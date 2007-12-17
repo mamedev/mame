@@ -642,7 +642,7 @@ static MACHINE_RESET( unico )
 }
 
 
-static struct EEPROM_interface zeropnt2_eeprom_interface =
+static const struct EEPROM_interface zeropnt2_eeprom_interface =
 {
 	7,				// address bits 7
 	8,				// data bits    8

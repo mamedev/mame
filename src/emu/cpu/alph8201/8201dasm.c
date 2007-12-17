@@ -15,7 +15,7 @@ typedef unsigned char byte;
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
 
-static const char *Formats[] = {
+static const char *const Formats[] = {
 	FMT("0000_0000", "NOP"),			// 00
 	FMT("0000_0001", "RRCA"),			// 01
 	FMT("0000_0010", "RLCA"),			// 02

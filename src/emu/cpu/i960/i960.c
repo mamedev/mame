@@ -396,7 +396,7 @@ INLINE void test(UINT32 opcode, int mask)
 
 static const char *i960_get_strflags(void)
 {
-	static const char *conditions[8] =
+	static const char *const conditions[8] =
 	{
 		"no", "g", "e", "ge", "l", "ne", "le", "o"
 	};

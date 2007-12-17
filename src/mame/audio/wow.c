@@ -29,7 +29,7 @@ wow_sh_ update- Null
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
  ****************************************************************************/
 
-static const char *PhonemeTable[65] =
+static const char *const PhonemeTable[65] =
 {
  "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
  "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
@@ -48,7 +48,7 @@ static const char *PhonemeTable[65] =
    doom.wav pop.wav
    Problems with YOU and YOU'LL and YOU'DD */
 
-static const char *wowWordTable[] =
+static const char *const wowWordTable[] =
 {
 "AH1I3Y1", "UH1GA1EH1N", "AHAH2", "AE1EH3M", "AE1EH3ND",
 "anew.wav", "AH1NUHTHER", "AE1NY", "anyone.wav", "appear.wav", "AH1UH3R", "UHR", "BABYY1S", "BAE1EH3K",
@@ -75,7 +75,7 @@ static const char *wowWordTable[] =
 #define num_samples (sizeof(wowWordTable)/sizeof(char *))
 
 
-const char *wow_sample_names[] =
+const char *const wow_sample_names[] =
 {
 	"*wow",
 	"a.wav", "again.wav", "ahh.wav", "am.wav", "and.wav",

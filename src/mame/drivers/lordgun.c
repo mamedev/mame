@@ -408,7 +408,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2,	// 2 chips
 	{ lordgun_eeprom_r,		input_port_1_r },		// Port A read

@@ -102,37 +102,37 @@ static int g65816_readop(UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-extern void (*g65816i_opcodes_M0X0[])(void);
+extern void (*const g65816i_opcodes_M0X0[])(void);
 extern uint g65816i_get_reg_M0X0(int regnum);
 extern void g65816i_set_reg_M0X0(int regnum, uint val);
 extern void g65816i_set_line_M0X0(int line, int state);
 extern int  g65816i_execute_M0X0(int cycles);
 
-extern void (*g65816i_opcodes_M0X1[])(void);
+extern void (*const g65816i_opcodes_M0X1[])(void);
 extern uint g65816i_get_reg_M0X1(int regnum);
 extern void g65816i_set_reg_M0X1(int regnum, uint val);
 extern void g65816i_set_line_M0X1(int line, int state);
 extern int  g65816i_execute_M0X1(int cycles);
 
-extern void (*g65816i_opcodes_M1X0[])(void);
+extern void (*const g65816i_opcodes_M1X0[])(void);
 extern uint g65816i_get_reg_M1X0(int regnum);
 extern void g65816i_set_reg_M1X0(int regnum, uint val);
 extern void g65816i_set_line_M1X0(int line, int state);
 extern int  g65816i_execute_M1X0(int cycles);
 
-extern void (*g65816i_opcodes_M1X1[])(void);
+extern void (*const g65816i_opcodes_M1X1[])(void);
 extern uint g65816i_get_reg_M1X1(int regnum);
 extern void g65816i_set_reg_M1X1(int regnum, uint val);
 extern void g65816i_set_line_M1X1(int line, int state);
 extern int  g65816i_execute_M1X1(int cycles);
 
-extern void (*g65816i_opcodes_E[])(void);
+extern void (*const g65816i_opcodes_E[])(void);
 extern uint g65816i_get_reg_E(int regnum);
 extern void g65816i_set_reg_E(int regnum, uint val);
 extern void g65816i_set_line_E(int line, int state);
 extern int  g65816i_execute_E(int cycles);
 
-void (**g65816i_opcodes[5])(void) =
+void (*const *const g65816i_opcodes[5])(void) =
 {
 	g65816i_opcodes_M0X0,
 	g65816i_opcodes_M0X1,
@@ -141,7 +141,7 @@ void (**g65816i_opcodes[5])(void) =
 	g65816i_opcodes_E
 };
 
-uint (*g65816i_get_reg[5])(int regnum) =
+uint (*const g65816i_get_reg[5])(int regnum) =
 {
 	g65816i_get_reg_M0X0,
 	g65816i_get_reg_M0X1,
@@ -150,7 +150,7 @@ uint (*g65816i_get_reg[5])(int regnum) =
 	g65816i_get_reg_E
 };
 
-void (*g65816i_set_reg[5])(int regnum, uint val) =
+void (*const g65816i_set_reg[5])(int regnum, uint val) =
 {
 	g65816i_set_reg_M0X0,
 	g65816i_set_reg_M0X1,
@@ -159,7 +159,7 @@ void (*g65816i_set_reg[5])(int regnum, uint val) =
 	g65816i_set_reg_E
 };
 
-void (*g65816i_set_line[5])(int line, int state) =
+void (*const g65816i_set_line[5])(int line, int state) =
 {
 	g65816i_set_line_M0X0,
 	g65816i_set_line_M0X1,
@@ -168,7 +168,7 @@ void (*g65816i_set_line[5])(int line, int state) =
 	g65816i_set_line_E
 };
 
-int (*g65816i_execute[5])(int cycles) =
+int (*const g65816i_execute[5])(int cycles) =
 {
 	g65816i_execute_M0X0,
 	g65816i_execute_M0X1,

@@ -649,7 +649,7 @@ static struct z80_irq_daisy_chain daisy_chain[] =
 
 
 
-static struct Samplesinterface senjyo_samples_interface =
+static const struct Samplesinterface senjyo_samples_interface =
 {
 	1,
 	NULL,

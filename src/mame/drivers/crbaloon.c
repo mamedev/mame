@@ -306,7 +306,7 @@ static GFXDECODE_START( crbaloon )
 GFXDECODE_END
 
 
-static struct SN76477interface sn76477_interface =
+static const struct SN76477interface sn76477_interface =
 {
 	RES_K( 47),	/*  4 noise_res          */
 	RES_K(330),	/*  5 filter_res         */

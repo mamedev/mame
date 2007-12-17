@@ -296,7 +296,7 @@ static unsigned char get_next_byte( void ) {
 }
 
 /* Table for indexed operations */
-static char index_reg[8][3] = {
+static const char index_reg[8][3] = {
 	"?", /* 0 - extended mode */
 	"?", /* 1 */
 	"x", /* 2 */
@@ -308,7 +308,7 @@ static char index_reg[8][3] = {
 };
 
 /* Table for tfr/exg operations */
-static char tfrexg_reg[8][3] = {
+static const char tfrexg_reg[8][3] = {
 	"a", /* 0 */
 	"b", /* 1 */
 	"x", /* 2 */
@@ -320,7 +320,7 @@ static char tfrexg_reg[8][3] = {
 };
 
 /* Table for stack S operations */
-static char stack_reg_s[8][3] = {
+static const char stack_reg_s[8][3] = {
 	"cc",
 	"a",
 	"b",
@@ -332,7 +332,7 @@ static char stack_reg_s[8][3] = {
 };
 
 /* Table for stack U operations */
-static char stack_reg_u[8][3] = {
+static const char stack_reg_u[8][3] = {
 	"cc",
 	"a",
 	"b",
@@ -1585,7 +1585,7 @@ typedef struct {
 	int confirmed;
 } konami_opcode_def;
 
-static konami_opcode_def op_table[256] = {
+static const konami_opcode_def op_table[256] = {
 	/* 00 */	{ illegal, 0 },
 	/* 01 */	{ illegal, 0 },
 	/* 02 */	{ illegal, 0 },

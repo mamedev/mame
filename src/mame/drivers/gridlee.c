@@ -408,7 +408,7 @@ static struct CustomSound_interface custom_interface =
 };
 
 
-static const char *sample_names[] =
+static const char *const sample_names[] =
 {
 	"*gridlee",
 	"bounce1.wav",
@@ -416,7 +416,7 @@ static const char *sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	8,	/* 8 channels */
 	sample_names

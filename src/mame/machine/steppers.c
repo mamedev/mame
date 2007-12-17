@@ -346,7 +346,7 @@ static const int BarcrestStepTab[] =
 	0, //0001->0110 1->6
 	0, //0001->0111 1->7
 	0, //0001->1000 1->8
-	-1, //0001->1001 1->9
+	-1,//0001->1001 1->9
 	0, //0001->1010 1->A
 	0, //0001->1011 1->B
 	0, //0001->1100 1->C
@@ -357,14 +357,14 @@ static const int BarcrestStepTab[] =
 	0, //0010->0000 2->0
 	0, //0010->0001 2->1
 	0, //0010->0010 2->2
-	-1, //0010->0011 2->3
+	-1,//0010->0011 2->3
 	0, //0010->0100 2->4
 	0, //0010->0101 2->5
 	1, //0010->0110 2->6
 	0, //0010->0111 2->7
-	0,//0010->1000 2->8
+	0, //0010->1000 2->8
 	0, //0010->1001 2->9
-	0,//0010->1010 2->A
+	0, //0010->1010 2->A
 	0, //0010->1011 2->B
 	0, //0010->1100 2->C
 	0, //0010->1101 2->D
@@ -372,7 +372,7 @@ static const int BarcrestStepTab[] =
 	0, //0010->1111 2->F
 
 	0, //0011->0000 3->0
-	-1, //0011->0001 3->1
+	-1,//0011->0001 3->1
 	1, //0011->0010 3->2
 	0, //0011->0011 3->3
 	0, //0011->0100 3->4
@@ -380,7 +380,7 @@ static const int BarcrestStepTab[] =
 	2, //0011->0110 3->6
 	0, //0011->0111 3->7
 	0, //0011->1000 3->8
-	-2, //0011->1001 3->9
+	-2,//0011->1001 3->9
 	0, //0011->1010 3->A
 	0, //0011->1011 3->B
 	0, //0011->1100 3->C
@@ -390,7 +390,7 @@ static const int BarcrestStepTab[] =
 
 	0, //0100->0000 4->0
 	0, //0100->0001 4->1
-	0,//0100->0010 4->2
+	0, //0100->0010 4->2
 	0, //0100->0011 4->3
 	0, //0100->0100 4->4
 	0, //0100->0101 4->5
@@ -409,9 +409,9 @@ static const int BarcrestStepTab[] =
 	0, //0101->0001 5->1
 	0, //0101->0010 5->2
 	0, //0101->0011 5->3
-	0,//0101->0100 5->4
+	0, //0101->0100 5->4
 	0, //0101->0101 5->5
-	0,//0101->0110 5->6
+	0, //0101->0110 5->6
 	0, //0101->0111 5->7
 	0, //0101->1000 5->8
 	0, //0101->1001 5->9
@@ -432,7 +432,7 @@ static const int BarcrestStepTab[] =
 	0, //0110->0111 6->7
 	0, //0110->1000 6->8
 	0, //0110->1001 6->9
-	0,//0110->1010 6->A
+	0, //0110->1010 6->A
 	0, //0110->1011 6->B
 	2, //0110->1100 6->C
 	0, //0110->1101 6->D
@@ -457,7 +457,7 @@ static const int BarcrestStepTab[] =
 	0, //0111->1111 7->F
 
 	0, //1000->0000 8->0
-	0,//1000->0001 8->1
+	0, //1000->0001 8->1
 	0, //1000->0010 8->2
 	0, //1000->0011 8->3
 	0, //1000->0100 8->4
@@ -468,7 +468,7 @@ static const int BarcrestStepTab[] =
 	1, //1000->1001 8->9
 	0, //1000->1010 8->A
 	0, //1000->1011 8->B
-	-1, //1000->1100 8->C
+	-1,//1000->1100 8->C
 	0, //1000->1101 8->D
 	0, //1000->1110 8->E
 	0, //1000->1111 8->F
@@ -478,14 +478,14 @@ static const int BarcrestStepTab[] =
 	0, //1001->0010 9->2
 	2, //1001->0011 9->3
 	0, //1001->0100 9->4
-	0,//1001->0101 9->5
+	0, //1001->0101 9->5
 	0, //1001->0110 9->6
 	0, //1001->0111 9->7
-	-1, //1001->1000 9->8
+	-1,//1001->1000 9->8
 	0, //1001->1001 9->9
 	0, //1001->1010 9->A
 	0, //1001->1011 9->B
-	-2, //1001->1100 9->C
+	-2,//1001->1100 9->C
 	0, //1001->1101 9->D
 	0, //1001->1110 9->E
 	0, //1001->1111 9->F
@@ -498,8 +498,8 @@ static const int BarcrestStepTab[] =
 	0, //1010->0101 A->5
 	0, //1010->0110 A->6
 	0, //1010->0111 A->7
-	0,//1010->1000 A->8
-	0,//1010->1001 A->9
+	0, //1010->1000 A->8
+	0, //1010->1001 A->9
 	0, //1010->1010 A->A
 	0, //1010->1011 A->B
 	0, //1010->1100 A->C
@@ -528,9 +528,9 @@ static const int BarcrestStepTab[] =
 	0, //1100->0001 C->1
 	0, //1100->0010 C->2
 	0, //1100->0011 C->3
-	-1, //1100->0100 C->4
+	-1,//1100->0100 C->4
 	0, //1100->0101 C->5
-	-2, //1100->0110 C->6
+	-2,//1100->0110 C->6
 	0, //1100->0111 C->7
 	1, //1100->1000 C->8
 	2, //1100->1001 C->9
@@ -605,20 +605,18 @@ void Stepper_init(int id, int type)
 		steppers[id].pattern     = 0;
 		steppers[id].old_pattern = 0;
 		steppers[id].step_pos    = 0;
-		steppers[id].max_steps   = (48*2)-1;
+		steppers[id].max_steps   = (48*2);
 		steppers[id].type		 = type;
 
 		switch ( steppers[id].type )
 		{
-			case STEPPER_48STEP_REEL :	  // STARPOINT RMxxx
+			case STARPOINT_48STEP_REEL :  // STARPOINT RMxxx
 			break;
-			case BARCREST_48STEP_REEL :	  // Barcrest reel units have different coil windings
-			steppers[id].index_pos   = 0;
-			steppers[id].index_len   = 16;
-			steppers[id].index_patt  = 0x09;
+			case BARCREST_48STEP_REEL :	  // Barcrest reel units have different coil windings and optic tabs
+			Stepper_set_index(id,0,16,0x09);
 			break;
-			case STEPPER_144STEPS_DICE :  // STARPOINT 1DCU DICE mechanism
-			steppers[id].max_steps = (144*2)-1;
+			case STARPOINT_144STEPS_DICE :// STARPOINT 1DCU DICE mechanism
+			steppers[id].max_steps = (144*2);
 			break;
 		}
 		state_save_register_item("Stepper", id, steppers[id].index_pos);
@@ -636,8 +634,8 @@ void Stepper_init(int id, int type)
 void Stepper_set_index(int id,int position,int length,int pattern)
 {
 	steppers[id].index_pos   = position;//location of first index value in half steps
-	steppers[id].index_len   = length;//number of half steps the index lasts
-	steppers[id].index_patt  = pattern;//hex value of coil pattern
+	steppers[id].index_len   = length;  //number of half steps the index lasts
+	steppers[id].index_patt  = pattern; //hex value of coil pattern
 }
 
 int Stepper_get_position(int id)
@@ -719,11 +717,11 @@ int Stepper_update(int id, UINT8 pattern)
 		switch ( steppers[id].type )
 		{
 			default:
-			case STEPPER_48STEP_REEL :	  // STARPOINT RMxxx
-			case STEPPER_144STEPS_DICE :  // STARPOINT 1DCU DICE mechanism
+			case STARPOINT_48STEP_REEL :	// STARPOINT RMxxx
+			case STARPOINT_144STEPS_DICE :  // STARPOINT 1DCU DICE mechanism
 			steps = StarpointStepTab[ index ];
 			break;
-			case BARCREST_48STEP_REEL :	  // Barcrest reel units have different optics
+			case BARCREST_48STEP_REEL :	    // Barcrest reel units have different windings
 			steps = BarcrestStepTab[ index ];
 			break;
 		}

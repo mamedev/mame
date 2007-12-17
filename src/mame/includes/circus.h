@@ -13,10 +13,10 @@ extern WRITE8_HANDLER( circus_clown_z_w );
 DISCRETE_SOUND_EXTERN( circus );
 DISCRETE_SOUND_EXTERN( robotbwl );
 DISCRETE_SOUND_EXTERN( crash );
-extern struct Samplesinterface circus_samples_interface;
-extern struct Samplesinterface crash_samples_interface;
-extern struct Samplesinterface ripcord_samples_interface;
-extern struct Samplesinterface robotbwl_samples_interface;
+extern const struct Samplesinterface circus_samples_interface;
+extern const struct Samplesinterface crash_samples_interface;
+extern const struct Samplesinterface ripcord_samples_interface;
+extern const struct Samplesinterface robotbwl_samples_interface;
 
 /*----------- defined in video/circus.c -----------*/
 

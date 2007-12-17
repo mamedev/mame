@@ -89,7 +89,7 @@ typedef struct
 	int (*int_ack)(int); /* Interrupt Acknowledge */
 	read8_handler read_vector;	/* Read vector override */
 	uint stopped;		/* Sets how the CPU is stopped */
-	void (**opcodes)(void);
+	void (*const *opcodes)(void);
 	uint (*get_reg)(int regnum);
 	void (*set_reg)(int regnum, uint val);
 	void (*set_line)(int line, int state);
@@ -101,11 +101,11 @@ extern int g65816_ICount;
 extern uint g65816i_source;
 extern uint g65816i_destination;
 
-extern void (**g65816i_opcodes[])(void);
-extern uint (*g65816i_get_reg[])(int regnum);
-extern void (*g65816i_set_reg[])(int regnum, uint val);
-extern void (*g65816i_set_line[])(int line, int state);
-extern int (*g65816i_execute[])(int cycles);
+extern void (*const *const g65816i_opcodes[])(void);
+extern uint (*const g65816i_get_reg[])(int regnum);
+extern void (*const g65816i_set_reg[])(int regnum, uint val);
+extern void (*const g65816i_set_line[])(int line, int state);
+extern int (*const g65816i_execute[])(int cycles);
 
 #define REGISTER_A		g65816i_cpu.a		/* Accumulator */
 #define REGISTER_B		g65816i_cpu.b		/* Accumulator hi byte */

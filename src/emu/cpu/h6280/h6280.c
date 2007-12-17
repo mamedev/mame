@@ -213,6 +213,7 @@ static void h6280_reset(void)
 
 	/* timer off by default */
 	h6280.timer_status=0;
+	h6280.timer_load = 128 * 1024;
 
     /* clear pending interrupts */
 	for (i = 0; i < 3; i++)

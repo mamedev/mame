@@ -417,7 +417,7 @@ INPUT_PORTS_END
 
 /***********************************************************/
 
-static const char *sharkatt_sample_names[] =
+static const char *const sharkatt_sample_names[] =
 {
 	"*sharkatt",
 	"talk.wav",
@@ -425,7 +425,7 @@ static const char *sharkatt_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface sharkatt_samples_interface =
+static const struct Samplesinterface sharkatt_samples_interface =
 {
 	2,	/* number of channels */
 	sharkatt_sample_names
@@ -433,7 +433,7 @@ static struct Samplesinterface sharkatt_samples_interface =
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static const char *thief_sample_names[] =
+static const char *const thief_sample_names[] =
 {
 	"*thief",
 	"talk.wav",
@@ -441,7 +441,7 @@ static const char *thief_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface thief_samples_interface =
+static const struct Samplesinterface thief_samples_interface =
 {
 	2,	/* number of channels */
 	thief_sample_names
@@ -449,7 +449,7 @@ static struct Samplesinterface thief_samples_interface =
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static const char *natodef_sample_names[] =
+static const char *const natodef_sample_names[] =
 {
 	"*natodef",
 	"talk.wav",
@@ -457,7 +457,7 @@ static const char *natodef_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface natodef_samples_interface =
+static const struct Samplesinterface natodef_samples_interface =
 {
 	2,	/* number of channels */
 	natodef_sample_names

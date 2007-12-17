@@ -70,7 +70,7 @@ uint m37710i_destination;
 
 /* interrupt control mapping */
 
-int m37710_irq_levels[M37710_LINE_MAX] =
+const int m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable
 	0x70,	// ADC
@@ -98,7 +98,7 @@ int m37710_irq_levels[M37710_LINE_MAX] =
 	0,	// reset
 };
 
-static int m37710_irq_vectors[M37710_LINE_MAX] =
+static const int m37710_irq_vectors[M37710_LINE_MAX] =
 {
 	// maskable          C74
 	0xffd6, // A-D converter     c68b
@@ -129,7 +129,7 @@ static int m37710_irq_vectors[M37710_LINE_MAX] =
 // M37710 internal peripherals
 
 #if M37710_DEBUG
-static const char *m37710_rnames[128] =
+static const char *const m37710_rnames[128] =
 {
 	"",
 	"",
@@ -261,7 +261,7 @@ static const char *m37710_rnames[128] =
 	"INT2 IRQ ctrl",
 };
 
-static const char *m37710_tnames[8] =
+static const char *const m37710_tnames[8] =
 {
 	"A0", "A1", "A2", "A3", "A4", "B0", "B1", "B2"
 };
@@ -684,39 +684,39 @@ static WRITE16_HANDLER( m37710_internal_word_w )
 	}
 }
 
-extern void (*m37710i_opcodes_M0X0[])(void);
-extern void (*m37710i_opcodes42_M0X0[])(void);
-extern void (*m37710i_opcodes89_M0X0[])(void);
+extern void (*const m37710i_opcodes_M0X0[])(void);
+extern void (*const m37710i_opcodes42_M0X0[])(void);
+extern void (*const m37710i_opcodes89_M0X0[])(void);
 extern uint m37710i_get_reg_M0X0(int regnum);
 extern void m37710i_set_reg_M0X0(int regnum, uint val);
 extern void m37710i_set_line_M0X0(int line, int state);
 extern int  m37710i_execute_M0X0(int cycles);
 
-extern void (*m37710i_opcodes_M0X1[])(void);
-extern void (*m37710i_opcodes42_M0X1[])(void);
-extern void (*m37710i_opcodes89_M0X1[])(void);
+extern void (*const m37710i_opcodes_M0X1[])(void);
+extern void (*const m37710i_opcodes42_M0X1[])(void);
+extern void (*const m37710i_opcodes89_M0X1[])(void);
 extern uint m37710i_get_reg_M0X1(int regnum);
 extern void m37710i_set_reg_M0X1(int regnum, uint val);
 extern void m37710i_set_line_M0X1(int line, int state);
 extern int  m37710i_execute_M0X1(int cycles);
 
-extern void (*m37710i_opcodes_M1X0[])(void);
-extern void (*m37710i_opcodes42_M1X0[])(void);
-extern void (*m37710i_opcodes89_M1X0[])(void);
+extern void (*const m37710i_opcodes_M1X0[])(void);
+extern void (*const m37710i_opcodes42_M1X0[])(void);
+extern void (*const m37710i_opcodes89_M1X0[])(void);
 extern uint m37710i_get_reg_M1X0(int regnum);
 extern void m37710i_set_reg_M1X0(int regnum, uint val);
 extern void m37710i_set_line_M1X0(int line, int state);
 extern int  m37710i_execute_M1X0(int cycles);
 
-extern void (*m37710i_opcodes_M1X1[])(void);
-extern void (*m37710i_opcodes42_M1X1[])(void);
-extern void (*m37710i_opcodes89_M1X1[])(void);
+extern void (*const m37710i_opcodes_M1X1[])(void);
+extern void (*const m37710i_opcodes42_M1X1[])(void);
+extern void (*const m37710i_opcodes89_M1X1[])(void);
 extern uint m37710i_get_reg_M1X1(int regnum);
 extern void m37710i_set_reg_M1X1(int regnum, uint val);
 extern void m37710i_set_line_M1X1(int line, int state);
 extern int  m37710i_execute_M1X1(int cycles);
 
-void (**m37710i_opcodes[4])(void) =
+void (*const *const m37710i_opcodes[4])(void) =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -724,7 +724,7 @@ void (**m37710i_opcodes[4])(void) =
 	m37710i_opcodes_M1X1,
 };
 
-void (**m37710i_opcodes2[4])(void) =
+void (*const *const m37710i_opcodes2[4])(void) =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -732,7 +732,7 @@ void (**m37710i_opcodes2[4])(void) =
 	m37710i_opcodes42_M1X1,
 };
 
-void (**m37710i_opcodes3[4])(void) =
+void (*const *const m37710i_opcodes3[4])(void) =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,
@@ -740,7 +740,7 @@ void (**m37710i_opcodes3[4])(void) =
 	m37710i_opcodes89_M1X1,
 };
 
-uint (*m37710i_get_reg[4])(int regnum) =
+uint (*const m37710i_get_reg[4])(int regnum) =
 {
 	m37710i_get_reg_M0X0,
 	m37710i_get_reg_M0X1,
@@ -748,7 +748,7 @@ uint (*m37710i_get_reg[4])(int regnum) =
 	m37710i_get_reg_M1X1,
 };
 
-void (*m37710i_set_reg[4])(int regnum, uint val) =
+void (*const m37710i_set_reg[4])(int regnum, uint val) =
 {
 	m37710i_set_reg_M0X0,
 	m37710i_set_reg_M0X1,
@@ -756,7 +756,7 @@ void (*m37710i_set_reg[4])(int regnum, uint val) =
 	m37710i_set_reg_M1X1,
 };
 
-void (*m37710i_set_line[4])(int line, int state) =
+void (*const m37710i_set_line[4])(int line, int state) =
 {
 	m37710i_set_line_M0X0,
 	m37710i_set_line_M0X1,
@@ -764,7 +764,7 @@ void (*m37710i_set_line[4])(int line, int state) =
 	m37710i_set_line_M1X1,
 };
 
-int (*m37710i_execute[4])(int cycles) =
+int (*const m37710i_execute[4])(int cycles) =
 {
 	m37710i_execute_M0X0,
 	m37710i_execute_M0X1,

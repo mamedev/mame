@@ -57,7 +57,7 @@ static int LBIops33[256];
 
 #include "420ops.c"
 
-static s_opcode cop420_opcode_op33[256]=
+static const s_opcode cop420_opcode_op33[256]=
 {
 	{1, inil 		},{1, skgbz0 	},{1, illegal 	},{1, skgbz2 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -98,7 +98,7 @@ static void cop420_op33(void)
 	(*(cop420_opcode_op33[ROM(PC++)].function))();
 }
 
-static s_opcode cop420_opcode_main[256]=
+static const s_opcode cop420_opcode_main[256]=
 {
 	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis0		},{1, ld0		},{1, x0		},{1, xds0		},
 	{1, lbi0_9		},{1, lbi0_10	},{1, lbi0_11	},{1, lbi0_12		},{1, lbi0_13	},{1, lbi0_14	},{1, lbi0_15	},{1, lbi0_0	},

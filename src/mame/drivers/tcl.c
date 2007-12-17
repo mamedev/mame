@@ -86,7 +86,7 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout2,     0, 16 ) /* wrong */
 GFXDECODE_END
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2,
 	{ NULL, NULL },

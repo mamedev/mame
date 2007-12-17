@@ -38,7 +38,7 @@ UINT16 xmen_current_frame;
 static int init_eeprom_count;
 
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	7,				/* address bits */
 	8,				/* data bits */

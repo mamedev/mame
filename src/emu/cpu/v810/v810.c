@@ -877,7 +877,7 @@ static UINT32 opFpoint(void)
 	return clkIF+1;
 }
 
-static UINT32 (*OpCodeTable[64])(void) =
+static UINT32 (*const OpCodeTable[64])(void) =
 {
 	/* 0x00 */ opMOVr,  	// mov r1,r2            1
 	/* 0x01 */ opADDr,  	// add r1,r2            1

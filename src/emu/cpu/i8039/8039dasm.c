@@ -29,7 +29,7 @@ typedef unsigned char byte;
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
 
-static const char *Formats[] = {
+static const char *const Formats[] = {
 	FMT("00000011dddddddd", "add  a,#$%X"),
 	FMT("01101rrr", "add  a,%R"),
 	FMT("0110000r", "add  a,@%R"),
@@ -148,7 +148,8 @@ static int OpInizialized = 0;
 
 static void InitDasm8039(void)
 {
-	const char *p, **ops;
+	const char *p;
+	const char *const *ops;
 	byte mask, bits;
 	int bit;
 	int i;

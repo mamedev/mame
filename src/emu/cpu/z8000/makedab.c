@@ -69,7 +69,7 @@ int main(int ac, char **av)
     printf(" * 0..7    result value                           \n");
     printf(" * 8       carry flag after                       \n");
     printf(" ************************************************/\n");
-    printf("static UINT16 Z8000_dab[0x800] = {\n");
+    printf("static const UINT16 Z8000_dab[0x800] = {\n");
     for (i = 0; i < 0x800; i++) {
 		if ((i & 0x3ff) == 0) {
 			if (i & 0x400)

@@ -295,11 +295,11 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 *opptr)
 	if (opcode != 0) {		// this is a little workaround for VF3
 		switch(opcode >> 26)
 		{
-			case 19:	return optable19[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 31:	return optable31[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 59:	return optable59[(opcode >> 1) & 0x3ff](drc, opcode);
-			case 63:	return optable63[(opcode >> 1) & 0x3ff](drc, opcode);
-			default:	return optable[opcode >> 26](drc, opcode);
+			case 19:	return ppc.optable19[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 31:	return ppc.optable31[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 59:	return ppc.optable59[(opcode >> 1) & 0x3ff](drc, opcode);
+			case 63:	return ppc.optable63[(opcode >> 1) & 0x3ff](drc, opcode);
+			default:	return ppc.optable[opcode >> 26](drc, opcode);
 		}
 	}
 	return RECOMPILE_SUCCESSFUL | RECOMPILE_END_OF_STRING;
@@ -484,7 +484,7 @@ static void append_branch_or_dispatch(drc_core *drc, UINT32 newpc, int cycles)
 
 /*
 // this table translates x86 SF and ZF flags to PPC CR values
-static UINT8 condition_table[4] =
+static const UINT8 condition_table[4] =
 {
     0x4,    // x86 SF == 0, ZF == 0   -->   PPC GT (positive)
     0x2,    // x86 SF == 0, ZF == 1   -->   PPC EQ (zero)

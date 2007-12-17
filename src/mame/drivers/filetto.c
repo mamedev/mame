@@ -475,7 +475,7 @@ static WRITE8_HANDLER( sys_reset_w )
 }
 
 
-static ppi8255_interface filetto_ppi8255_intf =
+static const ppi8255_interface filetto_ppi8255_intf =
 {
 	2, 							/* 2 chips */
 	{ port_a_r,NULL },			/* Port A read */

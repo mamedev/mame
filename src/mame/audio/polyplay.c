@@ -50,7 +50,7 @@ void polyplay_play_channel1(int data)
 	if (data) {
 		freq1 = 2457600 / 16 / data / 8;
 		sample_set_volume(0, channel_playing1 * 1.0);
-		sample_start_raw(0, backgroundwave, sizeof(backgroundwave)/2, sizeof(backgroundwave)*freq1,1);
+		sample_start_raw(0, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq1,1);
 	}
 	else {
 		sample_stop(0);
@@ -63,7 +63,7 @@ void polyplay_play_channel2(int data)
 	if (data) {
 		freq2 = 2457600 / 16 / data / 8;
 		sample_set_volume(1, channel_playing2 * 1.0);
-		sample_start_raw(1, backgroundwave, sizeof(backgroundwave)/2, sizeof(backgroundwave)*freq2,1);
+		sample_start_raw(1, backgroundwave, ARRAY_LENGTH(backgroundwave), sizeof(backgroundwave)*freq2,1);
 	}
 	else {
 		sample_stop(0);

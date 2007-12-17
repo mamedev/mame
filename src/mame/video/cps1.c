@@ -230,7 +230,7 @@ struct CPS1config
 	int kludge;  /* Ghouls n Ghosts sprite kludge */
 };
 
-static struct CPS1config *cps1_game_config;
+static const struct CPS1config *cps1_game_config;
 
 /*                 CPSB ID    multiply protection  ctrl     priority masks   unknwn     layer enable masks  */
 #define CPS_B_01 0x00,0x0000, 0,0,0,0, /* n/a */   0x66,{0x68,0x6a,0x6c,0x6e},0x70, {0x02,0x04,0x08,0x30,0x30}
@@ -262,7 +262,7 @@ static struct CPS1config *cps1_game_config;
 #define HACK_B_1 0x00,0x0000, 0x00,0x00,0x00,0x00, 0x54,{0x52,0x50,0x4e,0x4c},0x5c, {0xff,0xff,0xff,0x00,0x00}
 
 
-static struct CPS1config cps1_config_table[]=
+static const struct CPS1config cps1_config_table[]=
 {
 	/* name       CPSB    banks        tile limits            kludge */
 	{"forgottn",CPS_B_01, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 7 },
@@ -430,7 +430,7 @@ void cps_setversion(int v)
 static MACHINE_RESET( cps )
 {
 	const char *gamename = machine->gamedrv->name;
-	struct CPS1config *pCFG=&cps1_config_table[0];
+	const struct CPS1config *pCFG=&cps1_config_table[0];
 
 	while(pCFG->name)
 	{

@@ -9,7 +9,7 @@
 #include "cpuintrf.h"
 
 
-static const char *reg[32] =
+static const char *const reg[32] =
 {
 	"0",	"r1",	"r2",	"r3",	"r4",	"r5",	"r6",	"r7",
 	"r8",	"r9",	"r10",	"r11",	"r12",	"r13",	"r14",	"r15",
@@ -18,7 +18,7 @@ static const char *reg[32] =
 };
 
 
-static const char *cpreg[4][32] =
+static const char *const cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo","cpr3",	"Context",	"cpr5",	"cpr6",	"cpr7",
@@ -47,7 +47,7 @@ static const char *cpreg[4][32] =
 };
 
 
-static const char *ccreg[4][32] =
+static const char *const ccreg[4][32] =
 {
 	{
 		"ccr0",	"ccr1",	"ccr2",	"ccr3",	"ccr4",	"ccr5",	"ccr6",	"ccr7",

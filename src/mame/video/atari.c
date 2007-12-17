@@ -93,7 +93,7 @@ static UINT32 tv_artifacts = 0;
  * player/missile colors calculated for the first part (00-1F).
  * The priorities of combining priority bits (which games use!) are:
  ************************************************************************/
-static	UINT8	_pm_colors[32][8*2*8] = {
+static const UINT8 _pm_colors[32][8*2*8] = {
 	{
 		M0, PL0,P0, PL0,M1, PL1,P1, PL1,M2, PL2,P2, PL2,M3, PL3,P3, PL3,  // 00
 		M0, PL0,P0, PL0,M1, PL1,P1, PL1,M2, PL2,P2, PL2,M3, PL3,P3, PL3,
@@ -423,7 +423,7 @@ static	UINT8	_pm_colors[32][8*2*8] = {
 static void prio_init(void)
 {
 	int i, j, pm, p, c;
-	UINT8 * prio;
+	const UINT8 * prio;
 
 	/* 32 priority bit combinations */
 	for( i = 0; i < 32; i++ )

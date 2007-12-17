@@ -20,7 +20,7 @@
 static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqcallback)(int));
 static void ppcdrc603_exit(void);
 #endif
-#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240)
+#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240 || HAS_PPC604)
 static void ppcdrc603_reset(void);
 static int ppcdrc603_execute(int cycles);
 static void ppcdrc603_set_irq_line(int irqline, int state);
@@ -102,7 +102,7 @@ static void ppcdrc_entrygen(drc_core *drc);
 	if((ppc.msr & 0x2000) == 0){	\
 	}
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT32		ppc_field_xlat[256];
 #endif
 
@@ -317,6 +317,12 @@ typedef struct {
 
 	/* saved ESP when entering entry point */
 	UINT32 host_esp;
+
+	UINT32 (* optable19[1024])(drc_core *, UINT32);
+	UINT32 (* optable31[1024])(drc_core *, UINT32);
+	UINT32 (* optable59[1024])(drc_core *, UINT32);
+	UINT32 (* optable63[1024])(drc_core *, UINT32);
+	UINT32 (* optable[64])(drc_core *, UINT32);
 } PPC_REGS;
 
 
@@ -522,7 +528,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 		case SPR_PVR:		return;
 	}
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if(ppc.is603 || ppc.is602) {
 		switch(spr)
 		{
@@ -735,7 +741,7 @@ INLINE UINT32 ppc_get_spr(int spr)
 	}
 #endif
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if (ppc.is603 || ppc.is602)
 	{
 		switch (spr)
@@ -860,12 +866,6 @@ static void log_code(drc_core *drc)
 #endif
 
 /***********************************************************************/
-
-static UINT32 (* optable19[1024])(drc_core *, UINT32);
-static UINT32 (* optable31[1024])(drc_core *, UINT32);
-static UINT32 (* optable59[1024])(drc_core *, UINT32);
-static UINT32 (* optable63[1024])(drc_core *, UINT32);
-static UINT32 (* optable[64])(drc_core *, UINT32);
 
 #include "ppc_mem.c"
 
@@ -1007,13 +1007,13 @@ static void ppc_init(void)
 	int i,j;
 
 	for( i=0; i < 64; i++ ) {
-		optable[i] = recompile_invalid;
+		ppc.optable[i] = recompile_invalid;
 	}
 	for( i=0; i < 1024; i++ ) {
-		optable19[i] = recompile_invalid;
-		optable31[i] = recompile_invalid;
-		optable59[i] = recompile_invalid;
-		optable63[i] = recompile_invalid;
+		ppc.optable19[i] = recompile_invalid;
+		ppc.optable31[i] = recompile_invalid;
+		ppc.optable59[i] = recompile_invalid;
+		ppc.optable63[i] = recompile_invalid;
 	}
 
 	/* Fill the opcode tables */
@@ -1022,11 +1022,11 @@ static void ppc_init(void)
 		switch(ppcdrc_opcode_common[i].code)
 		{
 			case 19:
-				optable19[ppcdrc_opcode_common[i].subcode] = ppcdrc_opcode_common[i].handler;
+				ppc.optable19[ppcdrc_opcode_common[i].subcode] = ppcdrc_opcode_common[i].handler;
 				break;
 
 			case 31:
-				optable31[ppcdrc_opcode_common[i].subcode] = ppcdrc_opcode_common[i].handler;
+				ppc.optable31[ppcdrc_opcode_common[i].subcode] = ppcdrc_opcode_common[i].handler;
 				break;
 
 			case 59:
@@ -1034,7 +1034,7 @@ static void ppc_init(void)
 				break;
 
 			default:
-				optable[ppcdrc_opcode_common[i].code] = ppcdrc_opcode_common[i].handler;
+				ppc.optable[ppcdrc_opcode_common[i].code] = ppcdrc_opcode_common[i].handler;
 		}
 
 	}
@@ -1063,16 +1063,16 @@ static void ppcdrc403_init(int index, int clock, const void *_config, int (*irqc
 	ppcdrc_init();
 
 	/* PPC403 specific opcodes */
-	optable31[454] = recompile_dccci;
-	optable31[486] = recompile_dcread;
-	optable31[262] = recompile_icbt;
-	optable31[966] = recompile_iccci;
-	optable31[998] = recompile_icread;
-	optable31[323] = recompile_mfdcr;
-	optable31[451] = recompile_mtdcr;
-	optable31[131] = recompile_wrtee;
-	optable31[163] = recompile_wrteei;
-	optable19[51] = recompile_rfci;
+	ppc.optable31[454] = recompile_dccci;
+	ppc.optable31[486] = recompile_dcread;
+	ppc.optable31[262] = recompile_icbt;
+	ppc.optable31[966] = recompile_iccci;
+	ppc.optable31[998] = recompile_icread;
+	ppc.optable31[323] = recompile_mfdcr;
+	ppc.optable31[451] = recompile_mtdcr;
+	ppc.optable31[131] = recompile_wrtee;
+	ppc.optable31[163] = recompile_wrteei;
+	ppc.optable19[51] = recompile_rfci;
 
 	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback, NULL);
 	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback, NULL);
@@ -1208,77 +1208,79 @@ static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqc
 	ppc_init();
 	ppcdrc_init();
 
-	optable[48] = recompile_lfs;
-	optable[49] = recompile_lfsu;
-	optable[50] = recompile_lfd;
-	optable[51] = recompile_lfdu;
-	optable[52] = recompile_stfs;
-	optable[53] = recompile_stfsu;
-	optable[54] = recompile_stfd;
-	optable[55] = recompile_stfdu;
-	optable31[631] = recompile_lfdux;
-	optable31[599] = recompile_lfdx;
-	optable31[567] = recompile_lfsux;
-	optable31[535] = recompile_lfsx;
-	optable31[595] = recompile_mfsr;
-	optable31[659] = recompile_mfsrin;
-	optable31[371] = recompile_mftb;
-	optable31[210] = recompile_mtsr;
-	optable31[242] = recompile_mtsrin;
-	optable31[758] = recompile_dcba;
-	optable31[759] = recompile_stfdux;
-	optable31[727] = recompile_stfdx;
-	optable31[983] = recompile_stfiwx;
-	optable31[695] = recompile_stfsux;
-	optable31[663] = recompile_stfsx;
-	optable31[370] = recompile_tlbia;
-	optable31[306] = recompile_tlbie;
-	optable31[566] = recompile_tlbsync;
-	optable31[310] = recompile_eciwx;
-	optable31[438] = recompile_ecowx;
+	ppc.optable[48] = recompile_lfs;
+	ppc.optable[49] = recompile_lfsu;
+	ppc.optable[50] = recompile_lfd;
+	ppc.optable[51] = recompile_lfdu;
+	ppc.optable[52] = recompile_stfs;
+	ppc.optable[53] = recompile_stfsu;
+	ppc.optable[54] = recompile_stfd;
+	ppc.optable[55] = recompile_stfdu;
+	ppc.optable31[631] = recompile_lfdux;
+	ppc.optable31[599] = recompile_lfdx;
+	ppc.optable31[567] = recompile_lfsux;
+	ppc.optable31[535] = recompile_lfsx;
+	ppc.optable31[595] = recompile_mfsr;
+	ppc.optable31[659] = recompile_mfsrin;
+	ppc.optable31[371] = recompile_mftb;
+	ppc.optable31[210] = recompile_mtsr;
+	ppc.optable31[242] = recompile_mtsrin;
+	ppc.optable31[758] = recompile_dcba;
+	ppc.optable31[759] = recompile_stfdux;
+	ppc.optable31[727] = recompile_stfdx;
+	ppc.optable31[983] = recompile_stfiwx;
+	ppc.optable31[695] = recompile_stfsux;
+	ppc.optable31[663] = recompile_stfsx;
+	ppc.optable31[370] = recompile_tlbia;
+	ppc.optable31[306] = recompile_tlbie;
+	ppc.optable31[566] = recompile_tlbsync;
+	ppc.optable31[310] = recompile_eciwx;
+	ppc.optable31[438] = recompile_ecowx;
 
-	optable63[264] = recompile_fabsx;
-	optable63[21] = recompile_faddx;
-	optable63[32] = recompile_fcmpo;
-	optable63[0] = recompile_fcmpu;
-	optable63[14] = recompile_fctiwx;
-	optable63[15] = recompile_fctiwzx;
-	optable63[18] = recompile_fdivx;
-	optable63[72] = recompile_fmrx;
-	optable63[136] = recompile_fnabsx;
-	optable63[40] = recompile_fnegx;
-	optable63[12] = recompile_frspx;
-	optable63[26] = recompile_frsqrtex;
-	optable63[22] = recompile_fsqrtx;
-	optable63[20] = recompile_fsubx;
-	optable63[583] = recompile_mffsx;
-	optable63[70] = recompile_mtfsb0x;
-	optable63[38] = recompile_mtfsb1x;
-	optable63[711] = recompile_mtfsfx;
-	optable63[134] = recompile_mtfsfix;
-	optable63[64] = recompile_mcrfs;
+	ppc.optable63[264] = recompile_fabsx;
+	ppc.optable63[21] = recompile_faddx;
+	ppc.optable63[32] = recompile_fcmpo;
+	ppc.optable63[0] = recompile_fcmpu;
+	ppc.optable63[14] = recompile_fctiwx;
+	ppc.optable63[15] = recompile_fctiwzx;
+	ppc.optable63[18] = recompile_fdivx;
+	ppc.optable63[72] = recompile_fmrx;
+	ppc.optable63[136] = recompile_fnabsx;
+	ppc.optable63[40] = recompile_fnegx;
+	ppc.optable63[12] = recompile_frspx;
+	ppc.optable63[26] = recompile_frsqrtex;
+	ppc.optable63[22] = recompile_fsqrtx;
+	ppc.optable63[20] = recompile_fsubx;
+	ppc.optable63[583] = recompile_mffsx;
+	ppc.optable63[70] = recompile_mtfsb0x;
+	ppc.optable63[38] = recompile_mtfsb1x;
+	ppc.optable63[711] = recompile_mtfsfx;
+	ppc.optable63[134] = recompile_mtfsfix;
+	ppc.optable63[64] = recompile_mcrfs;
 
-	optable59[21] = recompile_faddsx;
-	optable59[18] = recompile_fdivsx;
-	optable59[24] = recompile_fresx;
-	optable59[22] = recompile_fsqrtsx;
-	optable59[20] = recompile_fsubsx;
+	ppc.optable59[21] = recompile_faddsx;
+	ppc.optable59[18] = recompile_fdivsx;
+	ppc.optable59[24] = recompile_fresx;
+	ppc.optable59[22] = recompile_fsqrtsx;
+	ppc.optable59[20] = recompile_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = recompile_fmaddx;
-		optable63[i * 32 | 28] = recompile_fmsubx;
-		optable63[i * 32 | 25] = recompile_fmulx;
-		optable63[i * 32 | 31] = recompile_fnmaddx;
-		optable63[i * 32 | 30] = recompile_fnmsubx;
-		optable63[i * 32 | 23] = recompile_fselx;
+		ppc.optable63[i * 32 | 29] = recompile_fmaddx;
+		ppc.optable63[i * 32 | 28] = recompile_fmsubx;
+		ppc.optable63[i * 32 | 25] = recompile_fmulx;
+		ppc.optable63[i * 32 | 31] = recompile_fnmaddx;
+		ppc.optable63[i * 32 | 30] = recompile_fnmsubx;
+		ppc.optable63[i * 32 | 23] = recompile_fselx;
 
-		optable59[i * 32 | 29] = recompile_fmaddsx;
-		optable59[i * 32 | 28] = recompile_fmsubsx;
-		optable59[i * 32 | 25] = recompile_fmulsx;
-		optable59[i * 32 | 31] = recompile_fnmaddsx;
-		optable59[i * 32 | 30] = recompile_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = recompile_fmaddsx;
+		ppc.optable59[i * 32 | 28] = recompile_fmsubsx;
+		ppc.optable59[i * 32 | 25] = recompile_fmulsx;
+		ppc.optable59[i * 32 | 31] = recompile_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
 	}
+
+	ppc.optable31[978] = recompile_tlbld;
 
 	for(i = 0; i < 256; i++)
 	{
@@ -1343,7 +1345,7 @@ static void ppcdrc603_exit(void)
 }
 #endif
 
-#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240)
+#if (HAS_PPC601 || HAS_PPC603 || HAS_MPC8240 || HAS_PPC604)
 static void ppcdrc603_reset(void)
 {
 	ppc.pc = ppc.npc = 0xfff00100;
@@ -1407,76 +1409,76 @@ static void ppcdrc602_init(int index, int clock, const void *_config, int (*irqc
 	ppc_init();
 	ppcdrc_init();
 
-	optable[48] = recompile_lfs;
-	optable[49] = recompile_lfsu;
-	optable[50] = recompile_lfd;
-	optable[51] = recompile_lfdu;
-	optable[52] = recompile_stfs;
-	optable[53] = recompile_stfsu;
-	optable[54] = recompile_stfd;
-	optable[55] = recompile_stfdu;
-	optable31[631] = recompile_lfdux;
-	optable31[599] = recompile_lfdx;
-	optable31[567] = recompile_lfsux;
-	optable31[535] = recompile_lfsx;
-	optable31[595] = recompile_mfsr;
-	optable31[659] = recompile_mfsrin;
-	optable31[371] = recompile_mftb;
-	optable31[210] = recompile_mtsr;
-	optable31[242] = recompile_mtsrin;
-	optable31[758] = recompile_dcba;
-	optable31[759] = recompile_stfdux;
-	optable31[727] = recompile_stfdx;
-	optable31[983] = recompile_stfiwx;
-	optable31[695] = recompile_stfsux;
-	optable31[663] = recompile_stfsx;
-	optable31[370] = recompile_tlbia;
-	optable31[306] = recompile_tlbie;
-	optable31[566] = recompile_tlbsync;
-	optable31[310] = recompile_eciwx;
-	optable31[438] = recompile_ecowx;
+	ppc.optable[48] = recompile_lfs;
+	ppc.optable[49] = recompile_lfsu;
+	ppc.optable[50] = recompile_lfd;
+	ppc.optable[51] = recompile_lfdu;
+	ppc.optable[52] = recompile_stfs;
+	ppc.optable[53] = recompile_stfsu;
+	ppc.optable[54] = recompile_stfd;
+	ppc.optable[55] = recompile_stfdu;
+	ppc.optable31[631] = recompile_lfdux;
+	ppc.optable31[599] = recompile_lfdx;
+	ppc.optable31[567] = recompile_lfsux;
+	ppc.optable31[535] = recompile_lfsx;
+	ppc.optable31[595] = recompile_mfsr;
+	ppc.optable31[659] = recompile_mfsrin;
+	ppc.optable31[371] = recompile_mftb;
+	ppc.optable31[210] = recompile_mtsr;
+	ppc.optable31[242] = recompile_mtsrin;
+	ppc.optable31[758] = recompile_dcba;
+	ppc.optable31[759] = recompile_stfdux;
+	ppc.optable31[727] = recompile_stfdx;
+	ppc.optable31[983] = recompile_stfiwx;
+	ppc.optable31[695] = recompile_stfsux;
+	ppc.optable31[663] = recompile_stfsx;
+	ppc.optable31[370] = recompile_tlbia;
+	ppc.optable31[306] = recompile_tlbie;
+	ppc.optable31[566] = recompile_tlbsync;
+	ppc.optable31[310] = recompile_eciwx;
+	ppc.optable31[438] = recompile_ecowx;
 
-	optable63[264] = recompile_fabsx;
-	optable63[21] = recompile_faddx;
-	optable63[32] = recompile_fcmpo;
-	optable63[0] = recompile_fcmpu;
-	optable63[14] = recompile_fctiwx;
-	optable63[15] = recompile_fctiwzx;
-	optable63[18] = recompile_fdivx;
-	optable63[72] = recompile_fmrx;
-	optable63[136] = recompile_fnabsx;
-	optable63[40] = recompile_fnegx;
-	optable63[12] = recompile_frspx;
-	optable63[26] = recompile_frsqrtex;
-	optable63[22] = recompile_fsqrtx;
-	optable63[20] = recompile_fsubx;
-	optable63[583] = recompile_mffsx;
-	optable63[70] = recompile_mtfsb0x;
-	optable63[38] = recompile_mtfsb1x;
-	optable63[711] = recompile_mtfsfx;
-	optable63[134] = recompile_mtfsfix;
-	optable63[64] = recompile_mcrfs;
+	ppc.optable63[264] = recompile_fabsx;
+	ppc.optable63[21] = recompile_faddx;
+	ppc.optable63[32] = recompile_fcmpo;
+	ppc.optable63[0] = recompile_fcmpu;
+	ppc.optable63[14] = recompile_fctiwx;
+	ppc.optable63[15] = recompile_fctiwzx;
+	ppc.optable63[18] = recompile_fdivx;
+	ppc.optable63[72] = recompile_fmrx;
+	ppc.optable63[136] = recompile_fnabsx;
+	ppc.optable63[40] = recompile_fnegx;
+	ppc.optable63[12] = recompile_frspx;
+	ppc.optable63[26] = recompile_frsqrtex;
+	ppc.optable63[22] = recompile_fsqrtx;
+	ppc.optable63[20] = recompile_fsubx;
+	ppc.optable63[583] = recompile_mffsx;
+	ppc.optable63[70] = recompile_mtfsb0x;
+	ppc.optable63[38] = recompile_mtfsb1x;
+	ppc.optable63[711] = recompile_mtfsfx;
+	ppc.optable63[134] = recompile_mtfsfix;
+	ppc.optable63[64] = recompile_mcrfs;
 
-	optable59[21] = recompile_faddsx;
-	optable59[18] = recompile_fdivsx;
-	optable59[24] = recompile_fresx;
-	optable59[22] = recompile_fsqrtsx;
-	optable59[20] = recompile_fsubsx;
+	ppc.optable59[21] = recompile_faddsx;
+	ppc.optable59[18] = recompile_fdivsx;
+	ppc.optable59[24] = recompile_fresx;
+	ppc.optable59[22] = recompile_fsqrtsx;
+	ppc.optable59[20] = recompile_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = recompile_fmaddx;
-		optable63[i * 32 | 28] = recompile_fmsubx;
-		optable63[i * 32 | 25] = recompile_fmulx;
-		optable63[i * 32 | 31] = recompile_fnmaddx;
-		optable63[i * 32 | 30] = recompile_fnmsubx;
-		optable63[i * 32 | 23] = recompile_fselx;
+		ppc.optable63[i * 32 | 29] = recompile_fmaddx;
+		ppc.optable63[i * 32 | 28] = recompile_fmsubx;
+		ppc.optable63[i * 32 | 25] = recompile_fmulx;
+		ppc.optable63[i * 32 | 31] = recompile_fnmaddx;
+		ppc.optable63[i * 32 | 30] = recompile_fnmsubx;
+		ppc.optable63[i * 32 | 23] = recompile_fselx;
 
-		optable59[i * 32 | 29] = recompile_fmaddsx;
-		optable59[i * 32 | 28] = recompile_fmsubsx;
-		optable59[i * 32 | 25] = recompile_fmulsx;
-		optable59[i * 32 | 31] = recompile_fnmaddsx;
-		optable59[i * 32 | 30] = recompile_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = recompile_fmaddsx;
+		ppc.optable59[i * 32 | 28] = recompile_fmsubsx;
+		ppc.optable59[i * 32 | 25] = recompile_fmulsx;
+		ppc.optable59[i * 32 | 31] = recompile_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1493,10 +1495,10 @@ static void ppcdrc602_init(int index, int clock, const void *_config, int (*irqc
 	}
 
 	// PPC602 specific opcodes
-	optable31[596] = recompile_esa;
-	optable31[628] = recompile_dsa;
-	optable31[1010] = recompile_tlbli;
-	optable31[978] = recompile_tlbld;
+	ppc.optable31[596] = recompile_esa;
+	ppc.optable31[628] = recompile_dsa;
+	ppc.optable31[1010] = recompile_tlbli;
+	ppc.optable31[978] = recompile_tlbld;
 
 	ppc.is603 = 0;
 	ppc.is602 = 1;
@@ -1597,76 +1599,76 @@ static void mpc8240drc_init(int index, int clock, const void *_config, int (*irq
 	ppc_init();
 	ppcdrc_init();
 
-	optable[48] = recompile_lfs;
-	optable[49] = recompile_lfsu;
-	optable[50] = recompile_lfd;
-	optable[51] = recompile_lfdu;
-	optable[52] = recompile_stfs;
-	optable[53] = recompile_stfsu;
-	optable[54] = recompile_stfd;
-	optable[55] = recompile_stfdu;
-	optable31[631] = recompile_lfdux;
-	optable31[599] = recompile_lfdx;
-	optable31[567] = recompile_lfsux;
-	optable31[535] = recompile_lfsx;
-	optable31[595] = recompile_mfsr;
-	optable31[659] = recompile_mfsrin;
-	optable31[371] = recompile_mftb;
-	optable31[210] = recompile_mtsr;
-	optable31[242] = recompile_mtsrin;
-	optable31[758] = recompile_dcba;
-	optable31[759] = recompile_stfdux;
-	optable31[727] = recompile_stfdx;
-	optable31[983] = recompile_stfiwx;
-	optable31[695] = recompile_stfsux;
-	optable31[663] = recompile_stfsx;
-	optable31[370] = recompile_tlbia;
-	optable31[306] = recompile_tlbie;
-	optable31[566] = recompile_tlbsync;
-	optable31[310] = recompile_eciwx;
-	optable31[438] = recompile_ecowx;
+	ppc.optable[48] = recompile_lfs;
+	ppc.optable[49] = recompile_lfsu;
+	ppc.optable[50] = recompile_lfd;
+	ppc.optable[51] = recompile_lfdu;
+	ppc.optable[52] = recompile_stfs;
+	ppc.optable[53] = recompile_stfsu;
+	ppc.optable[54] = recompile_stfd;
+	ppc.optable[55] = recompile_stfdu;
+	ppc.optable31[631] = recompile_lfdux;
+	ppc.optable31[599] = recompile_lfdx;
+	ppc.optable31[567] = recompile_lfsux;
+	ppc.optable31[535] = recompile_lfsx;
+	ppc.optable31[595] = recompile_mfsr;
+	ppc.optable31[659] = recompile_mfsrin;
+	ppc.optable31[371] = recompile_mftb;
+	ppc.optable31[210] = recompile_mtsr;
+	ppc.optable31[242] = recompile_mtsrin;
+	ppc.optable31[758] = recompile_dcba;
+	ppc.optable31[759] = recompile_stfdux;
+	ppc.optable31[727] = recompile_stfdx;
+	ppc.optable31[983] = recompile_stfiwx;
+	ppc.optable31[695] = recompile_stfsux;
+	ppc.optable31[663] = recompile_stfsx;
+	ppc.optable31[370] = recompile_tlbia;
+	ppc.optable31[306] = recompile_tlbie;
+	ppc.optable31[566] = recompile_tlbsync;
+	ppc.optable31[310] = recompile_eciwx;
+	ppc.optable31[438] = recompile_ecowx;
 
-	optable63[264] = recompile_fabsx;
-	optable63[21] = recompile_faddx;
-	optable63[32] = recompile_fcmpo;
-	optable63[0] = recompile_fcmpu;
-	optable63[14] = recompile_fctiwx;
-	optable63[15] = recompile_fctiwzx;
-	optable63[18] = recompile_fdivx;
-	optable63[72] = recompile_fmrx;
-	optable63[136] = recompile_fnabsx;
-	optable63[40] = recompile_fnegx;
-	optable63[12] = recompile_frspx;
-	optable63[26] = recompile_frsqrtex;
-	optable63[22] = recompile_fsqrtx;
-	optable63[20] = recompile_fsubx;
-	optable63[583] = recompile_mffsx;
-	optable63[70] = recompile_mtfsb0x;
-	optable63[38] = recompile_mtfsb1x;
-	optable63[711] = recompile_mtfsfx;
-	optable63[134] = recompile_mtfsfix;
-	optable63[64] = recompile_mcrfs;
+	ppc.optable63[264] = recompile_fabsx;
+	ppc.optable63[21] = recompile_faddx;
+	ppc.optable63[32] = recompile_fcmpo;
+	ppc.optable63[0] = recompile_fcmpu;
+	ppc.optable63[14] = recompile_fctiwx;
+	ppc.optable63[15] = recompile_fctiwzx;
+	ppc.optable63[18] = recompile_fdivx;
+	ppc.optable63[72] = recompile_fmrx;
+	ppc.optable63[136] = recompile_fnabsx;
+	ppc.optable63[40] = recompile_fnegx;
+	ppc.optable63[12] = recompile_frspx;
+	ppc.optable63[26] = recompile_frsqrtex;
+	ppc.optable63[22] = recompile_fsqrtx;
+	ppc.optable63[20] = recompile_fsubx;
+	ppc.optable63[583] = recompile_mffsx;
+	ppc.optable63[70] = recompile_mtfsb0x;
+	ppc.optable63[38] = recompile_mtfsb1x;
+	ppc.optable63[711] = recompile_mtfsfx;
+	ppc.optable63[134] = recompile_mtfsfix;
+	ppc.optable63[64] = recompile_mcrfs;
 
-	optable59[21] = recompile_faddsx;
-	optable59[18] = recompile_fdivsx;
-	optable59[24] = recompile_fresx;
-	optable59[22] = recompile_fsqrtsx;
-	optable59[20] = recompile_fsubsx;
+	ppc.optable59[21] = recompile_faddsx;
+	ppc.optable59[18] = recompile_fdivsx;
+	ppc.optable59[24] = recompile_fresx;
+	ppc.optable59[22] = recompile_fsqrtsx;
+	ppc.optable59[20] = recompile_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = recompile_fmaddx;
-		optable63[i * 32 | 28] = recompile_fmsubx;
-		optable63[i * 32 | 25] = recompile_fmulx;
-		optable63[i * 32 | 31] = recompile_fnmaddx;
-		optable63[i * 32 | 30] = recompile_fnmsubx;
-		optable63[i * 32 | 23] = recompile_fselx;
+		ppc.optable63[i * 32 | 29] = recompile_fmaddx;
+		ppc.optable63[i * 32 | 28] = recompile_fmsubx;
+		ppc.optable63[i * 32 | 25] = recompile_fmulx;
+		ppc.optable63[i * 32 | 31] = recompile_fnmaddx;
+		ppc.optable63[i * 32 | 30] = recompile_fnmsubx;
+		ppc.optable63[i * 32 | 23] = recompile_fselx;
 
-		optable59[i * 32 | 29] = recompile_fmaddsx;
-		optable59[i * 32 | 28] = recompile_fmsubsx;
-		optable59[i * 32 | 25] = recompile_fmulsx;
-		optable59[i * 32 | 31] = recompile_fnmaddsx;
-		optable59[i * 32 | 30] = recompile_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = recompile_fmaddsx;
+		ppc.optable59[i * 32 | 28] = recompile_fmsubsx;
+		ppc.optable59[i * 32 | 25] = recompile_fmulsx;
+		ppc.optable59[i * 32 | 31] = recompile_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1683,8 +1685,8 @@ static void mpc8240drc_init(int index, int clock, const void *_config, int (*irq
 	}
 
 	// MPC8240 specific opcodes
-	optable31[978] = recompile_tlbld;
-	optable31[1010] = recompile_tlbli;
+	ppc.optable31[978] = recompile_tlbld;
+	ppc.optable31[1010] = recompile_tlbli;
 
 	ppc.is603 = 1;
 
@@ -1730,76 +1732,76 @@ static void ppc601drc_init(int index, int clock, const void *_config, int (*irqc
 	ppc_init();
 	ppcdrc_init();
 
-	optable[48] = recompile_lfs;
-	optable[49] = recompile_lfsu;
-	optable[50] = recompile_lfd;
-	optable[51] = recompile_lfdu;
-	optable[52] = recompile_stfs;
-	optable[53] = recompile_stfsu;
-	optable[54] = recompile_stfd;
-	optable[55] = recompile_stfdu;
-	optable31[631] = recompile_lfdux;
-	optable31[599] = recompile_lfdx;
-	optable31[567] = recompile_lfsux;
-	optable31[535] = recompile_lfsx;
-	optable31[595] = recompile_mfsr;
-	optable31[659] = recompile_mfsrin;
-	optable31[371] = recompile_mftb;
-	optable31[210] = recompile_mtsr;
-	optable31[242] = recompile_mtsrin;
-	optable31[758] = recompile_dcba;
-	optable31[759] = recompile_stfdux;
-	optable31[727] = recompile_stfdx;
-	optable31[983] = recompile_stfiwx;
-	optable31[695] = recompile_stfsux;
-	optable31[663] = recompile_stfsx;
-	optable31[370] = recompile_tlbia;
-	optable31[306] = recompile_tlbie;
-	optable31[566] = recompile_tlbsync;
-	optable31[310] = recompile_eciwx;
-	optable31[438] = recompile_ecowx;
+	ppc.optable[48] = recompile_lfs;
+	ppc.optable[49] = recompile_lfsu;
+	ppc.optable[50] = recompile_lfd;
+	ppc.optable[51] = recompile_lfdu;
+	ppc.optable[52] = recompile_stfs;
+	ppc.optable[53] = recompile_stfsu;
+	ppc.optable[54] = recompile_stfd;
+	ppc.optable[55] = recompile_stfdu;
+	ppc.optable31[631] = recompile_lfdux;
+	ppc.optable31[599] = recompile_lfdx;
+	ppc.optable31[567] = recompile_lfsux;
+	ppc.optable31[535] = recompile_lfsx;
+	ppc.optable31[595] = recompile_mfsr;
+	ppc.optable31[659] = recompile_mfsrin;
+	ppc.optable31[371] = recompile_mftb;
+	ppc.optable31[210] = recompile_mtsr;
+	ppc.optable31[242] = recompile_mtsrin;
+	ppc.optable31[758] = recompile_dcba;
+	ppc.optable31[759] = recompile_stfdux;
+	ppc.optable31[727] = recompile_stfdx;
+	ppc.optable31[983] = recompile_stfiwx;
+	ppc.optable31[695] = recompile_stfsux;
+	ppc.optable31[663] = recompile_stfsx;
+	ppc.optable31[370] = recompile_tlbia;
+	ppc.optable31[306] = recompile_tlbie;
+	ppc.optable31[566] = recompile_tlbsync;
+	ppc.optable31[310] = recompile_eciwx;
+	ppc.optable31[438] = recompile_ecowx;
 
-	optable63[264] = recompile_fabsx;
-	optable63[21] = recompile_faddx;
-	optable63[32] = recompile_fcmpo;
-	optable63[0] = recompile_fcmpu;
-	optable63[14] = recompile_fctiwx;
-	optable63[15] = recompile_fctiwzx;
-	optable63[18] = recompile_fdivx;
-	optable63[72] = recompile_fmrx;
-	optable63[136] = recompile_fnabsx;
-	optable63[40] = recompile_fnegx;
-	optable63[12] = recompile_frspx;
-	optable63[26] = recompile_frsqrtex;
-	optable63[22] = recompile_fsqrtx;
-	optable63[20] = recompile_fsubx;
-	optable63[583] = recompile_mffsx;
-	optable63[70] = recompile_mtfsb0x;
-	optable63[38] = recompile_mtfsb1x;
-	optable63[711] = recompile_mtfsfx;
-	optable63[134] = recompile_mtfsfix;
-	optable63[64] = recompile_mcrfs;
+	ppc.optable63[264] = recompile_fabsx;
+	ppc.optable63[21] = recompile_faddx;
+	ppc.optable63[32] = recompile_fcmpo;
+	ppc.optable63[0] = recompile_fcmpu;
+	ppc.optable63[14] = recompile_fctiwx;
+	ppc.optable63[15] = recompile_fctiwzx;
+	ppc.optable63[18] = recompile_fdivx;
+	ppc.optable63[72] = recompile_fmrx;
+	ppc.optable63[136] = recompile_fnabsx;
+	ppc.optable63[40] = recompile_fnegx;
+	ppc.optable63[12] = recompile_frspx;
+	ppc.optable63[26] = recompile_frsqrtex;
+	ppc.optable63[22] = recompile_fsqrtx;
+	ppc.optable63[20] = recompile_fsubx;
+	ppc.optable63[583] = recompile_mffsx;
+	ppc.optable63[70] = recompile_mtfsb0x;
+	ppc.optable63[38] = recompile_mtfsb1x;
+	ppc.optable63[711] = recompile_mtfsfx;
+	ppc.optable63[134] = recompile_mtfsfix;
+	ppc.optable63[64] = recompile_mcrfs;
 
-	optable59[21] = recompile_faddsx;
-	optable59[18] = recompile_fdivsx;
-	optable59[24] = recompile_fresx;
-	optable59[22] = recompile_fsqrtsx;
-	optable59[20] = recompile_fsubsx;
+	ppc.optable59[21] = recompile_faddsx;
+	ppc.optable59[18] = recompile_fdivsx;
+	ppc.optable59[24] = recompile_fresx;
+	ppc.optable59[22] = recompile_fsqrtsx;
+	ppc.optable59[20] = recompile_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = recompile_fmaddx;
-		optable63[i * 32 | 28] = recompile_fmsubx;
-		optable63[i * 32 | 25] = recompile_fmulx;
-		optable63[i * 32 | 31] = recompile_fnmaddx;
-		optable63[i * 32 | 30] = recompile_fnmsubx;
-		optable63[i * 32 | 23] = recompile_fselx;
+		ppc.optable63[i * 32 | 29] = recompile_fmaddx;
+		ppc.optable63[i * 32 | 28] = recompile_fmsubx;
+		ppc.optable63[i * 32 | 25] = recompile_fmulx;
+		ppc.optable63[i * 32 | 31] = recompile_fnmaddx;
+		ppc.optable63[i * 32 | 30] = recompile_fnmsubx;
+		ppc.optable63[i * 32 | 23] = recompile_fselx;
 
-		optable59[i * 32 | 29] = recompile_fmaddsx;
-		optable59[i * 32 | 28] = recompile_fmsubsx;
-		optable59[i * 32 | 25] = recompile_fmulsx;
-		optable59[i * 32 | 31] = recompile_fnmaddsx;
-		optable59[i * 32 | 30] = recompile_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = recompile_fmaddsx;
+		ppc.optable59[i * 32 | 28] = recompile_fmsubsx;
+		ppc.optable59[i * 32 | 25] = recompile_fmulsx;
+		ppc.optable59[i * 32 | 31] = recompile_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1857,6 +1859,139 @@ static void ppc601drc_init(int index, int clock, const void *_config, int (*irqc
 }
 
 static void ppc601drc_exit(void)
+{
+#if LOG_CODE
+	//if (symfile) fclose(symfile);
+#endif
+	drc_exit(ppc.drc);
+}
+#endif
+
+
+#if (HAS_PPC604)
+static void ppc604drc_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+{
+	float multiplier;
+	const ppc_config *config = _config;
+	int i;
+
+	ppc_init();
+	ppcdrc_init();
+
+	ppc.optable[48] = recompile_lfs;
+	ppc.optable[49] = recompile_lfsu;
+	ppc.optable[50] = recompile_lfd;
+	ppc.optable[51] = recompile_lfdu;
+	ppc.optable[52] = recompile_stfs;
+	ppc.optable[53] = recompile_stfsu;
+	ppc.optable[54] = recompile_stfd;
+	ppc.optable[55] = recompile_stfdu;
+	ppc.optable31[631] = recompile_lfdux;
+	ppc.optable31[599] = recompile_lfdx;
+	ppc.optable31[567] = recompile_lfsux;
+	ppc.optable31[535] = recompile_lfsx;
+	ppc.optable31[595] = recompile_mfsr;
+	ppc.optable31[659] = recompile_mfsrin;
+	ppc.optable31[371] = recompile_mftb;
+	ppc.optable31[210] = recompile_mtsr;
+	ppc.optable31[242] = recompile_mtsrin;
+	ppc.optable31[758] = recompile_dcba;
+	ppc.optable31[759] = recompile_stfdux;
+	ppc.optable31[727] = recompile_stfdx;
+	ppc.optable31[983] = recompile_stfiwx;
+	ppc.optable31[695] = recompile_stfsux;
+	ppc.optable31[663] = recompile_stfsx;
+	ppc.optable31[370] = recompile_tlbia;
+	ppc.optable31[306] = recompile_tlbie;
+	ppc.optable31[566] = recompile_tlbsync;
+	ppc.optable31[310] = recompile_eciwx;
+	ppc.optable31[438] = recompile_ecowx;
+
+	ppc.optable63[264] = recompile_fabsx;
+	ppc.optable63[21] = recompile_faddx;
+	ppc.optable63[32] = recompile_fcmpo;
+	ppc.optable63[0] = recompile_fcmpu;
+	ppc.optable63[14] = recompile_fctiwx;
+	ppc.optable63[15] = recompile_fctiwzx;
+	ppc.optable63[18] = recompile_fdivx;
+	ppc.optable63[72] = recompile_fmrx;
+	ppc.optable63[136] = recompile_fnabsx;
+	ppc.optable63[40] = recompile_fnegx;
+	ppc.optable63[12] = recompile_frspx;
+	ppc.optable63[26] = recompile_frsqrtex;
+	ppc.optable63[22] = recompile_fsqrtx;
+	ppc.optable63[20] = recompile_fsubx;
+	ppc.optable63[583] = recompile_mffsx;
+	ppc.optable63[70] = recompile_mtfsb0x;
+	ppc.optable63[38] = recompile_mtfsb1x;
+	ppc.optable63[711] = recompile_mtfsfx;
+	ppc.optable63[134] = recompile_mtfsfix;
+	ppc.optable63[64] = recompile_mcrfs;
+
+	ppc.optable59[21] = recompile_faddsx;
+	ppc.optable59[18] = recompile_fdivsx;
+	ppc.optable59[24] = recompile_fresx;
+	ppc.optable59[22] = recompile_fsqrtsx;
+	ppc.optable59[20] = recompile_fsubsx;
+
+	for(i = 0; i < 32; i++)
+	{
+		ppc.optable63[i * 32 | 29] = recompile_fmaddx;
+		ppc.optable63[i * 32 | 28] = recompile_fmsubx;
+		ppc.optable63[i * 32 | 25] = recompile_fmulx;
+		ppc.optable63[i * 32 | 31] = recompile_fnmaddx;
+		ppc.optable63[i * 32 | 30] = recompile_fnmsubx;
+		ppc.optable63[i * 32 | 23] = recompile_fselx;
+
+		ppc.optable59[i * 32 | 29] = recompile_fmaddsx;
+		ppc.optable59[i * 32 | 28] = recompile_fmsubsx;
+		ppc.optable59[i * 32 | 25] = recompile_fmulsx;
+		ppc.optable59[i * 32 | 31] = recompile_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
+	}
+
+	ppc.optable31[978] = recompile_tlbld;
+
+	for(i = 0; i < 256; i++)
+	{
+		ppc_field_xlat[i] =
+			((i & 0x80) ? 0xF0000000 : 0) |
+			((i & 0x40) ? 0x0F000000 : 0) |
+			((i & 0x20) ? 0x00F00000 : 0) |
+			((i & 0x10) ? 0x000F0000 : 0) |
+			((i & 0x08) ? 0x0000F000 : 0) |
+			((i & 0x04) ? 0x00000F00 : 0) |
+			((i & 0x02) ? 0x000000F0 : 0) |
+			((i & 0x01) ? 0x0000000F : 0);
+	}
+
+	ppc.is603 = 1;
+
+	ppc.read8 = program_read_byte_64be;
+	ppc.read16 = program_read_word_64be;
+	ppc.read32 = program_read_dword_64be;
+	ppc.read64 = program_read_qword_64be;
+	ppc.write8 = program_write_byte_64be;
+	ppc.write16 = program_write_word_64be;
+	ppc.write32 = program_write_dword_64be;
+	ppc.write64 = program_write_qword_64be;
+	ppc.read16_unaligned = ppc_read16_unaligned;
+	ppc.read32_unaligned = ppc_read32_unaligned;
+	ppc.read64_unaligned = ppc_read64_unaligned;
+	ppc.write16_unaligned = ppc_write16_unaligned;
+	ppc.write32_unaligned = ppc_write32_unaligned;
+	ppc.write64_unaligned = ppc_write64_unaligned;
+
+	ppc.irq_callback = irqcallback;
+
+	ppc.pvr = config->pvr;
+
+	multiplier = (float)((config->bus_frequency_multiplier >> 4) & 0xf) +
+				 (float)(config->bus_frequency_multiplier & 0xf) / 10.0f;
+	bus_freq_multiplier = (int)(multiplier * 2);
+}
+
+static void ppc604drc_exit(void)
 {
 #if LOG_CODE
 	//if (symfile) fclose(symfile);
@@ -2295,6 +2430,51 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
+
+		default:										ppc_get_info(state, info);				break;
+	}
+}
+#endif
+
+/* PPC604 */
+
+#if (HAS_PPC604)
+static void ppc604_set_info(UINT32 state, cpuinfo *info)
+{
+	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
+	{
+		ppcdrc603_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i);
+		return;
+	}
+	switch(state)
+	{
+		default:										ppc_set_info(state, info);				break;
+	}
+}
+
+void ppc604_get_info(UINT32 state, cpuinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc604_set_info;		break;
+		case CPUINFO_PTR_INIT:							info->init = ppc604drc_init;			break;
+		case CPUINFO_PTR_RESET:							info->reset = ppcdrc603_reset;			break;
+		case CPUINFO_PTR_EXIT:							info->exit = ppc604drc_exit;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = ppcdrc603_execute;		break;
+		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
+		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
+		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC604");				break;
 
 		default:										ppc_get_info(state, info);				break;
 	}

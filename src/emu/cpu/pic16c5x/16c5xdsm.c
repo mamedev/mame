@@ -52,14 +52,14 @@ typedef unsigned short int word;
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
 
-static const char *regfile[32] = { "Reg$00 (IND)",    "Reg$01 (TMR)",    "Reg$02 (PCL)",  "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
+static const char *const regfile[32] = { "Reg$00 (IND)",    "Reg$01 (TMR)",    "Reg$02 (PCL)",  "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
 								 "Reg$08", "Reg$09", "Reg$0A", "Reg$0B", "Reg$0C", "Reg$0D", "Reg$0E", "Reg$0F",
 								 "Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
 								 "Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F" };
 
-static const char *dest[2] = { "W", "Reg" };
+static const char *const dest[2] = { "W", "Reg" };
 
-static const char *PIC16C5xFormats[] = {
+static const char *const PIC16C5xFormats[] = {
 	FMT("000000000000", "nop"),
 	FMT("000000000010", "option"),
 	FMT("000000000011", "sleep"),
@@ -113,7 +113,8 @@ static int OpInizialized = 0;
 
 static void InitDasm16C5x(void)
 {
-	const char *p, **ops;
+	const char *p;
+	const char *const *ops;
 	word mask, bits;
 	int bit;
 	int i;

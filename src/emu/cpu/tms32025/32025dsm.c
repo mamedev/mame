@@ -60,12 +60,12 @@ typedef unsigned short int word;
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
 
-static const char *arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" } ;
-static const char *nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" } ;
-static const char *cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" } ;
+static const char *const arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" } ;
+static const char *const nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" } ;
+static const char *const cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" } ;
 
 
-static const char *TMS32025Formats[] = {
+static const char *const TMS32025Formats[] = {
 	FMT("0000tttt0aaaaaaa", "add  %A,%T"),	/* 0xxx */
 	FMT("0000tttt1mmmnnnn", "add  %M,%T%N"),
 	FMT("0001tttt0aaaaaaa", "sub  %A,%T"),	/* 1xxx */
@@ -347,7 +347,8 @@ static int OpInizialized = 0;
 
 static void InitDasm32025(void)
 {
-	const char *p, **ops;
+	const char *p;
+	const char *const *ops;
 	word mask, bits;
 	int bit;
 	int i;

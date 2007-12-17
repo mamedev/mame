@@ -34,7 +34,7 @@ static WRITE8_HANDLER(pa_w){homerun_xpa=data;}
 static WRITE8_HANDLER(pb_w){homerun_xpb=data;}
 static WRITE8_HANDLER(pc_w){homerun_xpc=data;}
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1,
 	{ 0 },

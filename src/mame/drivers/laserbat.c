@@ -558,7 +558,7 @@ static VIDEO_UPDATE( laserbat )
 
 /* Laser Battle sound **********************************/
 
-static struct SN76477interface sn76477_interface =
+static const struct SN76477interface sn76477_interface =
 {
 	RES_K(47), 		/*  4 noise_res         R21    47K */
 	0,				/*  5 filter_res (variable) */

@@ -381,7 +381,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 ********************************************************************/
 
 #ifndef MESS
-static struct EEPROM_interface qsound_eeprom_interface =
+static const struct EEPROM_interface qsound_eeprom_interface =
 {
 	7,		/* address bits */
 	8,		/* data bits */
@@ -390,7 +390,7 @@ static struct EEPROM_interface qsound_eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static struct EEPROM_interface pang3_eeprom_interface =
+static const struct EEPROM_interface pang3_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */

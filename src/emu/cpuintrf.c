@@ -164,6 +164,7 @@ void ppc403_get_info(UINT32 state, cpuinfo *info);
 void ppc601_get_info(UINT32 state, cpuinfo *info);
 void ppc602_get_info(UINT32 state, cpuinfo *info);
 void ppc603_get_info(UINT32 state, cpuinfo *info);
+void ppc604_get_info(UINT32 state, cpuinfo *info);
 void mpc8240_get_info(UINT32 state, cpuinfo *info);
 void SE3208_get_info(UINT32 state, cpuinfo *info);
 void mc68hc11_get_info(UINT32 state, cpuinfo *info);
@@ -684,6 +685,9 @@ static const struct
 #endif
 #if (HAS_PPC603)
 	{ CPU_PPC603, ppc603_get_info },
+#endif
+#if (HAS_PPC604)
+	{ CPU_PPC604, ppc604_get_info },
 #endif
 #if (HAS_MPC8240)
 	{ CPU_MPC8240, mpc8240_get_info },

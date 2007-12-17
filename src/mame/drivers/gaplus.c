@@ -737,14 +737,14 @@ static struct namco_interface namco_interface =
 	REGION_SOUND1	/* memory region */
 };
 
-static const char *gaplus_sample_names[] =
+static const char *const gaplus_sample_names[] =
 {
 	"*gaplus",
 	"bang.wav",
 	0
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	1,	/* one channel */
 	gaplus_sample_names

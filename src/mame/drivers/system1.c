@@ -2632,7 +2632,7 @@ ROM_START( starjack )
 	ROM_LOAD( "epr-5318.86",	0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
 	ROM_LOAD( "epr-5319.93",	0x4000, 0x4000, CRC(ebee4999) SHA1(bb331be270dc1da63699533d9f02d73ce28f1bc5) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2660,18 +2660,18 @@ ROM_START( starjacs )
 	ROM_LOAD( "a1_ic86.86",   0x0000, 0x4000, CRC(6f2e1fd3) SHA1(326d538551245fce67d0fdba85975e27093b7a93) )
 	ROM_LOAD( "a1_ic93.93",   0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 )	/* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 )	/* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
 ROM_START( regulus )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "epr5640a.129",	0x0000, 0x2000, CRC(dafb1528) SHA1(9140c5507bd931df3f8ef8d2910bc74f737b1a5a) ) /* encrypted */
-	ROM_LOAD( "epr5641a.130",	0x2000, 0x2000, CRC(0fcc850e) SHA1(d2d6b06bf1e2dc404aa5451cc9f1b919fb5be0f5) ) /* encrypted */
-	ROM_LOAD( "epr5642a.131",	0x4000, 0x2000, CRC(4feffa17) SHA1(9d9f4227c4e60a5cc53c369e7c9ce59ea8df3553) ) /* encrypted */
-	ROM_LOAD( "epr5643a.132",	0x6000, 0x2000, CRC(b8ac7eb4) SHA1(f96bcde021060a8c1c5270b73487e24d1893e8e5) ) /* encrypted */
+	ROM_LOAD( "epr-5640a.129",	0x0000, 0x2000, CRC(dafb1528) SHA1(9140c5507bd931df3f8ef8d2910bc74f737b1a5a) ) /* encrypted */
+	ROM_LOAD( "epr-5641a.130",	0x2000, 0x2000, CRC(0fcc850e) SHA1(d2d6b06bf1e2dc404aa5451cc9f1b919fb5be0f5) ) /* encrypted */
+	ROM_LOAD( "epr-5642a.131",	0x4000, 0x2000, CRC(4feffa17) SHA1(9d9f4227c4e60a5cc53c369e7c9ce59ea8df3553) ) /* encrypted */
+	ROM_LOAD( "epr-5643a.132",	0x6000, 0x2000, CRC(b8ac7eb4) SHA1(f96bcde021060a8c1c5270b73487e24d1893e8e5) ) /* encrypted */
 	ROM_LOAD( "epr-5644.133",	0x8000, 0x2000, CRC(ffd05b7d) SHA1(6fe471548d227d834c012d5d148b1ea1c12dfd00) )
-	ROM_LOAD( "epr5645a.134",	0xa000, 0x2000, CRC(6b4bf77c) SHA1(0200efb58b85a6873db44ffa70c3c14dbca958a6) )
+	ROM_LOAD( "epr-5645a.134",	0xa000, 0x2000, CRC(6b4bf77c) SHA1(0200efb58b85a6873db44ffa70c3c14dbca958a6) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "epr-5652.3",		0x0000, 0x2000, CRC(74edcb98) SHA1(bc181c73a6009ca723e715650adb920b77bd311c) )
@@ -2688,7 +2688,7 @@ ROM_START( regulus )
 	ROM_LOAD( "epr-5638.86",	0x0000, 0x4000, CRC(617363dd) SHA1(c8024f541086a8a940e21219fa4522646aeb365a) )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2716,7 +2716,7 @@ ROM_START( reguluso )
 	ROM_LOAD( "epr-5638.86",	0x0000, 0x4000, CRC(617363dd) SHA1(c8024f541086a8a940e21219fa4522646aeb365a) )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2744,7 +2744,7 @@ ROM_START( regulusu )
 	ROM_LOAD( "epr-5638.86",	0x0000, 0x4000, CRC(617363dd) SHA1(c8024f541086a8a940e21219fa4522646aeb365a) )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2772,7 +2772,7 @@ ROM_START( upndown )
 	ROM_LOAD( "epr-5514.86",	0x0000, 0x4000, CRC(fcc0a88b) SHA1(ca7db3df10deb6720096e6c50eddd9b74c47f0a0) )
 	ROM_LOAD( "epr-5515.93",	0x4000, 0x4000, CRC(60908838) SHA1(aedff8ce07ab16942037e5aff212652e51c19e71) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2800,7 +2800,7 @@ ROM_START( upndownu )
 	ROM_LOAD( "epr-5514.86",	0x0000, 0x4000, CRC(fcc0a88b) SHA1(ca7db3df10deb6720096e6c50eddd9b74c47f0a0) )
 	ROM_LOAD( "epr-5515.93",	0x4000, 0x4000, CRC(60908838) SHA1(aedff8ce07ab16942037e5aff212652e51c19e71) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2828,7 +2828,7 @@ ROM_START( mrviking )
 	ROM_LOAD( "epr-5749.86",	0x0000, 0x4000, CRC(e24682cd) SHA1(3f626f3e5e2db486ccf727e9869ab488643b4a8c) )
 	ROM_LOAD( "epr-5750.93",	0x4000, 0x4000, CRC(6564d1ad) SHA1(f246afee7e73bc30054b0e5dcb83fa0edd2d2164) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2856,7 +2856,7 @@ ROM_START( mrvikngj )
 	ROM_LOAD( "epr-5749.86",	0x0000, 0x4000, CRC(e24682cd) SHA1(3f626f3e5e2db486ccf727e9869ab488643b4a8c) )
 	ROM_LOAD( "epr-5750.93",	0x4000, 0x4000, CRC(6564d1ad) SHA1(f246afee7e73bc30054b0e5dcb83fa0edd2d2164) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2884,7 +2884,7 @@ ROM_START( swat )
 	ROM_LOAD( "epr-5805.86",	0x0000, 0x4000, CRC(5a732865) SHA1(55c54e54f052187ddd957131e56400c9c432a6b2) )
 	ROM_LOAD( "epr-5806.93",	0x4000, 0x4000, CRC(26ac258c) SHA1(e4e9f929ab8ae7da74f885481cf94335d7553a1c) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2908,7 +2908,7 @@ ROM_START( flicky )
 	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2932,7 +2932,7 @@ ROM_START( flicks2 )
 	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2960,7 +2960,7 @@ ROM_START( flicks1 )
 	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -2986,7 +2986,7 @@ ROM_START( flickyo )
 	ROM_LOAD( "epr-5855.117",	0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3014,7 +3014,7 @@ ROM_START( wmatch )
 	ROM_LOAD( "wm.86",			0x0000, 0x4000, CRC(238ae0e5) SHA1(af18cfe7f8103358a0ce2aef9bbd949fdc0bfbfc) )
 	ROM_LOAD( "wm.93",			0x4000, 0x4000, CRC(a2f19170) SHA1(47dacc380b09c6365c737d320145cedad54ecedb) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 )	/* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 )	/* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3042,7 +3042,7 @@ ROM_START( bullfgt )
 	ROM_LOAD( "epr-6069.86",	0x0000, 0x4000, CRC(fe691e41) SHA1(90faf26685202e2a25bb3024750456014d0722b3) ) /* epr-6069.86 */
 	ROM_LOAD( "epr-6070.93",	0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) ) /* epr-6070.93 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -3068,7 +3068,7 @@ ROM_START( thetogyu )
 	ROM_LOAD( "epr-6069.117",	0x0000, 0x4000, CRC(fe691e41) SHA1(90faf26685202e2a25bb3024750456014d0722b3) )
 	ROM_LOAD( "epr-6070.110",	0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3093,7 +3093,7 @@ ROM_START( pitfall2 )
 	ROM_LOAD( "epr6454a.117",	0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
 	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3118,7 +3118,7 @@ ROM_START( pitfallu )
 	ROM_LOAD( "epr6454a.117",	0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
 	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3145,7 +3145,7 @@ ROM_START( seganinj )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3172,7 +3172,7 @@ ROM_START( seganinu )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3202,7 +3202,7 @@ ROM_START( nprinces )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) ) /* epr-6547.4 */
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -3230,7 +3230,7 @@ ROM_START( nprincso )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3260,7 +3260,7 @@ ROM_START( nprincsu )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) ) /* epr-6547.4 */
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3287,7 +3287,7 @@ ROM_START( nprincsb )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
-	ROM_REGION( 0x0220, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0220, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 	ROM_LOAD( "nprinces.129",	0x0100, 0x0100, CRC(ae765f62) SHA1(9434b5a23d118a9c62015b479719826b38269cd4) ) /* decryption table (not used) */
 	ROM_LOAD( "nprinces.123",	0x0200, 0x0020, CRC(ed5146e9) SHA1(7044035c07636e4029f4b746c1a92e15173869e9) ) /* decryption table (not used) */
@@ -3316,7 +3316,7 @@ ROM_START( ninja )
 	ROM_LOAD( "epr-6547.110",	0x8000, 0x4000, CRC(34451b08) SHA1(ee8708f6c886b63f138bcc10dc2a053bfad96c37) )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3341,7 +3341,7 @@ ROM_START( imsorry )
 	ROM_LOAD( "epr-6645.117",	0x0000, 0x4000, CRC(1ba167ee) SHA1(5a105cc3112f2533e7c5982233405d365402fba2) )
 	ROM_LOAD( "epr-6646.04",	0x4000, 0x4000, CRC(edda7ad6) SHA1(eef7dcde632787283c4cb522380b138060018204) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3366,7 +3366,7 @@ ROM_START( imsorryj )
 	ROM_LOAD( "epr-6645.117",	0x0000, 0x4000, CRC(1ba167ee) SHA1(5a105cc3112f2533e7c5982233405d365402fba2) )
 	ROM_LOAD( "epr-6646.04",	0x4000, 0x4000, CRC(edda7ad6) SHA1(eef7dcde632787283c4cb522380b138060018204) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3393,7 +3393,7 @@ ROM_START( teddybb )
 	ROM_LOAD( "epr-6736.110",	0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) )
 	ROM_LOAD( "epr-6738.05",	0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3420,7 +3420,7 @@ ROM_START( teddybbo )
 	ROM_LOAD( "epr-6736.110",	0x8000, 0x4000, CRC(565c25d0) SHA1(5ae524ef01138c5042b223286d65eb9043c0f0d5) )
 	ROM_LOAD( "epr-6738.05",	0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3478,7 +3478,7 @@ ROM_START( myhero )
 	ROM_LOAD( "epr-6922.110",	0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3505,7 +3505,7 @@ ROM_START( sscandal )
 	ROM_LOAD( "epr-6922.110",	0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3533,12 +3533,12 @@ ROM_START( myherok )
 	ROM_LOAD( "epr-6922.110",	0x8000, 0x4000, CRC(37f77a78) SHA1(01d8bd41303bd5e3a6f1cdafa4a1d682e4c659a2) )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
 /*
-    Shooting Master (SEGA) - Set 1, 8751 315-5159
+    Shooting Master (SEGA) - Rev A, 8751 315-5159a
     Year: 1985
     System 2
 
@@ -3549,7 +3549,7 @@ ROM_END
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
     /* This rom is located on the daughter board .*/
-	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
+	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
     /* These roms are located on the main board. */
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
@@ -3560,7 +3560,7 @@ ROM_START( shtngmst )
 
     /* This mcu is located on the main board. */
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* Internal i8751 MCU code */
-	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, NO_DUMP )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3596,7 +3596,7 @@ ROM_START( shtngmst )
 ROM_END
 
 /*
-    Shooting Master (SEGA) - Set 2, 8751 315-5159a
+    Shooting Master (SEGA) - Set 1, 8751 315-5159
     Year: 1985
     System 2
 
@@ -3604,10 +3604,10 @@ ROM_END
     Light Gun Board?  834-5720
 */
 
-ROM_START( shtngmsb )
+ROM_START( shtngms1 )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
     /* This rom is located on the daughter board .*/
-	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
+	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
     /* These roms are located on the main board. */
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
@@ -3618,7 +3618,7 @@ ROM_START( shtngmsb )
 
     /* This mcu is located on the main board. */
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* Internal i8751 MCU code */
-	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP )
 
     /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -3706,16 +3706,16 @@ this set seems to hang sometimes, is it bad, it could be hacked and failing chec
 ROM_START( shtngmsa )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
 	ROM_LOAD( "7100.18",      0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) // different..
-	ROM_LOAD( "epr7101",      0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
-	ROM_LOAD( "epr7102",      0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
+	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "epr7043",      0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "epr7040",      0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
-	ROM_LOAD( "epr7041",      0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
-	ROM_LOAD( "epr7042",      0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
+	ROM_LOAD( "epr7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
+	ROM_LOAD( "epr7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
+	ROM_LOAD( "epr7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
 
 	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_ERASEFF )
 	ROM_LOAD( "epr7110",      0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
@@ -3727,14 +3727,14 @@ ROM_START( shtngmsa )
 	ROM_LOAD( "epr7107",      0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
-	ROM_LOAD( "epr7113",      0x0000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
-	ROM_LOAD( "epr7112",      0x0100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
-	ROM_LOAD( "epr7111",      0x0200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component */
-	ROM_LOAD( "epr5317",      0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "epr7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
+	ROM_LOAD( "epr7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
+	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
 
 	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pal16r4a.ic9",  0x0000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* label on chip is: 315-5137 */
-	ROM_LOAD( "pal16r4a(315-5137).bin",  0x0200, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) )
+	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
+	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
 ROM_END
 
 /*
@@ -3888,7 +3888,7 @@ ROM_START( 4dwarrio )
 	ROM_LOAD( "4d.110",       0x8000, 0x4000, CRC(6ec5990a) SHA1(a26dbd470744c38a26a016e5d4792ac2f2b9bc4b) )
 	ROM_LOAD( "4d.05",        0xc000, 0x4000, CRC(f31a1e6a) SHA1(f49dbc4b381e7096d5ffe3c16660dd63121dabf7) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -3944,7 +3944,7 @@ ROM_START( raflesia )
 	ROM_LOAD( "epr-7408.110",	0x8000, 0x4000, CRC(3189f33c) SHA1(8476c2c01920f0492cf643929d4f023f3afe0164) ) /* epr-7408.4 */
 	ROM_LOAD( "epr-7410.05",	0xc000, 0x4000, CRC(ced74789) SHA1(d0ad845bfe83412ac8d43125e1c50d0581a5b47e) ) /* epr-7410.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -3972,7 +3972,7 @@ ROM_START( spatter )
 	ROM_LOAD( "epr-6307.05",	0x8000, 0x4000, CRC(0a5ad543) SHA1(5acada30c1affc4ffbebc8365a9ba4465f213d47) )
 	ROM_LOAD( "epr-6309.110",	0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -4000,7 +4000,7 @@ ROM_START( ssanchan )
 	ROM_LOAD( "epr-6307.05",	0x8000, 0x4000, CRC(0a5ad543) SHA1(5acada30c1affc4ffbebc8365a9ba4465f213d47) )
 	ROM_LOAD( "epr-6309.110",	0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -4028,7 +4028,7 @@ ROM_START( wboy )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4055,7 +4055,7 @@ ROM_START( wboyo )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4085,7 +4085,7 @@ ROM_START( wboy2 )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) ) /* epr-7486.4 */
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -4116,7 +4116,7 @@ ROM_START( wboy2u )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) ) /* epr-7486.4 */
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -4144,7 +4144,7 @@ ROM_START( wboy3 )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4178,7 +4178,7 @@ ROM_START( wboy4 )
 	ROM_LOAD( "7578.87",  0x00000, 0x8000, CRC(6ff1637f) SHA1(9a6ddbd7b8d53273b30c3529b028c1f28bf3c63b) )	// epr7577.ic110
 	ROM_LOAD( "7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )	// epr7576.ic117
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4205,7 +4205,7 @@ ROM_START( wboyu )
 	ROM_LOAD( "ic110_86.bin",	0x8000, 0x4000, CRC(26d0fac4) SHA1(2e6a06f6850b2d19e3dd7dcdc6b700d0eda878cb) )
 	ROM_LOAD( "ic005_88.bin",	0xc000, 0x4000, CRC(2602e519) SHA1(00e94ec7ae37b5063137d4d49af7806fb0357c4b) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4259,7 +4259,7 @@ ROM_START( wbdeluxe )
 	ROM_LOAD( "epr-7486.110",	0x8000, 0x4000, CRC(8d622c50) SHA1(9a76a50204c618347d3e8eee6cda841becd906eb) ) /* epr-7486.4 */
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 															 /* pr-5317.106 */
 ROM_END
@@ -4344,7 +4344,7 @@ ROM_START( blockgal )
 	ROM_LOAD( "bg.110",       0x8000, 0x4000, CRC(064c812c) SHA1(673790dc5131fd280333386a0e9915fb94e9f3e1) )
 	ROM_LOAD( "bg.05",        0xc000, 0x4000, CRC(02e0b040) SHA1(fb626fc31dfe25bf9fac0c8d76d5041609b06e82) )
 
-	ROM_REGION( 0x0100, REGION_USER2, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER2, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4370,7 +4370,7 @@ ROM_START( blckgalb )
 	ROM_LOAD( "bg.110",       0x8000, 0x4000, CRC(064c812c) SHA1(673790dc5131fd280333386a0e9915fb94e9f3e1) )
 	ROM_LOAD( "bg.05",        0xc000, 0x4000, CRC(02e0b040) SHA1(fb626fc31dfe25bf9fac0c8d76d5041609b06e82) )
 
-	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but no color so don't use REGION_PROMS! */
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
 	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
@@ -4821,51 +4821,51 @@ static DRIVER_INIT( bootlegb )
 }
 
 
-GAME( 1983, starjack, 0,        small,    starjack, 0,        ROT270, "Sega", 			 	   "Star Jacker (Sega)", GAME_SUPPORTS_SAVE )
-GAME( 1983, starjacs, starjack, small,    starjacs, 0,        ROT270, "Stern",			  	   "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
-GAME( 1983, regulus,  0,        small,	  regulus,  regulus,  ROT270, "Sega", 			 	   "Regulus (315-5033, New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1983, reguluso, regulus,  small,	  reguluso, regulus,  ROT270, "Sega", 			 	   "Regulus (315-5033, Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1983, regulusu, regulus,  small,	  regulus,  0,        ROT270, "Sega", 			 	   "Regulus (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1983, upndown,  0,        system1,  upndown,  nprinces, ROT270, "Sega", 			 	   "Up'n Down (315-5030)", GAME_SUPPORTS_SAVE )
-GAME( 1983, upndownu, upndown,  system1,  upndown,  0,        ROT270, "Sega", 			 	   "Up'n Down (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, mrviking, 0,        small,    mrviking, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041)", GAME_SUPPORTS_SAVE )
-GAME( 1984, mrvikngj, mrviking, small,    mrvikngj, mrviking, ROT270, "Sega", 			 	   "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, swat,     0,        system1,  swat,     swat,     ROT270, "Coreland / Sega", 	   "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flicks2,  flicky,   system1,  flicky,   0,        ROT0,   "Sega", 			 	   "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (64k Version, System 1, 315-5051, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1984, flicks1,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega", 			 	   "Flicky (64k Version, System 1, 315-5051, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1984, wmatch,   0,        small, 	  wmatch,   wmatch,   ROT270, "Sega", 			 	   "Water Match (315-5064)", GAME_SUPPORTS_SAVE )
-GAME( 1984, bullfgt,  0,        system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
-GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", 	   "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1984, spatter,  0,        small,    spatter,  spatter,  ROT0,   "Sega", 			 	   "Spatter", GAME_SUPPORTS_SAVE )
-GAME( 1984, ssanchan, spatter,  small,    spatter,  spatter,  ROT0,   "Sega", 			 	   "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pitfall2, 0,        pitfall2, pitfall2, pitfall2, ROT0,   "Sega", 			 	   "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
-GAME( 1985, pitfallu, pitfall2, pitfall2, pitfallu, 0,        ROT0,   "Sega", 			 	   "Pitfall II (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, seganinj, 0,        system1,  seganinj, seganinj, ROT0,   "Sega", 			 	   "Sega Ninja (315-5102)", GAME_SUPPORTS_SAVE )
-GAME( 1985, seganinu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega", 			 	   "Sega Ninja (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, ninja,    seganinj, system1,  seganinj, seganinj, ROT0,   "Sega", 				   "Ninja (315-5102)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprinces, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (315-5051, 64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprincso, seganinj, system1,  seganinj, nprinces, ROT0,   "Sega", 			 	   "Ninja Princess (315-5098, 128k Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprincsu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega", 			 	   "Ninja Princess (64k Ver. not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, nprincsb, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?", 		 	   "Ninja Princess (315-5051?, 128k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1985, imsorry,  0,        system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "I'm Sorry (315-5110, US)", GAME_SUPPORTS_SAVE )
-GAME( 1985, imsorryj, imsorry,  system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", 	   "Gonbee no I'm Sorry (315-5110, Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, teddybb,  0,        system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (315-5115, New Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, teddybbo, teddybb,  system1,  teddybb,  teddybb,  ROT0,   "Sega", 			 	   "TeddyBoy Blues (315-5115, Old Ver.)", GAME_SUPPORTS_SAVE )
-GAME( 1985, myhero,   0,        system1,  myhero,   0,        ROT0,   "Sega", 			 	   "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1985, sscandal, myhero,   system1,  myhero,   myheroj,  ROT0,   "Coreland / Sega", 	   "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1985, myherok,  myhero,   system1,  myhero,   myherok,  ROT0,   "Coreland / Sega", 	   "My Hero (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1985, hvymetal, 0,        hvymetal, hvymetal, hvymetal, ROT0,   "Sega", 			 	   "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtngmst, 0,        shtngmst, shtngmst, 0,        ROT0,   "Sega", 			 	   "Shooting Master (set 1, 8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
-GAME( 1985, shtngmsa, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega [EVG]",			   "Shooting Master (EVG)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
-GAME( 1985, shtngmsb, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega",                  "Shooting Master (set 2, 8751 315-5159a)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159a */
-GAME( 1985, chplft,   0,        chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection */
-GAME( 1985, chplftb,  chplft,   chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1985, chplftbl, chplft,   chplft,   chplft,   0,        ROT0,   "bootleg", 		 	   "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, 4dwarrio, 0,        system1,  4dwarrio, 4dwarrio, ROT0,   "Coreland / Sega", 	   "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
-GAME( 1986, brain,    0,        brain,    brain,    0,        ROT0,   "Coreland / Sega", 	   "Brain", GAME_SUPPORTS_SAVE )
-GAME( 1986, raflesia, 0,        system1,  raflesia, 4dwarrio, ROT270, "Coreland / Sega", 	   "Rafflesia (315-5162)", GAME_SUPPORTS_SAVE )
+GAME( 1983, starjack, 0,        small,    starjack, 0,        ROT270, "Sega",            "Star Jacker (Sega)", GAME_SUPPORTS_SAVE )
+GAME( 1983, starjacs, starjack, small,    starjacs, 0,        ROT270, "Stern",           "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1983, regulus,  0,        small,	  regulus,  regulus,  ROT270, "Sega",            "Regulus (315-5033, Rev A.)", GAME_SUPPORTS_SAVE )
+GAME( 1983, reguluso, regulus,  small,	  reguluso, regulus,  ROT270, "Sega",            "Regulus (315-5033)", GAME_SUPPORTS_SAVE )
+GAME( 1983, regulusu, regulus,  small,	  regulus,  0,        ROT270, "Sega",            "Regulus (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1983, upndown,  0,        system1,  upndown,  nprinces, ROT270, "Sega",            "Up'n Down (315-5030)", GAME_SUPPORTS_SAVE )
+GAME( 1983, upndownu, upndown,  system1,  upndown,  0,        ROT270, "Sega",            "Up'n Down (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, mrviking, 0,        small,    mrviking, mrviking, ROT270, "Sega",            "Mister Viking (315-5041)", GAME_SUPPORTS_SAVE )
+GAME( 1984, mrvikngj, mrviking, small,    mrvikngj, mrviking, ROT270, "Sega",            "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, swat,     0,        system1,  swat,     swat,     ROT270, "Coreland / Sega", "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicky,   0,        system1,  flicky,   flicky,   ROT0,   "Sega",            "Flicky (128k Version, System 2, 315-5051)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicks2,  flicky,   system1,  flicky,   0,        ROT0,   "Sega",            "Flicky (128k Version, System 2, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flickyo,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega",            "Flicky (64k Version, System 1, 315-5051, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, flicks1,  flicky,   system1,  flicky,   flicky,   ROT0,   "Sega",            "Flicky (64k Version, System 1, 315-5051, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, wmatch,   0,        small, 	  wmatch,   wmatch,   ROT270, "Sega",            "Water Match (315-5064)", GAME_SUPPORTS_SAVE )
+GAME( 1984, bullfgt,  0,        system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", "Bullfight (315-5065)", GAME_SUPPORTS_SAVE )
+GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, spatter,  0,        small,    spatter,  spatter,  ROT0,   "Sega",            "Spatter", GAME_SUPPORTS_SAVE )
+GAME( 1984, ssanchan, spatter,  small,    spatter,  spatter,  ROT0,   "Sega",            "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pitfall2, 0,        pitfall2, pitfall2, pitfall2, ROT0,   "Sega",            "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pitfallu, pitfall2, pitfall2, pitfallu, 0,        ROT0,   "Sega",            "Pitfall II (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, seganinj, 0,        system1,  seganinj, seganinj, ROT0,   "Sega",            "Sega Ninja (315-5102)", GAME_SUPPORTS_SAVE )
+GAME( 1985, seganinu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega",            "Sega Ninja (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, ninja,    seganinj, system1,  seganinj, seganinj, ROT0,   "Sega",            "Ninja (315-5102)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprinces, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?",        "Ninja Princess (315-5051, 64k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprincso, seganinj, system1,  seganinj, nprinces, ROT0,   "Sega",            "Ninja Princess (315-5098, 128k Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprincsu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega",            "Ninja Princess (64k Ver. not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, nprincsb, seganinj, system1,  seganinj, flicky,   ROT0,   "bootleg?",        "Ninja Princess (315-5051?, 128k Ver. bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1985, imsorry,  0,        system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", "I'm Sorry (315-5110, US)", GAME_SUPPORTS_SAVE )
+GAME( 1985, imsorryj, imsorry,  system1,  imsorry,  imsorry,  ROT0,   "Coreland / Sega", "Gonbee no I'm Sorry (315-5110, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, teddybb,  0,        system1,  teddybb,  teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, New Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, teddybbo, teddybb,  system1,  teddybb,  teddybb,  ROT0,   "Sega",            "TeddyBoy Blues (315-5115, Old Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1985, myhero,   0,        system1,  myhero,   0,        ROT0,   "Sega",            "My Hero (US, not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1985, sscandal, myhero,   system1,  myhero,   myheroj,  ROT0,   "Coreland / Sega", "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1985, myherok,  myhero,   system1,  myhero,   myherok,  ROT0,   "Coreland / Sega", "My Hero (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1985, hvymetal, 0,        hvymetal, hvymetal, hvymetal, ROT0,   "Sega",            "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shtngmst, 0,        shtngmst, shtngmst, 0,        ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngms1, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmsa, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, chplft,   0,        chplft,   chplft,   0,        ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, chplftb,  chplft,   chplft,   chplft,   0,        ROT0,   "Sega",            "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1985, chplftbl, chplft,   chplft,   chplft,   0,        ROT0,   "bootleg",         "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1985, 4dwarrio, 0,        system1,  4dwarrio, 4dwarrio, ROT0,   "Coreland / Sega", "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
+GAME( 1986, brain,    0,        brain,    brain,    0,        ROT0,   "Coreland / Sega", "Brain", GAME_SUPPORTS_SAVE )
+GAME( 1986, raflesia, 0,        system1,  raflesia, 4dwarrio, ROT270, "Coreland / Sega", "Rafflesia (315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy,     0,        system1,  wboy,     wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5177)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyo,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2,    wboy,     system1,  wboy,     wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
@@ -4875,17 +4875,17 @@ GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Esc
 GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Escape license)", "Wonder Boy (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", 	   "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg", 		 	   "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1986, noboranb, 0,        noboranb, noboranb, noboranb, ROT270, "bootleg", 		 	   "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai",	   "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, blckgalb, blockgal, blckgalb, blockgal, bootleg,  ROT90,  "bootleg", 		 	   "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, tokisens, 0,        wbml,     tokisens, 0,        ROT90,  "Sega", 			 	   "Toki no Senshi - Chrono Soldier", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbml,     0,        wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  	   "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,    wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg", 		 	   "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn, 0,        wbml,     wbml,     dakkochn, ROT0,   "Whiteboard",		 	   "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega", 			 	   "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensb, ufosensi, ufosensi, ufosensi, bootlegb, ROT0,   "bootleg", 			   "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1986, gardia,   0,        brain,    gardia,   gardia,   ROT270, "Sega / Coreland", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1986, gardiab,  gardia,   brain,    gardia,   gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1986, noboranb, 0,        noboranb, noboranb, noboranb, ROT270, "bootleg",         "Noboranka (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blockgal, 0,        system1,  blockgal, blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1987, blckgalb, blockgal, blckgalb, blockgal, bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, tokisens, 0,        wbml,     tokisens, 0,        ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbml,     0,        wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmljb,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,    wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1987, dakkochn, 0,        wbml,     wbml,     dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensb, ufosensi, ufosensi, ufosensi, bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )

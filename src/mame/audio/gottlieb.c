@@ -103,7 +103,7 @@ static TIMER_CALLBACK( gottlieb_nmi_generate )
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static const char *PhonemeTable[65] =
+static const char *const PhonemeTable[65] =
 {
  "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
  "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",

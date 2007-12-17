@@ -16,7 +16,7 @@ struct EEPROM_interface
 };
 
 
-void EEPROM_init(struct EEPROM_interface *interface);
+void EEPROM_init(const struct EEPROM_interface *interface);
 
 void EEPROM_write_bit(int bit);
 int EEPROM_read_bit(void);
@@ -30,11 +30,11 @@ void EEPROM_set_data(const UINT8 *data, int length);
 UINT8 * EEPROM_get_data_pointer(int * length);
 
 /* 93C46 */
-extern struct EEPROM_interface eeprom_interface_93C46;
+extern const struct EEPROM_interface eeprom_interface_93C46;
 NVRAM_HANDLER( 93C46 );
 
 /* 93C66B */
-extern struct EEPROM_interface eeprom_interface_93C66B;
+extern const struct EEPROM_interface eeprom_interface_93C66B;
 NVRAM_HANDLER( 93C66B );
 
 #endif

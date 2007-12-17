@@ -32,7 +32,7 @@ static int dac_enable;
 static	int channel;
 static	int freq1 = 1000;
 static	int freq2 = 1000;
-static	INT16 waveform[2] = { -120*256, 120*256 };
+static const INT16 waveform[2] = { -120*256, 120*256 };
 
 /************************************/
 /* Sound handler start              */
@@ -44,9 +44,9 @@ void meadows_sh_start(void)
 	vol[0]=vol[1]=255;
 
 	sample_set_volume(0,0);
-	sample_start_raw(0,waveform,sizeof(waveform)/2,freq1,1);
+	sample_start_raw(0,waveform,ARRAY_LENGTH(waveform),freq1,1);
 	sample_set_volume(1,0);
-	sample_start_raw(1,waveform,sizeof(waveform)/2,freq2,1);
+	sample_start_raw(1,waveform,ARRAY_LENGTH(waveform),freq2,1);
 }
 
 /************************************/

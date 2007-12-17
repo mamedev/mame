@@ -597,7 +597,7 @@ static READ8_HANDLER( snd_rom_r )
 	return memory_region(REGION_USER1)[romaddr & 0x7fff];
 }
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 										/* 1 chips */
 	{ NULL,             input_port_0_r },	/* Port A read */

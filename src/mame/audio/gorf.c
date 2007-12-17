@@ -28,7 +28,7 @@ gorf_sh_ update- Null
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
  ****************************************************************************/
 
-static const char *PhonemeTable[65] =
+static const char *const PhonemeTable[65] =
 {
  "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
  "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
@@ -41,7 +41,7 @@ static const char *PhonemeTable[65] =
  0
 };
 
-static const char *GorfWordTable[] =
+static const char *const GorfWordTable[] =
 {
  "A2AYY1","A2E1","UH1GEH1I3N","AE1EH2M","AEM",
  "AE1EH3ND","UH1NAH2I1YLA2SHUH2N","AH2NUHTHER","AH1NUHTHVRR",
@@ -78,7 +78,7 @@ static const char *GorfWordTable[] =
 
 #define num_samples (sizeof(GorfWordTable)/sizeof(char *))
 
-const char *gorf_sample_names[] =
+const char *const gorf_sample_names[] =
 {
  "*gorf","a.wav","a.wav","again.wav","am.wav","am.wav","and.wav","anhilatn.wav",
  "another.wav","another.wav","are.wav","are.wav",

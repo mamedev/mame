@@ -1643,7 +1643,7 @@ static unsigned cycles_CE_subset[256]=
  *  Opcode Table
  ***********************************************************************/
 
-static opcode_fn opcode_main[256]=
+static const opcode_fn opcode_main[256]=
 {
 /*00*/ add,			add,		add,		add,		add,		add,		add,		add,
 /*08*/ add,			add,		add,		add,		add,		add,		add,		add,
@@ -1679,12 +1679,12 @@ static opcode_fn opcode_main[256]=
 /*F8*/ bbz,			bbnz,		bioz,		banz,		blkp,		blkd,		call,		br
 };
 
-static opcode_fn opcode_DX_subset[8]=	/* Instructions living under the Dxxx opcode */
+static const opcode_fn opcode_DX_subset[8]=	/* Instructions living under the Dxxx opcode */
 {
 /*00*/ lrlk,		lalk,		adlk,		sblk,		andk,		ork,		xork,		illegal
 };
 
-static opcode_fn opcode_CE_subset[256]=
+static const opcode_fn opcode_CE_subset[256]=
 {
 /*00*/ eint,		dint,		rovm,		sovm,		cnfd,		cnfp,		rsxm,		ssxm,
 /*08*/ spm,			spm,		spm,		spm,		rxf,		sxf,		fort,		fort,

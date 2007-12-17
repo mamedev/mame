@@ -458,7 +458,7 @@ INLINE dsp32_regs *FINDCONTEXT(int cpu)
 	return context;
 }
 
-static UINT32 regmap[4][16] =
+static const UINT32 regmap[4][16] =
 {
 	{	/* DSP32 compatible mode */
 		PIO_PAR|LOWER, PIO_PAR|UPPER, PIO_PDR|LOWER, PIO_PDR|UPPER,

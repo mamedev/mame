@@ -136,7 +136,7 @@ static void ldr_le(UINT32 op);
 static void sdl_le(UINT32 op);
 static void sdr_le(UINT32 op);
 
-static UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
+static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
 
 
 

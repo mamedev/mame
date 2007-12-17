@@ -560,9 +560,9 @@ static void print_game_sampleof(FILE* out, const game_driver* game)
 
 	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
 	{
-		const char **samplenames = NULL;
+		const char *const *samplenames = NULL;
 		if( drv.sound[i].type == SOUND_SAMPLES )
-			samplenames = ((struct Samplesinterface *)drv.sound[i].config)->samplenames;
+			samplenames = ((const struct Samplesinterface *)drv.sound[i].config)->samplenames;
 		if (samplenames != 0 && samplenames[0] != 0) {
 			int k = 0;
 			if (samplenames[k][0]=='*')
@@ -587,9 +587,9 @@ static void print_game_sample(FILE* out, const game_driver* game)
 
 	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
 	{
-		const char **samplenames = NULL;
+		const char *const *samplenames = NULL;
 		if( drv.sound[i].type == SOUND_SAMPLES )
-			samplenames = ((struct Samplesinterface *)drv.sound[i].config)->samplenames;
+			samplenames = ((const struct Samplesinterface *)drv.sound[i].config)->samplenames;
 		if (samplenames != 0 && samplenames[0] != 0) {
 			int k = 0;
 			if (samplenames[k][0]=='*')

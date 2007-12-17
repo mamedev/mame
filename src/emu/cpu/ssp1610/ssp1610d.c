@@ -10,46 +10,46 @@
 #include "cpuintrf.h"
 
 
-static const char* reg[] =
+static const char *const reg[] =
 {
 	"-", "X", "Y", "A", "ST", "STACK", "PC", "P", "AL", "?", "?", "XST", "PL", "?", "?", "SRCR", "BRCR", "BRER",
 	"XRD0", "XRD1", "AE", "DIOR", "GR22", "GR23", "EXT0", "EXT1", "EXT2", "EXT3", "EXT4", "EXT5", "EXT6", "EXT7"
 };
 
-static const char* rij[] =
+static const char *const rij[] =
 {
 	"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"
 };
 
-static const char* erij[] =
+static const char *const erij[] =
 {
 	"er0", "er1", "er2", "er3", "er4", "er5", "er6", "er7"
 };
 
-static const char* modifier[] =
+static const char *const modifier[] =
 {
 	"", "+!", "-", "+"
 };
 
-static const char* cond[] =
+static const char *const cond[] =
 {
 	"always", "always", "RESERVED", "RESERVED", "gpi0=0", "gpi0=1", "gpi1=0", "gpi1=1", "l=0", "l=1", "z=0", "z=1", "ov=0", "ov=1", "n=0", "n=1",
     "diof=0", "diof=1", "gpi2=0", "gpi2=1", "gpi3=0", "gpi3=1", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED", "RESERVED"
 };
 
-static const char* acc_op[] =
+static const char *const acc_op[] =
 {
 	"ror", "rol", "shr", "shl", "inc", "dec", "neg", "abs"
 };
 
 // pag. 81 uses different addresses!
-static const char* flag_op[] =
+static const char *const flag_op[] =
 {
 	"?", "?", "resl", "setl", "resie", "setie", "?", "?", "resop", "setop", "?", "?", "?", "?", "res", "set"
 };
 
 
-static const char* st_mod[] =
+static const char *const st_mod[] =
 {
 	"macs", "rpl", "gpo", "rb", "gpo0", "gpo1", "gpo2", "gpo3", "wte", "diof", "bre", "reserved", "reserved", "reserved", "reserved", "reserved"
 };

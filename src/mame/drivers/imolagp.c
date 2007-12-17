@@ -510,7 +510,7 @@ ROM_START( imolagp )
 	ROM_LOAD( "xe.bin", 0x3c00, 0x400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1, 			/* 1 chips */
 	{0},		/* Port A read */

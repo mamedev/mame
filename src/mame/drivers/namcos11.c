@@ -881,6 +881,8 @@ static DRIVER_INIT( namcos11 )
 	}
 
 	state_save_register_global( m_n_oldcoin );
+
+	at28c16_init( 0, NULL, NULL );
 }
 
 static MACHINE_RESET( namcos11 )

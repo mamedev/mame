@@ -161,7 +161,7 @@ static PALETTE_INIT( starcrus )
 	memcpy(colortable,colortable_source,sizeof(colortable_source));
 }
 
-static const char *starcrus_sample_names[] =
+static const char *const starcrus_sample_names[] =
 {
     "*starcrus",
     "engine.wav",	/* engine sound, channel 0 */
@@ -171,7 +171,7 @@ static const char *starcrus_sample_names[] =
     0
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
     4,	/* 4 channels */
 	starcrus_sample_names

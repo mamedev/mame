@@ -70,7 +70,7 @@ static UINT16 *dsp56k_bank01_ram ;
 static UINT16 *dsp56k_bank02_ram ;
 static UINT16 *dsp56k_bank04_ram ;
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	7,			/* address bits */
 	8,			/* data bits */

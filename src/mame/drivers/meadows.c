@@ -578,14 +578,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct Samplesinterface meadows_samples_interface =
+static const struct Samplesinterface meadows_samples_interface =
 {
 	2,
 	NULL,
 	meadows_sh_start
 };
 
-static const char *bowl3d_sample_names[] =
+static const char *const bowl3d_sample_names[] =
 {
 	"*bowl3d",
 	"roll.wav",     /* "roll" */
@@ -597,7 +597,7 @@ static const char *bowl3d_sample_names[] =
     0	/* end of array */
 };
 
-static struct Samplesinterface bowl3d_samples_interface =
+static const struct Samplesinterface bowl3d_samples_interface =
 {
  	1,	/* one channel */
 	bowl3d_sample_names

@@ -189,7 +189,7 @@ enum
 	XRI
 };
 
-static const char* token[] =
+static const char *const token[] =
 {
 	"",
 	"illegal",
@@ -364,7 +364,7 @@ static const char* token[] =
 
 
 /* prefix 48 */
-static struct dasm_s dasm48_7810[256] =
+static const struct dasm_s dasm48_7810[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1000 0000 0000                      */
 	{SLRC,"A",       2, 8}, /* 01: 0100 1000 0000 0001                      */
@@ -639,7 +639,7 @@ static struct dasm_s dasm48_7810[256] =
 	{illegal,0, 	 2, 8}	/* ff: 0100 1000 1111 1111                      */
 };
 
-static struct dasm_s dasm48_7807[256] =
+static const struct dasm_s dasm48_7807[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1000 0000 0000                      */
 	{SLRC,"A",       2, 8}, /* 01: 0100 1000 0000 0001                      */
@@ -915,7 +915,7 @@ static struct dasm_s dasm48_7807[256] =
 };
 
 /* prefix 4C */
-static struct dasm_s  dasm4C_7810[256] =
+static const struct dasm_s  dasm4C_7810[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1100 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0100 1100 0000 0001                      */
@@ -1190,7 +1190,7 @@ static struct dasm_s  dasm4C_7810[256] =
 	{illegal,0, 	 2,10}	/* ff: 0100 1100 1111 1111                      */
 };
 
-static struct dasm_s  dasm4C_7807[256] =
+static const struct dasm_s  dasm4C_7807[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1100 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0100 1100 0000 0001                      */
@@ -1466,7 +1466,7 @@ static struct dasm_s  dasm4C_7807[256] =
 };
 
 /* prefix 4D */
-static struct dasm_s  dasm4D_7810[256] =
+static const struct dasm_s  dasm4D_7810[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1101 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0100 1101 0000 0001                      */
@@ -1741,7 +1741,7 @@ static struct dasm_s  dasm4D_7810[256] =
 	{illegal,0, 	 2,10}	/* ff: 0100 1101 1111 1111                      */
 };
 
-static struct dasm_s  dasm4D_7807[256] =
+static const struct dasm_s  dasm4D_7807[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0100 1101 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0100 1101 0000 0001                      */
@@ -2017,7 +2017,7 @@ static struct dasm_s  dasm4D_7807[256] =
 };
 
 /* prefix 60 */
-static struct dasm_s  dasm60[256] =
+static const struct dasm_s  dasm60[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0110 0000 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0110 0000 0000 0001                      */
@@ -2293,7 +2293,7 @@ static struct dasm_s  dasm60[256] =
 };
 
 /* prefix 64 */
-static struct dasm_s  dasm64_7810[256] =
+static const struct dasm_s  dasm64_7810[256] =
 {
 	{MVI,"PA,%b",    3,14}, /* 00: 0110 0100 0000 0000 xxxx xxxx            */
 	{MVI,"PB,%b",    3,14}, /* 01: 0110 0100 0000 0001 xxxx xxxx            */
@@ -2568,7 +2568,7 @@ static struct dasm_s  dasm64_7810[256] =
 	{illegal,0, 	 3,20}	/* ff: 0110 0100 1111 1111 xxxx xxxx            */
 };
 
-static struct dasm_s  dasm64_7807[256] =
+static const struct dasm_s  dasm64_7807[256] =
 {
 	{MVI,"PA,%b",    3,14}, /* 00: 0110 0100 0000 0000 xxxx xxxx            */
 	{MVI,"PB,%b",    3,14}, /* 01: 0110 0100 0000 0001 xxxx xxxx            */
@@ -2844,7 +2844,7 @@ static struct dasm_s  dasm64_7807[256] =
 };
 
 /* prefix 70 */
-static struct dasm_s  dasm70[256] =
+static const struct dasm_s  dasm70[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0111 0000 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0111 0000 0000 0001                      */
@@ -3120,7 +3120,7 @@ static struct dasm_s  dasm70[256] =
 };
 
 /* prefix 74 */
-static struct dasm_s  dasm74[256] =
+static const struct dasm_s  dasm74[256] =
 {
 	{illegal,0, 	 2, 8}, /* 00: 0111 0100 0000 0000                      */
 	{illegal,0, 	 2, 8}, /* 01: 0111 0100 0000 0001                      */
@@ -3396,7 +3396,7 @@ static struct dasm_s  dasm74[256] =
 };
 
 /* main opcodes */
-static struct dasm_s  dasmXX_7810[256] =
+static const struct dasm_s  dasmXX_7810[256] =
 {
 	{NOP,0, 		 1, 4}, /* 00: 0000 0000                                */
 	{LDAW,"%a",      2,10}, /* 01: 0000 0001 oooo oooo                      */
@@ -3671,7 +3671,7 @@ static struct dasm_s  dasmXX_7810[256] =
 	{JR,"%o",        1,10}  /* ff: 11oo oooo                                */
 };
 
-static struct dasm_s  dasmXX_7807[256] =
+static const struct dasm_s  dasmXX_7807[256] =
 {
 	{NOP,0, 		 1, 4}, /* 00: 0000 0000                                */
 	{LDAW,"%a",      2,10}, /* 01: 0000 0001 oooo oooo                      */
@@ -3947,7 +3947,7 @@ static struct dasm_s  dasmXX_7807[256] =
 
 
 /* register names for bit manipulation instructions */
-static const char *regname[32] =
+static const char *const regname[32] =
 {
 	"illegal", "illegal", "illegal", "illegal",
 	"illegal", "illegal", "illegal", "illegal",
@@ -3961,7 +3961,7 @@ static const char *regname[32] =
 
 static unsigned upd7810_get_reg(int reg) { cpuinfo info; upd7810_get_info(CPUINFO_INT_REGISTER + (reg), &info); return info.i; }
 
-static unsigned Dasm( char *buffer, unsigned pc, struct dasm_s *dasmXX, const UINT8 *oprom, const UINT8 *opram )
+static unsigned Dasm( char *buffer, unsigned pc, const struct dasm_s *dasmXX, const UINT8 *oprom, const UINT8 *opram )
 {
 	unsigned opc = pc;
 	UINT8 op = oprom[pc++ - opc], op2, t, l;

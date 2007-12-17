@@ -156,7 +156,7 @@ logerror("Explosion: %x\n", data);
 }
 
 
-static const char *astrof_sample_names[] =
+static const char *const astrof_sample_names[] =
 {
 	"*astrof",
 	"fire.wav",
@@ -174,7 +174,7 @@ static const char *astrof_sample_names[] =
 };
 
 
-static struct Samplesinterface astrof_samples_interface =
+static const struct Samplesinterface astrof_samples_interface =
 {
 	4,	/* 4 channels */
 	astrof_sample_names
@@ -219,7 +219,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 }
 
 
-static struct SN76477interface tomahawk_sn76477_interface =
+static const struct SN76477interface tomahawk_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */

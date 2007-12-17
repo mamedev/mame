@@ -158,9 +158,9 @@ extern VIDEO_START( satansat );
 
 /* audio */
 
-extern const char *sasuke_sample_names[];
-extern const char *vanguard_sample_names[];
-extern const char *fantasy_sample_names[];
+extern const char *const sasuke_sample_names[];
+extern const char *const vanguard_sample_names[];
+extern const char *const fantasy_sample_names[];
 
 extern WRITE8_HANDLER( sasuke_sound_w );
 extern WRITE8_HANDLER( satansat_sound_w );
@@ -713,26 +713,26 @@ static struct CustomSound_interface custom_interface =
 	rockola_sh_start
 };
 
-static struct Samplesinterface sasuke_samples_interface =
+static const struct Samplesinterface sasuke_samples_interface =
 {
 	4,	/* 4 channels */
 	sasuke_sample_names
 };
 
-static struct Samplesinterface vanguard_samples_interface =
+static const struct Samplesinterface vanguard_samples_interface =
 {
 	3,	/* 3 channel */
 	vanguard_sample_names
 };
 
-static struct Samplesinterface fantasy_samples_interface =
+static const struct Samplesinterface fantasy_samples_interface =
 {
 	1,	/* 1 channel */
 	fantasy_sample_names
 };
 
 
-static struct SN76477interface sasuke_sn76477_intf_1 =
+static const struct SN76477interface sasuke_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_K(150),		/*  5  filter_res    */
@@ -761,7 +761,7 @@ static struct SN76477interface sasuke_sn76477_intf_1 =
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
 };
 
-static struct SN76477interface sasuke_sn76477_intf_2 =
+static const struct SN76477interface sasuke_sn76477_intf_2 =
 {
 	RES_K(340),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -790,7 +790,7 @@ static struct SN76477interface sasuke_sn76477_intf_2 =
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
 };
 
-static struct SN76477interface sasuke_sn76477_intf_3 =
+static const struct SN76477interface sasuke_sn76477_intf_3 =
 {
 	RES_K(330),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -819,7 +819,7 @@ static struct SN76477interface sasuke_sn76477_intf_3 =
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
 };
 
-static struct SN76477interface satansat_sn76477_intf =
+static const struct SN76477interface satansat_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -848,7 +848,7 @@ static struct SN76477interface satansat_sn76477_intf =
 	// ???      GND: 2,26,27        +5V: 15,25
 };
 
-static struct SN76477interface vanguard_sn76477_intf_1 =
+static const struct SN76477interface vanguard_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -877,7 +877,7 @@ static struct SN76477interface vanguard_sn76477_intf_1 =
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
 };
 
-static struct SN76477interface vanguard_sn76477_intf_2 =
+static const struct SN76477interface vanguard_sn76477_intf_2 =
 {
 	RES_K(10),		/*  4  noise_res     */
 	RES_K(30),		/*  5  filter_res    */
@@ -906,7 +906,7 @@ static struct SN76477interface vanguard_sn76477_intf_2 =
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
 };
 
-static struct SN76477interface fantasy_sn76477_intf =
+static const struct SN76477interface fantasy_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */

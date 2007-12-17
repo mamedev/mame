@@ -1,4 +1,4 @@
-static void (*PREFIX186(_instruction)[256])(void) =
+static void (*const PREFIX186(_instruction)[256])(void) =
 {
 	 PREFIX86(_add_br8),           /* 0x00 */
 	 PREFIX86(_add_wr16),          /* 0x01 */

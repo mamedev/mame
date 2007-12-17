@@ -93,12 +93,12 @@ typedef struct
 	UINT16	A11;
 	UINT8	irq_state, irq_extra_cycles;
 	int		(*irq_callback)(int irqline);
+	UINT8	Old_T1;
 } I8039_Regs;
 
 static I8039_Regs R;
 static int	   i8039_ICount;
 static int    inst_cycles;
-static UINT8 Old_T1;
 
 /* The opcode table now is a combination of cycle counts and function pointers */
 typedef struct {
@@ -106,8 +106,8 @@ typedef struct {
 	void (*function) (void);
 }	s_opcode;
 
-#define POSITIVE_EDGE_T1  (( (int)(T1-Old_T1) > 0) ? 1 : 0)
-#define NEGATIVE_EDGE_T1  (( (int)(Old_T1-T1) > 0) ? 1 : 0)
+#define POSITIVE_EDGE_T1  (( (int)(T1-R.Old_T1) > 0) ? 1 : 0)
+#define NEGATIVE_EDGE_T1  (( (int)(R.Old_T1-T1) > 0) ? 1 : 0)
 
 #define M_Cy	((R.PSW & C_FLAG) >> 7)
 #define M_Cn	(!M_Cy)
@@ -462,7 +462,7 @@ static void sel_mb1(void)	 { R.A11 = 0x800; }
 static void sel_rb0(void)	 { CLR(B_FLAG); regPTR = 0;  }
 static void sel_rb1(void)	 { SET(B_FLAG); regPTR = 24; }
 static void stop_tcnt(void)	 { R.timerON = R.countON = 0; }
-static void strt_cnt(void)	 { R.countON = 1; R.timerON = 0; Old_T1 = test_r(1); }	/* NS990113 */
+static void strt_cnt(void)	 { R.countON = 1; R.timerON = 0; R.Old_T1 = test_r(1); }	/* NS990113 */
 static void strt_t(void)	 { R.timerON = 1; R.countON = 0; R.masterClock = 0; }	/* NS990113 */
 static void swap_a(void)	 { UINT8 i=R.A >> 4; R.A <<= 4; R.A |= i; }
 static void xch_a_r0(void)	 { UINT8 i=R.A; R.A=R0; R0=i; }
@@ -489,7 +489,7 @@ static void xrl_a_r7(void)	 { R.A ^= R7; }
 static void xrl_a_xr0(void)	 { R.A ^= intRAM[R0 & 0x7f]; }
 static void xrl_a_xr1(void)	 { R.A ^= intRAM[R1 & 0x7f]; }
 
-static s_opcode opcode_main[256]=
+static const s_opcode opcode_main[256]=
 {
 	{1, nop 	   },{0, illegal	},{2, outl_bus_a },{2, add_a_n	  },{2, jmp 	   },{1, en_i		},{0, illegal	 },{1, dec_a	  },
 	{2, ins_a_bus  },{2, in_a_p1	},{2, in_a_p2	 },{0, illegal	  },{2, movd_a_p4  },{2, movd_a_p5	},{2, movd_a_p6  },{2, movd_a_p7  },
@@ -558,6 +558,7 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.A11);
 	state_save_register_item("i8039", index, R.irq_state);
 	state_save_register_item("i8039", index, R.irq_extra_cycles);
+	state_save_register_item("i8039", index, R.Old_T1);
 }
 
 /****************************************************************************
@@ -690,7 +691,7 @@ static int i8039_execute(int cycles)
 						i8039_ICount -= count;
 					}
 				}
-				Old_T1 = T1;
+				R.Old_T1 = T1;
 			}
 		}
 

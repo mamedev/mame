@@ -57,7 +57,7 @@ static INT32 pitch,vol;
 static INT32 counter, countdown;
 static INT32 lfobit[4];
 
-static INT16 backgroundwave[32] =
+static const INT16 backgroundwave[32] =
 {
    0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000,
    0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000, 0x4000,
@@ -357,11 +357,11 @@ static void galaxian_sh_start(void)
 	sample_start_raw(CHANNEL_SHOOT,shootwave,SHOOT_LENGTH,SHOOT_RATE,1);
 
 	sample_set_volume(CHANNEL_LFO+0,0);
-	sample_start_raw(CHANNEL_LFO+0,backgroundwave,sizeof(backgroundwave)/2,1000,1);
+	sample_start_raw(CHANNEL_LFO+0,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 	sample_set_volume(CHANNEL_LFO+1,0);
-	sample_start_raw(CHANNEL_LFO+1,backgroundwave,sizeof(backgroundwave)/2,1000,1);
+	sample_start_raw(CHANNEL_LFO+1,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 	sample_set_volume(CHANNEL_LFO+2,0);
-	sample_start_raw(CHANNEL_LFO+2,backgroundwave,sizeof(backgroundwave)/2,1000,1);
+	sample_start_raw(CHANNEL_LFO+2,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 
 	noisetimer = timer_alloc(noise_timer_cb, NULL);
 	timer_adjust(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
@@ -525,7 +525,7 @@ static TIMER_CALLBACK( galaxian_sh_update )
 }
 
 
-struct Samplesinterface galaxian_samples_interface =
+const struct Samplesinterface galaxian_samples_interface =
 {
 	5,
 	NULL,

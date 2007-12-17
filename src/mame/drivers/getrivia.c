@@ -359,7 +359,7 @@ INPUT_PORTS_END
 
 
 
-static ppi8255_interface getrivia_ppi8255_intf =
+static const ppi8255_interface getrivia_ppi8255_intf =
 {
 	2, 						/* 2 chips */
 	{ input_port_0_r, input_port_2_r },  /* Port A read */
@@ -370,7 +370,7 @@ static ppi8255_interface getrivia_ppi8255_intf =
 	{ sound_w,        lamps2_w },        /* Port C write */
 };
 
-static ppi8255_interface gselect_ppi8255_intf =
+static const ppi8255_interface gselect_ppi8255_intf =
 {
 	2, 						/* 2 chips */
 	{ input_port_0_r, input_port_2_r },  /* Port A read */

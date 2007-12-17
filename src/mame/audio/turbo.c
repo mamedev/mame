@@ -164,7 +164,7 @@ WRITE8_HANDLER( turbo_sound_c_w )
  *
  *************************************/
 
-static const char *turbo_sample_names[] =
+static const char *const turbo_sample_names[] =
 {
 	"*turbo",
 	"01.wav",		/* 0: Trig1 */
@@ -180,7 +180,7 @@ static const char *turbo_sample_names[] =
 };
 
 
-static struct Samplesinterface turbo_samples_interface =
+static const struct Samplesinterface turbo_samples_interface =
 {
 	10,
 	turbo_sample_names
@@ -418,7 +418,7 @@ WRITE8_HANDLER( subroc3d_sound_c_w )
  *
  *************************************/
 
-static const char *subroc3d_sample_names[] =
+static const char *const subroc3d_sample_names[] =
 {
 	"*subroc3d",
 	"01.wav",   /*  0: enemy missile */
@@ -436,7 +436,7 @@ static const char *subroc3d_sample_names[] =
 };
 
 
-static struct Samplesinterface subroc3d_samples_interface =
+static const struct Samplesinterface subroc3d_samples_interface =
 {
 	12,
 	subroc3d_sample_names
@@ -571,7 +571,7 @@ WRITE8_HANDLER( buckrog_sound_b_w )
  *
  *************************************/
 
-static const char *buckrog_sample_names[]=
+static const char *const buckrog_sample_names[]=
 {
 	"*buckrog",
 	"alarm0.wav",	/* 0 */
@@ -589,7 +589,7 @@ static const char *buckrog_sample_names[]=
 };
 
 
-static struct Samplesinterface buckrog_samples_interface =
+static const struct Samplesinterface buckrog_samples_interface =
 {
 	6,          /* 6 channels */
 	buckrog_sample_names

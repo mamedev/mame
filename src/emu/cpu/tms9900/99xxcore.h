@@ -2377,7 +2377,7 @@ static int read_single_CRU(int port)
 
 static int readCRU(int CRUAddr, int Number)
 {
-	static int BitMask[] =
+	static const int BitMask[] =
 	{
 		0, /* filler - saves a subtract to find mask */
 		0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF,
@@ -4527,7 +4527,7 @@ INLINE void execute(UINT16 opcode)
 
 	/* tms9900-like instruction set*/
 
-	static void (* jumptable[128])(UINT16) =
+	static void (*const jumptable[128])(UINT16) =
 	{
 		&illegal,&h0200,&h0400,&h0400,&h0800,&h0800,&illegal,&illegal,
 		&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,&h1000,
@@ -4554,7 +4554,7 @@ INLINE void execute(UINT16 opcode)
 	/* tms9989 and tms9995 include 4 extra instructions, and one additionnal instruction type */
 	/* tms99000 includes yet another additional instruction */
 
-	static void (* jumptable[256])(UINT16) =
+	static void (*const jumptable[256])(UINT16) =
 	{
 		&h0040,&h0100,&h0200,&h0200,&h0400,&h0400,&h0400,&h0400,
 		&h0800,&h0800,&h0800,&h0800,&illegal,&illegal,&illegal,&illegal,

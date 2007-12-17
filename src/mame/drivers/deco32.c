@@ -1836,7 +1836,7 @@ static const UINT8 tattass_default_eprom[0x160] =
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-static struct EEPROM_interface eeprom_interface_tattass =
+static const struct EEPROM_interface eeprom_interface_tattass =
 {
 	10,				// address bits 10  ==> } 1024 byte eprom
 	8,				// data bits    8

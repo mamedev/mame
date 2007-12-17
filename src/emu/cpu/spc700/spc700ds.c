@@ -54,7 +54,7 @@ enum
 };
 
 
-static const char* g_opnames[] =
+static const char *const g_opnames[] =
 {
 	"ADC  ", "ADDW ", "AND  ", "AND1 ", "ASL  ", "BBC  ", "BBS  ", "BCC  ",
 	"BCS  ", "BEQ  ", "BMI  ", "BNE  ", "BPL  ", "BRA  ", "BRK  ", "BVC  ",
@@ -67,7 +67,7 @@ static const char* g_opnames[] =
 	"TCLR1", "TSET1", "XCN  "
 };
 
-static opcode_struct g_opcodes[256] =
+static const opcode_struct g_opcodes[256] =
 {
 /* 00 */ {NOP    , {IMP , IMP }},
 /* 01 */ {TCALL  , {N0  , IMP }},
@@ -346,7 +346,7 @@ INLINE unsigned int read_16_immediate(void)
 
 offs_t spc700_dasm(char *buff, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	opcode_struct* opcode;
+	const opcode_struct* opcode;
 	UINT32 flags = 0;
 	char* ptr;
 	int var;

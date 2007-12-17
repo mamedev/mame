@@ -67,11 +67,12 @@
     * escounts: Colours are completely wrong. Is there a palette register
     somewhere that affects blitter/video output?
     * qos: Game clock and score dividers aren't drawn (needs line draw mode)
-
+    * all games bar qos: NVRAM not saved.
 ******************************************************************************/
 #include "driver.h"
 #include "debugger.h"
 #include "machine/6850acia.h"
+#include "machine/meters.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/upd7759.h"
@@ -1134,10 +1135,12 @@ static READ8_HANDLER( meter_r )
 	return meter_latch;
 }
 
-/* TODO */
+/* TODO: This is borrowed from Scorpion 1 */
 static WRITE8_HANDLER( meter_w )
 {
-	//int changed = meter_latch ^ data;
+	int i;
+	int  changed = meter_latch ^ data;
+	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
 
 	meter_latch = data;
 
@@ -1145,10 +1148,15 @@ static WRITE8_HANDLER( meter_w )
         When a meter is triggered, the current drawn is sensed. If a meter
         is connected, the /FIRQ line will be pulsed.
     */
-	if ( data )
-	{
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, PULSE_LINE );
-	}
+
+	for (i = 0; i<8; i++)
+ 	{
+		if ( changed & (1 << i) )
+		{
+			Mechmtr_update(i, cycles, data & (1 << i) );
+			cpunum_set_input_line(1, M6809_FIRQ_LINE, PULSE_LINE );
+		}
+ 	}
 }
 
 /* TODO */
@@ -1227,14 +1235,14 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bfcobra )
-PORT_START_TAG("STROBE0")
+	PORT_START_TAG("STROBE0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin: 10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin: 20p")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin: 50p")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) PORT_NAME("Coin: 1 pound")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Green Test?") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Red Test?")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("STROBE1")
@@ -1258,8 +1266,8 @@ PORT_START_TAG("STROBE0")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("STROBE3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Unknown (resets)") PORT_CODE(KEYCODE_T) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Cash box door") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Front Door? (resets)") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )

@@ -37,7 +37,7 @@ INLINE char *signed_16bit(INT16 val)
 	return temp;
 }
 
-static const char *regname[32] =
+static const char *const regname[32] =
 {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"AR0", "AR1", "AR2", "AR3", "AR4", "AR5", "AR6", "AR7",
@@ -45,7 +45,7 @@ static const char *regname[32] =
 	"IOF", "RS", "RE", "RC", "??", "??", "??", "??"
 };
 
-static const char *condition[32] =
+static const char *const condition[32] =
 {
 	"U", "LO", "LS", "HI", "HS", "EQ", "NE", "LT",
 	"LE", "GT", "GE", "??", "NV", "V", "NUF", "UF",

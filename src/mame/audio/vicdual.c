@@ -101,7 +101,7 @@ static DISCRETE_SOUND_START(frogs)
 
 DISCRETE_SOUND_END
 
-static const char *frogs_sample_names[] =
+static const char *const frogs_sample_names[] =
 {
 	"*frogs",
 	"boing.wav",
@@ -113,7 +113,7 @@ static const char *frogs_sample_names[] =
 	0
 };
 
-static struct Samplesinterface frogs_samples_interface =
+static const struct Samplesinterface frogs_samples_interface =
 {
 	5,	/* 5 channels */
 	frogs_sample_names

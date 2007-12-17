@@ -1513,6 +1513,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/dorachan.o \
 	$(DRIVERS)/dreamwld.o \
 	$(DRIVERS)/dribling.o $(VIDEO)/dribling.o \
+	$(DRIVERS)/drw80pkr.o \
 	$(DRIVERS)/dwarfd.o \
 	$(DRIVERS)/dynadice.o \
 	$(DRIVERS)/epos.o $(VIDEO)/epos.o \

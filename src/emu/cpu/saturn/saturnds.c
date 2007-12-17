@@ -44,13 +44,13 @@ static int set=1;
 #define W "W"
 #define A "A"
 
-static const char *adr_b[]=
+static const char *const adr_b[]=
 { P, WP, XS, X, S, M, B, W };
 
-static const char *adr_af[]=
+static const char *const adr_af[]=
 { P, WP, XS, X, S, M, B, W, 0, 0, 0, 0, 0, 0, 0, A };
 
-static const char *adr_a[]=
+static const char *const adr_a[]=
 { P, WP, XS, X, S, M, B, W };
 
 static const char number_2_hex[]=
@@ -587,7 +587,7 @@ static const char *field_2_string(int adr_enum)
 	return 0;
 }
 
-static OPCODE opcodes[][0x10]= {
+static const OPCODE opcodes[][0x10]= {
 	{
 		// first digit
 		{ Opcode0 },
@@ -1261,7 +1261,7 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 	int cont=1; // operation still not complete disassembled
 	char bin[10]; int binsize=0; // protocollizing fetched nibbles
 	char number[17];
-	OPCODE *level=opcodes[0]; //pointer to current digit
+	const OPCODE *level=opcodes[0]; //pointer to current digit
 	int op; // currently fetched nibble
 	int	pos = 0;
 

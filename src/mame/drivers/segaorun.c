@@ -76,7 +76,7 @@ static WRITE8_HANDLER( video_control_w );
  *
  *************************************/
 
-static ppi8255_interface single_ppi_intf =
+static const ppi8255_interface single_ppi_intf =
 {
 	1,
 	{ unknown_porta_r },

@@ -105,9 +105,6 @@ X86_MIPS3_DRC = 1
 # uncomment next line to use DRC PowerPC engine
 X86_PPC_DRC = 1
 
-# uncomment next line to use DRC Voodoo rasterizers
-# X86_VOODOO_DRC = 1
-
 
 
 #-------------------------------------------------
@@ -270,11 +267,6 @@ endif
 # define MAME_PROFILER if we are a profiling build
 ifdef PROFILER
 DEFS += -DMAME_PROFILER
-endif
-
-# define VOODOO_DRC if we are building the DRC Voodoo engine
-ifdef X86_VOODOO_DRC
-DEFS += -DVOODOO_DRC
 endif
 
 

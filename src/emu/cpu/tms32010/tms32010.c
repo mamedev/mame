@@ -665,7 +665,7 @@ static unsigned cycles_7F_other[32]=
  *  Opcode Table
  ***********************************************************************/
 
-static opcode_fn opcode_main[256]=
+static const opcode_fn opcode_main[256]=
 {
 /*00*/  add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh
 /*08*/ ,add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh		,add_sh
@@ -701,7 +701,7 @@ static opcode_fn opcode_main[256]=
 /*F8*/ ,call		,br			,blz		,blez		,bgz		,bgez		,bnz		,bz
 };
 
-static opcode_fn opcode_7F_other[32]=
+static const opcode_fn opcode_7F_other[32]=
 {
 /*80*/  nop			,dint		,eint		,illegal	,illegal	,illegal	,illegal	,illegal
 /*88*/ ,abst		,zac		,rovm		,sovm		,cala		,ret		,pac		,apac

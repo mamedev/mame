@@ -57,7 +57,7 @@ static int init_eeprom_count;
 static int rng_z80_control;
 static int rng_sound_status;
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	7,			/* address bits */
 	8,			/* data bits */

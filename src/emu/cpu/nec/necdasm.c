@@ -802,9 +802,9 @@ static const GROUP_OP group_op_table[] =
 
 
 
-static const char *nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
-static const char *neg_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
-static const char *nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
+static const char *const nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
+static const char *const neg_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
+static const char *const nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
 
 static UINT32 pc;
 static UINT8 modrm;

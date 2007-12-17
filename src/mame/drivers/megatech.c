@@ -68,9 +68,12 @@ Tetris                  171-5834    837-6963-22       610-0239-22          MPR-1
 Ghouls & Ghosts         171-5869A   -                 610-0239-23          MPR-12605    (40 pins) MPR-12606    (40 pins) EPR-12368-23 (27256)
 Super Hang On           171-5782    837-6963-24       610-0239-24          MPR-12640    (234000)  EPR-12368-24 (27256)   n/a
 Forgotten Worlds        171-5782    837-6963-26       610-0239-26          MPR-12672-H  (Mask)    EPR-12368-26 (27256)   n/a
+Arnold Palmer Tour Golf 171-5782    837-6963-31       610-0239-31          MPR-12645F   (23C4000) EPR-12368-31 (27256)   n/a
 Super Real Basket Ball  171-5782    837-6963-32       610-0239-32          MPR-12904F   (838200A) EPR-12368-32 (27256)   n/a
-Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-15000A-F (838200)  EPR-12368-62 (27256)   n/a
+Wrestle War             171-5782    837-6963-48       610-0239-48          MPR-14025-F  (23C4000) EPR-12368-48 (27256)   n/a
+Bonanza Bros.           171-5782    837-6963-49       610-0239-49          MPR-13905A-F (23C4000) EPR-12368-49 (27256)   n/a
 Mario Lemeux Hockey     171-5782    837-6963-59       610-0239-59          MPR-14376-H  (234000)  EPR-12368-59 (27256)   n/a
+Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-15000A-F (838200)  EPR-12368-62 (27256)   n/a
 
 
 */
@@ -878,6 +881,19 @@ ROM_START( mt_bbros ) /* Bonanza Bros */
 	MEGATECH_GAME49(REGION_USER1, REGION_USER2)
 ROM_END
 
+/* Game 48 - Wrestle War */
+
+#define MEGATECH_GAME48(GAME_REGION, INSTRUCTION_REGION) \
+	ROM_REGION16_BE( 0x300000, GAME_REGION, 0 ) \
+	ROM_LOAD16_WORD_SWAP( "mpr-14025-f.ic1", 0x000000, 0x080000, CRC(26e899fe) SHA1(6d28e154ae2e4196097a2aa96c5acd5dfe7e3d2b) ) \
+    MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_GEN ) \
+	ROM_LOAD( "12368-48.ic2", 0x000000, 0x08000, CRC(25817bc2) SHA1(ba1bbb952aff12fb4d3ecfb10d82c54128439395) ) \
+
+ROM_START( mt_wwar ) /* Wrestle War */
+	MEGATECH_BIOS
+	MEGATECH_GAME48(REGION_USER1, REGION_USER2)
+ROM_END
+
 /* Game 62 - Sonic 2 */
 
 #define MEGATECH_GAME62(GAME_REGION, INSTRUCTION_REGION) \
@@ -1293,7 +1309,7 @@ ROM_END
 /* 45 */ // unknown
 /* 46 */ // unknown
 /* 47 */ GAME( 1990, mt_astrm, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Storm (Mega-Tech", GAME_NOT_WORKING )
-/* 48 */ // unknown
+/* 48 */ GAME( 1991, mt_wwar,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Wrestle War (Mega-Tech)", GAME_NOT_WORKING ) /* Copyright 1989, 1991 Sega */
 /* 49 */ GAME( 1991, mt_bbros, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Bonanza Bros. (Mega-Tech)", GAME_NOT_WORKING )
 /* 50 */ // unknown
 /* 51 */ // unknown
@@ -1309,10 +1325,7 @@ ROM_END
 /* 60 */ GAME( 1992, mt_kcham, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Kid Chameleon (Mega-Tech)", GAME_NOT_WORKING )
 /* 61 */ // unknown
 /* 62 */ GAME( 1992, mt_soni2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Sonic The Hedgehog 2 (Mega-Tech)", GAME_NOT_WORKING )
-/*
-    Known to Exist, but nn number currently not known:
-    Wrestle War
-*/
+
 /* more? */
 
 /* Compilations to test multi-game support */

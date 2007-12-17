@@ -43,6 +43,61 @@
 #define I8035_DIVIDER			(15)
 #define I8035_CLOCK				(I8035_MASTER_CLOCK/I8035_DIVIDER)
 
+#define HARDWARE_TYPE_TAG		"HARDWARE_TYPE"
+#define HARDWARE_TKG04			0
+#define HARDWARE_TRS01			1
+#define HARDWARE_TRS02			2
+#define HARDWARE_TKG02			3
+
+#define DK2B_PALETTE_LENGTH		(256+256+8+1) // (256)
+#define DK4B_PALETTE_LENGTH		(256+256+8+1) // (256)
+#define DK3_PALETTE_LENGTH		(256+256+8+1) // (256)
+#define RS_PALETTE_LENGTH		(256+256+8+1)
+
+typedef struct _dkong_state dkong_state;
+struct _dkong_state
+{
+	/* memory pointers */
+
+	/* machine states */
+	UINT8	hardware_type;
+
+	/* sound state */
+
+	/* video state */
+	tilemap *bg_tilemap;
+
+	mame_bitmap *	bg_bits;
+	const UINT8 *	color_codes;
+	emu_timer *		scanline_timer;
+	INT8 			vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+
+	/* radar scope */
+	UINT8	sig30Hz;
+	UINT8	grid_sig;
+	UINT8	rflip_sig;
+	UINT8	star_ff;
+	UINT8	blue_level;
+	double 	cd4049_a;
+	double	cd4049_b;
+
+	/* Specific states */
+	INT8 decrypt_counter;
+	int hunchloopback;
+
+	/* Save state relevant */
+	UINT8	gfx_bank, palette_bank;
+	UINT8	grid_on;
+	UINT8	snd02_enable;
+	UINT8	sig_ansn;
+	UINT16	grid_col;
+	UINT8	sprite_bank;
+	UINT8	dma_latch;
+
+	/* reverse address lookup map - hunchbkd */
+	INT16 rev_map[0x200];
+
+};
 
 /*----------- defined in video/dkong.c -----------*/
 
@@ -59,15 +114,13 @@ WRITE8_HANDLER( dkong_palettebank_w );
 
 WRITE8_HANDLER( dkong_videoram_w );
 
-PALETTE_INIT( dkong );
+PALETTE_INIT( dkong2b );
+PALETTE_INIT( dkong4b );
 PALETTE_INIT( radarscp );
 PALETTE_INIT( radarsc1 );
 PALETTE_INIT( dkong3 );
 
 VIDEO_START( dkong );
-VIDEO_START( radarsc1 );
-VIDEO_START( radarscp );
-VIDEO_UPDATE( radarscp );
 VIDEO_UPDATE( dkong );
 VIDEO_UPDATE( pestplce );
 VIDEO_UPDATE( spclforc );
@@ -86,39 +139,21 @@ DRIVER_INIT( drakton );
 
 /*----------- defined in audio/dkong.c -----------*/
 
-READ8_HANDLER( dkong_sh_p1_r );
-READ8_HANDLER( dkong_sh_p2_r );
-READ8_HANDLER( dkong_sh_t0_r );
-READ8_HANDLER( dkong_sh_t1_r );
-READ8_HANDLER( dkong_sh_tune_r );
-READ8_HANDLER( dkong_in2_r );
-
-WRITE8_HANDLER( radarsc1_snd_disc_w );
-WRITE8_HANDLER( dkong_sh_w );
-WRITE8_HANDLER( dkong_sh_p1_w );
-WRITE8_HANDLER( dkong_sh_p2_w );
+READ8_HANDLER( dkong_audio_status_r );
+WRITE8_HANDLER( dkong_audio_irq_w );
 
 WRITE8_HANDLER( dkong_snd_disc_w );
 WRITE8_HANDLER( dkong_sh_tuneselect_w );
 
 WRITE8_HANDLER( dkongjr_sh_test6_w );
-WRITE8_HANDLER( dkongjr_sh_test5_w );
-WRITE8_HANDLER( dkongjr_sh_test4_w );
 WRITE8_HANDLER( dkongjr_sh_tuneselect_w );
 
 WRITE8_HANDLER( dkongjr_snd_w1 );
 WRITE8_HANDLER( dkongjr_snd_w2 );
 
-READ8_HANDLER( radarsc1_sh_tune_r );
-READ8_HANDLER( radarsc1_sh_p1_r );
-WRITE8_HANDLER( radarsc1_sh_p1_w );
-WRITE8_HANDLER( radarsc1_sh_p2_w );
-
-SOUND_START( dkong );
-SOUND_START( dkongjr );
-SOUND_START( hunchbkd );
-SOUND_START( radarsc1 );
-
-DISCRETE_SOUND_EXTERN( dkong );
-DISCRETE_SOUND_EXTERN( radarscp );
+MACHINE_DRIVER_EXTERN( radarscp_audio );
+MACHINE_DRIVER_EXTERN( dkong2b_audio );
+MACHINE_DRIVER_EXTERN( dkongjr_audio );
+MACHINE_DRIVER_EXTERN( dkong3_audio );
+MACHINE_DRIVER_EXTERN( radarsc1_audio );
 

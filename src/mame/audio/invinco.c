@@ -20,7 +20,7 @@
 
 
 /* sample file names */
-static const char *invinco_sample_names[] =
+static const char *const invinco_sample_names[] =
 {
 	"*invinco",
 	"saucer.wav",
@@ -35,7 +35,7 @@ static const char *invinco_sample_names[] =
 };
 
 
-static struct Samplesinterface invinco_samples_interface =
+static const struct Samplesinterface invinco_samples_interface =
 {
 	8,
 	invinco_sample_names

@@ -81,7 +81,7 @@ static UINT8 sound_state[3];
  *
  *************************************/
 
-static const char *zaxxon_sample_names[] =
+static const char *const zaxxon_sample_names[] =
 {
 	"*zaxxon",
 	"03.wav",   /* 0 - Homing Missile */
@@ -100,7 +100,7 @@ static const char *zaxxon_sample_names[] =
 };
 
 
-static struct Samplesinterface zaxxon_samples_interface =
+static const struct Samplesinterface zaxxon_samples_interface =
 {
 	12,
 	zaxxon_sample_names
@@ -194,7 +194,7 @@ WRITE8_HANDLER( zaxxon_sound_c_w )
  *
  *************************************/
 
-static const char *congo_sample_names[] =
+static const char *const congo_sample_names[] =
 {
 	"*congo",
 	"gorilla.wav",	/* 0 */
@@ -206,7 +206,7 @@ static const char *congo_sample_names[] =
 };
 
 
-static struct Samplesinterface congo_samples_interface =
+static const struct Samplesinterface congo_samples_interface =
 {
 	5,	/* 5 channels */
 	congo_sample_names

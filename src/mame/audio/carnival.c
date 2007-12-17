@@ -81,7 +81,7 @@
 
 
 /* sample file names */
-static const char *carnival_sample_names[] =
+static const char *const carnival_sample_names[] =
 {
 	"*carnival",
 	"bear.wav",
@@ -98,7 +98,7 @@ static const char *carnival_sample_names[] =
 };
 
 
-static struct Samplesinterface carnival_samples_interface =
+static const struct Samplesinterface carnival_samples_interface =
 {
 	10,
 	carnival_sample_names

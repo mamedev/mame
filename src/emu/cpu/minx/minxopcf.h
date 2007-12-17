@@ -274,7 +274,7 @@ OP(FD) { /* illegal instruction? */ }
 OP(FE) { regs.Y = regs.SP; }
 OP(FF) { /* illegal instruction? */ }
 
-static void (*insnminx_CF[256])(void) = {
+static void (*const insnminx_CF[256])(void) = {
 	minx_CF_00, minx_CF_01, minx_CF_02, minx_CF_03, minx_CF_04, minx_CF_05, minx_CF_06, minx_CF_07,
 	minx_CF_08, minx_CF_09, minx_CF_0A, minx_CF_0B, minx_CF_0C, minx_CF_0D, minx_CF_0E, minx_CF_0F,
 	minx_CF_10, minx_CF_11, minx_CF_12, minx_CF_13, minx_CF_14, minx_CF_15, minx_CF_16, minx_CF_17,
@@ -309,7 +309,7 @@ static void (*insnminx_CF[256])(void) = {
 	minx_CF_F8, minx_CF_F9, minx_CF_FA, minx_CF_FB, minx_CF_FC, minx_CF_FD, minx_CF_FE, minx_CF_FF
 };
 
-static int insnminx_cycles_CF[256] = {
+static const int insnminx_cycles_CF[256] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

@@ -272,12 +272,12 @@ static void update_mpu68_interrupts(void)
 	/* set the new state of the IRQ lines */
 	if (newstate)
 	{
-		LOG(("68k IRQ, %x\n", newstate));
+		LOGSTUFF(("68k IRQ, %x\n", newstate));
 		cpunum_set_input_line(1, newstate, ASSERT_LINE);
 	}
 	else
 	{
-		LOG(("68k IRQ Clear, %x\n", newstate));
+		LOGSTUFF(("68k IRQ Clear, %x\n", newstate));
 		cpunum_set_input_line(1, 7, CLEAR_LINE);
 	}
 }

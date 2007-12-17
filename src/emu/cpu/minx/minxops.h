@@ -274,7 +274,7 @@ OP(FD) { UINT16 i = rdop() << 1; JMP( i ); /* PUSH8( regs.F );?? */ }
 OP(FE) { /* illegal operation? */ }
 OP(FF) { }
 
-static void (*insnminx[256])(void) = {
+static void (*const insnminx[256])(void) = {
 	minx_00, minx_01, minx_02, minx_03, minx_04, minx_05, minx_06, minx_07,
 	minx_08, minx_09, minx_0A, minx_0B, minx_0C, minx_0D, minx_0E, minx_0F,
 	minx_10, minx_11, minx_12, minx_13, minx_14, minx_15, minx_16, minx_17,
@@ -309,7 +309,7 @@ static void (*insnminx[256])(void) = {
 	minx_F8, minx_F9, minx_FA, minx_FB, minx_FC, minx_FD, minx_FE, minx_FF
 };
 
-static int insnminx_cycles[256] = {
+static const int insnminx_cycles[256] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

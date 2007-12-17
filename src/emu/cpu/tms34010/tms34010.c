@@ -825,7 +825,7 @@ static int tms34010_execute(int cycles)
     PIXEL OPS
 ***************************************************************************/
 
-static void (*pixel_write_ops[4][5])(offs_t offset,UINT32 data) =
+static void (*const pixel_write_ops[4][5])(offs_t offset,UINT32 data) =
 {
 	{ write_pixel_1,     write_pixel_2,     write_pixel_4,     write_pixel_8,     write_pixel_16     },
 	{ write_pixel_r_1,   write_pixel_r_2,   write_pixel_r_4,   write_pixel_r_8,   write_pixel_r_16   },
@@ -833,7 +833,7 @@ static void (*pixel_write_ops[4][5])(offs_t offset,UINT32 data) =
 	{ write_pixel_r_t_1, write_pixel_r_t_2, write_pixel_r_t_4, write_pixel_r_t_8, write_pixel_r_t_16 }
 };
 
-static UINT32 (*pixel_read_ops[5])(offs_t offset) =
+static UINT32 (*const pixel_read_ops[5])(offs_t offset) =
 {
 	read_pixel_1,        read_pixel_2,      read_pixel_4,      read_pixel_8,      read_pixel_16
 };
@@ -876,7 +876,7 @@ static void set_pixel_function(void)
     RASTER OPS
 ***************************************************************************/
 
-static INT32 (*raster_ops[32]) (INT32 newpix, INT32 oldpix) =
+static INT32 (*const raster_ops[32]) (INT32 newpix, INT32 oldpix) =
 {
 	           0, raster_op_1 , raster_op_2 , raster_op_3,
 	raster_op_4 , raster_op_5 , raster_op_6 , raster_op_7,
@@ -1120,7 +1120,7 @@ VIDEO_UPDATE( tms340x0 )
     I/O REGISTER WRITES
 ***************************************************************************/
 
-static const char *ioreg_name[] =
+static const char *const ioreg_name[] =
 {
 	"HESYNC", "HEBLNK", "HSBLNK", "HTOTAL",
 	"VESYNC", "VEBLNK", "VSBLNK", "VTOTAL",
@@ -1247,7 +1247,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 }
 
 
-static const char *ioreg020_name[] =
+static const char *const ioreg020_name[] =
 {
 	"VESYNC", "HESYNC", "VEBLNK", "HEBLNK",
 	"VSBLNK", "HSBLNK", "VTOTAL", "HTOTAL",

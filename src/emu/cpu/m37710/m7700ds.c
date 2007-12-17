@@ -58,7 +58,7 @@ enum
   BBC,   BBS,   TBY,   ANDB,  PUL ,  PSH ,  PLAB,  XAB ,  PHB
 };
 
-static const char* g_opnames[] =
+static const char *const g_opnames[] =
 {
  "ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
  "BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
@@ -74,7 +74,7 @@ static const char* g_opnames[] =
  "BBC", "BBS", "TBY", "ANDB","PUL", "PSH", "PLB", "XAB", "PHB",
 };
 
-static opcode_struct g_opcodes[256] =
+static const opcode_struct g_opcodes[256] =
 {
 	{BRK, I, SIG }, {ORA, M, DXI }, {UNK, I, SIG }, {ORA, M, S   },
 	{SEB, M, LDM4 }, {ORA, M, D   }, {ASL, M, D   }, {ORA, M, DLI },
@@ -157,7 +157,7 @@ static opcode_struct g_opcodes[256] =
 	{JSR, I, AXI }, {SBC, M, AX  }, {INC, M, AX  }, {SBC, M, ALX }
 };
 
-static opcode_struct g_opcodes_prefix42[256] =
+static const opcode_struct g_opcodes_prefix42[256] =
 {
 	{BRK, I, SIG }, {ORB, M, DXI }, {COP, I, SIG }, {ORB, M, S   },
 	{TSB, M, D   }, {ORB, M, D   }, {ASL, M, D   }, {ORB, M, DLI },
@@ -240,7 +240,7 @@ static opcode_struct g_opcodes_prefix42[256] =
 	{JSR, I, AXI }, {SBCB, M, AX  }, {INC, M, AX  }, {SBCB, M, ALX }
 };
 
-static opcode_struct g_opcodes_prefix89[256] =
+static const opcode_struct g_opcodes_prefix89[256] =
 {
 	{BRK, I, SIG }, {MPY, M, DXI }, {COP, I, SIG }, {MPY, M, S   },
 	{TSB, M, D   }, {MPY, M, D   }, {ASL, M, D   }, {MPY, M, DLI },
@@ -373,7 +373,7 @@ INLINE char* int_16_str(unsigned int val)
 int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag)
 {
 	unsigned int instruction;
-	opcode_struct *opcode;
+	const opcode_struct *opcode;
 	char* ptr;
 	int var;
 	signed char varS;

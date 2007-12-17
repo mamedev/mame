@@ -100,7 +100,7 @@
 #if TEST_MODE
 #include "input.h"
 
-static struct SN76477interface empty_interface =
+static const struct SN76477interface empty_interface =
 {
 	0,			/*  4 noise_clock_res  */
 	0,			/*  5 filter_res       */

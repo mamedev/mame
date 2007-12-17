@@ -107,7 +107,7 @@ READ8_HANDLER( asteroid_IN1_r )
 	int bitmask;
 
 	res=readinputport(1);
-	bitmask = (1 << offset);
+	bitmask = (1 << (offset & 0x7));
 
 	if (res & bitmask)
 		res = 0x80;
@@ -186,8 +186,13 @@ READ8_HANDLER( llander_IN0_r )
 
 	if (avgdvg_done())
 		res |= 0x01;
+	else
+		res &= ~0x01;
+
 	if (activecpu_gettotalcycles() & 0x100)
 		res |= 0x40;
+	else
+		res &= ~0x40;
 
 	return res;
 }

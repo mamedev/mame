@@ -52,11 +52,11 @@ typedef unsigned short int word;
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
 
-static const char *arith[4] = { "*" , "*-" , "*+" , "??" } ;
-static const char *nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
+static const char *const arith[4] = { "*" , "*-" , "*+" , "??" } ;
+static const char *const nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
 
 
-static const char *TMS32010Formats[] = {
+static const char *const TMS32010Formats[] = {
 	FMT("0000ssss0aaaaaaa", "add  %A%S"),
 	FMT("0000ssss10mmn00n", "add  %M%S%N"),
 	FMT("0001ssss0aaaaaaa", "sub  %A%S"),
@@ -183,7 +183,8 @@ static int OpInizialized = 0;
 
 static void InitDasm32010(void)
 {
-	const char *p, **ops;
+	const char *p;
+	const char *const *ops;
 	word mask, bits;
 	int bit;
 	int i;

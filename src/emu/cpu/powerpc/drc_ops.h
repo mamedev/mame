@@ -1,4 +1,4 @@
-static PPC_OPCODE ppcdrc_opcode_common[] =
+static const PPC_OPCODE ppcdrc_opcode_common[] =
 {
 	/*code  subcode         handler                 */
 	{ 31,	266,			recompile_addx				},

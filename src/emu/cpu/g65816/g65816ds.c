@@ -63,7 +63,7 @@ enum
   TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE
 };
 
-static const char* g_opnames[] =
+static const char *const g_opnames[] =
 {
  "ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
  "BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",

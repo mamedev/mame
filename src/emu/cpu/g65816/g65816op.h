@@ -1954,7 +1954,7 @@ INLINE uint EA_SIY(void)   {return MAKE_UINT_16(read_16_SIY(REGISTER_S + OPER_8_
 #if FLAG_SET_E
 #define OP(CODE, OPERATION) static void g65816i_ ## CODE ## _E(void) {OPERATION;}
 #define O(CODE) g65816i_ ## CODE ## _E
-#define TABLE_OPCODES void (*g65816i_opcodes_E[256])(void)
+#define TABLE_OPCODES void (*const g65816i_opcodes_E[256])(void)
 #define TABLE_FUNCTION(RTYPE, NAME, ARGS)	RTYPE g65816i_ ## NAME ## _E ARGS
 
 #else
@@ -1962,28 +1962,28 @@ INLINE uint EA_SIY(void)   {return MAKE_UINT_16(read_16_SIY(REGISTER_S + OPER_8_
 #if !FLAG_SET_M && !FLAG_SET_X
 #define OP(CODE, OPERATION) static void g65816i_ ## CODE ## _M0X0(void) {OPERATION;}
 #define O(CODE) g65816i_ ## CODE ## _M0X0
-#define TABLE_OPCODES void (*g65816i_opcodes_M0X0[256])(void)
+#define TABLE_OPCODES void (*const g65816i_opcodes_M0X0[256])(void)
 #define TABLE_FUNCTION(RTYPE, NAME, ARGS)	RTYPE g65816i_ ## NAME ## _M0X0 ARGS
 
 #elif !FLAG_SET_M && FLAG_SET_X
 
 #define OP(CODE, OPERATION) static void g65816i_ ## CODE ## _M0X1(void) {OPERATION;}
 #define O(CODE) g65816i_ ## CODE ## _M0X1
-#define TABLE_OPCODES void (*g65816i_opcodes_M0X1[256])(void)
+#define TABLE_OPCODES void (*const g65816i_opcodes_M0X1[256])(void)
 #define TABLE_FUNCTION(RTYPE, NAME, ARGS)	RTYPE g65816i_ ## NAME ## _M0X1 ARGS
 
 #elif FLAG_SET_M && !FLAG_SET_X
 
 #define OP(CODE, OPERATION) static void g65816i_ ## CODE ## _M1X0(void) {OPERATION;}
 #define O(CODE) g65816i_ ## CODE ## _M1X0
-#define TABLE_OPCODES void (*g65816i_opcodes_M1X0[256])(void)
+#define TABLE_OPCODES void (*const g65816i_opcodes_M1X0[256])(void)
 #define TABLE_FUNCTION(RTYPE, NAME, ARGS)	RTYPE g65816i_ ## NAME ## _M1X0 ARGS
 
 #elif FLAG_SET_M && FLAG_SET_X
 
 #define OP(CODE, OPERATION) static void g65816i_ ## CODE ## _M1X1(void) {OPERATION;}
 #define O(CODE) g65816i_ ## CODE ## _M1X1
-#define TABLE_OPCODES void (*g65816i_opcodes_M1X1[256])(void)
+#define TABLE_OPCODES void (*const g65816i_opcodes_M1X1[256])(void)
 #define TABLE_FUNCTION(RTYPE, NAME, ARGS)	RTYPE g65816i_ ## NAME ## _M1X1 ARGS
 
 #endif

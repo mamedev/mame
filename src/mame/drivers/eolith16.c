@@ -18,7 +18,7 @@ static UINT16 *vram;
 static int vbuffer = 0;
 
 // It's configured for 512 bytes
-static struct EEPROM_interface eeprom_interface_93C66 =
+static const struct EEPROM_interface eeprom_interface_93C66 =
 {
 	9,				// address bits 9
 	8,				// data bits    8

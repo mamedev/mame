@@ -394,7 +394,7 @@ static void vlcol(void);
 
 
 /* Opcode Table */
-static void (*opcode_table[65536 >> 4])(void) =
+static void (*const opcode_table[65536 >> 4])(void) =
 {
 	/* 0x0000 0x0010 0x0020 0x0030 ... 0x00f0 */
 	unimpl,		unimpl,		rev_a,		rev_b,		idle,		unimpl,		unimpl,		unimpl,

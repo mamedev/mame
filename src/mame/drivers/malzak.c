@@ -414,7 +414,7 @@ static PALETTE_INIT( malzak )
 }
 
 
-static struct SN76477interface sn76477_intf =
+static const struct SN76477interface sn76477_intf =
 {
 	0,	/* N/C */		/*  4  noise_res         */
 	0,	/* N/C */		/*  5  filter_res        */

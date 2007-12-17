@@ -9,7 +9,7 @@
 #include "debugger.h"
 #include "e132xs.h"
 
-static const char *L_REG[] =
+static const char *const L_REG[] =
 {
   "L0",  "L1",  "L2",  "L3",  "L4",  "L5",  "L6",  "L7",  "L8",  "L9",
   "L10", "L11", "L12", "L13", "L14", "L15", "L16", "L17", "L18", "L19",
@@ -20,7 +20,7 @@ static const char *L_REG[] =
   "L60", "L61", "L62", "L63"
 };
 
-static const char *G_REG[] =
+static const char *const G_REG[] =
 {
   "PC",  "SR",  "FER", "G03", "G04", "G05", "G06", "G07", "G08", "G09",
   "G10", "G11", "G12", "G13", "G14", "G15", "G16", "G17", "SP",  "UB",
@@ -28,7 +28,7 @@ static const char *G_REG[] =
   "G30", "G31"
 };
 
-static const char *SETxx[] =
+static const char *const SETxx[] =
 {
   "SETADR",   "Reserved", "SET1",   "SET0",     "SETLE",  "SETGT",  "SETLT",  "SETGE",
   "SETSE",    "SETHT",    "SETST",  "SETHE",    "SETE",   "SETNE",  "SETV",   "SETNV",

@@ -263,8 +263,8 @@ static int dvg_dmald(vgdata *vg)
 static void dvg_draw_to(int x, int y, int intensity)
 {
 	if (((x | y) & 0x400) == 0)
-		vg_add_point_buf(xcenter + ((x - 0x200) << 16),
-						 ycenter - ((y - 0x200) << 16),
+		vg_add_point_buf((xmin + x - 512) << 16,
+						 (ymin + 512 - y) << 16,
 						 VECTOR_COLOR111(7), intensity << 4);
 }
 
@@ -1270,71 +1270,6 @@ MACHINE_RESET( avgdvg )
 
 /*************************************
  *
- *  Vector generator init
- *
- ************************************/
-
-static VIDEO_START( avgdvg )
-{
-	xmin = machine->screen[0].visarea.min_x;
-	ymin = machine->screen[0].visarea.min_y;
-	xmax = machine->screen[0].visarea.max_x;
-	ymax = machine->screen[0].visarea.max_y;
-
-	xcenter = ((xmax + xmin) / 2) << 16;
-	ycenter = ((ymax + ymin) / 2) << 16;
-
-	flip_x = flip_y = 0;
-
-	vg_halt_timer = timer_alloc(vg_set_halt_callback, NULL);
-	vg_run_timer = timer_alloc(run_state_machine, NULL);
-
-	/*
-     * The x and y DACs use 10 bit of the counter values which are in
-     * two's complement representation. The DAC input is xored with
-     * 0x200 to convert the value to unsigned.
-     */
-	vg->xdac_xor = 0x200;
-	vg->ydac_xor = 0x200;
-
-	state_save_register_item("AVG", 0, vg->pc);
-	state_save_register_item("AVG", 0, vg->sp);
-	state_save_register_item("AVG", 0, vg->dvx);
-	state_save_register_item("AVG", 0, vg->dvy);
-	state_save_register_item("AVG", 0, vg->dvy12);
-	state_save_register_item("AVG", 0, vg->timer);
-	state_save_register_item_array("AVG", 0, vg->stack);
-	state_save_register_item("AVG", 0, vg->data);
-	state_save_register_item("AVG", 0, vg->state_latch);
-	state_save_register_item("AVG", 0, vg->int_latch);
-	state_save_register_item("AVG", 0, vg->scale);
-	state_save_register_item("AVG", 0, vg->bin_scale);
-	state_save_register_item("AVG", 0, vg->intensity);
-	state_save_register_item("AVG", 0, vg->color);
-	state_save_register_item("AVG", 0, vg->enspkl);
-	state_save_register_item("AVG", 0, vg->spkl_shift);
-	state_save_register_item("AVG", 0, vg->map);
-	state_save_register_item("AVG", 0, vg->hst);
-	state_save_register_item("AVG", 0, vg->lst);
-	state_save_register_item("AVG", 0, vg->izblank);
-	state_save_register_item("AVG", 0, vg->op);
-	state_save_register_item("AVG", 0, vg->halt);
-	state_save_register_item("AVG", 0, vg->sync_halt);
-	state_save_register_item("AVG", 0, vg->xdac_xor);
-	state_save_register_item("AVG", 0, vg->ydac_xor);
-	state_save_register_item("AVG", 0, vg->xpos);
-	state_save_register_item("AVG", 0, vg->ypos);
-	state_save_register_item("AVG", 0, vg->clipx_min);
-	state_save_register_item("AVG", 0, vg->clipy_min);
-	state_save_register_item("AVG", 0, vg->clipx_max);
-	state_save_register_item("AVG", 0, vg->clipy_max);
-
-	video_start_vector(machine);
-}
-
-
-/*************************************
- *
  *  Configuration of VG variants
  *
  *************************************/
@@ -1468,56 +1403,126 @@ static vgconf avg_quantum =
 
 /*************************************
  *
- *  Video startup
+ *  Vector generator init
  *
  ************************************/
+
+static void register_state (void)
+{
+	state_save_register_item("AVG", 0, vg->pc);
+	state_save_register_item("AVG", 0, vg->sp);
+	state_save_register_item("AVG", 0, vg->dvx);
+	state_save_register_item("AVG", 0, vg->dvy);
+	state_save_register_item("AVG", 0, vg->dvy12);
+	state_save_register_item("AVG", 0, vg->timer);
+	state_save_register_item_array("AVG", 0, vg->stack);
+	state_save_register_item("AVG", 0, vg->data);
+	state_save_register_item("AVG", 0, vg->state_latch);
+	state_save_register_item("AVG", 0, vg->int_latch);
+	state_save_register_item("AVG", 0, vg->scale);
+	state_save_register_item("AVG", 0, vg->bin_scale);
+	state_save_register_item("AVG", 0, vg->intensity);
+	state_save_register_item("AVG", 0, vg->color);
+	state_save_register_item("AVG", 0, vg->enspkl);
+	state_save_register_item("AVG", 0, vg->spkl_shift);
+	state_save_register_item("AVG", 0, vg->map);
+	state_save_register_item("AVG", 0, vg->hst);
+	state_save_register_item("AVG", 0, vg->lst);
+	state_save_register_item("AVG", 0, vg->izblank);
+	state_save_register_item("AVG", 0, vg->op);
+	state_save_register_item("AVG", 0, vg->halt);
+	state_save_register_item("AVG", 0, vg->sync_halt);
+	state_save_register_item("AVG", 0, vg->xdac_xor);
+	state_save_register_item("AVG", 0, vg->ydac_xor);
+	state_save_register_item("AVG", 0, vg->xpos);
+	state_save_register_item("AVG", 0, vg->ypos);
+	state_save_register_item("AVG", 0, vg->clipx_min);
+	state_save_register_item("AVG", 0, vg->clipy_min);
+	state_save_register_item("AVG", 0, vg->clipx_max);
+	state_save_register_item("AVG", 0, vg->clipy_max);
+}
+
+static VIDEO_START( avg_common )
+{
+	xmin = machine->screen[0].visarea.min_x;
+	ymin = machine->screen[0].visarea.min_y;
+	xmax = machine->screen[0].visarea.max_x;
+	ymax = machine->screen[0].visarea.max_y;
+
+	xcenter = ((xmax - xmin) / 2) << 16;
+	ycenter = ((ymax - ymin) / 2) << 16;
+
+	flip_x = flip_y = 0;
+
+	vg_halt_timer = timer_alloc(vg_set_halt_callback, NULL);
+	vg_run_timer = timer_alloc(run_state_machine, NULL);
+
+	/*
+     * The x and y DACs use 10 bit of the counter values which are in
+     * two's complement representation. The DAC input is xored with
+     * 0x200 to convert the value to unsigned.
+     */
+	vg->xdac_xor = 0x200;
+	vg->ydac_xor = 0x200;
+
+	register_state ();
+	video_start_vector(machine);
+}
 
 VIDEO_START( dvg )
 {
 	vgc = &dvg_default;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+
+	xmin = machine->screen[0].visarea.min_x;
+	ymin = machine->screen[0].visarea.min_y;
+
+	vg_halt_timer = timer_alloc(vg_set_halt_callback, NULL);
+	vg_run_timer = timer_alloc(run_state_machine, NULL);
+
+	register_state ();
+	video_start_vector(machine);
 }
 
 VIDEO_START( avg )
 {
 	vgc = &avg_default;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 
 VIDEO_START( avg_starwars )
 {
 	vgc = &avg_starwars;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 
 VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 
 VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 
 VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 
 VIDEO_START( avg_quantum )
 {
 	vgc = &avg_quantum;
 	vg = &vgd;
-	video_start_avgdvg(machine);
+	video_start_avg_common(machine);
 }
 

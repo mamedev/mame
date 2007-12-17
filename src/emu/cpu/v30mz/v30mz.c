@@ -925,7 +925,7 @@ static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 
 static void nec_init(int index, int clock, const void *config, int (*irqcallback)(int), int type)
 {
-	static const char *names[]={"V20","V30","V33","V30MZ"};
+	static const char *const names[]={"V20","V30","V33","V30MZ"};
 
 	state_save_register_item_array(names[type], index, I.regs.w);
 	state_save_register_item_array(names[type], index, I.sregs);

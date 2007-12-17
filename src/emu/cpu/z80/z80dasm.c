@@ -35,7 +35,7 @@ enum e_mnemonics
 	zSLL  ,zSRA  ,zSRL	,zSUB  ,zXOR
 };
 
-static const char *s_mnemonic[] =
+static const char *const s_mnemonic[] =
 {
 	"adc" ,"add" ,"and" ,"bit" ,"call","ccf" ,"cp"  ,"cpd" ,
 	"cpdr","cpi" ,"cpir","cpl" ,"daa" ,"db"  ,"dec" ,"di"  ,

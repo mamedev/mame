@@ -204,7 +204,7 @@ static VIDEO_UPDATE( smstrv )
 	return 0;
 }
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 					/* 2 chips */
 	{ r1, r4 },			/* Port A read */

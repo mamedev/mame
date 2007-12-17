@@ -59,7 +59,7 @@ enum e_operand {
 	OP, OP1
 };
 
-static const char *s_mnemonic[] = {
+static const char *const s_mnemonic[] = {
 	"add", "addc", "and", "bcdd", "bcde", "bcdx", "call", "callc", "callg", "callge", "calll",
 	"callle", "calln", "callnc", "callno", "callnz", "callo", "callp", "callnx0",
 	"callnx1", "callnx2", "callnx3", "callx0", "callx1", "callx2", "callx3", "callz",

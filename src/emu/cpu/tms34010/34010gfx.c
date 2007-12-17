@@ -251,14 +251,14 @@ static UINT32 pixel_op19(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { INT32 tmp 
 static UINT32 pixel_op20(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix > dstpix) ? srcpix : dstpix; }
 static UINT32 pixel_op21(UINT32 dstpix, UINT32 mask, UINT32 srcpix) { dstpix &= mask; return (srcpix < dstpix) ? srcpix : dstpix; }
 
-static UINT32 (*pixel_op_table[])(UINT32, UINT32, UINT32) =
+static UINT32 (*const pixel_op_table[])(UINT32, UINT32, UINT32) =
 {
 	pixel_op00,	pixel_op01,	pixel_op02,	pixel_op03,	pixel_op04,	pixel_op05,	pixel_op06,	pixel_op07,
 	pixel_op08,	pixel_op09,	pixel_op10,	pixel_op11,	pixel_op12,	pixel_op13,	pixel_op14,	pixel_op15,
 	pixel_op16,	pixel_op17,	pixel_op18,	pixel_op19,	pixel_op20,	pixel_op21,	pixel_op00,	pixel_op00,
 	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00,	pixel_op00
 };
-static UINT8 pixel_op_timing_table[] =
+static const UINT8 pixel_op_timing_table[] =
 {
 	2,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,6,5,5,2,2,2,2,2,2,2,2,2,2,2
 };
@@ -353,7 +353,7 @@ static void fill_16_opx_trans(int dst_is_linear);
 
 
 /* tables */
-static void (*pixblt_op_table[])(int, int) =
+static void (*const pixblt_op_table[])(int, int) =
 {
 	pixblt_1_op0,	pixblt_1_op0_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
 	pixblt_1_opx,	pixblt_1_opx_trans,		pixblt_1_opx,	pixblt_1_opx_trans,
@@ -441,7 +441,7 @@ static void (*pixblt_op_table[])(int, int) =
 	pixblt_16_opx,	pixblt_16_opx_trans,	pixblt_16_opx,	pixblt_16_opx_trans
 };
 
-static void (*pixblt_r_op_table[])(int, int) =
+static void (*const pixblt_r_op_table[])(int, int) =
 {
 	pixblt_r_1_op0,	pixblt_r_1_op0_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
 	pixblt_r_1_opx,	pixblt_r_1_opx_trans,	pixblt_r_1_opx,	pixblt_r_1_opx_trans,
@@ -529,7 +529,7 @@ static void (*pixblt_r_op_table[])(int, int) =
 	pixblt_r_16_opx,pixblt_r_16_opx_trans,	pixblt_r_16_opx,pixblt_r_16_opx_trans
 };
 
-static void (*pixblt_b_op_table[])(int) =
+static void (*const pixblt_b_op_table[])(int) =
 {
 	pixblt_b_1_op0,	pixblt_b_1_op0_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
 	pixblt_b_1_opx,	pixblt_b_1_opx_trans,	pixblt_b_1_opx,	pixblt_b_1_opx_trans,
@@ -617,7 +617,7 @@ static void (*pixblt_b_op_table[])(int) =
 	pixblt_b_16_opx,pixblt_b_16_opx_trans,	pixblt_b_16_opx,pixblt_b_16_opx_trans
 };
 
-static void (*fill_op_table[])(int) =
+static void (*const fill_op_table[])(int) =
 {
 	fill_1_op0,		fill_1_op0_trans,		fill_1_opx,		fill_1_opx_trans,
 	fill_1_opx,		fill_1_opx_trans,		fill_1_opx,		fill_1_opx_trans,
@@ -893,7 +893,7 @@ static void (*fill_op_table[])(int) =
 #undef PIXEL_OP_TIMING
 #undef PIXEL_OP
 
-static UINT8 pixelsize_lookup[32] =
+static const UINT8 pixelsize_lookup[32] =
 {
 	0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 };

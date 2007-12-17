@@ -501,7 +501,7 @@ static INT32 rd_stacktop(void)	{ return pc_stack_pop_val(); }
 
 #define READ_REG(grp,reg) ((*rd_reg[grp][reg])())
 
-static INT32 (*rd_reg[4][16])(void) =
+static INT32 (*const rd_reg[4][16])(void) =
 {
 	{
 		rd_ax0, rd_ax1, rd_mx0, rd_mx1, rd_ay0, rd_ay1, rd_my0, rd_my1,

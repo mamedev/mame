@@ -6,7 +6,7 @@
 #define SERIAL_BUFFER_LENGTH 40
 #define MEMORY_SIZE 1024
 
-static struct EEPROM_interface *intf;
+static const struct EEPROM_interface *intf;
 
 static int serial_count;
 static UINT8 serial_buffer[SERIAL_BUFFER_LENGTH];
@@ -76,7 +76,7 @@ static int EEPROM_command_match(const char *buf, const char *cmd, int len)
 }
 
 
-struct EEPROM_interface eeprom_interface_93C46 =
+const struct EEPROM_interface eeprom_interface_93C46 =
 {
 	6,				// address bits 6
 	16,				// data bits    16
@@ -90,7 +90,7 @@ struct EEPROM_interface eeprom_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-struct EEPROM_interface eeprom_interface_93C66B =
+const struct EEPROM_interface eeprom_interface_93C66B =
 {
 	8,				/* address bits */
 	16,				/* data bits */
@@ -126,7 +126,7 @@ NVRAM_HANDLER( 93C66B )
 	}
 }
 
-void EEPROM_init(struct EEPROM_interface *interface)
+void EEPROM_init(const struct EEPROM_interface *interface)
 {
 	intf = interface;
 

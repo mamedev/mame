@@ -351,7 +351,7 @@ static int compile_store_double_partial(drc_core *drc, compiler_state *compiler,
 
 static const UINT8 nvreg[] = { REG_NV0, REG_NV1, REG_NV2, REG_NV3, REG_NV4, REG_NV5, REG_NV6 };
 
-static const char *x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"};
+static const char *const x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi", "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15"};
 
 
 

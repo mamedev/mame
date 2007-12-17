@@ -3,7 +3,7 @@
 
 
 
-static const char *zl_condition_codes[] =
+static const char *const zl_condition_codes[] =
 {
 	// bit 3, 2 (ZL), bit 1, 0 (MASK)
 	"",				// Z=0, L=0, ZM=0, ZL=0
@@ -24,7 +24,7 @@ static const char *zl_condition_codes[] =
 	"leq",			// Z=1, L=1, ZM=1, ZL=1
 };
 
-static const char *cv_condition_codes[16] =
+static const char *const cv_condition_codes[16] =
 {
 	"",				// C=0, V=0, CM=0, VM=0
 	"nov",			// C=0, V=0, CM=0, VM=1
@@ -44,7 +44,7 @@ static const char *cv_condition_codes[16] =
 	"c ov",			// C=1, V=1, CM=1, VM=1
 };
 
-static const char *tp_condition_codes[4] =
+static const char *const tp_condition_codes[4] =
 {
 	"bio",
 	"tc",

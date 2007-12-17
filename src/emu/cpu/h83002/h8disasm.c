@@ -11,13 +11,13 @@
 #include "debugger.h"
 #include "h83002.h"
 
-static const char *bit_instr[8] = {"bset", "bnot", "bclr", "btst", "bor", "bxor", "band", "bld"};
-static const char *bit_instr2[8] = {"bset", "bnot", "bclr", "btst", "bior", "bixor", "biand", "bild"};
-static const char *imm32l_instr[8] = {"mov", "add", "cmp", "sub", "or", "xor", "and", "?"};
-static const char *branch_instr[16] = {"bt", "bf", "bhi", "bls", "bcc", "bcs", "bne", "beq", "bvc", "bvs", "bpl", "bmi", "bge", "blt", "bgt", "ble"};
-static const char *reg_names32[8] = {"ER0", "ER1", "ER2", "ER3", "ER4", "ER5", "ER6", "SP"};
-static const char *reg_names16[16] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"};
-static const char *reg_names8[16] = {"R0H", "R1H", "R2H", "R3H", "R4H", "R5H", "R6H", "R7H","R0L", "R1L", "R2L", "R3L", "R4L", "R5L", "R6L", "R7L"};
+static const char *const bit_instr[8] = {"bset", "bnot", "bclr", "btst", "bor", "bxor", "band", "bld"};
+static const char *const bit_instr2[8] = {"bset", "bnot", "bclr", "btst", "bior", "bixor", "biand", "bild"};
+static const char *const imm32l_instr[8] = {"mov", "add", "cmp", "sub", "or", "xor", "and", "?"};
+static const char *const branch_instr[16] = {"bt", "bf", "bhi", "bls", "bcc", "bcs", "bne", "beq", "bvc", "bvs", "bpl", "bmi", "bge", "blt", "bgt", "ble"};
+static const char *const reg_names32[8] = {"ER0", "ER1", "ER2", "ER3", "ER4", "ER5", "ER6", "SP"};
+static const char *const reg_names16[16] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"};
+static const char *const reg_names8[16] = {"R0H", "R1H", "R2H", "R3H", "R4H", "R5H", "R6H", "R7H","R0L", "R1L", "R2L", "R3L", "R4L", "R5L", "R6L", "R7L"};
 
 static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT8 *oprom);
 static UINT32 h8disasm_1(UINT32 address, UINT32 opcode, char *output, const UINT8 *oprom);

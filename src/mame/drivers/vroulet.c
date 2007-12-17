@@ -232,7 +232,7 @@ static WRITE8_HANDLER( ppi8255_a_w ){}// watchdog ?
 static WRITE8_HANDLER( ppi8255_b_w ){}// lamps ?
 static WRITE8_HANDLER( ppi8255_c_w ){}
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 							        // 2 chips
 	{ input_port_0_r,	NULL },	        // Port A read

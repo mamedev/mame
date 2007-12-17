@@ -9,7 +9,7 @@
 #include "cpuintrf.h"
 
 
-static const char *reg[32] =
+static const char *const reg[32] =
 {
 	"0",	"r1",	"r2",	"r3",	"r4",	"r5",	"r6",	"r7",
 	"r8",	"r9",	"r10",	"r11",	"r12",	"r13",	"r14",	"r15",
@@ -18,7 +18,7 @@ static const char *reg[32] =
 };
 
 
-static const char *cpreg[4][32] =
+static const char *const cpreg[4][32] =
 {
 	{
 		"Index","Random","EntryLo0","EntryLo1","Context","PageMask","Wired","Error",
@@ -47,7 +47,7 @@ static const char *cpreg[4][32] =
 };
 
 
-static const char *ccreg[4][32] =
+static const char *const ccreg[4][32] =
 {
 	{
 		"ccr0",	"ccr1",	"ccr2",	"ccr3",	"ccr4",	"ccr5",	"ccr6",	"ccr7",
@@ -148,7 +148,7 @@ static UINT32 dasm_cop0(UINT32 pc, UINT32 op, char *buffer)
 
 static UINT32 dasm_cop1(UINT32 pc, UINT32 op, char *buffer)
 {
-	static const char *format_table[] =
+	static const char *const format_table[] =
 	{
 		"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
 		"s","d","?","?","w","l","?","?","?","?","?","?","?","?","?","?"
@@ -231,7 +231,7 @@ static UINT32 dasm_cop1(UINT32 pc, UINT32 op, char *buffer)
 
 static UINT32 dasm_cop1x(UINT32 pc, UINT32 op, char *buffer)
 {
-	static const char *format3_table[] =
+	static const char *const format3_table[] =
 	{
 		"s","d","?","?","w","l","?","?"
 	};

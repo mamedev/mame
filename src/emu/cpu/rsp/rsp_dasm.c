@@ -7,7 +7,7 @@
 #include "cpuintrf.h"
 #include <stdarg.h>
 
-static const char *reg[32] =
+static const char *const reg[32] =
 {
 	"0",	"r1",	"r2",	"r3",	"r4",	"r5",	"r6",	"r7",
 	"r8",	"r9",	"r10",	"r11",	"r12",	"r13",	"r14",	"r15",
@@ -15,7 +15,7 @@ static const char *reg[32] =
 	"r24",	"r25",	"r26",	"r27",	"r28",	"r29",	"r30",	"r31"
 };
 
-static const char *vreg[32] =
+static const char *const vreg[32] =
 {
 	" v0", " v1", " v2", " v3", " v4", " v5", " v6", " v7",
 	" v8", " v9", "v10", "v11", "v12", "v13", "v14", "v15",
@@ -23,7 +23,7 @@ static const char *vreg[32] =
 	"v24", "v25", "v26", "v27", "v28", "v29", "v30", "v31"
 };
 
-static const char *cop0_regs[32] =
+static const char *const cop0_regs[32] =
 {
 	"SP_MEM_ADDR",  "SP_DRAM_ADDR",    "SP_RD_LEN",    "SP_WR_LEN",
 	"SP_STATUS",    "SP_DMA_FULL",     "SP_DMA_BUSY",  "SP_SEMAPHORE",
@@ -35,13 +35,13 @@ static const char *cop0_regs[32] =
 	"???",          "???",             "???",          "???"
 };
 
-static const char *element[16] =
+static const char *const element[16] =
 {
 	"",           "[???]",      "[00224466]", "[11335577]", "[00004444]", "[11115555]", "[22226666]", "[33337777]",
 	"[00000000]", "[11111111]", "[22222222]", "[33333333]", "[44444444]", "[55555555]", "[66666666]", "[77777777]"
 };
 
-static const char *element2[16] =
+static const char *const element2[16] =
 {
 	"01234567", "????????", "00224466", "11335577", "00004444", "11115555", "22226666", "33337777",
 	"00000000", "11111111", "22222222", "33333333", "44444444", "55555555", "66666666", "77777777"

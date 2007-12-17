@@ -115,7 +115,7 @@ static const discrete_lfsr_desc midway_lfsr =
  *
  *************************************/
 
-static const char *seawolf_sample_names[] =
+static const char *const seawolf_sample_names[] =
 {
 	"*seawolf",
 	"shiphit.wav",
@@ -127,7 +127,7 @@ static const char *seawolf_sample_names[] =
 };
 
 
-static struct Samplesinterface seawolf_samples_interface =
+static const struct Samplesinterface seawolf_samples_interface =
 {
 	5,	/* 5 channels */
 	seawolf_sample_names
@@ -178,7 +178,7 @@ WRITE8_HANDLER( seawolf_audio_w )
  *
  *************************************/
 
-static const char *gunfight_sample_names[] =
+static const char *const gunfight_sample_names[] =
 {
 	"*gunfight",
 	"gunshot.wav",
@@ -187,7 +187,7 @@ static const char *gunfight_sample_names[] =
 };
 
 
-static struct Samplesinterface gunfight_samples_interface =
+static const struct Samplesinterface gunfight_samples_interface =
 {
 	1,	/* 1 channel */
 	gunfight_sample_names
@@ -1597,7 +1597,7 @@ WRITE8_HANDLER( dplay_audio_w )
  *
  *************************************/
 
-static const char *gmissile_sample_names[] =
+static const char *const gmissile_sample_names[] =
 {
 	"*gmissile",
 	"1.wav",	/* missle */
@@ -1606,7 +1606,7 @@ static const char *gmissile_sample_names[] =
 };
 
 
-static struct Samplesinterface gmissile_samples_interface =
+static const struct Samplesinterface gmissile_samples_interface =
 {
 	1,	/* 1 channel */
 	gmissile_sample_names
@@ -1695,7 +1695,7 @@ WRITE8_HANDLER( gmissile_audio_3_w )
 
 /* Noise clock was breadboarded and measured at 3760Hz */
 
-static const char *m4_sample_names[] =
+static const char *const m4_sample_names[] =
 {
 	"*m4",
 	"1.wav",	/* missle */
@@ -1704,7 +1704,7 @@ static const char *m4_sample_names[] =
 };
 
 
-static struct Samplesinterface m4_samples_interface =
+static const struct Samplesinterface m4_samples_interface =
 {
 	2,	/* 2 channels */
 	m4_sample_names
@@ -1985,14 +1985,14 @@ static DISCRETE_SOUND_START(clowns)
 DISCRETE_SOUND_END
 
 
-static const char *clowns_sample_names[] =
+static const char *const clowns_sample_names[] =
 {
 	"*clowns",
 	"miss.wav",
 	0
 };
 
-static struct Samplesinterface clowns_samples_interface =
+static const struct Samplesinterface clowns_samples_interface =
 {
 	1,	/* 1 channel */
 	clowns_sample_names
@@ -2177,7 +2177,7 @@ WRITE8_HANDLER( dogpatch_audio_w )
  *  Apr 2007, D.R.
  *************************************/
 
-static struct SN76477interface spcenctr_sn76477_interface =
+static const struct SN76477interface spcenctr_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */
@@ -2750,7 +2750,7 @@ WRITE8_HANDLER( spcenctr_audio_3_w )
  *
  *************************************/
 
-static const char *phantom2_sample_names[] =
+static const char *const phantom2_sample_names[] =
 {
 	"*phantom2",
 	"1.wav",	/* shot */
@@ -2759,7 +2759,7 @@ static const char *phantom2_sample_names[] =
 };
 
 
-static struct Samplesinterface phantom2_samples_interface =
+static const struct Samplesinterface phantom2_samples_interface =
 {
 	2,	/* 2 channels */
 	phantom2_sample_names
@@ -2993,7 +2993,7 @@ WRITE8_HANDLER( bowler_audio_6_w )
  *
  *************************************/
 
-static struct SN76477interface invaders_sn76477_interface =
+static const struct SN76477interface invaders_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3022,7 +3022,7 @@ static struct SN76477interface invaders_sn76477_interface =
 
 
 
-static const char *invaders_sample_names[] =
+static const char *const invaders_sample_names[] =
 {
 	"*invaders",
 	"1.wav",		/* shot/missle */
@@ -3038,7 +3038,7 @@ static const char *invaders_sample_names[] =
 };
 
 
-static struct Samplesinterface invaders_samples_interface =
+static const struct Samplesinterface invaders_samples_interface =
 {
 	6,	/* 6 channels */
 	invaders_sample_names
@@ -3816,7 +3816,7 @@ WRITE8_HANDLER( blueshrk_audio_w )
  *
  *************************************/
 
-static struct SN76477interface invad2ct_p1_sn76477_interface =
+static const struct SN76477interface invad2ct_p1_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3844,7 +3844,7 @@ static struct SN76477interface invad2ct_p1_sn76477_interface =
 };
 
 
-static struct SN76477interface invad2ct_p2_sn76477_interface =
+static const struct SN76477interface invad2ct_p2_sn76477_interface =
 {
 	0,			  /*  4 noise_res (N/C)        */
 	0,			  /*  5 filter_res (N/C)       */

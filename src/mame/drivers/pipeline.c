@@ -306,7 +306,7 @@ static struct z80_irq_daisy_chain daisy_chain_sound[] =
 	{ 0, 0, 0, 0, -1 }		/* end mark */
 };
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	3,
 	{ input_port_0_r, input_port_1_r, NULL },	/* Port A read */

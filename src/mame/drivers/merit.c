@@ -769,7 +769,7 @@ static GFXDECODE_START( merit )
 	GFXDECODE_ENTRY( REGION_GFX2, 8, tiles8x8x1_layout, 0, 128 ) // flipped tiles
 GFXDECODE_END
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 						/* 2 chips */
 	{ input_port_0_r, input_port_3_r },	/* Port A read */

@@ -1109,7 +1109,7 @@ static void sub_ixd_ixd(void);
 
 
 
-static void (*opcode_table[65536 >> 3])(void) =
+static void (*const opcode_table[65536 >> 3])(void) =
 {
 	/* 0x0000 */
 	op_0000,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,

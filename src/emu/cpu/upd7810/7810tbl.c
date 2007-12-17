@@ -1024,7 +1024,7 @@ static void XRI_SMH_xx(void);
 static void XRI_TMM_xx(void);
 static void XRI_V_xx(void);
 
-static struct opcode_s op48[256] =
+static const struct opcode_s op48[256] =
 {
 	{illegal,		2, 8, 8,L0|L1}, /* 00: 0100 1000 0000 0000                      */
 	{SLRC_A,		2, 8, 8,L0|L1}, /* 01: 0100 1000 0000 0001                      */
@@ -1303,7 +1303,7 @@ static struct opcode_s op48[256] =
 };
 
 /* prefix 4C */
-static struct opcode_s op4C[256] =
+static const struct opcode_s op4C[256] =
 {
 	{illegal2,		2, 8, 8,L0|L1}, /* 00: 0100 1100 0000 0000                      */
 	{illegal2,		2, 8, 8,L0|L1}, /* 01: 0100 1100 0000 0001                      */
@@ -1580,7 +1580,7 @@ static struct opcode_s op4C[256] =
 };
 
 /* prefix 4D */
-static struct opcode_s op4D[256] =
+static const struct opcode_s op4D[256] =
 {
 	{illegal2,		2, 8, 8,L0|L1}, /* 00: 0100 1101 0000 0000                      */
 	{illegal2,		2, 8, 8,L0|L1}, /* 01: 0100 1101 0000 0001                      */
@@ -1856,7 +1856,7 @@ static struct opcode_s op4D[256] =
 };
 
 /* prefix 60 */
-static struct opcode_s op60[256] =
+static const struct opcode_s op60[256] =
 {
 	{illegal2,		2, 8, 8,L0|L1}, /* 00: 0110 0000 0000 0000                      */
 	{illegal2,		2, 8, 8,L0|L1}, /* 01: 0110 0000 0000 0001                      */
@@ -2132,7 +2132,7 @@ static struct opcode_s op60[256] =
 };
 
 /* prefix 64 */
-static struct opcode_s op64[256] =
+static const struct opcode_s op64[256] =
 {
 	{MVI_PA_xx, 	3,14,11,L0|L1}, /* 00: 0110 0100 0000 0000 xxxx xxxx            */
 	{MVI_PB_xx, 	3,14,11,L0|L1}, /* 01: 0110 0100 0000 0001 xxxx xxxx            */
@@ -2408,7 +2408,7 @@ static struct opcode_s op64[256] =
 };
 
 /* prefix 70 */
-static struct opcode_s op70[256] =
+static const struct opcode_s op70[256] =
 {
 	{illegal2,		2, 8, 8,L0|L1}, /* 00: 0111 0000 0000 0000                      */
 	{illegal2,		2, 8, 8,L0|L1}, /* 01: 0111 0000 0000 0001                      */
@@ -2685,7 +2685,7 @@ static struct opcode_s op70[256] =
 };
 
 /* prefix 74 */
-static struct opcode_s op74[256] =
+static const struct opcode_s op74[256] =
 {
 	{illegal2,		2, 8, 8,L0|L1}, /* 00: 0111 0100 0000 0000                      */
 	{illegal2,		2, 8, 8,L0|L1}, /* 01: 0111 0100 0000 0001                      */
@@ -2961,7 +2961,7 @@ static struct opcode_s op74[256] =
 };
 
 /* main opcodes */
-static struct opcode_s opXX_7810[256] =
+static const struct opcode_s opXX_7810[256] =
 {
 	{NOP,			1, 4, 4,L0|L1}, /* 00: 0000 0000                                */
 	{LDAW_wa,		2,10,10,L0|L1}, /* 01: 0000 0001 oooo oooo                      */
@@ -3236,7 +3236,7 @@ static struct opcode_s opXX_7810[256] =
 	{JR,			1,10,10,L0|L1}	/* ff: 1111 1111                                */
 };
 
-static struct opcode_s opXX_7807[256] =
+static const struct opcode_s opXX_7807[256] =
 {
 	{NOP,			1, 4, 4,L0|L1}, /* 00: 0000 0000                                */
 	{LDAW_wa,		2,10,10,L0|L1}, /* 01: 0000 0001 oooo oooo                      */

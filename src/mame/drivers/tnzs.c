@@ -1279,7 +1279,7 @@ static struct YM2203interface kabukiz_ym2203_interface =
 	irqhandler
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	1,
 	NULL,

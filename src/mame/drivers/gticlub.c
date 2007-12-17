@@ -119,7 +119,7 @@ static VIDEO_UPDATE( hangplt )
 /******************************************************************/
 
 /* 93C56 EEPROM */
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	8,				/* address bits */
 	16,				/* data bits */

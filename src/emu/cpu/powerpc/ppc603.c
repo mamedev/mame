@@ -272,11 +272,11 @@ static int ppc603_execute(int cycles)
 		ppc.npc = ppc.pc + 4;
 		switch(opcode >> 26)
 		{
-			case 19:	optable19[(opcode >> 1) & 0x3ff](opcode); break;
-			case 31:	optable31[(opcode >> 1) & 0x3ff](opcode); break;
-			case 59:	optable59[(opcode >> 1) & 0x3ff](opcode); break;
-			case 63:	optable63[(opcode >> 1) & 0x3ff](opcode); break;
-			default:	optable[opcode >> 26](opcode); break;
+			case 19:	ppc.optable19[(opcode >> 1) & 0x3ff](opcode); break;
+			case 31:	ppc.optable31[(opcode >> 1) & 0x3ff](opcode); break;
+			case 59:	ppc.optable59[(opcode >> 1) & 0x3ff](opcode); break;
+			case 63:	ppc.optable63[(opcode >> 1) & 0x3ff](opcode); break;
+			default:	ppc.optable[opcode >> 26](opcode); break;
 		}
 
 		ppc_icount--;

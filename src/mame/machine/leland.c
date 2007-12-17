@@ -676,7 +676,7 @@ void ataxx_bankswitch(void)
 
 void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
 {
-	static struct EEPROM_interface eeprom_interface =
+	static const struct EEPROM_interface eeprom_interface =
 	{
 		6,
 		16,
@@ -769,7 +769,7 @@ void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offs
 
 void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset)
 {
-	static struct EEPROM_interface eeprom_interface =
+	static const struct EEPROM_interface eeprom_interface =
 	{
 		7,
 		16,

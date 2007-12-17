@@ -2589,12 +2589,12 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 #endif /* MAME_DEBUG */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z180_icount;			break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = z180_translate;		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = cc[Z180_TABLE_op];			break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = cc[Z180_TABLE_cb];			break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = cc[Z180_TABLE_ed];			break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: info->p = cc[Z180_TABLE_xy];			break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: info->p = cc[Z180_TABLE_xycb];		break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: info->p = cc[Z180_TABLE_ex];			break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = (void *)cc[Z180_TABLE_op];			break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: info->p = (void *)cc[Z180_TABLE_cb];			break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: info->p = (void *)cc[Z180_TABLE_ed];			break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: info->p = (void *)cc[Z180_TABLE_xy];			break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: info->p = (void *)cc[Z180_TABLE_xycb];		break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: info->p = (void *)cc[Z180_TABLE_ex];			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;

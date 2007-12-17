@@ -33,7 +33,7 @@
 
 
 /* sample file names */
-static const char *pulsar_sample_names[] =
+static const char *const pulsar_sample_names[] =
 {
 	"*pulsar",
 	"clang.wav",
@@ -52,7 +52,7 @@ static const char *pulsar_sample_names[] =
 };
 
 
-static struct Samplesinterface pulsar_samples_interface =
+static const struct Samplesinterface pulsar_samples_interface =
 {
 	12,
 	pulsar_sample_names

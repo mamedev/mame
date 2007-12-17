@@ -862,7 +862,7 @@ GFXDECODE_END
 
 
 
-static struct Samplesinterface pbillian_samples_interface =
+static const struct Samplesinterface pbillian_samples_interface =
 {
 	1,
 	NULL,

@@ -1599,7 +1599,7 @@ static struct namco_52xx_interface namco_52xx_interface =
 	.25				/* Combined gain of both filters */
 };
 
-static const char *battles_sample_names[] =
+static const char *const battles_sample_names[] =
 {
 	"*battles",
 	"explo1.wav",	/* ground target explosion */
@@ -1607,7 +1607,7 @@ static const char *battles_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface battles_samples_interface =
+static const struct Samplesinterface battles_samples_interface =
 {
 	1,	/* one channel */
 	battles_sample_names

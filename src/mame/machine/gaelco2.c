@@ -164,7 +164,7 @@ WRITE16_HANDLER( wrally2_coin_w )
 
 ***************************************************************************/
 
-static struct EEPROM_interface gaelco2_eeprom_interface =
+static const struct EEPROM_interface gaelco2_eeprom_interface =
 {
 	8,				/* address bits */
 	16,				/* data bits */

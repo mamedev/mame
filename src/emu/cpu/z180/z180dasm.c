@@ -61,7 +61,7 @@ enum e_mnemonics {
 	zSLP   ,zSRA   ,zSRL   ,zSUB   ,zTST   ,zTSTIO ,zXOR
 };
 
-static const char *s_mnemonic[] = {
+static const char *const s_mnemonic[] = {
 	"adc"  ,"add"  ,"and"  ,"bit"  ,"call" ,"ccf"  ,"cp"   ,"cpd"  ,
 	"cpdr" ,"cpi"  ,"cpir" ,"cpl"  ,"daa"  ,"db"   ,"dec"  ,"di"   ,
 	"djnz" ,"ei"   ,"ex"   ,"exx"  ,"halt" ,"im"   ,"in"   ,"in0"  ,
@@ -79,7 +79,7 @@ typedef struct {
 	const char *arguments;
 }	z80dasm;
 
-static z80dasm mnemonic_xx_cb[256]= {
+static const z80dasm mnemonic_xx_cb[256]= {
 	{zRLC,"b=Y"},   {zRLC,"c=Y"},   {zRLC,"d=Y"},   {zRLC,"e=Y"},
 	{zRLC,"h=Y"},   {zRLC,"l=Y"},   {zRLC,"Y"},     {zRLC,"a=Y"},
 	{zRRC,"b=Y"},   {zRRC,"c=Y"},   {zRRC,"d=Y"},   {zRRC,"e=Y"},
@@ -146,7 +146,7 @@ static z80dasm mnemonic_xx_cb[256]= {
 	{zSET,"h=7,Y"}, {zSET,"l=7,Y"}, {zSET,"7,Y"},   {zSET,"a=7,Y"}
 };
 
-static z80dasm mnemonic_cb[256] = {
+static const z80dasm mnemonic_cb[256] = {
 	{zRLC,"b"},     {zRLC,"c"},     {zRLC,"d"},     {zRLC,"e"},
 	{zRLC,"h"},     {zRLC,"l"},     {zRLC,"(hl)"},  {zRLC,"a"},
 	{zRRC,"b"},     {zRRC,"c"},     {zRRC,"d"},     {zRRC,"e"},
@@ -213,7 +213,7 @@ static z80dasm mnemonic_cb[256] = {
 	{zSET,"7,h"},   {zSET,"7,l"},   {zSET,"7,(hl)"},{zSET,"7,a"}
 };
 
-static z80dasm mnemonic_ed[256]= {
+static const z80dasm mnemonic_ed[256]= {
 	{zIN0,"b,(B)"}, {zOUT0,"(B),b"},{zDB,"?"},      {zDB,"?"},
 	{zTST,"b"},     {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zIN0,"c,(B)"}, {zOUT0,"(B),c"},{zDB,"?"},      {zDB,"?"},
@@ -280,7 +280,7 @@ static z80dasm mnemonic_ed[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static z80dasm mnemonic_xx[256]= {
+static const z80dasm mnemonic_xx[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"},
 	{zDB,"?"},      {zADD,"I,bc"},  {zDB,"?"},      {zDB,"?"},
@@ -347,7 +347,7 @@ static z80dasm mnemonic_xx[256]= {
 	{zDB,"?"},      {zDB,"?"},      {zDB,"?"},      {zDB,"?"}
 };
 
-static z80dasm mnemonic_main[256]= {
+static const z80dasm mnemonic_main[256]= {
 	{zNOP,0},		{zLD,"bc,N"},   {zLD,"(bc),a"}, {zINC,"bc"},
 	{zINC,"b"},     {zDEC,"b"},     {zLD,"b,B"},    {zRLCA,0},
 	{zEX,"af,af'"}, {zADD,"hl,bc"}, {zLD,"a,(bc)"}, {zDEC,"bc"},
@@ -430,7 +430,7 @@ static int offs(INT8 offset)
  ****************************************************************************/
 offs_t z180_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	z80dasm *d;
+	const z80dasm *d;
 	const char *src, *ixy;
 	char *dst;
 	unsigned PC = pc;

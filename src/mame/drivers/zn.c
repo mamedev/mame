@@ -86,7 +86,9 @@ static const UINT8 mg05[ 8 ] = { 0x80, 0xc2, 0x38, 0xf9, 0xfd, 0x0c, 0x10, 0xe0 
 static const UINT8 mg06[ 8 ] = { 0xc0, 0xe2, 0xe1, 0xfd, 0x04, 0x78, 0x70, 0xf0 };
 static const UINT8 mg08[ 8 ] = { 0xf0, 0xfa, 0xf9, 0xc1, 0x20, 0x1c, 0x7c, 0x80 };
 static const UINT8 mg09[ 8 ] = { 0xf0, 0x03, 0xe2, 0x18, 0x78, 0x7c, 0x3c, 0xc0 }; /* brute forced */
+static const UINT8 mg10[ 8 ] = { 0xfc, 0xf2, 0x30, 0xc1, 0xf9, 0x78, 0x60, 0xe0 };
 static const UINT8 mg11[ 8 ] = { 0x80, 0xc2, 0x38, 0xf9, 0xfd, 0x1c, 0x10, 0xf0 };
+static const UINT8 mg12[ 8 ] = { 0x02, 0x40, 0x38, 0xf9, 0xfd, 0x1c, 0x10, 0xf0 };
 static const UINT8 mg13[ 8 ] = { 0xc0, 0xe2, 0xe1, 0xf9, 0x04, 0x0c, 0x70, 0x80 };
 static const UINT8 mg14[ 8 ] = { 0xfc, 0xf2, 0xfa, 0x18, 0x20, 0x40, 0x81, 0x01 };
 static const UINT8 tt01[ 8 ] = { 0xe0, 0xf9, 0xfd, 0x7c, 0x70, 0x30, 0xc2, 0x02 };
@@ -156,7 +158,9 @@ static struct
 	{ "flameguj", mg01, mg06 }, /* OK, geometry issues */
 	{ "glpracr3", mg01, mg08 },
 	{ "tondemo",  mg01, mg09 }, /* OK */
+	{ "1on1gov",  mg01, mg10 }, /* OK */
 	{ "brvblade", mg01, mg11 }, /* OK */
+	{ "tblkkuzu", mg01, mg12 }, /* OK */
 	{ "tecmowcm", mg01, mg13 }, /* OK */
 	{ "mfjump",   mg01, mg14 }, /* OK */
 	{ "sfchamp",  tt01, tt02 }, /* stuck in test mode */
@@ -399,6 +403,8 @@ static void zn_driver_init( void )
 		}
 		n_game++;
 	}
+
+	at28c16_init( 0, memory_region( REGION_USER4 ), NULL );
 }
 
 static struct PSXSPUinterface psxspu_interface =
@@ -4015,6 +4021,34 @@ ROM_START( mfjump )
 	ROM_LOAD( "mfj.216",            0x0400000, 0x400000, CRC(0d518dba) SHA1(100cd4d0a1e678e660336027f067a9a1f5cbad3e) )
 ROM_END
 
+ROM_START( tblkkuzu )
+	TPS_BIOS
+
+	ROM_REGION32_LE( 0x02800000, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "tbk.u119",   0x0000001, 0x100000, CRC(621b07e1) SHA1(30773aaa333fdee7ef55db2f8adde010688abce1) )
+	ROM_LOAD16_BYTE( "tbk.u120",   0x0000000, 0x100000, CRC(bb390f7d) SHA1(6bce88448fbb5308952f8c221e786be8aa51ceff) )
+	ROM_LOAD( "tbk.u0216",          0x0400000, 0x400000, CRC(41f8285f) SHA1(3326ab83d96d51ed31fb5c2f30630ff480d45282) )
+ROM_END
+
+ROM_START( 1on1gov )
+	TPS_BIOS
+
+	ROM_REGION32_LE( 0x02800000, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "1on1.u119",   0x0000001, 0x100000, CRC(10aecc19) SHA1(ad2fe6011551935907568cc3b4028f481034537c) )
+	ROM_LOAD16_BYTE( "1on1.u120",   0x0000000, 0x100000, CRC(eea158bd) SHA1(2b2a56fcce46557201bbbab7b170ee64549ddafe) )
+	ROM_LOAD( "ooo-0.u0217",  0x0800000, 0x400000, CRC(8b42f365) SHA1(6035a370f477f0f33894f642717fa0b012540d36) )
+	ROM_LOAD( "ooo-1.u0218",  0x0c00000, 0x400000, CRC(65162f46) SHA1(db420a2f0d996b32cd4b6e9352d46a36fa31eaaa) )
+	ROM_LOAD( "ooo-2.u0219",  0x1000000, 0x400000, CRC(14cf3a84) SHA1(60175a1fb2c765e4c3d0e30e77961f84cfa8485c) )
+	ROM_LOAD( "ooo-3.u0220",  0x1400000, 0x400000, CRC(9a45f6ff) SHA1(e0ee90c545c821bf1d6b4709b1e40f93314c51a6) )
+	ROM_LOAD( "ooo-4.u0221",  0x1800000, 0x400000, CRC(ba20a1fd) SHA1(7893f50de730624b8447f39fc7e25e4e334df845) )
+	ROM_LOAD( "ooo-5.u0222",  0x1c00000, 0x400000, CRC(eed1953d) SHA1(8d3e738a07b9c6b6ca55be7b47444b5e3725065c) )
+	ROM_LOAD( "ooo-6.u0223",  0x2000000, 0x400000, CRC(f74f38b6) SHA1(ff7f0ebff85fc982f8d1c13d6649d4c7c5da6c45) )
+	ROM_LOAD( "ooo-7.u0323",  0x2400000, 0x400000, CRC(0e58777c) SHA1(9f8ee3c6d6d8b1482522500e18217577056d8c98) )
+
+	ROM_REGION( 0x800, REGION_USER4, 0 ) /* at28c16 */
+        ROM_LOAD( "at28c16",      0x0000000, 0x000800, BAD_DUMP CRC(ff7b63e3) SHA1(febf073c91041394cabdc1c37cbce344b14cd6bd) )
+ROM_END
+
 /* video system */
 
 #define KN_BIOS \
@@ -4600,6 +4634,8 @@ GAME( 1999, tondemo,  tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tondemo 
 GAME( 1999, glpracr3, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Gallop Racer 3 (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flamegun, tps,      coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, flameguj, flamegun, coh1002m, zn, coh1002m, ROT0, "GAPS Inc.", "Flame Gunner (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, tblkkuzu, tps,	coh1002m, zn, coh1002m, ROT0, "Tamsoft/D3 Publisher", "The Block Kuzushi (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 2000, 1on1gov,  tps,	coh1002m, zn, coh1002m, ROT0, "Tecmo", "1 on 1 Government (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 2000, tecmowcm, tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Tecmo World Cup Millennium (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 2001, mfjump,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster Farm Jump (JAPAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 

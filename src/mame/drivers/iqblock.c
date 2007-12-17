@@ -110,7 +110,7 @@ static WRITE8_HANDLER( port_C_w )
 	/* bit 7 could be a second coin counter, but coin 2 doesn't seem to work... */
 }
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1, 							/* 1 chip */
 	{ input_port_0_r },			/* Port A read */

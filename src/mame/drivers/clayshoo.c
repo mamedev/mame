@@ -132,7 +132,7 @@ static void create_analog_timers(void)
  *
  *************************************/
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 							/* 2 chips */
 	{ 0, 0 },					/* Port A read */

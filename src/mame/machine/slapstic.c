@@ -278,7 +278,7 @@ enum state_type
  *************************************/
 
 /* slapstic 137412-101: Empire Strikes Back/Tetris (NOT confirmed) */
-static struct slapstic_data slapstic101 =
+static const struct slapstic_data slapstic101 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -305,7 +305,7 @@ static struct slapstic_data slapstic101 =
 
 
 /* slapstic 137412-103: Marble Madness (confirmed) */
-static struct slapstic_data slapstic103 =
+static const struct slapstic_data slapstic103 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -332,7 +332,7 @@ static struct slapstic_data slapstic103 =
 
 
 /* slapstic 137412-104: Gauntlet (confirmed) */
-static struct slapstic_data slapstic104 =
+static const struct slapstic_data slapstic104 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -359,7 +359,7 @@ static struct slapstic_data slapstic104 =
 
 
 /* slapstic 137412-105: Indiana Jones/Paperboy (confirmed) */
-static struct slapstic_data slapstic105 =
+static const struct slapstic_data slapstic105 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -386,7 +386,7 @@ static struct slapstic_data slapstic105 =
 
 
 /* slapstic 137412-106: Gauntlet II (confirmed) */
-static struct slapstic_data slapstic106 =
+static const struct slapstic_data slapstic106 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -413,7 +413,7 @@ static struct slapstic_data slapstic106 =
 
 
 /* slapstic 137412-107: Peter Packrat/Xybots/2p Gauntlet/720 (confirmed) */
-static struct slapstic_data slapstic107 =
+static const struct slapstic_data slapstic107 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -440,7 +440,7 @@ static struct slapstic_data slapstic107 =
 
 
 /* slapstic 137412-108: Road Runner/Super Sprint (confirmed) */
-static struct slapstic_data slapstic108 =
+static const struct slapstic_data slapstic108 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -467,7 +467,7 @@ static struct slapstic_data slapstic108 =
 
 
 /* slapstic 137412-109: Championship Sprint/Road Blasters (confirmed) */
-static struct slapstic_data slapstic109 =
+static const struct slapstic_data slapstic109 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -494,7 +494,7 @@ static struct slapstic_data slapstic109 =
 
 
 /* slapstic 137412-110: Road Blasters/APB (confirmed) */
-static struct slapstic_data slapstic110 =
+static const struct slapstic_data slapstic110 =
 {
 	/* basic banking */
 	3,								/* starting bank */
@@ -528,7 +528,7 @@ static struct slapstic_data slapstic110 =
  *************************************/
 
 /* slapstic 137412-111: Pit Fighter (confirmed) */
-static struct slapstic_data slapstic111 =
+static const struct slapstic_data slapstic111 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -554,7 +554,7 @@ static struct slapstic_data slapstic111 =
 
 
 /* slapstic 137412-112: Pit Fighter (Japan) (confirmed) */
-static struct slapstic_data slapstic112 =
+static const struct slapstic_data slapstic112 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -580,7 +580,7 @@ static struct slapstic_data slapstic112 =
 
 
 /* slapstic 137412-113: Unknown (Europe) (confirmed) */
-static struct slapstic_data slapstic113 =
+static const struct slapstic_data slapstic113 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -606,7 +606,7 @@ static struct slapstic_data slapstic113 =
 
 
 /* slapstic 137412-114: Unknown (Europe) (unconfirmed) */
-static struct slapstic_data slapstic114 =
+static const struct slapstic_data slapstic114 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -632,7 +632,7 @@ static struct slapstic_data slapstic114 =
 
 
 /* slapstic 137412-115: Race Drivin' DSK board (confirmed) */
-static struct slapstic_data slapstic115 =
+static const struct slapstic_data slapstic115 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -658,7 +658,7 @@ static struct slapstic_data slapstic115 =
 
 
 /* slapstic 137412-116: Hydra (confirmed) */
-static struct slapstic_data slapstic116 =
+static const struct slapstic_data slapstic116 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -684,7 +684,7 @@ static struct slapstic_data slapstic116 =
 
 
 /* slapstic 137412-117: Race Drivin' main board (confirmed) */
-static struct slapstic_data slapstic117 =
+static const struct slapstic_data slapstic117 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -710,7 +710,7 @@ static struct slapstic_data slapstic117 =
 
 
 /* slapstic 137412-118: Rampart/Vindicators II (confirmed) */
-static struct slapstic_data slapstic118 =
+static const struct slapstic_data slapstic118 =
 {
 	/* basic banking */
 	0,								/* starting bank */
@@ -743,7 +743,7 @@ static struct slapstic_data slapstic118 =
  *************************************/
 
 /* master table */
-static struct slapstic_data *slapstic_table[] =
+static const struct slapstic_data *const slapstic_table[] =
 {
 	&slapstic101,	/* NOT confirmed! */
 	NULL,			/* never seen */

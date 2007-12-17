@@ -812,7 +812,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const char *elim_sample_names[] =
+static const char *const elim_sample_names[] =
 {
 	"*elim2",
 	"elim1.wav",
@@ -830,7 +830,7 @@ static const char *elim_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface elim2_samples_interface =
+static const struct Samplesinterface elim2_samples_interface =
 {
 	8,	/* 8 channels */
 	elim_sample_names
@@ -844,7 +844,7 @@ static struct Samplesinterface elim2_samples_interface =
  *
  *************************************/
 
-static const char *spacfury_sample_names[] =
+static const char *const spacfury_sample_names[] =
 {
 	"*spacfury",
 	/* Sound samples */
@@ -862,7 +862,7 @@ static const char *spacfury_sample_names[] =
 };
 
 
-static struct Samplesinterface spacfury_samples_interface =
+static const struct Samplesinterface spacfury_samples_interface =
 {
 	8,	/* 8 channels */
 	spacfury_sample_names
@@ -875,7 +875,7 @@ static struct Samplesinterface spacfury_samples_interface =
  *
  *************************************/
 
-static const char *zektor_sample_names[] =
+static const char *const zektor_sample_names[] =
 {
 	"*zektor",
 	"elim1.wav",  /*  0 fireball */
@@ -893,7 +893,7 @@ static const char *zektor_sample_names[] =
 };
 
 
-static struct Samplesinterface zektor_samples_interface =
+static const struct Samplesinterface zektor_samples_interface =
 {
 	8,
 	zektor_sample_names

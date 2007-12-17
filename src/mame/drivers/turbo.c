@@ -1526,7 +1526,7 @@ static void turbo_rom_decode(void)
 
 static DRIVER_INIT( turbo )
 {
-	static ppi8255_interface turbo_8255_intf =
+	static const ppi8255_interface turbo_8255_intf =
 	{
 		4,
 		{ NULL,          NULL,          NULL,            turbo_analog_r },
@@ -1548,7 +1548,7 @@ static DRIVER_INIT( turbo_enc )
 
 static DRIVER_INIT( subroc3d )
 {
-	static ppi8255_interface subroc3d_8255_intf =
+	static const ppi8255_interface subroc3d_8255_intf =
 	{
 		2,
 		{ NULL,             NULL },
@@ -1564,7 +1564,7 @@ static DRIVER_INIT( subroc3d )
 
 static DRIVER_INIT( buckrog )
 {
-	static ppi8255_interface buckrog_8255_intf =
+	static const ppi8255_interface buckrog_8255_intf =
 	{
 		2,
 		{ NULL,            NULL },

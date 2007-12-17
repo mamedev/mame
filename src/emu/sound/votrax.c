@@ -45,7 +45,7 @@ struct votrax_info
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
  ****************************************************************************/
 
-static const char *VotraxTable[65] =
+static const char *const VotraxTable[65] =
 {
  "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
  "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",

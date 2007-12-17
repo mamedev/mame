@@ -6,7 +6,7 @@
 struct sample_channel
 {
 	sound_stream *stream;
-	INT16 *		source;
+	const INT16 *source;
 	INT32		source_length;
 	INT32		source_num;
 	UINT32		pos;
@@ -174,7 +174,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
     readsamples - load all samples
 -------------------------------------------------*/
 
-struct loaded_samples *readsamples(const char **samplenames, const char *basename)
+struct loaded_samples *readsamples(const char *const *samplenames, const char *basename)
 {
 	struct loaded_samples *samples;
 	int skipfirst = 0;
@@ -270,7 +270,7 @@ void sample_start(int channel,int samplenum,int loop)
 }
 
 
-void sample_start_raw_n(int num,int channel,INT16 *sampledata,int samples,int frequency,int loop)
+void sample_start_raw_n(int num,int channel,const INT16 *sampledata,int samples,int frequency,int loop)
 {
     struct samples_info *info = sndti_token(SOUND_SAMPLES, num);
     struct sample_channel *chan;
@@ -293,7 +293,7 @@ void sample_start_raw_n(int num,int channel,INT16 *sampledata,int samples,int fr
 	chan->loop = loop;
 }
 
-void sample_start_raw(int channel,INT16 *sampledata,int samples,int frequency,int loop)
+void sample_start_raw(int channel,const INT16 *sampledata,int samples,int frequency,int loop)
 {
     sample_start_raw_n(0,channel,sampledata,samples,frequency,loop);
 }
@@ -452,7 +452,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 		UINT32 pos = chan->pos;
 		UINT32 frac = chan->frac;
 		UINT32 step = chan->step;
-		INT16 *sample = chan->source;
+		const INT16 *sample = chan->source;
 		UINT32 sample_length = chan->source_length;
 
 		while (length--)

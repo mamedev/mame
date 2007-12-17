@@ -4,7 +4,7 @@
 #include "ppc.h"
 #include "debugger.h"
 
-#if (HAS_PPC603 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC601 || HAS_PPC604)
 void ppc603_exception(int exception);
 #endif
 #if (HAS_PPC602)
@@ -71,7 +71,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d);
 	if((ppc.msr & 0x2000) == 0){	\
 	}
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT32		ppc_field_xlat[256];
 #endif
 
@@ -249,7 +249,7 @@ typedef struct {
 	FPR	fpr[32];
 	UINT32 sr[16];
 
-#if HAS_PPC603 || HAS_PPC601 || HAS_MPC8240
+#if HAS_PPC603 || HAS_PPC601 || HAS_MPC8240 || HAS_PPC604
 	int is603;
 #endif
 #if HAS_PPC602
@@ -281,6 +281,12 @@ typedef struct {
 	void (*write16_unaligned)(offs_t address, UINT16 data);
 	void (*write32_unaligned)(offs_t address, UINT32 data);
 	void (*write64_unaligned)(offs_t address, UINT64 data);
+
+	void (* optable19[1024])(UINT32);
+	void (* optable31[1024])(UINT32);
+	void (* optable59[1024])(UINT32);
+	void (* optable63[1024])(UINT32);
+	void (* optable[64])(UINT32);
 } PPC_REGS;
 
 
@@ -317,7 +323,7 @@ INLINE int IS_PPC602(void)
 
 INLINE int IS_PPC603(void)
 {
-#if HAS_PPC603 || HAS_PPC601
+#if HAS_PPC603 || HAS_PPC601 || HAS_PPC604
 	return ppc.is603;
 #else
 	return 0;
@@ -480,7 +486,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 		case SPR_PVR:		return;
 	}
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if(IS_PPC602() || IS_PPC603()) {
 		switch(spr)
 		{
@@ -492,7 +498,7 @@ INLINE void ppc_set_spr(int spr, UINT32 value)
 					if (IS_PPC602())
 						ppc602_exception(EXCEPTION_DECREMENTER);
 #endif
-#if HAS_PPC603 || HAS_PPC601
+#if HAS_PPC603 || HAS_PPC601 || HAS_PPC604
 					if (IS_PPC603())
 						ppc603_exception(EXCEPTION_DECREMENTER);
 #endif
@@ -691,7 +697,7 @@ INLINE UINT32 ppc_get_spr(int spr)
 	}
 #endif
 
-#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601)
+#if (HAS_PPC603 || HAS_PPC602 || HAS_PPC601 || HAS_PPC604)
 	if (IS_PPC603() || IS_PPC602())
 	{
 		switch (spr)
@@ -817,12 +823,6 @@ INLINE void ppc_exception(int exception_type)
 
 /***********************************************************************/
 
-static void (* optable19[1024])(UINT32);
-static void (* optable31[1024])(UINT32);
-static void (* optable59[1024])(UINT32);
-static void (* optable63[1024])(UINT32);
-static void (* optable[64])(UINT32);
-
 #include "ppc_mem.c"
 
 #if (HAS_PPC403)
@@ -833,7 +833,7 @@ static void (* optable[64])(UINT32);
 #include "ppc602.c"
 #endif
 
-#if (HAS_PPC603 || HAS_PPC601 || HAS_MPC8240)
+#if (HAS_PPC603 || HAS_PPC601 || HAS_MPC8240 || HAS_PPC604)
 #include "ppc603.c"
 #endif
 
@@ -851,13 +851,13 @@ void ppc_init(void)
 	memset(&ppc, 0, sizeof(ppc));
 
 	for( i=0; i < 64; i++ ) {
-		optable[i] = ppc_invalid;
+		ppc.optable[i] = ppc_invalid;
 	}
 	for( i=0; i < 1024; i++ ) {
-		optable19[i] = ppc_invalid;
-		optable31[i] = ppc_invalid;
-		optable59[i] = ppc_invalid;
-		optable63[i] = ppc_invalid;
+		ppc.optable19[i] = ppc_invalid;
+		ppc.optable31[i] = ppc_invalid;
+		ppc.optable59[i] = ppc_invalid;
+		ppc.optable63[i] = ppc_invalid;
 	}
 
 	/* Fill the opcode tables */
@@ -866,11 +866,11 @@ void ppc_init(void)
 		switch(ppc_opcode_common[i].code)
 		{
 			case 19:
-				optable19[ppc_opcode_common[i].subcode] = ppc_opcode_common[i].handler;
+				ppc.optable19[ppc_opcode_common[i].subcode] = ppc_opcode_common[i].handler;
 				break;
 
 			case 31:
-				optable31[ppc_opcode_common[i].subcode] = ppc_opcode_common[i].handler;
+				ppc.optable31[ppc_opcode_common[i].subcode] = ppc_opcode_common[i].handler;
 				break;
 
 			case 59:
@@ -878,7 +878,7 @@ void ppc_init(void)
 				break;
 
 			default:
-				optable[ppc_opcode_common[i].code] = ppc_opcode_common[i].handler;
+				ppc.optable[ppc_opcode_common[i].code] = ppc_opcode_common[i].handler;
 		}
 
 	}
@@ -908,18 +908,18 @@ static void ppc403_init(int index, int clock, const void *_config, int (*irqcall
 	ppc_init();
 
 	/* PPC403 specific opcodes */
-	optable31[454] = ppc_dccci;
-	optable31[486] = ppc_dcread;
-	optable31[262] = ppc_icbt;
-	optable31[966] = ppc_iccci;
-	optable31[998] = ppc_icread;
-	optable31[323] = ppc_mfdcr;
-	optable31[451] = ppc_mtdcr;
-	optable31[131] = ppc_wrtee;
-	optable31[163] = ppc_wrteei;
+	ppc.optable31[454] = ppc_dccci;
+	ppc.optable31[486] = ppc_dcread;
+	ppc.optable31[262] = ppc_icbt;
+	ppc.optable31[966] = ppc_iccci;
+	ppc.optable31[998] = ppc_icread;
+	ppc.optable31[323] = ppc_mfdcr;
+	ppc.optable31[451] = ppc_mtdcr;
+	ppc.optable31[131] = ppc_wrtee;
+	ppc.optable31[163] = ppc_wrteei;
 
 	// !!! why is rfci here !!!
-	optable19[51] = ppc_rfci;
+	ppc.optable19[51] = ppc_rfci;
 
 	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback, NULL);
 	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback, NULL);
@@ -957,77 +957,79 @@ static void ppc603_init(int index, int clock, const void *_config, int (*irqcall
 
 	ppc_init() ;
 
-	optable[48] = ppc_lfs;
-	optable[49] = ppc_lfsu;
-	optable[50] = ppc_lfd;
-	optable[51] = ppc_lfdu;
-	optable[52] = ppc_stfs;
-	optable[53] = ppc_stfsu;
-	optable[54] = ppc_stfd;
-	optable[55] = ppc_stfdu;
-	optable31[631] = ppc_lfdux;
-	optable31[599] = ppc_lfdx;
-	optable31[567] = ppc_lfsux;
-	optable31[535] = ppc_lfsx;
-	optable31[595] = ppc_mfsr;
-	optable31[659] = ppc_mfsrin;
-	optable31[371] = ppc_mftb;
-	optable31[210] = ppc_mtsr;
-	optable31[242] = ppc_mtsrin;
-	optable31[758] = ppc_dcba;
-	optable31[759] = ppc_stfdux;
-	optable31[727] = ppc_stfdx;
-	optable31[983] = ppc_stfiwx;
-	optable31[695] = ppc_stfsux;
-	optable31[663] = ppc_stfsx;
-	optable31[370] = ppc_tlbia;
-	optable31[306] = ppc_tlbie;
-	optable31[566] = ppc_tlbsync;
-	optable31[310] = ppc_eciwx;
-	optable31[438] = ppc_ecowx;
+	ppc.optable[48] = ppc_lfs;
+	ppc.optable[49] = ppc_lfsu;
+	ppc.optable[50] = ppc_lfd;
+	ppc.optable[51] = ppc_lfdu;
+	ppc.optable[52] = ppc_stfs;
+	ppc.optable[53] = ppc_stfsu;
+	ppc.optable[54] = ppc_stfd;
+	ppc.optable[55] = ppc_stfdu;
+	ppc.optable31[631] = ppc_lfdux;
+	ppc.optable31[599] = ppc_lfdx;
+	ppc.optable31[567] = ppc_lfsux;
+	ppc.optable31[535] = ppc_lfsx;
+	ppc.optable31[595] = ppc_mfsr;
+	ppc.optable31[659] = ppc_mfsrin;
+	ppc.optable31[371] = ppc_mftb;
+	ppc.optable31[210] = ppc_mtsr;
+	ppc.optable31[242] = ppc_mtsrin;
+	ppc.optable31[758] = ppc_dcba;
+	ppc.optable31[759] = ppc_stfdux;
+	ppc.optable31[727] = ppc_stfdx;
+	ppc.optable31[983] = ppc_stfiwx;
+	ppc.optable31[695] = ppc_stfsux;
+	ppc.optable31[663] = ppc_stfsx;
+	ppc.optable31[370] = ppc_tlbia;
+	ppc.optable31[306] = ppc_tlbie;
+	ppc.optable31[566] = ppc_tlbsync;
+	ppc.optable31[310] = ppc_eciwx;
+	ppc.optable31[438] = ppc_ecowx;
 
-	optable63[264] = ppc_fabsx;
-	optable63[21] = ppc_faddx;
-	optable63[32] = ppc_fcmpo;
-	optable63[0] = ppc_fcmpu;
-	optable63[14] = ppc_fctiwx;
-	optable63[15] = ppc_fctiwzx;
-	optable63[18] = ppc_fdivx;
-	optable63[72] = ppc_fmrx;
-	optable63[136] = ppc_fnabsx;
-	optable63[40] = ppc_fnegx;
-	optable63[12] = ppc_frspx;
-	optable63[26] = ppc_frsqrtex;
-	optable63[22] = ppc_fsqrtx;
-	optable63[20] = ppc_fsubx;
-	optable63[583] = ppc_mffsx;
-	optable63[70] = ppc_mtfsb0x;
-	optable63[38] = ppc_mtfsb1x;
-	optable63[711] = ppc_mtfsfx;
-	optable63[134] = ppc_mtfsfix;
-	optable63[64] = ppc_mcrfs;
+	ppc.optable63[264] = ppc_fabsx;
+	ppc.optable63[21] = ppc_faddx;
+	ppc.optable63[32] = ppc_fcmpo;
+	ppc.optable63[0] = ppc_fcmpu;
+	ppc.optable63[14] = ppc_fctiwx;
+	ppc.optable63[15] = ppc_fctiwzx;
+	ppc.optable63[18] = ppc_fdivx;
+	ppc.optable63[72] = ppc_fmrx;
+	ppc.optable63[136] = ppc_fnabsx;
+	ppc.optable63[40] = ppc_fnegx;
+	ppc.optable63[12] = ppc_frspx;
+	ppc.optable63[26] = ppc_frsqrtex;
+	ppc.optable63[22] = ppc_fsqrtx;
+	ppc.optable63[20] = ppc_fsubx;
+	ppc.optable63[583] = ppc_mffsx;
+	ppc.optable63[70] = ppc_mtfsb0x;
+	ppc.optable63[38] = ppc_mtfsb1x;
+	ppc.optable63[711] = ppc_mtfsfx;
+	ppc.optable63[134] = ppc_mtfsfix;
+	ppc.optable63[64] = ppc_mcrfs;
 
-	optable59[21] = ppc_faddsx;
-	optable59[18] = ppc_fdivsx;
-	optable59[24] = ppc_fresx;
-	optable59[22] = ppc_fsqrtsx;
-	optable59[20] = ppc_fsubsx;
+	ppc.optable59[21] = ppc_faddsx;
+	ppc.optable59[18] = ppc_fdivsx;
+	ppc.optable59[24] = ppc_fresx;
+	ppc.optable59[22] = ppc_fsqrtsx;
+	ppc.optable59[20] = ppc_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = ppc_fmaddx;
-		optable63[i * 32 | 28] = ppc_fmsubx;
-		optable63[i * 32 | 25] = ppc_fmulx;
-		optable63[i * 32 | 31] = ppc_fnmaddx;
-		optable63[i * 32 | 30] = ppc_fnmsubx;
-		optable63[i * 32 | 23] = ppc_fselx;
+		ppc.optable63[i * 32 | 29] = ppc_fmaddx;
+		ppc.optable63[i * 32 | 28] = ppc_fmsubx;
+		ppc.optable63[i * 32 | 25] = ppc_fmulx;
+		ppc.optable63[i * 32 | 31] = ppc_fnmaddx;
+		ppc.optable63[i * 32 | 30] = ppc_fnmsubx;
+		ppc.optable63[i * 32 | 23] = ppc_fselx;
 
-		optable59[i * 32 | 29] = ppc_fmaddsx;
-		optable59[i * 32 | 28] = ppc_fmsubsx;
-		optable59[i * 32 | 25] = ppc_fmulsx;
-		optable59[i * 32 | 31] = ppc_fnmaddsx;
-		optable59[i * 32 | 30] = ppc_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = ppc_fmaddsx;
+		ppc.optable59[i * 32 | 28] = ppc_fmsubsx;
+		ppc.optable59[i * 32 | 25] = ppc_fmulsx;
+		ppc.optable59[i * 32 | 31] = ppc_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = ppc_fnmsubsx;
 	}
+
+	ppc.optable31[978] = ppc_tlbld;
 
 	for(i = 0; i < 256; i++)
 	{
@@ -1099,76 +1101,76 @@ static void ppc602_init(int index, int clock, const void *_config, int (*irqcall
 
 	ppc_init() ;
 
-	optable[48] = ppc_lfs;
-	optable[49] = ppc_lfsu;
-	optable[50] = ppc_lfd;
-	optable[51] = ppc_lfdu;
-	optable[52] = ppc_stfs;
-	optable[53] = ppc_stfsu;
-	optable[54] = ppc_stfd;
-	optable[55] = ppc_stfdu;
-	optable31[631] = ppc_lfdux;
-	optable31[599] = ppc_lfdx;
-	optable31[567] = ppc_lfsux;
-	optable31[535] = ppc_lfsx;
-	optable31[595] = ppc_mfsr;
-	optable31[659] = ppc_mfsrin;
-	optable31[371] = ppc_mftb;
-	optable31[210] = ppc_mtsr;
-	optable31[242] = ppc_mtsrin;
-	optable31[758] = ppc_dcba;
-	optable31[759] = ppc_stfdux;
-	optable31[727] = ppc_stfdx;
-	optable31[983] = ppc_stfiwx;
-	optable31[695] = ppc_stfsux;
-	optable31[663] = ppc_stfsx;
-	optable31[370] = ppc_tlbia;
-	optable31[306] = ppc_tlbie;
-	optable31[566] = ppc_tlbsync;
-	optable31[310] = ppc_eciwx;
-	optable31[438] = ppc_ecowx;
+	ppc.optable[48] = ppc_lfs;
+	ppc.optable[49] = ppc_lfsu;
+	ppc.optable[50] = ppc_lfd;
+	ppc.optable[51] = ppc_lfdu;
+	ppc.optable[52] = ppc_stfs;
+	ppc.optable[53] = ppc_stfsu;
+	ppc.optable[54] = ppc_stfd;
+	ppc.optable[55] = ppc_stfdu;
+	ppc.optable31[631] = ppc_lfdux;
+	ppc.optable31[599] = ppc_lfdx;
+	ppc.optable31[567] = ppc_lfsux;
+	ppc.optable31[535] = ppc_lfsx;
+	ppc.optable31[595] = ppc_mfsr;
+	ppc.optable31[659] = ppc_mfsrin;
+	ppc.optable31[371] = ppc_mftb;
+	ppc.optable31[210] = ppc_mtsr;
+	ppc.optable31[242] = ppc_mtsrin;
+	ppc.optable31[758] = ppc_dcba;
+	ppc.optable31[759] = ppc_stfdux;
+	ppc.optable31[727] = ppc_stfdx;
+	ppc.optable31[983] = ppc_stfiwx;
+	ppc.optable31[695] = ppc_stfsux;
+	ppc.optable31[663] = ppc_stfsx;
+	ppc.optable31[370] = ppc_tlbia;
+	ppc.optable31[306] = ppc_tlbie;
+	ppc.optable31[566] = ppc_tlbsync;
+	ppc.optable31[310] = ppc_eciwx;
+	ppc.optable31[438] = ppc_ecowx;
 
-	optable63[264] = ppc_fabsx;
-	optable63[21] = ppc_faddx;
-	optable63[32] = ppc_fcmpo;
-	optable63[0] = ppc_fcmpu;
-	optable63[14] = ppc_fctiwx;
-	optable63[15] = ppc_fctiwzx;
-	optable63[18] = ppc_fdivx;
-	optable63[72] = ppc_fmrx;
-	optable63[136] = ppc_fnabsx;
-	optable63[40] = ppc_fnegx;
-	optable63[12] = ppc_frspx;
-	optable63[26] = ppc_frsqrtex;
-	optable63[22] = ppc_fsqrtx;
-	optable63[20] = ppc_fsubx;
-	optable63[583] = ppc_mffsx;
-	optable63[70] = ppc_mtfsb0x;
-	optable63[38] = ppc_mtfsb1x;
-	optable63[711] = ppc_mtfsfx;
-	optable63[134] = ppc_mtfsfix;
-	optable63[64] = ppc_mcrfs;
+	ppc.optable63[264] = ppc_fabsx;
+	ppc.optable63[21] = ppc_faddx;
+	ppc.optable63[32] = ppc_fcmpo;
+	ppc.optable63[0] = ppc_fcmpu;
+	ppc.optable63[14] = ppc_fctiwx;
+	ppc.optable63[15] = ppc_fctiwzx;
+	ppc.optable63[18] = ppc_fdivx;
+	ppc.optable63[72] = ppc_fmrx;
+	ppc.optable63[136] = ppc_fnabsx;
+	ppc.optable63[40] = ppc_fnegx;
+	ppc.optable63[12] = ppc_frspx;
+	ppc.optable63[26] = ppc_frsqrtex;
+	ppc.optable63[22] = ppc_fsqrtx;
+	ppc.optable63[20] = ppc_fsubx;
+	ppc.optable63[583] = ppc_mffsx;
+	ppc.optable63[70] = ppc_mtfsb0x;
+	ppc.optable63[38] = ppc_mtfsb1x;
+	ppc.optable63[711] = ppc_mtfsfx;
+	ppc.optable63[134] = ppc_mtfsfix;
+	ppc.optable63[64] = ppc_mcrfs;
 
-	optable59[21] = ppc_faddsx;
-	optable59[18] = ppc_fdivsx;
-	optable59[24] = ppc_fresx;
-	optable59[22] = ppc_fsqrtsx;
-	optable59[20] = ppc_fsubsx;
+	ppc.optable59[21] = ppc_faddsx;
+	ppc.optable59[18] = ppc_fdivsx;
+	ppc.optable59[24] = ppc_fresx;
+	ppc.optable59[22] = ppc_fsqrtsx;
+	ppc.optable59[20] = ppc_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = ppc_fmaddx;
-		optable63[i * 32 | 28] = ppc_fmsubx;
-		optable63[i * 32 | 25] = ppc_fmulx;
-		optable63[i * 32 | 31] = ppc_fnmaddx;
-		optable63[i * 32 | 30] = ppc_fnmsubx;
-		optable63[i * 32 | 23] = ppc_fselx;
+		ppc.optable63[i * 32 | 29] = ppc_fmaddx;
+		ppc.optable63[i * 32 | 28] = ppc_fmsubx;
+		ppc.optable63[i * 32 | 25] = ppc_fmulx;
+		ppc.optable63[i * 32 | 31] = ppc_fnmaddx;
+		ppc.optable63[i * 32 | 30] = ppc_fnmsubx;
+		ppc.optable63[i * 32 | 23] = ppc_fselx;
 
-		optable59[i * 32 | 29] = ppc_fmaddsx;
-		optable59[i * 32 | 28] = ppc_fmsubsx;
-		optable59[i * 32 | 25] = ppc_fmulsx;
-		optable59[i * 32 | 31] = ppc_fnmaddsx;
-		optable59[i * 32 | 30] = ppc_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = ppc_fmaddsx;
+		ppc.optable59[i * 32 | 28] = ppc_fmsubsx;
+		ppc.optable59[i * 32 | 25] = ppc_fmulsx;
+		ppc.optable59[i * 32 | 31] = ppc_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = ppc_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1185,10 +1187,10 @@ static void ppc602_init(int index, int clock, const void *_config, int (*irqcall
 	}
 
 	// PPC602 specific opcodes
-	optable31[596] = ppc_esa;
-	optable31[628] = ppc_dsa;
-	optable31[1010] = ppc_tlbli;
-	optable31[978] = ppc_tlbld;
+	ppc.optable31[596] = ppc_esa;
+	ppc.optable31[628] = ppc_dsa;
+	ppc.optable31[1010] = ppc_tlbli;
+	ppc.optable31[978] = ppc_tlbld;
 
 	ppc.is602 = 1;
 
@@ -1243,76 +1245,76 @@ static void mpc8240_init(int index, int clock, const void *_config, int (*irqcal
 
 	ppc_init();
 
-	optable[48] = ppc_lfs;
-	optable[49] = ppc_lfsu;
-	optable[50] = ppc_lfd;
-	optable[51] = ppc_lfdu;
-	optable[52] = ppc_stfs;
-	optable[53] = ppc_stfsu;
-	optable[54] = ppc_stfd;
-	optable[55] = ppc_stfdu;
-	optable31[631] = ppc_lfdux;
-	optable31[599] = ppc_lfdx;
-	optable31[567] = ppc_lfsux;
-	optable31[535] = ppc_lfsx;
-	optable31[595] = ppc_mfsr;
-	optable31[659] = ppc_mfsrin;
-	optable31[371] = ppc_mftb;
-	optable31[210] = ppc_mtsr;
-	optable31[242] = ppc_mtsrin;
-	optable31[758] = ppc_dcba;
-	optable31[759] = ppc_stfdux;
-	optable31[727] = ppc_stfdx;
-	optable31[983] = ppc_stfiwx;
-	optable31[695] = ppc_stfsux;
-	optable31[663] = ppc_stfsx;
-	optable31[370] = ppc_tlbia;
-	optable31[306] = ppc_tlbie;
-	optable31[566] = ppc_tlbsync;
-	optable31[310] = ppc_eciwx;
-	optable31[438] = ppc_ecowx;
+	ppc.optable[48] = ppc_lfs;
+	ppc.optable[49] = ppc_lfsu;
+	ppc.optable[50] = ppc_lfd;
+	ppc.optable[51] = ppc_lfdu;
+	ppc.optable[52] = ppc_stfs;
+	ppc.optable[53] = ppc_stfsu;
+	ppc.optable[54] = ppc_stfd;
+	ppc.optable[55] = ppc_stfdu;
+	ppc.optable31[631] = ppc_lfdux;
+	ppc.optable31[599] = ppc_lfdx;
+	ppc.optable31[567] = ppc_lfsux;
+	ppc.optable31[535] = ppc_lfsx;
+	ppc.optable31[595] = ppc_mfsr;
+	ppc.optable31[659] = ppc_mfsrin;
+	ppc.optable31[371] = ppc_mftb;
+	ppc.optable31[210] = ppc_mtsr;
+	ppc.optable31[242] = ppc_mtsrin;
+	ppc.optable31[758] = ppc_dcba;
+	ppc.optable31[759] = ppc_stfdux;
+	ppc.optable31[727] = ppc_stfdx;
+	ppc.optable31[983] = ppc_stfiwx;
+	ppc.optable31[695] = ppc_stfsux;
+	ppc.optable31[663] = ppc_stfsx;
+	ppc.optable31[370] = ppc_tlbia;
+	ppc.optable31[306] = ppc_tlbie;
+	ppc.optable31[566] = ppc_tlbsync;
+	ppc.optable31[310] = ppc_eciwx;
+	ppc.optable31[438] = ppc_ecowx;
 
-	optable63[264] = ppc_fabsx;
-	optable63[21] = ppc_faddx;
-	optable63[32] = ppc_fcmpo;
-	optable63[0] = ppc_fcmpu;
-	optable63[14] = ppc_fctiwx;
-	optable63[15] = ppc_fctiwzx;
-	optable63[18] = ppc_fdivx;
-	optable63[72] = ppc_fmrx;
-	optable63[136] = ppc_fnabsx;
-	optable63[40] = ppc_fnegx;
-	optable63[12] = ppc_frspx;
-	optable63[26] = ppc_frsqrtex;
-	optable63[22] = ppc_fsqrtx;
-	optable63[20] = ppc_fsubx;
-	optable63[583] = ppc_mffsx;
-	optable63[70] = ppc_mtfsb0x;
-	optable63[38] = ppc_mtfsb1x;
-	optable63[711] = ppc_mtfsfx;
-	optable63[134] = ppc_mtfsfix;
-	optable63[64] = ppc_mcrfs;
+	ppc.optable63[264] = ppc_fabsx;
+	ppc.optable63[21] = ppc_faddx;
+	ppc.optable63[32] = ppc_fcmpo;
+	ppc.optable63[0] = ppc_fcmpu;
+	ppc.optable63[14] = ppc_fctiwx;
+	ppc.optable63[15] = ppc_fctiwzx;
+	ppc.optable63[18] = ppc_fdivx;
+	ppc.optable63[72] = ppc_fmrx;
+	ppc.optable63[136] = ppc_fnabsx;
+	ppc.optable63[40] = ppc_fnegx;
+	ppc.optable63[12] = ppc_frspx;
+	ppc.optable63[26] = ppc_frsqrtex;
+	ppc.optable63[22] = ppc_fsqrtx;
+	ppc.optable63[20] = ppc_fsubx;
+	ppc.optable63[583] = ppc_mffsx;
+	ppc.optable63[70] = ppc_mtfsb0x;
+	ppc.optable63[38] = ppc_mtfsb1x;
+	ppc.optable63[711] = ppc_mtfsfx;
+	ppc.optable63[134] = ppc_mtfsfix;
+	ppc.optable63[64] = ppc_mcrfs;
 
-	optable59[21] = ppc_faddsx;
-	optable59[18] = ppc_fdivsx;
-	optable59[24] = ppc_fresx;
-	optable59[22] = ppc_fsqrtsx;
-	optable59[20] = ppc_fsubsx;
+	ppc.optable59[21] = ppc_faddsx;
+	ppc.optable59[18] = ppc_fdivsx;
+	ppc.optable59[24] = ppc_fresx;
+	ppc.optable59[22] = ppc_fsqrtsx;
+	ppc.optable59[20] = ppc_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = ppc_fmaddx;
-		optable63[i * 32 | 28] = ppc_fmsubx;
-		optable63[i * 32 | 25] = ppc_fmulx;
-		optable63[i * 32 | 31] = ppc_fnmaddx;
-		optable63[i * 32 | 30] = ppc_fnmsubx;
-		optable63[i * 32 | 23] = ppc_fselx;
+		ppc.optable63[i * 32 | 29] = ppc_fmaddx;
+		ppc.optable63[i * 32 | 28] = ppc_fmsubx;
+		ppc.optable63[i * 32 | 25] = ppc_fmulx;
+		ppc.optable63[i * 32 | 31] = ppc_fnmaddx;
+		ppc.optable63[i * 32 | 30] = ppc_fnmsubx;
+		ppc.optable63[i * 32 | 23] = ppc_fselx;
 
-		optable59[i * 32 | 29] = ppc_fmaddsx;
-		optable59[i * 32 | 28] = ppc_fmsubsx;
-		optable59[i * 32 | 25] = ppc_fmulsx;
-		optable59[i * 32 | 31] = ppc_fnmaddsx;
-		optable59[i * 32 | 30] = ppc_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = ppc_fmaddsx;
+		ppc.optable59[i * 32 | 28] = ppc_fmsubsx;
+		ppc.optable59[i * 32 | 25] = ppc_fmulsx;
+		ppc.optable59[i * 32 | 31] = ppc_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = ppc_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1329,8 +1331,8 @@ static void mpc8240_init(int index, int clock, const void *_config, int (*irqcal
 	}
 
 	// MPC8240 specific opcodes
-	optable31[978] = mpc8240_tlbld;
-	optable31[1010] = mpc8240_tlbli;
+	ppc.optable31[978] = mpc8240_tlbld;
+	ppc.optable31[1010] = mpc8240_tlbli;
 
 	ppc.is603 = 1;
 
@@ -1374,76 +1376,76 @@ static void ppc601_init(int index, int clock, const void *_config, int (*irqcall
 
 	ppc_init() ;
 
-	optable[48] = ppc_lfs;
-	optable[49] = ppc_lfsu;
-	optable[50] = ppc_lfd;
-	optable[51] = ppc_lfdu;
-	optable[52] = ppc_stfs;
-	optable[53] = ppc_stfsu;
-	optable[54] = ppc_stfd;
-	optable[55] = ppc_stfdu;
-	optable31[631] = ppc_lfdux;
-	optable31[599] = ppc_lfdx;
-	optable31[567] = ppc_lfsux;
-	optable31[535] = ppc_lfsx;
-	optable31[595] = ppc_mfsr;
-	optable31[659] = ppc_mfsrin;
-	optable31[371] = ppc_mftb;
-	optable31[210] = ppc_mtsr;
-	optable31[242] = ppc_mtsrin;
-	optable31[758] = ppc_dcba;
-	optable31[759] = ppc_stfdux;
-	optable31[727] = ppc_stfdx;
-	optable31[983] = ppc_stfiwx;
-	optable31[695] = ppc_stfsux;
-	optable31[663] = ppc_stfsx;
-	optable31[370] = ppc_tlbia;
-	optable31[306] = ppc_tlbie;
-	optable31[566] = ppc_tlbsync;
-	optable31[310] = ppc_eciwx;
-	optable31[438] = ppc_ecowx;
+	ppc.optable[48] = ppc_lfs;
+	ppc.optable[49] = ppc_lfsu;
+	ppc.optable[50] = ppc_lfd;
+	ppc.optable[51] = ppc_lfdu;
+	ppc.optable[52] = ppc_stfs;
+	ppc.optable[53] = ppc_stfsu;
+	ppc.optable[54] = ppc_stfd;
+	ppc.optable[55] = ppc_stfdu;
+	ppc.optable31[631] = ppc_lfdux;
+	ppc.optable31[599] = ppc_lfdx;
+	ppc.optable31[567] = ppc_lfsux;
+	ppc.optable31[535] = ppc_lfsx;
+	ppc.optable31[595] = ppc_mfsr;
+	ppc.optable31[659] = ppc_mfsrin;
+	ppc.optable31[371] = ppc_mftb;
+	ppc.optable31[210] = ppc_mtsr;
+	ppc.optable31[242] = ppc_mtsrin;
+	ppc.optable31[758] = ppc_dcba;
+	ppc.optable31[759] = ppc_stfdux;
+	ppc.optable31[727] = ppc_stfdx;
+	ppc.optable31[983] = ppc_stfiwx;
+	ppc.optable31[695] = ppc_stfsux;
+	ppc.optable31[663] = ppc_stfsx;
+	ppc.optable31[370] = ppc_tlbia;
+	ppc.optable31[306] = ppc_tlbie;
+	ppc.optable31[566] = ppc_tlbsync;
+	ppc.optable31[310] = ppc_eciwx;
+	ppc.optable31[438] = ppc_ecowx;
 
-	optable63[264] = ppc_fabsx;
-	optable63[21] = ppc_faddx;
-	optable63[32] = ppc_fcmpo;
-	optable63[0] = ppc_fcmpu;
-	optable63[14] = ppc_fctiwx;
-	optable63[15] = ppc_fctiwzx;
-	optable63[18] = ppc_fdivx;
-	optable63[72] = ppc_fmrx;
-	optable63[136] = ppc_fnabsx;
-	optable63[40] = ppc_fnegx;
-	optable63[12] = ppc_frspx;
-	optable63[26] = ppc_frsqrtex;
-	optable63[22] = ppc_fsqrtx;
-	optable63[20] = ppc_fsubx;
-	optable63[583] = ppc_mffsx;
-	optable63[70] = ppc_mtfsb0x;
-	optable63[38] = ppc_mtfsb1x;
-	optable63[711] = ppc_mtfsfx;
-	optable63[134] = ppc_mtfsfix;
-	optable63[64] = ppc_mcrfs;
+	ppc.optable63[264] = ppc_fabsx;
+	ppc.optable63[21] = ppc_faddx;
+	ppc.optable63[32] = ppc_fcmpo;
+	ppc.optable63[0] = ppc_fcmpu;
+	ppc.optable63[14] = ppc_fctiwx;
+	ppc.optable63[15] = ppc_fctiwzx;
+	ppc.optable63[18] = ppc_fdivx;
+	ppc.optable63[72] = ppc_fmrx;
+	ppc.optable63[136] = ppc_fnabsx;
+	ppc.optable63[40] = ppc_fnegx;
+	ppc.optable63[12] = ppc_frspx;
+	ppc.optable63[26] = ppc_frsqrtex;
+	ppc.optable63[22] = ppc_fsqrtx;
+	ppc.optable63[20] = ppc_fsubx;
+	ppc.optable63[583] = ppc_mffsx;
+	ppc.optable63[70] = ppc_mtfsb0x;
+	ppc.optable63[38] = ppc_mtfsb1x;
+	ppc.optable63[711] = ppc_mtfsfx;
+	ppc.optable63[134] = ppc_mtfsfix;
+	ppc.optable63[64] = ppc_mcrfs;
 
-	optable59[21] = ppc_faddsx;
-	optable59[18] = ppc_fdivsx;
-	optable59[24] = ppc_fresx;
-	optable59[22] = ppc_fsqrtsx;
-	optable59[20] = ppc_fsubsx;
+	ppc.optable59[21] = ppc_faddsx;
+	ppc.optable59[18] = ppc_fdivsx;
+	ppc.optable59[24] = ppc_fresx;
+	ppc.optable59[22] = ppc_fsqrtsx;
+	ppc.optable59[20] = ppc_fsubsx;
 
 	for(i = 0; i < 32; i++)
 	{
-		optable63[i * 32 | 29] = ppc_fmaddx;
-		optable63[i * 32 | 28] = ppc_fmsubx;
-		optable63[i * 32 | 25] = ppc_fmulx;
-		optable63[i * 32 | 31] = ppc_fnmaddx;
-		optable63[i * 32 | 30] = ppc_fnmsubx;
-		optable63[i * 32 | 23] = ppc_fselx;
+		ppc.optable63[i * 32 | 29] = ppc_fmaddx;
+		ppc.optable63[i * 32 | 28] = ppc_fmsubx;
+		ppc.optable63[i * 32 | 25] = ppc_fmulx;
+		ppc.optable63[i * 32 | 31] = ppc_fnmaddx;
+		ppc.optable63[i * 32 | 30] = ppc_fnmsubx;
+		ppc.optable63[i * 32 | 23] = ppc_fselx;
 
-		optable59[i * 32 | 29] = ppc_fmaddsx;
-		optable59[i * 32 | 28] = ppc_fmsubsx;
-		optable59[i * 32 | 25] = ppc_fmulsx;
-		optable59[i * 32 | 31] = ppc_fnmaddsx;
-		optable59[i * 32 | 30] = ppc_fnmsubsx;
+		ppc.optable59[i * 32 | 29] = ppc_fmaddsx;
+		ppc.optable59[i * 32 | 28] = ppc_fmsubsx;
+		ppc.optable59[i * 32 | 25] = ppc_fmulsx;
+		ppc.optable59[i * 32 | 31] = ppc_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = ppc_fnmsubsx;
 	}
 
 	for(i = 0; i < 256; i++)
@@ -1488,6 +1490,136 @@ static void ppc601_init(int index, int clock, const void *_config, int (*irqcall
 }
 
 static void ppc601_exit(void)
+{
+
+}
+#endif
+
+#if (HAS_PPC604)
+static void ppc604_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+{
+	const ppc_config *config = _config;
+	float multiplier;
+	int i ;
+
+	ppc_init() ;
+
+	ppc.optable[48] = ppc_lfs;
+	ppc.optable[49] = ppc_lfsu;
+	ppc.optable[50] = ppc_lfd;
+	ppc.optable[51] = ppc_lfdu;
+	ppc.optable[52] = ppc_stfs;
+	ppc.optable[53] = ppc_stfsu;
+	ppc.optable[54] = ppc_stfd;
+	ppc.optable[55] = ppc_stfdu;
+	ppc.optable31[631] = ppc_lfdux;
+	ppc.optable31[599] = ppc_lfdx;
+	ppc.optable31[567] = ppc_lfsux;
+	ppc.optable31[535] = ppc_lfsx;
+	ppc.optable31[595] = ppc_mfsr;
+	ppc.optable31[659] = ppc_mfsrin;
+	ppc.optable31[371] = ppc_mftb;
+	ppc.optable31[210] = ppc_mtsr;
+	ppc.optable31[242] = ppc_mtsrin;
+	ppc.optable31[758] = ppc_dcba;
+	ppc.optable31[759] = ppc_stfdux;
+	ppc.optable31[727] = ppc_stfdx;
+	ppc.optable31[983] = ppc_stfiwx;
+	ppc.optable31[695] = ppc_stfsux;
+	ppc.optable31[663] = ppc_stfsx;
+	ppc.optable31[370] = ppc_tlbia;
+	ppc.optable31[306] = ppc_tlbie;
+	ppc.optable31[566] = ppc_tlbsync;
+	ppc.optable31[310] = ppc_eciwx;
+	ppc.optable31[438] = ppc_ecowx;
+
+	ppc.optable63[264] = ppc_fabsx;
+	ppc.optable63[21] = ppc_faddx;
+	ppc.optable63[32] = ppc_fcmpo;
+	ppc.optable63[0] = ppc_fcmpu;
+	ppc.optable63[14] = ppc_fctiwx;
+	ppc.optable63[15] = ppc_fctiwzx;
+	ppc.optable63[18] = ppc_fdivx;
+	ppc.optable63[72] = ppc_fmrx;
+	ppc.optable63[136] = ppc_fnabsx;
+	ppc.optable63[40] = ppc_fnegx;
+	ppc.optable63[12] = ppc_frspx;
+	ppc.optable63[26] = ppc_frsqrtex;
+	ppc.optable63[22] = ppc_fsqrtx;
+	ppc.optable63[20] = ppc_fsubx;
+	ppc.optable63[583] = ppc_mffsx;
+	ppc.optable63[70] = ppc_mtfsb0x;
+	ppc.optable63[38] = ppc_mtfsb1x;
+	ppc.optable63[711] = ppc_mtfsfx;
+	ppc.optable63[134] = ppc_mtfsfix;
+	ppc.optable63[64] = ppc_mcrfs;
+
+	ppc.optable59[21] = ppc_faddsx;
+	ppc.optable59[18] = ppc_fdivsx;
+	ppc.optable59[24] = ppc_fresx;
+	ppc.optable59[22] = ppc_fsqrtsx;
+	ppc.optable59[20] = ppc_fsubsx;
+
+	for(i = 0; i < 32; i++)
+	{
+		ppc.optable63[i * 32 | 29] = ppc_fmaddx;
+		ppc.optable63[i * 32 | 28] = ppc_fmsubx;
+		ppc.optable63[i * 32 | 25] = ppc_fmulx;
+		ppc.optable63[i * 32 | 31] = ppc_fnmaddx;
+		ppc.optable63[i * 32 | 30] = ppc_fnmsubx;
+		ppc.optable63[i * 32 | 23] = ppc_fselx;
+
+		ppc.optable59[i * 32 | 29] = ppc_fmaddsx;
+		ppc.optable59[i * 32 | 28] = ppc_fmsubsx;
+		ppc.optable59[i * 32 | 25] = ppc_fmulsx;
+		ppc.optable59[i * 32 | 31] = ppc_fnmaddsx;
+		ppc.optable59[i * 32 | 30] = ppc_fnmsubsx;
+	}
+
+	ppc.optable31[978] = ppc_tlbld;
+
+	for(i = 0; i < 256; i++)
+	{
+		ppc_field_xlat[i] =
+			((i & 0x80) ? 0xF0000000 : 0) |
+			((i & 0x40) ? 0x0F000000 : 0) |
+			((i & 0x20) ? 0x00F00000 : 0) |
+			((i & 0x10) ? 0x000F0000 : 0) |
+			((i & 0x08) ? 0x0000F000 : 0) |
+			((i & 0x04) ? 0x00000F00 : 0) |
+			((i & 0x02) ? 0x000000F0 : 0) |
+			((i & 0x01) ? 0x0000000F : 0);
+	}
+
+	ppc.is603 = 1;
+
+	ppc.read8 = program_read_byte_64be;
+	ppc.read16 = program_read_word_64be;
+	ppc.read32 = program_read_dword_64be;
+	ppc.read64 = program_read_qword_64be;
+	ppc.write8 = program_write_byte_64be;
+	ppc.write16 = program_write_word_64be;
+	ppc.write32 = program_write_dword_64be;
+	ppc.write64 = program_write_qword_64be;
+	ppc.read16_unaligned = ppc_read16_unaligned;
+	ppc.read32_unaligned = ppc_read32_unaligned;
+	ppc.read64_unaligned = ppc_read64_unaligned;
+	ppc.write16_unaligned = ppc_write16_unaligned;
+	ppc.write32_unaligned = ppc_write32_unaligned;
+	ppc.write64_unaligned = ppc_write64_unaligned;
+
+	ppc.irq_callback = irqcallback;
+
+	ppc.pvr = config->pvr;
+
+	multiplier = (float)((config->bus_frequency_multiplier >> 4) & 0xf) +
+				 (float)(config->bus_frequency_multiplier & 0xf) / 10.0f;
+	bus_freq_multiplier = (int)(multiplier * 2);
+
+	ppc.hid1 = 0;
+}
+
+static void ppc604_exit(void)
 {
 
 }
@@ -1931,6 +2063,51 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
+
+		default:										ppc_get_info(state, info);				break;
+	}
+}
+#endif
+
+/* PPC604 */
+
+#if (HAS_PPC604)
+static void ppc604_set_info(UINT32 state, cpuinfo *info)
+{
+	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
+	{
+		ppc603_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i);
+		return;
+	}
+	switch(state)
+	{
+		default:										ppc_set_info(state, info);				break;
+	}
+}
+
+void ppc604_get_info(UINT32 state, cpuinfo *info)
+{
+	switch(state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc604_set_info;		break;
+		case CPUINFO_PTR_INIT:							info->init = ppc604_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = ppc603_reset;				break;
+		case CPUINFO_PTR_EXIT:							info->exit = ppc604_exit;				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = ppc603_execute;			break;
+		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
+		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
+		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC604");				break;
 
 		default:										ppc_get_info(state, info);				break;
 	}

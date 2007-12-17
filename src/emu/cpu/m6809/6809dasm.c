@@ -354,9 +354,9 @@ static const int m6809_numops[3] =
 	sizeof(m6809_pg2opcodes) / sizeof(m6809_pg2opcodes[0])
 };
 
-static const char *m6809_regs[5] = { "X", "Y", "U", "S", "PC" };
+static const char *const m6809_regs[5] = { "X", "Y", "U", "S", "PC" };
 
-static const char *m6809_regs_te[16] =
+static const char *const m6809_regs_te[16] =
 {
 	"D", "X",  "Y",  "U",   "S",  "PC", "inv", "inv",
 	"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"

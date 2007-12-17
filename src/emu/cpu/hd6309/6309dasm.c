@@ -586,22 +586,22 @@ static const int hd6309_numops[3] =
 	sizeof(hd6309_pg2opcodes) / sizeof(hd6309_pg2opcodes[0])
 };
 
-static const char *hd6309_regs[5] = { "X", "Y", "U", "S", "PC" };
+static const char *const hd6309_regs[5] = { "X", "Y", "U", "S", "PC" };
 
-static const char *hd6309_btwregs[5] = { "CC", "A", "B", "inv" };
+static const char *const hd6309_btwregs[5] = { "CC", "A", "B", "inv" };
 
-static const char *hd6309_teregs[16] =
+static const char *const hd6309_teregs[16] =
 {
 	"D", "X",  "Y",  "U", "S", "PC", "W", "V",
 	"A", "B", "CC", "DP", "0",  "0", "E", "F"
 };
 
-static const char *hd6309_tfmregs[16] = {
+static const char *const hd6309_tfmregs[16] = {
 	  "D",   "X",   "Y",   "U",   "S", "inv", "inv", "inv",
 	"inv", "inv", "inv", "inv", "inv", "inv", "inv", "inv"
 };
 
-static const char *tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
+static const char *const tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
 
 offs_t hd6309_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {

@@ -808,7 +808,7 @@ static WRITE8_HANDLER(TX1_COIN_COUNTER)
        coin_counter_w(0,data & 0x80);
        coin_counter_w(1,data & 0x40);
 }
-static ppi8255_interface tx1_ppi8255_intf =
+static const ppi8255_interface tx1_ppi8255_intf =
 {
 	1,
 	{ input_port_2_r },         /* Accelerator and brake */
@@ -821,7 +821,7 @@ static ppi8255_interface tx1_ppi8255_intf =
 
 
 /* Buggy Boy (3-monitor) uses a 8255 instead of the YM2149 ports for inputs */
-static ppi8255_interface buggyboy_ppi8255_intf =
+static const ppi8255_interface buggyboy_ppi8255_intf =
 {
 	1,
 	{ input_port_2_r },

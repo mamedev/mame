@@ -337,7 +337,7 @@ typedef struct
 	UINT8 cpu_cycles[X86_NUM_CPUS][2];
 } X86_CYCLE_TABLE;
 
-static X86_CYCLE_TABLE x86_cycle_table[] =
+static const X86_CYCLE_TABLE x86_cycle_table[] =
 {
 	// opcode                     rm/pmode
 	//                            i386         i486         pentium      mediagx

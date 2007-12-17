@@ -16,7 +16,7 @@ void astinvad_set_screen_red(int data);
 
 /*----------- defined in audio/astinvad.c -----------*/
 
-extern struct Samplesinterface astinvad_samples_interface;
+extern const struct Samplesinterface astinvad_samples_interface;
 
 WRITE8_HANDLER( astinvad_sound1_w );
 WRITE8_HANDLER( astinvad_sound2_w );

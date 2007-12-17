@@ -18,7 +18,7 @@
 #include "sound/samples.h"
 #include "includes/astinvad.h"
 
-static const char *astinvad_sample_names[] =
+static const char *const astinvad_sample_names[] =
 {
 	"*invaders",
 	"0.wav",
@@ -48,7 +48,7 @@ enum
 };
 
 
-struct Samplesinterface astinvad_samples_interface =
+const struct Samplesinterface astinvad_samples_interface =
 {
 	6,   /* channels */
 	astinvad_sample_names

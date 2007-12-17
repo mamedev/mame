@@ -119,7 +119,7 @@ static char *WriteImmediateOperand( char *pBuf, UINT32 opcode )
 static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0, int printOp1, int printOp2 )
 {
 	/* ccccctttmmmm */
-	static const char *pRegOp[4] = { "LSL","LSR","ASR","ROR" };
+	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
 
 	if (printOp0)
 		pBuf += sprintf(pBuf,"R%d, ", (opcode>>12)&0xf);
@@ -158,7 +158,7 @@ static char *WriteDataProcessingOperand( char *pBuf, UINT32 opcode, int printOp0
 static char *WriteRegisterOperand1( char *pBuf, UINT32 opcode )
 {
 	/* ccccctttmmmm */
-	static const char *pRegOp[4] = { "LSL","LSR","ASR","ROR" };
+	static const char *const pRegOp[4] = { "LSL","LSR","ASR","ROR" };
 
 	pBuf += sprintf(
 		pBuf,
@@ -202,14 +202,14 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 {
 	const char *pBuf0;
 
-	static const char *pConditionCodeTable[16] =
+	static const char *const pConditionCodeTable[16] =
 	{
 		"EQ","NE","CS","CC",
 		"MI","PL","VS","VC",
 		"HI","LS","GE","LT",
 		"GT","LE","","NV"
 	};
-	static const char *pOperation[16] =
+	static const char *const pOperation[16] =
 	{
 		"AND","EOR","SUB","RSB",
 		"ADD","ADC","SBC","RSC",

@@ -32,7 +32,7 @@ z1A, z1B, z4F,
 5A, 5B,
 */
 
-static const char *s_mnemonic[] =
+static const char *const s_mnemonic[] =
 {
 	"adc",  "adcw", "add",  "addw", "and",  "andw",  "band", "bbc",  "bbs",
 	"bclr", "bcmp", "bmov", "bor",  "br",   "btst", "bset",  "bxor", "call", "cals", "clr",
@@ -71,7 +71,7 @@ typedef struct
 	UINT8	arguments;
 }	sm8500dasm;
 
-static const char *sm8500_cond[16] = {
+static const char *const sm8500_cond[16] = {
 	"F", "LT", "LE", "ULE", "OV",  "MI", "Z",  "C",
 	"T", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
 };

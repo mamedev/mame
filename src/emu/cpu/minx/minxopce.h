@@ -274,7 +274,7 @@ OP(FD) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X1 ) ) { CALL( regs.PC + d8 - 1 
 OP(FE) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_X2 ) ) { CALL( regs.PC + d8 - 1 ); } }
 OP(FF) { INT8 d8 = rdop(); if ( ( regs.E & EXEC_DZ ) ) { CALL( regs.PC + d8 - 1 ); } }
 
-static void (*insnminx_CE[256])(void) = {
+static void (*const insnminx_CE[256])(void) = {
 	minx_CE_00, minx_CE_01, minx_CE_02, minx_CE_03, minx_CE_04, minx_CE_05, minx_CE_06, minx_CE_07,
 	minx_CE_08, minx_CE_09, minx_CE_0A, minx_CE_0B, minx_CE_0C, minx_CE_0D, minx_CE_0E, minx_CE_0F,
 	minx_CE_10, minx_CE_11, minx_CE_12, minx_CE_13, minx_CE_14, minx_CE_15, minx_CE_16, minx_CE_17,
@@ -309,7 +309,7 @@ static void (*insnminx_CE[256])(void) = {
 	minx_CE_F8, minx_CE_F9, minx_CE_FA, minx_CE_FB, minx_CE_FC, minx_CE_FD, minx_CE_FE, minx_CE_FF
 };
 
-static int insnminx_cycles_CE[256] = {
+static const int insnminx_cycles_CE[256] = {
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,

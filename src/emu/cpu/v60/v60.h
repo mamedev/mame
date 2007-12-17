@@ -75,7 +75,7 @@ enum {
 	V60_REGMAX
 };
 
-extern const char *v60_reg_names[];
+extern const char *const v60_reg_names[];
 void v60_stall(void);
 
 #if HAS_V60

@@ -817,14 +817,14 @@ static struct namco_interface namco_interface =
 	REGION_SOUND1	/* memory region */
 };
 
-static const char *rallyx_sample_names[] =
+static const char *const rallyx_sample_names[] =
 {
 	"*rallyx",
 	"bang.wav",
 	0	/* end of array */
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	1,	/* 1 channel */
 	rallyx_sample_names

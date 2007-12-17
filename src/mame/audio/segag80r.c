@@ -173,7 +173,7 @@ static SOUND_START( astrob );
 
 */
 
-static const char *astrob_sample_names[] =
+static const char *const astrob_sample_names[] =
 {
 	"*astrob",
 	"invadr1.wav",		/* 0 */
@@ -196,7 +196,7 @@ static const char *astrob_sample_names[] =
 };
 
 
-static struct Samplesinterface astrob_samples_interface =
+static const struct Samplesinterface astrob_samples_interface =
 {
 	11,
 	astrob_sample_names
@@ -397,7 +397,7 @@ static TIMER_CALLBACK( sega005_auto_timer );
         The 4391 output is the final output.
 */
 
-static const char *sega005_sample_names[] =
+static const char *const sega005_sample_names[] =
 {
 	"*005",
 	"lexplode.wav",		/* 0 */
@@ -411,7 +411,7 @@ static const char *sega005_sample_names[] =
 };
 
 
-static struct Samplesinterface sega005_samples_interface =
+static const struct Samplesinterface sega005_samples_interface =
 {
 	7,
 	sega005_sample_names
@@ -632,7 +632,7 @@ static TIMER_CALLBACK( sega005_auto_timer )
 
 static SOUND_START( spaceod );
 
-static const char *spaceod_sample_names[] =
+static const char *const spaceod_sample_names[] =
 {
 	"*spaceod",
 	"fire.wav",			/* 0 */
@@ -650,7 +650,7 @@ static const char *spaceod_sample_names[] =
 };
 
 
-static struct Samplesinterface spaceod_samples_interface =
+static const struct Samplesinterface spaceod_samples_interface =
 {
 	11,
 	spaceod_sample_names
@@ -766,7 +766,7 @@ static READ8_HANDLER( n7751_t1_r );
 */
 
 
-static const char *monsterb_sample_names[] =
+static const char *const monsterb_sample_names[] =
 {
 	"*monsterb",
 	"zap.wav",
@@ -775,7 +775,7 @@ static const char *monsterb_sample_names[] =
 };
 
 
-static struct Samplesinterface monsterb_samples_interface =
+static const struct Samplesinterface monsterb_samples_interface =
 {
 	2,
 	monsterb_sample_names

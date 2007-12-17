@@ -449,7 +449,7 @@ static GFXDECODE_START( ninjakd2 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	1,	/* 1 channel */
 	NULL,

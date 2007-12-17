@@ -257,7 +257,7 @@ GFXDECODE_END
 
 
 
-static const char *tankbatt_sample_names[] =
+static const char *const tankbatt_sample_names[] =
 {
 	"*tankbatt",
 	"fire.wav",
@@ -267,7 +267,7 @@ static const char *tankbatt_sample_names[] =
     0	/* end of array */
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	3,	/* 3 channels */
 	tankbatt_sample_names

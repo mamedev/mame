@@ -62,7 +62,7 @@ static READ8_HANDLER( adc_status_r );
  *
  *************************************/
 
-static ppi8255_interface hangon_ppi_intf =
+static const ppi8255_interface hangon_ppi_intf =
 {
 	2,
 	{ NULL,            NULL },

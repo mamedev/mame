@@ -258,7 +258,7 @@ static int m6809_ICount;
 #define SET_V8(a,b,r)	CC|=(((a^b^r^(r>>1))&0x80)>>6)
 #define SET_V16(a,b,r)	CC|=(((a^b^r^(r>>1))&0x8000)>>14)
 
-static UINT8 flags8i[256]=	 /* increment */
+static const UINT8 flags8i[256]=	 /* increment */
 {
 CC_Z,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -277,7 +277,7 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
 CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,
 CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 };
-static UINT8 flags8d[256]= /* decrement */
+static const UINT8 flags8d[256]= /* decrement */
 {
 CC_Z,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -360,7 +360,7 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 
 #if (!BIG_SWITCH)
 /* timings for 1-byte opcodes */
-static UINT8 cycles1[] =
+static const UINT8 cycles1[] =
 {
 	/*   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /*0*/  6, 0, 0, 6, 6, 0, 6, 6, 6, 6, 6, 0, 6, 6, 3, 6,

@@ -52,7 +52,7 @@ enum op_names {
 	tstb,	tsx,	txs,	asx1,	asx2,	xgdx,	addx,	adcx
 };
 
-static const char *op_name_str[] = {
+static const char *const op_name_str[] = {
 	"aba",   "abx",   "adca",  "adcb",  "adda",  "addb",  "addd",  "aim",
 	"anda",  "andb",  "asl",   "asla",  "aslb",  "asld",  "asr",   "asra",
 	"asrb",  "bcc",   "bcs",   "beq",   "bge",   "bgt",   "bhi",   "bita",
@@ -79,7 +79,7 @@ static const char *op_name_str[] = {
  * 2    invalid opcode for 1:6800/6802/6808, 2:6801/6803, 4:HD63701
  */
 
-static UINT8 table[0x102][3] = {
+static const UINT8 table[0x102][3] = {
 	{ill, inh,7},{nop, inh,0},{ill, inh,7},{ill, inh,7},/* 00 */
 	{lsrd,inh,1},{asld,inh,1},{tap, inh,0},{tpa, inh,0},
 	{inx, inh,0},{dex, inh,0},{clv, inh,0},{sev, inh,0},

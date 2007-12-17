@@ -186,7 +186,7 @@ static WRITE8_HANDLER( iowrite )
  *
  *************************************/
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2,
 	{ dsr_r,        NULL           },

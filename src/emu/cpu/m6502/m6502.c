@@ -59,7 +59,7 @@
 typedef struct
 {
 	UINT8	subtype;		/* currently selected cpu sub type */
-	void	(**insn)(void); /* pointer to the function pointer table */
+	void	(*const *insn)(void); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc; 			/* program counter */
 	PAIR	sp; 			/* stack pointer (always 100 - 1FF) */
@@ -127,7 +127,7 @@ static m6502_Regs m6502;
  *
  *****************************************************************************/
 
-static void m6502_common_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT8 subtype, void (**insn)(void), const char *type)
+static void m6502_common_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT8 subtype, void (*const *insn)(void), const char *type)
 {
 	memset(&m6502, 0, sizeof(m6502));
 	m6502.irq_callback = irqcallback;

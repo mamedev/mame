@@ -1189,7 +1189,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const char *seawolf_sample_names[] =
+static const char *const seawolf_sample_names[] =
 {
 	"*seawolf",
 	"shiphit.wav",
@@ -1200,19 +1200,19 @@ static const char *seawolf_sample_names[] =
 	0
 };
 
-static struct Samplesinterface seawolf2_samples_interface =
+static const struct Samplesinterface seawolf2_samples_interface =
 {
 	10,	/* 5*2 channels */
 	seawolf_sample_names
 };
 
-static struct Samplesinterface wow_samples_interface =
+static const struct Samplesinterface wow_samples_interface =
 {
 	1,
 	wow_sample_names
 };
 
-static struct Samplesinterface gorf_samples_interface =
+static const struct Samplesinterface gorf_samples_interface =
 {
 	1,
 	gorf_sample_names

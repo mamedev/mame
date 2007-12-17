@@ -21,7 +21,7 @@ static char *make_signed_hex_str_16( UINT32 value )
 	return s_hex;
 }
 
-static const char *s_cpugenreg[] =
+static const char *const s_cpugenreg[] =
 {
 	"zero", "at", "v0", "v1", "a0", "a1", "a2", "a3",
 	"t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
@@ -29,7 +29,7 @@ static const char *s_cpugenreg[] =
 	"t8", "t9", "k0", "k1", "gp", "sp", "fp", "ra"
 };
 
-static const char *s_cp0genreg[] =
+static const char *const s_cp0genreg[] =
 {
 	"Index", "Random", "EntryLo", "cp0r3", "Context", "cp0r5", "cp0r6", "cp0r7",
 	"BadVAddr", "cp0r9", "EntryHi", "cp0r11", "SR", "Cause", "EPC", "PRId",
@@ -37,7 +37,7 @@ static const char *s_cp0genreg[] =
 	"cp0r24", "cp0r25", "cp0r26", "cp0r27", "cp0r28", "cp0r29", "cp0r30", "cp0r31"
 };
 
-static const char *s_cp1genreg[] =
+static const char *const s_cp1genreg[] =
 {
 	"cp1r0", "cp1r1", "cp1r2", "cp1r3", "cp1r4", "cp1r5", "cp1r6", "cp1r7",
 	"cp1r8", "cp1r9", "cp1r10", "cp1r11", "cp1r12", "cp1r13", "cp1r14", "cp1r15",
@@ -45,7 +45,7 @@ static const char *s_cp1genreg[] =
 	"cp1r23", "cp1r24", "cp1r25", "cp1r26", "cp1r27", "cp1r28", "cp1r29", "cp1r30"
 };
 
-static const char *s_cp1ctlreg[] =
+static const char *const s_cp1ctlreg[] =
 {
 	"cp1cr0", "cp1cr1", "cp1cr2", "cp1cr3", "cp1cr4", "cp1cr5", "cp1cr6", "cp1cr7",
 	"cp1cr8", "cp1cr9", "cp1cr10", "cp1cr11", "cp1cr12", "cp1cr13", "cp1cr14", "cp1cr15",
@@ -53,7 +53,7 @@ static const char *s_cp1ctlreg[] =
 	"cp1cr24", "cp1cr25", "cp1cr26", "cp1cr27", "cp1cr28", "cp1cr29", "cp1cr30", "cp1cr31"
 };
 
-static const char *s_cp2genreg[] =
+static const char *const s_cp2genreg[] =
 {
 	"vxy0", "vz0", "vxy1", "vz1", "vxy2", "vz2", "rgb", "otz",
 	"ir0", "ir1", "ir2", "ir3", "sxy0", "sxy1", "sxy2", "sxyp",
@@ -61,7 +61,7 @@ static const char *s_cp2genreg[] =
 	"mac0", "mac1", "mac2", "mac3", "irgb", "orgb", "lzcs", "lzcr"
 };
 
-static const char *s_cp2ctlreg[] =
+static const char *const s_cp2ctlreg[] =
 {
 	"r11r12", "r13r21", "r22r23", "r31r32", "r33", "trx", "try", "trz",
 	"l11l12", "l13l21", "l22l23", "l31l32", "l33", "rbk", "gbk", "bbk",
@@ -69,27 +69,27 @@ static const char *s_cp2ctlreg[] =
 	"ofx", "ofy", "h", "dqa", "dqb", "zsf3", "zsf4", "flag"
 };
 
-static const char *s_gtesf[] =
+static const char *const s_gtesf[] =
 {
 	"0", "12"
 };
 
-static const char *s_gtemx[] =
+static const char *const s_gtemx[] =
 {
 	"rm", "lm", "cm", "0"
 };
 
-static const char *s_gtev[] =
+static const char *const s_gtev[] =
 {
 	"v0", "v1", "v2", "ir"
 };
 
-static const char *s_gtecv[] =
+static const char *const s_gtecv[] =
 {
 	"tr", "bk", "fc", "0"
 };
 
-static const char *s_gtelm[] =
+static const char *const s_gtelm[] =
 {
 	"0", "1"
 };

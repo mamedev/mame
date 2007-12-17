@@ -251,7 +251,7 @@ INLINE void cpx_ix(void);
 static void trap(void);
 #endif
 
-static void (*m6800_insn[0x100])(void) = {
+static void (*const m6800_insn[0x100])(void) = {
 illegal,nop,	illegal,illegal,illegal,illegal,tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,
 sba,	cba,	illegal,illegal,illegal,illegal,tab,	tba,
@@ -287,7 +287,7 @@ eorb_ex,adcb_ex,orb_ex, addb_ex,illegal,illegal,ldx_ex, stx_ex
 };
 
 #if (HAS_M6801||HAS_M6803)
-static void (*m6803_insn[0x100])(void) = {
+static void (*const m6803_insn[0x100])(void) = {
 illegal,nop,	illegal,illegal,lsrd,	asld,	tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,
 sba,	cba,	illegal,illegal,illegal,illegal,tab,	tba,
@@ -324,7 +324,7 @@ eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldx_ex, stx_ex
 #endif
 
 #if (HAS_HD63701)
-static void (*hd63701_insn[0x100])(void) = {
+static void (*const hd63701_insn[0x100])(void) = {
 trap	,nop,	trap	,trap	,lsrd,	asld,	tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,
 sba,	cba,	undoc1, undoc2, trap	,trap	,tab,	tba,
@@ -361,7 +361,7 @@ eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldx_ex, stx_ex
 #endif
 
 #if (HAS_NSC8105)
-static void (*nsc8105_insn[0x100])(void) = {
+static void (*const nsc8105_insn[0x100])(void) = {
 illegal,illegal,nop,	illegal,illegal,tap,	illegal,tpa,
 inx,	clv,	dex,	sev,	clc,	cli,	sec,	sei,
 sba,	illegal,cba,	illegal,illegal,tab,	illegal,tba,

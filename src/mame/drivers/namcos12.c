@@ -1338,6 +1338,8 @@ static DRIVER_INIT( namcos12 )
 	psx_driver_init();
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
+
+	at28c16_init( 0, NULL, NULL );
 }
 
 static DRIVER_INIT( ptblank2 )

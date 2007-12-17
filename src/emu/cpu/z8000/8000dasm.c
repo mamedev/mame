@@ -64,17 +64,17 @@ static void GET_OP(const UINT8 *oprom, int i, unsigned offset)
 	n[i*4+3] = opcode & 0x0f;
 }
 
-static const char *cc[16] = {
+static const char *const cc[16] = {
 	"n",   "lt",  "le",  "ule",  "pe/ov",   "mi",  "eq/z",   "c/ult",
 	"a",   "ge",  "gt",  "ugt",  "po/nov",  "pl",  "ne/nz",  "nc/uge"
 };
 
-static const char *flg[16] = {
+static const char *const flg[16] = {
 	"",    "p/v",  "s",   "p/v,s",   "z",   "p/v,z",  "s,z",  "p/v,s,z",
 	"c",   "p/v,c","s,c", "p/v,s,c", "z,c", "p/v,z,c","s,z,c","p/v,s,z,c"
 };
 
-static const char *ints[4] = {
+static const char *const ints[4] = {
 	"",    "vi",  "nvi",   "vi,nvi"
 };
 

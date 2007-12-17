@@ -455,7 +455,7 @@ static WRITE16_HANDLER( ssriders_protection_w )
 static int init_eeprom_count;
 
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -565,7 +565,7 @@ static WRITE16_HANDLER( detatwin_eeprom_w )
 WRITE16_HANDLER( ssriders_eeprom_w );	/* in video/tmnt.c */
 
 
-static struct EEPROM_interface thndrx2_eeprom_interface =
+static const struct EEPROM_interface thndrx2_eeprom_interface =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -2485,7 +2485,7 @@ static struct upd7759_interface upd7759_interface =
 	REGION_SOUND2		/* memory region */
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	1,	/* 1 channel for the title music */
 	NULL,

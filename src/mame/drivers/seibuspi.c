@@ -1699,7 +1699,7 @@ static NVRAM_HANDLER( spi )
 }
 
 /* this is a 93C46 but with reset delay */
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */

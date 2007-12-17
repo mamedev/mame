@@ -42,9 +42,9 @@ static struct
 
 static UINT8 *filebuf;
 static UINT32 offset;
-static UINT8 order[] = { 0, 1, 2, 3 };
+static const UINT8 order[] = { 0, 1, 2, 3 };
 
-static char *Options[]=
+static const char *const Options[]=
 {
 	"begin", "end", "offset", "order", "format", "cpu", 0
 };

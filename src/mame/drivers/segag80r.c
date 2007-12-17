@@ -1542,7 +1542,7 @@ static DRIVER_INIT( pignewt )
 
 static DRIVER_INIT( sindbadm )
 {
-	ppi8255_interface ppi_intf =
+	static ppi8255_interface ppi_intf =
 	{
 		1,
 		{ 0 },

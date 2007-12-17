@@ -916,7 +916,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 /*****************************************************************************/
 
 /* this is a 93C46 but with reset delay that is needed by Lost World */
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */

@@ -1431,7 +1431,7 @@ static GFXDECODE_START( charROM )
 GFXDECODE_END
 
 
-static const char *reactor_sample_names[] =
+static const char *const reactor_sample_names[] =
 {
 	"*reactor",
 	"fx_53.wav", /* "8 left" */
@@ -1457,7 +1457,7 @@ static const char *reactor_sample_names[] =
      0	/* end of array */
 };
 
-static const char *qbert_sample_names[] =
+static const char *const qbert_sample_names[] =
 {
 	"*qbert",
 	"fx_17a.wav", /* random speech, voice clock 255 */
@@ -1508,13 +1508,13 @@ static const char *qbert_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface qbert_samples_interface =
+static const struct Samplesinterface qbert_samples_interface =
 {
  	1,	/* one channel */
 	qbert_sample_names
 };
 
-static struct Samplesinterface reactor_samples_interface =
+static const struct Samplesinterface reactor_samples_interface =
 {
 	1,	/* one channel */
 	reactor_sample_names

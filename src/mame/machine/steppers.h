@@ -18,11 +18,11 @@
 #ifndef INC_STEPPERS
 #define INC_STEPPERS
 
-#define MAX_STEPPERS		  16			// maximum number of steppers
+#define MAX_STEPPERS		    8			// maximum number of steppers
 
-#define STEPPER_48STEP_REEL    0			// STARPOINT RMXXX reel unit
-#define BARCREST_48STEP_REEL   1			// Barcrest bespoke reel unit
-#define STEPPER_144STEPS_DICE  2			// STARPOINT 1DCU DICE mechanism - tech sheet available  on request
+#define STARPOINT_48STEP_REEL   0			// STARPOINT RMXXX reel unit
+#define BARCREST_48STEP_REEL    1			// Barcrest bespoke reel unit
+#define STARPOINT_144STEPS_DICE 2			// STARPOINT 1DCU DICE mechanism - tech sheet available  on request
 
 void Stepper_init(  int id, int type);		// init a stepper motor
 

@@ -9,7 +9,7 @@ static UINT32 offset;
 #include "34010dsm.c"
 
 
-static char *Options[]=
+static const char *const Options[]=
 {
 	"begin","end","offset",0
 };

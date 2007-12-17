@@ -4,7 +4,7 @@ typedef struct {
 	void (*handler)(void);
 } HC11_OPCODE_LIST;
 
-static HC11_OPCODE_LIST hc11_opcode_list[] =
+static const HC11_OPCODE_LIST hc11_opcode_list[] =
 {
 	/*  page    opcode          handler                     */
 	{	0,		0x1b,			HC11OP(aba)					},

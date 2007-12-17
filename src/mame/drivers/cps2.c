@@ -634,7 +634,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 
 
 
-static struct EEPROM_interface cps2_eeprom_interface =
+static const struct EEPROM_interface cps2_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */

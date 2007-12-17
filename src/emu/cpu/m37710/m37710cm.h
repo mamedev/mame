@@ -95,9 +95,9 @@ typedef struct
 	uint irq_level;		/* irq level */
 	int (*int_ack)(int); /* Interrupt Acknowledge */
 	uint stopped;		/* Sets how the CPU is stopped */
-	void (**opcodes)(void);		/* opcodes with no prefix */
-	void (**opcodes42)(void);	/* opcodes with 0x42 prefix */
-	void (**opcodes89)(void);	/* opcodes with 0x89 prefix */
+	void (*const *opcodes)(void);		/* opcodes with no prefix */
+	void (*const *opcodes42)(void);	/* opcodes with 0x42 prefix */
+	void (*const *opcodes89)(void);	/* opcodes with 0x89 prefix */
 	uint (*get_reg)(int regnum);
 	void (*set_reg)(int regnum, uint val);
 	void (*set_line)(int line, int state);
@@ -116,13 +116,13 @@ extern uint m37710i_destination;
 extern uint m37710i_adc_tbl[];
 extern uint m37710i_sbc_tbl[];
 
-extern void (**m37710i_opcodes[])(void);
-extern void (**m37710i_opcodes2[])(void);
-extern void (**m37710i_opcodes3[])(void);
-extern uint (*m37710i_get_reg[])(int regnum);
-extern void (*m37710i_set_reg[])(int regnum, uint val);
-extern void (*m37710i_set_line[])(int line, int state);
-extern int (*m37710i_execute[])(int cycles);
+extern void (*const *const m37710i_opcodes[])(void);
+extern void (*const *const m37710i_opcodes2[])(void);
+extern void (*const *const m37710i_opcodes3[])(void);
+extern uint (*const m37710i_get_reg[])(int regnum);
+extern void (*const m37710i_set_reg[])(int regnum, uint val);
+extern void (*const m37710i_set_line[])(int line, int state);
+extern int (*const m37710i_execute[])(int cycles);
 
 #define REG_A			m37710i_cpu.a		/* Accumulator */
 #define REG_B			m37710i_cpu.b		/* Accumulator hi byte */

@@ -3306,6 +3306,48 @@ ROM_START( thunt )
 	ROM_LOAD16_WORD_SWAP( "th-e-5.ic5",   0x1000000, 0x0400000, CRC(3914b805) SHA1(1331ce82ba0bdfc76fe3456a5252e69c00e2cf1f) )
 ROM_END
 
+ROM_START( thuntk )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
+	ROM_FILL(                             0x0000000, 0x0400000, 0x00 )
+	ROM_LOAD16_BYTE( "2.ic13_2",               0x0200000, 0x0080000, CRC(6cae2926) SHA1(e8d5745b4228de24672da5017cb3dab58344f59f) )
+	ROM_LOAD16_BYTE( "1.ic13_1",    0x0200001, 0x0080000, CRC(460727c8) SHA1(da7171b65734264e10692e3408ac93beb374c65e) )
+
+	ROM_LOAD( "bom210-10.ic2",   0x1c00000, 0x0400000, CRC(f59d0827) SHA1(2bed4b2c78e9b4e9332f576e1b264a6343f4cfff) )
+	ROM_RELOAD(                           0x0400000, 0x0400000 )
+	ROM_LOAD( "bom210-11.ic3",   0x2000000, 0x0400000, CRC(44e5a13e) SHA1(aee3c06662a1d083f3bd01292cf2694132f63533) )
+	ROM_RELOAD(                           0x0800000, 0x0400000 )
+	ROM_LOAD( "bom210-12.ic4",   0x2400000, 0x0400000, CRC(deabc701) SHA1(cb313ae9bf6f115682fc76647a999e12c98f6120) )
+	ROM_RELOAD(                           0x0c00000, 0x0400000 )
+	ROM_LOAD( "bom210-13.ic5",   0x2800000, 0x0400000, CRC(5ece1d5c) SHA1(6d88f71b485bf2b3c164fa22f1c7ecaba4b3f5b1) )
+	ROM_RELOAD(                           0x1000000, 0x0400000 )
+ROM_END
+
+
+ROM_START( sanjeon )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
+	ROM_LOAD( "ic11",               0x0000000, 0x0200000, CRC(9abae8d4) SHA1(ddbe4c8fff8fa59d63e278e95f245145d2da8aeb) ) // ic13 bad
+	ROM_RELOAD ( 0x0100000, 0x0200000 )
+	ROM_RELOAD ( 0x0200000, 0x0200000 )
+	ROM_RELOAD ( 0x0300000, 0x0200000 )
+
+	ROM_LOAD( "ic13",    0x0400000, 0x0200000, CRC(f72c1d13) SHA1(a2b168d187034024b83fbbe2f5eec78816285da9) ) // ic2 good
+	ROM_LOAD( "ic14",    0x0600000, 0x0200000, CRC(bcd72105) SHA1(fb88a1f2589fef5d9845027646259ec8e781771b) ) // ic2 good
+	ROM_LOAD( "ic15",    0x0800000, 0x0200000, CRC(8c9c8352) SHA1(312e9e6435c6e9a4a19b72e234b087d4f5b069a5) ) // ic3 good
+	ROM_LOAD( "ic16",    0x0a00000, 0x0200000, CRC(07e11512) SHA1(5fb5e93a167aae501bd799aba98f7dbc3762a795) ) // ic3 good
+	ROM_LOAD( "ic17",    0x0c00000, 0x0200000, CRC(46b7b344) SHA1(a325b724e6346f585582bb2581d3063b1c8ddee9) ) // ic4 good
+	ROM_LOAD( "ic18",    0x0e00000, 0x0200000, CRC(d48404e1) SHA1(e4927d17cb19f6825f41b41056b89de224cf97de) ) // ic4 good
+	ROM_LOAD( "ic19",    0x1000000, 0x0200000, CRC(33d23bb9) SHA1(0179438a0b14ad7eb553a24d86fae778671fcc49) ) // ic5 good
+	ROM_LOAD( "ic20",    0x1200000, 0x0200000, CRC(f8cc1038) SHA1(06bcb25eb5df77bd503b0692a96ec66c00976fe9) ) // ic5 good
+	ROM_LOAD( "ic21",    0x1400000, 0x0200000, CRC(74ceb649) SHA1(91b7eb699b7167f890528149178644a74ef3ad17) ) // ic6 good
+	ROM_LOAD( "ic22",    0x1600000, 0x0200000, CRC(85f31277) SHA1(277c28d44cabd9081a8151d6ec27d47b5606435a) ) // ic6 good
+	ROM_LOAD( "ic12",    0x1800000, 0x0400000, CRC(d5ebc84e) SHA1(f990b793cdfadbbac69c680191660f4a2f282ba2) ) // ic1 good
+ROM_END
+
+
 ROM_START( sasissu )
 	STV_BIOS
 
@@ -3668,6 +3710,44 @@ ROM_START( sfish2j )
 ROM_END
 
 
+ROM_START( magzun )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
+	ROM_LOAD( "flash.ic13",               0x0000000, 0x0100000, CRC(e6f0aca0) SHA1(251d4d9c5a332d13af3a144c5eb9d8e7836bdd1b) ) // good
+	ROM_RELOAD ( 0x0100000, 0x0100000 )
+	ROM_RELOAD ( 0x0200000, 0x0100000 )
+	ROM_RELOAD ( 0x0300000, 0x0100000 )
+
+	ROM_LOAD16_WORD_SWAP( "mpr-19354.ic2",    0x0400000, 0x0400000, CRC(a23822e7) SHA1(10ca5d39dcaaf35b80168a08d8a18d77fba1d2ce) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-19355.ic3",    0x0800000, 0x0400000, CRC(d70e5ebc) SHA1(2d560f6b6e693b2b91cf5ff5c4f0890cc2176f91) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-19356.ic4",    0x0c00000, 0x0400000, CRC(3bc43fe9) SHA1(f72b0f3208e2f411f4c9cc76c317a605acd32a67) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-19357.ic5",    0x1000000, 0x0400000, CRC(aa749370) SHA1(f09b0aa94fcc983419aaf2465dae5c9c64606158) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-19358.ic6",    0x1400000, 0x0400000, CRC(0969f1ec) SHA1(25b9671f0975172f283458d46e160080dd1d19e9) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-19359.ic1",    0x1800000, 0x0400000, CRC(b0d06f9c) SHA1(19e04c9c3a0bea5950aba8e1975962fa37722f32) ) // good
+ROM_END
+
+
+ROM_START( stress )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, REGION_USER1, 0 ) /* SH2 code */
+	ROM_LOAD( "epr-21300a.ic13",    0x0000000, 0x0100000, CRC(899d829e) SHA1(b6c6da92dc108353998b29c0659d288645541519) ) // good
+	ROM_RELOAD ( 0x0100000, 0x0100000 )
+	ROM_RELOAD ( 0x0200000, 0x0100000 )
+	ROM_RELOAD ( 0x0300000, 0x0100000 )
+	ROM_LOAD16_WORD_SWAP( "mpr-21290.ic2",    0x0400000, 0x0400000, CRC(a49d29f3) SHA1(8f6c26fd9e94a9e03dd0029026d205cf481fe151) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21291.ic3",    0x0800000, 0x0400000, CRC(9452ba20) SHA1(8a9ff546901715f99bb911616c74ae30ebd7c6d7) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21292.ic4",    0x0c00000, 0x0400000, CRC(f60268e2) SHA1(5c2febb94553a941a68e9611617750a89c82e783) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21293.ic5",    0x1000000, 0x0400000, CRC(794946e0) SHA1(7881adb92fbf3efecb88f30834cdd1ed863b0b0e) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21294.ic6",    0x1400000, 0x0400000, CRC(550843bb) SHA1(5e278a0ae60f7bee23b5f1ee10b8ce31effc9718) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21289.ic1",    0x1800000, 0x0400000, CRC(c2ee8bea) SHA1(5fa0e6b492cc272c33b01adbef9233e6c8098827) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21296.ic8",    0x1c00000, 0x0400000, CRC(b825c42a) SHA1(7c6f737b69b9283345f8fa23cb1d110b9b5f3d7e) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21297.ic9",    0x2000000, 0x0400000, CRC(4bff7469) SHA1(8a36405a1a292d60b5918e604b460ed98740fae3) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21298.ic10",   0x2400000, 0x0400000, CRC(68d07144) SHA1(5021f43d19105b484135ebddd3fa203233096c98) ) // good
+	ROM_LOAD16_WORD_SWAP( "mpr-21299.ic11",   0x2800000, 0x0400000, CRC(ecc521c6) SHA1(f7ed4dd1cbe179652fdfdde34929b41a1fdcf9e2) ) // good
+ROM_END
+
 /*
 country codes:
 J = Japan
@@ -3689,54 +3769,78 @@ by introdon in ST-V ("SG0000000"),and according to the manual it's even wrong! (
 by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 */
 
+DRIVER_INIT( sanjeon )
+{
+	UINT8 *src    = memory_region       ( REGION_USER1 );
+	int x;
+
+	for (x=0;x<0x3000000;x++)
+	{
+		src[x] = src[x]^0xff;
+
+		src[x] = BITSWAP8(src[x],7,2,5,1,  3,6,4,0);
+		src[x] = BITSWAP8(src[x],4,6,5,7,  3,2,1,0);
+		src[x] = BITSWAP8(src[x],7,6,5,4,  2,3,1,0);
+		src[x] = BITSWAP8(src[x],7,0,5,4,  3,2,1,6);
+		src[x] = BITSWAP8(src[x],3,6,5,4,  7,2,1,0);
+
+	}
+
+
+	driver_init_sasissu(Machine);
+}
+
 GAME( 1996, stvbios,   0, stv, stv,  stv,       ROT0,   "Sega",                      "ST-V Bios", GAME_IS_BIOS_ROOT )
 
 //GBX   YEAR, NAME,      PARENT,  BIOS,    MACH,INP,  INIT,      MONITOR
 /* Playable */
-GAME( 1998, astrass,   stvbios, stv, stv,  astrass,   ROT0,   "Sunsoft",    				  "Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, astrass,   stvbios, stv, stv,  astrass,   ROT0,   "Sunsoft",    			  "Astra SuperStars (J 980514 V1.002)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv, stv,  bakubaku,  ROT0,   "Sega",     				  "Baku Baku Animal (J 950407 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, batmanfr,  stvbios, stv, stv,  batmanfr,  ROT0,   "Acclaim",    				  "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND )
+GAME( 1996, batmanfr,  stvbios, stv, stv,  batmanfr,  ROT0,   "Acclaim",    			  "Batman Forever (JUE 960507 V1.000)", GAME_NO_SOUND )
 GAME( 1996, colmns97,  stvbios, stv, stv,  colmns97,  ROT0,   "Sega", 	 				  "Columns '97 (JET 961209 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv, stv,  cotton2,   ROT0,   "Success",  				  "Cotton 2 (JUET 970902 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv, stv,  cottonbm,  ROT0,   "Success",  				  "Cotton Boomerang (JUET 980709 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, critcrsh,  stvbios, stv, critcrsh, ic13, ROT0, "Sega", 	     			  "Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, danchih,   stvbios, stv, stvmp,danchih,   ROT0,   "Altron (Tecmo license)", 	  "Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, critcrsh,  stvbios, stv, critcrsh, ic13,  ROT0, "Sega", 	     			  "Critter Crusher (EA 951204 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, danchih,   stvbios, stv, stvmp,danchih,   ROT0,   "Altron (Tecmo license)",   "Danchi de Hanafuda (J 990607 V1.400)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv, stv,  diehard,   ROT0,   "Sega", 	 				  "Die Hard Arcade (UET 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv, stv,  dnmtdeka,  ROT0,   "Sega", 	 				  "Dynamite Deka (J 960515 V1.000)", GAME_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv, stv,  ic13,      ROT0,   "Sega", 	 				  "Ejihon Tantei Jimusyo (J 950613 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, fhboxers,  stvbios, stv, stv,  fhboxers,  ROT0,   "Sega", 	 				  "Funky Head Boxers (JUETBKAL 951218 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, gaxeduel,  stvbios, stv, stv,  gaxeduel,	ROT0,   "Sega", 	     			  "Golden Axe - The Duel (JUETL 950117 V1.000)", GAME_IMPERFECT_SOUND )
+GAME( 1994, gaxeduel,  stvbios, stv, stv,  gaxeduel,  ROT0,   "Sega", 	     			  "Golden Axe - The Duel (JUETL 950117 V1.000)", GAME_IMPERFECT_SOUND )
 GAME( 1998, grdforce,  stvbios, stv, stv,  grdforce,  ROT0,   "Success",  				  "Guardian Force (JUET 980318 V0.105)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, groovef,   stvbios, stv, stv,  groovef,   ROT0,   "Atlus",    				  "Power Instinct 3 - Groove On Fight (J 970416 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hanagumi,  stvbios, stv, stv,  hanagumi,  ROT0,   "Sega",     				  "Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, introdon,  stvbios, stv, stv,  ic13,		ROT0,   "Sunsoft / Success", 		  "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, introdon,  stvbios, stv, stv,  ic13,      ROT0,   "Sunsoft / Success", 		  "Karaoke Quiz Intro Don Don! (J 960213 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, kiwames,   stvbios, stv, stvmp,ic13,      ROT0,   "Athena",   				  "Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, maruchan,  stvbios, stv, stv,  maruchan,  ROT0,   "Sega / Toyosuisan", 	      "Maru-Chan de Goo! (J 971216 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv, stv,  mausuke,   ROT0,   "Data East",				  "Mausuke no Ojama the World (J 960314 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv, stv,  othellos,  ROT0,   "Success",  				  "Othello Shiyouyo (J 980423 V1.002)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, pblbeach,  stvbios, stv, stv,  pblbeach,  ROT0,   "T&E Soft",   				  "Pebble Beach - The Great Shot (JUE 950913 V0.990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, pblbeach,  stvbios, stv, stv,  pblbeach,  ROT0,   "T&E Soft",                 "Pebble Beach - The Great Shot (JUE 950913 V0.990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv, stv,  prikura,   ROT0,   "Atlus",    				  "Princess Clara Daisakusen (J 960910 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, puyosun,   stvbios, stv, stv,  puyosun,   ROT0,   "Compile",  				  "Puyo Puyo Sun (J 961115 V0.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, rsgun,     stvbios, stv, stv,  rsgun,     ROT0,   "Treasure",   				  "Radiant Silvergun (JUET 980523 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, rsgun,     stvbios, stv, stv,  rsgun,     ROT0,   "Treasure",   			  "Radiant Silvergun (JUET 980523 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, sasissu,   stvbios, stv, stv,  sasissu,   ROT0,   "Sega", 	     			  "Taisen Tanto-R Sashissu!! (J 980216 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sanjeon,   sasissu, stv, stv,  sanjeon,   ROT0,   "Sega / Deniam",	          "DaeJeon! SanJeon SuJeon (Korea)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, seabass,   stvbios, stv, stv,  seabass,   ROT0,   "A wave inc. (Able license)","Sea Bass Fishing (JUET 971110 V0.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, shanhigw,  stvbios, stv, stv,  shanhigw,	ROT0,   "Sunsoft / Activision", 	  "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, shanhigw,  stvbios, stv, stv,  shanhigw,  ROT0,   "Sunsoft / Activision", 	  "Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, shienryu,  stvbios, stv, stv,  shienryu,  ROT270, "Warashi",  				  "Shienryu (JUET 961226 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, smleague,  stvbios, stv, stv,  smleague,  ROT0,   "Sega", 	     			  "Super Major League (U 960108 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, finlarch,  smleague, stv, stv,  finlarch,  ROT0,   "Sega", 	     			  "Final Arch (J 950714 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, finlarch,  smleague,stv, stv,  finlarch,  ROT0,   "Sega", 	     			  "Final Arch (J 950714 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, sss,       stvbios, stv, stv,  sss,       ROT0,   "Capcom / Cave / Victor",	  "Steep Slope Sliders (JUET 981110 V1.000)", GAME_IMPERFECT_SOUND )
 GAME( 1995, sandor,    stvbios, stv, stv,  sandor,    ROT0,   "Sega", 	     			  "Puzzle & Action: Sando-R (J 951114 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, thunt,     sandor,  stv, stv,  thunt,     ROT0,   "Sega",	                  "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, thuntk,    sandor,  stv, stv,  sandor,    ROT0,   "Sega / Deniam",            "Puzzle & Action: BoMulEul Chajara (Korea)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, sokyugrt,  stvbios, stv, stv,  sokyugrt,  ROT0,   "Raizing / 8ing",    		  "Soukyugurentai / Terra Diver (JUET 960821 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, suikoenb,  stvbios, stv, stv,  suikoenb,  ROT0,   "Data East",  				  "Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND )
-GAME( 1997, thunt,     sandor, stv, stv,  thunt,     ROT0,   "Sega",	  					  "Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, suikoenb,  stvbios, stv, stv,  suikoenb,  ROT0,   "Data East",                "Suikoenbu / Outlaws of the Lost Dynasty (JUETL 950314 V2.001)", GAME_IMPERFECT_SOUND )
 GAME( 1996, vfkids,    stvbios, stv, stv,  ic13,      ROT0,   "Sega", 	 				  "Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND )
 GAME( 1997, winterht,  stvbios, stv, stv,  winterht,  ROT0,   "Sega", 	 				  "Winter Heat (JUET 971012 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv, stv,  znpwfv,    ROT0,   "Sega", 	     			  "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Almost */
-GAME( 1997, vmahjong,  stvbios, stv, stvmp,stv,       ROT0,   "Micronet",   				  "Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv, stvmp,stv,       ROT0,   "Micronet",   				  "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1998, twcup98,   stvbios, stv, stv,  twcup98,   ROT0,   "Tecmo",      				  "Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
+GAME( 1997, vmahjong,  stvbios, stv, stvmp,stv,       ROT0,   "Micronet",                 "Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stv, stvmp,stv,       ROT0,   "Micronet",                 "Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1998, twcup98,   stvbios, stv, stv,  twcup98,   ROT0,   "Tecmo",                    "Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
+GAME( 1997, stress,    stvbios, stv, stv,  ic13,      ROT0,   "Sega", 	     			  "Stress Busters", GAME_NOT_WORKING ) // needs printer
 
 /* Doing Something.. but not enough yet */
 GAME( 1998, elandore,  stvbios, stv, stv,  elandore,  ROT0,   "Sai-Mate",   				  "Elan Doree - Legend of Dragon (JUET 980922 V1.006)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )//japanese name?
@@ -3749,6 +3853,7 @@ GAME( 1999, ffreveng,  stvbios, stv, stv,  ffreveng,  ROT0,   "Capcom",     				
 /* CD games */
 GAME( 1995, sfish2,    0, stv, stv,  ic13,    ROT0,   "Sega",	     			  "Sport Fishing 2 (UET 951106 V1.10e)", GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1995, sfish2j,   sfish2, stv, stv,  ic13,    ROT0,   "Sega",	     			  "Sport Fishing 2 (J 951201 V1.100)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1997, magzun,    stvbios, stv, stv,  ic13,      ROT0,   "Sega", 	     			  "Magical Zunou Power", GAME_NOT_WORKING )
 
 /*
 This is the known list of undumped ST-V games:

@@ -393,7 +393,7 @@ OP(bf) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS3 ZPG ?? */
 OP(df) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS5 ZPG ?? */
 OP(ff) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS7 ZPG ?? */
 
-static void (*insndeco16[0x100])(void) = {
+static void (*const insndeco16[0x100])(void) = {
 	deco16_00,deco16_01,deco16_02,deco16_03,deco16_04,deco16_05,deco16_06,deco16_07,
 	deco16_08,deco16_09,deco16_0a,deco16_0b,deco16_0c,deco16_0d,deco16_0e,deco16_0f,
 	deco16_10,deco16_11,deco16_12,deco16_13,deco16_14,deco16_15,deco16_16,deco16_17,

@@ -566,7 +566,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 			for (sndnum = 0; sndnum < MAX_SOUND && drv.sound[sndnum].type != SOUND_DUMMY; sndnum++)
 				if (drv.sound[sndnum].type == SOUND_SAMPLES)
 				{
-					const char **samplenames = ((struct Samplesinterface *)drv.sound[sndnum].config)->samplenames;
+					const char *const *samplenames = ((const struct Samplesinterface *)drv.sound[sndnum].config)->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */

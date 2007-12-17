@@ -31,7 +31,7 @@ typedef struct {
 	int address_mode;
 } M68HC11_OPCODE;
 
-static M68HC11_OPCODE opcode_table[256] =
+static const M68HC11_OPCODE opcode_table[256] =
 {
 	/* 0x00 - 0x0f */
 	{ "test",			0,						},
@@ -311,7 +311,7 @@ static M68HC11_OPCODE opcode_table[256] =
 /*****************************************************************************/
 
 
-static M68HC11_OPCODE opcode_table_page2[256] =
+static const M68HC11_OPCODE opcode_table_page2[256] =
 {
 	/* 0x00 - 0x0f */
 	{ "?",				0,						},
@@ -591,7 +591,7 @@ static M68HC11_OPCODE opcode_table_page2[256] =
 /*****************************************************************************/
 
 
-static M68HC11_OPCODE opcode_table_page3[256] =
+static const M68HC11_OPCODE opcode_table_page3[256] =
 {
 	/* 0x00 - 0x0f */
 	{ "?",				0,						},
@@ -871,7 +871,7 @@ static M68HC11_OPCODE opcode_table_page3[256] =
 /*****************************************************************************/
 
 
-static M68HC11_OPCODE opcode_table_page4[256] =
+static const M68HC11_OPCODE opcode_table_page4[256] =
 {
 	/* 0x00 - 0x0f */
 	{ "?",				0,						},
@@ -1175,7 +1175,7 @@ static UINT16 fetch16(void)
 	return w;
 }
 
-static UINT32 decode_opcode(UINT32 pc, M68HC11_OPCODE *op_table)
+static UINT32 decode_opcode(UINT32 pc, const M68HC11_OPCODE *op_table)
 {
 	UINT8 imm8, mask;
 	INT8 rel8;

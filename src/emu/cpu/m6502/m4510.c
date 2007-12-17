@@ -125,7 +125,7 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
 
 
 typedef struct {
-	void	(**insn)(void); /* pointer to the function pointer table */
+	void	(*const *insn)(void); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc; 			/* program counter */
 	PAIR	sp; 			/* stack pointer (always 100 - 1FF) */

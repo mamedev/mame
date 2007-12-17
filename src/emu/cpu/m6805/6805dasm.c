@@ -38,7 +38,7 @@ enum op_names {
 	tstx,	txa
 };
 
-static const char *op_name_str[] = {
+static const char *const op_name_str[] = {
 	"adca", "adda", "anda", "asl",  "asla", "aslx", "asr",  "asra",
 	"asrx", "bcc",  "bclr", "bcs",  "beq",  "bhcc", "bhcs", "bhi",
 	"bih",  "bil",  "bita", "bls",  "bmc",  "bmi",  "bms",  "bne",
@@ -120,7 +120,7 @@ static const unsigned char disasm[0x100][2] = {
 };
 
 #if 0
-static char *opcode_strings[0x0100] =
+static const char *const opcode_strings[0x0100] =
 {
 	"brset0", 	"brclr0", 	"brset1", 	"brclr1", 	"brset2", 	"brclr2",	"brset3",	"brclr3",		/*00*/
 	"brset4",	"brclr4",	"brset5",	"brclr5",	"brset6",	"brclr6",	"brset7",	"brclr7",

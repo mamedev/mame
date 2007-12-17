@@ -15,7 +15,7 @@ typedef struct {
 	UINT32		s_flag;
 } opcodeinfo;
 
-static oprandinfo of[] = {
+static const oprandinfo of[] = {
 /* 00 */ { {" B,A",		"",			"",			""},		{NONE, DONE, DONE, DONE} },
 /* 01 */ { {" R%u",		",A",		"", 		""},		{UI8, NONE, DONE, DONE} },
 /* 02 */ { {" R%u",		",B",		"", 		""},		{UI8, NONE, DONE, DONE} },
@@ -75,7 +75,7 @@ static oprandinfo of[] = {
 /* 45 */ { {" *R%u",	"",			"",			""},		{UI8, DONE, DONE, DONE} }
 };
 
-static opcodeinfo opcodes[] = {
+static const opcodeinfo opcodes[] = {
 	{0x69, "ADC", 0, 0 },
 	{0x19, "ADC", 1, 0 },
 	{0x39, "ADC", 2, 0 },

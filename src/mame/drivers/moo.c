@@ -60,7 +60,7 @@ static UINT16 protram[16];
 static UINT16 cur_control2;
 
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	7,			/* address bits */
 	8,			/* data bits */

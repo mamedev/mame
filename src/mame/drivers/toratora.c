@@ -167,7 +167,7 @@ static WRITE8_HANDLER( clear_timer_w )
  *
  *************************************/
 
-static struct SN76477interface sn76477_interface =
+static const struct SN76477interface sn76477_interface =
 {
 	RES_K(47),	/*  4 noise_res                */
 //  RES_K(120), /*  5 filter_res               */

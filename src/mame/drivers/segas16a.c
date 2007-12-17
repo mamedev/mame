@@ -183,7 +183,7 @@ static WRITE8_HANDLER( tilemap_sound_w );
  *
  *************************************/
 
-static ppi8255_interface single_ppi_intf =
+static const ppi8255_interface single_ppi_intf =
 {
 	1,
 	{ NULL },

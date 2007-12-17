@@ -92,7 +92,7 @@ typedef struct
 	int			isdsp;
 	int			op;
 	int			interrupt_cycles;
-	void 		(**table)(void);
+	void 		(*const *table)(void);
 	int 		(*irq_callback)(int irqline);
 	void		(*cpu_interrupt)(void);
 } jaguar_regs;
@@ -197,7 +197,7 @@ static void subqmod_n_rn(void);	/* DSP only */
 static void subqt_n_rn(void);
 static void xor_rn_rn(void);
 
-static void (*gpu_op_table[64])(void) =
+static void (*const gpu_op_table[64])(void) =
 {
 	/* 00-03 */	add_rn_rn,		addc_rn_rn,		addq_n_rn,		addqt_n_rn,
 	/* 04-07 */	sub_rn_rn,		subc_rn_rn,		subq_n_rn,		subqt_n_rn,
@@ -217,7 +217,7 @@ static void (*gpu_op_table[64])(void) =
 	/* 60-63 */	store_rn_r14rn,	store_rn_r15rn,	sat24_rn,		pack_rn
 };
 
-static void (*dsp_op_table[64])(void) =
+static void (*const dsp_op_table[64])(void) =
 {
 	/* 00-03 */	add_rn_rn,		addc_rn_rn,		addq_n_rn,		addqt_n_rn,
 	/* 04-07 */	sub_rn_rn,		subc_rn_rn,		subq_n_rn,		subqt_n_rn,

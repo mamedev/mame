@@ -57,14 +57,14 @@ WRITE8_HANDLER( blockade_env_off_w )
     return;
 }
 
-static const char *blockade_sample_names[] =
+static const char *const blockade_sample_names[] =
 {
     "*blockade",
     "boom.wav",
     0
 };
 
-struct Samplesinterface blockade_samples_interface =
+const struct Samplesinterface blockade_samples_interface =
 {
     1,	/* 1 channel */
 	blockade_sample_names

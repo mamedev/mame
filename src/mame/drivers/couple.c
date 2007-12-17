@@ -125,7 +125,7 @@ static struct AY8910interface ay8910_interface =
 };
 #endif
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2,
 	{ input_port_0_r,   input_port_1_r },	/* Port A read */

@@ -360,6 +360,10 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info);
 void ppc601_get_info(UINT32 state, cpuinfo *info);
 #endif
 
+#if (HAS_PPC604)
+void ppc604_get_info(UINT32 state, cpuinfo *info);
+#endif
+
 #ifdef MAME_DEBUG
 extern offs_t ppc_dasm_one(char *buffer, offs_t pc, UINT32 op);
 #endif

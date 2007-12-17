@@ -229,7 +229,7 @@ static const pia6821_interface pia_1_intf =
 };
 
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1, 								/* 1 chip */
 	{input_port_3_r},				/* Port A read */

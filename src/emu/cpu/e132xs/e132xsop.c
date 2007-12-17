@@ -1842,7 +1842,7 @@ static void hyperstone_opff(UINT16 opcode)
 }
 
 
-static void (*hyperstone_op[0x100])(UINT16 opcode) =
+static void (*const hyperstone_op[0x100])(UINT16 opcode) =
 {
 	hyperstone_op00, hyperstone_op01, hyperstone_op02, hyperstone_op03,
 	hyperstone_op04, hyperstone_op05, hyperstone_op06, hyperstone_op07,

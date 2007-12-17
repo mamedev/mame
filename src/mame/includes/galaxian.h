@@ -207,7 +207,7 @@ WRITE8_HANDLER( hunchbks_mirror_w );
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-extern struct Samplesinterface galaxian_samples_interface;
+extern const struct Samplesinterface galaxian_samples_interface;
 WRITE8_HANDLER( galaxian_pitch_w );
 WRITE8_HANDLER( galaxian_vol_w );
 WRITE8_HANDLER( galaxian_noise_enable_w );

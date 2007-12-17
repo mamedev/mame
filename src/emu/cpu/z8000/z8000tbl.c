@@ -21,7 +21,7 @@
  *
  *****************************************************************************/
 
-static Z8000_init table[] = {
+static const Z8000_init table[] = {
 {0x0000,0x000f, 1,2,  7,Z00_0000_dddd_imm8, 					 "addb    %rb3,%#b3"},
 {0x0010,0x00ff, 1,1,  7,Z00_ssN0_dddd,							 "addb    %rb3,@%rw2"},
 {0x0100,0x010f, 1,2,  7,Z01_0000_dddd_imm16,					 "add     %rw3,%#w1"},
@@ -538,7 +538,7 @@ static Z8000_init table[] = {
 void z8000_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
     int i;
-	Z8000_init *init;
+	const Z8000_init *init;
 
 	/* already initialized? */
 	if( z8000_exec )

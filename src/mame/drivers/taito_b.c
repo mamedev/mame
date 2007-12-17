@@ -382,7 +382,7 @@ static WRITE16_HANDLER( gain_control_w )
 
 ***************************************************************************/
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */

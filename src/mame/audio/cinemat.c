@@ -136,7 +136,7 @@ static void generic_init(running_machine *machine, void (*callback)(UINT8, UINT8
  *
  *************************************/
 
-static const char *spacewar_sample_names[] =
+static const char *const spacewar_sample_names[] =
 {
 	"*spacewar",
 	"explode1.wav",
@@ -150,7 +150,7 @@ static const char *spacewar_sample_names[] =
     0
 };
 
-static struct Samplesinterface spacewar_samples_interface =
+static const struct Samplesinterface spacewar_samples_interface =
 {
 	8,
 	spacewar_sample_names
@@ -218,7 +218,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *barrier_sample_names[] =
+static const char *const barrier_sample_names[] =
 {
 	"*barrier",
 	"playrdie.wav",
@@ -227,7 +227,7 @@ static const char *barrier_sample_names[] =
     0
 };
 
-static struct Samplesinterface barrier_samples_interface =
+static const struct Samplesinterface barrier_samples_interface =
 {
 	3,
 	barrier_sample_names
@@ -271,14 +271,14 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *speedfrk_sample_names[] =
+static const char *const speedfrk_sample_names[] =
 {
 	"*speedfrk",
 	"offroad.wav",
     NULL
 };
 
-static struct Samplesinterface speedfrk_samples_interface =
+static const struct Samplesinterface speedfrk_samples_interface =
 {
 	1,
 	speedfrk_sample_names
@@ -329,7 +329,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *starhawk_sample_names[] =
+static const char *const starhawk_sample_names[] =
 {
 	"*starhawk",
 	"explode.wav",
@@ -341,7 +341,7 @@ static const char *starhawk_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface starhawk_samples_interface =
+static const struct Samplesinterface starhawk_samples_interface =
 {
 	5,
 	starhawk_sample_names
@@ -403,7 +403,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *sundance_sample_names[] =
+static const char *const sundance_sample_names[] =
 {
 	"*sundance",
 	"bong.wav",
@@ -415,7 +415,7 @@ static const char *sundance_sample_names[] =
     0
 };
 
-static struct Samplesinterface sundance_samples_interface =
+static const struct Samplesinterface sundance_samples_interface =
 {
 	6,
 	sundance_sample_names
@@ -471,7 +471,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *tailg_sample_names[] =
+static const char *const tailg_sample_names[] =
 {
 	"*tailg",
 	"sexplode.wav",
@@ -483,7 +483,7 @@ static const char *tailg_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface tailg_samples_interface =
+static const struct Samplesinterface tailg_samples_interface =
 {
 	6,
 	tailg_sample_names
@@ -558,7 +558,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *warrior_sample_names[] =
+static const char *const warrior_sample_names[] =
 {
 	"*warrior",
 	"bgmhum1.wav",
@@ -569,7 +569,7 @@ static const char *warrior_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface warrior_samples_interface =
+static const struct Samplesinterface warrior_samples_interface =
 {
 	5,
 	warrior_sample_names
@@ -625,7 +625,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *armora_sample_names[] =
+static const char *const armora_sample_names[] =
 {
 	"*armora",
     "loexp.wav",
@@ -638,7 +638,7 @@ static const char *armora_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface armora_samples_interface =
+static const struct Samplesinterface armora_samples_interface =
 {
 	7,
 	armora_sample_names
@@ -718,7 +718,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *ripoff_sample_names[] =
+static const char *const ripoff_sample_names[] =
 {
 	"*ripoff",
 	"bonuslvl.wav",
@@ -737,7 +737,7 @@ static const char *ripoff_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface ripoff_samples_interface =
+static const struct Samplesinterface ripoff_samples_interface =
 {
 	6,
 	ripoff_sample_names
@@ -808,7 +808,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *starcas_sample_names[] =
+static const char *const starcas_sample_names[] =
 {
 	"*starcas",
 	"cfire.wav",
@@ -822,7 +822,7 @@ static const char *starcas_sample_names[] =
     0
 };
 
-static struct Samplesinterface starcas_samples_interface =
+static const struct Samplesinterface starcas_samples_interface =
 {
 	8,
 	starcas_sample_names
@@ -920,7 +920,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *solarq_sample_names[] =
+static const char *const solarq_sample_names[] =
 {
 	"*solarq",
     "bigexpl.wav",
@@ -934,7 +934,7 @@ static const char *solarq_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface solarq_samples_interface =
+static const struct Samplesinterface solarq_samples_interface =
 {
 	8,
 	solarq_sample_names
@@ -1055,7 +1055,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *boxingb_sample_names[] =
+static const char *const boxingb_sample_names[] =
 {
 	"*boxingb",
     "softexpl.wav",
@@ -1073,7 +1073,7 @@ static const char *boxingb_sample_names[] =
     NULL
 };
 
-static struct Samplesinterface boxingb_samples_interface =
+static const struct Samplesinterface boxingb_samples_interface =
 {
 	12,
 	boxingb_sample_names
@@ -1188,7 +1188,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *wotw_sample_names[] =
+static const char *const wotw_sample_names[] =
 {
 	"*wotw",
 	"cfire.wav",
@@ -1202,7 +1202,7 @@ static const char *wotw_sample_names[] =
     0
 };
 
-static struct Samplesinterface wotw_samples_interface =
+static const struct Samplesinterface wotw_samples_interface =
 {
 	8,
 	wotw_sample_names
@@ -1300,7 +1300,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static const char *wotwc_sample_names[] =
+static const char *const wotwc_sample_names[] =
 {
 	"*wotwc",
 	"cfire.wav",
@@ -1314,7 +1314,7 @@ static const char *wotwc_sample_names[] =
     0
 };
 
-static struct Samplesinterface wotwc_samples_interface =
+static const struct Samplesinterface wotwc_samples_interface =
 {
 	8,
 	wotwc_sample_names

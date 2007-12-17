@@ -26,7 +26,7 @@ void * realloc_file_line(void *memory, size_t size, const char *file, int line);
 #ifdef _MSC_VER
 void *__cdecl _alloca(size_t);
 #define alloca _alloca
-#if _MSC_VER < 1400
+#if _MSC_VER < 1500
 #define vsnprintf _vsnprintf
 #endif
 #endif

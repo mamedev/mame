@@ -1085,9 +1085,10 @@ CPUDEFS += -DHAS_PPC403=$(if $(filter PPC403,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC601=$(if $(filter PPC601,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC602=$(if $(filter PPC602,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC603=$(if $(filter PPC603,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC604=$(if $(filter PPC604,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
 
-ifneq ($(filter PPC403 PPC601 PPC602 PPC603 MPC8240,$(CPUS)),)
+ifneq ($(filter PPC403 PPC601 PPC602 PPC603 PPC604 MPC8240,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 

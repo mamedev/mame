@@ -11,14 +11,14 @@
 #include "driver.h"
 #include "machine/at28c16.h"
 
-#define DATA_SIZE ( 0x800 )
-#define ID_SIZE ( 0x020 )
-#define ID_OFFSET ( DATA_SIZE - ID_SIZE )
+#define SIZE_DATA ( 0x800 )
+#define SIZE_ID ( 0x020 )
+#define OFFSET_ID ( SIZE_DATA - SIZE_ID )
 
 struct at28c16_chip
 {
-	UINT8 data[ DATA_SIZE ];
-	UINT8 id[ ID_SIZE ];
+	UINT8 *data;
+	UINT8 *id;
 	UINT8 a9_12v;
 };
 
@@ -39,7 +39,7 @@ void at28c16_a9_12v( int chip, int a9_12v )
 
 /* nvram handlers */
 
-static void at28c16_init( int chip )
+void at28c16_init( int chip, UINT8 *data, UINT8 *id )
 {
 	struct at28c16_chip *c;
 	if( chip >= MAX_AT28C16_CHIPS )
@@ -50,11 +50,22 @@ static void at28c16_init( int chip )
 	c = &at28c16[ chip ];
 
 	c->a9_12v = 0;
-	memset( c->data, 0, DATA_SIZE );
-	memset( c->id, 0, ID_SIZE );
 
-	state_save_register_item_array( "at28c16", chip, c->data );
-	state_save_register_item_array( "at28c16", chip, c->id );
+	if( data == NULL )
+	{
+		data = auto_malloc( SIZE_DATA );
+	}
+
+	if( id == NULL )
+	{
+		id = auto_malloc( SIZE_ID );
+	}
+
+	c->data = data;
+	c->id = id;
+
+	state_save_register_item_pointer( "at28c16", chip, c->data, SIZE_DATA );
+	state_save_register_item_pointer( "at28c16", chip, c->id, SIZE_ID );
 	state_save_register_item( "at28c16", chip, c->a9_12v );
 }
 
@@ -70,16 +81,15 @@ static void nvram_handler_at28c16( running_machine *machine, int chip, mame_file
 
 	if( read_or_write )
 	{
-		mame_fwrite( file, c->data, DATA_SIZE );
-		mame_fwrite( file, c->id, ID_SIZE );
+		mame_fwrite( file, c->data, SIZE_DATA );
+		mame_fwrite( file, c->id, SIZE_ID );
 	}
 	else
 	{
-		at28c16_init( chip );
 		if( file )
 		{
-			mame_fread( file, c->data, DATA_SIZE );
-			mame_fread( file, c->id, ID_SIZE );
+			mame_fread( file, c->data, SIZE_DATA );
+			mame_fread( file, c->id, SIZE_ID );
 		}
 	}
 }
@@ -101,14 +111,14 @@ static UINT8 at28c16_read( UINT32 chip, offs_t offset )
 	}
 	c = &at28c16[ chip ];
 
-	if( offset >= ID_OFFSET && c->a9_12v )
+	if( offset >= OFFSET_ID && c->a9_12v )
 	{
 		logerror( "at28c16_read( %04x ) id\n", offset );
-		return c->id[ offset - ID_OFFSET ];
+		return c->id[ offset - OFFSET_ID ];
 	}
 	else
 	{
-//      logerror( "at28c16_read( %04x ) data\n", offset );
+//      logerror( "%08x: at28c16_read( %d, %04x ) %02x data\n", activecpu_get_pc(), chip, offset, c->data[ offset ] );
 		return c->data[ offset ];
 	}
 }
@@ -123,14 +133,14 @@ static void at28c16_write( UINT32 chip, offs_t offset, UINT8 data )
 	}
 	c = &at28c16[ chip ];
 
-	if( offset >= ID_OFFSET && c->a9_12v )
+	if( offset >= OFFSET_ID && c->a9_12v )
 	{
 		logerror( "at28c16_write( %d, %04x, %02x ) id\n", chip, offset, data );
-		c->id[ offset - ID_OFFSET ] = data;
+		c->id[ offset - OFFSET_ID ] = data;
 	}
 	else
 	{
-//      logerror( "at28c16_write( %d, %04x, %02x ) data\n", chip, offset, data );
+//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) data\n", activecpu_get_pc(), chip, offset, data );
 		c->data[ offset ] = data;
 	}
 }

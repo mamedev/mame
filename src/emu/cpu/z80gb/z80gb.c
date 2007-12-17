@@ -131,7 +131,7 @@ INLINE void mem_WriteWord (UINT32 address, UINT16 value)
 /* Nr of cycles to run */
 static int z80gb_ICount;
 
-static int Cycles[256] =
+static const int Cycles[256] =
 {
 	 4,12, 8, 8, 4, 4, 8, 4,20, 8, 8, 8, 4, 4, 8, 4,
 	 4,12, 8, 8, 4, 4, 8, 4,12, 8, 8, 8, 4, 4, 8, 4,
@@ -151,7 +151,7 @@ static int Cycles[256] =
 	12,12, 8, 4, 4,16, 8,16,12, 8,16, 4, 4, 4, 8,16
 };
 
-static int CyclesCB[256] =
+static const int CyclesCB[256] =
 {
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8,

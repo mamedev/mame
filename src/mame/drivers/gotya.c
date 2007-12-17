@@ -146,7 +146,7 @@ static GFXDECODE_START( gotya )
 GFXDECODE_END
 
 
-static const char *sample_names[] =
+static const char *const sample_names[] =
 {												// Address triggered at
 	"*thehand",
 	"01.wav",	/* game start tune */			// 075f
@@ -182,7 +182,7 @@ static const char *sample_names[] =
 	0
 };
 
-static struct Samplesinterface samples_interface =
+static const struct Samplesinterface samples_interface =
 {
 	4,	/* 4 channels */
 	sample_names

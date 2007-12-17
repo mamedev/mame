@@ -27,7 +27,7 @@ static int bg_yoffset;
 static int xoffset;
 static int yoffset;
 
-static struct EEPROM_interface eeprom_interface =
+static const struct EEPROM_interface eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */

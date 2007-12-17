@@ -944,7 +944,7 @@ static GFXDECODE_START( cosmica )
 GFXDECODE_END
 
 
-static const char *panic_sample_names[] =
+static const char *const panic_sample_names[] =
 {
 	"*panic",
 	"walk.wav",
@@ -961,13 +961,13 @@ static const char *panic_sample_names[] =
 	0
 };
 
-static struct Samplesinterface panic_samples_interface =
+static const struct Samplesinterface panic_samples_interface =
 {
 	9,	/* 9 channels */
 	panic_sample_names
 };
 
-static const char *cosmicg_sample_names[] =
+static const char *const cosmicg_sample_names[] =
 {
 	"*cosmicg",
 	"cg_m0.wav",	/* 8 Different pitches of March Sound */
@@ -988,7 +988,7 @@ static const char *cosmicg_sample_names[] =
 	0
 };
 
-static struct Samplesinterface cosmicg_samples_interface =
+static const struct Samplesinterface cosmicg_samples_interface =
 {
 	9,	/* 9 channels */
 	cosmicg_sample_names

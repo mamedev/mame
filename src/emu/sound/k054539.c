@@ -129,15 +129,13 @@ static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_
 	};
 
 	int ch, reverb_pos;
-	short *rev_max;
-	short *rbase, *rbuffer, *rev_top;
+	short *rbase;
 	unsigned char *samples;
 	UINT32 rom_mask;
 
 	unsigned char *base1, *base2;
 	struct K054539_channel *chan;
 	stream_sample_t *bufl, *bufr;
-	short *revb;
 	int cur_pos, cur_pfrac, cur_val, cur_pval;
 	int delta, rdelta, fdelta, pdelta;
 	int vol, bval, pan, i;
@@ -146,8 +144,6 @@ static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	reverb_pos = info->reverb_pos;
 	rbase = (short *)(info->ram);
-	rbuffer = rbase + reverb_pos;
-	rev_max = rev_top = rbase + 0x4000;
 
 	memset(buffer[0], 0, length*sizeof(*buffer[0]));
 	memset(buffer[1], 0, length*sizeof(*buffer[1]));
@@ -199,7 +195,6 @@ else
 			rdelta = (base1[6] | (base1[7] << 8)) >> 3;
 //          rdelta = (reverb_pos + (int)((rdelta - 0x2000) * info->freq_ratio)) & 0x3fff;
 			rdelta = (int)(rdelta + reverb_pos) & 0x3fff;
-			revb = rbase + rdelta;
 
 			cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
 
@@ -231,7 +226,8 @@ else
 			do {																		\
 				*bufl++ += (INT16)(cur_val*lvol);										\
 				*bufr++ += (INT16)(cur_val*rvol);										\
-				*revb++ += (INT16)(cur_val*rbvol);										\
+				rbase[rdelta++] += (INT16)(cur_val*rbvol);										\
+				rdelta &= 0x3fff;										\
 			} while(0)
 
 			switch(base2[0] & 0xc) {
@@ -351,16 +347,7 @@ else
 				base1[0x0d] = cur_pos>> 8 & 0xff;
 				base1[0x0e] = cur_pos>>16 & 0xff;
 			}
-
-			if(revb > rev_max)
-				rev_max = revb;
 		}
-
-	while(rev_max >= rev_top) {
-		rev_max[-0x4000] += rev_max[0];
-		rev_max[0] = 0;
-		rev_max--;
-	}
 
 	//* drivers should be given the option to disable reverb when things go terribly wrong
 	if(!(info->K054539_flags & K054539_DISABLE_REVERB))
@@ -372,12 +359,12 @@ else
 		}
 	}
 
-	if(rbuffer+length > rev_top) {
-		i = rev_top-rbuffer; // delta
-		memset(rbuffer, 0, i*2);
+	if(reverb_pos + length > 0x4000) {
+		i = 0x4000 - reverb_pos;
+		memset(rbase + reverb_pos, 0, i*2);
 		memset(rbase, 0, (length-i)*2);
 	} else
-		memset(rbuffer, 0, length*2);
+		memset(rbase + reverb_pos, 0, length*2);
 
 	#if CHANNEL_DEBUG
 	{

@@ -21,7 +21,7 @@ static offs_t pcbase;
 #define MNEMO   1
 
 /* handy table to build relative offsets from HR (holding register) */
-static int rel[0x100] = {
+static const int rel[0x100] = {
 	  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
 	 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -65,7 +65,7 @@ static char *IMM(int pc)
 }
 
 #if MNEMO
-static	char cc[4] = { 'z', 'p', 'm', 'a' };
+static const char cc[4] = { 'z', 'p', 'm', 'a' };
 
 /* format an immediate for PSL */
 static char *IMM_PSL(int pc)
@@ -136,7 +136,7 @@ static char *IMM_PSU(int pc)
 	return buff;
 }
 #else
-static	char cc[4] = { '0', '1', '2', '3' };
+static const char cc[4] = { '0', '1', '2', '3' };
 #define IMM_PSL IMM
 #define IMM_PSU IMM
 #endif

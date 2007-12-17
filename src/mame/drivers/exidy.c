@@ -791,7 +791,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *targ_sample_names[] =
+static const char *const targ_sample_names[] =
 {
 	"*targ",
 	"expl.wav",
@@ -803,7 +803,7 @@ static const char *targ_sample_names[] =
 };
 
 
-static struct Samplesinterface targ_samples_interface =
+static const struct Samplesinterface targ_samples_interface =
 {
 	4,	/* 3 Channels */
 	targ_sample_names,

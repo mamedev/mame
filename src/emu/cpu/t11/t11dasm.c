@@ -10,7 +10,7 @@
 #include "debugger.h"
 #include "t11.h"
 
-static const char *regs[8] = { "R0", "R1", "R2", "R3", "R4", "R5", "SP", "PC" };
+static const char *const regs[8] = { "R0", "R1", "R2", "R3", "R4", "R5", "SP", "PC" };
 
 static const UINT8 *rombase;
 static offs_t pcbase;

@@ -50,7 +50,7 @@ static sound_stream * tone_stream;
 static int Sound0StopOnRollover;
 static UINT8 LastPort1;
 
-const char *sasuke_sample_names[] =
+const char *const sasuke_sample_names[] =
 {
 	"*sasuke",
 
@@ -63,7 +63,7 @@ const char *sasuke_sample_names[] =
 	0
 };
 
-const char *vanguard_sample_names[] =
+const char *const vanguard_sample_names[] =
 {
 	"*vanguard",
 
@@ -92,7 +92,7 @@ const char *vanguard_sample_names[] =
 	0
 };
 
-const char *fantasy_sample_names[] =
+const char *const fantasy_sample_names[] =
 {
 	"*fantasy",
 

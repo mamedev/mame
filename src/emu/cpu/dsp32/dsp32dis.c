@@ -22,17 +22,17 @@
     CODE CODE
 ***************************************************************************/
 
-static const char *sizesuffix[] = { "", "e" };
-static const char *unarysign[] = { "", "-" };
-static const char *sign[] = { "+", "-" };
-static const char *aMvals[] = { "a0", "a1", "a2", "a3", "0.0", "1.0", "Format 4", "Reserved" };
-static const char *memsuffix[] = { "h", "l", "", "e" };
-static const char *functable[] =
+static const char *const sizesuffix[] = { "", "e" };
+static const char *const unarysign[] = { "", "-" };
+static const char *const sign[] = { "+", "-" };
+static const char *const aMvals[] = { "a0", "a1", "a2", "a3", "0.0", "1.0", "Format 4", "Reserved" };
+static const char *const memsuffix[] = { "h", "l", "", "e" };
+static const char *const functable[] =
 {
 	"ic", "oc", "float", "int", "round", "ifalt", "ifaeq", "ifagt",
 	"reserved8", "reserved9", "float24", "int24", "ieee", "dsp", "seed", "reservedf"
 };
-static const char *condtable[] =
+static const char *const condtable[] =
 {
 	"false", "true",
 	"pl", "mi",
@@ -67,14 +67,14 @@ static const char *condtable[] =
 	"!?1e", "?1e",
 	"!?1f", "?1f"
 };
-static const char *regname[] =
+static const char *const regname[] =
 {
 	"0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
 	"r8", "r9", "r10", "r11", "r12", "r13", "r14", "pc",
 	"0", "r15", "r16", "r17", "r18", "r19", "-1", "1",
 	"r20", "r21", "dauc", "ioc", "res1c", "r22", "pcsh", "res1f"
 };
-static const char *regnamee[] =
+static const char *const regnamee[] =
 {
 	"0", "r1e", "r2e", "r3e", "r4e", "r5e", "r6e", "r7e",
 	"r8e", "r9e", "r10e", "r11e", "r12e", "r13e", "r14e", "pce",

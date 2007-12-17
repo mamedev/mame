@@ -62,7 +62,7 @@
 #define CAUSE_CE2 ( 2L << 28 )
 #define CAUSE_BD ( 1L << 31 )
 
-static const char *delayn[] =
+static const char *const delayn[] =
 {
 	"pc", "at", "v0", "v1", "a0", "a1", "a2", "a3",
 	"t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7",
@@ -92,7 +92,7 @@ static mips_cpu_context mipscpu;
 
 static int mips_ICount = 0;
 
-static UINT32 mips_mtc0_writemask[]=
+static const UINT32 mips_mtc0_writemask[]=
 {
 	0xffffffff, /* INDEX */
 	0x00000000, /* RANDOM */
@@ -2513,23 +2513,23 @@ static void docop2( int gteop )
 	UINT16 n_v1;
 	UINT16 n_v2;
 	UINT16 n_v3;
-	const UINT16 **p_n_mx;
-	const UINT32 **p_n_cv;
+	const UINT16 *const *p_n_mx;
+	const UINT32 *const *p_n_cv;
 	static const UINT16 n_zm = 0;
 	static const UINT32 n_zc = 0;
-	static const UINT16 *p_n_vx[] = { &VX0, &VX1, &VX2 };
-	static const UINT16 *p_n_vy[] = { &VY0, &VY1, &VY2 };
-	static const UINT16 *p_n_vz[] = { &VZ0, &VZ1, &VZ2 };
-	static const UINT16 *p_n_rm[] = { &R11, &R12, &R13, &R21, &R22, &R23, &R31, &R32, &R33 };
-	static const UINT16 *p_n_lm[] = { &L11, &L12, &L13, &L21, &L22, &L23, &L31, &L32, &L33 };
-	static const UINT16 *p_n_cm[] = { &LR1, &LR2, &LR3, &LG1, &LG2, &LG3, &LB1, &LB2, &LB3 };
-	static const UINT16 *p_n_zm[] = { &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm };
-	static const UINT16 **p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
-	static const UINT32 *p_n_tr[] = { &TRX, &TRY, &TRZ };
-	static const UINT32 *p_n_bk[] = { &RBK, &GBK, &BBK };
-	static const UINT32 *p_n_fc[] = { &RFC, &GFC, &BFC };
-	static const UINT32 *p_n_zc[] = { &n_zc, &n_zc, &n_zc };
-	static const UINT32 **p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
+	static const UINT16 *const p_n_vx[] = { &VX0, &VX1, &VX2 };
+	static const UINT16 *const p_n_vy[] = { &VY0, &VY1, &VY2 };
+	static const UINT16 *const p_n_vz[] = { &VZ0, &VZ1, &VZ2 };
+	static const UINT16 *const p_n_rm[] = { &R11, &R12, &R13, &R21, &R22, &R23, &R31, &R32, &R33 };
+	static const UINT16 *const p_n_lm[] = { &L11, &L12, &L13, &L21, &L22, &L23, &L31, &L32, &L33 };
+	static const UINT16 *const p_n_cm[] = { &LR1, &LR2, &LR3, &LG1, &LG2, &LG3, &LB1, &LB2, &LB3 };
+	static const UINT16 *const p_n_zm[] = { &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm };
+	static const UINT16 *const *p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
+	static const UINT32 *const p_n_tr[] = { &TRX, &TRY, &TRZ };
+	static const UINT32 *const p_n_bk[] = { &RBK, &GBK, &BBK };
+	static const UINT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
+	static const UINT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
+	static const UINT32 *const *p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
 
 	switch( GTE_FUNCT( gteop ) )
 	{

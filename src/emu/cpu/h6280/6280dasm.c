@@ -76,7 +76,7 @@ enum opcodes {
 };
 
 
-static const char *token[]=
+static const char *const token[]=
 {
 	/* 6502 opcodes */
 	"adc", "and", "asl", "bcc", "bcs", "beq", "bit", "bmi",

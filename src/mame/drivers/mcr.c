@@ -1478,14 +1478,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *journey_sample_names[] =
+static const char *const journey_sample_names[] =
 {
 	"*journey",
 	"sepways.wav",
 	0
 };
 
-static struct Samplesinterface journey_samples_interface =
+static const struct Samplesinterface journey_samples_interface =
 {
 	1,
 	journey_sample_names

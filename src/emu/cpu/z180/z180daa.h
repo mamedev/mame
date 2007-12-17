@@ -1,4 +1,4 @@
-static UINT16 DAATable[0x800] = {
+static const UINT16 DAATable[0x800] = {
   (0x00<<8)   +ZF         +VF      ,
   (0x01<<8)                        ,
   (0x02<<8)                        ,

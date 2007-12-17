@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( dealer_writeport, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	1, 					/* 1 chip */
 	{ input_port_2_r },	/* Port A read */

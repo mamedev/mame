@@ -96,7 +96,7 @@
     FORWARD DECLARATIONS
 ***************************************************************************/
 
-extern void (*dsp32ops[])(void);
+extern void (*const dsp32ops[])(void);
 
 
 
@@ -2534,7 +2534,7 @@ static void d5_seed(void)
     FUNCTION TABLE
 ***************************************************************************/
 
-void (*dsp32ops[])(void) =
+void (*const dsp32ops[])(void) =
 {
 	nop,		goto_t,		goto_pl,	goto_mi,	goto_ne,	goto_eq,	goto_vc,	goto_vs,	/* 00 */
 	goto_cc,	goto_cs,	goto_ge,	goto_lt,	goto_gt,	goto_le,	goto_hi,	goto_ls,

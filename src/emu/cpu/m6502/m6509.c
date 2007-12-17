@@ -62,7 +62,7 @@ addresses take place.
 
 typedef struct {
 	UINT8	subtype;		/* currently selected cpu sub type */
-	void	(**insn)(void); /* pointer to the function pointer table */
+	void	(*const *insn)(void); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	/* pc.w.h contains the current page pc_bank.w.h for better speed */
 	PAIR	pc; 			/* program counter */

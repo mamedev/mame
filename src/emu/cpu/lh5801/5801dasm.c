@@ -54,7 +54,7 @@ typedef enum {
 	P, S
 } Regs;
 
-static const char *RegNames[]= {
+static const char *const RegNames[]= {
 	0, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
 };
 
@@ -92,7 +92,7 @@ typedef enum {
 	RPV, SPV,// flip flop pv off
 } Ins;
 
-static const char *InsNames[]={
+static const char *const InsNames[]={
 	"ILL", "ILL", 0, "NOP",
 	"LDA", "STA", "LDI", "LDX", "STX",
 	"LDE", "SDE", "LIN", "SIN",

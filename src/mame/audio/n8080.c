@@ -30,7 +30,7 @@ static int mono_flop[3];
 
 
 
-static struct SN76477interface sheriff_sn76477_interface =
+static const struct SN76477interface sheriff_sn76477_interface =
 {
 	RES_K(36)  ,  /* 04 */
 	RES_K(100) ,  /* 05 */
@@ -58,7 +58,7 @@ static struct SN76477interface sheriff_sn76477_interface =
 };
 
 
-static struct SN76477interface spacefev_sn76477_interface =
+static const struct SN76477interface spacefev_sn76477_interface =
 {
 	RES_K(36)  ,  /* 04 */
 	RES_K(150) ,  /* 05 */

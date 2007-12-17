@@ -269,7 +269,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static struct EEPROM_interface eeprom_interface_policetr =
+static const struct EEPROM_interface eeprom_interface_policetr =
 {
 	8,				// address bits 8
 	16,				// data bits    16

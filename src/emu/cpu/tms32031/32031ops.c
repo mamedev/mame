@@ -66,7 +66,7 @@
     FORWARD DECLARATIONS
 ***************************************************************************/
 
-void (*tms32031ops[])(void);
+void (*const tms32031ops[])(void);
 
 
 
@@ -1231,7 +1231,7 @@ static UINT32 mod17_def(UINT8 ar)
 
 /* tables */
 
-static UINT32 (*indirect_d[0x20])(UINT8) =
+static UINT32 (*const indirect_d[0x20])(UINT8) =
 {
 	mod00_d,	mod01_d,	mod02_d,	mod03_d,	mod04_d,	mod05_d,	mod06_d,	mod07_d,
 	mod08,		mod09,		mod0a,		mod0b,		mod0c,		mod0d,		mod0e,		mod0f,
@@ -1240,7 +1240,7 @@ static UINT32 (*indirect_d[0x20])(UINT8) =
 };
 
 
-static UINT32 (*indirect_1[0x20])(UINT8) =
+static UINT32 (*const indirect_1[0x20])(UINT8) =
 {
 	mod00_1,	mod01_1,	mod02_1,	mod03_1,	mod04_1,	mod05_1,	mod06_1,	mod07_1,
 	mod08,		mod09,		mod0a,		mod0b,		mod0c,		mod0d,		mod0e,		mod0f,
@@ -1249,7 +1249,7 @@ static UINT32 (*indirect_1[0x20])(UINT8) =
 };
 
 
-static UINT32 (*indirect_1_def[0x20])(UINT8) =
+static UINT32 (*const indirect_1_def[0x20])(UINT8) =
 {
 	mod00_1,	mod01_1,	mod02_1_def,mod03_1_def,mod04_1_def,mod05_1_def,mod06_1_def,mod07_1_def,
 	mod08,		mod09,		mod0a_def,	mod0b_def,	mod0c_def,	mod0d_def,	mod0e_def,	mod0f_def,
@@ -6103,7 +6103,7 @@ static void xor3sti(void)
     FUNCTION TABLE
 ***************************************************************************/
 
-void (*tms32031ops[])(void) =
+void (*const tms32031ops[])(void) =
 {
 	absf_reg,		absf_dir,		absf_ind,		absf_imm,		/* 0x00 */
 	absi_reg,		absi_dir,		absi_ind,		absi_imm,

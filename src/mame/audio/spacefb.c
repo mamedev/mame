@@ -66,7 +66,7 @@ WRITE8_HANDLER( spacefb_port_1_w )
 }
 
 
-static const char *spacefb_sample_names[] =
+static const char *const spacefb_sample_names[] =
 {
 	"*spacefb",
 	"ekilled.wav",
@@ -77,7 +77,7 @@ static const char *spacefb_sample_names[] =
 };
 
 
-static struct Samplesinterface spacefb_samples_interface =
+static const struct Samplesinterface spacefb_samples_interface =
 {
 	3,
 	spacefb_sample_names

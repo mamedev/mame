@@ -1539,7 +1539,7 @@ static struct AY8910interface hardhead_ay8910_interface =
 	suna8_samples_number_w
 };
 
-static struct Samplesinterface suna8_samples_interface =
+static const struct Samplesinterface suna8_samples_interface =
 {
 	1,
 	NULL,

@@ -110,7 +110,7 @@ static WRITE8_HANDLER( sound_w )
 //  popmessage("%02x",data);
 }
 
-static ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf =
 {
 	2, 									/* 2 chips */
 	{ input_port_0_r, input_port_2_r },	/* Port A read */

@@ -208,7 +208,7 @@ typedef struct
  * and print instructions.
  */
 
-static IDESCR itab[] =
+static const IDESCR itab[] =
 {
     { "add",    D_OP(31)|D_XO(266), M_RT|M_RA|M_RB|M_OE|M_RC,   F_RT_RA_RB,     FL_OE|FL_RC },
     { "addc",   D_OP(31)|D_XO(10),  M_RT|M_RA|M_RB|M_OE|M_RC,   F_RT_RA_RB,     FL_OE|FL_RC },
@@ -423,7 +423,7 @@ static IDESCR itab[] =
  * Use an index of BI&3 into this table to obtain the CR field bit name.
  */
 
-static char crbit[][4] = { "lt", "gt", "eq", "so" };
+static const char *const crbit[4] = { "lt", "gt", "eq", "so" };
 
 
 /*

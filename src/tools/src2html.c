@@ -67,6 +67,14 @@ struct _include_path
 };
 
 
+typedef struct _list_entry list_entry;
+struct _list_entry
+{
+	list_entry *	next;
+	const astring *	name;
+};
+
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -246,6 +254,14 @@ usage:
     CORE OUTPUT FUNCTIONS
 ***************************************************************************/
 
+static int compare_list_entries(const void *p1, const void *p2)
+{
+	const list_entry *entry1 = *(const list_entry **)p1;
+	const list_entry *entry2 = *(const list_entry **)p2;
+	return strcmp(astring_c(entry1->name), astring_c(entry2->name));
+}
+
+
 /*-------------------------------------------------
     recurse_dir - recurse through a directory
 -------------------------------------------------*/
@@ -281,6 +297,9 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 	{
 		osd_dir_entry_type entry_type = typelist[entindex];
 		const osd_directory_entry *entry;
+		list_entry *list = NULL;
+		list_entry **listarray;
+		list_entry *curlist;
 		osd_directory *dir;
 		int found = 0;
 
@@ -292,65 +311,105 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			goto error;
 		}
 
-		/* iterate through each file */
-		while ((entry = osd_readdir(dir)) != NULL && result == 0)
+		/* build up the list of files */
+		while ((entry = osd_readdir(dir)) != NULL)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
-				astring *srcfile, *dstfile;
-
-				/* add a header */
-				if (++found == 1)
-					core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
-
-				/* build the source filename */
-				srcfile = astring_alloc();
-				astring_printf(srcfile, "%s%c%s", astring_c(srcdir), PATH_SEPARATOR[0], entry->name);
-
-				/* if we have a file, output it */
-				dstfile = astring_alloc();
-				if (entry->type == ENTTYPE_FILE)
-				{
-					file_type type = FILE_TYPE_INVALID;
-					int extnum;
-
-					/* make sure we care, first */
-					for (extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
-						if (core_filename_ends_with(entry->name, extension_lookup[extnum].extension))
-						{
-							type = extension_lookup[extnum].type;
-							break;
-						}
-
-					/* if we got a valid file, process it */
-					if (type != FILE_TYPE_INVALID)
-					{
-						astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], entry->name);
-						if (indexfile != NULL)
-							core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", entry->name, entry->name);
-						result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile);
-					}
-				}
-
-				/* if we have a directory, recurse */
-				else
-				{
-					astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], entry->name);
-					if (indexfile != NULL)
-						core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", entry->name, entry->name);
-					result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile);
-				}
-
-				/* free memory for the names */
-				astring_free(srcfile);
-				astring_free(dstfile);
+				list_entry *lentry = malloc(sizeof(*lentry));
+				lentry->name = astring_dupc(entry->name);
+				lentry->next = list;
+				list = lentry;
+				found++;
 			}
-
-		/* close the list if we found some stuff */
-		if (found > 0)
-			core_fprintf(indexfile, "\t</ul>\n");
 
 		/* close the directory */
 		osd_closedir(dir);
+
+		/* skip if nothing found */
+		if (found == 0)
+			continue;
+
+		/* allocate memory for sorting */
+		listarray = malloc(sizeof(list_entry *) * found);
+		found = 0;
+		for (curlist = list; curlist != NULL; curlist = curlist->next)
+			listarray[found++] = curlist;
+
+		/* sort the list */
+		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
+
+		/* rebuild the list */
+		list = NULL;
+		while (--found >= 0)
+		{
+			listarray[found]->next = list;
+			list = listarray[found];
+		}
+
+		/* iterate through each file */
+		for (curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
+		{
+			astring *srcfile, *dstfile;
+
+			/* add a header */
+			if (curlist == list)
+				core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
+
+			/* build the source filename */
+			srcfile = astring_alloc();
+			astring_printf(srcfile, "%s%c%s", astring_c(srcdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+
+			/* if we have a file, output it */
+			dstfile = astring_alloc();
+			if (entry_type == ENTTYPE_FILE)
+			{
+				file_type type = FILE_TYPE_INVALID;
+				int extnum;
+
+				/* make sure we care, first */
+				for (extnum = 0; extnum < ARRAY_LENGTH(extension_lookup); extnum++)
+					if (core_filename_ends_with(astring_c(curlist->name), extension_lookup[extnum].extension))
+					{
+						type = extension_lookup[extnum].type;
+						break;
+					}
+
+				/* if we got a valid file, process it */
+				if (type != FILE_TYPE_INVALID)
+				{
+					astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+					if (indexfile != NULL)
+						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile);
+				}
+			}
+
+			/* if we have a directory, recurse */
+			else
+			{
+				astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
+				if (indexfile != NULL)
+					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile);
+			}
+
+			/* free memory for the names */
+			astring_free(srcfile);
+			astring_free(dstfile);
+		}
+
+		/* close the list if we found some stuff */
+		if (list != NULL)
+			core_fprintf(indexfile, "\t</ul>\n");
+
+		/* free all the allocated entries */
+		while (list != NULL)
+		{
+			list_entry *next = list->next;
+			astring_free((astring *)list->name);
+			free(list);
+			list = next;
+		}
 	}
 
 error:

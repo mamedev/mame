@@ -4,7 +4,7 @@
 
 int circus_game;
 
-static const char *circus_sample_names[] =
+static const char *const circus_sample_names[] =
 {
 	"*circus",
 	"pop.wav",
@@ -13,26 +13,26 @@ static const char *circus_sample_names[] =
 	0
 };
 
-struct Samplesinterface circus_samples_interface =
+const struct Samplesinterface circus_samples_interface =
 {
 	3,	/* 3 channels */
 	circus_sample_names
 };
 
-static const char *crash_sample_names[] =
+static const char *const crash_sample_names[] =
 {
 	"*crash",
 	"crash.wav",
 	0
 };
 
-struct Samplesinterface crash_samples_interface =
+const struct Samplesinterface crash_samples_interface =
 {
 	1,	/* 1 channel */
 	crash_sample_names
 };
 
-static const char *ripcord_sample_names[] =
+static const char *const ripcord_sample_names[] =
 {
 	"*ripcord",
 	"splash.wav",
@@ -42,13 +42,13 @@ static const char *ripcord_sample_names[] =
 	0
 };
 
-struct Samplesinterface ripcord_samples_interface =
+const struct Samplesinterface ripcord_samples_interface =
 {
 	4,	/* 4 channels */
 	ripcord_sample_names
 };
 
-static const char *robotbwl_sample_names[] =
+static const char *const robotbwl_sample_names[] =
 {
 	"*robotbwl",
 	"hit.wav",
@@ -59,7 +59,7 @@ static const char *robotbwl_sample_names[] =
 	0
 };
 
-struct Samplesinterface robotbwl_samples_interface =
+const struct Samplesinterface robotbwl_samples_interface =
 {
 	5,	/* 5 channels */
 	robotbwl_sample_names

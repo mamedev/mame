@@ -18,7 +18,7 @@
 
 
 /* sample file names */
-static const char *depthch_sample_names[] =
+static const char *const depthch_sample_names[] =
 {
 	"*depthch",
 	"longex.wav",
@@ -29,7 +29,7 @@ static const char *depthch_sample_names[] =
 };
 
 
-static struct Samplesinterface depthch_samples_interface =
+static const struct Samplesinterface depthch_samples_interface =
 {
 	4,
 	depthch_sample_names
