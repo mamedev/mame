@@ -86,7 +86,7 @@ const struct OKIM6295interface okim6295_interface_region_4_pin7low = { REGION_SO
 static void compute_tables(void)
 {
 	/* nibble to bit map */
-	static int nbl2bit[16][4] =
+	static const int nbl2bit[16][4] =
 	{
 		{ 1, 0, 0, 0}, { 1, 0, 0, 1}, { 1, 0, 1, 0}, { 1, 0, 1, 1},
 		{ 1, 1, 0, 0}, { 1, 1, 0, 1}, { 1, 1, 1, 0}, { 1, 1, 1, 1},

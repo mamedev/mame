@@ -25,4 +25,4 @@ void taito_f3_soundsystem_reset(void);
 
 ADDRESS_MAP_EXTERN(f3_sound_map);
 
-extern struct ES5505interface es5505_interface;
+extern const struct ES5505interface es5505_interface;

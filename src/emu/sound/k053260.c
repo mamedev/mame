@@ -95,7 +95,7 @@ INLINE int limit( int val, int max, int min ) {
 #define MINOUT -0x8000
 
 static void K053260_update( void * param, stream_sample_t **inputs, stream_sample_t **buffer, int length ) {
-	static long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
+	static const long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
 
 	int i, j, lvol[4], rvol[4], play[4], loop[4], ppcm_data[4], ppcm[4];
 	unsigned char *rom[4];

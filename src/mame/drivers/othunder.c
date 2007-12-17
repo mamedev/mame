@@ -419,7 +419,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 
 static READ16_HANDLER( othunder_lightgun_r )
 {
-	static const char *dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
+	static const char *const dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
 	return readinputportbytag(dswname[offset]);
 }
 
@@ -689,7 +689,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irqhandler,
 	REGION_SOUND2,	/* Delta-T */

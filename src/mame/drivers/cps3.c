@@ -2478,7 +2478,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 //static struct sh2_config sh2cp_conf_slave  = { 1 };
 
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	cps3_sh_start
 };
@@ -2497,13 +2497,13 @@ static TIMER_CALLBACK( fastboot_timer_callback )
 	cpunum_set_reg(0,SH2_VBR, 0x6000000);
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	1,                                      /* 1 SCSI device */
 	{ { SCSI_ID_1, 0, SCSI_DEVICE_CDROM } } /* SCSI ID 2, using CD 0, and it's a CD-ROM */
 };
 
-static struct WD33C93interface scsi_intf =
+static const struct WD33C93interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	NULL			/* command completion IRQ */

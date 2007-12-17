@@ -594,13 +594,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	ym2151_irq_gen
 };
 
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	REGION_SOUND1
 };

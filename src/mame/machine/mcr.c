@@ -101,7 +101,7 @@ static WRITE8_HANDLER( ipu_break_changed );
  *
  *************************************/
 
-gfx_layout mcr_bg_layout =
+const gfx_layout mcr_bg_layout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -113,7 +113,7 @@ gfx_layout mcr_bg_layout =
 };
 
 
-gfx_layout mcr_sprite_layout =
+const gfx_layout mcr_sprite_layout =
 {
 	32,32,
 	RGN_FRAC(1,4),
@@ -199,14 +199,14 @@ static void ipu_ctc_interrupt(int state)
 }
 
 
-struct z80_irq_daisy_chain mcr_daisy_chain[] =
+const struct z80_irq_daisy_chain mcr_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */
 };
 
 
-struct z80_irq_daisy_chain mcr_ipu_daisy_chain[] =
+const struct z80_irq_daisy_chain mcr_ipu_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 1 }, /* CTC number 1 */
 	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 1 }, /* PIO number 1 */
@@ -238,7 +238,7 @@ static z80ctc_interface nflfoot_ctc_intf =
 };
 
 
-static z80pio_interface nflfoot_pio_intf =
+static const z80pio_interface nflfoot_pio_intf =
 {
 	ipu_ctc_interrupt,
 	0,

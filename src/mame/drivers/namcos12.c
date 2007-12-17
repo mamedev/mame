@@ -14,42 +14,35 @@
     - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
 
 
+Namco System 12 - Arcade PSX Hardware
+=====================================
+
 Game & software revision                 Company/Year            CPU board   Mother board        Daughter board   Keycus
 ------------------------------------------------------------------------------------------------------------------------
-*Aerosmith - Quest for Fame              (C) Namco,        2001
 Aqua Rush (AQ1/VER.A1)                   (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC053
-*Attack Pla-Rail                         (C) Tomy/Namco,   199?
 Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M10X64  KC035
 Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Fighting Layer (FTL0/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
-*Fighting Spirit Biography 3             (C) Namco,        1997
 Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
 Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
 Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
-*Kaiun Quiz                              (C) Namco,        199?
-*Kart Duel                               (C) Namco,        2000
+Kaiun Quiz (KW1/VER.A1)                  (C) Namco/Moss,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
 Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
 Mr Driller (DRI1/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
-*Oh Bakyuuun                             (C) Namco/Raizing,1999
-*Over Kuhn                               (C) Namco,        1999
 Paca Paca Passion (PPP1/VER.A2)          (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC038
 Paca Paca Passion Special (PSP1/VER.A)   (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC052
 Paca Paca Passion 2 (PKS1/VER.A)         (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC046
 Point Blank 2 (GNB5/VER.A)               (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
 Soul Calibur (SOC11/VER.A2)              (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
 Soul Calibur (SOC11/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
-Soul Calibur (SOC13/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
 Soul Calibur (SOC11/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
+Soul Calibur (SOC13/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
 Soul Calibur (SOC14/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER     JO 11-04-98      none
-*Soul Calibur Ver.B                      (C) Namco,        199?
-*Submarines                              (C) Namco,        199?
-*Super World Stadium '98                 (C) Namco,        1998
+Super World Stadium '98 (SS81/VER.A)     (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC025
 Super World Stadium '99 (SS91/VER.A3)    (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC043
-*Super World Stadium 2000                (C) Namco,        2000
-*Super World Stadium 2001                (C) Namco,        2001
-*Techno Drive                            (C) Namco,        1998
-*TeknoWerk                               (C) Namco,        1999
+Super World Stadium 2000 (SS01/VER.A3)   (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F4    KC055
+Super World Stadium 2001 (SS11/VER.A2)   (C) Namco,        2001  COH-716     SYSTEM12 MOTHER(C)  SYSTEM12 F2M5    KC061
 Tenkomori Shooting (TKM1/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
 Tenkomori Shooting (TKM2/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
 Tekken 3 (TET1/VER.E1)                   (C) Namco,        1996  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
@@ -58,13 +51,45 @@ Tekken 3 (TET3/VER.A)                    (C) Namco,        1996  COH-700     SYS
 Tekken 3 (TET3/VER.B)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
 Tekken Tag Tournament (TEG3/VER.B)       (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
 Tekken Tag Tournament (TEG3/VER.C1)      (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
-*Toukon Retsuden 3                       (C) Namco,        1997
-*Truck Kyosokyoku                        (C) Namco,        2000
-*Um Jammer Lammy                         (C) Namco,        1999
+Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC019
 
-* - Denotes not dumped yet. If you can help with the remaining undumped S12 games,
-    please contact me at http://www.mameworld.net/gurudumps/
-    Note that this list above may not be 100% complete. Alternative versions are also welcome :-)
+
+Wanted Games
+------------
+Aerosmith - Quest for Fame              (C) Namco,        2001
+http://www.bandainamcogames.co.jp/aa/am/vg/questforfame/
+
+Attack Pla-Rail                         (C) Tomy/Namco,   199?
+Possibly some kind of redemption game for kids
+
+Kart Duel                               (C) Namco,        2000
+http://www.bandainamcogames.co.jp/aa/am/vg/kartduel/
+
+Oh Bakyuuun                             (C) Namco/Raizing,1999
+http://www.8ing.net/prd/ohbakyun/index.html
+
+Soul Calibur Ver.B                      (C) Namco,        199?
+Probably doesn't exist
+
+Submarines                              (C) Namco,        199?
+http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=5531
+This was cancelled, only the flyer exists.
+It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
+
+Techno Drive                            (C) Namco,        1998
+http://www.bandainamcogames.co.jp/aa/am/em/techno-drive/main/index.php
+
+Tekno Werk                              (C) Namco,        1999
+Some kind of music game similar to Konami's Keyboard Mania series
+
+Truck Kyosokyoku                        (C) Namco,        2000
+http://www.bandainamcogames.co.jp/aa/am/vg/truckkyosokyoku/
+
+Um Jammer Lammy                         (C) Namco,        1999
+http://www.bandainamcogames.co.jp/aa/am/vg/umjammerlammy/#nbgiWrapper
+
+If you can help with the remaining undumped S12 games, please contact me at http://www.mameworld.net/gurudumps/
+Note that this list above may not be 100% complete. Alternative versions are also welcome :-)
 
 The Namco System 12 system comprises 3 mandatory PCB's....
 MOTHER PCB  - This is the main PCB. It holds all sound circuitry, sound ROMs, program ROMs, shared RAM, bank-switching
@@ -73,7 +98,7 @@ MOTHER PCB  - This is the main PCB. It holds all sound circuitry, sound ROMs, pr
               some of the PALs are different and it has the capability to use 1x TSOP56 ROM in the program location,
               instead of the regular TSOP40/48 ROMs. The first 2 revisions appear to be identical.
 CPU PCB     - All games use the exact same PCB. Contains main CPU/RAM and GPU/Video RAM
-ROM PCB     - There are eight known revisions of this PCB (so far). They're mostly identical except for the type and
+ROM PCB     - There are nine known revisions of this PCB (so far). They're mostly identical except for the type and
               number of ROMs used. Most have a PAL and a CPLD known as a 'KEYCUS'. Some also have an additional CPLD for
               protection.
 
@@ -110,7 +135,7 @@ Rev. (C) Main Board is only slightly different to the other revs. Mostly some PA
 PCB is wired for 1x 32M TSOP56 FlashROM (replaces 2E & 2J) and 2x 16M TSOP48 FlashROMs (replaces 2R/2P/2N/2L).
 One other difference is that the motherboard has a serial number sticker on it and the program ROMs also contain
 that same serial number, so all the games running on the Rev. C mother board have serialised ROMs. I'm not sure why,
-they're not exactly _easily_ tracable and no one cares either way ;-)
+they're not exactly _easily_ traceable and no one cares either way ;-)
   |--------------------------------------------------------------|
 |-|     SOUND.11S       |--------------|               AT28C16   |
 |                       |--------------|                         |
@@ -192,6 +217,7 @@ Notes:
       D6345        : NEC uPD6345 Serial 8-bit Shift Register IC (SOIC16)
 
       PRG.2L/PRG.2P: Main program ROMs, Intel 28F016S5 2M x8 FLASHROM (both TSOP40)
+                     or Fujitsu 29F016A 2M x8 FLASHROM (both TSOP48)
                      These ROMs are populated on the following games....
 
                                                             Test Mode S/W
@@ -202,6 +228,7 @@ Notes:
                      Ehrgeiz                   EG3 Ver.A    EG3/VER.A        MOTHER(B)
                      Golgo 13                  GLG1 Ver.A   GLG1/VER.A       MOTHER(C) (ROMs serialised)
                      Golgo 13 Kiseki no Dandou GLS1 Ver.A   GLS1/VER.A       MOTHER(C) (ROMs serialised)
+                     Kaiun Quiz                KW1 Ver.A    KW1/VER.A1       MOTHER(C) (ROMs serialised)
                      Libero Grande             LG2 Ver.A    LG2/VER.A        MOTHER(B)
                      Mr Driller                DRI1 Ver.A   DRI1/VER.A2      MOTHER(C) (ROMs serialised)
                      Paca Paca Passion         PPP1 Ver.A   PPP1/VER.A2      MOTHER(B)
@@ -211,6 +238,8 @@ Notes:
                      Soul Calibur              SOC1 Ver.A   SOC11/VER.A2     MOTHER(B)
                      Soul Calibur              SOC3 Ver.B   SOC13/VER.B      MOTHER(B)
                      Soul Calibur              SOC1 Ver.C   SOC11/VER.C      MOTHER(B)
+                     Super World Stadium 2000  SS01 Ver.A   SS01/VER.A3      MOTHER(C) (ROMs serialised)
+                     Super World Stadium 2001  SS11 Ver.A   SS11/VER.A2      MOTHER(C) (ROMs serialised)
                      Tekken Tag Tournament     TEG3 Ver.B   TEG3/VER.B       MOTHER(B)
                      Tekken Tag Tournament     TEG3 Ver.B   TEG3/VER.C1      MOTHER(B)
 
@@ -233,6 +262,7 @@ Notes:
                      Ghoul Panic               OB2 Ver.A    OB2/VER.A        MOTHER(B)
                      Soul Calibur              SOC1 Ver.B   SOC11/VER.B      MOTHER(B)
                      Soul Calibur              TET1 Ver.C   SOC14/VER.C      MOTHER  (factory upgraded from Tekken 3 to Soul Calibur)
+                     Super World Stadium '98   SS81 Ver.A   SS81/VER.A       MOTHER(B)
                      Super World Stadium '99   SS91 Ver.A   SS91/VER.A3      MOTHER(B)
                      Tekken 3                  TET1 Ver.A   TET1/VER.E1      MOTHER(B)
                      Tekken 3                  TET2 Ver.A   TET2/VER.A       MOTHER
@@ -254,7 +284,8 @@ All of the PCBs are the same size (approx 2" x 7") containing one custom connect
 PAL and a KEYCUS (which is a PLCC CPLD) and in some cases an extra TQFP CPLD.
 The PCBs are named with a special coding. First a letter M, denoting MASKROM (always SOP44), then a number denoting how
 many ROMs of that type, then another letter F, denoting FLASHROM (always TSOP40/48/56), then a number denoting how many
-ROMs of that type.
+ROMs of that type. That number is always the maximum amount of that ROM type that can be used on the PCB. The actual number
+of ROMs populated on the PCB can be less.
 
 ********
 *Type 1*
@@ -281,7 +312,7 @@ Notes:
       |----------|----|----|   |----------|----|
 
       WAVEx: 64M SOP44 MASKROM (R6 populated)
-      FLx  : Intel E28F016 TSOP40 16M FlashROM (R8 not populated)
+      FLx  : Intel E28F016 TSOP40 16M FlashROM or Fujitsu 29F016A TSOP48 16M FlashROM (R8 not populated)
       ROM0x: 64M SOP44 MASKROM (size fixed at 64M, no configure options)
       IC3  : MACH211 CPLD (PLCC44, labelled 'KEYCUS' and stamped with 'KC' & a 3-digit number which is different per game.)
       IC4  : PALCE 16V8H (PLCC20, PCB labelled 'A_DECO', chip stamped 'A DECO')
@@ -319,6 +350,10 @@ Point Blank 2 GNB5/VER.A   Same PCB but sticker says....                  KC042 
                            'SYSTEM 12 M4F0 PCB 8661962000'                         GNB1 PRG0U.IC11, GNB1 PRG0L.IC12
                            (i.e no FlashROMs)                                      (note these ROMs contains the same data as)
                                                                                    (the ones used on System 11 Point Blank 2)
+
+Super World   SS81/VER.A   SYSTEM 12 M4F6 PCB 8661960901 (8661970901)     KC025    SS81 WAVE0, SS81 WAVE1
+Stadium '98                                                                        SS81 FL1U, SS81 FL1L, SS81 FL2U
+                                                                                   SS81 FL2L, SS81 FL3U, SS81 FL3L
 
 ********
 *Type 2*
@@ -428,6 +463,10 @@ Stadium '99                                                         (sticker KC0
                                                                                     SS91 FL4L, SS91 FL4H
                                                                                     SS91 FL3L, SS91 FL3H
 
+Super World    SS01/VER.A3  SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC055    SS01 WAVE0, SS01 WAVE1
+Stadium 2000                                                                        SS01 ROM0, SS01 ROM1, SS01 ROM2
+                                                                                    SS01 FL3L, SS01 FL3H
+
 Soul Calibur   SOC13/VER.B  SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC020    SOC1 WAVE0
                                                                                     SOC1 ROM0, SOC1 ROM1, SOC1 ROM2
                                                                                     SOC1 FL4L, SOC1 FL4H
@@ -512,6 +551,8 @@ Libero Grande  LG2/VER.A     SYSTEM 12 M8F2F PCB 8661960301 (8661970301)    KC01
                                                                                      LG1 ROM0U, LG1 ROM0L
                                                                                      LG1 FL3L, LG1 FL3U
 
+Toukon         TR1/VER.A     SYSTEM 12 M8F2F PCB 8661960301 (8661970301)    KC019    TR1 WAVE0, TR1 WAVE1    R4, R7
+Retsuden 3                                                                           TR1 ROM0U, TR1 ROM0L
 
 ********
 *Type 5*
@@ -621,37 +662,46 @@ Kiseki no Dandou                                                                
 ********
 *Type 7*
 ********
-SYSTEM 12 M10X64 PCB ?????????? (??????????)
+SYSTEM 12 M10X64 PCB 8661961500 (8661971500)
 |----------------------------------------------------------|
 |WAVE0                                                     |
-|                ROM0L    ROM0U     ROM2L   ROM3L    ROM4L |
-|                                                          |
-|                ROM1L    ROM1U     ROM2U   ROM3U    ROM4U |
+|              ROM3L ROM3U ROM2L ROM2U   ROM1L    ROM0L    |
+|         IC4                                              |
+|                                        ROM1U    ROM0U    |
 |                                                          |
 |WAVE1                                                     |
 |           KEYCUS |-------------------|                   |
 |                  |-------------------|                   |
 |----------------------------------------------------------|
 Notes:
-      Due to the lack of documentation, the follow is unknown.....
-      - The presence or absence of zero Ohm resistor jumpers to set the ROM sizes.
-      - The locations of the ROMs and KEYCUS.
-      - The PCB number.
-      - The presence or absence of a PAL.
+      This PCB has zero Ohm resistor jumpers to set the ROM sizes.
+      Note X means 'not populated', O means 'populated'
+      |----------|----|----|
+      |   MASK   | R4 | R5 |
+      |----------|----|----|
+      | WAVE 32M | O  | X  |
+      |      64M | X  | O  |
+      |----------|----|----|
 
-      WAVEx : 64M SOP44 MASKROM
-      ROMx  : 64M SOP44 MASKROM
-      KEYCUS: MACH211 CPLD (PLCC44, labelled 'KEYCUS' and stamped with 'KC' & a 3-digit number which is different per game.)
+      WAVEx : 32M/64M SOP44 MASKROM
+      ROMx  : 64M SOP44 MASKROM (size fixed at 64M, no configure options)
+      KEYCUS: CY37064 CPLD (PLCC44, labelled 'KEYCUS' and stamped with 'KC' & a 3-digit number which is different per game.)
+      IC4   : PALCE 16V8H (PLCC20, PCB labelled 'A_DECO', chip stamped 'S12M10X')
 
 This PCB is used on:
 
                Software
 Game           Revision      PCB                                            KEYCUS   ROMs Populated
 -----------------------------------------------------------------------------------------------------------
-Derby Quiz My  MDH1/VER.A2   SYSTEM 12 M10X64 PCB ?????????? (??????????)   KC035    MDH1 WAVE0
+Derby Quiz My  MDH1/VER.A2   SYSTEM 12 M10X64 PCB 8661961500 (8661971500)   KC035    MDH1 WAVE0
 Dream Horse                                                                          MDH1 ROM0L, MDH1 ROM1L
                                                                                      MDH1 ROM2L, MDH1 ROM0U
                                                                                      MDH1 ROM1U, MDH1 ROM2U
+
+Kaiun Quiz     KW1/VER.A1    SYSTEM 12 M10X64 PCB 8661961500 (8661971500)   KC050    KW1 WAVE0
+                                                                                     KW1 ROM0L, KW1 ROM1L
+                                                                                     KW1 ROM2L, KW1 ROM0U
+                                                                                     KW1 ROM1U, KW1 ROM2U
 
 ********
 *Type 8*
@@ -694,10 +744,45 @@ Soul Calibur   SOC14/VER.C   JO 11-04-98                                    ----
                                                                                      ROM1-1, ROM2, ROM2-1
                                                                                      FL3, FL4
 
+********
+*Type 9*
+********
+SYSTEM 12 F2M5 PCB 8661962600 (8661972600)
+|----------------------------------------------------------|
+|WAVE0.IC2      IC4                                        |
+|                                     ROM0.IC7             |
+|                   FL1L.IC5   FL1U.IC6                    |
+|                                           ROM1.IC8       |
+|                                                          |
+|WAVE1.IC1                                         ROM2.IC9|
+|             IC3  |-------------------|                   |
+|                  |-------------------|                   |
+|----------------------------------------------------------|
+Notes:
+      WAVEx: 64M SOP44 MASKROM
+      FLx  : Intel Flash DA28F640J5 64M FlashROM (SSOP56)
+      ROMx : 64M SOP44 MASKROM
+      IC3  : CY37064 CPLD (PLCC44, labelled 'KEYCUS' and stamped with 'KC' & a 3-digit number which is different per game.)
+      IC4  : GAL22V10 (PLCC28, PCB labelled 'S12F2M', chip stamped 'S12F2M')
+
+This PCB is used on:
+
+               Software
+Game           Revision     PCB                                            KEYCUS   ROMs Populated
+-------------------------------------------------------------------------------------------------------------------
+Super World    SS11/VER.A2  SYSTEM 12 F2M5 PCB 8661962600 (8661972600)     KC061    SS01 WAVE0, SS01 WAVE1
+Stadium 2001                                                                        SS01 ROM0, SS01 ROM1, SS01 ROM2
+                                                                                    SS11FL1L, SS11FL1U
+
 
 CPU PCB
 -------
-COH-700 GP-15
+
+There are 2 known types (so far). Type 1 is the most common.
+
+Type 1
+------
+COH-700 GP-15 (manufactured by Sony)
 |-------------------------------------------|
 |    74F74   74ALS08                        |
 |                                           |
@@ -726,6 +811,23 @@ Notes:
       CXD8654Q   : Sony CXD8654Q GPU (QFP208)
       CXD8661R   : Sony CXD8661R R3000A-based CPU (QFP208)
       MC44200FT  : Motorola MC44200FT Triple 8-bit Video DAC (QFP44)
+
+Type 2
+------
+      SYSTEM12 COH716 PCB 8661962301 (8661972301)
+      (manufactured by Namco, probably in 2001, under licence from Sony)
+      Component layout is identical to COH-700 PCB with some updated components. Generally
+      it has 2X the amount of video RAM and 4X the amount of program RAM that the COH-700 PCB has.
+      KM4132G271Q replaced with OKI 54V25632A 256k x 32-bit x 2 Banks SGRAM (x2, QFP100)
+      KM416V1204 replaced with Samsung Electronics K4E6416120D 4M x16 EDO DRAM (x2, TSOP44)
+      Updated Sony CXD8561CQ GPU (QFP208)
+      Updated Sony CXD8606BQ R3000A-based CPU (QFP208)
+      Updated Motorola MC141685FT Video DAC (QFP44)
+
+      The Type 2 PCB is used only by Super World Stadium 2001 (so far)
+      Note, this CPU PCB was tested with some of the older S12 games and
+      they worked fine, so it seems to be 100% compatible with all S12 games.
+      The older COH-700 CPU board will also work with SWS2001.
 
 
 NETWORK PCB
@@ -838,7 +940,14 @@ INLINE void verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", activecpu_get_pc(), buf );
+		if( cpu_getactivecpu() != -1 )
+		{
+			logerror( "%08x: %s", activecpu_get_pc(), buf );
+		}
+		else
+		{
+			logerror( "(timer) : %s", buf );
+		}
 	}
 }
 
@@ -931,37 +1040,56 @@ static WRITE32_HANDLER( dmaoffset_w )
 
 static void namcos12_rom_read( UINT32 n_address, INT32 n_size )
 {
-	INT32 n_left;
+	int n_region;
+	int n_offset;
+
+	INT32 n_ramleft;
+	INT32 n_romleft;
+
 	UINT32 *p_n_src;
 	UINT32 *p_n_dst;
 
-	verboselog( 1, "namcos12_rom_read( %08x, %08x )\n", n_address, n_size );
-
 	if( ( m_n_dmaoffset >= 0x80000000 ) || ( m_n_dmabias == 0x1f300000 ) )
 	{
-		p_n_src = (UINT32 *)( memory_region( REGION_USER1 ) + ( m_n_dmaoffset & 0x003fffff ) );
+		n_region = REGION_USER1;
+		n_offset = m_n_dmaoffset & 0x003fffff;
+		verboselog( 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
 	}
 	else if( m_n_tektagdmaoffset >= 0x00000000 && m_n_tektagdmaoffset <= 0x03800000 )
 	{
-		p_n_src = (UINT32 *)( memory_region( REGION_USER2 ) + ( m_n_tektagdmaoffset & 0x7fffffff ) );
+		n_region = REGION_USER2;
+		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
+		verboselog( 1, "namcos12_rom_read( %08x, %08x ) tektag1 %08x\n", n_address, n_size, n_offset );
 	}
 	else if( m_n_tektagdmaoffset >= 0x04000000 && m_n_tektagdmaoffset <= 0x04400000 )
 	{
-		p_n_src = (UINT32 *)( memory_region( REGION_USER1 ) + ( m_n_tektagdmaoffset & 0x003fffff ) );
+		n_region = REGION_USER1;
+		n_offset = m_n_tektagdmaoffset & 0x003fffff;
+		verboselog( 1, "namcos12_rom_read( %08x, %08x ) tektag2 %08x\n", n_address, n_size, n_offset );
 	}
 	else
 	{
-		p_n_src = (UINT32 *)( memory_region( REGION_USER2 ) + ( m_n_dmaoffset & 0x7fffffff ) );
+		n_region = REGION_USER2;
+		n_offset = m_n_dmaoffset & 0x7fffffff;
+		verboselog( 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
+	p_n_src = (UINT32 *)( memory_region( n_region ) + n_offset );
+	n_romleft = ( memory_region_length( n_region ) - n_offset ) / 4;
+	if( n_size > n_romleft )
+	{
+		verboselog( 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
+		n_size = n_romleft;
+	}
 
 	p_n_dst = &g_p_n_psxram[ n_address / 4 ];
-
-	n_left = ( g_n_psxramsize - n_address ) / 4;
-	if( n_size > n_left )
+	n_ramleft = ( g_n_psxramsize - n_address ) / 4;
+	if( n_size > n_ramleft )
 	{
-		n_size = n_left;
+		verboselog( 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
+		n_size = n_ramleft;
 	}
+
 	while( n_size > 0 )
 	{
 		*( p_n_dst++ ) = *( p_n_src++ );
@@ -1131,6 +1259,8 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "tenkomoj" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tenkomor" ) == 0 ||
 		strcmp( machine->gamedrv->name, "ptblank2" ) == 0 ||
+		strcmp( machine->gamedrv->name, "sws2000" ) == 0 ||
+		strcmp( machine->gamedrv->name, "sws2001" ) == 0 ||
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
@@ -1192,7 +1322,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 {
 	UINT8 ret = 0;
 	mame_system_time systime;
-	static int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
+	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
 	mame_get_current_datetime(Machine, &systime);
 
@@ -1328,7 +1458,7 @@ static ADDRESS_MAP_START( s12h8iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 
-static struct C352interface c352_interface =
+static const struct C352interface c352_interface =
 {
 	REGION_SOUND1
 };
@@ -1666,6 +1796,26 @@ ROM_START( ghlpanic )
 	ROM_LOAD( "ob1wave.ic2",           0x000000, 0x800000, CRC(e7bc7202) SHA1(f0f598304866ebe62642eaac6b7d8709baa14fe1) )
 ROM_END
 
+ROM_START( kaiunqz )
+	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
+        ROM_LOAD16_BYTE( "kw1vera.2l",   0x000000, 0x200000, CRC(fd1d2324) SHA1(eedb4627dfa17e9aac2c99592628f1fa7060edb5) )
+        ROM_LOAD16_BYTE( "kw1vera.2p",   0x000001, 0x200000, CRC(d8bdea6b) SHA1(d32118846a1f43eecff7f56dcda03adf04975784) )
+
+	ROM_REGION32_LE( 0x3000000, REGION_USER2, 0 ) /* main data */
+        ROM_LOAD16_BYTE( "kw1rom0l.12",  0x0000000, 0x800000, CRC(e0768f0b) SHA1(3ffec7c789a95fcff7f06432723f155b99a20c42) )
+        ROM_LOAD16_BYTE( "kw1rom0u.11",  0x0000001, 0x800000, CRC(04101a16) SHA1(c2d79333ee382e2fea229bba23918fb5f88a25d4) )
+        ROM_LOAD16_BYTE( "kw1rom1l.10",  0x1000000, 0x800000, CRC(6a4edfa6) SHA1(a59fa28446b28db28b38368c794af71e673f69a2) )
+        ROM_LOAD16_BYTE( "kw1rom1u.9",   0x1000001, 0x800000, CRC(e6150b0d) SHA1(7dd1ba524246aea007e7bd6d3e7d457033b23a09) )
+        ROM_LOAD16_BYTE( "kw1rom2l.7",   0x2000000, 0x800000, CRC(21c376e4) SHA1(4b82494c1e13ebcea3c4e97803c0667be73bf6ae) )
+        ROM_LOAD16_BYTE( "kw1rom2u.8",   0x2000001, 0x800000, CRC(d850c222) SHA1(802c1782b323802eae871e2b9ccc5eae34277861) )
+
+	ROM_REGION( 0x0080000, REGION_CPU2, 0 ) /* sound prg */
+        ROM_LOAD16_WORD_SWAP( "kw1vera.11s",  0x000000, 0x080000, CRC(d863fafa) SHA1(3c2bb38c24165e3a1a4d1d257fcfc019b63d5199) )
+
+	ROM_REGION( 0x0800000, REGION_SOUND1, 0 ) /* samples */
+        ROM_LOAD( "kw1wave0.2",   0x000000, 0x800000, CRC(060e52ae) SHA1(7ea95cae9d3c648163b225d0c7d365644be90241) )
+ROM_END
+
 ROM_START( lbgrande )
 	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "lg2vera.2l",   0x0000000, 0x200000, CRC(5ed6b152) SHA1(fdab457862bd6e0a3178c9329bd0978b6aa3ae2f) )
@@ -1889,6 +2039,27 @@ ROM_START( soulclbd )
 	ROM_LOAD( "soc1wave0.2",         0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
+ROM_START( sws98 )
+	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ss81vera.2l",  0x0000000, 0x200000, CRC(94b1f34c) SHA1(0c8491fda366b5b2874e5f49959dccd11d372e46) )
+	ROM_LOAD16_BYTE( "ss81vera.2p",  0x0000001, 0x200000, CRC(7d0ed33d) SHA1(34342ce57b29ee15c6279c099bb145ac7ad262f3) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_USER2, 0 ) /* main data */
+	ROM_LOAD16_BYTE( "ss81fl1l.9",   0x1000000, 0x200000, CRC(b0b5dc77) SHA1(abce4e6ae60858b7c7408d10975b7a1e0d183115) )
+	ROM_LOAD16_BYTE( "ss81fl1u.10",  0x1000001, 0x200000, CRC(e526dba5) SHA1(889fdfba17282eb05a3e254af81ee15c3e16acc4) )
+	ROM_LOAD16_BYTE( "ss81fl2l.7",   0x1400000, 0x200000, CRC(2dc6f6b5) SHA1(e6c7bb804d7d027acca5adb15b0bb95321905ff3) )
+	ROM_LOAD16_BYTE( "ss81fl2u.8",   0x1400001, 0x200000, CRC(c8341c9f) SHA1(b7c5a960a238e963c7ec5bdb0751a8730d3b09f7) )
+	ROM_LOAD16_BYTE( "ss81fl3l.5",   0x1800000, 0x200000, CRC(ce5d2a96) SHA1(08f3955e1ce949ce436f6f2f19fd42204682ae8c) )
+	ROM_LOAD16_BYTE( "ss81fl3u.6",   0x1800001, 0x200000, CRC(02df4df8) SHA1(01fd66c905cde9ca073dc4b6dbd826c5fe96b79b) )
+
+	ROM_REGION( 0x0080000, REGION_CPU2, 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ss81vera.11s", 0x0000000, 0x080000, CRC(c6bc5c31) SHA1(c6ef46c3fa8a7749618126d360e614ea6c8d9c54) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "ss81wave0.2",         0x0000000, 0x800000, CRC(1c5e2ff1) SHA1(4f29dfd49f6b5c3ca3b758823d368051354bd673) )
+	ROM_LOAD( "ss81wave1.1",         0x0800000, 0x800000, CRC(5f4c8861) SHA1(baee7182c32bc064d805de5a16948faf78941ac4) )
+ROM_END
+
 ROM_START( sws99 )
 	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "ss91vera.2e",  0x0000000, 0x200000, CRC(4dd928d7) SHA1(d76c0f52d1a2cd101a6879e6ff57ed1c52b5e228) )
@@ -1909,6 +2080,46 @@ ROM_START( sws99 )
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
 	ROM_LOAD( "ss91wave0.2",         0x0000000, 0x800000, CRC(1c5e2ff1) SHA1(4f29dfd49f6b5c3ca3b758823d368051354bd673) )
 	ROM_LOAD( "ss91wave1.1",         0x0800000, 0x800000, CRC(5f4c8861) SHA1(baee7182c32bc064d805de5a16948faf78941ac4) )
+ROM_END
+
+ROM_START( sws2000 )
+	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
+        ROM_LOAD16_BYTE( "ss01vera.2l",  0x000000, 0x200000, CRC(6ddbdcaa) SHA1(cff31d75e7780851b2c2c025ee34fd8990e2f502) )
+        ROM_LOAD16_BYTE( "ss01vera.2p",  0x000001, 0x200000, CRC(6ade7d28) SHA1(3e8d7bc9a284324c4de0ac265872b613d108cb57) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_USER2, 0 ) /* main data */
+        ROM_LOAD( "ss01rom0.9",   0x0000000, 0x800000, CRC(c08cc59c) SHA1(f2d8064491c98acbb40260d7f13d0f9b394c1383) )
+        ROM_LOAD( "ss01rom1.10",  0x0800000, 0x800000, CRC(d4aa1dc6) SHA1(68fcb60aadf35668d7d746da1e29d5d985e40aec) )
+        ROM_LOAD( "ss01rom2.11",  0x1000000, 0x800000, CRC(3371904a) SHA1(58bbf98a44560bc021bac4bc513fe89deea85b50) )
+        ROM_LOAD16_BYTE( "ss01fl3l.7",   0x1800000, 0x200000, CRC(35bad813) SHA1(19ceffb78695c8c22b30659aad56ac237ffb56ac) )
+        ROM_LOAD16_BYTE( "ss01fl3h.8",   0x1800001, 0x200000, CRC(a14828fc) SHA1(fd8a052451f74f420f4a4a2b902e0c2e83e3239b) )
+
+	ROM_REGION( 0x0080000, REGION_CPU2, 0 ) /* sound prg */
+        ROM_LOAD16_WORD_SWAP( "ss01vera.11s", 0x000000, 0x080000, CRC(641e6584) SHA1(dfc0ac21bea5b19dbce5d50fb681854889d756dc) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
+        ROM_LOAD( "ss01wave0.2",  0x000000, 0x800000, CRC(1c5e2ff1) SHA1(4f29dfd49f6b5c3ca3b758823d368051354bd673) )
+        ROM_LOAD( "ss01wave1.1",  0x800000, 0x800000, CRC(5f4c8861) SHA1(baee7182c32bc064d805de5a16948faf78941ac4) )
+ROM_END
+
+ROM_START( sws2001 )
+	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
+        ROM_LOAD16_BYTE( "ss11vera.2l",  0x000000, 0x200000, CRC(a7b4dbe5) SHA1(1bcb8d127388e2ead9ca04b527779896c69daf7f) )
+        ROM_LOAD16_BYTE( "ss11vera.2p",  0x000001, 0x200000, CRC(3ef76b4e) SHA1(34c21b6002d3f88aa3f4b4606c8aace24be92920) )
+
+	ROM_REGION32_LE( 0x2800000, REGION_USER2, 0 ) /* main data */
+        ROM_LOAD( "ss01rom0.9",   0x0000000, 0x800000, CRC(c08cc59c) SHA1(f2d8064491c98acbb40260d7f13d0f9b394c1383) )
+        ROM_LOAD( "ss01rom1.10",  0x0800000, 0x800000, CRC(d4aa1dc6) SHA1(68fcb60aadf35668d7d746da1e29d5d985e40aec) )
+        ROM_LOAD( "ss01rom2.11",  0x1000000, 0x800000, CRC(3371904a) SHA1(58bbf98a44560bc021bac4bc513fe89deea85b50) )
+        ROM_LOAD16_BYTE( "ss11fl1l.5",   0x1800000, 0x800000, CRC(0546a2b4) SHA1(b61457c9c5136f94ace48e83de8043ce20ca4d99) )
+        ROM_LOAD16_BYTE( "ss11fl1u.6",   0x1800001, 0x800000, CRC(b3de0b2c) SHA1(a89d3a2eb0952a98cc4765af2897b94136ca58ad) )
+
+	ROM_REGION( 0x0080000, REGION_CPU2, 0 ) /* sound prg */
+        ROM_LOAD16_WORD_SWAP( "ss01vera.11s", 0x000000, 0x080000, CRC(641e6584) SHA1(dfc0ac21bea5b19dbce5d50fb681854889d756dc) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
+        ROM_LOAD( "ss01wave0.2",  0x000000, 0x800000, CRC(1c5e2ff1) SHA1(4f29dfd49f6b5c3ca3b758823d368051354bd673) )
+        ROM_LOAD( "ss01wave1.1",  0x800000, 0x800000, CRC(5f4c8861) SHA1(baee7182c32bc064d805de5a16948faf78941ac4) )
 ROM_END
 
 ROM_START( tekken3 )
@@ -2149,11 +2360,29 @@ ROM_START( tenkomoj )
 	ROM_LOAD( "tkm1wave1.1",  0x0800000, 0x800000, CRC(7567796b) SHA1(99e4b867477da2ccddfa9bebc4be84adc5cba53c) )
 ROM_END
 
+ROM_START( toukon3 )
+	ROM_REGION32_LE( 0x00400000, REGION_USER1, 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tr1vera.2e",  0x000000, 0x200000, CRC(126ebb73) SHA1(de429e335e03f2b5116fc50f556a5507475a0535) )
+	ROM_LOAD16_BYTE( "tr1vera.2j",  0x000001, 0x200000, CRC(2edb3ad2) SHA1(d1d2d78b781c7f6fb5a201785295daa825ad057e) )
+
+	ROM_REGION32_LE( 0x1c00000, REGION_USER2, 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tr1rom0l.6", 0x0000000, 0x400000, CRC(42946d26) SHA1(dc7944cb6daceda41ecee7a4e3f549cba916ab87) )
+	ROM_LOAD16_BYTE( "tr1rom0u.9", 0x0000001, 0x400000, CRC(e3cd0be0) SHA1(f27d14cd086b5961be33e635662aca89a5e8c857) )
+
+	ROM_REGION( 0x0080000, REGION_CPU2, 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "tr1vera.11s", 0x0000000, 0x080000, CRC(f9ecbd19) SHA1(ad64f95ef85ee5c45dcf15217ea5adff61fddba6) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "tr1wave0.5",  0x0000000, 0x400000, CRC(07d10e55) SHA1(3af8f7019a221981984741181b6be98e2315d441) )
+	ROM_LOAD( "tr1wave1.4",  0x0400000, 0x400000, CRC(34539cdd) SHA1(afb7079c0f447fbda285a5b97a37c04baf26db75) )
+ROM_END
+
 GAME( 1996, tekken3,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Tekken 3 (TET1/VER.E1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1996, tekken3a,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Tekken 3 (TET2/VER.B)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Tekken 3 (TET3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1996, tekken3c,  tekken3,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Tekken 3 (TET2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Libero Grande (LG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC006 */
+GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12, ROT0, "Tomy/Namco",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC019 */
 GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC14/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1998, soulclba,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.C)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
 GAME( 1998, soulclbb,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC13/VER.B)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
@@ -2161,7 +2390,9 @@ GAME( 1998, soulclbc,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1998, soulclbd,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
 GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, ehrgeiza,  ehrgeiz,  coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
+GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Kaiun Quiz (KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Derby Quiz My Dream Horse (MDH1/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC035 */
+GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium '98 (SS81/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC0?? */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12, ROT90, "Namco",        "Tenkomori Shooting (TKM2/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, tenkomoj,  tenkomor, coh700,   namcos12, namcos12, ROT90, "Namco",        "Tenkomori Shooting (TKM1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */
 GAME( 1998, fgtlayer,  0,        coh700,   namcos12, namcos12, ROT0, "Arika/Namco",   "Fighting Layer (FTL0/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC037 */
@@ -2179,3 +2410,6 @@ GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12, ROT0, "Produce/Na
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Aqua Rush (AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
 GAME( 1999, golgo13,   0,        coh700,   golgo13,  golgo13,  ROT0, "Raizing/Namco", "Golgo 13 (GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
 GAME( 1999, g13knd,    0,        coh700,   golgo13,  golgo13,  ROT0, "Raizing/Namco", "Golgo 13 Kiseki no Dandou (GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
+GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium 2000 (SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
+GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium 2001 (SS11/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC061 */
+

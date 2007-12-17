@@ -233,7 +233,7 @@ static READ8_HANDLER(t5182_sharedram_semaphore_main_r)
 }
 
 
-struct YM2151interface t5182_ym2151_interface =
+const struct YM2151interface t5182_ym2151_interface =
 {
 	t5182_ym2151_irq_handler
 };

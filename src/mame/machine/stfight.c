@@ -170,7 +170,7 @@ WRITE8_HANDLER( stfight_coin_w )
  *      Machine hardware for MSM5205 ADPCM sound control
  */
 
-static int sampleLimits[] =
+static const int sampleLimits[] =
 {
     0x0000,     // machine gun fire?
     0x1000,     // player getting shot

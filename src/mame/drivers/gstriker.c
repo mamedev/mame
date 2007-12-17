@@ -276,7 +276,7 @@ static void gs_ym2610_irq(int irq)
 		cpunum_set_input_line(1, 0, CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	gs_ym2610_irq,
 	REGION_SOUND1,

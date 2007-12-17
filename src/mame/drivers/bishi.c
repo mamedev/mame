@@ -256,7 +256,7 @@ static void sound_irq_gen(int state)
 		cpunum_set_input_line(0, MC68000_IRQ_1, CLEAR_LINE);
 }
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	sound_irq_gen

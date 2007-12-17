@@ -700,7 +700,7 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 {
 	UINT8 ret = 0;
 	mame_system_time systime;
-	static int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
+	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
 	mame_get_current_datetime(Machine, &systime);
 
@@ -837,7 +837,7 @@ static GFXDECODE_START( namcos23 )
 	GFXDECODE_ENTRY( 0, 0, namcos23_cg_layout,  0, 0x80 )
 GFXDECODE_END
 
-static struct mips3_config config =
+static const struct mips3_config config =
 {
 	8192,				/* code cache size - VERIFIED */
 	8192				/* data cache size - VERIFIED */
@@ -847,7 +847,7 @@ static INTERRUPT_GEN( namcos23_interrupt )
 {
 }
 
-static struct C352interface c352_interface =
+static const struct C352interface c352_interface =
 {
 	REGION_SOUND1
 };

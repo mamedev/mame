@@ -337,7 +337,7 @@ static void ChangePC_32(offs_t pc)
 /* Structures pointing to various I/O functions */
 /************************************************/
 
-static struct cpu_info v60_i =
+static const struct cpu_info v60_i =
 {
 	MemRead8_16,  MemWrite8_16,  MemRead16_16,  MemWrite16_16,  MemRead32_16,  MemWrite32_16,
 	PortRead8_16, PortWrite8_16, PortRead16_16, PortWrite16_16, PortRead32_16, PortWrite32_16,
@@ -346,7 +346,7 @@ static struct cpu_info v60_i =
 	0xfffff0
 };
 
-static struct cpu_info v70_i =
+static const struct cpu_info v70_i =
 {
 	MemRead8_32,  MemWrite8_32,  MemRead16_32,  MemWrite16_32,  MemRead32_32,  MemWrite32_32,
 	PortRead8_32, PortWrite8_32, PortRead16_32, PortWrite16_32, PortRead32_32, PortWrite32_32,

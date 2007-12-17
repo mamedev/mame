@@ -47,7 +47,7 @@ static UINT8 cidelsa_ef_r(void)
 	return (cdp1869_prd & 0x01) + (readinputportbytag("EF") & 0xfe);
 }
 
-static CDP1802_CONFIG cidelsa_cdp1802_config =
+static const CDP1802_CONFIG cidelsa_cdp1802_config =
 {
 	cidelsa_mode_r,
 	cidelsa_ef_r,
@@ -148,7 +148,7 @@ static WRITE8_HANDLER ( draco_ay8910_port_b_w )
     */
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	0,

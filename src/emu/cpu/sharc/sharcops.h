@@ -5,7 +5,7 @@ typedef struct
 	void (* handler)(void);
 } SHARC_OP;
 
-static SHARC_OP sharc_opcode_table[] =
+static const SHARC_OP sharc_opcode_table[] =
 {
 	//  |0 0 1|
 	{	0xe000,		0x2000,		sharcop_compute_dreg_dm_dreg_pm						},

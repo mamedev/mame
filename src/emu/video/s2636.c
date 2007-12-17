@@ -76,7 +76,7 @@
 #include "driver.h"
 #include "s2636.h"
 
-static int SpriteOffset[4] = {0,0x10,0x20,0x40};
+static const int SpriteOffset[4] = {0,0x10,0x20,0x40};
 
 /* To adjust sprites against bitmap */
 

@@ -414,7 +414,7 @@ void decrypt_cthd2003(void)
 static WRITE16_HANDLER ( cthd2003_bankswitch_w )
 {
 	int bankaddress;
-	static int cthd2003_banks[8] =
+	static const int cthd2003_banks[8] =
 	{
 		1,0,1,0,1,0,3,2,
 	};

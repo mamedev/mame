@@ -27,7 +27,7 @@ static const rgb_t geebee_palette[] =
 	MAKE_RGB(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-static UINT16 geebee_colortable[] =
+static const UINT16 geebee_colortable[] =
 {
 	 0, 1,
 	 1, 0,
@@ -35,7 +35,7 @@ static UINT16 geebee_colortable[] =
 	 2, 0
 };
 
-static UINT16 navarone_colortable[] =
+static const UINT16 navarone_colortable[] =
 {
 	 0, 2,
 	 2, 0,

@@ -564,7 +564,7 @@ WRITE32_HANDLER( n64_dp_reg_w )
 }
 
 
-rsp_config n64_rsp_config =
+const rsp_config n64_rsp_config =
 {
 	n64_dp_reg_r,
 	n64_dp_reg_w,

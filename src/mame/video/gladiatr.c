@@ -204,7 +204,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
-		static int tile_offset[2][2] =
+		static const int tile_offset[2][2] =
 		{
 			{0x0,0x1},
 			{0x2,0x3},

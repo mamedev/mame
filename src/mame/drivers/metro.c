@@ -517,7 +517,7 @@ static void metro_sound_irq_handler(int state)
 	cpunum_set_input_line(1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	metro_sound_irq_handler	/* irq handler */
 };
@@ -555,7 +555,7 @@ static WRITE16_HANDLER( ymf278b_w )
 }
 
 
-static struct YMF278B_interface ymf278b_interface =
+static const struct YMF278B_interface ymf278b_interface =
 {
 	REGION_SOUND1,
 	ymf278b_interrupt
@@ -1942,7 +1942,7 @@ static void blzntrnd_irqhandler(int irq)
 	cpunum_set_input_line(1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface blzntrnd_ym2610_interface =
+static const struct YM2610interface blzntrnd_ym2610_interface =
 {
 	blzntrnd_irqhandler,
 	REGION_SOUND1,
@@ -3679,7 +3679,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static UPD7810_CONFIG metro_cpu_config =
+static const UPD7810_CONFIG metro_cpu_config =
 {
     TYPE_7810,
     metro_io_callback

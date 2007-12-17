@@ -256,7 +256,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	return 0;
 }
 
-static struct TAITO8741interface gsword_8741interface=
+static const struct TAITO8741interface gsword_8741interface=
 {
 	4,         /* 4 chips */
 	{TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT},/* program mode */
@@ -653,13 +653,13 @@ static READ8_HANDLER(f1_r)
 	return mame_rand(Machine);
 }
 
-static struct YM2203interface ppking_ym2203_interface =
+static const struct YM2203interface ppking_ym2203_interface =
 {
 	f1_r,
 	f1_r
 };
 
-static struct YM2203interface gladiatr_ym2203_interface =
+static const struct YM2203interface gladiatr_ym2203_interface =
 {
 	0,
 	gladiator_dsw3_r,         /* port B read */
@@ -668,7 +668,7 @@ static struct YM2203interface gladiatr_ym2203_interface =
 	gladiator_ym_irq          /* NMI request for 2nd cpu */
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */

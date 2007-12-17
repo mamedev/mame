@@ -83,7 +83,7 @@ READ16_HANDLER( ga2_dpram_r )
 #if 0 // simulation
 READ16_HANDLER(ga2_sprite_protection_r)
 {
-	static UINT32 prot[16] =
+	static const UINT16 prot[16] =
 	{
 		0x0a, 0,
 		0xc5, 0,
@@ -100,7 +100,7 @@ READ16_HANDLER(ga2_sprite_protection_r)
 
 READ16_HANDLER(ga2_wakeup_protection_r)
 {
-	static const char *prot =
+	static const char prot[] =
 		"wake up! GOLDEN AXE The Revenge of Death-Adder! ";
 	return prot[offset];
 }
@@ -310,7 +310,7 @@ WRITE16_HANDLER(arabfgt_protection_w)
 
 READ16_HANDLER(arf_wakeup_protection_r)
 {
-	static const char *prot =
+	static const char prot[] =
 		"wake up! ARF!                                   ";
 	return prot[offset];
 }

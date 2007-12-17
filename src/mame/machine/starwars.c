@@ -17,7 +17,7 @@
 #define kYaw		1
 #define kThrust		2
 
-/* Constants for mathbox operations */
+/* Constants for matrix processor operations */
 #define NOP			0x00
 #define LAC			0x01
 #define READ_ACC	0x02
@@ -31,6 +31,7 @@
 /* Debugging flag */
 #define MATHDEBUG	0
 
+#define MASTER_CLOCK (12096000)
 
 UINT8 *starwars_mathram;
 UINT8 *starwars_ram_overlay;
@@ -49,10 +50,17 @@ static UINT8 *PROM_STR; /* Storage for instruction strobe only */
 static UINT8 *PROM_MAS; /* Storage for direct address only */
 static UINT8 *PROM_AM; /* Storage for address mode select only */
 
+static int math_run;
+static emu_timer *math_timer;
 
 /* Local function prototypes */
-static void run_mbox(void);
+static void run_mproc(void);
 
+
+static TIMER_CALLBACK( math_run_clear )
+{
+	math_run = 0;
+}
 
 
 /*************************************
@@ -122,10 +130,11 @@ READ8_HANDLER( starwars_input_1_r )
 {
 	int x = readinputport(1);
 
-	/* Kludge to enable Starwars Mathbox Self-test                  */
-	/* The mathbox looks like it's running, from this address... :) */
-	if (activecpu_get_pc() == 0xf978 || activecpu_get_pc() == 0xf655)
+	/* set the matrix processor flag */
+	if (math_run)
 		x |= 0x80;
+	else
+		x &= ~0x80;
 
 	/* set the AVG done flag */
 	if (avgdvg_done())
@@ -169,11 +178,11 @@ WRITE8_HANDLER( starwars_adc_select_w )
 
 /*************************************
  *
- *  Mathbox initialization
+ *  Matrix Processor initialization
  *
  *************************************/
 
-void swmathbox_init(void)
+void starwars_mproc_init(void)
 {
 	UINT8 *src = memory_region(REGION_USER2);
 	int cnt, val;
@@ -195,30 +204,33 @@ void swmathbox_init(void)
 		PROM_MAS[cnt] =  val       & 0x007f;
 		PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
+
+	math_timer = timer_alloc(math_run_clear, NULL);
 }
 
 
 
 /*************************************
  *
- *  Mathbox reset
+ *  Matrix Processor reset
  *
  *************************************/
 
-void swmathbox_reset(void)
+void starwars_mproc_reset(void)
 {
 	MPA = BIC = 0;
+	math_run = 0;
 }
 
 
 
 /*************************************
  *
- *  Mathbox execution
+ *  Matrix Processor execution
  *
  *************************************/
 
-void run_mbox(void)
+void run_mproc(void)
 {
 	static INT16 A, B, C;
 	static INT32 ACC;
@@ -229,13 +241,20 @@ void run_mbox(void)
 	int M_STOP = 100000; /* Limit on number of instructions allowed before halt */
 	int MA;
 	int IP15_8, IP7, IP6_0; /* Instruction PROM values */
+	int mptime;
 
+	logerror("Running Matrix Processor...\n");
 
-	logerror("Running Mathbox...\n");
+	mptime = 0;
+	math_run = 1;
 
 	/* loop until finished */
 	while (M_STOP > 0)
 	{
+
+		/* each step of the matrix processor takes five clock cycles */
+		mptime += 5;
+
 		/* fetch the current instruction data */
 		IP15_8 = PROM_STR[MPA];
 		IP7    = PROM_AM[MPA];
@@ -341,6 +360,11 @@ void run_mbox(void)
              */
 			A = (A & 0x8000)? 0xffff: 0;
 			B = (B & 0x8000)? 0xffff: 0;
+
+			/* The multiply-add holds the main matrix processor counter
+             * for 33 cycles
+             */
+			mptime += 33;
 		}
 
 		/* 0x40 - LDB */
@@ -362,6 +386,8 @@ void run_mbox(void)
 
 		M_STOP--; /* Decrease count */
 	}
+
+	timer_adjust(math_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), mptime), 1, attotime_zero);
 }
 
 
@@ -372,7 +398,7 @@ void run_mbox(void)
  *
  *************************************/
 
-READ8_HANDLER( swmathbx_prng_r )
+READ8_HANDLER( starwars_prng_r )
 {
 	/*
      * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
@@ -394,23 +420,23 @@ READ8_HANDLER( swmathbx_prng_r )
 
 /*************************************
  *
- *  Mathbox divider
+ *  Starwars divider
  *
  *************************************/
 
-READ8_HANDLER( swmathbx_reh_r )
+READ8_HANDLER( starwars_div_reh_r )
 {
 	return (quotient_shift & 0xff00) >> 8;
 }
 
 
-READ8_HANDLER( swmathbx_rel_r )
+READ8_HANDLER( starwars_div_rel_r )
 {
 	return quotient_shift & 0x00ff;
 }
 
 
-WRITE8_HANDLER( swmathbx_w )
+WRITE8_HANDLER( starwars_math_w )
 {
 	int i;
 
@@ -419,7 +445,7 @@ WRITE8_HANDLER( swmathbx_w )
 	{
 		case 0:	/* mw0 */
 			MPA = data << 2;	/* Set starting PROM address */
-			run_mbox();			/* and run the Mathbox */
+			run_mproc();			/* and run the Matrix Processor */
 			break;
 
 		case 1:	/* mw1 */

@@ -179,7 +179,7 @@ static WRITE8_HANDLER(dummy_w)
 	//DAC ? communication with main cpu ?
 }
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	soundlatch_r,
 	0,
@@ -187,7 +187,7 @@ static struct AY8910interface ay8910_interface_1 =
 	dummy_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	0,
 	0,

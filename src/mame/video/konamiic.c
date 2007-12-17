@@ -1353,8 +1353,8 @@ if (input_code_pressed(KEYCODE_D))
 		int yflip = source[offs[4]] & 0x20;		/* flip y */
 		int color = base_color + ((source[offs[1]] & 0xf0) >> 4);
 		int width,height;
-		static int x_offset[4] = {0x0,0x1,0x4,0x5};
-		static int y_offset[4] = {0x0,0x2,0x8,0xa};
+		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
+		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
 		int x,y, ex, ey;
 
 		if (attr & 0x01) sx -= 256;
@@ -1730,8 +1730,8 @@ void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
 	for (offs = K007420_SPRITERAM_SIZE - 8; offs >= 0; offs -= 8)
 	{
 		int ox,oy,code,color,flipx,flipy,zoom,w,h,x,y,bank;
-		static int xoffset[4] = { 0, 1, 4, 5 };
-		static int yoffset[4] = { 0, 2, 8, 10 };
+		static const int xoffset[4] = { 0, 1, 4, 5 };
+		static const int yoffset[4] = { 0, 2, 8, 10 };
 
 		code = K007420_ram[offs+1];
 		color = K007420_ram[offs+2];
@@ -2682,10 +2682,10 @@ void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_
             40 41 44 45 56 57 60 61
             42 43 46 47 58 59 62 63
         */
-		static int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-		static int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
-		static int width[8] =  { 1, 2, 1, 2, 4, 2, 4, 8 };
-		static int height[8] = { 1, 1, 2, 2, 2, 4, 4, 8 };
+		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+		static const int width[8] =  { 1, 2, 1, 2, 4, 2, 4, 8 };
+		static const int height[8] = { 1, 1, 2, 2, 2, 4, 4, 8 };
 
 
 		offs = sortedlist[pri_code];
@@ -4153,8 +4153,8 @@ void K053247_sprites_draw(running_machine *machine, mame_bitmap *bitmap,const re
         40 41 44 45 56 57 60 61
         42 43 46 47 58 59 62 63
     */
-	static int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-	static int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 
 	int sortedlist[NUM_SPRITES];
 	int offs,zcode;
@@ -4551,7 +4551,7 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 		void (*callback)(int *code,int *color,int *flags))
 {
 	int gfx_index;
-	static tile_get_info_callback get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
+	static const tile_get_info_callback get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -5421,13 +5421,13 @@ static void (*K056832_callback)(int layer, int *code, int *color, int *flags);
 
 INLINE void K056832_get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int pageIndex )
 {
-	static struct K056832_SHIFTMASKS
+	static const struct K056832_SHIFTMASKS
 	{
 		int flips, palm1, pals2, palm2;
 	}
 	K056832_shiftmasks[4] = {{6,0x3f,0,0x00},{4,0x0f,2,0x30},{2,0x03,2,0x3c},{0,0x00,2,0x3f}};
 
-	struct K056832_SHIFTMASKS *smptr;
+	const struct K056832_SHIFTMASKS *smptr;
 	int layer, flip, fbits, attr, code, color, flags;
 	UINT16 *pMem;
 
@@ -7101,7 +7101,7 @@ void K055555_vh_start(void)
 void K055555_write_reg(UINT8 regnum, UINT8 regdat)
 {
 	#if VERBOSE
-	static const char *rnames[46] =
+	static const char *const rnames[46] =
 	{
 		"BGC CBLK", "BGC SET", "COLSET0", "COLSET1", "COLSET2", "COLSET3", "COLCHG ON",
 		"A PRI 0", "A PRI 1", "A COLPRI", "B PRI 0", "B PRI 1", "B COLPRI", "C PRI", "D PRI",

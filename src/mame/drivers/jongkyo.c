@@ -580,7 +580,7 @@ static PALETTE_INIT(jongkyo)
 	}
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	keyboard1_r,
 	keyboard2_r,

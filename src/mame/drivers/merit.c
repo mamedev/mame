@@ -780,7 +780,7 @@ static const ppi8255_interface ppi8255_intf =
 	{ NULL,		misc_w },		/* Port C write */
 };
 
-static struct AY8910interface merit_ay8912_interface =
+static const struct AY8910interface merit_ay8912_interface =
 {
 	0,0,
 	led2_w,0

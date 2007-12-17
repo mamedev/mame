@@ -464,7 +464,7 @@ static INTERRUPT_GEN( tumbleb2_interrupt )
 	tumbleb2_playmusic();
 }
 
-static int tumbleb_sound_lookup[256] = {
+static const int tumbleb_sound_lookup[256] = {
 	/*0     1     2     3     4     5     6     7     8     9     a     b     c     d     e    f*/
 	0x00,  -2,  0x00, 0x00,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2,   -2, 0x00,   -2, /* 0 */
 	  -2, 0x00,   -2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 1 */
@@ -2159,7 +2159,7 @@ static void semicom_irqhandler(int irq)
 }
 
 
-static struct YM2151interface semicom_ym2151_interface =
+static const struct YM2151interface semicom_ym2151_interface =
 {
 	semicom_irqhandler
 };

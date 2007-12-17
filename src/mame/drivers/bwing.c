@@ -35,7 +35,7 @@ Known issues:
 //****************************************************************************
 // Imports
 
-extern gfx_layout bwing_tilelayout;
+extern const gfx_layout bwing_tilelayout;
 
 extern WRITE8_HANDLER( bwing_paletteram_w );
 extern WRITE8_HANDLER( bwing_videoram_w );

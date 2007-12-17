@@ -1502,13 +1502,13 @@ static GFXDECODE_START( namcos21 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tile_layout,  0x1000, 0x10 )
 GFXDECODE_END
 
-static struct C140interface C140_interface_typeA =
+static const struct C140interface C140_interface_typeA =
 {
 	C140_TYPE_SYSTEM21_A,
 	REGION_SOUND1
 };
 
-static struct C140interface C140_interface_typeB =
+static const struct C140interface C140_interface_typeB =
 {
 	C140_TYPE_SYSTEM21_B,
 	REGION_SOUND1

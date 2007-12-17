@@ -108,7 +108,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 	for (offs = 0x80-2;offs >= 0;offs-=2)
 	{
-		static int gfx_offs[2][2] =
+		static const int gfx_offs[2][2] =
 		{
 			{ 0, 1 },
 			{ 2, 3 }

@@ -556,7 +556,7 @@ static INTERRUPT_GEN( slave_irq )
 	}
 }
 
-static struct Y8950interface y8950_interface = {
+static const struct Y8950interface y8950_interface = {
 	0, /* TODO */
 	REGION_SOUND1	/* memory region */
 };

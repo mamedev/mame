@@ -369,7 +369,7 @@ GFXDECODE_END
 
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_3_r,
 	input_port_4_r

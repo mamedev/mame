@@ -1530,7 +1530,7 @@ static GFXDECODE_START( luckywld )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x000000, chr_layout,				16*256, 16 )
 GFXDECODE_END
 
-static struct C140interface C140_interface =
+static const struct C140interface C140_interface =
 {
 	C140_TYPE_SYSTEM2,
 	REGION_SOUND1

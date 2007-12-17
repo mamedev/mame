@@ -536,7 +536,7 @@ static GFXDECODE_START( rk )
 	GFXDECODE_ENTRY( REGION_GFX4, 0x00000, rk_bglayout,       0, 32 )	/* bg tiles */
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r
 };

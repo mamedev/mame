@@ -246,7 +246,7 @@ static void i_ffpre(void);
 
 static void i_wait(void);
 
-static void (*nec_instruction[256])(void) =
+static void (*const nec_instruction[256])(void) =
 {
     i_add_br8,          /* 0x00 */
     i_add_wr16,         /* 0x01 */

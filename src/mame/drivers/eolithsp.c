@@ -29,7 +29,7 @@ void eolith_speedup_read(void)
 
 }
 
-static struct
+static const struct
 {
 	const char *s_name;
 	UINT32 speedup_address;

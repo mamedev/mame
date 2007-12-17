@@ -160,7 +160,7 @@ static VIDEO_START( madalien )
 {
 	rectangle rect = { 0, 127, 0, 127 };
 
-	static crtc6845_interface crtc6845_intf =
+	static const crtc6845_interface crtc6845_intf =
 	{
 		0,                /* screen we are acting on */
 		PIXEL_CLOCK / 8,  /* the clock of the chip  */
@@ -647,7 +647,7 @@ static GFXDECODE_START( madalien )
 GFXDECODE_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	NULL,
 	NULL,

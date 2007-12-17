@@ -358,7 +358,7 @@ static GFXDECODE_START( tankbust )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, charlayout2,		0x60, 16  )	/* txt tilemap characters*/
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	tankbust_soundlatch_r,
 	tankbust_soundtimer_r

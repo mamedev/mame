@@ -558,7 +558,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static gfx_layout layout_16x16x8 =
+static const gfx_layout layout_16x16x8 =
 {
 	16,16,
 	RGN_FRAC(1,4),

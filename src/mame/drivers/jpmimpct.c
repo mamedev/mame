@@ -794,7 +794,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	REGION_SOUND1
 };
@@ -812,7 +812,7 @@ static void jpmimpct_tms_irq(int state)
 	update_irqs();
 }
 
-static tms34010_config tms_config =
+static const tms34010_config tms_config =
 {
 	TRUE,                       /* halt on reset */
 	0,                          /* the screen operated on */

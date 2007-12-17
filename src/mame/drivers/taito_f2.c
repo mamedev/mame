@@ -3823,7 +3823,7 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irq_handler,
 	REGION_SOUND2,	/* Delta-T */
@@ -3836,7 +3836,7 @@ static WRITE8_HANDLER( camltrya_porta_w )
 	// Implement //
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,	/* portA read */
 	0,

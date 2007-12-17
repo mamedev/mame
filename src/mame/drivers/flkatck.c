@@ -260,7 +260,7 @@ static void volume_callback0(int v)
 	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static struct K007232_interface k007232_interface =
+static const struct K007232_interface k007232_interface =
 {
 	REGION_SOUND1,		/* memory region */
 	volume_callback0	/* external port callback */

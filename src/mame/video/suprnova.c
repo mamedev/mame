@@ -380,7 +380,7 @@ static void blit_fxy_z(mame_bitmap *bitmap, const rectangle *cliprect, const UIN
 	}
 }
 
-static void (*blit_z[4])(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour) = {
+static void (*const blit_z[4])(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,

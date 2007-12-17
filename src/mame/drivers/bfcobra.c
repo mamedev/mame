@@ -750,7 +750,7 @@ INLINE void z80_bank(int num, int data)
 	if (data < 0x08)
 	{
 		/* TODO: Don't need this table! */
-		static UINT32 offs_table[2][8] =
+		static const UINT32 offs_table[2][8] =
 		{
 			{ 0x10000, 0x14000, 0x18000, 0x1c000, 0x00000, 0x04000, 0x08000, 0x0c000 },
 			{ 0x00000, 0x04000, 0x08000, 0x0c000, 0x10000, 0x14000, 0x18000, 0x1c000 }
@@ -1367,7 +1367,7 @@ static void m6809_data_irq(int state)
 /*
     What are the correct ACIA clocks ?
 */
-static struct acia6850_interface z80_acia_if =
+static const struct acia6850_interface z80_acia_if =
 {
 	500000,
 	500000,
@@ -1379,7 +1379,7 @@ static struct acia6850_interface z80_acia_if =
 	z80_acia_irq
 };
 
-static struct acia6850_interface m6809_acia_if =
+static const struct acia6850_interface m6809_acia_if =
 {
 	500000,
 	500000,
@@ -1391,7 +1391,7 @@ static struct acia6850_interface m6809_acia_if =
 	NULL
 };
 
-static struct acia6850_interface data_acia_if =
+static const struct acia6850_interface data_acia_if =
 {
 	500000,
 	500000,
@@ -1474,7 +1474,7 @@ static DRIVER_INIT( bfcobra )
 	state_save_register_global_pointer(video_ram, 0x20000);
 }
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	REGION_SOUND1
 };

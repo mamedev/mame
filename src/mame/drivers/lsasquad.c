@@ -575,7 +575,7 @@ static WRITE8_HANDLER( unk )
 }
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,

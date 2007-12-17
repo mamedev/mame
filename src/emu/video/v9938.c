@@ -62,7 +62,7 @@ static UINT16 pal_ind16[16], pal_ind256[256], *pal_indYJK;
 #define V9938_MODE_UNKNOWN	(10)
 
 
-static const char *v9938_modes[] = {
+static const char *const v9938_modes[] = {
 	"TEXT 1", "MULTICOLOR", "GRAPHIC 1", "GRAPHIC 2", "GRAPHIC 3",
 	"GRAPHIC 4", "GRAPHIC 5", "GRAPHIC 6", "GRAPHIC 7", "TEXT 2",
 	"UNKNOWN" };
@@ -1504,7 +1504,7 @@ static void VDPpset(register UINT8 SM, register int MXD,
                     register int DX, register int DY,
                     register UINT8 CL, register UINT8 OP);
 
-static int GetVdpTimingValue(register int *);
+static int GetVdpTimingValue(register const int *);
 
 static void SrchEngine(void);
 static void LineEngine(void);
@@ -1522,27 +1522,27 @@ static void ReportVdpCommand(register UINT8 Op);
 /*************************************************************/
 /** Variables visible only in this module                   **/
 /*************************************************************/
-static UINT8 Mask[4] = { 0x0F,0x03,0x0F,0xFF };
-static int  PPB[4]  = { 2,4,2,1 };
-static int  PPL[4]  = { 256,512,512,256 };
+static const UINT8 Mask[4] = { 0x0F,0x03,0x0F,0xFF };
+static const int  PPB[4]  = { 2,4,2,1 };
+static const int  PPL[4]  = { 256,512,512,256 };
 static int  VdpOpsCnt=1;
 static void (*VdpEngine)(void)=0;
 
                       /*  SprOn SprOn SprOf SprOf */
                       /*  ScrOf ScrOn ScrOf ScrOn */
-static int srch_timing[8]={ 818, 1025,  818,  830,   /* ntsc */
+static const int srch_timing[8]={ 818, 1025,  818,  830,   /* ntsc */
                             696,  854,  696,  684 }; /* pal  */
-static int line_timing[8]={ 1063, 1259, 1063, 1161,
+static const int line_timing[8]={ 1063, 1259, 1063, 1161,
                             904,  1026, 904,  953 };
-static int hmmv_timing[8]={ 439,  549,  439,  531,
+static const int hmmv_timing[8]={ 439,  549,  439,  531,
                             366,  439,  366,  427 };
-static int lmmv_timing[8]={ 873,  1135, 873, 1056,
+static const int lmmv_timing[8]={ 873,  1135, 873, 1056,
                             732,  909,  732,  854 };
-static int ymmm_timing[8]={ 586,  952,  586,  610,
+static const int ymmm_timing[8]={ 586,  952,  586,  610,
                             488,  720,  488,  500 };
-static int hmmm_timing[8]={ 818,  1111, 818,  854,
+static const int hmmm_timing[8]={ 818,  1111, 818,  854,
                             684,  879,  684,  708 };
-static int lmmm_timing[8]={ 1160, 1599, 1160, 1172,
+static const int lmmm_timing[8]={ 1160, 1599, 1160, 1172,
                             964,  1257, 964,  977 };
 
 
@@ -1695,7 +1695,7 @@ INLINE void VDPpset(UINT8 SM, int MXD, int DX, int DY, UINT8 CL, UINT8 OP)
 /** GetVdpTimingValue() **************************************/
 /** Get timing value for a certain VDP command              **/
 /*************************************************************/
-static int GetVdpTimingValue(register int *timing_values)
+static int GetVdpTimingValue(register const int *timing_values)
 {
   return(timing_values[((VDP[1]>>6)&1)|(VDP[8]&2)|((VDP[9]<<1)&4)]);
 }
@@ -2249,12 +2249,12 @@ static UINT8 v9938_vdp_to_cpu (void)
 /*************************************************************/
 static void ReportVdpCommand(register UINT8 Op)
 {
-	static const char *Ops[16] =
+	static const char *const Ops[16] =
 	{
 		"SET ","AND ","OR  ","XOR ","NOT ","NOP ","NOP ","NOP ",
 		"TSET","TAND","TOR ","TXOR","TNOT","NOP ","NOP ","NOP "
 	};
-	static const char *Commands[16] =
+	static const char *const Commands[16] =
 	{
 		" ABRT"," ????"," ????"," ????","POINT"," PSET"," SRCH"," LINE",
 		" LMMV"," LMMM"," LMCM"," LMMC"," HMMV"," HMMM"," YMMM"," HMMC"

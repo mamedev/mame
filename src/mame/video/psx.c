@@ -232,10 +232,10 @@ static UINT16 m_p_n_blueaddtrans[ MAX_LEVEL * MAX_LEVEL ];
 static UINT16 m_p_n_redsubtrans[ MAX_LEVEL * MAX_LEVEL ];
 static UINT16 m_p_n_greensubtrans[ MAX_LEVEL * MAX_LEVEL ];
 static UINT16 m_p_n_bluesubtrans[ MAX_LEVEL * MAX_LEVEL ];
-static UINT16 m_p_n_nextpointlist4[] = { 1, 3, 0, 2 };
-static UINT16 m_p_n_prevpointlist4[] = { 2, 0, 3, 1 };
-static UINT16 m_p_n_nextpointlist3[] = { 1, 2, 0 };
-static UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
+static const UINT16 m_p_n_nextpointlist4[] = { 1, 3, 0, 2 };
+static const UINT16 m_p_n_prevpointlist4[] = { 2, 0, 3, 1 };
+static const UINT16 m_p_n_nextpointlist3[] = { 1, 2, 0 };
+static const UINT16 m_p_n_prevpointlist3[] = { 2, 0, 1 };
 
 static UINT16 m_p_n_g0r0[ 0x10000 ];
 static UINT16 m_p_n_b0[ 0x10000 ];
@@ -1486,8 +1486,8 @@ static void FlatPolygon( int n_points )
 	UINT16 n_point;
 	UINT16 n_rightpoint;
 	UINT16 n_leftpoint;
-	UINT16 *p_n_rightpointlist;
-	UINT16 *p_n_leftpointlist;
+	const UINT16 *p_n_rightpointlist;
+	const UINT16 *p_n_leftpointlist;
 
 	UINT16 *p_vram;
 
@@ -1658,8 +1658,8 @@ static void FlatTexturedPolygon( int n_points )
 	UINT16 n_point;
 	UINT16 n_rightpoint;
 	UINT16 n_leftpoint;
-	UINT16 *p_n_rightpointlist;
-	UINT16 *p_n_leftpointlist;
+	const UINT16 *p_n_rightpointlist;
+	const UINT16 *p_n_leftpointlist;
 	UINT16 *p_clut;
 	UINT16 *p_vram;
 	UINT32 n_bgr;
@@ -1878,8 +1878,8 @@ static void GouraudPolygon( int n_points )
 	UINT16 n_point;
 	UINT16 n_rightpoint;
 	UINT16 n_leftpoint;
-	UINT16 *p_n_rightpointlist;
-	UINT16 *p_n_leftpointlist;
+	const UINT16 *p_n_rightpointlist;
+	const UINT16 *p_n_leftpointlist;
 
 	UINT16 *p_vram;
 
@@ -2108,8 +2108,8 @@ static void GouraudTexturedPolygon( int n_points )
 	UINT16 n_point;
 	UINT16 n_rightpoint;
 	UINT16 n_leftpoint;
-	UINT16 *p_n_rightpointlist;
-	UINT16 *p_n_leftpointlist;
+	const UINT16 *p_n_rightpointlist;
+	const UINT16 *p_n_leftpointlist;
 	UINT16 *p_clut;
 	UINT16 *p_vram;
 	UINT32 n_bgr;

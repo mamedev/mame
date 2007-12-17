@@ -264,7 +264,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static struct sp0250_interface sp0250_interface =
+static const struct sp0250_interface sp0250_interface =
 {
 	speech_drq_w
 };
@@ -902,7 +902,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static struct CustomSound_interface usb_custom_interface =
+static const struct CustomSound_interface usb_custom_interface =
 {
     usb_start
 };

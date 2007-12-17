@@ -199,8 +199,8 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 		}
 
 		{
-			static int x_offset[2] = { 0x00, 0x01 };
-			static int y_offset[2] = { 0x00, 0x02 };
+			static const int x_offset[2] = { 0x00, 0x01 };
+			static const int y_offset[2] = { 0x00, 0x02 };
 			int x,y, ex, ey;
 
 			for( y=0; y < height; y++ ){

@@ -42,7 +42,8 @@ extern int wecleman_selected_ip, wecleman_irqctrl;
 UINT16 *wecleman_videostatus;
 UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
 size_t wecleman_roadram_size;
-static int wecleman_bgpage[4], wecleman_fgpage[4], *wecleman_gfx_bank;
+static int wecleman_bgpage[4], wecleman_fgpage[4];
+static const int *wecleman_gfx_bank;
 
 /* Variables only used here: */
 static tilemap *bg_tilemap, *fg_tilemap, *txt_tilemap;
@@ -874,7 +875,7 @@ VIDEO_START( wecleman )
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 16 banks
     */
-	static int bank[0x40] =
+	static const int bank[0x40] =
 	{
 		0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,
 		8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,
@@ -977,7 +978,7 @@ VIDEO_START( hotchase )
         Sprite banking - each bank is 0x20000 bytes (we support 0x40 bank codes)
         This game has ROMs for 0x30 banks
     */
-	static int bank[0x40] =
+	static const int bank[0x40] =
 	{
 		0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
 		16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,

@@ -133,7 +133,7 @@ static z80sio_interface sio_intf =
 };
 
 
-static struct z80_irq_daisy_chain dleuro_daisy_chain[] =
+static const struct z80_irq_daisy_chain dleuro_daisy_chain[] =
 {
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
@@ -783,7 +783,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_0_r,
 	input_port_1_r

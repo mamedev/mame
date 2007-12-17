@@ -6323,7 +6323,7 @@ struct parameters
 	int s7,s6,s5,s4,s3,s2,s1,s0;
 };
 
-static UINT8 basetable_fd1089[0x100] =
+static const UINT8 basetable_fd1089[0x100] =
 {
 	0x00,0x1c,0x75,0x69,0x5d,0x41,0x24,0x38,0x4b,0x67,0xae,0x82,0xea,0xc6,0x03,0x2f,
 	0x46,0x6a,0xaf,0x83,0xe7,0xcb,0x02,0x2e,0x01,0x1d,0x78,0x64,0x5c,0x40,0x29,0x35,
@@ -6345,7 +6345,7 @@ static UINT8 basetable_fd1089[0x100] =
 
 
 /* common to FD1089A and FD1089B */
-static struct parameters addr_params[16] =
+static const struct parameters addr_params[16] =
 {
 	{ 0x26, 3,1,7,5,2,4,6,0 },
 	{ 0x08, 6,7,4,2,0,5,1,3 },
@@ -6368,7 +6368,7 @@ static struct parameters addr_params[16] =
 
 static int decode_fd1089a(int val,int table,int opcode)
 {
-	static struct parameters data_params[16] =
+	static const struct parameters data_params[16] =
 	{
 		{ 0x94, 7,6,4,2,1,5,0,3 },
 		{ 0x3f, 7,3,1,2,4,6,0,5 },
@@ -6387,8 +6387,8 @@ static int decode_fd1089a(int val,int table,int opcode)
 		{ 0x71, 4,3,7,1,5,6,0,2 },
 		{ 0x57, 6,4,7,2,0,5,3,1 },
 	};
-	struct parameters *p = &addr_params[table >> 4];
-	struct parameters *q;
+	const struct parameters *p = &addr_params[table >> 4];
+	const struct parameters *q;
 	int family = table & 0x0e;
 
 
@@ -6445,7 +6445,7 @@ static int decode_fd1089a(int val,int table,int opcode)
 
 static int decode_fd1089b(int val,int table,int opcode)
 {
-	struct parameters *p = &addr_params[table >> 4];
+	const struct parameters *p = &addr_params[table >> 4];
 
 
 	/* special case - don't decrypt */

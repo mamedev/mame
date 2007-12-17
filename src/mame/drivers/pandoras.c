@@ -388,7 +388,7 @@ static READ8_HANDLER( pandoras_portB_r )
 	return (activecpu_gettotalcycles() / 512) & 0x0f;
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	pandoras_portA_r,	// not used
 	pandoras_portB_r

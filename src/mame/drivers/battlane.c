@@ -246,7 +246,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM3526interface ym3526_interface =
+static const struct YM3526interface ym3526_interface =
 {
 	irqhandler
 };

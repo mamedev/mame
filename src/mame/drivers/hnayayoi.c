@@ -602,7 +602,7 @@ popmessage("irq");
 }
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_0_r,
 	input_port_1_r,
@@ -611,7 +611,7 @@ static struct YM2203interface ym2203_interface =
 	irqhandler
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,					/* IRQ handler */
 	MSM5205_SEX_4B

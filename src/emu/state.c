@@ -135,7 +135,7 @@ static void ss_c2(UINT8 *, UINT32);
 static void ss_c4(UINT8 *, UINT32);
 static void ss_c8(UINT8 *, UINT32);
 
-static void (*ss_conv[])(UINT8 *, UINT32) = { 0, 0, ss_c2, 0, ss_c4, 0, 0, 0, ss_c8 };
+static void (*const ss_conv[])(UINT8 *, UINT32) = { 0, 0, ss_c2, 0, ss_c4, 0, 0, 0, ss_c8 };
 
 
 

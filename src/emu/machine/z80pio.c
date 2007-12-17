@@ -167,7 +167,7 @@ static void update_irq_state(z80pio *pio, int ch)
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-void z80pio_init(int which, z80pio_interface *intf)
+void z80pio_init(int which, const z80pio_interface *intf)
 {
 	z80pio *pio = pios + which;
 

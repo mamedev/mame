@@ -266,7 +266,7 @@ static INPUT_PORTS_START( asterix )
 	PORT_BIT( 0xf800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static struct K053260_interface k053260_interface =
+static const struct K053260_interface k053260_interface =
 {
 	REGION_SOUND1 /* memory region */
 };

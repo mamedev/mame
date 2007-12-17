@@ -33,7 +33,7 @@ struct star
 extern UINT8 *galaga_videoram;
 extern UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
 extern UINT8 galaga_starcontrol[];
-extern struct star star_seed_tab[];
+extern const struct star star_seed_tab[];
 
 PALETTE_INIT( galaga );
 READ8_HANDLER( galaga_videoram_r );

@@ -2157,7 +2157,7 @@ WRITE16_HANDLER( model1_vr_tgp_w )
 }
 
 /* TGP config */
-struct mb86233_config model1_vr_tgp_config =
+const struct mb86233_config model1_vr_tgp_config =
 {
 	copro_fifoin_pop,
 	copro_fifoout_push

@@ -143,7 +143,7 @@ static READ8_HANDLER( dsw0_port_r )
 
 static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 {
-	static int values[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
+	static const int values[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static int count;
 
 	count = (count + 1) % 4;
@@ -351,17 +351,17 @@ GFXDECODE_END
 
 
 
-static struct CustomSound_interface naughtyb_custom_interface =
+static const struct CustomSound_interface naughtyb_custom_interface =
 {
 	naughtyb_sh_start
 };
 
-static struct CustomSound_interface popflame_custom_interface =
+static const struct CustomSound_interface popflame_custom_interface =
 {
 	popflame_sh_start
 };
 
-static struct TMS36XXinterface tms3615_interface =
+static const struct TMS36XXinterface tms3615_interface =
 {
 	TMS3615,	/* TMS36xx subtype */
 	/*
@@ -706,6 +706,35 @@ ROM_START( trvmstra )
 	ROM_LOAD( "comic_hi.u7",  0x1c000, 0x4000, CRC(8e8b5f71) SHA1(71514af2af2468a13cf5cc4237fa2590d7a16b27) )
 ROM_END
 
+ROM_START( trvmstrb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "ic30-3.bin",   0x0000, 0x1000, CRC(d3eb4197) SHA1(5843ffc8ec82ffe9a6519180e54c82b0375cc3dc) )
+	ROM_LOAD( "ic28.bin",     0x1000, 0x1000, CRC(70322d65) SHA1(498102236390f2e15444943e0fff8a53f37db083) )
+	ROM_LOAD( "ic26.bin",     0x2000, 0x1000, CRC(31dfa9cf) SHA1(007c6ef2381ce9e707932c66a451805cec342eeb) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic44.bin",     0x0000, 0x1000, CRC(dac8cff7) SHA1(21da2b2ceb4a726d03b2e49a2df75ca66b89a197) )
+	ROM_LOAD( "ic46.bin",     0x1000, 0x1000, CRC(a97ab879) SHA1(67b86d056896f10e0c055fb58c97341cf75c3d17) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic48.bin",     0x0000, 0x1000, CRC(79952015) SHA1(8407c2bab476a60d945d82201f01bf59ae9e0dad) )
+	ROM_LOAD( "ic50.bin",     0x1000, 0x1000, CRC(f09da428) SHA1(092d0eea41c8bbd48d7a3aff54c15f85262b21ff) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "ic64.bin",     0x0000, 0x0100, CRC(e9915da8) SHA1(7c64ea76e39eaff724179d52ff5482df363fcf56) )  /* palette low & high bits */
+	ROM_RELOAD(				  0x0100, 0x0100 )
+
+	ROM_REGION( 0x20000, REGION_USER1, 0 )	/* Questions roms */
+	ROM_LOAD( "earlytv_lo.u2", 0x00000, 0x4000, CRC(dbfce45f) SHA1(5d96186c96dee810b0ef63964cb3614fd486aefa) )
+	ROM_LOAD( "earlytv_hi.u1", 0x04000, 0x4000, CRC(c8f5a02d) SHA1(8a566f83f9bd39ab508085af942957a7ed941813) )
+	ROM_LOAD( "sex_lo.u4",     0x08000, 0x4000, CRC(27a4ff7a) SHA1(7479c69b85ea1f4bb3d368a11cb036f707b65b6b) )
+	ROM_LOAD( "sex_hi.u3",     0x0c000, 0x4000, CRC(de84fc2f) SHA1(ac5736ca6654fc649f2e8e4a996c2b0f1e86947b) )
+	ROM_LOAD( "rock_lo.u6",    0x10000, 0x4000, CRC(ec1df27b) SHA1(95f32b366123742a4576aef272209c8d59cc6b0a) )
+	ROM_LOAD( "rock_hi.u5",    0x14000, 0x4000, CRC(8a4eccc9) SHA1(e3a03f511a84b3321a59f9e9672da27b96931713) )
+	ROM_LOAD( "lifesci_lo.u8", 0x18000, 0x4000, CRC(b58ba9eb) SHA1(4fdd62a464dec84c880e1be598a7896a957d9339) )
+	ROM_LOAD( "lifesci_hi.u7", 0x1c000, 0x4000, CRC(e03dfa12) SHA1(e668ea5bccc95d8a53a1de1d96583beef6636edb) )
+ROM_END
+
 /* These 'Trivia Genius' roms were found on a Naughty Boy pcb, factory?-retooled somewhat to use 8 2732s instead of 16 2716s. The pcb is a real Naughty Boy PCB, with Jaleco markings. Latest chip datecodes on the PCB are from 85 (on the two proms) but the other chips are dated 81 and 82 (which makes sense if they're formerly naughty boy pcbs).
 This may be a hacked/bootlegged version of trivia master, hacked to run on a naughty boy pcb, or (if ALL versions of trivia master ran on naughty boy pcbs) may be a 'second source bootleg', a bootleg of the trivia master naughty boy conversion.
 */
@@ -786,4 +815,5 @@ GAME( 1982, popflamb, popflame, popflame, naughtyb, 0,        ROT90, "Jaleco", "
 GAME( 1982, popflamn, popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "Pop Flamer (bootleg on Naughty Boy PCB)", 0 )
 GAME( 1985, trvmstr,  0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", 0 )
 GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", 0 )
+GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", 0 )
 GAME( 1985, trvgns,   0,		naughtyb, trvmstr,  trvmstr,  ROT90, "bootleg?", "Trivia Genius", 0 )

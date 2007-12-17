@@ -35,7 +35,7 @@
 #define MULTIPCM_CLOCKDIV    	(360.0)
 #define MULTIPCM_ONE		(18)
 
-static int ctbl[] =
+static const int ctbl[] =
 {
 	0, 1, 2, 3, 4, 5, 6 , -1,	// voice number mapping
 	7, 8, 9, 10,11,12,13, -1,
@@ -43,7 +43,7 @@ static int ctbl[] =
 	21,22,23,24,25,26,27, -1,
 };
 
-static int decaytbl[16] =	// decay times
+static const int decaytbl[16] =	// decay times
 {
      0,   300,   800,  1400,
   2100,  3000,  4000,  5200,

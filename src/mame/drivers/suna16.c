@@ -1011,7 +1011,7 @@ static void bestbest_ym3526_irqhandler(int state)
 	cpunum_set_input_line(1, INPUT_LINE_IRQ0, state);
 }
 
-static struct YM3526interface bestbest_ym3526_interface =
+static const struct YM3526interface bestbest_ym3526_interface =
 {
 	bestbest_ym3526_irqhandler
 };
@@ -1021,7 +1021,7 @@ static WRITE8_HANDLER( bestbest_ay8910_port_a_w )
 	// ?
 }
 
-static struct AY8910interface bestbest_ay8910_interface =
+static const struct AY8910interface bestbest_ay8910_interface =
 {
 	0,							0,
 	bestbest_ay8910_port_a_w,	0

@@ -170,7 +170,7 @@ static void generate_interrupt(int state)
 }
 
 
-static struct tms34061_interface tms34061intf =
+static const struct tms34061_interface tms34061intf =
 {
 	0,						/* the screen we are acting on */
 	8,						/* VRAM address is (row << rowshift) | col */

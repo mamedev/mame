@@ -547,13 +547,13 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_0_r,
 	input_port_1_r,
 };
 
-static struct TMS5110interface tms5110_interface =
+static const struct TMS5110interface tms5110_interface =
 {
 	0,		/*irq callback function*/
 	bagman_speech_rom_read_bit	/*M0 callback function. Called whenever chip requests a single bit of data*/

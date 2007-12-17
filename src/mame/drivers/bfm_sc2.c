@@ -3031,7 +3031,7 @@ static INPUT_PORTS_START( pokio )
 
 INPUT_PORTS_END
 
- static struct upd7759_interface upd7759_interface =
+ static const struct upd7759_interface upd7759_interface =
  {
 	REGION_SOUND1,		/* memory region */
 	0

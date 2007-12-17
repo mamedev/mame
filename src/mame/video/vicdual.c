@@ -11,7 +11,7 @@
 static UINT8 palette_bank;
 
 
-static pen_t pens_from_color_prom[] =
+static const pen_t pens_from_color_prom[] =
 {
 	RGB_BLACK,
 	MAKE_RGB(0x00, 0xff, 0x00),

@@ -277,7 +277,7 @@ static void namcoio_51XX_write(int chip,int data)
   verified on Namco original hardware, but they are the same in all the bootlegs,
   so we can assume they are right.
 */
-static int joy_map[16] =
+static const int joy_map[16] =
 /*  LDRU, LDR, LDU,  LD, LRU, LR,  LU,    L, DRU,  DR,  DU,   D,  RU,   R,   U, center */
 {	 0xf, 0xe, 0xd, 0x5, 0xc, 0x9, 0x7, 0x6, 0xb, 0x3, 0xa, 0x4, 0x1, 0x2, 0x0, 0x8 };
 

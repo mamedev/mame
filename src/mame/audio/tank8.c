@@ -86,7 +86,7 @@ static const discrete_op_amp_filt_info tank8_filt =
 	0  /* VEE */
 };
 
-static discrete_dac_r1_ladder tank8_dac =
+static const discrete_dac_r1_ladder tank8_dac =
 {
 	1,
 	{RES_K(4.7)},	// R89

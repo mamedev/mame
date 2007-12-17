@@ -285,7 +285,7 @@ static void via_irq(int state)
 }
 
 
-static struct via6522_interface gameplan_via_0_interface =
+static const struct via6522_interface gameplan_via_0_interface =
 {
 	0, 0,									/*inputs : A/B         */
 	/*vblank*/0, 0, 0, 0,					/*inputs : CA/B1,CA/B2 */
@@ -295,7 +295,7 @@ static struct via6522_interface gameplan_via_0_interface =
 };
 
 
-static struct via6522_interface leprechn_via_0_interface =
+static const struct via6522_interface leprechn_via_0_interface =
 {
 	0, 0,									/*inputs : A/B         */
 	/*vblank*/0, 0, 0, 0,					/*inputs : CA/B1,CA/B2 */
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( coin_w )
 }
 
 
-static struct via6522_interface via_1_interface =
+static const struct via6522_interface via_1_interface =
 {
 	io_port_r, 0,	 /*inputs : A/B         */
 	0, 0, 0, 0,		 /*inputs : CA/B1,CA/B2 */
@@ -406,7 +406,7 @@ static WRITE8_HANDLER( sound_trigger_w )
 }
 
 
-static struct via6522_interface via_2_interface =
+static const struct via6522_interface via_2_interface =
 {
 	0, soundlatch2_r,					  /*inputs : A/B         */
 	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */
@@ -1395,7 +1395,7 @@ INPUT_PORTS_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_6_r,
 	input_port_7_r,

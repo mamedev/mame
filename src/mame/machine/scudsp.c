@@ -877,7 +877,7 @@ void dsp_execute_program()
     SCU DSP Disassembler
 
 ************************************************************************/
-static const char* ALU_Commands[] =
+static const char *const ALU_Commands[] =
 {
 	"",		/* 0000 */
 	"AND",	/* 0001 */
@@ -897,7 +897,7 @@ static const char* ALU_Commands[] =
 	"RL8",	/* 1111 */
 };
 
-static const char* X_Commands[] =
+static const char *const X_Commands[] =
 {
 	"",				/* 000 */
 	"",				/* 001 */	/* NOP? check instruction @ 0x0B */
@@ -906,7 +906,7 @@ static const char* X_Commands[] =
 	"MOV %s,X",		/* 100 */
 };
 
-static const char* Y_Commands[] =
+static const char *const Y_Commands[] =
 {
 	"",				/* 000 */
 	"CLR A",		/* 001 */
@@ -915,7 +915,7 @@ static const char* Y_Commands[] =
 	"MOV %s,Y",		/* 100 */
 };
 
-static const char* D1_Commands[] =
+static const char *const D1_Commands[] =
 {
 	"",					/* 00 */
 	"MOV %I8,%d",		/* 01 */
@@ -923,7 +923,7 @@ static const char* D1_Commands[] =
 	"MOV %S,%d",		/* 11 */
 };
 
-static const char* SourceMemory[] =
+static const char *const SourceMemory[] =
 {
 	"M0",			/* 000 */
 	"M1",			/* 001 */
@@ -935,7 +935,7 @@ static const char* SourceMemory[] =
 	"MC3",			/* 111 */
 };
 
-static const char* SourceMemory2[] =
+static const char *const SourceMemory2[] =
 {
 	"M0",			/* 0000 */
 	"M1",			/* 0001 */
@@ -955,7 +955,7 @@ static const char* SourceMemory2[] =
 	"???",			/* 1111 */
 };
 
-static const char* DestMemory[] =
+static const char *const DestMemory[] =
 {
 	"MC0",			/* 0000 */
 	"MC1",			/* 0001 */
@@ -975,7 +975,7 @@ static const char* DestMemory[] =
 	"CT3",			/* 1111 */
 };
 
-static const char* DestDMAMemory[] =
+static const char *const DestDMAMemory[] =
 {
 	"M0",			/* 000 */
 	"M1",			/* 001 */
@@ -987,19 +987,19 @@ static const char* DestDMAMemory[] =
 	"???",			/* 111 */
 };
 
-static const char* MVI_Command[] =
+static const char *const MVI_Command[] =
 {
 	"MVI %I,%d",	/* 0 */
 	"MVI %I,%d,%f",	/* 1 */
 };
 
-static const char* JMP_Command[] =
+static const char *const JMP_Command[] =
 {
 	"JMP %IA",
 	"JMP %f,%IA",
 };
 
-static const char* DMA_Command[] =
+static const char *const DMA_Command[] =
 {
 	"DMA%H%A D0,%M,%I",
 	"DMA%H%A %s,D0,%I",

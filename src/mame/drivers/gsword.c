@@ -242,7 +242,7 @@ static READ8_HANDLER( gsword_8741_3_r )
 	return 0;
 }
 
-static struct TAITO8741interface gsword_8741interface=
+static const struct TAITO8741interface gsword_8741interface=
 {
 	4,         /* 4 chips */
 	{ TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT },  /* program mode */
@@ -670,7 +670,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	0,
@@ -678,7 +678,7 @@ static struct AY8910interface ay8910_interface =
 	0
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */

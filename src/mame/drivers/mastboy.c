@@ -644,7 +644,7 @@ static void mastboy_adpcm_int(int data)
 }
 
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	mastboy_adpcm_int,	/* interrupt function */
 	MSM5205_SEX_4B		/* 4KHz 4-bit */

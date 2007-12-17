@@ -339,7 +339,7 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 
 
 /* The Y8950 is basically a YM3526 with ADPCM built in */
-static struct Y8950interface y8950_interface =
+static const struct Y8950interface y8950_interface =
 {
 	0,
 	REGION_SOUND1	/* ROM region */

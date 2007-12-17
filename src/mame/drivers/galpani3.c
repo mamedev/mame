@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	0	// irq ?

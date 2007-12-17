@@ -10,7 +10,7 @@
 #include "machine/scsi.h"
 
 // CD-ROM handler
-extern SCSIClass SCSIClassCDROM;
+extern const SCSIClass SCSIClassCDROM;
 #define SCSI_DEVICE_CDROM &SCSIClassCDROM
 
 #endif

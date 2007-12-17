@@ -217,7 +217,7 @@ WRITE16_HANDLER( gaelco2_vram_w )
 #define ADJUST_COLOR(c) ((c < 0) ? 0 : ((c > 255) ? 255 : c))
 
 /* table used for color adjustment */
-static int pen_color_adjust[16] = {
+static const int pen_color_adjust[16] = {
 	+RGB_CHG*0, -RGB_CHG*1, -RGB_CHG*2, -RGB_CHG*3, -RGB_CHG*4, -RGB_CHG*5, -RGB_CHG*6, -RGB_CHG*7,
 	+RGB_CHG*8, +RGB_CHG*7, +RGB_CHG*6, +RGB_CHG*5, +RGB_CHG*4, +RGB_CHG*3, +RGB_CHG*2, +RGB_CHG*1
 };

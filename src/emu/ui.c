@@ -1134,13 +1134,16 @@ int sprintf_game_info(char *buffer)
 		bufptr += sprintf(bufptr, "\n%s\n", ui_getstring(UI_vectorgame));
 
 	/* display screen resolution and refresh rate info for raster games */
-	else
+	else if (Machine->drv->video_attributes & VIDEO_TYPE_RASTER)
 		bufptr += sprintf(bufptr,"\n%s:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 				ui_getstring(UI_screenres),
 				Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
 				Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 				ATTOSECONDS_TO_HZ(Machine->screen[0].refresh));
+	else
+		*bufptr++ = '\0';
+
 	return bufptr - buffer;
 }
 

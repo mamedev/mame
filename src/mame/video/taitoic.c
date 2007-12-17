@@ -754,7 +754,7 @@ static TILE_GET_INFO( PC080SN_get_fg_tile_info_1 )
 	common_get_PC080SN_fg_tile_info(machine,tileinfo,tile_index,PC080SN_bg_ram[1][1],PC080SN_bg_gfx[1]);
 }
 
-static tile_get_info_callback PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
+static const tile_get_info_callback PC080SN_get_tile_info[PC080SN_MAX_CHIPS][2] =
 {
 	{ PC080SN_get_bg_tile_info_0, PC080SN_get_fg_tile_info_0 },
 	{ PC080SN_get_bg_tile_info_1, PC080SN_get_fg_tile_info_1 }
@@ -1371,7 +1371,7 @@ INT32 TC0080VCO_flipscreen = 0,TC0080VCO_has_tx;
 
 
 #if 0
-static int TC0080VCO_zoomy_conv_table[] =
+static const int TC0080VCO_zoomy_conv_table[] =
 {
 /*      These are hand-tuned values...      */
 /*    +0   +1   +2   +3   +4   +5   +6   +7    +8   +9   +a   +b   +c   +d   +e   +f */
@@ -2163,7 +2163,7 @@ static TILE_GET_INFO( TC0100SCN_get_tx_tile_info_2 )
 
 /* This array changes with TC0100SCN_MAX_CHIPS */
 
-static tile_get_info_callback TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
+static const tile_get_info_callback TC0100SCN_get_tile_info[TC0100SCN_MAX_CHIPS][3] =
 {
 	{ TC0100SCN_get_bg_tile_info_0, TC0100SCN_get_fg_tile_info_0, TC0100SCN_get_tx_tile_info_0 },
 	{ TC0100SCN_get_bg_tile_info_1, TC0100SCN_get_fg_tile_info_1, TC0100SCN_get_tx_tile_info_1 },
@@ -3011,7 +3011,7 @@ static TILE_GET_INFO( TC0480SCP_get_tx_tile_info )
 	common_get_tc0480tx_tile_info(machine,tileinfo,tile_index,TC0480SCP_tx_ram,TC0480SCP_tx_gfx);
 }
 
-static tile_get_info_callback tc480_get_tile_info[5] =
+static const tile_get_info_callback tc480_get_tile_info[5] =
 {
 	TC0480SCP_get_bg0_tile_info, TC0480SCP_get_bg1_tile_info,
 	TC0480SCP_get_bg2_tile_info, TC0480SCP_get_bg3_tile_info,
@@ -3892,7 +3892,7 @@ void TC0480SCP_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int la
 
 /* For evidence table of TC0480SCP bg layer priorities, refer to mame55 source */
 
-static UINT16 TC0480SCP_bg_pri_lookup[8] =
+static const UINT16 TC0480SCP_bg_pri_lookup[8] =
 {
 	0x0123,
 	0x1230,

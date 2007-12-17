@@ -2333,7 +2333,7 @@ typedef struct
 	UINT8		addr_A1;			/* address line A1      */
 
 	/* ADPCM-A unit */
-	UINT8		*pcmbuf;			/* pcm rom buffer       */
+	const UINT8	*pcmbuf;			/* pcm rom buffer       */
 	UINT32		pcm_size;			/* size of pcm rom      */
 	UINT8		adpcmTL;			/* adpcmA total level   */
 	ADPCM_CH 	adpcm[6];			/* adpcm channels       */
@@ -2353,14 +2353,14 @@ typedef YM2610 YM2608;
 #define ADPCM_SHIFT    (16)      /* frequency step rate   */
 #define ADPCMA_ADDRESS_SHIFT 8   /* adpcm A address shift */
 
-static UINT8 *pcmbufA;
+static const UINT8 *pcmbufA;
 static UINT32 pcmsizeA;
 
 
 /* Algorithm and tables verified on real YM2608 and YM2610 */
 
 /* usual ADPCM table (16 * 1.1^N) */
-static int steps[49] =
+static const int steps[49] =
 {
 	 16,  17,   19,   21,   23,   25,   28,
 	 31,  34,   37,   41,   45,   50,   55,
@@ -2372,7 +2372,7 @@ static int steps[49] =
 };
 
 /* different from the usual ADPCM table */
-static int step_inc[8] = { -1*16, -1*16, -1*16, -1*16, 2*16, 5*16, 7*16, 9*16 };
+static const int step_inc[8] = { -1*16, -1*16, -1*16, -1*16, 2*16, 5*16, 7*16, 9*16 };
 
 /* speedup purposes only */
 static int jedi_table[ 49*16 ];
@@ -2599,7 +2599,7 @@ static void FMsave_state_adpcma(const char *name,int num,ADPCM_CH *adpcm)
 
 
 
-static unsigned int YM2608_ADPCM_ROM_addr[2*6] = {
+static const unsigned int YM2608_ADPCM_ROM_addr[2*6] = {
 0x0000, 0x01bf, /* bass drum  */
 0x01c0, 0x043f, /* snare drum */
 0x0440, 0x1b7f, /* top cymbal */
@@ -2614,7 +2614,7 @@ static unsigned int YM2608_ADPCM_ROM_addr[2*6] = {
     It was verified, using real YM2608, that this ADPCM stream produces 100% correct output signal.
 */
 
-static unsigned char YM2608_ADPCM_ROM[0x2000] = {
+static const unsigned char YM2608_ADPCM_ROM[0x2000] = {
 
 /* Source: 01BD.ROM */
 /* Length: 448 / 0x000001C0 */
@@ -4119,7 +4119,7 @@ void *YM2610Init(void *param, int index, int clock, int rate,
 	F2610->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2610->OPN.ST.SSG           = ssg;
 	/* ADPCM */
-	F2610->pcmbuf   = (UINT8 *)pcmroma;
+	F2610->pcmbuf   = (const UINT8 *)pcmroma;
 	F2610->pcm_size = pcmsizea;
 	/* DELTA-T */
 	F2610->deltaT.memory = (UINT8 *)pcmromb;

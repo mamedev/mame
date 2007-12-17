@@ -184,7 +184,7 @@ static void shdancbl_msm5205_callback(int data)
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct MSM5205interface shdancbl_msm5205_interface =
+static const struct MSM5205interface shdancbl_msm5205_interface =
 {
 	shdancbl_msm5205_callback,
 	MSM5205_S48_4B

@@ -519,7 +519,7 @@ static void irqhandler(int irq)
 //  cpunum_set_input_line(1,1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct ES5506interface es5506_interface =
+static const struct ES5506interface es5506_interface =
 {
 	REGION_SOUND1,
 	REGION_SOUND2,

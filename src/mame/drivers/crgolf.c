@@ -346,7 +346,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct MSM5205interface msm5205_intf =
+static const struct MSM5205interface msm5205_intf =
 {
 	vck_callback,
 	MSM5205_S64_4B

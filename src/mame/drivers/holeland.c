@@ -280,13 +280,13 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	input_port_0_r,
 	input_port_1_r
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	input_port_2_r,
 	input_port_3_r

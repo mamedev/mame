@@ -65,13 +65,13 @@ static INPUT_PORTS_START( mjsiyoub )
 INPUT_PORTS_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,				/* Input A: DSW 2 */
 	0,				/* Input B: DSW 1 */
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,							/* IRQ handler */
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  ?? */

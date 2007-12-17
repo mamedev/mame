@@ -422,7 +422,7 @@ static PALETTE_INIT( atari )
 }
 
 
-static struct POKEYinterface pokey_interface = {
+static const struct POKEYinterface pokey_interface = {
 	{ 0 },
 	0,
 	0,0,

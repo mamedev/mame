@@ -337,7 +337,7 @@ static WRITE32_HANDLER( crusnwld_serial_data_w )
 
 /* values from offset 3, 6, and 10 must add up to 0x904752a2 */
 static UINT16 bit_index;
-static UINT32 bit_data[0x10] =
+static const UINT32 bit_data[0x10] =
 {
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
 	0x3017c636,0x3017c636,0x3017c636,0x3017c636,
@@ -503,7 +503,7 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static struct tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
+static const struct tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(&ram_base)
@@ -1388,7 +1388,7 @@ static DRIVER_INIT( offroadc )
 }
 
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	0
 };

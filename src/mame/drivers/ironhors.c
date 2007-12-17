@@ -382,7 +382,7 @@ static GFXDECODE_START( farwest )
 GFXDECODE_END
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,

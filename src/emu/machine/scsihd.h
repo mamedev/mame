@@ -10,7 +10,7 @@
 #include "machine/scsi.h"
 
 // CD-ROM handler
-extern SCSIClass SCSIClassHARDDISK;
+extern const SCSIClass SCSIClassHARDDISK;
 #define SCSI_DEVICE_HARDDISK &SCSIClassHARDDISK
 
 #endif

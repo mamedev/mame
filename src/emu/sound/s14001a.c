@@ -172,7 +172,7 @@ typedef struct
 #define REPEATCOUNT ((chip->PlayParams<<1)&0x6) // remember: its 3 bits and the bottom bit is always zero!
 #define LOCALSILENCESTATE ((chip->OutputCounter & 0x2) && (MIRRORMODE)) // 1 when silent output, 0 when DAC output.
 
-static INT8 DeltaTable[4][4] =
+static const INT8 DeltaTable[4][4] =
 {
 	{ 0xCD, 0xCD, 0xEF, 0xEF, },
 	{ 0xEF, 0xEF, 0x00, 0x00, },

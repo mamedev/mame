@@ -121,6 +121,7 @@ struct _video_global
 	UINT32					speed;				/* overall speed (*100) */
 	UINT32					original_speed;		/* originally-specified speed */
 	UINT8					refresh_speed;		/* flag: TRUE if we max out our speed according to the refresh */
+	UINT8					update_in_pause;	/* flag: TRUE if video is updated while in pause */
 
 	/* frameskipping */
 	UINT8					empty_skip_count;	/* number of empty frames we have skipped */
@@ -284,6 +285,7 @@ void video_init(running_machine *machine)
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
 	global.original_speed = global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
 	global.refresh_speed = options_get_bool(mame_options(), OPTION_REFRESHSPEED);
+	global.update_in_pause = options_get_bool(mame_options(), OPTION_UPDATEINPAUSE);
 
 	/* allocate memory for our private data */
 	viddata = machine->video_data = auto_malloc(sizeof(*viddata));
@@ -1023,11 +1025,7 @@ void video_frame_update(int debug)
 	int phase = mame_get_phase(Machine);
 
 	/* only render sound and video if we're in the running phase */
-#ifdef MAME_DEBUG
-	if (phase == MAME_PHASE_RUNNING)
-#else
-	if (phase == MAME_PHASE_RUNNING && (debug || !mame_is_paused(Machine)))
-#endif
+	if (phase == MAME_PHASE_RUNNING && (!mame_is_paused(Machine) || global.update_in_pause))
 	{
 		int anything_changed = finish_screen_updates(Machine);
 
@@ -1522,6 +1520,7 @@ static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks)
 		}
 		current_ticks = new_ticks;
 	}
+	profiler_mark(PROFILER_END);
 
 	return current_ticks;
 }
@@ -1864,6 +1863,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 {
 	video_private *viddata = machine->video_data;
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
+	const rgb_t *palette;
 
 	/* only record if we have a file */
 	if (info->movie_file != NULL)
@@ -1901,7 +1901,8 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 		}
 
 		/* write the next frame */
-		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->drv->total_colors, palette_entry_list_adjusted(machine->palette));
+		palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
+		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->drv->total_colors, palette);
 		png_free(&pnginfo);
 		if (error != PNGERR_NONE)
 		{

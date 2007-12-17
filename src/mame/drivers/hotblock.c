@@ -176,7 +176,7 @@ static INTERRUPT_GEN( hotblocks_irq ) /* right? */
 	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_0_r,
 	input_port_1_r,

@@ -151,7 +151,7 @@ UINT8 YM_DELTAT_ADPCM_Read(YM_DELTAT *DELTAT)
 
 
 /* 0-DRAM x1, 1-ROM, 2-DRAM x8, 3-ROM (3 is bad setting - not allowed by the manual) */
-static UINT8 dram_rightshift[4]={3,0,0,0};
+static const UINT8 dram_rightshift[4]={3,0,0,0};
 
 /* DELTA-T ADPCM write register */
 void YM_DELTAT_ADPCM_Write(YM_DELTAT *DELTAT,int r,int v)

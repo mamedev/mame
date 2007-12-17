@@ -1798,7 +1798,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static struct C352interface c352_interface =
+static const struct C352interface c352_interface =
 {
 	REGION_SOUND1
 };

@@ -24,7 +24,7 @@ void namcoc7x_on_driver_init(void);
 void namcoc7x_set_host_ram(UINT32 *hostram);
 
 #define NAMCO_C7X_HARDWARE	\
-static struct C352interface namcoc7x_c352_interface =	\
+static const struct C352interface namcoc7x_c352_interface =	\
 {	\
 	REGION_SOUND1	\
 };

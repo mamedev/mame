@@ -1289,7 +1289,7 @@ static MACHINE_RESET( namcona1_mcu )
 // bit 7 => port 7
 static READ8_HANDLER( portana_r )
 {
-	static UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
+	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
 	UINT8 port = readinputport(2);
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
@@ -1334,7 +1334,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static struct C140interface C140_interface_typeA =
+static const struct C140interface C140_interface_typeA =
 {
 	C140_TYPE_ASIC219,
 	0

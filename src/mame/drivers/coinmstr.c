@@ -617,7 +617,7 @@ static MACHINE_RESET( trailblz )
 	pia_reset();
 }
 
-static struct AY8910interface ay8912_interface =
+static const struct AY8910interface ay8912_interface =
 {
 	input_port_4_r
 };

@@ -811,7 +811,7 @@ static const struct Samplesinterface targ_samples_interface =
 };
 
 
-static struct CustomSound_interface exidy_custom_interface =
+static const struct CustomSound_interface exidy_custom_interface =
 {
 	exidy_sh_start
 };

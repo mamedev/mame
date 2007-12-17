@@ -852,7 +852,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static tms34010_config zunit_tms_config =
+static const tms34010_config zunit_tms_config =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -864,7 +864,7 @@ static tms34010_config zunit_tms_config =
 	midyunit_from_shiftreg			/* read from shiftreg function */
 };
 
-static tms34010_config yunit_tms_config =
+static const tms34010_config yunit_tms_config =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */

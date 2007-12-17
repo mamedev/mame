@@ -516,7 +516,7 @@ static void yunsung8_adpcm_int(int irq)
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct MSM5205interface yunsung8_msm5205_interface =
+static const struct MSM5205interface yunsung8_msm5205_interface =
 {
 	yunsung8_adpcm_int,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz, 4 Bits */

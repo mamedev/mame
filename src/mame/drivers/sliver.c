@@ -93,7 +93,7 @@ static mame_bitmap *sliver_bitmap_bg;
 
 static UINT16 tempbuf[8];
 
-static int gfxlookup[][4]=
+static const int gfxlookup[][4]=
 {
    { 0x0000000, 0x0000000, 512, 256 },
    { 0x0060000, 0x0007fa5, 512, 256 },

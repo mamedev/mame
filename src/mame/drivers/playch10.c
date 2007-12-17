@@ -724,7 +724,7 @@ static INTERRUPT_GEN( playch10_interrupt ) {
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct NESinterface nes_interface =
+static const struct NESinterface nes_interface =
 {
 	REGION_CPU2
 };

@@ -133,6 +133,7 @@
 #define OPTION_LOG					"log"
 #define OPTION_DEBUG				"debug"
 #define OPTION_DEBUGSCRIPT			"debugscript"
+#define OPTION_UPDATEINPAUSE		"update_in_pause"
 
 /* core misc options */
 #define OPTION_BIOS					"bios"

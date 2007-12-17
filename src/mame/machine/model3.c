@@ -22,7 +22,7 @@ static int m3_step;
 #define NEXT(new_state) fsm[state][new_state]
 
 static INT32  state;  // current state
-static INT32  fsm[][2] =  {
+static const INT32  fsm[][2] =  {
                             {  1,  0 },  // 0  Test-Logic/Reset
                             {  1,  2 },  // 1  Run-Test/Idle
                             {  3,  9 },  // 2  Select-DR-Scan

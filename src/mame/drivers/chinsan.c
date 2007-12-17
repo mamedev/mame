@@ -94,7 +94,7 @@ static WRITE8_HANDLER( ym_port_w2 )
 }
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_0_r,
 	input_port_1_r,

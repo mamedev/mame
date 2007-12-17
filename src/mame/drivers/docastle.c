@@ -616,7 +616,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	idsoccer_adpcm_int,	// interrupt function
 	MSM5205_S64_4B		// 6 kHz    ???

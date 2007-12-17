@@ -24,7 +24,7 @@ static int dsp_execute;
 static UINT32 dsp_addr_w, main_ram_seg;
 
 #if LOG_DSP_CALLS
-const static int toaplan_port_type[2] = { 0x7800c, 0x5c };
+static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
 #endif
 
 UINT8 *twincobr_sharedram;

@@ -549,12 +549,12 @@ static void irqhandler(int linestate)
 	cpunum_set_input_line(1,0,linestate);
 }
 
-static struct YM3526interface ym3812_interface =
+static const struct YM3526interface ym3812_interface =
 {
 	irqhandler
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	tecmo_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */

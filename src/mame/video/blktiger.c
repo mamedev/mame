@@ -35,7 +35,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* the tile priority table is a guess compiled by looking at the game. It
        was not derived from a PROM so it could be wrong. */
-	static int split_table[16] =
+	static const int split_table[16] =
 	{
 		3,0,2,2,	/* the fourth could be 1 instead of 2 */
 		0,1,0,0,

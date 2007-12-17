@@ -840,12 +840,12 @@ ADDRESS_MAP_END
 
 
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	REGION_SOUND1
 };
 
-static tms34010_config vgb_config =
+static const tms34010_config vgb_config =
 {
 	FALSE,							/* halt on reset ????? - check this */
 	0,								/* the screen operated on */

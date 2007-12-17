@@ -325,7 +325,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface thedeep_ym2203_intf =
+static const struct YM2203interface thedeep_ym2203_intf =
 {
 	0,0,0,0,
 	irqhandler

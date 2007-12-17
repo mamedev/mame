@@ -69,7 +69,7 @@ static void write_dword(offs_t offset,UINT32 data)
 
 static WRITE16_HANDLER( protection_w )
 {
-	static int maplist[4][10] = {
+	static const int maplist[4][10] = {
 		{ 1, 0, 3, 2, 4, 5, 6, 7, 8, 9 },
 		{ 4, 5, 6, 7, 1, 0, 3, 2, 8, 9 },
 		{ 3, 2, 1, 0, 6, 7, 4, 5, 8, 9 },
@@ -107,10 +107,10 @@ static WRITE16_HANDLER( protection_w )
 		}
 	case 2:
 		{
-			static int delta1[10] = {
+			static const int delta1[10] = {
 				0x1f80, 0x1c80, 0x2700, 0x2400, 0x2b80, 0x2e80, 0x3300, 0x3600, 0x3a80, 0x3d80
 			};
-			static int delta2[10] = {
+			static const int delta2[10] = {
 				0x2180, 0x1800, 0x3480, 0x2b00, 0x3e00, 0x4780, 0x5100, 0x5a80, 0x6400, 0x6d80
 			};
 
@@ -161,7 +161,7 @@ static WRITE16_HANDLER( protection_w )
 /* We simulate them with 3 buttons the same way the other versions
    internally do */
 
-static int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
+static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
@@ -803,12 +803,12 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irq_handler
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* 8KHz playback ?    */

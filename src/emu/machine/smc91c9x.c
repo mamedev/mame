@@ -92,7 +92,7 @@
 #define EINT_ERCV			0x40
 
 /* Ethernet register names */
-static const char *ethernet_regname[64] =
+static const char *const ethernet_regname[64] =
 {
 	"TCR", "EPH STATUS", "RCR", "COUNTER", "MIR", "MCR", "(0.6)", "BANK",
 	"CONFIG", "BASE", "IA0-1", "IA2-3", "IA4-5", "GENERAL PURPOSE", "CONTROL", "BANK",
@@ -164,7 +164,7 @@ static void update_ethernet_irq(void);
  *
  *************************************/
 
-void smc91c94_init(struct smc91c9x_interface *config)
+void smc91c94_init(const struct smc91c9x_interface *config)
 {
 	ethernet.irq_handler = config->irq_handler;
 }

@@ -326,7 +326,7 @@ static void DrawQuadFill(_Quad *Quad)
 
 typedef void (*_DrawTemplate)(_Quad *);
 
-static _DrawTemplate DrawImage[]=
+static const _DrawTemplate DrawImage[]=
 {
 	TILENAME(4,0,0),
 	TILENAME(8,0,0),
@@ -344,7 +344,7 @@ static _DrawTemplate DrawImage[]=
 	TILENAME(16,0,2),
 };
 
-static _DrawTemplate DrawTile[]=
+static const _DrawTemplate DrawTile[]=
 {
 	TILENAME(4,1,0),
 	TILENAME(8,1,0),

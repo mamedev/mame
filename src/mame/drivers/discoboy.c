@@ -464,7 +464,7 @@ GFXDECODE_END
 
 
 
-static struct MSM5205interface discoboy_msm5205_interface =
+static const struct MSM5205interface discoboy_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* ??? unknown hz */

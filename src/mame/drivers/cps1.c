@@ -162,7 +162,7 @@ Stephh's log (2006.09.20) :
 
 READ16_HANDLER( cps1_dsw_r )
 {
-	static const char *dswname[3] = { "DSWA", "DSWB", "DSWC" };
+	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	int control = readinputportbytag(dswname[offset]);
 	return control << 8 | control;
 }
@@ -306,7 +306,7 @@ INTERRUPT_GEN( cps1_interrupt )
 *
 ********************************************************************/
 
-struct QSound_interface qsound_interface =
+const struct QSound_interface qsound_interface =
 {
 	REGION_SOUND1
 };
@@ -3463,7 +3463,7 @@ static void cps1_irq_handler_mus(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	cps1_irq_handler_mus
 };

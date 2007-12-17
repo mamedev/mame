@@ -191,7 +191,7 @@ typedef enum {
 
 } MNEMONICS;
 
-static struct {
+static const struct {
 	const char *name[2];
 } mnemonics[]={
 	{ { "rtn",					"RET" } },

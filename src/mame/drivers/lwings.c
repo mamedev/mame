@@ -844,7 +844,7 @@ static GFXDECODE_START( trojan )
 	GFXDECODE_ENTRY( REGION_GFX4, 0, bg2_tilelayout,   0,  8 ) /* colors   0-127 */
 GFXDECODE_END
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* slave mode */

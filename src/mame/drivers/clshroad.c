@@ -294,7 +294,7 @@ GFXDECODE_END
 
 
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	wiping_sh_start
 };

@@ -204,7 +204,7 @@ static UINT8 eeprom_enable;
 
 static UINT32 *rom_base;
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	jaguar_external_int
 };
@@ -964,7 +964,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct r3000_config config =
+static const struct r3000_config config =
 {
 	0,		/* 1 if we have an FPU, 0 otherwise */
 	4096,	/* code cache size */
@@ -972,13 +972,13 @@ static struct r3000_config config =
 };
 
 
-static struct jaguar_config gpu_config =
+static const struct jaguar_config gpu_config =
 {
 	jaguar_gpu_cpu_int
 };
 
 
-static struct jaguar_config dsp_config =
+static const struct jaguar_config dsp_config =
 {
 	jaguar_dsp_cpu_int
 };

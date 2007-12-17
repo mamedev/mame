@@ -532,7 +532,7 @@ static void sound_irq(int irq)
 //  mame_printf_debug("sound irq\n");
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_irq
 };

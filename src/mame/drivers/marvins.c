@@ -94,7 +94,7 @@ extern WRITE8_HANDLER( snkwave_w );
 
 static int sound_cpu_busy;
 
-static struct namco_interface snkwave_interface =
+static const struct namco_interface snkwave_interface =
 {
 	1,				/* number of voices */
 	-1				/* memory region */

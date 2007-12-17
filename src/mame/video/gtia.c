@@ -932,7 +932,7 @@ static void render_##player##_w4(UINT8 *dst)	\
 		dst[31] |= color;						\
 	}											\
 }												\
-static void (*render_##player[4])(UINT8 *dst)={ \
+static void (*const render_##player[4])(UINT8 *dst)={ \
 	render_##player##_w1,						\
 	render_##player##_w2,						\
 	render_##player##_w2,						\
@@ -977,7 +977,7 @@ static void render_##missile##_w4(UINT8 *dst)	\
 		dst[ 7] |= color;						\
 	}											\
 }												\
-static void (*render_##missile[4])(UINT8 *dst) = { \
+static void (*const render_##missile[4])(UINT8 *dst) = { \
 	render_##missile##_w1,						\
 	render_##missile##_w2,						\
 	render_##missile##_w2,						\

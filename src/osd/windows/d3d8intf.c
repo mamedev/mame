@@ -231,7 +231,7 @@ static ULONG d3d_release(d3d *d3dptr)
 }
 
 
-static d3d_interface d3d8_interface =
+static const d3d_interface d3d8_interface =
 {
 	d3d_check_device_format,
 	d3d_check_device_type,
@@ -406,7 +406,7 @@ static HRESULT device_test_cooperative_level(d3d_device *dev)
 }
 
 
-static d3d_device_interface d3d8_device_interface =
+static const d3d_device_interface d3d8_device_interface =
 {
 	device_begin_scene,
 	device_clear,
@@ -458,7 +458,7 @@ static HRESULT surface_unlock_rect(d3d_surface *surf)
 }
 
 
-static d3d_surface_interface d3d8_surface_interface =
+static const d3d_surface_interface d3d8_surface_interface =
 {
 	surface_lock_rect,
 	surface_release,
@@ -499,7 +499,7 @@ static HRESULT texture_unlock_rect(d3d_texture *tex, UINT level)
 }
 
 
-static d3d_texture_interface d3d8_texture_interface =
+static const d3d_texture_interface d3d8_texture_interface =
 {
 	texture_get_surface_level,
 	texture_lock_rect,
@@ -534,7 +534,7 @@ static HRESULT vertex_buffer_unlock(d3d_vertex_buffer *vbuf)
 }
 
 
-static d3d_vertex_buffer_interface d3d8_vertex_buffer_interface =
+static const d3d_vertex_buffer_interface d3d8_vertex_buffer_interface =
 {
 	vertex_buffer_lock,
 	vertex_buffer_release,

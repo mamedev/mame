@@ -225,7 +225,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	pcktgal_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz            */

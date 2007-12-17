@@ -755,7 +755,7 @@ static void galaxygn_sound_irq(int line)
 	cpunum_set_input_line_and_vector(1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
-static struct YM2151interface galaxygn_ym2151_interface =
+static const struct YM2151interface galaxygn_ym2151_interface =
 {
 	galaxygn_sound_irq
 };
@@ -798,7 +798,7 @@ MACHINE_DRIVER_END
 
 
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	borntofi_adpcm_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */

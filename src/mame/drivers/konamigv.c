@@ -292,7 +292,7 @@ static void scsi_irq(void)
 	psx_irq_set(0x400);
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
@@ -300,7 +300,7 @@ static SCSIConfigTable dev_table =
 	}
 };
 
-static struct AM53CF96interface scsi_intf =
+static const struct AM53CF96interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */
@@ -331,7 +331,7 @@ static MACHINE_RESET( konamigv )
 	state_save_register_global_array(btc_trackball_data);
 }
 
-static struct PSXSPUinterface konamigv_psxspu_interface =
+static const struct PSXSPUinterface konamigv_psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,

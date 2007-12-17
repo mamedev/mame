@@ -961,7 +961,7 @@ static void soundirq(int state)
 	cpunum_set_input_line(1, 0, state);
 }
 
-static struct YM3812interface ym3812_intf =
+static const struct YM3812interface ym3812_intf =
 {
 	soundirq	/* IRQ Line */
 };

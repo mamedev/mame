@@ -59,7 +59,7 @@ extern int		TC0080VCO_flipscreen;
 extern int TC0080VCO_has_tx;
 
 /* These are hand-tuned values */
-static int zoomy_conv_table[] =
+static const int zoomy_conv_table[] =
 {
 /*    +0   +1   +2   +3   +4   +5   +6   +7    +8   +9   +a   +b   +c   +d   +e   +f */
 	0x00,0x01,0x01,0x02,0x02,0x03,0x04,0x05, 0x06,0x06,0x07,0x08,0x09,0x0a,0x0a,0x0b,	/* 0x00 */

@@ -77,7 +77,7 @@ READ8_HANDLER( taitol_bankc_r );
 
 
 
-static void (*rambank_modify_notifiers[12])(int) =
+static void (*const rambank_modify_notifiers[12])(int) =
 {
 	taitol_chardef14_m,	// 14
 	taitol_chardef15_m,	// 15
@@ -2244,7 +2244,7 @@ static WRITE8_HANDLER( portA_w )
 	}
 }
 
-static struct YM2203interface ym2203_interface_triple =
+static const struct YM2203interface ym2203_interface_triple =
 {
 	0,
 	0,
@@ -2253,7 +2253,7 @@ static struct YM2203interface ym2203_interface_triple =
 	irqhandler
 };
 
-static struct YM2203interface ym2203_interface_champwr =
+static const struct YM2203interface ym2203_interface_champwr =
 {
 	0,
 	0,
@@ -2263,20 +2263,20 @@ static struct YM2203interface ym2203_interface_champwr =
 };
 
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	champwr_msm5205_vck,/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irqhandler,
 	REGION_SOUND1,
 	REGION_SOUND1
 };
 
-static struct YM2203interface ym2203_interface_single =
+static const struct YM2203interface ym2203_interface_single =
 {
 	portA_r,
 	portB_r

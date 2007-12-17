@@ -425,7 +425,7 @@ static MACHINE_RESET( mlc )
 	raster_irq_timer = timer_alloc(interrupt_gen, NULL);
 }
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	0

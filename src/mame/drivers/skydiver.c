@@ -100,7 +100,7 @@ static int skydiver_nmion;
  *
  *************************************/
 
-static UINT16 colortable_source[] =
+static const UINT16 colortable_source[] =
 {
 	0x02, 0x00,
 	0x02, 0x01,

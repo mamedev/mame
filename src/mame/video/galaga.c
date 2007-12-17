@@ -40,7 +40,7 @@ There are 63 stars in each set, 126 displayed at any one time
 
 */
 
-struct star star_seed_tab[252]=
+const struct star star_seed_tab[252]=
 {
 
 /* also shared by Bosconian */
@@ -501,7 +501,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 	for (offs = 0;offs < 0x80;offs += 2)
 	{
-		static int gfx_offs[2][2] =
+		static const int gfx_offs[2][2] =
 		{
 			{ 0, 1 },
 			{ 2, 3 }

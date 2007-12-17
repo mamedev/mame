@@ -346,13 +346,13 @@ static GFXDECODE_START( mlanding )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	ml_msm5205_vck,	/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irq_handler,
 	sound_bankswitch_w

@@ -259,7 +259,7 @@ static void ide_interrupt(int state)
 }
 
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	ide_interrupt
 };
@@ -643,7 +643,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct mips3_config config =
+static const struct mips3_config config =
 {
 	16384,				/* code cache size */
 	16384				/* data cache size */

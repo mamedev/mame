@@ -264,7 +264,7 @@ static void irqhandler(int linestate)
 	cpunum_set_input_line(1,0,linestate);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irqhandler
 };

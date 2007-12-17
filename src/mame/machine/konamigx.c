@@ -920,8 +920,8 @@ static int vinmix, vmixon, osinmix, osmixon;
 static void konamigx_precache_registers(void)
 {
 	// (see sprite color coding scheme on p.46 & 47)
-	static int coregmasks[5] = {0xf,0xe,0xc,0x8,0x0};
-	static int coregshifts[5]= {4,5,6,7,8};
+	static const int coregmasks[5] = {0xf,0xe,0xc,0x8,0x0};
+	static const int coregshifts[5]= {4,5,6,7,8};
 	int i;
 
 	K053246_objset1 = K053246_read_register(5);
@@ -1232,8 +1232,8 @@ void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectang
 					tilemap *sub2, int sub2flags,
 					int mixerflags)
 {
-	static int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-	static int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+	static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+	static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 	static int parity = 0;
 
 	int objbuf[GX_MAX_OBJECTS];
@@ -2049,7 +2049,7 @@ void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode) // (W
 {
 
 // hand-filled but should be close
-static UINT8 ztable[7][8] =
+static const UINT8 ztable[7][8] =
 {
 	{5,4,3,2,1,7,6,0},
 	{4,3,2,1,0,7,6,5},
@@ -2060,7 +2060,7 @@ static UINT8 ztable[7][8] =
 	{5,4,3,2,1,7,6,0}
 };
 
-static UINT8 ptable[7][8] =
+static const UINT8 ptable[7][8] =
 {
 	{0x00,0x00,0x00,0x10,0x20,0x00,0x00,0x30},
 	{0x20,0x20,0x20,0x20,0x20,0x00,0x20,0x20},
@@ -2074,7 +2074,7 @@ static UINT8 ptable[7][8] =
 	INT32 data1, data2, i, j, vpos, hpos, voffs, hoffs, vcorr, hcorr, vmask, hmask, magicid;
 	UINT32 *src, *srcend, *obj, *objend;
 	UINT16 *dst;
-	UINT8  *zcode, *pcode;
+	const UINT8  *zcode, *pcode;
 
 	if (!count || !srcbase) return;
 

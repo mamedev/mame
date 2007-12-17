@@ -422,7 +422,7 @@ static GFXDECODE_START( splash )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
 
-static struct MSM5205interface splash_msm5205_interface =
+static const struct MSM5205interface splash_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8KHz */
@@ -471,7 +471,7 @@ static void ym_irq(int state)
 	logerror("2203 IRQ: %d\n", state);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,ym_irq
 };

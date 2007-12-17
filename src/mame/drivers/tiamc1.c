@@ -267,7 +267,7 @@ static GFXDECODE_START( tiamc1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static struct CustomSound_interface tiamc1_custom_interface =
+static const struct CustomSound_interface tiamc1_custom_interface =
 {
         tiamc1_sh_start
 };

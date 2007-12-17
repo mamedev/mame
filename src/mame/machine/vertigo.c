@@ -39,7 +39,7 @@ static UINT8 irq_state;
 static UINT8 adc_result;
 
 /* 8254 timer config */
-static struct pit8253_config pit8254_config =
+static const struct pit8253_config pit8254_config =
 {
 	TYPE8254,
 	{
@@ -59,7 +59,7 @@ static struct pit8253_config pit8254_config =
 	}
 };
 
-static struct TTL74148_interface irq_encoder =
+static const struct TTL74148_interface irq_encoder =
 {
 	update_irq
 };

@@ -60,7 +60,7 @@ typedef struct _laserdisc_info laserdisc_info;
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern struct CustomSound_interface laserdisc_custom_interface;
+extern const struct CustomSound_interface laserdisc_custom_interface;
 
 
 

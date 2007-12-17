@@ -1264,12 +1264,12 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static struct upd7759_interface upd7759_intf =
+static const struct upd7759_interface upd7759_intf =
 {
 	REGION_SOUND1				/* Memory pointer (gen.h) */
 };
 
-static struct YM3438interface ym3438_intf =
+static const struct YM3438interface ym3438_intf =
 {
 	genesis_irq2_interrupt		/* IRQ handler */
 };

@@ -264,7 +264,7 @@ static void sound_irq(int state)
 	cpunum_set_input_line(1,0,state);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_irq
 };

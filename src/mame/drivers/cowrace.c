@@ -149,7 +149,7 @@ static INPUT_PORTS_START( cowrace )
 	PORT_START	// IN0
 INPUT_PORTS_END
 
-static struct YM2203interface ym2203_interface_1 =
+static const struct YM2203interface ym2203_interface_1 =
 {
 	soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
 	0,				OKIM6295_data_0_w,		// write A,B

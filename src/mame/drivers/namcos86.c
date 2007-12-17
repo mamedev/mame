@@ -1046,14 +1046,14 @@ GFXDECODE_END
 
 /*******************************************************************/
 
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	8,		/* number of voices */
 	-1,		/* memory region */
 	0		/* stereo */
 };
 
-static struct namco_63701x_interface namco_63701x_interface =
+static const struct namco_63701x_interface namco_63701x_interface =
 {
 	REGION_SOUND1	/* memory region */
 };

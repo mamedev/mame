@@ -709,7 +709,7 @@ static void parse_frame(struct tms5110 *tms)
 
 #if 0
 /*This is an example word TEN taken from the TMS5110A datasheet*/
-static unsigned int example_word_TEN[619]={
+static const unsigned int example_word_TEN[619]={
 /* 1*/1,0,0,0,	0,	0,0,0,0,0,	1,1,0,0,0,	0,0,0,1,0,	0,1,1,1,	0,1,0,1,
 /* 2*/1,0,0,0,	0,	0,0,0,0,0,	1,0,0,1,0,	0,0,1,1,0,	0,0,1,1,	0,1,0,1,
 /* 3*/1,1,0,0,	0,	1,0,0,0,0,	1,0,1,0,0,	0,1,0,1,0,	0,1,0,0,	1,0,1,0,	1,0,0,0,	1,0,0,1,	0,1,0,1,	0,0,1,	0,1,0,	0,1,1,

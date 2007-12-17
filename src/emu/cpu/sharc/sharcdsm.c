@@ -1052,7 +1052,7 @@ static UINT32 dasm_invalid(UINT32 pc, UINT64 opcode)
 	return 0;
 }
 
-static SHARC_DASM_OP sharc_dasm_ops[] =
+static const SHARC_DASM_OP sharc_dasm_ops[] =
 {
 	//  |0 0 1|
 	{	0xe000,		0x2000,		dasm_compute_dreg_dmpm								},

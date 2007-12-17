@@ -1280,7 +1280,9 @@ static void ppcdrc603_init(int index, int clock, const void *_config, int (*irqc
 		ppc.optable59[i * 32 | 30] = recompile_fnmsubsx;
 	}
 
+#if (HAS_PPC602 || HAS_MPC8240)
 	ppc.optable31[978] = recompile_tlbld;
+#endif /* (HAS_PPC602 || HAS_MPC8240) */
 
 	for(i = 0; i < 256; i++)
 	{

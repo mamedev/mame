@@ -441,7 +441,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static tms34010_config master_config =
+static const tms34010_config master_config =
 {
 	FALSE,						/* halt on reset */
 	0,							/* the screen operated on */
@@ -453,7 +453,7 @@ static tms34010_config master_config =
 	exterm_from_shiftreg_master	/* read from shiftreg function */
 };
 
-static tms34010_config slave_config =
+static const tms34010_config slave_config =
 {
 	TRUE,						/* halt on reset */
 	0,							/* the screen operated on */

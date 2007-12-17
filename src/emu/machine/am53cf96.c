@@ -13,7 +13,7 @@
 #include "am53cf96.h"
 
 static UINT8 scsi_regs[32], fifo[16], fptr = 0, xfer_state, last_id;
-static struct AM53CF96interface *intf;
+static const struct AM53CF96interface *intf;
 
 static SCSIInstance *devices[8];	// SCSI IDs 0-7
 
@@ -208,7 +208,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 }
 
-void am53cf96_init( struct AM53CF96interface *interface )
+void am53cf96_init( const struct AM53CF96interface *interface )
 {
 	int i;
 

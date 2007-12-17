@@ -283,7 +283,7 @@ static GFXDECODE_START( rcasino )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout2, 0, 16 )
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_2_r,	// DSW1
 	input_port_3_r,	// DSW2

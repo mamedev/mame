@@ -413,7 +413,7 @@ static WRITE8_HANDLER(yscroll_w)
 static READ8_HANDLER(portA_r) {	return readinputportbytag("YM_PortA"); }
 static READ8_HANDLER(portB_r) {	return readinputportbytag("YM_PortB");}
 
-static struct YM2203interface ym2203_interface_0 =
+static const struct YM2203interface ym2203_interface_0 =
 {
 	portA_r,
 	portB_r,
@@ -421,7 +421,7 @@ static struct YM2203interface ym2203_interface_0 =
 	NULL
 };
 
-static struct YM2203interface ym2203_interface_1 =
+static const struct YM2203interface ym2203_interface_1 =
 {
 	NULL,
 	NULL,
@@ -655,7 +655,7 @@ F180 kkkbbppp ; Read on port 0xA005
 
 INPUT_PORTS_END
 
-static struct ES8712interface es8712_interface =
+static const struct ES8712interface es8712_interface =
 {
 	REGION_SOUND1
 };

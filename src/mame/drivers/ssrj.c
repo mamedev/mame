@@ -161,7 +161,7 @@ static GFXDECODE_START( ssrj )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 8*4 )
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0, /* not used ? */
 	input_port_3_r,

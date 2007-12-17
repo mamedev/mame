@@ -1468,13 +1468,13 @@ static MACHINE_RESET( greatgun )
 
 
 /* only Great Guns */
-static struct AY8910interface ay8912_interface_1 =
+static const struct AY8910interface ay8912_interface_1 =
 {
 	0,
 	soundcommand_r
 };
 
-static struct AY8910interface ay8912_interface_2 =
+static const struct AY8910interface ay8912_interface_2 =
 {
 	0,
 	0,

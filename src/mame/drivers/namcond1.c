@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( nd1h8iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 
-static struct C352interface c352_interface =
+static const struct C352interface c352_interface =
 {
 	REGION_SOUND1
 };

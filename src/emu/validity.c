@@ -654,7 +654,7 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			static const char *spacename[] = { "program", "data", "I/O" };
+			static const char *const spacename[] = { "program", "data", "I/O" };
 			int databus_width = cputype_databus_width(cpu->type, spacenum);
 			int addr_shift = cputype_addrbus_shift(cpu->type, spacenum);
 			int alignunit = databus_width/8;

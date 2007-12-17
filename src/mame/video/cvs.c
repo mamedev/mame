@@ -55,7 +55,7 @@ static mame_bitmap *scrolled_background;
 
 int cvs_collision_register=0;
 
-static int ModeOffset[4] = {223,191,255,127};
+static const int ModeOffset[4] = {223,191,255,127};
 
 /******************************************************
  * Convert Colour prom to format for Mame Colour Map  *

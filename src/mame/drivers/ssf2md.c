@@ -12,7 +12,7 @@ ROM_END
 
 static READ16_HANDLER( ssf2ghw_dsw_r )
 {
-	static const char *dswname[3] = { "DSWA", "DSWB", "DSWC" };
+	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return readinputportbytag(dswname[offset]);
 }
 

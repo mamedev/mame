@@ -130,7 +130,7 @@ static render_texture *hilight_texture;
 
 static render_texture *arrow_texture;
 
-static const char *input_format[] =
+static const char *const input_format[] =
 {
 	"%s",
 	"%s Analog",
@@ -1891,7 +1891,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 			((in->type == IPT_OTHER && in->name != IP_NAME_DEFAULT) || port_type_to_group(in->type, in->player) != IPG_INVALID))
 		{
 			UINT16 sortorder;
-			input_seq *curseq, *defseq;
+			const input_seq *curseq, *defseq;
 
 			/* determine the sorting order */
 			if (in->type >= IPT_START1 && in->type <= __ipt_analog_end)

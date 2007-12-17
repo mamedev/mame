@@ -461,7 +461,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static struct AY8910interface lcay8910_interface =
+static const struct AY8910interface lcay8910_interface =
 {
 	input_port_3_r, //DSW0
 	input_port_4_r  //DSW1

@@ -184,7 +184,7 @@ static void lfkp(int mask)
 
 	for (A = 0x0000;A < 0x8000-14;A++)
 	{
-		static char text[] = "INSERT COIN";
+		static const char text[] = "INSERT COIN";
 		int i;
 
 

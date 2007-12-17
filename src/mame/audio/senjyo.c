@@ -11,7 +11,7 @@ static void pio_interrupt(int state)
 	cpunum_set_input_line(1, 0, state);
 }
 
-static z80pio_interface pio_intf =
+static const z80pio_interface pio_intf =
 {
 	pio_interrupt,
 	0,

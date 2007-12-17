@@ -35,7 +35,7 @@ static UINT8 outvalue[8];
 **  1 - fuse blown: disconnected from input (equal to 1)
 **  0 - fuse not blown: connected to input (ie. x, not x, q, not q accordingly)
 */
-static UINT8 fusemap[64*32]=
+static const UINT8 fusemap[64*32]=
 {
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1,1,1,1,1,

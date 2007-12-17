@@ -74,8 +74,8 @@ static WRITE16_HANDLER( sound_w )
 static READ16_HANDLER( alpha_mcu_r )
 {
 	static unsigned coinvalue=0;
-	static UINT8 coinage1[2][2]={{1,1},{1,2}};
-	static UINT8 coinage2[2][2]={{1,5},{2,1}};
+	static const UINT8 coinage1[2][2]={{1,1},{1,2}};
+	static const UINT8 coinage2[2][2]={{1,5},{2,1}};
 
 	static int latch;
 	int source=shared_ram[offset];
@@ -288,7 +288,7 @@ static INTERRUPT_GEN( meijinsn_interrupt )
 		cpunum_set_input_line(0, 2, HOLD_LINE);
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r
 };

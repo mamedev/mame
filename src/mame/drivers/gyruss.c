@@ -338,7 +338,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	0,
 	0,
@@ -346,7 +346,7 @@ static struct AY8910interface ay8910_interface_1 =
 	gyruss_filter0_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	0,
 	0,
@@ -354,7 +354,7 @@ static struct AY8910interface ay8910_interface_2 =
 	gyruss_filter1_w
 };
 
-static struct AY8910interface ay8910_interface_3 =
+static const struct AY8910interface ay8910_interface_3 =
 {
 	gyruss_portA_r
 };

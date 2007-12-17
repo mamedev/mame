@@ -48,7 +48,7 @@ static void fill_srxlat(int *xlat)
 //****************************************************************************
 // Exports
 
-gfx_layout bwing_tilelayout =
+const gfx_layout bwing_tilelayout =
 {
 	16, 16,
 	BW_NTILES,

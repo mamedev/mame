@@ -574,7 +574,7 @@ static const opcodeinfo hd6309_pg2opcodes[] =
 	{ 0xFB, 4, "ADDF",  EXT     }
 };
 
-static const opcodeinfo *hd6309_pgpointers[3] =
+static const opcodeinfo *const hd6309_pgpointers[3] =
 {
 	hd6309_pg0opcodes, hd6309_pg1opcodes, hd6309_pg2opcodes
 };

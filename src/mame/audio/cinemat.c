@@ -1468,7 +1468,7 @@ static WRITE8_HANDLER( sound_output_w )
 }
 
 
-static struct AY8910interface demon_ay8910_interface_1 =
+static const struct AY8910interface demon_ay8910_interface_1 =
 {
 	sound_porta_r,
 	sound_portb_r,
@@ -1476,7 +1476,7 @@ static struct AY8910interface demon_ay8910_interface_1 =
 	sound_portb_w
 };
 
-static struct AY8910interface demon_ay8910_interface_3 =
+static const struct AY8910interface demon_ay8910_interface_3 =
 {
 	0,
 	0,
@@ -1543,7 +1543,7 @@ static ADDRESS_MAP_START( demon_sound_ports, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static struct z80_irq_daisy_chain daisy_chain[] =
+static const struct z80_irq_daisy_chain daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
 	{ 0,0,0,0,-1 }

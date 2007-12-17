@@ -53,7 +53,7 @@ static WRITE8_HANDLER(amidar_soundram_w)
 	amidar_soundram[offset & 0x03ff] = data;
 }
 
-static struct AY8910interface amidar_ay8910_interface_2 =
+static const struct AY8910interface amidar_ay8910_interface_2 =
 {
 	soundlatch_r,
 	scramble_portB_r

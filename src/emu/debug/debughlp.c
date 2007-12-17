@@ -53,7 +53,7 @@ struct _help_item
     TABLE OF HELP
 ***************************************************************************/
 
-static help_item static_help_list[] =
+static const help_item static_help_list[] =
 {
 	{
 		"",
@@ -1035,7 +1035,7 @@ static help_item static_help_list[] =
 const char *debug_get_help(const char *tag)
 {
 	static char ambig_message[1024];
-	help_item *found = NULL;
+	const help_item *found = NULL;
 	int i, msglen, foundcount = 0;
 	int taglen = (int)strlen(tag);
 	char tagcopy[256];

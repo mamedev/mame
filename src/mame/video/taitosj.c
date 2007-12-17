@@ -34,7 +34,7 @@ static UINT8 flipscreen[2];
 static rectangle spritearea[32]; /*areas on bitmap (sprite locations)*/
 static UINT8 spriteon[32]; /* 1 if sprite is active */
 
-static int playfield_enable_mask[3] = { 0x10, 0x20, 0x40 };
+static const int playfield_enable_mask[3] = { 0x10, 0x20, 0x40 };
 
 
 /***************************************************************************
@@ -707,8 +707,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 
 static void draw_playfield(running_machine *machine, int n, mame_bitmap *bitmap)
 {
-	static int fudge1[3] = { 3,  1, -1 };
-	static int fudge2[3] = { 8, 10, 12 };
+	static const int fudge1[3] = { 3,  1, -1 };
+	static const int fudge2[3] = { 8, 10, 12 };
 
 	if (taitosj_video_enable & playfield_enable_mask[n])
 	{

@@ -1370,7 +1370,7 @@ static ADDRESS_MAP_START( ms32_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
-static struct YMF271interface ymf271_interface =
+static const struct YMF271interface ymf271_interface =
 {
 	REGION_SOUND1
 };

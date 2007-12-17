@@ -343,7 +343,7 @@ static GFXDECODE_START( mjkjidai )
 GFXDECODE_END
 
 
-static struct CustomSound_interface adpcm_interface =
+static const struct CustomSound_interface adpcm_interface =
 {
 	mjkjidai_adpcm_start
 };

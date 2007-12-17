@@ -58,7 +58,7 @@ typedef struct kdacApcm
 
 
 #if 0
-static int kdac_note[] = {
+static const int kdac_note[] = {
   261.63/8, 277.18/8,
   293.67/8, 311.13/8,
   329.63/8,
@@ -70,7 +70,7 @@ static int kdac_note[] = {
   523.25/8,
 };
 
-static float kdaca_fn[][2] = {
+static const float kdaca_fn[][2] = {
   /* B */
   { 0x03f, 493.88/8 },		/* ?? */
   { 0x11f, 493.88/4 },		/* ?? */

@@ -14,4 +14,4 @@
 #include <ctype.h>
 
 /* a giant string buffer for temporary strings */
-char giant_string_buffer[GIANT_STRING_BUFFER_SIZE];
+char giant_string_buffer[GIANT_STRING_BUFFER_SIZE] = { 0 };

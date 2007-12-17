@@ -593,12 +593,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	ide_interrupt,
 };
 
-static struct ide_interface gp2_ide_intf =
+static const struct ide_interface gp2_ide_intf =
 {
 	gp2_ide_interrupt,
 };
@@ -616,14 +616,14 @@ static void sound_irq(void)
 		cpunum_set_input_line(0, 1, HOLD_LINE);
 }
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1,
 	NULL,
 	sound_irq
 };
 
-static struct K054539interface gp2_k054539_interface =
+static const struct K054539interface gp2_k054539_interface =
 {
 	REGION_SOUND1
 };

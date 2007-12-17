@@ -155,8 +155,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	int j, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
 
-	static int x_offset[2] = {0x0,0x2};
-	static int y_offset[2] = {0x0,0x1};
+	static const int x_offset[2] = {0x0,0x2};
+	static const int y_offset[2] = {0x0,0x1};
 
 	for (j = 0; j < sprite_count[pri]; j++){
 		int i = sprite_table[pri][j];

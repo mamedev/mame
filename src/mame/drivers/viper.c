@@ -157,7 +157,7 @@ static WRITE64_HANDLER(epic_64be_w)
 
 static int cf_card_ide = 0;
 
-static UINT8 cf_card_tuples[] =
+static const UINT8 cf_card_tuples[] =
 {
 	0x01,		// Device Tuple
 	0x01,		// Tuple size
@@ -608,7 +608,7 @@ static INPUT_PORTS_START(viper)
 
 INPUT_PORTS_END
 
-static ppc_config viper_ppc_cfg =
+static const ppc_config viper_ppc_cfg =
 {
 	PPC_MODEL_MPC8240,
 	0x30,
@@ -659,19 +659,19 @@ static void ide_interrupt(int state)
 {
 }
 
-static struct pci_device_info mpc8240 =
+static const struct pci_device_info mpc8240 =
 {
 	mpc8240_pci_r,
 	mpc8240_pci_w
 };
 
-static struct pci_device_info voodoo3 =
+static const struct pci_device_info voodoo3 =
 {
 	voodoo3_pci_r,
 	voodoo3_pci_w
 };
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	ide_interrupt
 };

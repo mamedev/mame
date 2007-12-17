@@ -591,7 +591,7 @@ struct _address_space
 	UINT8 *				writelookup;		/* write table lookup */
 	handler_data *		readhandlers;		/* read handlers */
 	handler_data *		writehandlers;		/* write handlers */
-	data_accessors *	accessors;			/* pointers to the data access handlers */
+	const data_accessors *	accessors;			/* pointers to the data access handlers */
 };
 
 
@@ -728,7 +728,7 @@ enum
 	ADDRESS_SPACES					/* maximum number of address spaces */
 };
 
-extern const char *address_space_names[ADDRESS_SPACES];
+extern const char *const address_space_names[ADDRESS_SPACES];
 
 /* ----- address map lookup table definitions ----- */
 #define SUBTABLE_COUNT			64						/* number of slots reserved for subtables */

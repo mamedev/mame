@@ -454,7 +454,7 @@ static INPUT_PORTS_START( toprollr )
 
 INPUT_PORTS_END
 
-static gfx_layout charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
 	512,    /* 512 characters (256 in Crazy Climber) */
@@ -464,7 +464,7 @@ static gfx_layout charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8     /* every char takes 8 consecutive bytes */
 };
-static gfx_layout bscharlayout =
+static const gfx_layout bscharlayout =
 {
 	8,8,    /* 8*8 characters */
 	512,//256,    /* 256 characters */
@@ -476,7 +476,7 @@ static gfx_layout bscharlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8     /* every char takes 8 consecutive bytes */
 };
-static gfx_layout spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	128,    /* 128 sprites (64 in Crazy Climber) */
@@ -490,7 +490,7 @@ static gfx_layout spritelayout =
 };
 
 
-static gfx_layout trcharlayout =
+static const gfx_layout trcharlayout =
 {
 	8,8,
 	RGN_FRAC(1,2),
@@ -501,7 +501,7 @@ static gfx_layout trcharlayout =
 	8*8
 };
 
-static gfx_layout trspritelayout =
+static const gfx_layout trspritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,2),    /* 128 sprites (64 in Crazy Climber) */

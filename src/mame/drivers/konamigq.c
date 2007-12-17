@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( sndwritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(MWA16_NOP) /* ?? */
 ADDRESS_MAP_END
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
 };
@@ -325,7 +325,7 @@ static void scsi_irq(void)
 	psx_irq_set(0x400);
 }
 
-static SCSIConfigTable dev_table =
+static const SCSIConfigTable dev_table =
 {
 	1, /* 1 SCSI device */
 	{
@@ -333,7 +333,7 @@ static SCSIConfigTable dev_table =
 	}
 };
 
-static struct AM53CF96interface scsi_intf =
+static const struct AM53CF96interface scsi_intf =
 {
 	&dev_table,		/* SCSI device table */
 	&scsi_irq,		/* command completion IRQ */

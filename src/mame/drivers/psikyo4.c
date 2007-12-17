@@ -481,7 +481,7 @@ static void irqhandler(int linestate)
 		cpunum_set_input_line(0, 12, CLEAR_LINE);
 }
 
-static struct YMF278B_interface ymf278b_interface =
+static const struct YMF278B_interface ymf278b_interface =
 {
 	REGION_SOUND1,
 	irqhandler

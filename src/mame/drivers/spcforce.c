@@ -228,7 +228,7 @@ GFXDECODE_END
 
 
 /* 1-bit RGB palette */
-static UINT16 colortable_source[] =
+static const UINT16 colortable_source[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	0, 0, 1, 2, 3, 4, 5, 6,	 /* not sure about these, but they are only used */

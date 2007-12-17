@@ -483,27 +483,27 @@ static const pia6821_interface pia_1_intf =
 	/*irqs   : A/B             */ 0, 0
 };
 
-static struct TTL74148_interface TTL74148_3S_intf =
+static const struct TTL74148_interface TTL74148_3S_intf =
 {
 	TTL74148_3S_cb
 };
 
-static struct TTL7474_interface TTL7474_2S_1_intf =
+static const struct TTL7474_interface TTL7474_2S_1_intf =
 {
 	TTL7474_2S_1_cb
 };
 
-static struct TTL7474_interface TTL7474_2S_2_intf =
+static const struct TTL7474_interface TTL7474_2S_2_intf =
 {
 	TTL7474_2S_2_cb
 };
 
-static struct TTL7474_interface TTL7474_2U_1_intf =
+static const struct TTL7474_interface TTL7474_2U_1_intf =
 {
 	TTL7474_2U_1_cb
 };
 
-static struct TTL7474_interface TTL7474_2U_2_intf =
+static const struct TTL7474_interface TTL7474_2U_2_intf =
 {
 	TTL7474_2U_2_cb
 };

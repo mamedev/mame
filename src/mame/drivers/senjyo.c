@@ -640,7 +640,7 @@ GFXDECODE_END
 
 
 
-static struct z80_irq_daisy_chain daisy_chain[] =
+static const struct z80_irq_daisy_chain daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti , 0 }, /* device 0 = CTC_0 , high priority */
 	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti , 0 }, /* device 1 = PIO_0 , low  priority */

@@ -876,8 +876,8 @@ read16_handler port_tag_to_handler16(const char *tag);
 read32_handler port_tag_to_handler32(const char *tag);
 read64_handler port_tag_to_handler64(const char *tag);
 const char *input_port_name(const input_port_entry *in);
-input_seq *input_port_seq(input_port_entry *in, int seqtype);
-input_seq *input_port_default_seq(int type, int player, int seqtype);
+const input_seq *input_port_seq(input_port_entry *in, int seqtype);
+const input_seq *input_port_default_seq(int type, int player, int seqtype);
 int input_port_condition(const input_port_entry *in);
 void input_port_set_changed_callback(int port, UINT32 mask, void (*callback)(void *, UINT32, UINT32), void *param);
 

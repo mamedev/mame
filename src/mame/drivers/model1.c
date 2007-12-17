@@ -1077,12 +1077,12 @@ static ADDRESS_MAP_START( model1_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
-static struct MultiPCM_interface m1_multipcm_interface_1 =
+static const struct MultiPCM_interface m1_multipcm_interface_1 =
 {
 	REGION_SOUND1
 };
 
-static struct MultiPCM_interface m1_multipcm_interface_2 =
+static const struct MultiPCM_interface m1_multipcm_interface_2 =
 {
 	REGION_SOUND2
 };

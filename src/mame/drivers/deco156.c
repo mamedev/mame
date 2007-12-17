@@ -409,7 +409,7 @@ static void sound_irq_gen(int state)
 	logerror("sound irq\n");
 }
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	sound_irq_gen

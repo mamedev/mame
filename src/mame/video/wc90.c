@@ -144,52 +144,32 @@ WRITE8_HANDLER( wc90_txvideoram_w )
 					drawgfx( bitmap, machine->gfx[3], code, flags >> 4, \
 					bank&1, bank&2, sx, sy, cliprect, TRANSPARENCY_PEN, 0 )
 
-static char pos32x32[] = { 0, 1, 2, 3 };
-static char pos32x32x[] = { 1, 0, 3, 2 };
-static char pos32x32y[] = { 2, 3, 0, 1 };
-static char pos32x32xy[] = { 3, 2, 1, 0 };
-
-static char pos32x64[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-static char pos32x64x[] = { 5, 4, 7, 6, 1, 0, 3, 2 };
-static char pos32x64y[] = { 2, 3, 0, 1,	6, 7, 4, 5 };
-static char pos32x64xy[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
-
-static char pos64x32[] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-static char pos64x32x[] = { 1, 0, 3, 2, 5, 4, 7, 6 };
-static char pos64x32y[] = { 6, 7, 4, 5, 2, 3, 0, 1 };
-static char pos64x32xy[] = { 7, 6, 5, 4, 3, 2, 1, 0 };
-
-static char pos64x64[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-static char pos64x64x[] = { 5, 4, 7, 6, 1, 0, 3, 2, 13, 12, 15, 14, 9, 8, 11, 10 };
-static char pos64x64y[] = { 10, 11, 8, 9, 14, 15, 12, 13, 2, 3, 0, 1, 6, 7,	4, 5 };
-static char pos64x64xy[] = { 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
-
-static char* p32x32[4] = {
-	pos32x32,
-	pos32x32x,
-	pos32x32y,
-	pos32x32xy
+static const char p32x32[4][4] = {
+	{ 0, 1, 2, 3 },
+	{ 1, 0, 3, 2 },
+	{ 2, 3, 0, 1 },
+	{ 3, 2, 1, 0 }
 };
 
-static char* p32x64[4] = {
-	pos32x64,
-	pos32x64x,
-	pos32x64y,
-	pos32x64xy
+static const char p32x64[4][8] = {
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 5, 4, 7, 6, 1, 0, 3, 2 },
+	{ 2, 3, 0, 1, 6, 7, 4, 5 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 }
 };
 
-static char* p64x32[4] = {
-	pos64x32,
-	pos64x32x,
-	pos64x32y,
-	pos64x32xy
+static const char p64x32[4][8] = {
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 1, 0, 3, 2, 5, 4, 7, 6 },
+	{ 6, 7, 4, 5, 2, 3, 0, 1 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 }
 };
 
-static char* p64x64[4] = {
-	pos64x64,
-	pos64x64x,
-	pos64x64y,
-	pos64x64xy
+static const char p64x64[4][16] = {
+	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+	{ 5, 4, 7, 6, 1, 0, 3, 2, 13, 12, 15, 14, 9, 8, 11, 10 },
+	{ 10, 11, 8, 9, 14, 15, 12, 13, 2, 3, 0, 1, 6, 7, 4, 5 },
+	{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
 };
 
 static void draw_sprite_16x16(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int code,
@@ -237,7 +217,7 @@ static void draw_sprite_32x16(running_machine *machine, mame_bitmap *bitmap, con
 static void draw_sprite_32x32(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
-	char *p = p32x32[ bank&3 ];
+	const char *p = p32x32[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
 	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
@@ -248,7 +228,7 @@ static void draw_sprite_32x32(running_machine *machine, mame_bitmap *bitmap, con
 static void draw_sprite_32x64(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
-	char *p = p32x64[ bank&3 ];
+	const char *p = p32x64[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
 	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
@@ -278,7 +258,7 @@ static void draw_sprite_64x16(running_machine *machine, mame_bitmap *bitmap, con
 static void draw_sprite_64x32(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
-	char *p = p64x32[ bank&3 ];
+	const char *p = p64x32[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
 	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
@@ -293,7 +273,7 @@ static void draw_sprite_64x32(running_machine *machine, mame_bitmap *bitmap, con
 static void draw_sprite_64x64(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int code,
 							  int sx, int sy, int bank, int flags ) {
 
-	char *p = p64x64[ bank&3 ];
+	const char *p = p64x64[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
 	WC90_DRAW_SPRITE( code+p[1], sx+16, sy );
@@ -321,7 +301,7 @@ static void draw_sprite_invalid(running_machine *machine, mame_bitmap *bitmap, c
 
 typedef void (*draw_sprites_procdef)(running_machine *, mame_bitmap *, const rectangle *, int, int, int, int, int );
 
-static draw_sprites_procdef draw_sprites_proc[16] = {
+static const draw_sprites_procdef draw_sprites_proc[16] = {
 	draw_sprite_invalid,	/* 0000 = 08x08 */
 	draw_sprite_invalid,	/* 0001 = 16x08 */
 	draw_sprite_invalid,	/* 0010 = 32x08 */

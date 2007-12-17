@@ -2069,12 +2069,12 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "Wrong 3" )
 INPUT_PORTS_END
 
-static struct NESinterface nes_interface_1 =
+static const struct NESinterface nes_interface_1 =
 {
 	REGION_CPU1
 };
 
-static struct NESinterface nes_interface_2 =
+static const struct NESinterface nes_interface_2 =
 {
 	REGION_CPU2
 };

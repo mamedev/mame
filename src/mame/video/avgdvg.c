@@ -130,7 +130,7 @@ static emu_timer *vg_run_timer, *vg_halt_timer;
 static int flip_x, flip_y;
 
 static vgdata vgd, *vg;
-static vgconf *vgc;
+static const vgconf *vgc;
 static int nvect;
 static vgvector vectbuf[MAXVECT];
 
@@ -1274,7 +1274,7 @@ MACHINE_RESET( avgdvg )
  *
  *************************************/
 
-static vgconf dvg_default =
+static const vgconf dvg_default =
 {
 	{
 		dvg_dmapush,
@@ -1292,7 +1292,7 @@ static vgconf dvg_default =
 	dvg_vgrst
 };
 
-static vgconf avg_default =
+static const vgconf avg_default =
 {
 	{
 		avg_latch0,
@@ -1310,7 +1310,7 @@ static vgconf avg_default =
 	avg_vgrst
 };
 
-static vgconf avg_mhavoc =
+static const vgconf avg_mhavoc =
 {
 	{
 		avg_latch0,
@@ -1328,7 +1328,7 @@ static vgconf avg_mhavoc =
 	mhavoc_vgrst
 };
 
-static vgconf avg_starwars =
+static const vgconf avg_starwars =
 {
 	{
 		avg_latch0,
@@ -1346,7 +1346,7 @@ static vgconf avg_starwars =
 	avg_vgrst
 };
 
-static vgconf avg_tempest =
+static const vgconf avg_tempest =
 {
 	{
 		avg_latch0,
@@ -1364,7 +1364,7 @@ static vgconf avg_tempest =
 	avg_vgrst
 };
 
-static vgconf avg_bzone =
+static const vgconf avg_bzone =
 {
 	{
 		avg_latch0,
@@ -1382,7 +1382,7 @@ static vgconf avg_bzone =
 	avg_vgrst
 };
 
-static vgconf avg_quantum =
+static const vgconf avg_quantum =
 {
 	{
 		quantum_st2st3,

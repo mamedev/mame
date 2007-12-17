@@ -76,14 +76,14 @@ WRITE8_HANDLER( seibu_adpcm_ctl_2_w );
 
 #define SEIBU_SOUND_SYSTEM_YM3812_HARDWARE							\
 																	\
-static struct YM3812interface ym3812_interface =					\
+static const struct YM3812interface ym3812_interface =				\
 {																	\
 	seibu_ym3812_irqhandler											\
 };
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE							\
 																	\
-static struct CustomSound_interface adpcm_interface =				\
+static const struct CustomSound_interface adpcm_interface =			\
 {																	\
 	seibu_adpcm_start,												\
 	seibu_adpcm_stop												\
@@ -91,14 +91,14 @@ static struct CustomSound_interface adpcm_interface =				\
 
 #define SEIBU_SOUND_SYSTEM_YM2151_HARDWARE							\
 																	\
-static struct YM2151interface ym2151_interface =					\
+static const struct YM2151interface ym2151_interface =				\
 {																	\
 	seibu_ym2151_irqhandler											\
 };
 
 #define SEIBU_SOUND_SYSTEM_YM2203_HARDWARE							\
 																	\
-static struct YM2203interface ym2203_interface =					\
+static const struct YM2203interface ym2203_interface =				\
 {																	\
 	0,0,0,0,seibu_ym2203_irqhandler									\
 };

@@ -997,7 +997,7 @@ static UINT16 m_p_n_mdec_r5[ 256 * 3 ];
 static UINT16 m_p_n_mdec_g5[ 256 * 3 ];
 static UINT16 m_p_n_mdec_b5[ 256 * 3 ];
 
-static UINT32 m_p_n_mdec_zigzag[ DCTSIZE2 ] =
+static const UINT32 m_p_n_mdec_zigzag[ DCTSIZE2 ] =
 {
 	 0,  1,  8, 16,  9,  2,  3, 10,
 	17, 24, 32, 25, 18, 11,  4,  5,

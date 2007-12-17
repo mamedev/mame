@@ -243,7 +243,7 @@ INPUT_PORTS_END
 static GFXDECODE_START( speglsht )
 GFXDECODE_END
 
-static struct ST0016interface st0016_interface =
+static const struct ST0016interface st0016_interface =
 {
 	&st0016_charram
 };
@@ -253,7 +253,7 @@ static struct ST0016interface st0016_interface =
 	cpunum_set_input_line(1, R3000_IRQ4, ASSERT_LINE);
 }
 
-static struct r3000_config config =
+static const struct r3000_config config =
 {
 	0,
 	4096,	/* code cache size */

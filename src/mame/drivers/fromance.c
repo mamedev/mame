@@ -1041,7 +1041,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	fromance_adpcm_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz */

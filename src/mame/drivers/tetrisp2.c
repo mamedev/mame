@@ -995,7 +995,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	0	// irq

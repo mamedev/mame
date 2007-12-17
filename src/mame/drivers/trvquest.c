@@ -224,7 +224,7 @@ static void via_irq(int state)
 }
 
 
-static struct via6522_interface via_0_interface =
+static const struct via6522_interface via_0_interface =
 {
 	/*inputs : A/B         */ input_port_0_r, input_port_1_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
@@ -233,7 +233,7 @@ static struct via6522_interface via_0_interface =
 	/*irq                  */ NULL
 };
 
-static struct via6522_interface via_1_interface =
+static const struct via6522_interface via_1_interface =
 {
 	/*inputs : A/B         */ input_port_2_r, input_port_3_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
@@ -242,7 +242,7 @@ static struct via6522_interface via_1_interface =
 	/*irq                  */ via_irq
 };
 
-static struct via6522_interface via_2_interface =
+static const struct via6522_interface via_2_interface =
 {
 	/*inputs : A/B         */ NULL, trvquest_vblank_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,

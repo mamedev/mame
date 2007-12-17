@@ -21,7 +21,7 @@
 /* Bit 3 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-static int gyruss_timer[10] =
+static const int gyruss_timer[10] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
 };

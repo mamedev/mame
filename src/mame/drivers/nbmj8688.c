@@ -3126,7 +3126,7 @@ static INPUT_PORTS_START( nightlov )
 INPUT_PORTS_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	nb1413m3_dipsw1_r,		// DIPSW-A read
 	nb1413m3_dipsw2_r		// DIPSW-B read

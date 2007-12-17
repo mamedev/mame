@@ -957,14 +957,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct CCPUConfig config_nojmi =
+static const struct CCPUConfig config_nojmi =
 {
 	joystick_read,
 	cinemat_vector_callback,
 	0
 };
 
-static struct CCPUConfig config_jmi =
+static const struct CCPUConfig config_jmi =
 {
 	NULL,
 	cinemat_vector_callback,

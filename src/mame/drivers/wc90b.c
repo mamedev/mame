@@ -363,7 +363,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,irqhandler
 };
@@ -381,7 +381,7 @@ static void adpcm_int(int data)
 
 }
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	adpcm_int,	            /* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */

@@ -7,7 +7,7 @@ Atari Wolf Pack (prototype) driver
 #include "driver.h"
 #include "sound/s14001a.h"
 
-static struct S14001A_interface wolfpack_s14001a_interface =
+static const struct S14001A_interface wolfpack_s14001a_interface =
 {
 	REGION_SOUND1	/* voice data region */
 };

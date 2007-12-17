@@ -443,7 +443,7 @@ static NVRAM_HANDLER( cave )
 	}
 }
 
-static struct EEPROM_interface eeprom_interface_93C46_8bit =
+static const struct EEPROM_interface eeprom_interface_93C46_8bit =
 {
 	7,				// address bits 7
 	8,				// data bits    8
@@ -2098,7 +2098,7 @@ static MACHINE_RESET( cave )
 		EEPROM_get_data_pointer(0)[cave_region_byte] =  readinputport(2);
 }
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	sound_irq_gen
@@ -2109,12 +2109,12 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irqhandler
 };
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,irqhandler
 };

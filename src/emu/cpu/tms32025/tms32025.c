@@ -1561,7 +1561,7 @@ static void zals(void)
  *  Cycle Timings
  ***********************************************************************/
 
-static unsigned cycles_main[256]=
+static const unsigned cycles_main[256]=
 {
 /*00*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
 /*08*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
@@ -1597,12 +1597,12 @@ static unsigned cycles_main[256]=
 /*F8*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK
 };
 
-static unsigned cycles_DX_subset[8]=
+static const unsigned cycles_DX_subset[8]=
 {
 /*00*/		2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 2*CLK, 0
 };
 
-static unsigned cycles_CE_subset[256]=
+static const unsigned cycles_CE_subset[256]=
 {
 /*00*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
 /*08*/		1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,

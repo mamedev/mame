@@ -429,7 +429,7 @@ static void soundirq(int state)
 	cpunum_set_input_line(1, 0, state);
 }
 
-static struct YM3812interface lordgun_ym3812_interface =
+static const struct YM3812interface lordgun_ym3812_interface =
 {
 	soundirq
 };

@@ -98,7 +98,7 @@ static UINT8			screen_to_cpu[MAX_SCREENS];
 static UINT8			executing_cpu = 0xff;
 
 /* default configuration */
-static tms34010_config default_config =
+static const tms34010_config default_config =
 {
 	0
 };

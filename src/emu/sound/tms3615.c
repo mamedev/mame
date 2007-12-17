@@ -7,7 +7,7 @@
 
 #define TONES 13
 
-static int divisor[TONES] = { 478, 451, 426, 402, 379, 358, 338, 319, 301, 284, 268, 253, 239 };
+static const int divisor[TONES] = { 478, 451, 426, 402, 379, 358, 338, 319, 301, 284, 268, 253, 239 };
 
 struct TMS3615 {
 	sound_stream *channel;	/* returned by stream_create() */

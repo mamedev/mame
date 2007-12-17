@@ -951,7 +951,7 @@ static WRITE32_HANDLER( model2_serial_w )
 
 /* Protection handling */
 
-static UINT8 ZGUNProt[] =
+static const UINT8 ZGUNProt[] =
 {
 	0x7F,0x4E,0x1B,0x1E,0xA8,0x48,0xF5,0x49,0x31,0x32,0x4A,0x09,0x89,0x29,0xC0,0x41,
 	0x3A,0x49,0x85,0x24,0xA0,0x4D,0x21,0x31,0xEA,0xC3,0x3F,0xAF,0x0E,0x4B,0x25,0x02,
@@ -962,7 +962,7 @@ static UINT8 ZGUNProt[] =
 	0x94,0xD5,0x73,0x09,0xE4,0x3D,0x2D,0x92,0xC9,0xA7,0xA3,0x53,0x42,0x82,0x55,0x67,
 	0xE4,0x66,0xD0,0x4A,0x7D,0x4A,0x13,0xDE,0xD7,0x9F,0x38,0xAA,0x00,0x56,0x85,0x0A
 };
-static UINT8 DCOPKey1326[]=
+static const UINT8 DCOPKey1326[]=
 {
 	0x43,0x66,0x54,0x11,0x99,0xfe,0xcc,0x8e,0xdd,0x87,0x11,0x89,0x22,0xdf,0x44,0x09
 };
@@ -1694,19 +1694,19 @@ static void scsp_irq(int irq)
 	}
 }
 
-static struct SCSPinterface scsp_interface =
+static const struct SCSPinterface scsp_interface =
 {
 	REGION_CPU2,
 	0,
 	scsp_irq
 };
 
-static struct MultiPCM_interface m1_multipcm_interface_1 =
+static const struct MultiPCM_interface m1_multipcm_interface_1 =
 {
 	REGION_SOUND1
 };
 
-static struct MultiPCM_interface m1_multipcm_interface_2 =
+static const struct MultiPCM_interface m1_multipcm_interface_2 =
 {
 	REGION_SOUND2
 };
@@ -1775,7 +1775,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static struct mb86233_config tgp_config =
+static const struct mb86233_config tgp_config =
 {
 	copro_fifoin_pop,
 	copro_fifoout_push,
@@ -1865,7 +1865,7 @@ static MACHINE_DRIVER_START( model2a )
 MACHINE_DRIVER_END
 
 
-static sharc_config sharc_cfg =
+static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_HOST
 };

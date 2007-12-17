@@ -42,7 +42,7 @@
 FILE *debug_source_file;
 symbol_table *global_symtable;
 
-static const char *address_space_name[] = { "program", "data", "I/O" };
+static const char *const address_space_name[] = { "program", "data", "I/O" };
 
 static UINT64 wpdata;
 static UINT64 wpaddr;
@@ -1317,7 +1317,7 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 			/* if we do, evaluate the condition */
 			if (wp->condition == NULL || (expression_execute(wp->condition, &result) == EXPRERR_NONE && result))
 			{
-				static const char *sizes[] =
+				static const char *const sizes[] =
 				{
 					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
 				};

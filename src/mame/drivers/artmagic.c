@@ -449,7 +449,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static tms34010_config tms_config =
+static const tms34010_config tms_config =
 {
 	TRUE,							/* halt on reset */
 	0,								/* the screen operated on */

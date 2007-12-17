@@ -189,7 +189,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 	if (ACCESSING_MSB)
 	{
 		static int jumpcode;
-		static int jumppoints[] =
+		static const int jumppoints[] =
 		{
 			0x0c0c,0x0cac,0x0d42,0x0da2,0x0eea,0x112e,0x1300,0x13fa,
 			0x159a,0x1630,0x109a,0x1700,0x1750,0x1806,0x18d6,0x1a44,
@@ -286,7 +286,7 @@ same commands as some of the above
 */
 
 /* these are used during startup */
-static int jumppoints_00[0x100] =
+static const int jumppoints_00[0x100] =
 {
 	0x6669,	   -1,    -1,    -1,    -1,    -1,    -1,    -1,
 	    -1,    -1,    -1,    -1,    -1,    -1,0x4a46,    -1,
@@ -299,7 +299,7 @@ static int jumppoints_00[0x100] =
 };
 
 /* these are used the rest of the time */
-static int jumppoints_other[0x100] =
+static const int jumppoints_other[0x100] =
 {
 	0x5457,0x494e,0x5f4b,0x4149,0x5345,0x525f,0x4d49,0x5941,
 	0x5241,0x5349,0x4d4f,0x4a49,    -1,    -1,    -1,    -1,
@@ -311,7 +311,7 @@ static int jumppoints_other[0x100] =
 	    -1,    -1,    -1,    -1,    -1,    -1,    -1,    -1
 };
 
-static int *raiga_jumppoints = jumppoints_00;
+static const int *raiga_jumppoints = jumppoints_00;
 
 static MACHINE_RESET ( raiga )
 {
@@ -954,7 +954,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,irqhandler
 };

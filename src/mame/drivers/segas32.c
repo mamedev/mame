@@ -860,7 +860,7 @@ static READ16_HANDLER( analog_custom_io_r )
 
 static WRITE16_HANDLER( analog_custom_io_w )
 {
-	static const char *names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4" };
+	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4" };
 	switch (offset)
 	{
 		case 0x10/2:
@@ -876,7 +876,7 @@ static WRITE16_HANDLER( analog_custom_io_w )
 
 static READ16_HANDLER( extra_custom_io_r )
 {
-	static const char *names[] = { "EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4" };
+	static const char *const names[] = { "EXTRA1", "EXTRA2", "EXTRA3", "EXTRA4" };
 	switch (offset)
 	{
 		case 0x20/2:
@@ -893,7 +893,7 @@ static READ16_HANDLER( extra_custom_io_r )
 
 static WRITE16_HANDLER( orunners_custom_io_w )
 {
-	static const char *names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
+	static const char *const names[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4", "ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 	switch (offset)
 	{
 		case 0x10/2:
@@ -913,7 +913,7 @@ static WRITE16_HANDLER( orunners_custom_io_w )
 
 static READ16_HANDLER( sonic_custom_io_r )
 {
-	static const char *names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
+	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
 
 	switch (offset)
 	{
@@ -933,7 +933,7 @@ static READ16_HANDLER( sonic_custom_io_r )
 
 static WRITE16_HANDLER( sonic_custom_io_w )
 {
-	static const char *names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
+	static const char *const names[] = { "TRACKX1", "TRACKY1", "TRACKX2", "TRACKY2", "TRACKX3", "TRACKY3" };
 
 	switch (offset)
 	{

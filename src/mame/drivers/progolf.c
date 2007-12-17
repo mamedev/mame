@@ -120,7 +120,7 @@ static INPUT_PORTS_START( progolf )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 ) PORT_IMPULSE(2)
 INPUT_PORTS_END
 
-static gfx_layout charlayout =
+static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
 	1024,   /* 1024 characters */
@@ -131,7 +131,7 @@ static gfx_layout charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static gfx_layout spritelayout =
+static const gfx_layout spritelayout =
 {
 	16,16,  /* 16*16 sprites */
 	256,    /* 256 sprites */
@@ -144,7 +144,7 @@ static gfx_layout spritelayout =
 	32*8    /* every sprite takes 32 consecutive bytes */
 };
 
-static gfx_layout progolf_charlayout =
+static const gfx_layout progolf_charlayout =
 {
 	8,8,			/* 8*8 characters */
 	RGN_FRAC(1,3),  /* 512 characters */
@@ -155,7 +155,7 @@ static gfx_layout progolf_charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static gfx_layout progolf_charlayout2 =
+static const gfx_layout progolf_charlayout2 =
 {
 	8,8,			/* 8*8 characters */
 	RGN_FRAC(1,1),  /* 512 characters */
@@ -167,7 +167,7 @@ static gfx_layout progolf_charlayout2 =
 };
 
 #if 1
-static gfx_layout progolf_spritelayout2 =
+static const gfx_layout progolf_spritelayout2 =
 {
 	16,16,  /* 16*16 sprites */
 	RGN_FRAC(1,1),    /* 256 sprites */

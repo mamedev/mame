@@ -126,7 +126,7 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 
 INLINE int sf_invert(int nb)
 {
-	static int delta[4] = {0x00, 0x18, 0x18, 0x00};
+	static const int delta[4] = {0x00, 0x18, 0x18, 0x00};
 	return nb ^ delta[(nb >> 3) & 3];
 }
 

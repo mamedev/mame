@@ -723,17 +723,17 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 	}
 }
 
-static struct K007232_interface hotchase_k007232_interface_1 =
+static const struct K007232_interface hotchase_k007232_interface_1 =
 {
 	REGION_SOUND1
 };
 
-static struct K007232_interface hotchase_k007232_interface_2 =
+static const struct K007232_interface hotchase_k007232_interface_2 =
 {
 	REGION_SOUND2
 };
 
-static struct K007232_interface hotchase_k007232_interface_3 =
+static const struct K007232_interface hotchase_k007232_interface_3 =
 {
 	REGION_SOUND3
 };
@@ -1099,7 +1099,7 @@ static INTERRUPT_GEN( wecleman_interrupt )
 		cpunum_set_input_line(0, 5, HOLD_LINE);	/* to read input ports */
 }
 
-static struct K007232_interface wecleman_k007232_interface =
+static const struct K007232_interface wecleman_k007232_interface =
 {
 	REGION_SOUND1	/* but the 2 channels use different ROMs !*/
 };

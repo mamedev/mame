@@ -66,12 +66,12 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 /* Sauro */
 
-static int scroll2_map     [8] = {2, 1, 4, 3, 6, 5, 0, 7};
-static int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
+static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
+static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
 WRITE8_HANDLER( sauro_scroll_fg_w )
 {
-	int *map = (flip_screen ? scroll2_map_flip : scroll2_map);
+	const int *map = (flip_screen ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];
 
 	tilemap_set_scrollx(fg_tilemap, 0, scroll);

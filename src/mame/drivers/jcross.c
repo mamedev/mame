@@ -45,7 +45,7 @@ static READ8_HANDLER(sharedram_r){	return jcr_sharedram[offset];}
 static WRITE8_HANDLER(sharedram_w){	jcr_sharedram[offset]=data;}
 #endif
 
-static struct namco_interface snkwave_interface =
+static const struct namco_interface snkwave_interface =
 {
 	1,
 	-1

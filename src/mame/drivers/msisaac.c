@@ -517,7 +517,7 @@ static GFXDECODE_START( msisaac )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout, 0, 64 )
 GFXDECODE_END
 
-static struct MSM5232interface msm5232_interface =
+static const struct MSM5232interface msm5232_interface =
 {
 	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }	/* 0.65 (???) uF capacitors (match the sample, not verified) */
 };

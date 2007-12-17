@@ -43,7 +43,7 @@ static READ8_HANDLER( konami_IN1_r )
 {
 	int res;
 	static int cheat = 0;
-	static int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
+	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
 	res = readinputportbytag("IN1");
 
@@ -450,7 +450,7 @@ GFXDECODE_END
 
 
 
-static struct VLM5030interface hyperspt_vlm5030_interface =
+static const struct VLM5030interface hyperspt_vlm5030_interface =
 {
 	REGION_SOUND1,	/* memory region  */
 	0		   /* memory size    */

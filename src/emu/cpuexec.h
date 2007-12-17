@@ -227,7 +227,7 @@ struct _cpu_config
 	int 		vblank_interrupts_per_frame;/* usually 1 */
 	void 		(*timed_interrupt)(void);	/* for interrupts not tied to VBLANK */
 	attoseconds_t timed_interrupt_period;	/* period for periodic interrupts */
-	void *		reset_param;				/* parameter for cpu_reset */
+	const void *reset_param;				/* parameter for cpu_reset */
 	const char *tag;
 };
 

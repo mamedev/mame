@@ -1071,7 +1071,7 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface afega_ym2151_intf =
+static const struct YM2151interface afega_ym2151_intf =
 {
 	irq_handler
 };

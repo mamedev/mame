@@ -795,12 +795,12 @@ static WRITE8_HANDLER( out_1 )
 	coin_lockout_global_w(data & 1);
 }
 
-static struct namcoio_interface intf0 =
+static const struct namcoio_interface intf0 =
 {
 	{ in0_l, in0_h, in1_l, in1_h },	/* port read handlers */
 	{ out_0, out_1 }				/* port write handlers */
 };
-static struct namcoio_interface intf1 =
+static const struct namcoio_interface intf1 =
 {
 	{ dipA_l, dipA_h, dipB_l, dipB_h },	/* port read handlers */
 	{ NULL, NULL }						/* port write handlers */
@@ -1578,7 +1578,7 @@ GFXDECODE_END
 /* The resistance path of the namco sound is 16k compared to
  * the 10k of the highest gain 54xx filter. Giving a 10/16 gain.
  */
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	3,				/* number of voices */
 	REGION_SOUND1	/* memory region */
@@ -1588,7 +1588,7 @@ static struct namco_interface namco_interface =
  * the signal is 1V, or 25%.  The relative volume between
  * 52xx & 54xx is the same.
  */
-static struct namco_52xx_interface namco_52xx_interface =
+static const struct namco_52xx_interface namco_52xx_interface =
 {
 	REGION_SOUND2,	/* memory region */
 	4000,			/* Playback frequency - from 555 timer 6M */

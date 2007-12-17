@@ -351,13 +351,13 @@ Memory Map
    structure for each big sprite: the hardware is probably
    constructing each 4x4 sprite from 4 2x2 sprites... */
 
-static UINT8 xlookup[16] =
+static const UINT8 xlookup[16] =
 	{ 0, 1, 0, 1,
 	  2, 3, 2, 3,
 	  0, 1, 0, 1,
 	  2, 3, 2, 3 };
 
-static UINT8 ylookup[16] =
+static const UINT8 ylookup[16] =
 	{ 0, 0, 1, 1,
 	  0, 0, 1, 1,
 	  2, 2, 3, 3,

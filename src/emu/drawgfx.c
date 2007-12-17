@@ -82,7 +82,7 @@ INLINE void write_dword(void *address, UINT32 data)
     offset
 -------------------------------------------------*/
 
-INLINE int readbit(const UINT8 *src, int bitnum)
+INLINE int readbit(const UINT8 *src, unsigned int bitnum)
 {
 	return src[bitnum / 8] & (0x80 >> (bitnum % 8));
 }

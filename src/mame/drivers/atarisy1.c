@@ -384,7 +384,7 @@ static READ8_HANDLER( via_pb_r )
 }
 
 
-static struct via6522_interface via_interface =
+static const struct via6522_interface via_interface =
 {
 	/*inputs : A/B         */ via_pa_r, via_pb_r,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
@@ -722,7 +722,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	atarigen_ym2151_irq_gen
 };

@@ -246,7 +246,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 
 static UINT32 ebases_trackball_r(void *param)
 {
-	static const char *names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
+	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
 	return readinputportbytag(names[input_select]);
 }
 
@@ -462,7 +462,7 @@ static READ8_HANDLER( demndrgn_io_r )
 
 static UINT32 demndragn_joystick_r(void *param)
 {
-	static const char *names[] = { "MOVEX", "MOVEY" };
+	static const char *const names[] = { "MOVEX", "MOVEY" };
 	return readinputportbytag(names[input_select]);
 }
 
@@ -1226,7 +1226,7 @@ static const struct Samplesinterface gorf_samples_interface =
  *
  *************************************/
 
-static struct z80_irq_daisy_chain tenpin_daisy_chain[] =
+static const struct z80_irq_daisy_chain tenpin_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */

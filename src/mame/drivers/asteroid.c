@@ -192,7 +192,7 @@ static WRITE8_HANDLER( astdelux_coin_counter_w )
 
 static WRITE8_HANDLER( llander_led_w )
 {
-	static const char *lampname[] =
+	static const char *const lampname[] =
 	{
 		"lamp0", "lamp1", "lamp2", "lamp3", "lamp4"
 	};
@@ -609,7 +609,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct POKEYinterface pokey_interface =
+static const struct POKEYinterface pokey_interface =
 {
 	{ 0 },
 	input_port_3_r

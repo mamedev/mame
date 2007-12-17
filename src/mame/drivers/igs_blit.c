@@ -2459,7 +2459,7 @@ static void sound_irq(int state)
 //  cpunum_set_input_line(0, 3, state);
 }
 
-static struct ics2115_interface pgm_ics2115_interface = {
+static const struct ics2115_interface pgm_ics2115_interface = {
 	REGION_SOUND1,
 	sound_irq
 };

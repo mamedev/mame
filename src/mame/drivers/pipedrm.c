@@ -531,14 +531,14 @@ static void irqhandler(int irq)
 }
 
 
-static struct YM2608interface ym2608_interface =
+static const struct YM2608interface ym2608_interface =
 {
 	0,0,0,0,irqhandler,
 	REGION_SOUND1
 };
 
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irqhandler,
 	REGION_SOUND1,

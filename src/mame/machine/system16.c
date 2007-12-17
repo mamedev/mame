@@ -59,7 +59,7 @@ static void sound_cause_nmi( int chip ){
 }
 
 
-struct upd7759_interface sys16_upd7759_interface =
+const struct upd7759_interface sys16_upd7759_interface =
 {
 	0,			/* memory region 3 contains the sample data */
 	sound_cause_nmi

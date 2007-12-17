@@ -924,25 +924,25 @@ static GFXDECODE_START( ojankohs )
 GFXDECODE_END
 
 
-static struct AY8910interface ojankohs_ay8910_interface =
+static const struct AY8910interface ojankohs_ay8910_interface =
 {
 	ojankohs_ay8910_0_r,	/* read port #0 */
 	ojankohs_ay8910_1_r	/* read port #1 */
 };
 
-static struct AY8910interface ojankoy_ay8910_interface =
+static const struct AY8910interface ojankoy_ay8910_interface =
 {
 	ojankoy_ay8910_0_r,		/* read port #0 */
 	ojankoy_ay8910_1_r,		/* read port #1 */
 };
 
-static struct AY8910interface ojankoc_ay8910_interface =
+static const struct AY8910interface ojankoc_ay8910_interface =
 {
 	input_port_0_r,			/* read port #0 */
 	input_port_1_r			/* read port #1 */
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	ojankohs_adpcm_int,		/* IRQ handler */
 	MSM5205_S48_4B			/* 8 KHz */

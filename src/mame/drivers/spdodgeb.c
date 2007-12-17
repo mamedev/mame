@@ -416,12 +416,12 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irq_handler
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	spd_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B	/* 8kHz? */

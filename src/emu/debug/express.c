@@ -1158,6 +1158,12 @@ static EXPRERR execute_tokens(parsed_expression *expr, UINT64 *result)
 	/* reset the token stack */
 	init_token_stack(expr);
 
+	/* Initialize t1, t2 to keep gcc's warnings-as-errors happy */
+	t1.type = TOK_INVALID;
+	t1.offset = 0;
+	t2.type = TOK_INVALID;
+	t2.offset = 0;
+
 	/* create a temporary token for holding intermediate number and memory values */
 	tempnum.type = TOK_NUMBER;
 	tempnum.offset = 0;

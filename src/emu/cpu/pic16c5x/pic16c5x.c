@@ -107,7 +107,7 @@ static int    picmodel;
 static int    pic16C5x_reset_vector;
 static int    pic16C5x_icount;
 typedef void (*opcode_fn) (void);
-static unsigned cycles_000_other[16];
+static const unsigned cycles_000_other[16];
 
 
 #define TMR0	internalram[1]
@@ -174,8 +174,8 @@ static unsigned cycles_000_other[16];
 
 /* Easy bit position selectors */
 #define POS	 ((R.opcode.b.l >> 5) & 7)
-static unsigned int bit_clr[8] = { 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
-static unsigned int bit_set[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+static const unsigned int bit_clr[8] = { 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
+static const unsigned int bit_set[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 
 
 INLINE void CLR(UINT16 flag) { R.STATUS &= ~flag; }
@@ -615,7 +615,7 @@ static void xorwf(void)
  *  Cycle Timings
  ***********************************************************************/
 
-static unsigned cycles_main[256]=
+static const unsigned cycles_main[256]=
 {
 /*00*/	1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
 /*10*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK,
@@ -635,7 +635,7 @@ static unsigned cycles_main[256]=
 /*F0*/	1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK
 };
 
-static opcode_fn opcode_main[256]=
+static const opcode_fn opcode_main[256]=
 {
 /*00*/  nop,	illegal,movwf,	movwf,	clrw,	illegal,clrf,	clrf,
 /*08*/  subwf,	subwf,	subwf,	subwf,	decf,	decf,	decf,	decf,
@@ -672,12 +672,12 @@ static opcode_fn opcode_main[256]=
 };
 
 
-static unsigned cycles_000_other[16]=
+static const unsigned cycles_000_other[16]=
 {
 /*00*/	1*CLK, 0*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 1*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK, 0*CLK
 };
 
-static opcode_fn opcode_000_other[16]=
+static const opcode_fn opcode_000_other[16]=
 {
 /*00*/  nop,	illegal,option,	sleepic,clrwdt,	tris,	tris,	tris,
 /*08*/  illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal

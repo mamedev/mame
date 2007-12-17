@@ -640,7 +640,7 @@ static void via_irq(int state)
 }
 
 
-static struct via6522_interface via_interface =
+static const struct via6522_interface via_interface =
 {
 	/*inputs : A/B         */ 0, 0,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
@@ -650,7 +650,7 @@ static struct via6522_interface via_interface =
 };
 
 
-static struct via6522_interface drivedge_via_interface =
+static const struct via6522_interface drivedge_via_interface =
 {
 	/*inputs : A/B         */ 0, 0,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
@@ -1484,7 +1484,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct ES5506interface es5506_interface =
+static const struct ES5506interface es5506_interface =
 {
 	REGION_SOUND1,
 	REGION_SOUND2,

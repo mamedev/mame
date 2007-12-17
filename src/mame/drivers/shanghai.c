@@ -37,7 +37,7 @@ static UINT16 cl0,cl1,ccmp;
 static INT16 cpx,cpy;
 
 
-static int instruction_length[64] =
+static const int instruction_length[64] =
 {
 	 0, 3, 2, 1,	/* 0x */
 	 0, 0,-1, 2,	/* 1x */
@@ -57,7 +57,7 @@ static int instruction_length[64] =
 	 5, 5, 5, 5 	/* Fx */
 };
 
-static const char *instruction_name[64] =
+static const char *const instruction_name[64] =
 {
 	"undef","ORG  ","WPR  ","RPR  ",	/* 0x */
 	"undef","undef","WPTN ","RPTN ",	/* 1x */
@@ -971,7 +971,7 @@ INPUT_PORTS_END
 
 
 
-static struct YM2203interface sh_ym2203_interface =
+static const struct YM2203interface sh_ym2203_interface =
 {
 	input_port_3_r,
 	input_port_4_r

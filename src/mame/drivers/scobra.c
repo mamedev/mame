@@ -82,7 +82,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface hustler_ay8910_interface =
+static const struct AY8910interface hustler_ay8910_interface =
 {
 	soundlatch_r,
 	frogger_portB_r
@@ -1373,7 +1373,7 @@ MM_COMMON2
 INPUT_PORTS_END
 
 
-static struct AY8910interface scobra_ay8910_interface_2 =
+static const struct AY8910interface scobra_ay8910_interface_2 =
 {
 	soundlatch_r,
 	scramble_portB_r

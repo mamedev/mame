@@ -1,3 +1,3 @@
 #include "scsi.h"
 
-extern SCSIClass SCSIClassCr589;
+extern const SCSIClass SCSIClassCr589;

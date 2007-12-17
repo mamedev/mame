@@ -221,13 +221,13 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static struct YM2203interface ym2203_interface_1 =
+static const struct YM2203interface ym2203_interface_1 =
 {
 	input_port_0_r,
 	input_port_1_r
 };
 
-static struct YM2203interface ym2203_interface_2 =
+static const struct YM2203interface ym2203_interface_2 =
 {
 	0,
 	input_port_2_r

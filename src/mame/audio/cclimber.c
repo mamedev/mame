@@ -75,7 +75,7 @@ WRITE8_HANDLER( cclimber_sample_trigger_w )
 }
 
 
-struct AY8910interface cclimber_ay8910_interface =
+const struct AY8910interface cclimber_ay8910_interface =
 {
 	0,
 	0,

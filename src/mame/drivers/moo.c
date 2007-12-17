@@ -606,7 +606,7 @@ static INPUT_PORTS_START( bucky )
 INPUT_PORTS_END
 
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
 };

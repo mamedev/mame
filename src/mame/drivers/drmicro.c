@@ -219,7 +219,7 @@ static GFXDECODE_START( drmicro )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout8, 256, 32 ) /* sprites */
 GFXDECODE_END
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	pcm_w,			/* IRQ handler */
 	MSM5205_S64_4B	/* 6 KHz */

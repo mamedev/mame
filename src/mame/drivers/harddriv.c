@@ -190,7 +190,7 @@ void slapstic_init(int chip);
  *************************************/
 
 /* used on the medium-resolution driver boards */
-static tms34010_config gsp_config_driver =
+static const tms34010_config gsp_config_driver =
 {
 	TRUE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -204,7 +204,7 @@ static tms34010_config gsp_config_driver =
 
 
 /* used on the low-resolution multisync boards for harddrvc, racedrvc, steeltal */
-static tms34010_config gsp_config_multisync =
+static const tms34010_config gsp_config_multisync =
 {
 	TRUE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -218,7 +218,7 @@ static tms34010_config gsp_config_multisync =
 
 
 /* used on the low-resolution multisync board for stunrun */
-static tms34010_config gsp_config_multisync_stunrun =
+static const tms34010_config gsp_config_multisync_stunrun =
 {
 	TRUE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -231,7 +231,7 @@ static tms34010_config gsp_config_multisync_stunrun =
 };
 
 
-static tms34010_config msp_config =
+static const tms34010_config msp_config =
 {
 	TRUE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -242,7 +242,7 @@ static tms34010_config msp_config =
 };
 
 
-static struct dsp32_config dsp32c_config =
+static const struct dsp32_config dsp32c_config =
 {
 	hddsk_update_pif				/* a change has occurred on an output pin */
 };

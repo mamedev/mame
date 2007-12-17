@@ -52,7 +52,7 @@ struct _flt_rc_config
 	double	C;
 };
 
-extern flt_rc_config flt_rc_ac_default;
+extern const flt_rc_config flt_rc_ac_default;
 
 void filter_rc_set_RC(int num, int type, double R1, double R2, double R3, double C);
 

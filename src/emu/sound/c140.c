@@ -138,7 +138,7 @@ static long find_sample(struct c140_info *info, long adrs, long bank, int voice)
 {
 	long newadr = 0;
 
-	static INT16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
+	static const INT16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
 
 	adrs=(bank<<16)+adrs;
 

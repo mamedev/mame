@@ -1344,7 +1344,7 @@ INLINE void swi( void )
 #define decodePB_dst(n) 	(((n) >> 0) & 0x07)
 
 static UINT8 dummy_byte;
-static unsigned char *regTable[4] = { &(CC), &(A), &(B), &dummy_byte };
+static unsigned char *const regTable[4] = { &(CC), &(A), &(B), &dummy_byte };
 
 static const UINT8 bitTable[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
 

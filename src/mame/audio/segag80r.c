@@ -418,7 +418,7 @@ static const struct Samplesinterface sega005_samples_interface =
 };
 
 
-static struct CustomSound_interface sega005_custom_interface =
+static const struct CustomSound_interface sega005_custom_interface =
 {
 	sega005_custom_start
 };
@@ -782,7 +782,7 @@ static const struct Samplesinterface monsterb_samples_interface =
 };
 
 
-static struct TMS36XXinterface monsterb_tms3617_interface =
+static const struct TMS36XXinterface monsterb_tms3617_interface =
 {
 	TMS3617,
 	{0.5,0.5,0.5,0.5,0.5,0.5}  /* decay times of voices */

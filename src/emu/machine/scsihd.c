@@ -303,7 +303,7 @@ static int scsihd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 	return SCSIBase( &SCSIClassHARDDISK, operation, file, intparm, ptrparm );
 }
 
-SCSIClass SCSIClassHARDDISK =
+const SCSIClass SCSIClassHARDDISK =
 {
 	&SCSIClassDevice,
 	scsihd_dispatch,

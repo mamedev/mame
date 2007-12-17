@@ -143,6 +143,7 @@ const options_entry mame_core_options[] =
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },
 	{ "log",                         "0",         OPTION_BOOLEAN,    "generate an error.log file" },
 	{ "verbose;v",                   "0",         OPTION_BOOLEAN,    "display additional diagnostic information" },
+	{ "update_in_pause",             "0",         OPTION_BOOLEAN,    "keep calling video updates while in pause" },
 #ifdef MAME_DEBUG
 	{ "debug;d",                     "1",         OPTION_BOOLEAN,    "enable/disable debugger" },
 	{ "debugscript",                 NULL,        0,                 "script for debugger" },

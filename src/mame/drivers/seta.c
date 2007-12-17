@@ -1340,11 +1340,11 @@ static WRITE16_HANDLER( timer_regs_w )
 
 ***************************************************************************/
 
-static struct x1_010_interface seta_sound_intf =
+static const struct x1_010_interface seta_sound_intf =
 {
 	0x0000,		/* address */
 };
-static struct x1_010_interface seta_sound_intf2 =
+static const struct x1_010_interface seta_sound_intf2 =
 {
 	0x1000,		/* address */
 };
@@ -1354,7 +1354,7 @@ static void utoukond_ym3438_interrupt(int linestate)
 	cpunum_set_input_line(1, INPUT_LINE_NMI, linestate);
 }
 
-static struct YM3438interface utoukond_ym3438_intf =
+static const struct YM3438interface utoukond_ym3438_intf =
 {
 	utoukond_ym3438_interrupt	// IRQ handler
 };
@@ -6378,7 +6378,7 @@ static INTERRUPT_GEN( seta_sub_interrupt )
                                 Thundercade
 ***************************************************************************/
 
-static struct YM2203interface tndrcade_ym2203_interface =
+static const struct YM2203interface tndrcade_ym2203_interface =
 {
 	dsw1_r,		/* input A: DSW 1 */
 	dsw2_r		/* input B: DSW 2 */
@@ -9000,7 +9000,7 @@ static DRIVER_INIT(wiggie)
 		memcpy(temp,&src[i],16);
 		for (j = 0;j < 16;j++)
 		{
-			static int convtable[16] =
+			static const int convtable[16] =
 			{
 				0x0, 0x1, 0x8, 0x9,
 				0x2, 0x3, 0xa, 0xb,

@@ -789,19 +789,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,sound_irq
 };
 
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_irq
 };
 
 
-static struct SEGAPCMinterface segapcm_interface =
+static const struct SEGAPCMinterface segapcm_interface =
 {
 	BANK_512,
 	REGION_SOUND1

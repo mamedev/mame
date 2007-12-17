@@ -575,7 +575,7 @@ static WRITE8_HANDLER(YM2203_out_b)
         set_led_status(1,!(data & 0x10));            // 'LOCK-ON' lamp
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_2_r,
 	0,

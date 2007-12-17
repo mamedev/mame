@@ -185,7 +185,7 @@ static const hash_function_desc hash_descs[HASH_NUM_FUNCTIONS] =
 	},
 };
 
-static const char* info_strings[] =
+static const char *const info_strings[] =
 {
 	"$ND$",       // No dump
 	"$BD$"        // Bad dump

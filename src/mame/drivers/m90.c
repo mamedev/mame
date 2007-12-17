@@ -639,7 +639,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	m72_ym2151_irq_handler
 };

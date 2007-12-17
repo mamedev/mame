@@ -247,12 +247,12 @@ static NVRAM_HANDLER(ultrsprt)
 	eeprom_handler(file, read_or_write);
 }
 
-static ppc_config ultrsprt_ppc_cfg =
+static const ppc_config ultrsprt_ppc_cfg =
 {
 	PPC_MODEL_403GA
 };
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
 };

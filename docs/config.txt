@@ -877,6 +877,13 @@ Debugging options
 	reporting bugs, please run with mame -verbose and include the 
 	resulting information. The default is OFF (-noverbose).
 
+-[no]update_in_pause
+
+	Enables updating of the main screen bitmap while the game is paused.
+	This means that the VIDEO_UPDATE callback will be called repeatedly
+	during pause, which can be useful for debugging. The default is OFF
+	(-noupdate_in_pause).
+
 -[no]debug
 
 	Activates the integrated debugger. This is available only if the 

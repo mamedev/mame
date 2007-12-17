@@ -53,7 +53,7 @@ write    read
 static READ16_HANDLER( shangha3_prot_r )
 {
 	static int count;
-	static int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
+	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
 logerror("PC %04x: read 20004e\n",activecpu_get_pc());
 
@@ -476,7 +476,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_3_r,
 	input_port_2_r
@@ -487,7 +487,7 @@ static void irqhandler(int linestate)
 	cpunum_set_input_line(1, INPUT_LINE_NMI, linestate);
 }
 
-static struct YM3438interface ym3438_interface =
+static const struct YM3438interface ym3438_interface =
 {
 	irqhandler
 };

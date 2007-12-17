@@ -420,7 +420,7 @@ static void msmint( int data ) {
 	}
 }
 
-static struct MSM5205interface msm_interface =
+static const struct MSM5205interface msm_interface =
 {
 	msmint,			/* interrupt function */
 	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback */

@@ -1339,11 +1339,11 @@ static WRITE32_HANDLER( sound_w )
 	}
 }
 
-static int cab_data[2] = { 0x0, 0x8 };
-static int kbm_cab_data[2] = { 0x2, 0x8 };
-static int ppd_cab_data[2] = { 0x1, 0x9 };
+static const int cab_data[2] = { 0x0, 0x8 };
+static const int kbm_cab_data[2] = { 0x2, 0x8 };
+static const int ppd_cab_data[2] = { 0x1, 0x9 };
 static int cab_data_ptr = 0;
-static int * cur_cab_data = cab_data;
+static const int * cur_cab_data = cab_data;
 
 static READ32_HANDLER( cabinet_r )
 {
@@ -1783,7 +1783,7 @@ static void sound_irq_callback(int state)
 {
 }
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	sound_irq_callback,			// irq
@@ -1974,7 +1974,7 @@ static MACHINE_RESET( firebeat )
 	cdda_set_cdrom(0, cd);
 }
 
-static ppc_config firebeat_ppc_cfg =
+static const ppc_config firebeat_ppc_cfg =
 {
 	PPC_MODEL_403GCX
 };

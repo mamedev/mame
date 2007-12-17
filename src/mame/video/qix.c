@@ -242,7 +242,7 @@ WRITE8_HANDLER( qix_paletteram_w )
 	/* this conversion table should be about right. It gives a reasonable */
 	/* gray scale in the test screen, and the red, green and blue squares */
 	/* in the same screen are barely visible, as the manual requires. */
-	static UINT8 table[16] =
+	static const UINT8 table[16] =
 	{
 		0x00,	/* value = 0, intensity = 0 */
 		0x12,	/* value = 0, intensity = 1 */

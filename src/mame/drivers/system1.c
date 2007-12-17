@@ -334,7 +334,7 @@ ADDRESS_MAP_END
 /* protection values from real hardware, these were verified to be the same on the title
    screen and in the first level... they're all jumps that the MCU appears to put in RAM
    at some point */
-static int  shtngtab[]=
+static const int shtngtab[]=
 {
 	0xC3,0xC1,0x39,
 	0xC3,0x6F,0x0A,

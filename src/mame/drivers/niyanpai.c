@@ -839,7 +839,7 @@ static INTERRUPT_GEN( niyanpai_interrupt )
 	cpunum_set_input_line(0, 1, HOLD_LINE);
 }
 
-static struct z80_irq_daisy_chain daisy_chain_sound[] =
+static const struct z80_irq_daisy_chain daisy_chain_sound[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },	/* device 0 = CTC_1 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */

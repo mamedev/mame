@@ -104,7 +104,7 @@ static void pc_com_refresh_connected(int n, int data)
 
 /* PC interface to PC-com hardware. Done this way because PCW16 also
 uses PC-com hardware and doesn't have the same setup! */
-static uart8250_interface com_interface[4]=
+static const uart8250_interface com_interface[4]=
 {
 	{
 		TYPE8250,
@@ -201,7 +201,7 @@ static const struct pit8253_config pc_pit8254_config =
 
 
 #ifdef MESS
-static PC_LPT_CONFIG lpt_config[3]={
+static const PC_LPT_CONFIG lpt_config[3]={
 	{
 		1,
 		LPT_UNIDIRECTIONAL,
@@ -219,7 +219,7 @@ static PC_LPT_CONFIG lpt_config[3]={
 	}
 };
 
-static CENTRONICS_CONFIG cent_config[3]={
+static const CENTRONICS_CONFIG cent_config[3]={
 	{
 		PRINTER_IBM,
 		pc_lpt_handshake_in
@@ -367,7 +367,7 @@ static void pc_dma_write_byte(int channel, offs_t offset, UINT8 data)
 
 
 
-static struct dma8237_interface pc_dma =
+static const struct dma8237_interface pc_dma =
 {
 	0,
 	1.0e-6,	// 1us

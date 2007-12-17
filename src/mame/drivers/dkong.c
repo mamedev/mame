@@ -230,7 +230,7 @@ static void p8257_ctl_w(UINT8 data);
  *
  *************************************/
 
-static struct dma8257_interface dk_dma =
+static const struct dma8257_interface dk_dma =
 {
 	0,
 	CLOCK_1H,
@@ -243,7 +243,7 @@ static struct dma8257_interface dk_dma =
 	{ 0, 0, 0, 0 }
 };
 
-static struct dma8257_interface hb_dma =
+static const struct dma8257_interface hb_dma =
 {
 	0,
 	CLOCK_1H,

@@ -702,12 +702,12 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,irqhandler
 };
 
-static struct YM2151interface whizz_ym2151_interface =
+static const struct YM2151interface whizz_ym2151_interface =
 {
 	irqhandler
 };

@@ -244,7 +244,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r,
 	soundlatch2_r

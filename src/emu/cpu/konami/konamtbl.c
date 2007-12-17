@@ -350,7 +350,7 @@ INLINE void absd( void );
 
 INLINE void opcode2( void );
 
-static void (*konami_main[0x100])(void) = {
+static void (*const konami_main[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	opcode2,opcode2,opcode2,opcode2,pshs   ,pshu   ,puls   ,pulu   ,
 	lda_im ,ldb_im ,opcode2,opcode2,adda_im,addb_im,opcode2,opcode2,	/* 10 */
@@ -385,7 +385,7 @@ static void (*konami_main[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*konami_indexed[0x100])(void) = {
+static void (*const konami_indexed[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	leax   ,leay   ,leau   ,leas   ,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_ix ,ldb_ix ,illegal,illegal,adda_ix,addb_ix,	/* 10 */
@@ -420,7 +420,7 @@ static void (*konami_indexed[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*konami_direct[0x100])(void) = {
+static void (*const konami_direct[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_di ,ldb_di ,illegal,illegal,adda_di,addb_di,	/* 10 */
@@ -455,7 +455,7 @@ static void (*konami_direct[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*konami_extended[0x100])(void) = {
+static void (*const konami_extended[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_ex ,ldb_ex ,illegal,illegal,adda_ex,addb_ex,	/* 10 */

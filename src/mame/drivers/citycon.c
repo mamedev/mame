@@ -196,7 +196,7 @@ GFXDECODE_END
 
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	soundlatch_r,
 	soundlatch2_r,

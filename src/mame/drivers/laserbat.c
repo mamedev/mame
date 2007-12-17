@@ -651,7 +651,7 @@ static const pia6821_interface pia_0_intf =
 	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
 };
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	soundlatch_r,

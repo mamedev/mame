@@ -760,7 +760,7 @@ static int scsicd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 	return SCSIBase( &SCSIClassCDROM, operation, file, intparm, ptrparm );
 }
 
-SCSIClass SCSIClassCDROM =
+const SCSIClass SCSIClassCDROM =
 {
 	&SCSIClassDevice,
 	scsicd_dispatch,

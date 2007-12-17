@@ -206,7 +206,7 @@ static WRITE8_HANDLER( maxrpm_op5_w )
 
 static WRITE8_HANDLER( maxrpm_op6_w )
 {
-	static const char *inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
+	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 
 	/*
         Reflective Sensor Control:
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( spyhunt_op4_w )
 	/* bit 5 = STR1 (J1-13) */
 	if (((last_op4 ^ data) & 0x20) && !(data & 0x20))
 	{
-		static const char *lampname[8] =
+		static const char *const lampname[8] =
 		{
 			"lamp0", "lamp1", "lamp2", "lamp3",
 			"lamp4", "lamp5", "lamp6", "lamp7"

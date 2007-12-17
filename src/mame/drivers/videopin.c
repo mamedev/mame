@@ -117,7 +117,7 @@ static READ8_HANDLER( videopin_misc_r )
 static WRITE8_HANDLER( videopin_led_w )
 {
 	int i = (video_screen_get_vpos(0) >> 5) & 7;
-	static const char* matrix[8][4] =
+	static const char *const matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },
 		{ "LED25", "LED17", "LED10", "LED08" },

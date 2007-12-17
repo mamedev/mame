@@ -391,7 +391,7 @@ static void vball_irq_handler(int irq)
 	cpunum_set_input_line( 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	vball_irq_handler
 };

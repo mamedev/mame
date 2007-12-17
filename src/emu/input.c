@@ -337,9 +337,9 @@ static INT32				joystick_deadzone;
 static INT32 				joystick_saturation;
 
 /* standard joystick mappings */
-const char *				joystick_map_8way = "7778...4445";
-const char *				joystick_map_4way_sticky = "s8.4s8.44s8.4445";
-const char *				joystick_map_4way_diagonal = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
+const char			joystick_map_8way[] = "7778...4445";
+const char			joystick_map_4way_sticky[] = "s8.4s8.44s8.4445";
+const char			joystick_map_4way_diagonal[] = "4444s8888..444458888.444555888.ss5.222555666.222256666.2222s6666.2222s6666";
 
 
 
@@ -1549,7 +1549,7 @@ static int joystick_map_parse(const char *mapstring, joystick_map *map)
 						JOYSTICK_MAP_DOWN | JOYSTICK_MAP_RIGHT,
 						JOYSTICK_MAP_STICKY
 					};
-					static const char *validchars = "789456123s";
+					static const char validchars[] = "789456123s";
 					const char *ptr = strchr(validchars, *mapstring++);
 
 					/* invalid characters exit immediately */

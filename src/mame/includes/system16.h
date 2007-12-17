@@ -90,7 +90,7 @@ extern UINT16 *sys16_extraram2;
 extern UINT16 *sys16_extraram3;
 
 /* sound */
-extern struct upd7759_interface sys16_upd7759_interface;
+extern const struct upd7759_interface sys16_upd7759_interface;
 
 extern int sys18_sound_info[4*2];
 
@@ -233,7 +233,7 @@ extern int sys16_gr_bitmap_width;
 extern int sys16_sprxoffset;
 extern int sys16_bgxoffset;
 extern int sys16_fgxoffset;
-extern int *sys16_obj_bank;
+extern const int *sys16_obj_bank;
 extern int sys16_textlayer_lo_min;
 extern int sys16_textlayer_lo_max;
 extern int sys16_textlayer_hi_min;

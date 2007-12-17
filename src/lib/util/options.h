@@ -87,7 +87,7 @@ typedef enum _options_range_type options_range_type;
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern const char *option_unadorned[MAX_UNADORNED_OPTIONS];
+extern const char *const option_unadorned[MAX_UNADORNED_OPTIONS];
 
 
 

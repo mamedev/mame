@@ -2581,21 +2581,21 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface_rsaga2 =
+static const struct YM2610interface ym2610_interface_rsaga2 =
 {
 	irqhandler,
 	REGION_SOUND1,
 	REGION_SOUND2
 };
 
-static struct YM2610interface ym2610_interface_crimec =
+static const struct YM2610interface ym2610_interface_crimec =
 {
 	irqhandler,
 	REGION_SOUND1,
 	REGION_SOUND1
 };
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,
@@ -2627,7 +2627,7 @@ static void mb87078_gain_changed(int channel, int percent)
 	}
 }
 
-static struct MB87078interface mb87078_interface =
+static const struct MB87078interface mb87078_interface =
 {
 	mb87078_gain_changed	/*callback function for gain change*/
 };

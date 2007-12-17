@@ -394,7 +394,7 @@ DMA_DRAW_FUNC(prefix##_c0c1_xf, XFLIP_YES, PIXEL_COLOR, PIXEL_COLOR)	\
 DMA_DRAW_FUNC(prefix##_c0p1_xf, XFLIP_YES, PIXEL_COLOR, PIXEL_COPY)		\
 DMA_DRAW_FUNC(prefix##_p0c1_xf, XFLIP_YES, PIXEL_COPY,  PIXEL_COLOR)	\
 																												\
-static dma_draw_func prefix[32] =																				\
+static const dma_draw_func prefix[32] =																				\
 {																												\
 /*  B0:N / B1:N         B0:Y / B1:N         B0:N / B1:Y         B0:Y / B1:Y */									\
 	dma_draw_none,		prefix##_p0,		prefix##_p1,		prefix##_p0p1,		/* no color */ 				\

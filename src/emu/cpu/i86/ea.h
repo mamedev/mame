@@ -28,7 +28,7 @@ static unsigned EA_205(void) { i8086_ICount-=9; EO=FETCHOP; EO+=FETCHOP<<8; EO+=
 static unsigned EA_206(void) { i8086_ICount-=9; EO=FETCHOP; EO+=FETCHOP<<8; EO+=I.regs.w[BP]; EA=DefaultBase(SS)+(WORD)EO; return EA; }
 static unsigned EA_207(void) { i8086_ICount-=9; EO=FETCHOP; EO+=FETCHOP<<8; EO+=I.regs.w[BX]; EA=DefaultBase(DS)+(WORD)EO; return EA; }
 
-static unsigned (*GetEA[192])(void)={
+static unsigned (*const GetEA[192])(void)={
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,

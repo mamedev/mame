@@ -150,7 +150,7 @@ static GFXDECODE_START( starcrus )
 GFXDECODE_END
 
 
-static UINT16 colortable_source[] =
+static const UINT16 colortable_source[] =
 {
 	0x00, 0x01, /* White on Black */
 };

@@ -5,13 +5,13 @@
 
 struct LSI53C810interface
 {
-	SCSIConfigTable *scsidevs;			/* SCSI devices */
+	const SCSIConfigTable *scsidevs;			/* SCSI devices */
 	void (*irq_callback)(void);			/* IRQ callback */
 	void (*dma_callback)(UINT32, UINT32, int, int);	/* DMA callback */
 	UINT32 (*fetch)(UINT32 dsp);
 };
 
-extern void lsi53c810_init(struct LSI53C810interface *interface);
+extern void lsi53c810_init(const struct LSI53C810interface *interface);
 
 extern void lsi53c810_read_data(int bytes, UINT8 *pData);
 extern void lsi53c810_write_data(int bytes, UINT8 *pData);

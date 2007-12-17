@@ -6,19 +6,49 @@
 
 static UINT16 PACK(INT32 val)
 {
-	//cut to 16 bits
-	INT32 f=((UINT32 ) val)>>8;
-	return f;
+	UINT32 temp;
+	int sign,exponent,k;
+
+	sign = (val >> 23) & 0x1;
+	temp = (val ^ (val << 1)) & 0xFFFFFF;
+	exponent = 0;
+	for (k=0; k<12; k++)
+	{
+		if (temp & 0x800000)
+			break;
+		temp <<= 1;
+		exponent += 1;
+	}
+	if (exponent < 12)
+		val = (val << exponent) & 0x3FFFFF;
+	else
+		val <<= 11;
+	val >>= 11;
+	val |= sign << 15;
+	val |= exponent << 11;
+
+	return (UINT16)val;
 }
 
 static INT32 UNPACK(UINT16 val)
 {
-	INT32 r=val<<8;
-	r<<=8;
-	r>>=8;
-	//if(r&0x00800000)
-	//  r|=0xFF000000;
-	return r;
+	int sign,exponent,mantissa;
+	INT32 uval;
+
+	sign = (val >> 15) & 0x1;
+	exponent = (val >> 11) & 0xF;
+	mantissa = val & 0x7FF;
+	uval = mantissa << 11;
+	if (exponent > 11)
+		exponent = 11;
+	else
+		uval |= (sign ^ 1) << 22;
+	uval |= sign << 23;
+	uval <<= 8;
+	uval >>= 8;
+	uval >>= exponent;
+
+	return uval;
 }
 
 void SCSPDSP_Init(struct _SCSPDSP *DSP)
@@ -125,7 +155,7 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 		if(IRA<=0x1f)
 			INPUTS=DSP->MEMS[IRA];
 		else if(IRA<=0x2F)
-			INPUTS=DSP->MIXS[IRA-0x20]<<8;	//MIXS is 16 bit
+			INPUTS=DSP->MIXS[IRA-0x20]<<4;	//MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
 
@@ -298,7 +328,7 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 void SCSPDSP_SetSample(struct _SCSPDSP *DSP,INT32 sample,int SEL,int MXL)
 {
 	//DSP->MIXS[SEL]+=sample<<(MXL+1)/*7*/;
-	DSP->MIXS[SEL]+=sample<<7;
+	DSP->MIXS[SEL]+=sample;
 //  if(MXL)
 //      int a=1;
 }

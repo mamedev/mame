@@ -14,7 +14,7 @@ typedef struct
 } SCSICr589;
 
 static const int identity_offset = 0x3ab;
-static const char *download_identity = "MATSHITA CD98Q4 DOWNLOADGS0N";
+static const char download_identity[] = "MATSHITA CD98Q4 DOWNLOADGS0N";
 
 static int cr589_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
@@ -144,7 +144,7 @@ static int cr589_dispatch( int operation, void *file, INT64 intparm, void *ptrpa
 	return SCSIBase( &SCSIClassCr589, operation, file, intparm, ptrparm );
 }
 
-SCSIClass SCSIClassCr589 =
+const SCSIClass SCSIClassCr589 =
 {
 	&SCSIClassCDROM,
 	cr589_dispatch,

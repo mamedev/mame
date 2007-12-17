@@ -845,12 +845,12 @@ static INPUT_PORTS_START( sscope )
 
 INPUT_PORTS_END
 
-static struct RF5C400interface rf5c400_interface =
+static const struct RF5C400interface rf5c400_interface =
 {
 	REGION_SOUND1
 };
 
-static ppc_config hornet_ppc_cfg =
+static const ppc_config hornet_ppc_cfg =
 {
 	PPC_MODEL_403GA
 };

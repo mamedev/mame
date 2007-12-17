@@ -1521,14 +1521,14 @@ static void irqhandler(int irq)
 
 /* SnowBros Sound */
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irqhandler
 };
 
 /* SemiCom Sound */
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irqhandler
 };

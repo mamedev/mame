@@ -45,7 +45,7 @@ static INPUT_PORTS_START(ddz)
 INPUT_PORTS_END
 
 
-static struct VR0Interface vr0_interface =
+static const struct VR0Interface vr0_interface =
 {
 	0x04800000
 };

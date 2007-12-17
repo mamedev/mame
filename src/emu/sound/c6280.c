@@ -214,7 +214,7 @@ static void c6280_write(c6280_t *p, int offset, int data)
 
 static void c6280_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
-    static int scale_tab[] = {
+    static const int scale_tab[] = {
         0x00, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F,
         0x10, 0x13, 0x15, 0x17, 0x19, 0x1B, 0x1D, 0x1F
     };

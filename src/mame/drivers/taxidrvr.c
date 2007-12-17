@@ -342,7 +342,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	p8910_0a_r,
 	0,
@@ -350,7 +350,7 @@ static struct AY8910interface ay8910_interface_1 =
 	p8910_0b_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	p8910_1a_r
 };

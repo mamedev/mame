@@ -340,7 +340,7 @@ static INPUT_PORTS_START( macs )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static struct ST0016interface st0016_interface =
+static const struct ST0016interface st0016_interface =
 {
 	&st0016_charram
 };

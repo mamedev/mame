@@ -715,12 +715,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 #ifdef _SHOW_VIDEO_DEBUG
-static char *mode[] = { "2PLANE_8BIT",
+static const char *const mode[] = { "2PLANE_8BIT",
 			"2PLANE_16BIT",
 			"1PLANE_16COLORS",
 			"1PLANE_256COLORS" };
 
-static char *psize[] = { "8x8", "16x16", "32x32", "64x64" };
+static const char *const psize[] = { "8x8", "16x16", "32x32", "64x64" };
 #endif
 
 VIDEO_UPDATE( ygv608 )

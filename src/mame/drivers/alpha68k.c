@@ -359,8 +359,8 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
          - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
     */
 	static unsigned coinvalue=0, microcontroller_data=0;
-	static UINT8 coinage1[8][2]={{1,1},{1,5},{1,3},{2,3},{1,2},{1,6},{1,4},{3,2}};
-	static UINT8 coinage2[8][2]={{1,1},{5,1},{3,1},{7,1},{2,1},{6,1},{4,1},{8,1}};
+	static const UINT8 coinage1[8][2]={{1,1},{1,5},{1,3},{2,3},{1,2},{1,6},{1,4},{3,2}};
+	static const UINT8 coinage2[8][2]={{1,1},{5,1},{3,1},{7,1},{2,1},{6,1},{4,1},{8,1}};
 
 	static int latch;
 	int source=shared_ram[offset];
@@ -441,8 +441,8 @@ static READ16_HANDLER( alpha_II_trigger_r )
          - Gold Medalist : 0x21,0x23,0x24,0x5b
     */
 	static unsigned coinvalue=0, microcontroller_data=0;
-	static UINT8 coinage1[8][2]={{1,1},{1,2},{1,3},{1,4},{1,5},{1,6},{2,3},{3,2}};
-	static UINT8 coinage2[8][2]={{1,1},{2,1},{3,1},{4,1},{5,1},{6,1},{7,1},{8,1}};
+	static const UINT8 coinage1[8][2]={{1,1},{1,2},{1,3},{1,4},{1,5},{1,6},{2,3},{3,2}};
+	static const UINT8 coinage2[8][2]={{1,1},{2,1},{3,1},{4,1},{5,1},{6,1},{7,1},{8,1}};
 
 	static int latch;
 	int source=shared_ram[offset];
@@ -537,8 +537,8 @@ static READ16_HANDLER( alpha_V_trigger_r )
          - Super Champion Baseball : 0x21,0x23,0x24
     */
 	static unsigned coinvalue=0, microcontroller_data=0;
-	static UINT8 coinage1[8][2]={{1,1},{1,5},{1,3},{2,3},{1,2},{1,6},{1,4},{3,2}};
-	static UINT8 coinage2[8][2]={{1,1},{5,1},{3,1},{7,1},{2,1},{6,1},{4,1},{8,1}};
+	static const UINT8 coinage1[8][2]={{1,1},{1,5},{1,3},{2,3},{1,2},{1,6},{1,4},{3,2}};
+	static const UINT8 coinage2[8][2]={{1,1},{5,1},{3,1},{7,1},{2,1},{6,1},{4,1},{8,1}};
 
 	static int latch;
 	int source=shared_ram[offset];
@@ -2018,12 +2018,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r
 };
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	soundlatch_r
 };
@@ -2033,7 +2033,7 @@ static void YM3812_irq(int param)
 	cpunum_set_input_line(1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	YM3812_irq
 };

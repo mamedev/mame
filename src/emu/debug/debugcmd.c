@@ -1275,7 +1275,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 
 static void execute_wplist(int ref, int params, const char *param[])
 {
-	static const char *spacenames[ADDRESS_SPACES] = { "program", "data", "I/O" };
+	static const char *const spacenames[ADDRESS_SPACES] = { "program", "data", "I/O" };
 	int cpunum, printed = 0;
 	char buffer[256];
 
@@ -1292,7 +1292,7 @@ static void execute_wplist(int ref, int params, const char *param[])
 			{
 				if (cpuinfo->space[spacenum].first_wp)
 				{
-					static const char *types[] = { "unkn ", "read ", "write", "r/w  " };
+					static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 					debug_cpu_watchpoint *wp;
 
 					debug_console_printf("CPU %d %s space watchpoints:\n", cpunum, spacenames[spacenum]);

@@ -58,7 +58,7 @@ to the scancode set I have here. - KT 22/Jun/2000 */
 
 
 /* key set 3 */
-static int at_keyboard_scancode_set_2_3[]=
+static const int at_keyboard_scancode_set_2_3[]=
 {
 	0,
 	0x076,
@@ -199,7 +199,7 @@ typedef struct extended_keyboard_code
 } extended_keyboard_code;
 
 
-static extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/]={
+static const extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/]={
 	{	{ "\xe0\x1c", "\xe0\x9c" } }, // keypad enter
 	{	{ "\xe0\x1d", "\xe0\x9d" } }, // right control
 	{	{ "\xe0\x35", "\xe0\xb5" } },
@@ -220,7 +220,7 @@ static extended_keyboard_code keyboard_mf2_code[0x10][2/*numlock off, on*/]={
 
 /* I don't think these keys change if num-lock is active! */
 /* pc-at extended keyboard make/break codes for code set 3 */
-static extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
+static const extended_keyboard_code at_keyboard_extended_codes_set_2_3[]=
 {
 	/*keypad enter */
 	{
@@ -477,7 +477,7 @@ static void at_keyboard_extended_scancode_insert(int code, int pressed)
 		case 2:
 		case 3:
 		{
-			extended_keyboard_code *key = &at_keyboard_extended_codes_set_2_3[code];
+			const extended_keyboard_code *key = &at_keyboard_extended_codes_set_2_3[code];
 
 			if (pressed)
 			{

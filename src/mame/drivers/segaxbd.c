@@ -235,7 +235,7 @@ static MACHINE_RESET( xboard )
 
 static READ16_HANDLER( adc_r )
 {
-	static const char *ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
+	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
 	int which = (iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
@@ -1082,13 +1082,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_cpu_irq
 };
 
 
-static struct SEGAPCMinterface segapcm_interface =
+static const struct SEGAPCMinterface segapcm_interface =
 {
 	BANK_512,
 	REGION_SOUND1

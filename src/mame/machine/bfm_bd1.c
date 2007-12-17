@@ -71,7 +71,7 @@ static const char BD1ASCII[] =
 
   */
 
-static UINT16 BD1charset[]=
+static const UINT16 BD1charset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
 	0xE027, // 1110 0000 0010 0111 A.

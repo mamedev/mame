@@ -322,7 +322,7 @@ static GFXDECODE_START( ddrible )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x40000, spritelayout,  64, 16 )	/* colors  0-15 but using lookup table */
 GFXDECODE_END
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	ddrible_vlm5030_busy_r,
@@ -330,7 +330,7 @@ static struct YM2203interface ym2203_interface =
 	0
 };
 
-static struct VLM5030interface vlm5030_interface =
+static const struct VLM5030interface vlm5030_interface =
 {
 	REGION_SOUND1,/* memory region of speech rom */
 	0x10000     /* memory size 64Kbyte * 2 bank */

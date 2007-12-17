@@ -1772,7 +1772,7 @@ static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *el
 	/* loop over all the layer types we support */
 	for (layer = 0; layer < ITEM_LAYER_MAX; layer++)
 	{
-		static const char *layer_node_name[ITEM_LAYER_MAX] = { "backdrop", "screen", "overlay", "bezel" };
+		static const char *const layer_node_name[ITEM_LAYER_MAX] = { "backdrop", "screen", "overlay", "bezel" };
 		xml_data_node *itemnode;
 
 		/* initialize the list */

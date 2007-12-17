@@ -9,7 +9,7 @@ struct gotya_sample
 };
 
 
-static struct gotya_sample gotya_samples[] =
+static const struct gotya_sample gotya_samples[] =
 {
 	{ 0x01, 0, 0 },
 	{ 0x02, 1, 0 },

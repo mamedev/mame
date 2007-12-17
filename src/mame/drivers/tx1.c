@@ -725,7 +725,7 @@ GFXDECODE_END
 /*    TX-1 Sound Hardware   */
 /****************************/
 
-static struct AY8910interface tx1_ay8910_interface =
+static const struct AY8910interface tx1_ay8910_interface =
 {
 	0,                        /* Probably hooked up to discrete sound filters */
 	0,
@@ -785,7 +785,7 @@ static WRITE8_HANDLER(BB_YM2149_1_B_w)
 
 
 /* YM2149 IC19 - front left */
-static struct AY8910interface buggyboy_ay8910_interface_1 =
+static const struct AY8910interface buggyboy_ay8910_interface_1 =
 {
 	input_port_2_r,
 	input_port_3_r,
@@ -795,7 +795,7 @@ static struct AY8910interface buggyboy_ay8910_interface_1 =
 
 
 /* YM2149 IC24 - front right */
-static struct AY8910interface buggyboy_ay8910_interface_2 =
+static const struct AY8910interface buggyboy_ay8910_interface_2 =
 {
 	0,
 	0,

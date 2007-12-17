@@ -1552,7 +1552,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static struct YM2610interface sngkace_ym2610_interface =
+static const struct YM2610interface sngkace_ym2610_interface =
 {
 	sound_irq,	/* irq */
 	REGION_SOUND1,	/* delta_t */
@@ -1606,7 +1606,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static struct YM2610interface gunbird_ym2610_interface =
+static const struct YM2610interface gunbird_ym2610_interface =
 {
 	sound_irq,	/* irq */
 	REGION_SOUND1,	/* delta_t */
@@ -1669,7 +1669,7 @@ static void irqhandler(int linestate)
 		cpunum_set_input_line(1, 0, CLEAR_LINE);
 }
 
-static struct YMF278B_interface ymf278b_interface =
+static const struct YMF278B_interface ymf278b_interface =
 {
 	REGION_SOUND1,
 	irqhandler

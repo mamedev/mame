@@ -26,7 +26,7 @@ static sound_stream *stream;
 #define POLEPOS_R167_SHUNT	1.0/(1.0/POLEPOS_R166 + 1.0/250)
 #define POLEPOS_R168_SHUNT	1.0/(1.0/POLEPOS_R166 + 1.0/250)
 
-static double volume_table[8] =
+static const double volume_table[8] =
 {
 	(POLEPOS_R168_SHUNT + POLEPOS_R167_SHUNT + POLEPOS_R166_SHUNT + 2200) / 10000,
 	(POLEPOS_R168_SHUNT + POLEPOS_R167_SHUNT + POLEPOS_R166       + 2200) / 10000,
@@ -40,8 +40,8 @@ static double volume_table[8] =
 
 static filter2_context filter_engine[3];
 
-static double r_filt_out[3] = {RES_K(4.7), RES_K(7.5), RES_K(10)};
-static double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/RES_K(10));
+static const double r_filt_out[3] = {RES_K(4.7), RES_K(7.5), RES_K(10)};
+static const double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/RES_K(10));
 
 /************************************/
 /* Stream updater                   */

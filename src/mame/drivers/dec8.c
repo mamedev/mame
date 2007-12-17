@@ -2019,22 +2019,22 @@ static void oscar_irqhandler(int linestate)
 	cpunum_set_input_line(2,0,linestate); /* M6502_IRQ_LINE */
 }
 
-static struct YM3526interface ym3526_interface =
+static const struct YM3526interface ym3526_interface =
 {
 	irqhandler
 };
 
-static struct YM3526interface oscar_ym3526_interface =
+static const struct YM3526interface oscar_ym3526_interface =
 {
 	oscar_irqhandler
 };
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irqhandler
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	csilver_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */

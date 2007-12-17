@@ -4,7 +4,7 @@
 /****************************************************************************/
 
 /* local copy of the interface pointer */
-static struct RP5H01_interface *intf;
+static const struct RP5H01_interface *intf;
 
 /* these also work as the address masks */
 enum {
@@ -25,7 +25,7 @@ static RP5H01 RP5H01_state[MAX_RP5H01];
 
 /****************************************************************************/
 
-int RP5H01_init( struct RP5H01_interface *interface ) {
+int RP5H01_init( const struct RP5H01_interface *interface ) {
 	int i;
 
 	/* setup our local copy of the interface */

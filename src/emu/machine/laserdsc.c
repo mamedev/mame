@@ -363,7 +363,7 @@ static void vp932_state_changed(laserdisc_info *info, UINT8 oldstate);
     GLOBAL VARIABLES
 ***************************************************************************/
 
-struct CustomSound_interface laserdisc_custom_interface =
+const struct CustomSound_interface laserdisc_custom_interface =
 {
 	custom_start
 };

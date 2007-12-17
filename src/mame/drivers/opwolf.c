@@ -138,13 +138,13 @@ static WRITE16_HANDLER( cchip_w )
 
 static READ16_HANDLER( opwolf_in_r )
 {
-	static const char *inname[2] = { "IN0", "IN1" };
+	static const char *const inname[2] = { "IN0", "IN1" };
 	return readinputportbytag(inname[offset]);
 }
 
 static READ16_HANDLER( opwolf_dsw_r )
 {
-	static const char *dswname[2] = { "DSWA", "DSWB" };
+	static const char *const dswname[2] = { "DSWA", "DSWB" };
 	return readinputportbytag(dswname[offset]);
 }
 
@@ -542,14 +542,14 @@ static void irq_handler(int irq)
 }
 
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irq_handler,
 	sound_bankswitch_w
 };
 
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	opwolf_msm5205_vck,	/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */

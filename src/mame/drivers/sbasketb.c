@@ -227,7 +227,7 @@ static GFXDECODE_START( sbasketb )
 GFXDECODE_END
 
 
-static struct VLM5030interface sbasketb_vlm5030_interface =
+static const struct VLM5030interface sbasketb_vlm5030_interface =
 {
 	REGION_SOUND1,	/* memory region  */
 	0           /* memory size    */

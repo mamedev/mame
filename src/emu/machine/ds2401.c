@@ -41,7 +41,7 @@ struct ds2401_chip
 	int shift;
 	int rx;
 	int tx;
-	UINT8 *data;
+	const UINT8 *data;
 	emu_timer *timer;
 	emu_timer *reset_timer;
 	attotime t_samp;
@@ -138,14 +138,9 @@ static TIMER_CALLBACK( ds2401_tick )
 	}
 }
 
-void ds2401_init( int which, UINT8 *data )
+void ds2401_init( int which, const UINT8 *data )
 {
 	struct ds2401_chip *c = &ds2401[ which ];
-
-	if( data == NULL )
-	{
-		data = auto_malloc( SIZE_DATA );
-	}
 
 	c->state = STATE_IDLE;
 	c->bit = 0;
@@ -166,7 +161,7 @@ void ds2401_init( int which, UINT8 *data )
 	state_save_register_item( "ds2401", which, c->shift );
 	state_save_register_item( "ds2401", which, c->rx );
 	state_save_register_item( "ds2401", which, c->tx );
-	state_save_register_item_pointer( "ds2401", which, data, SIZE_DATA );
+	state_save_register_generic( "ds2401", which, "data", (UINT8 *)&data[0], data[0], SIZE_DATA );
 
 	c->timer = timer_alloc( ds2401_tick , NULL);
 	c->reset_timer = timer_alloc( ds2401_reset , NULL);

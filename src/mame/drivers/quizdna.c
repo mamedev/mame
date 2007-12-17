@@ -443,7 +443,7 @@ static GFXDECODE_START( quizdna )
 GFXDECODE_END
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_1_r,
 	input_port_0_r

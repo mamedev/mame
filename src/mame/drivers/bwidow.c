@@ -659,14 +659,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct POKEYinterface pokey_interface_1 =
+static const struct POKEYinterface pokey_interface_1 =
 {
 	{ 0 },
 	input_port_1_r
 };
 
 
-static struct POKEYinterface pokey_interface_2 =
+static const struct POKEYinterface pokey_interface_2 =
 {
 	{ 0 },
 	input_port_2_r

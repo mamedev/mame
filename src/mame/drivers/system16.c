@@ -159,9 +159,9 @@ Notes:
 void fd1094_machine_init(void);
 void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
-static void sys16_video_config(void (*update)(void), int sprxoffs, int *bank)
+static void sys16_video_config(void (*update)(void), int sprxoffs, const int *bank)
 {
-	static int bank_default[16] =
+	static const int bank_default[16] =
 	{
 		0x0,0x1,0x2,0x3,
 		0x4,0x5,0x6,0x7,
@@ -264,7 +264,7 @@ static void tturfbl_msm5205_callback(int data)
 		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct MSM5205interface tturfbl_msm5205_interface =
+static const struct MSM5205interface tturfbl_msm5205_interface =
 {
 	tturfbl_msm5205_callback,
 	MSM5205_S48_4B
@@ -640,7 +640,7 @@ static void bayroute_update_proc( void )
 
 static MACHINE_RESET( bayroute )
 {
-	static int bank[16] = {
+	static const int bank[16] = {
 		0,0,0,0,
 		0,0,0,3,
 		0,0,0,2,
@@ -805,7 +805,7 @@ static MACHINE_RESET( dduxbl )
 
 static DRIVER_INIT( dduxbl )
 {
-	static int bank[16] = { //*
+	static const int bank[16] = { //*
 		0,0,0,0,
 		0,0,0,4,
 		0,0,0,3,
@@ -922,7 +922,7 @@ static void eswatbl_update_proc( void )
 
 static MACHINE_RESET( eswatbl )
 {
-	static int bank[] = {
+	static const int bank[16] = {
 		0,1,	4,5,
 		8,9,	12,13,
 		2,3,	6,7,
@@ -1277,7 +1277,7 @@ static void goldnaxe_update_proc( void )
 
 static MACHINE_RESET( goldnaxe )
 {
-	static int bank[16] = {
+	static const int bank[16] = {
 		0,1,4,5,
 		8,9,0,0,
 		2,3,6,7,
@@ -1758,7 +1758,7 @@ static void shinobl_update_proc( void )
 
 static MACHINE_RESET( shinobl )
 {
-	static int bank[] = {
+	static const int bank[16] = {
 		0,2,4,6,
 		1,3,5,7
 	};
@@ -2047,7 +2047,7 @@ static void tturfbl_update_proc( void )
 
 static MACHINE_RESET( tturfbl )
 {
-	static int bank[16] = {
+	static const int bank[16] = {
 		0,0,0,0,
 		0,0,0,3,
 		0,0,0,2,
@@ -2186,7 +2186,7 @@ static void wb3bbl_update_proc( void )
 
 static MACHINE_RESET( wb3bbl )
 {
-	static int bank[16] = {
+	static const int bank[16] = {
 		2,0,
 		1,0,
 		3,0,

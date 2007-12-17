@@ -862,7 +862,7 @@ static GFXDECODE_START( joinem )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, joinem_charlayout, 0, 32 )
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r,
 	timer_r

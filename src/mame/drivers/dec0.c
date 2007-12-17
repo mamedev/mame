@@ -912,12 +912,12 @@ static void sound_irq2(int linestate)
 	cpunum_set_input_line(1,1,linestate); /* IRQ2 */
 }
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	sound_irq
 };
 
-static struct YM3812interface ym3812b_interface =
+static const struct YM3812interface ym3812b_interface =
 {
 	sound_irq2
 };
@@ -1965,10 +1965,10 @@ ROM_END
 
 ROM_START( secretag )
 	ROM_REGION( 0x60000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "fb14.bin",   0x00000, 0x10000, CRC(9be6ac90) SHA1(1c78af9da63add7c77c8d2ce24924505481381b1) )
-	ROM_LOAD16_BYTE( "fb12.bin",   0x00001, 0x10000, CRC(28904b6b) SHA1(c3fd42c3ba5b19c3483df3ac9e44016570762de7) )
-	ROM_LOAD16_BYTE( "fb15.bin",   0x20000, 0x10000, CRC(106bb26c) SHA1(e5d05124b6dfc54e41dcf40916633caaa9a19823) )
-	ROM_LOAD16_BYTE( "fb13.bin",   0x20001, 0x10000, CRC(90523413) SHA1(7ea65525f2d7c577255aa01260acc5f43d136b3c) )
+	ROM_LOAD16_BYTE( "fb14-3.17l",   0x00000, 0x10000, CRC(9be6ac90) SHA1(1c78af9da63add7c77c8d2ce24924505481381b1) )
+	ROM_LOAD16_BYTE( "fb12-3.9l",   0x00001, 0x10000, CRC(28904b6b) SHA1(c3fd42c3ba5b19c3483df3ac9e44016570762de7) )
+	ROM_LOAD16_BYTE( "fb15.19l",   0x20000, 0x10000, CRC(106bb26c) SHA1(e5d05124b6dfc54e41dcf40916633caaa9a19823) )
+	ROM_LOAD16_BYTE( "fb13.11l",   0x20001, 0x10000, CRC(90523413) SHA1(7ea65525f2d7c577255aa01260acc5f43d136b3c) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound CPU */
 	ROM_LOAD( "fa10.5h",      0x00000, 0x10000, CRC(dfd2ff25) SHA1(3dcd6d50b92b49daae4b51581abe9c95f764e848) )

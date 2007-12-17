@@ -37,9 +37,9 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 
 	for (pri_code = NUM_SPRITES - 1; pri_code >= 0; pri_code--)
 	{
-		static int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
-		static int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
-		static int sizetab[4] =  { 1, 2, 4, 8 };
+		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
+		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
+		static const int sizetab[4] =  { 1, 2, 4, 8 };
 		int x, y;
 		int ox, oy;
 		int flipx, flipy;

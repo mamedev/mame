@@ -708,7 +708,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	rockola_sh_start
 };

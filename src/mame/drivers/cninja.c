@@ -846,13 +846,13 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	OKIM6295_set_bank_base(1, (data & 1) * 0x40000);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_irq,
 	sound_bankswitch_w
 };
 
-static struct YM2151interface ym2151_interface2 =
+static const struct YM2151interface ym2151_interface2 =
 {
 	sound_irq2
 };

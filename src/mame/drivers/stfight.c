@@ -476,7 +476,7 @@ static GFXDECODE_START( stfight )
 	GFXDECODE_ENTRY( REGION_GFX4, 0x0000, spritelayout, 16*4+16*16+16*16, 16 )
 GFXDECODE_END
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	stfight_adpcm_int,  /* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */

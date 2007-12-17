@@ -481,7 +481,7 @@ static void sound_irq( int irq )
 {
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
-static struct YM2610interface mcatadv_ym2610_interface =
+static const struct YM2610interface mcatadv_ym2610_interface =
 {
 	sound_irq,	/* irq */
 	REGION_SOUND1,	/* delta_t */

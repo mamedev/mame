@@ -116,7 +116,7 @@ Wrong vectors (at least not where I tested it):
 0x060427FC (1st) (resets the sh2)
 0x0603B1B2 (1st) (crashes the sh2)
 */
-static UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
+static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( a_bus_ctrl_r )
 {

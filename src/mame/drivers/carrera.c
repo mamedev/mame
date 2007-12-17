@@ -271,7 +271,7 @@ static READ8_HANDLER( unknown_r )
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	unknown_r,
 	unknown_r,

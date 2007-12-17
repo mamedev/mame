@@ -661,7 +661,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static struct AY8910interface dunhuang_ay8910_interface =
+static const struct AY8910interface dunhuang_ay8910_interface =
 {
 //  A                   B
 	0,					dunhuang_dsw_r,	// R

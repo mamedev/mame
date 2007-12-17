@@ -298,7 +298,7 @@ static WRITE16_HANDLER( int_enable_w )
 
 static WRITE16_HANDLER( bankselect_w )
 {
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 		0x28000, 0x20000, 0x18000, 0x10000,
 		0x2a000, 0x22000, 0x1a000, 0x12000,
@@ -1268,13 +1268,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct POKEYinterface pokey_interface_1 =
+static const struct POKEYinterface pokey_interface_1 =
 {
 	{ 0 },
 	input_port_11_r
 };
 
-static struct POKEYinterface pokey_interface_2 =
+static const struct POKEYinterface pokey_interface_2 =
 {
 	{ 0 },
 	input_port_12_r
@@ -1288,7 +1288,7 @@ static struct POKEYinterface pokey_interface_2 =
  *
  *************************************/
 
-static struct t11_setup t11_data =
+static const struct t11_setup t11_data =
 {
 	0x36ff			/* initial mode word has DAL15,14,11,8 pulled low */
 };

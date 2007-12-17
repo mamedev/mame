@@ -392,7 +392,7 @@ static UINT32 p2_controls_r(void *param)
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	sound_latch_r,
 	0,

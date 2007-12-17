@@ -224,7 +224,7 @@ static GFXDECODE_START( flower )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, flower_tilelayout, 0,  16 )
 GFXDECODE_END
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	flower_sh_start
 };

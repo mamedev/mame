@@ -329,7 +329,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	ticket_dispenser_r,
 	0,

@@ -75,7 +75,7 @@ static READ8_HANDLER( cheat1_r )
 {
 	int res;
 	static int cheat = 0;
-	static int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
+	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
 	res = readinputportbytag("IN1");
 
@@ -93,7 +93,7 @@ static READ8_HANDLER( cheat2_r )
 {
 	int res;
 	static int cheat = 0;
-	static int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
+	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
 	res = readinputportbytag("IN2");
 
@@ -275,12 +275,12 @@ INPUT_PORTS_END
 
 
 
-static struct upd7759_interface upd7759_interface_1 =
+static const struct upd7759_interface upd7759_interface_1 =
 {
 	REGION_SOUND1	/* memory region */
 };
 
-static struct upd7759_interface upd7759_interface_2 =
+static const struct upd7759_interface upd7759_interface_2 =
 {
 	REGION_SOUND2	/* memory region */
 };

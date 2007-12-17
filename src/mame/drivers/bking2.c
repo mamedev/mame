@@ -465,7 +465,7 @@ static const gfx_layout charlayout =
 	8*8     /* every char takes 8 consecutive bytes */
 };
 
-static gfx_layout crowlayout =
+static const gfx_layout crowlayout =
 {
 	16,32,	/* 16*32 characters */
 	16,		/* 16 characters */
@@ -482,7 +482,7 @@ static gfx_layout crowlayout =
 	128*8    /* every sprite takes 128 consecutive bytes */
 };
 
-static gfx_layout balllayout =
+static const gfx_layout balllayout =
 {
 	8,16,  /* 8*16 sprites */
 	8,     /* 8 sprites */
@@ -508,7 +508,7 @@ static WRITE8_HANDLER( portb_w )
 	if (data != 0x00) logerror("portB = %02x\n",data);
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	0,

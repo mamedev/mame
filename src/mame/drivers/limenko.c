@@ -453,7 +453,7 @@ INPUT_PORTS_END
 *****************************************************************************************************/
 
 
-static gfx_layout tile_layout =
+static const gfx_layout tile_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),

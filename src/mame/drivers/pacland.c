@@ -400,7 +400,7 @@ GFXDECODE_END
 
 
 
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	8,		/* number of voices */
 	-1,		/* memory region */

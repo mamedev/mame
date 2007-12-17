@@ -279,7 +279,7 @@ INLINE void pref10(void);
 INLINE void pref11(void);
 
 #if (BIG_SWITCH==0)
-static void (*m6809_main[0x100])(void) = {
+static void (*const m6809_main[0x100])(void) = {
 	neg_di, neg_di, illegal,com_di, lsr_di, illegal,ror_di, asr_di, 	/* 00 */
 	asl_di, rol_di, dec_di, illegal,inc_di, tst_di, jmp_di, clr_di,
 	pref10, pref11, nop,	sync,	illegal,illegal,lbra,	lbsr,		/* 10 */

@@ -39,7 +39,7 @@ static void gradius3_sprite_callback(int *code,int *color,int *priority_mask,int
 	#define L0 0xaa
 	#define L1 0xcc
 	#define L2 0xf0
-	static int primask[2][4] =
+	static const int primask[2][4] =
 	{
 		{ L0|L2, L0, L0|L2, L0|L1|L2 },
 		{ L1|L2, L2, 0,     L0|L1|L2 }

@@ -74,7 +74,7 @@ static int K001604_layer_size;
 #define K001604_NUM_TILES_LAYER0		16384
 #define K001604_NUM_TILES_LAYER1		4096
 
-static gfx_layout K001604_char_layout_layer_8x8 =
+static const gfx_layout K001604_char_layout_layer_8x8 =
 {
 	8, 8,
 	K001604_NUM_TILES_LAYER0,
@@ -85,7 +85,7 @@ static gfx_layout K001604_char_layout_layer_8x8 =
 	8*128
 };
 
-static gfx_layout K001604_char_layout_layer_16x16 =
+static const gfx_layout K001604_char_layout_layer_16x16 =
 {
 	16, 16,
 	K001604_NUM_TILES_LAYER1,
@@ -885,17 +885,17 @@ static INPUT_PORTS_START( nwktr )
 
 INPUT_PORTS_END
 
-static struct RF5C400interface rf5c400_interface =
+static const struct RF5C400interface rf5c400_interface =
 {
 	REGION_SOUND1
 };
 
-static ppc_config nwktr_ppc_cfg =
+static const ppc_config nwktr_ppc_cfg =
 {
 	PPC_MODEL_403GA
 };
 
-static sharc_config sharc_cfg =
+static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
 };

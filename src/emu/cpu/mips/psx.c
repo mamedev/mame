@@ -2524,12 +2524,12 @@ static void docop2( int gteop )
 	static const UINT16 *const p_n_lm[] = { &L11, &L12, &L13, &L21, &L22, &L23, &L31, &L32, &L33 };
 	static const UINT16 *const p_n_cm[] = { &LR1, &LR2, &LR3, &LG1, &LG2, &LG3, &LB1, &LB2, &LB3 };
 	static const UINT16 *const p_n_zm[] = { &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm };
-	static const UINT16 *const *p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
+	static const UINT16 *const *const p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
 	static const UINT32 *const p_n_tr[] = { &TRX, &TRY, &TRZ };
 	static const UINT32 *const p_n_bk[] = { &RBK, &GBK, &BBK };
 	static const UINT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
 	static const UINT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
-	static const UINT32 *const *p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
+	static const UINT32 *const *const p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
 
 	switch( GTE_FUNCT( gteop ) )
 	{
@@ -2788,7 +2788,7 @@ static void docop2( int gteop )
 		}
 		break;
 	case 0x1b:
-		if( gteop == 0x108041b )
+		if( gteop == 0x108041b || gteop == 0x118041b )
 		{
 			GTELOG( "NCCS" );
 			FLAG = 0;

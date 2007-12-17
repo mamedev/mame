@@ -221,7 +221,7 @@ GFXDECODE_END
 
 
 
-static struct VLM5030interface vlm5030_interface =
+static const struct VLM5030interface vlm5030_interface =
 {
 	REGION_SOUND1,	/* memory region of speech rom */
 	0           /* memory size of speech rom */

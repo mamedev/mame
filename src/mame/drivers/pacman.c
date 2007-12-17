@@ -3048,7 +3048,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	3,			/* number of voices */
 	REGION_SOUND1	/* memory region */
@@ -3314,7 +3314,7 @@ static MACHINE_DRIVER_START( crush4 )
 	MDRV_GFXDECODE(crush4)
 MACHINE_DRIVER_END
 
-static struct AY8910interface crushs_ay8910_interface =
+static const struct AY8910interface crushs_ay8910_interface =
 {
 	NULL
 };

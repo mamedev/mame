@@ -646,7 +646,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static tms34010_config tms_config_amerdart =
+static const tms34010_config tms_config_amerdart =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */
@@ -659,7 +659,7 @@ static tms34010_config tms_config_amerdart =
 };
 
 
-static tms34010_config tms_config_coolpool =
+static const tms34010_config tms_config_coolpool =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */

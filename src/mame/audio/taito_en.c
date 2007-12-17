@@ -260,7 +260,7 @@ void taito_f3_soundsystem_reset(void)
 	//cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-struct ES5505interface es5505_interface =
+const struct ES5505interface es5505_interface =
 {
 	REGION_SOUND1,	/* Bank 0: Unused by F3 games? */
 	REGION_SOUND1,	/* Bank 1: All games seem to use this */

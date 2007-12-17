@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static struct r3000_config config =
+static const struct r3000_config config =
 {
 	1,	/* 1 if we have an FPU, 0 otherwise */
 	4096,	/* code cache size */
@@ -615,7 +615,7 @@ PORT_START
 	PORT_DIPSETTING(      0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static struct ST0016interface st0016_interface =
+static const struct ST0016interface st0016_interface =
 {
 	&st0016_charram
 };

@@ -654,7 +654,7 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-static struct YMZ280Binterface realbrk_ymz280b_intf =
+static const struct YMZ280Binterface realbrk_ymz280b_intf =
 {
 	REGION_SOUND1,
 	0

@@ -412,7 +412,7 @@ void ssio_reset_w(int state)
 
 READ8_HANDLER( ssio_input_port_r )
 {
-	static const char *port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
+	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
 	UINT8 result = readinputportbytag_safe(port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
@@ -443,7 +443,7 @@ void ssio_set_custom_output(int which, int mask, write8_handler handler)
 
 
 /********* sound interfaces ***********/
-static struct AY8910interface ssio_ay8910_interface_1 =
+static const struct AY8910interface ssio_ay8910_interface_1 =
 {
 	0,
 	0,
@@ -451,7 +451,7 @@ static struct AY8910interface ssio_ay8910_interface_1 =
 	ssio_portb0_w
 };
 
-static struct AY8910interface ssio_ay8910_interface_2 =
+static const struct AY8910interface ssio_ay8910_interface_2 =
 {
 	0,
 	0,

@@ -244,7 +244,7 @@ static READ16_HANDLER( tharrier_mcu_r )
         all word accesses are to the input port */
 	if (ACCESSING_MSB && !ACCESSING_LSB)
 	{
-		static UINT8 to_main[] =
+		static const UINT8 to_main[] =
 		{
 			0x82,0xc7,0x00,0x2c,0x6c,0x00,0x9f,0xc7,0x00,0x29,0x69,0x00,0x8b,0xc7,0x00
 		};
@@ -2878,7 +2878,7 @@ GFXDECODE_END
 
 
 
-static struct YM2203interface ym2203_nmk004_interface =
+static const struct YM2203interface ym2203_nmk004_interface =
 {
 	0,0,0,0,NMK004_irq
 };
@@ -2888,7 +2888,7 @@ static void ym2203_irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,ym2203_irqhandler
 };
@@ -4850,7 +4850,7 @@ ROM_END
 
 
 
-static UINT8 decode_byte(UINT8 src, UINT8 *bitp)
+static UINT8 decode_byte(UINT8 src, const UINT8 *bitp)
 {
 	UINT8 ret, i;
 
@@ -4867,7 +4867,7 @@ static UINT32 bjtwin_address_map_bg0(UINT32 addr)
 }
 
 
-static UINT16 decode_word(UINT16 src, UINT8 *bitp)
+static UINT16 decode_word(UINT16 src, const UINT8 *bitp)
 {
 	UINT16 ret, i;
 
@@ -4891,7 +4891,7 @@ static void decode_gfx(void)
 	UINT8 *rom;
 	int A;
 
-	static UINT8 decode_data_bg[8][8] =
+	static const UINT8 decode_data_bg[8][8] =
 	{
 		{0x3,0x0,0x7,0x2,0x5,0x1,0x4,0x6},
 		{0x1,0x2,0x6,0x5,0x4,0x0,0x3,0x7},
@@ -4903,7 +4903,7 @@ static void decode_gfx(void)
 		{0x3,0x4,0x7,0x6,0x2,0x0,0x5,0x1},
 	};
 
-	static UINT8 decode_data_sprite[8][16] =
+	static const UINT8 decode_data_sprite[8][16] =
 	{
 		{0x9,0x3,0x4,0x5,0x7,0x1,0xb,0x8,0x0,0xd,0x2,0xc,0xe,0x6,0xf,0xa},
 		{0x1,0x3,0xc,0x4,0x0,0xf,0xb,0xa,0x8,0x5,0xe,0x6,0xd,0x2,0x7,0x9},
@@ -4943,13 +4943,13 @@ static void decode_tdragonb(void)
 	int A;
 
 	/* The Main 68k Program of the Bootleg is Bitswapped */
-	static UINT8 decode_data_tdragonb[1][16] =
+	static const UINT8 decode_data_tdragonb[1][16] =
 	{
 		{0xe,0xc,0xa,0x8,0x7,0x5,0x3,0x1,0xf,0xd,0xb,0x9,0x6,0x4,0x2,0x0},
 	};
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static UINT8 decode_data_tdragonbgfx[1][8] =
+	static const UINT8 decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
@@ -4988,7 +4988,7 @@ static void decode_ssmissin(void)
 	int A;
 
 	/* Graphic Roms Could Also Do With Rearranging to make things simpler */
-	static UINT8 decode_data_tdragonbgfx[1][8] =
+	static const UINT8 decode_data_tdragonbgfx[1][8] =
 	{
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};

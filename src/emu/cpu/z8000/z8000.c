@@ -125,7 +125,7 @@ static UINT8 z8000_zsp[256];
  **************************************************************************/
 #ifdef	LSB_FIRST
 	/* pointers to byte (8bit) registers */
-	static UINT8	*pRB[16] =
+	static UINT8	*const pRB[16] =
 	{
 		&Z.regs.B[ 7],&Z.regs.B[ 5],&Z.regs.B[ 3],&Z.regs.B[ 1],
 		&Z.regs.B[15],&Z.regs.B[13],&Z.regs.B[11],&Z.regs.B[ 9],
@@ -133,7 +133,7 @@ static UINT8 z8000_zsp[256];
 		&Z.regs.B[14],&Z.regs.B[12],&Z.regs.B[10],&Z.regs.B[ 8]
 	};
 
-	static UINT16	*pRW[16] =
+	static UINT16	*const pRW[16] =
 	{
         &Z.regs.W[ 3],&Z.regs.W[ 2],&Z.regs.W[ 1],&Z.regs.W[ 0],
         &Z.regs.W[ 7],&Z.regs.W[ 6],&Z.regs.W[ 5],&Z.regs.W[ 4],
@@ -142,7 +142,7 @@ static UINT8 z8000_zsp[256];
     };
 
     /* pointers to long (32bit) registers */
-	static UINT32	*pRL[16] =
+	static UINT32	*const pRL[16] =
 	{
 		&Z.regs.L[ 1],&Z.regs.L[ 1],&Z.regs.L[ 0],&Z.regs.L[ 0],
 		&Z.regs.L[ 3],&Z.regs.L[ 3],&Z.regs.L[ 2],&Z.regs.L[ 2],
@@ -153,7 +153,7 @@ static UINT8 z8000_zsp[256];
 #else	/* MSB_FIRST */
 
     /* pointers to byte (8bit) registers */
-	static UINT8	*pRB[16] =
+	static UINT8	*const pRB[16] =
 	{
 		&Z.regs.B[ 0],&Z.regs.B[ 2],&Z.regs.B[ 4],&Z.regs.B[ 6],
 		&Z.regs.B[ 8],&Z.regs.B[10],&Z.regs.B[12],&Z.regs.B[14],
@@ -162,7 +162,7 @@ static UINT8 z8000_zsp[256];
 	};
 
 	/* pointers to word (16bit) registers */
-	static UINT16	*pRW[16] =
+	static UINT16	*const pRW[16] =
 	{
 		&Z.regs.W[ 0],&Z.regs.W[ 1],&Z.regs.W[ 2],&Z.regs.W[ 3],
 		&Z.regs.W[ 4],&Z.regs.W[ 5],&Z.regs.W[ 6],&Z.regs.W[ 7],
@@ -171,7 +171,7 @@ static UINT8 z8000_zsp[256];
 	};
 
 	/* pointers to long (32bit) registers */
-	static UINT32	*pRL[16] =
+	static UINT32	*const pRL[16] =
 	{
 		&Z.regs.L[ 0],&Z.regs.L[ 0],&Z.regs.L[ 1],&Z.regs.L[ 1],
 		&Z.regs.L[ 2],&Z.regs.L[ 2],&Z.regs.L[ 3],&Z.regs.L[ 3],
@@ -182,7 +182,7 @@ static UINT8 z8000_zsp[256];
 #endif
 
 /* pointers to quad word (64bit) registers */
-static UINT64   *pRQ[16] = {
+static UINT64   *const pRQ[16] = {
     &Z.regs.Q[ 0],&Z.regs.Q[ 0],&Z.regs.Q[ 0],&Z.regs.Q[ 0],
     &Z.regs.Q[ 1],&Z.regs.Q[ 1],&Z.regs.Q[ 1],&Z.regs.Q[ 1],
     &Z.regs.Q[ 2],&Z.regs.Q[ 2],&Z.regs.Q[ 2],&Z.regs.Q[ 2],

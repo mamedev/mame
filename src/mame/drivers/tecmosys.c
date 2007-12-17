@@ -521,13 +521,13 @@ static void sound_irq(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YMF262interface ymf262_interface =
+static const struct YMF262interface ymf262_interface =
 {
 	sound_irq		/* irq */
 };
 
 
-static struct YMZ280Binterface ymz280b_interface =
+static const struct YMZ280Binterface ymz280b_interface =
 {
 	REGION_SOUND1,
 	0	/* irq */

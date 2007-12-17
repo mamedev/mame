@@ -563,7 +563,7 @@ static INT32				menuItemInfoLength = 0;
 
 static UINT32				cheatOptions = 2;
 
-static const char *   kCheatNameTemplates[] =
+static const char *const kCheatNameTemplates[] =
 {
     "Infinite Credits",
    "Infinite Time",
@@ -724,14 +724,14 @@ static const UINT32 kPrefillValueTable[] =
 	0x01
 };
 
-static const char * kWatchLabelStringList[] =
+static const char *const kWatchLabelStringList[] =
 {
 	"None",
 	"Address",
 	"String"
 };
 
-static const char * kWatchDisplayTypeStringList[] =
+static const char *const kWatchDisplayTypeStringList[] =
 {
 	"Hex",
 	"Decimal",
@@ -2827,7 +2827,7 @@ static int AddEditCheatMenu(int selection)
 
 static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 {
-	static const char *	kTypeNames[] =
+	static const char *const kTypeNames[] =
 	{
 		"Normal/Delay",
 		"Wait",
@@ -2837,7 +2837,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"Select"
 	};
 
-	static const char *	kNumbersTable[] =
+	static const char *const kNumbersTable[] =
 	{
 		"0",	"1",	"2",	"3",	"4",	"5",	"6",	"7",
 		"8",	"9",	"10",	"11",	"12",	"13",	"14",	"15",
@@ -2845,7 +2845,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"24",	"25",	"26",	"27",	"28",	"29",	"30",	"31"
 	};
 
-	static const char *	kOperationNames[] =
+	static const char *const kOperationNames[] =
 	{
 		"Write",
 		"Add/Subtract",
@@ -2857,19 +2857,19 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"Null"
 	};
 
-	static const char *	kAddSubtractNames[] =
+	static const char *const kAddSubtractNames[] =
 	{
 		"Add",
 		"Subtract"
 	};
 
-	static const char *	kSetClearNames[] =
+	static const char *const kSetClearNames[] =
 	{
 		"Set",
 		"Clear"
 	};
 
-	static const char *	kPrefillNames[] =
+	static const char *const kPrefillNames[] =
 	{
 		"None",
 		"FF",
@@ -2877,13 +2877,13 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"01"
 	};
 
-	static const char *	kEndiannessNames[] =
+	static const char *const kEndiannessNames[] =
 	{
 		"Normal",
 		"Swap"
 	};
 
-	static const char *	kRegionNames[] =
+	static const char *const kRegionNames[] =
 	{
 		"CPU1",		"CPU2",		"CPU3",		"CPU4",		"CPU5",		"CPU6",		"CPU7",		"CPU8",
 		"GFX1",		"GFX2",		"GFX3",		"GFX4",		"GFX5",		"GFX6",		"GFX7",		"GFX8",
@@ -2892,7 +2892,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"USER1",	"USER2",	"USER3",	"USER4",	"USER5",	"USER6",	"USER7",	"USER8"
 	};
 
-	static const char *	kLocationNames[] =
+	static const char *const kLocationNames[] =
 	{
 		"Normal",
 		"Region",
@@ -2904,7 +2904,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"Unused (7)"
 	};
 
-	static const char *	kCustomLocationNames[] =
+	static const char *const kCustomLocationNames[] =
 	{
 		"Comment",
 		"EEPROM",
@@ -2917,7 +2917,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 		"Unused (28)",	"Unused (29)",	"Unused (30)",	"Unused (31)"
 	};
 
-	static const char *	kSizeNames[] =
+	static const char *const kSizeNames[] =
 	{
 		"8 Bit",
 		"16 Bit",
@@ -5270,7 +5270,7 @@ static int DoSearchMenuMinimum(int selection)
 
 static int DoSearchMenuClassic(int selection)
 {
-	static const char * energyStrings[] =
+	static const char *const energyStrings[] =
 	{
 		"Less",
 		"Greater",
@@ -5278,13 +5278,13 @@ static int DoSearchMenuClassic(int selection)
 		"Greater or Equal",
 	};
 
-	static const char * equalOrNotStrings[] =
+	static const char *const equalOrNotStrings[] =
 	{
 		"Equal",
 		"Not Equal",
 	};
 
-	static const char * operandStrings[] =
+	static const char *const operandStrings[] =
 	{
 		"Previous Data",
 		"First Data",
@@ -5800,7 +5800,7 @@ static int DoSearchMenuClassic(int selection)
 static int DoSearchMenu(int selection)
 {
 	/* menu stirngs */
-	static const char * kOperandNameTable[] =
+	static const char *const kOperandNameTable[] =
 	{
 		"Current Data",
 		"Previous Data",
@@ -5808,7 +5808,7 @@ static int DoSearchMenu(int selection)
 		"Value"
 	};
 
-	static const char * kComparisonNameTable[] =
+	static const char *const kComparisonNameTable[] =
 	{
 		"Less",
 		"Greater",
@@ -5820,7 +5820,7 @@ static int DoSearchMenu(int selection)
 		"Near To"
 	};
 
-	static const char * kSearchByteNameTable[] =
+	static const char *const kSearchByteNameTable[] =
 	{
 		"1",
 		"2",
@@ -6289,7 +6289,7 @@ static int DoSearchMenu(int selection)
 
 static int SelectSearchRegions(int selection, SearchInfo * search)
 {
-	static const char	* kSearchSpeedList[] =
+	static const char *const kSearchSpeedList[] =
 	{
 		"Fast",
 		"Medium",
@@ -7066,7 +7066,7 @@ static int EditWatch(WatchInfo * entry, int selection)
 		kMenu_Return
 	};
 
-	static const char * kWatchSizeStringList[] =
+	static const char *const kWatchSizeStringList[] =
 	{
 		"8 Bit",
 		"16 Bit",
@@ -9246,7 +9246,7 @@ static int ConvertOldCode(int code, int cpu, int * data, int * extendData)
 		UINT8	customField;
 	};
 
-	static struct ConversionTable kConversionTable[] =
+	static const struct ConversionTable kConversionTable[] =
 	{
 		{	0,		0x00000000,	kCustomField_None },
 		{	1,		0x00000001,	kCustomField_None },
@@ -9313,7 +9313,7 @@ static int ConvertOldCode(int code, int cpu, int * data, int * extendData)
 		{	-1,		0x00000000,	kCustomField_End }
 	};
 
-	struct ConversionTable	* traverse = kConversionTable;
+	const struct ConversionTable	* traverse = kConversionTable;
 	UINT32					newCode;
 	UINT8					linkCheat = 0;
 

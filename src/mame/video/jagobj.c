@@ -222,7 +222,7 @@ static void bitmap_4_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 	bitmap_4_draw(firstpix, iwidth, src, xpos, 7, -1);
 }
 
-static void (*bitmap4[8])(INT32, INT32, UINT32 *, INT32) =
+static void (*const bitmap4[8])(INT32, INT32, UINT32 *, INT32) =
 {
 	bitmap_4_0,
 	bitmap_4_1,
@@ -352,7 +352,7 @@ static void bitmap_8_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 	bitmap_8_draw(firstpix, iwidth, src, xpos, 7, -1);
 }
 
-static void (*bitmap8[8])(INT32, INT32, UINT32 *, INT32) =
+static void (*const bitmap8[8])(INT32, INT32, UINT32 *, INT32) =
 {
 	bitmap_8_0,
 	bitmap_8_1,
@@ -459,7 +459,7 @@ static void bitmap_16_7(INT32 firstpix, INT32 iwidth, UINT32 *src, INT32 xpos)
 	bitmap_16_draw(firstpix, iwidth, src, xpos, 7, -1);
 }
 
-static void (*bitmap16[8])(INT32, INT32, UINT32 *, INT32) =
+static void (*const bitmap16[8])(INT32, INT32, UINT32 *, INT32) =
 {
 	bitmap_16_0,
 	bitmap_16_1,

@@ -119,7 +119,7 @@ int sys16_MaxShadowColors;
 /* video driver constants (potentially different for each game) */
 int sys16_gr_bitmap_width;
 int (*sys16_spritesystem)( struct sys16_sprite_attributes *sprite, const UINT16 *source, int bJustGetColor );
-int *sys16_obj_bank;
+const int *sys16_obj_bank;
 int sys16_sprxoffset;
 int sys16_bgxoffset;
 int sys16_fgxoffset;
@@ -760,7 +760,7 @@ WRITE16_HANDLER( sys16_textram_w ){
 /***************************************************************************/
 
 VIDEO_START( system16 ){
-	static int bank_default[16] = {
+	static const int bank_default[16] = {
 		0x0,0x1,0x2,0x3,
 		0x4,0x5,0x6,0x7,
 		0x8,0x9,0xa,0xb,

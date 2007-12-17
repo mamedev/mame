@@ -31,9 +31,13 @@ extern size_t timelimt_bg_videoram_size;
 
 static int nmi_enabled = 0;
 
-static MACHINE_RESET( timelimt )
+static MACHINE_START( timelimt )
 {
 	soundlatch_setclearedvalue( 0 );
+}
+
+static MACHINE_RESET( timelimt )
+{
 	nmi_enabled = 0;
 }
 
@@ -239,7 +243,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r
 };
@@ -269,6 +273,7 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(50)
 
+	MDRV_MACHINE_START(timelimt)
 	MDRV_MACHINE_RESET(timelimt)
 
 	/* video hardware */

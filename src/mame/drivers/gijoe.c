@@ -331,7 +331,7 @@ static INPUT_PORTS_START( gijoe )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1,
 	NULL,

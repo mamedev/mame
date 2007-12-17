@@ -420,7 +420,7 @@ static void wr_topstack(INT32 val) { pc_stack_push_val(val & 0x3fff); }
 
 #define WRITE_REG(grp,reg,val) ((*wr_reg[grp][reg])(val))
 
-static void (*wr_reg[4][16])(INT32) =
+static void (*const wr_reg[4][16])(INT32) =
 {
 	{
 		wr_ax0, wr_ax1, wr_mx0, wr_mx1, wr_ay0, wr_ay1, wr_my0, wr_my1,
@@ -681,7 +681,7 @@ INLINE UINT32 pgm_read_dag2(UINT32 op)
 #define ALU_GETYREG_UNSIGNED(y) (*(UINT16 *)alu_yregs[y])
 #define ALU_GETYREG_SIGNED(y)   (*( INT16 *)alu_yregs[y])
 
-static const void *alu_xregs[8] =
+static const void *const alu_xregs[8] =
 {
 	&adsp2100.core.ax0,
 	&adsp2100.core.ax1,
@@ -693,7 +693,7 @@ static const void *alu_xregs[8] =
 	&adsp2100.core.sr.srx.sr1
 };
 
-static const void *alu_yregs[4] =
+static const void *const alu_yregs[4] =
 {
 	&adsp2100.core.ay0,
 	&adsp2100.core.ay1,
@@ -712,7 +712,7 @@ static const void *alu_yregs[4] =
 #define MAC_GETYREG_UNSIGNED(y) (*(UINT16 *)mac_yregs[y])
 #define MAC_GETYREG_SIGNED(y)   (*( INT16 *)mac_yregs[y])
 
-static const void *mac_xregs[8] =
+static const void *const mac_xregs[8] =
 {
 	&adsp2100.core.mx0,
 	&adsp2100.core.mx1,
@@ -724,7 +724,7 @@ static const void *mac_xregs[8] =
 	&adsp2100.core.sr.srx.sr1
 };
 
-static const void *mac_yregs[4] =
+static const void *const mac_yregs[4] =
 {
 	&adsp2100.core.my0,
 	&adsp2100.core.my1,
@@ -741,7 +741,7 @@ static const void *mac_yregs[4] =
 #define SHIFT_GETXREG_UNSIGNED(x) (*(UINT16 *)shift_xregs[x])
 #define SHIFT_GETXREG_SIGNED(x)   (*( INT16 *)shift_xregs[x])
 
-static const void *shift_xregs[8] =
+static const void *const shift_xregs[8] =
 {
 	&adsp2100.core.si,
 	&adsp2100.core.si,

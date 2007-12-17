@@ -385,7 +385,7 @@ GFXDECODE_END
 
 
 
-static struct K053260_interface k053260_interface =
+static const struct K053260_interface k053260_interface =
 {
 	REGION_SOUND1
 };

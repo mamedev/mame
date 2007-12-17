@@ -671,7 +671,7 @@ static void sound_irq(int linestate)
 	cpunum_set_input_line(1,0,linestate); /* IRQ */
 }
 
-static struct YM3526interface ym3526_interface =
+static const struct YM3526interface ym3526_interface =
 {
 	sound_irq
 };

@@ -716,11 +716,12 @@ VIDEO_UPDATE( mrokumei )
 	tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][1], 0, 0);
 	return 0;
 }
-/*
+
+#ifdef UNUSED_FUNCTION
 VIDEO_UPDATE( reikaids )
 {
     int flags;
-    static int pritable[8][4] =
+    static const int pritable[8][4] =
     {
         { 3,1,0,2 },
         { 1,3,0,2 },
@@ -749,12 +750,12 @@ VIDEO_UPDATE( reikaids )
         tilemap_draw(bitmap, cliprect, bg_tilemap[homedata_visible_page][pritable[pri][3-i]], 0, 0);
     return 0;
 }
+#endif
 
-*/
 VIDEO_UPDATE( reikaids )
 {
 	int flags;
-	static int pritable[2][8][4] =	/* table of priorities derived from the PROM */
+	static const int pritable[2][8][4] =	/* table of priorities derived from the PROM */
 	{
 	{
 		{ 3,1,0,2 },

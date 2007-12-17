@@ -55,7 +55,7 @@ ADDRESS_MAP_START( locomotn_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-struct AY8910interface timeplt_ay8910_interface =
+const struct AY8910interface timeplt_ay8910_interface =
 {
 	soundlatch_r,
 	timeplt_portB_r
@@ -79,7 +79,7 @@ struct AY8910interface timeplt_ay8910_interface =
 /* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-static int timeplt_timer[10] =
+static const int timeplt_timer[10] =
 {
 	0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 };

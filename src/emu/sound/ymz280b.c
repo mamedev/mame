@@ -117,7 +117,7 @@ static TIMER_CALLBACK( update_irq_state_timer_5 );
 static TIMER_CALLBACK( update_irq_state_timer_6 );
 static TIMER_CALLBACK( update_irq_state_timer_7 );
 
-static timer_callback update_irq_state_cb[] =
+static const timer_callback update_irq_state_cb[] =
 {
 	update_irq_state_timer_0,
 	update_irq_state_timer_1,

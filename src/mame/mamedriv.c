@@ -565,6 +565,7 @@ const game_driver * const drivers[] =
 	DRIVER( popflamn )	/* (c) 1982 Jaleco */
 	DRIVER( trvmstr )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstra )	/* (c) 1985 Enerdyne Technologies Inc. */
+	DRIVER( trvmstrb )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvgns )	/* (c) 198? Enerdyne Technologies Inc. */
 
 
@@ -2820,6 +2821,7 @@ V-V                           TP-027
 	DRIVER( tekken3b )	/* Tekken 3 (TET3/VER.A) */
 	DRIVER( tekken3c )	/* Tekken 3 (TET2/VER.A) */
 	DRIVER( lbgrande )	/* Libero Grande (LG2/VER.A) */
+	DRIVER( toukon3 )	/* Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A) */
 	DRIVER( soulclbr )	/* Soul Calibur (SOC14/VER.C) */
 	DRIVER( soulclba )	/* Soul Calibur (SOC11/VER.C) */
 	DRIVER( soulclbb )	/* Soul Calibur (SOC13/VER.B) */
@@ -2827,7 +2829,9 @@ V-V                           TP-027
 	DRIVER( soulclbd )	/* Soul Calibur (SOC11/VER.A2) */
 	DRIVER( ehrgeiz )	/* Ehrgeiz (EG3/VER.A) */
 	DRIVER( ehrgeiza )	/* Ehrgeiz (EG2/VER.A) */
+	DRIVER( kaiunqz )	/* Kaiun Quiz (KW1/VER.A) */
 	DRIVER( mdhorse )	/* Derby Quiz My Dream Horse (MDH1/VER.A2) */
+	DRIVER( sws98 )		/* Super World Stadium '98 (SS81/VER.A) */
 	DRIVER( tenkomor )	/* Tenkomori Shooting (TKM2/VER.A1) */
 	DRIVER( tenkomoj )	/* Tenkomori Shooting (TKM1/VER.A1) */
 	DRIVER( fgtlayer )	/* Fighting Layer (FTL0/VER.A) */
@@ -2845,6 +2849,8 @@ V-V                           TP-027
 	DRIVER( pacappsp )	/* Paca Paca Passion Special (PSP1/VER.A) */
 	DRIVER( golgo13 )	/* Golgo 13 (GLG1/VER.A) */
 	DRIVER( g13knd )	/* Golgo 13 Kiseki no Dandou (GLS1/VER.A) */
+	DRIVER( sws2000 )	/* Super World Stadium 2000 (SS01/VER.A) */
+	DRIVER( sws2001 )	/* Super World Stadium 2001 (SS11/VER.A) */
 
 	/* Namco System 10 */
 	DRIVER( mrdrilr2 )	/* Mr Driller 2 (DR21 Ver.A) */

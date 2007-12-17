@@ -343,7 +343,7 @@ static void ic60_74123_output_changed(int output)
 }
 
 
-static TTL74123_interface ic60_intf =
+static const TTL74123_interface ic60_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */

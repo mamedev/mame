@@ -310,7 +310,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct CustomSound_interface i80186_custom_interface =
+static const struct CustomSound_interface i80186_custom_interface =
 {
     leland_80186_sh_start
 };

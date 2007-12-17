@@ -343,12 +343,12 @@ static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const
 	}
 }
 
-static int sprite_xtable[2][8] =
+static const int sprite_xtable[2][8] =
 {
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }
 };
-static int sprite_ytable[2][8] =
+static const int sprite_ytable[2][8] =
 {
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }

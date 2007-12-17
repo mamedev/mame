@@ -124,7 +124,7 @@ static void gridiron_draw_led(running_machine *machine, mame_bitmap *bitmap, con
 	int i;
 
 
-	static UINT8 ledvalues[] =
+	static const UINT8 ledvalues[] =
 			{ 0x86, 0xdb, 0xcf, 0xe6, 0xed, 0xfd, 0x87, 0xff, 0xf3, 0xf1 };
 
 

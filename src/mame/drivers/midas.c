@@ -429,7 +429,7 @@ static void livequiz_irqhandler (int state)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static struct YMZ280Binterface ymz280b_interface =
+static const struct YMZ280Binterface ymz280b_interface =
 {
 	REGION_SOUND1,
 	livequiz_irqhandler

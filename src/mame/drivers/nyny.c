@@ -208,7 +208,7 @@ static void ic48_1_74123_output_changed(int output)
 }
 
 
-static TTL74123_interface ic48_1_intf =
+static const TTL74123_interface ic48_1_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_b_w )
 }
 
 
-static struct AY8910interface ay8910_37_interface =
+static const struct AY8910interface ay8910_37_interface =
 {
 	0,
 	0,
@@ -463,7 +463,7 @@ static struct AY8910interface ay8910_37_interface =
 };
 
 
-static struct AY8910interface ay8910_64_interface =
+static const struct AY8910interface ay8910_64_interface =
 {
 	input_port_3_r,
 	input_port_2_r

@@ -789,7 +789,7 @@ static ADDRESS_MAP_START( namcos11_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static struct
+static const struct
 {
 	const char *s_name;
 	read32_handler keycus_r;

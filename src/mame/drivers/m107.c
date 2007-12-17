@@ -462,12 +462,12 @@ static void sound_irq(int state)
 		timer_call_after_resynch(NULL, YM2151_CLEAR,setvector_callback);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	sound_irq
 };
 
-static struct IremGA20_interface iremGA20_interface =
+static const struct IremGA20_interface iremGA20_interface =
 {
 	REGION_SOUND1
 };

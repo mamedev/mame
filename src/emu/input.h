@@ -485,9 +485,9 @@ typedef struct _input_device input_device;
 ***************************************************************************/
 
 /* joystick maps */
-extern const char *	joystick_map_8way;
-extern const char *	joystick_map_4way_sticky;
-extern const char *	joystick_map_4way_diagonal;
+extern const char joystick_map_8way[];
+extern const char joystick_map_4way_sticky[];
+extern const char joystick_map_4way_diagonal[];
 
 
 

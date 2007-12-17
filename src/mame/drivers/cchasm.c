@@ -159,7 +159,7 @@ static MACHINE_START( cchasm )
  *
  *************************************/
 
-static struct z80_irq_daisy_chain daisy_chain[] =
+static const struct z80_irq_daisy_chain daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
 	{ 0,0,0,0,-1 } 		/* end mark */

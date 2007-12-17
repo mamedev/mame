@@ -83,7 +83,7 @@ const static short k10table   [0x08]={
 
 /* chirp table */
 
-static char chirptable[51]={
+static const char chirptable[51]={
 0x00, 0x2a, (char)0xd4, 0x32,
 (char)0xb2, 0x12, 0x25, 0x14,
 0x02, (char)0xe1, (char)0xc5, 0x02,
@@ -101,7 +101,7 @@ static char chirptable[51]={
 
 /* interpolation coefficients (in rightshifts, as in actual chip) */
 
-static char interp_coeff[8] = {
+static const char interp_coeff[8] = {
 3, 3, 3, 2, 2, 1, 1, 0
 };
 

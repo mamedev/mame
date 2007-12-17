@@ -72,7 +72,7 @@ struct ioasic_state
 	UINT8	dcs_cpu;
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
-	UINT8 *	shuffle_map;
+	const UINT8 *	shuffle_map;
 	void 	(*irq_callback)(int);
 	UINT8	irq_state;
 	UINT16	sound_irq_state;
@@ -589,7 +589,7 @@ static void ioasic_register_state(void)
 
 void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(int))
 {
-	static UINT8 shuffle_maps[][16] =
+	static const UINT8 shuffle_maps[][16] =
 	{
 		{ 0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xc,0xd,0xe,0xf },	/* WarGods, WG3DH, SFRush, MK4 */
 		{ 0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0x3,0x2,0x1,0x0,0xf,0xe,0xd,0xc },	/* Blitz, Blitz99 */

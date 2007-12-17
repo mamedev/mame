@@ -364,20 +364,20 @@ static void snk_sound_callback1_w( int state ){ /* ? */
 	if( state ) snk_sound_register |= 0x02;
 }
 
-static struct YM3526interface ym3526_interface_0 = {
+static const struct YM3526interface ym3526_interface_0 = {
 	snk_sound_callback0_w /* ? */
 };
 
-static struct YM3526interface ym3526_interface_1 = {
+static const struct YM3526interface ym3526_interface_1 = {
 	snk_sound_callback1_w /* ? */
 };
 
-static struct Y8950interface y8950_interface = {
+static const struct Y8950interface y8950_interface = {
 	snk_sound_callback1_w, /* ? */
 	REGION_SOUND1	/* memory region */
 };
 
-static struct YM3812interface ym3812_interface = {
+static const struct YM3812interface ym3812_interface = {
 	snk_sound_callback0_w /* ? */
 };
 

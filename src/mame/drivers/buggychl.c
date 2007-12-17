@@ -403,7 +403,7 @@ static WRITE8_HANDLER( portB_1_w )
 }
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	0,
 	0,
@@ -411,7 +411,7 @@ static struct AY8910interface ay8910_interface_1 =
 	portB_0_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	0,
 	0,
@@ -419,7 +419,7 @@ static struct AY8910interface ay8910_interface_2 =
 	portB_1_w
 };
 
-static struct MSM5232interface msm5232_interface =
+static const struct MSM5232interface msm5232_interface =
 {
 	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 }	/* default 0.39 uF capacitors (not verified) */
 };

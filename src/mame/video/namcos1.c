@@ -368,7 +368,7 @@ VIDEO_UPDATE( namcos1 )
 
 	for (i = 0;i < 4;i++)
 	{
-		static int disp_x[] = { 25, 27, 28, 29 };
+		static const int disp_x[] = { 25, 27, 28, 29 };
 
 		j = i << 2;
 		scrollx = ( namcos1_playfield_control[j+1] + (namcos1_playfield_control[j+0]<<8) ) - disp_x[i];

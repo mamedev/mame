@@ -110,7 +110,7 @@ static void output_printf(void (*output)(const char *s), const char *format, ...
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const char *option_unadorned[MAX_UNADORNED_OPTIONS] =
+const char *const option_unadorned[MAX_UNADORNED_OPTIONS] =
 {
 	"<UNADORNED0>",
 	"<UNADORNED1>",

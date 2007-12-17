@@ -123,7 +123,7 @@ static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_
 	struct k054539_info *info = param;
 #define VOL_CAP 1.80
 
-	static INT16 dpcm[16] = {
+	static const INT16 dpcm[16] = {
 		0<<8, 1<<8, 4<<8, 9<<8, 16<<8, 25<<8, 36<<8, 49<<8,
 		-64<<8, -49<<8, -36<<8, -25<<8, -16<<8, -9<<8, -4<<8, -1<<8
 	};
@@ -368,7 +368,7 @@ else
 
 	#if CHANNEL_DEBUG
 	{
-		static char gc_msg[32] = "chip :                         ";
+		static const char gc_msg[32] = "chip :                         ";
 		static int gc_active=0, gc_chip=0, gc_pos[2]={0,0};
 		double *gc_fptr;
 		char *gc_cptr;

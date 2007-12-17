@@ -1756,13 +1756,13 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 	}
 }
 
-static struct AY8910interface ay8910_intf_dsw =
+static const struct AY8910interface ay8910_intf_dsw =
 {
 	input_port_4_r,	/* input A: DSW 1 */
 	input_port_5_r	/* input B: DSW 2 */
 };
 
-static struct AY8910interface ay8910_intf_eeprom =
+static const struct AY8910interface ay8910_intf_eeprom =
 {
 	kaneko16_eeprom_r,		/* inputs  A:  0,EEPROM bit read */
 	0,						/* inputs  B */

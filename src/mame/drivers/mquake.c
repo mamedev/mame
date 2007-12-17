@@ -319,13 +319,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct CustomSound_interface amiga_custom_interface =
+static const struct CustomSound_interface amiga_custom_interface =
 {
 	amiga_sh_start
 };
 
 
-static struct ES5503interface es5503_intf =
+static const struct ES5503interface es5503_intf =
 {
 	NULL,
 	NULL,

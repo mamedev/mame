@@ -189,7 +189,7 @@ static INPUT_PORTS_START( cham24 )
 
 INPUT_PORTS_END
 
-static struct NESinterface cham24_interface_1 =
+static const struct NESinterface cham24_interface_1 =
 {
 	REGION_CPU1
 };

@@ -99,7 +99,7 @@ struct DEBUGOPTS
 };
 static struct DEBUGOPTS debug_options  = {5, {0,0,0,0,0,0}, 0, 0, 0};
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
-static UINT16 dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
+static const UINT16 dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
 static UINT8 snes_dbg_video(running_machine *machine, mame_bitmap *bitmap, UINT16 curline);
 #endif /* SNES_DBG_video */
 
@@ -142,7 +142,7 @@ struct SNES_MODE_CONFIG
 
 static struct SCANLINE scanlines[2];
 struct SNES_PPU_STRUCT snes_ppu;
-static struct SNES_MODE_CONFIG snes_modedefs[8] =
+static const struct SNES_MODE_CONFIG snes_modedefs[8] =
 {
 /*0*/	{ {snes_update_line_2, snes_update_line_2, snes_update_line_2, snes_update_line_2}, 4 },
 /*1*/	{ {snes_update_line_4, snes_update_line_4, snes_update_line_2, NULL}, 3 },
@@ -2001,7 +2001,7 @@ static UINT8 snes_dbg_video(running_machine *machine, mame_bitmap *bitmap, UINT1
 	{
 		//UINT16 y = 1;
 		char t[100];
-		static char WINLOGIC[4] = { '|', '&', '^', '!' };
+		static const char WINLOGIC[4] = { '|', '&', '^', '!' };
 
 		if( !debug_options.input_count-- )
 		{

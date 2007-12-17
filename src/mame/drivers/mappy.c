@@ -626,23 +626,23 @@ static WRITE8_HANDLER( out_lamps )
 }
 
 /* chip #0: player inputs, buttons, coins */
-static struct namcoio_interface intf0 =
+static const struct namcoio_interface intf0 =
 {
 	{ in1_h, in0_l, in0_h, in1_l },	/* port read handlers */
 	{ NULL, NULL }					/* port write handlers */
 };
-static struct namcoio_interface intf0_lamps =
+static const struct namcoio_interface intf0_lamps =
 {
 	{ in1_h, in0_l, in0_h, in1_l },	/* port read handlers */
 	{ out_lamps, NULL }				/* port write handlers */
 };
 /* chip #1: dip switches, test/cocktail, optional buttons */
-static struct namcoio_interface intf1 =
+static const struct namcoio_interface intf1 =
 {
 	{ dipB_mux, dipA_l, dipA_h, in2 },	/* port read handlers */
 	{ out_mux, NULL }					/* port write handlers */
 };
-static struct namcoio_interface intf1_interleave =
+static const struct namcoio_interface intf1_interleave =
 {
 	{ dipB_muxi, dipA_l, dipA_h, in2 },	/* port read handlers */
 	{ out_mux, NULL }					/* port write handlers */
@@ -1559,7 +1559,7 @@ GFXDECODE_END
 
 
 
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	8,				/* number of voices */
 	REGION_SOUND1	/* memory region */

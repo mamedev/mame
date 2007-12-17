@@ -47,7 +47,7 @@ struct tms34061_data
 
 static struct tms34061_data tms34061;
 
-static const char *regnames[] =
+static const char *const regnames[] =
 {
 	"HORENDSYNC",	"HORENDBLNK",	"HORSTARTBLNK",		"HORTOTAL",
 	"VERENDSYNC",	"VERENDBLNK",	"VERSTARTBLNK",		"VERTOTAL",
@@ -74,7 +74,7 @@ static TIMER_CALLBACK( tms34061_interrupt );
  *
  *************************************/
 
-void tms34061_start(struct tms34061_interface *interface)
+void tms34061_start(const struct tms34061_interface *interface)
 {
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));

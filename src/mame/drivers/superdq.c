@@ -175,7 +175,7 @@ static WRITE8_HANDLER( superdq_videoram_w )
 static WRITE8_HANDLER( superdq_io_w )
 {
 	int 			i;
-	static UINT8	black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
 		cpunum_set_input_line(0, 0, CLEAR_LINE);

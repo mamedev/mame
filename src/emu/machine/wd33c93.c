@@ -18,7 +18,7 @@
 #define VERBOSE 0
 
 static SCSIInstance *devices[8];	// SCSI IDs 0-7
-static struct WD33C93interface *intf;
+static const struct WD33C93interface *intf;
 
 /* wd register names */
 #define WD_OWN_ID					0x00
@@ -457,7 +457,7 @@ static void wd33c93_xferinfo_cmd( void )
 }
 
 /* Command handlers */
-static cmd_handler wd33c93_cmds[0x22] =
+static const cmd_handler wd33c93_cmds[0x22] =
 {
 	&wd33c93_reset_cmd,		/* 0x00 - WD_CMD_RESET */
 	&wd33c93_abort_cmd,		/* 0x01 - WD_CMD_ABORT */
@@ -785,7 +785,7 @@ READ8_HANDLER(wd33c93_r)
 	return 0;
 }
 
-extern void wd33c93_init( struct WD33C93interface *interface )
+extern void wd33c93_init( const struct WD33C93interface *interface )
 {
 	int i;
 

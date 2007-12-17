@@ -521,7 +521,7 @@ static const pia6821_interface pia_interface =
 
 static void via_irq(int state);
 
-static struct via6522_interface via_interface =
+static const struct via6522_interface via_interface =
 {
 	/*inputs : A/B         */ 0, 0,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,
@@ -1734,7 +1734,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,
@@ -1744,7 +1744,7 @@ static struct YM2203interface ym2203_interface =
 };
 
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	generate_sound_irq
 };

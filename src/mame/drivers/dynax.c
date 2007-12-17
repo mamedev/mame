@@ -3576,7 +3576,7 @@ INPUT_PORTS_END
                                 Hana no Mai
 ***************************************************************************/
 
-static struct YM2203interface hanamai_ym2203_interface =
+static const struct YM2203interface hanamai_ym2203_interface =
 {
 	input_port_1_r,				/* Port A Read: DSW */
 	input_port_0_r,				/* Port B Read: DSW */
@@ -3585,7 +3585,7 @@ static struct YM2203interface hanamai_ym2203_interface =
 	sprtmtch_sound_callback		/* IRQ handler */
 };
 
-static struct MSM5205interface hanamai_msm5205_interface =
+static const struct MSM5205interface hanamai_msm5205_interface =
 {
 	adpcm_int,			/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz, 4 Bits  */
@@ -3642,7 +3642,7 @@ MACHINE_DRIVER_END
                                 Hana Oriduru
 ***************************************************************************/
 
-static struct AY8910interface hnoridur_ay8910_interface =
+static const struct AY8910interface hnoridur_ay8910_interface =
 {
 	input_port_0_r		/* Port A Read: DSW */
 };
@@ -3691,7 +3691,7 @@ MACHINE_DRIVER_END
                                 Sports Match
 ***************************************************************************/
 
-static struct YM2203interface sprtmtch_ym2203_interface =
+static const struct YM2203interface sprtmtch_ym2203_interface =
 {
 	input_port_3_r,				/* Port A Read: DSW */
 	input_port_4_r,				/* Port B Read: DSW */
@@ -3861,7 +3861,7 @@ MACHINE_DRIVER_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-static struct YM2203interface jantouki_ym2203_interface =
+static const struct YM2203interface jantouki_ym2203_interface =
 {
 	0,							/* Port A Read: DSW */
 	0,							/* Port B Read: DSW */
@@ -3870,7 +3870,7 @@ static struct YM2203interface jantouki_ym2203_interface =
 	jantouki_sound_callback		/* IRQ handler */
 };
 
-static struct MSM5205interface jantouki_msm5205_interface =
+static const struct MSM5205interface jantouki_msm5205_interface =
 {
 	adpcm_int_cpu1,			/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz, 4 Bits  */
@@ -4033,7 +4033,7 @@ MACHINE_DRIVER_END
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
-static struct AY8910interface htengoku_ay8910_interface =
+static const struct AY8910interface htengoku_ay8910_interface =
 {
 	// A            B
 	htengoku_dsw_r,	0,					// R
@@ -4091,7 +4091,7 @@ static INTERRUPT_GEN( tenkai_interrupt )
 	}
 }
 
-static struct AY8910interface tenkai_ay8910_interface =
+static const struct AY8910interface tenkai_ay8910_interface =
 {
 	// A                // B
 	tenkai_dsw_r,		0,				// Read

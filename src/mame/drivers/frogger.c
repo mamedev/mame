@@ -223,7 +223,7 @@ static INPUT_PORTS_START( froggrmc )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static struct AY8910interface frogger_ay8910_interface =
+static const struct AY8910interface frogger_ay8910_interface =
 {
 	soundlatch_r,
 	frogger_portB_r

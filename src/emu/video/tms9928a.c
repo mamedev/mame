@@ -110,7 +110,7 @@ static void draw_modebogus (running_machine *machine, mame_bitmap *bitmap, const
 static void draw_sprites (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
 static void change_register (int reg, UINT8 data);
 
-static void (*ModeHandlers[])(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) = {
+static void (*const ModeHandlers[])(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
         draw_modebogus };
@@ -305,7 +305,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
 static void change_register (int reg, UINT8 val) {
     static const UINT8 Mask[8] =
         { 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
-    static const char *modes[] = {
+    static const char *const modes[] = {
         "Mode 0 (GRAPHIC 1)", "Mode 1 (TEXT 1)", "Mode 2 (GRAPHIC 2)",
         "Mode 1+2 (TEXT 1 variation)", "Mode 3 (MULTICOLOR)",
         "Mode 1+3 (BOGUS)", "Mode 2+3 (MULTICOLOR variation)",

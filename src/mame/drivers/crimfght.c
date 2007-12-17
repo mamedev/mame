@@ -341,7 +341,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	0,
 	crimfght_snd_bankswitch_w
@@ -353,7 +353,7 @@ static void volume_callback(int v)
 	K007232_set_volume(0,1,0,(v >> 4) * 0x11);
 }
 
-static struct K007232_interface k007232_interface =
+static const struct K007232_interface k007232_interface =
 {
 	REGION_SOUND1,	/* memory regions */
 	volume_callback	/* external port callback */

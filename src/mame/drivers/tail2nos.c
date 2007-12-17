@@ -249,7 +249,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2608interface ym2608_interface =
+static const struct YM2608interface ym2608_interface =
 {
 	0,
 	0,

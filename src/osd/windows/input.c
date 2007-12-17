@@ -212,7 +212,7 @@ static device_info *		lightgun_list;
 static device_info *		joystick_list;
 
 // default axis names
-static const TCHAR *default_axis_name[] =
+static const TCHAR *const default_axis_name[] =
 {
 	TEXT("X"), TEXT("Y"), TEXT("Z"), TEXT("RX"),
 	TEXT("RY"), TEXT("RZ"), TEXT("SL1"), TEXT("SL2")
@@ -914,7 +914,7 @@ static void win32_init(running_machine *machine)
 	// allocate two lightgun devices
 	for (gunnum = 0; gunnum < 2; gunnum++)
 	{
-		static const TCHAR *gun_names[] = { TEXT("Shared Axis Gun 1"), TEXT("Shared Axis Gun 2") };
+		static const TCHAR *const gun_names[] = { TEXT("Shared Axis Gun 1"), TEXT("Shared Axis Gun 2") };
 		device_info *devinfo;
 		int axisnum, butnum;
 
@@ -1735,8 +1735,8 @@ static void rawinput_device_release(device_info *devinfo)
 
 static TCHAR *rawinput_device_improve_name(TCHAR *name)
 {
-	static const TCHAR *usbbasepath = TEXT("SYSTEM\\CurrentControlSet\\Enum\\USB");
-	static const TCHAR *basepath = TEXT("SYSTEM\\CurrentControlSet\\Enum\\");
+	static const TCHAR usbbasepath[] = TEXT("SYSTEM\\CurrentControlSet\\Enum\\USB");
+	static const TCHAR basepath[] = TEXT("SYSTEM\\CurrentControlSet\\Enum\\");
 	TCHAR *regstring = NULL;
 	TCHAR *parentid = NULL;
 	TCHAR *regpath = NULL;

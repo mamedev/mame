@@ -1595,27 +1595,27 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface centipdb_ay8910_interface =
+static const struct AY8910interface centipdb_ay8910_interface =
 {
 	caterplr_rand_r
 };
 
 
-static struct POKEYinterface milliped_pokey_interface_1 =
+static const struct POKEYinterface milliped_pokey_interface_1 =
 {
 	{ 0 },
 	input_port_4_r
 };
 
 
-static struct POKEYinterface milliped_pokey_interface_2 =
+static const struct POKEYinterface milliped_pokey_interface_2 =
 {
 	{ 0 },
 	input_port_5_r
 };
 
 
-static struct POKEYinterface warlords_pokey_interface =
+static const struct POKEYinterface warlords_pokey_interface =
 {
 	{ input_port_4_r,input_port_5_r,input_port_6_r,input_port_7_r }
 };

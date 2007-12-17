@@ -173,7 +173,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	0,
 	0,
@@ -181,7 +181,7 @@ static struct AY8910interface ay8910_interface_1 =
 	nova2001_scroll_y_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	input_port_3_r,
 	input_port_4_r

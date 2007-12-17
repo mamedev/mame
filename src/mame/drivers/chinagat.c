@@ -460,14 +460,14 @@ static void chinagat_irq_handler(int irq) {
 	cpunum_set_input_line( 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	chinagat_irq_handler
 };
 
 
 /* This on the bootleg board, instead of the m6295 */
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	saiyugb1_m5205_irq_w,	/* Interrupt function */
 	MSM5205_S64_4B			/* vclk input mode (6030Hz, 4-bit) */
@@ -480,7 +480,7 @@ static INTERRUPT_GEN( chinagat_interrupt )
 }
 
 /* This is only on the second bootleg board */
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,

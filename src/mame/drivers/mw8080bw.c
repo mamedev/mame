@@ -274,7 +274,7 @@ static WRITE8_HANDLER( seawolf_explosion_lamp_w )
 */
 	int i;
 
-	static const char *lamp_names[] =
+	static const char *const lamp_names[] =
 	{
 		"EXP_LAMP_0", "EXP_LAMP_1", "EXP_LAMP_2", "EXP_LAMP_3",
 		"EXP_LAMP_4", "EXP_LAMP_5", "EXP_LAMP_6", "EXP_LAMP_7",

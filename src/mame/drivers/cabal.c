@@ -513,7 +513,7 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	seibu_ym3812_irqhandler
 };
@@ -523,20 +523,20 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface cabalbl_ym2151_interface =
+static const struct YM2151interface cabalbl_ym2151_interface =
 {
 	irqhandler
 };
 
 SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE
 
-static struct MSM5205interface msm5205_interface_1 =
+static const struct MSM5205interface msm5205_interface_1 =
 {
 	0,
 	MSM5205_SEX_4B
 };
 
-static struct MSM5205interface msm5205_interface_2 =
+static const struct MSM5205interface msm5205_interface_2 =
 {
 	0,
 	MSM5205_SEX_4B

@@ -363,7 +363,7 @@ static GFXDECODE_START( cherrym )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0020, spritelayout, 0, 16 )
 GFXDECODE_END
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_6_r,	//
 	input_port_7_r,	//

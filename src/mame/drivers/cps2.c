@@ -1342,7 +1342,7 @@ GFXDECODE_END
 
 
 
-static struct m68k_encryption_interface cps2_encryption =
+static const struct m68k_encryption_interface cps2_encryption =
 {
 	CPS2_Read8, CPS2_Read16, CPS2_Read32,
 	CPS2_Read16, CPS2_Read32

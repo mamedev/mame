@@ -4118,13 +4118,13 @@ static INPUT_PORTS_START( mjegolf )
 INPUT_PORTS_END
 
 
-static struct z80_irq_daisy_chain daisy_chain_main[] =
+static const struct z80_irq_daisy_chain daisy_chain_main[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },	/* device 0 = CTC_0 */
 	{ 0, 0, 0, 0, -1 }										/* end mark */
 };
 
-static struct z80_irq_daisy_chain daisy_chain_sound[] =
+static const struct z80_irq_daisy_chain daisy_chain_sound[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 1 },	/* device 0 = CTC_1 */
 	{ 0, 0, 0, 0, -1 }										/* end mark */

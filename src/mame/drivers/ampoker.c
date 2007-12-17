@@ -843,7 +843,7 @@ GFXDECODE_END
 * AY8910 Interfase *
 *******************/
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 0, 0, 0, 0	/* no ports used */
 };

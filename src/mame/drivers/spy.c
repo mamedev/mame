@@ -507,13 +507,13 @@ static void volume_callback1(int v)
 	K007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
 }
 
-static struct K007232_interface k007232_interface_1 =
+static const struct K007232_interface k007232_interface_1 =
 {
 	REGION_SOUND1,
 	volume_callback0
 };
 
-static struct K007232_interface k007232_interface_2 =
+static const struct K007232_interface k007232_interface_2 =
 {
 	REGION_SOUND2,
 	volume_callback1
@@ -525,7 +525,7 @@ static void irqhandler(int linestate)
 	cpunum_set_input_line(1, INPUT_LINE_NMI, linestate);
 }
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irqhandler
 };

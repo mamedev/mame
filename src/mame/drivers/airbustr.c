@@ -557,7 +557,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_3_r,		// DSW-1 connected to port A
 	input_port_4_r		// DSW-2 connected to port B

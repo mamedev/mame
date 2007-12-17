@@ -1827,7 +1827,7 @@ static GFXDECODE_START( taitosj )
 GFXDECODE_END
 
 
-static UINT8 voltable[256] =
+static const UINT8 voltable[256] =
 {
 	0xff,0xfe,0xfc,0xfb,0xf9,0xf7,0xf6,0xf4,0xf3,0xf2,0xf1,0xef,0xee,0xec,0xeb,0xea,
 	0xe8,0xe7,0xe5,0xe4,0xe2,0xe1,0xe0,0xdf,0xde,0xdd,0xdc,0xdb,0xd9,0xd8,0xd7,0xd6,
@@ -1863,13 +1863,13 @@ static WRITE8_HANDLER( dac_vol_w )
 }
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	input_port_6_r,
 	input_port_7_r
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	0,
 	0,
@@ -1877,7 +1877,7 @@ static struct AY8910interface ay8910_interface_2 =
 	dac_vol_w	/* port Bwrite */
 };
 
-static struct AY8910interface ay8910_interface_3 =
+static const struct AY8910interface ay8910_interface_3 =
 {
 	0,
 	0,
@@ -1885,7 +1885,7 @@ static struct AY8910interface ay8910_interface_3 =
 	0
 };
 
-static struct AY8910interface ay8910_interface_4 =
+static const struct AY8910interface ay8910_interface_4 =
 {
 	0,
 	0,

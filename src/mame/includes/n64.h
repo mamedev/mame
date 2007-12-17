@@ -42,7 +42,7 @@ extern void rdp_process_list(void);
 
 /*----------- defined in machine/n64.c -----------*/
 
-extern rsp_config n64_rsp_config;
+extern const rsp_config n64_rsp_config;
 
 extern UINT32 *rdram;
 extern UINT32 *rsp_imem;

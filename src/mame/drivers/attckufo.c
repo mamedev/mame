@@ -46,7 +46,7 @@ LOIPOIO-B
 #include "includes/attckufo.h"
 
 
-static struct CustomSound_interface attckufo_sound_interface =
+static const struct CustomSound_interface attckufo_sound_interface =
 {
 	attckufo_custom_start
 };

@@ -7,7 +7,7 @@
 #define DASM_OPCODES 0
 
 static SCSIInstance *devices[8];	/* SCSI IDs 0-7 */
-static struct LSI53C810interface *intf;
+static const struct LSI53C810interface *intf;
 static UINT8 last_id;
 
 static struct {
@@ -659,7 +659,7 @@ static void add_opcode(UINT8 op, UINT8 mask, void (* handler)(void))
 	}
 }
 
-extern void lsi53c810_init(struct LSI53C810interface *interface)
+extern void lsi53c810_init(const struct LSI53C810interface *interface)
 {
 	int i;
 
@@ -756,7 +756,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 	UINT32 dest;
 	int i;
 
-	static const char *phases[] =
+	static const char *const phases[] =
 	{
 		"DATA_OUT", "DATA_IN", "CMD", "STATUS",
 		"RESERVED_OUT??", "RESERVED_IN??", "MSG_OUT", "MSG_IN"
@@ -777,7 +777,7 @@ unsigned lsi53c810_dasm(char *buf, UINT32 pc)
 	else if (((op & 0xF8000000) == 0x58000000)
 		| ((op & 0xF8000000) == 0x60000000))
 	{
-		static struct
+		static const struct
 		{
 			UINT32 flag;
 			const char *text;

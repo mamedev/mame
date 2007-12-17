@@ -65,7 +65,7 @@ we actually have 18 segments, including the semicolon portions.
 This means our segment maths needs to be more than 16-bit to work!
 */
 
-static UINT32 roc10937charset[]=
+static const UINT32 roc10937charset[]=
 {           // 11 10 FEDC BA98 7654 3210
 	0x0507F, //  0  0 0101 0000 0111 1111 @.
 	0x044CF, //  0  0 0100 0100 1100 1111 A.

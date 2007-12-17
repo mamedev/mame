@@ -32,7 +32,7 @@ static WRITE8_HANDLER( protection_w )
 	}
 	else
 	{
-		static int jumptable[] =
+		static const int jumptable[] =
 		{
 			0x02be, 0x0314, 0x0475, 0x0662, 0x0694, 0x08f3, 0x0959, 0x096f,
 			0x0992, 0x09a4, 0x0a50, 0x0d69, 0x0eee, 0x0f98, 0x1040, 0x1075,
@@ -274,7 +274,7 @@ GFXDECODE_END
 
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_2_r
 };

@@ -46,7 +46,7 @@ const UINT8 masterVolumeLevels[16] =
 
 static UINT16 masterAmplModTable[16*256];
 
-static float attackTimes[16] =
+static const float attackTimes[16] =
 {
   /* milliseconds */
 #if defined(SID_REFTIMES)
@@ -60,7 +60,7 @@ static float attackTimes[16] =
 #endif
 };
 
-static float decayReleaseTimes[16] =
+static const float decayReleaseTimes[16] =
 {
   /* milliseconds */
 #if defined(SID_REFTIMES)

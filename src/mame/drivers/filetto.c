@@ -390,7 +390,7 @@ static void pc_timer0_w(int state)
 	//  pic8259_0_issue_irq(0);
 }
 
-static struct pit8253_config pc_pit8253_config =
+static const struct pit8253_config pc_pit8253_config =
 {
 	TYPE8253,
 	{

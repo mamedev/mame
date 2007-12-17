@@ -995,8 +995,8 @@ static void m68k_post_load(void)
 
 void m68k_state_register(const char *type, int index)
 {
+	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
 	state_save_register_item_array(type, index, REG_D);
-	state_save_register_item_array(type, index, REG_A);
 	state_save_register_item(type, index, REG_PPC);
 	state_save_register_item(type, index, REG_PC);
 	state_save_register_item(type, index, REG_USP);

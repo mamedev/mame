@@ -97,7 +97,7 @@ static TIMER_CALLBACK( ptm6840_t3_timeout );
 static ptm6840 ptm[PTM_6840_MAX];
 
 #if PTMVERBOSE
-static const char *opmode[] =
+static const char *const opmode[] =
 {
 	"000 continous mode",
 	"001 freq comparison mode",

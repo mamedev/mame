@@ -298,7 +298,7 @@ static READ8_HANDLER( sound_r )
 	return sound_flag;
 }
 
-static struct AY8910interface ay8912_interface =
+static const struct AY8910interface ay8912_interface =
 {
 	sound_r
 };

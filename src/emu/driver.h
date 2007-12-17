@@ -119,16 +119,17 @@
 
 /* ----- flags for video_attributes ----- */
 
-/* is the video hardware raser or vector base? */
-#define	VIDEO_TYPE_RASTER				0x0000
-#define	VIDEO_TYPE_VECTOR				0x0001
+/* is the video hardware raster or vector based? */
+#define VIDEO_TYPE_NONE                 0x0000
+#define	VIDEO_TYPE_RASTER				0x0001
+#define	VIDEO_TYPE_VECTOR				0x0002
 
 /* should VIDEO_UPDATE by called at the start of VBLANK or at the end? */
 #define	VIDEO_UPDATE_BEFORE_VBLANK		0x0000
-#define	VIDEO_UPDATE_AFTER_VBLANK		0x0002
+#define	VIDEO_UPDATE_AFTER_VBLANK		0x0004
 
 /* indicates VIDEO_UPDATE will add container bits its */
-#define VIDEO_SELF_RENDER				0x0004
+#define VIDEO_SELF_RENDER				0x0008
 
 /* automatically extend the palette creating a darker copy for shadows */
 #define VIDEO_HAS_SHADOWS				0x0010

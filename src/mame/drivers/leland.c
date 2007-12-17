@@ -696,7 +696,7 @@ GFXDECODE_END
    register.
 */
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
     leland_sound_port_r,
 	0,
@@ -705,19 +705,19 @@ static struct AY8910interface ay8910_interface =
 };
 
 
-static struct CustomSound_interface dac_custom_interface =
+static const struct CustomSound_interface dac_custom_interface =
 {
     leland_sh_start
 };
 
 
-static struct CustomSound_interface i80186_custom_interface =
+static const struct CustomSound_interface i80186_custom_interface =
 {
     leland_80186_sh_start
 };
 
 
-static struct CustomSound_interface redline_custom_interface =
+static const struct CustomSound_interface redline_custom_interface =
 {
   	redline_80186_sh_start
 };

@@ -189,7 +189,7 @@ void mslugx_install_protection(void)
 static WRITE16_HANDLER( kof99_bankswitch_w )
 {
 	int bankaddress;
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 		0x000000, 0x100000, 0x200000, 0x300000,
 		0x3cc000, 0x4cc000, 0x3f2000, 0x4f2000,
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 {
 	/* thanks to Razoola and Mr K for the info */
 	int bankaddress;
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 		0x000000, 0x100000, 0x200000, 0x300000, // 00
 		0x280000, 0x380000, 0x2d0000, 0x3d0000, // 04
@@ -258,7 +258,7 @@ static WRITE16_HANDLER( garouo_bankswitch_w )
 {
 	/* thanks to Razoola and Mr K for the info */
 	int bankaddress;
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 		0x000000, 0x100000, 0x200000, 0x300000, // 00
 		0x280000, 0x380000, 0x2d0000, 0x3d0000, // 04
@@ -297,7 +297,7 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 {
 	/* thanks to Razoola and Mr K for the info */
 	int bankaddress;
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 	  0x000000, 0x020000, 0x040000, 0x060000, // 00
 	  0x070000, 0x090000, 0x0b0000, 0x0d0000, // 04
@@ -333,7 +333,7 @@ static WRITE16_HANDLER( kof2000_bankswitch_w )
 {
 	/* thanks to Razoola and Mr K for the info */
 	int bankaddress;
-	static int bankoffset[64] =
+	static const int bankoffset[64] =
 	{
 		0x000000, 0x100000, 0x200000, 0x300000, // 00
 		0x3f7800, 0x4f7800, 0x3ff800, 0x4ff800, // 04

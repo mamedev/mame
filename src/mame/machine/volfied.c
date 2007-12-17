@@ -260,7 +260,7 @@ static const UINT16 palette_data_11[0x50] =
 	0xce39, 0x1c02, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000
 };
 
-static const UINT16* palette_data_lookup[] =
+static const UINT16 *const palette_data_lookup[] =
 {
 	0,
 	palette_data_01,

@@ -1306,12 +1306,12 @@ static ADDRESS_MAP_START( bnstars_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 #endif
 
-static struct YMF271interface ymf271_interface1 =
+static const struct YMF271interface ymf271_interface1 =
 {
 	REGION_SOUND1
 };
 
-static struct YMF271interface ymf271_interface2 =
+static const struct YMF271interface ymf271_interface2 =
 {
 	REGION_SOUND2
 };

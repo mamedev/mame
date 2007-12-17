@@ -167,7 +167,7 @@ struct x_offset
 };
 
 /* note that drgnunit, stg and qzkklogy run on the same board, yet they need different alignment */
-static struct x_offset game_offsets[] =
+static const struct x_offset game_offsets[] =
 {
 	/* only sprites */
 	{ "tndrcade", { -1,  0 } },				// correct (wall at beginning of game)
@@ -217,7 +217,7 @@ static struct x_offset game_offsets[] =
 	{ NULL }
 };
 
-static struct x_offset *global_offsets;
+static const struct x_offset *global_offsets;
 
 
 /*  ---- 3---       Coin #1 Lock Out
@@ -229,7 +229,7 @@ void seta_coin_lockout_w(int data)
 {
 	static int seta_coin_lockout = 1;
 	static const game_driver *seta_driver = NULL;
-	static const char *seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
+	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
 	if (seta_driver != Machine->gamedrv)

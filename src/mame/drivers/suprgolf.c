@@ -261,7 +261,7 @@ static void irqhandler(int irq)
 //  cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_5_r,
 	input_port_6_r,

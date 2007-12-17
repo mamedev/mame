@@ -353,7 +353,7 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_intf_sandscrp =
+static const struct YM2203interface ym2203_intf_sandscrp =
 {
 	input_port_4_r,	/* Port A Read - DSW 1 */
 	input_port_5_r,	/* Port B Read - DSW 2 */

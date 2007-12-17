@@ -229,7 +229,7 @@ static UINT32 akiko_c2p_read(void)
 }
 
 #if LOG_AKIKO
-static const char* akiko_reg_names[] =
+static const char *const akiko_reg_names[] =
 {
 	/*0*/	"ID",
 	/*1*/	"CDROM STATUS 1",

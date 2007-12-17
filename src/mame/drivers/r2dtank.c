@@ -186,14 +186,14 @@ static WRITE8_HANDLER( AY8910_port_w )
 }
 
 
-static struct AY8910interface ay8910_1_interface =
+static const struct AY8910interface ay8910_1_interface =
 {
 	input_port_3_r,
 	0
 };
 
 
-static struct AY8910interface ay8910_2_interface =
+static const struct AY8910interface ay8910_2_interface =
 {
 	input_port_1_r,
 	input_port_2_r
@@ -226,7 +226,7 @@ static UINT32 get_ttl74123_output(void *param)
 }
 
 
-static TTL74123_interface ttl74123_intf =
+static const TTL74123_interface ttl74123_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */

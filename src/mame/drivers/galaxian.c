@@ -4236,12 +4236,12 @@ static GFXDECODE_START( _4in1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x4000, _4in1_spritelayout,    0, 8 )
 GFXDECODE_END
 
-static struct AY8910interface checkmaj_ay8910_interface =
+static const struct AY8910interface checkmaj_ay8910_interface =
 {
 	soundlatch_r
 };
 
-static struct AY8910interface bongo_ay8910_interface =
+static const struct AY8910interface bongo_ay8910_interface =
 {
 	input_port_3_r
 };

@@ -264,7 +264,7 @@ static digital_joystick_info joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PL
 static UINT8 ui_memory[__ipt_max];
 
 /* XML attributes for the different types */
-static const char *seqtypestrings[] = { "standard", "decrement", "increment" };
+static const char *const seqtypestrings[] = { "standard", "decrement", "increment" };
 
 /* original input_ports without modifications */
 static input_port_entry *input_ports_default;
@@ -2598,9 +2598,9 @@ const char *input_port_name(const input_port_entry *port)
 }
 
 
-input_seq *input_port_seq(input_port_entry *port, int seqtype)
+const input_seq *input_port_seq(input_port_entry *port, int seqtype)
 {
-	static input_seq ip_none = SEQ_DEF_0;
+	static const input_seq ip_none = SEQ_DEF_0;
 	input_seq *portseq;
 
 	/* if port is disabled, return no key */
@@ -2639,9 +2639,9 @@ input_seq *input_port_seq(input_port_entry *port, int seqtype)
 }
 
 
-input_seq *input_port_default_seq(int type, int player, int seqtype)
+const input_seq *input_port_default_seq(int type, int player, int seqtype)
 {
-	static input_seq ip_none = SEQ_DEF_0;
+	static const input_seq ip_none = SEQ_DEF_0;
 
 	/* find the default setting */
 	int defindex = default_ports_lookup[type][player];

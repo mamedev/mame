@@ -643,7 +643,7 @@ static double compute_center_to_peak_voltage_out(struct SN76477 *sn)
 static void log_enable_line(struct SN76477 *sn)
 {
 #if VERBOSE
-	static const char *desc[] =
+	static const char *const desc[] =
 	{
 		"Enabled", "Inhibited"
 	};

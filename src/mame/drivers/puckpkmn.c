@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static struct YM3438interface ym3438_intf =
+static const struct YM3438interface ym3438_intf =
 {
 	genesis_irq2_interrupt		/* IRQ handler */
 };

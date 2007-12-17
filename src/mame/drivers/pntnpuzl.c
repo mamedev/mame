@@ -344,7 +344,7 @@ static WRITE16_HANDLER( pntnpuzl_280018_w )
 
 static READ16_HANDLER( pntnpuzl_280014_r )
 {
-	static int startup[3] = { 0x80, 0x0c, 0x00 };
+	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
 
 	if (serial_out == 0x11)

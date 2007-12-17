@@ -22,14 +22,14 @@ READ8_HANDLER( starwars_input_1_r );
 READ8_HANDLER( starwars_adc_r );
 WRITE8_HANDLER( starwars_adc_select_w );
 
-void swmathbox_init(void);
-void swmathbox_reset(void);
+void starwars_mproc_init(void);
+void starwars_mproc_reset(void);
 
-READ8_HANDLER( swmathbx_prng_r );
-READ8_HANDLER( swmathbx_reh_r );
-READ8_HANDLER( swmathbx_rel_r );
+READ8_HANDLER( starwars_prng_r );
+READ8_HANDLER( starwars_div_reh_r );
+READ8_HANDLER( starwars_div_rel_r );
 
-WRITE8_HANDLER( swmathbx_w );
+WRITE8_HANDLER( starwars_math_w );
 
 
 /*----------- defined in audio/starwars.c -----------*/

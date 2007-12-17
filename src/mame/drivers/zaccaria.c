@@ -91,7 +91,7 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 	if (data & 1)	/* DAC enable */
 	{
 		/* TODO: is this right? it sound awful */
-		static int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
+		static const int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
 		DAC_signed_data_w(0,table[(data & 0x06) >> 1]);
 	}
 	else
@@ -641,7 +641,7 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,
 	soundlatch2_r,
@@ -649,7 +649,7 @@ static struct AY8910interface ay8910_interface =
 	0
 };
 
-static struct TMS5220interface tms5220_interface =
+static const struct TMS5220interface tms5220_interface =
 {
 	tms5220_irq_handler	/* IRQ handler */
 };

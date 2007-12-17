@@ -1111,7 +1111,7 @@ static void irqhandler(int state)
 	}
 }
 
-static struct YMF271interface ymf271_interface =
+static const struct YMF271interface ymf271_interface =
 {
 	REGION_SOUND1,
 	flashrom_read,

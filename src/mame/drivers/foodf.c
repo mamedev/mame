@@ -356,7 +356,7 @@ static READ8_HANDLER( pot_r )
 	return (readinputport(5) >> offset) << 7;
 }
 
-static struct POKEYinterface pokey_interface =
+static const struct POKEYinterface pokey_interface =
 {
 	{ pot_r,pot_r,pot_r,pot_r,pot_r,pot_r,pot_r,pot_r }
 };

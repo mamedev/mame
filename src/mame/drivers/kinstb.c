@@ -203,7 +203,7 @@ static INPUT_PORTS_START( kinstb )
 
 INPUT_PORTS_END
 
-static struct CustomSound_interface snes_sound_interface =
+static const struct CustomSound_interface snes_sound_interface =
 { snes_sh_start };
 
 static GFXDECODE_START( kinstb )

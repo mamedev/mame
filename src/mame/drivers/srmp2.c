@@ -1035,14 +1035,14 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static struct AY8910interface srmp2_ay8910_interface =
+static const struct AY8910interface srmp2_ay8910_interface =
 {
 	input_port_2_r,				/* Input A: DSW 2 */
 	input_port_1_r,				/* Input B: DSW 1 */
 };
 
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	srmp2_adpcm_int,			/* IRQ handler */
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  */

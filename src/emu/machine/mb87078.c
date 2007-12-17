@@ -19,7 +19,7 @@ struct MB87078 {
 
 static struct MB87078 chip[MAX_MB87078];
 
-static float MB87078_gain_decibel[66]={
+static const float MB87078_gain_decibel[66]={
 	0.0, -0.5, -1.0, -1.5, -2.0, -2.5, -3.0, -3.5,
    -4.0, -4.5, -5.0, -5.5, -6.0, -6.5, -7.0, -7.5,
    -8.0, -8.5, -9.0, -9.5,-10.0,-10.5,-11.0,-11.5,
@@ -31,7 +31,7 @@ static float MB87078_gain_decibel[66]={
   -32.0, -256.0
   };
 
-static int MB87078_gain_percent[66]={
+static const int MB87078_gain_percent[66]={
    100,94,89,84,79,74,70,66,
     63,59,56,53,50,47,44,42,
     39,37,35,33,31,29,28,26,

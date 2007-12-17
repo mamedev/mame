@@ -299,7 +299,7 @@ static GFXDECODE_START( demoneye )
 GFXDECODE_END
 
 /* Arbitrary colortable */
-static UINT16 colortable_source[] =
+static const UINT16 colortable_source[] =
 {
 	0,7,
 	0,6,
@@ -344,7 +344,7 @@ static INTERRUPT_GEN( redalert_interrupt )
 	}
 }
 
-static struct AY8910interface redalert_ay8910_interface =
+static const struct AY8910interface redalert_ay8910_interface =
 {
 	redalert_AY8910_A_r,		/* Port A Read */
 	0,		/* Port B Read */

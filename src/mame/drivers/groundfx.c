@@ -127,7 +127,7 @@ static const UINT8 default_eeprom[128]=
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-static struct EEPROM_interface groundfx_eeprom_interface =
+static const struct EEPROM_interface groundfx_eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */

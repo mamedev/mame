@@ -445,7 +445,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irqhandler,
 	REGION_SOUND2,	/* Delta-T */
@@ -469,7 +469,7 @@ static int subwoofer_sh_start(const sound_config *msound)
 	return 0;
 }
 
-static struct CustomSound_interface subwoofer_interface =
+static const struct CustomSound_interface subwoofer_interface =
 {
 	subwoofer_sh_start,
 	0, /* none */

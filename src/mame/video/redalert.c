@@ -24,7 +24,7 @@ static UINT8 redalert_backcolor[0x400];
 /* There might be a color PROM that dictates this? */
 /* These guesses are based on comparing the color bars on the test
    screen with the picture in the manual */
-static UINT8 color_lookup[] = {
+static const UINT8 color_lookup[] = {
 	1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,
 	1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,
 	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,

@@ -428,7 +428,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	atarigen_ym2151_irq_gen
 };

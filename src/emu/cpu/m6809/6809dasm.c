@@ -342,7 +342,7 @@ static const opcodeinfo m6809_pg2opcodes[] =
 	{ 0xBC, 4, "CMPS",  EXT    }
 };
 
-static const opcodeinfo *m6809_pgpointers[3] =
+static const opcodeinfo *const m6809_pgpointers[3] =
 {
 	m6809_pg0opcodes, m6809_pg1opcodes, m6809_pg2opcodes
 };

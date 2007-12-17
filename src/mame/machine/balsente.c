@@ -1066,7 +1066,7 @@ WRITE8_HANDLER( balsente_chip_select_w )
 #if LOG_CEM_WRITES
 			if (temp != cem3394_get_parameter(i, reg))
 			{
-				static const char *names[] =
+				static const char *const names[] =
 				{
 					"VCO_FREQUENCY",
 					"FINAL_GAIN",

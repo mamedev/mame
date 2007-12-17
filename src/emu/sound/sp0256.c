@@ -283,7 +283,7 @@ static int lpc12_update(struct lpc12_t *f, int num_samp, INT16 *out, UINT32 *opt
     return i;
 }
 
-static int stage_map[6] = { 0, 1, 2, 3, 4, 5 };
+static const int stage_map[6] = { 0, 1, 2, 3, 4, 5 };
 
 /* ======================================================================== */
 /*  LPC12_REGDEC -- Decode the register set in the filter bank.             */

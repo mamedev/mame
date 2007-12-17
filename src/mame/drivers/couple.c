@@ -119,7 +119,7 @@ static WRITE8_HANDLER( merit_prot_w )
 }
 
 #if 0
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_4_r,
 };

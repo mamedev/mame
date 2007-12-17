@@ -330,7 +330,7 @@ static void chqflag_ym2151_irq_w(int data)
 }
 
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	chqflag_ym2151_irq_w
 };
@@ -351,13 +351,13 @@ static void volume_callback1(int v)
 	K007232_set_volume(1,0,(v & 0x0f)*0x11/2,(v >> 4)*0x11/2);
 }
 
-static struct K007232_interface k007232_interface_1 =
+static const struct K007232_interface k007232_interface_1 =
 {
 	REGION_SOUND1,
 	volume_callback0
 };
 
-static struct K007232_interface k007232_interface_2 =
+static const struct K007232_interface k007232_interface_2 =
 {
 	REGION_SOUND2,
 	volume_callback1

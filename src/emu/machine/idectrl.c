@@ -157,15 +157,15 @@ struct ide_state
 	UINT8	config_register[IDE_CONFIG_REGISTERS];
 	UINT8	config_register_num;
 
-	struct ide_interface *intf;
+	const struct ide_interface *intf;
 	hard_disk_file *	disk;
 	emu_timer *	last_status_timer;
 	emu_timer *	reset_timer;
 
 	UINT8	master_password_enable;
 	UINT8	user_password_enable;
-	UINT8 *	master_password;
-	UINT8 *	user_password;
+	const UINT8 *	master_password;
+	const UINT8 *	user_password;
 };
 
 
@@ -289,7 +289,7 @@ static void ide_controller_exit(running_machine *machine)
 }
 
 
-int ide_controller_init_custom(int which, struct ide_interface *intf, chd_file *diskhandle)
+int ide_controller_init_custom(int which, const struct ide_interface *intf, chd_file *diskhandle)
 {
 	struct ide_state *ide = &idestate[which];
 	const hard_disk_info *hdinfo;
@@ -380,7 +380,7 @@ int ide_controller_init_custom(int which, struct ide_interface *intf, chd_file *
 	return 0;
 }
 
-int ide_controller_init(int which, struct ide_interface *intf)
+int ide_controller_init(int which, const struct ide_interface *intf)
 {
 	/* we only support one hard disk right now; get a handle to it */
 	return ide_controller_init_custom(which, intf, get_disk_handle(0));
@@ -414,7 +414,7 @@ UINT8 *ide_get_features(int which)
 }
 
 
-void ide_set_master_password(int which, UINT8 *password)
+void ide_set_master_password(int which, const UINT8 *password)
 {
 	struct ide_state *ide = &idestate[which];
 
@@ -423,7 +423,7 @@ void ide_set_master_password(int which, UINT8 *password)
 }
 
 
-void ide_set_user_password(int which, UINT8 *password)
+void ide_set_user_password(int which, const UINT8 *password)
 {
 	struct ide_state *ide = &idestate[which];
 

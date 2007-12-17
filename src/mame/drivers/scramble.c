@@ -1930,13 +1930,13 @@ static GFXDECODE_START( ad2083 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, ad2083_spritelayout,  0, 8 )
 GFXDECODE_END
 
-static struct AY8910interface scramble_ay8910_interface_2 =
+static const struct AY8910interface scramble_ay8910_interface_2 =
 {
 	soundlatch_r,
 	scramble_portB_r
 };
 
-static struct AY8910interface sfx_ay8910_interface_1 =
+static const struct AY8910interface sfx_ay8910_interface_1 =
 {
 	0,
 	0,
@@ -1944,23 +1944,23 @@ static struct AY8910interface sfx_ay8910_interface_1 =
 	sfx_sh_irqtrigger_w
 };
 
-static struct AY8910interface explorer_ay8910_interface_1 =
+static const struct AY8910interface explorer_ay8910_interface_1 =
 {
 	scramble_portB_r
 };
 
-static struct AY8910interface explorer_ay8910_interface_2 =
+static const struct AY8910interface explorer_ay8910_interface_2 =
 {
 	hotshock_soundlatch_r
 };
 
-static struct AY8910interface hotshock_ay8910_interface_2 =
+static const struct AY8910interface hotshock_ay8910_interface_2 =
 {
 	hotshock_soundlatch_r,
 	scramble_portB_r
 };
 
-static struct AY8910interface scorpion_ay8910_interface_1 =
+static const struct AY8910interface scorpion_ay8910_interface_1 =
 {
 	0,
 	0,
@@ -1968,12 +1968,12 @@ static struct AY8910interface scorpion_ay8910_interface_1 =
 	scorpion_sound_cmd_w,
 };
 
-static struct AY8910interface triplep_ay8910_interface =
+static const struct AY8910interface triplep_ay8910_interface =
 {
 	0
 };
 
-static struct TMS5110interface tms5110_interface =
+static const struct TMS5110interface tms5110_interface =
 {
 	0,							/* irq callback function */
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
@@ -2169,7 +2169,7 @@ static ADDRESS_MAP_START( frogger_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_0_w)
 ADDRESS_MAP_END
 
-static struct AY8910interface frogger_ay8910_interface =
+static const struct AY8910interface frogger_ay8910_interface =
 {
 	soundlatch_r,
 	frogger_portB_r

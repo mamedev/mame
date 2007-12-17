@@ -3265,12 +3265,12 @@ static void irqhandler(int linestate)
 	cpunum_set_input_line(1,0,linestate);
 }
 
-static struct YM3812interface ym3812_interface =
+static const struct YM3812interface ym3812_interface =
 {
 	irqhandler
 };
 
-static struct YMZ280Binterface ymz280b_interface =
+static const struct YMZ280Binterface ymz280b_interface =
 {
 	REGION_SOUND1,
 	bbakraid_irqhandler

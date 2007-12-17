@@ -254,7 +254,7 @@ READ8_HANDLER( pc10_in1_r )
 }
 
 /* RP5H01 interface */
-static struct RP5H01_interface rp5h01_interface =
+static const struct RP5H01_interface rp5h01_interface =
 {
 	1,
 	{ REGION_USER1 },

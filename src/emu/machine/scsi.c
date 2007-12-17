@@ -1,8 +1,8 @@
 #include "scsi.h"
 
-void SCSIAllocInstance( SCSIClass *scsiClass, SCSIInstance **instance, int diskId )
+void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, int diskId )
 {
-	scsiClass->dispatch( SCSIOP_ALLOC_INSTANCE, scsiClass, diskId, instance );
+	scsiClass->dispatch( SCSIOP_ALLOC_INSTANCE, (void *)scsiClass, diskId, instance );
 }
 
 void SCSIDeleteInstance( SCSIInstance *instance )
@@ -60,19 +60,19 @@ void SCSIGetPhase( SCSIInstance *instance, int *phase )
 	*phase = instance->scsiClass->dispatch( SCSIOP_GET_PHASE, instance, 0, NULL );
 }
 
-int SCSIBase( SCSIClass *scsiClass, int operation, void *file, INT64 intparm, UINT8 *ptrparm )
+int SCSIBase( const SCSIClass *scsiClass, int operation, void *file, INT64 intparm, UINT8 *ptrparm )
 {
 	return scsiClass->baseClass->dispatch( operation, file, intparm, ptrparm );
 }
 
-SCSIInstance *SCSIMalloc( SCSIClass *scsiClass )
+SCSIInstance *SCSIMalloc( const SCSIClass *scsiClass )
 {
 	SCSIInstance *scsiInstance = (SCSIInstance *) malloc_or_die( SCSISizeof( scsiClass ) );
 	scsiInstance->scsiClass = scsiClass;
 	return scsiInstance;
 }
 
-void *SCSIThis( SCSIClass *scsiClass, SCSIInstance *instance )
+void *SCSIThis( const SCSIClass *scsiClass, SCSIInstance *instance )
 {
 	if( instance != NULL )
 	{
@@ -90,7 +90,7 @@ void *SCSIThis( SCSIClass *scsiClass, SCSIInstance *instance )
 	return NULL;
 }
 
-int SCSISizeof( SCSIClass *scsiClass )
+int SCSISizeof( const SCSIClass *scsiClass )
 {
 	int sizeofData = sizeof( SCSIInstance );
 

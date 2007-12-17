@@ -301,7 +301,7 @@ static const int tune4[13*6] = {
 	B(1),	B(2),	Dx(3),	B(3),	Dx(4),	B(4)
 };
 
-static const int *tunes[] = {NULL,tune1,tune2,tune3,tune4};
+static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 
 #define DECAY(voice)											\
 	if( tms->vol[voice] > VMIN )								\

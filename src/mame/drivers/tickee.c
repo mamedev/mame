@@ -261,13 +261,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	input_port_0_r,
  	input_port_2_r
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	port1_r,
 	port2_r
@@ -281,7 +281,7 @@ static struct AY8910interface ay8910_interface_2 =
  *
  *************************************/
 
-static tms34010_config tms_config =
+static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */

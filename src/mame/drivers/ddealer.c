@@ -213,7 +213,7 @@ MACHINE_DRIVER_END
 
 static READ16_HANDLER( ddealer_mcu_r )
 {
-	static int resp[] =
+	static const int resp[] =
 	{
 		0x93, 0xc7, 0x00, 0x8000,
 		0x2d, 0x6d, 0x00, 0x8000,

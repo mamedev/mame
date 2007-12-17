@@ -967,7 +967,7 @@ static NVRAM_HANDLER( model3 )
 	}
 }
 
-static SCSIConfigTable scsi_dev_table =
+static const SCSIConfigTable scsi_dev_table =
 {
 	1, /* 1 SCSI device */
 	{
@@ -975,7 +975,7 @@ static SCSIConfigTable scsi_dev_table =
 	}
 };
 
-static struct LSI53C810interface scsi_intf =
+static const struct LSI53C810interface scsi_intf =
 {
 	&scsi_dev_table,  /* SCSI device table */
 	&scsi_irq_callback,
@@ -1333,7 +1333,7 @@ static WRITE64_HANDLER(network_w)
 
 static int prot_data_ptr = 0;
 
-static UINT16 vs299_prot_data[] =
+static const UINT16 vs299_prot_data[] =
 {
 	0xc800, 0x4a20, 0x5041, 0x4e41, 0x4920, 0x4154, 0x594c, 0x4220,
 	0x4152, 0x4953, 0x204c, 0x5241, 0x4547, 0x544e, 0x4e49, 0x2041,
@@ -1350,7 +1350,7 @@ static UINT16 vs299_prot_data[] =
 	0x4149, 0x4620, 0x5f43, 0x4553, 0x4147
 };
 
-static UINT16 swt_prot_data[] =
+static const UINT16 swt_prot_data[] =
 {
 	0xffff,
 	0x3d3d, 0x3d3d, 0x203d, 0x5453, 0x5241, 0x5720, 0x5241, 0x2053,
@@ -1362,7 +1362,7 @@ static UINT16 swt_prot_data[] =
 	0x614b, 0x6f79, 0x6f6b, 0x5920, 0x6d61, 0x6d61, 0x746f, 0x0a6f,
 };
 
-static UINT16 fvipers2_prot_data[] =
+static const UINT16 fvipers2_prot_data[] =
 {
 	0x2a2a,
 	0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x202a, 0x5b5b,
@@ -1375,7 +1375,7 @@ static UINT16 fvipers2_prot_data[] =
 	0x2e64, 0x2a20, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a, 0x2a2a,
 };
 
-static UINT16 spikeout_prot_data[] =
+static const UINT16 spikeout_prot_data[] =
 {
 	0x0000,
 	0x4f4d, 0x4544, 0x2d4c, 0x2033, 0x7953, 0x7473, 0x6d65, 0x5020,
@@ -1386,7 +1386,7 @@ static UINT16 spikeout_prot_data[] =
 	0x6465, 0x202e, 0x2020, 0x0020
 };
 
-static UINT16 eca_prot_data[] =
+static const UINT16 eca_prot_data[] =
 {
 	0x0000,
     0x2d2f, 0x202d, 0x4d45, 0x5245, 0x4547, 0x434e, 0x2059, 0x4143,
@@ -4003,14 +4003,14 @@ static void scsp_irq(int irq)
 	}
 }
 
-static struct SCSPinterface scsp_interface =
+static const struct SCSPinterface scsp_interface =
 {
 	REGION_CPU2,
 	0,
 	scsp_irq
 };
 
-static struct SCSPinterface scsp2_interface =
+static const struct SCSPinterface scsp2_interface =
 {
 	REGION_SOUND3,
 	0,
@@ -4042,21 +4042,21 @@ static INTERRUPT_GEN(model3_interrupt)
 	model3_vblank &= 1;
 }
 
-static ppc_config model3_10 =
+static const ppc_config model3_10 =
 {
 	PPC_MODEL_603E,		/* 603e, Stretch, 1.3 */
 	0x10,				/* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 	BUS_FREQUENCY_66MHZ
 };
 
-static ppc_config model3_15 =
+static const ppc_config model3_15 =
 {
 	PPC_MODEL_603E,		/* 603e, Stretch, 1.3 */
 	0x15,				/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	BUS_FREQUENCY_66MHZ
 };
 
-static ppc_config model3_2x =
+static const ppc_config model3_2x =
 {
 	PPC_MODEL_603R,		/* 603e-PID7t, Goldeneye, 2.1 */
 	0x25,				/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */

@@ -369,7 +369,7 @@ extern UINT16 *amiga_custom_regs;
 extern UINT16 *amiga_expansion_ram;
 extern UINT16 *amiga_autoconfig_mem;
 
-extern const char *amiga_custom_names[0x100];
+extern const char *const amiga_custom_names[0x100];
 
 extern UINT16 (*amiga_chip_ram_r)(offs_t offset);
 extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);

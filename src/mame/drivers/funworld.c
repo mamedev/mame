@@ -1389,7 +1389,7 @@ static const pia6821_interface pia1_intf =
 *    Sound Interface    *
 ************************/
 
-static struct AY8910interface ay8910_intf =
+static const struct AY8910interface ay8910_intf =
 {
 	0,	// portA in
 	0,	// portB in

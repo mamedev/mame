@@ -30,7 +30,7 @@ static unsigned EA_205(void) { E16=FETCH; E16+=FETCH<<8; EO=I.regs.w[IY]+(INT16)
 static unsigned EA_206(void) { E16=FETCH; E16+=FETCH<<8; EO=I.regs.w[BP]+(INT16)E16; EA=DefaultBase(SS)+EO; return EA; }
 static unsigned EA_207(void) { E16=FETCH; E16+=FETCH<<8; EO=I.regs.w[BW]+(INT16)E16; EA=DefaultBase(DS)+EO; return EA; }
 
-static unsigned (*GetEA[192])(void)={
+static unsigned (*const GetEA[192])(void)={
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,
 	EA_000, EA_001, EA_002, EA_003, EA_004, EA_005, EA_006, EA_007,

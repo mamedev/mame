@@ -2463,7 +2463,7 @@ static void cbj_irq_handler(int state)
 	cbj_snd_irqlatch = state;
 }
 
-static struct YM2151interface ym2151_interface_cbj =
+static const struct YM2151interface ym2151_interface_cbj =
 {
 	cbj_irq_handler
 };
@@ -2474,13 +2474,13 @@ static void volume_callback(int v)
 	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static struct K007232_interface k007232_interface =
+static const struct K007232_interface k007232_interface =
 {
 	REGION_SOUND1,	/* memory regions */
 	volume_callback	/* external port callback */
 };
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	REGION_SOUND2		/* memory region */
 };
@@ -2492,7 +2492,7 @@ static const struct Samplesinterface samples_interface =
 	tmnt_decode_sample
 };
 
-static struct K053260_interface k053260_interface =
+static const struct K053260_interface k053260_interface =
 {
 	REGION_SOUND1 /* memory region */
 };
@@ -2785,7 +2785,7 @@ static void sound_nmi(void)
 	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1,
 	NULL,
@@ -4247,7 +4247,7 @@ static DRIVER_INIT( tmnt )
 		/* 9 low bits of the sprite line address, which bit to pick it from. */
 		/* For example, when the PROM contains 4, which applies to 4x2 sprites, */
 		/* bit OA1 comes from CA5, OA2 from CA0, and so on. */
-		static UINT8 bit_pick_table[10][8] =
+		static const UINT8 bit_pick_table[10][8] =
 		{
 			/*0(1x1) 1(2x1) 2(1x2) 3(2x2) 4(4x2) 5(2x4) 6(4x4) 7(8x8) */
 			{ CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3,   CA3 },	/* CA3 */

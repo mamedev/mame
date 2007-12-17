@@ -557,7 +557,7 @@ static const INT8 lfo_pm_table[8*8] = {
  - waveform DC and DM select are 100% correct
 */
 
-static unsigned char table[19][8] = {
+static const unsigned char table[19][8] = {
 /* MULT  MULT modTL DcDmFb AR/DR AR/DR SL/RR SL/RR */
 /*   0     1     2     3     4     5     6    7    */
   {0x49, 0x4c, 0x4c, 0x12, 0x00, 0x00, 0x00, 0x00 },	//0

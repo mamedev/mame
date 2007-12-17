@@ -406,7 +406,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************/
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	dbz_sound_irq
 };

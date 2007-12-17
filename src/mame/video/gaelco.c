@@ -128,8 +128,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	int i, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];
 
-	static int x_offset[2] = {0x0,0x2};
-	static int y_offset[2] = {0x0,0x1};
+	static const int x_offset[2] = {0x0,0x2};
+	static const int y_offset[2] = {0x0,0x1};
 
 	for (i = 0x800 - 4 - 1; i >= 3; i -= 4){
 		int sx = gaelco_spriteram[i+2] & 0x01ff;

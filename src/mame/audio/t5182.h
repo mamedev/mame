@@ -11,4 +11,4 @@ WRITE8_HANDLER(t5182_sharedram_semaphore_main_release_w);
 
 extern UINT8 *t5182_sharedram;
 
-extern struct YM2151interface t5182_ym2151_interface;
+extern const struct YM2151interface t5182_ym2151_interface;

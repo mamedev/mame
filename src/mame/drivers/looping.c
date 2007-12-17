@@ -555,12 +555,12 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct TMS5220interface tms5220_interface =
+static const struct TMS5220interface tms5220_interface =
 {
 	looping_spcint
 };
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r
 };

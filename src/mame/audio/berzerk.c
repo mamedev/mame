@@ -15,13 +15,13 @@
 #define BERZERK_AUDIO_DEBUG		(0)
 
 
-static struct S14001A_interface berzerk_s14001a_interface =
+static const struct S14001A_interface berzerk_s14001a_interface =
 {
 	REGION_SOUND1	/* voice data region */
 };
 
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	berzerk_sh_start
 };

@@ -147,7 +147,7 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 	return 0;
 }
 
-SCSIClass SCSIClassDevice =
+const SCSIClass SCSIClassDevice =
 {
 	NULL,
 	scsidev_dispatch,

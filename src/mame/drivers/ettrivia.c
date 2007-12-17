@@ -200,12 +200,12 @@ static VIDEO_UPDATE( ettrivia )
 	return 0;
 }
 
-static struct AY8910interface ay8912_interface_2 =
+static const struct AY8910interface ay8912_interface_2 =
 {
 	input_port_1_r
 };
 
-static struct AY8910interface ay8912_interface_3 =
+static const struct AY8910interface ay8912_interface_3 =
 {
 	input_port_0_r
 };

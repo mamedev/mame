@@ -604,7 +604,7 @@ static const UINT8 banshee_register_access[0x100] =
  *
  *************************************/
 
-static const char *voodoo_reg_name[] =
+static const char *const voodoo_reg_name[] =
 {
 	/* 0x000 */
 	"status",		"{intrCtrl}",	"vertexAx",		"vertexAy",
@@ -681,7 +681,7 @@ static const char *voodoo_reg_name[] =
 };
 
 
-static const char *banshee_reg_name[] =
+static const char *const banshee_reg_name[] =
 {
 	/* 0x000 */
 	"status",		"intrCtrl",		"vertexAx",		"vertexAy",
@@ -843,7 +843,7 @@ static const char *banshee_reg_name[] =
  *
  *************************************/
 
-static const char *banshee_io_reg_name[] =
+static const char *const banshee_io_reg_name[] =
 {
 	/* 0x000 */
 	"status",		"pciInit0",		"sipMonitor",	"lfbMemoryConfig",
@@ -924,7 +924,7 @@ static const char *banshee_io_reg_name[] =
  *
  *************************************/
 
-static const char *banshee_agp_reg_name[] =
+static const char *const banshee_agp_reg_name[] =
 {
 	/* 0x000 */
 	"agpReqSize",	"agpHostAddressLow","agpHostAddressHigh","agpGraphicsAddress",
@@ -1681,7 +1681,7 @@ struct _voodoo_state
 
 	voodoo_reg	reg[0x400];				/* raw registers */
 	const UINT8 *regaccess;				/* register access array */
-	const char **regnames;				/* register names array */
+	const char *const *regnames;				/* register names array */
 	UINT8		alt_regmap;				/* enable alternate register map? */
 
 	pci_state	pci;					/* PCI state */

@@ -1152,7 +1152,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	ide_interrupt,
 };
@@ -1165,7 +1165,7 @@ static struct ide_interface ide_intf =
  *
  *************************************/
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
 };
@@ -1731,7 +1731,7 @@ static DRIVER_INIT( beatmania )
 	ide_controller_init(0, &ide_intf);
 }
 
-static UINT8 beatmania_master_password[2 + 32] =
+static const UINT8 beatmania_master_password[2 + 32] =
 {
 	0x01, 0x00,
 	0x4d, 0x47, 0x43, 0x28, 0x4b, 0x29, 0x4e, 0x4f,
@@ -1742,7 +1742,7 @@ static UINT8 beatmania_master_password[2 + 32] =
 
 static DRIVER_INIT( hmcompmx )
 {
-	static UINT8 hmcompmx_user_password[2 + 32] =
+	static const UINT8 hmcompmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3a, 0x34, 0x38, 0x2a,
@@ -1759,7 +1759,7 @@ static DRIVER_INIT( hmcompmx )
 
 static DRIVER_INIT( bm4thmix )
 {
-	static UINT8 bm4thmix_user_password[2 + 32] =
+	static const UINT8 bm4thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x29, 0x4b, 0x2f, 0x2c, 0x4c, 0x32,
@@ -1775,7 +1775,7 @@ static DRIVER_INIT( bm4thmix )
 
 static DRIVER_INIT( bm5thmix )
 {
-	static UINT8 bm5thmix_user_password[2 + 32] =
+	static const UINT8 bm5thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x37, 0x35, 0x4a, 0x23,
@@ -1792,7 +1792,7 @@ static DRIVER_INIT( bm5thmix )
 
 static DRIVER_INIT( bmclubmx )
 {
-	static UINT8 bmclubmx_user_password[2 + 32] =
+	static const UINT8 bmclubmx_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x20, 0x30, 0x57, 0x3c, 0x3f, 0x38, 0x32,
@@ -1810,7 +1810,7 @@ static DRIVER_INIT( bmclubmx )
 
 static DRIVER_INIT( bmcompm2 )
 {
-	static UINT8 bmcompm2_user_password[2 + 32] =
+	static const UINT8 bmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x3a, 0x20, 0x31, 0x3e, 0x46, 0x2c, 0x35, 0x46,
@@ -1827,7 +1827,7 @@ static DRIVER_INIT( bmcompm2 )
 
 static DRIVER_INIT( hmcompm2 )
 {
-	static UINT8 hmcompm2_user_password[2 + 32] =
+	static const UINT8 hmcompm2_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x3b, 0x39, 0x24, 0x3e, 0x4e, 0x59, 0x5c, 0x32,
@@ -1844,7 +1844,7 @@ static DRIVER_INIT( hmcompm2 )
 
 static DRIVER_INIT( bmdct )
 {
-	static UINT8 bmdct_user_password[2 + 32] =
+	static const UINT8 bmdct_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x52, 0x47, 0x30, 0x3f, 0x2f, 0x39, 0x54, 0x5e,
@@ -1861,7 +1861,7 @@ static DRIVER_INIT( bmdct )
 
 static DRIVER_INIT( bmcorerm )
 {
-	static UINT8 bmcorerm_user_password[2 + 32] =
+	static const UINT8 bmcorerm_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4d, 0x4a, 0x27,
@@ -1878,7 +1878,7 @@ static DRIVER_INIT( bmcorerm )
 
 static DRIVER_INIT( bm6thmix )
 {
-	static UINT8 bm6thmix_user_password[2 + 32] =
+	static const UINT8 bm6thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3d, 0x4d, 0x4a, 0x23,
@@ -1895,7 +1895,7 @@ static DRIVER_INIT( bm6thmix )
 
 static DRIVER_INIT( bm7thmix )
 {
-	static UINT8 bm7thmix_user_password[2 + 32] =
+	static const UINT8 bm7thmix_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4e, 0x4a, 0x25,
@@ -1913,7 +1913,7 @@ static DRIVER_INIT( bm7thmix )
 #if 0
 static DRIVER_INIT( bmfinal )
 {
-	static UINT8 bmfinal_user_password[2 + 32] =
+	static const UINT8 bmfinal_user_password[2 + 32] =
 	{
 		0x00, 0x00,
 		0x44, 0x42, 0x56, 0x4b, 0x3f, 0x4f, 0x4a, 0x23,

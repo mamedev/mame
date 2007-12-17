@@ -558,13 +558,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct POKEYinterface pokey_interface_1 =
+static const struct POKEYinterface pokey_interface_1 =
 {
 	{ input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,
 	  input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r,input_port_1_bit_r }
 };
 
-static struct POKEYinterface pokey_interface_2 =
+static const struct POKEYinterface pokey_interface_2 =
 {
 	{ input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,
 	  input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r,input_port_2_bit_r }

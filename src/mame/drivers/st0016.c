@@ -402,7 +402,7 @@ static INTERRUPT_GEN(st0016_int)
 }
 
 extern UINT8 *st0016_charram;
-static struct ST0016interface st0016_interface =
+static const struct ST0016interface st0016_interface =
 {
 	&st0016_charram
 };

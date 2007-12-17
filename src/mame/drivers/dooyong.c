@@ -907,7 +907,7 @@ static READ8_HANDLER( unk_r )
 	return 0;
 }
 
-static struct YM2203interface ym2203_interface_1 =
+static const struct YM2203interface ym2203_interface_1 =
 {
 	unk_r,
 	0,
@@ -916,12 +916,12 @@ static struct YM2203interface ym2203_interface_1 =
 	irqhandler
 };
 
-static struct YM2203interface ym2203_interface_2 =
+static const struct YM2203interface ym2203_interface_2 =
 {
 	unk_r
 };
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	irqhandler
 };

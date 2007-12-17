@@ -2166,7 +2166,7 @@ static void mix_all_layers(int which, int xoffs, mame_bitmap *bitmap, const rect
 	}
 /*
 {
-    static const char *layname[] = { "TEXT", "NBG0", "NBG1", "NBG2", "NBG3", "BITM", "SPRI", "LINE" };
+    static const char *const layname[] = { "TEXT", "NBG0", "NBG1", "NBG2", "NBG3", "BITM", "SPRI", "LINE" };
     for (groupnum = 0; groupnum <= sprgroup_mask; groupnum++)
     {
         mame_printf_debug("%X: ", groupnum);
@@ -2539,7 +2539,7 @@ VIDEO_UPDATE( system32 )
 
 #if SHOW_ALPHA
 {
-	static const char *layername[] = { "TEXT ", "NBG0 ", "NBG1 ", "NBG2 ", "NBG3 ", "BITMAP " };
+	static const char *const layername[] = { "TEXT ", "NBG0 ", "NBG1 ", "NBG2 ", "NBG3 ", "BITMAP " };
 	char temp[100];
 	int count = 0, i;
 	sprintf(temp, "ALPHA(%d):", (mixer_control[which][0x4e/2] >> 8) & 7);

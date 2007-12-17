@@ -1246,7 +1246,7 @@ static GFXDECODE_START( insectx )
 GFXDECODE_END
 
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_0_r,		/* DSW1 connected to port A */
 	input_port_1_r		/* DSW2 connected to port B */
@@ -1259,7 +1259,7 @@ static void irqhandler(int irq)
 	cpunum_set_input_line(2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface kageki_ym2203_interface =
+static const struct YM2203interface kageki_ym2203_interface =
 {
 	kageki_csport_r,
 	0,
@@ -1267,13 +1267,13 @@ static struct YM2203interface kageki_ym2203_interface =
 	kageki_csport_w
 };
 
-static struct YM2203interface ym2203b_interface =
+static const struct YM2203interface ym2203b_interface =
 {
 	0,0,0,0,
 	irqhandler
 };
 
-static struct YM2203interface kabukiz_ym2203_interface =
+static const struct YM2203interface kabukiz_ym2203_interface =
 {
 	0,0,kabukiz_sound_bank_w,kabukiz_sample_w,
 	irqhandler

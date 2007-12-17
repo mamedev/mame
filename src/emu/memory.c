@@ -243,7 +243,7 @@ struct _addrspace_data
 	UINT64					unmap;					/* unmapped value */
 	table_data				read;					/* memory read lookup table */
 	table_data				write;					/* memory write lookup table */
-	data_accessors *		accessors;				/* pointer to the memory accessors */
+	const data_accessors *		accessors;				/* pointer to the memory accessors */
 	address_map *			map;					/* original memory map */
 	address_map *			adjmap;					/* adjusted memory map */
 };
@@ -300,7 +300,7 @@ static debug_hook_read_ptr	debug_hook_read;				/* pointer to debugger callback f
 static debug_hook_write_ptr	debug_hook_write;				/* pointer to debugger callback for memory writes */
 #endif
 
-static data_accessors memory_accessors[ADDRESS_SPACES][4][2] =
+static const data_accessors memory_accessors[ADDRESS_SPACES][4][2] =
 {
 	/* program accessors */
 	{
@@ -363,7 +363,7 @@ static data_accessors memory_accessors[ADDRESS_SPACES][4][2] =
 	},
 };
 
-const char *address_space_names[ADDRESS_SPACES] = { "program", "data", "I/O" };
+const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/O" };
 
 
 /*-------------------------------------------------
@@ -3254,7 +3254,7 @@ static genf *get_static_handler(int databits, int readorwrite, int spacenum, int
 
 static const char *handler_to_string(const table_data *table, UINT8 entry)
 {
-	static const char *strings[] =
+	static const char *const strings[] =
 	{
 		"invalid",		"bank 1",		"bank 2",		"bank 3",
 		"bank 4",		"bank 5",		"bank 6",		"bank 7",

@@ -271,7 +271,7 @@ static const gfx_layout charlayout =
 	8*8*2
 };
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	soundlatch_r,
 	soundlatch_r

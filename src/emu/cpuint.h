@@ -30,7 +30,7 @@ void cpuint_init(running_machine *machine);
 
 void cpuint_reset(void);
 
-extern int (*cpu_irq_callbacks[])(int);
+extern int (*const cpu_irq_callbacks[])(int);
 
 
 

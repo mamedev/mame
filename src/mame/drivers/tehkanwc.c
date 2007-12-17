@@ -772,7 +772,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface_1 =
+static const struct AY8910interface ay8910_interface_1 =
 {
 	0,
 	0,
@@ -780,13 +780,13 @@ static struct AY8910interface ay8910_interface_1 =
 	tehkanwc_portB_w
 };
 
-static struct AY8910interface ay8910_interface_2 =
+static const struct AY8910interface ay8910_interface_2 =
 {
 	tehkanwc_portA_r,
 	tehkanwc_portB_r
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	tehkanwc_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */

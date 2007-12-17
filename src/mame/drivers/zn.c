@@ -103,7 +103,7 @@ static const UINT8 tt16[ 8 ] = { 0xc0, 0x04, 0xf9, 0xe1, 0x60, 0x70, 0xf2, 0x02 
 static const UINT8 kn01[ 8 ] = { 0xf8, 0xe1, 0xe2, 0xfe, 0x3c, 0x30, 0x70, 0x80 }; /* brute forced */
 static const UINT8 kn02[ 8 ] = { 0x01, 0x18, 0xe2, 0xfe, 0x3c, 0x30, 0x70, 0x80 }; /* brute forced */
 
-static struct
+static const struct
 {
 	const char *s_name;
 	const UINT8 *p_n_mainsec;
@@ -407,7 +407,7 @@ static void zn_driver_init( void )
 	at28c16_init( 0, memory_region( REGION_USER4 ), NULL );
 }
 
-static struct PSXSPUinterface psxspu_interface =
+static const struct PSXSPUinterface psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,
@@ -614,7 +614,7 @@ static ADDRESS_MAP_START( qsound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static struct QSound_interface qsound_interface =
+static const struct QSound_interface qsound_interface =
 {
 	REGION_SOUND1
 };
@@ -1305,7 +1305,7 @@ static void irq_handler(int irq)
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2610interface ym2610_interface =
+static const struct YM2610interface ym2610_interface =
 {
 	irq_handler,
 	REGION_SOUND1,	/* Delta-T */
@@ -1765,7 +1765,7 @@ static void atpsx_interrupt(int state)
 	}
 }
 
-static struct ide_interface atpsx_intf =
+static const struct ide_interface atpsx_intf =
 {
 	atpsx_interrupt
 };
@@ -2060,7 +2060,7 @@ static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static struct YMF271interface ymf271_interface =
+static const struct YMF271interface ymf271_interface =
 {
 	REGION_SOUND1
 };
@@ -2284,7 +2284,7 @@ static void jdredd_ide_interrupt(int state)
 	}
 }
 
-static struct ide_interface jdredd_ide_intf =
+static const struct ide_interface jdredd_ide_intf =
 {
 	jdredd_ide_interrupt
 };
@@ -2929,7 +2929,7 @@ static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x91, 0x91 ) AM_READ( cbaj_z80_ready_r )
 ADDRESS_MAP_END
 
-static struct YMZ280Binterface ymz280b_intf =
+static const struct YMZ280Binterface ymz280b_intf =
 {
 	REGION_SOUND1,
 	0

@@ -10,6 +10,6 @@
 #include "machine/scsi.h"
 
 // base handler
-extern SCSIClass SCSIClassDevice;
+extern const SCSIClass SCSIClassDevice;
 
 #endif

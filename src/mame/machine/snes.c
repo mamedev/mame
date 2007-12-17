@@ -46,9 +46,9 @@ static UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on 
 
 // full graphic variables
 static UINT16 vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
-static UINT16 vram_fgr_inctab[4] = { 1, 32, 128, 128 };
-static UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
-static UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
+static const UINT16 vram_fgr_inctab[4] = { 1, 32, 128, 128 };
+static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
+static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 struct snes_cart_info snes_cart = { SNES_MODE_20, 0x40000, 0x40000 };
 

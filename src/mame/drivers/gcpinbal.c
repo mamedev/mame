@@ -366,7 +366,7 @@ GFXDECODE_END
                             (SOUND)
 **************************************************************/
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	NULL,				/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */

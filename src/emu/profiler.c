@@ -102,7 +102,7 @@ const char *profiler_get_text(void)
 	int i,j;
 	UINT64 total,normalize;
 	UINT64 computed;
-	static const char *names[PROFILER_TOTAL] =
+	static const char *const names[PROFILER_TOTAL] =
 	{
 		"CPU 1  ",
 		"CPU 2  ",

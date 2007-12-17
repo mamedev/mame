@@ -30,14 +30,14 @@ STA-0001    SAM-5127    93  Survival Arts                           Sammy
 STA-0001    SAM-5127    93  Dyna Gears                              Sammy
 STA-0001B   VISCO-001B  94  Drift Out '94                           Visco
 STA-0001B   GOLF ROM    94  Eagle Shot Golf                         Sammy
-STA-0001B   ?           94  Twin Eagle II - The Rescue Mission      Seta
-STA-0001B   VISCO       95  Mobil Suit Gundam Final Shooting (1)    Banpresto
+STA-0001B   STS0003     94  Twin Eagle II - The Rescue Mission (1)  Seta
+STA-0001B   VISCO       95  Mobil Suit Gundam Final Shooting (2)    Banpresto
 STA-0001B   P1-102A     95  Mahjong Hyper Reaction                  Sammy
 ?           ?           95  Ultra X Weapons / Ultra Keibitai        Banpresto + Tsuburaya Prod.
 STA-0001B   VISCO-JJ1   96  Lovely Pop Mahjong JangJang Shimasho    Visco
 STA-0001B   VISCO-001B  96  Storm Blade                             Visco
 STA-0001B   P1-105A     96? Meosis Magic                            Sammy
-STA-0001B   ?           97  Joryuu Syougi Kyoushitsu (2)            Visco
+STA-0001B   ?           97  Joryuu Syougi Kyoushitsu (3)            Visco
 STA-0001B   VISCO-JJ1   97  Koi Koi Shimasho 2                      Visco
 STA-0001B   P1-112A     97  Mahjong Hyper Reaction 2                Sammy
 STA-0001B   ?           97  Monster Slider                          Visco / Datt
@@ -51,8 +51,9 @@ STA-0001B   SSV_SUB     00  Vasara                                  Visco
 STA-0001B   SSV_SUB     01  Vasara 2                                Visco
 -----------------------------------------------------------------------------------
 
-(1) Uses ST-0009 & ST-0020 & Light Gun
-(2) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the majinsen games on st0016)
+(1) Uses ST010 MCU / Math chip
+(2) Uses ST-0009 & ST-0020 & Light Gun
+(3) Uses NEC V810 CPU as sub cpu for the AI (basically the same as the majinsen games on st0016)
 
 SSV Hardware Overview
 Sammy/Seta/Visco, 1993-2001
@@ -2675,7 +2676,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static struct ES5506interface es5506_interface =
+static const struct ES5506interface es5506_interface =
 {
 	REGION_SOUND1,
 	REGION_SOUND2,
@@ -4336,33 +4337,64 @@ ROM_END
 /***************************************************************************
 
                                 Twin Eagle II
+SETA, 1994
+
+STS0003 TWIN EAGLE
+|-------------------------------------|
+|                                     |
+|                                     |
+|                 SX002-09.u2         |
+|                                     |
+|                 SX002-08.u3         |
+|                                     |
+| SX002-11.u7     SX002-07.u6         |
+|                                     |
+|                                     |
+| SX002-10.u14    SX002-06.u13        |
+|                                     |
+|                 SX002-05.u16        |
+|                                     |
+| SX002-12.u22    SX002-04.u19        |
+|                                     |
+| SX002-13                            |
+|                 SX002-03.u22        |
+|                                     |
+|                 SX002-02.u28        |
+|                                     |
+|                 SX002-01.u32        |
+| SETA ST010                          |
+|-------------------------------------|
+
+SX002-13 is GAL16V8B (undumped)
+SETA ST010 is some type of MCU/Math chip?
+All roms are 16M Mask roms
 
 ***************************************************************************/
 
 ROM_START( twineag2 )
 	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )		/* V60 Code */
-	ROM_LOAD16_WORD( "sx002_12", 0x000000, 0x200000, CRC(846044dc) SHA1(c1c85de1c466fb7c3580824baa1571cd0fed6ec6) )
+	ROM_LOAD16_WORD( "sx002-12.u22", 0x000000, 0x200000, CRC(846044dc) SHA1(c1c85de1c466fb7c3580824baa1571cd0fed6ec6) )
 
 	ROM_REGION( 0x1800000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "sx002_01", 0x0000000, 0x200000, CRC(6d6896b5) SHA1(e8efd29b9f951bff6664e47cb5fd67f1d8f40608) )
-	ROM_LOAD( "sx002_02", 0x0200000, 0x200000, CRC(3f47e97a) SHA1(5b0fdc762cf704c8bd92c4a4a42dba4a127b3d49) )
-	ROM_LOAD( "sx002_03", 0x0400000, 0x200000, CRC(544f18bf) SHA1(539e6df1ded4e9ac8974c697215cc1e5c5a40cda) )
+	ROM_LOAD( "sx002-01.u32", 0x0000000, 0x200000, CRC(6d6896b5) SHA1(e8efd29b9f951bff6664e47cb5fd67f1d8f40608) ) /* A0 */
+	ROM_LOAD( "sx002-02.u28", 0x0200000, 0x200000, CRC(3f47e97a) SHA1(5b0fdc762cf704c8bd92c4a4a42dba4a127b3d49) ) /* A1 */
+	ROM_LOAD( "sx002-03.u25", 0x0400000, 0x200000, CRC(544f18bf) SHA1(539e6df1ded4e9ac8974c697215cc1e5c5a40cda) ) /* A2, A3 is unpopulated */
 
-	ROM_LOAD( "sx002_04", 0x0600000, 0x200000, CRC(58c270e2) SHA1(7629ba978b18252f375bdc16ed62388d64a35ca1) )
-	ROM_LOAD( "sx002_05", 0x0800000, 0x200000, CRC(3c310229) SHA1(9a8b81d5f17ce3078627a697aaf07f1b3ba6e08c) )
-	ROM_LOAD( "sx002_06", 0x0a00000, 0x200000, CRC(46d5b1f3) SHA1(3ec03eddb159eb391ccdce5a0a867a54b3350150) )
+	ROM_LOAD( "sx002-04.u19", 0x0600000, 0x200000, CRC(58c270e2) SHA1(7629ba978b18252f375bdc16ed62388d64a35ca1) ) /* B0 */
+	ROM_LOAD( "sx002-05.u16", 0x0800000, 0x200000, CRC(3c310229) SHA1(9a8b81d5f17ce3078627a697aaf07f1b3ba6e08c) ) /* B1 */
+	ROM_LOAD( "sx002-06.u13", 0x0a00000, 0x200000, CRC(46d5b1f3) SHA1(3ec03eddb159eb391ccdce5a0a867a54b3350150) ) /* B2, B3 is unpopulated */
 
-	ROM_LOAD( "sx002_07", 0x0c00000, 0x200000, CRC(c30fa397) SHA1(d4575868c1b63f9e94bf24539a3fd8a85df93d0b) )
-	ROM_LOAD( "sx002_08", 0x0e00000, 0x200000, CRC(64edcefa) SHA1(55a71afe87da93e35c5ba291e970bdcd91b52a7a) )
-	ROM_LOAD( "sx002_09", 0x1000000, 0x200000, CRC(51527c56) SHA1(378155a585e5b847bd8ae1f17cb651138d844e33) )
+	ROM_LOAD( "sx002-07.u6",  0x0c00000, 0x200000, CRC(c30fa397) SHA1(d4575868c1b63f9e94bf24539a3fd8a85df93d0b) ) /* C0 */
+	ROM_LOAD( "sx002-08.u3",  0x0e00000, 0x200000, CRC(64edcefa) SHA1(55a71afe87da93e35c5ba291e970bdcd91b52a7a) ) /* C1 */
+	ROM_LOAD( "sx002-09.u2",  0x1000000, 0x200000, CRC(51527c56) SHA1(378155a585e5b847bd8ae1f17cb651138d844e33) ) /* C2, C3 is unpopulated */
 
 	ROM_FILL(             0x1200000, 0x600000, 0          )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE | 0 ) /* Samples */
-	ROM_LOAD16_BYTE( "sx002_10", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
+	ROM_LOAD16_BYTE( "sx002-10.u14", 0x000000, 0x200000, CRC(b0669dfa) SHA1(ff805f59864ac4ccee3e249c06804d844d3df59c) )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE | 0 ) /* Samples */
-	ROM_LOAD16_BYTE( "sx002_11", 0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
+	ROM_LOAD16_BYTE( "sx002-11.u7",  0x000000, 0x200000, CRC(b8dd621a) SHA1(f9b43e018f2bb121e4f4e9554419cd32b870556b) )
 
 	ROM_REGION16_BE( 0x400000, REGION_SOUND3, 0 ) /* Samples */
 	ROM_COPY( REGION_SOUND1, 0x000000, 0x000000, 0x400000 )

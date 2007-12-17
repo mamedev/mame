@@ -217,7 +217,7 @@ static void jsr_c(void);
 static void jsr_c0(void);
 static void trapf(void);
 
-static void (*opcodetable[32][4])(void) =
+static void (*const opcodetable[32][4])(void) =
 {
 	{	trap0,		trap0,		trap0,		trap0		},
 	{	NULL,		NULL,		NULL,		NULL		},
@@ -253,7 +253,7 @@ static void (*opcodetable[32][4])(void) =
 	{	trapf,		trapf,		trapf,		trapf		}
 };
 
-static void (*conditiontable[16])(void) =
+static void (*const conditiontable[16])(void) =
 {
 	bsp, bmz, bgt, ble, bge, blt, bhi, bls,
 	bcc, bcs, bpl, bmi, bne, beq, bvc, bvs

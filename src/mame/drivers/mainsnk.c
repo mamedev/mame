@@ -358,7 +358,7 @@ static const gfx_layout sprite_layout =
 	256
 };
 
-static struct namco_interface snkwave_interface =
+static const struct namco_interface snkwave_interface =
 {
 	1,
 	-1

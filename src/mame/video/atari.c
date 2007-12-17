@@ -460,10 +460,10 @@ static void prio_init(void)
  ************************************************************************/
 static void cclk_init(void)
 {
-	static UINT8 _pf_21[4] =   {T00,T01,T10,T11};
-	static UINT8 _pf_1b[4] =   {G00,G01,G10,G11};
-	static UINT8 _pf_210b[4] = {PBK,PF0,PF1,PF2};
-	static UINT8 _pf_310b[4] = {PBK,PF0,PF1,PF3};
+	static const UINT8 _pf_21[4] =   {T00,T01,T10,T11};
+	static const UINT8 _pf_1b[4] =   {G00,G01,G10,G11};
+	static const UINT8 _pf_210b[4] = {PBK,PF0,PF1,PF2};
+	static const UINT8 _pf_310b[4] = {PBK,PF0,PF1,PF3};
 	int i;
 	UINT8 * dst;
 
@@ -1088,7 +1088,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 }
 
 
-static  renderer_function renderer[2][19][5] = {
+static const renderer_function renderer[2][19][5] = {
 	/*   no playfield    narrow          normal          wide         */
 	{
 		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},

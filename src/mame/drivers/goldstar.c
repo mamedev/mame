@@ -50,7 +50,7 @@ static WRITE8_HANDLER( protection_w )
 
 static READ8_HANDLER( protection_r )
 {
-	static int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
+	static const int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
 
 	dataoffset %= 4;
 	return data[dataoffset++];
@@ -277,7 +277,7 @@ GFXDECODE_END
 
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
  input_port_7_r,	/* DSW 4 */
  input_port_6_r,	/* DSW 3 */

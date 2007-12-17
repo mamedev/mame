@@ -547,7 +547,7 @@ static void darius_adpcm_int (int data)
 	}
 }
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	darius_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz   */
@@ -832,7 +832,7 @@ static void irqhandler(int irq)	/* assumes Z80 sandwiched between 68Ks */
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2203interface ym2203_interface_1 =
+static const struct YM2203interface ym2203_interface_1 =
 {
 	0,		/* portA read */
 	0,
@@ -841,7 +841,7 @@ static struct YM2203interface ym2203_interface_1 =
 	irqhandler
 };
 
-static struct YM2203interface ym2203_interface_2 =
+static const struct YM2203interface ym2203_interface_2 =
 {
 	0,		/* portA read */
 	0,

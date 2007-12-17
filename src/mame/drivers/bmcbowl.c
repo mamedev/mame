@@ -460,7 +460,7 @@ static WRITE8_HANDLER(input_mux_w)
 }
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	dips1_r,
 	0,
@@ -469,7 +469,7 @@ static struct AY8910interface ay8910_interface =
 };
 
 
-static struct via6522_interface via_interface =
+static const struct via6522_interface via_interface =
 {
 	/*inputs : A/B         */ 0, via_b_in,
 	/*inputs : CA/B1,CA/B2 */ 0, 0, 0, 0,

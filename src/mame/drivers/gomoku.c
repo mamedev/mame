@@ -160,7 +160,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static struct CustomSound_interface custom_interface =
+static const struct CustomSound_interface custom_interface =
 {
 	gomoku_sh_start
 };

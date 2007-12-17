@@ -300,7 +300,7 @@ static z80ctc_interface ctc_intf =
 	0,					// ZC/TO2 callback
 };
 
-static struct z80_irq_daisy_chain daisy_chain_sound[] =
+static const struct z80_irq_daisy_chain daisy_chain_sound[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },	/* device 0 = CTC_1 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */
@@ -317,7 +317,7 @@ static const ppi8255_interface ppi8255_intf =
 	{ vidctrl_w,      protection_w,   NULL },	/* Port C write */
 };
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,

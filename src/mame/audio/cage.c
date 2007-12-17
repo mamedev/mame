@@ -87,7 +87,7 @@ static UINT32 *speedup_ram;
 #define SPORT_DATA_TX			0x48
 #define SPORT_DATA_RX			0x4c
 
-static const char *register_names[] =
+static const char *const register_names[] =
 {
 	"TMS32031-DMA global control", NULL, NULL, NULL,
 	"TMS32031-DMA source address", NULL, "TMS32031-DMA destination address", NULL,
@@ -590,7 +590,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static struct tms32031_config cage_config =
+static const struct tms32031_config cage_config =
 {
 	0x400000
 };

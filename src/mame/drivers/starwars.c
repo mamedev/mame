@@ -63,8 +63,8 @@ static MACHINE_RESET( starwars )
 		starwars_out_w(4, 0);
 	}
 
-	/* reset the mathbox */
-	swmathbox_reset();
+	/* reset the matrix processor */
+	starwars_mproc_reset();
 }
 
 
@@ -178,10 +178,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
 	AM_RANGE(0x46e0, 0x46e0) AM_WRITE(starwars_soundrst_w)
-	AM_RANGE(0x4700, 0x4707) AM_WRITE(swmathbx_w)
-	AM_RANGE(0x4700, 0x4700) AM_READ(swmathbx_reh_r)
-	AM_RANGE(0x4701, 0x4701) AM_READ(swmathbx_rel_r)
-	AM_RANGE(0x4703, 0x4703) AM_READ(swmathbx_prng_r)			/* pseudo random number generator */
+	AM_RANGE(0x4700, 0x4707) AM_WRITE(starwars_math_w)
+	AM_RANGE(0x4700, 0x4700) AM_READ(starwars_div_reh_r)
+	AM_RANGE(0x4701, 0x4701) AM_READ(starwars_div_rel_r)
+	AM_RANGE(0x4703, 0x4703) AM_READ(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(&starwars_mathram)	/* CPU and Math RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)						/* banked ROM */
@@ -563,7 +563,7 @@ static DRIVER_INIT( starwars )
 
 	/* prepare the mathbox */
 	starwars_is_esb = 0;
-	swmathbox_init();
+	starwars_mproc_init();
 
 	/* initialize banking */
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x6000, 0x10000 - 0x6000);
@@ -591,9 +591,9 @@ static DRIVER_INIT( esb )
 	/* install additional banking */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, MRA8_BANK2);
 
-	/* prepare the mathbox */
+	/* prepare the matrix processor */
 	starwars_is_esb = 1;
-	swmathbox_init();
+	starwars_mproc_init();
 
 	/* initialize banking */
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x6000, 0x10000 - 0x6000);

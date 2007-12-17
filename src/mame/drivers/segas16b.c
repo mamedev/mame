@@ -978,7 +978,7 @@ static const struct segaic16_memory_map_entry rom_171_5797_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry *region_info_list[] =
+static const struct segaic16_memory_map_entry *const region_info_list[] =
 {
 	&rom_171_5358_info_small[0],
 	&rom_171_5358_info[0],
@@ -1575,7 +1575,7 @@ static READ16_HANDLER( hwchamp_custom_io_r )
 
 static WRITE16_HANDLER( hwchamp_custom_io_w )
 {
-	static const char *portname[4] = { "MONITOR", "LEFT", "RIGHT", "DUMMY" };
+	static const char *const portname[4] = { "MONITOR", "LEFT", "RIGHT", "DUMMY" };
 
 	switch (offset & (0x3000/2))
 	{
@@ -1660,7 +1660,7 @@ static READ16_HANDLER( sdi_custom_io_r )
 
 static READ16_HANDLER( sjryuko_custom_io_r )
 {
-	static const char *portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
+	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
 
 	switch (offset & (0x3000/2))
 	{
@@ -3095,7 +3095,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct upd7759_interface upd7759_interface =
+static const struct upd7759_interface upd7759_interface =
 {
 	0,
 	upd7759_generate_nmi

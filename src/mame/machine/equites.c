@@ -54,8 +54,8 @@ extern WRITE8_HANDLER(equites_dac0_w);
 extern WRITE8_HANDLER(equites_dac1_w);
 
 extern UINT16 *equites_8404ram;
-extern struct MSM5232interface equites_5232intf;
-extern struct AY8910interface equites_8910intf;
+extern struct const MSM5232interface equites_5232intf;
+extern struct const AY8910interface equites_8910intf;
 
 static ADDRESS_MAP_START( equites_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	{ 0x0000, 0xbfff, MRA8_ROM }, // sound program
@@ -92,7 +92,7 @@ extern UINT16 *equites_workram;
 /******************************************************************************/
 // Locals
 
-static UINT16 e_ent_addr[8][4] =
+static const UINT16 e_ent_addr[8][4] =
 {
 	{0xce25, 0xcd3c, 0xcd89, 0xcdd5},
 	{     0, 0xce6e, 0xcebe, 0xcff2},
@@ -104,7 +104,7 @@ static UINT16 e_ent_addr[8][4] =
 	{     0,      0,      0,      0},
 };
 
-static UINT16 e_exit_pos[8][4] =
+static const UINT16 e_exit_pos[8][4] =
 {
 	{0x1878, 0x4878, 0x7878, 0x3878},
 	{     0, 0x3878, 0x4878, 0x4878},
@@ -116,7 +116,7 @@ static UINT16 e_exit_pos[8][4] =
 	{     0,      0,      0,      0},
 };
 
-static UINT16 e_swap_addr[4][4] =
+static const UINT16 e_swap_addr[4][4] =
 {
 	{     0, 0x92ec,      0, 0x92ec},
 	{     0, 0x92ec,      0, 0x92ec},
@@ -124,7 +124,7 @@ static UINT16 e_swap_addr[4][4] =
 	{     0, 0x92d2,      0, 0x92d2},
 };
 
-static UINT16 e_respawn_addr[4][4] =
+static const UINT16 e_respawn_addr[4][4] =
 {
 	{     0, 0x9382,      0, 0x9382},
 	{     0, 0x9382,      0, 0x9382},
@@ -132,26 +132,26 @@ static UINT16 e_respawn_addr[4][4] =
 	{     0, 0x0cc8,      0, 0x9382},
 };
 
-static UINT16 h_respawn_addr[2][4] =
+static const UINT16 h_respawn_addr[2][4] =
 {
 	{0x1026, 0x0fb6, 0x0fb6, 0x0fb6},
 	{0x11ac, 0x20b0, 0x1c44, 0x1996},
 };
 
-static UINT16 s_respawn_addr[3][6] =
+static const UINT16 s_respawn_addr[3][6] =
 {
 	{0x0b6a, 0x0b52, 0x29da, 0x0846, 0x1610, 0x0c84}, // game over seq
 	{0x347e, 0x0e10, 0x0c2c, 0x0c2c, 0x0c2c, 0x0c2c}, // depth seq
 	{0x0c2e, 0x1fbe, 0x166a, 0x0c84, 0x0c2c, 0x0c2c}, // level change seq
 };
 
-static UINT16 s_lvdata_addr[6] = {0xccc2, 0xd04a, 0xd408, 0xd796, 0xdaa8, 0xdbd6};
+static const UINT16 s_lvdata_addr[6] = {0xccc2, 0xd04a, 0xd408, 0xd796, 0xdaa8, 0xdbd6};
 
-static UINT16 s_objdata_addr[6] = {0xb7ce, 0xba64, 0xbdbc, 0xc0f2, 0xc446, 0xc810};
+static const UINT16 s_objdata_addr[6] = {0xb7ce, 0xba64, 0xbdbc, 0xc0f2, 0xc446, 0xc810};
 
-static UINT8 s_spawn_list[8] = {0x07, 0x08, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26};
+static const UINT8 s_spawn_list[8] = {0x07, 0x08, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26};
 
-static UINT8 s_pow_list[8] = {0, 0, 2, 2, 2, 2, 2, 1};
+static const UINT8 s_pow_list[8] = {0, 0, 2, 2, 2, 2, 2, 1};
 
 static struct MRULE
 {
@@ -428,12 +428,12 @@ WRITE8_HANDLER(equites_dac1_w)
 /******************************************************************************/
 // Alpha "Soundboard 7" Chip Definitions
 
-struct MSM5232interface equites_5232intf =
+const struct MSM5232interface equites_5232intf =
 {
 	{ 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6 } // needs verification
 };
 
-struct AY8910interface equites_8910intf =
+const struct AY8910interface equites_8910intf =
 {
 	0,
 	0,

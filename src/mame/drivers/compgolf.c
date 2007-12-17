@@ -198,7 +198,7 @@ static void sound_irq(int linestate)
 	cpunum_set_input_line(0,0,linestate);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,
 	0,

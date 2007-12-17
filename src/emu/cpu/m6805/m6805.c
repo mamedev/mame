@@ -199,7 +199,7 @@ static const UINT8 flags8d[256]= /* decrement */
 #define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC+=SIGNED(t); change_pc(PC); if (t==0xfe) { /* speed up busy loops */ if(m6805_ICount > 0) m6805_ICount = 0; } } }
 
 /* what they say it is ... */
-static unsigned char cycles1[] =
+static const unsigned char cycles1[] =
 {
       /* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
   /*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,

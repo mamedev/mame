@@ -206,7 +206,7 @@ static INPUT_PORTS_START( multigam )
 	PORT_DIPSETTING( 0x06, "10 min" )
 INPUT_PORTS_END
 
-static struct NESinterface multigam_interface_1 =
+static const struct NESinterface multigam_interface_1 =
 {
 	REGION_CPU1
 };

@@ -1523,7 +1523,7 @@ static const struct Samplesinterface reactor_samples_interface =
 #define gottlieb_samples_interface qbert_samples_interface	/* not used */
 #define krull_samples_interface qbert_samples_interface		/* not used */
 
-static struct sp0250_interface sp0250_interface =
+static const struct sp0250_interface sp0250_interface =
 {
 	stooges_sp0250_drq
 };

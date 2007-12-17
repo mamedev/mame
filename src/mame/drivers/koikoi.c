@@ -238,7 +238,7 @@ static GFXDECODE_START( koikoi )
 GFXDECODE_END
 
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	0,				 input_r,
 	unknown_w, 0

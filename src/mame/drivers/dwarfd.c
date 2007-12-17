@@ -674,7 +674,7 @@ static PALETTE_INIT(dwarfd)
 	palette_set_color(machine, 6, MAKE_RGB(255, 0, 0));
 }
 
-static struct AY8910interface ay8910_interface =
+static const struct AY8910interface ay8910_interface =
 {
 	input_port_3_r,
 	input_port_2_r,

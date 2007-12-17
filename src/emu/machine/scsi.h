@@ -14,14 +14,14 @@ typedef int (*pSCSIDispatch)( int operation, void *file, INT64 intparm, void *pt
 
 typedef struct _SCSIClass
 {
-	struct _SCSIClass *baseClass;
+	const struct _SCSIClass *baseClass;
 	pSCSIDispatch dispatch;
 	int sizeofData;
 } SCSIClass;
 
 typedef struct
 {
-	SCSIClass *scsiClass;
+	const SCSIClass *scsiClass;
 } SCSIInstance;
 
 // commands accepted by a SCSI device's dispatch handler
@@ -45,7 +45,7 @@ typedef struct scsiconfigitem
 {
 	int scsiID;
 	int diskID;
-	SCSIClass *scsiClass;
+	const SCSIClass *scsiClass;
 } SCSIConfigItem;
 
 #define SCSI_MAX_DEVICES	(16)
@@ -53,7 +53,7 @@ typedef struct scsiconfigitem
 typedef struct scsiconfigtable
 {
 	int devs_present;
-	SCSIConfigItem devices[SCSI_MAX_DEVICES];
+	const SCSIConfigItem devices[SCSI_MAX_DEVICES];
 } SCSIConfigTable;
 
 // SCSI IDs
@@ -77,7 +77,7 @@ enum
 #define SCSI_PHASE_MESSAGE_OUT ( 6 )
 #define SCSI_PHASE_MESSAGE_IN ( 7 )
 
-extern void SCSIAllocInstance( SCSIClass *scsiClass, SCSIInstance **instance, int diskId );
+extern void SCSIAllocInstance( const SCSIClass *scsiClass, SCSIInstance **instance, int diskId );
 extern void SCSIDeleteInstance( SCSIInstance *instance );
 extern void SCSISetDevice( SCSIInstance *instance, void *device );
 extern void SCSIGetDevice( SCSIInstance *instance, void **device );
@@ -90,10 +90,10 @@ extern void SCSIReadData( SCSIInstance *instance, void *data, int dataLength );
 extern void SCSISetPhase( SCSIInstance *instance, int phase );
 extern void SCSIGetPhase( SCSIInstance *instance, int *phase );
 
-extern SCSIInstance *SCSIMalloc( SCSIClass *scsiClass );
-extern int SCSIBase( SCSIClass *scsiClass, int operation, void *file, INT64 intparm, UINT8 *ptrparm );
-extern void *SCSIThis( SCSIClass *scsiClass, SCSIInstance *instance );
-extern int SCSISizeof( SCSIClass *scsiClass );
+extern SCSIInstance *SCSIMalloc( const SCSIClass *scsiClass );
+extern int SCSIBase( const SCSIClass *scsiClass, int operation, void *file, INT64 intparm, UINT8 *ptrparm );
+extern void *SCSIThis( const SCSIClass *scsiClass, SCSIInstance *instance );
+extern int SCSISizeof( const SCSIClass *scsiClass );
 extern int SCSILengthFromUINT8( UINT8 *length );
 extern int SCSILengthFromUINT16( UINT8 *length );
 

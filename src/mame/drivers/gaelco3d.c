@@ -928,7 +928,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static struct tms32031_config tms_config =
+static const struct tms32031_config tms_config =
 {
 	0x1000,
 	0,

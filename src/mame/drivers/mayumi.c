@@ -261,7 +261,7 @@ static GFXDECODE_START( mayumi )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout, 0, 32 )
 GFXDECODE_END
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	input_port_0_r,
 	input_port_1_r

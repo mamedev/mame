@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
-static struct K054539interface k054539_interface =
+static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
 };
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( jetwave )
 
 INPUT_PORTS_END
 
-static ppc_config zr107_ppc_cfg =
+static const ppc_config zr107_ppc_cfg =
 {
 	PPC_MODEL_403GA
 };

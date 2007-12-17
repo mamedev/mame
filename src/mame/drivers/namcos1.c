@@ -965,12 +965,12 @@ static void namcos1_sound_interrupt( int irq )
 	cpunum_set_input_line( 2, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static struct YM2151interface ym2151_interface =
+static const struct YM2151interface ym2151_interface =
 {
 	namcos1_sound_interrupt
 };
 
-static struct namco_interface namco_interface =
+static const struct namco_interface namco_interface =
 {
 	8,          /* number of voices */
 	-1,         /* memory region */

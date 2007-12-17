@@ -190,7 +190,7 @@ static output_callback output_cb[OUTPUT_CHANNEL_COUNT];
 static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
 
 /* the "disclaimer" that should be printed when run with no parameters */
-const char *mame_disclaimer =
+const char mame_disclaimer[] =
 	"MAME is an emulator: it reproduces, more or less faithfully, the behaviour of\n"
 	"several arcade machines. But hardware is useless without software, so an image\n"
 	"of the ROMs which run on that hardware is required. Such ROMs, like any other\n"
@@ -200,7 +200,7 @@ const char *mame_disclaimer =
 	"images is a violation of copyright law and should be promptly reported to the\n"
 	"authors so that appropriate legal action can be taken.\n";
 
-const char *memory_region_names[REGION_MAX] =
+const char *const memory_region_names[REGION_MAX] =
 {
 	"REGION_INVALID",
 	"REGION_CPU1",

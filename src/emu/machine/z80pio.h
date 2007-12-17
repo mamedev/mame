@@ -33,7 +33,7 @@ typedef struct _z80pio_interface z80pio_interface;
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-void z80pio_init(int which, z80pio_interface *intf);
+void z80pio_init(int which, const z80pio_interface *intf);
 void z80pio_reset(int which);
 
 

@@ -1316,7 +1316,7 @@ static void flash_init( void )
 	int chip;
 	int size;
 	UINT8 *data;
-	static struct
+	static const struct
 	{
 		int *start;
 		int region;
@@ -1515,7 +1515,7 @@ static MACHINE_RESET( konami573 )
 	flash_bank = -1;
 }
 
-static struct PSXSPUinterface konami573_psxspu_interface =
+static const struct PSXSPUinterface konami573_psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,
@@ -1713,7 +1713,7 @@ static void gx700pwbf_output( int offset, UINT8 data )
 	if( gx700pwfbf_output_callback != NULL )
 	{
 		int i;
-		static int shift[] = { 7, 6, 1, 0, 5, 4, 3, 2 };
+		static const int shift[] = { 7, 6, 1, 0, 5, 4, 3, 2 };
 		for( i = 0; i < 8; i++ )
 		{
 			int oldbit = ( gx700pwbf_output_data[ offset ] >> shift[ i ] ) & 1;
@@ -1802,7 +1802,7 @@ static struct
 	int bit;
 } stage[ 2 ];
 
-static int mask[] =
+static const int mask[] =
 {
 	0, 6, 2, 4,
 	0, 4, 0, 4,
@@ -2024,7 +2024,7 @@ static DRIVER_INIT( gtrfrks )
 
 /* GX894 digital i/o */
 
-static UINT8 ds2401_xid[] =
+static const UINT8 ds2401_xid[] =
 {
 	0x3d, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x01
 };
@@ -2157,7 +2157,7 @@ static void gx894pwbba_output( int offset, UINT8 data )
 	if( gx894pwbba_output_callback != NULL )
 	{
 		int i;
-		static int shift[] = { 0, 2, 3, 1 };
+		static const int shift[] = { 0, 2, 3, 1 };
 		for( i = 0; i < 4; i++ )
 		{
 			int oldbit = ( gx894pwbba_output_data[ offset ] >> shift[ i ] ) & 1;

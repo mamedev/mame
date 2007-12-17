@@ -272,12 +272,12 @@ static void shootout_snd2_irq(int linestate)
 	cpunum_set_input_line(0,0,linestate);
 }
 
-static struct YM2203interface ym2203_interface =
+static const struct YM2203interface ym2203_interface =
 {
 	0,0,0,0,shootout_snd_irq
 };
 
-static struct YM2203interface ym2203_interface2 =
+static const struct YM2203interface ym2203_interface2 =
 {
 	0,
 	0,

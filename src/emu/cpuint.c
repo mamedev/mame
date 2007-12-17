@@ -83,7 +83,7 @@ static int cpu_5_irq_callback(int line);
 static int cpu_6_irq_callback(int line);
 static int cpu_7_irq_callback(int line);
 
-int (*cpu_irq_callbacks[MAX_CPU])(int) =
+int (*const cpu_irq_callbacks[MAX_CPU])(int) =
 {
 	cpu_0_irq_callback,
 	cpu_1_irq_callback,

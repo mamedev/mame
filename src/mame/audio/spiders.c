@@ -57,7 +57,7 @@ static const discrete_lfsr_desc spiders_lfsr =
 };
 
 
-static discrete_dac_r1_ladder spiders_fire_dac =
+static const discrete_dac_r1_ladder spiders_fire_dac =
 {
 	1,
 	{RES_K(10)},	// R29
@@ -67,7 +67,7 @@ static discrete_dac_r1_ladder spiders_fire_dac =
 	CAP_N(100)		// C100
 };
 
-static discrete_dac_r1_ladder spiders_web_exp_dac =
+static const discrete_dac_r1_ladder spiders_web_exp_dac =
 {
 	1,
 	{RES_K(10)},	// R44

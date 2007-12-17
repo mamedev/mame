@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 
 ADDRESS_MAP_END
 
-static gfx_layout layout16 =
+static const gfx_layout layout16 =
 {
 	16,16,
 	RGN_FRAC(1,3),
@@ -154,7 +154,7 @@ static gfx_layout layout16 =
 	16*16
 };
 
-static gfx_layout layout8 =
+static const gfx_layout layout8 =
 {
 	8,8,
 	RGN_FRAC(1,3),

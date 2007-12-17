@@ -844,13 +844,13 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
-static struct VLM5030interface trackfld_vlm5030_interface =
+static const struct VLM5030interface trackfld_vlm5030_interface =
 {
 	REGION_SOUND1,	/* memory region  */
 	0           /* memory size    */
 };
 
-static struct MSM5205interface msm5205_interface =
+static const struct MSM5205interface msm5205_interface =
 {
 	NULL,				/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */

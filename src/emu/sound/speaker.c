@@ -11,12 +11,12 @@
 #include "streams.h"
 #include "speaker.h"
 
-static INT16 default_levels[2] = {0,32767};
+static const INT16 default_levels[2] = {0,32767};
 
 struct speaker
 {
 	sound_stream *channel;
-	INT16 *levels;
+	const INT16 *levels;
 	int num_levels;
 	int level;
 };

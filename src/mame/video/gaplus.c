@@ -275,7 +275,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		/* is it on? */
 		if ((spriteram_3[offs+1] & 2) == 0)
 		{
-			static int gfx_offs[2][2] =
+			static const int gfx_offs[2][2] =
 			{
 				{ 0, 1 },
 				{ 2, 3 }

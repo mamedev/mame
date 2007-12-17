@@ -178,10 +178,6 @@ static const struct m68k_memory_interface interface_d32 =
 };
 
 
-/* global access */
-struct m68k_memory_interface m68k_memory_intf;
-
-
 static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
@@ -298,7 +294,7 @@ static offs_t m68008_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 }
 #endif /* MAME_DEBUG */
 
-#endif
+#endif /* HAS_M68008 */
 
 /****************************************************************************
  * M68010 section
@@ -814,7 +810,7 @@ void m68008_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
+#endif /* HAS_M68008 */
 
 /**************************************************************************
  * CPU-specific set_info
@@ -859,7 +855,7 @@ void m68010_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
+#endif /* HAS_M68010 */
 
 /**************************************************************************
  * CPU-specific set_info
@@ -1099,7 +1095,7 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
+#endif /* HAS_M68EC020 */
 
 /**************************************************************************
  * CPU-specific set_info
@@ -1301,5 +1297,5 @@ void m68040_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-#endif
+#endif /* HAS_M68040 */
 

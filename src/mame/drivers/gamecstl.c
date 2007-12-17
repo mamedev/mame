@@ -474,13 +474,13 @@ static MACHINE_DRIVER_START(gamecstl)
 
 MACHINE_DRIVER_END
 
-static struct pci_device_info intel82439tx =
+static const struct pci_device_info intel82439tx =
 {
 	intel82439tx_pci_r,
 	intel82439tx_pci_w
 };
 
-static struct pci_device_info intel82371ab =
+static const struct pci_device_info intel82371ab =
 {
 	intel82371ab_pci_r,
 	intel82371ab_pci_w
@@ -501,12 +501,12 @@ static void ide_interrupt(int state)
 	pic8259_set_irq_line(1, 6, state);
 }
 
-static struct kbdc8042_interface at8042 =
+static const struct kbdc8042_interface at8042 =
 {
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt
 };
 
-static struct ide_interface ide_intf =
+static const struct ide_interface ide_intf =
 {
 	ide_interrupt
 };
