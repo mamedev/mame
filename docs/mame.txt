@@ -1,0 +1,81 @@
+MAME(tm), the Multiple Arcade Machine Emulator
+Copyright (c) 1997-2007 by Nicola Salmoria and the MAME team
+MAME is a trademark owned by Nicola Salmoria
+
+
+----------
+I. Purpose
+----------
+MAME is strictly a non-profit project. Its main purpose is to be a 
+reference to the inner workings of the emulated arcade machines. This is 
+done both for educational purposes and for preservation purposes, in 
+order to prevent many historical games from disappearing forever once the 
+hardware they run on stops working. Of course, in order to preserve the 
+games and demonstrate that the emulated behavior matches the original, 
+you must also be able to actually play the games. This is considered a 
+nice side effect, and is not MAME's primary focus. 
+
+It is not our intention to infringe on any copyrights or patents on the 
+original games. All of MAME's source code is either our own or freely 
+available. To operate, the emulator requires images of the original ROMs, 
+CDs, or hard disks from the arcade machines, which must be provided by 
+the user. No portions of the original game code are included in the 
+executable. 
+
+
+--------
+II. Cost
+--------
+MAME is free. Its source code is free. Selling either is not allowed. 
+
+
+----------------
+III. Image Files
+----------------
+ROM, CD, and hard disk images are all copyrighted material. They cannot 
+be distributed without the explicit permission of the copyright owner. 
+They are not "abandonware", nor have any of the games supported by MAME 
+passed out of copyright. 
+
+MAME is not intended to be used as a tool for mass copyright 
+infringement. Therefore, it is strongly against the authors' wishes to 
+sell, advertise, or link to resources that provide illegal copies of ROM, 
+CD, or hard disk images. 
+
+
+--------------------
+IV. Derivative Works
+--------------------
+Derivative works are allowed under the MAME license. However, you are 
+discouraged from providing specific functionality that goes against the 
+philosophy of the MAME team. Specifically: 
+
+* Do not add games which are more recent than 3 years old, or which are 
+still being sold new by the company that produced them. MAME is not 
+intended to be a platform that competes with arcade games that are still 
+being actively sold. 
+
+* Do not provide a means of generating a list of games that specifically 
+identifies those games for which the user does not have image files. This 
+only encourages users to seek out sources for illegal ROM, CD, and hard 
+disk images in order to "complete" their collection. 
+
+* Do not remove the startup screen that contains information about why 
+certain non-working games don't work. This only serves to generate a 
+bunch of useless email traffic to the developers asking why the games 
+don't work. 
+
+Because the name MAME is trademarked, you must abide by the rules of the 
+trademark usage if you wish to use "MAME" as part of the name your 
+derivative work. In general, this means you must request permission, 
+which requires that you follow the guidelines above. 
+
+The version number of any derivative work should reflect the version 
+number of the MAME release it was derived from. 
+
+
+-------------------------------
+V. Official Contact Information
+-------------------------------
+For questions regarding the MAME license, trademark, or other usage, go 
+to http://www.mamedev.org/
