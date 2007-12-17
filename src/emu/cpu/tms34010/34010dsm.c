@@ -246,7 +246,7 @@ static void print_reg_list(UINT16 rev)
 }
 
 
-unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
+static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 {
 	int flags = 0;
 	UINT8 bad = 0;

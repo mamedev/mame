@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_ADD_TAG("main",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
-	MDRV_CPU_ADD(Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
+	MDRV_CPU_ADD(Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
@@ -391,7 +391,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 	MDRV_CPU_VBLANK_INT(mexico86_m68705_interrupt,2)
 
-	MDRV_CPU_ADD_TAG("sub", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MDRV_CPU_ADD_TAG("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 

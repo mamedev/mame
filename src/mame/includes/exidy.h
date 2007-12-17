@@ -52,23 +52,13 @@ WRITE8_HANDLER( targ_sh_w );
 
 /*----------- defined in video/exidy.c -----------*/
 
-#define PALETTE_LEN 8
-#define COLORTABLE_LEN 20
-
 extern UINT8 *exidy_characterram;
-extern UINT8 *exidy_palette;
-extern UINT16 *exidy_colortable;
-
-extern UINT8 sidetrac_palette[];
-extern UINT8 targ_palette[];
-extern UINT8 spectar_palette[];
-extern UINT16 exidy_1bpp_colortable[];
-extern UINT16 exidy_2bpp_colortable[];
 
 extern UINT8 exidy_collision_mask;
 extern UINT8 exidy_collision_invert;
 
-PALETTE_INIT( exidy );
+extern UINT8 exidy_color_latch[3];
+
 VIDEO_START( exidy );
 VIDEO_EOF( exidy );
 VIDEO_UPDATE( exidy );

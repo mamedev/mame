@@ -20,7 +20,6 @@
 #include "includes/pacman.h"
 #include "video/resnet.h"
 
-static colortable *pacman_colortable;
 static tilemap *bg_tilemap;
 static UINT8 charbank;
 static UINT8 spritebank;
@@ -93,7 +92,7 @@ PALETTE_INIT( pacman )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	pacman_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -118,7 +117,7 @@ PALETTE_INIT( pacman )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(pacman_colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -130,10 +129,10 @@ PALETTE_INIT( pacman )
 		UINT8 ctabentry = color_prom[i] & 0x0f;
 
 		/* first palette bank */
-		colortable_entry_set_value(pacman_colortable, i, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 
 		/* second palette bank */
-		colortable_entry_set_value(pacman_colortable, i + 64*4, 0x10 + ctabentry);
+		colortable_entry_set_value(machine->colortable, i + 64*4, 0x10 + ctabentry);
 	}
 }
 
@@ -247,7 +246,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
@@ -256,7 +255,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx - 256,sy,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 		}
 		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 		/* one pixel to the left to get a more correct placement */
@@ -275,7 +274,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy + xoffsethack,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx(bitmap,machine->gfx[1],
@@ -284,7 +283,7 @@ VIDEO_UPDATE( pacman )
 					spriteram[offs] & 2,spriteram[offs] & 1,
 					sx - 256,sy + xoffsethack,
 					&spriteclip,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 		}
 	}
 
@@ -417,7 +416,7 @@ VIDEO_UPDATE( s2650games )
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
 				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 	}
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
@@ -438,7 +437,7 @@ VIDEO_UPDATE( s2650games )
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy + xoffsethack,
 				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(pacman_colortable, machine->gfx[1], color & 0x3f, 0));
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color & 0x3f, 0));
 	}
 	return 0;
 }

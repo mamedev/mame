@@ -40,7 +40,7 @@ Oct. 5, 2003:
 
 Stephh's notes (based on the games Z80 code and some tests) :
 
-1)  'ftsoccer'
+1)  'fsoccerb'
 
   - The code to support the rotary jotsticks has been removed and/or patched
     in this version (check the 'jmp' instruction at 0x00f1).
@@ -120,8 +120,8 @@ AT08XX03:
  - revamped CPU handshaking, improved clipping and made changes public to
    marvins.c, hal21.c and sgladiat.c
  - fixed shadows in tnk3, athena, fitegolf, countryc,
- and ftsoccer
- - added highlights to tdfever and ftsoccer(needs masking at team selection)
+ and fsoccer
+ - added highlights to tdfever and fsoccer(needs masking at team selection)
  - notes:
 
     Mad Crasher and Gladiator(sgladiat.c) have different memory maps but
@@ -466,7 +466,7 @@ static READ8_HANDLER( cpuA_io_r ){
 		case 0x500: return snk_input_port_r( 9 );	// unused by tdfever
 		case 0x580: return snk_input_port_r( 10 );	// dsw
 		case 0x600: return snk_input_port_r( 11 );	// dsw
-		case 0x080: return snk_input_port_r( 12 );	// player start (types C and D in 'ftsoccer')
+		case 0x080: return snk_input_port_r( 12 );	// player start (types C and D in 'fsoccer')
 
 		case 0x700: return(snk_cpuB_nmi_trigger_r(0));
 
@@ -1258,7 +1258,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( ftsoccer )
+static MACHINE_DRIVER_START( fsoccer )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)
@@ -1272,7 +1272,7 @@ static MACHINE_DRIVER_START( ftsoccer )
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(Y8950_sound_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -2665,15 +2665,15 @@ ROM_END
 
 /***********************************************************************/
 
-ROM_START( ftsoccer )
+ROM_START( fsoccer )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for cpuA code */
-	ROM_LOAD( "ft-003.bin",  0x00000, 0x10000, CRC(649d4448) SHA1(876a4cf3ce3211ee19390deb17a661ec52b419d2) )
+	ROM_LOAD( "fs3_ver4.bin",  0x00000, 0x10000, CRC(94c3f918) SHA1(7c8343556d6c3897e72f8b41c6fbdc5c58e78b8c) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for cpuB code */
-	ROM_LOAD( "ft-001.bin",  0x00000, 0x10000, CRC(2f68e38b) SHA1(0cbf2de24a5a5ae2134eb6f1e1404691554192bc) )
+	ROM_LOAD( "fs1_ver4.bin",  0x00000, 0x10000, CRC(97830108) SHA1(dab241baf8d889c768e1fbe25f1e5059b3cbbab6) )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for sound code */
-	ROM_LOAD( "ft-002.bin",  0x00000, 0x10000, CRC(9ee54ea1) SHA1(4e3bbacaa0e247eb8c4043f394e763817a4f9a28) )
+	ROM_LOAD( "fs2.bin",  0x00000, 0x10000, CRC(9ee54ea1) SHA1(4e3bbacaa0e247eb8c4043f394e763817a4f9a28) )
 
 	ROM_REGION( 0x0c00, REGION_PROMS, 0 )
 	ROM_LOAD( "prom2.bin", 0x000, 0x400, CRC(bf4ac706) SHA1(b5015563d88dbd93ba2838f01b189812958f142b) ) /* red */
@@ -2681,29 +2681,70 @@ ROM_START( ftsoccer )
 	ROM_LOAD( "prom3.bin", 0x800, 0x400, CRC(dbeddb14) SHA1(6053b587a3c8272aefe728a7198a15aa7fb9b2fa) ) /* blue */
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE ) /* characters */
-	ROM_LOAD( "ft-013.bin",  0x0000, 0x08000, CRC(0de7b7ad) SHA1(4fa54b2acf83f03d09d16fc054ad6623cafe0f4a) )
+	ROM_LOAD( "fs13.bin",  0x0000, 0x08000, CRC(0de7b7ad) SHA1(4fa54b2acf83f03d09d16fc054ad6623cafe0f4a) )
 
 	ROM_REGION( 0x50000, REGION_GFX2, ROMREGION_DISPOSE ) /* background tiles */
-	ROM_LOAD( "ft-014.bin",  0x00000, 0x10000, CRC(38c38b40) SHA1(c4580add0946720441f5ef751d0d4a944cd92ad5) )
-	ROM_LOAD( "ft-015.bin",  0x10000, 0x10000, CRC(a614834f) SHA1(d73930e4bd780915e1b0d7f3fe7cbeaad19c233f) )
+	ROM_LOAD( "fs14.bin",  0x00000, 0x10000, CRC(38c38b40) SHA1(c4580add0946720441f5ef751d0d4a944cd92ad5) )
+	ROM_LOAD( "fs15.bin",  0x10000, 0x10000, CRC(a614834f) SHA1(d73930e4bd780915e1b0d7f3fe7cbeaad19c233f) )
 
 //  ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE ) /* 16x16 sprites */
 
 	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE ) /* 32x32 sprites */
-	ROM_LOAD( "ft-005.bin",  0x10000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
-	ROM_LOAD( "ft-006.bin",  0x00000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
+	ROM_LOAD( "fs5.bin",  0x10000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
+	ROM_LOAD( "fs6.bin",  0x00000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
 
-	ROM_LOAD( "ft-007.bin",  0x30000, 0x10000, CRC(d584964b) SHA1(7c806fc40dcce700ed0c268abbd2704938b65ff2) )
-	ROM_LOAD( "ft-008.bin",  0x20000, 0x10000, CRC(11156a7d) SHA1(f298a54fa4c118bf8e7c7cccb6c95a4b97daf4d4) )
+	ROM_LOAD( "fs7.bin",  0x30000, 0x10000, CRC(d584964b) SHA1(7c806fc40dcce700ed0c268abbd2704938b65ff2) )
+	ROM_LOAD( "fs8.bin",  0x20000, 0x10000, CRC(11156a7d) SHA1(f298a54fa4c118bf8e7c7cccb6c95a4b97daf4d4) )
 
-	ROM_LOAD( "ft-009.bin",  0x50000, 0x10000, CRC(d8112aa6) SHA1(575dd6dff2f00901603768f2c121eb0ea5afa444) )
-	ROM_LOAD( "ft-010.bin",  0x40000, 0x10000, CRC(e42864d8) SHA1(fe18f58e5507676780fe181e2fb0e0e9d72e276e) )
+	ROM_LOAD( "fs9.bin",  0x50000, 0x10000, CRC(d8112aa6) SHA1(575dd6dff2f00901603768f2c121eb0ea5afa444) )
+	ROM_LOAD( "fs10.bin",  0x40000, 0x10000, CRC(e42864d8) SHA1(fe18f58e5507676780fe181e2fb0e0e9d72e276e) )
 
-	ROM_LOAD( "ft-011.bin",  0x70000, 0x10000, CRC(022f3e96) SHA1(57aa423b8f62015566bc3021300ac7e9682ed500) )
-	ROM_LOAD( "ft-012.bin",  0x60000, 0x10000, CRC(b2442c30) SHA1(ba9331810659726389494ddc7c94c5a02ba80747) )
+	ROM_LOAD( "fs11.bin",  0x70000, 0x10000, CRC(022f3e96) SHA1(57aa423b8f62015566bc3021300ac7e9682ed500) )
+	ROM_LOAD( "fs12.bin",  0x60000, 0x10000, CRC(b2442c30) SHA1(ba9331810659726389494ddc7c94c5a02ba80747) )
 
 	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
-	ROM_LOAD( "ft-004.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
+	ROM_LOAD( "fs4.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
+ROM_END
+
+ROM_START( fsoccerb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )     /* 64k for cpuA code */
+	ROM_LOAD( "ft-003.bin",  0x00000, 0x10000, CRC(649d4448) SHA1(876a4cf3ce3211ee19390deb17a661ec52b419d2) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for cpuB code */
+	ROM_LOAD( "ft-001.bin",  0x00000, 0x10000, CRC(2f68e38b) SHA1(0cbf2de24a5a5ae2134eb6f1e1404691554192bc) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )     /* 64k for sound code */
+	ROM_LOAD( "fs2.bin",  0x00000, 0x10000, CRC(9ee54ea1) SHA1(4e3bbacaa0e247eb8c4043f394e763817a4f9a28) )
+
+	ROM_REGION( 0x0c00, REGION_PROMS, 0 )
+	ROM_LOAD( "prom2.bin", 0x000, 0x400, CRC(bf4ac706) SHA1(b5015563d88dbd93ba2838f01b189812958f142b) ) /* red */
+	ROM_LOAD( "prom1.bin", 0x400, 0x400, CRC(1bac8010) SHA1(16854b1b6f3d1be48a247796d65aeb90547099b6) ) /* green */
+	ROM_LOAD( "prom3.bin", 0x800, 0x400, CRC(dbeddb14) SHA1(6053b587a3c8272aefe728a7198a15aa7fb9b2fa) ) /* blue */
+
+	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE ) /* characters */
+	ROM_LOAD( "fs13.bin",  0x0000, 0x08000, CRC(0de7b7ad) SHA1(4fa54b2acf83f03d09d16fc054ad6623cafe0f4a) )
+
+	ROM_REGION( 0x50000, REGION_GFX2, ROMREGION_DISPOSE ) /* background tiles */
+	ROM_LOAD( "fs14.bin",  0x00000, 0x10000, CRC(38c38b40) SHA1(c4580add0946720441f5ef751d0d4a944cd92ad5) )
+	ROM_LOAD( "fs15.bin",  0x10000, 0x10000, CRC(a614834f) SHA1(d73930e4bd780915e1b0d7f3fe7cbeaad19c233f) )
+
+//  ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE ) /* 16x16 sprites */
+
+	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE ) /* 32x32 sprites */
+	ROM_LOAD( "fs5.bin",  0x10000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
+	ROM_LOAD( "fs6.bin",  0x00000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
+
+	ROM_LOAD( "fs7.bin",  0x30000, 0x10000, CRC(d584964b) SHA1(7c806fc40dcce700ed0c268abbd2704938b65ff2) )
+	ROM_LOAD( "fs8.bin",  0x20000, 0x10000, CRC(11156a7d) SHA1(f298a54fa4c118bf8e7c7cccb6c95a4b97daf4d4) )
+
+	ROM_LOAD( "fs9.bin",  0x50000, 0x10000, CRC(d8112aa6) SHA1(575dd6dff2f00901603768f2c121eb0ea5afa444) )
+	ROM_LOAD( "fs10.bin",  0x40000, 0x10000, CRC(e42864d8) SHA1(fe18f58e5507676780fe181e2fb0e0e9d72e276e) )
+
+	ROM_LOAD( "fs11.bin",  0x70000, 0x10000, CRC(022f3e96) SHA1(57aa423b8f62015566bc3021300ac7e9682ed500) )
+	ROM_LOAD( "fs12.bin",  0x60000, 0x10000, CRC(b2442c30) SHA1(ba9331810659726389494ddc7c94c5a02ba80747) )
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
+	ROM_LOAD( "fs4.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
 ROM_END
 
 /***********************************************************************/
@@ -3817,7 +3858,7 @@ static INPUT_PORTS_START( countryc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ftsoccer )
+static INPUT_PORTS_START( fsoccer )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -4250,7 +4291,7 @@ static const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_UNUSED
 };
 
-static const SNK_INPUT_PORT_TYPE ftsoccer_io[SNK_MAX_INPUT_PORTS] = {
+static const SNK_INPUT_PORT_TYPE fsoccer_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
 	/* c300 */ SNK_INP5, SNK_INP6, SNK_INP7, SNK_INP8, /* aim1..aim4 */
@@ -4424,9 +4465,9 @@ static DRIVER_INIT( tdfever2 ){
 	snk_irq_delay = 1000;
 }
 
-static DRIVER_INIT( ftsoccer ){
+static DRIVER_INIT( fsoccer ){
 	snk_sound_busy_bit = 0x08;
-	snk_io = ftsoccer_io;
+	snk_io = fsoccer_io;
 	hard_flags = 0;
 	videoram = snk_rambase + 0x800;
 	snk_gamegroup = 7;
@@ -4476,7 +4517,7 @@ GAME( 1986, ikarijp,  ikari,    ikari,    ikarijp,  ikarijp,  ROT270, "SNK", "Ik
 GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, ikarijpb, ROT270, "bootleg", "Ikari (Japan bootleg)", GAME_NO_COCKTAIL )
 GAME( 1986, victroad, 0,        victroad, victroad, victroad, ROT270, "SNK", "Victory Road", GAME_NO_COCKTAIL )
 GAME( 1986, dogosoke, victroad, victroad, victroad, dogosoke, ROT270, "SNK", "Dogou Souken", GAME_NO_COCKTAIL )
-GAME( 1986, dogosokj, victroad, victroad, dogosokj, dogosoke, ROT270, "bootleg", "Dogou Souken (Joystick bootleg)", GAME_NO_COCKTAIL )
+GAME( 1986, dogosokj, victroad, victroad, dogosokj, dogosoke, ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", GAME_NO_COCKTAIL )
 GAME( 1987, gwar,     0,        gwar,     gwar,     gwar,     ROT270, "SNK", "Guerrilla War (US)", GAME_NO_COCKTAIL )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     gwar,     ROT270, "SNK", "Guevara (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, gwara,    gwar,     gwar,     gwar,     gwara,    ROT270, "SNK", "Guerrilla War (Version 1)", GAME_NO_COCKTAIL )
@@ -4492,6 +4533,8 @@ GAME( 1988, choppera, chopper,  chopper1, choppera, choppera, ROT270, "SNK", "Ch
 GAME( 1988, chopperb, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Chopper I (US set 3)", GAME_NO_COCKTAIL )
 GAME( 1988, legofair, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, tdfever,  0,        tdfever,  tdfever,  tdfever,  ROT270, "SNK", "TouchDown Fever", GAME_NO_COCKTAIL )
-GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj,  tdfever,  ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj,  tdfever, ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, ftsoccer, 0,        ftsoccer, ftsoccer, ftsoccer, ROT0,   "SNK", "Fighting Soccer", GAME_NO_COCKTAIL )
+GAME( 1988, fsoccer,  0,        fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (version 4)", GAME_NO_COCKTAIL )
+GAME( 1988, fsoccerb, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "bootleg", "Fighting Soccer (joystick hack bootleg)", GAME_NO_COCKTAIL )
+

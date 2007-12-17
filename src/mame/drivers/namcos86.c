@@ -1088,8 +1088,7 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(3 + 8*8, 3 + 44*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(namcos86)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_COLORTABLE_LENGTH(4096)
+	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_PALETTE_INIT(namcos86)
 	MDRV_VIDEO_START(namcos86)
@@ -1216,8 +1215,8 @@ ROM_START( skykiddx )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "sk3-1.3r",     0x0000, 0x0200, CRC(9e81dedd) SHA1(9d2ddf51788d22ed65db9070684e586b2f64f99e) )	/* red & green components */
 	ROM_LOAD( "sk3-2.3s",     0x0200, 0x0200, CRC(cbfec4dd) SHA1(98adf5db270a853ab2a2e1cdd9edfd5657287a96) )	/* blue component */
-	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles colortable */
-	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites colortable */
+	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles color table */
+	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites color table */
 	ROM_LOAD( "sk3-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1252,8 +1251,8 @@ ROM_START( skykiddo )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "sk3-1.3r",     0x0000, 0x0200, CRC(9e81dedd) SHA1(9d2ddf51788d22ed65db9070684e586b2f64f99e) )	/* red & green components */
 	ROM_LOAD( "sk3-2.3s",     0x0200, 0x0200, CRC(cbfec4dd) SHA1(98adf5db270a853ab2a2e1cdd9edfd5657287a96) )	/* blue component */
-	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles colortable */
-	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites colortable */
+	ROM_LOAD( "sk3-3.4v",     0x0400, 0x0800, CRC(81714109) SHA1(577e513369a4368b7dd29dff80904eb0ac2004ff) )	/* tiles color table */
+	ROM_LOAD( "sk3-4.5v",     0x0c00, 0x0800, CRC(1bf25acc) SHA1(a8db254ba4cbb85efc232a5bf9b268534455ad4a) )	/* sprites color table */
 	ROM_LOAD( "sk3-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1287,8 +1286,8 @@ ROM_START( hopmappy )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "hm1-1.3r",     0x0000, 0x0200, CRC(cc801088) SHA1(d2c39ac1694d9b8c426e253702ecd096e68c6db9) )	/* red & green components */
 	ROM_LOAD( "hm1-2.3s",     0x0200, 0x0200, CRC(a1cb71c5) SHA1(d8c33c2e52d64ebf4a07d8a26453e7b872cae413) )	/* blue component */
-	ROM_LOAD( "hm1-3.4v",     0x0400, 0x0800, CRC(e362d613) SHA1(16d87711c1ac4ac2b649a32a5627cbd62cc5031f) )	/* tiles colortable */
-	ROM_LOAD( "hm1-4.5v",     0x0c00, 0x0800, CRC(678252b4) SHA1(9e2f7328532be3ac4b48bd5d52cd993108558452) )	/* sprites colortable */
+	ROM_LOAD( "hm1-3.4v",     0x0400, 0x0800, CRC(e362d613) SHA1(16d87711c1ac4ac2b649a32a5627cbd62cc5031f) )	/* tiles color table */
+	ROM_LOAD( "hm1-4.5v",     0x0c00, 0x0800, CRC(678252b4) SHA1(9e2f7328532be3ac4b48bd5d52cd993108558452) )	/* sprites color table */
 	ROM_LOAD( "hm1-5.6u",     0x1400, 0x0020, CRC(475bf500) SHA1(7e6a91e57d3709a5c70786c8e3ed545ee6026d03) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1328,8 +1327,8 @@ ROM_START( roishtar )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "ri1-1.3r",     0x0000, 0x0200, CRC(29cd0400) SHA1(a9b0d09492710e72e34155cd6a7b7c1a34c56b20) )	/* red & green components */
 	ROM_LOAD( "ri1-2.3s",     0x0200, 0x0200, CRC(02fd278d) SHA1(db104fc7acf2739def902180981eb7ba10ec3dda) )	/* blue component */
-	ROM_LOAD( "ri1-3.4v",     0x0400, 0x0800, CRC(cbd7e53f) SHA1(77ef70be4e8a21948d697649352a5e3527086cf2) )	/* tiles colortable */
-	ROM_LOAD( "ri1-4.5v",     0x0c00, 0x0800, CRC(22921617) SHA1(7304cb5a86f524f912feb8b58801393cce5d3b09) )	/* sprites colortable */
+	ROM_LOAD( "ri1-3.4v",     0x0400, 0x0800, CRC(cbd7e53f) SHA1(77ef70be4e8a21948d697649352a5e3527086cf2) )	/* tiles color table */
+	ROM_LOAD( "ri1-4.5v",     0x0c00, 0x0800, CRC(22921617) SHA1(7304cb5a86f524f912feb8b58801393cce5d3b09) )	/* sprites color table */
 	ROM_LOAD( "ri1-5.6u",     0x1400, 0x0020, CRC(e2188075) SHA1(be079ace2070433d4d90c757aef3e415b4e21455) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1370,8 +1369,8 @@ ROM_START( genpeitd )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "gt1-1.3r",     0x0000, 0x0200, CRC(2f0ddddb) SHA1(27fa45c0baf9a48002db11be9b3c0472ecfd986c) )	/* red & green components */
 	ROM_LOAD( "gt1-2.3s",     0x0200, 0x0200, CRC(87d27025) SHA1(a50f969d48a99c6d29141458fb3e34b23cf5e67c) )	/* blue component */
-	ROM_LOAD( "gt1-3.4v",     0x0400, 0x0800, CRC(c178de99) SHA1(67289ef9e5068636023316560f9f1690a8384bfb) )	/* tiles colortable */
-	ROM_LOAD( "gt1-4.5v",     0x0c00, 0x0800, CRC(9f48ef17) SHA1(78c813dd57326f3f5ab785005ef89ba96303adeb) )	/* sprites colortable */
+	ROM_LOAD( "gt1-3.4v",     0x0400, 0x0800, CRC(c178de99) SHA1(67289ef9e5068636023316560f9f1690a8384bfb) )	/* tiles color table */
+	ROM_LOAD( "gt1-4.5v",     0x0c00, 0x0800, CRC(9f48ef17) SHA1(78c813dd57326f3f5ab785005ef89ba96303adeb) )	/* sprites color table */
 	ROM_LOAD( "gt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1421,8 +1420,8 @@ ROM_START( rthunder )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "rt1-1.3r",     0x0000, 0x0200, CRC(8ef3bb9d) SHA1(4636d6b8ba7611b11d4863fab02475dc4a619eaf) )	/* red & green components */
 	ROM_LOAD( "rt1-2.3s",     0x0200, 0x0200, CRC(6510a8f2) SHA1(935f140bfa7e6f8cebafa7f1b0de99dd319273d4) )	/* blue component */
-	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles colortable */
-	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites colortable */
+	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles color table */
+	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites color table */
 	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1472,8 +1471,8 @@ ROM_START( rthundro )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "rt1-1.3r",     0x0000, 0x0200, CRC(8ef3bb9d) SHA1(4636d6b8ba7611b11d4863fab02475dc4a619eaf) )	/* red & green components */
 	ROM_LOAD( "rt1-2.3s",     0x0200, 0x0200, CRC(6510a8f2) SHA1(935f140bfa7e6f8cebafa7f1b0de99dd319273d4) )	/* blue component */
-	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles colortable */
-	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites colortable */
+	ROM_LOAD( "rt1-3.4v",     0x0400, 0x0800, CRC(95c7d944) SHA1(ca5fea028674882a61507ac7c89ada96f5b2674d) )	/* tiles color table */
+	ROM_LOAD( "rt1-4.5v",     0x0c00, 0x0800, CRC(1391fec9) SHA1(8ca94e22110b20d2ecdf03610bcc89ff4245920f) )	/* sprites color table */
 	ROM_LOAD( "rt1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
@@ -1523,8 +1522,8 @@ ROM_START( wndrmomo )
 	ROM_REGION( 0x1420, REGION_PROMS, 0 )
 	ROM_LOAD( "wm1-1.3r",     0x0000, 0x0200, CRC(1af8ade8) SHA1(1aa0d314c34abc4154092d4b588214afb0b21e22) )	/* red & green components */
 	ROM_LOAD( "wm1-2.3s",     0x0200, 0x0200, CRC(8694e213) SHA1(f00d692e587c3706e71b6eeef21e1ea87c9dd921) )	/* blue component */
-	ROM_LOAD( "wm1-3.4v",     0x0400, 0x0800, CRC(2ffaf9a4) SHA1(2002df3cc38e05f3e127d05c244cb101d1f1d85f) )	/* tiles colortable */
-	ROM_LOAD( "wm1-4.5v",     0x0c00, 0x0800, CRC(f4e83e0b) SHA1(b000d884c6e0373b0403bc9d63eb0452c1197491) )	/* sprites colortable */
+	ROM_LOAD( "wm1-3.4v",     0x0400, 0x0800, CRC(2ffaf9a4) SHA1(2002df3cc38e05f3e127d05c244cb101d1f1d85f) )	/* tiles color table */
+	ROM_LOAD( "wm1-4.5v",     0x0c00, 0x0800, CRC(f4e83e0b) SHA1(b000d884c6e0373b0403bc9d63eb0452c1197491) )	/* sprites color table */
 	ROM_LOAD( "wm1-5.6u",     0x1400, 0x0020, CRC(e4130804) SHA1(e1a3e1383186d036fba6dc8a8681f48f24f59281) )	/* tile address decoder (used at runtime) */
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )

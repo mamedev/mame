@@ -96,7 +96,7 @@ typedef struct
 } I8039_Regs;
 
 static I8039_Regs R;
-int	   i8039_ICount;
+static int	   i8039_ICount;
 static int    inst_cycles;
 static UINT8 Old_T1;
 

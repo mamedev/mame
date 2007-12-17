@@ -744,8 +744,8 @@ static const gfx_layout charlayout_1bpp =
 	256,
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -755,8 +755,8 @@ static const gfx_layout charlayout_2bpp =
 	256,
 	2,
 	{ 0, 256*8*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
 	8*8
 };
 
@@ -766,21 +766,21 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8},
+	{ STEP8(0,1), STEP8(16*8,1), },
+	{ STEP16(0,8) },
 	8*32
 };
 
 
 static GFXDECODE_START( 1bpp )
-	GFXDECODE_ENTRY( REGION_CPU1, 0x4800, charlayout_1bpp, 0, 4 )	/* the game dynamically modifies this */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    8, 2 )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x4800, charlayout_1bpp, 4, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 2 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( 2bpp )
-	GFXDECODE_ENTRY( REGION_CPU1, 0x6000, charlayout_2bpp, 0, 4 )	/* the game dynamically modifies this */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,   16, 2 )
+	GFXDECODE_ENTRY( REGION_CPU1, 0x6000, charlayout_2bpp, 4, 4 )	/* the game dynamically modifies this */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 2 )
 GFXDECODE_END
 
 
@@ -836,10 +836,8 @@ static MACHINE_DRIVER_START( targ )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 	MDRV_GFXDECODE(1bpp)
-	MDRV_PALETTE_LENGTH(PALETTE_LEN)
-	MDRV_COLORTABLE_LENGTH(COLORTABLE_LEN)
+	MDRV_PALETTE_LENGTH(2*2 + 4*2)
 
-	MDRV_PALETTE_INIT(exidy)
 	MDRV_VIDEO_START(exidy)
 	MDRV_VIDEO_EOF(exidy)
 	MDRV_VIDEO_UPDATE(exidy)
@@ -913,6 +911,7 @@ static MACHINE_DRIVER_START( pepper2 )
 
 	/* video hardware */
 	MDRV_GFXDECODE(2bpp)
+	MDRV_PALETTE_LENGTH(2*2 + 4*4)
 MACHINE_DRIVER_END
 
 
@@ -1341,10 +1340,8 @@ ROM_END
  *
  *************************************/
 
-static void exidy_common_init(UINT8 palette[], UINT16 colortable[], UINT8 cmask, UINT8 cinvert)
+static void exidy_common_init(UINT8 cmask, UINT8 cinvert)
 {
-	exidy_palette 			= palette;
-	exidy_colortable 		= colortable;
 	exidy_collision_mask 	= cmask;
 	exidy_collision_invert	= cinvert;
 	targ_spec_flag 			= 0;
@@ -1353,7 +1350,12 @@ static void exidy_common_init(UINT8 palette[], UINT16 colortable[], UINT8 cmask,
 
 static DRIVER_INIT( sidetrac )
 {
-	exidy_common_init(sidetrac_palette, exidy_1bpp_colortable, 0x00, 0x00);
+	exidy_common_init(0x00, 0x00);
+
+	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	exidy_color_latch[2] = 0xf8;
+	exidy_color_latch[1] = 0xdc;
+	exidy_color_latch[0] = 0xb8;
 
 	/* ROM in place of character RAM */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MWA8_ROM);
@@ -1362,19 +1364,35 @@ static DRIVER_INIT( sidetrac )
 
 static DRIVER_INIT( targ )
 {
-	exidy_common_init(targ_palette, exidy_1bpp_colortable, 0x00, 0x00);
+	exidy_common_init(0x00, 0x00);
+
+	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	exidy_color_latch[2] = 0x5c;
+	exidy_color_latch[1] = 0xee;
+	exidy_color_latch[0] = 0x6b;
+
 	targ_spec_flag = 1;
 }
 
 
 static DRIVER_INIT( spectar )
 {
-	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
+	exidy_common_init(0x00, 0x00);
+
+	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	exidy_color_latch[2] = 0x58;
+	exidy_color_latch[1] = 0xee;
+	exidy_color_latch[0] = 0x09;
 }
 
 static DRIVER_INIT( rallys )
 {
-	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
+	exidy_common_init(0x00, 0x00);
+
+	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	exidy_color_latch[2] = 0x58;
+	exidy_color_latch[1] = 0xee;
+	exidy_color_latch[0] = 0x09;
 
 	/* sprite locations are slightly different */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5000, 0, 0, exidy_sprite1_xpos_w);
@@ -1385,7 +1403,12 @@ static DRIVER_INIT( rallys )
 
 static DRIVER_INIT( phantoma )
 {
-	exidy_common_init(spectar_palette, exidy_1bpp_colortable, 0x00, 0x00);
+	exidy_common_init(0x00, 0x00);
+
+	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	exidy_color_latch[2] = 0x58;
+	exidy_color_latch[1] = 0xee;
+	exidy_color_latch[0] = 0x09;
 
 	/* sprite locations are slightly different */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5000, 0, 0, exidy_sprite1_xpos_w);
@@ -1401,19 +1424,19 @@ static DRIVER_INIT( phantoma )
 
 static DRIVER_INIT( mtrap )
 {
-	exidy_common_init(NULL, exidy_1bpp_colortable, 0x14, 0x00);
+	exidy_common_init(0x14, 0x00);
 }
 
 
 static DRIVER_INIT( venture )
 {
-	exidy_common_init(NULL, exidy_1bpp_colortable, 0x04, 0x04);
+	exidy_common_init(0x04, 0x04);
 }
 
 
 static DRIVER_INIT( teetert )
 {
-	exidy_common_init(NULL, exidy_1bpp_colortable, 0x0c, 0x0c);
+	exidy_common_init(0x0c, 0x0c);
 
 	/* special input handler for the dial */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5101, 0x5101, 0, 0, teetert_input_r);
@@ -1422,7 +1445,7 @@ static DRIVER_INIT( teetert )
 
 static DRIVER_INIT( pepper2 )
 {
-	exidy_common_init(NULL, exidy_2bpp_colortable, 0x14, 0x04);
+	exidy_common_init(0x14, 0x04);
 
 	/* two 6116 character RAMs */
 	exidy_characterram = memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_RAM);
@@ -1434,7 +1457,7 @@ static DRIVER_INIT( pepper2 )
 
 static DRIVER_INIT( fax )
 {
-	exidy_common_init(NULL, exidy_2bpp_colortable, 0x04, 0x04);
+	exidy_common_init(0x04, 0x04);
 
 	/* reset the ROM bank */
 	fax_bank_select_w(0,0);

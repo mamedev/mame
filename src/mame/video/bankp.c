@@ -15,7 +15,6 @@ static int scroll_x;
 static int priority;
 
 static tilemap *bg_tilemap, *fg_tilemap;
-static colortable *bankp_colortable;
 
 
 /***************************************************************************
@@ -43,11 +42,9 @@ static colortable *bankp_colortable;
 PALETTE_INIT( bankp )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* allocate the colortable */
-	bankp_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	for (i = 0;i < 32;i++)
 	{
@@ -69,7 +66,7 @@ PALETTE_INIT( bankp )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(bankp_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -78,13 +75,13 @@ PALETTE_INIT( bankp )
 
 	/* charset #1 lookup table */
 	for (i = 0;i < machine->gfx[0]->total_colors * machine->gfx[0]->color_granularity;i++)
-		colortable_entry_set_value(bankp_colortable, machine->gfx[0]->color_base + i, *color_prom++ & 0x0f);
+		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i, *color_prom++ & 0x0f);
 
 	color_prom += 128;	/* skip the bottom half of the PROM - seems to be not used */
 
 	/* charset #2 lookup table */
 	for (i = 0;i < machine->gfx[1]->total_colors * machine->gfx[1]->color_granularity;i++)
-		colortable_entry_set_value(bankp_colortable, machine->gfx[1]->color_base + i, *color_prom++ & 0x0f);
+		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i, *color_prom++ & 0x0f);
 
 	/* the bottom half of the PROM seems to be not used */
 }
@@ -163,8 +160,8 @@ VIDEO_START( bankp )
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
-	colortable_configure_tilemap_groups(bankp_colortable, bg_tilemap, machine->gfx[1], 0);
-	colortable_configure_tilemap_groups(bankp_colortable, fg_tilemap, machine->gfx[0], 0);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[1], 0);
+	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0);
 }
 
 VIDEO_UPDATE( bankp )

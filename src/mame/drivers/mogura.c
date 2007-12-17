@@ -10,7 +10,6 @@ static tilemap *mogura_tilemap;
 static PALETTE_INIT( mogura )
 {
 	int i,j;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	j = 0;
 	for (i = 0;i < 0x20;i++)

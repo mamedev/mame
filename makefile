@@ -91,10 +91,11 @@ X86_PPC_DRC = 1
 # uncomment one of the next lines to build a target-optimized build
 # NATIVE = 1
 # ATHLON = 1
+# AMD64 = 1
 # I686 = 1
 # P4 = 1
 # PM = 1
-# AMD64 = 1
+# CORE2 = 1
 # G4 = 1
 # G5 = 1
 # CELL = 1
@@ -198,6 +199,11 @@ SUFFIX = at
 ARCH = -march=athlon
 endif
 
+ifdef AMD64
+SUFFIX = 64
+ARCH = -march=athlon64
+endif
+
 ifdef I686
 SUFFIX = pp
 ARCH = -march=pentiumpro
@@ -208,14 +214,14 @@ SUFFIX = p4
 ARCH = -march=pentium4
 endif
 
-ifdef AMD64
-SUFFIX = 64
-ARCH = -march=athlon64
-endif
-
 ifdef PM
 SUFFIX = pm
-ARCH = -march=pentium3 -msse2
+ARCH = -march=pentium-m
+endif
+
+ifdef CORE2
+SUFFIX = c2
+ARCH = -march=pentium-m -msse3
 endif
 
 ifdef G4
@@ -235,6 +241,7 @@ SUFFIX = cbe
 ARCH = 
 ENDIAN = big
 endif
+
 
 
 #-------------------------------------------------

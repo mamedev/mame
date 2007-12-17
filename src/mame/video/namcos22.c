@@ -251,14 +251,14 @@ INLINE unsigned texel( unsigned x, unsigned y )
 typedef struct _poly_extra_data poly_extra_data;
 struct _poly_extra_data
 {
+	rgbint fogColor;
+	rgbint fadeColor;
 	int color;
 	int bn;
 	UINT16 flags;
 	int cmode;
 	int fogFactor;
-	rgbint fogColor;
 	int fadeFactor;
-	rgbint fadeColor;
 	const UINT8 *source;		/* sprites */
 	int z;
 	int alpha;

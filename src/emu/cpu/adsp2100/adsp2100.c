@@ -2048,7 +2048,7 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
+static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
 	/* see how many words we need to copy */
 	int pagelen = (srcdata[(3)] + 1) * 8;

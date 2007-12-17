@@ -47,14 +47,10 @@
 
 static PALETTE_INIT( canyon )
 {
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00)); /* BLACK */
-	palette_set_color(machine, 1, MAKE_RGB(0xff, 0xff, 0xff)); /* WHITE */
+	palette_set_color(machine, 0, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
+	palette_set_color(machine, 1, MAKE_RGB(0x00, 0x00, 0x00)); /* BLACK */
 	palette_set_color(machine, 2, MAKE_RGB(0x80, 0x80, 0x80)); /* GREY  */
-
-	colortable[0] = 2;
-	colortable[1] = 0;
-	colortable[2] = 2;
-	colortable[3] = 1;
+	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff)); /* WHITE */
 }
 
 
@@ -253,8 +249,7 @@ static MACHINE_DRIVER_START( canyon )
 	MDRV_SCREEN_SIZE(256, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_GFXDECODE(canyon)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(4)
+	MDRV_PALETTE_LENGTH(4)
 
 	MDRV_PALETTE_INIT(canyon)
 	MDRV_VIDEO_START(canyon)

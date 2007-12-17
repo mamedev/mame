@@ -835,6 +835,7 @@ core_file *chd_core_file(chd_file *chd)
     filename
 -------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTION
 void chd_multi_filename(const char *origname, char *finalname, int index)
 {
 	char *extension;
@@ -856,6 +857,7 @@ void chd_multi_filename(const char *origname, char *finalname, int index)
 		findex[2] = 'h';
 	strcpy(extension, findex);
 }
+#endif
 
 
 

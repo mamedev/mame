@@ -1497,7 +1497,7 @@ static void upd7810_timers(int cycles)
 	}
 }
 
-void upd7810_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void upd7810_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	upd7810.config = *(const UPD7810_CONFIG*) config;
 	upd7810.irq_callback = irqcallback;

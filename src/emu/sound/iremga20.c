@@ -56,7 +56,7 @@ struct IremGA20_chip_def
 	struct IremGA20_channel_def channel[4];
 };
 
-void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
 {
 	struct IremGA20_chip_def *chip = param;
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];

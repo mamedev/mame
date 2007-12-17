@@ -551,7 +551,7 @@ static TIMER_CALLBACK_PTR( pokey_pot_trigger_7 );
 #endif
 
 
-void pokey_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static void pokey_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
 {
 	struct POKEYregisters *chip = param;
 	stream_sample_t *buffer = _buffer[0];
@@ -1037,7 +1037,7 @@ READ8_HANDLER( quad_pokey_r )
 }
 
 
-void pokey_register_w(int chip, int offs, int data)
+static void pokey_register_w(int chip, int offs, int data)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
 	int ch_mask = 0, new_val;
@@ -1473,7 +1473,7 @@ void pokey4_serin_ready(int after)
 	timer_set_ptr(attotime_mul(p->clock_period, after), p, pokey_serin_ready);
 }
 
-void pokey_break_w(int chip, int shift)
+static void pokey_break_w(int chip, int shift)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
     if( shift )                     /* shift code ? */
@@ -1510,7 +1510,7 @@ void pokey4_break_w(int shift)
 	pokey_break_w(3, shift);
 }
 
-void pokey_kbcode_w(int chip, int kbcode, int make)
+static void pokey_kbcode_w(int chip, int kbcode, int make)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
     /* make code ? */

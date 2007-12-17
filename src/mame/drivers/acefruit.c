@@ -240,29 +240,15 @@ static PALETTE_INIT( acefruit )
 	palette_set_color( machine, 6, MAKE_RGB(0xff, 0xff, 0xff) );
 	palette_set_color( machine, 7, MAKE_RGB(0x7f, 0x3f, 0x1f) );
 
-	colortable[ 0 ] = 0;
-	colortable[ 1 ] = 1;
-	colortable[ 2 ] = 2;
-	colortable[ 3 ] = 3;
-	colortable[ 4 ] = 4;
-	colortable[ 5 ] = 5;
-	colortable[ 6 ] = 6;
-	colortable[ 7 ] = 7;
-
 	/* tiles */
-	palette_set_color( machine, 8, MAKE_RGB(0xff, 0xff, 0xff) );
-	palette_set_color( machine, 9, MAKE_RGB(0x00, 0x00, 0xff) );
-	palette_set_color( machine, 10, MAKE_RGB(0x00, 0xff, 0x00) );
-	palette_set_color( machine, 11, MAKE_RGB(0xff, 0x00, 0x00) );
-
-	colortable[ 8 ] = 0;
-	colortable[ 9 ] = 8;
-	colortable[ 10 ] = 0;
-	colortable[ 11 ] = 9;
-	colortable[ 12 ] = 0;
-	colortable[ 13 ] = 10;
-	colortable[ 14 ] = 0;
-	colortable[ 15 ] = 11;
+	palette_set_color( machine, 8, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine, 9, MAKE_RGB(0xff, 0xff, 0xff) );
+	palette_set_color( machine, 10, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine, 11, MAKE_RGB(0x00, 0x00, 0xff) );
+	palette_set_color( machine, 12, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine, 13, MAKE_RGB(0x00, 0xff, 0x00) );
+	palette_set_color( machine, 14, MAKE_RGB(0x00, 0x00, 0x00) );
+	palette_set_color( machine, 15, MAKE_RGB(0xff, 0x00, 0x00) );
 }
 
 static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -573,8 +559,7 @@ static MACHINE_DRIVER_START( acefruit )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
-	MDRV_PALETTE_LENGTH(12)
-	MDRV_COLORTABLE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

@@ -59,45 +59,22 @@ static PALETTE_INIT( fgoal )
 {
 	int i;
 
-	for (i = 0; i < 64; i++)
-	{
-		int r = (i >> 4) & 3;
-		int g = (i >> 2) & 3;
-		int b = (i >> 0) & 3;
-
-		palette_set_color_rgb(machine,i,
-			intensity(r),
-			intensity(g),
-			intensity(b));
-	}
-
-	palette_set_color(machine,0x40,MAKE_RGB(0x2e,0x80,0x2e));
-	palette_set_color(machine,0x41,MAKE_RGB(0x2e,0x2e,0x2e));
-
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */
 
 	for (i = 0; i < 128; i++)
 	{
-		colortable[i] = color_prom[0x80 | i] & 63;
+		UINT8 color = color_prom[0x80 | i] & 63;
+		palette_set_color_rgb(machine, i, intensity(color >> 4), intensity(color >> 2), intensity(color >> 0));
 	}
 
-	colortable[0x80] = 0x40;
-	colortable[0x81] = 0x40;
-	colortable[0x82] = 0x40;
-	colortable[0x83] = 0x40;
-	colortable[0x84] = 0x40;
-	colortable[0x85] = 0x40;
-	colortable[0x86] = 0x40;
-	colortable[0x87] = 0x40;
+	for (i = 0; i < 8; i++)
+	{
+		palette_set_color(machine, 128 + 0*8 + i, MAKE_RGB(0x2e,0x80,0x2e));
+		palette_set_color(machine, 128 + 1*8 + i, MAKE_RGB(0x2e,0x2e,0x2e));
+	}
 
-	colortable[0x88] = 0x41;
-	colortable[0x89] = 0x41;
-	colortable[0x8a] = 0x41;
-	colortable[0x8b] = 0x41;
-	colortable[0x8c] = 0x41;
-	colortable[0x8d] = 0x41;
-	colortable[0x8e] = 0x41;
-	colortable[0x8f] = 0x41;
+	/* ball is a fixed color */
+	palette_set_color_rgb(machine, 128 + 16, intensity(0x38 >> 4), intensity(0x38 >> 2), intensity(0x38 >> 0));
 }
 
 
@@ -398,8 +375,7 @@ static MACHINE_DRIVER_START( fgoal )
 	MDRV_SCREEN_SIZE(256, 263)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 255)
 	MDRV_GFXDECODE(fgoal)
-	MDRV_PALETTE_LENGTH(64 + 2)
-	MDRV_COLORTABLE_LENGTH(128 + 16)
+	MDRV_PALETTE_LENGTH(128 + 16 + 1)
 
 	MDRV_PALETTE_INIT(fgoal)
 	MDRV_VIDEO_START(fgoal)

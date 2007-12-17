@@ -1092,7 +1092,7 @@ WRITE16_HANDLER( pipibibi_spriteram16_w )
 
 
 #ifdef MAME_DEBUG
-void toaplan2_log_vram(void)
+static void toaplan2_log_vram(void)
 {
 	offs_t sprite_voffs, tile_voffs;
 	int vid_controllers = 1;

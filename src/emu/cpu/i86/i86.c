@@ -57,7 +57,7 @@ i8086_Regs;
 /* cpu state                                                               */
 /***************************************************************************/
 
-int i8086_ICount;
+static int i8086_ICount;
 
 static i8086_Regs I;
 static unsigned prefix_base;		   /* base address of the latest prefix segment */

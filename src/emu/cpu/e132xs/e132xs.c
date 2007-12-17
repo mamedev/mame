@@ -212,8 +212,15 @@
 *********************************************************************/
 
 #include "debugger.h"
+#include "eminline.h"
 #include "e132xs.h"
 #include "osd_cpu.h"
+
+#ifdef MAME_DEBUG
+#define DEBUG_PRINTF(x) do { mame_printf_debug x; } while (0)
+#else
+#define DEBUG_PRINTF(x) do { } while (0)
+#endif
 
 static UINT8  (*hyp_cpu_read_byte)(offs_t address);
 static UINT16 (*hyp_cpu_read_half_word)(offs_t address);
@@ -230,115 +237,6 @@ int hyp_type_16bit;
 #define MISSIONCRAFT_FLAGS 1
 
 static int hyperstone_ICount;
-
-static void hyperstone_chk(void);
-static void hyperstone_movd(void);
-static void hyperstone_divu(void);
-static void hyperstone_divs(void);
-static void hyperstone_xm(void);
-static void hyperstone_mask(void);
-static void hyperstone_sum(void);
-static void hyperstone_sums(void);
-static void hyperstone_cmp(void);
-static void hyperstone_mov(void);
-static void hyperstone_add(void);
-static void hyperstone_adds(void);
-static void hyperstone_cmpb(void);
-static void hyperstone_andn(void);
-static void hyperstone_or(void);
-static void hyperstone_xor(void);
-static void hyperstone_subc(void);
-static void hyperstone_not(void);
-static void hyperstone_sub(void);
-static void hyperstone_subs(void);
-static void hyperstone_addc(void);
-static void hyperstone_and(void);
-static void hyperstone_neg(void);
-static void hyperstone_negs(void);
-static void hyperstone_cmpi(void);
-static void hyperstone_movi(void);
-static void hyperstone_addi(void);
-static void hyperstone_addsi(void);
-static void hyperstone_cmpbi(void);
-static void hyperstone_andni(void);
-static void hyperstone_ori(void);
-static void hyperstone_xori(void);
-static void hyperstone_shrdi(void);
-static void hyperstone_shrd(void);
-static void hyperstone_shr(void);
-static void hyperstone_sardi(void);
-static void hyperstone_sard(void);
-static void hyperstone_sar(void);
-static void hyperstone_shldi(void);
-static void hyperstone_shld(void);
-static void hyperstone_shl(void);
-static void reserved(void);
-static void hyperstone_testlz(void);
-static void hyperstone_rol(void);
-static void hyperstone_ldxx1(void);
-static void hyperstone_ldxx2(void);
-static void hyperstone_stxx1(void);
-static void hyperstone_stxx2(void);
-static void hyperstone_shri(void);
-static void hyperstone_sari(void);
-static void hyperstone_shli(void);
-static void hyperstone_mulu(void);
-static void hyperstone_muls(void);
-static void hyperstone_set(void);
-static void hyperstone_mul(void);
-static void hyperstone_fadd(void);
-static void hyperstone_faddd(void);
-static void hyperstone_fsub(void);
-static void hyperstone_fsubd(void);
-static void hyperstone_fmul(void);
-static void hyperstone_fmuld(void);
-static void hyperstone_fdiv(void);
-static void hyperstone_fdivd(void);
-static void hyperstone_fcmp(void);
-static void hyperstone_fcmpd(void);
-static void hyperstone_fcmpu(void);
-static void hyperstone_fcmpud(void);
-static void hyperstone_fcvt(void);
-static void hyperstone_fcvtd(void);
-static void hyperstone_extend(void);
-static void hyperstone_do(void);
-static void hyperstone_ldwr(void);
-static void hyperstone_lddr(void);
-static void hyperstone_ldwp(void);
-static void hyperstone_lddp(void);
-static void hyperstone_stwr(void);
-static void hyperstone_stdr(void);
-static void hyperstone_stwp(void);
-static void hyperstone_stdp(void);
-static void hyperstone_dbv(void);
-static void hyperstone_dbnv(void);
-static void hyperstone_dbe(void);
-static void hyperstone_dbne(void);
-static void hyperstone_dbc(void);
-static void hyperstone_dbnc(void);
-static void hyperstone_dbse(void);
-static void hyperstone_dbht(void);
-static void hyperstone_dbn(void);
-static void hyperstone_dbnn(void);
-static void hyperstone_dble(void);
-static void hyperstone_dbgt(void);
-static void hyperstone_dbr(void);
-static void hyperstone_frame(void);
-static void hyperstone_call(void);
-static void hyperstone_bv(void);
-static void hyperstone_bnv(void);
-static void hyperstone_be(void);
-static void hyperstone_bne(void);
-static void hyperstone_bc(void);
-static void hyperstone_bnc(void);
-static void hyperstone_bse(void);
-static void hyperstone_bht(void);
-static void hyperstone_bn(void);
-static void hyperstone_bnn(void);
-static void hyperstone_ble(void);
-static void hyperstone_bgt(void);
-static void hyperstone_br(void);
-static void hyperstone_trap(void);
 
 /* Registers */
 
@@ -417,15 +315,23 @@ typedef struct
 	UINT16	op;		// opcode
 	UINT32	trap_entry; // entry point to get trap address
 
-	UINT8	n;
-	INT32	delay_timer;
-	int		timer_clocks;
+	UINT8	clock_scale_mask;
+	UINT8	clock_scale;
+	UINT8	clock_cycles_1;
+	UINT8	clock_cycles_2;
+	UINT8	clock_cycles_4;
+	UINT8	clock_cycles_6;
+
+	UINT64	tr_base_cycles;
+	UINT32	tr_base_value;
+	UINT32	tr_clocks_per_tick;
+	UINT8	timer_int_pending;
+	emu_timer *timer;
 
 	struct _delay delay;
 
 	int	(*irq_callback)(int irqline);
 
-	INT32 h_clear;
 	INT32 instruction_length;
 	INT32 intblock;
 
@@ -433,7 +339,7 @@ typedef struct
 
 static hyperstone_regs hyperstone;
 
-static struct regs_decode
+struct regs_decode
 {
 	UINT8	src, dst;	    // destination and source register code
 	UINT32	src_value;      // current source register value
@@ -443,39 +349,39 @@ static struct regs_decode
 	UINT8	sub_type;		// sub type opcode (for DD and X_CODE bits)
 	union
 	{
-			UINT32 u;
-			INT32  s;
+		UINT32 u;
+		INT32  s;
 	} extra;				// extra value such as immediate value, const, pcrel, ...
-	void	(*set_src_register)(UINT8 reg, UINT32 data);  // set local / global source register
-	void	(*set_dst_register)(UINT8 reg, UINT32 data);  // set local / global destination register
-	UINT8	src_is_pc;
-	UINT8	dst_is_pc;
-	UINT8	src_is_sr;
-	UINT8	dst_is_sr;
+	UINT8	src_is_local;
+	UINT8	dst_is_local;
 	UINT8   same_src_dst;
 	UINT8   same_src_dstf;
 	UINT8   same_srcf_dst;
-} current_regs;
+	UINT16	op;
+};
 
-#define SREG  current_regs.src_value
-#define SREGF current_regs.next_src_value
-#define DREG  current_regs.dst_value
-#define DREGF current_regs.next_dst_value
-#define EXTRA_U current_regs.extra.u
-#define EXTRA_S current_regs.extra.s
+static void check_interrupts(void);
 
-#define SET_SREG( _data_ )  (*current_regs.set_src_register)(current_regs.src, _data_)
-#define SET_SREGF( _data_ ) (*current_regs.set_src_register)(current_regs.src + 1, _data_)
-#define SET_DREG( _data_ )  (*current_regs.set_dst_register)(current_regs.dst, _data_)
-#define SET_DREGF( _data_ ) (*current_regs.set_dst_register)(current_regs.dst + 1, _data_)
+#define SREG  (decode)->src_value
+#define SREGF (decode)->next_src_value
+#define DREG  (decode)->dst_value
+#define DREGF (decode)->next_dst_value
+#define EXTRA_U (decode)->extra.u
+#define EXTRA_S (decode)->extra.s
+#define OP    (decode)->op
 
-#define SRC_IS_PC      current_regs.src_is_pc
-#define DST_IS_PC      current_regs.dst_is_pc
-#define SRC_IS_SR      current_regs.src_is_sr
-#define DST_IS_SR      current_regs.dst_is_sr
-#define SAME_SRC_DST   current_regs.same_src_dst
-#define SAME_SRC_DSTF  current_regs.same_src_dstf
-#define SAME_SRCF_DST  current_regs.same_srcf_dst
+#define SET_SREG( _data_ )  ((decode)->src_is_local ? set_local_register((decode)->src, _data_) : set_global_register((decode)->src, _data_))
+#define SET_SREGF( _data_ ) ((decode)->src_is_local ? set_local_register((decode)->src + 1, _data_) : set_global_register((decode)->src + 1, _data_))
+#define SET_DREG( _data_ )  ((decode)->dst_is_local ? set_local_register((decode)->dst, _data_) : set_global_register((decode)->dst, _data_))
+#define SET_DREGF( _data_ ) ((decode)->dst_is_local ? set_local_register((decode)->dst + 1, _data_) : set_global_register((decode)->dst + 1, _data_))
+
+#define SRC_IS_PC      (!(decode)->src_is_local && (decode)->src == PC_REGISTER)
+#define DST_IS_PC      (!(decode)->dst_is_local && (decode)->dst == PC_REGISTER)
+#define SRC_IS_SR      (!(decode)->src_is_local && (decode)->src == SR_REGISTER)
+#define DST_IS_SR      (!(decode)->dst_is_local && (decode)->dst == SR_REGISTER)
+#define SAME_SRC_DST   (decode)->same_src_dst
+#define SAME_SRC_DSTF  (decode)->same_src_dstf
+#define SAME_SRCF_DST  (decode)->same_srcf_dst
 
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static UINT32 program_read_dword_16be(offs_t address)
@@ -501,74 +407,6 @@ static void io_write_dword_16be(offs_t address, UINT32 data)
 }
 #endif
 
-
-/* Opcodes table */
-static void (*hyperstone_op[0x100])(void) = {
-	hyperstone_chk,	 hyperstone_chk,  hyperstone_chk,   hyperstone_chk,		/* CHK - CHKZ - NOP */
-	hyperstone_movd, hyperstone_movd, hyperstone_movd,  hyperstone_movd,	/* MOVD - RET */
-	hyperstone_divu, hyperstone_divu, hyperstone_divu,  hyperstone_divu,	/* DIVU */
-	hyperstone_divs, hyperstone_divs, hyperstone_divs,  hyperstone_divs,	/* DIVS */
-	hyperstone_xm,	 hyperstone_xm,   hyperstone_xm,    hyperstone_xm,		/* XMx - XXx */
-	hyperstone_mask, hyperstone_mask, hyperstone_mask,  hyperstone_mask,	/* MASK */
-	hyperstone_sum,  hyperstone_sum,  hyperstone_sum,   hyperstone_sum,		/* SUM */
-	hyperstone_sums, hyperstone_sums, hyperstone_sums,  hyperstone_sums,	/* SUMS */
-	hyperstone_cmp,  hyperstone_cmp,  hyperstone_cmp,   hyperstone_cmp,		/* CMP */
-	hyperstone_mov,  hyperstone_mov,  hyperstone_mov,   hyperstone_mov,		/* MOV */
-	hyperstone_add,  hyperstone_add,  hyperstone_add,   hyperstone_add,		/* ADD */
-	hyperstone_adds, hyperstone_adds, hyperstone_adds,  hyperstone_adds,	/* ADDS */
-	hyperstone_cmpb, hyperstone_cmpb, hyperstone_cmpb,  hyperstone_cmpb,	/* CMPB */
-	hyperstone_andn, hyperstone_andn, hyperstone_andn,  hyperstone_andn,	/* ANDN */
-	hyperstone_or,   hyperstone_or,   hyperstone_or,    hyperstone_or,		/* OR */
-	hyperstone_xor,  hyperstone_xor,  hyperstone_xor,   hyperstone_xor,		/* XOR */
-	hyperstone_subc, hyperstone_subc, hyperstone_subc,  hyperstone_subc,	/* SUBC */
-	hyperstone_not,  hyperstone_not,  hyperstone_not,   hyperstone_not,		/* NOT */
-	hyperstone_sub,  hyperstone_sub,  hyperstone_sub,   hyperstone_sub,		/* SUB */
-	hyperstone_subs, hyperstone_subs, hyperstone_subs,  hyperstone_subs,	/* SUBS */
-	hyperstone_addc, hyperstone_addc, hyperstone_addc,  hyperstone_addc,	/* ADDC */
-	hyperstone_and,  hyperstone_and,  hyperstone_and,   hyperstone_and,		/* AND */
-	hyperstone_neg,  hyperstone_neg,  hyperstone_neg,   hyperstone_neg,		/* NEG */
-	hyperstone_negs, hyperstone_negs, hyperstone_negs,  hyperstone_negs,	/* NEGS */
-	hyperstone_cmpi, hyperstone_cmpi, hyperstone_cmpi,  hyperstone_cmpi,	/* CMPI */
-	hyperstone_movi, hyperstone_movi, hyperstone_movi,  hyperstone_movi,	/* MOVI */
-	hyperstone_addi, hyperstone_addi, hyperstone_addi,  hyperstone_addi,	/* ADDI */
-	hyperstone_addsi,hyperstone_addsi,hyperstone_addsi, hyperstone_addsi,	/* ADDSI */
-	hyperstone_cmpbi,hyperstone_cmpbi,hyperstone_cmpbi, hyperstone_cmpbi,	/* CMPBI */
-	hyperstone_andni,hyperstone_andni,hyperstone_andni, hyperstone_andni,	/* ANDNI */
-	hyperstone_ori,  hyperstone_ori,  hyperstone_ori,   hyperstone_ori,		/* ORI */
-	hyperstone_xori, hyperstone_xori, hyperstone_xori,  hyperstone_xori,	/* XORI */
-	hyperstone_shrdi,hyperstone_shrdi,hyperstone_shrd,  hyperstone_shr,		/* SHRDI, SHRD, SHR */
-	hyperstone_sardi,hyperstone_sardi,hyperstone_sard,  hyperstone_sar,		/* SARDI, SARD, SAR */
-	hyperstone_shldi,hyperstone_shldi,hyperstone_shld,  hyperstone_shl,		/* SHLDI, SHLD, SHL */
-	reserved,		 reserved,		  hyperstone_testlz,hyperstone_rol,		/* RESERVED, TESTLZ, ROL */
-	hyperstone_ldxx1,hyperstone_ldxx1,hyperstone_ldxx1, hyperstone_ldxx1,	/* LDxx.D/A/IOD/IOA */
-	hyperstone_ldxx2,hyperstone_ldxx2,hyperstone_ldxx2, hyperstone_ldxx2,	/* LDxx.N/S */
-	hyperstone_stxx1,hyperstone_stxx1,hyperstone_stxx1, hyperstone_stxx1,	/* STxx.D/A/IOD/IOA */
-	hyperstone_stxx2,hyperstone_stxx2,hyperstone_stxx2, hyperstone_stxx2,	/* STxx.N/S */
-	hyperstone_shri, hyperstone_shri, hyperstone_shri,  hyperstone_shri,	/* SHRI */
-	hyperstone_sari, hyperstone_sari, hyperstone_sari,  hyperstone_sari,	/* SARI */
-	hyperstone_shli, hyperstone_shli, hyperstone_shli,  hyperstone_shli,	/* SHLI */
-	reserved,		 reserved,		  reserved,			reserved,			/* RESERVED */
-	hyperstone_mulu, hyperstone_mulu, hyperstone_mulu,  hyperstone_mulu,	/* MULU */
-	hyperstone_muls, hyperstone_muls, hyperstone_muls,  hyperstone_muls,	/* MULS */
-	hyperstone_set,  hyperstone_set,  hyperstone_set,   hyperstone_set,		/* SETxx - SETADR - FETCH */
-	hyperstone_mul,  hyperstone_mul,  hyperstone_mul,   hyperstone_mul,		/* MUL */
-	hyperstone_fadd, hyperstone_faddd,hyperstone_fsub,  hyperstone_fsubd,	/* FADD, FADDD, FSUB, FSUBD */
-	hyperstone_fmul, hyperstone_fmuld,hyperstone_fdiv,  hyperstone_fdivd,	/* FMUL, FMULD, FDIV, FDIVD */
-	hyperstone_fcmp, hyperstone_fcmpd,hyperstone_fcmpu, hyperstone_fcmpud,	/* FCMP, FCMPD, FCMPU, FCMPUD */
-	hyperstone_fcvt, hyperstone_fcvtd,hyperstone_extend,hyperstone_do,		/* FCVT, FCVTD, EXTEND, DO */
-	hyperstone_ldwr, hyperstone_ldwr, hyperstone_lddr,  hyperstone_lddr,	/* LDW.R, LDD.R */
-	hyperstone_ldwp, hyperstone_ldwp, hyperstone_lddp,  hyperstone_lddp,	/* LDW.P, LDD.P */
-	hyperstone_stwr, hyperstone_stwr, hyperstone_stdr,  hyperstone_stdr,	/* STW.R, STD.R */
-	hyperstone_stwp, hyperstone_stwp, hyperstone_stdp,  hyperstone_stdp,	/* STW.P, STD.P */
-	hyperstone_dbv,  hyperstone_dbnv, hyperstone_dbe,   hyperstone_dbne,	/* DBV, DBNV, DBE, DBNE */
-	hyperstone_dbc,  hyperstone_dbnc, hyperstone_dbse,  hyperstone_dbht,	/* DBC, DBNC, DBSE, DBHT */
-	hyperstone_dbn,  hyperstone_dbnn, hyperstone_dble,  hyperstone_dbgt,	/* DBN, DBNN, DBLE, DBGT */
-	hyperstone_dbr,  hyperstone_frame,hyperstone_call,  hyperstone_call,	/* DBR, FRAME, CALL */
-	hyperstone_bv,   hyperstone_bnv,  hyperstone_be,    hyperstone_bne,		/* BV, BNV, BE, BNE */
-	hyperstone_bc,   hyperstone_bnc,  hyperstone_bse,   hyperstone_bht,		/* BC, BNC, BSE, BHT */
-	hyperstone_bn,   hyperstone_bnn,  hyperstone_ble,   hyperstone_bgt,		/* BN, BNN, BLE, BGT */
- 	hyperstone_br,   hyperstone_trap, hyperstone_trap,  hyperstone_trap		/* BR, TRAPxx - TRAP */
-};
 
 // 4Kb IRAM (On-Chip Memory)
 #if (HAS_E116T || HAS_GMS30C2116)
@@ -680,12 +518,10 @@ static void hyperstone_set_trap_entry(int which)
 			break;
 
 		default:
-			logerror("Set entry point to a reserved value: %d\n", which);
+			DEBUG_PRINTF(("Set entry point to a reserved value: %d\n", which));
 			break;
 	}
 }
-
-#define OP				hyperstone.op
 
 #define PPC				hyperstone.ppc //previous pc
 #define PC				hyperstone.global_regs[0] //Program Counter
@@ -698,7 +534,7 @@ static void hyperstone_set_trap_entry(int which)
 #define BCR				hyperstone.global_regs[20] //Bus Control Register
 #define TPR				hyperstone.global_regs[21] //Timer Prescaler Register
 #define TCR				hyperstone.global_regs[22] //Timer Compare Register
-#define TR				hyperstone.global_regs[23] //Timer Register
+#define TR				compute_tr() //Timer Register
 #define WCR				hyperstone.global_regs[24] //Watchdog Compare Register
 #define ISR				hyperstone.global_regs[25] //Input Status Register
 #define FCR				hyperstone.global_regs[26] //Function Control Register
@@ -761,6 +597,96 @@ static void hyperstone_set_trap_entry(int which)
 //other bits are reversed, in particular 7 - 5 for the operating system.
 //the user program can only changes the above 2 flags
 
+
+
+
+static UINT32 compute_tr(void)
+{
+	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
+	return hyperstone.tr_base_value + (clocks_since_base / hyperstone.tr_clocks_per_tick);
+}
+
+static void update_timer_prescale(void)
+{
+	UINT32 prevtr = compute_tr();
+	TPR &= ~0x80000000;
+	hyperstone.clock_scale = (TPR >> 26) & hyperstone.clock_scale_mask;
+	hyperstone.clock_cycles_1 = 1 << hyperstone.clock_scale;
+	hyperstone.clock_cycles_2 = 2 << hyperstone.clock_scale;
+	hyperstone.clock_cycles_4 = 4 << hyperstone.clock_scale;
+	hyperstone.clock_cycles_6 = 6 << hyperstone.clock_scale;
+	hyperstone.tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
+	hyperstone.tr_base_value = prevtr;
+	hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+}
+
+static void adjust_timer_interrupt(void)
+{
+	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
+	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << hyperstone.clock_scale);
+	int cpunum = cpu_getactivecpu();
+
+	if (cycles_until_next_clock == 0)
+		cycles_until_next_clock = (UINT64)(1 << hyperstone.clock_scale);
+
+	/* special case: if we have a change pending, set a timer to fire then */
+	if (TPR & 0x80000000)
+	{
+		UINT64 clocks_until_int = hyperstone.tr_clocks_per_tick - (clocks_since_base % hyperstone.tr_clocks_per_tick);
+		UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
+		timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1, attotime_never);
+	}
+
+	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
+	else if (!(FCR & 0x00800000))
+	{
+		UINT32 curtr = hyperstone.tr_base_value + (clocks_since_base / hyperstone.tr_clocks_per_tick);
+		UINT32 delta = TCR - curtr;
+		if (delta > 0x80000000)
+		{
+			if (!hyperstone.timer_int_pending)
+				timer_adjust(hyperstone.timer, attotime_zero, cpunum * 2 + 0, attotime_never);
+		}
+		else
+		{
+			UINT64 clocks_until_int = mulu_32x32(delta, hyperstone.tr_clocks_per_tick);
+			UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
+			timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0, attotime_never);
+		}
+	}
+
+	/* otherwise, disable the timer */
+	else
+		timer_adjust(hyperstone.timer, attotime_never, 0, attotime_never);
+}
+
+static TIMER_CALLBACK( timer_callback )
+{
+	int update = param & 1;
+	int cpunum = param >> 1;
+
+	cpuintrf_push_context(cpunum);
+
+	/* update the values if necessary */
+	if (update)
+		update_timer_prescale();
+
+	/* see if the timer is right for firing */
+	if (!((compute_tr() - TCR) & 0x80000000))
+		hyperstone.timer_int_pending = 1;
+
+	/* adjust ourselves for the next time */
+	else
+		adjust_timer_interrupt();
+
+	cpuintrf_pop_context();
+}
+
+
+
+
 static UINT32 get_global_register(UINT8 code)
 {
 /*
@@ -774,31 +700,38 @@ static UINT32 get_global_register(UINT8 code)
         case 29:
         case 30:
         case 31:
-            mame_printf_debug("read _Reserved_ Global Register %d @ %08X\n",code,PC);
+            DEBUG_PRINTF(("read _Reserved_ Global Register %d @ %08X\n",code,PC));
             break;
 
         case BCR_REGISTER:
-            mame_printf_debug("read write-only BCR register @ %08X\n",PC);
+            DEBUG_PRINTF(("read write-only BCR register @ %08X\n",PC));
             return 0;
 
         case TPR_REGISTER:
-            mame_printf_debug("read write-only TPR register @ %08X\n",PC);
+            DEBUG_PRINTF(("read write-only TPR register @ %08X\n",PC));
             return 0;
 
         case FCR_REGISTER:
-            mame_printf_debug("read write-only FCR register @ %08X\n",PC);
+            DEBUG_PRINTF(("read write-only FCR register @ %08X\n",PC));
             return 0;
 
         case MCR_REGISTER:
-            mame_printf_debug("read write-only MCR register @ %08X\n",PC);
+            DEBUG_PRINTF(("read write-only MCR register @ %08X\n",PC));
             return 0;
         }
     }
 */
+	if (code == TR_REGISTER)
+	{
+		/* it is common to poll this in a loop */
+		if (hyperstone_ICount > hyperstone.tr_clocks_per_tick / 2)
+			hyperstone_ICount -= hyperstone.tr_clocks_per_tick / 2;
+		return compute_tr();
+	}
 	return hyperstone.global_regs[code];
 }
 
-static void set_global_register(UINT8 code, UINT32 val)
+INLINE void set_global_register(UINT8 code, UINT32 val)
 {
 	//TODO: add correct FER set instruction
 
@@ -810,15 +743,17 @@ static void set_global_register(UINT8 code, UINT32 val)
 	else if( code == SR_REGISTER )
 	{
 		SET_LOW_SR(val); // only a RET instruction can change the full content of SR
-
 		SR &= ~0x40; //reserved bit 6 always zero
+		if (hyperstone.intblock < 1)
+			hyperstone.intblock = 1;
 	}
 	else
 	{
+		UINT32 oldval = hyperstone.global_regs[code];
 		if( code != ISR_REGISTER )
 			hyperstone.global_regs[code] = val;
 		else
-			logerror("Written to ISR register. PC = %08X\n", PC);
+			DEBUG_PRINTF(("Written to ISR register. PC = %08X\n", PC));
 
 		//are these set only when privilege bit is set?
 		if( code >= 16 )
@@ -834,19 +769,19 @@ static void set_global_register(UINT8 code, UINT32 val)
 				break;
 /*
             case ISR_REGISTER:
-                mame_printf_debug("written %08X to read-only ISR register\n",val);
+                DEBUG_PRINTF(("written %08X to read-only ISR register\n",val));
                 break;
 
-            case 22:
-//              mame_printf_debug("written %08X to TCR register\n",val);
+            case TCR_REGISTER:
+//              DEBUG_PRINTF(("written %08X to TCR register\n",val));
                 break;
 
             case 23:
-//              mame_printf_debug("written %08X to TR register\n",val);
+//              DEBUG_PRINTF(("written %08X to TR register\n",val));
                 break;
 
             case 24:
-//              mame_printf_debug("written %08X to WCR register\n",val);
+//              DEBUG_PRINTF(("written %08X to WCR register\n",val));
                 break;
 
             case 16:
@@ -855,57 +790,50 @@ static void set_global_register(UINT8 code, UINT32 val)
             case 29:
             case 30:
             case 31:
-                mame_printf_debug("written %08X to _Reserved_ Global Register %d\n",val,code);
+                DEBUG_PRINTF(("written %08X to _Reserved_ Global Register %d\n",val,code));
                 break;
 
             case BCR_REGISTER:
                 break;
 */
-			case TPR_REGISTER:
-
-				hyperstone.n = (val & 0xff0000) >> 16;
-
-				if(!(val & 0x80000000)) /* change immediately */
-				{
-					hyperstone.delay_timer = 0;
-					hyperstone.timer_clocks = hyperstone.n + 2;
-				}
-				else
-				{
-					hyperstone.delay_timer = 1;
-				}
-
+			case TR_REGISTER:
+				hyperstone.tr_base_value = val;
+				hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+				adjust_timer_interrupt();
 				break;
-/*
-            case FCR_REGISTER:
-                switch((val & 0x3000)>>12)
-                {
-                case 0:
-                    mame_printf_debug("IO3 interrupt mode\n");
-                    break;
-                case 1:
-                    mame_printf_debug("IO3 timing mode\n");
-                    break;
-                case 2:
-                    mame_printf_debug("watchdog mode\n");
-                    break;
-                case 3:
-                    // IO3 standard mode
-                    break;
-                }
+
+			case TPR_REGISTER:
+				if (!(val & 0x80000000)) /* change immediately */
+					update_timer_prescale();
+				adjust_timer_interrupt();
+				break;
+
+            case TCR_REGISTER:
+            	if (oldval != val)
+            	{
+					adjust_timer_interrupt();
+					if (hyperstone.intblock < 1)
+						hyperstone.intblock = 1;
+				}
                 break;
-*/
+
+            case FCR_REGISTER:
+            	if ((oldval ^ val) & 0x00800000)
+					adjust_timer_interrupt();
+				if (hyperstone.intblock < 1)
+					hyperstone.intblock = 1;
+                break;
+
 			case MCR_REGISTER:
 				// bits 14..12 EntryTableMap
 				hyperstone_set_trap_entry((val & 0x7000) >> 12);
-
 				break;
 			}
 		}
 	}
 }
 
-static void set_local_register(UINT8 code, UINT32 val)
+INLINE void set_local_register(UINT8 code, UINT32 val)
 {
 	UINT8 new_code = (code + GET_FP) % 64;
 
@@ -928,526 +856,454 @@ static void set_local_register(UINT8 code, UINT32 val)
 
 #define LOCAL  1
 
-static void decode_source(int local, int hflag)
+static const INT32 immediate_values[32] =
 {
-	if(local)
-	{
-		UINT8 code = current_regs.src;
-		current_regs.set_src_register = set_local_register;
-		code = (current_regs.src + GET_FP) % 64; // registers offset by frame pointer
-		SREG = hyperstone.local_regs[code];
-		code = (current_regs.src + 1 + GET_FP) % 64;
-		SREGF = hyperstone.local_regs[code];
-	}
-	else
-	{
-		current_regs.set_src_register = set_global_register;
-
-		if(hflag)
-			current_regs.src += hflag * 16;
-
-		SREG = hyperstone.global_regs[current_regs.src];
-
-		/* bound safe */
-		if(current_regs.src != 15 && current_regs.src != 31)
-			SREGF = hyperstone.global_regs[current_regs.src + 1];
-
-		if(current_regs.src == PC_REGISTER)
-			SRC_IS_PC = 1;
-		else if(current_regs.src == SR_REGISTER)
-			SRC_IS_SR = 1;
-		else if( current_regs.src == BCR_REGISTER || current_regs.src == TPR_REGISTER ||
-				 current_regs.src == FCR_REGISTER || current_regs.src == MCR_REGISTER )
-		{
-			SREG = 0; // write-only registers
-		}
-		else if( current_regs.src == ISR_REGISTER )
-			mame_printf_debug("read src ISR. PC = %08X\n",PPC);
-	}
-}
-
-static void decode_dest(int local, int hflag)
-{
-	if(local)
-	{
-		UINT8 code = current_regs.dst;
-		current_regs.set_dst_register = set_local_register;
-		code = (current_regs.dst + GET_FP) % 64; // registers offset by frame pointer
-		DREG = hyperstone.local_regs[code];
-		code = (current_regs.dst + 1 + GET_FP) % 64;
-		DREGF = hyperstone.local_regs[code];
-	}
-	else
-	{
-		current_regs.set_dst_register = set_global_register;
-
-		if(hflag)
-			current_regs.dst += hflag * 16;
-
-		DREG = hyperstone.global_regs[current_regs.dst];
-
-		/* bound safe */
-		if(current_regs.dst != 15 && current_regs.dst != 31)
-			DREGF = hyperstone.global_regs[current_regs.dst + 1];
-
-		if(current_regs.dst == PC_REGISTER)
-			DST_IS_PC = 1;
-		else if(current_regs.dst == SR_REGISTER)
-			DST_IS_SR = 1;
-		else if( current_regs.src == ISR_REGISTER )
-			mame_printf_debug("read dst ISR. PC = %08X\n",PPC);
-	}
-}
-
-INLINE void decode_RR(void)
-{
-	current_regs.src = SRC_CODE;
-	current_regs.dst = DST_CODE;
-	decode_source(S_BIT, 0);
-	decode_dest(D_BIT, 0);
-
-	if( SRC_CODE == DST_CODE && S_BIT == D_BIT )
-		SAME_SRC_DST = 1;
-
-	if( S_BIT == LOCAL && D_BIT == LOCAL )
-	{
-		if( SRC_CODE == ((DST_CODE + 1) % 64) )
-			SAME_SRC_DSTF = 1;
-
-		if( ((SRC_CODE + 1) % 64) == DST_CODE )
-			SAME_SRCF_DST = 1;
-	}
-	else if( S_BIT == 0 && D_BIT == 0 )
-	{
-		if( SRC_CODE == (DST_CODE + 1) )
-			SAME_SRC_DSTF = 1;
-
-		if( (SRC_CODE + 1) == DST_CODE )
-			SAME_SRCF_DST = 1;
-	}
-}
-
-INLINE void decode_LL(void)
-{
-	current_regs.src = SRC_CODE;
-	current_regs.dst = DST_CODE;
-	decode_source(LOCAL, 0);
-	decode_dest(LOCAL, 0);
-
-	if( SRC_CODE == DST_CODE )
-		SAME_SRC_DST = 1;
-
-	if( SRC_CODE == ((DST_CODE + 1) % 64) )
-		SAME_SRC_DSTF = 1;
-}
-
-INLINE void decode_LR(void)
-{
-	current_regs.src = SRC_CODE;
-	current_regs.dst = DST_CODE;
-	decode_source(S_BIT, 0);
-	decode_dest(LOCAL, 0);
-
-	if( ((SRC_CODE + 1) % 64) == DST_CODE && S_BIT == LOCAL )
-		SAME_SRCF_DST = 1;
-}
-
-INLINE void check_delay_PC(void)
-{
-	// if PC is used in a delay instruction, the delayed PC should be used
-	if( hyperstone.delay.delay_cmd == DELAY_EXECUTE )
-	{
-		PC = hyperstone.delay.delay_pc;
-		hyperstone.delay.delay_cmd = NO_DELAY;
-	}
-}
-
-INLINE void decode_immediate(void)
-{
-	switch( N_VALUE )
-	{
-		case 0:	case 1:  case 2:  case 3:  case 4:  case 5:  case 6:  case 7: case 8:
-		case 9:	case 10: case 11: case 12: case 13: case 14: case 15: case 16:
-			EXTRA_U = N_VALUE;
-			break;
-
-		case 17:
-			hyperstone.instruction_length = 3;
-			EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);
-			PC += 4;
-			break;
-
-		case 18:
-			hyperstone.instruction_length = 2;
-			EXTRA_U = READ_OP(PC);
-			PC += 2;
-			break;
-
-		case 19:
-			hyperstone.instruction_length = 2;
-			EXTRA_U = 0xffff0000 | READ_OP(PC);
-			PC += 2;
-			break;
-
-		case 20:
-			EXTRA_U = 32;	// bit 5 = 1, others = 0
-			break;
-
-		case 21:
-			EXTRA_U = 64;	// bit 6 = 1, others = 0
-			break;
-
-		case 22:
-			EXTRA_U = 128; // bit 7 = 1, others = 0
-			break;
-
-		case 23:
-			EXTRA_U = 0x80000000; // bit 31 = 1, others = 0 (2 at the power of 31)
-			break;
-
-		case 24:
-			EXTRA_U = -8;
-			break;
-
-		case 25:
-			EXTRA_U = -7;
-			break;
-
-		case 26:
-			EXTRA_U = -6;
-			break;
-
-		case 27:
-			EXTRA_U = -5;
-			break;
-
-		case 28:
-			EXTRA_U = -4;
-			break;
-
-		case 29:
-			EXTRA_U = -3;
-			break;
-
-		case 30:
-			EXTRA_U = -2;
-			break;
-
-		case 31:
-			EXTRA_U = -1;
-			break;
-	}
-}
-
-INLINE void decode_const(void)
-{
-	UINT16 imm_1 = READ_OP(PC);
-
-	PC += 2;
-	hyperstone.instruction_length = 2;
-
-	if( E_BIT(imm_1) )
-	{
-		UINT16 imm_2 = READ_OP(PC);
-
-		PC += 2;
-		hyperstone.instruction_length = 3;
-
-		EXTRA_S = imm_2;
-		EXTRA_S |= ((imm_1 & 0x3fff) << 16);
-
-		if( S_BIT_CONST(imm_1) )
-		{
-			EXTRA_S |= 0xc0000000;
-		}
-	}
-	else
-	{
-		EXTRA_S = imm_1 & 0x3fff;
-
-		if( S_BIT_CONST(imm_1) )
-		{
-			EXTRA_S |= 0xffffc000;
-		}
-	}
-}
-
-INLINE void decode_pcrel(void)
-{
-	if( OP & 0x80 )
-	{
-		UINT16 next = READ_OP(PC);
-
-		PC += 2;
-		hyperstone.instruction_length = 2;
-
-		EXTRA_S = (OP & 0x7f) << 16;
-		EXTRA_S |= (next & 0xfffe);
-
-		if( next & 1 )
-			EXTRA_S |= 0xff800000;
-	}
-	else
-	{
-		EXTRA_S = OP & 0x7e;
-
-		if( OP & 1 )
-			EXTRA_S |= 0xffffff80;
-	}
-}
-
-INLINE void decode_dis(void)
-{
-	UINT16 next_1 = READ_OP(PC);
-
-	PC += 2;
-	hyperstone.instruction_length = 2;
-
-	current_regs.sub_type = DD(next_1);
-
-	if( E_BIT(next_1) )
-	{
-		UINT16 next_2 = READ_OP(PC);
-
-		PC += 2;
-		hyperstone.instruction_length = 3;
-
-		EXTRA_S = next_2;
-		EXTRA_S |= ((next_1 & 0xfff) << 16);
-
-		if( S_BIT_CONST(next_1) )
-		{
-			EXTRA_S |= 0xf0000000;
-		}
-	}
-	else
-	{
-		EXTRA_S = next_1 & 0xfff;
-
-		if( S_BIT_CONST(next_1) )
-		{
-			EXTRA_S |= 0xfffff000;
-		}
-	}
-}
-
-INLINE void decode_lim(void)
-{
-	UINT32 next = READ_OP(PC);
-	PC += 2;
-	hyperstone.instruction_length = 2;
-
-	current_regs.sub_type = X_CODE(next);
-
-	if( E_BIT(next) )
-	{
-		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);
-		PC += 2;
-		hyperstone.instruction_length = 3;
-	}
-	else
-	{
-		EXTRA_U = next & 0xfff;
-	}
-}
-
-/* used in the jumptable */
-INLINE void RRdecode(void)
-{
-	check_delay_PC();
-	decode_RR();
-}
-
-INLINE void RRlimdecode(void)
-{
-	decode_lim();
-	check_delay_PC();
-	decode_RR();
-}
-
-INLINE void RRconstdecode(void)
-{
-	decode_const();
-	check_delay_PC();
-	decode_RR();
-}
-
-INLINE void RRdisdecode(void)
-{
-	decode_dis();
-	check_delay_PC();
-	decode_RR();
-}
-
-INLINE void RRdecodewithHflag(void)
-{
-	check_delay_PC();
-	current_regs.src = SRC_CODE;
-	current_regs.dst = DST_CODE;
-	decode_source(S_BIT, GET_H);
-	decode_dest(D_BIT, GET_H);
-
-	if(GET_H)
-		if(S_BIT == 0 && D_BIT == 0)
-			popmessage("MOV with hflag and 2 GRegs! PC = %08X\n",PPC);
-}
-
-INLINE void Rimmdecode(void)
-{
-	decode_immediate();
-	check_delay_PC();
-	current_regs.dst = DST_CODE;
-	decode_dest(D_BIT, 0);
-}
-
-INLINE void Rndecode(void)
-{
-	check_delay_PC();
-	current_regs.dst = DST_CODE;
-	decode_dest(D_BIT, 0);
-}
-
-INLINE void RimmdecodewithHflag(void)
-{
-	decode_immediate();
-	check_delay_PC();
-	current_regs.dst = DST_CODE;
-	decode_dest(D_BIT, GET_H);
-}
-
-INLINE void Lndecode(void)
-{
-	check_delay_PC();
-	current_regs.dst = DST_CODE;
-	decode_dest(LOCAL, 0);
-}
-
-INLINE void LLdecode(void)
-{
-	check_delay_PC();
-	decode_LL();
-}
-
-INLINE void LLextdecode(void)
-{
-	hyperstone.instruction_length = 2;
-	EXTRA_U = READ_OP(PC);
-	PC += 2;
-	check_delay_PC();
-	decode_LL();
-}
-
-INLINE void LRdecode(void)
-{
-	check_delay_PC();
-	decode_LR();
-}
-
-INLINE void LRconstdecode(void)
-{
-	decode_const();
-	check_delay_PC();
-	decode_LR();
-}
-
-INLINE void PCreldecode(void)
-{
-	decode_pcrel();
-	check_delay_PC();
-}
-
-INLINE void PCadrdecode(void)
-{
-	check_delay_PC();
-}
-
-INLINE void no_decode(void)
-{
-
-}
-
-
-/* Decode helper table */
-static void (*hyperstone_decode[0x100])(void) = {
-/*00*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CHK - CHKZ - NOP */
-/*04*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MOVD - RET */
-/*08*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* DIVU */
-/*0c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* DIVS */
-/*10*/ RRlimdecode,         RRlimdecode,         RRlimdecode,         RRlimdecode,         /* XMx - XXx */
-/*14*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* MASK */
-/*18*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* SUM */
-/*1c*/ RRconstdecode,       RRconstdecode,       RRconstdecode,       RRconstdecode,       /* SUMS */
-/*20*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CMP */
-/*24*/ RRdecodewithHflag,   RRdecodewithHflag,   RRdecodewithHflag,   RRdecodewithHflag,   /* MOV */
-/*28*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADD */
-/*2c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADDS */
-/*30*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* CMPB */
-/*34*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ANDN */
-/*38*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* OR */
-/*3c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* XOR */
-/*40*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUBC */
-/*44*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NOT */
-/*48*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUB */
-/*4c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* SUBS */
-/*50*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* ADDC */
-/*54*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* AND */
-/*58*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NEG */
-/*5c*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* NEGS */
-/*60*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* CMPI */
-/*64*/ RimmdecodewithHflag, RimmdecodewithHflag, RimmdecodewithHflag, RimmdecodewithHflag, /* MOVI */
-/*68*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ADDI */
-/*6c*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ADDSI */
-/*70*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* CMPBI */
-/*74*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ANDNI */
-/*78*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* ORI */
-/*7c*/ Rimmdecode,          Rimmdecode,          Rimmdecode,          Rimmdecode,          /* XORI */
-/*80*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SHRDI, SHRD, SHR */
-/*84*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SARDI, SARD, SAR */
-/*88*/ Lndecode,            Lndecode,            LLdecode,            LLdecode,            /* SHLDI, SHLD, SHL */
-/*8c*/ no_decode,           no_decode,           LLdecode,            LLdecode,            /* RESERVED, TESTLZ, ROL */
-/*90*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* LDxx.D/A/IOD/IOA */
-/*94*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* LDxx.N/S */
-/*98*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* STxx.D/A/IOD/IOA */
-/*9c*/ RRdisdecode,         RRdisdecode,         RRdisdecode,         RRdisdecode,         /* STxx.N/S */
-/*a0*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SHRI */
-/*a4*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SARI */
-/*a8*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SHLI */
-/*ac*/ no_decode,           no_decode,           no_decode,           no_decode,           /* RESERVED */
-/*b0*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MULU */
-/*b4*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MULS */
-/*b8*/ Rndecode,            Rndecode,            Rndecode,            Rndecode,            /* SETxx - SETADR - FETCH */
-/*bc*/ RRdecode,            RRdecode,            RRdecode,            RRdecode,            /* MUL */
-/*c0*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FADD, FADDD, FSUB, FSUBD */
-/*c4*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FMUL, FMULD, FDIV, FDIVD */
-/*c8*/ LLdecode,            LLdecode,            LLdecode,            LLdecode,            /* FCMP, FCMPD, FCMPU, FCMPUD */
-/*cc*/ LLdecode,            LLdecode,            LLextdecode,         LLdecode,            /* FCVT, FCVTD, EXTEND, DO */
-/*d0*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* LDW.R, LDD.R */
-/*d4*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* LDW.P, LDD.P */
-/*d8*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* STW.R, STD.R */
-/*dc*/ LRdecode,            LRdecode,            LRdecode,            LRdecode,            /* STW.P, STD.P */
-/*e0*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBV, DBNV, DBE, DBNE */
-/*e4*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBC, DBNC, DBSE, DBHT */
-/*e8*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* DBN, DBNN, DBLE, DBGT */
-/*ec*/ PCreldecode,         LLdecode,            LRconstdecode,       LRconstdecode,       /* DBR, FRAME, CALL */
-/*f0*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BV, BNV, BE, BNE */
-/*f4*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BC, BNC, BSE, BHT */
-/*f8*/ PCreldecode,         PCreldecode,         PCreldecode,         PCreldecode,         /* BN, BNN, BLE, BGT */
-/*fc*/ PCreldecode,         PCadrdecode,         PCadrdecode,         PCadrdecode          /* BR, TRAPxx - TRAP */
+	0, 1, 2, 3, 4, 5, 6, 7,
+	8, 9, 10, 11, 12, 13, 14, 15,
+	16, 0, 0, 0, 32, 64, 128, 0x80000000,
+	-8, -7, -6, -5, -4, -3, -2, -1
 };
 
-INLINE void execute_br(void)
+#define WRITE_ONLY_REGMASK	((1 << BCR_REGISTER) | (1 << TPR_REGISTER) | (1 << FCR_REGISTER) | (1 << MCR_REGISTER))
+
+#define decode_source(decode, local, hflag)											\
+do																					\
+{																					\
+	if(local)																		\
+	{																				\
+		UINT8 code = (decode)->src;													\
+		(decode)->src_is_local = 1;													\
+		code = ((decode)->src + GET_FP) % 64; /* registers offset by frame pointer  */\
+		SREG = hyperstone.local_regs[code];											\
+		code = ((decode)->src + 1 + GET_FP) % 64;									\
+		SREGF = hyperstone.local_regs[code];										\
+	}																				\
+	else																			\
+	{																				\
+		(decode)->src_is_local = 0;													\
+																					\
+		if (!hflag)																	\
+		{																			\
+			SREG = get_global_register((decode)->src);								\
+																					\
+			/* bound safe */														\
+			if ((decode)->src != 15)												\
+				SREGF = get_global_register((decode)->src + 1);						\
+		}																			\
+		else																		\
+		{																			\
+			(decode)->src += 16;													\
+																					\
+			SREG = get_global_register((decode)->src);								\
+			if ((WRITE_ONLY_REGMASK >> (decode)->src) & 1)							\
+				SREG = 0; /* write-only registers */								\
+			else if ((decode)->src == ISR_REGISTER)									\
+				DEBUG_PRINTF(("read src ISR. PC = %08X\n",PPC));					\
+																					\
+			/* bound safe */														\
+			if ((decode)->src != 31)												\
+				SREGF = get_global_register((decode)->src + 1);						\
+		}																			\
+	}																				\
+} while (0)
+
+#define decode_dest(decode, local, hflag)											\
+do																					\
+{																					\
+	if(local)																		\
+	{																				\
+		UINT8 code = (decode)->dst;													\
+		(decode)->dst_is_local = 1;													\
+		code = ((decode)->dst + GET_FP) % 64; /* registers offset by frame pointer */\
+		DREG = hyperstone.local_regs[code];											\
+		code = ((decode)->dst + 1 + GET_FP) % 64;									\
+		DREGF = hyperstone.local_regs[code];										\
+	}																				\
+	else																			\
+	{																				\
+		(decode)->dst_is_local = 0;													\
+																					\
+		if (!hflag)																	\
+		{																			\
+			DREG = get_global_register((decode)->dst);								\
+																					\
+			/* bound safe */														\
+			if ((decode)->dst != 15)												\
+				DREGF = get_global_register((decode)->dst + 1);						\
+		}																			\
+		else																		\
+		{																			\
+			(decode)->dst += 16;													\
+																					\
+			DREG = get_global_register((decode)->dst);								\
+			if( (decode)->dst == ISR_REGISTER )										\
+				DEBUG_PRINTF(("read dst ISR. PC = %08X\n",PPC));					\
+																					\
+			/* bound safe */														\
+			if ((decode)->dst != 31)												\
+				DREGF = get_global_register((decode)->dst + 1);						\
+		}																			\
+	}																				\
+} while (0)
+
+#define decode_RR(decode, dlocal, slocal)											\
+do																					\
+{																					\
+	(decode)->src = SRC_CODE;														\
+	(decode)->dst = DST_CODE;														\
+	decode_source(decode, slocal, 0);												\
+	decode_dest(decode, dlocal, 0);													\
+																					\
+	if( (slocal) == (dlocal) && SRC_CODE == DST_CODE )								\
+		SAME_SRC_DST = 1;															\
+																					\
+	if( (slocal) == LOCAL && (dlocal) == LOCAL )									\
+	{																				\
+		if( SRC_CODE == ((DST_CODE + 1) % 64) )										\
+			SAME_SRC_DSTF = 1;														\
+																					\
+		if( ((SRC_CODE + 1) % 64) == DST_CODE )										\
+			SAME_SRCF_DST = 1;														\
+	}																				\
+	else if( (slocal) == 0 && (dlocal) == 0 )										\
+	{																				\
+		if( SRC_CODE == (DST_CODE + 1) )											\
+			SAME_SRC_DSTF = 1;														\
+																					\
+		if( (SRC_CODE + 1) == DST_CODE )											\
+			SAME_SRCF_DST = 1;														\
+	}																				\
+} while (0)
+
+#define decode_LL(decode)															\
+do																					\
+{																					\
+	(decode)->src = SRC_CODE;														\
+	(decode)->dst = DST_CODE;														\
+	decode_source(decode, LOCAL, 0);												\
+	decode_dest(decode, LOCAL, 0);													\
+																					\
+	if( SRC_CODE == DST_CODE )														\
+		SAME_SRC_DST = 1;															\
+																					\
+	if( SRC_CODE == ((DST_CODE + 1) % 64) )											\
+		SAME_SRC_DSTF = 1;															\
+} while (0)
+
+#define decode_LR(decode, slocal)													\
+do																					\
+{																					\
+	(decode)->src = SRC_CODE;														\
+	(decode)->dst = DST_CODE;														\
+	decode_source(decode, slocal, 0);												\
+	decode_dest(decode, LOCAL, 0);													\
+																					\
+	if( ((SRC_CODE + 1) % 64) == DST_CODE && slocal == LOCAL )						\
+		SAME_SRCF_DST = 1;															\
+} while (0)
+
+#define check_delay_PC()															\
+do																					\
+{																					\
+	/* if PC is used in a delay instruction, the delayed PC should be used */		\
+	if( hyperstone.delay.delay_cmd == DELAY_EXECUTE )								\
+	{																				\
+		PC = hyperstone.delay.delay_pc;												\
+		hyperstone.delay.delay_cmd = NO_DELAY;										\
+	}																				\
+} while (0)
+
+#define decode_immediate(decode, nbit)												\
+do																					\
+{																					\
+	if (!nbit)																		\
+		EXTRA_U = immediate_values[OP & 0x0f];										\
+	else																			\
+		switch( OP & 0x0f )															\
+		{																			\
+			default:																\
+				EXTRA_U = immediate_values[0x10 + (OP & 0x0f)];						\
+				break;																\
+																					\
+			case 1:																	\
+				hyperstone.instruction_length = 3;									\
+				EXTRA_U = (READ_OP(PC) << 16) | READ_OP(PC + 2);					\
+				PC += 4;															\
+				break;																\
+																					\
+			case 2:																	\
+				hyperstone.instruction_length = 2;									\
+				EXTRA_U = READ_OP(PC);												\
+				PC += 2;															\
+				break;																\
+																					\
+			case 3:																	\
+				hyperstone.instruction_length = 2;									\
+				EXTRA_U = 0xffff0000 | READ_OP(PC);									\
+				PC += 2;															\
+				break;																\
+		}																			\
+} while (0)
+
+#define decode_const(decode)														\
+do																					\
+{																					\
+	UINT16 imm_1 = READ_OP(PC);														\
+																					\
+	PC += 2;																		\
+	hyperstone.instruction_length = 2;												\
+																					\
+	if( E_BIT(imm_1) )																\
+	{																				\
+		UINT16 imm_2 = READ_OP(PC);													\
+																					\
+		PC += 2;																	\
+		hyperstone.instruction_length = 3;											\
+																					\
+		EXTRA_S = imm_2;															\
+		EXTRA_S |= ((imm_1 & 0x3fff) << 16);										\
+																					\
+		if( S_BIT_CONST(imm_1) )													\
+		{																			\
+			EXTRA_S |= 0xc0000000;													\
+		}																			\
+	}																				\
+	else																			\
+	{																				\
+		EXTRA_S = imm_1 & 0x3fff;													\
+																					\
+		if( S_BIT_CONST(imm_1) )													\
+		{																			\
+			EXTRA_S |= 0xffffc000;													\
+		}																			\
+	}																				\
+} while (0)
+
+#define decode_pcrel(decode)														\
+do																					\
+{																					\
+	if( OP & 0x80 )																	\
+	{																				\
+		UINT16 next = READ_OP(PC);													\
+																					\
+		PC += 2;																	\
+		hyperstone.instruction_length = 2;											\
+																					\
+		EXTRA_S = (OP & 0x7f) << 16;												\
+		EXTRA_S |= (next & 0xfffe);													\
+																					\
+		if( next & 1 )																\
+			EXTRA_S |= 0xff800000;													\
+	}																				\
+	else																			\
+	{																				\
+		EXTRA_S = OP & 0x7e;														\
+																					\
+		if( OP & 1 )																\
+			EXTRA_S |= 0xffffff80;													\
+	}																				\
+} while (0)
+
+#define decode_dis(decode)															\
+do																					\
+{																					\
+	UINT16 next_1 = READ_OP(PC);													\
+																					\
+	PC += 2;																		\
+	hyperstone.instruction_length = 2;												\
+																					\
+	(decode)->sub_type = DD(next_1);												\
+																					\
+	if( E_BIT(next_1) )																\
+	{																				\
+		UINT16 next_2 = READ_OP(PC);												\
+																					\
+		PC += 2;																	\
+		hyperstone.instruction_length = 3;											\
+																					\
+		EXTRA_S = next_2;															\
+		EXTRA_S |= ((next_1 & 0xfff) << 16);										\
+																					\
+		if( S_BIT_CONST(next_1) )													\
+		{																			\
+			EXTRA_S |= 0xf0000000;													\
+		}																			\
+	}																				\
+	else																			\
+	{																				\
+		EXTRA_S = next_1 & 0xfff;													\
+																					\
+		if( S_BIT_CONST(next_1) )													\
+		{																			\
+			EXTRA_S |= 0xfffff000;													\
+		}																			\
+	}																				\
+} while (0)
+
+#define decode_lim(decode)															\
+do																					\
+{																					\
+	UINT32 next = READ_OP(PC);														\
+	PC += 2;																		\
+	hyperstone.instruction_length = 2;												\
+																					\
+	(decode)->sub_type = X_CODE(next);												\
+																					\
+	if( E_BIT(next) )																\
+	{																				\
+		EXTRA_U = ((next & 0xfff) << 16) | READ_OP(PC);								\
+		PC += 2;																	\
+		hyperstone.instruction_length = 3;											\
+	}																				\
+	else																			\
+	{																				\
+		EXTRA_U = next & 0xfff;														\
+	}																				\
+} while (0)
+
+#define RRdecode(decode, dlocal, slocal)											\
+do																					\
+{																					\
+	check_delay_PC();																\
+	decode_RR(decode, dlocal, slocal);												\
+} while (0)
+
+#define RRlimdecode(decode, dlocal, slocal)											\
+do																					\
+{																					\
+	decode_lim(decode);																\
+	check_delay_PC();																\
+	decode_RR(decode, dlocal, slocal);												\
+} while (0)
+
+#define RRconstdecode(decode, dlocal, slocal)										\
+do																					\
+{																					\
+	decode_const(decode);															\
+	check_delay_PC();																\
+	decode_RR(decode, dlocal, slocal);												\
+} while (0)
+
+#define RRdisdecode(decode, dlocal, slocal)											\
+do																					\
+{																					\
+	decode_dis(decode);																\
+	check_delay_PC();																\
+	decode_RR(decode, dlocal, slocal);												\
+} while (0)
+
+#define RRdecodewithHflag(decode, dlocal, slocal)									\
+do																					\
+{																					\
+	check_delay_PC();																\
+	(decode)->src = SRC_CODE;														\
+	(decode)->dst = DST_CODE;														\
+	decode_source(decode, slocal, GET_H);											\
+	decode_dest(decode, dlocal, GET_H);												\
+																					\
+	if(GET_H)																		\
+		if(slocal == 0 && dlocal == 0)												\
+			DEBUG_PRINTF(("MOV with hflag and 2 GRegs! PC = %08X\n",PPC));			\
+} while (0)
+
+#define Rimmdecode(decode, dlocal, nbit)											\
+do																					\
+{																					\
+	decode_immediate(decode, nbit);													\
+	check_delay_PC();																\
+	(decode)->dst = DST_CODE;														\
+	decode_dest(decode, dlocal, 0);													\
+} while (0)
+
+#define Rndecode(decode, dlocal)													\
+do																					\
+{																					\
+	check_delay_PC();																\
+	(decode)->dst = DST_CODE;														\
+	decode_dest(decode, dlocal, 0);													\
+} while (0)
+
+#define RimmdecodewithHflag(decode, dlocal, nbit)									\
+do																					\
+{																					\
+	decode_immediate(decode, nbit);													\
+	check_delay_PC();																\
+	(decode)->dst = DST_CODE;														\
+	decode_dest(decode, dlocal, GET_H);												\
+} while (0)
+
+#define Lndecode(decode)															\
+do																					\
+{																					\
+	check_delay_PC();																\
+	(decode)->dst = DST_CODE;														\
+	decode_dest(decode, LOCAL, 0);													\
+} while (0)
+
+#define LLdecode(decode)															\
+do																					\
+{																					\
+	check_delay_PC();																\
+	decode_LL(decode);																\
+} while (0)
+
+#define LLextdecode(decode)															\
+do																					\
+{																					\
+	hyperstone.instruction_length = 2;												\
+	EXTRA_U = READ_OP(PC);															\
+	PC += 2;																		\
+	check_delay_PC();																\
+	decode_LL(decode);																\
+} while (0)
+
+#define LRdecode(decode, slocal)													\
+do																					\
+{																					\
+	check_delay_PC();																\
+	decode_LR(decode, slocal);														\
+} while (0)
+
+#define LRconstdecode(decode, slocal)												\
+do																					\
+{																					\
+	decode_const(decode);															\
+	check_delay_PC();																\
+	decode_LR(decode, slocal);														\
+} while (0)
+
+#define PCreldecode(decode)															\
+do																					\
+{																					\
+	decode_pcrel(decode);															\
+	check_delay_PC();																\
+} while (0)
+
+#define PCadrdecode(decode)															\
+do																					\
+{																					\
+	check_delay_PC();																\
+} while (0)
+
+#define no_decode(decode)															\
+do																					\
+{																					\
+} while (0)
+
+
+INLINE void execute_br(struct regs_decode *decode)
 {
 	PPC = PC;
 	PC += EXTRA_S;
 	change_pc(PC);
 	SET_M(0);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-INLINE void execute_dbr(void)
+INLINE void execute_dbr(struct regs_decode *decode)
 {
-	hyperstone.delay.delay_cmd = DELAY_TAKEN;
+	hyperstone.delay.delay_cmd = DELAY_EXECUTE;
 	hyperstone.delay.delay_pc  = PC + EXTRA_S;
 
 	hyperstone.intblock = 3;
@@ -1479,7 +1335,7 @@ static void execute_trap(UINT32 addr)
 	PC = addr;
 	change_pc(PC);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
 
@@ -1509,7 +1365,7 @@ static void execute_int(UINT32 addr)
 	PC = addr;
 	change_pc(PC);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
 /* TODO: mask Parity Error and Extended Overflow exceptions */
@@ -1538,11 +1394,11 @@ static void execute_exception(UINT32 addr)
 	PC = addr;
 	change_pc(PC);
 
-	mame_printf_debug("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2);
-	hyperstone_ICount -= 2;
+	DEBUG_PRINTF(("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2));
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void execute_software(void)
+static void execute_software(struct regs_decode *decode)
 {
 	UINT8 reg;
 	UINT32 oldSR;
@@ -1557,7 +1413,7 @@ static void execute_software(void)
 	//since it's sure the register is in the register part of the stack,
 	//set the stack address to a value above the highest address
 	//that can be set by a following frame instruction
-	stack_of_dst = (SP & ~0xff) + 64*4 + (((GET_FP + current_regs.dst) % 64) * 4); //converted to 32bits offset
+	stack_of_dst = (SP & ~0xff) + 64*4 + (((GET_FP + decode->dst) % 64) * 4); //converted to 32bits offset
 
 	oldSR = SR;
 
@@ -1591,81 +1447,141 @@ static void execute_software(void)
         6 - IO3     (trap 54)
         7 - TIMER   (trap 55)
 */
-static void set_irq_line(int irqline, int state)
+
+#define INT1_LINE_STATE		((ISR >> 0) & 1)
+#define INT2_LINE_STATE		((ISR >> 1) & 1)
+#define INT3_LINE_STATE		((ISR >> 2) & 1)
+#define INT4_LINE_STATE		((ISR >> 3) & 1)
+#define IO1_LINE_STATE		((ISR >> 4) & 1)
+#define IO2_LINE_STATE		((ISR >> 5) & 1)
+#define IO3_LINE_STATE		((ISR >> 6) & 1)
+
+static void check_interrupts(void)
 {
 	/* Interrupt-Lock flag isn't set */
-
-	if(hyperstone.intblock)
+	if (GET_L || hyperstone.intblock > 0)
 		return;
 
-	if( !GET_L && state )
+	/* quick exit if nothing */
+	if (!hyperstone.timer_int_pending && (ISR & 0x7f) == 0)
+		return;
+
+	/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
+	if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
 	{
-		int execint=0;
-		switch(irqline)
-		{
-			case 0:	 if( (FCR&(1<<6)) && (!(FCR&(1<<4))) ) execint=1; // IO2
-				break;
-			case 1:	 if( (FCR&(1<<2)) && (!(FCR&(1<<0))) ) execint=1; // IO1
-				break;
-			case 2:	 if( !(FCR&(1<<31)) ) execint=1; //  int 4
-				break;
-			case 3:	 if( !(FCR&(1<<30)) ) execint=1; //  int 3
-				break;
-			case 4:	 if( !(FCR&(1<<29)) ) execint=1; //  int 2
-				break;
-			case 5:	 if( !(FCR&(1<<28)) ) execint=1; //  int 1
-				break;
-			case 6:	 if( (FCR&(1<<10)) && (!(FCR&(1<<8))) ) execint=1; // IO3
-				break;
-			case 7:	 if( !(FCR&(1<<23)) ) execint=1; //  timer
-				break;
-		}
-/*
-        if( (FCR&(1<<6)) && (!(FCR&(1<<4))) ) mame_printf_debug("IO2 en\n"); // IO2
+		execute_int(get_trap_addr(IO3));
+		(*hyperstone.irq_callback)(IRQ_IO3);
+		return;
+	}
 
-        if( (FCR&(1<<2)) && (!(FCR&(1<<0))) ) mame_printf_debug("IO1 en\n"); // IO1
+	/* timer int might be priority 6 if FCR bits 20-21 == 3; FCR bit 23 inhibits interrupt */
+	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00300000)
+	{
+		hyperstone.timer_int_pending = 0;
+		execute_int(get_trap_addr(TIMER));
+		return;
+	}
 
-        if( !(FCR&(1<<31)) ) mame_printf_debug("int4 en\n"); //  int 4
+	/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
+	if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
+	{
+		execute_int(get_trap_addr(INT1));
+		(*hyperstone.irq_callback)(IRQ_INT1);
+		return;
+	}
 
-        if( !(FCR&(1<<30)) ) mame_printf_debug("int3 en\n"); //  int 3
+	/* timer int might be priority 8 if FCR bits 20-21 == 2; FCR bit 23 inhibits interrupt */
+	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00200000)
+	{
+		hyperstone.timer_int_pending = 0;
+		execute_int(get_trap_addr(TIMER));
+		return;
+	}
 
-        if( !(FCR&(1<<29)) ) mame_printf_debug("int2 en\n"); //  int 2
+	/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
+	if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
+	{
+		execute_int(get_trap_addr(INT2));
+		(*hyperstone.irq_callback)(IRQ_INT2);
+		return;
+	}
 
-        if( !(FCR&(1<<28)) ) mame_printf_debug("int1 en\n"); //  int 1
+	/* timer int might be priority 10 if FCR bits 20-21 == 1; FCR bit 23 inhibits interrupt */
+	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00100000)
+	{
+		hyperstone.timer_int_pending = 0;
+		execute_int(get_trap_addr(TIMER));
+		return;
+	}
 
-        if( (FCR&(1<<10)) && (!(FCR&(1<<8))) ) mame_printf_debug("IO3 en\n"); // IO3
+	/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
+	if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
+	{
+		execute_int(get_trap_addr(INT3));
+		(*hyperstone.irq_callback)(IRQ_INT3);
+		return;
+	}
 
-      //  if( !(FCR&(1<<23)) ) mame_printf_debug("timer irq!\n"); //  timer
-*/
-		if(execint)
-		{
-			execute_int(get_trap_addr(irqline + 48));
-			(*hyperstone.irq_callback)(irqline);
-		}
+	/* timer int might be priority 12 if FCR bits 20-21 == 0; FCR bit 23 inhibits interrupt */
+	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00000000)
+	{
+		hyperstone.timer_int_pending = 0;
+		execute_int(get_trap_addr(TIMER));
+		return;
+	}
+
+	/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
+	if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
+	{
+		execute_int(get_trap_addr(INT4));
+		(*hyperstone.irq_callback)(IRQ_INT4);
+		return;
+	}
+
+	/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
+	if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
+	{
+		execute_int(get_trap_addr(IO1));
+		(*hyperstone.irq_callback)(IRQ_IO3);
+		return;
+	}
+
+	/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
+	if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
+	{
+		execute_int(get_trap_addr(IO2));
+		(*hyperstone.irq_callback)(IRQ_IO2);
+		return;
 	}
 }
 
-static void hyperstone_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void set_irq_line(int irqline, int state)
+{
+	if (state)
+		ISR |= 1 << irqline;
+	else
+		ISR &= ~(1 << irqline);
+}
+
+static void hyperstone_init(int index, int clock, const void *config, int (*irqcallback)(int), int scale_mask)
 {
 	state_save_register_item_array("E132XS", index, hyperstone.global_regs);
 	state_save_register_item_array("E132XS", index, hyperstone.local_regs);
 	state_save_register_item("E132XS", index, hyperstone.ppc);
 	state_save_register_item("E132XS", index, hyperstone.trap_entry);
 	state_save_register_item("E132XS", index, hyperstone.delay.delay_pc);
-	state_save_register_item("E132XS", index, hyperstone.op);
-	state_save_register_item("E132XS", index, hyperstone.n);
-	state_save_register_item("E132XS", index, hyperstone.h_clear);
 	state_save_register_item("E132XS", index, hyperstone.instruction_length);
 	state_save_register_item("E132XS", index, hyperstone.intblock);
-	state_save_register_item("E132XS", index, hyperstone.delay_timer);
 	state_save_register_item("E132XS", index, hyperstone.delay.delay_cmd);
-	state_save_register_item("E132XS", index, hyperstone.timer_clocks);
+	state_save_register_item("E132XS", index, hyperstone.tr_clocks_per_tick);
 
 	hyperstone.irq_callback = irqcallback;
+	hyperstone.timer = timer_alloc(timer_callback);
+	hyperstone.clock_scale_mask = scale_mask;
 }
 
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static void e116_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void e116_init(int index, int clock, const void *config, int (*irqcallback)(int), int scale_mask)
 {
 	hyp_cpu_read_byte      = program_read_byte_16be;
 	hyp_cpu_read_half_word = program_read_word_16be;
@@ -1679,12 +1595,42 @@ static void e116_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyp_type_16bit = 1;
 
-	hyperstone_init(index, clock, config, irqcallback);
+	hyperstone_init(index, clock, config, irqcallback, scale_mask);
+}
+
+static void e116t_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 0);
+}
+
+static void e116xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 3);
+}
+
+static void e116xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 7);
+}
+
+static void e116xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 7);
+}
+
+static void gms30c2116_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 0);
+}
+
+static void gms30c2216_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e116_init(index, clock, config, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
-static void e132_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void e132_init(int index, int clock, const void *config, int (*irqcallback)(int), int scale_mask)
 {
 	hyp_cpu_read_byte      = program_read_byte_32be;
 	hyp_cpu_read_half_word = program_read_word_32be;
@@ -1698,7 +1644,47 @@ static void e132_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyp_type_16bit = 0;
 
-	hyperstone_init(index, clock, config, irqcallback);
+	hyperstone_init(index, clock, config, irqcallback, scale_mask);
+}
+
+static void e132n_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 0);
+}
+
+static void e132t_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 0);
+}
+
+static void e132xn_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 3);
+}
+
+static void e132xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 3);
+}
+
+static void e132xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 7);
+}
+
+static void e132xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 7);
+}
+
+static void gms30c2132_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 0);
+}
+
+static void gms30c2232_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	e132_init(index, clock, config, irqcallback, 0);
 }
 #endif
 
@@ -1706,14 +1692,16 @@ static void hyperstone_reset(void)
 {
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
+	emu_timer *save_timer;
 	int (*save_irqcallback)(int);
 
+	save_timer = hyperstone.timer;
 	save_irqcallback = hyperstone.irq_callback;
 	memset(&hyperstone, 0, sizeof(hyperstone_regs));
 	hyperstone.irq_callback = save_irqcallback;
+	hyperstone.timer = save_timer;
 
-	hyperstone.h_clear = 0;
-	hyperstone.instruction_length = 0;
+	hyperstone.tr_clocks_per_tick = 2;
 
 	hyperstone_set_trap_entry(E132XS_ENTRY_MEM3); /* default entry point @ MEM3 */
 
@@ -1736,126 +1724,12 @@ static void hyperstone_reset(void)
 	SET_L_REG(0, (PC & 0xfffffffe) | GET_S);
 	SET_L_REG(1, SR);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
 static void hyperstone_exit(void)
 {
 	// nothing to do
-}
-
-/* Handle the timer, increasing its value after "timer_clocks" clocks and returning the new icount base that needs to be used for the next check */
-static int handle_timers(int current_icount, int previous_icount)
-{
-	int diff = previous_icount - current_icount;
-	int new_icount_base;
-
-	if(diff >= hyperstone.timer_clocks)
-	{
-		TR++; // wrap around to 0 modulo 32 bits
-
-		if( hyperstone.delay_timer )
-		{
-			hyperstone.delay_timer = 0;
-			hyperstone.timer_clocks = hyperstone.n + 2;
-		}
-
-		new_icount_base = current_icount + (diff - hyperstone.timer_clocks);
-	}
-	else
-	{
-		new_icount_base = previous_icount;
-	}
-
-	if(!hyperstone.intblock)
-	{
-		if( !((TR - TCR) & 0x80000000) )
-		{
-			/* generate a timer interrupt */
-			set_irq_line(7, PULSE_LINE);
-		}
-	}
-
-	return new_icount_base;
-}
-
-static int hyperstone_execute(int cycles)
-{
-	int old_icount = cycles;
-	hyperstone_ICount = cycles;
-
-	do
-	{
-		PPC = PC;	/* copy PC to previous PC */
-
-		CALL_MAME_DEBUG;
-
-		OP = READ_OP(PC);
-
-		PC += 2;
-
-		if(GET_H)
-		{
-			hyperstone.h_clear = 1;
-		}
-
-		hyperstone.instruction_length = 1;
-
-		/* clear 'current regs / flags' */
-		current_regs.src = 0;
-		current_regs.dst = 0;
-		current_regs.src_value = 0;
-		current_regs.next_src_value = 0;
-		current_regs.dst_value = 0;
-		current_regs.next_dst_value = 0;
-		current_regs.sub_type = 0;
-		current_regs.extra.u = 0;
-		current_regs.extra.s = 0;
-		current_regs.set_src_register = NULL;
-		current_regs.set_dst_register = NULL;
-		current_regs.src_is_pc = 0;
-		current_regs.dst_is_pc = 0;
-		current_regs.src_is_sr = 0;
-		current_regs.dst_is_sr = 0;
-		current_regs.same_src_dst = 0;
-		current_regs.same_src_dstf = 0;
-		current_regs.same_srcf_dst = 0;
-
-		/* decode current opcode details into current regs */
-		hyperstone_decode[(OP & 0xff00) >> 8]();
-
-		/* execute opcode */
-		hyperstone_op[(OP & 0xff00) >> 8]();
-
-		SET_ILC(hyperstone.instruction_length & 3);
-
-		old_icount = handle_timers(hyperstone_ICount, old_icount);
-
-		if(hyperstone.h_clear)
-		{
-			SET_H(0);
-			hyperstone.h_clear = 0;
-		}
-
-		if( GET_T && GET_P && hyperstone.delay.delay_cmd == NO_DELAY ) /* Not in a Delayed Branch instructions */
-		{
-			UINT32 addr = get_trap_addr(TRACE_EXCEPTION);
-			execute_exception(addr);
-		}
-
-		if( hyperstone.delay.delay_cmd == DELAY_TAKEN )
-		{
-			hyperstone.delay.delay_cmd = DELAY_EXECUTE;
-		}
-
-		if(hyperstone.intblock > 0)
-		{
-			hyperstone.intblock--;
-		}
-
-	} while( hyperstone_ICount > 0 );
-
-	return cycles - hyperstone_ICount;
 }
 
 static void hyperstone_get_context(void *regs)
@@ -1881,7 +1755,7 @@ static offs_t hyperstone_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const
 
 /* Opcodes */
 
-static void hyperstone_chk(void)
+INLINE void hyperstone_chk(struct regs_decode *decode)
 {
 	UINT32 addr = get_trap_addr(RANGE_ERROR);
 
@@ -1904,10 +1778,10 @@ static void hyperstone_chk(void)
 		}
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_movd(void)
+INLINE void hyperstone_movd(struct regs_decode *decode)
 {
 	if( DST_IS_PC ) // Rd denotes PC
 	{
@@ -1918,7 +1792,7 @@ static void hyperstone_movd(void)
 
 		if( SRC_IS_PC || SRC_IS_SR )
 		{
-			logerror("Denoted PC or SR in RET instruction. PC = %08X\n", PC);
+			DEBUG_PRINTF(("Denoted PC or SR in RET instruction. PC = %08X\n", PC));
 		}
 		else
 		{
@@ -1929,6 +1803,8 @@ static void hyperstone_movd(void)
 			PC = SET_PC(SREG);
 			change_pc(PC);
 			SR = (SREGF & 0xffe00000) | ((SREG & 0x01) << 18 ) | (SREGF & 0x3ffff);
+			if (hyperstone.intblock < 1)
+				hyperstone.intblock = 1;
 
 			hyperstone.instruction_length = 0; // undefined
 
@@ -1959,7 +1835,7 @@ static void hyperstone_movd(void)
 		}
 
 		//TODO: no 1!
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 	}
 	else if( SRC_IS_SR ) // Rd doesn't denote PC and Rs denotes SR
 	{
@@ -1968,7 +1844,7 @@ static void hyperstone_movd(void)
 		SET_Z(1);
 		SET_N(0);
 
-		hyperstone_ICount -= 2;
+		hyperstone_ICount -= hyperstone.clock_cycles_2;
 	}
 	else // Rd doesn't denote PC and Rs doesn't denote SR
 	{
@@ -1981,21 +1857,21 @@ static void hyperstone_movd(void)
 		SET_Z( tmp == 0 ? 1 : 0 );
 		SET_N( SIGN_BIT(SREG) );
 
-		hyperstone_ICount -= 2;
+		hyperstone_ICount -= hyperstone.clock_cycles_2;
 	}
 }
 
-static void hyperstone_divu(void)
+INLINE void hyperstone_divu(struct regs_decode *decode)
 {
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
-		logerror("Denoted the same register code in hyperstone_divu instruction. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted the same register code in hyperstone_divu instruction. PC = %08X\n", PC));
 	}
 	else
 	{
 		if( SRC_IS_PC || SRC_IS_SR )
 		{
-			logerror("Denoted PC or SR as source register in hyperstone_divu instruction. PC = %08X\n", PC);
+			DEBUG_PRINTF(("Denoted PC or SR as source register in hyperstone_divu instruction. PC = %08X\n", PC));
 		}
 		else
 		{
@@ -2031,20 +1907,20 @@ static void hyperstone_divu(void)
 		}
 	}
 
-	hyperstone_ICount -= 36;
+	hyperstone_ICount -= 36 << hyperstone.clock_scale;
 }
 
-static void hyperstone_divs(void)
+INLINE void hyperstone_divs(struct regs_decode *decode)
 {
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
-		logerror("Denoted the same register code in hyperstone_divs instruction. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted the same register code in hyperstone_divs instruction. PC = %08X\n", PC));
 	}
 	else
 	{
 		if( SRC_IS_PC || SRC_IS_SR )
 		{
-			logerror("Denoted PC or SR as source register in hyperstone_divs instruction. PC = %08X\n", PC);
+			DEBUG_PRINTF(("Denoted PC or SR as source register in hyperstone_divs instruction. PC = %08X\n", PC));
 		}
 		else
 		{
@@ -2080,18 +1956,18 @@ static void hyperstone_divs(void)
 		}
 	}
 
-	hyperstone_ICount -= 36;
+	hyperstone_ICount -= 36 << hyperstone.clock_scale;
 }
 
-static void hyperstone_xm(void)
+INLINE void hyperstone_xm(struct regs_decode *decode)
 {
 	if( SRC_IS_SR || DST_IS_SR || DST_IS_PC )
 	{
-		logerror("Denoted PC or SR in hyperstone_xm. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_xm. PC = %08X\n", PC));
 	}
 	else
 	{
-		switch( current_regs.sub_type ) // x_code
+		switch( decode->sub_type ) // x_code
 		{
 			case 0:
 			case 1:
@@ -2109,7 +1985,7 @@ static void hyperstone_xm(void)
 				}
 				else
 				{
-					SREG <<= current_regs.sub_type;
+					SREG <<= decode->sub_type;
 				}
 
 				break;
@@ -2118,8 +1994,8 @@ static void hyperstone_xm(void)
 			case 5:
 			case 6:
 			case 7:
-				current_regs.sub_type -= 4;
-				SREG <<= current_regs.sub_type;
+				decode->sub_type -= 4;
+				SREG <<= decode->sub_type;
 
 				break;
 		}
@@ -2127,20 +2003,20 @@ static void hyperstone_xm(void)
 		SET_DREG(SREG);
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_mask(void)
+INLINE void hyperstone_mask(struct regs_decode *decode)
 {
 	DREG = SREG & EXTRA_U;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_sum(void)
+INLINE void hyperstone_sum(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2161,10 +2037,10 @@ static void hyperstone_sum(void)
 	SET_Z( DREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_sums(void)
+INLINE void hyperstone_sums(struct regs_decode *decode)
 {
 	INT32 res;
 	INT64 tmp;
@@ -2186,7 +2062,7 @@ static void hyperstone_sums(void)
 	SET_Z( res == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(res) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 
 	if( GET_V && !SRC_IS_SR )
 	{
@@ -2195,7 +2071,7 @@ static void hyperstone_sums(void)
 	}
 }
 
-static void hyperstone_cmp(void)
+INLINE void hyperstone_cmp(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2220,12 +2096,12 @@ static void hyperstone_cmp(void)
 	else
 		SET_C(0);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_mov(void)
+INLINE void hyperstone_mov(struct regs_decode *decode)
 {
-	if( !GET_S && current_regs.dst >= 16 )
+	if( !GET_S && decode->dst >= 16 )
 	{
 		UINT32 addr = get_trap_addr(PRIVILEGE_ERROR);
 		execute_exception(addr);
@@ -2239,11 +2115,11 @@ static void hyperstone_mov(void)
 	SET_Z( SREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(SREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
 
-static void hyperstone_add(void)
+INLINE void hyperstone_add(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2263,10 +2139,10 @@ static void hyperstone_add(void)
 	SET_Z( DREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_adds(void)
+INLINE void hyperstone_adds(struct regs_decode *decode)
 {
 	INT32 res;
 	INT64 tmp;
@@ -2288,7 +2164,7 @@ static void hyperstone_adds(void)
 	SET_Z( res == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(res) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 
 	if( GET_V )
 	{
@@ -2297,44 +2173,44 @@ static void hyperstone_adds(void)
 	}
 }
 
-static void hyperstone_cmpb(void)
+INLINE void hyperstone_cmpb(struct regs_decode *decode)
 {
 	SET_Z( (DREG & SREG) == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_andn(void)
+INLINE void hyperstone_andn(struct regs_decode *decode)
 {
 	DREG = DREG & ~SREG;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_or(void)
+INLINE void hyperstone_or(struct regs_decode *decode)
 {
 	DREG = DREG | SREG;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_xor(void)
+INLINE void hyperstone_xor(struct regs_decode *decode)
 {
 	DREG = DREG ^ SREG;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_subc(void)
+INLINE void hyperstone_subc(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2367,18 +2243,18 @@ static void hyperstone_subc(void)
 	SET_Z( GET_Z & (DREG == 0 ? 1 : 0) );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_not(void)
+INLINE void hyperstone_not(struct regs_decode *decode)
 {
 	SET_DREG(~SREG);
 	SET_Z( ~SREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_sub(void)
+INLINE void hyperstone_sub(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2398,10 +2274,10 @@ static void hyperstone_sub(void)
 	SET_Z( DREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_subs(void)
+INLINE void hyperstone_subs(struct regs_decode *decode)
 {
 	INT32 res;
 	INT64 tmp;
@@ -2424,7 +2300,7 @@ static void hyperstone_subs(void)
 	SET_Z( res == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(res) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 
 	if( GET_V )
 	{
@@ -2433,7 +2309,7 @@ static void hyperstone_subs(void)
 	}
 }
 
-static void hyperstone_addc(void)
+INLINE void hyperstone_addc(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2471,20 +2347,20 @@ static void hyperstone_addc(void)
 	SET_Z( GET_Z & (DREG == 0 ? 1 : 0) );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_and(void)
+INLINE void hyperstone_and(struct regs_decode *decode)
 {
 	DREG = DREG & SREG;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_neg(void)
+INLINE void hyperstone_neg(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2502,10 +2378,10 @@ static void hyperstone_neg(void)
 	SET_Z( DREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_negs(void)
+INLINE void hyperstone_negs(struct regs_decode *decode)
 {
 	INT32 res;
 	INT64 tmp;
@@ -2528,7 +2404,7 @@ static void hyperstone_negs(void)
 	SET_N( SIGN_BIT(res) );
 
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 
 	if( GET_V && !SRC_IS_SR ) //trap doesn't occur when source is SR
 	{
@@ -2537,7 +2413,7 @@ static void hyperstone_negs(void)
 	}
 }
 
-static void hyperstone_cmpi(void)
+INLINE void hyperstone_cmpi(struct regs_decode *decode)
 {
 	UINT64 tmp;
 
@@ -2559,12 +2435,12 @@ static void hyperstone_cmpi(void)
 	else
 		SET_C(0);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_movi(void)
+INLINE void hyperstone_movi(struct regs_decode *decode)
 {
-	if( !GET_S && current_regs.dst >= 16 )
+	if( !GET_S && decode->dst >= 16 )
 	{
 		UINT32 addr = get_trap_addr(PRIVILEGE_ERROR);
 		execute_exception(addr);
@@ -2582,10 +2458,10 @@ static void hyperstone_movi(void)
 	SET_V(0); // or V undefined ?
 #endif
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_addi(void)
+INLINE void hyperstone_addi(struct regs_decode *decode)
 {
 	UINT32 imm;
 	UINT64 tmp;
@@ -2609,10 +2485,10 @@ static void hyperstone_addi(void)
 	SET_Z( DREG == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(DREG) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_addsi(void)
+INLINE void hyperstone_addsi(struct regs_decode *decode)
 {
 	INT32 imm, res;
 	INT64 tmp;
@@ -2636,7 +2512,7 @@ static void hyperstone_addsi(void)
 	SET_Z( res == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(res) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 
 	if( GET_V )
 	{
@@ -2645,7 +2521,7 @@ static void hyperstone_addsi(void)
 	}
 }
 
-static void hyperstone_cmpbi(void)
+INLINE void hyperstone_cmpbi(struct regs_decode *decode)
 {
 	UINT32 imm;
 
@@ -2671,10 +2547,10 @@ static void hyperstone_cmpbi(void)
 			SET_Z(0);
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_andni(void)
+INLINE void hyperstone_andni(struct regs_decode *decode)
 {
 	UINT32 imm;
 
@@ -2688,30 +2564,30 @@ static void hyperstone_andni(void)
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_ori(void)
+INLINE void hyperstone_ori(struct regs_decode *decode)
 {
 	DREG = DREG | EXTRA_U;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_xori(void)
+INLINE void hyperstone_xori(struct regs_decode *decode)
 {
 	DREG = DREG ^ EXTRA_U;
 
 	SET_DREG(DREG);
 	SET_Z( DREG == 0 ? 1 : 0 );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_shrdi(void)
+INLINE void hyperstone_shrdi(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	UINT64 val;
@@ -2736,10 +2612,10 @@ static void hyperstone_shrdi(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(high_order) );
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_shrd(void)
+INLINE void hyperstone_shrd(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	UINT64 val;
@@ -2748,7 +2624,7 @@ static void hyperstone_shrd(void)
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
-		logerror("Denoted same registers in hyperstone_shrd. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted same registers in hyperstone_shrd. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -2774,10 +2650,10 @@ static void hyperstone_shrd(void)
 		SET_N( SIGN_BIT(high_order) );
 	}
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_shr(void)
+INLINE void hyperstone_shr(struct regs_decode *decode)
 {
 	UINT32 ret;
 	UINT8 n;
@@ -2796,10 +2672,10 @@ static void hyperstone_shr(void)
 	SET_Z( ret == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(ret) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_sardi(void)
+INLINE void hyperstone_sardi(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	UINT64 val;
@@ -2836,10 +2712,10 @@ static void hyperstone_sardi(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(high_order) );
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_sard(void)
+INLINE void hyperstone_sard(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	UINT64 val;
@@ -2850,7 +2726,7 @@ static void hyperstone_sard(void)
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
-		logerror("Denoted same registers in hyperstone_sard. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted same registers in hyperstone_sard. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -2886,10 +2762,10 @@ static void hyperstone_sard(void)
 		SET_N( SIGN_BIT(high_order) );
 	}
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_sar(void)
+INLINE void hyperstone_sar(struct regs_decode *decode)
 {
 	UINT32 ret;
 	UINT8 n, sign_bit;
@@ -2918,10 +2794,10 @@ static void hyperstone_sar(void)
 	SET_Z( ret == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(ret) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_shldi(void)
+INLINE void hyperstone_shldi(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order, tmp;
 	UINT64 val, mask;
@@ -2951,10 +2827,10 @@ static void hyperstone_shldi(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(high_order) );
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_shld(void)
+INLINE void hyperstone_shld(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order, tmp, n;
 	UINT64 val, mask;
@@ -2964,7 +2840,7 @@ static void hyperstone_shld(void)
 	// result undefined if Ls denotes the same register as Ld or Ldf
 	if( SAME_SRC_DST || SAME_SRC_DSTF )
 	{
-		logerror("Denoted same registers in hyperstone_shld. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted same registers in hyperstone_shld. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -2995,10 +2871,10 @@ static void hyperstone_shld(void)
 		SET_N( SIGN_BIT(high_order) );
 	}
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_shl(void)
+INLINE void hyperstone_shl(struct regs_decode *decode)
 {
 	UINT32 base, ret, n;
 	UINT64 mask;
@@ -3019,15 +2895,15 @@ static void hyperstone_shl(void)
 	SET_Z( ret == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(ret) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void reserved(void)
+static void reserved(struct regs_decode *decode)
 {
-	logerror("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP);
+	DEBUG_PRINTF(("Executed Reserved opcode. PC = %08X OP = %04X\n", PC, OP));
 }
 
-static void hyperstone_testlz(void)
+INLINE void hyperstone_testlz(struct regs_decode *decode)
 {
 	UINT8 zeros = 0;
 	UINT32 mask;
@@ -3045,10 +2921,10 @@ static void hyperstone_testlz(void)
 
 	SET_DREG(zeros);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_rol(void)
+INLINE void hyperstone_rol(struct regs_decode *decode)
 {
 	UINT32 val, base;
 	UINT8 n;
@@ -3081,17 +2957,17 @@ static void hyperstone_rol(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(val) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
 //TODO: add trap error
-static void hyperstone_ldxx1(void)
+INLINE void hyperstone_ldxx1(struct regs_decode *decode)
 {
 	UINT32 load;
 
 	if( DST_IS_SR )
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // LDBS.A
 
@@ -3137,7 +3013,7 @@ static void hyperstone_ldxx1(void)
 					load = IO_READ_W((EXTRA_S & ~3) + 4);
 					SET_SREGF(load);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else if( (EXTRA_S & 3) == 2 ) // LDW.IOA
 				{
@@ -3152,7 +3028,7 @@ static void hyperstone_ldxx1(void)
 					load = READ_W((EXTRA_S & ~1) + 4);
 					SET_SREGF(load);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // LDW.A
 				{
@@ -3165,7 +3041,7 @@ static void hyperstone_ldxx1(void)
 	}
 	else
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // LDBS.D
 
@@ -3211,7 +3087,7 @@ static void hyperstone_ldxx1(void)
 					load = IO_READ_W(DREG + (EXTRA_S & ~3) + 4);
 					SET_SREGF(load);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else if( (EXTRA_S & 3) == 2 ) // LDW.IOD
 				{
@@ -3226,7 +3102,7 @@ static void hyperstone_ldxx1(void)
 					load = READ_W(DREG + (EXTRA_S & ~1) + 4);
 					SET_SREGF(load);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // LDW.D
 				{
@@ -3238,25 +3114,25 @@ static void hyperstone_ldxx1(void)
 		}
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_ldxx2(void)
+INLINE void hyperstone_ldxx2(struct regs_decode *decode)
 {
 	UINT32 load;
 
 	if( DST_IS_PC || DST_IS_SR )
 	{
-		logerror("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_ldxx2. PC = %08X\n", PC));
 	}
 	else
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // LDBS.N
 
 				if(SAME_SRC_DST)
-					popmessage("LDBS.N denoted same regs @ %08X",PPC);
+					DEBUG_PRINTF(("LDBS.N denoted same regs @ %08X",PPC));
 
 				load = READ_B(DREG);
 				load |= (load & 0x80) ? 0xffffff00 : 0;
@@ -3270,7 +3146,7 @@ static void hyperstone_ldxx2(void)
 			case 1: // LDBU.N
 
 				if(SAME_SRC_DST)
-					popmessage("LDBU.N denoted same regs @ %08X",PPC);
+					DEBUG_PRINTF(("LDBU.N denoted same regs @ %08X",PPC));
 
 				load = READ_B(DREG);
 				SET_SREG(load);
@@ -3289,7 +3165,7 @@ static void hyperstone_ldxx2(void)
 					load |= (load & 0x8000) ? 0xffff0000 : 0;
 
 					if(SAME_SRC_DST)
-						popmessage("LDHS.N denoted same regs @ %08X",PPC);
+						DEBUG_PRINTF(("LDHS.N denoted same regs @ %08X",PPC));
 				}
 				/*
                 else          // LDHU.N
@@ -3310,7 +3186,7 @@ static void hyperstone_ldxx2(void)
 				if( (EXTRA_S & 3) == 3 )      // LDW.S
 				{
 					if(SAME_SRC_DST)
-						popmessage("LDW.S denoted same regs @ %08X",PPC);
+						DEBUG_PRINTF(("LDW.S denoted same regs @ %08X",PPC));
 
 					if(DREG < SP)
 						SET_SREG(READ_W(DREG));
@@ -3320,16 +3196,16 @@ static void hyperstone_ldxx2(void)
 					if(!SAME_SRC_DST)
 						SET_DREG(DREG + (EXTRA_S & ~3));
 
-					hyperstone_ICount -= 2; // extra cycles
+					hyperstone_ICount -= hyperstone.clock_cycles_2; // extra cycles
 				}
 				else if( (EXTRA_S & 3) == 2 ) // Reserved
 				{
-					logerror("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC);
+					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_ldxx2. PC = %08X\n", PC));
 				}
 				else if( (EXTRA_S & 3) == 1 ) // LDD.N
 				{
 					if(SAME_SRC_DST || SAME_SRCF_DST)
-						popmessage("LDD.N denoted same regs @ %08X",PPC);
+						DEBUG_PRINTF(("LDD.N denoted same regs @ %08X",PPC));
 
 					load = READ_W(DREG);
 					SET_SREG(load);
@@ -3340,12 +3216,12 @@ static void hyperstone_ldxx2(void)
 					if(!SAME_SRC_DST && !SAME_SRCF_DST)
 						SET_DREG(DREG + (EXTRA_S & ~1));
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // LDW.N
 				{
 					if(SAME_SRC_DST)
-						popmessage("LDW.N denoted same regs @ %08X",PPC);
+						DEBUG_PRINTF(("LDW.N denoted same regs @ %08X",PPC));
 
 					load = READ_W(DREG);
 					SET_SREG(load);
@@ -3358,18 +3234,18 @@ static void hyperstone_ldxx2(void)
 		}
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
 //TODO: add trap error
-static void hyperstone_stxx1(void)
+INLINE void hyperstone_stxx1(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
 
 	if( DST_IS_SR )
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // STBS.A
 
@@ -3408,7 +3284,7 @@ static void hyperstone_stxx1(void)
 					IO_WRITE_W(EXTRA_S & ~3, SREG);
 					IO_WRITE_W((EXTRA_S & ~3) + 4, SREGF);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else if( (EXTRA_S & 3) == 2 ) // STW.IOA
 				{
@@ -3419,7 +3295,7 @@ static void hyperstone_stxx1(void)
 					WRITE_W(EXTRA_S & ~1, SREG);
 					WRITE_W((EXTRA_S & ~1) + 4, SREGF);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // STW.A
 				{
@@ -3431,7 +3307,7 @@ static void hyperstone_stxx1(void)
 	}
 	else
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // STBS.D
 
@@ -3470,7 +3346,7 @@ static void hyperstone_stxx1(void)
 					IO_WRITE_W(DREG + (EXTRA_S & ~3), SREG);
 					IO_WRITE_W(DREG + (EXTRA_S & ~3) + 4, SREGF);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else if( (EXTRA_S & 3) == 2 ) // STW.IOD
 				{
@@ -3481,7 +3357,7 @@ static void hyperstone_stxx1(void)
 					WRITE_W(DREG + (EXTRA_S & ~1), SREG);
 					WRITE_W(DREG + (EXTRA_S & ~1) + 4, SREGF);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // STW.D
 				{
@@ -3492,21 +3368,21 @@ static void hyperstone_stxx1(void)
 		}
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_stxx2(void)
+INLINE void hyperstone_stxx2(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
 
 	if( DST_IS_PC || DST_IS_SR )
 	{
-		logerror("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_stxx2. PC = %08X\n", PC));
 	}
 	else
 	{
-		switch( current_regs.sub_type )
+		switch( decode->sub_type )
 		{
 			case 0: // STBS.N
 
@@ -3549,20 +3425,20 @@ static void hyperstone_stxx2(void)
 						WRITE_W(DREG, SREG);
 					else
 					{
-						if(((DREG & 0xfc) >> 2) == ((current_regs.src + GET_FP) % 64) && S_BIT == LOCAL)
-							popmessage("STW.S denoted the same local register @ %08X\n",PPC);
+						if(((DREG & 0xfc) >> 2) == ((decode->src + GET_FP) % 64) && S_BIT == LOCAL)
+							DEBUG_PRINTF(("STW.S denoted the same local register @ %08X\n",PPC));
 
 						SET_ABS_L_REG((DREG & 0xfc) >> 2,SREG);
 					}
 
 					SET_DREG(DREG + (EXTRA_S & ~3));
 
-					hyperstone_ICount -= 2; // extra cycles
+					hyperstone_ICount -= hyperstone.clock_cycles_2; // extra cycles
 
 				}
 				else if( (EXTRA_S & 3) == 2 ) // Reserved
 				{
-					logerror("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC);
+					DEBUG_PRINTF(("Executed Reserved instruction in hyperstone_stxx2. PC = %08X\n", PC));
 				}
 				else if( (EXTRA_S & 3) == 1 ) // STD.N
 				{
@@ -3574,7 +3450,7 @@ static void hyperstone_stxx2(void)
 					else
 						WRITE_W(DREG + 4, SREGF);
 
-					hyperstone_ICount -= 1; // extra cycle
+					hyperstone_ICount -= hyperstone.clock_cycles_1; // extra cycle
 				}
 				else                      // STW.N
 				{
@@ -3586,10 +3462,10 @@ static void hyperstone_stxx2(void)
 		}
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_shri(void)
+INLINE void hyperstone_shri(struct regs_decode *decode)
 {
 	UINT32 val;
 
@@ -3606,10 +3482,10 @@ static void hyperstone_shri(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(val) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_sari(void)
+INLINE void hyperstone_sari(struct regs_decode *decode)
 {
 	UINT32 val;
 	UINT8 sign_bit;
@@ -3637,10 +3513,10 @@ static void hyperstone_sari(void)
 	SET_Z( val == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(val) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_shli(void)
+INLINE void hyperstone_shli(struct regs_decode *decode)
 {
 	UINT32 val, val2;
 	UINT64 mask;
@@ -3660,10 +3536,10 @@ static void hyperstone_shli(void)
 	SET_Z( val2 == 0 ? 1 : 0 );
 	SET_N( SIGN_BIT(val2) );
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_mulu(void)
+INLINE void hyperstone_mulu(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	UINT64 double_word;
@@ -3671,7 +3547,7 @@ static void hyperstone_mulu(void)
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
 	{
-		logerror("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mulu instruction. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -3688,12 +3564,12 @@ static void hyperstone_mulu(void)
 	}
 
 	if(SREG <= 0xffff && DREG <= 0xffff)
-		hyperstone_ICount -= 4;
+		hyperstone_ICount -= hyperstone.clock_cycles_4;
 	else
-		hyperstone_ICount -= 6;
+		hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_muls(void)
+INLINE void hyperstone_muls(struct regs_decode *decode)
 {
 	UINT32 low_order, high_order;
 	INT64 double_word;
@@ -3701,7 +3577,7 @@ static void hyperstone_muls(void)
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
 	{
-		logerror("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_muls instruction. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -3717,25 +3593,25 @@ static void hyperstone_muls(void)
 	}
 
 	if((SREG >= 0xffff8000 && SREG <= 0x7fff) && (DREG >= 0xffff8000 && DREG <= 0x7fff))
-		hyperstone_ICount -= 4;
+		hyperstone_ICount -= hyperstone.clock_cycles_4;
 	else
-		hyperstone_ICount -= 6;
+		hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_set(void)
+INLINE void hyperstone_set(struct regs_decode *decode)
 {
 	int n = N_VALUE;
 
 	if( DST_IS_PC )
 	{
-		logerror("Denoted PC in hyperstone_set. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC in hyperstone_set. PC = %08X\n", PC));
 	}
 	else if( DST_IS_SR )
 	{
 		//TODO: add fetch opcode when there's the pipeline
 
 		//TODO: no 1!
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 	}
 	else
 	{
@@ -3759,7 +3635,7 @@ static void hyperstone_set(void)
 			case 16:
 			case 17:
 			case 19:
-				logerror("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC);
+				DEBUG_PRINTF(("Used reserved N value (%d) in hyperstone_set. PC = %08X\n", n, PC));
 				break;
 
 			// SETxx
@@ -4064,18 +3940,18 @@ static void hyperstone_set(void)
 				break;
 		}
 
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 	}
 }
 
-static void hyperstone_mul(void)
+INLINE void hyperstone_mul(struct regs_decode *decode)
 {
 	UINT32 single_word;
 
 	// PC or SR aren't denoted, else result is undefined
 	if( SRC_IS_PC || SRC_IS_SR || DST_IS_PC || DST_IS_SR  )
 	{
-		logerror("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC);
+		DEBUG_PRINTF(("Denoted PC or SR in hyperstone_mul instruction. PC = %08X\n", PC));
 	}
 	else
 	{
@@ -4088,96 +3964,96 @@ static void hyperstone_mul(void)
 	}
 
 	if((SREG >= 0xffff8000 && SREG <= 0x7fff) && (DREG >= 0xffff8000 && DREG <= 0x7fff))
-		hyperstone_ICount -= 3;
+		hyperstone_ICount -= 3 << hyperstone.clock_scale;
 	else
-		hyperstone_ICount -= 5;
+		hyperstone_ICount -= 5 << hyperstone.clock_scale;
 }
 
-static void hyperstone_fadd(void)
+INLINE void hyperstone_fadd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_faddd(void)
+INLINE void hyperstone_faddd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fsub(void)
+INLINE void hyperstone_fsub(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fsubd(void)
+INLINE void hyperstone_fsubd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fmul(void)
+INLINE void hyperstone_fmul(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fmuld(void)
+INLINE void hyperstone_fmuld(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fdiv(void)
+INLINE void hyperstone_fdiv(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fdivd(void)
+INLINE void hyperstone_fdivd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcmp(void)
+INLINE void hyperstone_fcmp(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcmpd(void)
+INLINE void hyperstone_fcmpd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcmpu(void)
+INLINE void hyperstone_fcmpu(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcmpud(void)
+INLINE void hyperstone_fcmpud(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcvt(void)
+INLINE void hyperstone_fcvt(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_fcvtd(void)
+INLINE void hyperstone_fcvtd(struct regs_decode *decode)
 {
-	execute_software();
-	hyperstone_ICount -= 6;
+	execute_software(decode);
+	hyperstone_ICount -= hyperstone.clock_cycles_6;
 }
 
-static void hyperstone_extend(void)
+INLINE void hyperstone_extend(struct regs_decode *decode)
 {
 	//TODO: add locks, overflow error and other things
 	UINT32 vals, vald;
@@ -4371,75 +4247,75 @@ static void hyperstone_extend(void)
 			break;
 		}
 		default:
-			logerror("Executed Illegal extended opcode (%X). PC = %08X\n", EXTRA_U, PC);
+			DEBUG_PRINTF(("Executed Illegal extended opcode (%X). PC = %08X\n", EXTRA_U, PC));
 			break;
 	}
 
-	hyperstone_ICount -= 1; //TODO: with the latency it can change
+	hyperstone_ICount -= hyperstone.clock_cycles_1; //TODO: with the latency it can change
 }
 
-static void hyperstone_do(void)
+INLINE void hyperstone_do(struct regs_decode *decode)
 {
 	fatalerror("Executed hyperstone_do instruction. PC = %08X", PPC);
 }
 
-static void hyperstone_ldwr(void)
+INLINE void hyperstone_ldwr(struct regs_decode *decode)
 {
 	SET_SREG(READ_W(DREG));
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_lddr(void)
+INLINE void hyperstone_lddr(struct regs_decode *decode)
 {
 	SET_SREG(READ_W(DREG));
 	SET_SREGF(READ_W(DREG + 4));
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_ldwp(void)
+INLINE void hyperstone_ldwp(struct regs_decode *decode)
 {
 	SET_SREG(READ_W(DREG));
 
 	// post increment the destination register if it's different from the source one
 	// (needed by Hidden Catch)
-	if(!(current_regs.src == current_regs.dst && S_BIT == LOCAL))
+	if(!(decode->src == decode->dst && S_BIT == LOCAL))
 		SET_DREG(DREG + 4);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_lddp(void)
+INLINE void hyperstone_lddp(struct regs_decode *decode)
 {
 	SET_SREG(READ_W(DREG));
 	SET_SREGF(READ_W(DREG + 4));
 
 	// post increment the destination register if it's different from the source one
 	// and from the "next source" one
-	if(!(current_regs.src == current_regs.dst && S_BIT == LOCAL) &&	!SAME_SRCF_DST )
+	if(!(decode->src == decode->dst && S_BIT == LOCAL) &&	!SAME_SRCF_DST )
 	{
 		SET_DREG(DREG + 8);
 	}
 	else
 	{
-		popmessage("LDD.P denoted same regs @ %08X",PPC);
+		DEBUG_PRINTF(("LDD.P denoted same regs @ %08X",PPC));
 	}
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_stwr(void)
+INLINE void hyperstone_stwr(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
 
 	WRITE_W(DREG, SREG);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_stdr(void)
+INLINE void hyperstone_stdr(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
@@ -4447,10 +4323,10 @@ static void hyperstone_stdr(void)
 	WRITE_W(DREG, SREG);
 	WRITE_W(DREG + 4, SREGF);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_stwp(void)
+INLINE void hyperstone_stwp(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
@@ -4458,10 +4334,10 @@ static void hyperstone_stwp(void)
 	WRITE_W(DREG, SREG);
 	SET_DREG(DREG + 4);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_stdp(void)
+INLINE void hyperstone_stdp(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = SREGF = 0;
@@ -4474,111 +4350,111 @@ static void hyperstone_stdp(void)
 	else
 		WRITE_W(DREG + 4, SREGF);
 
-	hyperstone_ICount -= 2;
+	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
 
-static void hyperstone_dbv(void)
+INLINE void hyperstone_dbv(struct regs_decode *decode)
 {
 	if( GET_V )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbnv(void)
+INLINE void hyperstone_dbnv(struct regs_decode *decode)
 {
 	if( !GET_V )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbe(void) //or DBZ
+INLINE void hyperstone_dbe(struct regs_decode *decode) //or DBZ
 {
 	if( GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbne(void) //or DBNZ
+INLINE void hyperstone_dbne(struct regs_decode *decode) //or DBNZ
 {
 	if( !GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbc(void) //or DBST
+INLINE void hyperstone_dbc(struct regs_decode *decode) //or DBST
 {
 	if( GET_C )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbnc(void) //or DBHE
+INLINE void hyperstone_dbnc(struct regs_decode *decode) //or DBHE
 {
 	if( !GET_C )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbse(void)
+INLINE void hyperstone_dbse(struct regs_decode *decode)
 {
 	if( GET_C || GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbht(void)
+INLINE void hyperstone_dbht(struct regs_decode *decode)
 {
 	if( !GET_C && !GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbn(void) //or DBLT
+INLINE void hyperstone_dbn(struct regs_decode *decode) //or DBLT
 {
 	if( GET_N )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbnn(void) //or DBGE
+INLINE void hyperstone_dbnn(struct regs_decode *decode) //or DBGE
 {
 	if( !GET_N )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dble(void)
+INLINE void hyperstone_dble(struct regs_decode *decode)
 {
 	if( GET_N || GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbgt(void)
+INLINE void hyperstone_dbgt(struct regs_decode *decode)
 {
 	if( !GET_N && !GET_Z )
-		execute_dbr();
+		execute_dbr(decode);
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_dbr(void)
+INLINE void hyperstone_dbr(struct regs_decode *decode)
 {
-	execute_dbr();
+	execute_dbr(decode);
 }
 
-static void hyperstone_frame(void)
+INLINE void hyperstone_frame(struct regs_decode *decode)
 {
 	INT8 difference; // really it's 7 bits
 	UINT8 realfp = GET_FP - SRC_CODE;
@@ -4617,16 +4493,16 @@ static void hyperstone_frame(void)
 	}
 
 	//TODO: no 1!
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_call(void)
+INLINE void hyperstone_call(struct regs_decode *decode)
 {
 	if( SRC_IS_SR )
 		SREG = 0;
 
 	if( !DST_CODE )
-		current_regs.dst = 16;
+		decode->dst = 16;
 
 	EXTRA_S = (EXTRA_S & ~1) + SREG;
 
@@ -4635,7 +4511,7 @@ static void hyperstone_call(void)
 	SET_DREG((PC & 0xfffffffe) | GET_S);
 	SET_DREGF(SR);
 
-	SET_FP(GET_FP + current_regs.dst);
+	SET_FP(GET_FP + decode->dst);
 
 	SET_FL(6); //default value for call
 	SET_M(0);
@@ -4649,111 +4525,111 @@ static void hyperstone_call(void)
 	//TODO: add interrupt locks, errors, ....
 
 	//TODO: no 1!
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bv(void)
+INLINE void hyperstone_bv(struct regs_decode *decode)
 {
 	if( GET_V )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bnv(void)
+INLINE void hyperstone_bnv(struct regs_decode *decode)
 {
 	if( !GET_V )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_be(void) //or BZ
+INLINE void hyperstone_be(struct regs_decode *decode) //or BZ
 {
 	if( GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bne(void) //or BNZ
+INLINE void hyperstone_bne(struct regs_decode *decode) //or BNZ
 {
 	if( !GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bc(void) //or BST
+INLINE void hyperstone_bc(struct regs_decode *decode) //or BST
 {
 	if( GET_C )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bnc(void) //or BHE
+INLINE void hyperstone_bnc(struct regs_decode *decode) //or BHE
 {
 	if( !GET_C )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bse(void)
+INLINE void hyperstone_bse(struct regs_decode *decode)
 {
 	if( GET_C || GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bht(void)
+INLINE void hyperstone_bht(struct regs_decode *decode)
 {
 	if( !GET_C && !GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bn(void) //or BLT
+INLINE void hyperstone_bn(struct regs_decode *decode) //or BLT
 {
 	if( GET_N )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bnn(void) //or BGE
+INLINE void hyperstone_bnn(struct regs_decode *decode) //or BGE
 {
 	if( !GET_N )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_ble(void)
+INLINE void hyperstone_ble(struct regs_decode *decode)
 {
 	if( GET_N || GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_bgt(void)
+INLINE void hyperstone_bgt(struct regs_decode *decode)
 {
 	if( !GET_N && !GET_Z )
-		execute_br();
+		execute_br(decode);
 	else
-		hyperstone_ICount -= 1;
+		hyperstone_ICount -= hyperstone.clock_cycles_1;
 }
 
-static void hyperstone_br(void)
+INLINE void hyperstone_br(struct regs_decode *decode)
 {
-	execute_br();
+	execute_br(decode);
 }
 
-static void hyperstone_trap(void)
+INLINE void hyperstone_trap(struct regs_decode *decode)
 {
 	UINT8 code, trapno;
 	UINT32 addr;
@@ -4837,7 +4713,54 @@ static void hyperstone_trap(void)
 			break;
 	}
 
-	hyperstone_ICount -= 1;
+	hyperstone_ICount -= hyperstone.clock_cycles_1;
+}
+
+
+#include "e132xsop.c"
+
+
+static int hyperstone_execute(int cycles)
+{
+	hyperstone_ICount = cycles;
+
+	if (hyperstone.intblock < 0)
+		hyperstone.intblock = 0;
+	check_interrupts();
+
+	do
+	{
+		UINT32 oldh = SR & 0x00000020;
+		UINT16 opcode;
+
+		PPC = PC;	/* copy PC to previous PC */
+		CALL_MAME_DEBUG;
+
+		opcode = READ_OP(PC);
+		PC += 2;
+
+		hyperstone.instruction_length = 1;
+
+		/* execute opcode */
+		(*hyperstone_op[(opcode & 0xff00) >> 8])(opcode);
+
+		/* clear the H state if it was previously set */
+		SR ^= oldh;
+
+		SET_ILC(hyperstone.instruction_length & 3);
+
+		if( GET_T && GET_P && hyperstone.delay.delay_cmd == NO_DELAY ) /* Not in a Delayed Branch instructions */
+		{
+			UINT32 addr = get_trap_addr(TRACE_EXCEPTION);
+			execute_exception(addr);
+		}
+
+		if (--hyperstone.intblock == 0)
+			check_interrupts();
+
+	} while( hyperstone_ICount > 0 );
+
+	return cycles - hyperstone_ICount;
 }
 
 
@@ -4855,36 +4778,36 @@ static void hyperstone_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; change_pc(PC);			break;
 		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;							break;
-		case CPUINFO_INT_REGISTER + E132XS_G3:			hyperstone.global_regs[3] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G4:			hyperstone.global_regs[4] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G5:			hyperstone.global_regs[5] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G6:			hyperstone.global_regs[6] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G7:			hyperstone.global_regs[7] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G8:			hyperstone.global_regs[8] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G9:			hyperstone.global_regs[9] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G10:			hyperstone.global_regs[10] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G11:			hyperstone.global_regs[11] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G12:			hyperstone.global_regs[12] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G13:			hyperstone.global_regs[13] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G14:			hyperstone.global_regs[14] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G15:			hyperstone.global_regs[15] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G16:			hyperstone.global_regs[16] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G17:			hyperstone.global_regs[17] = info->i;	break;
+		case CPUINFO_INT_REGISTER + E132XS_G3:			set_global_register(3, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G4:			set_global_register(4, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G5:			set_global_register(5, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G6:			set_global_register(6, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G7:			set_global_register(7, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G8:			set_global_register(8, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G9:			set_global_register(9, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G10:			set_global_register(10, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G11:			set_global_register(11, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G12:			set_global_register(12, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G13:			set_global_register(13, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G14:			set_global_register(14, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G15:			set_global_register(15, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G16:			set_global_register(16, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G17:			set_global_register(17, info->i);	break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + E132XS_SP:			SP  = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_UB:			UB  = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_BCR:			BCR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_TPR:			TPR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_TCR:			TCR = info->i;							break;
-		case CPUINFO_INT_REGISTER + E132XS_TR:			TR  = info->i;							break;
+		case CPUINFO_INT_REGISTER + E132XS_TR:			set_global_register(TR_REGISTER, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_WCR:			WCR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_ISR:			ISR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_FCR:			FCR = info->i;							break;
 		case CPUINFO_INT_REGISTER + E132XS_MCR:			MCR = info->i;							break;
-		case CPUINFO_INT_REGISTER + E132XS_G28:			hyperstone.global_regs[28] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G29:			hyperstone.global_regs[29] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G30:			hyperstone.global_regs[30] = info->i;	break;
-		case CPUINFO_INT_REGISTER + E132XS_G31:			hyperstone.global_regs[31] = info->i;	break;
+		case CPUINFO_INT_REGISTER + E132XS_G28:			set_global_register(28, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G29:			set_global_register(29, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G30:			set_global_register(30, info->i);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G31:			set_global_register(31, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_CL0:			hyperstone.local_regs[(0 + GET_FP) % 64] = info->i; break;
 		case CPUINFO_INT_REGISTER + E132XS_CL1:			hyperstone.local_regs[(1 + GET_FP) % 64] = info->i; break;
 		case CPUINFO_INT_REGISTER + E132XS_CL2:			hyperstone.local_regs[(2 + GET_FP) % 64] = info->i; break;
@@ -4981,7 +4904,7 @@ static void hyperstone_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void hyperstone_get_info(UINT32 state, cpuinfo *info)
+static void hyperstone_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
@@ -5012,21 +4935,21 @@ void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + E132XS_PC:			info->i =  PC;							break;
 		case CPUINFO_INT_REGISTER + E132XS_SR:			info->i =  SR;							break;
 		case CPUINFO_INT_REGISTER + E132XS_FER:			info->i =  FER;							break;
-		case CPUINFO_INT_REGISTER + E132XS_G3:			info->i =  hyperstone.global_regs[3];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G4:			info->i =  hyperstone.global_regs[4];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G5:			info->i =  hyperstone.global_regs[5];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G6:			info->i =  hyperstone.global_regs[6];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G7:			info->i =  hyperstone.global_regs[7];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G8:			info->i =  hyperstone.global_regs[8];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G9:			info->i =  hyperstone.global_regs[9];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G10:			info->i =  hyperstone.global_regs[10];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G11:			info->i =  hyperstone.global_regs[11];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G12:			info->i =  hyperstone.global_regs[12];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G13:			info->i =  hyperstone.global_regs[13];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G14:			info->i =  hyperstone.global_regs[14];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G15:			info->i =  hyperstone.global_regs[15];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G16:			info->i =  hyperstone.global_regs[16];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G17:			info->i =  hyperstone.global_regs[17];	break;
+		case CPUINFO_INT_REGISTER + E132XS_G3:			info->i =  get_global_register(3);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G4:			info->i =  get_global_register(4);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G5:			info->i =  get_global_register(5);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G6:			info->i =  get_global_register(6);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G7:			info->i =  get_global_register(7);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G8:			info->i =  get_global_register(8);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G9:			info->i =  get_global_register(9);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G10:			info->i =  get_global_register(10);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G11:			info->i =  get_global_register(11);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G12:			info->i =  get_global_register(12);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G13:			info->i =  get_global_register(13);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G14:			info->i =  get_global_register(14);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G15:			info->i =  get_global_register(15);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G16:			info->i =  get_global_register(16);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G17:			info->i =  get_global_register(17);	break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + E132XS_SP:			info->i =  SP;							break;
 		case CPUINFO_INT_REGISTER + E132XS_UB:			info->i =  UB;							break;
@@ -5038,10 +4961,10 @@ void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + E132XS_ISR:			info->i =  ISR;							break;
 		case CPUINFO_INT_REGISTER + E132XS_FCR:			info->i =  FCR;							break;
 		case CPUINFO_INT_REGISTER + E132XS_MCR:			info->i =  MCR;							break;
-		case CPUINFO_INT_REGISTER + E132XS_G28:			info->i =  hyperstone.global_regs[28];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G29:			info->i =  hyperstone.global_regs[29];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G30:			info->i =  hyperstone.global_regs[30];	break;
-		case CPUINFO_INT_REGISTER + E132XS_G31:			info->i =  hyperstone.global_regs[31];	break;
+		case CPUINFO_INT_REGISTER + E132XS_G28:			info->i =  get_global_register(28);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G29:			info->i =  get_global_register(29);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G30:			info->i =  get_global_register(30);	break;
+		case CPUINFO_INT_REGISTER + E132XS_G31:			info->i =  get_global_register(31);	break;
 		case CPUINFO_INT_REGISTER + E132XS_CL0:			info->i =  hyperstone.local_regs[(0 + GET_FP) % 64]; break;
 		case CPUINFO_INT_REGISTER + E132XS_CL1:			info->i =  hyperstone.local_regs[(1 + GET_FP) % 64]; break;
 		case CPUINFO_INT_REGISTER + E132XS_CL2:			info->i =  hyperstone.local_regs[(2 + GET_FP) % 64]; break;
@@ -5127,7 +5050,7 @@ void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = hyperstone_set_info;	break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hyperstone_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hyperstone_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = hyperstone_init;			break;
+		case CPUINFO_PTR_INIT:							info->init = NULL;						break;
 		case CPUINFO_PTR_RESET:							info->reset = hyperstone_reset;			break;
 		case CPUINFO_PTR_EXIT:							info->exit = hyperstone_exit;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hyperstone_execute;		break;
@@ -5295,7 +5218,7 @@ void e116t_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_4k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e116t_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16T");				break;
@@ -5318,7 +5241,7 @@ void e116xt_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_8k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e116xt_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XT");				break;
@@ -5341,7 +5264,7 @@ void e116xs_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_16k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e116xs_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XS");				break;
@@ -5364,7 +5287,7 @@ void e116xsr_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_16k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e116xsr_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XSR");			break;
@@ -5387,7 +5310,7 @@ void e132n_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_4k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132n_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32N");				break;
@@ -5410,7 +5333,7 @@ void e132t_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_4k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132t_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32T");				break;
@@ -5433,7 +5356,7 @@ void e132xn_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_8k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132xn_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XN");				break;
@@ -5456,7 +5379,7 @@ void e132xt_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_8k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132xt_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XT");				break;
@@ -5479,7 +5402,7 @@ void e132xs_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_16k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132xs_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XS");				break;
@@ -5502,7 +5425,7 @@ void e132xsr_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_16k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = e132xsr_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XSR");			break;
@@ -5525,7 +5448,7 @@ void gms30c2116_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_4k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = gms30c2116_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2116");			break;
@@ -5548,7 +5471,7 @@ void gms30c2132_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_4k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = gms30c2132_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2132");			break;
@@ -5571,7 +5494,7 @@ void gms30c2216_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e116_8k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e116_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = gms30c2216_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2216");			break;
@@ -5594,7 +5517,7 @@ void gms30c2232_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_e132_8k_iram_map; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = e132_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = gms30c2232_init;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2232");			break;

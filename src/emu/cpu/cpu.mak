@@ -498,7 +498,8 @@ DBGOBJS += $(CPUOBJ)/e132xs/32xsdasm.o
 endif
 
 $(CPUOBJ)/e132xs/e132xs.o:	$(CPUSRC)/e132xs/e132xs.c \
-							$(CPUSRC)/e132xs/e132xs.h
+							$(CPUSRC)/e132xs/e132xs.h \
+							$(CPUSRC)/e132xs/e132xsop.c
 
 
 

@@ -59,8 +59,8 @@ struct _palette_private
 };
 
 
-/* typedef struct _colortable colortable; */
-struct _colortable
+/* typedef struct _colortable_t colortable_t; */
+struct _colortable_t
 {
 	running_machine *	machine;			/* associated machine */
 	UINT32				entries;			/* number of entries */
@@ -365,9 +365,9 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
     with the given number of entries
 -------------------------------------------------*/
 
-colortable *colortable_alloc(running_machine *machine, UINT32 palettesize)
+colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 {
-	colortable *ctable;
+	colortable_t *ctable;
 	UINT32 index;
 
 	/* allocate the colortable */
@@ -400,7 +400,7 @@ colortable *colortable_alloc(running_machine *machine, UINT32 palettesize)
     of a colortable entry
 -------------------------------------------------*/
 
-void colortable_entry_set_value(colortable *ctable, UINT32 entry, UINT16 value)
+void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value)
 {
 	/* ensure values are within range */
 	assert(entry < ctable->entries);
@@ -420,7 +420,7 @@ void colortable_entry_set_value(colortable *ctable, UINT32 entry, UINT16 value)
     of a colortable entry
 -------------------------------------------------*/
 
-UINT16 colortable_entry_get_value(colortable *ctable, UINT32 entry)
+UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry)
 {
 	assert(entry < ctable->entries);
 	return ctable->raw[entry];
@@ -432,7 +432,7 @@ UINT16 colortable_entry_get_value(colortable *ctable, UINT32 entry)
     color of a colortable palette entry
 -------------------------------------------------*/
 
-void colortable_palette_set_color(colortable *ctable, UINT32 entry, rgb_t color)
+void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t color)
 {
 	/* ensure values are within range */
 	assert(entry < ctable->palentries);
@@ -460,7 +460,7 @@ void colortable_palette_set_color(colortable *ctable, UINT32 entry, rgb_t color)
     of a colortable palette entry
 -------------------------------------------------*/
 
-rgb_t colortable_palette_get_color(colortable *ctable, UINT32 entry)
+rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry)
 {
 	assert(entry < ctable->palentries);
 	return ctable->palette[entry];
@@ -473,7 +473,7 @@ rgb_t colortable_palette_get_color(colortable *ctable, UINT32 entry)
     color
 -------------------------------------------------*/
 
-UINT32 colortable_get_transpen_mask(colortable *ctable, const gfx_element *gfx, int color, int transcolor)
+UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx, int color, int transcolor)
 {
 	UINT32 entry = gfx->color_base + (color % gfx->total_colors) * gfx->color_granularity;
 	UINT32 mask = 0;
@@ -503,7 +503,7 @@ UINT32 colortable_get_transpen_mask(colortable *ctable, const gfx_element *gfx, 
     (each group maps to a gfx color)
 -------------------------------------------------*/
 
-void colortable_configure_tilemap_groups(colortable *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor)
+void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor)
 {
 	int color;
 

@@ -36,6 +36,7 @@ enum {
 };
 
 extern void cop410_get_info(UINT32 state, cpuinfo *info);
+extern void cop411_get_info(UINT32 state, cpuinfo *info);
 extern void cop420_get_info(UINT32 state, cpuinfo *info);
 
 #ifdef MAME_DEBUG

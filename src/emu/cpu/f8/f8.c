@@ -56,7 +56,7 @@ typedef struct {
     int     irq_request;
 }	f8_Regs;
 
-int f8_icount;
+static int f8_icount;
 
 static f8_Regs f8;
 
@@ -1531,7 +1531,7 @@ static void f8_ns_isar_d(void)
 	f8.is = (f8.is & 0x38) | ((f8.is - 1) & 0x07);
 }
 
-void f8_reset(void)
+static void f8_reset(void)
 {
 	UINT8 data;
 	int i;
@@ -1570,7 +1570,7 @@ void f8_reset(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-int f8_execute(int cycles)
+static int f8_execute(int cycles)
 {
     f8_icount = cycles;
 

@@ -2845,7 +2845,7 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2.m[offset];
 }
 
-void sh2_set_frt_input(int cpunum, int state)
+static void sh2_set_frt_input(int cpunum, int state)
 {
 	if(state == PULSE_LINE)
 	{

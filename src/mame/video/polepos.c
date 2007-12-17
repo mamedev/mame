@@ -15,7 +15,6 @@ static UINT16 polepos_vertical_position_modifier[256];
 
 static UINT16 road16_vscroll;
 
-static colortable *polepos_colortable;
 static tilemap *bg_tilemap,*tx_tilemap;
 static int polepos_chacl;
 
@@ -41,7 +40,7 @@ PALETTE_INIT( polepos )
 	int i, j;
 
 	/* allocate the colortable */
-	polepos_colortable = colortable_alloc(machine, 128);
+	machine->colortable = colortable_alloc(machine, 128);
 
 	/*******************************************************
      * Color PROMs
@@ -87,7 +86,7 @@ PALETTE_INIT( polepos )
 		bit3 = (color_prom[0x200 + i] >> 3) & 1;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(polepos_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 	}
 
 	/*******************************************************
@@ -98,8 +97,8 @@ PALETTE_INIT( polepos )
 	for (i = 0; i < 64*4; i++)
 	{
 		int color = color_prom[0x300 + i];
-		colortable_entry_set_value(polepos_colortable, 0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
-		colortable_entry_set_value(polepos_colortable, 0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
+		colortable_entry_set_value(machine->colortable, 0x0000 + i, (color != 15) ? (0x020 + color) : 0x2f);
+		colortable_entry_set_value(machine->colortable, 0x0100 + i, (color != 15) ? (0x060 + color) : 0x2f);
 	}
 
 	/*******************************************************
@@ -111,7 +110,7 @@ PALETTE_INIT( polepos )
 	for (i = 0; i < 64*4; i++)
 	{
 		int color = color_prom[0x400 + i];
-		colortable_entry_set_value(polepos_colortable, 0x0200 + i, 0x000 + color);
+		colortable_entry_set_value(machine->colortable, 0x0200 + i, 0x000 + color);
 	}
 
 	/*******************************************************
@@ -122,8 +121,8 @@ PALETTE_INIT( polepos )
 	for (i = 0; i < 64*16; i++)
 	{
 		int color = color_prom[0xc00 + i];
-		colortable_entry_set_value(polepos_colortable, 0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
-		colortable_entry_set_value(polepos_colortable, 0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
+		colortable_entry_set_value(machine->colortable, 0x0300 + i, (color != 15) ? (0x010 + color) : 0x1f);
+		colortable_entry_set_value(machine->colortable, 0x0700 + i, (color != 15) ? (0x050 + color) : 0x1f);
 	}
 
 	/*******************************************************
@@ -135,7 +134,7 @@ PALETTE_INIT( polepos )
 	for (i = 0; i < 64*16; i++)
 	{
 		int color = color_prom[0x800 + i];
-		colortable_entry_set_value(polepos_colortable, 0x0b00 + i, 0x040 + color);
+		colortable_entry_set_value(machine->colortable, 0x0b00 + i, 0x040 + color);
 	}
 
 	/* 136014-142, 136014-143, 136014-144 Vertical position modifiers */
@@ -205,7 +204,7 @@ VIDEO_START( polepos )
 	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,16);
 	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
-	colortable_configure_tilemap_groups(polepos_colortable, tx_tilemap, machine->gfx[0], 0x2f);
+	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0x2f);
 }
 
 
@@ -434,7 +433,7 @@ static void zoom_sprite(running_machine *machine, mame_bitmap *bitmap,int big,
 	const gfx_element *gfx = machine->gfx[big ? 3 : 2];
 	UINT8 *gfxdata = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 	UINT8 *scaling_rom = memory_region(REGION_GFX6);
-	UINT32 transmask = colortable_get_transpen_mask(polepos_colortable, gfx, color, 0x1f);
+	UINT32 transmask = colortable_get_transpen_mask(machine->colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->color_base + color * gfx->color_granularity;
 	int x,y;
 

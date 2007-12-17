@@ -132,26 +132,43 @@ void osd_lock_free(osd_lock *lock)
 
 
 //============================================================
-//  osd_compare_exchange32
+//  win_compare_exchange32
 //============================================================
 
-#ifndef osd_compare_exchange32
-INT32 osd_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+INT32 win_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	return InterlockedCompareExchange((LPLONG)ptr, (LONG)exchange, (LONG)compare);
 }
-#endif
 
 
 //============================================================
-//  osd_compare_exchange64
+//  win_compare_exchange64
 //============================================================
 
 #ifdef PTR64
-#ifndef osd_compare_exchange64
-INT64 osd_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+INT64 win_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	return InterlockedCompareExchange64((LONGLONG*)ptr, (LONGLONG)exchange, (LONGLONG)compare);
 }
 #endif
-#endif
+
+
+//============================================================
+//  win_atomic_exchange32
+//============================================================
+
+INT32 win_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+{
+	return InterlockedExchange((LONG *) ptr, exchange);
+}
+
+
+//============================================================
+//  win_atomic_add32
+//============================================================
+
+INT32 win_atomic_add32(INT32 volatile *ptr, INT32 delta)
+{
+	return InterlockedExchangeAdd((LONG *) ptr, delta) + delta;
+}
+

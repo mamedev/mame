@@ -707,6 +707,7 @@ static void *ymz280b_start(int sndindex, int clock, const void *config)
 
 ***********************************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 void YMZ280B_sh_stop(void)
 {
 #if MAKE_WAVS
@@ -721,6 +722,7 @@ void YMZ280B_sh_stop(void)
 }
 #endif
 }
+#endif
 
 
 

@@ -526,7 +526,7 @@ WRITE8_HANDLER( ics2115_w )
 	//  if (ICS2115LOGERROR) logerror("ICS2115: wi %d, %02x (%04x)\n", offset, data, caller_get_pc());
 }
 
-void ics2115_reset(void *_chip)
+static void ics2115_reset(void *_chip)
 {
 	struct ics2115 *chip = _chip;
 	chip->irq_en = 0;

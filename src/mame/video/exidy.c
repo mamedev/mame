@@ -12,9 +12,6 @@ UINT8 *exidy_characterram;
 UINT8 exidy_collision_mask;
 UINT8 exidy_collision_invert;
 
-UINT8 *exidy_palette;
-UINT16 *exidy_colortable;
-
 static mame_bitmap *motion_object_1_vid;
 static mame_bitmap *motion_object_2_vid;
 static mame_bitmap *motion_object_2_clip;
@@ -31,118 +28,7 @@ static UINT8 sprite1_ypos;
 static UINT8 sprite2_xpos;
 static UINT8 sprite2_ypos;
 
-static UINT8 color_latch[3];
-
-
-
-/*************************************
- *
- *  Hard coded palettes
- *
- *************************************/
-
-/* Sidetrack/Targ/Spectar don't have a color PROM; colors are changed by the means of 8x3 */
-/* dip switches on the board. Here are the colors they map to. */
-UINT8 sidetrac_palette[PALETTE_LEN*3] =
-{
-	0x00,0x00,0x00,   /* BACKGND */
-	0x00,0x00,0x00,   /* CSPACE0 */
-	0x00,0xff,0x00,   /* CSPACE1 */
-	0xff,0xff,0xff,   /* CSPACE2 */
-	0xff,0xff,0xff,   /* CSPACE3 */
-	0xff,0x00,0xff,   /* 5LINES (unused?) */
-	0xff,0xff,0x00,   /* 5MO2VID  */
-	0xff,0xff,0xff    /* 5MO1VID  */
-};
-
-/* Targ has different colors */
-UINT8 targ_palette[PALETTE_LEN*3] =
-{
-					/* color   use                */
-	0x00,0x00,0xff, /* blue    background         */
-	0x00,0xff,0xff, /* cyan    characters 192-255 */
-	0xff,0xff,0x00, /* yellow  characters 128-191 */
-	0xff,0xff,0xff, /* white   characters  64-127 */
-	0xff,0x00,0x00, /* red     characters   0- 63 */
-	0x00,0xff,0xff, /* cyan    not used           */
-	0xff,0xff,0xff, /* white   bullet sprite      */
-	0x00,0xff,0x00, /* green   wummel sprite      */
-};
-
-/* Spectar has different colors */
-UINT8 spectar_palette[PALETTE_LEN*3] =
-{
-					/* color   use                */
-	0x00,0x00,0xff, /* blue    background         */
-	0x00,0xff,0x00, /* green   characters 192-255 */
-	0x00,0xff,0x00, /* green   characters 128-191 */
-	0xff,0xff,0xff, /* white   characters  64-127 */
-	0xff,0x00,0x00, /* red     characters   0- 63 */
-	0x00,0xff,0x00, /* green   not used           */
-	0xff,0xff,0x00, /* yellow  bullet sprite      */
-	0x00,0xff,0x00, /* green   wummel sprite      */
-};
-
-
-
-/*************************************
- *
- *  Hard coded color tables
- *
- *************************************/
-
-UINT16 exidy_1bpp_colortable[COLORTABLE_LEN] =
-{
-	/* one-bit characters */
-	0, 4,  /* chars 0x00-0x3F */
-	0, 3,  /* chars 0x40-0x7F */
-	0, 2,  /* chars 0x80-0xBF */
-	0, 1,  /* chars 0xC0-0xFF */
-
-	/* Motion Object 1 */
-	0, 7,
-
-	/* Motion Object 2 */
-	0, 6,
-};
-
-UINT16 exidy_2bpp_colortable[COLORTABLE_LEN] =
-{
-	/* two-bit characters */
-	/* (Because this is 2-bit color, the colorspace is only divided
-        in half instead of in quarters.  That's why 00-3F = 40-7F and
-        80-BF = C0-FF) */
-	0, 0, 4, 3,  /* chars 0x00-0x3F */
-	0, 0, 4, 3,  /* chars 0x40-0x7F */
-	0, 0, 2, 1,  /* chars 0x80-0xBF */
-	0, 0, 2, 1,  /* chars 0xC0-0xFF */
-
-	/* Motion Object 1 */
-	0, 7,
-
-	/* Motion Object 2 */
-	0, 6,
-};
-
-
-
-/*************************************
- *
- *  Palettes and colors
- *
- *************************************/
-
-PALETTE_INIT( exidy )
-{
-	if (exidy_palette)
-	{
-		int i;
-
-		for (i = 0; i < PALETTE_LEN; i++)
-			palette_set_color_rgb(machine,i,exidy_palette[i*3+0],exidy_palette[i*3+1],exidy_palette[i*3+2]);
-	}
-	memcpy(colortable, exidy_colortable, COLORTABLE_LEN * sizeof(colortable[0]));
-}
+UINT8 exidy_color_latch[3];
 
 
 
@@ -159,6 +45,10 @@ VIDEO_START( exidy )
 	motion_object_1_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
 	motion_object_2_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
 	motion_object_2_clip = auto_bitmap_alloc(16, 16, machine->screen[0].format);
+
+	exidy_color_w(0, exidy_color_latch[0]);
+	exidy_color_w(1, exidy_color_latch[1]);
+	exidy_color_w(2, exidy_color_latch[2]);
 }
 
 
@@ -232,14 +122,56 @@ WRITE8_HANDLER( exidy_characterram_w )
  *
  *************************************/
 
+INLINE void set_1_color(int index, int palette)
+{
+	palette_set_color_rgb(Machine, index, pal1bit(exidy_color_latch[2] >> palette), pal1bit(exidy_color_latch[1] >> palette), pal1bit(exidy_color_latch[0] >> palette));
+}
+
 WRITE8_HANDLER( exidy_color_w )
 {
-	int i;
+	exidy_color_latch[offset] = data;
 
-	color_latch[offset] = data;
+	/* motion object 1 */
+	set_1_color(0, 0);
+	set_1_color(1, 7);
 
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(Machine, i, pal1bit(color_latch[2] >> i), pal1bit(color_latch[1] >> i), pal1bit(color_latch[0] >> i));
+	/* motion object 2 */
+	set_1_color(2, 0);
+	set_1_color(3, 6);
+
+	/* one-bit characters */
+	if (Machine->gfx[0]->color_granularity == 2)
+	{
+		set_1_color(4, 0);		/* chars 0x00-0x3F */
+		set_1_color(5, 4);
+		set_1_color(6, 0);		/* chars 0x40-0x7F */
+		set_1_color(7, 3);
+		set_1_color(8, 0);		/* chars 0x80-0xBF */
+		set_1_color(9, 2);
+		set_1_color(10, 0);		/* chars 0xC0-0xFF */
+		set_1_color(11, 1);
+	}
+
+	/* two-bit characters */
+	else
+	{
+		set_1_color(4, 0);		/* chars 0x00-0x3F */
+		set_1_color(5, 0);
+		set_1_color(6, 4);
+		set_1_color(7, 3);
+		set_1_color(8, 0);		/* chars 0x40-0x7F */
+		set_1_color(9, 0);
+		set_1_color(10, 4);
+		set_1_color(11, 3);
+		set_1_color(12, 0);		/* chars 0x80-0xBF */
+		set_1_color(13, 0);
+		set_1_color(14, 2);
+		set_1_color(15, 1);
+		set_1_color(16, 0);		/* chars 0xC0-0xFF */
+		set_1_color(17, 0);
+		set_1_color(18, 2);
+		set_1_color(19, 1);
+	}
 }
 
 
@@ -367,7 +299,7 @@ VIDEO_EOF( exidy )
 {
 	UINT8 enable_set = ((sprite_enable & 0x20) != 0);
     static const rectangle clip = { 0, 15, 0, 15 };
-    int pen0 = machine->pens[0];
+    int bgmask = machine->gfx[0]->color_granularity - 1;
     int org_1_x = 0, org_1_y = 0;
     int org_2_x = 0, org_2_y = 0;
     int sx, sy;
@@ -390,64 +322,62 @@ VIDEO_EOF( exidy )
 	update_complete = 0;
 
 	/* draw sprite 1 */
+	fillbitmap(motion_object_1_vid, 0xff, &clip);
 	if (sprite_1_enabled())
 	{
 		org_1_x = 236 - sprite1_xpos - 4;
 		org_1_y = 244 - sprite1_ypos - 4;
 		drawgfx(motion_object_1_vid, machine->gfx[1],
 			(spriteno & 0x0f) + 16 * enable_set, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 	}
-	else
-		fillbitmap(motion_object_1_vid, pen0, &clip);
 
 	/* draw sprite 2 */
+	fillbitmap(motion_object_2_vid, 0xff, &clip);
 	if (sprite_2_enabled())
 	{
 		org_2_x = 236 - sprite2_xpos - 4;
 		org_2_y = 244 - sprite2_ypos - 4;
 		drawgfx(motion_object_2_vid, machine->gfx[1],
 			((spriteno >> 4) & 0x0f) + 32, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 	}
-	else
-		fillbitmap(motion_object_2_vid, pen0, &clip);
 
     /* draw sprite 2 clipped to sprite 1's location */
-	fillbitmap(motion_object_2_clip, pen0, &clip);
+	fillbitmap(motion_object_2_clip, 0xff, &clip);
 	if (sprite_1_enabled() && sprite_2_enabled())
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
 		drawgfx(motion_object_2_clip, machine->gfx[1],
 			((spriteno >> 4) & 0x0f) + 32, 0,
-			0, 0, sx, sy, &clip, TRANSPARENCY_NONE, 0);
+			0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
 	}
 
     /* scan for collisions */
     for (sy = 0; sy < 16; sy++)
 	    for (sx = 0; sx < 16; sx++)
 	    {
-    		if (*BITMAP_ADDR16(motion_object_1_vid, sy, sx) != pen0)
+    		if (*BITMAP_ADDR16(motion_object_1_vid, sy, sx) != 0xff)
     		{
 	  			UINT8 collision_mask = 0;
 
                 /* check for background collision (M1CHAR) */
-				if (*BITMAP_ADDR16(tmpbitmap, org_1_y + sy, org_1_x + sx) != pen0)
+				if (((*BITMAP_ADDR16(tmpbitmap, org_1_y + sy, org_1_x + sx) - 4) & bgmask) != 0)
 					collision_mask |= 0x04;
 
                 /* check for motion object collision (M1M2) */
-				if (*BITMAP_ADDR16(motion_object_2_clip, sy, sx) != pen0)
+				if (*BITMAP_ADDR16(motion_object_2_clip, sy, sx) != 0xff)
 					collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
 				if ((collision_mask & exidy_collision_mask) && count++ < 128)
 					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), collision_mask, collision_irq_callback);
             }
-            if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != pen0)
+            if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
     		{
                 /* check for background collision (M2CHAR) */
-				if (*BITMAP_ADDR16(tmpbitmap, org_2_y + sy, org_2_x + sx) != pen0)
+				if (((*BITMAP_ADDR16(tmpbitmap, org_2_y + sy, org_2_x + sx) - 4) & bgmask) != 0)
 					if ((exidy_collision_mask & 0x08) && count++ < 128)
 						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), 0x08, collision_irq_callback);
             }

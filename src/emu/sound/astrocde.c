@@ -287,7 +287,7 @@ static void *astrocade_start(int sndindex, int clock, const void *config)
  *
  *************************************/
 
-void astrocade_sound_w(UINT8 num, offs_t offset, UINT8 data)
+static void astrocade_sound_w(UINT8 num, offs_t offset, UINT8 data)
 {
 	struct astrocade_info *chip = sndti_token(SOUND_ASTROCADE, num);
 

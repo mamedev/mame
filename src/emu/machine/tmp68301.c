@@ -61,7 +61,7 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 	}
 }
 
-void tmp68301_update_timer( int i )
+static void tmp68301_update_timer( int i )
 {
 	UINT16 TCR	=	tmp68301_regs[(0x200 + i * 0x20)/2];
 	UINT16 MAX1	=	tmp68301_regs[(0x204 + i * 0x20)/2];

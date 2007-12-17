@@ -1370,11 +1370,13 @@ static void dma_scsp(struct _SCSP *SCSP)
 	cpunum_set_input_line(2,dma_transfer_end,HOLD_LINE);
 }
 
+#ifdef UNUSED_FUNCTION
 int SCSP_IRQCB(void *param)
 {
 	CheckPendingIRQ(param);
 	return -1;
 }
+#endif
 
 static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t **buf, int samples)
 {

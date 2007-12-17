@@ -38,6 +38,9 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 extern int firetrk_game;
 
+extern UINT32 firetrk_color1_mask;
+extern UINT32 firetrk_color2_mask;
+
 
 /*----------- defined in audio/firetrk.c -----------*/
 

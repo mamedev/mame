@@ -45,16 +45,11 @@ static const UINT8 *tile_address_prom;
 PALETTE_INIT( namcos86 )
 {
 	int i;
-	int totcolors,totlookup;
+	rgb_t palette[512];
 
-
-	totcolors = machine->drv->total_colors;
-	totlookup = machine->drv->color_table_len;
-
-	for (i = 0;i < totcolors;i++)
+	for (i = 0;i < 512;i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
-
 
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
@@ -66,26 +61,26 @@ PALETTE_INIT( namcos86 )
 		bit2 = (color_prom[0] >> 6) & 0x01;
 		bit3 = (color_prom[0] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[totcolors] >> 0) & 0x01;
-		bit1 = (color_prom[totcolors] >> 1) & 0x01;
-		bit2 = (color_prom[totcolors] >> 2) & 0x01;
-		bit3 = (color_prom[totcolors] >> 3) & 0x01;
+		bit0 = (color_prom[512] >> 0) & 0x01;
+		bit1 = (color_prom[512] >> 1) & 0x01;
+		bit2 = (color_prom[512] >> 2) & 0x01;
+		bit3 = (color_prom[512] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette[i] = MAKE_RGB(r,g,b);
 		color_prom++;
 	}
 
-	color_prom += totcolors;
+	color_prom += 512;
 	/* color_prom now points to the beginning of the lookup table */
 
 	/* tiles lookup table */
-	for (i = 0;i < totlookup/2;i++)
-		*(colortable++) = *color_prom++;
+	for (i = 0;i < 2048;i++)
+		palette_set_color(machine, i, palette[*color_prom++]);
 
 	/* sprites lookup table */
-	for (i = 0;i < totlookup/2;i++)
-		*(colortable++) = *(color_prom++) + totcolors/2;
+	for (i = 0;i < 2048;i++)
+		palette_set_color(machine, 2048 + i, palette[256 + *color_prom++]);
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 

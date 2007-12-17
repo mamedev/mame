@@ -9,8 +9,6 @@ static tilemap *bg_tilemap,*tx_tilemap;
 
 static INT32 bg_select, tx_color_mode, bg_disable, bg_color_bank;
 
-static colortable *digdug_colortable;
-
 
 /***************************************************************************
 
@@ -35,7 +33,7 @@ PALETTE_INIT( digdug )
 {
 	int i;
 
-	digdug_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	for (i = 0;i < 32;i++)
 	{
@@ -53,24 +51,24 @@ PALETTE_INIT( digdug )
 		bit1 = (*color_prom >> 6) & 0x01;
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		colortable_palette_set_color(digdug_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* characters - direct mapping */
 	for (i = 0; i < 16; i++)
 	{
-		colortable_entry_set_value(digdug_colortable, i*2+0, 0);
-		colortable_entry_set_value(digdug_colortable, i*2+1, i);
+		colortable_entry_set_value(machine->colortable, i*2+0, 0);
+		colortable_entry_set_value(machine->colortable, i*2+1, i);
 	}
 
 	/* sprites */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(digdug_colortable, 16*2+i, (*color_prom++ & 0x0f) + 0x10);
+		colortable_entry_set_value(machine->colortable, 16*2+i, (*color_prom++ & 0x0f) + 0x10);
 
 	/* bg_select */
 	for (i = 0;i < 0x100;i++)
-		colortable_entry_set_value(digdug_colortable, 16*2+256+i, *color_prom++ & 0x0f);
+		colortable_entry_set_value(machine->colortable, 16*2+256+i, *color_prom++ & 0x0f);
 }
 
 
@@ -292,7 +290,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask = colortable_get_transpen_mask(digdug_colortable, machine->gfx[1], color, 0x1f);
+				UINT32 transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f);
 				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,

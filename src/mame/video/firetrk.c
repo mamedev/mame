@@ -419,6 +419,7 @@ VIDEO_EOF( firetrk )
 			continue;
 		}
 
+		fillbitmap(helper2, 0xff, NULL);
 		drawgfx(helper2,
 			machine->gfx[car[i].layout],
 			car[i].number,
@@ -428,7 +429,7 @@ VIDEO_EOF( firetrk )
 			car[i].x,
 			car[i].y,
 			&playfield_window,
-			TRANSPARENCY_NONE, 0);
+			TRANSPARENCY_PEN, 0);
 
 		for (y = car[i].y; y < car[i].y + height; y++)
 		{
@@ -449,11 +450,11 @@ VIDEO_EOF( firetrk )
 				a = *BITMAP_ADDR16(helper1, y, x);
 				b = *BITMAP_ADDR16(helper2, y, x);
 
-				if (b != 0 && a == 1)
+				if (b != 0xff && (firetrk_color1_mask >> a) & 1)
 				{
 					firetrk_crash[i] = 1;
 				}
-				if (b != 0 && a == 2)
+				if (b != 0xff && (firetrk_color2_mask >> a) & 1)
 				{
 					firetrk_skid[i] = 1;
 				}

@@ -33,7 +33,7 @@ To Do:
 
 ***************************************************************************/
 
-int okibank;
+static int okibank;
 static WRITE16_HANDLER( tmaster_oki_bank_w )
 {
 	if (ACCESSING_MSB)
@@ -55,9 +55,9 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 ***************************************************************************/
 
-int touchscreen;
+static int touchscreen;
 
-void show_touchscreen(void)
+static void show_touchscreen(void)
 {
 #ifdef MAME_DEBUG
 	popmessage("% d] %03x %03x - %d",touchscreen,readinputportbytag("TSCREEN_X")&0x1ff,readinputportbytag("TSCREEN_Y"),okibank);
@@ -127,9 +127,9 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
 ***************************************************************************/
 
 static mame_bitmap *tmaster_bitmap[2];
-UINT16 *tmaster_regs;
-UINT16 tmaster_color;
-UINT16 tmaster_addr;
+static UINT16 *tmaster_regs;
+static UINT16 tmaster_color;
+static UINT16 tmaster_addr;
 
 static VIDEO_START( tmaster )
 {
@@ -235,7 +235,7 @@ static void tmaster_draw(void)
 	}
 }
 
-WRITE16_HANDLER( tmaster_blitter_w )
+static WRITE16_HANDLER( tmaster_blitter_w )
 {
 	COMBINE_DATA( tmaster_regs + offset );
 	switch (offset*2)
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_PORTS_START( tmaster )
+static INPUT_PORTS_START( tmaster )
 	PORT_START_TAG("TSCREEN_X")
 	PORT_BIT( 0x01ff, 0x100, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1, 0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(3) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON1 )	PORT_IMPULSE(5)	// press

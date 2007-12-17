@@ -26,14 +26,12 @@ UINT8 *bosco_videoram;
 UINT8 *bosco_radarattr;
 static UINT8 *bosco_radarx,*bosco_radary;
 
-static colortable *bosco_colortable;
-
 
 PALETTE_INIT( bosco )
 {
 	int i;
 
-	bosco_colortable = colortable_alloc(machine, 32+64);
+	machine->colortable = colortable_alloc(machine, 32+64);
 
 	/* core palette */
 	for (i = 0;i < 32;i++)
@@ -54,7 +52,7 @@ PALETTE_INIT( bosco )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(bosco_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -71,24 +69,24 @@ PALETTE_INIT( bosco )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(bosco_colortable,32 + i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,32 + i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters / sprites */
 	for (i = 0;i < 64*4;i++)
 	{
-		colortable_entry_set_value(bosco_colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
-		colortable_entry_set_value(bosco_colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
+		colortable_entry_set_value(machine->colortable, i, (color_prom[i] & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine->colortable, i+64*4, color_prom[i] & 0x0f);	/* sprites */
 	}
 
 	/* bullets lookup table */
 	/* they use colors 28-31, I think - PAL 5A controls it */
 	for (i = 0;i < 4;i++)
-		colortable_entry_set_value(bosco_colortable, 64*4+64*4+i, 31-i);
+		colortable_entry_set_value(machine->colortable, 64*4+64*4+i, 31-i);
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(bosco_colortable, 64*4+64*4+4+i, 32 + i);
+		colortable_entry_set_value(machine->colortable, 64*4+64*4+4+i, 32 + i);
 }
 
 
@@ -141,8 +139,8 @@ VIDEO_START( bosco )
 	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 	fg_tilemap = tilemap_create(fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
 
-	colortable_configure_tilemap_groups(bosco_colortable, bg_tilemap, machine->gfx[0], 0x1f);
-	colortable_configure_tilemap_groups(bosco_colortable, fg_tilemap, machine->gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0x1f);
 
 	tilemap_set_scrolldx(bg_tilemap,3,3);
 
@@ -232,7 +230,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				flipx,flipy,
 				sx,sy,
 				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(bosco_colortable, machine->gfx[1], color, 0x0f));
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x0f));
 	}
 }
 

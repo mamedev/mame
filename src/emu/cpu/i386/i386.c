@@ -55,7 +55,7 @@ static void i386_load_protected_mode_segment( I386_SREG *seg )
 	seg->d = (seg->flags & 0x4000) ? 1 : 0;
 }
 
-void i386_load_segment_descriptor( int segment )
+static void i386_load_segment_descriptor( int segment )
 {
 	if (PROTECTED_MODE)
 	{
@@ -496,7 +496,7 @@ static void i386_postload(void)
 	CHANGE_PC(I.eip);
 }
 
-void i386_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void i386_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -614,7 +614,7 @@ static void build_opcode_table(UINT32 features)
 	}
 }
 
-void i386_reset(void)
+static void i386_reset(void)
 {
 	int (*save_irqcallback)(int);
 
@@ -696,7 +696,7 @@ static void i386_set_a20_line(int state)
 	}
 }
 
-int i386_execute(int num_cycles)
+static int i386_execute(int num_cycles)
 {
 	I.cycles = num_cycles;
 	I.base_cycles = num_cycles;
@@ -1067,7 +1067,7 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_I486)
 
-void i486_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void i486_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i386_init(index, clock, config, irqcallback);
 }
@@ -1173,7 +1173,7 @@ void i486_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_PENTIUM)
 
-void pentium_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void pentium_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i386_init(index, clock, config, irqcallback);
 }
@@ -1299,7 +1299,7 @@ void pentium_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_MEDIAGX)
 
-void mediagx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void mediagx_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i386_init(index, clock, config, irqcallback);
 }

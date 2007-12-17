@@ -1145,12 +1145,12 @@ static void configure_memory_16bit(void)
 
 /* Wrappers for the different CPU types */
 #if (HAS_V20||HAS_V25)
-void v20_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void v20_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 0);
 	configure_memory_8bit();
 }
-int v20_execute(int cycles)
+static int v20_execute(int cycles)
 {
 	nec_ICount=cycles;
 	chip_type=V20;
@@ -1177,12 +1177,12 @@ int v20_execute(int cycles)
 #endif
 
 #if (HAS_V30||HAS_V35)
-void v30_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void v30_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 1);
 	configure_memory_16bit();
 }
-int v30_execute(int cycles) {
+static int v30_execute(int cycles) {
 	nec_ICount=cycles;
 	chip_type=V30;
 
@@ -1208,12 +1208,12 @@ int v30_execute(int cycles) {
 #endif
 
 #if (HAS_V33)
-void v33_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void v33_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 2);
 	configure_memory_16bit();
 }
-int v33_execute(int cycles)
+static int v33_execute(int cycles)
 {
 	nec_ICount=cycles;
 	chip_type=V33;
@@ -1301,7 +1301,7 @@ static void nec_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void nec_get_info(UINT32 state, cpuinfo *info)
+static void nec_get_info(UINT32 state, cpuinfo *info)
 {
 	int flags;
 

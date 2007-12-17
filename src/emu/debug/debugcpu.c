@@ -77,7 +77,7 @@ static UINT64 tempvar[NUM_TEMP_VARIABLES];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void debug_cpu_exit(running_machine *machine);
+static void debug_cpu_exit(running_machine *machine);
 static void perform_trace(debug_cpu_info *info);
 static void prepare_for_step_overout(void);
 static void process_source_file(void);
@@ -288,7 +288,7 @@ void debug_cpu_init(running_machine *machine)
     debug_cpu_exit - free all memory
 -------------------------------------------------*/
 
-void debug_cpu_exit(running_machine *machine)
+static void debug_cpu_exit(running_machine *machine)
 {
 	int cpunum, spacenum;
 

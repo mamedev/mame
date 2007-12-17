@@ -566,7 +566,7 @@ static void ppc_wrteei(UINT32 op)
 /**************************************************************************/
 /* PPC403 Serial Port */
 
-UINT8 ppc403_spu_r(UINT32 a)
+static UINT8 ppc403_spu_r(UINT32 a)
 {
 	switch(a & 0xf)
 	{
@@ -582,7 +582,7 @@ UINT8 ppc403_spu_r(UINT32 a)
 	}
 }
 
-void ppc403_spu_w(UINT32 a, UINT8 d)
+static void ppc403_spu_w(UINT32 a, UINT8 d)
 {
 	switch(a & 0xf)
 	{

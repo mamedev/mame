@@ -206,7 +206,7 @@ VIDEO_UPDATE( malzak )
 				sx+=256;
 
 			drawgfx(bitmap,machine->gfx[0],field[x*16 + y].code,7,0,0,
-			sx, sy, &machine->screen[0].visarea, TRANSPARENCY_COLOR, 0);
+				sx, sy, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
 		}
 
 	// S2636 - Sprites / Collision detection (x2)

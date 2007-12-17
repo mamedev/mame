@@ -47,7 +47,7 @@ static void plot_pattern(running_machine *machine, mame_bitmap *bitmap, int x, i
 			if (x+xbit < 0 || x+xbit >= HORZ_RES * HORZ_CHR)
 				continue;
 
-			*BITMAP_ADDR16(bitmap, y+ybit, x+xbit) = machine->pens[2];
+			*BITMAP_ADDR16(bitmap, y+ybit, x+xbit) = 4;
 		}
 	}
 }

@@ -845,7 +845,7 @@ static void sharc_set_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_ADSP21062)
-void adsp21062_set_info(UINT32 state, cpuinfo *info)
+static void adsp21062_set_info(UINT32 state, cpuinfo *info)
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 2)
 	{
@@ -956,7 +956,7 @@ static ADDRESS_MAP_START( internal_pgm, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x20000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
-void sharc_get_info(UINT32 state, cpuinfo *info)
+static void sharc_get_info(UINT32 state, cpuinfo *info)
 {
 	switch(state)
 	{

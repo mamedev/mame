@@ -17,7 +17,7 @@ static offs_t pcbase;
 
 #define PARAM_WORD(v)	((v) = rombase[pc - pcbase] | (rombase[pc + 1 - pcbase] << 8), pc += 2)
 
-unsigned MakeEA (char **ea, int lo, unsigned pc, int width)
+static unsigned MakeEA (char **ea, int lo, unsigned pc, int width)
 {
 	char *buffer = cpuintrf_temp_str();
 	int reg, pm;

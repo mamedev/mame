@@ -67,7 +67,7 @@ struct _sndintrf_data
     EXTERNAL PROTOTYPES
 ***************************************************************************/
 
-void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info);
+static void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info);
 void custom_get_info(void *token, UINT32 state, sndinfo *info);
 void samples_get_info(void *token, UINT32 state, sndinfo *info);
 void dac_get_info(void *token, UINT32 state, sndinfo *info);
@@ -945,7 +945,7 @@ static void dummy_sound_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info)
+static void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
 	{

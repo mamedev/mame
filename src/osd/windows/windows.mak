@@ -152,10 +152,8 @@ DEFS += -Dmain=utf8_main
 
 # debug build: enable guard pages on all memory allocations
 ifdef DEBUG
-ifndef WINUI
 DEFS += -DMALLOC_DEBUG
 LDFLAGS += -Wl,--allow-multiple-definition
-endif
 endif
 
 # enable UNICODE flags for unicode builds

@@ -1299,7 +1299,7 @@ static void m6802_init(int index, int clock, const void *config, int (*irqcallba
  * M6803 almost (fully?) equal to the M6801
  ****************************************************************************/
 #if (HAS_M6803)
-void m6803_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void m6803_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 //  m6800.subtype = SUBTYPE_M6803;
 	m6800.insn = m6803_insn;

@@ -751,7 +751,7 @@ WRITE16_HANDLER( toaplan1_scroll_regs_w )
 
 
 #ifdef MAME_DEBUG
-void toaplan1_log_vram(void)
+static void toaplan1_log_vram(void)
 {
 	if ( input_code_pressed(KEYCODE_M) )
 	{

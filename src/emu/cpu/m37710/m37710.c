@@ -56,12 +56,13 @@
 
 #define M37710_DEBUG	(0)	// enables verbose logging for peripherals, etc.
 
-extern void m37710_set_irq_line(int line, int state);
+static void m37710_set_irq_line(int line, int state);
 
 /* Our CPU structure */
 m37710i_cpu_struct m37710i_cpu = {0};
 
-int m37710_ICount = 0, m37710_fullCount = 0;
+int m37710_ICount = 0;
+static int m37710_fullCount = 0;
 
 /* Temporary Variables */
 uint m37710i_source;
@@ -882,7 +883,7 @@ void m37710i_update_irqs(void)
 
 /* external functions */
 
-void m37710_reset(void)
+static void m37710_reset(void)
 {
 	/* Start the CPU */
 	CPU_STOPPED = 0;
@@ -927,6 +928,7 @@ void m37710_exit(void)
 	/* nothing to do yet */
 }
 
+#ifdef UNUSED_FUNCTION
 /* return elapsed cycles in the current slice */
 int m37710_getcycles(void)
 {
@@ -940,9 +942,10 @@ void m37710_yield(void)
 
 	m37710_ICount = 0;
 }
+#endif
 
 /* Execute some instructions */
-int m37710_execute(int cycles)
+static int m37710_execute(int cycles)
 {
 	m37710_fullCount = cycles;
 
@@ -959,45 +962,47 @@ static void m37710_get_context(void *dst_context)
 }
 
 /* Set the current CPU context */
-void m37710_set_context(void *src_context)
+static void m37710_set_context(void *src_context)
 {
 	m37710i_cpu = *(m37710i_cpu_struct*)src_context;
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
 /* Get the current Program Counter */
+#ifdef UNUSED_FUNCTION
 unsigned m37710_get_pc(void)
 {
 	return REG_PC;
 }
+#endif
 
 /* Set the Program Counter */
-void m37710_set_pc(unsigned val)
+static void m37710_set_pc(unsigned val)
 {
 	REG_PC = MAKE_UINT_16(val);
 	m37710_jumping(REG_PB | REG_PC);
 }
 
 /* Get the current Stack Pointer */
-unsigned m37710_get_sp(void)
+static unsigned m37710_get_sp(void)
 {
 	return REG_S;
 }
 
 /* Set the Stack Pointer */
-void m37710_set_sp(unsigned val)
+static void m37710_set_sp(unsigned val)
 {
 	REG_S = MAKE_UINT_16(val);
 }
 
 /* Get a register */
-unsigned m37710_get_reg(int regnum)
+static unsigned m37710_get_reg(int regnum)
 {
 	return FTABLE_GET_REG(regnum);
 }
 
 /* Set a register */
-void m37710_set_reg(int regnum, unsigned value)
+static void m37710_set_reg(int regnum, unsigned value)
 {
 	FTABLE_SET_REG(regnum, value);
 }
@@ -1013,16 +1018,18 @@ void m37710_state_save(void *file)
 }
 
 /* Set an interrupt line */
-void m37710_set_irq_line(int line, int state)
+static void m37710_set_irq_line(int line, int state)
 {
 	FTABLE_SET_LINE(line, state);
 }
 
 /* Set the callback that is called when servicing an interrupt */
+#ifdef UNUSED_FUNCTION
 void m37710_set_irq_callback(int (*callback)(int))
 {
 	INT_ACK = callback;
 }
+#endif
 
 /* Disassemble an instruction */
 #ifdef MAME_DEBUG
@@ -1043,7 +1050,7 @@ static void m37710_restore_state(void)
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
-void m37710_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void m37710_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	INT_ACK = irqcallback;
 

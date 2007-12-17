@@ -17,8 +17,6 @@ UINT8 *xevious_sr1,*xevious_sr2,*xevious_sr3;
 static tilemap *fg_tilemap,*bg_tilemap;
 static INT32 xevious_bs[2];
 
-static colortable *xevious_colortable;
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -39,7 +37,7 @@ PALETTE_INIT( xevious )
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 
-	xevious_colortable = colortable_alloc(machine, 128+1);
+	machine->colortable = colortable_alloc(machine, 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -64,12 +62,12 @@ PALETTE_INIT( xevious )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(xevious_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(xevious_colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine->colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -78,7 +76,7 @@ PALETTE_INIT( xevious )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(xevious_colortable, machine->gfx[1]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i,
 				(color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(1)] & 0x0f) << 4));
 
 		color_prom++;
@@ -90,7 +88,7 @@ PALETTE_INIT( xevious )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[TOTAL_COLORS(2)] & 0x0f) << 4);
 
-		colortable_entry_set_value(xevious_colortable, machine->gfx[2]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -100,7 +98,7 @@ PALETTE_INIT( xevious )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(xevious_colortable, machine->gfx[0]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -111,7 +109,7 @@ PALETTE_INIT( battles )
 {
 	int i;
 
-	xevious_colortable = colortable_alloc(machine, 128+1);
+	machine->colortable = colortable_alloc(machine, 128+1);
 
 	for (i = 0;i < 128;i++)
 	{
@@ -136,12 +134,12 @@ PALETTE_INIT( battles )
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(xevious_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color 0x80 is used by sprites to mark transparency */
-	colortable_palette_set_color(xevious_colortable,0x80,MAKE_RGB(0,0,0));
+	colortable_palette_set_color(machine->colortable,0x80,MAKE_RGB(0,0,0));
 
 	color_prom += 128;  /* the bottom part of the PROM is unused */
 	color_prom += 2*256;
@@ -150,7 +148,7 @@ PALETTE_INIT( battles )
 	/* background tiles */
 	for (i = 0;i < TOTAL_COLORS(1);i++)
 	{
-		colortable_entry_set_value(xevious_colortable, machine->gfx[1]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i,
 				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
 
 		color_prom++;
@@ -162,7 +160,7 @@ PALETTE_INIT( battles )
 	{
 		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
 
-		colortable_entry_set_value(xevious_colortable, machine->gfx[2]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i,
 				(c & 0x80) ? (c & 0x7f) : 0x80);
 
 		color_prom++;
@@ -171,7 +169,7 @@ PALETTE_INIT( battles )
 	/* foreground characters */
 	for (i = 0;i < TOTAL_COLORS(0);i++)
 	{
-		colortable_entry_set_value(xevious_colortable, machine->gfx[0]->color_base + i,
+		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i,
 				(i % 2 != 0) ? (i / 2) : 0x80);
 	}
 }
@@ -460,7 +458,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
 			sy = 28*8-spriteram_2[offs]-1;
 
-			transmask = colortable_get_transpen_mask(xevious_colortable, machine->gfx[bank], color, 0x80);
+			transmask = colortable_get_transpen_mask(machine->colortable, machine->gfx[bank], color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{

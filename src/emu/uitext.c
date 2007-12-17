@@ -18,7 +18,7 @@ extern const char *mess_default_text[];
 #endif /* MESS */
 
 
-lang_struct lang;
+static lang_struct lang;
 
 /* All entries in this table must match the enum ordering in "uitext.h" */
 static const char *mame_default_text[] =

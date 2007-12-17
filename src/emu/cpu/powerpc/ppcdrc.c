@@ -33,8 +33,8 @@ static int ppcdrc602_execute(int cycles);
 static void ppcdrc602_set_irq_line(int irqline, int state);
 #endif
 #if (HAS_PPC403)
-UINT8 ppc403_spu_r(UINT32 a);
-void ppc403_spu_w(UINT32 a, UINT8 d);
+static UINT8 ppc403_spu_r(UINT32 a);
+static void ppc403_spu_w(UINT32 a, UINT8 d);
 static void ppcdrc403_init(int index, int clock, const void *_config, int (*irqcallback)(int));
 static void ppcdrc403_exit(void);
 static void ppcdrc403_reset(void);
@@ -1002,7 +1002,7 @@ static void code_log(const char *label, x86code *start, x86code *stop)
 
 /* Initialization and shutdown */
 
-void ppc_init(void)
+static void ppc_init(void)
 {
 	int i,j;
 
@@ -1939,7 +1939,7 @@ static void ppc_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void ppc_get_info(UINT32 state, cpuinfo *info)
+static void ppc_get_info(UINT32 state, cpuinfo *info)
 {
 	switch(state)
 	{
@@ -2077,7 +2077,7 @@ void ppc_get_info(UINT32 state, cpuinfo *info)
 
 /* PowerPC 403 */
 #if (HAS_PPC403)
-void ppc403_set_info(UINT32 state, cpuinfo *info)
+static void ppc403_set_info(UINT32 state, cpuinfo *info)
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2115,7 +2115,7 @@ void ppc403_get_info(UINT32 state, cpuinfo *info)
 
 /* PowerPC 603 */
 #if (HAS_PPC603)
-void ppc603_set_info(UINT32 state, cpuinfo *info)
+static void ppc603_set_info(UINT32 state, cpuinfo *info)
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2165,7 +2165,7 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 
 /* PowerPC 602 */
 #if (HAS_PPC602)
-void ppc602_set_info(UINT32 state, cpuinfo *info)
+static void ppc602_set_info(UINT32 state, cpuinfo *info)
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{

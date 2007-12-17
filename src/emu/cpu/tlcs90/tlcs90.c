@@ -2302,7 +2302,7 @@ static READ8_HANDLER( t90_internal_registers_r )
 	return data;
 }
 
-void t90_start_timer(int i)
+static void t90_start_timer(int i)
 {
 	int prescaler;
 	attotime period;
@@ -2349,7 +2349,7 @@ void t90_start_timer(int i)
 	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / attotime_to_double(period));
 }
 
-void t90_start_timer4(void)
+static void t90_start_timer4(void)
 {
 	int prescaler;
 	attotime period;
@@ -2372,13 +2372,13 @@ void t90_start_timer4(void)
 }
 
 
-void t90_stop_timer(int i)
+static void t90_stop_timer(int i)
 {
 	timer_adjust(T90.timer[i], attotime_never, i, attotime_zero);
 	logerror("%04X: CPU Timer %d stopped\n", activecpu_get_pc(), i);
 }
 
-void t90_stop_timer4(void)
+static void t90_stop_timer4(void)
 {
 	t90_stop_timer(4);
 }

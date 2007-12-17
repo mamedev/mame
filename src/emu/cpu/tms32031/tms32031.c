@@ -416,7 +416,7 @@ static void tms32031_reset(void)
 static UINT32 hits[0x200*4];
 #endif
 
-void tms32031_exit(void)
+static void tms32031_exit(void)
 {
 #if (LOG_OPCODE_USAGE)
 	int i;

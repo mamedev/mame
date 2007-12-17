@@ -179,8 +179,8 @@ attotime attotime_sub_attoseconds(attotime _time1, attoseconds_t _attoseconds)
 
 attotime attotime_mul(attotime _time1, UINT32 factor)
 {
-	INT32 attolo, attohi, reslo, reshi;
-	INT64 temp;
+	UINT32 attolo, attohi, reslo, reshi;
+	UINT64 temp;
 
 	/* if one of the items is attotime_never, return attotime_never */
 	if (_time1.seconds >= ATTOTIME_MAX_SECONDS)
@@ -191,18 +191,18 @@ attotime attotime_mul(attotime _time1, UINT32 factor)
 		return attotime_zero;
 
 	/* split attoseconds into upper and lower halves which fit into 32 bits */
-	attohi = div_64x32_rem(_time1.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &attolo);
+	attohi = divu_64x32_rem(_time1.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &attolo);
 
 	/* scale the lower half, then split into high/low parts */
-	temp = mul_32x32(attolo, factor);
-	temp = div_64x32_rem(temp, ATTOSECONDS_PER_SECOND_SQRT, &reslo);
+	temp = mulu_32x32(attolo, factor);
+	temp = divu_64x32_rem(temp, ATTOSECONDS_PER_SECOND_SQRT, &reslo);
 
 	/* scale the upper half, then split into high/low parts */
-	temp += mul_32x32(attohi, factor);
-	temp = div_64x32_rem(temp, ATTOSECONDS_PER_SECOND_SQRT, &reshi);
+	temp += mulu_32x32(attohi, factor);
+	temp = divu_64x32_rem(temp, ATTOSECONDS_PER_SECOND_SQRT, &reshi);
 
 	/* scale the seconds */
-	temp += mul_32x32(_time1.seconds, factor);
+	temp += mulu_32x32(_time1.seconds, factor);
 	if (temp >= ATTOTIME_MAX_SECONDS)
 		return attotime_never;
 
@@ -218,9 +218,9 @@ attotime attotime_mul(attotime _time1, UINT32 factor)
 
 attotime attotime_div(attotime _time1, UINT32 factor)
 {
-	INT32 attolo, attohi, reshi, reslo, remainder;
+	UINT32 attolo, attohi, reshi, reslo, remainder;
 	attotime result;
-	INT64 temp;
+	UINT64 temp;
 
 	/* if one of the items is attotime_never, return attotime_never */
 	if (_time1.seconds >= ATTOTIME_MAX_SECONDS)
@@ -231,21 +231,21 @@ attotime attotime_div(attotime _time1, UINT32 factor)
 		return _time1;
 
 	/* split attoseconds into upper and lower halves which fit into 32 bits */
-	attohi = div_64x32_rem(_time1.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &attolo);
+	attohi = divu_64x32_rem(_time1.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &attolo);
 
 	/* divide the seconds and get the remainder */
-	result.seconds = div_64x32_rem(_time1.seconds, factor, &remainder);
+	result.seconds = divu_64x32_rem(_time1.seconds, factor, &remainder);
 
 	/* combine the upper half of attoseconds with the remainder and divide that */
-	temp = (INT64)attohi + mul_32x32(remainder, ATTOSECONDS_PER_SECOND_SQRT);
-	reshi = div_64x32_rem(temp, factor, &remainder);
+	temp = (INT64)attohi + mulu_32x32(remainder, ATTOSECONDS_PER_SECOND_SQRT);
+	reshi = divu_64x32_rem(temp, factor, &remainder);
 
 	/* combine the lower half of attoseconds with the remainder and divide that */
-	temp = attolo + mul_32x32(remainder, ATTOSECONDS_PER_SECOND_SQRT);
-	reslo = div_64x32_rem(temp, factor, &remainder);
+	temp = attolo + mulu_32x32(remainder, ATTOSECONDS_PER_SECOND_SQRT);
+	reslo = divu_64x32_rem(temp, factor, &remainder);
 
 	/* round based on the remainder */
-	result.attoseconds = (attoseconds_t)reslo + mul_32x32(reshi, ATTOSECONDS_PER_SECOND_SQRT);
+	result.attoseconds = (attoseconds_t)reslo + mulu_32x32(reshi, ATTOSECONDS_PER_SECOND_SQRT);
 	if (remainder >= factor / 2)
 		if (++result.attoseconds >= ATTOSECONDS_PER_SECOND)
 		{
@@ -297,15 +297,15 @@ const char *attotime_string(attotime _time, int precision)
 	/* case 2: we want 9 or fewer digits of precision */
 	else if (precision <= 9)
 	{
-		INT32 upper = _time.attoseconds / ATTOSECONDS_PER_SECOND_SQRT;
+		UINT32 upper = _time.attoseconds / ATTOSECONDS_PER_SECOND_SQRT;
 		sprintf(buffer, "%d.%0*d", _time.seconds, precision, upper);
 	}
 
 	/* case 3: more than 9 digits of precision */
 	else
 	{
-		INT32 lower;
-		INT32 upper = div_64x32_rem(_time.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &lower);
+		UINT32 lower;
+		UINT32 upper = divu_64x32_rem(_time.attoseconds, ATTOSECONDS_PER_SECOND_SQRT, &lower);
 		sprintf(buffer, "%d.%09d%0*d", _time.seconds, upper, precision - 9, lower);
 	}
 	return buffer;

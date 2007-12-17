@@ -670,7 +670,7 @@ static void tms_get_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_TMS32051)
-void tms32051_set_info(UINT32 state, cpuinfo *info)
+static void tms32051_set_info(UINT32 state, cpuinfo *info)
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{

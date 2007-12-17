@@ -13,7 +13,6 @@ UINT8 *gaplus_videoram;
 UINT8 *gaplus_spriteram;
 
 static tilemap *bg_tilemap;
-static colortable *gaplus_colortable;
 
 
 /***************************************************************************
@@ -34,7 +33,7 @@ PALETTE_INIT( gaplus )
 	int i;
 
 	/* allocate the colortable */
-	gaplus_colortable = colortable_alloc(machine, 256);
+	machine->colortable = colortable_alloc(machine, 256);
 
 	for (i = 0;i < 256;i++)
 	{
@@ -59,7 +58,7 @@ PALETTE_INIT( gaplus )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(gaplus_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 0x300;
@@ -67,12 +66,12 @@ PALETTE_INIT( gaplus )
 
 	/* characters use colors 0xf0-0xff */
 	for (i = 0;i < machine->gfx[0]->total_colors * machine->gfx[0]->color_granularity;i++)
-		colortable_entry_set_value(gaplus_colortable, machine->gfx[0]->color_base + i, 0xf0 + (*color_prom++ & 0x0f));
+		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i, 0xf0 + (*color_prom++ & 0x0f));
 
 	/* sprites */
 	for (i = 0;i < machine->gfx[1]->total_colors * machine->gfx[1]->color_granularity;i++)
 	{
-		colortable_entry_set_value(gaplus_colortable, machine->gfx[1]->color_base + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
+		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i, (color_prom[0] & 0x0f) + ((color_prom[0x200] & 0x0f) << 4));
 		color_prom++;
 	}
 }
@@ -198,7 +197,7 @@ VIDEO_START( gaplus )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
-	colortable_configure_tilemap_groups(gaplus_colortable, bg_tilemap, machine->gfx[0], 0xff);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 0xff);
 
 	spriteram = gaplus_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -311,7 +310,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
 						cliprect,TRANSPARENCY_PENS,
-						colortable_get_transpen_mask(gaplus_colortable, machine->gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0xff));
 				}
 			}
 		}

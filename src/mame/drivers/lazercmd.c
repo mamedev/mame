@@ -599,17 +599,15 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-static UINT16 colortable_source[] =
-{
-	 1, 0,
-	 0, 1
-};
 static PALETTE_INIT( lazercmd )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); 	/* black */
-	palette_set_color(machine,1,MAKE_RGB(0xb0,0xb0,0xb0)); 	/* white */
-	palette_set_color(machine,2,MAKE_RGB(0xff,0xff,0xff));	/* bright white */
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
+	palette_set_color(machine,0,MAKE_RGB(0xb0,0xb0,0xb0)); 	/* white */
+	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); 	/* black */
+
+	palette_set_color(machine,2,MAKE_RGB(0x00,0x00,0x00)); 	/* black */
+	palette_set_color(machine,3,MAKE_RGB(0xb0,0xb0,0xb0)); 	/* white */
+
+	palette_set_color(machine,4,MAKE_RGB(0xff,0xff,0xff)); 	/* bright white */
 }
 
 static MACHINE_DRIVER_START( lazercmd )
@@ -634,8 +632,7 @@ static MACHINE_DRIVER_START( lazercmd )
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(2*2)
+	MDRV_PALETTE_LENGTH(5)
 
 	MDRV_PALETTE_INIT(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)
@@ -670,8 +667,7 @@ static MACHINE_DRIVER_START( medlanes )
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
 	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(2*2)
+	MDRV_PALETTE_LENGTH(5)
 
 	MDRV_PALETTE_INIT(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)
@@ -706,8 +702,7 @@ static MACHINE_DRIVER_START( bbonk )
 	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(2*2)
+	MDRV_PALETTE_LENGTH(5)
 
 	MDRV_PALETTE_INIT(lazercmd)
 	MDRV_VIDEO_UPDATE(lazercmd)

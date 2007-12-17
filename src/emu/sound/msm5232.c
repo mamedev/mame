@@ -665,7 +665,7 @@ INLINE void TG_group_advance(MSM5232 *chip, int groupidx)
 #endif
 
 
-void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sample_t** buffer, int samples)
+static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sample_t** buffer, int samples)
 {
 	MSM5232 * chip = param;
 	stream_sample_t *buf1 = buffer[0];

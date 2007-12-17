@@ -91,8 +91,8 @@ struct qsound_info
 };
 
 /* Function prototypes */
-void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length );
-void qsound_set_command(struct qsound_info *chip, int data, int value);
+static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length );
+static void qsound_set_command(struct qsound_info *chip, int data, int value);
 
 static void *qsound_start(int sndindex, int clock, const void *config)
 {
@@ -198,7 +198,7 @@ READ8_HANDLER( qsound_status_r )
 	return 0x80;
 }
 
-void qsound_set_command(struct qsound_info *chip, int data, int value)
+static void qsound_set_command(struct qsound_info *chip, int data, int value)
 {
 	int ch=0,reg=0;
 	if (data < 0x80)
@@ -313,7 +313,7 @@ void qsound_set_command(struct qsound_info *chip, int data, int value)
 }
 
 
-void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
+static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length )
 {
 	struct qsound_info *chip = param;
 	int i,j;

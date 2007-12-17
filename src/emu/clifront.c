@@ -67,7 +67,7 @@ static void match_roms(const char *hash, int length, int *found);
     COMMAND-LINE OPTIONS
 ***************************************************************************/
 
-const options_entry cli_options[] =
+static const options_entry cli_options[] =
 {
 	/* core commands */
 	{ NULL,                       NULL,       OPTION_HEADER,     "CORE COMMANDS" },

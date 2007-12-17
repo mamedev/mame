@@ -153,7 +153,7 @@ INLINE void saturn_take_irq(void)
 	saturn.pending_irq = 0;
 }
 
-int saturn_execute(int cycles)
+static int saturn_execute(int cycles)
 {
 	saturn_ICount = cycles;
 
@@ -195,6 +195,7 @@ int saturn_execute(int cycles)
 	return cycles - saturn_ICount;
 }
 
+#ifdef UNUSED_FUNCTION
 void saturn_set_nmi_line(int state)
 {
 	if (saturn.nmi_state == state) return;
@@ -225,6 +226,7 @@ void saturn_set_irq_callback(int (*callback)(int))
 {
 	saturn.irq_callback = callback;
 }
+#endif
 
 #if 0
 static void saturn_state_save(void *file)

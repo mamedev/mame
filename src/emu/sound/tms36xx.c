@@ -447,7 +447,7 @@ void tms36xx_note_w(int chip, int octave, int note)
 	tms->tune_max = note + 1;
 }
 
-void tms3617_enable(struct TMS36XX *tms, int enable)
+static void tms3617_enable(struct TMS36XX *tms, int enable)
 {
 	int i, bits = 0;
 

@@ -127,7 +127,7 @@ static char *GET_SHIFT(int shift)
 	return buffer;
 }
 
-void dasm_group_be(UINT16 opcode)
+static void dasm_group_be(UINT16 opcode)
 {
 	int subop = opcode & 0xff;
 

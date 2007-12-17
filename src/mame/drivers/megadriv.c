@@ -608,10 +608,9 @@ static UINT16 get_word_from_68k_mem(UINT32 source)
 
 /* Note, In reality this transfer is NOT instant, the 68k isn't paused
    as the 68k address bus isn't accessed */
-static void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length);
 
 /* Wani Wani World, James Pond 3, Pirates Gold! */
-void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
+static void megadrive_do_insta_vram_copy(UINT32 source, UINT16 length)
 {
 	int x;
 

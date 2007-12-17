@@ -1545,7 +1545,7 @@ static void cp1610_xori(int d)
 	cp1610_icount -= 8;
 }
 
-void cp1610_reset(void)
+static void cp1610_reset(void)
 {
 	/* This is how we set the reset vector */
 	cpunum_set_input_line(cpu_getactivecpu(), CP1610_RESET, PULSE_LINE);
@@ -2157,7 +2157,7 @@ static void cp1610_do_jumps(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-int cp1610_execute(int cycles)
+static int cp1610_execute(int cycles)
 {
 	UINT16 opcode;
 
@@ -3382,7 +3382,7 @@ static void cp1610_set_context (void *src)
 		cp1610 = *(cp1610_Regs *) src;
 }
 
-void cp1610_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void cp1610_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	cp1610.intr_enabled = 0;
 	cp1610.reset_pending = 0;

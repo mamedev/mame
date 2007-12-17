@@ -163,7 +163,7 @@ static PALETTE_INIT( eolith16 )
 
 
 static MACHINE_DRIVER_START( eolith16 )
-	MDRV_CPU_ADD(E116T, 60000000)		 /* 60 MHz */
+	MDRV_CPU_ADD(E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
 	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
 

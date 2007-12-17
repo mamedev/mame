@@ -16,7 +16,6 @@ static tilemap *bg_tilemap;
 
 static PALETTE_INIT( cm )
 {
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 	int i;
 
 	for ( i = 0; i < machine->drv->total_colors; i++ )
@@ -392,7 +391,6 @@ static MACHINE_DRIVER_START( cmv801 )
 
 	MDRV_GFXDECODE(cherrym)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(cm)
 	MDRV_VIDEO_START(cm)

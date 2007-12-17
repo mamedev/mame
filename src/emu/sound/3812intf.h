@@ -25,20 +25,24 @@ struct Y8950interface
 /* YM3812 */
 READ8_HANDLER ( YM3812_status_port_0_r );
 WRITE8_HANDLER( YM3812_control_port_0_w );
+READ8_HANDLER( YM3812_read_port_0_r );
 WRITE8_HANDLER( YM3812_write_port_0_w );
 
 READ8_HANDLER ( YM3812_status_port_1_r );
 WRITE8_HANDLER( YM3812_control_port_1_w );
+READ8_HANDLER( YM3812_read_port_1_r );
 WRITE8_HANDLER( YM3812_write_port_1_w );
 
 
 /* YM3526 */
 READ8_HANDLER ( YM3526_status_port_0_r );
 WRITE8_HANDLER( YM3526_control_port_0_w );
+READ8_HANDLER( YM3526_read_port_0_r );
 WRITE8_HANDLER( YM3526_write_port_0_w );
 
 READ8_HANDLER ( YM3526_status_port_1_r );
 WRITE8_HANDLER( YM3526_control_port_1_w );
+READ8_HANDLER( YM3526_read_port_1_r );
 WRITE8_HANDLER( YM3526_write_port_1_w );
 
 

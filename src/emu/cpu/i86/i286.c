@@ -65,7 +65,7 @@ typedef struct
 	memory_interface	mem;
 } i80286_Regs;
 
-int i80286_ICount;
+static int i80286_ICount;
 
 static i80286_Regs I;
 static unsigned prefix_base;	/* base address of the latest prefix segment */

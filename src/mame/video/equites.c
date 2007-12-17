@@ -34,7 +34,6 @@ static int scrollx, scrolly;
 static int bgcolor[4];
 static rectangle halfclip;
 static struct PRESTEP_TYPE { unsigned sy, fdx; } *prestep;
-static colortable *equites_colortable;
 
 /******************************************************************************/
 // Exports
@@ -78,17 +77,17 @@ PALETTE_INIT( equites )
 	UINT8 *clut_ptr;
 	int i;
 
-	equites_colortable = colortable_alloc(machine, 256);
+	machine->colortable = colortable_alloc(machine, 256);
 
 	for (i=0; i<256; i++)
-		colortable_palette_set_color(equites_colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
 
 	for (i=0; i<256; i++)
-		colortable_entry_set_value(equites_colortable, i, i);
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	clut_ptr = memory_region(REGION_USER1) + 0x80;
 	for (i=0; i<128; i++)
-		colortable_entry_set_value(equites_colortable, i+0x100, clut_ptr[i]);
+		colortable_entry_set_value(machine->colortable, i+0x100, clut_ptr[i]);
 }
 
 static TILE_GET_INFO( equites_charinfo )
@@ -120,24 +119,24 @@ PALETTE_INIT( splndrbt )
 	UINT8 *prom_ptr;
 	int i;
 
-	equites_colortable = colortable_alloc(machine, 256);
+	machine->colortable = colortable_alloc(machine, 256);
 
 	for (i=0; i<0x100; i++)
-		colortable_palette_set_color(equites_colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(pal4bit(color_prom[i]), pal4bit(color_prom[i+0x100]), pal4bit(color_prom[i+0x200])));
 
 	for (i = 0; i < 0x100; i++)
-		colortable_entry_set_value(equites_colortable, i, i);
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	prom_ptr = memory_region(REGION_USER1);
 	for (i=0; i<0x80; i++)
 	{
-		colortable_entry_set_value(equites_colortable, i + 0x100, prom_ptr[i] + 0x10);
-		colortable_entry_set_value(equites_colortable, i + 0x180, prom_ptr[i]);
+		colortable_entry_set_value(machine->colortable, i + 0x100, prom_ptr[i] + 0x10);
+		colortable_entry_set_value(machine->colortable, i + 0x180, prom_ptr[i]);
 	}
 
 	prom_ptr += 0x100;
 	for (i=0; i<0x400; i++)
-		colortable_entry_set_value(equites_colortable, i + 0x200, prom_ptr[i]);
+		colortable_entry_set_value(machine->colortable, i + 0x200, prom_ptr[i]);
 }
 
 static TILE_GET_INFO( splndrbt_char0info )
@@ -276,7 +275,7 @@ static void equites_update_clut(running_machine *machine)
 	c = *bgcolor;
 
 	for (i=0x80; i<0x100; i+=0x08)
-		colortable_entry_set_value(equites_colortable, i, c);
+		colortable_entry_set_value(machine->colortable, i, c);
 }
 
 static void equites_draw_scroll(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -398,7 +397,7 @@ static void splndrbt_update_clut(running_machine *machine)
 	switch(equites_id)
 	{
 		case 0x8511:
-			colortable_entry_set_value(equites_colortable, 0x114, c);
+			colortable_entry_set_value(machine->colortable, 0x114, c);
 		break;
 	}
 }

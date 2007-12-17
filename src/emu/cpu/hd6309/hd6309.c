@@ -556,7 +556,7 @@ static void hd6309_reset(void)
 	UpdateState();
 }
 
-void hd6309_exit(void)
+static void hd6309_exit(void)
 {
 	/* nothing to do ? */
 }

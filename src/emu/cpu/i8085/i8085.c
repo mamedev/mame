@@ -1261,7 +1261,7 @@ static void Interrupt(void)
 	}
 }
 
-int i8085_execute(int cycles)
+static int i8085_execute(int cycles)
 {
 
 	i8085_ICount = cycles;
@@ -1536,7 +1536,7 @@ static void i8085_set_irq_line(int irqline, int state)
  **************************************************************************/
 #if (HAS_8080)
 
-void i8080_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void i8080_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	init_tables();
 	I.cputype = 0;
@@ -1558,7 +1558,7 @@ void i8080_init(int index, int clock, const void *config, int (*irqcallback)(int
 	state_save_register_item_array("i8080", index, I.irq_state);
 }
 
-void i8080_set_irq_line(int irqline, int state)
+static void i8080_set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{

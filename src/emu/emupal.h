@@ -112,7 +112,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _colortable colortable;
+typedef struct _colortable_t colortable_t;
 
 
 
@@ -154,25 +154,25 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
 /* ----- colortable management ----- */
 
 /* allocate a new colortable with the given number of entries */
-colortable *colortable_alloc(running_machine *machine, UINT32 palettesize);
+colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize);
 
 /* set the value of a colortable entry */
-void colortable_entry_set_value(colortable *ctable, UINT32 entry, UINT16 value);
+void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value);
 
 /* return the value of a colortable entry */
-UINT16 colortable_entry_get_value(colortable *ctable, UINT32 entry);
+UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry);
 
 /* change the color of a colortable palette entry */
-void colortable_palette_set_color(colortable *ctable, UINT32 entry, rgb_t color);
+void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t color);
 
 /* return the color of a colortable palette entry */
-rgb_t colortable_palette_get_color(colortable *ctable, UINT32 entry);
+rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry);
 
 /* return a 32-bit transparency mask for a given gfx element and color */
-UINT32 colortable_get_transpen_mask(colortable *ctable, const gfx_element *gfx, int color, int transcolor);
+UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx, int color, int transcolor);
 
 /* configure groups in a tilemap to represent transparency based on colortable entries (each group maps to a gfx color) */
-void colortable_configure_tilemap_groups(colortable *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor);
+void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, const gfx_element *gfx, int transcolor);
 
 
 

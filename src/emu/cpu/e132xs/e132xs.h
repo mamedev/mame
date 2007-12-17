@@ -3,6 +3,22 @@
 
 #include "cpuintrf.h"
 
+/*
+    A note about clock multipliers and dividers:
+
+    E1-16[T] and E1-32[T] accept a straight clock
+
+    E1-16X[T|N] and E1-32X[T|N] accept a clock and multiply it
+        internally by 4; in the emulator, you MUST specify 4 * XTAL
+        to achieve the correct speed
+
+    E1-16XS[R] and E1-32XS[R] accept a clock and multiply it
+        internally by 8; in the emulator, you MUST specify 8 * XTAL
+        to achieve the correct speed
+*/
+
+
+
 /* Functions */
 
 #if (HAS_E116T)
@@ -98,6 +114,8 @@ extern int hyp_type_16bit;
 #define SR_REGISTER			 1
 #define BCR_REGISTER		20
 #define TPR_REGISTER		21
+#define TCR_REGISTER		22
+#define TR_REGISTER			23
 #define ISR_REGISTER		25
 #define FCR_REGISTER		26
 #define MCR_REGISTER		27
@@ -127,7 +145,15 @@ extern int hyp_type_16bit;
 /* Delay values */
 #define NO_DELAY		0
 #define DELAY_EXECUTE	1
-#define DELAY_TAKEN		2
+
+/* IRQ numbers */
+#define IRQ_INT1		0
+#define IRQ_INT2		1
+#define IRQ_INT3		2
+#define IRQ_INT4		3
+#define IRQ_IO1			4
+#define IRQ_IO2			5
+#define IRQ_IO3			6
 
 /* Trap numbers */
 #define IO2					48

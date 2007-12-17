@@ -550,7 +550,7 @@ static void mips3_set_info(UINT32 state, cpuinfo *info)
 }
 
 
-void mips3_get_info(UINT32 state, cpuinfo *info)
+static void mips3_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{

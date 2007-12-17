@@ -10,8 +10,6 @@ static tilemap *bg_tilemap;
 
 static mame_bitmap *sprite_bitmap;
 
-static colortable *mappy_colortable;
-
 
 /***************************************************************************
 
@@ -53,7 +51,7 @@ PALETTE_INIT( superpac )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	mappy_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -78,7 +76,7 @@ PALETTE_INIT( superpac )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -88,14 +86,14 @@ PALETTE_INIT( superpac )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, (ctabentry ^ 15) + 0x10);
+		colortable_entry_set_value(machine->colortable, i, (ctabentry ^ 15) + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -112,7 +110,7 @@ PALETTE_INIT( mappy )
 			2, &resistances[1], bweights, 0, 0);
 
 	/* allocate the colortable */
-	mappy_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -137,7 +135,7 @@ PALETTE_INIT( mappy )
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		b = combine_2_weights(bweights, bit0, bit1);
 
-		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -147,14 +145,14 @@ PALETTE_INIT( mappy )
 	for (i = 0*4; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, ctabentry + 0x10);
+		colortable_entry_set_value(machine->colortable, i, ctabentry + 0x10);
 	}
 
 	/* sprites map to the lower 16 palette entries */
 	for (i = 64*4; i < machine->drv->total_colors; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -183,7 +181,7 @@ PALETTE_INIT( phozon )
 			4, &resistances[0], bweights, 0, 0);
 
 	/* allocate the colortable */
-	mappy_colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 32);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 32; i++)
@@ -212,7 +210,7 @@ PALETTE_INIT( phozon )
 		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		colortable_palette_set_color(mappy_colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
@@ -222,14 +220,14 @@ PALETTE_INIT( phozon )
 	for (i = 0; i < 64*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
 	/* sprites map to the upper 16 palette entries */
 	for (i = 64*4; i < 128*4; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
-		colortable_entry_set_value(mappy_colortable, i, ctabentry + 0x10);
+		colortable_entry_set_value(machine->colortable, i, ctabentry + 0x10);
 	}
 }
 
@@ -327,7 +325,7 @@ VIDEO_START( superpac )
 	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 31);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
 
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -338,7 +336,7 @@ VIDEO_START( phozon )
 {
 	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
-	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 15);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 15);
 
 	spriteram = mappy_spriteram + 0x780;
 	spriteram_2 = spriteram + 0x800;
@@ -349,7 +347,7 @@ VIDEO_START( mappy )
 {
 	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,60);
 
-	colortable_configure_tilemap_groups(mappy_colortable, bg_tilemap, machine->gfx[0], 31);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
 	tilemap_set_scroll_cols(bg_tilemap, 36);
 
 	spriteram = mappy_spriteram + 0x780;
@@ -402,7 +400,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, colortable *ctable, int transcolor)
+void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor)
 {
 	int offs;
 
@@ -448,7 +446,7 @@ void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rec
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
 						cliprect,TRANSPARENCY_PENS,
-						colortable_get_transpen_mask(ctable, machine->gfx[1], color, transcolor));
+						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, transcolor));
 				}
 			}
 		}
@@ -523,7 +521,7 @@ static void phozon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 						flipx,flipy,
 						sx + 8*x,sy + 8*y,
 						cliprect,TRANSPARENCY_PENS,
-						colortable_get_transpen_mask(mappy_colortable, machine->gfx[1], color, 31));
+						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 31));
 				}
 			}
 		}
@@ -539,7 +537,7 @@ VIDEO_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
-	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,mappy_colortable,15);
+	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,15);
 	copybitmap(bitmap,sprite_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,15);
 
 	/* Redraw the high priority characters */
@@ -582,7 +580,7 @@ VIDEO_UPDATE( mappy )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
-	mappy_draw_sprites(machine,bitmap,cliprect,0,0,mappy_colortable,15);
+	mappy_draw_sprites(machine,bitmap,cliprect,0,0,15);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

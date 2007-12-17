@@ -523,7 +523,7 @@ READ16_HANDLER( scudhamm_motor_pos_r )
 
     Within $20 vblanks the motor must reach the target. */
 
-WRITE16_HANDLER( scudhamm_motor_command_w )
+static WRITE16_HANDLER( scudhamm_motor_command_w )
 {
 	COMBINE_DATA( &scudhamm_motor_command );
 }

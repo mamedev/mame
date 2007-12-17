@@ -334,7 +334,7 @@ static void vdp_setregister(UINT8 chip, UINT16 cmd)
 
 *******************************************************************************/
 
-void segae_drawscanline(int line, int chips, int blank)
+static void segae_drawscanline(int line, int chips, int blank)
 {
 
 	UINT8* dest;

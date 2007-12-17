@@ -121,23 +121,25 @@ int atarifb_game;
  *
  *************************************/
 
-static const UINT16 colortable_source[] =
-{
-	0x02, 0x00, /* chars */
-	0x03, 0x02, /* sprites */
-	0x03, 0x00,
-	0x03, 0x01, /* sprite masks */
-	0x03, 0x00,
-	0x03, 0x02,
-};
-
 static PALETTE_INIT( atarifb )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-	palette_set_color(machine,1,MAKE_RGB(0x80,0x80,0x80)); /* grey  */
-	palette_set_color(machine,2,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-	palette_set_color(machine,3,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
+	/* chars */
+	palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+
+	/* sprites */
+	palette_set_color(machine,2,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,3,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+	palette_set_color(machine,4,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,5,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+
+	/* sprite masks */
+	palette_set_color(machine,6,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,7,MAKE_RGB(0x80,0x80,0x80)); /* grey  */
+	palette_set_color(machine,8,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,9,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+	palette_set_color(machine,10,MAKE_RGB(0x40,0x40,0x40)); /* dark grey (?) - used in Soccer only */
+	palette_set_color(machine,11,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 }
 
 
@@ -538,8 +540,7 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_SCREEN_SIZE(38*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(atarifb)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MDRV_PALETTE_LENGTH(12)
 
 	MDRV_PALETTE_INIT(atarifb)
 	MDRV_VIDEO_START(generic)

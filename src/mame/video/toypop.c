@@ -16,8 +16,6 @@ static tilemap *bg_tilemap;
 UINT16 *toypop_bg_image;
 static int bitmapflip,palettebank;
 
-static colortable *toypop_colortable;
-
 
 /***************************************************************************
 
@@ -33,7 +31,7 @@ PALETTE_INIT( toypop )
 	int i;
 
 	/* allocate the colortable */
-	toypop_colortable = colortable_alloc(machine, 256);
+	machine->colortable = colortable_alloc(machine, 256);
 
 	for (i = 0;i < 256;i++)
 	{
@@ -58,7 +56,7 @@ PALETTE_INIT( toypop )
 		bit3 = (color_prom[i+0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		colortable_palette_set_color(toypop_colortable, i, MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	for (i = 0;i < 256;i++)
@@ -66,17 +64,17 @@ PALETTE_INIT( toypop )
 		UINT8 entry;
 
 		// characters
-		colortable_entry_set_value(toypop_colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
-		colortable_entry_set_value(toypop_colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
+		colortable_entry_set_value(machine->colortable, i + 0*256, (color_prom[i + 0x300] & 0x0f) | 0x70);
+		colortable_entry_set_value(machine->colortable, i + 1*256, (color_prom[i + 0x300] & 0x0f) | 0xf0);
 		// sprites
 		entry = color_prom[i + 0x500];
-		colortable_entry_set_value(toypop_colortable, i + 2*256, entry);
+		colortable_entry_set_value(machine->colortable, i + 2*256, entry);
 	}
 	for (i = 0;i < 16;i++)
 	{
 		// background
-		colortable_entry_set_value(toypop_colortable, i + 3*256 + 0*16, 0x60 + i);
-		colortable_entry_set_value(toypop_colortable, i + 3*256 + 1*16, 0xe0 + i);
+		colortable_entry_set_value(machine->colortable, i + 3*256 + 0*16, 0x60 + i);
+		colortable_entry_set_value(machine->colortable, i + 3*256 + 1*16, 0xe0 + i);
 	}
 }
 
@@ -223,7 +221,7 @@ static void draw_background(mame_bitmap *bitmap)
 ***************************************************************************/
 
 /* from mappy.c */
-void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, colortable *ctable, int transcolor);
+void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor);
 
 
 VIDEO_UPDATE( toypop )
@@ -231,6 +229,6 @@ VIDEO_UPDATE( toypop )
 	draw_background(bitmap);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	mappy_draw_sprites(machine, bitmap, cliprect, -31, -8, toypop_colortable, 0xff);
+	mappy_draw_sprites(machine, bitmap, cliprect, -31, -8, 0xff);
 	return 0;
 }

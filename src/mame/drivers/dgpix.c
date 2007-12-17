@@ -213,6 +213,13 @@ static WRITE32_HANDLER( coin_w )
 	coin_counter_w(1, data & 2);
 }
 
+static READ32_HANDLER( vblank_r )
+{
+	/* burn a bunch of cycles because this is polled frequently during busy loops */
+	activecpu_adjust_icount(-100);
+	return input_port_0_dword_r(offset, 0);
+}
+
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE(vram_r, vram_w)
@@ -223,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0200, 0x0203) AM_READNOP // used to sync with the protecion PIC? tested bits 0 and 1
-	AM_RANGE(0x0400, 0x0403) AM_READWRITE(input_port_0_dword_r, vbuffer_w)
+	AM_RANGE(0x0400, 0x0403) AM_READWRITE(vblank_r, vbuffer_w)
 	AM_RANGE(0x0a10, 0x0a13) AM_READ(input_port_1_dword_r)
 	AM_RANGE(0x0200, 0x0203) AM_WRITE(coin_w)
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITENOP // writes only: 1, 0, 1 at startup
@@ -311,7 +318,7 @@ static VIDEO_UPDATE( dgpix )
 }
 
 static MACHINE_DRIVER_START( dgpix )
-	MDRV_CPU_ADD(E132XT, 20000000)
+	MDRV_CPU_ADD(E132XT, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 

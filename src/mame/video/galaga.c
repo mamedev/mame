@@ -17,7 +17,6 @@ UINT8 *galaga_videoram;
 UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
 UINT8 galaga_starcontrol[6];
 static UINT32 stars_scrollx,stars_scrolly;
-static colortable *galaga_colortable;
 
 static INT32 galaga_gfxbank; // used by catsbee
 
@@ -338,7 +337,7 @@ PALETTE_INIT( galaga )
 {
 	int i;
 
-	galaga_colortable = colortable_alloc(machine, 32+64);
+	machine->colortable = colortable_alloc(machine, 32+64);
 
 	/* core palette */
 	for (i = 0;i < 32;i++)
@@ -358,7 +357,7 @@ PALETTE_INIT( galaga )
 		bit2 = ((*color_prom) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		colortable_palette_set_color(galaga_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -375,20 +374,20 @@ PALETTE_INIT( galaga )
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
 
-		colortable_palette_set_color(galaga_colortable,32 + i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,32 + i,MAKE_RGB(r,g,b));
 	}
 
 	/* characters */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(galaga_colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
+		colortable_entry_set_value(machine->colortable, i, (*(color_prom++) & 0x0f) + 0x10);	/* chars */
 
 	/* sprites */
 	for (i = 0;i < 64*4;i++)
-		colortable_entry_set_value(galaga_colortable, 64*4+i, (*(color_prom++) & 0x0f));
+		colortable_entry_set_value(machine->colortable, 64*4+i, (*(color_prom++) & 0x0f));
 
 	/* now the stars */
 	for (i = 0;i < 64;i++)
-		colortable_entry_set_value(galaga_colortable, 64*4+64*4+i, 32 + i);
+		colortable_entry_set_value(machine->colortable, 64*4+64*4+i, 32 + i);
 }
 
 
@@ -442,7 +441,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( galaga )
 {
 	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
-	colortable_configure_tilemap_groups(galaga_colortable, tx_tilemap, machine->gfx[0], 0x1f);
+	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0x1f);
 
 	galaga_gfxbank = 0;
 
@@ -536,7 +535,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					flipx,flipy,
 					sx + 16*x, sy + 16*y,
 					cliprect,TRANSPARENCY_PENS,
-					colortable_get_transpen_mask(galaga_colortable, machine->gfx[1], color, 0x0f));
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x0f));
 			}
 		}
 	}

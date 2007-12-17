@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 #define mKEY_MASK(x,y) if (input_code_pressed_once(x)){nycaptor_mask|=y;tilemap_mark_all_tiles_dirty( bg_tilemap );}
 
-void nycaptor_setmask(void)
+static void nycaptor_setmask(void)
 {
   mKEY_MASK(KEYCODE_Q,1); /* bg */
   mKEY_MASK(KEYCODE_W,2);

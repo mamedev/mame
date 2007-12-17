@@ -657,7 +657,7 @@ WRITE8_HANDLER( NESPSG_0_w ) {apu_write(0,offset,data);}
 WRITE8_HANDLER( NESPSG_1_w ) {apu_write(1,offset,data);}
 
 /* UPDATE APU SYSTEM */
-void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
   struct nesapu_info *info = param;
   apu_update(info, buffer[0], length);

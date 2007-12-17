@@ -184,7 +184,7 @@ typedef struct {
 }	s_opcode;
 
 static ALPHA8201_Regs R;
-int	   ALPHA8201_ICount;
+static int	   ALPHA8201_ICount;
 static int    inst_cycles;
 
 #define intRAM	R.RAM

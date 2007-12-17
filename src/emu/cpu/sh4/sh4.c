@@ -3944,7 +3944,7 @@ READ32_HANDLER( sh4_internal_r )
 	return sh4.m[offset];
 }
 
-void sh4_set_frt_input(int cpunum, int state)
+static void sh4_set_frt_input(int cpunum, int state)
 {
 	if(state == PULSE_LINE)
 	{
@@ -3984,7 +3984,7 @@ void sh4_set_frt_input(int cpunum, int state)
 	cpuintrf_pop_context();
 }
 
-void sh4_set_irln_input(int cpunum, int value)
+static void sh4_set_irln_input(int cpunum, int value)
 {
 	if (sh4.irln == value)
 		return;
@@ -4221,7 +4221,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 
 }
 
-void sh4_dma_ddt(struct sh4_ddt_dma *s)
+static void sh4_dma_ddt(struct sh4_ddt_dma *s)
 {
 UINT32 chcr;
 UINT32 *p32bits;

@@ -116,7 +116,7 @@ WRITE8_HANDLER( pastelg_romsel_w )
 
 
 ******************************************************************************/
-void pastelg_vramflip(void)
+static void pastelg_vramflip(void)
 {
 	static int pastelg_flipscreen_old = 0;
 	int x, y;
@@ -150,7 +150,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 	nb1413m3_busyflag = 1;
 }
 
-void pastelg_gfxdraw(void)
+static void pastelg_gfxdraw(void)
 {
 	UINT8 *GFX = memory_region(REGION_GFX1);
 

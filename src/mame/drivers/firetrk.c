@@ -15,6 +15,9 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 int firetrk_game;
 
+UINT32 firetrk_color1_mask;
+UINT32 firetrk_color2_mask;
+
 static int last_service;
 static int steer_dir[2];
 static int steer_flag[2];
@@ -244,7 +247,7 @@ static MACHINE_RESET( firetrk )
 
 static PALETTE_INIT( firetrk )
 {
-	static const UINT16 colortable_source[] =
+	static const UINT8 colortable_source[] =
 	{
 		0, 0, 1, 0,
 		2, 0, 3, 0,
@@ -254,13 +257,25 @@ static PALETTE_INIT( firetrk )
 		2, 0, 0, 3,
 		3, 0, 0, 3
 	};
+	static const rgb_t palette_source[] =
+	{
+		MAKE_RGB(0x00, 0x00, 0x00),
+		MAKE_RGB(0x5b, 0x5b, 0x5b),
+		MAKE_RGB(0xa4, 0xa4, 0xa4),
+		MAKE_RGB(0xff, 0xff, 0xff)
+	};
+	int i;
 
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	palette_set_color(machine, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
-
-	memcpy(colortable, colortable_source, sizeof(colortable_source));
+	firetrk_color1_mask = firetrk_color2_mask = 0;
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	{
+		UINT8 color = colortable_source[i];
+		if (color == 1)
+			firetrk_color1_mask |= 1 << i;
+		else if (color == 2)
+			firetrk_color2_mask |= 1 << i;
+		palette_set_color(machine, i, palette_source[color]);
+	}
 }
 
 
@@ -272,7 +287,7 @@ static void prom_to_palette(running_machine *machine, int number, UINT8 val)
 
 static PALETTE_INIT( montecar )
 {
-	static const UINT16 colortable_source[] =
+	static const UINT8 colortable_source[] =
 	{
 		0x00, 0x00, 0x00, 0x01,
 		0x00, 0x02, 0x00, 0x03,
@@ -280,12 +295,11 @@ static PALETTE_INIT( montecar )
 		0x03, 0x01, 0x03, 0x00,
 		0x00, 0x00, 0x02, 0x00,
 		0x02, 0x01, 0x02, 0x02,
-		0x00, 0x05, 0x06, 0x07,
-		0x00, 0x09, 0x0A, 0x0B,
-		0x00, 0x0D, 0x0E, 0x0F,
-		0x00, 0x11, 0x12, 0x13,
-		0x00, 0x15, 0x16, 0x17,
-		0x18, 0x19
+		0x00, 0x10, 0x20, 0x30,
+		0x00, 0x04, 0x08, 0x0C,
+		0x00, 0x44, 0x48, 0x4C,
+		0x00, 0x84, 0x88, 0x8C,
+		0x00, 0xC4, 0xC8, 0xCC
 	};
 
 	/*
@@ -307,43 +321,21 @@ static PALETTE_INIT( montecar )
      */
 
 	const UINT8* p = memory_region(REGION_PROMS);
+	int i;
 
-	int number = 0;
+	firetrk_color1_mask = firetrk_color2_mask = 0;
+	for (i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	{
+		UINT8 color = colortable_source[i];
+		if (color == 1)
+			firetrk_color1_mask |= 1 << i;
+		else if (color == 2)
+			firetrk_color2_mask |= 1 << i;
+		prom_to_palette(machine, i, p[0x100 + colortable_source[i]]);
+	}
 
-	prom_to_palette(machine, number++, p[0x100]);
-	prom_to_palette(machine, number++, p[0x101]);
-	prom_to_palette(machine, number++, p[0x102]);
-	prom_to_palette(machine, number++, p[0x103]);
-
-	prom_to_palette(machine, number++, p[0x100]);
-	prom_to_palette(machine, number++, p[0x110]);
-	prom_to_palette(machine, number++, p[0x120]);
-	prom_to_palette(machine, number++, p[0x130]);
-
-	prom_to_palette(machine, number++, p[0x100]);
-	prom_to_palette(machine, number++, p[0x104]);
-	prom_to_palette(machine, number++, p[0x108]);
-	prom_to_palette(machine, number++, p[0x10C]);
-
-	prom_to_palette(machine, number++, p[0x140]);
-	prom_to_palette(machine, number++, p[0x144]);
-	prom_to_palette(machine, number++, p[0x148]);
-	prom_to_palette(machine, number++, p[0x14C]);
-
-	prom_to_palette(machine, number++, p[0x180]);
-	prom_to_palette(machine, number++, p[0x184]);
-	prom_to_palette(machine, number++, p[0x188]);
-	prom_to_palette(machine, number++, p[0x18C]);
-
-	prom_to_palette(machine, number++, p[0x1C0]);
-	prom_to_palette(machine, number++, p[0x1C4]);
-	prom_to_palette(machine, number++, p[0x1C8]);
-	prom_to_palette(machine, number++, p[0x1CC]);
-
-	palette_set_color(machine, number++, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, number++, MAKE_RGB(0xff, 0xff, 0xff));
-
-	memcpy(colortable, colortable_source, sizeof(colortable_source));
+	palette_set_color(machine, ARRAY_LENGTH(colortable_source) + 0, MAKE_RGB(0x00, 0x00, 0x00));
+	palette_set_color(machine, ARRAY_LENGTH(colortable_source) + 1, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
 
@@ -1074,8 +1066,7 @@ static MACHINE_DRIVER_START( firetrk )
 	MDRV_GFXDECODE(firetrk)
 
 	MDRV_PALETTE_INIT(firetrk)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(28)
+	MDRV_PALETTE_LENGTH(28)
 
 	MDRV_VIDEO_START(firetrk)
 	MDRV_VIDEO_EOF(firetrk)
@@ -1101,8 +1092,7 @@ static MACHINE_DRIVER_START( superbug )
 	MDRV_GFXDECODE(superbug)
 
 	MDRV_PALETTE_INIT(firetrk)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(28)
+	MDRV_PALETTE_LENGTH(28)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
@@ -1122,8 +1112,7 @@ static MACHINE_DRIVER_START( montecar )
 	MDRV_GFXDECODE(montecar)
 
 	MDRV_PALETTE_INIT(montecar)
-	MDRV_PALETTE_LENGTH(26)
-	MDRV_COLORTABLE_LENGTH(46)
+	MDRV_PALETTE_LENGTH(46)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)

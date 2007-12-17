@@ -1078,7 +1078,7 @@ ADDRESS_MAP_END
  *  PIC16C54 Reset
  ****************************************************************************/
 
-void pic16C54_reset(void)
+static void pic16C54_reset(void)
 {
 	picmodel = 0x16C54;
 	picRAMmask = 0x1f;
@@ -1130,7 +1130,7 @@ ADDRESS_MAP_END
  *  PIC16C55 Reset
  ****************************************************************************/
 
-void pic16C55_reset(void)
+static void pic16C55_reset(void)
 {
 	picmodel = 0x16C55;
 	picRAMmask = 0x1f;
@@ -1182,7 +1182,7 @@ ADDRESS_MAP_END
  *  PIC16C56 Reset
  ****************************************************************************/
 
-void pic16C56_reset(void)
+static void pic16C56_reset(void)
 {
 	picmodel = 0x16C56;
 	picRAMmask = 0x1f;
@@ -1239,7 +1239,7 @@ ADDRESS_MAP_END
  *  PIC16C57 Reset
  ****************************************************************************/
 
-void pic16C57_reset(void)
+static void pic16C57_reset(void)
 {
 	picmodel = 0x16C57;
 	picRAMmask = 0x7f;
@@ -1297,7 +1297,7 @@ ADDRESS_MAP_END
  *  PIC16C58 Reset
  ****************************************************************************/
 
-void pic16C58_reset(void)
+static void pic16C58_reset(void)
 {
 	picmodel = 0x16C58;
 	picRAMmask = 0x7f;

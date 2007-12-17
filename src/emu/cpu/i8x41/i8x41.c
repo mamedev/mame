@@ -111,7 +111,7 @@ typedef struct {
 	int 	(*irq_callback)(int irqline);
 }	I8X41;
 
-int i8x41_ICount;
+static int i8x41_ICount;
 
 static I8X41 i8x41;
 

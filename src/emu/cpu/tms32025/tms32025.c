@@ -130,8 +130,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #endif
 
 
-UINT16 *tms32025_pgmmap[0x200];
-UINT16 *tms32025_datamap[0x200];
+static UINT16 *tms32025_pgmmap[0x200];
+static UINT16 *tms32025_datamap[0x200];
 
 #define SET_PC(x)	do { R.PC = (x); change_pc(R.PC<<1); } while (0)
 

@@ -258,7 +258,7 @@ static void					(*key_changed)(void);
 static void set_default_key_params(void);
 static void load_overlay_file(void);
 static void save_overlay_file(void);
-void fd1094_regenerate_key(void);
+static void fd1094_regenerate_key(void);
 
 static int instruction_hook(offs_t curpc);
 

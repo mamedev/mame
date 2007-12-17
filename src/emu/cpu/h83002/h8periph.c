@@ -339,12 +339,14 @@ void h8_itu_write8(UINT8 reg, UINT8 val)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 UINT8 h8_debugger_itu_read8(UINT8 reg)
 {
 	UINT8 val;
 	val = 0;
 	return val;
 }
+#endif
 
 
 UINT8 h8_register_read8(UINT32 address)

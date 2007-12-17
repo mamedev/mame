@@ -394,6 +394,8 @@ void amiga_add_autoconfig(amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
 
+const amiga_machine_interface *amiga_get_interface(void);
+
 
 /*----------- defined in audio/amiga.c -----------*/
 

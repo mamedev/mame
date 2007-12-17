@@ -289,7 +289,7 @@ static void PostPhoneme(S14001AChip *chip) /* figure out what the heck to do aft
 #endif
 }
 
-void s14001a_clock(S14001AChip *chip) /* called once per clock */
+static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 {
 	UINT8 CurDelta; // Current delta
 

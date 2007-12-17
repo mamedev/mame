@@ -354,26 +354,29 @@ GFXDECODE_END
 static PALETTE_INIT( decocass )
 {
 	int i;
+
+	machine->colortable = colortable_alloc(machine, 32);
+
 	/* set up 32 colors 1:1 pens */
 	for (i = 0; i < 32; i++)
-		colortable[i] = i;
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* setup straight/flipped colors for background tiles (D7 of color_center_bot ?) */
 	for (i = 0; i < 8; i++)
 	{
-		colortable[32+i] = 3*8+i;
-		colortable[40+i] = 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01);
+		colortable_entry_set_value(machine->colortable, 32+i, 3*8+i);
+		colortable_entry_set_value(machine->colortable, 40+i, 3*8+((i << 1) & 0x04) + ((i >> 1) & 0x02) + (i & 0x01));
 	}
 
 	/* setup 4 colors for 1bpp object */
-	colortable[48+0*2+0] = 0;
-	colortable[48+0*2+1] = 25;	/* testtape red from 4th palette section? */
-	colortable[48+1*2+0] = 0;
-	colortable[48+1*2+1] = 28;	/* testtape blue from 4th palette section? */
-	colortable[48+2*2+0] = 0;
-	colortable[48+2*2+1] = 26;	/* testtape green from 4th palette section? */
-	colortable[48+3*2+0] = 0;
-	colortable[48+3*2+1] = 23;	/* ???? */
+	colortable_entry_set_value(machine->colortable, 48+0*2+0, 0);
+	colortable_entry_set_value(machine->colortable, 48+0*2+1, 25);	/* testtape red from 4th palette section? */
+	colortable_entry_set_value(machine->colortable, 48+1*2+0, 0);
+	colortable_entry_set_value(machine->colortable, 48+1*2+1, 28);	/* testtape blue from 4th palette section? */
+	colortable_entry_set_value(machine->colortable, 48+2*2+0, 0);
+	colortable_entry_set_value(machine->colortable, 48+2*2+1, 26);	/* testtape green from 4th palette section? */
+	colortable_entry_set_value(machine->colortable, 48+3*2+0, 0);
+	colortable_entry_set_value(machine->colortable, 48+3*2+1, 23);	/* ???? */
 }
 
 
@@ -402,8 +405,7 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(decocass)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32+2*8+2*4)
+	MDRV_PALETTE_LENGTH(32+2*8+2*4)
 
 	MDRV_PALETTE_INIT(decocass)
 	MDRV_VIDEO_START(decocass)

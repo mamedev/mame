@@ -84,7 +84,7 @@ typedef struct {
     int (*irq_callback)(int irqline);
 }   z8000_Regs;
 
-int z8000_ICount;
+static int z8000_ICount;
 
 /* current CPU context */
 static z8000_Regs Z;

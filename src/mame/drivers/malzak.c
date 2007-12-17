@@ -391,31 +391,6 @@ static const gfx_layout saa5050_lolayout =
 	8 * 10
 };
 
-static const rgb_t saa5050_palette[8] =
-{
-	MAKE_RGB(0x00, 0x00, 0x00),	/* black */
-	MAKE_RGB(0xff, 0x00, 0x00),	/* red */
-	MAKE_RGB(0x00, 0xff, 0x00),	/* green */
-	MAKE_RGB(0xff, 0xff, 0x00),	/* yellow */
-	MAKE_RGB(0x00, 0x00, 0xff),	/* blue */
-	MAKE_RGB(0xff, 0x00, 0xff),	/* magenta */
-	MAKE_RGB(0x00, 0xff, 0xff),	/* cyan */
-	MAKE_RGB(0xff, 0xff, 0xff)	/* white */
-};
-
-/* bgnd, fgnd */
-static	unsigned	short	saa5050_colortable[64 * 2] =
-{
-	0,1, 0,1, 0,2, 0,3, 0,4, 0,5, 0,6, 0,7,
-	1,0, 1,1, 1,2, 1,3, 1,4, 1,5, 1,6, 1,7,
-	2,0, 2,1, 2,2, 2,3, 2,4, 2,5, 2,6, 2,7,
-	3,0, 3,1, 3,2, 3,3, 3,4, 3,5, 3,6, 3,7,
-	4,0, 4,1, 4,2, 4,3, 4,4, 4,5, 4,6, 4,7,
-	5,0, 5,1, 5,2, 5,3, 5,4, 5,5, 5,6, 5,7,
-	6,0, 6,1, 6,2, 6,3, 6,4, 6,5, 6,6, 6,7,
-	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
-};
-
 //add s2636 decodes here (i.e. from zac2650) and maybe re-arrange them
 static GFXDECODE_START( malzak )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 16 )
@@ -429,8 +404,13 @@ GFXDECODE_END
 
 static PALETTE_INIT( malzak )
 {
-	palette_set_colors(machine, 0, saa5050_palette, ARRAY_LENGTH(saa5050_palette));
-	memcpy(colortable, saa5050_colortable, sizeof (saa5050_colortable));
+	int i;
+
+	for (i = 0; i < 8*8; i++)
+	{
+		palette_set_color_rgb(machine, i * 2 + 0, pal1bit(i >> 3), pal1bit(i >> 4), pal1bit(i >> 5));
+		palette_set_color_rgb(machine, i * 2 + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+	}
 }
 
 
@@ -478,9 +458,8 @@ static MACHINE_DRIVER_START( malzak )
 	MDRV_SCREEN_SIZE(240, 256)	/* vert size is a guess */
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 239)
 	MDRV_GFXDECODE(malzak)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(malzak)
-	MDRV_COLORTABLE_LENGTH(128)
 
 //  MDRV_MACHINE_RESET(malzak)
 

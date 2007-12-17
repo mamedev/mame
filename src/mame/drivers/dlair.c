@@ -181,11 +181,9 @@ static PALETTE_INIT( dleuro )
 
 	for (i = 0; i < 8; i++)
 	{
-		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-		colortable[2 * i + 0] = 8;
-		colortable[2 * i + 1] = i;
+		palette_set_color(machine, 2 * i + 0, MAKE_RGB(0, 0, 0));
+		palette_set_color_rgb(machine, 2 * i + 1, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
-	palette_set_color(machine, 8, MAKE_RGB(0, 0, 0));
 }
 
 
@@ -858,8 +856,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_SCREEN_VISIBLE_AREA(0, 199, 0, 239)
 
 	MDRV_GFXDECODE(dlair)
-	MDRV_PALETTE_LENGTH(9)
-	MDRV_COLORTABLE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(dleuro)
 	MDRV_VIDEO_START(dleuro)

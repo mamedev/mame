@@ -949,8 +949,8 @@ static void nec_init(int index, int clock, const void *config, int (*irqcallback
 	I.irq_callback = irqcallback;
 }
 
-void v30mz_init(int index, int clock, const void *config, int (*irqcallback)(int)) { nec_init(index, clock, config, irqcallback, 3); }
-int v30mz_execute(int cycles)
+static void v30mz_init(int index, int clock, const void *config, int (*irqcallback)(int)) { nec_init(index, clock, config, irqcallback, 3); }
+static int v30mz_execute(int cycles)
 {
 	nec_ICount=cycles;
 	chip_type=V30MZ;

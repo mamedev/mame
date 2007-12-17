@@ -311,7 +311,7 @@ CALC3_MCU_COM_W(3)
     - Supply code snippets to the 68000
 */
 
-void calc3_mcu_run(void)
+static void calc3_mcu_run(void)
 {
 	UINT16 mcu_command;
 

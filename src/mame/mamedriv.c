@@ -3632,6 +3632,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( titlef )	/* (c) 1992 (World) */
 	DRIVER( titlefu )	/* (c) 1992 (US) */
 	DRIVER( scross )	/* (c) 1992 (World) */
+	DRIVER( scrossu )	/* (c) 1992 (World) */
 
 	/* Model 1 Games */
 	DRIVER( vf )		/* (c) 1993 */
@@ -5367,7 +5368,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( choppera )	/* A7003 'KK' (c) 1988 */
 	DRIVER( chopperb )	/* A7003 'KK' (c) 1988 */
 	DRIVER( legofair )	/* A7003 'KK' (c) 1988 */
-	DRIVER( ftsoccer )	/*            (c) 1988 */
+	DRIVER( fsoccer )	/* A6006 'FS' (c) 1988 */
+	DRIVER( fsoccerb )	/*            (c) 1988 */
 	DRIVER( tdfever )	/* A6006 'TD' (c) 1987 */
 	DRIVER( tdfeverj )	/* A6006 'TD' (c) 1987 */
 	DRIVER( tdfever2 )	/* A6006 'TD'?(c) 1988 */

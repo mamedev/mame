@@ -1844,7 +1844,7 @@ void galaxian_draw_stars(running_machine *machine, mame_bitmap *bitmap)
 	}
 }
 
-void scramble_draw_stars(running_machine *machine, mame_bitmap *bitmap)
+static void scramble_draw_stars(running_machine *machine, mame_bitmap *bitmap)
 {
 	int offs;
 

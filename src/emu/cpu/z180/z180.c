@@ -743,7 +743,7 @@ typedef struct {
 #define Z180_IOCR_RMASK 		0xff
 #define Z180_IOCR_WMASK 		0xff
 
-int z180_icount;
+static int z180_icount;
 static Z180_Regs Z180;
 static UINT32 EA;
 
@@ -2294,6 +2294,7 @@ static void z180_set_context (void *src)
 	z180_change_pc(_PCD);
 }
 
+#ifdef UNUSED_FUNCTION
 READ8_HANDLER( z180_internal_r )
 {
 	return Z180.io[offset & 0x3f];
@@ -2305,6 +2306,7 @@ WRITE8_HANDLER( z180_internal_w )
 	info.i = data;
 	z180_set_info( CPUINFO_INT_REGISTER + Z180_CNTLA0 + (offset & 0x3f), &info );
 }
+#endif
 
 /****************************************************************************
  * Set IRQ line state

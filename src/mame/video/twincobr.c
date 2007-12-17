@@ -412,7 +412,7 @@ static void wardner_sprite_priority_hack(void)
 
 
 #ifdef MAME_DEBUG
-void twincobr_log_vram(void)
+static void twincobr_log_vram(void)
 {
 	if ( input_code_pressed(KEYCODE_M) )
 	{

@@ -32,7 +32,6 @@ UINT8 *pacland_videoram,*pacland_videoram2,*pacland_spriteram;
 static UINT8 palette_bank;
 static const UINT8 *pacland_color_prom;
 
-static colortable *pacland_colortable;
 static tilemap *bg_tilemap, *fg_tilemap;
 static mame_bitmap *fg_bitmap;
 
@@ -95,7 +94,7 @@ static void switch_palette(running_machine *machine)
 
 		color_prom++;
 
-		colortable_palette_set_color(pacland_colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -104,7 +103,7 @@ PALETTE_INIT( pacland )
 	int i;
 
 	/* allocate the colortable */
-	pacland_colortable = colortable_alloc(machine, 256);
+	machine->colortable = colortable_alloc(machine, 256);
 
 	pacland_color_prom = color_prom;	/* we'll need this later */
 	/* skip the palette data, it will be initialized later */
@@ -112,15 +111,15 @@ PALETTE_INIT( pacland )
 	/* color_prom now points to the beginning of the lookup table */
 
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(pacland_colortable, machine->gfx[0]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine->colortable, machine->gfx[0]->color_base + i, *color_prom++);
 
 	/* Background */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(pacland_colortable, machine->gfx[1]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine->colortable, machine->gfx[1]->color_base + i, *color_prom++);
 
 	/* Sprites */
 	for (i = 0;i < 0x400;i++)
-		colortable_entry_set_value(pacland_colortable, machine->gfx[2]->color_base + i, *color_prom++);
+		colortable_entry_set_value(machine->colortable, machine->gfx[2]->color_base + i, *color_prom++);
 
 	palette_bank = 0;
 	switch_palette(machine);
@@ -139,7 +138,7 @@ PALETTE_INIT( pacland )
 		/* iterate over all palette entries except the last one */
 		for (palentry = 0; palentry < 0x100; palentry++)
 		{
-			UINT32 mask = colortable_get_transpen_mask(pacland_colortable, machine->gfx[2], i, palentry);
+			UINT32 mask = colortable_get_transpen_mask(machine->colortable, machine->gfx[2], i, palentry);
 
 			/* transmask[0] is a mask that is used to draw only high priority sprite pixels; thus, pens
                $00-$7F are opaque, and others are transparent */
@@ -216,8 +215,8 @@ VIDEO_START( pacland )
 	assert(machine->gfx[0]->total_colors <= TILEMAP_NUM_GROUPS);
 	for (color = 0; color < machine->gfx[0]->total_colors; color++)
 	{
-		UINT32 mask = colortable_get_transpen_mask(pacland_colortable, machine->gfx[0], color, 0x7f);
-		mask |= colortable_get_transpen_mask(pacland_colortable, machine->gfx[0], color, 0xff);
+		UINT32 mask = colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0x7f);
+		mask |= colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0xff);
 		tilemap_set_transmask(fg_tilemap, color, mask, 0);
 	}
 

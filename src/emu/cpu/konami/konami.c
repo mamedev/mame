@@ -167,8 +167,8 @@ static PAIR ea;         /* effective address */
 	}
 
 /* public globals */
-int konami_ICount=50000;
-int konami_Flags;	/* flags for speed optimization (obsolete!!) */
+static int konami_ICount=50000;
+//int konami_Flags; /* flags for speed optimization (obsolete!!) */
 
 /* these are re-defined in konami.h TO RAM, ROM or functions in memory.c */
 #define RM(Addr)			KONAMI_RDMEM(Addr)

@@ -1759,3 +1759,16 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 		cur_autoconfig = cur_autoconfig->next;
 	}
 }
+
+
+
+/*************************************
+ *
+ *  Get interface
+ *
+ *************************************/
+
+const amiga_machine_interface *amiga_get_interface(void)
+{
+	return amiga_intf;
+}

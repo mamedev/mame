@@ -1243,7 +1243,7 @@ static void dsp_dasm_dma( UINT32 op, char* buffer )
 	dsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], buffer, data );
 }
 
-void dsp_dasm_opcode( UINT32 op, char *buffer )
+static void dsp_dasm_opcode( UINT32 op, char *buffer )
 {
 	switch( (op & 0xc0000000) >> 30 )
 	{

@@ -531,7 +531,7 @@ int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const me
     bottom
 -------------------------------------------------*/
 
-void ui_menu_draw_text_box(const char *text)
+static void ui_menu_draw_text_box(const char *text)
 {
 	const char *priortext = ui_getstring(UI_returntoprior);
 	float line_height = ui_get_line_height();
