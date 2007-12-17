@@ -1,0 +1,13 @@
+//
+//	mame.rc - Minimal resource file for Win32 MAME
+//
+//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Visit http://mamedev.org for licensing and usage restrictions.
+//
+
+#define NOWINRES
+#include "windows.h"
+#include "commctrl.h"
+#include "mamevers.rc"
+
+1                       24      MOVEABLE PURE   "mame.man"

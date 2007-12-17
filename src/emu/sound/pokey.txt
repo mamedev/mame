@@ -1,0 +1,319 @@
+                       Atari POKEY Chip Emulator V2.0
+                       ==============================
+                                by Ron Fries
+                                  31 Jan 97
+
+The PokeySound Chip Emulator is designed to emulate the functionality of the
+Atari POKEY Chip Hardware through 'C' Sourcecode.  The emulator is able to 
+produce sounds which are essentially identical to the original POKEY chip, 
+including the exact distortions and pitches. 
+
+The emulator is designed to run in a 32-bit environment.  Though it can be
+compiled and run in a 16-bit environment, it is slow.  
+
+I would like to give special thanks to Neil Bradley.  He provided excellent
+testing support and was also the driving force behind the multiple POKEY
+emulation.
+
+New Features:
+-------------
+
+Version 2.0 of the 'PokeySound' adds the following features:
+
+1) Support for multiple POKEY chips.  The maximum supported is configured
+   at compile time.
+
+2) An adjustable gain.  The previous releases had a built-in gain of 64.
+
+3) A clipping option.  Depending on the number of chips emulated and the
+   configured gain, it is possible for the output to exceed 8-bits.  
+   Clipping can be enabled to prevent this, though it does increase the
+   processing time. 
+
+
+Standard Features:
+------------------
+
+The 'PokeySound' emulator supports the following functions:
+
+1) All polynomial sound generators: 
+   a) 4-bit poly - actual bit pattern determined from sampled sound
+   b) 5-bit poly - actual bit pattern determined from sampled sound
+   c) 17-bit poly - simulated random bit pattern
+   d) 9-bit poly - derived from simulated 17-bit poly
+   
+2) Full support of all 'Divide by N' counter clocks:
+   a) 1.79 MHz (high limited to playback sample rate)
+   b) 64 KHz (high limited to playback sample rate)
+   c) 15 KHz
+
+3) Full support of all 'Divide by N' resolutions:
+   a) 8-bit - single channel
+   b) 16-bit - double channel
+
+4) Full support of all distortions 
+   a) 5-bit poly, then 17-bit poly
+   b) 5-bit poly only
+   c) 5-bit poly, then 4-bit poly
+   d) 17-bit poly only
+   e) no poly counters (pure tone)
+   f) 5-bit poly only
+
+5) Full support of volume control 
+
+6) Full support of all pitches - distortions will vary exactly as the
+   original Atari based on different pitches
+
+7) Accurate pitch generation
+
+8) Support of any playback sample rate (e.g. 22050)
+
+
+The 'PokeySound' emulator does not currently support the following functions:
+
+1) High pass filters
+
+
+Though I don't believe adding support for the High-Pass filters is very
+complicated, I decided not to add support right now because I don't
+believe this feature is used much.  I'm also not sure how much impact it
+would have on performance.  Let me know if you find an application that
+uses it.
+
+In the 2.0 release, I've removed the non-optimized vrersion.  It was only
+left in for reference.  If you would still like to see the non-optimized
+version, it's available in the 1.2 release.
+
+One of the unique features of the emulator is that the processing time varies 
+based on the frequency.  Since the routine only calculates new output values 
+when a change is sensed, the lower frequencies (which change less frequently) 
+will require less processing time.
+
+
+Differences Between the Emulator and the Actual POKEY Chip:
+-----------------------------------------------------------  
+
+The biggest difference between the emulator and the original hardware is 
+that the emulator emulates an 'ideal' POKEY chip.  All output from the 
+emulator is a based on a precise square wave, whereas the output from the
+original chip has decay.  Though the output is slightly different, I
+don't believe this difference is easily discernible.
+
+Another slight difference is the 17-bit/9-bit poly.  Since the polynomial
+is large (2^17 bits), I choose to create the sample using a random number
+generator rather than a table.  I don't believe this difference is 
+significant.
+
+There are also a few differences which are introduced by aliasing.  This is
+a direct result of using an output sampling rate which is not identical to
+the original sound rate.  It is most evident with high frequencies. 
+
+A final difference is the lack of support for the High-Pass Filter 
+functionality.  I plan to add this in a future release if necessary.
+
+
+Sample/Test Application:
+------------------------
+
+The test program I've distributed is a 16-bit DOS application created with 
+the Borland 'C' compiler.  The only reason I used 16-bit was because I 
+already had a set of working SB drivers in 16-bit.  Since the test system
+is dedicated to generating sounds, the performance in 16-bit is more than
+adequate.
+
+
+POKEY.C
+=======
+
+The POKEY.C file is the heart of the PokeySound Emulation program.  
+Although the routines in the file must work together, no other files are
+modules are required for operation.  A header file, 'POKEY.H', has 
+been included for use in other modules, and provides the necessary 
+function prototypes.  I've attempted to make the routines as portable as
+possible, so the file should compile on almost any compiler with little
+or no modification.  
+
+I have made some attempts at optimizing the routines, though I am sure
+more optimization can be done.  They are currently only available in 'C'.
+I'll be happy to convert them to assembly language if desired.  Please feel 
+free to send me e-mail at rfries@tcmail.frco.com.
+
+The routines are easy to use.  Detailed descriptions on the function calls   
+are listed below.
+
+The POKEY.C module can be compiled in a 32-bit or 16-bit environment.
+Since these routines are optimized for 32-bit use, the code will default
+to 32-bit.  To compile in 16-bits, use a command line option to define
+the variable COMP16.
+
+
+GENERAL OVERVIEW
+----------------
+
+On start-up of the system, a single call should be made to Pokey_sound_init.  
+This routine will prepare the structures for sound output.  This routine
+can be called again if necessary during warm-start or other reset.
+
+Once in the main loop, there are two other functions that will be used.  
+Whenever the system needs to write to either the AUDC or AUDF values,
+a call should be made to the Update_pokey_sound routine.  This routine will 
+take care of updating the internal registers.  It will pre-calculate several
+values to help with optimization.
+
+The only other routine that is called is the Pokey_process function.  This 
+function will fill a audio buffer with a specified number of bytes.  This
+function should be called whenever a new audio buffer is required.
+
+For best results, I recommend using at least two output buffers.  Using this
+scheme, the sound card can be playing one buffer while the system is filling
+the other.
+
+
+DETAILED FUNCTION DESCRIPTIONS
+------------------------------
+
+Pokey_sound_init(uint32 freq17, uint16 playback_freq, uint8 num_pokeys)
+-----------------------------------------------------------------------
+
+This function initializes the structures used by the PokeySound routines.
+This function takes three parameters: the main clock frequency, the 
+playback frequency and the number of POKEY chips to emulate.
+
+The maximum number of POKEY chips emulated is configured at compile time.
+Though the maximum number of chips can be configured as one, the PokeySound 
+1.2 routines are recommended if only a single chip is to be emulated since 
+they have will provide better performance.  
+
+The main clock frequency is the frequency of the 1.79MHz source clock.  
+To provide exact results, freq17 should be set equal to 1789790 Hz.  As an 
+alternative, freq17 can be set to an approximate frequency of 1787520 Hz.  
+Using this approximate frequency will reduce aliasing and thus produce a 
+clearer output signal.
+
+A constant has been defined for both of these values for your convenience.
+The names are FREQ_17_EXACT and FREQ_17_APPROX.
+
+The playback frequency is the frequency of the sound playback (the frequency 
+used by the sound card).  For best results, the playback frequency should 
+be an even division of the main clock frequency.  Since most of the sounds
+will be generated using the 64kHz clock, I also recommend making the 
+playback frequency an even division of the 64kHz clock.
+
+The 64kHz clock is exactly equal to the main clock divided by 28.  For
+the playback frequency, I recommend one of the following values:
+
+1) FREQ_17_APPROX / (28*1), which is equal to 63840.  Of course, most sound 
+   cards can't reproduce this frequency.
+
+2) FREQ_17_APPROX / (28*2), which is equal to 31920.  All of the newer cards
+   will support this frequency.  
+
+3) FREQ_17_APPROX / (28*3), which is equal to 21280.  All of the SB 
+   compatibles should support this frequency.
+
+4) FREQ_17_APPROX / (28*4), which is equal to 15960.  This may be the
+   best choice, as it offers good sound reproduction with good performance.
+  
+Of course, these options also assume you are using the approximate
+frequency for the main clock as well.  Any of these choices will offer the
+best results when the main 64kHz clock is used, reasonable results when the
+15kHz clock is selected, and marginal results when the 1.79MHz clock is
+selected (the only way to produce good results in all cases is to set the
+playback frequency to 1.79MHz!)
+
+Feel free to experiment to find other alternatives as well.
+
+This function has no return value (void).
+
+
+Update_pokey_sound (uint16 addr, uint8 val, uint8 chip, uint8 gain)
+-------------------------------------------------------------------
+
+This function should be called each time an AUDC, AUDF or AUDCTL value
+changes.  This function takes four parameters: the address to change,
+the new value, the chip to be updated, and the gain to be used.  
+The lower four bits of the address should be one of the following values:
+
+                  Addr     Description
+                 ------    -----------
+                  0x00        AUDF1
+                  0x01        AUDC1
+                  0x02        AUDF2
+                  0x03        AUDC2
+                  0x04        AUDF3
+                  0x05        AUDC3
+                  0x06        AUDF4
+                  0x07        AUDC4
+                  0x08        AUDCTL
+
+In order to support multiple POKEY chips, only the lower four bits of
+the address are used.  Note that this routine can no longer be called with
+any address as it will affect the operation of the specified chip.
+
+The routine pre-calculates several values that are needed by the 
+processing function.  This is done to optimize performance.
+
+The output will be amplified (multiplied) by gain/16 (previous releases had 
+a built in multiplier of 4, which calculates to a gain value of 64).  If the 
+output exceeds the maximum value after then gain and clipping is enabled, 
+the output will be limited to reduce distortion.
+
+The best value for the gain depends on the number of POKEYs emulated and
+the maximum volume used.  The maximum possible output for each channel is 15, 
+making the maximum possible output for a single chip to be 60.  Assuming all 
+four channels on the chip are used at full volume, a gain of 64 can be used 
+without distortion.  If 4 POKEY chips are emulated and all 16 channels are 
+used at full volume, the gain must be no more than 16 to prevent distortion.  
+Of course, if only a few of the 16 channels are used or not all channels are 
+used at full volume, a larger gain can be used.
+
+To enable clipping, define the logical CLIP before compiling.  This is the
+default mode of operation as it has already been included in the POKEY.H file.
+Note that this is only recommended if clipping is necessary since it will 
+impact the performance.
+
+This function has no return value (void).
+
+
+Pokey_process (uint8 *buffer, uint16 n)
+---------------------------------------
+
+This function calculates and fills a buffer with unsigned 8-bit mono audio.
+This function takes two parameters: a pointer to the buffer to fill and
+the size of the buffer (limited to 65535).  This function fills the 
+buffer based on the requested size and returns.  It automatically
+updates the pointers for the next call, so subsequent calls to this function
+will provide a continuous stream of data.
+
+The size of the buffer that is needed depends on the playback frequency.
+It is best to keep the buffer as small as possible to maximize response time
+to changes in the sound.  Of course, the minimum size is dependent on
+system and emulator performance.
+
+Selecting the correct buffer size is a careful balance.  Selecting a buffer
+size that is too small will produce noticeable clicks in the output, though
+selecting a size that is too large will cause a poor response time and 
+possible delays in the system when the new buffer is filled.
+
+This function has no return value (void).
+
+
+License Information and Copyright Notice
+========================================
+
+PokeySound is Copyright(c) 1996-1997 by Ron Fries
+
+This library is free software; you can redistribute it and/or modify it under 
+the terms of version 2 of the GNU Library General Public License as published 
+by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful, but WITHOUT 
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+FOR A PARTICULAR PURPOSE.  See the GNU Library General Public License for more 
+details.
+
+To obtain a copy of the GNU Library General Public License, write to the Free 
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Any permitted reproduction of these routines, in whole or in part, must bear 
+this legend.  
