@@ -239,17 +239,8 @@ struct POKEYregisters
 #define P9(chip)  chip->poly9[chip->p9]
 #define P17(chip) chip->poly17[chip->p17]
 
-static TIMER_CALLBACK_PTR( pokey_timer_expire_1 );
-static TIMER_CALLBACK_PTR( pokey_timer_expire_2 );
-static TIMER_CALLBACK_PTR( pokey_timer_expire_4 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_0 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_1 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_2 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_3 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_4 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_5 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_6 );
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_7 );
+static TIMER_CALLBACK( pokey_timer_expire );
+static TIMER_CALLBACK( pokey_pot_trigger );
 
 
 #define SAMPLE	-1
@@ -675,20 +666,20 @@ static void *pokey_start(int sndindex, int clock, const void *config)
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = timer_alloc(NULL);
+	chip->rtimer = timer_alloc(NULL, NULL);
 
-	chip->timer[0] = timer_alloc_ptr(pokey_timer_expire_1, chip);
-	chip->timer[1] = timer_alloc_ptr(pokey_timer_expire_2, chip);
-	chip->timer[2] = timer_alloc_ptr(pokey_timer_expire_4, chip);
+	chip->timer[0] = timer_alloc(pokey_timer_expire, chip);
+	chip->timer[1] = timer_alloc(pokey_timer_expire, chip);
+	chip->timer[2] = timer_alloc(pokey_timer_expire, chip);
 
-	chip->ptimer[0] = timer_alloc_ptr(pokey_pot_trigger_0, chip);
-	chip->ptimer[1] = timer_alloc_ptr(pokey_pot_trigger_1, chip);
-	chip->ptimer[2] = timer_alloc_ptr(pokey_pot_trigger_2, chip);
-	chip->ptimer[3] = timer_alloc_ptr(pokey_pot_trigger_3, chip);
-	chip->ptimer[4] = timer_alloc_ptr(pokey_pot_trigger_4, chip);
-	chip->ptimer[5] = timer_alloc_ptr(pokey_pot_trigger_5, chip);
-	chip->ptimer[6] = timer_alloc_ptr(pokey_pot_trigger_6, chip);
-	chip->ptimer[7] = timer_alloc_ptr(pokey_pot_trigger_7, chip);
+	chip->ptimer[0] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[1] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[2] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[3] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[4] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[5] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[6] = timer_alloc(pokey_pot_trigger, chip);
+	chip->ptimer[7] = timer_alloc(pokey_pot_trigger, chip);
 
 	chip->pot_r[0] = chip->intf.pot_r[0];
 	chip->pot_r[1] = chip->intf.pot_r[1];
@@ -710,8 +701,11 @@ static void *pokey_start(int sndindex, int clock, const void *config)
     return chip;
 }
 
-static void pokey_timer_expire_common(struct POKEYregisters *p, int timers)
+static TIMER_CALLBACK( pokey_timer_expire )
 {
+	struct POKEYregisters *p = ptr;
+	int timers = param;
+
 	LOG_TIMER(("POKEY #%p timer %d with IRQEN $%02x\n", p, timers, p->IRQEN));
 
     /* check if some of the requested timer interrupts are enabled */
@@ -725,22 +719,6 @@ static void pokey_timer_expire_common(struct POKEYregisters *p, int timers)
 		if( p->interrupt_cb )
 			(*p->interrupt_cb)(timers);
     }
-}
-
-static TIMER_CALLBACK_PTR( pokey_timer_expire_1 )
-{
-	struct POKEYregisters *chip = param;
-	pokey_timer_expire_common(chip, chip->timer_param[TIMER1]);
-}
-static TIMER_CALLBACK_PTR( pokey_timer_expire_2 )
-{
-	struct POKEYregisters *chip = param;
-	pokey_timer_expire_common(chip, chip->timer_param[TIMER2]);
-}
-static TIMER_CALLBACK_PTR( pokey_timer_expire_4 )
-{
-	struct POKEYregisters *chip = param;
-	pokey_timer_expire_common(chip, chip->timer_param[TIMER4]);
 }
 
 #if VERBOSE_SOUND
@@ -795,9 +773,9 @@ static char *audctl2str(int val)
 }
 #endif
 
-static TIMER_CALLBACK_PTR( pokey_serin_ready )
+static TIMER_CALLBACK( pokey_serin_ready )
 {
-	struct POKEYregisters *p = param;
+	struct POKEYregisters *p = ptr;
     if( p->IRQEN & IRQ_SERIN )
 	{
 		/* set the enabled timer irq status bits */
@@ -808,9 +786,9 @@ static TIMER_CALLBACK_PTR( pokey_serin_ready )
 	}
 }
 
-static TIMER_CALLBACK_PTR( pokey_serout_ready )
+static TIMER_CALLBACK( pokey_serout_ready )
 {
-	struct POKEYregisters *p = param;
+	struct POKEYregisters *p = ptr;
     if( p->IRQEN & IRQ_SEROR )
 	{
 		p->IRQST |= IRQ_SEROR;
@@ -819,9 +797,9 @@ static TIMER_CALLBACK_PTR( pokey_serout_ready )
 	}
 }
 
-static TIMER_CALLBACK_PTR( pokey_serout_complete )
+static TIMER_CALLBACK( pokey_serout_complete )
 {
-	struct POKEYregisters *p = param;
+	struct POKEYregisters *p = ptr;
     if( p->IRQEN & IRQ_SEROC )
 	{
 		p->IRQST |= IRQ_SEROC;
@@ -830,20 +808,13 @@ static TIMER_CALLBACK_PTR( pokey_serout_complete )
 	}
 }
 
-static void pokey_pot_trigger_common(struct POKEYregisters *p, int pot)
+static TIMER_CALLBACK( pokey_pot_trigger )
 {
+	struct POKEYregisters *p = ptr;
+	int pot = param;
 	LOG(("POKEY #%p POT%d triggers after %dus\n", p, pot, (int)(1000000 * attotime_to_double(timer_timeelapsed(p->ptimer[pot])))));
 	p->ALLPOT &= ~(1 << pot);	/* set the enabled timer irq status bits */
 }
-
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_0 ) { pokey_pot_trigger_common(param, 0); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_1 ) { pokey_pot_trigger_common(param, 1); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_2 ) { pokey_pot_trigger_common(param, 2); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_3 ) { pokey_pot_trigger_common(param, 3); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_4 ) { pokey_pot_trigger_common(param, 4); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_5 ) { pokey_pot_trigger_common(param, 5); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_6 ) { pokey_pot_trigger_common(param, 6); }
-static TIMER_CALLBACK_PTR( pokey_pot_trigger_7 ) { pokey_pot_trigger_common(param, 7); }
 
 #define AD_TIME  ((p->SKCTL & SK_PADDLE) ? p->ad_time_fast : p->ad_time_slow)
 
@@ -870,7 +841,7 @@ static void pokey_potgo(struct POKEYregisters *p)
 
                 /* final value */
                 p->POTx[pot] = r;
-				timer_adjust_ptr(p->ptimer[pot], attotime_mul(AD_TIME, r), attotime_zero);
+				timer_adjust(p->ptimer[pot], attotime_mul(AD_TIME, r), pot, attotime_zero);
 			}
 		}
 	}
@@ -1137,9 +1108,9 @@ static void pokey_register_w(int chip, int offs, int data)
         /* first remove any existing timers */
 		LOG_TIMER(("POKEY #%d STIMER $%02x\n", chip, data));
 
-		timer_adjust_ptr(p->timer[TIMER1], attotime_never, attotime_zero);
-		timer_adjust_ptr(p->timer[TIMER2], attotime_never, attotime_zero);
-		timer_adjust_ptr(p->timer[TIMER4], attotime_never, attotime_zero);
+		timer_adjust(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1], attotime_zero);
+		timer_adjust(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2], attotime_zero);
+		timer_adjust(p->timer[TIMER4], attotime_never, p->timer_param[TIMER4], attotime_zero);
 
         /* reset all counters to zero (side effect) */
 		p->polyadjust = 0;
@@ -1157,7 +1128,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #1 _and_ #2 event after timer_div clocks of joined CHAN1+CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2|IRQ_TIMR1;
-				timer_adjust_ptr(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_period[TIMER2]);
+				timer_adjust(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
         else
@@ -1168,7 +1139,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #1 event after timer_div clocks of CHAN1 */
 				p->timer_period[TIMER1] = attotime_mul(p->clock_period, p->divisor[CHAN1]);
 				p->timer_param[TIMER1] = (chip<<3)|IRQ_TIMR1;
-				timer_adjust_ptr(p->timer[TIMER1], p->timer_period[TIMER1], p->timer_period[TIMER1]);
+				timer_adjust(p->timer[TIMER1], p->timer_period[TIMER1], p->timer_param[TIMER1], p->timer_period[TIMER1]);
 			}
 
 			if( p->divisor[CHAN2] > 4 )
@@ -1177,7 +1148,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #2 event after timer_div clocks of CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2;
-				timer_adjust_ptr(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_period[TIMER2]);
+				timer_adjust(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
 
@@ -1194,7 +1165,7 @@ static void pokey_register_w(int chip, int offs, int data)
 					/* set timer #4 event after timer_div clocks of CHAN4 */
 					p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 					p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
-					timer_adjust_ptr(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_period[TIMER4]);
+					timer_adjust(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 				}
             }
         }
@@ -1206,7 +1177,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #4 event after timer_div clocks of CHAN4 */
 				p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 				p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
-				timer_adjust_ptr(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_period[TIMER4]);
+				timer_adjust(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 			}
         }
 
@@ -1236,9 +1207,9 @@ static void pokey_register_w(int chip, int offs, int data)
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set_ptr(ATTOTIME_IN_USEC(200), p, pokey_serout_ready);
+        timer_set(ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set_ptr(ATTOTIME_IN_USEC(2000), p, pokey_serout_complete);
+        timer_set(ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
         break;
 
     case IRQEN_C:
@@ -1303,7 +1274,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN1] )
 			p->counter[CHAN1] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER1] )
-			timer_adjust_ptr(p->timer[TIMER1], attotime_mul(p->clock_period, new_val), p->timer_period[TIMER1]);
+			timer_adjust(p->timer[TIMER1], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER1], p->timer_period[TIMER1]);
 		p->audible[CHAN1] = !(
 			(p->AUDC[CHAN1] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN1] & VOLUME_MASK) == 0 ||
@@ -1339,7 +1310,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN2] )
 			p->counter[CHAN2] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER2] )
-			timer_adjust_ptr(p->timer[TIMER2], attotime_mul(p->clock_period, new_val), p->timer_period[TIMER2]);
+			timer_adjust(p->timer[TIMER2], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER2], p->timer_period[TIMER2]);
 		p->audible[CHAN2] = !(
 			(p->AUDC[CHAN2] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN2] & VOLUME_MASK) == 0 ||
@@ -1404,7 +1375,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN4] )
 			p->counter[CHAN4] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER4] )
-			timer_adjust_ptr(p->timer[TIMER4], attotime_mul(p->clock_period, new_val), p->timer_period[TIMER4]);
+			timer_adjust(p->timer[TIMER4], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER4], p->timer_period[TIMER4]);
 		p->audible[CHAN4] = !(
 			(p->AUDC[CHAN4] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN4] & VOLUME_MASK) == 0 ||
@@ -1452,25 +1423,25 @@ WRITE8_HANDLER( quad_pokey_w )
 void pokey1_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 0);
-	timer_set_ptr(attotime_mul(p->clock_period, after), p, pokey_serin_ready);
+	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey2_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 1);
-	timer_set_ptr(attotime_mul(p->clock_period, after), p, pokey_serin_ready);
+	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey3_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 2);
-	timer_set_ptr(attotime_mul(p->clock_period, after), p, pokey_serin_ready);
+	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey4_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 3);
-	timer_set_ptr(attotime_mul(p->clock_period, after), p, pokey_serin_ready);
+	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 static void pokey_break_w(int chip, int shift)

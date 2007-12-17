@@ -105,7 +105,7 @@ static TIMER_CALLBACK( irq_callback )
 
 static void create_irq_timer(void)
 {
-	irq_timer = timer_alloc(irq_callback);
+	irq_timer = timer_alloc(irq_callback, NULL);
 }
 
 

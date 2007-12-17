@@ -616,7 +616,7 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 		screen_to_cpu[config->scrnum] = index;
 
 	/* allocate a scanline timer and set it to go off at the start */
-	state.scantimer = timer_alloc(scanline_callback);
+	state.scantimer = timer_alloc(scanline_callback, NULL);
 	timer_adjust(state.scantimer, attotime_zero, index, attotime_zero);
 
 	/* allocate the shiftreg */
@@ -932,7 +932,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (enabled && vcount == SMART_IOREG(DPYINT))
 	{
 		/* generate the display interrupt signal */
-		internal_interrupt_callback(machine, cpunum | (TMS34010_DI << 8));
+		internal_interrupt_callback(machine, NULL, cpunum | (TMS34010_DI << 8));
 	}
 
 	/* at the start of VBLANK, load the starting display address */
@@ -1179,7 +1179,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(cpunum, internal_interrupt_callback);
+				timer_call_after_resynch(NULL, cpunum, internal_interrupt_callback);
 			break;
 
 		case REG_HSTCTLL:
@@ -1214,7 +1214,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				timer_call_after_resynch(NULL, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG_INTPEND) &= ~TMS34010_HI;
 			break;
@@ -1323,7 +1323,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* NMI issued? */
 			if (data & 0x0100)
-				timer_call_after_resynch(cpunum, internal_interrupt_callback);
+				timer_call_after_resynch(NULL, cpunum, internal_interrupt_callback);
 			break;
 
 		case REG020_HSTCTLL:
@@ -1358,7 +1358,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 			/* input interrupt? (should really be state-based, but the functions don't exist!) */
 			if (!(oldreg & 0x0008) && (newreg & 0x0008))
-				timer_call_after_resynch(cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
+				timer_call_after_resynch(NULL, cpunum | (TMS34010_HI << 8), internal_interrupt_callback);
 			else if ((oldreg & 0x0008) && !(newreg & 0x0008))
 				IOREG(REG020_INTPEND) &= ~TMS34010_HI;
 			break;

@@ -372,14 +372,14 @@ VIDEO_EOF( exidy )
 
 				/* if we got one, trigger an interrupt */
 				if ((collision_mask & exidy_collision_mask) && count++ < 128)
-					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), collision_mask, collision_irq_callback);
+					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), NULL, collision_mask, collision_irq_callback);
             }
             if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
     		{
                 /* check for background collision (M2CHAR) */
 				if (((*BITMAP_ADDR16(tmpbitmap, org_2_y + sy, org_2_x + sx) - 4) & bgmask) != 0)
 					if ((exidy_collision_mask & 0x08) && count++ < 128)
-						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), 0x08, collision_irq_callback);
+						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
             }
 		}
 }

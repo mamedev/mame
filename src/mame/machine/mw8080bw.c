@@ -87,7 +87,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 
 static void mw8080bw_create_interrupt_timer(void)
 {
-	interrupt_timer = timer_alloc(mw8080bw_interrupt_callback);
+	interrupt_timer = timer_alloc(mw8080bw_interrupt_callback, NULL);
 }
 
 

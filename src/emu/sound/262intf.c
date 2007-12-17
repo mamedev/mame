@@ -28,15 +28,15 @@ static void IRQHandler_262(void *param,int irq)
 	if (info->intf->handler) (info->intf->handler)(irq);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_262_0 )
+static TIMER_CALLBACK( timer_callback_262_0 )
 {
-	struct ymf262_info *info = param;
+	struct ymf262_info *info = ptr;
 	YMF262TimerOver(info->chip, 0);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_262_1 )
+static TIMER_CALLBACK( timer_callback_262_1 )
 {
-	struct ymf262_info *info = param;
+	struct ymf262_info *info = ptr;
 	YMF262TimerOver(info->chip, 1);
 }
 
@@ -49,7 +49,7 @@ static void timer_handler_262(void *param,int timer, attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_ptr(info->timer[timer], period, attotime_zero);
+		timer_adjust(info->timer[timer], period, 0, attotime_zero);
 	}
 }
 
@@ -89,8 +89,8 @@ static void *ymf262_start(int sndindex, int clock, const void *config)
 	YMF262SetIRQHandler   (info->chip, IRQHandler_262, info);
 	YMF262SetUpdateHandler(info->chip, _stream_update, info);
 
-	info->timer[0] = timer_alloc_ptr(timer_callback_262_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_262_1, info);
+	info->timer[0] = timer_alloc(timer_callback_262_0, info);
+	info->timer[1] = timer_alloc(timer_callback_262_1, info);
 
 	return info;
 }

@@ -526,17 +526,17 @@ void *leland_80186_sh_start(int clock, const struct CustomSound_interface *confi
 	is_redline = 0;
 
 	/* create timers here so they stick around */
-	i80186.timer[0].int_timer = timer_alloc(internal_timer_int);
-	i80186.timer[1].int_timer = timer_alloc(internal_timer_int);
-	i80186.timer[2].int_timer = timer_alloc(internal_timer_int);
-	i80186.timer[0].time_timer = timer_alloc(NULL);
-	i80186.timer[1].time_timer = timer_alloc(NULL);
-	i80186.timer[2].time_timer = timer_alloc(NULL);
-	i80186.dma[0].finish_timer = timer_alloc(dma_timer_callback);
-	i80186.dma[1].finish_timer = timer_alloc(dma_timer_callback);
+	i80186.timer[0].int_timer = timer_alloc(internal_timer_int, NULL);
+	i80186.timer[1].int_timer = timer_alloc(internal_timer_int, NULL);
+	i80186.timer[2].int_timer = timer_alloc(internal_timer_int, NULL);
+	i80186.timer[0].time_timer = timer_alloc(NULL, NULL);
+	i80186.timer[1].time_timer = timer_alloc(NULL, NULL);
+	i80186.timer[2].time_timer = timer_alloc(NULL, NULL);
+	i80186.dma[0].finish_timer = timer_alloc(dma_timer_callback, NULL);
+	i80186.dma[1].finish_timer = timer_alloc(dma_timer_callback, NULL);
 
 	for (i = 0; i < 9; i++)
-		counter[i].timer = timer_alloc(NULL);
+		counter[i].timer = timer_alloc(NULL, NULL);
 
 	return auto_malloc(1);
 }
@@ -1720,7 +1720,7 @@ static TIMER_CALLBACK( command_lo_sync )
 
 WRITE8_HANDLER( leland_80186_command_lo_w )
 {
-	timer_call_after_resynch(data, command_lo_sync);
+	timer_call_after_resynch(NULL, data, command_lo_sync);
 }
 
 
@@ -1775,7 +1775,7 @@ READ8_HANDLER( leland_80186_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", activecpu_get_previouspc(), sound_response);
 
 	/* synchronize the response */
-	timer_call_after_resynch(activecpu_get_previouspc() + 2, delayed_response_r);
+	timer_call_after_resynch(NULL, activecpu_get_previouspc() + 2, delayed_response_r);
 	return sound_response;
 }
 

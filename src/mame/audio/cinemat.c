@@ -1426,7 +1426,7 @@ static void demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
 
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if ((bits_changed & 0x10) && (sound_val & 0x10))
-		timer_call_after_resynch(sound_val & 0x0f, synced_sound_w);
+		timer_call_after_resynch(NULL, sound_val & 0x0f, synced_sound_w);
 }
 
 

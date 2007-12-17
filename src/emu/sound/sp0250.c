@@ -117,9 +117,9 @@ static void sp0250_load_values(struct sp0250 *sp)
 	sp->playing = 1;
 }
 
-static TIMER_CALLBACK_PTR( sp0250_timer_tick )
+static TIMER_CALLBACK( sp0250_timer_tick )
 {
-	struct sp0250 *sp = param;
+	struct sp0250 *sp = ptr;
 	stream_update(sp->stream);
 }
 
@@ -200,7 +200,7 @@ static void *sp0250_start(int sndindex, int clock, const void *config)
 	sp->RNG = 1;
 	sp->drq = intf->drq_callback;
 	sp->drq(ASSERT_LINE);
-	timer_pulse_ptr(attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, sp0250_timer_tick);
+	timer_pulse(attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 
 	sp->stream = stream_create(0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 

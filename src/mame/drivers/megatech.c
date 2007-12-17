@@ -19,7 +19,7 @@
 todo: cleanup, fix so that everything works properly
       games are marked as NOT WORKING due to
       a) incorrect behavior at time out
-      b) they're sms based games which aren't yet supported
+      b) they're sms based games which aren't yet fully supported
 
 
 About MegaTech:
@@ -1057,9 +1057,10 @@ ROM_END
 
 #define MEGATECH_GAME04(GAME_REGION, INSTRUCTION_REGION) \
 	ROM_REGION( 0x300000, GAME_REGION, 0 ) \
-	ROM_LOAD( "mp11129f.ic1", 0x000000, 0x020000, CRC(972c75ac) SHA1(2ae74c8563a3cefb27611d17bf3926865b6ebd45) ) \
+	ROM_LOAD( "mp11129f.ic1", 0x000000, 0x020000, CRC(c6611c84) SHA1(eab0eed872dd26b13bcf0b2dd74fcbbc078812c9) ) \
     MEGATECH_INSTRUCTION_REGION( INSTRUCTION_REGION, MEGATECH_GAME_IS_SMS ) \
 	ROM_LOAD( "12368-04.ic2", 0x000000, 0x08000, CRC(62e5579b) SHA1(e1f531be5c40a1216d4192baeda9352384444410) ) \
+	/* Also known to have the ID# MPR-11128 instead of MPR-11129F, same contents */
 
 ROM_START( mt_ggolf )
 	MEGATECH_BIOS
@@ -1248,16 +1249,16 @@ ROM_END
 /* 01 */ GAME( 1988, mt_beast, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Altered Beast (Mega-Tech)", GAME_NOT_WORKING )
 /* 02 */ GAME( 1988, mt_shar2, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Space Harrier II (Mega-Tech)", GAME_NOT_WORKING )
 /* 03 */ GAME( 1988, mt_stbld, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Thunder Blade (Mega-Tech)", GAME_NOT_WORKING )
-/* 04 */ GAME( 19??, mt_ggolf, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 05 */ GAME( 19??, mt_gsocr, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
-/* 06 */ GAME( 1989, mt_orun,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 07 */ GAME( 19??, mt_asyn,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
-/* 08 */ GAME( 19??, mt_shnbi, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
+/* 04 */ GAME( 1987, mt_ggolf, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Golf (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 05 */ GAME( 198?, mt_gsocr, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Great Soccer (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! also bad */
+/* 06 */ GAME( 1987, mt_orun,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Out Run (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 07 */ GAME( 1987, mt_asyn,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Alien Syndrome (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 08 */ GAME( 1987, mt_shnbi, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Shinobi (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 09 */ // unknown
-/* 10 */ GAME( 19??, mt_aftrb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
+/* 10 */ GAME( 1987, mt_aftrb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "After Burner (Mega-Tech, SMS based)", GAME_NOT_WORKING) /* sms */
 /* 11 */ GAME( 1989, mt_tfor2, megatech, megatech, megatech, mtnew, ROT0, "Tecno Soft / Sega",     "Thunder Force II MD (Mega-Tech)", GAME_NOT_WORKING )
 /* 12 */ // unknown
-/* 13 */ GAME( 19??, mt_astro, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 13 */ GAME( 1986, mt_astro, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Astro Warrior (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 14 */ // unknown
 /* 15 */ // unknown
 /* 16 */ // unknown
@@ -1266,14 +1267,14 @@ ROM_END
 /* 19 */ // unknown
 /* 20 */ GAME( 1989, mt_lastb, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Last Battle (Mega-Tech)", GAME_NOT_WORKING )
 /* 21 */ GAME( 1989, mt_wcsoc, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "World Championship Soccer (Mega-Tech)", GAME_NOT_WORKING )
-/* 22 */ GAME( 19??, mt_tetri, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
+/* 22 */ GAME( 1989, mt_tetri, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Tetris (Mega-Tech)", GAME_NOT_WORKING )
 /* 23 */ GAME( 1989, mt_gng,   megatech, megatech, megatech, mtnew, ROT0, "Capcom / Sega",         "Ghouls'n Ghosts (Mega-Tech)", GAME_NOT_WORKING )
 /* 24 */ GAME( 1989, mt_shang, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Hang-On (Mega-Tech)", GAME_NOT_WORKING )
 /* 25 */ GAME( 1989, mt_gaxe,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Golden Axe (Mega-Tech)", GAME_NOT_WORKING )
 /* 26 */ GAME( 1989, mt_fwrld, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Forgotten Worlds (Mega-Tech)", GAME_NOT_WORKING )
 /* 27 */ GAME( 1989, mt_mystd, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Mystic Defender (Mega-Tech)", GAME_NOT_WORKING )
 /* 28 */ GAME( 1989, mt_revsh, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "The Revenge of Shinobi (Mega-Tech)", GAME_NOT_WORKING )
-/* 29 */ GAME( 19??, mt_parlg, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
+/* 29 */ GAME( 1987, mt_parlg, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Parlour Games (Mega-Tech, SMS based)", GAME_NOT_WORKING ) /* sms! */
 /* 30 */ // unknown
 /* 31 */ GAME( 1989, mt_tgolf, megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Arnold Palmer Tournament Golf (Mega-Tech)", GAME_NOT_WORKING )
 /* 32 */ GAME( 1989, mt_srbb,  megatech, megatech, megatech, mtnew, ROT0, "Sega",                  "Super Real Basketball (Mega-Tech)", GAME_NOT_WORKING )

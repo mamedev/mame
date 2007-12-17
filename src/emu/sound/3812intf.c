@@ -39,15 +39,15 @@ static void IRQHandler_3812(void *param,int irq)
 	struct ym3812_info *info = param;
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
-static TIMER_CALLBACK_PTR( timer_callback_3812_0 )
+static TIMER_CALLBACK( timer_callback_3812_0 )
 {
-	struct ym3812_info *info = param;
+	struct ym3812_info *info = ptr;
 	YM3812TimerOver(info->chip,0);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_3812_1 )
+static TIMER_CALLBACK( timer_callback_3812_1 )
 {
-	struct ym3812_info *info = param;
+	struct ym3812_info *info = ptr;
 	YM3812TimerOver(info->chip,1);
 }
 
@@ -60,7 +60,7 @@ static void TimerHandler_3812(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_ptr(info->timer[c], period, attotime_zero);
+		timer_adjust(info->timer[c], period, 0, attotime_zero);
 	}
 }
 
@@ -101,8 +101,8 @@ static void *ym3812_start(int sndindex, int clock, const void *config)
 	YM3812SetIRQHandler   (info->chip, IRQHandler_3812, info);
 	YM3812SetUpdateHandler(info->chip, _stream_update_3812, info);
 
-	info->timer[0] = timer_alloc_ptr(timer_callback_3812_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_3812_1, info);
+	info->timer[0] = timer_alloc(timer_callback_3812_0, info);
+	info->timer[1] = timer_alloc(timer_callback_3812_1, info);
 
 	return info;
 }
@@ -209,14 +209,14 @@ static void IRQHandler_3526(void *param,int irq)
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Timer overflow callback from timer.c */
-static TIMER_CALLBACK_PTR( timer_callback_3526_0 )
+static TIMER_CALLBACK( timer_callback_3526_0 )
 {
-	struct ym3526_info *info = param;
+	struct ym3526_info *info = ptr;
 	YM3526TimerOver(info->chip,0);
 }
-static TIMER_CALLBACK_PTR( timer_callback_3526_1 )
+static TIMER_CALLBACK( timer_callback_3526_1 )
 {
-	struct ym3526_info *info = param;
+	struct ym3526_info *info = ptr;
 	YM3526TimerOver(info->chip,1);
 }
 /* TimerHandler from fm.c */
@@ -229,7 +229,7 @@ static void TimerHandler_3526(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_ptr(info->timer[c], period, attotime_zero);
+		timer_adjust(info->timer[c], period, 0, attotime_zero);
 	}
 }
 
@@ -269,8 +269,8 @@ static void *ym3526_start(int sndindex, int clock, const void *config)
 	YM3526SetIRQHandler   (info->chip, IRQHandler_3526, info);
 	YM3526SetUpdateHandler(info->chip, _stream_update_3526, info);
 
-	info->timer[0] = timer_alloc_ptr(timer_callback_3526_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_3526_1, info);
+	info->timer[0] = timer_alloc(timer_callback_3526_0, info);
+	info->timer[1] = timer_alloc(timer_callback_3526_1, info);
 
 	return info;
 }
@@ -375,14 +375,14 @@ static void IRQHandler_8950(void *param,int irq)
 	struct y8950_info *info = param;
 	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
 }
-static TIMER_CALLBACK_PTR( timer_callback_8950_0 )
+static TIMER_CALLBACK( timer_callback_8950_0 )
 {
-	struct y8950_info *info = param;
+	struct y8950_info *info = ptr;
 	Y8950TimerOver(info->chip,0);
 }
-static TIMER_CALLBACK_PTR( timer_callback_8950_1 )
+static TIMER_CALLBACK( timer_callback_8950_1 )
 {
-	struct y8950_info *info = param;
+	struct y8950_info *info = ptr;
 	Y8950TimerOver(info->chip,1);
 }
 static void TimerHandler_8950(void *param,int c,attotime period)
@@ -394,7 +394,7 @@ static void TimerHandler_8950(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust_ptr(info->timer[c], period, attotime_zero);
+		timer_adjust(info->timer[c], period, 0, attotime_zero);
 	}
 }
 
@@ -475,8 +475,8 @@ static void *y8950_start(int sndindex, int clock, const void *config)
 	Y8950SetIRQHandler   (info->chip, IRQHandler_8950, info);
 	Y8950SetUpdateHandler(info->chip, _stream_update_8950, info);
 
-	info->timer[0] = timer_alloc_ptr(timer_callback_8950_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_8950_1, info);
+	info->timer[0] = timer_alloc(timer_callback_8950_0, info);
+	info->timer[1] = timer_alloc(timer_callback_8950_1, info);
 
 	return info;
 }

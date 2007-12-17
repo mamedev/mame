@@ -48,9 +48,9 @@ struct flash_chip
 
 static struct flash_chip chips[FLASH_CHIPS_MAX];
 
-static TIMER_CALLBACK_PTR( erase_finished )
+static TIMER_CALLBACK( erase_finished )
 {
-	struct flash_chip *c = param;
+	struct flash_chip *c = ptr;
 
 	switch( c->flash_mode )
 	{
@@ -131,7 +131,7 @@ void intelflash_init(int chip, int type, void *data)
 	c->status = 0x80;
 	c->flash_mode = FM_NORMAL;
 	c->flash_master_lock = 0;
-	c->timer = timer_alloc_ptr(erase_finished, c);
+	c->timer = timer_alloc(erase_finished, c);
 	c->flash_memory = data;
 
 	state_save_register_item( "intelfsh", chip, c->status );
@@ -335,7 +335,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust_ptr( c->timer, ATTOTIME_IN_SEC( 17 ), attotime_zero );
+			timer_adjust( c->timer, ATTOTIME_IN_SEC( 17 ), 0, attotime_zero );
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
@@ -360,7 +360,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust_ptr( c->timer, ATTOTIME_IN_SEC( 1 ), attotime_zero );
+			timer_adjust( c->timer, ATTOTIME_IN_SEC( 1 ), 0, attotime_zero );
 		}
 		else
 		{
@@ -429,7 +429,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 0x00;
 			c->flash_mode = FM_READSTATUS;
 
-			timer_adjust_ptr( c->timer, ATTOTIME_IN_SEC( 1 ), attotime_zero );
+			timer_adjust( c->timer, ATTOTIME_IN_SEC( 1 ), 0, attotime_zero );
 			break;
 		}
 		else

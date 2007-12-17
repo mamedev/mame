@@ -171,7 +171,7 @@ typedef struct
 
 /* 6309 registers */
 static hd6309_Regs hd6309;
-int hd6309_slapstic = 0;
+//static int hd6309_slapstic = 0;
 
 #define pPPC	hd6309.ppc
 #define pPC 	hd6309.pc

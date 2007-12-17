@@ -26,7 +26,7 @@ struct uPD4701_chip
 	int cf;
 };
 
-struct uPD4701_chip uPD4701[ UPD4701_MAXCHIP ];
+static struct uPD4701_chip uPD4701[ UPD4701_MAXCHIP ];
 
 #define MASK_SWITCHES ( 7 )
 #define MASK_COUNTER ( 0xfff )

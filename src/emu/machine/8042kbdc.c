@@ -275,7 +275,7 @@ void kbdc8042_init(const struct kbdc8042_interface *intf)
 	kbdc8042.inport = 0xa0;
 	at_8042_set_outport(0xfe, 1);
 
-	timer_pulse(ATTOTIME_IN_HZ(60), 0, kbdc8042_time);
+	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, kbdc8042_time);
 }
 
 static void at_8042_receive(UINT8 data)

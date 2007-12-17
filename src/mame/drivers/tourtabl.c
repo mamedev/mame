@@ -251,5 +251,5 @@ ROM_START( tourtab2 )
 ROM_END
 
 
-GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, NULL, ROT0, "Atari", "Tournament Table (set 1)", 0 )
-GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, NULL, ROT0, "Atari", "Tournament Table (set 2)", 0 )
+GAME( 1978, tourtabl, 0,        tourtabl, tourtabl, 0, ROT0, "Atari", "Tournament Table (set 1)", 0 )
+GAME( 1978, tourtab2, tourtabl, tourtabl, tourtabl, 0, ROT0, "Atari", "Tournament Table (set 2)", 0 )

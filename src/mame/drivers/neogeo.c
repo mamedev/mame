@@ -272,9 +272,9 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 
 static void create_interrupt_timers(void)
 {
-	display_position_interrupt_timer = timer_alloc(display_position_interrupt_callback);
-	display_position_vblank_timer = timer_alloc(display_position_vblank_callback);
-	vblank_interrupt_timer = timer_alloc(vblank_interrupt_callback);
+	display_position_interrupt_timer = timer_alloc(display_position_interrupt_callback, NULL);
+	display_position_vblank_timer = timer_alloc(display_position_vblank_callback, NULL);
+	vblank_interrupt_timer = timer_alloc(vblank_interrupt_callback, NULL);
 }
 
 

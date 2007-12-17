@@ -236,13 +236,13 @@ static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(param, 0, 
 INTERRUPT_GEN( snk_irq_AB )
 {
 	cpunum_set_input_line(0, 0, HOLD_LINE);
-	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), 1, irq_trigger_callback);
+	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 1, irq_trigger_callback);
 }
 
 INTERRUPT_GEN( snk_irq_BA )
 {
 	cpunum_set_input_line(1, 0, HOLD_LINE);
-	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), 0, irq_trigger_callback);
+	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 0, irq_trigger_callback);
 }
 
 // NMI handshakes between CPUs are determined to be much simpler

@@ -77,7 +77,7 @@ static TIMER_CALLBACK( sbrkout_tones_4V )
 
 static MACHINE_RESET( sbrkout )
 {
-	timer_pulse(TIME_4V, 0, sbrkout_tones_4V);
+	timer_pulse(TIME_4V, NULL, 0, sbrkout_tones_4V);
 }
 
 

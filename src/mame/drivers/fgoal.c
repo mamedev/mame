@@ -99,13 +99,13 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = 0;
 	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, 0, interrupt_callback);
 }
 
 
 static MACHINE_RESET( fgoal )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, interrupt_callback);
 }
 
 

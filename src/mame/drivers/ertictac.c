@@ -161,7 +161,7 @@ static TIMER_CALLBACK( ertictacTimer )
 
 static void startTimer(void)
 {
-	timer_set(ATTOTIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), 0, ertictacTimer);
+	timer_set(ATTOTIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), NULL, 0, ertictacTimer);
 }
 
 static WRITE32_HANDLER(T1GO_w)

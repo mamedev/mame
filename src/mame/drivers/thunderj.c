@@ -120,7 +120,7 @@ static WRITE16_HANDLER( latch_w )
 static TIMER_CALLBACK( shared_sync_callback )
 {
 	if (--param)
-		timer_set(ATTOTIME_IN_USEC(50), param, shared_sync_callback);
+		timer_set(ATTOTIME_IN_USEC(50), NULL, param, shared_sync_callback);
 }
 
 
@@ -143,7 +143,7 @@ static READ16_HANDLER( shared_ram_r )
 			if ((opcode & 0xffc0) == 0x4ac0 ||
 				((opcode & 0xffc0) == 0x0080 && rom_base[cpunum][ppc / 2 + 1] == 7))
 			{
-				timer_call_after_resynch(4, shared_sync_callback);
+				timer_call_after_resynch(NULL, 4, shared_sync_callback);
 			}
 		}
 	}

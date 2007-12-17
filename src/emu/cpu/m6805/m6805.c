@@ -78,7 +78,7 @@ static PAIR ea; 		/* effective address */
 #define EA  ea.w.l
 
 /* public globals */
-int m6805_ICount=50000;
+static int m6805_ICount=50000;
 
 /* DS -- THESE ARE RE-DEFINED IN m6805.h TO RAM, ROM or FUNCTIONS IN cpuintrf.c */
 #define RM(Addr)			M6805_RDMEM(Addr)

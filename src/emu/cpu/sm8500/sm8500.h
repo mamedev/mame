@@ -20,8 +20,6 @@ typedef struct {
 #define WDT_INT         9
 #define NMI_INT         10
 
-extern int sm8500_icount;
-
 enum {
 	/* "main" 16 bit register */
         SM8500_PC=1, SM8500_SP, SM8500_PS, SM8500_SYS16, SM8500_RR0, SM8500_RR2, SM8500_RR4, SM8500_RR6, SM8500_RR8, SM8500_RR10,

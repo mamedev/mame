@@ -225,7 +225,7 @@ static MACHINE_START( m92 )
 	state_save_register_global(bankaddress);
 	state_save_register_func_postload(set_m92_bank);
 
-	scanline_timer = timer_alloc(m92_scanline_interrupt);
+	scanline_timer = timer_alloc(m92_scanline_interrupt, NULL);
 }
 
 static MACHINE_RESET( m92 )
@@ -330,7 +330,7 @@ static TIMER_CALLBACK( setvector_callback )
 
 static WRITE16_HANDLER( m92_soundlatch_w )
 {
-	timer_call_after_resynch(V30_ASSERT, setvector_callback);
+	timer_call_after_resynch(NULL, V30_ASSERT, setvector_callback);
 	soundlatch_w(0, data & 0xff);
 }
 
@@ -347,7 +347,7 @@ static READ16_HANDLER( m92_soundlatch_r )
 
 static WRITE16_HANDLER( m92_sound_irq_ack_w )
 {
-	timer_call_after_resynch(V30_CLEAR, setvector_callback);
+	timer_call_after_resynch(NULL, V30_CLEAR, setvector_callback);
 }
 
 static WRITE16_HANDLER( m92_sound_status_w )
@@ -928,9 +928,9 @@ GFXDECODE_END
 static void sound_irq(int state)
 {
 	if (state)
-		timer_call_after_resynch(YM2151_ASSERT, setvector_callback);
+		timer_call_after_resynch(NULL, YM2151_ASSERT, setvector_callback);
 	else
-		timer_call_after_resynch(YM2151_CLEAR, setvector_callback);
+		timer_call_after_resynch(NULL, YM2151_CLEAR, setvector_callback);
 }
 
 static struct YM2151interface ym2151_interface =
@@ -1920,7 +1920,7 @@ static void init_m92(running_machine *machine, const UINT8 *decryption_table, in
 	m92_irq_vectorbase=0x80;
 	m92_sprite_buffer_busy=1;
 
-	setvector_callback(machine, VECTOR_INIT);
+	setvector_callback(machine, NULL, VECTOR_INIT);
 	irem_cpu_decrypt(1,decryption_table);
 }
 

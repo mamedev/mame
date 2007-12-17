@@ -141,7 +141,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static void create_interrupt_timer(void)
 {
-	interrupt_timer = timer_alloc(interrupt_callback);
+	interrupt_timer = timer_alloc(interrupt_callback, NULL);
 }
 
 

@@ -15,10 +15,13 @@
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/namco.h"
+#include "rendlay.h"
+#include "tceptor2.lh"
 
 extern PALETTE_INIT( tceptor );
 extern VIDEO_START( tceptor );
 extern VIDEO_UPDATE( tceptor );
+extern VIDEO_EOF( tceptor );
 
 extern READ8_HANDLER( tceptor_tile_ram_r );
 extern WRITE8_HANDLER( tceptor_tile_ram_w );
@@ -220,7 +223,7 @@ static ADDRESS_MAP_START( m6809_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4f01, 0x4f01) AM_READ(input_port_4_r)		// analog input (accel)
 	AM_RANGE(0x4f02, 0x4f02) AM_READ(input_port_5_r)		// analog input (left/right)
 	AM_RANGE(0x4f03, 0x4f03) AM_READ(input_port_6_r)		// analog input (up/down)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(m68k_shared_r)		// COM RAM
+	AM_RANGE(0x6000, 0x7fff) AM_READ(m68k_shared_r)			// COM RAM
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
@@ -234,7 +237,7 @@ static ADDRESS_MAP_START( m6809_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(MWA8_NOP)			// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITE(MWA8_NOP)			// analog input control?
-	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
+	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)		// bg scroll
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(m68k_shared_w) AM_BASE(&m68k_shared_ram)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(m6809_irq_enable_w)
@@ -281,9 +284,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68k_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_ROM)		// M68K ERROR 1
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_ROM)		// not sure
-	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM)		// M68K ERROR 0
+	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_ROM)			// M68K ERROR 1
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_ROM)			// not sure
+	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM)			// M68K ERROR 0
 	AM_RANGE(0x700000, 0x703fff) AM_READ(m68k_shared_word_r)
 ADDRESS_MAP_END
 
@@ -431,7 +434,7 @@ static INPUT_PORTS_START( tceptor2 )
 	PORT_DIPSETTING(    0x03, "B" )
 	PORT_DIPSETTING(    0x01, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
-	PORT_DIPNAME( 0x04, 0x00, "MODE" )		// set default as 2D mode
+	PORT_DIPNAME( 0x04, 0x04, "MODE" )
 	PORT_DIPSETTING(    0x00, "2D" )
 	PORT_DIPSETTING(    0x04, "3D" )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -539,8 +542,6 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_CPU_IO_MAP(mcu_readport,mcu_writeport)
 	MDRV_CPU_VBLANK_INT(mcu_vb_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60.606060)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -550,16 +551,37 @@ static MACHINE_DRIVER_START( tceptor )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(38*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 	MDRV_GFXDECODE(tceptor)
 	MDRV_PALETTE_LENGTH(1024)
 	MDRV_COLORTABLE_LENGTH(4096)
+	MDRV_DEFAULT_LAYOUT(layout_horizont)
+
+	MDRV_SCREEN_ADD("2D", 0x000)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(60.606060)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_SIZE(38*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
+
+	MDRV_SCREEN_ADD("3D Left", 0x000)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(60.606060)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_SIZE(38*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
+
+	MDRV_SCREEN_ADD("3D Right", 0x000)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(60.606060)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_SIZE(38*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1 + 2*8, 0*8, 28*8-1 + 0)
 
 	MDRV_PALETTE_INIT(tceptor)
+
 	MDRV_VIDEO_START(tceptor)
 	MDRV_VIDEO_UPDATE(tceptor)
+	MDRV_VIDEO_EOF(tceptor)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -694,5 +716,5 @@ ROM_END
 
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR   COMPANY FULLNAME ) */
-GAME( 1986, tceptor,  0,        tceptor,  tceptor,  0,        ROT0,     "Namco",  "Thunder Ceptor", 0)
-GAME( 1986, tceptor2, tceptor,  tceptor,  tceptor2, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0)
+GAME ( 1986, tceptor,  0,        tceptor,  tceptor,  0,        ROT0,     "Namco",  "Thunder Ceptor", 0)
+GAMEL( 1986, tceptor2, tceptor,  tceptor,  tceptor2, 0,        ROT0,     "Namco",  "Thunder Ceptor II", 0, layout_tceptor2)

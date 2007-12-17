@@ -98,7 +98,7 @@ if (data&0x0f) popmessage("analog sound %x",data&0x0f);
 }
 
 
-struct AY8910interface irem_ay8910_interface_1 =
+static struct AY8910interface irem_ay8910_interface_1 =
 {
 	soundlatch_r,
 	0,
@@ -106,7 +106,7 @@ struct AY8910interface irem_ay8910_interface_1 =
 	irem_msm5205_w
 };
 
-struct AY8910interface irem_ay8910_interface_2 =
+static struct AY8910interface irem_ay8910_interface_2 =
 {
 	0,
 	0,
@@ -114,13 +114,13 @@ struct AY8910interface irem_ay8910_interface_2 =
 	0
 };
 
-struct MSM5205interface irem_msm5205_interface_1 =
+static struct MSM5205interface irem_msm5205_interface_1 =
 {
 	irem_adpcm_int,		/* interrupt function */
 	MSM5205_S96_4B		/* default to 4KHz, but can be changed at run time */
 };
 
-struct MSM5205interface irem_msm5205_interface_2 =
+static struct MSM5205interface irem_msm5205_interface_2 =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B		/* default to 4KHz, but can be changed at run time, slave */

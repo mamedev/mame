@@ -35,7 +35,7 @@
 #include "kaneko16.h"
 #include "kan_pand.h"
 
-UINT16 kaneko16_disp_enable = 1; // default enabled for games not using it
+static UINT16 kaneko16_disp_enable = 1; // default enabled for games not using it
 
 
 static tilemap *kaneko16_tmap_0, *kaneko16_tmap_1;
@@ -49,7 +49,7 @@ UINT16* galsnew_bg_pixram;
 UINT16* galsnew_fg_pixram;
 
 int kaneko16_sprite_type;
-int kaneko16_keep_sprites = 0; // default disabled for games not using it
+static int kaneko16_keep_sprites = 0; // default disabled for games not using it
 UINT16 kaneko16_sprite_xoffs, kaneko16_sprite_flipx;
 UINT16 kaneko16_sprite_yoffs, kaneko16_sprite_flipy;
 UINT16 *kaneko16_sprites_regs;

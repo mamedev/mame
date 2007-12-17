@@ -30,3 +30,5 @@ WRITE8_HANDLER( centiped_flip_screen_w );
 WRITE8_HANDLER( bullsdrt_tilesbank_w );
 WRITE8_HANDLER( bullsdrt_sprites_bank_w );
 
+WRITE8_HANDLER( mazeinv_paletteram_w );
+

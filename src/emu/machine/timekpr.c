@@ -34,7 +34,7 @@ struct timekeeper_chip
 	int offset_flags;
 };
 
-struct timekeeper_chip timekeeper[ MAX_TIMEKEEPER_CHIPS ];
+static struct timekeeper_chip timekeeper[ MAX_TIMEKEEPER_CHIPS ];
 
 #define MASK_SECONDS ( 0x7f )
 #define MASK_MINUTES ( 0x7f )
@@ -139,9 +139,9 @@ static void counters_from_ram( int chip )
 	c->century = counter_from_ram( c->data, c->offset_century );
 }
 
-static TIMER_CALLBACK_PTR( timekeeper_tick )
+static TIMER_CALLBACK( timekeeper_tick )
 {
-	struct timekeeper_chip *c = param;
+	struct timekeeper_chip *c = ptr;
 
 	int carry;
 
@@ -300,9 +300,9 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 	state_save_register_item( "timekeeper", chip, c->century );
 	state_save_register_item_pointer( "timekeeper", chip, c->data, c->size );
 
-	timer = timer_alloc_ptr( timekeeper_tick, c );
+	timer = timer_alloc( timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);
-	timer_adjust_ptr( timer, duration, duration );
+	timer_adjust( timer, duration, 0, duration );
 }
 
 static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )

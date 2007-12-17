@@ -60,7 +60,7 @@ struct x76f100_chip
 #define SIZE_READ_PASSWORD ( SIZE_WRITE_BUFFER )
 #define SIZE_DATA ( 112 )
 
-struct x76f100_chip x76f100[ X76F100_MAXCHIP ];
+static struct x76f100_chip x76f100[ X76F100_MAXCHIP ];
 
 #define COMMAND_WRITE ( 0x80 )
 #define COMMAND_READ ( 0x81 )

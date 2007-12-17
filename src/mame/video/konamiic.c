@@ -1443,11 +1443,11 @@ static UINT8 *K007342_ram,*K007342_scroll_ram;
 static int K007342_gfxnum;
 static int K007342_int_enabled;
 static int K007342_flipscreen;
-static int K007342_scrollx[2];
-static int K007342_scrolly[2];
+static UINT16 K007342_scrollx[2];
+static UINT8 K007342_scrolly[2];
 static UINT8 *K007342_videoram_0,*K007342_colorram_0;
 static UINT8 *K007342_videoram_1,*K007342_colorram_1;
-static int K007342_regs[8];
+static UINT8 K007342_regs[8];
 static void (*K007342_callback)(int tmap, int bank, int *code, int *color, int *flags);
 static tilemap *K007342_tilemap[2];
 
@@ -1517,6 +1517,14 @@ void K007342_vh_start(int gfx_index, void (*callback)(int tmap, int bank, int *c
 
 	tilemap_set_transparent_pen(K007342_tilemap[0],0);
 	tilemap_set_transparent_pen(K007342_tilemap[1],0);
+
+	state_save_register_global_pointer(K007342_ram, 0x2000);
+	state_save_register_global_pointer(K007342_scroll_ram, 0x0200);
+	state_save_register_global(K007342_int_enabled);
+	state_save_register_global(K007342_flipscreen);
+	state_save_register_global_array(K007342_scrollx);
+	state_save_register_global_array(K007342_scrolly);
+	state_save_register_global_array(K007342_regs);
 }
 
 READ8_HANDLER( K007342_r )
@@ -1677,6 +1685,9 @@ void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int
 	memset(K007420_ram,0,0x200);
 
 	K007420_banklimit = -1;
+
+	state_save_register_global_pointer(K007420_ram, 0x0200);
+	state_save_register_global(K007420_banklimit);
 }
 
 READ8_HANDLER( K007420_r )
@@ -2468,6 +2479,14 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 	K051960_callback = callback;
 	K051960_ram = auto_malloc(0x400);
 	memset(K051960_ram,0,0x400);
+
+	state_save_register_global(K051960_romoffset);
+	state_save_register_global(K051960_spriteflip);
+	state_save_register_global(K051960_readroms);
+	state_save_register_global_array(K051960_spriterombank);
+	state_save_register_global_pointer(K051960_ram, 0x400);
+	state_save_register_global(K051960_irq_enabled);
+	state_save_register_global(K051960_nmi_enabled);
 }
 
 
@@ -2964,6 +2983,13 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 
 	memset(K053245_ram[chip],0,K053245_ramsize[chip]);
 	memset(K053245_buffer[chip],0,K053245_ramsize[chip]);
+
+	state_save_register_item_pointer("K053245", chip, K053245_ram[chip], K053245_ramsize[chip] / 2);
+	state_save_register_item_pointer("K053245", chip, K053245_buffer[chip], K053245_ramsize[chip] / 2);
+	state_save_register_item("K053245", chip, K053244_rombank[chip]);
+	state_save_register_item("K053245", chip, K053245_dx[chip]);
+	state_save_register_item("K053245", chip, K053245_dy[chip]);
+	state_save_register_item_array("K053245", chip, K053244_regs[chip]);
 }
 
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy)
@@ -4613,6 +4639,12 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 
 	K051316_wraparound[chip] = 0;	/* default = no wraparound */
 	K051316_offset[chip][0] = K051316_offset[chip][1] = 0;
+
+	state_save_register_item_pointer("K051316", chip, K051316_ram[chip], 0x800);
+	state_save_register_item_array("K051316", chip, K051316_ctrlram[chip]);
+	state_save_register_item("K051316", chip, K051316_wraparound[chip]);
+	state_save_register_item("K051316", chip, K051316_offset[chip][0]);
+	state_save_register_item("K051316", chip, K051316_offset[chip][1]);
 }
 
 void K051316_vh_start_0(running_machine *machine,int gfx_memory_region,int bpp,

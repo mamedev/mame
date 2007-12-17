@@ -74,13 +74,13 @@ static TIMER_CALLBACK( update_callback )
 	scanline += SCANLINE_UPDATE_CHUNK;
 	if (scanline >= machine->screen[0].height)
 		scanline = 32;
-	timer_set(video_screen_get_time_until_pos(0, scanline + SCANLINE_UPDATE_CHUNK - 1, 0), scanline, update_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline + SCANLINE_UPDATE_CHUNK - 1, 0), NULL, scanline, update_callback);
 }
 
 
 static MACHINE_RESET( starfire )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32 + SCANLINE_UPDATE_CHUNK - 1, 0), 32, update_callback);
+	timer_set(video_screen_get_time_until_pos(0, 32 + SCANLINE_UPDATE_CHUNK - 1, 0), NULL, 32, update_callback);
 }
 
 

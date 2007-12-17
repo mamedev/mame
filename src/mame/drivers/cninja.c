@@ -825,7 +825,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( cninja )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen);
+	raster_irq_timer = timer_alloc(interrupt_gen, NULL);
 	cninja_scanline=0;
 	cninja_irq_mask=0;
 }

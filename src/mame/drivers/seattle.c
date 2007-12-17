@@ -541,10 +541,10 @@ static MACHINE_RESET( seattle )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the galileo */
-	galileo.timer[0].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[1].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[2].timer = timer_alloc(galileo_timer_callback);
-	galileo.timer[3].timer = timer_alloc(galileo_timer_callback);
+	galileo.timer[0].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[1].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[2].timer = timer_alloc(galileo_timer_callback, NULL);
+	galileo.timer[3].timer = timer_alloc(galileo_timer_callback, NULL);
 	galileo.dma_active = -1;
 
 	vblank_irq_num = 0;

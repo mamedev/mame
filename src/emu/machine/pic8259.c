@@ -81,7 +81,7 @@ int pic8259_init(int count, void (*set_int_line)(int which, int interrupt))
 
 	for (i = 0; i < count; i++)
 	{
-		pic[i].timer = timer_alloc(pic8259_timerproc);
+		pic[i].timer = timer_alloc(pic8259_timerproc, NULL);
 		pic[i].set_int_line = set_int_line;
 	}
 

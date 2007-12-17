@@ -33,6 +33,8 @@ static INT32 bg2_scroll_x, bg2_scroll_y;
 
 static mame_bitmap *temp_bitmap;
 
+static UINT16 *tceptor_sprite_ram_buffered;
+
 static int is_mask_spr[1024/16];
 
 /*******************************************************************/
@@ -73,12 +75,12 @@ PALETTE_INIT( tceptor )
 	/* color_prom now points to the beginning of the lookup table */
 
 	/*
-      color lookup table:
-        0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
-        1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
-        2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
-        3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
-    */
+          color lookup table:
+            0-    +1024 ( 4 * 256) colors: text   (use 0-   256 colors)
+            1024- +1024 (16 *  64) colors: sprite (use 768- 256 colors)
+            2048-  +512 ( 8 *  64) colors: bg     (use 0-   512 colors)
+            3840-  +256 ( 4 *  64) colors: road   (use 512- 256 colors)
+        */
 
 	/* tiles lookup table (1024 colors) */
 	for (i = 0; i < 1024;i++)
@@ -419,6 +421,9 @@ VIDEO_START( tceptor )
 {
 	int gfx_index;
 
+	tceptor_sprite_ram_buffered = auto_malloc(0x200);
+	memset(tceptor_sprite_ram_buffered, 0, 0x200);
+
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
 		if (machine->gfx[gfx_index] == 0)
@@ -450,6 +455,7 @@ VIDEO_START( tceptor )
 	bg1_tilemap = tilemap_create(get_bg1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
+	state_save_register_global_pointer(tceptor_sprite_ram_buffered, 0x200 / 2);
 	state_save_register_global(bg1_scroll_x);
 	state_save_register_global(bg1_scroll_y);
 	state_save_register_global(bg2_scroll_x);
@@ -484,8 +490,8 @@ VIDEO_START( tceptor )
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
 {
-	UINT16 *mem1 = &tceptor_sprite_ram[0x000/2];
-	UINT16 *mem2 = &tceptor_sprite_ram[0x100/2];
+	UINT16 *mem1 = &tceptor_sprite_ram_buffered[0x000/2];
+	UINT16 *mem2 = &tceptor_sprite_ram_buffered[0x100/2];
 	int need_mask = 0;
 	int i;
 
@@ -571,6 +577,16 @@ VIDEO_UPDATE( tceptor )
 	int pri;
 	int bg_center = 144 - ((((bg1_scroll_x + bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
+	if (screen)
+	{
+		int frame = cpu_getcurrentframe();
+
+		if ((frame & 1) == 1 && screen == 1)
+			return UPDATE_HAS_NOT_CHANGED;
+		if ((frame & 1) == 0 && screen == 2)
+			return UPDATE_HAS_NOT_CHANGED;
+	}
+
 	// left background
 	rect = *cliprect;
 	rect.max_x = bg_center;
@@ -594,4 +610,10 @@ VIDEO_UPDATE( tceptor )
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 	return 0;
+}
+
+
+VIDEO_EOF( tceptor )
+{
+	memcpy(tceptor_sprite_ram_buffered, tceptor_sprite_ram, 0x200);
 }

@@ -287,7 +287,7 @@ void midway_serial_pic2_init(int upper, int yearoffs)
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = timer_alloc(reset_timer);
+	pic.time_write_timer = timer_alloc(reset_timer, NULL);
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(upper);
 }

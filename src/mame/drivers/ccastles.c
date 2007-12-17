@@ -232,7 +232,7 @@ static MACHINE_START( ccastles )
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(0);
 

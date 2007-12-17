@@ -266,7 +266,7 @@ static void namco_50xx_irq_set(int cpunum)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(ATTOTIME_IN_USEC(21), cpunum, namco_50xx_irq_clear);
+	timer_set(ATTOTIME_IN_USEC(21), NULL, cpunum, namco_50xx_irq_clear);
 }
 
 void namco_50xx_write(UINT8 data)
@@ -276,7 +276,7 @@ void namco_50xx_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	timer_call_after_resynch(data, namco_50xx_latch_callback);
+	timer_call_after_resynch(NULL, data, namco_50xx_latch_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -288,7 +288,7 @@ void namco_50xx_2_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	timer_call_after_resynch(data, namco_50xx_2_latch_callback);
+	timer_call_after_resynch(NULL, data, namco_50xx_2_latch_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -301,7 +301,7 @@ void namco_50xx_read_request(void)
 	if (cpunum == -1)
 		return;
 
-	timer_call_after_resynch(0, namco_50xx_readrequest_callback);
+	timer_call_after_resynch(NULL, 0, namco_50xx_readrequest_callback);
 
 	namco_50xx_irq_set(cpunum);
 }
@@ -313,7 +313,7 @@ void namco_50xx_2_read_request(void)
 	if (cpunum == -1)
 		return;
 
-	timer_call_after_resynch(0, namco_50xx_2_readrequest_callback);
+	timer_call_after_resynch(NULL, 0, namco_50xx_2_readrequest_callback);
 
 	namco_50xx_irq_set(cpunum);
 }

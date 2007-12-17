@@ -1284,7 +1284,7 @@ static void tms99xx_init(int index, int clock, const void *config, int (*irqcall
 	I.irq_callback = irqcallback;
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	I.timer = timer_alloc(decrementer_callback);
+	I.timer = timer_alloc(decrementer_callback, NULL);
 #endif
 
 	I.idle_callback = param ? param->idle_callback : NULL;
@@ -1864,7 +1864,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 					{	/* decrement, then interrupt if reach 0 */
 						if ((-- I.decrementer_count) == 0)
 						{
-							decrementer_callback(Machine, 0);
+							decrementer_callback(Machine, NULL, 0);
 							I.decrementer_count = I.decrementer_interval;	/* reload */
 						}
 					}

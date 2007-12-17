@@ -783,9 +783,9 @@ INLINE void envelope_KONKOFF(YM2151Operator * op, int v)
 
 #ifdef USE_MAME_TIMERS
 
-static TIMER_CALLBACK_PTR( irqAon_callback )
+static TIMER_CALLBACK( irqAon_callback )
 {
-	YM2151 *chip = param;
+	YM2151 *chip = ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate |= 1;
@@ -793,9 +793,9 @@ static TIMER_CALLBACK_PTR( irqAon_callback )
 	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
 }
 
-static TIMER_CALLBACK_PTR( irqBon_callback )
+static TIMER_CALLBACK( irqBon_callback )
 {
-	YM2151 *chip = param;
+	YM2151 *chip = ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate |= 2;
@@ -803,9 +803,9 @@ static TIMER_CALLBACK_PTR( irqBon_callback )
 	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
 }
 
-static TIMER_CALLBACK_PTR( irqAoff_callback )
+static TIMER_CALLBACK( irqAoff_callback )
 {
-	YM2151 *chip = param;
+	YM2151 *chip = ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate &= ~1;
@@ -813,9 +813,9 @@ static TIMER_CALLBACK_PTR( irqAoff_callback )
 	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(0);
 }
 
-static TIMER_CALLBACK_PTR( irqBoff_callback )
+static TIMER_CALLBACK( irqBoff_callback )
 {
-	YM2151 *chip = param;
+	YM2151 *chip = ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate &= ~2;
@@ -823,34 +823,34 @@ static TIMER_CALLBACK_PTR( irqBoff_callback )
 	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(0);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_a )
+static TIMER_CALLBACK( timer_callback_a )
 {
-	YM2151 *chip = param;
-	timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], attotime_zero);
+	YM2151 *chip = ptr;
+	timer_adjust(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0, attotime_zero);
 	chip->timer_A_index_old = chip->timer_A_index;
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		timer_set_ptr(attotime_zero,chip,irqAon_callback);
+		timer_set(attotime_zero,chip,0,irqAon_callback);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
 }
-static TIMER_CALLBACK_PTR( timer_callback_b )
+static TIMER_CALLBACK( timer_callback_b )
 {
-	YM2151 *chip = param;
-	timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], attotime_zero);
+	YM2151 *chip = ptr;
+	timer_adjust(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0, attotime_zero);
 	chip->timer_B_index_old = chip->timer_B_index;
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		timer_set_ptr(attotime_zero,chip,irqBon_callback);
+		timer_set(attotime_zero,chip,0,irqBon_callback);
 	}
 }
 #if 0
-static TIMER_CALLBACK_PTR( timer_callback_chip_busy )
+static TIMER_CALLBACK( timer_callback_chip_busy )
 {
-	YM2151 *chip = param;
+	YM2151 *chip = ptr;
 	chip->status &= 0x7f;	/* reset busy flag */
 }
 #endif
@@ -1056,7 +1056,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 #if 0
 	/* There is no info on what YM2151 really does when busy flag is set */
 	if ( chip->status & 0x80 ) return;
-	timer_set_ptr ( attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64), chip, timer_callback_chip_busy);
+	timer_set ( attotime_mul(ATTOTIME_IN_HZ(chip->clock), 64), chip, 0, timer_callback_chip_busy);
 	chip->status |= 0x80;	/* set busy flag for 64 chip clock cycles */
 #endif
 
@@ -1107,7 +1107,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				timer_set_ptr(attotime_zero,chip,irqAoff_callback);
+				timer_set(attotime_zero,chip,0,irqAoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1119,7 +1119,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				timer_set_ptr(attotime_zero,chip,irqBoff_callback);
+				timer_set(attotime_zero,chip,0,irqBoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1133,7 +1133,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
 					if (!timer_enable(chip->timer_B, 1))
 					{
-						timer_adjust_ptr(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], attotime_zero);
+						timer_adjust(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0, attotime_zero);
 						chip->timer_B_index_old = chip->timer_B_index;
 					}
 				#else
@@ -1158,7 +1158,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
 					if (!timer_enable(chip->timer_A, 1))
 					{
-						timer_adjust_ptr(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], attotime_zero);
+						timer_adjust(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0, attotime_zero);
 						chip->timer_A_index_old = chip->timer_A_index;
 					}
 				#else
@@ -1542,8 +1542,8 @@ void * YM2151Init(int index, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to YM2151ResetChip() */
-	PSG->timer_A = timer_alloc_ptr(timer_callback_a, PSG);
-	PSG->timer_B = timer_alloc_ptr(timer_callback_b, PSG);
+	PSG->timer_A = timer_alloc(timer_callback_a, PSG);
+	PSG->timer_B = timer_alloc(timer_callback_b, PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;

@@ -391,11 +391,11 @@ static MACHINE_START( missile )
 	opcode_base = opcode_arg_base = videoram;
 
 	/* create a timer to speed/slow the CPU */
-	cpu_timer = timer_alloc(adjust_cpu_speed);
+	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);
 	timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0, attotime_zero);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(-32);
 

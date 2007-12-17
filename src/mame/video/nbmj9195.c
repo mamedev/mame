@@ -382,7 +382,7 @@ static void nbmj9195_gfxdraw(int vram)
 	nb19010_busyflag = 0;
 
 	/* 1650ns per count */
-	timer_set(attotime_make(0, nb19010_busyctr * 1650 * ATTOSECONDS_PER_NANOSECOND), 0, blitter_timer_callback);
+	timer_set(ATTOTIME_IN_NSEC(nb19010_busyctr * 1650), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************

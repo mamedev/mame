@@ -39,10 +39,10 @@ static int collision_reg = 0x00;
    audio bits are in the same bytes, and there are so few
    samples... */
 
-int starcrus_engine_sound_playing = 0;
-int starcrus_explode_sound_playing = 0;
-int starcrus_launch1_sound_playing = 0;
-int starcrus_launch2_sound_playing = 0;
+static int starcrus_engine_sound_playing = 0;
+static int starcrus_explode_sound_playing = 0;
+static int starcrus_launch1_sound_playing = 0;
+static int starcrus_launch2_sound_playing = 0;
 
 WRITE8_HANDLER( starcrus_s1_x_w ) { s1_x = data^0xff; }
 WRITE8_HANDLER( starcrus_s1_y_w ) { s1_y = data^0xff; }

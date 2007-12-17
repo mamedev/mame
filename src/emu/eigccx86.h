@@ -33,9 +33,10 @@
 
 #ifndef __x86_64__
 #define mul_32x32 _mul_32x32
-INLINE INT64 _mul_32x32(INT32 a, INT32 b)
+INLINE INT64 __attribute__((const, always_inline))
+_mul_32x32(INT32 a, INT32 b)
 {
-	INT64 result;
+	register INT64 result;
 
 	__asm__ (
 		" imull  %[b] ;"
@@ -58,9 +59,10 @@ INLINE INT64 _mul_32x32(INT32 a, INT32 b)
 
 #ifndef __x86_64__
 #define mulu_32x32 _mulu_32x32
-INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
+INLINE UINT64 __attribute__((const, always_inline))
+_mulu_32x32(UINT32 a, UINT32 b)
 {
-	UINT64 result;
+	register UINT64 result;
 
 	__asm__ (
 		" mull  %[b] ;"
@@ -82,9 +84,10 @@ INLINE UINT64 _mulu_32x32(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
+INLINE INT32 __attribute__((const, always_inline))
+_mul_32x32_hi(INT32 a, INT32 b)
 {
-	INT32 result;
+	register INT32 result;
 
 	__asm__ (
 		" imull  %[b] ;"
@@ -105,9 +108,10 @@ INLINE INT32 _mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
+INLINE UINT32 __attribute__((const, always_inline))
+_mulu_32x32_hi(UINT32 a, UINT32 b)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		" mull  %[b] ;"
@@ -130,10 +134,12 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 a, UINT32 b)
 
 #ifndef __x86_64__
 #define mul_32x32_shift _mul_32x32_shift
-INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+INLINE INT32 __attribute__((const, always_inline))
+_mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
-	INT32 result;
+	register INT32 result;
 
+	/* Valid for (0 <= shift <= 31) */
 	__asm__ (
 		" imull  %[b]                       ;"
 		" shrdl  %[shift], %%edx, %[result] ;"
@@ -158,10 +164,12 @@ INLINE INT32 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mulu_32x32_shift _mulu_32x32_shift
-INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+INLINE UINT32 __attribute__((const, always_inline))
+_mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
-	UINT32 result;
+	register UINT32 result;
 
+	/* Valid for (0 <= shift <= 31) */
 	__asm__ (
 		" mull   %[b]                       ;"
 		" shrdl  %[shift], %%edx, %[result] ;"
@@ -184,10 +192,12 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define div_64x32 _div_64x32
-INLINE INT32 _div_64x32(INT64 a, INT32 b)
+INLINE INT32 __attribute__((const, always_inline))
+_div_64x32(INT64 a, INT32 b)
 {
-	INT32 result, temp;
+	register INT32 result, temp;
 
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 		" idivl  %[b] ;"
 		: [result] "=a" (result)	/* Result ends up in eax */
@@ -209,10 +219,12 @@ INLINE INT32 _div_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define divu_64x32 _divu_64x32
-INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
+INLINE UINT32 __attribute__((const, always_inline))
+_divu_64x32(UINT64 a, UINT32 b)
 {
-	UINT32 result, temp;
+	register UINT32 result, temp;
 
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 		" divl  %[b] ;"
 		: [result] "=a" (result)	/* Result ends up in eax */
@@ -235,10 +247,12 @@ INLINE UINT32 _divu_64x32(UINT64 a, UINT32 b)
 
 #ifndef __x86_64__
 #define div_64x32_rem _div_64x32_rem
-INLINE INT32 _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
+INLINE INT32 __attribute__((always_inline))
+_div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
 {
-	INT32 quotient;
+	register INT32 quotient;
 
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 		" idivl  %[divisor] ;"
 		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
@@ -261,10 +275,12 @@ INLINE INT32 _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
 
 #ifndef __x86_64__
 #define divu_64x32_rem _divu_64x32_rem
-INLINE UINT32 _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
+INLINE UINT32 __attribute__((always_inline))
+_divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 {
-	UINT32 quotient;
+	register UINT32 quotient;
 
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 		" divl  %[divisor] ;"
 		: [result]    "=a" (quotient)	/* Quotient ends up in eax */
@@ -287,10 +303,13 @@ INLINE UINT32 _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder
 
 #ifndef __x86_64__
 #define div_32x32_shift _div_32x32_shift
-INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
+INLINE INT32 __attribute__((const, always_inline))
+_div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
-	INT32 result;
+	register INT32 result;
 
+	/* Valid for (0 <= shift <= 31) */
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 	    " cdq                          ;"
 	    " shldl  %[shift], %[a], %%edx ;"
@@ -316,10 +335,13 @@ INLINE INT32 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define divu_32x32_shift _divu_32x32_shift
-INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
+INLINE UINT32 __attribute__((const, always_inline))
+_divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
-	INT32 result;
+	register INT32 result;
 
+	/* Valid for (0 <= shift <= 31) */
+	/* Throws arithmetic exception if result doesn't fit in 32 bits */
 	__asm__ (
 	    " clr    %%edx                 ;"
 	    " shldl  %[shift], %[a], %%edx ;"
@@ -344,10 +366,12 @@ INLINE UINT32 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mod_64x32 _mod_64x32
-INLINE INT32 _mod_64x32(INT64 a, INT32 b)
+INLINE INT32 __attribute__((const, always_inline))
+_mod_64x32(INT64 a, INT32 b)
 {
-	INT32 result, temp;
+	register INT32 result, temp;
 
+	/* Throws arithmetic exception if quotient doesn't fit in 32 bits */
 	__asm__ (
 		" idivl  %[b] ;"
 		: [result] "=d" (result)	/* Result ends up in edx */
@@ -369,10 +393,12 @@ INLINE INT32 _mod_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define modu_64x32 _modu_64x32
-INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
+INLINE UINT32 __attribute__((const, always_inline))
+_modu_64x32(UINT64 a, UINT32 b)
 {
-	UINT32 result, temp;
+	register UINT32 result, temp;
 
+	/* Throws arithmetic exception if quotient doesn't fit in 32 bits */
 	__asm__ (
 		" divl  %[b] ;"
 		: [result] "=d" (result)	/* Result ends up in edx */
@@ -394,7 +420,8 @@ INLINE UINT32 _modu_64x32(UINT64 a, UINT32 b)
 
 #ifdef __SSE2__
 #define recip_approx _recip_approx
-INLINE float _recip_approx(float value)
+INLINE float __attribute__((const))
+_recip_approx(float value)
 {
 	__m128 value_xmm = _mm_set_ss(value);
 	__m128 result_xmm = _mm_rcp_ss(value_xmm);
@@ -416,9 +443,10 @@ INLINE float _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-INLINE UINT8 _count_leading_zeros(UINT32 value)
+INLINE UINT8 __attribute__((const, always_inline))
+_count_leading_zeros(UINT32 value)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		"   bsrl  %[value], %[result] ;"
@@ -440,9 +468,10 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-INLINE UINT8 _count_leading_ones(UINT32 value)
+INLINE UINT8 __attribute__((const, always_inline))
+_count_leading_ones(UINT32 value)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		"   movl  %[value], %[result]  ;"
@@ -473,12 +502,13 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 -------------------------------------------------*/
 
 #define compare_exchange32 _compare_exchange32
-INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	register INT32 result;
 
 	__asm__ __volatile__ (
-		" lock ; cmpxchg  %[exchange], %[ptr] ;"
+		" lock ; cmpxchgl  %[exchange], %[ptr] ;"
 	  : [ptr]      "+m" (*ptr)
 	  , [result]   "=a" (result)
 	  : [compare]  "1"  (compare)
@@ -499,12 +529,13 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 
 #ifdef __x86_64__
 #define compare_exchange64 _compare_exchange64
-INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+INLINE INT64 __attribute__((nonnull(1), always_inline))
+_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	register INT64 result;
 
 	__asm__ __volatile__ (
-		" lock ; cmpxchg  %[exchange], %[ptr] ;"
+		" lock ; cmpxchgq  %[exchange], %[ptr] ;"
 	  : [ptr]      "+m" (*ptr)
 	  , [result]   "=a" (result)
 	  : [compare]  "1"  (compare)
@@ -524,12 +555,13 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 -------------------------------------------------*/
 
 #define atomic_exchange32 _atomic_exchange32
-INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	register INT32 result;
 
 	__asm__ __volatile__ (
-		" lock ; xchg  %[exchange], %[ptr] ;"
+		" lock ; xchgl  %[exchange], %[ptr] ;"
 		: [ptr]      "+m" (*ptr)
 		, [result]   "=r" (result)
 		: [exchange] "1"  (exchange)
@@ -546,12 +578,13 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 -------------------------------------------------*/
 
 #define atomic_add32 _atomic_add32
-INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result = delta;
 
 	__asm__ __volatile__ (
-		" lock ; xadd  %[result], %[ptr] ;"
+		" lock ; xaddl  %[result], %[ptr] ;"
 	  : [ptr]    "+m" (*ptr)
 	  , [result] "+r" (result)
 	  :
@@ -569,12 +602,13 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_increment32(INT32 volatile *ptr)
 {
 	register INT32 result = 1;
 
 	__asm__ __volatile__ (
-		" lock ; xadd  %[result], %[ptr] ;"
+		" lock ; xaddl  %[result], %[ptr] ;"
 	  : [ptr]    "+m" (*ptr)
 	  , [result] "+r" (result)
 	  :
@@ -592,12 +626,13 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_decrement32(INT32 volatile *ptr)
 {
 	register INT32 result = -1;
 
 	__asm__ __volatile__ (
-		" lock ; xadd  %[result], %[ptr] ;"
+		" lock ; xaddl  %[result], %[ptr] ;"
 	  : [ptr]    "+m" (*ptr)
 	  , [result] "+r" (result)
 	  :

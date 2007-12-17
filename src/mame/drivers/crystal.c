@@ -593,16 +593,16 @@ static MACHINE_RESET(crystal)
 	Timer2ctrl=0;
 	Timer3ctrl=0;
 
-	Timer0=timer_alloc(Timer0cb);
+	Timer0=timer_alloc(Timer0cb, NULL);
 	timer_adjust(Timer0,attotime_never,0,attotime_never);
 
-	Timer1=timer_alloc(Timer1cb);
+	Timer1=timer_alloc(Timer1cb, NULL);
 	timer_adjust(Timer1,attotime_never,0,attotime_never);
 
-	Timer2=timer_alloc(Timer2cb);
+	Timer2=timer_alloc(Timer2cb, NULL);
 	timer_adjust(Timer2,attotime_never,0,attotime_never);
 
-	Timer3=timer_alloc(Timer3cb);
+	Timer3=timer_alloc(Timer3cb, NULL);
 	timer_adjust(Timer3,attotime_never,0,attotime_never);
 
 	VR0_Snd_Set_Areas(textureram,frameram);

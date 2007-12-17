@@ -3537,34 +3537,120 @@ ROM_START( myherok )
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
+/*
+    Shooting Master (SEGA) - Set 1, 8751 315-5159
+    Year: 1985
+    System 2
+
+    Main Board        834-5719
+    Light Gun Board?  834-5720
+*/
+
 ROM_START( shtngmst )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
-	ROM_LOAD( "epr7100",      0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
-	ROM_LOAD( "epr7101",      0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
-	ROM_LOAD( "epr7102",      0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+    /* This rom is located on the daughter board .*/
+	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
+    /* These roms are located on the main board. */
+	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
+	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
+    /* This rom is located on the main board. */
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "epr7043",      0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
+    /* This mcu is located on the main board. */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* Internal i8751 MCU code */
+	ROM_LOAD( "315-5159.ic74", 0x00000, 0x1000, NO_DUMP )
+
+    /* These roms are located on the main board. */
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "epr7040",      0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
-	ROM_LOAD( "epr7041",      0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
-	ROM_LOAD( "epr7042",      0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
+	ROM_LOAD( "epr7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
+	ROM_LOAD( "epr7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
+	ROM_LOAD( "epr7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
 
+    /* These roms are located on the daughter board. */
 	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr7110",      0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
-	ROM_LOAD( "epr7106",      0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
-	ROM_LOAD( "epr7108",      0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
-	ROM_LOAD( "epr7104",      0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
-	ROM_LOAD( "epr7109",      0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
-	ROM_LOAD( "epr7105",      0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
-	ROM_LOAD( "epr7107",      0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
+	ROM_LOAD( "epr7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
+	ROM_LOAD( "epr7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
+	ROM_LOAD( "epr7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
+	ROM_LOAD( "epr7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
+	ROM_LOAD( "epr7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
+	ROM_LOAD( "epr7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
+	ROM_LOAD( "epr7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
 
+    /* These proms are located on the main board. */
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
-	ROM_LOAD( "epr7113",      0x0000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
-	ROM_LOAD( "epr7112",      0x0100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
-	ROM_LOAD( "epr7111",      0x0200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component */
-	ROM_LOAD( "epr5317",      0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "epr7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
+	ROM_LOAD( "epr7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
+	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
+
+    /* These pld's are located on the main board. */
+	ROM_REGION( 0x0618, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
+	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
+    ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19 */
+ROM_END
+
+/*
+    Shooting Master (SEGA) - Set 2, 8751 315-5159a
+    Year: 1985
+    System 2
+
+    Main Board        834-5719
+    Light Gun Board?  834-5720
+*/
+
+ROM_START( shtngmsb )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+    /* This rom is located on the daughter board .*/
+	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
+    /* These roms are located on the main board. */
+	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
+	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
+
+    /* This rom is located on the main board. */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
+
+    /* This mcu is located on the main board. */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* Internal i8751 MCU code */
+	ROM_LOAD( "315-5159a.ic74", 0x00000, 0x1000, NO_DUMP )
+
+    /* These roms are located on the main board. */
+	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "epr7040.ic4",    0x00000, 0x8000, CRC(f30769fa) SHA1(366c1fbe4e1c8943b209f6c831c9a6b7e4372105) )
+	ROM_LOAD( "epr7041.ic5",    0x08000, 0x8000, CRC(f3e273f9) SHA1(b8715c528299dc1e4f0c19c50d91ca9861a423a1) )
+	ROM_LOAD( "epr7042.ic6",    0x10000, 0x8000, CRC(6841c917) SHA1(6553843eea0131eb7b5a9aa29dddf641e41d8cc3) )
+
+    /* These roms are located on the daughter board. */
+	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_ERASEFF )
+	ROM_LOAD( "epr7110.ic26",   0x00000, 0x8000, CRC(5d1a5048) SHA1(d1626ab1981080451c912df7e4ad7f76c0cb3459) )
+	ROM_LOAD( "epr7106.ic22",   0x08000, 0x8000, CRC(ae7ab7a2) SHA1(153691e468d29d21b95f1fbffb6896a3140d7e14) )
+	ROM_LOAD( "epr7108.ic24",   0x10000, 0x8000, CRC(816180ac) SHA1(a59670ec77d4359041ebf12dae5b74add55d82ac) )
+	ROM_LOAD( "epr7104.ic20",   0x18000, 0x8000, CRC(84a679c5) SHA1(19a21b1b33fc215f606093bfd61d597e4bd0b3d0) )
+	ROM_LOAD( "epr7109.ic25",   0x20000, 0x8000, CRC(097f7481) SHA1(4d93ea01b811af1cd3e136116625e4b8e06358a2) )
+	ROM_LOAD( "epr7105.ic21",   0x28000, 0x8000, CRC(13111729) SHA1(57ca2b945db36b056d0e40a39456fd8bf9d0a3ec) )
+	ROM_LOAD( "epr7107.ic23",   0x30000, 0x8000, CRC(8f50ea24) SHA1(781687e202dedca7b72c9bd5b97d9d46fcfd601c) )
+
+    /* These proms are located on the main board. */
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
+	ROM_LOAD( "epr7113.ic20",   0x00000, 0x0100, CRC(5c0e1360) SHA1(2011b3eef2a58f9bd3f3b1bb9e6c201db85727c2) ) /* palette red component */
+	ROM_LOAD( "epr7112.ic14",   0x00100, 0x0100, CRC(46fbd351) SHA1(1fca7fbc5d5f8e13e58bbac735511bd0af392446) ) /* palette green component */
+	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
+
+    /* These pld's are located on the main board. */
+	ROM_REGION( 0x0618, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
+	ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4ACN Located at IC11 */
+    ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13 */
+    ROM_LOAD( "315-5155.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19 */
 ROM_END
 
 /*
@@ -3651,64 +3737,100 @@ ROM_START( shtngmsa )
 	ROM_LOAD( "pal16r4a(315-5137).bin",  0x0200, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) )
 ROM_END
 
+/*
+    Choplifter (8751 315-5151)
+    Year: 1985
+    System 2
+
+    Main Board 834-5795
+*/
 
 ROM_START( chplft )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
-	ROM_LOAD( "epr-7124.90",	0x00000, 0x8000, CRC(678d5c41) SHA1(7553979f78270c2ddc5b3f3ebf7817ead8e08de7) )
-	ROM_LOAD( "epr-7125.91",	0x10000, 0x8000, CRC(f5283498) SHA1(1ad40f6d7b4cd18212ee56917240c0796f1a4ec2) )
-	ROM_LOAD( "epr-7126.92",	0x18000, 0x8000, CRC(dbd192ab) SHA1(03d280c82599a14fc6a2065d57c6241cdc6f1143) )
+	ROM_LOAD( "epr-7124.ic90",	0x00000, 0x8000, CRC(678d5c41) SHA1(7553979f78270c2ddc5b3f3ebf7817ead8e08de7) )
+	ROM_LOAD( "epr-7125.ic91",	0x10000, 0x8000, CRC(f5283498) SHA1(1ad40f6d7b4cd18212ee56917240c0796f1a4ec2) )
+	ROM_LOAD( "epr-7126.ic92",	0x18000, 0x8000, CRC(dbd192ab) SHA1(03d280c82599a14fc6a2065d57c6241cdc6f1143) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "epr-7130.126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
+	ROM_LOAD( "epr-7130.ic126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* Internal i8751 MCU code */
+	ROM_LOAD( "315-5151.ic74",  0x00000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "epr-7127.4",		0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
-	ROM_LOAD( "epr-7128.5",		0x08000, 0x8000, CRC(b922e787) SHA1(16087671ec7de25f749b5fd66409d48ef7b35820) )
-	ROM_LOAD( "epr-7129.6",		0x10000, 0x8000, CRC(bd3b6e6e) SHA1(c66f21b98cb8fc61a9318041ac1812c13099d974) )
+	ROM_LOAD( "epr-7127.ic4",	0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
+	ROM_LOAD( "epr-7128.ic5",	0x08000, 0x8000, CRC(b922e787) SHA1(16087671ec7de25f749b5fd66409d48ef7b35820) )
+	ROM_LOAD( "epr-7129.ic6",	0x10000, 0x8000, CRC(bd3b6e6e) SHA1(c66f21b98cb8fc61a9318041ac1812c13099d974) )
 
 	ROM_REGION( 0x20000, REGION_GFX2, 0 ) /* 128k for sprites data */
-	ROM_LOAD( "epr-7121.87",	0x00000, 0x8000, CRC(f2b88f73) SHA1(2b06da1beabbea82d502fbe12f6ec3ef26056edd) )
-	ROM_LOAD( "epr-7120.86",	0x08000, 0x8000, CRC(517d7fd3) SHA1(3fb5c00224920c3f62fb86e82caf0fee2293e1e2) )
-	ROM_LOAD( "epr-7123.89",	0x10000, 0x8000, CRC(8f16a303) SHA1(5f2465505f001dc052e9de4cf66bc1d53fc8c7da) )
-	ROM_LOAD( "epr-7122.88",	0x18000, 0x8000, CRC(7c93f160) SHA1(6ab156cad7556808496070f8b02a708ce405c492) )
+	ROM_LOAD( "epr-7121.ic87",	0x00000, 0x8000, CRC(f2b88f73) SHA1(2b06da1beabbea82d502fbe12f6ec3ef26056edd) )
+	ROM_LOAD( "epr-7120.ic86",	0x08000, 0x8000, CRC(517d7fd3) SHA1(3fb5c00224920c3f62fb86e82caf0fee2293e1e2) )
+	ROM_LOAD( "epr-7123.ic89",	0x10000, 0x8000, CRC(8f16a303) SHA1(5f2465505f001dc052e9de4cf66bc1d53fc8c7da) )
+	ROM_LOAD( "epr-7122.ic88",	0x18000, 0x8000, CRC(7c93f160) SHA1(6ab156cad7556808496070f8b02a708ce405c492) )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
-	ROM_LOAD( "pr7119.20",		0x0000, 0x0100, CRC(b2a8260f) SHA1(36c1debb4b3f2f190a25b18d533319d7380416de) ) /* palette red component */
-	ROM_LOAD( "pr7118.14",		0x0100, 0x0100, CRC(693e20c7) SHA1(9ebf4bd2c30ddd9648bc4b41c7739cfdf80100da) ) /* palette green component */
-	ROM_LOAD( "pr7117.8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
-	ROM_LOAD( "pr5317.28",		0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr7119.ic20",	0x0000, 0x0100, CRC(b2a8260f) SHA1(36c1debb4b3f2f190a25b18d533319d7380416de) ) /* palette red component */
+	ROM_LOAD( "pr7118.ic14",	0x0100, 0x0100, CRC(693e20c7) SHA1(9ebf4bd2c30ddd9648bc4b41c7739cfdf80100da) ) /* palette green component */
+	ROM_LOAD( "pr7117.ic8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
+	ROM_LOAD( "pr5317.ic28",	0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 
-	ROM_REGION( 0x0400, REGION_PLDS, ROMREGION_DISPOSE )
-	ROM_LOAD( "pal16r4a.ic9",  0x0000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) )
-	ROM_LOAD( "pal16r4a.ic10", 0x0200, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) )
+	ROM_REGION( 0x0618, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
+    ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC located at IC11. */
+    ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19. */
 ROM_END
+
+/*
+    Choplifter (Unprotected)
+    Year: 1985
+    System 2
+
+    Main Board 834-5795
+*/
 
 ROM_START( chplftb )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
-	ROM_LOAD( "epr-7152.90",	0x00000, 0x8000, CRC(fe49d83e) SHA1(307be38dd73ed37b275c1b464d266a752cb06132) )
-	ROM_LOAD( "epr-7153.91",	0x10000, 0x8000, CRC(48697666) SHA1(0f4c6db9558272f5ceb347e742b284474f18b707) )
-	ROM_LOAD( "epr-7154.92",	0x18000, 0x8000, CRC(56d6222a) SHA1(ad8ccf15fe7f1d6716f78490892da0167d79f678) )
+	ROM_LOAD( "epr-7152.ic90",	0x00000, 0x8000, CRC(fe49d83e) SHA1(307be38dd73ed37b275c1b464d266a752cb06132) )
+	ROM_LOAD( "epr-7153.ic91",	0x10000, 0x8000, CRC(48697666) SHA1(0f4c6db9558272f5ceb347e742b284474f18b707) )
+	ROM_LOAD( "epr-7154.ic92",	0x18000, 0x8000, CRC(56d6222a) SHA1(ad8ccf15fe7f1d6716f78490892da0167d79f678) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "epr-7130.126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
+	ROM_LOAD( "epr-7130.ic126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "epr-7127.4",		0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
-	ROM_LOAD( "epr-7128.5",		0x08000, 0x8000, CRC(b922e787) SHA1(16087671ec7de25f749b5fd66409d48ef7b35820) )
-	ROM_LOAD( "epr-7129.6",		0x10000, 0x8000, CRC(bd3b6e6e) SHA1(c66f21b98cb8fc61a9318041ac1812c13099d974) )
+	ROM_LOAD( "epr-7127.ic4",	0x00000, 0x8000, CRC(1e708f6d) SHA1(b975e13bdc44105e7a15c2694e3ec53b60e23e5e) )
+	ROM_LOAD( "epr-7128.ic5",	0x08000, 0x8000, CRC(b922e787) SHA1(16087671ec7de25f749b5fd66409d48ef7b35820) )
+	ROM_LOAD( "epr-7129.ic6",	0x10000, 0x8000, CRC(bd3b6e6e) SHA1(c66f21b98cb8fc61a9318041ac1812c13099d974) )
 
 	ROM_REGION( 0x20000, REGION_GFX2, 0 ) /* 128k for sprites data */
-	ROM_LOAD( "epr-7121.87",	0x00000, 0x8000, CRC(f2b88f73) SHA1(2b06da1beabbea82d502fbe12f6ec3ef26056edd) )
-	ROM_LOAD( "epr-7120.86",	0x08000, 0x8000, CRC(517d7fd3) SHA1(3fb5c00224920c3f62fb86e82caf0fee2293e1e2) )
-	ROM_LOAD( "epr-7123.89",	0x10000, 0x8000, CRC(8f16a303) SHA1(5f2465505f001dc052e9de4cf66bc1d53fc8c7da) )
-	ROM_LOAD( "epr-7122.88",	0x18000, 0x8000, CRC(7c93f160) SHA1(6ab156cad7556808496070f8b02a708ce405c492) )
+	ROM_LOAD( "epr-7121.ic87",	0x00000, 0x8000, CRC(f2b88f73) SHA1(2b06da1beabbea82d502fbe12f6ec3ef26056edd) )
+	ROM_LOAD( "epr-7120.ic86",	0x08000, 0x8000, CRC(517d7fd3) SHA1(3fb5c00224920c3f62fb86e82caf0fee2293e1e2) )
+	ROM_LOAD( "epr-7123.ic89",	0x10000, 0x8000, CRC(8f16a303) SHA1(5f2465505f001dc052e9de4cf66bc1d53fc8c7da) )
+	ROM_LOAD( "epr-7122.ic88",	0x18000, 0x8000, CRC(7c93f160) SHA1(6ab156cad7556808496070f8b02a708ce405c492) )
 
 	ROM_REGION( 0x0400, REGION_PROMS, 0 )
-	ROM_LOAD( "pr7119.20",		0x0000, 0x0100, CRC(b2a8260f) SHA1(36c1debb4b3f2f190a25b18d533319d7380416de) ) /* palette red component */
-	ROM_LOAD( "pr7118.14",		0x0100, 0x0100, CRC(693e20c7) SHA1(9ebf4bd2c30ddd9648bc4b41c7739cfdf80100da) ) /* palette green component */
-	ROM_LOAD( "pr7117.8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
-	ROM_LOAD( "pr5317.28",		0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr7119.ic20",	0x0000, 0x0100, CRC(b2a8260f) SHA1(36c1debb4b3f2f190a25b18d533319d7380416de) ) /* palette red component */
+	ROM_LOAD( "pr7118.ic14",	0x0100, 0x0100, CRC(693e20c7) SHA1(9ebf4bd2c30ddd9648bc4b41c7739cfdf80100da) ) /* palette green component */
+	ROM_LOAD( "pr7117.ic8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
+	ROM_LOAD( "pr5317.ic28",	0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+
+	ROM_REGION( 0x0618, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
+    ROM_LOAD( "315-5138.bin",   0x00000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) ) /* TI PAL16R4NC located at IC11. */
+    ROM_LOAD( "315-5139.bin",   0x00000, 0x0104, NO_DUMP ) /* CK2605 located at IC50. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC7. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC13. */
+    ROM_LOAD( "315-5025.bin",   0x00000, 0x0104, NO_DUMP ) /* Located at IC19. */
 ROM_END
+
+/*
+    Choplifter (Bootleg)
+    Year: 1985
+    System 2
+*/
 
 ROM_START( chplftbl )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )
@@ -4735,10 +4857,11 @@ GAME( 1985, myhero,   0,        system1,  myhero,   0,        ROT0,   "Sega", 		
 GAME( 1985, sscandal, myhero,   system1,  myhero,   myheroj,  ROT0,   "Coreland / Sega", 	   "Seishun Scandal (315-5132, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, myherok,  myhero,   system1,  myhero,   myherok,  ROT0,   "Coreland / Sega", 	   "My Hero (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1985, hvymetal, 0,        hvymetal, hvymetal, hvymetal, ROT0,   "Sega", 			 	   "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtngmst, 0,        shtngmst, shtngmst, 0,        ROT0,   "Sega", 			 	   "Shooting Master", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
+GAME( 1985, shtngmst, 0,        shtngmst, shtngmst, 0,        ROT0,   "Sega", 			 	   "Shooting Master (set 1, 8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
 GAME( 1985, shtngmsa, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega [EVG]",			   "Shooting Master (EVG)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159 */
-GAME( 1985, chplft,   0,        chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection */
-GAME( 1985, chplftb,  chplft,   chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (alternate)", GAME_SUPPORTS_SAVE )
+GAME( 1985, shtngmsb, shtngmst, shtngmst, shtngmst, 0,        ROT0,   "Sega",                  "Shooting Master (set 2, 8751 315-5159a)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection, mcu = 315-5159a */
+GAME( 1985, chplft,   0,        chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )	/* 8751 protection */
+GAME( 1985, chplftb,  chplft,   chplft,   chplft,   0,        ROT0,   "Sega", 			 	   "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chplftbl, chplft,   chplft,   chplft,   0,        ROT0,   "bootleg", 		 	   "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1985, 4dwarrio, 0,        system1,  4dwarrio, 4dwarrio, ROT0,   "Coreland / Sega", 	   "4-D Warriors (315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, brain,    0,        brain,    brain,    0,        ROT0,   "Coreland / Sega", 	   "Brain", GAME_SUPPORTS_SAVE )

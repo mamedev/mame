@@ -153,6 +153,12 @@ attotime attotime_div(attotime _time1, UINT32 factor);
 /* compare two attotimes */
 int attotime_compare(attotime _time1, attotime _time2);
 
+/* return the minimum of two attotimes */
+attotime attotime_min(attotime _time1, attotime _time2);
+
+/* return the maximum of two attotimes */
+attotime attotime_max(attotime _time1, attotime _time2);
+
 
 /* ----- misc utilities ----- */
 

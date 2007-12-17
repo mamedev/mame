@@ -378,7 +378,7 @@ int mame_execute(core_options *options)
 			begin_resource_tracking();
 
 			/* perform a soft reset -- this takes us to the running phase */
-			soft_reset(machine, 0);
+			soft_reset(machine, NULL, 0);
 
 			/* run the CPUs until a reset or exit */
 			mame->hard_reset_pending = FALSE;
@@ -392,7 +392,7 @@ int mame_execute(core_options *options)
 
 				/* otherwise, just pump video updates through */
 				else
-					video_frame_update();
+					video_frame_update(FALSE);
 
 				/* handle save/load */
 				if (mame->saveload_schedule_callback)
@@ -1508,7 +1508,7 @@ static void init_machine(running_machine *machine)
 	/* initialize the timers and allocate a soft_reset timer */
 	/* this must be done before cpu_init so that CPU's can allocate timers */
 	timer_init(machine);
-	mame->soft_reset_timer = timer_alloc(soft_reset);
+	mame->soft_reset_timer = timer_alloc(soft_reset, NULL);
 
 	/* init the osd layer */
 	osd_init(machine);

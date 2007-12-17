@@ -415,6 +415,54 @@ static INPUT_PORTS_START( falcona )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( nextfase )
+	PORT_START		/* IN0 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+
+	PORT_START		/* IN1 */
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL )	/* comes from IN0 0-2 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_COCKTAIL
+
+	PORT_START		/* DSW0 */
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x01, "2" )
+	PORT_DIPSETTING(	0x02, "3" )
+	PORT_DIPSETTING(	0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(	0x00, "3K 30K" )
+	PORT_DIPSETTING(	0x04, "4K 40K" )
+	PORT_DIPSETTING(	0x08, "5K 50K" )
+	PORT_DIPSETTING(	0x0c, "6K 60K" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(	0x00, "1C/1C & 1C/2C" )
+	PORT_DIPSETTING(	0x20, "2C/3C & 1C/3C" )
+	PORT_DIPSETTING(	0x40, "1C/2C & 1C/4C" )
+	PORT_DIPSETTING(	0x60, "2C/5C & 1C/5C" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+
+	PORT_START		/* fake port for non-memory mapped dip switch */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( pleiads )
 	PORT_START		/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1096,6 +1144,32 @@ ROM_START( falcona )
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
 
+ROM_START( nextfase )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )
+	ROM_LOAD( "nf02.bin",   0x0800, 0x0800, CRC(891d21e1) SHA1(bea01962c0706c00eae42920bb2b3bfdb7e80d89) )
+	ROM_LOAD( "nf03.bin",   0x1000, 0x0800, CRC(2ab7389d) SHA1(c0bc0c235cae4a8e880237196ea1718f8c1d0123) )
+	ROM_LOAD( "nf04.bin",   0x1800, 0x0800, CRC(590d3c36) SHA1(89e87f207cdb9a7f5624170c09626ef85ede3969) )
+	ROM_LOAD( "nf05.bin",   0x2000, 0x0800, CRC(3527f247) SHA1(0cccbc3e15d7603deaec845581983bfbcc4d4560) )
+	ROM_LOAD( "nf06.bin",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "nf07.bin",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "nf08.bin",   0x3800, 0x0800, CRC(04c2323f) SHA1(4d820464f57e4f59acc46ea3264dba3cb9c501a1) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "nf11.bin",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "nf12.bin",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "nf09.bin",   0x0000, 0x0800, CRC(bacbfa88) SHA1(bf378a729726db01448f2cc4820f06e17659d674) )
+	ROM_LOAD( "nf10.bin",   0x0800, 0x0800, CRC(3143a9ee) SHA1(371bb314dc9e4ec6ed469eb81391061296c547ec) )
+
+	/* Proms were missing from this dump, these might not be correct */
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
+
 ROM_START( pleiads )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic47.r1",      0x0000, 0x0800, CRC(960212c8) SHA1(52a3232e99920805ce9e195b8a6338ae7044dd18) )
@@ -1239,15 +1313,20 @@ GAME( 1980, phoenixb, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Cen
 GAME( 1980, phoenixt, phoenix, phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", 0 )
 GAME( 1980, phoenix3, phoenix, phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", 0 )
 GAME( 1981, phoenixc, phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", 0 )
-GAME( 1981, condor,   phoenix, condor,   condor,   condor,   ROT90, "Sidam", "Condor", 0 )
+
+
+GAME( 1981, condor,   phoenix, condor,   condor,   condor,   ROT90, "Sidam (bootleg)",      "Condor (bootleg of Phoenix)", 0 )
 // the following 2 were common bootlegs in england & france respectively
-GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Falcon (bootleg set 1)", 0 )
-GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg", "Vautour (set 1 - Jeutel France)", 0 )
-GAME( 1980, vautour2, phoenix, condor,   condor,   condor,   ROT90, "bootleg", "Vautour (set 2)", 0 )
+GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg",              "Falcon (bootleg of Phoenix) (set 1)", 0 )
+GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "Jeutel (bootleg)",     "Vautour (bootleg of Phoenix) (set 1)", 0 )
+GAME( 1980, vautour2, phoenix, condor,   condor,   condor,   ROT90, "bootleg",              "Vautour (bootleg of Phoenix) (set 2)", 0 )
 // fenix is an italian bootleg based on vautour
-GAME( 1980, fenix,    phoenix, condor,   condor,   condor,   ROT90, "bootleg", "Fenix", GAME_NOT_WORKING )
-GAME( 1980, griffon,  phoenix, condor,   condor,   condor,   ROT90, "Videotron", "Griffon", 0 )
-GAME( 1980, falcona,  phoenix, condor,   falcona,  0,        ROT90, "bootleg", "Falcon (bootleg set 2)", 0 )
+GAME( 1980, fenix,    phoenix, condor,   condor,   condor,   ROT90, "bootleg",              "Fenix (bootleg of Phoenix)", GAME_NOT_WORKING )
+GAME( 1980, griffon,  phoenix, condor,   condor,   condor,   ROT90, "Videotron (bootleg)",  "Griffon (bootleg of Phoenix)", 0 )
+GAME( 1980, falcona,  phoenix, condor,   falcona,  0,        ROT90, "bootleg",              "Falcon (bootleg of Phoenix) (set 2)", 0 )
+// nextfase is a spanish bootleg
+GAME( 1981, nextfase, phoenix, phoenix,  nextfase, 0,        ROT90, "Petaco S.A. (bootleg)","Next Fase (bootleg of Phoenix)", 0 )
+
 GAME( 1981, pleiads,  0,       pleiads,  pleiads,  0,        ROT90, "Tehkan", "Pleiads (Tehkan)", GAME_IMPERFECT_COLORS )
 GAME( 1981, pleiadbl, pleiads, pleiads,  pleiads,  0,        ROT90, "bootleg", "Pleiads (bootleg)", GAME_IMPERFECT_COLORS )
 GAME( 1981, pleiadce, pleiads, pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )

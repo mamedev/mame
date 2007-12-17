@@ -1065,12 +1065,12 @@ static int cycle(void)
 }
 #endif
 
-static void after(int cycles, void (*function)(running_machine *machine, int), const char *funcname)
+static void after(int cycles, timer_callback function, const char *funcname)
 {
     attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
-	timer_set(duration, 0, function);
+	timer_set(duration, NULL, 0, function);
 }
 
 static TIMER_CALLBACK( antic_issue_dli )

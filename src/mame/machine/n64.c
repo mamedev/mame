@@ -2,7 +2,6 @@
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/rsp/rsp.h"
 #include "sound/custom.h"
 #include "streams.h"
 #include "includes/n64.h"
@@ -225,7 +224,7 @@ static void sp_dma(int direction)
 
 
 
-void sp_set_status(UINT32 status)
+static void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
 	{
@@ -499,23 +498,6 @@ WRITE32_HANDLER( n64_sp_reg_w )
 	}
 }
 
-UINT32 sp_read_reg(UINT32 reg)
-{
-	switch (reg)
-	{
-		//case 4:       return rsp_sp_status;
-		default:	return n64_sp_reg_r(reg, 0x00000000);
-	}
-}
-
-void sp_write_reg(UINT32 reg, UINT32 data)
-{
-	switch (reg)
-	{
-		default:	n64_sp_reg_w(reg, data, 0x00000000); break;
-	}
-}
-
 // RDP Interface
 UINT32 dp_start;
 UINT32 dp_end;
@@ -581,6 +563,15 @@ WRITE32_HANDLER( n64_dp_reg_w )
 	}
 }
 
+
+rsp_config n64_rsp_config =
+{
+	n64_dp_reg_r,
+	n64_dp_reg_w,
+	n64_sp_reg_r,
+	n64_sp_reg_w,
+	sp_set_status
+};
 
 
 // Video Interface
@@ -1059,9 +1050,9 @@ WRITE32_HANDLER( n64_ri_reg_w )
 // Serial Interface
 static UINT8 pif_ram[0x40];
 static UINT8 pif_cmd[0x40];
-UINT32 si_dram_addr = 0;
-UINT32 si_pif_addr = 0;
-UINT32 si_status = 0;
+static UINT32 si_dram_addr = 0;
+static UINT32 si_pif_addr = 0;
+static UINT32 si_status = 0;
 
 static UINT8 eeprom[512];
 static UINT8 mempack[0x8000];
@@ -1517,7 +1508,7 @@ WRITE32_HANDLER( n64_si_reg_w )
 	}
 }
 
-UINT32 cic_status = 0x00000000;
+static UINT32 cic_status = 0x00000000;
 
 READ32_HANDLER( n64_pif_ram_r )
 {
@@ -1576,7 +1567,7 @@ void n64_machine_reset(void)
 	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	audio_timer = timer_alloc(audio_timer_callback);
+	audio_timer = timer_alloc(audio_timer_callback, NULL);
 	timer_adjust(audio_timer, attotime_never, 0, attotime_never);
 
 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);

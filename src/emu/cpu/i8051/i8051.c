@@ -173,7 +173,7 @@ typedef struct {
 
 }	I8051;
 
-int i8051_icount;
+static int i8051_icount;
 
 static I8051 i8051;
 static I8051_UART uart;

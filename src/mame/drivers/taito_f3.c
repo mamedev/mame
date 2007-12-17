@@ -393,7 +393,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 static INTERRUPT_GEN( f3_interrupt2 )
 {
 	cpunum_set_input_line(0, 2, HOLD_LINE);	// vblank
-	timer_set( ATTOTIME_IN_CYCLES(10000,0), 0, f3_interrupt3);
+	timer_set( ATTOTIME_IN_CYCLES(10000,0), NULL, 0, f3_interrupt3);
 }
 
 static MACHINE_RESET( f3 )

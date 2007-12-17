@@ -108,16 +108,16 @@ static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x
 static int diff_lookup[16];
 
 /* timer callback */
-static TIMER_CALLBACK_PTR( update_irq_state_timer_0 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_1 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_2 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_3 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_4 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_5 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_6 );
-static TIMER_CALLBACK_PTR( update_irq_state_timer_7 );
+static TIMER_CALLBACK( update_irq_state_timer_0 );
+static TIMER_CALLBACK( update_irq_state_timer_1 );
+static TIMER_CALLBACK( update_irq_state_timer_2 );
+static TIMER_CALLBACK( update_irq_state_timer_3 );
+static TIMER_CALLBACK( update_irq_state_timer_4 );
+static TIMER_CALLBACK( update_irq_state_timer_5 );
+static TIMER_CALLBACK( update_irq_state_timer_6 );
+static TIMER_CALLBACK( update_irq_state_timer_7 );
 
-static void (*update_irq_state_cb[])(running_machine *, void *) =
+static timer_callback update_irq_state_cb[] =
 {
 	update_irq_state_timer_0,
 	update_irq_state_timer_1,
@@ -199,7 +199,7 @@ static void YMZ280B_state_save_update_step(void *param)
 		struct YMZ280BVoice *voice = &chip->voice[j];
 		update_step(chip, voice);
 		if(voice->irq_schedule)
-			timer_set_ptr(attotime_zero, chip, update_irq_state_cb[j]);
+			timer_set(attotime_zero, chip, 0, update_irq_state_cb[j]);
 	}
 }
 
@@ -217,14 +217,14 @@ static void update_irq_state_timer_common(void *param, int voicenum)
 	voice->irq_schedule = 0;
 }
 
-static TIMER_CALLBACK_PTR( update_irq_state_timer_0 ) { update_irq_state_timer_common(param, 0); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_1 ) { update_irq_state_timer_common(param, 1); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_2 ) { update_irq_state_timer_common(param, 2); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_3 ) { update_irq_state_timer_common(param, 3); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_4 ) { update_irq_state_timer_common(param, 4); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_5 ) { update_irq_state_timer_common(param, 5); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_6 ) { update_irq_state_timer_common(param, 6); }
-static TIMER_CALLBACK_PTR( update_irq_state_timer_7 ) { update_irq_state_timer_common(param, 7); }
+static TIMER_CALLBACK( update_irq_state_timer_0 ) { update_irq_state_timer_common(ptr, 0); }
+static TIMER_CALLBACK( update_irq_state_timer_1 ) { update_irq_state_timer_common(ptr, 1); }
+static TIMER_CALLBACK( update_irq_state_timer_2 ) { update_irq_state_timer_common(ptr, 2); }
+static TIMER_CALLBACK( update_irq_state_timer_3 ) { update_irq_state_timer_common(ptr, 3); }
+static TIMER_CALLBACK( update_irq_state_timer_4 ) { update_irq_state_timer_common(ptr, 4); }
+static TIMER_CALLBACK( update_irq_state_timer_5 ) { update_irq_state_timer_common(ptr, 5); }
+static TIMER_CALLBACK( update_irq_state_timer_6 ) { update_irq_state_timer_common(ptr, 6); }
+static TIMER_CALLBACK( update_irq_state_timer_7 ) { update_irq_state_timer_common(ptr, 7); }
 
 
 /**********************************************************************************************
@@ -575,7 +575,7 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 				voice->playing = 0;
 
 				/* set update_irq_state_timer. IRQ is signaled on next CPU execution. */
-				timer_set_ptr(attotime_zero, chip, update_irq_state_cb[v]);
+				timer_set(attotime_zero, chip, 0, update_irq_state_cb[v]);
 				voice->irq_schedule = 1;
 			}
 		}

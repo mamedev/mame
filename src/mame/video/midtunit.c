@@ -44,9 +44,6 @@ enum
        UINT8	midtunit_gfx_rom_large;
 static UINT16	midtunit_control;
 
-/* palette-related variables */
-static pen_t *	pen_map;
-
 /* videoram-related variables */
 static UINT32 	gfxbank_offset[2];
 static UINT16 *	local_videoram;
@@ -89,15 +86,8 @@ static struct
 
 VIDEO_START( midtunit )
 {
-	int i;
-
 	/* allocate memory */
 	local_videoram = auto_malloc(0x100000);
-	pen_map = auto_malloc(65536 * sizeof(pen_map[0]));
-
-	/* initialize pen map */
-	for (i = 0; i < 0x10000; i++)
-		pen_map[i] = i & 0x7fff;
 
 	/* reset all the globals */
 	gfxbank_offset[0] = 0x000000;
@@ -804,7 +794,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* signal we're done */
 skipdma:
-	timer_set(ATTOTIME_IN_NSEC(41 * pixels), 0, dma_callback);
+	timer_set(ATTOTIME_IN_NSEC(41 * pixels), NULL, 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }
@@ -826,7 +816,7 @@ void midtunit_scanline_update(running_machine *machine, int screen, mame_bitmap 
 
 	/* copy the non-blanked portions of this scanline */
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
+		dest[x] = src[coladdr++ & 0x1ff] & 0x7fff;
 }
 
 void midxunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
@@ -838,5 +828,5 @@ void midxunit_scanline_update(running_machine *machine, int screen, mame_bitmap 
 
 	/* copy the non-blanked portions of this scanline */
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = pen_map[src[fulladdr++ & 0x1ff]];
+		dest[x] = src[fulladdr++ & 0x1ff] & 0x7fff;
 }

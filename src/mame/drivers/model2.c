@@ -341,10 +341,10 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = timer_alloc(model2_timer_0_cb);
-	model2_timers[1] = timer_alloc(model2_timer_1_cb);
-	model2_timers[2] = timer_alloc(model2_timer_2_cb);
-	model2_timers[3] = timer_alloc(model2_timer_3_cb);
+	model2_timers[0] = timer_alloc(model2_timer_0_cb, NULL);
+	model2_timers[1] = timer_alloc(model2_timer_1_cb, NULL);
+	model2_timers[2] = timer_alloc(model2_timer_2_cb, NULL);
+	model2_timers[3] = timer_alloc(model2_timer_3_cb, NULL);
 
 	timer_adjust(model2_timers[0], attotime_never, 0, attotime_never);
 	timer_adjust(model2_timers[1], attotime_never, 0, attotime_never);
@@ -621,7 +621,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 /* GEO */
 
 UINT32 geo_read_start_address = 0;
-UINT32 geo_write_start_address = 0;
+static UINT32 geo_write_start_address = 0;
 
 static WRITE32_HANDLER( geo_ctl1_w )
 {

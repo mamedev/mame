@@ -111,7 +111,7 @@ VIDEO_START( dcheese )
 	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->screen[0].format);
 
 	/* create a timer */
-	blitter_timer = timer_alloc(blitter_scanline_callback);
+	blitter_timer = timer_alloc(blitter_scanline_callback, NULL);
 
 	/* register for saving */
 	state_save_register_global_array(blitter_color);
@@ -162,7 +162,7 @@ static void do_clear(void)
 		memset(BITMAP_ADDR16(dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(video_screen_get_scan_period(0), 1, dcheese_signal_irq_callback);
+	timer_set(video_screen_get_scan_period(0), NULL, 1, dcheese_signal_irq_callback);
 }
 
 
@@ -216,7 +216,7 @@ static void do_blit(void)
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) / 2), 2, dcheese_signal_irq_callback);
+	timer_set(attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) / 2), NULL, 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||

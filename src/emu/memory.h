@@ -158,45 +158,48 @@ typedef struct _data_accessors data_accessors;
 #define AMEF_UNMAP(x)			(((x) << AMEF_UNMAP_SHIFT) | AMEF_SPECIFIES_UNMAP) /* specifies a given unmap value */
 
 /* ----- static data access handler constants ----- */
-#define STATIC_INVALID			0						/* invalid - should never be used */
-#define STATIC_BANK1			1						/* banked memory #1 */
-#define STATIC_BANK2			2						/* banked memory #2 */
-#define STATIC_BANK3			3						/* banked memory #3 */
-#define STATIC_BANK4			4						/* banked memory #4 */
-#define STATIC_BANK5			5						/* banked memory #5 */
-#define STATIC_BANK6			6						/* banked memory #6 */
-#define STATIC_BANK7			7						/* banked memory #7 */
-#define STATIC_BANK8			8						/* banked memory #8 */
-#define STATIC_BANK9			9						/* banked memory #9 */
-#define STATIC_BANK10			10						/* banked memory #10 */
-#define STATIC_BANK11			11						/* banked memory #11 */
-#define STATIC_BANK12			12						/* banked memory #12 */
-#define STATIC_BANK13			13						/* banked memory #13 */
-#define STATIC_BANK14			14						/* banked memory #14 */
-#define STATIC_BANK15			15						/* banked memory #15 */
-#define STATIC_BANK16			16						/* banked memory #16 */
-#define STATIC_BANK17			17						/* banked memory #17 */
-#define STATIC_BANK18			18						/* banked memory #18 */
-#define STATIC_BANK19			19						/* banked memory #19 */
-#define STATIC_BANK20			20						/* banked memory #20 */
-#define STATIC_BANK21			21						/* banked memory #21 */
-#define STATIC_BANK22			22						/* banked memory #22 */
-#define STATIC_BANK23			23						/* banked memory #23 */
-#define STATIC_BANK24			24						/* banked memory #24 */
-#define STATIC_BANK25			25						/* banked memory #25 */
-#define STATIC_BANK26			26						/* banked memory #26 */
-#define STATIC_BANK27			27						/* banked memory #27 */
-#define STATIC_BANK28			28						/* banked memory #28 */
-#define STATIC_BANK29			29						/* banked memory #29 */
-#define STATIC_BANK30			30						/* banked memory #30 */
-#define STATIC_BANK31			31						/* banked memory #31 */
-#define STATIC_BANK32			32						/* banked memory #32 */
+enum
+{
+	STATIC_INVALID = 0,	/* invalid - should never be used */
+	STATIC_BANK1,		/* banked memory */
+	STATIC_BANK2,
+	STATIC_BANK3,
+	STATIC_BANK4,
+	STATIC_BANK5,
+	STATIC_BANK6,
+	STATIC_BANK7,
+	STATIC_BANK8,
+	STATIC_BANK9,
+	STATIC_BANK10,
+	STATIC_BANK11,
+	STATIC_BANK12,
+	STATIC_BANK13,
+	STATIC_BANK14,
+	STATIC_BANK15,
+	STATIC_BANK16,
+	STATIC_BANK17,
+	STATIC_BANK18,
+	STATIC_BANK19,
+	STATIC_BANK20,
+	STATIC_BANK21,
+	STATIC_BANK22,
+	STATIC_BANK23,
+	STATIC_BANK24,
+	STATIC_BANK25,
+	STATIC_BANK26,
+	STATIC_BANK27,
+	STATIC_BANK28,
+	STATIC_BANK29,
+	STATIC_BANK30,
+	STATIC_BANK31,
+	STATIC_BANK32,
 /* entries 33-67 are reserved for dynamically allocated internal banks */
-#define STATIC_RAM				68						/* RAM - standard reads/writes */
-#define STATIC_ROM				69						/* ROM - standard reads, no writes */
-#define STATIC_NOP				70						/* unmapped - all unmapped memory goes here */
-#define STATIC_UNMAP			71						/* unmapped - all unmapped memory goes here */
-#define STATIC_COUNT			72						/* total number of static handlers */
+	STATIC_RAM = 68,	/* RAM - standard reads/writes */
+	STATIC_ROM,		/* ROM - standard reads, no writes */
+	STATIC_NOP,
+	STATIC_UNMAP,		/* unmapped - all unmapped memory goes here */
+	STATIC_COUNT		/* total number of static handlers */
+};
 
 /* ----- banking constants ----- */
 #define MAX_BANKS				66						/* maximum number of banks */
@@ -717,10 +720,13 @@ address_map *construct_map_##_name(address_map *map)					\
 ***************************************************************************/
 
 /* ----- address spaces ----- */
-#define ADDRESS_SPACES			3						/* maximum number of address spaces */
-#define ADDRESS_SPACE_PROGRAM	0						/* program address space */
-#define ADDRESS_SPACE_DATA		1						/* data address space */
-#define ADDRESS_SPACE_IO		2						/* I/O address space */
+enum
+{
+	ADDRESS_SPACE_PROGRAM = 0,			/* program address space */
+	ADDRESS_SPACE_DATA,				/* data address space */
+	ADDRESS_SPACE_IO,				/* I/O address space */
+	ADDRESS_SPACES					/* maximum number of address spaces */
+};
 
 extern const char *address_space_names[ADDRESS_SPACES];
 
@@ -1153,11 +1159,7 @@ INLINE UINT32 cpu_readop_arg32(offs_t A)	{ if (address_is_unsafe(A)) { memory_se
 INLINE UINT64 cpu_readop_arg64(offs_t A)	{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg64_unsafe(A); }
 
 /* ----- bank switching for CPU cores ----- */
-#define change_pc(pc)																	\
-do {																					\
-	if (active_address_space[ADDRESS_SPACE_PROGRAM].readlookup[LEVEL1_INDEX((pc) & active_address_space[ADDRESS_SPACE_PROGRAM].addrmask)] != opcode_entry)	\
-		memory_set_opbase(pc);															\
-} while (0)																				\
+#define change_pc(pc)				memory_set_opbase(pc);
 
 /* ----- forces the next branch to generate a call to the opbase handler ----- */
 #define catch_nextBranch()			(opcode_entry = 0xff)

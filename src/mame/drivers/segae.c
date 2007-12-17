@@ -305,7 +305,7 @@ covert megatech / megaplay drivers to use new code etc. etc.
 //static UINT8* sms_rom;
 static UINT8* sms_mainram;
 //static UINT8* smsgg_backupram;
-static TIMER_CALLBACK_PTR( sms_scanline_timer_callback );
+static TIMER_CALLBACK( sms_scanline_timer_callback );
 static struct sms_vdp *vdp2;
 static struct sms_vdp *vdp1;
 
@@ -729,7 +729,7 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->writemode = 0;
 	chip->r_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
-	chip->sms_scanline_timer = timer_alloc_ptr(sms_scanline_timer_callback, chip);
+	chip->sms_scanline_timer = timer_alloc(sms_scanline_timer_callback, chip);
 
 	return chip;
 }
@@ -737,7 +737,7 @@ static void *start_vdp(running_machine *machine, int type)
 /* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
 void segae_md_sms_stop_scanline_timer(void)
 {
-	timer_adjust_ptr(md_sms_vdp->sms_scanline_timer,  attotime_never, attotime_never);
+	timer_adjust(md_sms_vdp->sms_scanline_timer,  attotime_never, 0, attotime_never);
 	memset(md_sms_vdp->vram,0x00,0x4000);
 }
 
@@ -1284,7 +1284,7 @@ static void sms_draw_scanline(int scanline, struct sms_vdp* chip)
 }
 
 
-static TIMER_CALLBACK_PTR( sms_scanline_timer_callback )
+static TIMER_CALLBACK( sms_scanline_timer_callback )
 {
 	/* This function is called at the very start of every scanline starting at the very
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
@@ -1299,12 +1299,12 @@ static TIMER_CALLBACK_PTR( sms_scanline_timer_callback )
        The position to get the H position also has to compensate for a few errors
     */
 //  printf("num %d\n",num );
-	struct sms_vdp *chip = param;
+	struct sms_vdp *chip = ptr;
 
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
 		chip->sms_scanline_counter++;
-		timer_adjust_ptr(chip->sms_scanline_timer, ATTOTIME_IN_HZ(chip->sms_framerate * chip->sms_total_scanlines), attotime_zero);
+		timer_adjust(chip->sms_scanline_timer, ATTOTIME_IN_HZ(chip->sms_framerate * chip->sms_total_scanlines), 0, attotime_zero);
 
 		if (chip->sms_scanline_counter>sms_mode_table[chip->screen_mode].sms2_height)
 		{
@@ -1469,7 +1469,7 @@ static void end_of_frame(struct sms_vdp *chip)
 
 	chip->sms_scanline_counter = -1;
 	chip->yscroll = chip->regs[0x9]; // this can't change mid-frame
-	timer_adjust_ptr(chip->sms_scanline_timer, attotime_zero, attotime_zero);
+	timer_adjust(chip->sms_scanline_timer, attotime_zero, 0, attotime_zero);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1491,7 +1491,7 @@ static VIDEO_START(sms)
 #ifdef UNUSED_FUNCTION
 MACHINE_RESET(sms)
 {
-	timer_adjust_ptr(vdp1->sms_scanline_timer, attotime_zero, attotime_zero);
+	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
 }
 #endif
 
@@ -1949,18 +1949,18 @@ static UINT8 f7_bank_value;
 
 static MACHINE_RESET(systeme)
 {
-	timer_adjust_ptr(vdp1->sms_scanline_timer, attotime_zero, attotime_zero);
-	timer_adjust_ptr(vdp2->sms_scanline_timer, attotime_zero, attotime_zero);
+	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust(vdp2->sms_scanline_timer, attotime_zero, 0, attotime_zero);
 }
 
 MACHINE_RESET(megatech_md_sms)
 {
-	timer_adjust_ptr(md_sms_vdp->sms_scanline_timer, attotime_zero, attotime_zero);
+	timer_adjust(md_sms_vdp->sms_scanline_timer, attotime_zero, 0, attotime_zero);
 }
 
 MACHINE_RESET(megatech_bios)
 {
-	timer_adjust_ptr(vdp1->sms_scanline_timer, attotime_zero, attotime_zero);
+	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
 }
 
 static VIDEO_EOF(systeme)

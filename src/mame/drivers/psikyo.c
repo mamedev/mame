@@ -130,7 +130,7 @@ static int psikyo_readcoinport(int has_mcu)
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
-		timer_call_after_resynch(0, NULL);
+		timer_call_after_resynch(NULL, 0, NULL);
 //      logerror("PC %06X - Read coin port during Z80 NMI\n", activecpu_get_pc());
 	}
 
@@ -171,7 +171,7 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 static WRITE32_HANDLER( psikyo_soundlatch_w )
 {
 	if (ACCESSING_LSB32)
-		timer_call_after_resynch(data & 0xff, psikyo_soundlatch_callback);
+		timer_call_after_resynch(NULL, data & 0xff, psikyo_soundlatch_callback);
 }
 
 /***************************************************************************
@@ -181,7 +181,7 @@ static WRITE32_HANDLER( psikyo_soundlatch_w )
 static WRITE32_HANDLER( s1945_soundlatch_w )
 {
 	if (!(mem_mask & 0x00ff0000))
-		timer_call_after_resynch((data >> 16) & 0xff, psikyo_soundlatch_callback);
+		timer_call_after_resynch(NULL, (data >> 16) & 0xff, psikyo_soundlatch_callback);
 }
 
 static UINT8 s1945_table[256] = {
@@ -1552,7 +1552,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-struct YM2610interface sngkace_ym2610_interface =
+static struct YM2610interface sngkace_ym2610_interface =
 {
 	sound_irq,	/* irq */
 	REGION_SOUND1,	/* delta_t */
@@ -1606,7 +1606,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-struct YM2610interface gunbird_ym2610_interface =
+static struct YM2610interface gunbird_ym2610_interface =
 {
 	sound_irq,	/* irq */
 	REGION_SOUND1,	/* delta_t */

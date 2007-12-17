@@ -443,7 +443,7 @@ Naomi 2 / GD-ROM             |           |              |
 
 #define CPU_CLOCK 200000000
                                  /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
-struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
+static struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static UINT64 *dc_sound_ram;
 

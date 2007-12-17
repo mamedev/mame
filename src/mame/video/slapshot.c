@@ -21,7 +21,7 @@ static INT32 sprites_disabled,sprites_active_area,sprites_master_scrollx,sprites
 static int sprites_flipscreen = 0;
 static UINT16 *spriteram_buffered,*spriteram_delayed;
 
-INT32 taito_sprite_type = 0;
+static INT32 taito_sprite_type = 0;
 UINT16 *taito_sprite_ext;
 size_t taito_spriteext_size;
 static UINT16 spritebank[8];

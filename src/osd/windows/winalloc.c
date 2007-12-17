@@ -328,7 +328,10 @@ void *realloc_file_line(void *memory, size_t size, const char *file, int line)
 	}
 	else
 	{
-		newmemory = (void *) GlobalReAlloc(memory, size, GMEM_MOVEABLE);
+		if (memory != NULL)
+			newmemory = (void *) GlobalReAlloc(memory, size, GMEM_MOVEABLE);
+		else
+			newmemory = (void *) GlobalAlloc(GMEM_FIXED, size);
 	}
 
 	return newmemory;
@@ -380,17 +383,27 @@ void CLIB_DECL free(void *memory)
 
 size_t CLIB_DECL _msize(void *memory)
 {
-	memory_entry *entry = find_entry(memory);
-	if (entry == NULL)
+	size_t result;
+
+	if (use_malloc_tracking())
 	{
-		if (winalloc_in_main_code)
+		memory_entry *entry = find_entry(memory);
+		if (entry == NULL)
 		{
-			fprintf(stderr, "Error: msize a non-existant block\n");
-			osd_break_into_debugger("Error: msize a non-existant block");
+			if (winalloc_in_main_code)
+			{
+				fprintf(stderr, "Error: msize a non-existant block\n");
+				osd_break_into_debugger("Error: msize a non-existant block");
+			}
+			return 0;
 		}
-		return 0;
+		result = entry->size;
 	}
-	return entry->size;
+	else
+	{
+		result = GlobalSize(memory);
+	}
+	return result;
 }
 
 

@@ -133,7 +133,7 @@ static z80sio_interface sio_intf =
 };
 
 
-struct z80_irq_daisy_chain dleuro_daisy_chain[] =
+static struct z80_irq_daisy_chain dleuro_daisy_chain[] =
 {
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 },
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },

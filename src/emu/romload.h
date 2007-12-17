@@ -24,17 +24,19 @@
 ***************************************************************************/
 
 /* ----- per-entry constants ----- */
-#define ROMENTRYTYPE_REGION			1					/* this entry marks the start of a region */
-#define ROMENTRYTYPE_END			2					/* this entry marks the end of a region */
-#define ROMENTRYTYPE_RELOAD			3					/* this entry reloads the previous ROM */
-#define ROMENTRYTYPE_CONTINUE		4					/* this entry continues loading the previous ROM */
-#define ROMENTRYTYPE_FILL			5					/* this entry fills an area with a constant value */
-#define ROMENTRYTYPE_COPY			6					/* this entry copies data from another region/offset */
-#define ROMENTRYTYPE_CARTRIDGE		7					/* this entry specifies a cartridge (MESS) */
-#define ROMENTRYTYPE_IGNORE			8					/* this entry continues loading the previous ROM but throws the data away */
-#define ROMENTRYTYPE_SYSTEM_BIOS		9					/* this entry specifies a bios */
-#define ROMENTRYTYPE_COUNT			10
-
+enum
+{
+	ROMENTRYTYPE_REGION = 1,	/* this entry marks the start of a region */
+	ROMENTRYTYPE_END,		/* this entry marks the end of a region */
+	ROMENTRYTYPE_RELOAD,		/* this entry reloads the previous ROM */
+	ROMENTRYTYPE_CONTINUE,		/* this entry continues loading the previous ROM */
+	ROMENTRYTYPE_FILL,		/* this entry fills an area with a constant value */
+	ROMENTRYTYPE_COPY,		/* this entry copies data from another region/offset */
+	ROMENTRYTYPE_CARTRIDGE,		/* this entry specifies a cartridge (MESS) */
+	ROMENTRYTYPE_IGNORE,		/* this entry continues loading the previous ROM but throws the data away */
+	ROMENTRYTYPE_SYSTEM_BIOS,	/* this entry specifies a bios */
+	ROMENTRYTYPE_COUNT
+};
 
 /* ----- per-region constants ----- */
 #define ROMREGION_WIDTHMASK			0x00000003			/* native width of region, as power of 2 */

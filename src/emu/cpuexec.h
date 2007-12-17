@@ -394,14 +394,8 @@ void cpu_spinuntil_trigger(int trigger);
 /* burn specified CPU cycles until a timer trigger */
 void cpunum_spinuntil_trigger(int cpunum, int trigger);
 
-/* yield our timeslice until a timer trigger */
-void cpu_yielduntil_trigger(int trigger);
-
 /* burn CPU cycles until the next interrupt */
 void cpu_spinuntil_int(void);
-
-/* yield our timeslice until the next interrupt */
-void cpu_yielduntil_int(void);
 
 /* burn CPU cycles until our timeslice is up */
 void cpu_spin(void);
@@ -411,9 +405,6 @@ void cpu_yield(void);
 
 /* burn CPU cycles for a specific period of time */
 void cpu_spinuntil_time(attotime duration);
-
-/* yield our timeslice for a specific period of time */
-void cpu_yielduntil_time(attotime duration);
 
 
 

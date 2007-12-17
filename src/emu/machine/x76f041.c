@@ -78,7 +78,7 @@ struct x76f041_chip
 #define BCR_Z ( 2 )
 #define BCR_T ( 1 )
 
-struct x76f041_chip x76f041[ X76F041_MAXCHIP ];
+static struct x76f041_chip x76f041[ X76F041_MAXCHIP ];
 
 #define COMMAND_WRITE ( 0x00 )
 #define COMMAND_READ ( 0x20 )

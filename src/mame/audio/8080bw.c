@@ -882,7 +882,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 
 MACHINE_START( schaser )
 {
-	schaser_effect_555_timer = timer_alloc(schaser_effect_555_cb);
+	schaser_effect_555_timer = timer_alloc(schaser_effect_555_cb, NULL);
 
 	machine_start_mw8080bw(machine);
 }

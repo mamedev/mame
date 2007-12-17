@@ -145,7 +145,7 @@ static VIDEO_UPDATE( alg )
 static MACHINE_START( alg )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_LDP1450, get_disk_handle(0), 1);
-	serial_timer = timer_alloc(response_timer);
+	serial_timer = timer_alloc(response_timer, NULL);
 	serial_timer_active = FALSE;
 }
 

@@ -1859,7 +1859,7 @@ static NVRAM_HANDLER(tattass)
 
 static MACHINE_RESET( deco32 )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen);
+	raster_irq_timer = timer_alloc(interrupt_gen, NULL);
 }
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )

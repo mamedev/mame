@@ -550,6 +550,7 @@ const game_driver * const drivers[] =
 	DRIVER( vautour2 )	/* bootleg */
 	DRIVER( griffon )	/* bootleg (Videotron) */
 	DRIVER( falcona )	/* bootleg */
+	DRIVER( nextfase )	/* bootleg */
 	DRIVER( pleiads )	/* (c) 1981 Tehkan */
 	DRIVER( pleiadbl )	/* bootleg */
 	DRIVER( pleiadce )	/* (c) 1981 Centuri + Tehkan */
@@ -662,6 +663,7 @@ const game_driver * const drivers[] =
 	DRIVER( skykid )	/* (c) 1985 */
 	DRIVER( skykido )	/* (c) 1985 */
 	DRIVER( skykidd )	/* (c) 1985 */
+	DRIVER( skykids )	/* (c) 1985 */
 	DRIVER( aliensec )	/* (c) 1985 */
 	DRIVER( baraduke )	/* (c) 1985 */
 	DRIVER( metrocrs )	/* (c) 1985 */
@@ -3270,6 +3272,7 @@ V-V                           TP-027
 	DRIVER( myherok )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( shtngmst )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( shtngmsa )	/* 834-5719/5720 (c) 1985 (S2) */
+ 	DRIVER( shtngmsb )	/* 834-5719/5720 (c) 1985 (S2) */
 	DRIVER( chplft )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chplftb )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
 	DRIVER( chplftbl )	/* bootleg (S2) */
@@ -3338,7 +3341,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( enduror1 )	/* (c) 1985 (FD1089B, decrypted) */
 	DRIVER( endurob2 )	/* (c) 1985 (Beta bootleg) */
 	DRIVER( endurobl )	/* (c) 1985 (Herb bootleg) */
-	DRIVER( hangon )	/* (c) 1985 */
+	DRIVER( hangon )	/* (c) 1985 (Rev A)*/
+	DRIVER( hangon1 )	/* (c) 1985 */
 	DRIVER( sharrier )	/* (c) 1985 */
 	DRIVER( sharrir1 )	/* (c) 1985 */
 	DRIVER( shangupb )	/* (c) 1992 (but bootleg, hangon hw?) */
@@ -4192,6 +4196,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( edrandy0 )	/* MAD (c) 1990 Data East Corporation (World) */
 	DRIVER( edrandyj )	/* MAD (c) 1990 Data East Corporation (Japan) */
 	DRIVER( supbtime )	/* MAE (c) 1990 Data East Corporation (World) */
+	DRIVER( supbtima )	/* MAE (c) 1990 Data East Corporation (World) */
 	DRIVER( supbtimj )	/* MAE (c) 1990 Data East Corporation (Japan) */
 	DRIVER( mutantf )	/* MAF (c) 1992 Data East Corporation (World) */
 	DRIVER( mutantfa )	/* MAF (c) 1992 Data East Corporation (World) */
@@ -4971,6 +4976,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( caterplr )	/* (bootleg) */
 	DRIVER( millpac )	/* Valadon */
 	DRIVER( magworm )	/* (bootleg) */
+	DRIVER( mazeinv ) 	/* (proto)          (c) 1982 */
 	DRIVER( milliped )	/* 136013           (c) 1982 */
 	DRIVER( qwak )	 	/* (proto)          (c) 1982 */
 	DRIVER( runaway )	/* (proto)          (c) 1982 */
@@ -5219,6 +5225,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Escape from the Planet of Robot Monsters */
 	DRIVER( eprom )		/* 136069           (c) 1989 */
 	DRIVER( eprom2 )	/* 136069           (c) 1989 */
+	DRIVER( guts )		/* prototype */
 	/* Cyberball 2 Player */
 	DRIVER( cyberb2p )	/* 136071           (c) 1989 */
 	DRIVER( cyberb23 )	/* 136071           (c) 1989 */
@@ -7846,10 +7853,10 @@ Other Sun games
 	DRIVER( esha )		/* (c) 1984 Funai / Gakken */
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
-	DRIVER( peplus )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
-	DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
     DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
     DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
     DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */

@@ -134,7 +134,7 @@ typedef struct
 /* Our CPU structure */
 static spc700i_cpu_struct spc700i_cpu = {0};
 
-int spc700_ICount = 0;
+static int spc700_ICount = 0;
 
 /* Temporary Variables */
 static uint spc700i_source;

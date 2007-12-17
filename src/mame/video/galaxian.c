@@ -1731,8 +1731,8 @@ void galaxian_init_stars(running_machine *machine, int colors_offset)
 
 	galaxian_stars_on = 0;
 	stars_blink_state = 0;
-	stars_blink_timer = timer_alloc(stars_blink_callback);
-	stars_scroll_timer = timer_alloc(stars_scroll_callback);
+	stars_blink_timer = timer_alloc(stars_blink_callback, NULL);
+	stars_scroll_timer = timer_alloc(stars_scroll_callback, NULL);
 	timer_adjusted = 0;
 	stars_colors_start = colors_offset;
 

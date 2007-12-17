@@ -133,7 +133,7 @@ VIDEO_START( atarisy2 )
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset the statics */
-	yscroll_reset_timer = timer_alloc(reset_yscroll_callback);
+	yscroll_reset_timer = timer_alloc(reset_yscroll_callback, NULL);
 	videobank = 0;
 }
 

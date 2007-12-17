@@ -271,7 +271,7 @@ static TIMER_CALLBACK( vblank_stop )
 INTERRUPT_GEN( qix_vblank_start )
 {
 	pia_3_cb1_w(0, 1);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, vblank_stop);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, vblank_stop);
 }
 
 
@@ -372,7 +372,7 @@ static TIMER_CALLBACK( deferred_pia_4_porta_w )
 static WRITE8_HANDLER( sync_pia_4_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	timer_call_after_resynch(data, deferred_pia_4_porta_w);
+	timer_call_after_resynch(NULL, data, deferred_pia_4_porta_w);
 }
 
 
@@ -519,7 +519,7 @@ WRITE8_HANDLER( qix_pia_0_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	timer_call_after_resynch(data | (offset << 8), pia_0_w_callback);
+	timer_call_after_resynch(NULL, data | (offset << 8), pia_0_w_callback);
 }
 
 

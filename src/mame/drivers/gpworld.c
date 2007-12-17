@@ -408,7 +408,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(100), 0, irq_stop);
+	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 
 	laserdisc_vsync(discinfo);
 }

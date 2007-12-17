@@ -199,9 +199,9 @@ static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, v
 static void soft_reset(voodoo_state *v);
 static void check_stalled_cpu(voodoo_state *v, attotime current_time);
 static void flush_fifos(voodoo_state *v, attotime current_time);
-static TIMER_CALLBACK_PTR( stall_cpu_callback );
+static TIMER_CALLBACK( stall_cpu_callback );
 static void stall_cpu(voodoo_state *v, int state, attotime current_time);
-static TIMER_CALLBACK_PTR( vblank_callback );
+static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
@@ -380,7 +380,7 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	v->pci.fifo.size = 64*2;
 	v->pci.fifo.in = v->pci.fifo.out = 0;
 	v->pci.stall_state = NOT_STALLED;
-	v->pci.continue_timer = timer_alloc_ptr(stall_cpu_callback, v);
+	v->pci.continue_timer = timer_alloc(stall_cpu_callback, v);
 
 	/* allocate memory */
 	if (type <= VOODOO_2)
@@ -803,7 +803,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	}
 
 	/* allocate a VBLANK timer */
-	f->vblank_timer = timer_alloc_ptr(vblank_callback, v);
+	f->vblank_timer = timer_alloc(vblank_callback, v);
 	f->vblank = FALSE;
 
 	/* initialize the memory FIFO */
@@ -1087,13 +1087,13 @@ static void adjust_vblank_timer(voodoo_state *v)
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (attotime_compare(vblank_period, attotime_zero) == 0)
 		vblank_period = video_screen_get_frame_period(v->scrnum);
-	timer_adjust_ptr(v->fbi.vblank_timer, vblank_period, attotime_never);
+	timer_adjust(v->fbi.vblank_timer, vblank_period, 0, attotime_never);
 }
 
 
-static TIMER_CALLBACK_PTR( vblank_off_callback )
+static TIMER_CALLBACK( vblank_off_callback )
 {
-	voodoo_state *v = param;
+	voodoo_state *v = ptr;
 
 	if (LOG_VBLANK_SWAP) logerror("--- vblank end\n");
 
@@ -1107,9 +1107,9 @@ static TIMER_CALLBACK_PTR( vblank_off_callback )
 }
 
 
-static TIMER_CALLBACK_PTR( vblank_callback )
+static TIMER_CALLBACK( vblank_callback )
 {
-	voodoo_state *v = param;
+	voodoo_state *v = ptr;
 
 	if (LOG_VBLANK_SWAP) logerror("--- vblank start\n");
 
@@ -1135,7 +1135,7 @@ static TIMER_CALLBACK_PTR( vblank_callback )
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	timer_set_ptr(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, vblank_off_callback);
+	timer_set(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, 0, vblank_off_callback);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -2139,9 +2139,9 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
  *
  *************************************/
 
-static TIMER_CALLBACK_PTR( stall_cpu_callback )
+static TIMER_CALLBACK( stall_cpu_callback )
 {
-	check_stalled_cpu(param, timer_get_time());
+	check_stalled_cpu(ptr, timer_get_time());
 }
 
 
@@ -2194,7 +2194,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 	/* if not, set a timer for the next one */
 	else
 	{
-		timer_adjust_ptr(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), attotime_never);
+		timer_adjust(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0, attotime_never);
 	}
 }
 
@@ -2215,7 +2215,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 		cpu_spinuntil_trigger(v->trigger);
 
 	/* set a timer to clear the stall */
-	timer_adjust_ptr(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), attotime_never);
+	timer_adjust(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0, attotime_never);
 }
 
 

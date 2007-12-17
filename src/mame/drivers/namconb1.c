@@ -347,7 +347,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( video_screen_get_time_until_pos(0, scanline, 0), scanline, namconb2_TriggerPOSIRQ );
+		timer_set( video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
 	}
 } /* namconb2_interrupt */
 static INTERRUPT_GEN( namconb1_interrupt )
@@ -395,7 +395,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( video_screen_get_time_until_pos(0, scanline, 0), scanline, namconb1_TriggerPOSIRQ );
+		timer_set( video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 

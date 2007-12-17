@@ -39,7 +39,7 @@ WRITE8_HANDLER( sys16_7751_audio_8255_w )
 	if ((data & 0x0f) != 8)
 	{
 		cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);
-		timer_set(ATTOTIME_IN_USEC(300), data, trigger_7751_sound);
+		timer_set(ATTOTIME_IN_USEC(300), NULL, data, trigger_7751_sound);
 	}
 }
 

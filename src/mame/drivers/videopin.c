@@ -65,13 +65,13 @@ static TIMER_CALLBACK( interrupt_callback )
 		scanline = 32;
 	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( videopin )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32, 0), 32, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(0, 32, 0), NULL, 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 

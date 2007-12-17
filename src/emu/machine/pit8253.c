@@ -781,14 +781,14 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 				timer->outputtimer = NULL;
 			else
 			{
-				timer->outputtimer = timer_alloc(outputcallback);
+				timer->outputtimer = timer_alloc(outputcallback, NULL);
 				timer_adjust(timer->outputtimer, attotime_never, i	| (timerno<<4),	attotime_zero);
 			}
 			if (timer->freq_callback ==	NULL)
 				timer->freqtimer = NULL;
 			else
 			{
-				timer->freqtimer = timer_alloc(freqcallback);
+				timer->freqtimer = timer_alloc(freqcallback, NULL);
 				timer_adjust(timer->freqtimer,	attotime_never,	i |	(timerno<<4), attotime_zero);
 			}
 

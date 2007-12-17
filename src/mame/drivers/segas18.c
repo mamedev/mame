@@ -204,7 +204,7 @@ static MACHINE_RESET( system18 )
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
 	if (machine->drv->cpu[2].type == CPU_I8751)
-		timer_call_after_resynch(0, boost_interleave);
+		timer_call_after_resynch(NULL, 0, boost_interleave);
 }
 
 

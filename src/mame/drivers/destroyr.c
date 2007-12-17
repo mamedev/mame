@@ -49,14 +49,14 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 	/* PCB supports two dials, but cab has only got one */
 
-	timer_set(video_screen_get_time_until_pos(0, readinputport(3), 0), 0, destroyr_dial_callback);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(0, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 
 static MACHINE_RESET( destroyr )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 

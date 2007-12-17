@@ -94,7 +94,7 @@ static void sc61860_reset(void)
 static void sc61860_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	sc61860.config = (SC61860_CONFIG *) config;
-	timer_pulse(ATTOTIME_IN_HZ(500), 0, sc61860_2ms_tick);
+	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
 }
 
 static void sc61860_get_context (void *dst)

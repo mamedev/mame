@@ -16,6 +16,7 @@
 
 // MAME headers
 #include "osdcore.h"
+#include "osinline.h"
 
 
 //============================================================

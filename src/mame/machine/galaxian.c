@@ -84,7 +84,7 @@ static void machine_reset_common( int line )
 	TTL7474_preset_w(1, 0);
 
 	/* start a timer to generate interrupts */
-	int_timer = timer_alloc(interrupt_timer);
+	int_timer = timer_alloc(interrupt_timer, NULL);
 	timer_adjust(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 }
 

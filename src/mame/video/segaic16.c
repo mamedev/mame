@@ -1178,14 +1178,14 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(video_screen_get_time_until_pos(0, 261, 0), param, segaic16_tilemap_16b_latch_values);
+	timer_set(video_screen_get_time_until_pos(0, 261, 0), NULL, param, segaic16_tilemap_16b_latch_values);
 }
 
 
 static void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(video_screen_get_time_until_pos(0, 261, 0), info->index, segaic16_tilemap_16b_latch_values);
+	timer_set(video_screen_get_time_until_pos(0, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
 }
 
 

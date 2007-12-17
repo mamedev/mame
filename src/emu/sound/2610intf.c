@@ -69,15 +69,15 @@ static void IRQHandler(void *param,int irq)
 }
 
 /* Timer overflow callback from timer.c */
-static TIMER_CALLBACK_PTR( timer_callback_0 )
+static TIMER_CALLBACK( timer_callback_0 )
 {
-	struct ym2610_info *info = param;
+	struct ym2610_info *info = ptr;
 	YM2610TimerOver(info->chip,0);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_1 )
+static TIMER_CALLBACK( timer_callback_1 )
 {
-	struct ym2610_info *info = param;
+	struct ym2610_info *info = ptr;
 	YM2610TimerOver(info->chip,1);
 }
 
@@ -93,7 +93,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 
 		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_ptr(info->timer[c], period, attotime_zero);
+			timer_adjust(info->timer[c], period, 0, attotime_zero);
 	}
 }
 
@@ -138,8 +138,8 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc_ptr(timer_callback_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_1, info);
+	info->timer[0] = timer_alloc(timer_callback_0, info);
+	info->timer[1] = timer_alloc(timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
@@ -190,8 +190,8 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc_ptr(timer_callback_0, info);
-	info->timer[1] =timer_alloc_ptr(timer_callback_1, info);
+	info->timer[0] =timer_alloc(timer_callback_0, info);
+	info->timer[1] =timer_alloc(timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);

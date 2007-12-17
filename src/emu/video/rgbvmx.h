@@ -12,7 +12,9 @@
 #ifndef __RGBVMX__
 #define __RGBVMX__
 
+#ifndef __APPLE_ALTIVEC__
 #include <altivec.h>
+#endif
 
 
 /***************************************************************************

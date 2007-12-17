@@ -3,8 +3,6 @@
 
 #include "cpuintrf.h"
 
-extern int z80gb_ICount;
-
 typedef struct {
 	UINT16	*regs;
 	UINT8	features;

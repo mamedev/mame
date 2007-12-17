@@ -1197,7 +1197,7 @@ static void mpu4_config_common(void)
 	pia_config(4,&pia_ic7_intf);
 	pia_config(5,&pia_ic8_intf);
 
-	ic24_timer = timer_alloc(ic24_timeout);
+	ic24_timer = timer_alloc(ic24_timeout, NULL);
 	// setup ptm ////////////////////////////////////////////////////////////
 	ptm6840_config(0, &ptm_ic2_intf );
 }

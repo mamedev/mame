@@ -154,7 +154,7 @@ static TIMER_CALLBACK( delayed_command_w )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_call_after_resynch(data, delayed_command_w);
+	timer_call_after_resynch(NULL, data, delayed_command_w);
 }
 
 

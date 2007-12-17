@@ -306,7 +306,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 		if (event_index >= MAX_INPUT_EVENTS)
 		{
 			input_event_index[cpunum][line]--;
-			cpunum_empty_event_queue(Machine, cpunum | (line << 8));
+			cpunum_empty_event_queue(Machine, NULL, cpunum | (line << 8));
 			event_index = input_event_index[cpunum][line]++;
 			logerror("Exceeded pending input line event queue on CPU %d!\n", cpunum);
 		}
@@ -318,7 +318,7 @@ void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vecto
 
 			/* if this is the first one, set the timer */
 			if (event_index == 0)
-				timer_call_after_resynch(cpunum | (line << 8), cpunum_empty_event_queue);
+				timer_call_after_resynch(NULL, cpunum | (line << 8), cpunum_empty_event_queue);
 		}
 	}
 }

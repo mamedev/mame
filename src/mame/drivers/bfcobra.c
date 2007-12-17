@@ -138,7 +138,7 @@ static void update_irqs(void)
 ***************************************************************************/
 
 #ifdef MAME_DEBUG
-int DEBUG_BLITTER = 0;
+static int DEBUG_BLITTER = 0;
 #endif
 
 /* Typedefs */

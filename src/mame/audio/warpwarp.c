@@ -215,7 +215,7 @@ void *warpwarp_sh_start(int clock, const struct CustomSound_interface *config)
 
 	channel = stream_create(0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	sound_volume_timer = timer_alloc(sound_volume_decay);
-	music_volume_timer = timer_alloc(music_volume_decay);
+	sound_volume_timer = timer_alloc(sound_volume_decay, NULL);
+	music_volume_timer = timer_alloc(music_volume_decay, NULL);
     return auto_malloc(1);
 }

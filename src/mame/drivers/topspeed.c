@@ -307,14 +307,14 @@ static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 static INTERRUPT_GEN( topspeed_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, topspeed_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_interrupt6);
 	cpunum_set_input_line(0, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( topspeed_cpub_interrupt )
 {
 	/* Unsure how many int6's per frame */
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, topspeed_cpub_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_cpub_interrupt6);
 	cpunum_set_input_line(2, 5, HOLD_LINE);
 }
 

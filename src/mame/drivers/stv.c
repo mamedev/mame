@@ -2642,8 +2642,8 @@ static GFXDECODE_START( stv )
 
 GFXDECODE_END
 
-struct sh2_config sh2_conf_master = { 0 };
-struct sh2_config sh2_conf_slave  = { 1 };
+static struct sh2_config sh2_conf_master = { 0 };
+static struct sh2_config sh2_conf_slave  = { 1 };
 
 static int scsp_last_line = 0;
 

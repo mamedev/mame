@@ -8,7 +8,7 @@
 #include "driver.h"
 
 #ifdef MAME_DEBUG
- int nycaptor_mask=0;
+static  int nycaptor_mask=0;
 #endif
 
 static tilemap *bg_tilemap;

@@ -128,7 +128,7 @@ static TIMER_CALLBACK( irq5_gen )
 static INTERRUPT_GEN( irq4_gen )
 {
 	cpunum_set_input_line(0, R3000_IRQ4, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, irq5_gen);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, irq5_gen);
 }
 
 
@@ -269,7 +269,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-struct EEPROM_interface eeprom_interface_policetr =
+static struct EEPROM_interface eeprom_interface_policetr =
 {
 	8,				// address bits 8
 	16,				// data bits    16

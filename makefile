@@ -62,6 +62,33 @@ endif
 
 
 #-------------------------------------------------
+# configure name of final executable
+#-------------------------------------------------
+
+# uncomment and specify prefix to be added to the name
+# PREFIX =
+
+# uncomment and specify suffix to be added to the name
+# SUFFIX =
+
+
+
+#-------------------------------------------------
+# specify architecture-specific optimizations
+#-------------------------------------------------
+
+# uncomment and specify architecture-specific optimizations here
+# some examples:
+#   optimize for I686:   ARCHOPTS = -march=pentiumpro
+#   optimize for Core 2: ARCHOPTS = -march=pentium-m -msse3
+#   optimize for G4:     ARCHOPTS = -mcpu=G4
+# note that we leave this commented by default so that you can
+# configure this in your environment and never have to think about it
+# ARCHOPTS =
+
+
+
+#-------------------------------------------------
 # specify program options; see each option below 
 # for details
 #-------------------------------------------------
@@ -88,20 +115,11 @@ X86_PPC_DRC = 1
 # for details
 #-------------------------------------------------
 
-# uncomment one of the next lines to build a target-optimized build
-# NATIVE = 1
-# ATHLON = 1
-# AMD64 = 1
-# I686 = 1
-# P4 = 1
-# PM = 1
-# CORE2 = 1
-# G4 = 1
-# G5 = 1
-# CELL = 1
-
 # uncomment next line if you are building for a 64-bit target
 # PTR64 = 1
+
+# uncomment next line if you are building for a big-endian target
+# BIGENDIAN = 1
 
 # uncomment next line to build expat as part of MAME build
 BUILD_EXPAT = 1
@@ -179,78 +197,12 @@ RM = @rm -f
 
 
 #-------------------------------------------------
-# based on the architecture, determine suffixes
-# and endianness
-#-------------------------------------------------
-
-# by default, don't compile for a specific target CPU
-# and assume little-endian (x86)
-ARCH = 
-ENDIAN = little
-
-# architecture-specific builds get extra options
-ifdef NATIVE
-SUFFIX = nat
-ARCH = -march=native
-endif
-
-ifdef ATHLON
-SUFFIX = at
-ARCH = -march=athlon
-endif
-
-ifdef AMD64
-SUFFIX = 64
-ARCH = -march=athlon64
-endif
-
-ifdef I686
-SUFFIX = pp
-ARCH = -march=pentiumpro
-endif
-
-ifdef P4
-SUFFIX = p4
-ARCH = -march=pentium4
-endif
-
-ifdef PM
-SUFFIX = pm
-ARCH = -march=pentium-m
-endif
-
-ifdef CORE2
-SUFFIX = c2
-ARCH = -march=pentium-m -msse3
-endif
-
-ifdef G4
-SUFFIX = g4
-ARCH = -mcpu=G4
-ENDIAN = big
-endif
-
-ifdef G5
-SUFFIX = g5
-ARCH = -mcpu=G5
-ENDIAN = big
-endif
-
-ifdef CELL
-SUFFIX = cbe
-ARCH = 
-ENDIAN = big
-endif
-
-
-
-#-------------------------------------------------
 # form the name of the executable
 #-------------------------------------------------
 
 # debug builds just get the 'd' suffix and nothing more
 ifdef DEBUG
-SUFFIX = d
+DEBUGSUFFIX = d
 endif
 
 # the name is just 'target' if no subtarget; otherwise it is
@@ -261,8 +213,8 @@ else
 NAME = $(TARGET)$(SUBTARGET)
 endif
 
-# fullname is prefix+name+suffix
-FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)
+# fullname is prefix+name+suffix+debugsuffix
+FULLNAME = $(PREFIX)$(NAME)$(SUFFIX)$(DEBUGSUFFIX)
 
 # add an EXE suffix to get the final emulator name
 EMULATOR = $(FULLNAME)$(EXE)
@@ -299,7 +251,7 @@ endif
 DEFS += -DINLINE="static __inline__"
 
 # define LSB_FIRST if we are a little-endian target
-ifeq ($(ENDIAN),little)
+ifndef BIGENDIAN
 DEFS += -DLSB_FIRST
 endif
 
@@ -334,6 +286,9 @@ endif
 # we compile to C89 standard with GNU extensions
 CFLAGS = -std=gnu89
 
+# this speeds it up a bit by piping between the preprocessor/compiler/assembler
+CFLAGS += -pipe
+
 # add -g if we need symbols
 ifdef SYMBOLS
 CFLAGS += -g
@@ -366,8 +321,8 @@ CFLAGS += -O$(OPTIMIZE)
 # if we are optimizing, include optimization options
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
-CFLAGS += -Werror $(ARCH) -fno-strict-aliasing
-#CFLAGS += $(ARCH) -fno-strict-aliasing
+CFLAGS += -Werror $(ARCHOPTS) -fno-strict-aliasing
+#CFLAGS += $(ARCHOPTS) -fno-strict-aliasing
 endif
 
 # if symbols are on, make sure we have frame pointers

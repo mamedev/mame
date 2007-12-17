@@ -15,8 +15,8 @@
 extern UINT8 jackal_interrupt_enable;
 extern void jackal_mark_tile_dirty(int offset);
 
-UINT8 *jackal_rambank = 0;
-UINT8 *jackal_spritebank = 0;
+static UINT8 *jackal_rambank = 0;
+static UINT8 *jackal_spritebank = 0;
 
 
 MACHINE_RESET( jackal )

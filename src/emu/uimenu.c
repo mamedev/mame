@@ -229,8 +229,8 @@ INLINE int get_num_dips(void)
 {
 	int num = 0;
 
-	while (dip_switch_model[num].dip_name != NULL && num++ < MAX_PHYSICAL_DIPS)
-		;
+	while (dip_switch_model[num].dip_name != NULL && num < MAX_PHYSICAL_DIPS)
+		num++;
 
 	return num;
 }

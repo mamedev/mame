@@ -9,4 +9,7 @@
 VIDEO_START( eprom );
 VIDEO_UPDATE( eprom );
 
+VIDEO_START( guts );
+VIDEO_UPDATE( guts );
+
 void eprom_scanline_update(running_machine *machine, int scrnum, int scanline);

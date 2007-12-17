@@ -32,7 +32,7 @@ static int ticketnotdispensed;
 
 static struct ticket_state dispenser[MAX_DISPENSERS];
 
-static TIMER_CALLBACK_PTR( ticket_dispenser_toggle );
+static TIMER_CALLBACK( ticket_dispenser_toggle );
 
 
 /***************************************************************************
@@ -53,7 +53,7 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 	{
 		dispenser[i].status	= ticketnotdispensed;
 		dispenser[i].power 	= 0x00;
-		dispenser[i].timer 	= timer_alloc_ptr(ticket_dispenser_toggle, &dispenser[i]);
+		dispenser[i].timer 	= timer_alloc(ticket_dispenser_toggle, &dispenser[i]);
 
 		state_save_register_item("ticket", i, dispenser[i].status);
 		state_save_register_item("ticket", i, dispenser[i].power);
@@ -102,7 +102,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			timer_adjust_ptr(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), attotime_zero);
+			timer_adjust(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 			dispenser[0].power = 1;
 
 			dispenser[0].status = ticketnotdispensed;
@@ -115,7 +115,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			timer_adjust_ptr(dispenser[0].timer, attotime_never, attotime_never);
+			timer_adjust(dispenser[0].timer, attotime_never, 0, attotime_never);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
 		}
@@ -132,7 +132,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
 #endif
-			timer_adjust_ptr(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), attotime_zero);
+			timer_adjust(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 			dispenser[1].power = 1;
 
 			dispenser[1].status = ticketnotdispensed;
@@ -145,7 +145,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 #ifdef DEBUG_TICKET
 			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
 #endif
-			timer_adjust_ptr(dispenser[1].timer, attotime_never, attotime_never);
+			timer_adjust(dispenser[1].timer, attotime_never, 0, attotime_never);
 			set_led_status(2,0);
 			dispenser[1].power = 0;
 		}
@@ -160,9 +160,9 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
   When a ticket dispenses, there is N milliseconds of status = high,
   and N milliseconds of status = low (a wait cycle?).
 ***************************************************************************/
-static TIMER_CALLBACK_PTR( ticket_dispenser_toggle )
+static TIMER_CALLBACK( ticket_dispenser_toggle )
 {
-	struct ticket_state *dispenser = param;
+	struct ticket_state *dispenser = ptr;
 
 	/* If we still have power, keep toggling ticket states. */
 	if (dispenser->power)
@@ -171,7 +171,7 @@ static TIMER_CALLBACK_PTR( ticket_dispenser_toggle )
 #ifdef DEBUG_TICKET
 		logerror("Ticket Status Changed to %02X\n", status);
 #endif
-		timer_adjust_ptr(dispenser->timer, ATTOTIME_IN_MSEC(time_msec), attotime_zero);
+		timer_adjust(dispenser->timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 	}
 
 	if (dispenser->status == ticketdispensed)

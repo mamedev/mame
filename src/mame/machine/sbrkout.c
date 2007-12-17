@@ -12,7 +12,7 @@
 #define SBRKOUT_DOUBLE      0x01
 #define SBRKOUT_CAVITY      0x02
 
-int sbrkout_game_switch = SBRKOUT_PROGRESSIVE;
+static int sbrkout_game_switch = SBRKOUT_PROGRESSIVE;
 
 
 /***************************************************************************

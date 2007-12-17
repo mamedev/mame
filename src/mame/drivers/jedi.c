@@ -169,7 +169,7 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static MACHINE_START( jedi )
 {
 	/* set a timer to run the interrupts */
-	jedi_timer = timer_alloc(generate_interrupt);
+	jedi_timer = timer_alloc(generate_interrupt, NULL);
 	timer_adjust(jedi_timer,video_screen_get_time_until_pos(0, 32, 0), 32, attotime_zero);
 
 	/* configure the banks */
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( delayed_sound_latch_w )
 
 static WRITE8_HANDLER( sound_latch_w )
 {
-	timer_call_after_resynch(data, delayed_sound_latch_w);
+	timer_call_after_resynch(NULL, data, delayed_sound_latch_w);
 }
 
 

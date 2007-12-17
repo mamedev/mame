@@ -96,8 +96,6 @@ const char *spc700_info(void *context, int regnum);
 /* Pulse the SO (Set Overflow) pin on the CPU */
 void spc700_pulse_so(void);
 
-extern int spc700_ICount;				/* cycle count */
-
 int spc700_execute(int clocks);
 
 

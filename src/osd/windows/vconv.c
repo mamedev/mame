@@ -86,6 +86,7 @@ static const translation_info gcc_translate[] =
 	{ 0,		"-mwindows",			"" },
 	{ 0,		"-mno-cygwin",			"" },
 	{ 0,		"-std=gnu89",			"" },
+	{ 0,		"-pipe",				"" },
 	{ 0 }
 };
 

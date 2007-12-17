@@ -34,15 +34,15 @@ static void IRQHandler(void *param,int irq)
 }
 
 /* Timer overflow callback from timer.c */
-static TIMER_CALLBACK_PTR( timer_callback_2612_0 )
+static TIMER_CALLBACK( timer_callback_2612_0 )
 {
-	struct ym2612_info *info = param;
+	struct ym2612_info *info = ptr;
 	YM2612TimerOver(info->chip,0);
 }
 
-static TIMER_CALLBACK_PTR( timer_callback_2612_1 )
+static TIMER_CALLBACK( timer_callback_2612_1 )
 {
-	struct ym2612_info *info = param;
+	struct ym2612_info *info = ptr;
 	YM2612TimerOver(info->chip,1);
 }
 
@@ -57,7 +57,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 	{	/* Start FM Timer */
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 		if (!timer_enable(info->timer[c], 1))
-			timer_adjust_ptr(info->timer[c], period, attotime_zero);
+			timer_adjust(info->timer[c], period, 0, attotime_zero);
 	}
 }
 
@@ -99,8 +99,8 @@ static void *ym2612_start(int sndindex, int clock, const void *config)
 
 	/* FM init */
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc_ptr(timer_callback_2612_0, info);
-	info->timer[1] = timer_alloc_ptr(timer_callback_2612_1, info);
+	info->timer[0] = timer_alloc(timer_callback_2612_0, info);
+	info->timer[1] = timer_alloc(timer_callback_2612_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);

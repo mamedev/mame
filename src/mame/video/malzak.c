@@ -28,7 +28,8 @@ static INT8 frame_count;
 #define SAA5050_BLACK   0
 #define SAA5050_WHITE   7
 
-struct	{
+static struct
+{
 	UINT16	saa5050_flags;
 	UINT8	saa5050_forecol;
 	UINT8	saa5050_backcol;

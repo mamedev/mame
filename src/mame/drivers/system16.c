@@ -271,7 +271,7 @@ static struct MSM5205interface tturfbl_msm5205_interface =
 };
 
 
-UINT8 *tturfbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
+static UINT8 *tturfbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
 
 static READ8_HANDLER( tturfbl_soundbank_r )
 {

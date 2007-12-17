@@ -170,7 +170,7 @@ static TIMER_CALLBACK( irq_callback )
 
 static void create_irq_timer(void)
 {
-	irq_timer = timer_alloc(irq_callback);
+	irq_timer = timer_alloc(irq_callback, NULL);
 }
 
 
@@ -247,7 +247,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static void create_nmi_timer(void)
 {
-	nmi_timer = timer_alloc(nmi_callback);
+	nmi_timer = timer_alloc(nmi_callback, NULL);
 }
 
 

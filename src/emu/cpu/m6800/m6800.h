@@ -83,7 +83,7 @@ extern void m6802_get_info(UINT32 state, cpuinfo *info);
 extern void m6803_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#if (HAS_M6803||HAS_HD63701)
+#if (HAS_M6801||HAS_M6803||HAS_HD63701)
 /* By default, on a port write port bits which are not set as output in the DDR */
 /* are set to the value returned by a read from the same port. If you need to */
 /* know the DDR for e.g. port 1, do m6803_internal_registers_r(M6801_DDR1) */

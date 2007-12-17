@@ -2430,7 +2430,7 @@ static TIMER_CALLBACK( t90_timer_callback )
 			case 2:
 				if ( !is16bit )
 					if ( (T90.internal_registers[ T90_TCLK - T90_IOBASE ] & (0x03 << (i * 2 + 2))) == 0 )	// T0/T1 match signal clocks T1/T3
-						t90_timer_callback(machine, i+1);
+						t90_timer_callback(machine, NULL, i+1);
 				break;
 		}
 	}
@@ -2446,7 +2446,7 @@ static TIMER_CALLBACK( t90_timer_callback )
 			case 0:
 			case 2:
 				if ( is16bit )	// T0/T1 overflow signal clocks T1/T3
-					t90_timer_callback(machine, i+1);
+					t90_timer_callback(machine, NULL, i+1);
 				break;
 		}
 	}
@@ -2662,9 +2662,9 @@ static void t90_init(int index, int clock, const void *config, int (*irqcallback
 	// Timers
 
 	for (i = 0; i < 4; i++)
-		T90.timer[i] = timer_alloc(t90_timer_callback);
+		T90.timer[i] = timer_alloc(t90_timer_callback, NULL);
 
-	T90.timer[4] = timer_alloc(t90_timer4_callback);
+	T90.timer[4] = timer_alloc(t90_timer4_callback, NULL);
 }
 
 static ADDRESS_MAP_START(tmp90840_mem, ADDRESS_SPACE_PROGRAM, 8)

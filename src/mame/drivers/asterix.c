@@ -127,7 +127,7 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(ATTOTIME_IN_USEC(5),0,nmi_callback);
+	timer_set(ATTOTIME_IN_USEC(5), NULL,0,nmi_callback);
 }
 
 static WRITE16_HANDLER( sound_irq_w )

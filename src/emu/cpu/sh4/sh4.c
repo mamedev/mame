@@ -4121,27 +4121,27 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh4_config *conf = config;
 
-	sh4.timer0 = timer_alloc(sh4_timer0_callback);
+	sh4.timer0 = timer_alloc(sh4_timer0_callback, NULL);
 	timer_adjust(sh4.timer0, attotime_never, 0, attotime_zero);
-	sh4.timer1 = timer_alloc(sh4_timer1_callback);
+	sh4.timer1 = timer_alloc(sh4_timer1_callback, NULL);
 	timer_adjust(sh4.timer1, attotime_never, 0, attotime_zero);
-	sh4.timer2 = timer_alloc(sh4_timer2_callback);
+	sh4.timer2 = timer_alloc(sh4_timer2_callback, NULL);
 	timer_adjust(sh4.timer2, attotime_never, 0, attotime_zero);
 
-	sh4.dma_timer[0] = timer_alloc(sh4_dmac_callback);
+	sh4.dma_timer[0] = timer_alloc(sh4_dmac_callback, NULL);
 	timer_adjust(sh4.dma_timer[0], attotime_never, 0, attotime_zero);
-	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback);
+	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback, NULL);
 	timer_adjust(sh4.dma_timer[1], attotime_never, 0, attotime_zero);
-	sh4.dma_timer[2] = timer_alloc(sh4_dmac_callback);
+	sh4.dma_timer[2] = timer_alloc(sh4_dmac_callback, NULL);
 	timer_adjust(sh4.dma_timer[2], attotime_never, 0, attotime_zero);
-	sh4.dma_timer[3] = timer_alloc(sh4_dmac_callback);
+	sh4.dma_timer[3] = timer_alloc(sh4_dmac_callback, NULL);
 	timer_adjust(sh4.dma_timer[3], attotime_never, 0, attotime_zero);
 
-	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback);
+	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback, NULL);
 	timer_adjust(sh4.refresh_timer, attotime_never, 0, attotime_zero);
 	sh4.refresh_timer_base = 0;
 
-	sh4.rtc_timer = timer_alloc(sh4_rtc_timer_callback);
+	sh4.rtc_timer = timer_alloc(sh4_rtc_timer_callback, NULL);
 	timer_adjust(sh4.rtc_timer, attotime_never, 0, attotime_zero);
 
 	sh4.m = auto_malloc(16384*4);

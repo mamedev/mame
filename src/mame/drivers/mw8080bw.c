@@ -872,7 +872,7 @@ static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 static MACHINE_START( maze )
 {
 	/* create astable timer for IC B1 */
-	timer_pulse(MAZE_555_B1_PERIOD, 0, maze_tone_timing_timer_callback);
+	timer_pulse(MAZE_555_B1_PERIOD, NULL, 0, maze_tone_timing_timer_callback);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	maze_tone_timing_state = 0;
@@ -2048,8 +2048,8 @@ static TIMER_CALLBACK( spcenctr_strobe_timer_callback )
 static MACHINE_START( spcenctr )
 {
 	/* create timers */
-	spcenctr_strobe_on_timer = timer_alloc(spcenctr_strobe_timer_callback);
-	spcenctr_strobe_off_timer = timer_alloc(spcenctr_strobe_timer_callback);
+	spcenctr_strobe_on_timer = timer_alloc(spcenctr_strobe_timer_callback, NULL);
+	spcenctr_strobe_off_timer = timer_alloc(spcenctr_strobe_timer_callback, NULL);
 
 	/* setup for save states */
 	state_save_register_global(spcenctr_strobe_state);

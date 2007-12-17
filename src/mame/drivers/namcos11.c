@@ -824,7 +824,7 @@ static DRIVER_INIT( namcos11 )
 	int n_game;
 	emu_timer *timer;
 
-	timer = timer_alloc( mcu_timer );
+	timer = timer_alloc( mcu_timer , NULL);
 	timer_adjust( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
 	psx_driver_init();

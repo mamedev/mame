@@ -196,7 +196,7 @@ static MACHINE_START( cloud9 )
 	video_screen_configure(0, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq);
+	irq_timer = timer_alloc(clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(0-64);
 

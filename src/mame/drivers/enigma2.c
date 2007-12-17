@@ -114,8 +114,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 
 static void create_interrupt_timers(void)
 {
-	interrupt_clear_timer = timer_alloc(interrupt_clear_callback);
-	interrupt_assert_timer = timer_alloc(interrupt_assert_callback);
+	interrupt_clear_timer = timer_alloc(interrupt_clear_callback, NULL);
+	interrupt_assert_timer = timer_alloc(interrupt_assert_callback, NULL);
 }
 
 

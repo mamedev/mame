@@ -167,7 +167,6 @@ Notes:
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/rsp/rsp.h"
 #include "streams.h"
 #include "sound/custom.h"
 #include "includes/n64.h"
@@ -434,6 +433,7 @@ static MACHINE_DRIVER_START( aleck64 )
 	MDRV_CPU_VBLANK_INT( n64_vblank, 1 )
 
 	MDRV_CPU_ADD(RSP, 62500000)
+	MDRV_CPU_CONFIG(n64_rsp_config)
 	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
 
 	MDRV_MACHINE_RESET( aleck64 )

@@ -118,7 +118,7 @@ UINT32 *atarirle_0_spriteram32;
 //UINT16 *atarirle_0_table;
 //UINT32 *atarirle_0_table32;
 
-int atarirle_hilite_index = -1;
+static int atarirle_hilite_index = -1;
 
 
 

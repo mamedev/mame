@@ -527,7 +527,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	timer_call_after_resynch(data, delayed_z80_control_w);
+	timer_call_after_resynch(NULL, data, delayed_z80_control_w);
 }
 
 

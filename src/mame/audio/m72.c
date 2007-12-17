@@ -107,7 +107,7 @@ static TIMER_CALLBACK( setvector_callback )
 
 MACHINE_RESET( m72_sound )
 {
-	setvector_callback(machine, VECTOR_INIT);
+	setvector_callback(machine, NULL, VECTOR_INIT);
 
 	state_save_register_global(irqvector);
 	state_save_register_global(sample_addr);
@@ -116,9 +116,9 @@ MACHINE_RESET( m72_sound )
 void m72_ym2151_irq_handler(int irq)
 {
 	if (irq)
-		timer_call_after_resynch(YM2151_ASSERT,setvector_callback);
+		timer_call_after_resynch(NULL, YM2151_ASSERT,setvector_callback);
 	else
-		timer_call_after_resynch(YM2151_CLEAR,setvector_callback);
+		timer_call_after_resynch(NULL, YM2151_CLEAR,setvector_callback);
 }
 
 WRITE16_HANDLER( m72_sound_command_w )
@@ -126,19 +126,19 @@ WRITE16_HANDLER( m72_sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(offset,data);
-		timer_call_after_resynch(Z80_ASSERT,setvector_callback);
+		timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_command_byte_w )
 {
 	soundlatch_w(offset,data);
-	timer_call_after_resynch(Z80_ASSERT,setvector_callback);
+	timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 }
 
 WRITE8_HANDLER( m72_sound_irq_ack_w )
 {
-	timer_call_after_resynch(Z80_CLEAR,setvector_callback);
+	timer_call_after_resynch(NULL, Z80_CLEAR,setvector_callback);
 }
 
 

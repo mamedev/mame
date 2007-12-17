@@ -262,7 +262,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 			/* set a timer for an arbitrarily short period.
                The real time it takes to clear to screen is not
                important to the software */
-			timer_call_after_resynch(0, clear_screen_done_callback);
+			timer_call_after_resynch(NULL, 0, clear_screen_done_callback);
 
 			break;
 		}
@@ -281,7 +281,7 @@ static void via_irq(int state)
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
        cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
        leave time for the program to see the flag change. */
-	timer_set(ATTOTIME_IN_USEC(50), state, via_irq_delayed);
+	timer_set(ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
 }
 
 
@@ -319,7 +319,7 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 
 static void create_via_0_timer(void)
 {
-	via_0_ca1_timer = timer_alloc(via_0_ca1_timer_callback);
+	via_0_ca1_timer = timer_alloc(via_0_ca1_timer_callback, NULL);
 }
 
 

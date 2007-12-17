@@ -174,7 +174,7 @@ static TIMER_CALLBACK( sound_command_w )
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_LSB)
-		timer_call_after_resynch(data & 0xff, sound_command_w);
+		timer_call_after_resynch(NULL, data & 0xff, sound_command_w);
 }
 
 READ16_HANDLER( vertigo_sio_r )

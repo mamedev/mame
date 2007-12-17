@@ -55,14 +55,14 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(1);
 
 	/* use a timer to make long transfers faster */
-	timer_set(ATTOTIME_IN_USEC(50), 0, 0);
+	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_LSB)
-		timer_call_after_resynch(data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
 
 

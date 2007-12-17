@@ -300,7 +300,7 @@ void video_init(running_machine *machine)
 			internal_screen_info *info = &viddata->scrinfo[scrnum];
 
 			/* allocate a timer to reset partial updates */
-			info->scanline0_timer = timer_alloc(scanline0_callback);
+			info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
 
 			/* make pointers back to the config and state */
 			info->config = &machine->drv->screen[scrnum];
@@ -1016,7 +1016,7 @@ static TIMER_CALLBACK( scanline0_callback )
     operations
 -------------------------------------------------*/
 
-void video_frame_update(void)
+void video_frame_update(int debug)
 {
 	attotime current_time = timer_get_time();
 	int skipped_it = global.skipping_this_frame;
@@ -1026,7 +1026,7 @@ void video_frame_update(void)
 #ifdef MAME_DEBUG
 	if (phase == MAME_PHASE_RUNNING)
 #else
-	if (phase == MAME_PHASE_RUNNING && !mame_is_paused(Machine))
+	if (phase == MAME_PHASE_RUNNING && (debug || !mame_is_paused(Machine)))
 #endif
 	{
 		int anything_changed = finish_screen_updates(Machine);
@@ -1044,30 +1044,32 @@ void video_frame_update(void)
 	ui_update_and_render();
 
 	/* if we're throttling, synchronize before rendering */
-	if (!skipped_it && effective_throttle())
+	if (!debug && !skipped_it && effective_throttle())
 		update_throttle(current_time);
 
 	/* ask the OSD to update */
 	profiler_mark(PROFILER_BLIT);
-	osd_update(skipped_it);
+	osd_update(!debug && skipped_it);
 	profiler_mark(PROFILER_END);
 
 	/* perform tasks for this frame */
-	mame_frame_update(Machine);
+	if (!debug)
+		mame_frame_update(Machine);
 
 	/* update frameskipping */
-	update_frameskip();
+	if (!debug)
+		update_frameskip();
 
 	/* update speed computations */
-	if (!skipped_it)
+	if (!debug && !skipped_it)
 		recompute_speed(current_time);
 
 	/* call the end-of-frame callback */
 	if (phase == MAME_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (video_screen_exists(0) && (mame_is_paused(Machine) || mame_debug_is_active()))
-			scanline0_callback(Machine, 0);
+		if (video_screen_exists(0) && (mame_is_paused(Machine) || debug || mame_debug_is_active()))
+			scanline0_callback(Machine, NULL, 0);
 
 		/* otherwise, call the video EOF callback */
 		else if (Machine->drv->video_eof != NULL)

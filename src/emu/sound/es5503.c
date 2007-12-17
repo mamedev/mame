@@ -132,9 +132,9 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 	}
 }
 
-static TIMER_CALLBACK_PTR( es5503_timer_cb )
+static TIMER_CALLBACK( es5503_timer_cb )
 {
-	ES5503Osc *osc = param;
+	ES5503Osc *osc = ptr;
 	ES5503Chip *chip = (ES5503Chip *)osc->chip;
 
 	stream_update(chip->stream);
@@ -262,7 +262,7 @@ static void *es5503_start(int sndindex, int clock, const void *config)
 		chip->oscillators[osc].irqpend = 0;
 		chip->oscillators[osc].accumulator = 0;
 
-		chip->oscillators[osc].timer = timer_alloc_ptr(es5503_timer_cb, &chip->oscillators[osc]);
+		chip->oscillators[osc].timer = timer_alloc(es5503_timer_cb, &chip->oscillators[osc]);
 		chip->oscillators[osc].chip = (void *)chip;
 	}
 
@@ -460,13 +460,13 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						// ok, we run for this long
 						period = attotime_mul(ATTOTIME_IN_HZ(chip->output_rate), length);
 
-						timer_adjust_ptr(chip->oscillators[osc].timer, period, period);
+						timer_adjust(chip->oscillators[osc].timer, period, 0, period);
 					}
 				}
 				else if (!(chip->oscillators[osc].control & 1) && (data&1))
 				{
 					// key off
-					timer_adjust_ptr(chip->oscillators[osc].timer, attotime_never, attotime_never);
+					timer_adjust(chip->oscillators[osc].timer, attotime_never, 0, attotime_never);
 				}
 
 				chip->oscillators[osc].control = data;

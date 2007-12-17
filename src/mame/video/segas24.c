@@ -1,6 +1,6 @@
 #include "driver.h"
 #include "video/segaic24.h"
-#include "includes/system24.h"
+#include "includes/segas24.h"
 
 VIDEO_START(system24)
 {

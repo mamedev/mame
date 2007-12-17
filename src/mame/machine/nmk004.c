@@ -88,7 +88,7 @@ struct effects_control
 /* C1CA-C1CB */	UINT16 timer_duration;
 };
 
-struct
+static struct
 {
 	const UINT8 *rom;	// NMK004 data ROM
 	UINT8 from_main;	// command from main CPU
@@ -1050,7 +1050,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 void NMK004_init(void)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
-	timer_call_after_resynch(0, real_nmk004_init);
+	timer_call_after_resynch(NULL, 0, real_nmk004_init);
 }
 
 

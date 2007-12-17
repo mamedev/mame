@@ -121,7 +121,7 @@ static TIMER_CALLBACK( soundlatch_callback )
 static WRITE8_HANDLER( bombjack_soundlatch_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	timer_call_after_resynch(data,soundlatch_callback);
+	timer_call_after_resynch(NULL, data,soundlatch_callback);
 }
 
 static READ8_HANDLER( bombjack_soundlatch_r )

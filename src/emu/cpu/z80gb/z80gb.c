@@ -129,7 +129,7 @@ INLINE void mem_WriteWord (UINT32 address, UINT16 value)
 }
 
 /* Nr of cycles to run */
-int z80gb_ICount;
+static int z80gb_ICount;
 
 static int Cycles[256] =
 {

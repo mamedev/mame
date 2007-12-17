@@ -13,8 +13,6 @@ enum
                     from the contents of ML and WS */
 };
 
-extern int apexc_ICount;
-
 void apexc_get_info(UINT32 state, cpuinfo *info);
 
 #ifndef SUPPORT_ODD_WORD_SIZES

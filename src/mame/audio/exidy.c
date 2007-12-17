@@ -420,7 +420,7 @@ static void *common_start(void)
 	sh6840_LFSR_3 = 0xffffffff;
 
 	/* Init 6532 */
-    riot_timer = timer_alloc(riot_interrupt);
+    riot_timer = timer_alloc(riot_interrupt, NULL);
     riot_irq_flag = 0;
     riot_timer_irq_enable = 0;
 	riot_porta_data = 0xff;

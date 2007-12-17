@@ -1200,7 +1200,7 @@ static const char *seawolf_sample_names[] =
 	0
 };
 
-struct Samplesinterface seawolf2_samples_interface =
+static struct Samplesinterface seawolf2_samples_interface =
 {
 	10,	/* 5*2 channels */
 	seawolf_sample_names
@@ -1226,7 +1226,7 @@ static struct Samplesinterface gorf_samples_interface =
  *
  *************************************/
 
-struct z80_irq_daisy_chain tenpin_daisy_chain[] =
+static struct z80_irq_daisy_chain tenpin_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */

@@ -1657,7 +1657,7 @@ static void decocass_init_common(void)
 
 	tape_dir = 0;
 	tape_speed = 0;
-	tape_timer = timer_alloc(NULL);
+	tape_timer = timer_alloc(NULL, NULL);
 
 	firsttime = 1;
 	tape_present = 1;
@@ -1711,7 +1711,7 @@ static void decocass_init_common(void)
 
 	memset(decocass_quadrature_decoder, 0, sizeof(decocass_quadrature_decoder));
 	decocass_sound_ack = 0;
-	decocass_sound_timer = timer_alloc(decocass_sound_nmi_pulse);
+	decocass_sound_timer = timer_alloc(decocass_sound_nmi_pulse, NULL);
 }
 
 MACHINE_RESET( decocass )

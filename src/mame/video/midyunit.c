@@ -580,7 +580,7 @@ WRITE16_HANDLER( midyunit_dma_w )
 	}
 
 	/* signal we're done */
-	timer_set(ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), 0, dma_callback);
+	timer_set(ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }
@@ -614,10 +614,10 @@ void midyunit_scanline_update(running_machine *machine, int screen, mame_bitmap 
 		dest[x] = pen_map[src[coladdr++ & 0x1ff]];
 
 	/* handle autoerase on the previous line */
-	autoerase_line(machine, params->rowaddr - 1);
+	autoerase_line(machine, NULL, params->rowaddr - 1);
 
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == machine->screen[0].visarea.max_y)
-		timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), params->rowaddr, autoerase_line);
+		timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

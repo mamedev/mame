@@ -57,7 +57,7 @@ static WRITE8_HANDLER( sound_irq_w )
 {
 	cpunum_set_input_line(1,0,HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
-	//timer_call_after_resynch(0, NULL);
+	//timer_call_after_resynch(NULL, 0, NULL);
 }
 
 static ADDRESS_MAP_START( wink_map, ADDRESS_SPACE_PROGRAM, 8 )

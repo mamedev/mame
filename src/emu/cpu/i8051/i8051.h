@@ -93,8 +93,6 @@ enum {
 #define TI_FLAG 1
 #define RI_FLAG 2
 
-extern int i8051_icount;						/* cycle count */
-
 extern void i8051_init (int index, int clock, const void *config, int (*irqcallback)(int));					/* Initialize save states */
 extern void i8051_reset (void);			/* Reset registers to the initial values */
 extern void i8051_exit	(void); 				/* Shut down CPU core */
@@ -125,8 +123,6 @@ extern offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
  * 8752 Section
  ****************************************************************************/
 #if (HAS_I8752)
-#define i8752_icount							i8051_icount
-
 extern void i8752_init (int index, int clock, const void *config, int (*irqcallback)(int));					/* Initialize save states */
 extern void i8752_reset (void);			/* Reset registers to the initial values */
 extern void i8752_exit	(void); 				/* Shut down CPU core */

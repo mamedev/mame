@@ -106,7 +106,7 @@ void polyplay_play_channel2(int data);
 void polyplay_sh_start(void);
 
 /* timer handling */
-static TIMER_CALLBACK( timer_callback );
+static TIMER_CALLBACK( polyplay_timer_callback );
 static emu_timer* polyplay_timer;
 static WRITE8_HANDLER( polyplay_start_timer2 );
 static WRITE8_HANDLER( polyplay_sound_channel );
@@ -133,7 +133,7 @@ static MACHINE_RESET( polyplay )
 	polyplay_set_channel2(0);
 	polyplay_play_channel2(0);
 
-	polyplay_timer = timer_alloc(timer_callback);
+	polyplay_timer = timer_alloc(polyplay_timer_callback, NULL);
 }
 
 
@@ -365,7 +365,7 @@ ROM_START( polyplay )
 ROM_END
 
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( polyplay_timer_callback )
 {
 	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x4c);
 }

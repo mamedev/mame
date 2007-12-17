@@ -333,7 +333,7 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 	// IRQ
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(50), 0, irq_stop);
+	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 
 	laserdisc_vsync(discinfo);
 }

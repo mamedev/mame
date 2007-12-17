@@ -368,6 +368,36 @@ WRITE8_HANDLER( milliped_paletteram_w )
 }
 
 
+WRITE8_HANDLER( mazeinv_paletteram_w )
+{
+	int bit0,bit1,bit2;
+	int r,g,b;
+
+	paletteram[offset] = data;
+	data = memory_region(REGION_PROMS)[~data & 0x0f];
+
+	/* red component */
+	bit0 = (data >> 5) & 0x01;
+	bit1 = (data >> 6) & 0x01;
+	bit2 = (data >> 7) & 0x01;
+	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	/* green component */
+	bit0 = 0;
+	bit1 = (data >> 3) & 0x01;
+	bit2 = (data >> 4) & 0x01;
+	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	/* blue component */
+	bit0 = (data >> 0) & 0x01;
+	bit1 = (data >> 1) & 0x01;
+	bit2 = (data >> 2) & 0x01;
+	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+}
+
+
 
 /*************************************
  *

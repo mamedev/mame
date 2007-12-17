@@ -54,7 +54,7 @@ static crtc6845_state crtc6845;
 static void crtc6845_state_save_postload(void *param);
 static void configure_screen(crtc6845_state *chip, int postload);
 static void update_timer(crtc6845_state *chip);
-static TIMER_CALLBACK_PTR( display_enable_changed_timer_cb );
+static TIMER_CALLBACK( display_enable_changed_timer_cb );
 
 
 void crtc6845_init(void)
@@ -98,7 +98,7 @@ void crtc6845_config(int which, const crtc6845_interface *intf)
 	/* create the timer if the user is interested in getting display enable
        notifications */
 	if (intf->display_enable_changed)
-		chip->display_enable_changed_timer = timer_alloc_ptr(display_enable_changed_timer_cb, chip);
+		chip->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, chip);
 }
 
 
@@ -334,14 +334,14 @@ static void update_timer(crtc6845_state *chip)
 		else
 			duration = attotime_never;
 
-		timer_adjust_ptr(chip->display_enable_changed_timer, duration, attotime_never);
+		timer_adjust(chip->display_enable_changed_timer, duration, 0, attotime_never);
 	}
 }
 
 
-static TIMER_CALLBACK_PTR( display_enable_changed_timer_cb )
+static TIMER_CALLBACK( display_enable_changed_timer_cb )
 {
-	crtc6845_state *chip = param;
+	crtc6845_state *chip = ptr;
 
 	/* call the callback function -- we know it exists */
 	chip->intf->display_enable_changed(is_display_enabled(chip));

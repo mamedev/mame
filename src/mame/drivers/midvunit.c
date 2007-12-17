@@ -63,8 +63,8 @@ static MACHINE_RESET( midvunit )
 
 	memcpy(ram_base, memory_region(REGION_USER1), 0x20000*4);
 
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL, NULL);
+	timer[1] = timer_alloc(NULL, NULL);
 }
 
 
@@ -75,8 +75,8 @@ static MACHINE_RESET( midvplus )
 
 	memcpy(ram_base, memory_region(REGION_USER1), 0x20000*4);
 
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL, NULL);
+	timer[1] = timer_alloc(NULL, NULL);
 
 	ide_controller_reset(0);
 }
@@ -154,7 +154,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		adc_data = readinputport(3 + which);
-		timer_set(ATTOTIME_IN_MSEC(1), 0, adc_ready);
+		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else
 		logerror("adc_w without enabling writes!\n");

@@ -84,7 +84,7 @@ VIDEO_START( qix )
 	vram_mask = 0xff;
 
 	/* allocate a timer */
-	scanline_timer = timer_alloc(scanline_callback);
+	scanline_timer = timer_alloc(scanline_callback, NULL);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* set up save states */

@@ -256,7 +256,7 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 
 static void create_auto_animation_timer(void)
 {
-	auto_animation_timer = timer_alloc(auto_animation_timer_callback);
+	auto_animation_timer = timer_alloc(auto_animation_timer_callback, NULL);
 }
 
 
@@ -678,7 +678,7 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 
 static void create_sprite_line_timer(void)
 {
-	sprite_line_timer = timer_alloc(sprite_line_timer_callback);
+	sprite_line_timer = timer_alloc(sprite_line_timer_callback, NULL);
 }
 
 

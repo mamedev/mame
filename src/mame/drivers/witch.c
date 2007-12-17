@@ -655,7 +655,7 @@ F180 kkkbbppp ; Read on port 0xA005
 
 INPUT_PORTS_END
 
-struct ES8712interface es8712_interface =
+static struct ES8712interface es8712_interface =
 {
 	REGION_SOUND1
 };

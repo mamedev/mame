@@ -31,11 +31,7 @@ static FILE *exec_output;
 #endif
 
 
-extern UINT32 sp_read_reg(UINT32 reg);
-extern void sp_write_reg(UINT32 reg, UINT32 data);
-extern READ32_HANDLER( n64_dp_reg_r );
-extern WRITE32_HANDLER( n64_dp_reg_w );
-extern void sp_set_status(UINT32 status);
+static rsp_config *config;
 
 
 typedef struct
@@ -52,7 +48,7 @@ typedef struct
 	UINT32 r[32];
 	VECTOR_REG v[32];
 	UINT16 flag[4];
-    UINT32 sr;
+	UINT32 sr;
 
 	INT64 accum[8];
 	INT32 square_root_res;
@@ -235,11 +231,11 @@ static UINT32 get_cop0_reg(int reg)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		return sp_read_reg(reg);
+		return (config->sp_reg_r)(reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return n64_dp_reg_r(reg - 8, 0x00000000);
+		return (config->dp_reg_r)(reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -251,11 +247,11 @@ static void set_cop0_reg(int reg, UINT32 data)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		sp_write_reg(reg, data);
+		(config->sp_reg_w)(reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		n64_dp_reg_w(reg - 8, data, 0x00000000);
+		(config->dp_reg_w)(reg - 8, data, 0x00000000);
 	}
 	else
 	{
@@ -348,33 +344,35 @@ static const int vector_elements_2[16][8] =
 
 static void rsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-    //int regIdx, accumIdx;
+	//int regIdx, accumIdx;
+	config = (rsp_config *)_config;
+
 #if LOG_INSTRUCTION_EXECUTION
 	exec_output = fopen("rsp_execute.txt", "wt");
 #endif
 
 	rsp.irq_callback = irqcallback;
-    /*
-    for(regIdx = 0; regIdx < 32; regIdx++ )
-    {
-        rsp.r[regIdx] = 0;
-        rsp.v[regIdx].d[0] = 0;
-        rsp.v[regIdx].d[1] = 0;
-    }
-    for(accumIdx = 0; accumIdx < 8; accumIdx++ )
-    {
-        rsp.accum[accumIdx] = 0;
-    }
-    rsp.flag[0] = 0;
-    rsp.flag[1] = 0;
-    rsp.flag[2] = 0;
-    rsp.flag[3] = 0;
-    rsp.square_root_res = 0;
-    rsp.square_root_high = 0;
-    rsp.reciprocal_res = 0;
-    rsp.reciprocal_high = 0;
-    */
-    rsp.sr = RSP_STATUS_HALT;
+#if 0
+	for(regIdx = 0; regIdx < 32; regIdx++ )
+	{
+		rsp.r[regIdx] = 0;
+		rsp.v[regIdx].d[0] = 0;
+		rsp.v[regIdx].d[1] = 0;
+	}
+	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
+	{
+		rsp.accum[accumIdx] = 0;
+	}
+	rsp.flag[0] = 0;
+	rsp.flag[1] = 0;
+	rsp.flag[2] = 0;
+	rsp.flag[3] = 0;
+	rsp.square_root_res = 0;
+	rsp.square_root_high = 0;
+	rsp.reciprocal_res = 0;
+	rsp.reciprocal_high = 0;
+#endif
+	rsp.sr = RSP_STATUS_HALT;
 }
 
 static void rsp_exit(void)
@@ -397,18 +395,17 @@ static void rsp_exit(void)
 #endif
 #if SAVE_DMEM
 	{
-		/*int i;
-        FILE *dmem;
-        dmem = fopen("rsp_dmem.txt", "wt");
-
-        for (i=0; i < 0x1000; i+=4)
-        {
-            fprintf(dmem, "%08X: %08X\n", 0x04000000 + i, READ32(0x04000000 + i));
-        }
-        fclose(dmem);*/
-
 		int i;
 		FILE *dmem;
+#if 0
+		dmem = fopen("rsp_dmem.txt", "wt");
+
+		for (i=0; i < 0x1000; i+=4)
+		{
+			fprintf(dmem, "%08X: %08X\n", 0x04000000 + i, READ32(0x04000000 + i));
+		}
+		fclose(dmem);
+#endif
 		dmem = fopen("rsp_dmem.bin", "wb");
 
 		for (i=0; i < 0x1000; i++)
@@ -966,7 +963,7 @@ static void handle_swc2(UINT32 op)
 			//
 			// Stores one element from maximum of 8 vectors, while incrementing element index
 
-			int element, eaoffset;
+			int element;
 			int vs = dest;
 			int ve = dest + 8;
 			if (ve > 32)
@@ -2308,7 +2305,7 @@ static void handle_vector_ops(UINT32 op)
 						i = 0;
 					}
 				}
-                rec = (INT32)(0x7fffffff / (double)rec);
+				rec = (INT32)(0x7fffffff / (double)rec);
 				for (i = 31; i > 0; i--)
 				{
 					if (rec & (1 << i))
@@ -2554,10 +2551,10 @@ static int rsp_execute(int cycles)
 
 	rsp.pc = 0x4001000 | (rsp.pc & 0xfff);
 
-    if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
-    {
-        rsp_icount = 0;
-    }
+	if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
+	{
+		rsp_icount = 0;
+	}
 
 	while (rsp_icount > 0)
 	{
@@ -2591,7 +2588,7 @@ static int rsp_execute(int cycles)
 					case 0x09:	/* JALR */		JUMP_PC_L(RSVAL, RDREG); break;
 					case 0x0d:	/* BREAK */
 					{
-						sp_set_status(0x3);
+						(config->sp_set_status)(0x3);
 						rsp_icount = 1;
 
 #if LOG_INSTRUCTION_EXECUTION
@@ -2784,15 +2781,15 @@ static int rsp_execute(int cycles)
 
 		--rsp_icount;
 
-        if( rsp.sr & RSP_STATUS_SSTEP )
-        {
-            rsp.sr |= RSP_STATUS_BROKE;
-        }
+		if( rsp.sr & RSP_STATUS_SSTEP )
+		{
+			rsp.sr |= RSP_STATUS_BROKE;
+		}
 
-        if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
-        {
-            rsp_icount = 0;
-        }
+		if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
+		{
+			rsp_icount = 0;
+		}
 
 	}
 
@@ -2942,8 +2939,8 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + RSP_R30:			info->i = rsp.r[30];					break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp.r[31];					break;
-        case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp.sr;                       break;
-        case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp.nextpc;                   break;
+		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp.sr;                       break;
+		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp.nextpc;                   break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = rsp_get_context;		break;
@@ -3002,7 +2999,7 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + RSP_R29:			sprintf(info->s, "R29: %08X", rsp.r[29]); break;
 		case CPUINFO_STR_REGISTER + RSP_R30:			sprintf(info->s, "R30: %08X", rsp.r[30]); break;
 		case CPUINFO_STR_REGISTER + RSP_R31:			sprintf(info->s, "R31: %08X", rsp.r[31]); break;
-        case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp.sr);    break;
-        case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp.nextpc);break;
+		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp.sr);    break;
+		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp.nextpc);break;
 	}
 }

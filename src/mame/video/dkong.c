@@ -820,7 +820,7 @@ VIDEO_START( radarscp )
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-    scanline_timer = timer_alloc(scanline_callback);
+    scanline_timer = timer_alloc(scanline_callback, NULL);
     timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 }
@@ -837,7 +837,7 @@ VIDEO_START( radarsc1 )
 
 	bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-    scanline_timer = timer_alloc(scanline_callback);
+    scanline_timer = timer_alloc(scanline_callback, NULL);
     timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
 
 }

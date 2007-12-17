@@ -892,7 +892,7 @@ static void atapi_init(void)
 	atapi_data_len = 0;
 	atapi_cdata_wait = 0;
 
-	atapi_timer = timer_alloc( atapi_xfer_end );
+	atapi_timer = timer_alloc( atapi_xfer_end , NULL);
 	timer_adjust(atapi_timer, attotime_never, 0, attotime_never);
 
 	for( i = 0; i < 2; i++ )
@@ -1483,7 +1483,7 @@ static DRIVER_INIT( konami573 )
 
 	for (i = 0; i < 3; i++)
 	{
-		m_p_timer_root[i] = timer_alloc(root_finished);
+		m_p_timer_root[i] = timer_alloc(root_finished, NULL);
 	}
 
 	timekeeper_init( 0, TIMEKEEPER_M48T58, memory_region( REGION_USER11 ) );

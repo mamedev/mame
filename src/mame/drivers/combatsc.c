@@ -904,7 +904,7 @@ ROM_END
 
 static void combasc_init_common(void)
 {
-	combasc_interleave_timer = timer_alloc(NULL);
+	combasc_interleave_timer = timer_alloc(NULL, NULL);
 }
 
 static DRIVER_INIT( combasct )

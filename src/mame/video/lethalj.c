@@ -161,7 +161,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
 	if (offset == 7)
 	{
 		do_blit();
-		timer_set(ATTOTIME_IN_USEC(10), 0, gen_ext1_int);
+		timer_set(ATTOTIME_IN_USEC(10), NULL, 0, gen_ext1_int);
 	}
 
 	/* clear the IRQ on offset 0 */

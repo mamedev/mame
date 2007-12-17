@@ -20,6 +20,12 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
  * 8-bit data memory interface
  ****************************************************************************/
 
+static UINT16 m68008_read_immediate_16(offs_t address)
+{
+	offs_t addr = (address) ^ m68k_memory_intf.opcode_xor;
+	return (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
+}
+
 static UINT16 readword_d8(offs_t address)
 {
 	UINT16 result = program_read_byte_8(address) << 8;
@@ -52,6 +58,7 @@ static void writelong_d8(offs_t address, UINT32 data)
 static const struct m68k_memory_interface interface_d8 =
 {
 	0,
+	m68008_read_immediate_16,
 	program_read_byte_8,
 	readword_d8,
 	readlong_d8,
@@ -63,6 +70,11 @@ static const struct m68k_memory_interface interface_d8 =
 /****************************************************************************
  * 16-bit data memory interface
  ****************************************************************************/
+
+static UINT16 read_immediate_16(offs_t address)
+{
+	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
+}
 
 static UINT32 readlong_d16(offs_t address)
 {
@@ -80,6 +92,7 @@ static void writelong_d16(offs_t address, UINT32 data)
 static const struct m68k_memory_interface interface_d16 =
 {
 	0,
+	read_immediate_16,
 	program_read_byte_16be,
 	program_read_word_16be,
 	readlong_d16,
@@ -155,6 +168,7 @@ static void writelong_d32(offs_t address, UINT32 data)
 static const struct m68k_memory_interface interface_d32 =
 {
 	WORD_XOR_BE(0),
+	read_immediate_16,
 	program_read_byte_32be,
 	readword_d32,
 	readlong_d32,
@@ -291,7 +305,7 @@ static offs_t m68008_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
  ****************************************************************************/
 #if HAS_M68010
 
-void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static void m68010_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	m68k_init();
 	m68k_set_cpu_type(M68K_CPU_TYPE_68010);

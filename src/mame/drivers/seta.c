@@ -1287,7 +1287,7 @@ static void uPD71054_timer_init( void )
 		uPD71054.max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054.timer[no] = timer_alloc( uPD71054_timer_callback );
+		uPD71054.timer[no] = timer_alloc( uPD71054_timer_callback , NULL);
 	}
 }
 

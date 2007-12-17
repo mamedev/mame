@@ -48,7 +48,7 @@ static void start_countdown_timer(void)
 {
 	timer_value = 0;
 
-	timer_pulse(ATTOTIME_IN_SEC(1), 0, countdown_timer_callback);
+	timer_pulse(ATTOTIME_IN_SEC(1), NULL, 0, countdown_timer_callback);
 }
 
 

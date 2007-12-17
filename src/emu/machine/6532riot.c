@@ -286,7 +286,7 @@ void r6532_reset(int which)
 
 	r6532[which].shift = 10;
 
-	r6532[which].counter_timer = timer_alloc(r6532_irq_timer_callback);
+	r6532[which].counter_timer = timer_alloc(r6532_irq_timer_callback, NULL);
 
 	r6532_set_timer( which, 0xFF );
 

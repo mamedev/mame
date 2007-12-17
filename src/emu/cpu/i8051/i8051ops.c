@@ -270,9 +270,9 @@ INLINE void da_a(void)
  The carry flag will be set if the result is > 0x99, but not cleared otherwise */
 
  UINT16 new_acc = R_ACC & 0xff;
- if(GET_AC || (R_ACC & 0x0f) > 0x09)
+ if(GET_AC || (new_acc & 0x0f) > 0x09)
 	 new_acc += 0x06;
- if(GET_CY || (R_ACC & 0xf0) > 0x90)
+ if(GET_CY || ((new_acc & 0xf0) > 0x90) || (new_acc & ~0xff))
 	 new_acc += 0x60;
  SFR_W(ACC,new_acc&0xff);
  if(new_acc & ~0xff)

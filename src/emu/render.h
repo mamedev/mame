@@ -87,19 +87,25 @@ enum
 									 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY)
 
 /* texture formats */
-#define TEXFORMAT_UNDEFINED			0				/* require a format to be specified */
-#define TEXFORMAT_PALETTE16			1				/* 16bpp palettized, alpha ignored */
-#define TEXFORMAT_PALETTEA16		2				/* 16bpp palettized, alpha respected */
-#define TEXFORMAT_RGB15				3				/* 16bpp 5-5-5 RGB */
-#define TEXFORMAT_RGB32				4				/* 32bpp 8-8-8 RGB */
-#define TEXFORMAT_ARGB32			5				/* 32bpp 8-8-8-8 ARGB */
-#define TEXFORMAT_YUY16				6				/* 16bpp 8-8 Y/Cb, Y/Cr in sequence */
+enum
+{
+	TEXFORMAT_UNDEFINED = 0,				/* require a format to be specified */
+	TEXFORMAT_PALETTE16,				/* 16bpp palettized, alpha ignored */
+	TEXFORMAT_PALETTEA16,				/* 16bpp palettized, alpha respected */
+	TEXFORMAT_RGB15,				/* 16bpp 5-5-5 RGB */
+	TEXFORMAT_RGB32,				/* 32bpp 8-8-8 RGB */
+	TEXFORMAT_ARGB32,				/* 32bpp 8-8-8-8 ARGB */
+	TEXFORMAT_YUY16					/* 16bpp 8-8 Y/Cb, Y/Cr in sequence */
+};
 
 /* blending modes */
-#define	BLENDMODE_NONE				0				/* no blending */
-#define	BLENDMODE_ALPHA				1				/* standard alpha blend */
-#define BLENDMODE_RGB_MULTIPLY		2				/* apply source alpha to source pix, then multiply RGB values */
-#define BLENDMODE_ADD				3				/* apply source alpha to source pix, then add to destination */
+enum
+{
+	BLENDMODE_NONE = 0,				/* no blending */
+	BLENDMODE_ALPHA,				/* standard alpha blend */
+	BLENDMODE_RGB_MULTIPLY,				/* apply source alpha to source pix, then multiply RGB values */
+	BLENDMODE_ADD					/* apply source alpha to source pix, then add to destination */
+};
 
 
 /* flags for primitives */

@@ -75,9 +75,9 @@ static void set_output(TTL74123_state *chip)
 }
 
 
-static TIMER_CALLBACK_PTR( clear_callback )
+static TIMER_CALLBACK( clear_callback )
 {
-	TTL74123_state *chip = param;
+	TTL74123_state *chip = ptr;
 
 	set_output(chip);
 }
@@ -96,7 +96,7 @@ void TTL74123_config(int which, const TTL74123_interface *intf)
 
 	chip->intf = intf;
 	chip->which = which;
-	chip->timer = timer_alloc_ptr(clear_callback, chip);
+	chip->timer = timer_alloc(clear_callback, chip);
 
 	/* start with the defaults */
 	chip->A = intf->A;
@@ -129,7 +129,7 @@ static void start_pulse(TTL74123_state *chip)
 
 		if (attotime_compare(timer_timeelapsed(chip->timer), delay_time) >= 0)
 		{
-			timer_adjust_ptr(chip->timer, duration, attotime_never);
+			timer_adjust(chip->timer, duration, 0, attotime_never);
 
 			if (LOG) logerror("74123 #%d:  Retriggering pulse.  Duration: %f\n", chip->which, attotime_to_double(duration));
 		}
@@ -141,7 +141,7 @@ static void start_pulse(TTL74123_state *chip)
 	else
 	{
 		/* starting */
-		timer_adjust_ptr(chip->timer, duration, attotime_never);
+		timer_adjust(chip->timer, duration, 0, attotime_never);
 
 		set_output(chip);
 
@@ -181,7 +181,7 @@ void TTL74123_clear_w(int which, int data)
 	/* clear the output if A=LO, B=HI and falling edge on clear */
 	if (!data && chip->clear && chip->B && !chip->A && !chip->clear)
 	{
-		timer_adjust_ptr(chip->timer, attotime_zero, attotime_never);
+		timer_adjust(chip->timer, attotime_zero, 0, attotime_never);
 
 		if (LOG) logerror("74123 #%d:  Cleared\n", which);
 	}

@@ -1063,7 +1063,7 @@ static MACHINE_RESET( system16b )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		timer_call_after_resynch(0, suspend_i8751);
+		timer_call_after_resynch(NULL, 0, suspend_i8751);
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
@@ -1080,7 +1080,7 @@ static TIMER_CALLBACK( atomicp_sound_irq )
 static MACHINE_RESET( atomicp )
 {
 	machine_reset_system16b(machine);
-	timer_pulse(ATTOTIME_IN_HZ(atomicp_sound_rate), 0, atomicp_sound_irq);
+	timer_pulse(ATTOTIME_IN_HZ(atomicp_sound_rate), NULL, 0, atomicp_sound_irq);
 }
 
 

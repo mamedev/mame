@@ -595,6 +595,12 @@ void memory_set_opbase(offs_t pc)
 	entry = space->readlookup[LEVEL1_INDEX(pc)];
 	if (entry >= SUBTABLE_BASE)
 		entry = space->readlookup[LEVEL2_INDEX(entry,pc)];
+
+	/* if this entry if the current one, no need to go further */
+	if (entry == opcode_entry)
+		return;
+
+	/* keep track of current entry */
 	opcode_entry = entry;
 
 	/* if we don't map to a bank, see if there are any banks we can map to */

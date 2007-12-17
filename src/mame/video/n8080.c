@@ -106,7 +106,7 @@ static void helifire_next_line(void)
 
 VIDEO_START( spacefev )
 {
-	cannon_timer = timer_alloc(spacefev_stop_red_cannon);
+	cannon_timer = timer_alloc(spacefev_stop_red_cannon, NULL);
 
 	flip_screen = 0;
 

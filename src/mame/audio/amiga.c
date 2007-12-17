@@ -241,7 +241,7 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
 				/* if we're in manual mode, signal an interrupt once we latch the low byte */
 				if (!chan->dmaenabled && chan->manualmode && (chan->curlocation & 1))
 				{
-					signal_irq(Machine, channum);
+					signal_irq(Machine, NULL, channum);
 					chan->manualmode = FALSE;
 				}
 			}
@@ -271,7 +271,7 @@ void *amiga_sh_start(int clock, const struct CustomSound_interface *config)
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = timer_alloc(signal_irq);
+		audio_state->channel[i].irq_timer = timer_alloc(signal_irq, NULL);
 	}
 
 	/* create the stream */

@@ -224,7 +224,7 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback);
+	scanline_timer = timer_alloc(scanline_callback, NULL);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* register for save states */
@@ -239,7 +239,7 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback);
+	scanline_timer = timer_alloc(scanline_callback, NULL);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
 
 	/* allocate videoram */
@@ -444,7 +444,7 @@ void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
 		else
 		{
 			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), 0, interrupt_off);
+			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -480,7 +480,7 @@ static TIMER_CALLBACK( scanline_callback )
 		else
 		{
 			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), 0, interrupt_off);
+			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 	}
 

@@ -267,7 +267,7 @@ VIDEO_EOF( tank8 )
 				}
 			}
 
-			timer_set(video_screen_get_time_until_pos(0, y, x), index, tank8_collision_callback);
+			timer_set(video_screen_get_time_until_pos(0, y, x), NULL, index, tank8_collision_callback);
 
 			state = 1;
 		}

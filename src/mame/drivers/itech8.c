@@ -622,7 +622,7 @@ static MACHINE_START( sstrike )
 	machine_start_itech8(machine);
 
 	/* we need to update behind the beam as well */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 32, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -674,7 +674,7 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
 }
 
 
@@ -786,7 +786,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_call_after_resynch(data, delayed_sound_data_w);
+	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }
 
 
@@ -797,7 +797,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	timer_call_after_resynch(data, delayed_sound_data_w);
+	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }
 
 

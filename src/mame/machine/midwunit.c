@@ -278,7 +278,7 @@ READ16_HANDLER( midxunit_uart_r )
 				int temp = midwunit_sound_state_r(0, 0);
 				result |= (temp & 0x800) >> 9;
 				result |= (~temp & 0x400) >> 10;
-				timer_call_after_resynch(0, 0);
+				timer_call_after_resynch(NULL, 0, 0);
 			}
 			break;
 
@@ -305,7 +305,7 @@ READ16_HANDLER( midxunit_uart_r )
 				int temp = midwunit_sound_state_r(0, 0);
 				result |= (temp & 0x800) >> 11;
 				result |= (~temp & 0x400) >> 8;
-				timer_call_after_resynch(0, 0);
+				timer_call_after_resynch(NULL, 0, 0);
 			}
 			break;
 

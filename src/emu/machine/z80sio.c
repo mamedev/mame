@@ -296,8 +296,8 @@ void z80sio_init(int which, z80sio_interface *intf)
 
 	memset(sio, 0, sizeof(*sio));
 
-	sio->chan[0].receive_timer = timer_alloc(serial_callback);
-	sio->chan[1].receive_timer = timer_alloc(serial_callback);
+	sio->chan[0].receive_timer = timer_alloc(serial_callback, NULL);
+	sio->chan[1].receive_timer = timer_alloc(serial_callback, NULL);
 
 	sio->irq_cb = intf->irq_cb;
 	sio->dtr_changed_cb = intf->dtr_changed_cb;
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( change_input_line )
 void z80sio_set_cts(int which, int ch, int state)
 {
 	/* operate deferred */
-	timer_call_after_resynch((SIO_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	timer_call_after_resynch(NULL, (SIO_RR0_CTS << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 
@@ -599,7 +599,7 @@ void z80sio_set_cts(int which, int ch, int state)
 void z80sio_set_dcd(int which, int ch, int state)
 {
 	/* operate deferred */
-	timer_call_after_resynch((SIO_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
+	timer_call_after_resynch(NULL, (SIO_RR0_DCD << 8) + (state != 0) * 0x80 + which * 2 + ch, change_input_line);
 }
 
 

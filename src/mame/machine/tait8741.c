@@ -204,7 +204,7 @@ static void taito8741_update(int num)
 				st->txd[0] = st->portHandler ? st->portHandler(0) : 0;
 				if( sst )
 				{
-					timer_call_after_resynch(num,taito8741_serial_tx);
+					timer_call_after_resynch(NULL, num, taito8741_serial_tx);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -445,7 +445,7 @@ static void josvolly_8741_do(int num)
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		timer_set (ATTOTIME_IN_USEC(1),num,josvolly_8741_tx);
+		timer_set (ATTOTIME_IN_USEC(1), NULL, num, josvolly_8741_tx);
 	}
 }
 

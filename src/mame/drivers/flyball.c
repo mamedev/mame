@@ -52,14 +52,14 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 	{
 		if (potsense[i] != 0)
 		{
-			timer_set(video_screen_get_time_until_pos(0, scanline + i, 0), potsense[i], flyball_joystick_callback);
+			timer_set(video_screen_get_time_until_pos(0, scanline + i, 0), NULL, potsense[i], flyball_joystick_callback);
 		}
 	}
 
 	scanline += 0x40;
 	scanline &= 0xff;
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, flyball_quarter_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, flyball_quarter_callback);
 
 	flyball_potsense = 0;
 	flyball_potmask = 0;
@@ -77,7 +77,7 @@ static MACHINE_RESET( flyball )
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
 
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, flyball_quarter_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, flyball_quarter_callback);
 }
 
 

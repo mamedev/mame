@@ -184,7 +184,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static MACHINE_RESET( yboard )
 {
-    interrupt_timer = timer_alloc(scanline_callback);
+    interrupt_timer = timer_alloc(scanline_callback, NULL);
     timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, attotime_zero);
 
 	state_save_register_global_array(misc_io_data);
@@ -217,7 +217,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_LSB)
-		timer_call_after_resynch(data & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_data_w);
 }
 
 

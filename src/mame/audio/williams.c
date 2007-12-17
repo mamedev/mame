@@ -464,7 +464,7 @@ static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 
 void williams_cvsd_data_w(int data)
 {
-	timer_call_after_resynch(data, williams_cvsd_delayed_data_w);
+	timer_call_after_resynch(NULL, data, williams_cvsd_delayed_data_w);
 }
 
 

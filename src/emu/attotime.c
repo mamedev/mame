@@ -274,6 +274,40 @@ int attotime_compare(attotime _time1, attotime _time2)
 }
 
 
+/*-------------------------------------------------
+    attotime_min - return the minimum of two
+    attotimes
+-------------------------------------------------*/
+
+attotime attotime_min(attotime _time1, attotime _time2)
+{
+	if (_time1.seconds > _time2.seconds)
+		return _time2;
+	if (_time1.seconds < _time2.seconds)
+		return _time1;
+	if (_time1.attoseconds > _time2.attoseconds)
+		return _time2;
+	return _time1;
+}
+
+
+/*-------------------------------------------------
+    attotime_max - return the maximum of two
+    attotimes
+-------------------------------------------------*/
+
+attotime attotime_max(attotime _time1, attotime _time2)
+{
+	if (_time1.seconds > _time2.seconds)
+		return _time1;
+	if (_time1.seconds < _time2.seconds)
+		return _time2;
+	if (_time1.attoseconds > _time2.attoseconds)
+		return _time1;
+	return _time2;
+}
+
+
 
 /***************************************************************************
     MISC UTILITIES

@@ -222,7 +222,7 @@ static void *k053260_start(int sndindex, int clock, const void *config)
 
 	/* setup SH1 timer if necessary */
 	if ( ic->intf->irq )
-		timer_pulse( attotime_mul(ATTOTIME_IN_HZ(clock), 32), 0, ic->intf->irq );
+		timer_pulse( attotime_mul(ATTOTIME_IN_HZ(clock), 32), NULL, 0, ic->intf->irq );
 
     return ic;
 }

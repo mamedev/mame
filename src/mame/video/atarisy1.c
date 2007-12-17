@@ -201,9 +201,9 @@ VIDEO_START( atarisy1 )
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
 	next_timer_scanline = -1;
-	scanline_timer = timer_alloc(int3_callback);
-	int3off_timer = timer_alloc(int3off_callback);
-	yscroll_reset_timer = timer_alloc(reset_yscroll_callback);
+	scanline_timer = timer_alloc(int3_callback, NULL);
+	int3off_timer = timer_alloc(int3off_callback, NULL);
+	yscroll_reset_timer = timer_alloc(reset_yscroll_callback, NULL);
 }
 
 

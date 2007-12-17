@@ -168,8 +168,8 @@ void ds2401_init( int which, UINT8 *data )
 	state_save_register_item( "ds2401", which, c->tx );
 	state_save_register_item_pointer( "ds2401", which, data, SIZE_DATA );
 
-	c->timer = timer_alloc( ds2401_tick );
-	c->reset_timer = timer_alloc( ds2401_reset );
+	c->timer = timer_alloc( ds2401_tick , NULL);
+	c->reset_timer = timer_alloc( ds2401_reset , NULL);
 }
 
 void ds2401_write( int which, int data )

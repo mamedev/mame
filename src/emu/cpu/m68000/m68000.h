@@ -26,18 +26,19 @@ extern int m68k_ICount;
 
 struct m68k_memory_interface
 {
-	offs_t		opcode_xor;						// Address Calculation
-	UINT8		(*read8)(offs_t);				// Normal read 8 bit
+	offs_t	opcode_xor;						// Address Calculation
+	UINT16	(*readimm16)(offs_t);			// Immediate read 16 bit
+	UINT8	(*read8)(offs_t);				// Normal read 8 bit
 	UINT16	(*read16)(offs_t);				// Normal read 16 bit
 	UINT32	(*read32)(offs_t);				// Normal read 32 bit
-	void		(*write8)(offs_t, UINT8);		// Write 8 bit
-	void		(*write16)(offs_t, UINT16);	// Write 16 bit
-	void		(*write32)(offs_t, UINT32);	// Write 32 bit
-	void		(*changepc)(offs_t);			// Change PC
+	void	(*write8)(offs_t, UINT8);		// Write 8 bit
+	void	(*write16)(offs_t, UINT16);		// Write 16 bit
+	void	(*write32)(offs_t, UINT32);		// Write 32 bit
+	void	(*changepc)(offs_t);			// Change PC
 
     // For Encrypted Stuff
 
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
+	UINT8	(*read8pc)(offs_t);				// PC Relative read 8 bit
 	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
 	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
 
@@ -47,7 +48,7 @@ struct m68k_memory_interface
 
 struct m68k_encryption_interface
 {
-	UINT8		(*read8pc)(offs_t);				// PC Relative read 8 bit
+	UINT8	(*read8pc)(offs_t);				// PC Relative read 8 bit
 	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
 	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
 

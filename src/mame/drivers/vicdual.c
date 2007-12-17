@@ -95,7 +95,7 @@ static UINT32 vicdual_read_coin_status(void *param)
 		cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(0))), 0, clear_coin_status);
+		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(0))), NULL, 0, clear_coin_status);
 	}
 
 	last_coin_input = coin_input;
@@ -174,7 +174,7 @@ static UINT32 vicdual_get_timer_value(void *param)
 	{
 		timer_started = 1;
 
-		timer_pulse(TIMER_HALF_PERIOD, 0, vicdual_timer_callback);
+		timer_pulse(TIMER_HALF_PERIOD, NULL, 0, vicdual_timer_callback);
 	}
 
 	return timer_value;

@@ -143,10 +143,10 @@ void atarigen_interrupt_reset(atarigen_int_callback update_int)
 
 	/* create timers */
 	for (i = 0; i < ATARIMO_MAX; i++)
-		scanline_timer[i] = timer_alloc(scanline_timer_callback);
+		scanline_timer[i] = timer_alloc(scanline_timer_callback, NULL);
 
 	/* create a timer for scanlines */
-	scanline_interrupt_timer = timer_alloc(scanline_interrupt_callback);
+	scanline_interrupt_timer = timer_alloc(scanline_interrupt_callback, NULL);
 }
 
 
@@ -595,7 +595,7 @@ void atarigen_ym2151_irq_gen(int irq)
 
 WRITE16_HANDLER( atarigen_sound_reset_w )
 {
-	timer_call_after_resynch(0, delayed_sound_reset);
+	timer_call_after_resynch(NULL, 0, delayed_sound_reset);
 }
 
 
@@ -606,7 +606,7 @@ WRITE16_HANDLER( atarigen_sound_reset_w )
 
 void atarigen_sound_reset(void)
 {
-	timer_call_after_resynch(1, delayed_sound_reset);
+	timer_call_after_resynch(NULL, 1, delayed_sound_reset);
 }
 
 
@@ -620,19 +620,19 @@ void atarigen_sound_reset(void)
 WRITE16_HANDLER( atarigen_sound_w )
 {
 	if (ACCESSING_LSB)
-		timer_call_after_resynch(data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
 
 WRITE16_HANDLER( atarigen_sound_upper_w )
 {
 	if (ACCESSING_MSB)
-		timer_call_after_resynch((data >> 8) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(NULL, (data >> 8) & 0xff, delayed_sound_w);
 }
 
 WRITE32_HANDLER( atarigen_sound_upper32_w )
 {
 	if (ACCESSING_MSB32)
-		timer_call_after_resynch((data >> 24) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(NULL, (data >> 24) & 0xff, delayed_sound_w);
 }
 
 
@@ -672,7 +672,7 @@ READ32_HANDLER( atarigen_sound_upper32_r )
 
 WRITE8_HANDLER( atarigen_6502_sound_w )
 {
-	timer_call_after_resynch(data, delayed_6502_sound_w);
+	timer_call_after_resynch(NULL, data, delayed_6502_sound_w);
 }
 
 
@@ -936,7 +936,7 @@ void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields)
 	atarivc_state.latch1 = atarivc_state.latch2 = -1;
 	actual_vc_latch0 = actual_vc_latch1 = -1;
 
-	atarivc_eof_update_timer[scrnum] = timer_alloc(atarivc_eof_update);
+	atarivc_eof_update_timer[scrnum] = timer_alloc(atarivc_eof_update, NULL);
 
 	/* start a timer to go off a little before scanline 0 */
 	if (atarivc_eof_data)
@@ -1297,7 +1297,7 @@ WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)Machine->screen[0].width;
-	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(0)) * fraction), 0, unhalt_cpu);
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(0)) * fraction), NULL, 0, unhalt_cpu);
 	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 }
 

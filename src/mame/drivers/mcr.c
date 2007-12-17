@@ -1485,7 +1485,7 @@ static const char *journey_sample_names[] =
 	0
 };
 
-struct Samplesinterface journey_samples_interface =
+static struct Samplesinterface journey_samples_interface =
 {
 	1,
 	journey_sample_names

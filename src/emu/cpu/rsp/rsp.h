@@ -1,6 +1,16 @@
 #ifndef _RSP_H
 #define _RSP_H
 
+struct _rsp_config
+{
+	read32_handler dp_reg_r;
+	write32_handler dp_reg_w;
+	read32_handler sp_reg_r;
+	write32_handler sp_reg_w;
+	void (*sp_set_status)(UINT32 status);
+};
+typedef struct _rsp_config rsp_config;
+
 enum
 {
     RSP_PC = 1,

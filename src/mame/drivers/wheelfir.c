@@ -569,7 +569,7 @@ static void render_background_to_render_buffer(int scanline)
 
 static TIMER_CALLBACK( scanline_timer_callback )
 {
-	timer_call_after_resynch(0, 0);
+	timer_call_after_resynch(NULL, 0, 0);
 
 	if (scanline_counter!=(total_scanlines-1))
 	{
@@ -612,8 +612,8 @@ static VIDEO_EOF( wheelfir )
 
 static MACHINE_RESET(wheelfir)
 {
-	frame_timer = timer_alloc(frame_timer_callback);
-	scanline_timer = timer_alloc(scanline_timer_callback);
+	frame_timer = timer_alloc(frame_timer_callback, NULL);
+	scanline_timer = timer_alloc(scanline_timer_callback, NULL);
 	timer_adjust(frame_timer, attotime_zero, 0, attotime_zero);
 	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 	scanline_counter = -1;

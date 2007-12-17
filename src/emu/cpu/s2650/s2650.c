@@ -28,7 +28,7 @@
 /* define this to expand all EA calculations inline */
 #define INLINE_EA	1
 
-int s2650_ICount = 0;
+static int s2650_ICount = 0;
 
 typedef struct {
 	UINT16	ppc;	/* previous program counter (page + iar) */

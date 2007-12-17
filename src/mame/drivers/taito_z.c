@@ -911,7 +911,7 @@ static INTERRUPT_GEN( sci_interrupt )
 	sci_int6 = !sci_int6;
 
 	if (sci_int6)
-		timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, taitoz_interrupt6);
+		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 
@@ -926,7 +926,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	dblaxle_int6 = !dblaxle_int6;
 
 	if (dblaxle_int6)
-		timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, taitoz_interrupt6);
+		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
 
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
@@ -934,7 +934,7 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
-	timer_set(ATTOTIME_IN_CYCLES(200000-500,0),0, taitoz_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL,  0, taitoz_interrupt6);
 	cpunum_set_input_line(2, 4, HOLD_LINE);
 }
 
@@ -1175,7 +1175,7 @@ static WRITE16_HANDLER( bshark_stick_w )
        but we don't want CPUA to have an int6 before int4 is over (?)
     */
 
-	timer_set(ATTOTIME_IN_CYCLES(10000,0),0, taitoz_interrupt6);
+	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, taitoz_interrupt6);
 }
 
 
@@ -1258,7 +1258,7 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
        Four lightgun interrupts happen before the collected coords
        are moved to shared ram where CPUA can use them. */
 
-	timer_set(ATTOTIME_IN_CYCLES(10000,0),0, taitoz_sg_cpub_interrupt5);
+	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, taitoz_sg_cpub_interrupt5);
 }
 
 

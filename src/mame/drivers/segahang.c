@@ -111,7 +111,7 @@ static MACHINE_RESET( hangon )
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
-		timer_call_after_resynch(0, suspend_i8751);
+		timer_call_after_resynch(NULL, 0, suspend_i8751);
 
 	/* reset global state */
 	adc_select = 0;
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( hangon_io_w )
 			case 0x0000/2: /* PPI @ 4B */
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				timer_call_after_resynch(((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
@@ -217,7 +217,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 			case 0x0000/2:
 				/* the port C handshaking signals control the Z80 NMI, */
 				/* so we have to sync whenever we access this PPI */
-				timer_call_after_resynch(((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
+				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
@@ -890,7 +890,7 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 	MDRV_CPU_PROGRAM_MAP(sound_map_2203,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
 
-	/* soud hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK_8MHz/2)
@@ -918,7 +918,7 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
 
-	/* soud hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK_8MHz/2)
@@ -956,7 +956,7 @@ static MACHINE_DRIVER_START( sound_board_2151 )
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
 
-	/* soud hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD(YM2151, MASTER_CLOCK_8MHz/2)
@@ -1033,7 +1033,7 @@ MACHINE_DRIVER_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
-    Hang On
+    Hang On (Rev A)
     CPU: 68000 (317-????)
 
      ASSY CPU BD 834-5704-01
@@ -1044,10 +1044,10 @@ MACHINE_DRIVER_END
 */
 ROM_START( hangon )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr-6918.ic22", 0x000000, 0x8000, CRC(20b1c2b0) SHA1(01b4f5105e2bbeb6ec6dbd18bfb728e3a973e0ca) ) /* Manual shows Rev A roms (Currently not dumped) */
-	ROM_LOAD16_BYTE( "epr-6916.ic8",  0x000001, 0x8000, CRC(7d9db1bf) SHA1(952ee3e7a0d57ec1bb3385e0e6675890b8378d31) )
-	ROM_LOAD16_BYTE( "epr-6917.ic20", 0x010000, 0x8000, CRC(fea12367) SHA1(9a1ce5863c562160b657ad948812b43f42d7d0cc) )
-	ROM_LOAD16_BYTE( "epr-6915.ic6",  0x010001, 0x8000, CRC(ac883240) SHA1(f943341ae13e062f3d12c6221180086ce8bdb8c4) )
+	ROM_LOAD16_BYTE( "epr-6918a.ic22", 0x000000, 0x8000, CRC(20b1c2b0) SHA1(01b4f5105e2bbeb6ec6dbd18bfb728e3a973e0ca) )
+	ROM_LOAD16_BYTE( "epr-6916a.ic8",  0x000001, 0x8000, CRC(7d9db1bf) SHA1(952ee3e7a0d57ec1bb3385e0e6675890b8378d31) )
+	ROM_LOAD16_BYTE( "epr-6917a.ic20", 0x010000, 0x8000, CRC(fea12367) SHA1(9a1ce5863c562160b657ad948812b43f42d7d0cc) )
+	ROM_LOAD16_BYTE( "epr-6915a.ic6",  0x010001, 0x8000, CRC(ac883240) SHA1(f943341ae13e062f3d12c6221180086ce8bdb8c4) )
 
 	ROM_REGION( 0x40000, REGION_CPU2, 0 ) /* second 68000 CPU */
 	ROM_LOAD16_BYTE( "epr-6920.ic63", 0x0000, 0x8000, CRC(1c95013e) SHA1(8344ac953477279c2c701f984d98292a21dd2f7d) )
@@ -1089,6 +1089,63 @@ ROM_START( hangon )
 ROM_END
 
 
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
+    Hang On
+    CPU: 68000 (317-????)
+
+     ASSY CPU BD 834-5704-01
+     ASSY CONTROL BD 834-5668
+     ASSY ROM BD 834-5669
+     ASSY SOUND BD 834-5670
+
+*/
+ROM_START( hangon1 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr-6918.ic22", 0x000000, 0x8000, CRC(0bf4f2ac) SHA1(26c5bb6fe805644a8d427ad77814f4b0b1128b1a) )
+	ROM_LOAD16_BYTE( "epr-6916.ic8",  0x000001, 0x8000, CRC(06c21c8a) SHA1(f06f21ff272a803c72e5041534053494f055e466) )
+	ROM_LOAD16_BYTE( "epr-6917.ic20", 0x010000, 0x8000, CRC(f48a6cbc) SHA1(6437efaeb0e4cb727c03eb83678a9e107d244af1) )
+	ROM_LOAD16_BYTE( "epr-6915.ic6",  0x010001, 0x8000, CRC(75d3b5ee) SHA1(00948d0610f52b1b554cadde96227428e510e73e) )
+
+	ROM_REGION( 0x40000, REGION_CPU2, 0 ) /* second 68000 CPU */
+	ROM_LOAD16_BYTE( "epr-6920.ic63", 0x0000, 0x8000, CRC(1c95013e) SHA1(8344ac953477279c2c701f984d98292a21dd2f7d) )
+	ROM_LOAD16_BYTE( "epr-6919.ic51", 0x0001, 0x8000, CRC(6ca30d69) SHA1(ed933351883ebf6d9ef9428a81d09749b609cd60) )
+
+	ROM_REGION( 0x18000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "epr-6841.ic38", 0x00000, 0x08000, CRC(54d295dc) SHA1(ad8cdb281032a2f931c2abbeb966998944683dc3) )
+	ROM_LOAD( "epr-6842.ic23", 0x08000, 0x08000, CRC(f677b568) SHA1(636ca60bd4be9b5c2be09de8ae49db1063aa6c79) )
+	ROM_LOAD( "epr-6843.ic7",  0x10000, 0x08000, CRC(a257f0da) SHA1(9828f8ce4ef245ffb8dbad347f9ca74ed81aa998) )
+
+	ROM_REGION16_BE( 0x80000, REGION_GFX2, 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "epr-6819.ic27", 0x000001, 0x8000, CRC(469dad07) SHA1(6d01c0b3506e28832928ad74d518577ff5be323b) )
+	ROM_LOAD16_BYTE( "epr-6820.ic34", 0x000000, 0x8000, CRC(87cbc6de) SHA1(b64652e062e1b88c6f6ae8dd2ffe4533bb27ba45) )
+	ROM_LOAD16_BYTE( "epr-6821.ic28", 0x010001, 0x8000, CRC(15792969) SHA1(b061dbf24e8b511116446794753c8b0cc49e2149) )
+	ROM_LOAD16_BYTE( "epr-6822.ic35", 0x010000, 0x8000, CRC(e9718de5) SHA1(30e3a7d5b33504da03c5780b4a946b977e46098a) )
+	ROM_LOAD16_BYTE( "epr-6823.ic29", 0x020001, 0x8000, CRC(49422691) SHA1(caee2a4a3f4587ae27dec330214edaa1229012af) )
+	ROM_LOAD16_BYTE( "epr-6824.ic36", 0x020000, 0x8000, CRC(701deaa4) SHA1(053032ef886b85a4cb4753d17b3c27d228695157) )
+	ROM_LOAD16_BYTE( "epr-6825.ic30", 0x030001, 0x8000, CRC(6e23c8b4) SHA1(b17fd7d590ed4e6616b7b4d91a47a2820248d8c7) )
+	ROM_LOAD16_BYTE( "epr-6826.ic37", 0x030000, 0x8000, CRC(77d0de2c) SHA1(83b126ed1d463504b2702391816e6e20dcd04ffc) )
+	ROM_LOAD16_BYTE( "epr-6827.ic31", 0x040001, 0x8000, CRC(7fa1bfb6) SHA1(a27b54c93613372f59050f0b2182d2984a8d2efe) )
+	ROM_LOAD16_BYTE( "epr-6828.ic38", 0x040000, 0x8000, CRC(8e880c93) SHA1(8c55deec065daf09a5d1c1c1f3f3f7bc1aeaf563) )
+	ROM_LOAD16_BYTE( "epr-6829.ic32", 0x050001, 0x8000, CRC(7ca0952d) SHA1(617d73591158ed3fea5174f7dabf0413d28de9b3) )
+	ROM_LOAD16_BYTE( "epr-6830.ic39", 0x050000, 0x8000, CRC(b1a63aef) SHA1(5db0a1cc2d13c6cfc77044f5d7f6f99d198531ed) )
+	ROM_LOAD16_BYTE( "epr-6845.ic18", 0x060001, 0x8000, CRC(ba08c9b8) SHA1(65ceaefa18999c468b38576c29101674d1f63e5f) )
+	ROM_LOAD16_BYTE( "epr-6846.ic25", 0x060000, 0x8000, CRC(f21e57a3) SHA1(92ce0723e722f446c0cef9e23080a008aa9752e7) )
+
+	ROM_REGION( 0x8000, REGION_GFX3, 0 ) /* road gfx */
+	ROM_LOAD( "epr-6840.ic108", 0x0000, 0x8000, CRC(581230e3) SHA1(954eab35059322a12a197bba04bf85f816132f20) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* sound CPU */
+	ROM_LOAD( "epr-6833.ic73", 0x00000, 0x4000, CRC(3b942f5f) SHA1(4384b5c090954e69de561dde0ef32104aa11399a) )
+
+	ROM_REGION( 0x10000, REGION_SOUND1, 0 ) /* Sega PCM sound data */
+	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
+	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
+
+	ROM_REGION( 0x2000, REGION_PROMS, 0 ) /* zoom table */
+	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
@@ -1673,7 +1730,8 @@ static DRIVER_INIT( endurob2 )
  *
  *************************************/
 
-GAME( 1985, hangon,   0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
+GAME( 1985, hangon,   0,        hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On (Rev A)", 0 )
+GAME( 1985, hangon1,  hangon,   hangon,   hangon,   hangon,   ROT0, "Sega",    "Hang-On", 0 )
 GAME( 1992, shangupb, shangon,  shangupb, shangupb, hangon,   ROT0, "bootleg", "Super Hang-On (Hang-On upgrade, bootleg)", 0 )
 GAME( 1985, sharrier, 0,        sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (Rev A, 8751 315-5163A)", 0 )
 GAME( 1985, sharrir1, sharrier, sharrier, sharrier, sharrier, ROT0, "Sega",    "Space Harrier (8751 315-5163)", 0 )

@@ -499,7 +499,7 @@ static struct dynamic_address
  *************************************/
 
 static void vblank_assert(int state);
-static TIMER_CALLBACK( timer_callback );
+static TIMER_CALLBACK( nile_timer_callback );
 static void ide_interrupt(int state);
 static void remap_dynamic_addresses(void);
 
@@ -576,10 +576,10 @@ static MACHINE_RESET( vegas )
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
-	timer[2] = timer_alloc(timer_callback);
-	timer[3] = timer_alloc(timer_callback);
+	timer[0] = timer_alloc(NULL, NULL);
+	timer[1] = timer_alloc(NULL, NULL);
+	timer[2] = timer_alloc(nile_timer_callback, NULL);
+	timer[3] = timer_alloc(nile_timer_callback, NULL);
 
 	/* reset dynamic addressing */
 	memset(nile_regs, 0, 0x1000);
@@ -952,7 +952,7 @@ static void update_nile_irqs(void)
 }
 
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( nile_timer_callback )
 {
 	int which = param;
 	UINT32 *regs = &nile_regs[NREG_T0CTRL + which * 4];

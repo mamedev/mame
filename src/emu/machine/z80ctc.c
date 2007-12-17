@@ -162,10 +162,10 @@ void z80ctc_init(int which, z80ctc_interface *intf)
 	ctc->period256 = attotime_mul(ATTOTIME_IN_HZ(intf->baseclock), 256);
 	ctc->notimer = intf->notimer;
 	ctc->intr = intf->intr;
-	ctc->timer[0] = timer_alloc(timercallback);
-	ctc->timer[1] = timer_alloc(timercallback);
-	ctc->timer[2] = timer_alloc(timercallback);
-	ctc->timer[3] = timer_alloc(timercallback);
+	ctc->timer[0] = timer_alloc(timercallback, NULL);
+	ctc->timer[1] = timer_alloc(timercallback, NULL);
+	ctc->timer[2] = timer_alloc(timercallback, NULL);
+	ctc->timer[3] = timer_alloc(timercallback, NULL);
 	ctc->zc[0] = intf->zc0;
 	ctc->zc[1] = intf->zc1;
 	ctc->zc[2] = intf->zc2;
@@ -391,7 +391,7 @@ void z80ctc_trg_w(int which, int ch, UINT8 data)
 
 				/* if we hit zero, do the same thing as for a timer interrupt */
 				if (!ctc->down[ch])
-					timercallback(Machine, (which << 2) + ch);
+					timercallback(Machine, NULL, (which << 2) + ch);
 			}
 		}
 	}

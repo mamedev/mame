@@ -1286,8 +1286,8 @@ static VIDEO_START( avgdvg )
 
 	flip_x = flip_y = 0;
 
-	vg_halt_timer = timer_alloc(vg_set_halt_callback);
-	vg_run_timer = timer_alloc(run_state_machine);
+	vg_halt_timer = timer_alloc(vg_set_halt_callback, NULL);
+	vg_run_timer = timer_alloc(run_state_machine, NULL);
 
 	/*
      * The x and y DACs use 10 bit of the counter values which are in

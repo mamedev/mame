@@ -36,7 +36,7 @@ void battles_customio_init(void)
 	battles_customio_command_count = 0;
 	battles_customio_data = 0;
 	battles_sound_played = 0;
-	nmi_timer = timer_alloc(battles_nmi_generate);
+	nmi_timer = timer_alloc(battles_nmi_generate, NULL);
 }
 
 

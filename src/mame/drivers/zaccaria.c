@@ -272,7 +272,7 @@ static WRITE8_HANDLER( mc1408_data_w )
 }
 
 
-extern game_driver driver_monymony;
+extern const game_driver driver_monymony;
 
 static READ8_HANDLER( zaccaria_prot1_r )
 {

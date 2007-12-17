@@ -1,6 +1,8 @@
 #ifndef _INCLUDES_N64_H_
 #define _INCLUDES_N64_H_
 
+#include "cpu/rsp/rsp.h"
+
 /*----------- defined in video/n64.c -----------*/
 
 extern VIDEO_START( n64 );
@@ -39,6 +41,8 @@ extern void rdp_process_list(void);
 #define DP_STATUS_FLUSH			0x04
 
 /*----------- defined in machine/n64.c -----------*/
+
+extern rsp_config n64_rsp_config;
 
 extern UINT32 *rdram;
 extern UINT32 *rsp_imem;

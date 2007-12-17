@@ -293,8 +293,8 @@ void amiga_machine_config(const amiga_machine_interface *intf)
 	cia_config(1, &cia_intf[1]);
 
 	/* setup the timers */
-	amiga_irq_timer = timer_alloc(amiga_irq_proc);
-	amiga_blitter_timer = timer_alloc(amiga_blitter_proc);
+	amiga_irq_timer = timer_alloc(amiga_irq_proc, NULL);
+	amiga_blitter_timer = timer_alloc(amiga_blitter_proc, NULL);
 }
 
 
@@ -1308,7 +1308,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (amiga_intf->serdat_w != NULL)
 				(*amiga_intf->serdat_w)(data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(amiga_get_serial_char_period(), 0, finish_serial_write);
+			timer_set(amiga_get_serial_char_period(), NULL, 0, finish_serial_write);
 			break;
 
 		case REG_BLTSIZE:

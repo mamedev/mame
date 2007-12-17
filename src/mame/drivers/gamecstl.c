@@ -11,6 +11,31 @@
     disk image, it's in C:\GH4\GH4.EXE.  It's UPX compressed, so unpack it before doing
     any forensics.  The emulator does run on Windows as new as XP Pro SP2 but you can't
     control it due to the lack of the custom input.
+
+    Updates 27/11/2007 (Diego Nappino):
+    The COM1 port is opened at 19200 bps, No parity, 8 bit data,1 stop bit.
+    The protocol is based on a 6 bytes frame with a leading byte valued 0x05 and a trailing one at 0x02
+    The four middle bytes are used, in negative logic (0xFF = No button pressed), to implement the inputs.
+    Each bit meaning as follows :
+
+               Byte 1         Byte 2          Byte 3        Byte 4
+       Bit 0    P1-Credit      P1-Button C     P2-Left        UNUSED
+    Bit 1    P1-Start       P1-Button D     P2-Right       UNUSED
+    Bit 2    P1-Down        P1-Button E     P2-Button A    SERVICE
+    Bit 3    P1-Up          TEST            P2-Button B    UNUSED
+    Bit 4    P1-Left        P2-Credit       P2-Button C    UNUSED
+    Bit 5    P1-Right       P2-Start        P2-Button D    UNUSED
+    Bit 6    P1-Button A    P2-Down         P2-Button E    UNUSED
+    Bit 7    P1-Button B    P2-Up           VIDEO-MODE     UNUSED
+
+    The JAMMA adaptor sends a byte frame each time an input changes. So, in example, if the P1-Button A and P1-Button B are both pressed, it will send :
+
+    0x05 0xFC 0xFF 0xFF 0xFF 0x02
+
+    And when the buttons are both released
+
+    0x05 0xFF 0xFF 0xFF 0xFF 0x02
+
 */
 
 #include "driver.h"

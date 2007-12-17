@@ -610,6 +610,7 @@ static void check_timer_event(void)
 /* include the opcode functions */
 #include "6800ops.c"
 
+#if (HAS_M6801||HAS_M6803||HAS_HD63701)
 static void m6800_tx(int value)
 {
 	m6800.port2_data = (m6800.port2_data & 0xef) | (value << 4);
@@ -804,6 +805,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 		}
 	}
 }
+#endif
 
 /****************************************************************************
  * Reset registers to their initial values
@@ -1274,8 +1276,8 @@ static void m6801_init(int index, int clock, const void *config, int (*irqcallba
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
 	state_register("m6801", index);
 }
@@ -1307,8 +1309,8 @@ static void m6803_init(int index, int clock, const void *config, int (*irqcallba
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
 	state_register("m6803", index);
 }
@@ -1650,8 +1652,8 @@ static void hd63701_init(int index, int clock, const void *config, int (*irqcall
 	m6800.irq_callback = irqcallback;
 
 	m6800.clock = clock;
-	m6800_rx_timer = timer_alloc(m6800_rx_tick);
-	m6800_tx_timer = timer_alloc(m6800_tx_tick);
+	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
+	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
 	state_register("hd63701", index);
 }

@@ -65,13 +65,13 @@ extern offs_t m68k_encrypted_opcode_end[MAX_CPU];
 #define m68k_read_memory_16(address)         (*m68k_memory_intf.read16)(address)
 #define m68k_read_memory_32(address)         (*m68k_memory_intf.read32)(address)
 
-#define m68k_read_immediate_16(address)      m68kx_read_immediate_16(address)
+#define m68k_read_immediate_16(address)      (*m68k_memory_intf.readimm16)(address)
 #define m68k_read_immediate_32(address)      m68kx_read_immediate_32(address)
 #define m68k_read_pcrelative_8(address)      m68kx_read_pcrelative_8(address)
 #define m68k_read_pcrelative_16(address)     m68kx_read_pcrelative_16(address)
 #define m68k_read_pcrelative_32(address)     m68kx_read_pcrelative_32(address)
 
-#define m68k_read_disassembler_16(address)   m68kx_read_immediate_16(address)
+#define m68k_read_disassembler_16(address)   m68k_read_immediate_16(address)
 #define m68k_read_disassembler_32(address)   m68kx_read_immediate_32(address)
 
 #define m68k_write_memory_8(address, value)  (*m68k_memory_intf.write8)(address, value)
@@ -80,18 +80,12 @@ extern offs_t m68k_encrypted_opcode_end[MAX_CPU];
 #define m68k_write_memory_32_pd(address, value) m68kx_write_memory_32_pd(address, value)
 
 
-INLINE unsigned int m68k_read_immediate_16(unsigned int address);
 INLINE unsigned int m68k_read_immediate_32(unsigned int address);
 INLINE unsigned int m68k_read_pcrelative_8(unsigned int address);
 INLINE unsigned int m68k_read_pcrelative_16(unsigned int address);
 INLINE unsigned int m68k_read_pcrelative_32(unsigned int address);
 INLINE void m68k_write_memory_32_pd(unsigned int address, unsigned int value);
 
-
-INLINE unsigned int m68kx_read_immediate_16(unsigned int address)
-{
-	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
-}
 
 INLINE unsigned int m68kx_read_immediate_32(unsigned int address)
 {

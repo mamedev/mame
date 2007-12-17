@@ -117,7 +117,7 @@ static cia_state cia_array[2];
  *
  *************************************/
 
-static TIMER_CALLBACK_PTR( cia_timer_proc );
+static TIMER_CALLBACK( cia_timer_proc );
 static void cia_timer_underflow(cia_state *cia, int timer);
 static TIMER_CALLBACK( cia_clock_tod_callback );
 
@@ -171,14 +171,14 @@ void cia_config(int which, const cia6526_interface *intf)
 	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
 	{
 		cia_timer *timer = &cia->timer[t];
-		timer->timer = timer_alloc_ptr(cia_timer_proc, timer);
+		timer->timer = timer_alloc(cia_timer_proc, timer);
 		timer->cia = cia;
 		timer->irq = 0x01 << t;
 	}
 
 	/* setup TOD timer, if appropriate */
 	if (intf->tod_clock)
-		timer_pulse(ATTOTIME_IN_HZ(intf->tod_clock), which, cia_clock_tod_callback);
+		timer_pulse(ATTOTIME_IN_HZ(intf->tod_clock), NULL, which, cia_clock_tod_callback);
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)
@@ -323,12 +323,12 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	{
 		/* timer is on and is connected to clock */
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
-		timer_adjust_ptr(timer->timer, period, attotime_zero);
+		timer_adjust(timer->timer, period, 0, attotime_zero);
 	}
 	else
 	{
 		/* timer is off or not connected to clock */
-		timer_adjust_ptr(timer->timer, attotime_never, attotime_zero);
+		timer_adjust(timer->timer, attotime_never, 0, attotime_zero);
 	}
 }
 
@@ -401,9 +401,9 @@ static void cia_timer_underflow(cia_state *cia, int timer)
 }
 
 
-static TIMER_CALLBACK_PTR( cia_timer_proc )
+static TIMER_CALLBACK( cia_timer_proc )
 {
-	cia_timer *timer = param;
+	cia_timer *timer = ptr;
 	cia_state *cia = timer->cia;
 
 	cia_timer_underflow(cia, timer - cia->timer);

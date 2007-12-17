@@ -454,9 +454,9 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET(skns)
 {
-	timer_pulse(ATTOTIME_IN_MSEC(2), 15, interrupt_callback);
-	timer_pulse(ATTOTIME_IN_MSEC(8), 11, interrupt_callback);
-	timer_pulse(ATTOTIME_IN_CYCLES(1824, 0), 9, interrupt_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(2), NULL, 15, interrupt_callback);
+	timer_pulse(ATTOTIME_IN_MSEC(8), NULL, 11, interrupt_callback);
+	timer_pulse(ATTOTIME_IN_CYCLES(1824, 0), NULL, 9, interrupt_callback);
 
 	memory_set_bankptr(1,memory_region(REGION_USER1));
 }

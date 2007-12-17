@@ -258,7 +258,7 @@ void equites_8404init(void)
 	mrulemap = (struct MRULELIST *)byte_ptr; // pointer table to rule lists
 	mrulepool = (struct MRULE *)(byte_ptr + 0x4000); // rules pool
 
-	timer_pulse(ATTOTIME_IN_HZ(106), 0, equites_synth_callback); // hand tuned
+	timer_pulse(ATTOTIME_IN_HZ(106), NULL, 0, equites_synth_callback); // hand tuned
 
 	seedMT(mame_rand(Machine));
 }

@@ -174,7 +174,7 @@ static MACHINE_RESET( jpmimpct )
 {
 	memset(&duart_1, 0, sizeof(duart_1));
 
-	duart_1_timer = timer_alloc(duart_1_timer_event);
+	duart_1_timer = timer_alloc(duart_1_timer_event, NULL);
 
 	/* Reset states */
 	duart_1_irq = tms_irq = 0;

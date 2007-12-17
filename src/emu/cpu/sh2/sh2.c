@@ -2933,13 +2933,13 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 {
 	const struct sh2_config *conf = config;
 
-	sh2.timer = timer_alloc(sh2_timer_callback);
+	sh2.timer = timer_alloc(sh2_timer_callback, NULL);
 	timer_adjust(sh2.timer, attotime_never, 0, attotime_zero);
 
-	sh2.dma_timer[0] = timer_alloc(sh2_dmac_callback);
+	sh2.dma_timer[0] = timer_alloc(sh2_dmac_callback, NULL);
 	timer_adjust(sh2.dma_timer[0], attotime_never, 0, attotime_zero);
 
-	sh2.dma_timer[1] = timer_alloc(sh2_dmac_callback);
+	sh2.dma_timer[1] = timer_alloc(sh2_dmac_callback, NULL);
 	timer_adjust(sh2.dma_timer[1], attotime_never, 0, attotime_zero);
 
 	sh2.m = auto_malloc(0x200);

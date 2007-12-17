@@ -110,7 +110,7 @@ static TIMER_CALLBACK( delayed_68k_w )
 
 WRITE16_HANDLER( hd68k_snd_data_w )
 {
-	timer_call_after_resynch(data, delayed_68k_w);
+	timer_call_after_resynch(NULL, data, delayed_68k_w);
 	logerror("%06X:main write to sound=%04X\n", activecpu_get_previouspc(), data);
 }
 

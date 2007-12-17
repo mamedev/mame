@@ -474,7 +474,7 @@ static TIMER_CALLBACK( gpu_sync_timer )
 {
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (gpu_command_pending && param < 1000)
-		timer_set(ATTOTIME_IN_USEC(50), ++param, gpu_sync_timer);
+		timer_set(ATTOTIME_IN_USEC(50), NULL, ++param, gpu_sync_timer);
 }
 
 
@@ -488,7 +488,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	jaguar_gpu_resume();
 
 	/* start the sync timer going, and note that there is a command pending */
-	timer_call_after_resynch(0, gpu_sync_timer);
+	timer_call_after_resynch(NULL, 0, gpu_sync_timer);
 	gpu_command_pending = 1;
 }
 

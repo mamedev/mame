@@ -201,7 +201,7 @@ void mc146818_init(MC146818_TYPE type)
 	memset(mc146818, 0, sizeof(*mc146818));
 	mc146818->type = type;
 	mc146818->last_refresh = timer_get_time();
-    timer_pulse(ATTOTIME_IN_HZ(1), 0, mc146818_timer);
+    timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, mc146818_timer);
 	mc146818_set_base_datetime();
 }
 

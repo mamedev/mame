@@ -37,22 +37,22 @@
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)	ATTOTIME_IN_NSEC((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
-#define timer_alloc(c)					_timer_alloc(c, __FILE__, __LINE__, #c)
-#define timer_alloc_ptr(c,p)			_timer_alloc_ptr(c, p, __FILE__, __LINE__, #c)
-#define timer_pulse(e,p,c)				_timer_pulse(e, p, c, __FILE__, __LINE__, #c)
-#define timer_pulse_ptr(e,p,c)			_timer_pulse_ptr(e, p, c, __FILE__, __LINE__, #c)
-#define timer_set(d,p,c)				_timer_set(d, p, c, __FILE__, __LINE__, #c)
-#define timer_set_ptr(d,p,c)			_timer_set_ptr(d, p, c, __FILE__, __LINE__, #c)
+#define timer_alloc(c,ptr)				_timer_alloc_internal(c, ptr, __FILE__, __LINE__, #c)
+#define timer_pulse(e,ptr,p,c)			_timer_pulse_internal(e, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_set(d,ptr,p,c)			_timer_set_internal(d, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_call_after_resynch(ptr,p,c) _timer_set_internal(attotime_zero, ptr, p, c, __FILE__, __LINE__, #c)
 
 /* macros for a timer callback functions */
-#define TIMER_CALLBACK(name)			void name(running_machine *machine, int param)
-#define TIMER_CALLBACK_PTR(name)		void name(running_machine *machine, void *param)
+#define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
 
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* a timer callback looks like this */
+typedef void (*timer_callback)(running_machine *machine, void *ptr, INT32 param);
 
 /* opaque type for representing a timer */
 typedef struct _emu_timer emu_timer;
@@ -104,24 +104,20 @@ int timer_count_anonymous(void);
 /* ----- core timer management ----- */
 
 /* allocate a permament timer that isn't primed yet */
-emu_timer *_timer_alloc(void (*callback)(running_machine *, int), const char *file, int line, const char *func);
-emu_timer *_timer_alloc_ptr(void (*callback)(running_machine *, void *), void *param, const char *file, int line, const char *func);
+emu_timer *_timer_alloc_internal(timer_callback callback, void *param, const char *file, int line, const char *func);
 
 /* adjust the time when this timer will fire, and whether or not it will fire periodically */
 void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period);
-void timer_adjust_ptr(emu_timer *which, attotime duration, attotime period);
 
 
 
 /* ----- anonymous timer management ----- */
 
-/* allocate a pulse timer, which repeatedly calls the callback using the given period */
-void _timer_pulse(attotime period, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func);
-void _timer_pulse_ptr(attotime period, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func);
-
 /* allocate a one-shot timer, which calls the callback after the given duration */
-void _timer_set(attotime duration, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func);
-void _timer_set_ptr(attotime duration, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func);
+void _timer_set_internal(attotime druation, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func);
+
+/* allocate a pulse timer, which repeatedly calls the callback using the given period */
+void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func);
 
 
 
@@ -158,28 +154,6 @@ attotime timer_starttime(emu_timer *which);
 
 /* return the time when this timer will fire next */
 attotime timer_firetime(emu_timer *which);
-
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    timer_call_after_resynch - synchs the CPUs
-    and calls the callback immediately
--------------------------------------------------*/
-
-INLINE void timer_call_after_resynch(INT32 param, void (*callback)(running_machine *, int))
-{
-	timer_set(attotime_zero, param, callback);
-}
-
-INLINE void timer_call_after_resynch_ptr(void *param, void (*callback)(running_machine *, void *))
-{
-	timer_set_ptr(attotime_zero, param, callback);
-}
 
 
 #endif	/* __TIMER_H__ */

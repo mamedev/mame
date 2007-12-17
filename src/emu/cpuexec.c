@@ -92,7 +92,7 @@ struct _cpuexec_data
 	INT32 	iloops; 				/* number of interrupts remaining this frame */
 
 	UINT64 	totalcycles;			/* total CPU cycles executed */
-	attotime localtime;			/* local time, relative to the timer system's global time */
+	attotime localtime;				/* local time, relative to the timer system's global time */
 	INT32	clock;					/* current active clock */
 	double	clockscale;				/* current active clock scale factor */
 
@@ -202,8 +202,8 @@ void cpuexec_init(running_machine *machine)
 		machine->screen[0].vblank = (machine->screen[0].refresh / machine->screen[0].height) * (machine->screen[0].height - (machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y));
 
 	/* allocate vblank and refresh timers, and compute the initial timing */
-	vblank_timer = timer_alloc(cpu_vblankcallback);
-	refresh_timer = timer_alloc(NULL);
+	vblank_timer = timer_alloc(cpu_vblankcallback, NULL);
+	refresh_timer = timer_alloc(NULL, NULL);
 	cpu_compute_vblank_timing();
 
 	/* loop over all our CPUs */
@@ -372,7 +372,7 @@ static void watchdog_setup(int alloc_new)
 		{
 			/* Start a time based watchdog. */
 			if (alloc_new)
-				watchdog_timer = timer_alloc(watchdog_callback);
+				watchdog_timer = timer_alloc(watchdog_callback, NULL);
 			timer_adjust(watchdog_timer, Machine->drv->watchdog_time, 0, attotime_zero);
 			watchdog_counter = WATCHDOG_IS_TIMER_BASED;
 		}
@@ -998,7 +998,7 @@ static TIMER_CALLBACK( cpu_triggertime_callback )
 
 void cpu_triggertime(attotime duration, int trigger)
 {
-	timer_set(duration, trigger, cpu_triggertime_callback);
+	timer_set(duration, NULL, trigger, cpu_triggertime_callback);
 }
 
 
@@ -1046,19 +1046,6 @@ void cpunum_spinuntil_trigger( int cpunum, int trigger )
 	cpu[cpunum].trigger = trigger;
 }
 
-void cpu_yielduntil_trigger(int trigger)
-{
-	int cpunum = cpu_getexecutingcpu();
-
-	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
-
-	/* suspend the CPU immediately if it's not already */
-	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, 0);
-
-	/* set the trigger */
-	cpu[cpunum].trigger = trigger;
-}
-
 
 
 /*************************************
@@ -1072,13 +1059,6 @@ void cpu_spinuntil_int(void)
 {
 	VERIFY_EXECUTINGCPU(cpu_spinuntil_int);
 	cpu_spinuntil_trigger(TRIGGER_INT + activecpu);
-}
-
-
-void cpu_yielduntil_int(void)
-{
-	VERIFY_EXECUTINGCPU(cpu_yielduntil_int);
-	cpu_yielduntil_trigger(TRIGGER_INT + activecpu);
 }
 
 
@@ -1098,7 +1078,15 @@ void cpu_spin(void)
 
 void cpu_yield(void)
 {
-	cpu_yielduntil_trigger(TRIGGER_TIMESLICE);
+	int cpunum = cpu_getexecutingcpu();
+
+	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
+
+	/* suspend the CPU immediately if it's not already */
+	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, 0);
+
+	/* set the trigger */
+	cpu[cpunum].trigger = TRIGGER_TIMESLICE;
 }
 
 
@@ -1116,16 +1104,6 @@ void cpu_spinuntil_time(attotime duration)
 
 	cpu_spinuntil_trigger(TRIGGER_SUSPENDTIME + timetrig);
 	cpu_triggertime(duration, TRIGGER_SUSPENDTIME + timetrig);
-	timetrig = (timetrig + 1) & 255;
-}
-
-
-void cpu_yielduntil_time(attotime duration)
-{
-	static int timetrig = 0;
-
-	cpu_yielduntil_trigger(TRIGGER_YIELDTIME + timetrig);
-	cpu_triggertime(duration, TRIGGER_YIELDTIME + timetrig);
 	timetrig = (timetrig + 1) & 255;
 }
 
@@ -1213,7 +1191,7 @@ static TIMER_CALLBACK( cpu_firstvblankcallback )
 	timer_adjust(vblank_timer, vblank_period, param, vblank_period);
 
 	/* but we need to call the standard routine as well */
-	cpu_vblankcallback(machine, param);
+	cpu_vblankcallback(machine, NULL, param);
 }
 
 
@@ -1271,7 +1249,7 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 	{
 		/* do we update the screen now? */
 		if (!(machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-			video_frame_update();
+			video_frame_update(FALSE);
 
 		/* Set the timer to update the screen */
 		timer_adjust(update_timer, attotime_make(0, machine->screen[0].vblank), 0, attotime_zero);
@@ -1301,7 +1279,7 @@ static TIMER_CALLBACK( cpu_updatecallback )
 {
 	/* update the screen if we didn't before */
 	if (machine->drv->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
-		video_frame_update();
+		video_frame_update(FALSE);
 	vblank = 0;
 
 	/* update IPT_VBLANK input ports */
@@ -1416,12 +1394,12 @@ static void cpu_inittimers(running_machine *machine)
 	if (ipf <= 0)
 		ipf = 1;
 	timeslice_period = attotime_make(0, machine->screen[0].refresh / ipf);
-	timeslice_timer = timer_alloc(cpu_timeslicecallback);
+	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
 	timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
 
 	/* allocate timers to handle interleave boosts */
-	interleave_boost_timer = timer_alloc(NULL);
-	interleave_boost_timer_end = timer_alloc(end_interleave_boost);
+	interleave_boost_timer = timer_alloc(NULL, NULL);
+	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 
 	/*
      *  The following code finds all the CPUs that are interrupting in sync with the VBLANK
@@ -1468,7 +1446,7 @@ static void cpu_inittimers(running_machine *machine)
 	vblank_countdown = vblank_multiplier;
 
 	/* allocate an update timer that will be used to time the actual screen updates */
-	update_timer = timer_alloc(cpu_updatecallback);
+	update_timer = timer_alloc(cpu_updatecallback, NULL);
 
 	/*
      *      The following code creates individual timers for each CPU whose interrupts are not
@@ -1483,13 +1461,13 @@ static void cpu_inittimers(running_machine *machine)
 		/* compute the average number of cycles per interrupt */
 		if (ipf <= 0)
 			ipf = 1;
-		cpu[cpunum].vblankint_timer = timer_alloc(NULL);
+		cpu[cpunum].vblankint_timer = timer_alloc(NULL, NULL);
 
 		/* see if we need to allocate a CPU timer */
 		if (machine->drv->cpu[cpunum].timed_interrupt_period != 0)
 		{
 			cpu[cpunum].timedint_period = attotime_make(0, machine->drv->cpu[cpunum].timed_interrupt_period);
-			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback);
+			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback, NULL);
 			timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}
 	}
@@ -1500,10 +1478,10 @@ static void cpu_inittimers(running_machine *machine)
 	first_time = attotime_sub_attoseconds(vblank_period, machine->screen[0].vblank);
 	while (attotime_compare(first_time, attotime_zero) < 0)
 	{
-		cpu_vblankcallback(machine, -1);
+		cpu_vblankcallback(machine, NULL, -1);
 		first_time = attotime_add(first_time, vblank_period);
 	}
-	timer_set(first_time, 0, cpu_firstvblankcallback);
+	timer_set(first_time, NULL, 0, cpu_firstvblankcallback);
 
 	/* reset the refresh timer to get ourself back in sync */
 	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);

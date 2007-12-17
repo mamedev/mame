@@ -656,7 +656,7 @@ static MACHINE_RESET( qdrmfgp2 )
 	sndram = memory_region(REGION_SOUND1) + 0x100000;
 
 	/* sound irq (CCU? 240Hz) */
-	timer_pulse(ATTOTIME_IN_HZ(18432000/76800), 0, gp2_timer_callback);
+	timer_pulse(ATTOTIME_IN_HZ(18432000/76800), NULL, 0, gp2_timer_callback);
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;

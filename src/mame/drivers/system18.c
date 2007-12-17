@@ -190,7 +190,7 @@ static struct MSM5205interface shdancbl_msm5205_interface =
 	MSM5205_S48_4B
 };
 
-UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
+static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
 
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_LSB ){

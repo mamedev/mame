@@ -12,8 +12,8 @@ void ppc602_exception(int exception);
 #endif
 #if (HAS_PPC403)
 void ppc403_exception(int exception);
-UINT8 ppc403_spu_r(UINT32 a);
-void ppc403_spu_w(UINT32 a, UINT8 d);
+static UINT8 ppc403_spu_r(UINT32 a);
+static void ppc403_spu_w(UINT32 a, UINT8 d);
 #endif
 
 #define RD				((op >> 21) & 0x1F)
@@ -921,8 +921,8 @@ static void ppc403_init(int index, int clock, const void *_config, int (*irqcall
 	// !!! why is rfci here !!!
 	optable19[51] = ppc_rfci;
 
-	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback);
-	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback);
+	ppc.spu.rx_timer = timer_alloc(ppc403_spu_rx_callback, NULL);
+	ppc.spu.tx_timer = timer_alloc(ppc403_spu_tx_callback, NULL);
 
 	ppc.read8 = ppc403_read8;
 	ppc.read16 = ppc403_read16;

@@ -108,7 +108,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xd7);
-   	timer_set(ATTOTIME_IN_HZ(120), 0, stfight_interrupt_1);
+   	timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 
 /*

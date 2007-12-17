@@ -186,13 +186,13 @@ static struct ide_state idestate[MAX_IDE_CONTROLLERS];
  *
  *************************************/
 
-static TIMER_CALLBACK_PTR( reset_callback );
+static TIMER_CALLBACK( reset_callback );
 
 static void ide_build_features(struct ide_state *ide);
 
 static void continue_read(struct ide_state *ide);
 static void read_sector_done(struct ide_state *ide);
-static TIMER_CALLBACK_PTR( read_sector_done_callback );
+static TIMER_CALLBACK( read_sector_done_callback );
 static void read_first_sector(struct ide_state *ide);
 static void read_next_sector(struct ide_state *ide);
 
@@ -237,17 +237,17 @@ INLINE void clear_interrupt(struct ide_state *ide)
  *
  *************************************/
 
-static TIMER_CALLBACK_PTR( delayed_interrupt )
+static TIMER_CALLBACK( delayed_interrupt )
 {
-	struct ide_state *ide = param;
+	struct ide_state *ide = ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	signal_interrupt(ide);
 }
 
 
-static TIMER_CALLBACK_PTR( delayed_interrupt_buffer_ready )
+static TIMER_CALLBACK( delayed_interrupt_buffer_ready )
 {
-	struct ide_state *ide = param;
+	struct ide_state *ide = ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	ide->status |= IDE_STATUS_BUFFER_READY;
 	signal_interrupt(ide);
@@ -262,9 +262,9 @@ INLINE void signal_delayed_interrupt(struct ide_state *ide, attotime time, int b
 
 	/* set a timer */
 	if (buffer_ready)
-		timer_set_ptr(time, ide, delayed_interrupt_buffer_ready);
+		timer_set(time, ide, 0, delayed_interrupt_buffer_ready);
 	else
-		timer_set_ptr(time, ide, delayed_interrupt);
+		timer_set(time, ide, 0, delayed_interrupt);
 }
 
 
@@ -328,8 +328,8 @@ int ide_controller_init_custom(int which, struct ide_interface *intf, chd_file *
 	ide_build_features(ide);
 
 	/* create a timer for timing status */
-	ide->last_status_timer = timer_alloc(NULL);
-	ide->reset_timer = timer_alloc_ptr(reset_callback, ide);
+	ide->last_status_timer = timer_alloc(NULL, NULL);
+	ide->reset_timer = timer_alloc(reset_callback, ide);
 
 	/* register ide status */
 	state_save_register_item("ide", which, ide->adapter_control);
@@ -432,9 +432,9 @@ void ide_set_user_password(int which, UINT8 *password)
 }
 
 
-static TIMER_CALLBACK_PTR( reset_callback )
+static TIMER_CALLBACK( reset_callback )
 {
-	ide_controller_reset_ptr(param);
+	ide_controller_reset_ptr(ptr);
 }
 
 
@@ -736,9 +736,9 @@ static void ide_build_features(struct ide_state *ide)
  *
  *************************************/
 
-static TIMER_CALLBACK_PTR( security_error_done )
+static TIMER_CALLBACK( security_error_done )
 {
-	struct ide_state *ide = param;
+	struct ide_state *ide = ptr;
 
 	/* clear error state */
 	ide->status &= ~IDE_STATUS_ERROR;
@@ -752,7 +752,7 @@ static void security_error(struct ide_state *ide)
 	ide->status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
-	timer_set_ptr(TIME_SECURITY_ERROR, ide, security_error_done);
+	timer_set(TIME_SECURITY_ERROR, ide, 0, security_error_done);
 }
 
 
@@ -904,9 +904,9 @@ static void read_sector_done(struct ide_state *ide)
 }
 
 
-static TIMER_CALLBACK_PTR( read_sector_done_callback )
+static TIMER_CALLBACK( read_sector_done_callback )
 {
-	read_sector_done(param);
+	read_sector_done(ptr);
 }
 
 
@@ -927,10 +927,10 @@ static void read_first_sector(struct ide_state *ide)
 			seek_time = TIME_SEEK_MULTISECTOR;
 
 		ide->cur_lba = new_lba;
-		timer_set_ptr(seek_time, ide, read_sector_done_callback);
+		timer_set(seek_time, ide, 0, read_sector_done_callback);
 	}
 	else
-		timer_set_ptr(TIME_PER_SECTOR, ide, read_sector_done_callback);
+		timer_set(TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
 }
 
 
@@ -946,11 +946,11 @@ static void read_next_sector(struct ide_state *ide)
 			read_sector_done(ide);
 		else
 			/* just set a timer */
-			timer_set_ptr(ATTOTIME_IN_USEC(1), ide, read_sector_done_callback);
+			timer_set(ATTOTIME_IN_USEC(1), ide, 0, read_sector_done_callback);
 	}
 	else
 		/* just set a timer */
-		timer_set_ptr(TIME_PER_SECTOR, ide, read_sector_done_callback);
+		timer_set(TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
 }
 
 
@@ -962,7 +962,7 @@ static void read_next_sector(struct ide_state *ide)
  *************************************/
 
 static void write_sector_done(struct ide_state *ide);
-static TIMER_CALLBACK_PTR( write_sector_done_callback );
+static TIMER_CALLBACK( write_sector_done_callback );
 
 static void continue_write(struct ide_state *ide)
 {
@@ -983,13 +983,13 @@ static void continue_write(struct ide_state *ide)
 		else
 		{
 			/* set a timer to do the write */
-			timer_set_ptr(TIME_PER_SECTOR, ide, write_sector_done_callback);
+			timer_set(TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
 		}
 	}
 	else
 	{
 		/* set a timer to do the write */
-		timer_set_ptr(TIME_PER_SECTOR, ide, write_sector_done_callback);
+		timer_set(TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
 	}
 }
 
@@ -1106,9 +1106,9 @@ static void write_sector_done(struct ide_state *ide)
 }
 
 
-static TIMER_CALLBACK_PTR( write_sector_done_callback )
+static TIMER_CALLBACK( write_sector_done_callback )
 {
-	write_sector_done(param);
+	write_sector_done(ptr);
 }
 
 
@@ -1563,7 +1563,7 @@ static void ide_controller_write(struct ide_state *ide, offs_t offset, int size,
 			{
 				ide->status |= IDE_STATUS_BUSY;
 				ide->status &= ~IDE_STATUS_DRIVE_READY;
-				timer_adjust_ptr(ide->reset_timer, ATTOTIME_IN_MSEC(5), attotime_zero);
+				timer_adjust(ide->reset_timer, ATTOTIME_IN_MSEC(5), 0, attotime_zero);
 			}
 			break;
 	}

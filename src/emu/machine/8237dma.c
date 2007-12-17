@@ -75,8 +75,8 @@ int dma8237_init(int count)
 	for (which = 0; which < dma_count; which++)
 	{
 		dma[which].status = 0x0F;
-		dma[which].timer = timer_alloc(dma8237_timerproc);
-		dma[which].msbflip_timer = timer_alloc(dma8237_msbflip_timerproc);
+		dma[which].timer = timer_alloc(dma8237_timerproc, NULL);
+		dma[which].msbflip_timer = timer_alloc(dma8237_msbflip_timerproc, NULL);
 		dma[which].eop = 1;
 	}
 	return 0;
@@ -406,7 +406,7 @@ void dma8237_drq_write(int which, int channel, int state)
 	int param;
 
 	param = (which << 3) | (channel << 1) | (state ? 1 : 0);
-	//timer_call_after_resynch(param, dma8237_drq_write_callback);
+	//timer_call_after_resynch(NULL, param, dma8237_drq_write_callback);
 	dma8237_drq_write_callback(param);
 }
 

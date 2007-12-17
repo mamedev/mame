@@ -33,7 +33,7 @@ void mb3773_set_ck( UINT8 new_ck )
 
 void mb3773_init( void )
 {
-	watchdog_timer = timer_alloc( watchdog_timeout );
+	watchdog_timer = timer_alloc( watchdog_timeout , NULL);
 	reset_timer();
 	state_save_register_global( ck );
 }

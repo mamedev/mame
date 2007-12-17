@@ -503,7 +503,7 @@ void init_pc_common(UINT32 flags)
 		pc_page_offset_mask = 0x0F0000;
 	}
 
-	pc_keyboard_timer = timer_alloc(pc_keyb_timer);
+	pc_keyboard_timer = timer_alloc(pc_keyb_timer, NULL);
 }
 
 /*

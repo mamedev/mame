@@ -662,7 +662,7 @@ static void adjust_timer_interrupt(void)
 		timer_adjust(hyperstone.timer, attotime_never, 0, attotime_never);
 }
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( e132xs_timer_callback )
 {
 	int update = param & 1;
 	int cpunum = param >> 1;
@@ -1576,7 +1576,7 @@ static void hyperstone_init(int index, int clock, const void *config, int (*irqc
 	state_save_register_item("E132XS", index, hyperstone.tr_clocks_per_tick);
 
 	hyperstone.irq_callback = irqcallback;
-	hyperstone.timer = timer_alloc(timer_callback);
+	hyperstone.timer = timer_alloc(e132xs_timer_callback, NULL);
 	hyperstone.clock_scale_mask = scale_mask;
 }
 

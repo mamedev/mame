@@ -1607,7 +1607,7 @@ static const char *battles_sample_names[] =
 	0	/* end of array */
 };
 
-struct Samplesinterface battles_samples_interface =
+static struct Samplesinterface battles_samples_interface =
 {
 	1,	/* one channel */
 	battles_sample_names

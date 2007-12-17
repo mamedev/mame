@@ -125,6 +125,6 @@ void *geebee_sh_start(int clock, const struct CustomSound_interface *config)
 	channel = stream_create(0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	vcount = 0;
 
-	volume_timer = timer_alloc(volume_decay);
+	volume_timer = timer_alloc(volume_decay, NULL);
     return auto_malloc(1);
 }

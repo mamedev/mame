@@ -64,8 +64,8 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 {
 	/* Unsure of actual sequence */
 
-	timer_set(ATTOTIME_IN_CYCLES(500,0),0, gcpinbal_interrupt1);
-//  timer_set(ATTOTIME_IN_CYCLES(1000,0),0, gcpinbal_interrupt3);
+	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, gcpinbal_interrupt1);
+//  timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, gcpinbal_interrupt3);
 	cpunum_set_input_line(0, 4, HOLD_LINE);
 }
 

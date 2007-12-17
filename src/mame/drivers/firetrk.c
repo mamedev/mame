@@ -102,7 +102,7 @@ static TIMER_CALLBACK( periodic_callback )
 		scanline = 0;
 	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, periodic_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, periodic_callback);
 }
 
 
@@ -226,7 +226,7 @@ static void write_output(UINT8 flags)
 
 static MACHINE_RESET( firetrk )
 {
-	timer_pulse(video_screen_get_frame_period(0), 0, frame_callback);
+	timer_pulse(video_screen_get_frame_period(0), NULL, 0, frame_callback);
 
 	if (GAME_IS_MONTECARLO)
 	{
@@ -241,7 +241,7 @@ static MACHINE_RESET( firetrk )
 		set_firetrk_service(last_service);
 	}
 
-	timer_call_after_resynch(0, periodic_callback);
+	timer_call_after_resynch(NULL, 0, periodic_callback);
 }
 
 

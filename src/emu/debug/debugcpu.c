@@ -530,7 +530,7 @@ void debug_halt_on_next_instruction(void)
 
 void debug_refresh_display(void)
 {
-	video_frame_update();
+	video_frame_update(TRUE);
 }
 
 

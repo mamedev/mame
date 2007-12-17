@@ -230,7 +230,7 @@ struct CPS1config
 	int kludge;  /* Ghouls n Ghosts sprite kludge */
 };
 
-struct CPS1config *cps1_game_config;
+static struct CPS1config *cps1_game_config;
 
 /*                 CPSB ID    multiply protection  ctrl     priority masks   unknwn     layer enable masks  */
 #define CPS_B_01 0x00,0x0000, 0,0,0,0, /* n/a */   0x66,{0x68,0x6a,0x6c,0x6e},0x70, {0x02,0x04,0x08,0x30,0x30}
@@ -601,11 +601,11 @@ size_t cps1_output_size;
 static int palette_basecolor[6];
 #define cps1_palette_entries (32*8)  /* Number colour schemes in palette */
 
-const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
-const int cps1_obj_size    =0x0800;
-const int cps1_other_size  =0x0800;
-const int cps1_palette_align=0x0800;	/* can't be larger than this, breaks ringdest & batcirc otherwise */
-const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette RAM */
+static const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
+static const int cps1_obj_size    =0x0800;
+static const int cps1_other_size  =0x0800;
+static const int cps1_palette_align=0x0800;	/* can't be larger than this, breaks ringdest & batcirc otherwise */
+static const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette RAM */
 
 static UINT16 *cps1_scroll1;
 static UINT16 *cps1_scroll2;
@@ -661,7 +661,7 @@ CPS1 VIDEO RENDERER
 static const int stars_rom_size = 0x2000;
 
 /* PSL: CPS2 support */
-const int cps2_obj_size    =0x2000;
+static const int cps2_obj_size    =0x2000;
 UINT16 *cps2_objram1,*cps2_objram2;
 UINT16 *cps2_output;
 

@@ -283,7 +283,7 @@ static const UINT16* palette_data_lookup[] =
 };
 
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( volfied_timer_callback )
 {
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (current_cmd>=0x1 && current_cmd<0x12)
@@ -392,12 +392,12 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (current_cmd >= 0x1 && current_cmd < 0x12)
 			{
-				timer_set(ATTOTIME_IN_CYCLES(122242,0), 0, timer_callback);
+				timer_set(ATTOTIME_IN_CYCLES(122242,0), NULL, 0, volfied_timer_callback);
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (current_cmd >= 0x81 && current_cmd < 0x92)
 			{
-				timer_set(ATTOTIME_IN_CYCLES(105500,0), 0, timer_callback);
+				timer_set(ATTOTIME_IN_CYCLES(105500,0), NULL, 0, volfied_timer_callback);
 			}
 			else
 			{

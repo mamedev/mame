@@ -150,7 +150,7 @@ typedef struct {
 	void	(*sod_callback)(int state);
 }	i8085_Regs;
 
-int i8085_ICount = 0;
+static int i8085_ICount = 0;
 
 static i8085_Regs I;
 static UINT8 ZS[256];

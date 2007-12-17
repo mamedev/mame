@@ -295,7 +295,7 @@ static READ32_HANDLER( unknown_hardware_r )
 static WRITE32_HANDLER( unknown_int_req_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(ATTOTIME_IN_CYCLES(10000,0),0, undrfire_interrupt5);
+	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, undrfire_interrupt5);
 }
 
 

@@ -153,7 +153,7 @@ static TIMER_CALLBACK( scanline_update )
 static MACHINE_START( foodf )
 {
 	state_save_register_global(whichport);
-	scanline_timer = timer_alloc(scanline_update);
+	scanline_timer = timer_alloc(scanline_update, NULL);
 }
 
 

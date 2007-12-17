@@ -122,7 +122,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
 	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(ATTOTIME_IN_USEC(50),0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
+	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
 /********************************************/

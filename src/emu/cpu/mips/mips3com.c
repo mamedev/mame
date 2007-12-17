@@ -118,7 +118,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 	mips->tlb_table = auto_malloc(sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
 
 	/* allocate a timer for the compare interrupt */
-	mips->compare_int_timer = timer_alloc(compare_int_callback);
+	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
 
 	/* reset the state */
 	mips3com_reset(mips);

@@ -139,7 +139,7 @@ static const char *register_names[] =
  *************************************/
 
 static TIMER_CALLBACK( dma_timer_callback );
-static TIMER_CALLBACK( timer_callback );
+static TIMER_CALLBACK( cage_timer_callback );
 static void update_timer(int which);
 static WRITE32_HANDLER( speedup_w );
 
@@ -164,9 +164,9 @@ void cage_init(int boot_region, offs_t speedup)
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(Machine->drv->cpu[cage_cpu].clock);
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
-	dma_timer = timer_alloc(dma_timer_callback);
-	timer[0] = timer_alloc(timer_callback);
-	timer[1] = timer_alloc(timer_callback);
+	dma_timer = timer_alloc(dma_timer_callback, NULL);
+	timer[0] = timer_alloc(cage_timer_callback, NULL);
+	timer[1] = timer_alloc(cage_timer_callback, NULL);
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
@@ -276,7 +276,7 @@ static void update_dma_state(void)
  *
  *************************************/
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( cage_timer_callback )
 {
 	int which = param;
 
@@ -521,7 +521,7 @@ void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
 		logerror("%06X:Command to CAGE = %04X\n", activecpu_get_pc(), data);
-	timer_call_after_resynch(data, deferred_cage_w);
+	timer_call_after_resynch(NULL, data, deferred_cage_w);
 }
 
 

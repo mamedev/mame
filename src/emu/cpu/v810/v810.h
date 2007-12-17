@@ -3,8 +3,6 @@
 
 #include "cpuintrf.h"
 
-extern int v810_ICount;
-
 void v810_get_info(UINT32, cpuinfo*);
 
 #define R_B(addr) (program_read_byte_32le(addr))

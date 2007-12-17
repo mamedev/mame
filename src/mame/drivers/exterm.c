@@ -104,7 +104,7 @@ static TIMER_CALLBACK( master_sound_nmi_callback );
 
 static MACHINE_RESET( exterm )
 {
-	sound_nmi_timer = timer_alloc(master_sound_nmi_callback);
+	sound_nmi_timer = timer_alloc(master_sound_nmi_callback, NULL);
 }
 
 
@@ -222,7 +222,7 @@ static TIMER_CALLBACK( sound_delayed_w )
 static WRITE16_HANDLER( sound_latch_w )
 {
 	if (ACCESSING_LSB)
-		timer_call_after_resynch(data & 0xff, sound_delayed_w);
+		timer_call_after_resynch(NULL, data & 0xff, sound_delayed_w);
 }
 
 

@@ -6753,8 +6753,8 @@ static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 static DRIVER_INIT( svcpcb )
 {
 	/* start a timer that will check the BIOS select DIP every second */
-	timer_pulse(ATTOTIME_IN_MSEC(1000), 0, svcpcb_bios_timer_callback);
-	svcpcb_bios_timer_callback(machine, 0);
+	timer_pulse(ATTOTIME_IN_MSEC(1000), NULL, 0, svcpcb_bios_timer_callback);
+	svcpcb_bios_timer_callback(machine, NULL, 0);
 
 	svcchaos_px_decrypt();
 	svcpcb_gfx_decrypt();

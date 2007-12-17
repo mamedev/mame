@@ -103,7 +103,7 @@ static TIMER_CALLBACK( vdp_reload_counter )
 		{
 			scanline_int = 1;
 			update_interrupts();
-			timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), 0, vdp_int4_off);
+			timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), NULL, 0, vdp_int4_off);
 		}
 
 	/* advance to the next scanline */
@@ -134,7 +134,7 @@ INTERRUPT_GEN( genesis_vblank_interrupt )
 	update_interrupts();
 
 	/* set a timer to turn it off */
-	timer_set(video_screen_get_time_until_pos(0, video_screen_get_vpos(0), 22), 0, vdp_int6_off);
+	timer_set(video_screen_get_time_until_pos(0, video_screen_get_vpos(0), 22), NULL, 0, vdp_int6_off);
 }
 
 
@@ -172,7 +172,7 @@ MACHINE_RESET( genesis )
 	logerror("Machine init\n");
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = timer_alloc(vdp_reload_counter);
+	scan_timer = timer_alloc(vdp_reload_counter, NULL);
 	timer_adjust(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0, attotime_zero);
 }
 

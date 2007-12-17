@@ -85,7 +85,7 @@ static TIMER_CALLBACK( latch_callback )
 
 INLINE void latch_w(int which, UINT16 value)
 {
-	timer_call_after_resynch(which | (value << 8), latch_callback);
+	timer_call_after_resynch(NULL, which | (value << 8), latch_callback);
 }
 
 

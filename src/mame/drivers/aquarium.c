@@ -57,7 +57,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 static int aquarium_snd_ack;
 
-UINT16 *aquarium_scroll, *aquarium_priority;
+UINT16 *aquarium_scroll;
+//UINT16 *aquarium_priority;
 UINT16 *aquarium_txt_videoram;
 UINT16 *aquarium_mid_videoram;
 UINT16 *aquarium_bak_videoram;

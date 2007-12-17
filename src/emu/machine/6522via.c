@@ -251,7 +251,7 @@ static void via_shift(int which)
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter)
-			timer_set(v_cycles_to_time(v, 2), which, via_shift_callback);
+			timer_set(v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
 		else
 		{
 			if (!(v->ifr & INT_SR))
@@ -365,9 +365,9 @@ void via_reset(void)
 		v.time2 = via[i].time2;
 		v.clock = via[i].clock;
 
-		v.t1 = timer_alloc(via_t1_timeout);
+		v.t1 = timer_alloc(via_t1_timeout, NULL);
 		v.t1_active = 0;
-		v.t2 = timer_alloc(via_t2_timeout);
+		v.t2 = timer_alloc(via_t2_timeout, NULL);
 		v.t2_active = 0;
 
 		via[i] = v;
@@ -524,7 +524,7 @@ int via_read(int which, int offset)
 		if (SO_O2_CONTROL(v->acr))
 		{
 			v->shift_counter=0;
-			timer_set(v_cycles_to_time(v, 2), which,via_shift_callback);
+			timer_set(v_cycles_to_time(v, 2), NULL, which,via_shift_callback);
 		}
 		break;
 
@@ -754,7 +754,7 @@ void via_write(int which, int offset, int data)
 		via_clear_int(which, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
-			timer_set(v_cycles_to_time(v, 2), which,via_shift_callback);
+			timer_set(v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
 		}
 		break;
 

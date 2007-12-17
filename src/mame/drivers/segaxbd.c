@@ -150,7 +150,7 @@ static TIMER_CALLBACK( scanline_callback )
 		update_main_irqs();
 
 	/* come back in 2 scanlines */
-	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), next_scanline, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, next_scanline, 0), NULL, next_scanline, scanline_callback);
 }
 
 
@@ -178,7 +178,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static void sound_data_w(UINT8 data)
 {
-	timer_call_after_resynch(data, delayed_sound_data_w);
+	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }
 
 
@@ -222,7 +222,7 @@ static MACHINE_RESET( xboard )
 	segaic16_compare_timer_init(1, NULL, NULL);
 
 	/* start timers to track interrupts */
-	timer_set(video_screen_get_time_until_pos(0, 1, 0), 1, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(0, 1, 0), NULL, 1, scanline_callback);
 }
 
 

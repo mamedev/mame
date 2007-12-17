@@ -734,7 +734,7 @@ VIDEO_START( cojag )
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
-	vi_timer = timer_alloc(vi_callback);
+	vi_timer = timer_alloc(vi_callback, NULL);
 
 	state_save_register_global_pointer(pen_table, 65536);
 	state_save_register_global_array(blitter_regs);

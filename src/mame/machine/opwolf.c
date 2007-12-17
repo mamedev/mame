@@ -284,7 +284,7 @@ static const UINT16* level_data_lookup[] =
 };
 
 
-static TIMER_CALLBACK( timer_callback )
+static TIMER_CALLBACK( opwolf_timer_callback )
 {
 	// Level data command
 	if (current_cmd==0xf5)
@@ -694,7 +694,7 @@ static TIMER_CALLBACK( cchip_timer )
 	{
 		// Simulate time for command to execute (exact timing unknown, this is close)
 		current_cmd=0xf5;
-		timer_set(ATTOTIME_IN_CYCLES(80000,0), 0, timer_callback);
+		timer_set(ATTOTIME_IN_CYCLES(80000,0), NULL, 0, opwolf_timer_callback);
 	}
 	cchip_last_7a=cchip_ram[0x7a];
 
@@ -747,5 +747,5 @@ void opwolf_cchip_init(void)
 	cchip_coins_for_credit[1]=1;
 	cchip_credits_for_coin[1]=1;
 
-	timer_pulse(ATTOTIME_IN_HZ(60), 0, cchip_timer);
+	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
 }

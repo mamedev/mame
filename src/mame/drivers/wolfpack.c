@@ -47,13 +47,13 @@ static TIMER_CALLBACK( periodic_callback )
 		scanline = 0;
 	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, periodic_callback);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, periodic_callback);
 }
 
 
 static MACHINE_RESET( wolfpack )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, periodic_callback);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, periodic_callback);
 }
 
 

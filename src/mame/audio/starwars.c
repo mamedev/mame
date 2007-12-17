@@ -158,7 +158,7 @@ WRITE8_HANDLER( starwars_m6532_w )
 			/* Should be decrementing every data*1024 6532 clock cycles */
 			/* 6532 runs at 1.5 MHz */
 
-			timer_set(attotime_mul(ATTOTIME_IN_HZ(1500000), data * 1024), 0, snd_interrupt);
+			timer_set(attotime_mul(ATTOTIME_IN_HZ(1500000), data * 1024), NULL, 0, snd_interrupt);
 			return;
 
 		default:
@@ -195,7 +195,7 @@ READ8_HANDLER( starwars_sin_r )
 
 WRITE8_HANDLER( starwars_sout_w )
 {
-	timer_call_after_resynch(data, sound_callback);
+	timer_call_after_resynch(NULL, data, sound_callback);
 }
 
 
@@ -233,7 +233,7 @@ static TIMER_CALLBACK( main_callback )
 
 WRITE8_HANDLER( starwars_main_wr_w )
 {
-	timer_call_after_resynch(data, main_callback);
+	timer_call_after_resynch(NULL, data, main_callback);
 }
 
 

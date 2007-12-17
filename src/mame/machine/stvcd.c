@@ -273,7 +273,7 @@ void stvcd_reset(void)
 		cd_stat = CD_STAT_OPEN;
 	}
 
-	sector_timer = timer_alloc(sector_cb);
+	sector_timer = timer_alloc(sector_cb, NULL);
 	timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);	// 150 sectors / second = 300kBytes/second
 }
 

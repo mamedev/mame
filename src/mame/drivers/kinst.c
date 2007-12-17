@@ -249,7 +249,7 @@ static TIMER_CALLBACK( irq0_stop )
 static INTERRUPT_GEN( irq0_start )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(50), 0, irq0_stop);
+	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
 }
 
 
@@ -392,7 +392,7 @@ static READ32_HANDLER( kinst_speedup_r )
 		UINT32 r26 = activecpu_get_reg(MIPS3_R26) - *kinst_speedup;
 		if (r26 < r3)
 		{
-			timer_set(ATTOTIME_IN_CYCLES((r3 - r26) * 2, 0), 0, end_spin);
+			timer_set(ATTOTIME_IN_CYCLES((r3 - r26) * 2, 0), NULL, 0, end_spin);
 			cpu_spinuntil_int();
 		}
 	}

@@ -259,7 +259,7 @@ static INTERRUPT_GEN( karatour_interrupt )
 			requested_int[0] = 1;
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
-			timer_set(ATTOTIME_IN_USEC(2500), 0, vblank_end_callback);
+			timer_set(ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
 			update_irq_state();
 			break;
 
@@ -754,7 +754,7 @@ static WRITE16_HANDLER( metro_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						timer_set(ATTOTIME_IN_USEC(500),0,metro_blit_done);
+						timer_set(ATTOTIME_IN_USEC(500), NULL,0,metro_blit_done);
 						return;
 					}
 
@@ -3679,7 +3679,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-UPD7810_CONFIG metro_cpu_config =
+static UPD7810_CONFIG metro_cpu_config =
 {
     TYPE_7810,
     metro_io_callback
@@ -4667,7 +4667,7 @@ static DRIVER_INIT( mouja )
 {
 	metro_common();
 	irq_line = -1;	/* split interrupt handlers */
-	mouja_irq_timer = timer_alloc(mouja_irq_callback);
+	mouja_irq_timer = timer_alloc(mouja_irq_callback, NULL);
 }
 
 static DRIVER_INIT( gakusai )

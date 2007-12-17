@@ -34,7 +34,7 @@ typedef struct
 
 static v810info v810;
 
-int v810_ICount;
+static int v810_ICount;
 
 #define R0 v810.reg[0]
 #define R1 v810.reg[1]

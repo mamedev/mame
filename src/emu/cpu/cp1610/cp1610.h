@@ -32,8 +32,6 @@ enum {
 #define CP1610_RESET		2				/* Non-Maskable */
 #define CP1610_INT_INTR		INPUT_LINE_NMI	/* Non-Maskable */
 
-extern int cp1610_icount;				 /* cycle count */
-
 
 void cp1610_get_info(UINT32 state, cpuinfo *info);
 

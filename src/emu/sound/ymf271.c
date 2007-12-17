@@ -1338,9 +1338,9 @@ static void ymf271_write_pcm(YMF271Chip *chip, int data)
 	}
 }
 
-static TIMER_CALLBACK_PTR( ymf271_timer_a_tick )
+static TIMER_CALLBACK( ymf271_timer_a_tick )
 {
-	YMF271Chip *chip = param;
+	YMF271Chip *chip = ptr;
 
 	chip->status |= 1;
 
@@ -1351,9 +1351,9 @@ static TIMER_CALLBACK_PTR( ymf271_timer_a_tick )
 	}
 }
 
-static TIMER_CALLBACK_PTR( ymf271_timer_b_tick )
+static TIMER_CALLBACK( ymf271_timer_b_tick )
 {
-	YMF271Chip *chip = param;
+	YMF271Chip *chip = ptr;
 
 	chip->status |= 2;
 
@@ -1449,7 +1449,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * (1024 - chip->timerAVal));
 
-					timer_adjust_ptr(chip->timA, period, period);
+					timer_adjust(chip->timA, period, 0, period);
 				}
 				if (data & 0x20)
 				{	// timer B reset
@@ -1460,7 +1460,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * 16 * (256 - chip->timerBVal));
 
-					timer_adjust_ptr(chip->timB, period, period);
+					timer_adjust(chip->timB, period, 0, period);
 				}
 
 				break;
@@ -1719,8 +1719,8 @@ static void init_state(YMF271Chip *chip)
 
 static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(int), read8_handler ext_read, write8_handler ext_write)
 {
-	chip->timA = timer_alloc_ptr(ymf271_timer_a_tick, chip);
-	chip->timB = timer_alloc_ptr(ymf271_timer_b_tick, chip);
+	chip->timA = timer_alloc(ymf271_timer_a_tick, chip);
+	chip->timB = timer_alloc(ymf271_timer_b_tick, chip);
 
 	chip->rom = rom;
 	chip->irq_callback = cb;

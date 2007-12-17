@@ -53,7 +53,7 @@ typedef struct {
 static sm8500_regs regs;
 
 /* nr of cycles to run */
-int sm8500_icount;
+static int sm8500_icount;
 
 static UINT8 sm8500_b2w[8] = {
         0, 8, 2, 10, 4, 12, 6, 14

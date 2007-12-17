@@ -392,8 +392,8 @@ static MACHINE_RESET( system32 )
 	memset(v60_irq_control, 0xff, sizeof(v60_irq_control));
 
 	/* allocate timers */
-	v60_irq_timer[0] = timer_alloc(signal_v60_irq_callback);
-	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback);
+	v60_irq_timer[0] = timer_alloc(signal_v60_irq_callback, NULL);
+	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback, NULL);
 
 	/* clear IRQ lines */
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
@@ -571,7 +571,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }

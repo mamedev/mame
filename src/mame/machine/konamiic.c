@@ -63,7 +63,7 @@ void K056800_init(void (* irq_callback)(int))
 
 	timer_period = attotime_mul(ATTOTIME_IN_HZ(44100), 128);	// roughly 2.9us
 
-	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick);
+	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick, NULL);
 	timer_adjust(K056800_sound_cpu_timer, timer_period, 0, timer_period);
 }
 

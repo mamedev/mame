@@ -87,8 +87,8 @@ typedef struct
 
 }	m6502_Regs;
 
-int m6502_IntOccured = 0;
-int m6502_ICount = 0;
+static int m6502_IntOccured = 0;
+static int m6502_ICount = 0;
 
 static m6502_Regs m6502;
 

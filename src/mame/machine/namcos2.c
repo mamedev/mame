@@ -665,7 +665,7 @@ INTERRUPT_GEN( namcos2_68k_master_vblank )
 	if( IsSystem21()==0 && namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
-		timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_master_posirq );
+		timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namcos2_68k_master_posirq );
 	}
 	cpunum_set_input_line( CPU_MASTER, namcos2_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
@@ -681,7 +681,7 @@ INTERRUPT_GEN( namcos2_68k_slave_vblank )
 	if( IsSystem21()==0 && namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = GetPosIRQScanline();
-		timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_slave_posirq );
+		timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namcos2_68k_slave_posirq );
 	}
 	cpunum_set_input_line( CPU_SLAVE, namcos2_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
@@ -699,7 +699,7 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 	if( namcos2_68k_gpu_C148[NAMCOS2_C148_POSIRQ] )
 	{
 		int scanline = 0x50+0x89; /* HACK for Winning Run */
-		timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, namcos2_68k_gpu_posirq );
+		timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namcos2_68k_gpu_posirq );
 	}
 	cpunum_set_input_line( CPU_GPU, namcos2_68k_gpu_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }

@@ -132,8 +132,8 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 			period_on  = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 7, machine->screen[scrnum].width * 0.9);
 			period_off = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 8, machine->screen[scrnum].width * 0.9);
 
-			timer_set(period_on,  0, irq_on);
-			timer_set(period_off, 0, irq_off);
+			timer_set(period_on, NULL,  0, irq_on);
+			timer_set(period_off, NULL, 0, irq_off);
 		}
 }
 

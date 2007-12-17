@@ -46,7 +46,7 @@ typedef struct {
 	int		mask_interrupts;
 }	cp1610_Regs;
 
-int cp1610_icount;
+static int cp1610_icount;
 
 static cp1610_Regs cp1610;
 

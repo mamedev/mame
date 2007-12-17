@@ -90,7 +90,7 @@ void f3853_init(F3853_CONFIG *config)
 
 	f3853.priority_line=FALSE;
 	f3853.external_interrupt_line=TRUE;
-	f3853.timer = timer_alloc(f3853_timer_callback);
+	f3853.timer = timer_alloc(f3853_timer_callback, NULL);
 }
 
 void f3853_reset(void)

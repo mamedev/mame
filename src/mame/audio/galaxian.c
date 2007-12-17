@@ -363,12 +363,12 @@ static void galaxian_sh_start(void)
 	sample_set_volume(CHANNEL_LFO+2,0);
 	sample_start_raw(CHANNEL_LFO+2,backgroundwave,sizeof(backgroundwave)/2,1000,1);
 
-	noisetimer = timer_alloc(noise_timer_cb);
+	noisetimer = timer_alloc(noise_timer_cb, NULL);
 	timer_adjust(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
 
-	lfotimer = timer_alloc(lfo_timer_cb);
+	lfotimer = timer_alloc(lfo_timer_cb, NULL);
 
-	timer_pulse(attotime_make(0, Machine->screen[0].refresh), 0, galaxian_sh_update);
+	timer_pulse(attotime_make(0, Machine->screen[0].refresh), NULL, 0, galaxian_sh_update);
 
 	state_save_register_global(freq);
 	state_save_register_global(noise_enable);

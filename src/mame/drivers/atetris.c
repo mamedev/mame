@@ -84,7 +84,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), scanline, interrupt_gen);
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_gen);
 }
 
 
@@ -109,7 +109,7 @@ static MACHINE_RESET( atetris )
 	memcpy(slapstic_base, &slapstic_source[current_bank * 0x4000], 0x4000);
 
 	/* start interrupts going (32V clocked by 16V) */
-	timer_set(video_screen_get_time_until_pos(0, 48, 0), 48, interrupt_gen);
+	timer_set(video_screen_get_time_until_pos(0, 48, 0), NULL, 48, interrupt_gen);
 }
 
 

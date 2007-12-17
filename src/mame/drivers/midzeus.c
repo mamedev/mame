@@ -47,8 +47,8 @@ static MACHINE_RESET( midzeus )
 
 	*(UINT32 *)ram_base *= 2;
 
-	timer[0] = timer_alloc(NULL);
-	timer[1] = timer_alloc(NULL);
+	timer[0] = timer_alloc(NULL, NULL);
+	timer[1] = timer_alloc(NULL, NULL);
 }
 
 
@@ -634,8 +634,8 @@ static MACHINE_DRIVER_START( midzeus )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 278)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 255)
+	MDRV_SCREEN_SIZE(512/*+256*/, 278/*+256*/)
+	MDRV_SCREEN_VISIBLE_AREA(0, 399/*+256*/, 0, 255/*+256*/)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(midzeus)

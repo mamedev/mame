@@ -351,7 +351,7 @@ static void wd33c93_select_cmd( void )
 		}
 
 		/* queue up a service request out in the future */
-		timer_set( ATTOTIME_IN_USEC(50), 0, wd33c93_service_request );
+		timer_set( ATTOTIME_IN_USEC(50), NULL, 0, wd33c93_service_request );
 	}
 	else
 	{
@@ -423,7 +423,7 @@ static void wd33c93_selectxfer_cmd( void )
 			scsi_data.busphase = PHS_MESS_IN;
 
 			/* queue up a service request out in the future */
-			timer_set( ATTOTIME_IN_MSEC(50), 0, wd33c93_service_request );
+			timer_set( ATTOTIME_IN_MSEC(50), NULL, 0, wd33c93_service_request );
 		}
 	}
 	else
@@ -453,7 +453,7 @@ static void wd33c93_xferinfo_cmd( void )
 	scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
 
 	/* the command will be completed once the data is transferred */
-	timer_set( ATTOTIME_IN_MSEC(1), 0, wd33c93_deassert_cip );
+	timer_set( ATTOTIME_IN_MSEC(1), NULL, 0, wd33c93_deassert_cip );
 }
 
 /* Command handlers */
@@ -802,7 +802,7 @@ extern void wd33c93_init( struct WD33C93interface *interface )
 	}
 
 	/* allocate a timer for commands */
-	scsi_data.cmd_timer = timer_alloc(wd33c93_complete_cb);
+	scsi_data.cmd_timer = timer_alloc(wd33c93_complete_cb, NULL);
 
 	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 

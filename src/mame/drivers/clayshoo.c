@@ -120,8 +120,8 @@ static READ8_HANDLER( analog_r )
 
 static void create_analog_timers(void)
 {
-	analog_timer_1 = timer_alloc(reset_analog_bit);
-	analog_timer_2 = timer_alloc(reset_analog_bit);
+	analog_timer_1 = timer_alloc(reset_analog_bit, NULL);
+	analog_timer_2 = timer_alloc(reset_analog_bit, NULL);
 }
 
 

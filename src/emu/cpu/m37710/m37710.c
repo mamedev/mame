@@ -1054,14 +1054,14 @@ static void m37710_init(int index, int clock, const void *config, int (*irqcallb
 {
 	INT_ACK = irqcallback;
 
-	m37710i_cpu.timers[0] = timer_alloc(m37710_timer_a0_cb);
-	m37710i_cpu.timers[1] = timer_alloc(m37710_timer_a1_cb);
-	m37710i_cpu.timers[2] = timer_alloc(m37710_timer_a2_cb);
-	m37710i_cpu.timers[3] = timer_alloc(m37710_timer_a3_cb);
-	m37710i_cpu.timers[4] = timer_alloc(m37710_timer_a4_cb);
-	m37710i_cpu.timers[5] = timer_alloc(m37710_timer_b0_cb);
-	m37710i_cpu.timers[6] = timer_alloc(m37710_timer_b1_cb);
-	m37710i_cpu.timers[7] = timer_alloc(m37710_timer_b2_cb);
+	m37710i_cpu.timers[0] = timer_alloc(m37710_timer_a0_cb, NULL);
+	m37710i_cpu.timers[1] = timer_alloc(m37710_timer_a1_cb, NULL);
+	m37710i_cpu.timers[2] = timer_alloc(m37710_timer_a2_cb, NULL);
+	m37710i_cpu.timers[3] = timer_alloc(m37710_timer_a3_cb, NULL);
+	m37710i_cpu.timers[4] = timer_alloc(m37710_timer_a4_cb, NULL);
+	m37710i_cpu.timers[5] = timer_alloc(m37710_timer_b0_cb, NULL);
+	m37710i_cpu.timers[6] = timer_alloc(m37710_timer_b1_cb, NULL);
+	m37710i_cpu.timers[7] = timer_alloc(m37710_timer_b2_cb, NULL);
 
 	state_save_register_item("M377xx", index, m37710i_cpu.a);
 	state_save_register_item("M377xx", index, m37710i_cpu.b);

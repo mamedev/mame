@@ -253,7 +253,7 @@ static void pastelg_gfxdraw(void)
 	}
 
 	nb1413m3_busyflag = 0;
-	timer_set(attotime_mul(ATTOTIME_IN_HZ(400000), nb1413m3_busyctr), 0, blitter_timer_callback);
+	timer_set(attotime_mul(ATTOTIME_IN_HZ(400000), nb1413m3_busyctr), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************

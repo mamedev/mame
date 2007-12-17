@@ -23,7 +23,7 @@
     multiply and return the full 64 bit result
 -------------------------------------------------*/
 
-/* TBD */
+/* GCC can do a good job of this. */
 
 
 /*-------------------------------------------------
@@ -32,7 +32,7 @@
     result
 -------------------------------------------------*/
 
-/* TBD */
+/* GCC can do a good job of this */
 
 
 /*-------------------------------------------------
@@ -42,9 +42,10 @@
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-INLINE INT32 _mul_32x32_hi(INT32 val1, INT32 val2)
+INLINE INT32 __attribute__((const, always_inline))
+_mul_32x32_hi(INT32 val1, INT32 val2)
 {
-	INT32 result;
+	register INT32 result;
 
 	__asm__ (
 		" mulhw  %[result], %[val1], %[val2] \n"
@@ -64,9 +65,10 @@ INLINE INT32 _mul_32x32_hi(INT32 val1, INT32 val2)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-INLINE UINT32 _mulu_32x32_hi(UINT32 val1, UINT32 val2)
+INLINE UINT32 __attribute__((const, always_inline))
+_mulu_32x32_hi(UINT32 val1, UINT32 val2)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		" mulhwu  %[result], %[val1], %[val2] \n"
@@ -88,10 +90,12 @@ INLINE UINT32 _mulu_32x32_hi(UINT32 val1, UINT32 val2)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mul_32x32_shift _mul_32x32_shift
-INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
+INLINE INT32 __attribute__((const, always_inline))
+_mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 {
-	INT32 result;
+	register INT32 result;
 
+	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
 		" mullw   %[result], %[val1], %[val2]    \n"
 		" mulhw   %[val1], %[val1], %[val2]      \n"
@@ -120,10 +124,12 @@ INLINE INT32 _mul_32x32_shift(INT32 val1, INT32 val2, UINT8 shift)
 
 #if !defined(__ppc64__) && !defined(__PPC64__) && !defined(_ARCH_PPC64)
 #define mulu_32x32_shift _mulu_32x32_shift
-INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
+INLINE UINT32 __attribute__((const, always_inline))
+_mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 {
-	UINT32 result;
+	register UINT32 result;
 
+	/* Valid for (0 <= shift <= 32) */
 	__asm__ (
 		" mullw   %[result], %[val1], %[val2]    \n"
 		" mulhwu  %[val1], %[val1], %[val2]      \n"
@@ -154,6 +160,24 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 /*-------------------------------------------------
     divu_64x32 - perform an unsigned 64 bit x 32 bit
     divide and return the 32 bit quotient
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    div_64x32_rem - perform a signed 64 bit x 32
+    bit divide and return the 32 bit quotient and
+    32 bit remainder
+-------------------------------------------------*/
+
+/* TBD */
+
+
+/*-------------------------------------------------
+    divu_64x32_rem - perform an unsigned 64 bit x
+    32 bit divide and return the 32 bit quotient
+    and 32 bit remainder
 -------------------------------------------------*/
 
 /* TBD */
@@ -199,9 +223,10 @@ INLINE UINT32 _mulu_32x32_shift(UINT32 val1, UINT32 val2, UINT8 shift)
 -------------------------------------------------*/
 
 #define recip_approx _recip_approx
-INLINE float _recip_approx(float value)
+INLINE float __attribute__((const, always_inline))
+_recip_approx(float value)
 {
-	float result;
+	register float result;
 
 	__asm__ (
 		" fres  %[result], %[value] \n"
@@ -224,9 +249,10 @@ INLINE float _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-INLINE UINT8 _count_leading_zeros(UINT32 value)
+INLINE UINT8 __attribute__((const, always_inline))
+_count_leading_zeros(UINT32 value)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		" cntlzw  %[result], %[value] \n"
@@ -244,9 +270,10 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-INLINE UINT8 _count_leading_ones(UINT32 value)
+INLINE UINT8 __attribute__((const, always_inline))
+_count_leading_ones(UINT32 value)
 {
-	UINT32 result;
+	register UINT32 result;
 
 	__asm__ (
 		" not     %[result], %[value]  \n"
@@ -272,7 +299,8 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 -------------------------------------------------*/
 
 #define compare_exchange32 _compare_exchange32
-INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	register INT32 result;
 
@@ -284,11 +312,12 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
 		"2:                                 "
-		: [result]   "=&r" (result)
-		: [ptr]      "r"   (ptr)
-		, [exchange] "r"   (exchange)
-		, [compare]  "r"   (compare)
-		: "cr0"
+	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result]   "=&r" (result)
+	  : [ptr]      "r"   (ptr)
+	  , [exchange] "r"   (exchange)
+	  , [compare]  "r"   (compare)
+	  : "cr0"
 	);
 
 	return result;
@@ -304,7 +333,8 @@ INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 excha
 
 #if defined(__ppc64__) || defined(__PPC64__)
 #define compare_exchange64 _compare_exchange64
-INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
+INLINE INT64 __attribute__((nonnull(1), always_inline))
+_compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	register INT64 result;
 
@@ -315,11 +345,12 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 		"   stdcx. %[exchange], 0, %[ptr] \n"
 		"   bne--  1b                     \n"
 		"2:                                 "
-		: [result]   "=&r" (result)
-		: [ptr]      "r"   (ptr)
-		, [exchange] "r"   (exchange)
-		, [compare]  "r"   (compare)
-		: "cr0"
+	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result]   "=&r" (result)
+	  : [ptr]      "r"   (ptr)
+	  , [exchange] "r"   (exchange)
+	  , [compare]  "r"   (compare)
+	  : "cr0"
 	);
 
 	return result;
@@ -334,7 +365,8 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 -------------------------------------------------*/
 
 #define atomic_exchange32 _atomic_exchange32
-INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	register INT32 result;
 
@@ -343,10 +375,11 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 		"   sync                          \n"
 		"   stwcx. %[exchange], 0, %[ptr] \n"
 		"   bne-   1b                     \n"
-		: [result]   "=&r" (result)
-		: [ptr]      "r"   (ptr)
-		, [exchange] "r"   (exchange)
-		: "cr0"
+	  : [dummy]    "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result]   "=&r" (result)
+	  : [ptr]      "r"   (ptr)
+	  , [exchange] "r"   (exchange)
+	  : "cr0"
 	);
 
 	return result;
@@ -360,7 +393,8 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 -------------------------------------------------*/
 
 #define atomic_add32 _atomic_add32
-INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result;
 
@@ -370,10 +404,11 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 		"   sync                                  \n"
 		"   stwcx. %[result], 0, %[ptr]           \n"
 		"   bne-   1b                             \n"
-		: [result] "=&b" (result)
-		: [ptr]    "r"   (ptr)
-		, [delta]  "r"   (delta)
-		: "cr0"
+	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result] "=&b" (result)
+	  : [ptr]    "r"   (ptr)
+	  , [delta]  "r"   (delta)
+	  : "cr0"
 	);
 
 	return result;
@@ -387,7 +422,8 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_increment32(INT32 volatile *ptr)
 {
 	register INT32 result;
 
@@ -397,7 +433,8 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 		"   sync                            \n"
 		"   stwcx.  %[result], 0, %[ptr]    \n"
 		"   bne-    1b                      \n"
-	  : [result] "=&b" (result)
+	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result] "=&b" (result)
 	  : [ptr]    "r"   (ptr)
 	  : "cr0"
 	);
@@ -413,7 +450,8 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
+INLINE INT32 __attribute__((nonnull(1), always_inline))
+_atomic_decrement32(INT32 volatile *ptr)
 {
 	register INT32 result;
 
@@ -423,7 +461,8 @@ INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
 		"   sync                             \n"
 		"   stwcx.  %[result], 0, %[ptr]     \n"
 		"   bne-    1b                       \n"
-	  : [result] "=&b" (result)
+	  : [dummy]  "+m"  (*ptr)	/* Lets GCC know that *ptr will be read/written in case it's not marked volatile */
+	  , [result] "=&b" (result)
 	  : [ptr]    "r"   (ptr)
 	  : "cr0"
 	);

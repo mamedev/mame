@@ -1373,7 +1373,7 @@ MM_COMMON2
 INPUT_PORTS_END
 
 
-struct AY8910interface scobra_ay8910_interface_2 =
+static struct AY8910interface scobra_ay8910_interface_2 =
 {
 	soundlatch_r,
 	scramble_portB_r

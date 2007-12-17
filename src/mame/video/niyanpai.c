@@ -342,7 +342,7 @@ static void niyanpai_gfxdraw(int vram)
 	}
 
 	nb19010_busyflag = 0;
-	timer_set(attotime_mul(ATTOTIME_IN_NSEC(1650), nb19010_busyctr), 0, blitter_timer_callback);
+	timer_set(ATTOTIME_IN_NSEC(1650 * nb19010_busyctr), NULL, 0, blitter_timer_callback);
 }
 
 /******************************************************************************

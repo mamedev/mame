@@ -90,7 +90,7 @@ VIDEO_START( fromance )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = timer_alloc(crtc_interrupt_gen);
+	crtc_timer = timer_alloc(crtc_interrupt_gen, NULL);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;
@@ -129,7 +129,7 @@ VIDEO_START( nekkyoku )
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = timer_alloc(crtc_interrupt_gen);
+	crtc_timer = timer_alloc(crtc_interrupt_gen, NULL);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;

@@ -168,8 +168,8 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	acia_p->cts_pin = intf->cts_pin;
 	acia_p->rts_pin = intf->rts_pin;
 	acia_p->dcd_pin = intf->dcd_pin;
-	acia_p->rx_timer = timer_alloc(receive_event);
-	acia_p->tx_timer = timer_alloc(transmit_event);
+	acia_p->rx_timer = timer_alloc(receive_event, NULL);
+	acia_p->tx_timer = timer_alloc(transmit_event, NULL);
 	acia_p->int_callback = intf->int_callback;
 	acia_p->first_reset = 1;
 	acia_p->status_read = 0;

@@ -153,7 +153,7 @@ static const int decode_y_gti[16] = {  0, 8, 32, 40, 1, 9, 33, 41, 64, 72, 96, 1
 static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
 static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
 
-UINT32 K001005_status = 0;
+static UINT32 K001005_status = 0;
 static mame_bitmap *K001005_bitmap[2];
 static mame_bitmap *K001005_zbuffer;
 static rectangle K001005_cliprect;

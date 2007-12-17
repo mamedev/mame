@@ -111,9 +111,9 @@ static void MSM5205_update(void *param,stream_sample_t **inputs, stream_sample_t
 }
 
 /* timer callback at VCLK low eddge */
-static TIMER_CALLBACK_PTR( MSM5205_vclk_callback )
+static TIMER_CALLBACK( MSM5205_vclk_callback )
 {
-	struct MSM5205Voice *voice = param;
+	struct MSM5205Voice *voice = ptr;
 	int val;
 	int new_signal;
 	/* callback user handler and latch next data */
@@ -184,7 +184,7 @@ static void *msm5205_start(int sndindex, int clock, const void *config)
 
 	/* stream system initialize */
 	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
-	voice->timer = timer_alloc_ptr(MSM5205_vclk_callback, voice);
+	voice->timer = timer_alloc(MSM5205_vclk_callback, voice);
 
 	/* initialize */
 	msm5205_reset(voice);
@@ -220,7 +220,7 @@ void MSM5205_vclk_w (int num, int vclk)
 		if( voice->vclk != vclk)
 		{
 			voice->vclk = vclk;
-			if( !vclk ) MSM5205_vclk_callback(Machine, voice);
+			if( !vclk ) MSM5205_vclk_callback(Machine, voice, 0);
 		}
 	}
 }
@@ -269,10 +269,10 @@ void MSM5205_playmode_w(int num,int select)
 		if( prescaler )
 		{
 			attotime period = attotime_mul(ATTOTIME_IN_HZ(voice->clock), prescaler);
-			timer_adjust_ptr(voice->timer, period, period);
+			timer_adjust(voice->timer, period, 0, period);
 		}
 		else
-			timer_adjust_ptr(voice->timer, attotime_never, attotime_zero);
+			timer_adjust(voice->timer, attotime_never, 0, attotime_zero);
 	}
 
 	if( voice->bitwidth != bitwidth )

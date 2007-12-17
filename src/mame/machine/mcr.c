@@ -61,7 +61,7 @@ static UINT8 m6840_irq_vector;
 static UINT8 v493_irq_state;
 static UINT8 v493_irq_vector;
 
-static void (*v493_callback)(running_machine *machine, int param);
+static timer_callback v493_callback;
 
 static UINT8 zwackery_sound_data;
 
@@ -290,7 +290,7 @@ MACHINE_START( nflfoot )
 	z80sio_init(0, &nflfoot_sio_intf);
 
 	/* allocate a timer for the IPU watchdog */
-	ipu_watchdog_timer = timer_alloc(ipu_watchdog_reset);
+	ipu_watchdog_timer = timer_alloc(ipu_watchdog_reset, NULL);
 }
 
 
@@ -319,7 +319,7 @@ MACHINE_START( mcr68 )
 	{
 		struct counter_state *m6840 = &m6840_state[i];
 
-		m6840->timer = timer_alloc(counter_fired_callback);
+		m6840->timer = timer_alloc(counter_fired_callback, NULL);
 
 		state_save_register_item("m6840", i, m6840->control);
 		state_save_register_item("m6840", i, m6840->latch);
@@ -459,7 +459,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
 	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
 	/* VBLANK and 493 using counter 2 */
-	timer_set(attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), 0, v493_callback);
+	timer_set(attotime_sub(ATTOTIME_IN_HZ(30), mcr68_timing_factor), NULL, 0, v493_callback);
 }
 
 
@@ -499,7 +499,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts();
-	timer_set(video_screen_get_scan_period(0), 0, mcr68_493_off_callback);
+	timer_set(video_screen_get_scan_period(0), NULL, 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
 
@@ -620,7 +620,7 @@ static TIMER_CALLBACK( zwackery_493_off_callback )
 static TIMER_CALLBACK( zwackery_493_callback )
 {
 	pia_2_ca1_w(0, 1);
-	timer_set(video_screen_get_scan_period(0), 0, zwackery_493_off_callback);
+	timer_set(video_screen_get_scan_period(0), NULL, 0, zwackery_493_off_callback);
 }
 
 

@@ -97,7 +97,7 @@ VIDEO_START( victory )
 	update_complete = 0;
 	video_control = 0;
 	memset(&micro, 0, sizeof(micro));
-	micro.timer = timer_alloc(NULL);
+	micro.timer = timer_alloc(NULL, NULL);
 }
 
 
@@ -1180,7 +1180,7 @@ VIDEO_EOF( victory )
 			int fpix = *fg++;
 			int bpix = bg[(x + scrollx) & 255];
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
+				timer_set(video_screen_get_time_until_pos(0, y, x), NULL, x | (y << 8), bgcoll_irq_callback);
 		}
 	}
 }
@@ -1218,7 +1218,7 @@ VIDEO_UPDATE( victory )
 			int bpix = bg[(x + scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(video_screen_get_time_until_pos(0, y, x), x | (y << 8), bgcoll_irq_callback);
+				timer_set(video_screen_get_time_until_pos(0, y, x), NULL, x | (y << 8), bgcoll_irq_callback);
 		}
 
 		/* draw the scanline */

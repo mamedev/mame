@@ -150,7 +150,7 @@ VIDEO_EOF( sprint8 )
 		{
 			if (p1[x] != 16 && p2[x] != 16)
 			{
-				timer_set(video_screen_get_time_until_pos(0, y + 24, x), p1[x], sprint8_collision_callback);
+				timer_set(video_screen_get_time_until_pos(0, y + 24, x), NULL, p1[x], sprint8_collision_callback);
 			}
 		}
 	}

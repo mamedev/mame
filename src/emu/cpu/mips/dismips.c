@@ -10,7 +10,7 @@
 extern unsigned dasmr3k(char *,unsigned, UINT32);
 extern unsigned dasmmips3(char *,unsigned, UINT32);
 
-struct
+static struct
 {
 	UINT8 id[ 8 ];
 	UINT32 text;	/* SCE only */

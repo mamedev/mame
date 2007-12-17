@@ -318,13 +318,13 @@ static void snes_init_ram(void)
 	snes_ram[VMAIN] = 0x80;
 
 	/* init timers and stop them */
-	snes_scanline_timer = timer_alloc(snes_scanline_tick);
+	snes_scanline_timer = timer_alloc(snes_scanline_tick, NULL);
 	timer_adjust(snes_scanline_timer, attotime_never, 0, attotime_never);
-	snes_hblank_timer = timer_alloc(snes_hblank_tick);
+	snes_hblank_timer = timer_alloc(snes_hblank_tick, NULL);
 	timer_adjust(snes_hblank_timer, attotime_never, 0, attotime_never);
-	snes_nmi_timer = timer_alloc(snes_nmi_tick);
+	snes_nmi_timer = timer_alloc(snes_nmi_tick, NULL);
 	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
-	snes_hirq_timer = timer_alloc(snes_hirq_tick_callback);
+	snes_hirq_timer = timer_alloc(snes_hirq_tick_callback, NULL);
 	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.

@@ -72,12 +72,13 @@ static double envelope,tt;
 static UINT8 decay;
 static UINT8 sh1_count = 0;
 
-enum {
+enum
+{
 	WAIT_CMD,
 	WAIT_WRITE,
 	WAIT_DONE1,
 	WAIT_DONE2
-} m58817_states;
+};
 
 static UINT8 m58817_state;
 static UINT8 m58817_drq;

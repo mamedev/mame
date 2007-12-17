@@ -1944,23 +1944,23 @@ static struct AY8910interface sfx_ay8910_interface_1 =
 	sfx_sh_irqtrigger_w
 };
 
-struct AY8910interface explorer_ay8910_interface_1 =
+static struct AY8910interface explorer_ay8910_interface_1 =
 {
 	scramble_portB_r
 };
 
-struct AY8910interface explorer_ay8910_interface_2 =
+static struct AY8910interface explorer_ay8910_interface_2 =
 {
 	hotshock_soundlatch_r
 };
 
-struct AY8910interface hotshock_ay8910_interface_2 =
+static struct AY8910interface hotshock_ay8910_interface_2 =
 {
 	hotshock_soundlatch_r,
 	scramble_portB_r
 };
 
-struct AY8910interface scorpion_ay8910_interface_1 =
+static struct AY8910interface scorpion_ay8910_interface_1 =
 {
 	0,
 	0,
@@ -1968,7 +1968,7 @@ struct AY8910interface scorpion_ay8910_interface_1 =
 	scorpion_sound_cmd_w,
 };
 
-struct AY8910interface triplep_ay8910_interface =
+static struct AY8910interface triplep_ay8910_interface =
 {
 	0
 };

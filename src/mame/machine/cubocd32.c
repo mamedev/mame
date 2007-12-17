@@ -94,8 +94,8 @@ void amiga_akiko_init(void)
 	akiko.cdrom_cmd_resp = 0;
 	akiko.cdrom = cdrom_open(get_disk_handle(0));
 	akiko.cdrom_toc = NULL;
-	akiko.dma_timer = timer_alloc(akiko_dma_proc);
-	akiko.frame_timer = timer_alloc(akiko_frame_proc);
+	akiko.dma_timer = timer_alloc(akiko_dma_proc, NULL);
+	akiko.frame_timer = timer_alloc(akiko_frame_proc, NULL);
 
 	/* create the TOC table */
 	if ( akiko.cdrom != NULL && cdrom_get_last_track(akiko.cdrom) )
@@ -679,7 +679,7 @@ static void akiko_update_cdrom( void )
 		{
 			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+3) & 0xff;
 
-			timer_set( ATTOTIME_IN_MSEC(1), resp[0], akiko_cd_delayed_cmd );
+			timer_set( ATTOTIME_IN_MSEC(1), NULL, resp[0], akiko_cd_delayed_cmd );
 
 			break;
 		}

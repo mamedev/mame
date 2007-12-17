@@ -844,7 +844,7 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
-struct VLM5030interface trackfld_vlm5030_interface =
+static struct VLM5030interface trackfld_vlm5030_interface =
 {
 	REGION_SOUND1,	/* memory region  */
 	0           /* memory size    */

@@ -17,8 +17,8 @@ UINT8 *vb_scrolly_lo;
 UINT8 *vb_videoram;
 UINT8 *vb_attribram;
 int vball_gfxset=0;
-int vb_bgprombank=0xff;
-int vb_spprombank=0xff;
+static int vb_bgprombank=0xff;
+static int vb_spprombank=0xff;
 
 static tilemap *bg_tilemap;
 static int scrollx[32];

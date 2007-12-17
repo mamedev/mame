@@ -87,11 +87,21 @@ static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1,0)
 ADDRESS_MAP_END
 
+static READ32_HANDLER( f32_input_port_1_r )
+{
+	/* burn a bunch of cycles because this is polled frequently during busy loops */
+	if ((activecpu_get_pc() == 0x000379de) ||
+	    (activecpu_get_pc() == 0x000379cc) ) activecpu_adjust_icount(-100);
+	//else printf("PC %08x\n", activecpu_get_pc() );
+	return input_port_1_dword_r(0, 0);
+}
+
+
 static ADDRESS_MAP_START( mosaicf2_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4000, 0x4003) AM_READ(oki_32bit_r)
 	AM_RANGE(0x4810, 0x4813) AM_READ(ym2151_status_32bit_r)
 	AM_RANGE(0x5000, 0x5003) AM_READ(input_port_0_dword_r)
-	AM_RANGE(0x5200, 0x5203) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
 	AM_RANGE(0x5400, 0x5403) AM_READ(eeprom_r)
 	AM_RANGE(0x6000, 0x6003) AM_WRITE(oki_32bit_w)
 	AM_RANGE(0x6800, 0x6803) AM_WRITE(ym2151_data_32bit_w)

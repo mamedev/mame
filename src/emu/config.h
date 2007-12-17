@@ -26,11 +26,14 @@
  *
  *************************************/
 
-#define CONFIG_TYPE_INIT			0		/* opportunity to initialize things first */
-#define CONFIG_TYPE_CONTROLLER		1		/* loading from controller file */
-#define CONFIG_TYPE_DEFAULT			2		/* loading from default.cfg */
-#define CONFIG_TYPE_GAME			3		/* loading from game.cfg */
-#define CONFIG_TYPE_FINAL			4		/* opportunity to finish initialization */
+enum
+{
+	CONFIG_TYPE_INIT = 0,					/* opportunity to initialize things first */
+	CONFIG_TYPE_CONTROLLER,					/* loading from controller file */
+	CONFIG_TYPE_DEFAULT,					/* loading from default.cfg */
+	CONFIG_TYPE_GAME,					/* loading from game.cfg */
+	CONFIG_TYPE_FINAL					/* opportunity to finish initialization */
+};
 
 
 

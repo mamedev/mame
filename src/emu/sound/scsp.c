@@ -308,9 +308,9 @@ static void ResetInterrupts(struct _SCSP *SCSP)
 	CheckPendingIRQ(SCSP);
 }
 
-static TIMER_CALLBACK_PTR( timerA_cb )
+static TIMER_CALLBACK( timerA_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)param;
+	struct _SCSP *SCSP = (struct _SCSP *)ptr;
 
 	SCSP->TimCnt[0] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x40;
@@ -320,9 +320,9 @@ static TIMER_CALLBACK_PTR( timerA_cb )
 	CheckPendingIRQ(SCSP);
 }
 
-static TIMER_CALLBACK_PTR( timerB_cb )
+static TIMER_CALLBACK( timerB_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)param;
+	struct _SCSP *SCSP = (struct _SCSP *)ptr;
 
 	SCSP->TimCnt[1] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x80;
@@ -332,9 +332,9 @@ static TIMER_CALLBACK_PTR( timerB_cb )
 	CheckPendingIRQ(SCSP);
 }
 
-static TIMER_CALLBACK_PTR( timerC_cb )
+static TIMER_CALLBACK( timerC_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)param;
+	struct _SCSP *SCSP = (struct _SCSP *)ptr;
 
 	SCSP->TimCnt[2] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x100;
@@ -524,9 +524,9 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 		}
 	}
 
-	SCSP->timerA = timer_alloc_ptr(timerA_cb, SCSP);
-	SCSP->timerB = timer_alloc_ptr(timerB_cb, SCSP);
-	SCSP->timerC = timer_alloc_ptr(timerC_cb, SCSP);
+	SCSP->timerA = timer_alloc(timerA_cb, SCSP);
+	SCSP->timerB = timer_alloc(timerB_cb, SCSP);
+	SCSP->timerC = timer_alloc(timerC_cb, SCSP);
 
 	for(i=0;i<0x400;++i)
 	{
@@ -720,7 +720,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[0]) / (255-(SCSP->udata.data[0x18/2]&0xff));
 					if (time)
 					{
-						timer_adjust_ptr(SCSP->timerA, ATTOTIME_IN_HZ(time), attotime_never);
+						timer_adjust(SCSP->timerA, ATTOTIME_IN_HZ(time), 0, attotime_never);
 					}
 				}
 			}
@@ -739,7 +739,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[1]) / (255-(SCSP->udata.data[0x1A/2]&0xff));
 					if (time)
 					{
-						timer_adjust_ptr(SCSP->timerB, ATTOTIME_IN_HZ(time), attotime_never);
+						timer_adjust(SCSP->timerB, ATTOTIME_IN_HZ(time), 0, attotime_never);
 					}
 				}
 			}
@@ -758,7 +758,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 					time = (44100 / SCSP->TimPris[2]) / (255-(SCSP->udata.data[0x1C/2]&0xff));
 					if (time)
 					{
-						timer_adjust_ptr(SCSP->timerC, ATTOTIME_IN_HZ(time), attotime_never);
+						timer_adjust(SCSP->timerC, ATTOTIME_IN_HZ(time), 0, attotime_never);
 					}
 				}
 			}

@@ -343,7 +343,7 @@ typedef struct
 
 static apexc_regs apexc;
 
-int apexc_ICount;
+static int apexc_ICount;
 
 /* decrement ICount by n */
 #define DELAY(n)	{apexc_ICount -= (n); apexc.current_word = (apexc.current_word + (n)) & 0x1f;}

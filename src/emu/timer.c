@@ -45,18 +45,16 @@
 /* in timer.h: typedef struct _emu_timer emu_timer; */
 struct _emu_timer
 {
-	emu_timer *	next;
-	emu_timer *	prev;
-	void 			(*callback)(running_machine *, int);
-	void			(*callback_ptr)(running_machine *, void *);
-	int 			callback_param;
-	void *			callback_ptr_param;
+	emu_timer *		next;
+	emu_timer *		prev;
+	timer_callback	callback;
+	INT32 			param;
+	void *			ptr;
 	const char *	file;
 	int 			line;
 	const char *	func;
 	UINT8 			enabled;
 	UINT8 			temporary;
-	UINT8			ptr;
 	attotime 		period;
 	attotime 		start;
 	attotime 		expire;
@@ -324,22 +322,12 @@ void timer_set_global_time(attotime newbase)
 		callback_timer_expire_time = timer->expire;
 
 		/* call the callback */
-		if (was_enabled)
+		if (was_enabled && timer->callback != NULL)
 		{
-			if (!timer->ptr && timer->callback)
-			{
-				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
-				profiler_mark(PROFILER_TIMER_CALLBACK);
-				(*timer->callback)(Machine, timer->callback_param);
-				profiler_mark(PROFILER_END);
-			}
-			else if (timer->ptr && timer->callback_ptr)
-			{
-				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
-				profiler_mark(PROFILER_TIMER_CALLBACK);
-				(*timer->callback_ptr)(Machine, timer->callback_ptr_param);
-				profiler_mark(PROFILER_END);
-			}
+			LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
+			profiler_mark(PROFILER_TIMER_CALLBACK);
+			(*timer->callback)(Machine, timer->ptr, timer->param);
+			profiler_mark(PROFILER_END);
 		}
 
 		/* clear the callback timer global */
@@ -392,7 +380,7 @@ static void timer_register_save(emu_timer *timer)
 
 	/* use different instances to differentiate the bits */
 	state_save_push_tag(0);
-	state_save_register_item(buf, count, timer->callback_param);
+	state_save_register_item(buf, count, timer->param);
 	state_save_register_item(buf, count, timer->enabled);
 	state_save_register_item(buf, count, timer->period.seconds);
 	state_save_register_item(buf, count, timer->period.attoseconds);
@@ -414,7 +402,7 @@ static void timer_postload(void)
 	emu_timer *t;
 
 	/* remove all timers and make a private list */
-	while (timer_head)
+	while (timer_head != NULL)
 	{
 		t = timer_head;
 
@@ -432,7 +420,7 @@ static void timer_postload(void)
 	}
 
 	/* now add them all back in; this effectively re-sorts them by time */
-	while (privlist)
+	while (privlist != NULL)
 	{
 		t = privlist;
 		privlist = t->next;
@@ -474,19 +462,17 @@ int timer_count_anonymous(void)
     isn't primed yet
 -------------------------------------------------*/
 
-INLINE emu_timer *_timer_alloc_common(void (*callback)(running_machine *, int), void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func, int temp)
+INLINE emu_timer *_timer_alloc_common(timer_callback callback, void *ptr, const char *file, int line, const char *func, int temp)
 {
 	attotime time = get_current_time();
 	emu_timer *timer = timer_new();
 
 	/* fill in the record */
 	timer->callback = callback;
-	timer->callback_ptr = callback_ptr;
-	timer->callback_param = 0;
-	timer->callback_ptr_param = param;
+	timer->ptr = ptr;
+	timer->param = 0;
 	timer->enabled = FALSE;
 	timer->temporary = temp;
-	timer->ptr = (callback_ptr != NULL);
 	timer->period = attotime_zero;
 	timer->file = file;
 	timer->line = line;
@@ -508,14 +494,9 @@ INLINE emu_timer *_timer_alloc_common(void (*callback)(running_machine *, int), 
 	return timer;
 }
 
-emu_timer *_timer_alloc(void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+emu_timer *_timer_alloc_internal(timer_callback callback, void *ptr, const char *file, int line, const char *func)
 {
-	return _timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
-}
-
-emu_timer *_timer_alloc_ptr(void (*callback_ptr)(running_machine *, void *), void *param, const char *file, int line, const char *func)
-{
-	return _timer_alloc_common(NULL, callback_ptr, param, file, line, func, FALSE);
+	return _timer_alloc_common(callback, ptr, file, line, func, FALSE);
 }
 
 
@@ -554,7 +535,7 @@ static void timer_remove(emu_timer *which)
     fire periodically
 -------------------------------------------------*/
 
-INLINE void timer_adjust_common(emu_timer *which, attotime duration, INT32 param, attotime period)
+void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period)
 {
 	attotime time = get_current_time();
 
@@ -563,7 +544,7 @@ INLINE void timer_adjust_common(emu_timer *which, attotime duration, INT32 param
 		callback_timer_modified = TRUE;
 
 	/* compute the time of the next firing and insert into the list */
-	which->callback_param = param;
+	which->param = param;
 	which->enabled = TRUE;
 
 	/* clamp negative times to 0 */
@@ -585,20 +566,6 @@ INLINE void timer_adjust_common(emu_timer *which, attotime duration, INT32 param
 		activecpu_abort_timeslice();
 }
 
-void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period)
-{
-	if (which->ptr)
-		fatalerror("timer_adjust called on a ptr timer!");
-	timer_adjust_common(which, duration, param, period);
-}
-
-void timer_adjust_ptr(emu_timer *which, attotime duration, attotime period)
-{
-	if (!which->ptr)
-		fatalerror("timer_adjust_ptr called on a non-ptr timer!");
-	timer_adjust_common(which, duration, 0, period);
-}
-
 
 
 /***************************************************************************
@@ -611,20 +578,10 @@ void timer_adjust_ptr(emu_timer *which, attotime duration, attotime period)
     period
 -------------------------------------------------*/
 
-void _timer_pulse(attotime period, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
 {
-	emu_timer *timer = _timer_alloc_common(callback, NULL, NULL, file, line, func, FALSE);
-
-	/* adjust to our liking */
+	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, FALSE);
 	timer_adjust(timer, period, param, period);
-}
-
-void _timer_pulse_ptr(attotime period, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
-{
-	emu_timer *timer = _timer_alloc_common(NULL, callback, param, file, line, func, FALSE);
-
-	/* adjust to our liking */
-	timer_adjust_ptr(timer, period, period);
 }
 
 
@@ -633,20 +590,10 @@ void _timer_pulse_ptr(attotime period, void *param, void (*callback)(running_mac
     calls the callback after the given duration
 -------------------------------------------------*/
 
-void _timer_set(attotime duration, INT32 param, void (*callback)(running_machine *, int), const char *file, int line, const char *func)
+void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
 {
-	emu_timer *timer = _timer_alloc_common(callback, NULL, NULL, file, line, func, TRUE);
-
-	/* adjust to our liking */
+	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, TRUE);
 	timer_adjust(timer, duration, param, attotime_zero);
-}
-
-void _timer_set_ptr(attotime duration, void *param, void (*callback)(running_machine *, void *), const char *file, int line, const char *func)
-{
-	emu_timer *timer = _timer_alloc_common(NULL, callback, param, file, line, func, TRUE);
-
-	/* adjust to our liking */
-	timer_adjust_ptr(timer, duration, attotime_zero);
 }
 
 
@@ -661,11 +608,7 @@ void _timer_set_ptr(attotime duration, void *param, void (*callback)(running_mac
 
 void timer_reset(emu_timer *which, attotime duration)
 {
-	/* adjust the timer */
-	if (!which->ptr)
-		timer_adjust(which, duration, which->callback_param, which->period);
-	else
-		timer_adjust_ptr(which, duration, which->period);
+	timer_adjust(which, duration, which->param, which->period);
 }
 
 
@@ -708,13 +651,13 @@ int timer_enabled(emu_timer *which)
 
 int timer_get_param(emu_timer *which)
 {
-	return which->callback_param;
+	return which->param;
 }
 
 
 void *timer_get_param_ptr(emu_timer *which)
 {
-	return which->callback_ptr_param;
+	return which->ptr;
 }
 
 

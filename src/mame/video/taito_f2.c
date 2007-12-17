@@ -38,7 +38,7 @@ static UINT16 *spriteram_buffered,*spriteram_delayed;
              tiles are always accessible)
 ************************************************************/
 
-int f2_sprite_type = 0;
+static int f2_sprite_type = 0;
 UINT16 *f2_sprite_extension;
 size_t f2_spriteext_size;
 
@@ -67,7 +67,7 @@ static INT32 f2_tilemap_xoffs = 0;	/* Needed in TC0480SCP games */
 static INT32 f2_tilemap_yoffs = 0;
 static INT32 f2_text_xoffs = 0;
 
-int f2_tilemap_col_base = 0;
+static int f2_tilemap_col_base = 0;
 
 static INT32 f2_game = 0;
 static INT32 FOOTCHMP = 1;

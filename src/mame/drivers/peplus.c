@@ -4,6 +4,7 @@
     PLAYER'S EDGE PLUS (PE+)
 
     Driver by Jim Stolis.
+    Layouts by Stephh.
 
     Special thanks to smf for I2C EEPROM support.
 
@@ -38,16 +39,127 @@
     periodically update an external eeprom for an even more secure backup.  This eeprom
     also holds the current game state in order to recover the player from a full power failure.
 
+
+Additional notes
+================
+
+1) What are "set chips" ?
+
+    They are meant to be used after you have already sucessfully put a new game in your machine.
+    Lets say you have 'pepp0516' installed and you go through the setup. In a real machine,
+    you may want to add a bill validator. The only way to do that is to un-socket the 'pepp0516'
+    chip and put in the 'peset038' chip and then reboot the machine. Then this chip's program
+    runs and you set the options and put the 'pepp0516' chip back in.
+
+    The only way to simulate this is to fire up the 'pepp0516' game and set it up. Then exit the
+    game and copy the pepp0516.nv file to peset038.nv, and then run the 'peset038' program.
+    This is because they have to have the same eeprom and cmos data in memory to work. When you
+    are done with the 'peset038' program, you copy the peset038.nv file back over the pepp0516.nv .
+    'peset038' is just a utility program with one screen and 3 tested inputs.
+
+
+2) Initialisation
+
+  - Method 1 :
+      * be sure the door is opened (if not, press 'O' by default)
+      * "CMOS DATA" will be displayed
+      * press the self-test button (default is 'K')
+      * be sure the door is opened (if not, press 'O' by default)
+      * "EEPROM DATA" will be displayed
+      * press the self-test button (default is 'K')
+      * be sure the door is closed (if not, press 'O' by default)
+
+  - Method 2 :
+      * be sure the door is opened (if not, press 'O' by default)
+      * "CMOS DATA" will be displayed
+      * press the self-test button (default is 'K') until a "beep" is heard
+      * be sure the door is closed (if not, press 'O' by default)
+      * press the jackpot reset button (default is 'L')
+      * be sure the door is opened (if not, press 'O' by default)
+      * "EEPROM DATA" will be displayed
+      * press the self-test button (default is 'K')
+      * be sure the door is closed (if not, press 'O' by default)
+
+
+          gamename  method
+          --------  ------
+          pepp0158     2
+          pepp0188     1
+          pepp0516     1
+          pebe0014     1
+          peke1012     1
+          peps0615     2
+          peps0716     2
+          pexp0019     2
+          pexs0006     2
+
+
+2) Configuration
+
+  - To configure a game :
+      * be sure the door is opened (if not, press 'O' by default)
+      * press the self-test button (default is 'K')
+      * cycle through the screens with the self-test button (default is 'K')
+      * close the door (default is 'O') to go back to the game and save the settings
+
+2a) What are "set chips" ?
+
+    They are meant to be used after you have already sucessfully put a new game in your machine.
+    Lets say you have 'pepp0516' installed and you go through the setup. In a real machine,
+    you may want to add a bill validator. The only way to do that is to un-socket the 'pepp0516'
+    chip and put in the 'peset038' chip and then reboot the machine. Then this chip's program
+    runs and you set the options and put the 'pepp0516' chip back in.
+
+    The only way to simulate this is to fire up the 'pepp0516' game and set it up. Then exit the
+    game and copy the pepp0516.nv file to peset038.nv, and then run the 'peset038' program.
+    This is because they have to have the same eeprom and cmos data in memory to work. When you
+    are done with the peset038 program, you copy the peset038.nv file back over the pepp0516.nv .
+    'peset038' is just a utility program with one screen.
+
+2b) About the "autohold" feature
+
+    Depending on laws which vary from cities/country, this feature can available or not in the
+    "operator mode". By default, it isn't available. To have this feature available in the
+    "operator mode", a new chip has to be burnt with a bit set and a new checksum (game ID
+    doesn't change though). Once the feature is available, it can be decided to turn the
+    "autohold" option ON or OFF (default is OFF).
+    To avoid having too many clones in MAME, a fake "Enable Autohold Feature" configuration
+    option has been added for (poker) games that support it. If you change this option,
+    you must leave the game, delete the .nv file, initialise and configure the game again.
+
+
+
+Stephh's log (2007.11.28) :
+  - split old peplus.c to peplus.c and pe_drvr.c (same as it was done for the NEOGEO)
+  - Renamed sets :
+      * 'peplus'   -> 'pepp0516' (so we get the game ID as for the other games)
+  - added MACHINE_RESET definition (needed for fake "Enable Autohold Feature" configuration)
+  - added generic/default layout, inputs and outputs
+  - for each kind of game (poker, bjack, keno, slots) :
+      * added two layouts (default is the "Bezel Lamps" for players, the other is "Debug Lamps")
+      * added one INPUT_PORT definition
+  - added fake "Enable Autohold Feature" configuration option for poker games that allow it
+    and added a specific INPUT_PORT definition
+  - for "set chips" :
+      * added one fake layout
+      * added one fake INPUT_PORT definition
+
 ***********************************************************************************/
+
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "cpu/i8051/i8051.h"
 #include "machine/i2cmem.h"
 
 #include "peplus.lh"
-#include "pepp0158.lh"
-#include "pepp0188.lh"
-#include "peset038.lh"
+#include "pe_schip.lh"
+#include "pe_poker.lh"
+#include "pe_bjack.lh"
+#include "pe_keno.lh"
+#include "pe_slots.lh"
+
+
+static UINT16 autohold_addr; /* address to patch in program RAM to enable autohold feature */
 
 static tilemap *bg_tilemap;
 
@@ -241,14 +353,14 @@ static WRITE8_HANDLER( peplus_sf000_w )
 
 static WRITE8_HANDLER( peplus_output_bank_a_w )
 {
-	output_set_value("coinlockout",(data >> 0) & 1); /* Coin Lockout */
-	output_set_value("diverter",(data >> 1) & 1); /* Diverter */
-	output_set_value("bell",(data >> 2) & 1); /* Bell */
-	output_set_value("na1",(data >> 3) & 1); /* N/A */
-	output_set_value("hopper1",(data >> 4) & 1); /* Hopper 1 */
-	output_set_value("hopper2",(data >> 5) & 1); /* Hopper 2 */
-	output_set_value("na2",(data >> 6) & 1); /* N/A */
-	output_set_value("na3",(data >> 7) & 1); /* N/A */
+	output_set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
+	output_set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
+	output_set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
+	output_set_value("pe_bnka3",(data >> 3) & 1); /* N/A */
+	output_set_value("pe_bnka4",(data >> 4) & 1); /* Hopper 1 */
+	output_set_value("pe_bnka5",(data >> 5) & 1); /* Hopper 2 */
+	output_set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
+	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
     coin_out_state = 0;
     if((data >> 4) & 1)
@@ -257,26 +369,26 @@ static WRITE8_HANDLER( peplus_output_bank_a_w )
 
 static WRITE8_HANDLER( peplus_output_bank_b_w )
 {
-	output_set_lamp_value(0,(data >> 0) & 1); /* Hold 2 3 4 Lt */
-	output_set_lamp_value(1,(data >> 1) & 1); /* Deal Draw Lt */
-	output_set_lamp_value(2,(data >> 2) & 1); /* Cash Out Lt */
-	output_set_lamp_value(3,(data >> 3) & 1); /* Hold 1 Lt */
-	output_set_lamp_value(4,(data >> 4) & 1); /* Bet Credits Lt */
-	output_set_lamp_value(5,(data >> 5) & 1); /* Change Request Lt */
-	output_set_lamp_value(6,(data >> 6) & 1); /* Door Open Lt */
-	output_set_lamp_value(7,(data >> 7) & 1); /* Hold 5 Lt */
+	output_set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
+	output_set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
+	output_set_value("pe_bnkb2",(data >> 2) & 1); /* Cash Out */
+	output_set_value("pe_bnkb3",(data >> 3) & 1); /* specific to a kind of machine */
+	output_set_value("pe_bnkb4",(data >> 4) & 1); /* Bet 1 / Bet Max */
+	output_set_value("pe_bnkb5",(data >> 5) & 1); /* Change Request */
+	output_set_value("pe_bnkb6",(data >> 6) & 1); /* Door Open */
+	output_set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
 }
 
 static WRITE8_HANDLER( peplus_output_bank_c_w )
 {
-	output_set_value("coininmeter",(data >> 0) & 1); /* Coin In Meter */
-	output_set_value("coinoutmeter",(data >> 1) & 1); /* Coin Out Meter */
-	output_set_value("coindropmeter",(data >> 2) & 1); /* Coin Drop Meter */
-	output_set_value("jackpotmeter",(data >> 3) & 1); /* Jackpot Meter */
-	output_set_value("billacceptor",(data >> 4) & 1); /* Bill Acceptor Enabled */
-	output_set_value("sdsout",(data >> 5) & 1); /* SDS Out */
-	output_set_value("na4",(data >> 6) & 1); /* N/A */
-	output_set_value("gamemeter",(data >> 7) & 1); /* Game Meter */
+	output_set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
+	output_set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
+	output_set_value("pe_bnkc2",(data >> 2) & 1); /* Coin Drop Meter */
+	output_set_value("pe_bnkc3",(data >> 3) & 1); /* Jackpot Meter */
+	output_set_value("pe_bnkc4",(data >> 4) & 1); /* Bill Acceptor Enabled */
+	output_set_value("pe_bnkc5",(data >> 5) & 1); /* SDS Out */
+	output_set_value("pe_bnkc6",(data >> 6) & 1); /* N/A */
+	output_set_value("pe_bnkc7",(data >> 7) & 1); /* Game Meter */
 }
 
 static WRITE8_HANDLER(i2c_nvram_w)
@@ -308,8 +420,8 @@ static READ8_HANDLER( peplus_crtc_lpen1_r )
 static READ8_HANDLER( peplus_crtc_lpen2_r )
 {
     UINT8 ret_val = 0x00;
-    UINT8 x_val = readinputportbytag("TOUCH_X");
-    UINT8 y_val = (0x19 - readinputportbytag("TOUCH_Y"));
+    UINT8 x_val = readinputportbytag_safe("TOUCH_X",0x00);
+    UINT8 y_val = (0x19 - readinputportbytag_safe("TOUCH_Y",0x00));
     UINT16 t_val = y_val * 0x28 + (x_val+1);
 
 	switch(vid_register) {
@@ -340,12 +452,12 @@ static READ8_HANDLER( peplus_cmos_r )
 	switch (offset)
 	{
 		case 0x00db:
-			if ((readinputportbytag("DOOR") & 0x01) == 0) {
+			if ((readinputportbytag_safe("DOOR",0xff) & 0x01) == 0) {
 				cmos_ram[offset] = 0x00;
 			}
 			break;
 		case 0x0b8d:
-			if ((readinputportbytag("DOOR") & 0x02) == 1) {
+			if ((readinputportbytag_safe("DOOR",0xff) & 0x02) == 1) {
 				cmos_ram[offset] = 0x01;
 			}
 			break;
@@ -438,7 +550,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_read(0, I2CMEM_SDA);
 	}
 
-	if ((readinputportbytag("SENSOR") & 0x01) == 0x01 && coin_state == 0) {
+	if ((readinputportbytag_safe("SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
 		coin_state = 1; // Start Coin Cycle
 		last_cycles = activecpu_gettotalcycles();
 	} else {
@@ -474,7 +586,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	}
 
 	if (curr_cycles - last_door > 6000) { // Guessing with 6000
-		if ((readinputportbytag("DOOR") & 0x01) == 0x01) {
+		if ((readinputportbytag_safe("DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
 			door_open = 1;
@@ -587,167 +699,6 @@ static GFXDECODE_START( peplus )
 GFXDECODE_END
 
 
-/**************
-* Driver Init *
-***************/
-
-static DRIVER_INIT( peplus )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	//program_ram[0x5e7e] = 0x01; // Enable Autohold Feature
-	program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-	program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0158 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	//program_ram[0x5ffe] = 0x01; // Enable Autohold Feature
-	program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-	program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0188 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	//program_ram[0x742f] = 0x01; // Enable Autohold Feature
-	program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peset038 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x302] = 0x22;  // RET - Disable Memory Test
-	program_ram[0x289f] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pebe0014 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x75e7] = 0x22; // RET - Disable Memory Test
-	program_ram[0xc3ab] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peke1012 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x59e7] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbe01] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peps0615 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x84be] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbfd8] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peps0716 )
-{
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x7f99] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbaa9] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pexp0019 )
-{
-    UINT8 *super_data = memory_region(REGION_USER1);
-
-    /* Distribute Superboard Data */
-    memcpy(s1000_ram, &super_data[0], 0x1000);
-    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
-    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
-    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
-    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
-    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
-    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
-
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0xc1e4] = 0x22; // RET - Disable Memory Test
-	program_ram[0xc15f] = 0x22; // RET - Disable Program Checksum
-    program_ram[0xc421] = 0x22; // RET - Disable 2nd Memory Test
-}
-
-static DRIVER_INIT( pexs0006 )
-{
-    UINT8 *super_data = memory_region(REGION_USER1);
-
-    /* Distribute Superboard Data */
-    memcpy(s1000_ram, &super_data[0], 0x1000);
-    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
-    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
-    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
-    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
-    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
-    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
-
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
-    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x9bd4] = 0x22; // RET - Disable Memory Test
-    program_ram[0x9e9c] = 0x22; // RET - Disable 2nd Memory Test
-}
-
-
 /*************************
 * Memory map information *
 *************************/
@@ -774,7 +725,7 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_3_r) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1") AM_WRITE(AY8910_write_port_0_w)
 
     // Superboard Data
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)
@@ -795,7 +746,7 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_WRITE(i2c_nvram_w)
 
 	// Input Banks B & C, Output Bank B
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r) AM_WRITE(peplus_output_bank_b_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
 
     // Superboard Data
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE(&sb000_ram)
@@ -820,28 +771,13 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)
 ADDRESS_MAP_END
 
+
 /*************************
 *      Input ports       *
 *************************/
 
-static INPUT_PORTS_START( peplus_poker )
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+static INPUT_PORTS_START( peplus )
+	/* IN0 has to be defined for each kind of game */
 
 	PORT_START_TAG("DOOR")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Upper Door") PORT_CODE(KEYCODE_O) PORT_TOGGLE
@@ -854,86 +790,169 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_DIPNAME( 0x01, 0x01, "Line Frequency" )
 	PORT_DIPSETTING(    0x01, "60HZ" )
 	PORT_DIPSETTING(    0x00, "50HZ" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( peplus_keno )
+
+/*************************
+*      Input ports       *
+*************************/
+
+/* Fake inputs to only map what is needed */
+static INPUT_PORTS_START( peplus_schip )
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Erase") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START_TAG("DOOR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Upper Door") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Lower Door") PORT_CODE(KEYCODE_I)
-
-	PORT_START_TAG("SENSOR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin In") PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x01, 0x01, "Line Frequency" )
 	PORT_DIPSETTING(    0x01, "60HZ" )
 	PORT_DIPSETTING(    0x00, "50HZ" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( peplus_poker )
+	PORT_INCLUDE(peplus)
+
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_BUTTON7  ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+INPUT_PORTS_END
+
+/* same as peplus_poker with additionnal fake option to enable the "Autohold" feature */
+static INPUT_PORTS_START( peplus_pokah )
+	PORT_INCLUDE(peplus_poker)
+
+	/* If you change this option, you'll have to delete the .nv file next time you launch the game ! */
+	PORT_START_TAG("AUTOHOLD")
+	PORT_CONFNAME( 0x01, 0x00, "Enable Autohold Feature" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( peplus_bjack )
+	PORT_INCLUDE(peplus)
+
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("Surrender") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("Stand") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("Insurance") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("Double Down") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_BUTTON7  ) PORT_NAME("Split") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( peplus_keno )
+	PORT_INCLUDE(peplus)
+
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_BUTTON7  ) PORT_NAME("Erase") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_BUTTON8  ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
     PORT_START_TAG("TOUCH_X")
     PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0x28) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
     PORT_START_TAG("TOUCH_Y")
 	PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0x19) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( peplus_slots )
+	PORT_INCLUDE(peplus)
+
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("Deal-Spin-Start") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Max Bet") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Play Credit") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+INPUT_PORTS_END
+
+
+
+/*************************
+*     Machine Reset      *
+*************************/
+
+static MACHINE_RESET( peplus )
+{
+	if (autohold_addr)
+		program_ram[autohold_addr] = readinputportbytag_safe("AUTOHOLD",0x00) & 0x01;
+}
+
 
 /*************************
 *     Machine Driver     *
@@ -950,6 +969,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
+	MDRV_MACHINE_RESET(peplus)
 	MDRV_NVRAM_HANDLER(peplus)
 
 	// video hardware
@@ -971,13 +991,151 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
+
+/*****************
+* Initialisation *
+*****************/
+
+/* Normal board */
+static void peplus_init(void)
+{
+	/* External RAM callback */
+	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
+
+    /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
+	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
+
+	/* default : no address to patch in program RAM to enable autohold feature */
+	autohold_addr = 0;
+}
+
+/* Superboard */
+static void peplussb_init(void)
+{
+    UINT8 *super_data = memory_region(REGION_USER1);
+
+    /* Distribute Superboard Data */
+    memcpy(s1000_ram, &super_data[0], 0x1000);
+    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
+    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
+    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
+    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
+    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
+    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
+
+	peplus_init();
+}
+
+
+/*************************
+*      Driver Init       *
+*************************/
+
+static DRIVER_INIT( peset038 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x302] = 0x22;  // RET - Disable Memory Test
+	program_ram[0x289f] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( pepp0158 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
+	program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+
+	autohold_addr = 0x5ffe;
+}
+
+static DRIVER_INIT( pepp0188 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
+	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+
+	autohold_addr = 0x742f;
+}
+
+static DRIVER_INIT( pepp0516 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
+	program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+
+	autohold_addr = 0x5e7e;
+}
+
+static DRIVER_INIT( pebe0014 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x75e7] = 0x22; // RET - Disable Memory Test
+	program_ram[0xc3ab] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( peke1012 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x59e7] = 0x22; // RET - Disable Memory Test
+	program_ram[0xbe01] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( peps0615 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x84be] = 0x22; // RET - Disable Memory Test
+	program_ram[0xbfd8] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( peps0716 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x7f99] = 0x22; // RET - Disable Memory Test
+	program_ram[0xbaa9] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( pexp0019 )
+{
+	peplussb_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0xc1e4] = 0x22; // RET - Disable Memory Test
+	program_ram[0xc15f] = 0x22; // RET - Disable Program Checksum
+    program_ram[0xc421] = 0x22; // RET - Disable 2nd Memory Test
+}
+
+static DRIVER_INIT( pexs0006 )
+{
+	peplussb_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x9bd4] = 0x22; // RET - Disable Memory Test
+    program_ram[0x9e9c] = 0x22; // RET - Disable 2nd Memory Test
+}
+
+
 /*************************
 *        Rom Load        *
 *************************/
 
-ROM_START( peplus )
+ROM_START( peset038 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "pp0516.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) )
+	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
@@ -1017,9 +1175,9 @@ ROM_START( pepp0188 )
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( peset038 )
+ROM_START( pepp0516 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
+	ROM_LOAD( "pp0516.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
@@ -1121,18 +1279,33 @@ ROM_START( pexs0006 )
 	ROM_LOAD( "cap2361.u43", 0x0000, 0x0100, CRC(051aea66) SHA1(2abf32caaeb821ca50a6398581de69bbfe5930e9) )
 ROM_END
 
+
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE  INPUT          INIT      ROT    COMPANY                                  FULLNAME                                                      FLAGS   */
-GAME( 1987, peplus,   0,      peplus,  peplus_poker,  peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0516) Double Bonus Poker",             0 )
-GAME( 1987, pepp0158, 0,      peplus,  peplus_poker,  pepp0158, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker",        0 )
-GAME( 1987, pepp0188, 0,      peplus,  peplus_poker,  pepp0188, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0188) Standard Draw Poker",            0 )
-GAME( 1987, peset038, 0,      peplus,  peplus_poker,  peset038, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (Set038) Set Chip",                       0 )
-GAME( 1994, pebe0014, 0,      peplus,  peplus_poker,  pebe0014, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (BE0014) Blackjack",                      0 )
-GAME( 1994, peke1012, 0,      peplus,  peplus_keno,   peke1012, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (KE1012) Keno",                           0 )
-GAME( 1996, peps0615, 0,      peplus,  peplus_poker,  peps0615, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0615) Chaos Slots",                    0 )
-GAME( 1996, peps0716, 0,      peplus,  peplus_poker,  peps0716, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) Quarter Mania Slots",            0 )
-GAME( 1995, pexp0019, 0,      peplus,  peplus_poker,  pexp0019, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",            0 )
-GAME( 1997, pexs0006, 0,      peplus,  peplus_poker,  pexs0006, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XS000006) Triple Triple Diamond Slots",  0 )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT         INIT      ROT    COMPANY                                  FULLNAME                                                  FLAGS   LAYOUT */
+
+/* Set chips */
+GAMEL(1987, peset038, 0,      peplus,  peplus_schip, peset038, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (Set038) Set Chip",                      0,   layout_pe_schip )
+
+/* Normal board : poker */
+GAMEL(1987, pepp0158, 0,      peplus,  peplus_pokah, pepp0158, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker",       0,   layout_pe_poker )
+GAMEL(1987, pepp0188, 0,      peplus,  peplus_pokah, pepp0188, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0188) Standard Draw Poker",           0,   layout_pe_poker )
+GAMEL(1987, pepp0516, 0,      peplus,  peplus_pokah, pepp0516, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0516) Double Bonus Poker",            0,   layout_pe_poker )
+
+/* Normal board : blackjack */
+GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, pebe0014, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (BE0014) Blackjack",                     0,   layout_pe_bjack )
+
+/* Normal board : keno */
+GAMEL(1994, peke1012, 0,      peplus,  peplus_keno,  peke1012, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (KE1012) Keno",                          0,   layout_pe_keno )
+
+/* Normal board : slots machine */
+GAMEL(1996, peps0615, 0,      peplus,  peplus_slots, peps0615, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0,   layout_pe_slots )
+GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peps0716, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) Quarter Mania Slots",           0,   layout_pe_slots )
+
+/* Superboard : poker */
+GAMEL(1995, pexp0019, 0,      peplus,  peplus_poker, pexp0019, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",           0,   layout_pe_poker )
+
+/* Superboard : slots machine */
+GAMEL(1997, pexs0006, 0,      peplus,  peplus_slots, pexs0006, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XS000006) Triple Triple Diamond Slots", 0,   layout_pe_slots )
