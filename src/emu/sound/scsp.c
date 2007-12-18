@@ -471,7 +471,7 @@ static void SCSP_StartSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	slot->active=1;
 	start_offset = PCM8B(slot) ? SA(slot) : SA(slot) & 0x7FFFE;
 	slot->base=SCSP->SCSPRAM + start_offset;
- 	slot->cur_addr=0; 
+ 	slot->cur_addr=0;
 	slot->nxt_addr=1<<SHIFT;
 	slot->step=SCSP_Step(slot);
 	Compute_EG(SCSP,slot);
@@ -1183,28 +1183,28 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
  		addr1=(slot->cur_addr>>(SHIFT-1))&0x7fffe;
  		addr2=(slot->nxt_addr>>(SHIFT-1))&0x7fffe;
  	}
-  
-	/*if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
-	{
-		INT32 smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
-		INT32 cycle=LEA(slot)-LSA(slot); // cycle corresponds to 2 pi
 
-		smp*=cycle; // associate cycle with full 16-bit sample range
-		smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
-		while(smp<0) smp+=cycle; smp%=cycle; // keep modulation sampler within a single cycle
-		if(!PCM8B(slot)) smp<<=1;
-		
-		addr1+=smp; addr2+=smp;
-		if(!PCM8B(slot))
-		{
-			addr1&=0x7fffe; addr2&=0x7fffe;
-		}
-		else
-		{
-			addr1&=0x7ffff; addr2&=0x7ffff;
-		}
-	}*/
-  
+	/*if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
+    {
+        INT32 smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
+        INT32 cycle=LEA(slot)-LSA(slot); // cycle corresponds to 2 pi
+
+        smp*=cycle; // associate cycle with full 16-bit sample range
+        smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
+        while(smp<0) smp+=cycle; smp%=cycle; // keep modulation sampler within a single cycle
+        if(!PCM8B(slot)) smp<<=1;
+
+        addr1+=smp; addr2+=smp;
+        if(!PCM8B(slot))
+        {
+            addr1&=0x7fffe; addr2&=0x7fffe;
+        }
+        else
+        {
+            addr1&=0x7ffff; addr2&=0x7ffff;
+        }
+    }*/
+
   	if(PCM8B(slot))	//8 bit signed
   	{
  		INT8 *p1=(signed char *) (SCSP->SCSPRAM+((SA(slot)+addr1)^1));
@@ -1236,10 +1236,10 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	else
 		slot->cur_addr+=step;
  	slot->nxt_addr=slot->cur_addr+(1<<SHIFT);
- 	
+
  	addr1=slot->cur_addr>>SHIFT;
  	addr2=slot->nxt_addr>>SHIFT;
- 	
+
 	if(addr1>=LSA(slot) && !(slot->Backwards))
 	{
 		if(LPSLNK(slot) && slot->EG.state==ATTACK)
@@ -1298,7 +1298,7 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 
 	if(!STWINH(slot))
 		*RBUFDST=sample;
-		
+
 	return sample;
 }
 

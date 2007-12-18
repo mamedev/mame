@@ -600,7 +600,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
         } else {
             coin_out_state = 3; // Coin-Out On
         }
-        
+
 		last_coin_out = activecpu_gettotalcycles();
 	}
 

@@ -600,7 +600,7 @@ endif
 SOUNDDEFS += -DHAS_M58817=$(if $(filter M58817,$(SOUNDS)),1,0)
 
 ifneq ($(filter M58817,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/m58817.o 
+SOUNDOBJS += $(SOUNDOBJ)/m58817.o
 endif
 
 

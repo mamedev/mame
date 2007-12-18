@@ -9,7 +9,7 @@ TODO:
   Clarify
 - 8ballact: read 1507 no mapped
 - drakton - add dkongjr conversion
-- dkong3 dma (Z80 dma)  
+- dkong3 dma (Z80 dma)
 - implement 74LS259 (8bit addressable latches), 74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
 
 Done:
@@ -56,35 +56,35 @@ Done:
 
   Couriersud: 12/2007
 
-	- changed dkong/radarscp based games to use hardware-conformant I8035 memory maps
-	- Added drakton clone drktnjr on dkongjr hardware
-	- wrote M58817 sound driver and hooked it up
-	     Uses tms5110 speech synthesis. LPC format is identical, however coefficients 
-	     seem to be different. Until coefficients are known, samples are used.
-	- moved address remapping proms to REGION_USER1	(hunchbkd & co)
-	- Service now adds credit 
-	- Hooked up coin_counters
-	- remove GAME_NOT_WORKING GAME_WRONG_COLORS from hunchbkd
-	- fixed shootgal0121u4red
-	- dkongjr: mapped more interface lines between sound board and cpu board 
-	- tagged all inputs, all reads use tag names
-	- moved more static vars into dkong_state
-	
+    - changed dkong/radarscp based games to use hardware-conformant I8035 memory maps
+    - Added drakton clone drktnjr on dkongjr hardware
+    - wrote M58817 sound driver and hooked it up
+         Uses tms5110 speech synthesis. LPC format is identical, however coefficients
+         seem to be different. Until coefficients are known, samples are used.
+    - moved address remapping proms to REGION_USER1 (hunchbkd & co)
+    - Service now adds credit
+    - Hooked up coin_counters
+    - remove GAME_NOT_WORKING GAME_WRONG_COLORS from hunchbkd
+    - fixed shootgal0121u4red
+    - dkongjr: mapped more interface lines between sound board and cpu board
+    - tagged all inputs, all reads use tag names
+    - moved more static vars into dkong_state
+
   General notes
-  
+
   The dma8257 is responsible for copying sprite data from 0x6900 (or where ever it is located) to 0x7400 (sprite banks).
-  2650 based games had a rom for address lookups. This is needed for proper operation of the 8257 code. 
-  Where this was missing, I copied the entry from hunchbkd and marked it as BAD_DUMP. 
-  Additional protection was done by pals. The only driver with a PAL entry is herbiedk. 
+  2650 based games had a rom for address lookups. This is needed for proper operation of the 8257 code.
+  Where this was missing, I copied the entry from hunchbkd and marked it as BAD_DUMP.
+  Additional protection was done by pals. The only driver with a PAL entry is herbiedk.
   I added NO_DUMP entries for the other 2650 games.
 
-  Thanks to Mike I was able to closer analyze TKG02/03/04 schematics. The radar scope to donkey kong conversions done 
-  should lead to the same discrete sound as TKG04 (2 board boards). However the colours are different. 
-  Red girders are back. Until the release of TKG04, the 2 board release, schematics were largely identical with radar scope. 
-  There were slight modifications from release to release in the analog video logic. Already at TKG2-02(03) the 
-  darlington amplifier for the blue channel was replaced with a emitter one by leaving away (OMIT in schematics) 
-  a resistor and transistor. Later on, TKG3-06, 4066 switches and background generation circuits for radarscope were removed. 
-  I have added a driver configuration switch to switch between TKG4 and TKG2-01 (radarscope) palettes. 
+  Thanks to Mike I was able to closer analyze TKG02/03/04 schematics. The radar scope to donkey kong conversions done
+  should lead to the same discrete sound as TKG04 (2 board boards). However the colours are different.
+  Red girders are back. Until the release of TKG04, the 2 board release, schematics were largely identical with radar scope.
+  There were slight modifications from release to release in the analog video logic. Already at TKG2-02(03) the
+  darlington amplifier for the blue channel was replaced with a emitter one by leaving away (OMIT in schematics)
+  a resistor and transistor. Later on, TKG3-06, 4066 switches and background generation circuits for radarscope were removed.
+  I have added a driver configuration switch to switch between TKG4 and TKG2-01 (radarscope) palettes.
   At a later stage, a TKG2-02 will be added as well.
 
 
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( p8257_drq_w )
 static READ8_HANDLER( dkong_in2_r )
 {
 	UINT8 r;
-	
+
 	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
@@ -849,7 +849,7 @@ static INPUT_PORTS_START( dkong_in2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) 	/* not connected - held to high - used as service */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* not connected - held to high */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* status from sound cpu */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) 
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dkong_dsw0 )

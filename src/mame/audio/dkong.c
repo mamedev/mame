@@ -17,10 +17,10 @@
  ****************************************************************/
 
 /* Set to 1 to use speech synthesizer instead of samples.
- * Disabled by default since M58817 emulation is not 
+ * Disabled by default since M58817 emulation is not
  * complete due to missing information about coefficients.
  */
- 
+
 #define RADARSC1_USE_M58817		(0)
 
 #define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
@@ -693,7 +693,7 @@ static SOUND_START( radarsc1  )
 static SOUND_RESET( dkong )
 {
 	dkong_state *state = machine->driver_data;
-	
+
 	state->mcustatus = 0;
 	state->page = 0;
 
@@ -709,12 +709,12 @@ static SOUND_RESET( dkongjr )
 	int i;
 
 	sound_reset_dkong(machine);
-		
+
 	state->envelope = 0;
 	state->tt = 0;
 	state->decay = 0;
 	state->sh_climb_count = 0;
-	
+
 	for (i=0;i<10;i++)
 		state->dkongjr_latch[i]=0;
 }
@@ -725,7 +725,7 @@ static SOUND_RESET( dkongjr )
  *
  ****************************************************************/
 
-/* 
+/*
 
 http://www.freepatentsonline.com/4633500.html
 
@@ -803,7 +803,7 @@ static READ8_HANDLER( dkong_sh_tune_r )
 	dkong_state *state = Machine->driver_data;
 	UINT8 *SND = memory_region(REGION_CPU2);
 
-	if ( state->page & 0x40 ) 
+	if ( state->page & 0x40 )
 	{
 		return soundlatch_r(0) & 0x0F;
 	}
@@ -982,22 +982,22 @@ WRITE8_HANDLER( dkongjr_snd_w1 )
 			case 3: /* Port 3 write ==> PB 5 */
 				I8035_P2_W_AL(5,data & 1);
 				break;
-#if 0 // above verified from schematics				
+#if 0 // above verified from schematics
 			case 3:			/* roar */
 				if (data)
 					sample_start (7,2,0);
 				break;
 #endif
 			case 4:			/* Port 4 write */
-				I8035_T_W_AL(1, data & 1);	
+				I8035_T_W_AL(1, data & 1);
 				break;
 			case 5:			/* Port 5 write */
-				I8035_T_W_AL(0, data & 1);	
+				I8035_T_W_AL(0, data & 1);
 				break;
 			case 6:			/* Port 6 write ==> PB 4 */
 				I8035_P2_W_AL(4,data & 1);
 				break;
-#if 0 // above verified from schematics				
+#if 0 // above verified from schematics
 			case 6:			/* snapjaw */
 				if (data)
 					sample_stop (7);
@@ -1022,7 +1022,7 @@ WRITE8_HANDLER( dkongjr_snd_w2 )
 		case 0:
 			dkong_audio_irq_w(0, data & 1);
 			break;
-#if 0 // above verified from schematics				
+#if 0 // above verified from schematics
 		case 0:			/* death */
 			if (data)
 				sample_stop (7);

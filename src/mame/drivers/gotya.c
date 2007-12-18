@@ -9,12 +9,12 @@ TODO: Emulated sound
               HD38882PA06
 
       I think HD38880 is a CPU/MCU, because the game just sends it a sound command (0-0x1a)
-      
+
       couriersud:
-      	 The chips above are speech synthesis chips. HD38880 is the main chip
-      	 whereas HD38882 is an eprom interface. PARCOR based.
-      	 http://www.freepatentsonline.com/4435832.html
-      	 Datasheet lists no parcor coefficients 
+         The chips above are speech synthesis chips. HD38880 is the main chip
+         whereas HD38882 is an eprom interface. PARCOR based.
+         http://www.freepatentsonline.com/4435832.html
+         Datasheet lists no parcor coefficients
 
 ****************************************************************************/
 

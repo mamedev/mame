@@ -406,98 +406,98 @@ INPUT_PORTS_END
 
 /***************************************************************************
 
-	Neo-Geo game pcb infos:
-	=======================
+    Neo-Geo game pcb infos:
+    =======================
 
-	The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
+    The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
 
-	Each cartridge consists of two pcb's: CHA and PROG.
+    Each cartridge consists of two pcb's: CHA and PROG.
 
-	CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
-	PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
+    CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
+    PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
 
-	On most pcb's various custom/protection chips can also be found:
+    On most pcb's various custom/protection chips can also be found:
 
-	CHA:
-	. NEO-273
-	. NEO-CMC
-	. NEO-ZMC
-	. NEO-ZMC2
-	. PRO-CT0
-	. SNK-9201
+    CHA:
+    . NEO-273
+    . NEO-CMC
+    . NEO-ZMC
+    . NEO-ZMC2
+    . PRO-CT0
+    . SNK-9201
 
-	PROG:
-	. ALTERA
-	. NEO-COMA
-	. NEO-PCM2 (SNK 1999)
-	. NEO-PCM2 (PLAYMORE 2002)
-	. NEO-PVC
-	. NEO-SMA
-	. PCM
+    PROG:
+    . ALTERA
+    . NEO-COMA
+    . NEO-PCM2 (SNK 1999)
+    . NEO-PCM2 (PLAYMORE 2002)
+    . NEO-PVC
+    . NEO-SMA
+    . PCM
 
 
-	Known pcb's:
-	============
+    Known pcb's:
+    ============
 
-	MVS CHA:
-	. NEO-MVS CHA-8M
-	. NEO-MVS CHA42G
-	. NEO-MVS CHA42G-1
-	. NEO-MVS CHA42G-2
-	. NEO-MVS CHA42G-3B
-	. NEO-MVS CHA256
-	. NEO-MVS CHA256B
-	. NEO-MVS PSTM CHA136
-	. NEO-MVS CHA512Y
-	. NEO-MVS CHAFIO
+    MVS CHA:
+    . NEO-MVS CHA-8M
+    . NEO-MVS CHA42G
+    . NEO-MVS CHA42G-1
+    . NEO-MVS CHA42G-2
+    . NEO-MVS CHA42G-3B
+    . NEO-MVS CHA256
+    . NEO-MVS CHA256B
+    . NEO-MVS PSTM CHA136
+    . NEO-MVS CHA512Y
+    . NEO-MVS CHAFIO
 
-	MVS PROG:
-	. NEO-MVS PROG8M42
-	. NEO-MVS PROG16
-	. NEO-MVS PROG42G
-	. NEO-MVS PROG42G-1
-	. NEO-MVS PROGGSC
-	. NEO-MVS PROGTOP
-	. NEO-MVS PROGSF1
-	. NEO-MVS PROGEOP
-	. NEO-MVS PROGLBA - LBA-SUB (2000.2.24)
-	. NEO-MVS PROGBK1
-	. NEO-MVS PROGBK2
-	. NEO-MVS PROGBK2R
-	. NEO-MVS PROGBK3R
-	. NEO-MVS PROGBK3S
+    MVS PROG:
+    . NEO-MVS PROG8M42
+    . NEO-MVS PROG16
+    . NEO-MVS PROG42G
+    . NEO-MVS PROG42G-1
+    . NEO-MVS PROGGSC
+    . NEO-MVS PROGTOP
+    . NEO-MVS PROGSF1
+    . NEO-MVS PROGEOP
+    . NEO-MVS PROGLBA - LBA-SUB (2000.2.24)
+    . NEO-MVS PROGBK1
+    . NEO-MVS PROGBK2
+    . NEO-MVS PROGBK2R
+    . NEO-MVS PROGBK3R
+    . NEO-MVS PROGBK3S
 
-	AES CHA:
-	. NEO-AEG CHA-32
-	. NEO-AEG CHA42G-1
-	. NEO-AEG CHA42G-3
-	. NEO-AEG CHA42G-4
-	. NEO-AEG CHA256
-	. NEO-AEG CHA256[B]
-	. NEO-AEG CHA256RY
-	. NEO-AEG CHA512Y
-	. NEO-AEG CHAFIO (SNK 1999.8.10)
+    AES CHA:
+    . NEO-AEG CHA-32
+    . NEO-AEG CHA42G-1
+    . NEO-AEG CHA42G-3
+    . NEO-AEG CHA42G-4
+    . NEO-AEG CHA256
+    . NEO-AEG CHA256[B]
+    . NEO-AEG CHA256RY
+    . NEO-AEG CHA512Y
+    . NEO-AEG CHAFIO (SNK 1999.8.10)
 
-	AES PROG:
-	. NEO-AEG PROG-NAM
-	. NEO-AEG PROG-HERO
-	. NEO-AEG PROG B
-	. NEO-AEG PROG-4A
-	. NEO-AEG PROG-4B
-	. NEO-AEG PROG16
-	. NEO-AEG PROG42G-COM
-	. NEO-AEG PROG42G-1
-	. NEO-AEG PROG4096B
-	. NEO-AEG PROGGS
-	. NEO-AEG PROGLBA
-	. NEO-AEG PROGRK
-	. NEO-AEG PROGRKB
-	. NEO-AEG PROGBK1Y
-	. NEO-AEG PROGBK2
-	. NEO-AEG PROGBK3R
+    AES PROG:
+    . NEO-AEG PROG-NAM
+    . NEO-AEG PROG-HERO
+    . NEO-AEG PROG B
+    . NEO-AEG PROG-4A
+    . NEO-AEG PROG-4B
+    . NEO-AEG PROG16
+    . NEO-AEG PROG42G-COM
+    . NEO-AEG PROG42G-1
+    . NEO-AEG PROG4096B
+    . NEO-AEG PROGGS
+    . NEO-AEG PROGLBA
+    . NEO-AEG PROGRK
+    . NEO-AEG PROGRKB
+    . NEO-AEG PROGBK1Y
+    . NEO-AEG PROGBK2
+    . NEO-AEG PROGBK3R
 
-	The above only covers SNK / SNK-PLAYMORE pcb's. There also exists a
-	wide range of 'bootleg' pcb's.
+    The above only covers SNK / SNK-PLAYMORE pcb's. There also exists a
+    wide range of 'bootleg' pcb's.
 
 ****************************************************************************/
 
@@ -1698,7 +1698,7 @@ ROM_START( androdun )
 	ROM_REGION( 0x100000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "049-v1.bin", 0x000000, 0x080000, CRC(577c85b3) SHA1(2c3072401fe73497dca0e9009ae2ba4053fe936d) )
 	ROM_LOAD( "049-v2.bin", 0x080000, 0x080000, CRC(e14551c4) SHA1(763a9912b9df55defb190af3f29ae034f6dd78d6) )
-	/* The MVS version has only v1 rom, size 8mbit. */ 
+	/* The MVS version has only v1 rom, size 8mbit. */
 
 	NO_DELTAT_REGION
 

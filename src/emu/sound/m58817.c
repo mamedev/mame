@@ -3,13 +3,13 @@
      M58817 interface
 
      Written for MAME by couriersud
-     
+
      - structure from TMS5110 interface
-	 - this is a wrapper around the TMS5110 interface
-	 - M58817 & TMS5110 seem to be similar, however it is very probable
-	   that they use different "coding" tables for energy, pitch
-	 - Speech is understandable, but off 
-	 - This driver supports to use a "sample" interface instead as well
+     - this is a wrapper around the TMS5110 interface
+     - M58817 & TMS5110 seem to be similar, however it is very probable
+       that they use different "coding" tables for energy, pitch
+     - Speech is understandable, but off
+     - This driver supports to use a "sample" interface instead as well
 
 ******************************************************************************/
 
@@ -56,7 +56,7 @@ static int speech_rom_read_bit(void)
 	const UINT8 *table = memory_region(info->intf->rom_region);
 
 	int r;
-	
+
 	if (info->speech_rom_bitnum<0)
 		r = 0;
 	else
@@ -85,8 +85,8 @@ static void m58817_state_loop(void *chip, int data)
 				case 0x00: // reset ????
 					info->count=0;
 					/*To be extremely accurate there should be a delays between each of
-					  the function calls below. In real they happen with the frequency of 160 kHz.
-					*/
+                      the function calls below. In real they happen with the frequency of 160 kHz.
+                    */
 
 					if (info->intf->rom_region != -1)
 					{
@@ -138,7 +138,7 @@ static void m58817_state_loop(void *chip, int data)
 				tms5110_PDC_set(info->chip, 0);
 				tms5110_PDC_set(info->chip, 1);
 				tms5110_PDC_set(info->chip, 0);
-			} 
+			}
 			else
 			{
 				for (i=0;i<M58817_MAX_SAMPLES;i++)
@@ -239,7 +239,7 @@ WRITE8_HANDLER( m58817_CTL_w )
 	struct m58817_info *info = sndti_token(SOUND_M58817, 0);
 
     /* bring up to date first */
-    //stream_update(info->stream);    
+    //stream_update(info->stream);
     info->command_latch = data & 0x0f;
 }
 

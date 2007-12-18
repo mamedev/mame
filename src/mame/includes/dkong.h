@@ -69,7 +69,7 @@ struct _dkong_state
 	UINT8 has_discrete_interface;
 
 	UINT8 page,mcustatus;
-	
+
 	double envelope,tt;
 	UINT8 decay;
 	UINT8 portT;
