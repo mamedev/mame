@@ -14,12 +14,12 @@ UINT8 *zaccaria_videoram,*zaccaria_attributesram;
 
 static tilemap *bg_tilemap;
 
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	2*8+1, 29*8-1,
 	2*8, 30*8-1
 };
-static rectangle spritevisiblearea_flipx =
+static const rectangle spritevisiblearea_flipx =
 {
 	3*8+1, 30*8-1,
 	2*8, 30*8-1

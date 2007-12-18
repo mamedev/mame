@@ -2628,8 +2628,6 @@ static DRIVER_INIT( slikshot )
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0180, 0x0180, 0, 0, slikshot_z80_r);
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
-
-	slikshot_set_crosshair_range(116 - 80, 116 + 80);
 }
 
 
@@ -2638,8 +2636,6 @@ static DRIVER_INIT( sstrike )
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x1180, 0x1180, 0, 0, slikshot_z80_r);
 	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
-
-	slikshot_set_crosshair_range(186 - 40, 186 + 40);
 }
 
 

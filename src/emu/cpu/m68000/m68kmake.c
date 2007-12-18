@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.31
+ *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
@@ -12,7 +12,7 @@
  * copyright notice remains unaltered in the source code and any binary files
  * containing this code in compiled form.
  *
- * All other lisencing terms must be negotiated with the author
+ * All other licensing terms must be negotiated with the author
  * (Karl Stenerud).
  *
  * The latest version of this code can be obtained at:
@@ -52,7 +52,7 @@
  */
 
 
-static const char* g_version = "3.31";
+static const char g_version[] = "3.32";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
@@ -227,7 +227,6 @@ int extract_opcode_info(char* src, char* name, int* size, char* spec_proc, char*
 void add_replace_string(replace_struct* replace, const char* search_str, const char* replace_str);
 void write_body(FILE* filep, body_struct* body, replace_struct* replace);
 void get_base_name(char* base_name, opcode_struct* op);
-void write_prototype(FILE* filep, char* base_name);
 void write_function_name(FILE* filep, char* base_name);
 void add_opcode_output_table_entry(opcode_struct* op, char* name);
 static int DECL_SPEC compare_nof_true_bits(const void* aptr, const void* bptr);
@@ -265,7 +264,7 @@ opcode_struct g_opcode_input_table[MAX_OPCODE_INPUT_TABLE_LENGTH];
 opcode_struct g_opcode_output_table[MAX_OPCODE_OUTPUT_TABLE_LENGTH];
 int g_opcode_output_table_length = 0;
 
-ea_info_struct g_ea_info_table[13] =
+const ea_info_struct g_ea_info_table[13] =
 {/* fname    ea        mask  match */
 	{"",     "",       0x00, 0x00}, /* EA_MODE_NONE */
 	{"ai",   "AY_AI",  0x38, 0x10}, /* EA_MODE_AI   */
@@ -283,7 +282,7 @@ ea_info_struct g_ea_info_table[13] =
 };
 
 
-const char* g_cc_table[16][2] =
+const char *const g_cc_table[16][2] =
 {
 	{ "t",  "T"}, /* 0000 */
 	{ "f",  "F"}, /* 0001 */
@@ -304,7 +303,7 @@ const char* g_cc_table[16][2] =
 };
 
 /* size to index translator (0 -> 0, 8 and 16 -> 1, 32 -> 2) */
-int g_size_select_table[33] =
+const int g_size_select_table[33] =
 {
 	0,												/* unsized */
 	0, 0, 0, 0, 0, 0, 0, 1,							/*    8    */
@@ -314,7 +313,7 @@ int g_size_select_table[33] =
 
 /* Extra cycles required for certain EA modes */
 /* TODO: correct timings for 040 */
-int g_ea_cycle_table[13][NUM_CPUS][3] =
+const int g_ea_cycle_table[13][NUM_CPUS][3] =
 {/*       000           010           020           040  */
 	{{ 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}, { 0,  0,  0}}, /* EA_MODE_NONE */
 	{{ 0,  4,  8}, { 0,  4,  8}, { 0,  4,  4}, { 0,  4,  4}}, /* EA_MODE_AI   */
@@ -332,7 +331,7 @@ int g_ea_cycle_table[13][NUM_CPUS][3] =
 };
 
 /* Extra cycles for JMP instruction (000, 010) */
-int g_jmp_cycle_table[13] =
+const int g_jmp_cycle_table[13] =
 {
 	 0, /* EA_MODE_NONE */
 	 4, /* EA_MODE_AI   */
@@ -350,7 +349,7 @@ int g_jmp_cycle_table[13] =
 };
 
 /* Extra cycles for JSR instruction (000, 010) */
-int g_jsr_cycle_table[13] =
+const int g_jsr_cycle_table[13] =
 {
 	 0, /* EA_MODE_NONE */
 	 4, /* EA_MODE_AI   */
@@ -368,7 +367,7 @@ int g_jsr_cycle_table[13] =
 };
 
 /* Extra cycles for LEA instruction (000, 010) */
-int g_lea_cycle_table[13] =
+const int g_lea_cycle_table[13] =
 {
 	 0, /* EA_MODE_NONE */
 	 4, /* EA_MODE_AI   */
@@ -386,7 +385,7 @@ int g_lea_cycle_table[13] =
 };
 
 /* Extra cycles for PEA instruction (000, 010) */
-int g_pea_cycle_table[13] =
+const int g_pea_cycle_table[13] =
 {
 	 0, /* EA_MODE_NONE */
 	 6, /* EA_MODE_AI   */
@@ -404,7 +403,7 @@ int g_pea_cycle_table[13] =
 };
 
 /* Extra cycles for MOVEM instruction (000, 010) */
-int g_movem_cycle_table[13] =
+const int g_movem_cycle_table[13] =
 {
 	 0, /* EA_MODE_NONE */
 	 0, /* EA_MODE_AI   */
@@ -422,7 +421,7 @@ int g_movem_cycle_table[13] =
 };
 
 /* Extra cycles for MOVES instruction (010) */
-int g_moves_cycle_table[13][3] =
+const int g_moves_cycle_table[13][3] =
 {
 	{ 0,  0,  0}, /* EA_MODE_NONE */
 	{ 0,  4,  6}, /* EA_MODE_AI   */
@@ -440,7 +439,7 @@ int g_moves_cycle_table[13][3] =
 };
 
 /* Extra cycles for CLR instruction (010) */
-int g_clr_cycle_table[13][3] =
+const int g_clr_cycle_table[13][3] =
 {
 	{ 0,  0,  0}, /* EA_MODE_NONE */
 	{ 0,  4,  6}, /* EA_MODE_AI   */
@@ -778,16 +777,10 @@ void get_base_name(char* base_name, opcode_struct* op)
 		sprintf(base_name+strlen(base_name), "_%s", op->spec_ea);
 }
 
-/* Write the prototype of an opcode handler function */
-void write_prototype(FILE* filep, char* base_name)
-{
-	fprintf(filep, "void %s(void);\n", base_name);
-}
-
 /* Write the name of an opcode handler function */
 void write_function_name(FILE* filep, char* base_name)
 {
-	fprintf(filep, "void %s(void)\n", base_name);
+	fprintf(filep, "static void %s(void)\n", base_name);
 }
 
 void add_opcode_output_table_entry(opcode_struct* op, char* name)
@@ -870,7 +863,6 @@ void generate_opcode_handler(FILE* filep, body_struct* body, replace_struct* rep
 	/* Set the opcode structure and write the tables, prototypes, etc */
 	set_opcode_struct(opinfo, op, ea_mode);
 	get_base_name(str, op);
-	write_prototype(g_prototype_file, str);
 	add_opcode_output_table_entry(op, str);
 	write_function_name(filep, str);
 

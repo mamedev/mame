@@ -26,13 +26,13 @@ static tilemap *bg_tilemap;
 #define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
 #define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-static rectangle clippanel =
+static const rectangle clippanel =
 {
 	26*8, 32*8-1,
 	1*8, 31*8-1
 };
 
-static rectangle clippanelflip =
+static const rectangle clippanelflip =
 {
 	0*8, 6*8-1,
 	1*8, 31*8-1

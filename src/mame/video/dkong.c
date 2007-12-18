@@ -547,7 +547,7 @@ WRITE8_HANDLER( radarscp_grid_color_w )
 	dkong_state *state = Machine->driver_data;
 
 	state->grid_col = (data & 0x07) ^ 0x07;
-	popmessage("Gridcol: %d", state->grid_col);
+	//popmessage("Gridcol: %d", state->grid_col);
 }
 
 WRITE8_HANDLER( dkong_flipscreen_w )
@@ -662,20 +662,23 @@ INLINE double CD4049(running_machine *machine, double x)
  * a period of roughly 4.4 ms
  */
 
+#define RC1		(2.2e3 * 22e-6) // 22e-6;
+#define RC2		(10e3 * 33e-6)
+#define RC31	(18e3 * 33e-6)
+#define RC32	((18e3 + 68e3) * 33e-6)
+#define RC4		(90e3 * 0.47e-6)
+#define dt		(1./60./(double) VTOTAL)
+#define period2 (((long long)(PIXEL_CLOCK) * ( 33L * 68L )) / (long)10000000L / 3)  // period/2 in pixel ...
+
 static void radarscp_step(running_machine *machine, int line_cnt)
 {
 	dkong_state *state = machine->driver_data;
 	/* Condensator is illegible in schematics for TRS2 board.
      * TRS1 board states 3.3u.
      */
-	const double RC1= 2.2e3 * 22e-6;// 22e-6;
-	const double RC2= 10e3 * 33e-6;
-	const double RC31= 18e3 * 33e-6;
-	const double RC32= (18e3 + 68e3) * 33e-6;
-	const double RC4= 90e3 * 0.47e-6;
-	const double dt= 1./60./(double) VTOTAL;
-	const int period2 = ((long long)(PIXEL_CLOCK) * ( 33L * 68L )) / (long)10000000L / 3;  // period/2 in pixel ...
-	static double cv1=0,cv2=0,vg1=0,vg2=0,vg3=0,vg3i=0,cv3=0,cv4=0;
+
+	static double cv1=0,cv2=0,vg1=0,vg2=0,vg3=0,cv3=0,cv4=0;
+	double vg3i;
 	static int pixelcnt = 0;
 	double diff;
 	int sig;
@@ -683,8 +686,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	line_cnt += 256;
 	if (line_cnt>511)
 		line_cnt -= VTOTAL;
-	//FIXME: remove after testing
-	//return;
+
 	/* sound2 mixes in a 30Hz noise signal.
      * With the current model this has no real effect
      * Included for completeness
@@ -693,12 +695,16 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	line_cnt++;
 	if (line_cnt>=512)
 		line_cnt=512-VTOTAL;
+
 	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(Machine) > RAND_MAX/2))
 		state->sig30Hz = (1-state->sig30Hz);
+
 	state->rflip_sig = state->snd02_enable & state->sig30Hz;
 	sig = state->rflip_sig ^ ((line_cnt & 0x80)>>7);
+
 	if (state->hardware_type == HARDWARE_TRS01)
 		state->rflip_sig = !state->rflip_sig;
+
 	if  (sig) // 128VF
 		diff = (0.0 - cv1);
 	else

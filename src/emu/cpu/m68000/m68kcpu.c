@@ -3,9 +3,9 @@
 /* ======================================================================== */
 
 #if 0
-static const char* copyright_notice =
+static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 3.31 (2007-07-09)\n"
+"Version 3.32 (2007-12-15)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
 "Copyright 1998-2007 Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -13,7 +13,7 @@ static const char* copyright_notice =
 "copyright notice remains unaltered in the source code and any binary files\n"
 "containing this code in compiled form.\n"
 "\n"
-"All other lisencing terms must be negotiated with the author\n"
+"All other licensing terms must be negotiated with the author\n"
 "(Karl Stenerud).\n"
 "\n"
 "The latest version of this code can be obtained at:\n"
@@ -49,7 +49,7 @@ uint m68ki_tracing = 0;
 uint m68ki_address_space;
 
 #ifdef M68K_LOG_ENABLE
-const char* m68ki_cpu_names[] =
+const char *const m68ki_cpu_names[] =
 {
 	"Invalid CPU",
 	"M68000",
@@ -83,7 +83,7 @@ uint    m68ki_aerr_write_mode;
 uint    m68ki_aerr_fc;
 
 /* Used by shift & rotate instructions */
-uint8 m68ki_shift_8_table[65] =
+const uint8 m68ki_shift_8_table[65] =
 {
 	0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -92,7 +92,7 @@ uint8 m68ki_shift_8_table[65] =
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff
 };
-uint16 m68ki_shift_16_table[65] =
+const uint16 m68ki_shift_16_table[65] =
 {
 	0x0000, 0x8000, 0xc000, 0xe000, 0xf000, 0xf800, 0xfc00, 0xfe00, 0xff00,
 	0xff80, 0xffc0, 0xffe0, 0xfff0, 0xfff8, 0xfffc, 0xfffe, 0xffff, 0xffff,
@@ -103,7 +103,7 @@ uint16 m68ki_shift_16_table[65] =
 	0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
 	0xffff, 0xffff
 };
-uint m68ki_shift_32_table[65] =
+const uint m68ki_shift_32_table[65] =
 {
 	0x00000000, 0x80000000, 0xc0000000, 0xe0000000, 0xf0000000, 0xf8000000,
 	0xfc000000, 0xfe000000, 0xff000000, 0xff800000, 0xffc00000, 0xffe00000,
@@ -122,7 +122,7 @@ uint m68ki_shift_32_table[65] =
 /* Number of clock cycles to use for exception processing.
  * I used 4 for any vectors that are undocumented for processing times.
  */
-uint8 m68ki_exception_cycle_table[4][256] =
+const uint8 m68ki_exception_cycle_table[4][256] =
 {
 	{ /* 000 */
 		  4, /*  0: Reset - Initial Stack Pointer                      */
@@ -418,7 +418,7 @@ uint8 m68ki_exception_cycle_table[4][256] =
 	}
 };
 
-uint8 m68ki_ea_idx_cycle_table[64] =
+const uint8 m68ki_ea_idx_cycle_table[64] =
 {
 	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
 	 0, /* ..01.000 no memory indirect, base NULL             */

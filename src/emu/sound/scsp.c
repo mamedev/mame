@@ -2,13 +2,11 @@
     Sega/Yamaha YMF292-F (SCSP = Saturn Custom Sound Processor) emulation
     By ElSemi
     MAME/M1 conversion and cleanup by R. Belmont
+    Additional code and bugfixes by kingshriek
 
     This chip has 32 voices.  Each voice can play a sample or be part of
     an FM construct.  Unlike traditional Yamaha FM chips, the base waveform
     for the FM still comes from the wavetable RAM.
-
-    Unsupported:
-        - FM mode (VF3 uses it, Hanagumi might late in the title song...)
 
     ChangeLog:
     * November 25, 2003 (ES) Fixed buggy timers and envelope overflows.
@@ -20,8 +18,10 @@
     * January 8, 2005   (RB) Added ability to specify region offset for RAM.
     * January 26, 2007  (ES) Added on-board DSP capability
     * September 24, 2007 (RB+ES) Removed fake reverb.  Rewrote timers and IRQ handling.
-                              Fixed case where voice frequency is updated while looping.
-                  Enabled DSP again.
+                             Fixed case where voice frequency is updated while looping.
+                             Enabled DSP again.
+    * December 16, 2007 (kingshriek) Many EG bug fixes, implemented effects mixer,
+                             implemented FM.
 */
 
 #include <math.h>
@@ -76,7 +76,7 @@
 #define SDIR(slot)		((slot->udata.data[0x6]>>0x0)&0x0100)
 #define TL(slot)		((slot->udata.data[0x6]>>0x0)&0x00FF)
 
-#define MDL(slot)		((slot->udata.data[0x7]>>0xB)&0x0007)
+#define MDL(slot)		((slot->udata.data[0x7]>>0xC)&0x000F)
 #define MDXSL(slot)		((slot->udata.data[0x7]>>0x6)&0x003F)
 #define MDYSL(slot)		((slot->udata.data[0x7]>>0x0)&0x003F)
 
@@ -138,6 +138,7 @@ struct _SLOT
 	UINT8 active;	//this slot is currently playing
 	UINT8 *base;		//samples base address
 	UINT32 cur_addr;	//current play address (24.8)
+	UINT32 nxt_addr;	//next play address
 	UINT32 step;		//pitch step (24.8)
 	struct _EG EG;			//Envelope
 	struct _LFO PLFO;		//Phase LFO
@@ -375,7 +376,7 @@ static void Compute_EG(struct _SCSP *SCSP,struct _SLOT *slot)
 	int rate;
 	if(octave&8) octave=octave-16;
 	if(KRS(slot)!=0xf)
-		rate=2*(octave+KRS(slot))+((FNS(slot)>>9)&1);
+		rate=octave+2*KRS(slot)+((FNS(slot)>>9)&1);
 	else
 		rate=0; //rate=((FNS(slot)>>9)&1);
 
@@ -443,7 +444,7 @@ static int EG_Update(struct _SLOT *slot)
 static UINT32 SCSP_Step(struct _SLOT *slot)
 {
 	int octave=OCT(slot);
-	int Fn;
+	UINT64 Fn;
 
 	Fn=(FNS_Table[FNS(slot)]);	//24.8
 	if(octave&8)
@@ -470,7 +471,8 @@ static void SCSP_StartSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	slot->active=1;
 	start_offset = PCM8B(slot) ? SA(slot) : SA(slot) & 0x7FFFE;
 	slot->base=SCSP->SCSPRAM + start_offset;
-	slot->cur_addr=0;
+ 	slot->cur_addr=0; 
+	slot->nxt_addr=1<<SHIFT;
 	slot->step=SCSP_Step(slot);
 	Compute_EG(SCSP,slot);
 	slot->EG.state=ATTACK;
@@ -1158,7 +1160,9 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 {
 	INT32 sample;
 	int step=slot->step;
-	UINT32 addr;
+	UINT32 addr1,addr2,addr_select;                                   // current and next sample addresses
+	UINT32 *addr[2]      = {&addr1, &addr2};                          // used for linear interpolation
+	UINT32 *slot_addr[2] = {&(slot->cur_addr), &(slot->nxt_addr)};    //
 
 	if(SSCTL(slot)!=0)	//no FM or noise yet
 		return 0;
@@ -1169,50 +1173,58 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		step>>=SHIFT;
 	}
 
-	if(PCM8B(slot))
-		addr=slot->cur_addr>>SHIFT;
-	else
-		addr=(slot->cur_addr>>(SHIFT-1)) & 0x7fffe;
-/*
-    if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
-    {
-        INT32 smp;
-        smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
-
-        smp>>=11;
-        addr+=smp;
-        if(!PCM8B(slot))
-            addr&=0x7fffe;
-        else
-            addr&=0x7ffff;
-    }
-*/
- 	if(addr==LSA(slot))
+  	if(PCM8B(slot))
  	{
- 		if(LPSLNK(slot) && slot->EG.state==ATTACK)
- 			slot->EG.state = DECAY1;
+ 		addr1=slot->cur_addr>>SHIFT;
+ 		addr2=slot->nxt_addr>>SHIFT;
  	}
-
-	if(PCM8B(slot))	//8 bit signed
+  	else
+ 	{
+ 		addr1=(slot->cur_addr>>(SHIFT-1))&0x7fffe;
+ 		addr2=(slot->nxt_addr>>(SHIFT-1))&0x7fffe;
+ 	}
+  
+	/*if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
 	{
-		INT8 *p=(INT8 *) (slot->base+BYTE_XOR_BE((slot->cur_addr>>SHIFT)));
-		INT32 s;
-		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
-		s=(int) (p[0]<<8)*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;
-		sample=(s>>SHIFT);
-		slot->Prev=p[0]<<8;
+		INT32 smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
+		INT32 cycle=LEA(slot)-LSA(slot); // cycle corresponds to 2 pi
 
-	}
-	else	//16 bit signed
-	{
-		INT16 *p=(INT16 *) (slot->base+addr);
-		INT32 s;
-		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
-		s=(int) (p[0])*((1<<SHIFT)-fpart)+(int) slot->Prev*fpart;
-		sample=(s>>SHIFT);
-		slot->Prev=p[0];
-
-	}
+		smp*=cycle; // associate cycle with full 16-bit sample range
+		smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
+		while(smp<0) smp+=cycle; smp%=cycle; // keep modulation sampler within a single cycle
+		if(!PCM8B(slot)) smp<<=1;
+		
+		addr1+=smp; addr2+=smp;
+		if(!PCM8B(slot))
+		{
+			addr1&=0x7fffe; addr2&=0x7fffe;
+		}
+		else
+		{
+			addr1&=0x7ffff; addr2&=0x7ffff;
+		}
+	}*/
+  
+  	if(PCM8B(slot))	//8 bit signed
+  	{
+ 		INT8 *p1=(signed char *) (SCSP->SCSPRAM+((SA(slot)+addr1)^1));
+ 		INT8 *p2=(signed char *) (SCSP->SCSPRAM+((SA(slot)+addr2)^1));
+  		//sample=(p[0])<<8;
+  		INT32 s;
+  		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
+ 		s=(int) (p1[0]<<8)*((1<<SHIFT)-fpart)+(int) (p2[0]<<8)*fpart;
+  		sample=(s>>SHIFT);
+  	}
+  	else	//16 bit signed (endianness?)
+  	{
+ 		INT16 *p1=(signed short *) (slot->base+addr1);
+ 		INT16 *p2=(signed short *) (slot->base+addr2);
+  		//sample=LE16(p[0]);
+  		INT32 s;
+  		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
+ 		s=(int) (p1[0])*((1<<SHIFT)-fpart)+(int) (p2[0])*fpart;
+  		sample=(s>>SHIFT);
+  	}
 
 	if(SBCTL(slot)&0x1)
 		sample ^= 0x7FFF;
@@ -1222,43 +1234,56 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	if(slot->Backwards)
 		slot->cur_addr-=step;
 	else
-	slot->cur_addr+=step;
-	addr=slot->cur_addr>>SHIFT;
-	switch(LPCTL(slot))
+		slot->cur_addr+=step;
+ 	slot->nxt_addr=slot->cur_addr+(1<<SHIFT);
+ 	
+ 	addr1=slot->cur_addr>>SHIFT;
+ 	addr2=slot->nxt_addr>>SHIFT;
+ 	
+	if(addr1>=LSA(slot) && !(slot->Backwards))
 	{
-	case 0:	//no loop
-		if(addr>=LEA(slot))
-		{
-			//slot->active=0;
-			SCSP_StopSlot(slot,0);
-		}
-		break;
-	case 1: //normal loop
-		if(addr>=LEA(slot))
-			slot->cur_addr=LSA(slot)<<SHIFT;
-		break;
-	case 2:	//reverse loop
-		if(addr>=LEA(slot))
-		{
-			slot->cur_addr=LEA(slot)<<SHIFT;
-			slot->Backwards=1;
-		}
-		if(addr<LSA(slot) || (addr&0x80000000))
-			slot->cur_addr=LEA(slot)<<SHIFT;
-		break;
-	case 3: //ping-pong
-		if(addr>=LEA(slot)) //reached end, reverse till start
-		{
-			slot->cur_addr=LEA(slot)<<SHIFT;
-			slot->Backwards=1;
-		}
-		if((addr<LSA(slot) || (addr&0x80000000)) && (slot->Backwards))//reached start or negative
-		{
-			slot->cur_addr=LSA(slot)<<SHIFT;
-			slot->Backwards=0;
-		}
-		break;
+		if(LPSLNK(slot) && slot->EG.state==ATTACK)
+			slot->EG.state = DECAY1;
 	}
+
+ 	for (addr_select=0;addr_select<2;addr_select++)
+  	{
+ 		switch(LPCTL(slot))
+  		{
+ 		case 0:	//no loop
+ 			if(*addr[addr_select]>=LSA(slot) && *addr[addr_select]>=LEA(slot))
+ 			{
+  			//slot->active=0;
+  			SCSP_StopSlot(slot,0);
+ 			}
+ 			break;
+ 		case 1: //normal loop
+ 			if(*addr[addr_select]>=LEA(slot))
+ 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+ 			break;
+ 		case 2:	//reverse loop
+ 			if((*addr[addr_select]>=LSA(slot)) && !(slot->Backwards))
+ 			{
+ 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+ 				slot->Backwards=1;
+ 			}
+ 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
+ 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+ 			break;
+ 		case 3: //ping-pong
+ 			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
+ 			{
+ 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+ 				slot->Backwards=1;
+ 			}
+ 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
+ 			{
+ 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+ 				slot->Backwards=0;
+ 			}
+ 			break;
+  		}
+  	}
 
 	if(ALFOS(slot)!=0)
 	{
@@ -1266,14 +1291,14 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		sample>>=SHIFT;
 	}
 
-	if(!STWINH(slot))
-		*RBUFDST=sample;
-
 	if(slot->EG.state==ATTACK)
 		sample=(sample*EG_Update(slot))>>SHIFT;
 	else
 		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
 
+	if(!STWINH(slot))
+		*RBUFDST=sample;
+		
 	return sample;
 }
 
@@ -1293,27 +1318,27 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 
 		for(sl=0;sl<32;++sl)
 		{
+			RBUFDST=SCSP->RINGBUF+SCSP->BUFPTR;
 			if(SCSP->Slots[sl].active)
 			{
 				struct _SLOT *slot=SCSP->Slots+sl;
 				unsigned short Enc;
 				signed int sample;
 
-				RBUFDST=SCSP->RINGBUF+SCSP->BUFPTR;
 				sample=SCSP_UpdateSlot(SCSP, slot);
-				++SCSP->BUFPTR;
-				SCSP->BUFPTR&=63;
+
 #ifdef USEDSP
- 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
- 				SCSPDSP_SetSample(&SCSP->DSP,(sample*SCSP->LPANTABLE[Enc])>>SHIFT,ISEL(slot),IMXL(slot));
+				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
+				SCSPDSP_SetSample(&SCSP->DSP,(sample*SCSP->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
 #endif
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
- 					smpl+=(sample*SCSP->LPANTABLE[Enc])>>SHIFT;
- 					smpr+=(sample*SCSP->RPANTABLE[Enc])>>SHIFT;
+					smpl+=(sample*SCSP->LPANTABLE[Enc])>>SHIFT;
+					smpr+=(sample*SCSP->RPANTABLE[Enc])>>SHIFT;
 				}
 			}
-
+			--SCSP->BUFPTR;
+			SCSP->BUFPTR&=63;
 		}
 
 		SCSPDSP_Step(&SCSP->DSP);

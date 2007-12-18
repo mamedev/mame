@@ -55,6 +55,7 @@ bootleg                 9? Triple Fun (4)                   bootleg (Comad?)
 P0-100-A                93 Quiz Kokology 2                  Tecmo
 P0-101-1                94 Pro Mahjong Kiwame               Athena
 PO-102-A                93 Mad Shark                        Allumer
+PO-107-A (prototype?)   94 Orbs (prototype?)                American Sammy
 P0-114-A (SKB-001)      94 Krazy Bowl                       American Sammy
 P0-117-A (DH-01)        95 Extreme Downhill                 Sammy Japan
 P0-117-A?               95 Sokonuke Taisen Game             Sammy Industries
@@ -1992,6 +1993,41 @@ static ADDRESS_MAP_START( wrofaero_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(MWA16_NOP						)	// ? Sound  IRQ Ack
 ADDRESS_MAP_END
 
+/***************************************************************************
+        orbs
+***************************************************************************/
+
+static ADDRESS_MAP_START( orbs_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM				)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(MRA16_RAM				)	// RAM
+	AM_RANGE(0x100000, 0x100001) AM_READ(MRA16_NOP				)	// ?
+	AM_RANGE(0x200000, 0x200001) AM_READ(MRA16_NOP				)	// ?
+	AM_RANGE(0x300000, 0x300003) AM_READ(seta_dsw_r			)	// DSW
+	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_0_word_r	)	// P1
+	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_1_word_r	)	// P2
+	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r	)	// Coins
+	//AM_RANGE(0x600000, 0x60000f) AM_READ(krzybowl_input_r		)	// P1
+	AM_RANGE(0x8000f0, 0x8000f1) AM_READ(MRA16_RAM				)	// NVRAM
+	AM_RANGE(0x800100, 0x8001ff) AM_READ(MRA16_RAM				)	// NVRAM
+	AM_RANGE(0xa00000, 0xa03fff) AM_READ(seta_sound_word_r		)	// Sound
+	AM_RANGE(0xb00000, 0xb003ff) AM_READ(MRA16_RAM				)	// Palette
+	AM_RANGE(0xc00000, 0xc03fff) AM_READ(MRA16_RAM				)	// Sprites Code + X + Attr
+/**/AM_RANGE(0xd00000, 0xd00001) AM_READ(MRA16_RAM				)	// ? 0x4000
+/**/AM_RANGE(0xe00000, 0xe00607) AM_READ(MRA16_RAM				)	// Sprites Y
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( orbs_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM					)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(MWA16_RAM					)	// RAM
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(MWA16_NOP					)	// ?
+	AM_RANGE(0x8000f0, 0x8000f1) AM_WRITE(MWA16_RAM					)	// NVRAM
+	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(MWA16_RAM					)	// NVRAM
+	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(seta_sound_word_w			)	// Sound
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
+	AM_RANGE(0xe00000, 0xe00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
+ADDRESS_MAP_END
 
 
 /***************************************************************************
@@ -6026,6 +6062,75 @@ static INPUT_PORTS_START( pairlove )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
+/***************************************************************************
+                                Orbs
+***************************************************************************/
+
+static INPUT_PORTS_START( orbs )
+	PORT_START_TAG("IN0") //Player 1
+	JOY_TYPE1_1BUTTON(1)
+
+	PORT_START_TAG("IN1") //Player 2 ??
+	JOY_TYPE1_1BUTTON(2)
+
+	PORT_START_TAG("IN2") //Coins
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(5)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_START_TAG("IN3") //2 DSWs - $600001 & 3.b
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Stock" )
+	PORT_DIPSETTING(      0x0010, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Level_Select ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Timer speed" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "Fast" )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x2800, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Force Coinage (Half Coinn)" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 2-7" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /***************************************************************************
                                 Crazy Fight
@@ -6275,6 +6380,14 @@ GFXDECODE_END
 
 static GFXDECODE_START( tndrcade )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
+GFXDECODE_END
+
+/***************************************************************************
+                                Orbs
+***************************************************************************/
+
+static GFXDECODE_START( orbs )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
 /***************************************************************************
@@ -7138,6 +7251,40 @@ static MACHINE_DRIVER_START( kamenrid )
 
 	MDRV_VIDEO_START(seta_2_layers)
 	MDRV_VIDEO_UPDATE(seta)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_CONFIG(seta_sound_intf)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
+/***************************************************************************
+                                Orbs
+***************************************************************************/
+
+static MACHINE_DRIVER_START( orbs )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 14318180)
+	MDRV_CPU_PROGRAM_MAP(orbs_readmem,orbs_writemem)
+	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 1*8, 31*8-1)
+	MDRV_GFXDECODE(orbs)
+	MDRV_PALETTE_LENGTH(512)	/* sprites only */
+
+	MDRV_VIDEO_START(seta_no_layers)
+	MDRV_VIDEO_UPDATE(seta_no_layers) /* just draw the sprites */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -8609,6 +8756,25 @@ ROM_START( krzybowl )
 	ROM_LOAD( "fv001.006", 0x080000, 0x080000, CRC(572a15e7) SHA1(b6a3e99e14a473b78ff48d1a46b20a0862d128e9) )
 ROM_END
 
+ROM_START( orbs )
+//all eproms are socketed and labelled (handwritten) "ORBS 10\7\94"
+//most of rom space is unused (filled with sound samples - same data in all roms)
+
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "orbs.u10",  0x000000, 0x080000, CRC(10f079c8) SHA1(0baf2b7e1e8be116a6fab609481c87fc7c86f305) )
+	ROM_LOAD16_BYTE( "orbs.u9",  0x000001, 0x080000, CRC(f269d16f) SHA1(34f38789cb3256e334b0ac8acd9f339d14481578) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "orbs.u14",  0x000000, 0x080000, CRC(1cc76541) SHA1(d8a233212bfb9a9c686a40e470524f95b34417fa) )	
+	ROM_LOAD( "orbs.u13",  0x080000, 0x080000, CRC(784bdc1a) SHA1(de2c5b38561b8ba6bd800126d010b734c2751575) )	
+	ROM_LOAD( "orbs.u12",  0x100000, 0x080000, CRC(b8c352c2) SHA1(7d6fd1425d9d5cf6a14a1ddceba0ad10e472dfa5) )	
+	ROM_LOAD( "orbs.u11",  0x180000, 0x080000, CRC(58cb38ba) SHA1(1c6c5f7ccb9c81b71bc1cbad080799b97962f262) )	
+	
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "orbs.u15",  0x000000, 0x080000, CRC(bc0e9fe3) SHA1(758a44d07d59af8bbc87602df25dfcdc6cb8d9b3) )	
+	ROM_LOAD( "orbs.u16",  0x080000, 0x080000, CRC(aecd8373) SHA1(5620bcb281a9ea4920cfe81d163827013289c5bf) )	
+ROM_END
+
 ROM_START( extdwnhl )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "fw001002.201",  0x000000, 0x080000, CRC(24d21924) SHA1(9914a68a578f884b06305ffcd9aeed7d83df1c7b) )
@@ -9086,6 +9252,7 @@ GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Chen
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )
 GAME( 1994, kiwame,   0,        kiwame,   kiwame,   kiwame,   ROT0,   "Athena",                 "Pro Mahjong Kiwame", 0 )
 GAME( 1994, krzybowl, 0,        krzybowl, krzybowl, 0,        ROT270, "American Sammy",         "Krazy Bowl", 0 )
+GAME( 1994, orbs,     0,        orbs,     orbs,     0,        ROT0,   "American Sammy",         "Orbs (10/7/94 prototype?)", 0 )
 GAME( 1995, extdwnhl, 0,        extdwnhl, extdwnhl, 0,        ROT0,   "Sammy Industries Japan", "Extreme Downhill (v1.5)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, gundhara, 0,        gundhara, gundhara, 0,        ROT270, "Banpresto",              "Gundhara", 0 )
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )

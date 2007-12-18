@@ -18,6 +18,8 @@
  *
  *************************************/
 
+#define DUMP_WAVE_RAM	0
+
 #define WAVERAM_WIDTH	512
 #define WAVERAM_HEIGHT	2048
 
@@ -243,6 +245,7 @@ VIDEO_START( midzeus )
 
 static void exit_handler(running_machine *machine)
 {
+#if DUMP_WAVE_RAM
 	FILE *f = fopen("waveram.dmp", "w");
 	int bank;
 	int i;
@@ -255,6 +258,7 @@ static void exit_handler(running_machine *machine)
 			if (i % 4 == 3) fprintf(f, "\n");
 		}
 	fclose(f);
+#endif
 
 	poly_free(poly);
 }

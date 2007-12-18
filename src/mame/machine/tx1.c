@@ -7,7 +7,7 @@
 #include "driver.h"
 
 static INT16 AU_DATA;
-static INT16 *AU_PTR = &AU_DATA;
+static INT16 *const AU_PTR = &AU_DATA;
 static UINT16 inst_index;
 
 /* Internal registers and so forth */

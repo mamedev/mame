@@ -26,19 +26,19 @@ static int bankreg;
 // true if cabinet == cocktail -AND- handling player 2
 int naughtyb_cocktail;
 
-static rectangle scrollvisiblearea =
+static const rectangle scrollvisiblearea =
 {
 	2*8, 34*8-1,
 	0*8, 28*8-1
 };
 
-static rectangle leftvisiblearea =
+static const rectangle leftvisiblearea =
 {
 	0*8, 2*8-1,
 	0*8, 28*8-1
 };
 
-static rectangle rightvisiblearea =
+static const rectangle rightvisiblearea =
 {
 	34*8, 36*8-1,
 	0*8, 28*8-1

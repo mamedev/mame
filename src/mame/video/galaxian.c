@@ -7,19 +7,19 @@
 #include "driver.h"
 #include "includes/galaxian.h"
 
-static rectangle _spritevisiblearea =
+static const rectangle _spritevisiblearea =
 {
 	2*8+1, 32*8-1,
 	2*8,   30*8-1
 };
-static rectangle _spritevisibleareaflipx =
+static const rectangle _spritevisibleareaflipx =
 {
 	0*8, 30*8-2,
 	2*8, 30*8-1
 };
 
-static rectangle* spritevisiblearea;
-static rectangle* spritevisibleareaflipx;
+static const rectangle* spritevisiblearea;
+static const rectangle* spritevisibleareaflipx;
 
 
 #define STARS_COLOR_BASE 		(memory_region_length(REGION_PROMS))

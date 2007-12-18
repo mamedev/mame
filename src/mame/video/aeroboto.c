@@ -144,8 +144,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( aeroboto )
 {
-	static rectangle splitrect1 = { 0, 255, 0, 39 };
-	static rectangle splitrect2 = { 0, 255, 40, 255 };
+	static const rectangle splitrect1 = { 0, 255, 0, 39 };
+	static const rectangle splitrect2 = { 0, 255, 40, 255 };
 	static int sx=0, sy=0;
 	static UINT8 ox=0, oy=0;
 	UINT8 *src_base, *src_colptr, *src_rowptr;

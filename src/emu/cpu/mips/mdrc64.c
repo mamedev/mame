@@ -1165,7 +1165,7 @@ static void probe_printf(void)
 static void exception_trap(void)
 {
 	if ((mips3.core->cpr[0][COP0_Cause] & 0xff) != 0)
-		printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", mips3.core->cpr[0][COP0_EPC], mips3.core->cpr[0][COP0_Cause], mips3.core->cpr[0][COP0_BadVAddr], mips3.core->pc);
+		printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", (UINT32)mips3.core->cpr[0][COP0_EPC], (UINT32)mips3.core->cpr[0][COP0_Cause], (UINT32)mips3.core->cpr[0][COP0_BadVAddr], mips3.core->pc);
 }
 
 
@@ -2710,7 +2710,7 @@ static int compile_special(drc_core *drc, compiler_state *compiler, const opcode
 {
 	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op & 63;
-	emit_link link1;
+	emit_link link1 = { 0 };
 
 	switch (opswitch)
 	{

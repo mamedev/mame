@@ -19,7 +19,6 @@ READ8_HANDLER( slikshot_z80_r );
 READ8_HANDLER( slikshot_z80_control_r );
 WRITE8_HANDLER( slikshot_z80_control_w );
 
-void slikshot_set_crosshair_range(int miny, int maxy);
 VIDEO_UPDATE( slikshot );
 
 

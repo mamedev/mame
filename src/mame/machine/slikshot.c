@@ -90,8 +90,6 @@ static int curxpos;
 static int last_ytotal;
 
 static UINT8 crosshair_vis;
-static int crosshair_min;
-static int crosshair_max;
 
 
 
@@ -534,22 +532,6 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 /*************************************
  *
- *  slikshot_set_crosshair_range
- *
- *  set the range for the crosshair
- *
- *************************************/
-
-void slikshot_set_crosshair_range(int miny, int maxy)
-{
-	crosshair_min = miny;
-	crosshair_max = maxy;
-}
-
-
-
-/*************************************
- *
  *  video_update_slikshot
  *
  *************************************/
@@ -612,14 +594,6 @@ VIDEO_UPDATE( slikshot )
 		memset(ybuffer, 0, sizeof(ybuffer));
 	}
 
-	/* draw a crosshair (rotated) */
-	if (crosshair_vis)
-	{
-//      if ((machine->gamedrv->flags & ORIENTATION_MASK) == ROT90)
-//          draw_crosshair(bitmap, 256 - 48, (crosshair_min + crosshair_max) / 2 - (curxpos * (crosshair_max - crosshair_min) / 0x100), cliprect, 0);
-//      else
-//          draw_crosshair(bitmap, 48, (crosshair_min + crosshair_max) / 2 + (curxpos * (crosshair_max - crosshair_min) / 0x100), cliprect, 0);
-	}
 	return 0;
 }
 

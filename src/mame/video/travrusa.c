@@ -279,12 +279,12 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
-	static rectangle spritevisiblearea =
+	static const rectangle spritevisiblearea =
 	{
 		1*8, 31*8-1,
 		0*8, 24*8-1
 	};
-	static rectangle spritevisibleareaflip =
+	static const rectangle spritevisibleareaflip =
 	{
 		1*8, 31*8-1,
 		8*8, 32*8-1

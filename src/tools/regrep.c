@@ -88,7 +88,7 @@ static summary_file *filehash[128][128];
 static summary_list lists[MAX_COMPARES];
 static int list_count;
 
-static const char *bucket_name[] =
+static const char *const bucket_name[] =
 {
 	"Unknown",
 	"Games That Have Improved",
@@ -112,7 +112,7 @@ static const int bucket_output_order[] =
 	BUCKET_CONSISTENT_ERROR
 };
 
-static const char *status_text[] =
+static const char *const status_text[] =
 {
 	"",
 	"Success",
@@ -124,7 +124,7 @@ static const char *status_text[] =
 	"Other Unknown Error"
 };
 
-static const char *status_color[] =
+static const char *const status_color[] =
 {
 	"",
 	"bgcolor=\"#00A000\"",

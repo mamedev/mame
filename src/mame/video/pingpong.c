@@ -14,7 +14,7 @@ static tilemap *bg_tilemap;
 /* This is strange; it's unlikely that the sprites actually have a hardware */
 /* clipping region, but I haven't found another way to have them masked by */
 /* the characters at the top and bottom of the screen. */
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	0*8, 32*8-1,
 	4*8, 29*8-1

@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.31
+ *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
@@ -12,7 +12,7 @@
  * copyright notice remains unaltered in the source code and any binary files
  * containing this code in compiled form.
  *
- * All other lisencing terms must be negotiated with the author
+ * All other licensing terms must be negotiated with the author
  * (Karl Stenerud).
  *
  * The latest version of this code can be obtained at:
@@ -208,18 +208,18 @@ static const unsigned char* g_rawop;
 static uint g_rawbasepc;
 
 /* used by ops like asr, ror, addq, etc */
-static uint g_3bit_qdata_table[8] = {8, 1, 2, 3, 4, 5, 6, 7};
+static const uint g_3bit_qdata_table[8] = {8, 1, 2, 3, 4, 5, 6, 7};
 
-static uint g_5bit_data_table[32] =
+static const uint g_5bit_data_table[32] =
 {
 	32,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
 };
 
-static const char* g_cc[16] =
+static const char *const g_cc[16] =
 {"t", "f", "hi", "ls", "cc", "cs", "ne", "eq", "vc", "vs", "pl", "mi", "ge", "lt", "gt", "le"};
 
-static const char* g_cpcc[64] =
+static const char *const g_cpcc[64] =
 {/* 000    001    010    011    100    101    110    111 */
 	  "f",  "eq", "ogt", "oge", "olt", "ole", "ogl",  "or", /* 000 */
 	 "un", "ueq", "ugt", "uge", "ult", "ule",  "ne",   "t", /* 001 */

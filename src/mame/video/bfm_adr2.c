@@ -212,7 +212,7 @@ VIDEO_START( adder2 )
 }
 
 // video update ///////////////////////////////////////////////////////////
-static rectangle visible1 = { 0, 400-1,  0,  280-1 };  //minx,maxx, miny,maxy
+static const rectangle visible1 = { 0, 400-1,  0,  280-1 };  //minx,maxx, miny,maxy
 
 VIDEO_UPDATE( adder2 )
 {

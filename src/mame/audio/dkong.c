@@ -6,6 +6,8 @@
 #include "sound/discrete.h"
 #include "sound/dac.h"
 
+#include "sound/m58817.h"
+
 #include "includes/dkong.h"
 
 /****************************************************************
@@ -14,13 +16,19 @@
  *
  ****************************************************************/
 
-#define DEBUG_SPEECH	(0)
+/* Set to 1 to use speech synthesizer instead of samples.
+ * Disabled by default since M58817 emulation is not 
+ * complete due to missing information about coefficients.
+ */
+ 
+#define RADARSC1_USE_M58817		(0)
 
 #define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
 
 /* Needed for dkongjr ... FIXME */
-#define I8035_T_R(N) ((portT >> (N)) & 1)
-#define I8035_T_W_AL(N,D) do { portT = ACTIVELOW_PORT_BIT(portT,N,D); soundlatch2_w(0, portT); } while (0)
+//#define I8035_T_R(N) ((portT >> (N)) & 1)
+#define I8035_T_R(N) ((soundlatch2_r(0) >> (N)) & 1)
+#define I8035_T_W_AL(N,D) do { state->portT = ACTIVELOW_PORT_BIT(state->portT,N,D); soundlatch2_w(0, state->portT); } while (0)
 
 #define I8035_P1_R() (soundlatch3_r(0))
 #define I8035_P2_R() (soundlatch4_r(0))
@@ -85,29 +93,7 @@
  *
  ****************************************************************/
 
-static UINT8 dkongjr_latch[10];
-static UINT8 sh_climb_count;
 
-static UINT8 has_discrete_interface;
-
-static UINT8 page,mcustatus;
-static double envelope,tt;
-static UINT8 decay;
-static UINT8 sh1_count;
-static UINT8 portT;
-
-enum {
-	WAIT_CMD,
-	WAIT_WRITE,
-	WAIT_DONE1,
-	WAIT_DONE2
-} m58817_states;
-
-static UINT8 m58817_state;
-static UINT8 m58817_drq;
-static UINT8 m58817_nibbles[4];
-static INT32 m58817_count;
-static INT32 m58817_address;
 
 /****************************************************************
  *
@@ -669,82 +655,82 @@ DISCRETE_SOUND_END
 
 static SOUND_START( dkong )
 {
-	state_save_register_global(page);
-	state_save_register_global(mcustatus);
-	state_save_register_global(envelope);
-	state_save_register_global(tt);
-	state_save_register_global(decay);
-	state_save_register_global(sh1_count);
-	state_save_register_global(portT);
+	dkong_state *state = machine->driver_data;
 
-	has_discrete_interface = 1;
+	state_save_register_global(state->page);
+	state_save_register_global(state->mcustatus);
+	state_save_register_global(state->portT);
 
+	state->has_discrete_interface = 1;
 
-}
-
-static SOUND_RESET( dkong )
-{
-
-	sh1_count = 0;
-	mcustatus = 0;
-	envelope = 0;
-	tt = 0;
-	decay = 0;
-
-	page = 0;
-
-	I8035_T_W_AL(0,0);
-	I8035_T_W_AL(1,0);
-	I8035_P1_W(255);
-	I8035_P2_W(255);
 
 }
 
 static SOUND_START( dkongjr )
 {
+	dkong_state *state = machine->driver_data;
+
 	sound_start_dkong(machine);
 
-	state_save_register_global(sh_climb_count);
-	state_save_register_global_array(dkongjr_latch);
+	state_save_register_global(state->sh_climb_count);
+	state_save_register_global_array(state->dkongjr_latch);
+	state_save_register_global(state->envelope);
+	state_save_register_global(state->tt);
+	state_save_register_global(state->decay);
 
-	sh_climb_count = 0;
-
-	has_discrete_interface = 0;
+	state->has_discrete_interface = 0;
 }
 
 static SOUND_START( radarsc1  )
 {
+	dkong_state *state = machine->driver_data;
+
 	sound_start_dkong(machine);
 
-	state_save_register_global(m58817_state);
-	state_save_register_global(m58817_drq);
-	state_save_register_global_array(m58817_nibbles);
-	state_save_register_global(m58817_count);
-	state_save_register_global(m58817_address);
-
-	has_discrete_interface = 1;
+	state->has_discrete_interface = 1;
 }
 
-static SOUND_RESET( radarsc1  )
+static SOUND_RESET( dkong )
 {
+	dkong_state *state = machine->driver_data;
+	
+	state->mcustatus = 0;
+	state->page = 0;
+
+	I8035_T_W_AL(0,0);
+	I8035_T_W_AL(1,0);
+	I8035_P1_W(255);
+	I8035_P2_W(255);
+}
+
+static SOUND_RESET( dkongjr )
+{
+	dkong_state *state = machine->driver_data;
+	int i;
+
 	sound_reset_dkong(machine);
-
-	m58817_state=WAIT_CMD;
-	m58817_drq=0;
-	m58817_count=0;
-	m58817_address=0;
-
+		
+	state->envelope = 0;
+	state->tt = 0;
+	state->decay = 0;
+	state->sh_climb_count = 0;
+	
+	for (i=0;i<10;i++)
+		state->dkongjr_latch[i]=0;
 }
 
 /****************************************************************
  *
  * M58817 Speech
  *
- * Fixme: Move to src/emu/audio
- *
  ****************************************************************/
 
-/* @0x510, cpu2
+/* 
+
+http://www.freepatentsonline.com/4633500.html
+
+
+  @0x510, cpu2
  10: 0000 00 00000000 ... 50 53 01010000 01010011 "scramble"
  12: 007a 44 01000100 ... 00 0f 00000000 00001111 "all pilots climb up"
  14: 018b 13 00010011 ... dc f0 11011100 11110000
@@ -778,175 +764,12 @@ static SOUND_RESET( radarsc1  )
  7: 20          engine trouble
 */
 
-#if DEBUG_SPEECH
-static UINT8 m58817_getbit(int bitnum)
-{
-	const UINT8 *table = memory_region(REGION_SOUND1);
-	return (table[bitnum >> 3] >> (0x07 - (bitnum & 0x07))) & 1;
-}
-
-static UINT32 m58817_getbits(int startbit, int num)
-{
-	int i;
-	UINT32 r=0;
-
-	for (i=0;i<num;i++)
-	{
-		r = r << 1;
-		r = r | m58817_getbit(startbit++);
-	}
-	return r;
-}
-
-static int m58817_decodeframe(int startbit)
-{
-	int energy;
-	int pitch;
-	int repeat;
-	UINT32 kx;
-
-	energy = m58817_getbits(startbit, 4);
-	logerror("frame @ bit %04d (%02x):", startbit, startbit>>3);
-	logerror(" energy = %d ", energy);
-	startbit += 4;
-	if (energy==0)
-	{
-		logerror(" - silence\n");
-		return startbit;
-	}
-	if (energy==15)
-	{
-		logerror(" - stop\n");
-		return -1; /* stop ... */
-	}
-	repeat = m58817_getbits(startbit, 1);
-	startbit += 1;
-	pitch = m58817_getbits(startbit, 6);
-	startbit += 6;
-	logerror(" pitch = %d ", pitch);
-	if (repeat)
-	{
-		logerror(" - repeat\n");
-		return startbit;
-	}
-	if (pitch == 0)
-	{
-		logerror(" - unvoiced skip %d\n", 18);
-		kx = m58817_getbits(startbit, 18);
-		startbit += 18;
-		return startbit;
-	}
-	else
-	{
-		logerror(" - voiced skip %d\n", 37);
-		kx = m58817_getbits(startbit, 30);
-		startbit += 30;
-		kx = m58817_getbits(startbit, 7);
-		startbit += 7;
-		return startbit;
-	}
-}
-
-static int m58817_dumpframe(int startbit)
-{
-	while (startbit>=0)
-		startbit=m58817_decodeframe(startbit);
-	logerror("\n");
-	return startbit;
-}
-#endif
-
-static void m58817_sampleframe(int addr)
-{
-	printf("0x%x\n", addr);
-	switch (addr)
-	{
-		case 0x0000:   /* 10 */
-			sample_start (0,0,0);
-			break;
-		case 0x007a:   /* 12 */
-			sample_start (0,1,0);
-			break;
-		case 0x018b:   /* 14 */
-			sample_start (0,2,0);
-			break;
-		case 0x0320:   /* 16 */
-			sample_start (0,3,0);
-			break;
-		case 0x036c:   /* 18 */
-			sample_start (0,4,0);
-			break;
-		case 0x03c4:   /* 1A */
-			sample_start (0,5,0);
-			break;
-		case 0x041c:   /* 1C */
-			sample_start (0,6,0);
-			break;
-		case 0x0520:   /* 1E */
-			sample_start (0,7,0);
-			break;
-		case 0x063e:   /* 20 */
-			sample_start (0,8,0);
-			break;
-	}
-}
-
-static void m58817_state_loop(int data)
-{
-	int i;
-	switch (m58817_state)
-	{
-		case WAIT_CMD:
-			switch (data)
-			{
-				case 0x00: // reset ????
-					m58817_count=0;
-					break;
-				case 0x02: // latch next nibbel
-					m58817_state=WAIT_WRITE;
-					break;
-				case 0x08: // play ????
-					m58817_state=WAIT_DONE1;
-					break;
-				default:
-					logerror("m58817: unknown cmd : 0x%02x\n", data);
-			}
-			break;
-		case WAIT_WRITE:
-			m58817_nibbles[m58817_count++] = data & 0x0f;
-			m58817_state=WAIT_CMD;
-			break;
-		case WAIT_DONE1:
-			if (data != 0x0A)
-				logerror("m58817: expected 0x0A got 0x%02x\n", data);
-			m58817_address = 0;
-			for (i=0;i<m58817_count;i++)
-			{
-				m58817_address |= (m58817_nibbles[i] << (i*4));
-			}
-			logerror("m58817: address: 0x%04x\n", m58817_address);
-			//m58817_dumpframe(m58817_address * 8);
-			m58817_sampleframe(m58817_address);
-			m58817_state=WAIT_CMD;
-			break;
-	}
-}
-
-
-static READ8_HANDLER( M58817_status_r )
-{
-	//return !(m58817_state == WAIT_CMD);
-	return sample_playing(0);
-}
-
 static WRITE8_HANDLER( M58817_command_w )
 {
-	int drq = (data>>4) & 0x01; // FIXME 0x20 ??
-	int dat = data & 0x0f;
 	logerror("PA Write %x\n", data);
-	if (!drq & m58817_drq)
-		m58817_state_loop(dat);
-	m58817_drq = drq;
+
+	m58817_CTL_w(0, data & 0x0f);
+	m58817_DRQ_w(0, (data>>4) & 0x01); // FIXME 0x20 ??
 }
 
 /****************************************************************
@@ -977,30 +800,38 @@ static READ8_HANDLER( dkong_sh_t1_r )
 
 static READ8_HANDLER( dkong_sh_tune_r )
 {
+	dkong_state *state = Machine->driver_data;
 	UINT8 *SND = memory_region(REGION_CPU2);
-	if ( page & 0x40 )
+
+	if ( state->page & 0x40 ) 
 	{
-		return soundlatch_r(0);
+		return soundlatch_r(0) & 0x0F;
 	}
 	else
-		return (SND[2048+(page & 7)*256+offset]);
+		return (SND[0x1000+(state->page & 7)*256+offset]);
+}
+
+static READ8_HANDLER( dkongjr_sh_tune_r )
+{
+	return soundlatch_r(0) & 0x01F;
 }
 
 #define TSTEP 0.001
 
 static WRITE8_HANDLER( dkong_sh_p1_w )
 {
+	dkong_state *state = Machine->driver_data;
 
-	if (has_discrete_interface)
+	if (state->has_discrete_interface)
 		discrete_sound_w(DS_DAC,data);
 	else
 	{
-		envelope=exp(-tt);
-		DAC_data_w(0,(int)(data*envelope));
-		if (decay)
-			tt+=TSTEP;
+		state->envelope=exp(-state->tt);
+		DAC_data_w(0,(int)(data*state->envelope));
+		if (state->decay)
+			state->tt+=TSTEP;
 		else
-			tt=0;
+			state->tt=0;
 	}
 }
 
@@ -1008,54 +839,30 @@ static WRITE8_HANDLER( dkong_sh_p1_w )
 static READ8_HANDLER( radarsc1_sh_p1_r )
 {
 	int r;
-	r = (I8035_P1_R() & 0x80) | (M58817_status_r(0)<<6);
+
+	r = (I8035_P1_R() & 0x80) | (m58817_status_r(0)<<6);
 	return r;
-}
-
-static WRITE8_HANDLER( radarsc1_sh_p1_w )
-{
-	M58817_command_w(0,data);
-}
-
-static WRITE8_HANDLER( radarsc1_sh_p2_w )
-{
-	/*   If P2.Bit7 -> external signal decay
-     *   If P2.Bit6 -> not connected
-     *   If P2.Bit5 -> Signal ANSN ==> Grid enable
-     *   If P2.Bit4 -> status code to main cpu
-     *   P2.Bit2-0  -> select the 256 byte bank for external ROM
-     */
-
-	if (has_discrete_interface)
-		discrete_sound_w(DS_DAC_DISCHARGE, (data & 0x80) ? 0 : 1 );
-	else
-		decay = !(data & 0x80);
-	page = (data & 0x07);
-	mcustatus = ((~data & 0x10) >> 4);
-	radarsc1_ansn_w(0, (data & 0x20) >> 5);
 }
 
 static WRITE8_HANDLER( dkong_sh_p2_w )
 {
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
-     *   If P2.Bit6 -> activates the external compressed sample ROM
+     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
+     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
      *   If P2.Bit4 -> status code to main cpu
      *   P2.Bit2-0  -> select the 256 byte bank for external ROM
      */
 
-	if (has_discrete_interface)
+	dkong_state *state = Machine->driver_data;
+
+	if (state->has_discrete_interface)
 		discrete_sound_w(DS_DAC_DISCHARGE, (data & 0x80) ? 0 : 1 );
 	else
-		decay = !(data & 0x80);
-	page = (data & 0x47);
-	mcustatus = ((~data & 0x10) >> 4);
+		state->decay = !(data & 0x80);
+	state->mcustatus = ((~data & 0x10) >> 4);
+	radarsc1_ansn_w(0, (data & 0x20) >> 5);
+	state->page = (data & 0x47);
 }
-
-static READ8_HANDLER( radarsc1_sh_tune_r )
-{
-	return soundlatch_r(0);
-}
-
 
 /****************************************************************
  *
@@ -1076,7 +883,9 @@ WRITE8_HANDLER( dkongjr_sh_tuneselect_w )
 
 READ8_HANDLER( dkong_audio_status_r )
 {
-	return mcustatus;
+	dkong_state *state = Machine->driver_data;
+
+	return state->mcustatus;
 }
 
 WRITE8_HANDLER( dkong_audio_irq_w )
@@ -1091,7 +900,7 @@ WRITE8_HANDLER( dkong_snd_disc_w )
 {
 	dkong_state *state = Machine->driver_data;
 
-	if (!has_discrete_interface && (offset<3))
+	if (!state->has_discrete_interface && (offset<3))
 	{
 		logerror("dkong.c: Write to snd port %d (%d)\n", offset, data);
 		return;
@@ -1122,11 +931,11 @@ WRITE8_HANDLER( dkong_snd_disc_w )
 			I8035_T_W_AL(0, data & 1);
 			break;
 		case 6:
-			if (has_discrete_interface)
+			if (state->has_discrete_interface)
 				discrete_sound_w(DS_SOUND6_INP,data & 1);
 			break;
 		case 7:
-			if (has_discrete_interface)
+			if (state->has_discrete_interface)
 				discrete_sound_w(DS_SOUND7_INP,data & 1);
 			break;
  	}
@@ -1140,24 +949,25 @@ WRITE8_HANDLER( dkong_sh_tuneselect_w )
 
 WRITE8_HANDLER( dkongjr_snd_w1 )
 {
+	dkong_state *state = Machine->driver_data;
 	static const int sample_order[7] = {1,2,1,2,0,1,0};
 
-	if (dkongjr_latch[offset] != data)
+	if (state->dkongjr_latch[offset] != data)
 	{
 		switch (offset)
 		{
 			case 0:			/* climb */
-				if (data && dkongjr_latch[7] == 0)
+				if (data && state->dkongjr_latch[7] == 0)
 				{
-					sample_start (3,sample_order[sh_climb_count]+3,0);
-					sh_climb_count++;
-					if (sh_climb_count == 7) sh_climb_count = 0;
+					sample_start (3,sample_order[state->sh_climb_count]+3,0);
+					state->sh_climb_count++;
+					if (state->sh_climb_count == 7) state->sh_climb_count = 0;
 				}
-				else if (data && dkongjr_latch[7] == 1)
+				else if (data && state->dkongjr_latch[7] == 1)
 				{
-					sample_start (3,sample_order[sh_climb_count]+8,0);
-					sh_climb_count++;
-					if (sh_climb_count == 7) sh_climb_count = 0;
+					sample_start (3,sample_order[state->sh_climb_count]+8,0);
+					state->sh_climb_count++;
+					if (state->sh_climb_count == 7) state->sh_climb_count = 0;
 				}
 				break;
 			case 1:			/* jump */
@@ -1169,46 +979,62 @@ WRITE8_HANDLER( dkongjr_snd_w1 )
 					sample_stop (7);
 				sample_start (4,1,0);
 				break;
+			case 3: /* Port 3 write ==> PB 5 */
+				I8035_P2_W_AL(5,data & 1);
+				break;
+#if 0 // above verified from schematics				
 			case 3:			/* roar */
 				if (data)
 					sample_start (7,2,0);
 				break;
+#endif
 			case 4:			/* Port 4 write */
-				I8035_T_W_AL(1, data & 1);
+				I8035_T_W_AL(1, data & 1);	
 				break;
 			case 5:			/* Port 5 write */
-				I8035_T_W_AL(0, data & 1);
+				I8035_T_W_AL(0, data & 1);	
 				break;
+			case 6:			/* Port 6 write ==> PB 4 */
+				I8035_P2_W_AL(4,data & 1);
+				break;
+#if 0 // above verified from schematics				
 			case 6:			/* snapjaw */
 				if (data)
 					sample_stop (7);
 				sample_start (4,11,0);
 				break;
+#endif
 			case 7:			/* walk */
 				//walk = data;
 				break;
 				}
-		dkongjr_latch[offset] = data;
+		state->dkongjr_latch[offset] = data;
 	}
 }
 
 WRITE8_HANDLER( dkongjr_snd_w2 )
 {
-	if (dkongjr_latch[offset+8] != data)
+	dkong_state *state = Machine->driver_data;
+	if (state->dkongjr_latch[offset+8] != data)
 	{
 		switch (offset)
 		{
+		case 0:
+			dkong_audio_irq_w(0, data & 1);
+			break;
+#if 0 // above verified from schematics				
 		case 0:			/* death */
 			if (data)
 				sample_stop (7);
 			sample_start (6, 6, 0);
 			break;
+#endif
 		case 1:			/* drop */
 			if (data)
 				sample_start (7, 7, 0);
 			break;
 		}
-		dkongjr_latch[offset+8] = data;
+		state->dkongjr_latch[offset+8] = data;
 	}
 }
 
@@ -1233,11 +1059,19 @@ static ADDRESS_MAP_START( dkong_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dkongjr_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff) AM_READ(dkongjr_sh_tune_r)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
+	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
+	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( radarsc1_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(radarsc1_sh_tune_r)
+	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
 	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_sh_p1_w) // DAC here
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(radarsc1_sh_p1_r, radarsc1_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, radarsc1_sh_p2_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(radarsc1_sh_p1_r, M58817_command_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
 	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
 ADDRESS_MAP_END
@@ -1265,7 +1099,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const char *const dkongjr_sample_names[] =
+static const char *dkongjr_sample_names[] =
 {
 	"*dkongjr",
 	"jump.wav",
@@ -1283,13 +1117,14 @@ static const char *const dkongjr_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface dkongjr_samples_interface =
+static struct Samplesinterface dkongjr_samples_interface =
 {
 	8,	/* 8 channels */
 	dkongjr_sample_names
 };
 
-static const char *const radarsc1_sample_names[] =
+#if !RADARSC1_USE_M58817
+static const char *radarsc1_sample_names[] =
 {
 	"*radarsc1",
 	"10.wav",
@@ -1304,14 +1139,25 @@ static const char *const radarsc1_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface radarsc1_samples_interface =
+static struct Samplesinterface radarsc1_samples_interface =
 {
 	8,	/* 8 channels */
 	radarsc1_sample_names
 };
+#endif
 
-static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
-static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
+static struct NESinterface nes_interface_1 = { REGION_CPU2 };
+static struct NESinterface nes_interface_2 = { REGION_CPU3 };
+
+static struct M58817interface m58817_interface =
+{
+#if !RADARSC1_USE_M58817
+	-1,
+#else
+	REGION_SOUND1,		/* Sample Rom */
+#endif
+	{ 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }		/* sample address map */
+};
 
 /*************************************
  *
@@ -1352,22 +1198,27 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
 	MDRV_SOUND_START(radarsc1)
-	MDRV_SOUND_RESET(radarsc1)
 
+	MDRV_SOUND_ADD(M58817, 640000)
+	MDRV_SOUND_CONFIG(m58817_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
+
+#if !RADARSC1_USE_M58817
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(radarsc1_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.0)
+#endif
 
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dkongjr_audio )
 
-	MDRV_CPU_ADD(I8035,I8035_CLOCK)
+	MDRV_CPU_ADD_TAG("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
-	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
+	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
 
 	MDRV_SOUND_START(dkongjr)
-	MDRV_SOUND_RESET(dkong)
+	MDRV_SOUND_RESET(dkongjr)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(DAC, 0)

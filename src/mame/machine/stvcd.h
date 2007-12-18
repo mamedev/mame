@@ -10,6 +10,7 @@
 #define __STVCD_H__
 
 void stvcd_reset(void);
+void stvcd_exit(running_machine* machine);
 
 READ32_HANDLER( stvcd_r );
 WRITE32_HANDLER( stvcd_w );

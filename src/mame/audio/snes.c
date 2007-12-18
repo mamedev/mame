@@ -149,10 +149,10 @@ static int              echo_ptr;
 static const int               TS_CYC = CPU_RATE / SAMP_FREQ;
 
 /* Ptrs to Gaussian table */
-static const int *      G1 = &gauss[ 256 ];
-static const int *      G2 = &gauss[ 512 ];
-static const int *      G3 = &gauss[ 255 ];
-static const int *      G4 = &gauss[ -1  ];
+static const int *const G1 = &gauss[ 256 ];
+static const int *const G2 = &gauss[ 512 ];
+static const int *const G3 = &gauss[ 255 ];
+static const int *const G4 = &gauss[ -1  ];
 
 static const int        mask = 0xFF;
 

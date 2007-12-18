@@ -295,7 +295,7 @@ static const struct cchip_mapping level08[] =
 	{ 0xff }
 };
 
-static const struct cchip_mapping* levelData[]=
+static const struct cchip_mapping *const levelData[]=
 {
 	level00,
 	level01,

@@ -61,7 +61,6 @@
           the language is set to Japanese, maybe the English endings
           are incomplete / buggy?
         * Graphical Glitches caused by incorrect timing?
-          - Ninja Combat sometimes glitches
           - Some raster effects are imperfect (off by a couple of lines)
         * Mult-cart support not implementd - the MVS can take up to 6 carts
           depending on the board being used
@@ -76,6 +75,7 @@
           can display 320x240 but most of the games seem designed
           to work with a width of 304, some less.
         * Distorted jumping sound in Nightmare in the Dark
+        * Ninja Combat sometimes glitches
 
 ****************************************************************************/
 

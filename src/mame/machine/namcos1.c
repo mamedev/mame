@@ -660,7 +660,7 @@ static WRITE8_HANDLER( unknown_w )
 }
 
 /* Main bankswitching routine */
-static void set_bank(int banknum, bankhandler *handler)
+static void set_bank(int banknum, const bankhandler *handler)
 {
 	int bankstart = (banknum & 7) * 0x2000;
 	int cpunum = (banknum >> 3) & 1;
@@ -834,7 +834,7 @@ static void namcos1_build_banks(read8_handler key_r,write8_handler key_w)
 
 MACHINE_RESET( namcos1 )
 {
-	static bankhandler unknown_handler = { unknown_r, unknown_w, 0, NULL };
+	static const bankhandler unknown_handler = { unknown_r, unknown_w, 0, NULL };
 	int bank;
 
 	/* Point all of our bankhandlers to the error handlers */

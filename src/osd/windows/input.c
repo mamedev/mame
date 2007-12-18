@@ -2032,8 +2032,8 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 			// otherwise, update it as a lightgun
 			else
 			{
-				devinfo->mouse.raw_x = normalize_absolute_axis(data->lLastX, 0, 0xffff);
-				devinfo->mouse.raw_y = normalize_absolute_axis(data->lLastY, 0, 0xffff);
+				devinfo->mouse.state.lX = normalize_absolute_axis(data->lLastX, 0, 0xffff);
+				devinfo->mouse.state.lY = normalize_absolute_axis(data->lLastY, 0, 0xffff);
 
 				// also clear the polling function so win32_lightgun_poll isn't called
 				devinfo->poll = NULL;

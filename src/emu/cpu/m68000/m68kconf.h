@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 3.31
+ *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
@@ -12,7 +12,7 @@
  * copyright notice remains unaltered in the source code and any binary files
  * containing this code in compiled form.
  *
- * All other lisencing terms must be negotiated with the author
+ * All other licensing terms must be negotiated with the author
  * (Karl Stenerud).
  *
  * The latest version of this code can be obtained at:

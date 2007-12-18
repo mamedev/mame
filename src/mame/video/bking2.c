@@ -284,7 +284,7 @@ VIDEO_UPDATE( bking2 )
 
 VIDEO_EOF( bking2 )
 {
-	static rectangle rect = { 0, 7, 0, 15 };
+	static const rectangle rect = { 0, 7, 0, 15 };
 
 	int xld = 0;
 	int yld = 0;

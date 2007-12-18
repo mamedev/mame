@@ -9,13 +9,13 @@
 #include "driver.h"
 
 
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	2*8, 32*8-1,
 	2*8, 30*8-1
 };
 
-static rectangle spritevisibleareaflipx =
+static const rectangle spritevisibleareaflipx =
 {
 	0*8, 30*8-1,
 	2*8, 30*8-1

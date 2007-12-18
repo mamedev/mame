@@ -272,7 +272,7 @@ static const UINT16 level_data_06[0xcc] =
 	0x0300,0x4e01,0x5006,0x0042
 };
 
-static const UINT16* level_data_lookup[] =
+static const UINT16 *const level_data_lookup[] =
 {
 	level_data_00,
 	level_data_01,

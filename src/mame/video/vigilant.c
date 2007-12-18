@@ -17,7 +17,7 @@
 #include "driver.h"
 
 
-static rectangle bottomvisiblearea =
+static const rectangle bottomvisiblearea =
 {
 	16*8, 48*8-1,
 	6*8, 32*8-1

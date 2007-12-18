@@ -185,7 +185,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
 			const rectangle *visarea = &Machine->screen[0].visarea;
-			static const char *names[2][2] =
+			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }

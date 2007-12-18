@@ -571,7 +571,7 @@ static struct point *fclip_clip_right(struct point *p1, struct point *p2)
 	return pointpt++;
 }
 
-static struct {
+static const struct {
 	int (*isclipped)(struct point *p);
 	struct point *(*clip)(struct point *p1, struct point *p2);
 } clipfn[4] = {

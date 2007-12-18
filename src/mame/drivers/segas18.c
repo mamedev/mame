@@ -131,7 +131,7 @@ static const struct segaic16_memory_map_entry rom_171_5987_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry *region_info_list[] =
+static const struct segaic16_memory_map_entry *const region_info_list[] =
 {
 	&rom_171_shad_info[0],
 	&rom_171_5874_info[0],

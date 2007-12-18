@@ -2704,6 +2704,8 @@ static MACHINE_START( stv )
 	state_save_register_global(scsp_last_line);
 
 	stv_register_protection_savestates(); // machine/stvprot.c
+
+	add_exit_callback(machine, stvcd_exit);
 }
 
 static MACHINE_RESET( stv )

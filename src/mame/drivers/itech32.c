@@ -1593,6 +1593,7 @@ static MACHINE_DRIVER_START( gt3dt )
 	MDRV_NVRAM_HANDLER( gt3dt ) /* Make Tournament sets load/store the Timekeeper info */
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( wcbowlt )
 
 	/* basic machine hardware */
@@ -1600,6 +1601,7 @@ static MACHINE_DRIVER_START( wcbowlt )
 
 	MDRV_NVRAM_HANDLER( gt3dt ) /* Make WCB Tournament load/store the Timekeeper info */
 MACHINE_DRIVER_END
+
 
 
 /*************************************

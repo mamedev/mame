@@ -1550,6 +1550,15 @@ static void make_dir_current(UINT32 fad)
 	}
 }
 
+void stvcd_exit(running_machine* machine)
+{
+	if (curdir != (direntryT *)NULL)
+	{
+		free((void *)curdir);
+		curdir = (direntryT *)NULL;
+	}
+}
+
 static void cd_readTOC(void)
 {
 	int i, ntrks, toclen, tocptr, fad;

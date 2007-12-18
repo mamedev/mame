@@ -850,7 +850,13 @@ static void atapi_cause_irq(void)
 	cpunum_set_input_line(0, INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
-static void atapi_init(void)
+static void atapi_exit(running_machine* machine)
+{
+	SCSIDeleteInstance(atapi_device_data[1]);
+	SCSIDeleteInstance(atapi_device_data[0]);
+}
+
+static void atapi_init(running_machine *machine)
 {
 	memset(atapi_regs, 0, sizeof(atapi_regs));
 
@@ -866,6 +872,7 @@ static void atapi_init(void)
 	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[0], 0 );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
 	SCSIAllocInstance( SCSI_DEVICE_CDROM, &atapi_device_data[1], 1 );
+	add_exit_callback(machine, atapi_exit);
 }
 
 static void atapi_reset(void)
@@ -2244,7 +2251,7 @@ static void init_firebeat(running_machine *machine)
 {
 	UINT8 *rom = memory_region(REGION_USER2);
 
-	atapi_init();
+	atapi_init(machine);
 	intelflash_init(0, FLASH_FUJITSU_29F016A, NULL);
 	intelflash_init(1, FLASH_FUJITSU_29F016A, NULL);
 	intelflash_init(2, FLASH_FUJITSU_29F016A, NULL);

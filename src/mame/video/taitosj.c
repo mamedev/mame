@@ -644,12 +644,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
        Note that the clipping is asymmetrical. This matches the real thing.
        I'm not sure of what should happen when the screen is flipped, though.
      */
-	static rectangle spritevisiblearea =
+	static const rectangle spritevisiblearea =
 	{
 		0*8+3, 32*8-1-1,
 		2*8, 30*8-1
 	};
-	static rectangle spritevisibleareaflip =
+	static const rectangle spritevisibleareaflip =
 	{
 		0*8+1, 32*8-3-1,
 		2*8, 30*8-1

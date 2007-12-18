@@ -309,14 +309,14 @@ INPUT_PORTS_END
 	ROM_SYSTEM_BIOS( 7, "japan-s1",   "Japan MVS (Ver. 1)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1.jipan.1024",0x00000, 0x020000,  CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* Japan, Older */ \
 
-//  ROM_SYSTEM_BIOS( 8, "uni-bios.10","Unibios MVS (Hack, Ver. 1.0)" )
-//  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.10",  0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9) ) /* Universe Bios v1.0 (hack) */
-//  ROM_SYSTEM_BIOS( 9, "uni-bios.11","Unibios MVS (Hack, Ver. 1.1)" )
-//  ROM_LOAD16_WORD_SWAP_BIOS( 9, "uni-bios.11",  0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7) ) /* Universe Bios v1.1 (hack) */
-//  ROM_SYSTEM_BIOS(10, "debug",      "Debug MVS (Hack?)" )
-//  ROM_LOAD16_WORD_SWAP_BIOS(10, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
-//  ROM_SYSTEM_BIOS(11, "asia-aes",   "Asia AES" )
-//  ROM_LOAD16_WORD_SWAP_BIOS(11, "aes-bios.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
+//  ROM_SYSTEM_BIOS( 8, "uni-bios","Universe Bios (Hack, Ver. 2.3)" )
+//  ROM_LOAD16_WORD_SWAP_BIOS( 8, "uni-bios.rom",  0x00000, 0x020000, CRC(601720ae) SHA1(1b8a72c720cdb5ee3f1d735bbcf447b09204b8d9) ) /* Universe Bios v2.3 (hack) */
+//  ROM_SYSTEM_BIOS( 9, "debug",      "Debug MVS (Hack?)" )
+//  ROM_LOAD16_WORD_SWAP_BIOS( 9, "neodebug.rom", 0x00000, 0x020000, CRC(698ebb7d) SHA1(081c49aa8cc7dad5939833dc1b18338321ea0a07) ) /* Debug (Development) Bios */
+//  ROM_SYSTEM_BIOS(10, "asia-aes",   "Asia AES" )
+//  ROM_LOAD16_WORD_SWAP_BIOS(10, "neo-epo.bin", 0x00000, 0x020000, CRC(d27a71f1) SHA1(1b3b22092f30c4d1b2c15f04d1670eb1e9fbea07) ) /* AES Console (Asia?) Bios */
+//  ROM_SYSTEM_BIOS(11, "jap-aes",   "Japan AES" )
+//  ROM_LOAD16_WORD_SWAP_BIOS(11, "neo-po.bin", 0x00000, 0x020000, CRC(16d0c132) SHA1(4e4a440cae46f3889d20234aebd7f8d5f522e22c) ) /* AES Console (Japan) Bios */
 
 /* note you'll have to modify the last for lines of each block to use the extra bios roms,
    they're hacks / homebrew / console bios roms so MAME doesn't list them by default */
@@ -404,8 +404,103 @@ INPUT_PORTS_END
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x10000, CRC(e09e253c) SHA1(2b1c719531dac9bb503f22644e6e4236b91e7cfc) )
 
 
+/***************************************************************************
 
-/******************************************************************************/
+	Neo-Geo game pcb infos:
+	=======================
+
+	The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
+
+	Each cartridge consists of two pcb's: CHA and PROG.
+
+	CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
+	PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
+
+	On most pcb's various custom/protection chips can also be found:
+
+	CHA:
+	. NEO-273
+	. NEO-CMC
+	. NEO-ZMC
+	. NEO-ZMC2
+	. PRO-CT0
+	. SNK-9201
+
+	PROG:
+	. ALTERA
+	. NEO-COMA
+	. NEO-PCM2 (SNK 1999)
+	. NEO-PCM2 (PLAYMORE 2002)
+	. NEO-PVC
+	. NEO-SMA
+	. PCM
+
+
+	Known pcb's:
+	============
+
+	MVS CHA:
+	. NEO-MVS CHA-8M
+	. NEO-MVS CHA42G
+	. NEO-MVS CHA42G-1
+	. NEO-MVS CHA42G-2
+	. NEO-MVS CHA42G-3B
+	. NEO-MVS CHA256
+	. NEO-MVS CHA256B
+	. NEO-MVS PSTM CHA136
+	. NEO-MVS CHA512Y
+	. NEO-MVS CHAFIO
+
+	MVS PROG:
+	. NEO-MVS PROG8M42
+	. NEO-MVS PROG16
+	. NEO-MVS PROG42G
+	. NEO-MVS PROG42G-1
+	. NEO-MVS PROGGSC
+	. NEO-MVS PROGTOP
+	. NEO-MVS PROGSF1
+	. NEO-MVS PROGEOP
+	. NEO-MVS PROGLBA - LBA-SUB (2000.2.24)
+	. NEO-MVS PROGBK1
+	. NEO-MVS PROGBK2
+	. NEO-MVS PROGBK2R
+	. NEO-MVS PROGBK3R
+	. NEO-MVS PROGBK3S
+
+	AES CHA:
+	. NEO-AEG CHA-32
+	. NEO-AEG CHA42G-1
+	. NEO-AEG CHA42G-3
+	. NEO-AEG CHA42G-4
+	. NEO-AEG CHA256
+	. NEO-AEG CHA256[B]
+	. NEO-AEG CHA256RY
+	. NEO-AEG CHA512Y
+	. NEO-AEG CHAFIO (SNK 1999.8.10)
+
+	AES PROG:
+	. NEO-AEG PROG-NAM
+	. NEO-AEG PROG-HERO
+	. NEO-AEG PROG B
+	. NEO-AEG PROG-4A
+	. NEO-AEG PROG-4B
+	. NEO-AEG PROG16
+	. NEO-AEG PROG42G-COM
+	. NEO-AEG PROG42G-1
+	. NEO-AEG PROG4096B
+	. NEO-AEG PROGGS
+	. NEO-AEG PROGLBA
+	. NEO-AEG PROGRK
+	. NEO-AEG PROGRKB
+	. NEO-AEG PROGBK1Y
+	. NEO-AEG PROGBK2
+	. NEO-AEG PROGBK3R
+
+	The above only covers SNK / SNK-PLAYMORE pcb's. There also exists a
+	wide range of 'bootleg' pcb's.
+
+****************************************************************************/
+
 
 ROM_START( nam1975 )
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
@@ -710,18 +805,18 @@ ROM_END
 ROM_START( superspy )
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "011-p1.bin", 0x000000, 0x080000, CRC(c7f944b5) SHA1(da7560e09187c68f1d9f7656218497b4464c56c9) )
-	ROM_LOAD16_WORD_SWAP( "011-p2.bin", 0x080000, 0x020000, CRC(811a4faf) SHA1(8169dfaf79f52d80ecec402ce1b1ab9cafb7ebdd) )
+	ROM_LOAD16_WORD_SWAP( "011-sp2.bin", 0x080000, 0x020000, CRC(811a4faf) SHA1(8169dfaf79f52d80ecec402ce1b1ab9cafb7ebdd) )
 
 	NEO_SFIX_128K( "011-s1.bin", CRC(ec5fdb96) SHA1(8003028025ac7bf531e568add6ba66c02d0b7e84) )
 
-	NEO_BIOS_AUDIO_128K( "011-m1.bin", BAD_DUMP CRC(d59d5d12) SHA1(0692b6f35c9ee3840f945703c4eb51ab83eb0714) )
+	NEO_BIOS_AUDIO_128K( "011-m1.bin", CRC(6f737b5a) SHA1(d52f7b6786b6e33f09ba0cf30889082c1dfb9336) )
 
-	ROM_REGION( 0x200000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
+	ROM_REGION( 0x180000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "011-v11.bin", 0x000000, 0x100000, CRC(5c674d5c) SHA1(d7b9beddeb247b584cea9ca6c43ec6869809b673) )
-	ROM_LOAD( "011-v12.bin", 0x100000, 0x100000, CRC(7df8898b) SHA1(23dd6df47fa51b210af800ae551295300e125106) )
+	ROM_LOAD( "011-v12.bin", 0x100000, 0x080000, CRC(9f513d5a) SHA1(37b04962f0b8e2a74abd35c407337a6151dc4e95) )
 
-	ROM_REGION( 0x100000, NEOGEO_REGION_AUDIO_DATA_2, 0 )
-	ROM_LOAD( "011-v21.bin", 0x000000, 0x100000, CRC(1ebe94c7) SHA1(c186810523a7df880cb080c62aa322bbcaefca17) )
+	ROM_REGION( 0x080000, NEOGEO_REGION_AUDIO_DATA_2, 0 )
+	ROM_LOAD( "011-v21.bin", 0x000000, 0x080000, CRC(426cd040) SHA1(b2b45189837c8287223c2b8bd4df9525b72a3f16) )
 
 	ROM_REGION( 0x400000, NEOGEO_REGION_SPRITES, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "011-c1.bin", 0x000000, 0x100000, CRC(cae7be57) SHA1(43b35b349594535689c358d9f324adda55e5281a) ) /* Plane 0,1 */
@@ -924,7 +1019,7 @@ ROM_START( gpilots )
 	ROM_LOAD16_BYTE( "020-c4.bin", 0x200001, 0x100000, CRC(edde439b) SHA1(79be7b10ecdab54c2f77062b8f5fda0e299fa982) )
 ROM_END
 
-ROM_START( joyjoy )
+ROM_START( joyjoy ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "021-p1.bin", 0x000000, 0x080000, CRC(39c3478f) SHA1(06ebe54c9c4e14c5c31e770013d58b7162359ecc) )
 
@@ -1134,7 +1229,28 @@ ROM_START( socbrawl )
 
 	NEO_SFIX_128K( "031-s1.bin", CRC(4c117174) SHA1(26e52c4f628338a9aa1c159517cdf873f738fb98) )
 
-	NEO_BIOS_AUDIO_64K( "031-m1.bin", BAD_DUMP CRC(2f38d5d3) SHA1(0fc01750277e554978e68e7e6d596f8bd6b1e178) )
+	NEO_BIOS_AUDIO_128K( "031-m1.bin", CRC(3aa4e9e1) SHA1(65e53d799a0cb55b5bc55d57773e4682a72d7c2d) )
+
+	ROM_REGION( 0x200000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
+	ROM_LOAD( "031-v1.bin", 0x000000, 0x100000, CRC(cc78497e) SHA1(895bd647150fae9b2259ef043ed681f4c4de66ea) )
+	ROM_LOAD( "031-v2.bin", 0x100000, 0x100000, CRC(dda043c6) SHA1(08165a59700ab6b1e523079dd2a3549e520cc594) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x300000, NEOGEO_REGION_SPRITES, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "031-c1.bin", 0x000000, 0x100000, CRC(bd0a4eb8) SHA1(b67988cb3e550d083e81c9bd436da55b242785ed) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "031-c2.bin", 0x000001, 0x100000, CRC(efde5382) SHA1(e42789c8d87ee3d4549d0a903e990c03338cbbd8) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "031-c3.bin", 0x200000, 0x080000, CRC(580f7f33) SHA1(f4f95a7c8de00e1366a723fc4cd0e8c1905af636) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "031-c4.bin", 0x200001, 0x080000, CRC(ed297de8) SHA1(616f8fa4c86231f3e79faf9f69f8bb909cbc35f0) ) /* Plane 2,3 */
+ROM_END
+
+ROM_START( socbrala ) /* MVS VERSION */
+	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
+	ROM_LOAD16_WORD_SWAP( "031-pg1.bin", 0x000000, 0x080000, CRC(17f034a7) SHA1(2e66c7bd93a08efe63c4894494db50bbf58f60e4) )
+
+	NEO_SFIX_128K( "031-s1.bin", CRC(4c117174) SHA1(26e52c4f628338a9aa1c159517cdf873f738fb98) )
+
+	NEO_BIOS_AUDIO_128K( "031-m1.bin", CRC(3aa4e9e1) SHA1(65e53d799a0cb55b5bc55d57773e4682a72d7c2d) )
 
 	ROM_REGION( 0x200000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "031-v1.bin", 0x000000, 0x100000, CRC(cc78497e) SHA1(895bd647150fae9b2259ef043ed681f4c4de66ea) )
@@ -1213,13 +1329,13 @@ ROM_START( fatfury1 )
 	ROM_LOAD16_BYTE( "033-c4.bin", 0x200001, 0x100000, CRC(9397476a) SHA1(a12dbb74020aeb6ebf24ec2abbfba5129cabcb7d) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( fbfrenzy )
+ROM_START( fbfrenzy ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "034-p1.bin", 0x000000, 0x080000, CRC(cdef6b19) SHA1(97482db0dffc6d625fb41fa38449c0a74d741a72) )
 
 	NEO_SFIX_128K( "034-s1.bin", CRC(8472ed44) SHA1(42e1a9671dddd090d2a634cff986f6c73ba08b70) )
 
-	NEO_BIOS_AUDIO_128K( "034-m1.bin", BAD_DUMP CRC(f41b16b8) SHA1(f3e1cfc4cd2c5baece176f169906aa796367d303) )
+	NEO_BIOS_AUDIO_128K( "034-m1.bin", CRC(f41b16b8) SHA1(f3e1cfc4cd2c5baece176f169906aa796367d303) )
 
 	ROM_REGION( 0x200000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "034-v1.bin", 0x000000, 0x100000, CRC(50c9d0dd) SHA1(2b3f2875b00e5f307d274128bd73c1521a7d901b) )
@@ -1582,6 +1698,7 @@ ROM_START( androdun )
 	ROM_REGION( 0x100000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "049-v1.bin", 0x000000, 0x080000, CRC(577c85b3) SHA1(2c3072401fe73497dca0e9009ae2ba4053fe936d) )
 	ROM_LOAD( "049-v2.bin", 0x080000, 0x080000, CRC(e14551c4) SHA1(763a9912b9df55defb190af3f29ae034f6dd78d6) )
+	/* The MVS version has only v1 rom, size 8mbit. */ 
 
 	NO_DELTAT_REGION
 
@@ -1912,7 +2029,7 @@ ROM_START( fightfev )
 	ROM_LOAD16_WORD_SWAP( "060-p1.bin", 0x000000, 0x080000, CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
 	ROM_LOAD16_WORD_SWAP( "060-p2.bin", 0x080000, 0x080000, CRC(b0801d5f) SHA1(085746d8f5d271d5f84ccbb7f577193c391f88d4) )
 
-	NEO_SFIX_128K( "060-s1.bin", CRC(70727a1e) SHA1(e0d226be0578adbe7c1d41baba79e61d4d8fac39) )
+	NEO_SFIX_128K( "060-s1.bin", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) )
 
 	NEO_BIOS_AUDIO_128K( "060-m1.bin", CRC(0b7c4e65) SHA1(999a1e784de18db3f1332b30bc425836ea6970be) )
 
@@ -1929,13 +2046,13 @@ ROM_START( fightfev )
 	ROM_LOAD16_BYTE( "060-c4.bin", 0x0400001, 0x200000, CRC(026f3b62) SHA1(d608483b70d60e7aa0e41f25a8b3fed508129eb7) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( fightfva )
+ROM_START( fightfva ) /* MVS VERSION */
 	ROM_REGION( 0x200000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
-	ROM_LOAD16_WORD_SWAP( "060-p1a.bin", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) )
+	ROM_LOAD16_WORD_SWAP( "060-p1.rom", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) )
 	/* there was also a copy of the 060-p1.bin with the name 060-p2.bin maybe it should be loaded over the top or this
        larger rom is an older revision... */
 
-	NEO_SFIX_128K( "060-s1.bin", CRC(70727a1e) SHA1(e0d226be0578adbe7c1d41baba79e61d4d8fac39) )
+	NEO_SFIX_128K( "060-s1.bin", CRC(7f012104) SHA1(f366dcc3923655dff16ec08a40d5fce22a84257d) )
 
 	NEO_BIOS_AUDIO_128K( "060-m1.bin", CRC(0b7c4e65) SHA1(999a1e784de18db3f1332b30bc425836ea6970be) )
 
@@ -2849,9 +2966,9 @@ ROM_START( sonicwi3 )
 
 	NEO_BIOS_AUDIO_128K( "097-m1.bin", CRC(b20e4291) SHA1(0e891ab53f9fded510295dfc7818bc59b4a9dd97) )
 
-	ROM_REGION( 0x500000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
+	ROM_REGION( 0x600000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	ROM_LOAD( "097-v1.bin", 0x000000, 0x400000, CRC(6f885152) SHA1(8175804d5c1420c5d37b733d4a8fa2aa81e59f1b) )
-	ROM_LOAD( "097-v2.bin", 0x400000, 0x100000, CRC(32187ccd) SHA1(35a93de2a23bdec181c504d9c21a871bf86edee1) )
+	ROM_LOAD( "097-v2.bin", 0x400000, 0x200000, CRC(3359e868) SHA1(b7efd9f1a6dab33271fe8356bcc863aeae1d3ed8) )
 
 	NO_DELTAT_REGION
 
@@ -2928,7 +3045,7 @@ ROM_START( mosyougi )
 	ROM_REGION( 0x100000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "203-p1.bin", 0x000000, 0x100000, CRC(7ba70e2d) SHA1(945f472cc3e7706f613c52df18de35c986d166e7) )
 
-	NEO_SFIX_128K( "203-s1.bin", CRC(4e132fac) SHA1(ecc5552880cc0a771121efe2a60810b70f6121ff) )
+	NEO_SFIX_128K( "203-s1.bin", CRC(bfdc8309) SHA1(781337eab932a130b396a6c1080611d6f9c24c6e) )
 
 	NEO_BIOS_AUDIO_128K( "203-m1.bin", CRC(a602c2c2) SHA1(19fd5d0379244c528b58343f6cbf78b4766fb23d) )
 
@@ -3898,7 +4015,7 @@ ROM_END
 
 ROM_START( kof98 ) /* encrypted code + protection */
 	ROM_REGION( 0x600000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
-	ROM_LOAD16_WORD_SWAP( "yz98-p1.160", 0x000000, 0x200000, CRC(8893df89) SHA1(0452828785110601c65f667209fc2d2926cd3751) )
+	ROM_LOAD16_WORD_SWAP( "242-p1.bin", 0x000000, 0x200000, CRC(8893df89) SHA1(0452828785110601c65f667209fc2d2926cd3751) )
 	ROM_LOAD16_WORD_SWAP( "242-p2.bin", 0x200000, 0x400000, CRC(980aba4c) SHA1(5e735929ec6c3ca5b2efae3c7de47bcbb8ade2c5) )
 
 	NEO_SFIX_128K( "242-s1.bin", CRC(7f7b4805) SHA1(80ee6e5d0ece9c34ebca54b043a7cb33f9ff6b92) )
@@ -3926,7 +4043,7 @@ ROM_END
 
 ROM_START( kof98k ) /* encrypted code + protection, only z80 rom is different to kof98 */
 	ROM_REGION( 0x600000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
-	ROM_LOAD16_WORD_SWAP( "yz98-p1.160", 0x000000, 0x200000, CRC(8893df89) SHA1(0452828785110601c65f667209fc2d2926cd3751) )
+	ROM_LOAD16_WORD_SWAP( "242-p1.bin", 0x000000, 0x200000, CRC(8893df89) SHA1(0452828785110601c65f667209fc2d2926cd3751) )
 	ROM_LOAD16_WORD_SWAP( "242-p2.bin", 0x200000, 0x400000, CRC(980aba4c) SHA1(5e735929ec6c3ca5b2efae3c7de47bcbb8ade2c5) )
 
 	NEO_SFIX_128K( "242-s1.bin", CRC(7f7b4805) SHA1(80ee6e5d0ece9c34ebca54b043a7cb33f9ff6b92) )
@@ -4185,7 +4302,7 @@ ROM_START( mslugx )
 	ROM_LOAD16_BYTE( "250-c6.bin", 0x2000001, 0x800000, CRC(83e3e69d) SHA1(39be66287696829d243fb71b3fb8b7dc2bc3298f) ) /* Plane 0,1 */
 ROM_END
 
-ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */
+ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */ /* AES VERSION */
 	ROM_REGION( 0x900000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "251-sma.kc",  0x0c0000, 0x040000, CRC(6c9d0647) SHA1(2a0ce62ca6c18007e8fbe1b60475c7874ab79389) )	/* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "251-p1.bin",  0x100000, 0x400000, CRC(006e4532) SHA1(47791ab4044ad55988b1d3412d95b65b91a163c8) )
@@ -4221,7 +4338,7 @@ ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */
 	ROM_LOAD16_BYTE( "251-c8.bin",   0x3000001, 0x800000, CRC(8d921c68) SHA1(42acf1d27d52a8e3b6262eb7df50693c0b135565) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( kof99a ) /* Original Version - Encrypted Code & GFX */
+ROM_START( kof99a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION */
 	ROM_REGION( 0x900000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD16_WORD_SWAP( "251-sma.ka",  0x0c0000, 0x040000, CRC(7766d09e) SHA1(4e0a49d1ad669a62676cb30f527c6590cde80194) )	/* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "251-p1.bin",  0x100000, 0x400000, CRC(006e4532) SHA1(47791ab4044ad55988b1d3412d95b65b91a163c8) )
@@ -5289,7 +5406,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_LOAD16_BYTE( "267-c2.bin", 0x0000001, 0x800000, CRC(2b67187b) SHA1(149c3efd3c444fd0d35a97fa2268102bf76be3ed) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( mslug5 ) /* Encrypted Set */
+ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_REGION( 0x800000, NEOGEO_REGION_MAIN_CPU_CARTRIDGE, 0 )
 	ROM_LOAD32_WORD_SWAP( "268-p1cr.bin", 0x000000, 0x400000, CRC(d0466792) SHA1(880819933d997fab398f91061e9dbccb959ae8a1) )
 	ROM_LOAD32_WORD_SWAP( "268-p2cr.bin", 0x000002, 0x400000, CRC(fbf6b61e) SHA1(9ec743d5988b5e3183f37f8edf45c72a8c0c893e) )
@@ -5302,11 +5419,11 @@ ROM_START( mslug5 ) /* Encrypted Set */
 	ROM_REGION( 0x20000, NEOGEO_REGION_FIXED_LAYER_BIOS, 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x10000, NEOGEO_REGION_AUDIO_CPU_ENCRYPTED, 0 )
+	ROM_REGION( 0x80000, NEOGEO_REGION_AUDIO_CPU_ENCRYPTED, 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
-	ROM_LOAD( "268-m1.bin", 0x00000, 0x10000, CRC(58b107d0) SHA1(cc7fe66ff4f9c026cde4df06f86c848eb21f7af8) )
+	ROM_LOAD( "268-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
 	/* Decrypted */
-	NEO_BIOS_AUDIO_64K( "268-m1_decrypted.bin",  CRC(3c0655a7) SHA1(ae839d4c2b87a7aa3dd8e5caddc43eb75ee9b732) ) //Incorrect data
+	NEO_BIOS_AUDIO_64K( "268-m1_decrypted.bin",  CRC(3c0655a7) SHA1(ae839d4c2b87a7aa3dd8e5caddc43eb75ee9b732) ) /* not a 100% match for encrypted version */
 
 	ROM_REGION( 0x1000000, NEOGEO_REGION_AUDIO_DATA_1, 0 )
 	/* Encrypted */
@@ -7041,7 +7158,8 @@ GAME( 1991, legendos, neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "Legend 
 GAME( 1991, 2020bb,   neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 1)", 0 )
 GAME( 1991, 2020bba,  2020bb, neogeo_s, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 2)", 0 )
 GAME( 1991, 2020bbh,  2020bb, neogeo_s, neogeo,  neogeo,   ROT0, "SNK / Pallas", "2020 Super Baseball (set 3)", 0 )
-GAME( 1991, socbrawl, neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "Soccer Brawl", 0 )
+GAME( 1991, socbrawl, neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "Soccer Brawl (set 1)", 0 )
+GAME( 1991, socbrala, socbrawl, neogeo_s, neogeo,  neogeo, ROT0, "SNK", "Soccer Brawl (set 2)", 0 )
 GAME( 1991, fatfury1, neogeo, neogeo,   neogeo,  neogeo,   ROT0, "SNK", "Fatal Fury - King of Fighters / Garou Densetsu - shukumei no tatakai", 0 )
 GAME( 1991, roboarmy, neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "Robo Army (set 1)", 0 )
 GAME( 1991, roboarma, roboarmy, neogeo_s, neogeo,  neogeo,   ROT0, "SNK", "Robo Army (set 2)", 0 )
@@ -7134,9 +7252,9 @@ GAME( 2004, kof2k4se, kof2002, neogeo_s, neogeo,  kof2k4se, ROT0, "bootleg", "Th
 GAME( 2003, mslug5,   neogeo, neogeo_s, neogeo,  mslug5,   ROT0, "SNK Playmore", "Metal Slug 5", 0 )
 GAME ( 2003, ms5pcb,   0,                neogeo_s, neogeo,  ms5pcb,   ROT0, "SNK Playmore", "Metal Slug 5 (JAMMA PCB)", 0 )
 GAME( 2003, ms5plus,  mslug5, neogeo_s, neogeo,  ms5plus,  ROT0, "bootleg", "Metal Slug 5 Plus (bootleg)",0 )
-GAME ( 2003, svcpcb,   0,                neogeo_s, svcpcb,  svcpcb,   ROT0, "Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB)", 0 ) // not a clone of neogeo because it's NOT a neogeo cart.
-GAME ( 2003, svcpcba,  svcpcb,           neogeo_s, svcpcb,  svcpcb,   ROT0, "Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB, set 2)" , 0 ) /* Encrypted Code */
-GAME( 2003, svc,      neogeo, neogeo_s, neogeo,  svc,      ROT0, "Playmore", "SNK vs. CAPCOM SVC CHAOS", 0 )
+GAME ( 2003, svcpcb,   0,                neogeo_s, svcpcb,  svcpcb,   ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB)", 0 ) // not a clone of neogeo because it's NOT a neogeo cart.
+GAME ( 2003, svcpcba,  svcpcb,           neogeo_s, svcpcb,  svcpcb,   ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS (JAMMA PCB, set 2)" , 0 ) /* Encrypted Code */
+GAME( 2003, svc,      neogeo, neogeo_s, neogeo,  svc,      ROT0, "SNK Playmore", "SNK vs. CAPCOM SVC CHAOS", 0 )
 GAME( 2003, svcboot,  svc, neogeo_s, neogeo,  svcboot,  ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS (bootleg)",0 )
 GAME( 2003, svcplus,  svc, neogeo_s, neogeo,  svcplus,  ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS Plus (set 1, bootleg)",0 )
 GAME( 2003, svcplusa, svc, neogeo_s, neogeo,  svcplusa, ROT0, "bootleg", "SNK vs. CAPCOM SVC CHAOS Plus (set 2, bootleg)",0 )
@@ -7194,7 +7312,7 @@ GAME( 1997, magdrop3, neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "Data East Corp
 
 /* Eleven */
 GAME( 2000, nitd,     neogeo, neogeo,   neogeo,  nitd,     ROT0, "Eleven / Gavaking", "Nightmare in the Dark" , 0) /* Encrypted GFX */
-GAME( 2001, nitdbl,   nitd, neogeo,   neogeo,  neogeo,   ROT0, "Eleven / Gavaking", "Nightmare in the Dark (bootleg)" , 0)
+GAME( 2001, nitdbl,   nitd,   neogeo,   neogeo,  neogeo,   ROT0, "bootleg", "Nightmare in the Dark (bootleg)" , 0)
 
 /* Face */
 GAME( 1994, gururin,  neogeo, neogeo_s, neogeo,  neogeo,   ROT0, "Face", "Gururin", 0 )

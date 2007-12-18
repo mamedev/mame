@@ -8,13 +8,13 @@ UINT8* mermaid_fg_scrollram;
 
 static int rougien_gfxbank1, rougien_gfxbank2;
 
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	0*8, 26*8-1,
 	2*8, 30*8-1
 };
 
-static rectangle flip_spritevisiblearea =
+static const rectangle flip_spritevisiblearea =
 {
 	6*8, 31*8-1,
 	2*8, 30*8-1

@@ -32,7 +32,7 @@ static int xoffsethack;
 UINT8 *s2650games_spriteram;
 UINT8 *s2650games_tileram;
 
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	2*8, 34*8-1,
 	0*8, 28*8-1

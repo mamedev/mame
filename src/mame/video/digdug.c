@@ -248,7 +248,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 
 ***************************************************************************/
 
-static rectangle spritevisiblearea =
+static const rectangle spritevisiblearea =
 {
 	2*8, 34*8-1,
 	0*8, 28*8-1

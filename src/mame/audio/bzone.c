@@ -176,8 +176,6 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 
 		if( latch & 0x80 )
 		{
-			static double r0 = 1.0/1e12, r1 = 1.0/1e12;
-
 			/* NE5555 timer
              * C = 0.018u, Ra = 100k, Rb = 125k
              * charge time = 0.693 * (Ra + Rb) * C = 3870us
@@ -201,6 +199,8 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 			motor_counter -= motor_rate;
 			while( motor_counter <= 0 )
 			{
+				double r0, r1;
+
 				motor_counter += OUTPUT_RATE;
 
 				r0 = 1.0/1e12;

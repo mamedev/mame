@@ -51,7 +51,7 @@ enum {	MODE_A,
 		MODE_E, MODE_O,
 		MODE_E12, MODE_O12, MODE_E22, MODE_O22,
 		TOTAL_MODES };
-const char *modenames[] =
+const char *const modenames[] =
 {
 	"          ",
 	"[bits 0-3]",

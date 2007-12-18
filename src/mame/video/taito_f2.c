@@ -70,11 +70,16 @@ static INT32 f2_text_xoffs = 0;
 static int f2_tilemap_col_base = 0;
 
 static INT32 f2_game = 0;
-static INT32 FOOTCHMP = 1;
 
 static UINT8 f2_tilepri[6]; // todo - move into taitoic.c
 static UINT8 f2_spritepri[6]; // todo - move into taitoic.c
 static UINT8 f2_spriteblendmode; // todo - move into taitoic.c
+
+enum
+{
+	FOOTCHMP = 1
+};
+
 
 /***********************************************************************************/
 

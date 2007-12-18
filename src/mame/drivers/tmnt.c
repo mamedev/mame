@@ -4351,10 +4351,10 @@ GAME( 1991, detatwin, blswhstl, detatwin, detatwin, gfx,      ROT90, "Konami", "
 GAME( 1991, glfgreat, 0,        glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1991, glfgretj, glfgreat, glfgreat, glfgreat, glfgreat, ROT0,  "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_UNEMULATED_PROTECTION ) // ver. UAA
-GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_UNEMULATED_PROTECTION ) // ver. ADA
-GAME( 1991, tmht22pe, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  GAME_UNEMULATED_PROTECTION ) // ver. EBA
-GAME( 1991, tmnt22pu, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_UNEMULATED_PROTECTION ) // ver. UDA
+GAME( 1991, tmnt2,    0,        tmnt2,    ssridr4p, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", 0 ) // ver. UAA
+GAME( 1991, tmnt2a,   tmnt2,    tmnt2,    ssrid4ps, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", 0 ) // ver. ADA
+GAME( 1991, tmht22pe, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  0 ) // ver. EBA
+GAME( 1991, tmnt22pu, tmnt2,    tmnt2,    ssriders, gfx,      ROT0,  "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", 0 ) // ver. UDA
 
 GAME( 1993, qgakumon, 0,        tmnt2,    qgakumon, gfx,      ROT0,  "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", 0 )
 

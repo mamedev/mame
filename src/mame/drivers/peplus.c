@@ -363,8 +363,8 @@ static WRITE8_HANDLER( peplus_output_bank_a_w )
 	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
     coin_out_state = 0;
-    if((data >> 4) & 1)
-        coin_out_state = 1;
+    if(((data >> 4) & 1) || ((data >> 5) & 1))
+        coin_out_state = 3;
 }
 
 static WRITE8_HANDLER( peplus_output_bank_b_w )
@@ -594,13 +594,31 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		last_door = activecpu_gettotalcycles();
 	}
 
-	if (curr_cycles - last_coin_out > 60000) { // Guessing with 60000
-		if (coin_out_state == 1) {
-            coin_out = 0x08;
-		}
-        coin_out_state = 0;
+	if (curr_cycles - last_coin_out > 600000 && coin_out_state != 0) { // Guessing with 600000
+		if (coin_out_state != 2) {
+            coin_out_state = 2; // Coin-Out Off
+        } else {
+            coin_out_state = 3; // Coin-Out On
+        }
+        
 		last_coin_out = activecpu_gettotalcycles();
 	}
+
+    switch (coin_out_state)
+    {
+        case 0x00: // No Coin-Out
+	        coin_out = 0x00;
+	        break;
+        case 0x01: // First Coin-Out On
+	        coin_out = 0x08;
+	        break;
+        case 0x02: // Coin-Out Off
+	        coin_out = 0x00;
+	        break;
+        case 0x03: // Additional Coin-Out On
+	        coin_out = 0x08;
+	        break;
+    }
 
 	bank_a = (sda<<7) | bank_a | (door_open<<5) | coin_optics | coin_out;
 

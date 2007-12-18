@@ -59,7 +59,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static const char *error_strings[] =
+static const char *const error_strings[] =
 {
 	"no error",
 	"no drive interface",

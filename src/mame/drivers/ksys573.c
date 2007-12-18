@@ -876,7 +876,20 @@ static WRITE32_HANDLER( atapi_w )
 	 }
 }
 
-static void atapi_init(void)
+static void atapi_exit(running_machine* machine)
+{
+	int i;
+
+	for( i = 0; i < 2; i++ )
+	{
+		if( get_disk_handle( i ) != NULL )
+		{
+			SCSIDeleteInstance( available_cdroms[ i ] );
+		}
+	}
+}
+
+static void atapi_init(running_machine *machine)
 {
 	int i;
 
@@ -906,6 +919,7 @@ static void atapi_init(void)
 			available_cdroms[ i ] = NULL;
 		}
 	}
+	add_exit_callback(machine, atapi_exit);
 
 	atapi_data = auto_malloc( ATAPI_DATA_SIZE );
 
@@ -1477,7 +1491,7 @@ static DRIVER_INIT( konami573 )
 	int i;
 
 	psx_driver_init();
-	atapi_init();
+	atapi_init(machine);
 	psx_dma_install_read_handler(5, cdrom_dma_read);
 	psx_dma_install_write_handler(5, cdrom_dma_write);
 
