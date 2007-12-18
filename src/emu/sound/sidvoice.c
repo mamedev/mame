@@ -9,10 +9,10 @@
 static UINT8 triangleTable[4096];
 static UINT8 sawtoothTable[4096];
 static UINT8 squareTable[2*4096];
-static UINT8* waveform30;
-static UINT8* waveform50;
-static UINT8* waveform60;
-static UINT8* waveform70;
+static const UINT8* waveform30;
+static const UINT8* waveform50;
+static const UINT8* waveform60;
+static const UINT8* waveform70;
 #if defined(LARGE_NOISE_TABLE)
   static UINT8 noiseTableMSB[1<<8];
   static UINT8 noiseTableLSB[1L<<16];
@@ -748,13 +748,6 @@ void sidInitWaveformTables(SIDTYPE type)
         waveform50 = waveform50_6581;
         waveform60 = waveform60_6581;
         waveform70 = waveform70_6581;  /* really audible? */
-	}
-
-	for ( i = 4096; i < 8192; i++ )
-	{
-		waveform50[i] = 0;
-		waveform60[i] = 0;
-		waveform70[i] = 0;
 	}
 
 	if ( type==MOS8580 )
