@@ -1488,7 +1488,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/4enraya.o $(VIDEO)/4enraya.o \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
-	$(DRIVERS)/afega.o $(VIDEO)/afega.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
 	$(DRIVERS)/ampoker.o $(VIDEO)/ampoker.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
