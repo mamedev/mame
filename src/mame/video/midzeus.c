@@ -60,9 +60,8 @@ static UINT8 log_fifo;
 static UINT32 zeus_fifo[20];
 static UINT8 zeus_fifo_words;
 static INT16 zeus_matrix[3][3];
-static INT16 zeus_matrix2[3][3];
-static UINT8 zeus_usematrix2;
 static INT32 zeus_point[3];
+static INT16 zeus_light[3];
 static UINT64 *zeus_renderbase;
 static UINT64 *zeus_palbase;
 static int zeus_enable_logging;
@@ -842,14 +841,14 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				zeus_matrix[2][1] = data[4] >> 16;
 				zeus_matrix[2][2] = data[1];
 
-				zeus_usematrix2 = FALSE;
-
 				zeus_point[0] = data[5];
 				zeus_point[1] = data[6];
 				zeus_point[2] = data[7];
 			}
 			else
 			{
+				INT16 matrix1[3][3];
+				INT16 matrix2[3][3];
 				if (numwords < 13)
 					return FALSE;
 				if (log_fifo)
@@ -879,26 +878,35 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 						(float)(INT32)data[12] * (1.0f / (65536.0f * 512.0f)));
 				}
 
-				zeus_matrix[0][0] = data[3];
-				zeus_matrix[0][1] = data[3] >> 16;
-				zeus_matrix[0][2] = data[7];
-				zeus_matrix[1][0] = data[5];
-				zeus_matrix[1][1] = data[6];
-				zeus_matrix[1][2] = data[2] >> 16;
-				zeus_matrix[2][0] = data[1];
-				zeus_matrix[2][1] = data[1] >> 16;
-				zeus_matrix[2][2] = data[2];
+				matrix1[0][0] = data[1];
+				matrix1[0][1] = data[2];
+				matrix1[0][2] = data[3];
+				matrix1[1][0] = data[1] >> 16;
+				matrix1[1][1] = data[2] >> 16;
+				matrix1[1][2] = data[3] >> 16;
+				matrix1[2][0] = data[5];
+				matrix1[2][1] = data[6];
+				matrix1[2][2] = data[7];
 
-				zeus_matrix2[0][0] = data[4];
-				zeus_matrix2[0][1] = data[4] >> 16;
-				zeus_matrix2[0][2] = data[5] >> 16;
-				zeus_matrix2[1][0] = data[8];
-				zeus_matrix2[1][1] = data[8] >> 16;
-				zeus_matrix2[1][2] = data[6] >> 16;
-				zeus_matrix2[2][0] = data[9];
-				zeus_matrix2[2][1] = data[9] >> 16;
-				zeus_matrix2[2][2] = data[7] >> 16;
-				zeus_usematrix2 = TRUE;
+				matrix2[0][0] = data[4];
+				matrix2[0][1] = data[4] >> 16;
+				matrix2[0][2] = data[5] >> 16;
+				matrix2[1][0] = data[8];
+				matrix2[1][1] = data[8] >> 16;
+				matrix2[1][2] = data[6] >> 16;
+				matrix2[2][0] = data[9];
+				matrix2[2][1] = data[9] >> 16;
+				matrix2[2][2] = data[7] >> 16;
+				
+				zeus_matrix[0][0] = ((INT64)(matrix1[0][0] * matrix2[0][0]) + (INT64)(matrix1[0][1] * matrix2[1][0]) + (INT64)(matrix1[0][2] * matrix2[2][0])) >> 16;
+				zeus_matrix[0][1] = ((INT64)(matrix1[0][0] * matrix2[0][1]) + (INT64)(matrix1[0][1] * matrix2[1][1]) + (INT64)(matrix1[0][2] * matrix2[2][1])) >> 16;
+				zeus_matrix[0][2] = ((INT64)(matrix1[0][0] * matrix2[0][2]) + (INT64)(matrix1[0][1] * matrix2[1][2]) + (INT64)(matrix1[0][2] * matrix2[2][2])) >> 16;
+				zeus_matrix[1][0] = ((INT64)(matrix1[1][0] * matrix2[0][0]) + (INT64)(matrix1[1][1] * matrix2[1][0]) + (INT64)(matrix1[1][2] * matrix2[2][0])) >> 16;
+				zeus_matrix[1][1] = ((INT64)(matrix1[1][0] * matrix2[0][1]) + (INT64)(matrix1[1][1] * matrix2[1][1]) + (INT64)(matrix1[1][2] * matrix2[2][1])) >> 16;
+				zeus_matrix[1][2] = ((INT64)(matrix1[1][0] * matrix2[0][2]) + (INT64)(matrix1[1][1] * matrix2[1][2]) + (INT64)(matrix1[1][2] * matrix2[2][2])) >> 16;
+				zeus_matrix[2][0] = ((INT64)(matrix1[2][0] * matrix2[0][0]) + (INT64)(matrix1[2][1] * matrix2[1][0]) + (INT64)(matrix1[2][2] * matrix2[2][0])) >> 16;
+				zeus_matrix[2][1] = ((INT64)(matrix1[2][0] * matrix2[0][1]) + (INT64)(matrix1[2][1] * matrix2[1][1]) + (INT64)(matrix1[2][2] * matrix2[2][1])) >> 16;
+				zeus_matrix[2][2] = ((INT64)(matrix1[2][0] * matrix2[0][2]) + (INT64)(matrix1[2][1] * matrix2[1][2]) + (INT64)(matrix1[2][2] * matrix2[2][2])) >> 16;
 
 				zeus_point[0] = data[10];
 				zeus_point[1] = data[11];
@@ -907,7 +915,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			break;
 
 		/* 0x23: some additional X,Y,Z coordinates */
-		/* 0x2e: save for invasn */
+		/* 0x2e: same for invasn */
 		case 0x23:
 		case 0x2e:
 			if (numwords < 2)
@@ -916,6 +924,9 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror(" -- additional xyz = %d,%d,%d\n", (INT16)data[0], (INT16)(data[1] >> 16), (INT16)data[1]);
+				zeus_light[0] = (INT16)data[0];
+				zeus_light[1] = (INT16)(data[1] >> 16);
+				zeus_light[2] = (INT16)data[1];
 			}
 			break;
 
@@ -1079,23 +1090,44 @@ static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit)
 	int val1, val2, texwshift;
 	int numverts;
 	int i;
+	INT16 normal[3];
+	INT32 rotnormal[3];
 
-/*
-int testbit = 0;
+/* look for interesting data patterns  */
+if (
+	(databuffer[1] & 0xffffffff) != 0x200c0000 && /* mk4 sometimes */
+	(databuffer[1] & 0xfffe0000) != 0x21000000 && /* most of mk4 */
+	(databuffer[1] & 0xffffffff) != 0x008c0000 && /* invasn */
+	(databuffer[1] & 0xfffeffff) != 0x028c0000 && /* invasn */
+	(databuffer[1] & 0xfffe0000) != 0x21800000 && /* invasn */
+	(databuffer[1] & 0xfffe0000) != 0x23800000 && /* invasn */
+	1)
+	printf("zeus_draw_quad: databuffer[1] = %08X\n", databuffer[1]);
 
-if (input_code_pressed(KEYCODE_Z)) testbit = 0x01;
-if (input_code_pressed(KEYCODE_X)) testbit = 0x02;
-if (input_code_pressed(KEYCODE_C)) testbit = 0x04;
-if (input_code_pressed(KEYCODE_V)) testbit = 0x08;
-if (input_code_pressed(KEYCODE_B)) testbit = 0x10;
-if (input_code_pressed(KEYCODE_N)) testbit = 0x20;
-if (input_code_pressed(KEYCODE_M)) testbit = 0x40;
-if (input_code_pressed(KEYCODE_COMMA)) testbit = 0x80;
-if (input_code_pressed(KEYCODE_STOP)) testbit = 0x100;
-*/
-	/* doesn't seem to matter if it is 0x21 or 0x23 */
-//  if ((databuffer[1] >> 24) == 0x21 || (databuffer[1] >> 24) == 0x23)
-		texdata = (texdata & 0xffff0000) | ((texdata + databuffer[1]) & 0xffff);
+	
+	/* do a simple backface cull; not sure if the hardware does it, but I see no other
+	   reason for a polygon normal here */
+	
+	/* extract the polygon normal */
+	normal[0] = (INT8)(databuffer[0] >> 0);
+	normal[1] = (INT8)(databuffer[0] >> 8);
+	normal[2] = (INT8)(databuffer[0] >> 16);
+
+	/* rotate the normal into camera view; we only need the Z coordinate */
+	rotnormal[2] = normal[0] * zeus_matrix[2][0] + normal[1] * zeus_matrix[2][1] + normal[2] * zeus_matrix[2][2];
+
+	/* if we're pointing away from the camera, toss */
+	if (rotnormal[2] > 0)
+	{
+		if (logit)
+			logerror("quad (culled %08X)\n", rotnormal[2]);
+//		return;
+	}
+
+	if (logit)
+		logerror("quad\n");
+
+	texdata = (texdata & 0xffff0000) | ((texdata + databuffer[1]) & 0xffff);
 
 	val1 = ((texdata >> 10) & 0x3f0000) | (texdata & 0xffff);
 	val2 = (texdata >> 16) & 0x3ff;
@@ -1117,51 +1149,46 @@ if (input_code_pressed(KEYCODE_STOP)) testbit = 0x100;
 	{
 		UINT32 ixy = databuffer[2 + i*2];
 		UINT32 iuvz = databuffer[3 + i*2];
-		INT64 x = (INT16)ixy << 14;
-		INT64 y = (INT16)(ixy >> 16) << 14;
-		INT64 z = (INT16)iuvz << 14;
+		UINT32 inormal = databuffer[10 + i];
+		INT32 xo = (INT16)ixy;
+		INT32 yo = (INT16)(ixy >> 16);
+		INT32 zo = (INT16)iuvz;
+		INT32 xn = (INT32)(inormal << 22) >> 20;
+		INT32 yn = (INT32)(inormal << 12) >> 20;
+		INT32 zn = (INT32)(inormal <<  2) >> 20;
 		UINT8 u = iuvz >> 16;
 		UINT8 v = iuvz >> 24;
-		INT32 xo, yo, zo;
-/*
-        if (zeus_usematrix2)
-        {
-            xo = x >> 14;
-            yo = y >> 14;
-            zo = z >> 14;
-            x = (INT64)(xo * zeus_matrix2[0][0]) + (INT64)(yo * zeus_matrix2[0][1]) + (INT64)(zo * zeus_matrix2[0][2]);
-            y = (INT64)(xo * zeus_matrix2[1][0]) + (INT64)(yo * zeus_matrix2[1][1]) + (INT64)(zo * zeus_matrix2[1][2]);
-            z = (INT64)(xo * zeus_matrix2[2][0]) + (INT64)(yo * zeus_matrix2[2][1]) + (INT64)(zo * zeus_matrix2[2][2]);
-        }
-        */
-		xo = x >> 14;
-		yo = y >> 14;
-		zo = z >> 14;
-		x = (INT64)(xo * zeus_matrix[0][0]) + (INT64)(yo * zeus_matrix[0][1]) + (INT64)(zo * zeus_matrix[0][2]);
-		y = (INT64)(xo * zeus_matrix[1][0]) + (INT64)(yo * zeus_matrix[1][1]) + (INT64)(zo * zeus_matrix[1][2]);
-		z = (INT64)(xo * zeus_matrix[2][0]) + (INT64)(yo * zeus_matrix[2][1]) + (INT64)(zo * zeus_matrix[2][2]);
+		INT32 dotnormal;
+		INT64 x, y, z;
+		
+		x = (INT64)(xo * zeus_matrix[0][0]) + (INT64)(yo * zeus_matrix[0][1]) + (INT64)(zo * zeus_matrix[0][2]) + zeus_point[0];
+		y = (INT64)(xo * zeus_matrix[1][0]) + (INT64)(yo * zeus_matrix[1][1]) + (INT64)(zo * zeus_matrix[1][2]) + zeus_point[1];
+		z = (INT64)(xo * zeus_matrix[2][0]) + (INT64)(yo * zeus_matrix[2][1]) + (INT64)(zo * zeus_matrix[2][2]) + zeus_point[2];
 
-		x += zeus_point[0];
-		y += zeus_point[1];
-		z += zeus_point[2];
+		rotnormal[0] = ((INT64)(xn * zeus_matrix[0][0]) + (INT64)(yn * zeus_matrix[0][1]) + (INT64)(zn * zeus_matrix[0][2])) >> 14;
+		rotnormal[1] = ((INT64)(xn * zeus_matrix[1][0]) + (INT64)(yn * zeus_matrix[1][1]) + (INT64)(zn * zeus_matrix[1][2])) >> 14;
+		rotnormal[2] = ((INT64)(xn * zeus_matrix[2][0]) + (INT64)(yn * zeus_matrix[2][1]) + (INT64)(zn * zeus_matrix[2][2])) >> 14;
+
+		dotnormal = rotnormal[0] * ((x >> 16) + zeus_light[0]) + rotnormal[1] * ((y >> 16) + zeus_light[1]) + rotnormal[2] * ((z >> 16) + zeus_light[2]);
 
 		vert[i].x = x;
 		vert[i].y = y;
 		vert[i].p[0] = z;
 		vert[i].p[1] = u * uscale;
 		vert[i].p[2] = v * vscale;
+		vert[i].p[3] = dotnormal;
 
 		if (logit)
 		{
-			if (i == 0) logerror("quad\n");
-			logerror("\t\t(%f,%f,%f) (%02X,%02X) (%03X,%03X,%03X)\n",
+			logerror("\t\t(%f,%f,%f) (%02X,%02X) (%03X,%03X,%03X) dot=%08X\n",
 					vert[i].x * (1.0f / 65536.0f), vert[i].y * (1.0f / 65536.0f), vert[i].p[0] * (1.0f / 65536.0f),
-					(int)vert[i].p[1], (int)vert[i].p[2],
-					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff);
+					(int)(vert[i].p[1] / 256.0f), (int)(vert[i].p[2] / 256.0f),
+					(databuffer[10 + i] >> 20) & 0x3ff, (databuffer[10 + i] >> 10) & 0x3ff, (databuffer[10 + i] >> 0) & 0x3ff,
+					dotnormal);
 		}
 	}
 
-	numverts = poly_zclip_if_less(4, &vert[0], &clipvert[0], 3, 512.0f);
+	numverts = poly_zclip_if_less(4, &vert[0], &clipvert[0], 4, 512.0f);
 	if (numverts < 3)
 		return;
 
@@ -1193,7 +1220,7 @@ if (input_code_pressed(KEYCODE_STOP)) testbit = 0x100;
 		single_step_advance = FALSE;
 	}
 
-	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 3, numverts, &clipvert[0]);
+	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 4, numverts, &clipvert[0]);
 	poly_wait(poly, "Normal");
 
 	if (single_step)
@@ -1214,9 +1241,11 @@ static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *exte
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
+	INT32 curi = extent->param[3].start;
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
+	INT32 didx = extent->param[3].dpdx;
 	const UINT64 *texbase = extra->texbase;
 	const UINT64 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
@@ -1259,6 +1288,7 @@ static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *exte
 		curz += dzdx;
 		curu += dudx;
 		curv += dvdx;
+		curi += didx;
 	}
 }
 
@@ -1269,9 +1299,11 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
+	INT32 curi = extent->param[3].start;
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
+	INT32 didx = extent->param[3].dpdx;
 	const UINT64 *texbase = extra->texbase;
 	const UINT64 *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
@@ -1314,6 +1346,7 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 		curz += dzdx;
 		curu += dudx;
 		curv += dvdx;
+		curi += didx;
 	}
 }
 
@@ -1350,7 +1383,9 @@ static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *ext
 	const poly_extra_data *extra = extradata;
 	UINT16 color = extra->solidcolor;
 	INT32 curz = (INT32)(extent->param[0].start);
+	INT32 curv = extent->param[2].start;
 	INT32 dzdx = (INT32)(extent->param[0].dpdx);
+	INT32 dvdx = extent->param[2].dpdx;
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -1358,8 +1393,13 @@ static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *ext
 		INT32 depth = (curz >> 16) + extra->zoffset;
 		if (depth > 0x7fff) depth = 0x7fff;
 		if (depth >= 0)
+		{
+//			UINT32 finalcolor = (((color & 0x7c00) * curv) & 0x7c000000) | (((color & 0x03e0) * curv) & 0x03e00000) | (((color & 0x001f) * curv) & 0x001f0000);
+//			waveram_plot_check_depth(scanline, x, finalcolor >> 16, depth);
 			waveram_plot_check_depth(scanline, x, color, depth);
+		}
 		curz += dzdx;
+		curv += dvdx;
 	}
 }
 
