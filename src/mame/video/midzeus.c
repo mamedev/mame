@@ -878,26 +878,26 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 						(float)(INT32)data[12] * (1.0f / (65536.0f * 512.0f)));
 				}
 
-				matrix1[0][0] = data[1];
-				matrix1[0][1] = data[2];
-				matrix1[0][2] = data[3];
-				matrix1[1][0] = data[1] >> 16;
-				matrix1[1][1] = data[2] >> 16;
-				matrix1[1][2] = data[3] >> 16;
-				matrix1[2][0] = data[5];
-				matrix1[2][1] = data[6];
-				matrix1[2][2] = data[7];
-
-				matrix2[0][0] = data[4];
-				matrix2[0][1] = data[4] >> 16;
-				matrix2[0][2] = data[5] >> 16;
-				matrix2[1][0] = data[8];
-				matrix2[1][1] = data[8] >> 16;
-				matrix2[1][2] = data[6] >> 16;
-				matrix2[2][0] = data[9];
-				matrix2[2][1] = data[9] >> 16;
-				matrix2[2][2] = data[7] >> 16;
+				matrix1[0][0] = data[4];
+				matrix1[0][1] = data[4] >> 16;
+				matrix1[0][2] = data[5] >> 16;
+				matrix1[1][0] = data[8];
+				matrix1[1][1] = data[8] >> 16;
+				matrix1[1][2] = data[6] >> 16;
+				matrix1[2][0] = data[9];
+				matrix1[2][1] = data[9] >> 16;
+				matrix1[2][2] = data[7] >> 16;
 				
+				matrix2[0][0] = data[1];
+				matrix2[0][1] = data[2];
+				matrix2[0][2] = data[3];
+				matrix2[1][0] = data[1] >> 16;
+				matrix2[1][1] = data[2] >> 16;
+				matrix2[1][2] = data[3] >> 16;
+				matrix2[2][0] = data[5];
+				matrix2[2][1] = data[6];
+				matrix2[2][2] = data[7];
+
 				zeus_matrix[0][0] = ((INT64)(matrix1[0][0] * matrix2[0][0]) + (INT64)(matrix1[0][1] * matrix2[1][0]) + (INT64)(matrix1[0][2] * matrix2[2][0])) >> 16;
 				zeus_matrix[0][1] = ((INT64)(matrix1[0][0] * matrix2[0][1]) + (INT64)(matrix1[0][1] * matrix2[1][1]) + (INT64)(matrix1[0][2] * matrix2[2][1])) >> 16;
 				zeus_matrix[0][2] = ((INT64)(matrix1[0][0] * matrix2[0][2]) + (INT64)(matrix1[0][1] * matrix2[1][2]) + (INT64)(matrix1[0][2] * matrix2[2][2])) >> 16;
