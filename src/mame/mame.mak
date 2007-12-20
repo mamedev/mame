@@ -1343,7 +1343,7 @@ $(MAMEOBJ)/taito.a: \
 $(MAMEOBJ)/tatsumi.a: \
 	$(DRIVERS)/lockon.o \
 	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
-	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(VIDEO)/tx1.o \
+	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
 
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \

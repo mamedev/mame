@@ -7500,7 +7500,7 @@ Other Sun games
 	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
 	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
 	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
-	DRIVER( buggyb1 )	/* (c) 1985 Tatsumi */
+	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( sprcros2 )	/* (c) 1986 GM Shoji */
 	DRIVER( sprcrs2a )	/* (c) 1986 GM Shoji */
 	DRIVER( gcpinbal )	/* (c) 1994 Excellent System */
