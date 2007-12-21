@@ -27,8 +27,8 @@
             3c00-3fff = 1k Internal Control regs            3c00-3fff = 1k Internal Control regs
 
 
-    For ADSP-2105, ADSP-2115, ADSP-2104
-    -----------------------------------
+    For ADSP-2105, ADSP-2115
+    ------------------------
 
         MMAP = 0                                        MMAP = 1
 
@@ -46,6 +46,29 @@
             3000-33ff = 1k External DWAIT3                  3000-33ff = 1k External DWAIT3
             3400-37ff = 1k External DWAIT4                  3400-37ff = 1k External DWAIT4
             3800-39ff = 512 Internal RAM                    3800-39ff = 512 Internal RAM
+            3a00-3bff = 512 Reserved                        3a00-3bff = 512 Reserved
+            3c00-3fff = 1k Internal Control regs            3c00-3fff = 1k Internal Control regs
+
+
+    For ADSP-2104
+    -------------
+
+        MMAP = 0                                        MMAP = 1
+
+        Automatic boot loading                          No auto boot loading
+
+        Program Space:                                  Program Space:
+            0000-01ff = 512 Internal RAM (booted)           0000-37ff = 14k External access
+            0400-07ff = 1k Reserved                         3800-3bff = 1k Internal RAM
+            0800-3fff = 14k External access                 3c00-3fff = 1k Reserved
+
+        Data Space:                                     Data Space:
+            0000-03ff = 1k External DWAIT0                  0000-03ff = 1k External DWAIT0
+            0400-07ff = 1k External DWAIT1                  0400-07ff = 1k External DWAIT1
+            0800-2fff = 10k External DWAIT2                 0800-2fff = 10k External DWAIT2
+            3000-33ff = 1k External DWAIT3                  3000-33ff = 1k External DWAIT3
+            3400-37ff = 1k External DWAIT4                  3400-37ff = 1k External DWAIT4
+            3800-38ff = 256 Internal RAM                    3800-38ff = 256 Internal RAM
             3a00-3bff = 512 Reserved                        3a00-3bff = 512 Reserved
             3c00-3fff = 1k Internal Control regs            3c00-3fff = 1k Internal Control regs
 

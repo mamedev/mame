@@ -2900,6 +2900,7 @@ src/mame/video/midtunit.c svneol=native#text/plain
 src/mame/video/midvunit.c svneol=native#text/plain
 src/mame/video/midyunit.c svneol=native#text/plain
 src/mame/video/midzeus.c svneol=native#text/plain
+src/mame/video/midzeus2.c svneol=native#text/plain
 src/mame/video/mikie.c svneol=native#text/plain
 src/mame/video/mitchell.c svneol=native#text/plain
 src/mame/video/mjkjidai.c svneol=native#text/plain

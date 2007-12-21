@@ -27,7 +27,7 @@
 
 #define BEAM_DY			3
 #define BEAM_DX			3
-#define BEAM_XOFFS		20		/* table in the code indicates an offset of 20 with a beam height of 7 */
+#define BEAM_XOFFS		40		/* table in the code indicates an offset of 20 with a beam height of 7 */
 
 static UINT32 			gun_control;
 static UINT8 			gun_irq_state;
@@ -138,6 +138,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 }
 
 
+
 /*************************************
  *
  *  Lightgun handling
@@ -146,6 +147,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 
 static void update_gun_irq(void)
 {
+	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
 		cpunum_set_input_line(0, 3, ASSERT_LINE);
 	else
@@ -158,9 +160,11 @@ static TIMER_CALLBACK( invasn_gun_callback )
 	int player = param;
 	int beamy = video_screen_get_vpos(0);
 
+	/* set the appropriate IRQ in the internal gun control and update */
 	gun_irq_state |= 0x01 << player;
 	update_gun_irq();
 
+	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= machine->screen[0].visarea.max_y && beamy <= gun_y[player] + BEAM_DY)
 		timer_adjust(gun_timer[player], video_screen_get_time_until_pos(0, beamy, MAX(0, gun_x[player] - BEAM_DX)), player, attotime_never);
@@ -197,6 +201,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 	}
 }
 
+
 static READ32_HANDLER( invasn_gun_r )
 {
 	int beamx = video_screen_get_hpos(0);
@@ -213,6 +218,7 @@ static READ32_HANDLER( invasn_gun_r )
 	}
 	return result;
 }
+
 
 
 /*************************************
@@ -232,8 +238,18 @@ static READ32_HANDLER( unknown_8d0000_r )
 }
 static WRITE32_HANDLER( unknown_8d0000_w )
 {
-	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
+//	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
 	COMBINE_DATA(&unknown_8d0000[offset]);
+}
+static WRITE32_HANDLER( unknown_9d0000_w )
+{
+//	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x9d0000 + offset, data);
+	COMBINE_DATA(&unknown_8d0000[offset]);
+}
+
+static WRITE32_HANDLER( rombank_select_w )
+{
+	memory_set_bank(1, data);
 }
 
 
@@ -245,6 +261,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x9d0000, 0x9d0001) AM_WRITE(unknown_9d0000_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -259,11 +276,13 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
+	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
-	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION(REGION_USER1, 0)
+	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION(REGION_USER2, 0)
 ADDRESS_MAP_END
 
 
@@ -717,8 +736,8 @@ static MACHINE_DRIVER_START( midzeus )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512/*+256*/, 278/*+256*/)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399/*+256*/, 0, 255/*+256*/)
+	MDRV_SCREEN_SIZE(512, 278)
+	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 255)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(midzeus)
@@ -735,6 +754,12 @@ static MACHINE_DRIVER_START( midzeus2 )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
+	
+	/* video hardware */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+
+	MDRV_VIDEO_START(midzeus2)
+	MDRV_VIDEO_UPDATE(midzeus2)
 MACHINE_DRIVER_END
 
 
@@ -810,23 +835,25 @@ ROM_START( crusnexo )
 	ROM_LOAD( "exotica.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
 	ROM_LOAD( "exotica.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
 
-	ROM_REGION32_LE( 0x3000000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x0800000, REGION_USER1, 0 )
 	ROM_LOAD32_WORD( "exotica.u10", 0x0000000, 0x200000, CRC(65450140) SHA1(cad41a2cad48426de01feb78d3f71f768e3fc872) )
 	ROM_LOAD32_WORD( "exotica.u11", 0x0000002, 0x200000, CRC(e994891f) SHA1(bb088729b665864c7f3b79b97c3c86f9c8f68770) )
 	ROM_LOAD32_WORD( "exotica.u12", 0x0400000, 0x200000, CRC(21f122b2) SHA1(5473401ec954bf9ab66a8283bd08d17c7960cd29) )
 	ROM_LOAD32_WORD( "exotica.u13", 0x0400002, 0x200000, CRC(cf9d3609) SHA1(6376891f478185d26370466bef92f0c5304d58d3) )
-	ROM_LOAD32_WORD( "exotica.u14", 0x0800000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
-	ROM_LOAD32_WORD( "exotica.u15", 0x0800002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
-	ROM_LOAD32_WORD( "exotica.u16", 0x1000000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
-	ROM_LOAD32_WORD( "exotica.u17", 0x1000002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
-	ROM_LOAD32_WORD( "exotica.u18", 0x1800000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
-	ROM_LOAD32_WORD( "exotica.u19", 0x1800002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
-	ROM_LOAD32_WORD( "exotica.u20", 0x1c00002, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
-	ROM_LOAD32_WORD( "exotica.u21", 0x1c00002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
-	ROM_LOAD32_WORD( "exotica.u22", 0x2000002, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
-	ROM_LOAD32_WORD( "exotica.u23", 0x2000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
-	ROM_LOAD32_WORD( "exotica.u24", 0x2800002, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
-	ROM_LOAD32_WORD( "exotica.u25", 0x2800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+
+	ROM_REGION32_LE( 0x3000000, REGION_USER2, 0 )
+	ROM_LOAD32_WORD( "exotica.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "exotica.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "exotica.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "exotica.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "exotica.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "exotica.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "exotica.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "exotica.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "exotica.u18", 0x2000000, 0x200000, CRC(60cf5caa) SHA1(629870a305802d632bd2681131d1ffc0086280d2) )
+	ROM_LOAD32_WORD( "exotica.u19", 0x2000002, 0x200000, CRC(6b919a18) SHA1(20e40e195554146ed1d3fad54f7280823ae89d4b) )
+	ROM_LOAD32_WORD( "exotica.u20", 0x2400000, 0x200000, CRC(4855b68b) SHA1(1f6e557590b2621d0d5c782b95577f1be5cbc51d) )
+	ROM_LOAD32_WORD( "exotica.u21", 0x2400002, 0x200000, CRC(0011b9d6) SHA1(231d768c964a16b905857b0814d758fe93c2eefb) )
 ROM_END
 
 
@@ -836,17 +863,19 @@ ROM_START( thegrid )
 	ROM_LOAD( "the_grid.u3", 0x400000, 0x400000, CRC(40be7585) SHA1(e481081edffa07945412a6eab17b4d3e7b42cfd3) )
 	ROM_LOAD( "the_grid.u4", 0x800000, 0x400000, CRC(7a15c203) SHA1(a0a49dd08bba92402640ed2d1fb4fee112c4ab5f) )
 
-	ROM_REGION32_LE( 0x3000000, REGION_USER1, 0 )
+	ROM_REGION32_LE( 0x0800000, REGION_USER1, 0 )
  	ROM_LOAD32_WORD( "thegrid-11.u10", 0x0000000, 0x100000, CRC(87ea0e9e) SHA1(618de2ca87b7a3e0225d1f7e65f8fc1356de1421) )
 	ROM_LOAD32_WORD( "thegrid-11.u11", 0x0000002, 0x100000, CRC(73d84b1a) SHA1(8dcfcab5ff64f46f8486e6439a10d91ad26fd48a) )
 	ROM_LOAD32_WORD( "thegrid-11.u12", 0x0200000, 0x100000, CRC(78d16ca1) SHA1(7b893ec8af2f44d8bc293861fd8622d68d41ccbe) )
 	ROM_LOAD32_WORD( "thegrid-11.u13", 0x0200002, 0x100000, CRC(8e00b400) SHA1(96581c5da62afc19e6d69b2352b3166665cb9918) )
-	ROM_LOAD32_WORD( "the_grid.u18",   0x0400000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
-	ROM_LOAD32_WORD( "the_grid.u19",   0x0400002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
-	ROM_LOAD32_WORD( "the_grid.u20",   0x0c00002, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
-	ROM_LOAD32_WORD( "the_grid.u21",   0x0c00002, 0x400000, CRC(48c03f8e) SHA1(50790bdae9f2234ffb4914c2c5c16374e3508b47) )
-	ROM_LOAD32_WORD( "the_grid.u22",   0x1400002, 0x400000, CRC(84c3a8b6) SHA1(de0dcf9daf7ada7a6952b9e29a29571b2aa9d0b2) )
-	ROM_LOAD32_WORD( "the_grid.u23",   0x1400002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
+
+	ROM_REGION32_LE( 0x3000000, REGION_USER2, 0 )
+	ROM_LOAD32_WORD( "the_grid.u18",   0x0000000, 0x400000, CRC(3a3460be) SHA1(e719dae8a2e54584cb6a074ed42e35e3debef2f6) )
+	ROM_LOAD32_WORD( "the_grid.u19",   0x0000002, 0x400000, CRC(af262d5b) SHA1(3eb3980fa81a360a70aa74e793b2bc3028f68cf2) )
+	ROM_LOAD32_WORD( "the_grid.u20",   0x0800000, 0x400000, CRC(e6ad1917) SHA1(acab25e1251fd07b374badebe79f6ec1772b3589) )
+	ROM_LOAD32_WORD( "the_grid.u21",   0x0800002, 0x400000, CRC(48c03f8e) SHA1(50790bdae9f2234ffb4914c2c5c16374e3508b47) )
+	ROM_LOAD32_WORD( "the_grid.u22",   0x1000000, 0x400000, CRC(84c3a8b6) SHA1(de0dcf9daf7ada7a6952b9e29a29571b2aa9d0b2) )
+	ROM_LOAD32_WORD( "the_grid.u23",   0x1000002, 0x400000, CRC(f48ef409) SHA1(79d74b4fe38b06a02ae0351d13d7f0a7ed0f0c87) )
 ROM_END
 
 
@@ -860,7 +889,7 @@ ROM_END
 static DRIVER_INIT( mk4 )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 97, NULL);
 	midway_ioasic_set_shuffle_state(1);
 }
 
@@ -868,7 +897,7 @@ static DRIVER_INIT( mk4 )
 static DRIVER_INIT( invasn )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 97, NULL);
 	memory_install_readwrite32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
@@ -876,7 +905,8 @@ static DRIVER_INIT( invasn )
 static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* unknown */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
+	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
 }
 
 
@@ -884,7 +914,8 @@ static DRIVER_INIT( thegrid )
 {
 	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* unknown */, 94, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
+	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
 }
 
 
@@ -897,6 +928,6 @@ static DRIVER_INIT( thegrid )
 
 GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
