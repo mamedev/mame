@@ -304,7 +304,7 @@ static void append_find_exception_handler(drc_core *drc);
 static void append_explode_ccr31(drc_core *drc);
 static void append_recover_ccr31(drc_core *drc);
 static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc);
-static void append_check_sw_interrupts(drc_core *drc, int inline_generate);
+//static void append_check_sw_interrupts(drc_core *drc, int inline_generate);
 
 static void emit_update_cycles_pc_and_flush(drc_core *drc, compiler_state *compiler, const opcode_desc *desc, offs_t destpc);
 
