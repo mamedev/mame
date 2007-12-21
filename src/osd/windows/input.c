@@ -533,22 +533,22 @@ static void wininput_exit(running_machine *machine)
 
 void wininput_poll(void)
 {
-	int hasfocus = winwindow_has_focus();
+	int hasfocus = winwindow_has_focus() && input_enabled;
 
 	// ignore if not enabled
-	if (!input_enabled)
-		return;
+	if (input_enabled)
+	{
+		// remember when this happened
+		last_poll = GetTickCount();
 
-	// remember when this happened
-	last_poll = GetTickCount();
+		// periodically process events, in case they're not coming through
+		// this also will make sure the mouse state is up-to-date
+		winwindow_process_events_periodic();
 
-	// periodically process events, in case they're not coming through
-	// this also will make sure the mouse state is up-to-date
-	winwindow_process_events_periodic();
-
-	// track if mouse/lightgun is enabled, for mouse hiding purposes
-	mouse_enabled = input_device_class_enabled(DEVICE_CLASS_MOUSE);
-	lightgun_enabled = input_device_class_enabled(DEVICE_CLASS_LIGHTGUN);
+		// track if mouse/lightgun is enabled, for mouse hiding purposes
+		mouse_enabled = input_device_class_enabled(DEVICE_CLASS_MOUSE);
+		lightgun_enabled = input_device_class_enabled(DEVICE_CLASS_LIGHTGUN);
+	}
 
 	// poll all of the devices
 	if (hasfocus)

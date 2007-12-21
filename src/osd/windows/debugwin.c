@@ -26,6 +26,7 @@
 #include "debugwin.h"
 #include "window.h"
 #include "video.h"
+#include "input.h"
 #include "config.h"
 #include "strconv.h"
 #include "winutf8.h"
@@ -265,6 +266,9 @@ void osd_wait_for_debugger(void)
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
 	smart_show_all(TRUE);
+	
+	// run input polling to ensure that our status is in sync
+	wininput_poll();
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
