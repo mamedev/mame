@@ -1394,7 +1394,8 @@ INLINE void refresh_fc_eg_slot(FM_SLOT *SLOT , int fc , int kc )
 }
 
 /* update phase increment counters */
-INLINE void refresh_fc_eg_chan(FM_CH *CH )
+/* Changed from INLINE to static to work around gcc 4.2.1 codegen bug */
+static void refresh_fc_eg_chan(FM_CH *CH )
 {
 	if( CH->SLOT[SLOT1].Incr==-1){
 		int fc = CH->fc;
