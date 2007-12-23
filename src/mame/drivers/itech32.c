@@ -12,7 +12,7 @@
         * Hard Yardage (2 sets)
         * Pairs (2 sets)
         * Driver's Edge (1 set)
-        * World Class Bowling (7 sets)
+        * World Class Bowling (8 sets)
         * Street Fighter: The Movie (4 sets)
         * Shuffleshot (3 sets)
         * Golden Tee 3D Golf (11 sets)
@@ -822,7 +822,7 @@ static NVRAM_HANDLER( itech020 )
 			((UINT8 *)nvram)[i] = mame_rand(Machine);
 }
 
-static NVRAM_HANDLER( gt3dt )
+static NVRAM_HANDLER( tournament )
 {
 	nvram_handler_itech020( machine, file, read_or_write );
 	nvram_handler_timekeeper_0( machine, file, read_or_write );
@@ -1585,21 +1585,12 @@ static MACHINE_DRIVER_START( sftm )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( gt3dt )
+static MACHINE_DRIVER_START( tourny )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sftm)
 
-	MDRV_NVRAM_HANDLER( gt3dt ) /* Make Tournament sets load/store the Timekeeper info */
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( wcbowlt )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sftm)
-
-	MDRV_NVRAM_HANDLER( gt3dt ) /* Make WCB Tournament load/store the Timekeeper info */
+	MDRV_NVRAM_HANDLER( tournament ) /* Make Tournament sets load/store the Timekeeper info */
 MACHINE_DRIVER_END
 
 
@@ -1942,7 +1933,7 @@ ROM_START( hotmemry )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "hotmem_snd.u17", 0x10000, 0x18000, CRC(805941c7) SHA1(4a6832d93ff2b986cb54052658af62584782cb59) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_CONTINUE(               0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "hotmem.grom0",  0x000000, 0x80000, CRC(68f279ef) SHA1(66098e68474e692676662b03835d1b74f581b0f4) )
@@ -1961,7 +1952,7 @@ ROM_START( hotmemry )
 	ROM_LOAD16_BYTE( "hotmem.srom0", 0x000000, 0x80000, CRC(c1103224) SHA1(52cf341ff9092ecb8cb94f66a96ee0c726bf1412) )
 ROM_END
 
-ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2) */
+ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
 	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
 	ROM_LOAD32_BYTE( "wcbdprm0.200", 0x00000, 0x20000, CRC(280df7f0) SHA1(dacffe8fc21263093b0f4a4fbf444abd49afbff1) )
 	ROM_LOAD32_BYTE( "wcbdprm1.200", 0x00001, 0x20000, CRC(526eded0) SHA1(106d5503ed4db2411e1f3446d613eac525a8a9cc) )
@@ -1970,7 +1961,7 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
-	ROM_CONTINUE(             0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -1997,6 +1988,42 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
+ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
+	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
+	ROM_LOAD32_BYTE( "wcbtprm0.140", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) )
+	ROM_LOAD32_BYTE( "wcbtprm1.140", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
+	ROM_LOAD32_BYTE( "wcbtprm2.140", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
+	ROM_LOAD32_BYTE( "wcbtprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 )
+	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
+	ROM_CONTINUE(            0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, REGION_GFX1, 0 )
+	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
+	ROM_LOAD32_BYTE( "wcb_grom.0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
+	ROM_LOAD32_BYTE( "wcb_grom.0_2", 0x000002, 0x080000, CRC(bccc0f35) SHA1(2389662e881e86f8cdb36eb2a082923d976676c8) )
+	ROM_LOAD32_BYTE( "wcb_grom.0_3", 0x000003, 0x080000, CRC(ab1da462) SHA1(3f3a4a083483d2d95d5ef540eea077cad799fcb7) )
+	ROM_LOAD32_BYTE( "wcb_grom.1_0", 0x200000, 0x080000, CRC(bdfafd1f) SHA1(bc0e6fe83d3f8e88c2e55ba3a436875d5470de5b) )
+	ROM_LOAD32_BYTE( "wcb_grom.1_1", 0x200001, 0x080000, CRC(7d6baa2e) SHA1(c47854b064aa96d2581c23afe13cd05a36f9dae3) )
+	ROM_LOAD32_BYTE( "wcb_grom.1_2", 0x200002, 0x080000, CRC(7513d3de) SHA1(b17650ed5210860c3bde53647a30f8fce67aaa38) )
+	ROM_LOAD32_BYTE( "wcb_grom.1_3", 0x200003, 0x080000, CRC(e46877e6) SHA1(f50c904ec5b2b8cbc92f2b28641433c91ee17af5) )
+	ROM_LOAD32_BYTE( "wcbdgrom.2_0", 0x400000, 0x040000, CRC(3b4c5a5c) SHA1(152cbc5d1aa84012f49fa13d91fd89a10f874508) )
+	ROM_LOAD32_BYTE( "wcbdgrom.2_1", 0x400001, 0x040000, CRC(ed0b9b26) SHA1(5173e3936cae419255b3034e2b8a69f6bd136b93) )
+	ROM_LOAD32_BYTE( "wcbdgrom.2_2", 0x400002, 0x040000, CRC(4b9e345e) SHA1(6842a8a6690db8478bdbb8e8119d3eef5e77439b) )
+	ROM_LOAD32_BYTE( "wcbdgrom.2_3", 0x400003, 0x040000, CRC(4e13ee7a) SHA1(245ce87cd6839119a9a976b9a90cd1028aa3e291) )
+	ROM_FILL(                        0x500000, 0x380000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
+
+	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
+	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
+ROM_END
+
+
 ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
 	ROM_LOAD32_BYTE( "wcb_prm0.166", 0x00000, 0x20000, CRC(f6774112) SHA1(cb09bb3e40490b3cdc3a5f7d18168384b5b29d85) )
@@ -2006,7 +2033,7 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -2038,7 +2065,7 @@ ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -2070,7 +2097,7 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcbo_snd.u88", 0x10000, 0x18000, CRC(194a51d7) SHA1(c67b042008ff2a2713562d3789e5bc3a312fae17) ) /* Version 4.0 */
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
@@ -2093,51 +2120,50 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
-	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "wcbtprm0.140", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) )
-	ROM_LOAD32_BYTE( "wcbtprm1.140", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
-	ROM_LOAD32_BYTE( "wcbtprm2.140", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
-	ROM_LOAD32_BYTE( "wcbtprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
-
-	ROM_REGION( 0x28000, REGION_CPU2, 0 )
-	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
-	ROM_CONTINUE(             0x08000, 0x08000 )
-
-	ROM_REGION( 0x880000, REGION_GFX1, 0 )
-	ROM_LOAD32_BYTE( "wcb_grom.0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
-	ROM_LOAD32_BYTE( "wcb_grom.0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
-	ROM_LOAD32_BYTE( "wcb_grom.0_2", 0x000002, 0x080000, CRC(bccc0f35) SHA1(2389662e881e86f8cdb36eb2a082923d976676c8) )
-	ROM_LOAD32_BYTE( "wcb_grom.0_3", 0x000003, 0x080000, CRC(ab1da462) SHA1(3f3a4a083483d2d95d5ef540eea077cad799fcb7) )
-	ROM_LOAD32_BYTE( "wcb_grom.1_0", 0x200000, 0x080000, CRC(bdfafd1f) SHA1(bc0e6fe83d3f8e88c2e55ba3a436875d5470de5b) )
-	ROM_LOAD32_BYTE( "wcb_grom.1_1", 0x200001, 0x080000, CRC(7d6baa2e) SHA1(c47854b064aa96d2581c23afe13cd05a36f9dae3) )
-	ROM_LOAD32_BYTE( "wcb_grom.1_2", 0x200002, 0x080000, CRC(7513d3de) SHA1(b17650ed5210860c3bde53647a30f8fce67aaa38) )
-	ROM_LOAD32_BYTE( "wcb_grom.1_3", 0x200003, 0x080000, CRC(e46877e6) SHA1(f50c904ec5b2b8cbc92f2b28641433c91ee17af5) )
-	ROM_LOAD32_BYTE( "wcbdgrom.2_0", 0x400000, 0x040000, CRC(3b4c5a5c) SHA1(152cbc5d1aa84012f49fa13d91fd89a10f874508) )
-	ROM_LOAD32_BYTE( "wcbdgrom.2_1", 0x400001, 0x040000, CRC(ed0b9b26) SHA1(5173e3936cae419255b3034e2b8a69f6bd136b93) )
-	ROM_LOAD32_BYTE( "wcbdgrom.2_2", 0x400002, 0x040000, CRC(4b9e345e) SHA1(6842a8a6690db8478bdbb8e8119d3eef5e77439b) )
-	ROM_LOAD32_BYTE( "wcbdgrom.2_3", 0x400003, 0x040000, CRC(4e13ee7a) SHA1(245ce87cd6839119a9a976b9a90cd1028aa3e291) )
-	ROM_FILL(                        0x500000, 0x380000, 0xff )
-
-	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) /* Newer sound sample roms */
-	ROM_LOAD16_BYTE( "wcb_srom.1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) /* Newer sound sample roms */
-
-	ROM_REGION16_BE( 0x400000, REGION_SOUND2, ROMREGION_ERASE00 )
-	ROM_LOAD16_BYTE( "wcb_srom.2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) /* Newer sound sample roms */
-	ROM_LOAD16_BYTE( "wcb_srom.3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) /* Newer sound sample roms, rom is a 27C020 in this set */
-ROM_END
-
-
 ROM_START( wcbwl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
-	/* v1.0 & v1.3 for this platform have been confirmed, but not dumped */
+	/* v1.0 for this platform have been confirmed, but not dumped */
 	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "wcb_v15.u83", 0x00000, 0x20000, CRC(3ca9ab85) SHA1(364946dceb3f7279b7d67d9d685a98ba7f4901aa) ) /* Labeled as "WCB V1.5 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v15.u88", 0x00001, 0x20000, CRC(d43e6fad) SHA1(fd72f6945e7f5ef86dc28503749d18086dd29906) ) /* Labeled as "WCB V1.5 (U88)" */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, REGION_GFX1, 0 )
+	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+    ROM_LOAD32_BYTE( "wcb8grom.0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+    ROM_LOAD32_BYTE( "wcb8grom.0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+    ROM_LOAD32_BYTE( "wcb8grom.0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+    ROM_LOAD32_BYTE( "wcb8grom.0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+    */
+	ROM_LOAD32_BYTE( "wcb_grm0.0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) )
+	ROM_LOAD32_BYTE( "wcb_grm0.1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
+	ROM_LOAD32_BYTE( "wcb_grm0.2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
+	ROM_LOAD32_BYTE( "wcb_grm0.3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
+	ROM_LOAD32_BYTE( "wcb_grm1.0", 0x200000, 0x080000, CRC(8bd31762) SHA1(a7274c8173b4fb04a6aed0b6a622b52a811a8c83) )
+	ROM_LOAD32_BYTE( "wcb_grm1.1", 0x200001, 0x080000, CRC(b3f761fc) SHA1(5880ca1423cea9a7ca3d0875c8db33787f4056d4) )
+	ROM_LOAD32_BYTE( "wcb_grm1.2", 0x200002, 0x080000, CRC(c22f44ad) SHA1(b25b11346ee1812b2be79105faf64faa0302c105) )
+	ROM_LOAD32_BYTE( "wcb_grm1.3", 0x200003, 0x080000, CRC(036084c4) SHA1(6d2e402d2f4565e037a2676ba676e4b1da2b5dfe) )
+	ROM_FILL(                      0x400000, 0x480000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, REGION_SOUND1, ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ensoniq.2mx", 0x000000, 0x200000, CRC(0814ab80) SHA1(e92525f7cf58cf480510c278fea705f67225e58f) ) /* Ensoniq 2MX16U 1350901801 */
+
+	ROM_REGION16_BE( 0x400000, REGION_SOUND3, ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srm.0",  0x000000, 0x080000, CRC(115bcd1f) SHA1(c321bf3145c11de1351c8f9cd554ab3d6600e854) )
+	ROM_LOAD16_BYTE( "wcb_srm.1",  0x100000, 0x080000, CRC(87a4a4d8) SHA1(60db2f466686481857eb39b90ac7a19d0a96adac) )
+ROM_END
+
+
+ROM_START( wcbwl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "wcb_v13.u83", 0x00000, 0x20000, CRC(2b6d284e) SHA1(339951661509d07b69c670b7249f30a616872bdf) ) /* Labeled as "WCB V1.3 (U83)" */
+	ROM_LOAD16_BYTE( "wcb_v13.u88", 0x00001, 0x20000, CRC(039af877) SHA1(2ac9a57e358ab1ccf9a4d18f7992b59f172e31cf) ) /* Labeled as "WCB V1.3 (U88)" */
+
+	ROM_REGION( 0x28000, REGION_CPU2, 0 )
+	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
@@ -2172,7 +2198,7 @@ ROM_START( wcbwl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079 
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, REGION_GFX1, 0 )
 	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
@@ -2251,7 +2277,7 @@ ROM_START( sftm )	/* Version 1.12 */
 
 	ROM_REGION( 0x48000, REGION_CPU2, 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "rm0-0.bin",  0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) )
@@ -2284,7 +2310,7 @@ ROM_START( sftm111 )	/* Version 1.11 */
 
 	ROM_REGION( 0x48000, REGION_CPU2, 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "rm0-0.bin",  0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) )
@@ -2317,7 +2343,7 @@ ROM_START( sftm110 )	/* Version 1.10 */
 
 	ROM_REGION( 0x48000, REGION_CPU2, 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
-	ROM_CONTINUE(            0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x2080000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "rm0-0.bin",  0x0000000, 0x400000, CRC(09ef29cb) SHA1(430da5b00554582391478849d5b1547fe12eedbe) )
@@ -2383,7 +2409,7 @@ ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "shf_grom.0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -2418,7 +2444,7 @@ ROM_START( sshot139 )	/* Version 1.39 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "shf_grom.0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -2453,7 +2479,7 @@ ROM_START( sshot137 )	/* Version 1.37 (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
-	ROM_CONTINUE(        0x08000, 0x08000 )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x800000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "shf_grom.0_0", 0x000000, 0x80000, CRC(832a3d6a) SHA1(443328fa61b79c93ec6c9d24893b2ec38358a905) )
@@ -2488,7 +2514,7 @@ ROM_START( gt3d )	/* Version 1.93N for the single large type PCB P/N 1082 Rev 2 
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gtg3_grm.0_0", 0x000000, 0x80000, CRC(1b10379d) SHA1(b6d61771e2bc3909ea4229777867b217a3e9e580) )
@@ -2815,7 +2841,7 @@ ROM_START( gt3dt231 ) /* Version 2.31 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gtg3_grm.0_0", 0x000000, 0x80000, CRC(1b10379d) SHA1(b6d61771e2bc3909ea4229777867b217a3e9e580) )
@@ -2846,7 +2872,7 @@ ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gtg38grm.0_0", 0x000000, 0x100000, CRC(22c481b7) SHA1(399bffec5e3b27aec2ebd8d7d49689b92f453e39) ) /* actually labeled "GTG3 GROM 0_0**" ect */
@@ -2877,7 +2903,7 @@ ROM_START( gt97 ) /* Version 1.30 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -2908,7 +2934,7 @@ ROM_START( gt97v122 ) /* Version 1.22 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -2939,7 +2965,7 @@ ROM_START( gt97v121 ) /* Version 1.21 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -2970,7 +2996,7 @@ ROM_START( gt97s121 ) /* Version 1.21S for the 3 tier type PCB with short ROM bo
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -3001,7 +3027,7 @@ ROM_START( gt97v120 ) /* Version 1.20 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -3032,7 +3058,7 @@ ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -3063,7 +3089,7 @@ ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt97_grm.0_0", 0x000000, 0x80000, CRC(81784aaf) SHA1(9544ed2087ca5f71c747e3b782513614937a51ed) )
@@ -3094,7 +3120,7 @@ ROM_START( gt98 )	/* Version 1.10 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt98_grm.0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
@@ -3125,7 +3151,7 @@ ROM_START( gt98v100 )	/* Version 1.00 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt98_grm.0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
@@ -3156,7 +3182,7 @@ ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM bo
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt98_grm.0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
@@ -3187,7 +3213,7 @@ ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt98_grm.0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
@@ -3218,7 +3244,7 @@ ROM_START( gt99 )	/* Version 1.00 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt99_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3286,7 +3312,7 @@ ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt99_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3320,7 +3346,7 @@ ROM_START( gtroyal )	/* Version 4.02T EDM (Tournament Edition, PCB P/N 1082 Rev 
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt99_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3354,7 +3380,7 @@ ROM_START( gt2k ) /* Version 1.00 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt2k_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3422,7 +3448,7 @@ ROM_START( gt2kt500 ) /* Version 5.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt2k_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3456,7 +3482,7 @@ ROM_START( gtsuprem ) /* Version 5.10T ELC S (Tournament Edition, PCB P/N 1082 R
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gt2k_grm.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3491,7 +3517,7 @@ ROM_START( gtclassc ) /* Version 1.00 */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gtc_grom.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3525,7 +3551,7 @@ ROM_START( gtclassp ) /* Version 1.00 Infinite Loop Protection */
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
-	ROM_CONTINUE(           0x08000, 0x08000 )
+	ROM_CONTINUE(          0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )
 	ROM_LOAD32_BYTE( "gtc_grom.0_0", 0x000000, 0x80000, CRC(c22b50f9) SHA1(9e8acfce6cc30adc150b602d026c00fa1fb7747f) )
@@ -3857,8 +3883,8 @@ GAME( 1994, drivedge, 0,        drivedge, drivedge, drivedge, ROT0, "Strata/Incr
 GAME( 1995, wcbowl,   0,        sftm,     wcbowln,  wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.66)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbwl165, wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.65)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbwl161, wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",        "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
-GAME( 1997, wcbwl140, wcbowldx, wcbowlt,  wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",        "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 GAME( 1995, wcbwl15,  wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbwl13,  wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbwl12,  wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",        "World Class Bowling (v1.2)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, sftm,     0,        sftm,     sftm,     sftm,     ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.12)" , 0) /* PIC 16C54 labeled as ITSF-1 */
 GAME( 1995, sftm111,  sftm,     sftm,     sftm,     sftm110,  ROT0, "Capcom/Incredible Technologies", "Street Fighter: The Movie (v1.11)" , 0) /* PIC 16C54 labeled as ITSF-1 */
@@ -3867,6 +3893,7 @@ GAME( 1995, sftmj,    sftm,     sftm,     sftm,     sftm,     ROT0, "Capcom/Incr
 GAME( 1997, shufshot, 0,        sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.40)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, sshot139, shufshot, sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.39)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, sshot137, shufshot, sftm,     shufbowl, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
+GAME( 1997, wcbwl140, wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",        "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible Technologies",        "World Class Bowling Deluxe (v2.00)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 
 /*
@@ -3919,31 +3946,31 @@ GAME( 1995, gt3dv17,  gt3d,     sftm,    gt3d,  gt3d,     ROT0, "Incredible Tech
 GAME( 1995, gt3dv16,  gt3d,     sftm,    gt3d,  gt3d,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.6)" , 0) /* PIC 16C54 labeled as ITGF-1 */
 GAME( 1995, gt3dv15,  gt3d,     sftm,    gt3d,  gt3d,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.5)" , 0) /* PIC 16C54 labeled as ITGF-1 */
 GAME( 1995, gt3dv14,  gt3d,     sftm,    gt3d,  gt3d,     ROT0, "Incredible Technologies", "Golden Tee 3D Golf (v1.4)" , 0) /* PIC 16C54 labeled as ITGF-1 */
-GAME( 1995, gt3dt231, gt3d,     gt3dt,   gt3d,  aamat,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.31)" , 0) /* PIC 16C54 labeled as ITGF-2 */
-GAME( 1995, gt3dt211, gt3d,     gt3dt,   gt3d,  aamat,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.11)" , 0) /* PIC 16C54 labeled as ITGF-2 */
+GAME( 1995, gt3dt231, gt3d,     tourny,  gt3d,  aamat,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.31)" , 0) /* PIC 16C54 labeled as ITGF-2 */
+GAME( 1995, gt3dt211, gt3d,     tourny,  gt3d,  aamat,    ROT0, "Incredible Technologies", "Golden Tee 3D Golf Tournament (v2.11)" , 0) /* PIC 16C54 labeled as ITGF-2 */
 
 GAME( 1997, gt97,     0,        sftm,    gt97,  aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.30)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 GAME( 1997, gt97v122, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.22)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 GAME( 1997, gt97v121, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.21)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 GAME( 1997, gt97s121, gt97,     sftm,    gt97s, s_ver,    ROT0, "Incredible Technologies", "Golden Tee '97 (v1.21S)" , 0) /* PIC 16C54 labeled as ITGFM-3 */
 GAME( 1997, gt97v120, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.20)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
-GAME( 1997, gt97t240, gt97,     gt3dt,   gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.40)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
-GAME( 1997, gt97t243, gt97,     gt3dt,   gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.43)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
+GAME( 1997, gt97t240, gt97,     tourny,  gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.40)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
+GAME( 1997, gt97t243, gt97,     tourny,  gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.43)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 
 GAME( 1998, gt98,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.10)" , 0) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98v100, gt98,     sftm,    gt98,  aama,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00)" , 0) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98s100, gt98,     sftm,    gt98s, s_ver,    ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00S)" , 0) /* PIC 16C54 labeled as ITGF98-M */
-GAME( 1998, gt98t303, gt98,     gt3dt,   gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.03)" , 0) /* PIC 16C54 labeled as ITGF98 */
+GAME( 1998, gt98t303, gt98,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.03)" , 0) /* PIC 16C54 labeled as ITGF98 */
 
 GAME( 1999, gt99,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee '99 (v1.00)" , 0) /* PIC 16C54 labeled as ITGF99 */
 GAME( 1999, gt99s100, gt99,     sftm,    s_ver, s_ver,    ROT0, "Incredible Technologies", "Golden Tee '99 (v1.00S)" , 0) /* PIC 16C54 labeled as ITGF99-M */
-GAME( 1999, gt99t400, gt99,     gt3dt,   gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee '99 Tournament (v4.00)" , 0) /* PIC 16C54 labeled as ITGF99 */
-GAME( 1999, gtroyal,  gt99,     gt3dt,   gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Royal Edition Tournament (v4.02)" , 0) /* PIC 16C54 labeled as ITGF99I */
+GAME( 1999, gt99t400, gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee '99 Tournament (v4.00)" , 0) /* PIC 16C54 labeled as ITGF99 */
+GAME( 1999, gtroyal,  gt99,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Royal Edition Tournament (v4.02)" , 0) /* PIC 16C54 labeled as ITGF99I */
 
 GAME( 2000, gt2k,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
 GAME( 2000, gt2ks100, gt2k,     sftm,    s_ver, s_ver,    ROT0, "Incredible Technologies", "Golden Tee 2K (v1.00S)" , 0) /* PIC 16C54 labeled as ITGF2K-M */
-GAME( 2000, gt2kt500, gt2k,     gt3dt,   gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee 2K Tournament (v5.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
-GAME( 2002, gtsuprem, gt2k,     gt3dt,   gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Supreme Edition Tournament (v5.10)" , 0) /* PIC 16C54 labeled as ITGF2K-I */
+GAME( 2000, gt2kt500, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee 2K Tournament (v5.00)" , 0) /* PIC 16C54 labeled as ITGF2K */
+GAME( 2002, gtsuprem, gt2k,     tourny,  gt98s, aamat,    ROT0, "Incredible Technologies", "Golden Tee Supreme Edition Tournament (v5.10)" , 0) /* PIC 16C54 labeled as ITGF2K-I */
 
 GAME( 2001, gtclassc, 0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00)" , 0) /* PIC 16C54 labeled as ITGFCL */
 GAME( 2001, gtclassp, gtclassc, sftm,    aama,  gtclassp, ROT0, "Incredible Technologies", "Golden Tee Classic (v1.00) Alt" , 0) /* PIC 16C54 labeled as ITGFCL */
