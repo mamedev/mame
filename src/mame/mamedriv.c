@@ -3064,6 +3064,7 @@ V-V                           TP-027
 	DRIVER( wcbwl161 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl140 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl15 )	/* (c) 1995 Incredible Technologies */
+	DRIVER( wcbwl13 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbwl12 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( sftm )		/* (c) 1995 Capcom/Incredible Technologies */
 	DRIVER( sftm110 )	/* (c) 1995 Capcom/Incredible Technologies */
