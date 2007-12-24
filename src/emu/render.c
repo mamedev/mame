@@ -385,9 +385,6 @@ INLINE render_primitive *alloc_render_primitive(int type)
 
 INLINE void append_render_primitive(render_primitive_list *list, render_primitive *prim)
 {
-	assert(prim->bounds.x0 <= prim->bounds.x1);
-	assert(prim->bounds.y0 <= prim->bounds.y1);
-
 	*list->nextptr = prim;
 	list->nextptr = &prim->next;
 }
