@@ -5,15 +5,19 @@ TODO:
 - dkongjr discrete interface
 - write a shootgal palette_init
 - Pestplce colors and origin
-- Shooting Gallery: Shootgal.txt mentions speech pcb, mikesarcade.com dk conversion
-  Clarify
+- Shooting Gallery: Shootgal.txt mentions speech pcb, 
+  mikesarcade.com dk conversion - Clarify
 - 8ballact: read 1507 no mapped
-- drakton - add dkongjr conversion
 - dkong3 dma (Z80 dma)
-- implement 74LS259 (8bit addressable latches), 74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
+- implement 74LS259 (8bit addressable latches), 
+  74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
+- for documentation: hook up speech interface still present on radarscp (TRS02) 
+  and early dkong (TKG02/TKG03) pcbs.
+  Minor priority since no records known where this has been used.
 
 Done:
 - when i am retired: implement 8257 DMA controller
+- drakton - add dkongjr conversion
 - radarscp_grid_color_w() is wrong, it probably isn't supposed to change
   the grid color. There are reports of the grid being constantly blue in
   the real game, the flyer confirms this.
@@ -1700,7 +1704,7 @@ ROM_START( radarscp )
 	ROM_REGION( 0x1800, REGION_CPU2, 0 )	/* sound */
 	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
 	ROM_RELOAD(               0x0800, 0x0800 )
-	ROM_FILL(                 0x1000, 0x0800, 0xFF )
+	ROM_FILL(                 0x1000, 0x0800, 0x00 )
 	/* socket 3J is empty */
 
 	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
