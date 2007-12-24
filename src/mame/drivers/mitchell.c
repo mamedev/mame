@@ -1361,7 +1361,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
+	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1385,11 +1385,11 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 990000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 1000000) /* (verified on pcb) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD_TAG("ym2413",YM2413, 4000000)
+	MDRV_SOUND_ADD_TAG("ym2413",YM2413, 4000000) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

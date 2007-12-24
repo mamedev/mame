@@ -1947,11 +1947,11 @@ static const struct AY8910interface ay8910_interface =
 
 
 static MACHINE_DRIVER_START( halleys )
-	MDRV_CPU_ADD_TAG("main", M6809, 19968000/4) // 5Mhz?(19.968MHz XTAL)
+	MDRV_CPU_ADD_TAG("main", M6809, 1664000) /* 19968000/12 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT(halleys_interrupt, 4)
 
-	MDRV_CPU_ADD(Z80, 6000000/2) // 3MHz(6MHz XTAL)
+	MDRV_CPU_ADD(Z80, 6000000/2) /* (verified on pcb) */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
@@ -1975,7 +1975,7 @@ static MACHINE_DRIVER_START( halleys )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 6000000/4)
+	MDRV_SOUND_ADD(AY8910, 6000000/4) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD(AY8910, 6000000/4)
