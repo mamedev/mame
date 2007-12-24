@@ -941,7 +941,7 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 		dcs.rev = 4;
 	}
 	dcs.channels = 2;
-	
+
 	/* always boot from the base of REGION_SOUND1 */
 	dcs.bootrom = (UINT16 *)memory_region(REGION_SOUND1);
 	dcs.bootrom_words = memory_region_length(REGION_SOUND1) / 2;
@@ -2097,17 +2097,17 @@ static int preprocess_stage_1(UINT16 data)
 			/* look for command 0x001a to transfer chunks of data */
 			if (data == 0x001a)
 			{
-				if (LOG_DCS_TRANSFERS) 
+				if (LOG_DCS_TRANSFERS)
 					logerror("%08X:DCS Transfer command %04X\n", activecpu_get_pc(), data);
 				transfer.state++;
-				if (transfer.hle_enabled) 
+				if (transfer.hle_enabled)
 					return 1;
 			}
 
 			/* look for command 0x002a to start booting the uploaded program */
 			else if (data == 0x002a)
 			{
-				if (LOG_DCS_TRANSFERS) 
+				if (LOG_DCS_TRANSFERS)
 					logerror("%08X:DCS State change %04X\n", activecpu_get_pc(), data);
 				transfer.dcs_state = 1;
 			}
@@ -2115,7 +2115,7 @@ static int preprocess_stage_1(UINT16 data)
 			/* anything else is ignored */
 			else
 			{
-				if (LOG_DCS_TRANSFERS) 
+				if (LOG_DCS_TRANSFERS)
 					logerror("Command: %04X\n", data);
 			}
 			break;
@@ -2124,9 +2124,9 @@ static int preprocess_stage_1(UINT16 data)
 			/* first word is the start address */
 			transfer.start = data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS) 
+			if (LOG_DCS_TRANSFERS)
 				logerror("Start address = %04X\n", transfer.start);
-			if (transfer.hle_enabled) 
+			if (transfer.hle_enabled)
 				return 1;
 			break;
 
@@ -2134,9 +2134,9 @@ static int preprocess_stage_1(UINT16 data)
 			/* second word is the stop address */
 			transfer.stop = data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS) 
+			if (LOG_DCS_TRANSFERS)
 				logerror("Stop address = %04X\n", transfer.stop);
-			if (transfer.hle_enabled) 
+			if (transfer.hle_enabled)
 				return 1;
 			break;
 
@@ -2243,7 +2243,7 @@ static int preprocess_stage_2(UINT16 data)
 			/* anything else is ignored */
 			else
 			{
-				if (LOG_DCS_TRANSFERS) 
+				if (LOG_DCS_TRANSFERS)
 					logerror("%08X:Command: %04X\n", activecpu_get_pc(), data);
 			}
 			break;
@@ -2278,7 +2278,7 @@ static int preprocess_stage_2(UINT16 data)
 			/* fourth word is the lower bits of the stop address */
 			transfer.stop |= data;
 			transfer.state++;
-			if (LOG_DCS_TRANSFERS) 
+			if (LOG_DCS_TRANSFERS)
 				logerror("Stop address = %08X\n", transfer.stop);
 
 			/* at this point, we can compute how many words to expect for the transfer */
@@ -2300,7 +2300,7 @@ static int preprocess_stage_2(UINT16 data)
 			/* if we're out, stop the transfer */
 			if (--transfer.writes_left == 0)
 			{
-				if (LOG_DCS_TRANSFERS) 
+				if (LOG_DCS_TRANSFERS)
 					logerror("Transfer done, sum = %04X\n", transfer.sum);
 				transfer.state = 0;
 			}

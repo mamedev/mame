@@ -846,12 +846,12 @@ VIDEO_UPDATE( bjtwin )
 VIDEO_EOF( nmk )
 {
 	/* sprites are DMA'd from Main RAM to a private buffer automatically
-	   (or at least this is how I interpret the datasheet) */
+       (or at least this is how I interpret the datasheet) */
 
 	/* -- I actually see little evidence to support this, sprite lag
-	      in some games should be checked on real boards */
+          in some games should be checked on real boards */
 
-//	memcpy(spriteram_old2,spriteram_old,0x1000);
+//  memcpy(spriteram_old2,spriteram_old,0x1000);
 	memcpy(spriteram_old2,nmk16_mainram+0x8000/2,0x1000);
 }
 

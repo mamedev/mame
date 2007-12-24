@@ -266,7 +266,7 @@ void osd_wait_for_debugger(void)
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
 	smart_show_all(TRUE);
-	
+
 	// run input polling to ensure that our status is in sync
 	wininput_poll();
 

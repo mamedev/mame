@@ -7,27 +7,27 @@
     Games supported:
         * TX-1 (1983) [2 sets]
         * Buggy Boy (1985)
-		* Buggy Boy Junior (1986)
+        * Buggy Boy Junior (1986)
 
-	Notes:
-		* 'buggyboy' and 'tx1' are preliminary
-		* 'buggyboy' set is using ROMs from 'buggybjr' for testing purposes
-		until the original set can be dumped.
-		
+    Notes:
+        * 'buggyboy' and 'tx1' are preliminary
+        * 'buggyboy' set is using ROMs from 'buggybjr' for testing purposes
+        until the original set can be dumped.
+
 ****************************************************************************
 
-	Buggy Boy Error Codes          TX-1 Error Codes
-	=====================          ================
+    Buggy Boy Error Codes          TX-1 Error Codes
+    =====================          ================
 
-	1  Main CPU RAM                1  Main microprocessor RAM
-	2  Video (character) RAM       2  Video RAM
-	3  Road/common RAM             3  Common RAM
-	4  Sound RAM                   4  Sound RAM
-	5  Main CPU ROM                5  Main microprocessor ROM
-	6  Sound ROM                   6  Sound ROM
-	8  Auxillary ROM               10 Interface ROM (time-out error)
-	12 Arithmetic unit             11 Common RAM (access for arithmetic CPU)
-	22 Main 8086-Z80 timeout       12 Common RAM (access for arithmetic CPU)
+    1  Main CPU RAM                1  Main microprocessor RAM
+    2  Video (character) RAM       2  Video RAM
+    3  Road/common RAM             3  Common RAM
+    4  Sound RAM                   4  Sound RAM
+    5  Main CPU ROM                5  Main microprocessor ROM
+    6  Sound ROM                   6  Sound ROM
+    8  Auxillary ROM               10 Interface ROM (time-out error)
+    12 Arithmetic unit             11 Common RAM (access for arithmetic CPU)
+    22 Main 8086-Z80 timeout       12 Common RAM (access for arithmetic CPU)
                                    13 Arithmetic RAM
                                    14 Common RAM (access for arithmetic CPU)
                                    15 Object RAM
@@ -59,7 +59,7 @@ static UINT32 ts;
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cpunum_set_input_line(2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);	
+	cpunum_set_input_line(2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
@@ -352,19 +352,19 @@ static READ16_HANDLER( dipswitches_r )
 	return (readinputport(0) & 0xfffe) | ts;
 }
 
-/*	
-	(TODO) TS: Connected in place of dipswitch A bit 0
-	Accessed on startup as some sort of acknowledgement
+/*
+    (TODO) TS: Connected in place of dipswitch A bit 0
+    Accessed on startup as some sort of acknowledgement
 */
 static WRITE8_HANDLER( ts_w )
 {
-//	TS = 1;
+//  TS = 1;
 	z80_ram[offset] = data;
 }
 
 static READ8_HANDLER( ts_r )
 {
-//	TS = 1;
+//  TS = 1;
 	return z80_ram[offset];
 }
 
@@ -524,7 +524,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x6803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0x7000, 0x7003) AM_RAM
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(z80_intreq_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)	
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
 
 /* Buggy Boy Jr Sound PCB TC043 */
@@ -532,7 +532,7 @@ static ADDRESS_MAP_START( buggybjr_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&z80_ram)
 	AM_RANGE(0x5000, 0x5003) AM_READWRITE(pit8253_r, pit8253_w)
-	AM_RANGE(0x6000, 0x6001) AM_READ(bbjr_analog_r)	
+	AM_RANGE(0x6000, 0x6001) AM_READ(bbjr_analog_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(z80_intreq_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
@@ -659,7 +659,7 @@ static struct CustomSound_interface bb_custom_interface =
 static MACHINE_DRIVER_START( tx1 )
 	MDRV_CPU_ADD(I8086, 5000000)
 	MDRV_CPU_PROGRAM_MAP(tx1_main, 0)
-//	MDRV_WATCHDOG_TIME_INIT(5)
+//  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD(I8086,5000000)
 	MDRV_CPU_PROGRAM_MAP(tx1_math, 0)
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_VIDEO_UPDATE(tx1)
 
 	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//	MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
 
 	MDRV_SOUND_ADD(AY8910, TX1_PIXEL_CLOCK / 8)
 	MDRV_SOUND_CONFIG(tx1_ay8910_interface)
@@ -716,7 +716,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buggyboy )
 	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
-//	MDRV_WATCHDOG_TIME_INIT(5)
+//  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
@@ -753,7 +753,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_VIDEO_UPDATE(buggyboy)
 
 	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//	MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
 
 	MDRV_SOUND_ADD(YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_1)
@@ -773,7 +773,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buggybjr )
 	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main, 0)
-//	MDRV_WATCHDOG_TIME_INIT(5)
+//  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD(BUGGYBOY_CPU_TYPE, 5000000)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( buggybjr )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	
+
 #if 0
 	MDRV_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 #else
@@ -807,7 +807,7 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_VIDEO_EOF(buggyboy)
 
 	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//	MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
 
 	MDRV_SOUND_ADD(YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_1)
@@ -854,7 +854,7 @@ ROM_START( tx1 )
 	/* 8x8 characters */
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "tx1_21a.ic204", 0x0000, 0x4000, CRC(cd3441ad) SHA1(8e6597b3177b8aaa34ed3373d85fc4b6231e1333) )
-	ROM_LOAD( "tx1_20a.ic174", 0x4000, 0x4000, CRC(dbe595fc) SHA1(1ed2f775f0a1b46a2ffbc056eb4ef732ed546d3c) )	
+	ROM_LOAD( "tx1_20a.ic174", 0x4000, 0x4000, CRC(dbe595fc) SHA1(1ed2f775f0a1b46a2ffbc056eb4ef732ed546d3c) )
 
 	/* 8x8 object chunks */
 	ROM_REGION( 0x40000, REGION_GFX2, 0 )
@@ -905,7 +905,7 @@ ROM_START( tx1 )
 	ROM_LOAD( "xb05a.ic8",  0x0600, 0x100, CRC(3b387d01) SHA1(1229548e3052ad34eeee9598743091d19f6b8f88) )
 	ROM_LOAD( "xb06a.ic9",  0x0700, 0x100, CRC(f6f4d7d9) SHA1(866024b76b26d6942bd4e1d2494686299414f6be) )
 	ROM_LOAD( "xb07a.ic10", 0x0800, 0x100, CRC(824e7532) SHA1(917ce74d2bae6af90f2c4e41d12a69f884320915) )
-	
+
 	/* Character colour tables (L, C, R) */
 	ROM_LOAD( "xb08.ic85",  0x0900, 0x100, CRC(5aeef5cc) SHA1(e123bf01d556178b0cf9d495bcce445f3f8421cd) )
 	ROM_LOAD( "xb08.ic116", 0x0a00, 0x100, CRC(5aeef5cc) SHA1(e123bf01d556178b0cf9d495bcce445f3f8421cd) )
@@ -928,7 +928,7 @@ ROM_START( tx1 )
 
 	/* Arithmetic unit instructions */
 	ROM_LOAD16_BYTE( "xb02b.ic223", 0x1800, 0x200, CRC(22c77af6) SHA1(1be8585b95316b4fc5712cdaef699e676320cd4d) )
-	ROM_LOAD16_BYTE( "xb01b.ic213", 0x1801, 0x200, CRC(f6b8b70b) SHA1(b79374acf11d71db1e4ad3c494ac5f500a52677b) )	
+	ROM_LOAD16_BYTE( "xb01b.ic213", 0x1801, 0x200, CRC(f6b8b70b) SHA1(b79374acf11d71db1e4ad3c494ac5f500a52677b) )
 ROM_END
 
 ROM_START( tx1a )
@@ -955,7 +955,7 @@ ROM_START( tx1a )
 	/* 8x8 characters */
 	ROM_REGION( 0x20000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "8411-136027-156.204", 0x0000, 0x4000, CRC(60f3c616) SHA1(59c4361891e4274e27e6279c919e8fd6803af7cf) )
-	ROM_LOAD( "8411-136027-155.174", 0x4000, 0x4000, CRC(e59a6b72) SHA1(c10efa77ab421ac60b97227a8d547f50f8415670) )	
+	ROM_LOAD( "8411-136027-155.174", 0x4000, 0x4000, CRC(e59a6b72) SHA1(c10efa77ab421ac60b97227a8d547f50f8415670) )
 
 	/* 8x8 object chunks */
 	ROM_REGION( 0x40000, REGION_GFX2, 0 )
@@ -1001,7 +1001,7 @@ ROM_START( tx1a )
 	ROM_LOAD( "xb05a.ic8",  0x0600, 0x100, CRC(3b387d01) SHA1(1229548e3052ad34eeee9598743091d19f6b8f88) )
 	ROM_LOAD( "xb06a.ic9",  0x0700, 0x100, CRC(f6f4d7d9) SHA1(866024b76b26d6942bd4e1d2494686299414f6be) )
 	ROM_LOAD( "xb07a.ic10", 0x0800, 0x100, CRC(824e7532) SHA1(917ce74d2bae6af90f2c4e41d12a69f884320915) )
-	
+
 	/* Character colour tables (L, C, R) */
 	ROM_LOAD( "xb08.ic85",  0x0900, 0x100, CRC(5aeef5cc) SHA1(e123bf01d556178b0cf9d495bcce445f3f8421cd) )
 	ROM_LOAD( "xb08.ic116", 0x0a00, 0x100, CRC(5aeef5cc) SHA1(e123bf01d556178b0cf9d495bcce445f3f8421cd) )
@@ -1076,7 +1076,7 @@ ROM_START( buggybjr )
 	ROM_LOAD16_BYTE( "bb2.162",  0x8001, 0x0200, CRC(71d47de1) SHA1(2da9aeb3f2ebb1114631c8042a37c4f4c18e741b) )
 
 	/* Object chunk sequence LUT */
-	ROM_REGION( 0x100000, REGION_USER2, 0 )	
+	ROM_REGION( 0x100000, REGION_USER2, 0 )
 	ROM_LOAD( "bug16s.139", 0x0000, 0x8000, CRC(1903a9ad) SHA1(526c404c15e3f04b4afb27dee66e9deb0a6b9704) )
 	ROM_LOAD( "bug17s.140", 0x8000, 0x8000, CRC(82cabdd4) SHA1(94324fcf83c373621fc40553473ae3cb552ab704) )
 

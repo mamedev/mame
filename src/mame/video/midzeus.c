@@ -769,7 +769,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 
 		/* 0x1C: write matrix and translation vector */
 		case 0x1c:
-		
+
 			/* single matrix form */
 			if ((data[0] & 0xffff) != 0x7fff)
 			{
@@ -798,13 +798,13 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				zeus_point[1] = data[6];
 				zeus_point[2] = data[7];
 			}
-			
+
 			/* double matrix form */
 			else
 			{
 				INT16 matrix1[3][3];
 				INT16 matrix2[3][3];
-				
+
 				/* requires 13 words total */
 				if (numwords < 13)
 					return FALSE;
@@ -827,7 +827,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				matrix1[0][0] = data[4];		matrix1[0][1] = data[4] >> 16;	matrix1[0][2] = data[5] >> 16;
 				matrix1[1][0] = data[8];		matrix1[1][1] = data[8] >> 16;	matrix1[1][2] = data[6] >> 16;
 				matrix1[2][0] = data[9];		matrix1[2][1] = data[9] >> 16;	matrix1[2][2] = data[7] >> 16;
-				
+
 				/* extract the second matrix from the raw data */
 				matrix2[0][0] = data[1];		matrix2[0][1] = data[2];		matrix2[0][2] = data[3];
 				matrix2[1][0] = data[1] >> 16;	matrix2[1][1] = data[2] >> 16;	matrix2[1][2] = data[3] >> 16;
@@ -861,7 +861,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			{
 				log_fifo_command(data, numwords, "");
 				logerror(" -- additional xyz = %d,%d,%d\n", (INT16)data[0], (INT16)(data[1] >> 16), (INT16)data[1]);
-				
+
 				/* guessing this might be a light source? */
 				zeus_light[0] = (INT16)data[0];
 				zeus_light[1] = (INT16)(data[1] >> 16);
@@ -1045,10 +1045,10 @@ if (
 	1)
 	printf("zeus_draw_quad: databuffer[1] = %08X\n", databuffer[1]);
 
-	
+
 	/* do a simple backface cull; not sure if the hardware does it, but I see no other
-	   reason for a polygon normal here */
-	
+       reason for a polygon normal here */
+
 	/* extract the polygon normal */
 	normal[0] = (INT8)(databuffer[0] >> 0);
 	normal[1] = (INT8)(databuffer[0] >> 8);
@@ -1062,8 +1062,8 @@ if (
 	{
 		if (logit)
 			logerror("quad (culled %08X)\n", rotnormal[2]);
-//		if (input_code_pressed(KEYCODE_COMMA))
-//			return;
+//      if (input_code_pressed(KEYCODE_COMMA))
+//          return;
 	}
 
 	if (logit)
@@ -1110,7 +1110,7 @@ if (
 		UINT8 v = iuvz >> 24;
 		INT32 dotnormal;
 		INT64 x, y, z;
-		
+
 		x = (INT64)(xo * zeus_matrix[0][0]) + (INT64)(yo * zeus_matrix[0][1]) + (INT64)(zo * zeus_matrix[0][2]) + zeus_point[0];
 		y = (INT64)(xo * zeus_matrix[1][0]) + (INT64)(yo * zeus_matrix[1][1]) + (INT64)(zo * zeus_matrix[1][2]) + zeus_point[1];
 		z = (INT64)(xo * zeus_matrix[2][0]) + (INT64)(yo * zeus_matrix[2][1]) + (INT64)(zo * zeus_matrix[2][2]) + zeus_point[2];
@@ -1151,7 +1151,7 @@ if (
 		clipvert[i].y *= ooz;
 		clipvert[i].x += 200.5f;
 		clipvert[i].y += 128.5f;
-		
+
 		maxx = MAX(maxx, clipvert[i].x);
 		maxy = MAX(maxy, clipvert[i].y);
 		if (logit)
@@ -1342,8 +1342,8 @@ static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *ext
 		if (depth > 0x7fff) depth = 0x7fff;
 		if (depth >= 0)
 		{
-//			UINT32 finalcolor = (((color & 0x7c00) * curv) & 0x7c000000) | (((color & 0x03e0) * curv) & 0x03e00000) | (((color & 0x001f) * curv) & 0x001f0000);
-//			waveram_plot_check_depth(scanline, x, finalcolor >> 16, depth);
+//          UINT32 finalcolor = (((color & 0x7c00) * curv) & 0x7c000000) | (((color & 0x03e0) * curv) & 0x03e00000) | (((color & 0x001f) * curv) & 0x001f0000);
+//          waveram_plot_check_depth(scanline, x, finalcolor >> 16, depth);
 			waveram_plot_check_depth(scanline, x, color, depth);
 		}
 		curz += dzdx;

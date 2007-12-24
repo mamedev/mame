@@ -409,7 +409,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 							// Sign + magnitude format
 							if ((v->mode & 0x01) && (lastdt & 0x80))
 								lastdt = -(lastdt & 0x7f);
-							
+
 							// Sign flip
 							if (v->mode & 0x40)
 								lastdt = -lastdt;

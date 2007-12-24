@@ -328,13 +328,13 @@ READ32_HANDLER( zeus2_r )
 
 	if (logit)
 		logerror("%06X:zeus2_r(%02X)\n", activecpu_get_pc(), offset);
-	
+
 	switch (offset)
 	{
 		case 0x00:
 			result = 0x20;
 			break;
-		
+
 		case 0x01:
 			/* bit  $000C0070 are tested in a loop until 0 */
 			/* bits $00080000 is tested in a loop until 0 */
@@ -343,7 +343,7 @@ READ32_HANDLER( zeus2_r )
 			if (video_screen_get_vblank(0))
 				result |= 0x04;
 			break;
-		
+
 		case 0x07:
 			/* this is needed to pass the self-test in thegrid */
 			result = 0x10451998;
@@ -354,7 +354,7 @@ READ32_HANDLER( zeus2_r )
 			result = video_screen_get_vpos(0) << 16;
 			break;
 	}
-	
+
 	return result;
 }
 
@@ -386,10 +386,10 @@ WRITE32_HANDLER( zeus2_w )
 static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
 {
 	UINT32 oldval = zeusbase[offset];
-	
+
 	/* writes to register $CC need to force a partial update */
-//	if ((offset & ~1) == 0xcc)
-//		video_screen_update_partial(0, video_screen_get_vpos(0));
+//  if ((offset & ~1) == 0xcc)
+//      video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* always write to low word? */
 	zeusbase[offset] = data;
@@ -420,15 +420,15 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 			if (zeus_fifo_process(zeus_fifo, zeus_fifo_words))
 				zeus_fifo_words = 0;
 			break;
-		
+
 		case 0x20:
 			/* toggles between two values based on the page:
-			
-				Page #		zeusbase[0x20]		zeusbase[0x38]
-				------		--------------		--------------
-				   0		  $04000190			  $00000000
-				   1		  $04000000			  $01900000
-			*/
+
+                Page #      zeusbase[0x20]      zeusbase[0x38]
+                ------      --------------      --------------
+                   0          $04000190           $00000000
+                   1          $04000000           $01900000
+            */
 			break;
 
 		case 0x33:
@@ -455,7 +455,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				}
 			}
 			break;
-		
+
 		case 0x38:
 			{
 				UINT32 temp = zeusbase[0x38];
@@ -464,7 +464,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				zeusbase[0x38] = temp;
 			}
 			break;
-		
+
 		case 0x41:
 			/* this is the address, except in read mode, where it latches values */
 			if (zeusbase[0x4e] & 0x10)
@@ -482,19 +482,19 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				}
 			}
 			break;
-		
+
 		case 0x48:
 		case 0x49:
 			/* if we're in write mode, process it */
 			if (zeusbase[0x40] == 0x00890000)
 			{
 				/*
-					zeusbase[0x4e]:
-						bit 0-1: which register triggers write through
-						bit 3:   enable write through via these registers
-						bit 4:   seems to be set during reads, when 0x41 is used for latching
-						bit 6:   enable autoincrement on write through
-				*/
+                    zeusbase[0x4e]:
+                        bit 0-1: which register triggers write through
+                        bit 3:   enable write through via these registers
+                        bit 4:   seems to be set during reads, when 0x41 is used for latching
+                        bit 6:   enable autoincrement on write through
+                */
 				if ((zeusbase[0x4e] & 0x08) && (offset & 3) == (zeusbase[0x4e] & 3))
 				{
 					void *dest = waveram_ptr_from_expanded_addr(0, zeusbase[0x41]);
@@ -502,7 +502,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 					WAVERAM_WRITE32(dest, 1, zeusbase[0x49]);
 			max_waveram[0][0] = MAX(max_waveram[0][0], zeusbase[0x41] & 0xffff);
 			max_waveram[0][1] = MAX(max_waveram[0][1], zeusbase[0x41] >> 16);
-					
+
 					if (zeusbase[0x4e] & 0x40)
 					{
 						zeusbase[0x41]++;
@@ -511,14 +511,14 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 					}
 				}
 			}
-			
+
 			/* make sure we log anything else */
 			else if (logit)
 				logerror("\t[40]=%08X [4E]=%08X\n", zeusbase[0x40], zeusbase[0x4e]);
 			break;
 
 		case 0x51:
-			
+
 			/* in this mode, crusnexo expects the reads to immediately latch */
 			if (zeusbase[0x50] == 0x00a20000)
 				oldval = zeusbase[0x51];
@@ -540,7 +540,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				}
 			}
 			break;
-		
+
 		case 0x57:
 			/* thegrid uses this to write either left or right halves of pixels */
 			if (zeusbase[0x50] == 0x00e90000)
@@ -553,12 +553,12 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 			max_waveram[1][0] = MAX(max_waveram[1][0], zeusbase[0x51] & 0xffff);
 			max_waveram[1][1] = MAX(max_waveram[1][1], zeusbase[0x51] >> 16);
 			}
-			
+
 			/* make sure we log anything else */
 			else if (logit)
 				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);
 			break;
-		
+
 		case 0x58:
 		case 0x59:
 		case 0x5a:
@@ -566,13 +566,13 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 			if (zeusbase[0x50] == 0x00890000)
 			{
 				/*
-					zeusbase[0x5e]:
-						bit 0-1: which register triggers write through
-						bit 3:   enable write through via these registers
-						bit 4:   seems to be set during reads, when 0x51 is used for latching
-						bit 5:   unknown, currently used to specify ordering, but this is suspect
-						bit 6:   enable autoincrement on write through
-				*/
+                    zeusbase[0x5e]:
+                        bit 0-1: which register triggers write through
+                        bit 3:   enable write through via these registers
+                        bit 4:   seems to be set during reads, when 0x51 is used for latching
+                        bit 5:   unknown, currently used to specify ordering, but this is suspect
+                        bit 6:   enable autoincrement on write through
+                */
 				if ((zeusbase[0x5e] & 0x08) && (offset & 3) == (zeusbase[0x5e] & 3))
 				{
 					void *dest = waveram_ptr_from_expanded_addr(1, zeusbase[0x51]);
@@ -586,7 +586,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 					}
 			max_waveram[1][0] = MAX(max_waveram[1][0], zeusbase[0x51] & 0xffff);
 			max_waveram[1][1] = MAX(max_waveram[1][1], zeusbase[0x51] >> 16);
-					
+
 					if (zeusbase[0x5e] & 0x40)
 					{
 						zeusbase[0x51]++;
@@ -595,7 +595,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 					}
 				}
 			}
-			
+
 			/* make sure we log anything else */
 			else if (logit)
 				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);

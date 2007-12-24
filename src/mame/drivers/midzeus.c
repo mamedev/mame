@@ -65,7 +65,7 @@ static MACHINE_RESET( midzeus )
 
 	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
-	
+
 	cmos_protected = TRUE;
 }
 
@@ -100,7 +100,7 @@ static READ32_HANDLER( cmos_r )
 static WRITE32_HANDLER( zpram_w )
 {
 	/* ZPRAM seems to use the same protection control as CMOS */
-//	if (!cmos_protected)
+//  if (!cmos_protected)
 		COMBINE_DATA(zpram + offset);
 	cmos_protected = TRUE;
 }
@@ -279,12 +279,12 @@ static READ32_HANDLER( unknown_8d0000_r )
 }
 static WRITE32_HANDLER( unknown_8d0000_w )
 {
-//	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
+//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
 	COMBINE_DATA(&unknown_8d0000[offset]);
 }
 static WRITE32_HANDLER( unknown_9d0000_w )
 {
-//	logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x9d0000 + offset, data);
+//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x9d0000 + offset, data);
 	COMBINE_DATA(&unknown_8d0000[offset]);
 }
 
@@ -794,7 +794,7 @@ static MACHINE_DRIVER_START( midzeus )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(32768)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

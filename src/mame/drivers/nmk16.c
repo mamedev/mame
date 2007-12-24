@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( tharrier_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x088000, 0x0883ff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-//	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
+//  AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x090000, 0x093fff) AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_WRITE(MWA16_NOP) /* Unused txvideoram area? */
 	AM_RANGE(0x09d000, 0x09d7ff) AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
@@ -635,7 +635,7 @@ anything to compare,infact
 /*
 static READ16_HANDLER( mcu_shared_r )
 {
-	return nmk16_mcu_shared_ram[offset];
+    return nmk16_mcu_shared_ram[offset];
 }
 */
 
@@ -840,11 +840,11 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 static ADDRESS_MAP_START( tdragon_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
 	AM_RANGE(0x044022, 0x044023) AM_READ(MRA16_NOP)  /* No Idea */
-//	AM_RANGE(0x0b0000, 0x0b7fff) AM_READ(MRA16_RAM)	/* Work RAM */
-//	AM_RANGE(0x0b8000, 0x0b8fff) AM_READ(MRA16_RAM)	/* Sprite RAM */
-//	AM_RANGE(0x0b9000, 0x0bdfff) AM_READ(MRA16_RAM)	/* Work RAM */
-//	AM_RANGE(0x0be000, 0x0befff) AM_READ(MRA16_RAM) /* Work RAM */
-//	AM_RANGE(0x0bf000, 0x0bffff) AM_READ(MRA16_RAM)	/* Work RAM */
+//  AM_RANGE(0x0b0000, 0x0b7fff) AM_READ(MRA16_RAM) /* Work RAM */
+//  AM_RANGE(0x0b8000, 0x0b8fff) AM_READ(MRA16_RAM) /* Sprite RAM */
+//  AM_RANGE(0x0b9000, 0x0bdfff) AM_READ(MRA16_RAM) /* Work RAM */
+//  AM_RANGE(0x0be000, 0x0befff) AM_READ(MRA16_RAM) /* Work RAM */
+//  AM_RANGE(0x0bf000, 0x0bffff) AM_READ(MRA16_RAM) /* Work RAM */
 	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_WRITE( tdragon_mainram_w ) AM_BASE(&nmk16_mainram)
 
 
@@ -860,11 +860,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdragon_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-//	AM_RANGE(0x0b0000, 0x0b7fff) AM_WRITE(MWA16_RAM)	/* Work RAM */
-//	AM_RANGE(0x0b8000, 0x0b8fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Sprite RAM */
-//	AM_RANGE(0x0b9000, 0x0bdfff) AM_WRITE(MWA16_RAM) AM_BASE(&nmk16_mcu_work_ram)	/* Work RAM */
-//	AM_RANGE(0x0be000, 0x0befff) AM_RAM AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)	/* Work RAM */
-//	AM_RANGE(0x0bf000, 0x0bffff) AM_WRITE(MWA16_RAM)	/* Work RAM */
+//  AM_RANGE(0x0b0000, 0x0b7fff) AM_WRITE(MWA16_RAM)    /* Work RAM */
+//  AM_RANGE(0x0b8000, 0x0b8fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Sprite RAM */
+//  AM_RANGE(0x0b9000, 0x0bdfff) AM_WRITE(MWA16_RAM) AM_BASE(&nmk16_mcu_work_ram)   /* Work RAM */
+//  AM_RANGE(0x0be000, 0x0befff) AM_RAM AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)  /* Work RAM */
+//  AM_RANGE(0x0bf000, 0x0bffff) AM_WRITE(MWA16_RAM)    /* Work RAM */
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(nmk_flipscreen_w) /* Maybe */
 	AM_RANGE(0x0c0018, 0x0c0019) AM_WRITE(nmk_tilebank_w) /* Tile Bank ? */
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(NMK004_w)

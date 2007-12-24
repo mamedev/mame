@@ -9,17 +9,17 @@
 #include "tx1.h"
 
 /*
-	6845 cursor output is connected to the main CPU interrupt pin.
-	The CRTC is programmed to provide a rudimentary VBLANK interrupt.
+    6845 cursor output is connected to the main CPU interrupt pin.
+    The CRTC is programmed to provide a rudimentary VBLANK interrupt.
 
-	TODO: Calc TX-1 values...
+    TODO: Calc TX-1 values...
 */
 #define CURSOR_YPOS 239
 #define CURSOR_XPOS 168
 
 
 /*
-	Globals
+    Globals
 */
 static UINT16 *prom;
 
@@ -41,7 +41,7 @@ static struct
 } math;
 
 /*
-	Helper functions
+    Helper functions
 */
 #define INC_PROM_ADDR		( math.promaddr = (math.promaddr + 1) & 0x1ff )
 #define ROR16(val, shift)	( ((UINT16)val >> shift) | ((UINT16)val << (16 - shift)) )
@@ -59,7 +59,7 @@ INLINE UINT8 reverse_nibble(UINT8 nibble)
 
 
 /*
-	TODO: Check interrupt timing from CRT config. Probably different between games.
+    TODO: Check interrupt timing from CRT config. Probably different between games.
 */
 static TIMER_CALLBACK( interrupt_callback )
 {
@@ -68,7 +68,7 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 /*
-	SN74S516 16x16 Multiplier/Divider
+    SN74S516 16x16 Multiplier/Divider
 */
 static struct
 {
@@ -91,11 +91,11 @@ static struct
 } SN74S516;
 
 /*
-	State transition table
+    State transition table
 
-	A little different to the real thing in that
-	there are no states between final input and
-	multiplication/division.
+    A little different to the real thing in that
+    there are no states between final input and
+    multiplication/division.
 */
 static const UINT8 state_table[16][8] =
 {
@@ -167,7 +167,7 @@ static void sn_multiply(void)
 			break;
 		}
 		case 0x662:
-		{			
+		{
 			SN74S516.ZW.ZW32 = (-SN74S516.X * SN74S516.Y) + (SN74S516.ZW.ZW32 & 0xffff0000);
 			break;
 		}
@@ -259,15 +259,15 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 #define CLEAR_SEQUENCE	(SN74S516.code = 0)
 
 	/*
-		Remember to change the Z/W flag.
-	*/
+        Remember to change the Z/W flag.
+    */
 	switch (SN74S516.state)
 	{
 		case 0:
 		{
 			CLEAR_SEQUENCE;
 			UPDATE_SEQUENCE;
-		
+
 			if (ins < 4)
 			{
 				LOAD_Y;
@@ -400,7 +400,7 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			{
 				// CHECK: Incomplete state
 				sn74s516_update(ins);
-			}			
+			}
 			else if (ins == 7)
 			{
 				/* 6667 = Load X, Load Z, Load W, Clear Z */
@@ -477,11 +477,11 @@ static void tx1_update_state(void)
 			go = 1;
 		}
 		/*
-			Example:
-			120 /GO /LHIEN
-			121 /GO        /LLOEN
-			Both 120 and 121 are used.
-		*/
+            Example:
+            120 /GO /LHIEN
+            121 /GO        /LLOEN
+            Both 120 and 121 are used.
+        */
 		else if ( (GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])) )
 		{
 			go = 1;
@@ -511,9 +511,9 @@ static void tx1_update_state(void)
 			{
 				UINT16 data;
 				int dsel = (math.inslatch >> 8) & TX1_DSEL;
-	
-//				int tfad = (math.inslatch & 0x1c00);
-//				int ps = math.ppshift & 0x78;
+
+//              int tfad = (math.inslatch & 0x1c00);
+//              int ps = math.ppshift & 0x78;
 
 
 				if ( (dsel & 1) == 0 )
@@ -530,7 +530,7 @@ static void tx1_update_state(void)
 					UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
 					UINT16 addr = get_tx1_datarom_addr();
 					data = romdata[addr];
-				}			
+				}
 				else if ( dsel == 2 )
 					data = ROL16(math.muxlatch, 4);
 				else if ( dsel == 3 )
@@ -539,9 +539,9 @@ static void tx1_update_state(void)
 				kick_sn74s516(&data, ins);
 			}
 			/*
-				TODO: Changed ppshift to muxlatch for TX-1
-				Changed masks.
-			*/
+                TODO: Changed ppshift to muxlatch for TX-1
+                Changed masks.
+            */
 			else if ( LHIEN(math.inslatch) || LLOEN(math.inslatch) )
 			{
 				UINT16 data;
@@ -580,7 +580,7 @@ static void tx1_update_state(void)
 				}
 			}
 			else
-			{	
+			{
 				if ( math.mux == TX1_SEL_PPSEN )
 				{
 					kick_sn74s516(&math.ppshift, ins);
@@ -612,7 +612,7 @@ READ16_HANDLER( tx1_math_r )
 		int ins;
 
 		if ( offset & 0x200 )
-		{		
+		{
 			ins = math.inslatch & 7;
 			TX1_SET_INS0_BIT;
 		}
@@ -635,29 +635,29 @@ READ16_HANDLER( tx1_math_r )
 	{
 
 		/*  TODO
-			SEL0 = 1 (DSEL = 0 or ???????)
-			DSEL1 = 0
-		*/
+            SEL0 = 1 (DSEL = 0 or ???????)
+            DSEL1 = 0
+        */
 		int dsel = (math.inslatch >> 8) & TX1_DSEL;
-//		int tfad = (math.inslatch & 0x1c00);
-//		int ps = math.ppshift & 0x78;
+//      int tfad = (math.inslatch & 0x1c00);
+//      int ps = math.ppshift & 0x78;
 
 		/*
-			Actual MUX selects
-			00 Straight from DLATCH
-			01 Straight from ROM
-			10 << 4
-			11 Halves swapped, << 3
+            Actual MUX selects
+            00 Straight from DLATCH
+            01 Straight from ROM
+            10 << 4
+            11 Halves swapped, << 3
 
-			If DSEL = x0,  MUX = x1
+            If DSEL = x0,  MUX = x1
 
-			00 -> 01
+            00 -> 01
 
-			10 -> 11
+            10 -> 11
 
-			10 = 11
-			00 = 01
-		*/
+            10 = 11
+            00 = 01
+        */
 
 		// TEST!
 		if ( (dsel & 1) == 0 )
@@ -672,17 +672,17 @@ READ16_HANDLER( tx1_math_r )
 		else if ( dsel == 1 )
 		{
 			/*
-				TODO make this constant somewhere
-				e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
-			*/
+                TODO make this constant somewhere
+                e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
+            */
 			UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
-		}			
+		}
 		else if ( dsel == 2 )
 			math.retval = ROL16(math.muxlatch, 4);
 		else if ( dsel == 3 )
-			math.retval = ROL16(SWAP16(math.muxlatch), 3);			
+			math.retval = ROL16(SWAP16(math.muxlatch), 3);
 
 		/* TODO for TX-1: This is /SPCS region? */
 		if ( offset < 0xe00 )
@@ -736,7 +736,7 @@ WRITE16_HANDLER( tx1_math_w )
 	math.cpulatch = data;
 	offset <<= 1;
 
-//	printf("W %x: %x\n", 0x3000 + offset, data);
+//  printf("W %x: %x\n", 0x3000 + offset, data);
 
 	/* /MLPCS */
 	if ( offset < 0x400 )
@@ -868,7 +868,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 	if ( math.mux != TX1_SEL_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state();		
+		tx1_update_state();
 	}
 
 	return math.cpulatch;
@@ -939,7 +939,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 WRITE16_HANDLER( tx1_spcs_ram_w )
 {
 	mame_printf_debug("Write to /SPCS RAM?");
-	COMBINE_DATA(&tx1_math_ram[offset]);	
+	COMBINE_DATA(&tx1_math_ram[offset]);
 }
 
 
@@ -1016,12 +1016,12 @@ static void buggyboy_update_state(void)
 			int ins = math.inslatch & 7;
 
 			BB_SET_INS0_BIT;
-			
+
 			if ( math.mux == BB_MUX_DPROE )
 			{
 				UINT16 *romdata = (UINT16*)memory_region(REGION_USER1);
 				UINT16 addr = get_bb_datarom_addr();
-				kick_sn74s516(&romdata[addr], ins);				
+				kick_sn74s516(&romdata[addr], ins);
 			}
 			else if ( math.mux == BB_MUX_PPOE )
 			{
@@ -1068,7 +1068,7 @@ static void buggyboy_update_state(void)
 				}
 			}
 			else
-			{	
+			{
 				if ( math.mux == BB_MUX_PPSEN )
 				{
 					kick_sn74s516(&math.ppshift, ins);
@@ -1101,7 +1101,7 @@ static void buggyboy_update_state(void)
 }
 
 READ16_HANDLER( buggyboy_math_r )
-{	
+{
 	offset = offset << 1;
 
 	/* /MLPCS */
@@ -1110,7 +1110,7 @@ READ16_HANDLER( buggyboy_math_r )
 		int ins;
 
 		if ( offset & 0x200 )
-		{		
+		{
 			ins = math.inslatch & 7;
 			BB_SET_INS0_BIT;
 		}
@@ -1124,7 +1124,7 @@ READ16_HANDLER( buggyboy_math_r )
 
 		/* TODO */
 		//if (math.mux == BB_MUX_PPSEN)
-		//	math.ppshift = math.retval;
+		//  math.ppshift = math.retval;
 	}
 	/* /PPSEN */
 	else if ( offset < 0x800 )
@@ -1142,7 +1142,7 @@ READ16_HANDLER( buggyboy_math_r )
 		/* This is necessary */
 		if ( math.mux == BB_MUX_PPSEN )
 			math.ppshift = romdata[addr];
-	
+
 		/* This is /SPCS region? Necessary anyway */
 		if ( offset < 0xe00 )
 		{
@@ -1237,7 +1237,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 			math.ppshift = val;
 		}
 		else
-		{			
+		{
 			mame_printf_debug("BB_DSEL was not 3 for P->S load!\n");
 			DEBUGGER_BREAK;
 		}
@@ -1261,10 +1261,10 @@ WRITE16_HANDLER( buggyboy_math_w )
 }
 
 /*
-	This is for ROM range 0x5000-0x7fff
+    This is for ROM range 0x5000-0x7fff
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
-{	
+{
 	math.cpulatch = *(UINT16*)((UINT8*)memory_region(REGION_CPU2) + 0xfc000 + 0x1000 + offset*2);
 
 	if ( math.mux == BB_MUX_ILDEN )
@@ -1311,14 +1311,14 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 					shift >>= 1;
 				}
 			}
-			math.ppshift = val;			
+			math.ppshift = val;
 		}
 	}
 
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();		
+		buggyboy_update_state();
 	}
 
 	return math.cpulatch;
@@ -1330,7 +1330,7 @@ WRITE16_HANDLER( buggyboy_spcs_ram_w )
 }
 
 READ16_HANDLER( buggyboy_spcs_ram_r )
-{	
+{
 	math.cpulatch = tx1_math_ram[offset];
 
 	offset <<= 1;
@@ -1379,14 +1379,14 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 					shift >>= 1;
 				}
 			}
-			math.ppshift = val;			
+			math.ppshift = val;
 		}
 	}
 
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state();		
+		buggyboy_update_state();
 	}
 
 	return math.cpulatch;

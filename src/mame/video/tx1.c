@@ -1,7 +1,7 @@
 /***************************************************************************
 
     Tatsumi TX-1/Buggy Boy video hardware
-		
+
 ****************************************************************************/
 #include "driver.h"
 #include "profiler.h"
@@ -12,7 +12,7 @@
 #define PRINT_CRTC_DATA 1
 
 /*
-	HD46505S-2 CRT Controller
+    HD46505S-2 CRT Controller
 */
 READ16_HANDLER( tx1_crtc_r )
 {
@@ -61,7 +61,7 @@ WRITE16_HANDLER( tx1_crtc_w )
 
 ***************************************************************************/
 static struct
-{	
+{
 	UINT16	scol;		/* Road colours */
 	UINT32  slock;		/* Scroll lock */
 	UINT8	flags;		/* Road flags */
@@ -195,7 +195,7 @@ WRITE16_HANDLER( tx1_bankcs_w )
 		tx1_vregs.h_inc = data;
 
 		if ( !(offset & 2) )
-			tx1_vregs.h_val = 0;		
+			tx1_vregs.h_val = 0;
 	}
 	if ( !(offset & 0x40) )
 	{
@@ -242,7 +242,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 	const UINT8 *const ic25  = (UINT8*)memory_region(REGION_PROMS) + 0x1000;
 
 	const UINT8 *const ic106 = (UINT8*)memory_region(REGION_USER2);
-	const UINT8 *const ic73  = (UINT8*)memory_region(REGION_USER2) + 0x4000;	
+	const UINT8 *const ic73  = (UINT8*)memory_region(REGION_USER2) + 0x4000;
 
 	const UINT8 *const ic190 = (UINT8*)memory_region(REGION_PROMS) + 0xc00;
 	const UINT8 *const ic162 = (UINT8*)memory_region(REGION_PROMS) + 0xe00;
@@ -273,7 +273,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 		/* TODO: Confirm against hardware? */
 		if ( x_scale == 0 )
 			continue;
-			
+
 		/* 16-bit y-scale accumulator */
 		y_scale = tx1_objram[offs + 1];
 		y_step  = tx1_objram[offs + 3];
@@ -286,7 +286,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		/* Global x-flip */
 		gxflip = (pctmp0_7 & 0x80) >> 7;
-		
+
 		/* Add 1 to account for line buffering */
 		y = (tx1_objram[offs] >> 8) + 1;
 
@@ -330,7 +330,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 
 				/* psa8_11 */
 				rom_addr = (psa0_11 & ~0xff) << 2;
-				
+
 				/* Prepare the x-scaling */
 				x_step = (128 << FRAC) / x_scale;
 				x_acc = (psa0_11 & 0xff) << (FRAC + 5);
@@ -364,7 +364,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 							rom_addr2 = rom_addr + low_addr;
 
 						ic106_data = ic106[rom_addr2 & 0x3fff];
-											
+
 						if ( (ic106_data & 0x40) && dataend )
 							lasttile = 1;
 
@@ -376,7 +376,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 						{
 							UINT32	psbb0_12;
 							UINT32	pscb0_14;
-							UINT32	pscb11;							
+							UINT32	pscb11;
 							UINT8	*romptr;
 							UINT32	ic281_addr;
 							UINT32  grom_addr;
@@ -399,14 +399,14 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 							if ( BIT(psbb0_12, 12) )
 								pscb0_14 |= psbb0_12 & 0x3c0;
 							else
-								pscb0_14 |= (pctmp0_7 & 0xf) << 6;								
+								pscb0_14 |= (pctmp0_7 & 0xf) << 6;
 
 							// This is the important one!
 							if ( BIT(lut_data, 13) ) // PSBB13
-								pscb0_14 |= BIT(psbb0_12, 10) << 12;								
+								pscb0_14 |= BIT(psbb0_12, 10) << 12;
 							else
 								pscb0_14 |= ((pctmp0_7 & 0x70) << 8);
-								
+
 
 
 							// 1 = Bit 12 is Bit 10 duplicated.
@@ -415,7 +415,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 							pscb0_14 &= ~(1 << 12);
 							pscb0_14 |= BIT(psbb0_12, 10) << 12;
 							#endif
-													
+
 							pscb11 = BIT(pscb0_14, 11);
 
 							/* TODO: Remove this - it's constant. */
@@ -443,9 +443,9 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 						{
 							UINT8	pix;
 							UINT8	bit;
-							
+
 							bit	= (x_acc >> FRAC) & 7;
-							
+
 							if ( xflip )
 								bit ^= 7;
 
@@ -478,7 +478,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 						newtile = 1;
 
 						if ( lasttile )
-							break;	
+							break;
 					}
 
 					// TODO!
@@ -488,7 +488,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 				}
 			}// if (yscale)
 			y_scale += y_step;
-		} /* for (y) */		
+		} /* for (y) */
 	}/* for (offs) */
 }
 
@@ -519,9 +519,9 @@ VIDEO_UPDATE( tx1 )
 	{
 		rectangle rect = { 0, 768 - 1, 0, 240 - 1 };
 
-//		tilemap_set_scrollx(tx1_tilemap, 0, scroll);
+//      tilemap_set_scrollx(tx1_tilemap, 0, scroll);
 		tilemap_draw(tx1_bitmap, &rect, tx1_tilemap, 0, 0);
-//		tx1_draw_road(tx1_bitmap, &rect);
+//      tx1_draw_road(tx1_bitmap, &rect);
 		tx1_draw_objects(tx1_bitmap, &rect);
 	}
 
@@ -749,7 +749,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
-	const UINT8 *vprom = rom + 0x4600;	
+	const UINT8 *vprom = rom + 0x4600;
 
 	/* Extract constant values */
 	tcmd	 = ((vregs.scol & 0xc000) >> 12) | ((vregs.scol & 0x00c0) >> 6);
@@ -767,7 +767,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 	for (y = 0; y < 240; ++y)
 	{
 		UINT8	rva0_6;
-		UINT8	ram_addr;		
+		UINT8	ram_addr;
 		UINT16	rcrdb0_15;
 		UINT16	rcrs10;
 		UINT16	ls161_156_a;
@@ -907,7 +907,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 
 			UINT32	cprom_addr;
 
-			UINT8	px0, px1, px2, px3;	
+			UINT8	px0, px1, px2, px3;
 
 			/* Counter Q10-7 are added to 384 */
 			ls283_159_co = (ls283_159 = (ls161 & 0x780) + X_ADJUST) & 0x800;
@@ -916,7 +916,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 
 			/* Strip pixel number */
 			pix = (ls161 & 7) ^ 7;
-		
+
 			/* Horizotnal position counter enables - also used as PAL inputs */
 			hp0_en = !(hp0_cy || hps02);
 			hp1_en = !(hp1_cy || hps12);
@@ -929,7 +929,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 			if ( (ls161 & 7) == 0 )
 			{
 				UINT8 d0 = 0;
-				UINT8 d1 = 0;		
+				UINT8 d1 = 0;
 
 				/* TODO: ROM data is 0xff if not enabled. */
 				if (rom_en)
@@ -961,9 +961,9 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 				else
 				{
 					/*
-						TODO: When ROM is not enabled, data = 0xff
-						But does anybody care?
-					*/
+                        TODO: When ROM is not enabled, data = 0xff
+                        But does anybody care?
+                    */
 					rc0 = rc1 = rc2 = rc3 = 0;
 				}
 
@@ -1008,8 +1008,8 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 			px3 = BIT(rc3, pix);
 
 			/*
-				Uh oh...
-			*/
+                Uh oh...
+            */
 			if (vp2)
 				ic4_o18 = (hps00 && hps01 && hp3_en && !hps30)		||
 						  (!hp0_en && hps01 && hp3_en && !hps30)	||
@@ -1018,7 +1018,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 						  vp7;
 			else
 				ic4_o18 = !vp1;
-					  
+
 
 			if (tnlf)
 				ic3_o15 = (vp4 && !vp6 && !hp2_en && hps21)		||
@@ -1112,14 +1112,14 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 				cprom_addr |= (ic149_o16 ? 0x8 : 0) |
 							  (ic150_o18 ? 0x4 : 0) |
 							  (ic150_o17 ? 0x2 : 0) |
-							  (ic150_o16 ? 0x1 : 0);	
-				
+							  (ic150_o16 ? 0x1 : 0);
+
 				/* Lower four bits of colour output come from PROM BB7 @ 188 */
 				rcsd0_3 = rcols[cprom_addr] & 0xf;
 
 				{
 					UINT32 lfsr = vregs.wave_lfsr;
-					UINT32 wave = 
+					UINT32 wave =
 								(wave0 ^ BIT(lfsr, 0))	&&
 								(wave1 ^ BIT(lfsr, 3))	&&
 								BIT(lfsr, 5)			&&
@@ -1133,7 +1133,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 			}
 			else
 				roadpix = 0;
-				
+
 
 			/* Horizontal position counters */
 			if (x >= 0)
@@ -1144,7 +1144,7 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 				UPDATE_HPOS(1);
 				UPDATE_HPOS(2);
 				UPDATE_HPOS(3);
-		
+
 				/* Update the LFSR */
 				vregs.wave_lfsr = (vregs.wave_lfsr << 1) | (BIT(vregs.wave_lfsr, 6) ^ !BIT(vregs.wave_lfsr, 15));
 
@@ -1195,11 +1195,11 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 				if ((sf & 0x08) == 0)
 					vregs.shift |= BIT(vregs.h_val, 15);
 			}
-		
+
 			if ((sf & 0x08) && !(vregs.shift & 0x08))
 				vregs.h_inc = vregs.gas;
 		}
-	
+
 		/* Finally, increment the banking accumulator */
 		vregs.ba_val = (vregs.ba_val + vregs.ba_inc) & 0x00ffffff;
 		}
@@ -1210,24 +1210,24 @@ static void buggybjr_draw_road(UINT8 *bitmap)
 
 /***************************************************************************
 
-	Buggy Boy Object Drawing
+    Buggy Boy Object Drawing
 
-	X-scaling isn't quite right but you wouldn't notice...
+    X-scaling isn't quite right but you wouldn't notice...
 
-	-------- xxxxxxxx		Object number
-	xxxxxxxx --------		Y position
+    -------- xxxxxxxx       Object number
+    xxxxxxxx --------       Y position
 
-	xxxxxxxx xxxxxxxx		Y scale value
+    xxxxxxxx xxxxxxxx       Y scale value
 
-	-------- xxxxxxxx		X scale
-							 00 = Invisible?
-							 80 = 1:1
-							 FF = Double size
-	xxxxxxxx --------		Attributes
-							 
-	xxxxxxxx xxxxxxxx		Y scale delta
+    -------- xxxxxxxx       X scale
+                             00 = Invisible?
+                             80 = 1:1
+                             FF = Double size
+    xxxxxxxx --------       Attributes
 
-	------xx xxxxxxxx		X position
+    xxxxxxxx xxxxxxxx       Y scale delta
+
+    ------xx xxxxxxxx       X position
 
 **************************************************************************/
 static void buggyboy_draw_objs(UINT8 *bitmap)
@@ -1275,7 +1275,7 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 		/* TODO: Confirm against hardware? */
 		if ( x_scale == 0 )
 			continue;
-			
+
 		/* 16-bit y-scale accumulator */
 		y_scale = buggyboy_objram[offs + 1];
 		y_step  = buggyboy_objram[offs + 3];
@@ -1288,7 +1288,7 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 
 		/* Global x-flip */
 		gxflip = (pctmp0_7 & 0x80) >> 7;
-		
+
 		/* Add 1 to account for line buffering */
 		y = (buggyboy_objram[offs] >> 8) + 1;
 
@@ -1337,7 +1337,7 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 
 				/* Static part of the BUG17S/BUG16S ROM address */
 				rom_addr = (psa0_12 & ~0xff) << 2;
-				
+
 				/* Prepare the x-scaling */
 				x_step = (128 << FRAC) / x_scale;
 				x_acc = (psa0_12 & 0xff) << (FRAC + 5);
@@ -1358,14 +1358,14 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 						UINT32	rombank;
 						UINT8	*romptr;
 						UINT32	bug18s_data;
-						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & MASK);						
+						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & MASK);
 
 						/*
-							Objects are grouped by width (either 16, 8 or 4 tiles) in
-							the LUT ROMs. The ROM address lines therefore indicate
-							width and are used to determine the correct scan order
-							when x-flip is set.
-						*/
+                            Objects are grouped by width (either 16, 8 or 4 tiles) in
+                            the LUT ROMs. The ROM address lines therefore indicate
+                            width and are used to determine the correct scan order
+                            when x-flip is set.
+                        */
 						if (gxflip)
 						{
 							UINT32	xor_mask;
@@ -1383,7 +1383,7 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 							rom_addr2 = rom_addr + low_addr;
 
 						bug17s_data = bug17s[rom_addr2 & 0x7fff];
-											
+
 						if ((bug17s_data & 0x40) && dataend)
 							lasttile = 1;
 
@@ -1396,8 +1396,8 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 
 						/* Form the tile ROM address */
 						pscb0_11 = ((((psbb0_15 & ~0xc0) | psbb6_7) << 3) | ((y_scale >> 8) & 7)) & 0x7fff;
-						
-						/* Choose from one of three banks */							
+
+						/* Choose from one of three banks */
 						rombank = ((BIT(pctmp0_7, 4) << 1) | BIT(psbb0_15, 13)) & 3;
 
 						/* TODO: Remember to put all the data into one GFX region */
@@ -1428,9 +1428,9 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 					{
 						UINT8	pix;
 						UINT8	bit;
-						
+
 						bit	= (x_acc >> FRAC) & 7;
-						
+
 						if (xflip)
 							bit ^= 7;
 
@@ -1450,10 +1450,10 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 								color = ~(color | bb9o[bb9_addr]) & 0x3f;
 							else
 								color = ~(color | bb9e[bb9_addr]) & 0x3f;
-						
+
 							*(bitmap + 256*y + x) = 0x40 | color;
 						}
-					}	
+					}
 
 					/* Check if we've stepped into a new 8x8 tile */
 					if ( (((x_acc + x_step) >> (FRAC + 3)) & MASK) != ((x_acc >> (FRAC + 3)) & MASK) )
@@ -1469,7 +1469,7 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 				}
 			}// if (yscale)
 			y_scale += y_step;
-		} /* for (y) */		
+		} /* for (y) */
 	}/* for (offs) */
 
 	profiler_mark(PROFILER_END);
@@ -1477,16 +1477,16 @@ static void buggyboy_draw_objs(UINT8 *bitmap)
 
 
 /*
-	2400-24FF is road control (R/W)
+    2400-24FF is road control (R/W)
 
-	/GAS = 24XX:
-	/BASET0 = 2400-F, 2410-F
-	/BASET1 = 2420-F, 2430-F
-	/BSET   = 2440-F, 2450-F
-	/HASET  = 2460-F, 2470-F
-	/HSET   = 2480-F, 2490-F
-	/WASET  = 24A0-F, 24B0-F
-	/FLAGS  = 24E0-F, 24F0-F
+    /GAS = 24XX:
+    /BASET0 = 2400-F, 2410-F
+    /BASET1 = 2420-F, 2430-F
+    /BSET   = 2440-F, 2450-F
+    /HASET  = 2460-F, 2470-F
+    /HSET   = 2480-F, 2490-F
+    /WASET  = 24A0-F, 24B0-F
+    /FLAGS  = 24E0-F, 24F0-F
 */
 WRITE16_HANDLER( buggyboy_gas_w )
 {
@@ -1528,7 +1528,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 			break;
 		}
 		case 0x60:
-		{	
+		{
 			vregs.h_inc = data;
 			vregs.shift = 0;
 
@@ -1597,7 +1597,7 @@ VIDEO_UPDATE( buggyboy )
 	int xscrollamount = screen * 256;
 	tilemap_set_scrollx(buggyboy_tilemap, 0, xscrollamount);
 
-	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);	
+	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
 }
 
@@ -1621,7 +1621,7 @@ VIDEO_START( buggybjr )
 }
 
 /*
-	Draw the tilemap with scrolling
+    Draw the tilemap with scrolling
 */
 static void buggyboy_draw_char(UINT8 *bitmap)
 {
@@ -1646,7 +1646,7 @@ static void buggyboy_draw_char(UINT8 *bitmap)
 		UINT32 y_offs;
 		UINT32 x_offs;
 		UINT32 y_gran;
-		
+
 		/* There's no y-scrolling between scanlines 0 and 1 */
 		if (y < 64)
 			y_offs = y;
@@ -1664,7 +1664,7 @@ static void buggyboy_draw_char(UINT8 *bitmap)
 		else
 			x_offs = 0;
 
-			
+
 		y_gran = y_offs & 7;
 
 		if (x_offs & 7)
@@ -1683,14 +1683,14 @@ static void buggyboy_draw_char(UINT8 *bitmap)
 			UINT32 x_gran = x_offs & 7;
 
 			if (!x_gran)
-			{	
+			{
 				UINT32 tilenum;
 				UINT16 ram_val = buggybjr_vram[((y_offs << 3) & 0x7c0) + ((x_offs >> 3) & 0x3f)];
 
 				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
 				colour = (ram_val & 0xfc00) >> 8;
 				d0 = *(gfx2 + (tilenum << 3) + y_gran);
-				d1 = *(gfx1 + (tilenum << 3) + y_gran);			
+				d1 = *(gfx1 + (tilenum << 3) + y_gran);
 			}
 
 			*bitmap++ = colour |
@@ -1742,7 +1742,7 @@ VIDEO_UPDATE( buggybjr )
 
 			UINT32 chr = !(BIT(char_val, 7) && (char_val & 3) );
 
-			UINT32 sel = 
+			UINT32 sel =
 			(
 				( BIT(obj_val, 6) && chr) ||
 				( sky_en && !(char_val & 3) && (!obj6 && !rod6) )
