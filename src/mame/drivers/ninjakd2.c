@@ -471,12 +471,12 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 12000000/2)		/* 12000000/2 ??? */
+	MDRV_CPU_ADD(Z80, 12000000/2)		/* 12000000/2 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu,0)	/* very sensitive to these settings */
 	MDRV_CPU_VBLANK_INT(ninjakd2_interrupt,1)
 
 	MDRV_CPU_ADD(Z80, 5000000)
-	/* audio CPU */		/* 5mhz crystal ??? */
+	/* audio CPU */		/* 5mhz crystal (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu,0)
 	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
 
@@ -497,11 +497,11 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, 1500000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, 1500000) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD(SAMPLES, 0)

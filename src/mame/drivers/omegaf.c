@@ -628,12 +628,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( omegaf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 12000000/2)		/* 12000000/2 ??? */
+	MDRV_CPU_ADD_TAG("main", Z80, 12000000/2)		/* 12000000/2 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(omegaf_readmem,omegaf_writemem)	/* very sensitive to these settings */
 	MDRV_CPU_VBLANK_INT(omegaf_interrupt,1)
 
 	MDRV_CPU_ADD(Z80, 5000000)
-	/* audio CPU */		/* 5 mhz crystal ??? */
+	/* audio CPU */		/* 5 mhz crystal (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
@@ -656,10 +656,10 @@ static MACHINE_DRIVER_START( omegaf )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 12000000/8)
+	MDRV_SOUND_ADD(YM2203, 12000000/8) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD(YM2203, 12000000/8)
+	MDRV_SOUND_ADD(YM2203, 12000000/8) /* (verified on pcb) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_DRIVER_END
 

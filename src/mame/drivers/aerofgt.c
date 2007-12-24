@@ -1603,12 +1603,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( turbofrc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
+	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(turbofrc_readmem,turbofrc_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
+	MDRV_CPU_ADD(Z80,5000000)
+	/* audio CPU */	/* 5 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(turbofrc_sound_readport,turbofrc_sound_writeport)
 								/* IRQs are triggered by the YM2610 */
@@ -1631,7 +1631,7 @@ static MACHINE_DRIVER_START( turbofrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD(YM2610, 8000000) /* (verified on pcb) */
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -1682,12 +1682,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aerofgt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
+	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(aerofgt_readmem,aerofgt_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
+	MDRV_CPU_ADD(Z80,5000000)
+	/* audio CPU */	/* 5 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(aerofgt_sound_readport,aerofgt_sound_writeport)
 								/* IRQs are triggered by the YM2610 */
@@ -1711,7 +1711,7 @@ static MACHINE_DRIVER_START( aerofgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD(YM2610, 8000000) /* (verified on pcb) */
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)

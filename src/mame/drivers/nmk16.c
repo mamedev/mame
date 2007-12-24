@@ -4037,7 +4037,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( acrobatm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz ? 12 MHz? */
+	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(acrobatm_readmem,acrobatm_writemem)
 	MDRV_CPU_VBLANK_INT(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -4061,19 +4061,19 @@ static MACHINE_DRIVER_START( acrobatm )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, 1500000) /* (verified on pcb) */
 	MDRV_SOUND_CONFIG(ym2203_nmk004_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 2.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/4) /* (verified on pcb) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* on the pcb pin7 is not connected to gnd or +5v! */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD(OKIM6295, 16000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/4) /* (verified on pcb) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* on the pcb pin7 is not connected to gnd or +5v! */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_DRIVER_END
 

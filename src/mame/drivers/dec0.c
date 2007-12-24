@@ -1236,7 +1236,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD(M68000, 10000000) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
@@ -1261,18 +1261,18 @@ static MACHINE_DRIVER_START( midres )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, 1500000) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD(YM3812, 3000000)
+	MDRV_SOUND_ADD(YM3812, 3000000) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812b_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, 1000000) /* verified on pcb (1mhz crystal) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 verified on pcb
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.40)
 MACHINE_DRIVER_END
 
