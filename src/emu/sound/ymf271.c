@@ -160,10 +160,10 @@ static const double DCTime[] =
 
 /* Notes about the LFO Frequency Table below;
 
-	There appears to be at least 2 errors in the table from the original manual.
+    There appears to be at least 2 errors in the table from the original manual.
 
-	Both 201 & 202 where listed as 3.74490.  202 has be changed to 3.92000 which is "about right"
-	232 was listed as 13.35547.  We use 14.35547 as it apears to be the correct value
+    Both 201 & 202 where listed as 3.74490.  202 has be changed to 3.92000 which is "about right"
+    232 was listed as 13.35547.  We use 14.35547 as it apears to be the correct value
 */
 
 static const double LFO_frequency_table[256] =
