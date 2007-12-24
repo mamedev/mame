@@ -687,7 +687,7 @@ static VIDEO_UPDATE(crystal)
 	tail=GetVidReg(0x80);
 	while((head&0x7ff)!=(tail&0x7ff))
 	{
-		DoFlip=ProcessPacket(0x03800000+head*64,DrawDest,(UINT8*)textureram);
+		DoFlip=vrender0_ProcessPacket(0x03800000+head*64,DrawDest,(UINT8*)textureram);
 		head++;
 		head&=0x7ff;
 		if(DoFlip)

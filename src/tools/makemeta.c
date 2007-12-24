@@ -334,7 +334,7 @@ static UINT32 parse_philips_code(char **argptr, const char *endchars)
     of pattern_data structs
 -------------------------------------------------*/
 
-pattern_data *parse_pattern(char *arg, int *countptr)
+static pattern_data *parse_pattern(char *arg, int *countptr)
 {
 	pattern_data *head = NULL;
 	pattern_data **tailptr = &head;

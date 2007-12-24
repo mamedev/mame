@@ -3,7 +3,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-/*static*/ UINT16 tatsumi_control_word=0;
+UINT16 tatsumi_control_word=0;
 static UINT16 tatsumi_last_control=0;
 static UINT16 tatsumi_last_irq=0;
 static UINT8 apache3_adc;

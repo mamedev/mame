@@ -177,7 +177,7 @@ maybe some priority issues / sprite placement issues..
 
 VIDEO_START(lethalen);
 VIDEO_UPDATE(lethalen);
-WRITE8_HANDLER(le_palette_control);
+WRITE8_HANDLER(lethalen_palette_control);
 
 static int init_eeprom_count;
 static UINT8 cur_control2;
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( le_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
 	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
-	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(le_palette_control)	// PCU1-PCU3 on the schematics
+	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control)	// PCU1-PCU3 on the schematics
 	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ(control2_r)
 	AM_RANGE(0x40d9, 0x40d9) AM_READ(input_port_0_r)

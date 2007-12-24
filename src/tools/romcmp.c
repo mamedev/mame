@@ -27,12 +27,6 @@
 #endif
 
 
-/* for unzip.c */
-void CLIB_DECL logerror(const char *text,...)
-{
-}
-
-
 
 /* compare modes when one file is twice as long as the other */
 /* A = All file */
@@ -51,7 +45,7 @@ enum {	MODE_A,
 		MODE_E, MODE_O,
 		MODE_E12, MODE_O12, MODE_E22, MODE_O22,
 		TOTAL_MODES };
-const char *const modenames[] =
+static const char *const modenames[] =
 {
 	"          ",
 	"[bits 0-3]",
@@ -113,8 +107,8 @@ struct _fileinfo
 };
 typedef struct _fileinfo fileinfo;
 
-fileinfo files[2][MAX_FILES];
-float matchscore[MAX_FILES][MAX_FILES][TOTAL_MODES][TOTAL_MODES];
+static fileinfo files[2][MAX_FILES];
+static float matchscore[MAX_FILES][MAX_FILES][TOTAL_MODES][TOTAL_MODES];
 
 
 static void checkintegrity(const fileinfo *file,int side)

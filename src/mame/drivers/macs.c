@@ -62,7 +62,7 @@ KISEKAE -- info
 
 
 
-UINT8 macs_mux_data;
+static UINT8 macs_mux_data;
 
 static MACHINE_RESET(macs);
 

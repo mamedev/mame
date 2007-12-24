@@ -87,7 +87,7 @@ static const float decayReleaseTimes[16] =
   static UINT32 decayReleaseRatesP[16];
 #endif
 
-const UINT32 attackTabLen = 255;
+static const UINT32 attackTabLen = 255;
 static UINT32 releaseTabLen;
 static UINT32 releasePos[256];
 

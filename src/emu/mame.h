@@ -252,7 +252,7 @@ extern running_machine *Machine;
 extern const char mame_disclaimer[];
 extern char giant_string_buffer[];
 
-extern char build_version[];
+extern const char build_version[];
 
 
 

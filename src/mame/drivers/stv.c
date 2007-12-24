@@ -3771,7 +3771,7 @@ by introdon in ST-V ("SG0000000"),and according to the manual it's even wrong! (
 by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 */
 
-DRIVER_INIT( sanjeon )
+static DRIVER_INIT( sanjeon )
 {
 	UINT8 *src    = memory_region       ( REGION_USER1 );
 	int x;

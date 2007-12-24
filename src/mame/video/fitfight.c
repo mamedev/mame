@@ -3,7 +3,9 @@
 #include "driver.h"
 
 extern UINT16 *fitfight_spriteram;
-extern UINT16 *fof_100000, *fof_600000, *fof_700000, *fof_800000, *fof_900000, *fof_a00000;
+extern UINT16 *fof_700000;
+extern UINT16 *fof_900000;
+extern UINT16 *fof_a00000;
 
 extern UINT16 *fof_bak_tileram;
 static tilemap *fof_bak_tilemap;

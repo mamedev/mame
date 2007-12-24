@@ -1817,7 +1817,7 @@ INLINE INT32 fifo_space(fifo_state *f)
 
 INLINE INT32 fast_reciplog(INT64 value, INT32 *log2)
 {
-	extern UINT32 reciplog[];
+	extern UINT32 voodoo_reciplog[];
 	UINT32 temp, recip, rlog;
 	UINT32 interp;
 	UINT32 *table;
@@ -1855,7 +1855,7 @@ INLINE INT32 fast_reciplog(INT64 value, INT32 *log2)
 	/* compute a pointer to the table entries we want */
 	/* math is a bit funny here because we shift one less than we need to in order */
 	/* to account for the fact that there are two UINT32's per table entry */
-	table = &reciplog[(temp >> (31 - RECIPLOG_LOOKUP_BITS - 1)) & ((2 << RECIPLOG_LOOKUP_BITS) - 2)];
+	table = &voodoo_reciplog[(temp >> (31 - RECIPLOG_LOOKUP_BITS - 1)) & ((2 << RECIPLOG_LOOKUP_BITS) - 2)];
 
 	/* compute the interpolation value */
 	interp = (temp >> (31 - RECIPLOG_LOOKUP_BITS - 8)) & 0xff;

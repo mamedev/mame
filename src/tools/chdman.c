@@ -111,7 +111,7 @@ INLINE void put_bigendian_uint32(UINT8 *base, UINT32 value)
     print_big_int - 64-bit int printing with commas
 -------------------------------------------------*/
 
-void print_big_int(UINT64 intvalue, char *output)
+static void print_big_int(UINT64 intvalue, char *output)
 {
 	int chunk;
 
@@ -132,7 +132,7 @@ void print_big_int(UINT64 intvalue, char *output)
     big_int_string - return a string for a big int
 -------------------------------------------------*/
 
-char *big_int_string(UINT64 intvalue)
+static char *big_int_string(UINT64 intvalue)
 {
 	static char buffer[256];
 	buffer[0] = 0;

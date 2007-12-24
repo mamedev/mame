@@ -87,7 +87,12 @@ Stephh's notes :
 
 
 UINT16 *fitfight_spriteram;
-UINT16 *fof_100000, *fof_600000, *fof_700000, *fof_800000, *fof_900000, *fof_a00000;
+static UINT16 *fof_100000;
+static UINT16 *fof_600000;
+UINT16 *fof_700000;
+static UINT16 *fof_800000;
+UINT16 *fof_900000;
+UINT16 *fof_a00000;
 
 UINT16 *fof_bak_tileram;
 UINT16 *fof_mid_tileram;

@@ -46,11 +46,11 @@
 VIDEO_START( rng );
 VIDEO_UPDATE( rng );
 static MACHINE_RESET( rng );
-READ16_HANDLER( ttl_ram_r );
-WRITE16_HANDLER( ttl_ram_w );
+READ16_HANDLER( rng_ttl_ram_r );
+WRITE16_HANDLER( rng_ttl_ram_w );
 WRITE16_HANDLER( rng_936_videoram_w );
 
-UINT16 *rng_936_videoram;
+extern UINT16 *rng_936_videoram;
 
 static UINT16 *rng_sysreg;
 static int init_eeprom_count;
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( rngreadmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x601000, 0x601fff) AM_READ(MRA16_RAM)		// communication? second monitor buffer?
 	AM_RANGE(0x6c0000, 0x6cffff) AM_READ(MRA16_RAM)		// PSAC2 render RAM
 	AM_RANGE(0x700000, 0x7007ff) AM_READ(MRA16_RAM)		// PSAC2 line effect
-	AM_RANGE(0x740000, 0x741fff) AM_READ(ttl_ram_r)		// text plane RAM
+	AM_RANGE(0x740000, 0x741fff) AM_READ(rng_ttl_ram_r)		// text plane RAM
 #if RNG_DEBUG
 	AM_RANGE(0x5c0010, 0x5c001f) AM_READ(K053247_reg_word_r)
 	AM_RANGE(0x640000, 0x640007) AM_READ(K053246_reg_word_r)
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( rngwritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x680000, 0x68001f) AM_WRITE(MWA16_RAM) AM_BASE(&K053936_0_ctrl)				// '936 registers
 	AM_RANGE(0x6c0000, 0x6cffff) AM_WRITE(rng_936_videoram_w) AM_BASE(&rng_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
 	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(MWA16_RAM) AM_BASE(&K053936_0_linectrl)			// "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_WRITE(ttl_ram_w)		// text plane RAM
+	AM_RANGE(0x740000, 0x741fff) AM_WRITE(rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(MWA16_NOP)		// watchdog
 ADDRESS_MAP_END
 

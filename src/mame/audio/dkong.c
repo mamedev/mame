@@ -1099,7 +1099,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const char *dkongjr_sample_names[] =
+static const char *const dkongjr_sample_names[] =
 {
 	"*dkongjr",
 	"jump.wav",
@@ -1117,14 +1117,14 @@ static const char *dkongjr_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface dkongjr_samples_interface =
+static const struct Samplesinterface dkongjr_samples_interface =
 {
 	8,	/* 8 channels */
 	dkongjr_sample_names
 };
 
 #if !RADARSC1_USE_M58817
-static const char *radarsc1_sample_names[] =
+static const char *const radarsc1_sample_names[] =
 {
 	"*radarsc1",
 	"10.wav",
@@ -1139,17 +1139,17 @@ static const char *radarsc1_sample_names[] =
 	0	/* end of array */
 };
 
-static struct Samplesinterface radarsc1_samples_interface =
+static const struct Samplesinterface radarsc1_samples_interface =
 {
 	8,	/* 8 channels */
 	radarsc1_sample_names
 };
 #endif
 
-static struct NESinterface nes_interface_1 = { REGION_CPU2 };
-static struct NESinterface nes_interface_2 = { REGION_CPU3 };
+static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
+static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
-static struct M58817interface m58817_interface =
+static const struct M58817interface m58817_interface =
 {
 #if !RADARSC1_USE_M58817
 	-1,

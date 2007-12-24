@@ -18,11 +18,6 @@
 #define ST0016_CHAR_BANK_MASK (ST0016_MAX_CHAR_BANK-1)
 #define ST0016_PAL_BANK_MASK  (ST0016_MAX_PAL_BANK-1)
 
-/*----------- defined in drivers/macs.c -----------*/
-
-extern UINT8 macs_mux_data;
-
-
 /*----------- defined in video/st0016.c -----------*/
 
 extern UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;

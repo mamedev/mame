@@ -15,7 +15,7 @@ static tilemap *ttl_tilemap, *rng_936_tilemap;
 static UINT16 ttl_vram[0x1000];
 
 static int sprite_colorbase;
-extern UINT16 *rng_936_videoram;
+UINT16 *rng_936_videoram;
 
 /* TTL text plane stuff */
 
@@ -37,12 +37,12 @@ static void rng_sprite_callback(int *code, int *color, int *priority_mask)
 	*color = sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_HANDLER( ttl_ram_r )
+READ16_HANDLER( rng_ttl_ram_r )
 {
 	return(ttl_vram[offset]);
 }
 
-WRITE16_HANDLER( ttl_ram_w )
+WRITE16_HANDLER( rng_ttl_ram_w )
 {
 	COMBINE_DATA(&ttl_vram[offset]);
 }

@@ -89,7 +89,7 @@ VIDEO_START(lethalen)
 	layer_colorbase[3] = 0xc0;
 }
 
-WRITE8_HANDLER(le_palette_control)
+WRITE8_HANDLER(lethalen_palette_control)
 {
 	switch (offset)
 	{

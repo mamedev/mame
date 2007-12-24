@@ -1155,10 +1155,6 @@ static void push_and_ident(void)
 	next_fn();
 }
 
-void tgp_tick(void)
-{
-}
-
 static void catmull_rom(void)
 {
 	float a = fifoin_pop_f();

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 
-UINT8 *s2636ram;
+UINT8 *zac_s2636ram;
 static mame_bitmap *spritebitmap;
 
 static UINT8 dirtychar[256>>3];
@@ -30,16 +30,16 @@ WRITE8_HANDLER( tinvader_videoram_w )
 
 WRITE8_HANDLER( zac_s2636_w )
 {
-	if (s2636ram[offset] != data)
+	if (zac_s2636ram[offset] != data)
     {
-		s2636ram[offset] = data;
+		zac_s2636ram[offset] = data;
         dirtychar[offset>>3] = 1;
     }
 }
 
 READ8_HANDLER( zac_s2636_r )
 {
-	if(offset!=0xCB) return s2636ram[offset];
+	if(offset!=0xCB) return zac_s2636ram[offset];
     else return CollisionSprite;
 }
 
@@ -57,10 +57,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	int Checksum=0;
 	int x,y;
 
-    if((s2636ram[first * 0x10 + 10] < 0xf0) && (s2636ram[second * 0x10 + 10] < 0xf0))
+    if((zac_s2636ram[first * 0x10 + 10] < 0xf0) && (zac_s2636ram[second * 0x10 + 10] < 0xf0))
     {
-    	int fx     = (s2636ram[first * 0x10 + 10] * 4)-22;
-        int fy     = (s2636ram[first * 0x10 + 12] * 3)+3;
+    	int fx     = (zac_s2636ram[first * 0x10 + 10] * 4)-22;
+        int fy     = (zac_s2636ram[first * 0x10 + 12] * 3)+3;
 		int expand = (first==1) ? 2 : 1;
 
         /* Draw first sprite */
@@ -96,7 +96,7 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 			    second * 2,
 			    1,
 			    0,0,
-			    (s2636ram[second * 0x10 + 10] * 4)-22,(s2636ram[second * 0x10 + 12] * 3) + 3,
+			    (zac_s2636ram[second * 0x10 + 10] * 4)-22,(zac_s2636ram[second * 0x10 + 12] * 3) + 3,
 			    0, TRANSPARENCY_PEN, 0);
 
         /* Remove fingerprint */
@@ -168,21 +168,21 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
-    	if((s2636ram[offs+10]<0xF0) && (offs!=0x30))
+    	if((zac_s2636ram[offs+10]<0xF0) && (offs!=0x30))
 		{
             int spriteno = (offs / 8);
-			int expand   = ((s2636ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
-            int bx       = (s2636ram[offs+10] * 4) - 22;
-            int by       = (s2636ram[offs+12] * 3) + 3;
+			int expand   = ((zac_s2636ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
+            int bx       = (zac_s2636ram[offs+10] * 4) - 22;
+            int by       = (zac_s2636ram[offs+12] * 3) + 3;
             int x,y;
 
             if(dirtychar[spriteno])
             {
             	/* 16x8 version */
-	   			decodechar(machine->gfx[1],spriteno,s2636ram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+	   			decodechar(machine->gfx[1],spriteno,zac_s2636ram,machine->drv->gfxdecodeinfo[1].gfxlayout);
 
                 /* 16x16 version */
-   				decodechar(machine->gfx[2],spriteno,s2636ram,machine->drv->gfxdecodeinfo[2].gfxlayout);
+   				decodechar(machine->gfx[2],spriteno,zac_s2636ram,machine->drv->gfxdecodeinfo[2].gfxlayout);
 
                 dirtychar[spriteno] = 0;
             }

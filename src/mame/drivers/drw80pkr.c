@@ -42,27 +42,27 @@ static UINT8 *pkr_cmos_ram;
 * Write Handlers *
 ******************/
 
-WRITE8_HANDLER( p1_w )
+static WRITE8_HANDLER( p1_w )
 {
 	p1 = data;
 }
 
-WRITE8_HANDLER( p2_w )
+static WRITE8_HANDLER( p2_w )
 {
 	p2 = data;
 }
 
-WRITE8_HANDLER( p4_w )
+static WRITE8_HANDLER( p4_w )
 {
 	p4 = data;
 }
 
-WRITE8_HANDLER( bus_w )
+static WRITE8_HANDLER( bus_w )
 {
 	bus = data;
 }
 
-WRITE8_HANDLER( drw80pkr_cmos_w )
+static WRITE8_HANDLER( drw80pkr_cmos_w )
 {
     //if (p2 == 0xc7) CRTC Register
     //if (p2 == 0xd7) CRTC Address
@@ -73,22 +73,22 @@ WRITE8_HANDLER( drw80pkr_cmos_w )
 * Read Handlers *
 ****************/
 
-READ8_HANDLER( p1_r )
+static READ8_HANDLER( p1_r )
 {
     return p1;
 }
 
-READ8_HANDLER( p2_r )
+static READ8_HANDLER( p2_r )
 {
     return p2;
 }
 
-READ8_HANDLER( bus_r )
+static READ8_HANDLER( bus_r )
 {
     return bus;
 }
 
-READ8_HANDLER( drw80pkr_cmos_r )
+static READ8_HANDLER( drw80pkr_cmos_r )
 {
     return pkr_cmos_ram[offset];
 }
@@ -106,19 +106,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-VIDEO_START( drw80pkr )
+static VIDEO_START( drw80pkr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 40, 25);
 }
 
-VIDEO_UPDATE( drw80pkr )
+static VIDEO_UPDATE( drw80pkr )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	return 0;
 }
 
-PALETTE_INIT( drw80pkr )
+static PALETTE_INIT( drw80pkr )
 {
 /*  prom bits
     7654 3210

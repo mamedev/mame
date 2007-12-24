@@ -183,7 +183,7 @@ static UINT8 dither4_lookup[256*16*2];
 static UINT8 dither2_lookup[256*16*2];
 
 /* fast reciprocal+log2 lookup */
-UINT32 reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
+UINT32 voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 
 
@@ -300,8 +300,8 @@ void voodoo_start(int which, int scrnum, int type, int fbmem_in_mb, int tmem0_in
 	for (val = 0; val <= (1 << RECIPLOG_LOOKUP_BITS); val++)
 	{
 		UINT32 value = (1 << RECIPLOG_LOOKUP_BITS) + val;
-		reciplog[val*2 + 0] = (1 << (RECIPLOG_LOOKUP_PREC + RECIPLOG_LOOKUP_BITS)) / value;
-		reciplog[val*2 + 1] = (UINT32)(LOGB2((double)value / (double)(1 << RECIPLOG_LOOKUP_BITS)) * (double)(1 << RECIPLOG_LOOKUP_PREC));
+		voodoo_reciplog[val*2 + 0] = (1 << (RECIPLOG_LOOKUP_PREC + RECIPLOG_LOOKUP_BITS)) / value;
+		voodoo_reciplog[val*2 + 1] = (UINT32)(LOGB2((double)value / (double)(1 << RECIPLOG_LOOKUP_BITS)) * (double)(1 << RECIPLOG_LOOKUP_PREC));
 	}
 
 	/* create dithering tables */

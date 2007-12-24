@@ -11,6 +11,7 @@
 #ifdef MESS
 #include "devices/harddriv.h"
 #endif
+#include "scsihd.h"
 
 typedef struct
 {

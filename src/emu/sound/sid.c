@@ -22,7 +22,7 @@
 static float *filterTable;
 static float *bandPassParam;
 #define lowPassParam filterTable
-float filterResTable[16];
+static float filterResTable[16];
 
 #define maxLogicalVoices 4
 
@@ -30,7 +30,7 @@ static const int mix16monoMiddleIndex = 256*maxLogicalVoices/2;
 static UINT16 mix16mono[256*maxLogicalVoices];
 
 static UINT16 zero16bit=0;  /* either signed or unsigned */
-UINT32 splitBufferLen;
+//UINT32 splitBufferLen;
 
 void MixerInit(int threeVoiceAmplify)
 {

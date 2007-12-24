@@ -106,7 +106,6 @@ extern void i8051_set_irq_line(int irqline, int state);
 extern void i8051_set_irq_callback(int (*callback)(int irqline));
 extern void i8051_state_save(void *file);
 extern void i8051_state_load(void *file);
-extern const char *i8051_info(void *context, int regnum);
 
 WRITE8_HANDLER( i8051_internal_w );
 READ8_HANDLER( i8051_internal_r );
@@ -135,7 +134,6 @@ extern void i8752_set_irq_line(int irqline, int state);
 extern void i8752_set_irq_callback(int (*callback)(int irqline));
 extern void i8752_state_save(void *file);
 extern void i8752_state_load(void *file);
-extern const char *i8752_info(void *context, int regnum);
 extern void i8752_set_serial_tx_callback(void (*callback)(int data));
 extern void i8752_set_serial_rx_callback(int (*callback)(void));
 WRITE8_HANDLER( i8752_internal_w );

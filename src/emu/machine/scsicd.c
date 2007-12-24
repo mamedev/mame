@@ -11,6 +11,7 @@
 #ifdef MESS
 #include "devices/chd_cd.h"
 #endif
+#include "scsicd.h"
 
 typedef struct
 {

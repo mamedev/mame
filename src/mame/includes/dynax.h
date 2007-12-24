@@ -76,32 +76,18 @@ PALETTE_INIT( sprtmtch );
 //----------- defined in drivers/ddenlovr.c -----------
 
 WRITE8_HANDLER( ddenlovr_bgcolor_w );
-WRITE8_HANDLER( ddenlovr_bgcolor2_w );
-WRITE16_HANDLER( ddenlovr16_bgcolor_w );
 
 WRITE8_HANDLER( ddenlovr_priority_w );
-WRITE8_HANDLER( ddenlovr_priority2_w );
-WRITE16_HANDLER( ddenlovr16_priority_w );
 
 WRITE8_HANDLER( ddenlovr_layer_enable_w );
-WRITE8_HANDLER( ddenlovr_layer_enable2_w );
-WRITE16_HANDLER( ddenlovr16_layer_enable_w );
 
 WRITE8_HANDLER( ddenlovr_palette_base_w );
-WRITE8_HANDLER( ddenlovr_palette_base2_w );
-WRITE16_HANDLER( ddenlovr16_palette_base_w );
 
 WRITE8_HANDLER( ddenlovr_palette_mask_w );
-WRITE8_HANDLER( ddenlovr_palette_mask2_w );
-WRITE16_HANDLER( ddenlovr16_palette_mask_w );
 
 WRITE8_HANDLER( ddenlovr_transparency_pen_w );
-WRITE8_HANDLER( ddenlovr_transparency_pen2_w );
-WRITE16_HANDLER( ddenlovr16_transparency_pen_w );
 
 WRITE8_HANDLER( ddenlovr_transparency_mask_w );
-WRITE8_HANDLER( ddenlovr_transparency_mask2_w );
-WRITE16_HANDLER( ddenlovr16_transparency_mask_w );
 
 extern UINT8 *ddenlovr_pixmap[8];
 

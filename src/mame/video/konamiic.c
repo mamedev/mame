@@ -1214,8 +1214,8 @@ void konami_rom_deinterleave_4(int mem_region)
 /*                                                                         */
 /***************************************************************************/
 
-/*static*/ UINT8 K007121_ctrlram[MAX_K007121][8];
-/*static*/ int K007121_flipscreen[MAX_K007121];
+UINT8 K007121_ctrlram[MAX_K007121][8];
+static int K007121_flipscreen[MAX_K007121];
 
 
 void K007121_ctrl_w(int chip,int offset,int data)

@@ -2319,16 +2319,6 @@ void i8752_set_serial_tx_callback(void (*callback)(int data))	{ i8051_set_serial
 void i8752_set_serial_rx_callback(int (*callback)(void))	{ i8051_set_serial_rx_callback(callback); }
 void i8752_state_save(void *file)				{ i8051_state_save(file); }
 void i8752_state_load(void *file)				{ i8051_state_load(file); }
-#if 0
-const char *i8752_info(void *context, int regnum)
-{
-	switch( regnum )
-	{
-		case CPU_INFO_NAME: return "I8752";
-	}
-	return i8051_info(context,regnum);
-}
-#endif
 
 /* The following two handlers are used by the MAME Debugger Memory Window...
    By keeping these functions separate from the internally used IRAM_W/IRAM_R functions,

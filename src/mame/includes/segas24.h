@@ -1,4 +1,4 @@
-/*----------- defined in machine/system24.c -----------*/
+/*----------- defined in machine/segas24.c -----------*/
 
 /* system24temp_ functions / variables are from shared rewrite files,
    once the rest of the rewrite is complete they can be removed, I

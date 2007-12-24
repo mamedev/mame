@@ -99,6 +99,8 @@ TODO:
 #include "sound/2413intf.h"
 #include "machine/msm6242.h"
 #include "profiler.h"
+#include "includes/dynax.h"
+
 
 UINT8 *ddenlovr_pixmap[8];
 static mame_bitmap *framebuffer;

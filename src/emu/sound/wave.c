@@ -15,6 +15,7 @@
 #include "utils.h"
 #include "devices/cassette.h"
 #endif
+#include "wave.h"
 
 #define ALWAYS_PLAY_SOUND	0
 #define WAVE_TOKEN_MASK		0xFFFF0000

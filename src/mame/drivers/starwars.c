@@ -196,7 +196,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )\
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)		/* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM							/* 6532 ram */

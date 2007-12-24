@@ -365,7 +365,7 @@ static const _DrawTemplate DrawTile[]=
 #define Packet(i) program_read_word_32le(PacketPtr+2*i)
 
 //Returns TRUE if the operation was a flip (sync or async)
-int ProcessPacket(UINT32 PacketPtr,UINT16 *Dest,UINT8 *TEXTURE)
+int vrender0_ProcessPacket(UINT32 PacketPtr,UINT16 *Dest,UINT8 *TEXTURE)
 {
 	UINT32 Dx=Packet(1)&0x3ff;
 	UINT32 Dy=Packet(2)&0x1ff;

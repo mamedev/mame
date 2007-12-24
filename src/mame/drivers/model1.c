@@ -737,13 +737,11 @@ static void irq_init(void)
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
-extern void tgp_tick(void);
 static INTERRUPT_GEN(model1_interrupt)
 {
 	if (cpu_getiloops())
 	{
 		irq_raise(1);
-		tgp_tick();
 	}
 	else
 	{

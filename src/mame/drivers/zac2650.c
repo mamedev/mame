@@ -13,7 +13,7 @@
 
 #include "tinv2650.lh"
 
-extern UINT8 *s2636ram;
+extern UINT8 *zac_s2636ram;
 
 extern WRITE8_HANDLER( tinvader_videoram_w );
 extern WRITE8_HANDLER( zac_s2636_w );
@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1d00, 0x1dff) AM_WRITE(MWA8_RAM)
     AM_RANGE(0x1e80, 0x1e80) AM_WRITE(tinvader_sound_w)
 	AM_RANGE(0x1e86, 0x1e86) AM_WRITE(MWA8_NOP)				/* Dodgem Only */
-    AM_RANGE(0x1f00, 0x1fff) AM_WRITE(zac_s2636_w) AM_BASE(&s2636ram)
+	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(zac_s2636_w) AM_BASE(&zac_s2636ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )

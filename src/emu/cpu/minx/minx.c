@@ -87,7 +87,7 @@ typedef struct {
 } minx_regs;
 
 static minx_regs regs;
-int minx_icount;
+static int minx_icount;
 
 #define rd(offset)	program_read_byte_8( offset )
 #define wr(offset,data)	program_write_byte_8( offset, data )

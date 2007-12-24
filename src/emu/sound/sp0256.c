@@ -1225,7 +1225,7 @@ static void sp0256_stop(void *token)
 	free( sp->scratch );
 }
 
-void sp0256_reset(void *token)
+static void sp0256_reset(void *token)
 {
 	struct sp0256 *sp = token;
 
