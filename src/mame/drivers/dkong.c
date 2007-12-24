@@ -247,7 +247,15 @@ Changes:
 
 /*************************************
  *
- *  prototypes
+ *  Defines
+ *
+ *************************************/
+
+#define DEBUG_PROTECTION	(0)
+
+/*************************************
+ *
+ *  Prototypes
  *
  *************************************/
 
@@ -496,11 +504,20 @@ static READ8_HANDLER( dkong_in2_r )
 
 static READ8_HANDLER( hunchbkd_mirror_r )
 {
-	return program_read_byte(0x1000+offset);
+	int data = program_read_byte(0x1000+offset);
+#if DEBUG_PROTECTION
+	if (offset >= 0xc04 && offset < 0xc14)
+		logerror("prot read %x, %x (%x)\n", offset, data, activecpu_get_pc());
+#endif
+	return data;
 }
 
 static WRITE8_HANDLER( hunchbkd_mirror_w )
 {
+#if DEBUG_PROTECTION
+	if (offset >= 0xc04 && offset < 0xc14)
+		logerror("prot write %x\n", data);
+#endif
 	program_write_byte(0x1000+offset,data);
 }
 
@@ -542,12 +559,16 @@ static WRITE8_HANDLER( hunchbkd_data_w )
 
 static READ8_HANDLER( hunchbkd_port0_r )
 {
+	dkong_state *state = Machine->driver_data;
+#if DEBUG_PROTECTION
 	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
+#endif
 
 	switch (activecpu_get_pc())
 	{
 		case 0x00e9:  return 0xff;
 		case 0x0114:  return 0xfb;
+		case 0x209b:  return state->hunchloopback; /* this at least prevents reset after super bonus */
 	}
 
     return 0;
