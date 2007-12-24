@@ -35,6 +35,8 @@ static emu_timer *		gun_timer[2];
 static INT32 			gun_x[2], gun_y[2];
 
 static UINT32 *ram_base;
+static UINT32 *zpram;
+static size_t zpram_size;
 static UINT8 cmos_protected;
 
 static emu_timer *timer[2];
@@ -63,6 +65,8 @@ static MACHINE_RESET( midzeus )
 
 	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
+	
+	cmos_protected = TRUE;
 }
 
 
@@ -75,7 +79,7 @@ static MACHINE_RESET( midzeus )
 
 static WRITE32_HANDLER( cmos_protect_w )
 {
-	cmos_protected = 0;
+	cmos_protected = FALSE;
 }
 
 
@@ -83,12 +87,48 @@ static WRITE32_HANDLER( cmos_w )
 {
 	if (!cmos_protected)
 		COMBINE_DATA(generic_nvram32 + offset);
+	cmos_protected = TRUE;
 }
 
 
 static READ32_HANDLER( cmos_r )
 {
 	return generic_nvram32[offset];
+}
+
+
+static WRITE32_HANDLER( zpram_w )
+{
+	/* ZPRAM seems to use the same protection control as CMOS */
+//	if (!cmos_protected)
+		COMBINE_DATA(zpram + offset);
+	cmos_protected = TRUE;
+}
+
+
+static READ32_HANDLER( zpram_r )
+{
+	return zpram[offset] | 0xffffff00;
+}
+
+
+static NVRAM_HANDLER( zeus2_nvram )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, generic_nvram, generic_nvram_size);
+		mame_fwrite(file, zpram, zpram_size);
+	}
+	else if (file)
+	{
+		mame_fread(file, generic_nvram, generic_nvram_size);
+		mame_fread(file, zpram, zpram_size);
+	}
+	else
+	{
+		memset(generic_nvram, 0xff, generic_nvram_size);
+		memset(zpram, 0xff, zpram_size);
+	}
 }
 
 
@@ -231,6 +271,7 @@ static READ32_HANDLER( invasn_gun_r )
 // read 8d0003, check bit 1, skip some stuff if 0
 // write junk to 9e0000
 
+static UINT32 *unknown_8a0000;
 static UINT32 *unknown_8d0000;
 static READ32_HANDLER( unknown_8d0000_r )
 {
@@ -250,6 +291,20 @@ static WRITE32_HANDLER( unknown_9d0000_w )
 static WRITE32_HANDLER( rombank_select_w )
 {
 	memory_set_bank(1, data);
+}
+
+static READ32_HANDLER( unknown_8a0000_r )
+{
+	logerror("%06X:unknown_8a000_r(%02X)\n", activecpu_get_pc(), offset);
+	if (offset == 0)
+		return 0x30313042;
+	return unknown_8a0000[offset];
+}
+
+static WRITE32_HANDLER( unknown_8a0000_w )
+{
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", activecpu_get_pc(),  offset, data);
+	COMBINE_DATA(&unknown_8a0000[offset]);
 }
 
 
@@ -275,8 +330,10 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
+	AM_RANGE(0x8a0000, 0x8a0027) AM_READWRITE(unknown_8a0000_r, unknown_8a0000_w) AM_BASE(&unknown_8a0000)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
+	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_BASE(&zpram) AM_SIZE(&zpram_size) AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
@@ -425,7 +482,7 @@ static INPUT_PORTS_START( invasn )
 	PORT_DIPNAME( 0x0040, 0x0040, "Flip Y" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x0080, 0x0000, "Test Switch" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
 	PORT_DIPNAME( 0x0100, 0x0100, "Mirrored Display" )
@@ -497,58 +554,58 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crusnexo )
 	PORT_START	    /* DS1 */
- 	PORT_DIPNAME( 0x0001, 0x0001, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
- 	PORT_DIPSETTING(      0x0001, "Dedicated" )	/*   to OFF position for proper operation" */
- 	PORT_DIPSETTING(      0x0000, "Kit" )
- 	PORT_DIPNAME( 0x0002, 0x0002, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
-  	PORT_DIPSETTING(      0x0002, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Cabinet ))
- 	PORT_DIPSETTING(      0x0004, "Stand Up" )
- 	PORT_DIPSETTING(      0x0000, "Sit Down" )
- 	PORT_DIPNAME( 0x0008, 0x0008, "Wheel Invert" )
-  	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ))	/* Manual lists this dip as Unused */
- 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x0020, 0x0020, "Link" )
- 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
-  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
- 	PORT_DIPNAME( 0x00c0, 0x00c0, "Linking I.D.")
- 	PORT_DIPSETTING(      0x00c0, "Master #1" )
- 	PORT_DIPSETTING(      0x0080, "Slave #2" )
- 	PORT_DIPSETTING(      0x0040, "Slave #3" )
- 	PORT_DIPSETTING(      0x0000, "Slave #4" )
- 	PORT_DIPNAME( 0x1f00, 0x1f00, "Country Code" )
- 	PORT_DIPSETTING(      0x1f00, DEF_STR( USA ) )
- 	PORT_DIPSETTING(      0x1e00, "Germany" )
- 	PORT_DIPSETTING(      0x1d00, "France" )
- 	PORT_DIPSETTING(      0x1c00, "Canada" )
- 	PORT_DIPSETTING(      0x1b00, "Switzerland" )
- 	PORT_DIPSETTING(      0x1a00, "Italy" )
- 	PORT_DIPSETTING(      0x1900, "UK" )
- 	PORT_DIPSETTING(      0x1800, "Spain" )
- 	PORT_DIPSETTING(      0x1700, "Austrilia" )
- 	PORT_DIPSETTING(      0x1600, DEF_STR( Japan ) )
- 	PORT_DIPSETTING(      0x1500, "Taiwan" )
- 	PORT_DIPSETTING(      0x1400, "Austria" )
- 	PORT_DIPSETTING(      0x1300, "Belgium" )
- 	PORT_DIPSETTING(      0x0f00, "Sweden" )
- 	PORT_DIPSETTING(      0x0e00, "Findland" )
-	PORT_DIPSETTING(      0x0d00, "Netherlands" )
- 	PORT_DIPSETTING(      0x0c00, "Norway" )
- 	PORT_DIPSETTING(      0x0b00, "Denmark" )
- 	PORT_DIPSETTING(      0x0a00, "Hungary" )
- 	PORT_DIPSETTING(      0x0800, "General" )
- 	PORT_DIPNAME( 0x6000, 0x6000, "Coin Mode" )
- 	PORT_DIPSETTING(      0x6000, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
- 	PORT_DIPSETTING(      0x4000, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
- 	PORT_DIPSETTING(      0x2000, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
+ 	PORT_DIPNAME( 0x001f, 0x001f, "Country Code" )
+ 	PORT_DIPSETTING(      0x001f, DEF_STR( USA ) )
+ 	PORT_DIPSETTING(      0x001e, "Germany" )
+ 	PORT_DIPSETTING(      0x001d, "France" )
+ 	PORT_DIPSETTING(      0x001c, "Canada" )
+ 	PORT_DIPSETTING(      0x001b, "Switzerland" )
+ 	PORT_DIPSETTING(      0x001a, "Italy" )
+ 	PORT_DIPSETTING(      0x0019, "UK" )
+ 	PORT_DIPSETTING(      0x0018, "Spain" )
+ 	PORT_DIPSETTING(      0x0017, "Austrilia" )
+ 	PORT_DIPSETTING(      0x0016, DEF_STR( Japan ) )
+ 	PORT_DIPSETTING(      0x0015, "Taiwan" )
+ 	PORT_DIPSETTING(      0x0014, "Austria" )
+ 	PORT_DIPSETTING(      0x0013, "Belgium" )
+ 	PORT_DIPSETTING(      0x000f, "Sweden" )
+ 	PORT_DIPSETTING(      0x000e, "Findland" )
+	PORT_DIPSETTING(      0x000d, "Netherlands" )
+ 	PORT_DIPSETTING(      0x000c, "Norway" )
+ 	PORT_DIPSETTING(      0x000b, "Denmark" )
+ 	PORT_DIPSETTING(      0x000a, "Hungary" )
+ 	PORT_DIPSETTING(      0x0008, "General" )
+ 	PORT_DIPNAME( 0x0060, 0x0060, "Coin Mode" )
+ 	PORT_DIPSETTING(      0x0060, "Mode 1" ) /* USA1/GER1/FRA1/SPN1/AUSTRIA1/GEN1/CAN1/SWI1/ITL1/JPN1/TWN1/BLGN1/NTHRLND1/FNLD1/NRWY1/DNMK1/HUN1 */
+ 	PORT_DIPSETTING(      0x0040, "Mode 2" ) /* USA3/GER1/FRA1/SPN1/AUSTRIA1/GEN3/CAN2/SWI2/ITL2/JPN2/TWN2/BLGN2/NTHRLND2 */
+ 	PORT_DIPSETTING(      0x0020, "Mode 3" ) /* USA7/GER1/FRA1/SPN1/AUSTRIA1/GEN5/CAN3/SWI3/ITL3/JPN3/TWN3/BLGN3 */
  	PORT_DIPSETTING(      0x0000, "Mode 4" ) /* USA8/GER1/FRA1/SPN1/AUSTRIA1/GEN7 */
-	PORT_DIPNAME( 0x8000, 0x8000, "Test Switch" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ))
+	PORT_DIPNAME( 0x0080, 0x0080, "Test Switch" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0100, 0x0100, "Game Type" )	/* Manual states "*DIP 1, Switch 1 MUST be set */
+ 	PORT_DIPSETTING(      0x0100, "Dedicated" )	/*   to OFF position for proper operation" */
+ 	PORT_DIPSETTING(      0x0000, "Kit" )
+ 	PORT_DIPNAME( 0x0200, 0x0200, "Seat Motion" )	/* For dedicated Sit Down models with Motion Seat */
+  	PORT_DIPSETTING(      0x0200, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Cabinet ))
+ 	PORT_DIPSETTING(      0x0400, "Stand Up" )
+ 	PORT_DIPSETTING(      0x0000, "Sit Down" )
+ 	PORT_DIPNAME( 0x0800, 0x0800, "Wheel Invert" )
+  	PORT_DIPSETTING(      0x0800, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0x1000, 0x1000, "ROM Configuration" )	/* Manual lists this dip as Unused */
+ 	PORT_DIPSETTING(      0x1000, "32M ROM Normal" )
+  	PORT_DIPSETTING(      0x0000, "16M ROM Split Active" )
+ 	PORT_DIPNAME( 0x2000, 0x2000, "Link" )
+ 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ))
+  	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+ 	PORT_DIPNAME( 0xc000, 0xc000, "Linking I.D.")
+ 	PORT_DIPSETTING(      0xc000, "Master #1" )
+ 	PORT_DIPSETTING(      0x8000, "Slave #2" )
+ 	PORT_DIPSETTING(      0x4000, "Slave #3" )
+ 	PORT_DIPSETTING(      0x0000, "Slave #4" )
 
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -565,35 +622,36 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )
 
 	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY /* Radio Switch */
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) /* View 2 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* View 3 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) /* View 1 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY /* Gear 1 */
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY /* Gear 2 */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY /* Gear 3 */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY /* Gear 4 */
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* Not Used */
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Radio Switch */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* View 1 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) /* View 2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* View 3 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) /* View 4 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) 	/* Gear 1 */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) 	/* Gear 2 */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) 	/* Gear 3 */
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) 	/* Gear 4 */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Not Used */
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* keypad 3 */
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	/* keypad 1 */
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)	/* keypad 2 */
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -682,6 +740,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
@@ -700,6 +759,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
@@ -710,6 +770,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -727,18 +788,16 @@ static MACHINE_DRIVER_START( midzeus )
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_RESET(midzeus)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 278)
-	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 255)
 	MDRV_PALETTE_LENGTH(32768)
+	
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/8, 529, 0, 400, 278, 0, 256)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_VIDEO_START(midzeus)
 	MDRV_VIDEO_UPDATE(midzeus)
@@ -749,17 +808,27 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( midzeus2 )
-	MDRV_IMPORT_FROM(midzeus)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
-	
+	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+
+	MDRV_MACHINE_RESET(midzeus)
+	MDRV_NVRAM_HANDLER(zeus2_nvram)
+
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
 	MDRV_VIDEO_START(midzeus2)
 	MDRV_VIDEO_UPDATE(midzeus2)
+
+	/* sound hardware */
+	MDRV_IMPORT_FROM(dcs2_audio_2104)
 MACHINE_DRIVER_END
 
 

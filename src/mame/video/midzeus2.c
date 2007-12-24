@@ -64,6 +64,7 @@ static rectangle zeus_cliprect;
 
 static void *waveram[2];
 
+static UINT32 max_waveram[2][2];
 
 
 /*************************************
@@ -75,7 +76,7 @@ static void *waveram[2];
 static void exit_handler(running_machine *machine);
 
 static void zeus_register32_w(offs_t offset, UINT32 data, int logit);
-static void zeus_register_update(offs_t offset, UINT32 oldval);
+static void zeus_register_update(offs_t offset, UINT32 oldval, int logit);
 static int zeus_fifo_process(const UINT32 *data, int numwords);
 
 static void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
@@ -250,6 +251,9 @@ static void exit_handler(running_machine *machine)
 #endif
 
 	poly_free(poly);
+
+printf("max[0] = %X, %X\n", max_waveram[0][0], max_waveram[0][1]);
+printf("max[1] = %X, %X\n", max_waveram[1][0], max_waveram[1][1]);
 }
 
 
@@ -319,9 +323,11 @@ VIDEO_UPDATE( midzeus2 )
 
 READ32_HANDLER( zeus2_r )
 {
+	int logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	UINT32 result = zeusbase[offset];
 
-	logerror("%06X:zeus2_r(%02X)\n", activecpu_get_pc(), offset);
+	if (logit)
+		logerror("%06X:zeus2_r(%02X)\n", activecpu_get_pc(), offset);
 	
 	switch (offset)
 	{
@@ -337,10 +343,15 @@ READ32_HANDLER( zeus2_r )
 			if (video_screen_get_vblank(0))
 				result |= 0x04;
 			break;
+		
+		case 0x07:
+			/* this is needed to pass the self-test in thegrid */
+			result = 0x10451998;
+			break;
 
 		case 0x54:
-			/* upper 16 bits are masked when read -- is that the hpos? */
-			result = video_screen_get_vpos(0);
+			/* lower 16 bits are masked when read -- is that the hpos? */
+			result = video_screen_get_vpos(0) << 16;
 			break;
 	}
 	
@@ -357,13 +368,16 @@ READ32_HANDLER( zeus2_r )
 
 WRITE32_HANDLER( zeus2_w )
 {
-	logerror("%06X:zeus2_w", activecpu_get_pc());
-	zeus_register32_w(offset, data, TRUE);
+	int logit = (offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
+				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
+	if (logit)
+		logerror("%06X:zeus2_w", activecpu_get_pc());
+	zeus_register32_w(offset, data, logit);
 }
 
 
 
-	/*************************************
+/*************************************
  *
  *  Handle register writes
  *
@@ -385,7 +399,7 @@ static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
 		logerror("(%02X) = %08X\n", offset, data);
 
 	/* handle the update */
-	zeus_register_update(offset, oldval);
+	zeus_register_update(offset, oldval, logit);
 }
 
 
@@ -396,7 +410,7 @@ static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
  *
  *************************************/
 
-static void zeus_register_update(offs_t offset, UINT32 oldval)
+static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 {
 	/* handle the writes; only trigger on low accesses */
 	switch (offset)
@@ -405,6 +419,16 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 			zeus_fifo[zeus_fifo_words++] = zeusbase[0x08];
 			if (zeus_fifo_process(zeus_fifo, zeus_fifo_words))
 				zeus_fifo_words = 0;
+			break;
+		
+		case 0x20:
+			/* toggles between two values based on the page:
+			
+				Page #		zeusbase[0x20]		zeusbase[0x38]
+				------		--------------		--------------
+				   0		  $04000190			  $00000000
+				   1		  $04000000			  $01900000
+			*/
 			break;
 
 		case 0x33:
@@ -429,6 +453,15 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
 				}
+			}
+			break;
+		
+		case 0x38:
+			{
+				UINT32 temp = zeusbase[0x38];
+				zeusbase[0x38] = oldval;
+				video_screen_update_partial(0, video_screen_get_vpos(0));
+				zeusbase[0x38] = temp;
 			}
 			break;
 		
@@ -467,6 +500,8 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 					void *dest = waveram_ptr_from_expanded_addr(0, zeusbase[0x41]);
 					WAVERAM_WRITE32(dest, 0, zeusbase[0x48]);
 					WAVERAM_WRITE32(dest, 1, zeusbase[0x49]);
+			max_waveram[0][0] = MAX(max_waveram[0][0], zeusbase[0x41] & 0xffff);
+			max_waveram[0][1] = MAX(max_waveram[0][1], zeusbase[0x41] >> 16);
 					
 					if (zeusbase[0x4e] & 0x40)
 					{
@@ -478,7 +513,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 			}
 			
 			/* make sure we log anything else */
-			else
+			else if (logit)
 				logerror("\t[40]=%08X [4E]=%08X\n", zeusbase[0x40], zeusbase[0x4e]);
 			break;
 
@@ -515,10 +550,12 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 					WAVERAM_WRITE32(dest, 0, zeusbase[0x58]);
 				if (zeusbase[0x57] & 4)
 					WAVERAM_WRITE32(dest, 1, zeusbase[0x59]);
+			max_waveram[1][0] = MAX(max_waveram[1][0], zeusbase[0x51] & 0xffff);
+			max_waveram[1][1] = MAX(max_waveram[1][1], zeusbase[0x51] >> 16);
 			}
 			
 			/* make sure we log anything else */
-			else
+			else if (logit)
 				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);
 			break;
 		
@@ -547,6 +584,8 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 						WAVERAM_WRITE32(dest, 1, zeusbase[0x59]);
 						WAVERAM_WRITE32(dest, 2, zeusbase[0x5a]);
 					}
+			max_waveram[1][0] = MAX(max_waveram[1][0], zeusbase[0x51] & 0xffff);
+			max_waveram[1][1] = MAX(max_waveram[1][1], zeusbase[0x51] >> 16);
 					
 					if (zeusbase[0x5e] & 0x40)
 					{
@@ -558,7 +597,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval)
 			}
 			
 			/* make sure we log anything else */
-			else
+			else if (logit)
 				logerror("\t[50]=%08X [5E]=%08X\n", zeusbase[0x50], zeusbase[0x5e]);
 			break;
 	}
@@ -588,9 +627,12 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			break;
 
 		default:
-			printf("Unknown command %08X\n", data[0]);
-			if (log_fifo)
-				log_fifo_command(data, numwords, "\n");
+			if (data[0] != 0x2c0)
+			{
+				printf("Unknown command %08X\n", data[0]);
+				if (log_fifo)
+					log_fifo_command(data, numwords, "\n");
+			}
 			break;
 	}
 	return TRUE;
