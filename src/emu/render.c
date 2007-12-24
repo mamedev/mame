@@ -385,6 +385,9 @@ INLINE render_primitive *alloc_render_primitive(int type)
 
 INLINE void append_render_primitive(render_primitive_list *list, render_primitive *prim)
 {
+	assert(prim->bounds.x0 <= prim->bounds.x1);
+	assert(prim->bounds.y0 <= prim->bounds.y1);
+
 	*list->nextptr = prim;
 	list->nextptr = &prim->next;
 }
@@ -1531,12 +1534,15 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 		append_render_primitive(&target->primlist[listnum], prim);
 
-		prim = alloc_render_primitive(RENDER_PRIMITIVE_QUAD);
-		set_render_bounds_xy(&prim->bounds, 1.0f, 1.0f, (float)(target->width - 1), (float)(target->height - 1));
-		set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
-		prim->texture.base = NULL;
-		prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
-		append_render_primitive(&target->primlist[listnum], prim);
+		if ((target->width > 1) && (target->height > 1))
+		{
+			prim = alloc_render_primitive(RENDER_PRIMITIVE_QUAD);
+			set_render_bounds_xy(&prim->bounds, 1.0f, 1.0f, (float)(target->width - 1), (float)(target->height - 1));
+			set_render_color(&prim->color, 1.0f, 0.0f, 0.0f, 0.0f);
+			prim->texture.base = NULL;
+			prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+			append_render_primitive(&target->primlist[listnum], prim);
+		}
 	}
 
 	/* process the UI if we are the UI target */
