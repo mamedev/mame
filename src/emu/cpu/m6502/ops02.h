@@ -93,16 +93,18 @@
  *  extra cycle if page boundary is crossed
  ***************************************************************/
 #define BRA(cond)												\
-	tmp = RDOPARG();											\
-	if (cond)													\
-	{															\
-		RDMEM(PCW);												\
-		EAW = PCW + (signed char)tmp;							\
-		if ( EAH != PCH ) {										\
-			RDMEM( (PCH << 8 ) | EAL) ;							\
-		}														\
-		PCD = EAD;												\
-		CHANGE_PC;												\
+	{																\
+		INT8 tmp2 = RDOPARG();										\
+		if (cond)													\
+		{															\
+			RDMEM(PCW);												\
+			EAW = PCW + (signed char)tmp2;							\
+			if ( EAH != PCH ) {										\
+				RDMEM( (PCH << 8 ) | EAL) ;							\
+			}														\
+			PCD = EAD;												\
+			CHANGE_PC;												\
+		}															\
 	}
 
 /***************************************************************

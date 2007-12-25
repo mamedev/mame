@@ -42,14 +42,14 @@ OP(a0) { int tmp; RD_IMM; LDY;                 } /* 2 LDY IMM */
 OP(c0) { int tmp; RD_IMM; CPY;                 } /* 2 CPY IMM */
 OP(e0) { int tmp; RD_IMM; CPX;                 } /* 2 CPX IMM */
 
-OP(10) { int tmp; BPL;                         } /* 2-4 BPL REL */
-OP(30) { int tmp; BMI;                         } /* 2-4 BMI REL */
-OP(50) { int tmp; BVC;                         } /* 2-4 BVC REL */
-OP(70) { int tmp; BVS;                         } /* 2-4 BVS REL */
-OP(90) { int tmp; BCC;                         } /* 2-4 BCC REL */
-OP(b0) { int tmp; BCS;                         } /* 2-4 BCS REL */
-OP(d0) { int tmp; BNE;                         } /* 2-4 BNE REL */
-OP(f0) { int tmp; BEQ;                         } /* 2-4 BEQ REL */
+OP(10) { BPL;                                  } /* 2-4 BPL REL */
+OP(30) { BMI;                                  } /* 2-4 BMI REL */
+OP(50) { BVC;                                  } /* 2-4 BVC REL */
+OP(70) { BVS;                                  } /* 2-4 BVS REL */
+OP(90) { BCC;                                  } /* 2-4 BCC REL */
+OP(b0) { BCS;                                  } /* 2-4 BCS REL */
+OP(d0) { BNE;                                  } /* 2-4 BNE REL */
+OP(f0) { BEQ;                                  } /* 2-4 BEQ REL */
 
 OP(01) { int tmp; RD_IDX; ORA;                 } /* 6 ORA IDX */
 OP(21) { int tmp; RD_IDX; AND;                 } /* 6 AND IDX */
