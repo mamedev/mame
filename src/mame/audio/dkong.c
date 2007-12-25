@@ -6,7 +6,8 @@
 #include "sound/discrete.h"
 #include "sound/dac.h"
 
-#include "sound/m58817.h"
+#include "sound/tms5110.h"
+#include "sound/5110intf.h"
 
 #include "includes/dkong.h"
 
@@ -15,13 +16,6 @@
  * Defines and Macros
  *
  ****************************************************************/
-
-/* Set to 1 to use speech synthesizer instead of samples.
- * Disabled by default since M58817 emulation is not
- * complete due to missing information about coefficients.
- */
-
-#define RADARSC1_USE_M58817		(0)
 
 #define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
 
@@ -80,7 +74,7 @@
 
 /* General defines */
 
-#define DK_1N5553_V			0.4	// from datasheet at 1mA
+#define DK_1N5553_V			0.4	/* from datasheet at 1mA */
 #define DK_SUP_V			5.0
 #define NE555_INTERNAL_R	RES_K(5)
 
@@ -730,7 +724,8 @@ static SOUND_RESET( dkongjr )
 http://www.freepatentsonline.com/4633500.html
 
 
-  @0x510, cpu2
+Addresses found at @0x510, cpu2
+
  10: 0000 00 00000000 ... 50 53 01010000 01010011 "scramble"
  12: 007a 44 01000100 ... 00 0f 00000000 00001111 "all pilots climb up"
  14: 018b 13 00010011 ... dc f0 11011100 11110000
@@ -762,14 +757,61 @@ http://www.freepatentsonline.com/4633500.html
  5: 10 10 10    trouble, trouble, trouble
  6: 12 12       all pilots climb up
  7: 20          engine trouble
+ 
+ PA5   ==> CS 28 
+ PA4   ==> PDC 2 
+ PA0   ==> CTL1 25 
+ PA1   ==> CTL2 23 
+ PA2   ==> CTL4 20 
+ PA3   ==> CTL8 27 
+ M1 19 ==> PA6         M1 on TMS5100 
+ 
+ 12,13 Speaker
+  7,8  Xin, Xout  (5100: RC-OSC, T11)
+  24 A0 (5100: ADD1)
+  22 A1 (5100: ADD2)
+  22 A2 (5100: ADD4)
+  26 A3 (5100: ADD8)
+  16 C0 (5100: NC)
+  18 C1 (5100: NC)
+  3  CLK  (5100: ROM-CK)
+  
+	For documentation purposes:
+	
+	Addresses 
+		{ 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }		
+	and related samples interface
+	 
+	static const char *const radarsc1_sample_names[] =
+	{
+		"*radarsc1",
+		"10.wav",
+		"12.wav",
+		"14.wav",
+		"16.wav",
+		"18.wav",
+		"1A.wav",
+		"1C.wav",
+		"1E.wav",
+		"20.wav",
+		0	
+	};
+	
+	static const struct Samplesinterface radarsc1_samples_interface =
+	{
+		8,
+		radarsc1_sample_names
+	};
+
 */
 
 static WRITE8_HANDLER( M58817_command_w )
 {
 	logerror("PA Write %x\n", data);
 
-	m58817_CTL_w(0, data & 0x0f);
-	m58817_DRQ_w(0, (data>>4) & 0x01); // FIXME 0x20 ??
+	tms5110_CTL_w(0, data & 0x0f);
+	tms5110_PDC_w(0, (data>>4) & 0x01); 
+	// FIXME 0x20 is CS
 }
 
 /****************************************************************
@@ -803,12 +845,15 @@ static READ8_HANDLER( dkong_sh_tune_r )
 	dkong_state *state = Machine->driver_data;
 	UINT8 *SND = memory_region(REGION_CPU2);
 
-	if ( state->page & 0x40 )
+	if ( state->page & 0x40 ) 
 	{
 		return soundlatch_r(0) & 0x0F;
 	}
 	else
+	{
+		printf("rom access at pc = %4x\n",activecpu_get_pc());
 		return (SND[0x1000+(state->page & 7)*256+offset]);
+	}
 }
 
 static READ8_HANDLER( dkongjr_sh_tune_r )
@@ -840,7 +885,7 @@ static READ8_HANDLER( radarsc1_sh_p1_r )
 {
 	int r;
 
-	r = (I8035_P1_R() & 0x80) | (m58817_status_r(0)<<6);
+	r = (I8035_P1_R() & 0x80) | (tms5110_status_r(0)<<6);
 	return r;
 }
 
@@ -982,22 +1027,22 @@ WRITE8_HANDLER( dkongjr_snd_w1 )
 			case 3: /* Port 3 write ==> PB 5 */
 				I8035_P2_W_AL(5,data & 1);
 				break;
-#if 0 // above verified from schematics
+#if 0 // above verified from schematics				
 			case 3:			/* roar */
 				if (data)
 					sample_start (7,2,0);
 				break;
 #endif
 			case 4:			/* Port 4 write */
-				I8035_T_W_AL(1, data & 1);
+				I8035_T_W_AL(1, data & 1);	
 				break;
 			case 5:			/* Port 5 write */
-				I8035_T_W_AL(0, data & 1);
+				I8035_T_W_AL(0, data & 1);	
 				break;
 			case 6:			/* Port 6 write ==> PB 4 */
 				I8035_P2_W_AL(4,data & 1);
 				break;
-#if 0 // above verified from schematics
+#if 0 // above verified from schematics				
 			case 6:			/* snapjaw */
 				if (data)
 					sample_stop (7);
@@ -1022,7 +1067,7 @@ WRITE8_HANDLER( dkongjr_snd_w2 )
 		case 0:
 			dkong_audio_irq_w(0, data & 1);
 			break;
-#if 0 // above verified from schematics
+#if 0 // above verified from schematics				
 		case 0:			/* death */
 			if (data)
 				sample_stop (7);
@@ -1037,8 +1082,6 @@ WRITE8_HANDLER( dkongjr_snd_w2 )
 		state->dkongjr_latch[offset+8] = data;
 	}
 }
-
-
 
 /*************************************
  *
@@ -1123,42 +1166,16 @@ static const struct Samplesinterface dkongjr_samples_interface =
 	dkongjr_sample_names
 };
 
-#if !RADARSC1_USE_M58817
-static const char *const radarsc1_sample_names[] =
-{
-	"*radarsc1",
-	"10.wav",
-	"12.wav",
-	"14.wav",
-	"16.wav",
-	"18.wav",
-	"1A.wav",
-	"1C.wav",
-	"1E.wav",
-	"20.wav",
-	0	/* end of array */
-};
-
-static const struct Samplesinterface radarsc1_samples_interface =
-{
-	8,	/* 8 channels */
-	radarsc1_sample_names
-};
-#endif
-
 static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
 static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
-static const struct M58817interface m58817_interface =
+static struct TMS5110interface tms5110_interface =
 {
-#if !RADARSC1_USE_M58817
-	-1,
-#else
+	TMS5110_IS_M58817,
 	REGION_SOUND1,		/* Sample Rom */
-#endif
-	{ 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }		/* sample address map */
+	NULL,
+	NULL
 };
-
 /*************************************
  *
  *  Machine driver
@@ -1186,7 +1203,7 @@ MACHINE_DRIVER_START( radarscp_audio )
 	MDRV_IMPORT_FROM( dkong2b_audio )
 	MDRV_SOUND_MODIFY("discrete")
 	MDRV_SOUND_CONFIG_DISCRETE(radarscp)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 
 MACHINE_DRIVER_END
 
@@ -1199,15 +1216,9 @@ MACHINE_DRIVER_START( radarsc1_audio )
 
 	MDRV_SOUND_START(radarsc1)
 
-	MDRV_SOUND_ADD(M58817, 640000)
-	MDRV_SOUND_CONFIG(m58817_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
-
-#if !RADARSC1_USE_M58817
-	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(radarsc1_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.0)
-#endif
+	MDRV_SOUND_ADD(TMS5110, 640000)
+	MDRV_SOUND_CONFIG(tms5110_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 

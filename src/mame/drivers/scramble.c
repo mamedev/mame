@@ -1975,7 +1975,8 @@ static const struct AY8910interface triplep_ay8910_interface =
 
 static const struct TMS5110interface tms5110_interface =
 {
-	0,							/* irq callback function */
+	TMS5110_IS_5110A,
+	-1,							/* rom_region */
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };
 

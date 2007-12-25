@@ -27,13 +27,36 @@ struct tms5110_info
 	const struct TMS5110interface *intf;
 	sound_stream *stream;
 	void *chip;
+	INT32 speech_rom_bitnum;
 };
 
 
 /* static function prototypes */
 static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
+static int speech_rom_read_bit(void)
+{
+	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+	const UINT8 *table = memory_region(info->intf->rom_region);
 
+	int r;
+	
+	if (info->speech_rom_bitnum<0)
+		r = 0;
+	else
+		r = (table[info->speech_rom_bitnum >> 3] >> (0x07 - (info->speech_rom_bitnum & 0x07))) & 1;
+
+	info->speech_rom_bitnum++;
+
+	return r;
+}
+
+static void speech_rom_set_addr(int addr)
+{
+	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
+
+	info->speech_rom_bitnum = addr * 8 - 1;	
+}
 
 /******************************************************************************
 
@@ -43,14 +66,14 @@ static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_
 
 static void *tms5110_start(int sndindex, int clock, const void *config)
 {
-	static const struct TMS5110interface dummy = { 0 };
+	static const struct TMS5110interface dummy = { TMS5110_IS_5110A, -1 };
 	struct tms5110_info *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 	info->intf = config ? config : &dummy;
 
-	info->chip = tms5110_create(sndindex);
+	info->chip = tms5110_create(sndindex, info->intf->variant);
 	if (!info->chip)
 		return NULL;
 	sndintrf_register_token(info);
@@ -58,12 +81,21 @@ static void *tms5110_start(int sndindex, int clock, const void *config)
 	/* initialize a stream */
 	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
 
-    if (info->intf->M0_callback==NULL)
-    {
-		logerror("\n file: 5110intf.c, tms5110_start(), line 53:\n  Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
-		return NULL;
-    }
-    tms5110_set_M0_callback(info->chip, info->intf->M0_callback );
+	if (info->intf->rom_region == -1 )
+	{
+	    if (info->intf->M0_callback==NULL)
+	    {
+			logerror("\n file: 5110intf.c, tms5110_start(), line 53:\n  Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+			return NULL;
+	    }
+	    tms5110_set_M0_callback(info->chip, info->intf->M0_callback );
+	    tms5110_set_load_address(info->chip, info->intf->load_address );
+	}
+	else
+	{
+	    tms5110_set_M0_callback(info->chip, speech_rom_read_bit );
+	    tms5110_set_load_address(info->chip, speech_rom_set_addr );
+	}
 
     /* reset the 5110 */
     tms5110_reset_chip(info->chip);

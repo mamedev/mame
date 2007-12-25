@@ -221,7 +221,9 @@ static READ8_HANDLER( cvs_393hz_Clock_r )
 
 static const struct TMS5110interface tms5110_interface =
 {
-	0,		/*irq callback function*/
+	//TMS5110_IS_5110A,
+	TMS5110_IS_5100,
+	-1,		/* ROM Region */
 	cvs_speech_rom_read_bit	/*M0 callback function. Called whenever chip requests a single bit of data*/
 };
 

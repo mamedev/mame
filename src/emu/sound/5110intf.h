@@ -7,8 +7,10 @@
 
 struct TMS5110interface
 {
-	void (*irq)(int state);		/* IRQ callback function */
-	int (*M0_callback)(void);	/* function to be called when chip requests another bit*/
+	int variant;				/* Variant of the 5110 - see tms5110.h */
+	int rom_region;				/* set to -1 to specifiy callbacks below */
+	int (*M0_callback)(void);	/* function to be called when chip requests another bit */
+	void (*load_address)(int addr);	/* speech ROM load address callback */
 };
 
 WRITE8_HANDLER( tms5110_CTL_w );

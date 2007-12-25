@@ -125,7 +125,6 @@ enum _sound_type
 	SOUND_SID8580,
 	SOUND_SP0256,
 	SOUND_S14001A,
-	SOUND_M58817,
 
 	/* filters start here */
 	SOUND_FILTER_VOLUME,

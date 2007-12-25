@@ -13,12 +13,19 @@
 #define TMS5110_CMD_READ_BRANCH (12) /*    1     1     0     x  |     1    */
 #define TMS5110_CMD_TEST_TALK   (14) /*    1     1     1     x  |     3    */
 
+/* Variants */
 
-void *tms5110_create(int index);
+#define TMS5110_IS_5110A	(1)
+#define TMS5110_IS_5100		(2)
+#define TMS5110_IS_M58817	(3)
+
+
+void *tms5110_create(int index, int variant);
 void tms5110_destroy(void *chip);
 
 void tms5110_reset_chip(void *chip);
 void tms5110_set_M0_callback(void *chip, int (*func)(void));
+void tms5110_set_load_address(void *chip, void (*func)(int));
 
 void tms5110_CTL_set(void *chip, int data);
 void tms5110_PDC_set(void *chip, int data);
