@@ -738,6 +738,7 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
 	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
 	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
+	AM_RANGE(0x7000, 0x73ff) AM_RAM /* Actual sprite ram location ... waiting for missing z80 dma */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
@@ -755,7 +756,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* ??? */
+	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* dma controller */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
