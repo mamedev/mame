@@ -840,6 +840,22 @@ static READ8_HANDLER( dkong_sh_t1_r )
 	return I8035_T_R(1);
 }
 
+static WRITE8_HANDLER( dkong_voice_w )
+{
+	/* only provided for documentation purposes
+	 * not actually used 
+	 */
+	logerror("dkong_speech_w: 0x%02x\n", data);
+}
+
+static READ8_HANDLER( dkong_voice_status_r )
+{
+	/* only provided for documentation purposes
+	 * not actually used 
+	 */
+	return 0;
+}
+
 static READ8_HANDLER( dkong_sh_tune_r )
 {
 	dkong_state *state = Machine->driver_data;
@@ -847,11 +863,11 @@ static READ8_HANDLER( dkong_sh_tune_r )
 
 	if ( state->page & 0x40 ) 
 	{
-		return soundlatch_r(0) & 0x0F;
+		return (soundlatch_r(0) & 0x0F) | (dkong_voice_status_r(0)<<4);
 	}
 	else
 	{
-		printf("rom access at pc = %4x\n",activecpu_get_pc());
+		/* printf("rom access at pc = %4x\n",activecpu_get_pc()); */
 		return (SND[0x1000+(state->page & 7)*256+offset]);
 	}
 }
@@ -908,6 +924,7 @@ static WRITE8_HANDLER( dkong_sh_p2_w )
 	radarsc1_ansn_w(0, (data & 0x20) >> 5);
 	state->page = (data & 0x47);
 }
+
 
 /****************************************************************
  *
@@ -1094,8 +1111,8 @@ static ADDRESS_MAP_START( dkong_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(dkong_sh_tune_r)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READ(dkong_sh_tune_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w) 
+	AM_RANGE(I8039_bus, I8039_bus) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w)
 	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
 	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)

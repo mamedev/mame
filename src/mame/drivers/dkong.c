@@ -11,13 +11,12 @@ TODO:
 - dkong3 dma (Z80 dma)
 - implement 74LS259 (8bit addressable latches), 
   74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
-- for documentation: hook up speech interface still present on radarscp (TRS02) 
-  and early dkong (TKG02/TKG03) pcbs.
-  Minor priority since no records known where this has been used.
 
 Done:
 - when i am retired: implement 8257 DMA controller
 - drakton - add dkongjr conversion
+- for documentation: hook up speech interface still present on radarscp (TRS02) 
+  and early dkong (TKG02/TKG03) pcbs.
 - radarscp_grid_color_w() is wrong, it probably isn't supposed to change
   the grid color. There are reports of the grid being constantly blue in
   the real game, the flyer confirms this.
