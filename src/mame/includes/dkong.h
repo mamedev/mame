@@ -93,7 +93,7 @@ struct _dkong_state
 
 	/* Specific states */
 	INT8 decrypt_counter;
-	int hunchloopback;
+	UINT8 hunchloopback;
 
 	/* Save state relevant */
 	UINT8	gfx_bank, palette_bank;
