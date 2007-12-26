@@ -286,7 +286,7 @@ static void galpani3_mcu_run(void)
    * com2=com3=0xFFFF -> status reading only
 */
 #define GALPANI3_MCU_COM_W(_n_) \
-WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
+static WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
 { \
 	COMBINE_DATA(&galpani3_mcu_com[_n_]); \
 	if (galpani3_mcu_com[0] != 0xFFFF)	return; \

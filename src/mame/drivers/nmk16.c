@@ -4737,10 +4737,6 @@ static DRIVER_INIT( ssmissin )
 	decode_ssmissin();
 }
 
-
-int is_blkheart;
-
-
 static DRIVER_INIT( bjtwin )
 {
 	driver_init_nmk(machine);

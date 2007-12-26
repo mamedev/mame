@@ -12,7 +12,7 @@ typedef struct {
     void (*interrupt_request)(UINT16 addr, int level);
 } F3853_CONFIG;
 
-void f3853_init(F3853_CONFIG *config);
+void f3853_init(const F3853_CONFIG *config);
 void f3853_reset(void);
 
 // ports 0x0c - 0x0f

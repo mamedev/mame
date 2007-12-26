@@ -229,7 +229,7 @@ static void sn_divide(void)
 	SN74S516.ZWfl = 0;
 }
 
-void sn74s516_update(const int ins)
+static void sn74s516_update(const int ins)
 {
 	SN74S516.state = state_table[SN74S516.state][ins];
 

@@ -1529,7 +1529,7 @@ attotime amiga_get_serial_char_period(void)
  *
  *************************************/
 
-void amiga_add_autoconfig(amiga_autoconfig_device *device)
+void amiga_add_autoconfig(const amiga_autoconfig_device *device)
 {
 	autoconfig_device *dev, **d;
 

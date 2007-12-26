@@ -367,7 +367,7 @@ are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
 }
 
 #define JCHAN_MCU_COM_W(_n_) \
-WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
+static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
 { \
 	COMBINE_DATA(&jchan_mcu_com[_n_]); \
 	if (jchan_mcu_com[0] != 0xFFFF)	return; \

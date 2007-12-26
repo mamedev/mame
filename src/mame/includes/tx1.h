@@ -29,8 +29,8 @@
 
 /*----------- defined in drivers/tx1.c -----------*/
 extern UINT16 *tx1_math_ram;
-extern ppi8255_interface tx1_ppi8255_intf;
-extern ppi8255_interface buggyboy_ppi8255_intf;
+extern const ppi8255_interface tx1_ppi8255_intf;
+extern const ppi8255_interface buggyboy_ppi8255_intf;
 
 /*----------- defined in machine/tx1.c -----------*/
 READ16_HANDLER( tx1_spcs_rom_r );

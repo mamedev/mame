@@ -1463,7 +1463,7 @@ static GFXDECODE_START( dealem )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
-UINT8 *dealem_videoram,*dealem_charram;
+UINT8 *dealem_videoram;
 
 /***************************************************************************
 

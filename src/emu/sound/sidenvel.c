@@ -214,7 +214,7 @@ INLINE UINT16 enveEmuAlterShortAttack(sidOperator*);
 INLINE UINT16 enveEmuShortAttack(sidOperator*);
 
 
-ptr2sidUwordFunc enveModeTable[] =
+const ptr2sidUwordFunc enveModeTable[] =
 {
 	/* 0 */
 	&enveEmuStartAttack, &enveEmuStartRelease,

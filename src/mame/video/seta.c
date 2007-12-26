@@ -150,7 +150,7 @@ static int tilemaps_flip;
 int seta_tiles_offset;
 
 UINT16 *seta_vram_0, *seta_vctrl_0;
-UINT16 *seta_vram_2, *seta_vram_3, *seta_vctrl_2;
+UINT16 *seta_vram_2, *seta_vctrl_2;
 UINT16 *seta_vregs;
 
 UINT16 *seta_workram; // Used for zombraid crosshair hack

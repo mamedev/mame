@@ -788,11 +788,11 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 /* Read and write handlers for one K007232 chip:
    even and odd register are mapped swapped */
 #define HOTCHASE_K007232_RW(_chip_) \
-READ8_HANDLER( hotchase_K007232_##_chip_##_r ) \
+static READ8_HANDLER( hotchase_K007232_##_chip_##_r ) \
 { \
 	return K007232_read_port_##_chip_##_r(offset ^ 1); \
 } \
-WRITE8_HANDLER( hotchase_K007232_##_chip_##_w ) \
+static WRITE8_HANDLER( hotchase_K007232_##_chip_##_w ) \
 { \
 	K007232_write_port_##_chip_##_w(offset ^ 1, data); \
 } \

@@ -72,7 +72,7 @@ static TIMER_CALLBACK( f3853_timer_callback )
 }
 
 
-void f3853_init(F3853_CONFIG *config)
+void f3853_init(const F3853_CONFIG *config)
 {
 	UINT8 reg=0xfe;
 	int i;

@@ -43,7 +43,7 @@ VIDEO_UPDATE( amspdwy );
     Or last value when wheel delta = 0
 */
 #define AMSPDWY_WHEEL_R( _n_ ) \
-READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
+static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 { \
 	static UINT8 wheel_old, ret; \
 	UINT8 wheel = readinputport(5 + _n_); \

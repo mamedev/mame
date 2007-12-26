@@ -582,12 +582,11 @@ UINT16 *buggybjr_vram;
 size_t buggyboy_objram_size;
 size_t buggyboy_rcram_size;
 
-tilemap *buggybjr_tilemap;
-tilemap *buggyboy_tilemap;
+static tilemap *buggyboy_tilemap;
 
-UINT8 *chr_bmp;
-UINT8 *obj_bmp;
-UINT8 *rod_bmp;
+static UINT8 *chr_bmp;
+static UINT8 *obj_bmp;
+static UINT8 *rod_bmp;
 
 /***************************************************************************
 

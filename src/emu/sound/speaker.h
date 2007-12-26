@@ -15,7 +15,7 @@ extern "C" {
 struct Speaker_interface
 {
 	int num_level; 	/* optional: number of levels (if not two) */
-	INT16 *levels; 	/* optional: pointer to level lookup table */
+	const INT16 *levels; 	/* optional: pointer to level lookup table */
 };
 
 void speaker_level_w (int which, int new_level);

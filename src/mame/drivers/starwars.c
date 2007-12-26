@@ -123,7 +123,7 @@ static WRITE8_HANDLER( esb_slapstic_w )
  *
  *************************************/
 
-OPBASE_HANDLER( esb_setopbase )
+static OPBASE_HANDLER( esb_setopbase )
 {
 	int prevpc = activecpu_get_previouspc();
 

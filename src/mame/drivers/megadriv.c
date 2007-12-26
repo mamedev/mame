@@ -1435,8 +1435,8 @@ static void init_megadri6_io(void)
 }
 
 /* pointers to our io data read/write functions */
-UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
-void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+static UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
+static void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
 INPUT_PORTS_START( megadri6 )
 	PORT_START /* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)

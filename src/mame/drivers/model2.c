@@ -64,7 +64,8 @@ extern VIDEO_UPDATE(model2);
 
 extern void model2_3d_set_zclip( UINT8 clip );
 
-UINT32 *model2_bufferram, *model2_colorxlat, *model2_workram, *model2_backup1, *model2_backup2;
+UINT32 *model2_bufferram, *model2_colorxlat;
+static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
 UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
 static UINT32 model2_intreq;
 static UINT32 model2_intena;

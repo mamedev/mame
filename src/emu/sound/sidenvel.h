@@ -10,7 +10,7 @@ extern void enveEmuInit(UINT32 updateFreq, int measuredValues);
 void enveEmuResetOperator(sidOperator* pVoice);
 
 
-extern ptr2sidUwordFunc enveModeTable[];   // -> envelope.cpp
+extern const ptr2sidUwordFunc enveModeTable[];   // -> envelope.cpp
 extern const UINT8 masterVolumeLevels[16];  // -> envelope.cpp
 
 static const UINT8 ENVE_STARTATTACK = 0;

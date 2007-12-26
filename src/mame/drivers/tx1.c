@@ -579,7 +579,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static struct AY8910interface tx1_ay8910_interface =
+static const struct AY8910interface tx1_ay8910_interface =
 {
 	/* TODO */
 	0,
@@ -590,7 +590,7 @@ static struct AY8910interface tx1_ay8910_interface =
 
 
 /* YM2149 IC19 */
-static struct AY8910interface buggyboy_ym2149_interface_1 =
+static const struct AY8910interface buggyboy_ym2149_interface_1 =
 {
 	input_port_1_r,
 	input_port_2_r,
@@ -599,7 +599,7 @@ static struct AY8910interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static struct AY8910interface buggyboy_ym2149_interface_2 =
+static const struct AY8910interface buggyboy_ym2149_interface_2 =
 {
 	0,
 	0,
@@ -613,7 +613,7 @@ static WRITE8_HANDLER( tx1_coin_cnt )
 	coin_counter_w(1, data & 0x40);
 }
 
-ppi8255_interface tx1_ppi8255_intf =
+const ppi8255_interface tx1_ppi8255_intf =
 {
 	1,
 	{ tx1_ppi_porta_r },         /* Accelerator and brake */
@@ -624,7 +624,7 @@ ppi8255_interface tx1_ppi8255_intf =
 	{ tx1_coin_cnt },
 };
 
-static struct CustomSound_interface tx1_custom_interface =
+static const struct CustomSound_interface tx1_custom_interface =
 {
 	tx1_sh_start,
 	NULL,
@@ -632,7 +632,7 @@ static struct CustomSound_interface tx1_custom_interface =
 };
 
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-ppi8255_interface buggyboy_ppi8255_intf =
+const ppi8255_interface buggyboy_ppi8255_intf =
 {
 	1,
 	{ input_port_1_r },
@@ -643,7 +643,7 @@ ppi8255_interface buggyboy_ppi8255_intf =
 	{ 0 },
 };
 
-static struct CustomSound_interface bb_custom_interface =
+static const struct CustomSound_interface bb_custom_interface =
 {
 	buggyboy_sh_start,
 	NULL,

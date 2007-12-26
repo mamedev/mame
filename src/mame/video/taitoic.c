@@ -1367,7 +1367,8 @@ static int TC0080VCO_bg_gfx,TC0080VCO_tx_gfx;
 static int TC0080VCO_bg_xoffs,TC0080VCO_bg_yoffs;
 static int TC0080VCO_bg_flip_yoffs;
 
-INT32 TC0080VCO_flipscreen = 0,TC0080VCO_has_tx;
+INT32 TC0080VCO_flipscreen = 0;
+static int TC0080VCO_has_tx;
 
 
 #if 0

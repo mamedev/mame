@@ -12,7 +12,6 @@
 UINT16 *nmk_bgvideoram,*nmk_fgvideoram,*nmk_txvideoram;
 UINT16 *gunnail_scrollram;
 static UINT16 gunnail_scrolly;
-UINT16 tharrier_scroll;
 
 static int redraw_bitmap;
 
@@ -871,6 +870,7 @@ UINT16 *afega_vram_1, *afega_scroll_1;
 
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( afega_palette_w )
 {
 	int r,g,b;
@@ -880,6 +880,7 @@ WRITE16_HANDLER( afega_palette_w )
 	r = ((data & 0xF000) >> 11) + ((data & 0x0008) >> 3);
 	palette_set_color_rgb( Machine, offset, pal5bit(r) , pal5bit(g) , pal5bit(b) );
 }
+#endif
 
 /* This game uses 8 bit tiles, so it ignores the color codes and just
    uses the same 256 colors for every tile */

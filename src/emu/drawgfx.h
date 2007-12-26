@@ -227,10 +227,13 @@ void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 void draw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen);
 void draw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen);
+void draw_scanline32(mame_bitmap *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen);
 void pdraw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen,int pri);
 void pdraw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen,int pri);
+void pdraw_scanline32(mame_bitmap *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen,int pri);
 void extract_scanline8(mame_bitmap *bitmap,int x,int y,int length,UINT8 *dst);
 void extract_scanline16(mame_bitmap *bitmap,int x,int y,int length,UINT16 *dst);
+void extract_scanline32(mame_bitmap *bitmap,int x,int y,int length,UINT32 *dst);
 
 
 void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,

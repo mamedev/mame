@@ -4,7 +4,7 @@
 #include "cpuintrf.h"
 
 typedef struct {
-	UINT16	*regs;
+	const UINT16	*regs;
 	UINT8	features;
 	void	(*timer_callback)(int cycles);
 } Z80GB_CONFIG;
