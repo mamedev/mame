@@ -971,7 +971,6 @@ static MACHINE_START( nmg5 )
 	state_save_register_global(gfx_bank);
 	state_save_register_global(priority_reg);
 	state_save_register_global(input_data);
-	state_save_register_item_array("nmg5", 0, nmg5_bitmap);
 }
 
 static MACHINE_RESET( nmg5 )
