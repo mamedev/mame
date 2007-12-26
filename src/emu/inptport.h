@@ -36,13 +36,13 @@
 
 
 /* sequence types for input_port_seq() call */
-enum
+enum _input_seq_type
 {
 	SEQ_TYPE_STANDARD = 0,
 	SEQ_TYPE_INCREMENT = 1,
 	SEQ_TYPE_DECREMENT = 2
 };
-
+typedef enum _input_seq_type input_seq_type;
 
 /* conditions for DIP switches */
 enum
@@ -876,8 +876,8 @@ read16_handler port_tag_to_handler16(const char *tag);
 read32_handler port_tag_to_handler32(const char *tag);
 read64_handler port_tag_to_handler64(const char *tag);
 const char *input_port_name(const input_port_entry *in);
-const input_seq *input_port_seq(input_port_entry *in, int seqtype);
-const input_seq *input_port_default_seq(int type, int player, int seqtype);
+const input_seq *input_port_seq(input_port_entry *in, input_seq_type seqtype);
+const input_seq *input_port_default_seq(int type, int player, input_seq_type seqtype);
 int input_port_condition(const input_port_entry *in);
 void input_port_set_changed_callback(int port, UINT32 mask, void (*callback)(void *, UINT32, UINT32), void *param);
 

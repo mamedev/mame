@@ -2598,7 +2598,7 @@ const char *input_port_name(const input_port_entry *port)
 }
 
 
-const input_seq *input_port_seq(input_port_entry *port, int seqtype)
+const input_seq *input_port_seq(input_port_entry *port, input_seq_type seqtype)
 {
 	static const input_seq ip_none = SEQ_DEF_0;
 	input_seq *portseq;
@@ -2639,7 +2639,7 @@ const input_seq *input_port_seq(input_port_entry *port, int seqtype)
 }
 
 
-const input_seq *input_port_default_seq(int type, int player, int seqtype)
+const input_seq *input_port_default_seq(int type, int player, input_seq_type seqtype)
 {
 	static const input_seq ip_none = SEQ_DEF_0;
 
