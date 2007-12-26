@@ -336,7 +336,7 @@ static void *psxspu_start(int sndindex, int clock, const void *config)
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_adsrvolume );
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_repeataddress );
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_effect );
-	state_save_register_item_pointer( "psx", sndindex, chip->m_p_n_spuram, SPU_RAM_SIZE );
+	state_save_register_item_pointer( "psx", sndindex, chip->m_p_n_spuram, SPU_RAM_SIZE/2 );
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockaddress );
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockoffset );
 	state_save_register_item_array( "psx", sndindex, chip->m_p_n_blockstatus );
