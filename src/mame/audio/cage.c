@@ -466,6 +466,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", activecpu_get_pc(), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines();
+	cpunum_set_input_line(cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 

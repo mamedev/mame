@@ -1793,7 +1793,7 @@ static void float_imm(void)
 
 static void idle(void)
 {
-	tms32031.is_idling = 1;
+	tms32031.is_idling = TRUE;
 	IREG(TMR_ST) |= GIEFLAG;
 	check_irqs();
 	if (tms32031.is_idling)
@@ -2541,7 +2541,7 @@ static void rtps_reg(void)
 	IREG(TMR_RE) = tms32031.pc;
 	IREG(TMR_ST) |= RMFLAG;
 	tms32031_icount -= 3*2;
-	tms32031.delayed = 1;
+	tms32031.delayed = TRUE;
 }
 
 static void rtps_dir(void)
@@ -2551,7 +2551,7 @@ static void rtps_dir(void)
 	IREG(TMR_RE) = tms32031.pc;
 	IREG(TMR_ST) |= RMFLAG;
 	tms32031_icount -= 3*2;
-	tms32031.delayed = 1;
+	tms32031.delayed = TRUE;
 }
 
 static void rtps_ind(void)
@@ -2561,7 +2561,7 @@ static void rtps_ind(void)
 	IREG(TMR_RE) = tms32031.pc;
 	IREG(TMR_ST) |= RMFLAG;
 	tms32031_icount -= 3*2;
-	tms32031.delayed = 1;
+	tms32031.delayed = TRUE;
 }
 
 static void rtps_imm(void)
@@ -2571,7 +2571,7 @@ static void rtps_imm(void)
 	IREG(TMR_RE) = tms32031.pc;
 	IREG(TMR_ST) |= RMFLAG;
 	tms32031_icount -= 3*2;
-	tms32031.delayed = 1;
+	tms32031.delayed = TRUE;
 }
 
 /*-----------------------------------------------------*/
@@ -5308,7 +5308,7 @@ static void ldizuf_imm(void)
 
 INLINE void execute_delayed(UINT32 newpc)
 {
-	tms32031.delayed = 1;
+	tms32031.delayed = TRUE;
 
 	execute_one();
 	execute_one();
@@ -5317,10 +5317,10 @@ INLINE void execute_delayed(UINT32 newpc)
 	tms32031.pc = newpc;
 	UPDATEPC(tms32031.pc);
 
-	tms32031.delayed = 0;
+	tms32031.delayed = FALSE;
 	if (tms32031.irq_pending)
 	{
-		tms32031.irq_pending = 0;
+		tms32031.irq_pending = FALSE;
 		check_irqs();
 	}
 }
@@ -5473,7 +5473,12 @@ static void trap(int trapnum)
 {
 	WMEM(++IREG(TMR_SP), tms32031.pc);
 	IREG(TMR_ST) &= ~GIEFLAG;
-	tms32031.pc = tms32031.mcu_mode ? (0x809fc0 + trapnum) : RMEM(trapnum);
+	if (tms32031.is_32032)
+		tms32031.pc = RMEM(((IREG(TMR_IF) >> 16) << 8) + trapnum);
+	else if (tms32031.mcu_mode)
+		tms32031.pc = 0x809fc0 + trapnum;
+	else
+		tms32031.pc = RMEM(trapnum);
 	UPDATEPC(tms32031.pc);
 	tms32031_icount -= 4*2;
 }
@@ -5494,6 +5499,7 @@ static void retic_reg(void)
 		UPDATEPC(tms32031.pc);
 		IREG(TMR_ST) |= GIEFLAG;
 		tms32031_icount -= 3*2;
+		check_irqs();
 	}
 }
 

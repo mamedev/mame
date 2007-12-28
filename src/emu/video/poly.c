@@ -9,6 +9,7 @@
 #include "poly.h"
 #include "eminline.h"
 #include "mame.h"
+#include "state.h"
 #include <math.h>
 
 
@@ -205,6 +206,7 @@ struct _poly_manager
 static void **allocate_array(size_t *itemsize, UINT32 itemcount);
 static void free_array(void **array);
 static void *poly_item_callback(void *param, int threadid);
+static void poly_state_presave(void *param);
 
 
 
@@ -356,6 +358,9 @@ poly_manager *poly_alloc(int max_polys, size_t extra_data_size, UINT8 flags)
 	/* create the work queue */
 	if (!(flags & POLYFLAG_NO_WORK_QUEUE))
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
+
+	/* request a pre-save callback for synchronization */
+	state_save_register_func_presave_ptr(poly_state_presave, poly);
 	return poly;
 }
 
@@ -1407,4 +1412,16 @@ static void *poly_item_callback(void *param, int threadid)
 		param = polygon->poly->unit[orig_count_next];
 	}
 	return NULL;
+}
+
+
+/*-------------------------------------------------
+    poly_state_presave - pre-save callback to
+    ensure everything is synced before saving
+-------------------------------------------------*/
+
+static void poly_state_presave(void *param)
+{
+	poly_manager *poly = param;
+	poly_wait(poly, "pre-save");
 }

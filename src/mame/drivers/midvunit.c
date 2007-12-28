@@ -133,7 +133,10 @@ static READ32_HANDLER( port2_r )
 static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
+	{
+		cpunum_set_input_line(0, 3, CLEAR_LINE);
 		return adc_data << adc_shift;
+	}
 	else
 		logerror("adc_r without enabling reads!\n");
 	return 0xffffffff;

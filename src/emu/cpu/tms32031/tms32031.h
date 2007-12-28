@@ -59,6 +59,8 @@ enum
 #define TMS32031_TINT0		8		/* timer 0 interrupt */
 #define TMS32031_TINT1		9		/* timer 1 interrupt */
 #define TMS32031_DINT		10		/* DMA interrupt */
+#define TMS32031_DINT0		10		/* DMA 0 interrupt (32032 only) */
+#define TMS32031_DINT1		11		/* DMA 1 interrupt (32032 only) */
 
 
 /***************************************************************************
@@ -67,5 +69,10 @@ enum
 
 extern void tms32031_get_info(UINT32 state, cpuinfo *info);
 extern void tms32032_get_info(UINT32 state, cpuinfo *info);
+
+extern float convert_tms3203x_fp_to_float(UINT32 floatdata);
+extern double convert_tms3203x_fp_to_double(UINT32 floatdata);
+extern UINT32 convert_float_to_tms3203x_fp(float fval);
+extern UINT32 convert_double_to_tms3203x_fp(double dval);
 
 #endif /* _TMS32031_H */

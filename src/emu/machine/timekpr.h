@@ -15,10 +15,16 @@ extern void timekeeper_init( int chip, int type, UINT8 *data );
 #define TIMEKEEPER_M48T58 ( 1 )
 #define TIMEKEEPER_M48T02 ( 2 )
 #define TIMEKEEPER_MK48T08 ( 3 )
+#define TIMEKEEPER_MIDZEUS2 ( 4 )
 
 /* nvram handlers */
 
 extern NVRAM_HANDLER( timekeeper_0 );
+
+/* 8bit memory handlers */
+
+extern READ8_HANDLER( timekeeper_0_r );
+extern WRITE8_HANDLER( timekeeper_0_w );
 
 /* 16bit memory handlers */
 

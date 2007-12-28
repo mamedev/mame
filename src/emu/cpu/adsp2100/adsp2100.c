@@ -717,7 +717,6 @@ static void adsp2100_init(int index, int clock, const void *config, int (*irqcal
 	state_save_register_item("adsp2100", index, adsp2100.fl0);
 	state_save_register_item("adsp2100", index, adsp2100.fl1);
 	state_save_register_item("adsp2100", index, adsp2100.fl2);
-
 	state_save_register_item("adsp2100", index, adsp2100.idma_addr);
 	state_save_register_item("adsp2100", index, adsp2100.idma_cache);
 	state_save_register_item("adsp2100", index, adsp2100.idma_offs);
@@ -725,7 +724,6 @@ static void adsp2100_init(int index, int clock, const void *config, int (*irqcal
 	state_save_register_item("adsp2100", index, adsp2100.imask);
 	state_save_register_item("adsp2100", index, adsp2100.icntl);
 	state_save_register_item("adsp2100", index, adsp2100.ifc);
-
 	state_save_register_item_array("adsp2100", index, adsp2100.irq_state);
 	state_save_register_item_array("adsp2100", index, adsp2100.irq_latch);
 	state_save_register_item("adsp2100", index, adsp2100.interrupt_cycles);

@@ -268,6 +268,19 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 		c->offset_flags = 0x1ff0;
 		c->size = 0x2000;
 		break;
+	case TIMEKEEPER_MIDZEUS2:
+		c->offset_control = 0x7ff8;
+		c->offset_seconds = 0x7ff9;
+		c->offset_minutes = 0x7ffa;
+		c->offset_hours = 0x7ffb;
+		c->offset_day = 0x7ffc;
+		c->offset_date = 0x7ffd;
+		c->offset_month = 0x7ffe;
+		c->offset_year = 0x7fff;
+		c->offset_century = -1;
+		c->offset_flags = -1;
+		c->size = 0x8000;
+		break;
 	}
 
 	if( data == NULL )
@@ -381,6 +394,18 @@ static void timekeeper_write( UINT32 chip, offs_t offset, UINT8 data )
 
 //  logerror( "%08x: timekeeper_write( %d, %04x, %02x )\n", activecpu_get_pc(), chip, offset, data );
 	c->data[ offset ] = data;
+}
+
+/* 8bit memory handlers */
+
+READ8_HANDLER( timekeeper_0_r )
+{
+	return timekeeper_read(0, offset);
+}
+
+WRITE8_HANDLER( timekeeper_0_w )
+{
+	timekeeper_write(0, offset, data);
 }
 
 /* 16bit memory handlers */

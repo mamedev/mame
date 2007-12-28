@@ -891,6 +891,8 @@ static void dcs_register_state(void)
 	state_save_register_global(transfer.writes_left);
 	state_save_register_global(transfer.sum);
 	state_save_register_global(transfer.fifo_entries);
+
+	state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
 }
 
 
@@ -924,7 +926,6 @@ void dcs_init(void)
 
 void dcs2_init(int dram_in_mb, offs_t polling_offset)
 {
-	dcs_register_state();
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
@@ -977,6 +978,9 @@ void dcs2_init(int dram_in_mb, offs_t polling_offset)
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
 	if (transfer.hle_enabled)
 		transfer.watchdog = timer_alloc(transfer_watchdog_callback, NULL);
+
+	/* register for save states */
+	dcs_register_state();
 
 	/* reset the system */
 	dcs_reset(Machine, NULL, 0);

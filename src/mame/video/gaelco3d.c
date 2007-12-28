@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "eminline.h"
 #include "gaelco3d.h"
+#include "cpu/tms32031/tms32031.h"
 #include "video/rgbutil.h"
 #include "video/poly.h"
 
@@ -100,43 +101,6 @@ VIDEO_START( gaelco3d )
 
 /*************************************
  *
- *  TMS32031 floating point conversion
- *
- *************************************/
-
-typedef union int_double
-{
-	double d;
-	float f[2];
-	UINT32 i[2];
-} int_double;
-
-
-static float dsp_to_float(UINT32 val)
-{
-	INT32 _mantissa = val << 8;
-	INT8 _exponent = (INT32)val >> 24;
-	int_double id;
-
-	if (_mantissa == 0 && _exponent == -128)
-		return 0;
-	else if (_mantissa >= 0)
-	{
-		int exponent = (_exponent + 127) << 23;
-		id.i[0] = exponent + (_mantissa >> 8);
-	}
-	else
-	{
-		int exponent = (_exponent + 127) << 23;
-		INT32 man = -_mantissa;
-		id.i[0] = 0x80000000 + exponent + ((man >> 8) & 0x00ffffff);
-	}
-	return id.f[0];
-}
-
-
-/*************************************
- *
  *  Polygon rendering
  *
  *************************************/
@@ -166,16 +130,16 @@ static void render_poly(UINT32 *polydata)
 {
 	float midx = Machine->screen[0].width / 2;
 	float midy = Machine->screen[0].height / 2;
-	float z0 = dsp_to_float(polydata[0]);
-	float voz_dy = dsp_to_float(polydata[1]) * 256.0f;
-	float voz_dx = dsp_to_float(polydata[2]) * 256.0f;
-	float ooz_dy = dsp_to_float(polydata[3]);
-	float ooz_dx = dsp_to_float(polydata[4]);
-	float uoz_dy = dsp_to_float(polydata[5]) * 256.0f;
-	float uoz_dx = dsp_to_float(polydata[6]) * 256.0f;
-	float voz_base = dsp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
-	float ooz_base = dsp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
-	float uoz_base = dsp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
+	float z0 = convert_tms3203x_fp_to_float(polydata[0]);
+	float voz_dy = convert_tms3203x_fp_to_float(polydata[1]) * 256.0f;
+	float voz_dx = convert_tms3203x_fp_to_float(polydata[2]) * 256.0f;
+	float ooz_dy = convert_tms3203x_fp_to_float(polydata[3]);
+	float ooz_dx = convert_tms3203x_fp_to_float(polydata[4]);
+	float uoz_dy = convert_tms3203x_fp_to_float(polydata[5]) * 256.0f;
+	float uoz_dx = convert_tms3203x_fp_to_float(polydata[6]) * 256.0f;
+	float voz_base = convert_tms3203x_fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
+	float ooz_base = convert_tms3203x_fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
+	float uoz_base = convert_tms3203x_fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
 	poly_extra_data *extra = poly_get_extra_data(poly);
 	int color = (polydata[10] & 0x7f) << 8;
 	poly_vertex vert[MAX_VERTICES];
@@ -186,16 +150,16 @@ static void render_poly(UINT32 *polydata)
 	{
 		int t;
 		logerror("poly: %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %12.2f %08X %08X (%4d,%4d) %08X",
-				(double)dsp_to_float(polydata[0]),
-				(double)dsp_to_float(polydata[1]),
-				(double)dsp_to_float(polydata[2]),
-				(double)dsp_to_float(polydata[3]),
-				(double)dsp_to_float(polydata[4]),
-				(double)dsp_to_float(polydata[5]),
-				(double)dsp_to_float(polydata[6]),
-				(double)dsp_to_float(polydata[7]),
-				(double)dsp_to_float(polydata[8]),
-				(double)dsp_to_float(polydata[9]),
+				(double)convert_tms3203x_fp_to_float(polydata[0]),
+				(double)convert_tms3203x_fp_to_float(polydata[1]),
+				(double)convert_tms3203x_fp_to_float(polydata[2]),
+				(double)convert_tms3203x_fp_to_float(polydata[3]),
+				(double)convert_tms3203x_fp_to_float(polydata[4]),
+				(double)convert_tms3203x_fp_to_float(polydata[5]),
+				(double)convert_tms3203x_fp_to_float(polydata[6]),
+				(double)convert_tms3203x_fp_to_float(polydata[7]),
+				(double)convert_tms3203x_fp_to_float(polydata[8]),
+				(double)convert_tms3203x_fp_to_float(polydata[9]),
 				polydata[10],
 				polydata[11],
 				(INT16)(polydata[12] >> 16), (INT16)(polydata[12] << 2) >> 2, polydata[12]);

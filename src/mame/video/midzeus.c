@@ -1392,7 +1392,7 @@ static void log_waveram(UINT32 length_and_base)
 
 	UINT32 numoctets = (length_and_base >> 24) + 1;
 	const UINT32 *ptr = waveram_ptr_from_block_addr(0, length_and_base);
-	UINT64 checksum = length_and_base;
+	UINT32 checksum = length_and_base;
 	int foundit = FALSE;
 	int i;
 

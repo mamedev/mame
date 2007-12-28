@@ -20,6 +20,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"
 #include "machine/midwayic.h"
+#include "machine/timekpr.h"
 #include "audio/dcs.h"
 
 
@@ -54,17 +55,32 @@ static TIMER_CALLBACK( invasn_gun_callback );
  *
  *************************************/
 
-static MACHINE_RESET( midzeus )
+static MACHINE_START( midzeus )
 {
-	memcpy(ram_base, memory_region(REGION_USER1), 0x40000*4);
-
-	*(UINT32 *)ram_base *= 2;
-
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
 
 	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
+	
+	state_save_register_global(gun_control);
+	state_save_register_global(gun_irq_state);
+	state_save_register_global_array(gun_x);
+	state_save_register_global_array(gun_y);
+}
+
+
+static MACHINE_START( midzeus2 )
+{
+	timekeeper_init(0, TIMEKEEPER_MIDZEUS2, NULL);
+	machine_start_midzeus(machine);
+}
+
+
+static MACHINE_RESET( midzeus )
+{
+	memcpy(ram_base, memory_region(REGION_USER1), 0x40000*4);
+	*ram_base <<= 1;
 
 	cmos_protected = TRUE;
 }
@@ -73,20 +89,14 @@ static MACHINE_RESET( midzeus )
 
 /*************************************
  *
- *  CMOS access
+ *  CMOS access (Zeus only)
  *
  *************************************/
-
-static WRITE32_HANDLER( cmos_protect_w )
-{
-	cmos_protected = FALSE;
-}
-
 
 static WRITE32_HANDLER( cmos_w )
 {
 	if (!cmos_protected)
-		COMBINE_DATA(generic_nvram32 + offset);
+		COMBINE_DATA(&generic_nvram32[offset]);
 	cmos_protected = TRUE;
 }
 
@@ -96,6 +106,45 @@ static READ32_HANDLER( cmos_r )
 	return generic_nvram32[offset];
 }
 
+
+static WRITE32_HANDLER( cmos_protect_w )
+{
+	cmos_protected = FALSE;
+}
+
+
+
+/*************************************
+ *
+ *  Timekeeper access (Zeus 2 only)
+ *
+ *************************************/
+
+static READ32_HANDLER( timekeeper_r )
+{
+	UINT8 result = timekeeper_0_r(offset);
+//	logerror("%06X:cmos_time_r(%X) = %02X\n", activecpu_get_pc(), offset, result);
+	return result;
+}
+
+
+static WRITE32_HANDLER( timekeeper_w )
+{
+	if (!cmos_protected)
+	{
+//		logerror("%06X:cmos_time_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
+		timekeeper_0_w(offset, data);
+	}
+	cmos_protected = TRUE;
+}
+
+
+
+/*************************************
+ *
+ *  Zero-power RAM access (Zeus 2 only)
+ *
+ *************************************/
 
 static WRITE32_HANDLER( zpram_w )
 {
@@ -112,23 +161,23 @@ static READ32_HANDLER( zpram_r )
 }
 
 
-static NVRAM_HANDLER( zeus2_nvram )
+
+/*************************************
+ *
+ *  NVRAM handler (Zeus 2 only)
+ *
+ *************************************/
+
+static NVRAM_HANDLER( midzeus2 )
 {
+	nvram_handler_timekeeper_0(machine, file, read_or_write);
+	
 	if (read_or_write)
-	{
-		mame_fwrite(file, generic_nvram, generic_nvram_size);
 		mame_fwrite(file, zpram, zpram_size);
-	}
 	else if (file)
-	{
-		mame_fread(file, generic_nvram, generic_nvram_size);
 		mame_fread(file, zpram, zpram_size);
-	}
 	else
-	{
-		memset(generic_nvram, 0xff, generic_nvram_size);
 		memset(zpram, 0xff, zpram_size);
-	}
 }
 
 
@@ -175,6 +224,44 @@ static WRITE32_HANDLER( tms32031_control_w )
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
+}
+
+
+
+/*************************************
+ *
+ *  49-way joystick handling
+ *
+ *************************************/
+
+static UINT32 custom_49way_r(void *param)
+{
+	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+	const char *namex = param;
+	const char *namey = namex + strlen(namex) + 1;
+	return (translate49[readinputportbytag(namey) >> 4] << 4) | translate49[readinputportbytag(namex) >> 4];
+}
+
+
+
+/*************************************
+ *
+ *  Analog input handling
+ *
+ *************************************/
+
+static READ32_HANDLER( analog_r )
+{
+	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
+	if (offset < 8 || offset > 11)
+		logerror("%06X:analog_r(%X)\n", activecpu_get_pc(), offset);
+	return readinputportbytag(tags[offset & 3]);
+}
+
+
+static WRITE32_HANDLER( analog_w )
+{
+	/* 16 writes to the location before a read */
 }
 
 
@@ -290,7 +377,8 @@ static WRITE32_HANDLER( unknown_9d0000_w )
 
 static WRITE32_HANDLER( rombank_select_w )
 {
-	memory_set_bank(1, data);
+	if (data >= 0 && data <= 2)
+		memory_set_bank(1, data);
 }
 
 static READ32_HANDLER( unknown_8a0000_r )
@@ -335,8 +423,9 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_BASE(&zpram) AM_SIZE(&zpram_size) AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(timekeeper_r, timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION(REGION_USER1, 0)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION(REGION_USER2, 0)
@@ -652,6 +741,18 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)	/* keypad 2 */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)	/* keypad 2 */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("ANALOG3")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+
+	PORT_START_TAG("ANALOG2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+
+	PORT_START_TAG("ANALOG1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+
+	PORT_START_TAG("ANALOG0")
+	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -740,7 +841,6 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BILL1 )	/* Bill */
-	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START /* Listed "names" are via the manual's "JAMMA" pinout sheet" */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(1) PORT_8WAY /* Not Used */
@@ -759,18 +859,16 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) /* No Connection */
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT (0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(custom_49way_r, "49WAYX\0" "49WAYY")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START_TAG("49WAYX")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START_TAG("49WAYY")
+	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
@@ -788,6 +886,7 @@ static MACHINE_DRIVER_START( midzeus )
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
+	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
@@ -814,8 +913,9 @@ static MACHINE_DRIVER_START( midzeus2 )
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
+	MDRV_MACHINE_START(midzeus2)
 	MDRV_MACHINE_RESET(midzeus)
-	MDRV_NVRAM_HANDLER(zeus2_nvram)
+	MDRV_NVRAM_HANDLER(midzeus2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
