@@ -353,7 +353,6 @@ static void check_irqs(void)
 
 static void set_irq_line(int irqline, int state)
 {
-	UINT16 oldstate = tms32031.irq_state;
 	UINT16 intmask = 1 << irqline;
 	
 	/* ignore anything out of range */

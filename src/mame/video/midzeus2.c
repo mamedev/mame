@@ -95,7 +95,7 @@ static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit);
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid);
 
 static void log_fifo_command(const UINT32 *data, int numwords, const char *suffix);
-static void log_waveram(UINT32 base, UINT16 length);
+//static void log_waveram(UINT32 base, UINT16 length);
 
 
 
@@ -1237,6 +1237,7 @@ static void log_fifo_command(const UINT32 *data, int numwords, const char *suffi
 }
 
 
+#if 0
 static void log_waveram(UINT32 base, UINT16 length)
 {
 	static struct
@@ -1277,3 +1278,4 @@ static void log_waveram(UINT32 base, UINT16 length)
 	for (i = 0; i < numoctets; i++)
 		logerror("\t%02X: %08X %08X\n", i, WAVERAM_READ32(ptr, i*2), WAVERAM_READ32(ptr, i*2+1));
 }
+#endif
