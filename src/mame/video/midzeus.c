@@ -18,10 +18,13 @@
  *
  *************************************/
 
-#define DUMP_WAVE_RAM	0
+#define DUMP_WAVE_RAM		0
 
-#define WAVERAM_WIDTH	512
-#define WAVERAM_HEIGHT	2048
+#define WAVERAM0_WIDTH		512
+#define WAVERAM0_HEIGHT		2048
+
+#define WAVERAM1_WIDTH		512
+#define WAVERAM1_HEIGHT		512
 
 
 
@@ -63,12 +66,12 @@ static INT16 zeus_matrix[3][3];
 static INT32 zeus_point[3];
 static INT16 zeus_light[3];
 static void *zeus_renderbase;
-static void *zeus_palbase;
+static UINT32 zeus_palbase;
 static int zeus_enable_logging;
 static UINT32 zeus_objdata;
 static rectangle zeus_cliprect;
 
-static void *waveram[2];
+static UINT32 *waveram[2];
 
 
 
@@ -105,7 +108,8 @@ static void log_waveram(UINT32 length_and_base);
  *
  *************************************/
 
-#define WAVERAM_BLOCK(bank, blocknum)			((void *)((UINT8 *)waveram[bank] + 8 * (blocknum)))
+#define WAVERAM_BLOCK0(blocknum)				((void *)((UINT8 *)waveram[0] + 8 * (blocknum)))
+#define WAVERAM_BLOCK1(blocknum)				((void *)((UINT8 *)waveram[1] + 8 * (blocknum)))
 
 #define WAVERAM_PTR8(base, bytenum)				((UINT8 *)(base) + BYTE4_XOR_LE(bytenum))
 #define WAVERAM_READ8(base, bytenum)			(*WAVERAM_PTR8(base, bytenum))
@@ -138,22 +142,28 @@ static void log_waveram(UINT32 length_and_base);
  *
  *************************************/
 
-INLINE void *waveram_ptr_from_block_addr(UINT8 bank, UINT32 addr)
+INLINE void *waveram0_ptr_from_block_addr(UINT32 addr)
 {
-	UINT32 blocknum = (addr % WAVERAM_WIDTH) + ((addr >> 12) % WAVERAM_HEIGHT) * WAVERAM_WIDTH;
-	return WAVERAM_BLOCK(bank, blocknum);
+	UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 12) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+	return WAVERAM_BLOCK0(blocknum);
 }
 
-INLINE void *waveram_ptr_from_expanded_addr(UINT8 bank, UINT32 addr)
+INLINE void *waveram0_ptr_from_expanded_addr(UINT32 addr)
 {
-	UINT32 blocknum = (addr % WAVERAM_WIDTH) + ((addr >> 16) % WAVERAM_HEIGHT) * WAVERAM_WIDTH;
-	return WAVERAM_BLOCK(bank, blocknum);
+	UINT32 blocknum = (addr % WAVERAM0_WIDTH) + ((addr >> 16) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+	return WAVERAM_BLOCK0(blocknum);
 }
 
-INLINE void *waveram_ptr_from_texture_addr(UINT8 bank, UINT32 addr, int width)
+INLINE void *waveram1_ptr_from_expanded_addr(UINT32 addr)
 {
-	UINT32 blocknum = ((addr & ~1) * width) / 8;
-	return WAVERAM_BLOCK(bank, blocknum);
+	UINT32 blocknum = (addr % WAVERAM1_WIDTH) + ((addr >> 16) % WAVERAM1_HEIGHT) * WAVERAM1_WIDTH;
+	return WAVERAM_BLOCK1(blocknum);
+}
+
+INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
+{
+	UINT32 blocknum = (((addr & ~1) * width) / 8) % (WAVERAM0_WIDTH * WAVERAM0_HEIGHT);
+	return WAVERAM_BLOCK0(blocknum);
 }
 
 
@@ -236,10 +246,8 @@ VIDEO_START( midzeus )
 	int i;
 
 	/* allocate memory for "wave" RAM */
-	waveram[0] = auto_malloc(WAVERAM_WIDTH * WAVERAM_HEIGHT * 8);
-	waveram[1] = auto_malloc(WAVERAM_WIDTH * WAVERAM_HEIGHT * 8);
-	state_save_register_global_pointer(((UINT32 *)waveram[0]), WAVERAM_WIDTH * WAVERAM_HEIGHT * 8/4);
-	state_save_register_global_pointer(((UINT32 *)waveram[1]), WAVERAM_WIDTH * WAVERAM_HEIGHT * 8/4);
+	waveram[0] = auto_malloc(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8);
+	waveram[1] = auto_malloc(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8);
 
 	/* initialize a 5-5-5 palette */
 	for (i = 0; i < 32768; i++)
@@ -252,6 +260,21 @@ VIDEO_START( midzeus )
 	add_exit_callback(machine, exit_handler);
 
 	zeus_renderbase = waveram[1];
+
+	/* state saving */
+	state_save_register_global_array(zeus_fifo);
+	state_save_register_global(zeus_fifo_words);
+	state_save_register_global_2d_array(zeus_matrix);
+	state_save_register_global_array(zeus_point);
+	state_save_register_global_array(zeus_light);
+	state_save_register_global(zeus_palbase);
+	state_save_register_global(zeus_objdata);
+	state_save_register_global(zeus_cliprect.min_x);
+	state_save_register_global(zeus_cliprect.max_x);
+	state_save_register_global(zeus_cliprect.min_y);
+	state_save_register_global(zeus_cliprect.max_y);
+	state_save_register_global_pointer(waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
+	state_save_register_global_pointer(waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(waveram[1][0]));
 }
 
 
@@ -259,16 +282,16 @@ static void exit_handler(running_machine *machine)
 {
 #if DUMP_WAVE_RAM
 	FILE *f = fopen("waveram.dmp", "w");
-	int bank;
 	int i;
 
-	for (bank = 0; bank < 2; bank++)
-		for (i = 0; i < WAVERAM_WIDTH * WAVERAM_HEIGHT; i++)
-		{
-			if (i % 4 == 0) fprintf(f, "%03X%03X: ", i / WAVERAM_WIDTH, i % WAVERAM_WIDTH);
-			fprintf(f, " %08X %08X ", (UINT32)(waveram[bank][i] >> 32), (UINT32)waveram[bank][i]);
-			if (i % 4 == 3) fprintf(f, "\n");
-		}
+	for (i = 0; i < WAVERAM0_WIDTH * WAVERAM0_HEIGHT; i++)
+	{
+		if (i % 4 == 0) fprintf(f, "%03X%03X: ", i / WAVERAM0_WIDTH, i % WAVERAM0_WIDTH);
+		fprintf(f, " %08X %08X ",
+			WAVERAM_READ32(waveram[0], i*2+0), 
+			WAVERAM_READ32(waveram[0], i*2+1)); 
+		if (i % 4 == 3) fprintf(f, "\n");
+	}
 	fclose(f);
 #endif
 
@@ -292,7 +315,7 @@ VIDEO_UPDATE( midzeus )
 	/* normal update case */
 	if (!input_code_pressed(KEYCODE_W))
 	{
-		const void *base = waveram_ptr_from_expanded_addr(1, zeusbase[0xcc]);
+		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
 		int xoffs = machine->screen[screen].visarea.min_x;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -315,7 +338,7 @@ VIDEO_UPDATE( midzeus )
 		if (input_code_pressed(KEYCODE_RIGHT) && width < 512) { width <<= 1; while (input_code_pressed(KEYCODE_RIGHT)) ; }
 
 		if (yoffs < 0) yoffs = 0;
-		base = waveram_ptr_from_block_addr(0, yoffs << 12);
+		base = waveram0_ptr_from_block_addr(yoffs << 12);
 
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -450,7 +473,7 @@ static void zeus_pointer_w(UINT32 which, UINT32 data, int logit)
 		case 0x00c040:
 			if (logit)
 				logerror(" -- setptr(palbase)\n");
-			zeus_palbase = waveram_ptr_from_block_addr(0, data);
+			zeus_palbase = data;
 			break;
 
 
@@ -639,7 +662,7 @@ static void zeus_register_update(offs_t offset)
 		case 0x84:
 			/* MK4: Written in tandem with 0xcc */
 			/* MK4: Writes either 0x80 (and 0x000000 to 0xcc) or 0x00 (and 0x800000 to 0xcc) */
-			zeus_renderbase = waveram_ptr_from_expanded_addr(1, zeusbase[0x84] << 16);
+			zeus_renderbase = waveram1_ptr_from_expanded_addr(zeusbase[0x84] << 16);
 			break;
 
 		case 0xb0:
@@ -649,7 +672,13 @@ static void zeus_register_update(offs_t offset)
 				if ((offset == 0xb0 && (zeusbase[0xb6] & 0x02000000) == 0) ||
 					(offset == 0xb2 && (zeusbase[0xb6] & 0x02000000) != 0))
 				{
-					void *dest = waveram_ptr_from_expanded_addr(zeusbase[0xb6] >> 31, zeusbase[0xb4]);
+					void *dest;
+					
+					if (zeusbase[0xb6] & 0x80000000)
+						dest = waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
+					else
+						dest = waveram0_ptr_from_expanded_addr(zeusbase[0xb4]);
+
 					if (zeusbase[0xb6] & 0x00100000)
 						WAVERAM_WRITE16(dest, 0, zeusbase[0xb0]);
 					if (zeusbase[0xb6] & 0x00200000)
@@ -667,7 +696,13 @@ static void zeus_register_update(offs_t offset)
 		case 0xb4:
 			if (zeusbase[0xb6] & 0x00010000)
 			{
-				const UINT32 *src = waveram_ptr_from_expanded_addr(zeusbase[0xb6] >> 31, zeusbase[0xb4]);
+				const UINT32 *src;
+				
+				if (zeusbase[0xb6] & 0x80000000)
+					src = waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
+				else
+					src = waveram0_ptr_from_expanded_addr(zeusbase[0xb4]);
+
 				poly_wait(poly, "vram_read");
 				zeusbase[0xb0] = WAVERAM_READ32(src, 0);
 				zeusbase[0xb2] = WAVERAM_READ32(src, 1);
@@ -933,7 +968,7 @@ static void zeus_draw_model(UINT32 texdata, int logit)
 
 	while (zeus_objdata != 0 && !model_done)
 	{
-		const void *base = waveram_ptr_from_block_addr(0, zeus_objdata);
+		const void *base = waveram0_ptr_from_block_addr(zeus_objdata);
 		int count = zeus_objdata >> 24;
 		int curoffs;
 
@@ -1171,8 +1206,8 @@ if (
 	extra->alpha = zeusbase[0x4e];
 	extra->transcolor = ((databuffer[1] >> 16) & 1) ? 0 : 0x100;
 	extra->texwidth = 512 >> texwshift;
-	extra->texbase = waveram_ptr_from_texture_addr(0, val1, extra->texwidth);
-	extra->palbase = zeus_palbase;
+	extra->texbase = waveram0_ptr_from_texture_addr(val1, extra->texwidth);
+	extra->palbase = waveram0_ptr_from_block_addr(zeus_palbase);
 
 	poly_render_quad_fan(poly, NULL, &zeus_cliprect, callback, 4, numverts, &clipvert[0]);
 }
@@ -1391,7 +1426,7 @@ static void log_waveram(UINT32 length_and_base)
 	} recent_entries[100];
 
 	UINT32 numoctets = (length_and_base >> 24) + 1;
-	const UINT32 *ptr = waveram_ptr_from_block_addr(0, length_and_base);
+	const UINT32 *ptr = waveram0_ptr_from_block_addr(length_and_base);
 	UINT32 checksum = length_and_base;
 	int foundit = FALSE;
 	int i;

@@ -1095,8 +1095,8 @@ static DRIVER_INIT( thegrid )
  *
  *************************************/
 
-GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

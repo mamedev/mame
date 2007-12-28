@@ -19,7 +19,7 @@
  *
  *************************************/
 
-#define DUMP_WAVE_RAM		1
+#define DUMP_WAVE_RAM		0
 
 #define WAVERAM0_WIDTH		1024
 #define WAVERAM0_HEIGHT		2048
