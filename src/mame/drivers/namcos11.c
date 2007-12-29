@@ -1584,7 +1584,7 @@ ROM_START( tekken2 )
 	NAMCO_C7X_BIOS
 
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
-	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(af5eadb1) SHA1(1cba35b524b5ec1aa0302d0a707e0c7f4b1a1401) )
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
 ROM_START( tekken2a )
@@ -1609,7 +1609,7 @@ ROM_START( tekken2a )
 	NAMCO_C7X_BIOS
 
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
-	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(af5eadb1) SHA1(1cba35b524b5ec1aa0302d0a707e0c7f4b1a1401) )
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
 ROM_START( tekken2b )
@@ -1634,7 +1634,7 @@ ROM_START( tekken2b )
 	NAMCO_C7X_BIOS
 
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* samples */
-	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(af5eadb1) SHA1(1cba35b524b5ec1aa0302d0a707e0c7f4b1a1401) )
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
 ROM_START( xevi3dg )
