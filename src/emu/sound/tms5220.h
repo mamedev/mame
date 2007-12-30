@@ -20,10 +20,12 @@ void tms5220_set_read(void *chip, int (*func)(int));
 void tms5220_set_load_address(void *chip, void (*func)(int));
 void tms5220_set_read_and_branch(void *chip, void (*func)(void));
 
+
+
 typedef enum
 {
-	variant_tms5220,
-	variant_tms0285
+	variant_tms5220,	/* TMS5220_IS_TMS5220, TMS5220_IS_TMS5220C,  TMS5220_IS_TSP5220C */
+	variant_tms0285		/* TMS5220_IS_TMS5200, TMS5220_IS_CD2501 */
 } tms5220_variant;
 
 void tms5220_set_variant(void *chip, tms5220_variant new_variant);

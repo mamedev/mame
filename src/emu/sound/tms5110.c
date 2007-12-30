@@ -160,12 +160,12 @@ void *tms5110_create(int index, int variant)
 	switch (variant)
 	{
 		case TMS5110_IS_5110A:
-			tms->coeff = &tms5110_coeff;
+			tms->coeff = &tms5110a_coeff;
 			break;
 		case TMS5110_IS_5100:
 			tms->coeff = &pat4209836_coeff;
 			break;
-		case TMS5110_IS_M58817:
+		case TMS5110_IS_5110:
 			tms->coeff = &pat4403965_coeff;
 			break;
 		default:

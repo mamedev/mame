@@ -17,8 +17,13 @@
 
 #define TMS5110_IS_5110A	(1)
 #define TMS5110_IS_5100		(2)
-#define TMS5110_IS_M58817	(3)
+#define TMS5110_IS_5110		(3)
 
+#define TMS5110_IS_CD2801	TMS5110_IS_5100
+#define TMS5110_IS_TMC0281	TMS5110_IS_5100
+
+#define TMS5110_IS_CD2802	TMS5110_IS_5110
+#define TMS5110_IS_M58817	TMS5110_IS_5110
 
 void *tms5110_create(int index, int variant);
 void tms5110_destroy(void *chip);

@@ -170,7 +170,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 */
 
 
-static const struct tms5100_coeffs tms5110_coeff =
+static const struct tms5100_coeffs tms5110a_coeff =
 {
 	/* subtype */
 	SUBTYPE_TMS5110,
