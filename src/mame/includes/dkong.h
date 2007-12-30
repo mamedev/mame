@@ -63,15 +63,7 @@ struct _dkong_state
 	UINT8	hardware_type;
 
 	/* sound state */
-	UINT8 dkongjr_latch[10];
-	UINT8 sh_climb_count;
-
-	UINT8 has_discrete_interface;
-
 	UINT8 page,mcustatus;
-
-	double envelope,tt;
-	UINT8 decay;
 	UINT8 portT;
 
 	/* video state */

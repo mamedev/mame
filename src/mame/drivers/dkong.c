@@ -2,7 +2,6 @@
 
 TODO:
 
-- dkongjr discrete interface
 - write a shootgal palette_init
 - Pestplce colors and origin
 - Shooting Gallery: Shootgal.txt mentions speech pcb, 
@@ -13,6 +12,7 @@ TODO:
   74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
 
 Done:
+- dkongjr discrete interface
 - when i am retired: implement 8257 DMA controller
 - drakton - add dkongjr conversion
 - for documentation: hook up speech interface still present on radarscp (TRS02) 
@@ -59,6 +59,9 @@ Done:
 
   Couriersud: 12/2007
 
+	- Added dkongjr discrete sound
+	- Proper interface Z80 - I8035 for dkongjr
+	- Changed discrete sound output factors
     - changed dkong/radarscp based games to use hardware-conformant I8035 memory maps
     - Added drakton clone drktnjr on dkongjr hardware
     - wrote M58817 sound driver and hooked it up
@@ -255,6 +258,7 @@ Changes:
  *************************************/
 
 #define DEBUG_PROTECTION	(0)
+#define DEBUG_DISC_SOUND	(0)
 
 /*************************************
  *
@@ -498,6 +502,21 @@ static READ8_HANDLER( dkong_in2_r )
 {
 	UINT8 r;
 
+#if DEBUG_DISC_SOUND	
+	static UINT8 ui_snd = 0;
+	static UINT8 lst = 0;
+	if  (!lst && (readinputportbytag("TST") & 0x01))
+	{
+		ui_snd = (ui_snd + 1) % 10;
+		ui_popup("Sound %d", ui_snd);
+	}
+	lst = readinputportbytag("TST") & 0x01;
+	if (ui_snd<8)
+		dkongjr_snd_w1(ui_snd, (readinputportbytag("TST") & 0x02)>>1);
+	else
+		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
+#endif
+	
 	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
@@ -769,9 +788,9 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	                            /* IN2 */
-	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0")                               /* DSW0 */
 	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		                    /* Sound addrs */
-	AM_RANGE(0x7d80, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		                    /* Sound addrs */
+	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
+	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		                    /* Sound addrs */
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
@@ -1036,6 +1055,12 @@ static INPUT_PORTS_START( dkongjr )
 	PORT_INCLUDE( dkong_in1_4 )
 	PORT_INCLUDE( dkong_in2 )
 	PORT_INCLUDE( dkong_dsw0 )
+	
+#if DEBUG_DISC_SOUND	
+	PORT_START_TAG("TST")      /* TST */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_A) 
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_B) 
+#endif
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hunchbkd )
