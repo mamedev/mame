@@ -24,6 +24,11 @@
       SYS386 seems like a lower-cost version of single-board SPI.
       It has a 40MHz AMD 386 and a considerably weaker sound system (dual MSM6295).
 
+NOTES:
+
+	rjetus:
+	- If you get a blank screen on startup you need to press F2 and choose "Reset settings", 
+	  followed by "Exit". This will create a proper NVRAM
 
 TODO:
 - Alpha blending. Screen shot on www.system16.com show that during attract mode
