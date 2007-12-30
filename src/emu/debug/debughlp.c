@@ -858,7 +858,7 @@ static const help_item static_help_list[] =
 		"  Set a watchpoint that will halt execution whenever a read occurs in the address range "
 		"3456-3475. When this happens, print Read @ <wpaddr> and continue executing.\n"
 		"\n"
-		"temp0 = 0; wp 45678,1,writeval==f0,{temp0++; g}\n"
+		"temp0 = 0; wp 45678,1,w,wpdata==f0,{temp0++; g}\n"
 		"  Set a watchpoint that will halt execution whenever a write occurs to the address 45678 AND "
 		"the value being written is equal to f0. When that happens, increment the variable temp0 and "
 		"resume execution.\n"
