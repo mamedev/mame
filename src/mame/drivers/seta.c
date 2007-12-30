@@ -115,32 +115,70 @@ TODO:
 
 /***************************************************************************
 
-                        Thundercade / Twin Formation
+Thundercade / Twin Formation
+Taito America Corp./Romstar USA/Seta, 1987
 
-CPU: HD68000PS8
-SND: YM3812, YM2203C
-OSC: 16MHz
-
-This PCB is loaded with custom SETA chips as follows
-X1-001 (also has written YM3906)
-X1-002 (also has written YM3909)
-X1-003
-X1-004
-X1-006
-
-Rom code is UAO, M/B code is M6100287A (the TAITO logo is written also)
-
+PCB Layout
+---------
+M6100287A
 P0-029-A
+|------------------------------------------------------------------|
+|M    L    K     J     H     G     F     E     D     C     B     A1|
+|A UA0-4  UA0-3  4364  UA0-2  UA0-1  4364           16MHz          |
+|                                         X1-001           X1-002 2|
+|  68000                                                           |
+|                                                                  |
+|                                                                 3|
+|                                                                  |
+|                                                                  |
+|                       4364 4364   UA0-9  UA0-8  UA0-7  UA0-6    4|
+|                                                                  |
+|                                                                  |
+|                                                                 5|
+|                            4584                                  |
+|                                                                  |
+|                        RESET_SW   UA0-13 UA0-12 UA0-11 UA0-10   6|
+|                        4050  TL7705                              |
+|                                                                  |
+|                                                                 7|
+|      X0-006                                                      |
+|                                                                  |
+|                            SW1                                  8|
+| UA10-5 2016 YM3812 YM2203                                        |
+|            YM3014          SW2                   X1-006         9|
+|VOL   4558  YM3014 M54528            X1-004                       |
+|                                                                10|
+|                         X2-003 X2-003 X2-003     X1-003          |
+|                                                                11|
+|            |--|              JAMMA               |--|            |
+|------------|  |----------------------------------|  |------------|
+Notes:
+      68000  - clock 8.000MHz [16/2]
+      YM3812 - clock 4.000MHz [16/4]
+      YM2203 - clock 4.000MHz [16/4]
+      4364   - 8kx8 SRAM
+      2016   - 2kx8 SRAM
+      VSync  - 59.1845Hz
+      HSync  - 15.21kHz
 
-  UA0-4 UA0-3 4364 UA0-2 UA0-1 4364  X1-001  16MHz  X1-002
-  68000-8
-                         4364 4364   UA0-9  UA0-8  UA0-7  UA0-6
-                                     UA0-13 UA0-12 UA0-11 UA0-10
-     X0-006
-  UA10-5 2016 YM3812 YM2203  SW1
-                             SW2                   X1-006
-                                     X1-004
-                                                 X1-003
+      Custom Chips -
+                    X1-001 (SDIP64)
+                    X1-002 (SDIP64)
+                    X1-006 (SDIP64)
+                    X0-006 (SDIP64), also marked 'RP5A10-0001'. This is a 65C02 in disguise,
+                                     possibly with additional ROM or logic acting as a protection chip.
+                                     clocks - pin1 16MHz, pin2 2MHz, pin3 59.1845Hz [VSYNC),
+                                     pin63 2MHz, pin62 2MHz
+                    X1-003 (SDIP42)
+                    X1-004 (SDIP52)
+                    X2-003 (DIP16) - Resistor network IC for inputs
+
+      ROMs -
+             UA0-6 to AU0-13 DIP42 maskROM, read as MX27C2100 (2 Meg)
+             UA0-2 DIP32 27C1000 EPROM 
+             All other ROMs DIP32 read as 27C1000
+             All ROMs have IC locations, but the PCB also has IC locations so components
+             can be referenced with IC# or location. See above diagram for info.
 
 ***************************************************************************/
 
@@ -6510,11 +6548,11 @@ static INTERRUPT_GEN( tndrcade_sub_interrupt )
 static MACHINE_DRIVER_START( tndrcade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(tndrcade_readmem,tndrcade_writemem)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(M65C02, 2000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(tndrcade_sub_readmem,tndrcade_sub_writemem)
 	MDRV_CPU_VBLANK_INT(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
 
@@ -6535,12 +6573,12 @@ static MACHINE_DRIVER_START( tndrcade )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2203, 2000000)
+	MDRV_SOUND_ADD(YM2203, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_CONFIG(tndrcade_ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.35)
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD(YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
@@ -6560,11 +6598,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( twineagl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
-	MDRV_CPU_ADD(M65C02, 1000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(twineagl_sub_readmem,twineagl_sub_writemem)
 	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
@@ -6585,7 +6623,7 @@ static MACHINE_DRIVER_START( twineagl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6602,11 +6640,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( downtown )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M65C02, 1000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_sub_readmem,downtown_sub_writemem)
 	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
@@ -6627,7 +6665,7 @@ static MACHINE_DRIVER_START( downtown )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 8000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6662,11 +6700,11 @@ static INTERRUPT_GEN( calibr50_interrupt )
 static MACHINE_DRIVER_START( usclssic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(usclssic_readmem,usclssic_writemem)
 	MDRV_CPU_VBLANK_INT(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M65C02, 1000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* NMI caused by main cpu when writing to the sound latch */
 
@@ -6689,7 +6727,7 @@ static MACHINE_DRIVER_START( usclssic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6708,11 +6746,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( calibr50 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_readmem,calibr50_writemem)
 	MDRV_CPU_VBLANK_INT(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M65C02, 2000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
@@ -6733,7 +6771,7 @@ static MACHINE_DRIVER_START( calibr50 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6749,11 +6787,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( metafox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
-	MDRV_CPU_ADD(M65C02, 1000000)	/* ?? */
+	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(metafox_sub_readmem,metafox_sub_writemem)
 	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
@@ -6774,7 +6812,7 @@ static MACHINE_DRIVER_START( metafox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6792,7 +6830,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( atehate )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(atehate_readmem,atehate_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -6813,7 +6851,7 @@ static MACHINE_DRIVER_START( atehate )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6833,7 +6871,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blandia )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blandia_readmem,blandia_writemem)
 
 	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
@@ -6858,7 +6896,7 @@ static MACHINE_DRIVER_START( blandia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6867,7 +6905,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blandiap )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blandiap_readmem,blandiap_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 
@@ -6891,7 +6929,7 @@ static MACHINE_DRIVER_START( blandiap )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6905,7 +6943,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blockcar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(blockcar_readmem,blockcar_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
@@ -6926,7 +6964,7 @@ static MACHINE_DRIVER_START( blockcar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6940,7 +6978,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daioh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(daioh_readmem,daioh_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -6961,7 +6999,7 @@ static MACHINE_DRIVER_START( daioh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -6980,7 +7018,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drgnunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnunit_readmem,drgnunit_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7002,7 +7040,7 @@ static MACHINE_DRIVER_START( drgnunit )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7014,7 +7052,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qzkklgy2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnunit_readmem,drgnunit_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7036,7 +7074,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7050,7 +7088,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( eightfrc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7071,7 +7109,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7090,7 +7128,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( extdwnhl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(extdwnhl_readmem,extdwnhl_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7113,7 +7151,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7143,7 +7181,7 @@ static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
 static MACHINE_DRIVER_START( gundhara )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 #if	__uPD71054_TIMER
 //  MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
@@ -7175,7 +7213,7 @@ static MACHINE_DRIVER_START( gundhara )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7193,7 +7231,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jjsquawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7216,7 +7254,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7230,7 +7268,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kamenrid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(kamenrid_readmem,kamenrid_writemem)
 	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
 
@@ -7255,7 +7293,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7268,7 +7306,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( orbs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14318180)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz or 14.318180MHz */
 	MDRV_CPU_PROGRAM_MAP(orbs_readmem,orbs_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7289,7 +7327,7 @@ static MACHINE_DRIVER_START( orbs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7303,7 +7341,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( krzybowl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(krzybowl_readmem,krzybowl_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7324,7 +7362,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7339,7 +7377,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( madshark )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(madshark_readmem,madshark_writemem)
 	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
 
@@ -7368,7 +7406,7 @@ static MACHINE_DRIVER_START( madshark )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7383,7 +7421,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( msgundam )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(msgundam_readmem,msgundam_writemem)
 #if	__uPD71054_TIMER
 	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
@@ -7413,7 +7451,7 @@ static MACHINE_DRIVER_START( msgundam )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7428,7 +7466,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( oisipuzl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(oisipuzl_readmem,oisipuzl_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7449,7 +7487,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7464,7 +7502,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( triplfun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(triplfun_readmem,triplfun_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
@@ -7498,7 +7536,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kiwame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(kiwame_readmem,kiwame_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* lev 1-7 are the same. WARNING:
                                    the interrupt table is written to. */
@@ -7519,7 +7557,7 @@ static MACHINE_DRIVER_START( kiwame )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7536,7 +7574,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rezon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7557,7 +7595,7 @@ static MACHINE_DRIVER_START( rezon )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7574,7 +7612,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thunderl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
@@ -7595,7 +7633,7 @@ static MACHINE_DRIVER_START( thunderl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7605,11 +7643,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wiggie )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(wiggie_sound_readmem,wiggie_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -7638,7 +7676,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wits )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
@@ -7659,7 +7697,7 @@ static MACHINE_DRIVER_START( wits )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7674,7 +7712,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( umanclub )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(umanclub_readmem,umanclub_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
@@ -7695,7 +7733,7 @@ static MACHINE_DRIVER_START( umanclub )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7709,11 +7747,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( utoukond )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(utoukond_readmem,utoukond_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(utoukond_sound_readmem,utoukond_sound_writemem)
 	MDRV_CPU_IO_MAP(utoukond_sound_readport,utoukond_sound_writeport)
@@ -7741,7 +7779,7 @@ static MACHINE_DRIVER_START( utoukond )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
-	MDRV_SOUND_ADD(YM3438, 6000000)
+	MDRV_SOUND_ADD(YM3438, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_CONFIG(utoukond_ym3438_intf)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
@@ -7755,7 +7793,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wrofaero )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 #if	__uPD71054_TIMER
 	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
@@ -7784,7 +7822,7 @@ static MACHINE_DRIVER_START( wrofaero )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7805,7 +7843,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( zingzip )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
 
@@ -7828,7 +7866,7 @@ static MACHINE_DRIVER_START( zingzip )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7841,7 +7879,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pairlove )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)
+	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pairlove_readmem,pairlove_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7862,7 +7900,7 @@ static MACHINE_DRIVER_START( pairlove )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -7885,7 +7923,7 @@ static INTERRUPT_GEN( crazyfgt_interrupt )
 static MACHINE_DRIVER_START( crazyfgt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(crazyfgt_map,0)
 	MDRV_CPU_VBLANK_INT(crazyfgt_interrupt,1+5)
 
@@ -7908,7 +7946,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 4000000)	// clock?
+	MDRV_SOUND_ADD(YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD(OKIM6295, 1000000)	// clock?
@@ -7926,46 +7964,46 @@ MACHINE_DRIVER_END
 
 ROM_START( tndrcade )
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "ua0-4.1l", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
-	ROM_LOAD16_BYTE( "ua0-2.1h", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
-	ROM_LOAD16_BYTE( "ua0-3.1k", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
-	ROM_LOAD16_BYTE( "ua0-1.1g", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
+	ROM_LOAD16_BYTE( "ua0-4.u19", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
+	ROM_LOAD16_BYTE( "ua0-2.u17", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
+	ROM_LOAD16_BYTE( "ua0-3.u18", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
+	ROM_LOAD16_BYTE( "ua0-1.u16", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
 
 	ROM_REGION( 0x02c000, REGION_CPU2, 0 )		/* 65c02 Code */
-	ROM_LOAD( "ua10-5.8m", 0x004000, 0x020000, CRC(8eff6122) SHA1(1adc1643018e612df85643014b78525106478889) )	// $1fffd=2 (country code)
-	ROM_RELOAD(            0x00c000, 0x020000             )
+	ROM_LOAD( "ua10-5.u24", 0x004000, 0x020000, CRC(8eff6122) SHA1(1adc1643018e612df85643014b78525106478889) )	// $1fffd=2 (country code)
+	ROM_RELOAD(             0x00c000, 0x020000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "ua0-10", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
-	ROM_LOAD( "ua0-11", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
-	ROM_LOAD( "ua0-12", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
-	ROM_LOAD( "ua0-13", 0x0c0000, 0x040000, CRC(8f9a0ed3) SHA1(61315312fdb2fe090cd8e99a1ce3ecba46b466e9) )
-	ROM_LOAD( "ua0-6",  0x100000, 0x040000, CRC(14ecc7bb) SHA1(920983f5086462f8f06dc9cf7bebffeeb7187977) )
-	ROM_LOAD( "ua0-7",  0x140000, 0x040000, CRC(ff1a4e68) SHA1(d732df7d139995814969a603c9c4e9f8b068b1a3) )
-	ROM_LOAD( "ua0-8",  0x180000, 0x040000, CRC(936e1884) SHA1(9ad495b88e124d08a7141611ed1897b6e2abd412) )
-	ROM_LOAD( "ua0-9",  0x1c0000, 0x040000, CRC(e812371c) SHA1(b0e1e0c143da743bf9f7b48d657594e76f4970ed) )
+	ROM_LOAD( "ua0-10.u12", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
+	ROM_LOAD( "ua0-11.u13", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
+	ROM_LOAD( "ua0-12.u14", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
+	ROM_LOAD( "ua0-13.u15", 0x0c0000, 0x040000, CRC(8f9a0ed3) SHA1(61315312fdb2fe090cd8e99a1ce3ecba46b466e9) )
+	ROM_LOAD( "ua0-6.u8",   0x100000, 0x040000, CRC(14ecc7bb) SHA1(920983f5086462f8f06dc9cf7bebffeeb7187977) )
+	ROM_LOAD( "ua0-7.u9",   0x140000, 0x040000, CRC(ff1a4e68) SHA1(d732df7d139995814969a603c9c4e9f8b068b1a3) )
+	ROM_LOAD( "ua0-8.u10",  0x180000, 0x040000, CRC(936e1884) SHA1(9ad495b88e124d08a7141611ed1897b6e2abd412) )
+	ROM_LOAD( "ua0-9.u11",  0x1c0000, 0x040000, CRC(e812371c) SHA1(b0e1e0c143da743bf9f7b48d657594e76f4970ed) )
 ROM_END
 
 ROM_START( tndrcadj )
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "ua0-4.1l", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
-	ROM_LOAD16_BYTE( "ua0-2.1h", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
-	ROM_LOAD16_BYTE( "ua0-3.1k", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
-	ROM_LOAD16_BYTE( "ua0-1.1g", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
+	ROM_LOAD16_BYTE( "ua0-4.u19", 0x000000, 0x020000, CRC(73bd63eb) SHA1(5d410d2a77f1c3c4c37a9fe1e56019335891fe67) )
+	ROM_LOAD16_BYTE( "ua0-2.u17", 0x000001, 0x020000, CRC(e96194b1) SHA1(c5084d06a2e4f7ba3112be1ccc314f7d712bb45e) )
+	ROM_LOAD16_BYTE( "ua0-3.u18", 0x040000, 0x020000, CRC(0a7b1c41) SHA1(ede14ac08d7e63972c21fd2d0717276e73153f18) )
+	ROM_LOAD16_BYTE( "ua0-1.u16", 0x040001, 0x020000, CRC(fa906626) SHA1(a1d28328afa8dda98dd20f3f5a19c0dbf2ebaf36) )
 
 	ROM_REGION( 0x02c000, REGION_CPU2, 0 )		/* 65c02 Code */
-	ROM_LOAD( "thcade5.bin", 0x004000, 0x020000, CRC(8cb9df7b) SHA1(5b504657f4cc1ea265913ff670aed108ceddba46) )	// $1fffd=1 (country code jp)
-	ROM_RELOAD(              0x00c000, 0x020000             )
+	ROM_LOAD( "thcade5.u24", 0x004000, 0x020000, CRC(8cb9df7b) SHA1(5b504657f4cc1ea265913ff670aed108ceddba46) )	// $1fffd=1 (country code jp)
+	ROM_RELOAD(              0x00c000, 0x020000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "ua0-10", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
-	ROM_LOAD( "ua0-11", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
-	ROM_LOAD( "ua0-12", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
-	ROM_LOAD( "ua0-13", 0x0c0000, 0x040000, CRC(8f9a0ed3) SHA1(61315312fdb2fe090cd8e99a1ce3ecba46b466e9) )
-	ROM_LOAD( "ua0-6",  0x100000, 0x040000, CRC(14ecc7bb) SHA1(920983f5086462f8f06dc9cf7bebffeeb7187977) )
-	ROM_LOAD( "ua0-7",  0x140000, 0x040000, CRC(ff1a4e68) SHA1(d732df7d139995814969a603c9c4e9f8b068b1a3) )
-	ROM_LOAD( "ua0-8",  0x180000, 0x040000, CRC(936e1884) SHA1(9ad495b88e124d08a7141611ed1897b6e2abd412) )
-	ROM_LOAD( "ua0-9",  0x1c0000, 0x040000, CRC(e812371c) SHA1(b0e1e0c143da743bf9f7b48d657594e76f4970ed) )
+	ROM_LOAD( "ua0-10.u12", 0x000000, 0x040000, CRC(aa7b6757) SHA1(9157cc930760c846cce95e18bf38e7ea241f7a8e) )
+	ROM_LOAD( "ua0-11.u13", 0x040000, 0x040000, CRC(11eaf931) SHA1(ba1dfc4b0f87b1bbdc6c2e36deaecda2b4655d57) )
+	ROM_LOAD( "ua0-12.u14", 0x080000, 0x040000, CRC(00b5381c) SHA1(6fc3138dd0e2b3f99872b1f0d177094df5bed39d) )
+	ROM_LOAD( "ua0-13.u15", 0x0c0000, 0x040000, CRC(8f9a0ed3) SHA1(61315312fdb2fe090cd8e99a1ce3ecba46b466e9) )
+	ROM_LOAD( "ua0-6.u8",   0x100000, 0x040000, CRC(14ecc7bb) SHA1(920983f5086462f8f06dc9cf7bebffeeb7187977) )
+	ROM_LOAD( "ua0-7.u9",   0x140000, 0x040000, CRC(ff1a4e68) SHA1(d732df7d139995814969a603c9c4e9f8b068b1a3) )
+	ROM_LOAD( "ua0-8.u10",  0x180000, 0x040000, CRC(936e1884) SHA1(9ad495b88e124d08a7141611ed1897b6e2abd412) )
+	ROM_LOAD( "ua0-9.u11",  0x1c0000, 0x040000, CRC(e812371c) SHA1(b0e1e0c143da743bf9f7b48d657594e76f4970ed) )
 ROM_END
 
 ROM_START( twineagl )
@@ -8005,7 +8043,7 @@ ROM_START( downtown )
 
 	ROM_REGION( 0x04c000, REGION_CPU2, 0 )		/* 65c02 Code */
 	ROM_LOAD( "ud2002.004", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) )
-	ROM_RELOAD(             0x00c000, 0x040000             )
+	ROM_RELOAD(             0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_BYTE( "ud2005.t01", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) )
@@ -8030,7 +8068,7 @@ ROM_START( downtow2 )
 
 	ROM_REGION( 0x04c000, REGION_CPU2, 0 )		/* 65c02 Code */
 	ROM_LOAD( "ud2002.004", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) )
-	ROM_RELOAD(             0x00c000, 0x040000             )
+	ROM_RELOAD(             0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_BYTE( "ud2005.t01", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) )
@@ -8055,7 +8093,7 @@ ROM_START( downtowp )
 
 	ROM_REGION( 0x04c000, REGION_CPU2, 0 )		/* 65c02 Code */
 	ROM_LOAD( "ud2002.004", 0x004000, 0x040000, CRC(bbd538b1) SHA1(de4c43bfc4004a14f9f66b5e8ff192b00c45c003) )
-	ROM_RELOAD(             0x00c000, 0x040000             )
+	ROM_RELOAD(             0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_BYTE( "ud2005.t01", 0x000000, 0x080000, CRC(77e6d249) SHA1(cdf67211cd447858293188511e826640fe24078b) )
@@ -8080,7 +8118,7 @@ ROM_START( usclssic )
 
 	ROM_REGION( 0x04c000, REGION_CPU2, 0 )		/* 65c02 Code */
 	ROM_LOAD( "ue002u61.004", 0x004000, 0x040000, CRC(476e9f60) SHA1(940c09eb472652a88d5d34130270ff55a5f5ba27) )
-	ROM_RELOAD(               0x00c000, 0x040000             )
+	ROM_RELOAD(               0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_BYTE( "ue001009.119", 0x000000, 0x080000, CRC(dc065204) SHA1(0478b8126cd3ce3dee64cb7de2b30b509636eb1a) )
@@ -8121,7 +8159,7 @@ ROM_START( calibr50 )
 
 	ROM_REGION( 0x04c000, REGION_CPU2, 0 )		/* 65c02 Code */
 	ROM_LOAD( "uh001005.u61", 0x004000, 0x040000, CRC(4a54c085) SHA1(f53ff257ce3d95f945a6befcfb61f1b570f0eafe) )
-	ROM_RELOAD(               0x00c000, 0x040000             )
+	ROM_RELOAD(               0x00c000, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD16_BYTE( "uh001006.ux2", 0x000000, 0x080000, CRC(fff52f91) SHA1(fd7807e9a8dd5a88df1fcd13746b44a33adbc0fa) )
@@ -8379,7 +8417,7 @@ ROM_START( blandia )
 	ROM_REGION( 0x240000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "ux001013.069",  0x000000, 0x0c0000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
 	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(              0x100000, 0x040000             )
+	ROM_CONTINUE(              0x100000, 0x040000  )
 	ROM_LOAD( "ux001014.070",  0x140000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
 ROM_END
 
@@ -8419,21 +8457,21 @@ ROM_START( blandiap )
 	/* The c0000-fffff region is bankswitched */
 	ROM_REGION( 0x240000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "s-0.bin",  0x000000, 0x020000, CRC(a5fde408) SHA1(89efcd37ef6c5b313169d74a962a7c074a09b12a) )
-	ROM_CONTINUE(         0x140000, 0x020000             )
+	ROM_CONTINUE(         0x140000, 0x020000  )
 	ROM_LOAD( "s-1.bin",  0x020000, 0x020000, CRC(3083f9c4) SHA1(f5d2297c3d680eb1f128fa42a3a7f61badb9853a) )
-	ROM_CONTINUE(         0x160000, 0x020000             )
+	ROM_CONTINUE(         0x160000, 0x020000  )
 	ROM_LOAD( "s-2.bin",  0x040000, 0x020000, CRC(a591c9ef) SHA1(83e665e342c42fd3582c83becfacc27a3a3e5a54) )
-	ROM_CONTINUE(         0x180000, 0x020000             )
+	ROM_CONTINUE(         0x180000, 0x020000  )
 	ROM_LOAD( "s-3.bin",  0x060000, 0x020000, CRC(68826c9d) SHA1(a860b7b2140a5a506bf25110c08c6ea59db25743) )
-	ROM_CONTINUE(         0x1a0000, 0x020000             )
+	ROM_CONTINUE(         0x1a0000, 0x020000  )
 	ROM_LOAD( "s-4.bin",  0x080000, 0x020000, CRC(1c7dc8c2) SHA1(006459a23de83fe48e11bdd6ebe23ef6a18a87e8) )
-	ROM_CONTINUE(         0x1c0000, 0x020000             )
+	ROM_CONTINUE(         0x1c0000, 0x020000  )
 	ROM_LOAD( "s-5.bin",  0x0a0000, 0x020000, CRC(4bb0146a) SHA1(1e3c1739ea3c85296573426e55f25dce11f0ed2b) )
-	ROM_CONTINUE(         0x1e0000, 0x020000             )
+	ROM_CONTINUE(         0x1e0000, 0x020000  )
 	ROM_LOAD( "s-6.bin",  0x100000, 0x020000, CRC(9f8f34ee) SHA1(60abb70ae87595ebae23df68d62f3b0ed4a2e768) )	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(         0x200000, 0x020000             )	// this half is 0
+	ROM_CONTINUE(         0x200000, 0x020000  )	// this half is 0
 	ROM_LOAD( "s-7.bin",  0x120000, 0x020000, CRC(e077dd39) SHA1(a6f0881a026161710adc132bcf7cb95c4c8f2528) )
-	ROM_CONTINUE(         0x220000, 0x020000             )	// this half is 0
+	ROM_CONTINUE(         0x220000, 0x020000  )	// this half is 0
 ROM_END
 
 ROM_START( blockcar )
@@ -8447,7 +8485,7 @@ ROM_START( blockcar )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
-	ROM_RELOAD(                0x080000, 0x080000             )
+	ROM_RELOAD(                0x080000, 0x080000  )
 ROM_END
 
 ROM_START( qzkklogy )
@@ -8485,22 +8523,22 @@ ROM_END
 
 ROM_START( zingzip )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "uy001001.3",	0x000000, 0x040000, CRC(1a1687ec) SHA1(c840752dd87d8c1c30e6b31452173148e20538b1) )
-	ROM_LOAD16_BYTE( "uy001002.4",	0x000001, 0x040000, CRC(62e3b0c4) SHA1(51a27fbf68a142dd132157bed1dc22acda3fa044) )
+	ROM_LOAD16_BYTE( "uy001001.3",  0x000000, 0x040000, CRC(1a1687ec) SHA1(c840752dd87d8c1c30e6b31452173148e20538b1) )
+	ROM_LOAD16_BYTE( "uy001002.4",  0x000001, 0x040000, CRC(62e3b0c4) SHA1(51a27fbf68a142dd132157bed1dc22acda3fa044) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "uy001006.64",		0x000000, 0x080000, CRC(46e4a7d8) SHA1(2c829e52d9aead351702335bf06aa0f337528306) )
-	ROM_LOAD( "uy001005.63",		0x080000, 0x080000, CRC(4aac128e) SHA1(3ac64c84a40f86e29e33a218babcd21cae6dbfdb) )
+	ROM_LOAD( "uy001006.64",  0x000000, 0x080000, CRC(46e4a7d8) SHA1(2c829e52d9aead351702335bf06aa0f337528306) )
+	ROM_LOAD( "uy001005.63",  0x080000, 0x080000, CRC(4aac128e) SHA1(3ac64c84a40f86e29e33a218babcd21cae6dbfdb) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 1 */
-	ROM_LOAD( "uy001008.66",		0x000000, 0x100000, CRC(1dff7c4b) SHA1(94f581f4aae1ef417dce6e62a611a523205e8c27) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD       ( "uy001008.66", 0x000000, 0x100000, CRC(1dff7c4b) SHA1(94f581f4aae1ef417dce6e62a611a523205e8c27) ) // FIRST AND SECOND HALF IDENTICAL
 	ROM_LOAD16_BYTE( "uy001007.65",	0x100000, 0x080000, CRC(ec5b3ab9) SHA1(e82fb050ae4e2486e43418fcb5fa726d92c5cd21) )
 
 	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE )	/* Layer 2 */
-	ROM_LOAD( "uy001010.68",		0x000000, 0x100000, CRC(bdbcdf03) SHA1(857f541697f76086ac6c761a3505678a3d3499df) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_LOAD( "uy001010.68",  0x000000, 0x100000, CRC(bdbcdf03) SHA1(857f541697f76086ac6c761a3505678a3d3499df) ) // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "uy001011.70",		0x000000, 0x100000, CRC(bd845f55) SHA1(345b79cfcd8c924d6ba365814286e518438f10bc) ) // uy001017 + uy001018
+	ROM_LOAD( "uy001011.70",  0x000000, 0x100000, CRC(bd845f55) SHA1(345b79cfcd8c924d6ba365814286e518438f10bc) ) // uy001017 + uy001018
 ROM_END
 
 ROM_START( atehate )
@@ -8661,9 +8699,9 @@ ROM_END
 ROM_START( jjsquawk )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "jj-rom1.040", 0x000000, 0x040000, CRC(7b9af960) SHA1(1718d54b0c12ae148de44f9ccccf90c0182f7b4f) )
-	ROM_CONTINUE   (                0x100000, 0x040000             )
+	ROM_CONTINUE   (                0x100000, 0x040000  )
 	ROM_LOAD16_BYTE( "jj-rom2.040", 0x000001, 0x040000, CRC(47dd71a3) SHA1(e219d984a1cac484ce1e570b7849562a88e0903e) )
-	ROM_CONTINUE   (                0x100001, 0x040000             )
+	ROM_CONTINUE   (                0x100001, 0x040000  )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "jj-rom9",  0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) )
@@ -8725,7 +8763,7 @@ ROM_START( eightfrc )
 	ROM_REGION( 0x240000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "u70.bin",  0x000000, 0x0c0000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
 	// skip c0000-fffff (banked region)
-	ROM_CONTINUE(         0x100000, 0x040000             )
+	ROM_CONTINUE(         0x100000, 0x040000  )
 	ROM_LOAD( "u69.bin",  0x140000, 0x100000, CRC(82ec08f1) SHA1(f17300d3cf990ef5c11056fd922f8cae0b2c918f) )
 ROM_END
 
@@ -8756,13 +8794,12 @@ ROM_START( krzybowl )
 	ROM_LOAD( "fv001.006", 0x080000, 0x080000, CRC(572a15e7) SHA1(b6a3e99e14a473b78ff48d1a46b20a0862d128e9) )
 ROM_END
 
-ROM_START( orbs )
-//all eproms are socketed and labelled (handwritten) "ORBS 10\7\94"
-//most of rom space is unused (filled with sound samples - same data in all roms)
+ROM_START( orbs )	/* All eproms are socketed and labelled (handwritten) "ORBS 10\7\94" */
+			/* most of rom space is unused (filled with sound samples - same data in all roms) */
 
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "orbs.u10",  0x000000, 0x080000, CRC(10f079c8) SHA1(0baf2b7e1e8be116a6fab609481c87fc7c86f305) )
-	ROM_LOAD16_BYTE( "orbs.u9",  0x000001, 0x080000, CRC(f269d16f) SHA1(34f38789cb3256e334b0ac8acd9f339d14481578) )
+	ROM_LOAD16_BYTE( "orbs.u9",   0x000001, 0x080000, CRC(f269d16f) SHA1(34f38789cb3256e334b0ac8acd9f339d14481578) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "orbs.u14",  0x000000, 0x080000, CRC(1cc76541) SHA1(d8a233212bfb9a9c686a40e470524f95b34417fa) )
@@ -8792,7 +8829,7 @@ ROM_START( extdwnhl )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "fw001007.026",  0x080000, 0x080000, CRC(16d84d7a) SHA1(fdc13776ba1ec9c48a33a9f2dfe8a0e55c54d89e) )	// swapped halves
-	ROM_CONTINUE(              0x000000, 0x080000             )
+	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
 
 ROM_START( gundhara )
@@ -8818,7 +8855,7 @@ ROM_START( gundhara )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "bpgh-013.u70",  0x080000, 0x080000, CRC(0fa5d503) SHA1(fd7a80cd25c23e737cc2c3d11de2291e22313b58) )	// swapped halves
-	ROM_CONTINUE(              0x000000, 0x080000             )
+	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
 
 ROM_START( sokonuke )
@@ -8838,7 +8875,7 @@ ROM_START( sokonuke )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "001-006.bin",   0x080000, 0x080000, CRC(ecfac767) SHA1(3d05bdb2c2a8c7eb5fa77b0c4482f98d3947c6d6) )
-	ROM_CONTINUE(              0x000000, 0x080000             )
+	ROM_CONTINUE(              0x000000, 0x080000  )
 ROM_END
 
 ROM_START( zombraid )
@@ -8862,7 +8899,7 @@ ROM_START( zombraid )
 	ROM_REGION( 0x480000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "fy001012.b",  0x000000, 0x080000, CRC(fd30e102) SHA1(ae02f94f69aa301b0c37921ca1117e3ad20467b5) )
 	// skip 80000-fffff (banked region)
-	ROM_CONTINUE(            0x100000, 0x180000 )
+	ROM_CONTINUE(            0x100000, 0x180000  )
 	ROM_LOAD( "fy001011.a",  0x280000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
 ROM_END
 
@@ -8940,7 +8977,7 @@ ROM_START( pairlove )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
-	ROM_RELOAD(                0x080000, 0x080000             )
+	ROM_RELOAD(                   0x080000, 0x080000  )
 ROM_END
 
 ROM_START( crazyfgt )
@@ -8949,21 +8986,21 @@ ROM_START( crazyfgt )
 	ROM_LOAD16_BYTE( "rom.u4", 0x00001, 0x40000, CRC(505e9d47) SHA1(3797d396a24e46b891de4c40aafe960d1cf5f161) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE ) 	/* Sprites */
-	ROM_LOAD( "rom.u228",     0x000000, 0x80000, CRC(7181618e) SHA1(57c5aced95b0a11a43dc9bd532290f067113e65a) )
-	ROM_LOAD( "rom.u227",     0x080000, 0x80000, CRC(7905b5f2) SHA1(633f86bf2be620afbe8012ade5d1e59c359a25d4) )
-	ROM_LOAD( "rom.u226",     0x100000, 0x80000, CRC(ef210e34) SHA1(99241ffcbc8af889c8ab6f0bc67eedef27d455f0) )
-	ROM_LOAD( "rom.u225",     0x180000, 0x80000, CRC(451b4419) SHA1(ab32b3c452b566ddfc64c0a80a257c3baadd8f41) )
+	ROM_LOAD( "rom.u228",  0x000000, 0x80000, CRC(7181618e) SHA1(57c5aced95b0a11a43dc9bd532290f067113e65a) )
+	ROM_LOAD( "rom.u227",  0x080000, 0x80000, CRC(7905b5f2) SHA1(633f86bf2be620afbe8012ade5d1e59c359a25d4) )
+	ROM_LOAD( "rom.u226",  0x100000, 0x80000, CRC(ef210e34) SHA1(99241ffcbc8af889c8ab6f0bc67eedef27d455f0) )
+	ROM_LOAD( "rom.u225",  0x180000, 0x80000, CRC(451b4419) SHA1(ab32b3c452b566ddfc64c0a80a257c3baadd8f41) )
 
 	ROM_REGION( 0xc0000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 1 */
-	ROM_LOAD( "rom.u67",      0x000000, 0x40000, CRC(ec8c6831) SHA1(e0ef1c2e539c1780fc5816ec950d33cb2a69d55e) )
-	ROM_LOAD( "rom.u68",      0x040000, 0x80000, CRC(2124312e) SHA1(1c6053c87a975bfdf910e75bd3e38d0898806ea0) )
+	ROM_LOAD( "rom.u67",  0x000000, 0x40000, CRC(ec8c6831) SHA1(e0ef1c2e539c1780fc5816ec950d33cb2a69d55e) )
+	ROM_LOAD( "rom.u68",  0x040000, 0x80000, CRC(2124312e) SHA1(1c6053c87a975bfdf910e75bd3e38d0898806ea0) )
 
 	ROM_REGION( 0xc0000, REGION_GFX3, ROMREGION_DISPOSE )	/* Layer 2 */
-	ROM_LOAD( "rom.u65",      0x000000, 0x40000, CRC(58448231) SHA1(711f24831777719f6a7b143f4f1bfd14f5a9ed4c) )
-	ROM_LOAD( "rom.u66",      0x040000, 0x80000, CRC(c6f7735b) SHA1(0e77045f82d0bf659be5dbfe21cfc8f223faeee9) )
+	ROM_LOAD( "rom.u65",  0x000000, 0x40000, CRC(58448231) SHA1(711f24831777719f6a7b143f4f1bfd14f5a9ed4c) )
+	ROM_LOAD( "rom.u66",  0x040000, 0x80000, CRC(c6f7735b) SHA1(0e77045f82d0bf659be5dbfe21cfc8f223faeee9) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* OKI samples */
-	ROM_LOAD( "rom.u85",      0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
+	ROM_LOAD( "rom.u85",  0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
 ROM_END
 
 
