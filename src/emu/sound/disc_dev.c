@@ -100,6 +100,12 @@ struct dsd_566_context
 	double		triOffset;		// used to shift a triangle to AC
 };
 
+struct dsd_ls624_context
+{
+	int			state;
+	double		remain;			// remaining time from last step
+	int			outtype;
+};
 
 
 /* Test to see if basic 555 options are valid. */
@@ -1369,4 +1375,91 @@ void dsd_566_reset(node_description *node)
 
 	/* Step the output */
 	dsd_566_step(node);
+}
+
+/************************************************************************
+ *
+ * DSD_LS624 - Usage of node_description values
+ *
+ * input[0]    - Enable input value
+ * input[1]    - Modulation Voltage
+ * input[2]    - Range Voltage
+ * input[3]    - C value
+ * input[4]    - Output type
+ *
+ * Dec 2007, Couriersud
+ ************************************************************************/
+#define DSD_LS624__ENABLE	(*(node->input[0]))
+#define DSD_LS624__VMOD		(*(node->input[1]))
+#define DSD_LS624__VRNG		(*(node->input[2]))
+#define DSD_LS624__C		(*(node->input[3]))
+#define DSD_LS624__OUTTYPE	(*(node->input[4]))
+
+/* 
+ * These formulas are derived from diagrams in the datasheet!
+ * They are not based on any law. The function is not
+ * described anywhere.
+ */
+
+#define LS624_F1(x)			(0.19 + 20.0/90.0*(x))
+#define LS624_T(_C, _R, _F)		(-600.0 * (_C) * log(1.0-LS624_F1(_R)*0.12/LS624_F1(_F)))
+
+void dsd_ls624_step(node_description *node)
+{
+	struct dsd_ls624_context *context = node->context;
+
+	if (DSD_LS624__ENABLE)
+	{
+		double dt;	// change in time
+		double sample_t;
+		double t;
+		int lst, cntf=0, cntr=0;
+
+		sample_t = discrete_current_context->sample_time;	// Change in time
+		dt = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD);
+		dt = 16 * dt;
+		t = context->remain;
+		lst = context->state;
+		while (t + dt < sample_t)
+		{
+			context->state = (1-context->state);
+			if (context->state)
+				cntr++;
+			else
+				cntf++;
+			t += dt;
+		}
+		context->remain = t - sample_t;
+
+		switch (context->outtype)
+		{
+			case DISC_LS624_OUT_ENERGY:
+				node->output = ((double) lst) * (1.0+context->remain/sample_t) - ((double) context->state) * context->remain/sample_t;
+				break;
+			case DISC_LS624_OUT_LOGIC:
+				node->output = context->state;
+				break;
+			case DISC_LS624_OUT_COUNT_F:
+				node->output = cntf;
+				break;
+			case DISC_LS624_OUT_COUNT_R:
+				node->output = cntr;
+				break;
+		}
+
+	}
+	else
+		node->output = 0;
+}
+
+void dsd_ls624_reset(node_description *node)
+{
+	struct dsd_ls624_context *context = node->context;
+
+	context->remain = 0;
+	context->state = 0;
+	context->outtype = DSD_LS624__OUTTYPE;
+	
+	/* Step the output */
+	dsd_ls624_step(node);
 }

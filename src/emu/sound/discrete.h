@@ -2911,9 +2911,9 @@
  *
  *     DISCRETE_566(name of node,
  *                  enable node or static value,
+ *                  vMod node or static value,
  *                  R node or static value in ohms,
  *                  C node or static value in Farads,
- *                  vMod node or static value,
  *                  address of discrete_566_desc structure)
  *
  *     discrete_566_desc = {options, vPlus, vNeg}
@@ -2927,6 +2927,50 @@
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *
+ ***********************************************************************
+ *
+ * DISCRETE_74LS624 - VCO.
+ *
+ * Simplified 74LS624 - calculated frequencies should match datasheet
+ * for C > 1nF. Output is Logic (1/0)                      
+ * 
+ * The datasheet gives no formulae. The implementation therefore is
+ * a rough model of the diagrams given. 
+ * 
+ * For a LS628, use VRng = 3.2
+ * 
+ *                          V+
+ *                           |
+ *                     .---------.
+ *   vRng >------------|Rng  V+  |
+ *                     |         |
+ *   vMod >------------|Freq   Z |---------> Netlist Node
+ *                     |         |
+ *                 .---|CX1      |
+ *                 |   |         |
+ *                ---  |         |
+ *              C ---  |         |
+ *                 |   |         |
+ *                 '---|CX2      |
+ *                     '---------'
+ *                         | 
+ *                        GND
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_74LS624(name of node,
+ *                      enable node or static value,
+ *                      vMod node or static value,
+ *                      vRng node or static value,
+ *                      C node or static value in Farads,
+ * 						Type of output static value)
+ * 
+ * Type of Output
+ *      DISC_LS624_OUT_ENERGY	Energy - use for audio output
+ *      DISC_LS624_OUT_LOGIC    Logic ( 0 or 1)
+ *      DISC_LS624_OUT_COUNT_F	Number of Falling edges
+ *      DISC_LS624_OUT_COUNT_R	Number of Rising  edges
+ * 
  ***********************************************************************
  *
  * DISCRETE_CUSTOMx - Link to custom code
@@ -3208,6 +3252,11 @@ enum
 
 #define DISC_566_OUT_MASK				0x30	/* Bits that define output type.
                                                  * Used only internally in module. */
+/* LS624 output flags */
+#define DISC_LS624_OUT_ENERGY			0x01
+#define DISC_LS624_OUT_LOGIC			0x02
+#define DISC_LS624_OUT_COUNT_F			0x03
+#define DISC_LS624_OUT_COUNT_R			0x04
 
 /* Oneshot types */
 #define DISC_ONESHOT_FEDGE				0x00
@@ -3739,6 +3788,7 @@ enum
 	DSD_555_CC,			/* Constant Current 555 circuit (VCO)*/
 	DSD_555_VCO1,		/* Op-Amp linear ramp based 555 VCO */
 	DSD_566,			/* NE566 Emulation */
+	DSD_LS624,			/* 74LS624 Emulation */
 
 	/* Custom */
 	DST_CUSTOM,			/* whatever you want */
@@ -3902,7 +3952,7 @@ enum
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "555 VCO1 - Op-Amp type" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "555 VCO1 with CV - Op-Amp type" },
 #define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "566" },
-
+#define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "74LS624" },
 #define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "CSV Log 1 Node" },
 #define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "CSV Log 2 Nodes" },
 #define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                        { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "CSV Log 3 Nodes" },

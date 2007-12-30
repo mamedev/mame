@@ -259,7 +259,7 @@ static const discrete_module module_list[] =
 	{ DSD_555_CC      ,"DSD_555_CC"      ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      },
 	{ DSD_555_VCO1    ,"DSD_555_VCO1"    ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    },
 	{ DSD_566         ,"DSD_566"         ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         },
-
+	{ DSD_LS624       ,"DSD_LS624"       ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       },
 	/* must be the last one */
 	{ DSS_NULL        ,"DSS_NULL"        ,0                                      ,NULL                  ,NULL                 }
 };
