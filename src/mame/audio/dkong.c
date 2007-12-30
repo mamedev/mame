@@ -353,22 +353,11 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	DISCRETE_MIXER4(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_DAC, DS_OUT_SOUND2, &dkong_mixer_desc)
 
-#if 0
-	/* This filter should simulate gain vs. frequency behaviour of MB3712 */
-	//DISCRETE_FILTER1(NODE_294,1,NODE_288,80,DISC_FILTER_HIGHPASS)
-
-	/* The following is the CR filter by the speaker and C8 */
-	/* 4 Ohm is from MB3712 Spec Sheet */
-	DISCRETE_CRFILTER(NODE_295,1,NODE_288, 4, DK_C8)
-	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0*15)
-#else
 	// Amplifier: internal amplifier
-	//DISCRETE_ADDER2(NODE_289,1,NODE_288,0.3+5.0*150.0/(150.0+1000.0))
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
 	DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 3)
-#endif
 
 DISCRETE_SOUND_END
 
@@ -623,22 +612,11 @@ static DISCRETE_SOUND_START(radarscp)
 
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND2, DS_OUT_SOUND7, DS_OUT_DAC, &radarscp_mixer_desc)
 
-#if 0
-	/* This filter should simulate gain vs. frequency behaviour of MB3712 */
-	//DISCRETE_FILTER1(NODE_291,1,NODE_289,80,DISC_FILTER_HIGHPASS)
-
-	/* The following is the CR filter by the speaker and C8 */
-	/* 4 Ohm is from MB3712 Spec Sheet */
-	DISCRETE_CRFILTER(NODE_295,1,NODE_288, 4, RS_C5)
-	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0*20)
-#else
 	// Amplifier: internal amplifier
-	//DISCRETE_ADDER2(NODE_289,1,NODE_288,0.5+5.0*150.0/(150.0+1000.0))
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
 	DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 3)
-#endif
 
 DISCRETE_SOUND_END
 
@@ -1060,8 +1038,6 @@ static READ8_HANDLER( dkongjr_sh_tune_r )
 	return soundlatch_r(0) & 0x01F;
 }
 
-#define TSTEP 0.001
-
 static WRITE8_HANDLER( dkong_sh_p1_w )
 {
 	discrete_sound_w(DS_DAC,data);
@@ -1158,6 +1134,7 @@ WRITE8_HANDLER( dkong_snd_disc_w )
 			break;
 		case 6:
 			discrete_sound_w(DS_SOUND6_INP,data & 1);
+			break;
 		case 7:
 			discrete_sound_w(DS_SOUND7_INP,data & 1);
 			break;
@@ -1272,30 +1249,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const char *const dkongjr_sample_names[] =
-{
-	"*dkongjr",
-	"jump.wav",
-	"land.wav",
-	"roar.wav",
-	"climb0.wav",
-	"climb1.wav",
-	"climb2.wav",
-	"death.wav",
-	"drop.wav",
-	"walk0.wav",
-	"walk1.wav",
-	"walk2.wav",
-	"snapjaw.wav",
-	0	/* end of array */
-};
-
-static const struct Samplesinterface dkongjr_samples_interface =
-{
-	8,	/* 8 channels */
-	dkongjr_sample_names
-};
-
 static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
 static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
@@ -1306,6 +1259,7 @@ static struct TMS5110interface tms5110_interface =
 	NULL,
 	NULL
 };
+
 /*************************************
  *
  *  Machine driver
@@ -1363,7 +1317,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dkongjr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
