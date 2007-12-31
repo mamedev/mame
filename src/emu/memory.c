@@ -143,7 +143,7 @@
 #define HANDLER_IS_BANK(h)		((FPTR)(h) >= STATIC_BANK1 && (FPTR)(h) <= STATIC_BANKMAX)
 #define HANDLER_IS_STATIC(h)	((FPTR)(h) < STATIC_COUNT)
 
-#define HANDLER_TO_BANK(h)		((FPTR)(h))
+#define HANDLER_TO_BANK(h)		((UINT32)(FPTR)(h))
 #define BANK_TO_HANDLER(b)		((genf *)(FPTR)(b))
 
 #define SPACE_SHIFT(s,a)		(((s)->ashift < 0) ? ((a) << -(s)->ashift) : ((a) >> (s)->ashift))
@@ -1484,11 +1484,7 @@ static void install_mem_handler(addrspace_data *space, int iswrite, int databits
 			if (state_save_registration_allowed())
 				state_save_register_item("memory", HANDLER_TO_BANK(handler), bdata->curentry);
 
-			#ifdef PTR64
-			VPRINTF(("Allocated new bank %lld\n", HANDLER_TO_BANK(handler)));
-			#else
 			VPRINTF(("Allocated new bank %d\n", HANDLER_TO_BANK(handler)));
-			#endif
 		}
 	}
 
