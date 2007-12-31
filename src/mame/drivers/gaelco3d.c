@@ -453,7 +453,7 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* done after uploading, and after modifying the comm area */
 	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 	if (!(mem_mask & 0xff))
-		cpunum_set_input_line(1, 0, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 static WRITE32_HANDLER( tms_irq_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_irq_w(offset, data, mem_mask); }
 

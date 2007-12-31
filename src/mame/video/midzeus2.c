@@ -20,6 +20,7 @@
  *************************************/
 
 #define DUMP_WAVE_RAM		0
+#define TRACK_REG_USAGE		0
 
 #define WAVERAM0_WIDTH		1024
 #define WAVERAM0_HEIGHT		2048
@@ -75,6 +76,23 @@ static int zeus_quad_size;
 
 static UINT32 *waveram[2];
 static emu_timer *int_timer;
+
+#if TRACK_REG_USAGE
+typedef struct reg_info
+{
+	struct reg_info *next;
+	UINT32 value;
+} reg_info;
+
+static reg_info *regdata[0x80];
+static int regdata_count[0x80];
+static int regread_count[0x80];
+static int regwrite_count[0x80];
+static reg_info *subregdata[0x100];
+static int subregdata_count[0x80];
+static int subregwrite_count[0x100];
+
+#endif
 
 
 
@@ -286,6 +304,39 @@ static void exit_handler(running_machine *machine)
 	fclose(f);
 #endif
 
+#if TRACK_REG_USAGE
+{
+	reg_info *info;
+	int regnum;
+	
+	for (regnum = 0; regnum < 0x80; regnum++)
+	{
+		printf("Register %02X\n", regnum);
+		if (regread_count[regnum] == 0)
+			printf("\tNever read\n");
+		else
+			printf("\tRead %d times\n", regread_count[regnum]);
+
+		if (regwrite_count[regnum] == 0)
+			printf("\tNever written\n");
+		else
+		{
+			printf("\tWritten %d times\n", regwrite_count[regnum]);
+			for (info = regdata[regnum]; info != NULL; info = info->next)
+				printf("\t%08X\n", info->value);
+		}
+	}
+	
+	for (regnum = 0; regnum < 0x100; regnum++)
+		if (subregwrite_count[regnum] != 0)
+		{
+			printf("Sub-Register %02X (%d writes)\n", regnum, subregwrite_count[regnum]);
+			for (info = subregdata[regnum]; info != NULL; info = info->next)
+				printf("\t%08X\n", info->value);
+		}
+}
+#endif
+
 	poly_free(poly);
 }
 
@@ -297,11 +348,16 @@ static void exit_handler(running_machine *machine)
  *
  *************************************/
 
+static float zbase = 2.0f;
+
 VIDEO_UPDATE( midzeus2 )
 {
 	int x, y;
 
 	poly_wait(poly, "VIDEO_UPDATE");
+
+if (input_code_pressed(KEYCODE_UP)) { zbase += 1.0f; popmessage("Zbase = %f", zbase); }
+if (input_code_pressed(KEYCODE_DOWN)) { zbase -= 1.0f; popmessage("Zbase = %f", zbase); }
 
 	/* normal update case */
 	if (!input_code_pressed(KEYCODE_W))
@@ -358,6 +414,10 @@ READ32_HANDLER( zeus2_r )
 {
 	int logit = (offset != 0x00 && offset != 0x01 && offset != 0x54 && offset != 0x48 && offset != 0x49 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
 	UINT32 result = zeusbase[offset];
+
+#if TRACK_REG_USAGE
+	regread_count[offset]++;
+#endif
 
 	if (logit)
 		logerror("%06X:zeus2_r(%02X)\n", activecpu_get_pc(), offset);
@@ -421,6 +481,25 @@ WRITE32_HANDLER( zeus2_w )
 static void zeus_register32_w(offs_t offset, UINT32 data, int logit)
 {
 	UINT32 oldval = zeusbase[offset];
+
+#if TRACK_REG_USAGE
+regwrite_count[offset]++;
+if (regdata_count[offset] < 256)
+{
+	reg_info **tailptr;
+	
+	for (tailptr = &regdata[offset]; *tailptr != NULL; tailptr = &(*tailptr)->next)
+		if ((*tailptr)->value == data)
+			break;
+	if (*tailptr == NULL)
+	{
+		*tailptr = malloc_or_die(sizeof(reg_info));
+		(*tailptr)->next = NULL;
+		(*tailptr)->value = data;
+		regdata_count[offset]++;
+	}
+}
+#endif
 
 	/* writes to register $CC need to force a partial update */
 //  if ((offset & ~1) == 0xcc)
@@ -647,6 +726,25 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 
 static void zeus_pointer_write(UINT8 which, UINT32 value)
 {
+#if TRACK_REG_USAGE
+subregwrite_count[which]++;
+if (subregdata_count[which] < 256)
+{
+	reg_info **tailptr;
+	
+	for (tailptr = &subregdata[which]; *tailptr != NULL; tailptr = &(*tailptr)->next)
+		if ((*tailptr)->value == value)
+			break;
+	if (*tailptr == NULL)
+	{
+		*tailptr = malloc_or_die(sizeof(reg_info));
+		(*tailptr)->next = NULL;
+		(*tailptr)->value = value;
+		subregdata_count[which]++;
+	}
+}
+#endif
+
 	switch (which)
 	{
 		case 0x04:
@@ -841,6 +939,9 @@ static void zeus_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 
 	if (logit)
 		logerror(" -- model @ %08X, len %04X\n", baseaddr, count);
+
+	if (count > 0x1000)
+		fatalerror("Extreme count\n");
 
 	while (baseaddr != 0 && !model_done)
 	{
@@ -1063,6 +1164,7 @@ In memory:
 		vert[i].x = x * zeus_matrix[0][0] + y * zeus_matrix[0][1] + z * zeus_matrix[0][2] + zeus_point[0];
 		vert[i].y = x * zeus_matrix[1][0] + y * zeus_matrix[1][1] + z * zeus_matrix[1][2] + zeus_point[1];
 		vert[i].p[0] = x * zeus_matrix[2][0] + y * zeus_matrix[2][1] + z * zeus_matrix[2][2] + zeus_point[2];
+vert[i].p[0] += zbase;
 		vert[i].p[2] += texoffs >> 16;
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
@@ -1082,6 +1184,7 @@ In memory:
 	maxx = maxy = -1000.0f;
 	for (i = 0; i < numverts; i++)
 	{
+// 412.0f here works for crusnexo
 		float ooz = 512.0f / clipvert[i].p[0];
 		
 //		ooz *= 1.0f / (512.0f * 512.0f);

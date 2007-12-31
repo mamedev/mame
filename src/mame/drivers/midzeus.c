@@ -89,6 +89,25 @@ static MACHINE_RESET( midzeus )
 
 /*************************************
  *
+ *  Display interrupt generation
+ *
+ *************************************/
+
+static TIMER_CALLBACK( display_irq_off )
+{
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+}
+
+static INTERRUPT_GEN( display_irq )
+{
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	timer_set(ATTOTIME_IN_HZ(30000000), NULL, 0, display_irq_off);
+}
+
+
+
+/*************************************
+ *
  *  CMOS access (Zeus only)
  *
  *************************************/
@@ -417,7 +436,7 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x880000, 0x8801ff) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
+	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8a0000, 0x8a0027) AM_READWRITE(unknown_8a0000_r, unknown_8a0000_w) AM_BASE(&unknown_8a0000)
 	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
 	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
@@ -884,7 +903,7 @@ static MACHINE_DRIVER_START( midzeus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT(display_irq,1)
 
 	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
@@ -911,7 +930,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", TMS32032, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT(display_irq,1)
 
 	MDRV_MACHINE_START(midzeus2)
 	MDRV_MACHINE_RESET(midzeus)
@@ -1081,7 +1100,6 @@ static DRIVER_INIT( crusnexo )
 
 static DRIVER_INIT( thegrid )
 {
-	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 	dcs2_init(0, 0);
 	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
 	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);

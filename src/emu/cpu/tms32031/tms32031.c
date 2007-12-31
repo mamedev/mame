@@ -317,6 +317,12 @@ static void check_irqs(void)
 	UINT16 validints;
 	int i;
 
+	/* external interrupts are level-sensitive on the '31 and can be
+	   configured as such on the '32; in that case, if the external
+	   signal is high, we need to update the value in IF accordingly */
+	if (!tms32031.is_32032 || (IREG(TMR_ST) & 0x4000) == 0)
+		IREG(TMR_IF) |= tms32031.irq_state & 0x0f;
+
 	/* determine if we have any live interrupts */
 	validints = IREG(TMR_IF) & IREG(TMR_IE) & 0x0fff;
 	if (validints == 0 || (IREG(TMR_ST) & GIEFLAG) == 0)
@@ -340,11 +346,10 @@ static void check_irqs(void)
 		IREG(TMR_IF) &= ~intmask;
 		trap(whichtrap);
 		
-		/* external interrupts are level-sensitive on the '31 and can be
-		   configured as such on the '32; in that case, if the external
-		   signal is still high, we need to retrigger the interrupt */
-		if (whichtrap < 4 && (!tms32031.is_32032 || (IREG(TMR_ST) & 0x4000) == 0))
-			IREG(TMR_IF) |= tms32031.irq_state & intmask;
+		/* after auto-clearing the interrupt bit, we need to re-trigger
+		   level-sensitive interrupts */
+		if (!tms32031.is_32032 || (IREG(TMR_ST) & 0x4000) == 0)
+			IREG(TMR_IF) |= tms32031.irq_state & 0x0f;
 	}
 	else
 		tms32031.irq_pending = TRUE;
@@ -514,6 +519,10 @@ static int tms32031_execute(int cycles)
 
 	while (tms32031_icount > 0)
 	{
+#ifdef MAME_DEBUG
+	if (IREG(TMR_SP) & 0xff000000)
+		DEBUGGER_BREAK;
+#endif
 		if ((IREG(TMR_ST) & RMFLAG) && tms32031.pc == IREG(TMR_RE) + 1)
 		{
 			if ((INT32)--IREG(TMR_RC) >= 0)
