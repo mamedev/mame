@@ -545,12 +545,12 @@ static const struct MSM5205interface msm5205_interface_2 =
 static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz */
+	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu,writemem_cpu)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* 4 MHz */
+	MDRV_CPU_ADD(Z80, 3579580) /* verified on pcb */
+	/* audio CPU */	
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -572,7 +572,7 @@ static MACHINE_DRIVER_START( cabal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579580)
+	MDRV_SOUND_ADD(YM2151, 3579580) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 

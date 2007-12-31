@@ -1236,12 +1236,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* verified on pcb */
+	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 3000000)
-	/* audio CPU */
+	MDRV_CPU_ADD(H6280, 24000000/4/3) 
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)

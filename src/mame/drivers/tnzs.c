@@ -1289,12 +1289,12 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( arknoid2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 8000000)	/* ?? Hz (only crystal is 12MHz) */
+	MDRV_CPU_ADD(Z80, 12000000/2)	/* verified on pcb */
 								/* 8MHz is wrong, but extrmatn doesn't work properly at 6MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(arknoid2_interrupt,1)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* ?? Hz */
+	MDRV_CPU_ADD(Z80, 12000000/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
@@ -1319,7 +1319,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD(YM2203, 12000000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1407,11 +1407,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( insectx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD(Z80, 12000000/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD(Z80, 12000000/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
@@ -1435,7 +1435,7 @@ static MACHINE_DRIVER_START( insectx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD(YM2203, 12000000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
@@ -1444,11 +1444,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kageki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)		/* 12000000/2 ??? */
+	MDRV_CPU_ADD(Z80, 12000000/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)		/* 12000000/3 ??? */
+	MDRV_CPU_ADD(Z80, 12000000/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
@@ -1472,7 +1472,7 @@ static MACHINE_DRIVER_START( kageki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3000000)
+	MDRV_SOUND_ADD(YM2203, 12000000/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(kageki_ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
@@ -1496,7 +1496,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("cpu2", Z80, 6000000)		/* 6 MHz */
+	MDRV_CPU_ADD_TAG("cpu2", Z80, 12000000/3) /* guessed but it makes sense since it's the sound z80 near the YM2203  */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_readport,tnzsb_writeport)
 

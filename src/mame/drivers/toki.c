@@ -423,11 +423,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* 10 MHz Toshiba TMP68000P-10 */
+	MDRV_CPU_ADD(M68000,20000000/2) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(toki_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* VBL */
 
-	SEIBU_SOUND_SYSTEM_CPU(20000000/5)	/* 4MHz Zilog Z0840004PSC */
+	SEIBU_SOUND_SYSTEM_CPU(14318180/4)	/* verifed on pcb */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_RESET(seibu_sound_1)
@@ -445,7 +445,7 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 	MDRV_VIDEO_UPDATE(toki)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000,1)
+	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1000000,1) /* verifed on pcb */
 MACHINE_DRIVER_END
 
 
