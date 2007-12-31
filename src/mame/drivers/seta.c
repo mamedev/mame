@@ -7303,10 +7303,12 @@ MACHINE_DRIVER_END
                                 Orbs
 ***************************************************************************/
 
+/* The CPU clock has been verified/measured, PCB only has one OSC and it's 14.318180 MHz */
+
 static MACHINE_DRIVER_START( orbs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz or 14.318180MHz */
+	MDRV_CPU_ADD(M68000, 14318180/2)	/* 7.143 MHz */
 	MDRV_CPU_PROGRAM_MAP(orbs_readmem,orbs_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
@@ -7327,7 +7329,7 @@ static MACHINE_DRIVER_START( orbs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_ADD(X1_010, 14318180)	/* 14.318180 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
