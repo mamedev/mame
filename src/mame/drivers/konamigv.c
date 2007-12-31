@@ -306,12 +306,18 @@ static const struct AM53CF96interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
+static void konamigv_exit(running_machine *machine)
+{
+	am53cf96_exit(&scsi_intf);
+}
+
 static DRIVER_INIT( konamigv )
 {
 	psx_driver_init();
 
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(&scsi_intf);
+	add_exit_callback(machine, konamigv_exit);
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 }

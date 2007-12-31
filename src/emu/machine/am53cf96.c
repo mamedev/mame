@@ -231,6 +231,16 @@ void am53cf96_init( const struct AM53CF96interface *interface )
 	state_save_register_global(last_id);
 }
 
+void am53cf96_exit( const struct AM53CF96interface *interface )
+{
+	int i;
+
+	for (i = 0; i < interface->scsidevs->devs_present; i++)
+	{
+		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
+	}
+}
+
 // retrieve data from the SCSI controller
 void am53cf96_read_data(int bytes, UINT8 *pData)
 {

@@ -698,6 +698,16 @@ extern void lsi53c810_init(const struct LSI53C810interface *interface)
 	}
 }
 
+extern void lsi53c810_exit(const struct LSI53C810interface *interface)
+{
+	int i;
+
+	for (i = 0; i < interface->scsidevs->devs_present; i++)
+	{
+		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
+	}
+}
+
 void lsi53c810_read_data(int bytes, UINT8 *pData)
 {
 	if (devices[last_id])

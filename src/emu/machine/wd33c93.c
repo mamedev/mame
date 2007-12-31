@@ -809,6 +809,16 @@ extern void wd33c93_init( const struct WD33C93interface *interface )
 //  state_save_register_item_array("wd33c93", 0, scsi_data);
 }
 
+extern void wd33c93_exit( const struct WD33C93interface *interface )
+{
+	int i;
+
+	for (i = 0; i < interface->scsidevs->devs_present; i++)
+	{
+		SCSIDeleteInstance( devices[interface->scsidevs->devices[i].scsiID] );
+	}
+}
+
 void wd33c93_get_dma_data( int bytes, UINT8 *pData )
 {
 	int		len = bytes;
