@@ -4,18 +4,18 @@ TODO:
 
 - write a shootgal palette_init
 - Pestplce colors and origin
-- Shooting Gallery: Shootgal.txt mentions speech pcb, 
+- Shooting Gallery: Shootgal.txt mentions speech pcb,
   mikesarcade.com dk conversion - Clarify
 - 8ballact: read 1507 no mapped
 - dkong3 dma (Z80 dma)
-- implement 74LS259 (8bit addressable latches), 
+- implement 74LS259 (8bit addressable latches),
   74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
 
 Done:
 - dkongjr discrete interface
 - when i am retired: implement 8257 DMA controller
 - drakton - add dkongjr conversion
-- for documentation: hook up speech interface still present on radarscp (TRS02) 
+- for documentation: hook up speech interface still present on radarscp (TRS02)
   and early dkong (TKG02/TKG03) pcbs.
 - radarscp_grid_color_w() is wrong, it probably isn't supposed to change
   the grid color. There are reports of the grid being constantly blue in
@@ -59,12 +59,12 @@ Done:
 
   Couriersud: 12/2007
 
-	- Cosmetic changes
-	- Fixed regression in radarscp sound
-	- Added dipswitch locations to dkong3b
-	- Added dkongjr discrete sound
-	- Proper interface Z80 - I8035 for dkongjr
-	- Changed discrete sound output factors
+    - Cosmetic changes
+    - Fixed regression in radarscp sound
+    - Added dipswitch locations to dkong3b
+    - Added dkongjr discrete sound
+    - Proper interface Z80 - I8035 for dkongjr
+    - Changed discrete sound output factors
     - changed dkong/radarscp based games to use hardware-conformant I8035 memory maps
     - Added drakton clone drktnjr on dkongjr hardware
     - wrote M58817 sound driver and hooked it up
@@ -505,7 +505,7 @@ static READ8_HANDLER( dkong_in2_r )
 {
 	UINT8 r;
 
-#if DEBUG_DISC_SOUND	
+#if DEBUG_DISC_SOUND
 	static UINT8 ui_snd = 0;
 	static UINT8 lst = 0;
 	if  (!lst && (readinputportbytag("TST") & 0x01))
@@ -519,7 +519,7 @@ static READ8_HANDLER( dkong_in2_r )
 	else
 		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
 #endif
-	
+
 	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
@@ -1054,11 +1054,11 @@ static INPUT_PORTS_START( dkongjr )
 	PORT_INCLUDE( dkong_in1_4 )
 	PORT_INCLUDE( dkong_in2 )
 	PORT_INCLUDE( dkong_dsw0 )
-	
-#if DEBUG_DISC_SOUND	
+
+#if DEBUG_DISC_SOUND
 	PORT_START_TAG("TST")      /* TST */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_A) 
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_B) 
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CODE(KEYCODE_B)
 #endif
 INPUT_PORTS_END
 

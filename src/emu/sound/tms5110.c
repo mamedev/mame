@@ -1,57 +1,57 @@
 /**********************************************************************************************
 
-	 TMS5110 simulator (modified from TMS5220 by Jarek Burczynski)
+     TMS5110 simulator (modified from TMS5220 by Jarek Burczynski)
 
-	 Written for MAME by Frank Palazzolo
-	 With help from Neill Corlett
-	 Additional tweaking by Aaron Giles
-	 Various fixes by Lord Nightmare
-	 Additional enhancements by Couriersud
-	 
-	 Todo:
-	 	- implement CS
-	 	- implement missing commands
-	 	
-	 TMS5100:
-	 
-			 	 +-----------------+
-		TST		 |  1           28 |  CS
-		PDC		 |  2           27 |  CTL8
-		ROM CK	 |  3           26 |  ADD8
-		CPU CK	 |  4           25 |  CTL1
-		VDD		 |  5           24 |  ADD1
-		CR OSC	 |  6           23 |  CTL2
-		RC OSC	 |  7           22 |  ADD2
-		T11		 |  8           21 |  ADD4
-		NC		 |  9           20 |  CTL4
-		I/O		 | 10           19 |  M1
-		SPK1	 | 11           18 |  NC
-		SPK2	 | 12           17 |  NC
-		PROM OUT | 13           16 |  NC
-		VSS		 | 14           15 |  M0
-			 	 +-----------------+
+     Written for MAME by Frank Palazzolo
+     With help from Neill Corlett
+     Additional tweaking by Aaron Giles
+     Various fixes by Lord Nightmare
+     Additional enhancements by Couriersud
 
-	M58817
+     Todo:
+        - implement CS
+        - implement missing commands
 
-	The following connections could be derived from radar scope schematics.
-	The M58817 is not 100% pin compatible to the 5100, but really close.
+     TMS5100:
 
-			 	 +-----------------+
-		(NC)	 |  1           28 |  CS
-		PDC		 |  2           27 |  CTL8
-		ROM CK	 |  3           26 |  ADD8 (to 58819)
-		(NC)	 |  4           25 |  CTL1
-		(VDD,-5) |  5           24 |  ADD1 (to 58819)
-		(GND)	 |  6           23 |  CTL2
-		Xin		 |  7           22 |  ADD2 (to 58819)
-		Xout	 |  8           21 |  ADD4 (to 58819)
-		(NC)	 |  9           20 |  CTL4
-		(VDD,-5) | 10           19 |  Status back to CPU
-		(NC)	 | 11           18 |  C1 (to 58819)
-		SPKR	 | 12           17 |  (NC)
-		SPKR	 | 13           16 |  C0 (to 58819)
-		(NC)	 | 14           15 |  (5V)
-			 	 +-----------------+
+                 +-----------------+
+        TST      |  1           28 |  CS
+        PDC      |  2           27 |  CTL8
+        ROM CK   |  3           26 |  ADD8
+        CPU CK   |  4           25 |  CTL1
+        VDD      |  5           24 |  ADD1
+        CR OSC   |  6           23 |  CTL2
+        RC OSC   |  7           22 |  ADD2
+        T11      |  8           21 |  ADD4
+        NC       |  9           20 |  CTL4
+        I/O      | 10           19 |  M1
+        SPK1     | 11           18 |  NC
+        SPK2     | 12           17 |  NC
+        PROM OUT | 13           16 |  NC
+        VSS      | 14           15 |  M0
+                 +-----------------+
+
+    M58817
+
+    The following connections could be derived from radar scope schematics.
+    The M58817 is not 100% pin compatible to the 5100, but really close.
+
+                 +-----------------+
+        (NC)     |  1           28 |  CS
+        PDC      |  2           27 |  CTL8
+        ROM CK   |  3           26 |  ADD8 (to 58819)
+        (NC)     |  4           25 |  CTL1
+        (VDD,-5) |  5           24 |  ADD1 (to 58819)
+        (GND)    |  6           23 |  CTL2
+        Xin      |  7           22 |  ADD2 (to 58819)
+        Xout     |  8           21 |  ADD4 (to 58819)
+        (NC)     |  9           20 |  CTL4
+        (VDD,-5) | 10           19 |  Status back to CPU
+        (NC)     | 11           18 |  C1 (to 58819)
+        SPKR     | 12           17 |  (NC)
+        SPKR     | 13           16 |  C0 (to 58819)
+        (NC)     | 14           15 |  (5V)
+                 +-----------------+
 
 ***********************************************************************************************/
 
@@ -263,7 +263,7 @@ void tms5110_reset_chip(void *chip)
 
 /******************************************************************************************
 
-	 tms5110_set_M0_callback -- set M0 callback for the TMS5110
+     tms5110_set_M0_callback -- set M0 callback for the TMS5110
 
 ******************************************************************************************/
 
@@ -275,7 +275,7 @@ void tms5110_set_M0_callback(void *chip, int (*func)(void))
 
 /******************************************************************************************
 
-	 tms5110_set_load_address -- set M0 callback for the TMS5110
+     tms5110_set_load_address -- set M0 callback for the TMS5110
 
 ******************************************************************************************/
 
@@ -287,7 +287,7 @@ void tms5110_set_load_address(void *chip, void (*func)(int))
 
 /******************************************************************************************
 
-	 FIFO_data_write -- handle bit data write to the TMS5110 (as a result of toggling M0 pin)
+     FIFO_data_write -- handle bit data write to the TMS5110 (as a result of toggling M0 pin)
 
 ******************************************************************************************/
 static void FIFO_data_write(struct tms5110 *tms, int data)
@@ -310,7 +310,7 @@ static void FIFO_data_write(struct tms5110 *tms, int data)
 
 /******************************************************************************************
 
-	 extract_bits -- extract a specific number of bits from the FIFO
+     extract_bits -- extract a specific number of bits from the FIFO
 
 ******************************************************************************************/
 
@@ -359,14 +359,14 @@ static void perform_dummy_read(struct tms5110 *tms)
 
 /**********************************************************************************************
 
-	 tms5110_status_read -- read status from the TMS5110
+     tms5110_status_read -- read status from the TMS5110
 
-		bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
-				Talk Status goes active at the initiation of a SPEAK command.
-				It goes inactive (low) when the stop code (Energy=1111) is processed, or
-				immediately(?????? not TMS5110) by a RESET command.
-		TMS5110 datasheets mention this is only available as a result of executing
-				TEST TALK command.
+        bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
+                Talk Status goes active at the initiation of a SPEAK command.
+                It goes inactive (low) when the stop code (Energy=1111) is processed, or
+                immediately(?????? not TMS5110) by a RESET command.
+        TMS5110 datasheets mention this is only available as a result of executing
+                TEST TALK command.
 
 
 ***********************************************************************************************/
@@ -383,7 +383,7 @@ int tms5110_status_read(void *chip)
 
 /**********************************************************************************************
 
-	 tms5110_ready_read -- returns the ready state of the TMS5110
+     tms5110_ready_read -- returns the ready state of the TMS5110
 
 ***********************************************************************************************/
 
@@ -397,7 +397,7 @@ int tms5110_ready_read(void *chip)
 
 /**********************************************************************************************
 
-	 tms5110_process -- fill the buffer with a specific number of samples
+     tms5110_process -- fill the buffer with a specific number of samples
 
 ***********************************************************************************************/
 
@@ -418,12 +418,12 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 
 	/* a "dummy read" is mentioned in the tms5200 datasheet */
 	/* The Bagman speech roms data are organized in such a way that
-	** the bit at address 0 is NOT a speech data. The bit at address 1
-	** is the speech data. It seems that the tms5110 performs a dummy read
-	** just before it executes a SPEAK command.
-	** This has been moved to command logic ...
-	**  perform_dummy_read(tms);
-	*/
+    ** the bit at address 0 is NOT a speech data. The bit at address 1
+    ** is the speech data. It seems that the tms5110 performs a dummy read
+    ** just before it executes a SPEAK command.
+    ** This has been moved to command logic ...
+    **  perform_dummy_read(tms);
+    */
 
 		/* clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
 		tms->new_energy = 0;
@@ -486,9 +486,9 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 			else if ((tms->old_energy == 0) && (tms->new_energy != 0)) /* was the old frame a zero-energy frame? */
 			{
 				/* if so, and if the new frame is non-zero energy frame then the new parameters
-				   should become our current and target parameters immediately,
-				   i.e. we should NOT interpolate them slowly in.
-				*/
+                   should become our current and target parameters immediately,
+                   i.e. we should NOT interpolate them slowly in.
+                */
 
 				/*logerror("processing non-zero energy frame after zero-energy frame\n");*/
 				tms->target_energy = tms->new_energy;
@@ -499,8 +499,8 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 			else if ((tms->old_pitch == 0) && (tms->new_pitch != 0))	/* is this a change from unvoiced to voiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
-				   i.e. we should NOT interpolate them slowly in.
-				*/
+                   i.e. we should NOT interpolate them slowly in.
+                */
 				/*if (DEBUG_5110) logerror("processing frame: UNVOICED->VOICED frame change\n");*/
 				tms->target_energy = tms->new_energy;
 				tms->target_pitch = tms->current_pitch = tms->new_pitch;
@@ -510,8 +510,8 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 			else if ((tms->old_pitch != 0) && (tms->new_pitch == 0))	/* is this a change from voiced to unvoiced frame ? */
 			{
 				/* if so, then the new parameters should become our current and target parameters immediately,
-				   i.e. we should NOT interpolate them slowly in.
-				*/
+                   i.e. we should NOT interpolate them slowly in.
+                */
 				/*if (DEBUG_5110) logerror("processing frame: VOICED->UNVOICED frame change\n");*/
 				tms->target_energy = tms->new_energy;
 				tms->target_pitch = tms->current_pitch = tms->new_pitch;
@@ -662,7 +662,7 @@ empty:
 
 /******************************************************************************************
 
-	 CTL_set -- set CTL pins named CTL1, CTL2, CTL4 and CTL8
+     CTL_set -- set CTL pins named CTL1, CTL2, CTL4 and CTL8
 
 ******************************************************************************************/
 
@@ -674,7 +674,7 @@ void tms5110_CTL_set(void *chip, int data)
 
 /******************************************************************************************
 
-	 PDC_set -- set Processor Data Clock. Execute CTL_pins command on hi-lo transition.
+     PDC_set -- set Processor Data Clock. Execute CTL_pins command on hi-lo transition.
 
 ******************************************************************************************/
 
@@ -740,7 +740,7 @@ void tms5110_PDC_set(void *chip, int data)
 
 /******************************************************************************************
 
-	 parse_frame -- parse a new frame's worth of data; returns 0 if not enough bits in buffer
+     parse_frame -- parse a new frame's worth of data; returns 0 if not enough bits in buffer
 
 ******************************************************************************************/
 

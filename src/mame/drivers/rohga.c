@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_CPU_PROGRAM_MAP(wizdfire_readmem,wizdfire_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) 
+	MDRV_CPU_ADD(H6280,32220000/4/3)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)

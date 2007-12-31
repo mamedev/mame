@@ -175,7 +175,7 @@ Notes:
 
       ROMs -
              UA0-6 to AU0-13 DIP42 maskROM, read as MX27C2100 (2 Meg)
-             UA0-2 DIP32 27C1000 EPROM 
+             UA0-2 DIP32 27C1000 EPROM
              All other ROMs DIP32 read as 27C1000
              All ROMs have IC locations, but the PCB also has IC locations so components
              can be referenced with IC# or location. See above diagram for info.

@@ -110,7 +110,7 @@ static WRITE16_HANDLER( z80_shared_w )
  *************************************/
 
 static INPUT_PORTS_START( tx1 )
-PORT_START_TAG("DSW")	
+PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x001c, 0x0000, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )

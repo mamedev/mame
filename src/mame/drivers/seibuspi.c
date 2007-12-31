@@ -26,9 +26,9 @@
 
 NOTES:
 
-	rjetus:
-	- If you get a blank screen on startup you need to press F2 and choose "Reset settings", 
-	  followed by "Exit". This will create a proper NVRAM
+    rjetus:
+    - If you get a blank screen on startup you need to press F2 and choose "Reset settings",
+      followed by "Exit". This will create a proper NVRAM
 
 TODO:
 - Alpha blending. Screen shot on www.system16.com show that during attract mode

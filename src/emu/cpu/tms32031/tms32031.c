@@ -318,8 +318,8 @@ static void check_irqs(void)
 	int i;
 
 	/* external interrupts are level-sensitive on the '31 and can be
-	   configured as such on the '32; in that case, if the external
-	   signal is high, we need to update the value in IF accordingly */
+       configured as such on the '32; in that case, if the external
+       signal is high, we need to update the value in IF accordingly */
 	if (!tms32031.is_32032 || (IREG(TMR_ST) & 0x4000) == 0)
 		IREG(TMR_IF) |= tms32031.irq_state & 0x0f;
 
@@ -341,13 +341,13 @@ static void check_irqs(void)
 	if (!tms32031.delayed)
 	{
 		UINT16 intmask = 1 << (whichtrap - 1);
-	
+
 		/* bit in IF is cleared when interrupt is taken */
 		IREG(TMR_IF) &= ~intmask;
 		trap(whichtrap);
-		
+
 		/* after auto-clearing the interrupt bit, we need to re-trigger
-		   level-sensitive interrupts */
+           level-sensitive interrupts */
 		if (!tms32031.is_32032 || (IREG(TMR_ST) & 0x4000) == 0)
 			IREG(TMR_IF) |= tms32031.irq_state & 0x0f;
 	}
@@ -359,7 +359,7 @@ static void check_irqs(void)
 static void set_irq_line(int irqline, int state)
 {
 	UINT16 intmask = 1 << irqline;
-	
+
 	/* ignore anything out of range */
 	if (irqline >= 12)
 		return;

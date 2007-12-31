@@ -288,8 +288,8 @@ static void exit_handler(running_machine *machine)
 	{
 		if (i % 4 == 0) fprintf(f, "%03X%03X: ", i / WAVERAM0_WIDTH, i % WAVERAM0_WIDTH);
 		fprintf(f, " %08X %08X ",
-			WAVERAM_READ32(waveram[0], i*2+0), 
-			WAVERAM_READ32(waveram[0], i*2+1)); 
+			WAVERAM_READ32(waveram[0], i*2+0),
+			WAVERAM_READ32(waveram[0], i*2+1));
 		if (i % 4 == 3) fprintf(f, "\n");
 	}
 	fclose(f);
@@ -673,7 +673,7 @@ static void zeus_register_update(offs_t offset)
 					(offset == 0xb2 && (zeusbase[0xb6] & 0x02000000) != 0))
 				{
 					void *dest;
-					
+
 					if (zeusbase[0xb6] & 0x80000000)
 						dest = waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
 					else
@@ -697,7 +697,7 @@ static void zeus_register_update(offs_t offset)
 			if (zeusbase[0xb6] & 0x00010000)
 			{
 				const UINT32 *src;
-				
+
 				if (zeusbase[0xb6] & 0x80000000)
 					src = waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
 				else

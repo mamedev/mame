@@ -1240,7 +1240,7 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 24000000/4/3) 
+	MDRV_CPU_ADD(H6280, 24000000/4/3)
 	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 

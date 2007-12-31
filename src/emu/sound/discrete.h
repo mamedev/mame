@@ -2932,13 +2932,13 @@
  * DISCRETE_74LS624 - VCO.
  *
  * Simplified 74LS624 - calculated frequencies should match datasheet
- * for C > 1nF. Output is Logic (1/0)                      
- * 
+ * for C > 1nF. Output is Logic (1/0)
+ *
  * The datasheet gives no formulae. The implementation therefore is
- * a rough model of the diagrams given. 
- * 
+ * a rough model of the diagrams given.
+ *
  * For a LS628, use VRng = 3.2
- * 
+ *
  *                          V+
  *                           |
  *                     .---------.
@@ -2953,7 +2953,7 @@
  *                 |   |         |
  *                 '---|CX2      |
  *                     '---------'
- *                         | 
+ *                         |
  *                        GND
  *
  *  Declaration syntax
@@ -2963,14 +2963,14 @@
  *                      vMod node or static value,
  *                      vRng node or static value,
  *                      C node or static value in Farads,
- * 						Type of output static value)
- * 
+ *                      Type of output static value)
+ *
  * Type of Output
- *      DISC_LS624_OUT_ENERGY	Energy - use for audio output
+ *      DISC_LS624_OUT_ENERGY   Energy - use for audio output
  *      DISC_LS624_OUT_LOGIC    Logic ( 0 or 1)
- *      DISC_LS624_OUT_COUNT_F	Number of Falling edges
- *      DISC_LS624_OUT_COUNT_R	Number of Rising  edges
- * 
+ *      DISC_LS624_OUT_COUNT_F  Number of Falling edges
+ *      DISC_LS624_OUT_COUNT_R  Number of Rising  edges
+ *
  ***********************************************************************
  *
  * DISCRETE_CUSTOMx - Link to custom code

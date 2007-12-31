@@ -40,7 +40,7 @@ static int speech_rom_read_bit(void)
 	const UINT8 *table = memory_region(info->intf->rom_region);
 
 	int r;
-	
+
 	if (info->speech_rom_bitnum<0)
 		r = 0;
 	else
@@ -55,7 +55,7 @@ static void speech_rom_set_addr(int addr)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 
-	info->speech_rom_bitnum = addr * 8 - 1;	
+	info->speech_rom_bitnum = addr * 8 - 1;
 }
 
 /******************************************************************************

@@ -249,7 +249,7 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
  *  Video startup
  *
  *************************************/
- 
+
 static TIMER_CALLBACK( int_timer_callback )
 {
 	cpunum_set_input_line(0, 2, ASSERT_LINE);
@@ -269,9 +269,9 @@ VIDEO_START( midzeus2 )
 	add_exit_callback(machine, exit_handler);
 
 	zeus_renderbase = waveram[1];
-	
+
 	int_timer = timer_alloc(int_timer_callback, NULL);
-	
+
 	/* save states */
 	state_save_register_global_pointer(waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
 	state_save_register_global_pointer(waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
@@ -296,9 +296,9 @@ static void exit_handler(running_machine *machine)
 	for (i = 0; i < WAVERAM0_WIDTH * WAVERAM0_HEIGHT; i++)
 	{
 		if (i % 4 == 0) fprintf(f, "%03X%03X: ", i / WAVERAM0_WIDTH, i % WAVERAM0_WIDTH);
-		fprintf(f, " %08X %08X ", 
-			WAVERAM_READ32(waveram[0], i*2+0), 
-			WAVERAM_READ32(waveram[0], i*2+1)); 
+		fprintf(f, " %08X %08X ",
+			WAVERAM_READ32(waveram[0], i*2+0),
+			WAVERAM_READ32(waveram[0], i*2+1));
 		if (i % 4 == 3) fprintf(f, "\n");
 	}
 	fclose(f);
@@ -308,7 +308,7 @@ static void exit_handler(running_machine *machine)
 {
 	reg_info *info;
 	int regnum;
-	
+
 	for (regnum = 0; regnum < 0x80; regnum++)
 	{
 		printf("Register %02X\n", regnum);
@@ -326,7 +326,7 @@ static void exit_handler(running_machine *machine)
 				printf("\t%08X\n", info->value);
 		}
 	}
-	
+
 	for (regnum = 0; regnum < 0x100; regnum++)
 		if (subregwrite_count[regnum] != 0)
 		{
@@ -487,7 +487,7 @@ regwrite_count[offset]++;
 if (regdata_count[offset] < 256)
 {
 	reg_info **tailptr;
-	
+
 	for (tailptr = &regdata[offset]; *tailptr != NULL; tailptr = &(*tailptr)->next)
 		if ((*tailptr)->value == data)
 			break;
@@ -633,7 +633,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 			else if (logit)
 				logerror("\t[40]=%08X [4E]=%08X\n", zeusbase[0x40], zeusbase[0x4e]);
 			break;
-		
+
 		case 0x51:
 
 			/* in this mode, crusnexo expects the reads to immediately latch */
@@ -731,7 +731,7 @@ subregwrite_count[which]++;
 if (subregdata_count[which] < 256)
 {
 	reg_info **tailptr;
-	
+
 	for (tailptr = &subregdata[which]; *tailptr != NULL; tailptr = &(*tailptr)->next)
 		if ((*tailptr)->value == value)
 			break;
@@ -750,11 +750,11 @@ if (subregdata_count[which] < 256)
 		case 0x04:
 			zeus_renderbase = waveram1_ptr_from_expanded_addr(value << 16);
 			break;
-	
+
 		case 0x05:
 			zeus_texbase = value % (WAVERAM0_HEIGHT * WAVERAM0_WIDTH);
 			break;
-		
+
 		case 0x40:
 			zeus_unknown_40 = value & 0xffffff;
 			zeus_quad_size = (zeus_unknown_40 == 0) ? 10 : 14;
@@ -773,7 +773,7 @@ if (subregdata_count[which] < 256)
 static int zeus_fifo_process(const UINT32 *data, int numwords)
 {
 	int dataoffs = 0;
-	
+
 	/* handle logging */
 	switch (data[0] >> 24)
 	{
@@ -786,28 +786,28 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			if (((data[0] >> 16) & 0x7f) != 0x08)
 				zeus_register32_w((data[0] >> 16) & 0x7f, data[1], log_fifo);
 			break;
-		
+
 		/* 0x08: set matrix and point (thegrid) */
 		case 0x08:
 			if (numwords < 14)
 				return FALSE;
 			dataoffs = 1;
-		
+
 		/* 0x07: set matrix and point (crusnexo) */
 		case 0x07:
 			if (numwords < 13)
 				return FALSE;
 
 			/* extract the matrix from the raw data */
-			zeus_matrix[0][0] = convert_tms3203x_fp_to_float(data[dataoffs + 1]);	
-			zeus_matrix[0][1] = convert_tms3203x_fp_to_float(data[dataoffs + 2]);	
-			zeus_matrix[0][2] = convert_tms3203x_fp_to_float(data[dataoffs + 3]);	
-			zeus_matrix[1][0] = convert_tms3203x_fp_to_float(data[dataoffs + 4]);	
-			zeus_matrix[1][1] = convert_tms3203x_fp_to_float(data[dataoffs + 5]);	
-			zeus_matrix[1][2] = convert_tms3203x_fp_to_float(data[dataoffs + 6]);	
-			zeus_matrix[2][0] = convert_tms3203x_fp_to_float(data[dataoffs + 7]);	
-			zeus_matrix[2][1] = convert_tms3203x_fp_to_float(data[dataoffs + 8]);	
-			zeus_matrix[2][2] = convert_tms3203x_fp_to_float(data[dataoffs + 9]);	
+			zeus_matrix[0][0] = convert_tms3203x_fp_to_float(data[dataoffs + 1]);
+			zeus_matrix[0][1] = convert_tms3203x_fp_to_float(data[dataoffs + 2]);
+			zeus_matrix[0][2] = convert_tms3203x_fp_to_float(data[dataoffs + 3]);
+			zeus_matrix[1][0] = convert_tms3203x_fp_to_float(data[dataoffs + 4]);
+			zeus_matrix[1][1] = convert_tms3203x_fp_to_float(data[dataoffs + 5]);
+			zeus_matrix[1][2] = convert_tms3203x_fp_to_float(data[dataoffs + 6]);
+			zeus_matrix[2][0] = convert_tms3203x_fp_to_float(data[dataoffs + 7]);
+			zeus_matrix[2][1] = convert_tms3203x_fp_to_float(data[dataoffs + 8]);
+			zeus_matrix[2][2] = convert_tms3203x_fp_to_float(data[dataoffs + 9]);
 
 			/* extract the translation point from the raw data */
 			zeus_point[0] = convert_tms3203x_fp_to_float(data[dataoffs + 10]);
@@ -826,7 +826,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 					zeus_point[2]);
 			}
 			break;
-		
+
 		/* 0x15: set point only (thegrid) */
 		/* 0x16: set point only (crusnexo) */
 		case 0x15:
@@ -838,7 +838,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 			zeus_point[0] = convert_tms3203x_fp_to_float(data[1]);
 			zeus_point[1] = convert_tms3203x_fp_to_float(data[2]);
 			zeus_point[2] = convert_tms3203x_fp_to_float(data[3]);
-			
+
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, "");
@@ -848,7 +848,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 					zeus_point[2]);
 			}
 			break;
-		
+
 		/* 0x1c: */
 		case 0x1c:
 			if (numwords < 4)
@@ -874,7 +874,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 						waveram_plot_depth(y, x, 0, 0x7fff);
 			}
 			break;
-		
+
 		/* 0x23: render model in waveram (thegrid) */
 		/* 0x24: render model in waveram (crusnexo) */
 		case 0x23:
@@ -885,7 +885,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				log_fifo_command(data, numwords, "");
 			zeus_draw_model(data[1], data[0] & 0xffff, log_fifo);
 			break;
-		
+
 		/* 0x31: sync pipeline? (thegrid) */
 		/* 0x32: sync pipeline? (crusnexo) */
 		case 0x31:
@@ -894,7 +894,7 @@ static int zeus_fifo_process(const UINT32 *data, int numwords)
 				log_fifo_command(data, numwords, "\n");
 			zeus_quad_size = 10;
 			break;
-		
+
 		/* 0x38: direct render quad (crusnexo) */
 		case 0x38:
 			if (numwords < 12)
@@ -991,7 +991,7 @@ static void zeus_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 						else if (logit)
 							logerror("unknown offset\n");
 						break;
-					
+
 					case 0x31:	/* thegrid */
 						if (logit)
 							logerror("sync?\n");
@@ -1003,7 +1003,7 @@ static void zeus_draw_model(UINT32 baseaddr, UINT16 count, int logit)
 							logerror("reg32");
 						zeus_register32_w((databuffer[0] >> 16) & 0x7f, databuffer[1], logit);
 						break;
-					
+
 					case 0x38:	/* crusnexo/thegrid */
 						zeus_draw_quad(databuffer, texoffs, logit);
 						break;
@@ -1040,13 +1040,13 @@ static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texoffs, int logit)
 	poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
-//	float uscale, vscale;
+//  float uscale, vscale;
 	float maxy, maxx;
-//	int val1, val2, texwshift;
+//  int val1, val2, texwshift;
 	int numverts;
 	int i;
-//	INT16 normal[3];
-//	INT32 rotnormal[3];
+//  INT16 normal[3];
+//  INT32 rotnormal[3];
 	int texmode = texoffs & 0xffff;
 
 	if (logit)
@@ -1065,43 +1065,43 @@ if (input_code_pressed(KEYCODE_Y) && (texoffs & 0xffff) == 0x0dd) return;
 	callback = render_poly_8bit;
 
 /*
-0	38800000
-1	x2 | x1
-2	v1 | u1
-3	y2 | y1
-4	v2 | u2
-5	z2 | z1
-6	v3 | u3
-7	v4 | u4
-8	???
-9	x4 | x3
-10	y4 | y3
-11	z4 | z3
+0   38800000
+1   x2 | x1
+2   v1 | u1
+3   y2 | y1
+4   v2 | u2
+5   z2 | z1
+6   v3 | u3
+7   v4 | u4
+8   ???
+9   x4 | x3
+10  y4 | y3
+11  z4 | z3
 
 In memory:
-	+0 = ???
-	+1 = set via $05410000/value
-	+2 = x1
-	+3 = y1
-	+4 = z1
-	+5 = x2
-	+6 = y2
-	+7 = z2
-	+8 = x3
-	+9 = y3
-	+10= z3
-	+11= x4
-	+12= y4
-	+13= z4
-	+14= uv1
-	+15= uv2
-	+16= uv3
-	+17= uv4
-	+18= set via $05200000/$05000000 | (value << 10) (uvoffset?)
-	+19= ???
-	
+    +0 = ???
+    +1 = set via $05410000/value
+    +2 = x1
+    +3 = y1
+    +4 = z1
+    +5 = x2
+    +6 = y2
+    +7 = z2
+    +8 = x3
+    +9 = y3
+    +10= z3
+    +11= x4
+    +12= y4
+    +13= z4
+    +14= uv1
+    +15= uv2
+    +16= uv3
+    +17= uv4
+    +18= set via $05200000/$05000000 | (value << 10) (uvoffset?)
+    +19= ???
 
-	38810000 00000000 00C7|FF38 FF5E|FF5E 15400154 11400114 00000000 00000000 FF38|00C7 00A3|00A3 -- quad
+
+    38810000 00000000 00C7|FF38 FF5E|FF5E 15400154 11400114 00000000 00000000 FF38|00C7 00A3|00A3 -- quad
                       xxxx|xxxx yyyy|yyyy                                     xxxx|xxxx yyyy|yyyy
 */
 
@@ -1111,7 +1111,7 @@ In memory:
 	vert[0].p[0] = (INT16)databuffer[6];
 	vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
 	vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
-	
+
 	vert[1].x = (INT16)(databuffer[2] >> 16);
 	vert[1].y = (INT16)(databuffer[3] >> 16);
 	vert[1].p[0] = (INT16)(databuffer[6] >> 16);
@@ -1123,7 +1123,7 @@ In memory:
 	vert[2].p[0] = (INT16)databuffer[7];
 	vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
 	vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
-	
+
 	vert[3].x = (INT16)(databuffer[8] >> 16);
 	vert[3].y = (INT16)(databuffer[9] >> 16);
 	vert[3].p[0] = (INT16)(databuffer[7] >> 16);
@@ -1131,36 +1131,36 @@ In memory:
 	vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
 
 /*
-	vert[0].x = (INT16)databuffer[1];
-	vert[0].y = (INT16)databuffer[3];
-	vert[0].p[0] = (INT16)databuffer[5];
-	vert[0].p[1] = (UINT16)databuffer[2];
-	vert[0].p[2] = (UINT16)(databuffer[2] >> 16);
-	
-	vert[1].x = (INT16)(databuffer[1] >> 16);
-	vert[1].y = (INT16)(databuffer[3] >> 16);
-	vert[1].p[0] = (INT16)(databuffer[5] >> 16);
-	vert[1].p[1] = (UINT16)databuffer[4];
-	vert[1].p[2] = (UINT16)(databuffer[4] >> 16);
+    vert[0].x = (INT16)databuffer[1];
+    vert[0].y = (INT16)databuffer[3];
+    vert[0].p[0] = (INT16)databuffer[5];
+    vert[0].p[1] = (UINT16)databuffer[2];
+    vert[0].p[2] = (UINT16)(databuffer[2] >> 16);
 
-	vert[2].x = (INT16)databuffer[9];
-	vert[2].y = (INT16)databuffer[10];
-	vert[2].p[0] = (INT16)databuffer[11];
-	vert[2].p[1] = (UINT16)databuffer[6];
-	vert[2].p[2] = (UINT16)(databuffer[6] >> 16);
-	
-	vert[3].x = (INT16)(databuffer[9] >> 16);
-	vert[3].y = (INT16)(databuffer[10] >> 16);
-	vert[3].p[0] = (INT16)(databuffer[11] >> 16);
-	vert[3].p[1] = (UINT16)databuffer[7];
-	vert[3].p[2] = (UINT16)(databuffer[7] >> 16);
+    vert[1].x = (INT16)(databuffer[1] >> 16);
+    vert[1].y = (INT16)(databuffer[3] >> 16);
+    vert[1].p[0] = (INT16)(databuffer[5] >> 16);
+    vert[1].p[1] = (UINT16)databuffer[4];
+    vert[1].p[2] = (UINT16)(databuffer[4] >> 16);
+
+    vert[2].x = (INT16)databuffer[9];
+    vert[2].y = (INT16)databuffer[10];
+    vert[2].p[0] = (INT16)databuffer[11];
+    vert[2].p[1] = (UINT16)databuffer[6];
+    vert[2].p[2] = (UINT16)(databuffer[6] >> 16);
+
+    vert[3].x = (INT16)(databuffer[9] >> 16);
+    vert[3].y = (INT16)(databuffer[10] >> 16);
+    vert[3].p[0] = (INT16)(databuffer[11] >> 16);
+    vert[3].p[1] = (UINT16)databuffer[7];
+    vert[3].p[2] = (UINT16)(databuffer[7] >> 16);
 */
 	for (i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
 		float y = vert[i].y;
 		float z = vert[i].p[0];
-	
+
 		vert[i].x = x * zeus_matrix[0][0] + y * zeus_matrix[0][1] + z * zeus_matrix[0][2] + zeus_point[0];
 		vert[i].y = x * zeus_matrix[1][0] + y * zeus_matrix[1][1] + z * zeus_matrix[1][2] + zeus_point[1];
 		vert[i].p[0] = x * zeus_matrix[2][0] + y * zeus_matrix[2][1] + z * zeus_matrix[2][2] + zeus_point[2];
@@ -1168,7 +1168,7 @@ vert[i].p[0] += zbase;
 		vert[i].p[2] += texoffs >> 16;
 		vert[i].p[1] *= 256.0f;
 		vert[i].p[2] *= 256.0f;
-		
+
 		if (logit)
 		{
 			logerror("\t\t(%f,%f,%f) (%02X,%02X)\n",
@@ -1186,8 +1186,8 @@ vert[i].p[0] += zbase;
 	{
 // 412.0f here works for crusnexo
 		float ooz = 512.0f / clipvert[i].p[0];
-		
-//		ooz *= 1.0f / (512.0f * 512.0f);
+
+//      ooz *= 1.0f / (512.0f * 512.0f);
 
 		clipvert[i].x *= ooz;
 		clipvert[i].y *= ooz;
@@ -1207,7 +1207,7 @@ vert[i].p[0] += zbase;
 		if (clipvert[i].y == maxy)
 			clipvert[i].y += 0.0005f;
 	}
-	
+
 	extra = poly_get_extra_data(poly);
 	switch (texmode)
 	{
@@ -1222,7 +1222,7 @@ vert[i].p[0] += zbase;
 		case 0xc5d:		/* crusnexo */
 			extra->texwidth = 256;
 			break;
-		
+
 		case 0x059:		/* crusnexo */
 		case 0x0d9:		/* crusnexo */
 		case 0x119:		/* crusnexo: license plates */
@@ -1234,7 +1234,7 @@ vert[i].p[0] += zbase;
 		case 0x155:		/* crusnexo */
 			extra->texwidth = 64;
 			break;
-		
+
 		default:
 		{
 			static UINT8 hits[0x10000];
@@ -1271,11 +1271,11 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
-//	INT32 curi = extent->param[3].start;
+//  INT32 curi = extent->param[3].start;
 	INT32 dzdx = extent->param[0].dpdx;
 	INT32 dudx = extent->param[1].dpdx;
 	INT32 dvdx = extent->param[2].dpdx;
-//	INT32 didx = extent->param[3].dpdx;
+//  INT32 didx = extent->param[3].dpdx;
 	const void *texbase = extra->texbase;
 	const void *palbase = extra->palbase;
 	UINT16 transcolor = extra->transcolor;
@@ -1317,7 +1317,7 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 		curz += dzdx;
 		curu += dudx;
 		curv += dvdx;
-//		curi += didx;
+//      curi += didx;
 	}
 }
 

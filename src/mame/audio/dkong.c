@@ -650,7 +650,7 @@ DISCRETE_SOUND_END
 #define JR_C15		CAP_U(22)
 #define JR_C16		CAP_U(3.3)
 #define JR_C17		CAP_U(3.3) // ??? illegible
-#define JR_C18		CAP_N(22) 
+#define JR_C18		CAP_N(22)
 #define JR_C19		CAP_N(4.7)
 #define JR_C20		CAP_U(0.12)
 #define JR_C21		CAP_N(56)
@@ -680,7 +680,7 @@ DISCRETE_SOUND_END
 	DISCRETE_ONESHOTR(_N, 0, _T, TTL_HIGH, (0.33 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE | DISC_OUT_ACTIVE_LOW)
 
 #define DISCRETE_BITSET(_N, _N1, _B) DISCRETE_TRANSFORM3(_N, 1, _N1, 1 << ((_B)-1), 0, "01&2>")
-#define DISCRETE_ENERGY_NAND(_N, _E, _N1, _N2) DISCRETE_TRANSFORM3(_N, _E, _N1, _N2, 1, "201*-") 
+#define DISCRETE_ENERGY_NAND(_N, _E, _N1, _N2) DISCRETE_TRANSFORM3(_N, _E, _N1, _N2, 1, "201*-")
 
 static const discrete_mixer_desc dkongjr_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
@@ -743,34 +743,34 @@ static DISCRETE_SOUND_START(dkongjr)
 
     DISCRETE_LOGIC_INVERT(DS_SOUND7,1,DS_SOUND7_INV)
 	DISCRETE_LOGIC_INVERT(DS_SOUND9,1,DS_SOUND9_INV)
-	
+
 	/************************************************/
 	/* SOUND1                                       */
 	/************************************************/
-	
-	DISCRETE_LS123(NODE_10, DS_SOUND1_INV, JR_R9, JR_C15)	
+
+	DISCRETE_LS123(NODE_10, DS_SOUND1_INV, JR_R9, JR_C15)
 	DISCRETE_TRANSFORM2(NODE_11,1,NODE_104,TTL_HIGH,"0!1*")
 	DISCRETE_LOGIC_INVERT(NODE_12,1,NODE_10)
 	DISCRETE_MIXER2(NODE_13, 1, NODE_10, NODE_11, &dkongjr_s1_mixer_desc)
 	DISCRETE_74LS624( NODE_14, 1, NODE_13, 0.98*DK_SUP_V, JR_C22, DISC_LS624_OUT_ENERGY)
 	DISCRETE_RCDISC_MODULATED(NODE_15, 1, NODE_12, NODE_14, 120, JR_R27, RES_K(0.001), JR_R28, JR_C28, DK_SUP_V)
 	/* The following circuit does not match 100%, however works.
-	 * To be exact, we need a C-R-C-R circuit, we actually do not have.
-	 */
+     * To be exact, we need a C-R-C-R circuit, we actually do not have.
+     */
 	DISCRETE_CRFILTER_VREF(NODE_16, 1, NODE_15, JR_R4, JR_C23, 2.5)
 	DISCRETE_RCFILTER(DS_OUT_SOUND1, 1, NODE_16, JR_R19, JR_C21)
-	
+
 	/************************************************/
 	/* SOUND2                                       */
 	/************************************************/
 
 	DISCRETE_74LS624( NODE_20, 1, 0, 0.98*DK_SUP_V, JR_C20, DISC_LS624_OUT_COUNT_F)
 	DISCRETE_LFSR_NOISE(NODE_21, 1, 1, NODE_20, 1.0, 0, 0.5, &dkongjr_lfsr)
-	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)	
+	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)
 	DISCRETE_RCDISC_MODULATED(NODE_26, 1, NODE_25, NODE_21, 120, JR_R24, RES_K(0.001), JR_R18, JR_C29, DK_SUP_V)
 	/* The following circuit does not match 100%, however works.
-	 * To be exact, we need a C-R-C-R circuit, we actually do not have.
-	 */
+     * To be exact, we need a C-R-C-R circuit, we actually do not have.
+     */
 	DISCRETE_CRFILTER_VREF(NODE_27, 1, NODE_26, JR_R6, JR_C30, 2.5)
 	DISCRETE_RCFILTER(DS_OUT_SOUND2, 1, NODE_27, JR_R2, JR_C25)
 
@@ -783,37 +783,37 @@ static DISCRETE_SOUND_START(dkongjr)
 	DISCRETE_74LS624( NODE_92, 1, NODE_91, DK_SUP_V, JR_C37, DISC_LS624_OUT_ENERGY)
 	DISCRETE_ENERGY_NAND(NODE_93, 1, NODE_92, DS_SOUND9)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND9, 1, NODE_93, TTL_HIGH)
-	
+
 	/************************************************/
 	/* SOUND0 / SOUND7                              */
 	/************************************************/
 
-	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT) 
-	
+	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
+
 	DISCRETE_BITSET(NODE_101, NODE_100, 7) 	//LS157 2A
 	DISCRETE_BITSET(NODE_102, NODE_100, 4) 	//LS157 2B
 	DISCRETE_BITSET(NODE_103, NODE_100, 13) //LS157 3A
 	DISCRETE_BITSET(NODE_104, NODE_100, 12) //LS157 3B
 
 	/* LS157 Switches */
-	DISCRETE_SWITCH(NODE_105, 1, DS_SOUND7_INV, GND, NODE_113) // Switch 1 from LS624 
-	DISCRETE_SWITCH(NODE_106, 1, DS_SOUND7_INV, NODE_101, NODE_102) // Switch 2 
-	DISCRETE_SWITCH(NODE_107, 1, DS_SOUND7_INV, NODE_103, NODE_104) // Switch 3 
+	DISCRETE_SWITCH(NODE_105, 1, DS_SOUND7_INV, GND, NODE_113) // Switch 1 from LS624
+	DISCRETE_SWITCH(NODE_106, 1, DS_SOUND7_INV, NODE_101, NODE_102) // Switch 2
+	DISCRETE_SWITCH(NODE_107, 1, DS_SOUND7_INV, NODE_103, NODE_104) // Switch 3
 
-	DISCRETE_LS123(NODE_110, DS_SOUND0_INV, JR_R8, JR_C14)	
+	DISCRETE_LS123(NODE_110, DS_SOUND0_INV, JR_R8, JR_C14)
 	DISCRETE_TRANSFORM2(NODE_111, 1, TTL_HIGH, NODE_110, "01-")
 	DISCRETE_RCFILTER(NODE_112, 1, NODE_111, JR_R10, JR_C17)
-	DISCRETE_74LS624(NODE_113, 1, NODE_112, DK_SUP_V, JR_C18, DISC_LS624_OUT_ENERGY) 
+	DISCRETE_74LS624(NODE_113, 1, NODE_112, DK_SUP_V, JR_C18, DISC_LS624_OUT_ENERGY)
 
 	DISCRETE_LOGIC_XOR(NODE_115, 1, NODE_105, NODE_106)
 
 	DISCRETE_TRANSFORM2(NODE_116,1, NODE_107, TTL_HIGH, "0!1*")
 	DISCRETE_RCFILTER(NODE_117, 1, NODE_116, JR_R11, JR_C16)
 	DISCRETE_74LS624(NODE_118, 1, NODE_117, DK_SUP_V, JR_C19, DISC_LS624_OUT_COUNT_F)
-	
+
 	DISCRETE_LOGIC_NAND(NODE_120, 1, NODE_115, NODE_110)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0, 1, NODE_120, TTL_HIGH)
-	
+
 	/************************************************/
 	/* DAC                                          */
 	/************************************************/
@@ -838,12 +838,12 @@ static DISCRETE_SOUND_START(dkongjr)
 
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND9, DS_OUT_SOUND0, DS_OUT_SOUND2, DS_OUT_SOUND1, DS_OUT_DAC, &dkongjr_mixer_desc)
 
-	/* Amplifier: internal amplifier 
-	 * Just a 1:n amplifier without filters - just the output filter
-	 */
+	/* Amplifier: internal amplifier
+     * Just a 1:n amplifier without filters - just the output filter
+     */
 	DISCRETE_CRFILTER(NODE_295,1,NODE_288, 1000, JR_C13)
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 10)
-	
+
 DISCRETE_SOUND_END
 
 /****************************************************************
@@ -918,15 +918,15 @@ Addresses found at @0x510, cpu2
  5: 10 10 10    trouble, trouble, trouble
  6: 12 12       all pilots climb up
  7: 20          engine trouble
- 
- PA5   ==> CS 28 
- PA4   ==> PDC 2 
- PA0   ==> CTL1 25 
- PA1   ==> CTL2 23 
- PA2   ==> CTL4 20 
- PA3   ==> CTL8 27 
- M1 19 ==> PA6         M1 on TMS5100 
- 
+
+ PA5   ==> CS 28
+ PA4   ==> PDC 2
+ PA0   ==> CTL1 25
+ PA1   ==> CTL2 23
+ PA2   ==> CTL4 20
+ PA3   ==> CTL8 27
+ M1 19 ==> PA6         M1 on TMS5100
+
  12,13 Speaker
   7,8  Xin, Xout  (5100: RC-OSC, T11)
   24 A0 (5100: ADD1)
@@ -936,33 +936,33 @@ Addresses found at @0x510, cpu2
   16 C0 (5100: NC)
   18 C1 (5100: NC)
   3  CLK  (5100: ROM-CK)
-  
-	For documentation purposes:
-	
-	Addresses 
-		{ 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }		
-	and related samples interface
-	 
-	static const char *const radarsc1_sample_names[] =
-	{
-		"*radarsc1",
-		"10.wav",
-		"12.wav",
-		"14.wav",
-		"16.wav",
-		"18.wav",
-		"1A.wav",
-		"1C.wav",
-		"1E.wav",
-		"20.wav",
-		0	
-	};
-	
-	static const struct Samplesinterface radarsc1_samples_interface =
-	{
-		8,
-		radarsc1_sample_names
-	};
+
+    For documentation purposes:
+
+    Addresses
+        { 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }
+    and related samples interface
+
+    static const char *const radarsc1_sample_names[] =
+    {
+        "*radarsc1",
+        "10.wav",
+        "12.wav",
+        "14.wav",
+        "16.wav",
+        "18.wav",
+        "1A.wav",
+        "1C.wav",
+        "1E.wav",
+        "20.wav",
+        0
+    };
+
+    static const struct Samplesinterface radarsc1_samples_interface =
+    {
+        8,
+        radarsc1_sample_names
+    };
 
 */
 
@@ -971,7 +971,7 @@ static WRITE8_HANDLER( M58817_command_w )
 	logerror("PA Write %x\n", data);
 
 	tms5110_CTL_w(0, data & 0x0f);
-	tms5110_PDC_w(0, (data>>4) & 0x01); 
+	tms5110_PDC_w(0, (data>>4) & 0x01);
 	// FIXME 0x20 is CS
 }
 
@@ -1004,16 +1004,16 @@ static READ8_HANDLER( dkong_sh_t1_r )
 static WRITE8_HANDLER( dkong_voice_w )
 {
 	/* only provided for documentation purposes
-	 * not actually used 
-	 */
+     * not actually used
+     */
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
 static READ8_HANDLER( dkong_voice_status_r )
 {
 	/* only provided for documentation purposes
-	 * not actually used 
-	 */
+     * not actually used
+     */
 	return 0;
 }
 
@@ -1022,7 +1022,7 @@ static READ8_HANDLER( dkong_sh_tune_r )
 	dkong_state *state = Machine->driver_data;
 	UINT8 *SND = memory_region(REGION_CPU2);
 
-	if ( state->page & 0x40 ) 
+	if ( state->page & 0x40 )
 	{
 		return (soundlatch_r(0) & 0x0F) | (dkong_voice_status_r(0)<<4);
 	}
@@ -1166,10 +1166,10 @@ WRITE8_HANDLER( dkongjr_snd_w1 )
 			I8035_P2_W_AL(5,data & 1);
 			break;
 		case 4:			/* Port 4 write */
-			I8035_T_W_AL(1, data & 1);	
+			I8035_T_W_AL(1, data & 1);
 			break;
 		case 5:			/* Port 5 write */
-			I8035_T_W_AL(0, data & 1);	
+			I8035_T_W_AL(0, data & 1);
 			break;
 		case 6:			/* Port 6 write ==> PB 4 */
 			I8035_P2_W_AL(4,data & 1);
@@ -1201,7 +1201,7 @@ static ADDRESS_MAP_START( dkong_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w) 
+	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w)
 	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
@@ -1314,7 +1314,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_SOUND_RESET(dkong)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dkongjr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

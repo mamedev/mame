@@ -62,7 +62,7 @@ static MACHINE_START( midzeus )
 
 	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
-	
+
 	state_save_register_global(gun_control);
 	state_save_register_global(gun_irq_state);
 	state_save_register_global_array(gun_x);
@@ -142,7 +142,7 @@ static WRITE32_HANDLER( cmos_protect_w )
 static READ32_HANDLER( timekeeper_r )
 {
 	UINT8 result = timekeeper_0_r(offset);
-//	logerror("%06X:cmos_time_r(%X) = %02X\n", activecpu_get_pc(), offset, result);
+//  logerror("%06X:cmos_time_r(%X) = %02X\n", activecpu_get_pc(), offset, result);
 	return result;
 }
 
@@ -151,7 +151,7 @@ static WRITE32_HANDLER( timekeeper_w )
 {
 	if (!cmos_protected)
 	{
-//		logerror("%06X:cmos_time_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
+//      logerror("%06X:cmos_time_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
 		timekeeper_0_w(offset, data);
 	}
 	cmos_protected = TRUE;
@@ -190,7 +190,7 @@ static READ32_HANDLER( zpram_r )
 static NVRAM_HANDLER( midzeus2 )
 {
 	nvram_handler_timekeeper_0(machine, file, read_or_write);
-	
+
 	if (read_or_write)
 		mame_fwrite(file, zpram, zpram_size);
 	else if (file)
@@ -882,7 +882,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_START
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(custom_49way_r, "49WAYX\0" "49WAYY")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START_TAG("49WAYX")
 	PORT_BIT( 0xff, 0x38, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0x6f) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 

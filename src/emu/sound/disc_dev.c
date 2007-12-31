@@ -1395,7 +1395,7 @@ void dsd_566_reset(node_description *node)
 #define DSD_LS624__C		(*(node->input[3]))
 #define DSD_LS624__OUTTYPE	(*(node->input[4]))
 
-/* 
+/*
  * These formulas are derived from diagrams in the datasheet!
  * They are not based on any law. The function is not
  * described anywhere.
@@ -1459,7 +1459,7 @@ void dsd_ls624_reset(node_description *node)
 	context->remain = 0;
 	context->state = 0;
 	context->outtype = DSD_LS624__OUTTYPE;
-	
+
 	/* Step the output */
 	dsd_ls624_step(node);
 }

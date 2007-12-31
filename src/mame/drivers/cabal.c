@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( cabal )
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 3579580) /* verified on pcb */
-	/* audio CPU */	
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

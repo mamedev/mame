@@ -10,10 +10,10 @@
  *           4234761
  *           4189779
  *           4449233
- * 
+ *
  * All patents give interpolation coefficients
- *	{ 8, 8, 8, 4, 4, 2, 2, 1 }
- *  This sequence will not calculate the published 
+ *  { 8, 8, 8, 4, 4, 2, 2, 1 }
+ *  This sequence will not calculate the published
  *  fractions:
  * 1 8 0.125
  * 2 8 0.234
@@ -23,7 +23,7 @@
  * 6 2 0.717
  * 7 2 0.859
  * 0 1 1.000
- * 
+ *
  * Instead,  { 8, 8, 8, 4, 4, 4, 2, 1 }
  * will calculate those coefficients and this has been used below.
  */

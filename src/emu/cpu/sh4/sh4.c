@@ -48,9 +48,9 @@
 #define FP_XFD(r) *( (double *)(sh4.xf+(r)) ) // double precision extended floating point register r
 #ifdef LSB_FIRST
 #define FP_RS2(r) sh4.fr[(r) ^ sh4.fpu_pr]
-#define FP_RFS2(r) *( (float  *)(sh4.fr+((r) ^ sh4.fpu_pr)) ) 
+#define FP_RFS2(r) *( (float  *)(sh4.fr+((r) ^ sh4.fpu_pr)) )
 #define FP_XS2(r) sh4.xf[(r) ^ sh4.fpu_pr]
-#define FP_XFS2(r) *( (float  *)(sh4.xf+((r) ^ sh4.fpu_pr)) ) 
+#define FP_XFS2(r) *( (float  *)(sh4.xf+((r) ^ sh4.fpu_pr)) )
 #endif
 
 typedef struct
@@ -3094,13 +3094,13 @@ INLINE void FMOVFR(UINT32 m,UINT32 n)
 /*  FLDI1  FRn 1111nnnn10011101 */
 INLINE void FLDI1(UINT32 n)
 {
-	sh4.fr[n] = 0x3F800000; 
+	sh4.fr[n] = 0x3F800000;
 }
 
 /*  FLDI0  FRn 1111nnnn10001101 */
 INLINE void FLDI0(UINT32 n)
 {
-	sh4.fr[n] = 0; 
+	sh4.fr[n] = 0;
 }
 
 /*  FLDS FRm,FPUL 1111mmmm00011101 */
@@ -3233,10 +3233,10 @@ INLINE void FCNVDS(UINT32 n)
 	if (sh4.fpu_pr) { /* PR = 1 */
 		n = n & 14;
 #ifdef LSB_FIRST
-		if (sh4.fpscr & RM) 
+		if (sh4.fpscr & RM)
 			sh4.fr[n] &= 0xe0000000; /* round toward zero*/
 #else
-		if (sh4.fpscr & RM) 
+		if (sh4.fpscr & RM)
 			sh4.fr[n | 1] &= 0xe0000000; /* round toward zero*/
 #endif
 		*((float *)&sh4.fpul) = (float)FP_RFD(n);
