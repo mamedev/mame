@@ -25,9 +25,12 @@
 #include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
+#include <math.h>
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS 	0
+/* work only as described in the datasheet */
+#define DATASHEET_STRICT	0
 
 #define VERBOSE 0
 
@@ -40,6 +43,19 @@
 #define EXPPRI(pl,po,p,n)	(((4-(pl)) << 24) | ((15-(po)) << 16) | ((p) << 8) | (255-(n)))
 #define NMIPRI()			EXPPRI(3,0,16,SH4_INTC_NMI)
 #define INTPRI(p,n)			EXPPRI(4,2,p,n)
+
+#define FP_RS(r) sh4.fr[(r)] // binary representation of single precision floating point register r
+#define FP_RFS(r) *( (float  *)(sh4.fr+(r)) ) // single precision floating point register r
+#define FP_RFD(r) *( (double *)(sh4.fr+(r)) ) // double precision floating point register r
+#define FP_XS(r) sh4.xf[(r)] // binary representation of extended single precision floating point register r
+#define FP_XFS(r) *( (float  *)(sh4.xf+(r)) ) // single precision extended floating point register r
+#define FP_XFD(r) *( (double *)(sh4.xf+(r)) ) // double precision extended floating point register r
+#ifdef LSB_FIRST
+#define FP_RS2(r) sh4.fr[(r) ^ sh4.fpu_pr]
+#define FP_RFS2(r) *( (float  *)(sh4.fr+((r) ^ sh4.fpu_pr)) ) 
+#define FP_XS2(r) sh4.xf[(r) ^ sh4.fpu_pr]
+#define FP_XFS2(r) *( (float  *)(sh4.xf+((r) ^ sh4.fpu_pr)) ) 
+#endif
 
 typedef struct
 {
@@ -84,6 +100,7 @@ typedef struct
 
 	int     is_slave, cpu_number;
 	int		cpu_clock, bus_clock, pm_clock;
+	int		fpu_sz, fpu_pr;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 } SH4;
@@ -270,6 +287,37 @@ int s;
 	}
 }
 
+static void sh4_swap_fp_registers(void)
+{
+int s;
+UINT32 z;
+
+	for (s = 0;s <= 15;s++)
+	{
+		z = sh4.fr[s];
+		sh4.fr[s] = sh4.xf[s];
+		sh4.xf[s] = z;
+	}
+}
+
+#ifdef LSB_FIRST
+static void sh4_swap_fp_couples(void)
+{
+int s;
+UINT32 z;
+
+	for (s = 0;s <= 15;s = s+2)
+	{
+		z = sh4.fr[s];
+		sh4.fr[s] = sh4.fr[s + 1];
+		sh4.fr[s + 1] = z;
+		z = sh4.xf[s];
+		sh4.xf[s] = sh4.xf[s + 1];
+		sh4.xf[s + 1] = z;
+	}
+}
+#endif
+
 #ifdef MAME_DEBUG
 static void sh4_syncronize_register_bank(int to)
 {
@@ -413,19 +461,6 @@ int a,irq,z;
 	}
 	if (z >= 0)
 		sh4_exception(message, irq);
-}
-
-static void sh4_swap_fp_registers(void)
-{
-int s;
-UINT32 z;
-
-	for (s = 0;s <= 15;s++)
-	{
-		z = sh4.fr[s];
-		sh4.fr[s] = sh4.xf[s];
-		sh4.xf[s] = z;
-	}
 }
 
 /*  code                 cycles  t-bit
@@ -2174,6 +2209,12 @@ UINT32 s;
 	sh4.r[m] += 4;
 	if ((s & FR) != (sh4.fpscr & FR))
 		sh4_swap_fp_registers();
+#ifdef LSB_FIRST
+	if ((s & PR) != (sh4.fpscr & PR))
+		sh4_swap_fp_couples();
+#endif
+	sh4.fpu_sz = (sh4.fpscr & SZ) ? 1 : 0;
+	sh4.fpu_pr = (sh4.fpscr & PR) ? 1 : 0;
 }
 
 /*  LDC.L   @Rm+,DBR */
@@ -2223,6 +2264,12 @@ UINT32 s;
 	sh4.fpscr = sh4.r[m] & 0x003FFFFF;
 	if ((s & FR) != (sh4.fpscr & FR))
 		sh4_swap_fp_registers();
+#ifdef LSB_FIRST
+	if ((s & PR) != (sh4.fpscr & PR))
+		sh4_swap_fp_couples();
+#endif
+	sh4.fpu_sz = (sh4.fpscr & SZ) ? 1 : 0;
+	sh4.fpu_pr = (sh4.fpscr & PR) ? 1 : 0;
 }
 
 /*  LDC     Rm,DBR */
@@ -2290,11 +2337,11 @@ UINT32 addr,dest,sq;
 		else
 			dest |= (sh4.m[QACR1] & 0x1C) << 24;
 		addr = addr & 0xFFFFFFE0;
-		for (a = 0;a < 8;a++)
+		for (a = 0;a < 4;a++)
 		{
-			program_write_dword_64le(dest, program_read_dword_64le(addr));
-			addr += 4;
-			dest += 4;
+			program_write_qword_64le(dest, program_read_qword_64le(addr));
+			addr += 8;
+			dest += 8;
 		}
 	}
 }
@@ -2774,20 +2821,24 @@ INLINE void op1110(UINT16 opcode)
 	MOVI(opcode & 0xff, Rn);
 }
 
+/*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
 /*  FMOV    @Rm+,DRn PR=0 SZ=1 1111nnn0mmmm1001 */
 /*  FMOV    @Rm+,XDn PR=1      1111nnn1mmmm1001 */
-/*  FMOV.S  @Rm+,FRn PR=0 SZ=0 1111nnnnmmmm1001 */
 INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+	if (sh4.fpu_pr) { /* PR = 1 */
 		n = n & 14;
 		sh4.ea = sh4.r[m];
+		sh4.r[m] += 8;
+#ifdef LSB_FIRST
+		sh4.xf[n+1] = RL( sh4.ea );
+		sh4.xf[n] = RL( sh4.ea+4 );
+#else
 		sh4.xf[n] = RL( sh4.ea );
-		sh4.r[m] += 4;
-		sh4.xf[n+1] = RL( sh4.r[m] );
-		sh4.r[m] += 4;
+		sh4.xf[n+1] = RL( sh4.ea+4 );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			n = n & 14;
 			sh4.ea = sh4.r[m];
 			sh4.fr[n] = RL( sh4.ea );
@@ -2802,18 +2853,23 @@ INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
 	}
 }
 
-/*  FMOV    XDm,@Rn PR=1      1111nnnnmmm11010 */
 /*  FMOV.S  FRm,@Rn PR=0 SZ=0 1111nnnnmmmm1010 */
 /*  FMOV    DRm,@Rn PR=0 SZ=1 1111nnnnmmm01010 */
+/*  FMOV    XDm,@Rn PR=1      1111nnnnmmm11010 */
 INLINE void FMOVFRMR(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+	if (sh4.fpu_pr) { /* PR = 1 */
 		m= m & 14;
 		sh4.ea = sh4.r[n];
+#ifdef LSB_FIRST
+		WL( sh4.ea,sh4.xf[m+1] );
+		WL( sh4.ea+4,sh4.xf[m] );
+#else
 		WL( sh4.ea,sh4.xf[m] );
 		WL( sh4.ea+4,sh4.xf[m+1] );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			m= m & 14;
 			sh4.ea = sh4.r[n];
 			WL( sh4.ea,sh4.fr[m] );
@@ -2825,19 +2881,24 @@ INLINE void FMOVFRMR(UINT32 m,UINT32 n)
 	}
 }
 
-/*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
 /*  FMOV.S  FRm,@-Rn PR=0 SZ=0 1111nnnnmmmm1011 */
 /*  FMOV    DRm,@-Rn PR=0 SZ=1 1111nnnnmmm01011 */
+/*  FMOV    XDm,@-Rn PR=1      1111nnnnmmm11011 */
 INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+	if (sh4.fpu_pr) { /* PR = 1 */
 		m= m & 14;
 		sh4.r[n] -= 8;
 		sh4.ea = sh4.r[n];
+#ifdef LSB_FIRST
+		WL( sh4.ea,sh4.xf[m+1] );
+		WL( sh4.ea+4,sh4.xf[m] );
+#else
 		WL( sh4.ea,sh4.xf[m] );
 		WL( sh4.ea+4,sh4.xf[m+1] );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			m= m & 14;
 			sh4.r[n] -= 8;
 			sh4.ea = sh4.r[n];
@@ -2851,30 +2912,23 @@ INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 	}
 }
 
-/*  FLDI1  FRn 1111nnnn10011101 */
-INLINE void FLDI1(UINT32 n)
-{
-	sh4.fr[n] = 0x3F800000;
-}
-
-/*  FLDI0  FRn 1111nnnn10001101 */
-INLINE void FLDI0(UINT32 n)
-{
-	sh4.fr[n] = 0;
-}
-
-/*  FMOV    XDm,@(R0,Rn) PR=1      1111nnnnmmm10111 */
 /*  FMOV.S  FRm,@(R0,Rn) PR=0 SZ=0 1111nnnnmmmm0111 */
 /*  FMOV    DRm,@(R0,Rn) PR=0 SZ=1 1111nnnnmmm00111 */
+/*  FMOV    XDm,@(R0,Rn) PR=1      1111nnnnmmm10111 */
 INLINE void FMOVFRS0(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+	if (sh4.fpu_pr) { /* PR = 1 */
 		m= m & 14;
 		sh4.ea = sh4.r[0] + sh4.r[n];
+#ifdef LSB_FIRST
+		WL( sh4.ea,sh4.xf[m+1] );
+		WL( sh4.ea+4,sh4.xf[m] );
+#else
 		WL( sh4.ea,sh4.xf[m] );
 		WL( sh4.ea+4,sh4.xf[m+1] );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			m= m & 14;
 			sh4.ea = sh4.r[0] + sh4.r[n];
 			WL( sh4.ea,sh4.fr[m] );
@@ -2886,18 +2940,23 @@ INLINE void FMOVFRS0(UINT32 m,UINT32 n)
 	}
 }
 
-/*  FMOV    @(R0,Rm),XDn PR=1      1111nnn1mmmm0110 */
 /*  FMOV.S  @(R0,Rm),FRn PR=0 SZ=0 1111nnnnmmmm0110 */
 /*  FMOV    @(R0,Rm),DRn PR=0 SZ=1 1111nnn0mmmm0110 */
+/*  FMOV    @(R0,Rm),XDn PR=1      1111nnn1mmmm0110 */
 INLINE void FMOVS0FR(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+	if (sh4.fpu_pr) { /* PR = 1 */
 		n= n & 14;
 		sh4.ea = sh4.r[0] + sh4.r[m];
+#ifdef LSB_FIRST
+		sh4.xf[n+1] = RL( sh4.ea );
+		sh4.xf[n] = RL( sh4.ea+4 );
+#else
 		sh4.xf[n] = RL( sh4.ea );
 		sh4.xf[n+1] = RL( sh4.ea+4 );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			n= n & 14;
 			sh4.ea = sh4.r[0] + sh4.r[m];
 			sh4.fr[n] = RL( sh4.ea );
@@ -2909,18 +2968,26 @@ INLINE void FMOVS0FR(UINT32 m,UINT32 n)
 	}
 }
 
-/*  FMOV    @Rm,XDn PR=1      1111nnn1mmmm1000 */
 /*  FMOV.S  @Rm,FRn PR=0 SZ=0 1111nnnnmmmm1000 */
 /*  FMOV    @Rm,DRn PR=0 SZ=1 1111nnn0mmmm1000 */
+/*  FMOV    @Rm,XDn PR=0 SZ=1 1111nnn1mmmm1000 */
+/*  FMOV    @Rm,XDn PR=1      1111nnn1mmmm1000 */
+/*  FMOV    @Rm,DRn PR=1      1111nnn0mmmm1000 */
 INLINE void FMOVMRFR(UINT32 m,UINT32 n)
 {
-	if (sh4.fpscr & PR) { /* PR = 1 */
+#if DATASHEET_STRICT
+	if (sh4.fpu_pr) { /* PR = 1 */
 		n= n & 14;
 		sh4.ea = sh4.r[m];
+#ifdef LSB_FIRST
+		sh4.xf[n+1] = RL( sh4.ea );
+		sh4.xf[n] = RL( sh4.ea+4 );
+#else
 		sh4.xf[n] = RL( sh4.ea );
 		sh4.xf[n+1] = RL( sh4.ea+4 );
+#endif
 	} else {              /* PR = 0 */
-		if (sh4.fpscr & SZ) { /* SZ = 1 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
 			n= n & 14;
 			sh4.ea = sh4.r[m];
 			sh4.fr[n] = RL( sh4.ea );
@@ -2930,6 +2997,126 @@ INLINE void FMOVMRFR(UINT32 m,UINT32 n)
 			sh4.fr[n] = RL( sh4.ea );
 		}
 	}
+#else
+	if (sh4.fpu_pr) { /* PR = 1 */
+		if (n & 1) {
+			n= n & 14;
+			sh4.ea = sh4.r[m];
+#ifdef LSB_FIRST
+			sh4.xf[n+1] = RL( sh4.ea );
+			sh4.xf[n] = RL( sh4.ea+4 );
+#else
+			sh4.xf[n] = RL( sh4.ea );
+			sh4.xf[n+1] = RL( sh4.ea+4 );
+#endif
+		} else {
+			n= n & 14;
+			sh4.ea = sh4.r[m];
+#ifdef LSB_FIRST
+			sh4.fr[n+1] = RL( sh4.ea );
+			sh4.fr[n] = RL( sh4.ea+4 );
+#else
+			sh4.fr[n] = RL( sh4.ea );
+			sh4.fr[n+1] = RL( sh4.ea+4 );
+#endif
+		}
+	} else {              /* PR = 0 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
+			if (n & 1) {
+				n= n & 14;
+				sh4.ea = sh4.r[m];
+				sh4.xf[n] = RL( sh4.ea );
+				sh4.xf[n+1] = RL( sh4.ea+4 );
+			} else {
+				n= n & 14;
+				sh4.ea = sh4.r[m];
+				sh4.fr[n] = RL( sh4.ea );
+				sh4.fr[n+1] = RL( sh4.ea+4 );
+			}
+		} else {              /* SZ = 0 */
+			sh4.ea = sh4.r[m];
+			sh4.fr[n] = RL( sh4.ea );
+		}
+	}
+#endif
+}
+
+/*  FMOV    FRm,FRn PR=0 SZ=0 FRm -> FRn 1111nnnnmmmm1100 */
+/*  FMOV    DRm,DRn PR=0 SZ=1 DRm -> DRn 1111nnn0mmm01100 */
+/*  FMOV    XDm,DRn PR=1      XDm -> DRn 1111nnn0mmm11100 */
+/*  FMOV    DRm,XDn PR=1      DRm -> XDn 1111nnn1mmm01100 */
+/*  FMOV    XDm,XDn PR=1      XDm -> XDn 1111nnn1mmm11100 */
+INLINE void FMOVFR(UINT32 m,UINT32 n)
+{
+#if DATASHEET_STRICT
+	if (sh4.fpu_pr) { /* PR = 1 */
+		if (m & 1)
+			if (n & 1) {
+				sh4.xf[n & 14] = sh4.xf[m & 14];
+				sh4.xf[n | 1] = sh4.xf[m | 1];
+			} else {
+				sh4.fr[n] = sh4.xf[m & 14];
+				sh4.fr[n | 1] = sh4.xf[m | 1];
+			}
+		else {
+			sh4.xf[n & 14] = sh4.fr[m];
+			sh4.xf[n | 1] = sh4.fr[m|1]; // (a&14)+1 -> a|1
+		}
+	} else {              /* PR = 0 */
+		if (sh4.fpu_sz) { /* SZ = 1 */
+			sh4.fr[n] = sh4.fr[m];
+			sh4.fr[n+1] = sh4.fr[m+1];
+		} else {              /* SZ = 0 */
+			sh4.fr[n] = sh4.fr[m];
+		}
+	}
+#else
+	if (sh4.fpu_sz == 0) /* SZ = 0 */
+		sh4.fr[n] = sh4.fr[m];
+	else { /* SZ = 1 or PR = 1 */
+		if (m & 1)
+			if (n & 1) {
+				sh4.xf[n & 14] = sh4.xf[m & 14];
+				sh4.xf[n | 1] = sh4.xf[m | 1];
+			} else {
+				sh4.fr[n] = sh4.xf[m & 14];
+				sh4.fr[n | 1] = sh4.xf[m | 1];
+			}
+		else {
+			if (n & 1) {
+				sh4.xf[n & 14] = sh4.fr[m];
+				sh4.xf[n | 1] = sh4.fr[m | 1]; // (a&14)+1 -> a|1
+			} else {
+				sh4.fr[n] = sh4.fr[m & 14];
+				sh4.fr[n | 1] = sh4.fr[m | 1];
+			}
+		}
+	}
+#endif
+}
+
+/*  FLDI1  FRn 1111nnnn10011101 */
+INLINE void FLDI1(UINT32 n)
+{
+	sh4.fr[n] = 0x3F800000; 
+}
+
+/*  FLDI0  FRn 1111nnnn10001101 */
+INLINE void FLDI0(UINT32 n)
+{
+	sh4.fr[n] = 0; 
+}
+
+/*  FLDS FRm,FPUL 1111mmmm00011101 */
+INLINE void	FLDS(UINT32 m)
+{
+	sh4.fpul = sh4.fr[m];
+}
+
+/*  FSTS FPUL,FRn 1111nnnn00001101 */
+INLINE void	FSTS(UINT32 n)
+{
+	sh4.fr[n] = sh4.fpul;
 }
 
 /* FRCHG 1111101111111101 */
@@ -2943,6 +3130,240 @@ INLINE void FRCHG(void)
 INLINE void FSCHG(void)
 {
 	sh4.fpscr ^= SZ;
+	sh4.fpu_sz = (sh4.fpscr & SZ) ? 1 : 0;
+}
+
+/* FTRC FRm,FPUL PR=0 1111mmmm00111101 */
+/* FTRC DRm,FPUL PR=1 1111mmm000111101 */
+INLINE void FTRC(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		sh4.fpul = (INT32)FP_RFD(n);
+	} else {              /* PR = 0 */
+		/* read sh4.fr[n] as float -> truncate -> fpul(32) */
+		sh4.fpul = (INT32)FP_RFS(n);
+	}
+}
+
+/* FLOAT FPUL,FRn PR=0 1111nnnn00101101 */
+/* FLOAT FPUL,DRn PR=1 1111nnn000101101 */
+INLINE void FLOAT(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		FP_RFD(n) = (double)(INT32)sh4.fpul;
+	} else {              /* PR = 0 */
+		FP_RFS(n) = (float)(INT32)sh4.fpul;
+	}
+}
+
+/* FNEG FRn PR=0 1111nnnn01001101 */
+/* FNEG DRn PR=1 1111nnn001001101 */
+INLINE void FNEG(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+#ifdef LSB_FIRST
+		n = n | 1; // n & 14 + 1
+		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
+#else
+		n = n & 14;
+		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
+#endif
+	} else {              /* PR = 0 */
+		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
+	}
+}
+
+
+/* FABS FRn PR=0 1111nnnn01011101 */
+/* FABS DRn PR=1 1111nnn001011101 */
+INLINE void FABS(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+#ifdef LSB_FIRST
+		n = n | 1; // n & 14 + 1
+		sh4.fr[n] = sh4.fr[n] & 0x7fffffff;
+#else
+		n = n & 14;
+		sh4.fr[n] = sh4.fr[n] & 0x7fffffff;
+#endif
+	} else {              /* PR = 0 */
+		sh4.fr[n] = sh4.fr[n] & 0x7fffffff;
+	}
+}
+
+/* FCMP/EQ FRm,FRn PR=0 1111nnnnmmmm0100 */
+/* FCMP/EQ DRm,DRn PR=1 1111nnn0mmm00100 */
+INLINE void FCMP_EQ(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		if (FP_RFD(n) == FP_RFD(m))
+			sh4.sr |= T;
+		else
+			sh4.sr &= ~T;
+	} else {              /* PR = 0 */
+		if (FP_RFS(n) == FP_RFS(m))
+			sh4.sr |= T;
+		else
+			sh4.sr &= ~T;
+	}
+}
+
+/* FCMP/GT FRm,FRn PR=0 1111nnnnmmmm0101 */
+/* FCMP/GT DRm,DRn PR=1 1111nnn0mmm00101 */
+INLINE void FCMP_GT(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		if (FP_RFD(n) > FP_RFD(m))
+			sh4.sr |= T;
+		else
+			sh4.sr &= ~T;
+	} else {              /* PR = 0 */
+		if (FP_RFS(n) > FP_RFS(m))
+			sh4.sr |= T;
+		else
+			sh4.sr &= ~T;
+	}
+}
+
+/* FCNVDS DRm,FPUL PR=1 1111mmm010111101 */
+INLINE void FCNVDS(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+#ifdef LSB_FIRST
+		if (sh4.fpscr & RM) 
+			sh4.fr[n] &= 0xe0000000; /* round toward zero*/
+#else
+		if (sh4.fpscr & RM) 
+			sh4.fr[n | 1] &= 0xe0000000; /* round toward zero*/
+#endif
+		*((float *)&sh4.fpul) = (float)FP_RFD(n);
+	}
+}
+
+/* FCNVSD FPUL, DRn PR=1 1111nnn010101101 */
+INLINE void FCNVSD(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		FP_RFD(n) = *((float *)&sh4.fpul);
+	}
+}
+
+/* FADD FRm,FRn PR=0 1111nnnnmmmm0000 */
+/* FADD DRm,DRn PR=1 1111nnn0mmm00000 */
+INLINE void FADD(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		FP_RFD(n) = FP_RFD(n) + FP_RFD(m);
+	} else {              /* PR = 0 */
+		FP_RFS(n) = FP_RFS(n) + FP_RFS(m);
+	}
+}
+
+/* FSUB FRm,FRn PR=0 1111nnnnmmmm0001 */
+/* FSUB DRm,DRn PR=1 1111nnn0mmm00001 */
+INLINE void FSUB(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		FP_RFD(n) = FP_RFD(n) - FP_RFD(m);
+	} else {              /* PR = 0 */
+		FP_RFS(n) = FP_RFS(n) - FP_RFS(m);
+	}
+}
+
+
+/* FMUL FRm,FRn PR=0 1111nnnnmmmm0010 */
+/* FMUL DRm,DRn PR=1 1111nnn0mmm00010 */
+INLINE void FMUL(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		FP_RFD(n) = FP_RFD(n) * FP_RFD(m);
+	} else {              /* PR = 0 */
+		FP_RFS(n) = FP_RFS(n) * FP_RFS(m);
+	}
+}
+
+/* FDIV FRm,FRn PR=0 1111nnnnmmmm0011 */
+/* FDIV DRm,DRn PR=1 1111nnn0mmm00011 */
+INLINE void FDIV(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		m = m & 14;
+		if (FP_RFD(m) == 0)
+			return;
+		FP_RFD(n) = FP_RFD(n) / FP_RFD(m);
+	} else {              /* PR = 0 */
+		if (FP_RFS(m) == 0)
+			return;
+		FP_RFS(n) = FP_RFS(n) / FP_RFS(m);
+	}
+}
+
+/* FMAC FR0,FRm,FRn PR=0 1111nnnnmmmm1110 */
+INLINE void FMAC(UINT32 m,UINT32 n)
+{
+	if (sh4.fpu_pr == 0) { /* PR = 0 */
+		FP_RFS(n) = (FP_RFS(0) * FP_RFS(m)) + FP_RFS(n);
+	}
+}
+
+/* FSQRT FRn PR=0 1111nnnn01101101 */
+/* FSQRT DRn PR=1 1111nnnn01101101 */
+INLINE void FSQRT(UINT32 n)
+{
+	if (sh4.fpu_pr) { /* PR = 1 */
+		n = n & 14;
+		if (FP_RFD(n) < 0)
+			return;
+		FP_RFD(n) = sqrt(FP_RFD(n));
+	} else {              /* PR = 0 */
+		if (FP_RFS(n) < 0)
+			return;
+		FP_RFS(n) = sqrt(FP_RFS(n));
+	}
+}
+
+/* FIPR FVm,FVn PR=0 1111nnmm11101101 */
+INLINE void FIPR(UINT32 n)
+{
+UINT32 m;
+float ml[4];
+int a;
+
+	m = (n & 3) << 2;
+	n = n & 12;
+	for (a = 0;a < 4;a++)
+		ml[a] = FP_RFS(n+a) * FP_RFS(m+a);
+	FP_RFS(n+3) = ml[0] + ml[1] + ml[2] + ml[3];
+}
+
+/* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
+INLINE void FTRV(UINT32 n)
+{
+int i,j;
+float sum[4];
+
+	n = n & 12;
+	for (i = 0;i < 4;i++) {
+		sum[i] = 0;
+		for (j=0;j < 4;j++)
+			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + i);
+		FP_RFS(n + i) = sum[i];
+	}
 }
 
 INLINE void op1111(UINT16 opcode)
@@ -2950,22 +3371,22 @@ INLINE void op1111(UINT16 opcode)
 	switch (opcode & 0xf)
 	{
 		case 0:
-			TODO();
+			FADD(Rm,Rn);
 			break;
 		case 1:
-			TODO();
+			FSUB(Rm,Rn);
 			break;
 		case 2:
-			TODO();
+			FMUL(Rm,Rn);
 			break;
 		case 3:
-			TODO();
+			FDIV(Rm,Rn);
 			break;
 		case 4:
-			TODO();
+			FCMP_EQ(Rm,Rn);
 			break;
 		case 5:
-			TODO();
+			FCMP_GT(Rm,Rn);
 			break;
 		case 6:
 			FMOVS0FR(Rm,Rn);
@@ -2986,31 +3407,31 @@ INLINE void op1111(UINT16 opcode)
 			FMOVFRMDR(Rm,Rn);
 			break;
 		case 12:
-			TODO();
+			FMOVFR(Rm,Rn);
 			break;
 		case 13:
 			switch (opcode & 0xF0)
 			{
 				case 0x00:
-					TODO();
+					FSTS(Rn);
 					break;
 				case 0x10:
-					TODO();
+					FLDS(Rn);
 					break;
 				case 0x20:
-					TODO();
+					FLOAT(Rn);
 					break;
 				case 0x30:
-					TODO();
+					FTRC(Rn);
 					break;
 				case 0x40:
-					TODO();
+					FNEG(Rn);
 					break;
 				case 0x50:
-					TODO();
+					FABS(Rn);
 					break;
 				case 0x60:
-					TODO();
+					FSQRT(Rn);
 					break;
 				case 0x80:
 					FLDI0(Rn);
@@ -3019,13 +3440,13 @@ INLINE void op1111(UINT16 opcode)
 					FLDI1(Rn);
 					break;
 				case 0xA0:
-					TODO();
+					FCNVSD(Rn);
 					break;
 				case 0xB0:
-					TODO();
+					FCNVDS(Rn);
 					break;
 				case 0xE0:
-					TODO();
+					FIPR(Rn);
 					break;
 				case 0xF0:
 					if (opcode == 0xF3FD)
@@ -3033,12 +3454,12 @@ INLINE void op1111(UINT16 opcode)
 					else if (opcode == 0xFBFD)
 						FRCHG();
 					else if ((opcode & 0x300) == 0x100)
-						TODO();
+						FTRV(Rn);
 					break;
 			}
 			break;
 		case 14:
-			TODO();
+			FMAC(Rm,Rn);
 			break;
 	}
 }
@@ -3113,6 +3534,8 @@ static void sh4_reset(void)
 	sh4.r[15] = RL(4);
 	sh4.sr = 0x700000f0;
 	sh4.fpscr = 0x00040001;
+	sh4.fpu_sz = (sh4.fpscr & SZ) ? 1 : 0;
+	sh4.fpu_pr = (sh4.fpscr & PR) ? 1 : 0;
 	sh4.fpul = 0;
 	sh4.dbr = 0;
 	change_pc(sh4.pc & AM);
@@ -3221,9 +3644,7 @@ UINT32 ticks;
 
 INLINE attotime sh4_scale_up_mame_time(attotime _time1, UINT32 factor1)
 {
-	if (factor1 == 0)
-		return attotime_zero;
-	return attotime_mul(_time1, factor1 + 1);
+	return attotime_add(attotime_mul(_time1, factor1), _time1);
 }
 
 static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
@@ -3499,7 +3920,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 
 	switch(size)
 	{
-	case 1:
+	case 1: // 8 bit
 		for(;count > 0; count --)
 		{
 			if(incs == 2)
@@ -3513,7 +3934,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				dst ++;
 		}
 		break;
-	case 2:
+	case 2: // 16 bit
 		src &= ~1;
 		dst &= ~1;
 		for(;count > 0; count --)
@@ -3529,7 +3950,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				dst += 2;
 		}
 		break;
-	case 8:
+	case 8: // 64 bit
 		src &= ~7;
 		dst &= ~7;
 		for(;count > 0; count --)
@@ -3546,7 +3967,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 
 		}
 		break;
-	case 4:
+	case 4: // 32 bit
 		src &= ~3;
 		dst &= ~3;
 		for(;count > 0; count --)
@@ -4307,7 +4728,7 @@ UINT32 pos,len,siz;
 	} else {
 		if ((s->direction) == 0) {
 			len = s->length;
-                        p32bits = (UINT32 *)(s->buffer);
+			p32bits = (UINT32 *)(s->buffer);
 			for (pos = 0;pos < len;pos++) {
 				*p32bits = program_read_dword_64le(s->source);
 				p32bits++;
@@ -4315,7 +4736,7 @@ UINT32 pos,len,siz;
 			}
 		} else {
 			len = s->length;
-                        p32bits = (UINT32 *)(s->buffer);
+			p32bits = (UINT32 *)(s->buffer);
 			for (pos = 0;pos < len;pos++) {
 				program_write_dword_64le(s->destination, *p32bits);
 				p32bits++;
@@ -4394,6 +4815,40 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_SGR:			sh4.sgr = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sh4.fpscr = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FPUL:			sh4.fpul = info->i; break;
+#ifdef LSB_FIRST
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sh4.fr[ 0 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:			sh4.fr[ 1 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:			sh4.fr[ 2 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:			sh4.fr[ 3 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:			sh4.fr[ 4 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:			sh4.fr[ 5 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:			sh4.fr[ 6 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:			sh4.fr[ 7 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:			sh4.fr[ 8 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:			sh4.fr[ 9 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:			sh4.fr[10 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:			sh4.fr[11 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:			sh4.fr[12 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:			sh4.fr[13 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:			sh4.fr[14 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:			sh4.fr[15 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:			sh4.xf[ 0 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:			sh4.xf[ 1 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:			sh4.xf[ 2 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:			sh4.xf[ 3 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:			sh4.xf[ 4 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:			sh4.xf[ 5 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:			sh4.xf[ 6 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:			sh4.xf[ 7 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:			sh4.xf[ 8 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:			sh4.xf[ 9 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:			sh4.xf[10 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:			sh4.xf[11 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:			sh4.xf[12 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:			sh4.xf[13 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:			sh4.xf[14 ^ sh4.fpu_pr] = info->i; break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4.xf[15 ^ sh4.fpu_pr] = info->i; break;
+#else
 		case CPUINFO_STR_REGISTER + SH4_FR0:			sh4.fr[ 0] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FR1:			sh4.fr[ 1] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_FR2:			sh4.fr[ 2] = info->i; break;
@@ -4426,6 +4881,7 @@ static void sh4_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_XF13:			sh4.xf[13] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_XF14:			sh4.xf[14] = info->i; break;
 		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4.xf[15] = info->i; break;
+#endif
 
 		case CPUINFO_INT_SH4_IRLn_INPUT:				sh4_set_irln_input(cpu_getactivecpu(), info->i); break;
 		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(cpu_getactivecpu(), info->i); break;
@@ -4599,38 +5055,73 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_SGR:			sprintf(info->s, "SGR  :%08X", sh4.sgr); break;
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sprintf(info->s, "FPSCR :%08X", sh4.fpscr); break;
 		case CPUINFO_STR_REGISTER + SH4_FPUL:			sprintf(info->s, "FPUL :%08X", sh4.fpul); break;
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X", sh4.fr[ 0]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X", sh4.fr[ 1]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X", sh4.fr[ 2]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X", sh4.fr[ 3]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X", sh4.fr[ 4]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X", sh4.fr[ 5]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X", sh4.fr[ 6]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X", sh4.fr[ 7]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X", sh4.fr[ 8]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X", sh4.fr[ 9]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X", sh4.fr[10]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X", sh4.fr[11]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X", sh4.fr[12]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X", sh4.fr[13]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X", sh4.fr[14]); break;
-		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X", sh4.fr[15]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X", sh4.xf[ 0]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X", sh4.xf[ 1]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X", sh4.xf[ 2]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X", sh4.xf[ 3]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X", sh4.xf[ 4]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X", sh4.xf[ 5]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X", sh4.xf[ 6]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X", sh4.xf[ 7]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X", sh4.xf[ 8]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X", sh4.xf[ 9]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X", sh4.xf[10]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X", sh4.xf[11]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X", sh4.xf[12]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X", sh4.xf[13]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X", sh4.xf[14]); break;
-		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X", sh4.xf[15]); break;
+#ifdef LSB_FIRST
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.4e", FP_RS2( 0),(double)FP_RFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS2( 1),(double)FP_RFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS2( 2),(double)FP_RFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS2( 3),(double)FP_RFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %01.2e", FP_RS2( 4),(double)FP_RFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %01.2e", FP_RS2( 5),(double)FP_RFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %01.2e", FP_RS2( 6),(double)FP_RFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %01.2e", FP_RS2( 7),(double)FP_RFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %01.2e", FP_RS2( 8),(double)FP_RFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %01.2e", FP_RS2( 9),(double)FP_RFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %01.2e", FP_RS2(10),(double)FP_RFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %01.2e", FP_RS2(11),(double)FP_RFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %01.2e", FP_RS2(12),(double)FP_RFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %01.2e", FP_RS2(13),(double)FP_RFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %01.2e", FP_RS2(14),(double)FP_RFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %01.2e", FP_RS2(15),(double)FP_RFS2(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %01.2e", FP_XS2( 0),(double)FP_XFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %01.2e", FP_XS2( 1),(double)FP_XFS2( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %01.2e", FP_XS2( 2),(double)FP_XFS2( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %01.2e", FP_XS2( 3),(double)FP_XFS2( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %01.2e", FP_XS2( 4),(double)FP_XFS2( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %01.2e", FP_XS2( 5),(double)FP_XFS2( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %01.2e", FP_XS2( 6),(double)FP_XFS2( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %01.2e", FP_XS2( 7),(double)FP_XFS2( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %01.2e", FP_XS2( 8),(double)FP_XFS2( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %01.2e", FP_XS2( 9),(double)FP_XFS2( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %01.2e", FP_XS2(10),(double)FP_XFS2(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %01.2e", FP_XS2(11),(double)FP_XFS2(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %01.2e", FP_XS2(12),(double)FP_XFS2(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %01.2e", FP_XS2(13),(double)FP_XFS2(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %01.2e", FP_XS2(14),(double)FP_XFS2(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %01.2e", FP_XS2(15),(double)FP_XFS2(15)); break;
+#else
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.4e", FP_RS( 0),(double)FP_RFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS( 1),(double)FP_RFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS( 2),(double)FP_RFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS( 3),(double)FP_RFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR4:			sprintf(info->s, "FR4  :%08X %01.2e", FP_RS( 4),(double)FP_RFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR5:			sprintf(info->s, "FR5  :%08X %01.2e", FP_RS( 5),(double)FP_RFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR6:			sprintf(info->s, "FR6  :%08X %01.2e", FP_RS( 6),(double)FP_RFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR7:			sprintf(info->s, "FR7  :%08X %01.2e", FP_RS( 7),(double)FP_RFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR8:			sprintf(info->s, "FR8  :%08X %01.2e", FP_RS( 8),(double)FP_RFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR9:			sprintf(info->s, "FR9  :%08X %01.2e", FP_RS( 9),(double)FP_RFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR10:			sprintf(info->s, "FR10 :%08X %01.2e", FP_RS(10),(double)FP_RFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR11:			sprintf(info->s, "FR11 :%08X %01.2e", FP_RS(11),(double)FP_RFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR12:			sprintf(info->s, "FR12 :%08X %01.2e", FP_RS(12),(double)FP_RFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR13:			sprintf(info->s, "FR13 :%08X %01.2e", FP_RS(13),(double)FP_RFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR14:			sprintf(info->s, "FR14 :%08X %01.2e", FP_RS(14),(double)FP_RFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR15:			sprintf(info->s, "FR15 :%08X %01.2e", FP_RS(15),(double)FP_RFS(15)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF0:			sprintf(info->s, "XF0  :%08X %01.2e", FP_XS( 0),(double)FP_XFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF1:			sprintf(info->s, "XF1  :%08X %01.2e", FP_XS( 1),(double)FP_XFS( 1)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF2:			sprintf(info->s, "XF2  :%08X %01.2e", FP_XS( 2),(double)FP_XFS( 2)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF3:			sprintf(info->s, "XF3  :%08X %01.2e", FP_XS( 3),(double)FP_XFS( 3)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF4:			sprintf(info->s, "XF4  :%08X %01.2e", FP_XS( 4),(double)FP_XFS( 4)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF5:			sprintf(info->s, "XF5  :%08X %01.2e", FP_XS( 5),(double)FP_XFS( 5)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF6:			sprintf(info->s, "XF6  :%08X %01.2e", FP_XS( 6),(double)FP_XFS( 6)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF7:			sprintf(info->s, "XF7  :%08X %01.2e", FP_XS( 7),(double)FP_XFS( 7)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF8:			sprintf(info->s, "XF8  :%08X %01.2e", FP_XS( 8),(double)FP_XFS( 8)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF9:			sprintf(info->s, "XF9  :%08X %01.2e", FP_XS( 9),(double)FP_XFS( 9)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF10:			sprintf(info->s, "XF10 :%08X %01.2e", FP_XS(10),(double)FP_XFS(10)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF11:			sprintf(info->s, "XF11 :%08X %01.2e", FP_XS(11),(double)FP_XFS(11)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF12:			sprintf(info->s, "XF12 :%08X %01.2e", FP_XS(12),(double)FP_XFS(12)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF13:			sprintf(info->s, "XF13 :%08X %01.2e", FP_XS(13),(double)FP_XFS(13)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %01.2e", FP_XS(14),(double)FP_XFS(14)); break;
+		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %01.2e", FP_XS(15),(double)FP_XFS(15)); break;
+#endif
 		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		info->f = (genf*)sh4.ftcsr_read_callback; break;
 
 	}

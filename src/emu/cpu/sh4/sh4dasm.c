@@ -543,7 +543,7 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 		sprintf(buffer, "MOV.B   @($%02X,%s),R0", (opcode & 15), regname[Rm]);
 		break;
 	case  5:
-		sprintf(buffer, "MOV.W   @($%02X,%s),R0", (opcode & 15), regname[Rm]);
+		sprintf(buffer, "MOV.W   @($%02X,%s),R0", (opcode & 15) * 2, regname[Rm]);
 		break;
 	case  8:
 		sprintf(buffer, "CMP/EQ  #$%02X,R0", (opcode & 0xff));
