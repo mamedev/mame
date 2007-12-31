@@ -19,6 +19,7 @@
 #include "c352.h"
 
 #define VERBOSE (0)
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 // flags
 
@@ -420,83 +421,63 @@ static void c352_write_reg16(struct c352_info *info, unsigned long address, unsi
 
 	if (chan > 31)
 	{
-		#if VERBOSE
-		logerror("C352 CTRL %08x %04x\n", address, val);
-		#endif
+		LOG(("C352 CTRL %08lx %04x\n", address, val));
 		return;
 	}
 	switch(address & 0xf)
 	{
 	case 0x0:
 		// volumes (output 1)
-		#if VERBOSE
-		logerror("CH %02d LVOL %02x RVOL %02x\n", chan, val & 0xff, val >> 8);
-		#endif
+		LOG(("CH %02ld LVOL %02x RVOL %02x\n", chan, val & 0xff, val >> 8));
 		info->c352_ch[chan].vol_l = val & 0xff;
 		info->c352_ch[chan].vol_r = val >> 8;
 		break;
 
 	case 0x2:
 		// volumes (output 2)
-		#if VERBOSE
-		logerror("CH %02d RLVOL %02x RRVOL %02x\n", chan, val & 0xff, val >> 8);
-		#endif
+		LOG(("CH %02ld RLVOL %02x RRVOL %02x\n", chan, val & 0xff, val >> 8));
 		info->c352_ch[chan].vol_l2 = val & 0xff;
 		info->c352_ch[chan].vol_r2 = val >> 8;
 		break;
 
 	case 0x4:
 		// pitch
-		#if VERBOSE
-		logerror("CH %02d PITCH %04x\n", chan, val);
-		#endif
+		LOG(("CH %02ld PITCH %04x\n", chan, val));
 		info->c352_ch[chan].pitch = val;
 		break;
 
 	case 0x6:
 		// flags
-		#if VERBOSE
-		logerror("CH %02d FLAG %02x\n", chan, val);
-		#endif
+		LOG(("CH %02ld FLAG %02x\n", chan, val));
 		info->c352_ch[chan].flag = val;
 		break;
 
 	case 0x8:
 		// bank (bits 16-31 of address);
 		info->c352_ch[chan].bank = val & 0xff;
-		#if VERBOSE
-		logerror("CH %02d BANK %02x", chan, info->c352_ch[chan].bank);
-		#endif
+		LOG(("CH %02ld BANK %02x", chan, info->c352_ch[chan].bank));
 		break;
 
 	case 0xa:
 		// start address
-		#if VERBOSE
-		logerror("CH %02d SADDR %04x\n", chan, val);
-		#endif
+		LOG(("CH %02ld SADDR %04x\n", chan, val));
 		info->c352_ch[chan].start_addr = val;
 		break;
 
 	case 0xc:
 		// end address
-		#if VERBOSE
-		logerror("CH %02d EADDR %04x\n", chan, val);
-		#endif
+		LOG(("CH %02ld EADDR %04x\n", chan, val));
 		info->c352_ch[chan].end_addr = val;
 		break;
 
 	case 0xe:
 		// loop address
-		#if VERBOSE
-		logerror("CH %02d LADDR %04x\n", chan, val);
-		#endif
+		LOG(("CH %02ld LADDR %04x\n", chan, val));
 		info->c352_ch[chan].repeat_addr = val;
 		break;
 
 	default:
-		#if VERBOSE
-		logerror("CH %02d UNKN %01x %04x", chan, address & 0xf, val);
-		#endif
+		LOG(("CH %02ld UNKN %01lx %04x", chan, address & 0xf, val));
 		break;
 	}
 }

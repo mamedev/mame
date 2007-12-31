@@ -10,6 +10,7 @@
 #include "st0016.h"
 
 #define VERBOSE (0)
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 UINT8 *st0016_sound_regs;
 
@@ -26,9 +27,7 @@ WRITE8_HANDLER(st0016_snd_w)
 	int voice = offset/32;
 	int reg = offset & 0x1f;
 	int oldreg = st0016_sound_regs[offset];
-#if VERBOSE
 	int vbase = offset & ~0x1f;
-#endif
 
 	st0016_sound_regs[offset] = data;
 
@@ -38,15 +37,13 @@ WRITE8_HANDLER(st0016_snd_w)
 		{
 			info->vpos[voice] = info->frac[voice] = info->lponce[voice] = 0;
 
-#if VERBOSE
-			logerror("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
+			LOG(("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
 				st0016_sound_regs[vbase+2]<<16 | st0016_sound_regs[vbase+1]<<8 | st0016_sound_regs[vbase+2],
 				st0016_sound_regs[vbase+0xe]<<16 | st0016_sound_regs[vbase+0xd]<<8 | st0016_sound_regs[vbase+0xc],
 				st0016_sound_regs[vbase+6]<<16 | st0016_sound_regs[vbase+5]<<8 | st0016_sound_regs[vbase+4],
 				st0016_sound_regs[vbase+0xa]<<16 | st0016_sound_regs[vbase+0x9]<<8 | st0016_sound_regs[vbase+0x8],
 				st0016_sound_regs[vbase+0x11]<<8 | st0016_sound_regs[vbase+0x10],
-				st0016_sound_regs[vbase+0x16]);
-#endif
+				st0016_sound_regs[vbase+0x16]));
 		}
 	}
 }

@@ -34,13 +34,8 @@
     DEBUGGING
 ***************************************************************************/
 
-//#define VERBOSE
-
-#ifdef VERBOSE
-#define TRACE(x) do {x;} while (0)
-#else
-#define TRACE(x)
-#endif
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 

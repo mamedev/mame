@@ -140,6 +140,7 @@ TODO:
 
 
 #define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 struct namcoio
 {
@@ -186,9 +187,7 @@ static void namcoio_51XX_write(int chip,int data)
 {
 	data &= 0x07;
 
-#if VERBOSE
-	logerror("%04x: custom 51XX write %02x\n",activecpu_get_pc(),data);
-#endif
+	LOG(("%04x: custom 51XX write %02x\n",activecpu_get_pc(),data));
 
 	if (io[chip].coincred_mode)
 	{
@@ -284,9 +283,7 @@ static const int joy_map[16] =
 
 static UINT8 namcoio_51XX_read(int chip)
 {
-#if VERBOSE
-	logerror("%04x: custom 51XX read\n",activecpu_get_pc());
-#endif
+	LOG(("%04x: custom 51XX read\n",activecpu_get_pc()));
 
 	if (io[chip].mode == 0)	/* switch mode */
 	{
@@ -518,9 +515,7 @@ static void handle_coins(int chip,int swap)
 
 static void namco_customio_56XX_run(int chip)
 {
-#if VERBOSE
-	logerror("execute 56XX %d mode %d\n",chip,IORAM_READ(8));
-#endif
+	LOG(("execute 56XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -600,9 +595,7 @@ static void namco_customio_56XX_run(int chip)
 
 static void namco_customio_59XX_run(int chip)
 {
-#if VERBOSE
-	logerror("execute 59XX %d mode %d\n",chip,IORAM_READ(8));
-#endif
+	LOG(("execute 59XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -625,9 +618,7 @@ static void namco_customio_59XX_run(int chip)
 
 static void namco_customio_58XX_run(int chip)
 {
-#if VERBOSE
-	logerror("execute 58XX %d mode %d\n",chip,IORAM_READ(8));
-#endif
+	LOG(("execute 58XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
 	{
@@ -737,9 +728,7 @@ READ8_HANDLER( namcoio_r )
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
 
-#if VERBOSE
-	logerror("%04x: I/O read %d: mode %d, offset %d = %02x\n", activecpu_get_pc(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f);
-#endif
+	LOG(("%04x: I/O read %d: mode %d, offset %d = %02x\n", activecpu_get_pc(), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
 
 	return 0xf0 | namcoio_ram[offset];
 }
@@ -749,9 +738,7 @@ WRITE8_HANDLER( namcoio_w )
 	offset &= 0x3f;
 	data &= 0x0f;	// RAM is 4-bit wide
 
-#if VERBOSE
-	logerror("%04x: I/O write %d: offset %d = %02x\n", activecpu_get_pc(), offset / 16, offset & 0x0f, data);
-#endif
+	LOG(("%04x: I/O write %d: offset %d = %02x\n", activecpu_get_pc(), offset / 16, offset & 0x0f, data));
 
 	namcoio_ram[offset] = data;
 }
@@ -841,16 +828,12 @@ static TIMER_CALLBACK( nmi_generate )
 {
 	if (!cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-#if VERBOSE
-	logerror("NMI cpu %d\n",nmi_cpu[param]);
-#endif
+		LOG(("NMI cpu %d\n",nmi_cpu[param]));
 
 		cpunum_set_input_line(nmi_cpu[param], INPUT_LINE_NMI, PULSE_LINE);
 	}
-#if VERBOSE
 	else
-		logerror("NMI not generated because cpu %d is suspended\n",nmi_cpu[param]);
-#endif
+		LOG(("NMI not generated because cpu %d is suspended\n",nmi_cpu[param]));
 }
 
 static UINT8 customio_command[MAX_06XX];
@@ -885,9 +868,7 @@ void namco_06xx_init(int chipnum, int cpu,
 
 static UINT8 namcoio_53XX_digdug_read(int chip)
 {
-#if VERBOSE
-	logerror("%04x: custom 53XX read\n",activecpu_get_pc());
-#endif
+	LOG(("%04x: custom 53XX read\n",activecpu_get_pc()));
 
 	switch ((io[chip].in_count++) % 2)
 	{
@@ -900,9 +881,7 @@ static UINT8 namcoio_53XX_digdug_read(int chip)
 
 static UINT8 namcoio_53XX_polepos_read(int chip)
 {
-#if VERBOSE
-	logerror("%04x: custom 53XX read\n",activecpu_get_pc());
-#endif
+	LOG(("%04x: custom 53XX read\n",activecpu_get_pc()));
 
 	switch ((io[chip].in_count++) % 8)
 	{
@@ -915,9 +894,7 @@ static UINT8 namcoio_53XX_polepos_read(int chip)
 
 static UINT8 namco_06xx_data_read(int chipnum)
 {
-#if VERBOSE
-	logerror("forwarding read to chip %d\n",chipnum%3);
-#endif
+	LOG(("forwarding read to chip %d\n",chipnum%3));
 
 	switch (io[chipnum].type)
 	{
@@ -935,9 +912,7 @@ static UINT8 namco_06xx_data_read(int chipnum)
 
 static void namco_06xx_data_write(int chipnum,UINT8 data)
 {
-#if VERBOSE
-	logerror("forwarding write to chip %d\n",chipnum%3);
-#endif
+	LOG(("forwarding write to chip %d\n",chipnum%3));
 
 	switch (io[chipnum].type)
 	{
@@ -955,9 +930,7 @@ static void namco_06xx_data_write(int chipnum,UINT8 data)
 
 static void namco_06xx_read_request(int chipnum)
 {
-#if VERBOSE
-	logerror("requesting read to chip %d\n",chipnum%3);
-#endif
+	LOG(("requesting read to chip %d\n",chipnum%3));
 
 	switch (io[chipnum].type)
 	{
@@ -972,9 +945,7 @@ static void namco_06xx_read_request(int chipnum)
 
 static UINT8 namco_06xx_data_r(int chip,int offset)
 {
-#if VERBOSE
-	logerror("%04x: 06XX #%d read offset %d\n",activecpu_get_pc(),chip,offset);
-#endif
+	LOG(("%04x: 06XX #%d read offset %d\n",activecpu_get_pc(),chip,offset));
 
 	if (!(customio_command[chip] & 0x10))
 	{
@@ -997,9 +968,7 @@ static UINT8 namco_06xx_data_r(int chip,int offset)
 
 static void namco_06xx_data_w(int chip,int offset,int data)
 {
-#if VERBOSE
-	logerror("%04x: 06XX #%d write offset %d = %02x\n",activecpu_get_pc(),chip,offset,data);
-#endif
+	LOG(("%04x: 06XX #%d write offset %d = %02x\n",activecpu_get_pc(),chip,offset,data));
 
 	if (customio_command[chip] & 0x10)
 	{
@@ -1022,32 +991,25 @@ static void namco_06xx_data_w(int chip,int offset,int data)
 
 static UINT8 namco_06xx_ctrl_r(int chip)
 {
-#if VERBOSE
-	logerror("%04x: 06XX #%d ctrl_r\n",activecpu_get_pc(),chip);
-#endif
+	LOG(("%04x: 06XX #%d ctrl_r\n",activecpu_get_pc(),chip));
 	return customio_command[chip];
 }
 
 static void namco_06xx_ctrl_w(int chip,int data)
 {
-#if VERBOSE
-	logerror("%04x: 06XX #%d command %02x\n",activecpu_get_pc(),chip,data);
-#endif
+	LOG(("%04x: 06XX #%d command %02x\n",activecpu_get_pc(),chip,data));
 
 	customio_command[chip] = data;
 
 	if ((customio_command[chip] & 0x0f) == 0)
 	{
-#if VERBOSE
-		logerror("disabling nmi generate timer\n");
-#endif
+		LOG(("disabling nmi generate timer\n"));
 		timer_adjust(nmi_timer[chip], attotime_never, chip, attotime_never);
 	}
 	else
 	{
-#if VERBOSE
-		logerror("setting nmi generate timer to 200us\n");
-#endif
+		LOG(("setting nmi generate timer to 200us\n"));
+
 		// this timing is critical. Due to a bug, Bosconian will stop responding to
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will

@@ -20,11 +20,7 @@
 
 #define VERBOSE		1
 
-#if VERBOSE
-#define VPRINTF(x) logerror x
-#else
-#define VPRINTF(x)
-#endif
+#define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 

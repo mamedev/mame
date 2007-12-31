@@ -50,17 +50,9 @@
 #define VERBOSE 0
 #define DEBUG_FIFO 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#ifdef DEBUG_FIFO
-#define LOG_FIFO(x)	logerror x
-#else
-#define LOG_FIFO(x)
-#endif
+#define LOG_FIFO(x)	do { if (DEBUG_FIFO) logerror x; } while (0)
 
 #define SET_SBY(line_state) {                  \
 	if( sp->sby_line != line_state )           \

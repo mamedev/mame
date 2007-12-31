@@ -97,10 +97,12 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #include "rendlay.h"
 
 #ifdef MAME_DEBUG
-#define LOG_CTRL(x) logerror x // show UART information
+#define VERBOSE 1
 #else
-#define LOG_CTRL(x)
+#define VERBOSE 0
 #endif
+
+#define LOG_CTRL(x) do { if (VERBOSE) logerror x; } while (0)
 
 // local vars /////////////////////////////////////////////////////////////
 

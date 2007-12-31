@@ -22,11 +22,7 @@
 
 #define VERBOSE		0
 
-#if VERBOSE
-#define VPRINTF(x) logerror x
-#else
-#define VPRINTF(x)
-#endif
+#define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -368,17 +364,20 @@ void z80ctc_trg_w(int which, int ch, UINT8 data)
 			/* if we're waiting for a trigger, start the timer */
 			if ((ctc->mode[ch] & WAITING_FOR_TRIG) && (ctc->mode[ch] & MODE) == MODE_TIMER)
 			{
-				VPRINTF(("CTC clock %f\n",1.0/clock));
-
 				if (!(ctc->notimer & (1<<ch)))
 				{
 					attotime period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
 					period = attotime_mul(period, ctc->tconst[ch]);
 
+					VPRINTF(("CTC period %s\n", attotime_string(period, 9)));
 					timer_adjust(ctc->timer[ch], period, (which << 2) + ch, period);
 				}
 				else
+				{
+					VPRINTF(("CTC disabled\n"));
+
 					timer_adjust(ctc->timer[ch], attotime_never, 0, attotime_never);
+				}
 			}
 
 			/* we're no longer waiting */

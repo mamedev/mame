@@ -19,19 +19,9 @@
 #define PRINTF_IDE_COMMANDS			0
 #define PRINTF_IDE_PASSWORD			0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(X)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#if (VERBOSE && PRINTF_IDE_COMMANDS)
-#define LOGPRINT(x)	logerror x; mame_printf_debug x
-#elif PRINTF_IDE_COMMANDS
-#define LOGPRINT(x)	mame_printf_debug x
-#else
-#define LOGPRINT(X)
-#endif
+#define LOGPRINT(x)	do { if (VERBOSE) logerror x; if (PRINTF_IDE_COMMANDS) mame_printf_debug x; } while (0)
 
 
 

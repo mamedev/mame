@@ -193,11 +193,12 @@ static void FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	/* don't blit if pointer bad */
 	if (!a1_base_mem || !a2_base_mem)
 	{
-#if LOG_BAD_BLITS
+		if (LOG_BAD_BLITS)
+		{
 		logerror("%08X:Blit!\n", activecpu_get_previouspc());
 		logerror("  a1_base  = %08X\n", a1_base);
 		logerror("  a2_base  = %08X\n", a2_base);
-#endif
+		}
 		return;
 	}
 
@@ -272,7 +273,8 @@ static void FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	adest_xmask			= (COMMAND & 0x00000800) ? a2_xmask : a1_xmask;
 	adest_ymask			= (COMMAND & 0x00000800) ? a2_ymask : a1_ymask;
 
-#if LOG_BLITS
+	if (LOG_BLITS)
+	{
 	logerror("%08X:Blit!\n", activecpu_get_previouspc());
 	logerror("  a1_base  = %08X\n", a1_base);
 	logerror("  a1_pitch = %d\n", a1_pitch);
@@ -298,13 +300,11 @@ static void FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 
 	logerror("  count    = %d x %d\n", inner_count, outer_count);
 	logerror("  command  = %08X\n", COMMAND);
-#endif
+	}
 
-#if LOG_UNHANDLED_BLITS
 	/* check for unhandled command bits */
-	if (COMMAND & 0x24003000)
+	if (LOG_UNHANDLED_BLITS && (COMMAND & 0x24003000))
 		logerror("Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24003000);
-#endif /* LOG_UNHANDLED_BLITS */
 
 	/* top of the outer loop */
 	outer = outer_count;

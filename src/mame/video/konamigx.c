@@ -1,5 +1,3 @@
-#define VERBOSE 0
-
 /*
  * video/konamigx.c - Konami GX video hardware (here there be dragons)
  *
@@ -8,6 +6,8 @@
 #include "driver.h"
 #include "video/konamiic.h"
 #include "machine/konamigx.h"
+
+#define VERBOSE 0
 
 static int layer_colorbase[4];
 static INT32 gx_tilebanks[8], gx_oldbanks[8];
@@ -105,9 +105,8 @@ static void konamigx_alpha_tile_callback(int layer, int *code, int *color, int *
 		/* save mixcode and mark tile alpha (unimplemented) */
 		*code = 0;
 
-		#if VERBOSE
+		if (VERBOSE)
 			popmessage("skipped alpha tile(layer=%d mix=%d)", layer, mixcode);
-		#endif
 	}
 }
 

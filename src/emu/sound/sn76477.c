@@ -66,11 +66,7 @@
 #define LOG_WAV_FILE_NAME		"sn76477_%d.wav"
 
 
-#if VERBOSE
-#define LOG(n,x) if (VERBOSE >= (n)) logerror x
-#else
-#define LOG(n,x)
-#endif
+#define LOG(n,x) do { if (VERBOSE >= (n)) logerror x; } while (0)
 
 #define CHECK_CHIP_NUM					assert(sn != NULL)
 #define CHECK_CHIP_NUM_AND_BOOLEAN		CHECK_CHIP_NUM; assert((data & 0x01) == data)
@@ -642,12 +638,10 @@ static double compute_center_to_peak_voltage_out(struct SN76477 *sn)
 
 static void log_enable_line(struct SN76477 *sn)
 {
-#if VERBOSE
 	static const char *const desc[] =
 	{
 		"Enabled", "Inhibited"
 	};
-#endif
 
 	LOG(1, ("SN76477 #%d:              Enable line (9): %d [%s]\n", sn->index, sn->enable, desc[sn->enable]));
 }
@@ -655,13 +649,11 @@ static void log_enable_line(struct SN76477 *sn)
 
 static void log_mixer_mode(struct SN76477 *sn)
 {
-#if VERBOSE
 	const char *desc[] =
 	{
 		"VCO", "SLF", "Noise", "VCO/Noise",
 		"SLF/Noise", "SLF/VCO/Noise", "SLF/VCO", "Inhibit"
 	};
-#endif
 
 	LOG(1, ("SN76477 #%d:           Mixer mode (25-27): %d [%s]\n", sn->index, sn->mixer_mode, desc[sn->mixer_mode]));
 }
@@ -669,12 +661,10 @@ static void log_mixer_mode(struct SN76477 *sn)
 
 static void log_envelope_mode(struct SN76477 *sn)
 {
-#if VERBOSE
 	const char *desc[] =
 	{
 		"VCO", "One-Shot", "Mixer Only", "VCO with Alternating Polarity"
 	};
-#endif
 
 	LOG(1, ("SN76477 #%d:         Envelope mode (1,28): %d [%s]\n", sn->index, sn->envelope_mode, desc[sn->envelope_mode]));
 }
@@ -682,12 +672,10 @@ static void log_envelope_mode(struct SN76477 *sn)
 
 static void log_vco_mode(struct SN76477 *sn)
 {
-#if VERBOSE
 	const char *desc[] =
 	{
 		"External (Pin 16)", "Internal (SLF)"
 	};
-#endif
 
 	LOG(1, ("SN76477 #%d:                VCO mode (22): %d [%s]\n", sn->index, sn->vco_mode, desc[sn->vco_mode]));
 }

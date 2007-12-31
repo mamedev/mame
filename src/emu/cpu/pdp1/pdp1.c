@@ -918,19 +918,15 @@ static void pdp1_set_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + PDP1_SNGL_INST:	pdp1.sngl_inst = info->i ? 1 : 0;			break;
 	case CPUINFO_INT_REGISTER + PDP1_EXTEND_SW:	pdp1.extend_sw = info->i ? 1 : 0;			break;
 	case CPUINFO_INT_REGISTER + PDP1_RUN:		pdp1.run = info->i ? 1 : 0;					break;
-#if LOG
-	case CPUINFO_INT_REGISTER + PDP1_CYC:		logerror("pdp1_set_reg to cycle flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_DEFER:		logerror("pdp1_set_reg to defer flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:	logerror("pdp1_set_reg to break counter ignored\n");/* no way!*/ break;
-#endif
+	case CPUINFO_INT_REGISTER + PDP1_CYC:		if (LOG) logerror("pdp1_set_reg to cycle flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_DEFER:		if (LOG) logerror("pdp1_set_reg to defer flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_BRK_CTR:	if (LOG) logerror("pdp1_set_reg to break counter ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_RIM:		pdp1.rim = info->i ? 1 : 0;					break;
 	case CPUINFO_INT_REGISTER + PDP1_SBM:		pdp1.sbm = info->i ? 1 : 0;					break;
 	case CPUINFO_INT_REGISTER + PDP1_EXD:		EXD = (pdp1.extend_support && info->i) ? 1 : 0; break;
-#if LOG
-	case CPUINFO_INT_REGISTER + PDP1_IOC:		logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_IOH:		logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + PDP1_IOS:		logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
-#endif
+	case CPUINFO_INT_REGISTER + PDP1_IOC:		if (LOG) logerror("pdp1_set_reg to ioc flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_IOH:		if (LOG) logerror("pdp1_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + PDP1_IOS:		if (LOG) logerror("pdp1_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + PDP1_START_CLEAR:	pulse_start_clear();					break;
 	case CPUINFO_INT_REGISTER + PDP1_IO_COMPLETE:	pdp1.ios = 1;							break;
 	}

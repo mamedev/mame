@@ -19,12 +19,7 @@
 
 #define VERBOSE		0
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
-
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 /*************************************
@@ -167,7 +162,7 @@ void dmadac_transfer(UINT8 first_channel, UINT8 num_channels, offs_t channel_spa
 		}
 	}
 
-	LOG(("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, (int)(total_frames * (double)DEFAULT_SAMPLE_RATE / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos));
+	//LOG(("dmadac_transfer - %d samples, %d effective, %d in buffer\n", total_frames, (int)(total_frames * (double)DEFAULT_SAMPLE_RATE / dmadac[first_channel].frequency), dmadac[first_channel].curinpos - dmadac[first_channel].curoutpos));
 }
 
 

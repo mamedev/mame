@@ -55,11 +55,7 @@
 
 #define VERBOSE			(0)
 
-#if VERBOSE
-#define VPRINTF(x)		mame_printf_debug x
-#else
-#define VPRINTF(x)
-#endif
+#define VPRINTF(x)	do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 
 

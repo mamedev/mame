@@ -15,7 +15,8 @@ Memo:
 #include "cpu/m68000/m68000.h"
 
 
-#define	TMP68301_DEBUG	0
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 //  TMP68301 System Memory Map
@@ -147,90 +148,70 @@ static UINT16 tmp68301_timer[0x50];
 
 READ16_HANDLER( tmp68301_address_decoder_r )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_address_decoder_r (%08X)\n", activecpu_get_pc(), (0xfffc00 + (offset * 2)));
-#endif
+	LOG(("PC %08X: TMP68301_address_decoder_r (%08X)\n", activecpu_get_pc(), (0xfffc00 + (offset * 2))));
 
 	return tmp68301_address_decoder[offset];
 }
 
 WRITE16_HANDLER( tmp68301_address_decoder_w )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_address_decoder_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffc00 + (offset * 2)), data);
-#endif
+	LOG(("PC %08X: TMP68301_address_decoder_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffc00 + (offset * 2)), data));
 
 	tmp68301_address_decoder[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_interrupt_controller_r )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_interrupt_controller_r (%08X)\n", activecpu_get_pc(), (0xfffc80 + (offset * 2)));
-#endif
+	LOG(("PC %08X: TMP68301_interrupt_controller_r (%08X)\n", activecpu_get_pc(), (0xfffc80 + (offset * 2))));
 
 	return tmp68301_interrupt_controller[offset];
 }
 
 WRITE16_HANDLER( tmp68301_interrupt_controller_w )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_interrupt_controller_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffc80 + (offset * 2)), data);
-#endif
+	LOG(("PC %08X: TMP68301_interrupt_controller_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffc80 + (offset * 2)), data));
 
 	tmp68301_interrupt_controller[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_parallel_interface_r )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_parallel_interface_r (%08X)\n", activecpu_get_pc(), (0xfffd00 + (offset * 2)));
-#endif
+	LOG(("PC %08X: TMP68301_parallel_interface_r (%08X)\n", activecpu_get_pc(), (0xfffd00 + (offset * 2))));
 
 	return tmp68301_parallel_interface[offset];
 }
 
 WRITE16_HANDLER( tmp68301_parallel_interface_w )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_parallel_interface_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffd00 + (offset * 2)), data);
-#endif
+	LOG(("PC %08X: TMP68301_parallel_interface_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffd00 + (offset * 2)), data));
 
 	tmp68301_parallel_interface[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_serial_interface_r )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_serial_interface_r (%08X)\n", activecpu_get_pc(), (0xfffd80 + (offset * 2)));
-#endif
+	LOG(("PC %08X: TMP68301_serial_interface_r (%08X)\n", activecpu_get_pc(), (0xfffd80 + (offset * 2))));
 
 	return tmp68301_serial_interface[offset];
 }
 
 WRITE16_HANDLER( tmp68301_serial_interface_w )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_serial_interface_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffd80 + (offset * 2)), data);
-#endif
+	LOG(("PC %08X: TMP68301_serial_interface_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffd80 + (offset * 2)), data));
 
 	tmp68301_serial_interface[offset] = data;
 }
 
 READ16_HANDLER( tmp68301_timer_r )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_timer_r (%08X)\n", activecpu_get_pc(), (0xfffe00 + (offset * 2)));
-#endif
+	LOG(("PC %08X: TMP68301_timer_r (%08X)\n", activecpu_get_pc(), (0xfffe00 + (offset * 2))));
 
 	return tmp68301_timer[offset];
 }
 
 WRITE16_HANDLER( tmp68301_timer_w )
 {
-#if TMP68301_DEBUG
-	logerror("PC %08X: TMP68301_timer_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffe00 + (offset * 2)), data);
-#endif
+	LOG(("PC %08X: TMP68301_timer_w (%08X = %04X)\n", activecpu_get_pc(), (0xfffe00 + (offset * 2)), data));
 
 	tmp68301_timer[offset] = data;
 }

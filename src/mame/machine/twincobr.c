@@ -10,6 +10,7 @@
 
 
 #define LOG_DSP_CALLS 0
+#define LOG(x) do { if (LOG_DSP_CALLS) logerror x; } while (0)
 #define CLEAR  0
 #define ASSERT 1
 
@@ -23,9 +24,7 @@ static int fsharkbt_8741;
 static int dsp_execute;
 static UINT32 dsp_addr_w, main_ram_seg;
 
-#if LOG_DSP_CALLS
 static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
-#endif
 
 UINT8 *twincobr_sharedram;
 
@@ -61,9 +60,7 @@ WRITE16_HANDLER( twincobr_dsp_addrsel_w )
 	main_ram_seg = ((data & 0xe000) << 3);
 	dsp_addr_w   = ((data & 0x1fff) << 1);
 
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w));
 }
 
 READ16_HANDLER( twincobr_dsp_r )
@@ -79,9 +76,7 @@ READ16_HANDLER( twincobr_dsp_r )
 						cpuintrf_pop_context(); break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",activecpu_get_previouspc(),main_ram_seg + dsp_addr_w); break;
 	}
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n",activecpu_get_previouspc(),input_data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",activecpu_get_previouspc(),input_data,main_ram_seg + dsp_addr_w));
 	return input_data;
 }
 
@@ -97,9 +92,7 @@ WRITE16_HANDLER( twincobr_dsp_w )
 						cpuintrf_pop_context(); break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",activecpu_get_previouspc(),main_ram_seg + dsp_addr_w); break;
 	}
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w));
 }
 
 WRITE16_HANDLER( wardner_dsp_addrsel_w )
@@ -114,9 +107,7 @@ WRITE16_HANDLER( wardner_dsp_addrsel_w )
 
 	if (main_ram_seg == 0x6000) main_ram_seg = 0x7000;
 
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w));
 }
 
 READ16_HANDLER( wardner_dsp_r )
@@ -133,9 +124,7 @@ READ16_HANDLER( wardner_dsp_r )
 						cpuintrf_pop_context(); break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",activecpu_get_previouspc(),main_ram_seg + dsp_addr_w); break;
 	}
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n",activecpu_get_previouspc(),input_data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO read %04x at %08x (port 1)\n",activecpu_get_previouspc(),input_data,main_ram_seg + dsp_addr_w));
 	return input_data;
 }
 
@@ -152,9 +141,7 @@ WRITE16_HANDLER( wardner_dsp_w )
 						cpuintrf_pop_context(); break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",activecpu_get_previouspc(),main_ram_seg + dsp_addr_w); break;
 	}
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w);
-#endif
+	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",activecpu_get_previouspc(),data,main_ram_seg + dsp_addr_w));
 }
 
 WRITE16_HANDLER( twincobr_dsp_bio_w )
@@ -164,17 +151,13 @@ WRITE16_HANDLER( twincobr_dsp_bio_w )
 	/*              Actually only DSP data bit 15 controls this */
 	/* data 0x0000  means set DSP BIO line active and disable */
 	/*              communication to main processor*/
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO write %04x at port 3\n",activecpu_get_previouspc(),data);
-#endif
+	LOG(("DSP PC:%04x IO write %04x at port 3\n",activecpu_get_previouspc(),data));
 	if (data & 0x8000) {
 		twincobr_dsp_BIO = CLEAR_LINE;
 	}
 	if (data == 0) {
 		if (dsp_execute) {
-#if LOG_DSP_CALLS
-			logerror("Turning the main CPU on\n");
-#endif
+			LOG(("Turning the main CPU on\n"));
 			cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
@@ -189,9 +172,7 @@ READ16_HANDLER( fsharkbt_dsp_r )
 	/* Port is read three times during startup. First and last data */
 	/*   read must equal, but second data read must be different */
 	fsharkbt_8741 += 1;
-#if LOG_DSP_CALLS
-	logerror("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",activecpu_get_previouspc(),(fsharkbt_8741 & 0x08));
-#endif
+	LOG(("DSP PC:%04x IO read %04x from 8741 MCU (port 2)\n",activecpu_get_previouspc(),(fsharkbt_8741 & 0x08)));
 	return (fsharkbt_8741 & 1);
 }
 
@@ -213,17 +194,13 @@ static void twincobr_dsp(int enable)
 {
 	twincobr_dsp_on = enable;
 	if (enable) {
-#if LOG_DSP_CALLS
-		logerror("Turning DSP on and main CPU off\n");
-#endif
+		LOG(("Turning DSP on and main CPU off\n"));
 		cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
 		cpunum_set_input_line(2, 0, ASSERT_LINE); /* TMS32010 INT */
 		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
-#if LOG_DSP_CALLS
-		logerror("Turning DSP off\n");
-#endif
+		LOG(("Turning DSP off\n"));
 		cpunum_set_input_line(2, 0, CLEAR_LINE); /* TMS32010 INT */
 		cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
 	}
@@ -237,9 +214,7 @@ static void twincobr_restore_dsp(void)
 
 static void toaplan0_control_w(int offset, int data)
 {
-#if LOG_DSP_CALLS
-	logerror("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset);
-#endif
+	LOG(("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset));
 
 	if (toaplan_main_cpu == 1) {
 		if (data == 0x0c) { data = 0x1c; wardner_sprite_hack=0; }	/* Z80 ? */
@@ -292,10 +267,8 @@ WRITE16_HANDLER( twincobr_sharedram_w )
 
 static void toaplan0_coin_dsp_w(int offset, int data)
 {
-#if LOG_DSP_CALLS
 	if (data > 1)
-		logerror("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset);
-#endif
+		LOG(("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset));
 	switch (data) {
 		case 0x08: coin_counter_w(0,0); break;
 		case 0x09: coin_counter_w(0,1); break;
@@ -307,17 +280,13 @@ static void toaplan0_coin_dsp_w(int offset, int data)
 		case 0x0f: coin_lockout_w(1,0); break;
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
-#if LOG_DSP_CALLS
-					logerror("Turning DSP on and main CPU off\n");
-#endif
+					LOG(("Turning DSP on and main CPU off\n"));
 					cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
 					cpunum_set_input_line(2, 0, ASSERT_LINE); /* TMS32010 INT */
 					cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
-#if LOG_DSP_CALLS
-					logerror("Turning DSP off\n");
-#endif
+					LOG(("Turning DSP off\n"));
 					cpunum_set_input_line(2, 0, CLEAR_LINE); /* TMS32010 INT */
 					cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
 					break;

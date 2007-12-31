@@ -63,7 +63,8 @@
 #include "cpuintrf.h"
 #include "ymf278b.h"
 
-#undef VERBOSE
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 typedef struct
 {
@@ -183,9 +184,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 		// Attack
 		slot->env_vol = (256U << 23) - 1;
 		slot->env_vol_lim = 256U<<23;
-#ifdef VERBOSE
-		logerror("YMF278B: Skipping attack (rate = %d)\n", slot->AR);
-#endif
+		LOG(("YMF278B: Skipping attack (rate = %d)\n", slot->AR));
 		slot->env_step++;
 	}
 	if(slot->env_step == 1)
@@ -196,9 +195,8 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 		if(slot->DL)
 		{
 			int rate = ymf278b_compute_rate(slot, slot->D1R);
-#ifdef VERBOSE
-			logerror("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0);
-#endif
+			LOG(("YMF278B: Decay step 1, dl=%d, val = %d rate = %d, delay = %g\n", slot->DL, slot->D1R, rate, ymf278_compute_decay_rate(rate)*1000.0));
+
 			if(rate<4)
 				slot->env_vol_step = 0;
 			else
@@ -211,9 +209,8 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	{
 		// Decay 2
 		int rate = ymf278b_compute_rate(slot, slot->D2R);
-#ifdef VERBOSE
-		logerror("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23);
-#endif
+
+		LOG(("YMF278B: Decay step 2, val = %d, rate = %d, delay = %g, current vol = %d\n", slot->D2R, rate, ymf278_compute_decay_rate(rate)*1000.0, slot->env_vol >> 23));
 		if(rate<4)
 			slot->env_vol_step = 0;
 		else
@@ -225,9 +222,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 3)
 	{
 		// Decay 2 reached -96dB
-#ifdef VERBOSE
-		logerror("YMF278B: Voice cleared because of decay 2\n");
-#endif
+		LOG(("YMF278B: Voice cleared because of decay 2\n"));
 		slot->env_vol = 256U<<23;
 		slot->env_vol_step = 0;
 		slot->env_vol_lim = 0;
@@ -238,9 +233,8 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	{
 		// Release
 		int rate = ymf278b_compute_rate(slot, slot->RR);
-#ifdef VERBOSE
-		logerror("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0);
-#endif
+
+		LOG(("YMF278B: Release, val = %d, rate = %d, delay = %g\n", slot->RR, rate, ymf278_compute_decay_rate(rate)*1000.0));
 		if(rate<4)
 			slot->env_vol_step = 0;
 		else
@@ -252,9 +246,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 	if(slot->env_step == 5)
 	{
 		// Release reached -96dB
-#ifdef VERBOSE
-		logerror("YMF278B: Release ends\n");
-#endif
+		LOG(("YMF278B: Release ends\n"));
 		slot->env_vol = 256U<<23;
 		slot->env_vol_step = 0;
 		slot->env_vol_lim = 0;
@@ -533,17 +525,13 @@ static void ymf278b_C_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 
 					ymf278b_envelope_next(slot);
 
-#ifdef VERBOSE
-					logerror("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,
-							 slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM);
-					logerror("                  b=%d, start=%x, loop=%x, end=%x, oct=%d, fn=%d, step=%x\n", slot->bits, slot->startaddr, slot->loopaddr>>16, slot->endaddr>>16, oct, slot->FN, slot->step);
-#endif
+					LOG(("YMF278B: slot %2d wave %3d lfo=%d vib=%d ar=%d d1r=%d dl=%d d2r=%d rc=%d rr=%d am=%d\n", snum, slot->wave,
+							 slot->lfo, slot->vib, slot->AR, slot->D1R, slot->DL, slot->D2R, slot->RC, slot->RR, slot->AM));
+					LOG(("                  b=%d, start=%x, loop=%x, end=%x, oct=%d, fn=%d, step=%x\n", slot->bits, slot->startaddr, slot->loopaddr>>16, slot->endaddr>>16, oct, slot->FN, slot->step));
 				}
 				else
 				{
-#ifdef VERBOSE
-					logerror("YMF278B: slot %2d off\n", snum);
-#endif
+					LOG(("YMF278B: slot %2d off\n", snum));
 					if(slot->active)
 					{
 						slot->env_step = 4;

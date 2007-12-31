@@ -28,7 +28,8 @@
 ***************************************************************************/
 
 #define LOG_THROTTLE				(0)
-#define LOG_PARTIAL_UPDATES(x)		/* logerror x */
+#define VERBOSE					(0)
+#define LOG_PARTIAL_UPDATES(x)		do { if (VERBOSE) logerror x; } while (0)
 
 
 

@@ -22,11 +22,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)			do { logerror x; } while (0)
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -304,7 +300,7 @@ void timer_set_global_time(attotime newbase)
 	/* set the new global offset */
 	global_basetime = newbase;
 
-	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase), attotime_string(timer_head->expire)));
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase, 9), attotime_string(timer_head->expire, 9)));
 
 	/* now process any timers that are overdue */
 	while (attotime_compare(timer_head->expire, global_basetime) <= 0)

@@ -22,6 +22,7 @@
 
 // Log Blitter
 #define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 /* 0 B01234 G01234 R01234 */
@@ -98,16 +99,12 @@ WRITE8_HANDLER( dynax_extra_scrolly_w )
 WRITE8_HANDLER( dynax_blit_pen_w )
 {
 	dynax_blit_pen = data;
-#if VERBOSE
-	logerror("P=%02X ",data);
-#endif
+	LOG(("P=%02X ",data));
 }
 WRITE8_HANDLER( dynax_blit2_pen_w )
 {
 	dynax_blit2_pen = data;
-#if VERBOSE
-	logerror("P'=%02X ",data);
-#endif
+	LOG(("P'=%02X ",data));
 }
 
 /* Destination Layers */
@@ -117,16 +114,12 @@ WRITE8_HANDLER( dynax_blit_dest_w )
 	if (layer_layout == LAYOUT_HNORIDUR)
 		dynax_blit_dest = BITSWAP8(dynax_blit_dest ^ 0x0f, 7,6,5,4, 0,1,2,3);
 
-#if VERBOSE
-	logerror("D=%02X ",data);
-#endif
+	LOG(("D=%02X ",data));
 }
 WRITE8_HANDLER( dynax_blit2_dest_w )
 {
 	dynax_blit2_dest = data;
-#if VERBOSE
-	logerror("D'=%02X ",data);
-#endif
+	LOG(("D'=%02X ",data));
 }
 WRITE8_HANDLER( tenkai_blit_dest_w )
 {
@@ -137,9 +130,7 @@ WRITE8_HANDLER( tenkai_blit_dest_w )
 WRITE8_HANDLER( dynax_blit_backpen_w )
 {
 	dynax_blit_backpen = data;
-#if VERBOSE
-	logerror("B=%02X ",data);
-#endif
+	LOG(("B=%02X ",data));
 }
 
 /* Layers 0&1 Palettes (Low Bits) */
@@ -149,16 +140,12 @@ WRITE8_HANDLER( dynax_blit_palette01_w )
 		dynax_blit_palettes = (dynax_blit_palettes & 0x00ff) | ((data&0x0f)<<12) | ((data&0xf0)<<4);
 	else
 		dynax_blit_palettes = (dynax_blit_palettes & 0xff00) | data;
-#if VERBOSE
-	logerror("P01=%02X ",data);
-#endif
+	LOG(("P01=%02X ",data));
 }
 WRITE8_HANDLER( tenkai_blit_palette01_w )
 {
 	dynax_blit_palettes = (dynax_blit_palettes & 0xff00) | data;
-#if VERBOSE
-	logerror("P01=%02X ",data);
-#endif
+	LOG(("P01=%02X ",data));
 }
 
 /* Layers 4&5 Palettes (Low Bits) */
@@ -168,9 +155,7 @@ WRITE8_HANDLER( dynax_blit_palette45_w )
 		dynax_blit2_palettes = (dynax_blit2_palettes & 0x00ff) | ((data&0x0f)<<12) | ((data&0xf0)<<4);
 	else
 		dynax_blit2_palettes = (dynax_blit2_palettes & 0xff00) | data;
-#if VERBOSE
-	logerror("P45=%02X ",data);
-#endif
+	LOG(("P45=%02X ",data));
 }
 
 /* Layer 2&3 Palettes (Low Bits) */
@@ -180,16 +165,12 @@ WRITE8_HANDLER( dynax_blit_palette23_w )
 		dynax_blit_palettes = (dynax_blit_palettes & 0xff00) | ((data&0x0f)<<4) | ((data&0xf0)>>4);
 	else
 		dynax_blit_palettes = (dynax_blit_palettes & 0x00ff) | (data<<8);
-#if VERBOSE
-	logerror("P23=%02X ",data);
-#endif
+	LOG(("P23=%02X ",data));
 }
 WRITE8_HANDLER( tenkai_blit_palette23_w )
 {
 	dynax_blit_palettes = (dynax_blit_palettes & 0x00ff) | ((data&0x0f)<<12) | ((data&0xf0)<<4);
-#if VERBOSE
-	logerror("P23=%02X ",data);
-#endif
+	LOG(("P23=%02X ",data));
 }
 /* Layer 6&7 Palettes (Low Bits) */
 WRITE8_HANDLER( dynax_blit_palette67_w )
@@ -198,9 +179,7 @@ WRITE8_HANDLER( dynax_blit_palette67_w )
 		dynax_blit2_palettes = (dynax_blit2_palettes & 0xff00) | ((data&0x0f)<<4) | ((data&0xf0)>>4);
 	else
 		dynax_blit2_palettes = (dynax_blit2_palettes & 0x00ff) | (data<<8);
-#if VERBOSE
-	logerror("P67=%02X ",data);
-#endif
+	LOG(("P67=%02X ",data));
 }
 
 
@@ -209,34 +188,26 @@ WRITE8_HANDLER( dynax_blit_palette67_w )
 WRITE8_HANDLER( dynax_blit_palbank_w )
 {
 	dynax_blit_palbank = data;
-#if VERBOSE
-	logerror("PB=%02X ",data);
-#endif
+	LOG(("PB=%02X ",data));
 }
 WRITE8_HANDLER( dynax_blit2_palbank_w )
 {
 	dynax_blit2_palbank = data;
-#if VERBOSE
-	logerror("PB'=%02X ",data);
-#endif
+	LOG(("PB'=%02X ",data));
 }
 
 /* Which half of the layers to write two (interleaved games only) */
 WRITE8_HANDLER( hanamai_layer_half_w )
 {
 	hanamai_layer_half = (~data) & 1;
-#if VERBOSE
-	logerror("H=%02X ",data);
-#endif
+	LOG(("H=%02X ",data));
 }
 
 /* Write to both halves of the layers (interleaved games only) */
 WRITE8_HANDLER( hnoridur_layer_half2_w )
 {
 	hnoridur_layer_half2 = (~data) & 1;
-#if VERBOSE
-	logerror("H2=%02X ",data);
-#endif
+	LOG(("H2=%02X ",data));
 }
 
 WRITE8_HANDLER( mjdialq2_blit_dest_w )
@@ -251,9 +222,7 @@ WRITE8_HANDLER( mjdialq2_blit_dest_w )
 WRITE8_HANDLER( dynax_layer_enable_w )
 {
 	dynax_layer_enable = data;
-#if VERBOSE
-	logerror("E=%02X ",data);
-#endif
+	LOG(("E=%02X ",data));
 }
 
 WRITE8_HANDLER( jantouki_layer_enable_w )
@@ -277,26 +246,20 @@ WRITE8_HANDLER( dynax_flipscreen_w )
 	flipscreen = data & 1;
 	if (data & ~1)
 		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", activecpu_get_pc(), data);
-#if VERBOSE
-	logerror("F=%02X ",data);
-#endif
+	LOG(("F=%02X ",data));
 }
 
 
 WRITE8_HANDLER( dynax_blit_romregion_w )
 {
 	dynax_blit_romregion = REGION_GFX1 + data;
-#if VERBOSE
-	logerror("GFX%X ",data+1);
-#endif
+	LOG(("GFX%X ",data+1));
 }
 
 WRITE8_HANDLER( dynax_blit2_romregion_w )
 {
 	dynax_blit2_romregion = REGION_GFX2 + data;
-#if VERBOSE
-	logerror("GFX%X' ",data+2);
-#endif
+	LOG(("GFX%X' ",data+2));
 }
 
 /***************************************************************************
@@ -544,9 +507,7 @@ static void dynax_blitter_start(int flags)
 {
 	int blit_newsrc;
 
-#if VERBOSE
-	logerror("XY=%X,%X SRC=%X BLIT=%X\n",blit_x,blit_y,blit_src,flags);
-#endif
+	LOG(("XY=%X,%X SRC=%X BLIT=%X\n",blit_x,blit_y,blit_src,flags));
 
 	blit_newsrc =
 		blitter_drawgfx(
@@ -575,9 +536,7 @@ static void jantouki_blitter_start(int flags)
 {
 	int blit_newsrc;
 
-#if VERBOSE
-	logerror("XY=%X,%X SRC=%X BLIT=%X\n",blit_x,blit_y,blit_src,flags);
-#endif
+	LOG(("XY=%X,%X SRC=%X BLIT=%X\n",blit_x,blit_y,blit_src,flags));
 
 	blit_newsrc =
 		blitter_drawgfx(
@@ -606,9 +565,7 @@ static void jantouki_blitter2_start(int flags)
 {
 	int blit2_newsrc;
 
-#if VERBOSE
-	logerror("XY'=%X,%X SRC'=%X BLIT'=%02X\n",blit2_x,blit2_y,blit2_src,flags);
-#endif
+	LOG(("XY'=%X,%X SRC'=%X BLIT'=%02X\n",blit2_x,blit2_y,blit2_src,flags));
 
 	blit2_newsrc =
 		blitter_drawgfx(
@@ -640,20 +597,14 @@ static WRITE8_HANDLER( dynax_blit_scroll_w )
 	switch( blit_src & 0xc00000 )
 	{
 		case 0x000000:	dynax_blit_scroll_x = data;
-						#if VERBOSE
-						logerror("SX=%02X ",data);
-						#endif
+						LOG(("SX=%02X ",data));
 						break;
 		case 0x400000:	dynax_blit_scroll_y = data;
-						#if VERBOSE
-						logerror("SY=%02X ",data);
-						#endif
+						LOG(("SY=%02X ",data));
 						break;
 		case 0x800000:
 		case 0xc00000:	dynax_blit_wrap_enable = data;
-						#if VERBOSE
-						logerror("WE=%02X ",data);
-						#endif
+						LOG(("WE=%02X ",data));
 						break;
 	}
 }
@@ -664,20 +615,14 @@ static WRITE8_HANDLER( tenkai_blit_scroll_w )
 	switch( blit_src & 0xc00000 )
 	{
 		case 0x000000:	dynax_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
-						#if VERBOSE
-						logerror("SX=%02X ",data);
-						#endif
+						LOG(("SX=%02X ",data));
 						break;
 		case 0x400000:	dynax_blit_scroll_y = data ^ 0xff;
-						#if VERBOSE
-						logerror("SY=%02X ",data);
-						#endif
+						LOG(("SY=%02X ",data));
 						break;
 		case 0x800000:
 		case 0xc00000:	dynax_blit_wrap_enable = data;
-						#if VERBOSE
-						logerror("WE=%02X ",data);
-						#endif
+						LOG(("WE=%02X ",data));
 						break;
 	}
 }
@@ -687,20 +632,14 @@ static WRITE8_HANDLER( dynax_blit2_scroll_w )
 	switch( blit2_src & 0xc00000 )
 	{
 		case 0x000000:	dynax_blit2_scroll_x = data;
-						#if VERBOSE
-						logerror("SX'=%02X ",data);
-						#endif
+						LOG(("SX'=%02X ",data));
 						break;
 		case 0x400000:	dynax_blit2_scroll_y = data;
-						#if VERBOSE
-						logerror("SY'=%02X ",data);
-						#endif
+						LOG(("SY'=%02X ",data));
 						break;
 		case 0x800000:
 		case 0xc00000:	dynax_blit2_wrap_enable = data;
-						#if VERBOSE
-						logerror("WE'=%02X ",data);
-						#endif
+						LOG(("WE'=%02X ",data));
 						break;
 	}
 }

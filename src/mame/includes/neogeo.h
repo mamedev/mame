@@ -5,8 +5,6 @@
 *************************************************************************/
 
 
-#define VERBOSE 	(0)
-
 #define NEOGEO_MASTER_CLOCK					(24000000)
 #define NEOGEO_MAIN_CPU_CLOCK				(NEOGEO_MASTER_CLOCK / 2)
 #define NEOGEO_AUDIO_CPU_CLOCK				(NEOGEO_MASTER_CLOCK / 6)

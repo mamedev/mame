@@ -31,11 +31,7 @@
 #define MINFREQ (139-139/3)
 #define MAXFREQ (139+139/3)
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static emu_timer *lfotimer = NULL;
 static INT32 freq = MAXFREQ;

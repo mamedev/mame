@@ -291,7 +291,6 @@ WRITE8_HANDLER( decocass_reset_w )
 	cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
 }
 
-#ifdef MAME_DEBUG
 static const char *dirnm(int speed)
 {
 	if (speed <  -1) return "fast rewind";
@@ -300,7 +299,6 @@ static const char *dirnm(int speed)
 	if (speed ==  1) return "forward";
 	return "fast forward";
 }
-#endif
 
 static void tape_crc16(UINT8 data)
 {

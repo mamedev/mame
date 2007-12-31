@@ -33,16 +33,8 @@
 #define	MAX_TIMER		3
 #define	VERBOSE			0
 
-#if	(VERBOSE ==	2)
-#define	LOG1(msg)		logerror msg
-#define	LOG2(msg)		logerror msg
-#elif (VERBOSE == 1)
-#define	LOG1(msg)		logerror msg
-#define	LOG2(msg)		(void)(0)
-#else
-#define	LOG1(msg)		(void)(0)
-#define	LOG2(msg)		(void)(0)
-#endif
+#define	LOG1(msg)		do { if (VERBOSE >= 1) logerror msg; } while (0)
+#define	LOG2(msg)		do { if (VERBOSE >= 2) logerror msg; } while (0)
 
 
 #define	TIMER_TIME_NEVER ((UINT64) -1)

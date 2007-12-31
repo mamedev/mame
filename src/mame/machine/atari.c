@@ -42,28 +42,31 @@ static void pokey_reset(running_machine *machine);
 void atari_interrupt_cb(int mask)
 {
 
-#if VERBOSE_POKEY
+	if (VERBOSE_POKEY)
+	{
 		if (mask & 0x80)
 			logerror("atari interrupt_cb BREAK\n");
 		if (mask & 0x40)
 			logerror("atari interrupt_cb KBCOD\n");
-#endif
-#if VERBOSE_SERIAL
+	}
+	if (VERBOSE_SERIAL)
+	{
 		if (mask & 0x20)
 			logerror("atari interrupt_cb SERIN\n");
 		if (mask & 0x10)
 			logerror("atari interrupt_cb SEROR\n");
 		if (mask & 0x08)
 			logerror("atari interrupt_cb SEROC\n");
-#endif
-#if VERBOSE_TIMERS
+	}
+	if (VERBOSE_TIMERS)
+	{
 		if (mask & 0x04)
 			logerror("atari interrupt_cb TIMR4\n");
 		if (mask & 0x02)
 			logerror("atari interrupt_cb TIMR2\n");
 		if (mask & 0x01)
 			logerror("atari interrupt_cb TIMR1\n");
-#endif
+	}
 
 	cpunum_set_input_line(0, 0, HOLD_LINE);
 }

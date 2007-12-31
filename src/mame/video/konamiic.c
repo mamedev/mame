@@ -1,5 +1,3 @@
-#define VERBOSE 0
-
 /***************************************************************************
 
 TODO:
@@ -1152,6 +1150,9 @@ Registers (word-wise):
 
 #include "driver.h"
 #include "video/konamiic.h"
+
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /*
     This recursive function doesn't use additional memory
@@ -2461,10 +2462,8 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 	else
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 
-#if VERBOSE
-	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-#endif
 
 	/* prepare shadow draw table */
 	gfx_drawmode_table[0] = DRAWMODE_NONE;
@@ -2960,10 +2959,9 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 	else
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 
-#if VERBOSE
-	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-#endif
+
 
 	/* prepare shadow draw table */
 	gfx_drawmode_table[0] = DRAWMODE_NONE;
@@ -3707,7 +3705,8 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 	else
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 
-#if VERBOSE
+	if (VERBOSE)
+	{
 	if (machine->screen[0].format == BITMAP_FORMAT_RGB32)
 	{
 		if ((machine->drv->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
@@ -3718,7 +3717,7 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 		if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
-#endif
+	}
 
 	/* prepare shadow draw table */
 	gfx_drawmode_table[0] = DRAWMODE_NONE;
@@ -3863,10 +3862,8 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 	else
 		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 
-#if VERBOSE
-	if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
-#endif
 
 	/* prepare shadow draw table */
 	c = machine->gfx[gfx_index]->color_granularity-1;
@@ -3994,9 +3991,7 @@ READ16_HANDLER( K055673_rom_word_r )	// 5bpp
 		       	return ROM8[romofs];
 			break;
 		default:
-#if VERBOSE
-			logerror("55673_rom_word_r: Unknown read offset %x\n", offset);
-#endif
+			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
 			break;
 	}
 
@@ -4036,9 +4031,7 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 		       	return ROM[romofs+2];
 			break;
 		default:
-#if VERBOSE
-			logerror("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, activecpu_get_pc());
-#endif
+			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, activecpu_get_pc()));
 			break;
 	}
 
@@ -4053,16 +4046,13 @@ READ8_HANDLER( K053246_r )
 
 		addr = (K053246_regs[6] << 17) | (K053246_regs[7] << 9) | (K053246_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= memory_region_length(K053247_memory_region)-1;
-#if VERBOSE
-	popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset,addr);
-#endif
+		if (VERBOSE)
+			popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset,addr);
 		return memory_region(K053247_memory_region)[addr];
 	}
 	else
 	{
-#if VERBOSE
-logerror("%04x: read from unknown 053246 address %x\n",activecpu_get_pc(),offset);
-#endif
+		LOG(("%04x: read from unknown 053246 address %x\n",activecpu_get_pc(),offset));
 		return 0;
 	}
 }
@@ -5833,9 +5823,7 @@ READ16_HANDLER( K056832_5bpp_rom_word_r )
 	}
 	else
 	{
-#if VERBOSE
-		logerror("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask);
-#endif
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -5860,9 +5848,7 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 	}
 	else
 	{
-#if VERBOSE
-		logerror("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask);
-#endif
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -5887,9 +5873,7 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 	}
 	else
 	{
-#if VERBOSE
-		logerror("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask);
-#endif
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
 	}
 	return 0;
 }
@@ -7100,7 +7084,6 @@ void K055555_vh_start(void)
 
 void K055555_write_reg(UINT8 regnum, UINT8 regdat)
 {
-	#if VERBOSE
 	static const char *const rnames[46] =
 	{
 		"BGC CBLK", "BGC SET", "COLSET0", "COLSET1", "COLSET2", "COLSET3", "COLCHG ON",
@@ -7113,9 +7096,8 @@ void K055555_write_reg(UINT8 regnum, UINT8 regdat)
 
 	if (regdat != k55555_regs[regnum])
 	{
-		logerror("5^5: %x to reg %x (%s)\n", regdat, regnum, rnames[regnum]);
+		LOG(("5^5: %x to reg %x (%s)\n", regdat, regnum, rnames[regnum]));
 	}
-	#endif
 
 	k55555_regs[regnum] = regdat;
 }
@@ -7370,9 +7352,8 @@ int K054338_set_alpha_level(int pblend)
 		mixlv = mixlv<<3 | mixlv>>2;
 		alpha_set_level(mixlv);
 
-		#if VERBOSE
+		if (VERBOSE)
 			popmessage("MIXSET%1d %s addition mode: %02x",pblend,(mixpri)?"dst":"src",mixset&0x1f);
-		#endif
 	}
 
 	return(mixlv);

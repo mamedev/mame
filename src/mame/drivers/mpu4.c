@@ -255,18 +255,16 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "machine/meters.h"
 
 #ifdef MAME_DEBUG
-#define LOG(x)logerror x
-#define LOG_CHR(x)logerror x
-#define LOG_CHR_FULL(x)logerror x
-#define LOG_IC3(x)logerror x
-#define LOG_IC8(x)logerror x
+#define VERBOSE 1
 #else
-#define LOG(x)
-#define LOG_CHR(x)
-#define LOG_CHR_FULL(x)
-#define LOG_IC3(x)
-#define LOG_IC8(x)
+#define VERBOSE 0
 #endif
+
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG_CHR(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG_CHR_FULL(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG_IC3(x)	do { if (VERBOSE) logerror x; } while (0)
+#define LOG_IC8(x)	do { if (VERBOSE) logerror x; } while (0)
 
 #ifndef AWP_VIDEO //Defined for fruit machines with mechanical reels
 #define draw_reel(x)

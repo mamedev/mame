@@ -35,7 +35,9 @@ static s16 mb_result = 0;
 #define REGf mb_reg [0x0f]
 
 
-/*define MB_TEST*/
+#define MB_TEST 0
+#define LOG(x) do { if (MB_TEST) logerror x; } while (0)
+
 
 WRITE8_HANDLER( mb_go_w )
 {
@@ -43,9 +45,7 @@ WRITE8_HANDLER( mb_go_w )
   s16 mb_q;     /* temp used in division */
   int msb;
 
-#ifdef MB_TEST
-  logerror("math box command %02x data %02x  ", offset, data);
-#endif
+  LOG(("math box command %02x data %02x  ", offset, data));
 
   switch (offset)
     {
@@ -149,9 +149,7 @@ WRITE8_HANDLER( mb_go_w )
       /* fall into command 13 */
 
     case 0x13:
-#ifdef MB_TEST
-      logerror("\nR7: %04x  R8: %04x  R9: %04x\n", REG7, REG8, REG9);
-#endif
+      LOG(("\nR7: %04x  R8: %04x  R9: %04x\n", REG7, REG8, REG9));
 
       REGc = REG9;
       mb_q = REG8;
@@ -258,9 +256,7 @@ WRITE8_HANDLER( mb_go_w )
       break;
     }
 
-#ifdef MB_TEST
-  logerror("  result %04x\n", mb_result & 0xffff);
-#endif
+  LOG(("  result %04x\n", mb_result & 0xffff));
 }
 
 READ8_HANDLER( mb_status_r )

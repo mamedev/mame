@@ -120,18 +120,14 @@
 
 /*int survival_prot = 0; */
 
-#define VERBOSE 0
-
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"
 #include "i8085daa.h"
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
+#define VERBOSE 0
+
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define I8085_INTR      0xff
 

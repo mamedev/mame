@@ -76,7 +76,8 @@ static UINT16 *sprram, *sprram_old;
 
 static int brightness;
 
-#define SRMP6_VERBOSE 0
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static const gfx_layout tiles8x8_layout =
 {
@@ -368,9 +369,7 @@ static WRITE16_HANDLER( video_regs_w )
 	{
 
 		case 0x5e/2: // bank switch, used by ROM check
-#if SRMP6_VERBOSE
-			printf("%x\n",data);
-#endif
+			LOG(("%x\n",data));
 
 			memory_set_bankptr(1,(UINT16 *)(memory_region(REGION_USER2) + (data & 0x0f)*0x200000));
 			break;
@@ -461,8 +460,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 		int tempidx=0;
 
 		/* show params */
-#if SRMP6_VERBOSE
-		printf("DMA! %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
+		LOG(("DMA! %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x\n",
 				dmaram[0x00/2],
 				dmaram[0x02/2],
 				dmaram[0x04/2],
@@ -476,8 +474,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 				dmaram[0x14/2],
 				dmaram[0x16/2],
 				dmaram[0x18/2],
-				dmaram[0x1a/2]);
-#endif
+				dmaram[0x1a/2]));
 
 		destl=dmaram[9]*0x40000;
 
@@ -513,9 +510,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 
 				if(tempidx>=len)
 				{
-#if SRMP6_VERBOSE
-					printf("%x\n",srcdata);
-#endif
+					LOG(("%x\n",srcdata));
 					return;
 				}
  			}

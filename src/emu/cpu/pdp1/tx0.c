@@ -432,11 +432,9 @@ static void tx0_set_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:	tx0.stop_cyc1 = info->i ? 1 : 0;			break;
 	case CPUINFO_INT_REGISTER + TX0_RUN:		tx0.run = info->i ? 1 : 0;					break;
 	case CPUINFO_INT_REGISTER + TX0_RIM:		tx0.rim = info->i ? 1 : 0;					break;
-#if LOG
-	case CPUINFO_INT_REGISTER + TX0_CYCLE:		logerror("tx0_set_reg to cycle counter ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + TX0_IOH:		logerror("tx0_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + TX0_IOS:		logerror("tx0_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
-#endif
+	case CPUINFO_INT_REGISTER + TX0_CYCLE:		if (LOG) logerror("tx0_set_reg to cycle counter ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + TX0_IOH:		if (LOG) logerror("tx0_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
+	case CPUINFO_INT_REGISTER + TX0_IOS:		if (LOG) logerror("tx0_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + TX0_RESET:		pulse_reset();							break;
 	case CPUINFO_INT_REGISTER + TX0_IO_COMPLETE:tx0.ios = 1;							break;
 	}

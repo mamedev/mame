@@ -601,9 +601,8 @@ WRITE32_HANDLER( jaguar_blitter_w )
 	if (offset == B_CMD)
 		blitter_run();
 
-#if LOG_BLITTER_WRITE
+	if (LOG_BLITTER_WRITE)
 	logerror("%08X:Blitter write register @ F022%02X = %08X\n", activecpu_get_previouspc(), offset * 4, data);
-#endif
 }
 
 

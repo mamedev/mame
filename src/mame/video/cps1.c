@@ -517,9 +517,7 @@ INLINE UINT16 *cps1_base(int offset,int boundary)
 
 READ16_HANDLER( cps1_output_r )
 {
-#if VERBOSE
-if (offset >= 0x18/2) logerror("PC %06x: read output port %02x\n",activecpu_get_pc(),offset*2);
-#endif
+	if (VERBOSE && offset >= 0x18/2) logerror("PC %06x: read output port %02x\n",activecpu_get_pc(),offset*2);
 
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
@@ -570,7 +568,8 @@ WRITE16_HANDLER( cps1_output_w )
 if (cps1_game_config->control_reg && offset == cps1_game_config->control_reg/2 && data != 0x3f)
 	logerror("control_reg = %04x",data);
 #endif
-#if VERBOSE
+if (VERBOSE)
+{
 if (offset > 0x22/2 &&
         offset != cps1_game_config->layer_control/2 &&
 		offset != cps1_game_config->priority[0]/2 &&
@@ -586,7 +585,7 @@ if (offset == 0x22/2 && (data & ~0x8001) != 0x0e)
 if (cps1_game_config->priority[0] && offset == cps1_game_config->priority[0]/2 && data != 0x00)
 	popmessage("priority0 %04x",data);
 #endif
-#endif
+}
 }
 
 

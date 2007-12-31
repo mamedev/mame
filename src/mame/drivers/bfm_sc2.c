@@ -163,14 +163,15 @@ Adder hardware:
 #include "slots.lh"
 
 #ifdef MAME_DEBUG
-#define LOG_SERIAL(x) logerror x	// log serial communication between mainboard (scorpion2) and videoboard (adder2)
-#define UART_LOG(x) logerror x		//enable UART data logging
-#define LOG(x) logerror x
+#define VERBOSE 1
 #else
-#define LOG_SERIAL(x)
-#define UART_LOG(x)
-#define LOG(x)
+#define VERBOSE 0
 #endif
+
+// log serial communication between mainboard (scorpion2) and videoboard (adder2)
+#define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
+#define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 // local prototypes ///////////////////////////////////////////////////////
 

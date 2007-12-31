@@ -16,6 +16,7 @@
 #include "wd33c93.h"
 
 #define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 static SCSIInstance *devices[8];	// SCSI IDs 0-7
 static const struct WD33C93interface *intf;
@@ -525,9 +526,7 @@ WRITE8_HANDLER(wd33c93_w)
 
 		case 1:
 		{
-#if VERBOSE
-			logerror( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_activecpu_get_pc(), scsi_data.sasr, data );
-#endif
+			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_activecpu_get_pc(), scsi_data.sasr, data ));
 
 			/* update the register */
 			scsi_data.regs[scsi_data.sasr] = data;
@@ -535,9 +534,7 @@ WRITE8_HANDLER(wd33c93_w)
 			/* if we receive a command, schedule to process it */
 			if ( scsi_data.sasr == WD_COMMAND )
 			{
-#if VERBOSE
-				logerror( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_activecpu_get_pc(), data, wd33c93_getunit() );
-#endif
+				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_activecpu_get_pc(), data, wd33c93_getunit() ));
 
 				/* signal we're processing it */
 				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
@@ -688,9 +685,7 @@ READ8_HANDLER(wd33c93_r)
 					intf->irq_callback(0);
 				}
 
-#if VERBOSE
-				logerror( "WD33C93: PC=%08x - Status read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_SCSI_STATUS] );
-#endif
+				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_SCSI_STATUS] ));
 			}
 			else if ( scsi_data.sasr == WD_DATA )
 			{
@@ -759,9 +754,7 @@ READ8_HANDLER(wd33c93_r)
 				}
 			}
 
-#if VERBOSE
-			logerror( "WD33C93: PC=%08x - Data read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_DATA] );
-#endif
+			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_DATA] ));
 
 			/* get the register value */
 			ret = scsi_data.regs[scsi_data.sasr];

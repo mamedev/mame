@@ -108,11 +108,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 typedef struct
 {
@@ -2886,18 +2882,20 @@ static void sh2_set_frt_input(int cpunum, int state)
 static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
-    {
+	{
 		if (sh2.nmi_line_state == state)
 			return;
 		sh2.nmi_line_state = state;
 
 		if( state == CLEAR_LINE )
+		{
 			LOG(("SH-2 #%d cleared nmi\n", cpu_getactivecpu()));
+		}
 		else
-        {
+		{
 			LOG(("SH-2 #%d assert nmi\n", cpu_getactivecpu()));
 			sh2_exception("sh2_set_irq_line/nmi", 16);
-        }
+		}
 	}
 	else
 	{

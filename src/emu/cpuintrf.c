@@ -213,11 +213,7 @@ void minx_get_info(UINT32 state, cpuinfo *info);
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 

@@ -194,15 +194,9 @@ TO DO (2006.09.12) :
 */
 
 
-#if ARKANOID_BOOTLEG_VERBOSE
-#define LOG_F002_R logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n",activecpu_get_pc(),arkanoid_bootleg_cmd,arkanoid_bootleg_val);
-#define LOG_D018_W logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n",activecpu_get_pc(),data,arkanoid_bootleg_cmd);
-#define LOG_D008_R logerror("%04x: arkanoid_bootleg_d008_r - val = %02x\n",activecpu_get_pc(),arkanoid_bootleg_d008_val);
-#else
-#define LOG_F002_R
-#define LOG_D018_W
-#define LOG_D008_R
-#endif
+#define LOG_F002_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_f002_r - cmd = %02x - val = %02x\n",activecpu_get_pc(),arkanoid_bootleg_cmd,arkanoid_bootleg_val);
+#define LOG_D018_W if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d018_w - data = %02x - cmd = %02x\n",activecpu_get_pc(),data,arkanoid_bootleg_cmd);
+#define LOG_D008_R if (ARKANOID_BOOTLEG_VERBOSE) logerror("%04x: arkanoid_bootleg_d008_r - val = %02x\n",activecpu_get_pc(),arkanoid_bootleg_d008_val);
 
 
 static UINT8 arkanoid_bootleg_cmd;

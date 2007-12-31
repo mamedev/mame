@@ -2,6 +2,7 @@
 #include "eeprom.h"
 
 #define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define SERIAL_BUFFER_LENGTH 40
 #define MEMORY_SIZE 1024
@@ -160,13 +161,11 @@ void EEPROM_init(const struct EEPROM_interface *interface)
 
 static void EEPROM_write(int bit)
 {
-#if VERBOSE
-logerror("EEPROM write bit %d\n",bit);
-#endif
+	LOG(("EEPROM write bit %d\n",bit));
 
 	if (serial_count >= SERIAL_BUFFER_LENGTH-1)
 	{
-logerror("error: EEPROM serial buffer overflow\n");
+		logerror("error: EEPROM serial buffer overflow\n");
 		return;
 	}
 
@@ -279,9 +278,7 @@ if (serial_count)
 
 void EEPROM_write_bit(int bit)
 {
-#if VERBOSE
-logerror("write bit %d\n",bit);
-#endif
+	LOG(("write bit %d\n",bit));
 	latch = bit;
 }
 
@@ -303,18 +300,14 @@ int EEPROM_read_bit(void)
 			res = 1;
 	}
 
-#if VERBOSE
-logerror("read bit %d\n",res);
-#endif
+	LOG(("read bit %d\n",res));
 
 	return res;
 }
 
 void EEPROM_set_cs_line(int state)
 {
-#if VERBOSE
-logerror("set reset line %d\n",state);
-#endif
+	LOG(("set reset line %d\n",state));
 	reset_line = state;
 
 	if (reset_line != CLEAR_LINE)
@@ -323,9 +316,7 @@ logerror("set reset line %d\n",state);
 
 void EEPROM_set_clock_line(int state)
 {
-#if VERBOSE
-logerror("set clock line %d\n",state);
-#endif
+	LOG(("set clock line %d\n",state));
 	if (state == PULSE_LINE || (clock_line == CLEAR_LINE && state != CLEAR_LINE))
 	{
 		if (reset_line == CLEAR_LINE)

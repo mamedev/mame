@@ -41,11 +41,7 @@
 #define PTMVERBOSE 0
 #endif
 
-#if PTMVERBOSE
-#define PLOG(x)	logerror x
-#else
-#define PLOG(x)
-#endif
+#define PLOG(x)	do { if (PTMVERBOSE) logerror x; } while (0)
 
 #define PTM_6840_CTRL1   0
 #define PTM_6840_CTRL2   1
@@ -96,7 +92,6 @@ static TIMER_CALLBACK( ptm6840_t3_timeout );
 
 static ptm6840 ptm[PTM_6840_MAX];
 
-#if PTMVERBOSE
 static const char *const opmode[] =
 {
 	"000 continous mode",
@@ -108,7 +103,6 @@ static const char *const opmode[] =
 	"110 single shot mode",
 	"111 pulse width comparison mode"
 };
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //

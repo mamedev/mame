@@ -19,11 +19,7 @@
 /* define this to have some interrupt information logged */
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x) logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* define this to expand all EA calculations inline */
 #define INLINE_EA	1

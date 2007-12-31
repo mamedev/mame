@@ -24,8 +24,9 @@
 ***************************************************************************/
 
 #define VERBOSE	(0)
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-
+void CLIB_DECL logerror(const char *text,...);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -123,9 +124,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return NULL;
 	}
 
-	#if VERBOSE
-	logerror("CD has %d tracks\n", file->cdtoc.numtrks);
-	#endif
+	LOG(("CD has %d tracks\n", file->cdtoc.numtrks));
 
 	/* calculate the starting frame for each track, keeping in mind that CHDMAN
        pads tracks out with extra frames to fit hunk size boundries
@@ -140,8 +139,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		chdofs  += file->cdtoc.tracks[i].frames;
 		chdofs  += file->cdtoc.tracks[i].extraframes;
 
-		#if VERBOSE
-		logerror("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
+		LOG(("Track %02d is format %d subtype %d datasize %d subsize %d frames %d extraframes %d physofs %d chdofs %d\n", i+1,
 			file->cdtoc.tracks[i].trktype,
 			file->cdtoc.tracks[i].subtype,
 			file->cdtoc.tracks[i].datasize,
@@ -149,8 +147,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 			file->cdtoc.tracks[i].frames,
 			file->cdtoc.tracks[i].extraframes,
 			file->cdtoc.tracks[i].physframeofs,
-			file->cdtoc.tracks[i].chdframeofs);
-		#endif
+			file->cdtoc.tracks[i].chdframeofs));
 	}
 
 	/* fill out dummy entries for the last track to help our search */
@@ -237,9 +234,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 			return 1;
 		}
 
-		#if VERBOSE
-		logerror("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype);
-		#endif
+		LOG(("CDROM: Conversion from type %d to type %d not supported!\n", tracktype, datatype));
 		return 0;
 	}
 	return 1;

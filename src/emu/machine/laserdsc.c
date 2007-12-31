@@ -24,11 +24,7 @@
 
 #define PRINTF_COMMANDS				1
 
-#if PRINTF_COMMANDS
-#define CMDPRINTF(x)				mame_printf_debug x
-#else
-#define CMDPRINTF(x)
-#endif
+#define CMDPRINTF(x)				do { if (PRINTF_COMMANDS) mame_printf_debug x; } while (0)
 
 
 

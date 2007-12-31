@@ -53,22 +53,12 @@
 #endif /* MESS */
 
 #define VERBOSE_DBG 0       /* general debug messages */
-#if VERBOSE_DBG
 #define DBG_LOG(N,M,A) \
 	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
-#else
-#define DBG_LOG(n,m,a)
-#endif
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
-
-#if VERBOSE_JOY
-#define LOG(LEVEL,N,M,A)  \
 #define JOY_LOG(N,M,A) \
 	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
-#else
-#define JOY_LOG(n,m,a)
-#endif
 
 #define FDC_DMA 2
 

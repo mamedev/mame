@@ -16,11 +16,7 @@
 #define VERBOSE 0
 #endif
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)	/* x */
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 ANTIC antic;
 

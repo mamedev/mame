@@ -30,13 +30,9 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE
+#define VERBOSE 0
 
-#ifdef VERBOSE
-#define TRACE(x) do {x;} while (0)
-#else
-#define TRACE(x)
-#endif
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -746,12 +742,12 @@ int state_save_save_begin(mame_file *file)
 	if (ss_illegal_regs > 0)
 		return 1;
 
-	TRACE(logerror("Beginning save\n"));
+	LOG(("Beginning save\n"));
 	ss_dump_file = file;
 
 	/* compute the total dump size and the offsets of each element */
 	ss_dump_size = compute_size_and_offsets();
-	TRACE(logerror("   total size %u\n", ss_dump_size));
+	LOG(("   total size %u\n", ss_dump_size));
 
 	/* allocate memory for the array */
 	ss_dump_array = malloc_or_die(ss_dump_size);
@@ -769,22 +765,22 @@ void state_save_save_continue(void)
 	ss_entry *entry;
 	int count;
 
-	TRACE(logerror("Saving tag %d\n", ss_current_tag));
+	LOG(("Saving tag %d\n", ss_current_tag));
 
 	/* call the pre-save functions */
-	TRACE(logerror("  calling pre-save functions\n"));
+	LOG(("  calling pre-save functions\n"));
 	count = call_hook_functions(ss_prefunc_reg);
-	TRACE(logerror("    %d functions called\n", count));
+	LOG(("    %d functions called\n", count));
 
 	/* then copy in all the data */
-	TRACE(logerror("  copying data\n"));
+	LOG(("  copying data\n"));
 
 	/* iterate over entries with matching tags */
 	for (entry = ss_registry; entry; entry = entry->next)
 		if (entry->tag == ss_current_tag)
 		{
 			memcpy(ss_dump_array + entry->offset, entry->data, entry->typesize * entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 }
 
@@ -799,7 +795,7 @@ void state_save_save_finish(void)
 	UINT32 signature;
 	UINT8 flags = 0;
 
-	TRACE(logerror("Finishing save\n"));
+	LOG(("Finishing save\n"));
 
 	/* compute the flags */
 #ifndef LSB_FIRST
@@ -840,7 +836,7 @@ void state_save_save_finish(void)
 
 int state_save_load_begin(mame_file *file)
 {
-	TRACE(logerror("Beginning load\n"));
+	LOG(("Beginning load\n"));
 
 	/* read the file into memory */
 	ss_dump_size = mame_fsize(file);
@@ -882,8 +878,8 @@ void state_save_load_continue(void)
 	need_convert = (ss_dump_array[9] & SS_MSB_FIRST) == 0;
 #endif
 
-	TRACE(logerror("Loading tag %d\n", ss_current_tag));
-	TRACE(logerror("  copying data\n"));
+	LOG(("Loading tag %d\n", ss_current_tag));
+	LOG(("  copying data\n"));
 
 	/* iterate over entries with matching tags */
 	for (entry = ss_registry; entry; entry = entry->next)
@@ -892,13 +888,13 @@ void state_save_load_continue(void)
 			memcpy(entry->data, ss_dump_array + entry->offset, entry->typesize * entry->typecount);
 			if (need_convert && ss_conv[entry->typesize])
 				(*ss_conv[entry->typesize])(entry->data, entry->typecount);
-			TRACE(logerror("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
+			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 
 	/* call the post-load functions */
-	TRACE(logerror("  calling post-load functions\n"));
+	LOG(("  calling post-load functions\n"));
 	count = call_hook_functions(ss_postfunc_reg);
-	TRACE(logerror("    %d functions called\n", count));
+	LOG(("    %d functions called\n", count));
 }
 
 
@@ -909,7 +905,7 @@ void state_save_load_continue(void)
 
 void state_save_load_finish(void)
 {
-	TRACE(logerror("Finishing load\n"));
+	LOG(("Finishing load\n"));
 
 	/* free memory and reset the global states */
 	free(ss_dump_array);
@@ -956,11 +952,9 @@ const char *state_save_get_indexed_item(int index, void **base, UINT32 *valsize,
 
 void state_save_dump_registry(void)
 {
-#ifdef VERBOSE
 	ss_entry *entry;
 
 	for (entry = ss_registry; entry; entry=entry->next)
-		logerror("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount);
-#endif
+		LOG(("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount));
 }
 

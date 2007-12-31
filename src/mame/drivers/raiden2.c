@@ -473,7 +473,8 @@ struct _cop_state
 static cop_state cop_data;
 
 
-#define COP_LOG(x)		logerror x
+#define VERBOSE 1
+#define COP_LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 

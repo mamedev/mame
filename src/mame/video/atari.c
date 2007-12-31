@@ -18,11 +18,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)	/* x */
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 char atari_frame_message[64+1];
 int atari_frame_counter;
@@ -1058,12 +1054,10 @@ static void antic_linerefresh(void)
 	draw_scanline8(tmpbitmap, 12, y, sizeof(scanline), (const UINT8 *) scanline, Machine->pens, -1);
 }
 
-#if VERBOSE
 static int cycle(void)
 {
 	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
 }
-#endif
 
 static void after(int cycles, timer_callback function, const char *funcname)
 {

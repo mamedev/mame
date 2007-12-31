@@ -13,7 +13,8 @@
 #include "driver.h"
 #include "machine/ticket.h"
 
-/*#define DEBUG_TICKET*/
+#define DEBUG_TICKET 0
+#define LOG(x) do { if (DEBUG_TICKET) logerror x; } while (0)
 
 #define MAX_DISPENSERS	2
 
@@ -70,17 +71,13 @@ READ8_HANDLER( ticket_dispenser_r )
 
 READ8_HANDLER( ticket_dispenser_0_r )
 {
-#ifdef DEBUG_TICKET
-	logerror("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), status);
-#endif
+	LOG(("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), dispenser[0].status));
 	return dispenser[0].status;
 }
 
 READ8_HANDLER( ticket_dispenser_1_r )
 {
-#ifdef DEBUG_TICKET
-	logerror("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), status);
-#endif
+	LOG(("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), dispenser[1].status));
 	return dispenser[1].status;
 }
 
@@ -99,9 +96,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 	{
 		if (!dispenser[0].power)
 		{
-#ifdef DEBUG_TICKET
-			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
-#endif
+			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
 			timer_adjust(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 			dispenser[0].power = 1;
 
@@ -112,9 +107,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 	{
 		if (dispenser[0].power)
 		{
-#ifdef DEBUG_TICKET
-			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
-#endif
+			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
 			timer_adjust(dispenser[0].timer, attotime_never, 0, attotime_never);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
@@ -129,9 +122,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 	{
 		if (!dispenser[1].power)
 		{
-#ifdef DEBUG_TICKET
-			logerror("PC: %04X  Ticket Power On\n", activecpu_get_pc());
-#endif
+			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
 			timer_adjust(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 			dispenser[1].power = 1;
 
@@ -142,9 +133,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 	{
 		if (dispenser[1].power)
 		{
-#ifdef DEBUG_TICKET
-			logerror("PC: %04X  Ticket Power Off\n", activecpu_get_pc());
-#endif
+			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
 			timer_adjust(dispenser[1].timer, attotime_never, 0, attotime_never);
 			set_led_status(2,0);
 			dispenser[1].power = 0;
@@ -168,9 +157,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 	if (dispenser->power)
 	{
 		dispenser->status ^= active_bit;
-#ifdef DEBUG_TICKET
-		logerror("Ticket Status Changed to %02X\n", status);
-#endif
+		LOG(("Ticket Status Changed to %02X\n", dispenser->status));
 		timer_adjust(dispenser->timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
 	}
 
@@ -179,9 +166,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 		set_led_status(2,1);
 		dispensed_tickets++;
 
-#ifdef DEBUG_TICKET
-		logerror("Ticket Dispensed\n");
-#endif
+		LOG(("Ticket Dispensed\n"));
 	}
 	else
 	{

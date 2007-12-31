@@ -3,10 +3,10 @@
 
 #ifdef MAME_DEBUG
 #define LOGLEVEL  3
-#define LOG(n,x)  if (LOGLEVEL >= n) logerror x
 #else
-#define LOG(n,x)
+#define LOGLEVEL  0
 #endif
+#define LOG(n,x)  do { if (LOGLEVEL >= n) logerror x; } while (0)
 
 extern WRITE8_HANDLER( decocass_coin_counter_w );
 extern WRITE8_HANDLER( decocass_sound_command_w );

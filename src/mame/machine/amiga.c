@@ -1065,9 +1065,8 @@ READ16_HANDLER( amiga_cia_r )
 	/* handle the reads */
 	data = cia_read(which, offset >> 7);
 
-#if LOG_CIA
-	logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask ^ 0xffff);
-#endif
+	if (LOG_CIA)
+		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask ^ 0xffff);
 
 	return data << shift;
 }
@@ -1084,9 +1083,8 @@ WRITE16_HANDLER( amiga_cia_w )
 {
 	int which;
 
-#if LOG_CIA
-	logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask ^ 0xffff);
-#endif
+	if (LOG_CIA)
+		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask ^ 0xffff);
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1251,9 +1249,8 @@ READ16_HANDLER( amiga_custom_r )
 			break;
 	}
 
-#if LOG_CUSTOM
-	logerror("%06X:read from custom %s\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff]);
-#endif
+	if (LOG_CUSTOM)
+		logerror("%06X:read from custom %s\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff]);
 
 	return 0xffff;
 }
@@ -1281,9 +1278,8 @@ WRITE16_HANDLER( amiga_custom_w )
 	UINT16 temp;
 	offset &= 0xff;
 
-#if LOG_CUSTOM
-	logerror("%06X:write to custom %s = %04X\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff], data);
-#endif
+	if (LOG_CUSTOM)
+		logerror("%06X:write to custom %s = %04X\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff], data);
 
 	switch (offset)
 	{

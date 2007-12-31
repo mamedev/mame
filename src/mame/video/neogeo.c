@@ -11,6 +11,7 @@
 
 #define NUM_PENS	(0x1000)
 
+#define VERBOSE 	(0)
 
 static UINT8 *sprite_gfx;
 static UINT32 sprite_gfx_address_mask;

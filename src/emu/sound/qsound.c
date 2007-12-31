@@ -40,7 +40,8 @@
 Debug defines
 */
 #define LOG_WAVE	0
-#define LOG_QSOUND  0
+#define VERBOSE  0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 /* 8 bit source ROM samples */
 typedef INT8 QSOUND_SRC_SAMPLE;
@@ -117,11 +118,10 @@ static void *qsound_start(int sndindex, int clock, const void *config)
 		chip->pan_table[i]=(int)((256/sqrt(32)) * sqrt(i));
 	}
 
-#if LOG_QSOUND
-	logerror("Pan table\n");
+	LOG(("Pan table\n"));
 	for (i=0; i<33; i++)
-		logerror("%02x ", chip->pan_table[i]);
-#endif
+		LOG(("%02x ", chip->pan_table[i]));
+
 	{
 		/* Allocate stream */
 		chip->stream = stream_create(
@@ -307,9 +307,7 @@ static void qsound_set_command(struct qsound_info *chip, int data, int value)
 */
 			break;
 	}
-#if LOG_QSOUND
-	logerror("QSOUND WRITE %02x CH%02d-R%02d =%04x\n", data, ch, reg, value);
-#endif
+	LOG(("QSOUND WRITE %02x CH%02d-R%02d =%04x\n", data, ch, reg, value));
 }
 
 

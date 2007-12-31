@@ -7,6 +7,9 @@
 #include "debugger.h"
 
 
+#define VERBOSE 0
+#define LOG(x) do { if (VERBOSE) mame_printf_debug x; } while (0)
+
 /* All post-i286 CPUs have a 16MB address space */
 #define AMASK	I.amask
 
@@ -219,12 +222,7 @@ static int i80286_execute(int num_cycles)
 	/* run until we're out */
 	while(i80286_ICount>0)
 	{
-
-//#define VERBOSE_DEBUG
-#ifdef VERBOSE_DEBUG
-		mame_printf_debug("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",I.sregs[CS],I.pc - I.base[CS],ReadByte(I.pc),I.flags,I.regs.w[AX],I.regs.w[BX],I.regs.w[CX],I.regs.w[DX], I.AuxVal?1:0, I.OverVal?1:0, I.SignVal?1:0, I.ZeroVal?1:0, I.CarryVal?1:0, I.ParityVal?1:0,I.TF, I.IF, I.DirVal<0?1:0);
-#endif
-
+		LOG(("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",I.sregs[CS],I.pc - I.base[CS],ReadByte(I.pc),I.flags,I.regs.w[AX],I.regs.w[BX],I.regs.w[CX],I.regs.w[DX], I.AuxVal?1:0, I.OverVal?1:0, I.SignVal?1:0, I.ZeroVal?1:0, I.CarryVal?1:0, I.ParityVal?1:0,I.TF, I.IF, I.DirVal<0?1:0));
 		CALL_MAME_DEBUG;
 
 		seg_prefix=FALSE;

@@ -94,8 +94,6 @@
  *
  */
 
-#define GX_DEBUG     0
-
 #include "driver.h"
 
 #include "video/konamiic.h"
@@ -105,6 +103,8 @@
 #include "sound/k054539.h"
 #include "machine/konamigx.h"
 #include "machine/adc083x.h"
+
+#define GX_DEBUG     0
 
 VIDEO_START(konamigx_5bpp);
 VIDEO_START(konamigx_6bpp);

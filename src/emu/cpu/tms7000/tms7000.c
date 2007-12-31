@@ -34,11 +34,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /* Private prototypes */
 
@@ -565,8 +561,8 @@ static void tms7000_service_timer1( void )
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
 			cpunum_set_input_line( cpu_getactivecpu(), TMS7000_IRQ2_LINE, HOLD_LINE);
-            LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
-			tick = activecpu_gettotalcycles() );
+            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
+			//tick = activecpu_gettotalcycles() );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */
         }
     }

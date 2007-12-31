@@ -182,10 +182,12 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 #include "video/crtc6845.h"
 
 #ifdef MAME_DEBUG
-#define LOGSTUFF(x)logerror x
+#define VERBOSE 1
 #else
-#define LOGSTUFF(x)
+#define VERBOSE 0
 #endif
+
+#define LOGSTUFF(x) do { if (VERBOSE) logerror x; } while (0)
 
 #define VIDEO_MASTER_CLOCK (10000000)
 

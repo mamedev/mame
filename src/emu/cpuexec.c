@@ -29,11 +29,7 @@
 
 #define VERBOSE 0
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 
 
@@ -1373,7 +1369,7 @@ static void compute_perfect_interleave(void)
 	if (perfect_interleave.attoseconds == ATTOSECONDS_PER_SECOND - 1)
 		perfect_interleave.attoseconds = attoseconds_per_cycle[0];
 
-	LOG(("Perfect interleave = %s, smallest = %.9f\n", attotime_string(perfect_interleave), ATTOSECONDS_TO_DOUBLE(smallest)));
+	LOG(("Perfect interleave = %s, smallest = %.9f\n", attotime_string(perfect_interleave, 9), ATTOSECONDS_TO_DOUBLE(smallest)));
 }
 
 

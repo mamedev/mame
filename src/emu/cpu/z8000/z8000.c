@@ -51,11 +51,7 @@
 #define VERBOSE 0
 
 
-#if VERBOSE
-#define LOG(x)	logerror x
-#else
-#define LOG(x)
-#endif
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 /* opcode execution table */
 Z8000_exec *z8000_exec = NULL;

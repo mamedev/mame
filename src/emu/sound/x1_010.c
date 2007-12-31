@@ -53,18 +53,20 @@ Hardcoded Values:
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "cpuintrf.h"
 #include "streams.h"
 #include "x1_010.h"
 
 
+#define VERBOSE_SOUND 0
+#define VERBOSE_REGISTER_WRITE 0
+#define VERBOSE_REGISTER_READ 0
 
-#define LOG_SOUND 0
+#define LOG_SOUND(x) do { if (VERBOSE_SOUND) logerror x; } while (0)
+#define LOG_REGISTER_WRITE(x) do { if (VERBOSE_REGISTER_WRITE) logerror x; } while (0)
+#define LOG_REGISTER_READ(x) do { if (VERBOSE_REGISTER_READ) logerror x; } while (0)
 
 #define SETA_NUM_CHANNELS 16
-
-
-#define	LOG_REGISTER_WRITE	0
-#define	LOG_REGISTER_READ	0
 
 #define FREQ_BASE_BITS		  8					// Frequency fixed decimal shift bits
 #define ENV_BASE_BITS		 16					// wave form envelope fixed decimal shift bits
@@ -134,12 +136,10 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 				if( freq == 0 ) freq = 4;
 				smp_step = (UINT32)((float)info->base_clock/8192.0
 							*freq*(1<<FREQ_BASE_BITS)/(float)info->rate);
-#if LOG_SOUND
 				if( smp_offs == 0 ) {
-					logerror( "Play sample %06X - %06X, channel %X volume %d freq %X step %X offset %X\n",
-						start, end, ch, vol, freq, smp_step, smp_offs );
+					LOG_SOUND(( "Play sample %p - %p, channel %X volume %d:%d freq %X step %X offset %X\n",
+						start, end, ch, volL, volR, freq, smp_step, smp_offs ));
 				}
-#endif
 				for( i = 0; i < length; i++ ) {
 					delta = smp_offs>>FREQ_BASE_BITS;
 					// sample ended?
@@ -162,13 +162,11 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 				env      = (UINT8 *)&(info->reg[reg->end*128]);
 				env_offs = info->env_offset[ch];
 				env_step = (UINT32)((float)info->base_clock/128.0/1024.0/4.0*reg->start*(1<<ENV_BASE_BITS)/(float)info->rate);
-#if LOG_SOUND
-/* Print some more debug info */
+				/* Print some more debug info */
 				if( smp_offs == 0 ) {
-					logerror( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
-						reg->volume, ch, reg->end, freq, smp_step, smp_offs );
+					LOG_SOUND(( "Play waveform %X, channel %X volume %X freq %4X step %X offset %X\n",
+						reg->volume, ch, reg->end, freq, smp_step, smp_offs ));
 				}
-#endif
 				for( i = 0; i < length; i++ ) {
 					int vol;
 					delta = env_offs>>ENV_BASE_BITS;
@@ -212,10 +210,9 @@ static void *x1_010_start(int sndindex, int clock, const void *config)
 		info->smp_offset[i] = 0;
 		info->env_offset[i] = 0;
 	}
-#if LOG_SOUND
 	/* Print some more debug info */
-	logerror("masterclock = %d rate = %d\n", master_clock, info->rate );
-#endif
+	LOG_SOUND(("masterclock = %d rate = %d\n", clock, info->rate ));
+
 	/* get stream channels */
 	info->stream = stream_create(0,2,info->rate,info,seta_update);
 
@@ -258,9 +255,7 @@ WRITE8_HANDLER( seta_sound_w )
 	 	info->smp_offset[channel] = 0;
 	 	info->env_offset[channel] = 0;
 	}
-#if	LOG_REGISTER_WRITE
-	logerror("PC: %06X : offset %6X : data %2X\n", activecpu_get_pc(), offset, data );
-#endif
+	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", activecpu_get_pc(), offset, data ));
 	info->reg[offset] = data;
 }
 
@@ -276,9 +271,7 @@ READ16_HANDLER( seta_sound_word_r )
 
 	ret = info->HI_WORD_BUF[offset]<<8;
 	ret += (seta_sound_r( offset )&0xff);
-#if LOG_REGISTER_READ
-	logerror( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, ret );
-#endif
+	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, ret ));
 	return ret;
 }
 
@@ -287,9 +280,7 @@ WRITE16_HANDLER( seta_sound_word_w )
 	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
 	seta_sound_w( offset, data&0xff );
-#if	LOG_REGISTER_WRITE
-	logerror( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, data );
-#endif
+	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, data ));
 }
 
 

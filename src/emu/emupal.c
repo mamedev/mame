@@ -325,9 +325,8 @@ void palette_set_shadow_dRGB32(running_machine *machine, int mode, int dr, int d
 	stable->db = db;
 	stable->noclip = noclip;
 
-	#if VERBOSE
+	if (VERBOSE)
 		popmessage("shadow %d recalc %d %d %d %02x", mode, dr, dg, db, noclip);
-	#endif
 
 	/* regenerate the table */
 	for (i = 0; i < 32768; i++)
@@ -774,10 +773,6 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
 	/* only applies to RGB direct modes */
 	assert(palette->format != BITMAP_FORMAT_INDEXED16);
 	assert(stable->base != NULL);
-
-	#if VERBOSE
-		popmessage("shadow %d recalc %d %d %d %02x", mode, dr, dg, db, noclip);
-	#endif
 
 	/* regenerate the table */
 	for (i = 0; i < 32768; i++)

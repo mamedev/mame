@@ -15,8 +15,8 @@
 #include "cpu/z80/z80daisy.h"
 #include "mcr.h"
 
-
-#define LOG(x) logerror x
+#define VERBOSE 1
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 /*************************************

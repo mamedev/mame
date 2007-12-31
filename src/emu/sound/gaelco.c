@@ -34,13 +34,16 @@ Registers per channel:
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "cpuintrf.h"
 #include "streams.h"
 #include "gaelco.h"
 #include "wavwrite.h"
 
+#define VERBOSE_SOUND 0
+#define VERBOSE_READ_WRITES 0
+#define LOG_SOUND(x) do { if (VERBOSE_SOUND) logerror x; } while (0)
+#define LOG_READ_WRITES(x) do { if (VERBOSE_READ_WRITES) logerror x; } while (0)
 
-//#define LOG_SOUND 1
-//#define LOG_READ_WRITES 1
 //#define LOG_WAVE  1
 //#define ALT_MIX
 
@@ -137,9 +140,7 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 						gaelco_sndregs[base_offset + 3]--;
 					}
 				} else {
-#ifdef LOG_SOUND
-	logerror("(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, gaelco_sndregs[base_offset + 3]);
-#endif
+					LOG_SOUND(("(GAE1) Playing unknown sample format in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", ch, type, bank, end_pos, gaelco_sndregs[base_offset + 3]));
 					channel->active = 0;
 				}
 
@@ -191,9 +192,7 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 READ16_HANDLER( gaelcosnd_r )
 {
-#ifdef LOG_READ_WRITES
-	logerror("%06x: (GAE1): read from %04x\n", activecpu_get_pc(), offset);
-#endif
+	LOG_READ_WRITES(("%06x: (GAE1): read from %04x\n", activecpu_get_pc(), offset));
 
 	return gaelco_sndregs[offset];
 }
@@ -207,9 +206,7 @@ WRITE16_HANDLER( gaelcosnd_w )
 	struct GAELCOSND *info = sndti_token(chip_type, 0);
 	struct gaelcosnd_channel *channel = &info->channel[offset >> 3];
 
-#ifdef LOG_READ_WRITES
-	logerror("%06x: (GAE1): write %04x to %04x\n", activecpu_get_pc(), data, offset);
-#endif
+	LOG_READ_WRITES(("%06x: (GAE1): write %04x to %04x\n", activecpu_get_pc(), data, offset));
 
 	/* first update the stream to this point in time */
 	stream_update(info->stream);
@@ -224,9 +221,7 @@ WRITE16_HANDLER( gaelcosnd_w )
 					channel->active = 1;
 					channel->chunkNum = 0;
 					channel->loop = 0;
-#ifdef LOG_SOUND
-	logerror("(GAE1) Playing sample channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (gaelco_sndregs[offset - 2] >> 4) & 0x0f, gaelco_sndregs[offset - 2] & 0x03, gaelco_sndregs[offset - 1] << 8, data);
-#endif
+					LOG_SOUND(("(GAE1) Playing sample channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (gaelco_sndregs[offset - 2] >> 4) & 0x0f, gaelco_sndregs[offset - 2] & 0x03, gaelco_sndregs[offset - 1] << 8, data));
 				}
 			} else {
 				channel->active = 0;
@@ -236,9 +231,7 @@ WRITE16_HANDLER( gaelcosnd_w )
 
 		case 0x07: /* enable/disable looping */
 			if ((gaelco_sndregs[offset - 1] != 0) && (data != 0)){
-#ifdef LOG_SOUND
-	logerror("(GAE1) Looping in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (gaelco_sndregs[offset - 2] >> 4) & 0x0f, gaelco_sndregs[offset - 2] & 0x03, gaelco_sndregs[offset - 1] << 8, data);
-#endif
+				LOG_SOUND(("(GAE1) Looping in channel: %02d, type: %02x, bank: %02x, end: %08x, Length: %04x\n", offset >> 3, (gaelco_sndregs[offset - 2] >> 4) & 0x0f, gaelco_sndregs[offset - 2] & 0x03, gaelco_sndregs[offset - 1] << 8, data));
 				channel->loop = 1;
 			} else {
 				channel->loop = 0;
