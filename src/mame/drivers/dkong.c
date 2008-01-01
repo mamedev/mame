@@ -1463,7 +1463,7 @@ static const gfx_layout spritelayout =
 static const gfx_layout pestplce_spritelayout =
 {
 	16,16,	                                /* 16*16 sprites */
-	RGN_FRAC(1,2),	                        /* 256 sprites */
+	RGN_FRAC(1,4),	                        /* 256 sprites */
 	2,	                                    /* 2 bits per pixel */
 	{ RGN_FRAC(1,2), RGN_FRAC(0,2) },	    /* the two bitplanes are separated */
 	{ STEP8(0,1), STEP8(RGN_FRAC(1,4),1) }, /* the two halves of the sprite are separated */
