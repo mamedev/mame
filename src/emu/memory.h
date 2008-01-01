@@ -953,6 +953,7 @@ void *		memory_get_op_ptr(int cpunum, offs_t offset, int arg);
 void		memory_configure_bank(int banknum, int startentry, int numentries, void *base, offs_t stride);
 void		memory_configure_bank_decrypted(int banknum, int startentry, int numentries, void *base, offs_t stride);
 void		memory_set_bank(int banknum, int entrynum);
+int 		memory_get_bank(int banknum);
 void		memory_set_bankptr(int banknum, void *base);
 
 /* ----- debugging ----- */

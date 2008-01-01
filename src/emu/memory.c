@@ -870,6 +870,23 @@ void memory_set_bank(int banknum, int entrynum)
 
 
 /*-------------------------------------------------
+    memory_get_bank - return the currently 
+    selected bank
+-------------------------------------------------*/
+
+int memory_get_bank(int banknum)
+{
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
+		fatalerror("memory_get_bank called with invalid bank %d", banknum);
+	if (bankdata[banknum].dynamic)
+		fatalerror("memory_get_bank called with dynamic bank %d", banknum);
+	return bankdata[banknum].curentry;
+}
+
+
+
+/*-------------------------------------------------
     memory_set_bankptr - set the base of a bank
 -------------------------------------------------*/
 
@@ -2118,7 +2135,7 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_
 	int allocatemem = (memory == NULL);
 	int region;
 
-	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%08X)\n", cpunum, spacenum, start, end, (UINT32)(FPTR)memory));
+	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, start, end, memory));
 
 	/* if we weren't passed a memory block, allocate one and clear it to zero */
 	if (allocatemem)
@@ -2188,7 +2205,7 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 				if (map->share && shared_ptr[map->share])
 				{
 					map->memory = shared_ptr[map->share];
-	 				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%08X]\n", map->start, map->end, map->share, (UINT32)(FPTR)map->memory));
+	 				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%p]\n", map->start, map->end, map->share, map->memory));
 	 			}
 
 				/* otherwise, look for a match in this block */
@@ -2199,7 +2216,7 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 						if (map->start >= start && map->end <= end)
 						{
 							map->memory = base + (map->start - start);
-	 						VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%08X]\n", map->start, map->end, start, end, (UINT32)(FPTR)map->memory));
+	 						VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", map->start, map->end, start, end, map->memory));
 	 					}
 					}
 					else
@@ -2207,7 +2224,7 @@ static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t sta
 						if (map->start >= start && map->start + map->mask <= end)
 						{
 							map->memory = base + (map->start - start);
-	 						VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%08X]\n", map->start, map->end, start, end, (UINT32)(FPTR)map->memory));
+	 						VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", map->start, map->end, start, end, map->memory));
 	 					}
 					}
 				}
@@ -2290,7 +2307,7 @@ static void find_memory(void)
 				if (!IS_AMENTRY_EXTENDED(map) && map->start == bankdata[banknum].base)
 				{
 					bank_ptr[banknum] = map->memory;
-	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%08X]\n", banknum, map->start, map->end, (UINT32)(FPTR)map->memory));
+	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, map->start, map->end, map->memory));
 					break;
 				}
 
@@ -2328,7 +2345,7 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 			{
 				if (maskoffs >= map->start && maskoffs <= map->end)
 				{
-					VPRINTF(("found in entry %08X-%08X [%08X]\n", map->start, map->end, (UINT32)(FPTR)map->memory + (maskoffs - map->start)));
+					VPRINTF(("found in entry %08X-%08X [%p]\n", map->start, map->end, (UINT8 *)map->memory + (maskoffs - map->start)));
 					return (UINT8 *)map->memory + (maskoffs - map->start);
 				}
 			}
@@ -2336,7 +2353,7 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 			{
 				if ((maskoffs & map->end) == map->start)
 				{
-					VPRINTF(("found in entry %08X-%08X [%08X]\n", map->start, map->end, (UINT32)(FPTR)map->memory + (maskoffs - map->start)));
+					VPRINTF(("found in entry %08X-%08X [%p]\n", map->start, map->end, (UINT8 *)map->memory + (maskoffs - map->start)));
 					return (UINT8 *)map->memory + (maskoffs - map->start);
 				}
 			}
@@ -2346,7 +2363,7 @@ static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t of
 	for (blocknum = 0, block = memory_block_list; blocknum < memory_block_count; blocknum++, block++)
 		if (block->cpunum == cpunum && block->spacenum == spacenum && block->start <= offset && block->end > offset)
 		{
-			VPRINTF(("found in allocated memory block %08X-%08X [%08X]\n", block->start, block->end, (UINT32)(FPTR)block->data + (offset - block->start)));
+			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->start, block->end, block->data + (offset - block->start)));
 			return block->data + offset - block->start;
 		}
 
