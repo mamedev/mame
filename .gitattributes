@@ -500,6 +500,7 @@ src/emu/drawgfx.h svneol=native#text/plain
 src/emu/driver.c svneol=native#text/plain
 src/emu/driver.h svneol=native#text/plain
 src/emu/drivers/empty.c svneol=native#text/plain
+src/emu/drivers/xtal.h svneol=native#text/plain
 src/emu/eigccppc.h svneol=native#text/plain
 src/emu/eigccx86.h svneol=native#text/plain
 src/emu/eminline.h svneol=native#text/plain

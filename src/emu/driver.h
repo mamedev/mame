@@ -68,6 +68,7 @@
 #include "output.h"
 #include "tilemap.h"
 #include "romload.h"
+#include "drivers/xtal.h"
 #include "machine/generic.h"
 #include "audio/generic.h"
 #include "video/generic.h"
