@@ -55,6 +55,7 @@ enum
 	XTAL_8MHz    		= 8000000,
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
+	XTAL_11MHz		  	= 11000000,		/* Mario I8039 sound */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_12MHz   		= 12000000,
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
@@ -74,7 +75,7 @@ enum
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling */
 	XTAL_22MHz   		= 22000000,
-	XTAL_24MHz   		= 24000000,
+	XTAL_24MHz   		= 24000000,		/* Mario */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
 	XTAL_25MHz   		= 25000000,		/* Namco System 22, Taito GNET */
 	XTAL_25_1748MHz  	= 25174800,		/* Sega S16A, S16B */
