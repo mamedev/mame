@@ -27,6 +27,88 @@
         * Super Hi Impact Proto V4.0: You need to at least reset the high score
             table from the UTILITIES menu.  It's best to do a FULL FACTORY RESTORE
 
+
+Super High Impact
+Midway, 1991
+
+This game runs on (typical) Midway Y-Unit hardware. The PCB is a base
+board 'system' that can run other Y-Unit games by swapping ROMs and
+the protection chip.
+
+PCB Layout
+----------
+
+5770-12555-00 REV. - A
+|-------------------------------------------------------------------|
+|                     6264  PAL    53461 53461 53461 48MHZ 24MHz  J6|
+|J4                                53461 53461 53461                |
+|                                  53461 53461 53461                |
+|                                  53461 53461 53461                |
+|J2           MAX691  6264  PAL                         |-----|     |
+|                         PAL PAL                       |TMS  |   J7|
+|RESET_SW                                               |34010|     |
+|  LED1                                                 |-----|     |
+|    LED2             6264 PAL PAL                                  |
+|                                                                   |
+|J       41464 41464                                              J8|
+|A  PAL  41464 41464                                                |
+|M                                                                  |
+|M                                                                  |
+|A           U89  U90  U91  U92  U93     U95  U96  U97  U98         |
+|                                                     |--------|    |
+|                                                     |L1A3787 |    |
+|                                                     |WILLIAMS|    |
+|                                                     |5410-12239   |
+|                                                     |--------|    |
+|DSW1 DSW2                                                          |
+|BATTERY                                             *A-5346-40017-8|
+|                                                                   |
+| J13   J12  U105 U106 U107 U108 U109    U111 U112 U113 U114        |
+|-------------------------------------------------------------------|
+Notes:
+      *    - Intel P5C090-50 protection chip labelled 'A-5346-40017-8'
+             clocks on pin1 6.00MHz, pin4 6.00MHz, pin21 6.00MHz
+     J*    - multi-pin connectors for additional controls, cabinet switches
+             and power input and output
+     J8    - used to connect external sound PCB via a flat cable.
+     J2    - Used to supply power to external sound PCB
+     34010 - clock 6.000MHz [48/8]
+     LED1  - power active
+     LED2  - data active, flickers while PCB is working
+     U89/105  - main program EPROMs 27C010
+     Other U* - 27C020 EPROMs
+
+
+Sound PCB
+---------
+
+5766-12702-00 REV. B
+|----------------------------------------|
+|    3.579545MHz 6116  U4  U19  U20      |
+|  YM2151                                |
+|YM3012                                  |
+|      458                         6809  |
+| 458                                    |
+|         MC1408                         |
+|J1            6821                      |
+|                                        |
+| 458    55536                  8MHz     |
+|     458                                |
+|                                        |
+|J2                                     J|
+|         J3     J4       TDA2002 TDA2002|
+|----------------------------------------|
+Notes:
+      6809   - clock 2.000MHz [8/4]
+      YM2151 - clock 3.579545MHz
+      55536  - Harris HC-55536 Continuously Variable Slope Delta Modulator
+      6116   - 2k x8 SRAM
+      U*     - 27C010 EPROMs
+      J4     - flat cable connector from main board J8
+      J3     - power input connector
+      J2     - connector for volume pot
+      J      - speakers output connector
+
 **************************************************************************/
 
 #include "driver.h"
