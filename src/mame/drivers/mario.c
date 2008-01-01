@@ -1,5 +1,20 @@
 /***************************************************************************
 
+TODO:
+	- combine memory maps
+	- discrete sound
+	- combine sh_* writes into one routine
+
+Done:	
+	- fixed mario0110u1gre
+	- rewrote driver, separate MACHINE_DRIVER(mario_audio)
+	- palette from schematics
+	- video timing from schematics
+	- driver configuration switch Nintendo/Std Monitor
+	- got rid of COLORTABLE
+	- clocks as defines in .h
+	- use XTAL_*
+
 Mario Bros memory map (preliminary):
 
 driver by Mirko Buffoni
@@ -69,81 +84,14 @@ write:
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/i8039/i8039.h"
-#include "sound/dac.h"
-#include "sound/ay8910.h"
-#include "sound/samples.h"
 
-static UINT8 p[8] = { 0,0xf0,0,0,0,0,0,0 };
-static UINT8 t[2] = { 0,0 };
+#include "mario.h"
 
-static UINT8 last;
-
-
-extern WRITE8_HANDLER( mario_videoram_w );
-extern WRITE8_HANDLER( mario_gfxbank_w );
-extern WRITE8_HANDLER( mario_palettebank_w );
-extern WRITE8_HANDLER( mario_scroll_w );
-
-extern PALETTE_INIT( mario );
-extern VIDEO_START( mario );
-extern VIDEO_UPDATE( mario );
-
-/*
- *  from audio/mario.c
- */
-extern WRITE8_HANDLER( mario_sh_w );
-extern WRITE8_HANDLER( mario_sh1_w );
-extern WRITE8_HANDLER( mario_sh2_w );
-extern WRITE8_HANDLER( mario_sh3_w );
-
-
-static MACHINE_START( mario )
-{
-	state_save_register_global_array(p);
-	state_save_register_global_array(t);
-	state_save_register_global(last);
-}
-
-
-#define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
-#define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
-
-
-static WRITE8_HANDLER( mario_sh_getcoin_w )    { t[0] = data; }
-static WRITE8_HANDLER( mario_sh_crab_w )       { p[1] = ACTIVEHIGH_PORT_BIT(p[1],0,data); }
-static WRITE8_HANDLER( mario_sh_turtle_w )     { p[1] = ACTIVEHIGH_PORT_BIT(p[1],1,data); }
-static WRITE8_HANDLER( mario_sh_fly_w )        { p[1] = ACTIVEHIGH_PORT_BIT(p[1],2,data); }
-static WRITE8_HANDLER( mario_sh_tuneselect_w ) { soundlatch_w(offset,data); }
-
-static READ8_HANDLER( mario_sh_p1_r )   { return p[1]; }
-static READ8_HANDLER( mario_sh_p2_r )   { return p[2]; }
-static READ8_HANDLER( mario_sh_t0_r )   { return t[0]; }
-static READ8_HANDLER( mario_sh_t1_r )   { return t[1]; }
-static READ8_HANDLER( mario_sh_tune_r ) { return soundlatch_r(offset); }
-
-static WRITE8_HANDLER( mario_sh_sound_w )
-{
-	DAC_data_w(0,data);
-}
-static WRITE8_HANDLER( mario_sh_p1_w )
-{
-	p[1] = data;
-}
-static WRITE8_HANDLER( mario_sh_p2_w )
-{
-	p[2] = data;
-}
-static WRITE8_HANDLER( masao_sh_irqtrigger_w )
-{
-	if (last == 1 && data == 0)
-	{
-		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
-	}
-
-	last = data;
-}
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
@@ -198,33 +146,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)  /* unknown... is this a trigger? */
+	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)  /*Z80 DMA Ctrl port */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READ(mario_sh_p1_r)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READ(mario_sh_p2_r)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(mario_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(mario_sh_t1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_WRITE(mario_sh_sound_w)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(mario_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(mario_sh_p2_w)
-ADDRESS_MAP_END
-
-
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mario )
 	PORT_START_TAG("IN0")
@@ -268,6 +197,12 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0x80, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+
+	PORT_START_TAG("MONITOR")
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
+	PORT_CONFSETTING(    0x00, "Nintendo" )
+	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
+	
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marioo )
@@ -318,6 +253,11 @@ static INPUT_PORTS_START( masao )
 INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
@@ -344,97 +284,39 @@ static const gfx_layout spritelayout =
 	16*8	/* every sprite takes 16 consecutive bytes */
 };
 
-
-
 static GFXDECODE_START( mario )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*4, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 	  0, 32 )
 GFXDECODE_END
 
 
-
-static const char *const mario_sample_names[] =
-{
-	"*mario",
-
-	/* 7f01 - 7f07 sounds */
-	"ice.wav",    /* 0x02 ice appears (formerly effect0.wav) */
-	"coin.wav",   /* 0x06 coin appears (formerly effect1.wav) */
-	"skid.wav",   /* 0x07 skid */
-
-	/* 7c00 */
-	"run.wav",        /* 03, 02, 01 - 0x1b */
-
-	/* 7c80 */
-	"luigirun.wav",   /* 03, 02, 01 - 0x1c */
-
-    0	/* end of array */
-};
-
-static const struct Samplesinterface samples_interface =
-{
-	3,	/* 3 channels */
-	mario_sample_names
-};
-
-static const struct AY8910interface ay8910_interface =
-{
-	soundlatch_r
-};
-
-static ADDRESS_MAP_START( masao_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(AY8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( masao_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_write_port_0_w)
-ADDRESS_MAP_END
-
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( mario )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 8000000/2)	/* verified on pcb */
+	MDRV_CPU_ADD(Z80, Z80_CLOCK)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(0,mario_writeport)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(I8039, 730000)
-	/* audio CPU */         /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
-
-	MDRV_MACHINE_START(mario)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(mario)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16*4+32*8)
+	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(mario)
 	MDRV_VIDEO_START(mario)
 	MDRV_VIDEO_UPDATE(mario)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_IMPORT_FROM(mario_audio)
 MACHINE_DRIVER_END
 
 
@@ -445,43 +327,27 @@ static MACHINE_DRIVER_START( masao )
 	MDRV_CPU_PROGRAM_MAP(readmem,masao_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(Z80,24576000/16)
-	/* audio CPU */	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(masao_sound_readmem,masao_sound_writemem)
-
-	MDRV_MACHINE_START(mario)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(mario)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16*4+32*8)
+	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(mario)
 	MDRV_VIDEO_START(mario)
 	MDRV_VIDEO_UPDATE(mario)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(AY8910, 14318000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_IMPORT_FROM(masao_audio)
 MACHINE_DRIVER_END
 
 
-
-
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( mario )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -587,7 +453,11 @@ ROM_START( masao )
 	ROM_LOAD( "mario.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 ROM_END
 
-
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME( 1983, mario,    0,       mario,   mario,   0, ROT180, "Nintendo of America", "Mario Bros. (US, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, marioo,   mario,   mario,   marioo,  0, ROT180, "Nintendo of America", "Mario Bros. (US, set 2)", GAME_SUPPORTS_SAVE )
