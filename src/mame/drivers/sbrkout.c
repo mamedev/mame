@@ -52,7 +52,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
  *
  *************************************/
 
-#define TIME_4V ATTOTIME_IN_SEC(4075000/4)
+#define TIME_4V ATTOTIME_IN_USEC(4075000/4/1000)
 
 static UINT8 *sbrkout_sound;
 
