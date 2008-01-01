@@ -43,6 +43,7 @@ static emu_timer *snes_nmi_timer;
 static emu_timer *snes_hirq_timer;
 static UINT16 hblank_offset;
 static UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
+static UINT8 has_dsp1;
 
 // full graphic variables
 static UINT16 vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
@@ -279,8 +280,8 @@ static void snes_init_ram(void)
 {
 	int i;
 
-	/* Init DSP1 interface */
-	InitDSP1();
+	/* Init DSP1 */
+	DSP1_reset();
 
 	/* Init VRAM */
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
@@ -436,27 +437,45 @@ READ8_HANDLER( snes_r_bank1 )
 	{
 		if ((address >= 0x8000) && (offset >= 0x200000))
 		{
-			return dsp1_read(address);
+			if (address >= 0xc000)
+				return DSP1_getSr();
+			else
+				return DSP1_getDr();
 		}
 	}
 
 	if( address <= 0x1fff )								/* Mirror of Low RAM */
+	{
 		return program_read_byte(0x7e0000 + address );
+	}
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
+	{
 		return snes_r_io( address );
+	}
 	else if( address >= 0x6000 && address <= 0x7fff )	/* Reserved */
 	{
 		if( snes_cart.mode == SNES_MODE_20 )
-		return 0xff;
-	else
-			return dsp1_read(address);
+		{
+			return 0xff;
+		}
+		else
+		{
+			if (address >= 0x7000)
+				return DSP1_getSr();
+			else
+				return DSP1_getDr();
+		}
 	}
 	else
 	{
 		if( snes_cart.mode == SNES_MODE_20 )
+		{
 			return snes_ram[offset];
+		}
 		else	/* MODE_21 */
+		{
 			return snes_ram[0xc00000 + offset];
+		}
 	}
 
 	return 0xff;
@@ -471,7 +490,10 @@ READ8_HANDLER( snes_r_bank2 )
 	{
 		if (address >= 0x8000)
 		{
-			return dsp1_read(address);
+			if (address >= 0xc000)
+				return DSP1_getSr();
+			else
+				return DSP1_getDr();
 		}
 	}
 
@@ -482,7 +504,9 @@ READ8_HANDLER( snes_r_bank2 )
 	else if( address >= 0x6000 && address <= 0x7fff )
 	{
 		if( snes_cart.mode == SNES_MODE_20 )
+		{
 			return 0xff;						/* Reserved */
+		}
 		else	/* MODE_21 */
 		{
 			int mask;
@@ -533,7 +557,10 @@ READ8_HANDLER( snes_r_bank6 )
 
 	if (address < 0x8000)
 	{
-		return dsp1_read(address);
+		if (address >= 0x4000)
+			return DSP1_getSr();
+		else
+			return DSP1_getDr();
 	}
 
 	return 0xff;
@@ -567,7 +594,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 
 	if ((address >= 0x8000) && (offset >= 0x200000))
 	{
-		dsp1_write(address, data);
+		DSP1_setDr(data);
 		return;
 	}
 
@@ -580,7 +607,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 		logerror( "Attempt to write to reserved address: %X\n", offset );
 	else
 		{
-			dsp1_write(address, data);
+			DSP1_setDr(data);
 			return;
 		}
 	else
@@ -594,7 +621,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 
 	if (address >= 0x8000)
 	{
-		dsp1_write(address, data);
+		DSP1_setDr(data);
 		return;
 	}
 
@@ -603,10 +630,10 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
 		snes_w_io( address, data );
 	else if( address >= 0x6000 && address <= 0x7fff )
-	{
+	{								
 		if( snes_cart.mode == SNES_MODE_20 )			/* Reserved */
 			logerror( "Attempt to write to reserved address: %X\n", offset );
-		else /* MODE_21 */
+		else /* MODE_21 */  
 		{
 			int mask;
 
@@ -629,9 +656,9 @@ WRITE8_HANDLER( snes_w_bank6 )
 
 	if (address < 0x8000)
 	{
-		dsp1_write(address, data);
+		DSP1_setDr(data);
 		return;
-	}
+	}	
 }
 
 /* 0x800000 - 0xffffff */
