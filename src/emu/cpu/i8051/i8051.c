@@ -114,11 +114,11 @@ typedef struct {
 	UINT8	cur_irq;		//Holds value of any current IRQ being serviced
 	UINT8	irq_priority;	//Holds value of the current IRQ Priority Level
 	UINT8	rwm;			//Signals that the current instruction is a read/write/modify instruction
-	int prev_used_cycles;	//Track previous # of used cycles
-	int last_int0;			//Store state of int0
-	int last_int1;			//Store state of int1
-	UINT8 int_vec;			//Pending Interrupt Vector
-	int priority_request;	//Priority level of incoming new irq
+	UINT8   prev_used_cycles;	//Track previous # of used cycles
+	UINT8   last_int0;			//Store state of int0
+	UINT8   last_int1;			//Store state of int1
+	UINT8   int_vec;			//Pending Interrupt Vector
+	UINT8   priority_request;	//Priority level of incoming new irq
 	//SFR Registers         (Note: Appear in order as they do in memory)
 	UINT8	po;				//Port 0
 	UINT8	sp;				//Stack Pointer
@@ -484,6 +484,12 @@ void i8051_init(int index, int clock, const void *config, int (*irqcallback)(int
 	state_save_register_item("i8051", index, i8051.subtype);
 	state_save_register_item("i8051", index, i8051.rwm );
 	state_save_register_item("i8051", index, i8051.cur_irq );
+	state_save_register_item("i8051", index, i8051.irq_priority );
+	state_save_register_item("i8051", index, i8051.prev_used_cycles );
+	state_save_register_item("i8051", index, i8051.last_int0 );
+	state_save_register_item("i8051", index, i8051.last_int1 );
+	state_save_register_item("i8051", index, i8051.int_vec );
+	state_save_register_item("i8051", index, i8051.priority_request );
 	//SFR Registers
 	state_save_register_item("i8051", index, i8051.po);
 	state_save_register_item("i8051", index, i8051.sp);
@@ -505,6 +511,7 @@ void i8051_init(int index, int clock, const void *config, int (*irqcallback)(int
 	state_save_register_item("i8051", index, i8051.ip);
 	//8052 Only registers
 	#if (HAS_I8052 || HAS_I8752)
+		state_save_register_item("i8051", index, i8051.t2con);
 		state_save_register_item("i8051", index, i8051.rcap2l);
 		state_save_register_item("i8051", index, i8051.rcap2h);
 		state_save_register_item("i8051", index, i8051.tl2);
@@ -513,6 +520,7 @@ void i8051_init(int index, int clock, const void *config, int (*irqcallback)(int
 	state_save_register_item("i8051", index, i8051.psw);
 	state_save_register_item("i8051", index, i8051.acc);
 	state_save_register_item("i8051", index, i8051.b);
+	state_save_register_item_array("i8051", index, i8051.IntRam);
 }
 
 /* Reset registers to the initial values */

@@ -98,7 +98,7 @@ UINT16 *sslam_bg_tileram, *sslam_tx_tileram, *sslam_md_tileram;
 UINT16 *sslam_spriteram, *sslam_regs;
 
 static UINT8 playmark_oki_control = 0, playmark_oki_command = 0;
-
+static UINT8 playmark_oki_bank = 0;
 
 
 /**************************************************************************
@@ -371,7 +371,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 				sslam_play(sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x60) {
-				sslam_snd_bank = 0;
+				if (sslam_snd_bank != 0)
 					OKIM6295_set_bank_base(0, (0 * 0x40000));
 				sslam_snd_bank = 0;
 				switch (sslam_sound)
@@ -469,16 +469,14 @@ static WRITE8_HANDLER( playmark_oki_w )
 
 static WRITE8_HANDLER( playmark_snd_control_w )
 {
-	static int oki_old_bank = -1;
-
 	playmark_oki_control = data;
 
 	if(data & 3)
 	{
-		if(oki_old_bank != (data & 3))
+		if(playmark_oki_bank != ((data & 3) - 1))
 		{
-			oki_old_bank = data & 3;
-			OKIM6295_set_bank_base(0, 0x40000 * (oki_old_bank - 1));
+			playmark_oki_bank = (data & 3) - 1;
+			OKIM6295_set_bank_base(0, 0x40000 * playmark_oki_bank);
 		}
 	}
 
@@ -965,6 +963,7 @@ static DRIVER_INIT( powerbls )
 {
 	state_save_register_global(playmark_oki_control);
 	state_save_register_global(playmark_oki_command);
+	state_save_register_global(playmark_oki_bank);
 }
 
 
