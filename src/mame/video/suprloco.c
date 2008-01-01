@@ -9,6 +9,7 @@
 #include "driver.h"
 
 UINT8 *suprloco_videoram;
+UINT8 *suprloco_scrollram;
 
 static tilemap *bg_tilemap;
 static int control;
@@ -116,19 +117,12 @@ WRITE8_HANDLER( suprloco_videoram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
 }
 
-static int suprloco_scrollram[32];
-
 WRITE8_HANDLER( suprloco_scrollram_w )
 {
 	int adj = flip_screen ? -8 : 8;
 
 	suprloco_scrollram[offset] = data;
 	tilemap_set_scrollx(bg_tilemap,offset, data - adj);
-}
-
-READ8_HANDLER( suprloco_scrollram_r )
-{
-	return suprloco_scrollram[offset];
 }
 
 WRITE8_HANDLER( suprloco_control_w )
@@ -152,7 +146,6 @@ WRITE8_HANDLER( suprloco_control_w )
 	coin_counter_w(1, data & 0x02);
 
 	flip_screen_set(data & 0x80);
-	tilemap_set_scrolly(bg_tilemap,0,flip_screen ? -32 : 0);
 
 	control = data;
 }
@@ -208,7 +201,7 @@ static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rect
 	}
 	else
 	{
-		adjy = sy + height + 30;  /* some of the sprites are still off by a pixel */
+		adjy = sy + height - 1;  /* some of the sprites are still off by a pixel */
 		dy = -1;
 	}
 

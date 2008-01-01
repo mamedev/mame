@@ -18,13 +18,13 @@ TODO:
 #include "sound/sn76496.h"
 
 extern UINT8 *suprloco_videoram;
+extern UINT8 *suprloco_scrollram;
 
 PALETTE_INIT( suprloco );
 VIDEO_START( suprloco );
 VIDEO_UPDATE( suprloco );
 WRITE8_HANDLER( suprloco_videoram_w );
 WRITE8_HANDLER( suprloco_scrollram_w );
-READ8_HANDLER( suprloco_scrollram_r );
 WRITE8_HANDLER( suprloco_control_w );
 READ8_HANDLER( suprloco_control_r );
 
@@ -37,45 +37,29 @@ static WRITE8_HANDLER( suprloco_soundport_w )
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }
 
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc1ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ(input_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_1_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_2_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_3_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_4_r)
-	AM_RANGE(0xe801, 0xe801) AM_READ(suprloco_control_r)
-	AM_RANGE(0xf000, 0xf6ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf7e0, 0xf7ff) AM_READ(suprloco_scrollram_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(suprloco_soundport_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(suprloco_control_w)
-	AM_RANGE(0xf000, 0xf6ff) AM_WRITE(suprloco_videoram_w) AM_BASE(&suprloco_videoram)
-	AM_RANGE(0xf7e0, 0xf7ff) AM_WRITE(suprloco_scrollram_w)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe801, 0xe801) AM_READWRITE(suprloco_control_r, suprloco_control_w)
+	AM_RANGE(0xf000, 0xf6ff) AM_RAM AM_WRITE(suprloco_videoram_w) AM_BASE(&suprloco_videoram)
+	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */
+	AM_RANGE(0xf7e0, 0xf7ff) AM_RAM AM_WRITE(suprloco_scrollram_w) AM_BASE(&suprloco_scrollram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xc000, 0xc003) AM_WRITE(SN76496_1_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -85,7 +69,7 @@ static INPUT_PORTS_START( suprloco )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -184,12 +168,12 @@ static MACHINE_DRIVER_START( suprloco )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)			/* NMIs are caused by the main CPU */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
