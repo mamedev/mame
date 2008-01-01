@@ -1542,7 +1542,7 @@ static void check_interrupts(void)
 	if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
 	{
 		execute_int(get_trap_addr(IO1));
-		(*hyperstone.irq_callback)(IRQ_IO3);
+		(*hyperstone.irq_callback)(IRQ_IO1);
 		return;
 	}
 
