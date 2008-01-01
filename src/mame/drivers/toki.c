@@ -8,6 +8,22 @@ driver by Jarek Parchanski
 Coin inputs are handled by the sound CPU, so they don't work with sound
 disabled. Use the service switch instead.
 
+--
+Mametesters bug tokiu056gre - "tokiu: "0000000" is always displayed as the top hiscore during gameplay, 
+regardless of what it actually is. This does not happen in the other Toki sets."
+
+Notes by bmcphail@vcmame.net, 1/1/2008
+
+Toki stores high score at $60008 in main ram (init code at $ADA, compared with player score at $1A1BA)
+Tokiu stores high score at $60010 instead (init code at $B16, equivalent compare code at $1a204), $60008
+is used for different purposes in many parts of the code.
+
+Both games feature a common routine ($1cba2 in toki, $1cbfa in tokiu) that prints the high score to screen, 
+the problem is that the version in Tokiu has not been adjusted for the different high score location and 
+it reads from the $68008 location instead of $680010.  From analysing the code I'm certain this is a bug
+in the original USA version code and not an emulation bug.
+
+
 
 TODO
 ----
