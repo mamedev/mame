@@ -4,7 +4,7 @@
 
 **************************************************************************/
 
-#define MIDZEUS_VIDEO_CLOCK		66000000
+#define MIDZEUS_VIDEO_CLOCK		XTAL_66_6667MHz
 
 
 /*----------- defined in video/midzeus.c -----------*/

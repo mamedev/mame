@@ -2312,6 +2312,7 @@ src/mame/layout/clowns.lay svneol=native#text/plain
 src/mame/layout/connect4.lay svneol=native#text/plain
 src/mame/layout/copsnrob.lay svneol=native#text/plain
 src/mame/layout/crash.lay svneol=native#text/plain
+src/mame/layout/crusnexo.lay svneol=native#text/plain
 src/mame/layout/darius.lay svneol=native#text/plain
 src/mame/layout/deadeye.lay svneol=native#text/plain
 src/mame/layout/dlair.lay svneol=native#text/plain

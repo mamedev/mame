@@ -1681,6 +1681,8 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/clowns.lh \
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 						$(LAYOUT)/gypsyjug.lh
 
+$(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
+
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \

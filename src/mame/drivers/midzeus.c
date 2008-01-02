@@ -16,6 +16,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "debugger.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"
@@ -23,8 +24,10 @@
 #include "machine/timekpr.h"
 #include "audio/dcs.h"
 
+#include "crusnexo.lh"
 
-#define CPU_CLOCK		60000000
+
+#define CPU_CLOCK		XTAL_60MHz
 
 #define BEAM_DY			3
 #define BEAM_DX			3
@@ -35,10 +38,16 @@ static UINT8 			gun_irq_state;
 static emu_timer *		gun_timer[2];
 static INT32 			gun_x[2], gun_y[2];
 
+static UINT8			crusnexo_leds_select;
+static UINT8			keypad_select;
+static UINT8			bitlatch[10];
+
 static UINT32 *ram_base;
 static UINT32 *zpram;
 static size_t zpram_size;
 static UINT8 cmos_protected;
+
+static UINT32 *linkram;
 
 static emu_timer *timer[2];
 
@@ -67,6 +76,8 @@ static MACHINE_START( midzeus )
 	state_save_register_global(gun_irq_state);
 	state_save_register_global_array(gun_x);
 	state_save_register_global_array(gun_y);
+	state_save_register_global(crusnexo_leds_select);
+	state_save_register_global(keypad_select);
 }
 
 
@@ -114,15 +125,17 @@ static INTERRUPT_GEN( display_irq )
 
 static WRITE32_HANDLER( cmos_w )
 {
-	if (!cmos_protected)
+	if (bitlatch[2] && !cmos_protected)
 		COMBINE_DATA(&generic_nvram32[offset]);
+	else
+		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", activecpu_get_pc(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
 
 static READ32_HANDLER( cmos_r )
 {
-	return generic_nvram32[offset];
+	return generic_nvram32[offset] | 0xffffff00;
 }
 
 
@@ -135,41 +148,23 @@ static WRITE32_HANDLER( cmos_protect_w )
 
 /*************************************
  *
- *  Timekeeper access (Zeus 2 only)
+ *  Timekeeper and ZPRAM access 
+ *	(Zeus 2 only)
  *
  *************************************/
 
 static READ32_HANDLER( timekeeper_r )
 {
-	UINT8 result = timekeeper_0_r(offset);
-//  logerror("%06X:cmos_time_r(%X) = %02X\n", activecpu_get_pc(), offset, result);
-	return result;
+	return timekeeper_0_r(offset) | 0xffffff00;
 }
 
 
 static WRITE32_HANDLER( timekeeper_w )
 {
-	if (!cmos_protected)
-	{
-//      logerror("%06X:cmos_time_w(%X) = %02X\n", activecpu_get_pc(), offset, data);
+	if (bitlatch[2] && !cmos_protected)
 		timekeeper_0_w(offset, data);
-	}
-	cmos_protected = TRUE;
-}
-
-
-
-/*************************************
- *
- *  Zero-power RAM access (Zeus 2 only)
- *
- *************************************/
-
-static WRITE32_HANDLER( zpram_w )
-{
-	/* ZPRAM seems to use the same protection control as CMOS */
-//  if (!cmos_protected)
-		COMBINE_DATA(zpram + offset);
+	else
+		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", activecpu_get_pc(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -177,6 +172,15 @@ static WRITE32_HANDLER( zpram_w )
 static READ32_HANDLER( zpram_r )
 {
 	return zpram[offset] | 0xffffff00;
+}
+
+
+static WRITE32_HANDLER( zpram_w )
+{
+	if (bitlatch[2])
+		COMBINE_DATA(&zpram[offset]);
+	else
+		logerror("%06X:zpram_w with bitlatch[2] = %d\n", activecpu_get_pc(), bitlatch[2]);
 }
 
 
@@ -197,6 +201,186 @@ static NVRAM_HANDLER( midzeus2 )
 		mame_fread(file, zpram, zpram_size);
 	else
 		memset(zpram, 0xff, zpram_size);
+}
+
+
+
+/*************************************
+ *
+ *  Miscellaneous bit latches
+ *
+ *************************************/
+
+static READ32_HANDLER( bitlatches_r )
+{
+	switch (offset)
+	{
+		/* unknown purpose; two bits are apparently used */
+		case 1:
+			return bitlatch[offset] | ~3;
+	
+		/* CMOS/ZPRAM extra enable latch; only low bit is used */
+		case 2:
+			return bitlatch[offset] | ~1;
+		
+		/* unknown purpose; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
+		/* only low bit is used */
+		case 3:
+			return bitlatch[offset] | ~1;
+		
+		/* ROM bank selection on Zeus 2; two bits are used */
+		case 5:
+			return bitlatch[offset] | ~3;
+
+		/* unknown purpose; crusnexo reads at startup: if (val & 0xf0) == 0xa0 it affects */
+		/* how the Zeus is used (reg 0x5d is set to 0x54580006) */
+		/* thegrid does the same, writing either 0xD4580006 or 0xC4180006 depending */
+		/* this is the value reported as DISK JR ASIC version in thegrid startup test */
+		case 6:
+			return 0xa0 | ~0xff;
+		
+		/* unknown purpose */
+		default:
+			logerror("%06X:bitlatches_r(%X)\n", activecpu_get_pc(), offset);
+			break;
+	}
+	return ~0;
+}
+
+
+static WRITE32_HANDLER( bitlatches_w )
+{
+	UINT32 oldval = bitlatch[offset];
+	bitlatch[offset] = data;
+
+	switch (offset)
+	{
+		/* unknown purpose */
+		default:
+			if (oldval ^ data)
+				logerror("%06X:bitlatches_w(%X) = %X\n", activecpu_get_pc(), offset, data);
+			break;
+		
+		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
+		case 0:
+			if (data != 0 && data != 1)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+
+		/* unknown purpose; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
+		case 1:
+			if (data != 1 && data != 3)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+
+		/* CMOS/ZPRAM extra enable latch; only low bit is used */
+		case 2:
+			break;
+	
+		/* unknown purpose; invasn writes 2 here at startup */
+		case 4:
+			if (data != 2)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+	
+		/* ROM bank selection on Zeus 2 */
+		case 5:
+			memory_set_bank(1, bitlatch[offset] & 3);
+			break;
+
+		/* unknown purpose; crusnexo/thegrid write 1 at startup */
+		case 7:
+			if (data != 1)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+
+		/* unknown purpose; crusnexo writes 4 at startup; thegrid writes 6 */
+		case 8:
+			if (data != 4 && data != 6)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+
+		/* unknown purpose; thegrid writes 1 at startup */
+		case 9:
+			if (data != 1)
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
+			break;
+	}
+}
+
+
+
+/*************************************
+ *
+ *  7-segment LED controls
+ *
+ *************************************/
+
+static READ32_HANDLER( crusnexo_leds_r )
+{
+	/* reads appear to just be for synchronization */
+	return ~0;
+}
+
+
+static WRITE32_HANDLER( crusnexo_leds_w )
+{
+	int bit, led;
+	
+	switch (offset)
+	{
+		case 0:	/* unknown purpose */
+			break;
+		
+		case 1:	/* controls lamps */
+			for (bit = 0; bit < 8; bit++)
+				output_set_lamp_value(bit, (data >> bit) & 1);
+			break;
+		
+		case 2:	/* sets state of selected LEDs */
+		
+			/* selection bits 4-6 select the 3 7-segment LEDs */
+			for (bit = 4; bit < 7; bit++)
+				if ((crusnexo_leds_select & (1 << bit)) == 0)
+					output_set_digit_value(bit, ~data & 0xff);
+			
+			/* selection bits 0-2 select the tachometer LEDs */
+			for (bit = 0; bit < 3; bit++)
+				if ((crusnexo_leds_select & (1 << bit)) == 0)
+					for (led = 0; led < 8; led++)
+						output_set_led_value(bit * 8 + led, (~data >> led) & 1);
+			break;
+		
+		case 3:	/* selects which set of LEDs we are addressing */
+			crusnexo_leds_select = data;
+			break;
+	}
+}
+
+
+/*************************************
+ *
+ *  Link controller access (Zeus 2 only)
+ *
+ *************************************/
+
+// read 8d0003, check bit 1, skip some stuff if 0
+// write junk to 9e0000
+
+static READ32_HANDLER( linkram_r )
+{
+	logerror("%06X:unknown_8a000_r(%02X)\n", activecpu_get_pc(), offset);
+	if (offset == 0)
+		return 0x30313042;
+	else if (offset == 0x3c)
+		return 0xffffffff;
+	return linkram[offset];
+}
+
+static WRITE32_HANDLER( linkram_w )
+{
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", activecpu_get_pc(),  offset, data);
+	COMBINE_DATA(&linkram[offset]);
 }
 
 
@@ -259,6 +443,26 @@ static UINT32 custom_49way_r(void *param)
 	const char *namex = param;
 	const char *namey = namex + strlen(namex) + 1;
 	return (translate49[readinputportbytag(namey) >> 4] << 4) | translate49[readinputportbytag(namex) >> 4];
+}
+
+
+static WRITE32_HANDLER( keypad_select_w )
+{
+	if (offset == 1)
+		keypad_select = data;
+}
+
+
+static UINT32 keypad_r(void *param)
+{
+	UINT32 bits = readinputportbytag(param);
+	UINT8 select = keypad_select;
+	while ((select & 1) != 0)
+	{
+		select >>= 1;
+		bits >>= 4;
+	}
+	return bits;
 }
 
 
@@ -373,57 +577,14 @@ static READ32_HANDLER( invasn_gun_r )
  *
  *************************************/
 
-
-// read 8d0003, check bit 1, skip some stuff if 0
-// write junk to 9e0000
-
-static UINT32 *unknown_8a0000;
-static UINT32 *unknown_8d0000;
-static READ32_HANDLER( unknown_8d0000_r )
-{
-	return unknown_8d0000[offset];
-}
-static WRITE32_HANDLER( unknown_8d0000_w )
-{
-//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x8d0000 + offset, data);
-	COMBINE_DATA(&unknown_8d0000[offset]);
-}
-static WRITE32_HANDLER( unknown_9d0000_w )
-{
-//  logerror("%06X:write to %06X = %08X\n", activecpu_get_pc(), 0x9d0000 + offset, data);
-	COMBINE_DATA(&unknown_8d0000[offset]);
-}
-
-static WRITE32_HANDLER( rombank_select_w )
-{
-	if (data >= 0 && data <= 2)
-		memory_set_bank(1, data);
-}
-
-static READ32_HANDLER( unknown_8a0000_r )
-{
-	logerror("%06X:unknown_8a000_r(%02X)\n", activecpu_get_pc(), offset);
-	if (offset == 0)
-		return 0x30313042;
-	return unknown_8a0000[offset];
-}
-
-static WRITE32_HANDLER( unknown_8a0000_w )
-{
-	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", activecpu_get_pc(),  offset, data);
-	COMBINE_DATA(&unknown_8a0000[offset]);
-}
-
-
 static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
-	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
+	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
-	AM_RANGE(0x9d0000, 0x9d0001) AM_WRITE(unknown_9d0000_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -437,9 +598,8 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
 	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
-	AM_RANGE(0x8a0000, 0x8a0027) AM_READWRITE(unknown_8a0000_r, unknown_8a0000_w) AM_BASE(&unknown_8a0000)
-	AM_RANGE(0x8d0000, 0x8d0003) AM_READWRITE(unknown_8d0000_r, unknown_8d0000_w) AM_BASE(&unknown_8d0000)
-	AM_RANGE(0x8d0005, 0x8d0005) AM_WRITE(rombank_select_w)
+	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE(&linkram)
+	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_BASE(&zpram) AM_SIZE(&zpram_size) AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
@@ -450,6 +610,43 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION(REGION_USER2, 0)
 ADDRESS_MAP_END
 
+/*
+
+	mk4:
+
+		writes to 9D0000: 00000009, FFFFFFFF
+		reads from 9D0000
+		writes to 9D0001: 00000000
+		writes to 9D0003: 00000374
+		writes to 9D0005: 00000000
+
+	crusnexo:
+	
+		reads from 8A0000
+	
+		writes to 9D0000: 00000000, 00000008, 00000009, FFFFFFFF
+		reads from 9D0000
+		writes to 9D0001: 00000000, 00000004, 00000204
+		writes to 9D0003: 00000374
+			-- hard coded to $374 at startup
+		writes to 9D0004: 0000000F
+			-- hard coded to $F at startup
+
+		writes to 9E0008: 00000000
+		
+		writes to 9E8000: 00810081
+		
+	thegrid:
+	
+		writes to 9D0000: 00000008, 00000009, 0000008D
+		writes to 9D0001: 00000000, 00000004, 00000204
+		writes to 9D0003: 00000354
+		reads from 9D0003
+		writes to 9D0004: FFFFFFFF
+		writes to 9D0005: 00000000
+		
+		writes to 9E8000: 00810081
+*/
 
 
 /*************************************
@@ -751,15 +948,22 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM( keypad_r, "KEYPAD" )
+	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START_TAG("KEYPAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* keypad 3 */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	/* keypad 1 */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)	/* keypad 2 */
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)	/* keypad 6 */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)	/* keypad 4 */
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)	/* keypad 5 */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(3)	/* keypad 9 */
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(3)	/* keypad 7 */
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(3)	/* keypad 8 */
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_PLAYER(3)	/* keypad # */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_PLAYER(3)	/* keypad * */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_PLAYER(3)	/* keypad 0 */
 
 	PORT_START_TAG("ANALOG3")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -1077,7 +1281,7 @@ ROM_END
 static DRIVER_INIT( mk4 )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 97, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 461/* or 474 */, 94, NULL);
 	midway_ioasic_set_shuffle_state(1);
 }
 
@@ -1085,7 +1289,7 @@ static DRIVER_INIT( mk4 )
 static DRIVER_INIT( invasn )
 {
 	dcs2_init(0, 0);
-	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 97, NULL);
+	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
 	memory_install_readwrite32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
@@ -1095,6 +1299,9 @@ static DRIVER_INIT( crusnexo )
 	dcs2_init(0, 0);
 	midway_ioasic_init(MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	memory_configure_bank(1, 0, 3, memory_region(REGION_USER2), 0x400000*4);
+
+	memory_install_readwrite32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
+	memory_install_write32_handler    (0, ADDRESS_SPACE_PROGRAM, 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
 }
 
 
@@ -1116,5 +1323,5 @@ static DRIVER_INIT( thegrid )
 GAME( 1997, mk4,      0,     midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (3.0)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1997, mk4a,     mk4,   midzeus,  mk4,      mk4,      ROT0, "Midway", "Mortal Kombat 4 (2.1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1999, invasn,   0,     midzeus,  invasn,   invasn,   ROT0, "Midway", "Invasion (Midway)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAMEL( 1999, crusnexo, 0,     midzeus2, crusnexo, crusnexo, ROT0, "Midway", "Cruis'n Exotica", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE, layout_crusnexo )
 GAME( 2001, thegrid,  0,     midzeus2, thegrid,  thegrid,  ROT0, "Midway", "The Grid (version 1.1)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
