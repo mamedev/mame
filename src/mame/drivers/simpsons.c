@@ -322,17 +322,17 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
-ROM_START( simpsons )
+ROM_START( simpsons ) /* World 4 Player */
 	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "072-g02.16c",      0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
-	ROM_LOAD( "072-g01.17c",      0x30000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
-	ROM_LOAD( "072-j13.13c",      0x50000, 0x20000, CRC(aade2abd) SHA1(10f178d5ed399b4866266e075d91ca3db26798f8) )
-	ROM_LOAD( "072-j12.15c",      0x70000, 0x18000, CRC(479e12f2) SHA1(15a6cb12e68b4773a29ab463640a43f8e814de59) )
-	ROM_CONTINUE(		      0x08000, 0x08000 )
+	ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-g01.17c", 0x30000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
+	ROM_LOAD( "072-j13.13c", 0x50000, 0x20000, CRC(aade2abd) SHA1(10f178d5ed399b4866266e075d91ca3db26798f8) )
+	ROM_LOAD( "072-j12.15c", 0x70000, 0x18000, CRC(479e12f2) SHA1(15a6cb12e68b4773a29ab463640a43f8e814de59) )
+	ROM_CONTINUE(		 0x08000, 0x08000 )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-e03.6g",       0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
-	ROM_CONTINUE(		      0x10000, 0x18000 )
+	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(		0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )	/* tiles */
@@ -349,17 +349,17 @@ ROM_START( simpsons )
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps4pa )
+ROM_START( simps4pa ) /* World 4 Player, later? (by use of later leters) */
 	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "072-g02.16c",      0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
-	ROM_LOAD( "072-g01.17c",      0x30000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
-	ROM_LOAD( "simpm13.13c",      0x50000, 0x20000, CRC(f36c9423) SHA1(4a7311ffcb2e6916006c1e79dfc231e7fc570781) )
-	ROM_LOAD( "simpl12.15c",      0x70000, 0x18000, CRC(84f9d9ba) SHA1(d52f999b7c8125daea5e9b5754c6e82c17861d1b) )
-	ROM_CONTINUE(                 0x08000, 0x08000 )
+	ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-g01.17c", 0x30000, 0x20000, CRC(9f843def) SHA1(858432b59101b0577c5cec6ac0c7c20ab0780c9a) )
+	ROM_LOAD( "072-m13.13c", 0x50000, 0x20000, CRC(f36c9423) SHA1(4a7311ffcb2e6916006c1e79dfc231e7fc570781) )
+	ROM_LOAD( "072-l12.15c", 0x70000, 0x18000, CRC(84f9d9ba) SHA1(d52f999b7c8125daea5e9b5754c6e82c17861d1b) )
+	ROM_CONTINUE(            0x08000, 0x08000 )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-e03.6g",       0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
-	ROM_CONTINUE(     	      0x10000, 0x18000 )
+	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(     	0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) ) /* tiles */
@@ -377,17 +377,17 @@ ROM_START( simps4pa )
 ROM_END
 
 
-ROM_START( simpsn2p )
+ROM_START( simpsn2p ) /* World 2 Player */
 	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "072-g02.16c",      0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
-	ROM_LOAD( "simp_p01.17c",     0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
-	ROM_LOAD( "simp_013.13c",     0x50000, 0x20000, CRC(8781105a) SHA1(ef2f16f7a56d3715536511c674df4b3aab1be2bd) )
-	ROM_LOAD( "simp_012.15c",     0x70000, 0x18000, CRC(244f9289) SHA1(eeda7f5c7340cbd1a1cd576af48cd5d1a629914a) )
-	ROM_CONTINUE(		      0x08000, 0x08000 )
+	ROM_LOAD( "072-g02.16c",  0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-p01.17c",  0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
+	ROM_LOAD( "072-013.13c",  0x50000, 0x20000, CRC(8781105a) SHA1(ef2f16f7a56d3715536511c674df4b3aab1be2bd) )
+	ROM_LOAD( "072-012.15c",  0x70000, 0x18000, CRC(244f9289) SHA1(eeda7f5c7340cbd1a1cd576af48cd5d1a629914a) )
+	ROM_CONTINUE(		  0x08000, 0x08000 )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-g03.6g",       0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
-	ROM_CONTINUE(		      0x10000, 0x18000 )
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
+	ROM_CONTINUE(		0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )	/* tiles */
@@ -404,17 +404,17 @@ ROM_START( simpsn2p )
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps2pa )
+ROM_START( simps2pa ) /* World 2 Player, alt */
 	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
-        ROM_LOAD( "072-g02.16c",      0x010000, 0x020000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
-        ROM_LOAD( "simp1.17c",        0x030000, 0x020000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
-        ROM_LOAD( "simp4.13c",        0x050000, 0x020000, CRC(54e6df66) SHA1(1b83ae56cf1deb51b04880fa421f06568c938a99) )
-        ROM_LOAD( "simp3.15c",        0x070000, 0x018000, CRC(96636225) SHA1(5de95606e5c9337f18bc42f4df791cacafa20399) )
-	ROM_CONTINUE(		      0x08000, 0x08000 )
+        ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) )
+	ROM_LOAD( "072-p01.17c", 0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) )
+        ROM_LOAD( "072-_13.13c", 0x50000, 0x20000, CRC(54e6df66) SHA1(1b83ae56cf1deb51b04880fa421f06568c938a99) ) /* Uknown revision/region code */
+        ROM_LOAD( "072-_12.15c", 0x70000, 0x18000, CRC(96636225) SHA1(5de95606e5c9337f18bc42f4df791cacafa20399) ) /* Uknown revision/region code */
+	ROM_CONTINUE(		 0x08000, 0x08000 )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-g03.6g",       0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
-	ROM_CONTINUE(		      0x10000, 0x18000 )
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
+	ROM_CONTINUE(		0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )	/* tiles */
@@ -431,17 +431,17 @@ ROM_START( simps2pa )
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
-ROM_START( simps2pj )
+ROM_START( simp2pa ) /* Asia 2 Player */
 	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "072-s02.16c",      0x10000, 0x20000, CRC(265f7a47) SHA1(d39c19a5e303f822313409343b209947f4c47ae4) )
-	ROM_LOAD( "072-t01.17c",      0x30000, 0x20000, CRC(91de5c2d) SHA1(1e18a5585ed821ec7cda69bdcdbfa4e6c71455c6) )
-	ROM_LOAD( "072-213.13c",      0x50000, 0x20000, CRC(b326a9ae) SHA1(f222c33f2e8b306f2f0ef6f0da9febbf8219e1a4) )
-	ROM_LOAD( "072-212.15c",      0x70000, 0x18000, CRC(584d9d37) SHA1(61b9df4dfb323b7284894e5e1eb9d713ebf64721) )
-	ROM_CONTINUE(		      0x08000, 0x08000 )
+	ROM_LOAD( "072-g02.16c", 0x10000, 0x20000, CRC(580ce1d6) SHA1(5b07fb8e8041e1663980aa35d853fdc13b22dac5) ) /* Same as both world 2p sets */
+	ROM_LOAD( "072-p01.17c", 0x30000, 0x20000, CRC(07ceeaea) SHA1(c18255ae1d578c2d53de80d6323cdf41cbe47b57) ) /* Same as both world 2p sets */
+	ROM_LOAD( "072-113.13c", 0x50000, 0x20000, CRC(8781105a) SHA1(ef2f16f7a56d3715536511c674df4b3aab1be2bd) ) /* Same as world set simpsn2p */
+	ROM_LOAD( "072-112.15c", 0x70000, 0x18000, CRC(3bd69404) SHA1(e055fed7e9bde8315ae2f9b2d35bc05fece6b80b) )
+	ROM_CONTINUE(		 0x08000, 0x08000 )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
-	ROM_LOAD( "072-g03.6g",       0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
-	ROM_CONTINUE(		      0x10000, 0x18000 )
+	ROM_LOAD( "072-e03.6g", 0x00000, 0x08000, CRC(866b7a35) SHA1(98905764eb4c7d968ccc17618a1f24ee12e33c0e) )
+	ROM_CONTINUE(		0x10000, 0x18000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
 	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )	/* tiles */
@@ -458,7 +458,32 @@ ROM_START( simps2pj )
 	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
 ROM_END
 
+ROM_START( simps2pj ) /* Japan 2 Player */
+	ROM_REGION( 0x8b000, REGION_CPU1, 0 ) /* code + banked roms + banked ram */
+	ROM_LOAD( "072-s02.16c", 0x10000, 0x20000, CRC(265f7a47) SHA1(d39c19a5e303f822313409343b209947f4c47ae4) )
+	ROM_LOAD( "072-t01.17c", 0x30000, 0x20000, CRC(91de5c2d) SHA1(1e18a5585ed821ec7cda69bdcdbfa4e6c71455c6) )
+	ROM_LOAD( "072-213.13c", 0x50000, 0x20000, CRC(b326a9ae) SHA1(f222c33f2e8b306f2f0ef6f0da9febbf8219e1a4) )
+	ROM_LOAD( "072-212.15c", 0x70000, 0x18000, CRC(584d9d37) SHA1(61b9df4dfb323b7284894e5e1eb9d713ebf64721) )
+	ROM_CONTINUE(		 0x08000, 0x08000 )
 
+	ROM_REGION( 0x28000, REGION_CPU2, 0 ) /* Z80 code + banks */
+	ROM_LOAD( "072-g03.6g", 0x00000, 0x08000, CRC(76c1850c) SHA1(9047c6b26c4e33c74eb7400a807d3d9f206f7bbe) )
+	ROM_CONTINUE(		0x10000, 0x18000 )
+
+	ROM_REGION( 0x100000, REGION_GFX1, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_LOAD( "072-b07.18h", 0x000000, 0x080000, CRC(ba1ec910) SHA1(0805ccb641271dea43185dc0365732260db1763d) )	/* tiles */
+	ROM_LOAD( "072-b06.16h", 0x080000, 0x080000, CRC(cf2bbcab) SHA1(47afea47f9bc8cb5eb1c7b7fbafe954b3e749aeb) )
+
+	ROM_REGION( 0x400000, REGION_GFX2, 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
+	ROM_LOAD( "072-b08.3n",  0x000000, 0x100000, CRC(7de500ad) SHA1(61b76b8f402e3bde1509679aaaa28ef08cafb0ab) )	/* sprites */
+	ROM_LOAD( "072-b09.8n",  0x100000, 0x100000, CRC(aa085093) SHA1(925239d79bf607021d371263352618876f59c1f8) )
+	ROM_LOAD( "072-b10.12n", 0x200000, 0x100000, CRC(577dbd53) SHA1(e603e03e3dcba766074561faa92afafa5761953d) )
+	ROM_LOAD( "072-b11.16l", 0x300000, 0x100000, CRC(55fab05d) SHA1(54db8559d71ed257de9a29c8808654eaea0df9e2) )
+
+	ROM_REGION( 0x140000, REGION_SOUND1, 0 ) /* samples for the 053260 */
+	ROM_LOAD( "072-d05.1f", 0x000000, 0x100000, CRC(1397a73b) SHA1(369422c84cca5472967af54b8351e29fcd69f621) )
+	ROM_LOAD( "072-d04.1d", 0x100000, 0x040000, CRC(78778013) SHA1(edbd6d83b0d1a20df39bb160b92395586fa3c32d) )
+ROM_END
 
 /***************************************************************************
 
@@ -472,8 +497,10 @@ static DRIVER_INIT( simpsons )
 	konami_rom_deinterleave_4(REGION_GFX2);
 }
 
-GAME( 1991, simpsons, 0,        simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players)", 0 )
-GAME( 1991, simps4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players alt)", 0 )
-GAME( 1991, simpsn2p, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players)", 0 )
-GAME( 1991, simps2pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players alt)", 0 )
+// the region warning, if one exists, is shown after the high-score screen in attract mode
+GAME( 1991, simpsons, 0,        simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 1)", 0 )
+GAME( 1991, simps4pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (4 Players World, set 2)", 0 )
+GAME( 1991, simpsn2p, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 1)", 0 )
+GAME( 1991, simps2pa, simpsons, simpsons, simpsons, simpsons, ROT0, "Konami", "The Simpsons (2 Players World, set 2)", 0 )
+GAME( 1991, simp2pa,  simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Asia)", 0 )
 GAME( 1991, simps2pj, simpsons, simpsons, simpsn2p, simpsons, ROT0, "Konami", "The Simpsons (2 Players Japan)", 0 )
