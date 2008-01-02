@@ -28,6 +28,8 @@ WRITE64_HANDLER( dc_aica_reg_w );
 
 MACHINE_RESET( dc );
 
+void dc_vblank( void );
+
 /*----------- defined in video/dc.c -----------*/
 
 READ64_HANDLER( pvr_ctrl_r );
