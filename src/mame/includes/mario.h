@@ -44,6 +44,7 @@ struct _mario_state
 
 	/* Save state relevant */
 
+	UINT8 dummy;	/* structs need to have something */
 };
 
 /*----------- defined in video/mario.c -----------*/

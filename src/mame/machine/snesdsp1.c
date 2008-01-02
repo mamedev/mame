@@ -42,9 +42,9 @@ struct DSP1_Command {
 
 static const struct DSP1_Command mCommandTable[0x40];
 static const INT16 DSP1_MaxAZS_Exp[16];
-static const INT16 DSP1_SinTable[];
-static const INT16 DSP1_MulTable[];
-static UINT16 DSP1_DataRom[];
+static const INT16 DSP1_SinTable[256];
+static const INT16 DSP1_MulTable[256];
+static UINT16 DSP1_DataRom[1024];
 
 static struct SharedData { // some RAM variables shared between commands
         INT16 MatrixA[3][3];          // attitude matrix A
