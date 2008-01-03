@@ -345,6 +345,9 @@ C - uses sub board with support for player 3 and 4 controls
 #include "sound/namco.h"
 #include "sound/dac.h"
 
+static int dac0_value, dac1_value, dac0_gain, dac1_gain;
+
+
 /* from video */
 VIDEO_START( namcos1 );
 VIDEO_UPDATE( namcos1 );
@@ -420,11 +423,17 @@ static WRITE8_HANDLER( namcos1_coin_w )
 	coin_counter_w(1,data & 4);
 }
 
-static int dac0_value ,dac1_value, dac0_gain=0x80, dac1_gain=0x80;
-
 static void namcos1_update_DACs(void)
 {
 	DAC_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+}
+
+void namcos1_init_DACs(void)
+{
+	dac0_value = 0;
+	dac1_value = 0;
+	dac0_gain=0x80;
+	dac1_gain=0x80;
 }
 
 static WRITE8_HANDLER( namcos1_dac_gain_w )

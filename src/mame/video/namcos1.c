@@ -50,6 +50,7 @@ static UINT8 namcos1_playfield_control[0x20];
 
 static tilemap *bg_tilemap[6];
 static UINT8 *tilemap_maskdata;
+static int copy_sprites;
 
 
 
@@ -142,6 +143,9 @@ VIDEO_START( namcos1 )
 		machine->shadow_table[machine->pens[i]] = machine->pens[i + 0x0800];
 
 	spriteram = &namcos1_spriteram[0x800];
+
+	memset(namcos1_playfield_control, 0, sizeof(namcos1_playfield_control));
+	copy_sprites = 0;
 }
 
 
@@ -212,7 +216,6 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 
 
 
-static int copy_sprites;
 
 READ8_HANDLER( namcos1_spriteram_r )
 {
