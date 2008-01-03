@@ -492,7 +492,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/rampart.o $(VIDEO)/rampart.o \
 	$(DRIVERS)/relief.o $(VIDEO)/relief.o \
 	$(DRIVERS)/runaway.o $(VIDEO)/runaway.o \
-	$(DRIVERS)/sbrkout.o $(MACHINE)/sbrkout.o $(VIDEO)/sbrkout.o \
+	$(DRIVERS)/sbrkout.o \
 	$(DRIVERS)/shuuz.o $(VIDEO)/shuuz.o \
 	$(DRIVERS)/skullxbo.o $(VIDEO)/skullxbo.o \
 	$(DRIVERS)/skydiver.o $(AUDIO)/skydiver.o $(VIDEO)/skydiver.o \

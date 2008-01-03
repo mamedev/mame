@@ -24,9 +24,15 @@
 ***************************************************************************/
 
 #define VERBOSE	(0)
+#if VERBOSE
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#else
+#define LOG(x)
+#endif
 
 void CLIB_DECL logerror(const char *text,...);
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
