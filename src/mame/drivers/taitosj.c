@@ -66,7 +66,7 @@ Address          Dir Data     Name       Description
 11010101----1010   W xxxxxxxx EXROM2     high 8 bits of address to read from graphics ROMs
 11010101----1011   W xxxxxxxx EPORT1     command to sound CPU
 11010101----1100   W -------x EPORT2     single bit signal to audio CPU (not used?)
-11010101----1101   W -------- TIME RESET wathcdog reset
+11010101----1101   W -------- TIME RESET watchdog reset
 11010101----1110   W -------x COIN LOCK  coin lockout
 11010101----1110   W ------x- SOUND STOP mute sound
 11010101----1110   W -xxxxx-- n.c.

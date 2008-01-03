@@ -74,6 +74,12 @@ void generic_machine_init(running_machine *machine)
 		servicecoinlockedout[counternum] = 0;
 	}
 
+	/* register coin save state */
+	state_save_register_item_array("coin", 0, coin_count);
+	state_save_register_item_array("coin", 0, coinlockedout);
+	state_save_register_item_array("coin", 0, servicecoinlockedout);
+	state_save_register_item_array("coin", 0, lastcoin);
+
 	/* reset NVRAM size and pointers */
 	generic_nvram_size = 0;
 	generic_nvram = NULL;
