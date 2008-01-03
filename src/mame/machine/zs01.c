@@ -12,7 +12,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -532,7 +532,7 @@ void zs01_scl_write( int chip, int scl )
 								memset( &c->read_buffer[ 0 ], 0xff, 2 );
 							}
 
-							verboselog( 1, "zs01(%d) <- status: %02x%02\n", chip,
+							verboselog( 1, "zs01(%d) <- status: %02x%02x\n", chip,
 								c->read_buffer[ 0 ], c->read_buffer[ 1 ] );
 
 							verboselog( 1, "zs01(%d) <- data: %02x%02x%02x%02x%02x%02x%02x%02x\n", chip,

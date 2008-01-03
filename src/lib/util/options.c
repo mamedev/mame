@@ -100,9 +100,9 @@ static options_data *find_entry_data(core_options *opts, const char *string, int
 static void update_data(core_options *opts, options_data *data, const char *newdata, int priority);
 static int parse_option_name(core_options *opts, const char *srcstring, options_data *data);
 
-static void message(core_options *opts, options_message msgtype, const char *format, ...);
+static void message(core_options *opts, options_message msgtype, const char *format, ...) ATTR_PRINTF(3,4);
 static UINT32 hash_value(core_options *opts, const char *str);
-static void output_printf(void (*output)(const char *s), const char *format, ...);
+static void output_printf(void (*output)(const char *s), const char *format, ...) ATTR_PRINTF(2,3);
 
 
 

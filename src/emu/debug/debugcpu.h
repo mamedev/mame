@@ -177,7 +177,7 @@ void				debug_halt_on_next_instruction(void);
 void				debug_refresh_display(void);
 int					debug_get_execution_state(void);
 UINT32				debug_get_execution_counter(void);
-void				debug_trace_printf(int cpunum, const char *fmt, ...);
+void				debug_trace_printf(int cpunum, const char *fmt, ...) ATTR_PRINTF(2,3);
 void				debug_source_script(const char *file);
 void				debug_flush_traces(void);
 

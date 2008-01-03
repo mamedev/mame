@@ -11,7 +11,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -68,7 +68,7 @@ void adc083x_init( int chip, int type, double (*input_callback)(int input) )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_init( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_init( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -134,7 +134,7 @@ void adc083x_cs_write( int chip, int cs )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_cs_write( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_cs_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -254,7 +254,7 @@ void adc083x_clk_write( int chip, int clk )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_clk_write( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_clk_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -398,7 +398,7 @@ void adc083x_di_write( int chip, int di )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_di_write( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_di_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -418,7 +418,7 @@ void adc083x_se_write( int chip, int se )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_se_write( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_se_write( %d ) chip out of range\n", chip );
 		return;
 	}
 
@@ -438,7 +438,7 @@ int adc083x_sars_read( int chip )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_sars_read( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_sars_read( %d ) chip out of range\n", chip );
 		return 0;
 	}
 
@@ -454,7 +454,7 @@ int adc083x_do_read( int chip )
 
 	if( chip >= MAX_ADC083X_CHIPS )
 	{
-		verboselog( 0, "adc083x_do_read( %d ) chip %d out of range\n", chip );
+		verboselog( 0, "adc083x_do_read( %d ) chip out of range\n", chip );
 		return 0;
 	}
 

@@ -100,7 +100,7 @@ int core_fputs(core_file *f, const char *s);
 
 /* printf-style text write to a file */
 int core_vfprintf(core_file *f, const char *fmt, va_list va);
-int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...);
+int CLIB_DECL core_fprintf(core_file *f, const char *fmt, ...) ATTR_PRINTF(2,3);
 
 
 

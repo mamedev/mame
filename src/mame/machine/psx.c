@@ -13,7 +13,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -726,7 +726,7 @@ static void sio_timer_adjust( int n_port )
 		if( m_p_n_sio_baud[ n_port ] != 0 && n_prescaler != 0 )
 		{
 			n_time = attotime_mul(ATTOTIME_IN_HZ(33868800), n_prescaler * m_p_n_sio_baud[n_port]);
-			verboselog( 2, "sio_timer_adjust( %d ) = %f ( %d x %d )\n", n_port, n_time, n_prescaler, m_p_n_sio_baud[ n_port ] );
+			verboselog( 2, "sio_timer_adjust( %d ) = %s ( %d x %d )\n", n_port, attotime_string(n_time, 9), n_prescaler, m_p_n_sio_baud[ n_port ] );
 		}
 		else
 		{

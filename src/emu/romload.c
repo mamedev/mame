@@ -162,7 +162,7 @@ const rom_entry *rom_next_chunk(const rom_entry *romp)
     debugload - log data to a file
 -------------------------------------------------*/
 
-static void CLIB_DECL debugload(const char *string, ...)
+static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 {
 #ifdef LOG_LOAD
 	static int opened;

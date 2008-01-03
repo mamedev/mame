@@ -222,7 +222,7 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void verboselog( int n_level, const char *s_fmt, ... )
+INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -289,7 +289,7 @@ static WRITE32_HANDLER( mb89371_w )
 static READ32_HANDLER( mb89371_r )
 {
 	UINT32 data = 0xffffffff;
-	verboselog( 2, "mb89371_r %08x %08x\n", offset, mem_mask, data );
+	verboselog( 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
@@ -2002,13 +2002,13 @@ static READ32_HANDLER( gtrfrks_io_r )
 		break;
 	}
 
-	verboselog( 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", data );
+	verboselog( 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static WRITE32_HANDLER( gtrfrks_io_w )
 {
-	verboselog( 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", data );
+	verboselog( 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2621,7 +2621,7 @@ static void dmx_output_callback( int offset, int data )
 
 static WRITE32_HANDLER( dmx_io_w )
 {
-	verboselog( 2, "dmx_io_w( %08x, %08x ) %08x\n", data );
+	verboselog( 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{

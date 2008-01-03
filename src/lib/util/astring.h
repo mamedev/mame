@@ -70,7 +70,7 @@ astring *astring_inssubstr(astring *dst, int insbefore, const astring *src, int 
 astring *astring_substr(astring *str, int start, int count);
 
 /* formatted printf to an astring */
-int astring_printf(astring *dst, const char *format, ...);
+int astring_printf(astring *dst, const char *format, ...) ATTR_PRINTF(2,3);
 
 
 

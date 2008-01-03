@@ -88,7 +88,7 @@ struct _object_pool_iterator
 ***************************************************************************/
 
 static void memory_destruct(void *object, size_t size);
-static void report_failure(object_pool *pool, const char *format, ...);
+static void report_failure(object_pool *pool, const char *format, ...) ATTR_PRINTF(2,3);
 
 
 
@@ -268,7 +268,7 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 	/* if we have an invalid type, fail */
 	if (type == NULL)
 	{
-		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add object of unknown type", file, line, (int)size);
+		report_failure(pool, "pool_object_add (via %s:%d): Attempted to add object of unknown type with size %d", file, line, (int)size);
 		return object;
 	}
 

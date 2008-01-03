@@ -206,7 +206,7 @@ static int select_game_handle_key(input_code keycode, char value);
     to the string pool
 -------------------------------------------------*/
 
-INLINE const char *CLIB_DECL menu_string_pool_add(const char *format, ...)
+INLINE const char *CLIB_DECL ATTR_PRINTF(1,2) menu_string_pool_add(const char *format, ...)
 {
 	char *result = &menu_string_pool[menu_string_pool_offset];
 	va_list arg;

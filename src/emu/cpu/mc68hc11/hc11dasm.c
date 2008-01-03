@@ -1153,7 +1153,7 @@ static const M68HC11_OPCODE opcode_table_page4[256] =
 static char *output;
 static const UINT8 *rombase;
 
-static void print(const char *fmt, ...)
+static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
 	va_list vl;
 

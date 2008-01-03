@@ -28,7 +28,7 @@ static int dasm_table_built = 0;
 
 
 static char *output;
-static void print(const char *fmt, ...)
+static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
 	va_list vl;
 

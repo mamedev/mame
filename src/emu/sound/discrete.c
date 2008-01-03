@@ -123,7 +123,7 @@ static void discrete_reset(void *chip);
  *
  *************************************/
 
-static void CLIB_DECL discrete_log(const char *text, ...)
+static void CLIB_DECL ATTR_PRINTF(1,2) discrete_log(const char *text, ...)
 {
 	if (DISCRETE_DEBUGLOG)
 	{
