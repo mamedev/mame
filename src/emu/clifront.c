@@ -115,6 +115,7 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 	core_options *options;
 	astring *gamename = astring_alloc();
 	astring *exename = astring_alloc();
+	const char *gamename_option;
 	const game_driver *driver;
 	int result;
 
@@ -136,7 +137,8 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 		goto error;
 
 	/* find out what game we might be referring to */
-	core_filename_extract_base(gamename, options_get_string(options, OPTION_GAMENAME), TRUE);
+	gamename_option = options_get_string(options, OPTION_GAMENAME);
+	core_filename_extract_base(gamename, gamename_option, TRUE);
 	driver = driver_get_name(astring_c(gamename));
 
 	/* execute any commands specified */
@@ -145,17 +147,17 @@ int cli_execute(int argc, char **argv, const options_entry *osd_options)
 		goto error;
 
 	/* if we don't have a valid driver selected, offer some suggestions */
-	if (astring_len(gamename) > 0 && driver == NULL)
+	if (strlen(gamename_option) > 0 && driver == NULL)
 	{
 		const game_driver *matches[10];
 		int drvnum;
 
 		/* get the top 10 approximate matches */
-		driver_list_get_approx_matches(drivers, astring_c(gamename), ARRAY_LENGTH(matches), matches);
+		driver_list_get_approx_matches(drivers, gamename_option, ARRAY_LENGTH(matches), matches);
 
 		/* print them out */
 		fprintf(stderr, "\n\"%s\" approximately matches the following\n"
-				"supported " GAMESNOUN " (best match first):\n\n", astring_c(gamename));
+				"supported " GAMESNOUN " (best match first):\n\n", gamename_option);
 		for (drvnum = 0; drvnum < ARRAY_LENGTH(matches); drvnum++)
 			if (matches[drvnum] != NULL)
 				fprintf(stderr, "%-10s%s\n", matches[drvnum]->name, matches[drvnum]->description);
