@@ -13,6 +13,11 @@
 #include "sound/bsmt2000.h"
 
 
+#define CPU_CLOCK			XTAL_64MHz
+#define VIDEO_CLOCK			XTAL_20MHz
+#define SOUND_CLOCK			XTAL_24MHz
+
+
 
 /*************************************
  *
@@ -316,7 +321,7 @@ static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */
-	40000000/4,						/* pixel clock */
+	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
 	btoads_scanline_update,			/* scanline callback */
 	NULL,							/* generate interrupt */
@@ -334,11 +339,11 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( btoads )
 
-	MDRV_CPU_ADD(TMS34020, 40000000/TMS34020_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(TMS34020, CPU_CLOCK/2/TMS34020_CLOCK_DIVIDER)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
@@ -353,7 +358,7 @@ static MACHINE_DRIVER_START( btoads )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(40000000/4, 640, 0, 512, 257, 0, 224)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
 
 	MDRV_VIDEO_START(btoads)
 	MDRV_VIDEO_UPDATE(tms340x0)
@@ -361,7 +366,7 @@ static MACHINE_DRIVER_START( btoads )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(BSMT2000, 24000000)
+	MDRV_SOUND_ADD(BSMT2000, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(bsmt2000_interface_region_1)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
