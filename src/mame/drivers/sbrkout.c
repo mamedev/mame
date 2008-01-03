@@ -12,21 +12,21 @@
 
 ****************************************************************************
 
-	To do:
-	
-	* Merge with Sprint 1
+    To do:
+
+    * Merge with Sprint 1
 
 ****************************************************************************
 
-	Stephh's notes (based on the games M6502 code and some tests) :
+    Stephh's notes (based on the games M6502 code and some tests) :
 
-	  - Each time the game is reset, it is set to "Cavity".
-	    I can't remember if it's the correct behaviour or not,
-	    but the VBLANK interruption is not called in "demo mode".
-	  - You can only select the game after 1st coin is inserted
-	    and before you press BUTTON1 to launch the first ball,
-	    then the VBLANK interruption is no more called.
-	    This means that player 2 plays the same game as player 1.
+      - Each time the game is reset, it is set to "Cavity".
+        I can't remember if it's the correct behaviour or not,
+        but the VBLANK interruption is not called in "demo mode".
+      - You can only select the game after 1st coin is inserted
+        and before you press BUTTON1 to launch the first ball,
+        then the VBLANK interruption is no more called.
+        This means that player 2 plays the same game as player 1.
 
 ***************************************************************************/
 
@@ -87,7 +87,7 @@ static MACHINE_START( sbrkout )
 	memory_set_bankptr(1, &videoram[0x380]);
 	scanline_timer = timer_alloc(scanline_callback, NULL);
 	pot_timer = timer_alloc(pot_trigger_callback, NULL);
-	
+
 	state_save_register_global(sync2_value);
 	state_save_register_global_array(pot_mask);
 	state_save_register_global_array(pot_trigger);
@@ -110,17 +110,17 @@ static MACHINE_RESET( sbrkout )
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-	
+
 	/* force a partial update before anything happens */
 	video_screen_update_partial(0, scanline);
-	
+
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
-	
+
 	/* update the DAC state */
 	DAC_data_w(0, (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
-	
+
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine->screen[0].visarea.max_y + 1)
 	{
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( irq_ack_w )
 static READ8_HANDLER( switches_r )
 {
 	UINT8 result = 0xff;
-	
+
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
 		result &= (readinputportbytag("DIPS") << 6) | 0x3f;
@@ -174,7 +174,7 @@ static READ8_HANDLER( switches_r )
 		result &= readinputportbytag("SERVE");
 	if ((offset & 0x17) == 0x07)
 		result &= (readinputportbytag("SELECT") << 6) | 0x7f;
-	
+
 	return result;
 }
 
@@ -219,9 +219,9 @@ static WRITE8_HANDLER( pot_mask2_w )
  *************************************/
 
 /*
-	The LEDs are turned on and off by two consecutive memory addresses.  The
-	first address turns them off, the second address turns them on.  This is
-	reversed for the Serve LED, which has a NOT on the signal.
+    The LEDs are turned on and off by two consecutive memory addresses.  The
+    first address turns them off, the second address turns them on.  This is
+    reversed for the Serve LED, which has a NOT on the signal.
 */
 
 static WRITE8_HANDLER( start_1_led_w )

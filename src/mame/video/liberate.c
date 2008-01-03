@@ -191,17 +191,17 @@ static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int multi,fx,fy,sx,sy,sy2,code,color;
 
 		/*
-			Byte 0: 0x01 - ?
-			        0x02 - Y flip
-			        0x04 - X flip
-			        0x08 - Colour?
-			        0x10 - Multi sprite set
-			        0x60 - Tile (high bits)
-			        0x80 - ?
-			Byte 1: 0xff - Tile (low bits)
-			Byte 2: 0xff - Y position
-			Byte 3: 0xff - X position
-		*/
+            Byte 0: 0x01 - ?
+                    0x02 - Y flip
+                    0x04 - X flip
+                    0x08 - Colour?
+                    0x10 - Multi sprite set
+                    0x60 - Tile (high bits)
+                    0x80 - ?
+            Byte 1: 0xff - Tile (low bits)
+            Byte 2: 0xff - Y position
+            Byte 3: 0xff - X position
+        */
 
 		code = spriteram[offs+1] + ((spriteram[offs+0] & 0x60) << 3);
 		sx = 240 - spriteram[offs+3];
@@ -209,7 +209,7 @@ static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		color = ((spriteram[offs+1] & 0x08) >> 3); // ?
 
 		fx = spriteram[offs+0] & 0x04;
-		fy = spriteram[offs+0] & 0x02; 
+		fy = spriteram[offs+0] & 0x02;
 		multi = spriteram[offs+0] & 0x10;
 
 		if (multi && fy==0) sy-=16;

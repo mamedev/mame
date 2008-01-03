@@ -1158,13 +1158,13 @@ void CLIB_DECL popmessage(const char *format, ...)
 	/* if the format is NULL, it is a signal to clear the popmessage */
 	if (format == NULL)
 		ui_popup_time(0, " ");
-	
+
 	/* otherwise, generate the buffer and call the UI to display the message */
 	else
 	{
 		extern void CLIB_DECL ui_popup(const char *format, ...) ATTR_PRINTF(1,2);
 		va_list arg;
-		
+
 		/* dump to the buffer */
 		va_start(arg, format);
 		vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);

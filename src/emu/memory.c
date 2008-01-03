@@ -870,7 +870,7 @@ void memory_set_bank(int banknum, int entrynum)
 
 
 /*-------------------------------------------------
-    memory_get_bank - return the currently 
+    memory_get_bank - return the currently
     selected bank
 -------------------------------------------------*/
 

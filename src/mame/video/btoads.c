@@ -52,7 +52,7 @@ VIDEO_START( btoads )
 	/* initialize the swapped pointers */
 	vram_fg_draw = (UINT8 *)btoads_vram_fg0;
 	vram_fg_display = (UINT8 *)btoads_vram_fg1;
-	
+
 	state_save_register_global(xscroll0);
 	state_save_register_global(xscroll1);
 	state_save_register_global(yscroll0);
@@ -350,7 +350,7 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	UINT16 *dst = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = fulladdr & 0x3ff;
 	int x;
-	
+
 	if (BT_DEBUG)
 		popmessage("screen_control = %02X", screen_control);
 
@@ -359,11 +359,11 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	{
 		/* mode 0: used in ship level, snake boss, title screen (free play) */
 		/* priority is:
-			1. BG1 pixels with the high bit set
-			2. Sprites
-			3. BG1
-			4. BG0
-		*/
+            1. BG1 pixels with the high bit set
+            2. Sprites
+            3. BG1
+            4. BG0
+        */
 		case 0:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -393,12 +393,12 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 		/* mode 1: used in snow level, title screen (free play), top part of rolling ball level */
 		/* priority is:
-			1. Sprite pixels with high bit clear
-			2. BG0
-			3. BG1 pixels with high bit set
-			4. Sprite pixels with high bit set
-			5. BG1
-		*/
+            1. Sprite pixels with high bit clear
+            2. BG0
+            3. BG1 pixels with high bit set
+            4. Sprite pixels with high bit set
+            5. BG1
+        */
 		case 1:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -437,10 +437,10 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 		/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
 		/* priority is:
-			1. Sprites
-			2. BG1
-			3. BG0
-		*/
+            1. Sprites
+            2. BG1
+            3. BG0
+        */
 		case 2:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -471,12 +471,12 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 		/* mode 3: used in toilet level, toad intros, bottom of rolling ball level */
 		/* priority is:
-			1. BG1 pixels with the high bit set
-			2. Sprite pixels with the high bit set
-			3. BG1
-			4. Sprites
-			5. BG0
-		*/
+            1. BG1 pixels with the high bit set
+            2. Sprite pixels with the high bit set
+            3. BG1
+            4. Sprites
+            5. BG0
+        */
 		case 3:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{

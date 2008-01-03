@@ -148,8 +148,8 @@ static WRITE32_HANDLER( cmos_protect_w )
 
 /*************************************
  *
- *  Timekeeper and ZPRAM access 
- *	(Zeus 2 only)
+ *  Timekeeper and ZPRAM access
+ *  (Zeus 2 only)
  *
  *************************************/
 
@@ -218,16 +218,16 @@ static READ32_HANDLER( bitlatches_r )
 		/* unknown purpose; two bits are apparently used */
 		case 1:
 			return bitlatch[offset] | ~3;
-	
+
 		/* CMOS/ZPRAM extra enable latch; only low bit is used */
 		case 2:
 			return bitlatch[offset] | ~1;
-		
+
 		/* unknown purpose; mk4/invasn/thegrid read at startup; invasn freaks if it is 1 at startup */
 		/* only low bit is used */
 		case 3:
 			return bitlatch[offset] | ~1;
-		
+
 		/* ROM bank selection on Zeus 2; two bits are used */
 		case 5:
 			return bitlatch[offset] | ~3;
@@ -238,7 +238,7 @@ static READ32_HANDLER( bitlatches_r )
 		/* this is the value reported as DISK JR ASIC version in thegrid startup test */
 		case 6:
 			return 0xa0 | ~0xff;
-		
+
 		/* unknown purpose */
 		default:
 			logerror("%06X:bitlatches_r(%X)\n", activecpu_get_pc(), offset);
@@ -260,7 +260,7 @@ static WRITE32_HANDLER( bitlatches_w )
 			if (oldval ^ data)
 				logerror("%06X:bitlatches_w(%X) = %X\n", activecpu_get_pc(), offset, data);
 			break;
-		
+
 		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
@@ -276,13 +276,13 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* CMOS/ZPRAM extra enable latch; only low bit is used */
 		case 2:
 			break;
-	
+
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
 				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", activecpu_get_pc(), offset, data);
 			break;
-	
+
 		/* ROM bank selection on Zeus 2 */
 		case 5:
 			memory_set_bank(1, bitlatch[offset] & 3);
@@ -326,31 +326,31 @@ static READ32_HANDLER( crusnexo_leds_r )
 static WRITE32_HANDLER( crusnexo_leds_w )
 {
 	int bit, led;
-	
+
 	switch (offset)
 	{
 		case 0:	/* unknown purpose */
 			break;
-		
+
 		case 1:	/* controls lamps */
 			for (bit = 0; bit < 8; bit++)
 				output_set_lamp_value(bit, (data >> bit) & 1);
 			break;
-		
+
 		case 2:	/* sets state of selected LEDs */
-		
+
 			/* selection bits 4-6 select the 3 7-segment LEDs */
 			for (bit = 4; bit < 7; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
 					output_set_digit_value(bit, ~data & 0xff);
-			
+
 			/* selection bits 0-2 select the tachometer LEDs */
 			for (bit = 0; bit < 3; bit++)
 				if ((crusnexo_leds_select & (1 << bit)) == 0)
 					for (led = 0; led < 8; led++)
 						output_set_led_value(bit * 8 + led, (~data >> led) & 1);
 			break;
-		
+
 		case 3:	/* selects which set of LEDs we are addressing */
 			crusnexo_leds_select = data;
 			break;
@@ -612,40 +612,40 @@ ADDRESS_MAP_END
 
 /*
 
-	mk4:
+    mk4:
 
-		writes to 9D0000: 00000009, FFFFFFFF
-		reads from 9D0000
-		writes to 9D0001: 00000000
-		writes to 9D0003: 00000374
-		writes to 9D0005: 00000000
+        writes to 9D0000: 00000009, FFFFFFFF
+        reads from 9D0000
+        writes to 9D0001: 00000000
+        writes to 9D0003: 00000374
+        writes to 9D0005: 00000000
 
-	crusnexo:
-	
-		reads from 8A0000
-	
-		writes to 9D0000: 00000000, 00000008, 00000009, FFFFFFFF
-		reads from 9D0000
-		writes to 9D0001: 00000000, 00000004, 00000204
-		writes to 9D0003: 00000374
-			-- hard coded to $374 at startup
-		writes to 9D0004: 0000000F
-			-- hard coded to $F at startup
+    crusnexo:
 
-		writes to 9E0008: 00000000
-		
-		writes to 9E8000: 00810081
-		
-	thegrid:
-	
-		writes to 9D0000: 00000008, 00000009, 0000008D
-		writes to 9D0001: 00000000, 00000004, 00000204
-		writes to 9D0003: 00000354
-		reads from 9D0003
-		writes to 9D0004: FFFFFFFF
-		writes to 9D0005: 00000000
-		
-		writes to 9E8000: 00810081
+        reads from 8A0000
+
+        writes to 9D0000: 00000000, 00000008, 00000009, FFFFFFFF
+        reads from 9D0000
+        writes to 9D0001: 00000000, 00000004, 00000204
+        writes to 9D0003: 00000374
+            -- hard coded to $374 at startup
+        writes to 9D0004: 0000000F
+            -- hard coded to $F at startup
+
+        writes to 9E0008: 00000000
+
+        writes to 9E8000: 00810081
+
+    thegrid:
+
+        writes to 9D0000: 00000008, 00000009, 0000008D
+        writes to 9D0001: 00000000, 00000004, 00000204
+        writes to 9D0003: 00000354
+        reads from 9D0003
+        writes to 9D0004: FFFFFFFF
+        writes to 9D0005: 00000000
+
+        writes to 9E8000: 00810081
 */
 
 
@@ -950,7 +950,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_START
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM( keypad_r, "KEYPAD" )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START_TAG("KEYPAD")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* keypad 3 */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	/* keypad 1 */

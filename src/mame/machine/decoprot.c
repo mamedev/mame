@@ -701,9 +701,9 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 			return deco16_prot_ram[0x104>>1];
 		case 0x3a8 >> 1: /* See 93e4/9376 */
 			return deco16_prot_ram[0x500>>1];
-					
-		// The top byte of 0x50c is used as a bitmask of completed levels, 
-		// checked at end of each (0x0100 = level 1 completed, 
+
+		// The top byte of 0x50c is used as a bitmask of completed levels,
+		// checked at end of each (0x0100 = level 1 completed,
 		// 0x3000 = levels 5 & 6 completed, 0x3f00 = levels 1-6 completed, etc)
 		case 0x56c >> 1:
 			return deco16_prot_ram[0x50c>>1];

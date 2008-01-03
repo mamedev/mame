@@ -93,7 +93,7 @@ static const char *maple_names[] =
 	"5f6cb0", "5f6cb4", "5f6cb8", "5f6cbc",
 	"5f6cc0", "5f6cc4", "5f6cc8", "5f6ccc",
 	"5f6cd0", "5f6cd4", "5f6cd8", "5f6cdc",
-	"5f6ce0", "5f6ce4", 
+	"5f6ce0", "5f6ce4",
 	"MSB select", "5f6cec", "5f6cf0",
 	"Txd address counter",
 	"Rxd address counter",
@@ -141,7 +141,7 @@ READ64_HANDLER( dc_sysctrl_r )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
@@ -155,7 +155,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
@@ -169,7 +169,7 @@ READ64_HANDLER( dc_maple_r )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	return (UINT64)maple_regs[reg] << shift;
@@ -179,7 +179,7 @@ WRITE64_HANDLER( dc_maple_w )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_MAPLE

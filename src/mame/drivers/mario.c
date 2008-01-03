@@ -1,19 +1,19 @@
 /***************************************************************************
 
 TODO:
-	- combine memory maps
-	- discrete sound
-	- combine sh_* writes into one routine
+    - combine memory maps
+    - discrete sound
+    - combine sh_* writes into one routine
 
-Done:	
-	- fixed mario0110u1gre
-	- rewrote driver, separate MACHINE_DRIVER(mario_audio)
-	- palette from schematics
-	- video timing from schematics
-	- driver configuration switch Nintendo/Std Monitor
-	- got rid of COLORTABLE
-	- clocks as defines in .h
-	- use XTAL_*
+Done:
+    - fixed mario0110u1gre
+    - rewrote driver, separate MACHINE_DRIVER(mario_audio)
+    - palette from schematics
+    - video timing from schematics
+    - driver configuration switch Nintendo/Std Monitor
+    - got rid of COLORTABLE
+    - clocks as defines in .h
+    - use XTAL_*
 
 Mario Bros memory map (preliminary):
 
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( mario )
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
 	PORT_CONFSETTING(    0x00, "Nintendo" )
 	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
-	
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marioo )

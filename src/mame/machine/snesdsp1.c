@@ -6,7 +6,7 @@
 
   Original C++ "dsp1emul.cpp" by Andreas Naive
   Based on research by Overload, The Dumper, Neviksti and Andreas Naive
-  MAME/MESS C conversion by R. Belmont 
+  MAME/MESS C conversion by R. Belmont
 
   This is up to date with the source version dated June 2006.
 
@@ -62,7 +62,7 @@ static struct SharedData { // some RAM variables shared between commands
         INT16 Nx, Ny, Nz;    // normal vector to the screen (norm 1, points toward the center of projection)
         INT16 Gx, Gy, Gz;    // center of the screen (global coordinates)
         INT16 Hx, Hy;        // horizontal vector of the screen (Hz=0, norm 1, points toward the right of the screen)
-        INT16 Vx, Vy, Vz;    // vertical vector of the screen (norm 1, points toward the top of the screen) 
+        INT16 Vx, Vy, Vz;    // vertical vector of the screen (norm 1, points toward the top of the screen)
 
 } shared;
 
@@ -296,7 +296,7 @@ static void DSP1_fsmStep(UINT8 read, UINT8 *data)
 
 // The info on this table follows Overload's docs.
 
-static const struct DSP1_Command mCommandTable[0x40] = 
+static const struct DSP1_Command mCommandTable[0x40] =
 {
    {&DSP1_multiply, 2, 1},   //0x00
    {&DSP1_attitudeA, 4, 0},    //0x01
@@ -523,7 +523,7 @@ static void DSP1_distance(INT16 *input, INT16 *output)
 
    INT32 Radius = X * X + Y * Y + Z * Z;
 
-   
+
    if (Radius == 0) Distance = 0;
    else
    {
@@ -540,7 +540,7 @@ static void DSP1_distance(INT16 *input, INT16 *output)
 
 #if DSP1_VERSION < 0x0102
 		if (Pos & 1) *Distance -= (Node2 - Node1);
-#endif		
+#endif
 		*Distance >>= (E >> 1);
    }
 }
@@ -606,7 +606,7 @@ static void DSP1_polar(INT16 *input, INT16 *output)
    X = (X1 * DSP1_cos(Ay) >> 15) - (Z1 * DSP1_sin(Ay) >> 15);
    *X2 = X; Z1 = Z;
 
-   // Rotate Around X	
+   // Rotate Around X
    Y = (Z1 * DSP1_sin(Ax) >> 15) + (Y1 * DSP1_cos(Ax) >> 15);
    Z = (Z1 * DSP1_cos(Ax) >> 15) - (Y1 * DSP1_sin(Ax) >> 15);
    *Y2 = Y; *Z2 = Z;
@@ -971,9 +971,9 @@ static void DSP1_gyrate(INT16 *input, INT16 *output)
 //////////////////////////////////////////////////////////////////
 
 static const INT16 DSP1_MaxAZS_Exp[16] = {
-   0x38b4, 0x38b7, 0x38ba, 0x38be, 0x38c0, 0x38c4, 0x38c7, 0x38ca,	
+   0x38b4, 0x38b7, 0x38ba, 0x38be, 0x38c0, 0x38c4, 0x38c7, 0x38ca,
    0x38ce, 0x38d0, 0x38d4, 0x38d7, 0x38da, 0x38dd, 0x38e0, 0x38e4
-};		
+};
 
 //////////////////////////////////////////////////////////////////
 
@@ -1033,14 +1033,14 @@ static void DSP1_parameter(INT16 *input, INT16 *output)
    shared.Hx = shared.CosAas*0x7fff>>15;
    shared.Hy = shared.SinAas*0x7fff>>15;
 
-   // vertical vector of the screen (norm 1, points toward the top of the screen) 
+   // vertical vector of the screen (norm 1, points toward the top of the screen)
    shared.Vx = shared.CosAzs*-shared.SinAas>>15;
    shared.Vy = shared.CosAzs*shared.CosAas>>15;
    shared.Vz = -shared.SinAzs*0x7fff>>15;
 
    LfeNx = Lfe*shared.Nx>>15;
    LfeNy = Lfe*shared.Ny>>15;
-   LfeNz = Lfe*shared.Nz>>15;  
+   LfeNz = Lfe*shared.Nz>>15;
 
    // Center of Projection
    shared.CentreX = Fx+LfeNx;
@@ -1080,7 +1080,7 @@ static void DSP1_parameter(INT16 *input, INT16 *output)
 
    // calculate the separation of (cx, cy) from the projection of
    // the 'centre of projection' over the ground... (CentreZ*tg(AZS))
-   inverse(shared.CosAZS, 0, &shared.SecAZS_C1, &shared.SecAZS_E1);	
+   inverse(shared.CosAZS, 0, &shared.SecAZS_C1, &shared.SecAZS_E1);
    normalize(C * shared.SecAZS_C1 >> 15, &C, &E);
    E += shared.SecAZS_E1;
    C = denormalizeAndClip(C, E) * shared.SinAZS >> 15;
@@ -1104,7 +1104,7 @@ static void DSP1_parameter(INT16 *input, INT16 *output)
       // we have only some few Taylor coefficients, so we cannot guess which ones
       // are the approximated functions and, what is worse, we don't know why
       // the own clipping stuff (and, particularly, this correction) is done
-      if (Azs == -32768) Azs = -32767;	
+      if (Azs == -32768) Azs = -32767;
 
       C = Azs - MaxAZS;
       if (C >= 0) C--;
@@ -1139,7 +1139,7 @@ static void DSP1_parameter(INT16 *input, INT16 *output)
    *Vva = denormalizeAndClip(-C, E);
 
    // Store Secant of clipped Zenith angle
-   inverse(shared.CosAZS, 0, &shared.SecAZS_C2, &shared.SecAZS_E2);	
+   inverse(shared.CosAZS, 0, &shared.SecAZS_C2, &shared.SecAZS_E2);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -1207,7 +1207,7 @@ static void DSP1_raster(INT16 *input, INT16 *output)
 // the centre of projection.
 // The only special point to take into account is the directions on the screen:
 // H is positive rightward, but V is positive downward; this is why
-// the signs take that configuration 
+// the signs take that configuration
 
 static void DSP1_target(INT16 *input, INT16 *output)
 {
@@ -1446,13 +1446,13 @@ static void normalize(INT16 m, INT16 *Coefficient, INT16 *Exponent)
    INT16 e = 0;
 
    if (m < 0)
-      while ((m & i) && i) 
+      while ((m & i) && i)
    {
       i >>= 1;
       e++;
    }
    else
-      while (!(m & i) && i) 
+      while (!(m & i) && i)
    {
       i >>= 1;
       e++;
@@ -1478,13 +1478,13 @@ static void normalizeDouble(INT32 Product, INT16 *Coefficient, INT16 *Exponent)
    INT16 e = 0;
 
    if (m < 0)
-      while ((m & i) && i) 
+      while ((m & i) && i)
    {
       i >>= 1;
       e++;
    }
    else
-      while (!(m & i) && i) 
+      while (!(m & i) && i)
    {
       i >>= 1;
       e++;
@@ -1501,13 +1501,13 @@ static void normalizeDouble(INT32 Product, INT16 *Coefficient, INT16 *Exponent)
          i = 0x4000;
 
          if (m < 0)
-            while ((n & i) && i) 
+            while ((n & i) && i)
          {
             i >>= 1;
             e++;
          }
          else
-            while (!(n & i) && i) 
+            while (!(n & i) && i)
          {
             i >>= 1;
             e++;

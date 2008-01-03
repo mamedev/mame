@@ -259,14 +259,14 @@ MACHINE_DRIVER_START( mario_audio )
 	MDRV_CPU_ADD(I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
-	
+
 	MDRV_SOUND_START(mario)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	
+
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -277,11 +277,11 @@ MACHINE_DRIVER_START( masao_audio )
 
 	MDRV_CPU_ADD(Z80,24576000/16) /* audio CPU */	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map,0)
-	
+
 	MDRV_SOUND_START(mario)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(AY8910, 14318000/6)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

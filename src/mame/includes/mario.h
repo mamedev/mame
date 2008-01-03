@@ -4,7 +4,7 @@
 /*
  * From the schematics:
  *
- * Video generation like dkong/dkongjr. However, clock is 24MHZ 
+ * Video generation like dkong/dkongjr. However, clock is 24MHZ
  * 7C -> 100 => 256 - 124 = 132 ==> 264 Scanlines
  */
 

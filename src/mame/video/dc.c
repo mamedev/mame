@@ -49,7 +49,7 @@ READ64_HANDLER( pvr_ctrl_r )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
@@ -63,7 +63,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
@@ -77,7 +77,7 @@ READ64_HANDLER( pvr_ta_r )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRTA
@@ -91,7 +91,7 @@ WRITE64_HANDLER( pvr_ta_w )
 {
 	int reg;
 	UINT64 shift;
-	
+
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRTA

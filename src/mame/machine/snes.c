@@ -630,10 +630,10 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
 		snes_w_io( address, data );
 	else if( address >= 0x6000 && address <= 0x7fff )
-	{								
+	{
 		if( snes_cart.mode == SNES_MODE_20 )			/* Reserved */
 			logerror( "Attempt to write to reserved address: %X\n", offset );
-		else /* MODE_21 */  
+		else /* MODE_21 */
 		{
 			int mask;
 
@@ -658,7 +658,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 	{
 		DSP1_setDr(data);
 		return;
-	}	
+	}
 }
 
 /* 0x800000 - 0xffffff */
