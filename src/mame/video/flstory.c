@@ -127,13 +127,6 @@ WRITE8_HANDLER( victnine_gfxctrl_w )
 
 }
 
-#ifdef UNUSED_FUNCTION
-READ8_HANDLER( flstory_scrlram_r )
-{
-	return flstory_scrlram[offset];
-}
-#endif
-
 WRITE8_HANDLER( flstory_scrlram_w )
 {
 	flstory_scrlram[offset] = data;
