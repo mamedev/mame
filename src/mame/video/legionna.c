@@ -319,31 +319,31 @@ VIDEO_UPDATE( legionna )
 if (input_code_pressed_once (KEYCODE_Z))
 	{
 		dislayer[0] ^= 1;
-		ui_popup("bg0: %01x",dislayer[0]);
+		popmessage("bg0: %01x",dislayer[0]);
 	}
 
 	if (input_code_pressed_once (KEYCODE_X))
 	{
 		dislayer[1] ^= 1;
-		ui_popup("bg1: %01x",dislayer[1]);
+		popmessage("bg1: %01x",dislayer[1]);
 	}
 
 	if (input_code_pressed_once (KEYCODE_C))
 	{
 		dislayer[2] ^= 1;
-		ui_popup("bg2: %01x",dislayer[2]);
+		popmessage("bg2: %01x",dislayer[2]);
 	}
 
 	if (input_code_pressed_once (KEYCODE_V))
 	{
 		dislayer[3] ^= 1;
-		ui_popup("sprites: %01x",dislayer[3]);
+		popmessage("sprites: %01x",dislayer[3]);
 	}
 
 	if (input_code_pressed_once (KEYCODE_B))
 	{
 		dislayer[4] ^= 1;
-		ui_popup("text: %01x",dislayer[4]);
+		popmessage("text: %01x",dislayer[4]);
 	}
 #endif
 

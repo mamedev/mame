@@ -807,28 +807,6 @@ void ui_draw_text_box(const char *text, int justify, float xpos, float ypos, rgb
 
 
 /*-------------------------------------------------
-    ui_popup - popup a message for a standard
-    amount of time
--------------------------------------------------*/
-
-void CLIB_DECL ui_popup(const char *text, ...)
-{
-	int seconds;
-	va_list arg;
-
-	/* extract the text */
-	va_start(arg,text);
-	vsprintf(messagebox_text, text, arg);
-	messagebox_backcolor = UI_FILLCOLOR;
-	va_end(arg);
-
-	/* set a timer */
-	seconds = (int)strlen(messagebox_text) / 40 + 2;
-	popup_text_end = osd_ticks() + osd_ticks_per_second() * seconds;
-}
-
-
-/*-------------------------------------------------
     ui_popup_time - popup a message for a specific
     amount of time
 -------------------------------------------------*/

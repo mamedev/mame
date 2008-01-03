@@ -511,7 +511,7 @@ static READ8_HANDLER( dkong_in2_r )
 	if  (!lst && (readinputportbytag("TST") & 0x01))
 	{
 		ui_snd = (ui_snd + 1) % 10;
-		ui_popup("Sound %d", ui_snd);
+		popmessage("Sound %d", ui_snd);
 	}
 	lst = readinputportbytag("TST") & 0x01;
 	if (ui_snd<8)

@@ -369,10 +369,10 @@ void mame_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
 /* ----- miscellaneous bits & pieces ----- */
 
 /* pop-up a user visible message */
-void CLIB_DECL popmessage(const char *text,...) ATTR_PRINTF(1,2);
+void CLIB_DECL popmessage(const char *format,...) ATTR_PRINTF(1,2);
 
 /* log to the standard error.log file */
-void CLIB_DECL logerror(const char *text,...) ATTR_PRINTF(1,2);
+void CLIB_DECL logerror(const char *format,...) ATTR_PRINTF(1,2);
 
 /* adds a callback to be called on logerror() */
 void add_logerror_callback(running_machine *machine, void (*callback)(running_machine *, const char *));

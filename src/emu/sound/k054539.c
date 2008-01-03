@@ -377,7 +377,7 @@ else
 		if (input_code_pressed_once(KEYCODE_DEL_PAD))
 		{
 			gc_active ^= 1;
-			if (!gc_active) ui_popup_time(0, " ");
+			if (!gc_active) popmessage(NULL);
 		}
 
 		if (gc_active)

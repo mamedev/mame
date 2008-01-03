@@ -1153,18 +1153,26 @@ void CLIB_DECL fatalerror_exitcode(int exitcode, const char *text, ...)
     popmessage - pop up a user-visible message
 -------------------------------------------------*/
 
-void CLIB_DECL popmessage(const char *text, ...)
+void CLIB_DECL popmessage(const char *format, ...)
 {
-	extern void CLIB_DECL ui_popup(const char *text, ...) ATTR_PRINTF(1,2);
-	va_list arg;
+	/* if the format is NULL, it is a signal to clear the popmessage */
+	if (format == NULL)
+		ui_popup_time(0, " ");
+	
+	/* otherwise, generate the buffer and call the UI to display the message */
+	else
+	{
+		extern void CLIB_DECL ui_popup(const char *format, ...) ATTR_PRINTF(1,2);
+		va_list arg;
+		
+		/* dump to the buffer */
+		va_start(arg, format);
+		vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
+		va_end(arg);
 
-	/* dump to the buffer */
-	va_start(arg, text);
-	vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
-	va_end(arg);
-
-	/* pop it in the UI */
-	ui_popup("%s", giant_string_buffer);
+		/* pop it in the UI */
+		ui_popup_time((int)strlen(giant_string_buffer) / 40 + 2, "%s", giant_string_buffer);
+	}
 }
 
 
@@ -1173,7 +1181,7 @@ void CLIB_DECL popmessage(const char *text, ...)
     OSD-defined output streams
 -------------------------------------------------*/
 
-void CLIB_DECL logerror(const char *text, ...)
+void CLIB_DECL logerror(const char *format, ...)
 {
 	running_machine *machine = Machine;
 
@@ -1191,8 +1199,8 @@ void CLIB_DECL logerror(const char *text, ...)
 			profiler_mark(PROFILER_LOGERROR);
 
 			/* dump to the buffer */
-			va_start(arg, text);
-			vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, text, arg);
+			va_start(arg, format);
+			vsnprintf(giant_string_buffer, GIANT_STRING_BUFFER_SIZE, format, arg);
 			va_end(arg);
 
 			/* log to all callbacks */
