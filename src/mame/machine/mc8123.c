@@ -62,7 +62,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-0042 Opa Opa                                      B31FD0  1C00
 317-0043 Wonder Boy Monster Land                      640708  1C00
 317-0054 Shinobi (sound CPU)       NEC MC-8123B 652   088992  1800
-317-0057 Fantasy Zone 2                               ADFACE    1800
+317-0057 Fantasy Zone 2                               ADFACE  1800
 317-0064 Ufo Senshi Yohko Chan                        880603  1C00
 317-0066 Altered Beast (sound CPU)                    ED8600  1800
 317-5012 Ganbare Chinsan Ooshoubu  NEC MC-8123A       804B54  1C00
@@ -77,374 +77,288 @@ CPU #    Game                      Notes              Seed   Upper Limit
 
 static int decrypt_type0(int val,int param,int swap)
 {
-	int a = val;
+	if (swap == 0) val = BITSWAP8(val,7,5,3,1,2,0,6,4);
+	if (swap == 1) val = BITSWAP8(val,5,3,7,2,1,0,4,6);
+	if (swap == 2) val = BITSWAP8(val,0,3,4,6,7,1,5,2);
+	if (swap == 3) val = BITSWAP8(val,0,7,3,2,6,4,1,5);
 
-	if (swap == 1) a = BITSWAP8(a,5,4,3,6,7,1,2,0);
-	if (swap == 2) a = BITSWAP8(a,0,5,3,2,4,7,6,1);
-	if (swap == 3) a = BITSWAP8(a,0,1,7,5,3,6,2,4);
+	if (BIT(param,3) && BIT(val,7))
+		val ^= (1<<5)|(1<<3)|(1<<0);
 
-	val = 0x1c;
-	if (BIT(a,0)) val ^= 0x23;
-	if (BIT(a,1)) val ^= 0x08;
-	if (BIT(a,2)) val ^= 0x04;
-	if (BIT(a,3)) val ^= 0x20;
-	if (BIT(a,4)) val ^= 0x01;
-	if (BIT(a,6)) val ^= 0x10;
-	if (BIT(a,5))
-	{
-		val ^= 0x73;
+	if (BIT(param,2) && BIT(val,6))
+		val ^= (1<<7)|(1<<2)|(1<<1);
 
-		if (param & 0x40)
-		{
-			val ^= 0xb3;
-			if (param & 0x01) val ^= 0x40;
-			if (param & 0x04) val ^= 0x40;
-			if (param & 0x08) val ^= 0x40;
-		}
-		if (~param & 0x02)
-		{
-			val ^= 0xb3;
-			if (param & 0x01) val ^= 0x40;
-			if (param & 0x04) val ^= 0x40;
-			if (param & 0x08) val ^= 0x40;
-		}
-		if (param & 0x01)
-		{
-			val ^= 0xb3;
-			if (param & 0x01) val ^= 0x40;
-			if (param & 0x04) val ^= 0x40;
-			if (param & 0x08) val ^= 0x40;
-		}
-	}
+	if (BIT(val,6)) val ^= (1<<7);
 
-	if (BIT(a,7))
-	{
-		val ^= 0x80;
+	if (BIT(param,1) && BIT(val,7))
+		val ^= (1<<6);
 
-		if (param & 0x01) val ^= 0x40;
-		if (param & 0x02) val ^= 0x25;
-		if (param & 0x04) val ^= 0x40;
-		if (param & 0x08) val ^= 0x40;
-		if (param & 0x40) val ^= 0x25;
-		if (param & 0x80) val ^= 0x25;
-	}
+	if (BIT(val,2)) val ^= (1<<5)|(1<<0);
 
-	if (param & 0x01) val ^= 0xe3;
-	if (param & 0x02) val ^= 0x23;
-	if (param & 0x04) val ^= 0xc0;
-	if (param & 0x08) val ^= 0xc0;
-	if (param & 0x40) val ^= 0x23;
+	val ^= (1<<4)|(1<<3)|(1<<1);
 
-	if (param & 0x01)
-		val ^= 0x21;
-	else
-		val = BITSWAP8(val,7,6,5,3,2,1,4,0);
+	if (BIT(param,2)) val ^= (1<<5)|(1<<2)|(1<<0);
+	if (BIT(param,1)) val ^= (1<<7)|(1<<6);
+	if (BIT(param,0)) val ^= (1<<5)|(1<<0);
+
+	if (BIT(param,0)) val = BITSWAP8(val,7,6,5,1,4,3,2,0);
 
 	return val;
 }
 
-static int decrypt_type1(int val,int param,int swap)
+
+static int decrypt_type1a(int val,int param,int swap)
 {
-	if (BIT(~param,2) ^ BIT(param,0))
+	if (swap == 0) val = BITSWAP8(val,4,2,6,5,3,7,1,0);
+	if (swap == 1) val = BITSWAP8(val,6,0,5,4,3,2,1,7);
+	if (swap == 2) val = BITSWAP8(val,2,3,6,1,4,0,7,5);
+	if (swap == 3) val = BITSWAP8(val,6,5,1,3,2,7,0,4);
+
+	if (BIT(param,2)) val = BITSWAP8(val,7,6,1,5,3,2,4,0);
+
+	if (BIT(val,1)) val ^= (1<<0);
+	if (BIT(val,6)) val ^= (1<<3);
+	if (BIT(val,7)) val ^= (1<<6)|(1<<3);
+	if (BIT(val,2)) val ^= (1<<6)|(1<<3)|(1<<1);
+	if (BIT(val,4)) val ^= (1<<7)|(1<<6)|(1<<2);
+
+	if (BIT(val,7) ^ BIT(val,2))
+		val ^= (1<<4);
+
+	val ^= (1<<6)|(1<<3)|(1<<1)|(1<<0);
+
+	if (BIT(param,3)) val ^= (1<<7)|(1<<2);
+	if (BIT(param,1)) val ^= (1<<6)|(1<<3);
+
+	if (BIT(param,0)) val = BITSWAP8(val,7,6,1,4,3,2,5,0);
+
+	return val;
+}
+
+static int decrypt_type1b(int val,int param,int swap)
+{
+	if (swap == 0) val = BITSWAP8(val,1,0,3,2,5,6,4,7);
+	if (swap == 1) val = BITSWAP8(val,2,0,5,1,7,4,6,3);
+	if (swap == 2) val = BITSWAP8(val,6,4,7,2,0,5,1,3);
+	if (swap == 3) val = BITSWAP8(val,7,1,3,6,0,2,5,4);
+
+	if (BIT(val,2) && BIT(val,0))
+		val ^= (1<<7)|(1<<4);
+
+	if (BIT(val,7)) val ^= (1<<2);
+	if (BIT(val,5)) val ^= (1<<7)|(1<<2);
+	if (BIT(val,1)) val ^= (1<<5);
+	if (BIT(val,6)) val ^= (1<<1);
+	if (BIT(val,4)) val ^= (1<<6)|(1<<5);
+	if (BIT(val,0)) val ^= (1<<6)|(1<<2)|(1<<1);
+	if (BIT(val,3)) val ^= (1<<7)|(1<<6)|(1<<2)|(1<<1)|(1<<0);
+
+	val ^= (1<<6)|(1<<4)|(1<<0);
+
+	if (BIT(param,3)) val ^= (1<<4)|(1<<1);
+	if (BIT(param,2)) val ^= (1<<7)|(1<<6)|(1<<3)|(1<<0);
+	if (BIT(param,1)) val ^= (1<<4)|(1<<3);
+	if (BIT(param,0)) val ^= (1<<6)|(1<<2)|(1<<1)|(1<<0);
+
+	return val;
+}
+
+static int decrypt_type2a(int val,int param,int swap)
+{
+	if (swap == 0) val = BITSWAP8(val,0,1,4,3,5,6,2,7);
+	if (swap == 1) val = BITSWAP8(val,6,3,0,5,7,4,1,2);
+	if (swap == 2) val = BITSWAP8(val,1,6,4,5,0,3,7,2);
+	if (swap == 3) val = BITSWAP8(val,4,6,7,5,2,3,1,0);
+
+	if (BIT(val,3) || (BIT(param,1) && BIT(val,2)))
+		val = BITSWAP8(val,6,0,7,4,3,2,1,5);
+
+	if (BIT(val,5)) val ^= (1<<7);
+	if (BIT(val,6)) val ^= (1<<5);
+	if (BIT(val,0)) val ^= (1<<6);
+	if (BIT(val,4)) val ^= (1<<3)|(1<<0);
+	if (BIT(val,1)) val ^= (1<<2);
+
+	val ^= (1<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<1);
+
+	if (BIT(param,2)) val ^= (1<<4)|(1<<3)|(1<<2)|(1<<1)|(1<<0);
+
+	if (BIT(param,3))
 	{
-		int a = val;
-
-		if (swap == 0) a = BITSWAP8(a,7,4,2,0,5,3,6,1);
-		if (swap == 1) a = BITSWAP8(a,2,6,0,7,4,3,5,1);
-		if (swap == 2) a = BITSWAP8(a,0,2,3,5,1,4,6,7);
-
-		if (BIT(~param,6) ^ BIT(param,1) ^ BIT(param,0))
-			a = BITSWAP8(a,7,6,5,4,0,2,3,1);
-
-		val = 0x4b;
-		if (BIT(a,0)) val ^= 0x20;
-		if (BIT(a,1)) val ^= 0xd4;
-		if (BIT(a,2)) val ^= 0x08;
-		if (BIT(a,3)) val ^= 0x03;
-		if (BIT(a,4)) val ^= 0x01;
-		if (BIT(a,5)) val ^= 0x48;
-		if (BIT(a,6)) val ^= 0xd8;
-		if (BIT(a,7)) val ^= 0x5e;
-
-		if (param & 0x01) val ^= 0x48;
-		if (param & 0x02) val ^= 0x84;
-		if (param & 0x04) val ^= 0x48;
-		if (param & 0x08) val ^= 0x48;
-		if (param & 0x40) val ^= 0x84;
-		if (param & 0x80) val ^= 0x84;
-
-		if (param & 0x01) val = BITSWAP8(val,7,6,1,4,3,2,5,0);
-
-		return val;
+		if (BIT(param,0))
+			val = BITSWAP8(val,7,6,5,3,4,1,2,0);
+		else
+			val = BITSWAP8(val,7,6,5,1,2,4,3,0);
 	}
 	else
 	{
-		int a = val;
-
-		if (swap == 1) a = BITSWAP8(a,3,4,7,6,5,1,2,0);
-		if (swap == 2) a = BITSWAP8(a,3,5,0,1,7,2,6,4);
-		if (swap == 3) a = BITSWAP8(a,4,2,0,5,3,6,7,1);
-
-		val = 0x51;
-		if (BIT(a,0)) val ^= 0x42;
-		if (BIT(a,1)) val ^= 0x84;
-		if (BIT(a,2)) val ^= 0x70;
-		if (BIT(a,3)) val ^= 0xa4;
-		if (BIT(a,4)) val ^= 0x22;
-		if (BIT(a,5)) val ^= 0xcf;
-		if (BIT(a,6)) val ^= 0x04;
-		if (BIT(a,7)) val ^= 0x47;
-
-		if (BIT(a,7) && BIT(a,6))
-			val ^= 0xf4;
-
-		if (param & 0x01) val ^= 0x96;
-		if (param & 0x02) val ^= 0xdb;
-		if (param & 0x04) val ^= 0x18;
-		if (param & 0x08) val ^= 0x18;
-		if (param & 0x40) val ^= 0xdb;
-		if (param & 0x80) val ^= 0x12;
-
-		return val;
+		if (BIT(param,0))
+			val = BITSWAP8(val,7,6,5,2,1,3,4,0);
 	}
+
+	return val;
 }
 
-static int decrypt_type2(int val,int param,int swap)
+static int decrypt_type2b(int val,int param,int swap)
 {
-	if (BIT(~param,2) ^ BIT(param,0))
-	{
-		int a = val;
+	// only 0x20 possible encryptions for this method - all others have 0x40
+	// this happens because BIT(param,2) cancels the other three
 
-		if (swap == 1) a = BITSWAP8(a,2,4,7,0,5,1,3,6);
-		if (swap == 2) a = BITSWAP8(a,2,3,0,4,5,7,6,1);
-		if (swap == 3) a = BITSWAP8(a,0,3,2,7,5,1,6,4);
+	if (swap == 0) val = BITSWAP8(val,1,3,4,6,5,7,0,2);
+	if (swap == 1) val = BITSWAP8(val,0,1,5,4,7,3,2,6);
+	if (swap == 2) val = BITSWAP8(val,3,5,4,1,6,2,0,7);
+	if (swap == 3) val = BITSWAP8(val,5,2,3,0,4,7,6,1);
 
-		val = 0xea;
-		if (BIT(a,0)) val ^= 0xa0;
-		if (BIT(a,1)) val ^= 0x80;
-		if (BIT(a,2)) val ^= 0x18;
-		if (BIT(a,3)) val ^= 0x07;
-		if (BIT(a,4)) val ^= 0x41;
-		if (BIT(a,5)) val ^= 0x04;
-		if (BIT(a,6)) val ^= 0x10;
-		if (BIT(a,7)) val ^= 0x60;
+	if (BIT(val,7) && BIT(val,3))
+		val ^= (1<<6)|(1<<4)|(1<<0);
 
-		if (!BIT(a,5) && ((~param & 0x08) || !BIT(a,6)))
-		{
-			if (BIT(a,0)) val ^= 0x20;
-			if (BIT(a,7)) val ^= 0x21;
-			if (BIT(a,1)) val ^= 0xe0;
-			if (BIT(a,4)) val ^= 0xe1;
-		}
+	if (BIT(val,7)) val ^= (1<<2);
+	if (BIT(val,5)) val ^= (1<<7)|(1<<3);
+	if (BIT(val,1)) val ^= (1<<5);
+	if (BIT(val,4)) val ^= (1<<7)|(1<<5)|(1<<3)|(1<<1);
 
-		if (param & 0x01) val ^= 0x1f;
-		if (param & 0x02) val ^= 0x1f;
-		if (param & 0x40) val ^= 0x1f;
+	if (BIT(val,7) && BIT(val,5))
+		val ^= (1<<4)|(1<<0);
 
-		if (BIT(param,6) ^ BIT(param,1) ^ BIT(param,7))
-		{
-			if (param & 0x01)
-				val = BITSWAP8(val,7,6,5,2,1,3,4,0);
-			else
-				val = BITSWAP8(val,7,6,5,3,4,1,2,0);
-		}
-		else
-		{
-			if (~param & 0x01)
-				val = BITSWAP8(val,7,6,5,1,2,4,3,0);
-		}
+	if (BIT(val,5) && BIT(val,1))
+		val ^= (1<<4)|(1<<0);
 
-		return val;
-	}
-	else
-	{
-		// only 0x20 possible encryptions for this method - all others have 0x40
+	if (BIT(val,6)) val ^= (1<<7)|(1<<5);
+	if (BIT(val,3)) val ^= (1<<7)|(1<<6)|(1<<5)|(1<<1);
+	if (BIT(val,2)) val ^= (1<<3)|(1<<1);
 
-		int a = val;
+	val ^= (1<<7)|(1<<3)|(1<<2)|(1<<1);
 
-		if (swap == 1) a = BITSWAP8(a,3,4,7,5,1,6,0,2);
-		if (swap == 2) a = BITSWAP8(a,2,1,6,4,5,7,3,0);
-		if (swap == 3) a = BITSWAP8(a,7,0,4,3,2,1,5,6);
+	if (BIT(param,3)) val ^= (1<<6)|(1<<3)|(1<<1);
+	if (BIT(param,2)) val ^= (1<<7)|(1<<6)|(1<<5)|(1<<3)|(1<<2)|(1<<1);	// same as the other three combined
+	if (BIT(param,1)) val ^= (1<<7);
+	if (BIT(param,0)) val ^= (1<<5)|(1<<2);
 
-		val = 0x0e;
-		if (BIT(a,0)) val ^= 0x33;
-		if (BIT(a,1)) val ^= 0x8e;
-		if (BIT(a,2)) val ^= 0x01;
-		if (BIT(a,3)) val ^= 0xe0;
-		if (BIT(a,4)) val ^= 0x5b;
-		if (BIT(a,5)) val ^= 0xea;
-		if (BIT(a,6)) val ^= 0x58;
-		if (BIT(a,7)) val ^= 0x0e;
-
-		if (BIT(a,1) && BIT(a,5))
-			val ^= 0xa8;
-
-		if (BIT(a,6))
-		{
-			if (BIT(a,0) ^ BIT(a,4) ^ BIT(a,1))
-				val ^= 0x11;
-		}
-		if (BIT(a,1))
-		{
-			if (!BIT(a,5))
-			{
-				if (BIT(a,0) ^ BIT(a,4))
-					val ^= 0x11;
-			}
-		}
-
-		if (param & 0x01) val ^= 0xca;
-		if (param & 0x02) val ^= 0xa4;
-		if (param & 0x08) val ^= 0x80;
-		if (param & 0x40) val ^= 0xa4;
-		if (param & 0x80) val ^= 0x4a;
-
-		return val;
-	}
+	return val;
 }
 
-static int decrypt_type3(int val,int param,int swap)
+static int decrypt_type3a(int val,int param,int swap)
 {
-	if (BIT(~param,2) ^ BIT(param,0))
-	{
-		int a = val;
+	if (swap == 0) val = BITSWAP8(val,5,3,1,7,0,2,6,4);
+	if (swap == 1) val = BITSWAP8(val,3,1,2,5,4,7,0,6);
+	if (swap == 2) val = BITSWAP8(val,5,6,1,2,7,0,4,3);
+	if (swap == 3) val = BITSWAP8(val,5,6,7,0,4,2,1,3);
 
-		if (swap == 0) a = BITSWAP8(a,2,4,7,0,5,1,3,6);
-		if (swap == 2) a = BITSWAP8(a,0,3,2,7,5,1,6,4);
-		if (swap == 3) a = BITSWAP8(a,2,3,0,4,5,7,6,1);
+	if (BIT(val,2)) val ^= (1<<7)|(1<<5)|(1<<4);
+	if (BIT(val,3)) val ^= (1<<0);
 
-		if (BIT(param,6) ^ BIT(param,1) ^ BIT(param,7))
-			a = BITSWAP8(a,7,6,5,4,2,3,1,0);
+	if (BIT(param,0)) val = BITSWAP8(val,7,2,5,4,3,1,0,6);
 
-		if (BIT(a,4))
-			a = BITSWAP8(a,7,6,5,4,2,3,1,0);
+	if (BIT(val,1)) val ^= (1<<6)|(1<<0);
+	if (BIT(val,3)) val ^= (1<<4)|(1<<2)|(1<<1);
 
-		val = 0x78;
-		if (BIT(a,2)) val ^= 0x26;
-		if (BIT(a,3)) val ^= 0x80;
-		if (BIT(a,5)) val ^= 0x10;
-		if (param & 0x01)
-		{
-			if (BIT(a,0)) val ^= 0x04;
-			if (BIT(a,1)) val ^= 0x01;
-			if (BIT(a,4)) val ^= 0x5d;
-			if (BIT(a,6)) val ^= 0x43;
-			if (BIT(a,7)) val ^= 0xf6;
-		}
-		else
-		{
-			if (BIT(a,0)) val ^= 0x43;
-			if (BIT(a,1)) val ^= 0x40;
-			if (BIT(a,4)) val ^= 0x1f;
-			if (BIT(a,6)) val ^= 0x01;
-			if (BIT(a,7)) val ^= 0xb2;
-		}
+	if (BIT(param,3)) val ^= (1<<4)|(1<<3);
 
-		if (param & 0x01) val ^= 0x81;
-		if (param & 0x02) val ^= 0x98;
-		if (param & 0x08) val ^= 0x10;
-		if (param & 0x40) val ^= 0x98;
-		if (param & 0x80) val ^= 0x18;
+	if (BIT(val,3)) val = BITSWAP8(val,5,6,7,4,3,2,1,0);
 
-		return val;
-	}
-	else
-	{
-		int a = val;
+	if (BIT(val,5)) val ^= (1<<2)|(1<<1);
 
-		if (swap == 0) a = BITSWAP8(a,3,4,7,5,1,6,0,2);
-		if (swap == 2) a = BITSWAP8(a,7,0,4,3,2,1,5,6);
-		if (swap == 3) a = BITSWAP8(a,2,1,6,4,5,7,3,0);
+	val ^= (1<<6)|(1<<5)|(1<<4)|(1<<3);
 
-		if (BIT(param,6) ^ BIT(param,1) ^ BIT(param,7))
-		{
-			val = 0xaa;
-			if (param & 0x01) val ^= 0x04;
-			if (param & 0x80) val ^= 0x04;
+	if (BIT(param,2)) val ^= (1<<7);
+	if (BIT(param,1)) val ^= (1<<4);
+	if (BIT(param,0)) val ^= (1<<0);
 
-			if (BIT(a,0)) val ^= 0xd6;
-			if (BIT(a,1)) val ^= 0x30;
-			if (BIT(a,2)) val ^= 0x11;
-			if (BIT(a,3)) val ^= 0x04;
-			if (BIT(a,4)) val ^= 0x08;
-			if (BIT(a,5)) val ^= 0x42;
-			if (BIT(a,6)) val ^= 0xc6;
-			if (BIT(a,7)) val ^= 0x03;
-		}
-		else
-		{
-			val = 0xac;
-			if (param & 0x01) val ^= 0x01;
-			if (param & 0x80) val ^= 0x01;
-
-			if (BIT(a,0)) val ^= 0x54;
-			if (BIT(a,1)) val ^= 0x08;
-			if (BIT(a,2)) val ^= 0x82;
-			if (BIT(a,3)) val ^= 0x01;
-			if (BIT(a,4)) val ^= 0x30;
-			if (BIT(a,5)) val ^= 0x40;
-			if (BIT(a,6)) val ^= 0x52;
-			if (BIT(a,7)) val ^= 0x86;
-		}
-
-		if (param & 0x01) val ^= 0x08;
-		if (param & 0x08) val ^= 0x80;
-
-		if (BIT(a,2) ^ BIT(a,7))
-		{
-			if (BIT(a,4) ^ BIT(a,1))
-				val ^= 0x38;
-
-			if (BIT(a,0) ^ BIT(a,5) ^ BIT(a,6))
-				val ^= 0x02;
-		}
-
-		return val;
-	}
+	return val;
 }
 
+static int decrypt_type3b(int val,int param,int swap)
+{
+	if (swap == 0) val = BITSWAP8(val,3,7,5,4,0,6,2,1);
+	if (swap == 1) val = BITSWAP8(val,7,5,4,6,1,2,0,3);
+	if (swap == 2) val = BITSWAP8(val,7,4,3,0,5,1,6,2);
+	if (swap == 3) val = BITSWAP8(val,2,6,4,1,3,7,0,5);
 
-static int decrypt(int val,int param,int opcode)
+	if (BIT(val,2)) val ^= (1<<7);
+
+	if (BIT(val,7)) val = BITSWAP8(val,7,6,3,4,5,2,1,0);
+
+	if (BIT(param,3)) val ^= (1<<7);
+
+	if (BIT(val,4)) val ^= (1<<6);
+	if (BIT(val,1)) val ^= (1<<6)|(1<<4)|(1<<2);
+
+	if (BIT(val,7) && BIT(val,6))
+		val ^= (1<<1);
+
+	if (BIT(val,7)) val ^= (1<<1);
+
+	if (BIT(param,3)) val ^= (1<<7);
+	if (BIT(param,2)) val ^= (1<<0);
+
+	if (BIT(param,3)) val = BITSWAP8(val,4,6,3,2,5,0,1,7);
+
+	if (BIT(val,4)) val ^= (1<<1);
+	if (BIT(val,5)) val ^= (1<<4);
+	if (BIT(val,7)) val ^= (1<<2);
+
+	val ^= (1<<5)|(1<<3)|(1<<2);
+
+	if (BIT(param,1)) val ^= (1<<7);
+	if (BIT(param,0)) val ^= (1<<3);
+
+	return val;
+}
+
+static int decrypt(int val, int key, int opcode)
 {
 	int type = 0;
 	int swap = 0;
+	int param = 0;
 
-	param ^= 0xff;
+	key ^= 0xff;
 
 	// no encryption
-	if (param == 0x00)
+	if (key == 0x00)
 		return val;
 
-	type ^= BIT(param,0) << 0;
-	type ^= BIT(param,1) << 0;
-	type ^= BIT(param,2) << 0;
-	type ^= BIT(param,4) << 0;
-	type ^= BIT(param,4) << 1;
-	type ^= BIT(param,5) << 1;
+	type ^= BIT(key,0) << 0;
+	type ^= BIT(key,2) << 0;
+	type ^= BIT(key,0) << 1;
+	type ^= BIT(key,1) << 1;
+	type ^= BIT(key,2) << 1;
+	type ^= BIT(key,4) << 1;
+	type ^= BIT(key,4) << 2;
+	type ^= BIT(key,5) << 2;
 
-	swap ^= BIT(param,0) << 0;
-	swap ^= BIT(param,1) << 0;
-	swap ^= BIT(param,2) << 1;
-	swap ^= BIT(param,3) << 1;
+	swap ^= BIT(key,0) << 0;
+	swap ^= BIT(key,1) << 0;
+	swap ^= BIT(key,2) << 1;
+	swap ^= BIT(key,3) << 1;
+
+	param ^= BIT(key,0) << 0;
+	param ^= BIT(key,0) << 1;
+	param ^= BIT(key,2) << 1;
+	param ^= BIT(key,3) << 1;
+	param ^= BIT(key,0) << 2;
+	param ^= BIT(key,1) << 2;
+	param ^= BIT(key,6) << 2;
+	param ^= BIT(key,1) << 3;
+	param ^= BIT(key,6) << 3;
+	param ^= BIT(key,7) << 3;
 
 	if (!opcode)
 	{
-		param ^= 1<<0;
-		param ^= 1<<1;
-		param ^= 1<<3;
-		param ^= 1<<7;
+		param ^= 1 << 0;
+		type ^= 1 << 0;
 	}
 
 	switch (type)
 	{
 		default:
 		case 0: return decrypt_type0(val,param,swap);
-
-		case 1: return decrypt_type1(val,param,swap);
-
-		case 2: return decrypt_type2(val,param,swap);
-
-		case 3: return decrypt_type3(val,param,swap);
+		case 1: return decrypt_type0(val,param,swap);
+		case 2: return decrypt_type1a(val,param,swap);
+		case 3: return decrypt_type1b(val,param,swap);
+		case 4: return decrypt_type2a(val,param,swap);
+		case 5: return decrypt_type2b(val,param,swap);
+		case 6: return decrypt_type3a(val,param,swap);
+		case 7: return decrypt_type3b(val,param,swap);
 	}
 }
 
