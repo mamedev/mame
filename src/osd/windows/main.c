@@ -27,6 +27,7 @@ extern int utf8_main(int argc, char **argv);
 // undo the command-line #define that maps main to utf8_main in all other cases
 #ifndef WINUI
 #undef main
+#undef wmain
 #endif
 
 #ifdef __GNUC__

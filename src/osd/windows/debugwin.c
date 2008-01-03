@@ -1738,7 +1738,7 @@ static void memory_determine_combo_items(void)
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 					t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
 					t_address_space_names = tstring_from_utf8(address_space_names[spacenum]);
-					_stprintf(ci->name, TEXT("CPU #%d (%s) %s memory"), cpunum, t_cpunum_name, t_address_space_names);
+					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d (%s) %s memory"), cpunum, t_cpunum_name, t_address_space_names);
 					free(t_address_space_names),
 					t_address_space_names = NULL;
 					free(t_cpunum_name);
@@ -1808,7 +1808,7 @@ static void memory_determine_combo_items(void)
 			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
 			t_name = tstring_from_utf8(name);
-			_tcscpy(ci->name, _tcsrchr(t_name, TEXT('/')) + sizeof(t_name[0]));
+			_tcscpy(ci->name, _tcsrchr(t_name, TEXT('/')) + 1);
 			free(t_name);
 			t_name = NULL;
 			*tail = ci;
@@ -2240,7 +2240,7 @@ static void disasm_create_window(void)
 				TCHAR name[100];
 				int item;
 				t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
-				_stprintf(name, TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
+				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
 				free(t_cpunum_name);
 				t_cpunum_name = NULL;
 				item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
@@ -2770,7 +2770,7 @@ static void console_set_cpunum(int cpunum)
 
 	// then update the caption
 	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
-	win_get_window_text_utf8(main_console->wnd, curtitle, sizeof(curtitle) / sizeof(curtitle[0]));
+	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle))
 		win_set_window_text_utf8(main_console->wnd, title);
 }
