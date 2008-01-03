@@ -42,8 +42,6 @@
 FILE *debug_source_file;
 symbol_table *global_symtable;
 
-static const char *const address_space_name[] = { "program", "data", "I/O" };
-
 static UINT64 wpdata;
 static UINT64 wpaddr;
 
@@ -1551,7 +1549,7 @@ static void check_hotspots(int cpunum, int spacenum, offs_t address)
 		/* if the bottom of the list is over the threshhold, print it */
 		debug_hotspot_entry *spot = &info->hotspots[info->hotspot_count - 1];
 		if (spot->count > info->hotspot_threshhold)
-			debug_console_printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", address_space_name[spot->spacenum], spot->access, spot->pc, spot->count);
+			debug_console_printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", address_space_names[spot->spacenum], spot->access, spot->pc, spot->count);
 
 		/* move everything else down and insert this one at the top */
 		memmove(&info->hotspots[1], &info->hotspots[0], sizeof(info->hotspots[0]) * (info->hotspot_count - 1));

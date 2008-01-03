@@ -156,7 +156,7 @@ typedef struct _memorycombo_item memorycombo_item;
 struct _memorycombo_item
 {
 	memorycombo_item *		next;
-	char					name[256];
+	TCHAR					name[256];
 	UINT8					cpunum;
 	UINT8					spacenum;
 	void *					base;
@@ -1721,6 +1721,7 @@ static void memory_determine_combo_items(void)
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
 	int rgnnum, itemnum;
+	TCHAR *t_cpunum_name, *t_address_space_names;
 
 	// first add all the CPUs' address spaces
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -1735,7 +1736,13 @@ static void memory_determine_combo_items(void)
 					ci->cpunum = cpunum;
 					ci->spacenum = spacenum;
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
-					sprintf(ci->name, "CPU #%d (%s) %s memory", cpunum, cpunum_name(cpunum), address_space_names[spacenum]);
+					t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
+					t_address_space_names = tstring_from_utf8(address_space_names[spacenum]);
+					_stprintf(ci->name, TEXT("CPU #%d (%s) %s memory"), cpunum, t_cpunum_name, t_address_space_names);
+					free(t_address_space_names),
+					t_address_space_names = NULL;
+					free(t_cpunum_name);
+					t_cpunum_name = NULL;
 					*tail = ci;
 					tail = &ci->next;
 				}
@@ -1744,6 +1751,7 @@ static void memory_determine_combo_items(void)
 	// then add all the memory regions
 	for (rgnnum = 0; rgnnum < MAX_MEMORY_REGIONS; rgnnum++)
 	{
+		TCHAR* t_memory_region_name;
 		UINT8 *base = memory_region(rgnnum);
 		UINT32 type = memory_region_type(Machine, rgnnum);
 		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
@@ -1768,7 +1776,10 @@ static void memory_determine_combo_items(void)
 			ci->prefsize = MIN(width, 8);
 			ci->offset_xor = width - 1;
 			ci->little_endian = little_endian;
-			strcpy(ci->name, memory_region_names[type - REGION_INVALID]);
+			t_memory_region_name = tstring_from_utf8(memory_region_names[type - REGION_INVALID]);
+			_tcscpy(ci->name, t_memory_region_name);
+			free(t_memory_region_name);
+			t_memory_region_name = NULL;
 			*tail = ci;
 			tail = &ci->next;
 		}
@@ -1780,6 +1791,7 @@ static void memory_determine_combo_items(void)
 		UINT32 valsize, valcount;
 		const char *name;
 		void *base;
+		TCHAR* t_name;
 
 		/* stop when we run out of items */
 		name = state_save_get_indexed_item(itemnum, &base, &valsize, &valcount);
@@ -1795,7 +1807,10 @@ static void memory_determine_combo_items(void)
 			ci->length = valcount * valsize;
 			ci->prefsize = MIN(valsize, 8);
 			ci->little_endian = TRUE;
-			strcpy(ci->name, strrchr(name, '/') + 1);
+			t_name = tstring_from_utf8(name);
+			_tcscpy(ci->name, _tcsrchr(t_name, TEXT('/')) + sizeof(t_name[0]));
+			free(t_name);
+			t_name = NULL;
 			*tail = ci;
 			tail = &ci->next;
 		}
@@ -1816,7 +1831,7 @@ static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
 	debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_RAW_OFFSET_XOR, ci->offset_xor);
 	debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_RAW_LITTLE_ENDIAN, ci->little_endian);
 	debug_view_set_property_UINT32(info->view[0].view, DVP_MEM_BYTES_PER_CHUNK, ci->prefsize);
-	win_set_window_text_utf8(info->wnd, ci->name);
+	SetWindowText(info->wnd, ci->name);
 }
 
 
@@ -1871,7 +1886,7 @@ static void memory_create_window(void)
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
-	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)"0");
+	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)TEXT("0"));
 	SendMessage(info->editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
 	SendMessage(info->editwnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1);
 
@@ -2204,7 +2219,7 @@ static void disasm_create_window(void)
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debug_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
-	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)"curpc");
+	SendMessage(info->editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)TEXT("curpc"));
 	SendMessage(info->editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
 	SendMessage(info->editwnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1);
 
@@ -2217,13 +2232,17 @@ static void disasm_create_window(void)
 	// populate the combobox
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
+		TCHAR* t_cpunum_name;
 		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
 		if (cpuinfo->valid)
 			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
 			{
-				char name[100];
+				TCHAR name[100];
 				int item;
-				sprintf(name, "CPU #%d (%s)", cpunum, cpunum_name(cpunum));
+				t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
+				_stprintf(name, TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
+				free(t_cpunum_name);
+				t_cpunum_name = NULL;
 				item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
 				if (cpunum == curcpu)
 					cursel = item;
