@@ -29,9 +29,9 @@ UINT16 *btoads_sprite_control;
 
 static UINT8 *vram_fg_draw, *vram_fg_display;
 
-static int xscroll0, yscroll0;
-static int xscroll1, yscroll1;
-static int screen_control;
+static INT32 xscroll0, yscroll0;
+static INT32 xscroll1, yscroll1;
+static UINT8 screen_control;
 
 static UINT16 sprite_source_offs;
 static UINT8 *sprite_dest_base;
@@ -52,6 +52,16 @@ VIDEO_START( btoads )
 	/* initialize the swapped pointers */
 	vram_fg_draw = (UINT8 *)btoads_vram_fg0;
 	vram_fg_display = (UINT8 *)btoads_vram_fg1;
+	
+	state_save_register_global(xscroll0);
+	state_save_register_global(xscroll1);
+	state_save_register_global(yscroll0);
+	state_save_register_global(yscroll1);
+	state_save_register_global(screen_control);
+
+	state_save_register_global(sprite_source_offs);
+	state_save_register_global(sprite_dest_offs);
+	state_save_register_global(misc_control);
 }
 
 
@@ -340,43 +350,55 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	UINT16 *dst = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = fulladdr & 0x3ff;
 	int x;
+	
+	if (BT_DEBUG)
+		popmessage("screen_control = %02X", screen_control);
 
 	/* for each scanline, switch off the render mode */
 	switch (screen_control & 3)
 	{
 		/* mode 0: used in ship level, snake boss, title screen (free play) */
+		/* priority is:
+			1. BG1 pixels with the high bit set
+			2. Sprites
+			3. BG1
+			4. BG0
+		*/
 		case 0:
-
-		/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
-		case 2:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
+				UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+				UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 				UINT8 sprpix = spr_base[coladdr & 0xff];
 
-				if (sprpix)
-				{
+				if (bg1pix & 0x80)
+					dst[x + 0] = bg1pix & 0xff;
+				else if (sprpix)
 					dst[x + 0] = sprpix;
-					dst[x + 1] = sprpix;
-				}
+				else if (bg1pix & 0xff)
+					dst[x + 0] = bg1pix & 0xff;
 				else
-				{
-					UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
-					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
+					dst[x + 0] = bg0pix & 0xff;
 
-					if (bg1pix & 0xff)
-						dst[x + 0] = bg1pix & 0xff;
-					else
-						dst[x + 0] = bg0pix & 0xff;
-
-					if (bg1pix >> 8)
-						dst[x + 1] = bg1pix >> 8;
-					else
-						dst[x + 1] = bg0pix >> 8;
-				}
+				if (bg1pix & 0x8000)
+					dst[x + 1] = bg1pix >> 8;
+				else if (sprpix)
+					dst[x + 1] = sprpix;
+				else if (bg1pix >> 8)
+					dst[x + 1] = bg1pix >> 8;
+				else
+					dst[x + 1] = bg0pix >> 8;
 			}
 			break;
 
 		/* mode 1: used in snow level, title screen (free play), top part of rolling ball level */
+		/* priority is:
+			1. Sprite pixels with high bit clear
+			2. BG0
+			3. BG1 pixels with high bit set
+			4. Sprite pixels with high bit set
+			5. BG1
+		*/
 		case 1:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
@@ -413,7 +435,48 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 			}
 			break;
 
+		/* mode 2: used in EOA screen, jetpack level, first level, high score screen */
+		/* priority is:
+			1. Sprites
+			2. BG1
+			3. BG0
+		*/
+		case 2:
+			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
+			{
+				UINT8 sprpix = spr_base[coladdr & 0xff];
+
+				if (sprpix)
+				{
+					dst[x + 0] = sprpix;
+					dst[x + 1] = sprpix;
+				}
+				else
+				{
+					UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
+
+					if (bg1pix & 0xff)
+						dst[x + 0] = bg1pix & 0xff;
+					else
+						dst[x + 0] = bg0pix & 0xff;
+
+					if (bg1pix >> 8)
+						dst[x + 1] = bg1pix >> 8;
+					else
+						dst[x + 1] = bg0pix >> 8;
+				}
+			}
+			break;
+
 		/* mode 3: used in toilet level, toad intros, bottom of rolling ball level */
+		/* priority is:
+			1. BG1 pixels with the high bit set
+			2. Sprite pixels with the high bit set
+			3. BG1
+			4. Sprites
+			5. BG0
+		*/
 		case 3:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{

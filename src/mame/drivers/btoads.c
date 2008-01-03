@@ -35,6 +35,16 @@ static UINT8 sound_int_state;
  *
  *************************************/
 
+static MACHINE_START( btoads )
+{
+	state_save_register_global(main_to_sound_data);
+	state_save_register_global(main_to_sound_ready);
+	state_save_register_global(sound_to_main_data);
+	state_save_register_global(sound_to_main_ready);
+	state_save_register_global(sound_int_state);
+}
+
+
 static MACHINE_RESET( btoads )
 {
 	tlc34076_reset(6);
@@ -333,6 +343,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
 
+	MDRV_MACHINE_START(btoads)
 	MDRV_MACHINE_RESET(btoads)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
@@ -384,4 +395,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, btoads, 0, btoads, btoads, 0,  ROT0, "Rare", "Battle Toads", 0 )
+GAME( 1994, btoads, 0, btoads, btoads, 0,  ROT0, "Rare", "Battle Toads", GAME_SUPPORTS_SAVE )
