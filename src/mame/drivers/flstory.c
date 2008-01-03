@@ -33,6 +33,7 @@ WRITE8_HANDLER( flstory_palette_w );
 WRITE8_HANDLER( flstory_gfxctrl_w );
 READ8_HANDLER( flstory_scrlram_r );
 WRITE8_HANDLER( flstory_scrlram_w );
+READ8_HANDLER( victnine_gfxctrl_r );
 WRITE8_HANDLER( victnine_gfxctrl_w );
 
 READ8_HANDLER( flstory_68705_portA_r );
@@ -186,7 +187,7 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xda00, 0xda00) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM AM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
-	AM_RANGE(0xdce0, 0xdce0) AM_WRITE(victnine_gfxctrl_w)
+	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	AM_BASE(&victnine_workram) /* work RAM */

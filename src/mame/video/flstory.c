@@ -109,6 +109,11 @@ WRITE8_HANDLER( flstory_gfxctrl_w )
 
 }
 
+READ8_HANDLER( victnine_gfxctrl_r )
+{
+	return gfxctrl;
+}
+
 WRITE8_HANDLER( victnine_gfxctrl_w )
 {
 	if (gfxctrl == data)
