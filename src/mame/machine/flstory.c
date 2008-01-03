@@ -153,13 +153,16 @@ WRITE8_HANDLER( onna34ro_mcu_w )
 			from_mcu = 0x6a;
 			break;
 		case 0x40:
-			from_mcu = onna34ro_workram[score_adr];			/* score l*/
+			if(score_adr >= 0xe000 && score_adr < 0xe800)
+				from_mcu = onna34ro_workram[score_adr - 0xe000];			/* score l*/
 			break;
 		case 0x41:
-			from_mcu = onna34ro_workram[score_adr+1];		/* score m*/
+			if(score_adr >= 0xe000 && score_adr < 0xe800)
+				from_mcu = onna34ro_workram[(score_adr+1) - 0xe000];		/* score m*/
 			break;
 		case 0x42:
-			from_mcu = onna34ro_workram[score_adr+2] & 0x0f;	/* score h*/
+			if(score_adr >= 0xe000 && score_adr < 0xe800)
+				from_mcu = onna34ro_workram[(score_adr+2) - 0xe000] & 0x0f;	/* score h*/
 			break;
 		default:
 			from_mcu = 0x80;
