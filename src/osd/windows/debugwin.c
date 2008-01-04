@@ -279,8 +279,10 @@ void osd_wait_for_debugger(void)
 		// check for F10 -- we need to capture that ourselves
 		case WM_SYSKEYDOWN:
 		case WM_SYSKEYUP:
+			if (message.wParam == VK_F4 && message.message == WM_SYSKEYDOWN)
+				SendMessage(GetAncestor(GetFocus(), GA_ROOT), WM_CLOSE, 0, 0);
 			if (message.wParam == VK_F10)
-				SendMessage(GetFocus(), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
+				SendMessage(GetAncestor(GetFocus(), GA_ROOT), (message.message == WM_SYSKEYDOWN) ? WM_KEYDOWN : WM_KEYUP, message.wParam, message.lParam);
 			break;
 
 		// process everything else
