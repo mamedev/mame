@@ -384,27 +384,40 @@ void batsugun_okisnd_w(int data);
   Initialisation handlers
 ***************************************************************************/
 
+static void toaplan2_reset(void)
+{
+	if ( cpu_gettotalcpu() > 1 )
+		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+}
 
 static MACHINE_RESET( toaplan2 )		/* machine_reset_toaplan2(); */
 {
 	mcu_data = 0x00;
+
+	/*
+	  All games execute a RESET instruction on init, presumably to reset the sound CPU.
+	  This is important for games with common RAM; the RAM test will fail
+	  when leaving service mode if the sound CPU is not reset.
+	*/
+	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
 }
 
 static MACHINE_RESET( ghox )
 {
+	machine_reset_toaplan2(machine);
 	old_p1_paddle_h = 0;
 	old_p2_paddle_h = 0;
-
-	machine_reset_toaplan2(machine);
 }
 
 static MACHINE_RESET( dogyuun )
 {
+	machine_reset_toaplan2(machine);
 	mcu_data = 0xffaa;
 }
 
 static MACHINE_RESET( vfive )
 {
+	machine_reset_toaplan2(machine);
 	mcu_data = 0xffaa;
 }
 
