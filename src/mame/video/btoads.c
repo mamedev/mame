@@ -294,7 +294,7 @@ void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
 	{
 		sprite_dest_base = &vram_fg_draw[TOWORD(address & 0x3fc000)];
-		sprite_dest_offs = (INT16)((address & 0x3ff) << 2) >> 2;
+		sprite_dest_offs = (address & 0x003fff) >> 5;
 	}
 
 	/* reads from this region set the sprite source address */
@@ -351,43 +351,51 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 
-	if (BT_DEBUG)
-		popmessage("screen_control = %02X", screen_control);
-
 	/* for each scanline, switch off the render mode */
 	switch (screen_control & 3)
 	{
 		/* mode 0: used in ship level, snake boss, title screen (free play) */
 		/* priority is:
-            1. BG1 pixels with the high bit set
-            2. Sprites
-            3. BG1
-            4. BG0
+            1. Sprite pixels with high bit clear
+            2. BG1 pixels with the high bit set
+            3. Sprites
+            4. BG1
+            5. BG0
         */
 		case 0:
 			for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 			{
-				UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
-				UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 				UINT8 sprpix = spr_base[coladdr & 0xff];
 
-				if (bg1pix & 0x80)
-					dst[x + 0] = bg1pix & 0xff;
-				else if (sprpix)
+				if (sprpix && !(sprpix & 0x80))
+				{
 					dst[x + 0] = sprpix;
-				else if (bg1pix & 0xff)
-					dst[x + 0] = bg1pix & 0xff;
-				else
-					dst[x + 0] = bg0pix & 0xff;
-
-				if (bg1pix & 0x8000)
-					dst[x + 1] = bg1pix >> 8;
-				else if (sprpix)
 					dst[x + 1] = sprpix;
-				else if (bg1pix >> 8)
-					dst[x + 1] = bg1pix >> 8;
+				}
 				else
-					dst[x + 1] = bg0pix >> 8;
+				{
+					UINT16 bg0pix = bg0_base[(coladdr + xscroll0) & 0xff];
+					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
+					UINT8 sprpix = spr_base[coladdr & 0xff];
+
+					if (bg1pix & 0x80)
+						dst[x + 0] = bg1pix & 0xff;
+					else if (sprpix)
+						dst[x + 0] = sprpix;
+					else if (bg1pix & 0xff)
+						dst[x + 0] = bg1pix & 0xff;
+					else
+						dst[x + 0] = bg0pix & 0xff;
+
+					if (bg1pix & 0x8000)
+						dst[x + 1] = bg1pix >> 8;
+					else if (sprpix)
+						dst[x + 1] = sprpix;
+					else if (bg1pix >> 8)
+						dst[x + 1] = bg1pix >> 8;
+					else
+						dst[x + 1] = bg0pix >> 8;
+				}
 			}
 			break;
 
@@ -396,7 +404,7 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
             1. Sprite pixels with high bit clear
             2. BG0
             3. BG1 pixels with high bit set
-            4. Sprite pixels with high bit set
+            4. Sprites
             5. BG1
         */
 		case 1:
@@ -511,12 +519,16 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 	/* debugging - dump the screen contents to a file */
 #if BT_DEBUG
+	popmessage("screen_control = %02X", screen_control & 0x7f);
+
 	if (input_code_pressed(KEYCODE_X))
 	{
 		static int count = 0;
 		char name[10];
 		FILE *f;
 		int i;
+		
+		while (input_code_pressed(KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", count++);
 		f = fopen(name, "w");
