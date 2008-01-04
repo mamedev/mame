@@ -7,11 +7,11 @@ TODO:
 - Shooting Gallery: Shootgal.txt mentions speech pcb,
   mikesarcade.com dk conversion - Clarify
 - 8ballact: read 1507 no mapped
-- dkong3 dma (Z80 dma)
 - implement 74LS259 (8bit addressable latches),
   74LS175 (QUAD D FlipFlop), 74LS373 (Octal transparent latch)
 
 Done:
+- dkong3 dma (Z80 dma)
 - dkongjr discrete interface
 - when i am retired: implement 8257 DMA controller
 - drakton - add dkongjr conversion
@@ -252,6 +252,7 @@ Changes:
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
+#include "machine/z80dma.h"
 #include <math.h>
 
 /*************************************
@@ -273,6 +274,8 @@ static UINT8 hb_dma_read_byte(int channel, offs_t offset);
 static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data);
 static UINT8 dk_dma_read_byte(int channel, offs_t offset);
 static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data);
+static UINT8 dk3_dma_read_byte(offs_t offset);
+static void dk3_dma_write_byte(offs_t offset, UINT8 data);
 static UINT8 p8257_ctl_r(void);
 static void p8257_ctl_w(UINT8 data);
 
@@ -281,6 +284,16 @@ static void p8257_ctl_w(UINT8 data);
  *  statics
  *
  *************************************/
+
+static const struct z80dma_interface dk3_dma =
+{
+	0,
+	CLOCK_1H,
+
+	dk3_dma_read_byte,
+	dk3_dma_write_byte,
+	0, 0, 0, 0
+};
 
 static const struct dma8257_interface dk_dma =
 {
@@ -339,7 +352,6 @@ static MACHINE_START( dkong2b )
 
 }
 
-
 static MACHINE_START( hunchbkd )
 {
 	UINT8	*p = memory_region(REGION_USER1);
@@ -361,7 +373,6 @@ static MACHINE_START( hunchbkd )
 
 }
 
-
 static MACHINE_START( radarscp )
 {
 	dkong_state *state = Machine->driver_data;
@@ -378,11 +389,24 @@ static MACHINE_START( radarsc1 )
 	state->hardware_type = HARDWARE_TRS01;
 }
 
+static MACHINE_START( dkong3 )
+{
+	machine_start_dkong2b(machine);
+	z80dma_init(1);
+	z80dma_config(0, &dk3_dma);
+}
 
 static MACHINE_RESET( dkong )
 {
 
 	dma8257_reset();
+
+}
+
+static MACHINE_RESET( dkong3 )
+{
+
+	z80dma_reset();
 
 }
 
@@ -430,6 +454,24 @@ static UINT8 dk_dma_read_byte(int channel, offs_t offset)
 }
 
 static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data)
+{
+	cpuintrf_push_context(0);
+	program_write_byte(offset, data);
+	cpuintrf_pop_context();
+}
+
+static UINT8 dk3_dma_read_byte(offs_t offset)
+{
+	UINT8 result;
+
+	cpuintrf_push_context(0);
+	result = program_read_byte(offset);
+	cpuintrf_pop_context();
+
+	return result;
+}
+
+static void dk3_dma_write_byte(offs_t offset, UINT8 data)
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -717,11 +759,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x68ff) AM_RAM
-	AM_RANGE(0x6900, 0x6a7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
-	AM_RANGE(0x6a80, 0x6cff) AM_RAM /* 0x6b00: sprite set 2 */
-	AM_RANGE(0x6d00, 0x6fff) AM_RAM /* ???? */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM /* Actual sprite ram location ... waiting for missing z80 dma */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x6800, 0x6fff) AM_RAM 
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
@@ -732,14 +772,15 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_NOP							/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(z80dma_0_rdy_w)						/* ==> DMA Chip */
 	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                        /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* dma controller */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(z80dma_0_r, z80dma_0_w)	/* dma controller */
+	//AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
@@ -1574,13 +1615,13 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_DRIVER_DATA(dkong_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	/* 4 MHz */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
 	MDRV_CPU_IO_MAP(0, dkong3_io_map)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_MACHINE_START(dkong2b)
-	MDRV_MACHINE_RESET(dkong)
+	MDRV_MACHINE_START(dkong3)
+	MDRV_MACHINE_RESET(dkong3)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
