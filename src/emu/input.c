@@ -39,7 +39,7 @@
 #define JOYSTICK_MAP_STICKY		0x0f
 
 /* the largest number of tracked pressed switches for memory */
-#define MAX_PRESSED_SWITCHES	16
+#define MAX_PRESSED_SWITCHES	64
 
 /* invalid memory value for axis polling */
 #define INVALID_AXIS_VALUE		0x7fffffff
@@ -946,6 +946,44 @@ input_code input_code_poll_switches(int reset)
 						}
 					}
 				}
+			}
+		}
+	}
+
+	/* if nothing, return an invalid code */
+	return INPUT_CODE_INVALID;
+}
+
+
+/*-------------------------------------------------
+    input_code_poll_keyboard_switches - poll for 
+    any keyboard-specific input
+-------------------------------------------------*/
+
+input_code input_code_poll_keyboard_switches(int reset)
+{
+	input_device_list *devlist = &device_list[DEVICE_CLASS_KEYBOARD];
+	int devnum;
+
+	/* if resetting memory, do it now */
+	if (reset)
+		code_pressed_memory_reset();
+
+	/* iterate over devices within each class */
+	for (devnum = 0; devnum < devlist->count; devnum++)
+	{
+		input_device *device = &devlist->list[devnum];
+		input_item_id itemid;
+
+		/* iterate over items within each device */
+		for (itemid = ITEM_ID_INVALID + 1; itemid <= device->maxitem; itemid++)
+		{
+			input_device_item *item = device->item[itemid];
+			if (item != NULL && item->itemclass == ITEM_CLASS_SWITCH)
+			{
+				input_code code = device_item_to_code(device, itemid);
+				if (input_code_pressed_once(code))
+					return code;
 			}
 		}
 	}

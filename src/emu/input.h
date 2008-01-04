@@ -535,6 +535,9 @@ INT32 input_code_pressed_once(input_code code);
 /* poll for any switch input, optionally resetting internal memory */
 input_code input_code_poll_switches(int reset);
 
+/* poll for any keyboard switch input, optionally resetting internal memory */
+input_code input_code_poll_keyboard_switches(int reset);
+
 /* poll for any axis input, optionally resetting internal memory */
 input_code input_code_poll_axes(int reset);
 

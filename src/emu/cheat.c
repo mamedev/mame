@@ -964,14 +964,14 @@ static int ReadKeyAsync(int flush)
 
 	if(flush)		// check key input
 	{
-		while(input_code_poll_switches(TRUE) != INPUT_CODE_INVALID) ;
+		while(input_code_poll_keyboard_switches(TRUE) != INPUT_CODE_INVALID) ;
 
 		return 0;
 	}
 
 	while(1)		// check pressed key
 	{
-		code = input_code_poll_switches(FALSE);
+		code = input_code_poll_keyboard_switches(FALSE);
 
 		if(code == INPUT_CODE_INVALID)
 		{
@@ -4470,7 +4470,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 				}
 				else
 				{
-					int	code = input_code_poll_switches(FALSE);
+					int	code = input_code_poll_keyboard_switches(FALSE);
 
 					if(code == KEYCODE_ESC)
 					{
