@@ -111,6 +111,13 @@ WRITE8_HANDLER( mario_scroll_w )
 	tilemap_set_scrolly(bg_tilemap, 0, data + 17);
 }
 
+WRITE8_HANDLER( mario_flip_w )
+{
+	
+	flip_screen_set(data & 0x01);
+	tilemap_set_scrollx(bg_tilemap, 0, flip_screen ? (HTOTAL-HBSTART) : 0);
+}
+
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + 256 * gfx_bank;
@@ -130,6 +137,11 @@ VIDEO_START( mario )
 	state_save_register_global(palette_bank);
 }
 
+/*
+ * Erratic line at top when scrolling down "Marios Bros" Title 
+ * confirmed on mametests.org as being present on real PCB as well.
+ */
+
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
@@ -138,12 +150,39 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	{
 		if (spriteram[offs])
 		{
-			drawgfx(bitmap,machine->gfx[1],
-					spriteram[offs + 2],
-					(spriteram[offs + 1] & 0x0f) + 16 * palette_bank+32 * monitor,
-					spriteram[offs + 1] & 0x80,spriteram[offs + 1] & 0x40,
-					spriteram[offs + 3] - 8,(VBSTART - 1) - spriteram[offs] + 8,
-					cliprect,TRANSPARENCY_PEN,0);
+			int x, y;
+			
+			// from schematics .... 
+			y = (spriteram[offs] + (flip_screen ? 0xF7 : 0xF9) + 1) & 0xFF;
+			x = spriteram[offs+3];
+			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
+			y = 240 - y; /* logical screen position */
+
+			y = y ^ (flip_screen ? 0xFF : 0x00); /* physical screen location */ 
+			x = x ^ (flip_screen ? 0xFF : 0x00); /* physical screen location */ 
+
+			if (flip_screen)
+			{
+				y -= 6; 
+				x -= 7; 
+				drawgfx(bitmap,machine->gfx[1],
+						spriteram[offs + 2],
+						(spriteram[offs + 1] & 0x0f) + 16 * palette_bank+32 * monitor,
+						!(spriteram[offs + 1] & 0x80),!(spriteram[offs + 1] & 0x40),
+						x, y,
+						cliprect,TRANSPARENCY_PEN,0);
+			} 
+			else
+			{
+				y += 1; 
+				x -= 8; 
+				drawgfx(bitmap,machine->gfx[1],
+						spriteram[offs + 2],
+						(spriteram[offs + 1] & 0x0f) + 16 * palette_bank+32 * monitor,
+						(spriteram[offs + 1] & 0x80),(spriteram[offs + 1] & 0x40),
+						x, y,
+						cliprect,TRANSPARENCY_PEN,0);
+			}
 		}
 	}
 }

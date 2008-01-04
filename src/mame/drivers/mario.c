@@ -6,6 +6,8 @@ TODO:
     - combine sh_* writes into one routine
 
 Done:
+    - Hooked up flipscreen
+    - Changed monitor orientation to ROT0
     - fixed mario0110u1gre
     - rewrote driver, separate MACHINE_DRIVER(mario_audio)
     - palette from schematics
@@ -114,6 +116,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7c80, 0x7c80) AM_WRITE(mario_sh2_w) /* Luigi run sample */
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(mario_gfxbank_w)
+	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(mario_flip_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(mario_palettebank_w)
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(mario_sh_w)	/* death */
@@ -459,7 +462,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,    0,       mario,   mario,   0, ROT180, "Nintendo of America", "Mario Bros. (US, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioo,   mario,   mario,   marioo,  0, ROT180, "Nintendo of America", "Mario Bros. (US, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, marioj,   mario,   mario,   marioj,  0, ROT180, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1983, masao,    mario,   masao,   masao,   0, ROT180, "bootleg", "Masao", GAME_SUPPORTS_SAVE )
+GAME( 1983, mario,    0,       mario,   mario,   0, ROT0, "Nintendo of America", "Mario Bros. (US, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, marioo,   mario,   mario,   marioo,  0, ROT0, "Nintendo of America", "Mario Bros. (US, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, marioj,   mario,   mario,   marioj,  0, ROT0, "Nintendo", "Mario Bros. (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, masao,    mario,   masao,   masao,   0, ROT0, "bootleg", "Masao", GAME_SUPPORTS_SAVE )

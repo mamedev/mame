@@ -53,6 +53,7 @@ WRITE8_HANDLER( mario_videoram_w );
 WRITE8_HANDLER( mario_gfxbank_w );
 WRITE8_HANDLER( mario_palettebank_w );
 WRITE8_HANDLER( mario_scroll_w );
+WRITE8_HANDLER( mario_flip_w );
 
 PALETTE_INIT( mario );
 VIDEO_START( mario );
