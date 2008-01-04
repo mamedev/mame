@@ -21,7 +21,7 @@ struct dma8257_interface
 	/* CPU to halt when DMA is active */
 	int cpunum;
 
-	/* speed of DMA accesses (per byte) */
+	/* clock */
 	int clockhz;
 
 	/* accessors to main memory */
