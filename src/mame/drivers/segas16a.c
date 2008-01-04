@@ -3107,9 +3107,9 @@ static DRIVER_INIT( aliensy1 )
 
 static DRIVER_INIT( aliensy5 )
 {
-//  void fd1089_decrypt_0037(void);
+	void fd1089_decrypt_0037(void);
 	system16a_generic_init(machine);
-//  fd1089_decrypt_0037();
+	fd1089_decrypt_0037();
 }
 
 static DRIVER_INIT( bodyslam )
@@ -3182,7 +3182,7 @@ GAME( 1986, quart21,  quartet,  system16a_8751,   quart2,   quartet,     ROT0,  
 GAME( 1986, quart2,   quartet,  system16a,        quart2,   generic_16a, ROT0,   "Sega",           "Quartet 2 (unprotected)", 0 )
 
 /* System 16A */
-GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, aliensy5,    ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_NOT_WORKING )
+GAME( 1987, aliensy5, aliensyn, system16a,        aliensyn, aliensy5,    ROT0,   "Sega",           "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", 0 )
 GAME( 1987, aliensy2, aliensyn, system16a,        aliensyn, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensy1, aliensyn, system16a,        aliensy1, aliensy1,    ROT0,   "Sega",           "Alien Syndrome (set 1, System 16A, FD1089A 317-0033)", 0 )
 GAME( 1988, aceattaa, aceattac, system16a       , aceattaa, aceattaa,    ROT270, "Sega",           "Ace Attacker (Japan, System 16A, FD1094 317-0060)", 0 )
