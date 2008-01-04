@@ -85,6 +85,7 @@ dcxx = /SPOSI (S36)
 
 
 /* in machine */
+MACHINE_RESET( buggychl );
 READ8_HANDLER( buggychl_68705_portA_r );
 WRITE8_HANDLER( buggychl_68705_portA_w );
 WRITE8_HANDLER( buggychl_68705_ddrA_w );
@@ -451,6 +452,8 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(buggychl)
 	MDRV_PALETTE_LENGTH(128+128)
+
+	MDRV_MACHINE_RESET(buggychl)
 
 	MDRV_PALETTE_INIT(buggychl)
 	MDRV_VIDEO_START(buggychl)

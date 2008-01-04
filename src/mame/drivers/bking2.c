@@ -10,43 +10,55 @@ Birdie King / Birdie King II / Birdie King III Memory Map
 9000-97ff Playfield RAM
 a000-bfff Unused?
 
-
-NOTE:
-ROM DM03 is missing from all known ROM sets.  This is a color palette.
-* is this note out of date?, DM_03.d1 in bking.zip = 82s141.2d in bking2.zip
-
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
-PALETTE_INIT( bking2 );
 
-VIDEO_START( bking2 );
-VIDEO_UPDATE( bking2 );
-VIDEO_EOF( bking2 );
+/* bking3 mcu communication */
+extern MACHINE_RESET( buggychl );
+extern READ8_HANDLER( buggychl_68705_portA_r );
+extern WRITE8_HANDLER( buggychl_68705_portA_w );
+extern WRITE8_HANDLER( buggychl_68705_ddrA_w );
+extern READ8_HANDLER( buggychl_68705_portB_r );
+extern WRITE8_HANDLER( buggychl_68705_portB_w );
+extern WRITE8_HANDLER( buggychl_68705_ddrB_w );
+extern READ8_HANDLER( buggychl_68705_portC_r );
+extern WRITE8_HANDLER( buggychl_68705_portC_w );
+extern WRITE8_HANDLER( buggychl_68705_ddrC_w );
+extern WRITE8_HANDLER( buggychl_mcu_w );
+extern READ8_HANDLER( buggychl_mcu_r );
+extern READ8_HANDLER( buggychl_mcu_status_r );
 
-WRITE8_HANDLER( bking2_xld1_w );
-WRITE8_HANDLER( bking2_yld1_w );
-WRITE8_HANDLER( bking2_xld2_w );
-WRITE8_HANDLER( bking2_yld2_w );
-WRITE8_HANDLER( bking2_xld3_w );
-WRITE8_HANDLER( bking2_yld3_w );
-WRITE8_HANDLER( bking2_msk_w );
-WRITE8_HANDLER( bking2_cont1_w );
-WRITE8_HANDLER( bking2_cont2_w );
-WRITE8_HANDLER( bking2_cont3_w );
-WRITE8_HANDLER( bking2_hitclr_w );
-WRITE8_HANDLER( bking2_playfield_w );
+extern PALETTE_INIT( bking2 );
 
-READ8_HANDLER( bking2_input_port_5_r );
-READ8_HANDLER( bking2_input_port_6_r );
-READ8_HANDLER( bking2_pos_r );
+extern VIDEO_START( bking2 );
+extern VIDEO_UPDATE( bking2 );
+extern VIDEO_EOF( bking2 );
 
-UINT8* bking2_playfield_ram;
+extern WRITE8_HANDLER( bking2_xld1_w );
+extern WRITE8_HANDLER( bking2_yld1_w );
+extern WRITE8_HANDLER( bking2_xld2_w );
+extern WRITE8_HANDLER( bking2_yld2_w );
+extern WRITE8_HANDLER( bking2_xld3_w );
+extern WRITE8_HANDLER( bking2_yld3_w );
+extern WRITE8_HANDLER( bking2_msk_w );
+extern WRITE8_HANDLER( bking2_cont1_w );
+extern WRITE8_HANDLER( bking2_cont2_w );
+extern WRITE8_HANDLER( bking2_cont3_w );
+extern WRITE8_HANDLER( bking2_hitclr_w );
+extern WRITE8_HANDLER( bking2_playfield_w );
 
+extern READ8_HANDLER( bking2_input_port_5_r );
+extern READ8_HANDLER( bking2_input_port_6_r );
+extern READ8_HANDLER( bking2_pos_r );
 
+UINT8 *bking2_playfield_ram;
+
+static int bking3_addr_h, bking3_addr_l;
 static int sndnmi_enable = 1;
 
 static READ8_HANDLER( bking2_sndnmi_disable_r )
@@ -72,23 +84,20 @@ static WRITE8_HANDLER( bking2_soundlatch_w )
 	if (sndnmi_enable) cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-
-static int bk3_l, bk3_h;
-
-static WRITE8_HANDLER( bk3_l_w)
+static WRITE8_HANDLER( bking3_addr_l_w )
 {
-	bk3_l = data;
+	bking3_addr_l = data;
 }
 
-static WRITE8_HANDLER( bk3_h_w)
+static WRITE8_HANDLER( bking3_addr_h_w )
 {
-	bk3_h = data;
+	bking3_addr_h = data;
 }
 
-static READ8_HANDLER( bk3_r )
+static READ8_HANDLER( bking3_extrarom_r )
 {
 	UINT8 *rom = memory_region(REGION_USER2);
-	return rom[bk3_h*256+bk3_l];
+	return rom[bking3_addr_h * 256 + bking3_addr_l];
 }
 
 static WRITE8_HANDLER( unk_w )
@@ -99,94 +108,26 @@ static WRITE8_HANDLER( unk_w )
 */
 }
 
-static READ8_HANDLER( mcu_status_r )
+static READ8_HANDLER( bking3_ext_check_r )
 {
-	static int res = 3;
-
-	return res;//cpu data / MCU ready
-}
-
-
-/*
-Birdie King 3 MCU simulation
-Nothing really special to report,just the typical protection HW test and another
-protection routine with 0x30 command when the player have to shot on the green.
-
-Todo:
-\-How to handle the reads at port($6f)?
-\-In-depth game untested.
-*/
-static UINT8 mcu_val;
-
-static WRITE8_HANDLER( mcu_data_w )
-{
-#ifdef MAME_DEBUG
-	logerror("mcu_data_w = %x\n",data);
-#endif
-	mcu_val = data;
-	/* HW test */
-	/* all bits of port ($02) except the MSB are connected to the command,
-       in all cases it should return 0x5e.This one is here to avoid to get a big
-       switch-case statement in the mcu_data_r function... */
-	if(mcu_val >= 0x80)
-		mcu_val = 0x5e;
-}
-
-static READ8_HANDLER( mcu_data_r )
-{
-//  popmessage("MCU-r1 PC = %04x %02x",activecpu_get_pc(),mcu_val);
-	switch(mcu_val)
-	{
-		/* Shot counter control at the green (check $bdf and afterwards in that condition)*/
-		case 0x30: return (mcu_val-0x1e);
-		default:   return (mcu_val);
-	}
-}
-
-static READ8_HANDLER( mcu_data_r2 )
-{
-//  popmessage("MCU-r2 PC = %04x %02x",activecpu_get_pc(),mcu_val);
 	return 0x31; //no "bad rom.", no "bad ext."
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( bking2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(bking2_playfield_w) AM_BASE(&bking2_playfield_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(bking2_playfield_w) AM_BASE(&bking2_playfield_ram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bking2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r)
-	AM_RANGE(0x05, 0x05) AM_READ(bking2_input_port_5_r)
-	AM_RANGE(0x06, 0x06) AM_READ(bking2_input_port_6_r)
-	AM_RANGE(0x07, 0x1f) AM_READ(bking2_pos_r)
-
-	AM_RANGE(0x2f, 0x2f) AM_READ(mcu_data_r)
-	AM_RANGE(0x4f, 0x4f) AM_READ(mcu_status_r)
-	AM_RANGE(0x60, 0x60) AM_READ(bk3_r)
-	AM_RANGE(0x6f, 0x6f) AM_READ(mcu_data_r2)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(bking2_xld1_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(bking2_yld1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(bking2_xld2_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(bking2_yld2_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(bking2_xld3_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(bking2_yld3_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(bking2_msk_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking2_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking2_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking2_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking2_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking2_xld3_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(bking2_input_port_5_r, bking2_yld3_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(bking2_input_port_6_r, bking2_msk_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bking2_cont1_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(bking2_cont2_w)
@@ -194,35 +135,122 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking2_soundlatch_w)
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking2_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking2_hitclr_w)
-
-	AM_RANGE(0x2f, 0x2f) AM_WRITE(mcu_data_w)
-	AM_RANGE(0x4f, 0x4f) AM_WRITE(unk_w)
-	AM_RANGE(0x6f, 0x6f) AM_WRITE(bk3_h_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(bk3_l_w)
+	AM_RANGE(0x07, 0x1f) AM_READ(bking2_pos_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(MRA8_ROM) //only bking3
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4401, 0x4401) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x4403, 0x4403) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_r)
-	AM_RANGE(0x4802, 0x4802) AM_READ(bking2_sndnmi_disable_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_ROM)   /* space for some other ROM???
-                                      It's checked if there is valid code there
-                                      [Probably diagnostic ROM like other early Taito games -AS]*/
+static ADDRESS_MAP_START( bking3_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking2_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking2_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking2_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking2_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking2_xld3_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(bking2_input_port_5_r, bking2_yld3_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(bking2_input_port_6_r, bking2_msk_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(bking2_cont1_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(bking2_cont2_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking2_cont3_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking2_soundlatch_w)
+//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking2_eport2_w)   this is not shown to be connected anywhere
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking2_hitclr_w)
+	AM_RANGE(0x07, 0x1f) AM_READ(bking2_pos_r)
+	AM_RANGE(0x2f, 0x2f) AM_READWRITE(buggychl_mcu_r, buggychl_mcu_w)
+	AM_RANGE(0x4f, 0x4f) AM_READWRITE(buggychl_mcu_status_r, unk_w)
+	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
+	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_ROM) //only bking3
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x4401, 0x4401) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(bking2_sndnmi_enable_w)
+	AM_RANGE(0x4403, 0x4403) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_r)
+	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking2_sndnmi_disable_r, bking2_sndnmi_enable_w)
+	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
+ADDRESS_MAP_END
+
+#if 0
+static UINT8 portA_in,portA_out,ddrA;
+
+static READ8_HANDLER( bking3_68705_portA_r )
+{
+	//printf("portA_r = %02X\n",(portA_out & ddrA) | (portA_in & ~ddrA));
+	return (portA_out & ddrA) | (portA_in & ~ddrA);
+}
+
+static WRITE8_HANDLER( bking3_68705_portA_w )
+{
+	portA_out = data;
+//	printf("portA_out = %02X\n",data);
+}
+
+static WRITE8_HANDLER( bking3_68705_ddrA_w )
+{
+	ddrA = data;
+}
+
+static UINT8 portB_in,portB_out,ddrB;
+
+static READ8_HANDLER( bking3_68705_portB_r )
+{
+	return (portB_out & ddrB) | (portB_in & ~ddrB);
+}
+
+static WRITE8_HANDLER( bking3_68705_portB_w )
+{
+//	if(data != 0xff)
+//		printf("portB_out = %02X\n",data);
+
+	if (~data & 0x02)
+	{
+		portA_in = from_main;
+		if (main_sent) cpunum_set_input_line(2,0,CLEAR_LINE);
+		main_sent = 0;
+	}
+
+	if (~data & 0x04)
+	{
+		/* 68705 is writing data for the Z80 */
+		from_mcu = portA_out;
+		mcu_sent = 1;
+	}
+
+	if(data != 0xff && data != 0xfb && data != 0xfd)
+		printf("portB_w = %X\n",data);
+
+	portB_out = data;
+}
+
+static WRITE8_HANDLER( bking3_68705_ddrB_w )
+{
+	ddrB = data;
+}
+
+static READ8_HANDLER( bking3_68705_portC_r )
+{
+	int portC_in = 0;
+	if (main_sent) portC_in |= 0x01;
+	if (!mcu_sent) portC_in |= 0x02;
+//logerror("%04x: 68705 port C read %02x\n",activecpu_get_pc(),portC_in);
+	return portC_in;
+}
+#endif
+static ADDRESS_MAP_START( m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_portA_r, buggychl_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_portB_r, buggychl_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_portC_r, buggychl_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bking )
@@ -519,14 +547,14 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( bking2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_ADD_TAG("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
+	MDRV_CPU_PROGRAM_MAP(bking2_map,0)
+	MDRV_CPU_IO_MAP(bking2_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 3000000)	/* 3 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_6MHz/2)	/* 3 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 			/* interrupts (from Jungle King hardware, might be wrong): */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
@@ -553,15 +581,29 @@ static MACHINE_DRIVER_START( bking2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_6MHz/4)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( bking3 )
+	MDRV_IMPORT_FROM(bking2)
+
+	MDRV_CPU_MODIFY("main_cpu")
+	MDRV_CPU_IO_MAP(bking3_io_map,0)
+	
+	MDRV_CPU_ADD(M68705, XTAL_3MHz/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
+
+	MDRV_MACHINE_RESET(buggychl)
+
+	MDRV_INTERLEAVE(100)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -651,6 +693,161 @@ ROM_START( bking2 )
 	ROM_LOAD( "pal16l8.3",  0x0400, 0x0104, CRC(a609d0cf) SHA1(7a18040720646c2dff4c1dc6f272c6a69e538c47) )
 ROM_END
 
+/*
+Birdie King 3
+Taito, 1984
+
+A golf game using a trackball. Uses same harness/pinout as 
+Elevator Action, Victorious Nine, Jolly Jogger (etc)
+
+PCB Layouts 
+(Note! There are no PALs on ANY of the PCBs)
+
+Top PCB
+-------
+DMO70003A
+K1000173B (sticker)
+ |------------------------|
+ |                        |
+|-|                       |
+| |  Z80        2114      |
+| |             2114      |
+| |N                      |
+| |  A24_18.4F            |
+| |      A24_19.4D        |
+|-|           A24_20.4B   |
+ |                        |
+ |  AY3-8910              |
+ |                        |
+ |      AY3-8910          |
+ |                        |
+ |                        |
+ |                   6MHz |
+ |                        |
+ |                        |
+ |                        |
+ | LM3900  LM3900  LM3900 |
+ |------------------------|
+Notes:
+      Z80      - Clock 3.000MHz [6/2]
+      AY3-8910 - Clock 1.500MHz [6/4]
+      2114     - 1kx4 SRAM (DIP18)
+      N        - Flat cable connector, joins to main board
+      LM3900   - National LM3900 Quad, dual-input amplifier IC (DIP14)
+      plus many resistors/capacitors below the AY3-8910's
+
+
+Sub PCB (below Top PCB)
+-----------------------
+SUB PCB J910 0010 A
+        K910 0018 A
+|------------------------|
+|           *            |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|                        |
+|A24_21.IC25             |
+|                        |
+|                   S2   |
+|                        |
+|         3MHz         S1|
+|T    A24_22.IC17        |
+|------------------------|
+Notes:
+      A24_22.IC17 - Motorola 68705P5 Microcontroller, clock 3.000MHz
+      A24_21.IC25 - 2732 EPROM
+      *           - DIP24 socket with flat cable below PCB, joins to main board
+      T           - 4-pin power connector (5 volts) coming from main board
+      S1          - Flat cable connector, joins to main PCB to connector S
+      S2          - Flat cable connector, joins to bottom PCB to connector S
+      
+      
+
+Main PCB
+--------
+J1100001A
+K1100001A
+M4300001D (sticker)
+K1100032A (sticker)
+|--------------------------------------------------------------|
+|      M3712    VOL             A24_03.2D             M53354   |
+|H                                        DM-04.2C            |-|
+|                     N                                  *    | |
+|           MC14584                                          R| |
+|                                                             | |
+|                                                             | |
+|                                                             | |
+|                                                             |-|
+|                                                              |
+|G          LM3900                                             |
+|    MC14093                                                   |
+|                   A24_01.7E                                 |-|
+|                                                             | |
+|                   A24_01.9E                                 | |
+|    MC14584                                                 S| |
+|                   A24_02.10E                                | |
+|    MC14584                    MC1455                        | |
+|                                                             |-|
+|    DSWC   DSWB   DSWA                                        |
+|--------------------------------------------------------------|
+Notes:
+      M53354    - ?, maybe 74LS154? (DIP24)
+      MC1455    - Motorola MC1455 Monolithic Timing Circuit (NE555 compatible)
+      A24_01/02 - 2716 EPROMs
+      A24_03    - Signetics 82S141 PROM (DIP24)
+      DM-04     - Signetics 82S123 PROM (DIP8)
+      *         - DIP24 socket with flat cable, joins to SUB PCB DIP24 socket
+      R/S       - Flat cable connector, R joins to main board, S joins to SUB PCB
+      G         - 22-way Edge Connector
+      N         - Flat cable connector, joins to TOP PCB
+      H         - 12-pin power connector
+      VSync     - 60Hz
+      HSync     - 15.67kHz
+      
+
+Bottom PCB
+----------
+DMO70002A
+DMN00002A
+K1000172B (sticker)
+|--------------------------------------------------------------|
+|   A24_17.13A         2114    Z80             A24_04.13F      |
+|                                                             |-|
+|   A24_16.11A         2114                    A24_05.11F     | |
+|                                                            S| |
+|   A24_15.10A                                 A24_06.10F     | |
+|                                                             | |
+|   A24_14.8A                                  A24_07.8F      | |
+|                                                             |-|
+|T  A24_13.7A                                  A24_08.7F       |
+|                                                              |
+|   A24_12.5A                                  A24_09.5F       |
+|                                                             |-|
+|                                              A24_10.4F      | |
+|            2114                                             | |
+|                                              A24_11.2F     R| |
+|            2114                                             | |
+|                                                             | |
+|            2114                                             |-|
+|                                                    12MHz     |
+|--------------------------------------------------------------|
+Notes:
+      R/S   - Flat cable connector, R joins to main board, S joins to SUB PCB
+      T     - 18-Way Edge Connector (for +5V/GND only)
+      A24_* - 2732 EPROMs
+      Z80   - Clock 3.000MHz [12/4]
+      2114  - 1kx4 SRAM (DIP18)
+*/
+
 ROM_START( bking3 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "a24-04.13f",   0x0000, 0x1000, CRC(a0c319a6) SHA1(6b79667288113fde43975fcfd05e93d8e45bf92d) )
@@ -668,7 +865,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-20.4b",    0x2000, 0x1000, CRC(0e9e16d6) SHA1(43c69602a8d9c34c527ce54472db84168acc4ef4) )
 
 	ROM_REGION( 0x0800, REGION_CPU3, 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "a24_22",    0x0000,  0x0800, NO_DUMP ) //M68705P5S uC 3MHz xtal
+	ROM_LOAD( "a24_22.ic17",  0x000000, 0x000800, CRC(27c497d5) SHA1(c6c72bbf0537da53148fa0a56d412ab46129d29c) )  //M68705P5S uC 3MHz xtal
 
 	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE ) /* Tiles */
 	ROM_LOAD( "a24-12.5a",    0x0000, 0x1000, CRC(c5fe4817) SHA1(fbf82d9d85e18b76c7e939932df074a545e73f42) )
@@ -691,17 +888,12 @@ ROM_START( bking3 )
 	ROM_LOAD( "82s123.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) ) /* collision detection */
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "82s141.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )	/* palette */
+	ROM_LOAD( "a24_03.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )	/* palette */
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */
-
-//missing?
-//"a24_03"  A24_03 - TI TBP28S46N - Not read
-//"a24_04"  A24_04 - Bipolar PROM - Not read
-
 ROM_END
 
 GAME( 1982, bking,  0, bking2, bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 )
 GAME( 1983, bking2, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
-GAME( 1984, bking3, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", 0 )
+GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_WRONG_COLORS )

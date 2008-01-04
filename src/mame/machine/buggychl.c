@@ -3,7 +3,14 @@
 
 
 static UINT8 from_main,from_mcu;
-static int mcu_sent = 0,main_sent = 0;
+static int mcu_sent,main_sent;
+
+MACHINE_RESET( buggychl )
+{
+	mcu_sent = 0;
+	main_sent = 0;
+	cpunum_set_input_line(2,0,CLEAR_LINE);
+}
 
 
 /***************************************************************************
