@@ -31,7 +31,7 @@ Caveman Ninja Issues:
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
-Note about verision levels using Mutant Fighter as the example:
+Note about version levels using Mutant Fighter as the example:
   Version 1  HD-00
   Version 2  HD-00-1
   Version 3  HD-00-2
@@ -132,7 +132,7 @@ static WRITE16_HANDLER( cninja_irq_w )
 	logerror("%08x:  Unmapped IRQ write %d %04x\n",activecpu_get_pc(),offset,data);
 }
 
-static READ16_HANDLER( robo2_dip3_r ) { return readinputport(3); }
+static READ16_HANDLER( robocop2_dip3_r ) { return readinputport(3); }
 
 static READ16_HANDLER( robocop2_prot_r )
 {
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( robocop2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x156000, 0x156fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1f8000, 0x1f8001) AM_READ(robo2_dip3_r) /* Dipswitch #3 */
+	AM_RANGE(0x1f8000, 0x1f8001) AM_READ(robocop2_dip3_r ) /* Dipswitch #3 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
