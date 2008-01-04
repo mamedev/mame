@@ -1378,7 +1378,7 @@ WRITE16_HANDLER( itech32_video_w )
 
 				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
 					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
-				video_screen_configure(0, VIDEO_HTOTAL, VIDEO_VTOTAL, &visarea, Machine->screen[0].refresh);
+				video_screen_configure(0, VIDEO_HTOTAL, VIDEO_VTOTAL, &visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
 			}
 			break;
 	}

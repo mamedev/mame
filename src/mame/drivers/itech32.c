@@ -24,6 +24,8 @@
 
     Known issues:
         * volume controls don't work in the Golden Tee games
+        * Driver's Edge accesses many uninitialized RAM locations;
+        	requires hack to make steering in attract mode work
 
 ****************************************************************************
 
@@ -218,11 +220,8 @@ Notes:
 #include "machine/timekpr.h"
 
 
-#define FULL_LOGGING	0
-
-#define CLOCK_8MHz		(8000000)
-#define CLOCK_12MHz		(12000000)
-#define CLOCK_25MHz		(25000000)
+#define FULL_LOGGING				0
+#define LOG_DRIVEDGE_UNINIT_RAM		0
 
 
 
@@ -709,7 +708,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(0);
 	if (!tms_spinning[0])
-		cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
+		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
@@ -718,21 +717,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(1);
 	if (!tms_spinning[1])
-		cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
+		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpu_boost_interleave(ATTOTIME_IN_HZ(CLOCK_25MHz/256), ATTOTIME_IN_USEC(20));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
@@ -804,8 +803,14 @@ static NVRAM_HANDLER( itech32 )
 	else if (file)
 		mame_fread(file, main_ram, main_ram_size);
 	else
+	{
 		for (i = 0x80; i < main_ram_size; i++)
 			((UINT8 *)main_ram)[i] = mame_rand(Machine);
+		
+		/* due to accessing uninitialized RAM, we need this hack */
+		if (is_drivedge)
+			((UINT32 *)main_ram)[0x2ce4/4] = 0x0000001e;
+	}
 }
 
 
@@ -818,15 +823,20 @@ static NVRAM_HANDLER( itech020 )
 	else if (file)
 		mame_fread(file, nvram, nvram_size);
 	else
+	{
 		for (i = 0; i < nvram_size; i++)
 			((UINT8 *)nvram)[i] = mame_rand(Machine);
+	}
 }
+
 
 static NVRAM_HANDLER( tournament )
 {
 	nvram_handler_itech020( machine, file, read_or_write );
 	nvram_handler_timekeeper_0( machine, file, read_or_write );
 }
+
+
 
 /*************************************
  *
@@ -873,7 +883,52 @@ ADDRESS_MAP_END
 
 
 /*------ Driver's Edge memory layouts ------*/
+
+#if LOG_DRIVEDGE_UNINIT_RAM
+static UINT8 written[0x8000];
+
+static READ32_HANDLER( test1_r )
+{
+	if (!(mem_mask & 0xff000000) && !written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+0);
+	if (!(mem_mask & 0x00ff0000) && !written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+1);
+	if (!(mem_mask & 0x0000ff00) && !written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+2);
+	if (!(mem_mask & 0x000000ff) && !written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+3);
+	return ((UINT32 *)main_ram)[0x100/4 + offset];
+}
+
+static WRITE32_HANDLER( test1_w )
+{
+	if (!(mem_mask & 0xff000000)) written[0x100 + offset*4+0] = 1;
+	if (!(mem_mask & 0x00ff0000)) written[0x100 + offset*4+1] = 1;
+	if (!(mem_mask & 0x0000ff00)) written[0x100 + offset*4+2] = 1;
+	if (!(mem_mask & 0x000000ff)) written[0x100 + offset*4+3] = 1;
+	COMBINE_DATA(&((UINT32 *)main_ram)[0x100/4 + offset]);
+}
+
+static READ32_HANDLER( test2_r )
+{
+	if (!(mem_mask & 0xff000000) && !written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+0);
+	if (!(mem_mask & 0x00ff0000) && !written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+1);
+	if (!(mem_mask & 0x0000ff00) && !written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+2);
+	if (!(mem_mask & 0x000000ff) && !written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+3);
+	return ((UINT32 *)main_ram)[0xc00/4 + offset];
+}
+
+static WRITE32_HANDLER( test2_w )
+{
+	if (!(mem_mask & 0xff000000)) written[0xc00 + offset*4+0] = 1;
+	if (!(mem_mask & 0x00ff0000)) written[0xc00 + offset*4+1] = 1;
+	if (!(mem_mask & 0x0000ff00)) written[0xc00 + offset*4+2] = 1;
+	if (!(mem_mask & 0x000000ff)) written[0xc00 + offset*4+3] = 1;
+	COMBINE_DATA(&((UINT32 *)main_ram)[0xc00/4 + offset]);
+}
+#endif
+
 static ADDRESS_MAP_START( drivedge_map, ADDRESS_SPACE_PROGRAM, 32 )
+#if LOG_DRIVEDGE_UNINIT_RAM
+AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
+AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
+#endif
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
 	AM_RANGE(0x080000, 0x080003) AM_READ(input_port_3_msw_r)
 	AM_RANGE(0x082000, 0x082003) AM_READ(input_port_4_msw_r)
@@ -1147,14 +1202,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( drivedge )
 	PORT_START	/* 8C000 */
-	PORT_BIT ( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT ( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Gear 1") PORT_CODE(KEYCODE_Z) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Gear 2") PORT_CODE(KEYCODE_X) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Gear 3") PORT_CODE(KEYCODE_C) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Gear 4") PORT_CODE(KEYCODE_V) PORT_PLAYER(1)
 	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT ( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* 8E000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Fan") PORT_CODE(KEYCODE_F) PORT_PLAYER(1)
@@ -1163,8 +1218,8 @@ static INPUT_PORTS_START( drivedge )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Turbo Boost") PORT_CODE(KEYCODE_B) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Network On") PORT_CODE(KEYCODE_N) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Key")
-	PORT_BIT ( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT ( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* 200000 */
 	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
@@ -1503,24 +1558,23 @@ static const struct ES5506interface es5506_interface =
 static MACHINE_DRIVER_START( timekill )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, CLOCK_12MHz)
+	MDRV_CPU_ADD_TAG("main", M68000, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(timekill_map,0)
 	MDRV_CPU_VBLANK_INT(generate_int1,1)
 
-	MDRV_CPU_ADD_TAG("sound", M6809, CLOCK_8MHz/4)
+	MDRV_CPU_ADD_TAG("sound", M6809, SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_RESET(itech32)
 	MDRV_NVRAM_HANDLER(itech32)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384,256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 199, 0, 199)  /* bogus size, game will set it later */
 	MDRV_PALETTE_LENGTH(8192)
+	
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_VIDEO_START(itech32)
 	MDRV_VIDEO_UPDATE(itech32)
@@ -1528,7 +1582,7 @@ static MACHINE_DRIVER_START( timekill )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(ES5506, 16000000)
+	MDRV_SOUND_ADD(ES5506, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(es5506_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1552,14 +1606,14 @@ static MACHINE_DRIVER_START( drivedge )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bloodstm)
 
-	MDRV_CPU_REPLACE("main", M68EC020, CLOCK_25MHz)
+	MDRV_CPU_REPLACE("main", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_map,0)
 	MDRV_CPU_VBLANK_INT(NULL,0)
 
-	MDRV_CPU_ADD(TMS32031, 40000000)
+	MDRV_CPU_ADD(TMS32031, TMS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_tms1_map,0)
 
-	MDRV_CPU_ADD(TMS32031, 40000000)
+	MDRV_CPU_ADD(TMS32031, TMS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_tms2_map,0)
 
 //  MDRV_CPU_ADD(M6803, 8000000/4) -- network CPU
@@ -1574,7 +1628,7 @@ static MACHINE_DRIVER_START( sftm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bloodstm)
 
-	MDRV_CPU_REPLACE("main", M68EC020, CLOCK_25MHz)
+	MDRV_CPU_REPLACE("main", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(itech020_map,0)
 
 	MDRV_CPU_MODIFY("sound")
@@ -3628,7 +3682,7 @@ static DRIVER_INIT( timekill )
 {
 	init_program_rom(machine);
 	via_config(0, &via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
+	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 512;
 	itech32_planes = 2;
 	is_drivedge = 0;
@@ -3639,7 +3693,7 @@ static DRIVER_INIT( hardyard )
 {
 	init_program_rom(machine);
 	via_config(0, &via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
+	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 0;
@@ -3650,7 +3704,7 @@ static DRIVER_INIT( bloodstm )
 {
 	init_program_rom(machine);
 	via_config(0, &via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
+	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 0;
@@ -3661,7 +3715,7 @@ static DRIVER_INIT( drivedge )
 {
 	init_program_rom(machine);
 	via_config(0, &drivedge_via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
+	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 	is_drivedge = 1;
@@ -3681,7 +3735,7 @@ static DRIVER_INIT( wcbowl )
     */
 	init_program_rom(machine);
 	via_config(0, &via_interface);
-	via_set_clock(0, CLOCK_8MHz/4);
+	via_set_clock(0, SOUND_CLOCK/8);
 	itech32_vram_height = 1024;
 	itech32_planes = 1;
 
