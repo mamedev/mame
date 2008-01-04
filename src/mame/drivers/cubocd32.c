@@ -384,7 +384,7 @@ static DRIVER_INIT( cd32 )
 	memory_configure_bank(1, 1, 1, memory_region(REGION_USER1), 0);
 
 	/* intialize akiko */
-	amiga_akiko_init();
+	amiga_akiko_init(machine);
 }
 
 /***************************************************************************************************/

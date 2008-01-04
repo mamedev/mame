@@ -1237,7 +1237,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 				cr3 = cr4 = 0;
 
 				// first 4 bytes = FAD
-				finfbuf[0] =   (curdir[temp].firstfad>>24)&0xff;
+				finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
 				finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
 				finfbuf[2] = (curdir[temp].firstfad>>8)&0xff;
 				finfbuf[3] = (curdir[temp].firstfad&0xff);
@@ -1556,6 +1556,12 @@ void stvcd_exit(running_machine* machine)
 	{
 		free((void *)curdir);
 		curdir = (direntryT *)NULL;
+	}
+
+	if (cdrom)
+	{
+		cdrom_close(cdrom);
+		cdrom = (cdrom_file *)NULL;
 	}
 }
 

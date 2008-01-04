@@ -1162,7 +1162,6 @@ void CLIB_DECL popmessage(const char *format, ...)
 	/* otherwise, generate the buffer and call the UI to display the message */
 	else
 	{
-		extern void CLIB_DECL ui_popup(const char *format, ...) ATTR_PRINTF(1,2);
 		va_list arg;
 
 		/* dump to the buffer */

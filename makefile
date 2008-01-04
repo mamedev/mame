@@ -314,7 +314,6 @@ CFLAGS += -O$(OPTIMIZE)
 # and make all errors into warnings
 ifneq ($(OPTIMIZE),0)
 CFLAGS += -Werror $(ARCHOPTS) -fno-strict-aliasing
-#CFLAGS += $(ARCHOPTS) -fno-strict-aliasing
 endif
 
 # if symbols are on, make sure we have frame pointers

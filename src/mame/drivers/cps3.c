@@ -2509,10 +2509,19 @@ static const struct WD33C93interface scsi_intf =
 	NULL			/* command completion IRQ */
 };
 
-static MACHINE_RESET( cps3 )
+static void cps3_exit(running_machine *machine)
+{
+	wd33c93_exit(&scsi_intf);
+}
+
+static MACHINE_START( cps3 )
 {
 	wd33c93_init(&scsi_intf);
+	add_exit_callback(machine, cps3_exit);
+}
 
+static MACHINE_RESET( cps3 )
+{
 	if (cps3_use_fastboot)
 	{
 		fastboot_timer = timer_alloc(fastboot_timer_callback, NULL);
@@ -2734,6 +2743,7 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_SCREEN_SIZE(512*2, 224*2)
 	MDRV_SCREEN_VISIBLE_AREA(0, (384*1)-1, 0, 223/*511*/)
 
+	MDRV_MACHINE_START(cps3)
 	MDRV_MACHINE_RESET(cps3)
 	MDRV_NVRAM_HANDLER( cps3 )
 	MDRV_PALETTE_LENGTH(0x10000) // actually 0x20000 ...

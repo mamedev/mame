@@ -68,7 +68,15 @@ static struct akiko_def
 static TIMER_CALLBACK(akiko_dma_proc);
 static TIMER_CALLBACK(akiko_frame_proc);
 
-void amiga_akiko_init(void)
+static void amiga_akiko_exit(running_machine* machine)
+{
+	if( akiko.cdrom ) {
+		cdrom_close(akiko.cdrom);
+		akiko.cdrom = (cdrom_file *)NULL;
+	}
+}
+
+void amiga_akiko_init(running_machine* machine)
 {
 	i2cmem_init( 0, I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE, NULL );
 
@@ -98,6 +106,8 @@ void amiga_akiko_init(void)
 	akiko.cdrom_toc = NULL;
 	akiko.dma_timer = timer_alloc(akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(akiko_frame_proc, NULL);
+	
+	add_exit_callback(machine, amiga_akiko_exit);
 
 	/* create the TOC table */
 	if ( akiko.cdrom != NULL && cdrom_get_last_track(akiko.cdrom) )
