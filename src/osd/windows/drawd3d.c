@@ -129,6 +129,7 @@ struct _d3d_info
 	int						adapter;					// ordinal adapter number
 	int						width, height;				// current width, height
 	int						refresh;					// current refresh rate
+	int						create_error_count;			// number of consecutive create errors
 
 	d3d_device *			device;						// pointer to the Direct3DDevice object
 	int						gamma_supported;			// is full screen gamma supported?
@@ -745,9 +746,20 @@ try_again:
 					D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &d3d->presentation, &d3d->device);
 	if (result != D3D_OK)
 	{
+		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
+		// we exceed a threshold
+		if (result == D3DERR_DEVICELOST)
+		{
+			d3d->create_error_count++;
+			if (d3d->create_error_count < 10)
+				return 1;
+		}
+	
+		//  fatal error if we just can't do it
 		mame_printf_error("Unable to create the Direct3D device (%08X)\n", (UINT32)result);
 		return 1;
 	}
+	d3d->create_error_count = 0;
 	mame_printf_verbose("Direct3D: Device created at %dx%d\n", d3d->width, d3d->height);
 
 	// set the max texture size
