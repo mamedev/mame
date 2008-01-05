@@ -95,21 +95,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x9000, 0x9fff) AM_READ(stactics_vert_pos_r)
     AM_RANGE(0xa000, 0xafff) AM_READ(stactics_horiz_pos_r)
 
-    AM_RANGE(0xb000, 0xb3ff) AM_READ(MRA8_RAM)
-    AM_RANGE(0xb800, 0xbfff) AM_READ(MRA8_RAM)
-
-    AM_RANGE(0xd000, 0xd3ff) AM_READ(MRA8_RAM)
-    AM_RANGE(0xd600, 0xd7ff) AM_READ(MRA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xd800, 0xdfff) AM_READ(MRA8_RAM)
-
-    AM_RANGE(0xe000, 0xe3ff) AM_READ(MRA8_RAM)
-    AM_RANGE(0xe600, 0xe7ff) AM_READ(MRA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xe800, 0xefff) AM_READ(MRA8_RAM)
-
-    AM_RANGE(0xf000, 0xf3ff) AM_READ(MRA8_RAM)
-    AM_RANGE(0xf600, 0xf7ff) AM_READ(MRA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)
-
+    AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM)	/* B RAM page */
+    AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)	/* D RAM page */
+    AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)	/* E RAM page */
+    AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)	/* F RAM page */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
