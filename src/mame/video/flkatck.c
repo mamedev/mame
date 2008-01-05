@@ -75,12 +75,6 @@ VIDEO_START( flkatck )
 	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 
-	k007121_clip[0] = machine->screen[0].visarea;
-	k007121_clip[0].min_x += 40;
-
-	k007121_clip[1] = machine->screen[0].visarea;
-	k007121_clip[1].max_x = 39;
-	k007121_clip[1].min_x = 0;
 }
 
 
@@ -144,10 +138,31 @@ popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%0
 	K007121_ctrlram[0][0x00],K007121_ctrlram[0][0x01],K007121_ctrlram[0][0x02],K007121_ctrlram[0][0x03],K007121_ctrlram[0][0x04],K007121_ctrlram[0][0x05],K007121_ctrlram[0][0x06],K007121_ctrlram[0][0x07],
 	K007121_ctrlram[1][0x00],K007121_ctrlram[1][0x01],K007121_ctrlram[1][0x02],K007121_ctrlram[1][0x03],K007121_ctrlram[1][0x04],K007121_ctrlram[1][0x05],K007121_ctrlram[1][0x06],K007121_ctrlram[1][0x07]);
 #endif
+	if (k007121_flip_screen)
+	{
+		k007121_clip[0] = Machine->screen[0].visarea;
+		k007121_clip[0].max_x -= 40;
 
-	/* set scroll registers */
-	tilemap_set_scrollx(k007121_tilemap[0],0,K007121_ctrlram[0][0x00] - 40);
-	tilemap_set_scrolly(k007121_tilemap[0],0,K007121_ctrlram[0][0x02]);
+		k007121_clip[1] = Machine->screen[0].visarea;
+		k007121_clip[1].min_x = k007121_clip[1].max_x-40;
+
+		tilemap_set_scrollx(k007121_tilemap[0],0,K007121_ctrlram[0][0x00] - 56 );
+		tilemap_set_scrolly(k007121_tilemap[0],0,K007121_ctrlram[0][0x02]);
+		tilemap_set_scrollx(k007121_tilemap[1],0,-16);
+	}
+	else
+	{
+		k007121_clip[0] = machine->screen[0].visarea;
+		k007121_clip[0].min_x += 40;
+
+		k007121_clip[1] = machine->screen[0].visarea;
+		k007121_clip[1].max_x = 39;
+		k007121_clip[1].min_x = 0;
+
+		tilemap_set_scrollx(k007121_tilemap[0],0,K007121_ctrlram[0][0x00] - 40 );
+		tilemap_set_scrolly(k007121_tilemap[0],0,K007121_ctrlram[0][0x02]);
+		tilemap_set_scrollx(k007121_tilemap[1],0,0);
+	}
 
 	/* compute clipping */
 	final_clip[0] = k007121_clip[0];
