@@ -752,7 +752,7 @@ try_again:
 		{
 			d3d->create_error_count++;
 			if (d3d->create_error_count < 10)
-				return 1;
+				return 0;
 		}
 	
 		//  fatal error if we just can't do it
