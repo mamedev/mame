@@ -1991,13 +1991,14 @@ const game_driver * const drivers[] =
 	DRIVER( commandw )	/* prototype */
 
 	/* Taito JC System */
-	DRIVER( landgear )	/* E17 (c) 199? Taito Corporation */
-	DRIVER( dendeg )	/* E35 (c) 199? Taito Corporation */
-	DRIVER( dendegx )	/* E35 (c) 199? Taito Corporation */
-	DRIVER( dendeg2 )	/* E52 (c) 199? Taito Corporation */
-	DRIVER( dendeg2x )	/* E52 (c) 199? Taito Corporation */
-	DRIVER( sidebs )	/* E23 (c) 199? Taito Corporation */
-	DRIVER( sidebs2 )	/* E38 (c) 199? Taito Corporation */
+	DRIVER( landgear )	/* E17 (c) 1995 Taito Corporation */
+	DRIVER( dendeg )	/* E35 (c) 1996 Taito Corporation */
+	DRIVER( dendegx )	/* E35 (c) 1996 Taito Corporation */
+	DRIVER( dendeg2 )	/* E52 (c) 1998 Taito Corporation */
+	DRIVER( dendeg2x )	/* E52 (c) 1998 Taito Corporation */
+	DRIVER( sidebs )	/* E23 (c) 1996 Taito Corporation */
+	DRIVER( sidebs2 )	/* E38 (c) 1997 Taito Corporation */
+	DRIVER( dangcurv )	/* E09 (c) 1995 Taito Corporation */
 
 	/* Taito "Wolf" System */
 	DRIVER( pf2012 )	/* E59 (c) 1997 Taito */
