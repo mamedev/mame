@@ -28,8 +28,8 @@ P0-125A ; KE (Namco)    1996    Kosodate Quiz My Angel                  Namco
 P0-136A ; KL (Namco)    1997    Kosodate Quiz My Angel 2                Namco
 P0-142A                 1999    Puzzle De Bowling                       Nihon System / Moss
 P0-142A + extra parts   2000    Penguin Brothers                        Subsino
-B0-003B                 2000    Deer Hunting USA                        Sammy
-B0-003B                 2001    Turkey Hunting USA                      Sammy
+B0-003A (or B0-003B)    2000    Deer Hunting USA                        Sammy
+B0-003A (or B0-003B)    2001    Turkey Hunting USA                      Sammy
 B0-010A                 2001    Wing Shooting Championship              Sammy
 B0-010A                 2002    Trophy Hunting - Bear & Moose           Sammy
 -------------------------------------------------------------------------------------------
@@ -181,7 +181,7 @@ Notes:  pzlbowl PCB with extra parts:
 
 Sammy USA Outdoor Shooting Series PCB
 
-PCB B0-003B:
+PCB B0-003A (or B0-003B):
    Deer Hunting USA (c) 2000 Sammy USA
    Turkey Hunting USA (c) 2001 Sammy USA
 
@@ -197,11 +197,11 @@ PCB B0-010A:
 EEPROM: 93LC46BX (1K Low-power 64 x 16-bit organization serial EEPROM)
    OSC: 50MHz & 28MHz
  Other: 8 Position Dipswitch x 2
-        Lattice ispLSI2032
-        Lattice isp1016E (2 for PCB B0-010A, used for light gun input)
+        Lattice ispLSI2032 - stamped "KW001"
+        Lattice isp1016E - stamped "GUN" (2 for PCB B0-010A, used for light gun input)
         BAT1 - CR2032 3Volt
 
-PCB Number: B0-003B
+PCB Number: B0-003A (or B0-003B)
 +-----------------------------------------------------------+
 |             VOL                          +------+         |
 |                                          |X1-010|     M1  |
