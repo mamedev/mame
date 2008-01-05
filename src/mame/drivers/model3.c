@@ -983,6 +983,22 @@ static const struct LSI53C810interface scsi_intf =
 	&scsi_fetch,
 };
 
+static void model3_exit(running_machine *machine)
+{
+	lsi53c810_exit(&scsi_intf);
+}
+
+static MACHINE_START(model3_10) 
+{
+	lsi53c810_init(&scsi_intf);
+	add_exit_callback(machine, model3_exit);
+}
+static MACHINE_START(model3_15) 
+{
+	lsi53c810_init(&scsi_intf);
+	add_exit_callback(machine, model3_exit);	
+}
+
 static void model3_init(running_machine *machine, int step)
 {
 	model3_step = step;
@@ -1006,7 +1022,6 @@ static void model3_init(running_machine *machine, int step)
 		} else {
 			mpc105_init();
 		}
-		lsi53c810_init(&scsi_intf);
 		real3d_device_id = 0x16c311db;	/* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
 	else {
@@ -4074,6 +4089,7 @@ static MACHINE_DRIVER_START( model3_10 )
 
  	MDRV_INTERLEAVE(10)
 
+	MDRV_MACHINE_START(model3_10)
 	MDRV_MACHINE_RESET(model3_10)
 	MDRV_NVRAM_HANDLER(model3)
 
@@ -4108,6 +4124,7 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model3_snd, 0)
 
+	MDRV_MACHINE_START(model3_15)
 	MDRV_MACHINE_RESET(model3_15)
 	MDRV_NVRAM_HANDLER(model3)
 
