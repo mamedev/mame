@@ -11,13 +11,16 @@
 
 ***************************************************************************/
 
-
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "sound/flt_rc.h"
+#include "sound/5110intf.h"
+#include "sound/tms5110.h"
+#include "sound/ay8910.h"
 #include "includes/galaxian.h"
 
+#define AD2083_TMS5110_CLOCK 		XTAL_640kHz
 
 /* The timer clock in Scramble which feeds the upper 4 bits of          */
 /* AY-3-8910 port A is based on the same clock                          */
@@ -252,3 +255,207 @@ void sfx_sh_init(void)
 }
 
 
+/***************************************************************************
+    AD2083 TMS5110 implementation (still wrong!)
+
+    ROMA: BIT1: Hypersoni ?
+    ROMA: BIT2: Two thousand eighty three
+   	ROMA: BIT4: Atomic City Attack
+    ROMA: BIT5: Thank you, please try again
+    ROMA: BIT6: Two, one, fire
+    ROMA: BIT7: Hyperjump
+    ROMB: BIT1: Noise (Explosion ?)
+    ROMB: BIT2: Welcome to the top 20
+    ROMB: BIT4: Atomic City Attack
+    ROMB: BIT5: Noise (Explosion ?)
+    ROMB: BIT6: Keep going pressing
+    ROMB: BIT7: You are the new champion
+    
+    The circuit consist of 
+    
+    2x 2532 32Kbit roms
+    2x 74LS393 quad 4bit counters to address roms
+    1x 74LS174 hex-d-flipflops to latch control byte
+    2x 74LS139 decoder to decode rom selects
+    1x 74LS161 8bit input multiplexor to select sound bit from rom data
+    1x 74LS00  quad nand to decode signals (unknown) to latch control byte
+               ==> 74LS139
+    1x 74LS16  quad open collector inverters
+    1x 74S288  32x8 Prom
+    
+    The prom obviously is used to provide the right timing when
+    fetching data bits. This circuit should be comparable to bagman.
+    
+    Prom
+    Q0		==> NC
+    Q1		==> PDC
+    Q2		==> CTL2/CTL8 (Speak/Reset)
+    Q7		==> Reset Counters (LS393)
+    Q8		==> Trigger Logic
+
+  ***************************************************************************/
+
+/* 
+ *      Alt1 Alt2
+ * 1 ==> C     B   Bit select
+ * 2 ==> B     C   Bit select
+ * 3 ==> A     A   Bit select
+ * 4 ==> B1        Rom select
+ * 5 ==> A1        Rom select
+ * 
+ *      ALT1      ALT2
+ * 321  CBA       CBA
+ * 000  000       000
+ * 001  100       010
+ * 010  010       100
+ * 011  110       110
+ * 100  001       001
+ * 101  101       011
+ * 110  011       101
+ * 111  111       111
+ * 
+ * Alt1 provides more sensible sound. Both Alt1 and Alt2 are
+ * possible on PCB so Alt2 is left in for documentation.
+ * 
+ */
+
+static UINT32 speech_rom_address;
+static UINT32 speech_rom_address_hi;
+static UINT8 speech_rom_bit;
+static UINT8 speech_cnt;
+
+static TIMER_CALLBACK( ad2083_step )
+{
+	/* only 16 bytes needed ... Stored here since 
+	 * prom is a bad dump 
+	 */
+	static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 
+			        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+	UINT8 ctrl;
+	
+	if (param == 0)
+	{
+		if (speech_cnt < 0x10)
+		{
+			/* Just reset and exit */
+			speech_cnt = 0;
+			return;
+		}
+		speech_cnt = 0;
+	}
+	ctrl = prom[speech_cnt++];
+
+	if (ctrl & 0x40)
+		speech_rom_address = 0;
+		
+	tms5110_CTL_w(0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_PDC_w(0, ctrl & 0x02 ? 0 : 1);
+
+	if (!(ctrl & 0x80))
+		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
+}
+
+static int ad2083_speech_rom_read_bit(void)
+{
+	UINT8 *ROM = memory_region(REGION_SOUND1);
+	int bit;
+
+	speech_rom_address %= 4096;
+
+	bit = (ROM[speech_rom_address | speech_rom_address_hi] >> speech_rom_bit) & 1;
+	speech_rom_address++;
+	
+	return bit;
+}
+
+static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
+{
+	int tbl[8] = {0,4,2,6,1,5,3,7};
+
+	speech_rom_bit = tbl[data & 0x07];
+	switch (data>>3)
+	{
+		case 0x00:
+			logerror("Rom 0 select .. \n");
+			break;
+		case 0x01:
+			/* Rom 2 select */
+			speech_rom_address_hi = 0x1000;
+			break;
+		case 0x02:
+			logerror("Rom 1 select\n");
+			break;
+		case 0x03:
+			/* Rom 3 select */
+			speech_rom_address_hi = 0x0000;
+			break;
+	}
+	timer_set(attotime_zero,NULL,0,ad2083_step);
+}
+
+static const struct TMS5110interface ad2083_tms5110_interface =
+{
+	TMS5110_IS_5110A,
+	-1,							/* rom_region */
+	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
+};
+
+
+static const struct AY8910interface ad2083_ay8910_interface_1 =
+{
+	scramble_portB_r
+};
+
+static const struct AY8910interface ad2083_ay8910_interface_2 =
+{
+	hotshock_soundlatch_r
+};
+
+static ADDRESS_MAP_START( ad2083_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_1_w)
+ADDRESS_MAP_END
+
+static SOUND_START( ad2083 )
+{
+	speech_rom_address = 0;
+	speech_rom_address_hi = 0;
+	speech_rom_bit = 0;
+	speech_cnt = 0x10;
+	
+	state_save_register_global(speech_rom_address);
+	state_save_register_global(speech_rom_address_hi);
+	state_save_register_global(speech_rom_bit);
+	state_save_register_global(speech_cnt);
+}
+
+MACHINE_DRIVER_START( ad2083_audio )
+	
+	MDRV_CPU_ADD(Z80, 14318000/8)	/* 1.78975 MHz */
+	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map,0)
+	MDRV_CPU_IO_MAP(ad2083_sound_io_map,0)
+	
+	MDRV_SOUND_START(ad2083)
+	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(AY8910, 14318000/8)
+	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	
+	MDRV_SOUND_ADD(AY8910, 14318000/8)
+	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	
+	MDRV_SOUND_ADD(TMS5110, AD2083_TMS5110_CLOCK)
+	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END

@@ -235,4 +235,5 @@ WRITE8_HANDLER( mrkougar_sh_irqtrigger_w );
 WRITE8_HANDLER( froggrmc_sh_irqtrigger_w );
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w );
 
+MACHINE_DRIVER_EXTERN( ad2083_audio );
 
