@@ -2378,17 +2378,16 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		xd = -x_offset;
 		yd = 8-y_offset;
 
-#if 0
+		// the multi-screen games need this, check the alignment grid screens..
 		if (chips==2)	/* Dual screen */
 		{
-			if (i==1)  xd += (320-multiscrn_xoffs);
+			if (i==1)  xd -= (multiscrn_xoffs);
 		}
 		if (chips==3)	/* Triple screen */
 		{
-			if (i==1)  xd += (286-multiscrn_xoffs);
-			if (i==2)  xd += (572-multiscrn_xoffs*2);
+			if (i==1)  xd -= multiscrn_xoffs;
+			if (i==2)  xd -= multiscrn_xoffs*2;
 		}
-#endif
 		tilemap_set_scrolldx(TC0100SCN_tilemap[i][0][1], xd-16, -flip_xoffs -xd-16);
 		tilemap_set_scrolldy(TC0100SCN_tilemap[i][0][1], yd,    -flip_yoffs -yd);
 		tilemap_set_scrolldx(TC0100SCN_tilemap[i][1][1], xd-16, -flip_xoffs -xd-16);

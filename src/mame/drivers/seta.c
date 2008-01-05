@@ -2161,8 +2161,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( drgnunit_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM				)	// ROM
-	AM_RANGE(0x080000, 0x0bffff) AM_READ(MRA16_RAM				)	// ROM (qzkklgy2)
+	AM_RANGE(0x000000, 0x0bffff) AM_READ(MRA16_ROM				)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(MRA16_RAM				)	// RAM (qzkklogy)
 	AM_RANGE(0xffc000, 0xffffff) AM_READ(MRA16_RAM				)	// RAM (drgnunit,stg)
 	AM_RANGE(0x100000, 0x103fff) AM_READ(seta_sound_word_r		)	// Sound
@@ -2180,8 +2179,7 @@ static ADDRESS_MAP_START( drgnunit_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnunit_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM						)	// ROM
-	AM_RANGE(0x080000, 0x0bffff) AM_WRITE(MWA16_RAM						)	// ROM (qzkklgy2)
+	AM_RANGE(0x000000, 0x0bffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(MWA16_RAM						)	// RAM (qzkklogy)
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(MWA16_RAM						)	// RAM (drgnunit,stg)
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(seta_sound_word_w				)	// Sound
@@ -4923,7 +4921,7 @@ static INPUT_PORTS_START( qzkklgy2 )
 	PORT_DIPNAME( 0x0004, 0x0004, "Highlight Right Answer (Cheat)")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "Unknown 1-3" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Skip Real DAT Rom Check?" ) // 'ON' it will pass DAT rom even if it isn't mapped(!)
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 1-4" )
@@ -8240,7 +8238,7 @@ ROM_END
 
 
 ROM_START( drgnunit )
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x0c0000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "prg-e.bin", 0x000000, 0x020000, CRC(728447df) SHA1(8bdc52a4cc5f36794a47f963545bdaa26c9acd6b) )
 	ROM_LOAD16_BYTE( "prg-o.bin", 0x000001, 0x020000, CRC(b2f58ecf) SHA1(5198e75b22bab630b458797988f2e443c601351f) )
 
@@ -8376,7 +8374,7 @@ ROM_START( rezont )
 ROM_END
 
 ROM_START( stg )
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x0c0000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "att01003.u27", 0x000000, 0x020000, CRC(7a640a93) SHA1(28c54eca9502d06ca55c2db91bfe7d149af006ed) )
 	ROM_LOAD16_BYTE( "att01001.u9",  0x000001, 0x020000, CRC(4fa88ad3) SHA1(55e0e689758511cdf514a633ffe3d7729e281b52) )
 	ROM_LOAD16_BYTE( "att01004.u33", 0x040000, 0x020000, CRC(bbd45ca1) SHA1(badb11faf5779e8444dd95eb08a94fbf9f73cc2c) ) // 1xxxxxxxxxxxxxxxx = 0xFF
@@ -8491,7 +8489,7 @@ ROM_START( blockcar )
 ROM_END
 
 ROM_START( qzkklogy )
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_REGION( 0x0c0000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "3.u27", 0x000000, 0x020000, CRC(b8c27cde) SHA1(4c36076801b6c915888b925c1e37d772bab1bb02) )
 	ROM_LOAD16_BYTE( "1.u9",  0x000001, 0x020000, CRC(ce01cd54) SHA1(ef91aecdf7b5586a6870ff237372d65f85cd4cd3) )
 	ROM_LOAD16_BYTE( "4.u33", 0x040000, 0x020000, CRC(4f5c554c) SHA1(0a10cefdf2dd876e6cb78023c3c15af24ba3c39a) )

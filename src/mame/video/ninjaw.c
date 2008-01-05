@@ -30,7 +30,7 @@ static VIDEO_START( ninjaw_core )
 
 	assert_always(chips > 0, "we have an erroneous TC0100SCN configuration");
 
-	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,2);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
