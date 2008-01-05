@@ -24,8 +24,10 @@
 #include "memconv.h"
 #include "z80dma.h"
 
-#define DEBUG(x...)
-//#define DEBUG(x...) printf(x)
+#define VERBOSE 0
+
+#define LOG(x)	do { if (VERBOSE) printf x; } while (0)
+
 
 #define REGNUM(_m, _s) (((_m)<<3) + (_s))
 #define GET_REGNUM(_c, _r) (&(_r) - &(WR0(_c)))
@@ -393,13 +395,13 @@ static void z80dma_write(int which, offs_t offset, UINT8 data)
 					fatalerror("Unimplemented WR6 command %02x", data);
 					break;
 				case 0xC3:	/* Reset */
-					DEBUG("Reset\n");
+					LOG(("Reset\n"));
 					break;
 				case 0xCF:	/* Load */
 					cntx->addressA = PORTA_ADDRESS(cntx);
 					cntx->addressB = PORTB_ADDRESS(cntx);
 					cntx->count = BLOCKLEN(cntx);
-					DEBUG("Load A: %x B: %x N: %x\n", cntx->addressA, cntx->addressB, cntx->count);
+					LOG(("Load A: %x B: %x N: %x\n", cntx->addressA, cntx->addressB, cntx->count));
 					break;
 				case 0x83:	/* Disable dma */
 					cntx->dma_enabled = 0;
@@ -461,7 +463,7 @@ void z80dma_rdy_write(int which, int state)
 	int param;
 
 	param = (which << 1) | (state ? 1 : 0);
-	DEBUG("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(&dma[which]));
+	LOG(("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH(&dma[which])));
 	timer_call_after_resynch(NULL, param, z80dma_rdy_write_callback);
 }
 
