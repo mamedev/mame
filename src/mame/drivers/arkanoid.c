@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Arkanoid driver (Preliminary)
+    Arkanoid driver
 
 
     Japanese version support cocktail mode (DSW #7), the others don't.

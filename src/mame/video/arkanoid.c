@@ -36,7 +36,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	}
 
 	/* bit 2 selects the input paddle */
-    arkanoid_paddle_select = data & 0x04;
+	arkanoid_paddle_select = data & 0x04;
 
 	/* bit 3 is coin lockout (but not the service coin) */
 	coin_lockout_w(0, !(data & 0x08));
@@ -60,7 +60,14 @@ WRITE8_HANDLER( arkanoid_d008_w )
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
-	/* bit 7 is unknown */
+	/* BM:  bit 7 is suspected to be MCU reset, the evidence for this is that
+	 the games tilt mode reset sequence shows the main CPU must be able to
+	 directly control the reset line of the MCU, else the game will crash 
+	 leaving the tilt screen (as the MCU is now out of sync with main CPU
+	 which resets itself).  This bit is the likely candidate as it is flipped
+	 early in bootup just prior to accessing the MCU for the first time. */
+	if (cpu_gettotalcpu()>1) // Bootlegs don't have the MCU but still set this bit
+		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
