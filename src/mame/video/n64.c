@@ -1011,15 +1011,21 @@ do																																	\
 																																	\
 		/* bilinear */																												\
 																																	\
-		sss1 = (SSS >> 10) - (tsl >> 2);																							\
-		sss2 = sss1 + 1;																											\
-																																	\
-		sst1 = (SST >> 10) - (ttl >> 2);																							\
-		sst2 = sst1 + 1;																											\
-																																	\
+        sss1 = SSS >> 10;                                                                                                           \
+        sss2 = sss1 + 1;                                                                                                            \
+                                                                                                                                    \
+        sst1 = SST >> 10;                                                                                                           \
+        sst2 = sst1 + 1;                                                                                                            \
+                                                                                                                                    \
 		CLAMP(sss1, sst1);																											\
 		CLAMP(sss2, sst2);																											\
 																																	\
+        sss1 -= tsl >> 2;                                                                                                           \
+        sss2 -= tsl >> 2;                                                                                                           \
+                                                                                                                                    \
+        sst1 -= ttl >> 2;                                                                                                           \
+        sst2 -= ttl >> 2;                                                                                                           \
+                                                                                                                                    \
 		FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);																\
 		FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);																\
 		FETCH_TEXEL(&t2, sss1, sst2, twidth, tformat, tsize, tbase);																\
@@ -1040,14 +1046,17 @@ do																																	\
 	else																															\
 	{																																\
 		int sss1, sst1;																												\
-		sss1 = (SSS >> 10) - (tsl >> 2);																							\
-		if ((SSS & 0x3ff) >= 0x200) sss1++;																							\
-																																	\
-		sst1 = (SST >> 10) - (ttl >> 2);																							\
-		if ((SST & 0x3ff) >= 0x200) sst1++;																							\
-																																	\
+        sss1 = SSS >> 10;                                                                                                           \
+        if ((SSS & 0x3ff) >= 0x200) sss1++;                                                                                         \
+                                                                                                                                    \
+        sst1 = SST >> 10;                                                                                                           \
+        if ((SST & 0x3ff) >= 0x200) sst1++;                                                                                         \
+                                                                                                                                    \
 		CLAMP(sss1, sst1);																											\
 																																	\
+        sss1 -= tsl >> 2;                                                                                                           \
+        sst1 -= ttl >> 2;                                                                                                           \
+                                                                                                                                    \
 		/* point sample */																											\
 		FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);																\
 	}																																\
@@ -1185,9 +1194,8 @@ static void texture_rectangle_16bit(TEX_RECTANGLE *rect)
 	tsize = tile[rect->tilenum].size;
 	tbase = tile[rect->tilenum].tmem;
 
-	// FIXME?: clamping breaks at least Rampage World Tour
-	clamp_t = 0; //tile[rect->tilenum].ct;
-	clamp_s = 0; //tile[rect->tilenum].cs;
+    clamp_t = tile[rect->tilenum].ct;
+    clamp_s = tile[rect->tilenum].cs;
 
 	mirror_t = tile[rect->tilenum].mt;
 	mirror_s = tile[rect->tilenum].ms;
@@ -1566,9 +1574,8 @@ static void texture_rectangle_32bit(TEX_RECTANGLE *rect)
 	tsize = tile[rect->tilenum].size;
 	tbase = tile[rect->tilenum].tmem;
 
-	// FIXME?: clamping breaks at least Rampage World Tour
-	clamp_t = 0; //tile[rect->tilenum].ct;
-	clamp_s = 0; //tile[rect->tilenum].cs;
+    clamp_t = tile[rect->tilenum].ct;
+    clamp_s = tile[rect->tilenum].cs;
 
 	mirror_t = tile[rect->tilenum].mt;
 	mirror_s = tile[rect->tilenum].ms;
