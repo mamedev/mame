@@ -72,6 +72,9 @@
 #include "sound/okim6295.h"
 
 
+#define MASTER_CLOCK		XTAL_14_31818MHz
+
+
 /*************************************
  *
  *  Interrupt handling
@@ -168,7 +171,7 @@ static WRITE16_HANDLER( latch_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_READWRITE(MRA16_RAM, rampart_bitmap_w) AM_BASE(&rampart_bitmap)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_READWRITE(MRA16_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
@@ -341,7 +344,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( arcadecl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz)
+	MDRV_CPU_ADD(M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
@@ -357,7 +360,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0+4, 336+4, 262, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 
 	MDRV_VIDEO_START(arcadecl)
 	MDRV_VIDEO_UPDATE(arcadecl)
@@ -365,7 +368,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, ATARI_CLOCK_14MHz/4/3)
+	MDRV_SOUND_ADD(OKIM6295, MASTER_CLOCK/4/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

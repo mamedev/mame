@@ -1636,7 +1636,7 @@ ROM_END
 static void gauntlet_common_init(int slapstic, int vindctr2)
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(0, 0x038000, slapstic);
+	atarigen_slapstic_init(0, 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	atarigen_swap_mem(memory_region(REGION_CPU1) + 0x000000, memory_region(REGION_CPU1) + 0x008000, 0x8000);

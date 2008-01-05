@@ -69,9 +69,6 @@ VIDEO_START( arcadecl )
 		0,					/* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	rampart_bitmap_init(machine, 43*8, 30*8);
-
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 

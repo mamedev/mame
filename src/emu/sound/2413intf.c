@@ -57,7 +57,7 @@ static void *ym2413_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = YM2413Init(clock, rate);
+	info->chip = YM2413Init(clock, rate, sndindex);
 	if (!info->chip)
 		return NULL;
 

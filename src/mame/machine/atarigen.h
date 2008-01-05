@@ -17,10 +17,10 @@
     CONSTANTS
 ##########################################################################*/
 
-#define ATARI_CLOCK_14MHz	14318180
-#define ATARI_CLOCK_20MHz	20000000
-#define ATARI_CLOCK_32MHz	32000000
-#define ATARI_CLOCK_50MHz	50000000
+#define ATARI_CLOCK_14MHz	XTAL_14_31818MHz
+#define ATARI_CLOCK_20MHz	XTAL_20MHz
+#define ATARI_CLOCK_32MHz	XTAL_32MHz
+#define ATARI_CLOCK_50MHz	XTAL_50MHz
 
 
 
@@ -134,7 +134,7 @@ NVRAM_HANDLER( atarigen );
     SLAPSTIC HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(int cpunum, int base, int chipnum);
+void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum);
 void atarigen_slapstic_reset(void);
 
 WRITE16_HANDLER( atarigen_slapstic_w );

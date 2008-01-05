@@ -71,7 +71,7 @@ static UINT8 			eeprom_unlocked;
 
 static UINT8			atarigen_slapstic_num;
 static UINT16 *			atarigen_slapstic;
-static UINT32			atarigen_slapstic_bank;
+static UINT8			atarigen_slapstic_bank;
 static void *			atarigen_slapstic_bank0;
 
 static UINT8 			sound_cpu_num;
@@ -452,29 +452,38 @@ INLINE void update_bank(int bank)
 }
 
 
+static void slapstic_postload(void)
+{
+	update_bank(slapstic_bank());
+}
+
+
 /*---------------------------------------------------------------
     atarigen_slapstic_init: Installs memory handlers for the
     slapstic and sets the chip number.
 ---------------------------------------------------------------*/
 
-void atarigen_slapstic_init(int cpunum, int base, int chipnum)
+void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum)
 {
+	/* reset in case we have no state */
 	atarigen_slapstic_num = chipnum;
 	atarigen_slapstic = NULL;
 
 	/* if we have a chip, install it */
-	if (chipnum)
+	if (chipnum != 0)
 	{
 		/* initialize the slapstic */
 		slapstic_init(chipnum);
 
 		/* install the memory handlers */
-		atarigen_slapstic = memory_install_read16_handler(cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, 0, atarigen_slapstic_r);
-		atarigen_slapstic = memory_install_write16_handler(cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, 0, atarigen_slapstic_w);
+		atarigen_slapstic = memory_install_readwrite16_handler(cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		atarigen_slapstic_bank0 = auto_malloc(0x2000);
 		memcpy(atarigen_slapstic_bank0, atarigen_slapstic, 0x2000);
+
+		/* ensure we recopy memory for the bank */
+		atarigen_slapstic_bank = 0xff;
 	}
 }
 
@@ -486,7 +495,7 @@ void atarigen_slapstic_init(int cpunum, int base, int chipnum)
 
 void atarigen_slapstic_reset(void)
 {
-	if (atarigen_slapstic_num)
+	if (atarigen_slapstic_num != 0)
 	{
 		slapstic_reset();
 		update_bank(slapstic_bank());
@@ -1497,4 +1506,7 @@ void atarigen_init_save_state(void)
 
 	state_save_register_global(playfield_latch);
 	state_save_register_global(playfield2_latch);
+
+	/* need a postload to reset the state */
+	state_save_register_func_postload(slapstic_postload);
 }

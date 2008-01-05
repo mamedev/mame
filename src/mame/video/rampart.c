@@ -22,18 +22,6 @@ UINT16 *rampart_bitmap;
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT8 *pfdirty;
-static mame_bitmap *pfbitmap;
-static int xdim, ydim;
-
-
-
-/*************************************
- *
  *  Video system start
  *
  *************************************/
@@ -77,14 +65,11 @@ VIDEO_START( rampart )
 		0,					/* callback routine for special entries */
 	};
 
-	/* initialize the playfield */
-	rampart_bitmap_init(machine, 43*8, 30*8);
-
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
 
 	/* set the intial scroll offset */
-	atarimo_set_xscroll(0, -4);
+	atarimo_set_xscroll(0, -12);
 }
 
 
@@ -114,8 +99,7 @@ VIDEO_UPDATE( rampart )
 			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
 				if (mo[x])
 				{
-					/* not yet verified
-                    */
+					/* the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default */
 					pf[x] = mo[x];
 
 					/* erase behind ourselves */
@@ -123,55 +107,6 @@ VIDEO_UPDATE( rampart )
 				}
 		}
 	return 0;
-}
-
-
-
-/*************************************
- *
- *  Bitmap initialization
- *
- *************************************/
-
-void rampart_bitmap_init(running_machine *machine, int _xdim, int _ydim)
-{
-	/* set the dimensions */
-	xdim = _xdim;
-	ydim = _ydim;
-
-	/* allocate dirty map */
-	pfdirty = auto_malloc(sizeof(pfdirty[0]) * ydim);
-	memset(pfdirty, 1, sizeof(pfdirty[0]) * ydim);
-
-	/* allocate playfield bitmap */
-	pfbitmap = auto_bitmap_alloc(xdim, ydim, machine->screen[0].format);
-}
-
-
-
-/*************************************
- *
- *  Bitmap RAM write handler
- *
- *************************************/
-
-WRITE16_HANDLER( rampart_bitmap_w )
-{
-	int oldword = rampart_bitmap[offset];
-	int newword = oldword;
-	int x, y;
-
-	COMBINE_DATA(&newword);
-	if (oldword != newword)
-	{
-		rampart_bitmap[offset] = newword;
-
-		/* track color usage */
-		x = offset % 256;
-		y = offset / 256;
-		if (x < xdim && y < ydim)
-			pfdirty[y] = 1;
-	}
 }
 
 
@@ -187,26 +122,17 @@ void rampart_bitmap_render(running_machine *machine, mame_bitmap *bitmap, const 
 	int x, y;
 
 	/* update any dirty scanlines */
-	for (y = 0; y < ydim; y++)
-		if (pfdirty[y])
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		const UINT16 *src = &rampart_bitmap[256 * y];
+		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+
+		/* regenerate the line */
+		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{
-			const UINT16 *src = &rampart_bitmap[256 * y];
-			UINT8 scanline[512];
-			UINT8 *dst = scanline;
-
-			/* regenerate the line */
-			for (x = 0; x < xdim / 2; x++)
-			{
-				int bits = *src++;
-				*dst++ = bits >> 8;
-				*dst++ = bits;
-			}
-			pfdirty[y] = 0;
-
-			/* draw it */
-			draw_scanline8(pfbitmap, 0, y, xdim, scanline, machine->pens, -1);
+			int bits = src[(x - 8) / 2];
+			dst[x + 0] = bits >> 8;
+			dst[x + 1] = bits & 0xff;
 		}
-
-	/* copy the cached bitmap */
-	copybitmap(bitmap, pfbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	}
 }

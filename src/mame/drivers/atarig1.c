@@ -944,7 +944,7 @@ static void init_g1_common(offs_t slapstic_base, int slapstic, int is_pitfight)
 	if (slapstic == -1)
 		pitfighb_cheap_slapstic_init();
 	else if (slapstic != 0)
-		atarigen_slapstic_init(0, slapstic_base, slapstic);
+		atarigen_slapstic_init(0, slapstic_base, 0, slapstic);
 	atarijsa_init(1, 4, 0, 0x8000);
 
 	atarig1_pitfight = is_pitfight;

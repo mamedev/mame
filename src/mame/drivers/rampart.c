@@ -13,6 +13,8 @@
     Note:
         P3 buttons 1 and 2 are mapped twice. THIS IS NOT A BUG!
 
+	bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -25,6 +27,9 @@
 #include "rampart.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
+
+
+#define MASTER_CLOCK		XTAL_14_31818MHz
 
 
 /*************************************
@@ -126,6 +131,8 @@ static WRITE16_HANDLER( latch_w )
         0x1000 == CBANK (color bank -- is it ever set to non-zero?)
         0x0800 == LETAMODE0 (controls center and left trackballs)
         0x0400 == LETARES (reset LETA analog control reader)
+        0x0200 == COINCTRL
+        0x0100 == COINCTRR
 
         0x0020 == PMIX0 (ADPCM mixer level)
         0x0010 == /PCMRES (ADPCM reset)
@@ -138,13 +145,19 @@ static WRITE16_HANDLER( latch_w )
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
+		coin_counter_w(0, (data >> 9) & 1);
+		coin_counter_w(1, (data >> 8) & 1);
 	}
 
 	/* lower byte being modified? */
 	if (ACCESSING_LSB)
 	{
-		atarigen_set_ym2413_vol(Machine, ((data >> 1) & 7) * 100 / 7);
 		atarigen_set_oki6295_vol(Machine, (data & 0x0020) ? 100 : 0);
+		if (!(data & 0x0010))
+			sndti_reset(SOUND_OKIM6295, 0);
+		atarigen_set_ym2413_vol(Machine, ((data >> 1) & 7) * 100 / 7);
+		if (!(data & 0x0001))
+			sndti_reset(SOUND_YM2413, 0);
 	}
 }
 
@@ -156,41 +169,31 @@ static WRITE16_HANDLER( latch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x140000, 0x147fff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x3e0000, 0x3effff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x460000, 0x460001) AM_READ(adpcm_r)
-	AM_RANGE(0x500000, 0x500fff) AM_READ(atarigen_eeprom_r)
-	AM_RANGE(0x640000, 0x640001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x640002, 0x640003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x6c0000, 0x6c0001) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x6c0002, 0x6c0003) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x6c0004, 0x6c0005) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x6c0006, 0x6c0007) AM_READ(input_port_5_word_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x140000, 0x147fff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(rampart_bitmap_w) AM_BASE(&rampart_bitmap)
-	AM_RANGE(0x220000, 0x3bffff) AM_WRITE(MWA16_NOP)	/* the code blasts right through this when initializing */
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3c0800, 0x3dffff) AM_WRITE(MWA16_NOP)	/* the code blasts right through this when initializing */
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
-	AM_RANGE(0x3e0800, 0x3e3f3f) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_WRITE(atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
-	AM_RANGE(0x3e3f80, 0x3effff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x460000, 0x460001) AM_WRITE(adpcm_w)
-	AM_RANGE(0x480000, 0x480003) AM_WRITE(ym2413_w)
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x5a0000, 0x5affff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x640000, 0x640001) AM_WRITE(latch_w)
-	AM_RANGE(0x720000, 0x72ffff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x7e0000, 0x7effff) AM_WRITE(atarigen_scanline_int_ack_w)
+/* full memory map deduced from schematics and GALs */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(23) )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
+	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_READWRITE(MRA16_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_READWRITE(MRA16_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
+	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_READWRITE(MRA16_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)
+	AM_RANGE(0x3e3f80, 0x3effff) AM_MIRROR(0x010000) AM_RAM
+	AM_RANGE(0x460000, 0x460001) AM_MIRROR(0x019ffe) AM_READWRITE(adpcm_r, adpcm_w)
+	AM_RANGE(0x480000, 0x480003) AM_MIRROR(0x019ffc) AM_WRITE(ym2413_w)
+	AM_RANGE(0x500000, 0x500fff) AM_MIRROR(0x019000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	AM_RANGE(0x5a6000, 0x5a6001) AM_MIRROR(0x019ffe) AM_WRITE(atarigen_eeprom_enable_w)
+	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffe) AM_WRITE(latch_w)
+	AM_RANGE(0x640000, 0x640001) AM_MIRROR(0x019ffc) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x640002, 0x640003) AM_MIRROR(0x019ffc) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x6c0000, 0x6c0001) AM_MIRROR(0x019ff8) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x6c0002, 0x6c0003) AM_MIRROR(0x019ff8) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x6c0004, 0x6c0005) AM_MIRROR(0x019ff8) AM_READ(input_port_4_word_r)
+	AM_RANGE(0x6c0006, 0x6c0007) AM_MIRROR(0x019ff8) AM_READ(input_port_5_word_r)
+	AM_RANGE(0x726000, 0x726001) AM_MIRROR(0x019ffe) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x7e6000, 0x7e6001) AM_MIRROR(0x019ffe) AM_WRITE(atarigen_scanline_int_ack_w)
 ADDRESS_MAP_END
 
 
@@ -203,7 +206,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rampart )
 	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -221,7 +224,7 @@ static INPUT_PORTS_START( rampart )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -245,7 +248,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ramprt2p )
 	PORT_START
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) // alternate button1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3) // alternate button1
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Players ) )
 	PORT_DIPSETTING(    0x0000, "2")
@@ -265,7 +268,7 @@ static INPUT_PORTS_START( ramprt2p )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) // alternate button2
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3) // alternate button2
 	PORT_SERVICE( 0x0800, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -379,12 +382,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rampart )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
+	MDRV_CPU_ADD(M68000, MASTER_CLOCK/2)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
 
 	MDRV_MACHINE_RESET(rampart)
 	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
@@ -395,7 +399,7 @@ static MACHINE_DRIVER_START( rampart )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0+4, 336+4, 262, 0, 240)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240)
 
 	MDRV_VIDEO_START(rampart)
 	MDRV_VIDEO_UPDATE(rampart)
@@ -403,11 +407,11 @@ static MACHINE_DRIVER_START( rampart )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, ATARI_CLOCK_14MHz/4/3)
+	MDRV_SOUND_ADD(OKIM6295, MASTER_CLOCK/4/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(YM2413, ATARI_CLOCK_14MHz/4)
+	MDRV_SOUND_ADD(YM2413, MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -531,7 +535,7 @@ static DRIVER_INIT( rampart )
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	memcpy(&memory_region(REGION_CPU1)[0x140000], &memory_region(REGION_CPU1)[0x40000], 0x8000);
-	atarigen_slapstic_init(0, 0x140000, 118);
+	atarigen_slapstic_init(0, 0x140000, 0x438000, 118);
 }
 
 
@@ -542,6 +546,6 @@ static DRIVER_INIT( rampart )
  *
  *************************************/
 
-GAME( 1990, rampart,  0,       rampart, rampart,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", 0 )
-GAME( 1990, ramprt2p, rampart, rampart, ramprt2p, rampart, ROT0, "Atari Games", "Rampart (Joystick)", 0 )
-GAME( 1990, rampartj, rampart, rampart, rampartj, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", 0 )
+GAME( 1990, rampart,  0,       rampart, rampart,  rampart, ROT0, "Atari Games", "Rampart (Trackball)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ramprt2p, rampart, rampart, ramprt2p, rampart, ROT0, "Atari Games", "Rampart (Joystick)", GAME_SUPPORTS_SAVE )
+GAME( 1990, rampartj, rampart, rampart, rampartj, rampart, ROT0, "Atari Games", "Rampart (Japan, Joystick)", GAME_SUPPORTS_SAVE )

@@ -252,7 +252,7 @@ struct slapstic_data
  *
  *************************************/
 
-enum state_type
+enum
 {
 	DISABLED,
 	ENABLED,
@@ -773,13 +773,13 @@ static const struct slapstic_data *const slapstic_table[] =
  *
  *************************************/
 
-static enum state_type state;
-static INT8 current_bank;
-static int access_68k;
+static UINT8 state;
+static UINT8 current_bank;
+static UINT8 access_68k;
 
-static INT8 alt_bank;
-static INT8 bit_bank;
-static INT8 add_bank;
+static UINT8 alt_bank;
+static UINT8 bit_bank;
+static UINT8 add_bank;
 static UINT8 bit_xor;
 
 static struct slapstic_data slapstic;
@@ -817,6 +817,14 @@ void slapstic_init(int chip)
 	/* see if we're 68k or 6502/6809 based */
 	access_68k = (Machine->drv->cpu[0].type != CPU_M6809 &&
 				  Machine->drv->cpu[0].type != CPU_M6502);
+	
+	/* save state */
+	state_save_register_item("slapstic", 0, state);
+	state_save_register_item("slapstic", 0, current_bank);
+	state_save_register_item("slapstic", 0, alt_bank);
+	state_save_register_item("slapstic", 0, bit_bank);
+	state_save_register_item("slapstic", 0, add_bank);
+	state_save_register_item("slapstic", 0, bit_xor);
 }
 
 
