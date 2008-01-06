@@ -38,9 +38,6 @@ static VIDEO_START( othunder_core )
 
 VIDEO_START( othunder )
 {
-	/* There is a problem here. 4 is correct for text layer/sprite
-       alignment, but the bg layers [or one of them] are wrong */
-
 	taito_hide_pixels = 4;
 	video_start_othunder_core(machine);
 }
