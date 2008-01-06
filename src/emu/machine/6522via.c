@@ -224,6 +224,18 @@ INLINE UINT32 v_time_to_cycles(struct via6522 *v, attotime t)
 }
 
 
+INLINE UINT16 v_get_counter1_value(struct via6522 *v) {
+	UINT16 val;
+
+	if (v->t1_active) {
+		val = v_time_to_cycles(v, timer_timeleft(v->t1)) - IFR_DELAY;
+	} else {
+		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1));
+	}
+	return val;
+}
+
+
 /************************ shift register ************************/
 
 static TIMER_CALLBACK( via_shift_callback );
@@ -462,27 +474,11 @@ int via_read(int which, int offset)
 
     case VIA_T1CL:
 		via_clear_int (which, INT_T1);
-		if (v->t1_active)
-			val = v_time_to_cycles(v, timer_timeleft(v->t1)) & 0xff;
-		else
-		{
-			if ( T1_CONTINUOUS(v->acr) )
-				val = (TIMER1_VALUE(v) - (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1)) % TIMER1_VALUE(v)) - 1) & 0xff;
-			else
-				val = (0x10000 - (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1)) & 0xffff) - 1) & 0xff;
-		}
+		val = v_get_counter1_value(v) & 0xFF;
 		break;
 
     case VIA_T1CH:
-		if (v->t1_active)
-			val = v_time_to_cycles(v, timer_timeleft(v->t1)) >> 8;
-		else
-		{
-			if ( T1_CONTINUOUS(v->acr) )
-				val = (TIMER1_VALUE(v)- (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1)) % TIMER1_VALUE(v)) - 1) >> 8;
-			else
-				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1)) & 0xffff) - 1) >> 8;
-		}
+		val = v_get_counter1_value(v) >> 8;
 		break;
 
     case VIA_T1LL:
@@ -784,28 +780,31 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 		break;
 
     case VIA_ACR:
-		v->acr = data;
-		if (T1_SET_PB7(v->acr))
 		{
-			if (v->t1_active)
-				v->out_b &= ~0x80;
-			else
-				v->out_b |= 0x80;
-
-			//if (v->ddr_b)
+			UINT16 counter1 = v_get_counter1_value(v);
+			v->acr = data;
+			if (T1_SET_PB7(v->acr))
 			{
-				UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
-
-				if (v->intf->out_b_func)
-					v->intf->out_b_func(0, write_data);
+				if (v->t1_active)
+					v->out_b &= ~0x80;
 				else
-					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
+					v->out_b |= 0x80;
+
+				//if (v->ddr_b)
+				{
+					UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
+	
+					if (v->intf->out_b_func)
+						v->intf->out_b_func(0, write_data);
+					else
+						logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
+				}
 			}
-		}
-		if (T1_CONTINUOUS(data))
-		{
-			timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, attotime_zero);
-			v->t1_active = 1;
+			if (T1_CONTINUOUS(data))
+			{
+				timer_adjust(v->t1, v_cycles_to_time(v, counter1 + IFR_DELAY), which, attotime_zero);
+				v->t1_active = 1;
+			}
 		}
 		break;
 
