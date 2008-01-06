@@ -866,29 +866,67 @@ static int validate_gfx(int drivnum, const machine_config *drv, const UINT32 *re
 	{
 		const gfx_decode_entry *gfx = &drv->gfxdecodeinfo[gfxnum];
 		int region = gfx->memory_region;
+		int xscale = (drv->gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : drv->gfxdecodeinfo[gfxnum].xscale;
+		int yscale = (drv->gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : drv->gfxdecodeinfo[gfxnum].yscale;
+		const gfx_layout *gl = gfx->gfxlayout;
+		int israw = (gl->planeoffset[0] == GFX_RAW);
+		int planes = gl->planes;
+		UINT16 width = gl->width;
+		UINT16 height = gl->height;
+		UINT32 total = gl->total;
 
 		/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
-		if (region && !IS_FRAC(gfx->gfxlayout->total))
+		if (region && !IS_FRAC(total))
 		{
 			int len, avail, plane, start;
+			UINT32 charincrement = gl->charincrement;
+			const UINT32 *poffset = gl->planeoffset;
 
 			/* determine which plane is the largest */
 			start = 0;
-			for (plane = 0; plane < MAX_GFX_PLANES; plane++)
-				if (gfx->gfxlayout->planeoffset[plane] > start)
-					start = gfx->gfxlayout->planeoffset[plane];
-			start &= ~(gfx->gfxlayout->charincrement - 1);
+			for (plane = 0; plane < planes; plane++)
+				if (poffset[plane] > start)
+					start = poffset[plane];
+			start &= ~(charincrement - 1);
 
 			/* determine the total length based on this info */
-			len = gfx->gfxlayout->total * gfx->gfxlayout->charincrement;
+			len = total * charincrement;
 
 			/* do we have enough space in the region to cover the whole decode? */
-			avail = region_length[region] - (gfx->start & ~(gfx->gfxlayout->charincrement/8-1));
+			avail = region_length[region] - (gfx->start & ~(charincrement/8-1));
 
 			/* if not, this is an error */
 			if ((start + len) / 8 > avail)
 			{
 				mame_printf_error("%s: %s has gfx[%d] extending past allocated memory\n", driver->source_file, driver->name, gfxnum);
+				error = TRUE;
+			}
+		}
+		if (israw)
+		{
+			if (total != RGN_FRAC(1,1))
+			{
+				mame_printf_error("%s: %s has gfx[%d] with unsupported layout total\n", driver->source_file, driver->name, gfxnum);
+				error = TRUE;
+			}
+
+			if (xscale != 1 || yscale != 1)
+			{
+				mame_printf_error("%s: %s has gfx[%d] with unsupported xscale/yscale\n", driver->source_file, driver->name, gfxnum);
+				error = TRUE;
+			}
+		}
+		else
+		{
+			if (planes > MAX_GFX_PLANES)
+			{
+				mame_printf_error("%s: %s has gfx[%d] with invalid planes\n", driver->source_file, driver->name, gfxnum);
+				error = TRUE;
+			}
+
+			if (xscale * width > MAX_ABS_GFX_SIZE || yscale * height > MAX_ABS_GFX_SIZE)
+			{
+				mame_printf_error("%s: %s has gfx[%d] with invalid xscale/yscale\n", driver->source_file, driver->name, gfxnum);
 				error = TRUE;
 			}
 		}

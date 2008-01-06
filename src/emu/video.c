@@ -498,8 +498,15 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		int region_length = 8 * memory_region_length(gfxdecodeinfo[i].memory_region);
 		int xscale = (gfxdecodeinfo[i].xscale == 0) ? 1 : gfxdecodeinfo[i].xscale;
 		int yscale = (gfxdecodeinfo[i].yscale == 0) ? 1 : gfxdecodeinfo[i].yscale;
-		UINT32 extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
+		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
 		gfx_layout glcopy;
+		const gfx_layout *gl = gfxdecodeinfo[i].gfxlayout;
+		int israw = (gl->planeoffset[0] == GFX_RAW);
+		int planes = gl->planes;
+		UINT16 width = gl->width;
+		UINT16 height = gl->height;
+		UINT32 total = gl->total;
+		UINT32 charincrement = gl->charincrement;
 		int j;
 
 		/* make a copy of the layout */
@@ -519,48 +526,50 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 		glcopy.extxoffs = extxoffs;
 		glcopy.extyoffs = extyoffs;
 
+		extpoffs = glcopy.planeoffset;
+
 		/* expand X and Y by the scale factors */
 		if (xscale > 1)
 		{
-			glcopy.width *= xscale;
-			for (j = glcopy.width - 1; j >= 0; j--)
+			width *= xscale;
+			for (j = width - 1; j >= 0; j--)
 				extxoffs[j] = extxoffs[j / xscale];
 		}
 		if (yscale > 1)
 		{
-			glcopy.height *= yscale;
-			for (j = glcopy.height - 1; j >= 0; j--)
+			height *= yscale;
+			for (j = height - 1; j >= 0; j--)
 				extyoffs[j] = extyoffs[j / yscale];
 		}
 
 		/* if the character count is a region fraction, compute the effective total */
-		if (IS_FRAC(glcopy.total))
+		if (IS_FRAC(total))
 		{
 			if (region_length == 0)
 				continue;
-			glcopy.total = region_length / glcopy.charincrement * FRAC_NUM(glcopy.total) / FRAC_DEN(glcopy.total);
+			total = region_length / charincrement * FRAC_NUM(total) / FRAC_DEN(total);
 		}
 
 		/* for non-raw graphics, decode the X and Y offsets */
-		if (glcopy.planeoffset[0] != GFX_RAW)
+		if (!israw)
 		{
 			/* loop over all the planes, converting fractions */
-			for (j = 0; j < glcopy.planes; j++)
+			for (j = 0; j < planes; j++)
 			{
-				UINT32 value = glcopy.planeoffset[j];
+				UINT32 value = extpoffs[j];
 				if (IS_FRAC(value))
-					glcopy.planeoffset[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
+					extpoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
 			}
 
 			/* loop over all the X/Y offsets, converting fractions */
-			for (j = 0; j < glcopy.width; j++)
+			for (j = 0; j < width; j++)
 			{
 				UINT32 value = extxoffs[j];
 				if (IS_FRAC(value))
 					extxoffs[j] = FRAC_OFFSET(value) + region_length * FRAC_NUM(value) / FRAC_DEN(value);
 			}
 
-			for (j = 0; j < glcopy.height; j++)
+			for (j = 0; j < height; j++)
 			{
 				UINT32 value = extyoffs[j];
 				if (IS_FRAC(value))
@@ -568,20 +577,26 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 			}
 		}
 
-		/* otherwise, just use yoffset[0] as the line modulo */
+		/* otherwise, just use the line modulo */
 		else
 		{
 			int base = gfxdecodeinfo[i].start;
 			int end = region_length/8;
+			int linemod = gl->yoffset[0];
 			while (glcopy.total > 0)
 			{
-				int elementbase = base + (glcopy.total - 1) * glcopy.charincrement / 8;
-				int lastpixelbase = elementbase + glcopy.height * glcopy.yoffset[0] / 8 - 1;
+				int elementbase = base + (total - 1) * charincrement / 8;
+				int lastpixelbase = elementbase + height * linemod / 8 - 1;
 				if (lastpixelbase < end)
 					break;
-				glcopy.total--;
+				total--;
 			}
 		}
+
+		/* update glcopy */
+		glcopy.width = width;
+		glcopy.height = height;
+		glcopy.total = total;
 
 		/* allocate the graphics */
 		machine->gfx[i] = allocgfx(&glcopy);

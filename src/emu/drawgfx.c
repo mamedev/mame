@@ -163,10 +163,16 @@ static void calc_penusage(gfx_element *gfx, int num)
 
 void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *gl)
 {
+	int israw = (gl->planeoffset[0] == GFX_RAW);
+	int planes = gl->planes;
+	UINT32 charincrement = gl->charincrement;
+	const UINT32 *poffset = gl->planeoffset;
 	const UINT32 *xoffset = gl->extxoffs ? gl->extxoffs : gl->xoffset;
 	const UINT32 *yoffset = gl->extyoffs ? gl->extyoffs : gl->yoffset;
 	UINT8 *dp = gfx->gfxdata + num * gfx->char_modulo;
 	int plane, x, y;
+
+	assert_always(!israw, "decodechar: raw layouts not supported");
 
 	/* zap the data to 0 */
 	memset(dp, 0, gfx->char_modulo);
@@ -174,10 +180,10 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *g
 	/* packed case */
 	if (gfx->flags & GFX_ELEMENT_PACKED)
 	{
-		for (plane = 0; plane < gl->planes; plane++)
+		for (plane = 0; plane < planes; plane++)
 		{
-			int planebit = 1 << (gl->planes - 1 - plane);
-			int planeoffs = num * gl->charincrement + gl->planeoffset[plane];
+			int planebit = 1 << (planes - 1 - plane);
+			int planeoffs = num * charincrement + poffset[plane];
 
 			for (y = 0; y < gfx->height; y++)
 			{
@@ -198,10 +204,10 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *g
 	/* unpacked case */
 	else
 	{
-		for (plane = 0; plane < gl->planes; plane++)
+		for (plane = 0; plane < planes; plane++)
 		{
-			int planebit = 1 << (gl->planes - 1 - plane);
-			int planeoffs = num * gl->charincrement + gl->planeoffset[plane];
+			int planebit = 1 << (planes - 1 - plane);
+			int planeoffs = num * charincrement + poffset[plane];
 
 			for (y = 0; y < gfx->height; y++)
 			{
@@ -232,6 +238,11 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *g
 
 gfx_element *allocgfx(const gfx_layout *gl)
 {
+	int israw = (gl->planeoffset[0] == GFX_RAW);
+	int planes = gl->planes;
+	UINT16 width = gl->width;
+	UINT16 height = gl->height;
+	UINT32 total = gl->total;
 	gfx_element *gfx;
 
 	/* allocate memory for the gfx_element structure */
@@ -254,17 +265,17 @@ gfx_element *allocgfx(const gfx_layout *gl)
 	}
 
 	/* fill in the rest */
-	gfx->width = gl->width;
-	gfx->height = gl->height;
-	gfx->total_elements = gl->total;
+	gfx->width = width;
+	gfx->height = height;
+	gfx->total_elements = total;
 	gfx->color_base = 0;
-	gfx->color_depth = 1 << gl->planes;
-	gfx->color_granularity = 1 << gl->planes;
+	gfx->color_depth = 1 << planes;
+	gfx->color_granularity = 1 << planes;
 	if (gfx->color_depth <= 32)
 		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
 
 	/* raw graphics case */
-	if (gl->planeoffset[0] == GFX_RAW)
+	if (israw)
 	{
 		/* modulos are determined for us by the layout */
 		gfx->line_modulo = (gl->extyoffs ? gl->extyoffs[0] : gl->yoffset[0]) / 8;
@@ -272,7 +283,7 @@ gfx_element *allocgfx(const gfx_layout *gl)
 
 		/* don't free the data because we will get a pointer at decode time */
 		gfx->flags |= GFX_ELEMENT_DONT_FREE;
-		if (gl->planes <= 4)
+		if (planes <= 4)
 			gfx->flags |= GFX_ELEMENT_PACKED;
 	}
 

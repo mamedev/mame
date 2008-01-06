@@ -237,10 +237,10 @@ void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 }
 
 /* the charlayout we use for the chargen */
-static gfx_layout ppu_charlayout =
+static const gfx_layout ppu_charlayout =
 {
 	8,8,	/* 8*8 characters */
-	512,	/* 512 characters - modified at runtime */
+	0,
 	2,		/* 2 bits per pixel */
 	{ 8*8, 0 },	/* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -256,6 +256,7 @@ static gfx_layout ppu_charlayout =
 void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 {
 	int i;
+	UINT32 total;
 
 	/* keep a local copy of the interface */
 	intf = auto_malloc(sizeof(*interface));
@@ -326,20 +327,24 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 			chips[i].videorom_banks = memory_region_length( intf->vrom_region[i] ) / 0x2000;
 
 			/* tweak the layout accordingly */
-			ppu_charlayout.total = chips[i].videorom_banks * CHARGEN_NUM_CHARS;
+			total = chips[i].videorom_banks * CHARGEN_NUM_CHARS;
 		}
 		else
 		{
 			chips[i].has_videorom = chips[i].videorom_banks = 0;
 
 			/* we need to reset this in case of mame running multisession */
-			ppu_charlayout.total = CHARGEN_NUM_CHARS;
+			total = CHARGEN_NUM_CHARS;
 		}
 
 		/* now create the gfx region */
 		{
+			gfx_layout gl;
 			UINT8 *src = chips[i].has_videorom ? memory_region( intf->vrom_region[i] ) : chips[i].videoram;
-			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &ppu_charlayout );
+
+			memcpy(&gl, &ppu_charlayout, sizeof(gl));
+			gl.total = total;
+			machine->gfx[intf->gfx_layout_number[i]] = allocgfx( &gl );
 			decodegfx( machine->gfx[intf->gfx_layout_number[i]], src, 0, machine->gfx[intf->gfx_layout_number[i]]->total_elements );
 			machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
 		}

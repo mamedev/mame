@@ -1205,6 +1205,22 @@ void konami_rom_deinterleave_4(int mem_region)
 }
 
 
+static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UINT32 total, const gfx_layout *layout, int bpp)
+{
+	gfx_layout gl;
+
+	memcpy(&gl, layout, sizeof(gl));
+	gl.total = total;
+	machine->gfx[gfx_index] = allocgfx(&gl);
+	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
+
+	/* set the color information */
+	if (machine->drv->color_table_len)
+		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / (1 << bpp);
+	else
+		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / (1 << bpp);
+}
+
 
 
 
@@ -1958,16 +1974,17 @@ static void K052109_tileflip_reset(void)
 }
 
 
-void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
 		void (*callback)(int tmap,int bank,int *code,int *color,int *flags,int *priority))
 {
 	int gfx_index, i;
-	static gfx_layout charlayout =
+	UINT32 total;
+	static const gfx_layout charlayout =
 	{
 		8,8,
-		0,				/* filled in later */
+		0,
 		4,
-		{ 0, 0, 0, 0 },	/* filled in later */
+		{ 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 		32*8
@@ -1980,22 +1997,17 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	/* tweak the structure for the number of tiles we have */
-	charlayout.total = memory_region_length(gfx_memory_region) / 32;
-	charlayout.planeoffset[0] = plane3 * 8;
-	charlayout.planeoffset[1] = plane2 * 8;
-	charlayout.planeoffset[2] = plane1 * 8;
-	charlayout.planeoffset[3] = plane0 * 8;
-
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(&charlayout);
-	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+	switch (plane_order)
+	{
+	case NORMAL_PLANE_ORDER:
+		total = memory_region_length(gfx_memory_region) / 32;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout, 4);
+		break;
 
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
+	default:
+		fatalerror("Unsupported plane_order");
+	}
 
 	K052109_memory_region = gfx_memory_region;
 	K052109_gfxnum = gfx_index;
@@ -2420,23 +2432,35 @@ static int K051960_dx, K051960_dy;
 static int K051960_irq_enabled, K051960_nmi_enabled;
 
 
-void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow))
 {
 	int gfx_index,i;
-	static gfx_layout spritelayout =
+	UINT32 total;
+	static const gfx_layout spritelayout =
 	{
 		16,16,
-		0,				/* filled in later */
+		0,
 		4,
-		{ 0, 0, 0, 0 },	/* filled in later */
+		{ 0, 8, 16, 24 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7,
 				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 				16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
 		128*8
 	};
-
+	static const gfx_layout spritelayout_reverse =
+	{
+		16,16,
+		0,
+		4,
+		{ 24, 16, 8, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7,
+				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
+		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+				16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
+		128*8
+	};
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -2445,22 +2469,22 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,
 
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	/* tweak the structure for the number of tiles we have */
-	spritelayout.total = memory_region_length(gfx_memory_region) / 128;
-	spritelayout.planeoffset[0] = plane0 * 8;
-	spritelayout.planeoffset[1] = plane1 * 8;
-	spritelayout.planeoffset[2] = plane2 * 8;
-	spritelayout.planeoffset[3] = plane3 * 8;
-
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+	switch (plane_order)
+	{
+	case NORMAL_PLANE_ORDER:
+		total = memory_region_length(gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		break;
 
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
+	case REVERSE_PLANE_ORDER:
+		total = memory_region_length(gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout_reverse, 4);
+		break;
+
+	default:
+		fatalerror("Unknown plane_order");
+	}
 
 	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
@@ -2913,16 +2937,17 @@ static UINT16 *K053245_ram[MAX_K053245_CHIPS], *K053245_buffer[MAX_K053245_CHIPS
 static UINT8 K053244_regs[MAX_K053245_CHIPS][0x10];
 static int K053245_dx[MAX_K053245_CHIPS], K053245_dy[MAX_K053245_CHIPS];
 
-void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index,i;
-	static gfx_layout spritelayout =
+	UINT32 total;
+	static const gfx_layout spritelayout =
 	{
 		16,16,
-		0,				/* filled in later */
+		0,
 		4,
-  		{ 0, 0, 0, 0 },	/* filled in later */
+  		{ 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7,
 				8*32+0, 8*32+1, 8*32+2, 8*32+3, 8*32+4, 8*32+5, 8*32+6, 8*32+7 },
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
@@ -2942,22 +2967,17 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	/* tweak the structure for the number of tiles we have */
-	spritelayout.total = memory_region_length(gfx_memory_region) / 128;
-	spritelayout.planeoffset[0] = plane3 * 8;
-	spritelayout.planeoffset[1] = plane2 * 8;
-	spritelayout.planeoffset[2] = plane1 * 8;
-	spritelayout.planeoffset[3] = plane0 * 8;
-
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+	switch (plane_order)
+	{
+	case NORMAL_PLANE_ORDER:
+		total = memory_region_length(gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		break;
 
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
+	default:
+		fatalerror("Unsupported plane_order");
+	}
 
 	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
@@ -3664,16 +3684,17 @@ void K053247_wraparound_enable(int status)
 	K053247_wraparound = status;
 }
 
-void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, int dy, int plane0,int plane1,int plane2,int plane3,
+void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, int dy, int plane_order,
 					 void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index,i;
-	static gfx_layout spritelayout =
+	UINT32 total;
+	static const gfx_layout spritelayout =
 	{
 		16,16,
-		0,				/* filled in later */
+		0,
 		4,
-		{ 0, 0, 0, 0 },	/* filled in later */
+		{ 0, 1, 2, 3 },
 		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
 				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
 		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
@@ -3688,22 +3709,17 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	/* tweak the structure for the number of tiles we have */
-	spritelayout.total = memory_region_length(gfx_memory_region) / 128;
-	spritelayout.planeoffset[0] = plane0;
-	spritelayout.planeoffset[1] = plane1;
-	spritelayout.planeoffset[2] = plane2;
-	spritelayout.planeoffset[3] = plane3;
-
 	/* decode the graphics */
-	machine->gfx[gfx_index] = allocgfx(&spritelayout);
-	decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+	switch (plane_order)
+	{
+	case NORMAL_PLANE_ORDER:
+		total = memory_region_length(gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout, 4);
+		break;
 
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
+	default:
+		fatalerror("Unsupported plane_order");
+	}
 
 	if (VERBOSE)
 	{
@@ -3749,11 +3765,12 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layout, int dx, int dy, void (*callback)(int *code,int *color,int *priority))
 {
 	int gfx_index;
+	UINT32 total;
 
-	static gfx_layout spritelayout =	/* System GX sprite layout */
+	static const gfx_layout spritelayout =	/* System GX sprite layout */
 	{
 		16,16,
-		32768,				/* filled in later */
+		0,
 		5,
 		{ 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 40, 41, 42, 43, 44, 45, 46, 47 },
@@ -3761,20 +3778,20 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 		  10*8*9, 10*8*10, 10*8*11, 10*8*12, 10*8*13, 10*8*14, 10*8*15 },
 		16*16*5
 	};
-	static gfx_layout spritelayout2 =	/* Run and Gun sprite layout */
+	static const gfx_layout spritelayout2 =	/* Run and Gun sprite layout */
 	{
 		16,16,
-		32768,				/* filled in later */
+		0,
 		4,
 		{ 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 32, 33, 34, 35, 36, 37, 38, 39 },
 		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
 		16*16*4
 	};
-	static gfx_layout spritelayout3 =	/* Lethal Enforcers II sprite layout */
+	static const gfx_layout spritelayout3 =	/* Lethal Enforcers II sprite layout */
 	{
 		16,16,
-		32768,				/* filled in later */
+		0,
 		8,
 		{ 8*1,8*0,8*3,8*2,8*5,8*4,8*7,8*6 },
 		{  0,1,2,3,4,5,6,7,64+0,64+1,64+2,64+3,64+4,64+5,64+6,64+7 },
@@ -3782,10 +3799,10 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 		  128*8, 128*9, 128*10, 128*11, 128*12, 128*13, 128*14, 128*15 },
 		128*16
 	};
-	static gfx_layout spritelayout4 =	/* System GX 6bpp sprite layout */
+	static const gfx_layout spritelayout4 =	/* System GX 6bpp sprite layout */
 	{
 		16,16,
-		32768,				/* filled in later */
+		0,
 		6,
 		{ 40, 32, 24, 16, 8, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7, 48, 49, 50, 51, 52, 53, 54, 55 },
@@ -3796,6 +3813,7 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 	UINT8 *s1, *s2, *d;
 	long i, c;
 	UINT16 *K055673_rom;
+	int size4;
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -3803,13 +3821,15 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	switch(layout) {
-	case K055673_LAYOUT_GX:
+	K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
+
+	/* decode the graphics */
+	switch(layout)
 	{
-		int size4 = (memory_region_length(gfx_memory_region)/(1024*1024))/5;
+	case K055673_LAYOUT_GX:
+		size4 = (memory_region_length(gfx_memory_region)/(1024*1024))/5;
 		size4 *= 4*1024*1024;
 		/* set the # of tiles based on the 4bpp section */
-		spritelayout.total = size4 / 128;
 		K055673_rom = auto_malloc(size4 * 5);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
@@ -3823,44 +3843,29 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 			*d++ = *s1++;
 			*d++ = *s2++;
 		}
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&spritelayout);
-		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
+
+		total = size4 / 128;
+		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout, 4);
 		break;
-	}
+
 	case K055673_LAYOUT_RNG:
-		K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
-		spritelayout2.total = memory_region_length(gfx_memory_region) / (16*16/2);
-
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&spritelayout2);
-		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
+		total = memory_region_length(gfx_memory_region) / (16*16/2);
+		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout2, 4);
 		break;
+
 	case K055673_LAYOUT_LE2:
-		K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
-		spritelayout3.total = memory_region_length(gfx_memory_region) / (16*16);
-
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&spritelayout3);
-		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
+		total = memory_region_length(gfx_memory_region) / (16*16);
+		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout3, 4);
 		break;
+
 	case K055673_LAYOUT_GX6:
-		K055673_rom = (UINT16 *)memory_region(gfx_memory_region);
-		spritelayout4.total = memory_region_length(gfx_memory_region) / (16*16*6/8);
-
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&spritelayout4);
-		decodegfx(machine->gfx[gfx_index], (UINT8 *)K055673_rom, 0, machine->gfx[gfx_index]->total_elements);
+		total = memory_region_length(gfx_memory_region) / (16*16*6/8);
+		decode_gfx(machine, gfx_index, (UINT8 *)K055673_rom, total, &spritelayout4, 4);
 		break;
+
+	default:
+		fatalerror("Unsupported layout");
 	}
-
-	assert(machine->gfx[gfx_index]);
-
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 
 	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
@@ -4541,6 +4546,43 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 		void (*callback)(int *code,int *color,int *flags))
 {
 	int gfx_index;
+	UINT32 total;
+	static const gfx_layout charlayout4 =
+	{
+		16,16,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
+				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		128*8
+	};
+	static const gfx_layout charlayout7 =
+	{
+		16,16,
+		0,
+		7,
+		{ 1,2,3,4,5,6,7 },
+		{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+				8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
+				8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		256*8
+	};
+	static const gfx_layout charlayout8 =
+	{
+		16,16,
+		0,
+		8,
+		{ 0,1,2,3,4,5,6,7 },
+		{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+				8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+		{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
+				8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+		256*8
+	};
 	static const tile_get_info_callback get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
 
 	/* find first empty slot to decode gfx */
@@ -4549,66 +4591,27 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
-	assert((bpp == 4) || (bpp == 7) || (bpp == 8));
-
-	if (bpp == 4)
+	/* decode the graphics */
+	switch (bpp)
 	{
-		static gfx_layout charlayout =
-		{
-			16,16,
-			0,				/* filled in later */
-			4,
-			{ 0, 1, 2, 3 },
-			{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-					8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-			{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-					8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-			128*8
-		};
+	case 4:
+		total = memory_region_length(gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4, 4);
+		break;
 
+	case 7:
+		total = memory_region_length(gfx_memory_region) / 256;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout7, 7);
+		break;
 
-		/* tweak the structure for the number of tiles we have */
-		charlayout.total = memory_region_length(gfx_memory_region) / 128;
+	case 8:
+		total = memory_region_length(gfx_memory_region) / 256;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8, 8);
+		break;
 
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&charlayout);
-		decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+	default:
+		fatalerror("Unsupported bpp");
 	}
-	else
-	{
-		static gfx_layout charlayout =
-		{
-			16,16,
-			0,				/* filled in later */
-			0,				/* filled in later */
-			{ 0 },			/* filled in later */
-			{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-					8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-			{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128,
-					8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-			256*8
-		};
-		int i;
-
-
-		/* tweak the structure for the number of tiles we have */
-		charlayout.total = memory_region_length(gfx_memory_region) / 256;
-		charlayout.planes = bpp;
-		if (bpp == 7) for (i = 0;i < 7;i++) charlayout.planeoffset[i] = i+1;
-		else for (i = 0;i < 8;i++) charlayout.planeoffset[i] = i;
-
-		/* decode the graphics */
-		machine->gfx[gfx_index] = allocgfx(&charlayout);
-		decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
-	}
-
-	assert(machine->gfx[gfx_index]);
-
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / (1 << bpp);
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / (1 << bpp);
 
 	K051316_memory_region[chip] = gfx_memory_region;
 	K051316_gfxnum[chip] = gfx_index;
@@ -5538,17 +5541,18 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 	tilemap *tmap;
 	int gfx_index;
 	int i;
-	gfx_layout charlayout8 =
+	UINT32 total;
+	static const gfx_layout charlayout8 =
 	{
 		8, 8,
-		0, /* filled in later */
+		0,
 		8,
 		{ 8*7,8*3,8*5,8*1,8*6,8*2,8*4,8*0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 0, 8*8, 8*8*2, 8*8*3, 8*8*4, 8*8*5, 8*8*6, 8*8*7 },
 		8*8*8
 	};
-	gfx_layout charlayout8le =
+	static const gfx_layout charlayout8le =
 	{
 		8, 8,
 		0,
@@ -5559,27 +5563,27 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
 		8*8*4
 	};
-	gfx_layout charlayout6 =
+	static const gfx_layout charlayout6 =
 	{
 		8, 8,
-		0, /* filled in later */
+		0,
 		6,
 		{ 40, 32, 24, 8, 16, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 0, 6*8, 6*8*2, 6*8*3, 6*8*4, 6*8*5, 6*8*6, 6*8*7 },
 		8*8*6
 	};
-	gfx_layout charlayout5 =
+	static const gfx_layout charlayout5 =
 	{
 		8, 8,
-		0, /* filled in later */
+		0,
 		5,
 		{ 32, 24, 8, 16, 0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
 		{ 0, 5*8, 5*8*2, 5*8*3, 5*8*4, 5*8*5, 5*8*6, 5*8*7 },
 		8*8*5
 	};
-	gfx_layout charlayout4 =
+	static const gfx_layout charlayout4 =
 	{
 		8, 8,
 		0,
@@ -5589,10 +5593,10 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 		{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
 		8*8*4
 	};
-	static gfx_layout charlayout4dj =
+	static const gfx_layout charlayout4dj =
 	{
 		8, 8,
-		0,				/* filled in later */
+		0,
 		4,
 		{ 8*3,8*1,8*2,8*0 },
 		{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -5612,69 +5616,43 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 	/* handle the various graphics formats */
 	i = (big) ? 8 : 16;
 
+	/* decode the graphics */
 	switch (bpp)
 	{
 		case K056832_BPP_4:
-			charlayout4.total = memory_region_length(gfx_memory_region) / (i*4);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout4);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*4);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4, 4);
 			break;
 
 		case K056832_BPP_5:
-			/* tweak the structure for the number of tiles we have */
-			charlayout5.total = memory_region_length(gfx_memory_region) / (i*5);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout5);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*5);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout5, 4);
 			break;
 
 		case K056832_BPP_6:
-			/* tweak the structure for the number of tiles we have */
-			charlayout6.total = memory_region_length(gfx_memory_region) / (i*6);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout6);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*6);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout6, 4);
 			break;
 
 		case K056832_BPP_8:
-			/* tweak the structure for the number of tiles we have */
-			charlayout8.total = memory_region_length(gfx_memory_region) / (i*8);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout8);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*8);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8, 4);
 			break;
 
 		case K056832_BPP_8LE:
-			/* tweak the structure for the number of tiles we have */
-			charlayout8le.total = memory_region_length(gfx_memory_region) / (i*8);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout8le);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*8);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout8le, 4);
 			break;
 
 		case K056832_BPP_4dj:
-			charlayout4dj.total = memory_region_length(gfx_memory_region) / (i*4);
-
-			/* decode the graphics */
-			machine->gfx[gfx_index] = allocgfx(&charlayout4dj);
-			decodegfx(machine->gfx[gfx_index], memory_region(gfx_memory_region), 0, machine->gfx[gfx_index]->total_elements);
+			total = memory_region_length(gfx_memory_region) / (i*4);
+			decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4dj, 4);
 			break;
+
+		default:
+			fatalerror("Unsupported bpp");
 	}
 
-	/* make sure the decode went OK */
-	assert(machine->gfx[gfx_index]);
-
-	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / 16;
-	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / 16;
 	machine->gfx[gfx_index]->color_granularity = 16; /* override */
 
 	K056832_memory_region = gfx_memory_region;

@@ -345,8 +345,6 @@ static const gfx_layout CGA_charlayout =
     { 0,1,2,3,4,5,6,7 },
     /* y offsets */
 	{ 0*8,1*8,2*8,3*8,
-	  4*8,5*8,6*8,7*8,
-	  0*8,1*8,2*8,3*8,
 	  4*8,5*8,6*8,7*8 },
     8*8                     /* every char takes 8 bytes */
 };

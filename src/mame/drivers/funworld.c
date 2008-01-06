@@ -1318,8 +1318,7 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	4,
-	8,
+	4,8,
 	0x1000,
 //  RGN_FRAC(1,2),
 	4,
@@ -1332,8 +1331,7 @@ static const gfx_layout charlayout =
 
 static const gfx_layout sn10_charlayout =
 {
-	4,
-	8,
+	4,8,
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(0,2), RGN_FRAC(0,2) + 4, RGN_FRAC(1,2), RGN_FRAC(1,2) + 4 },

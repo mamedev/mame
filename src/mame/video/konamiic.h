@@ -44,8 +44,8 @@ The konami_rom_deinterleave() function above will do the reorganization for
 you in most cases (but see tmnt.c for additional bit rotations or byte
 permutations which may be required).
 */
-#define NORMAL_PLANE_ORDER 0,1,2,3
-#define REVERSE_PLANE_ORDER 3,2,1,0
+#define NORMAL_PLANE_ORDER 0x0123
+#define REVERSE_PLANE_ORDER 0x3210
 
 
 /*
@@ -64,7 +64,7 @@ The callback must put:
 */
 extern tilemap *K052109_tilemap[3];
 
-void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
 		void (*callback)(int layer,int bank,int *code,int *color,int *flags,int *priority));
 /* plain 8-bit access */
 READ8_HANDLER( K052109_r );
@@ -92,7 +92,7 @@ The callback must put:
   shadow is preloaded with color & 0x80 so it doesn't need to be changed unless
   the game has special treatment (Aliens)
 */
-void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority,int *shadow));
 READ8_HANDLER( K051960_r );
 WRITE8_HANDLER( K051960_w );
@@ -112,7 +112,7 @@ READ8_HANDLER( K052109_051960_r );
 WRITE8_HANDLER( K052109_051960_w );
 
 
-void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane0,int plane1,int plane2,int plane3,
+void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ16_HANDLER( K053245_word_r );
 WRITE16_HANDLER( K053245_word_w );
@@ -152,7 +152,7 @@ Callback procedures for non-standard shadows:
 #define K053247_CUSTOMSHADOW	0x20000000
 #define K053247_SHDSHIFT		20
 
-void K053247_vh_start(running_machine *machine, int gfx_memory_region,int dx,int dy,int plane0,int plane1,int plane2,int plane3,
+void K053247_vh_start(running_machine *machine, int gfx_memory_region,int dx,int dy,int plane_order,
 		void (*callback)(int *code,int *color,int *priority_mask));
 READ8_HANDLER( K053247_r );
 WRITE8_HANDLER( K053247_w );

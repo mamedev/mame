@@ -1216,39 +1216,9 @@ INPUT_PORTS_END
 /********** GFX DECODE **********/
 
 /* sprites are contained in 256x256 "tiles" */
-static const gfx_layout spritelayout =
-{
-	256,256,
-	RGN_FRAC(1,1),
-	8,
-	{ GFX_RAW },
-	{ 0 },		/* org displacement */
-	{ 256*8 },	/* line modulo */
-	256*256*8	/* char modulo */
-};
-
-static const gfx_layout bglayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ GFX_RAW },
-	{ 0 },		/* org displacement */
-	{ 16*8 },	/* line modulo */
-	16*16*8		/* char modulo */
-};
-
-
-static const gfx_layout txlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	8,
-	{ GFX_RAW },
-	{ 0 },		/* org displacement */
-	{ 8*8 },	/* line modulo */
-	8*8*8		/* char modulo */
-};
+static GFXLAYOUT_RAW( spritelayout, 8, 256, 256, 256*8, 256*256*8 )
+static GFXLAYOUT_RAW( bglayout, 8, 16, 16, 16*8, 16*16*8 )
+static GFXLAYOUT_RAW( txlayout, 8, 8, 8, 8*8, 8*8*8 )
 
 static GFXDECODE_START( ms32 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0x0000, 0x10 )

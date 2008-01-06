@@ -1311,27 +1311,8 @@ static const gfx_layout cps1_layout8x8_2 =
 	64*8
 };
 
-static const gfx_layout layout16x16 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ GFX_RAW },
-	{ 0 },		/* org displacement */
-	{ 8*8 },	/* line modulo */
-	128*8		/* char modulo */
-};
-
-static const gfx_layout layout32x32 =
-{
-	32,32,
-	RGN_FRAC(1,1),
-	4,
-	{ GFX_RAW },
-	{ 0 },		/* org displacement */
-	{ 16*8 },	/* line modulo */
-	512*8		/* char modulo */
-};
+static GFXLAYOUT_RAW( layout16x16, 4, 16, 16, 8*8, 128*8 )
+static GFXLAYOUT_RAW( layout32x32, 4, 32, 32, 16*8, 512*8 )
 
 static GFXDECODE_START( cps2 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, cps1_layout8x8,   0, 0x100 )

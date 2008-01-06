@@ -338,16 +338,18 @@ static const gfx_layout gfxlayout_8x8x4 =
     8*8*4
 };
 
+#if 0
 static const gfx_layout gfxlayout_16x16x16 =
 {
     16,16,
     RGN_FRAC(1,1),
     16,
-    { 0 },
+    { STEP16(0,0) },	// >8planes not supported
     { STEP16(15,-1) },
     { STEP16(0,16*1) },
     16*16*16
 };
+#endif
 
 static GFXDECODE_START( igs_m027 )
     GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout_8x8x4,   0, 16  )

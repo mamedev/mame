@@ -105,6 +105,10 @@ enum
 #define GFXDECODE_SCALE(region,offset,layout,start,colors,xscale,yscale) { region, offset, &layout, start, colors, xscale, yscale },
 #define GFXDECODE_END { -1 } };
 
+/* these macros are used for declaring gfx_layout structures. */
+#define GFXLAYOUT_RAW( name, planes, width, height, linemod, charmod ) \
+const gfx_layout name = { width, height, RGN_FRAC(1,1), planes, { GFX_RAW }, { 0 }, { linemod }, charmod };
+
 
 /***************************************************************************
     TYPE DEFINITIONS
