@@ -3034,7 +3034,7 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			emit_mov_r32_m32(DRCTOP, REG_EDX, CPR0ADDR(COP0_Status));						// mov  edx,[Status]
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Status), REG_EAX);						// mov  [Status],eax
 			emit_xor_r32_r32(DRCTOP, REG_EDX, REG_EAX);										// xor  edx,eax
-			emit_test_r32_imm(DRCTOP, REG_EDX, 0x8000);										// test edx,0x8000
+			emit_test_r32_imm(DRCTOP, REG_EDX, SR_IMEX5);										// test edx,0x8000
 			emit_jcc_short_link(DRCTOP, COND_Z, &link1);									// jz   skip
 			emit_lea_r64_m64(DRCTOP, REG_P1, COREADDR);										// lea  p1,[mips3.core]
 			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->mips3com_update_cycle_counting));	// call mips3com_update_cycle_counting

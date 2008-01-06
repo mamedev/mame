@@ -2553,7 +2553,7 @@ static int rsp_execute(int cycles)
 
 	if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 	{
-		rsp_icount = 0;
+		rsp_icount = MIN(rsp_icount, 0);
 	}
 
 	while (rsp_icount > 0)
@@ -2589,7 +2589,7 @@ static int rsp_execute(int cycles)
 					case 0x0d:	/* BREAK */
 					{
 						(config->sp_set_status)(0x3);
-						rsp_icount = 1;
+						rsp_icount = MIN(rsp_icount, 1);
 
 #if LOG_INSTRUCTION_EXECUTION
 						fprintf(exec_output, "\n---------- break ----------\n\n");
@@ -2788,7 +2788,7 @@ static int rsp_execute(int cycles)
 
 		if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
 		{
-			rsp_icount = 0;
+			rsp_icount = MIN(rsp_icount, 0);
 		}
 
 	}
