@@ -230,6 +230,20 @@ static RECTANGLE clip;
 static UINT8 *texture_cache;
 static UINT32 tlut[256];
 
+#define MASK(S, T)                                                        \
+do                                                                        \
+{                                                                        \
+    if (mask_s != 0)                                                    \
+    {                                                                    \
+        S &= (((UINT32)(0xffffffff) >> (32-mask_s)));                    \
+    }                                                                    \
+    if (mask_t != 0)                                                    \
+    {                                                                    \
+        T &= (((UINT32)(0xffffffff) >> (32-mask_t)));                    \
+    }                                                                    \
+}                                                                        \
+while (0)
+
 #define CLAMP(S, T)														\
 do																		\
 {																		\
@@ -243,10 +257,6 @@ do																		\
 		if (S < (tsl >> 2)) S = abs(S - (tsl >> 2));					\
 		if (S > (tsh >> 2)) S = abs(S - (tsh >> 2));					\
 	}																	\
-	if (mask_s != 0)													\
-	{																	\
-		S &= (((UINT32)(0xffffffff) >> (32-mask_s)));					\
-	}																	\
 	if (clamp_t)														\
 	{																	\
 		if (T < (ttl >> 2)) T = (ttl >> 2);								\
@@ -256,10 +266,6 @@ do																		\
 	{																	\
 		if (T < (ttl >> 2)) T = abs(T - (ttl >> 2));					\
 		if (T > (tth >> 2)) T = abs(T - (tth >> 2));					\
-	}																	\
-	if (mask_t != 0)													\
-	{																	\
-		T &= (((UINT32)(0xffffffff) >> (32-mask_t)));					\
 	}																	\
 }																		\
 while (0)
@@ -832,7 +838,7 @@ INLINE void FETCH_TEXEL(COLOR *color, int s, int t, UINT32 twidth, UINT32 tforma
 				case PIXEL_SIZE_32BIT:
 				{
 					UINT32 *tc = (UINT32*)texture_cache;
-					int taddr = ((tbase/4) + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_DWORD : 0);
+                    int taddr = ((tbase/4) + ((t) * (twidth/2)) + (s)) ^ ((t & 1) ? XOR_SWAP_DWORD : 0);
 					UINT32 c = tc[taddr];
 
 					color->r = ((c >> 24) & 0xff);
@@ -1026,6 +1032,9 @@ do																																	\
         sst1 -= ttl >> 2;                                                                                                           \
         sst2 -= ttl >> 2;                                                                                                           \
                                                                                                                                     \
+        MASK(sss1, sst1);                                                                                                           \
+        MASK(sss2, sst2);                                                                                                           \
+                                                                                                                                    \
 		FETCH_TEXEL(&t0, sss1, sst1, twidth, tformat, tsize, tbase);																\
 		FETCH_TEXEL(&t1, sss2, sst1, twidth, tformat, tsize, tbase);																\
 		FETCH_TEXEL(&t2, sss1, sst2, twidth, tformat, tsize, tbase);																\
@@ -1056,6 +1065,8 @@ do																																	\
 																																	\
         sss1 -= tsl >> 2;                                                                                                           \
         sst1 -= ttl >> 2;                                                                                                           \
+                                                                                                                                    \
+        MASK(sss1, sst1);                                                                                                           \
                                                                                                                                     \
 		/* point sample */																											\
 		FETCH_TEXEL(&TEX, sss1, sst1, twidth, tformat, tsize, tbase);																\
@@ -1821,6 +1832,7 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
 
 			if (x >= clipx1 && x < clipx2)
 			{
+                int alpha_out = 0;
 				COLOR c1, c2;
 				c1.r = c1.g = c1.b = c1.a = 0;
 				c2.r = c2.g = c2.b = c2.a = 0;
@@ -1905,44 +1917,55 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
 				if (other_modes.cycle_type == CYCLE_TYPE_1)
 				{
 					c1 = COLOR_COMBINER(0);
+                    if( c1.a == 0 )
+                    {
+                        alpha_out = 1;
+                    }
 				}
 				else if (other_modes.cycle_type == CYCLE_TYPE_2)
 				{
 					c1 = COLOR_COMBINER(0);
 					c2 = COLOR_COMBINER(1);
+                    if( c2.a == 0 )
+                    {
+                        alpha_out = 1;
+                    }
 				}
 
-				oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-				if (zbuffer)
-				{
-					if (sz < oz /*&& c.a != 0*/)
-					{
-						if (other_modes.cycle_type == CYCLE_TYPE_1)
-						{
-							BLENDER1_32(&fb[(fb_index + x)], c1);
-						}
-						else
-						{
-							BLENDER2_32(&fb[(fb_index + x)], c1, c2);
-						}
+                if( !alpha_out )
+                {
+                    oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
+                    if (zbuffer)
+                    {
+                        if (sz < oz /*&& c.a != 0*/)
+                        {
+                            if (other_modes.cycle_type == CYCLE_TYPE_1)
+                            {
+                                BLENDER1_32(&fb[(fb_index + x)], c1);
+                            }
+                            else
+                            {
+                                BLENDER2_32(&fb[(fb_index + x)], c1, c2);
+                            }
 
-						if (other_modes.z_compare_en && other_modes.z_update_en)
-						{
-							zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
-						}
-					}
-				}
-				else
-				{
-					if (other_modes.cycle_type == CYCLE_TYPE_1)
-					{
-						BLENDER1_32(&fb[(fb_index + x)], c1);
-					}
-					else
-					{
-						BLENDER2_32(&fb[(fb_index + x)], c1, c2);
-					}
-				}
+                            if (other_modes.z_compare_en && other_modes.z_update_en)
+                            {
+                                zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (other_modes.cycle_type == CYCLE_TYPE_1)
+                        {
+                            BLENDER1_32(&fb[(fb_index + x)], c1);
+                        }
+                        else
+                        {
+                            BLENDER2_32(&fb[(fb_index + x)], c1, c2);
+                        }
+                    }
+                }
 			}
 
 			r += drinc;
@@ -2110,6 +2133,7 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
 			UINT16 sz = z >> 16;
 			int oz;
 			int sss = 0, sst = 0;
+            int alpha_out = 0;
 			COLOR c1, c2;
 			c1.r = c1.g = c1.b = c1.a = 0;
 			c2.r = c2.g = c2.b = c2.a = 0;
@@ -2196,53 +2220,64 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
 				if (other_modes.cycle_type == CYCLE_TYPE_1)
 				{
 					c1 = COLOR_COMBINER(0);
+                    if( c1.a == 0 )
+                    {
+                        alpha_out = 1;
+                    }
 				}
 				else if (other_modes.cycle_type == CYCLE_TYPE_2)
 				{
 					c1 = COLOR_COMBINER(0);
 					c2 = COLOR_COMBINER(1);
+                    if( c2.a == 0 )
+                    {
+                        alpha_out = 1;
+                    }
 				}
 
-				oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
-				if (zbuffer)
-				{
-					if (sz < oz /*&& c.a != 0*/)
-					{
-						//BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
-						{
-							int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-							if (other_modes.cycle_type == CYCLE_TYPE_1)
-							{
-								BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
-							}
-							else
-							{
-								BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
-							}
-						}
+                if( !alpha_out )
+                {
+                    oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
+                    if (zbuffer)
+                    {
+                        if (sz < oz /*&& c.a != 0*/)
+                        {
+                            //BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
+                            {
+                                int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
+                                if (other_modes.cycle_type == CYCLE_TYPE_1)
+                                {
+                                    BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
+                                }
+                                else
+                                {
+                                    BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
+                                }
+                            }
 
-						if (other_modes.z_compare_en && other_modes.z_update_en)
-						{
-							zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
-						}
-					}
-				}
-				else
-				{
-					//BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
+                            if (other_modes.z_compare_en && other_modes.z_update_en)
+                            {
+                                zb[(fb_index + x) ^ WORD_ADDR_XOR] = sz;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c);
 
-					{
-						int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
-						if (other_modes.cycle_type == CYCLE_TYPE_1)
-						{
-							BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
-						}
-						else
-						{
-							BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
-						}
-					}
-				}
+                        {
+                            int dith = dither_matrix_4x4[(((j) & 3) << 2) + ((i^WORD_ADDR_XOR) & 3)];
+                            if (other_modes.cycle_type == CYCLE_TYPE_1)
+                            {
+                                BLENDER1_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, dith);
+                            }
+                            else
+                            {
+                                BLENDER2_16(&fb[(fb_index + x) ^ WORD_ADDR_XOR], c1, c2, dith);
+                            }
+                        }
+                    }
+                }
 			}
 
 			r += drinc;
@@ -3245,7 +3280,7 @@ static void rdp_load_tile(UINT32 w1, UINT32 w2)
 
 			for (j=0; j < height; j++)
 			{
-				int tline = tb + ((tile[tilenum].line / 4) * j);
+				int tline = tb + ((tile[tilenum].line / 2) * j);
 				int s = ((j + tl) * ti_width) + sl;
 
 				for (i=0; i < width; i++)
