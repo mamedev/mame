@@ -56,6 +56,18 @@ static UINT32 *midvplus_misc;
  *
  *************************************/
 
+static MACHINE_START( midvunit )
+{
+	state_save_register_global(cmos_protected);
+	state_save_register_global(control_data);
+	state_save_register_global(adc_data);
+	state_save_register_global(adc_shift);
+	state_save_register_global(last_port0);
+	state_save_register_global(shifter_state);
+	state_save_register_global(timer_rate);
+}
+
+
 static MACHINE_RESET( midvunit )
 {
 	dcs_reset_w(1);
@@ -997,6 +1009,7 @@ static MACHINE_DRIVER_START( midvcommon )
 	MDRV_CPU_ADD_TAG("main", TMS32031, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(midvunit_map,0)
 
+	MDRV_MACHINE_START(midvunit)
 	MDRV_MACHINE_RESET(midvunit)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
@@ -1429,13 +1442,13 @@ static DRIVER_INIT( wargods )
  *
  *************************************/
 
-GAME( 1994, crusnusa, 0,        midvunit, crusnusa, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", 0 )
-GAME( 1994, crusnu40, crusnusa, midvunit, crusnusa, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", 0 )
-GAME( 1994, crusnu21, crusnusa, midvunit, crusnusa, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", 0 )
-GAME( 1996, crusnwld, 0,        midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", 0 )
-GAME( 1996, crusnw23, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", 0 )
-GAME( 1996, crusnw20, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", 0 )
-GAME( 1996, crusnw13, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", 0 )
-GAME( 1997, offroadc, 0,        midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge", GAME_NOT_WORKING )
+GAME( 1994, crusnusa, 0,        midvunit, crusnusa, crusnusa, ROT0, "Midway", "Cruis'n USA (rev L4.1)", GAME_SUPPORTS_SAVE )
+GAME( 1994, crusnu40, crusnusa, midvunit, crusnusa, crusnu40, ROT0, "Midway", "Cruis'n USA (rev L4.0)", GAME_SUPPORTS_SAVE )
+GAME( 1994, crusnu21, crusnusa, midvunit, crusnusa, crusnu21, ROT0, "Midway", "Cruis'n USA (rev L2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnwld, 0,        midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.4)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnw23, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.3)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnw20, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L2.0)", GAME_SUPPORTS_SAVE )
+GAME( 1996, crusnw13, crusnwld, midvunit, crusnwld, crusnwld, ROT0, "Midway", "Cruis'n World (rev L1.3)", GAME_SUPPORTS_SAVE )
+GAME( 1997, offroadc, 0,        midvunit, offroadc, offroadc, ROT0, "Midway", "Off Road Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 1995, wargods,  0,        midvplus, wargods,  wargods,  ROT0, "Midway", "War Gods", 0 )
+GAME( 1995, wargods,  0,        midvplus, wargods,  wargods,  ROT0, "Midway", "War Gods", GAME_SUPPORTS_SAVE )

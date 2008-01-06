@@ -892,14 +892,15 @@ static void dcs_register_state(void)
 	state_save_register_global(transfer.sum);
 	state_save_register_global(transfer.fifo_entries);
 
-	state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
+	if (dcs_sram != NULL)
+		state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
 }
 
 
 void dcs_init(void)
 {
-	dcs_register_state();
 	memset(&dcs, 0, sizeof(dcs));
+	dcs_sram = NULL;
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpunum = mame_find_cpu_index(Machine, "dcs");
@@ -918,6 +919,9 @@ void dcs_init(void)
 
 	/* non-RAM based automatically acks */
 	dcs.auto_ack = TRUE;
+
+	/* register for save states */
+	dcs_register_state();
 
 	/* reset the system */
 	dcs_reset(Machine, NULL, 0);
