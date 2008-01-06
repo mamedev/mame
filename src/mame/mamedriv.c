@@ -7315,10 +7315,16 @@ Other Sun games
 	DRIVER( hiryuken )	/* (c) 1985 Taito */
 
 	/* Tatsumi Games */
-	DRIVER( lockon )	/* (c) 1986 */
-	DRIVER( apache3 )	/* (c) 1988 */
-	DRIVER( roundup5 )	/* (c) 1989 */
-	DRIVER( cyclwarr )	/* (c) 1991 */
+	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
+	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
+	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
+	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
+	DRIVER( lockon )	/* (c) 1986 Tatsumi */
+	/* Gray Out */		/* (c) 1987 Tatsumi */
+	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
+	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
+	DRIVER( cyclwarr )	/* (c) 1991 Tatsumi */
+	DRIVER( bigfight )	/* (c) 1992 Tatsumi */
 
 	/* Electronic Devices */
 	DRIVER( mugsmash )	/* (c) Electronic Devices (Italy) / 3D Games (England) */
@@ -7503,10 +7509,6 @@ Other Sun games
 	DRIVER( mosaic )	/* (c) 1990 Space */
 	DRIVER( mosaica )	/* (c) 1990 Space + Fuuki license */
 	DRIVER( gfire2 )	/* (c) 1992 Topis Corp */
-	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
-	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
-	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
-	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( sprcros2 )	/* (c) 1986 GM Shoji */
 	DRIVER( sprcrs2a )	/* (c) 1986 GM Shoji */
 	DRIVER( gcpinbal )	/* (c) 1994 Excellent System */

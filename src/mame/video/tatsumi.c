@@ -2,13 +2,24 @@
 #include "tatsumi.h"
 #include <math.h>
 
-static tilemap *bg_layer,*tx_layer;
+static tilemap *tx_layer;
+static tilemap *layer0, *layer1, *layer2, *layer3;
+
 static mame_bitmap *temp_bitmap;
 
 UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
-UINT16 *cyclwarr_videoram, *cyclwarr_videoram2;
+UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
 UINT16* tatsumi_sprite_control_ram;
 static UINT16* roundup5_vram;
+
+extern UINT16 bigfight_a20000[8], bigfight_a40000[2], bigfight_a60000[8];
+static UINT16 bigfight_bank, bigfight_last_bank;
+
+static UINT8 roundupt_crt_selected_reg;
+static UINT8 roundupt_crt_reg[64];
+extern UINT16 debugA,debugB,debugC,debugD;
+
+static UINT8* shadow_pen_array;
 
 /******************************************************************************/
 
@@ -113,39 +124,35 @@ WRITE16_HANDLER( roundup5_text_w )
 	tilemap_mark_tile_dirty( tx_layer,offset);
 }
 
-READ16_HANDLER( cyclwarr_videoram_r )
+READ16_HANDLER( cyclwarr_videoram0_r )
 {
-	 return cyclwarr_videoram[offset];
+	 return cyclwarr_videoram0[offset];
 }
 
-READ16_HANDLER( cyclwarr_videoram2_r )
+READ16_HANDLER( cyclwarr_videoram1_r )
 {
-	 return cyclwarr_videoram2[offset];
+	 return cyclwarr_videoram1[offset];
 }
 
-WRITE16_HANDLER( cyclwarr_videoram_w )
+WRITE16_HANDLER( cyclwarr_videoram0_w )
 {
-	COMBINE_DATA(&cyclwarr_videoram[offset]);
-	if (offset>=0x400 && offset<0x1400)
-		tilemap_mark_tile_dirty( tx_layer,offset - 0x400);
-	if (offset>=0x1400 && offset<0x3400)
-		tilemap_mark_tile_dirty( bg_layer,offset - 0x1400);
+	COMBINE_DATA(&cyclwarr_videoram0[offset]);
+	if (offset>=0x400)
+	{
+		tilemap_mark_tile_dirty( layer0, offset-0x400);
+		tilemap_mark_tile_dirty( layer1, offset-0x400);
+	}
 }
 
-WRITE16_HANDLER( cyclwarr_videoram2_w )
+WRITE16_HANDLER( cyclwarr_videoram1_w )
 {
-	COMBINE_DATA(&cyclwarr_videoram2[offset]);
-	if (offset>=0x400 && offset<0x1400)
-		tilemap_mark_tile_dirty( tx_layer,offset - 0x400);
-	if (offset>=0x1400 && offset<0x3400)
-		tilemap_mark_tile_dirty( bg_layer,offset - 0x1400);
+	COMBINE_DATA(&cyclwarr_videoram1[offset]);
+	if (offset>=0x400)
+	{
+		tilemap_mark_tile_dirty( layer2, offset-0x400);
+		tilemap_mark_tile_dirty( layer3, offset-0x400);
+	}
 }
-
-static UINT8 roundupt_crt_selected_reg;
-static UINT8 roundupt_crt_reg[64];
-extern UINT16 debugA,debugB,debugC,debugD;
-
-static UINT8* shadow_pen_array;
 
 WRITE16_HANDLER( roundup5_crt_w )
 {
@@ -170,32 +177,18 @@ static TILE_GET_INFO( get_text_tile_info )
 			0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info_cyclwarr )
+static TILE_GET_INFO( get_tile_info_bigfight_0 )
 {
-	int tile=cyclwarr_videoram2[tile_index+0x1400];
-	int color=tile >> 14;
-
-	tile=(tile&0x3fff) | 0x000;
-
-	SET_TILE_INFO(
-			1,
-			tile,
-			color,
-			0);
+	int tile=cyclwarr_videoram0[(tile_index+0x400)%0x8000];
+	int bank = (bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
+	SET_TILE_INFO(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
-static TILE_GET_INFO( get_text_tile_info_cyclwarr )
+static TILE_GET_INFO( get_tile_info_bigfight_1 )
 {
-	int tile=cyclwarr_videoram[tile_index+0x400];
-	int color=tile >> 12;
-
-	tile=tile&0xfff;
-
-	SET_TILE_INFO(
-			1,
-			tile,
-			color,
-			0);
+	int tile=cyclwarr_videoram1[(tile_index+0x400)%0x8000];
+	int bank = (bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
+	SET_TILE_INFO(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
 /********************************************************************/
@@ -222,13 +215,25 @@ VIDEO_START( roundup5 )
 
 VIDEO_START( cyclwarr )
 {
-	bg_layer = tilemap_create(get_bg_tile_info_cyclwarr,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,256,256);
-	tx_layer = tilemap_create(get_text_tile_info_cyclwarr,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	shadow_pen_array = auto_malloc(8192);
+	layer0 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,512);
+	//layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,512);
+	layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,256);
+	layer2 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,512);
+	layer3 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,512);
 
+	shadow_pen_array = auto_malloc(8192);
 	memset(shadow_pen_array, 0, 8192);
-	tilemap_set_transparent_pen(bg_layer,0);
-	tilemap_set_transparent_pen(tx_layer,0);
+}
+
+VIDEO_START( bigfight )
+{
+	layer0 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,256);
+	layer1 = tilemap_create(get_tile_info_bigfight_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,256);
+	layer2 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,256);
+	layer3 = tilemap_create(get_tile_info_bigfight_1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,256);
+
+	shadow_pen_array = auto_malloc(8192);
+	memset(shadow_pen_array, 0, 8192);
 }
 
 /********************************************************************/
@@ -537,7 +542,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
                     0x0007 - ?
             Word 2: 0xffff - X position
             Word 3: 0xffff - Y position
-            Word 4: 0x01ff - Rotation
+            Word 4: 0x01ff - Scale
+            Word 5: 0x01ff - Rotation
 
             Sprite ROM table format, alternate lines come from each bank, with the
             very first line indicating control information:
@@ -556,7 +562,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
         */
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
-		scale = spriteram16[offs+4]&0xff;
+		scale = spriteram16[offs+4]&0x1ff;
 		color = (spriteram16[offs+1]>>3)&0x1ff;
 		fx = spriteram16[offs+1]&0x8000;
 		rotate = 0;//spriteram16[offs+5]&0x1ff; // Todo:  Turned off for now
@@ -570,7 +576,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if (index==0xffff || spriteram16[offs+4]==0xffff) //todo
 			return;
 
-		if (index>=0x1000)
+		if (index>=0x4000)
 			continue;
 
 		src1 = tatsumi_rom_sprite_lookup1 + (index*4);
@@ -618,7 +624,7 @@ extent_x=extent_y=0;
 				if (!rotate)
 				{
 					if (fx)
-						x_pos=render_x-x_offs;
+						x_pos=render_x-x_offs-scale*8;
 					else
 						x_pos=render_x+x_offs;
 				}
@@ -955,6 +961,43 @@ static void update_cluts(running_machine *machine, int fake_palette_offset, int 
 
 /**********************************************************************/
 
+static void draw_bg(running_machine *machine, mame_bitmap *dst, tilemap *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
+{
+	/*
+		Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
+		from sets of 8 bit palettes!  
+	*/
+	const UINT8* tile_cluts = memory_region(REGION_GFX4);
+	const mame_bitmap *src_bitmap = tilemap_get_pixmap(src);
+	int src_y_mask=ysize-1;
+	int src_x_mask=xsize-1;
+	int tile_y_mask=(ysize/8)-1;
+	int tile_x_mask=(xsize/8)-1;
+	int tiles_per_x_line=(xsize/8);
+	int x, y, p, pp, ppp;
+
+	for (y=0; y<240; y++)
+	{
+		for (x=0; x<320; x++)
+		{
+			int src_x = x + scrollx[y] + xscroll_offset;
+			int src_y = y + scrolly[y] + yscroll_offset;
+			int tile_index = (((src_x>>3)&tile_x_mask) + (((src_y>>3)&tile_y_mask) * tiles_per_x_line));
+			int bank = (tile_bank >> (((tilemap_ram[(tile_index+0x400)&0x7fff]&0xc00)>>10)*4))&0xf;
+			int tile = (tilemap_ram[(tile_index+0x400)&0x7fff]&0x3ff) | (bank<<10);
+
+			p=*BITMAP_ADDR16(src_bitmap, src_y&src_y_mask, src_x&src_x_mask);
+			pp=tile_cluts[tile*8 + (p&0x7)];
+			ppp=pp + ((p&0x78)<<5);
+			
+			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Not quite correct - some opaque pixels show as transparent
+				*BITMAP_ADDR32(dst, y, x) = machine->pens[ppp];
+		}
+	}
+}
+
+/**********************************************************************/
+
 VIDEO_UPDATE( apache3 )
 {
 	update_cluts(machine, 1024, 0, 2048);
@@ -988,10 +1031,47 @@ VIDEO_UPDATE( roundup5 )
 
 VIDEO_UPDATE( cyclwarr )
 {
+	bigfight_bank=bigfight_a40000[0];
+	if (bigfight_bank!=bigfight_last_bank)
+	{
+		tilemap_mark_all_tiles_dirty(layer0);
+		tilemap_mark_all_tiles_dirty(layer1);
+		tilemap_mark_all_tiles_dirty(layer2);
+		tilemap_mark_all_tiles_dirty(layer3);
+		bigfight_last_bank=bigfight_bank;
+	}
+
 	fillbitmap(bitmap,machine->pens[0],cliprect);
-//  tilemap_draw(bitmap,cliprect,bg_layer,0,0);
+
+	draw_bg(machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	update_cluts(machine, 8192, 4096, 8192);
 	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
+	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x80, 512, 4096); 
+
+	return 0;
+}
+
+VIDEO_UPDATE( bigfight )
+{
+	bigfight_bank=bigfight_a40000[0];
+	if (bigfight_bank!=bigfight_last_bank)
+	{
+		tilemap_mark_all_tiles_dirty(layer0);
+		tilemap_mark_all_tiles_dirty(layer1);
+		tilemap_mark_all_tiles_dirty(layer2);
+		tilemap_mark_all_tiles_dirty(layer3);
+		bigfight_last_bank=bigfight_bank;
+	}
+
+	fillbitmap(bitmap,machine->pens[0],cliprect);
+	draw_bg(machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	update_cluts(machine, 8192, 4096, 8192);
+	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x40, 1024, 2048);
+
 	return 0;
 }

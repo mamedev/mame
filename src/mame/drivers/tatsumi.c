@@ -3,6 +3,7 @@
     Apache 3                                            ATF-011
     Round Up 5                                          ATC-011
     Cycle Warriors                                      ABA-011
+    Big Fight                                           ABA-011
 
     Incredibly complex hardware!  These are all different boards, but share
     a similar sprite chip (TZB215 on Apache 3, TZB315 on others).  Other
@@ -18,7 +19,13 @@
         Round Up 5 doesn't survive a reset
         Dip switches
         Various other things..
-
+	Combine Big Fight & CycleWarriors video routines - currently each
+	game uses different sized tilemaps - these are probably software
+	controlled rather than hardwired, but I don't think either game
+	changes the size at runtime.
+	Big Fight/Cyclewarriors - misc graphics problems.
+	Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
+	
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
 
@@ -66,6 +73,68 @@
 
     CW27
 
+	Big Fight
+	Tatsumi, 1992
+
+	PCB Layout
+	----------
+
+	ABA-011
+	A-8
+	|-----------------------------------------------------------------|
+	|     LM324   M6295    ROM15                TC5563                |
+	|LM324  VOL   KA51             50MHz        TC5563   PAL       |-||
+	|    TC51832 TC51832          |--------|                       | ||
+	|    TC51832 TC51832          |TATSUMI |                       | ||
+	|    TC51832 TC51832          |TZB315  |           ROM20       | ||
+	|    TC51832 TC51832          |        |           TMM2063     | ||
+	|     ROM0    ROM8            |--------|           Z80B        | ||
+	|                                                              | ||
+	|J                     PAL                  16MHz              |-||
+	|A    ROM2    ROM10     |--------------|                 PAL      |
+	|M                      |     68000    |            TMM2088       |
+	|M                      |--------------|                          |
+	|A    ROM4    ROM12                                 TMM2088       |
+	|                                ROM16    ROM17                |-||
+	|                            PAL      PAL           TC51832    | ||
+	|     ROM6    ROM14                       ROM18                | ||
+	|                            EPL204   PAL           TC51832    | ||
+	|                       |--------------|                       | ||
+	|   CXD10950  CXD10950  |    68000     |  ROM19     TC51832    | ||
+	|                       |--------------|                       | ||
+	|                                                   TC51832    |-||
+	|      DSW3(4) DSW2(8) DSW1(8)                                    |
+	|-----------------------------------------------------------------|
+	Z80 clock - 4.000MHz [16/4]
+	68k clocks - 12.500MHz [50/4]
+	M6295 clock - 2.000MHz [16/8]. Sample rate = 2000000/132
+	YM2151 clock - 4.000MHz [16/4]
+
+	|-------------------------|
+	|       D65005(x16)       |
+	|ROM21                 |-||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|PAL                   |-||
+	|     ROM24       PAL  PAL|
+	|        ROM23     HD6445 |
+	|           ROM22         |
+	|          TC51832(x4)    |
+	|      PAL             |-||
+	|      PAL             | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      | ||
+	|                      |-||
+	|PAL                      |
+	|-------------------------|
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -79,19 +148,22 @@ UINT16 *roundup5_d0000_ram, *roundup5_e0000_ram;
 UINT8 *tatsumi_rom_sprite_lookup1, *tatsumi_rom_sprite_lookup2;
 UINT8 *tatsumi_rom_clut0, *tatsumi_rom_clut1;
 UINT16 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
+UINT16 bigfight_a20000[8], bigfight_a40000[2], bigfight_a60000[2];
+extern UINT16 bigfight_bank;
 static UINT8 *apache3_bg_ram;
 
 /***************************************************************************/
 
-//static READ16_HANDLER(cyclwarr_cpu_b_r) { return cyclwarr_cpub_ram[offset+0x800]; }
-//static WRITE16_HANDLER(cyclwarr_cpu_b_w){ COMBINE_DATA(&cyclwarr_cpub_ram[offset+0x800]); }
 static READ16_HANDLER(cyclwarr_cpu_bb_r){ return cyclwarr_cpub_ram[offset]; }
 static WRITE16_HANDLER(cyclwarr_cpu_bb_w) { COMBINE_DATA(&cyclwarr_cpub_ram[offset]); }
 static READ16_HANDLER(cyclwarr_palette_r) { return paletteram16[offset]; }
 static READ16_HANDLER(cyclwarr_sprite_r) { return spriteram16[offset]; }
 static WRITE16_HANDLER(cyclwarr_sprite_w) { COMBINE_DATA(&spriteram16[offset]); }
 static READ16_HANDLER(cyclwarr_input_r) { return readinputport(offset); }
-static READ16_HANDLER(cyclwarr_input2_r) { return readinputport(offset+3); }
+static READ16_HANDLER(cyclwarr_input2_r) { return readinputport(offset+4); }
+static WRITE16_HANDLER(bigfight_a20000_w) { COMBINE_DATA(&bigfight_a20000[offset]); }
+static WRITE16_HANDLER(bigfight_a40000_w) { COMBINE_DATA(&bigfight_a40000[offset]); }
+static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset]); }
 
 /***************************************************************************/
 
@@ -182,16 +254,18 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00dfff) AM_RAM AM_BASE(&cyclwarr_cpua_ram)
-	AM_RANGE(0x00e000, 0x00ffff) AM_RAM AM_BASE(&videoram16)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&cyclwarr_cpua_ram)
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM
 	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram2_r, cyclwarr_videoram2_w) AM_BASE(&cyclwarr_videoram2)
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram_r, cyclwarr_videoram_w) AM_BASE(&cyclwarr_videoram)
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) //b9008 - dips
-	// ba000 + ba002 - dips
-	AM_RANGE(0x0ba000, 0x0ba003) AM_READ(cyclwarr_input2_r) //temp
-	AM_RANGE(0x0ba004, 0x0ba007) AM_READ(cyclwarr_input2_r)
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_BASE(&cyclwarr_videoram1)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_BASE(&cyclwarr_videoram0)
+
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(&spriteram16)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
@@ -201,10 +275,19 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclwarr_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00dfff) AM_RAM AM_BASE(&cyclwarr_cpub_ram)
-	AM_RANGE(0x00e000, 0x00ffff) AM_RAM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram2_r, cyclwarr_videoram2_w)
-	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram_r, cyclwarr_videoram_w)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&cyclwarr_cpub_ram)
+
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
+
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0ba008, 0x0ba009) AM_READ(cyclwarr_control_r)
+
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
@@ -224,6 +307,50 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(input_port_2_r)// MRA_NOP)
 	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(MWA8_NOP) //irq ack?
 	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(MWA8_NOP) //irq ack?
+ADDRESS_MAP_END
+
+/******************************************************************************/
+
+static ADDRESS_MAP_START( bigfight_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&cyclwarr_cpua_ram)
+
+	AM_RANGE(0x03e000, 0x03efff) AM_RAM
+	AM_RANGE(0x040000, 0x04ffff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_BASE(&cyclwarr_videoram1)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_BASE(&cyclwarr_videoram0)
+
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(&spriteram16)
+	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK(2) /* CPU A ROM */
+	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK(1) /* CPU B ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bigfight_68000b_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(&cyclwarr_cpub_ram)
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
+	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
+
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0ba008, 0x0ba009) AM_READ(cyclwarr_control_r)
+
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
+	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK(2) /* CPU A ROM */
+	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK(1) /* CPU B ROM */
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -401,6 +528,72 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Test ) ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") 
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") 
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
@@ -419,15 +612,124 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(4)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bigfight )
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON4  )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON4  )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON4  )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Test ) ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") 
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") 
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") 
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(4)
 INPUT_PORTS_END
 
 /******************************************************************************/
@@ -448,21 +750,12 @@ static const gfx_layout cyclwarr_charlayout =
 	8,8,
 	RGN_FRAC(1,3),
 	3,
-	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3)},
-	{ 0, 1, 2, 3, 4, 5, 6, 7},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
-	8*8
-};
-static const gfx_layout cyclwarr_charlayout2 =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3)},
 	{ 0, 1, 2, 3, 4, 5, 6, 7},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8},
 	8*8
 };
+
 static const gfx_layout roundup5_vramlayout =
 {
 	8,8,
@@ -475,19 +768,18 @@ static const gfx_layout roundup5_vramlayout =
 };
 
 static GFXDECODE_START( apache3 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,    1024, 128)
-	GFXDECODE_ENTRY( REGION_GFX4, 0, cyclwarr_charlayout,     768, 16)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout, 1024, 128)
+	GFXDECODE_ENTRY( REGION_GFX4, 0, cyclwarr_charlayout, 768, 16)
 GFXDECODE_END
 
 static GFXDECODE_START( roundup5 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,     1024, 256)
-	GFXDECODE_ENTRY( 0, 0, roundup5_vramlayout,					0, 16)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout, 1024, 256)
+	GFXDECODE_ENTRY( 0, 0, roundup5_vramlayout, 0, 16)
 GFXDECODE_END
 
 static GFXDECODE_START( cyclwarr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout,    8192, 512)
-	GFXDECODE_ENTRY( REGION_GFX5, 0, cyclwarr_charlayout,    0, 512)
-	GFXDECODE_ENTRY( REGION_GFX5, 0, cyclwarr_charlayout2,   0, 512)
+	GFXDECODE_ENTRY( REGION_GFX1, 0, roundup5_charlayout, 8192, 512)
+	GFXDECODE_ENTRY( REGION_GFX5, 0, cyclwarr_charlayout, 0, 512)
 GFXDECODE_END
 
 /******************************************************************************/
@@ -597,15 +889,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000 / 2) /* NEC V30 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
 
-	MDRV_CPU_ADD(M68000,20000000 / 2) /* 68000 CPU, 20MHz / 2 */
+	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000) //???
+	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -616,12 +908,55 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(cyclwarr)
-	MDRV_PALETTE_LENGTH(8192 + 8192) //todo
+	MDRV_PALETTE_LENGTH(8192 + 8192)
 
 	MDRV_VIDEO_START(cyclwarr)
 	MDRV_VIDEO_UPDATE(cyclwarr)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(YM2151, 16000000/4)
+	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_ROUTE(0, "left", 0.45)
+	MDRV_SOUND_ROUTE(1, "right", 0.45)
+
+	MDRV_SOUND_ADD(OKIM6295, 20000000/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( bigfight )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
+	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+
+	MDRV_CPU_ADD(M68000, 50000000 / 4) /* Confirmed */
+	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map,0)
+	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+
+	MDRV_CPU_ADD(Z80, 16000000 / 4) /* Confirmed */
+	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_INTERLEAVE(200)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(40*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MDRV_GFXDECODE(cyclwarr)
+	MDRV_PALETTE_LENGTH(8192 + 8192)
+
+	MDRV_VIDEO_START(bigfight)
+	MDRV_VIDEO_UPDATE(bigfight)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -733,17 +1068,17 @@ ROM_START( roundup5 )
 ROM_END
 
 ROM_START( cyclwarr )
-	ROM_REGION( 0x180000, REGION_CPU1, 0 ) /* 68000 main cpu */
-	ROM_LOAD16_BYTE( "cw16b",   0x100000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
-	ROM_LOAD16_BYTE( "cw18b",   0x100001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
-	ROM_LOAD16_BYTE( "cw17a",   0x140000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
-	ROM_LOAD16_BYTE( "cw19a",   0x140001, 0x20000, CRC(d3853658) SHA1(c9338083a04f55bd22285176831f4b0bdb78564f) )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 main cpu */
+	ROM_LOAD16_BYTE( "cw16b",   0x000000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
+	ROM_LOAD16_BYTE( "cw18b",   0x000001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
+	ROM_LOAD16_BYTE( "cw17a",   0x040000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
+	ROM_LOAD16_BYTE( "cw19a",   0x040001, 0x20000, CRC(d3853658) SHA1(c9338083a04f55bd22285176831f4b0bdb78564f) )
 
-	ROM_REGION( 0x180000, REGION_CPU2, 0 ) /* 68000 sub cpu */
-	ROM_LOAD16_BYTE( "cw20a",   0x100000, 0x20000, CRC(c3578ac1) SHA1(21d369da874f01922d0f0b757a42b4321df891d4) )
-	ROM_LOAD16_BYTE( "cw22a",   0x100001, 0x20000, CRC(5339ed24) SHA1(5b0a54c2442dcf7373ff8b55b91af9772473ff77) )
-	ROM_LOAD16_BYTE( "cw21",    0x140000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
-	ROM_LOAD16_BYTE( "cw23",    0x140001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+	ROM_REGION( 0x80000, REGION_CPU2, 0 ) /* 68000 sub cpu */
+	ROM_LOAD16_BYTE( "cw20a",   0x000000, 0x20000, CRC(c3578ac1) SHA1(21d369da874f01922d0f0b757a42b4321df891d4) )
+	ROM_LOAD16_BYTE( "cw22a",   0x000001, 0x20000, CRC(5339ed24) SHA1(5b0a54c2442dcf7373ff8b55b91af9772473ff77) )
+	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
+	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
@@ -775,13 +1110,52 @@ ROM_START( cyclwarr )
 	ROM_LOAD( "cw27",   0x000000, 0x20000, CRC(2db48a9e) SHA1(16c307340d17cd3b5455ebcee681fbe0335dec58) )
 
 	ROM_REGION( 0x60000, REGION_GFX5, ROMREGION_DISPOSE )
-	ROM_LOAD( "cw28",   0x000000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
+	ROM_LOAD( "cw30",   0x000000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
 	ROM_LOAD( "cw29",   0x020000, 0x20000, CRC(64dd519c) SHA1(e23611fc2be896861997063546c3eb03527eaf8e) )
-	ROM_LOAD( "cw30",   0x040000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
+	ROM_LOAD( "cw28",   0x040000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	 /* ADPCM samples */
 	ROM_LOAD( "cw24a",   0x000000, 0x20000, CRC(22600cba) SHA1(a1514fbe037942f1493a17eb0b7986949470cb22) )
 	ROM_LOAD( "cw25a",   0x020000, 0x20000, CRC(372c6bc8) SHA1(d4875bf3bffecf338bebba3b8d6a791585556a06) )
+ROM_END
+
+ROM_START( bigfight )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 main cpu */
+	ROM_LOAD16_BYTE( "rom16.ic77",   0x000000, 0x40000, CRC(e7304ec8) SHA1(31a37e96bf963b349d36534bc5ebbf45e19ad00e) )
+	ROM_LOAD16_BYTE( "rom17.ic98",   0x000001, 0x40000, CRC(4cf090f6) SHA1(9ae0274c890e829a90108ce316aff9665128c982) )
+
+	ROM_REGION( 0x80000, REGION_CPU2, 0 ) /* 68000 sub cpu */
+	ROM_LOAD16_BYTE( "rom18.ic100",   0x000000, 0x40000, CRC(49df6207) SHA1(c4126f4542add11a3a3d236311c8787c24c98440) )
+	ROM_LOAD16_BYTE( "rom19.ic102",   0x000001, 0x40000, CRC(c12aa9e9) SHA1(19cc7feaa97c6f5148ae8c0077174f96be684f05) )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* Filled in by both regions below */
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 )
+	ROM_LOAD32_BYTE( "rom0.ic26",   0x000000, 0x80000, CRC(a4a3c8d6) SHA1(b5365d9bc6068260c23ba9d5971c7c7d7cc07a97) )
+	ROM_LOAD32_BYTE( "rom8.ic45",   0x000001, 0x80000, CRC(220956ed) SHA1(68e0ba1e850101b4cc2778819dfa76f04d88d2d6) )
+	ROM_LOAD32_BYTE( "rom2.ic28",   0x000002, 0x80000, CRC(c4f6d243) SHA1(e23b241b5a40b332165a34e2f1bc4366973b2070) )
+	ROM_LOAD32_BYTE( "rom10.ic47",  0x000003, 0x80000, CRC(0212d472) SHA1(5549461195fd7b6b43c0174462d7fe1a1bac24e9) )
+
+	ROM_REGION( 0x200000, REGION_GFX3, 0 )
+	ROM_LOAD32_BYTE( "rom4.ic30",   0x000000, 0x80000, CRC(999ff7e9) SHA1(a53b06ad084722d7a52fcf01c52967f68620e609) )
+	ROM_LOAD32_BYTE( "rom12.ic49",  0x000001, 0x80000, CRC(cb4c1f0b) SHA1(32d64b78ed3d5971eb5d25be2c38e6f2c9048f74) )
+	ROM_LOAD32_BYTE( "rom6.ic32",   0x000002, 0x80000, CRC(f70e2d47) SHA1(00517b5f3b2deb6f3f3bd12df421e63884c22b2e) )
+	ROM_LOAD32_BYTE( "rom14.ic51",  0x000003, 0x80000, CRC(77430bc9) SHA1(0b1fd54ace84a9fb5b44d5600de8089a20bcbd47) )
+
+	ROM_REGION( 0x20000, REGION_GFX4, 0 )
+	ROM_LOAD( "rom21.ic128",   0x000000, 0x20000, CRC(da027dcf) SHA1(47d18a8a273fea72cb3ad3d58166fe38ca28a860) )
+
+	ROM_REGION( 0x60000, REGION_GFX5, ROMREGION_DISPOSE )
+	ROM_LOAD( "rom24.ic73",   0x000000, 0x20000, CRC(c564185d) SHA1(e9b5fc10a5a5014735852c22db2a054d5787d8cb) )
+	ROM_LOAD( "rom23.ic72",   0x020000, 0x20000, CRC(f8bb340b) SHA1(905a1ec778d6ed5c6f53d9d08cd105eed7e307ca) )
+	ROM_LOAD( "rom22.ic71",   0x040000, 0x20000, CRC(fb505074) SHA1(b6d9b20be7c3e971e5a4392736f087e807b9c850) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	 /* ADPCM samples */
+	ROM_LOAD( "rom15.ic39",   0x000000, 0x40000, CRC(58d136e8) SHA1(4aa063c4b9b057cba4655ecbe44a87c8c411e3aa) )
 ROM_END
 
 /***************************************************************************/
@@ -844,7 +1218,7 @@ static DRIVER_INIT( cyclwarr )
 	UINT8 *src1 = memory_region(REGION_GFX2);
 	UINT8 *src2 = memory_region(REGION_GFX3);
 	int i;
-	for (i=0; i<0x100000; i+=32) {
+	for (i=0; i<memory_region_length(REGION_GFX2); i+=32) {
 		memcpy(dst,src1,32);
 		src1+=32;
 		dst+=32;
@@ -854,18 +1228,18 @@ static DRIVER_INIT( cyclwarr )
 	}
 
 	dst = memory_region(REGION_CPU1);
-	memcpy(cyclwarr_cpua_ram,dst+0x100000,8);
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x100000);
+	memcpy(cyclwarr_cpua_ram,dst,8);
+	memory_set_bankptr(1, memory_region(REGION_CPU1));
 
 	dst = memory_region(REGION_CPU2);
-	memcpy(cyclwarr_cpub_ram,dst+0x100000,8);
-	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x100000);
+	memcpy(cyclwarr_cpub_ram,dst,8);
+	memory_set_bankptr(2, memory_region(REGION_CPU2));
 
 	// Copy sprite & palette data out of GFX rom area
 	tatsumi_rom_sprite_lookup1 = memory_region(REGION_GFX2);
 	tatsumi_rom_sprite_lookup2 = memory_region(REGION_GFX3);
-	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ 0x100000 - 0x1000;
-	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ 0x100000 - 0x1000;
+	tatsumi_rom_clut0 = memory_region(REGION_GFX2)+ memory_region_length(REGION_GFX2) - 0x1000;
+	tatsumi_rom_clut1 = memory_region(REGION_GFX3)+ memory_region_length(REGION_GFX3) - 0x1000;
 
 	tatsumi_reset();
 }
@@ -878,5 +1252,5 @@ static DRIVER_INIT( cyclwarr )
 /* 1987 Gray Out */
 GAME( 1988, apache3,  0, apache3,   apache3,  apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, roundup5, 0, roundup5,  roundup5, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, cyclwarr, 0, cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS )
-/* 1992 Big Fight */
+GAME( 1991, cyclwarr, 0, cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, bigfight, 0, bigfight,  bigfight, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)

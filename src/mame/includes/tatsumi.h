@@ -46,22 +46,25 @@ WRITE16_HANDLER( roundup5_palette_w );
 WRITE16_HANDLER( tatsumi_sprite_control_w );
 WRITE16_HANDLER( roundup5_text_w );
 WRITE16_HANDLER( roundup5_crt_w );
-READ16_HANDLER( cyclwarr_videoram_r );
-WRITE16_HANDLER( cyclwarr_videoram_w );
-READ16_HANDLER( cyclwarr_videoram2_r );
-WRITE16_HANDLER( cyclwarr_videoram2_w );
+READ16_HANDLER( cyclwarr_videoram0_r );
+WRITE16_HANDLER( cyclwarr_videoram0_w );
+READ16_HANDLER( cyclwarr_videoram1_r );
+WRITE16_HANDLER( cyclwarr_videoram1_w );
 READ16_HANDLER(roundup5_vram_r);
 WRITE16_HANDLER(roundup5_vram_w);
 WRITE16_HANDLER(apache3_palette_w);
 
 extern UINT16* tatsumi_sprite_control_ram;
-extern UINT16 *cyclwarr_videoram, *cyclwarr_videoram2;
+extern UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
 extern UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
 
 VIDEO_START( apache3 );
 VIDEO_START( roundup5 );
 VIDEO_START( cyclwarr );
+VIDEO_START( bigfight );
+
 VIDEO_UPDATE( roundup5 );
 VIDEO_UPDATE( apache3 );
 VIDEO_UPDATE( cyclwarr );
+VIDEO_UPDATE( bigfight );
 
