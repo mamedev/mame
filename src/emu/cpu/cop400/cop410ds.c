@@ -1,8 +1,13 @@
-/**************************************************************************
- *               National Semiconductor COP410 Emulator                   *
- *                                                                        *
- *                   Copyright (C) 2006 MAME Team                         *
- **************************************************************************/
+/***************************************************************************
+
+    cop410ds.c
+
+    National Semiconductor COP410 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
 
 #include "cpuintrf.h"
 

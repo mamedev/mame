@@ -1106,7 +1106,7 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "SHARC");				break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.01");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2004-2006 Ville Linde"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Ville Linde"); break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 

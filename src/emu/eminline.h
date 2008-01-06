@@ -5,7 +5,7 @@
     Definitions for inline functions that can be overriden by OSD-
     specific code.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/

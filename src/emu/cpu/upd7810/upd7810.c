@@ -3,9 +3,7 @@
  *   upd7810.c
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 emulator V0.3
  *
- *   Copyright (c) 2001 Juergen Buchmueller, all rights reserved.
- *
- *   Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   You can contact me at juergen@mame.net or pullmoll@stop1984.com
  *
  *   - This source code is released as freeware for non-commercial purposes
@@ -1929,7 +1927,7 @@ void upd7810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC uPD7810");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.3");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2001 Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s:%s:%s:%s:%s:%s",

@@ -7,7 +7,7 @@
  *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
- * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
+ * Copyright Karl Stenerud.  All rights reserved.
  *
  * This code may be freely used for non-commercial purposes as long as this
  * copyright notice remains unaltered in the source code and any binary files

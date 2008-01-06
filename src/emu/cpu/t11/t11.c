@@ -1,6 +1,6 @@
 /*** t11: Portable DEC T-11 emulator ******************************************
 
-    Copyright (C) Aaron Giles 1998-2001
+    Copyright Aaron Giles
 
     System dependencies:    long must be at least 32 bits
                             word must be 16 bit unsigned int
@@ -513,7 +513,7 @@ void t11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "DEC T-11");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) Aaron Giles 1998"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

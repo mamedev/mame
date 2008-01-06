@@ -2,12 +2,12 @@
 
     6309dasm.c - a 6309 opcode disassembler
     Version 1.0 5-AUG-2000
-    Copyright 2000 Tim Lindner
+    Copyright Tim Lindner
 
     Based on:
     6809dasm.c - a 6809 opcode disassembler
     Version 1.4 1-MAR-95
-    Copyright 1995 Sean Riddle
+    Copyright Sean Riddle
 
     Thanks to Franklin Bowen for bug fixes, ideas
 

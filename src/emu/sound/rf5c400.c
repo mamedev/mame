@@ -576,6 +576,6 @@ void rf5c400_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ricoh PCM";					break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2004-2007, The MAME Team & hoot development team"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team & hoot development team"; break;
 	}
 }

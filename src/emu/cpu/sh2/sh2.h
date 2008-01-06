@@ -3,7 +3,7 @@
  *   sh2.h
  *   Portable Hitachi SH-2 (SH7600 family) emulator interface
  *
- *   Copyright (c) 2000 Juergen Buchmueller <pullmoll@t-online.de>,
+ *   Copyright Juergen Buchmueller <pullmoll@t-online.de>,
  *   all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.

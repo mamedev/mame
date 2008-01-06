@@ -4,7 +4,7 @@
  *   portable saturn emulator interface
  *   (hp calculators)
  *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved.
+ *   Copyright Peter Trauner, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -386,7 +386,7 @@ void saturn_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY: 					strcpy(info->s = cpuintrf_temp_str(), "Saturn");	break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0alpha");	break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__);	break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Copyright (c) 2000 Peter Trauner, all rights reserved.");	break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Copyright Peter Trauner, all rights reserved.");	break;
 
 		case CPUINFO_STR_REGISTER + SATURN_PC:		sprintf(info->s = cpuintrf_temp_str(), "PC:   %.5x", saturn.pc);break;
 		case CPUINFO_STR_REGISTER + SATURN_D0:		sprintf(info->s = cpuintrf_temp_str(), "D0:   %.5x", saturn.d[0]);break;

@@ -3,7 +3,7 @@
     express.h
     Generic expressions engine.
     Written by Aaron Giles
-    Copyright (c) 2006, Aaron Giles
+    Copyright Aaron Giles
 
 ***************************************************************************/
 

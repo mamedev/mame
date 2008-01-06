@@ -3,7 +3,7 @@
  *   i8x41.h
  *   Portable UPI-41/8041/8741/8042/8742 emulator interface
  *
- *   Copyright (c) 1999 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

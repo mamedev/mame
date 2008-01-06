@@ -2,7 +2,7 @@
 
     6809dasm.c - a 6809 opcode disassembler
     Version 1.4 1-MAR-95
-    Copyright 1995 Sean Riddle
+    Copyright Sean Riddle
 
     Thanks to Franklin Bowen for bug fixes, ideas
 

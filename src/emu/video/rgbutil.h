@@ -5,7 +5,7 @@
     Utility definitions for RGB manipulation. Allows RGB handling to be
     performed in an abstracted fashion and optimized with SIMD.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/

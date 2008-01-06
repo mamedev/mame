@@ -3,7 +3,7 @@
  *   z80gbd.c
  *   Portable Z80 Gameboy disassembler
  *
- *   Copyright (C) 2000 by The MESS Team.
+ *   Copyright The MESS Team.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

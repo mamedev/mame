@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  *   Portable uPD7810/11, 7810H/11H, 78C10/C11/C14 disassembler
- *   Copyright (c) 2001 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   NS20030112: added 7807.
  *

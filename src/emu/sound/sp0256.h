@@ -6,8 +6,8 @@
 
    By Joe Zbiciak. Ported to MESS by tim lindner.
 
- Copyright (c) 1998-2000, Joseph Zbiciak, all rights reserved.
- Copyright (c) 2006, tim lindner, all rights reserved.
+ Copyright Joseph Zbiciak, all rights reserved.
+ Copyright tim lindner, all rights reserved.
 
  - This source code is released as freeware for non-commercial purposes.
  - You are free to use and redistribute this code in modified or

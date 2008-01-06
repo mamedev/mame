@@ -3,7 +3,7 @@
  *   arm7.c
  *   Portable ARM7TDMI CPU Emulator
  *
- *   Copyright (c) 2004 Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -351,7 +351,7 @@ void arm7_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:			strcpy(info->s, "Acorn Risc Machine");			break;
 		case CPUINFO_STR_CORE_VERSION:			strcpy(info->s, "1.3");							break;
 		case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);						break;
-		case CPUINFO_STR_CORE_CREDITS:			strcpy(info->s, "Copyright 2004-2006 Steve Ellenoff, sellenoff@hotmail.com"); break;
+		case CPUINFO_STR_CORE_CREDITS:			strcpy(info->s, "Copyright Steve Ellenoff, sellenoff@hotmail.com"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c %s",

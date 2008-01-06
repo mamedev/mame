@@ -1,6 +1,6 @@
 /*** t11: Portable DEC T-11 emulator ******************************************
 
-    Copyright (C) Aaron Giles 1998
+    Copyright Aaron Giles
 
     Opcode table plus function prototypes
 

@@ -4,7 +4,7 @@
  *   Portable Z8000(2) emulator
  *   Z8000 MAME interface
  *
- *   Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   You can contact me at juergen@mame.net or pullmoll@stop1984.com
  *
  *   - This source code is released as freeware for non-commercial purposes
@@ -697,7 +697,7 @@ void z8000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Zilog Z8000");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 1998,1999 Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

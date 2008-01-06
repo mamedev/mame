@@ -3,7 +3,7 @@
  *   z80.c
  *   Portable Z80 emulator V3.5
  *
- *   Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -3770,7 +3770,7 @@ void z80_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:				strcpy(info->s, "Zilog Z80");				break;
 		case CPUINFO_STR_CORE_VERSION:				strcpy(info->s, "3.7");						break;
 		case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);					break;
-		case CPUINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_CORE_CREDITS:				strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

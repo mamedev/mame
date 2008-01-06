@@ -4,8 +4,8 @@
 **
 ** File: fm.c -- software implementation of Yamaha FM sound generator
 **
-** Copyright (C) 2001, 2002, 2003 Jarek Burczynski (bujar at mame dot net)
-** Copyright (C) 1998 Tatsuyuki Satoh , MultiArcadeMachineEmulator development
+** Copyright Jarek Burczynski (bujar at mame dot net)
+** Copyright Tatsuyuki Satoh , MultiArcadeMachineEmulator development
 **
 ** Version 1.4 (final beta)
 **

@@ -5,7 +5,7 @@
     Simple core functions that are defined in mamecore.h and which may
     need to be accessed by other MAME-related tools.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************/

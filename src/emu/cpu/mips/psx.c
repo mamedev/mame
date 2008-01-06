@@ -3484,7 +3484,7 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "mipscpu");				break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.5");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 2005 smf");	break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright smf");		break;
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 

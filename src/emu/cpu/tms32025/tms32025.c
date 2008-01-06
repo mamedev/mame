@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                Texas Instruments TMS320x25 DSP Emulator                  *
  *                                                                          *
- *                 Copyright (C) 2001-2002+ Tony La Porta                   *
+ *                 Copyright Tony La Porta                                  *
  *                      Written for the MAME project.                       *
  *                                                                          *
  *                                                                          *
@@ -2396,7 +2396,7 @@ void tms32025_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments TMS320x25"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.10");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2001 by Tony La Porta"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tony La Porta"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "arp%d%c%c%c%cdp%03x  arb%d%c%c%c%c%c%c%c%c%c%c%cpm%d",

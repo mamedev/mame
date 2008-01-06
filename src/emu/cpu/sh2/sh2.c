@@ -3,7 +3,7 @@
  *   sh2.c
  *   Portable Hitachi SH-2 (SH7600 family) emulator
  *
- *   Copyright (c) 2000 Juergen Buchmueller <pullmoll@t-online.de>,
+ *   Copyright Juergen Buchmueller <pullmoll@t-online.de>,
  *   all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
@@ -3137,7 +3137,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi SH7600");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2000 Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%d%c%c",

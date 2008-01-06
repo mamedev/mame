@@ -3,8 +3,8 @@
 ** File: fmopl.c - software implementation of FM sound generator
 **                                            types OPL and OPL2
 **
-** Copyright (C) 2002,2003 Jarek Burczynski (bujar at mame dot net)
-** Copyright (C) 1999,2000 Tatsuyuki Satoh , MultiArcadeMachineEmulator development
+** Copyright Jarek Burczynski (bujar at mame dot net)
+** Copyright Tatsuyuki Satoh , MultiArcadeMachineEmulator development
 **
 ** Version 0.72
 **

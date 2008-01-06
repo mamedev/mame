@@ -3,7 +3,7 @@
  * vector.c
  *
  *
- * Copyright 1997,1998 by the M.A.M.E. Project
+ * Copyright Nicola Salmoria and the MAME Team
  *
  *        anti-alias code by Andrew Caldwell
  *        (still more to add)

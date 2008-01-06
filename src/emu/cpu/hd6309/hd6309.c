@@ -1,7 +1,7 @@
 /*** hd6309: Portable 6309 emulator ******************************************
 
-    Copyright (C) John Butler 1997
-    Copyright (C) Tim Lindner 2000
+    Copyright John Butler
+    Copyright Tim Lindner
 
     References:
 
@@ -1300,7 +1300,7 @@ void hd6309_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi 6309");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.01");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) John Butler 1997 and Tim Lindner 2000"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright John Butler and Tim Lindner"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c (MD:%c%c%c%c)",

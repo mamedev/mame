@@ -3,7 +3,7 @@
  *   tbl6502.c
  *   6502 opcode functions and function pointer table
  *
- *   Copyright (c) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

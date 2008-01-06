@@ -4,7 +4,7 @@
 
     Command-line interface frontend for MAME.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -310,7 +310,7 @@ static void display_help(void)
 {
 #ifndef MESS
 	mame_printf_info("M.A.M.E. v%s - Multiple Arcade Machine Emulator\n"
-		   "Copyright (C) 1997-2007 by Nicola Salmoria and the MAME Team\n\n", build_version);
+		   "Copyright Nicola Salmoria and the MAME Team\n\n", build_version);
 	mame_printf_info("%s\n", mame_disclaimer);
 	mame_printf_info("Usage:  MAME gamename [options]\n\n"
 		   "        MAME -showusage    for a brief list of options\n"

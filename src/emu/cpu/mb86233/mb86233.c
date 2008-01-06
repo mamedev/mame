@@ -1651,7 +1651,7 @@ void mb86233_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Fujitsu MB86233");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 2007 ElSemi and Ernesto Corvi"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright ElSemi and Ernesto Corvi"); break;
 
 		case CPUINFO_STR_FLAGS:
     		sprintf(info->s, "%c%c", (GETSR()&SIGN_FLAG) ? 'N' : 'n', (GETSR()&ZERO_FLAG) ? 'Z' : 'z' );

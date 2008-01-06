@@ -1,7 +1,7 @@
  /**************************************************************************\
  *              Texas Instruments TMS320x25 DSP Disassembler                *
  *                                                                          *
- *                 Copyright (C) 2001-2002+ Tony La Porta                   *
+ *                 Copyright Tony La Porta                                  *
  *              To be used with TMS320x25 DSP Emulator engine.              *
  *                      Written for the MAME project.                       *
  *                                                                          *

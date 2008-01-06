@@ -1,8 +1,8 @@
 /****************************************************************************
  *                      Intel 8039 Portable Emulator                        *
  *                                                                          *
- *                   Copyright (C) 1997 by Mirko Buffoni                    *
- *  Based on the original work (C) 1997 by Dan Boris, an 8048 emulator      *
+ *                   Copyright Mirko Buffoni                             *
+ *  Based on the original work Copyright Dan Boris, an 8048 emulator     *
  *      You are not allowed to distribute this software commercially        *
  *        Please, notify me, if you make any changes to this file           *
  *                                                                          *
@@ -865,7 +865,7 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8039");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 1997 by Mirko Buffoni\nBased on the original work (C) 1997 by Dan Boris"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

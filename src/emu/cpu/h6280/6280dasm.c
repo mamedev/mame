@@ -2,7 +2,7 @@
 
     6280dasm.c Hudsonsoft Hu6280 (HuC6280/Hu6280a) disassembler
 
-    Copyright (c) 1999, 2000 Bryan McPhail, mish@tendril.co.uk
+    Copyright Bryan McPhail, mish@tendril.co.uk
 
     This source code is based (with permission!) on the 6502 emulator by
     Juergen Buchmueller.  It is released as part of the Mame emulator project.

@@ -1,7 +1,7 @@
 /****************************************************************************
                          Alpha8201 Emulator
 
-                      Copyright (C) 2006 Tatsuyuki Satoh
+                      Copyright Tatsuyuki Satoh
                    Originally written for the MAME project.
 
     Notes :
@@ -956,7 +956,7 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "AlphaDenshi MCU");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.1");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2006 by Tatsuyuki Satoh"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tatsuyuki Satoh"); break;
 		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c", CF?'C':'.',ZF?'Z':'.'); break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_PC:		sprintf(info->s, "PC:%03X", PC);		break;
 		case CPUINFO_STR_REGISTER + ALPHA8201_SP:		sprintf(info->s, "SP:%02X", M_RDMEM(0x001) ); break;

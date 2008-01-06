@@ -32,7 +32,7 @@ int main (int argc,char *argv[])
 	FILE *f;
         UINT32 begin=0,end=(UINT32)-1,filelen,len,pc;
 	printf ("DIS34010\n"
-                        "Copyright (C) Zsolt Vasvari/Aaron Giles 1998-1999\n");
+                        "Copyright Zsolt Vasvari/Aaron Giles\n");
 
 	for (i=1,n=0;i<argc;++i)
 	{

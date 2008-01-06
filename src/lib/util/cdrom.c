@@ -2,7 +2,7 @@
 
     Generic MAME CD-ROM utilties - build IDE and SCSI CD-ROMs on top of this
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************

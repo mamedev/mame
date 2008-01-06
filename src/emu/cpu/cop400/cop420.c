@@ -1,8 +1,13 @@
-/**************************************************************************
- *               National Semiconductor COP420 Emulator                   *
- *                                                                        *
- *                   Copyright (C) 2006 MAME Team                         *
- **************************************************************************/
+/***************************************************************************
+
+    cop420.c
+
+    National Semiconductor COP420 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
 
 /*
 
@@ -385,7 +390,7 @@ void cop420_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COP420"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) 2006 MAME Team"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright MAME Team"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, " ");

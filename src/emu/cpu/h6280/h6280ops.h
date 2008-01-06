@@ -2,7 +2,7 @@
 
     h6280ops.h - Addressing modes and opcode macros for the Hu6820 cpu
 
-    Copyright (c) 1999 Bryan McPhail, mish@tendril.co.uk
+    Copyright Bryan McPhail, mish@tendril.co.uk
 
     This source code is based (with permission!) on the 6502 emulator by
     Juergen Buchmueller.  It is released as part of the Mame emulator project.

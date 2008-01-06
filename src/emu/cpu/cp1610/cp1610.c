@@ -3,7 +3,7 @@
  *   cp1610.c
  *   Portable CP1610 emulator (General Instrument CP1610)
  *
- *   Copyright (c) 2004 Frank Palazzolo, all rights reserved.
+ *   Copyright Frank Palazzolo, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -3500,7 +3500,7 @@ void cp1610_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0");			break;
 	case CPUINFO_STR_CORE_FILE:		strcpy(info->s = cpuintrf_temp_str(), __FILE__);		break;
 	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(),
-									"Copyright (c) 2004 Frank Palazzolo, all rights reserved.");
+									"Copyright Frank Palazzolo, all rights reserved.");
 									break;
     case CPUINFO_STR_FLAGS:
 			sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c",

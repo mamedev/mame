@@ -5,7 +5,7 @@
 
 SPC700 CPU Emulator V0.90
 
-Copyright (c) 2000 Karl Stenerud
+Copyright Karl Stenerud
 All rights reserved.
 
 Permission is granted to use this source code for non-commercial purposes.

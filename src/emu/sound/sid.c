@@ -1,5 +1,5 @@
 /*
-  copyright peter trauner 2000
+  copyright peter trauner
 
   based on michael schwend's sid play
 

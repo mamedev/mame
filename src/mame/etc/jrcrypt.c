@@ -456,7 +456,7 @@ the top of this file. It is included here for completeness.
 
 // CreateJrDecodeTable.c
 //
-// Copyright (C) 1997 David Caldwell
+// Copyright David Caldwell
 // This program is published under the GNU Public License.
 //
 // Comments, questions to: david@indigita.com

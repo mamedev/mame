@@ -9,7 +9,7 @@
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
  *
- *   Copyright (c) 2003 Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

@@ -286,7 +286,7 @@ void minx_get_info( UINT32 state, cpuinfo *info ) {
 	case CPUINFO_STR_CORE_FAMILY:				strcpy( info->s = cpuintrf_temp_str(), "Nintendo Minx" ); break;
 	case CPUINFO_STR_CORE_VERSION:				strcpy( info->s = cpuintrf_temp_str(), "0.1" ); break;
 	case CPUINFO_STR_CORE_FILE:				strcpy( info->s = cpuintrf_temp_str(), __FILE__ ); break;
-	case CPUINFO_STR_CORE_CREDITS:				strcpy( info->s = cpuintrf_temp_str(), "Copyright (C) 2006 by The MESS Team." ); break;
+	case CPUINFO_STR_CORE_CREDITS:				strcpy( info->s = cpuintrf_temp_str(), "Copyright The MESS Team." ); break;
 	case CPUINFO_STR_FLAGS:
 		sprintf( info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c%c%c-%c%c%c%c%c",
 			regs.F & FLAG_I ? 'I' : '.',

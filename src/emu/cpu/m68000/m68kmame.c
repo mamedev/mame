@@ -582,7 +582,7 @@ void m68000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.32");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 1998-2007 Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68k_get_reg(NULL, M68K_REG_SR);
@@ -761,7 +761,7 @@ void m68008_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.32");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 1998-2007 Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68k_get_reg(NULL, M68K_REG_SR);
@@ -1001,7 +1001,7 @@ void m68020_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.32");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 1998-2007 Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68k_get_reg(NULL, M68K_REG_SR);
@@ -1242,7 +1242,7 @@ void m68040_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "3.32");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright 1998-2007 Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB)"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sr = m68k_get_reg(NULL, M68K_REG_SR);

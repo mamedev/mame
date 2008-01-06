@@ -3,7 +3,7 @@
  *   tms7000.c
  *   Portable TMS7000 emulator (Texas Instruments 7000)
  *
- *   Copyright (c) 2001 tim lindner, all rights reserved.
+ *   Copyright tim lindner, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -340,7 +340,7 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s = cpuintrf_temp_str(), "Texas Instriuments TMS7000"); break;
         case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0"); break;
         case CPUINFO_STR_CORE_FILE:	strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(), "Copyright (C) tim lindner 2003"); break;
+        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(), "Copyright tim lindner"); break;
 
         case CPUINFO_STR_FLAGS:
                 sprintf(info->s = cpuintrf_temp_str(),  "%c%c%c%c%c%c%c%c",

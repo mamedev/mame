@@ -6,7 +6,7 @@
  *                                Version 3.32
  *
  * A portable Motorola M680x0 processor emulation engine.
- * Copyright 1998-2007 Karl Stenerud.  All rights reserved.
+ * Copyright Karl Stenerud.  All rights reserved.
  *
  * This code may be freely used for non-commercial purposes as long as this
  * copyright notice remains unaltered in the source code and any binary files
@@ -1233,7 +1233,7 @@ int main(int argc, char **argv)
 	int ophandler_body_read = 0;
 
 	printf("\n\tMusashi v%s 68000, 68008, 68010, 68EC020, 68020, 68040 emulator\n", g_version);
-	printf("\tCopyright 1998-2007 Karl Stenerud (karl@mame.net)\n\n");
+	printf("\tCopyright Karl Stenerud (karl@mame.net)\n\n");
 
 	/* Check if output path and source for the input file are given */
     if(argc > 1)

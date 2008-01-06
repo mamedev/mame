@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                      Alpha8201 Emulator                                  *
  *                                                                          *
- *                    Copyright (C) 2006 Tatsuyuki Satoh                    *
+ *                    Copyright Tatsuyuki Satoh                             *
  *                 Originally written for the MAME project.                 *
  *                                                                          *
  *                                                                          *

@@ -1,8 +1,13 @@
-/**************************************************************************
- *               National Semiconductor COP420 Emulator                   *
- *                                                                        *
- *                   Copyright (C) 2006 MAME Team                         *
- **************************************************************************/
+/***************************************************************************
+
+    420ops.c
+
+    National Semiconductor COP420 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
 
 #define SC				R.SC
 

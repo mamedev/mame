@@ -1,8 +1,13 @@
-/**************************************************************************
- *               National Semiconductor COP400 Emulator                   *
- *                                                                        *
- *                   Copyright (C) 2006 MAME Team                         *
- **************************************************************************/
+/***************************************************************************
+
+    cop400.h
+
+    National Semiconductor COP400 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
 
 #ifndef _COP400_H
 #define _COP400_H

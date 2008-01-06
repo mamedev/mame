@@ -3,7 +3,7 @@
  *   tms70op.c (Op code functions)
  *   Portable TMS7000 emulator (Texas Instruments 7000)
  *
- *   Copyright (c) 2001 tim lindner, all rights reserved.
+ *   Copyright tim lindner, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

@@ -3,7 +3,7 @@
  *   ops4510.h
  *   Addressing mode and opcode macros for 4510 CPU
  *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved.
+ *   Copyright Peter Trauner, all rights reserved.
  *   documentation preliminary databook
  *   documentation by michael steil mist@c64.org
  *   available at ftp://ftp.funet.fi/pub/cbm/c65

@@ -4990,7 +4990,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi SH7750");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");				break;
 		case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2007 R. Belmont"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright R. Belmont"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%s%s%s%s%c%c%d%c%c",

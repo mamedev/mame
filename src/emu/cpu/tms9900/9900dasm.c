@@ -3,8 +3,8 @@
  *   9900dasm.c
  *   TMS 9900 family disassembler
  *
- *   Raphael Nabet 2003
- *   Based on previous work Copyright (c) 1998 John Butler.
+ *   Copyright Raphael Nabet
+ *   Based on previous work Copyright John Butler.
  *   Based on 6502dasm.c 6502/65c02/6510 disassembler by Juergen Buchmueller
  *
  *   - This source code is released as freeware for non-commercial purposes.

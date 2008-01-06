@@ -1237,7 +1237,7 @@ void m37710_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "M7700");				break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2004-2006 R. Belmont, based on G65816 by Karl Stenerud"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright R. Belmont, based on G65816 by Karl Stenerud"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

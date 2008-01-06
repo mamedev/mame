@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                Texas Instruments TMS320x25 DSP Emulator                  *
  *                                                                          *
- *                 Copyright (C) 2001-2002+ Tony La Porta                   *
+ *                 Copyright Tony La Porta                                  *
  *                      Written for the MAME project.                       *
  *                                                                          *
  *      Note :  This is a word based microcontroller, with addressing       *

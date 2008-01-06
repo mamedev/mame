@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                      Microchip PIC16C5x Emulator                         *
  *                                                                          *
- *                    Copyright (C) 2003+ Tony La Porta                     *
+ *                    Copyright Tony La Porta                               *
  *                 Originally written for the MAME project.                 *
  *                                                                          *
  *                                                                          *
@@ -1021,7 +1021,7 @@ static void pic16C5x_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Microchip");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.12");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C)2003+ by Tony La Porta"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tony La Porta"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%01x%c%c%c%c%c %c%c%c%03x",

@@ -3,7 +3,7 @@
 ** File: ymf262.c - software implementation of YMF262
 **                  FM sound generator type OPL3
 **
-** Copyright (C) 2003 Jarek Burczynski
+** Copyright Jarek Burczynski
 **
 ** Version 0.2
 **

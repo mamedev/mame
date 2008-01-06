@@ -5,7 +5,7 @@
  * MOS-6581 R1, R3, R4
  *
  * Read-out combined waveforms taken from reSID 0.5.
- * Copyright (C) 1998  Dag Lem <resid@nimrod.no>
+ * Copyright Dag Lem <resid@nimrod.no>
  */
 
 static const UINT8 waveform30_6581[4096] =

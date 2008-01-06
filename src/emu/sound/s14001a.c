@@ -4,7 +4,7 @@
  By Jonathan Gevaryahu ("Lord Nightmare") with help from Kevin Horton ("kevtris")
  MAME conversion and integration by R. Belmont
 
- Copyright (c) 2007 Jonathan Gevaryahu.
+ Copyright Jonathan Gevaryahu.
 
  Version history:
  0.8 initial version - LN
@@ -542,7 +542,7 @@ void s14001a_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "TSI S14001A";		break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.11";			break;
 		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;			break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2007 Jonathan Gevaryahu"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Jonathan Gevaryahu"; break;
 	}
 }
 

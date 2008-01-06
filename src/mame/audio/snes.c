@@ -11,7 +11,7 @@
 
  ---------------------------------------------------------------------------
 
-  Copyright (c) 2003-2005 Brad Martin.
+  Copyright Brad Martin.
 
   OpenSPC is free software; you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by

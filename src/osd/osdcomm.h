@@ -5,7 +5,7 @@
     Common definitions shared by the OSD layer. This includes the most
     fundamental integral types as well as compiler-specific tweaks.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/

@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                 Texas Instruments TMS32010 DSP Emulator                  *
  *                                                                          *
- *                  Copyright (C) 1999-2004+ Tony La Porta                  *
+ *                  Copyright Tony La Porta                                 *
  *      You are not allowed to distribute this software commercially.       *
  *                      Written for the MAME project.                       *
  *                                                                          *
@@ -944,7 +944,7 @@ void tms32010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments TMS32010"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.22");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C)1999-2004+ by Tony La Porta"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Tony La Porta"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

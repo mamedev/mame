@@ -3,8 +3,8 @@
  *   ill02.h
  *   Addressing mode and opcode macros for the NMOS 6502 illegal opcodes
  *
- *   Copyright (c) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
- *   65sc02 core Copyright (c) 2000 Peter Trauner, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
+ *   65sc02 core Copyright Peter Trauner, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

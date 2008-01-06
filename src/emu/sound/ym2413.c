@@ -3,7 +3,7 @@
 ** File: ym2413.c - software implementation of YM2413
 **                  FM sound generator type OPLL
 **
-** Copyright (C) 2002 Jarek Burczynski
+** Copyright Jarek Burczynski
 **
 ** Version 1.0
 **

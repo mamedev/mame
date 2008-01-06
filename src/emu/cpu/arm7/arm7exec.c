@@ -3,7 +3,7 @@
  *   arm7exec.c
  *   Portable ARM7TDMI Core Emulator
  *
- *   Copyright (c) 2004 Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

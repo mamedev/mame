@@ -7,7 +7,7 @@
  *   of the ADC and SBC instructions, so all opcodes except ADC/SBC
  *   are simply mapped to the m6502 ones.
  *
- *   Copyright (c) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

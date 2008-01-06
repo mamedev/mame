@@ -1,8 +1,13 @@
-/**************************************************************************
- *               National Semiconductor COP410 Emulator                   *
- *                                                                        *
- *                   Copyright (C) 2006 MAME Team                         *
- **************************************************************************/
+/***************************************************************************
+
+    410ops.c
+
+    National Semiconductor COP410 Emulator.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+***************************************************************************/
 
 #define ROM(A)			cpu_readop(A)
 #define RAM_W(A,V)		(data_write_byte_8(A,V))

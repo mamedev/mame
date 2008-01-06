@@ -3,7 +3,7 @@
  *   f8.c
  *   Portable F8 emulator (Fairchild 3850)
  *
- *   Copyright (c) 2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -2127,7 +2127,7 @@ void f8_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0");			break;
 	case CPUINFO_STR_CORE_FILE:		strcpy(info->s = cpuintrf_temp_str(), __FILE__);		break;
 	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(),
-									"Copyright (c) 2000 Juergen Buchmueller, all rights reserved.");
+									"Copyright Juergen Buchmueller, all rights reserved.");
 									break;
 
     case CPUINFO_STR_FLAGS:

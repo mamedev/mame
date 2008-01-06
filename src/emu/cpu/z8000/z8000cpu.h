@@ -4,7 +4,7 @@
  *   Portable Z8000(2) emulator
  *   Macros and types used in z8000.c / z8000ops.c / z8000tbl.c
  *
- *   Copyright (c) 1998,1999 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   Bug fixes and MSB_FIRST compliance Ernesto Corvi.
  *
  *   - This source code is released as freeware for non-commercial purposes.

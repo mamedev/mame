@@ -3,7 +3,7 @@
  *   t65ce02.c
  *   65ce02 opcode functions and function pointer table
  *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved.
+ *   Copyright Peter Trauner, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

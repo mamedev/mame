@@ -1,6 +1,6 @@
 /*** m6809: Portable 6809 emulator ******************************************
 
-    Copyright (C) John Butler 1997
+    Copyright John Butler
 
     References:
 
@@ -1182,7 +1182,7 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 6809");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.11");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) John Butler 1997"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright John Butler"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

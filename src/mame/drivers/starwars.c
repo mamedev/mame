@@ -4,7 +4,7 @@
 
     driver by Steve Baines (sulaco@ntlworld.com) and Frank Palazzolo
 
-    This file is Copyright 1997, Steve Baines.
+    This file is Copyright Steve Baines.
     Modified by Frank Palazzolo for sound support
 
     Games supported:

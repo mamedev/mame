@@ -9,7 +9,7 @@ By R. Belmont
 Based on:
 G65C816 CPU Emulator V0.92
 
-Copyright (c) 2000 Karl Stenerud
+Copyright Karl Stenerud
 All rights reserved.
 
 */

@@ -3,7 +3,7 @@
  *   i8085.c
  *   Portable I8085A emulator V1.2
  *
- *   Copyright (c) 1999 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   Partially based on information out of Z80Em by Marcel De Kogel
  *
  * changes in V1.3
@@ -37,7 +37,7 @@
  *     OUT (#),A      10      11     /
  *     EX (SP),HL     18      19    /
  *
- *   Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   You can contact me at juergen@mame.net or pullmoll@stop1984.com
  *
  *   - This source code is released as freeware for non-commercial purposes
@@ -1687,7 +1687,7 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8080");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 1999 Juergen Buchmueller, all rights reserved."); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

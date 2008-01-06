@@ -3,7 +3,7 @@
  *  6502dasm.c
  *  6502/65c02/6510 disassembler
  *
- *  Copyright (c) 1998 Juergen Buchmueller, all rights reserved.
+ *  Copyright Juergen Buchmueller, all rights reserved.
  *
  *  - This source code is released as freeware for non-commercial purposes.
  *  - You are free to use and redistribute this code in modified or

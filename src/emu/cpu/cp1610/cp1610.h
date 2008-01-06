@@ -3,7 +3,7 @@
  *   cp1610.h
  *   Portable General Instruments CP1610 emulator interface
  *
- *   Copyright (c) 2004 Frank Palazzolo, all rights reserved.
+ *   Copyright Frank Palazzolo, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

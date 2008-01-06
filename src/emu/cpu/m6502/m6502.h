@@ -3,9 +3,9 @@
  *   m6502.h
  *   Portable 6502/65c02/65sc02/6510/n2a03 emulator interface
  *
- *   Copyright (c) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
- *   65sc02 core Copyright (c) 2000 Peter Trauner.
- *   Deco16 portions Copyright (c) 2001 Bryan McPhail.
+ *   Copyright Juergen Buchmueller, all rights reserved.
+ *   65sc02 core Copyright Peter Trauner.
+ *   Deco16 portions Copyright Bryan McPhail.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or

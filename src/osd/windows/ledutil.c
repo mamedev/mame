@@ -3,7 +3,7 @@
 //  ledutil.c - Win32 example code that tracks changing
 //  outputs and updates the keyboard LEDs in response
 //
-//  Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+//  Copyright Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.
 //
 //============================================================

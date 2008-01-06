@@ -3,7 +3,7 @@
   ES5503 - Ensoniq ES5503 "DOC" emulator v1.0
   By R. Belmont.
 
-  Copyright (c) 2005-2007 R. Belmont.
+  Copyright R. Belmont.
 
   This software is dual-licensed: it may be used in MAME and properly licensed
   MAME derivatives under the terms of the MAME license.  For use outside of
@@ -545,7 +545,7 @@ void es5503_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Ensoniq ES550x";					break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2005-2007 R. Belmont"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright R. Belmont"; break;
 	}
 }
 

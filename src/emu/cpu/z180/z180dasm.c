@@ -3,9 +3,7 @@
  *   z180dasm.c
  *   Portable Z8x180 disassembler
  *
- *   Copyright (C) 2000 Juergen Buchmueller, all rights reserved.
- *
- *   Copyright (C) 1998,1999,2000 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   You can contact me at juergen@mame.net or pullmoll@stop1984.com
  *
  *   - This source code is released as freeware for non-commercial purposes

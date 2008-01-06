@@ -2,7 +2,7 @@
  *
  *      mcs48 disassembler
  *
- * This file is Copyright 1996 Michael Cuddy, Fen's Ende Sofware.
+ * This file is Copyright Michael Cuddy, Fen's Ende Sofware.
  * Redistribution is allowed in source and binary form as long as both
  * forms are distributed together with the file 'README'.  This copyright
  * notice must also accompany the files.

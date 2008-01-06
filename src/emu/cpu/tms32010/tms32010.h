@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                 Texas Instruments TMS32010 DSP Emulator                  *
  *                                                                          *
- *                  Copyright (C) 1999-2002+ Tony La Porta                  *
+ *                  Copyright Tony La Porta                                 *
  *      You are not allowed to distribute this software commercially.       *
  *                      Written for the MAME project.                       *
  *                                                                          *

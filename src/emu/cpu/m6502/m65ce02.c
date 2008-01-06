@@ -3,7 +3,7 @@
  *   m65ce02.c
  *   Portable 65ce02 emulator V1.0beta3
  *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved
+ *   Copyright Peter Trauner, all rights reserved
  *   documentation preliminary databook
  *   documentation by michael steil mist@c64.org
  *   available at ftp://ftp.funet.fi/pub/cbm/c65
@@ -361,8 +361,8 @@ const char *m65ce02_info(void *context, int regnum)
 		case CPU_INFO_FAMILY: return "CBM Semiconductor Group CSG 65CE02";
 		case CPU_INFO_VERSION: return "1.0beta";
 		case CPU_INFO_CREDITS:
-			return "Copyright (c) 1998 Juergen Buchmueller\n"
-				"Copyright (c) 2000 Peter Trauner\n"
+			return "Copyright Juergen Buchmueller\n"
+				"Copyright Peter Trauner\n"
 				"all rights reserved.";
 		case CPU_INFO_FILE: return __FILE__;
 		case CPU_INFO_REG_LAYOUT: return (const char*)m65ce02_reg_layout;

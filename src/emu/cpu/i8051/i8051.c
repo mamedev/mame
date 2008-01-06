@@ -9,7 +9,7 @@
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
  *
- *   Copyright (c) 2003 Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -2492,7 +2492,7 @@ void i8051_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "MCS-51");				break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 2003-2004 Steve Ellenoff"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Steve Ellenoff"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

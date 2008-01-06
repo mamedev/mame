@@ -1,7 +1,7 @@
 /****************************************************************************
                          Alpha 8201/8301 Disassembler
 
-                      Copyright (C) 2006 Tatsuyuki Satoh
+                      Copyright Tatsuyuki Satoh
                    Originally written for the MAME project.
 
 ****************************************************************************/

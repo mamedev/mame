@@ -1,7 +1,7 @@
  /**************************************************************************\
  *                      Microchip PIC16C5x Emulator                         *
  *                                                                          *
- *                    Copyright (C) 2003+ Tony La Porta                     *
+ *                    Copyright Tony La Porta                               *
  *                 Originally written for the MAME project.                 *
  *                                                                          *
  *                                                                          *

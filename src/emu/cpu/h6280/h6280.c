@@ -2,7 +2,7 @@
 
     h6280.c - Portable HuC6280 emulator
 
-    Copyright (c) 1999, 2000 Bryan McPhail, mish@tendril.co.uk
+    Copyright Bryan McPhail, mish@tendril.co.uk
 
     This source code is based (with permission!) on the 6502 emulator by
     Juergen Buchmueller.  It is released as part of the Mame emulator project.
@@ -523,7 +523,7 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hudsonsoft 6280");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.11");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (c) 1999, 2000 Bryan McPhail, mish@tendril.co.uk"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Bryan McPhail, mish@tendril.co.uk"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

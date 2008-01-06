@@ -4,7 +4,7 @@
  *   Portable Z8000(2) emulator
  *   Opcode functions
  *
- *   Copyright (c) 1998 Juergen Buchmueller, all rights reserved.
+ *   Copyright Juergen Buchmueller, all rights reserved.
  *   Bug fixes and MSB_FIRST compliance Ernesto Corvi.
  *
  *   - This source code is released as freeware for non-commercial purposes.

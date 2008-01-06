@@ -1,8 +1,8 @@
 /*** konami: Portable Konami cpu emulator ******************************************
 
-    Copyright (C) The MAME Team 1999
+    Copyright Nicola Salmoria and the MAME Team
 
-    Based on M6809 cpu core copyright (C) John Butler 1997
+    Based on M6809 cpu core copyright John Butler
 
     References:
 
@@ -619,7 +619,7 @@ void konami_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "KONAMI 5000x");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) The MAME Team 1999"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",

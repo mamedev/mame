@@ -1,7 +1,7 @@
 /*****************************************************************************
  *
  *  POKEY chip emulator 4.51
- *  Copyright (c) 2000-2007 by The MAME Team
+ *  Copyright Nicola Salmoria and the MAME Team
  *
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller,
@@ -1542,7 +1542,7 @@ void pokey_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Atari custom";				break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "4.51";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2000-2007, The MAME Team"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
 

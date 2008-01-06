@@ -2,7 +2,7 @@
 
     TMS34010: Portable Texas Instruments TMS34010 emulator
 
-    Copyright (C) Alex Pasadyn/Zsolt Vasvari 1998
+    Copyright Alex Pasadyn/Zsolt Vasvari
     Parts based on code by Aaron Giles
 
 ***************************************************************************/
@@ -1856,7 +1856,7 @@ void tms34010_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments 340x0"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright (C) Alex Pasadyn/Zsolt Vasvari 1998\nParts based on code by Aaron Giles"); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Alex Pasadyn/Zsolt Vasvari\nParts based on code by Aaron Giles"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",

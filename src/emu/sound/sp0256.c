@@ -9,8 +9,8 @@
    - Support for non bit-flipped ROMs
    - SPB-640 perpherial/RAM bus
 
- Copyright (c) 1998-2000, Joseph Zbiciak, all rights reserved.
- Copyright (c) 2006, tim lindner, all rights reserved.
+ Copyright Joseph Zbiciak, all rights reserved.
+ Copyright tim lindner, all rights reserved.
 
  - This source code is released as freeware for non-commercial purposes.
  - You are free to use and redistribute this code in modified or
@@ -1369,7 +1369,7 @@ void sp0256_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "GI";							break;
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
-		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright (c) 2006, Joseph Zbiciak, tim lindner"; break;
+		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Joseph Zbiciak, tim lindner"; break;
 	}
 }
 

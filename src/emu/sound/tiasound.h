@@ -15,7 +15,7 @@
 /*                 License Information and Copyright Notice                  */
 /*                 ========================================                  */
 /*                                                                           */
-/* TiaSound is Copyright(c) 1997 by Ron Fries                                */
+/* TiaSound is Copyright Ron Fries                                           */
 /*                                                                           */
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of version 2 of the GNU Library General Public License    */

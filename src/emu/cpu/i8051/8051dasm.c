@@ -9,7 +9,7 @@
  *   8054 Product Line (8054)
  *   8058 Product Line (8058)
  *
- *   Copyright (c) 2003 Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff, all rights reserved.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -30,8 +30,7 @@
  *
  *****************************************************************************
  * Symbol Memory Name Tables borrowed from:
- * D52 8052 Disassembler - Copyright (C) 1995-2002 by
- * Jeffery L. Post
+ * D52 8052 Disassembler - Copyright Jeffery L. Post
  *****************************************************************************/
 
 #include "debugger.h"

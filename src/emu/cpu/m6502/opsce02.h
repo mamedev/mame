@@ -3,7 +3,7 @@
  *   opsce02.h
  *   Addressing mode and opcode macros for 65ce02 CPU
  *
- *   Copyright (c) 2000 Peter Trauner, all rights reserved.
+ *   Copyright Peter Trauner, all rights reserved.
  *   documentation preliminary databook
  *   documentation by michael steil mist@c64.org
  *   available at ftp://ftp.funet.fi/pub/cbm/c65

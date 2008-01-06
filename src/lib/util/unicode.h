@@ -11,7 +11,7 @@
     functions that convert UTF-8 and UTF-16 char clusters to and from
     singular 32-bit Unicode chars.
 
-    Copyright (c) 1996-2007, Nicola Salmoria and the MAME Team.
+    Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
