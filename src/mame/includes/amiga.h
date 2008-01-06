@@ -289,12 +289,12 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
 
 /* Clock speeds */
-#define AMIGA_68000_NTSC_CLOCK		7159090 /* Hz */
-#define AMIGA_68000_PAL_CLOCK		7093790 /* Hz */
-#define AMIGA_68EC020_NTSC_CLOCK	14318180 /* Hz */
-#define AMIGA_68EC020_PAL_CLOCK		14187580 /* Hz */
-#define CDTV_CLOCK_X1               28636363 /* Hz */
-#define CDTV_CLOCK_X5               28375160 /* Hz */
+#define AMIGA_68000_NTSC_CLOCK      XTAL_28_63636MHz/4
+#define AMIGA_68000_PAL_CLOCK       XTAL_28_37516MHz/4
+#define AMIGA_68EC020_NTSC_CLOCK    XTAL_28_63636MHz/2
+#define AMIGA_68EC020_PAL_CLOCK     XTAL_28_37516MHz/2
+#define CDTV_CLOCK_X1               XTAL_28_63636MHz
+#define CDTV_CLOCK_X5               XTAL_28_37516MHz
 
 
 #define ANGUS_CHIP_RAM_MASK		0x07fffe

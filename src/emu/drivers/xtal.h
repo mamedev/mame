@@ -49,6 +49,7 @@ enum
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz    		= 4000000,
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
+	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_6MHz    		= 6000000,
 	XTAL_7_3728MHz   	= 7372800,
@@ -69,6 +70,7 @@ enum
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz   		= 16000000,
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
+	XTAL_17_73447MHz	= 17734470,		/* 4 times the PAL subcarrier */
 	XTAL_18MHz   		= 18000000,
 	XTAL_18_432MHz  	= 18432000,
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
@@ -85,7 +87,8 @@ enum
 	XTAL_27MHz   		= 27000000,		/* Some Banpresto games macrossp and Irem M92 */
 	XTAL_27_164MHz  	= 27164000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_28MHz   		= 28000000,
-	XTAL_28_63636MHz  	= 28636360,		/* later Leland games and Atari GT */
+	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
+	XTAL_28_63636MHz  	= 28636360,		/* later Leland games and Atari GT, Amiga NTSC */
 	XTAL_30_4761MHz  	= 30476100,		/* Taito JC */
 	XTAL_32MHz   		= 32000000,
 	XTAL_32_22MHz  		= 32220000,		/* Typically used on 90's Data East PCBs */
