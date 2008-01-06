@@ -990,7 +990,7 @@ static void draw_bg(running_machine *machine, mame_bitmap *dst, tilemap *src, co
 			pp=tile_cluts[tile*8 + (p&0x7)];
 			ppp=pp + ((p&0x78)<<5);
 			
-			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Not quite correct - some opaque pixels show as transparent
+			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Transparent pixels are set by both the tile pixel data==0 AND colour palette==0 
 				*BITMAP_ADDR32(dst, y, x) = machine->pens[ppp];
 		}
 	}
