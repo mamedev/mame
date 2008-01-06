@@ -252,9 +252,8 @@ static void mips3_exit(void)
 		x86log_free_context(mips3.log);
 
 	/* clean up the DRC */
-	mips3drc_exit();
 	drcfe_exit(mips3.drcfe);
-	drc_exit(mips3.drc);
+	mips3drc_exit();
 
 	/* free the cache */
 	osd_free_executable(mips3.core, CACHE_SIZE + sizeof(*mips3.core));

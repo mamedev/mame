@@ -268,6 +268,7 @@ static void mips3drc_init(void)
 
 static void mips3drc_exit(void)
 {
+	drc_exit(mips3.drc);
 }
 
 

@@ -482,6 +482,7 @@ static void mips3drc_exit(void)
 		}
 	}
 #endif
+	drc_exit(mips3.drc);
 }
 
 

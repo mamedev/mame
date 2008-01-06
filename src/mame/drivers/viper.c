@@ -39,9 +39,15 @@
 
 static UINT8 backup_ram[0x2000];
 
+static void viper_exit(running_machine *machine)
+{
+	voodoo_exit(0);
+}
 
 static VIDEO_START(viper)
 {
+	add_exit_callback(machine, viper_exit);	
+	
 	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
 }
 

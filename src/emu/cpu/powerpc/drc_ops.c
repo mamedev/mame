@@ -110,6 +110,11 @@ static void ppcdrc_reset(drc_core *drc)
 	}
 }
 
+static void ppcdrc_exit(void)
+{
+	drc_exit(ppc.drc);
+}
+
 static UINT32 *ppcdrc_getopptr(UINT32 address)
 {
 	UINT32 *result;
