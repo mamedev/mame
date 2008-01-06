@@ -2330,6 +2330,7 @@ src/mame/layout/lazercmd.lay svneol=native#text/plain
 src/mame/layout/maxaflex.lay svneol=native#text/plain
 src/mame/layout/mpu4.lay svneol=native#text/plain
 src/mame/layout/nbmj8688.lay svneol=native#text/plain
+src/mame/layout/neogeo.lay svneol=native#text/plain
 src/mame/layout/paradice.lay svneol=native#text/plain
 src/mame/layout/pe_bjack.lay svneol=native#text/plain
 src/mame/layout/pe_keno.lay svneol=native#text/plain

@@ -85,6 +85,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 
+#include "neogeo.lh"
+
 
 #define LOG_VIDEO_SYSTEM		(0)
 #define LOG_CPU_COMM			(0)
@@ -1242,6 +1244,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_VIDEO_START(neogeo)
 	MDRV_VIDEO_RESET(neogeo)
 	MDRV_VIDEO_UPDATE(neogeo)
+	MDRV_DEFAULT_LAYOUT(layout_neogeo)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1257,29 +1260,6 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
-
-
-/*
- *  A large number of the software produced for the
- *  system expects the visible display width to be 304 pixels
- *  and displays garbage in the left and right most 8 pixel
- *  columns.  This machine driver sets a smaller visible area
- *  to hide the garbage.
- *
- *  I don't like to do this, but I don't like the idea of the
- *  bug reports we'd get if we didn't
- */
-
-static MACHINE_DRIVER_START( neogeo_s )
-
-	MDRV_IMPORT_FROM(neogeo)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_DEFAULT_POSITION((float)NEOGEO_HTOTAL / (NEOGEO_HTOTAL - 20), 0.0, 1.0, 0.0)
-
-MACHINE_DRIVER_END
-
-
 
 /*************************************
  *
