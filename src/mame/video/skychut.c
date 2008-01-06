@@ -6,133 +6,188 @@
 
   (c) 12/2/1998 Lee Taylor
 
+  2006 - major rewrite by couriersud
+
 ***************************************************************************/
 
 #include "driver.h"
+#include "skychut.h"
+
+static tilemap *		tx_tilemap;
+static gfx_element *	back_gfx;
+static UINT32			extyoffs[32*8];
+static UINT32			extxoffs[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+static const gfx_layout backlayout =
+{
+	8,8*32,	/* 8*8 characters */
+	4,	/* 256 characters */
+	1,	/* 1 bits per pixel */
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8*32, 1*8*32, 2*8*32, 3*8*32, 4*8*32, 5*8*32, 6*8*32, 7*8*32 },
+	32*8*8,	/* every char takes 8 consecutive bytes */
+	extxoffs, extyoffs
+};
+
+static const gfx_layout charlayout =
+{
+	8,8,	/* 8*8 characters */
+	256,	/* 256 characters */
+	1,	/* 1 bits per pixel */
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8	/* every char takes 8 consecutive bytes */
+};
+
+static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows)
+{
+	//irem_state *state = Machine->driver_data;
+
+	return (31-col)*32 + row;
+}
 
 
-
-UINT8 *iremm15_chargen;
-static int bottomline;
+static void get_tile_info(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
+{ 
+	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index] & 0x07, 0);
+}
 
 
 WRITE8_HANDLER( skychut_colorram_w )
 {
-	colorram[offset] = data;
-}
-
-WRITE8_HANDLER( skychut_ctrl_w )
-{
-//popmessage("%02x",data);
-
-	/* I have NO IDEA if this is correct or not */
-	bottomline = ~data & 0x20;
+	if (colorram[offset] != data)
+	{
+		tilemap_mark_tile_dirty(tx_tilemap, offset);
+		colorram[offset] = data;
+	}
 }
 
 
-VIDEO_UPDATE( skychut )
+WRITE8_HANDLER( iremm15_chargen_w )
 {
+	irem_state *state = Machine->driver_data;
+	
+	if (state->chargen[offset] != data)
+	{
+		state->chargen[offset] = data;
+		/* not very effective ... dirty would be better */
+		decodechar(Machine->gfx[0],offset >> 3,state->chargen, &Machine->gfx[0]->layout);
+	}
+}
+
+
+INLINE void plot_pixel_iremm10(mame_bitmap *bm, int x, int y, int col)
+{
+	irem_state *state = Machine->driver_data;
+
+	if (!state->flip)
+		*BITMAP_ADDR16(bm, y, x) = col;
+	else
+		*BITMAP_ADDR16(bm, (IREMM10_VBSTART - 1)- (y - IREMM10_VBEND) + 6
+				, (IREMM10_HBSTART - 1)- (x- IREMM10_HBEND)) = col; // only when flip_screen(?)
+}
+
+VIDEO_START( iremm10 )
+{
+	//irem_state *state = machine->driver_data;
+	int i;
+	
+	for (i=0;i<32*8;i++)
+		extyoffs[i] = i*8;
+
+	video_start_generic(machine);
+
+	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,32,32);
+	tilemap_set_transparent_pen(tx_tilemap, 0x07);
+	tilemap_set_scrolldx(tx_tilemap, 0, 62);
+	tilemap_set_scrolldy(tx_tilemap, 0, 0);
+	
+	back_gfx = allocgfx(&backlayout);
+	back_gfx->total_colors = 8;
+	
+	machine->gfx[1] = back_gfx;
+	return ;
+}
+
+VIDEO_START( iremm15 )
+{
+	irem_state *state = machine->driver_data;
+
+	machine->gfx[0] = allocgfx(&charlayout);
+	machine->gfx[0]->total_colors = 8;
+	
+	decodegfx(machine->gfx[0], state->chargen,0,256);
+
+	video_start_generic(machine);
+
+	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,32,32);
+	tilemap_set_scrolldx(tx_tilemap, 0, 116);
+	tilemap_set_scrolldy(tx_tilemap, 0, 0);
+
+	return ;
+}
+
+/***************************************************************************
+
+  Draw the game screen in the given mame_bitmap.
+
+***************************************************************************/
+VIDEO_UPDATE( iremm10 )
+{
+	irem_state *state = machine->driver_data;
 	int offs;
+	int color[4]= { 3, 3, 5, 5};
+	int xpos[4] = { 4*8, 26*8, 7*8, 6*8} ;
+	int i;
 
 	fillbitmap(bitmap,machine->pens[7],cliprect);
 
-	for (offs = 0;offs < 0x400;offs++)
-	{
-		int mask=iremm15_chargen[offs];
-		int x = offs / 256;
-		int y = offs % 256;
-		int col = 0;
+	decodegfx(back_gfx, state->chargen,0,4);
+	for (i=0;i<4;i++)
+		if (state->flip)
+			drawgfx(bitmap, back_gfx, i, color[i], 1, 1, 31*8 - xpos[i], 6, cliprect, 0, 0);
+		else
+			drawgfx(bitmap, back_gfx, i, color[i], 0, 0, xpos[i], 0, cliprect, 0, 0);
 
-		switch (x)
-		{
-			case 0: x = 4*8;  col = 3; break;
-			case 1: x = 26*8; col = 3; break;
-			case 2: x = 7*8;  col = 5; break;
-			case 3: x = 6*8;  col = 5; break;
-		}
-
-		if (x >= cliprect->min_x && x+7 <= cliprect->max_x
-				&& y >= cliprect->min_y && y <= cliprect->max_y)
-		{
-			if (mask&0x80) *BITMAP_ADDR16(bitmap, y, x+0) = col;
-			if (mask&0x40) *BITMAP_ADDR16(bitmap, y, x+1) = col;
-			if (mask&0x20) *BITMAP_ADDR16(bitmap, y, x+2) = col;
-			if (mask&0x10) *BITMAP_ADDR16(bitmap, y, x+3) = col;
-			if (mask&0x08) *BITMAP_ADDR16(bitmap, y, x+4) = col;
-			if (mask&0x04) *BITMAP_ADDR16(bitmap, y, x+5) = col;
-			if (mask&0x02) *BITMAP_ADDR16(bitmap, y, x+6) = col;
-			if (mask&0x01) *BITMAP_ADDR16(bitmap, y, x+7) = col;
-		}
-	}
-
-	if (bottomline)
+	if (state->bottomline)
 	{
 		int y;
 
-		for (y = cliprect->min_y;y <= cliprect->max_y;y++)
+		for (y = IREMM10_VBEND;y < IREMM10_VBSTART;y++)
 		{
-			*BITMAP_ADDR16(bitmap, y, 16) = 0;
+			plot_pixel_iremm10(bitmap,16,y,0);
 		}
 	}
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int sx,sy;
+		tilemap_mark_tile_dirty(tx_tilemap, offs);
 
-		sx = 31 - offs / 32;
-		sy = offs % 32;
+	tilemap_set_flip(tx_tilemap, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-		drawgfx(bitmap,machine->gfx[0],
-				videoram[offs],
-				colorram[offs],
-				0,0,
-				8*sx,8*sy,
-				cliprect,TRANSPARENCY_PEN,0);
-	}
 	return 0;
 }
 
 
-static void iremm15_drawgfx(mame_bitmap *bitmap, int ch,
-							INT16 color, INT16 back, int x, int y)
-{
-	UINT8 mask;
-	int i;
+/***************************************************************************
 
-	for (i=0; i<8; i++, y++) {
-		mask=iremm15_chargen[ch*8+i];
-		*BITMAP_ADDR16(bitmap, y, x+0) = mask&0x80?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+1) = mask&0x40?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+2) = mask&0x20?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+3) = mask&0x10?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+4) = mask&0x08?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+5) = mask&0x04?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+6) = mask&0x02?color:back;
-		*BITMAP_ADDR16(bitmap, y, x+7) = mask&0x01?color:back;
-	}
-}
+  Draw the game screen in the given mame_bitmap.
 
-
+***************************************************************************/
 VIDEO_UPDATE( iremm15 )
 {
+	irem_state *state = machine->driver_data;
 	int offs;
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int sx,sy;
+		tilemap_mark_tile_dirty(tx_tilemap, offs);
 
+	//tilemap_mark_all_tiles_dirty(tx_tilemap);
+	tilemap_set_flip(tx_tilemap, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-		sx = 31 - offs / 32;
-		sy = offs % 32;
-
-		iremm15_drawgfx(tmpbitmap,
-						videoram[offs],
-						machine->pens[colorram[offs] & 7],
-						machine->pens[7], // space beam not color 0
-						8*sx,8*sy);
-	}
-
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

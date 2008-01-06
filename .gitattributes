@@ -2256,6 +2256,7 @@ src/mame/includes/segas32.h svneol=native#text/plain
 src/mame/includes/seta.h svneol=native#text/plain
 src/mame/includes/shuuz.h svneol=native#text/plain
 src/mame/includes/skullxbo.h svneol=native#text/plain
+src/mame/includes/skychut.h svneol=native#text/plain
 src/mame/includes/skydiver.h svneol=native#text/plain
 src/mame/includes/slapstic.h svneol=native#text/plain
 src/mame/includes/snes.h svneol=native#text/plain
