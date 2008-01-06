@@ -58,7 +58,7 @@ VIDEO_START( ninjaw )
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int primask,int x_offs,int y_offs)
 {
 	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, invis, curx, cury;
+	int x, y, priority, curx, cury;
 	int code;
 
 #ifdef MAME_DEBUG
@@ -77,24 +77,33 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		if (!tilenum) continue;
 
 		data = spriteram16[offs+0];
-//      x = (data - 8) & 0x3ff;
 		x = (data - 32) & 0x3ff;	/* aligns sprites on rock outcrops and sewer hole */
 
 		data = spriteram16[offs+1];
 		y = (data - 0) & 0x1ff;
 
-		/* don't know meaning of "invis" bit (Darius: explosions of your bomb shots) */
+		/* 
+			The purpose of the bit at data&0x8 (below) is unknown, but it is set
+			on Darius explosions, some enemy missiles and at least 1 boss.
+			It is most likely another priority bit but as there are no obvious
+			visual problems it will need checked against the original pcb.
+			
+			There is a report this bit is set when the player intersects
+			the tank sprite in Ninja Warriors however I was unable to repro
+			this or find any use of this bit in that game.  
+			
+			Bit&0x8000 is set on some sprites in later levels of Darius 
+			but is again unknown, and there is no obvious visual problem.
+		*/
 		data = spriteram16[offs+3];
 		flipx    = (data & 0x1);
 		flipy    = (data & 0x2) >> 1;
 		priority = (data & 0x4) >> 2; // 1 = low
+		/* data&0x8 - unknown */
 		if (priority != primask) continue;
-		invis    = (data & 0x8) >> 3;
 		color    = (data & 0x7f00) >> 8;
-
-		/* Ninjaw: this stops your player flickering black and cutting into tank sprites */
-		if (invis) continue;
-
+		/* data&0x8000 - unknown */
+		
 #ifdef MAME_DEBUG
 		if (data & 0x80f0)   unknown |= (data &0x80f0);
 #endif
