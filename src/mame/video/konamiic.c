@@ -1901,6 +1901,7 @@ static UINT8 *K052109_videoram_F,*K052109_videoram2_F,*K052109_colorram_F;
 static UINT8 *K052109_videoram_A,*K052109_videoram2_A,*K052109_colorram_A;
 static UINT8 *K052109_videoram_B,*K052109_videoram2_B,*K052109_colorram_B;
 static UINT8 K052109_charrombank[4];
+static UINT8 K052109_charrombank_2[4];
 static UINT8 has_extra_video_ram;
 static INT32 K052109_RMRD_line;
 static int K052109_tileflip_enable;
@@ -2050,14 +2051,13 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	state_save_register_global(K052109_scrollctrl);
 	state_save_register_global(K052109_irq_enabled);
 	state_save_register_global_array(K052109_charrombank);
+	state_save_register_global_array(K052109_charrombank_2);
 	state_save_register_global_array(K052109_dx);
 	state_save_register_global_array(K052109_dy);
 	state_save_register_global(has_extra_video_ram);
 
 	state_save_register_func_postload(K052109_tileflip_reset);
 }
-
-
 
 READ8_HANDLER( K052109_r )
 {
@@ -2090,14 +2090,16 @@ READ8_HANDLER( K052109_r )
 		int bank = K052109_charrombank[(color & 0x0c) >> 2] >> 2;   /* discard low bits (TMNT) */
 		int addr;
 
+		bank |= (K052109_charrombank_2[(color & 0x0c) >> 2] >> 2); // Surprise Attack uses this 2nd bank in the rom test
+
 if (has_extra_video_ram) code |= color << 8;	/* kludge for X-Men */
 else
 		(*K052109_callback)(0,bank,&code,&color,&flags,&priority);
 
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= memory_region_length(K052109_memory_region)-1;
-
-//  popmessage("%04x: off%04x sub%02x (bnk%x) adr%06x",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
+  
+//		logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
 
 		return memory_region(K052109_memory_region)[addr];
 	}
@@ -2151,14 +2153,14 @@ WRITE8_HANDLER( K052109_w )
 				for (i = 0;i < 0x1800;i++)
 				{
 					int bank = (K052109_ram[i]&0x0c) >> 2;
-					if ((bank == 0 && (dirty & 1)) || (bank == 1 && dirty & 2))
+					if ((bank == 0 && (dirty & 1)) || (bank == 1 && (dirty & 2)))
 					{
 						tilemap_mark_tile_dirty(K052109_tilemap[(i & 0x1800) >> 11],i & 0x7ff);
 					}
 				}
 			}
 		}
-		else if (offset == 0x1e00)
+		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
 //logerror("%04x: 052109 register 1e00 = %02x\n",activecpu_get_pc(),data);
 			K052109_romsubbank = data;
@@ -2194,7 +2196,7 @@ WRITE8_HANDLER( K052109_w )
 				for (i = 0;i < 0x1800;i++)
 				{
 					int bank = (K052109_ram[i] & 0x0c) >> 2;
-					if ((bank == 2 && (dirty & 1)) || (bank == 3 && dirty & 2))
+					if ((bank == 2 && (dirty & 1)) || (bank == 3 && (dirty & 2)))
 						tilemap_mark_tile_dirty(K052109_tilemap[(i & 0x1800) >> 11],i & 0x7ff);
 				}
 			}
@@ -2203,8 +2205,20 @@ WRITE8_HANDLER( K052109_w )
 		{	/* B y scroll */	}
 		else if (offset >= 0x3a00 && offset < 0x3c00)
 		{	/* B x scroll */	}
-//      else
-//logerror("%04x: write %02x to unknown 052109 address %04x\n",activecpu_get_pc(),data,offset);
+		else if (offset == 0x3d80) // Surprise Attack uses offset 0x3d80 in rom test
+		{
+			// mirroring this write, breaks Surprise Attack in game tilemaps
+			K052109_charrombank_2[0] = data & 0x0f;
+			K052109_charrombank_2[1] = (data >> 4) & 0x0f;
+		}
+		else if (offset == 0x3f00) // Surprise Attack uses offset 0x3f00 in rom test
+		{
+			// mirroring this write, breaks Surprise Attack in game tilemaps
+			K052109_charrombank_2[2] = data & 0x0f;
+			K052109_charrombank_2[3] = (data >> 4) & 0x0f;
+		}
+//		else
+//			logerror("%04x: write %02x to unknown 052109 address %04x\n",activecpu_get_pc(),data,offset);
 	}
 }
 
