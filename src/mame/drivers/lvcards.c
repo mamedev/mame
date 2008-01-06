@@ -1,12 +1,7 @@
 /***************************************************************************
-Lovely Poker/Pontoon driver, updated by El Condor from work by Uki and Zsolt Vasvari respectively.
+Lovely Cards/Poker/Pontoon driver, updated by El Condor from work by Uki and
+Zsolt Vasvari respectively.
 Later cleaned up by Curt Coder and Scott Yellig.
-
-Lovely Cards also runs on this hardware, but is not a gambling game.
-
-Any fixes for this driver should be forwarded to the AGEMAME forum at (http://www.mameworld.info),
-or to MAME, if they affect Lovely Cards.
-
 ---
 
 Lovely Poker by Uki/El Condor
@@ -102,24 +97,24 @@ static MACHINE_START( lvpoker )
 
 static MACHINE_RESET( lvpoker )
 {
-payout = 0;
-pulse = 0;
-result = 0;
+	payout = 0;
+	pulse = 0;
+	result = 0;
 }
 
 static WRITE8_HANDLER(control_port_2_w)
 {
 	switch (data)
 	{
-	case 0x60:
-	payout = 1;
-	break;
-	case 0xc0:
-	payout = 1;
-	break;
-	default:
-	payout = 0;
-	break;
+		case 0x60:
+		payout = 1;
+		break;
+		case 0xc0:
+		payout = 1;
+		break;
+		default:
+		payout = 0;
+		break;
 	}
 }
 
@@ -127,15 +122,15 @@ static WRITE8_HANDLER(control_port_2a_w)
 {
 	switch (data)
 	{
-	case 0x60:
-	payout = 1;
-	break;
-	case 0x80:
-	payout = 1;
-	break;
-	default:
-	payout = 0;
-	break;
+		case 0x60:
+		payout = 1;
+		break;
+		case 0x80:
+		payout = 1;
+		break;
+		default:
+		payout = 0;
+		break;
 	}
 }
 
@@ -147,12 +142,12 @@ static READ8_HANDLER( payout_r )
 	{
     	if ( pulse < 3 )
 		{
-		result = result | 0x40;
-        pulse++;
+			result = result | 0x40;
+	        pulse++;
         }
        else
     	{
-        pulse = 0;
+        	pulse = 0;
         }
    }
    return result;

@@ -173,6 +173,8 @@ Adder hardware:
 #define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
+#define MASTER_CLOCK		(XTAL_8MHz)
+
 // local prototypes ///////////////////////////////////////////////////////
 
 static int  get_scorpion2_uart_status(void);	// retrieve status of uart on scorpion2 board
@@ -516,7 +518,7 @@ static INTERRUPT_GEN( timer_irq )
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
 
-		cpunum_set_input_line(0, M6809_IRQ_LINE, HOLD_LINE );
+		cpunum_set_input_line(0, M6809_IRQ_LINE, PULSE_LINE );
 	}
 }
 
@@ -678,7 +680,7 @@ static WRITE8_HANDLER( mmtr_w )
 		}
 	}
 
-	if ( data & 0x1F ) cpunum_set_input_line(0, M6809_FIRQ_LINE, PULSE_LINE );
+	if ( data & 0x1F ) cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -790,7 +792,7 @@ static WRITE8_HANDLER( nec_latch_w )
 
 	upd7759_port_w(0, data&0x3F);	// setup sample
 	upd7759_start_w(0, 0);
-	upd7759_start_w(0, 1);			// start
+	upd7759_start_w(0, 1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1479,7 +1481,6 @@ static int read_e2ram(void)
 
 	return e2data_pin;
 }
-
 
 static const UINT16 AddressDecode[]=
 {
@@ -3032,11 +3033,11 @@ static INPUT_PORTS_START( pokio )
 
 INPUT_PORTS_END
 
- static const struct upd7759_interface upd7759_interface =
- {
+static const struct upd7759_interface upd7759_interface =
+{
 	REGION_SOUND1,		/* memory region */
 	0
- };
+};
 
 ///////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion2 board + adder2 expansion //////////////////
@@ -3045,7 +3046,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_INTERLEAVE(16)									// needed for serial communication !!
-	MDRV_CPU_ADD_TAG("main", M6809, 2000000 )			// 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD_TAG("main", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap_vid,0)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 
@@ -3068,7 +3069,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_PALETTE_INIT(adder2)
 	MDRV_GFXDECODE(adder2)
 
-	MDRV_CPU_ADD_TAG("adder2", M6809, 2000000 )			// adder2 board 6809 CPU at 2 Mhz
+	MDRV_CPU_ADD_TAG("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
 	MDRV_CPU_VBLANK_INT(adder2_vbl, 1)					// board has a VBL IRQ
 
@@ -3077,7 +3078,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_SOUND_CONFIG(upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ADD(YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
