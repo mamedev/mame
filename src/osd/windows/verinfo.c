@@ -129,9 +129,8 @@ static int parse_version_digit(const char *str, int *position)
 //  parse_version
 //============================================================
 
-static int parse_version(char *str, int *version_major, int *version_minor, int *version_micro, int *year, const char **version_string)
+static int parse_version(char *str, int *version_major, int *version_minor, int *version_micro, const char **version_string)
 {
-	char *copyright;
 	char *version;
 	int position = 0;
 
@@ -151,20 +150,6 @@ static int parse_version(char *str, int *version_major, int *version_minor, int 
 	*version_major = parse_version_digit(version, &position);
 	*version_minor = parse_version_digit(version, &position);
 	*version_micro = parse_version_digit(version, &position);
-
-	// find the copyright string
-	copyright = strstr(str, "(c)");
-	if (copyright != NULL)
-		copyright = strchr(copyright, '-');
-	if (copyright == NULL)
-	{
-		fprintf(stderr, "Unable to find copyright string\n");
-		return 1;
-	}
-	copyright++;
-
-	*year = 0;
-	sscanf(copyright, "%d", year);
 	return 0;
 }
 
@@ -177,7 +162,6 @@ static int parse_version(char *str, int *version_major, int *version_minor, int 
 int main(int argc, char *argv[])
 {
 	version_info v;
-	int begin_year, current_year;
 	char legal_copyright[512];
 	char *buffer;
 	size_t size;
@@ -220,7 +204,7 @@ int main(int argc, char *argv[])
 	buffer[size] = 0;
 
 	// parse out version string
-	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &current_year, &v.version_string))
+	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &v.version_string))
 		return 1;
 
 #ifdef MESS
@@ -232,7 +216,6 @@ int main(int argc, char *argv[])
 	v.internal_name = "MESS";
 	v.original_filename = "MESS";
 	v.product_name = "MESS";
-	begin_year = 1998;
 #elif defined(WINUI)
 	// MAMEUI
 	v.author = "Christopher Kirmse and the MAMEUI team";
@@ -242,7 +225,6 @@ int main(int argc, char *argv[])
 	v.internal_name = "MAMEUI";
 	v.original_filename = "MAMEUI";
 	v.product_name = "MAMEUI";
-	begin_year = 1997;
 #else
 	// MAME
 	v.author = "Nicola Salmoria and the MAME Team";
@@ -252,12 +234,11 @@ int main(int argc, char *argv[])
 	v.internal_name = "MAME";
 	v.original_filename = "MAME";
 	v.product_name = "MAME";
-	begin_year = 1996;
 #endif
 
 	// build legal_copyright string
 	v.legal_copyright = legal_copyright;
-	snprintf(legal_copyright, ARRAY_LENGTH(legal_copyright), "Copyright %d-%d Nicola Salmoria and the MAME team", begin_year, current_year);
+	snprintf(legal_copyright, ARRAY_LENGTH(legal_copyright), "Copyright Nicola Salmoria and the MAME team");
 
 	// emit the info
 	emit_version_info(&v);
