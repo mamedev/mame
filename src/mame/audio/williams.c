@@ -32,6 +32,17 @@
 #include "sound/dac.h"
 
 
+#define NARC_MASTER_CLOCK		XTAL_8MHz
+#define NARC_FM_CLOCK			XTAL_3_579545MHz
+
+#define CVSD_MASTER_CLOCK		XTAL_8MHz
+#define CVSD_FM_CLOCK			XTAL_3_579545MHz
+
+#define ADPCM_MASTER_CLOCK		XTAL_8MHz
+#define ADPCM_FM_CLOCK			XTAL_3_579545MHz
+
+
+
 /***************************************************************************
     STATIC GLOBALS
 ****************************************************************************/
@@ -39,6 +50,7 @@
 static UINT8 williams_sound_int_state;
 
 static UINT8 audio_talkback;
+static UINT8 audio_sync;
 
 static INT8 sound_cpunum;
 static INT8 soundalt_cpunum;
@@ -177,12 +189,12 @@ static const struct YM2151interface adpcm_ym2151_interface =
 ****************************************************************************/
 
 MACHINE_DRIVER_START( williams_cvsd_sound )
-	MDRV_CPU_ADD_TAG("cvsd", M6809, 8000000/4)
+	MDRV_CPU_ADD_TAG("cvsd", M6809E, CVSD_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579580)
+	MDRV_SOUND_ADD(YM2151, CVSD_FM_CLOCK)
 	MDRV_SOUND_CONFIG(cvsd_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -195,15 +207,15 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( williams_narc_sound )
-	MDRV_CPU_ADD_TAG("narc1", M6809, 8000000/4)
+	MDRV_CPU_ADD_TAG("narc1", M6809E, NARC_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_master_map,0)
 
-	MDRV_CPU_ADD_TAG("narc2", M6809, 8000000/4)
+	MDRV_CPU_ADD_TAG("narc2", M6809E, NARC_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_slave_map,0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579580)
+	MDRV_SOUND_ADD(YM2151, NARC_FM_CLOCK)
 	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.10)
@@ -223,19 +235,19 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( williams_adpcm_sound )
-	MDRV_CPU_ADD_TAG("adpcm", M6809, 8000000/4)
+	MDRV_CPU_ADD_TAG("adpcm", M6809E, ADPCM_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(williams_adpcm_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579580)
+	MDRV_SOUND_ADD(YM2151, ADPCM_FM_CLOCK)
 	MDRV_SOUND_CONFIG(adpcm_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(OKIM6295, 8000000/8)
+	MDRV_SOUND_ADD(OKIM6295, ADPCM_MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -322,6 +334,7 @@ void williams_narc_init(void)
 	/* register for save states */
 	state_save_register_global(williams_sound_int_state);
 	state_save_register_global(audio_talkback);
+	state_save_register_global(audio_sync);
 }
 
 
@@ -529,8 +542,15 @@ static WRITE8_HANDLER( narc_master_talkback_w )
 }
 
 
+static TIMER_CALLBACK( narc_sync_clear )
+{
+	audio_sync &= ~param;
+}
+
 static WRITE8_HANDLER( narc_master_sync_w )
 {
+	timer_set(double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x01, narc_sync_clear);
+	audio_sync |= 0x01;
 	logerror("Master sync = %02X\n", data);
 }
 
@@ -543,6 +563,8 @@ static WRITE8_HANDLER( narc_slave_talkback_w )
 
 static WRITE8_HANDLER( narc_slave_sync_w )
 {
+	timer_set(double_to_attotime(TIME_OF_74LS123(180000, 0.000001)), NULL, 0x02, narc_sync_clear);
+	audio_sync |= 0x02;
 	logerror("Slave sync = %02X\n", data);
 }
 
@@ -584,6 +606,12 @@ void williams_narc_reset_w(int state)
 }
 
 
+int williams_narc_talkback_r(void)
+{
+	return audio_talkback | (audio_sync << 8);
+}
+
+
 
 /***************************************************************************
     ADPCM READ/WRITE HANDLERS
@@ -601,10 +629,19 @@ static WRITE8_HANDLER( adpcm_6295_bank_select_w )
 }
 
 
+static TIMER_CALLBACK( clear_irq_state )
+{
+	williams_sound_int_state = 0;
+}
+
+
 static READ8_HANDLER( adpcm_command_r )
 {
 	cpunum_set_input_line(sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-	williams_sound_int_state = 0;
+	
+	/* don't clear the external IRQ state for a short while; this allows the
+	   self-tests to pass */
+	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
 	return soundlatch_r(0);
 }
 
@@ -628,6 +665,7 @@ void williams_adpcm_data_w(int data)
 	{
 		cpunum_set_input_line(sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
+		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -644,4 +682,10 @@ void williams_adpcm_reset_w(int state)
 	/* going low resets and reactivates the CPU */
 	else
 		cpunum_set_input_line(sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+}
+
+
+int williams_adpcm_sound_irq_r(void)
+{
+	return williams_sound_int_state;
 }

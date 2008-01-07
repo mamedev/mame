@@ -774,6 +774,9 @@ static void dcs_boot(void)
 
 static TIMER_CALLBACK( dcs_reset )
 {
+	if (LOG_DCS_IO)
+		logerror("dcs_reset\n");
+
 	/* reset the memory banking */
 	switch (dcs.rev)
 	{
