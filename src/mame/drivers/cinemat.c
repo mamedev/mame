@@ -1131,6 +1131,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wotw )
 	MDRV_IMPORT_FROM(cinemat_jmi_16k)
+	MDRV_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
 	MDRV_IMPORT_FROM(wotw_sound)
 MACHINE_DRIVER_END
 
@@ -1496,7 +1497,7 @@ GAMEL(1980, starcas1, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,
 GAMEL(1980, starcasp, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (prototype)", GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1980, starcase, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics (Mottoeis license)", "Star Castle (Mottoeis)", GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1980, stellcas, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "bootleg", "Stellar Castle (Elettronolo)", GAME_SUPPORTS_SAVE, layout_starcas )
-GAMEL(1981, spaceftr, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Zaccaria", "Space Fortress (Zaccaria)", GAME_SUPPORTS_SAVE, layout_starcas )
+GAMEL(1981, spaceftr, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Zaccaria", "Space Fortress (Zaccaria)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_starcas )
 GAMEL(1981, solarq,   0,       solarq,   solarq,   0,        ORIENTATION_FLIP_Y ^ ORIENTATION_FLIP_X, "Cinematronics", "Solar Quest", GAME_SUPPORTS_SAVE, layout_solarq )
 GAME( 1981, boxingb,  0,       boxingb,  boxingb,  boxingb,  ORIENTATION_FLIP_Y,   "Cinematronics", "Boxing Bugs", GAME_SUPPORTS_SAVE )
 GAME( 1981, wotw,     0,       wotw,     wotw,     0,        ORIENTATION_FLIP_Y,   "Cinematronics", "War of the Worlds", GAME_SUPPORTS_SAVE )
