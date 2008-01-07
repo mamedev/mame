@@ -1932,7 +1932,12 @@ static void render_spans_32(int start, int end, int tilenum, int shade, int text
                     }
 				}
 
-                if( !alpha_out )
+                /* SGINUT 1/6/08: This fixes things in some games and breaks things in others.
+                                  I believe the pixels should be discarded based on the alpha
+                                  value stored in memory, but alpha and coverage are stored in
+                                  anciliary bits in the framebuffer which are not currently
+                                  emulated by MESS. */
+                if( /*!alpha_out*/ 1 )
                 {
                     oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
                     if (zbuffer)
@@ -2235,7 +2240,12 @@ static void render_spans_16(int start, int end, int tilenum, int shade, int text
                     }
 				}
 
-                if( !alpha_out )
+                /* SGINUT 1/6/08: This fixes things in some games and breaks things in others.
+                                  I believe the pixels should be discarded based on the alpha
+                                  value stored in memory, but alpha and coverage are stored in
+                                  anciliary bits in the framebuffer which are not currently
+                                  emulated by MESS. */
+                if( /*!alpha_out*/ 1 )
                 {
                     oz = (UINT16)zb[(fb_index + x) ^ WORD_ADDR_XOR];
                     if (zbuffer)
