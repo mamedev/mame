@@ -617,7 +617,7 @@ ROM_END
 static DRIVER_INIT( toobin )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 2, 1, 0x1000);
+	atarijsa_init(machine, 1, 0x1000);
 }
 
 

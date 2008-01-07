@@ -39,14 +39,17 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 
+
+#define JSA_MASTER_CLOCK			XTAL_3_579545MHz
+
+
 static UINT8 *bank_base;
 static UINT8 *bank_source_data;
 
 static UINT8 speech_data;
 static UINT8 last_ctl;
 
-static UINT8 cpu_num;
-static UINT8 input_port;
+static int cpu_num;
 static UINT8 test_port;
 static UINT16 test_mask;
 
@@ -101,19 +104,19 @@ static void init_save_state(void)
  *
  *************************************/
 
-void atarijsa_init(int cpunum, int inputport, int testport, int testmask)
+void atarijsa_init(running_machine *machine, int testport, int testmask)
 {
 	int i;
 
 	/* copy in the parameters */
-	cpu_num = cpunum;
-	input_port = inputport;
+	cpu_num = mame_find_cpu_index(machine, "jsa");
+	assert_always(cpu_num != -1, "Could not find JSA CPU!");
 	test_port = testport;
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	bank_base = &memory_region(REGION_CPU1+cpunum)[0x03000];
-	bank_source_data = &memory_region(REGION_CPU1+cpunum)[0x10000];
+	bank_base = &memory_region(REGION_CPU1+cpu_num)[0x03000];
+	bank_source_data = &memory_region(REGION_CPU1+cpu_num)[0x10000];
 
 	/* determine which sound hardware is installed */
 	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;
@@ -141,8 +144,8 @@ void atarijsa_init(int cpunum, int inputport, int testport, int testmask)
 	/* install POKEY memory handlers */
 	if (has_pokey)
 	{
-		memory_install_read8_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x2c00, 0x2c0f, 0, 0, pokey1_r);
-		memory_install_write8_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x2c00, 0x2c0f, 0, 0, pokey1_w);
+		memory_install_read8_handler(cpu_num, ADDRESS_SPACE_PROGRAM, 0x2c00, 0x2c0f, 0, 0, pokey1_r);
+		memory_install_write8_handler(cpu_num, ADDRESS_SPACE_PROGRAM, 0x2c00, 0x2c0f, 0, 0, pokey1_w);
 	}
 
 	init_save_state();
@@ -218,7 +221,7 @@ static READ8_HANDLER( jsa1_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = readinputport(input_port);
+			result = readinputportbytag("JSAI");
 			if (!(readinputport(test_port) & test_mask)) result ^= 0x80;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
@@ -282,7 +285,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 				if (((data ^ last_ctl) & 0x02) && (data & 0x02))
 					tms5220_data_w(0, speech_data);
 				count = 5 | ((data >> 2) & 2);
-				tms5220_set_frequency(ATARI_CLOCK_3MHz*2 / (16 - count));
+				tms5220_set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
 			}
 
 			/* coin counters */
@@ -345,7 +348,7 @@ static READ8_HANDLER( jsa2_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = readinputport(input_port);
+			result = readinputportbytag("JSAII");
 			if (!(readinputport(test_port) & test_mask)) result ^= 0x80;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
@@ -464,7 +467,7 @@ static READ8_HANDLER( jsa3_io_r )
                 0x02 = coin L (active high)
                 0x01 = coin R (active high)
             */
-			result = readinputport(input_port);
+			result = readinputportbytag("JSAIII");
 			if (!(readinputport(test_port) & test_mask)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
@@ -601,7 +604,7 @@ static READ8_HANDLER( jsa3s_io_r )
                 0x02 = coin L (active high)
                 0x01 = coin R (active high)
             */
-			result = readinputport(input_port);
+			result = readinputportbytag("JSAIII");
 			if (!(readinputport(test_port) & test_mask)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
@@ -729,37 +732,23 @@ static void update_all_volumes(running_machine *machine )
  *
  *************************************/
 
-static ADDRESS_MAP_START( atarijsa1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x2001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(jsa1_io_r)
-	AM_RANGE(0x3000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( atarijsa1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(jsa1_io_w)
-	AM_RANGE(0x3000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( atarijsa2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x2001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(jsa2_io_r)
-	AM_RANGE(0x3000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
+	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( atarijsa2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(jsa2_io_w)
-	AM_RANGE(0x3000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x2001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
+	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -808,14 +797,14 @@ static const struct YM2151interface ym2151_interface =
 MACHINE_DRIVER_START( jsa_i_stereo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_readmem,atarijsa1_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
+	MDRV_CPU_ADD_TAG("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("ym", YM2151, ATARI_CLOCK_3MHz)
+	MDRV_SOUND_ADD_TAG("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
@@ -829,7 +818,7 @@ MACHINE_DRIVER_START( jsa_i_stereo_swapped )
 	MDRV_IMPORT_FROM(jsa_i_stereo)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ym", YM2151, ATARI_CLOCK_3MHz)
+	MDRV_SOUND_REPLACE("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "right", 0.60)
 	MDRV_SOUND_ROUTE(1, "left", 0.60)
@@ -843,7 +832,7 @@ MACHINE_DRIVER_START( jsa_i_stereo_pokey )
 	MDRV_IMPORT_FROM(jsa_i_stereo)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD(POKEY, ATARI_CLOCK_3MHz/2)
+	MDRV_SOUND_ADD(POKEY, JSA_MASTER_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 MACHINE_DRIVER_END
@@ -853,19 +842,19 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( jsa_i_mono_speech )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_readmem,atarijsa1_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
+	MDRV_CPU_ADD_TAG("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MDRV_CPU_PROGRAM_MAP(atarijsa1_map,0)
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ym", YM2151, ATARI_CLOCK_3MHz)
+	MDRV_SOUND_ADD_TAG("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD(TMS5220, ATARI_CLOCK_3MHz*2/11) /* potentially ATARI_CLOCK_3MHz/9 as well */
+	MDRV_SOUND_ADD(TMS5220, JSA_MASTER_CLOCK*2/11) /* potentially JSA_MASTER_CLOCK/9 as well */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -874,19 +863,19 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( jsa_ii_mono )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa2_readmem,atarijsa2_writemem)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
+	MDRV_CPU_ADD_TAG("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MDRV_CPU_PROGRAM_MAP(atarijsa2_map,0)
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("ym", YM2151, ATARI_CLOCK_3MHz)
+	MDRV_SOUND_ADD_TAG("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD_TAG("adpcm", OKIM6295, ATARI_CLOCK_3MHz/3)
+	MDRV_SOUND_ADD_TAG("adpcm", OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -917,23 +906,23 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( jsa_iiis_stereo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("jsa", M6502, ATARI_CLOCK_3MHz/2)
+	MDRV_CPU_ADD_TAG("jsa", M6502, JSA_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map,0)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_3MHz/4/16/16/14)
+	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD_TAG("ym", YM2151, ATARI_CLOCK_3MHz)
+	MDRV_SOUND_ADD_TAG("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
-	MDRV_SOUND_ADD(OKIM6295, ATARI_CLOCK_3MHz/3)
+	MDRV_SOUND_ADD(OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 
-	MDRV_SOUND_ADD(OKIM6295, ATARI_CLOCK_3MHz/3)
+	MDRV_SOUND_ADD(OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
 MACHINE_DRIVER_END

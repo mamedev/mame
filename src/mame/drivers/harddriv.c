@@ -3652,7 +3652,7 @@ static DRIVER_INIT( stunrun )
 	/* initialize the boards */
 	init_multisync(machine, 0);
 	init_adsp();
-	atarijsa_init(hdcpu_jsa, 14, 0, 0x0020);
+	atarijsa_init(machine, 0, 0x0020);
 
 	/* set up gsp speedup handler */
 	hdgsp_speedup_addr[0] = memory_install_write16_handler(hdcpu_gsp, ADDRESS_SPACE_PROGRAM, 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup1_w);
@@ -3765,7 +3765,7 @@ static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_p
 	init_ds3(machine);
 	init_dspcom();
 	atarijsa3_init_adpcm(REGION_SOUND1);
-	atarijsa_init(hdcpu_jsa, 14, 0, 0x0020);
+	atarijsa_init(machine, 0, 0x0020);
 
 	memory_install_read16_handler(hdcpu_main, ADDRESS_SPACE_PROGRAM, 0x908000, 0x908001, 0, 0, steeltal_dummy_r);
 

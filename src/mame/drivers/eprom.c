@@ -730,7 +730,7 @@ ROM_END
 static DRIVER_INIT( eprom )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(2, 6, 1, 0x0002);
+	atarijsa_init(machine, 1, 0x0002);
 
 	/* install CPU synchronization handlers */
 	sync_data = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_r);
@@ -743,14 +743,14 @@ static DRIVER_INIT( eprom )
 static DRIVER_INIT( klaxp )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 2, 1, 0x0002);
+	atarijsa_init(machine, 1, 0x0002);
 }
 
 
 static DRIVER_INIT( guts )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 6, 1, 0x0002);
+	atarijsa_init(machine, 1, 0x0002);
 }
 
 

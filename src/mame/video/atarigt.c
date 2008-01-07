@@ -113,7 +113,7 @@ static TILEMAP_MAPPER( atarigt_playfield_scan )
 
 VIDEO_START( atarigt )
 {
-	static const struct atarirle_desc modesc =
+	static const atarirle_desc modesc =
 	{
 		REGION_GFX3,/* region where the GFX data lives */
 		256,		/* number of entries in sprite RAM */
@@ -133,7 +133,7 @@ VIDEO_START( atarigt )
 		{{ 0,0x0e00,0,0,0,0,0,0 }},	/* mask for the priority */
 		{{ 0,0x8000,0,0,0,0,0,0 }}	/* mask for the VRAM target */
 	};
-	struct atarirle_desc adjusted_modesc = modesc;
+	atarirle_desc adjusted_modesc = modesc;
 	int i;
 
 	/* blend the playfields and free the temporary one */

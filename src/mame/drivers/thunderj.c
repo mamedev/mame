@@ -452,7 +452,7 @@ ROM_END
 static DRIVER_INIT( thunderj )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(2, 3, 2, 0x0002);
+	atarijsa_init(machine, 2, 0x0002);
 }
 
 

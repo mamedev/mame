@@ -484,7 +484,7 @@ static const UINT16 default_eeprom[] =
 static DRIVER_INIT( offtwall )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(1, 2, 3, 0x0040);
+	atarijsa_init(machine, 3, 0x0040);
 
 	/* install son-of-slapstic workarounds */
 	spritecache_count = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
@@ -496,7 +496,7 @@ static DRIVER_INIT( offtwall )
 static DRIVER_INIT( offtwalc )
 {
 	atarigen_eeprom_default = default_eeprom;
-	atarijsa_init(1, 2, 3, 0x0040);
+	atarijsa_init(machine, 3, 0x0040);
 
 	/* install son-of-slapstic workarounds */
 	spritecache_count = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);

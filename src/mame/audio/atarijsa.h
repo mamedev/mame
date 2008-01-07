@@ -5,11 +5,7 @@
 ****************************************************************************/
 
 
-
-#define ATARI_CLOCK_3MHz		3579000
-
-
-void atarijsa_init(int cpunum, int inputport, int testport, int testmask);
+void atarijsa_init(running_machine *machine, int testport, int testmask);
 void atarijsa3_init_adpcm(int region);
 void atarijsa_reset(void);
 

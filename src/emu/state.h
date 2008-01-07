@@ -51,6 +51,9 @@ do {																					\
 #define state_save_register_item_2d_array(_mod, _inst, _val) \
 	state_save_register_item_pointer(_mod, _inst, _val[0], sizeof(_val)/sizeof(_val[0][0]))
 
+#define state_save_register_item_bitmap(_mod, _inst, _val)	\
+	state_save_register_bitmap(_mod, _inst, #_val, _val)
+
 #define state_save_register_global(_val) \
 	state_save_register_item("globals", 0, _val)
 

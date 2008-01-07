@@ -731,6 +731,10 @@ static TIMER_CALLBACK( delayed_sound_reset )
 	/* reset the sound write state */
 	atarigen_sound_to_cpu_ready = 0;
 	atarigen_sound_int_ack_w(0, 0, 0);
+
+	/* allocate a high frequency timer until a response is generated */
+	/* the main CPU is *very* sensistive to the timing of the response */
+	cpu_boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 

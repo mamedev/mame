@@ -1,10 +1,10 @@
-/*##########################################################################
+/***************************************************************************
 
     atarirle.c
 
     RLE sprite handling for early-to-mid 90's Atari raster games.
 
-############################################################################
+****************************************************************************
 
     Description:
 
@@ -16,146 +16,144 @@
     See the bottom of the source for more details on the operation of these
     components.
 
-##########################################################################*/
+***************************************************************************/
 
 #include "driver.h"
 #include "atarirle.h"
 
 
-/*##########################################################################
+/***************************************************************************
     TYPES & STRUCTURES
-##########################################################################*/
+***************************************************************************/
 
 /* internal structure containing a word index, shift and mask */
+typedef struct atarirle_mask atarirle_mask;
 struct atarirle_mask
 {
-	int					word;				/* word index */
-	int					shift;				/* shift amount */
-	int					mask;				/* final mask */
+	int				word;				/* word index */
+	int				shift;				/* shift amount */
+	int				mask;				/* final mask */
 };
 
 /* internal structure for sorting the motion objects */
+typedef struct mo_sort_entry mo_sort_entry;
 struct mo_sort_entry
 {
-	struct mo_sort_entry *next;
-	int entry;
+	mo_sort_entry *	next;
+	int 			entry;
 };
 
 /* internal structure describing each object in the ROMs */
+typedef struct atarirle_info atarirle_info;
 struct atarirle_info
 {
-	INT16				width;
-	INT16 				height;
-	INT16 				xoffs;
-	INT16 				yoffs;
-	UINT8 				bpp;
+	INT16			width;
+	INT16 			height;
+	INT16 			xoffs;
+	INT16 			yoffs;
+	UINT8 			bpp;
 	const UINT16 *	table;
 	const UINT16 *	data;
 };
 
 /* internal structure containing the state of the motion objects */
+typedef struct atarirle_data atarirle_data;
 struct atarirle_data
 {
-	int					bitmapwidth;		/* width of the full playfield bitmap */
-	int					bitmapheight;		/* height of the full playfield bitmap */
-	int					bitmapxmask;		/* x coordinate mask for the playfield bitmap */
-	int					bitmapymask;		/* y coordinate mask for the playfield bitmap */
+	int				bitmapwidth;		/* width of the full playfield bitmap */
+	int				bitmapheight;		/* height of the full playfield bitmap */
+	int				bitmapxmask;		/* x coordinate mask for the playfield bitmap */
+	int				bitmapymask;		/* y coordinate mask for the playfield bitmap */
 
-	int					spriterammask;		/* combined mask when accessing sprite RAM with raw addresses */
-	int					spriteramsize;		/* total size of sprite RAM, in entries */
+	int				spriterammask;		/* combined mask when accessing sprite RAM with raw addresses */
+	int				spriteramsize;		/* total size of sprite RAM, in entries */
 
-	int					palettebase;		/* base palette entry */
-	int					maxcolors;			/* maximum number of colors */
+	int				palettebase;		/* base palette entry */
+	int				maxcolors;			/* maximum number of colors */
 
-	rectangle	cliprect;			/* clipping rectangle */
+	rectangle		cliprect;			/* clipping rectangle */
 
-	struct atarirle_mask codemask;			/* mask for the code index */
-	struct atarirle_mask colormask;			/* mask for the color */
-	struct atarirle_mask xposmask;			/* mask for the X position */
-	struct atarirle_mask yposmask;			/* mask for the Y position */
-	struct atarirle_mask scalemask;			/* mask for the scale factor */
-	struct atarirle_mask hflipmask;			/* mask for the horizontal flip */
-	struct atarirle_mask ordermask;			/* mask for the order */
-	struct atarirle_mask prioritymask;		/* mask for the priority */
-	struct atarirle_mask vrammask;			/* mask for the VRAM target */
+	atarirle_mask 	codemask;			/* mask for the code index */
+	atarirle_mask 	colormask;			/* mask for the color */
+	atarirle_mask 	xposmask;			/* mask for the X position */
+	atarirle_mask 	yposmask;			/* mask for the Y position */
+	atarirle_mask 	scalemask;			/* mask for the scale factor */
+	atarirle_mask 	hflipmask;			/* mask for the horizontal flip */
+	atarirle_mask 	ordermask;			/* mask for the order */
+	atarirle_mask 	prioritymask;		/* mask for the priority */
+	atarirle_mask 	vrammask;			/* mask for the VRAM target */
 
 	const UINT16 *	rombase;			/* pointer to the base of the GFX ROM */
-	int					romlength;			/* length of the GFX ROM */
-	int					objectcount;		/* number of objects in the ROM */
-	struct atarirle_info *info;				/* list of info records */
-	struct atarirle_entry *spriteram;		/* pointer to sprite RAM */
+	int				romlength;			/* length of the GFX ROM */
+	int				objectcount;		/* number of objects in the ROM */
+	atarirle_info *	info;				/* list of info records */
+	atarirle_entry *spriteram;			/* pointer to sprite RAM */
 
-	mame_bitmap *vram[2][2];			/* pointers to VRAM bitmaps and backbuffers */
-	int					partial_scanline;	/* partial update scanline */
+	mame_bitmap *	vram[2][2];			/* pointers to VRAM bitmaps and backbuffers */
+	int				partial_scanline;	/* partial update scanline */
 
-	UINT8				control_bits;		/* current control bits */
-	UINT8				command;			/* current command */
-	UINT8				is32bit;			/* 32-bit or 16-bit? */
-	UINT16				checksums[256];		/* checksums for each 0x40000 bytes */
+	UINT8			control_bits;		/* current control bits */
+	UINT8			command;			/* current command */
+	UINT8			is32bit;			/* 32-bit or 16-bit? */
+	UINT16			checksums[256];		/* checksums for each 0x40000 bytes */
 };
 
 
 
-/*##########################################################################
+/***************************************************************************
     MACROS
-##########################################################################*/
+***************************************************************************/
 
 /* data extraction */
 #define EXTRACT_DATA(_input, _mask) (((_input)->data[(_mask).word] >> (_mask).shift) & (_mask).mask)
 
 
 
-/*##########################################################################
+/***************************************************************************
     GLOBAL VARIABLES
-##########################################################################*/
+***************************************************************************/
 
 UINT16 *atarirle_0_spriteram;
 UINT32 *atarirle_0_spriteram32;
-
-//UINT16 *atarirle_0_command;
-//UINT32 *atarirle_0_command32;
-
-//UINT16 *atarirle_0_table;
-//UINT32 *atarirle_0_table32;
 
 static int atarirle_hilite_index = -1;
 
 
 
-/*##########################################################################
+/***************************************************************************
     STATIC VARIABLES
-##########################################################################*/
+***************************************************************************/
 
-static struct atarirle_data atarirle[ATARIRLE_MAX];
+static atarirle_data atarirle[ATARIRLE_MAX];
 
 static UINT8 rle_bpp[8];
 static UINT16 *rle_table[8];
 
 
 
-/*##########################################################################
+/***************************************************************************
     STATIC FUNCTION DECLARATIONS
-##########################################################################*/
+***************************************************************************/
 
 static void build_rle_tables(void);
 static int count_objects(const UINT16 *base, int length);
-static void prescan_rle(const struct atarirle_data *mo, int which);
-static void sort_and_render(struct atarirle_data *mo);
-static void compute_checksum(struct atarirle_data *mo);
-static void draw_rle(struct atarirle_data *mo, mame_bitmap *bitmap, int code, int color, int hflip, int vflip,
+static void prescan_rle(const atarirle_data *mo, int which);
+static void sort_and_render(atarirle_data *mo);
+static void compute_checksum(atarirle_data *mo);
+static void draw_rle(atarirle_data *mo, mame_bitmap *bitmap, int code, int color, int hflip, int vflip,
 		int x, int y, int xscale, int yscale, const rectangle *clip);
-static void draw_rle_zoom(mame_bitmap *bitmap, const struct atarirle_info *gfx,
+static void draw_rle_zoom(mame_bitmap *bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle *clip);
-static void draw_rle_zoom_hflip(mame_bitmap *bitmap, const struct atarirle_info *gfx,
+static void draw_rle_zoom_hflip(mame_bitmap *bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle *clip);
 
 
 
-/*##########################################################################
+/***************************************************************************
     INLINE FUNCTIONS
-##########################################################################*/
+***************************************************************************/
 
 /*---------------------------------------------------------------
     compute_log: Computes the number of bits necessary to
@@ -222,7 +220,7 @@ INLINE int collapse_bits(int value, int mask)
     shift, and adjusted mask. Returns 0 if invalid.
 ---------------------------------------------------------------*/
 
-INLINE int convert_mask(const struct atarirle_entry *input, struct atarirle_mask *result)
+INLINE int convert_mask(const atarirle_entry *input, atarirle_mask *result)
 {
 	int i, temp;
 
@@ -258,9 +256,9 @@ INLINE int convert_mask(const struct atarirle_entry *input, struct atarirle_mask
 
 
 
-/*##########################################################################
+/***************************************************************************
     GLOBAL FUNCTIONS
-##########################################################################*/
+***************************************************************************/
 
 /*---------------------------------------------------------------
     atarirle_init: Configures the motion objects using the input
@@ -268,10 +266,10 @@ INLINE int convert_mask(const struct atarirle_entry *input, struct atarirle_mask
     the attribute lookup table.
 ---------------------------------------------------------------*/
 
-void atarirle_init(int map, const struct atarirle_desc *desc)
+void atarirle_init(int map, const atarirle_desc *desc)
 {
 	const UINT16 *base = (const UINT16 *)memory_region(desc->region);
-	struct atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = &atarirle[map];
 	int i;
 
 	/* verify the map index */
@@ -355,6 +353,21 @@ void atarirle_init(int map, const struct atarirle_desc *desc)
 	}
 
 	mo->partial_scanline = -1;
+	
+	/* register for save states */
+	state_save_register_item_pointer("atarirle", map, mo->spriteram[0].data, ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
+	state_save_register_item_bitmap("atarirle", map, mo->vram[0][0]);
+	state_save_register_item_bitmap("atarirle", map, mo->vram[0][1]);
+	if (mo->vrammask.mask != 0)
+	{
+		state_save_register_item_bitmap("atarirle", map, mo->vram[1][0]);
+		state_save_register_item_bitmap("atarirle", map, mo->vram[1][1]);
+	}
+	state_save_register_item("atarirle", map, mo->partial_scanline);
+	state_save_register_item("atarirle", map, mo->control_bits);
+	state_save_register_item("atarirle", map, mo->command);
+	state_save_register_item("atarirle", map, mo->is32bit);
+	state_save_register_item_array("atarirle", map, mo->checksums);
 }
 
 
@@ -365,7 +378,7 @@ void atarirle_init(int map, const struct atarirle_desc *desc)
 
 void atarirle_control_w(int map, UINT8 bits)
 {
-	struct atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = &atarirle[map];
 	int scanline = video_screen_get_vpos(0);
 	int oldbits = mo->control_bits;
 
@@ -421,7 +434,7 @@ void atarirle_control_w(int map, UINT8 bits)
 
 void atarirle_command_w(int map, UINT8 command)
 {
-	struct atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = &atarirle[map];
 	mo->command = command;
 }
 
@@ -440,7 +453,7 @@ VIDEO_EOF( atarirle )
 	/* loop over all RLE handlers */
 	for (i = 0; i < ATARIRLE_MAX; i++)
 	{
-		struct atarirle_data *mo = &atarirle[i];
+		atarirle_data *mo = &atarirle[i];
 
 		/* if the erase flag is set, erase to the end of the screen */
 		if (mo->control_bits & ATARIRLE_CONTROL_ERASE)
@@ -511,7 +524,7 @@ WRITE32_HANDLER( atarirle_0_spriteram32_w )
 
 mame_bitmap *atarirle_get_vram(int map, int idx)
 {
-	struct atarirle_data *mo = &atarirle[map];
+	atarirle_data *mo = &atarirle[map];
 //logerror("atarirle_get_vram (frame %d)\n", (mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 	return mo->vram[idx][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 }
@@ -605,9 +618,9 @@ int count_objects(const UINT16 *base, int length)
     width, height, and other goodies.
 ---------------------------------------------------------------*/
 
-static void prescan_rle(const struct atarirle_data *mo, int which)
+static void prescan_rle(const atarirle_data *mo, int which)
 {
-	struct atarirle_info *rledata = &mo->info[which];
+	atarirle_info *rledata = &mo->info[which];
 	UINT16 *base = (UINT16 *)&mo->rombase[which * 4];
 	const UINT16 *end = mo->rombase + mo->romlength / 2;
 	int width = 0, height, flags, offset;
@@ -685,7 +698,7 @@ static void prescan_rle(const struct atarirle_data *mo, int which)
     compute_checksum: Compute the checksum values on the ROMs.
 ---------------------------------------------------------------*/
 
-static void compute_checksum(struct atarirle_data *mo)
+static void compute_checksum(atarirle_data *mo)
 {
 	int reqsums = mo->spriteram[0].data[0] + 1;
 	int i;
@@ -715,17 +728,17 @@ static void compute_checksum(struct atarirle_data *mo)
     sort_and_render: Render all motion objects in order.
 ---------------------------------------------------------------*/
 
-static void sort_and_render(struct atarirle_data *mo)
+static void sort_and_render(atarirle_data *mo)
 {
 	mame_bitmap *bitmap1 = mo->vram[0][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
 	mame_bitmap *bitmap2 = mo->vram[1][(~mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2];
-	struct atarirle_entry *obj = mo->spriteram;
-	struct mo_sort_entry sort_entry[256];
-	struct mo_sort_entry *list_head[256];
-	struct mo_sort_entry *current;
+	atarirle_entry *obj = mo->spriteram;
+	mo_sort_entry sort_entry[256];
+	mo_sort_entry *list_head[256];
+	mo_sort_entry *current;
 	int i;
 
-struct atarirle_entry *hilite = NULL;
+atarirle_entry *hilite = NULL;
 int count = 0;
 
 	/* sort the motion objects into their proper priorities */
@@ -799,7 +812,7 @@ if (hilite)
 		int x = EXTRACT_DATA(obj, mo->xposmask);
 		int y = EXTRACT_DATA(obj, mo->yposmask);
 		int scaled_xoffs, scaled_yoffs;
-		const struct atarirle_info *info;
+		const atarirle_info *info;
 
 		if (x & ((mo->xposmask.mask + 1) >> 1))
 			x = (INT16)(x | ~mo->xposmask.mask);
@@ -889,11 +902,11 @@ fprintf(stderr, "   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d 
     object.
 ---------------------------------------------------------------*/
 
-void draw_rle(struct atarirle_data *mo, mame_bitmap *bitmap, int code, int color, int hflip, int vflip,
+void draw_rle(atarirle_data *mo, mame_bitmap *bitmap, int code, int color, int hflip, int vflip,
 	int x, int y, int xscale, int yscale, const rectangle *clip)
 {
 	UINT32 palettebase = mo->palettebase + color;
-	const struct atarirle_info *info = &mo->info[code];
+	const atarirle_info *info = &mo->info[code];
 	int scaled_xoffs = (xscale * info->xoffs) >> 12;
 	int scaled_yoffs = (yscale * info->yoffs) >> 12;
 
@@ -930,7 +943,7 @@ void draw_rle(struct atarirle_data *mo, mame_bitmap *bitmap, int code, int color
     bitmap.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom(mame_bitmap *bitmap, const struct atarirle_info *gfx,
+void draw_rle_zoom(mame_bitmap *bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle *clip)
 {
@@ -1120,7 +1133,7 @@ void draw_rle_zoom(mame_bitmap *bitmap, const struct atarirle_info *gfx,
     16-bit bitmap with horizontal flip.
 ---------------------------------------------------------------*/
 
-void draw_rle_zoom_hflip(mame_bitmap *bitmap, const struct atarirle_info *gfx,
+void draw_rle_zoom_hflip(mame_bitmap *bitmap, const atarirle_info *gfx,
 		UINT32 palette, int sx, int sy, int scalex, int scaley,
 		const rectangle *clip)
 {

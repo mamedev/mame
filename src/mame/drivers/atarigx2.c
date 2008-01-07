@@ -2036,7 +2036,7 @@ ROM_END
 static DRIVER_INIT( spclords )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 4, 2, 0x0040);
+	atarijsa_init(machine, 2, 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x000;
@@ -2048,7 +2048,7 @@ static DRIVER_INIT( spclords )
 static DRIVER_INIT( motofren )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 4, 2, 0x0040);
+	atarijsa_init(machine, 2, 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x400;
@@ -2086,7 +2086,7 @@ static READ32_HANDLER( rrreveng_prot_r )
 static DRIVER_INIT( rrreveng )
 {
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 4, 2, 0x0040);
+	atarijsa_init(machine, 2, 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	atarigx2_playfield_base = 0x000;

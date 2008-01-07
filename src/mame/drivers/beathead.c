@@ -530,7 +530,7 @@ static DRIVER_INIT( beathead )
 {
 	/* initialize the common systems */
 	atarigen_eeprom_default = NULL;
-	atarijsa_init(1, 4, 2, 0x0040);
+	atarijsa_init(machine, 2, 0x0040);
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	/* prepare the speedups */
