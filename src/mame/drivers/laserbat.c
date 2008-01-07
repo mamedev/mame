@@ -469,17 +469,6 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_layout s2636_character10 =
-{
-	8,10,
-	5,
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16
-};
-
 static const gfx_layout sprites_layout =
 {
 	32,32,
@@ -498,11 +487,11 @@ static const gfx_layout sprites_layout =
 };
 
 static GFXDECODE_START( laserbat )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,        0, 256 )	/* Rom chars */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1500, s2636_character10, 0,   8 )	/* s2636 #1  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1600, s2636_character10, 0,   8 )	/* s2636 #2  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1700, s2636_character10, 0,   8 )	/* s2636 #3  */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, sprites_layout,    0,   8 )	/* Sprites   */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,       0, 256 )	/* Rom chars */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1500, s2636_gfx_layout, 0,   8 )	/* s2636 #1  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1600, s2636_gfx_layout, 0,   8 )	/* s2636 #2  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x1700, s2636_gfx_layout, 0,   8 )	/* s2636 #3  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, sprites_layout,   0,   8 )	/* Sprites   */
 GFXDECODE_END
 
 static TILE_GET_INFO( get_tile_info )

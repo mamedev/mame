@@ -76,7 +76,7 @@
 #include "driver.h"
 #include "s2636.h"
 
-static const int SpriteOffset[4] = {0,0x10,0x20,0x40};
+static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40};
 
 /* To adjust sprites against bitmap */
 
@@ -88,8 +88,19 @@ mame_bitmap *s2636_1_bitmap;
 mame_bitmap *s2636_2_bitmap;
 mame_bitmap *s2636_3_bitmap;
 
-int s2636_x_offset=0;
-int s2636_y_offset=0;
+int s2636_x_offset;
+int s2636_y_offset;
+
+const gfx_layout s2636_gfx_layout =
+{
+	8,10,
+	5,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
+	8*16
+};
 
 
 /*****************************************/
@@ -103,20 +114,20 @@ static int SpriteCheck(running_machine *machine, int first,int second,UINT8 *wor
 
     // Does not check shadow sprites yet
 
-    if((workram[SpriteOffset[first] + 10] != 0xff) && (workram[SpriteOffset[second] + 10] != 0xff))
+    if((workram[sprite_offsets[first] + 10] != 0xff) && (workram[sprite_offsets[second] + 10] != 0xff))
     {
-    	int fx1 = workram[SpriteOffset[first] + 10] + s2636_x_offset;
-        int fy1 = workram[SpriteOffset[first] + 12] + s2636_y_offset;
-		int fx2 = workram[SpriteOffset[second] + 10] + s2636_x_offset;
-		int fy2 = workram[SpriteOffset[second] + 12] + s2636_y_offset;
+    	int fx1 = workram[sprite_offsets[first] + 10] + s2636_x_offset;
+        int fy1 = workram[sprite_offsets[first] + 12] + s2636_y_offset;
+		int fx2 = workram[sprite_offsets[second] + 10] + s2636_x_offset;
+		int fy2 = workram[sprite_offsets[second] + 12] + s2636_y_offset;
 
         if((fx1>=0) && (fy1>=0) && (fx2>=0) && (fy2>=0))
 		{
   		    int expand1 = 1 << (16+((workram[0xC0]>>(first<<1)) & 3));
   		    int expand2 = 1 << (16+((workram[0xC0]>>(second<<1)) & 3));
 
-    	    int char1   = SpriteOffset[first]>>4;
-    	    int char2   = SpriteOffset[second]>>4;
+    	    int char1   = sprite_offsets[first]>>4;
+    	    int char2   = sprite_offsets[second]>>4;
 
             /* Draw first sprite */
 
@@ -197,7 +208,7 @@ void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *wor
 
     for(spriteno=0;spriteno<4;spriteno++)
     {
-    	offs = SpriteOffset[spriteno];
+    	offs = sprite_offsets[spriteno];
 
     	if(workram[offs+10]!=0xFF)
 		{

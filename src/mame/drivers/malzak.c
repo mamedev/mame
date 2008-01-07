@@ -324,17 +324,6 @@ static const gfx_layout charlayout =
 //  8*8
 };
 
-static const gfx_layout s2636_character10 =
-{
-	8,10,
-	5,
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16
-};
-
 static const gfx_layout saa5050_charlayout =
 {
 	6, 10,
@@ -373,12 +362,12 @@ static const gfx_layout saa5050_lolayout =
 
 //add s2636 decodes here (i.e. from zac2650) and maybe re-arrange them
 static GFXDECODE_START( malzak )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,  0, 16 )
-  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #1  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_character10, 0, 8 )	/* s2636 #2  */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128)
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout, 0, 128)
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout, 0, 128)
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,         0,  16 )
+  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #1  */
+	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #2  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout,   0, 128 )
 GFXDECODE_END
 
 

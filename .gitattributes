@@ -2148,6 +2148,7 @@ src/mame/includes/crbaloon.h svneol=native#text/plain
 src/mame/includes/crgolf.h svneol=native#text/plain
 src/mame/includes/crshrace.h svneol=native#text/plain
 src/mame/includes/cubocd32.h svneol=native#text/plain
+src/mame/includes/cvs.h svneol=native#text/plain
 src/mame/includes/cyberbal.h svneol=native#text/plain
 src/mame/includes/dc.h svneol=native#text/plain
 src/mame/includes/dcheese.h svneol=native#text/plain

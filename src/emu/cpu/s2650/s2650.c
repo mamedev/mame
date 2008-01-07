@@ -1605,9 +1605,9 @@ void s2650_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + S2650_R1:			sprintf(info->s, "R1:%02X", S.reg[1]);	break;
 		case CPUINFO_STR_REGISTER + S2650_R2:			sprintf(info->s, "R2:%02X", S.reg[2]);	break;
 		case CPUINFO_STR_REGISTER + S2650_R3:			sprintf(info->s, "R3:%02X", S.reg[3]);	break;
-		case CPUINFO_STR_REGISTER + S2650_R1A:			sprintf(info->s, "R1'%02X", S.reg[4]);	break;
-		case CPUINFO_STR_REGISTER + S2650_R2A:			sprintf(info->s, "R2'%02X", S.reg[5]);	break;
-		case CPUINFO_STR_REGISTER + S2650_R3A:			sprintf(info->s, "R3'%02X", S.reg[6]);	break;
+		case CPUINFO_STR_REGISTER + S2650_R1A:			sprintf(info->s, "R1':%02X", S.reg[4]);	break;
+		case CPUINFO_STR_REGISTER + S2650_R2A:			sprintf(info->s, "R2':%02X", S.reg[5]);	break;
+		case CPUINFO_STR_REGISTER + S2650_R3A:			sprintf(info->s, "R3':%02X", S.reg[6]);	break;
 		case CPUINFO_STR_REGISTER + S2650_HALT:			sprintf(info->s, "HALT:%X", S.halt);	break;
 		case CPUINFO_STR_REGISTER + S2650_SI:			sprintf(info->s, "SI:%X", (S.psu & SI) ? 1 : 0); break;
 		case CPUINFO_STR_REGISTER + S2650_FO:			sprintf(info->s, "FO:%X", (S.psu & FO) ? 1 : 0); break;

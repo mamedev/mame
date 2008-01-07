@@ -58,16 +58,17 @@ Sound Board 1b11107
 ************************************************************************/
 
 #include "driver.h"
+#include "cvs.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 #include "video/s2636.h"
 
+
 PALETTE_INIT( quasar );
 VIDEO_UPDATE( quasar );
 VIDEO_START( quasar );
 
-extern UINT8 *cvs_bullet_ram;
 
 extern UINT8 *quasar_effectram;
 extern int quasar_effectcontrol;
@@ -75,23 +76,6 @@ extern int quasar_effectcontrol;
 static int page = 0;
 static int IOpage = 8;
 
-
-WRITE8_HANDLER( cvs_videoram_w );
-WRITE8_HANDLER( cvs_bullet_w );
-WRITE8_HANDLER( cvs_2636_1_w );
-WRITE8_HANDLER( cvs_2636_2_w );
-WRITE8_HANDLER( cvs_2636_3_w );
-WRITE8_HANDLER( cvs_scroll_w );
-WRITE8_HANDLER( cvs_video_fx_w );
-
-READ8_HANDLER( cvs_collision_r );
-READ8_HANDLER( cvs_collision_clear );
-READ8_HANDLER( cvs_videoram_r );
-READ8_HANDLER( cvs_bullet_r );
-READ8_HANDLER( cvs_2636_1_r );
-READ8_HANDLER( cvs_2636_2_r );
-READ8_HANDLER( cvs_2636_3_r );
-READ8_HANDLER( cvs_character_mode_r );
 
 /************************************************************************
 
@@ -145,15 +129,12 @@ static WRITE8_HANDLER( page_B_w )
 
 static WRITE8_HANDLER( quasar_video_w )
 {
-	if (page == 0) videoram_w(offset,data);
-	if (page == 1) colorram_w(offset,(data & 7));	// 3 bits of ram only - 3 x 2102
-	if (page == 2)
+	switch (page)
 	{
-		quasar_effectram[offset]   = data;
-	}
-	if (page == 3)
-	{
-		quasar_effectcontrol = data;
+	case 0:  cvs_video_ram[offset] = data; break;
+	case 1:  cvs_color_ram[offset] = data & 7; break;	// 3 bits of ram only - 3 x 2102
+	case 2:  quasar_effectram[offset] = data; break;
+	case 3:  quasar_effectcontrol = data; break;
 	}
 }
 
@@ -216,11 +197,11 @@ static WRITE8_HANDLER( Quasar_DAC_w )
 
 static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_r, quasar_bullet_w) AM_BASE(&cvs_bullet_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_1_r, cvs_2636_1_w) AM_BASE(&s2636_1_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_2_r, cvs_2636_2_w) AM_BASE(&s2636_2_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_2636_3_r, cvs_2636_3_w) AM_BASE(&s2636_3_ram)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(MRA8_RAM /*quasar_video_r*/, quasar_video_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) //0 = background, 1 = colour, 2 = effect, 3 = port blank
+    AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE(&cvs_bullet_ram)
+    AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w) AM_BASE(&s2636_1_ram)
+    AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w) AM_BASE(&s2636_2_ram)
+    AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_3_or_character_ram_r, cvs_s2636_3_or_character_ram_w) AM_BASE(&s2636_3_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE(&cvs_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM
@@ -382,34 +363,11 @@ static const gfx_layout charlayout =
 
 /* S2636 Mappings */
 
-static const gfx_layout s2636_character10 =
-{
-	8,10,
-	5,
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16
-};
-
-static const gfx_layout charlayout8colour =
-{
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	3,		/* 3 bits per pixel */
-	{ 0, 0x800*8, 0x1000*8 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
-};
-
 static GFXDECODE_START( quasar )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,     0, 256)		/* Rom chars */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout8colour, 0, 259 )	/* Ram chars (NOT USED) */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #1  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #2  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_character10, 2072, 8 )	/* s2636 #3  */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,           0, 256 )	/* Rom chars */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #1  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #2  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #3  */
 GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )

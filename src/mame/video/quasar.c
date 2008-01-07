@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cvs.h"
 #include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
 
@@ -34,18 +35,6 @@
 #define WL1 0
 #endif
 
-// All defined in video/cvs.c
-
-VIDEO_START( cvs );
-
-extern UINT8 *cvs_bullet_ram;
-
-extern mame_bitmap *cvs_collision_bitmap;
-extern mame_bitmap *cvs_collision_background;
-
-
-extern int cvs_collision_register;
-
 
 // Used here
 //static int    scroll[8];
@@ -55,6 +44,7 @@ UINT8 *quasar_effectram;
 int quasar_effectcontrol;
 
 static mame_bitmap *effect_bitmap;
+static mame_bitmap *background_bitmap;
 
 PALETTE_INIT( quasar )
 {
@@ -134,6 +124,7 @@ VIDEO_START( quasar )
 	quasar_effectram   = auto_malloc(0x400);
 
 	effect_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	background_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	video_start_cvs(machine);
 }
@@ -147,9 +138,9 @@ VIDEO_UPDATE( quasar )
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (offs = 0; offs < 0x0400; offs++)
 	{
-        character = videoram[offs];
+        character = cvs_video_ram[offs];
 
 		sx = (offs % 32) * 8;
 		sy = (offs / 32) * 8;
@@ -168,9 +159,9 @@ VIDEO_UPDATE( quasar )
 
 		/* Main Screen */
 
-		drawgfx(tmpbitmap,machine->gfx[0],
+		drawgfx(background_bitmap,machine->gfx[0],
 				character,
-				colorram[offs],
+				cvs_color_ram[offs],
 				0,0,
 				sx,sy,
 				0,TRANSPARENCY_NONE,0);
@@ -178,7 +169,7 @@ VIDEO_UPDATE( quasar )
 
 		/* background for Collision Detection (it can only hit certain items) */
 
-		if((colorram[offs] & 7) == 0)
+		if((cvs_color_ram[offs] & 7) == 0)
 		{
 			drawgfx(cvs_collision_background,machine->gfx[0],
 					character,
@@ -192,18 +183,18 @@ VIDEO_UPDATE( quasar )
     /* Update screen */
 
 	copybitmap(bitmap,effect_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+	copybitmap(bitmap,background_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,2,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,1,cvs_collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,3,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,2,cvs_collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,4,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,3,cvs_collision_bitmap);
 
     /* Bullet Hardware */
 
