@@ -688,8 +688,9 @@ const game_driver * const drivers[] =
 	DRIVER( shadowld )	/* (c) 1987 */
 	DRIVER( youkaidk )	/* (c) 1987 (Japan new version) */
 	DRIVER( yokaidko )	/* (c) 1987 (Japan old version) */
-	DRIVER( dspirit )	/* (c) 1987 new version */
-	DRIVER( dspirito )	/* (c) 1987 old version */
+	DRIVER( dspirit )	/* (c) 1987 (Japan new version) */
+	DRIVER( dspirito )	/* (c) 1987 (Japan old version) */
+	DRIVER( dspirita )	/* (c) 1987 (Atari license) */
 	DRIVER( blazer )	/* (c) 1987 (Japan) */
 	DRIVER( quester )	/* (c) 1987 (Japan) */
 	DRIVER( pacmania )	/* (c) 1987 */
