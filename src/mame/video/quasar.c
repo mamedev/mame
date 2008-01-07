@@ -127,10 +127,6 @@ PALETTE_INIT( quasar )
 
 	s2636_x_offset = -26;
 	s2636_y_offset = 3;
-
-	memset(s2636_1_dirty,0,sizeof(s2636_1_dirty));
-	memset(s2636_2_dirty,0,sizeof(s2636_2_dirty));
-	memset(s2636_3_dirty,0,sizeof(s2636_3_dirty));
 }
 
 VIDEO_START( quasar )
@@ -201,13 +197,13 @@ VIDEO_UPDATE( quasar )
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,2,cvs_collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,3,cvs_collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,4,cvs_collision_bitmap);
 
     /* Bullet Hardware */
 

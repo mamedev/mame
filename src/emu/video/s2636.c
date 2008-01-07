@@ -88,38 +88,9 @@ mame_bitmap *s2636_1_bitmap;
 mame_bitmap *s2636_2_bitmap;
 mame_bitmap *s2636_3_bitmap;
 
-UINT8 s2636_1_dirty[4];
-UINT8 s2636_2_dirty[4];
-UINT8 s2636_3_dirty[4];
-
 int s2636_x_offset=0;
 int s2636_y_offset=0;
 
-void s2636_w(UINT8 *workram,int offset,int data,UINT8 *dirty)
-{
-	if (workram[offset] != data)
-    {
-        workram[offset] = data;
-
-        if(offset < 10)
-			dirty[0]=1;
-        else
-        {
-	        if((offset > 15) && (offset < 26))
-				dirty[1]=1;
-            else
-            {
-		        if((offset > 31) && (offset < 42))
-					dirty[2]=1;
-                else
-                {
-			        if((offset > 63) && (offset < 74))
-						dirty[3]=1;
-                }
-            }
-        }
-    }
-}
 
 /*****************************************/
 /* Check for Collision between 2 sprites */
@@ -218,7 +189,7 @@ static int SpriteCheck(running_machine *machine, int first,int second,UINT8 *wor
 	return Checksum;
 }
 
-void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *workram,UINT8 *dirty,int Graphics_Bank,mame_bitmap *collision_bitmap)
+void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *workram,int Graphics_Bank,mame_bitmap *collision_bitmap)
 {
 	int CollisionSprite = 0;
     int spriteno;
@@ -245,11 +216,7 @@ void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *wor
 
                 colour = (colour & 7) + 7;
 
-                if(dirty[spriteno])
-                {
-	   			    decodechar(machine->gfx[Graphics_Bank],charno,workram,machine->drv->gfxdecodeinfo[Graphics_Bank].gfxlayout);
-                    dirty[spriteno] = 0;
-                }
+				decodechar(machine->gfx[Graphics_Bank],charno,workram,machine->drv->gfxdecodeinfo[Graphics_Bank].gfxlayout);
 
 		        drawgfxzoom(bitmap,machine->gfx[Graphics_Bank],
 			                charno,

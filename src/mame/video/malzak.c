@@ -57,8 +57,6 @@ VIDEO_START( malzak )
 	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
 	saa5050_vidram = auto_malloc(0x800);
-	s2636_1_ram = auto_malloc(0x100);
-	s2636_2_ram = auto_malloc(0x100);
 }
 
 VIDEO_UPDATE( malzak )
@@ -215,8 +213,8 @@ VIDEO_UPDATE( malzak )
 	s2636_x_offset = -16;
 //  s2636_y_offset = -8;
 
-	s2636_update_bitmap(machine,bitmap,s2636_1_ram,s2636_1_dirty,1,collision_bitmap);
-	s2636_update_bitmap(machine,bitmap,s2636_2_ram,s2636_2_dirty,2,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_1_ram,1,collision_bitmap);
+	s2636_update_bitmap(machine,bitmap,s2636_2_ram,2,collision_bitmap);
 	return 0;
 }
 

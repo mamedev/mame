@@ -10,19 +10,17 @@
 
 #include "driver.h"
 #include "cpu/s2650/s2650.h"
+#include "video/s2636.h"
 
 #include "tinv2650.lh"
 
-extern UINT8 *zac_s2636ram;
+WRITE8_HANDLER( tinvader_videoram_w );
+WRITE8_HANDLER( tinvader_sound_w );
+READ8_HANDLER( zac_s2636_r );
+READ8_HANDLER( tinvader_port_0_r );
 
-extern WRITE8_HANDLER( tinvader_videoram_w );
-extern WRITE8_HANDLER( zac_s2636_w );
-extern WRITE8_HANDLER( tinvader_sound_w );
-extern READ8_HANDLER( zac_s2636_r );
-extern READ8_HANDLER( tinvader_port_0_r );
-
-extern VIDEO_START( tinvader );
-extern VIDEO_UPDATE( tinvader );
+VIDEO_START( tinvader );
+VIDEO_UPDATE( tinvader );
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_ROM)
@@ -45,7 +43,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1d00, 0x1dff) AM_WRITE(MWA8_RAM)
     AM_RANGE(0x1e80, 0x1e80) AM_WRITE(tinvader_sound_w)
 	AM_RANGE(0x1e86, 0x1e86) AM_WRITE(MWA8_NOP)				/* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(zac_s2636_w) AM_BASE(&zac_s2636ram)
+	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_1_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )

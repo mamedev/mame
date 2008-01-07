@@ -43,7 +43,6 @@ static int    character_page=0;
 static int    scroll_reg = 0;
 static int    stars_scroll=0;
 
-static UINT8 *dirty_character;
 static UINT8 *character_1_ram;
 static UINT8 *character_2_ram;
 static UINT8 *character_3_ram;
@@ -104,12 +103,10 @@ PALETTE_INIT( cvs )
     }
 
     /* Initialise Dirty Character Array */
-	dirty_character = auto_malloc(0x100);
 	character_1_ram = auto_malloc(0x2000);
 	character_2_ram = character_1_ram + 0x800;
 	character_3_ram = character_2_ram + 0x800;
 
-	memset(dirty_character, 0, 256);
     memset(character_1_ram, 0, 1024);
     memset(character_2_ram, 0, 1024);
     memset(character_3_ram, 0, 1024);
@@ -253,17 +250,12 @@ WRITE8_HANDLER( cvs_2636_1_w )
     {
     	// First 2636
 
-        s2636_w(s2636_1_ram,offset,data,s2636_1_dirty);
+        s2636_1_ram[offset] = data;
     }
     else
     {
     	// Character Ram 1
-
-        if(character_1_ram[character_page + offset] != data)
-        {
-        	character_1_ram[character_page + offset] = data;
-			dirty_character[128+((character_page + offset)>>3)] = 1;
-        }
+       	character_1_ram[character_page + offset] = data;
 	}
 }
 
@@ -289,17 +281,12 @@ WRITE8_HANDLER( cvs_2636_2_w )
     {
     	// Second 2636
 
-        s2636_w(s2636_2_ram,offset,data,s2636_2_dirty);
+        s2636_2_ram[offset] = data;
     }
     else
     {
     	// Character Ram 2
-
-        if(character_2_ram[character_page + offset] != data)
-        {
-        	character_2_ram[character_page + offset] = data;
-			dirty_character[128+((character_page + offset)>>3)] = 1;
-        }
+       	character_2_ram[character_page + offset] = data;
     }
 }
 
@@ -325,17 +312,12 @@ WRITE8_HANDLER( cvs_2636_3_w )
     {
     	// Third 2636
 
-        s2636_w(s2636_3_ram,offset,data,s2636_3_dirty);
+        s2636_3_ram[offset] = data;
     }
     else
     {
     	// Character Ram 3
-
-        if(character_3_ram[character_page + offset] != data)
-        {
-        	character_3_ram[character_page + offset] = data;
-			dirty_character[128+((character_page + offset)>>3)] = 1;
-        }
+       	character_3_ram[character_page + offset] = data;
     }
 }
 
@@ -457,14 +439,7 @@ VIDEO_UPDATE( cvs )
 
 		if(character > ModeOffset[character_mode])
 		{
-			/* re-generate character if dirty */
-
-			if (dirty_character[character])
-			{
-				decodechar(machine->gfx[1],character,character_1_ram-1024,machine->drv->gfxdecodeinfo[1].gfxlayout);
-
-				dirty_character[character] = 0;
-			}
+			decodechar(machine->gfx[1],character,character_1_ram-1024,machine->drv->gfxdecodeinfo[1].gfxlayout);
 
 			character_bank=1;
 		}
@@ -514,13 +489,13 @@ VIDEO_UPDATE( cvs )
     /* 2636's */
 
 	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,s2636_1_dirty,2,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,2,cvs_collision_bitmap);
 
 	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,s2636_2_dirty,3,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,3,cvs_collision_bitmap);
 
 	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,s2636_3_dirty,4,cvs_collision_bitmap);
+	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,4,cvs_collision_bitmap);
 
     /* Bullet Hardware */
 
