@@ -51,32 +51,28 @@ TODO:
 #include "sound/sn76496.h"
 
 
-extern READ8_HANDLER( ladybug_IN0_r );
-extern READ8_HANDLER( ladybug_IN1_r );
-extern INTERRUPT_GEN( ladybug_interrupt );
+WRITE8_HANDLER( ladybug_videoram_w );
+WRITE8_HANDLER( ladybug_colorram_w );
+WRITE8_HANDLER( ladybug_flipscreen_w );
 
-extern WRITE8_HANDLER( ladybug_videoram_w );
-extern WRITE8_HANDLER( ladybug_colorram_w );
-extern WRITE8_HANDLER( ladybug_flipscreen_w );
+PALETTE_INIT( ladybug );
+VIDEO_START( ladybug );
+VIDEO_UPDATE( ladybug );
 
-extern PALETTE_INIT( ladybug );
-extern VIDEO_START( ladybug );
-extern VIDEO_UPDATE( ladybug );
+PALETTE_INIT( sraider );
+VIDEO_START( sraider );
+VIDEO_UPDATE( sraider );
+VIDEO_EOF( sraider );
+WRITE8_HANDLER( sraider_grid_color_w );
+WRITE8_HANDLER( sraider_grid_data_w );
 
-extern PALETTE_INIT( sraider );
-extern VIDEO_START( sraider );
-extern VIDEO_UPDATE( sraider );
-extern VIDEO_EOF( sraider );
-extern WRITE8_HANDLER( sraider_grid_color_w );
-extern WRITE8_HANDLER( sraider_grid_data_w );
-
-extern READ8_HANDLER( sraider_8005_r );
-extern WRITE8_HANDLER( sraider_sound_low_w );
-extern WRITE8_HANDLER( sraider_sound_high_w );
-extern READ8_HANDLER( sraider_sound_low_r );
-extern READ8_HANDLER( sraider_sound_high_r );
-extern WRITE8_HANDLER( sraider_io_w );
-extern WRITE8_HANDLER( sraider_misc_w );
+READ8_HANDLER( sraider_8005_r );
+WRITE8_HANDLER( sraider_sound_low_w );
+WRITE8_HANDLER( sraider_sound_high_w );
+READ8_HANDLER( sraider_sound_low_r );
+READ8_HANDLER( sraider_sound_high_r );
+WRITE8_HANDLER( sraider_io_w );
+WRITE8_HANDLER( sraider_misc_w );
 
 //extern UINT8 sraider_grid_status;
 //extern UINT8 sraider_0x30, sraider_0x38;
@@ -111,7 +107,7 @@ ADDRESS_MAP_END
   slots. Left slot generates a NMI, Right slot an IRQ.
 
 ***************************************************************************/
-INTERRUPT_GEN( ladybug_interrupt )
+static INTERRUPT_GEN( ladybug_interrupt )
 {
 	if (readinputport(5) & 1)	/* Left Coin */
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -119,23 +115,38 @@ INTERRUPT_GEN( ladybug_interrupt )
 		cpunum_set_input_line(0, 0, HOLD_LINE);
 }
 
+
+#define LADYBUG_P1_CONTROL_PORT_TAG	("CONTP1")
+#define LADYBUG_P2_CONTROL_PORT_TAG	("CONTP2")
+
+static UINT32 ladybug_p1_control_r(void *param)
+{
+	return readinputportbytag(LADYBUG_P1_CONTROL_PORT_TAG);
+}
+
+static UINT32 ladybug_p2_control_r(void *param)
+{
+	UINT32 ret;
+
+	/* upright cabinet only uses a single set of controls */
+	if (readinputportbytag("DSW0") & 0x20)
+		ret = readinputportbytag(LADYBUG_P2_CONTROL_PORT_TAG);
+	else
+		ret = readinputportbytag(LADYBUG_P1_CONTROL_PORT_TAG);
+
+	return ret;
+}
+
+
 static INPUT_PORTS_START( ladybug )
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_UNUSED
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p1_control_r, 0)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p2_control_r, 0)
 	/* This should be connected to the 4V clock. I don't think the game uses it. */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
@@ -208,6 +219,20 @@ static INPUT_PORTS_START( ladybug )
 	/* user releases the key. */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+
+	PORT_START_TAG(LADYBUG_P1_CONTROL_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_UNUSED
+
+	PORT_START_TAG(LADYBUG_P2_CONTROL_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_UNUSED PORT_COCKTAIL
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( snapjack )
