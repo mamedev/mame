@@ -130,6 +130,12 @@ WRITE8_HANDLER( suprridr_bgscrolly_w )
 }
 
 
+int suprridr_is_screen_flipped(void)
+{
+	return flipx;  /* or is it flipy? */
+}
+
+
 
 /*************************************
  *
