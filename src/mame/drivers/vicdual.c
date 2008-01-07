@@ -1903,6 +1903,7 @@ static MACHINE_DRIVER_START( invho2 )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(invinco_audio)
 	MDRV_IMPORT_FROM(headon_audio)
 
 MACHINE_DRIVER_END
