@@ -34,7 +34,7 @@ struct _irem_state
 	UINT8 *			chargen;
 	UINT8 *			memory;
 	UINT8 *			rom;
-	
+
 	/* machine states */
 
 	/* sound state */

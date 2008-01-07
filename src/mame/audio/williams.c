@@ -638,9 +638,9 @@ static TIMER_CALLBACK( clear_irq_state )
 static READ8_HANDLER( adpcm_command_r )
 {
 	cpunum_set_input_line(sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-	
+
 	/* don't clear the external IRQ state for a short while; this allows the
-	   self-tests to pass */
+       self-tests to pass */
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
 	return soundlatch_r(0);
 }

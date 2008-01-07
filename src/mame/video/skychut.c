@@ -50,7 +50,7 @@ static UINT32 tilemap_scan(UINT32 col,UINT32 row,UINT32 num_cols,UINT32 num_rows
 
 
 static void get_tile_info(running_machine *machine, tile_data *tileinfo, tilemap_memory_index tile_index, void *param)
-{ 
+{
 	SET_TILE_INFO(0, videoram[tile_index], colorram[tile_index] & 0x07, 0);
 }
 
@@ -68,7 +68,7 @@ WRITE8_HANDLER( skychut_colorram_w )
 WRITE8_HANDLER( iremm15_chargen_w )
 {
 	irem_state *state = Machine->driver_data;
-	
+
 	if (state->chargen[offset] != data)
 	{
 		state->chargen[offset] = data;
@@ -93,7 +93,7 @@ VIDEO_START( iremm10 )
 {
 	//irem_state *state = machine->driver_data;
 	int i;
-	
+
 	for (i=0;i<32*8;i++)
 		extyoffs[i] = i*8;
 
@@ -103,10 +103,10 @@ VIDEO_START( iremm10 )
 	tilemap_set_transparent_pen(tx_tilemap, 0x07);
 	tilemap_set_scrolldx(tx_tilemap, 0, 62);
 	tilemap_set_scrolldy(tx_tilemap, 0, 0);
-	
+
 	back_gfx = allocgfx(&backlayout);
 	back_gfx->total_colors = 8;
-	
+
 	machine->gfx[1] = back_gfx;
 	return ;
 }
@@ -117,7 +117,7 @@ VIDEO_START( iremm15 )
 
 	machine->gfx[0] = allocgfx(&charlayout);
 	machine->gfx[0]->total_colors = 8;
-	
+
 	decodegfx(machine->gfx[0], state->chargen,0,256);
 
 	video_start_generic(machine);

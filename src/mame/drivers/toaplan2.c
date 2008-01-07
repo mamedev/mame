@@ -395,10 +395,10 @@ static MACHINE_RESET( toaplan2 )		/* machine_reset_toaplan2(); */
 	mcu_data = 0x00;
 
 	/*
-	  All games execute a RESET instruction on init, presumably to reset the sound CPU.
-	  This is important for games with common RAM; the RAM test will fail
-	  when leaving service mode if the sound CPU is not reset.
-	*/
+      All games execute a RESET instruction on init, presumably to reset the sound CPU.
+      This is important for games with common RAM; the RAM test will fail
+      when leaving service mode if the sound CPU is not reset.
+    */
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)toaplan2_reset);
 }
 

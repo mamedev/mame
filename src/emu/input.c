@@ -956,7 +956,7 @@ input_code input_code_poll_switches(int reset)
 
 
 /*-------------------------------------------------
-    input_code_poll_keyboard_switches - poll for 
+    input_code_poll_keyboard_switches - poll for
     any keyboard-specific input
 -------------------------------------------------*/
 

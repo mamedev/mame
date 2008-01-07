@@ -754,7 +754,7 @@ try_again:
 			if (d3d->create_error_count < 10)
 				return 0;
 		}
-	
+
 		//  fatal error if we just can't do it
 		mame_printf_error("Unable to create the Direct3D device (%08X)\n", (UINT32)result);
 		return 1;

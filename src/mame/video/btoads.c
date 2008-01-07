@@ -527,7 +527,7 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 		char name[10];
 		FILE *f;
 		int i;
-		
+
 		while (input_code_pressed(KEYCODE_X)) ;
 
 		sprintf(name, "disp%d.log", count++);

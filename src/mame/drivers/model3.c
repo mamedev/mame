@@ -988,15 +988,15 @@ static void model3_exit(running_machine *machine)
 	lsi53c810_exit(&scsi_intf);
 }
 
-static MACHINE_START(model3_10) 
+static MACHINE_START(model3_10)
 {
 	lsi53c810_init(&scsi_intf);
 	add_exit_callback(machine, model3_exit);
 }
-static MACHINE_START(model3_15) 
+static MACHINE_START(model3_15)
 {
 	lsi53c810_init(&scsi_intf);
-	add_exit_callback(machine, model3_exit);	
+	add_exit_callback(machine, model3_exit);
 }
 
 static void model3_init(running_machine *machine, int step)

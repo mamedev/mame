@@ -260,7 +260,7 @@ void sfx_sh_init(void)
 
     ROMA: BIT1: Hypersoni ?
     ROMA: BIT2: Two thousand eighty three
-   	ROMA: BIT4: Atomic City Attack
+    ROMA: BIT4: Atomic City Attack
     ROMA: BIT5: Thank you, please try again
     ROMA: BIT6: Two, one, fire
     ROMA: BIT7: Hyperjump
@@ -270,9 +270,9 @@ void sfx_sh_init(void)
     ROMB: BIT5: Noise (Explosion ?)
     ROMB: BIT6: Keep going pressing
     ROMB: BIT7: You are the new champion
-    
-    The circuit consist of 
-    
+
+    The circuit consist of
+
     2x 2532 32Kbit roms
     2x 74LS393 quad 4bit counters to address roms
     1x 74LS174 hex-d-flipflops to latch control byte
@@ -282,27 +282,27 @@ void sfx_sh_init(void)
                ==> 74LS139
     1x 74LS16  quad open collector inverters
     1x 74S288  32x8 Prom
-    
+
     The prom obviously is used to provide the right timing when
     fetching data bits. This circuit should be comparable to bagman.
-    
+
     Prom
-    Q0		==> NC
-    Q1		==> PDC
-    Q2		==> CTL2/CTL8 (Speak/Reset)
-    Q7		==> Reset Counters (LS393)
-    Q8		==> Trigger Logic
+    Q0      ==> NC
+    Q1      ==> PDC
+    Q2      ==> CTL2/CTL8 (Speak/Reset)
+    Q7      ==> Reset Counters (LS393)
+    Q8      ==> Trigger Logic
 
   ***************************************************************************/
 
-/* 
+/*
  *      Alt1 Alt2
  * 1 ==> C     B   Bit select
  * 2 ==> B     C   Bit select
  * 3 ==> A     A   Bit select
  * 4 ==> B1        Rom select
  * 5 ==> A1        Rom select
- * 
+ *
  *      ALT1      ALT2
  * 321  CBA       CBA
  * 000  000       000
@@ -313,10 +313,10 @@ void sfx_sh_init(void)
  * 101  101       011
  * 110  011       101
  * 111  111       111
- * 
+ *
  * Alt1 provides more sensible sound. Both Alt1 and Alt2 are
  * possible on PCB so Alt2 is left in for documentation.
- * 
+ *
  */
 
 static UINT32 speech_rom_address;
@@ -326,13 +326,13 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	/* only 16 bytes needed ... Stored here since 
-	 * prom is a bad dump 
-	 */
-	static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00, 
+	/* only 16 bytes needed ... Stored here since
+     * prom is a bad dump
+     */
+	static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
 			        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
 	UINT8 ctrl;
-	
+
 	if (param == 0)
 	{
 		if (speech_cnt < 0x10)
@@ -347,7 +347,7 @@ static TIMER_CALLBACK( ad2083_step )
 
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
-		
+
 	tms5110_CTL_w(0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
 	tms5110_PDC_w(0, ctrl & 0x02 ? 0 : 1);
 
@@ -364,7 +364,7 @@ static int ad2083_speech_rom_read_bit(void)
 
 	bit = (ROM[speech_rom_address | speech_rom_address_hi] >> speech_rom_bit) & 1;
 	speech_rom_address++;
-	
+
 	return bit;
 }
 
@@ -431,7 +431,7 @@ static SOUND_START( ad2083 )
 	speech_rom_address_hi = 0;
 	speech_rom_bit = 0;
 	speech_cnt = 0x10;
-	
+
 	state_save_register_global(speech_rom_address);
 	state_save_register_global(speech_rom_address_hi);
 	state_save_register_global(speech_rom_bit);
@@ -439,22 +439,22 @@ static SOUND_START( ad2083 )
 }
 
 MACHINE_DRIVER_START( ad2083_audio )
-	
+
 	MDRV_CPU_ADD(Z80, 14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map,0)
 	MDRV_CPU_IO_MAP(ad2083_sound_io_map,0)
-	
+
 	MDRV_SOUND_START(ad2083)
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-	
+
 	MDRV_SOUND_ADD(AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-	
+
 	MDRV_SOUND_ADD(TMS5110, AD2083_TMS5110_CLOCK)
 	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

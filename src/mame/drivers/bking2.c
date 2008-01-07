@@ -187,7 +187,7 @@ static READ8_HANDLER( bking3_68705_portA_r )
 static WRITE8_HANDLER( bking3_68705_portA_w )
 {
 	portA_out = data;
-//	printf("portA_out = %02X\n",data);
+//  printf("portA_out = %02X\n",data);
 }
 
 static WRITE8_HANDLER( bking3_68705_ddrA_w )
@@ -204,8 +204,8 @@ static READ8_HANDLER( bking3_68705_portB_r )
 
 static WRITE8_HANDLER( bking3_68705_portB_w )
 {
-//	if(data != 0xff)
-//		printf("portB_out = %02X\n",data);
+//  if(data != 0xff)
+//      printf("portB_out = %02X\n",data);
 
 	if (~data & 0x02)
 	{
@@ -597,7 +597,7 @@ static MACHINE_DRIVER_START( bking3 )
 
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map,0)
-	
+
 	MDRV_CPU_ADD(M68705, XTAL_3MHz/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
@@ -697,10 +697,10 @@ ROM_END
 Birdie King 3
 Taito, 1984
 
-A golf game using a trackball. Uses same harness/pinout as 
+A golf game using a trackball. Uses same harness/pinout as
 Elevator Action, Victorious Nine, Jolly Jogger (etc)
 
-PCB Layouts 
+PCB Layouts
 (Note! There are no PALs on ANY of the PCBs)
 
 Top PCB
@@ -769,8 +769,8 @@ Notes:
       T           - 4-pin power connector (5 volts) coming from main board
       S1          - Flat cable connector, joins to main PCB to connector S
       S2          - Flat cable connector, joins to bottom PCB to connector S
-      
-      
+
+
 
 Main PCB
 --------
@@ -812,7 +812,7 @@ Notes:
       H         - 12-pin power connector
       VSync     - 60Hz
       HSync     - 15.67kHz
-      
+
 
 Bottom PCB
 ----------

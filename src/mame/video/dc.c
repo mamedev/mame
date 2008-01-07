@@ -21,7 +21,7 @@ static UINT32 tafifo_buff[32];
 static int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
 static int start_render_received;
 
-struct testsprites 
+struct testsprites
 {
 	int positionx, positiony;
 	int sizex, sizey;
@@ -43,7 +43,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 	*shift = 0;
 
-	// non 32-bit accesses have not yet been seen here, we need to know when they are 
+	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0x00000000ffffffff)) && (mem_mask != U64(0xffffffff00000000)))
 	{
 		assert_always(0, "Wrong mask!\n");
@@ -162,32 +162,32 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 	static UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	static UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect;
 
-	if (!mem_mask) 	// 64 bit 
-	{ 
+	if (!mem_mask) 	// 64 bit
+	{
 		tafifo_buff[tafifo_pos]=(UINT32)data;
 		tafifo_buff[tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
 		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %llx -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
 		#endif
 		tafifo_pos += 2;
-	} 
-	else 
+	}
+	else
 	{
 		logerror("ta_fifo_poly_w:  Only 64 bit writes supported!\n");
 	}
 
 	tafifo_pos &= tafifo_mask;
-	if (tafifo_pos == 0) 
+	if (tafifo_pos == 0)
 	{
 		paracontrol=(tafifo_buff[0] >> 24) & 0xff;
-		
-		// 0 end of list 
-		// 1 user tile clip 
-		// 2 object list set 
-		// 3 reserved 
-		// 4 polygon/modifier volume 
-		// 5 sprite 
-		// 6 reserved 
+
+		// 0 end of list
+		// 1 user tile clip
+		// 2 object list set
+		// 3 reserved
+		// 4 polygon/modifier volume
+		// 5 sprite
+		// 6 reserved
 		// 7 vertex
 		paratype=(paracontrol >> 5) & 7;
 		endofstrip=(paracontrol >> 4) & 1;
@@ -205,29 +205,29 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 		gouraud=(objcontrol >> 1) & 1;
 		uv16bit=(objcontrol >> 0) & 1;
 
-		if (toerasesprites == 1) 
+		if (toerasesprites == 1)
 		{
 			toerasesprites=0;
 			testsprites_size=0;
 		}
 
-		// check if we need 8 words more 
-		if (tafifo_mask == 7) 
-		{ 
-			if ((paratype == 4) && (((coltype >= 2) && (offfset == 1)) || ((coltype >= 2) && (volume == 1)))) 
+		// check if we need 8 words more
+		if (tafifo_mask == 7)
+		{
+			if ((paratype == 4) && (((coltype >= 2) && (offfset == 1)) || ((coltype >= 2) && (volume == 1))))
 			{
 				tafifo_mask = 15;
 				tafifo_pos = 8;
 				return;
 			}
-			
-			if ((paratype == 7) && (tafifo_vertexwords == 16)) 
+
+			if ((paratype == 7) && (tafifo_vertexwords == 16))
 			{
 				tafifo_mask = 15;
 				tafifo_pos = 8;
 				return;
 			}
-		} 
+		}
 		else
 		{
 			tafifo_mask = 7;
@@ -235,7 +235,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 
 		// now we heve all the needed words
 		// interpret their meaning
-		if (tafifo_buff[0] == 0) 
+		if (tafifo_buff[0] == 0)
 		{
 			a=0; // 6-10 0-3
 			switch (tafifo_listtype)
@@ -260,14 +260,14 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 			sysctrl_regs[SB_ISTNRM] |= a;
 			update_interrupt_status();
 			tafifo_listtype= -1;
-		} 
-		else 
+		}
+		else
 		{
 			#if DEBUG_PVRDLIST
 			mame_printf_verbose("Para Type %d End of Strip %d List Type %d\n", paratype, endofstrip, listtype);
 			#endif
 
-			if (((paratype == 4) && (texture == 1)) || (paratype == 5)) 
+			if (((paratype == 4) && (texture == 1)) || (paratype == 5))
 			{
 				depthcomparemode=(tafifo_buff[1] >> 29) & 7;
 				cullingmode=(tafifo_buff[1] >> 27) & 3;
@@ -304,7 +304,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 				#endif
 			}
 
-			if (paratype == 7) 
+			if (paratype == 7)
 			{ // vertex
 				#if DEBUG_PVRDLIST
 				mame_printf_verbose(" test vertex ");
@@ -366,7 +366,7 @@ UINT32 dilate0(UINT32 value,int bits) // dilate first "bits" bits in "value"
 	int a;
 
 	x = value;
-	for (a=0;a < bits;a++) 
+	for (a=0;a < bits;a++)
 	{
 		m2 = 1 << (a << 1);
 		m1 = m2 - 1;
@@ -382,7 +382,7 @@ UINT32 dilate1(UINT32 value,int bits) // dilate first "bits" bits in "value"
 	int a;
 
 	x = value;
-	for (a=0;a < bits;a++) 
+	for (a=0;a < bits;a++)
 	{
 		m2 = 1 << (a << 1);
 		m1 = m2 - 1;
@@ -415,7 +415,7 @@ void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 	int c,xt,yt,cd;
 
 	fillbitmap(bitmap,MAKE_RGB(128,128,128),cliprect);
-	for (cs=0;cs < testsprites_size;cs++) 
+	for (cs=0;cs < testsprites_size;cs++)
 	{
 		dx=showsprites[cs].sizex;
 		dy=showsprites[cs].sizey;
@@ -435,9 +435,9 @@ void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 		if (showsprites[cs].positiony < 0)
 			yi=-showsprites[cs].positiony;
 
-		for (y = yi;y < dy;y++) 
+		for (y = yi;y < dy;y++)
 		{
-			for (x = xi;x < dx;x++) 
+			for (x = xi;x < dx;x++)
 			{
 				u=showsprites[cs].u+iu*x;
 				v=showsprites[cs].v+iv*y;
@@ -450,13 +450,13 @@ void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 					addrp=showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
 
 				c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
-				if (showsprites[cs].texturepf == 2) 
+				if (showsprites[cs].texturepf == 2)
 				{
 					a=(c & 0xf000) >> 8;
 					bmpaddr=BITMAP_ADDR32(bitmap,showsprites[cs].positiony+y,showsprites[cs].positionx+x);
 					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
-				} 
-				else 
+				}
+				else
 				{
 					a=(c & 0x7000) >> 7;
 					bmpaddr=BITMAP_ADDR32(bitmap,showsprites[cs].positiony+y,showsprites[cs].positionx+x);
@@ -493,7 +493,7 @@ VIDEO_UPDATE(dc)
 {
 	int a;
 
-	if (pvrta_regs[VO_CONTROL] & (1 << 3)) 
+	if (pvrta_regs[VO_CONTROL] & (1 << 3))
 	{
 		fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
 		return 0;
@@ -501,7 +501,7 @@ VIDEO_UPDATE(dc)
 
 	testdrawscreen(bitmap,cliprect);
 
-	if (start_render_received) 
+	if (start_render_received)
 	{
 		start_render_received=0;
 		a=4; // tsp end

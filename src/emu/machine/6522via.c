@@ -793,7 +793,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 				//if (v->ddr_b)
 				{
 					UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
-	
+
 					if (v->intf->out_b_func)
 						v->intf->out_b_func(0, write_data);
 					else

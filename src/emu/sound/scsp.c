@@ -966,7 +966,7 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
 		while(smp<0) smp+=cycle; smp%=cycle; // keep modulation sampler within a single cycle
 		if(!PCM8B(slot)) smp<<=1;
-		
+
 		addr1+=smp; addr2+=smp;
 	}
 
@@ -1105,7 +1105,7 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 					smpr+=(sample*SCSP->RPANTABLE[Enc])>>SHIFT;
 				}
 			}
-			
+
 #if FM_DELAY
 			SCSP->RINGBUF[(SCSP->BUFPTR+64-(FM_DELAY-1))&63] = SCSP->DELAYBUF[(SCSP->DELAYPTR+FM_DELAY-(FM_DELAY-1))%FM_DELAY];
 #endif

@@ -134,7 +134,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 
 	*shift = 0;
 
-	// non 32-bit accesses have not yet been seen here, we need to know when they are 
+	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0x00000000ffffffff)) && (mem_mask != U64(0xffffffff00000000)))
 	{
 		assert_always(0, "Wrong mask!\n");
@@ -306,14 +306,14 @@ WRITE64_HANDLER( dc_maple_w )
 	{
 	case SB_MDST:
 		maple_regs[reg] = old;
-		if (!(old & 1) && (dat & 1)) // 0 -> 1 
-		{ 
-			if (!(maple_regs[SB_MDTSEL] & 1)) 
+		if (!(old & 1) && (dat & 1)) // 0 -> 1
+		{
+			if (!(maple_regs[SB_MDTSEL] & 1))
 			{
 				maple_regs[reg] = 1;
 				dat=maple_regs[SB_MDSTAR];
-				while (1) // do transfers 
-				{ 
+				while (1) // do transfers
+				{
 					ddtdata.source=dat;
 					ddtdata.length=3;
 					ddtdata.size=4;
@@ -352,7 +352,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.mode=-1;
 								cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 								chk=0;
-								for (a=1;a < length;a++) 
+								for (a=1;a < length;a++)
 								{
 									chk=chk+(signed char)(buff[a] & 255);
 									chk=chk+(signed char)((buff[a] >> 8) & 255);
@@ -367,7 +367,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.length=2;
 								break;
 							case 0x82: // get license string
-								for (a=0;a < 16;a++) 
+								for (a=0;a < 16;a++)
 								{
 									buff[a]=maple0x82answer[a];
 								}
@@ -380,28 +380,28 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.mode=-1;
 								cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
-								if ((buff[0] & 0xff) == 3) 
+								if ((buff[0] & 0xff) == 3)
 								{
 									buff[1]=0x14131211;
-									for (a=0;a < 31;a++) 
+									for (a=0;a < 31;a++)
 									{
 										buff[2+a]=buff[1+a]+0x04040404;
 									}
 									buff[1]=0x1413b1b9; // put checksum
 									buff[5]=0x8ab82221; // put checksum
 									ddtdata.length=0x84/4;
-								} 
+								}
 								else if (((buff[0] & 0xff) == 0x31) || ((buff[0] & 0xff) == 0xb) || ((buff[0] & 0xff) == 0x1))
 								{
 									ddtdata.length=1;
 								}
-								else if ((buff[0] & 0xff) == 0x17) // send command into jvs serial bus !!! 
-								{ 
+								else if ((buff[0] & 0xff) == 0x17) // send command into jvs serial bus !!!
+								{
 									// 17,*c295407 (77),*c295404,*c295405,*c295406,0,ff,2,f0,d9, 0
-									// 17,*c295407 (77),*c295404,*c295405,*c295406,0,ff,2,f1,01, 0 
+									// 17,*c295407 (77),*c295404,*c295405,*c295406,0,ff,2,f1,01, 0
 									// 17,*c295407 (77),*c295404,*c295405,*c295406,0,01,1,10,    01,0
-									switch (buff[2] & 0xff) // jvs command 
-									{ 
+									switch (buff[2] & 0xff) // jvs command
+									{
 										case 0xf0:
 										case 0xf1:
 										case 0x10:
@@ -409,12 +409,12 @@ WRITE64_HANDLER( dc_maple_w )
 									}
 									buff[1]=0xe4e3e2e1;
 									ddtdata.length=2;
-								} 
-								else if ((buff[0] & 0xff) == 0x15) 
+								}
+								else if ((buff[0] & 0xff) == 0x15)
 								{
 									// 15,0,0,0
 									buff[1]=0xA4A3A2A1;
-									for (a=0;a < 7;a++) 
+									for (a=0;a < 7;a++)
 									{
 										buff[2+a]=buff[1+a]+0x04040404;
 									}
@@ -427,7 +427,7 @@ WRITE64_HANDLER( dc_maple_w )
 									*(((unsigned char *)buff)+0x1d)=1;
 									*(((unsigned char *)buff)+0x16)=0x8e;
 									ddtdata.length=9;
-								} 
+								}
 								else if ((buff[0] & 0xff) == 0x21)
 								{
 									// 21,*c295407 (77),*c295404,*c295405,*c295406,0,1,0
@@ -468,11 +468,11 @@ READ64_HANDLER( dc_gdrom_r )
 {
 	UINT32 off;
 
-	if ((int)mem_mask & 1) 
+	if ((int)mem_mask & 1)
 	{
 		off=(offset << 1) | 1;
-	} 
-	else 
+	}
+	else
 	{
 		off=offset << 1;
 	}
@@ -489,12 +489,12 @@ WRITE64_HANDLER( dc_gdrom_w )
 {
 	UINT32 dat,off;
 
-	if ((int)mem_mask & 1) 
+	if ((int)mem_mask & 1)
 	{
 		dat=(UINT32)(data >> 32);
 		off=(offset << 1) | 1;
-	} 
-	else 
+	}
+	else
 	{
 		dat=(UINT32)data;
 		off=offset << 1;
@@ -552,30 +552,30 @@ UINT32 old;
 	}
 	old = dc_rtcregister[off];
 	dc_rtcregister[off] = dat & 0xFFFF; // 5f6c00+off*4=dat
-/*	switch (off)
-	{
-	case RTC1:
-		if (dc_rtcregister[RTC3])
-			dc_rtcregister[RTC3] = 0;
-		else
-			dc_rtcregister[off] = old;
-		break;
-	case RTC2:
-		if (dc_rtcregister[RTC3] == 0)
-			dc_rtcregister[off] = old;
-		break;
-	case RTC3:
-		dc_rtcregister[RTC3] &= 1;
-		break;
-	}*/
+/*  switch (off)
+    {
+    case RTC1:
+        if (dc_rtcregister[RTC3])
+            dc_rtcregister[RTC3] = 0;
+        else
+            dc_rtcregister[off] = old;
+        break;
+    case RTC2:
+        if (dc_rtcregister[RTC3] == 0)
+            dc_rtcregister[off] = old;
+        break;
+    case RTC3:
+        dc_rtcregister[RTC3] &= 1;
+        break;
+    }*/
 	mame_printf_verbose("RTC: write %llx to %x, mask %llx\n", data, offset, mem_mask);
 }
 
 /*static void dc_rtc_increment(void)
 {
-	dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
-	if (dc_rtcregister[RTC2] == 0)
-		dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
+    dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
+    if (dc_rtcregister[RTC2] == 0)
+        dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
 }*/
 
 MACHINE_RESET( dc )
@@ -597,7 +597,7 @@ READ64_HANDLER( dc_aica_reg_r )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
-//	logerror("dc_aica_reg_r:  Unmapped read %08x\n", 0x700000+reg*4);
+//  logerror("dc_aica_reg_r:  Unmapped read %08x\n", 0x700000+reg*4);
 	return 0;
 }
 
@@ -610,7 +610,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
-	if (reg == (0x2c00/4)) 
+	if (reg == (0x2c00/4))
 	{
 		if (dat & 1)
 		{

@@ -233,7 +233,7 @@ TODO:
 
 BM, 060108 - The original flyer for this game has screenshots which clearly
 show the background is 4 pixels to the left on several game stages (you can
-see the edge of sprites overlapping past the right edge).  Therefore I 
+see the edge of sprites overlapping past the right edge).  Therefore I
 do not believe the TC0100SCN problem mentioned above actually exists.  The
 current emulation appears to be accurate.
 

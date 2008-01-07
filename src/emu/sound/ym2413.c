@@ -252,7 +252,7 @@ typedef struct {
 	UINT8 address;					/* address register             */
 	UINT8 status;					/* status flag                  */
 
-	int index;						/* index			            */
+	int index;						/* index                        */
 	int clock;						/* master clock  (Hz)           */
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
@@ -1262,24 +1262,24 @@ static void OPLL_init_save(YM2413 *chip)
 	state_save_register_item_2d_array("ym2413", chipitem, chip->inst_tab);
 	state_save_register_item("ym2413", chipitem, chip->address);
 	state_save_register_item("ym2413", chipitem, chip->status);
-	
+
 	for (chnum = 0; chnum < ARRAY_LENGTH(chip->P_CH); chnum++)
 	{
 		OPLL_CH *ch = &chip->P_CH[chnum];
 		int chitem = chipitem + (chnum + 1) * 10;
 		int slotnum;
-		
+
 		state_save_register_item("ym2413", chitem, ch->block_fnum);
 		state_save_register_item("ym2413", chitem, ch->fc);
 		state_save_register_item("ym2413", chitem, ch->ksl_base);
 		state_save_register_item("ym2413", chitem, ch->kcode);
 		state_save_register_item("ym2413", chitem, ch->sus);
-		
+
 		for (slotnum = 0; slotnum < ARRAY_LENGTH(ch->SLOT); slotnum++)
 		{
 			OPLL_SLOT *sl = &ch->SLOT[slotnum];
 			int slitem = chitem + (slotnum + 1);
-			
+
 			state_save_register_item("ym2413", slitem, sl->ar);
 			state_save_register_item("ym2413", slitem, sl->dr);
 			state_save_register_item("ym2413", slitem, sl->rr);

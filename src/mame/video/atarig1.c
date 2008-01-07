@@ -129,7 +129,7 @@ VIDEO_START( atarig1 )
 	playfield_tile_bank = 0;
 	playfield_xscroll = 0;
 	playfield_yscroll = 0;
-	
+
 	/* state saving */
 	state_save_register_global(current_control);
 	state_save_register_global(playfield_tile_bank);

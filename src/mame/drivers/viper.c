@@ -46,8 +46,8 @@ static void viper_exit(running_machine *machine)
 
 static VIDEO_START(viper)
 {
-	add_exit_callback(machine, viper_exit);	
-	
+	add_exit_callback(machine, viper_exit);
+
 	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
 }
 

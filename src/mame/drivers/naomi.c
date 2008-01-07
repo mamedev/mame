@@ -485,23 +485,23 @@ WRITE32_HANDLER( dc_aica_arm_w )
 }
 
 /*
-	Naomi ROM board info from ElSemi:
+    Naomi ROM board info from ElSemi:
 
-	NAOMI_ROM_OFFSETH = 0x5f7000,   
-	NAOMI_ROM_OFFSETL = 0x5f7004,	
-	NAOMI_ROM_DATA = 0x5f7008,	
-	NAOMI_DMA_OFFSETH = 0x5f700C,	
-	NAOMI_DMA_OFFSETL = 0x5f7010,   
-	NAOMI_DMA_COUNT = 0x5f7014,	
-	NAOMI_COMM_OFFSET = 0x5F7050,
-	NAOMI_COMM_DATA = 0x5F7054,
-	NAOMI_BOARDID_WRITE = 0x5F7078,
-	NAOMI_BOARDID_READ = 0x5F707C,
-	each port is 16 bit wide, to access the rom in PIO mode, just set an offset in ROM_OFFSETH/L and read from ROM_DATA, each access reads 2 bytes and increases the offset by 2.
+    NAOMI_ROM_OFFSETH = 0x5f7000,
+    NAOMI_ROM_OFFSETL = 0x5f7004,
+    NAOMI_ROM_DATA = 0x5f7008,
+    NAOMI_DMA_OFFSETH = 0x5f700C,
+    NAOMI_DMA_OFFSETL = 0x5f7010,
+    NAOMI_DMA_COUNT = 0x5f7014,
+    NAOMI_COMM_OFFSET = 0x5F7050,
+    NAOMI_COMM_DATA = 0x5F7054,
+    NAOMI_BOARDID_WRITE = 0x5F7078,
+    NAOMI_BOARDID_READ = 0x5F707C,
+    each port is 16 bit wide, to access the rom in PIO mode, just set an offset in ROM_OFFSETH/L and read from ROM_DATA, each access reads 2 bytes and increases the offset by 2.
 
-	the BOARDID regs access the password protected eeprom in the game board. the main board eeprom is read through port 0x1F800030
+    the BOARDID regs access the password protected eeprom in the game board. the main board eeprom is read through port 0x1F800030
 
-	To access the board using DMA, use the DMA_OFFSETL/H. DMA_COUNT is in units of 0x20 bytes. Then trigger a GDROM DMA request.
+    To access the board using DMA, use the DMA_OFFSETL/H. DMA_COUNT is in units of 0x20 bytes. Then trigger a GDROM DMA request.
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -514,7 +514,7 @@ READ64_HANDLER( naomi_rom_board_r )
 	if ((offset == 1) && ((mem_mask & 0xffff) == 0))
 	{
 		UINT64 ret;
-		
+
 		ret = (UINT64)(ROM[rom_offset] | (ROM[rom_offset+1]<<8));
 
 		rom_offset += 2;
@@ -537,11 +537,11 @@ WRITE64_HANDLER( naomi_rom_board_w )
 		dma_offset &= 0xffff;
 		dma_offset |= (data & 0x1fff)<<16;
 	}
-	else if ((offset == 1) && ((mem_mask & U64(0xffff00000000)) == 0)) 
+	else if ((offset == 1) && ((mem_mask & U64(0xffff00000000)) == 0))
 	{
 		// DMA_OFFSETL
-		dma_offset &= 0xffff0000;      
-		dma_offset |= (data & 0xffff); 
+		dma_offset &= 0xffff0000;
+		dma_offset |= (data & 0xffff);
 	}
 	else if ((offset == 0) && ((mem_mask & U64(0xffff)) == 0))
 	{
@@ -794,7 +794,7 @@ IC4     64M     2E60    4CBF     MPR23423.4
 IC5     64M     BB81    7E26     MPR23424.5
 IC6     64M     B3A8    F2EA     MPR23425.6
 IC7     64M     05C5    A084     MPR23426.7
-IC8     64M     9E13    7535     MPR23427.8
+?IC8     64M     9E13    7535     MPR23427.8
 
 Serial: BCHE-01A0803
 

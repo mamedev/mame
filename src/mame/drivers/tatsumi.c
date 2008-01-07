@@ -19,13 +19,13 @@
         Round Up 5 doesn't survive a reset
         Dip switches
         Various other things..
-	Combine Big Fight & CycleWarriors video routines - currently each
-	game uses different sized tilemaps - these are probably software
-	controlled rather than hardwired, but I don't think either game
-	changes the size at runtime.
-	Big Fight/Cyclewarriors - misc graphics problems.
-	Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
-	
+    Combine Big Fight & CycleWarriors video routines - currently each
+    game uses different sized tilemaps - these are probably software
+    controlled rather than hardwired, but I don't think either game
+    changes the size at runtime.
+    Big Fight/Cyclewarriors - misc graphics problems.
+    Cyclewarriors - test mode text does not appear as it needs a -256 Y scroll offset from somewhere.
+
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
 
@@ -73,67 +73,67 @@
 
     CW27
 
-	Big Fight
-	Tatsumi, 1992
+    Big Fight
+    Tatsumi, 1992
 
-	PCB Layout
-	----------
+    PCB Layout
+    ----------
 
-	ABA-011
-	A-8
-	|-----------------------------------------------------------------|
-	|     LM324   M6295    ROM15                TC5563                |
-	|LM324  VOL   KA51             50MHz        TC5563   PAL       |-||
-	|    TC51832 TC51832          |--------|                       | ||
-	|    TC51832 TC51832          |TATSUMI |                       | ||
-	|    TC51832 TC51832          |TZB315  |           ROM20       | ||
-	|    TC51832 TC51832          |        |           TMM2063     | ||
-	|     ROM0    ROM8            |--------|           Z80B        | ||
-	|                                                              | ||
-	|J                     PAL                  16MHz              |-||
-	|A    ROM2    ROM10     |--------------|                 PAL      |
-	|M                      |     68000    |            TMM2088       |
-	|M                      |--------------|                          |
-	|A    ROM4    ROM12                                 TMM2088       |
-	|                                ROM16    ROM17                |-||
-	|                            PAL      PAL           TC51832    | ||
-	|     ROM6    ROM14                       ROM18                | ||
-	|                            EPL204   PAL           TC51832    | ||
-	|                       |--------------|                       | ||
-	|   CXD10950  CXD10950  |    68000     |  ROM19     TC51832    | ||
-	|                       |--------------|                       | ||
-	|                                                   TC51832    |-||
-	|      DSW3(4) DSW2(8) DSW1(8)                                    |
-	|-----------------------------------------------------------------|
-	Z80 clock - 4.000MHz [16/4]
-	68k clocks - 12.500MHz [50/4]
-	M6295 clock - 2.000MHz [16/8]. Sample rate = 2000000/132
-	YM2151 clock - 4.000MHz [16/4]
+    ABA-011
+    A-8
+    |-----------------------------------------------------------------|
+    |     LM324   M6295    ROM15                TC5563                |
+    |LM324  VOL   KA51             50MHz        TC5563   PAL       |-||
+    |    TC51832 TC51832          |--------|                       | ||
+    |    TC51832 TC51832          |TATSUMI |                       | ||
+    |    TC51832 TC51832          |TZB315  |           ROM20       | ||
+    |    TC51832 TC51832          |        |           TMM2063     | ||
+    |     ROM0    ROM8            |--------|           Z80B        | ||
+    |                                                              | ||
+    |J                     PAL                  16MHz              |-||
+    |A    ROM2    ROM10     |--------------|                 PAL      |
+    |M                      |     68000    |            TMM2088       |
+    |M                      |--------------|                          |
+    |A    ROM4    ROM12                                 TMM2088       |
+    |                                ROM16    ROM17                |-||
+    |                            PAL      PAL           TC51832    | ||
+    |     ROM6    ROM14                       ROM18                | ||
+    |                            EPL204   PAL           TC51832    | ||
+    |                       |--------------|                       | ||
+    |   CXD10950  CXD10950  |    68000     |  ROM19     TC51832    | ||
+    |                       |--------------|                       | ||
+    |                                                   TC51832    |-||
+    |      DSW3(4) DSW2(8) DSW1(8)                                    |
+    |-----------------------------------------------------------------|
+    Z80 clock - 4.000MHz [16/4]
+    68k clocks - 12.500MHz [50/4]
+    M6295 clock - 2.000MHz [16/8]. Sample rate = 2000000/132
+    YM2151 clock - 4.000MHz [16/4]
 
-	|-------------------------|
-	|       D65005(x16)       |
-	|ROM21                 |-||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|PAL                   |-||
-	|     ROM24       PAL  PAL|
-	|        ROM23     HD6445 |
-	|           ROM22         |
-	|          TC51832(x4)    |
-	|      PAL             |-||
-	|      PAL             | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      | ||
-	|                      |-||
-	|PAL                      |
-	|-------------------------|
+    |-------------------------|
+    |       D65005(x16)       |
+    |ROM21                 |-||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |PAL                   |-||
+    |     ROM24       PAL  PAL|
+    |        ROM23     HD6445 |
+    |           ROM22         |
+    |          TC51832(x4)    |
+    |      PAL             |-||
+    |      PAL             | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      | ||
+    |                      |-||
+    |PAL                      |
+    |-------------------------|
 
 ***************************************************************************/
 
@@ -532,7 +532,7 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
@@ -558,7 +558,7 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") 
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
@@ -570,9 +570,9 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
@@ -584,7 +584,7 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") 
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
@@ -596,7 +596,7 @@ static INPUT_PORTS_START( cyclwarr )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
@@ -650,7 +650,7 @@ static INPUT_PORTS_START( bigfight )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:2")
@@ -664,7 +664,7 @@ static INPUT_PORTS_START( bigfight )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
@@ -676,7 +676,7 @@ static INPUT_PORTS_START( bigfight )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5") 
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
@@ -688,9 +688,9 @@ static INPUT_PORTS_START( bigfight )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") 
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
@@ -702,7 +702,7 @@ static INPUT_PORTS_START( bigfight )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") 
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
@@ -714,7 +714,7 @@ static INPUT_PORTS_START( bigfight )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)

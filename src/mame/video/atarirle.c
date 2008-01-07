@@ -353,7 +353,7 @@ void atarirle_init(int map, const atarirle_desc *desc)
 	}
 
 	mo->partial_scanline = -1;
-	
+
 	/* register for save states */
 	state_save_register_item_pointer("atarirle", map, mo->spriteram[0].data, ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
 	state_save_register_item_bitmap("atarirle", map, mo->vram[0][0]);

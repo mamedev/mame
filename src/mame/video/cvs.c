@@ -270,8 +270,8 @@ VIDEO_START( cvs )
 	cvs_color_ram = auto_malloc(0x400);
 	palette_ram = auto_malloc(0x10);
 	character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
-												by allocating twice the amount,
-												we can use the same gfx_layout */
+                                                by allocating twice the amount,
+                                                we can use the same gfx_layout */
 
 	/* precalculate the star background */
 
@@ -352,7 +352,7 @@ VIDEO_UPDATE( cvs )
 
 
 	/* create our background character set, which is a software
-	   selectable mixture of RAM and ROM based tiles */
+       selectable mixture of RAM and ROM based tiles */
 
 	/* ROM based tiles first */
 	for (code = 0; code < ram_based_char_start_indecies[character_mode]; code++)

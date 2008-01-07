@@ -89,16 +89,16 @@ Notes:
 /***************************************************************************
 Notes (couriersud)
 
-	From http://www.crazykong.com/tech/IremBoardList.txt
-	
-	skychut:		M-11
-	andromed:		N/A
-	ipminvad:		N/A
-	spacbeam:		not listed
-	headon:			not listed
-	greenber:		N/A
-	
-	M10-Board: Has SN76477
+    From http://www.crazykong.com/tech/IremBoardList.txt
+
+    skychut:        M-11
+    andromed:       N/A
+    ipminvad:       N/A
+    spacbeam:       not listed
+    headon:         not listed
+    greenber:       N/A
+
+    M10-Board: Has SN76477
 
 ***************************************************************************/
 #include "driver.h"
@@ -159,12 +159,12 @@ static MACHINE_RESET( irem )
  *
  * 76543210
  * ========
- * e-------		ACTIVE LOW	Demo mode
- * -?------		????
- * --b-----		ACTIVE LOW	Bottom line
- * ---f----		ACTIVE LOW	Flip screen
- * ----u---		ACTIVE LOW	Ufo sound enable (SN76477)		
- * -----sss		Sound #sss start
+ * e-------     ACTIVE LOW  Demo mode
+ * -?------     ????
+ * --b-----     ACTIVE LOW  Bottom line
+ * ---f----     ACTIVE LOW  Flip screen
+ * ----u---     ACTIVE LOW  Ufo sound enable (SN76477)
+ * -----sss     Sound #sss start
  *              0x01: MISSILE
  *              0x02: EXPLOSION
  *              0x03: INVADER HIT
@@ -172,16 +172,16 @@ static MACHINE_RESET( irem )
  *              0x05: FLEET MOVE
  *              0x06: SAUCER HIT
  */
-  
+
 WRITE8_HANDLER( iremm10_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
-	
+
 #if DEBUG
 	if (data & 0x40)
 		popmessage("ctrl: %02x",data);
 #endif
-	
+
 	/* I have NO IDEA if this is correct or not */
 	state->bottomline = ~data & 0x20;
 
@@ -194,26 +194,26 @@ WRITE8_HANDLER( iremm10_ctrl_w )
 	/* sound command in lower 4 bytes */
 	switch (data & 0x07)
 	{
-		case 0x00: 
+		case 0x00:
 			/* no sound mapped */
 			break;
-		case 0x01: 
+		case 0x01:
 			/* MISSILE sound */
 			sample_start_n(0, 0, 0, 0);
 			break;
-		case 0x02: 
+		case 0x02:
 			/* EXPLOSION sound */
 			sample_start_n(0, 1, 1, 0);
 			break;
-		case 0x03: 
+		case 0x03:
 			/* INVADER HIT sound */
 			sample_start_n(0, 2, 2, 0);
 			break;
-		case 0x04: 
+		case 0x04:
 			/* BONUS BASE sound */
 			sample_start_n(0, 3, 8, 0);
 			break;
-		case 0x05: 
+		case 0x05:
 			/* FLEET MOVE sound */
 			sample_start_n(0, 3, 3, 0);
 			break;
@@ -238,12 +238,12 @@ WRITE8_HANDLER( iremm10_ctrl_w )
  *
  * 76543210
  * ========
- * e-------		ACTIVE LOW	Demo mode
- * -?------		????
- * --b-----		ACTIVE LOW	Bottom line
- * ---f----		ACTIVE LOW	Flip screen
- * ----??--		????	
- * ------cc		Credits indicator ?
+ * e-------     ACTIVE LOW  Demo mode
+ * -?------     ????
+ * --b-----     ACTIVE LOW  Bottom line
+ * ---f----     ACTIVE LOW  Flip screen
+ * ----??--     ????
+ * ------cc     Credits indicator ?
  *              0x03: 0 Credits
  *              0x02: 1 Credit
  *              0x00: 2 or more credits
@@ -254,11 +254,11 @@ WRITE8_HANDLER( iremm11_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
-#if DEBUG	
+#if DEBUG
 	if (data & 0x4C)
 		popmessage("M11 ctrl: %02x",data);
 #endif
-	
+
 	state->bottomline = ~data & 0x20;
 
 	if (readinputportbytag("CAB") & 0x01)
@@ -273,10 +273,10 @@ WRITE8_HANDLER( iremm11_ctrl_w )
  *
  * 76543210
  * ========
- * ????----		????
- * ----e---		ACTIVE LOW	Demo mode
- * -----f--		ACTIVE LOW	Flip screen
- * ------cc		Credits indicator ?
+ * ????----     ????
+ * ----e---     ACTIVE LOW  Demo mode
+ * -----f--     ACTIVE LOW  Flip screen
+ * ------cc     Credits indicator ?
  *              0x03: 0 Credits
  *              0x02: 1 Credit
  *              0x00: 2 or more credits
@@ -303,8 +303,8 @@ WRITE8_HANDLER( iremm15_ctrl_w )
  *
  * 76543210
  * ========
- * ??????--		Always 111111
- * ------cc		Credits indicator ?
+ * ??????--     Always 111111
+ * ------cc     Credits indicator ?
  *              0x03: 0 Credits
  *              0x02: 1 Credit
  *              0x00: 2 or more credits
@@ -324,25 +324,25 @@ WRITE8_HANDLER( iremm11_a100_w )
 	static int last = 0x00;
 	int raising_bits = data & ~last;
 	//int falling_bits = ~data & last;
-	
+
 	// should a falling bit stop a sample?
 	// This port is written to about 20x per vblank
-#if DEBUG	
+#if DEBUG
 	if ((last & 0xE8) != (data & 0xE8))
 		popmessage("A100: %02x\n", data);
 #endif
 	last = data;
 	// audio control!
 	/* MISSILE sound */
-	if (raising_bits & 0x01) 
+	if (raising_bits & 0x01)
 		sample_start_n(0, 0, 0, 0);
 
 	/* EXPLOSION sound */
-	if (raising_bits & 0x02) 
+	if (raising_bits & 0x02)
 		sample_start_n(0, 1, 1, 0);
 
 	/* Rapidly falling parachute */
-	if (raising_bits & 0x04) 
+	if (raising_bits & 0x04)
 		sample_start_n(0, 3, 8, 0);
 
 	/* Background sound ? */
@@ -358,13 +358,13 @@ WRITE8_HANDLER( iremm15_a100_w )
 	static int last = 0x00;
 	//int raising_bits = data & ~last;
 	int falling_bits = ~data & last;
-	
+
 	// should a falling bit stop a sample?
 	// Bit 4 is used
 	// Bit 5 is used 0xef
 	// Bit 7 is used
-	
-	// headoni 
+
+	// headoni
 	// 0x01: Acceleration
 	// 0x04: background (motor) ?
 	// 0x08: explosion
@@ -372,39 +372,39 @@ WRITE8_HANDLER( iremm15_a100_w )
 	// 0x20: computer car changes lane
 	// 0x40: dot
 
-#if DEBUG	
+#if DEBUG
 	if ((last & 0x82) != (data & 0x82))
 		popmessage("A100: %02x\n", data);
 #endif
 	/* DOT sound */
-	if (falling_bits & 0x40) 
+	if (falling_bits & 0x40)
 		sample_start_n(0, 0, 0, 0);
 #if 0
-	if (raising_bits & 0x40) 
+	if (raising_bits & 0x40)
 		sample_stop_n(0, 0);
 #endif
 
 	/* EXPLOSION sound */
-	if (falling_bits & 0x08) 
+	if (falling_bits & 0x08)
 		sample_start_n(0, 1, 1, 0);
 #if 0
-	if (raising_bits & 0x08) 
+	if (raising_bits & 0x08)
 		sample_stop_n(0, 1);
 #endif
 
 	/* player changes lane */
-	if (falling_bits & 0x10) 
+	if (falling_bits & 0x10)
 		sample_start_n(0, 3, 3, 0);
 #if 0
-	if (raising_bits & 0x10) 
+	if (raising_bits & 0x10)
 		sample_stop_n(0, 3);
 #endif
 
 	/* computer car changes lane */
-	if (falling_bits & 0x20) 
+	if (falling_bits & 0x20)
 		sample_start_n(0, 4, 4, 0);
 #if 0
-	if (raising_bits & 0x20) 
+	if (raising_bits & 0x20)
 		sample_stop_n(0, 4);
 #endif
 
@@ -429,7 +429,7 @@ READ8_HANDLER( iremm11_a700_r )
  *  Interrupt handling
  *
  *************************************/
- 
+
 TIMER_CALLBACK( skychut_callback )
 {
     if (param==0)
@@ -444,7 +444,7 @@ TIMER_CALLBACK( skychut_callback )
     }
     if (param==-1)
 	    cpunum_set_input_line(0, 0, CLEAR_LINE);
- 
+
 }
 
 INTERRUPT_GEN( iremm11_interrupt )
@@ -482,7 +482,7 @@ INTERRUPT_GEN( iremm15_interrupt )
  *  Main CPU memory handlers
  *
  *************************************/
- 
+
 static ADDRESS_MAP_START( iremm10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
@@ -580,7 +580,7 @@ INPUT_PORTS_START( skychut )
 
 	PORT_START	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	
+
 	CAB_PORTENV
 INPUT_PORTS_END
 
@@ -622,7 +622,7 @@ INPUT_PORTS_START( ipminvad )
 	PORT_START	/* FAKE */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	CAB_PORTENV	
+	CAB_PORTENV
 INPUT_PORTS_END
 
 INPUT_PORTS_START( spacebeam )
@@ -655,8 +655,8 @@ INPUT_PORTS_START( spacebeam )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	
-	CAB_PORTENV	
+
+	CAB_PORTENV
 INPUT_PORTS_END
 
 INPUT_PORTS_START( headoni )
@@ -692,7 +692,7 @@ INPUT_PORTS_START( headoni )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	CAB_PORTENV	
+	CAB_PORTENV
 INPUT_PORTS_END
 
 
@@ -702,8 +702,8 @@ INPUT_PORTS_END
  *  Graphics definitions
  *
  *************************************/
- 
- 
+
+
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -725,7 +725,7 @@ GFXDECODE_END
  *  Sound definitions
  *
  *************************************/
- 
+
 static const char *iremm10_sample_names[] =
 {
 	"*ipminvad",
@@ -754,7 +754,7 @@ static struct Samplesinterface iremm10_samples_interface =
  *  Machine driver
  *
  *************************************/
- 
+
 static MACHINE_DRIVER_START( iremm10 )
 
 	MDRV_DRIVER_DATA(irem_state)
@@ -762,7 +762,7 @@ static MACHINE_DRIVER_START( iremm10 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("Main", M6502,IREMM10_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(iremm10_main,0)
-	
+
 	MDRV_MACHINE_RESET(irem)
 
 	MDRV_CPU_VBLANK_INT(iremm10_interrupt,1)
@@ -783,7 +783,7 @@ static MACHINE_DRIVER_START( iremm10 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(iremm10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( greenberet )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD(SAMPLES, 0)
 	MDRV_SOUND_CONFIG(iremm10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -850,11 +850,11 @@ static DRIVER_INIT( andromed )
 
 	for (i=0x1c00;i<0x2000;i++)
 		state->rom[i]=0x60;
-}	
+}
 
 static DRIVER_INIT( iremm15 )
 {
-}	
+}
 
 
 /***************************************************************************
@@ -873,8 +873,8 @@ ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
 	ROM_LOAD( "am5",  0x2000, 0x0400, CRC(518a3b88) SHA1(5e20c905c2190b381a105327e112fcc0a127bb2f) )
 	ROM_LOAD( "am6",  0x2400, 0x0400, CRC(ce3d5fff) SHA1(c34178aca9ffb8b2dd468d9e3369a985f52daf9a) )
 	ROM_LOAD( "am7",  0x2800, 0x0400, CRC(30d3366f) SHA1(aa73bba194fa6d1f3909f8df517a0bff07583ea9) )
-	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries 
-	
+	ROM_LOAD( "am8",  0x2c00, 0x0400, NO_DUMP ) // $60 entries
+
 	ROM_REGION( 0x0800, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "am9",  0x0000, 0x0400, CRC(a1c8f4db) SHA1(bedf5d7126c7e9b91ad595188c69aa2c043c71e8) )
 	ROM_LOAD( "am10", 0x0400, 0x0400, CRC(be2de8f3) SHA1(7eb3d1eb88b4481b0dcb7d001207f516a5db32b3) )

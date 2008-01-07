@@ -233,7 +233,7 @@ static int mips3_execute(int cycles)
 	if (mips3.cache_dirty)
 		drc_cache_reset(mips3.drc);
 	mips3.cache_dirty = FALSE;
-	
+
 	/* execute */
 	mips3.core->icount = cycles;
 	drc_execute(mips3.drc);

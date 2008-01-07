@@ -13,7 +13,7 @@
     Note:
         P3 buttons 1 and 2 are mapped twice. THIS IS NOT A BUG!
 
-	bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
+    bp 548,a0==6c0007 && (d0&ffff)!=0,{print d0&ffff; g}
 
 ****************************************************************************
 

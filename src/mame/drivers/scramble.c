@@ -2017,7 +2017,7 @@ static MACHINE_DRIVER_START( explorer )
 	MDRV_SOUND_MODIFY("8910.1")
 	MDRV_SOUND_CONFIG(explorer_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-	
+
 	MDRV_SOUND_MODIFY("8910.2")
 	MDRV_SOUND_CONFIG(explorer_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
@@ -2424,7 +2424,7 @@ static MACHINE_DRIVER_START( ad2083 )
 	/* sound hardware */
 
 	MDRV_IMPORT_FROM(ad2083_audio)
-	
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( turpins )

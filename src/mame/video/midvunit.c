@@ -79,7 +79,7 @@ VIDEO_START( midvunit )
 	scanline_timer = timer_alloc(scanline_timer_cb, NULL);
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
-	
+
 	state_save_register_global_array(video_regs);
 	state_save_register_global_array(dma_data);
 	state_save_register_global(dma_data_index);

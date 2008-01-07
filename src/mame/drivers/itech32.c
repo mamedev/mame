@@ -25,7 +25,7 @@
     Known issues:
         * volume controls don't work in the Golden Tee games
         * Driver's Edge accesses many uninitialized RAM locations;
-        	requires hack to make steering in attract mode work
+            requires hack to make steering in attract mode work
 
 ****************************************************************************
 
@@ -806,7 +806,7 @@ static NVRAM_HANDLER( itech32 )
 	{
 		for (i = 0x80; i < main_ram_size; i++)
 			((UINT8 *)main_ram)[i] = mame_rand(Machine);
-		
+
 		/* due to accessing uninitialized RAM, we need this hack */
 		if (is_drivedge)
 			((UINT32 *)main_ram)[0x2ce4/4] = 0x0000001e;
@@ -1571,7 +1571,7 @@ static MACHINE_DRIVER_START( timekill )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_PALETTE_LENGTH(8192)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

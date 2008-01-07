@@ -82,19 +82,19 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		data = spriteram16[offs+1];
 		y = (data - 0) & 0x1ff;
 
-		/* 
-			The purpose of the bit at data&0x8 (below) is unknown, but it is set
-			on Darius explosions, some enemy missiles and at least 1 boss.
-			It is most likely another priority bit but as there are no obvious
-			visual problems it will need checked against the original pcb.
-			
-			There is a report this bit is set when the player intersects
-			the tank sprite in Ninja Warriors however I was unable to repro
-			this or find any use of this bit in that game.  
-			
-			Bit&0x8000 is set on some sprites in later levels of Darius 
-			but is again unknown, and there is no obvious visual problem.
-		*/
+		/*
+            The purpose of the bit at data&0x8 (below) is unknown, but it is set
+            on Darius explosions, some enemy missiles and at least 1 boss.
+            It is most likely another priority bit but as there are no obvious
+            visual problems it will need checked against the original pcb.
+
+            There is a report this bit is set when the player intersects
+            the tank sprite in Ninja Warriors however I was unable to repro
+            this or find any use of this bit in that game.
+
+            Bit&0x8000 is set on some sprites in later levels of Darius
+            but is again unknown, and there is no obvious visual problem.
+        */
 		data = spriteram16[offs+3];
 		flipx    = (data & 0x1);
 		flipy    = (data & 0x2) >> 1;
@@ -103,7 +103,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		if (priority != primask) continue;
 		color    = (data & 0x7f00) >> 8;
 		/* data&0x8000 - unknown */
-		
+
 #ifdef MAME_DEBUG
 		if (data & 0x80f0)   unknown |= (data &0x80f0);
 #endif

@@ -8,15 +8,15 @@
 
         - architecture copied from 8257 DMA
         - significant changes to implementation
-    	- This is only a minimum implementation to support dkong3 and mario drivers
-    	- Only memory to memory is tested!
+        - This is only a minimum implementation to support dkong3 and mario drivers
+        - Only memory to memory is tested!
 
     TODO:
-    	- implement missing features
-    	- implement interrupt support (not used in dkong3 and mario)
-    	- implement more asserts
-    	- implement a INPUT_LINE_BUSREQ for Z80. As a workaround,
-    	  HALT is used. This implies burst mode.
+        - implement missing features
+        - implement interrupt support (not used in dkong3 and mario)
+        - implement more asserts
+        - implement a INPUT_LINE_BUSREQ for Z80. As a workaround,
+          HALT is used. This implies burst mode.
 
 **********************************************************************/
 
@@ -102,7 +102,7 @@ struct z80dma
 	UINT16 count;
 
 	UINT8 rdy;
-	
+
 	UINT8 is_read;
 	UINT8 cur_cycle;
 	UINT8 latch;
@@ -127,7 +127,7 @@ int z80dma_init(int count)
 	for (which = 0; which < dma_count; which++)
 	{
 		dma[which].timer = timer_alloc(z80dma_timerproc, NULL);
-	
+
 		state_save_register_item_array("Z80DMA", which, dma[which].regs);
 		state_save_register_item_array("Z80DMA", which, dma[which].regs_follow);
 
@@ -143,7 +143,7 @@ int z80dma_init(int count)
 		state_save_register_item("Z80DMA", which, dma[which].is_read);
 		state_save_register_item("Z80DMA", which, dma[which].cur_cycle);
 		state_save_register_item("Z80DMA", which, dma[which].latch);
-		
+
 	}
 
 	return 0;
@@ -201,7 +201,7 @@ static void z80dma_do_read(int which)
 				cntx->addressB += PORTB_STEP(cntx);
 			}
 			break;
-	
+
 		default:
 			fatalerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
@@ -240,7 +240,7 @@ static int z80dma_do_write(int which)
 			cntx->count--;
 			done = (cntx->count == 0xFFFF);
 			break;
-	
+
 		default:
 			fatalerror("z80dma_do_operation: invalid mode %d!\n", mode);
 			break;
@@ -417,7 +417,7 @@ static void z80dma_write(int which, offs_t offset, UINT8 data)
 				default:
 					fatalerror("Unknown WR6 command %02x", data);
 			}
-		} 
+		}
 		else
 			fatalerror("Unknown base register %02x", data);
 		cntx->cur_follow = 0;

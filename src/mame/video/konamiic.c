@@ -2098,8 +2098,8 @@ else
 
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= memory_region_length(K052109_memory_region)-1;
-  
-//		logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
+
+//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
 
 		return memory_region(K052109_memory_region)[addr];
 	}
@@ -2217,8 +2217,8 @@ WRITE8_HANDLER( K052109_w )
 			K052109_charrombank_2[2] = data & 0x0f;
 			K052109_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
-//		else
-//			logerror("%04x: write %02x to unknown 052109 address %04x\n",activecpu_get_pc(),data,offset);
+//      else
+//          logerror("%04x: write %02x to unknown 052109 address %04x\n",activecpu_get_pc(),data,offset);
 	}
 }
 

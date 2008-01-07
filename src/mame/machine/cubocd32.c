@@ -106,7 +106,7 @@ void amiga_akiko_init(running_machine* machine)
 	akiko.cdrom_toc = NULL;
 	akiko.dma_timer = timer_alloc(akiko_dma_proc, NULL);
 	akiko.frame_timer = timer_alloc(akiko_frame_proc, NULL);
-	
+
 	add_exit_callback(machine, amiga_akiko_exit);
 
 	/* create the TOC table */

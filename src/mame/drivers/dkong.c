@@ -760,7 +760,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6fff) AM_RAM 
+	AM_RANGE(0x6800, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
@@ -780,7 +780,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(z80dma_0_r, z80dma_0_w)	/* dma controller */
-	//AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* dma controller */
+	//AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)   /* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */

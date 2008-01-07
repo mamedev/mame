@@ -964,9 +964,9 @@ static void update_cluts(running_machine *machine, int fake_palette_offset, int 
 static void draw_bg(running_machine *machine, mame_bitmap *dst, tilemap *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
 {
 	/*
-		Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
-		from sets of 8 bit palettes!  
-	*/
+        Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
+        from sets of 8 bit palettes!
+    */
 	const UINT8* tile_cluts = memory_region(REGION_GFX4);
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(src);
 	int src_y_mask=ysize-1;
@@ -989,8 +989,8 @@ static void draw_bg(running_machine *machine, mame_bitmap *dst, tilemap *src, co
 			p=*BITMAP_ADDR16(src_bitmap, src_y&src_y_mask, src_x&src_x_mask);
 			pp=tile_cluts[tile*8 + (p&0x7)];
 			ppp=pp + ((p&0x78)<<5);
-			
-			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Transparent pixels are set by both the tile pixel data==0 AND colour palette==0 
+
+			if ((p&0x7)!=0 || ((p&0x7)==0 && (pp&0x7)!=0)) // Transparent pixels are set by both the tile pixel data==0 AND colour palette==0
 				*BITMAP_ADDR32(dst, y, x) = machine->pens[ppp];
 		}
 	}
@@ -1048,7 +1048,7 @@ VIDEO_UPDATE( cyclwarr )
 	draw_bg(machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
 	update_cluts(machine, 8192, 4096, 8192);
 	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x80, 512, 4096); 
+	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x80, 512, 4096);
 
 	return 0;
 }
