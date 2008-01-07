@@ -1853,7 +1853,7 @@ static void append_recover_ccr31(drc_core *drc)
 
 static void append_check_interrupts(drc_core *drc, compiler_state *compiler, const opcode_desc *desc)
 {
-	emit_link link1, link2;
+	emit_link link1, link2, link3 = { 0 };
 
 	emit_mov_r32_m32(DRCTOP, REG_EAX, CPR0ADDR(COP0_Cause));								// mov  eax,[Cause]
 	emit_and_r32_m32(DRCTOP, REG_EAX, CPR0ADDR(COP0_Status));								// and  eax,[Status]
@@ -1865,12 +1865,15 @@ static void append_check_interrupts(drc_core *drc, compiler_state *compiler, con
 	if (desc == NULL)
 	{
 		emit_mov_r32_m32(DRCTOP, REG_P1, MDRC(drc->pcptr));									// mov  p1,[pc]
-		emit_jcc(DRCTOP, COND_Z, mips3.drcdata->generate_interrupt_exception);				// jz   generate_interrupt_exception
+		emit_jcc_short_link(DRCTOP, COND_NZ, &link3);										// jnz  skip
+		emit_jmp_m64(DRCTOP, MDRC(&mips3.drcdata->generate_interrupt_exception));			// jmp  generate_interrupt_exception
 	}
 	else
 		oob_request_callback(drc, COND_Z, oob_interrupt_cleanup, compiler, desc, mips3.drcdata->generate_interrupt_exception);
 	resolve_link(DRCTOP, &link1);														// skip:
 	resolve_link(DRCTOP, &link2);
+	if (desc == NULL)
+		resolve_link(DRCTOP, &link3);
 }
 
 
