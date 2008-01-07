@@ -201,15 +201,21 @@ static void kingofb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 {
 	int offs;
 
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = 0; offs < spriteram_size; offs += 4)
 	{
-		int bank = (spriteram[offs + 3] & 0x04) >> 2;
-		int code = spriteram[offs + 2] + ((spriteram[offs + 3] & 0x03) << 8);
-		int color = ((spriteram[offs + 3] & 0x70) >> 4) + 8 * palette_bank;
-		int flipx = 0;
-		int flipy = spriteram[offs + 3] & 0x80;
-		int sx = spriteram[offs+1];
-		int sy = spriteram[offs];
+		int roffs,bank,code,color,flipx,flipy,sx,sy;
+
+		/* the offset into spriteram seems scrambled */
+		roffs = BITSWAP16(offs,15,14,13,12,11,10,4,7,6,5,9,8,3,2,1,0) ^ 0x3c;
+		if (roffs & 0x200) roffs ^= 0x1c0;
+
+		bank = (spriteram[roffs + 3] & 0x04) >> 2;
+		code = spriteram[roffs + 2] + ((spriteram[roffs + 3] & 0x03) << 8);
+		color = ((spriteram[roffs + 3] & 0x70) >> 4) + 8 * palette_bank;
+		flipx = 0;
+		flipy = spriteram[roffs + 3] & 0x80;
+		sx = spriteram[roffs+1];
+		sy = spriteram[roffs];
 
 		if (flip_screen)
 		{
