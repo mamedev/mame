@@ -52,13 +52,12 @@ WRITE8_HANDLER( targ_sh_w );
 
 /*----------- defined in video/exidy.c -----------*/
 
+extern UINT8 *exidy_videoram;
 extern UINT8 *exidy_characterram;
-
-extern UINT8 exidy_collision_mask;
-extern UINT8 exidy_collision_invert;
 
 extern UINT8 *exidy_color_latch;
 
+void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
 VIDEO_EOF( exidy );
 VIDEO_UPDATE( exidy );
