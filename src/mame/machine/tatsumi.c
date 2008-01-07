@@ -363,9 +363,11 @@ READ8_HANDLER(tatsumi_hack_ym2151_r)
 READ8_HANDLER(tatsumi_hack_oki_r)
 {
 	int r=OKIM6295_status_0_r(0);
-
+	
 	if (activecpu_get_pc()==0x2b70 || activecpu_get_pc()==0x2bb5
 		|| activecpu_get_pc()==0x2acc
+		|| activecpu_get_pc()==0x1c79 // BigFight
+		|| activecpu_get_pc()==0x1cbe // BigFight
 		|| activecpu_get_pc()==0xf9881)
 		return 0xf;
 	if (activecpu_get_pc()==0x2ba3 || activecpu_get_pc()==0x2a9b || activecpu_get_pc()==0x2adc

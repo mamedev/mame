@@ -165,6 +165,12 @@ static WRITE16_HANDLER(bigfight_a20000_w) { COMBINE_DATA(&bigfight_a20000[offset
 static WRITE16_HANDLER(bigfight_a40000_w) { COMBINE_DATA(&bigfight_a40000[offset]); }
 static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset]); }
 
+static WRITE16_HANDLER(cyclwarr_sound_w)
+{
+	soundlatch_w(0, data >> 8);
+	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 /***************************************************************************/
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -264,6 +270,7 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
+	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
 	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
 	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
@@ -301,12 +308,8 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
 	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
-	AM_RANGE(0xfff8, 0xfff8) AM_READ(input_port_0_r)
-	AM_RANGE(0xfff9, 0xfff9) AM_READ(input_port_1_r)
-//  AM_RANGE(0xfffa, 0xfffa) AM_READ(input_port_0_r)// MRA_NOP) //irq ack???
-	AM_RANGE(0xfffc, 0xfffc) AM_READ(input_port_2_r)// MRA_NOP)
-	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(MWA8_NOP) //irq ack?
-	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(MWA8_NOP) //irq ack?
+	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
+	AM_RANGE(0xfffe, 0xfffe) AM_WRITE(MWA8_NOP)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -324,6 +327,7 @@ static ADDRESS_MAP_START( bigfight_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
 	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
+	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
 	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
 	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
@@ -838,7 +842,7 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 20000000/8)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/4/2)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -880,7 +884,7 @@ static MACHINE_DRIVER_START( roundup5 )
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 20000000/8)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/4/2)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -923,7 +927,7 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 20000000/8)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -966,7 +970,7 @@ static MACHINE_DRIVER_START( bigfight )
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)
 
-	MDRV_SOUND_ADD(OKIM6295, 20000000/8)
+	MDRV_SOUND_ADD(OKIM6295, 16000000/8/2)    // Measured value of 2MHz seems too fast
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
@@ -1246,11 +1250,10 @@ static DRIVER_INIT( cyclwarr )
 
 /***************************************************************************/
 
-/* http://www.tatsu-mi.co.jp/game/HTML/history.html */
+/* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
-/* 1986 Lock On */
 /* 1987 Gray Out */
 GAME( 1988, apache3,  0, apache3,   apache3,  apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, roundup5, 0, roundup5,  roundup5, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, cyclwarr, 0, cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, bigfight, 0, bigfight,  bigfight, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+GAME( 1991, cyclwarr, 0, cyclwarr,  cyclwarr, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS)
+GAME( 1992, bigfight, 0, bigfight,  bigfight, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)
