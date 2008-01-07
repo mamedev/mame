@@ -1108,6 +1108,7 @@ const game_driver * const drivers[] =
 	DRIVER( boothill )	/* 612 [1977] */
 	DRIVER( checkmat )	/* 615 [1977] */
 	DRIVER( desertgu )	/* 618 [1977] */
+	DRIVER( roadrunm )	/* 618 [1977] */
 	DRIVER( dplay )		/* 619 [1977] */
 	DRIVER( lagunar )	/* 622 [1977] */
 	DRIVER( gmissile )	/* 623 [1977] */
