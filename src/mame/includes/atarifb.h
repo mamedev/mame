@@ -49,8 +49,4 @@ extern UINT8 *atarifb_alphap1_vram;
 extern UINT8 *atarifb_alphap2_vram;
 extern UINT8 *atarifb_scroll_register;
 
-WRITE8_HANDLER( atarifb_scroll_w );
-WRITE8_HANDLER( atarifb_alphap1_vram_w );
-WRITE8_HANDLER( atarifb_alphap2_vram_w );
-
 VIDEO_UPDATE( atarifb );

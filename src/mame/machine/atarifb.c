@@ -45,14 +45,14 @@ WRITE8_HANDLER( atarifb_out1_w )
 		if (data & 0x80)
 		{
 			/* Invert video */
-			palette_set_color(Machine,2,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+			palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
 			palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 		}
 		else
 		{
 			/* Regular video */
 			palette_set_color(Machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-			palette_set_color(Machine,2,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+			palette_set_color(Machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 		}
 	}
 }

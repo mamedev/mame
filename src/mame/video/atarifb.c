@@ -20,25 +20,6 @@ static const rectangle bigfield_area = {  4*8, 34*8-1, 0*8, 32*8-1 };
 static const rectangle left_area =     {  0*8,  3*8-1, 0*8, 32*8-1 };
 static const rectangle right_area =    { 34*8, 38*8-1, 0*8, 32*8-1 };
 
-/***************************************************************************
-***************************************************************************/
-WRITE8_HANDLER( atarifb_alphap1_vram_w )
-{
-	atarifb_alphap1_vram[offset] = data;
-}
-
-WRITE8_HANDLER( atarifb_alphap2_vram_w )
-{
-	atarifb_alphap2_vram[offset] = data;
-}
-
-/***************************************************************************
-***************************************************************************/
-WRITE8_HANDLER( atarifb_scroll_w )
-{
-	*atarifb_scroll_register = data - 8;
-}
-
 
 VIDEO_UPDATE( atarifb )
 {
@@ -103,13 +84,11 @@ VIDEO_UPDATE( atarifb )
 		int flipx,flipy;
 		int sx,sy;
 
-		dirtybuffer[offs]=0;
-
 		charcode = videoram[offs] & 0x3f;
 		flipx = (videoram[offs] & 0x40) >> 6;
 		flipy = (videoram[offs] & 0x80) >> 7;
 
-		sx = (8 * (offs % 32) - *atarifb_scroll_register);
+		sx = 8 * (offs % 32) - *atarifb_scroll_register + 8;
 		sy = 8 * (offs / 32) + 8;
 
 		/* Soccer hack */
