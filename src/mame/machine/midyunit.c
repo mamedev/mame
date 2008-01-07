@@ -565,12 +565,12 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 			case SOUND_CVSD_SMALL:
 			case SOUND_CVSD:
-				williams_cvsd_reset_w((~data & 0x100) >> 1);
+				williams_cvsd_reset_w((~data & 0x100) >> 8);
 				williams_cvsd_data_w((data & 0xff) | ((data & 0x200) >> 1));
 				break;
 
 			case SOUND_ADPCM:
-				williams_adpcm_reset_w((~data & 0x100) >> 1);
+				williams_adpcm_reset_w((~data & 0x100) >> 8);
 				williams_adpcm_data_w(data);
 				break;
 

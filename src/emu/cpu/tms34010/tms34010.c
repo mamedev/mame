@@ -60,6 +60,7 @@ typedef struct tms34010_regs
 	UINT8 pixelshift;
 	UINT8 is_34020;
 	UINT8 reset_deferred;
+	UINT8 hblank_stable;
 	int (*irq_callback)(int irqline);
 	const tms34010_config *config;
 	emu_timer *scantimer;
@@ -1007,9 +1008,14 @@ static TIMER_CALLBACK( scanline_callback )
 				if (visarea.min_x < visarea.max_x && visarea.max_x <= width && visarea.min_y < visarea.max_y && visarea.max_y <= height)
 				{
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
-                       if they are the only thing that has changed */
-					if (width != screen->width || height != screen->height || visarea.min_y != screen->visarea.min_y || visarea.max_y != screen->visarea.max_y)
+                       if they are the only thing that has changed, unless they are stable for a couple
+                       of frames */
+					if (width != screen->width || height != screen->height || visarea.min_y != screen->visarea.min_y || visarea.max_y != screen->visarea.max_y ||
+						(state.hblank_stable > 2 && (visarea.min_x != screen->visarea.min_x || visarea.max_x != screen->visarea.max_x)))
+					{
 						video_screen_configure(state.config->scrnum, width, height, &visarea, refresh);
+					}
+					state.hblank_stable++;
 				}
 
 				LOG(("Configuring screen: HTOTAL=%3d BLANK=%3d-%3d VTOTAL=%3d BLANK=%3d-%3d refresh=%f\n",
@@ -1269,6 +1275,12 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			if (!(data & TMS34010_DI))
 				IOREG(REG_INTPEND) &= ~TMS34010_DI;
 			break;
+
+		case REG_HEBLNK:
+		case REG_HSBLNK:
+			if (oldreg != data)
+				state.hblank_stable = 0;
+			break;
 	}
 
 	if (LOG_CONTROL_REGS)
@@ -1446,6 +1458,12 @@ WRITE16_HANDLER( tms34020_io_register_w )
 		case REG020_DPYSTRT:
 		case REG020_DPYADR:
 		case REG020_DPYTAP:
+			break;
+
+		case REG020_HEBLNK:
+		case REG020_HSBLNK:
+			if (oldreg != data)
+				state.hblank_stable = 0;
 			break;
 	}
 }
