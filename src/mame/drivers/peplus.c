@@ -166,7 +166,6 @@ static tilemap *bg_tilemap;
 /* Pointers to External RAM */
 static UINT8 *program_ram;
 static UINT8 *cmos_ram;
-static UINT8 *s1000_ram;
 static UINT8 *s3000_ram;
 static UINT8 *s5000_ram;
 static UINT8 *s7000_ram;
@@ -195,7 +194,7 @@ static UINT8 coin_out_state = 0;
 static int sda_dir = 0;
 
 /* Static Variables */
-#define CMOS_NVRAM_SIZE     0x1000
+#define CMOS_NVRAM_SIZE     0x2000
 #define EEPROM_NVRAM_SIZE   0x200 // 4k Bit
 
 
@@ -314,11 +313,6 @@ static WRITE8_HANDLER( peplus_duart_w )
 static WRITE8_HANDLER( peplus_cmos_w )
 {
 	cmos_ram[offset] = data;
-}
-
-static WRITE8_HANDLER( peplus_s1000_w )
-{
-	s1000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s3000_w )
@@ -464,11 +458,6 @@ static READ8_HANDLER( peplus_cmos_r )
 	}
 
 	return cmos_ram[offset];
-}
-
-static READ8_HANDLER( peplus_s1000_r )
-{
-	return s1000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s3000_r )
@@ -726,11 +715,8 @@ static ADDRESS_MAP_START( peplus_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
-	// Battery-backed RAM
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
-
-	// Superboard Data
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_READWRITE(peplus_s1000_r, peplus_s1000_w) AM_BASE(&s1000_ram)
+	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_WRITE(peplus_crtc_mode_w)
@@ -1033,7 +1019,6 @@ static void peplussb_init(void)
     UINT8 *super_data = memory_region(REGION_USER1);
 
     /* Distribute Superboard Data */
-    memcpy(s1000_ram, &super_data[0], 0x1000);
     memcpy(s3000_ram, &super_data[0x3000], 0x1000);
     memcpy(s5000_ram, &super_data[0x5000], 0x1000);
     memcpy(s7000_ram, &super_data[0x7000], 0x1000);
