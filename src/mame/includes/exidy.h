@@ -57,7 +57,7 @@ extern UINT8 *exidy_characterram;
 extern UINT8 exidy_collision_mask;
 extern UINT8 exidy_collision_invert;
 
-extern UINT8 exidy_color_latch[3];
+extern UINT8 *exidy_color_latch;
 
 VIDEO_START( exidy );
 VIDEO_EOF( exidy );
@@ -66,7 +66,6 @@ VIDEO_UPDATE( exidy );
 INTERRUPT_GEN( exidy_vblank_interrupt );
 INTERRUPT_GEN( teetert_vblank_interrupt );
 
-WRITE8_HANDLER( exidy_characterram_w );
 WRITE8_HANDLER( exidy_color_w );
 WRITE8_HANDLER( exidy_sprite1_xpos_w );
 WRITE8_HANDLER( exidy_sprite1_ypos_w );

@@ -189,7 +189,7 @@ static WRITE8_HANDLER( fax_bank_select_w )
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_READWRITE(videoram_r, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x5000, 0x503f) AM_WRITE(exidy_sprite1_xpos_w)
 	AM_RANGE(0x5040, 0x507f) AM_WRITE(exidy_sprite1_ypos_w)
 	AM_RANGE(0x5080, 0x50bf) AM_WRITE(exidy_sprite2_xpos_w)
@@ -199,21 +199,29 @@ static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0xfc) AM_WRITE(exidy_spriteno_w)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0xfc) AM_WRITE(exidy_sprite_enable_w)
 	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0xfc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITE(exidy_color_w)
+	AM_RANGE(0x5210, 0x5212) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_color_latch)
 	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( sidetrac_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0800, 0x3fff) AM_ROM
+	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_BASE(&exidy_characterram)
+	AM_RANGE(0x5200, 0x5201) AM_WRITE(targ_sh_w)
+	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x3f00)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( targ_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(MRA8_RAM, exidy_characterram_w) AM_BASE(&exidy_characterram)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x5200, 0x5201) AM_WRITE(targ_sh_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x3f00)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( venture_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(MRA8_RAM, exidy_characterram_w) AM_BASE(&exidy_characterram)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x5200, 0x520f) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -221,7 +229,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pepper2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5200, 0x520f) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(MRA8_RAM, exidy_characterram_w) AM_BASE(&exidy_characterram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -234,7 +242,7 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x5200, 0x520f) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x5213, 0x5217) AM_WRITE(MWA8_NOP)				/* empty control lines on color/sound board */
-	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(MRA8_RAM, exidy_characterram_w) AM_BASE(&exidy_characterram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -824,11 +832,11 @@ static const struct CustomSound_interface exidy_custom_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( targ )
+static MACHINE_DRIVER_START( sidetrac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, EXIDY_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(common_map,targ_map)
+	MDRV_CPU_PROGRAM_MAP(common_map,sidetrac_map)
 	MDRV_CPU_VBLANK_INT(exidy_vblank_interrupt,1)
 
 	/* video hardware */
@@ -851,6 +859,15 @@ static MACHINE_DRIVER_START( targ )
 
 	MDRV_SOUND_ADD_TAG("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( targ )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(sidetrac)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(common_map,targ_map)
 MACHINE_DRIVER_END
 
 
@@ -936,7 +953,7 @@ ROM_START( sidetrac )
 	ROM_LOAD( "stl8a-1", 0x2800, 0x0800, CRC(e41750ff) SHA1(3868a0d7e34a5118b39b31cff9e4fc839df541ff) )
 	ROM_LOAD( "stl7a-2", 0x3000, 0x0800, CRC(57fb28dc) SHA1(6addd633d655d6a56b3e509d18e5f7c0ab2d0fbb) )
 	ROM_LOAD( "stl6a-2", 0x3800, 0x0800, CRC(4226d469) SHA1(fd18b732b66082988b01e04adc2b1e5dae410c98) )
-	ROM_LOAD( "stl9c-1", 0x4800, 0x0400, CRC(08710a84) SHA1(4bff254a14af7c968656ccc85277d31ab5a8f0c4) ) /* prom instead of ram chr gen*/
+	ROM_LOAD( "stl9c-1", 0x4800, 0x0400, CRC(08710a84) SHA1(4bff254a14af7c968656ccc85277d31ab5a8f0c4) ) /* PROM instead of RAM char generator */
 
 	ROM_REGION( 0x0200, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "stl11d",  0x0000, 0x0200, CRC(3bd1acc1) SHA1(06f900cb8f56cd4215c5fbf58a852426d390e0c1) )
@@ -1356,9 +1373,6 @@ static DRIVER_INIT( sidetrac )
 	exidy_color_latch[2] = 0xf8;
 	exidy_color_latch[1] = 0xdc;
 	exidy_color_latch[0] = 0xb8;
-
-	/* ROM in place of character RAM */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MWA8_ROM);
 }
 
 
@@ -1449,7 +1463,7 @@ static DRIVER_INIT( pepper2 )
 
 	/* two 6116 character RAMs */
 	exidy_characterram = memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_RAM);
-	exidy_characterram = memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, exidy_characterram_w);
+	exidy_characterram = memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MWA8_RAM);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4fff, 0, 0, MRA8_NOP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4fff, 0, 0, MWA8_NOP);
 }
@@ -1471,22 +1485,22 @@ static DRIVER_INIT( fax )
  *
  *************************************/
 
-GAME( 1979, sidetrac, 0,       targ,    sidetrac, sidetrac, ROT0, "Exidy", "Side Trak", 0 )
-GAME( 1980, targ,     0,       targ,    targ,     targ,     ROT0, "Exidy", "Targ", 0 )
-GAME( 1980, targc,    targ,    targ,    targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 )
-GAME( 1980, spectar,  0,       targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 )
-GAME( 1980, spectar1, spectar, targ,    spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", 0 )
-GAME( 1980, rallys,   spectar, targ,    rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", 0 )
-GAME( 1980, phantoma, spectar, targ,    phantoma, phantoma, ROT0, "Jeutel","Phantomas", 0 )
+GAME( 1979, sidetrac, 0,       sidetrac, sidetrac, sidetrac, ROT0, "Exidy", "Side Trak", 0 )
+GAME( 1980, targ,     0,       targ,     targ,     targ,     ROT0, "Exidy", "Targ", 0 )
+GAME( 1980, targc,    targ,    targ,     targ,     targ,     ROT0, "Exidy", "Targ (cocktail?)", 0 )
+GAME( 1980, spectar,  0,       targ,     spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 3)", 0 )
+GAME( 1980, spectar1, spectar, targ,     spectar,  spectar,  ROT0, "Exidy", "Spectar (revision 1?)", 0 )
+GAME( 1980, rallys,   spectar, targ,     rallys,   rallys,   ROT0, "Novar", "Rallys (bootleg?)", 0 )
+GAME( 1980, phantoma, spectar, targ,     phantoma, phantoma, ROT0, "Jeutel","Phantomas", 0 )
 
-GAME( 1981, mtrap,    0,       mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", 0 )
-GAME( 1981, mtrap3,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", 0 )
-GAME( 1981, mtrap4,   mtrap,   mtrap,   mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", 0 )
-GAME( 1981, venture,  0,       venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", 0 )
-GAME( 1981, venture2, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", 0 )
-GAME( 1981, venture4, venture, venture, venture,  venture,  ROT0, "Exidy", "Venture (version 4)", 0 )
-GAME( 1982, teetert,  0,       teetert, teetert,  teetert,  ROT0, "Exidy", "Teeter Torture (prototype)", 0 )
-GAME( 1982, pepper2,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 )
-GAME( 1982, hardhat,  0,       pepper2, pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 )
-GAME( 1983, fax,      0,       fax,     fax,      fax,      ROT0, "Exidy", "FAX", 0 )
-GAME( 1983, fax2,     fax,     fax,     fax,      fax,      ROT0, "Exidy", "FAX 2", 0 )
+GAME( 1981, mtrap,    0,       mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 5)", 0 )
+GAME( 1981, mtrap3,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 3)", 0 )
+GAME( 1981, mtrap4,   mtrap,   mtrap,    mtrap,    mtrap,    ROT0, "Exidy", "Mouse Trap (version 4)", 0 )
+GAME( 1981, venture,  0,       venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 1)", 0 )
+GAME( 1981, venture2, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 5 set 2)", 0 )
+GAME( 1981, venture4, venture, venture,  venture,  venture,  ROT0, "Exidy", "Venture (version 4)", 0 )
+GAME( 1982, teetert,  0,       teetert,  teetert,  teetert,  ROT0, "Exidy", "Teeter Torture (prototype)", 0 )
+GAME( 1982, pepper2,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Pepper II", 0 )
+GAME( 1982, hardhat,  0,       pepper2,  pepper2,  pepper2,  ROT0, "Exidy", "Hard Hat", 0 )
+GAME( 1983, fax,      0,       fax,      fax,      fax,      ROT0, "Exidy", "FAX", 0 )
+GAME( 1983, fax2,     fax,     fax,      fax,      fax,      ROT0, "Exidy", "FAX 2", 0 )

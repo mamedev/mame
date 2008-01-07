@@ -8,6 +8,7 @@
 #include "exidy.h"
 
 UINT8 *exidy_characterram;
+UINT8 *exidy_color_latch;
 
 UINT8 exidy_collision_mask;
 UINT8 exidy_collision_invert;
@@ -16,7 +17,6 @@ static mame_bitmap *motion_object_1_vid;
 static mame_bitmap *motion_object_2_vid;
 static mame_bitmap *motion_object_2_clip;
 
-static UINT8 chardirty[256];
 static UINT8 update_complete;
 
 static UINT8 int_condition;
@@ -27,8 +27,6 @@ static UINT8 sprite1_xpos;
 static UINT8 sprite1_ypos;
 static UINT8 sprite2_xpos;
 static UINT8 sprite2_ypos;
-
-UINT8 exidy_color_latch[3];
 
 
 
@@ -45,10 +43,6 @@ VIDEO_START( exidy )
 	motion_object_1_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
 	motion_object_2_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
 	motion_object_2_clip = auto_bitmap_alloc(16, 16, machine->screen[0].format);
-
-	exidy_color_w(0, exidy_color_latch[0]);
-	exidy_color_w(1, exidy_color_latch[1]);
-	exidy_color_w(2, exidy_color_latch[2]);
 }
 
 
@@ -101,76 +95,57 @@ READ8_HANDLER( exidy_interrupt_r )
 
 /*************************************
  *
- *  Character RAM
- *
- *************************************/
-
-WRITE8_HANDLER( exidy_characterram_w )
-{
-	if (exidy_characterram[offset] != data)
-	{
-		exidy_characterram[offset] = data;
-		chardirty[offset / 8 % 256] = 1;
-	}
-}
-
-
-
-/*************************************
- *
  *  Palette RAM
  *
  *************************************/
 
-INLINE void set_1_color(int index, int palette)
+INLINE void set_1_color(running_machine *machine, int index, int palette)
 {
-	palette_set_color_rgb(Machine, index, pal1bit(exidy_color_latch[2] >> palette), pal1bit(exidy_color_latch[1] >> palette), pal1bit(exidy_color_latch[0] >> palette));
+	palette_set_color_rgb(machine, index, pal1bit(exidy_color_latch[2] >> palette), pal1bit(exidy_color_latch[1] >> palette), pal1bit(exidy_color_latch[0] >> palette));
 }
 
-WRITE8_HANDLER( exidy_color_w )
+static void set_colors(running_machine *machine)
 {
-	exidy_color_latch[offset] = data;
-
 	/* motion object 1 */
-	set_1_color(0, 0);
-	set_1_color(1, 7);
+	set_1_color(machine, 0, 0);
+	set_1_color(machine, 1, 7);
 
 	/* motion object 2 */
-	set_1_color(2, 0);
-	set_1_color(3, 6);
+	set_1_color(machine, 2, 0);
+	set_1_color(machine, 3, 6);
 
 	/* one-bit characters */
-	if (Machine->gfx[0]->color_granularity == 2)
+	if (machine->gfx[0]->color_granularity == 2)
 	{
-		set_1_color(4, 0);		/* chars 0x00-0x3F */
-		set_1_color(5, 4);
-		set_1_color(6, 0);		/* chars 0x40-0x7F */
-		set_1_color(7, 3);
-		set_1_color(8, 0);		/* chars 0x80-0xBF */
-		set_1_color(9, 2);
-		set_1_color(10, 0);		/* chars 0xC0-0xFF */
-		set_1_color(11, 1);
+		set_1_color(machine, 4, 0);		/* chars 0x00-0x3F */
+		set_1_color(machine, 5, 4);
+		set_1_color(machine, 6, 0);		/* chars 0x40-0x7F */
+		set_1_color(machine, 7, 3);
+		set_1_color(machine, 8, 0);		/* chars 0x80-0xBF */
+		set_1_color(machine, 9, 2);
+		set_1_color(machine, 10, 0);		/* chars 0xC0-0xFF */
+		set_1_color(machine, 11, 1);
 	}
 
 	/* two-bit characters */
 	else
 	{
-		set_1_color(4, 0);		/* chars 0x00-0x3F */
-		set_1_color(5, 0);
-		set_1_color(6, 4);
-		set_1_color(7, 3);
-		set_1_color(8, 0);		/* chars 0x40-0x7F */
-		set_1_color(9, 0);
-		set_1_color(10, 4);
-		set_1_color(11, 3);
-		set_1_color(12, 0);		/* chars 0x80-0xBF */
-		set_1_color(13, 0);
-		set_1_color(14, 2);
-		set_1_color(15, 1);
-		set_1_color(16, 0);		/* chars 0xC0-0xFF */
-		set_1_color(17, 0);
-		set_1_color(18, 2);
-		set_1_color(19, 1);
+		set_1_color(machine, 4, 0);		/* chars 0x00-0x3F */
+		set_1_color(machine, 5, 0);
+		set_1_color(machine, 6, 4);
+		set_1_color(machine, 7, 3);
+		set_1_color(machine, 8, 0);		/* chars 0x40-0x7F */
+		set_1_color(machine, 9, 0);
+		set_1_color(machine, 10, 4);
+		set_1_color(machine, 11, 3);
+		set_1_color(machine, 12, 0);		/* chars 0x80-0xBF */
+		set_1_color(machine, 13, 0);
+		set_1_color(machine, 14, 2);
+		set_1_color(machine, 15, 1);
+		set_1_color(machine, 16, 0);		/* chars 0xC0-0xFF */
+		set_1_color(machine, 17, 0);
+		set_1_color(machine, 18, 2);
+		set_1_color(machine, 19, 1);
 	}
 }
 
@@ -222,34 +197,25 @@ WRITE8_HANDLER( exidy_sprite_enable_w )
 
 static void update_background(running_machine *machine)
 {
-	int x, y, offs;
+	int x, y, code, offs;
 
-	/* update the background and any dirty characters in it */
+	/* decode chars */
+	const gfx_layout *gfx = machine->drv->gfxdecodeinfo[0].gfxlayout;
+
+	for (code = 0; code < gfx->total; code++)
+			decodechar(machine->gfx[0], code, exidy_characterram, gfx);
+
+	/* update the background */
 	for (y = offs = 0; y < 32; y++)
 		for (x = 0; x < 32; x++, offs++)
 		{
-			int code = videoram[offs];
+			int color;
 
-			/* see if the character is dirty */
-			if (chardirty[code] == 1)
-			{
-				decodechar(machine->gfx[0], code, exidy_characterram, machine->drv->gfxdecodeinfo[0].gfxlayout);
-				chardirty[code] = 2;
-			}
+			code = videoram[offs];
+			color = code >> 6;
 
-			/* see if the bitmap is dirty */
-			if (dirtybuffer[offs] || chardirty[code])
-			{
-				int color = code >> 6;
-				drawgfx(tmpbitmap, machine->gfx[0], code, color, 0, 0, x * 8, y * 8, NULL, TRANSPARENCY_NONE, 0);
-				dirtybuffer[offs] = 0;
-			}
+			drawgfx(tmpbitmap, machine->gfx[0], code, color, 0, 0, x * 8, y * 8, NULL, TRANSPARENCY_NONE, 0);
 		}
-
-	/* reset the char dirty array */
-	for (y = 0; y < 256; y++)
-		if (chardirty[y] == 2)
-			chardirty[y] = 0;
 }
 
 
@@ -290,14 +256,10 @@ INLINE int sprite_1_enabled(void)
 	return (!(sprite_enable & 0x80) || (sprite_enable & 0x10) || (exidy_collision_mask == 0x00));
 }
 
-INLINE int sprite_2_enabled(void)
-{
-	return (!(sprite_enable & 0x40));
-}
-
 VIDEO_EOF( exidy )
 {
-	UINT8 enable_set = ((sprite_enable & 0x20) != 0);
+	UINT8 enable_set_1 = ((sprite_enable & 0x20) != 0);
+	UINT8 enable_set_2 = ((sprite_enable & 0x40) != 0);
     static const rectangle clip = { 0, 15, 0, 15 };
     int bgmask = machine->gfx[0]->color_granularity - 1;
     int org_1_x = 0, org_1_y = 0;
@@ -308,13 +270,6 @@ VIDEO_EOF( exidy )
 	/* if there is nothing to detect, bail */
 	if (exidy_collision_mask == 0)
 		return;
-
-	/* if the sprites aren't enabled, we can't collide */
-	if (!sprite_1_enabled() && !sprite_2_enabled())
-	{
-		update_complete = 0;
-		return;
-	}
 
 	/* update the background if necessary */
 	if (!update_complete)
@@ -328,29 +283,26 @@ VIDEO_EOF( exidy )
 		org_1_x = 236 - sprite1_xpos - 4;
 		org_1_y = 244 - sprite1_ypos - 4;
 		drawgfx(motion_object_1_vid, machine->gfx[1],
-			(spriteno & 0x0f) + 16 * enable_set, 0,
+			(spriteno & 0x0f) + 16 * enable_set_1, 0,
 			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 	}
 
 	/* draw sprite 2 */
 	fillbitmap(motion_object_2_vid, 0xff, &clip);
-	if (sprite_2_enabled())
-	{
-		org_2_x = 236 - sprite2_xpos - 4;
-		org_2_y = 244 - sprite2_ypos - 4;
-		drawgfx(motion_object_2_vid, machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
-	}
+	org_2_x = 236 - sprite2_xpos - 4;
+	org_2_y = 244 - sprite2_ypos - 4;
+	drawgfx(motion_object_2_vid, machine->gfx[1],
+		((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
+		0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 
     /* draw sprite 2 clipped to sprite 1's location */
 	fillbitmap(motion_object_2_clip, 0xff, &clip);
-	if (sprite_1_enabled() && sprite_2_enabled())
+	if (sprite_1_enabled())
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
 		drawgfx(motion_object_2_clip, machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 0,
+			((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
 			0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
 	}
 
@@ -395,26 +347,29 @@ VIDEO_EOF( exidy )
 VIDEO_UPDATE( exidy )
 {
 	int sx, sy;
+	UINT8 enable_set_2;
+
+	/* refresh the colors from the palette (static or dynamic) */
+	set_colors(machine);
 
 	/* update the background and draw it */
 	update_background(machine);
 	copybitmap(bitmap, tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 
 	/* draw sprite 2 first */
-	if (sprite_2_enabled())
-	{
-		sx = 236 - sprite2_xpos - 4;
-		sy = 244 - sprite2_ypos - 4;
+	enable_set_2 = ((sprite_enable & 0x40) != 0);
 
-		drawgfx(bitmap, machine->gfx[1],
-			((spriteno >> 4) & 0x0f) + 32, 1,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-	}
+	sx = 236 - sprite2_xpos - 4;
+	sy = 244 - sprite2_ypos - 4;
+
+	drawgfx(bitmap, machine->gfx[1],
+		((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 1,
+		0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 
 	/* draw sprite 1 next */
 	if (sprite_1_enabled())
 	{
-		UINT8 enable_set = ((sprite_enable & 0x20) != 0);
+		UINT8 enable_set_1 = ((sprite_enable & 0x20) != 0);
 
 		sx = 236 - sprite1_xpos - 4;
 		sy = 244 - sprite1_ypos - 4;
@@ -422,7 +377,7 @@ VIDEO_UPDATE( exidy )
 		if (sy < 0) sy = 0;
 
 		drawgfx(bitmap, machine->gfx[1],
-			(spriteno & 0x0f) + 16 * enable_set, 0,
+			(spriteno & 0x0f) + 16 * enable_set_1, 0,
 			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
 
