@@ -16,8 +16,18 @@
 		<bezel name="blank" element="blank">
 			<bounds left="0" top="0" right="0.1" bottom="3" />
 		</bezel>
+		<bezel name="blank" element="blank">
+			<bounds left="3.9" top="0" right="4" bottom="3" />
+		</bezel>
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+	</view>
+
+	<view name="Screen 0 Stretched (304x224)">
+		<bounds left="0" top="0" right="4" bottom="3" />
+		<screen index="0">
+			<bounds left="-0.105263" top="0" right="4.105263" bottom="3" />
 		</screen>
 	</view>
 </mamelayout>
