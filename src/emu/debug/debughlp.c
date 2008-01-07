@@ -79,11 +79,14 @@ static const help_item static_help_list[] =
 		"  help [<topic>] -- get help on a particular topic\n"
 		"  do <expression> -- evaluates the given expression\n"
 		"  symlist [<cpunum>] -- lists registered symbols\n"
+		"  softreset -- executes a soft reset\n"
+		"  hardreset -- executes a hard reset\n"
 		"  print <item>[,...] -- prints one or more <item>s to the console\n"
 		"  printf <format>[,<item>[,...]] -- prints one or more <item>s to the console using <format>\n"
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
 		"  snap [<filename>] -- save a screen snapshot\n"
+		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
 	{
@@ -118,12 +121,15 @@ static const help_item static_help_list[] =
 		"  out -- single steps until the current subroutine/exception handler is exited (Shift-F11)\n"
 		"  g[o] [<address>] -- resumes execution, sets temp breakpoint at <address> (F5)\n"
 		"  gi[nt] [<irqline>] -- resumes execution, setting temp breakpoint if <irqline> is taken (F7)\n"
+		"  gt[ime] <milliseconds> -- resumes execution until the given delay has elapsed\n"
 		"  gv[blank] -- resumes execution, setting temp breakpoint on the next VBLANK (F8)\n"
 		"  n[ext] -- executes until the next CPU switch (F6)\n"
 		"  focus <cpunum> -- focuses debugger only on <cpunum>\n"
 		"  ignore [<cpunum>[,<cpunum>[,...]]] -- stops debugging on <cpunum>\n"
 		"  observe [<cpunum>[,<cpunum>[,...]]] -- resumes debugging on <cpunum>\n"
 		"  trace {<filename>|OFF}[,<cpunum>[,<action>]] -- trace the given CPU to a file (defaults to active CPU)\n"
+		"  traceover {<filename>|OFF}[,<cpunum>[,<action>]] -- trace the given CPU to a file, but skip subroutines (defaults to active CPU)\n"
+		"  traceflush -- flushes all open trace files\n"
 	},
 	{
 		"breakpoints",
