@@ -133,8 +133,13 @@ static WRITE8_HANDLER( control_port_w )
 
     /* Sample CPU write - Causes interrupt if bit 7 set */
 
-    soundlatch_w(0,data);
-	if(data & 0x80) cpunum_set_input_line(1,3,HOLD_LINE);
+   	soundlatch_w(0, data);
+
+	if (data & 0x80)
+	{
+		cpunum_set_input_line_vector(1, 0, 0x03);
+		cpunum_set_input_line(1, 0, HOLD_LINE);
+	}
 
 
     /* Speech CPU stuff */
@@ -182,15 +187,15 @@ static WRITE8_HANDLER( cvs_DAC2_w )
 {
     /* 4 Bit DAC - 4 memory locations used */
 
-	static int DAC_Value=0;
+	static UINT8 DAC_Value=0;
 
-    DAC_Value &= (1 << ~(offset + 4));
-    DAC_Value |= ((data & 0x80) >> 7) << (offset + 4);
+    DAC_Value = DAC_Value & ~(1 << offset);
+    DAC_Value = DAC_Value | (data >> 7 << offset);
 
-	DAC_1_data_w(0,DAC_Value);
+	DAC_1_data_w(0, (DAC_Value << 4) | DAC_Value);
 }
 
-static READ8_HANDLER( cvs_393hz_Clock_r )
+static READ8_HANDLER( cvs_393hz_clock_r )
 {
   	if(cpu_scalebyfcount(6) & 1) return 0x80;
     else return 0;
@@ -204,7 +209,7 @@ static const struct TMS5110interface tms5110_interface =
 	cvs_speech_rom_read_bit	/*M0 callback function. Called whenever chip requests a single bit of data*/
 };
 
-static ADDRESS_MAP_START( cvs_cpu1_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvs_main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
     AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_BASE(&cvs_bullet_ram)
     AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_3_or_character_ram_r, cvs_s2636_3_or_character_ram_w) AM_BASE(&s2636_3_ram)
@@ -217,14 +222,14 @@ static ADDRESS_MAP_START( cvs_cpu1_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cvs_cpu1_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cvs_main_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(cvs_input_r, cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, control_port_w)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_6_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cvs_cpu2_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvs_audio_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0x107f) AM_RAM
@@ -234,9 +239,10 @@ static ADDRESS_MAP_START( cvs_cpu2_program, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1884, 0x1887) AM_WRITE(MWA8_NOP)		/* Not connected to anything */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cvs_cpu2_io, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_Clock_r)
+static ADDRESS_MAP_START( cvs_audio_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( cvs )
 
@@ -329,14 +335,13 @@ static MACHINE_DRIVER_START( cvs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(S2650,894886.25)
-	MDRV_CPU_PROGRAM_MAP(cvs_cpu1_program,0)
-	MDRV_CPU_IO_MAP(cvs_cpu1_io,0)
+	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
+	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT(cvs_interrupt,1)
 
 	MDRV_CPU_ADD(S2650,894886.25)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(cvs_cpu2_program,0)
-	MDRV_CPU_IO_MAP(cvs_cpu2_io,0)
+	MDRV_CPU_PROGRAM_MAP(cvs_audio_cpu_map,0)
+	MDRV_CPU_IO_MAP(cvs_audio_cpu_io_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))

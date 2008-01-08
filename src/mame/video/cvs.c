@@ -328,8 +328,8 @@ INTERRUPT_GEN( cvs_interrupt )
 {
 	stars_scroll++;
 
-	cpunum_set_input_line_vector(0,0,0x03);
-	cpunum_set_input_line(0,0,PULSE_LINE);
+	cpunum_set_input_line_vector(0, 0, 0x03);
+	cpunum_set_input_line(0, 0, PULSE_LINE);
 }
 
 
