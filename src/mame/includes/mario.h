@@ -39,12 +39,16 @@ struct _mario_state
 	/* machine states */
 
 	/* sound state */
+	UINT8	last;
+	UINT8	portT; 
 
 	/* video state */
+	UINT8	gfx_bank;
+	UINT8	palette_bank;
+	UINT16	gfx_scroll;
 
-	/* Save state relevant */
-
-	UINT8 dummy;	/* structs need to have something */
+	tilemap *bg_tilemap;
+	int monitor;
 };
 
 /*----------- defined in video/mario.c -----------*/
@@ -62,15 +66,10 @@ VIDEO_UPDATE( mario );
 
 /*----------- defined in audio/mario.c -----------*/
 
-WRITE8_HANDLER( mario_sh_w );
 WRITE8_HANDLER( mario_sh1_w );
 WRITE8_HANDLER( mario_sh2_w );
 WRITE8_HANDLER( mario_sh3_w );
 
-WRITE8_HANDLER( mario_sh_getcoin_w );
-WRITE8_HANDLER( mario_sh_crab_w );
-WRITE8_HANDLER( mario_sh_turtle_w );
-WRITE8_HANDLER( mario_sh_fly_w );
 WRITE8_HANDLER( mario_sh_tuneselect_w );
 WRITE8_HANDLER( masao_sh_irqtrigger_w );
 
