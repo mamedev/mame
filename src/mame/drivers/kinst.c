@@ -9,7 +9,10 @@
         * Killer Instinct 2
 
     Known bugs:
-        * none at this time
+        * the SRAM test fails in diagnostics; this is due to the fact that
+          the test relies on executing out of the cache while it tromps
+          over (and eventually restores) the instructions it is executing;
+          this will likely never be fixed
 
 ****************************************************************************
 
