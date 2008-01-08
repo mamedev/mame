@@ -3,8 +3,6 @@
 
 #define TC0100SCN_GFX_NUM 1
 
-UINT16 *othunder_ram;
-
 struct tempsprite
 {
 	int gfx;
@@ -16,13 +14,11 @@ struct tempsprite
 };
 static struct tempsprite *spritelist;
 
-static int taito_hide_pixels;
-
 
 
 /**********************************************************/
 
-static VIDEO_START( othunder_core )
+VIDEO_START( othunder )
 {
 	/* Up to $800/8 big sprites, requires 0x100 * sizeof(*spritelist)
        Multiply this by 32 to give room for the number of small sprites,
@@ -30,16 +26,10 @@ static VIDEO_START( othunder_core )
 
 	spritelist = auto_malloc(0x2000 * sizeof(*spritelist));
 
-	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,0);
+	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,4,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start();
-}
-
-VIDEO_START( othunder )
-{
-	taito_hide_pixels = 4;
-	video_start_othunder_core(machine);
 }
 
 
@@ -254,90 +244,6 @@ VIDEO_UPDATE( othunder )
 		draw_sprites(machine, bitmap,cliprect,primasks,3);
 	}
 
-	/* Draw artificial gun targets */
-	{
-		int rawx, rawy, centrex, centrey, screenx, screeny;
-
-		/* calculate p1 screen co-ords by matching routine at $A932 */
-		rawx = othunder_ram[0x2848/2];
-		centrex = othunder_ram[0xa046/2];
-		if (rawx <= centrex)
-		{
-			rawx = centrex - rawx;
-			screenx = rawx * othunder_ram[0xa04e/2] + (((rawx * othunder_ram[0xa050/2]) & 0xffff0000) >> 16);
-			screenx = 0xa0 - screenx;
-			if (screenx < 0) screenx = 0;
-		}
-		else
-		{
-			if (rawx > othunder_ram[0xa028/2]) rawx = othunder_ram[0xa028/2];
-			rawx -= centrex;
-			screenx = rawx * othunder_ram[0xa056/2] + (((rawx * othunder_ram[0xa058/2]) & 0xffff0000) >> 16);
-			screenx += 0xa0;
-			if (screenx > 0x140) screenx = 0x140;
-		}
-		rawy = othunder_ram[0x284a/2];
-		centrey = othunder_ram[0xa048/2];
-		if (rawy <= centrey)
-		{
-			rawy = centrey - rawy;
-			screeny = rawy * othunder_ram[0xa052/2] + (((rawy * othunder_ram[0xa054/2]) & 0xffff0000) >> 16);
-			screeny = 0x78 - screeny;
-			if (screeny < 0) screeny = 0;
-		}
-		else
-		{
-			if (rawy > othunder_ram[0xa030/2]) rawy = othunder_ram[0xa030/2];
-			rawy -= centrey;
-			screeny = rawy * othunder_ram[0xa05a/2] + (((rawy * othunder_ram[0xa05c/2]) & 0xffff0000) >> 16);
-			screeny += 0x78;
-			if (screeny > 0xf0) screeny = 0xf0;
-		}
-
-		// fudge y to show in centre of scope/hit sprite, note that screenx, screeny
-		// were confirmed to match those stored by the game at $82732, $82734
-		screeny += 2;
-
-		/* calculate p2 screen co-ords by matching routine at $AA48 */
-		rawx = othunder_ram[0x284c/2];
-		centrex = othunder_ram[0xa04a/2];
-		if (rawx <= centrex)
-		{
-			rawx = centrex - rawx;
-			screenx = rawx * othunder_ram[0xa05e/2] + (((rawx * othunder_ram[0xa060/2]) & 0xffff0000) >> 16);
-			screenx = 0xa0 - screenx;
-			if (screenx < 0) screenx = 0;
-		}
-		else
-		{
-			if (rawx > othunder_ram[0xa038/2]) rawx = othunder_ram[0xa038/2];
-			rawx -= centrex;
-			screenx = rawx * othunder_ram[0xa066/2] + (((rawx * othunder_ram[0xa068/2]) & 0xffff0000) >> 16);
-			screenx += 0xa0;
-			if (screenx > 0x140) screenx = 0x140;
-		}
-		rawy = othunder_ram[0x284e/2];
-		centrey = othunder_ram[0xa04c/2];
-		if (rawy <= centrey)
-		{
-			rawy = centrey - rawy;
-			screeny = rawy * othunder_ram[0xa062/2] + (((rawy * othunder_ram[0xa064/2]) & 0xffff0000) >> 16);
-			screeny = 0x78 - screeny;
-			if (screeny < 0) screeny = 0;
-		}
-		else
-		{
-			if (rawy > othunder_ram[0xa040/2]) rawy = othunder_ram[0xa040/2];
-			rawy -= centrey;
-			screeny = rawy * othunder_ram[0xa06a/2] + (((rawy * othunder_ram[0xa06c/2]) & 0xffff0000) >> 16);
-			screeny += 0x78;
-			if (screeny > 0xf0) screeny = 0xf0;
-		}
-
-		// fudge y to show in centre of scope/hit sprite, note that screenx, screeny
-		// were confirmed to match those stored by the game at $82736, $82738
-		screeny += 2;
-	}
 	return 0;
 }
 

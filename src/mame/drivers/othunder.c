@@ -158,6 +158,12 @@ Notes:
 - The keyboard leds I'm turning on are actually the gun solenoid outputs, which
   would rattle the gun while firing.
 
+- BM, 060108 - The original flyer for this game has screenshots which clearly
+  show the background is 4 pixels to the left on several game stages (you can
+  see the edge of sprites overlapping past the right edge).  Therefore I
+  do not believe the TC0100SCN problem mentioned above actually exists.  The
+  current emulation appears to be accurate.
+
 
 Stephh's notes (based on the game M68000 code and some tests) :
 
@@ -222,21 +228,6 @@ TODO:
 - Schematics show a OBPRI output to control sprite priority. This doesn't seem
   to be used however, and isn't hooked up. See othunder_TC0220IOC_w().
 
-- TC0100SCN problem: text vs. bg0/1 offsets are wrong: first level
-  wants bg0 4 further right. Cut screens (all?) want bg0 4 pixels
-  further left. But the bg0 x scroll value is zero in both cases!
-  (and the code setting it is a CLR, so there's no doubt it's meant
-  to be).
-  There are no set bits in the TC0100SCN ctrl regs which might be
-  causing this. So I'm mystified. (Maybe it's related to game being
-  ORIENTATION_FLIP_X ??)
-
-BM, 060108 - The original flyer for this game has screenshots which clearly
-show the background is 4 pixels to the left on several game stages (you can
-see the edge of sprites overlapping past the right edge).  Therefore I
-do not believe the TC0100SCN problem mentioned above actually exists.  The
-current emulation appears to be accurate.
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -250,8 +241,6 @@ current emulation appears to be accurate.
 
 VIDEO_START( othunder );
 VIDEO_UPDATE( othunder );
-
-extern UINT16 *othunder_ram;
 
 
 /***********************************************************
@@ -515,7 +504,7 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 
 static ADDRESS_MAP_START( othunder_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(&othunder_ram)
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_TC0220IOC_r, othunder_TC0220IOC_w)
 //  AM_RANGE(0x090006, 0x090007) AM_WRITE(eeprom_w)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITE(MWA16_NOP)   /* ?? (keeps writing 0x77) */
