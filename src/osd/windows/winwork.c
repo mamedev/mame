@@ -12,6 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
+#include <tchar.h>
 
 #ifdef __GNUC__
 #include <stdint.h>
@@ -625,13 +626,13 @@ void osd_work_item_release(osd_work_item *item)
 
 static int effective_num_processors(void)
 {
-	char *procsoverride;
+	TCHAR *procsoverride;
 	SYSTEM_INFO info;
 	int numprocs = 0;
 
 	// if the OSDPROCESSORS environment variable is set, use that value if valid
-	procsoverride = getenv("OSDPROCESSORS");
-	if (procsoverride != NULL && sscanf(procsoverride, "%d", &numprocs) == 1 && numprocs > 0)
+	procsoverride = _tgetenv(_T("OSDPROCESSORS"));
+	if (procsoverride != NULL && _stscanf(procsoverride, _T("%d"), &numprocs) == 1 && numprocs > 0)
 		return numprocs;
 
 	// otherwise, fetch the info from the system
