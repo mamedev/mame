@@ -6,6 +6,24 @@
 #include "sound/sp0250.h"
 
 
+
+static void play_sample(const char *phonemes)
+{
+	if (strcmp(phonemes, " HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
+		sample_start(0, 42, 0);
+	else if (strcmp(phonemes, "BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
+		sample_start(0, 43, 0);
+	else if (strcmp(phonemes, "A2YHT LEH2FTTH") == 0) 					  /* Reactor - Eight left */
+		sample_start(0, 0, 0);
+	else if (strcmp(phonemes, "SI3KS DTYN LEH2FTTH") == 0) 				  /* Reactor - Sixteen left */
+		sample_start(0, 1, 0);
+	else if (strcmp(phonemes, "WO2RNYNG KO2R UH1NSDTABUH1L") == 0) 		  /* Reactor - Warning core unstable */
+		sample_start(0, 5, 0);
+	else if (strcmp(phonemes, "CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
+		sample_start(0, 7, 0);
+}
+
+
 WRITE8_HANDLER( gottlieb_sh_w )
 {
 	static int score_sample=7;
@@ -20,17 +38,13 @@ WRITE8_HANDLER( gottlieb_sh_w )
 			{
 				switch (data ^ 0x3f)
 				{
-					case 53:
-					case 54:
 					case 55:
 					case 56:
 					case 57:
-					case 58:
 					case 59:
 						sample_start(0,(data^0x3f)-53,0);
 						break;
 					case 31:
-						sample_start(0,7,0);
 						score_sample=7;
 						break;
 					case 39:
@@ -56,12 +70,6 @@ WRITE8_HANDLER( gottlieb_sh_w )
 						break;
 					case 23:
 						sample_start(0,41,0);
-						break;
-					case 28:
-						sample_start(0,42,0);
-						break;
-					case 36:
-						sample_start(0,43,0);
 						break;
 				}
 			}
@@ -103,7 +111,7 @@ static TIMER_CALLBACK( gottlieb_nmi_generate )
 	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static const char *const PhonemeTable[65] =
+static const char *const PhonemeTable[0x40] =
 {
  "EH3","EH2","EH1","PA0","DT" ,"A1" ,"A2" ,"ZH",
  "AH2","I3" ,"I2" ,"I1" ,"M"  ,"N"  ,"B"  ,"V",
@@ -112,8 +120,7 @@ static const char *const PhonemeTable[65] =
  "A"  ,"AY" ,"Y1" ,"UH3","AH" ,"P"  ,"O"  ,"I",
  "U"  ,"Y"  ,"T"  ,"R"  ,"E"  ,"W"  ,"AE" ,"AE1",
  "AW2","UH2","UH1","UH" ,"O2" ,"O1" ,"IU" ,"U1",
- "THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP",
- 0
+ "THV","TH" ,"ER" ,"EH" ,"E1" ,"AW" ,"PA1","STOP"
 };
 
 
@@ -121,7 +128,7 @@ WRITE8_HANDLER( gottlieb_speech_w )
 {
 	static int queue[100],pos;
 
-	data ^= 255;
+	data ^= 0xff;
 
 logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,PhonemeTable[data & 0x3f]);
 
@@ -129,22 +136,24 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 
 	if ((data & 0x3f) == 0x3f)
 	{
-#if 0
 		if (pos > 1)
 		{
 			int i;
-			char buf[200];
+			char phonemes[200];
 
-			buf[0] = 0;
+			phonemes[0] = 0;
 			for (i = 0;i < pos-1;i++)
 			{
-				if (queue[i] == 0x03 || queue[i] == 0x3e) strcat(buf," ");
-				else strcat(buf,PhonemeTable[queue[i]]);
+				if (queue[i] == 0x03 || queue[i] == 0x3e) strcat(phonemes," ");
+				else strcat(phonemes,PhonemeTable[queue[i]]);
 			}
 
-			popmessage(buf);
-		}
+			logerror("Votrax played '%s'\n", phonemes);
+			play_sample(phonemes);
+#if 0
+			popmessage("%s", phonemes);
 #endif
+		}
 
 		pos = 0;
 	}
@@ -158,43 +167,21 @@ WRITE8_HANDLER( gottlieb_speech_clock_DAC_w )
 
 
 
-    /* partial decoding takes place to minimize chip count in a 6502+6532
-       system, so both page 0 (direct page) and 1 (stack) access the same
-       128-bytes ram,
-       either with the first 128 bytes of the page or the last 128 bytes */
-
-UINT8 *riot_ram;
-
-READ8_HANDLER( riot_ram_r )
-{
-    return riot_ram[offset&0x7f];
-}
-
-WRITE8_HANDLER( riot_ram_w )
-{
-	riot_ram[offset&0x7f]=data;
-}
-
-static UINT8 riot_regs[32];
+UINT8 *gottlieb_riot_regs;
     /* lazy handling of the 6532's I/O, and no handling of timers at all */
 
 READ8_HANDLER( gottlieb_riot_r )
 {
-    switch (offset&0x1f) {
+    switch (offset) {
 	case 0: /* port A */
-		return soundlatch_r(offset) ^ 0xff;	/* invert command */
+		return soundlatch_r(0) ^ 0xff;	/* invert command */
 	case 2: /* port B */
 		return 0x40;    /* say that PB6 is 1 (test SW1 not pressed) */
 	case 5: /* interrupt register */
 		return 0x40;    /* say that edge detected on PA7 */
 	default:
-		return riot_regs[offset&0x1f];
+		return gottlieb_riot_regs[offset];
     }
-}
-
-WRITE8_HANDLER( gottlieb_riot_w )
-{
-    riot_regs[offset&0x1f]=data;
 }
 
 

@@ -155,6 +155,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 
 extern UINT8 *gottlieb_charram;
+extern UINT8 *gottlieb_riot_regs;
 
 extern WRITE8_HANDLER( gottlieb_videoram_w );
 extern WRITE8_HANDLER( gottlieb_charram_w );
@@ -162,27 +163,26 @@ extern WRITE8_HANDLER( gottlieb_video_outputs_w );
 extern WRITE8_HANDLER( usvsthem_video_outputs_w );
 extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
-extern VIDEO_START( gottlieb );
-extern VIDEO_UPDATE( gottlieb );
-extern VIDEO_START( vidvince );
+VIDEO_START( gottlieb );
+VIDEO_UPDATE( gottlieb );
+VIDEO_START( vidvince );
 
-extern WRITE8_HANDLER( gottlieb_sh_w );
+WRITE8_HANDLER( gottlieb_sh_w );
 
-extern UINT8 *riot_ram;
-extern READ8_HANDLER( riot_ram_r );
-extern READ8_HANDLER( gottlieb_riot_r );
-extern WRITE8_HANDLER( riot_ram_w );
-extern WRITE8_HANDLER( gottlieb_riot_w );
-extern WRITE8_HANDLER( gottlieb_speech_w );
-extern WRITE8_HANDLER( gottlieb_speech_clock_DAC_w );
-extern void gottlieb_sound_init(void);
-extern void stooges_sp0250_drq(int level);
-extern READ8_HANDLER( stooges_sound_input_r );
-extern WRITE8_HANDLER( stooges_8910_latch_w );
-extern WRITE8_HANDLER( stooges_sp0250_latch_w );
-extern WRITE8_HANDLER( stooges_sound_control_w );
-extern WRITE8_HANDLER( gottlieb_nmi_rate_w );
-extern WRITE8_HANDLER( gottlieb_cause_dac_nmi_w );
+READ8_HANDLER( riot_ram_r );
+READ8_HANDLER( gottlieb_riot_r );
+WRITE8_HANDLER( riot_ram_w );
+WRITE8_HANDLER( gottlieb_riot_w );
+WRITE8_HANDLER( gottlieb_speech_w );
+WRITE8_HANDLER( gottlieb_speech_clock_DAC_w );
+void gottlieb_sound_init(void);
+void stooges_sp0250_drq(int level);
+READ8_HANDLER( stooges_sound_input_r );
+WRITE8_HANDLER( stooges_8910_latch_w );
+WRITE8_HANDLER( stooges_sp0250_latch_w );
+WRITE8_HANDLER( stooges_sound_control_w );
+WRITE8_HANDLER( gottlieb_nmi_rate_w );
+WRITE8_HANDLER( gottlieb_cause_dac_nmi_w );
 
 
 static UINT8 *audiobuffer_region;
@@ -444,63 +444,38 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(riot_ram_r)
-	AM_RANGE(0x0200, 0x03ff) AM_READ(gottlieb_riot_r)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_ROM)
-			 /* A15 not decoded except in expansion socket */
-	AM_RANGE(0x8000, 0x81ff) AM_READ(riot_ram_r)
-	AM_RANGE(0x8200, 0x83ff) AM_READ(gottlieb_riot_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gottlieb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(riot_ram_w) AM_BASE(&riot_ram)
-	AM_RANGE(0x0200, 0x03ff) AM_WRITE(gottlieb_riot_w)
+static ADDRESS_MAP_START( gottlieb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	/* A15 not decoded except in expansion socket */
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0180) AM_RAM
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x01e0) AM_READWRITE(gottlieb_riot_r, MWA8_RAM) AM_BASE(&gottlieb_riot_regs)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(gottlieb_speech_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(gottlieb_speech_clock_DAC_w)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)
-			 /* A15 not decoded except in expansion socket */
-	AM_RANGE(0x8000, 0x81ff) AM_WRITE(riot_ram_w)
-	AM_RANGE(0x8200, 0x83ff) AM_WRITE(gottlieb_riot_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(gottlieb_speech_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(gottlieb_speech_clock_DAC_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stooges_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( stooges_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( stooges_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stooges_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(stooges_sound_input_r)	/* various signals */
-	AM_RANGE(0xa800, 0xa800) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( stooges_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( stooges_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(stooges_sp0250_latch_w)	/* speech chip. The game sends strings */
 									/* of 15 bytes (clocked by 4000). The chip also */
 									/* checks a DATA REQUEST bit in 6000. */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(stooges_sound_control_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ(stooges_sound_input_r)	/* various signals */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(stooges_8910_latch_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(gottlieb_nmi_rate_w)	/* the timer generates NMIs */
+	AM_RANGE(0xa800, 0xa800) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(gottlieb_cause_dac_nmi_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1550,9 +1525,9 @@ static MACHINE_DRIVER_START( gottlieb )
 	MDRV_CPU_PROGRAM_MAP(gottlieb_map,0)
 	MDRV_CPU_VBLANK_INT(gottlieb_interrupt,1)
 
-	MDRV_CPU_ADD_TAG("sound", M6502, 3579545/4)	/* the board can be set to /2 as well */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(gottlieb_sound_readmem,gottlieb_sound_writemem)
+	MDRV_CPU_ADD_TAG("sound", M6502, 3579545/4)	/* the board can be set to /2 as well */
+	MDRV_CPU_PROGRAM_MAP(gottlieb_sound_map,0)
 								/* NMIs are triggered by the Votrax SC-01 */
 	MDRV_SCREEN_REFRESH_RATE(61)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
@@ -1629,11 +1604,11 @@ static MACHINE_DRIVER_START( gottlieb2 )
 
 	MDRV_CPU_ADD_TAG("sound", M6502, 1000000)	/* 1 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(stooges_sound_readmem,stooges_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(stooges_sound_map,0)
 
 	MDRV_CPU_ADD_TAG("sound2", M6502, 1000000)	/* 1 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(stooges_sound2_readmem,stooges_sound2_writemem)
+	MDRV_CPU_PROGRAM_MAP(stooges_sound2_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(61)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1018)	/* frames per second, vblank duration */)
@@ -1707,10 +1682,8 @@ ROM_START( reactor )
 	ROM_LOAD( "rom0",         0xf000, 0x1000, CRC(55930aed) SHA1(37ed60386935741e8cc0b8750bfcdf6f54c1bf9e) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "snd1",         0xf000, 0x800, CRC(d958a0fd) SHA1(3c383076c68a929f96d844e89b09f3075f331906) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "snd2",         0xf800, 0x800, CRC(5dc86942) SHA1(a449fcfb25521a0e7523184518b5204dac56e5f8) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(d958a0fd) SHA1(3c383076c68a929f96d844e89b09f3075f331906) )
+	ROM_LOAD( "snd2",         0x7800, 0x800, CRC(5dc86942) SHA1(a449fcfb25521a0e7523184518b5204dac56e5f8) )
 
 	/* no gfx1 (RAM is used) */
 
@@ -1736,10 +1709,8 @@ ROM_START( mplanets )
 	/* note from f205v: my original Gottlieb PCB only sports one 2732 sound EPROM labeled "snd.3h"
     It contains the two joint roms you can find herefollowing, therefore the sound is identical */
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "snd1",         0xf000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "snd2",         0xf800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "snd1",         0x7000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
+	ROM_LOAD( "snd2",         0x7800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "bg0.e11-12",          0x0000, 0x1000, CRC(709aa24c) SHA1(95be072bf63320f4b44feaf88003ba011754e20f) )	/* chars */
@@ -1761,10 +1732,8 @@ ROM_START( mplanuk )
 	ROM_LOAD( "mpt_rom0.bin", 0xe000, 0x2000, CRC(a9e30ad2) SHA1(39d830dda92ab5a6dbb44943be92bca0464e64e0) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mpt_snd1.bin", 0xf000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "mpt_snd2.bin", 0xf800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "mpt_snd1.bin", 0x7000, 0x800, CRC(453193a1) SHA1(317ec81f71661eaa92624c0304a52b635dcd5613) )
+	ROM_LOAD( "mpt_snd2.bin", 0x7800, 0x800, CRC(f5ffc98f) SHA1(516e895df94942fc51f1b51eb9316d4296df82e7) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mpt_bg0.bin",  0x0000, 0x1000, CRC(709aa24c) SHA1(95be072bf63320f4b44feaf88003ba011754e20f) )	/* chars */
@@ -1784,10 +1753,8 @@ ROM_START( qbert )
 	ROM_LOAD( "qb-rom0.bin",  0xe000, 0x2000, CRC(8e318641) SHA1(7f8f66d1e6a7905e93cce07fc92e8801370b7194) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) )	/* chars */
@@ -1807,10 +1774,8 @@ ROM_START( qberta )
 	ROM_LOAD( "qrom_0.bin",  0xe000, 0x2000, CRC(2e7fad1b) SHA1(5c1feafe00c21ddddde67ab0093e847a5fc9ec2d) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) )	/* chars */
@@ -1830,10 +1795,8 @@ ROM_START( qbertjp )
 	ROM_LOAD( "qbj-rom0.bin", 0xe000, 0x2000, CRC(69679d5c) SHA1(996d45517d0c01a1952fead05dbe201dbb7dca35) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) )	/* chars */
@@ -1853,10 +1816,8 @@ ROM_START( myqbert )
 	ROM_LOAD( "mqb-rom0.bin",  0xe000, 0x2000, CRC(12a90cb2) SHA1(a33203aea79fe43d1233a16e3fdddaceac6e4a20) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mqb-snd1.bin",  0xf000, 0x800, CRC(e704b450) SHA1(d509f54658e9f0264b9ab865a6f36e5423a28904) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "mqb-snd2.bin",  0xf800, 0x800, CRC(c6a98bf8) SHA1(cc5b5bb5966f5d79226f1f665a3f9fc934f4ef7f) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "mqb-snd1.bin",  0x7000, 0x800, CRC(e704b450) SHA1(d509f54658e9f0264b9ab865a6f36e5423a28904) )
+	ROM_LOAD( "mqb-snd2.bin",  0x7800, 0x800, CRC(c6a98bf8) SHA1(cc5b5bb5966f5d79226f1f665a3f9fc934f4ef7f) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) ) /* chars */
@@ -1876,10 +1837,8 @@ ROM_START( qberttst )
 	ROM_LOAD( "qbtst0.bin",   0xe000, 0x2000, CRC(94c9f588) SHA1(f586bcd8e6762614bed634a007508abea071754c) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) )	/* chars */
@@ -1900,10 +1859,8 @@ ROM_START( qbtrktst)
 	ROM_LOAD( "gv103_t-ball-test_rom0_2764.c11c12",  0xe000, 0x2000, CRC(5d390cd2) SHA1(9031926a6f6179e340b67c3a7949062b4a75e3cf) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(7a9ba824) SHA1(12aa6df499eb6996ee35f56acac403ff6290f844) )	/* chars */
@@ -1924,8 +1881,7 @@ ROM_START( insector )
 	ROM_LOAD( "rom0",         0xe000, 0x2000, CRC(31cee24b) SHA1(3d21f5d530cc022f9633ad487e13a664848dd3e6) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "gv106s.bin",   0xf000, 0x1000, CRC(25bcc8bc) SHA1(adf401901f1479a5bffaed85135669b1133334b4) )
-      ROM_RELOAD(                 0x7000, 0x1000 ) /* A15 is not decoded */
+	ROM_LOAD( "gv106s.bin",   0x7000, 0x1000, CRC(25bcc8bc) SHA1(adf401901f1479a5bffaed85135669b1133334b4) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "bg0",          0x0000, 0x1000, CRC(0dc2037e) SHA1(aa3fdec7884aad782e430182326f5b113f59bf00) )	/* chars */
@@ -1946,8 +1902,7 @@ ROM_START( tylz )
 	ROM_LOAD( "tylz.n4",         0xe000, 0x2000, CRC(b2a15510) SHA1(15db4d1a2fb70d8111940246cd7a8ae06403cac5) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "tylz.f2",   0xf000, 0x1000, CRC(ebcedba9) SHA1(94aee8e32bdc80bbc5dc1423ca97597bdb9d808c) )
-	ROM_RELOAD(             0x7000, 0x1000 ) /* A15 is not decoded */
+	ROM_LOAD( "tylz.f2",   0x7000, 0x1000, CRC(ebcedba9) SHA1(94aee8e32bdc80bbc5dc1423ca97597bdb9d808c) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "tylz.m6",          0x0000, 0x1000, CRC(5e300b9b) SHA1(3b1e0371ba6d76ace893b92728c7a64b0e207d22) )	/* chars */
@@ -1971,7 +1926,7 @@ ROM_START( screwloo )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "drom1",        0xe000, 0x2000, CRC(ae965ade) SHA1(84a690cba8990fe6406b7cfbd6ea643a48446567) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(3719b0b5) SHA1(4f215ca2f15956374c4cd9484b6798f1c4d60fc7) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1992,10 +1947,8 @@ ROM_START( sqbert )
 	ROM_LOAD( "qb-rom0.bin",  0xe000, 0x2000, CRC(61260a7e) SHA1(e2028a453aa34aaffa2c465f64a963504315df3c) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qb-bg0.bin",   0x0000, 0x1000, CRC(c3118eef) SHA1(2c320eb8aae8841046ac3fca3bdaeeba778360e4) )	/* chars */
@@ -2016,10 +1969,8 @@ ROM_START( qbertqub )
 	ROM_LOAD( "qq-rom0.bin",  0xe000, 0x2000, CRC(8ddbe438) SHA1(31112d711af5d4039491e99a0be0c088b3272482) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0xf000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "qb-snd2.bin",  0xf800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qq-bg0.bin",   0x0000, 0x1000, CRC(050badde) SHA1(d049367e262cc6080e01d32227e86310166e00bb) )	/* chars */
@@ -2043,10 +1994,8 @@ ROM_START( krull )
 	ROM_LOAD( "rom0.bin",     0xe000, 0x2000, CRC(a466afae) SHA1(d691cbb46e8c3b71f9b1688d7fcef36df82aa854) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "snd1.bin",     0xe000, 0x1000, CRC(dd2b30b4) SHA1(f01cb64932493bf69d4fc75a7fa809ff6f6e4263) )
-	ROM_RELOAD(               0x6000, 0x1000 ) /* A15 is not decoded */
-	ROM_LOAD( "snd2.bin",     0xf000, 0x1000, CRC(8cab901b) SHA1(b886532828efc8cf442e2ee4ebbfe37acd489f62) )
-	ROM_RELOAD(               0x7000, 0x1000 ) /* A15 is not decoded */
+	ROM_LOAD( "snd1.bin",     0x6000, 0x1000, CRC(dd2b30b4) SHA1(f01cb64932493bf69d4fc75a7fa809ff6f6e4263) )
+	ROM_LOAD( "snd2.bin",     0x7000, 0x1000, CRC(8cab901b) SHA1(b886532828efc8cf442e2ee4ebbfe37acd489f62) )
 
 	/* no gfx1 (RAM is used) */
 
@@ -2068,7 +2017,7 @@ ROM_START( mach3 )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "m3drom1.bin",  0xf000, 0x1000, CRC(a6e29212) SHA1(a73aafc2efa99e9ae0aecbb6075a10f7178ac938) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "m3yrom1.bin",  0xf000, 0x1000, CRC(eddf8872) SHA1(29ed0d1828639849bab826b3e2ab4eefac45fd85) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2117,7 +2066,7 @@ ROM_START( usvsthem )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "usvsdrom.1",   0xe000, 0x2000, CRC(c0b5cab0) SHA1(b18e8fd9837bb52d6b3d86f2b652f6573c7cd3b3) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "usvsyrom.1",   0xe000, 0x2000, CRC(c3d245ca) SHA1(d281b139ae6c58e855b2914a24ca4bc5f8800681) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2143,7 +2092,7 @@ ROM_START( 3stooges )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "drom1",        0xe000, 0x2000, CRC(87a9fa10) SHA1(9c07837dce1384d6b51b716aa8ceeb5bc247a911) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "yrom2",        0xc000, 0x2000, CRC(90f9c940) SHA1(646dacc902cf235948ac9c064c92390e2764370b) )
 	ROM_LOAD( "yrom1",        0xe000, 0x2000, CRC(55f8ab30) SHA1(a6b6318f12fd4a1fab61b82cde33759da615d5b2) )
 
@@ -2164,8 +2113,8 @@ ROM_START( curvebal )
 	ROM_LOAD( "cb-rom-0.chp", 0xe000, 0x2000, CRC(401fc7e3) SHA1(86ca53cb6f1d88d5a95baa9524c6b42a1f7fc9c2) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "yrom.sbd",     0xe000, 0x1000, CRC(4c313d9b) SHA1(c61a8c827f4b199fdfb6ffc0bc6cca396c73625e) )
-	ROM_LOAD( "drom.sbd",     0xf000, 0x1000, CRC(cecece88) SHA1(4c6639f6f89f80b04b6ffbb5004ea2121e71f504) )
+	ROM_LOAD( "yrom.sbd",     0x6000, 0x1000, CRC(4c313d9b) SHA1(c61a8c827f4b199fdfb6ffc0bc6cca396c73625e) )
+	ROM_LOAD( "drom.sbd",     0x7000, 0x1000, CRC(cecece88) SHA1(4c6639f6f89f80b04b6ffbb5004ea2121e71f504) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "cb-bg-0.chp",  0x0000, 0x1000, CRC(d666a179) SHA1(3b9aca5272ae3f3d99ba55f5dc2db4eac82896bc) )
@@ -2190,7 +2139,7 @@ ROM_START( vidvince )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "gv132_drom_snd_2764.k2",        0xe000, 0x2000, CRC(18d9d72f) SHA1(985007f49885621eb96e86dc51812983bd113550) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "gv132_yrom2_snd_2764.k3",        0xc000, 0x2000, CRC(ff59f618) SHA1(c8b2cb1ab3b69f94dd6be87da8bdfc85c6ed8707) )
 	ROM_LOAD( "gv132_yrom1_snd_2764.n3",        0xe000, 0x2000, CRC(befa4b97) SHA1(424b40844629631a3f31cc12c61ac7000b5f3eb9) )
 
@@ -2215,7 +2164,7 @@ ROM_START( wizwarz )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "gv110_drom1_snd_2732.k2",0xf000, 0x1000, CRC(05ca79da) SHA1(f9e9b0de02d618aeb73f7218a49b41d7b94c24a4) )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 )	/* 64k for second sound cpu */
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "gv110_yrom1_snd_2732.n3",0xf000, 0x1000, CRC(1e3de643) SHA1(7717547c6c5b1ff178595c67f19265dc59130d90) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -2240,10 +2189,8 @@ ROM_START( argusg )
 	ROM_LOAD( "arg_rom0_2764.c11c12",     0xe000, 0x2000, CRC(e1906355) SHA1(4735370ff0dfe381358dfa41d82fab455ec3c016) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "arg_snd1_2716.u5",  0xf000, 0x800, CRC(3a6cf455) SHA1(0c701aa4d956947a101212b494b030cd2df5a2d6) )
-	ROM_RELOAD(               0x7000, 0x800 ) /* A15 is not decoded */
-	ROM_LOAD( "arg_snd2_2716.u6",  0xf800, 0x800, CRC(ddf32040) SHA1(61ae22faa013b29a5fbd9520073f172a98ca38ec) )
-	ROM_RELOAD(               0x7800, 0x800 ) /* A15 is not decoded */
+	ROM_LOAD( "arg_snd1_2716.u5",  0x7000, 0x800, CRC(3a6cf455) SHA1(0c701aa4d956947a101212b494b030cd2df5a2d6) )
+	ROM_LOAD( "arg_snd2_2716.u6",  0x7800, 0x800, CRC(ddf32040) SHA1(61ae22faa013b29a5fbd9520073f172a98ca38ec) )
 
 	/* no gfx1 (RAM is used) */
 
@@ -2262,7 +2209,7 @@ ROM_START( kngtmare )
 	ROM_LOAD( "gv112_rom0_2764.c11c12", 0xe000, 0x2000, CRC(620dc629) SHA1(0d94b7c50ef499eb9bb3f4986a8d29547181f7ea) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "gv112_snd",              0xf000, 0x1000, NO_DUMP )
+	ROM_LOAD( "gv112_snd",              0x7000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x8000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "gv112_fg3_2764.k7k8",    0x0000, 0x2000, CRC(d1886658) SHA1(2ba452acfb3548c02137c8732e1f7cf8f4c31275) )
@@ -2312,8 +2259,8 @@ GAME( 1983, mplanuk,  mplanets, gottlieb, mplanets, 0,        ROT270, "Gottlieb 
 GAME( 1983, krull,    0,        krull,    krull,    0,        ROT270, "Gottlieb", "Krull", 0 )
 GAME( 1983, kngtmare, 0,        gottlieb, kngtmare, 0,        ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
 GAME( 1983, sqbert,   0,        qbert,    qbert,    0,        ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, mach3,    0,        gottlieb2,mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
 GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", 0 )
+GAME( 1983, mach3,    0,        gottlieb2,mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
 GAME( 1983, screwloo, 0,        gottlieb2,screwloo, gottlieb, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1984, cobram3,  0,        gottlieb2,mach3,    laserdsc, ROT0,   "Data East","Cobra Command", GAME_NOT_WORKING )
 GAME( 1984, curvebal, 0,        gottlieb, curvebal, 0,        ROT270, "Mylstar", "Curve Ball", 0 )
