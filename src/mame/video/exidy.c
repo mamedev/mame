@@ -93,7 +93,7 @@ INTERRUPT_GEN( teetert_vblank_interrupt )
 {
 	/* standard stuff */
 	if (cpu_getiloops() == 0)
-		exidy_vblank_interrupt();
+		exidy_vblank_interrupt(machine, cpunum);
 
 	/* plus a pulse on the NMI line */
 	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);

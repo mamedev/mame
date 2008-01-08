@@ -312,7 +312,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
 		(*i8751_vblank_hook)();
-	irq4_line_hold();
+	irq4_line_hold(machine, cpunum);
 }
 
 

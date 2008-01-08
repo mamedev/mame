@@ -90,7 +90,7 @@ static MACHINE_RESET( atarigt )
 static void cage_irq_callback(int reason)
 {
 	if (reason)
-		atarigen_sound_int_gen();
+		atarigen_sound_int_gen(Machine, 0);
 	else
 		atarigen_sound_int_ack_w(0,0,0);
 }

@@ -913,14 +913,14 @@ static INTERRUPT_GEN( sqix_interrupt )
 {
 	/* highly suspicious... */
 	if (cpu_getiloops() <= 3)
-		nmi_line_assert();
+		nmi_line_assert(machine, cpunum);
 }
 
 static INTERRUPT_GEN( bootleg_interrupt )
 {
 	/* highly suspicious... */
 	if (cpu_getiloops() <= 3)
-		nmi_line_pulse();
+		nmi_line_pulse(machine, cpunum);
 }
 
 

@@ -50,7 +50,7 @@ static void update_interrupts(void)
 
 static TIMER_CALLBACK( irq_gen )
 {
-	atarigen_scanline_int_gen();
+	atarigen_scanline_int_gen(machine, 0);
 }
 
 

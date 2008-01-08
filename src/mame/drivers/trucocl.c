@@ -138,7 +138,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( trucocl_interrupt )
 {
-	irq0_line_hold();
+	irq0_line_hold(machine, cpunum);
 }
 
 static MACHINE_DRIVER_START( trucocl )

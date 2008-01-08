@@ -293,7 +293,7 @@ static INTERRUPT_GEN( shootout_interrupt )
 	if ( readinputport( 2 ) & 0xc0 ) {
 		if ( coin == 0 ) {
 			coin = 1;
-			nmi_line_pulse();
+			nmi_line_pulse(machine, cpunum);
 		}
 	} else
 		coin = 0;

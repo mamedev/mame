@@ -448,7 +448,7 @@ static INTERRUPT_GEN( raiden2_interrupt )
 	mainram[0x74c/2] = readinputport(4) | 0xff00;
 	mainram[0x74e/2] = 0xffff;
 
-	cpunum_set_input_line_and_vector(cpu_getactivecpu(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 

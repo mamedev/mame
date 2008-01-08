@@ -315,7 +315,7 @@ static UINT8 *qsound_sharedram1,*qsound_sharedram2;
 
 INTERRUPT_GEN( cps1_qsound_interrupt )
 {
-	cpunum_set_input_line(cpu_getactivecpu(), 2, HOLD_LINE);
+	cpunum_set_input_line(cpunum, 2, HOLD_LINE);
 }
 
 

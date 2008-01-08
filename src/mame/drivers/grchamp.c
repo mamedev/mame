@@ -92,21 +92,19 @@ static MACHINE_START( grchamp )
 
 static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 {
-	grchamp_state *state = Machine->driver_data;
-	int cpu = cpu_getactivecpu();
+	grchamp_state *state = machine->driver_data;
 
 	if (state->cpu0_out[0] & 0x01)
-		cpunum_set_input_line(cpu, 0, ASSERT_LINE);
+		cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 {
-	grchamp_state *state = Machine->driver_data;
-	int cpu = cpu_getactivecpu();
+	grchamp_state *state = machine->driver_data;
 
 	if (state->cpu1_out[4] & 0x01)
-		cpunum_set_input_line(cpu, 0, ASSERT_LINE);
+		cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
 }
 
 

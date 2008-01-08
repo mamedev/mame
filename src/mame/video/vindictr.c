@@ -191,7 +191,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen();
+				atarigen_scanline_int_gen(machine, 0);
 				break;
 
 			case 7:		/* /PFVS */

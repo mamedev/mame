@@ -1571,7 +1571,7 @@ static INTERRUPT_GEN( sys573_vblank )
 {
 	update_mode();
 
-	if( strcmp( Machine->gamedrv->name, "ddr2ml" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1583,7 +1583,7 @@ static INTERRUPT_GEN( sys573_vblank )
 		}
 	}
 
-	psx_vblank();
+	psx_vblank(machine, cpunum);
 }
 
 /*

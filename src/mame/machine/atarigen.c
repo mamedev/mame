@@ -271,7 +271,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen();
+	atarigen_scanline_int_gen(machine, 0);
 
 	/* set a new timer to go off at the same scan line next frame */
 	timer_adjust(scanline_interrupt_timer, video_screen_get_frame_period(param), param, attotime_zero);
@@ -774,7 +774,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 	/* set up the states and signal the sound interrupt to the main CPU */
 	atarigen_sound_to_cpu = param;
 	atarigen_sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen();
+	atarigen_sound_int_gen(machine, 0);
 }
 
 

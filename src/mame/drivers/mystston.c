@@ -219,7 +219,7 @@ static INTERRUPT_GEN( mystston_interrupt )
 		if (coin == 0)
 		{
 			coin = 1;
-			nmi_line_pulse();
+			nmi_line_pulse(machine, cpunum);
 			return;
 		}
 	}

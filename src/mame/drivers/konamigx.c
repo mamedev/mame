@@ -732,7 +732,7 @@ static INTERRUPT_GEN(konamigx_hbinterrupt)
 {
 	if (!cpu_getiloops())
 	{
-		konamigx_vbinterrupt_type4();
+		konamigx_vbinterrupt_type4(machine, cpunum);
 	}
 	else	// hblank
 	{

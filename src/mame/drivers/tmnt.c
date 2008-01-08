@@ -209,13 +209,13 @@ static INTERRUPT_GEN(cbj_interrupt)
 
 static INTERRUPT_GEN( punkshot_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) irq4_line_hold();
+	if (K052109_is_IRQ_enabled()) irq4_line_hold(machine, cpunum);
 
 }
 
 static INTERRUPT_GEN( lgtnfght_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) irq5_line_hold();
+	if (K052109_is_IRQ_enabled()) irq5_line_hold(machine, cpunum);
 
 }
 

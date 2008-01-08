@@ -200,7 +200,7 @@ static const res_net_info radarscp_grid_net_info =
 
 PALETTE_INIT( dkong2b)
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	rgb_t	*rgb;
 	int i;
 
@@ -229,7 +229,7 @@ PALETTE_INIT( dkong2b)
 
 PALETTE_INIT( dkong4b )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int i;
 	int r,g,b;
 
@@ -267,7 +267,7 @@ PALETTE_INIT( dkong4b )
 
 PALETTE_INIT( radarscp )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int i;
 	int r,g,b;
 
@@ -331,7 +331,7 @@ PALETTE_INIT( radarscp )
 
 PALETTE_INIT( radarsc1 )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	int i;
 	int r,g,b;
 
@@ -431,7 +431,7 @@ PALETTE_INIT( radarsc1 )
 
 PALETTE_INIT( dkong3 )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	rgb_t	*rgb;
 
 	rgb = compute_res_net_all(color_prom, &dkong3_decode_info, &dkong3_net_info);

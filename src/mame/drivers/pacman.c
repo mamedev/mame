@@ -395,7 +395,7 @@ static INTERRUPT_GEN( pacman_interrupt )
 {
 	/* always signal a normal VBLANK */
 	if (cpu_getiloops() == 0)
-		irq0_line_hold();
+		irq0_line_hold(machine, cpunum);
 
 	/* on other "VBLANK" opportunities, check to make sure the cheat is enabled */
 	/* and that the speedup button is pressed */
@@ -406,7 +406,7 @@ static INTERRUPT_GEN( pacman_interrupt )
 		{
 			UINT8 value = readinputport(portnum);
 			if ((value & 7) == 5 || (value & 6) == 2)
-				irq0_line_hold();
+				irq0_line_hold(machine, cpunum);
 		}
 	}
 }

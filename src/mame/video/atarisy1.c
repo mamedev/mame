@@ -415,7 +415,7 @@ static TIMER_CALLBACK( int3_callback )
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen();
+	atarigen_scanline_int_gen(machine, 0);
 
 	/* set a timer to turn it off */
 	timer_adjust(int3off_timer, video_screen_get_scan_period(0), 0, attotime_zero);

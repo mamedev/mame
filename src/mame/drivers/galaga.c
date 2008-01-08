@@ -713,7 +713,7 @@ static INTERRUPT_GEN( galaga_cpu3_nmi )
 {
 	/* see notes at the top of the driver */
 	if (cpu_getiloops() & 1)
-		nmi_line_pulse();
+		nmi_line_pulse(machine, cpunum);
 }
 
 static READ8_HANDLER( bosco_dsw_r )

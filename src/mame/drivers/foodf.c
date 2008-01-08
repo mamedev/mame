@@ -138,7 +138,7 @@ static TIMER_CALLBACK( scanline_update )
        mystery yet */
 
 	/* INT 1 is on 32V */
-	atarigen_scanline_int_gen();
+	atarigen_scanline_int_gen(machine, 0);
 
 	/* advance to the next interrupt */
 	scanline += 64;

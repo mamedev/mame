@@ -37,9 +37,9 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( cheekyms_interrupt )
 {
 	if (readinputport(2) & 1)	/* Coin */
-		nmi_line_pulse();
+		nmi_line_pulse(machine, cpunum);
 	else
-		irq0_line_hold();
+		irq0_line_hold(machine, cpunum);
 }
 
 

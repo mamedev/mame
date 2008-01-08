@@ -3351,7 +3351,7 @@ static MACHINE_DRIVER_START( ippatsu )
 	MDRV_CPU_IO_MAP(ippatsu_iomap,0)
 MACHINE_DRIVER_END
 
-static void suzume_irq(void)
+static INTERRUPT_GEN( suzume_irq )
 {
 	if ( suzume_bank & 0x40 )
 		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);

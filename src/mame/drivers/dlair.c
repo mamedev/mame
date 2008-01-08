@@ -307,7 +307,7 @@ static MACHINE_RESET( dlair )
  *
  *************************************/
 
-static void vblank_callback(void)
+static INTERRUPT_GEN( vblank_callback )
 {
 	/* update the laserdisc */
 	laserdisc_vsync(discinfo);

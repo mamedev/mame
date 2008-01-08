@@ -855,7 +855,7 @@ static MACHINE_RESET( mappy )
 
 static INTERRUPT_GEN( mappy_interrupt_1 )
 {
-	irq0_line_assert();	// this also checks if irq is enabled - IMPORTANT!
+	irq0_line_assert(machine, cpunum);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cpunum_set_input_line(0, 0, ASSERT_LINE);
 
 	namcoio_set_irq_line(0,PULSE_LINE);

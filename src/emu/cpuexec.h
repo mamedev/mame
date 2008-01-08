@@ -223,9 +223,9 @@ struct _cpu_config
 	int			flags;					/* flags; see #defines below */
 	int			clock;					/* in Hertz */
 	construct_map_t construct_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
-	void 		(*vblank_interrupt)(void);	/* for interrupts tied to VBLANK */
+	void 		(*vblank_interrupt)(running_machine *machine, int cpunum);	/* for interrupts tied to VBLANK */
 	int 		vblank_interrupts_per_frame;/* usually 1 */
-	void 		(*timed_interrupt)(void);	/* for interrupts not tied to VBLANK */
+	void 		(*timed_interrupt)(running_machine *machine, int cpunum);	/* for interrupts not tied to VBLANK */
 	attoseconds_t timed_interrupt_period;	/* period for periodic interrupts */
 	const void *reset_param;				/* parameter for cpu_reset */
 	const char *tag;

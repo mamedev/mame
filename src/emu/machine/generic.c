@@ -624,9 +624,8 @@ READ8_HANDLER( interrupt_enable_r )
     specified state on the active CPU
 -------------------------------------------------*/
 
-INLINE void irqn_line_set(int line, int state)
+INLINE void irqn_line_set(int cpunum, int line, int state)
 {
-	int cpunum = cpu_getactivecpu();
 	if (interrupt_enable[cpunum])
 		cpunum_set_input_line(cpunum, line, state);
 }
@@ -636,45 +635,45 @@ INLINE void irqn_line_set(int line, int state)
     NMI callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( nmi_line_pulse )		{ irqn_line_set(INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(INPUT_LINE_NMI, ASSERT_LINE); }
+INTERRUPT_GEN( nmi_line_pulse )		{ irqn_line_set(cpunum, INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(cpunum, INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 /*-------------------------------------------------
     IRQn callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(0, HOLD_LINE); }
-INTERRUPT_GEN( irq0_line_pulse )	{ irqn_line_set(0, PULSE_LINE); }
-INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(0, ASSERT_LINE); }
+INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(cpunum, 0, HOLD_LINE); }
+INTERRUPT_GEN( irq0_line_pulse )	{ irqn_line_set(cpunum, 0, PULSE_LINE); }
+INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(cpunum, 0, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(1, HOLD_LINE); }
-INTERRUPT_GEN( irq1_line_pulse )	{ irqn_line_set(1, PULSE_LINE); }
-INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(1, ASSERT_LINE); }
+INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(cpunum, 1, HOLD_LINE); }
+INTERRUPT_GEN( irq1_line_pulse )	{ irqn_line_set(cpunum, 1, PULSE_LINE); }
+INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(cpunum, 1, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(2, HOLD_LINE); }
-INTERRUPT_GEN( irq2_line_pulse )	{ irqn_line_set(2, PULSE_LINE); }
-INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(2, ASSERT_LINE); }
+INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(cpunum, 2, HOLD_LINE); }
+INTERRUPT_GEN( irq2_line_pulse )	{ irqn_line_set(cpunum, 2, PULSE_LINE); }
+INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(cpunum, 2, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(3, HOLD_LINE); }
-INTERRUPT_GEN( irq3_line_pulse )	{ irqn_line_set(3, PULSE_LINE); }
-INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(3, ASSERT_LINE); }
+INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(cpunum, 3, HOLD_LINE); }
+INTERRUPT_GEN( irq3_line_pulse )	{ irqn_line_set(cpunum, 3, PULSE_LINE); }
+INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(cpunum, 3, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(4, HOLD_LINE); }
-INTERRUPT_GEN( irq4_line_pulse )	{ irqn_line_set(4, PULSE_LINE); }
-INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(4, ASSERT_LINE); }
+INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(cpunum, 4, HOLD_LINE); }
+INTERRUPT_GEN( irq4_line_pulse )	{ irqn_line_set(cpunum, 4, PULSE_LINE); }
+INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(cpunum, 4, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(5, HOLD_LINE); }
-INTERRUPT_GEN( irq5_line_pulse )	{ irqn_line_set(5, PULSE_LINE); }
-INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(5, ASSERT_LINE); }
+INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(cpunum, 5, HOLD_LINE); }
+INTERRUPT_GEN( irq5_line_pulse )	{ irqn_line_set(cpunum, 5, PULSE_LINE); }
+INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(cpunum, 5, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(6, HOLD_LINE); }
-INTERRUPT_GEN( irq6_line_pulse )	{ irqn_line_set(6, PULSE_LINE); }
-INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(6, ASSERT_LINE); }
+INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(cpunum, 6, HOLD_LINE); }
+INTERRUPT_GEN( irq6_line_pulse )	{ irqn_line_set(cpunum, 6, PULSE_LINE); }
+INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(cpunum, 6, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(7, HOLD_LINE); }
-INTERRUPT_GEN( irq7_line_pulse )	{ irqn_line_set(7, PULSE_LINE); }
-INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(7, ASSERT_LINE); }
+INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(cpunum, 7, HOLD_LINE); }
+INTERRUPT_GEN( irq7_line_pulse )	{ irqn_line_set(cpunum, 7, PULSE_LINE); }
+INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(cpunum, 7, ASSERT_LINE); }
 
 
 

@@ -612,7 +612,7 @@ INLINE void cps3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 
 
-static offs_t cps3_opbase_handler(offs_t address);
+static OPBASE_HANDLER( cps3_opbase_handler );
 
 /* Encryption */
 
@@ -1392,7 +1392,7 @@ static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 
 
 
-static offs_t cps3_opbase_handler(offs_t address)
+static OPBASE_HANDLER( cps3_opbase_handler )
 {
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 

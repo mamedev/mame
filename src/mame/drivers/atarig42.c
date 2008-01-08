@@ -143,14 +143,14 @@ static WRITE16_HANDLER( mo_command_w )
  *
  *************************************/
 
-static offs_t sloop_opbase_handler(offs_t pc)
+static OPBASE_HANDLER( sloop_opbase_handler )
 {
-	if  (pc < 0x80000)
+	if  (address < 0x80000)
 	{
 		opcode_base = opcode_arg_base = (void *)sloop_base;
 		return (offs_t)-1;
 	}
-	return pc;
+	return address;
 }
 
 

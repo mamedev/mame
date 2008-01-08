@@ -203,7 +203,7 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (interrupt_enable & 4)
-				atarigen_scanline_int_gen();
+				atarigen_scanline_int_gen(machine, 0);
 	}
 }
 
@@ -215,15 +215,15 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
  *
  *************************************/
 
-static offs_t atarisy2_opbase_handler(offs_t pc)
+static OPBASE_HANDLER( atarisy2_opbase_handler )
 {
 	/* make sure slapstic area looks like ROM */
-	if (pc >= 0x8000 && pc < 0x8200)
+	if (address >= 0x8000 && address < 0x8200)
 	{
 		opcode_base = opcode_arg_base = (UINT8 *)atarisy2_slapstic - 0x8000;
 		return ~0;
 	}
-	return pc;
+	return address;
 }
 
 
@@ -256,7 +256,7 @@ static INTERRUPT_GEN( vblank_int )
 {
 	/* clock the VBLANK through */
 	if (interrupt_enable & 8)
-		atarigen_video_int_gen();
+		atarigen_video_int_gen(machine, cpunum);
 }
 
 

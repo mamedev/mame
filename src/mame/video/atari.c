@@ -1541,22 +1541,22 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 
 
 
-void a400_interrupt(void)
+INTERRUPT_GEN( a400_interrupt )
 {
 	generic_atari_interrupt(a800_handle_keyboard, 4);
 }
 
-void a800_interrupt(void)
+INTERRUPT_GEN( a800_interrupt )
 {
 	generic_atari_interrupt(a800_handle_keyboard, 4);
 }
 
-void a800xl_interrupt(void)
+INTERRUPT_GEN( a800xl_interrupt )
 {
 	generic_atari_interrupt(a800_handle_keyboard, 2);
 }
 
-void a5200_interrupt(void)
+INTERRUPT_GEN( a5200_interrupt )
 {
 	generic_atari_interrupt(a5200_handle_keypads, 4);
 }

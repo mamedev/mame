@@ -223,7 +223,7 @@ static MACHINE_RESET(supervisor_board)
 	output_set_digit_value(2, 0x00);
 }
 
-static void supervisor_board_check_coin_input(void)
+static INTERRUPT_GEN( supervisor_board_check_coin_input )
 {
 	if ( !readinputport(4) )
 	{

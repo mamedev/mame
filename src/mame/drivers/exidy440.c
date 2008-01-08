@@ -285,7 +285,7 @@ static INTERRUPT_GEN( main_interrupt )
 {
 	/* generate coin interrupts */
 	handle_coins();
-	exidy440_vblank_interrupt();
+	exidy440_vblank_interrupt(machine, cpunum);
 }
 
 

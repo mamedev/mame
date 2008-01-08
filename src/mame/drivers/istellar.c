@@ -321,7 +321,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 	cpunum_set_input_line(2, 0, ASSERT_LINE);
 
 	/* Only do the LDP's sync once */
-	if (cpu_getactivecpu() == 0)
+	if (cpunum == 0)
 		laserdisc_vsync(discinfo);
 }
 

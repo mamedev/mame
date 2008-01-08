@@ -355,7 +355,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 }
 
 
-static offs_t missile_opbase_handler(offs_t address)
+static OPBASE_HANDLER( missile_opbase_handler )
 {
 	/* offset accounts for lack of A15 decoding */
 	int offset = address & 0x8000;

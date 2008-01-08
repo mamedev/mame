@@ -604,9 +604,9 @@ static INTERRUPT_GEN( namcos11_vblank )
 	}
 	m_n_oldcoin = ~n_coin;
 
-	psx_vblank();
+	psx_vblank(machine, cpunum);
 
-	if( strcmp( Machine->gamedrv->name, "pocketrc" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "pocketrc" ) == 0 )
  	{
 		if( g_p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
 		{

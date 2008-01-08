@@ -395,7 +395,7 @@ static void tms_interrupt(int state)
    m68901_int_gen(GPIP4);
 }
 
-static void micro3d_vblank(void)
+static INTERRUPT_GEN( micro3d_vblank )
 {
    m68901_int_gen(GPIP7);
 }

@@ -38,13 +38,13 @@ static INTERRUPT_GEN( ssozumo_interrupt )
 		if (coin == 0)
 		{
 			coin = 1;
-			nmi_line_pulse();
+			nmi_line_pulse(machine, cpunum);
 			return;
 		}
 	}
 	else coin = 0;
 
-	irq0_line_hold();
+	irq0_line_hold(machine, cpunum);
 }
 
 

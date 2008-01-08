@@ -48,7 +48,7 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(readinputport(0) & 0x800))
-		atarigen_scanline_int_gen();
+		atarigen_scanline_int_gen(machine, 0);
 }
 
 

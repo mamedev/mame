@@ -165,7 +165,7 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen();
+		atarigen_6502_irq_gen(machine, 0);
 	else
 		atarigen_6502_irq_ack_r(0);
 }

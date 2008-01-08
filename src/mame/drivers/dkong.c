@@ -357,7 +357,7 @@ static MACHINE_START( hunchbkd )
 	UINT8	*p = memory_region(REGION_USER1);
 	int i;
 
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	machine_start_dkong2b(machine);
 	dma8257_config(0, &hb_dma);
@@ -375,7 +375,7 @@ static MACHINE_START( hunchbkd )
 
 static MACHINE_START( radarscp )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	machine_start_dkong2b(machine);
 	state->hardware_type = HARDWARE_TRS02;
@@ -383,7 +383,7 @@ static MACHINE_START( radarscp )
 
 static MACHINE_START( radarsc1 )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	machine_start_dkong2b(machine);
 	state->hardware_type = HARDWARE_TRS01;

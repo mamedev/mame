@@ -1221,7 +1221,7 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 					if (machine->drv->cpu[cpunum].vblank_interrupt && !cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 					{
 						cpuintrf_push_context(cpunum);
-						(*machine->drv->cpu[cpunum].vblank_interrupt)();
+						(*machine->drv->cpu[cpunum].vblank_interrupt)(machine, cpunum);
 						cpuintrf_pop_context();
 					}
 
@@ -1303,7 +1303,7 @@ static TIMER_CALLBACK( cpu_timedintcallback )
 	if (machine->drv->cpu[param].timed_interrupt && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		cpuintrf_push_context(param);
-		(*machine->drv->cpu[param].timed_interrupt)();
+		(*machine->drv->cpu[param].timed_interrupt)(machine, param);
 		cpuintrf_pop_context();
 	}
 }

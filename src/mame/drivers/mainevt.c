@@ -38,7 +38,7 @@ VIDEO_START( dv );
 static INTERRUPT_GEN( mainevt_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		irq0_line_hold();
+		irq0_line_hold(machine, cpunum);
 }
 
 
@@ -52,7 +52,7 @@ static WRITE8_HANDLER( dv_nmienable_w )
 static INTERRUPT_GEN( dv_interrupt )
 {
 	if (nmi_enable)
-		nmi_line_pulse();
+		nmi_line_pulse(machine, cpunum);
 }
 
 

@@ -652,10 +652,10 @@ extern int atari_frame_counter;
 extern VIDEO_START( atari );
 extern VIDEO_UPDATE( atari );
 
-void a400_interrupt(void);
-void a800_interrupt(void);
-void a800xl_interrupt(void);
-void a5200_interrupt(void);
+INTERRUPT_GEN( a400_interrupt );
+INTERRUPT_GEN( a800_interrupt );
+INTERRUPT_GEN( a800xl_interrupt );
+INTERRUPT_GEN( a5200_interrupt );
 
 /*----------- defined in drivers/maxaflex.c -----------*/
 

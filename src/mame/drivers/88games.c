@@ -28,7 +28,7 @@ VIDEO_UPDATE( 88games );
 static INTERRUPT_GEN( k88games_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		irq0_line_hold();
+		irq0_line_hold(machine, cpunum);
 }
 
 static int zoomreadroms;

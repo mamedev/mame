@@ -1147,7 +1147,7 @@ static WRITE32_HANDLER( bank_coh1000t_w )
 static INTERRUPT_GEN( coh1000t_vblank )
 {
 	/* kludge: stop dropping into test mode on bootup */
-	if( strcmp( Machine->gamedrv->name, "raystorm" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "raystorm" ) == 0 )
 	{
 		if( g_p_n_psxram[ 0x1b358 / 4 ] == 0x34020001 )
 		{
@@ -1155,49 +1155,49 @@ static INTERRUPT_GEN( coh1000t_vblank )
 		}
 	}
 	/* kludge: stop dropping into test mode on bootup */
-	if( strcmp( Machine->gamedrv->name, "raystorj" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "raystorj" ) == 0 )
 	{
 		if( g_p_n_psxram[ 0x1b358 / 4 ] == 0x34020001 )
 		{
 			g_p_n_psxram[ 0x1b358 / 4 ] = 0x34020000;
 		}
 	}
-	if(strcmp( Machine->gamedrv->name, "gdarius" ) == 0 )
+	if(strcmp( machine->gamedrv->name, "gdarius" ) == 0 )
 	{
 		if (psxreadbyte(0x165d53) == 0)
 		{
 			psxwritebyte(0x165d53, 1);
 		}
 	}
-	if(strcmp( Machine->gamedrv->name, "gdariusb" ) == 0 )
+	if(strcmp( machine->gamedrv->name, "gdariusb" ) == 0 )
 	{
 		if (psxreadbyte(0x165dfb) == 0)
 		{
 			psxwritebyte(0x165dfb, 1);
 		}
 	}
-	if(strcmp( Machine->gamedrv->name, "gdarius2" ) == 0 )
+	if(strcmp( machine->gamedrv->name, "gdarius2" ) == 0 )
 	{
 		if (psxreadbyte(0x16be3b) == 0)
 		{
 			psxwritebyte(0x16be3b, 1);
 		}
 	}
-	if(strcmp( Machine->gamedrv->name, "ftimpcta" ) == 0 )
+	if(strcmp( machine->gamedrv->name, "ftimpcta" ) == 0 )
 	{
 		if (psxreadbyte(0x0f8997) == 0)
 		{
 			psxwritebyte(0x0f8997, 1);
 		}
 	}
-	if(strcmp( Machine->gamedrv->name, "ftimpact" ) == 0 ) /* WRONG!!!- Copied from ftimpcta */
+	if(strcmp( machine->gamedrv->name, "ftimpact" ) == 0 ) /* WRONG!!!- Copied from ftimpcta */
 	{
 		if (psxreadbyte(0x0f8997) == 0) /* WRONG!!!- Copied from ftimpcta */
 		{
 			psxwritebyte(0x0f8997, 1); /* WRONG!!!- Copied from ftimpcta */
 		}
 	}
-	psx_vblank();
+	psx_vblank(machine, cpunum);
 }
 
 static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
@@ -2652,7 +2652,7 @@ static MACHINE_RESET( coh1002v )
 static INTERRUPT_GEN( coh1002v_vblank )
 {
 	/* kludge: to stop dropping into test mode on bootup */
-	if(strcmp( Machine->gamedrv->name, "sncwgltd" ) == 0 )
+	if(strcmp( machine->gamedrv->name, "sncwgltd" ) == 0 )
 	{
 		if (psxreadbyte(0x0db422) == 0)
 		{
@@ -2663,7 +2663,7 @@ static INTERRUPT_GEN( coh1002v_vblank )
 			psxwritebyte(0x0db423, 1);
 		}
 	}
-	psx_vblank();
+	psx_vblank(machine, cpunum);
 }
 
 static MACHINE_DRIVER_START( coh1002v )

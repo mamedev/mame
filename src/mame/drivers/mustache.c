@@ -186,7 +186,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
 
-static void assert_irq(void)
+static INTERRUPT_GEN( assert_irq )
 {
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_CYCLES(14288, 0), NULL, 0, clear_irq_cb);

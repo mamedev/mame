@@ -254,9 +254,9 @@ SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE
 static INTERRUPT_GEN( deadang_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(cpu_getactivecpu(), 0, HOLD_LINE, 0xc8/4);	/* VBL */
+		cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 	else
-		cpunum_set_input_line_and_vector(cpu_getactivecpu(), 0, HOLD_LINE, 0xc4/4);	/* VBL */
+		cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc4/4);	/* VBL */
 }
 
 /* Machine Drivers */

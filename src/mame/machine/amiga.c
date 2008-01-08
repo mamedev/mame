@@ -357,7 +357,7 @@ MACHINE_RESET( amiga )
 
 INTERRUPT_GEN( amiga_scanline_callback )
 {
-	int scanline = Machine->screen[0].height - 1 - cpu_getiloops();
+	int scanline = machine->screen[0].height - 1 - cpu_getiloops();
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)

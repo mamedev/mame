@@ -508,8 +508,8 @@ static const struct K054539interface k054539_interface =
 
 static INTERRUPT_GEN( xmen_interrupt )
 {
-	if (cpu_getiloops() == 0) irq5_line_hold();
-	else irq3_line_hold();
+	if (cpu_getiloops() == 0) irq5_line_hold(machine, cpunum);
+	else irq3_line_hold(machine, cpunum);
 }
 
 static MACHINE_START( xmen )
@@ -569,7 +569,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{
-		irq5_line_hold();
+		irq5_line_hold(machine, cpunum);
 
 
 	}
@@ -577,7 +577,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 	{
 //      if (xmen_irqenabled&0x04)
 //      {
-			irq3_line_hold();
+			irq3_line_hold(machine, cpunum);
 //          xmen_current_frame = 0x0000;
 
 //      }

@@ -220,5 +220,5 @@ INTERRUPT_GEN( timeplt_interrupt )
 	memcpy(sprite_mux_buffer_2 + scanline * spriteram_size,spriteram_2,spriteram_size);
 
 	if (scanline == 255)
-		nmi_line_pulse();
+		nmi_line_pulse(machine, cpunum);
 }

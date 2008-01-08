@@ -948,12 +948,12 @@ static const struct upd7759_interface upd7759_interface =
 
 static INTERRUPT_GEN( CPUA_interrupt )
 {
-	if (CPUA_IRQ_ENABLE) cpunum_set_input_line(cpu_getactivecpu(), 5, HOLD_LINE);
+	if (CPUA_IRQ_ENABLE) cpunum_set_input_line(cpunum, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( CPUB_interrupt )
 {
-	if (CPUB_IRQ_ENABLE) cpunum_set_input_line(cpu_getactivecpu(), 5, HOLD_LINE);
+	if (CPUB_IRQ_ENABLE) cpunum_set_input_line(cpunum, 5, HOLD_LINE);
 }
 
 /* Machine Drivers */

@@ -16,7 +16,7 @@
 
 #include "memory.h"
 
-#define INTERRUPT_GEN(func)		void func(void)
+#define INTERRUPT_GEN(func)		void func(running_machine *machine, int cpunum)
 
 
 
