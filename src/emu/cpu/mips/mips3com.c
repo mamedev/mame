@@ -92,8 +92,12 @@ static const memory_handlers le_memory =
     structure based on the configured type
 -------------------------------------------------*/
 
-void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
+size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int), void *memory)
 {
+	/* if no memory, return the amount needed */
+	if (memory == NULL)
+		return config->icache + config->dcache + (sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
+
 	/* initialize the state */
 	memset(mips, 0, sizeof(*mips));
 
@@ -113,15 +117,16 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int in
 		mips->memory = le_memory;
 
 	/* allocate memory */
-	mips->icache = auto_malloc(config->icache);
-	mips->dcache = auto_malloc(config->dcache);
-	mips->tlb_table = auto_malloc(sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
+	mips->icache = memory;
+	mips->dcache = (void *)((UINT8 *)memory + config->icache);
+	mips->tlb_table = (void *)((UINT8 *)memory + config->dcache);
 
 	/* allocate a timer for the compare interrupt */
 	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
 
 	/* reset the state */
 	mips3com_reset(mips);
+	return 0;
 }
 
 

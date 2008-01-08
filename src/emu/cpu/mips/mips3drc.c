@@ -161,6 +161,7 @@ static void mips3c_reset(void);
 ***************************************************************************/
 
 static mips3_regs mips3;
+static size_t allocatedsize;
 
 
 
@@ -181,15 +182,17 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
 		mips3fe_describe			/* callback to describe a single instruction */
 	};
+	size_t memsize = mips3com_init(NULL, flavor, bigendian, index, clock, config, irqcallback, NULL);
 
 	/* allocate a cache and memory for the core data in a single block */
-	mips3.core = osd_alloc_executable(CACHE_SIZE + sizeof(*mips3.core));
+	allocatedsize = CACHE_SIZE + sizeof(*mips3.core) + memsize;
+	mips3.core = osd_alloc_executable(allocatedsize);
 	if (mips3.core == NULL)
-		fatalerror("Unable to allocate cache of size %d\n", CACHE_SIZE);
-	mips3.cache = (UINT8 *)(mips3.core + 1);
+		fatalerror("Unable to allocate cache of size %d\n", allocatedsize);
+	mips3.cache = (UINT8 *)(mips3.core + 1) + memsize;
 
 	/* initialize the core */
-	mips3com_init(mips3.core, flavor, bigendian, index, clock, config, irqcallback);
+	mips3com_init(mips3.core, flavor, bigendian, index, clock, config, irqcallback, mips3.core + 1);
 #if COMPARE_AGAINST_C
 	mips3c_init(flavor, bigendian, index, clock, config, irqcallback);
 #endif
@@ -1246,7 +1249,9 @@ static const memory_handlers override_memory =
 
 static void mips3c_init(mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
 {
-	mips3com_init(&c_mips3.core, flavor, bigendian, index, clock, config, irqcallback);
+	size_t memsize = mips3com_init(&c_mips3.core, flavor, bigendian, index, clock, config, irqcallback, NULL);
+	void *memory = auto_malloc(memsize);
+	mips3com_init(&c_mips3.core, flavor, bigendian, index, clock, config, irqcallback, memory);
 	mips3.orighandler = mips3.core->memory;
 	mips3.core->memory = override_memory;
 	c_mips3.core.memory = override_memory;
