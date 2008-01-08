@@ -5,58 +5,11 @@
 
 
 UINT16 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
+UINT32 m72_raster_irq_position;
 static UINT16 *m72_spriteram;
-static INT32 splitline;
 static tilemap *fg_tilemap,*bg_tilemap;
-static int xadjust;
-static int bgadjust;
 static INT32 scrollx1,scrolly1,scrollx2,scrolly2;
 static INT32 video_off;
-
-static int irqbase;
-
-MACHINE_RESET( m72 )
-{
-	irqbase = 0x20;
-	machine_reset_m72_sound(machine);
-}
-
-MACHINE_RESET( xmultipl )
-{
-	irqbase = 0x08;
-	machine_reset_m72_sound(machine);
-}
-
-MACHINE_RESET( kengo )
-{
-	irqbase = 0x18;
-	machine_reset_m72_sound(machine);
-}
-
-INTERRUPT_GEN( m72_interrupt )
-{
-	int line = 255 - cpu_getiloops();
-
-	if (line == 255)	/* vblank */
-	{
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, irqbase+0);
-	}
-	else
-	{
-		if (line != splitline - 128)
-			return;
-
-		video_screen_update_partial(0, line + 128);
-
-		/* this is used to do a raster effect and show the score display at
-           the bottom of the screen or other things. The line where the
-           interrupt happens is programmable (and the interrupt can be triggered
-           multiple times, by changing the interrupt line register in the
-           interrupt handler).
-         */
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, irqbase+2);
-	}
-}
 
 
 
@@ -156,7 +109,7 @@ static TILEMAP_MAPPER( majtitle_scan_rows )
 
 static void register_savestate(void)
 {
-	state_save_register_global(splitline);
+	state_save_register_global(m72_raster_irq_position);
 	state_save_register_global(video_off);
 	state_save_register_global(scrollx1);
 	state_save_register_global(scrolly1);
@@ -183,8 +136,11 @@ VIDEO_START( m72 )
 
 	memset(m72_spriteram,0,spriteram_size);
 
-	xadjust = 0;
-	bgadjust = 0;
+	tilemap_set_scrolldx(fg_tilemap,0,0);
+	tilemap_set_scrolldy(fg_tilemap,-128,16);
+
+	tilemap_set_scrolldx(bg_tilemap,0,0);
+	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
 	register_savestate();
 }
@@ -206,8 +162,11 @@ VIDEO_START( rtype2 )
 
 	memset(m72_spriteram,0,spriteram_size);
 
-	xadjust = -4;
-	bgadjust = 0;
+	tilemap_set_scrolldx(fg_tilemap,4,0);
+	tilemap_set_scrolldy(fg_tilemap,-128,16);
+
+	tilemap_set_scrolldx(bg_tilemap,4,0);
+	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
 	register_savestate();
 }
@@ -216,7 +175,8 @@ VIDEO_START( poundfor )
 {
 	video_start_rtype2(machine);
 
-	xadjust = -6;
+	tilemap_set_scrolldx(fg_tilemap,6,0);
+	tilemap_set_scrolldx(bg_tilemap,6,0);
 }
 
 
@@ -241,8 +201,11 @@ VIDEO_START( majtitle )
 
 	memset(m72_spriteram,0,spriteram_size);
 
-	xadjust = -4;
-	bgadjust = 0;
+	tilemap_set_scrolldx(fg_tilemap,4,0);
+	tilemap_set_scrolldy(fg_tilemap,-128,16);
+
+	tilemap_set_scrolldx(bg_tilemap,4,0);
+	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
 	register_savestate();
 }
@@ -264,8 +227,11 @@ VIDEO_START( hharry )
 
 	memset(m72_spriteram,0,spriteram_size);
 
-	xadjust = -4;
-	bgadjust = -2;
+	tilemap_set_scrolldx(fg_tilemap,4,0);
+	tilemap_set_scrolldy(fg_tilemap,-128,16);
+
+	tilemap_set_scrolldx(bg_tilemap,6,0);
+	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
 	register_savestate();
 }
@@ -338,7 +304,7 @@ WRITE16_HANDLER( m72_videoram2_w )
 
 WRITE16_HANDLER( m72_irq_line_w )
 {
-	COMBINE_DATA(&splitline);
+	COMBINE_DATA(&m72_raster_irq_position);
 }
 
 WRITE16_HANDLER( m72_scrollx1_w )
@@ -447,7 +413,7 @@ static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const
 		code = m72_spriteram[offs+1];
 		color = m72_spriteram[offs+2] & 0x0f;
 		sx = -256+(m72_spriteram[offs+3] & 0x3ff);
-		sy = 512-(m72_spriteram[offs+0] & 0x1ff);
+		sy = 384-(m72_spriteram[offs+0] & 0x1ff);
 		flipx = m72_spriteram[offs+2] & 0x0800;
 		flipy = m72_spriteram[offs+2] & 0x0400;
 
@@ -458,7 +424,7 @@ static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const
 		if (flip_screen)
 		{
 			sx = 512 - 16*w - sx;
-			sy = 512 - 16*h - sy;
+			sy = 284 - 16*h - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -499,7 +465,7 @@ static void majtitle_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		code = spriteram16_2[offs+1];
 		color = spriteram16_2[offs+2] & 0x0f;
 		sx = -256+(spriteram16_2[offs+3] & 0x3ff);
-		sy = 512-(spriteram16_2[offs+0] & 0x1ff);
+		sy = 384-(spriteram16_2[offs+0] & 0x1ff);
 		flipx = spriteram16_2[offs+2] & 0x0800;
 		flipy = spriteram16_2[offs+2] & 0x0400;
 
@@ -510,7 +476,7 @@ static void majtitle_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		if (flip_screen)
 		{
 			sx = 512 - 16*w - sx;
-			sy = 512 - 16*h - sy;
+			sy = 256 - 16*h - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
@@ -545,10 +511,10 @@ VIDEO_UPDATE( m72 )
 		return 0;
 	}
 
-	tilemap_set_scrollx(fg_tilemap,0,scrollx1 + xadjust);
+	tilemap_set_scrollx(fg_tilemap,0,scrollx1);
 	tilemap_set_scrolly(fg_tilemap,0,scrolly1);
 
-	tilemap_set_scrollx(bg_tilemap,0,scrollx2 + xadjust + bgadjust);
+	tilemap_set_scrollx(bg_tilemap,0,scrollx2);
 	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
@@ -570,7 +536,7 @@ VIDEO_UPDATE( majtitle )
 		return 0;
 	}
 
-	tilemap_set_scrollx(fg_tilemap,0,scrollx1 + xadjust);
+	tilemap_set_scrollx(fg_tilemap,0,scrollx1);
 	tilemap_set_scrolly(fg_tilemap,0,scrolly1);
 
 	if (majtitle_rowscroll)
@@ -578,12 +544,12 @@ VIDEO_UPDATE( majtitle )
 		tilemap_set_scroll_rows(bg_tilemap,512);
 		for (i = 0;i < 512;i++)
 			tilemap_set_scrollx(bg_tilemap,(i+scrolly2)&0x1ff,
-					256 + majtitle_rowscrollram[i] + xadjust);
+					256 + majtitle_rowscrollram[i]);
 	}
 	else
 	{
 		tilemap_set_scroll_rows(bg_tilemap,1);
-		tilemap_set_scrollx(bg_tilemap,0,256 + scrollx2 + xadjust);
+		tilemap_set_scrollx(bg_tilemap,0,256 + scrollx2);
 	}
 	tilemap_set_scrolly(bg_tilemap,0,scrolly2);
 

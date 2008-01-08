@@ -7,12 +7,7 @@
 /*----------- defined in video/m72.c -----------*/
 
 extern UINT16 *m72_videoram1,*m72_videoram2,*majtitle_rowscrollram;
-
-MACHINE_RESET( m72 );
-MACHINE_RESET( xmultipl );
-MACHINE_RESET( kengo );
-
-INTERRUPT_GEN( m72_interrupt );
+extern UINT32 m72_raster_irq_position;
 
 VIDEO_START( m72 );
 VIDEO_START( rtype2 );
