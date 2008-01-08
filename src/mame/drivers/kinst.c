@@ -134,7 +134,7 @@ Notes:
 
 
 /* constants */
-#define MASTER_CLOCK	50000000
+#define MASTER_CLOCK	XTAL_50MHz
 
 
 /* local variables */
@@ -188,9 +188,6 @@ static MACHINE_START( kinst )
 
 static MACHINE_RESET( kinst )
 {
-	/* keep the DCS held in reset at startup */
-	dcs_reset_w(1);
-
 	/* reset the IDE controller */
 	ide_controller_reset(0);
 
