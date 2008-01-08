@@ -15,7 +15,9 @@ Year + Game                 By              CPUs        Sound Chips
 
 Notes:
 
-- unknown CPU speeds (affect game timing)
+- unknown CPU speeds (affect game timing), currently using same as the
+  Rock-Ola games of the same area.  Lot of similarities between these
+  hardware.  The music ends at the perfect time with this clock speed
 - Lasso: fire button auto-repeats on high score entry screen (real behavior?)
 
 ***************************************************************************/
@@ -34,52 +36,41 @@ static UINT8 coins_old;
 
 static INTERRUPT_GEN( lasso_interrupt )
 {
-	UINT8 coins_new;
-
 	// VBlank
 	if (cpu_getiloops() == 0)
-	{
 		cpunum_set_input_line(0, 0, HOLD_LINE);
-		return;
+	else
+	{
+		UINT8 coins_new;
+
+		// Coins
+		coins_new = ~readinputport(3) & 0x30;
+
+		if ( ((coins_new & 0x10) && !(coins_old & 0x10)) ||
+			 ((coins_new & 0x20) && !(coins_old & 0x20)) )
+			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+
+		coins_old = coins_new;
 	}
-
-	// Coins
-	coins_new = ~readinputport(3) & 0x30;
-
-	if ( ((coins_new & 0x10) && !(coins_old & 0x10)) ||
-		 ((coins_new & 0x20) && !(coins_old & 0x20)) )
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-
-	coins_old = coins_new;
 }
 
-
-/* Shared RAM between Main CPU and sub CPU */
-
-static UINT8 *lasso_sharedram;
-
-static READ8_HANDLER( lasso_sharedram_r )
-{
-	return lasso_sharedram[offset];
-}
-static WRITE8_HANDLER( lasso_sharedram_w )
-{
-	lasso_sharedram[offset] = data;
-}
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
 
+static UINT8 *lasso_chip_data;
+
+
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line( 1, 0, PULSE_LINE );
+	cpunum_set_input_line(1, 0, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line( 1, 0, HOLD_LINE );
+	cpunum_set_input_line(1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -88,204 +79,152 @@ static READ8_HANDLER( sound_status_r )
 	return 0x03;
 }
 
-static UINT8 lasso_chip_data;
-
-static WRITE8_HANDLER( sound_data_w )
-{
-	lasso_chip_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
-}
-
 static WRITE8_HANDLER( sound_select_w )
 {
+	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
+
 	if (~data & 0x01)	/* chip #0 */
-		SN76496_0_w(0,lasso_chip_data);
+		SN76496_0_w(0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		SN76496_1_w(0,lasso_chip_data);
+		SN76496_1_w(0, to_write);
 }
 
 static MACHINE_START( lasso )
 {
 	/* register for saving */
 	state_save_register_global(coins_old);
-	state_save_register_global(lasso_chip_data);
-}
-
-static MACHINE_START( pinbo )
-{
-	/* register for saving */
-	state_save_register_global(coins_old);
 }
 
 
-static ADDRESS_MAP_START( lasso_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0c7f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(lasso_sharedram_r	)
-	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
-	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
-	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lasso_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x0c00, 0x0c7f) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(lasso_sharedram_w	)
+static ADDRESS_MAP_START( lasso_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(MRA8_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(MRA8_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(lasso_backcolor_w	)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x1806, 0x1806) AM_WRITE(MWA8_NOP)	// games uses 'lsr' to read port
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( chameleo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x10ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
 	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
-	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
+	AM_RANGE(0x1806, 0x1806) AM_READWRITE(input_port_2_r, MWA8_NOP)  /* game uses 'lsr' to read port */
 	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
-	AM_RANGE(0x2000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chameleo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x0c00, 0x0fff) AM_WRITE(MWA8_RAM)	//
-	AM_RANGE(0x1000, 0x107f) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
-	AM_RANGE(0x1080, 0x10ff) AM_WRITE(MWA8_RAM)
+
+static ADDRESS_MAP_START( lasso_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x5000, 0x7fff) AM_ROM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_chip_data)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(REGION_CPU2, 0x7000)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( lasso_coprocessor_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&lasso_bitmap_ram)
+	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( chameleo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(MRA8_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(MRA8_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x107f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x1080, 0x10ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(lasso_backcolor_w	)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(lasso_video_control_w)
-	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( wwjgtin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x10ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
 	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
 	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
 	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
-	AM_RANGE(0x5000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xfffa, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0xa000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wwjgtin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+
+static ADDRESS_MAP_START( chameleo_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_chip_data)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(REGION_CPU2, 0x7000)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( wwjgtin_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(MRA8_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(MRA8_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(lasso_backcolor_w	)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(wwjgtin_video_control_w	)
-	AM_RANGE(0x1c00, 0x1c03) AM_WRITE(wwjgtin_lastcolor_w)
+	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
+	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
+	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
+	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x1c00, 0x1c03) AM_WRITE(MWA8_RAM) AM_BASE(&wwjgtin_last_colors)
 	AM_RANGE(0x1c04, 0x1c07) AM_WRITE(MWA8_RAM) AM_BASE(&wwjgtin_track_scroll)
-	AM_RANGE(0x5000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xfffa, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x8000)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pinbo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
-	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( lasso_coprocessor_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lasso_coprocessor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_sharedram)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_bitmap_ram)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( lasso_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x5000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lasso_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x5000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(sound_data_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( chameleo_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
-	AM_RANGE(0xfffa, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( chameleo_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(sound_data_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xfffa, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( wwjgtin_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x5000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(sound_data_w)
+static ADDRESS_MAP_START( wwjgtin_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(MWA8_RAM) AM_BASE(&lasso_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0xfffa, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pinbo_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( pinbo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(MRA8_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(MRA8_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
+	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_0_r)
+	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_1_r)
+	AM_RANGE(0x1806, 0x1806) AM_READ(input_port_2_r)
+	AM_RANGE(0x1807, 0x1807) AM_READ(input_port_3_r)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0xbfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0xa000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pinbo_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+
+static ADDRESS_MAP_START( pinbo_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pinbo_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0x08, 0x08) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pinbo_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pinbo_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(MWA8_NOP)	/* ??? */
+	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(soundlatch_r, MWA8_NOP) /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITE(MWA8_NOP)	/* ??? */
 ADDRESS_MAP_END
 
@@ -628,22 +567,18 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( lasso )
+static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6502, 2000000)	/* 2 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(lasso_readmem,lasso_writemem)
-	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
+	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16)	/* guess */
+	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
 
 	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(lasso_sound_readmem,lasso_sound_writemem)
-
-	MDRV_CPU_ADD_TAG("blitter", M6502, 2000000)	/* 2 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_readmem,lasso_coprocessor_writemem)
+	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(lasso)
@@ -670,17 +605,24 @@ static MACHINE_DRIVER_START( lasso )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( lasso )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(base)
+	MDRV_CPU_ADD_TAG("blitter", M6502, 11289000/16)	/* guess */
+	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map,0)
+
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( chameleo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(lasso)
+	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(chameleo_readmem,chameleo_writemem)
+	MDRV_CPU_PROGRAM_MAP(chameleo_main_map,0)
 
 	MDRV_CPU_MODIFY("audio")
-	MDRV_CPU_PROGRAM_MAP(chameleo_sound_readmem,chameleo_sound_writemem)
-
-	MDRV_CPU_REMOVE("blitter")
+	MDRV_CPU_PROGRAM_MAP(chameleo_audio_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(chameleo)
@@ -689,14 +631,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wwjgtin )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(lasso)
+	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(wwjgtin_readmem,wwjgtin_writemem)
+	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map,0)
 
 	MDRV_CPU_MODIFY("audio")
-	MDRV_CPU_PROGRAM_MAP(lasso_sound_readmem,wwjgtin_sound_writemem)
-
-	MDRV_CPU_REMOVE("blitter")
+	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
@@ -716,17 +656,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pinbo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(lasso)
+	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(chameleo_readmem,pinbo_writemem)
+	MDRV_CPU_PROGRAM_MAP(pinbo_main_map,0)
 
 	MDRV_CPU_REPLACE("audio", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(pinbo_sound_readmem,pinbo_sound_writemem)
-	MDRV_CPU_IO_MAP(pinbo_sound_readport,pinbo_sound_writeport)
-
-	MDRV_CPU_REMOVE("blitter")
-
-	MDRV_MACHINE_START(pinbo)
+	MDRV_CPU_PROGRAM_MAP(pinbo_audio_map,0)
+	MDRV_CPU_IO_MAP(pinbo_audio_io_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(pinbo)
@@ -734,46 +670,42 @@ static MACHINE_DRIVER_START( pinbo )
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MDRV_VIDEO_START(pinbo)
-	MDRV_VIDEO_UPDATE(chameleo)
+	MDRV_VIDEO_UPDATE(pinbo)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("sn76489.1")
 	MDRV_SOUND_REMOVE("sn76489.2")
 
 	MDRV_SOUND_ADD(AY8910, 1250000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 
 	MDRV_SOUND_ADD(AY8910, 1250000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_DRIVER_END
 
 
 ROM_START( lasso )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "wm3",       0x8000, 0x2000, CRC(f93addd6) SHA1(b0a1b263874da8608c3bab4e8785358e2aa19c2e) )
-	ROM_RELOAD(            0xc000, 0x2000)
-	ROM_LOAD( "wm4",       0xe000, 0x2000, CRC(77719859) SHA1(d206b6af9a567f70d69624866ae9973652527065) )
-	ROM_RELOAD(            0xa000, 0x2000)
+	ROM_LOAD( "wm4",       0xa000, 0x2000, CRC(77719859) SHA1(d206b6af9a567f70d69624866ae9973652527065) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "wmc",       0x5000, 0x1000, CRC(8b4eb242) SHA1(55ada50036abbaa10799f37e35254e6ff70ee947) )
 	ROM_LOAD( "wmb",       0x6000, 0x1000, CRC(4658bcb9) SHA1(ecc83ef99edbe5f69a884a142478ff0f56edba12) )
 	ROM_LOAD( "wma",       0x7000, 0x1000, CRC(2e7de3e9) SHA1(665a89b9914ca16b9c08b751e142cf7320aaf793) )
-	ROM_RELOAD(            0xf000, 0x1000 )
 
-	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* 6502 code (lasso image blitter) */
-	ROM_LOAD( "wm5",       0xf000, 0x1000, CRC(7dc3ff07) SHA1(46aaa9186940d06fd679a573330e9ad3796aa647) )
-	ROM_RELOAD(            0x8000, 0x1000)
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "wm5",       0x8000, 0x1000, CRC(7dc3ff07) SHA1(46aaa9186940d06fd679a573330e9ad3796aa647) )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "wm1",       0x0000, 0x0800, CRC(7db77256) SHA1(d12305bdfb6923c32982982a5544ae9bd8dbc2cb) )	/* Tiles   */
-	ROM_CONTINUE(          0x1000, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(          0x0800, 0x0800             )
-	ROM_CONTINUE(          0x1800, 0x0800             )
-	ROM_LOAD( "wm2",       0x2000, 0x0800, CRC(9e7d0b6f) SHA1(c82be332209bf7331718e51926004fe9aa6f5ebd) )	/* 2nd bitplane */
-	ROM_CONTINUE(          0x3000, 0x0800             )
-	ROM_CONTINUE(          0x2800, 0x0800             )
-	ROM_CONTINUE(          0x3800, 0x0800             )
+	ROM_LOAD( "wm1",       0x0000, 0x0800, CRC(7db77256) SHA1(d12305bdfb6923c32982982a5544ae9bd8dbc2cb) )
+	ROM_CONTINUE(          0x1000, 0x0800 )
+	ROM_CONTINUE(          0x0800, 0x0800 )
+	ROM_CONTINUE(          0x1800, 0x0800 )
+	ROM_LOAD( "wm2",       0x2000, 0x0800, CRC(9e7d0b6f) SHA1(c82be332209bf7331718e51926004fe9aa6f5ebd) )
+	ROM_CONTINUE(          0x3000, 0x0800 )
+	ROM_CONTINUE(          0x2800, 0x0800 )
+	ROM_CONTINUE(          0x3800, 0x0800 )
 
 	ROM_REGION( 0x40, REGION_PROMS, 0 )
 	ROM_LOAD( "82s123.69", 0x0000, 0x0020, CRC(1eabb04d) SHA1(3dc5b407bc1b1dea77337b4e913f1e945386d5c9) )
@@ -781,61 +713,57 @@ ROM_START( lasso )
 ROM_END
 
 ROM_START( chameleo )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )		/* 6502 Code (Main CPU) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "chamel4.bin", 0x4000, 0x2000, CRC(97379c47) SHA1(b29fa2318d4260c29fc95d22a461173dc960ad1a) )
 	ROM_LOAD( "chamel5.bin", 0x6000, 0x2000, CRC(0a2cadfd) SHA1(1ccc43accd60ca15b8f03ed1c3fda76a840a2bb1) )
 	ROM_LOAD( "chamel6.bin", 0x8000, 0x2000, CRC(b023c354) SHA1(0424ecf81ac9f0e055f9ff01cf0bd6d5c9ff866c) )
 	ROM_LOAD( "chamel7.bin", 0xa000, 0x2000, CRC(a5a03375) SHA1(c1eac4596c2bda419f3c513ecd3df9fae49ae159) )
-	ROM_RELOAD(              0xe000, 0x2000             )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* 6502 Code (Sound CPU) */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "chamel3.bin", 0x1000, 0x1000, CRC(52eab9ec) SHA1(554c34134e3af970262da89fe82feeaf47fd30bc) )
 	ROM_LOAD( "chamel2.bin", 0x6000, 0x1000, CRC(81dcc49c) SHA1(7e1b4351775f9c140a43f531da8b055271b7b28c) )
 	ROM_LOAD( "chamel1.bin", 0x7000, 0x1000, CRC(96031d3b) SHA1(a143b54b98891423d355e0ba08c3b88d70fa0e23) )
-	ROM_RELOAD(              0xf000, 0x1000             )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "chamel8.bin", 0x0800, 0x0800, CRC(dc67916b) SHA1(8b3fad0d5d42925b44e51df7f88ea4b6a8dbb4f6) )	/* Tiles   */
-	ROM_CONTINUE(            0x1800, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(            0x0000, 0x0800             )
-	ROM_CONTINUE(            0x1000, 0x0800             )
-	ROM_LOAD( "chamel9.bin", 0x2800, 0x0800, CRC(6b559bf1) SHA1(b7b8b8bccbd88ea868e2d3ccb42513615120d8e6) )	/* 2nd bitplane */
-	ROM_CONTINUE(            0x3800, 0x0800             )
-	ROM_CONTINUE(            0x2000, 0x0800             )
-	ROM_CONTINUE(            0x3000, 0x0800             )
+	ROM_LOAD( "chamel8.bin", 0x0800, 0x0800, CRC(dc67916b) SHA1(8b3fad0d5d42925b44e51df7f88ea4b6a8dbb4f6) )
+	ROM_CONTINUE(            0x1800, 0x0800 )
+	ROM_CONTINUE(            0x0000, 0x0800 )
+	ROM_CONTINUE(            0x1000, 0x0800 )
+	ROM_LOAD( "chamel9.bin", 0x2800, 0x0800, CRC(6b559bf1) SHA1(b7b8b8bccbd88ea868e2d3ccb42513615120d8e6) )
+	ROM_CONTINUE(            0x3800, 0x0800 )
+	ROM_CONTINUE(            0x2000, 0x0800 )
+	ROM_CONTINUE(            0x3000, 0x0800 )
 
-	ROM_REGION( 0x40, REGION_PROMS, ROMREGION_DISPOSE )	/* Colors */
+	ROM_REGION( 0x40, REGION_PROMS, ROMREGION_DISPOSE )
 	ROM_LOAD( "chambprm.bin", 0x0000, 0x0020, CRC(e3ad76df) SHA1(cd115cece4931bfcfc0f60147b942998a5c21bf7) )
 	ROM_LOAD( "chamaprm.bin", 0x0020, 0x0020, CRC(c7063b54) SHA1(53baed3806848207ab3a8fafd182cabec3be4b04) )
 ROM_END
 
 ROM_START( wwjgtin )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )		/* 6502 Code (Main CPU) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic2.6", 0x4000, 0x4000, CRC(744ba45b) SHA1(cccf3e2dd3c27bf54d2abd366cd9a044311aa031) )
 	ROM_LOAD( "ic5.5", 0x8000, 0x4000, CRC(af751614) SHA1(fc0f0a3967524b1743a182c1da4f9b0c3097a157) )
-	ROM_RELOAD(        0xc000, 0x4000             )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* 6502 Code (Sound CPU) */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ic59.9", 0x4000, 0x4000, CRC(2ecb4d98) SHA1(d5b0d447b24f64fca452dc13e6ff95b090fce2d7) )
-	ROM_RELOAD(         0xc000, 0x4000             )
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ic81.7", 0x0000, 0x0800, CRC(a27f1a63) SHA1(3c770424bd4996f648687afce4aecea252da83a7) )	/* Tiles   */
-	ROM_CONTINUE(       0x2000, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(       0x0800, 0x0800             )
-	ROM_CONTINUE(       0x2800, 0x0800             )
-	ROM_CONTINUE(       0x1000, 0x0800             )
-	ROM_CONTINUE(       0x3000, 0x0800             )
-	ROM_CONTINUE(       0x1800, 0x0800             )
-	ROM_CONTINUE(       0x3800, 0x0800             )
-	ROM_LOAD( "ic82.8", 0x4000, 0x0800, CRC(ea2862b3) SHA1(f7604fd324560c54311c35f806a17e30e018032a) )	/* 2nd bitplane */
-	ROM_CONTINUE(       0x6000, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(       0x4800, 0x0800             )
-	ROM_CONTINUE(       0x6800, 0x0800             )
-	ROM_CONTINUE(       0x5000, 0x0800             )
-	ROM_CONTINUE(       0x7000, 0x0800             )
-	ROM_CONTINUE(       0x5800, 0x0800             )
-	ROM_CONTINUE(       0x7800, 0x0800             )
+	ROM_LOAD( "ic81.7", 0x0000, 0x0800, CRC(a27f1a63) SHA1(3c770424bd4996f648687afce4aecea252da83a7) )
+	ROM_CONTINUE(       0x2000, 0x0800 )
+	ROM_CONTINUE(       0x0800, 0x0800 )
+	ROM_CONTINUE(       0x2800, 0x0800 )
+	ROM_CONTINUE(       0x1000, 0x0800 )
+	ROM_CONTINUE(       0x3000, 0x0800 )
+	ROM_CONTINUE(       0x1800, 0x0800 )
+	ROM_CONTINUE(       0x3800, 0x0800 )
+	ROM_LOAD( "ic82.8", 0x4000, 0x0800, CRC(ea2862b3) SHA1(f7604fd324560c54311c35f806a17e30e018032a) )
+	ROM_CONTINUE(       0x6000, 0x0800 )
+	ROM_CONTINUE(       0x4800, 0x0800 )
+	ROM_CONTINUE(       0x6800, 0x0800 )
+	ROM_CONTINUE(       0x5000, 0x0800 )
+	ROM_CONTINUE(       0x7000, 0x0800 )
+	ROM_CONTINUE(       0x5800, 0x0800 )
+	ROM_CONTINUE(       0x7800, 0x0800 )
 
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "ic47.3", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) )	// 1xxxxxxxxxxxx = 0xFF
@@ -851,32 +779,30 @@ ROM_START( wwjgtin )
 ROM_END
 
 ROM_START( photof )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )		/* 6502 Code (Main CPU) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "ic2.bin", 0x4000, 0x4000, CRC(4d960b54) SHA1(fe6c4943cbf9a9c79a2fd1dd86bb6e1f414b3c8d) )
 	ROM_LOAD( "ic6.bin", 0x8000, 0x4000, CRC(a4ad21dc) SHA1(55b3ecdf80b4a384a0d9932756330fb3021502f8) )
-	ROM_RELOAD(        0xc000, 0x4000             )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* 6502 Code (Sound CPU) */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "ic59.bin", 0x4000, 0x4000, CRC(2ecb4d98) SHA1(d5b0d447b24f64fca452dc13e6ff95b090fce2d7) )
-	ROM_RELOAD(         0xc000, 0x4000             )
 
 	ROM_REGION( 0x8000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ic81.bin", 0x0000, 0x0800, CRC(0f170253) SHA1(e8b09cf4e9bae6c762ff325a559fb860a80133aa) )	/* Tiles   */
-	ROM_CONTINUE(       0x2000, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(       0x0800, 0x0800             )
-	ROM_CONTINUE(       0x2800, 0x0800             )
-	ROM_CONTINUE(       0x1000, 0x0800             )
-	ROM_CONTINUE(       0x3000, 0x0800             )
-	ROM_CONTINUE(       0x1800, 0x0800             )
-	ROM_CONTINUE(       0x3800, 0x0800             )
-	ROM_LOAD( "ic82.bin", 0x4000, 0x0800, CRC(c4cadee9) SHA1(46cc0ecc3642c432625c0d131aa31fec2e060d2f) )	/* 2nd bitplane */
-	ROM_CONTINUE(       0x6000, 0x0800             )	/* Sprites */
-	ROM_CONTINUE(       0x4800, 0x0800             )
-	ROM_CONTINUE(       0x6800, 0x0800             )
-	ROM_CONTINUE(       0x5000, 0x0800             )
-	ROM_CONTINUE(       0x7000, 0x0800             )
-	ROM_CONTINUE(       0x5800, 0x0800             )
-	ROM_CONTINUE(       0x7800, 0x0800             )
+	ROM_LOAD( "ic81.bin", 0x0000, 0x0800, CRC(0f170253) SHA1(e8b09cf4e9bae6c762ff325a559fb860a80133aa) )
+	ROM_CONTINUE(       0x2000, 0x0800 )
+	ROM_CONTINUE(       0x0800, 0x0800 )
+	ROM_CONTINUE(       0x2800, 0x0800 )
+	ROM_CONTINUE(       0x1000, 0x0800 )
+	ROM_CONTINUE(       0x3000, 0x0800 )
+	ROM_CONTINUE(       0x1800, 0x0800 )
+	ROM_CONTINUE(       0x3800, 0x0800 )
+	ROM_LOAD( "ic82.bin", 0x4000, 0x0800, CRC(c4cadee9) SHA1(46cc0ecc3642c432625c0d131aa31fec2e060d2f) )
+	ROM_CONTINUE(       0x6000, 0x0800 )
+	ROM_CONTINUE(       0x4800, 0x0800 )
+	ROM_CONTINUE(       0x6800, 0x0800 )
+	ROM_CONTINUE(       0x5000, 0x0800 )
+	ROM_CONTINUE(       0x7000, 0x0800 )
+	ROM_CONTINUE(       0x5800, 0x0800 )
+	ROM_CONTINUE(       0x7800, 0x0800 )
 
 	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "3-ic47.bin", 0x0000, 0x2000, CRC(40594c59) SHA1(94533be8e267d9aa5bcdd52b45f6974436d3fed5) )	// 1xxxxxxxxxxxx = 0xFF
@@ -897,38 +823,37 @@ ROM_START( pinbo )
 	ROM_LOAD( "rom3.e7",     0x6000, 0x2000, CRC(1cd1b3bd) SHA1(388ea72568f5bfd39856d872415327a2afaf7fad) )
 	ROM_LOAD( "rom4.h7",     0x8000, 0x2000, CRC(ba043fa7) SHA1(ef3d67b6dab5c82035c58290879a3ca969a0256d) )
 	ROM_LOAD( "rom5.j7",     0xa000, 0x2000, CRC(e71046c4) SHA1(f49133544c98df5f3e1a1d2ae92e17261b1504fc) )
-	ROM_RELOAD(              0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64K for sound */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "rom1.s8",     0x0000, 0x2000, CRC(ca45a1be) SHA1(d0b2d8f1e6d01b60cba83d2bd458a57548549b4b) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) )	/* tiles   */
-	ROM_CONTINUE(       	 0x2000, 0x0800             )	/* sprites */
-	ROM_CONTINUE(       	 0x0800, 0x0800             )
-	ROM_CONTINUE(       	 0x2800, 0x0800             )
-	ROM_CONTINUE(       	 0x1000, 0x0800             )
-	ROM_CONTINUE(       	 0x3000, 0x0800             )
-	ROM_CONTINUE(       	 0x1800, 0x0800             )
-	ROM_CONTINUE(       	 0x3800, 0x0800             )
-	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )	/* 2nd bitplane */
-	ROM_CONTINUE(       	 0x6000, 0x0800             )
-	ROM_CONTINUE(       	 0x4800, 0x0800             )
-	ROM_CONTINUE(       	 0x6800, 0x0800             )
-	ROM_CONTINUE(       	 0x5000, 0x0800             )
-	ROM_CONTINUE(       	 0x7000, 0x0800             )
-	ROM_CONTINUE(       	 0x5800, 0x0800             )
-	ROM_CONTINUE(       	 0x7800, 0x0800             )
+	ROM_CONTINUE(       	 0x2000, 0x0800 )
+	ROM_CONTINUE(       	 0x0800, 0x0800 )
+	ROM_CONTINUE(       	 0x2800, 0x0800 )
+	ROM_CONTINUE(       	 0x1000, 0x0800 )
+	ROM_CONTINUE(       	 0x3000, 0x0800 )
+	ROM_CONTINUE(       	 0x1800, 0x0800 )
+	ROM_CONTINUE(       	 0x3800, 0x0800 )
+	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )
+	ROM_CONTINUE(       	 0x6000, 0x0800 )
+	ROM_CONTINUE(       	 0x4800, 0x0800 )
+	ROM_CONTINUE(       	 0x6800, 0x0800 )
+	ROM_CONTINUE(       	 0x5000, 0x0800 )
+	ROM_CONTINUE(       	 0x7000, 0x0800 )
+	ROM_CONTINUE(       	 0x5800, 0x0800 )
+	ROM_CONTINUE(       	 0x7800, 0x0800 )
 	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) )	/* 3rd bitplane */
-	ROM_CONTINUE(       	 0xa000, 0x0800             )
-	ROM_CONTINUE(       	 0x8800, 0x0800             )
-	ROM_CONTINUE(       	 0xa800, 0x0800             )
-	ROM_CONTINUE(       	 0x9000, 0x0800             )
-	ROM_CONTINUE(       	 0xb000, 0x0800             )
-	ROM_CONTINUE(       	 0x9800, 0x0800             )
-	ROM_CONTINUE(       	 0xb800, 0x0800             )
+	ROM_CONTINUE(       	 0xa000, 0x0800 )
+	ROM_CONTINUE(       	 0x8800, 0x0800 )
+	ROM_CONTINUE(       	 0xa800, 0x0800 )
+	ROM_CONTINUE(       	 0x9000, 0x0800 )
+	ROM_CONTINUE(       	 0xb000, 0x0800 )
+	ROM_CONTINUE(       	 0x9800, 0x0800 )
+	ROM_CONTINUE(       	 0xb800, 0x0800 )
 
-	ROM_REGION( 0x00300, REGION_PROMS, 0 ) /* Color PROMs */
+	ROM_REGION( 0x00300, REGION_PROMS, 0 )
 	ROM_LOAD( "red.l10",     0x0000, 0x0100, CRC(e6c9ba52) SHA1(6ea96f9bd71de6181d675b0f2d59a8c5e1be5aa3) )
 	ROM_LOAD( "green.k10",   0x0100, 0x0100, CRC(1bf2d335) SHA1(dcb074d3de939dfc652743e25bc66bd6fbdc3289) )
 	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) )
@@ -940,38 +865,37 @@ ROM_START( pinboa )
 	ROM_LOAD( "6.bin",       0x6000, 0x2000, CRC(f80b204c) SHA1(ee9b4ae1d8ea2fc062022fcfae67df87ed7aff41) )
 	ROM_LOAD( "5.bin",       0x8000, 0x2000, CRC(c57fe503) SHA1(11b7371c07c9b2c73ab61420a2cc609653c48d37) )
 	ROM_LOAD( "4.bin",       0xa000, 0x2000, CRC(d632b598) SHA1(270a5a790a66eaf3d90bf8081ab144fd1af9db3d) )
-	ROM_RELOAD(              0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64K for sound */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "8.bin",       0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) )	/* tiles   */
-	ROM_CONTINUE(       	 0x2000, 0x0800             )	/* sprites */
-	ROM_CONTINUE(       	 0x0800, 0x0800             )
-	ROM_CONTINUE(       	 0x2800, 0x0800             )
-	ROM_CONTINUE(       	 0x1000, 0x0800             )
-	ROM_CONTINUE(       	 0x3000, 0x0800             )
-	ROM_CONTINUE(       	 0x1800, 0x0800             )
-	ROM_CONTINUE(       	 0x3800, 0x0800             )
-	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )	/* 2nd bitplane */
-	ROM_CONTINUE(       	 0x6000, 0x0800             )
-	ROM_CONTINUE(       	 0x4800, 0x0800             )
-	ROM_CONTINUE(       	 0x6800, 0x0800             )
-	ROM_CONTINUE(       	 0x5000, 0x0800             )
-	ROM_CONTINUE(       	 0x7000, 0x0800             )
-	ROM_CONTINUE(       	 0x5800, 0x0800             )
-	ROM_CONTINUE(       	 0x7800, 0x0800             )
+	ROM_CONTINUE(       	 0x2000, 0x0800 )
+	ROM_CONTINUE(       	 0x0800, 0x0800 )
+	ROM_CONTINUE(       	 0x2800, 0x0800 )
+	ROM_CONTINUE(       	 0x1000, 0x0800 )
+	ROM_CONTINUE(       	 0x3000, 0x0800 )
+	ROM_CONTINUE(       	 0x1800, 0x0800 )
+	ROM_CONTINUE(       	 0x3800, 0x0800 )
+	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )
+	ROM_CONTINUE(       	 0x6000, 0x0800 )
+	ROM_CONTINUE(       	 0x4800, 0x0800 )
+	ROM_CONTINUE(       	 0x6800, 0x0800 )
+	ROM_CONTINUE(       	 0x5000, 0x0800 )
+	ROM_CONTINUE(       	 0x7000, 0x0800 )
+	ROM_CONTINUE(       	 0x5800, 0x0800 )
+	ROM_CONTINUE(       	 0x7800, 0x0800 )
 	ROM_LOAD( "2.bin",       0x8000, 0x0800, CRC(33cac92e) SHA1(55d4ff3ae9c9519a59bd6021a53584c873b4d327) ) /* 3rd bitplane */
-	ROM_CONTINUE(       	 0xa000, 0x0800             )
-	ROM_CONTINUE(       	 0x8800, 0x0800             )
-	ROM_CONTINUE(       	 0xa800, 0x0800             )
-	ROM_CONTINUE(       	 0x9000, 0x0800             )
-	ROM_CONTINUE(       	 0xb000, 0x0800             )
-	ROM_CONTINUE(       	 0x9800, 0x0800             )
-	ROM_CONTINUE(       	 0xb800, 0x0800             )
+	ROM_CONTINUE(       	 0xa000, 0x0800 )
+	ROM_CONTINUE(       	 0x8800, 0x0800 )
+	ROM_CONTINUE(       	 0xa800, 0x0800 )
+	ROM_CONTINUE(       	 0x9000, 0x0800 )
+	ROM_CONTINUE(       	 0xb000, 0x0800 )
+	ROM_CONTINUE(       	 0x9800, 0x0800 )
+	ROM_CONTINUE(       	 0xb800, 0x0800 )
 
-	ROM_REGION( 0x00300, REGION_PROMS, 0 ) /* Color PROMs */
+	ROM_REGION( 0x00300, REGION_PROMS, 0 )
 	ROM_LOAD( "red.l10",     0x0000, 0x0100, CRC(e6c9ba52) SHA1(6ea96f9bd71de6181d675b0f2d59a8c5e1be5aa3) )
 	ROM_LOAD( "green.k10",   0x0100, 0x0100, CRC(1bf2d335) SHA1(dcb074d3de939dfc652743e25bc66bd6fbdc3289) )
 	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) )
@@ -983,38 +907,37 @@ ROM_START( pinbos )
 	ROM_LOAD( "b5.bin",      0x6000, 0x2000, CRC(f80b204c) SHA1(ee9b4ae1d8ea2fc062022fcfae67df87ed7aff41) )
 	ROM_LOAD( "b6.bin",      0x8000, 0x2000, CRC(ae967d83) SHA1(e79db85917a31821d10f919c4c429da33e97894d) )
 	ROM_LOAD( "b7.bin",      0xa000, 0x2000, CRC(7a584b4e) SHA1(2eb55b706815228b3b12ee5c0f6c415cd1d612e6) )
-	ROM_RELOAD(              0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64K for sound */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "b8.bin",      0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "rom6.a1",     0x0000, 0x0800, CRC(74fe8e98) SHA1(3c9ac38d7054b2831a515786b6f204b1804aaea3) )	/* tiles   */
-	ROM_CONTINUE(       	 0x2000, 0x0800             )	/* sprites */
-	ROM_CONTINUE(       	 0x0800, 0x0800             )
-	ROM_CONTINUE(       	 0x2800, 0x0800             )
-	ROM_CONTINUE(       	 0x1000, 0x0800             )
-	ROM_CONTINUE(       	 0x3000, 0x0800             )
-	ROM_CONTINUE(       	 0x1800, 0x0800             )
-	ROM_CONTINUE(       	 0x3800, 0x0800             )
-	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )	/* 2nd bitplane */
-	ROM_CONTINUE(       	 0x6000, 0x0800             )
-	ROM_CONTINUE(       	 0x4800, 0x0800             )
-	ROM_CONTINUE(       	 0x6800, 0x0800             )
-	ROM_CONTINUE(       	 0x5000, 0x0800             )
-	ROM_CONTINUE(       	 0x7000, 0x0800             )
-	ROM_CONTINUE(       	 0x5800, 0x0800             )
-	ROM_CONTINUE(       	 0x7800, 0x0800             )
+	ROM_CONTINUE(       	 0x2000, 0x0800 )
+	ROM_CONTINUE(       	 0x0800, 0x0800 )
+	ROM_CONTINUE(       	 0x2800, 0x0800 )
+	ROM_CONTINUE(       	 0x1000, 0x0800 )
+	ROM_CONTINUE(       	 0x3000, 0x0800 )
+	ROM_CONTINUE(       	 0x1800, 0x0800 )
+	ROM_CONTINUE(       	 0x3800, 0x0800 )
+	ROM_LOAD( "rom8.c1",     0x4000, 0x0800, CRC(5a800fe7) SHA1(375269ec73fab7f0cf017a79e002e31b006f5ad7) )
+	ROM_CONTINUE(       	 0x6000, 0x0800 )
+	ROM_CONTINUE(       	 0x4800, 0x0800 )
+	ROM_CONTINUE(       	 0x6800, 0x0800 )
+	ROM_CONTINUE(       	 0x5000, 0x0800 )
+	ROM_CONTINUE(       	 0x7000, 0x0800 )
+	ROM_CONTINUE(       	 0x5800, 0x0800 )
+	ROM_CONTINUE(       	 0x7800, 0x0800 )
 	ROM_LOAD( "rom7.d1",     0x8000, 0x0800, CRC(327a3c21) SHA1(e938915d28ac4ec033b20d33728788493e3f30f6) )	/* 3rd bitplane */
-	ROM_CONTINUE(       	 0xa000, 0x0800             )
-	ROM_CONTINUE(       	 0x8800, 0x0800             )
-	ROM_CONTINUE(       	 0xa800, 0x0800             )
-	ROM_CONTINUE(       	 0x9000, 0x0800             )
-	ROM_CONTINUE(       	 0xb000, 0x0800             )
-	ROM_CONTINUE(       	 0x9800, 0x0800             )
-	ROM_CONTINUE(       	 0xb800, 0x0800             )
+	ROM_CONTINUE(       	 0xa000, 0x0800 )
+	ROM_CONTINUE(       	 0x8800, 0x0800 )
+	ROM_CONTINUE(       	 0xa800, 0x0800 )
+	ROM_CONTINUE(       	 0x9000, 0x0800 )
+	ROM_CONTINUE(       	 0xb000, 0x0800 )
+	ROM_CONTINUE(       	 0x9800, 0x0800 )
+	ROM_CONTINUE(       	 0xb800, 0x0800 )
 
-	ROM_REGION( 0x00300, REGION_PROMS, 0 ) /* Color PROMs */
+	ROM_REGION( 0x00300, REGION_PROMS, 0 )
 	ROM_LOAD( "red.l10",     0x0000, 0x0100, CRC(e6c9ba52) SHA1(6ea96f9bd71de6181d675b0f2d59a8c5e1be5aa3) )
 	ROM_LOAD( "green.k10",   0x0100, 0x0100, CRC(1bf2d335) SHA1(dcb074d3de939dfc652743e25bc66bd6fbdc3289) )
 	ROM_LOAD( "blue.n10",    0x0200, 0x0100, CRC(e41250ad) SHA1(2e9a2babbacb1753057d46cf1dd6dc183611747e) )
@@ -1028,10 +951,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1982, lasso,    0,     lasso,    lasso,    0, ROT90, "SNK",            "Lasso",                   GAME_SUPPORTS_SAVE )
-GAME( 1983, chameleo, 0,     chameleo, chameleo, 0, ROT0,  "Jaleco",         "Chameleon",               GAME_SUPPORTS_SAVE )
-GAME( 1984, wwjgtin,  0,     wwjgtin,  wwjgtin,  0, ROT0,  "Jaleco / Casio", "Wai Wai Jockey Gate-In!", GAME_SUPPORTS_SAVE )
-GAME( 1991, photof,   wwjgtin,wwjgtin,  wwjgtin,  0, ROT0,  "bootleg?",	     "Photo Finish", 		GAME_SUPPORTS_SAVE )
-GAME( 1984, pinbo,    0,     pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 1)",           GAME_SUPPORTS_SAVE )
-GAME( 1984, pinboa,   pinbo, pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 2)",           GAME_SUPPORTS_SAVE )
-GAME( 1985, pinbos,   pinbo, pinbo,    pinbo,    0, ROT90, "bootleg?",       "Pinbo (Strike)",          GAME_SUPPORTS_SAVE )
+GAME( 1982, lasso,    0,       lasso,    lasso,    0, ROT90, "SNK",            "Lasso", GAME_SUPPORTS_SAVE )
+GAME( 1983, chameleo, 0,       chameleo, chameleo, 0, ROT0,  "Jaleco",         "Chameleon", GAME_SUPPORTS_SAVE )
+GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  0, ROT0,  "Jaleco / Casio", "Wai Wai Jockey Gate-In!", GAME_SUPPORTS_SAVE )
+GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  0, ROT0,  "bootleg?",	   "Photo Finish", GAME_SUPPORTS_SAVE )
+GAME( 1984, pinbo,    0,       pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, pinboa,   pinbo,   pinbo,    pinbo,    0, ROT90, "Jaleco",         "Pinbo (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pinbos,   pinbo,   pinbo,    pinbo,    0, ROT90, "bootleg?",       "Pinbo (Strike)", GAME_SUPPORTS_SAVE )

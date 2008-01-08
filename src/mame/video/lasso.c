@@ -37,8 +37,9 @@ UINT8 *lasso_spriteram;
 size_t lasso_spriteram_size;
 UINT8 *lasso_bitmap_ram; 	/* 0x2000 bytes for a 256 x 256 x 1 bitmap */
 UINT8 *wwjgtin_track_scroll;
+UINT8 *lasso_back_color;
+UINT8 *wwjgtin_last_colors;
 
-/* variables only used here: */
 static tilemap *bg_tilemap, *track_tilemap;
 static UINT8 gfxbank;				/* used by lasso, chameleo, wwjgtin and pinbo */
 static UINT8 wwjgtin_track_enable;	/* used by wwjgtin */
@@ -52,7 +53,7 @@ static UINT8 wwjgtin_track_enable;	/* used by wwjgtin */
 
 ***************************************************************************/
 
-static void lasso_set_color(int i, int data)
+static void lasso_set_color(running_machine *machine, int i, int data)
 {
 	int bit0,bit1,bit2,r,g,b;
 
@@ -61,29 +62,33 @@ static void lasso_set_color(int i, int data)
 	bit1 = (data >> 1) & 0x01;
 	bit2 = (data >> 2) & 0x01;
 	r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 	/* green component */
 	bit0 = (data >> 3) & 0x01;
 	bit1 = (data >> 4) & 0x01;
 	bit2 = (data >> 5) & 0x01;
 	g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 	/* blue component */
 	bit0 = (data >> 6) & 0x01;
 	bit1 = (data >> 7) & 0x01;
 	b = 0x4f * bit0 + 0xa8 * bit1;
 
-	palette_set_color( Machine,i,MAKE_RGB(r,g,b) );
+	palette_set_color(machine, i, MAKE_RGB(r, g, b));
 }
+
 
 PALETTE_INIT( lasso )
 {
 	int i;
 
-	for (i = 0;i < 0x40;i++)
+	for (i = 0; i < 0x40; i++)
 	{
-		lasso_set_color(i,*color_prom);
+		lasso_set_color(machine, i, *color_prom);
 		color_prom++;
 	}
 }
+
 
 /* 16 color tiles with a 4 color step for the palettes */
 PALETTE_INIT( wwjgtin )
@@ -93,9 +98,30 @@ PALETTE_INIT( wwjgtin )
 	palette_init_lasso(machine,colortable,color_prom);
 
 	for( color = 0; color < 0x10; color++ )
-		for( pen = 0; pen < 16; pen++ )
-			colortable[color * 16 + pen + 4*16] = (color * 4 + pen) % 0x40;
+		for( pen = 0; pen < 0x10; pen++ )
+			colortable[color * 0x10 + pen + 0x40] = (color * 4 + pen) & 0x3f;
 }
+
+
+static void set_back_color(running_machine *machine)
+{
+	int i;
+
+	 /* stuff into color#0 of each palette */
+	for (i = 0; i < 0x40; i += 4)
+		lasso_set_color(machine, i, *lasso_back_color);
+}
+
+
+static void set_wwjgtin_last_colors(running_machine *machine)
+{
+	int i;
+
+	/* the last palette entries can be changed */
+	for (i = 0; i < 4; i++)
+		lasso_set_color(machine, 0x3f - i, wwjgtin_last_colors[i]);
+}
+
 
 
 /***************************************************************************
@@ -108,6 +134,7 @@ static TILE_GET_INFO( lasso_get_bg_tile_info )
 {
 	int code  = lasso_videoram[tile_index];
 	int color = lasso_colorram[tile_index];
+
 	SET_TILE_INFO(0,
 				  code + ((UINT16)gfxbank << 8),
 				  color & 0x0f,
@@ -119,6 +146,7 @@ static TILE_GET_INFO( wwjgtin_get_track_tile_info )
 	UINT8 *ROM = memory_region(REGION_USER1);
 	int code  = ROM[tile_index];
 	int color = ROM[tile_index + 0x2000];
+
 	SET_TILE_INFO(2,
 				  code,
 				  color & 0x0f,
@@ -129,6 +157,7 @@ static TILE_GET_INFO( pinbo_get_bg_tile_info )
 {
 	int code  = lasso_videoram[tile_index];
 	int color = lasso_colorram[tile_index];
+
 	SET_TILE_INFO(0,
 				  code + ((color & 0x30) << 4),
 				  color & 0x0f,
@@ -240,22 +269,6 @@ WRITE8_HANDLER( pinbo_video_control_w )
 }
 
 
-/* The bg_tilemap color can be changed */
-WRITE8_HANDLER( lasso_backcolor_w )
-{
-	int i;
-	for( i=0; i<0x40; i+=4 ) /* stuff into color#0 of each palette */
-		lasso_set_color(i,data);
-}
-
-
-/* The last 4 color (= last palette) entries can be changed */
-WRITE8_HANDLER( wwjgtin_lastcolor_w )
-{
-	lasso_set_color(0x3f - offset,data);
-}
-
-
 /*************************************
  *
  *  Video update
@@ -332,39 +345,32 @@ static void draw_lasso(running_machine *machine, mame_bitmap *bitmap)
 	{
 		for (x = 0; x < 256; )
 		{
+			int bit;
+
 			UINT8 data = *source++;
 
-			if (data)
+			for (bit = 0; bit < 8; bit++)
 			{
-				int bit;
-
-				for (bit = 0; bit < 8; bit++)
+				if (data & 0x80)
 				{
-					if (data & 0x80)
+					if (flip_screen_x)
 					{
-						if (flip_screen_x)
-						{
-							if (flip_screen_y)
-								*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
-							else
-								*BITMAP_ADDR16(bitmap, y, 255-x) = pen;
-						}
+						if (flip_screen_y)
+							*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 						else
-						{
-							if (flip_screen_y)
-								*BITMAP_ADDR16(bitmap, 255-y, x) = pen;
-							else
-								*BITMAP_ADDR16(bitmap, y, x) = pen;
-						}
+							*BITMAP_ADDR16(bitmap, y, 255-x) = pen;
 					}
-
-					x++;
-					data <<= 1;
+					else
+					{
+						if (flip_screen_y)
+							*BITMAP_ADDR16(bitmap, 255-y, x) = pen;
+						else
+							*BITMAP_ADDR16(bitmap, y, x) = pen;
+					}
 				}
-			}
-			else
-			{
-				x += 8;
+
+				x++;
+				data <<= 1;
 			}
 		}
 	}
@@ -373,22 +379,31 @@ static void draw_lasso(running_machine *machine, mame_bitmap *bitmap)
 
 VIDEO_UPDATE( lasso )
 {
+	set_back_color(machine);
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_lasso(machine, bitmap);
 	draw_sprites(machine, bitmap, cliprect, 0);
+
 	return 0;
 }
 
 VIDEO_UPDATE( chameleo )
 {
+	set_back_color(machine);
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect, 0);
+
 	return 0;
 }
 
 
 VIDEO_UPDATE( wwjgtin )
 {
+	set_back_color(machine);
+	set_wwjgtin_last_colors(machine);
+
 	tilemap_set_scrollx(track_tilemap,0,wwjgtin_track_scroll[0] + wwjgtin_track_scroll[1]*256);
 	tilemap_set_scrolly(track_tilemap,0,wwjgtin_track_scroll[2] + wwjgtin_track_scroll[3]*256);
 
@@ -399,5 +414,17 @@ VIDEO_UPDATE( wwjgtin )
 
 	draw_sprites(machine, bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+
 	return 0;
 }
+
+
+VIDEO_UPDATE( pinbo )
+{
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(machine, bitmap, cliprect, 0);
+
+	return 0;
+}
+
+
