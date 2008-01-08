@@ -583,7 +583,7 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 			int base = gfxdecodeinfo[i].start;
 			int end = region_length/8;
 			int linemod = gl->yoffset[0];
-			while (glcopy.total > 0)
+			while (total > 0)
 			{
 				int elementbase = base + (total - 1) * charincrement / 8;
 				int lastpixelbase = elementbase + height * linemod / 8 - 1;
