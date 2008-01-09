@@ -1313,6 +1313,7 @@ src/mame/drivers/csk.c svneol=native#text/plain
 src/mame/drivers/cubocd32.c svneol=native#text/plain
 src/mame/drivers/cultures.c svneol=native#text/plain
 src/mame/drivers/cvs.c svneol=native#text/plain
+src/mame/drivers/cvsdrvr.c svneol=native#text/plain
 src/mame/drivers/cyberbal.c svneol=native#text/plain
 src/mame/drivers/cybertnk.c svneol=native#text/plain
 src/mame/drivers/dacholer.c svneol=native#text/plain

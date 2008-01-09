@@ -9,6 +9,8 @@
 #include "driver.h"
 #include "video/s2636.h"
 #include "cpu/s2650/s2650.h"
+#include "cvs.h"
+
 
 #define MAX_STARS        250
 #define STARS_COLOR_BASE 16
@@ -37,18 +39,9 @@ struct star
 };
 
 
-UINT8 *cvs_color_ram;
-UINT8 *cvs_video_ram;
-UINT8 *cvs_bullet_ram;
-
-static UINT8 *palette_ram;
-static UINT8 *character_ram;
-
 static struct star stars[MAX_STARS];
 static int    total_stars;
 static int    stars_on;
-static UINT8  character_mode;
-static UINT16 character_ram_page;
 static UINT8  scroll_reg;
 static int    stars_scroll;
 
@@ -75,36 +68,36 @@ PALETTE_INIT( cvs )
 
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-    /* Colour Mapping Prom */
+	/* Colour Mapping Prom */
 
-    for(attr = 0;attr < 256; attr++)
-    {
-    	for(col = 0; col < 8; col++)
-        {
-          	map = color_prom[(col * 256) + attr];
+	for(attr = 0;attr < 256; attr++)
+	{
+		for(col = 0; col < 8; col++)
+		{
+			map = color_prom[(col * 256) + attr];
 
-            /* bits 0 and 2 are swapped */
+			/* bits 0 and 2 are swapped */
 
-            COLOR(0,attr*8 + col) = ((map & 1) << 2) + (map & 2) + ((map & 4) >> 2);
-        }
-    }
+			COLOR(0,attr*8 + col) = ((map & 1) << 2) + (map & 2) + ((map & 4) >> 2);
+		}
+	}
 
-    /* Background Collision Map */
+	/* Background Collision Map */
 
-    for(map=0;map<8;map++)
-    {
-    	COLOR(0,2048+map) = (map & 4) >> 2;
-        COLOR(0,2056+map) = (map & 2) >> 1;
-        COLOR(0,2064+map) = ((map & 2) >> 1) || ((map & 4) >> 2);
-    }
+	for(map=0;map<8;map++)
+	{
+		COLOR(0,2048+map) = (map & 4) >> 2;
+		COLOR(0,2056+map) = (map & 2) >> 1;
+		COLOR(0,2064+map) = ((map & 2) >> 1) || ((map & 4) >> 2);
+	}
 
-    /* Sprites */
+	/* Sprites */
 
-    for(map=0;map<8;map++)
-    {
-    	COLOR(0,map*2 + 2072) = 0;
-    	COLOR(0,map*2 + 2073) = 8 + map;
-    }
+	for(map=0;map<8;map++)
+	{
+		COLOR(1,map*2+0) = 0;
+		COLOR(1,map*2+1) = 8 + map;
+	}
 
     /* set the sprite chip offsets */
 	s2636_x_offset = -26;
@@ -115,45 +108,21 @@ PALETTE_INIT( cvs )
 WRITE8_HANDLER( cvs_video_fx_w )
 {
 	if (data & 0xce)
-		logerror("%4x : Unimplemented CVS video fx = %2x\n",activecpu_get_pc(),data);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",activecpu_get_pc(), data & 0xce);
 
     stars_on = data & 0x01;
 
-    if (data & 0x02)   logerror("       SHADE BRIGHTER TO RIGHT\n");
-    if (data & 0x04)   logerror("       SCREEN ROTATE\n");
-    if (data & 0x08)   logerror("       SHADE BRIGHTER TO LEFT\n");
+    if (data & 0x02)   logerror("           SHADE BRIGHTER TO RIGHT\n");
+    if (data & 0x04)   logerror("           SCREEN ROTATE\n");
+    if (data & 0x08)   logerror("           SHADE BRIGHTER TO LEFT\n");
 
     set_led_status(1, data & 0x10);	/* lamp 1 */
     set_led_status(2, data & 0x20);	/* lamp 2 */
 
-    if (data & 0x40)   logerror("       SHADE BRIGHTER TO BOTTOM\n");
-    if (data & 0x80)   logerror("       SHADE BRIGHTER TO TOP\n");
+    if (data & 0x40)   logerror("           SHADE BRIGHTER TO BOTTOM\n");
+    if (data & 0x80)   logerror("           SHADE BRIGHTER TO TOP\n");
 }
 
-
-
-READ8_HANDLER( cvs_input_r )
-{
-	UINT8 ret;
-
-	/* the upper 4 bits of the address is used to select the tile banking attributes */
-	character_mode = (offset >> 4) & 0x03;
-	character_ram_page = (offset << 2) & 0x300;
-
-	/* the lower 4 (or 3?) bits select the port to read */
-	switch (offset & 0x0f)	/* might be 0x07 */
-	{
-	case 0x00:  ret = input_port_0_r(0); break;
-	case 0x02:  ret = input_port_1_r(0); break;
-	case 0x03:  ret = input_port_2_r(0); break;
-	case 0x04:  ret = input_port_3_r(0); break;
-	case 0x06:  ret = input_port_4_r(0); break;
-	case 0x07:  ret = input_port_5_r(0); break;
-	default:    ret = 0x00; break;
-	}
-
-	return ret;
-}
 
 
 READ8_HANDLER( cvs_collision_r )
@@ -175,103 +144,11 @@ WRITE8_HANDLER( cvs_scroll_w )
 }
 
 
-READ8_HANDLER( cvs_video_or_color_ram_r )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		return cvs_color_ram[offset];
-	else
-		return cvs_video_ram[offset];
-}
-
-WRITE8_HANDLER( cvs_video_or_color_ram_w )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		cvs_color_ram[offset] = data;
-	else
-		cvs_video_ram[offset] = data;
-}
-
-
-READ8_HANDLER( cvs_bullet_ram_or_palette_r )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		return cvs_bullet_ram[offset];
-	else
-		return palette_ram[offset & 0x0f];
-}
-
-WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		cvs_bullet_ram[offset] = data;
-	else
-		palette_ram[offset & 0x0f] = data;
-}
-
-
-READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_1_ram[offset];
-	else
-		return character_ram[(0 * 0x800) | 0x400 | character_ram_page | offset];
-}
-
-WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_1_ram[offset] = data;
-	else
-		character_ram[(0 * 0x800) | 0x400 | character_ram_page | offset] = data;
-}
-
-
-READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_2_ram[offset];
-	else
-		return character_ram[(1 * 0x800) | 0x400 | character_ram_page | offset];
-}
-
-WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_2_ram[offset] = data;
-	else
-		character_ram[(1 * 0x800) | 0x400 | character_ram_page | offset] = data;
-}
-
-
-READ8_HANDLER( cvs_s2636_3_or_character_ram_r )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_3_ram[offset];
-	else
-		return character_ram[(2 * 0x800) | 0x400 | character_ram_page | offset];
-}
-
-WRITE8_HANDLER( cvs_s2636_3_or_character_ram_w )
-{
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_3_ram[offset] = data;
-	else
-		character_ram[(2 * 0x800) | 0x400 | character_ram_page | offset] = data;
-}
-
-
 VIDEO_START( cvs )
 {
 	int generator = 0;
 	int y;
 
-
-	/* allocate memory */
-	cvs_color_ram = auto_malloc(0x400);
-	palette_ram = auto_malloc(0x10);
-	character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
-                                                by allocating twice the amount,
-                                                we can use the same gfx_layout */
 
 	/* precalculate the star background */
 
@@ -324,12 +201,9 @@ VIDEO_START( cvs )
 
 
 
-INTERRUPT_GEN( cvs_interrupt )
+void cvs_scroll_stars(void)
 {
 	stars_scroll++;
-
-	cpunum_set_input_line_vector(0, 0, 0x03);
-	cpunum_set_input_line(0, 0, PULSE_LINE);
 }
 
 
@@ -340,12 +214,13 @@ VIDEO_UPDATE( cvs )
 	int code;
 	offs_t offs;
 	int scroll[8];
+	UINT8 character_banking_mode;
 
 
 	/* set the palette */
 	for (offs = 0; offs < 0x10; offs++)
 	{
-		UINT8 data = palette_ram[offs];
+		UINT8 data = cvs_palette_ram[offs];
 
 		palette_set_color_rgb(machine, offs, pal2bit(~data >> 0), pal3bit(~data >> 2), pal3bit(~data >> 5));
 	}
@@ -354,14 +229,16 @@ VIDEO_UPDATE( cvs )
 	/* create our background character set, which is a software
        selectable mixture of RAM and ROM based tiles */
 
+	character_banking_mode = cvs_get_character_banking_mode();
+
 	/* ROM based tiles first */
-	for (code = 0; code < ram_based_char_start_indecies[character_mode]; code++)
+	for (code = 0; code < ram_based_char_start_indecies[character_banking_mode]; code++)
 		decodechar(machine->gfx[0], code, memory_region(REGION_GFX1),
 		           machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 	/* now the RAM based ones */
 	for (; code < 0x100; code++)
-		decodechar(machine->gfx[0], code, character_ram,
+		decodechar(machine->gfx[0], code, cvs_character_ram,
 		           machine->drv->gfxdecodeinfo[0].gfxlayout);
 
 
@@ -439,83 +316,75 @@ VIDEO_UPDATE( cvs )
             	int bx=255-7-cvs_bullet_ram[offs]-ct;
 
             	/* Bullet/Object Collision */
-
-                if((cvs_collision_register & 8) == 0)
-                {
-                    if ((*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
-					    (*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) ||
-					    (*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0))
-                        cvs_collision_register |= 8;
-                }
+				if ((*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0))
+					cvs_collision_register |= 8;
 
             	/* Bullet/Background Collision */
-
-                if((cvs_collision_register & 0x80) == 0)
-                {
-					if (*BITMAP_ADDR8(scrolled_background, offs, bx) != machine->pens[0])
-                    	cvs_collision_register |= 0x80;
-                }
+				if (*BITMAP_ADDR8(scrolled_background, offs, bx) != machine->pens[0])
+                   	cvs_collision_register |= 0x80;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
             }
         }
     }
 
-    /* Update 2636 images */
+	/* Update 2636 images */
 
-    {
+	{
 		int x;
-        UINT32 S1,S2,S3,SB,pen;
+		UINT32 S1,S2,S3,SB,pen;
 
-        for(x=255;x>7;x--)
-        {
-        	UINT32 *sp1 = (UINT32 *)BITMAP_ADDR8(s2636_1_bitmap, x, 0);
-	    	UINT32 *sp2 = (UINT32 *)BITMAP_ADDR8(s2636_2_bitmap, x, 0);
-		    UINT32 *sp3 = (UINT32 *)BITMAP_ADDR8(s2636_3_bitmap, x, 0);
-	        UINT64 *dst = (UINT64 *)BITMAP_ADDR16(bitmap, x, 0);
-		    UINT8  *spb = (UINT8  *)BITMAP_ADDR8(scrolled_background, x, 0);
+		for(x=255;x>7;x--)
+		{
+			UINT32 *sp1 = (UINT32 *)BITMAP_ADDR8(s2636_1_bitmap, x, 0);
+			UINT32 *sp2 = (UINT32 *)BITMAP_ADDR8(s2636_2_bitmap, x, 0);
+			UINT32 *sp3 = (UINT32 *)BITMAP_ADDR8(s2636_3_bitmap, x, 0);
+			UINT64 *dst = (UINT64 *)BITMAP_ADDR16(bitmap, x, 0);
+			UINT8  *spb = (UINT8  *)BITMAP_ADDR8(scrolled_background, x, 0);
 
-            for(offs=0;offs<62;offs++)
-            {
-        	     S1 = (*sp1++);
-                 S2 = (*sp2++);
-                 S3 = (*sp3++);
+			for(offs=0;offs<62;offs++)
+			{
+				S1 = (*sp1++);
+				S2 = (*sp2++);
+				S3 = (*sp3++);
 
-        	     pen = S1 | S2 | S3;
+				pen = S1 | S2 | S3;
 
-                 if(pen)
-                 {
-             	    UINT16 *address = (UINT16 *)dst;
-				    if (pen & 0xff000000) address[BL3] = machine->pens[(pen >> 24) & 15];
-				    if (pen & 0x00ff0000) address[BL2] = machine->pens[(pen >> 16) & 15];
-				    if (pen & 0x0000ff00) address[BL1] = machine->pens[(pen >>  8) & 15];
-				    if (pen & 0x000000ff) address[BL0] = machine->pens[(pen & 15)];
+				if(pen)
+				{
+					UINT16 *address = (UINT16 *)dst;
+					if (pen & 0xff000000) address[BL3] = machine->pens[(pen >> 24) & 15];
+					if (pen & 0x00ff0000) address[BL2] = machine->pens[(pen >> 16) & 15];
+					if (pen & 0x0000ff00) address[BL1] = machine->pens[(pen >>  8) & 15];
+					if (pen & 0x000000ff) address[BL0] = machine->pens[(pen & 15)];
 
-                    /* Collision Detection */
+					/* Collision Detection */
 
-                    SB = 0;
-				    if (spb[BL3] != machine->pens[0]) SB =  0x08000000;
-				    if (spb[BL2] != machine->pens[0]) SB |= 0x00080000;
-				    if (spb[BL1] != machine->pens[0]) SB |= 0x00000800;
-				    if (spb[BL0] != machine->pens[0]) SB |= 0x00000008;
+					SB = 0;
+					if (spb[BL3] != machine->pens[0]) SB =  0x08000000;
+					if (spb[BL2] != machine->pens[0]) SB |= 0x00080000;
+					if (spb[BL1] != machine->pens[0]) SB |= 0x00000800;
+					if (spb[BL0] != machine->pens[0]) SB |= 0x00000008;
 
-       	            if (S1 & S2) cvs_collision_register |= 1;
-       	            if (S2 & S3) cvs_collision_register |= 2;
-    			    if (S1 & S3) cvs_collision_register |= 4;
+					if (S1 & S2) cvs_collision_register |= 1;
+					if (S2 & S3) cvs_collision_register |= 2;
+					if (S1 & S3) cvs_collision_register |= 4;
 
-                    if (SB)
-                    {
-    			        if (S1 & SB) cvs_collision_register |= 16;
-   			            if (S2 & SB) cvs_collision_register |= 32;
-       	                if (S3 & SB) cvs_collision_register |= 64;
-                    }
-                 }
+					if (SB)
+					{
+						if (S1 & SB) cvs_collision_register |= 16;
+						if (S2 & SB) cvs_collision_register |= 32;
+						if (S3 & SB) cvs_collision_register |= 64;
+					}
+				}
 
-           	     dst++;
-                 spb+=4;
-            }
-        }
-    }
+				dst++;
+				spb+=4;
+			}
+		}
+	}
 
 
     /* stars circuit */
