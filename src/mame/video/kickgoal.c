@@ -34,13 +34,13 @@ static TILE_GET_INFO( get_kickgoal_bg2_tile_info )
 }
 
 
-static TILEMAP_MAPPER( tilemap_scan_kicksbg )
+static TILEMAP_MAPPER( tilemap_scan_kicksbg2 )
 {
 	/* logical (col,row) -> memory offset */
 	return col*8 + (row & 0x7) + ((row & 0x3c) >> 3) * 0x200;
 }
 
-static TILEMAP_MAPPER( tilemap_scan_kicksbg2 )
+static TILEMAP_MAPPER( tilemap_scan_kicksbg )
 {
 	/* logical (col,row) -> memory offset */
 	return col*16 + (row & 0xf) + ((row & 0x70) >> 4) * 0x400;
