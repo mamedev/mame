@@ -11,7 +11,6 @@
 
     - ghunter trackball input is broken
     - coin lockouts
-    - driver is currently locking up after 1st level due to CPU comm problems
 
 
 Lead Angle
@@ -297,7 +296,7 @@ static MACHINE_DRIVER_START( deadang )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-	MDRV_INTERLEAVE(200)
+	MDRV_INTERLEAVE(1) // the game stops working with higher interleave rates..
 
 	MDRV_MACHINE_RESET(seibu_sound_2)
 
