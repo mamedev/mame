@@ -51,6 +51,9 @@ Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
 #include "sound/3812intf.h"
 
 
+#define MASTER_CLOCK		XTAL_12MHz
+
+
 //UINT8 *brkthru_nmi_enable; /* needs to be tracked down */
 extern UINT8 *brkthru_videoram;
 extern size_t brkthru_videoram_size;
@@ -89,71 +92,52 @@ static WRITE8_HANDLER( brkthru_soundlatch_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)		/* Plane 0: Text */
-	AM_RANGE(0x0400, 0x0bff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0c00, 0x0fff) AM_READ(MRA8_RAM)		/* Plane 2  Background */
-	AM_RANGE(0x1000, 0x10ff) AM_READ(MRA8_RAM)		/* Plane 1: Sprites */
-	AM_RANGE(0x1100, 0x17ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( brkthru_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(MRA8_RAM, brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
+	AM_RANGE(0x0400, 0x0bff) AM_RAM
+	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(MRA8_RAM, brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1100, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)	/* player controls, player start */
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)	/* cocktail player controls */
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_3_r)	/* DSW 0 */
 	AM_RANGE(0x1803, 0x1803) AM_READ(input_port_2_r)	/* coin input & DSW */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x4000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
-	AM_RANGE(0x0400, 0x0bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0c00, 0x0fff) AM_WRITE(brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1100, 0x17ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)	/* bg scroll and color, ROM bank selection, flip screen */
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(brkthru_soundlatch_w)
 	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)	/* NMI enable, + ? */
-	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-static ADDRESS_MAP_START( darwin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM)		/* Plane 0: Text */
-	AM_RANGE(0x0400, 0x07ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1c00, 0x1fff) AM_READ(MRA8_RAM)		/* Plane 2  Background */
-	AM_RANGE(0x0000, 0x00ff) AM_READ(MRA8_RAM)		/* Plane 1: Sprites */
- 	AM_RANGE(0x1400, 0x1bff) AM_READ(MRA8_RAM)
+
+
+/* same as brktrhu, but xor 0x1000 below 8k */
+static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(MRA8_RAM, brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
+	AM_RANGE(0x1400, 0x1bff) AM_RAM
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(MRA8_RAM, brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0100, 0x01ff) AM_WRITE(MWA8_NOP) /*tidyup, nothing realy here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ(input_port_0_r)	/* player controls, player start */
 	AM_RANGE(0x0801, 0x0801) AM_READ(input_port_1_r)	/* cocktail player controls */
 	AM_RANGE(0x0802, 0x0802) AM_READ(input_port_3_r)	/* DSW 0 */
 	AM_RANGE(0x0803, 0x0803) AM_READ(input_port_2_r)	/* coin input & DSW */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x4000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darwin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(brkthru_fgram_w) AM_BASE(&brkthru_videoram) AM_SIZE(&brkthru_videoram_size)
-	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1400, 0x1bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0100, 0x01ff) AM_WRITE(MWA8_NOP) /*tidyup, nothing realy here?*/
 	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(brkthru_soundlatch_w)
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
-	AM_RANGE(0x2000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-	AM_RANGE(0x6000, 0x6000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM3526_control_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x6001, 0x6001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -415,24 +399,22 @@ static const struct YM3526interface ym3526_interface =
 static MACHINE_DRIVER_START( brkthru )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1250000)        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(brkthru_map,0)
 	MDRV_CPU_VBLANK_INT(brkthru_interrupt,2)
 
-	MDRV_CPU_ADD(M6809, 1250000)
-	/* audio CPU */        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION	/* frames per second, vblank duration (not sure) */)
+	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)	/* not sure */
 	MDRV_GFXDECODE(brkthru)
 	MDRV_PALETTE_LENGTH(256)
+
+	/* not sure; assuming to be the same as darwin */
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_INIT(brkthru)
 	MDRV_VIDEO_START(brkthru)
@@ -441,30 +423,35 @@ static MACHINE_DRIVER_START( brkthru )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD(YM3526, MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( darwin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1500000)        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darwin_readmem,darwin_writemem)
+	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(darwin_map,0)
 	MDRV_CPU_VBLANK_INT(brkthru_interrupt,2)
 
-	MDRV_CPU_ADD(M6809, 1500000)
-	/* audio CPU */        /* 1.25 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_SCREEN_REFRESH_RATE(15625.0/272)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_GFXDECODE(brkthru)
+	MDRV_PALETTE_LENGTH(256)
+	
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	/* frames per second, vblank duration
         Horizontal video frequency:
             HSync = Dot Clock / Horizontal Frame Length
@@ -477,14 +464,7 @@ static MACHINE_DRIVER_START( darwin )
                   = 15.625kHz / (240 + 32)
                   = 57.444855Hz
     tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(brkthru)
-	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(brkthru)
 	MDRV_VIDEO_START(brkthru)
@@ -493,16 +473,17 @@ static MACHINE_DRIVER_START( darwin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD(YM3526, MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
 
 
 /***************************************************************************
