@@ -192,7 +192,13 @@ static void sn_divide(void)
 	INT32 W = 0;
 
 	if ( SN74S516.X == 0 )
-		fatalerror("SN74S516 tried to divide by zero (PC=%x)\n", activecpu_get_pc());
+	{
+		mame_printf_debug("SN74S516 tried to divide by zero (PC=%x)\n", activecpu_get_pc());
+		SN74S516.ZW.Z = 0xffff;
+		SN74S516.ZW.W = 0xffff;
+		SN74S516.ZWfl = 0;
+		return;
+	}
 
 	switch ( SN74S516.code )
 	{
@@ -434,13 +440,16 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 #define TX1_RADCHG		0x20
 #define TX1_DSEL		0x03
 
-#define TX1_SEL_MULEN	0x00
-#define TX1_SEL_PPSEN	0x01
-#define TX1_SEL_PSSEN	0x02
-#define TX1_SEL_LMSEL	0x03
-#define TX1_SEL_DSELOE	0x04
-#define TX1_SEL_INSCL	0x06
-#define TX1_SEL_ILDEN	0x07
+enum
+{
+	TX1_SEL_MULEN =	0x00,
+	TX1_SEL_PPSEN,
+	TX1_SEL_PSSEN,
+	TX1_SEL_LMSEL,
+	TX1_SEL_DSELOE,
+	TX1_SEL_INSCL = 0x06,
+	TX1_SEL_ILDEN
+};
 
 #define TX1_SET_INS0_BIT	do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff; } while(0)
 
@@ -508,20 +517,21 @@ static void tx1_update_state(void)
 			TX1_SET_INS0_BIT;
 
 			if ( math.mux == TX1_SEL_DSELOE )
-			{
-				UINT16 data;
-				int dsel = (math.inslatch >> 8) & TX1_DSEL;
+			{				
+				int		dsel = (math.inslatch >> 8) & TX1_DSEL;
+				int		tfad = (math.inslatch & 0x1c00) << 1;
+				int		sd   = math.ppshift;
+				int		o4;
+				UINT16	data;
+				
+				o4 = 
+					(!BIT(sd, 9) && !BIT(sd,10)) ||
+					( BIT(sd, 7) &&  BIT(sd,10)) ||
+					(!BIT(sd, 8) &&  BIT(sd, 9)) ||
+					(!BIT(sd, 7) &&  BIT(sd, 8)) ||
+					!BIT(dsel, 1) || BIT(tfad, 13) || BIT(tfad, 12) || BIT(tfad, 11);
 
-//              int tfad = (math.inslatch & 0x1c00);
-//              int ps = math.ppshift & 0x78;
-
-
-				if ( (dsel & 1) == 0 )
-					dsel |= 1;
-				else
-				{
-					dsel &= ~1;
-				}
+				dsel = (dsel & 2) | ((dsel & o4) ^ 1);
 
 				if ( dsel == 0 )
 					data = math.muxlatch;
@@ -540,25 +550,34 @@ static void tx1_update_state(void)
 			}
 			/*
                 TODO: Changed ppshift to muxlatch for TX-1
-                Changed masks.
-            */
+
+				/TMPLD1: /LHIEN
+				/TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
+				/TMPLD3: /LLOEN
+					 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+						 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+						 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+			*/
 			else if ( LHIEN(math.inslatch) || LLOEN(math.inslatch) )
 			{
 				UINT16 data;
 
 				kick_sn74s516(&data, ins);
 
+				/* All latches enabled */
 				if ( LHIEN(math.inslatch) && LLOEN(math.inslatch) )
 				{
 					math.muxlatch = data;
 				}
-				else if ( math.mux == TX1_SEL_LMSEL )
+				else if ( math.mux == TX1_SEL_LMSEL ) // O4 = 0
 				{
+					// TMPLD2/TMPLD3 15-5
 					if ( LLOEN(math.inslatch) )
 					{
 						math.muxlatch &= 0x001f;
 						math.muxlatch |= data & 0xffe0;
 					}
+					// TMLPD1 4-0???????
 					else if ( LHIEN(math.inslatch) )
 					{
 						math.muxlatch &= 0xffe0;
@@ -567,15 +586,49 @@ static void tx1_update_state(void)
 				}
 				else
 				{
+					/*
+						/TMPLD1: /LHIEN
+						/TMPLD2: /LLOEN.!O4 + /LHIEN.O4
+						/TMPLD3: /LLOEN
+							 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+								 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+								 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+					*/
+					int		dsel = (math.inslatch >> 8) & TX1_DSEL;
+					int		tfad = (math.inslatch & 0x1c00) << 1;
+					int		sd   = math.ppshift;
+					int		o4;
+				
+					o4 = 
+						(!BIT(sd, 9) && !BIT(sd,10)) ||
+						( BIT(sd, 7) &&  BIT(sd,10)) ||
+						(!BIT(sd, 8) &&  BIT(sd, 9)) ||
+						(!BIT(sd, 7) &&  BIT(sd, 8)) ||
+						!BIT(dsel, 1) || BIT(tfad, 13) || BIT(tfad, 12) || BIT(tfad, 11);
+
 					if ( LLOEN(math.inslatch) )
 					{
 						math.muxlatch &= 0x0fff;
 						math.muxlatch |= data & 0xf000;
+
+						if (!o4)
+						{
+							// TMPLD11-5
+							math.muxlatch &= 0xf01f;
+							math.muxlatch |= data & 0x0fe0;						
+						}
 					}
 					else if ( LHIEN(math.inslatch) )
 					{
-						math.muxlatch &= 0xf000;
-						math.muxlatch |= data & 0x0fff;
+						math.muxlatch &= 0xffe0;
+						math.muxlatch |= data & 0x001f;
+
+						if (o4)
+						{
+							// TMPLD11-5
+							math.muxlatch &= 0xf01f;
+							math.muxlatch |= data & 0x0fe0;						
+						}
 					}
 				}
 			}
@@ -633,39 +686,24 @@ READ16_HANDLER( tx1_math_r )
 	/* /MUXCS */
 	else if ( (offset & 0xc00) == 0xc00 )
 	{
-
-		/*  TODO
-            SEL0 = 1 (DSEL = 0 or ???????)
-            DSEL1 = 0
-        */
-		int dsel = (math.inslatch >> 8) & TX1_DSEL;
-//      int tfad = (math.inslatch & 0x1c00);
-//      int ps = math.ppshift & 0x78;
-
-		/*
-            Actual MUX selects
-            00 Straight from DLATCH
-            01 Straight from ROM
-            10 << 4
-            11 Halves swapped, << 3
-
-            If DSEL = x0,  MUX = x1
-
-            00 -> 01
-
-            10 -> 11
-
-            10 = 11
-            00 = 01
-        */
-
-		// TEST!
-		if ( (dsel & 1) == 0 )
-			dsel |= 1;
+		int		dsel = (math.inslatch >> 8) & TX1_DSEL;
+		int		tfad = (math.inslatch & 0x1c00) << 1;
+		int		sd   = math.ppshift;
+		int		o4;
+		
+		if ( math.mux == TX1_SEL_LMSEL )
+			o4 = 0;
 		else
 		{
-			dsel &= ~1;
+			o4 = 
+			(!BIT(sd, 9) && !BIT(sd,10)) ||
+			( BIT(sd, 7) &&  BIT(sd,10)) ||
+			(!BIT(sd, 8) &&  BIT(sd, 9)) ||
+			(!BIT(sd, 7) &&  BIT(sd, 8)) ||
+			!BIT(dsel, 1) || BIT(tfad, 13) || BIT(tfad, 12) || BIT(tfad, 11);
 		}
+
+		dsel = (dsel & 2) | ((dsel & o4) ^ 1);
 
 		if ( dsel == 0 )
 			math.retval = math.muxlatch;
@@ -694,7 +732,8 @@ READ16_HANDLER( tx1_math_r )
 			}
 			else if ( math.mux == TX1_SEL_PSSEN )
 			{
-				// ????????
+				// WRONG!!!!
+				mame_printf_debug("Math Read with PSSEN!\n");
 				math.ppshift = math.retval;
 			}
 
@@ -711,7 +750,7 @@ READ16_HANDLER( tx1_math_r )
 	else
 	{
 		if ( math.mux == TX1_SEL_PPSEN )
-			math.retval = math.ppshift;
+			math.retval = math.ppshift & 0x3fff;
 		else
 			/* Nothing is mapped - read from pull up resistors! */
 			math.retval = 0xffff;
@@ -791,13 +830,18 @@ WRITE16_HANDLER( tx1_math_w )
 					shift >>= 1;
 				}
 			}
-			math.ppshift = val & 0x7ff;
+			math.ppshift = val;
 		}
 	}
 	/* /MUXCS */
 	else if ( (offset & 0xc00) == 0xc00 )
 	{
-		/* TODO */
+
+		/*
+			/TMPLD1: 0
+			/TMPLD2: 0
+			/TMPLD3: 0
+		*/
 		math.muxlatch = math.cpulatch;
 	}
 
@@ -894,7 +938,8 @@ READ16_HANDLER( tx1_spcs_ram_r )
 	}
 	else if ( math.mux == TX1_SEL_PPSEN )
 	{
-		math.ppshift = math.retval & 0x3fff;
+//		math.ppshift = math.retval & 0x3fff;
+		math.ppshift = math.cpulatch;
 	}
 	else if ( math.mux == TX1_SEL_PSSEN )
 	{
@@ -953,14 +998,17 @@ WRITE16_HANDLER( tx1_spcs_ram_w )
 #define BB_RADCHG		0x20
 #define BB_DSEL			0x03
 
-#define BB_MUX_MULEN	0x00
-#define BB_MUX_PPSEN	0x01
-#define BB_MUX_PSSEN	0x02
-#define BB_MUX_LMSEL	0x03
-#define BB_MUX_DPROE	0x04
-#define BB_MUX_PPOE		0x05
-#define BB_MUX_INSCL	0x06
-#define BB_MUX_ILDEN	0x07
+enum
+{
+	BB_MUX_MULEN = 0x00,
+	BB_MUX_PPSEN,
+	BB_MUX_PSSEN,
+	BB_MUX_LMSEL,
+	BB_MUX_DPROE,
+	BB_MUX_PPOE,
+	BB_MUX_INSCL,
+	BB_MUX_ILDEN,
+};
 
 #define BB_SET_INS0_BIT	do { if (!(ins & 0x4) && math.i0ff) ins |= math.i0ff;} while(0)
 

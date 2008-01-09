@@ -9,8 +9,76 @@
 #include "sound/custom.h"
 #include "streams.h"
 
+/*************************************
+ *
+ *  Common
+ *
+ *************************************/
+
 static sound_stream *stream;
-static int freq_to_step;
+static UINT32 freq_to_step;
+static UINT32 step0;
+static UINT32 step1;
+static UINT32 step2;
+
+/*************************************
+ *
+ *  8253 Programmable Interval Timer
+ *
+ *************************************/
+static struct
+{
+	union
+	{
+#ifdef LSB_FIRST
+		struct { UINT8 LSB; UINT8 MSB; };
+#else
+		struct { UINT8 MSB; UINT8 LSB; };
+#endif
+		UINT16 val;
+	} counts[3];
+
+	int idx[3];
+} pit8253;
+
+
+WRITE8_HANDLER( pit8253_w )
+{
+	stream_update(stream);
+
+	if (offset < 3)
+	{
+		if (pit8253.idx[offset] == 0)
+		{
+			pit8253.counts[offset].LSB = data;
+			pit8253.idx[offset] = 1;
+		}
+		else
+		{
+			pit8253.counts[offset].MSB = data;
+			pit8253.idx[offset] = 0;
+		}
+	}
+	else
+	{
+		int mode = (data >> 1) & 7;
+
+		if (mode == 3)
+		{
+			int cntsel = (data >> 6) & 3;
+			pit8253.idx[cntsel] = 0;
+			pit8253.counts[cntsel].val = 0;
+		}
+		else
+			mame_printf_debug("PIT8253: Unsupported mode %d.\n", mode);
+	}
+}
+
+READ8_HANDLER( pit8253_r )
+{
+	mame_printf_debug("PIT R: %x", offset);
+	return 0;
+}
 
 /*************************************
  *
@@ -18,6 +86,217 @@ static int freq_to_step;
  *
  *************************************/
 
+/* RC oscillator: 1785Hz */
+#define TX1_NOISE_CLOCK		(1/(1000.0e-12 * 560000.0))
+#define TX1_PIT_CLOCK		(TX1_PIXEL_CLOCK / 16)
+#define TX1_FRAC			30
+
+#define TX1_SHUNT			(250.0)
+#define TX1_R0				(180000.0 + TX1_SHUNT)
+#define TX1_R1				(56000.0  + TX1_SHUNT)
+#define TX1_R2				(22000.0  + TX1_SHUNT)
+#define TX1_R				(100000.0 + TX1_SHUNT)
+#define TX1_RI				(180000.0)
+
+static const double tx1_engine_gains[16] =
+{
+	-( TX1_R )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R1) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R1 + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R2) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R2 + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R2 + 1.0/TX1_R1) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_R2 + 1.0/TX1_R1 + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT ) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R1) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R1 + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R2) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R2 + 1.0/TX1_R0) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R2 + 1.0/TX1_R1) )/TX1_RI,
+	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R2 + 1.0/TX1_R1 + 1.0/TX1_R0) )/TX1_RI
+};
+
+static UINT8 ay_outputa;
+static UINT8 ay_outputb;
+
+static double weights0[3], weights1[3], weights2[4];
+static int eng0[4];
+static int eng1[4];
+static int eng2[4];
+
+
+/***************************************************************************
+
+    AY-8910 port mappings:
+
+    Port A                      Port B
+    =======                     ======
+
+    0: Engine 0 gain #0         0: Engine 0 gain #8
+    1: Engine 0 gain #1         1: Engine 0 gain #9
+    2: Engine 0 gain #2         2: Engine 0 gain #10
+    3: Engine 0 gain #3         3: Engine 0 gain #11
+    4: Engine 0 gain #4         4: /Enable AY on speaker CR
+    5: Engine 0 gain #5         5: /Enable Engines 1/2 on speakers LR/RR/CF
+    6: Engine 0 gain #6         6: /Skid 0 enable
+    7: Engine 0 gain #7         7: /Skid 1 enable
+
+***************************************************************************/
+WRITE8_HANDLER( tx1_ay8910_a_w )
+{
+	stream_update(stream);
+
+	/* All outputs inverted */
+	ay_outputa = ~data;
+}
+
+WRITE8_HANDLER( tx1_ay8910_b_w )
+{
+	double gain;
+
+	stream_update(stream);
+	/* Only B3-0 are inverted */
+	ay_outputb = data ^ 0xf;
+
+	/* It'll do until we get quadrophonic speaker support! */
+	gain = BIT(ay_outputb, 4) ? 1.5 : 2.0;
+	sndti_set_output_gain(SOUND_AY8910, 0, 0, gain);
+	sndti_set_output_gain(SOUND_AY8910, 0, 1, gain);
+	sndti_set_output_gain(SOUND_AY8910, 0, 2, gain);
+
+	if (!BIT(ay_outputb, 6))
+		popmessage("Skid!");
+
+	if (!BIT(ay_outputb, 7))
+		popmessage("Screech!");
+}
+
+/***************************************************************************
+
+    Engine sounds are produced by three of these 4013B chains:
+
+				+------------------
+                |  +---------+				
+        +-----+ |  | +-----+ |
+      +-|D 1 Q|-+  +-|D 2 Q|-|-----
+      | |C  /Q|-o----|C  /Q|-+
+      | +-----+ |    +-----+
+	  +---------+
+
+	 +----------+
+     |  +-----+ |    +-----+
+     |  |C 3 Q|-+    |C 4 Q|-------
+    !&--|D  /Q|------|D  /Q|-+
+     |  +-----+      +-----+ |
+     +-----------------------+
+
+     Common clocks omitted for clarity (all driven from an 8253 output pin).
+
+	     Player: ES0, ES1, ES2
+	 Opponent 2: ES2
+
+ ***************************************************************************/
+
+
+INLINE void update_engine (int eng[4])
+{
+	int p0 = eng[0];
+	int p1 = eng[1];
+	int p2 = eng[2];
+	int p3 = eng[3];
+
+	eng[0] = !p0;
+	if (p0 && !eng[0]) eng[1] = !p1;
+	eng[2] = !(p2 && !p3);
+	eng[3] = !p2;
+}
+
+
+static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+{
+	UINT32 step_0, step_1, step_2;
+	double gain_0, gain_1, gain_2, gain_3;
+
+	stream_sample_t *fl = &buffer[0][0];
+	stream_sample_t *fr = &buffer[1][0];
+
+	static stream_sample_t pit0 = 0;
+	static stream_sample_t pit1 = 0;
+	static stream_sample_t pit2 = 0;
+
+	/* Clear the buffers */
+	memset(buffer[0], 0, length * sizeof(*buffer[0]));
+	memset(buffer[1], 0, length * sizeof(*buffer[1]));
+
+	/* 8253 outputs for the player/opponent buggy engine sounds. */
+	step_0 = pit8253.counts[0].val ? (TX1_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
+	step_1 = pit8253.counts[1].val ? (TX1_PIT_CLOCK / pit8253.counts[1].val) * freq_to_step : 0;
+	step_2 = pit8253.counts[2].val ? (TX1_PIT_CLOCK / pit8253.counts[2].val) * freq_to_step : 0;
+
+	gain_0 = tx1_engine_gains[ay_outputa & 0xf];
+	gain_1 = tx1_engine_gains[ay_outputa >> 4];
+	gain_2 = tx1_engine_gains[ay_outputb & 0xf];
+	gain_3 = BIT(ay_outputb, 5) ? 1.0f : 1.5f;
+
+	while (length--)
+	{
+		if (step0 & ((1 << TX1_FRAC)))
+		{
+			update_engine(eng0);
+			pit0 = combine_4_weights(weights0, eng0[0], eng0[1], eng0[2], eng0[3]);
+			step0 &= ((1 << TX1_FRAC) - 1);
+		}
+
+		if (step1 & ((1 << TX1_FRAC)))
+		{
+			update_engine(eng1);
+			pit1 = combine_3_weights(weights1, eng1[0], eng1[1], eng1[3]);
+			step1 &= ((1 << TX1_FRAC) - 1);
+		}
+
+		if (step2 & ((1 << TX1_FRAC)))
+		{
+			update_engine(eng2);
+			pit2 = combine_3_weights(weights2, eng2[0], eng2[1], eng2[3]);
+			step2 &= ((1 << TX1_FRAC) - 1);
+		}
+
+		*fl++ = (pit0 + pit1)*gain_3 + 2*pit2*gain_2;
+		*fr++ = (pit0 + pit1)*gain_3 + 2*pit2*gain_2;
+
+		step0 += step_0;
+		step1 += step_1;
+		step2 += step_2;
+	}
+}
+
+
+void *tx1_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
+	const int r1[3] = { 180e3, 390e3, 56e3 };
+	const int r2[3] = { 390e3, 390e3, 180e3 };
+
+
+	/* Allocate the stream */
+	stream = stream_create(0, 2, Machine->sample_rate, NULL, tx1_stream_update);
+	freq_to_step = (double)(1 << TX1_FRAC) / (double)Machine->sample_rate;
+
+	/* Compute the engine resistor weights */
+	compute_resistor_weights(0,	10000, -1.0,
+			4, &r0[0], weights0, 0, 0,
+			3, &r1[0], weights1, 0, 0,
+			3, &r2[0], weights2, 0, 0);
+
+	return auto_malloc(1);
+}
+
+void tx1_sh_reset(void *token)
+{
+	step0 = step1 = step2 = 0;
+}
 
 /*************************************
  *
@@ -44,61 +323,45 @@ static int noise_lfsrb;
 static int noise_lfsrc;
 static int noise_lfsrd;
 static int noise_counter;
-static int step0;
-static int step1;
 static UINT8 ym_outputa;
 static UINT8 ym_outputb;
 static UINT16 buggyboy_eng_voltages[16];
 
 static const double bb_engine_gains[16] =
 {
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100E3)/100E3,
-	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100E3)/100E3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1  + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2  + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3  + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4 ) + 1.0/100e3)/100e3,
+	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
 
-/*
-    8253 Programmable Interval Timer
-*/
-static struct
-{
-	union
-	{
-#ifdef LSB_FIRST
-		struct { UINT8 LSB; UINT8 MSB; };
-#else
-		struct { UINT8 MSB; UINT8 LSB; };
-#endif
-		UINT16 val;
-	} counts[3];
 
-	int idx[3];
-} pit8253;
+/***************************************************************************
 
-/*
-    Port A                     Port B
-    ======                     ======
+    YM-2149, IC24 port mappings:
+
+    Port A                      Port B
+    =======                     ======
 
     0: Engine 1 gain (FR) #0    0: Coin Counter 1
     1: Engine 1 gain (FR) #1    1: Coin Counter 2
     2: Engine 1 gain (FR) #2    2: Coin Counter 3 (Unused)
     3: Engine 1 gain (FR) #3    3: Engine 0 gain
-    4: Engine 1 gain (FL) #0    4: Noise EN1
-    5: Engine 1 gain (FL) #1    5: Noise EN2
+    4: Engine 1 gain (FL) #0    4: Skid 0 enable
+    5: Engine 1 gain (FL) #1    5: Skid 1 enable
     6: Engine 1 gain (FL) #2    6: Enable YM IC24 output on RR
     7: Engine 1 gain (FL) #3    7: Enable YM IC19 output on RL
 
@@ -120,7 +383,7 @@ static struct
     [1] is used to amplify sound during tunnel.
     [2] and [3] are stereo fades
 
-*/
+***************************************************************************/
 
 WRITE8_HANDLER( bb_ym1_a_w )
 {
@@ -155,57 +418,10 @@ WRITE8_HANDLER( bb_ym1_b_w )
 	sndti_set_output_gain(SOUND_AY8910, 1, 2, gain);
 }
 
-
-WRITE8_HANDLER( pit8253_w )
-{
-	stream_update(stream);
-
-	if (offset < 3)
-	{
-		if (pit8253.idx[offset] == 0)
-		{
-			pit8253.counts[offset].LSB = data;
-			pit8253.idx[offset] = 1;
-		}
-		else
-		{
-			pit8253.counts[offset].MSB = data;
-			pit8253.idx[offset] = 0;
-		}
-	}
-	else
-	{
-		int mode = (data >> 1) & 7;
-
-		if (mode == 3)
-		{
-			int cntsel = (data >> 6) & 3;
-			pit8253.idx[cntsel] = 0;
-			pit8253.counts[cntsel].val = 0;
-		}
-		else
-			mame_printf_debug("PIT8253: Unsupported mode %d.\n", mode);
-
-	}
-}
-
-READ8_HANDLER( pit8253_r )
-{
-	mame_printf_debug("PIT R: %x", offset);
-	return 0;
-}
-
-static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
-{
-
-}
-
-/*
-    This is admittedly a bit of a hack job...
-*/
+/* This is admittedly a bit of a hack job... */
 static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
-	int step_0, step_1;
+	UINT32 step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
 
@@ -298,9 +514,7 @@ void *buggyboy_sh_start(int clock, const struct CustomSound_interface *config)
 
 	/* Allocate the stream */
 	stream = stream_create(0, 2, Machine->sample_rate, NULL, buggyboy_stream_update);
-
 	freq_to_step = (double)(1 << 24) / (double)Machine->sample_rate;
-	step0 = step1 = 0;
 
 	return auto_malloc(1);
 }
@@ -314,20 +528,4 @@ void buggyboy_sh_reset(void *token)
 	noise_lfsrb = 1;
 	noise_lfsrc = 0;
 	noise_lfsrd = 0;
-}
-
-void *tx1_sh_start(int clock, const struct CustomSound_interface *config)
-{
-	/* Allocate the stream */
-	stream = stream_create(0, 2, Machine->sample_rate, NULL, tx1_stream_update);
-
-	freq_to_step = (double)(1 << 24) / (double)Machine->sample_rate;
-	step0 = 0;
-	step1 = 0;
-
-	return auto_malloc(1);
-}
-
-void tx1_sh_reset(void *token)
-{
 }

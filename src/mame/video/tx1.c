@@ -273,7 +273,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 		/* TODO: Confirm against hardware? */
 		if ( x_scale == 0 )
 			continue;
-
+			
 		/* 16-bit y-scale accumulator */
 		y_scale = tx1_objram[offs + 1];
 		y_step  = tx1_objram[offs + 3];
@@ -335,17 +335,22 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 				x_step = (128 << FRAC) / x_scale;
 				x_acc = (psa0_11 & 0xff) << (FRAC + 5);
 
-				/* TODO */
-				//x = tx1_objram[offs + 4] & 0x7ff;
-				x = tx1_objram[offs + 4];
+#define TX1_MASK	0xfff
+
+				x = tx1_objram[offs + 4] & TX1_MASK;
 
 				for (;;)
 				{
-					#define MASK	0x3ff
-
 					if (newtile)
 					{
-						UINT32 low_addr = ((x_acc >> (FRAC + 3)) & MASK);
+						UINT32	psbb0_12;
+						UINT32	pscb0_14;
+						UINT32	pscb11;
+						UINT8	*romptr;
+						UINT32	ic281_addr;
+						UINT32  grom_addr;
+						UINT32	lut_data;
+						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & TX1_MASK);
 
 						if (gxflip)
 						{
@@ -353,7 +358,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 
 							if ( BIT(psa0_11, 11) && BIT(psa0_11, 10) )
 								xor_mask = 0xf;
-							else if ( BIT(psa0_11, 9) )
+							else if ( BIT(psa0_11, 11) || BIT(psa0_11, 10) || BIT(psa0_11, 9) )
 								xor_mask = 0x7;
 							else
 								xor_mask = 0x3;
@@ -369,121 +374,97 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 							lasttile = 1;
 
 						dataend |= ic106_data & 0x40;
+
+						/* Retrieve data for an 8x8 tile */
+						ic73_data = ic73[rom_addr2];
+
+						// This is the data from the LUT pair
+						lut_data = (ic106_data << 8) | ic73_data;
+						psbb0_12 = lut_data & 0x1fff;
+
+						// 0000 1100 0011 1111
+						pscb0_14 = (psbb0_12 & 0xc3f);
+
+						/* Bits 9_6 are from PCTMP11-8 or PSBB9-6 */
+						if ( BIT(psbb0_12, 12) )
+							pscb0_14 |= psbb0_12 & 0x3c0;
+						else
+							pscb0_14 |= (pctmp0_7 & 0xf) << 6;
+
+						if ( BIT(lut_data, 13) )
+							pscb0_14 |= BIT(psbb0_12, 10) << 12;	// NOT USED
+						else
+							pscb0_14 |= ((pctmp0_7 & 0x70) << 8);
+
+						/* Bit 12 is Bit 10 duplicated. */
+						pscb0_14 &= ~(1 << 12);
+						pscb0_14 |= BIT(psbb0_12, 10) << 12;
+
+						pscb11 = BIT(pscb0_14, 11);
+
+						/* TODO: Remove this - it's constant. */
+						romptr = (UINT8*)(pixdata_rgn + pscb11 * (0x4000 * 2));
+
+						grom_addr = ((pscb0_14 << 3) | ((y_scale >> 8) & 7)) & 0x3fff;
+
+						/* Get raw 8x8 2bpp pixel row data */
+						data1 = *(grom_addr + romptr);
+						data2 = *(grom_addr + romptr + 0x4000);
+
+						/* Determine flip state (global XOR local) */
+						xflip = gxflip ^ !BIT(lut_data, 15);
+
+						ic281_addr = pscb0_14 & 0x3ff;
+						ic281_addr |= ((pscb0_14 & 0x7000) >> 2);
+						ic281_addr |= pscb11 << 13;
+
+						opcd0_7 = ic281[ic281_addr];
+
+						newtile = 0;
 					}
 
+					/* Draw a pixel? */
+					if ( x <= cliprect->max_x )
 					{
-						if ( newtile )
+						UINT8	pix;
+						UINT8	bit;
+
+						bit	= (x_acc >> FRAC) & 7;
+
+						if ( xflip )
+							bit ^= 7;
+
+						pix = (((data1 >> bit) & 1) << 1) | ((data2 >> bit) & 1);
+
+						/* Draw pixel, if not transparent */
+						if ( !(!(opcd0_7 & 0x80) && !pix) )
 						{
-							UINT32	psbb0_12;
-							UINT32	pscb0_14;
-							UINT32	pscb11;
-							UINT8	*romptr;
-							UINT32	ic281_addr;
-							UINT32  grom_addr;
-							UINT32	lut_data;
+							UINT8 color;
+							UINT32 prom_addr;
 
-							/* Retrieve data for an 8x8 tile */
-							ic73_data = ic73[rom_addr2];
+							prom_addr = ((opcd0_7 << 2) | pix) & 0x1ff;
 
-							// This is the data from the LUT pair
-							lut_data = (ic106_data << 8) | ic73_data;
-							psbb0_12 = lut_data & 0x1fff;
-
-							// 0000 1100 0011 1111
-							pscb0_14 = (psbb0_12 & 0xc3f);
-
-
-							/* Bits 9_6 are from PCTMP11-8 or PSBB9-6 */
-
-							/* 0000 0011 1100 0000 */
-							if ( BIT(psbb0_12, 12) )
-								pscb0_14 |= psbb0_12 & 0x3c0;
+							/* Inverted on schematic */
+							if (x & 1)
+								color = ~ic190[prom_addr] & 0x3f;
 							else
-								pscb0_14 |= (pctmp0_7 & 0xf) << 6;
+								color = ~ic162[prom_addr] & 0x3f;
 
-							// This is the important one!
-							if ( BIT(lut_data, 13) ) // PSBB13
-								pscb0_14 |= BIT(psbb0_12, 10) << 12;
-							else
-								pscb0_14 |= ((pctmp0_7 & 0x70) << 8);
-
-
-
-							// 1 = Bit 12 is Bit 10 duplicated.
-							// Schematics indicate otherwise...
-							#if 1
-							pscb0_14 &= ~(1 << 12);
-							pscb0_14 |= BIT(psbb0_12, 10) << 12;
-							#endif
-
-							pscb11 = BIT(pscb0_14, 11);
-
-							/* TODO: Remove this - it's constant. */
-							romptr = (UINT8*)(pixdata_rgn + pscb11 * (0x4000 * 2));
-
-							grom_addr = ((pscb0_14 << 3) | ((y_scale >> 8) & 7)) & 0x3fff;
-
-							/* Get raw 8x8 2bpp pixel row data */
-							data1 = *(grom_addr + romptr);
-							data2 = *(grom_addr + romptr + 0x4000);
-
-							/* Determine flip state (global XOR local) */
-							xflip = gxflip ^ !BIT(lut_data, 15);
-
-							/* WRONG */
-							ic281_addr = pscb0_14 & 0x3ff; // Bits 9_0
-							ic281_addr |= ((pscb0_14 & 0x7000) >> 2);	//Bits 14 13 12
-							ic281_addr |= pscb11 << 13; // Bit 11
-
-							opcd0_7 = ic281[ic281_addr];
-						}
-
-						/* Draw a pixel? */
-						if ( x <= cliprect->max_x )
-						{
-							UINT8	pix;
-							UINT8	bit;
-
-							bit	= (x_acc >> FRAC) & 7;
-
-							if ( xflip )
-								bit ^= 7;
-
-							pix = (((data1 >> bit) & 1) << 1) | ((data2 >> bit) & 1);
-
-							/* Draw pixel, if not transparent */
-							if ( !(!(opcd0_7 & 0x80) && !pix) )
-							{
-								UINT8 color;
-								UINT32 prom_addr;
-
-								prom_addr = ((opcd0_7 << 2) | pix) & 0x1ff;
-
-								/* Inverted on schematic */
-								if (x & 1)
-									color = ~ic190[prom_addr] & 0x3f;
-								else
-									color = ~ic162[prom_addr] & 0x3f;
-
-								*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[TX1_COLORS_OBJ + color];
-							}
+							*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[TX1_COLORS_OBJ + color];
 						}
 					}
-					newtile = 0;
 
 					/* Check if we've stepped into a new 8x8 tile */
 					/* TODO */
-					if ( (((x_acc + x_step) >> (FRAC + 3)) & MASK) != ((x_acc >> (FRAC + 3)) & MASK) )
+					if ( (((x_acc + x_step) >> (FRAC + 3)) & TX1_MASK) != ((x_acc >> (FRAC + 3)) & TX1_MASK) )
 					{
-						newtile = 1;
-
-						if ( lasttile )
+						if (lasttile)
 							break;
+
+						newtile = 1;
 					}
 
-					// TODO!
-  					//x = (x + 1) & 0x7ff;
-					x = (x + 1);
+  					x = (x + 1) & TX1_MASK;
 					x_acc += x_step;
 				}
 			}// if (yscale)
