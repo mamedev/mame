@@ -460,12 +460,12 @@ static const struct VLM5030interface hyperspt_vlm5030_interface =
 static MACHINE_DRIVER_START( hyperspt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2048000)		/* 1.400 MHz ??? */
+	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hyperspt_readmem,writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,14318180/4)
-	/* audio CPU */ /* Z80 Clock is derived from a 14.31818 MHz crystal */
+	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	/* audio CPU */ 
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -492,10 +492,10 @@ static MACHINE_DRIVER_START( hyperspt )
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(SN76496, 14318180/8)
+	MDRV_SOUND_ADD(SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(VLM5030, 3580000)
+	MDRV_SOUND_ADD(VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(hyperspt_vlm5030_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

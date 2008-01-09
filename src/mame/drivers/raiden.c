@@ -237,15 +237,15 @@ static VIDEO_EOF( raiden )
 static MACHINE_DRIVER_START( raiden )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
+	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
-	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
+	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -266,22 +266,22 @@ static MACHINE_DRIVER_START( raiden )
 	MDRV_VIDEO_UPDATE(raiden)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(14318180/4,1320000,1) // frequency and pin 7 not verified (pin set in audio\seibu.h)
+	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12,1) // frequency and pin 7 verified (pin set in audio\seibu.h)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( raidena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
+	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(alt_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
-	MDRV_CPU_ADD(V30,20000000/2) /* NEC V30 CPU, 20MHz */
+	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -302,7 +302,7 @@ static MACHINE_DRIVER_START( raidena )
 	MDRV_VIDEO_UPDATE(raiden)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(14318180/4,1320000,1)
+	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12,1) /* frequency and pin 7 verified on pcb */
 MACHINE_DRIVER_END
 
 /***************************************************************************/

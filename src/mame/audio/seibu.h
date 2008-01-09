@@ -142,7 +142,7 @@ static const struct YM2203interface ym2203_interface =				\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
 	MDRV_SOUND_ADD(OKIM6295, freq2)									\
-	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7low)	\
+	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7high)	\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2,region)		\

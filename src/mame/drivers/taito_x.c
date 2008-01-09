@@ -1006,11 +1006,11 @@ static MACHINE_START( taitox )
 static MACHINE_DRIVER_START( superman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz? */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(superman_readmem,superman_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD(Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.43)
@@ -1034,7 +1034,7 @@ static MACHINE_DRIVER_START( superman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD(YM2610, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
@@ -1045,11 +1045,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daisenpu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz? */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(daisenpu_readmem,daisenpu_writemem)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD(Z80, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(daisenpu_sound_readmem,daisenpu_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1072,7 +1072,7 @@ static MACHINE_DRIVER_START( daisenpu )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 4000000)
+	MDRV_SOUND_ADD(YM2151, XTAL_16MHz/4)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.45)
 	MDRV_SOUND_ROUTE(1, "right", 0.45)

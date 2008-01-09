@@ -1193,12 +1193,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( slyspy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(slyspy_readmem,slyspy_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 3000000)
-	/* audio CPU */
+	MDRV_CPU_ADD(H6280, XTAL_12MHz/2/3)
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
 	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
@@ -1218,29 +1218,29 @@ static MACHINE_DRIVER_START( slyspy )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD(YM3812, 3000000)
+	MDRV_SOUND_ADD(YM3812, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812b_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 1023924)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/12) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( midres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
-	MDRV_CPU_ADD(H6280, 24000000/4/3)
+	MDRV_CPU_ADD(H6280, XTAL_24MHz/4/3)
 	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
@@ -1261,17 +1261,17 @@ static MACHINE_DRIVER_START( midres )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000) /* verified on pcb */
+	MDRV_SOUND_ADD(YM2203, XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
 	MDRV_SOUND_ROUTE(2, "mono", 0.90)
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD(YM3812, 3000000) /* verified on pcb */
+	MDRV_SOUND_ADD(YM3812, XTAL_24MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812b_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD(OKIM6295, 1000000) /* verified on pcb (1mhz crystal) */
+	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb (1mhz crystal) */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // pin 7 verified on pcb
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.40)
 MACHINE_DRIVER_END

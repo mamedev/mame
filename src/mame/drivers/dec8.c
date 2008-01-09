@@ -2243,14 +2243,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( oscar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 2000000)
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_readmem,oscar_writemem)
 	MDRV_CPU_VBLANK_INT(oscar_interrupt,1)
 
-	MDRV_CPU_ADD(HD6309, 2000000)
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_sub_readmem,oscar_sub_writemem)
 
-	MDRV_CPU_ADD(M6502, 1500000)
+	MDRV_CPU_ADD(M6502, XTAL_12MHz/8)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(dec8_s_readmem,oscar_s_writemem)
 								/* NMIs are caused by the main CPU */
@@ -2272,13 +2272,13 @@ static MACHINE_DRIVER_START( oscar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.23)
 	MDRV_SOUND_ROUTE(1, "mono", 0.23)
 	MDRV_SOUND_ROUTE(2, "mono", 0.23)
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
-	MDRV_SOUND_ADD(YM3526, 3000000)
+	MDRV_SOUND_ADD(YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
@@ -2370,14 +2370,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( csilver )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 2000000)
+	MDRV_CPU_ADD(M6809, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(csilver_readmem,csilver_writemem)
 
-	MDRV_CPU_ADD(M6809, 2000000)
+	MDRV_CPU_ADD(M6809, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(csilver_sub_readmem,csilver_sub_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
-	MDRV_CPU_ADD(M6502, 1500000)
+	MDRV_CPU_ADD(M6502, XTAL_12MHz/8) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(csilver_s_readmem,csilver_s_writemem)
 								/* NMIs are caused by the main CPU */
@@ -2399,17 +2399,17 @@ static MACHINE_DRIVER_START( csilver )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 1500000)
+	MDRV_SOUND_ADD(YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "mono", 0.23)
 	MDRV_SOUND_ROUTE(1, "mono", 0.23)
 	MDRV_SOUND_ROUTE(2, "mono", 0.23)
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
-
-	MDRV_SOUND_ADD(YM3526, 3000000)
+ 
+	MDRV_SOUND_ADD(YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD(MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_DRIVER_END

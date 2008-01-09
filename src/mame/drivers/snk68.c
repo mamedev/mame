@@ -775,11 +775,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( searchar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD(M68000, XTAL_18MHz/2) /* verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(searchar_readmem,searchar_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb  */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
@@ -801,7 +801,7 @@ static MACHINE_DRIVER_START( searchar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 4000000)
+	MDRV_SOUND_ADD(YM3812, XTAL_8MHz/2) /* verified on pcb  */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

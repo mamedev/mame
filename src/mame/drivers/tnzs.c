@@ -1289,8 +1289,7 @@ static const struct Samplesinterface samples_interface =
 static MACHINE_DRIVER_START( arknoid2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 12000000/2)	/* verified on pcb */
-								/* 8MHz is wrong, but extrmatn doesn't work properly at 6MHz */
+	MDRV_CPU_ADD(Z80, XTAL_12MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(arknoid2_interrupt,1)
 

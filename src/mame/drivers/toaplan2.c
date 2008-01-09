@@ -3332,12 +3332,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ghox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD(M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
 
 #if HD64x180
-	MDRV_CPU_ADD(Z180, 10000000)			/* HD647180 CPU actually */
+	MDRV_CPU_ADD(Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
 
@@ -3360,7 +3360,7 @@ static MACHINE_DRIVER_START( ghox )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 27000000/8)
+	MDRV_SOUND_ADD(YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3368,17 +3368,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dogyuun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD(M68000, XTAL_25MHz/2)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
 
 #if V25
-	MDRV_CPU_ADD(Z180, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD(Z180, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
 	MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
-	MDRV_SCREEN_REFRESH_RATE( (27000000.0 / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz   / 4) / (432 * 263) )
 
 	MDRV_MACHINE_RESET(dogyuun)
 
@@ -3397,11 +3397,11 @@ static MACHINE_DRIVER_START( dogyuun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 27000000/8)
+	MDRV_SOUND_ADD(YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 27000000/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_25MHz/24) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3485,11 +3485,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq2,1)
 
-	MDRV_SCREEN_REFRESH_RATE( (27000000.0 / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_28MHz / 4) / (432 * 263) ) /* 28MHz Oscillator */
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3508,11 +3508,11 @@ static MACHINE_DRIVER_START( truxton2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 27000000/8)
+	MDRV_SOUND_ADD(YM2151, XTAL_28MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD(OKIM6295, 27000000/10)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+ 
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3520,11 +3520,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD(M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
 
-	MDRV_CPU_ADD(Z80,27000000/8)			/* ??? 3.37MHz , 27MHz Oscillator */
+	MDRV_CPU_ADD(Z80,XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -3547,7 +3547,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM3812, 27000000/8)
+	MDRV_SOUND_ADD(YM3812, XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3629,17 +3629,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fixeight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq4,1)
 
 #if V25
-	MDRV_CPU_ADD(Z180, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD(Z180, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
 	MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
-	MDRV_SCREEN_REFRESH_RATE( (27000000.0 / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )
 
 	MDRV_MACHINE_RESET(toaplan2)
 //  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
@@ -3659,11 +3659,11 @@ static MACHINE_DRIVER_START( fixeight )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 27000000/8)
+	MDRV_SOUND_ADD(YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/16) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -4722,7 +4722,7 @@ GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan",
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND )
 GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", 0 )
 GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", 0 )
-GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!!", 0 )
+GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu)", 0 )
 GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", 0 )
 GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg ?)", 0 )
 GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

@@ -202,11 +202,11 @@ static const struct YM2151interface ym2151_interface =
 
 static MACHINE_DRIVER_START( dietgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 14000000)	/* DE102 */
+	MDRV_CPU_ADD(M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(dietgo_map,0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280, 32220000/4)	/* Custom chip 45; Audio section crystal is 32.220 MHz */
+	MDRV_CPU_ADD(H6280, XTAL_32_22MHz/4/12)	/* Custom chip 45; XIN is 32.220MHZ/4, HSM pin is low so XIN/12 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -226,12 +226,12 @@ static MACHINE_DRIVER_START( dietgo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 32220000/9)
+	MDRV_SOUND_ADD(YM2151, XTAL_32_22MHz/9) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-
-	MDRV_SOUND_ADD(OKIM6295, 32220000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+ 
+	MDRV_SOUND_ADD(OKIM6295, XTAL_32_22MHz/32) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

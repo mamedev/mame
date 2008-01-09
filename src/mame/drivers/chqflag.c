@@ -5,9 +5,6 @@ Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 Notes:
 - Position counter doesn't behave correctly because of the K051733 protection.
 - 007232 volume & panning control is almost certainly wrong.
-- I've modified the YM2151 clock with an xtal of 2,on what I recall the
-  music at the title screen should end when the words "Chequered Flag"
-  flashes.Needs a comparison with a real PCB however. -AS
 
 ***************************************************************************/
 
@@ -366,11 +363,11 @@ static const struct K007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( chqflag )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(KONAMI,3000000)	/* 052001 */
+	MDRV_CPU_ADD(KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem,chqflag_writemem)
 	MDRV_CPU_VBLANK_INT(chqflag_interrupt,16)	/* ? */
 
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem_sound,chqflag_writemem_sound)
 
@@ -391,25 +388,23 @@ static MACHINE_DRIVER_START( chqflag )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 3579545/2)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD(K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_1)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 
-	MDRV_SOUND_ADD(K007232, 3579545)
+	MDRV_SOUND_ADD(K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(1, "right", 0.20)
 MACHINE_DRIVER_END
-
-
 
 ROM_START( chqflag )
 	ROM_REGION( 0x58800, REGION_CPU1, 0 )	/* 052001 code */

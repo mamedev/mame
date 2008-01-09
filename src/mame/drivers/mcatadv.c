@@ -492,11 +492,11 @@ static const struct YM2610interface mcatadv_ym2610_interface =
 static MACHINE_DRIVER_START( mcatadv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_ADD(M68000, XTAL_16MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_readmem,mcatadv_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 28000000/4) // Guess, 3.5MHz is too slow and CPU comms fail reporting U9 bad.
+	MDRV_CPU_ADD_TAG("sound", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_readmem,mcatadv_sound_writemem)
 	MDRV_CPU_IO_MAP(mcatadv_sound_readport,mcatadv_sound_writeport)
 
@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
+	MDRV_SOUND_ADD(YM2610, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(mcatadv_ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.32)
 	MDRV_SOUND_ROUTE(0, "right", 0.32)
