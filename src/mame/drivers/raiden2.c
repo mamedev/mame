@@ -1,21 +1,49 @@
 /*
 
-Raiden 2 Preliminary Driver
-based on Bryan McPhail's driver
+Raiden 2 Hardware
 
-could also probably support
- Zero Team
+Games on this PCB / Similar PCBs
+ Raiden 2
  Raiden DX
+ Zero Team
 
-Not Working because of protection? banking?
-Missing Sound
-Tilemaps are Wrong
-Inputs are wrong? (protection?)
-Sprite Encryption
-Sprite Ram Format
+ + varients
 
-to get control of player 1 start a game with player 2 start then press player 1 start during the game
-it will crash shortly afterwards tho
+Some of these games were also released on updated PCBs
+which usually featured vastly inferior sound hardware
+ (see the V33 based version of Raiden II/DX New)
+
+
+Protection Notes:
+ These games use the 2nd (and 3rd) generation of Seibu's 'COP' protection,
+ utilizing the external 'COPX_D2' and 'COPX_D3' lookup roms (probably for
+ math operations)  These chips, marked (c)1992 RISE Corp. are not thought
+ to be the actual MCU which is probably internal to one of the Seibu
+ customs.
+
+ The games in legionna.c use the same protection chips.
+
+Current Problem(s) - in order of priority
+
+ High Priority
+
+ ROM banking - we don't know where the ROM bank registers are, this causes
+ serious problems as it's hard to see which glitches are caused by
+ protection, and which are caused by a lack of ROM banking.
+
+ Protection - it isn't emulated, until it is the games will never work.
+
+ Sprite Encryption - this is 99% complete for Raiden 2 / DX, just a few bad
+ bits remain.  No decryption support for Zero Team yet.
+
+ Sound - the main sets should use a variant of the Seibu Sound System, with
+ an extra OKI6295, currently no sound is hooked up in these sets.  The V33
+ set uses weaker sound hardware which is emulated.
+
+ Video emulation - used to be more complete than it is now, tile banking is
+ currently broken.
+
+ Low Priority
 
 
 */
@@ -23,6 +51,11 @@ it will crash shortly afterwards tho
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
+#include "machine/eeprom.h"
+#include "sound/okim6295.h"
+
+/* in machine/r2crypt.c */
+extern void raiden2_decrypt_sprites(void);
 
 static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
 static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
@@ -206,6 +239,7 @@ static TILE_GET_INFO( get_text_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
+#if 0
 static void set_scroll(tilemap *tm, int plane)
 {
 	int x = mainram[0x620/2+plane*2+0];
@@ -213,7 +247,7 @@ static void set_scroll(tilemap *tm, int plane)
 	tilemap_set_scrollx(tm, 0, x);
 	tilemap_set_scrolly(tm, 0, y);
 }
-
+#endif
 /* VIDEO START (move to video file) */
 
 static VIDEO_START( raiden2 )
@@ -243,6 +277,8 @@ static VIDEO_START( raiden2 )
 
 static VIDEO_UPDATE ( raiden2 )
 {
+
+#if 0
 	int info_1, info_2, info_3;
 
 #if 0
@@ -409,6 +445,7 @@ static VIDEO_UPDATE ( raiden2 )
 			tilemap_mark_all_tiles_dirty(foreground_layer);
 		}
 	}
+#endif
 #endif
 
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
@@ -1083,61 +1120,6 @@ static INPUT_PORTS_START( raidendx )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( raiden2n ) /* For "Newer" (V33) versions of Raiden 2 & Raiden DX */
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START	/* Dip switch A  */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Test Mode" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-/* No Dip switch B - Manual Doesn't list a SW2 */
-
-	PORT_START	/* START BUTTONS */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-INPUT_PORTS_END
-
-
 
 
 /*************************************
@@ -1779,95 +1761,6 @@ ROM_START( raidndxm )
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 ROM_END
 
-/*
-
-Raiden DX
-Seibu Kaihatsu, 1993/1996
-
-Note! PCB seems like an updated version. It uses _entirely_ SMD technology and
-is smaller than the previous hardware. I guess the game is still popular, so
-Seibu re-manufactured it using newer technology to meet demand.
-Previous version hardware is similar to Heated Barrel/Legionairre/Seibu Cup Soccer etc.
-It's possible that the BG and OBJ ROMs from this set can be used to complete the
-previous (incomplete) dump that runs on the V30 hardware, since most GFX chips are the same.
-
-PCB ID: (C) 1996 JJ4-China-Ver2.0 SEIBU KAIHATSU INC., MADE IN JAPAN
-CPU   : NEC 70136AL-16 (V33)
-SOUND : Oki M6295
-OSC   : 28.636360MHz
-RAM   : CY7C199-15 (28 Pin SOIC, x11)
-        Breakdown of RAM locations...
-                                     (x2 near SIE150)
-                                     (x3 near SEI252)
-                                     (x2 near SEI0200)
-                                     (x4 near SEI360)
-
-DIPs  : 8 position (x1)
-        1-6 OFF   (NOT USED)
-        7   OFF = Normal Mode  , ON = Test/Setting Mode
-        8   OFF = Normal Screen, ON = FLIP Screen
-
-OTHER : Controls are 8-way + 3 Buttons
-        Amtel 93C46 EEPROM (SOIC8)
-        PALCE16V8 (x1, near BG ROM, SOIC20)
-        SEIBU SEI360 SB06-1937   (160 pin PQFP)
-        SEIBI SIE150             (100 pin PQFP, Note SIE, not a typo)
-        SEIBU SEI252             (208 pin PQFP)
-        SEIBU SEI333             (208 pin PQFP)
-        SEIBU SEI0200 TC110G21AF (100 pin PQFP)
-
-        Note: Most of the custom SEIBU chips are the same as the ones used on the
-              previous version hardware.
-
-ROMs  :   (filename is PCB label, extension is PCB 'u' location)
-
-              ROM                ROM                 Probably               Byte
-Filename      Label              Type                Used...        Note    C'sum
----------------------------------------------------------------------------------
-PCM.099       RAIDEN-X SOUND     LH538100  (SOP32)   Oki Samples      0     8539h
-FIX.613       RAIDEN-X FIX       LH532048  (SOP40)   ? (BG?)          1     182Dh
-COPX_D3.357   RAIDEN-X 333       LH530800A (SOP32)   Protection?      2     CEE4h
-PRG.223       RAIDEN-X CHR-4A1   MX23C3210 (SOP44)   V33 program      3     F276h
-OBJ1.724      RAIDEN-X CHR1      MX23C3210 (SOP44)   Motion Objects   4     4148h
-OBJ2.725      RAIDEN-X CHR2      MX23C3210 (SOP44)   Motion Objects   4     00C3h
-BG.612        RAIDEN-X CHR3      MX23C3210 (SOP44)   Backgrounds      5     3280h
-
-
-Notes
-0. Located near Oki M6295
-1. Located near SEI0200 and BG ROM
-2. Located near SEI333
-3. Located near V33 and SEI333
-4. Located near V33 and SEI252
-5. Located near FIX ROM and SEI0200
-
-*/
-
-
-ROM_START( raidndxb )
-	ROM_REGION( 0x400000, REGION_USER1, 0 ) /* v33 main cpu */
-	ROM_LOAD("prg.223",   0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
-
-	ROM_REGION( 0x20000, REGION_CPU2, ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
-	/* nothing?  no z80*/
-
-	ROM_REGION( 0x040000, REGION_GFX1, ROMREGION_DISPOSE ) /* chars */
-	ROM_LOAD( "fix.613",	0x000000,	0x040000,	CRC(3da27e39) SHA1(3d446990bf36dd0a3f8fadb68b15bed54904c8b5) )
-
-	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* background gfx */
-	ROM_LOAD( "bg.612",   0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
-
-	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* sprite gfx (encrypted) */
-	ROM_LOAD32_WORD( "obj1.724",  0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
-	ROM_LOAD32_WORD( "obj2.725",  0x000002, 0x400000, CRC(b09434d9) SHA1(da75252b7693ab791fece4c10b8a4910edb76c88) )
-
-	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
-	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
-
-	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
-	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
-ROM_END
-
 
 /* Zero Team sets */
 
@@ -2014,277 +1907,96 @@ ROM_START( nzerotea )
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) )
 ROM_END
 
-/* INIT */
-
-static const int swx[32] = {
-  25, 28, 15, 19,  6,  0,  3, 24,
-  11,  1,  2, 30, 16,  7, 22, 17,
-  31, 14, 23,  9, 27, 18,  4, 10,
-  13, 20,  5, 12,  8, 29, 26, 21,
-};
-
-static UINT32 sw(UINT32 v)
-{
-  UINT32 r = 0;
-  int i;
-  for(i=0; i<32; i++)
-    if(v & (1 << swx[i]))
-      r |= 1 << (31-i);
-  return r;
-}
-
-static const UINT8 rotate[512] = {
-  0x11, 0x17, 0x0d, 0x03, 0x17, 0x1f, 0x08, 0x1a, 0x0f, 0x04, 0x1e, 0x13, 0x19, 0x0e, 0x0e, 0x05,
-  0x06, 0x07, 0x08, 0x08, 0x0d, 0x18, 0x11, 0x1a, 0x0b, 0x06, 0x12, 0x0c, 0x1f, 0x0b, 0x1c, 0x19,
-  0x00, 0x1b, 0x0c, 0x09, 0x1d, 0x18, 0x1a, 0x16, 0x1a, 0x08, 0x03, 0x04, 0x0f, 0x1d, 0x16, 0x07,
-  0x1a, 0x12, 0x01, 0x0b, 0x00, 0x0f, 0x1e, 0x10, 0x09, 0x0f, 0x10, 0x09, 0x0a, 0x1c, 0x0d, 0x08,
-  0x06, 0x1a, 0x06, 0x02, 0x11, 0x1e, 0x0c, 0x1c, 0x11, 0x0f, 0x19, 0x0a, 0x16, 0x14, 0x18, 0x11,
-  0x0b, 0x0d, 0x1c, 0x1f, 0x0d, 0x1f, 0x0d, 0x19, 0x0d, 0x04, 0x19, 0x0f, 0x06, 0x13, 0x0c, 0x1b,
-  0x1f, 0x12, 0x15, 0x1a, 0x04, 0x02, 0x06, 0x03, 0x0a, 0x0d, 0x12, 0x09, 0x17, 0x1d, 0x12, 0x10,
-  0x05, 0x07, 0x03, 0x00, 0x14, 0x07, 0x14, 0x1a, 0x1c, 0x0a, 0x10, 0x0f, 0x0b, 0x0c, 0x08, 0x0f,
-  0x07, 0x00, 0x13, 0x1c, 0x04, 0x15, 0x0e, 0x02, 0x17, 0x17, 0x00, 0x03, 0x18, 0x00, 0x02, 0x13,
-  0x14, 0x0c, 0x01, 0x0a, 0x15, 0x0b, 0x0a, 0x1c, 0x1b, 0x06, 0x17, 0x1d, 0x11, 0x1f, 0x10, 0x04,
-  0x1a, 0x01, 0x1b, 0x13, 0x03, 0x09, 0x09, 0x0f, 0x0d, 0x03, 0x15, 0x1c, 0x04, 0x06, 0x06, 0x0b,
-  0x04, 0x0a, 0x1f, 0x16, 0x11, 0x0a, 0x05, 0x05, 0x0c, 0x1c, 0x10, 0x0c, 0x11, 0x04, 0x10, 0x1a,
-  0x06, 0x10, 0x19, 0x06, 0x15, 0x0f, 0x11, 0x01, 0x10, 0x0c, 0x1d, 0x05, 0x1f, 0x05, 0x12, 0x16,
-  0x02, 0x12, 0x14, 0x0d, 0x14, 0x0f, 0x04, 0x07, 0x13, 0x01, 0x11, 0x1c, 0x1c, 0x1d, 0x0e, 0x06,
-  0x1d, 0x13, 0x10, 0x06, 0x0f, 0x02, 0x12, 0x10, 0x1e, 0x0c, 0x17, 0x15, 0x0b, 0x1f, 0x01, 0x19,
-  0x02, 0x01, 0x07, 0x1d, 0x13, 0x19, 0x0f, 0x0f, 0x10, 0x03, 0x1e, 0x03, 0x0d, 0x0a, 0x0c, 0x0d,
-
-  0x16, 0x1f, 0x16, 0x1a, 0x1c, 0x16, 0x01, 0x03, 0x01, 0x08, 0x14, 0x19, 0x03, 0x1e, 0x08, 0x02,
-  0x02, 0x1d, 0x15, 0x00, 0x09, 0x1d, 0x03, 0x11, 0x11, 0x0b, 0x1b, 0x14, 0x01, 0x1e, 0x11, 0x12,
-  0x1d, 0x06, 0x0b, 0x13, 0x1e, 0x16, 0x0d, 0x10, 0x11, 0x1f, 0x1c, 0x15, 0x0d, 0x1a, 0x13, 0x1f,
-  0x0e, 0x05, 0x10, 0x06, 0x0d, 0x1c, 0x07, 0x19, 0x06, 0x1d, 0x11, 0x00, 0x1c, 0x05, 0x0b, 0x1d,
-  0x1c, 0x06, 0x05, 0x1d, 0x00, 0x13, 0x00, 0x12, 0x1b, 0x17, 0x1a, 0x1b, 0x17, 0x1c, 0x16, 0x0a,
-  0x11, 0x15, 0x0f, 0x0b, 0x0f, 0x07, 0x0e, 0x04, 0x13, 0x00, 0x1c, 0x05, 0x16, 0x00, 0x1a, 0x04,
-  0x17, 0x04, 0x08, 0x1b, 0x05, 0x12, 0x1d, 0x0d, 0x02, 0x16, 0x12, 0x0e, 0x06, 0x08, 0x14, 0x07,
-  0x0e, 0x0f, 0x15, 0x13, 0x12, 0x00, 0x1d, 0x16, 0x1b, 0x18, 0x1f, 0x05, 0x12, 0x13, 0x01, 0x0c,
-  0x12, 0x04, 0x19, 0x13, 0x12, 0x15, 0x07, 0x06, 0x0a, 0x00, 0x09, 0x14, 0x1e, 0x03, 0x10, 0x1b,
-  0x08, 0x1a, 0x07, 0x02, 0x1b, 0x0d, 0x18, 0x13, 0x02, 0x07, 0x1e, 0x05, 0x15, 0x02, 0x06, 0x18,
-  0x12, 0x09, 0x1c, 0x07, 0x0b, 0x02, 0x03, 0x00, 0x18, 0x18, 0x03, 0x0f, 0x02, 0x0f, 0x10, 0x09,
-  0x05, 0x18, 0x08, 0x1b, 0x0d, 0x10, 0x03, 0x00, 0x0c, 0x14, 0x1d, 0x08, 0x02, 0x10, 0x0b, 0x0c,
-  0x00, 0x0d, 0x0d, 0x0a, 0x06, 0x1c, 0x09, 0x19, 0x1b, 0x14, 0x18, 0x0f, 0x02, 0x07, 0x05, 0x04,
-  0x1c, 0x15, 0x18, 0x00, 0x0b, 0x10, 0x19, 0x1c, 0x1b, 0x08, 0x1d, 0x12, 0x17, 0x1d, 0x0c, 0x01,
-  0x03, 0x0d, 0x03, 0x0d, 0x15, 0x0e, 0x16, 0x08, 0x05, 0x11, 0x1f, 0x03, 0x16, 0x03, 0x0f, 0x10,
-  0x08, 0x19, 0x18, 0x15, 0x1f, 0x05, 0x00, 0x09, 0x0e, 0x05, 0x16, 0x1b, 0x01, 0x08, 0x08, 0x1f,
-};
 
 
-static const UINT32 xmap_low_01[8] = { 0x915b174c, 0xd1e3d41d, 0x7afd901e, 0x890aeda6, 0xdaa66bf6, 0xcf3a5859, 0x1fc8ae80, 0xd7c864c2 };
-static const UINT32 xmap_low_03[8] = { 0xc9b43501, 0x2d4136ef, 0x5a3e2047, 0xccab4852, 0x67770213, 0xcc1c22ee, 0x7f767fe5, 0xae783fa3 };
-static const UINT32 xmap_low_07[8] = { 0x533ce0ff, 0x21561e2b, 0x5e52735b, 0x2f89d3c0, 0x383ee980, 0x807ae78a, 0x6dfab360, 0xccd84e92 };
-static const UINT32 xmap_low_23[8] = { 0xa3b39673, 0xb3a21d4a, 0x07440937, 0xa9005a05, 0x12bbf9d7, 0x257164a7, 0x6162a1e4, 0x862c5d73 };
+/*
 
-static const UINT32 xmap_low_31[8] = { 0x76fa8a84, 0x2f3f4960, 0x82087362, 0x40aebf9e, 0x02854535, 0xfcbd325a, 0x7b8823f3, 0xcbd62b3a };
+Raiden DX
+Seibu Kaihatsu, 1993/1996
 
-static const UINT32 xmap_high_00[8] = { 0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f };
-static const UINT32 xmap_high_02[8] = { 0x3caa374d, 0xfabf45a5, 0x2633d9ba, 0x05573b6a, 0x03234029, 0x185b17b0, 0x53afc974, 0x2067077d };
-static const UINT32 xmap_high_03[8] = { 0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38 };
-static const UINT32 xmap_high_04[8] = { 0x91a1acfe, 0x5adaac01, 0x9dc40024, 0x1c87c08b, 0x34ab1b76, 0x631175d5, 0x017b85e6, 0x13359cd1 };
-static const UINT32 xmap_high_06[8] = { 0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82 };
-static const UINT32 xmap_high_21[8] = { 0x1d51f8b6, 0xcc1b30b3, 0x9bf75b9d, 0x2c57e2cd, 0x3b5138de, 0xba5c69c4, 0x422c4b8e, 0xd5465cf6 };
-static const UINT32 xmap_high_20[8] = { 0x41d4146c, 0x536d7b04, 0x59d60240, 0x7d01cc23, 0x8a0e5ce4, 0x11e0b0db, 0x513381e1, 0x3264be61 };
-static const UINT32 xmap_high_10[8] = { 0xc04f0362, 0x44fa6936, 0xc048b0db, 0x704897b2, 0x7e28568f, 0xfb9e070f, 0xc34a5704, 0xd5888a6f };
-static const UINT32 xmap_high_11[8] = { 0xd88e9b92, 0xda49726b, 0xc13f86b7, 0x6ce2a1b0, 0xb3adc6e9, 0xd83c2f64, 0xa14c1efc, 0xe98a3c19 };
-static const UINT32 xmap_high_13[8] = { 0x03f8a061, 0x19f39b5a, 0x13a17ae2, 0x85c06682, 0x42118566, 0x78e4ff8a, 0xbee64f97, 0x5eecb443 };
-static const UINT32 xmap_high_15[8] = { 0x1c6f2b4f, 0x9eebe281, 0x784b85d8, 0x401d6412, 0x0370ae0a, 0xa791d0b3, 0x89d290ea, 0x4666f009 };
-static const UINT32 xmap_high_16[8] = { 0xbe2beb93, 0xac9284fb, 0xa629fdbf, 0x82fe33dc, 0x75f1a31b, 0xee1f4f24, 0xaecc7e1e, 0xcd9b419e };
+Note! PCB seems like an updated version. It uses _entirely_ SMD technology and
+is smaller than the previous hardware. I guess the game is still popular, so
+Seibu re-manufactured it using newer technology to meet demand.
+Previous version hardware is similar to Heated Barrel/Legionairre/Seibu Cup Soccer etc.
+It's possible that the BG and OBJ ROMs from this set can be used to complete the
+previous (incomplete) dump that runs on the V30 hardware, since most GFX chips are the same.
 
-static const UINT32 zmap_0[8] = { 0x08b01003, 0xed4037ec, 0x9a3a3044, 0x0daf5851, 0xa7725210, 0x0c1822ed, 0xbf726fe6, 0x6e783ea0 };
-static const UINT32 zmap_1[8] = { 0xc6783a02, 0x1e8239df, 0xa53d108b, 0xcc5784a1, 0x9bbb0123, 0xcc2c11dd, 0xbfb9bfda, 0x5db43f53 };
+PCB ID: (C) 1996 JJ4-China-Ver2.0 SEIBU KAIHATSU INC., MADE IN JAPAN
+CPU   : NEC 70136AL-16 (V33)
+SOUND : Oki M6295
+OSC   : 28.636360MHz
+RAM   : CY7C199-15 (28 Pin SOIC, x11)
+        Breakdown of RAM locations...
+                                     (x2 near SIE150)
+                                     (x3 near SEI252)
+                                     (x2 near SEI0200)
+                                     (x4 near SEI360)
 
-static const UINT32 zmap_2[32] = {
-  0x1b301017, 0x02310910, 0x04404644, 0x08042024, 0x050a3aa4, 0xb6087024, 0xa2204208, 0x1c9d9228,
-  0x00c04200, 0xe0821041, 0x0018a803, 0x6402d208, 0x3a104109, 0x005082c0, 0x00920910, 0x20404007,
-  0xc006a0c0, 0x1c48e006, 0xf8871010, 0x83510440, 0x80600410, 0x00040c0a, 0x510590e6, 0x40200910,
-  0x24090928, 0x010406a8, 0x032001a8, 0x10a80993, 0x40858042, 0x49a30111, 0x0c482401, 0x830224c0
-};
+DIPs  : 8 position (x1)
+        1-6 OFF   (NOT USED)
+        7   OFF = Normal Mode  , ON = Test/Setting Mode
+        8   OFF = Normal Screen, ON = FLIP Screen
 
-static const UINT32 zmap_3[32] = {
-  0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82,
-  0x2b949d79, 0xd256c897, 0x06a0a4b8, 0x9a84b8d1, 0xfa126bf0, 0x79c9b077, 0x79c2a012, 0x1c0e107d,
-  0x146dc646, 0x31e1d76e, 0x01d84b57, 0xe62a436e, 0x858d901f, 0x86324382, 0xd738cf0b, 0xa3d1e692,
-  0x0f9d9451, 0xd352ce3f, 0x0580a510, 0x8a2cb142, 0xba97ebb2, 0x306ab166, 0x758a8413, 0x9f0c34bd,
-};
+OTHER : Controls are 8-way + 3 Buttons
+        Amtel 93C46 EEPROM (SOIC8)
+        PALCE16V8 (x1, near BG ROM, SOIC20)
+        SEIBU SEI360 SB06-1937   (160 pin PQFP)
+        SEIBI SIE150             (100 pin PQFP, Note SIE, not a typo)
+        SEIBU SEI252             (208 pin PQFP)
+        SEIBU SEI333             (208 pin PQFP)
+        SEIBU SEI0200 TC110G21AF (100 pin PQFP)
 
-static const UINT32 zmap_4[16] = {
-  0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38,
-  0x24c94b28, 0xe18616e9, 0x0338a9ab, 0x74aadb9b, 0x7a95c14b, 0x49f383d1, 0x0cda2d11, 0xa34264c7,
-};
+        Note: Most of the custom SEIBU chips are the same as the ones used on the
+              previous version hardware.
 
-static const UINT32 zmap_5[32] = {
-  0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
-  0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
-  0x3f39193f, 0x03350fb8, 0x076047ec, 0x18ac29b7, 0x458fbae6, 0xffab7135, 0xae686609, 0x9f9fb6e8,
-  0xc0c6e6c0, 0xfccaf047, 0xf89fb813, 0xe753d648, 0xba704519, 0x00548eca, 0x519799f6, 0x60604917,
-};
+ROMs  :   (filename is PCB label, extension is PCB 'u' location)
 
-#if 0
-static UINT32 xrot(UINT32 v, int r)
-{
-  return (v >> r) | (v << (32-r));
-}
-#endif
+              ROM                ROM                 Probably               Byte
+Filename      Label              Type                Used...        Note    C'sum
+---------------------------------------------------------------------------------
+PCM.099       RAIDEN-X SOUND     LH538100  (SOP32)   Oki Samples      0     8539h
+FIX.613       RAIDEN-X FIX       LH532048  (SOP40)   ? (BG?)          1     182Dh
+COPX_D3.357   RAIDEN-X 333       LH530800A (SOP32)   Protection?      2     CEE4h
+PRG.223       RAIDEN-X CHR-4A1   MX23C3210 (SOP44)   V33 program      3     F276h
+OBJ1.724      RAIDEN-X CHR1      MX23C3210 (SOP44)   Motion Objects   4     4148h
+OBJ2.725      RAIDEN-X CHR2      MX23C3210 (SOP44)   Motion Objects   4     00C3h
+BG.612        RAIDEN-X CHR3      MX23C3210 (SOP44)   Backgrounds      5     3280h
 
-static UINT32 yrot(UINT32 v, int r)
-{
-  return (v << r) | (v >> (32-r));
-}
 
-static int bt(const UINT32 *tb, int v)
-{
-  return (tb[v/32] & (1<<(v % 32))) != 0;
-}
+Notes
+0. Located near Oki M6295
+1. Located near SEI0200 and BG ROM
+2. Located near SEI333
+3. Located near V33 and SEI333
+4. Located near V33 and SEI252
+5. Located near FIX ROM and SEI0200
 
-static UINT32 gr(int i)
-{
-  int idx = i & 0xff;
-  if(i & 0x008000)
-    idx ^= 1;
-  if(i & 0x100000)
-    idx ^= 256;
-  return rotate[idx];
-}
+*/
 
-static UINT32 gm(int i)
-{
-  UINT32 x;
-  int idx = i & 0xff;
-  int idx2 = ((i>>8) & 0x1ff) | ((i>>9) & 0x200);
-  int i1, i2;
 
-  if(i & 0x008000)
-    idx ^= 1;
-  if(i & 0x100000)
-    idx ^= 256;
+ROM_START( r2dx_v33 )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 ) /* v33 main cpu */
+	ROM_LOAD("prg.223",   0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
 
-  i1 = idx & 0xff;
-  i2 = (i >> 8) & 0xff;
+	ROM_REGION( 0x20000, REGION_CPU2, ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
+	/* nothing?  no z80*/
 
-  x    = 0x41135012;
+	ROM_REGION( 0x040000, REGION_GFX1, ROMREGION_DISPOSE ) /* chars */
+	ROM_LOAD( "fix.613",	0x000000,	0x040000,	CRC(3da27e39) SHA1(3d446990bf36dd0a3f8fadb68b15bed54904c8b5) )
 
-  if(bt(xmap_low_01, i1))
-    x ^= 0x00c01000;
-  if(bt(xmap_low_03, i1))
-    x ^= 0x03000800;
-  if(bt(xmap_low_07, i1))
-    x ^= 0x00044000;
-  if(bt(xmap_low_23, i1))
-    x ^= 0x00102000;
-  if(bt(xmap_low_31, i1))
-    x ^= 0x00008000;
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* background gfx */
+	ROM_LOAD( "bg.612",   0x000000, 0x400000, CRC(162c61e9) SHA1(bd0a6a29804b84196ba6bf3402e9f30a25da9269) )
 
-  if(bt(xmap_high_00, i2))
-    x ^= 0x00000400;
-  if(bt(xmap_high_02, i2))
-    x ^= 0x00200020;
-  if(bt(xmap_high_03, i2))
-    x ^= 0x02000008;
-  if(bt(xmap_high_04, i2))
-    x ^= 0x10000200;
-  if(bt(xmap_high_06, i2))
-    x ^= 0x00000004;
-  if(bt(xmap_high_21, i2))
-    x ^= 0x80000001;
-  if(bt(xmap_high_20, i2))
-    x ^= 0x00100040;
-  if(bt(xmap_high_10, i2))
-    x ^= 0x40000100;
-  if(bt(xmap_high_11, i2))
-    x ^= 0x00800010;
-  if(bt(xmap_high_13, i2))
-    x ^= 0x00020080;
-  if(bt(xmap_high_15, i2))
-    x ^= 0x20000002;
-  if(bt(xmap_high_16, i2))
-    x ^= 0x00080000;
+	ROM_REGION( 0x800000, REGION_GFX3, ROMREGION_DISPOSE ) /* sprite gfx (encrypted) */
+	ROM_LOAD32_WORD( "obj1.724",  0x000000, 0x400000, CRC(7d218985) SHA1(777241a533defcbea3d7e735f309478d260bad52) )
+	ROM_LOAD32_WORD( "obj2.725",  0x000002, 0x400000, CRC(b09434d9) SHA1(da75252b7693ab791fece4c10b8a4910edb76c88) )
 
-  if(i & 0x010000)
-    x ^= 0xa200000f;
-  if(i & 0x020000)
-    x ^= 0x00ba00f0;
-  if(i & 0x040000)
-    x ^= 0x53000f00;
-  if(i & 0x080000)
-    x ^= 0x00d4f000;
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "pcm.099", 0x00000, 0x100000, CRC(97ca2907) SHA1(bfe8189300cf72089d0beaeab8b1a0a1a4f0a5b6) )
 
-  if(bt(zmap_2, idx2) && bt(xmap_low_03, i1))
-    x ^= 0x08000000;
-
-  if(bt(zmap_3, idx2))
-    x ^= 0x08000000;
-
-  if(bt(zmap_4, idx2&0x1ff) && bt(xmap_low_03, i1))
-    x ^= 0x04000000;
-
-  if(bt(zmap_5, idx2))
-    x ^= 0x04000000;
-
-  return x;
-}
-
-static UINT32 trans(UINT32 v, UINT32 x)
-{
-  UINT32 R = v^x, r = R;
-
-  if((R & (1<<8)) && (v & (1<<30)))
-    r ^= 1<<9;
-
-  if((R & (1<<12)) && (v & (1<<22)))
-    r ^= 1<<13;
-
-  if((v & (1<<18)) && (x & (1<<14)))
-    r ^= 1<<19;
-
-  if((v & (1<<19)) && (x & (1<<6)))
-    r ^= 1<<20;
-
-  if((R & (1<<22)) && (x & (1<<22)))
-    r ^= 1<<23;
-
-  if((R & (1<<24)) && (x & (1<<24)))
-    r ^= 1<<25;
-
-  if((R & (1<<25)) && (v & (1<<3)))
-    r ^= 1<<26;
-
-  if((R & (1<<26)) && (x & (1<<26)))
-    r ^= 1<<27;
-
-  if((R & (1<<28)) && (v & (1<<28)))
-    r ^= 1<<29;
-
-  return r;
-}
-
-static void decrypt_sprites(void)
-{
-  int i;
-  UINT32 *data = (UINT32 *)memory_region(REGION_GFX3);
-  for(i=0; i<0x800000/4; i++) {
-    UINT32 x1, v1, y1;
-
-    int idx = i & 0xff;
-    int i2;
-    int idx2;
-
-    idx2 = ((i>>7) & 0x3ff) | ((i>>8) & 0x400);
-    if(i & 0x008000)
-      idx ^= 1;
-    if(i & 0x100000)
-      idx ^= 256;
-
-    i2 = i >> 8;
-
-    v1 = sw(yrot(data[i], gr(i)));
-
-    x1 = gm(i);
-
-    y1 = ~trans(v1, x1);
-
-    data[i] = y1;
-  }
-}
+	ROM_REGION( 0x40000, REGION_USER2, 0 )	/* COPDX */
+	ROM_LOAD( "copx_d3.357",   0x00000, 0x20000, CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
+ROM_END
 
 
 static DRIVER_INIT (raiden2)
@@ -2295,22 +2007,279 @@ static DRIVER_INIT (raiden2)
 	memory_set_bankptr(1,&RAM[0x000000]);
 	memory_set_bankptr(2,&RAM[0x040000]);
 
-	decrypt_sprites();
+	raiden2_decrypt_sprites();
 }
 
-static DRIVER_INIT (r2nocpu)
+
+
+
+static const UINT8 r2_v33_default_eeprom_type1[32] =
 {
-	/* wrong , there must be some banking this just stops it crashing */
-	UINT8 *RAM = memory_region(REGION_USER1);
+	0x41, 0x52, 0x44, 0x49, 0x4E, 0x45, 0x49, 0x49, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x91, 0x80,
+	0x80, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
 
-	memory_set_bankptr(1,&RAM[0x000000]);
-	memory_set_bankptr(2,&RAM[0x040000]);
+static NVRAM_HANDLER( rdx_v33 )
+{
+	if (read_or_write)
+		EEPROM_save(file);
+	else
+	{
+		EEPROM_init(&eeprom_interface_93C46);
 
-	decrypt_sprites();
+		if (file) EEPROM_load(file);
+		else
+		{
+			EEPROM_set_data(r2_v33_default_eeprom_type1,32);
+		}
+	}
+}
 
-	/* stop cpu, not the right cpu anyway */
-	cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
 
+static WRITE16_HANDLER( rdx_v33_eeprom_w )
+{
+	if (ACCESSING_LSB)
+	{
+		EEPROM_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		EEPROM_write_bit(data & 0x20);
+		EEPROM_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+
+		if (data&0xc7) logerror("eeprom_w extra bits used %04x\n",data);
+	}
+	else
+	{
+		logerror("eeprom_w MSB used %04x",data);
+	}
+}
+
+static READ16_HANDLER( rdx_v33_eeprom_r )
+{
+	return readinputport(0) | (EEPROM_read_bit()<<4);
+}
+
+
+static UINT16 mcu_prog[0x400];
+static int mcu_prog_offs = 0;
+
+static WRITE16_HANDLER( mcu_prog_w )
+{
+	mcu_prog[mcu_prog_offs*2] = data;
+}
+
+static WRITE16_HANDLER( mcu_prog_w2 )
+{
+	mcu_prog[mcu_prog_offs*2+1] = data;
+
+	{
+		FILE *fp;
+		fp=fopen("rdx_v33.dmp", "w+b");
+		if (fp)
+		{
+			fwrite(mcu_prog, 0x400, 2, fp);
+			fclose(fp);
+		}
+	}
+}
+
+static WRITE16_HANDLER( mcu_prog_offs_w )
+{
+	mcu_prog_offs = data;
+}
+
+static READ16_HANDLER( r2_playerin_r )
+{
+	return readinputport(1);
+}
+static READ16_HANDLER( rdx_v33_oki_r )
+{
+	return OKIM6295_status_0_r(0);
+}
+
+static WRITE16_HANDLER( rdx_v33_oki_w )
+{
+	if (ACCESSING_LSB) OKIM6295_data_0_w(0, data & 0x00ff);
+	if (ACCESSING_MSB) logerror("rdx_v33_oki_w MSB %04x\n",data);
+}
+
+static READ16_HANDLER( rdx_v33_unknown_r )
+{
+	return 0x00;
+}
+
+static READ16_HANDLER( rdx_v33_unknown2_r )
+{
+	return 0x00;
+}
+
+
+static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
+
+	/* results from cop? */
+	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+
+//	AM_RANGE(0x00620, 0x00621) AM_WRITE(scroll_w) // scroll1
+//	AM_RANGE(0x00622, 0x00623) AM_WRITE(scroll_w) // scroll1
+
+//	AM_RANGE(0x00624, 0x00625) AM_WRITE(scroll_w) // scroll2
+//	AM_RANGE(0x00626, 0x00627) AM_WRITE(scroll_w) // scroll2
+
+//	AM_RANGE(0x00628, 0x00629) AM_WRITE(scroll_w) // scroll3
+//	AM_RANGE(0x0062a, 0x0062b) AM_WRITE(scroll_w) // scroll3
+
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+	AM_RANGE(0x006b4, 0x006b5) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x006b6, 0x006b7) AM_WRITE(MWA16_NOP)
+
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+
+//	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
+//	AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+
+	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
+
+	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
+
+	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
+	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_eeprom_r)
+
+	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
+
+	AM_RANGE(0x00780, 0x00781) AM_READWRITE(rdx_v33_oki_r, rdx_v33_oki_w) // single OKI chip on this version
+
+	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
+	AM_RANGE(0x00880, 0x0bfff) AM_RAM
+
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_READWRITE(MRA16_RAM, raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(MRA16_RAM, raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_READWRITE(MRA16_RAM, raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_READWRITE(MRA16_RAM, raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
+	AM_RANGE(0x10000, 0x1efff) AM_RAM
+	AM_RANGE(0x1f000, 0x1ffff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+
+	/* not sure of bank sizes etc. */
+	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(1)
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK(2)
+	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK(3)
+	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK(4)
+	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK(5)
+	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK(6)
+	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(7)
+	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK(8)
+	AM_RANGE(0xa0000, 0xaffff) AM_ROMBANK(9)
+	AM_RANGE(0xb0000, 0xbffff) AM_ROMBANK(10)
+	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK(11)
+	AM_RANGE(0xd0000, 0xdffff) AM_ROMBANK(12)
+	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK(13)
+	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK(14)
+ADDRESS_MAP_END
+
+
+
+
+static INPUT_PORTS_START( rdx_v33 )
+   PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) 	/* 0x0010 = eeprom */
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+ 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INTERRUPT_GEN( rdx_v33_interrupt )
+{
+	cpunum_set_input_line_and_vector(cpu_getactivecpu(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	logerror("VSYNC\n");
+}
+
+static MACHINE_DRIVER_START( rdx_v33 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(V33, 32000000/2 ) // ?
+	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
+	MDRV_CPU_VBLANK_INT(rdx_v33_interrupt,1)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+
+	MDRV_NVRAM_HANDLER(rdx_v33)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(5*8, 43*8-1, 1, 30*8)
+
+	MDRV_GFXDECODE(raiden2)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(raiden2)
+	MDRV_VIDEO_UPDATE(raiden2)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, 1000000)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+
+DRIVER_INIT(rdx_v33)
+{
+	memory_set_bankptr(1,&memory_region(REGION_CPU1)[0x020000]);
+	memory_set_bankptr(2,&memory_region(REGION_CPU1)[0x030000]);
+	memory_set_bankptr(3,&memory_region(REGION_CPU1)[0x040000]);
+	memory_set_bankptr(4,&memory_region(REGION_CPU1)[0x050000]);
+	memory_set_bankptr(5,&memory_region(REGION_CPU1)[0x060000]);
+	memory_set_bankptr(6,&memory_region(REGION_CPU1)[0x070000]);
+	memory_set_bankptr(7,&memory_region(REGION_CPU1)[0x080000]);
+	memory_set_bankptr(8,&memory_region(REGION_CPU1)[0x090000]);
+	memory_set_bankptr(9,&memory_region(REGION_CPU1)[0x0a0000]);
+	memory_set_bankptr(10,&memory_region(REGION_CPU1)[0x0b0000]);
+	memory_set_bankptr(11,&memory_region(REGION_CPU1)[0x0c0000]);
+	memory_set_bankptr(12,&memory_region(REGION_CPU1)[0x0d0000]);
+	memory_set_bankptr(13,&memory_region(REGION_CPU1)[0x0e0000]);
+	memory_set_bankptr(14,&memory_region(REGION_CPU1)[0x0f0000]);
+
+	raiden2_decrypt_sprites();
 }
 
 
@@ -2325,7 +2294,6 @@ GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raidndx,  0,       raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndxa, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndxm, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (Metrotainment license)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, raidndxb, raidndx, raiden2,  raiden2n, r2nocpu,  ROT270, "Seibu Kaihatsu", "Raiden DX (set 3, Newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndxj, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (Japan)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteam, 0,       raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteaa, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
@@ -2333,3 +2301,5 @@ GAME( 1993, zeroteab, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaih
 GAME( 1993, zerotsel, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, nzerotea, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
 
+// newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
+GAME( 1996, r2dx_v33, 0, rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden 2 / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)

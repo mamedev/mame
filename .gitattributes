@@ -2489,6 +2489,7 @@ src/mame/machine/pitnrun.c svneol=native#text/plain
 src/mame/machine/playch10.c svneol=native#text/plain
 src/mame/machine/psx.c svneol=native#text/plain
 src/mame/machine/qix.c svneol=native#text/plain
+src/mame/machine/r2crypt.c svneol=native#text/plain
 src/mame/machine/rainbow.c svneol=native#text/plain
 src/mame/machine/retofinv.c svneol=native#text/plain
 src/mame/machine/s16fd.c svneol=native#text/plain

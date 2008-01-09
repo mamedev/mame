@@ -6190,7 +6190,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raiden2e )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndx )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxa )	/* (c) 1993 Seibu Kaihatsu */
-	DRIVER( raidndxb )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxj )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( raidndxm )	/* (c) 1993 Seibu Kaihatsu + Metrotainment license */
 	DRIVER( zeroteam )	/* (c) 1993 Seibu Kaihatsu */
@@ -6198,6 +6197,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zeroteab )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zerotsel )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( nzerotea )	/* (c) 1993 Seibu Kaihatsu */
+
+	/* Newer V33 PCB with COP3 protection */
+	DRIVER( r2dx_v33 )	/* (c) 1996 Seibu Kaihatsu */
+
 
 	/* Seibu SPI System games */
 
