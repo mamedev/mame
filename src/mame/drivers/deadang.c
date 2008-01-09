@@ -11,6 +11,27 @@
 
     - ghunter trackball input is broken
     - coin lockouts
+    - driver is currently locking up after 1st level due to CPU comm problems
+
+
+Lead Angle
+Seibu, 1988
+
+Clocks
+------
+Top board
+Two crystals on top board 12MHz and 16MHz
+V30(x2) - both 8MHz [16/2]
+
+Bottom board
+One crystal on bottom board 14.31818MHz
+Z80 - 3.579545MHz [14.31818/4]
+OKI M5205(x2) - 375kHz [12/32]
+YM2203(x2) 3.579545MHz [14.31818/4]
+Seibu  SEI0100 YM3931 - 3.579545MHz [14.31818/4]
+VSync 60Hz
+HSync 15.37kHz
+
 
 */
 
@@ -264,15 +285,15 @@ static INTERRUPT_GEN( deadang_interrupt )
 static MACHINE_DRIVER_START( deadang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MDRV_CPU_ADD(V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(deadang_interrupt,2)
 
-	MDRV_CPU_ADD(V30,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MDRV_CPU_ADD(V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_VBLANK_INT(deadang_interrupt,2)
 
-	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
@@ -292,7 +313,7 @@ static MACHINE_DRIVER_START( deadang )
 	MDRV_VIDEO_UPDATE(deadang)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(14318180/4)
+	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
 MACHINE_DRIVER_END
 
@@ -316,6 +337,51 @@ ROM_START( deadang )
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE ) /* Chars */
 	ROM_LOAD( "7.21j", 0x000000, 0x4000, CRC(fe615fcd) SHA1(d67ee5e877b937173f4c188829d5bcbd354ceb29) )
 	ROM_LOAD( "8.21l", 0x004000, 0x4000, CRC(905d6b27) SHA1(952f1879e6c27dc87234a4dc572e0453dc2d59fa) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "l12", 0x000000, 0x80000, CRC(c94d5cd2) SHA1(25ded13faaed90886c9fe40f85969dab2f511e31) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) /* pf1 layer */
+	ROM_LOAD( "16n", 0x000000, 0x80000, CRC(fd70e1a5) SHA1(c3d1233f4dfe08f686ec99a556889f9ed6a21da3) ) // bank 0 (0x1000 tiles)
+	ROM_LOAD( "16r", 0x080000, 0x80000, CRC(92f5e382) SHA1(2097b9e9bf3cd37c8613847e7aed677b5aeab7f9) ) // bank 1 (0x1000 tiles)
+
+	ROM_REGION( 0x40000, REGION_GFX4, ROMREGION_DISPOSE ) // pf2 layer
+	ROM_LOAD( "11m", 0x000000, 0x40000, CRC(a366659a) SHA1(e2fcd82b0b2d4e3adcdf50c710984907d26acd04) ) // fixed (0x800 tiles)
+
+	ROM_REGION( 0x40000, REGION_GFX5, ROMREGION_DISPOSE ) // pf3 layer
+	ROM_LOAD( "11k", 0x000000, 0x40000, CRC(9cf5bcc7) SHA1(cf96592e601fc373b1bf322d9b576668799130a5) ) // fixed (0x800 tiles)
+
+	ROM_REGION16_BE( 0x10000, REGION_GFX6, 0 )	/* background map data */
+	ROM_LOAD16_BYTE( "10.6l",  0x00000, 0x8000, CRC(ca99176b) SHA1(283e3769a1ff579c78a008b65cb8267e5770ba1f) )
+	ROM_LOAD16_BYTE( "9.6m",   0x00001, 0x8000, CRC(51d868ca) SHA1(3e9a4e6bc4bc68773c4ba18c5f4110e6c595d0c9) )
+
+	ROM_REGION16_BE( 0x10000, REGION_GFX7, 0 )	/* background map data */
+	ROM_LOAD16_BYTE( "12.6j",  0x00000, 0x8000, CRC(2674d23f) SHA1(0533d80a23d917e20a703aeb833dcaccfa3a1967) )
+	ROM_LOAD16_BYTE( "11.6k",  0x00001, 0x8000, CRC(3dd4d81d) SHA1(94f0a13a8d3812f6879819ca186abf3a8665f7cb) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD( "15.b11", 0x000000, 0x10000, CRC(fabd74f2) SHA1(ac70e952a8b38287613b384cdc7ca00a7f155a13) )
+	ROM_LOAD( "16.11a", 0x010000, 0x10000, CRC(a8d46fc9) SHA1(3ba51bdec4057413396a152b35015f9d95253e3f) )
+ROM_END
+
+ROM_START( leadang )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) /* v20 main cpu */
+	ROM_LOAD16_BYTE("2.18h",   0x0c0000, 0x10000, CRC(611247e0) SHA1(1b9ad50f67ba3a3a9e5a0d6e33f4d4be2fc20446) )
+	ROM_LOAD16_BYTE("4.22h",   0x0c0001, 0x10000, CRC(348c1201) SHA1(277dd77dcbc950299de0fd56a4f66db8f90752ad) )
+	ROM_LOAD16_BYTE("1.18f",   0x0e0000, 0x10000, CRC(fb952d71) SHA1(c6578cddf019872e6005c3a9e8e3e024d17d8c6e) )
+	ROM_LOAD16_BYTE("3.22f",   0x0e0001, 0x10000, CRC(2271c6df) SHA1(774a92bb698606e58d0c74ea07d7eaecf766dddf) )
+
+	ROM_REGION( 0x100000, REGION_CPU2, 0 ) /* v20 sub cpu */
+	ROM_LOAD16_BYTE("5.6b",    0x0e0000, 0x10000, CRC(9c69eb35) SHA1(d5a9714f279b71c419b4bae0f142c4cb1cc8d30e) )
+	ROM_LOAD16_BYTE("6.9b",    0x0e0001, 0x10000, CRC(34a44ce5) SHA1(621c69d8778d4c96ac3be06b033a5931a6a23da2) )
+
+	ROM_REGION( 0x20000, REGION_CPU3, 0 ) /* sound Z80 */
+	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
+	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
+
+	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE ) /* Chars */
+	ROM_LOAD( "7.22k", 0x000000, 0x4000, CRC(490701e7) SHA1(2f5cbc0407d7fe41b9e7683c7531656fda7bf9f7) )
+	ROM_LOAD( "8.22l", 0x004000, 0x4000, CRC(18024c5e) SHA1(b02bcaa1ba6e7c188f3d2a6b20b52b2dcb8215e0) )
 
 	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "l12", 0x000000, 0x80000, CRC(c94d5cd2) SHA1(25ded13faaed90886c9fe40f85969dab2f511e31) )
@@ -408,4 +474,5 @@ static DRIVER_INIT( ghunter )
 /* Game Drivers */
 
 GAME( 1988, deadang, 0,       deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Dead Angle", 0 )
+GAME( 1988, leadang, deadang, deadang, deadang, deadang, ROT0, "Seibu Kaihatsu", "Lead Angle (Japan)", 0 )
 GAME( 1988, ghunter, deadang, deadang, ghunter, ghunter, ROT0, "Seibu Kaihatsu (Segasa/Sonic license)", "Gang Hunter (Spain)", 0 )
