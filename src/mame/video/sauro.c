@@ -14,6 +14,7 @@ UINT8 *tecfri_videoram2;
 UINT8 *tecfri_colorram2;
 
 static tilemap *bg_tilemap, *fg_tilemap;
+static UINT8 palette_bank;
 
 /* General */
 
@@ -49,7 +50,7 @@ WRITE8_HANDLER( tecfri_scroll_bg_w )
 static TILE_GET_INFO( get_tile_info_bg )
 {
 	int code = tecfri_videoram[tile_index] + ((tecfri_colorram[tile_index] & 0x07) << 8);
-	int color = (tecfri_colorram[tile_index] >> 4) & 0x0f;
+	int color = ((tecfri_colorram[tile_index] >> 4) & 0x0f) | palette_bank;
 	int flags = tecfri_colorram[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(0, code, color, flags);
@@ -58,7 +59,7 @@ static TILE_GET_INFO( get_tile_info_bg )
 static TILE_GET_INFO( get_tile_info_fg )
 {
 	int code = tecfri_videoram2[tile_index] + ((tecfri_colorram2[tile_index] & 0x07) << 8);
-	int color = (tecfri_colorram2[tile_index] >> 4) & 0x0f;
+	int color = ((tecfri_colorram2[tile_index] >> 4) & 0x0f) | palette_bank;
 	int flags = tecfri_colorram2[tile_index] & 0x08 ? TILE_FLIPX : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
@@ -68,6 +69,12 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
 static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
+
+WRITE8_HANDLER( sauro_palette_bank_w )
+{
+	palette_bank = (data & 0x03) << 4;
+	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+}
 
 WRITE8_HANDLER( sauro_scroll_fg_w )
 {
@@ -86,6 +93,7 @@ VIDEO_START( sauro )
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+	palette_bank = 0;
 }
 
 static void sauro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -100,7 +108,7 @@ static void sauro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 		code = spriteram[offs+1] + ((spriteram[offs+3] & 0x03) << 8);
 		sx = spriteram[offs+2];
 		sy = 236 - sy;
-		color = (spriteram[offs+3] >> 4) & 0x0f;
+		color = ((spriteram[offs+3] >> 4) & 0x0f) | palette_bank;
 
 		// I'm not really sure how this bit works
 		if (spriteram[offs+3] & 0x08)
