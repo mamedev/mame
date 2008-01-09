@@ -433,6 +433,72 @@ Naomi 2 / GD-ROM             |           |              |
     EPR-23605B (and newer)   |   Yes     |    Yes       |
 ---------------------------------------------------------
 
+
+
+Sega NAOMI ROM cart usage
+-------------------------
+
+837-13668  171-7919A (C) Sega 1998
+|----------------------------------------------------------|
+|IC1   IC2   IC3   IC4   IC5   IC6         CN2             |
+|ROM1  ROM2  ROM3  ROM4  ROM5  ROM6                     JP1|
+|                                              IC42        |
+|                                       71256              |
+|                                       71256         IC22 |
+|            IC7  IC8  IC9  IC10  IC11                     |
+|            ROM7 ROM8 ROM9 ROM10 ROM11        IC41        |
+|                                                          |
+|                                              28MHz       |
+|                                                          |
+|    CN3              X76F100               CN1            |
+|----------------------------------------------------------|
+Notes:
+      Not all MASKROM positions are populated.
+      All MASKROMs (IC1 to IC21) are SOP44, either 32M or 64M
+      The other side of the cart PCB just has more locations for
+      SOP44 MASKROMs... IC12 to IC21 (ROM12 to ROM21)
+
+      IC22    - DIP42 EPROM, either 27C160 or 27C322
+      JP1     - Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
+      IC41    - Xilinx XC9536 (PLCC44)
+      IC42    - SEGA 315-5881 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game.
+                On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+      X76F100 - Xicor X76F100 secured EEPROM (SOIC8)
+      71256   - IDT 71256 32kx8 SRAM (SOJ28)
+      CN1/2/3 - connectors joining to main board
+
+      Note! Generally, games that require a special I/O board or controller will not boot at all with a
+            standard NAOMI I/O board. Usually they display a message saying the I/O board is not acceptable
+            or not connected properly.
+
+
+Games known to use this PCB include....
+
+                           Sticker    EPROM        # of SOP44
+Game                       on cart    IC22#        MASKROMs   IC41#      IC42#          Notes
+--------------------------------------------------------------------------------------------------------------
+Cosmic Smash               840-0044C  23428A       8          315-6213   317-0289-COM
+*Dead Or Alive 2           841-0003C  22121        21         315-6213   317-5048-COM
+*Dead Or Alive 2 Millenium 841-0003C  DOA2 Ver.M   21         315-6213   317-5048-COM
+*Derby Owners Club         840-0016C  22099B       14         315-6213   317-0262-JPN
+*Dynamite Baseball '99     840-0019C  22141B       19         315-6213   317-0269-JPN
+*Dynamite Baseball Naomi   840-0001C  21575        21         315-6213   317-0246-JPN
+*Giant Gram Pro Wrestle 2  840-0007C  21820        9          315-6213   317-0253-JPN
+*Heavy Metal Geo Matrix    HMG016007  23716A       11         315-6213   317-5071-COM
+Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-5047-JPN   requires special I/O board and mahjong panel
+*Out Trigger               840-0017C  22163        19         315-6213   317-0266-COM   requires analog controllers/special panel
+*Power Stone               841-0001C  21597        8          315-6213   317-5046-COM
+*Power Stone 2             841-0008C  23127        9          315-6213   317-5054-COM
+*Samba de Amigo            840-0020C  22966B       16         315-6213   317-0270-COM   will boot but requires special controller to play it
+Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
+*Slash Out                 840-0041C  23341        17         315-6213   317-0286-COM
+*Spawn                     841-0005C  22977B       10         315-6213   317-5051-COM
+Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM
+*Zombie Revenge            840-0003C  21707        19         315-6213   317-0249-COM
+
+* denotes not dumped yet
+
+
 */
 
 #include "driver.h"
@@ -1655,6 +1721,29 @@ ROM_START( vs2_2ka )
 	ROM_LOAD("mpr21928.u15",0x7800000, 0x0400000, CRC(d127d9a5) SHA1(78c95357344ea15469b84fa8b1332e76521892cd) )
 ROM_END
 
+/* Sega Marine Fishing */
+
+ROM_START( smarinef )
+	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x8000000, REGION_USER1, 0)
+	ROM_LOAD("epr-22221.ic22", 0x0000000, 0x0400000, CRC(9d984375) SHA1(fe1185d70b4bc1529e3579fd6b2b678c7d548400) )
+	ROM_LOAD("mpr-22208.ic1", 0x0800000, 0x0800000, CRC(6a1e418c) SHA1(7092c6a34ac0c2c6fb2b4b78415d08ef473785d9) )
+	ROM_LOAD("mpr-22209.ic2", 0x1000000, 0x0800000, CRC(ecf5be54) SHA1(d7c264da4e232ce6f9b05c9920394f8027fa4a1d) )
+	/* IC3 empty */
+	/* IC4 empty */
+	ROM_LOAD("mpr-22212.ic5", 0x2800000, 0x0800000, CRC(8305f462) SHA1(7993231fa71f509b3b7fec691b5a6139947a01e7) )
+	ROM_LOAD("mpr-22213.ic6", 0x3000000, 0x0800000, CRC(0912eaea) SHA1(e4cb1262f3b53d3c619900767cfa192115a53d4b) )
+	ROM_LOAD("mpr-22214.ic7", 0x3800000, 0x0800000, CRC(661526b6) SHA1(490321a893f706eaea49c6c35c01af6ae45adf01) )
+	ROM_LOAD("mpr-22215.ic8", 0x4000000, 0x0800000, CRC(a80714fa) SHA1(b32dde5cc79a9ae9f7f34064c2382115e9303070) )
+	ROM_LOAD("mpr-22216.ic9", 0x4800000, 0x0800000, CRC(cf3d1049) SHA1(a390304256dfac623b6fe1b205d918ce3eb67723) )
+	ROM_LOAD("mpr-22217.ic10",0x5000000, 0x0800000, CRC(48c92fd6) SHA1(26b17a8d0130512807cf533a60c10c6d1e769de0) )
+	ROM_LOAD("mpr-22218.ic11",0x5800000, 0x0800000, CRC(f9ca31b8) SHA1(ea3d0f38ca1a46c896c06f038a6362ad3c9f90b2) )
+	ROM_LOAD("mpr-22219.ic12",0x6000000, 0x0800000, CRC(b3b45811) SHA1(045e7236b814f848d4c9767618ddcd4344d880ec) )
+ROM_END
+
+
 /*
 
 SYSTEMID: NAOMI
@@ -1979,6 +2068,7 @@ GAME( 2001, csmash,   naomi, naomi, naomi, 0, ROT0, "Sega",         "Cosmic Smas
 GAME( 1999, suchie3,  naomi, naomi, naomi, 0, ROT0, "Jaleco",         "Idol Janshi Suchie-Pai 3 (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, vs2_2k,   naomi, naomi, naomi, 0, ROT0, "Sega",         "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, vs2_2ka,  vs2_2k, naomi, naomi, 0, ROT0, "Sega",         "Virtua Striker 2 Ver. 2000 (set 2) (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, smarinef, naomi, naomi, naomi, 0, ROT0, "Sega",         "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
 // Incomplete Dumps (just IC22)
 GAME( 2000, cspike,   naomi, naomi, naomi, 0, ROT0, "Psikyo / Capcom","Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, capsnk,   naomi, naomi, naomi, 0, ROT0, "Capcom / SNK",   "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
