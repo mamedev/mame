@@ -3722,6 +3722,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( sfish2 )	/* (c) 1995 */
 	DRIVER( sfish2j )	/* (c) 1995 */
 	DRIVER( magzun )	/* (c) 1995 */
+	DRIVER( nclubv3 )
 
 	/* Sega Model 2 Games */
 
