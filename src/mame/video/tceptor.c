@@ -161,11 +161,6 @@ static void tile_mark_dirty(int offset)
 }
 
 
-READ8_HANDLER( tceptor_tile_ram_r )
-{
-	return tceptor_tile_ram[offset];
-}
-
 WRITE8_HANDLER( tceptor_tile_ram_w )
 {
 	if (tceptor_tile_ram[offset] != data)
@@ -173,11 +168,6 @@ WRITE8_HANDLER( tceptor_tile_ram_w )
 		tceptor_tile_ram[offset] = data;
 		tile_mark_dirty(offset);
 	}
-}
-
-READ8_HANDLER( tceptor_tile_attr_r )
-{
-	return tceptor_tile_attr[offset];
 }
 
 WRITE8_HANDLER( tceptor_tile_attr_w )
@@ -208,11 +198,6 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	int color = (data & 0xfc00) >> 10;
 
 	SET_TILE_INFO(bg, code, color, 0);
-}
-
-READ8_HANDLER( tceptor_bg_ram_r )
-{
-	return tceptor_bg_ram[offset];
 }
 
 WRITE8_HANDLER( tceptor_bg_ram_w )
