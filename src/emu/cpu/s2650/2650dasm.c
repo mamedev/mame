@@ -114,8 +114,8 @@ static char *IMM_PSU(int pc)
 
     } else {
 
-        if (v & 0x80)   /* sign */
-			p += sprintf(p, "m+");
+        if (v & 0x80)   /* sense bit */
+			p += sprintf(p, "si+");
 		if (v & 0x40)
 			p += sprintf(p, "p+");
 		if (v & 0x20)	/* interrupt inhibit */
