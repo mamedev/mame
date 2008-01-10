@@ -1202,7 +1202,6 @@ const game_driver * const drivers[] =
 	DRIVER( medlanes )	/* [1977?] */
 
 	/* CVS games */
-	DRIVER( cvs )
 	DRIVER( cosmos )	/* (c) 1981 Century */
 	DRIVER( darkwar )	/* (c) 1981 Century */
 	DRIVER( spacefrt )	/* (c) 1981 Century */
