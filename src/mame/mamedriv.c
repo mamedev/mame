@@ -7409,6 +7409,7 @@ Other Sun games
 	DRIVER( quizvadr )	/* 1991 BFM */
 	DRIVER( qos )		/* 1992 BFM */
 	DRIVER( qosa )		/* 1992 BFM */
+	DRIVER( qosb )		/* 1992 BFM */	
 
 	/* Scorpion 2+Video Board Games */
 	DRIVER( qntoondo )	/* 1993 */
