@@ -73,7 +73,7 @@ struct _x86log_context
 ***************************************************************************/
 
 static void reset_log(x86log_context *log);
-static int x86log_i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
+static int x86log_i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode);
 
 
 
@@ -237,9 +237,9 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		else
 		{
 #ifdef PTR64
-			bytes = x86log_i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
+			bytes = x86log_i386_dasm_one_ex(buffer, (FPTR)cur, cur, 64) & DASMFLAG_LENGTHMASK;
 #else
-			bytes = x86log_i386_dasm_one(buffer, (UINT32)(FPTR)cur, cur, 32) & DASMFLAG_LENGTHMASK;
+			bytes = x86log_i386_dasm_one_ex(buffer, (FPTR)cur, cur, 32) & DASMFLAG_LENGTHMASK;
 #endif
 		}
 
@@ -313,4 +313,5 @@ static void reset_log(x86log_context *log)
 ***************************************************************************/
 
 #define i386_dasm_one x86log_i386_dasm_one
+#define i386_dasm_one_ex x86log_i386_dasm_one_ex
 #include "cpu/i386/i386dasm.c"

@@ -1092,7 +1092,7 @@ static const char *const i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "??
 
 static int address_size;
 static int operand_size;
-static UINT32 pc;
+static UINT64 pc;
 static UINT8 modrm;
 static UINT32 segment;
 static offs_t dasm_flags;
@@ -1184,6 +1184,14 @@ static char *hexstring64(UINT32 lo, UINT32 hi)
 	else
 		sprintf(&buffer[1], "%Xh", lo);
 	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
+}
+
+static char *hexstringpc(UINT64 pc)
+{
+	if (curmode == 64)
+		return hexstring64((UINT32)pc, (UINT32)(pc >> 32));
+	else
+		return hexstring((UINT32)pc, 0);
 }
 
 static char *shexstring(UINT32 value, int digits, int always)
@@ -1531,17 +1539,17 @@ static char* handle_param(char* s, UINT32 param)
 		case PARAM_REL:
 			if( operand_size ) {
 				d32 = FETCHD32();
-				s += sprintf( s, "%s", hexstring(pc + d32, 0) );
+				s += sprintf( s, "%s", hexstringpc(pc + d32) );
 			} else {
 				/* make sure to keep the relative offset within the segment */
 				d16 = FETCHD16();
-				s += sprintf( s, "%s", hexstring((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF), 0) );
+				s += sprintf( s, "%s", hexstringpc((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF)) );
 			}
 			break;
 
 		case PARAM_REL8:
 			d8 = FETCHD();
-			s += sprintf( s, "%s", hexstring(pc + d8, 0) );
+			s += sprintf( s, "%s", hexstringpc(pc + d8) );
 			break;
 
 		case PARAM_MEM_OFFS_B:
@@ -2104,7 +2112,7 @@ handle_unknown:
 	sprintf(s, "???");
 }
 
-int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
+int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode)
 {
 	UINT8 op;
 
@@ -2122,4 +2130,9 @@ int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 
 	decode_opcode( buffer, &i386_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
+}
+
+int i386_dasm_one(char *buffer, offs_t eip, const UINT8 *oprom, int mode)
+{
+	return i386_dasm_one_ex(buffer, eip, oprom, mode);
 }
