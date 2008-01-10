@@ -145,86 +145,86 @@ UINT8 cvs_get_character_banking_mode(void)
 
 READ8_HANDLER( cvs_video_or_color_ram_r )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		return cvs_color_ram[offset];
-	else
+	if (activecpu_get_reg(S2650_FO))
 		return cvs_video_ram[offset];
+	else
+		return cvs_color_ram[offset];
 }
 
 WRITE8_HANDLER( cvs_video_or_color_ram_w )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		cvs_color_ram[offset] = data;
-	else
+	if (activecpu_get_reg(S2650_FO))
 		cvs_video_ram[offset] = data;
+	else
+		cvs_color_ram[offset] = data;
 }
 
 
 READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		return cvs_bullet_ram[offset];
-	else
+	if (activecpu_get_reg(S2650_FO))
 		return cvs_palette_ram[offset & 0x0f];
+	else
+		return cvs_bullet_ram[offset];
 }
 
 WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		cvs_bullet_ram[offset] = data;
-	else
+	if (activecpu_get_reg(S2650_FO))
 		cvs_palette_ram[offset & 0x0f] = data;
+	else
+		cvs_bullet_ram[offset] = data;
 }
 
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_1_ram[offset];
-	else
+	if (activecpu_get_reg(S2650_FO))
 		return cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset];
+	else
+		return s2636_1_ram[offset];
 }
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_1_ram[offset] = data;
-	else
+	if (activecpu_get_reg(S2650_FO))
 		cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	else
+		s2636_1_ram[offset] = data;
 }
 
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_2_ram[offset];
-	else
+	if (activecpu_get_reg(S2650_FO))
 		return cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset];
+	else
+		return s2636_2_ram[offset];
 }
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_2_ram[offset] = data;
-	else
+	if (activecpu_get_reg(S2650_FO))
 		cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	else
+		s2636_2_ram[offset] = data;
 }
 
 
 READ8_HANDLER( cvs_s2636_3_or_character_ram_r )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		return s2636_3_ram[offset];
-	else
+	if (activecpu_get_reg(S2650_FO))
 		return cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset];
+	else
+		return s2636_3_ram[offset];
 }
 
 WRITE8_HANDLER( cvs_s2636_3_or_character_ram_w )
 {
-	if (!activecpu_get_reg(S2650_FO))
-		s2636_3_ram[offset] = data;
-	else
+	if (activecpu_get_reg(S2650_FO))
 		cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
+	else
+		s2636_3_ram[offset] = data;
 }
 
 
@@ -1188,30 +1188,6 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( spacefrt )
-{
-	/* patch out 2nd character mode change */
-	memory_region(REGION_CPU1)[0x0260] = 0xc0;
-	memory_region(REGION_CPU1)[0x0261] = 0xc0;
-}
-
-
-static DRIVER_INIT( cosmos )
-{
-	/* patch out 2nd character mode change */
-	memory_region(REGION_CPU1)[0x0357] = 0xc0;
-	memory_region(REGION_CPU1)[0x0358] = 0xc0;
-}
-
-
-static DRIVER_INIT( goldbug )
-{
-	/* redirect calls to real memory bank */
-	memory_region(REGION_CPU1)[0x4347] = 0x1e;
-	memory_region(REGION_CPU1)[0x436a] = 0x1e;
-}
-
-
 static DRIVER_INIT( huncholy )
 {
 	/* patch out protection */
@@ -1316,9 +1292,9 @@ static DRIVER_INIT( raiders )
 GAME( year, name, parent, cvs, cvs, init, ROT90, company, desc, GAME_NO_COCKTAIL )
 
 /*        YEAR  NAME      PARENT    INIT */
-CVS_GAME( 1981, cosmos,   0,        cosmos,  "Century Electronics", "Cosmos" )
+CVS_GAME( 1981, cosmos,   0,        0,       "Century Electronics", "Cosmos" )
 CVS_GAME( 1981, darkwar,  0,        0,       "Century Electronics", "Dark Warrior" )
-CVS_GAME( 1981, spacefrt, 0,        spacefrt,"Century Electronics", "Space Fortress (CVS)" )
+CVS_GAME( 1981, spacefrt, 0,        0,       "Century Electronics", "Space Fortress (CVS)" )
 CVS_GAME( 1982, 8ball,    0,        0,       "Century Electronics", "Video Eight Ball" )
 CVS_GAME( 1982, 8ball1,   8ball,    0,       "Century Electronics", "Video Eight Ball (Rev.1)" )
 CVS_GAME( 1982, logger,   0,        0,       "Century Electronics", "Logger" )
@@ -1328,7 +1304,7 @@ CVS_GAME( 1982, radarzon, 0,        0,       "Century Electronics", "Radar Zone"
 CVS_GAME( 1982, radarzn1, radarzon, 0,       "Century Electronics", "Radar Zone (Rev.1)" )
 CVS_GAME( 1982, radarznt, radarzon, 0,       "Century Electronics (Tuni Electro Service Inc)", "Radar Zone (Tuni)" )
 CVS_GAME( 1982, outline,  radarzon, 0,       "Century Electronics", "Outline" )
-CVS_GAME( 1982, goldbug,  0,        goldbug, "Century Electronics", "Gold Bug" )
+CVS_GAME( 1982, goldbug,  0,        0,       "Century Electronics", "Gold Bug" )
 CVS_GAME( 1982, diggerc,  0,        0,       "Century Electronics", "Digger (CVS)" )
 CVS_GAME( 1983, heartatk, 0,        0,       "Century Electronics", "Heart Attack" )
 CVS_GAME( 1983, hunchbak, 0,        0,       "Century Electronics", "Hunchback (set 1)" )
