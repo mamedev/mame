@@ -1616,6 +1616,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
+	$(DRIVERS)/uapce.o $(DRIVERS)/paranoia.o $(VIDEO)/vdc.o $(MACHINE)/pcecommn.o \
 
 
 #-------------------------------------------------

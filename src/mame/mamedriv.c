@@ -7904,5 +7904,7 @@ Other Sun games
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( gamecstl )	/* MAME based bootleg */
 	DRIVER( drw80pkr )
+	DRIVER( blazlaz )
+	DRIVER( paranoia )
 
 #endif	/* DRIVER_RECURSIVE */

@@ -242,6 +242,7 @@ DRIVER_INIT(elandore);
 DRIVER_INIT(rsgun);
 DRIVER_INIT(ffreveng);
 DRIVER_INIT(decathlt);
+DRIVER_INIT(nameclv3);
 
 /**************************************************************************************/
 /*to be added into a stv Header file,remember to remove all the static...*/
@@ -3853,7 +3854,7 @@ GAME( 1995, suikoenb,  stvbios, stv, stv,  suikoenb,  ROT0,   "Data East",      
 GAME( 1996, vfkids,    stvbios, stv, stv,  ic13,      ROT0,   "Sega", 	 				  "Virtua Fighter Kids (JUET 960319 V0.000)", GAME_IMPERFECT_SOUND )
 GAME( 1997, winterht,  stvbios, stv, stv,  winterht,  ROT0,   "Sega", 	 				  "Winter Heat (JUET 971012 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, znpwfv,    stvbios, stv, stv,  znpwfv,    ROT0,   "Sega", 	     			  "Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, nclubv3,   stvbios, stv, stv,  stv,       ROT0,   "Sega", 	     			  "Name Club Ver.3", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ) // seems to work, although it could do with speedups, and the printer isn't emulated..
+GAME( 1997, nclubv3,   stvbios, stv, stv,  nameclv3,  ROT0,   "Sega", 	     			  "Name Club Ver.3 (J 970723 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ) // seems to work, although it could do with speedups, and the printer isn't emulated..
 
 /* Almost */
 GAME( 1997, vmahjong,  stvbios, stv, stvmp,stv,       ROT0,   "Micronet",                 "Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

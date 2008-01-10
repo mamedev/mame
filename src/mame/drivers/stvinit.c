@@ -1404,3 +1404,23 @@ DRIVER_INIT(decathlt)
 	install_decathlt_protection();
 	driver_init_ic13(machine);
 }
+
+static READ32_HANDLER( nameclv3_speedup_r )
+{
+	if (activecpu_get_pc()==0x601eb4e) cpu_spinuntil_time(ATTOTIME_IN_USEC(30)); 
+	return stv_workram_h[0x0452c0/4];
+}
+
+static void nameclv3_slave_speedup( UINT32 data )
+{
+	if ( activecpu_get_pc() == 0x0602B810 )
+		if ( (data & 0x00800000) == 0 )
+			cpunum_spinuntil_trigger(1, 1000);
+}
+
+DRIVER_INIT(nameclv3)
+{
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x60452c0, 0x60452c3, 0, 0, nameclv3_speedup_r );
+	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)nameclv3_slave_speedup );
+	driver_init_stv(machine);
+}

@@ -56,7 +56,7 @@ static const translation_info gcc_translate[] =
 	{ 0,		"-c",					"/c~/Fo" },
 	{ 0,		"-E",					"/c~/E >" },
 	{ 0,		"-S",					"/c~/Fa" },
-	{ VS7,		"-O0",					"/Od /GS" },
+	{ VS7,		"-O0",					"/Od /GS /Oi" },
 	{ 0,		"-O0",					"/Od" },
 	{ 0,		"-O1",					"/O2" },
 	{ 0,		"-O2",					"/O2" },
