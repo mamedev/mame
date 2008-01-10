@@ -290,7 +290,7 @@ UINT32 core_fread(core_file *file, void *buffer, UINT32 length)
 			/* read the remainder directly from the file */
 			else
 			{
-				UINT32 new_bytes_read;
+				UINT32 new_bytes_read = 0;
 				filerr = osd_read(file->file, (UINT8 *)buffer + bytes_read, file->offset + bytes_read, length - bytes_read, &new_bytes_read);
 				bytes_read += new_bytes_read;
 			}
