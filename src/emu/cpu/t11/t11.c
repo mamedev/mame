@@ -309,6 +309,7 @@ static void t11_init(int index, int clock, const void *config, int (*irqcallback
 	state_save_register_item("t11", index, t11.reg[7].w.l);
 	state_save_register_item("t11", index, t11.psw.w.l);
 	state_save_register_item("t11", index, t11.op);
+	state_save_register_item("t11", index, t11.initial_pc);
 	state_save_register_item("t11", index, t11.wait_state);
 	state_save_register_item("t11", index, t11.irq_state);
 	state_save_register_item("t11", index, t11.interrupt_cycles);
