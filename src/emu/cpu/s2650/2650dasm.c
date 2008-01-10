@@ -114,10 +114,10 @@ static char *IMM_PSU(int pc)
 
     } else {
 
-        if (v & 0x80)   /* sense bit */
+        if (v & 0x80)   /* sense input */
 			p += sprintf(p, "si+");
-		if (v & 0x40)
-			p += sprintf(p, "p+");
+		if (v & 0x40)	/* flag output */
+			p += sprintf(p, "fo+");
 		if (v & 0x20)	/* interrupt inhibit */
 			p += sprintf(p, "ii+");
 		if (v & 0x10)	/* unused bit 4 */
@@ -266,7 +266,11 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
             pc+=2;
 			break;
 		case 0x10: case 0x11:
-			sprintf(buff, "****   %02X",op);
+#if HJB
+			sprintf(buff, "**** $%02X",op);
+#else
+			sprintf(buff, "****   $%02X",op);
+#endif
 			break;
 		case 0x12:
 #if HJB
@@ -573,7 +577,11 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
             pc+=2;
 			break;
 		case 0x90: case 0x91:
-			sprintf(buff, "****   %02X",op);
+#if HJB
+			sprintf(buff, "**** $%02X",op);
+#else
+			sprintf(buff, "****   $%02X",op);
+#endif
 			break;
 		case 0x92:
 #if HJB
@@ -683,7 +691,11 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
             pc+=1;
 			break;
 		case 0xb6: case 0xb7:
-			sprintf(buff, "****   %02X", op);
+#if HJB
+			sprintf(buff, "**** $%02X",op);
+#else
+			sprintf(buff, "****   $%02X",op);
+#endif
 			break;
 		case 0xb8: case 0xb9: case 0xba:
 #if HJB
@@ -714,7 +726,7 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
 			break;
 		case 0xbf:
 #if HJB
-			sprintf(buff, "call  %s+r3", ADR(pc));
+			sprintf(buff, "call %s+r3", ADR(pc));
 #else
             sprintf(buff, "bsxa   %s", ADR(pc));
 #endif
@@ -732,7 +744,11 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
 #endif
             break;
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
-			sprintf(buff, "****   %02X", op);
+#if HJB
+			sprintf(buff, "**** $%02X",op);
+#else
+			sprintf(buff, "****   $%02X",op);
+#endif
 			break;
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 #if HJB
@@ -759,7 +775,7 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
             break;
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 #if HJB
-			sprintf(buff, "out r%d,(%s)", rv, IMM(pc));
+			sprintf(buff, "out  (%s),r%d", IMM(pc), rv);
 #else
             sprintf(buff, "wrte,%d %s", rv, IMM(pc));
 #endif
