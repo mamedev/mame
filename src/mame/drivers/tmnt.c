@@ -2565,6 +2565,13 @@ static MACHINE_DRIVER_START( mia )
 MACHINE_DRIVER_END
 
 
+static MACHINE_RESET( tmnt )
+{
+	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
+	upd7759_0_start_w(0, 0);
+	upd7759_0_reset_w(0, 1);
+}
+
 static MACHINE_DRIVER_START( tmnt )
 
 	/* basic machine hardware */
@@ -2575,6 +2582,8 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(tmnt_s_readmem,tmnt_s_writemem)
+
+	MDRV_MACHINE_RESET(tmnt)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
