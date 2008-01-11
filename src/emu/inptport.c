@@ -231,7 +231,7 @@ struct ext_header
 	char header[7];  // must be "XINP" followed by NULLs
 	char shortname[9];  // game shortname
 	char version[32];  // MAME version string
-	long starttime;  // approximate INP start time
+	UINT32 starttime;  // approximate INP start time 
 	char dummy[32];  // for possible future expansion
 };
 
@@ -1157,7 +1157,7 @@ static void setup_playback(running_machine *machine)
 	const char *filename = options_get_string(mame_options(), OPTION_PLAYBACK);
 	inp_header inpheader;
 	file_error filerr;
-
+	time_t started_time; 
 	struct ext_header xheader;
 	char check[7];
 
@@ -1204,7 +1204,8 @@ static void setup_playback(running_machine *machine)
 
 		// output info to console
 		mame_printf_info("Version string: %s\n",xheader.version);
-		mame_printf_info("Start time: %s\n", ctime((const time_t *)&xheader.starttime));
+		started_time = (time_t)xheader.starttime; 
+		mame_printf_info("Start time: %s\n", ctime(&started_time)); 
 
 		// verify header against current game
 		if (strcmp(machine->gamedrv->name, xheader.shortname) != 0)
@@ -3009,9 +3010,9 @@ profiler_mark(PROFILER_INPUT);
 	/* store speed read from INP file, if extended INP */
 	if (Machine->playback_file != NULL && !no_extended_inp)
 	{
-		long dummy;
-		mame_fread(Machine->playback_file,&rec_speed,sizeof(double));
-		mame_fread(Machine->playback_file,&dummy,sizeof(long));
+		UINT32 dummy;
+		mame_fread(Machine->playback_file, &rec_speed, sizeof(rec_speed));
+		mame_fread(Machine->playback_file, &dummy, sizeof(dummy));
 		framecount++;
 		rec_speed *= 100;
 		totalspeed += rec_speed;

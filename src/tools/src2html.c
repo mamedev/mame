@@ -302,6 +302,9 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 		list_entry *curlist;
 		osd_directory *dir;
 		int found = 0;
+		int colheight;
+		int colcount;
+		int colnum;
 
 		/* open the directory and iterate through it */
 		dir = osd_opendir(astring_c(srcdir));
@@ -337,6 +340,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 		/* sort the list */
 		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
+		colheight = (found + 3) / 4;
 
 		/* rebuild the list */
 		list = NULL;
@@ -346,14 +350,15 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			list = listarray[found];
 		}
 
+		/* add a header */
+		if (list != NULL)
+			core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<div align=\"center\"><table border=\"0\" width=\"90%%\"><tr><td width=\"25%%\">\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
+
 		/* iterate through each file */
+		colcount = colnum = 0;
 		for (curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
 		{
 			astring *srcfile, *dstfile;
-
-			/* add a header */
-			if (curlist == list)
-				core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
 
 			/* build the source filename */
 			srcfile = astring_alloc();
@@ -379,7 +384,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 				{
 					astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 					if (indexfile != NULL)
-						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+						core_fprintf(indexfile, "\t\t<a href=\"%s.html\">%s</a><br />\n", astring_c(curlist->name), astring_c(curlist->name));
 					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile);
 				}
 			}
@@ -389,8 +394,16 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			{
 				astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 				if (indexfile != NULL)
-					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+					core_fprintf(indexfile, "\t\t<a href=\"%s/index.html\">%s/</a><br />\n", astring_c(curlist->name), astring_c(curlist->name));
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile);
+			}
+			
+			/* move to the next column if we got them all */
+			if (++colcount >= colheight)
+			{
+				core_fprintf(indexfile, "\t</td><td width=\"25%%\">\n");
+				colcount = 0;
+				colnum++;
 			}
 
 			/* free memory for the names */
@@ -400,7 +413,11 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 		/* close the list if we found some stuff */
 		if (list != NULL)
-			core_fprintf(indexfile, "\t</ul>\n");
+		{
+			while (colnum++ < 3)
+				core_fprintf(indexfile, "\t</td><td width=\"25%%\">\n");
+			core_fprintf(indexfile, "\t</td></tr></table></div>\n");
+		}
 
 		/* free all the allocated entries */
 		while (list != NULL)
