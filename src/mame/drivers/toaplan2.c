@@ -3510,7 +3510,7 @@ static MACHINE_DRIVER_START( truxton2 )
 
 	MDRV_SOUND_ADD(YM2151, XTAL_28MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
- 
+
 	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

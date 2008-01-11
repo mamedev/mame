@@ -9,8 +9,8 @@
         * Buggy Boy (1985)
         * Buggy Boy Junior (1986)
 
-	ROMs wanted:
-	    * TX-1 V8 (1984)
+    ROMs wanted:
+        * TX-1 V8 (1984)
 
     Notes:
         * 'buggyboy' and 'tx1' are preliminary

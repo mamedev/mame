@@ -2404,7 +2404,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(1, "mono", 0.23)
 	MDRV_SOUND_ROUTE(2, "mono", 0.23)
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
- 
+
 	MDRV_SOUND_ADD(YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)

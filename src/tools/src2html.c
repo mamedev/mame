@@ -524,7 +524,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 		int quotes_are_linked = FALSE;
 		char in_quotes = 0;
 		int curcol = 0;
-		
+
 		/* start with the line number */
 		dstptr += sprintf(dstptr, "<span style=\"" LINENUM_STYLE "\">%5d</span>&nbsp;&nbsp;", linenum++);
 

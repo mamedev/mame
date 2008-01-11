@@ -1,11 +1,11 @@
 /****************************************************************************
 
-	Paranoia
-	Driver by Mariusz Wojcieszek
+    Paranoia
+    Driver by Mariusz Wojcieszek
 
-	Notes:
-	- jamma interface is not emulated, hence the game is marked as 'not working'
-	- rom mapping, memory maps and clocks for jamma interface cpus are probably not correct
+    Notes:
+    - jamma interface is not emulated, hence the game is marked as 'not working'
+    - rom mapping, memory maps and clocks for jamma interface cpus are probably not correct
 
 Paranoia by Naxat Soft 1990
 
@@ -23,7 +23,7 @@ Winbond WF19054
 
 Sound : Nec D8085AHC + Nec D8155HC
 
-This board has also : 
+This board has also :
 
 HuC6260A (Hudson)
 HuC6270  (Hudson)

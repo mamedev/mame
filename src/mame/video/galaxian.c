@@ -636,9 +636,9 @@ VIDEO_START( scramble )
 {
 	video_start_galaxian_plain(machine);
 
-	/* FIXME: This most probably needs to be adjusted 
-	 * again when RAW video params are added to scramble
-	 */
+	/* FIXME: This most probably needs to be adjusted
+     * again when RAW video params are added to scramble
+     */
 	tilemap_set_scrolldx(bg_tilemap, 0, 0);
 
 	draw_stars = scramble_draw_stars;

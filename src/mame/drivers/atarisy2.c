@@ -618,7 +618,7 @@ static WRITE8_HANDLER( sound_reset_w )
 	if ((data & 1) == sound_reset_state)
 		return;
 	sound_reset_state = data & 1;
-	
+
 	/* only track the 0 -> 1 transition */
 	if (sound_reset_state == 0)
 		return;
@@ -1367,7 +1367,7 @@ static MACHINE_DRIVER_START( atarisy2 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_GFXDECODE(atarisy2)
 	MDRV_PALETTE_LENGTH(256)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3262,8 +3262,8 @@ static DRIVER_INIT( paperboy )
 static DRIVER_INIT( 720 )
 {
 	/* without the default EEPROM, 720 hangs at startup due to communication
-	   issues with the sound CPU; temporarily increasing the sound CPU frequency
-	   to ~2.2MHz "fixes" the problem */
+       issues with the sound CPU; temporarily increasing the sound CPU frequency
+       to ~2.2MHz "fixes" the problem */
 	static const UINT16 compressed_default_eeprom[] =
 	{
 		0x0000,0x01ff,0x01d0,0x0107,0x0100,0x01d7,0x0300,0x01d7,0x0400,0x01d0,

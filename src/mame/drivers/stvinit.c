@@ -1407,7 +1407,7 @@ DRIVER_INIT(decathlt)
 
 static READ32_HANDLER( nameclv3_speedup_r )
 {
-	if (activecpu_get_pc()==0x601eb4e) cpu_spinuntil_time(ATTOTIME_IN_USEC(30)); 
+	if (activecpu_get_pc()==0x601eb4e) cpu_spinuntil_time(ATTOTIME_IN_USEC(30));
 	return stv_workram_h[0x0452c0/4];
 }
 

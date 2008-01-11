@@ -517,14 +517,14 @@ static void tx1_update_state(void)
 			TX1_SET_INS0_BIT;
 
 			if ( math.mux == TX1_SEL_DSELOE )
-			{				
+			{
 				int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 				int		tfad = (math.inslatch & 0x1c00) << 1;
 				int		sd   = math.ppshift;
 				int		o4;
 				UINT16	data;
-				
-				o4 = 
+
+				o4 =
 					(!BIT(sd, 9) && !BIT(sd,10)) ||
 					( BIT(sd, 7) &&  BIT(sd,10)) ||
 					(!BIT(sd, 8) &&  BIT(sd, 9)) ||
@@ -551,13 +551,13 @@ static void tx1_update_state(void)
 			/*
                 TODO: Changed ppshift to muxlatch for TX-1
 
-				/TMPLD1: /LHIEN
-				/TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
-				/TMPLD3: /LLOEN
-					 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-						 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-						 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-			*/
+                /TMPLD1: /LHIEN
+                /TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
+                /TMPLD3: /LLOEN
+                     O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+                         !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+                         /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+            */
 			else if ( LHIEN(math.inslatch) || LLOEN(math.inslatch) )
 			{
 				UINT16 data;
@@ -587,19 +587,19 @@ static void tx1_update_state(void)
 				else
 				{
 					/*
-						/TMPLD1: /LHIEN
-						/TMPLD2: /LLOEN.!O4 + /LHIEN.O4
-						/TMPLD3: /LLOEN
-							 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-								 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-								 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-					*/
+                        /TMPLD1: /LHIEN
+                        /TMPLD2: /LLOEN.!O4 + /LHIEN.O4
+                        /TMPLD3: /LLOEN
+                             O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+                                 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+                                 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+                    */
 					int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 					int		tfad = (math.inslatch & 0x1c00) << 1;
 					int		sd   = math.ppshift;
 					int		o4;
-				
-					o4 = 
+
+					o4 =
 						(!BIT(sd, 9) && !BIT(sd,10)) ||
 						( BIT(sd, 7) &&  BIT(sd,10)) ||
 						(!BIT(sd, 8) &&  BIT(sd, 9)) ||
@@ -615,7 +615,7 @@ static void tx1_update_state(void)
 						{
 							// TMPLD11-5
 							math.muxlatch &= 0xf01f;
-							math.muxlatch |= data & 0x0fe0;						
+							math.muxlatch |= data & 0x0fe0;
 						}
 					}
 					else if ( LHIEN(math.inslatch) )
@@ -627,7 +627,7 @@ static void tx1_update_state(void)
 						{
 							// TMPLD11-5
 							math.muxlatch &= 0xf01f;
-							math.muxlatch |= data & 0x0fe0;						
+							math.muxlatch |= data & 0x0fe0;
 						}
 					}
 				}
@@ -690,12 +690,12 @@ READ16_HANDLER( tx1_math_r )
 		int		tfad = (math.inslatch & 0x1c00) << 1;
 		int		sd   = math.ppshift;
 		int		o4;
-		
+
 		if ( math.mux == TX1_SEL_LMSEL )
 			o4 = 0;
 		else
 		{
-			o4 = 
+			o4 =
 			(!BIT(sd, 9) && !BIT(sd,10)) ||
 			( BIT(sd, 7) &&  BIT(sd,10)) ||
 			(!BIT(sd, 8) &&  BIT(sd, 9)) ||
@@ -838,10 +838,10 @@ WRITE16_HANDLER( tx1_math_w )
 	{
 
 		/*
-			/TMPLD1: 0
-			/TMPLD2: 0
-			/TMPLD3: 0
-		*/
+            /TMPLD1: 0
+            /TMPLD2: 0
+            /TMPLD3: 0
+        */
 		math.muxlatch = math.cpulatch;
 	}
 
@@ -938,7 +938,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 	}
 	else if ( math.mux == TX1_SEL_PPSEN )
 	{
-//		math.ppshift = math.retval & 0x3fff;
+//      math.ppshift = math.retval & 0x3fff;
 		math.ppshift = math.cpulatch;
 	}
 	else if ( math.mux == TX1_SEL_PSSEN )

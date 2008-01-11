@@ -84,7 +84,7 @@
 #define MR_R65		RES_K(10)
 
 #define MR_C3		CAP_U(10)
-#define MR_C4		CAP_U(47)		
+#define MR_C4		CAP_U(47)
 #define MR_C5		CAP_N(39)
 #define MR_C6		CAP_N(3.9)
 #define MR_C14		CAP_U(4.7)
@@ -167,7 +167,7 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, MR_R7, MR_C4)
 	DISCRETE_74LS624( NODE_22, 1, NODE_21, VSS, MR_C5, DISC_LS624_OUT_ENERGY)
 	DISCRETE_74LS624( NODE_23, 1, NODE_21, VSS, MR_C16, DISC_LS624_OUT_ENERGY)
-	
+
 	DISCRETE_LOGIC_XOR(NODE_24, 1, NODE_22, NODE_23)
 	DISCRETE_LOGIC_AND(NODE_25, 1, NODE_24, NODE_20)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1, 1, NODE_25, TTL_HIGH)
@@ -200,8 +200,8 @@ static DISCRETE_SOUND_START(mario)
 	/************************************************/
 
 	/* following the resistor DAC are two opamps. The first is a 1:1 amplifier, the second
-	 * is a filter circuit. Simulation in LTSPICE shows, that the following is equivalent:
-	 */
+     * is a filter circuit. Simulation in LTSPICE shows, that the following is equivalent:
+     */
 
 	DISCRETE_MULTIPLY(NODE_170, 1, DS_DAC, TTL_HIGH/256.0)
 	DISCRETE_RCFILTER(DS_OUT_DAC, 1, NODE_170, RES_K(750), CAP_P(200))
@@ -237,9 +237,9 @@ static SOUND_START( mario )
 	soundlatch3_clear_w(0,0);
 	soundlatch4_clear_w(0,0);
 	/*
-	 * The code below will play the correct start up sound
-	 * However, it is not backed by hardware at all.
-	 */
+     * The code below will play the correct start up sound
+     * However, it is not backed by hardware at all.
+     */
 	//soundlatch_w(0,2);
 }
 
@@ -281,7 +281,7 @@ static READ8_HANDLER( mario_sh_tune_r )
 	UINT8 *SND = memory_region(REGION_CPU2);
 	UINT16 mask = memory_region_length(REGION_CPU2)-1;
 	UINT8 p2 = I8035_P2_R();
-	
+
 	if ((p2 >> 7) & 1)
 		return soundlatch_r(offset);
 	else
@@ -343,7 +343,7 @@ WRITE8_HANDLER( mario_sh2_w )
 WRITE8_HANDLER( mario_sh3_w )
 {
 	mario_state	*state = Machine->driver_data;
-	
+
 	switch (offset)
 	{
 		case 0: /* death */

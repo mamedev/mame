@@ -50,7 +50,7 @@ READ8_HANDLER ( pce_joystick_r )
 {
 	UINT8 ret;
 	int data;
-	
+
 	if ( pce_joystick_readinputport_callback != NULL )
 	{
 		data = pce_joystick_readinputport_callback();

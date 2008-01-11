@@ -273,7 +273,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 		/* TODO: Confirm against hardware? */
 		if ( x_scale == 0 )
 			continue;
-			
+
 		/* 16-bit y-scale accumulator */
 		y_scale = tx1_objram[offs + 1];
 		y_step  = tx1_objram[offs + 3];

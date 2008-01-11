@@ -1605,10 +1605,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ad2083 )
 	/* There are no Player 2 controls for this game:
-	 * Dipswitch is read upon startup. If Cabinet = Cocktail, a 1 is stored @400F. 
-	 * 400F in turn is only read just before Player 2 turn. If 400F=1 then flip line 
-	 * is set. That is all. If there is a dedicated player 2 input, 
-	 * it must be multiplexed by flip line. */
+     * Dipswitch is read upon startup. If Cabinet = Cocktail, a 1 is stored @400F.
+     * 400F in turn is only read just before Player 2 turn. If 400F=1 then flip line
+     * is set. That is all. If there is a dedicated player 2 input,
+     * it must be multiplexed by flip line. */
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )

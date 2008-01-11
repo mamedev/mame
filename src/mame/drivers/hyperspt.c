@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( hyperspt )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	/* audio CPU */ 
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

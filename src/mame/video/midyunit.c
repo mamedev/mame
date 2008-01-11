@@ -287,7 +287,7 @@ static void dma_draw(UINT16 command)
 	UINT16 pal = dma_state.palette;
 	UINT16 color = pal | dma_state.color;
 	int x, y;
-	
+
 	/* we only need the low 4 bits of the command */
 	command &= 0x0f;
 
@@ -309,13 +309,13 @@ static void dma_draw(UINT16 command)
 		/* check for overruns if they are relevant */
 		if (o >= 0x06000000 && command < 0x0c)
 			continue;
-		
+
 		/* switch off the zero/non-zero options */
 		switch (command)
 		{
 			case 0x00:	/* draw nothing */
 				break;
-			
+
 			case 0x01:	/* draw only 0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] == 0)
@@ -330,19 +330,19 @@ static void dma_draw(UINT16 command)
 						dest[tx] = pal | pixel;
 				}
 				break;
-			
+
 			case 0x03:	/* draw all pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					dest[tx] = pal | base[o++];
 				break;
-			
+
 			case 0x04:	/* color only 0 pixels */
 			case 0x05:	/* color only 0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] == 0)
 						dest[tx] = color;
 				break;
-			
+
 			case 0x06:	/* color only 0 pixels, copy the rest */
 			case 0x07:	/* color only 0 pixels, copy the rest */
 				for (x = 0; x < width; x++, tx += dx)
@@ -351,14 +351,14 @@ static void dma_draw(UINT16 command)
 					dest[tx] = (pixel == 0) ? color : (pal | pixel);
 				}
 				break;
-			
+
 			case 0x08:	/* color only non-0 pixels */
 			case 0x0a:	/* color only non-0 pixels */
 				for (x = 0; x < width; x++, tx += dx)
 					if (base[o++] != 0)
 						dest[tx] = color;
 				break;
-			
+
 			case 0x09:	/* color only non-0 pixels, copy the rest */
 			case 0x0b:	/* color only non-0 pixels, copy the rest */
 				for (x = 0; x < width; x++, tx += dx)
@@ -367,7 +367,7 @@ static void dma_draw(UINT16 command)
 					dest[tx] = (pixel != 0) ? color : (pal | pixel);
 				}
 				break;
-			
+
 			case 0x0c:	/* color all pixels */
 			case 0x0d:	/* color all pixels */
 			case 0x0e:	/* color all pixels */

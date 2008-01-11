@@ -1,8 +1,8 @@
 /*
 
-	United Amusement PC-Engine based hardware
-	Driver by Mariusz Wojcieszek
-	Thanks for Charles MacDonald for hardware docs
+    United Amusement PC-Engine based hardware
+    Driver by Mariusz Wojcieszek
+    Thanks for Charles MacDonald for hardware docs
 
  Overview
 
@@ -40,7 +40,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
 	if ( diff & 0x40 )
 	{
-		cpunum_set_input_line(0, INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);		
+		cpunum_set_input_line(0, INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// bit 3 - enable 752 Hz (D-3) square wave output
@@ -118,7 +118,7 @@ ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE( jamma_if_control_latch_w )
 	AM_RANGE( 0x1800, 0x1FFF) AM_READ(  jamma_if_read_dsw )
-	AM_RANGE( 0x2000, 0x27FF) AM_READ(  port_tag_to_handler8( "COIN" ) ) 
+	AM_RANGE( 0x2000, 0x27FF) AM_READ(  port_tag_to_handler8( "COIN" ) )
 	AM_RANGE( 0x2800, 0x2FFF) AM_READ(  jamma_if_control_latch_r )
 ADDRESS_MAP_END
 

@@ -90,8 +90,8 @@ INTERRUPT_GEN( pce_interrupt )
 		/* Check if we need to draw more just the overscan color */
 		if ( vdc[0].current_segment == STATE_VDW ) {
 			/* 0 - no sprite and background pixels drawn
-			   1 - background pixel drawn
-			   otherwise is 2 + sprite# */
+               1 - background pixel drawn
+               otherwise is 2 + sprite# */
 			UINT8 drawn[VDC_WPF];
 			/* our line buffer */
 			UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
@@ -130,8 +130,8 @@ INTERRUPT_GEN( sgx_interrupt )
 		/* Check if we need to draw more just the overscan color */
 		if ( vdc[0].current_segment == STATE_VDW ) {
 			/* 0 - no sprite and background pixels drawn
-			   1 - background pixel drawn
-			   otherwise is 2 + sprite# */
+               1 - background pixel drawn
+               otherwise is 2 + sprite# */
 			UINT8 drawn[2][512];
 			UINT16 *line_buffer;
 			UINT16 temp_buffer[2][512];
@@ -190,11 +190,11 @@ INTERRUPT_GEN( sgx_interrupt )
 							}
 							break;
 						case 2: /* BG1 + SP1 => SP1
-								   BG0 + SP1 => BG0
-								   BG0 + BG1 => BG0
-								   BG0 + SP0 => SP0
-								   BG1 + SP0 => BG1
-								   SP0 + SP1 => SP0 */
+                                   BG0 + SP1 => BG0
+                                   BG0 + BG1 => BG0
+                                   BG0 + SP0 => SP0
+                                   BG1 + SP0 => BG1
+                                   SP0 + SP1 => SP0 */
 							if ( drawn[0][i] ) {
 								if ( drawn[0][i] > 1 ) {
 									if ( drawn[1][i] == 1 ) {
@@ -380,9 +380,9 @@ static void draw_black_line(int line)
 {
 	int i;
 
-	/* our line buffer */ 
+	/* our line buffer */
 	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
-	
+
 	for( i=0; i< VDC_WPF; i++ )
 		line_buffer[i] = get_black_pen( Machine );
 }
@@ -394,9 +394,9 @@ static void draw_overscan_line(int line)
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
-	/* our line buffer */ 
+	/* our line buffer */
 	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
-	
+
 	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = Machine->pens[color_base + vce.vce_data[0x100].w];
 }
@@ -409,7 +409,7 @@ static void draw_sgx_overscan_line(int line) {
 
 	/* our line buffer */
 	UINT16 *line_buffer = BITMAP_ADDR16( vce.bmp, line, 0 );
-   
+
 	for ( i = 0; i < VDC_WPF; i++ )
 		line_buffer[i] = Machine->pens[color_base + vce.vce_data[0].w];
 }
@@ -475,13 +475,13 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 					break;
 
 				case LENR:
-//					logerror("LENR LSB = %02X\n", data);
+//                  logerror("LENR LSB = %02X\n", data);
 					break;
 				case SOUR:
-//					logerror("SOUR LSB = %02X\n", data);
+//                  logerror("SOUR LSB = %02X\n", data);
 					break;
 				case DESR:
-//					logerror("DESR LSB = %02X\n", data);
+//                  logerror("DESR LSB = %02X\n", data);
 					break;
 			}
 			break;
@@ -522,10 +522,10 @@ static void vdc_w( int which, offs_t offset, UINT8 data )
 					vdc_do_dma( which );
 					break;
 				case SOUR:
-//					logerror("SOUR MSB = %02X\n", data);
+//                  logerror("SOUR MSB = %02X\n", data);
 					break;
 				case DESR:
-//					logerror("DESR MSB = %02X\n", data);
+//                  logerror("DESR MSB = %02X\n", data);
 					break;
 			}
 			break;
@@ -762,7 +762,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
-	/* count up: Highest priority is Sprite 0 */ 
+	/* count up: Highest priority is Sprite 0 */
 	for(i=0; i<64; i++)
 	{
 		static const int cgy_table[] = {16, 32, 64, 64};
@@ -807,7 +807,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 				vdc[which].status |= VDC_OR;
 				if(vdc[which].vdc_data[CR].w&CR_OV)
 					cpunum_set_input_line(0, 0, ASSERT_LINE);
-				continue;  /* Should cause an interrupt */ 
+				continue;  /* Should cause an interrupt */
 			}
 
 			cgypos = (obj_l >> 4);
@@ -828,9 +828,9 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 							if( drawn[pixel_x] < 2 ) {
 								if( priority || drawn[pixel_x] == 0 ) {
 									line_buffer[pixel_x] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
-									if ( vdc[which].physical_width != 512 ) { 
+									if ( vdc[which].physical_width != 512 ) {
 										int dp = 1;
-										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) { 
+										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) {
 											drawn[pixel_x + dp] = i + 2;
 											line_buffer[pixel_x + dp] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
 											dp++;
@@ -897,8 +897,8 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 				}
 
 				/* 32 pixel wide sprites are counted as 2 sprites and the right half
-				   is only drawn if there are 2 open slots.
-				*/
+                   is only drawn if there are 2 open slots.
+                */
 				sprites_drawn++;
 				if( sprites_drawn > 16 ) {
 					vdc[which].status |= VDC_OR;
@@ -921,7 +921,7 @@ static void pce_refresh_sprites(int which, int line, UINT8 *drawn, UINT16 *line_
 												line_buffer[pixel_x + dp] = Machine->pens[color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w];
 												dp++;
 											}
-										}                                   
+										}
 									}
 									drawn[pixel_x] = i + 2;
 								}
@@ -950,11 +950,11 @@ static void vdc_do_dma(int which)
 	int src = vdc[which].vdc_data[SOUR].w;
 	int dst = vdc[which].vdc_data[DESR].w;
 	int len = vdc[which].vdc_data[LENR].w;
-	
+
 	int did = (vdc[which].vdc_data[DCR].w >> 3) & 1;
 	int sid = (vdc[which].vdc_data[DCR].w >> 2) & 1;
 	int dvc = (vdc[which].vdc_data[DCR].w >> 1) & 1;
-	
+
 	do {
 		UINT8 l, h;
 
@@ -966,14 +966,14 @@ static void vdc_do_dma(int which)
 
 		if(sid) src = (src - 1) & 0xFFFF;
 		else	src = (src + 1) & 0xFFFF;
-		
+
 		if(did) dst = (dst - 1) & 0xFFFF;
 		else	dst = (dst + 1) & 0xFFFF;
-		
+
 		len = (len - 1) & 0xFFFF;
-		
+
 	} while (len != 0xFFFF);
-	
+
 	vdc[which].status |= VDC_DV;
 	vdc[which].vdc_data[SOUR].w = src;
 	vdc[which].vdc_data[DESR].w = dst;
@@ -982,7 +982,7 @@ static void vdc_do_dma(int which)
 	{
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
 	}
-	
+
 }
 
 static void vpc_update_prio_map( void ) {

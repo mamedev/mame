@@ -127,14 +127,14 @@ INLINE void memory_lock_release(void)
 
 //============================================================
 //  malloc_file_line - debugging version of malloc which
-//	accepts filename and line number
+//  accepts filename and line number
 //============================================================
 
 void *malloc_file_line(size_t size, const char *file, int line)
 {
 	UINT8 *block_base;
 	int id = current_id++;
-	
+
 	// perform global intialization if not already done
 	global_init_if_not_done();
 
@@ -201,7 +201,7 @@ void *CLIB_DECL malloc(size_t size)
 
 //============================================================
 //  calloc_file_line - debugging version of calloc which
-//	accepts filename and line number
+//  accepts filename and line number
 //============================================================
 
 void *calloc_file_line(size_t size, size_t count, const char *file, int line)
@@ -229,7 +229,7 @@ void *CLIB_DECL calloc(size_t size, size_t count)
 
 //============================================================
 //  _calloc_crt - override for the _calloc_crt() function,
-//	which is called by beginthreadex
+//  which is called by beginthreadex
 //============================================================
 
 void *CLIB_DECL _calloc_crt(size_t size, size_t count)
@@ -240,7 +240,7 @@ void *CLIB_DECL _calloc_crt(size_t size, size_t count)
 
 //============================================================
 //  realloc_file_line - debugging version of realloc which
-//	accepts filename and line number
+//  accepts filename and line number
 //============================================================
 
 void *realloc_file_line(void *memory, size_t size, const char *file, int line)
@@ -348,7 +348,7 @@ void CLIB_DECL free(void *memory)
 
 //============================================================
 //  _msize - internal MSVC routine that returns the size of
-//	a memory block
+//  a memory block
 //============================================================
 
 size_t CLIB_DECL _msize(void *memory)
@@ -380,7 +380,7 @@ size_t CLIB_DECL _msize(void *memory)
 
 //============================================================
 //  check_unfreed_mem - called from the exit path of any
-//	code that wants to check for unfreed memory
+//  code that wants to check for unfreed memory
 //============================================================
 
 void check_unfreed_mem(void)
@@ -413,7 +413,7 @@ void check_unfreed_mem(void)
 
 //============================================================
 //  allocate_entry - allocate a new entry and link it into
-//	the list of allocated memory
+//  the list of allocated memory
 //============================================================
 
 static memory_entry *allocate_entry(void)
@@ -466,7 +466,7 @@ static memory_entry *allocate_entry(void)
 
 //============================================================
 //  find_entry - find a memory_object entry in the list that
-//	contains the given pointer
+//  contains the given pointer
 //============================================================
 
 static memory_entry *find_entry(void *pointer)
@@ -545,14 +545,14 @@ static void global_init(void)
 	if (envstring == NULL || _ttoi(envstring) != 0)
 	{
 		INT8 allocshift;
-		
+
 		// loop from 256MB down to 4k (page size)
 		for (allocshift = 8 + 20; allocshift >= 12; allocshift--)
 		{
 			// keep allocating address space at that size until we get something >4gb
 			while ((UINT64)VirtualAlloc(NULL, (UINT64)1 << allocshift, MEM_RESERVE, PAGE_NOACCESS) < ((UINT64)1 << 32)) ;
 		}
-		
+
 		// loop from 64k down
 		for (allocshift = 6 + 10; allocshift >= 1; allocshift--)
 		{

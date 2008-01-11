@@ -1,11 +1,11 @@
 /***************************************************************************
 
 TODO:
-	- start up sound (Sound #2 should play but does not
+    - start up sound (Sound #2 should play but does not
 
 Done:
     - discrete sound
-	- hooked up z80dma
+    - hooked up z80dma
     - combined memory maps
     - statics in mario_state struct
     - fixed save state issues
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( mario_base )
 	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
 	MDRV_CPU_IO_MAP(0,mario_writeport)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-	
+
 	MDRV_MACHINE_START(mario)
 	MDRV_MACHINE_RESET(mario)
 
@@ -381,7 +381,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mario )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mario_base ) 
+	MDRV_IMPORT_FROM(mario_base )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(mario_audio)
@@ -391,13 +391,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( masao )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mario_base ) 
-	
+	MDRV_IMPORT_FROM(mario_base )
+
 	MDRV_CPU_REPLACE("main", Z80, 4000000)        /* 4.000 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(masao_map, 0)
 	MDRV_CPU_IO_MAP(0,mario_writeport)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-	
+
 	/* sound hardware */
 	MDRV_IMPORT_FROM(masao_audio)
 MACHINE_DRIVER_END

@@ -371,7 +371,7 @@ static MACHINE_DRIVER_START( ddribble )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
- 
+
 	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(0, "filter1", 0.25)

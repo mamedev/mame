@@ -135,7 +135,7 @@ VIDEO_START( atarisy2 )
 	/* reset the statics */
 	yscroll_reset_timer = timer_alloc(reset_yscroll_callback, NULL);
 	videobank = 0;
-	
+
 	/* save states */
 	state_save_register_global_array(playfield_tile_bank);
 	state_save_register_global(videobank);

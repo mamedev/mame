@@ -177,15 +177,15 @@ WRITE8_HANDLER( tx1_ay8910_b_w )
 
     Engine sounds are produced by three of these 4013B chains:
 
-				+------------------
-                |  +---------+				
+                +------------------
+                |  +---------+
         +-----+ |  | +-----+ |
       +-|D 1 Q|-+  +-|D 2 Q|-|-----
       | |C  /Q|-o----|C  /Q|-+
       | +-----+ |    +-----+
-	  +---------+
+      +---------+
 
-	 +----------+
+     +----------+
      |  +-----+ |    +-----+
      |  |C 3 Q|-+    |C 4 Q|-------
     !&--|D  /Q|------|D  /Q|-+
@@ -194,8 +194,8 @@ WRITE8_HANDLER( tx1_ay8910_b_w )
 
      Common clocks omitted for clarity (all driven from an 8253 output pin).
 
-	     Player: ES0, ES1, ES2
-	 Opponent 2: ES2
+         Player: ES0, ES1, ES2
+     Opponent 2: ES2
 
  ***************************************************************************/
 
