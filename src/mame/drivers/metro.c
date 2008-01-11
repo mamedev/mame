@@ -5878,8 +5878,8 @@ ROM_END
 
 /*     year  rom       clone     machine   inputs    init */
 GAME( 1992, karatour, 0,        karatour, karatour, karatour, ROT0,   "Mitchell",                   "The Karate Tournament",           GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, pangpoms, 0,        pangpoms, pangpoms, metro,    ROT0,   "Metro",                      "Pang Poms"                          , 0 )
-GAME( 1992, pangpomm, pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",   "Pang Poms (Mitchell)"               , 0 )
+GAME( 1992, pangpoms, 0,        pangpoms, pangpoms, metro,    ROT0,   "Metro",                      "Pang Pom's"                         , 0 )
+GAME( 1992, pangpomm, pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",   "Pang Pom's (Mitchell)"              , 0 )
 GAME( 1992, skyalert, 0,        skyalert, skyalert, metro,    ROT270, "Metro",                      "Sky Alert"                          , 0 )
 GAME( 1993?,ladykill, 0,        karatour, ladykill, karatour, ROT90,  "Yanyaka (Mitchell license)", "Lady Killer",                     GAME_IMPERFECT_GRAPHICS )
 GAME( 1993?,moegonta, ladykill, karatour, moegonta, karatour, ROT90,  "Yanyaka",                    "Moeyo Gonta!! (Japan)",           GAME_IMPERFECT_GRAPHICS )
