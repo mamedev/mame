@@ -86,8 +86,8 @@ static UINT16 twin16_CPUA_register, twin16_CPUB_register;
 static UINT8 twin16_soundlatch;
 static UINT16 twin16_sound_command;
 
-static int cuebrick_nvram_bank;
-static UINT16 cuebrick_nvram[0x400*0x20];	// 32k paged in a 1k window
+static int cuebrckj_nvram_bank;
+static UINT16 cuebrckj_nvram[0x400*0x20];	// 32k paged in a 1k window
 
 
 int twin16_spriteram_process_enable( void )
@@ -245,19 +245,19 @@ static WRITE8_HANDLER( twin16_sres_w )
 	twin16_soundlatch = data;
 }
 
-static READ16_HANDLER( cuebrick_nvram_r )
+static READ16_HANDLER( cuebrckj_nvram_r )
 {
-	return cuebrick_nvram[offset + (cuebrick_nvram_bank * 0x400 / 2)];
+	return cuebrckj_nvram[offset + (cuebrckj_nvram_bank * 0x400 / 2)];
 }
 
-static WRITE16_HANDLER( cuebrick_nvram_w )
+static WRITE16_HANDLER( cuebrckj_nvram_w )
 {
-	COMBINE_DATA(&cuebrick_nvram[offset + (cuebrick_nvram_bank * 0x400 / 2)]);
+	COMBINE_DATA(&cuebrckj_nvram[offset + (cuebrckj_nvram_bank * 0x400 / 2)]);
 }
 
-static WRITE16_HANDLER( cuebrick_nvram_bank_w )
+static WRITE16_HANDLER( cuebrckj_nvram_bank_w )
 {
-	cuebrick_nvram_bank = (data >> 8);
+	cuebrckj_nvram_bank = (data >> 8);
 }
 
 /* Memory Maps */
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x063fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READ(cuebrick_nvram_r)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READ(cuebrckj_nvram_r)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x100000, 0x103fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x104000, 0x105fff) AM_READ(MRA16_RAM)	// miaj
@@ -309,8 +309,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_WRITE(cuebrick_nvram_w)
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvram_bank_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_WRITE(cuebrckj_nvram_w)
+	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrckj_nvram_bank_w)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(twin16_videoram2_w) AM_BASE(&twin16_videoram2)
 	AM_RANGE(0x104000, 0x105fff) AM_WRITE(MWA16_RAM)	// miaj
@@ -833,7 +833,7 @@ static INPUT_PORTS_START( miaj )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( cuebrick )
+static INPUT_PORTS_START( cuebrckj )
 	PORT_START      /* 0xa0001 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1075,7 +1075,7 @@ static MACHINE_DRIVER_START( vulcan )
 	MDRV_VIDEO_UPDATE(vulcan )
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( cuebrick )
+static MACHINE_DRIVER_START( cuebrckj )
 	MDRV_IMPORT_FROM(twin16)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 2*8, 30*8-1)
 	MDRV_VIDEO_START(fround)
@@ -1437,7 +1437,7 @@ ROM_START( miaj )
 	ROM_REGION( 0x20000, REGION_SOUND2, ROMREGION_ERASE00 ) // samples
 ROM_END
 
-ROM_START( cuebrick )
+ROM_START( cuebrckj )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 ) // Z80 code (sound CPU)
 	ROM_LOAD( "903_d03.10a",		0x00000,  0x8000, CRC(455e855a) SHA1(cfdd54a5071862653ee94c0455301f4a7245fbd8) )
 
@@ -1508,27 +1508,27 @@ static DRIVER_INIT( hpuncher )
 	twin16_custom_video = 2;
 }
 
-static DRIVER_INIT( cuebrick )
+static DRIVER_INIT( cuebrckj )
 {
 	gfx_untangle();
 	twin16_custom_video = 2;
 
-	generic_nvram = (UINT8 *)cuebrick_nvram;
+	generic_nvram = (UINT8 *)cuebrckj_nvram;
 	generic_nvram_size = 0x400*0x20;
 }
 
 /* Game Drivers */
 
-GAME( 1987, devilw,   0,      heavysync, devilw,   twin16,   ROT0, "Konami", "Devil World", 0 )
-GAME( 1987, majuu,    devilw, heavysync, devilw,   twin16,   ROT0, "Konami", "Majuu no Ohkoku", 0 )
-GAME( 1987, darkadv,  devilw, heavysync, darkadv,  twin16,   ROT0, "Konami", "Dark Adventure", 0 )
-GAME( 1988, vulcan,   0,      vulcan,    vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture", 0 )
-GAME( 1988, gradius2, vulcan, vulcan,    gradius2, twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", 0 )
-GAME( 1988, grdius2a, vulcan, vulcan,    vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", 0 )
-GAME( 1988, grdius2b, vulcan, vulcan,    vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", 0 )
+GAME( 1987, devilw,   0,        heavysync, devilw,   twin16,   ROT0, "Konami", "Devil World", 0 )
+GAME( 1987, majuu,    devilw,   heavysync, devilw,   twin16,   ROT0, "Konami", "Majuu no Ohkoku", 0 )
+GAME( 1987, darkadv,  devilw,   heavysync, darkadv,  twin16,   ROT0, "Konami", "Dark Adventure", 0 )
+GAME( 1988, vulcan,   0,        vulcan,    vulcan,   twin16,   ROT0, "Konami", "Vulcan Venture", 0 )
+GAME( 1988, gradius2, vulcan,   vulcan,    gradius2, twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", 0 )
+GAME( 1988, grdius2a, vulcan,   vulcan,    vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", 0 )
+GAME( 1988, grdius2b, vulcan,   vulcan,    vulcan,   twin16,   ROT0, "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", 0 )
 
-GAME( 1988, fround,   0,      fround,    fround,   fround,   ROT0, "Konami", "The Final Round (version M)", 0 )
-GAME( 1988, froundl,  fround, fround,    fround,   fround,   ROT0, "Konami", "The Final Round (version L)", 0 )
-GAME( 1988, hpuncher, fround, hpuncher,  fround,   hpuncher, ROT0, "Konami", "Hard Puncher (Japan)", 0 )
-GAME( 1989, miaj,     mia,    mia,       miaj,     hpuncher, ROT0, "Konami", "M.I.A. - Missing in Action (Japan)", 0 )
-GAME( 1989, cuebrick, 0,      cuebrick,  cuebrick, cuebrick, ROT0, "Konami", "Cue Brick (Japan)", 0 )
+GAME( 1988, fround,   0,        fround,    fround,   fround,   ROT0, "Konami", "The Final Round (version M)", 0 )
+GAME( 1988, froundl,  fround,   fround,    fround,   fround,   ROT0, "Konami", "The Final Round (version L)", 0 )
+GAME( 1988, hpuncher, fround,   hpuncher,  fround,   hpuncher, ROT0, "Konami", "Hard Puncher (Japan)", 0 )
+GAME( 1989, miaj,     mia,      mia,       miaj,     hpuncher, ROT0, "Konami", "M.I.A. - Missing in Action (Japan)", 0 )
+GAME( 1989, cuebrckj, cuebrick, cuebrckj,  cuebrckj, cuebrckj, ROT0, "Konami", "Cue Brick (Japan)", 0 )

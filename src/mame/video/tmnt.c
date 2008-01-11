@@ -61,7 +61,7 @@ static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags
 	}
 }
 
-static void cuebrckj_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+static void cuebrick_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	if (layer == 0)
 	{
@@ -99,13 +99,13 @@ static void ssbl_tile_callback(int layer,int bank,int *code,int *color,int *flag
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
-static int detatwin_rombank;
+static int blswhstl_rombank;
 
-static void detatwin_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
+static void blswhstl_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8)
-			| (bank << 12) | detatwin_rombank << 14;
+			| (bank << 12) | blswhstl_rombank << 14;
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
@@ -169,7 +169,7 @@ static void lgtnfght_sprite_callback(int *code,int *color,int *priority_mask)
 	*color = sprite_colorbase + (*color & 0x1f);
 }
 
-static void detatwin_sprite_callback(int *code,int *color,int *priority_mask)
+static void blswhstl_sprite_callback(int *code,int *color,int *priority_mask)
 {
 #if 0
 if (input_code_pressed(KEYCODE_Q) && (*color & 0x20)) *color = rand();
@@ -216,13 +216,13 @@ VIDEO_START( mia )
 	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
-VIDEO_START( cuebrckj )
+VIDEO_START( cuebrick )
 {
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 40;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,cuebrckj_tile_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,cuebrick_tile_callback);
 	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,mia_sprite_callback);
 }
 
@@ -266,11 +266,11 @@ VIDEO_START( sunsetbl )
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
-VIDEO_START( detatwin )
+VIDEO_START( blswhstl )
 {
 	K053251_vh_start();
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,detatwin_tile_callback);
-	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,detatwin_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,blswhstl_tile_callback);
+	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
@@ -396,7 +396,7 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 	}
 }
 
-WRITE16_HANDLER( detatwin_700300_w )
+WRITE16_HANDLER( blswhstl_700300_w )
 {
 	if (ACCESSING_LSB)
 	{
@@ -408,9 +408,9 @@ WRITE16_HANDLER( detatwin_700300_w )
 		K052109_set_RMRD_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 7 = select char ROM bank */
-		if (detatwin_rombank != ((data & 0x80) >> 7))
+		if (blswhstl_rombank != ((data & 0x80) >> 7))
 		{
-			detatwin_rombank = (data & 0x80) >> 7;
+			blswhstl_rombank = (data & 0x80) >> 7;
 			tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		}
 
@@ -809,7 +809,7 @@ VIDEO_UPDATE( thndrx2 )
 
 ***************************************************************************/
 
-VIDEO_EOF( detatwin )
+VIDEO_EOF( blswhstl )
 {
 	K053245_clear_buffer(0);
 }

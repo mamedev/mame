@@ -4614,14 +4614,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gradius2 )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( grdius2a )	/* GX785 (c) 1988 (Japan) */
 	DRIVER( grdius2b )	/* GX785 (c) 1988 (Japan) */
-	DRIVER( cuebrick )	/* GX903 (c) 1989 */
+	DRIVER( cuebrckj )	/* GX903 (c) 1989 */
 	DRIVER( fround )	/* GX870 (c) 1988 */
 	DRIVER( froundl )	/* GX870 (c) 1988 */
 	DRIVER( hpuncher )	/* GX870 (c) 1988 (Japan) */
 	DRIVER( miaj )		/* GX808 (c) 1989 (Japan) */
 
 	/* (some) Konami 68000 games */
-	DRIVER( cuebrckj )	/* GX903 (c) 1989 */
+	DRIVER( cuebrick )	/* GX903 (c) 1989 */
 	DRIVER( mia )		/* GX808 (c) 1989 */
 	DRIVER( mia2 )		/* GX808 (c) 1989 */
 	DRIVER( tmnt )		/* GX963 (c) 1989 (World) */
@@ -7410,7 +7410,7 @@ Other Sun games
 	DRIVER( quizvadr )	/* 1991 BFM */
 	DRIVER( qos )		/* 1992 BFM */
 	DRIVER( qosa )		/* 1992 BFM */
-	DRIVER( qosb )		/* 1992 BFM */	
+	DRIVER( qosb )		/* 1992 BFM */
 
 	/* Scorpion 2+Video Board Games */
 	DRIVER( qntoondo )	/* 1993 */
