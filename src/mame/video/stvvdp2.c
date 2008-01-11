@@ -6154,41 +6154,41 @@ VIDEO_UPDATE( stv_vdp2 )
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[0], tilecode,  stv_vdp2_gfx_decode, machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[1], tilecode,  stv_vdp2_gfx_decode, machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[2], tilecode,  stv_vdp2_gfx_decode, machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[3], tilecode, stv_vdp2_gfx_decode, machine->drv->gfxdecodeinfo[3].gfxlayout);
+			decodechar(machine->gfx[3], tilecode, stv_vdp2_gfx_decode);
 		}
 
 		/* vdp 1 ... doesn't have to be tile based */
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[4], tilecode,  stv_vdp1_gfx_decode, machine->drv->gfxdecodeinfo[4].gfxlayout);
+			decodechar(machine->gfx[4], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[5], tilecode,  stv_vdp1_gfx_decode, machine->drv->gfxdecodeinfo[5].gfxlayout);
+			decodechar(machine->gfx[5], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[6], tilecode,  stv_vdp1_gfx_decode, machine->drv->gfxdecodeinfo[6].gfxlayout);
+			decodechar(machine->gfx[6], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[7], tilecode,  stv_vdp1_gfx_decode, machine->drv->gfxdecodeinfo[7].gfxlayout);
+			decodechar(machine->gfx[7], tilecode,  stv_vdp1_gfx_decode);
 		}
 	}
 
