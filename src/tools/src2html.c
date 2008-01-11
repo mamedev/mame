@@ -25,6 +25,7 @@
 #define PREPROCESSOR_STYLE	"color:#0000b3"
 #define KEYWORD_STYLE		"color:#0000b3"
 #define MAMEWORD_STYLE		"color:#7f007f"
+#define LINENUM_STYLE		"color:#999"
 
 
 
@@ -171,7 +172,7 @@ static const token_entry c_token_table[] =
 
 /* core output functions */
 static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir);
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile);
+static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file);
 
 /* HTML helpers */
 static core_file *create_file_and_output_header(const astring *filename, const char *title, const char *subtitle);
@@ -179,7 +180,7 @@ static void output_footer_and_close_file(core_file *file);
 
 /* path helpers */
 static const astring *normalized_subpath(const astring *path, int start);
-static void output_path_as_links(core_file *file, const astring *path, int end_is_directory);
+static void output_path_as_links(core_file *file, const astring *path, int end_is_directory, int link_to_file);
 static astring *find_include_file(int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, const astring *filename);
 
 
@@ -288,7 +289,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 	/* output the directory navigation */
 	core_fprintf(indexfile, "<h3>Viewing Directory: ");
-	output_path_as_links(indexfile, srcdir_subpath, TRUE);
+	output_path_as_links(indexfile, srcdir_subpath, TRUE, FALSE);
 	core_fprintf(indexfile, "</h3>");
 	astring_free((astring *)srcdir_subpath);
 
@@ -302,9 +303,6 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 		list_entry *curlist;
 		osd_directory *dir;
 		int found = 0;
-		int colheight;
-		int colcount;
-		int colnum;
 
 		/* open the directory and iterate through it */
 		dir = osd_opendir(astring_c(srcdir));
@@ -340,7 +338,6 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 		/* sort the list */
 		qsort(listarray, found, sizeof(listarray[0]), compare_list_entries);
-		colheight = (found + 3) / 4;
 
 		/* rebuild the list */
 		list = NULL;
@@ -350,15 +347,14 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			list = listarray[found];
 		}
 
-		/* add a header */
-		if (list != NULL)
-			core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<div align=\"center\"><table border=\"0\" width=\"90%%\"><tr><td width=\"25%%\">\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
-
 		/* iterate through each file */
-		colcount = colnum = 0;
 		for (curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
 		{
 			astring *srcfile, *dstfile;
+
+			/* add a header */
+			if (curlist == list)
+				core_fprintf(indexfile, "\t<h2>%s</h2>\n\t<ul>\n", (entry_type == ENTTYPE_DIR) ? "Directories" : "Files");
 
 			/* build the source filename */
 			srcfile = astring_alloc();
@@ -384,8 +380,8 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 				{
 					astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 					if (indexfile != NULL)
-						core_fprintf(indexfile, "\t\t<a href=\"%s.html\">%s</a><br />\n", astring_c(curlist->name), astring_c(curlist->name));
-					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile);
+						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
+					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, astring_cmp(srcdir, dstdir) == 0);
 				}
 			}
 
@@ -394,16 +390,8 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			{
 				astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 				if (indexfile != NULL)
-					core_fprintf(indexfile, "\t\t<a href=\"%s/index.html\">%s/</a><br />\n", astring_c(curlist->name), astring_c(curlist->name));
+					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
 				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile);
-			}
-			
-			/* move to the next column if we got them all */
-			if (++colcount >= colheight)
-			{
-				core_fprintf(indexfile, "\t</td><td width=\"25%%\">\n");
-				colcount = 0;
-				colnum++;
 			}
 
 			/* free memory for the names */
@@ -413,11 +401,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 		/* close the list if we found some stuff */
 		if (list != NULL)
-		{
-			while (colnum++ < 3)
-				core_fprintf(indexfile, "\t</td><td width=\"25%%\">\n");
-			core_fprintf(indexfile, "\t</td></tr></table></div>\n");
-		}
+			core_fprintf(indexfile, "\t</ul>\n");
 
 		/* free all the allocated entries */
 		while (list != NULL)
@@ -441,7 +425,7 @@ error:
     HTML
 -------------------------------------------------*/
 
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile)
+static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file)
 {
 	const char *comment_start, *comment_end, *comment_inline, *token_chars;
 	const char *comment_start_esc, *comment_end_esc, *comment_inline_esc;
@@ -454,6 +438,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 	core_file *src;
 	core_file *dst;
 	int toknum;
+	int linenum = 1;
 
 	/* extract a normalized subpath */
 	srcfile_subpath = normalized_subpath(srcfile, srcrootlen + 1);
@@ -522,7 +507,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 
 	/* output the directory navigation */
 	core_fprintf(dst, "<h3>Viewing File: ");
-	output_path_as_links(dst, srcfile_subpath, FALSE);
+	output_path_as_links(dst, srcfile_subpath, FALSE, link_to_file);
 	core_fprintf(dst, "</h3>");
 	astring_free((astring *)srcfile_subpath);
 
@@ -539,6 +524,9 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 		int quotes_are_linked = FALSE;
 		char in_quotes = 0;
 		int curcol = 0;
+		
+		/* start with the line number */
+		dstptr += sprintf(dstptr, "<span style=\"" LINENUM_STYLE "\">%5d</span>&nbsp;&nbsp;", linenum++);
 
 		/* iterate over characters in the source line */
 		for (srcptr = srcline; *srcptr != 0; )
@@ -795,7 +783,7 @@ static const astring *normalized_subpath(const astring *path, int start)
     series of links
 -------------------------------------------------*/
 
-static void output_path_as_links(core_file *file, const astring *path, int end_is_directory)
+static void output_path_as_links(core_file *file, const astring *path, int end_is_directory, int link_to_file)
 {
 	astring *substr = astring_alloc();
 	int srcdepth, curdepth, depth;
@@ -834,6 +822,8 @@ static void output_path_as_links(core_file *file, const astring *path, int end_i
 	astring_cpysubstr(substr, path, lastslash, -1);
 	if (end_is_directory)
 		core_fprintf(file, "<a href=\"index.html\">%s</a>", astring_c(substr));
+	else if (link_to_file)
+		core_fprintf(file, "<a href=\"%s\">%s</a>", astring_c(substr), astring_c(substr));
 	else
 		core_fprintf(file, "<a href=\"%s.html\">%s</a>", astring_c(substr), astring_c(substr));
 
