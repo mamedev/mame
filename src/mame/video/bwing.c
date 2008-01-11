@@ -108,10 +108,10 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			if (bp_ready == 7 && !srbank)
 			{
 				src = srbase[1];
-				for (i=0; i<BW_NTILES; i++) decodechar(fgfx, i, src, &bwing_tilelayout);
+				for (i=0; i<BW_NTILES; i++) decodechar(fgfx, i, src);
 
 				src += 0x1000;
-				for (i=0; i<BW_NTILES; i++) decodechar(bgfx, i, src, &bwing_tilelayout);
+				for (i=0; i<BW_NTILES; i++) decodechar(bgfx, i, src);
 
 				bp_ready = 0;
 			}

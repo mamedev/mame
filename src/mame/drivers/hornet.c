@@ -360,7 +360,7 @@ static void K037122_tile_update(running_machine *machine, int chip)
 			if (K037122_dirty_map[chip][i])
 			{
 				K037122_dirty_map[chip][i] = 0;
-				decodechar(machine->gfx[K037122_gfx_index[chip]], i, (UINT8 *)K037122_char_ram[chip], &K037122_char_layout);
+				decodechar(machine->gfx[K037122_gfx_index[chip]], i, (UINT8 *)K037122_char_ram[chip]);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(K037122_layer[chip][0]);

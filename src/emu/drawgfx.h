@@ -197,7 +197,7 @@ extern int pdrawgfx_shadow_lowpri;
 void drawgfx_init(running_machine *machine);
 
 
-void decodechar(gfx_element *gfx,int num,const unsigned char *src,const gfx_layout *gl);
+void decodechar(gfx_element *gfx,int num,const unsigned char *src);
 gfx_element *allocgfx(const gfx_layout *gl);
 void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
 void freegfx(gfx_element *gfx);

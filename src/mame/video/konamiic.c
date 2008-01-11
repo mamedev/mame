@@ -1990,6 +1990,20 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 		32*8
 	};
+	static const gfx_layout charlayout_gradius3 =
+	{
+		8,8,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+#ifdef LSB_FIRST
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+#else
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+#endif
+		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+		32*8
+	};
 
 
 	/* find first empty slot to decode gfx */
@@ -2004,6 +2018,11 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	case NORMAL_PLANE_ORDER:
 		total = memory_region_length(gfx_memory_region) / 32;
 		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout, 4);
+		break;
+
+	case GRADIUS3_PLANE_ORDER:
+		total = 0x1000;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout_gradius3, 4);
 		break;
 
 	default:
@@ -2475,6 +2494,18 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 				16*32, 17*32, 18*32, 19*32, 20*32, 21*32, 22*32, 23*32 },
 		128*8
 	};
+	static const gfx_layout spritelayout_gradius3 =
+	{
+		16,16,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+			32*8+2*4, 32*8+3*4, 32*8+0*4, 32*8+1*4, 32*8+6*4, 32*8+7*4, 32*8+4*4, 32*8+5*4 },
+		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+			64*8+0*32, 64*8+1*32, 64*8+2*32, 64*8+3*32, 64*8+4*32, 64*8+5*32, 64*8+6*32, 64*8+7*32 },
+		128*8
+	};
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -2494,6 +2525,11 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	case REVERSE_PLANE_ORDER:
 		total = memory_region_length(gfx_memory_region) / 128;
 		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout_reverse, 4);
+		break;
+
+	case GRADIUS3_PLANE_ORDER:
+		total = 0x4000;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &spritelayout_gradius3, 4);
 		break;
 
 	default:
@@ -4597,6 +4633,23 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 				8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 		256*8
 	};
+	static const gfx_layout charlayout_tail2nos =
+	{
+		16,16,
+		0,
+		4,
+		{ 0, 1, 2, 3 },
+#ifdef LSB_FIRST
+		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
+#else
+		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
+				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+#endif
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		128*8
+	};
 	static const tile_get_info_callback get_tile_info[3] = { K051316_get_tile_info0,K051316_get_tile_info1,K051316_get_tile_info2 };
 
 	/* find first empty slot to decode gfx */
@@ -4608,6 +4661,12 @@ static void K051316_vh_start(running_machine *machine,int chip, int gfx_memory_r
 	/* decode the graphics */
 	switch (bpp)
 	{
+	case -4:
+		total = 0x400;
+		bpp = 4;
+		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout_tail2nos, 4);
+		break;
+
 	case 4:
 		total = memory_region_length(gfx_memory_region) / 128;
 		decode_gfx(machine, gfx_index, memory_region(gfx_memory_region), total, &charlayout4, 4);

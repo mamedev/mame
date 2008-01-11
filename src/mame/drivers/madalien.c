@@ -248,8 +248,7 @@ static VIDEO_UPDATE( madalien )
 
 	for (i = 0; i < 256; i++)
 	{
-		decodechar(machine->gfx[0], i, madalien_charram,
-			machine->drv->gfxdecodeinfo[0].gfxlayout);
+		decodechar(machine->gfx[0], i, madalien_charram);
 	}
 
 	tilemap_mark_all_tiles_dirty(tilemap_fg);

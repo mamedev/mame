@@ -51,8 +51,7 @@ WRITE16_HANDLER(roundup5_vram_w)
 
 	offset=offset%0xc000;
 
-	decodechar(Machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram,
-			Machine->drv->gfxdecodeinfo[1].gfxlayout);
+	decodechar(Machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram);
 }
 
 

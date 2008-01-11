@@ -3246,7 +3246,7 @@ VIDEO_UPDATE( f3 )
 	if (vram_changed)
 		for (tile = 0;tile < 256;tile++)
 			if (vram_dirty[tile]) {
-				decodechar(machine->gfx[0],tile,(UINT8 *)f3_vram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],tile,(UINT8 *)f3_vram);
 				tilemap_mark_all_tiles_dirty(vram_layer); // TODO
 				//tilemap_mark_tile_dirty(vram_layer,tile);
 				vram_dirty[tile]=0;
@@ -3256,7 +3256,7 @@ VIDEO_UPDATE( f3 )
 	if (pivot_changed)
 		for (tile = 0;tile < 2048;tile++)
 			if (pivot_dirty[tile]) {
-				decodechar(machine->gfx[3],tile,(UINT8 *)f3_pivot_ram,machine->drv->gfxdecodeinfo[3].gfxlayout);
+				decodechar(machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
 				tilemap_mark_tile_dirty(pixel_layer,tile);
 				pivot_dirty[tile]=0;
 			}

@@ -302,8 +302,7 @@ void K001604_tile_update(running_machine *machine, int chip)
 			if(K001604_dirty_map[chip][0][i])
 			{
 				K001604_dirty_map[chip][0][i] = 0;
-				decodechar(machine->gfx[K001604_gfx_index[chip][0]], i,
-						  (UINT8*)&K001604_char_ram[chip][0], &K001604_char_layout_layer_8x8);
+				decodechar(machine->gfx[K001604_gfx_index[chip][0]], i, (UINT8*)&K001604_char_ram[chip][0]);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(K001604_layer_8x8[chip][0]);
@@ -324,8 +323,7 @@ void K001604_tile_update(running_machine *machine, int chip)
 			if(K001604_dirty_map[chip][1][i])
 			{
 				K001604_dirty_map[chip][1][i] = 0;
-				decodechar(machine->gfx[K001604_gfx_index[chip][1]], i,
-						  (UINT8*)&K001604_char_ram[chip][0], &K001604_char_layout_layer_16x16);
+				decodechar(machine->gfx[K001604_gfx_index[chip][1]], i, (UINT8*)&K001604_char_ram[chip][0]);
 			}
 		}
 

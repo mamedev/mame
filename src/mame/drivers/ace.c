@@ -63,13 +63,13 @@ static VIDEO_UPDATE( ace )
 {
 	int offs;
 
-	decodechar(machine->gfx[1], 0, ace_characterram, machine->drv->gfxdecodeinfo[1].gfxlayout);
-	decodechar(machine->gfx[2], 0, ace_characterram, machine->drv->gfxdecodeinfo[2].gfxlayout);
-	decodechar(machine->gfx[3], 0, ace_characterram, machine->drv->gfxdecodeinfo[3].gfxlayout);
+	decodechar(machine->gfx[1], 0, ace_characterram);
+	decodechar(machine->gfx[2], 0, ace_characterram);
+	decodechar(machine->gfx[3], 0, ace_characterram);
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		decodechar(machine->gfx[4], offs, ace_scoreram, machine->drv->gfxdecodeinfo[4].gfxlayout);
+		decodechar(machine->gfx[4], offs, ace_scoreram);
 	}
 
 	/* first of all, fill the screen with the background color */

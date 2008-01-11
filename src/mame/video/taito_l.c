@@ -159,57 +159,49 @@ READ8_HANDLER( taitol_control_r )
 
 void taitol_chardef14_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32,     taitol_rambanks,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32,     taitol_rambanks);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef15_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+128, taitol_rambanks,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+128, taitol_rambanks);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef16_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+256, taitol_rambanks,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+256, taitol_rambanks);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef17_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+384, taitol_rambanks,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+384, taitol_rambanks);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef1c_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+512, taitol_rambanks + 0x4000,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+512, taitol_rambanks + 0x4000);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef1d_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+640, taitol_rambanks + 0x4000,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+640, taitol_rambanks + 0x4000);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef1e_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+768, taitol_rambanks + 0x4000,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+768, taitol_rambanks + 0x4000);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 
 void taitol_chardef1f_m(int offset)
 {
-	decodechar(Machine->gfx[2], offset/32+896, taitol_rambanks + 0x4000,
-			   Machine->drv->gfxdecodeinfo[2].gfxlayout);
+	decodechar(Machine->gfx[2], offset/32+896, taitol_rambanks + 0x4000);
 	tilemap_mark_all_tiles_dirty(ch1a_tilemap);
 }
 

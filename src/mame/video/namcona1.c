@@ -207,8 +207,8 @@ static void update_gfx(running_machine *machine)
 			if( dirtychar[i] )
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[0],i,(UINT8 *)cgram,&cg_layout);
-				decodechar(machine->gfx[1],i,(UINT8 *)shaperam,&shape_layout);
+				decodechar(machine->gfx[0],i,(UINT8 *)cgram);
+				decodechar(machine->gfx[1],i,(UINT8 *)shaperam);
 			}
 		}
 		dirtygfx = 0;

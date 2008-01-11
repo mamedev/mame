@@ -661,7 +661,7 @@ static void draw_videoram(running_machine *machine, mame_bitmap *bitmap, const r
 			/* if the tile is dirty, decode it */
 			if (dirtychar[tile])
 			{
-				decodechar(machine->gfx[0], tile, &videoram[0x800], machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0], tile, &videoram[0x800]);
 				dirtychar[tile] = 0;
 			}
 

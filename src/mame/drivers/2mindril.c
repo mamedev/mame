@@ -83,7 +83,7 @@ static VIDEO_UPDATE( drill )
 
 	for (i=0; i<256; i++)
 	{
-		decodechar(machine->gfx[1],i,(UINT8*)&charram[0],machine->drv->gfxdecodeinfo[1].gfxlayout);
+		decodechar(machine->gfx[1],i,(UINT8*)&charram[0]);
 	}
 
 	DRAW_MAP(map1ram,0)

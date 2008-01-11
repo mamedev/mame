@@ -60,7 +60,7 @@ WRITE8_HANDLER( usg_charram_w )
 {
 	usg_charram[offset] = data;
 
-	decodechar(Machine->gfx[0], offset/8, usg_charram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(Machine->gfx[0], offset/8, usg_charram);
 
 	tilemap_mark_all_tiles_dirty(usg_tilemap);
 }

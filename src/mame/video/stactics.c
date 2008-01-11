@@ -282,8 +282,7 @@ VIDEO_START( stactics )
     {
         decodechar(machine->gfx[4],
                    i,
-                   firechar,
-                   machine->drv->gfxdecodeinfo[4].gfxlayout);
+                   firechar);
     }
 
     /* Decode the Fire Beam ROM for later      */
@@ -312,8 +311,7 @@ VIDEO_START( stactics )
     {
         decodechar(machine->gfx[5],
                    i,
-                   stactics_special_chars,
-                   machine->drv->gfxdecodeinfo[5].gfxlayout);
+                   stactics_special_chars);
     }
 
     stactics_vblank_count = 0;
@@ -517,8 +515,7 @@ VIDEO_UPDATE( stactics )
         {
             decodechar(machine->gfx[3],
                        char_number,
-                       stactics_chardata_d,
-                       machine->drv->gfxdecodeinfo[3].gfxlayout);
+                       stactics_chardata_d);
             dirty_chardata_d[char_number] = 2;
             dirty_videoram_d[offs] = 1;
         }
@@ -546,8 +543,7 @@ VIDEO_UPDATE( stactics )
         {
             decodechar(machine->gfx[2],
                        char_number,
-                       stactics_chardata_e,
-                       machine->drv->gfxdecodeinfo[2].gfxlayout);
+                       stactics_chardata_e);
             dirty_chardata_e[char_number] = 2;
             dirty_videoram_e[offs] = 1;
         }
@@ -575,8 +571,7 @@ VIDEO_UPDATE( stactics )
         {
             decodechar(machine->gfx[1],
                        char_number,
-                       stactics_chardata_f,
-                       machine->drv->gfxdecodeinfo[1].gfxlayout);
+                       stactics_chardata_f);
             dirty_chardata_f[char_number] = 2;
             dirty_videoram_f[offs] = 1;
         }
@@ -604,8 +599,7 @@ VIDEO_UPDATE( stactics )
         {
             decodechar(machine->gfx[0],
                        char_number,
-                       stactics_chardata_b,
-                       machine->drv->gfxdecodeinfo[0].gfxlayout);
+                       stactics_chardata_b);
             dirty_chardata_b[char_number] = 2;
             dirty_videoram_b[offs] = 1;
         }

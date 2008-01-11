@@ -259,7 +259,7 @@ VIDEO_UPDATE( buggychl )
 	for (code = 0;code < 256;code++)
 	{
 		if (dirtychar[code])
-			decodechar(machine->gfx[0],code,buggychl_character_ram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,buggychl_character_ram);
 	}
 
 	if (bg_on)

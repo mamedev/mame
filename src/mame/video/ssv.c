@@ -930,8 +930,8 @@ VIDEO_UPDATE( eaglshot )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[0].gfxlayout);
-				decodechar(machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[1].gfxlayout);
+				decodechar(machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram);
+				decodechar(machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram);
 			}
 		}
 	}
@@ -1120,7 +1120,7 @@ VIDEO_UPDATE( gdfs )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram, machine->drv->gfxdecodeinfo[2].gfxlayout);
+				decodechar(machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram);
 			}
 		}
 	}

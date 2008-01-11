@@ -171,7 +171,7 @@ VIDEO_UPDATE( lemmings )
 	/* Decode any characters that have changed in vram */
 	for (i=0; i<2048; i++) {
 		if (vram_dirty[i]) {
-			decodechar(machine->gfx[2],i,vram_buffer,machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],i,vram_buffer);
 			tilemap_mark_tile_dirty(vram_tilemap,i);
 			vram_dirty[i]=0;
 		}

@@ -54,7 +54,7 @@ VIDEO_START( tail2nos )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 
-	K051316_vh_start_0(machine,REGION_GFX3,4,TRUE,0,zoom_callback);
+	K051316_vh_start_0(machine,REGION_GFX3,-4,TRUE,0,zoom_callback);
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -164,25 +164,6 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_UPDATE( tail2nos )
 {
-	static const gfx_layout tilelayout =
-	{
-		16,16,
-		TOTAL_CHARS,
-		4,
-		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-#endif
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		128*8
-	};
-
-
 	if (dirtygfx)
 	{
 		int i;
@@ -194,7 +175,7 @@ VIDEO_UPDATE( tail2nos )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[2],i,(UINT8 *)zoomdata,&tilelayout);
+				decodechar(machine->gfx[2],i,(UINT8 *)zoomdata);
 			}
 		}
 

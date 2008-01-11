@@ -161,8 +161,9 @@ static void calc_penusage(gfx_element *gfx, int num)
     on a specified layout
 -------------------------------------------------*/
 
-void decodechar(gfx_element *gfx, int num, const UINT8 *src, const gfx_layout *gl)
+void decodechar(gfx_element *gfx, int num, const UINT8 *src)
 {
+	const gfx_layout *gl = &gfx->layout;
 	int israw = (gl->planeoffset[0] == GFX_RAW);
 	int planes = gl->planes;
 	UINT32 charincrement = gl->charincrement;
@@ -332,7 +333,7 @@ void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count)
 	else
 	{
 		for (c = first; c <= last; c++)
-			decodechar(gfx, c, src, &gfx->layout);
+			decodechar(gfx, c, src);
 	}
 }
 

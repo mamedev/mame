@@ -88,7 +88,7 @@ WRITE8_HANDLER( pacgal_charram_w )
 {
 	pacgal_charram[offset] = data;
 
-	decodechar(Machine->gfx[0],offset/16,pacgal_charram,Machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(Machine->gfx[0],offset/16,pacgal_charram);
 }
 
 WRITE8_HANDLER( pacgal_sprram_w )
@@ -96,7 +96,7 @@ WRITE8_HANDLER( pacgal_sprram_w )
 	offset = (offset & 0x1f83) | ((offset & 0x078) >> 1) | ((offset & 0x004) << 4);
 	pacgal_sprram[offset] = data;
 
-	decodechar(Machine->gfx[1],offset/64,pacgal_sprram,Machine->drv->gfxdecodeinfo[1].gfxlayout);
+	decodechar(Machine->gfx[1],offset/64,pacgal_sprram);
 }
 
 

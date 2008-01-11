@@ -502,6 +502,24 @@ static const gfx_layout tilelayout =
 	64*16
 };
 
+static const gfx_layout tilelayout2 =
+{
+	16,16,
+	0x800,
+	4,
+	{ 0, 1, 2, 3 },
+#ifdef LSB_FIRST
+	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
+			10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
+#else
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
+			8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
+#endif
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
+			8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+	64*16
+};
+
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -519,7 +537,7 @@ static GFXDECODE_START( f1gp )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x000,  1 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 0x100, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x200, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout,   0x300, 16 )	/* changed at runtime */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, tilelayout2,  0x300, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( f1gp2 )

@@ -123,8 +123,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 {
 	int code = tiamc1_tileram[tile_index];
 
-	decodechar(machine->gfx[0], code, tiamc1_charram,
-		   machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(machine->gfx[0], code, tiamc1_charram);
 
 	SET_TILE_INFO(0, code, 0, 0);
 }
@@ -133,8 +132,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 {
 	int code = tiamc1_tileram[tile_index + 1024];
 
-	decodechar(machine->gfx[0], code, tiamc1_charram,
-		   machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(machine->gfx[0], code, tiamc1_charram);
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

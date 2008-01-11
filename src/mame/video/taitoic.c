@@ -1749,7 +1749,7 @@ void TC0080VCO_tilemap_update(running_machine *machine)
 		{
 			if (TC0080VCO_char_dirty[j])
 				decodechar(machine->gfx[TC0080VCO_tx_gfx],j,
-					(UINT8 *)TC0080VCO_char_ram,&TC0080VCO_charlayout);
+					(UINT8 *)TC0080VCO_char_ram);
 			TC0080VCO_char_dirty[j] = 0;
 		}
 		TC0080VCO_chars_dirty = 0;
@@ -2677,7 +2677,7 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 			{
 				if (TC0100SCN_char_dirty[chip][j])
 					decodechar(machine->gfx[TC0100SCN_tx_gfx[chip]],j,
-					(UINT8 *)TC0100SCN_char_ram[chip],&TC0100SCN_charlayout);
+					(UINT8 *)TC0100SCN_char_ram[chip]);
 				TC0100SCN_char_dirty[chip][j] = 0;
 			}
 			TC0100SCN_chars_dirty[chip] = 0;
@@ -3545,7 +3545,7 @@ void TC0480SCP_tilemap_update(running_machine *machine)
 		{
 			if (TC0480SCP_char_dirty[j])
 				decodechar(machine->gfx[TC0480SCP_tx_gfx],j,
-					(UINT8 *)TC0480SCP_char_ram,&TC0480SCP_charlayout);
+					(UINT8 *)TC0480SCP_char_ram);
 			TC0480SCP_char_dirty[j] = 0;
 		}
 		TC0480SCP_chars_dirty = 0;

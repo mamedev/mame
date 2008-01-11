@@ -813,13 +813,13 @@ VIDEO_UPDATE( taitosj )
 	{
 		if (dirtycharacter1[offs] == 1)
 		{
-			decodechar(machine->gfx[0],offs,taitosj_characterram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],offs,taitosj_characterram);
 			dirtycharacter1[offs] = 0;
 			alldirty = 1;
 		}
 		if (dirtycharacter2[offs] == 1)
 		{
-			decodechar(machine->gfx[2],offs,taitosj_characterram + 0x1800,machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],offs,taitosj_characterram + 0x1800);
 			dirtycharacter2[offs] = 0;
 			alldirty = 1;
 		}
@@ -838,12 +838,12 @@ VIDEO_UPDATE( taitosj )
 	{
 		if (dirtysprite1[offs] == 1)
 		{
-			decodechar(machine->gfx[1],offs,taitosj_characterram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],offs,taitosj_characterram);
 			dirtysprite1[offs] = 0;
 		}
 		if (dirtysprite2[offs] == 1)
 		{
-			decodechar(machine->gfx[3],offs,taitosj_characterram + 0x1800,machine->drv->gfxdecodeinfo[3].gfxlayout);
+			decodechar(machine->gfx[3],offs,taitosj_characterram + 0x1800);
 			dirtysprite2[offs] = 0;
 		}
 	}

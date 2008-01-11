@@ -184,8 +184,7 @@ VIDEO_UPDATE( redalert )
 			/* decode modified background */
 			if (redalert_dirtyback[offs] == 1)
 			{
-				decodechar(machine->gfx[0],offs,redalert_backram,
-							machine->drv->gfxdecodeinfo[0].gfxlayout);
+				decodechar(machine->gfx[0],offs,redalert_backram);
 				redalert_dirtyback[offs] = 2;
 			}
 
@@ -193,18 +192,15 @@ VIDEO_UPDATE( redalert )
 			if (redalert_dirtycharacter[charcode] == 1)
 			{
 				if (charcode < 0x80)
-					decodechar(machine->gfx[1],charcode,redalert_characterram,
-								machine->drv->gfxdecodeinfo[1].gfxlayout);
+					decodechar(machine->gfx[1],charcode,redalert_characterram);
 				else
-					decodechar(machine->gfx[2],charcode-0x80,redalert_spriteram1,
-								machine->drv->gfxdecodeinfo[2].gfxlayout);
+					decodechar(machine->gfx[2],charcode-0x80,redalert_spriteram1);
 				redalert_dirtycharacter[charcode] = 2;
 			}
 
 			if (redalert_dirtycharacter2[charcode] == 1)
 			{
-				decodechar(machine->gfx[3],charcode-0x80,redalert_spriteram3,
-							machine->drv->gfxdecodeinfo[3].gfxlayout);
+				decodechar(machine->gfx[3],charcode-0x80,redalert_spriteram3);
 				redalert_dirtycharacter2[charcode] = 2;
 			}
 

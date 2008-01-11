@@ -859,7 +859,7 @@ static void decode_ssram(void)
 		{
 			if (cps3_ss_ram_dirty[i])
 			{
-				decodechar(Machine->gfx[0], i, (UINT8*)cps3_ss_ram, &cps3_tiles8x8_layout);
+				decodechar(Machine->gfx[0], i, (UINT8*)cps3_ss_ram);
 				cps3_ss_ram_dirty[i] = 0;
 			}
 		}
@@ -879,7 +879,7 @@ static void decode_charram(void)
 		{
 			if (cps3_char_ram_dirty[i])
 			{
-				decodechar(Machine->gfx[1], i, (UINT8*)cps3_char_ram, &cps3_tiles16x16_layout);
+				decodechar(Machine->gfx[1], i, (UINT8*)cps3_char_ram);
 				cps3_char_ram_dirty[i] = 0;
 			}
 		}
@@ -1019,7 +1019,7 @@ static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *b
 
 			if (cps3_char_ram_dirty[tileno])
 			{
-				decodechar(Machine->gfx[1], tileno, (UINT8*)cps3_char_ram, &cps3_tiles16x16_layout);
+				decodechar(Machine->gfx[1], tileno, (UINT8*)cps3_char_ram);
 				cps3_char_ram_dirty[tileno] = 0;
 			}
 			cps3_drawgfxzoom(bitmap, Machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,&clip,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
@@ -1269,7 +1269,7 @@ static VIDEO_UPDATE(cps3)
 
 									if (cps3_char_ram_dirty[realtileno])
 									{
-										decodechar(machine->gfx[1], realtileno, (UINT8*)cps3_char_ram, &cps3_tiles16x16_layout);
+										decodechar(machine->gfx[1], realtileno, (UINT8*)cps3_char_ram);
 										cps3_char_ram_dirty[realtileno] = 0;
 									}
 
@@ -1348,7 +1348,7 @@ static VIDEO_UPDATE(cps3)
 
 				if (cps3_ss_ram_dirty[tile])
 				{
-					decodechar(machine->gfx[0], tile, (UINT8*)cps3_ss_ram, &cps3_tiles8x8_layout);
+					decodechar(machine->gfx[0], tile, (UINT8*)cps3_ss_ram);
 					cps3_ss_ram_dirty[tile] = 0;
 				}
 

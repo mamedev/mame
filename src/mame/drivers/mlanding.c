@@ -37,7 +37,7 @@ static void updateChars(running_machine *machine)
 		if(dirtychar[i])
 		{
 			dirtychar[i]=0;
-			decodechar(machine->gfx[0], i,(UINT8 *) ml_tileram, machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0], i,(UINT8 *) ml_tileram);
 		}
 	}
 }

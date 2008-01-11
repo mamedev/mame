@@ -1571,7 +1571,7 @@ static void DrawCharacterLayer(running_machine *machine, mame_bitmap *bitmap, co
 		{
 			if( cgdirty[i] )
 			{
-				decodechar( machine->gfx[GFX_CHAR],i,(UINT8 *)namcos22_cgram,&namcos22_cg_layout );
+				decodechar( machine->gfx[GFX_CHAR],i,(UINT8 *)namcos22_cgram );
 				cgdirty[i] = 0;
 			}
 		}

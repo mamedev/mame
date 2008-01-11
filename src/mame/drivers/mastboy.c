@@ -562,7 +562,7 @@ static WRITE8_HANDLER( banked_ram_w )
 			mastboy_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			decodechar(Machine->gfx[0], offs/32, mastboy_vram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(Machine->gfx[0], offs/32, mastboy_vram);
 		}
 	}
 	else

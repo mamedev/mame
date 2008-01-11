@@ -227,7 +227,7 @@ void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *wor
 
                 colour = (colour & 7) + 7;
 
-				decodechar(machine->gfx[Graphics_Bank],charno,workram,machine->drv->gfxdecodeinfo[Graphics_Bank].gfxlayout);
+				decodechar(machine->gfx[Graphics_Bank],charno,workram);
 
 		        drawgfxzoom(bitmap,machine->gfx[Graphics_Bank],
 			                charno,

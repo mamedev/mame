@@ -155,10 +155,8 @@ static void machine_init(running_machine *machine)
 
 	for(i=0;i<512;i++)
 	{
-		decodechar(machine->gfx[2], i, taitol_rambanks,
-				   machine->drv->gfxdecodeinfo[2].gfxlayout);
-		decodechar(machine->gfx[2], i+512, taitol_rambanks + 0x4000,
-				   machine->drv->gfxdecodeinfo[2].gfxlayout);
+		decodechar(machine->gfx[2], i, taitol_rambanks);
+		decodechar(machine->gfx[2], i+512, taitol_rambanks + 0x4000);
 	}
 }
 

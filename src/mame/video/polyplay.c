@@ -57,7 +57,7 @@ VIDEO_UPDATE( polyplay )
 
 		if (dirtycharacter[code])
 		{
-			decodechar(machine->gfx[1], code & 0x7f, polyplay_characterram, machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1], code & 0x7f, polyplay_characterram);
 
 			dirtycharacter[code] = 0;
 		}

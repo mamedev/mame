@@ -46,6 +46,7 @@ permutations which may be required).
 */
 #define NORMAL_PLANE_ORDER 0x0123
 #define REVERSE_PLANE_ORDER 0x3210
+#define GRADIUS3_PLANE_ORDER 0x1111
 
 
 /*

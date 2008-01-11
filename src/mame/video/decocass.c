@@ -519,7 +519,7 @@ static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int int
 		switch (char_dirty[code])
 		{
 		case 1:
-			decodechar(machine->gfx[0],code,decocass_charram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,decocass_charram);
 			char_dirty[code] = 2;
 			/* fall through */
 		case 2:
@@ -546,7 +546,7 @@ static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int int
 		{
 			sprite_dirty[code] = 0;
 
-			decodechar(machine->gfx[1],code,decocass_charram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],code,decocass_charram);
 		}
 	}
 
@@ -559,7 +559,7 @@ static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int int
 		{
 			tile_dirty[code] = 0;
 
-			decodechar(machine->gfx[2],code,decocass_tileram,machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],code,decocass_tileram);
 
 			/* mark all visible tiles dirty */
 			for (i = offs; i < decocass_bgvideoram_size; i++)
@@ -571,8 +571,8 @@ static void decode_modified(running_machine* machine, UINT8 *sprite_ram, int int
 	/* decode object if it is dirty */
 	if (object_dirty)
 	{
-		decodechar(machine->gfx[3], 0, decocass_objectram, machine->drv->gfxdecodeinfo[3].gfxlayout);
-		decodechar(machine->gfx[3], 1, decocass_objectram, machine->drv->gfxdecodeinfo[3].gfxlayout);
+		decodechar(machine->gfx[3], 0, decocass_objectram);
+		decodechar(machine->gfx[3], 1, decocass_objectram);
 		object_dirty = 0;
 	}
 }

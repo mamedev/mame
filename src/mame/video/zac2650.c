@@ -167,10 +167,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
             int x,y;
 
 			/* 16x8 version */
-			decodechar(machine->gfx[1],spriteno,s2636_1_ram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],spriteno,s2636_1_ram);
 
 			/* 16x16 version */
-			decodechar(machine->gfx[2],spriteno,s2636_1_ram,machine->drv->gfxdecodeinfo[2].gfxlayout);
+			decodechar(machine->gfx[2],spriteno,s2636_1_ram);
 
             /* Sprite->Background collision detection */
 			drawgfx(bitmap,machine->gfx[expand],

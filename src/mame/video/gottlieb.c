@@ -141,8 +141,7 @@ WRITE8_HANDLER( gottlieb_charram_w )
 	{
 		gottlieb_charram[offset] = data;
 
-		decodechar(Machine->gfx[0], offset / 32, gottlieb_charram,
-			Machine->drv->gfxdecodeinfo[0].gfxlayout);
+		decodechar(Machine->gfx[0], offset / 32, gottlieb_charram);
 
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}

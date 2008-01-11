@@ -141,7 +141,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 static WRITE8_HANDLER( trvmadns_gfxram_w )
 {
 	trvmadns_gfxram[offset] = data;
-	decodechar(Machine->gfx[0], offset/16, trvmadns_gfxram, Machine->drv->gfxdecodeinfo[0].gfxlayout);
+	decodechar(Machine->gfx[0], offset/16, trvmadns_gfxram);
 
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }

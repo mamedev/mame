@@ -1589,8 +1589,7 @@ UpdateRoad(running_machine *machine)
 				decodechar(
 					machine->gfx[mRoadGfxBank],
 					i,
-					0x10000+(UINT8 *)mpRoadRAM,
-					&RoadTileLayout );
+					0x10000+(UINT8 *)mpRoadRAM);
 				mpRoadDirty[i] = 0;
 			}
 		}

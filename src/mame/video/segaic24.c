@@ -182,7 +182,7 @@ void sys24_tile_update(running_machine *machine)
 		for(i=0; i<SYS24_TILES; i++) {
 			if(sys24_char_dirtymap[i]) {
 				sys24_char_dirtymap[i] = 0;
-				decodechar(machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram, &sys24_char_layout);
+				decodechar(machine->gfx[sys24_char_gfx_index], i, (UINT8 *)sys24_char_ram);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(sys24_tile_layer[0]);

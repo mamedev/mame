@@ -895,7 +895,7 @@ logerror("vlbank starting\n");
 		{
 			if ( dirtyarray[i] )
 			{
-				decodechar( gfx, i, vram, &ppu_charlayout);
+				decodechar( gfx, i, vram );
 				dirtyarray[i] = 0;
 			}
 		}

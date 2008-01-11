@@ -63,26 +63,13 @@ static void gradius3_sprite_callback(int *code,int *color,int *priority_mask,int
 VIDEO_START( gradius3 )
 {
 	int i;
-	static const gfx_layout spritelayout =
-	{
-		16,16,
-		TOTAL_SPRITES,
-		4,
-		{ 0, 1, 2, 3 },
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-			32*8+2*4, 32*8+3*4, 32*8+0*4, 32*8+1*4, 32*8+6*4, 32*8+7*4, 32*8+4*4, 32*8+5*4 },
-		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-			64*8+0*32, 64*8+1*32, 64*8+2*32, 64*8+3*32, 64*8+4*32, 64*8+5*32, 64*8+6*32, 64*8+7*32 },
-		128*8
-	};
-
 
 	layer_colorbase[0] = 0;
 	layer_colorbase[1] = 32;
 	layer_colorbase[2] = 48;
 	sprite_colorbase = 16;
-	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,gradius3_tile_callback);
-	K051960_vh_start(machine,REGION_GFX2,REVERSE_PLANE_ORDER,gradius3_sprite_callback);
+	K052109_vh_start(machine,REGION_GFX1,GRADIUS3_PLANE_ORDER,gradius3_tile_callback);
+	K051960_vh_start(machine,REGION_GFX2,GRADIUS3_PLANE_ORDER,gradius3_sprite_callback);
 
 	K052109_set_layer_offsets(2, -2, 0);
 	K051960_set_sprite_offsets(2, 0);
@@ -90,7 +77,7 @@ VIDEO_START( gradius3 )
 	/* re-decode the sprites because the ROMs are connected to the custom IC differently
        from how they are connected to the CPU. */
 	for (i = 0;i < TOTAL_SPRITES;i++)
-		decodechar(machine->gfx[1],i,memory_region(REGION_GFX2),&spritelayout);
+		decodechar(machine->gfx[1],i,memory_region(REGION_GFX2));
 
 	dirtychar = auto_malloc(TOTAL_CHARS);
 	memset(dirtychar,1,TOTAL_CHARS);
@@ -132,21 +119,6 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 VIDEO_UPDATE( gradius3 )
 {
-	static const gfx_layout charlayout =
-	{
-		8,8,
-		TOTAL_CHARS,
-		4,
-		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-#endif
-		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-		32*8
-	};
-
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
 	K052109_w(0x1d80,0x10);
 	K052109_w(0x1f00,0x32);
@@ -162,7 +134,7 @@ VIDEO_UPDATE( gradius3 )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[0],i,(UINT8 *)gradius3_gfxram,&charlayout);
+				decodechar(machine->gfx[0],i,(UINT8 *)gradius3_gfxram);
 			}
 		}
 

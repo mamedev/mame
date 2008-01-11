@@ -313,12 +313,12 @@ static void screenrefresh(running_machine *machine, mame_bitmap *bitmap,const re
 	/* Dynamically decode chars if dirty */
 	for (code = 0x0000;code < 0x1000;code++)
 		if (tile_dirty[code])
-			decodechar(machine->gfx[0],code,HuC6270_vram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+			decodechar(machine->gfx[0],code,HuC6270_vram);
 
 	/* Dynamically decode sprites if dirty */
 	for (code = 0x0000;code < 0x400;code++)
 		if (sprite_dirty[code])
-			decodechar(machine->gfx[1],code,HuC6270_vram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+			decodechar(machine->gfx[1],code,HuC6270_vram);
 
 	/* NB: If first 0x1000 byte is always tilemap, no need to decode the first batch of tiles/sprites */
 

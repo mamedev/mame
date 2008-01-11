@@ -73,7 +73,7 @@ WRITE8_HANDLER( iremm15_chargen_w )
 	{
 		state->chargen[offset] = data;
 		/* not very effective ... dirty would be better */
-		decodechar(Machine->gfx[0],offset >> 3,state->chargen, &Machine->gfx[0]->layout);
+		decodechar(Machine->gfx[0],offset >> 3,state->chargen);
 	}
 }
 

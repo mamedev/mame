@@ -152,7 +152,7 @@ static void srmp6_decode_charram(void)
 		int i;
 		for (i=0;i<(0x100000*16)/0x40;i++)
 		{
-			decodechar(Machine->gfx[0], i, (UINT8*)tileram, &tiles8x8_layout);
+			decodechar(Machine->gfx[0], i, (UINT8*)tileram);
 			dirty_tileram[i] = 0;
 		}
 	}
@@ -272,7 +272,7 @@ static VIDEO_UPDATE(srmp6)
 
 						if (dirty_tileram[tileno])
 						{
-							decodechar(machine->gfx[0], tileno, (UINT8*)tileram, &tiles8x8_layout);
+							decodechar(machine->gfx[0], tileno, (UINT8*)tileram);
 							dirty_tileram[tileno] = 0;
 						}
 

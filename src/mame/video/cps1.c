@@ -1130,7 +1130,7 @@ static void cps1_create_empty_8x8_tile(running_machine *machine)
 	};
 
 	machine->gfx[4] = allocgfx(&empty_layout8x8);
-	decodechar(machine->gfx[4], 0, (UINT8 *)empty_tile, &empty_layout8x8);
+	decodechar(machine->gfx[4], 0, (UINT8 *)empty_tile);
 	machine->gfx[4]->total_colors = 0x100;
 
 }

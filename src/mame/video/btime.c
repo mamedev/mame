@@ -453,7 +453,7 @@ static void decode_modified(running_machine *machine, UINT8 *sprite_ram, int int
 
         if (char_dirty[code])
         {
-            decodechar(machine->gfx[0],code,deco_charram,machine->drv->gfxdecodeinfo[0].gfxlayout);
+            decodechar(machine->gfx[0],code,deco_charram);
 
             char_dirty[code] = 0;
         }
@@ -468,7 +468,7 @@ static void decode_modified(running_machine *machine, UINT8 *sprite_ram, int int
 
         if (sprite_dirty[code])
         {
-            decodechar(machine->gfx[1],code,deco_charram,machine->drv->gfxdecodeinfo[1].gfxlayout);
+            decodechar(machine->gfx[1],code,deco_charram);
 
             sprite_dirty[code] = 0;
         }

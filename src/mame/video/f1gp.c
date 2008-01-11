@@ -330,25 +330,6 @@ static void f1gpb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,con
 
 VIDEO_UPDATE( f1gp )
 {
-	static const gfx_layout tilelayout =
-	{
-		16,16,
-		TOTAL_CHARS,
-		4,
-		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-#endif
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		64*16,
-	};
-
-
 	if (dirtygfx)
 	{
 		int i;
@@ -360,7 +341,7 @@ VIDEO_UPDATE( f1gp )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[3],i,(UINT8 *)zoomdata,&tilelayout);
+				decodechar(machine->gfx[3],i,(UINT8 *)zoomdata);
 			}
 		}
 
@@ -394,25 +375,6 @@ VIDEO_UPDATE( f1gpb )
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
 
-	static const gfx_layout tilelayout =
-	{
-		16,16,
-		TOTAL_CHARS,
-		4,
-		{ 0, 1, 2, 3 },
-#ifdef LSB_FIRST
-		{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4,
-				10*4, 11*4, 8*4, 9*4, 14*4, 15*4, 12*4, 13*4 },
-#else
-		{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,
-				8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-#endif
-		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64,
-				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-		64*16,
-	};
-
-
 	if (dirtygfx)
 	{
 		int i;
@@ -424,7 +386,7 @@ VIDEO_UPDATE( f1gpb )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[3],i,(UINT8 *)zoomdata,&tilelayout);
+				decodechar(machine->gfx[3],i,(UINT8 *)zoomdata);
 			}
 		}
 

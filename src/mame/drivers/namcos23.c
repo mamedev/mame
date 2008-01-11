@@ -523,13 +523,11 @@ static VIDEO_UPDATE( ss23 )
 	return 0;
 }
 
-static const gfx_layout namcos23_cg_layout;
-
 static WRITE32_HANDLER( s23_txtchar_w )
 {
 	COMBINE_DATA(&namcos23_charram[offset]	);
 
-	decodechar( Machine->gfx[0],offset/32,(UINT8 *)namcos23_charram,&namcos23_cg_layout );
+	decodechar( Machine->gfx[0],offset/32,(UINT8 *)namcos23_charram );
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
 }
