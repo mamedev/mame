@@ -572,6 +572,7 @@ const game_driver * const drivers[] =
 
 	/* Namco games (plus some intruders on similar hardware) */
 	DRIVER( geebee )	/* [1978] Namco */
+	DRIVER( geebeeb )	/* [1978] Namco (F.lli Bertolino license) */
 	DRIVER( geebeeg )	/* [1978] Gremlin */
 	DRIVER( bombbee )	/* [1979] Namco */
 	DRIVER( cutieq )	/* (c) 1979 Namco */

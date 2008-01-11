@@ -833,7 +833,7 @@ static const struct CustomSound_interface warpwarp_custom_interface =
 static MACHINE_DRIVER_START( geebee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8080,18432000/9) 		/* 18.432 MHz / 9 */
+	MDRV_CPU_ADD_TAG("main", 8080,XTAL_18_432MHz/9) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_geebee,writemem_geebee)
 	MDRV_CPU_IO_MAP(readport_geebee,writeport_geebee)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse,1)	/* one interrupt per frame */
@@ -923,6 +923,15 @@ MACHINE_DRIVER_END
 ROM_START( geebee )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "geebee.1k",    0x0000, 0x1000, CRC(8a5577e0) SHA1(356d33e19c6b4f519816ee4b65ff9b59d6c1b565) )
+	ROM_LOAD( "geebee.3a",    0x3000, 0x0400, CRC(f257b21b) SHA1(c788fd923438f1bffbff9ff3cd4c5c8b547c0c14) )
+ROM_END
+
+ROM_START( geebeeb )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "1.1m",    0x0000, 0x0400, CRC(23252fc7) SHA1(433f0f435ff741a789942194356aaec53192608a) )
+	ROM_LOAD( "2.1p",    0x0400, 0x0400, CRC(0bc4d4ca) SHA1(46028ce1dbf46e49b921cfabec78cded914af358) )
+	ROM_LOAD( "3.1s",    0x0800, 0x0400, CRC(7899b4c1) SHA1(70f609f9873f1a4d9c8a90361c7519bdd24ad9ea) )
+	ROM_LOAD( "4.1t",    0x0c00, 0x0400, CRC(0b6e6fcb) SHA1(e7c3e8a13e3d2be6cfb6675fb57cc4a2fda6bec2) )
 	ROM_LOAD( "geebee.3a",    0x3000, 0x0400, CRC(f257b21b) SHA1(c788fd923438f1bffbff9ff3cd4c5c8b547c0c14) )
 ROM_END
 
@@ -1076,6 +1085,7 @@ static DRIVER_INIT( warpwarp )
 
 /* B & W games */
 GAMEL(1978, geebee,   0,        geebee,   geebee,   geebee,   ROT90, "Namco", "Gee Bee", 0, layout_geebee )
+GAMEL(1978, geebeeb,  geebee,   geebee,   geebee,   geebee,   ROT90, "[Namco] (F.lli Bertolino license)", "Gee Bee (F.lli Bertolino license)", 0, layout_geebee )
 GAMEL(1978, geebeeg,  geebee,   geebee,   geebee,   geebee,   ROT90, "[Namco] (Gremlin license)", "Gee Bee (Gremlin)", 0, layout_geebee )
 GAME( 1980, navarone, 0,        navarone, navarone, navarone, ROT90, "Namco", "Navarone", GAME_IMPERFECT_SOUND )
 GAME( 1980, kaitei,   0,        navarone, kaitei,   kaitei,   ROT90, "Namco", "Kaitei Takara Sagashi", 0 )
