@@ -497,6 +497,14 @@ static void ygv608_register_state_save(void)
 	state_save_register_func_postload(ygv608_postload);
 }
 
+static void ygv608_exit(running_machine *machine)
+{
+	if( work_bitmap )
+		bitmap_free( work_bitmap );
+	work_bitmap = NULL;
+}
+
+
 VIDEO_START( ygv608 )
 {
 	memset( &ygv608, 0, sizeof(ygv608) );
@@ -527,6 +535,7 @@ VIDEO_START( ygv608 )
 	tilemap_B = NULL;
 
 	ygv608_register_state_save();
+	add_exit_callback(machine, ygv608_exit);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
