@@ -26,7 +26,6 @@
 #define MAX_SOUND 32
 
 /* Enum listing all the sound chips */
-typedef enum _sound_type sound_type;
 enum _sound_type
 {
 	SOUND_DUMMY,
@@ -133,6 +132,7 @@ enum _sound_type
 
 	SOUND_COUNT
 };
+typedef enum _sound_type sound_type;
 
 
 /* Sound information constants */

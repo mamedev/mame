@@ -19,7 +19,6 @@
 
 
 /* Enum listing all the CPUs */
-typedef enum _cpu_type cpu_type;
 enum _cpu_type
 {
 	CPU_DUMMY,
@@ -208,6 +207,7 @@ enum _cpu_type
 	CPU_MINX,
     CPU_COUNT
 };
+typedef enum _cpu_type cpu_type;
 
 
 /*************************************
