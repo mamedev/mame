@@ -10,7 +10,6 @@ static int prmrsocr_sprite_bank;
 static int sorted_layer[3];
 static int dim_c,dim_v;	/* ssriders, tmnt2 */
 static int lastdim,lasten;
-static int priorityflag;
 
 static tilemap *roz_tilemap;
 
@@ -348,7 +347,7 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 		interrupt_enable_w(0,data & 0x20);
 
 		/* bit 7 = enable char ROM reading through the video RAM */
-		K052109_set_RMRD_line(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
+		K052109_set_RMRD_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* other bits unused */
 	}
