@@ -1234,7 +1234,7 @@ $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/snk68.o $(VIDEO)/snk68.o \
 
 $(MAMEOBJ)/stern.a: \
-	$(DRIVERS)/astinvad.o $(AUDIO)/astinvad.o $(VIDEO)/astinvad.o \
+	$(DRIVERS)/astinvad.o \
 	$(DRIVERS)/berzerk.o $(AUDIO)/berzerk.o \
 	$(DRIVERS)/cliffhgr.o $(AUDIO)/cliffhgr.o \
 	$(DRIVERS)/mazerbla.o \

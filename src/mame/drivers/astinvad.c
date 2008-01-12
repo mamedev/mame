@@ -14,78 +14,360 @@ Space Intruder emulation by Lee Taylor (lee@defender.demon.co.uk),
 ***************************************************************************/
 
 #include "driver.h"
+#include "machine/8255ppi.h"
 #include "sound/samples.h"
-#include "includes/astinvad.h"
 
 
-static ADDRESS_MAP_START( kamikaze_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1bff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x1c00, 0x3fff) AM_READ(MRA8_RAM)
+#define MASTER_CLOCK		XTAL_2MHz
+#define VIDEO_CLOCK			XTAL_4_9152MHz
+
+
+/* sample sound IDs - must match sample file name table below */
+enum
+{
+	SND_UFO = 0,
+	SND_SHOT,
+	SND_BASEHIT,
+	SND_INVADERHIT,
+	SND_FLEET1,
+	SND_FLEET2,
+	SND_FLEET3,
+	SND_FLEET4,
+	SND_UFOHIT
+};
+
+
+
+/*************************************
+ *
+ *  Globals
+ *
+ *************************************/
+
+static emu_timer *int_timer;
+static UINT8 sound_state[2];
+static UINT8 screen_flip;
+static UINT8 screen_red;
+static UINT8 flip_yoffs;
+static UINT8 color_latch;
+
+
+
+/*************************************
+ *
+ *  Prototypes and interfaces
+ *
+ *************************************/
+
+static WRITE8_HANDLER( astinvad_sound1_w );
+static WRITE8_HANDLER( astinvad_sound2_w );
+
+static const ppi8255_interface ppi8255_intf =
+{
+	2,
+	{ input_port_0_r, NULL },
+	{ input_port_1_r, input_port_3_r },
+	{ input_port_2_r, NULL },
+	{ NULL, astinvad_sound1_w },
+	{ NULL, astinvad_sound2_w },
+	{ NULL, NULL },
+};
+
+
+
+/*************************************
+ *
+ *  Spaceint color RAM handling
+ *
+ *************************************/
+
+static VIDEO_START( spaceint )
+{
+	colorram = auto_malloc(videoram_size);
+}
+
+
+static WRITE8_HANDLER( color_latch_w )
+{
+	color_latch = data & 0x0f;
+}
+
+
+static WRITE8_HANDLER( spaceint_videoram_w )
+{
+	videoram[offset] = data;
+	colorram[offset] = color_latch;
+}
+
+
+
+/*************************************
+ *
+ *  Spaceint color RAM handling
+ *
+ *************************************/
+
+static void plot_byte(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color)
+{
+	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
+	UINT8 flip_xor = screen_flip & 7;
+	
+	*BITMAP_ADDR32(bitmap, y, x + (0 ^ flip_xor)) = (data & 0x01) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (1 ^ flip_xor)) = (data & 0x02) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (2 ^ flip_xor)) = (data & 0x04) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (3 ^ flip_xor)) = (data & 0x08) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (4 ^ flip_xor)) = (data & 0x10) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (5 ^ flip_xor)) = (data & 0x20) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (6 ^ flip_xor)) = (data & 0x40) ? fore_pen : RGB_BLACK;
+	*BITMAP_ADDR32(bitmap, y, x + (7 ^ flip_xor)) = (data & 0x80) ? fore_pen : RGB_BLACK;
+}
+
+
+static VIDEO_UPDATE( astinvad )
+{
+	const UINT8 *color_prom = memory_region(REGION_PROMS);
+	UINT8 yoffs = flip_yoffs & screen_flip;
+	int x, y;
+
+	/* red screen: just fill with red and exit */	
+	if (screen_red)
+	{
+		fillbitmap(bitmap, MAKE_RGB(0xff,0x00,0x00), cliprect);
+		return 0;
+	}
+
+	/* render the visible pixels */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = cliprect->min_x & ~7; x <= cliprect->max_x; x += 8)
+		{
+			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (screen_flip ? 0 : 4);
+			UINT8 data = videoram[(((y ^ screen_flip) + yoffs) << 5) | ((x ^ screen_flip) >> 3)];
+			plot_byte(bitmap, y, x, data, color);
+		}
+
+	return 0;
+}
+
+
+static VIDEO_UPDATE( spaceint )
+{
+	int offs;
+
+	for (offs = 0; offs < videoram_size; offs++)
+	{
+		UINT8 data = videoram[offs];
+		UINT8 color = colorram[offs];
+
+		UINT8 y = ~offs;
+		UINT8 x = offs >> 8 << 3;
+
+		/* this is almost certainly wrong */
+		offs_t n = ((offs >> 5) & 0xf0) | color;
+		color = memory_region(REGION_PROMS)[n] & 0x07;
+
+		plot_byte(bitmap, y, x, data, color);
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Interrupts
+ *
+ *************************************/
+
+static TIMER_CALLBACK( kamikaze_int_off )
+{
+	cpunum_set_input_line(0, 0, CLEAR_LINE);
+}
+ 
+
+static TIMER_CALLBACK( kamizake_int_gen )
+{
+	/* interrupts are asserted on every state change of the 128V line */
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	param ^= 128;
+	timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_never);
+
+	/* an RC circuit turns the interrupt off after a short amount of time */
+	timer_set(double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
+}
+
+
+static MACHINE_START( kamikaze )
+{
+	ppi8255_init(&ppi8255_intf);
+	int_timer = timer_alloc(kamizake_int_gen, NULL);
+	timer_adjust(int_timer, video_screen_get_time_until_pos(0, 128, 0), 128, attotime_never);
+}
+
+
+static INTERRUPT_GEN( spaceint_interrupt )
+{
+	if (readinputport(2) & 1)	/* coin */
+		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+
+	cpunum_set_input_line(0, 0, HOLD_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  8255 PPI handlers
+ *
+ *************************************/
+
+static READ8_HANDLER( kamikaze_ppi_r )
+{
+	UINT8 result = 0xff;
+	
+	/* the address lines are used for /CS; yes, they can overlap! */
+	if (!(offset & 4))
+		result &= ppi8255_0_r(offset);
+	if (!(offset & 8))
+		result &= ppi8255_1_r(offset);
+	return result;
+}
+
+
+static WRITE8_HANDLER( kamikaze_ppi_w )
+{
+	/* the address lines are used for /CS; yes, they can overlap! */
+	if (!(offset & 4))
+		ppi8255_0_w(offset, data);
+	if (!(offset & 8))
+		ppi8255_1_w(offset, data);
+}
+
+
+
+/*************************************
+ *
+ *  Sound and I/O port handlers
+ *
+ *************************************/
+
+static WRITE8_HANDLER( astinvad_sound1_w )
+{
+	int bits_gone_hi = data & ~sound_state[0];
+	sound_state[0] = data;
+
+	if (bits_gone_hi & 0x01) sample_start(0, SND_UFO, 1);
+	if (!(data & 0x01))      sample_stop(0);
+	if (bits_gone_hi & 0x02) sample_start(1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x04) sample_start(2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(3, SND_INVADERHIT, 0);
+
+	sound_global_enable(data & 0x20);
+	screen_red = data & 0x04;
+}
+
+
+static WRITE8_HANDLER( astinvad_sound2_w )
+{
+	int bits_gone_hi = data & ~sound_state[1];
+	sound_state[1] = data;
+
+	if (bits_gone_hi & 0x01) sample_start(5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x02) sample_start(5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x04) sample_start(5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
+	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
+	
+	screen_flip = (readinputport(3) & data & 0x20) ? 0xff : 0x00;
+}
+
+
+static WRITE8_HANDLER( spaceint_sound1_w )
+{
+	int bits_gone_hi = data & ~sound_state[0];
+	sound_state[0] = data;
+
+	if (bits_gone_hi & 0x01) sample_start(1, SND_SHOT, 0);
+	if (bits_gone_hi & 0x02) sample_start(2, SND_BASEHIT, 0);
+	if (bits_gone_hi & 0x04) sample_start(4, SND_UFOHIT, 0);
+	if (bits_gone_hi & 0x08) sample_start(0, SND_UFO, 1);
+	if (!(data & 0x08))      sample_stop(0);
+
+	if (bits_gone_hi & 0x10) sample_start(5, SND_FLEET1, 0);
+	if (bits_gone_hi & 0x20) sample_start(5, SND_FLEET2, 0);
+	if (bits_gone_hi & 0x40) sample_start(5, SND_FLEET3, 0);
+	if (bits_gone_hi & 0x80) sample_start(5, SND_FLEET4, 0);
+}
+
+
+static WRITE8_HANDLER( spaceint_sound2_w )
+{
+	int bits_gone_hi = data & ~sound_state[1];
+	sound_state[1] = data;
+
+	sound_global_enable(data & 0x02);
+
+	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
+
+	screen_flip = (readinputport(3) & data & 0x80) ? 0xff : 0x00;
+}
+
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( kamikaze_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	AM_RANGE(0x0000, 0x1bff) AM_ROM
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kamikaze_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1bff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_NOP) /* sloppy game code writes here */
+
+static ADDRESS_MAP_START( spaceint_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM, spaceint_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spaceint_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(spaceint_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( kamikaze_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kamikaze_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x08, 0x08) AM_READ(input_port_0_r)
-	AM_RANGE(0x09, 0x09) AM_READ(input_port_1_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(input_port_2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kamikaze_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x04, 0x04) AM_WRITE(astinvad_sound1_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(astinvad_sound2_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spaceint_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spaceint_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spaceint_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(spaceint_color_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
 ADDRESS_MAP_END
 
 
-#define COMMON_INPUT_BITS \
-	PORT_START_TAG("IN0") \
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) \
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) \
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) \
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) \
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) \
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY \
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY \
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) \
 
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( kamikaze )
-	COMMON_INPUT_BITS
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -93,17 +375,15 @@ static INPUT_PORTS_START( kamikaze )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPNAME( 0x88, 0x88, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x88, "5000" )
 	PORT_DIPSETTING(    0x80, "10000" )
 	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
@@ -115,10 +395,11 @@ static INPUT_PORTS_START( kamikaze )
 	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( astinvad )
-	COMMON_INPUT_BITS
 
-	PORT_START_TAG("IN1")
+static INPUT_PORTS_START( astinvad )
+	PORT_INCLUDE(kamikaze)
+
+	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -131,52 +412,26 @@ static INPUT_PORTS_START( astinvad )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0xff, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spcking2 )
-	COMMON_INPUT_BITS
 
-	PORT_START_TAG("IN1")
+static INPUT_PORTS_START( spcking2 )
+	PORT_INCLUDE(kamikaze)
+
+	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "2000" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START_TAG("IN3")
-	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( spaceint )
 	PORT_START_TAG("IN0")
@@ -211,22 +466,50 @@ static INPUT_PORTS_START( spaceint )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( spaceint_interrupt )
+
+/*************************************
+ *
+ *  Sound definitions
+ *
+ *************************************/
+
+static const char *const astinvad_sample_names[] =
 {
-	if (readinputport(2) & 1)	/* coin */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	"*invaders",
+	"0.wav",
+	"1.wav",
+	"2.wav",
+	"3.wav",
+	"4.wav",
+	"5.wav",
+	"6.wav",
+	"7.wav",
+	"8.wav",
+	0
+};
 
-	cpunum_set_input_line(0, 0, HOLD_LINE);
-}
+static const struct Samplesinterface astinvad_samples_interface =
+{
+	6,   /* channels */
+	astinvad_sample_names
+};
 
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( kamikaze )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2000000)
-	MDRV_CPU_PROGRAM_MAP(kamikaze_readmem,kamikaze_writemem)
-	MDRV_CPU_IO_MAP(kamikaze_readport,kamikaze_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)    /* two interrupts per frame */
+	MDRV_CPU_ADD(Z80, MASTER_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(kamikaze_map,0)
+	MDRV_CPU_IO_MAP(kamikaze_portmap,0)
+	
+	MDRV_MACHINE_START(kamikaze)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -234,10 +517,7 @@ static MACHINE_DRIVER_START( kamikaze )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -252,20 +532,17 @@ static MACHINE_DRIVER_START( spcking2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(kamikaze)
-
-	/* video hardware */
-	MDRV_VIDEO_UPDATE( spcking2 )
-
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( spaceint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 2000000)        /* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(spaceint_readmem,spaceint_writemem)
-	MDRV_CPU_IO_MAP(spaceint_readport,spaceint_writeport)
+	MDRV_CPU_ADD(Z80, MASTER_CLOCK)        /* a guess */
+	MDRV_CPU_PROGRAM_MAP(spaceint_map,0)
+	MDRV_CPU_IO_MAP(spaceint_portmap,0)
 	MDRV_CPU_VBLANK_INT(spaceint_interrupt,1)
 
 	/* video hardware */
@@ -287,6 +564,13 @@ static MACHINE_DRIVER_START( spaceint )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( kamikaze )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -365,9 +649,37 @@ ROM_START( spaceinj )
 ROM_END
 
 
-GAME( 1979, kamikaze, 0,        kamikaze, kamikaze, 0, ROT270, "Leijac Corporation", "Kamikaze", 0 )
-GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, 0, ROT270, "Stern",              "Astro Invader", 0 )
-GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, 0, ROT270, "bootleg",            "Kosmo Killer", 0 ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979, spcking2, 0,        spcking2, spcking2, 0, ROT270, "Konami",             "Space King 2", 0 )
-GAME( 1980, spaceint, 0,        spaceint, spaceint, 0, ROT90,  "Shoei",              "Space Intruder", GAME_WRONG_COLORS )
-GAME( 1980, spaceinj, spaceint, spaceint, spaceint, 0, ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_WRONG_COLORS )
+
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( kamikaze )
+{
+	/* the flip screen logic adds 32 to the Y after flipping */
+	flip_yoffs = 32;
+}
+
+
+static DRIVER_INIT( spcking2 )
+{
+	/* don't have the schematics, but the blanking must center the screen here */
+	flip_yoffs = 0;
+}
+
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1979, kamikaze, 0,        kamikaze, kamikaze, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", 0 )
+GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, kamikaze, ROT270, "Stern",              "Astro Invader", 0 )
+GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, kamikaze, ROT270, "bootleg",            "Kosmo Killer", 0 ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979, spcking2, 0,        spcking2, spcking2, spcking2, ROT270, "Konami",             "Space King 2", 0 )
+GAME( 1980, spaceint, 0,        spaceint, spaceint, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_WRONG_COLORS )
+GAME( 1980, spaceinj, spaceint, spaceint, spaceint, 0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_WRONG_COLORS )

@@ -1118,6 +1118,8 @@ static ADDRESS_MAP_START( crushs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)
 ADDRESS_MAP_END
 
+
+
 /*************************************
  *
  *  Main CPU port handlers
@@ -1203,6 +1205,8 @@ static ADDRESS_MAP_START( crushs_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
 ADDRESS_MAP_END
+
+
 
 /*************************************
  *
@@ -2966,6 +2970,8 @@ static INPUT_PORTS_START( cannonbp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+
 /*************************************
  *
  *  Graphics layouts
@@ -3333,6 +3339,8 @@ static MACHINE_DRIVER_START( crushs )
 	MDRV_SOUND_CONFIG(crushs_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
+
+
 
 /*************************************
  *
