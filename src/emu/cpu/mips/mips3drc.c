@@ -27,7 +27,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_CODE				(1)
+#define LOG_CODE				(0)
 #define SINGLE_INSTRUCTION_MODE	(0)
 
 #ifdef MAME_DEBUG
