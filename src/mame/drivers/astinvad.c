@@ -129,20 +129,13 @@ static VIDEO_UPDATE( astinvad )
 	UINT8 yoffs = flip_yoffs & screen_flip;
 	int x, y;
 
-	/* red screen: just fill with red and exit */	
-	if (screen_red)
-	{
-		fillbitmap(bitmap, MAKE_RGB(0xff,0x00,0x00), cliprect);
-		return 0;
-	}
-
 	/* render the visible pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for (x = cliprect->min_x & ~7; x <= cliprect->max_x; x += 8)
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (screen_flip ? 0 : 4);
 			UINT8 data = videoram[(((y ^ screen_flip) + yoffs) << 5) | ((x ^ screen_flip) >> 3)];
-			plot_byte(bitmap, y, x, data, color);
+			plot_byte(bitmap, y, x, data, screen_red ? 1 : color);
 		}
 
 	return 0;
