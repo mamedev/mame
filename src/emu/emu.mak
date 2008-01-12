@@ -73,7 +73,6 @@ EMUOBJS = \
 	$(EMUOBJ)/ui.o \
 	$(EMUOBJ)/uigfx.o \
 	$(EMUOBJ)/uimenu.o \
-	$(EMUOBJ)/uitext.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
 

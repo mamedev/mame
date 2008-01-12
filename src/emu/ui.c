@@ -19,7 +19,6 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uigfx.h"
-#include "uitext.h"
 
 #ifdef MESS
 #include "mess.h"
@@ -246,10 +245,6 @@ int ui_init(running_machine *machine)
 {
 	/* make sure we clean up after ourselves */
 	add_exit_callback(machine, ui_exit);
-
-	/* load the localization file */
-	/* fix me -- need to find a real way to do this */
-	uistring_init(NULL);
 
 	/* allocate the font */
 	ui_font = render_font_alloc("ui.bdf");
@@ -939,9 +934,9 @@ int ui_is_slider_active(void)
 static int sprintf_disclaimer(char *buffer)
 {
 	char *bufptr = buffer;
-	bufptr += sprintf(bufptr, "%s\n\n", ui_getstring(UI_copyright1));
-	bufptr += sprintf(bufptr, ui_getstring(UI_copyright2), Machine->gamedrv->description);
-	bufptr += sprintf(bufptr, "\n\n%s", ui_getstring(UI_copyright3));
+	bufptr += sprintf(bufptr, "Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
+	bufptr += sprintf(bufptr, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", Machine->gamedrv->description);
+	bufptr += sprintf(bufptr, "Otherwise, type OK or move the joystick left then right to continue");
 	return bufptr - buffer;
 }
 
@@ -971,7 +966,7 @@ static int sprintf_warnings(char *buffer)
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings() > 0)
 	{
-		bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_incorrectroms));
+		bufptr += sprintf(bufptr, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
 		if (Machine->gamedrv->flags & WARNING_FLAGS)
 			*bufptr++ = '\n';
 	}
@@ -979,7 +974,7 @@ static int sprintf_warnings(char *buffer)
 	/* if we have at least one warning flag, print the general header */
 	if (Machine->gamedrv->flags & WARNING_FLAGS)
 	{
-		bufptr += sprintf(bufptr, "%s\n\n", ui_getstring(UI_knownproblems));
+		bufptr += sprintf(bufptr, "There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
 #ifdef MESS
@@ -987,17 +982,17 @@ static int sprintf_warnings(char *buffer)
 			bufptr += sprintf(bufptr, "%s\n\n%s\n", ui_getstring(UI_comp1), ui_getstring(UI_comp2));
 #endif
 		if (Machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_imperfectcolors));
+			bufptr += sprintf(bufptr, "The colors aren't 100%% accurate.\n");
 		if (Machine->gamedrv->flags & GAME_WRONG_COLORS)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_wrongcolors));
+			bufptr += sprintf(bufptr, "The colors are completely wrong.\n");
 		if (Machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_imperfectgraphics));
+			bufptr += sprintf(bufptr, "The video emulation isn't 100%% accurate.\n");
 		if (Machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_imperfectsound));
+			bufptr += sprintf(bufptr, "The sound emulation isn't 100%% accurate.\n");
 		if (Machine->gamedrv->flags & GAME_NO_SOUND)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_nosound));
+			bufptr += sprintf(bufptr, "The game lacks sound.\n");
 		if (Machine->gamedrv->flags & GAME_NO_COCKTAIL)
-			bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_nococktail));
+			bufptr += sprintf(bufptr, "Screen flipping in cocktail mode is not supported.\n");
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (Machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
@@ -1008,9 +1003,9 @@ static int sprintf_warnings(char *buffer)
 
 			/* add the strings for these warnings */
 			if (Machine->gamedrv->flags & GAME_NOT_WORKING)
-				bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_brokengame));
+				bufptr += sprintf(bufptr, "THIS " CAPGAMENOUN " DOESN'T WORK. You won't be able to make it work correctly.  Don't bother.\n");
 			if (Machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
-				bufptr += sprintf(bufptr, "%s\n", ui_getstring(UI_brokenprotection));
+				bufptr += sprintf(bufptr, "The game has protection which isn't fully emulated.\n");
 
 			/* find the parent of this driver */
 			clone_of = driver_get_clone(Machine->gamedrv);
@@ -1027,7 +1022,7 @@ static int sprintf_warnings(char *buffer)
 					{
 						/* this one works, add a header and display the name of the clone */
 						if (foundworking == 0)
-							bufptr += sprintf(bufptr, "\n\n%s\n\n", ui_getstring(UI_workingclones));
+							bufptr += sprintf(bufptr, "\n\nThere are working clones of this game. They are:\n\n");
 						bufptr += sprintf(bufptr, "%s\n", drivers[i]->name);
 						foundworking = 1;
 					}
@@ -1035,7 +1030,7 @@ static int sprintf_warnings(char *buffer)
 	}
 
 	/* add the 'press OK' string */
-	bufptr += sprintf(bufptr, "\n\n%s", ui_getstring(UI_typeok));
+	bufptr += sprintf(bufptr, "\n\nType OK or move the joystick left then right to continue");
 	return bufptr - buffer;
 }
 
@@ -1052,7 +1047,7 @@ int sprintf_game_info(char *buffer)
 	int count;
 
 	/* print description, manufacturer, and CPU: */
-	bufptr += sprintf(bufptr, "%s\n%s %s\n\n%s:\n", Machine->gamedrv->description, Machine->gamedrv->year, Machine->gamedrv->manufacturer, ui_getstring(UI_cpu));
+	bufptr += sprintf(bufptr, "%s\n%s %s\n\nCPU:\n", Machine->gamedrv->description, Machine->gamedrv->year, Machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
@@ -1079,7 +1074,7 @@ int sprintf_game_info(char *buffer)
 	}
 
 	/* append the Sound: string */
-	bufptr += sprintf(bufptr, "\n%s:\n", ui_getstring(UI_sound));
+	bufptr += sprintf(bufptr, "\nSound:\n");
 
 	/* loop over all sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND && Machine->drv->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
@@ -1109,12 +1104,11 @@ int sprintf_game_info(char *buffer)
 
 	/* display vector information for vector games */
 	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
-		bufptr += sprintf(bufptr, "\n%s\n", ui_getstring(UI_vectorgame));
+		bufptr += sprintf(bufptr, "\nVector Game\n");
 
 	/* display screen resolution and refresh rate info for raster games */
 	else if (Machine->drv->video_attributes & VIDEO_TYPE_RASTER)
-		bufptr += sprintf(bufptr,"\n%s:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-				ui_getstring(UI_screenres),
+		bufptr += sprintf(bufptr,"\nScreen Resolution:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 				Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
 				Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
 				(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
@@ -1661,7 +1655,7 @@ static INT32 slider_volume(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		sound_set_attenuation(newval);
-		sprintf(buffer, "%s %3ddB", ui_getstring(UI_volume), sound_get_attenuation());
+		sprintf(buffer, "Volume %3ddB", sound_get_attenuation());
 	}
 	return sound_get_attenuation();
 }
@@ -1677,7 +1671,7 @@ static INT32 slider_mixervol(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		sound_set_user_gain(arg, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s %4.2f", sound_get_user_gain_name(arg), ui_getstring(UI_volume), sound_get_user_gain(arg));
+		sprintf(buffer, "%s Volume %4.2f", sound_get_user_gain_name(arg), sound_get_user_gain(arg));
 	}
 	return floor(sound_get_user_gain(arg) * 1000.0f + 0.5f);
 }
@@ -1710,7 +1704,7 @@ static INT32 slider_overclock(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		cpunum_set_clockscale(arg, (float)newval * 0.001f);
-		sprintf(buffer, "%s %s%d %3.0f%%", ui_getstring(UI_overclock), ui_getstring(UI_cpu), arg, floor(cpunum_get_clockscale(arg) * 100.0f + 0.5f));
+		sprintf(buffer, "Overclock CPU %d %3.0f%%", arg, floor(cpunum_get_clockscale(arg) * 100.0f + 0.5f));
 	}
 	return floor(cpunum_get_clockscale(arg) * 1000.0f + 0.5f);
 }
@@ -1729,7 +1723,7 @@ static INT32 slider_refresh(INT32 newval, char *buffer, int arg)
 	{
 		screen_state *state = &Machine->screen[arg];
 		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_refresh_rate), ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
+		sprintf(buffer, "Screen %d Refresh rate %.3f", arg, ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
 	}
 	refresh = ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
@@ -1747,7 +1741,7 @@ static INT32 slider_brightness(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_brightness(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_brightness), render_container_get_brightness(container));
+		sprintf(buffer, "Screen %d Brightness %.3f", arg, render_container_get_brightness(container));
 	}
 	return floor(render_container_get_brightness(container) * 1000.0f + 0.5f);
 }
@@ -1764,7 +1758,7 @@ static INT32 slider_contrast(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_contrast(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_contrast), render_container_get_contrast(container));
+		sprintf(buffer, "Screen %d Contrast %.3f", arg, render_container_get_contrast(container));
 	}
 	return floor(render_container_get_contrast(container) * 1000.0f + 0.5f);
 }
@@ -1780,7 +1774,7 @@ static INT32 slider_gamma(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_gamma(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, ui_getstring(UI_gamma), render_container_get_gamma(container));
+		sprintf(buffer, "Screen %d Gamma %.3f", arg, render_container_get_gamma(container));
 	}
 	return floor(render_container_get_gamma(container) * 1000.0f + 0.5f);
 }
@@ -1864,7 +1858,7 @@ static INT32 slider_flicker(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		vector_set_flicker((float)newval * 0.1f);
-		sprintf(buffer, "%s %1.2f", ui_getstring(UI_vectorflicker), vector_get_flicker());
+		sprintf(buffer, "Vector Flicker %1.2f", vector_get_flicker());
 	}
 	return floor(vector_get_flicker() * 10.0f + 0.5f);
 }

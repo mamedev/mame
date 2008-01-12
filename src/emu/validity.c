@@ -15,7 +15,6 @@
 #include "hash.h"
 #include <ctype.h>
 #include <stdarg.h>
-#include "uitext.h"
 #include "unicode.h"
 #include <zlib.h>
 

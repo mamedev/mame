@@ -12,7 +12,6 @@
 #include "driver.h"
 #include "ui.h"
 #include "uimenu.h"
-#include "uitext.h"
 #include "machine/eeprom.h"
 #include "cheat.h"
 #include <ctype.h>
@@ -1675,9 +1674,9 @@ int cheat_menu(int selection)
 	}
 
 	/********** MENU CONSTRUCION **********/
-	menu_item[total++].text = ui_getstring(UI_enablecheat);				// Enable/Disable a Cheat
+	menu_item[total++].text = "Enable/Disable a Cheat";				// Enable/Disable a Cheat
 
-	menu_item[total++].text = ui_getstring(UI_addeditcheat);			// Add/Edit a Cheat
+	menu_item[total++].text = "Add/Edit a Cheat";			// Add/Edit a Cheat
 
 	switch(EXTRACT_FIELD(cheatOptions, SearchBox))						// Search a Cheat
 	{
@@ -1694,13 +1693,13 @@ int cheat_menu(int selection)
 			break;
 	}
 
-	menu_item[total++].text = ui_getstring(UI_memorywatch);				// Configure Watchpoints
+	menu_item[total++].text = "Configure Watchpoints";				// Configure Watchpoints
 
-	menu_item[total++].text = ui_getstring(UI_reloaddatabase);			// Reload Cheat Database
+	menu_item[total++].text = "Reload Database";			// Reload Cheat Database
 
-	menu_item[total++].text = ui_getstring(UI_options);					// Options
+	menu_item[total++].text = "Options";					// Options
 
-	menu_item[total++].text = ui_getstring(UI_returntomain);			// return to the MAME general menu
+	menu_item[total++].text = "Return to Main Menu";			// return to the MAME general menu
 
 	menu_item[total].text = NULL;										// terminate array
 
@@ -2030,17 +2029,12 @@ static INT32 UserSelectValueMenu(int selection, CheatEntry * entry)
 
 	/* ----- print it ----- */
 	if(TEST_FIELD(action->type, UserSelectBCD))
-		sprintf(buf, "\t%s\n\t%.2X\n", ui_getstring(UI_search_select_value), displayValue);
+		sprintf(buf, "\tSelect a value\n\t%.2X\n", displayValue);
 	else
-		sprintf(buf, "\t%s\n\t%.2X (%d)\n", ui_getstring(UI_search_select_value), displayValue, displayValue);
+		sprintf(buf, "\tSelect a value\n\t%.2X (%d)\n", displayValue, displayValue);
 
 	/* ----- create fake menu strings ----- */
-	strcat(buf, "\t");
-	strcat(buf, ui_getstring(UI_lefthilight));
-	strcat(buf, " ");
-	strcat(buf, ui_getstring(UI_OK));
-	strcat(buf, " ");
-	strcat(buf, ui_getstring(UI_righthilight));
+	strcat(buf, "\t OK ");
 
 	/* ----- print it ----- */
 	ui_draw_message_window(buf);
@@ -2184,7 +2178,7 @@ static INT32 CommentMenu(int selection, CheatEntry * entry)
 	else
 		comment = "(none)";
 
-	sprintf(buf, "%s\n\t%s %s %s", comment, ui_getstring(UI_lefthilight), ui_getstring(UI_OK), ui_getstring(UI_righthilight));
+	sprintf(buf, "%s\n\t OK ", comment);
 
 	/* ----- print it ----- */
 	ui_draw_message_window(buf);
@@ -2276,7 +2270,7 @@ static int EnableDisableCheatMenu(int selection, int firstTime)
 			if(traverse->selection && (traverse->selection < traverse->actionListLength))
 				menu_subitem[total] = traverse->actionList[traverse->selection].optionalName;
 			else
-				menu_subitem[total] = ui_getstring(UI_off);
+				menu_subitem[total] = "Off";
 		}
 		else							// others get "ON" or "OFF"
 		{
@@ -2284,13 +2278,13 @@ static int EnableDisableCheatMenu(int selection, int firstTime)
 			if(!(traverse->flags & kCheatFlag_Null))
 			{
 				if(traverse->flags & kCheatFlag_OneShot)
-					menu_subitem[total] = ui_getstring(UI_set);
+					menu_subitem[total] = "Set";
 				else
 				{
 					if(traverse->flags & kCheatFlag_Active)
-						menu_subitem[total] = ui_getstring(UI_on);
+						menu_subitem[total] = "On";
 					else
-						menu_subitem[total] = ui_getstring(UI_off);
+						menu_subitem[total] = "Off";
 				}
 			}
 		}
@@ -2324,7 +2318,7 @@ static int EnableDisableCheatMenu(int selection, int firstTime)
 	}
 
 	/* ----- set return item ----- */
-	menu_item[total] = ui_getstring(UI_returntoprior);
+	menu_item[total] = "Return to Prior Menu";
 	menu_subitem[total] = NULL;
 	flagBuf[total++] = 0;
 
@@ -2691,7 +2685,7 @@ static int AddEditCheatMenu(int selection)
 			menu_item[total++] = "(none)";
 	}
 
-	menu_item[total++] = ui_getstring(UI_returntoprior);		// return
+	menu_item[total++] = "Return to Prior Menu";		// return
 
 	menu_item[total] = NULL;					// terminate array
 
@@ -3176,7 +3170,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 			menuItemInfo[total].subcheat = i;
 			menuItemInfo[total].fieldType = kType_LinkExtension;
 			menuItem[total] = "Link Extension";
-			menuSubItem[total++] = ui_getstring(TEST_FIELD(traverse->type, LinkExtension) ? UI_on : UI_off);
+			menuSubItem[total++] = TEST_FIELD(traverse->type, LinkExtension) ? "On" : "Off";
 		}
 
 		{
@@ -3221,7 +3215,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 					menuItemInfo[total].subcheat = i;
 					menuItemInfo[total].fieldType = kType_OneShot;
 					menuItem[total] = "One Shot";
-					menuSubItem[total++] = ui_getstring(TEST_FIELD(traverse->type, OneShot) ? UI_on : UI_off);
+					menuSubItem[total++] = TEST_FIELD(traverse->type, OneShot) ? "On" : "Off";
 				}
 
 				{
@@ -3229,7 +3223,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 					menuItemInfo[total].subcheat = i;
 					menuItemInfo[total].fieldType = kType_RestorePreviousValue;
 					menuItem[total] = "Restore Previous Value";
-					menuSubItem[total++] = ui_getstring(TEST_FIELD(traverse->type, RestorePreviousValue) ? UI_on : UI_off);
+					menuSubItem[total++] = TEST_FIELD(traverse->type, RestorePreviousValue) ? "On" : "Off";
 				}
 			}
 
@@ -3319,7 +3313,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 					menuItemInfo[total].subcheat = i;
 					menuItemInfo[total].fieldType = kType_WatchLabel;
 					menuItem[total] = "Watch Label";
-					menuSubItem[total++] = ui_getstring(((typeParameter >> 2) & 0x01) ? UI_on : UI_off);
+					menuSubItem[total++] = ((typeParameter >> 2) & 0x01) ? "On" : "Off";
 				}
 			}
 			else
@@ -3491,7 +3485,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 						menuItemInfo[total].subcheat = i;
 						menuItemInfo[total].fieldType = kType_UserSelect;
 						menuItem[total] = "User Select";
-						menuSubItem[total++] = ui_getstring(userSelect ? UI_on : UI_off);
+						menuSubItem[total++] = userSelect ? "On" : "Off";
 					}
 
 					if(!i && userSelect)
@@ -3519,7 +3513,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 						menuItemInfo[total].subcheat = i;
 						menuItemInfo[total].fieldType = kType_UserSelectBCD;
 						menuItem[total] = "BCD";
-						menuSubItem[total++] = ui_getstring(TEST_FIELD(traverse->type, UserSelectBCD) ? UI_on : UI_off);
+						menuSubItem[total++] = TEST_FIELD(traverse->type, UserSelectBCD) ? "On" : "Off";
 					}
 
 					if(userSelect || isSelect)
@@ -3537,7 +3531,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 						menuItemInfo[total].subcheat = i;
 						menuItemInfo[total].fieldType = kType_CopyPrevious;
 						menuItem[total] = "Copy Previous Value";
-						menuSubItem[total++] = ui_getstring(TEST_FIELD(traverse->type, LinkCopyPreviousValue) ? UI_on : UI_off);
+						menuSubItem[total++] = TEST_FIELD(traverse->type, LinkCopyPreviousValue) ? "On" : "Off";
 					}
 				}
 
@@ -3680,7 +3674,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 
 	menuItemInfo[total].subcheat =	0;				// return
 	menuItemInfo[total].fieldType =	kType_Return;
-	menuItem[total] =				ui_getstring(UI_returntoprior);
+	menuItem[total] =				"Return to Prior Menu";
 	menuSubItem[total++] =			NULL;
 
 	menuItemInfo[total].subcheat =	0;				// terminate arrey
@@ -4774,7 +4768,7 @@ static int DoSearchMenuMinimum(int selection)
 
 	/********** MENU CONSTRUCTION **********/
 	sprintf(cpuBuffer, "%d", search->targetIdx);		// CPU
-	menuItem[total] = ui_getstring(UI_cpu);
+	menuItem[total] = "CPU";
 	menuSubItem[total++] = cpuBuffer;
 
 	if(search->sign && (search->oldOptions.value & kSearchByteSignBitTable[search->bytes]))
@@ -4852,13 +4846,13 @@ static int DoSearchMenuMinimum(int selection)
 		menuItem[total] = "Save Memory";
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_viewresults);		// view result
+	menuItem[total] = "View Last Results";		// view result
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_restoreresults);	// restore result
+	menuItem[total] = "Restore Previous Results";	// restore result
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_returntoprior);	// return
+	menuItem[total] = "Return to Prior Menu";	// return
 	menuSubItem[total++] = NULL;
 
 	menuItem[total] = NULL;								// terminate array
@@ -5397,7 +5391,7 @@ static int DoSearchMenuClassic(int selection)
 	menuSubItem[total++] = NULL;
 
 	sprintf(cpuBuffer, "%d", search->targetIdx);
-	menuItem[total] = ui_getstring(UI_cpu);
+	menuItem[total] = "CPU";
 	menuSubItem[total++] = cpuBuffer;
 
 	if(search->sign && (search->oldOptions.value & kSearchByteSignBitTable[search->bytes]))
@@ -5441,13 +5435,13 @@ static int DoSearchMenuClassic(int selection)
 	menuItem[total] = "--------------------";
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_viewresults);		// view result
+	menuItem[total] = "View Last Results";		// view result
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_restoreresults);	// restore result
+	menuItem[total] = "Restore Previous Results";	// restore result
 	menuSubItem[total++] = NULL;
 
-	menuItem[total] = ui_getstring(UI_returntoprior);	// return
+	menuItem[total] = "Return to Prior Menu";	// return
 	menuSubItem[total++] = NULL;
 
 	menuItem[total] = NULL;								// terminate array
@@ -5952,10 +5946,10 @@ static int DoSearchMenu(int selection)
 	menu_subitem[total++] = kSearchByteNameTable[search->bytes];
 
 	menu_item[total] = "Swap";
-	menu_subitem[total++] = ui_getstring(search->swap ? UI_on : UI_off);
+	menu_subitem[total++] = search->swap ? "On" : "Off";
 
 	menu_item[total] = "Signed";
-	menu_subitem[total++] = ui_getstring(search->sign ? UI_on : UI_off);
+	menu_subitem[total++] = search->sign ? "On" : "Off";
 
 	sprintf(cpuBuffer, "%d", search->targetIdx);
 	menu_item[total] = "CPU";
@@ -5979,13 +5973,13 @@ static int DoSearchMenu(int selection)
 	menu_item[total] = "---";
 	menu_subitem[total++] = NULL;
 
-	menu_item[total] = ui_getstring(UI_viewresults);		// view result
+	menu_item[total] = "View Last Results";		// view result
 	menu_subitem[total++] = NULL;
 
-	menu_item[total] = ui_getstring(UI_restoreresults);		// restore result
+	menu_item[total] = "Restore Previous Results";		// restore result
 	menu_subitem[total++] = NULL;
 
-	menu_item[total] = ui_getstring(UI_returntoprior);		// return
+	menu_item[total] = "Return to Prior Menu";		// return
 	menu_subitem[total++] = NULL;
 
 	menu_item[total] = NULL;								// terminate array
@@ -6321,13 +6315,13 @@ static int SelectSearchRegions(int selection, SearchInfo * search)
 		SearchRegion	* traverse = &search->regionList[i];
 
 		menuItem[total] = traverse->name;
-		menuSubItem[total++] = ui_getstring((traverse->flags & kRegionFlag_Enabled) ? UI_on : UI_off);
+		menuSubItem[total++] = (traverse->flags & kRegionFlag_Enabled) ? "On" : "Off";
 	}
 
 	menuItem[total] = "Search Speed";
 	menuSubItem[total++] = kSearchSpeedList[search->searchSpeed];
 
-	menuItem[total] = ui_getstring(UI_returntoprior);		// return item
+	menuItem[total] = "Return to Prior Menu";		// return item
 	menuSubItem[total++] = NULL;
 
 	menuItem[total] = NULL;			// terminate array
@@ -6604,7 +6598,7 @@ static int ViewSearchResults(int selection, int firstTime)
 			menu_item[total++] = "no results found";
 	}
 
-	menu_item[total++] = ui_getstring(UI_returntoprior);		// return
+	menu_item[total++] = "Return to Prior Menu";		// return
 
 	menu_item[total] = NULL;									// terminate array
 
@@ -6869,7 +6863,7 @@ static int ChooseWatch(int selection)
 		total++;
 	}
 
-	menuItem[total++] = ui_getstring(UI_returntoprior);		// return
+	menuItem[total++] = "Return to Prior Menu";		// return
 
 	menuItem[total] = NULL;									// terminate array
 
@@ -7174,7 +7168,7 @@ static int EditWatch(WatchInfo * entry, int selection)
 	menuSubItem[total] = buf[total];
 	total++;
 
-	menuItem[total] = ui_getstring(UI_returntoprior);		// return
+	menuItem[total] = "Return to Prior Menu";		// return
 	menuSubItem[total++] = NULL;
 
 	menuItem[total] = NULL;									// terminate array
@@ -7612,21 +7606,21 @@ static int SelectOptions(int selection)
 	}
 
 	menuItem[total] =		"Show Search Labels";
-	menuSubItem[total++] =	ui_getstring(TEST_FIELD(cheatOptions, DontPrintNewLabels) ? UI_off : UI_on);
+	menuSubItem[total++] =	TEST_FIELD(cheatOptions, DontPrintNewLabels) ? "Off" : "On";
 
 	menuItem[total] =		"Auto Save Cheats";
-	menuSubItem[total++] =	ui_getstring(TEST_FIELD(cheatOptions, AutoSaveEnabled) ? UI_on : UI_off);
+	menuSubItem[total++] =	TEST_FIELD(cheatOptions, AutoSaveEnabled) ? "On" : "Off";
 
 	menuItem[total] =		"Show Activation Key Message";
-	menuSubItem[total++] =	ui_getstring(TEST_FIELD(cheatOptions, ActivationKeyMessage) ? UI_on : UI_off);
+	menuSubItem[total++] =	TEST_FIELD(cheatOptions, ActivationKeyMessage) ? "On" : "Off";
 
 	menuItem[total] =		"Load Old Format Code";
-	menuSubItem[total++] =	ui_getstring(TEST_FIELD(cheatOptions, LoadOldFormat) ? UI_on : UI_off);
+	menuSubItem[total++] =	TEST_FIELD(cheatOptions, LoadOldFormat) ? "On" : "Off";
 
 	menuItem[total] =		"Debug";
-	menuSubItem[total++] =	ui_getstring(TEST_FIELD(cheatOptions, Debug) ? UI_on : UI_off);
+	menuSubItem[total++] =	TEST_FIELD(cheatOptions, Debug) ? "On" : "Off";
 
-	menuItem[total] =		ui_getstring(UI_returntoprior);		// return
+	menuItem[total] =		"Return to Prior Menu";		// return
 	menuSubItem[total++] =	NULL;
 
 	menuItem[total] =		NULL;								// terminate array
@@ -7800,7 +7794,7 @@ static int SelectSearch(int selection)
 		total++;
 	}
 
-	menuItem[total++] = ui_getstring(UI_returntoprior);		// return
+	menuItem[total++] = "Return to Prior Menu";		// return
 
 	menuItem[total] = NULL;									// terminate array
 
@@ -7895,14 +7889,14 @@ static TIMER_CALLBACK( cheat_periodic )
 			/* ------ toggle watchpoint display if shift + toggle cheat ----- */
 			watchesDisabled ^= 1;
 
-			ui_popup_time(1, "%s %s", ui_getstring(UI_watchpoints), watchesDisabled ? ui_getstring (UI_off) : ui_getstring (UI_on));
+			ui_popup_time(1, "Watchpoints %s", watchesDisabled ? "Off" : "On");
 		}
 		else
 		{
 			/* ------ toggle cheat ----- */
 			cheatsDisabled ^= 1;
 
-			ui_popup_time(1, "%s %s", ui_getstring(UI_cheats), cheatsDisabled ? ui_getstring (UI_off) : ui_getstring (UI_on));
+			ui_popup_time(1, "Cheats %s", cheatsDisabled ? "Off" : "On");
 
 			if(cheatsDisabled)
 			{

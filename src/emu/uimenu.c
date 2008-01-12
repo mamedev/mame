@@ -13,7 +13,6 @@
 #include "rendutil.h"
 #include "cheat.h"
 #include "uimenu.h"
-#include "uitext.h"
 #include "audit.h"
 
 #ifdef MESS
@@ -184,7 +183,7 @@ static void switches_menu_add_item(ui_menu_item *item, const input_port_entry *i
 static void switches_menu_select_previous(input_port_entry *in, int switch_entry);
 static void switches_menu_select_next(input_port_entry *in, int switch_entry);
 //static int switches_menu_compare_items(const void *i1, const void *i2);
-static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in, int append_string, int which_item);
+static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in, const char *append_string, int which_item);
 
 /* DIP switch helpers */
 static void dip_switch_build_model(input_port_entry *entry, int item_is_selected);
@@ -533,7 +532,7 @@ int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const me
 
 static void ui_menu_draw_text_box(const char *text)
 {
-	const char *priortext = ui_getstring(UI_returntoprior);
+	const char *priortext = "Return to Prior Menu";
 	float line_height = ui_get_line_height();
 	float lr_arrow_width = 0.4f * line_height * render_get_ui_aspect();
 	float gutter_width = lr_arrow_width;
@@ -756,7 +755,7 @@ static UINT32 menu_main(UINT32 state)
 {
 #define ADD_MENU(name, _handler, _param) \
 do { \
-	item_list[menu_items].text = ui_getstring(name); \
+	item_list[menu_items].text = name; \
 	handler_list[menu_items].handler = _handler; \
 	handler_list[menu_items].state = _param; \
 	menu_items++; \
@@ -790,57 +789,57 @@ do { \
 	memset(item_list, 0, sizeof(item_list));
 
 	/* add input menu items */
-	ADD_MENU(UI_inputgeneral, menu_input_groups, 0);
-	ADD_MENU(UI_inputspecific, menu_input, 1000 << 16);
+	ADD_MENU("Input (general)", menu_input_groups, 0);
+	ADD_MENU("Input (this " CAPSTARTGAMENOUN ")", menu_input, 1000 << 16);
 
 	/* add optional input-related menus */
 	if (has_dips)
-		ADD_MENU(UI_dipswitches, menu_switches, (IPT_DIPSWITCH_NAME << 16) | (IPT_DIPSWITCH_SETTING << 24));
+		ADD_MENU("Dip Switches", menu_switches, (IPT_DIPSWITCH_NAME << 16) | (IPT_DIPSWITCH_SETTING << 24));
 	if (has_configs)
-		ADD_MENU(UI_configuration, menu_switches, (IPT_CONFIG_NAME << 16) | (IPT_CONFIG_SETTING << 24));
+		ADD_MENU("Driver Configuration", menu_switches, (IPT_CONFIG_NAME << 16) | (IPT_CONFIG_SETTING << 24));
 #ifdef MESS
 	if (has_categories)
-		ADD_MENU(UI_categories, menu_switches, (IPT_CATEGORY_NAME << 16) | (IPT_CATEGORY_SETTING << 24));
+		ADD_MENU("Categories", menu_switches, (IPT_CATEGORY_NAME << 16) | (IPT_CATEGORY_SETTING << 24));
 #endif
 	if (has_analog)
-		ADD_MENU(UI_analogcontrols, menu_analog, 0);
+		ADD_MENU("Analog Controls", menu_analog, 0);
 
 #ifndef MESS
   	/* add bookkeeping menu */
-	ADD_MENU(UI_bookkeeping, menu_bookkeeping, 0);
+	ADD_MENU("Bookkeeping Info", menu_bookkeeping, 0);
 #endif
 
 	/* add game info menu */
-	ADD_MENU(UI_gameinfo, menu_game_info, 0);
+	ADD_MENU(CAPSTARTGAMENOUN " Information", menu_game_info, 0);
 
 #ifdef MESS
   	/* add image info menu */
-	ADD_MENU(UI_imageinfo, ui_menu_image_info, 0);
+	ADD_MENU("Image Information", ui_menu_image_info, 0);
 
   	/* add image info menu */
-	ADD_MENU(UI_filemanager, menu_file_manager, 1);
+	ADD_MENU("File Manager", menu_file_manager, 1);
 
 #if HAS_WAVE
   	/* add tape control menu */
 	if (device_find(Machine->devices, IO_CASSETTE))
-		ADD_MENU(UI_tapecontrol, menu_tape_control, 1);
+		ADD_MENU("Tape Control", menu_tape_control, 1);
 #endif /* HAS_WAVE */
 #endif /* MESS */
 
 	/* add video options menu */
-	ADD_MENU(UI_video, menu_video, 1000 << 16);
+	ADD_MENU("Video Options", menu_video, 1000 << 16);
 
 	/* add cheat menu */
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
-		ADD_MENU(UI_cheat, menu_cheat, 1);
+		ADD_MENU("Cheat", menu_cheat, 1);
 
 	/* add memory card menu */
 	if (Machine->drv->memcard_handler != NULL)
-		ADD_MENU(UI_memorycard, menu_memory_card, 0);
+		ADD_MENU("Memory Card", menu_memory_card, 0);
 
 	/* add reset and exit menus */
-	ADD_MENU(UI_selectgame, menu_select_game, 1 << 16);
-	ADD_MENU(UI_returntogame, NULL, 0);
+	ADD_MENU("Select New " CAPSTARTGAMENOUN, menu_select_game, 1 << 16);
+	ADD_MENU("Return to " CAPSTARTGAMENOUN, NULL, 0);
 
 	/* draw the menu */
 	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
@@ -867,16 +866,19 @@ static UINT32 menu_input_groups(UINT32 state)
 	ui_menu_item item_list[IPG_TOTAL_GROUPS + 2];
 	int menu_items = 0;
 	int visible_items;
+	int player;
 
 	/* reset the menu */
 	memset(item_list, 0, sizeof(item_list));
 
 	/* build up the menu */
-	for (menu_items = 0; menu_items < IPG_TOTAL_GROUPS; menu_items++)
-		item_list[menu_items].text = ui_getstring(UI_uigroup + menu_items);
+	item_list[menu_items++].text = "User Interface";
+	for (player = 0; player < MAX_PLAYERS; player++)
+		item_list[menu_items++].text = menu_string_pool_add("Player %d Controls", player + 1);
+	item_list[menu_items++].text = "Other Controls";
 
 	/* add an item for the return */
-	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+	item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* draw the menu */
 	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
@@ -932,7 +934,7 @@ static UINT32 menu_input(UINT32 state)
 	qsort(item_list, menu_items, sizeof(item_list[0]), input_menu_compare_items);
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+	item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* if we're polling, just put an empty entry and arrows for the subitem */
 	if (polling)
@@ -1037,7 +1039,7 @@ static UINT32 menu_switches(UINT32 state)
 	selected_in = item_list[selected].ref;
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+	item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* configure the extra menu */
 	extra.top = 0;
@@ -1140,15 +1142,15 @@ static UINT32 menu_analog(UINT32 state)
 			}
 
 			/* add the needed items for each analog input */
-			analog_menu_add_item(&item_list[menu_items++], in, UI_keyjoyspeed, ANALOG_ITEM_KEYSPEED);
+			analog_menu_add_item(&item_list[menu_items++], in, "Digital Speed", ANALOG_ITEM_KEYSPEED);
 			if (use_autocenter)
-				analog_menu_add_item(&item_list[menu_items++], in, UI_centerspeed, ANALOG_ITEM_CENTERSPEED);
-			analog_menu_add_item(&item_list[menu_items++], in, UI_reverse, ANALOG_ITEM_REVERSE);
-			analog_menu_add_item(&item_list[menu_items++], in, UI_sensitivity, ANALOG_ITEM_SENSITIVITY);
+				analog_menu_add_item(&item_list[menu_items++], in, "Autocenter Speed", ANALOG_ITEM_CENTERSPEED);
+			analog_menu_add_item(&item_list[menu_items++], in, "Reverse", ANALOG_ITEM_REVERSE);
+			analog_menu_add_item(&item_list[menu_items++], in, "Sensitivity", ANALOG_ITEM_SENSITIVITY);
 		}
 
 	/* add an item to return */
-	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+	item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* draw the menu */
 	visible_items = ui_menu_draw(item_list, menu_items, state, NULL);
@@ -1196,29 +1198,29 @@ static UINT32 menu_bookkeeping(UINT32 state)
 	/* show total time first */
 	total_time = timer_get_time();
 	if (total_time.seconds >= 60 * 60)
-		bufptr += sprintf(bufptr, "%s: %d:%02d:%02d\n\n", ui_getstring(UI_totaltime), total_time.seconds / (60*60), (total_time.seconds / 60) % 60, total_time.seconds % 60);
+		bufptr += sprintf(bufptr, "Uptime: %d:%02d:%02d\n\n", total_time.seconds / (60*60), (total_time.seconds / 60) % 60, total_time.seconds % 60);
 	else
-		bufptr += sprintf(bufptr, "%s: %d:%02d\n\n", ui_getstring(UI_totaltime), (total_time.seconds / 60) % 60, total_time.seconds % 60);
+		bufptr += sprintf(bufptr, "Uptime: %d:%02d\n\n", (total_time.seconds / 60) % 60, total_time.seconds % 60);
 
 	/* show tickets at the top */
 	if (dispensed_tickets)
-		bufptr += sprintf(bufptr, "%s: %d\n\n", ui_getstring(UI_tickets), dispensed_tickets);
+		bufptr += sprintf(bufptr, "Tickets dispensed: %d\n\n", dispensed_tickets);
 
 	/* loop over coin counters */
 	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
 	{
 		/* display the coin counter number */
-		bufptr += sprintf(bufptr, "%s %c: ", ui_getstring(UI_coin), ctrnum + 'A');
+		bufptr += sprintf(bufptr, "Coin %c: ", ctrnum + 'A');
 
 		/* display how many coins */
 		if (!coin_count[ctrnum])
-			bufptr += sprintf(bufptr, "%s", ui_getstring(UI_NA));
+			bufptr += sprintf(bufptr, "NA");
 		else
 			bufptr += sprintf(bufptr, "%d", coin_count[ctrnum]);
 
 		/* display whether or not we are locked out */
 		if (coinlockedout[ctrnum])
-			bufptr += sprintf(bufptr, " %s", ui_getstring(UI_locked));
+			bufptr += sprintf(bufptr, " (locked)");
 		*bufptr++ = '\n';
 	}
 	*bufptr = 0;
@@ -1288,7 +1290,7 @@ static UINT32 menu_memory_card(UINT32 state)
 	menu_string_pool_offset = 0;
 
 	/* add the card select menu */
-	item_list[menu_items].text = ui_getstring(UI_selectcard);
+	item_list[menu_items].text = "Card Number:";
 	item_list[menu_items].subtext = menu_string_pool_add("%d", cardnum);
 	if (cardnum > 0)
 		item_list[menu_items].flags |= MENU_FLAG_LEFT_ARROW;
@@ -1297,13 +1299,13 @@ static UINT32 menu_memory_card(UINT32 state)
 	menu_items++;
 
 	/* add the remaining items */
-	item_list[insertindex = menu_items++].text = ui_getstring(UI_loadcard);
+	item_list[insertindex = menu_items++].text = "Load Selected Card";
 	if (memcard_present() != -1)
-		item_list[ejectindex = menu_items++].text = ui_getstring(UI_ejectcard);
-	item_list[createindex = menu_items++].text = ui_getstring(UI_createcard);
+		item_list[ejectindex = menu_items++].text = "Eject Current Card";
+	item_list[createindex = menu_items++].text = "Create New Card";
 
 	/* add an item for the return */
-	item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+	item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* draw the menu */
 	visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
@@ -1324,28 +1326,28 @@ static UINT32 menu_memory_card(UINT32 state)
 		{
 			if (memcard_insert(cardnum) == 0)
 			{
-				popmessage("%s", ui_getstring(UI_loadok));
+				popmessage("Memory card loaded");
 				ui_menu_stack_reset();
 				return 0;
 			}
 			else
-				popmessage("%s", ui_getstring(UI_loadfailed));
+				popmessage("Error loading memory card");
 		}
 
 		/* handle eject */
 		else if (selected == ejectindex)
 		{
 			memcard_eject(Machine);
-			popmessage("%s", ui_getstring(UI_cardejected));
+			popmessage("Memory card ejected");
 		}
 
 		/* handle create */
 		else if (selected == createindex)
 		{
 			if (memcard_create(cardnum, FALSE) == 0)
-				popmessage("%s", ui_getstring(UI_cardcreated));
+				popmessage("Memory card created");
 			else
-				popmessage("%s\n%s", ui_getstring(UI_cardcreatedfailed), ui_getstring(UI_cardcreatedfailed2));
+				popmessage("Error creating memory card\n(Card may already exist)");
 		}
 	}
 
@@ -1384,7 +1386,7 @@ static UINT32 menu_video(UINT32 state)
 	{
 		/* count up the targets, creating menu items for them */
 		for (; menu_items < targets; menu_items++)
-			item_list[menu_items].text = menu_string_pool_add("%s%d", ui_getstring(UI_screen), menu_items);
+			item_list[menu_items].text = menu_string_pool_add("Screen #%d", menu_items);
 
 		/* if we only ended up with one, auto-select it */
 		if (menu_items == 1)
@@ -1394,7 +1396,7 @@ static UINT32 menu_video(UINT32 state)
 		item_list[menu_items++].text = "Move User Interface";
 
 		/* add an item to return */
-		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+		item_list[menu_items++].text = "Return to Prior Menu";
 
 		/* draw the menu */
 		visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
@@ -1469,7 +1471,7 @@ static UINT32 menu_video(UINT32 state)
 			item_list[menu_items++].text = "Crop to Screen";
 
 		/* add an item to return */
-		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+		item_list[menu_items++].text = "Return to Prior Menu";
 
 		/* draw the menu */
 		visible_items = ui_menu_draw(item_list, menu_items, selected, NULL);
@@ -1604,13 +1606,13 @@ static UINT32 menu_select_game(UINT32 state)
 
 	/* add an item to return, but only if we're not going to pop to the quit handler */
 	if (!ui_menu_is_force_game_select())
-		item_list[menu_items++].text = ui_getstring(UI_returntoprior);
+		item_list[menu_items++].text = "Return to Prior Menu";
 
 	/* otherwise, add a general input configuration and exit menus */
 	else
 	{
 		item_list[menu_items++].text = "Configure General Inputs";
-		item_list[menu_items++].text = ui_getstring(UI_exit);
+		item_list[menu_items++].text = "Exit";
 	}
 
 	/* configure the extra menu */
@@ -2025,7 +2027,7 @@ static void switches_menu_add_item(ui_menu_item *item, const input_port_entry *i
 
 	/* if no matches, we're invalid */
 	if (!item->subtext)
-		item->subtext = ui_getstring(UI_INVALID);
+		item->subtext = "INVALID";
 
 	/* stash our reference */
 	item->ref = ref;
@@ -2110,12 +2112,12 @@ static int switches_menu_compare_items(const void *i1, const void *i2)
     analog controls menu
 -------------------------------------------------*/
 
-static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in, int append_string, int which_item)
+static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in, const char *append_string, int which_item)
 {
 	int value, minval, maxval;
 
 	/* set the item text using the formatting string provided */
-	item->text = menu_string_pool_add("%s %s", input_port_name(in), ui_getstring(append_string));
+	item->text = menu_string_pool_add("%s %s", input_port_name(in), append_string);
 
 	/* set the subitem text */
 	switch (which_item)
@@ -2139,7 +2141,7 @@ static void analog_menu_add_item(ui_menu_item *item, const input_port_entry *in,
 			value = in->analog.reverse;
 			minval = 0;
 			maxval = 1;
-			item->subtext = value ? ui_getstring(UI_on) : ui_getstring(UI_off);
+			item->subtext = value ? "On" : "Off";
 			break;
 
 		case ANALOG_ITEM_SENSITIVITY:
