@@ -27,7 +27,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_CODE				(0)
+#define LOG_CODE				(1)
 #define SINGLE_INSTRUCTION_MODE	(0)
 
 #ifdef MAME_DEBUG
@@ -188,7 +188,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 	allocatedsize = CACHE_SIZE + sizeof(*mips3.core) + memsize;
 	mips3.core = osd_alloc_executable(allocatedsize);
 	if (mips3.core == NULL)
-		fatalerror("Unable to allocate cache of size %d\n", allocatedsize);
+		fatalerror("Unable to allocate cache of size %d\n", (UINT32)allocatedsize);
 	mips3.cache = (UINT8 *)(mips3.core + 1) + memsize;
 
 	/* initialize the core */

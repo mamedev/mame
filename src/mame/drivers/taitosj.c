@@ -329,7 +329,7 @@ static int kikstart_gear_r(void *param)
 {
 	const char *port_tag;
 
-	int player = (int)param;
+	int player = (int)(FPTR)param;
 
 	if (player == 0)
 		port_tag = "GEARP1";
