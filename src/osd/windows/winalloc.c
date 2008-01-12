@@ -526,8 +526,10 @@ static void global_init(void)
 
 	// determine if we enabled by default
 #ifdef MESS
-	extern BOOL win_is_gui_application(void);
-	use_malloc_tracking = !win_is_gui_application();
+	{
+		extern BOOL win_is_gui_application(void);
+		use_malloc_tracking = !win_is_gui_application();
+	}
 #elif defined(WINUI)
 	use_malloc_tracking = FALSE;
 #else
