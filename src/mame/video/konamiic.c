@@ -2270,6 +2270,11 @@ void K052109_set_RMRD_line(int state)
 	K052109_RMRD_line = state;
 }
 
+int K052109_get_RMRD_line(void)
+{
+	return K052109_RMRD_line;
+}
+
 
 void K052109_tilemap_update(void)
 {

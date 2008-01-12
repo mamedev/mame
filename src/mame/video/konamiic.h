@@ -75,6 +75,7 @@ WRITE16_HANDLER( K052109_word_w );
 READ16_HANDLER( K052109_lsb_r );
 WRITE16_HANDLER( K052109_lsb_w );
 void K052109_set_RMRD_line(int state);
+int K052109_get_RMRD_line(void);
 void K052109_tilemap_update(void);
 int K052109_is_IRQ_enabled(void);
 void K052109_set_layer_offsets(int layer, int dx, int dy);
