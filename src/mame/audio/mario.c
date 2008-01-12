@@ -216,7 +216,6 @@ static DISCRETE_SOUND_START(mario)
      * Just a 1:n amplifier without filters and no output capacitor
      */
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 3 )
-	DISCRETE_WAVELOG2(DS_SOUND7_INV, 32767/5, NODE_110, 32767/5)
 
 DISCRETE_SOUND_END
 
@@ -236,10 +235,13 @@ static SOUND_START( mario )
 	soundlatch2_clear_w(0,0);
 	soundlatch3_clear_w(0,0);
 	soundlatch4_clear_w(0,0);
+	I8035_P1_W(0xf0); /* Port is in high impedance state after reset */
+	I8035_P2_W(0xff); /* Port is in high impedance state after reset */
 	/*
-     * The code below will play the correct start up sound
-     * However, it is not backed by hardware at all.
-     */
+	 * The code below will play the correct start up sound according
+	 * to mametesters.
+	 * However, it is not backed by hardware at all.  The LS393 latch 
+	 */
 	//soundlatch_w(0,2);
 }
 
@@ -263,7 +265,7 @@ static READ8_HANDLER( mario_sh_p1_r )
 
 static READ8_HANDLER( mario_sh_p2_r )
 {
-	return I8035_P2_R() & 0xE0; /* Bit 4 connected to GND! */
+	return I8035_P2_R() & 0xEF; /* Bit 4 connected to GND! */
 }
 
 static READ8_HANDLER( mario_sh_t0_r )
@@ -274,6 +276,12 @@ static READ8_HANDLER( mario_sh_t0_r )
 static READ8_HANDLER( mario_sh_t1_r )
 {
 	return I8035_T_R(1);
+}
+
+static READ8_HANDLER( mario_sh_ea_r )
+{
+	int p2 = (I8035_P2_R() >> 5) & 1;
+	return p2 ^ 1;
 }
 
 static READ8_HANDLER( mario_sh_tune_r )
@@ -392,6 +400,7 @@ static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
 	AM_RANGE(I8039_t0, I8039_t0) AM_READ(mario_sh_t0_r)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(mario_sh_t1_r)
+	AM_RANGE(I8039_ea, I8039_ea) AM_READ(mario_sh_ea_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masao_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -421,7 +430,7 @@ static const struct AY8910interface ay8910_interface =
 
 MACHINE_DRIVER_START( mario_audio )
 
-	MDRV_CPU_ADD(I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+	MDRV_CPU_ADD(M58715, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
 

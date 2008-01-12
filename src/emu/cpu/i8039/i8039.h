@@ -31,7 +31,8 @@
 
 enum { I8039_PC=1, I8039_SP, I8039_PSW, I8039_A,  I8039_TC,
 	   I8039_P1,   I8039_P2, I8039_R0,  I8039_R1, I8039_R2,
-	   I8039_R3,   I8039_R4, I8039_R5,  I8039_R6, I8039_R7
+	   I8039_R3,   I8039_R4, I8039_R5,  I8039_R6, I8039_R7,
+	   I8039_EA
 };
 
 extern void i8039_get_info(UINT32 state, cpuinfo *info);
@@ -49,6 +50,9 @@ extern void i8039_get_info(UINT32 state, cpuinfo *info);
 #define  I8039_p7	0x107
 #define  I8039_t0	0x110
 #define  I8039_t1	0x111
+/* EA is activelow input on real hardware. It is treated
+ * as active high here to remain compatible with existing drivers! */
+#define  I8039_ea	0x112
 #define  I8039_bus	0x120
 
 /**************************************************************************
@@ -127,6 +131,110 @@ extern void i8048_get_info(UINT32 state, cpuinfo *info);
 #define n7751_ICount			i8039_ICount
 
 extern void n7751_get_info(UINT32 state, cpuinfo *info);
+#endif
+
+/**************************************************************************
+ * N7751 section
+ **************************************************************************/
+#if (HAS_N7751)
+#define N7751_PC				I8039_PC
+#define N7751_SP				I8039_SP
+#define N7751_PSW				I8039_PSW
+#define N7751_A 				I8039_A
+#define N7751_TC				I8039_TC
+#define N7751_P1				I8039_P1
+#define N7751_P2				I8039_P2
+#define N7751_R0				I8039_R0
+#define N7751_R1				I8039_R1
+#define N7751_R2				I8039_R2
+#define N7751_R3				I8039_R3
+#define N7751_R4				I8039_R4
+#define N7751_R5				I8039_R5
+#define N7751_R6				I8039_R6
+#define N7751_R7				I8039_R7
+
+#define N7751_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
+#define n7751_ICount			i8039_ICount
+
+extern void n7751_get_info(UINT32 state, cpuinfo *info);
+#endif
+
+/**************************************************************************
+ * N7751 section
+ **************************************************************************/
+#if (HAS_N7751)
+#define N7751_PC				I8039_PC
+#define N7751_SP				I8039_SP
+#define N7751_PSW				I8039_PSW
+#define N7751_A 				I8039_A
+#define N7751_TC				I8039_TC
+#define N7751_P1				I8039_P1
+#define N7751_P2				I8039_P2
+#define N7751_R0				I8039_R0
+#define N7751_R1				I8039_R1
+#define N7751_R2				I8039_R2
+#define N7751_R3				I8039_R3
+#define N7751_R4				I8039_R4
+#define N7751_R5				I8039_R5
+#define N7751_R6				I8039_R6
+#define N7751_R7				I8039_R7
+
+#define N7751_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
+#define n7751_ICount			i8039_ICount
+
+extern void n7751_get_info(UINT32 state, cpuinfo *info);
+#endif
+
+/**************************************************************************
+ * MB8884 section
+ **************************************************************************/
+#if (HAS_MB8884)
+#define MB8884_PC				I8039_PC
+#define MB8884_SP				I8039_SP
+#define MB8884_PSW				I8039_PSW
+#define MB8884_A 				I8039_A
+#define MB8884_TC				I8039_TC
+#define MB8884_P1				I8039_P1
+#define MB8884_P2				I8039_P2
+#define MB8884_R0				I8039_R0
+#define MB8884_R1				I8039_R1
+#define MB8884_R2				I8039_R2
+#define MB8884_R3				I8039_R3
+#define MB8884_R4				I8039_R4
+#define MB8884_R5				I8039_R5
+#define MB8884_R6				I8039_R6
+#define MB8884_R7				I8039_R7
+
+#define MB8884_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
+#define mb8884_ICount			i8039_ICount
+
+extern void mb8884_get_info(UINT32 state, cpuinfo *info);
+#endif
+
+/**************************************************************************
+ * M58715 section
+ **************************************************************************/
+#if (HAS_M58715)
+#define M58715_PC				I8039_PC
+#define M58715_SP				I8039_SP
+#define M58715_PSW				I8039_PSW
+#define M58715_A 				I8039_A
+#define M58715_TC				I8039_TC
+#define M58715_P1				I8039_P1
+#define M58715_P2				I8039_P2
+#define M58715_R0				I8039_R0
+#define M58715_R1				I8039_R1
+#define M58715_R2				I8039_R2
+#define M58715_R3				I8039_R3
+#define M58715_R4				I8039_R4
+#define M58715_R5				I8039_R5
+#define M58715_R6				I8039_R6
+#define M58715_R7				I8039_R7
+
+#define m58715_CLOCK_DIVIDER	I8039_CLOCK_DIVIDER
+#define m58715_ICount			i8039_ICount
+
+extern void m58715_get_info(UINT32 state, cpuinfo *info);
 #endif
 
 /*

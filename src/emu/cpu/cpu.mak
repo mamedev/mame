@@ -531,6 +531,8 @@ CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8039=$(if $(filter I8039,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
 CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
+CPUDEFS += -DHAS_MB8884=$(if $(filter MB8884,$(CPUS)),1,0)
+CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
 
 ifneq ($(filter I8035 I8039 I8048 N7751,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8039

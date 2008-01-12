@@ -50,7 +50,8 @@
 #define ADJUST_CYCLES { }					/* User Manual cycles setting */
 #endif
 
-
+/* There are certain differences between the processors */
+#define FEATURE_M58715		1
 
 /* HJB 01/05/99 changed to positive values to use pending_irq as a flag */
 #define I8039_NO_INT		0	/* No Interrupts pending or executing   */
@@ -74,6 +75,9 @@ static int Timer_IRQ(void);
 #define bus_r()			I8039_In(I8039_bus)
 #define bus_w(V)		I8039_Out(I8039_bus,V)
 
+#define INTRAM_R(A)		(intRAM[(A) & R.ram_mask])
+#define INTRAM_W(A,V)	do { intRAM[(A) & R.ram_mask] = V; } while (0);
+
 #define C_FLAG			0x80
 #define A_FLAG			0x40
 #define F_FLAG			0x20
@@ -87,18 +91,20 @@ typedef struct
 	UINT8	RAM[128];
 	UINT8	bus, f1;		/* Bus data, and flag1 */
 	UINT8	P1, P2;			/* Internal Port 1 and 2 latched outputs */
-
+	UINT8	EA;				/* latched EA input */
+	UINT8	cpu_feature;	/* process feature */
+	UINT8	ram_mask;		/* internal ram size - 1 */
 	UINT8	pending_irq, irq_executing, masterClock, regPtr;
 	UINT8	t_flag, timer, timerON, countON, xirq_en, tirq_en;
 	UINT16	A11;
 	UINT8	irq_state, irq_extra_cycles;
 	int		(*irq_callback)(int irqline);
+	int		inst_cycles;
 	UINT8	Old_T1;
 } I8039_Regs;
 
 static I8039_Regs R;
 static int	   i8039_ICount;
-static int    inst_cycles;
 
 /* The opcode table now is a combination of cycle counts and function pointers */
 typedef struct {
@@ -130,6 +136,11 @@ typedef struct {
 #define R6	intRAM[regPTR+6]
 #define R7	intRAM[regPTR+7]
 
+INLINE UINT8 ea_r(void)
+{
+	R.EA = I8039_In(I8039_ea);
+	return R.EA;
+}
 
 INLINE void CLR (UINT8 flag) { R.PSW &= ~flag; }
 INLINE void SET (UINT8 flag) { R.PSW |= flag;  }
@@ -205,10 +216,12 @@ INLINE void M_CALL(UINT16 addr)
 INLINE void M_XCHD(UINT8 addr)
 {
 	UINT8 dat = R.A & 0x0f;
+	UINT8 val = INTRAM_R(addr);
 	R.A &= 0xf0;
-	R.A |= intRAM[addr] & 0x0f;
-	intRAM[addr] &= 0xf0;
-	intRAM[addr] |= dat;
+	R.A |= val & 0x0f;
+	val &= 0xf0;
+	val |= dat;
+	INTRAM_W(addr, val);
 }
 
 
@@ -233,8 +246,8 @@ static void add_a_r4(void)	 { M_ADD(R4); }
 static void add_a_r5(void)	 { M_ADD(R5); }
 static void add_a_r6(void)	 { M_ADD(R6); }
 static void add_a_r7(void)	 { M_ADD(R7); }
-static void add_a_xr0(void)	 { M_ADD(intRAM[R0 & 0x7f]); }
-static void add_a_xr1(void)	 { M_ADD(intRAM[R1 & 0x7f]); }
+static void add_a_xr0(void)	 { M_ADD(INTRAM_R(R0)); }
+static void add_a_xr1(void)	 { M_ADD(INTRAM_R(R1)); }
 static void adc_a_n(void)	 { M_ADDC(M_RDMEM_OPCODE()); }
 static void adc_a_r0(void)	 { M_ADDC(R0); }
 static void adc_a_r1(void)	 { M_ADDC(R1); }
@@ -244,8 +257,8 @@ static void adc_a_r4(void)	 { M_ADDC(R4); }
 static void adc_a_r5(void)	 { M_ADDC(R5); }
 static void adc_a_r6(void)	 { M_ADDC(R6); }
 static void adc_a_r7(void)	 { M_ADDC(R7); }
-static void adc_a_xr0(void)	 { M_ADDC(intRAM[R0 & 0x7f]); }
-static void adc_a_xr1(void)	 { M_ADDC(intRAM[R1 & 0x7f]); }
+static void adc_a_xr0(void)	 { M_ADDC(INTRAM_R(R0)); }
+static void adc_a_xr1(void)	 { M_ADDC(INTRAM_R(R1)); }
 static void anl_a_n(void)	 { R.A &= M_RDMEM_OPCODE(); }
 static void anl_a_r0(void)	 { R.A &= R0; }
 static void anl_a_r1(void)	 { R.A &= R1; }
@@ -255,15 +268,26 @@ static void anl_a_r4(void)	 { R.A &= R4; }
 static void anl_a_r5(void)	 { R.A &= R5; }
 static void anl_a_r6(void)	 { R.A &= R6; }
 static void anl_a_r7(void)	 { R.A &= R7; }
-static void anl_a_xr0(void)	 { R.A &= intRAM[R0 & 0x7f]; }
-static void anl_a_xr1(void)	 { R.A &= intRAM[R1 & 0x7f]; }
+static void anl_a_xr0(void)	 { R.A &= INTRAM_R(R0); }
+static void anl_a_xr1(void)	 { R.A &= INTRAM_R(R1); }
 static void anl_bus_n(void)	 { bus_w( bus_r() & M_RDMEM_OPCODE() ); }
-static void anl_p1_n(void)	 { R.P1 &= M_RDMEM_OPCODE(); port_w( 1, R.P1 ); }
-static void anl_p2_n(void)	 { R.P2 &= M_RDMEM_OPCODE(); port_w( 2, R.P2 ); }
-static void anld_p4_a(void)	 { port_w( 4, port_r(4) & M_RDMEM_OPCODE() ); }
-static void anld_p5_a(void)	 { port_w( 5, port_r(5) & M_RDMEM_OPCODE() ); }
-static void anld_p6_a(void)	 { port_w( 6, port_r(6) & M_RDMEM_OPCODE() ); }
-static void anld_p7_a(void)	 { port_w( 7, port_r(7) & M_RDMEM_OPCODE() ); }
+
+static void anl_p1_n(void)	 
+{
+	R.P1 &= M_RDMEM_OPCODE(); 
+	port_w( 1, R.P1 ); 
+}
+
+static void anl_p2_n(void)	 
+{
+	R.P2 &= M_RDMEM_OPCODE(); 
+	port_w( 2, R.P2 ); 
+}
+
+static void anld_p4_a(void)	 { port_w( 4, (port_r(4) & M_RDMEM_OPCODE()) & 0x0f ); }
+static void anld_p5_a(void)	 { port_w( 5, (port_r(5) & M_RDMEM_OPCODE()) & 0x0f ); }
+static void anld_p6_a(void)	 { port_w( 6, (port_r(6) & M_RDMEM_OPCODE()) & 0x0f ); }
+static void anld_p7_a(void)	 { port_w( 7, (port_r(7) & M_RDMEM_OPCODE()) & 0x0f ); }
 static void call(void)		 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | a11); }
 static void call_1(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x100 | a11); }
 static void call_2(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x200 | a11); }
@@ -314,8 +338,8 @@ static void inc_r4(void)	 { R4++; }
 static void inc_r5(void)	 { R5++; }
 static void inc_r6(void)	 { R6++; }
 static void inc_r7(void)	 { R7++; }
-static void inc_xr0(void)	 { intRAM[R0 & 0x7f]++; }
-static void inc_xr1(void)	 { intRAM[R1 & 0x7f]++; }
+static void inc_xr0(void)	 { INTRAM_W(R0, INTRAM_R(R0) + 1); }
+static void inc_xr1(void)	 { INTRAM_W(R1, INTRAM_R(R1) + 1); }
 
 static void jmp(void)
 {
@@ -370,8 +394,8 @@ static void mov_a_r5(void)	 { R.A = R5; }
 static void mov_a_r6(void)	 { R.A = R6; }
 static void mov_a_r7(void)	 { R.A = R7; }
 static void mov_a_psw(void)	 { R.A = R.PSW; }
-static void mov_a_xr0(void)	 { R.A = intRAM[R0 & 0x7f]; }
-static void mov_a_xr1(void)	 { R.A = intRAM[R1 & 0x7f]; }
+static void mov_a_xr0(void)	 { R.A = INTRAM_R(R0); }
+static void mov_a_xr1(void)	 { R.A = INTRAM_R(R1); }
 static void mov_r0_a(void)	 { R0 = R.A; }
 static void mov_r1_a(void)	 { R1 = R.A; }
 static void mov_r2_a(void)	 { R2 = R.A; }
@@ -391,18 +415,18 @@ static void mov_r6_n(void)	 { R6 = M_RDMEM_OPCODE(); }
 static void mov_r7_n(void)	 { R7 = M_RDMEM_OPCODE(); }
 static void mov_a_t(void)	 { R.A = R.timer; }
 static void mov_t_a(void)	 { R.timer = R.A; }
-static void mov_xr0_a(void)	 { intRAM[R0 & 0x7f] = R.A; }
-static void mov_xr1_a(void)	 { intRAM[R1 & 0x7f] = R.A; }
-static void mov_xr0_n(void)	 { intRAM[R0 & 0x7f] = M_RDMEM_OPCODE(); }
-static void mov_xr1_n(void)	 { intRAM[R1 & 0x7f] = M_RDMEM_OPCODE(); }
-static void movd_a_p4(void)	 { R.A = port_r(4); }
-static void movd_a_p5(void)	 { R.A = port_r(5); }
-static void movd_a_p6(void)	 { R.A = port_r(6); }
-static void movd_a_p7(void)	 { R.A = port_r(7); }
-static void movd_p4_a(void)	 { port_w(4, R.A); }
-static void movd_p5_a(void)	 { port_w(5, R.A); }
-static void movd_p6_a(void)	 { port_w(6, R.A); }
-static void movd_p7_a(void)	 { port_w(7, R.A); }
+static void mov_xr0_a(void)	 { INTRAM_W(R0, R.A); }
+static void mov_xr1_a(void)	 { INTRAM_W(R1, R.A); }
+static void mov_xr0_n(void)	 { INTRAM_W(R0, M_RDMEM_OPCODE()); }
+static void mov_xr1_n(void)	 { INTRAM_W(R1, M_RDMEM_OPCODE()); }
+static void movd_a_p4(void)	 { R.A = port_r(4) & 0x0F; }
+static void movd_a_p5(void)	 { R.A = port_r(5) & 0x0F; }
+static void movd_a_p6(void)	 { R.A = port_r(6) & 0x0F; }
+static void movd_a_p7(void)	 { R.A = port_r(7) & 0x0F; }
+static void movd_p4_a(void)	 { port_w(4, R.A & 0x0F); }
+static void movd_p5_a(void)	 { port_w(5, R.A & 0x0F); }
+static void movd_p6_a(void)	 { port_w(6, R.A & 0x0F); }
+static void movd_p7_a(void)	 { port_w(7, R.A & 0x0F); }
 static void movp_a_xa(void)	 { R.A = M_RDMEM((R.PC.w.l & 0x0f00) | R.A); }
 static void movp3_a_xa(void) { R.A = M_RDMEM(0x300 | R.A); }
 static void movx_a_xr0(void) { R.A = M_IN(R0); }
@@ -419,11 +443,21 @@ static void orl_a_r4(void)	 { R.A |= R4; }
 static void orl_a_r5(void)	 { R.A |= R5; }
 static void orl_a_r6(void)	 { R.A |= R6; }
 static void orl_a_r7(void)	 { R.A |= R7; }
-static void orl_a_xr0(void)	 { R.A |= intRAM[R0 & 0x7f]; }
-static void orl_a_xr1(void)	 { R.A |= intRAM[R1 & 0x7f]; }
+static void orl_a_xr0(void)	 { R.A |= INTRAM_R(R0); }
+static void orl_a_xr1(void)	 { R.A |= INTRAM_R(R1); }
 static void orl_bus_n(void)	 { bus_w( bus_r() | M_RDMEM_OPCODE() ); }
-static void orl_p1_n(void)	 { R.P1 |= M_RDMEM_OPCODE(); port_w(1, R.P1); }
-static void orl_p2_n(void)	 { R.P2 |= M_RDMEM_OPCODE(); port_w(2, R.P2); }
+static void orl_p1_n(void)	 
+{
+	R.P1 |= M_RDMEM_OPCODE();
+	port_w(1, R.P1); 
+}
+
+static void orl_p2_n(void)	 
+{
+	R.P2 |= M_RDMEM_OPCODE();
+	port_w(2, R.P2); 
+}
+
 static void orld_p4_a(void)	 { port_w(4, port_r(4) | R.A ); }
 static void orld_p5_a(void)	 { port_w(5, port_r(5) | R.A ); }
 static void orld_p6_a(void)	 { port_w(6, port_r(6) | R.A ); }
@@ -473,10 +507,10 @@ static void xch_a_r4(void)	 { UINT8 i=R.A; R.A=R4; R4=i; }
 static void xch_a_r5(void)	 { UINT8 i=R.A; R.A=R5; R5=i; }
 static void xch_a_r6(void)	 { UINT8 i=R.A; R.A=R6; R6=i; }
 static void xch_a_r7(void)	 { UINT8 i=R.A; R.A=R7; R7=i; }
-static void xch_a_xr0(void)	 { UINT8 i=R.A; R.A=intRAM[R0 & 0x7f]; intRAM[R0 & 0x7f]=i; }
-static void xch_a_xr1(void)	 { UINT8 i=R.A; R.A=intRAM[R1 & 0x7f]; intRAM[R1 & 0x7f]=i; }
-static void xchd_a_xr0(void) { M_XCHD(R0 & 0x7f); }
-static void xchd_a_xr1(void) { M_XCHD(R1 & 0x7f); }
+static void xch_a_xr0(void)	 { UINT8 i=R.A; R.A=INTRAM_R(R0); INTRAM_W(R0, i); }
+static void xch_a_xr1(void)	 { UINT8 i=R.A; R.A=INTRAM_R(R1); INTRAM_W(R1, i); }
+static void xchd_a_xr0(void) { M_XCHD(R0); }
+static void xchd_a_xr1(void) { M_XCHD(R1); }
 static void xrl_a_n(void)	 { R.A ^= M_RDMEM_OPCODE(); }
 static void xrl_a_r0(void)	 { R.A ^= R0; }
 static void xrl_a_r1(void)	 { R.A ^= R1; }
@@ -486,43 +520,43 @@ static void xrl_a_r4(void)	 { R.A ^= R4; }
 static void xrl_a_r5(void)	 { R.A ^= R5; }
 static void xrl_a_r6(void)	 { R.A ^= R6; }
 static void xrl_a_r7(void)	 { R.A ^= R7; }
-static void xrl_a_xr0(void)	 { R.A ^= intRAM[R0 & 0x7f]; }
-static void xrl_a_xr1(void)	 { R.A ^= intRAM[R1 & 0x7f]; }
+static void xrl_a_xr0(void)	 { R.A ^= INTRAM_R(R0); }
+static void xrl_a_xr1(void)	 { R.A ^= INTRAM_R(R1); }
 
 static const s_opcode opcode_main[256]=
 {
-	{1, nop 	   },{0, illegal	},{2, outl_bus_a },{2, add_a_n	  },{2, jmp 	   },{1, en_i		},{0, illegal	 },{1, dec_a	  },
-	{2, ins_a_bus  },{2, in_a_p1	},{2, in_a_p2	 },{0, illegal	  },{2, movd_a_p4  },{2, movd_a_p5	},{2, movd_a_p6  },{2, movd_a_p7  },
-	{1, inc_xr0    },{1, inc_xr1	},{2, jb_0		 },{2, adc_a_n	  },{2, call	   },{1, dis_i		},{2, jtf		 },{1, inc_a	  },
-	{1, inc_r0	   },{1, inc_r1 	},{1, inc_r2	 },{1, inc_r3	  },{1, inc_r4	   },{1, inc_r5 	},{1, inc_r6	 },{1, inc_r7	  },
-	{1, xch_a_xr0  },{1, xch_a_xr1	},{0, illegal	 },{2, mov_a_n	  },{2, jmp_1	   },{1, en_tcnti	},{2, jnt_0 	 },{1, clr_a	  },
-	{1, xch_a_r0   },{1, xch_a_r1	},{1, xch_a_r2	 },{1, xch_a_r3   },{1, xch_a_r4   },{1, xch_a_r5	},{1, xch_a_r6	 },{1, xch_a_r7   },
-	{1, xchd_a_xr0 },{1, xchd_a_xr1 },{2, jb_1		 },{0, illegal	  },{2, call_1	   },{1, dis_tcnti	},{2, jt_0		 },{1, cpl_a	  },
-	{0, illegal    },{2, outl_p1_a	},{2, outl_p2_a  },{0, illegal	  },{2, movd_p4_a  },{2, movd_p5_a	},{2, movd_p6_a  },{2, movd_p7_a  },
-	{1, orl_a_xr0  },{1, orl_a_xr1	},{1, mov_a_t	 },{2, orl_a_n	  },{2, jmp_2	   },{1, strt_cnt	},{2, jnt_1 	 },{1, swap_a	  },
-	{1, orl_a_r0   },{1, orl_a_r1	},{1, orl_a_r2	 },{1, orl_a_r3   },{1, orl_a_r4   },{1, orl_a_r5	},{1, orl_a_r6	 },{1, orl_a_r7   },
-	{1, anl_a_xr0  },{1, anl_a_xr1	},{2, jb_2		 },{2, anl_a_n	  },{2, call_2	   },{1, strt_t 	},{2, jt_1		 },{1, daa_a	  },
-	{1, anl_a_r0   },{1, anl_a_r1	},{1, anl_a_r2	 },{1, anl_a_r3   },{1, anl_a_r4   },{1, anl_a_r5	},{1, anl_a_r6	 },{1, anl_a_r7   },
-	{1, add_a_xr0  },{1, add_a_xr1	},{1, mov_t_a	 },{0, illegal	  },{2, jmp_3	   },{1, stop_tcnt	},{0, illegal	 },{1, rrc_a	  },
-	{1, add_a_r0   },{1, add_a_r1	},{1, add_a_r2	 },{1, add_a_r3   },{1, add_a_r4   },{1, add_a_r5	},{1, add_a_r6	 },{1, add_a_r7   },
-	{1, adc_a_xr0  },{1, adc_a_xr1	},{2, jb_3		 },{0, illegal	  },{2, call_3	   },{1, ento_clk	},{2, jf1		 },{1, rr_a 	  },
-	{1, adc_a_r0   },{1, adc_a_r1	},{1, adc_a_r2	 },{1, adc_a_r3   },{1, adc_a_r4   },{1, adc_a_r5	},{1, adc_a_r6	 },{1, adc_a_r7   },
-	{2, movx_a_xr0 },{2, movx_a_xr1 },{0, illegal	 },{2, ret		  },{2, jmp_4	   },{1, clr_f0 	},{2, jni		 },{0, illegal	  },
-	{2, orl_bus_n  },{2, orl_p1_n	},{2, orl_p2_n	 },{0, illegal	  },{2, orld_p4_a  },{2, orld_p5_a	},{2, orld_p6_a  },{2, orld_p7_a  },
-	{2, movx_xr0_a },{2, movx_xr1_a },{2, jb_4		 },{2, retr 	  },{2, call_4	   },{1, cpl_f0 	},{2, jnz		 },{1, clr_c	  },
-	{2, anl_bus_n  },{2, anl_p1_n	},{2, anl_p2_n	 },{0, illegal	  },{2, anld_p4_a  },{2, anld_p5_a	},{2, anld_p6_a  },{2, anld_p7_a  },
-	{1, mov_xr0_a  },{1, mov_xr1_a	},{0, illegal	 },{2, movp_a_xa  },{2, jmp_5	   },{1, clr_f1 	},{0, illegal	 },{1, cpl_c	  },
-	{1, mov_r0_a   },{1, mov_r1_a	},{1, mov_r2_a	 },{1, mov_r3_a   },{1, mov_r4_a   },{1, mov_r5_a	},{1, mov_r6_a	 },{1, mov_r7_a   },
-	{2, mov_xr0_n  },{2, mov_xr1_n	},{2, jb_5		 },{2, jmpp_xa	  },{2, call_5	   },{1, cpl_f1 	},{2, jf0		 },{0, illegal	  },
-	{2, mov_r0_n   },{2, mov_r1_n	},{2, mov_r2_n	 },{2, mov_r3_n   },{2, mov_r4_n   },{2, mov_r5_n	},{2, mov_r6_n	 },{2, mov_r7_n   },
-	{0, illegal    },{0, illegal	},{0, illegal	 },{0, illegal	  },{2, jmp_6	   },{1, sel_rb0	},{2, jz		 },{1, mov_a_psw  },
-	{1, dec_r0	   },{1, dec_r1 	},{1, dec_r2	 },{1, dec_r3	  },{1, dec_r4	   },{1, dec_r5 	},{1, dec_r6	 },{1, dec_r7	  },
-	{1, xrl_a_xr0  },{1, xrl_a_xr1	},{2, jb_6		 },{2, xrl_a_n	  },{2, call_6	   },{1, sel_rb1	},{0, illegal	 },{1, mov_psw_a  },
-	{1, xrl_a_r0   },{1, xrl_a_r1	},{1, xrl_a_r2	 },{1, xrl_a_r3   },{1, xrl_a_r4   },{1, xrl_a_r5	},{1, xrl_a_r6	 },{1, xrl_a_r7   },
-	{0, illegal    },{0, illegal	},{0, illegal	 },{2, movp3_a_xa },{2, jmp_7	   },{1, sel_mb0	},{2, jnc		 },{1, rl_a 	  },
-	{2, djnz_r0    },{2, djnz_r1	},{2, djnz_r2	 },{2, djnz_r3	  },{2, djnz_r4    },{2, djnz_r5	},{2, djnz_r6	 },{2, djnz_r7	  },
-	{1, mov_a_xr0  },{1, mov_a_xr1	},{2, jb_7		 },{0, illegal	  },{2, call_7	   },{1, sel_mb1	},{2, jc		 },{1, rlc_a	  },
-	{1, mov_a_r0   },{1, mov_a_r1	},{1, mov_a_r2	 },{1, mov_a_r3   },{1, mov_a_r4   },{1, mov_a_r5	},{1, mov_a_r6	 },{1, mov_a_r7   }
+	{1, nop	 	   },{0, illegal	},{2, outl_bus_a},{2, add_a_n	},{2, jmp 	   	},{1, en_i		},{0, illegal	},{1, dec_a		},
+	{2, ins_a_bus  },{2, in_a_p1	},{2, in_a_p2	},{0, illegal	},{2, movd_a_p4 },{2, movd_a_p5	},{2, movd_a_p6	},{2, movd_a_p7 },
+	{1, inc_xr0    },{1, inc_xr1	},{2, jb_0		},{2, adc_a_n	},{2, call	   	},{1, dis_i		},{2, jtf		},{1, inc_a		},
+	{1, inc_r0	   },{1, inc_r1 	},{1, inc_r2	},{1, inc_r3	},{1, inc_r4	},{1, inc_r5 	},{1, inc_r6	},{1, inc_r7	},
+	{1, xch_a_xr0  },{1, xch_a_xr1	},{0, illegal	},{2, mov_a_n	},{2, jmp_1	   	},{1, en_tcnti	},{2, jnt_0 	},{1, clr_a	  	},
+	{1, xch_a_r0   },{1, xch_a_r1	},{1, xch_a_r2	},{1, xch_a_r3  },{1, xch_a_r4  },{1, xch_a_r5	},{1, xch_a_r6	},{1, xch_a_r7  },
+	{1, xchd_a_xr0 },{1, xchd_a_xr1	},{2, jb_1		},{0, illegal	},{2, call_1	},{1, dis_tcnti	},{2, jt_0		},{1, cpl_a	  	},
+	{0, illegal    },{2, outl_p1_a	},{2, outl_p2_a	},{0, illegal	},{2, movd_p4_a },{2, movd_p5_a	},{2, movd_p6_a },{2, movd_p7_a },
+	{1, orl_a_xr0  },{1, orl_a_xr1	},{1, mov_a_t	},{2, orl_a_n	},{2, jmp_2	   	},{1, strt_cnt	},{2, jnt_1 	},{1, swap_a	},
+	{1, orl_a_r0   },{1, orl_a_r1	},{1, orl_a_r2	},{1, orl_a_r3  },{1, orl_a_r4  },{1, orl_a_r5	},{1, orl_a_r6	},{1, orl_a_r7  },
+	{1, anl_a_xr0  },{1, anl_a_xr1	},{2, jb_2		},{2, anl_a_n	},{2, call_2	},{1, strt_t 	},{2, jt_1		},{1, daa_a	  	},
+	{1, anl_a_r0   },{1, anl_a_r1	},{1, anl_a_r2	},{1, anl_a_r3  },{1, anl_a_r4  },{1, anl_a_r5	},{1, anl_a_r6	},{1, anl_a_r7  },
+	{1, add_a_xr0  },{1, add_a_xr1	},{1, mov_t_a	},{0, illegal	},{2, jmp_3	   	},{1, stop_tcnt	},{0, illegal	},{1, rrc_a	  	},
+	{1, add_a_r0   },{1, add_a_r1	},{1, add_a_r2	},{1, add_a_r3  },{1, add_a_r4  },{1, add_a_r5	},{1, add_a_r6	},{1, add_a_r7  },
+	{1, adc_a_xr0  },{1, adc_a_xr1	},{2, jb_3		},{0, illegal	},{2, call_3	},{1, ento_clk	},{2, jf1		},{1, rr_a 	  	},
+	{1, adc_a_r0   },{1, adc_a_r1	},{1, adc_a_r2	},{1, adc_a_r3  },{1, adc_a_r4  },{1, adc_a_r5	},{1, adc_a_r6	},{1, adc_a_r7  },
+	{2, movx_a_xr0 },{2, movx_a_xr1 },{0, illegal	},{2, ret		},{2, jmp_4	   	},{1, clr_f0 	},{2, jni		},{0, illegal	},
+	{2, orl_bus_n  },{2, orl_p1_n	},{2, orl_p2_n	},{0, illegal	},{2, orld_p4_a },{2, orld_p5_a	},{2, orld_p6_a },{2, orld_p7_a },
+	{2, movx_xr0_a },{2, movx_xr1_a },{2, jb_4		},{2, retr		},{2, call_4	},{1, cpl_f0 	},{2, jnz		},{1, clr_c	  	},
+	{2, anl_bus_n  },{2, anl_p1_n	},{2, anl_p2_n	},{0, illegal	},{2, anld_p4_a },{2, anld_p5_a	},{2, anld_p6_a },{2, anld_p7_a },
+	{1, mov_xr0_a  },{1, mov_xr1_a	},{0, illegal	},{2, movp_a_xa },{2, jmp_5	   	},{1, clr_f1 	},{0, illegal	},{1, cpl_c	  	},
+	{1, mov_r0_a   },{1, mov_r1_a	},{1, mov_r2_a	},{1, mov_r3_a  },{1, mov_r4_a  },{1, mov_r5_a	},{1, mov_r6_a	},{1, mov_r7_a  },
+	{2, mov_xr0_n  },{2, mov_xr1_n	},{2, jb_5		},{2, jmpp_xa	},{2, call_5	},{1, cpl_f1 	},{2, jf0		},{0, illegal	},
+	{2, mov_r0_n   },{2, mov_r1_n	},{2, mov_r2_n	},{2, mov_r3_n  },{2, mov_r4_n  },{2, mov_r5_n	},{2, mov_r6_n	},{2, mov_r7_n  },
+	{0, illegal    },{0, illegal	},{0, illegal	},{0, illegal	},{2, jmp_6	   	},{1, sel_rb0	},{2, jz		},{1, mov_a_psw },
+	{1, dec_r0	   },{1, dec_r1 	},{1, dec_r2	},{1, dec_r3	},{1, dec_r4	},{1, dec_r5 	},{1, dec_r6	},{1, dec_r7	},
+	{1, xrl_a_xr0  },{1, xrl_a_xr1	},{2, jb_6		},{2, xrl_a_n	},{2, call_6	},{1, sel_rb1	},{0, illegal	},{1, mov_psw_a },
+	{1, xrl_a_r0   },{1, xrl_a_r1	},{1, xrl_a_r2	},{1, xrl_a_r3  },{1, xrl_a_r4  },{1, xrl_a_r5	},{1, xrl_a_r6	},{1, xrl_a_r7  },
+	{0, illegal    },{0, illegal	},{0, illegal	},{2, movp3_a_xa},{2, jmp_7		},{1, sel_mb0	},{2, jnc		},{1, rl_a 	  	},
+	{2, djnz_r0    },{2, djnz_r1	},{2, djnz_r2	},{2, djnz_r3	},{2, djnz_r4   },{2, djnz_r5	},{2, djnz_r6	},{2, djnz_r7	},
+	{1, mov_a_xr0  },{1, mov_a_xr1	},{2, jb_7		},{0, illegal	},{2, call_7	},{1, sel_mb1	},{2, jc		},{1, rlc_a	  	},
+	{1, mov_a_r0   },{1, mov_a_r1	},{1, mov_a_r2	},{1, mov_a_r3  },{1, mov_a_r4  },{1, mov_a_r5	},{1, mov_a_r6	},{1, mov_a_r7  }
 };
 
 
@@ -559,6 +593,24 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.irq_state);
 	state_save_register_item("i8039", index, R.irq_extra_cycles);
 	state_save_register_item("i8039", index, R.Old_T1);
+	
+	R.cpu_feature = 0;
+	R.ram_mask = 0x7F;
+	/* not changed on reset*/
+	memset(R.RAM, 0x00, 128);
+	R.timer = 0;
+}
+
+static void i8035_init (int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i8039_init(index, clock, config, irqcallback);
+	R.ram_mask = 0x3F;
+}
+
+static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i8039_init(index, clock, config, irqcallback);
+	R.cpu_feature = FEATURE_M58715;
 }
 
 /****************************************************************************
@@ -569,8 +621,8 @@ static void i8039_reset (void)
 	R.PC.w.l = 0;
 	R.SP  = 0;
 	R.A   = 0;
-	R.PSW = 0x08;		/* Start with Carry SET, Bit 4 is always SET */
-	memset(R.RAM, 0x0, 128);
+	R.PSW = 0x08;		/* Start with No Carry, Bit 4 is always SET */
+	//R.PSW = C_FLAG | 0x08;
 	R.P1  = 0xff;
 	R.P2  = 0xff;
 	R.bus = 0;
@@ -580,7 +632,12 @@ static void i8039_reset (void)
 	R.A11     = 0;
 	R.tirq_en = R.xirq_en = 0;
 	R.timerON = R.countON = 0;
-	R.timerON = 1;  /* Mario Bros. doesn't work without this */
+
+	if (R.cpu_feature & FEATURE_M58715) 
+	{
+		R.timerON = 1;  /* Mario Bros. doesn't work without this */
+		//R.PSW |= C_FLAG; //MB will play startup sound, but wrong # */
+	}
 	R.irq_extra_cycles = 0;
 	R.masterClock = 0;
 }
@@ -657,9 +714,9 @@ static int Timer_IRQ(void)
  ****************************************************************************/
 static int i8039_execute(int cycles)
 {
-	unsigned opcode, T1;
+	unsigned opcode, T1, timerInt;
 	int count;
-
+	
 	i8039_ICount = (cycles - R.irq_extra_cycles);
 	R.irq_extra_cycles = 0;
 
@@ -674,22 +731,21 @@ static int i8039_execute(int cycles)
 /*      logerror("I8039:  PC = %04x,  opcode = %02x\n", R.PC.w.l, opcode); */
 
 		R.PC.w.l++;
-		inst_cycles = opcode_main[opcode].cycles;
+		R.inst_cycles = opcode_main[opcode].cycles;
 		(*(opcode_main[opcode].function))();
-		i8039_ICount -= inst_cycles; ///
+		i8039_ICount -= R.inst_cycles; ///
 
+		timerInt = 0;
 		if (R.countON)	/* NS990113 */
 		{
-			for ( ; inst_cycles > 0; inst_cycles-- )
+			for ( ; R.inst_cycles > 0; R.inst_cycles-- )
 			{
 				T1 = test_r(1);
 				if (POSITIVE_EDGE_T1)
 				{
 					R.timer++;
-					if (R.timer == 0) {
-						count = Timer_IRQ();	/* Handle Counter IRQ */
-						i8039_ICount -= count;
-					}
+					if (R.timer == 0)
+						timerInt = 0;
 				}
 				R.Old_T1 = T1;
 			}
@@ -700,12 +756,17 @@ static int i8039_execute(int cycles)
 			if (R.masterClock >= 32) {	/* NS990113 */
 				R.masterClock -= 32;
 				R.timer++;
-				if (R.timer == 0) {
-					count = Timer_IRQ();	/* Handle Timer IRQ */
-					i8039_ICount -= count;
-				}
+				if (R.timer == 0) 
+					timerInt = 1;
 			}
 		}
+		
+		if (timerInt)
+		{
+			count = Timer_IRQ();	/* Handle Timer IRQ */
+			i8039_ICount -= count;
+		}
+
 	} while (i8039_ICount>0);
 
 	i8039_ICount -= R.irq_extra_cycles;
@@ -790,6 +851,7 @@ static void i8039_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8039_R5:			R5 = info->i;							break;
 		case CPUINFO_INT_REGISTER + I8039_R6:			R6 = info->i;							break;
 		case CPUINFO_INT_REGISTER + I8039_R7:			R7 = info->i;							break;
+		case CPUINFO_INT_REGISTER + I8039_EA:			R.EA = info->i;							break;
 	}
 }
 
@@ -845,6 +907,7 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8039_R5:			info->i = R5;							break;
 		case CPUINFO_INT_REGISTER + I8039_R6:			info->i = R6;							break;
 		case CPUINFO_INT_REGISTER + I8039_R7:			info->i = R7;							break;
+		case CPUINFO_INT_REGISTER + I8039_EA:			info->i = R.EA;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8039_set_info;			break;
@@ -868,7 +931,8 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
+			sprintf(info->s, "%c %c%c%c%c%c%c%c%c",
+				R.A11        ? 'M':'.',
 				R.PSW & 0x80 ? 'C':'.',
 				R.PSW & 0x40 ? 'A':'.',
 				R.PSW & 0x20 ? 'F':'.',
@@ -894,6 +958,7 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I8039_R5:			sprintf(info->s, "R5:%02X", R.RAM[R.regPtr+5]); break;
 		case CPUINFO_STR_REGISTER + I8039_R6:			sprintf(info->s, "R6:%02X", R.RAM[R.regPtr+6]); break;
 		case CPUINFO_STR_REGISTER + I8039_R7:			sprintf(info->s, "R7:%02X", R.RAM[R.regPtr+7]); break;
+		case CPUINFO_STR_REGISTER + I8039_EA:			sprintf(info->s, "EA:%02X", R.EA); break;
 	}
 }
 
@@ -909,6 +974,7 @@ void i8035_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I8035");				break;
+		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
 
 		default:										i8039_get_info(state, info);			break;
 	}
@@ -926,6 +992,7 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I8048");				break;
+		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
 
 		default:										i8039_get_info(state, info);			break;
 	}
@@ -943,6 +1010,41 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "N7751");				break;
+		case CPUINFO_PTR_INIT:							info->init = i8039_init;				break;
+
+		default:										i8039_get_info(state, info);			break;
+	}
+}
+#endif
+
+#if (HAS_MB8884)
+/**************************************************************************
+ * CPU-specific get_info/set_info
+ **************************************************************************/
+void mb8884_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8884");				break;
+		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
+
+		default:										i8039_get_info(state, info);			break;
+	}
+}
+#endif
+
+#if (HAS_M58715)
+/**************************************************************************
+ * CPU-specific get_info/set_info
+ **************************************************************************/
+void m58715_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "M58715");				break;
+		case CPUINFO_PTR_INIT:							info->init = m58715_init;				break;
 
 		default:										i8039_get_info(state, info);			break;
 	}
