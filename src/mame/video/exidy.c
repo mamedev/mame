@@ -11,26 +11,22 @@
 UINT8 *exidy_videoram;
 UINT8 *exidy_characterram;
 UINT8 *exidy_color_latch;
+UINT8 *exidy_sprite1_xpos;
+UINT8 *exidy_sprite1_ypos;
+UINT8 *exidy_sprite2_xpos;
+UINT8 *exidy_sprite2_ypos;
+UINT8 *exidy_spriteno;
+UINT8 *exidy_sprite_enable;
 
 static UINT8 collision_mask;
 static UINT8 collision_invert;
 static int is_2bpp;
+static UINT8 int_condition;
 
 static mame_bitmap *background_bitmap;
 static mame_bitmap *motion_object_1_vid;
 static mame_bitmap *motion_object_2_vid;
 static mame_bitmap *motion_object_2_clip;
-
-static UINT8 update_complete;
-
-static UINT8 int_condition;
-
-static UINT8 spriteno;
-static UINT8 sprite_enable;
-static UINT8 sprite1_xpos;
-static UINT8 sprite1_ypos;
-static UINT8 sprite2_xpos;
-static UINT8 sprite2_ypos;
 
 
 
@@ -113,7 +109,7 @@ READ8_HANDLER( exidy_interrupt_r )
 
 /*************************************
  *
- *  Palette RAM
+ *  Palette handling
  *
  *************************************/
 
@@ -140,44 +136,6 @@ static void set_colors(running_machine *machine)
 	set_1_color(machine, 5, 3);
 	set_1_color(machine, 6, 2);
 	set_1_color(machine, 7, 1);
-}
-
-
-
-/*************************************
- *
- *  Sprite controls
- *
- *************************************/
-
-WRITE8_HANDLER( exidy_sprite1_xpos_w )
-{
-	sprite1_xpos = data;
-}
-
-WRITE8_HANDLER( exidy_sprite1_ypos_w )
-{
-	sprite1_ypos = data;
-}
-
-WRITE8_HANDLER( exidy_sprite2_xpos_w )
-{
-	sprite2_xpos = data;
-}
-
-WRITE8_HANDLER( exidy_sprite2_ypos_w )
-{
-	sprite2_ypos = data;
-}
-
-WRITE8_HANDLER( exidy_spriteno_w )
-{
-	spriteno = data;
-}
-
-WRITE8_HANDLER( exidy_sprite_enable_w )
-{
-	sprite_enable = data;
 }
 
 
@@ -256,20 +214,54 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 
 
-static TIMER_CALLBACK( collision_irq_callback )
-{
-	/* latch the collision bits */
-	latch_condition(param);
+/*************************************
+ *
+ *  Sprite hardware
+ *
+ *************************************/
 
-	/* set the IRQ line */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+INLINE int sprite_1_enabled(void)
+{
+	/* if the collision_mask is 0x00, then we are on old hardware that always has */
+	/* sprite 1 enabled regardless */
+	return (!(*exidy_sprite_enable & 0x80) || (*exidy_sprite_enable & 0x10) || (collision_mask == 0x00));
+}
+
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	/* draw sprite 2 first */
+	int enable_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
+
+	int sx = 236 - *exidy_sprite2_xpos - 4;
+	int sy = 244 - *exidy_sprite2_ypos - 4;
+
+	drawgfx(bitmap, machine->gfx[0],
+			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 1,
+			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+
+	/* draw sprite 1 next */
+	if (sprite_1_enabled())
+	{
+		int enable_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
+
+		sx = 236 - *exidy_sprite1_xpos - 4;
+		sy = 244 - *exidy_sprite1_ypos - 4;
+
+		if (sy < 0) sy = 0;
+
+		drawgfx(bitmap, machine->gfx[0],
+				(*exidy_spriteno & 0x0f) + 16 * enable_set_1, 0,
+				0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
+	}
+
 }
 
 
 
 /*************************************
  *
- *  End-of-frame callback
+ *  Collision detection
  *
  *************************************/
 
@@ -285,17 +277,20 @@ static TIMER_CALLBACK( collision_irq_callback )
 
 ***************************************************************************/
 
-INLINE int sprite_1_enabled(void)
+static TIMER_CALLBACK( collision_irq_callback )
 {
-	/* if the collision_mask is 0x00, then we are on old hardware that always has */
-	/* sprite 1 enabled regardless */
-	return (!(sprite_enable & 0x80) || (sprite_enable & 0x10) || (collision_mask == 0x00));
+	/* latch the collision bits */
+	latch_condition(param);
+
+	/* set the IRQ line */
+	cpunum_set_input_line(0, 0, ASSERT_LINE);
 }
 
-VIDEO_EOF( exidy )
+
+static void check_collision(running_machine *machine)
 {
-	UINT8 enable_set_1 = ((sprite_enable & 0x20) != 0);
-	UINT8 enable_set_2 = ((sprite_enable & 0x40) != 0);
+	UINT8 enable_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
+	UINT8 enable_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
     static const rectangle clip = { 0, 15, 0, 15 };
     int bgmask = machine->gfx[0]->color_granularity - 1;
     int org_1_x = 0, org_1_y = 0;
@@ -307,68 +302,64 @@ VIDEO_EOF( exidy )
 	if (collision_mask == 0)
 		return;
 
-	/* update the background if necessary */
-	if (!update_complete)
-		draw_background(machine, background_bitmap, NULL);
-	update_complete = 0;
-
 	/* draw sprite 1 */
 	fillbitmap(motion_object_1_vid, 0xff, &clip);
 	if (sprite_1_enabled())
 	{
-		org_1_x = 236 - sprite1_xpos - 4;
-		org_1_y = 244 - sprite1_ypos - 4;
+		org_1_x = 236 - *exidy_sprite1_xpos - 4;
+		org_1_y = 244 - *exidy_sprite1_ypos - 4;
 		drawgfx(motion_object_1_vid, machine->gfx[0],
-			(spriteno & 0x0f) + 16 * enable_set_1, 0,
-			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
+				(*exidy_spriteno & 0x0f) + 16 * enable_set_1, 0,
+				0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 	}
 
 	/* draw sprite 2 */
 	fillbitmap(motion_object_2_vid, 0xff, &clip);
-	org_2_x = 236 - sprite2_xpos - 4;
-	org_2_y = 244 - sprite2_ypos - 4;
+	org_2_x = 236 - *exidy_sprite2_xpos - 4;
+	org_2_y = 244 - *exidy_sprite2_ypos - 4;
 	drawgfx(motion_object_2_vid, machine->gfx[0],
-		((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
-		0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
+			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
+			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 
-    /* draw sprite 2 clipped to sprite 1's location */
+	/* draw sprite 2 clipped to sprite 1's location */
 	fillbitmap(motion_object_2_clip, 0xff, &clip);
 	if (sprite_1_enabled())
 	{
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
 		drawgfx(motion_object_2_clip, machine->gfx[0],
-			((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
-			0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
+				((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
+				0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
 	}
 
-    /* scan for collisions */
-    for (sy = 0; sy < 16; sy++)
-	    for (sx = 0; sx < 16; sx++)
-	    {
+	/* scan for collisions */
+	for (sy = 0; sy < 16; sy++)
+		for (sx = 0; sx < 16; sx++)
+		{
     		if (*BITMAP_ADDR16(motion_object_1_vid, sy, sx) != 0xff)
-    		{
-	  			UINT8 collision_mask = 0;
+			{
+				UINT8 collision_mask = 0;
 
-                /* check for background collision (M1CHAR) */
+				/* check for background collision (M1CHAR) */
 				if (((*BITMAP_ADDR16(background_bitmap, org_1_y + sy, org_1_x + sx) - 4) & bgmask) != 0)
 					collision_mask |= 0x04;
 
-                /* check for motion object collision (M1M2) */
+				/* check for motion object collision (M1M2) */
 				if (*BITMAP_ADDR16(motion_object_2_clip, sy, sx) != 0xff)
 					collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
 				if ((collision_mask & collision_mask) && count++ < 128)
 					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), NULL, collision_mask, collision_irq_callback);
-            }
-            if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
-    		{
-                /* check for background collision (M2CHAR) */
+			}
+
+			if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
+			{
+				/* check for background collision (M2CHAR) */
 				if (((*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) - 4) & bgmask) != 0)
 					if ((collision_mask & 0x08) && count++ < 128)
 						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
-            }
+			}
 		}
 }
 
@@ -382,9 +373,6 @@ VIDEO_EOF( exidy )
 
 VIDEO_UPDATE( exidy )
 {
-	int sx, sy;
-	UINT8 enable_set_2;
-
 	/* refresh the colors from the palette (static or dynamic) */
 	set_colors(machine);
 
@@ -392,32 +380,11 @@ VIDEO_UPDATE( exidy )
 	draw_background(machine, background_bitmap, NULL);
 	copybitmap(bitmap, background_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 
-	/* draw sprite 2 first */
-	enable_set_2 = ((sprite_enable & 0x40) != 0);
+	/* draw the sprites */
+	draw_sprites(machine, bitmap, NULL);
 
-	sx = 236 - sprite2_xpos - 4;
-	sy = 244 - sprite2_ypos - 4;
+	/* check for collision, this will set the appropriate bits in collision_mask */
+	check_collision(machine);
 
-	drawgfx(bitmap, machine->gfx[0],
-		((spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 1,
-		0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-
-	/* draw sprite 1 next */
-	if (sprite_1_enabled())
-	{
-		UINT8 enable_set_1 = ((sprite_enable & 0x20) != 0);
-
-		sx = 236 - sprite1_xpos - 4;
-		sy = 244 - sprite1_ypos - 4;
-
-		if (sy < 0) sy = 0;
-
-		drawgfx(bitmap, machine->gfx[0],
-			(spriteno & 0x0f) + 16 * enable_set_1, 0,
-			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-	}
-
-	/* indicate that we already updated the background */
-	update_complete = 1;
 	return 0;
 }

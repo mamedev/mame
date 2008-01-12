@@ -7,7 +7,7 @@
 #include "sound/custom.h"
 
 
-#define EXIDY_MASTER_CLOCK				(11289000)
+#define EXIDY_MASTER_CLOCK				(XTAL_11_289MHz)
 #define EXIDY_CPU_CLOCK					(EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK				(EXIDY_MASTER_CLOCK / 2)
 #define EXIDY_HTOTAL					(0x150)
@@ -54,23 +54,19 @@ WRITE8_HANDLER( targ_sh_w );
 
 extern UINT8 *exidy_videoram;
 extern UINT8 *exidy_characterram;
-
 extern UINT8 *exidy_color_latch;
+extern UINT8 *exidy_sprite1_xpos;
+extern UINT8 *exidy_sprite1_ypos;
+extern UINT8 *exidy_sprite2_xpos;
+extern UINT8 *exidy_sprite2_ypos;
+extern UINT8 *exidy_spriteno;
+extern UINT8 *exidy_sprite_enable;
 
 void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
 VIDEO_START( exidy );
-VIDEO_EOF( exidy );
 VIDEO_UPDATE( exidy );
 
 INTERRUPT_GEN( exidy_vblank_interrupt );
 INTERRUPT_GEN( teetert_vblank_interrupt );
-
-WRITE8_HANDLER( exidy_color_w );
-WRITE8_HANDLER( exidy_sprite1_xpos_w );
-WRITE8_HANDLER( exidy_sprite1_ypos_w );
-WRITE8_HANDLER( exidy_sprite2_xpos_w );
-WRITE8_HANDLER( exidy_sprite2_ypos_w );
-WRITE8_HANDLER( exidy_spriteno_w );
-WRITE8_HANDLER( exidy_sprite_enable_w );
 
 READ8_HANDLER( exidy_interrupt_r );
