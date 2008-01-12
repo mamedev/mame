@@ -15,34 +15,38 @@
  Unknown reads/writes:
  - AY i/o ports (writes)
  - mem $c000, $c001 = protection device ? if tests fails, game crashes (problems with stack - skipped code with "pop af")
- - i/o port $8 = data read used for  $e command arg for onr of AY chips (volume? - could be a sample player (based on volume changes?)
- - i/o port $1a = 1 or 0, rarely accessed
- - i/o ports $fe,$ff (pair, unknown device , $fe = register, $ff = data ?? sample player)
-   initialized with data:
-
- 0 34
- 1 24
- 2 2c
- 3 14
- 4 f
- 5 0
- 6 e
- 7 e
- 8 0
- 9 f
- a 0
- b 0
- c 0
- d 0
- e 0
- f 0
-
+ - i/o port $8 = data read used for  $e command arg for one of AY chips (volume? - could be a sample player (based on volume changes?)
+ - i/o port $1a = 1 or 0, rarely accessed, related to crt  writes
 */
 
 #include "driver.h"
 #include "sound/ay8910.h"
+#include "video/crtc6845.h"
 
-static UINT8* ssingles_vram;
+static tilemap *ssingles_tilemap;
+static UINT8 *ssingles_vram;
+static UINT8 prot_data;
+
+static const crtc6845_interface crtc6845_intf =
+{
+		0,
+		1000000, /* the clock of the chip  - guess */
+		8,
+		NULL,             
+		NULL,            
+		NULL,             
+		NULL              
+};
+
+static TILE_GET_INFO( get_tile_info )
+{
+	int code = ssingles_vram[tile_index]+256*(ssingles_vram[tile_index+0x800]);
+	SET_TILE_INFO(
+		0,
+		code,
+		0,
+		0);
+}
 
 static WRITE8_HANDLER(ssingles_vram_w)
 {
@@ -51,53 +55,31 @@ static WRITE8_HANDLER(ssingles_vram_w)
 
 static VIDEO_START(ssingles)
 {
+	ssingles_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,18,113 ); //smaller than 113
+	crtc6845_config(0, &crtc6845_intf);
 }
 
 static VIDEO_UPDATE(ssingles)
 {
-	int x,y;
-	int addr=0;
-	for(y=0;y<32;y++)
-	{
-		for(x=0;x<18;x++)
-		{
-			int 	code=ssingles_vram[addr]+256*(ssingles_vram[addr+0x800]&3);
-			addr++;
-
-			drawgfx(bitmap,machine->gfx[0],
-					code,
-					0,
-					0,0,
-					x<<4, y<<4,
-					0,TRANSPARENCY_NONE,0);
-		}
-	}
+	tilemap_mark_all_tiles_dirty(ssingles_tilemap);
+	tilemap_draw(bitmap,cliprect,ssingles_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	return 0;
 }
 
-static READ8_HANDLER(prot_r)
+static READ8_HANDLER(c000_r)
 {
-		int address=activecpu_get_pc();
-		switch(address)
-		{
-			case 0x638c:
-			case 0x638e: return 0;    //    not used = device reset /clear ?
-			case 0x6392: return 0x80; //1st check
-			case 0x639c: return 0xc4;	//2nd check
-			default: logerror("unk protection read @ %x\n",address);
-		}
-		return 0;
+	return prot_data;
 }
 
-static WRITE8_HANDLER(prot_w)
+static READ8_HANDLER(c001_r)
 {
-	int address=activecpu_get_pc();
-		switch(address)
-		{
-			case 0x6390:
-			case 0x639a: break;// do nothing
-			default: logerror("unk protection write %x @ %x\n",data,address);
-		}
+	prot_data=0xc4;
+	return 0;
+}
+
+static WRITE8_HANDLER(c001_w)
+{
+	prot_data^=data^0x11;
 }
 
 static READ8_HANDLER(controls_r)
@@ -118,7 +100,8 @@ static READ8_HANDLER(controls_r)
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ( MRA8_ROM ) AM_WRITE(ssingles_vram_w)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE( prot_r, prot_w ) //protection
+	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -133,8 +116,10 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ(input_port_2_r)
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
-	AM_RANGE(0x1a, 0x1a) AM_WRITENOP
-	AM_RANGE(0xfe, 0xff) AM_WRITENOP
+	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video related
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(crtc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(crtc6845_register_w)
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
@@ -223,19 +208,21 @@ static GFXDECODE_START( ssingles )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0x0000, 1 )
 GFXDECODE_END
 
+
 static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(288, 288)
+	MDRV_SCREEN_SIZE(512, 256)
 
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 288-1, 0*8, 224-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
 
 	MDRV_GFXDECODE(ssingles)
 	MDRV_PALETTE_LENGTH(16*4) //guess
@@ -267,7 +254,7 @@ ROM_START( ssingles )
 	ROM_LOAD( "11.bin", 0x8000, 0x4000, CRC(f7107b29) SHA1(a405926fd3cb4b3d2a1c705dcde25d961dba5884) )
 	ROM_LOAD( "12.bin", 0xc000, 0x4000, CRC(e5585a93) SHA1(04d55699b56d869066f2be2c6ac48042aa6c3108) )
 
-	ROM_REGION( 0x08000, REGION_USER1, 0 ) /* samples ? */
+	ROM_REGION( 0x010000, REGION_USER1, 0) /* samples ? */
 	ROM_LOAD( "5.bin", 0x00000, 0x2000, CRC(242a8dda) SHA1(e140893cc05fb8cee75904d98b02626f2565ed1b) )
 	ROM_LOAD( "6.bin", 0x02000, 0x2000, CRC(85ab8aab) SHA1(566f034e1ba23382442f27457447133a0e0f1cfc) )
 	ROM_LOAD( "7.bin", 0x04000, 0x2000, CRC(57cc112d) SHA1(fc861c58ae39503497f04d302a9f16fca19b37fb) )
