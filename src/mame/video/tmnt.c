@@ -63,15 +63,23 @@ static void mia_tile_callback(int layer,int bank,int *code,int *color,int *flags
 
 static void cuebrick_tile_callback(int layer,int bank,int *code,int *color,int *flags,int *priority)
 {
-	if (layer == 0)
-	{
-		*code |= ((*color & 0x01) << 8);
-		*color = layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
-	}
-	else
-	{
-		*code |= ((*color & 0xf) << 8);
-		*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	/* HACK! - since konamiic.c calls here with layer=0 when reading the ROM, detect this
+       and return the proper value in 'code' */
+    if ((cpu_getactivecpu() == 0) && ((activecpu_get_pc() & 0xffff0) == 0x002630))
+    	*code |= ((*color & 0xf) << 8);
+    /* normal access via the tilemap code */
+    else
+    {
+		if (layer == 0)
+		{
+			*code |= ((*color & 0x01) << 8);
+			*color = layer_colorbase[layer]  + ((*color & 0x80) >> 5) + ((*color & 0x10) >> 1);
+		}
+		else
+		{
+			*code |= ((*color & 0xf) << 8);
+			*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+		}
 	}
 }
 
