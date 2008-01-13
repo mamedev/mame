@@ -286,13 +286,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x780) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_WRITE(exidy_sfxctrl_w)
 	AM_RANGE(0x5800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -822,7 +822,9 @@ static const struct Samplesinterface targ_samples_interface =
 
 static const struct CustomSound_interface exidy_custom_interface =
 {
-	exidy_sh_start
+	exidy_sh_start,
+	0,
+	exidy_sh_reset
 };
 
 

@@ -177,6 +177,8 @@ void pia_reset(void)
 	{
 		const pia6821_interface *intf = pias[i].intf;
 
+		if (intf == NULL)  continue;
+
 		memset(&pias[i], 0, sizeof(pias[i]));
 
 		pias[i].intf = intf;
@@ -190,44 +192,11 @@ void pia_reset(void)
 		pias[i].in_a = 0xff;
 		pias[i].in_ca1 = TRUE;
 		pias[i].in_ca2 = TRUE;
+
+		/* clear the IRQs */
+		if (intf->irq_a_func) (*intf->irq_a_func)(FALSE);
+		if (intf->irq_b_func) (*intf->irq_b_func)(FALSE);
 	}
-}
-
-
-
-/*************************************
- *
- *  Wire-OR for all interrupt handlers
- *
- *************************************/
-
-static void update_shared_irq_handler(void (*irq_func)(int state))
-{
-	int i;
-
-	/* search all PIAs for this same IRQ function */
-	for (i = 0; i < MAX_PIA; i++)
-	{
-		if (pias[i].intf)
-		{
-			/* check IRQ A */
-			if ((pias[i].intf->irq_a_func == irq_func) && pias[i].irq_a_state)
-			{
-				(*irq_func)(TRUE);
-				return;
-			}
-
-			/* check IRQ B */
-			if ((pias[i].intf->irq_b_func == irq_func) && pias[i].irq_b_state)
-			{
-				(*irq_func)(TRUE);
-				return;
-			}
-		}
-	}
-
-	/* if we found nothing, the state is off */
-	(*irq_func)(FALSE);
 }
 
 
@@ -249,7 +218,7 @@ static void update_interrupts(pia6821 *p)
 	{
 		p->irq_a_state = new_state;
 
-		if (p->intf->irq_a_func) update_shared_irq_handler(p->intf->irq_a_func);
+		if (p->intf->irq_a_func) (p->intf->irq_a_func)(p->irq_a_state);
 	}
 
 	/* then do IRQ B */
@@ -259,7 +228,7 @@ static void update_interrupts(pia6821 *p)
 	{
 		p->irq_b_state = new_state;
 
-		if (p->intf->irq_b_func) update_shared_irq_handler(p->intf->irq_b_func);
+		if (p->intf->irq_b_func) (p->intf->irq_b_func)(p->irq_b_state);
 	}
 }
 
@@ -879,11 +848,21 @@ void pia_set_port_a_z_mask(int which, UINT8 data)
  *
  *************************************/
 
+UINT8 pia_get_input_a(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_a;
+}
+
+
 void pia_set_input_a(int which, UINT8 data, UINT8 z_mask)
 {
 	pia6821 *p = &pias[which];
 
 	assert_always(p->intf->in_a_func == NULL, "pia_set_input_a() called when in_a_func implemented");
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input port A = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
 
 	p->in_a = data;
 	p->port_a_z_mask = z_mask;
@@ -908,6 +887,14 @@ UINT8 pia_get_output_a(int which)
  *
  *************************************/
 
+int pia_get_input_ca1(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_ca1;
+}
+
+
 void pia_set_input_ca1(int which, int data)
 {
 	pia6821 *p = &pias[which];
@@ -915,10 +902,14 @@ void pia_set_input_ca1(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? TRUE : FALSE;
 
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CA1 = %d\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
 	/* the new state has caused a transition */
 	if ((p->in_ca1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: CA1 triggering\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which));
+
 		/* mark the IRQ */
 		p->irq_a1 = TRUE;
 
@@ -943,6 +934,14 @@ void pia_set_input_ca1(int which, int data)
  *
  *************************************/
 
+int pia_get_input_ca2(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_ca2;
+}
+
+
 void pia_set_input_ca2(int which, int data)
 {
 	pia6821 *p = &pias[which];
@@ -950,11 +949,15 @@ void pia_set_input_ca2(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CA2 = %d\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_a) &&
 		(p->in_ca2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: CA2 triggering\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which));
+
 		/* mark the IRQ */
 		p->irq_a2 = TRUE;
 
@@ -985,11 +988,21 @@ int pia_get_output_ca2(int which)
  *
  *************************************/
 
+UINT8 pia_get_input_b(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_b;
+}
+
+
 void pia_set_input_b(int which, UINT8 data)
 {
 	pia6821 *p = &pias[which];
 
 	assert_always(p->intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
+
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input port B = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
 
 	p->in_b = data;
 	p->in_b_pushed = TRUE;
@@ -1014,6 +1027,14 @@ UINT8 pia_get_output_b(int which)
  *
  *************************************/
 
+int pia_get_input_cb1(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_cb1;
+}
+
+
 void pia_set_input_cb1(int which, int data)
 {
 	pia6821 *p = &pias[which];
@@ -1021,10 +1042,14 @@ void pia_set_input_cb1(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CB1 = %d\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
 	/* the new state has caused a transition */
 	if ((p->in_cb1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
 	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: CB1 triggering\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which));
+
 		/* mark the IRQ */
 		p->irq_b1 = 1;
 
@@ -1050,6 +1075,14 @@ void pia_set_input_cb1(int which, int data)
  *
  *************************************/
 
+int pia_get_input_cb2(int which)
+{
+	pia6821 *p = &pias[which];
+
+	return p->in_cb2;
+}
+
+
 void pia_set_input_cb2(int which, int data)
 {
 	pia6821 *p = &pias[which];
@@ -1057,11 +1090,15 @@ void pia_set_input_cb2(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
+	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CB2 = %d\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, data));
+
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_b) &&
 		(p->in_cb2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
 	{
+		LOG(("cpu #%d (PC=%08X): PIA #%d: CB2 triggering\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which));
+
 		/* mark the IRQ */
 		p->irq_b2 = 1;
 
@@ -1256,23 +1293,23 @@ WRITE8_HANDLER( pia_5_portb_w ) { pia_set_input_b(5, data); }
 WRITE8_HANDLER( pia_6_portb_w ) { pia_set_input_b(6, data); }
 WRITE8_HANDLER( pia_7_portb_w ) { pia_set_input_b(7, data); }
 
-READ8_HANDLER( pia_0_porta_r ) { return pias[0].in_a; }
-READ8_HANDLER( pia_1_porta_r ) { return pias[1].in_a; }
-READ8_HANDLER( pia_2_porta_r ) { return pias[2].in_a; }
-READ8_HANDLER( pia_3_porta_r ) { return pias[3].in_a; }
-READ8_HANDLER( pia_4_porta_r ) { return pias[4].in_a; }
-READ8_HANDLER( pia_5_porta_r ) { return pias[5].in_a; }
-READ8_HANDLER( pia_6_porta_r ) { return pias[6].in_a; }
-READ8_HANDLER( pia_7_porta_r ) { return pias[7].in_a; }
+READ8_HANDLER( pia_0_porta_r ) { return pia_get_input_a(0); }
+READ8_HANDLER( pia_1_porta_r ) { return pia_get_input_a(1); }
+READ8_HANDLER( pia_2_porta_r ) { return pia_get_input_a(2); }
+READ8_HANDLER( pia_3_porta_r ) { return pia_get_input_a(3); }
+READ8_HANDLER( pia_4_porta_r ) { return pia_get_input_a(4); }
+READ8_HANDLER( pia_5_porta_r ) { return pia_get_input_a(5); }
+READ8_HANDLER( pia_6_porta_r ) { return pia_get_input_a(6); }
+READ8_HANDLER( pia_7_porta_r ) { return pia_get_input_a(7); }
 
-READ8_HANDLER( pia_0_portb_r ) { return pias[0].in_b; }
-READ8_HANDLER( pia_1_portb_r ) { return pias[1].in_b; }
-READ8_HANDLER( pia_2_portb_r ) { return pias[2].in_b; }
-READ8_HANDLER( pia_3_portb_r ) { return pias[3].in_b; }
-READ8_HANDLER( pia_4_portb_r ) { return pias[4].in_b; }
-READ8_HANDLER( pia_5_portb_r ) { return pias[5].in_b; }
-READ8_HANDLER( pia_6_portb_r ) { return pias[6].in_b; }
-READ8_HANDLER( pia_7_portb_r ) { return pias[7].in_b; }
+READ8_HANDLER( pia_0_portb_r ) { return pia_get_input_b(0); }
+READ8_HANDLER( pia_1_portb_r ) { return pia_get_input_b(1); }
+READ8_HANDLER( pia_2_portb_r ) { return pia_get_input_b(2); }
+READ8_HANDLER( pia_3_portb_r ) { return pia_get_input_b(3); }
+READ8_HANDLER( pia_4_portb_r ) { return pia_get_input_b(4); }
+READ8_HANDLER( pia_5_portb_r ) { return pia_get_input_b(5); }
+READ8_HANDLER( pia_6_portb_r ) { return pia_get_input_b(6); }
+READ8_HANDLER( pia_7_portb_r ) { return pia_get_input_b(7); }
 
 /******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
 
@@ -1312,38 +1349,38 @@ WRITE8_HANDLER( pia_5_cb2_w ) { pia_set_input_cb2(5, data); }
 WRITE8_HANDLER( pia_6_cb2_w ) { pia_set_input_cb2(6, data); }
 WRITE8_HANDLER( pia_7_cb2_w ) { pia_set_input_cb2(7, data); }
 
-READ8_HANDLER( pia_0_ca1_r ) { return pias[0].in_ca1; }
-READ8_HANDLER( pia_1_ca1_r ) { return pias[1].in_ca1; }
-READ8_HANDLER( pia_2_ca1_r ) { return pias[2].in_ca1; }
-READ8_HANDLER( pia_3_ca1_r ) { return pias[3].in_ca1; }
-READ8_HANDLER( pia_4_ca1_r ) { return pias[4].in_ca1; }
-READ8_HANDLER( pia_5_ca1_r ) { return pias[5].in_ca1; }
-READ8_HANDLER( pia_6_ca1_r ) { return pias[6].in_ca1; }
-READ8_HANDLER( pia_7_ca1_r ) { return pias[7].in_ca1; }
+READ8_HANDLER( pia_0_ca1_r ) { return pia_get_input_ca1(0); }
+READ8_HANDLER( pia_1_ca1_r ) { return pia_get_input_ca1(1); }
+READ8_HANDLER( pia_2_ca1_r ) { return pia_get_input_ca1(2); }
+READ8_HANDLER( pia_3_ca1_r ) { return pia_get_input_ca1(3); }
+READ8_HANDLER( pia_4_ca1_r ) { return pia_get_input_ca1(4); }
+READ8_HANDLER( pia_5_ca1_r ) { return pia_get_input_ca1(5); }
+READ8_HANDLER( pia_6_ca1_r ) { return pia_get_input_ca1(6); }
+READ8_HANDLER( pia_7_ca1_r ) { return pia_get_input_ca1(7); }
 
-READ8_HANDLER( pia_0_ca2_r ) { return pias[0].in_ca2; }
-READ8_HANDLER( pia_1_ca2_r ) { return pias[1].in_ca2; }
-READ8_HANDLER( pia_2_ca2_r ) { return pias[2].in_ca2; }
-READ8_HANDLER( pia_3_ca2_r ) { return pias[3].in_ca2; }
-READ8_HANDLER( pia_4_ca2_r ) { return pias[4].in_ca2; }
-READ8_HANDLER( pia_5_ca2_r ) { return pias[5].in_ca2; }
-READ8_HANDLER( pia_6_ca2_r ) { return pias[6].in_ca2; }
-READ8_HANDLER( pia_7_ca2_r ) { return pias[7].in_ca2; }
+READ8_HANDLER( pia_0_ca2_r ) { return pia_get_input_ca2(0); }
+READ8_HANDLER( pia_1_ca2_r ) { return pia_get_input_ca2(1); }
+READ8_HANDLER( pia_2_ca2_r ) { return pia_get_input_ca2(2); }
+READ8_HANDLER( pia_3_ca2_r ) { return pia_get_input_ca2(3); }
+READ8_HANDLER( pia_4_ca2_r ) { return pia_get_input_ca2(4); }
+READ8_HANDLER( pia_5_ca2_r ) { return pia_get_input_ca2(5); }
+READ8_HANDLER( pia_6_ca2_r ) { return pia_get_input_ca2(6); }
+READ8_HANDLER( pia_7_ca2_r ) { return pia_get_input_ca2(7); }
 
-READ8_HANDLER( pia_0_cb1_r ) { return pias[0].in_cb1; }
-READ8_HANDLER( pia_1_cb1_r ) { return pias[1].in_cb1; }
-READ8_HANDLER( pia_2_cb1_r ) { return pias[2].in_cb1; }
-READ8_HANDLER( pia_3_cb1_r ) { return pias[3].in_cb1; }
-READ8_HANDLER( pia_4_cb1_r ) { return pias[4].in_cb1; }
-READ8_HANDLER( pia_5_cb1_r ) { return pias[5].in_cb1; }
-READ8_HANDLER( pia_6_cb1_r ) { return pias[6].in_cb1; }
-READ8_HANDLER( pia_7_cb1_r ) { return pias[7].in_cb1; }
+READ8_HANDLER( pia_0_cb1_r ) { return pia_get_input_cb1(0); }
+READ8_HANDLER( pia_1_cb1_r ) { return pia_get_input_cb1(1); }
+READ8_HANDLER( pia_2_cb1_r ) { return pia_get_input_cb1(2); }
+READ8_HANDLER( pia_3_cb1_r ) { return pia_get_input_cb1(3); }
+READ8_HANDLER( pia_4_cb1_r ) { return pia_get_input_cb1(4); }
+READ8_HANDLER( pia_5_cb1_r ) { return pia_get_input_cb1(5); }
+READ8_HANDLER( pia_6_cb1_r ) { return pia_get_input_cb1(6); }
+READ8_HANDLER( pia_7_cb1_r ) { return pia_get_input_cb1(7); }
 
-READ8_HANDLER( pia_0_cb2_r ) { return pias[0].in_cb2; }
-READ8_HANDLER( pia_1_cb2_r ) { return pias[1].in_cb2; }
-READ8_HANDLER( pia_2_cb2_r ) { return pias[2].in_cb2; }
-READ8_HANDLER( pia_3_cb2_r ) { return pias[3].in_cb2; }
-READ8_HANDLER( pia_4_cb2_r ) { return pias[4].in_cb2; }
-READ8_HANDLER( pia_5_cb2_r ) { return pias[5].in_cb2; }
-READ8_HANDLER( pia_6_cb2_r ) { return pias[6].in_cb2; }
-READ8_HANDLER( pia_7_cb2_r ) { return pias[7].in_cb2; }
+READ8_HANDLER( pia_0_cb2_r ) { return pia_get_input_cb2(0); }
+READ8_HANDLER( pia_1_cb2_r ) { return pia_get_input_cb2(1); }
+READ8_HANDLER( pia_2_cb2_r ) { return pia_get_input_cb2(2); }
+READ8_HANDLER( pia_3_cb2_r ) { return pia_get_input_cb2(3); }
+READ8_HANDLER( pia_4_cb2_r ) { return pia_get_input_cb2(4); }
+READ8_HANDLER( pia_5_cb2_r ) { return pia_get_input_cb2(5); }
+READ8_HANDLER( pia_6_cb2_r ) { return pia_get_input_cb2(6); }
+READ8_HANDLER( pia_7_cb2_r ) { return pia_get_input_cb2(7); }

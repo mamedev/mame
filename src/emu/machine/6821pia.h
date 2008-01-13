@@ -76,6 +76,7 @@ void pia_set_port_a_z_mask(int which, UINT8 data);  /* see second note */
 
 /*------------- Device interface for port A --------------*/
 
+UINT8 pia_get_input_a(int which);
 void pia_set_input_a(int which, UINT8 data, UINT8 z_mask);
 UINT8 pia_get_output_a(int which);
 
@@ -83,19 +84,22 @@ UINT8 pia_get_output_a(int which);
 
 /*----------- Device interface for the CA1 pin -----------*/
 
+int pia_get_input_ca1(int which);
 void pia_set_input_ca1(int which, int data);
 
 
 
 /*----------- Device interface for the CA2 pin -----------*/
 
+int pia_get_input_ca2(int which);
 void pia_set_input_ca2(int which, int data);
 int pia_get_output_ca2(int which);
 
 
 
-/*------------- Device interface for port A --------------*/
+/*------------- Device interface for port B --------------*/
 
+UINT8 pia_get_input_b(int which);
 void pia_set_input_b(int which, UINT8 data);
 UINT8 pia_get_output_b(int which);
 
@@ -103,12 +107,14 @@ UINT8 pia_get_output_b(int which);
 
 /*----------- Device interface for the CB1 pin -----------*/
 
+int pia_get_input_cb1(int which);
 void pia_set_input_cb1(int which, int data);
 
 
 
 /*----------- Device interface for the CB2 pin -----------*/
 
+int pia_get_input_cb2(int which);
 void pia_set_input_cb2(int which, int data);
 int pia_get_output_cb2(int which);
 int pia_get_output_cb2_z(int which);  /* see first note */

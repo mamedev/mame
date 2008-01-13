@@ -97,88 +97,9 @@
 
 #include "driver.h"
 #include "exidy.h"
+#include "victory.h"
 #include "machine/6821pia.h"
 #include "sound/5220intf.h"
-
-
-#define LOG_SOUND		0
-
-
-static UINT8 sound_response;
-static UINT8 sound_response_ack_clk;
-
-
-/* video driver data & functions */
-extern UINT8 *victory_charram;
-
-VIDEO_START( victory );
-VIDEO_EOF( victory );
-VIDEO_UPDATE( victory );
-INTERRUPT_GEN( victory_vblank_interrupt );
-
-READ8_HANDLER( victory_video_control_r );
-WRITE8_HANDLER( victory_video_control_w );
-WRITE8_HANDLER( victory_paletteram_w );
-WRITE8_HANDLER( victory_videoram_w );
-WRITE8_HANDLER( victory_charram_w );
-
-
-
-/*************************************
- *
- *  Sound CPU control
- *
- *************************************/
-
-static READ8_HANDLER( sound_response_r )
-{
-	if (LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", activecpu_get_previouspc(), sound_response);
-	pia_0_cb1_w(0, 0);
-	return sound_response;
-}
-
-
-static READ8_HANDLER( sound_status_r )
-{
-	if (LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", activecpu_get_previouspc(), (pia_0_ca1_r(0) << 7) | (pia_0_cb1_r(0) << 6));
-	return (pia_0_ca1_r(0) << 7) | (pia_0_cb1_r(0) << 6);
-}
-
-
-static TIMER_CALLBACK( delayed_command_w )
-{
-	pia_0_porta_w(0, param);
-	pia_0_ca1_w(0, 0);
-	if (LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), param);
-}
-
-static WRITE8_HANDLER( sound_command_w )
-{
-	timer_call_after_resynch(NULL, data, delayed_command_w);
-}
-
-
-WRITE8_HANDLER( victory_sound_response_w )
-{
-	sound_response = data;
-	if (LOG_SOUND) logerror("%04X:!!!! Sound response = %02X\n", activecpu_get_previouspc(), data);
-}
-
-
-WRITE8_HANDLER( victory_sound_irq_clear_w )
-{
-	if (LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", activecpu_get_previouspc(), data);
-	if (!data) pia_0_ca1_w(0, 1);
-}
-
-
-WRITE8_HANDLER( victory_main_ack_w )
-{
-	if (LOG_SOUND) logerror("%04X:!!!! Sound ack = %02X\n", activecpu_get_previouspc(), data);
-	if (sound_response_ack_clk && !data)
-		pia_0_cb1_w(0, 1);
-	sound_response_ack_clk = data;
-}
 
 
 
@@ -190,10 +111,10 @@ WRITE8_HANDLER( victory_main_ack_w )
 
 static WRITE8_HANDLER( lamp_control_w )
 {
-	set_led_status(0,data & 0x80);
-	set_led_status(1,data & 0x40);
-	set_led_status(2,data & 0x20);
-	set_led_status(3,data & 0x10);
+	set_led_status(0, data & 0x80);
+	set_led_status(1, data & 0x40);
+	set_led_status(2, data & 0x20);
+	set_led_status(3, data & 0x10);
 }
 
 
@@ -208,17 +129,17 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READ(victory_video_control_r)
 	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(victory_video_control_w)
-	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(victory_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(MRA8_RAM, victory_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc800, 0xdfff) AM_READWRITE(MRA8_RAM, victory_charram_w) AM_BASE(&victory_charram)
+	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(victory_paletteram_w)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&victory_videoram)
+	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE(&victory_charram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(sound_response_r, sound_command_w)
-	AM_RANGE(0xf801, 0xf801) AM_READ(sound_status_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_READWRITE(victory_sound_response_r, victory_sound_command_w)
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_READ(victory_sound_status_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x03) AM_READ(input_port_0_r)
 	AM_RANGE(0x04, 0x07) AM_READ(input_port_1_r)
@@ -237,15 +158,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(exidy_sound_filter_w)
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(exidy_sfxctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x4000, 0x4fff) AM_NOP
+	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x7000, 0xafff) AM_NOP
+	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -310,7 +232,7 @@ static const struct CustomSound_interface custom_interface =
 {
     victory_sh_start,
     0,
-	0
+	victory_sh_reset,
 };
 
 
@@ -324,26 +246,25 @@ static const struct CustomSound_interface custom_interface =
 static MACHINE_DRIVER_START( victory )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, VICTORY_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_IO_MAP(main_iomap,0)
+	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT(victory_vblank_interrupt,1)
 
-	MDRV_CPU_ADD(M6502,3579545/4)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_ADD(M6502, VICTORY_AUDIO_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
 	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(victory)
-	MDRV_VIDEO_EOF(victory)
 	MDRV_VIDEO_UPDATE(victory)
 
 	/* sound hardware */

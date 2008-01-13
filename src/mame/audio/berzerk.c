@@ -23,7 +23,9 @@ static const struct S14001A_interface berzerk_s14001a_interface =
 
 static const struct CustomSound_interface custom_interface =
 {
-	berzerk_sh_start
+	berzerk_sh_start,
+	0,
+	berzerk_sh_reset,
 };
 
 

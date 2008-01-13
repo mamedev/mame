@@ -21,7 +21,7 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC			(3579545)
+#define CRYSTAL_OSC			(XTAL_3_579545MHz)
 #define SH8253_CLOCK		(CRYSTAL_OSC/2)
 #define SH6840_CLOCK		(CRYSTAL_OSC/4)
 #define SH6532_CLOCK		(CRYSTAL_OSC/4)
@@ -43,8 +43,7 @@ enum
  *
  *************************************/
 
-/* IRQ variables */
-static UINT8 pia_irq_state;
+/* IRQ variable */
 static UINT8 riot_irq_state;
 
 /* 6532 variables */
@@ -87,7 +86,9 @@ static UINT32 sh6840_LFSR_2 = 0xffffffff;/* ditto */
 static UINT32 sh6840_LFSR_3 = 0xffffffff;/* ditto */
 static UINT32 sh6840_clocks_per_sample;
 static UINT32 sh6840_clock_count;
+
 static UINT8 exidy_sfxctrl;
+static UINT8 victory_sound_response_ack_clk;	/* 7474 @ F4 */
 
 /* 8253 variables */
 struct sh8253_timer_channel
@@ -117,11 +118,11 @@ static double freq_to_step;
  *
  *************************************/
 
-static void exidy_irq(int state);
+static void update_irq_state(int);
 
-WRITE8_HANDLER(victory_sound_response_w);
-WRITE8_HANDLER(victory_sound_irq_clear_w);
-WRITE8_HANDLER(victory_main_ack_w);
+static WRITE8_HANDLER( victory_sound_irq_clear_w );
+static WRITE8_HANDLER( victory_main_ack_w );
+
 
 /* PIA 0 */
 static const pia6821_interface pia_0_intf =
@@ -136,35 +137,28 @@ static const pia6821_interface pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_0_portb_w, pia_0_porta_w, pia_0_cb1_w, pia_0_ca1_w,
-	/*irqs   : A/B             */ 0, exidy_irq
+	/*irqs   : A/B             */ 0, update_irq_state
 };
 
 /* Victory PIA 0 */
-static const pia6821_interface victory_pia_0_intf =
+static const pia6821_interface victory_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, victory_sound_response_w, victory_sound_irq_clear_w, victory_main_ack_w,
-	/*irqs   : A/B             */ 0, exidy_irq
+	/*outputs: A/B,CA/B2       */ 0, 0, victory_sound_irq_clear_w, victory_main_ack_w,
+	/*irqs   : A/B             */ 0, update_irq_state
 };
 
 
 
 /*************************************
  *
- *  Interrupt generation helpers
+ *  Interrupt generation helper
  *
  *************************************/
 
-INLINE void update_irq_state(void)
+static void update_irq_state(/* unused */ int state)
 {
-	cpunum_set_input_line(1, M6502_IRQ_LINE, (pia_irq_state | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static void exidy_irq(int state)
-{
-	pia_irq_state = state;
-	update_irq_state();
+	cpunum_set_input_line(1, M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -384,6 +378,71 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 /*************************************
  *
+ *  Extra logic for Victory
+ *
+ *************************************/
+
+#define VICTORY_LOG_SOUND	0
+
+
+READ8_HANDLER( victory_sound_response_r )
+{
+	UINT8 ret = pia_get_output_b(1);
+
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", activecpu_get_previouspc(), ret);
+
+	pia_set_input_cb1(1, 0);
+
+	return ret;
+}
+
+
+READ8_HANDLER( victory_sound_status_r )
+{
+	UINT8 ret = (pia_get_input_ca1(1) << 7) | (pia_get_input_cb1(1) << 6);
+
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", activecpu_get_previouspc(), ret);
+
+	return ret;
+}
+
+
+static TIMER_CALLBACK( delayed_command_w )
+{
+	pia_set_input_a(1, param, 0);
+	pia_set_input_ca1(1, 0);
+}
+
+WRITE8_HANDLER( victory_sound_command_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), data);
+
+	timer_call_after_resynch(NULL, data, delayed_command_w);
+}
+
+
+WRITE8_HANDLER( victory_sound_irq_clear_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", activecpu_get_previouspc(), data);
+
+	if (!data) pia_set_input_ca1(1, 1);
+}
+
+
+static WRITE8_HANDLER( victory_main_ack_w )
+{
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", activecpu_get_previouspc(), data);
+
+	if (victory_sound_response_ack_clk && !data)
+		pia_set_input_cb1(1, 1);
+
+	victory_sound_response_ack_clk = data;
+}
+
+
+
+/*************************************
+ *
  *  Sound startup routines
  *
  *************************************/
@@ -409,36 +468,13 @@ static void *common_start(void)
 	/* allocate the stream */
 	exidy_stream = stream_create(0, 1, sample_rate, NULL, exidy_stream_update);
 
-	/* Init PIA */
-	pia_reset();
-
-	/* Init LFSR */
-	sh6840_LFSR_oldxor = 0;
-	sh6840_LFSR_0 = 0xffffffff;
-	sh6840_LFSR_1 = 0xffffffff;
-	sh6840_LFSR_2 = 0xffffffff;
-	sh6840_LFSR_3 = 0xffffffff;
-
-	/* Init 6532 */
+	/* 6532 */
     riot_timer = timer_alloc(riot_interrupt, NULL);
-    riot_irq_flag = 0;
-    riot_timer_irq_enable = 0;
-	riot_porta_data = 0xff;
-	riot_portb_data = 0xff;
-    riot_clock_divisor = 1;
-    riot_state = RIOT_IDLE;
 
-	/* Init 6840 */
-	memset(sh6840_timer, 0, sizeof(sh6840_timer));
+	/* 6840 */
 	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
-	sh6840_MSB = 0;
-	sh6840_volume[0] = 0;
-	sh6840_volume[1] = 0;
-	sh6840_volume[2] = 0;
-	exidy_sfxctrl = 0;
 
-	/* Init 8253 */
-	memset(sh8253_timer, 0, sizeof(sh8253_timer));
+	/* 8253 */
 	freq_to_step = (double)(1 << 24) / (double)sample_rate;
 
 	return auto_malloc(1);
@@ -447,7 +483,6 @@ static void *common_start(void)
 
 void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	/* Init PIA */
 	pia_config(0, &pia_0_intf);
 	pia_config(1, &pia_1_intf);
 	has_sh8253 = TRUE;
@@ -457,10 +492,9 @@ void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
 
 void *victory_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	/* Init PIA */
-	pia_config(0, &victory_pia_0_intf);
-	pia_0_cb1_w(0, 1);
+	pia_config(1, &victory_pia_1_intf);
 	has_sh8253 = TRUE;
+
 	return common_start();
 }
 
@@ -469,6 +503,73 @@ void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	has_sh8253 = FALSE;
 	return common_start();
+}
+
+
+
+/*************************************
+ *
+ *  Sound reset routines
+ *
+ *************************************/
+
+static void common_reset(void)
+{
+	/* PIA */
+	pia_reset();
+
+	/* LFSR */
+	sh6840_LFSR_oldxor = 0;
+	sh6840_LFSR_0 = 0xffffffff;
+	sh6840_LFSR_1 = 0xffffffff;
+	sh6840_LFSR_2 = 0xffffffff;
+	sh6840_LFSR_3 = 0xffffffff;
+
+	/* 6532 */
+	riot_irq_flag = 0;
+	riot_timer_irq_enable = 0;
+	riot_porta_data = 0xff;
+	riot_portb_data = 0xff;
+	riot_clock_divisor = 1;
+	riot_state = RIOT_IDLE;
+
+	/* 6840 */
+	memset(sh6840_timer, 0, sizeof(sh6840_timer));
+	sh6840_MSB = 0;
+	sh6840_volume[0] = 0;
+	sh6840_volume[1] = 0;
+	sh6840_volume[2] = 0;
+	exidy_sfxctrl = 0;
+
+	/* 8253 */
+	memset(sh8253_timer, 0, sizeof(sh8253_timer));
+}
+
+
+void exidy_sh_reset(void *token)
+{
+	common_reset();
+}
+
+
+void victory_sh_reset(void *token)
+{
+	common_reset();
+
+	/* the flip-flop @ F4 is reset */
+	victory_sound_response_ack_clk = 0;
+	pia_set_input_cb1(1, 1);
+
+	/* these two lines shouldn't be needed, but it avoids the log entry
+       as the sound CPU checks port A before the main CPU ever writes to it */
+	pia_set_input_a(1, 0, 0);
+	pia_set_input_ca1(1, 1);
+}
+
+
+void berzerk_sh_reset(void *token)
+{
+	common_reset();
 }
 
 
@@ -487,7 +588,7 @@ static TIMER_CALLBACK( riot_interrupt )
 		/* generate the IRQ */
 		riot_irq_flag |= 0x80;
 		riot_irq_state = riot_timer_irq_enable;
-		update_irq_state();
+		update_irq_state(0);
 
 		/* now start counting clock cycles down */
 		riot_state = RIOT_POST_COUNT;
@@ -512,9 +613,6 @@ static TIMER_CALLBACK( riot_interrupt )
 
 WRITE8_HANDLER( exidy_shriot_w )
 {
-	/* mask to the low 7 bits */
-	offset &= 0x7f;
-
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
 	{
@@ -568,10 +666,10 @@ WRITE8_HANDLER( exidy_shriot_w )
 		if (riot_state != RIOT_COUNT)
 			riot_irq_flag &= ~0x80;
 		riot_irq_state = 0;
-		update_irq_state();
+		update_irq_state(0);
 
 		/* set the enable from the offset */
-		riot_timer_irq_enable = offset & 0x08;
+		riot_timer_irq_enable = (offset & 0x08) ? 1 : 0;
 
 		/* set a new timer */
 		riot_clock_divisor = divisors[offset & 0x03];
@@ -590,9 +688,6 @@ WRITE8_HANDLER( exidy_shriot_w )
 
 READ8_HANDLER( exidy_shriot_r )
 {
-	/* mask to the low 7 bits */
-	offset &= 0x7f;
-
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
 	{
@@ -624,7 +719,7 @@ READ8_HANDLER( exidy_shriot_r )
 		int temp = riot_irq_flag;
 		riot_irq_flag = 0;
 		riot_irq_state = 0;
-		update_irq_state();
+		update_irq_state(0);
 		return temp;
 	}
 
@@ -666,7 +761,6 @@ WRITE8_HANDLER( exidy_sh8253_w )
 
 	stream_update(exidy_stream);
 
-	offset &= 3;
 	switch (offset)
 	{
 		case 0:
@@ -723,8 +817,6 @@ WRITE8_HANDLER( exidy_sh6840_w )
 	/* force an update of the stream */
 	stream_update(exidy_stream);
 
-	/* only look at the low 3 bits */
-	offset &= 7;
 	switch (offset)
 	{
 		/* offset 0 writes to either channel 0 control or channel 2 control */
@@ -784,7 +876,6 @@ WRITE8_HANDLER( exidy_sfxctrl_w )
 {
 	stream_update(exidy_stream);
 
-	offset &= 3;
 	switch (offset)
 	{
 		case 0:
