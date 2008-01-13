@@ -351,6 +351,48 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 	zoom = punchout_bigsprite1[0] + 256 * (punchout_bigsprite1[1] & 0x0f);
 	if (zoom)
 	{
+		mame_bitmap *sprbitmap = tilemap_get_pixmap(spr1tilemap);
+		int sx,sy;
+		UINT32 startx,starty;
+		int incxx,incyy;
+
+		sx = 4096 - (punchout_bigsprite1[2] + 256 * (punchout_bigsprite1[3] & 0x0f));
+		if (sx > 4096-4*127) sx -= 4096;
+
+		sy = -(punchout_bigsprite1[4] + 256 * (punchout_bigsprite1[5] & 1));
+		if (sy <= -256 + zoom/0x40) sy += 512;
+		sy += 12;
+
+		incxx = zoom << 6;
+		incyy = zoom << 6;
+
+		startx = -sx * 0x4000;
+		starty = -sy * 0x10000;
+		startx += 3740 * zoom;	/* adjustment to match the screen shots */
+		starty -= 178 * zoom;	/* and make the hall of fame picture nice */
+
+		if (punchout_bigsprite1[6] & 1)	/* flip x */
+		{
+			startx = (sprbitmap->width << 16) - startx - 1;
+			incxx = -incxx;
+		}
+
+		copyrozbitmap(bitmap,sprbitmap,
+			startx,starty + 0x200*(2) * zoom,
+			incxx,0,0,incyy,	/* zoom, no rotation */
+			0,	/* no wraparound */
+			cliprect,TRANSPARENCY_COLOR,1024,0);
+	}
+}
+
+
+static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	int zoom;
+
+	zoom = punchout_bigsprite1[0] + 256 * (punchout_bigsprite1[1] & 0x0f);
+	if (zoom)
+	{
 		mame_bitmap *sprbitmap;
 		int sx,sy;
 		UINT32 startx,starty;
@@ -440,14 +482,14 @@ VIDEO_UPDATE( armwrest )
 		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
-			draw_big_sprite(bitmap, cliprect);
+			armwrest_draw_big_sprite(bitmap, cliprect);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, punchout_botTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
-			draw_big_sprite(bitmap, cliprect);
+			armwrest_draw_big_sprite(bitmap, cliprect);
 		drawbs2(bitmap, cliprect);
 
 		tilemap_draw(bitmap, cliprect, fgtilemap, 0, 0);
