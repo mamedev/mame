@@ -12,7 +12,7 @@
 #define LOG_OBJECTS			0
 
 
-static UINT16 scanline[360];
+static UINT16 *scanline;
 static UINT16 *clutbase;
 static UINT8 *blend_y, *blend_cc;
 
@@ -900,87 +900,75 @@ static UINT32 *process_branch(UINT32 *objdata, int vc, int logit)
  *
  *************************************/
 
-static void process_object_list(mame_bitmap *bitmap, const rectangle *cliprect)
+static void process_object_list(int vc, UINT16 *_scanline)
 {
+	int done = 0, count = 0;
 	UINT32 *objdata;
-	int y, x, pass;
 	int logit;
+	int x;
 
-	/* loop over all scanlines */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
-		/* erase the scanline first */
-		for (x = 0; x < 336; x++)
-			scanline[x] = gpu_regs[BG];
+	/* erase the scanline first */
+	scanline = _scanline;
+	for (x = 0; x < 336; x++)
+		scanline[x] = gpu_regs[BG];
 
 #if LOG_OBJECTS
-		logit = (y == cliprect->min_y);
+	logit = (y == cliprect->min_y);
 #else
-		logit = 0;
+	logit = 0;
 #endif
 
-		/* two passes per scanline */
-		for (pass = 0; pass < 1; pass++)
+	/* fetch the object pointer */
+	objdata = (UINT32 *)get_jaguar_memory((gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);
+	while (!done && objdata && count++ < 100)
+	{
+		/* the low 3 bits determine the command */
+		switch (objdata[1] & 7)
 		{
-			int vc = y * 2 + pass + gpu_regs[VBE];
-			int done = 0, count = 0;
+			/* bitmap object */
+			case 0:
+				if (logit)
+					logerror("bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
+				objdata = process_bitmap(objdata, vc, logit);
+				break;
 
-			/* fetch the object pointer */
-			objdata = (UINT32 *)get_jaguar_memory((gpu_regs[OLP_H] << 16) | gpu_regs[OLP_L]);
-			while (!done && objdata && count++ < 100)
+			/* scaled bitmap object */
+			case 1:
+				if (logit)
+					logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
+				objdata = process_scaled_bitmap(objdata, vc, logit);
+				break;
+
+			/* branch */
+			case 3:
+				if (logit)
+					logerror("branch = %08X-%08X\n", objdata[0], objdata[1]);
+				objdata = process_branch(objdata, vc, logit);
+				break;
+
+			/* stop */
+			case 4:
 			{
-				/* the low 3 bits determine the command */
-				switch (objdata[1] & 7)
+				int interrupt = (objdata[1] >> 3) & 1;
+				done = 1;
+
+				if (logit)
+					logerror("stop   = %08X-%08X\n", objdata[0], objdata[1]);
+				if (interrupt)
 				{
-					/* bitmap object */
-					case 0:
-						if (logit)
-							logerror("bitmap = %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3]);
-						objdata = process_bitmap(objdata, vc, logit);
-						break;
-
-					/* scaled bitmap object */
-					case 1:
-						if (logit)
-							logerror("scaled = %08X-%08X %08X-%08X %08X-%08X\n", objdata[0], objdata[1], objdata[2], objdata[3], objdata[4], objdata[5]);
-						objdata = process_scaled_bitmap(objdata, vc, logit);
-						break;
-
-					/* branch */
-					case 3:
-						if (logit)
-							logerror("branch = %08X-%08X\n", objdata[0], objdata[1]);
-						objdata = process_branch(objdata, vc, logit);
-						break;
-
-					/* stop */
-					case 4:
-					{
-						int interrupt = (objdata[1] >> 3) & 1;
-						done = 1;
-
-						if (logit)
-							logerror("stop   = %08X-%08X\n", objdata[0], objdata[1]);
-						if (interrupt)
-						{
 #ifndef MESS
-							fprintf(stderr, "stop int=%d\n", interrupt);
+					fprintf(stderr, "stop int=%d\n", interrupt);
 #endif
-							cpu_irq_state |= 4;
-							update_cpu_irq();
-						}
-						break;
-					}
-
-					default:
-						fprintf(stderr, "%08X %08X\n", objdata[0], objdata[1]);
-						done = 1;
-						break;
+					cpu_irq_state |= 4;
+					update_cpu_irq();
 				}
+				break;
 			}
-		}
 
-		/* render this scanline */
-		draw_scanline16(bitmap, 0, y, 336, scanline, pen_table, -1);
+			default:
+				fprintf(stderr, "%08X %08X\n", objdata[0], objdata[1]);
+				done = 1;
+				break;
+		}
 	}
 }

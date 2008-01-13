@@ -177,6 +177,11 @@ Notes:
 #include "jaguar.h"
 
 
+#define JAGUAR_CLOCK		XTAL_52MHz
+#define R3000_CLOCK			XTAL_40MHz
+#define M68K_CLOCK			XTAL_50MHz
+
+
 
 /*************************************
  *
@@ -987,29 +992,27 @@ static const struct jaguar_config dsp_config =
 static MACHINE_DRIVER_START( cojagr3k )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(R3000BE, 66000000/2)
+	MDRV_CPU_ADD_TAG("main", R3041BE, R3000_CLOCK)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(r3000_map,0)
 
-	MDRV_CPU_ADD(JAGUARGPU, 52000000/2)
+	MDRV_CPU_ADD(JAGUARGPU, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(gpu_config)
 	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
 
-	MDRV_CPU_ADD(JAGUARDSP, 52000000/2)
+	MDRV_CPU_ADD(JAGUARDSP, JAGUAR_CLOCK/2)
 	MDRV_CPU_CONFIG(dsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_MACHINE_RESET(cojag)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 262)	  /* guess -- TOM registers should be used to configure screen */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
-	MDRV_PALETTE_LENGTH(65534)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(COJAG_PIXEL_CLOCK/2, 456, 42, 402, 262, 17, 257)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
 	MDRV_VIDEO_START(cojag)
 	MDRV_VIDEO_UPDATE(cojag)
@@ -1022,54 +1025,15 @@ static MACHINE_DRIVER_START( cojagr3k )
 
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( r3knarrow )
-	MDRV_IMPORT_FROM(cojagr3k)
-
-	/* video hardware */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( cojag68k )
+	MDRV_IMPORT_FROM(cojagr3k)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 50000000/2)
+	MDRV_CPU_REPLACE("main", M68EC020, M68K_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(m68020_map,0)
-
-	MDRV_CPU_ADD(JAGUARGPU, 52000000/2)
-	MDRV_CPU_CONFIG(gpu_config)
-	MDRV_CPU_PROGRAM_MAP(gpu_map,0)
-
-	MDRV_CPU_ADD(JAGUARDSP, 52000000/2)
-	MDRV_CPU_CONFIG(dsp_config)
-	MDRV_CPU_PROGRAM_MAP(dsp_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
-
-	MDRV_MACHINE_RESET(cojag)
-	MDRV_NVRAM_HANDLER(generic_1fill)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(42*8, 262)	  /* guess -- TOM registers should be used to configure screen */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_PALETTE_LENGTH(65534)
-
-	MDRV_VIDEO_START(cojag)
-	MDRV_VIDEO_UPDATE(cojag)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1423,7 +1387,7 @@ ROM_END
 static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UINT16 spin_pc)
 {
 	/* copy over the ROM */
-	cojag_is_r3000 = (machine->drv->cpu[0].type == CPU_R3000BE);
+	cojag_is_r3000 = (machine->drv->cpu[0].type == CPU_R3041BE);
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)
@@ -1560,7 +1524,7 @@ static DRIVER_INIT( vcircle )
  *
  *************************************/
 
-GAME( 1996, area51,   0,        r3knarrow, area51,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
+GAME( 1996, area51,   0,        cojagr3k,  area51,   area51,   ROT0, "Atari Games", "Area 51 (R3000)", 0 )
 GAME( 1995, area51t,  area51,   cojag68k,  area51,   area51a,  ROT0, "Time Warner", "Area 51 (Time Warner License)", 0 )
 GAME( 1995, area51a,  area51,   cojag68k,  area51,   area51a,  ROT0, "Atari Games", "Area 51 (Atari Games License)", 0 )
 GAME( 1995, fishfren, 0,        cojagr3k,  fishfren, fishfren, ROT0, "Time Warner Interactive", "Fishin' Frenzy (prototype)", 0 )
@@ -1571,9 +1535,9 @@ GAME( 1996, freezea3, freezeat, cojagr3k,  freezeat, freezea3, ROT0, "Atari Game
 GAME( 1996, freezea4, freezeat, cojagr3k,  freezeat, freezea4, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/10/03)", 0 )
 GAME( 1996, freezea5, freezeat, cojagr3k,  freezeat, freezea5, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/20, AMOA-96)", 0 )
 GAME( 1996, freezea6, freezeat, cojagr3k,  freezeat, freezea6, ROT0, "Atari Games", "Freeze (Atari) (prototype, 96/09/07, Jamma-96)", 0 )
-GAME( 1996, maxforce, 0,        r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
-GAME( 1996, maxf_102, maxforce, r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
-GAME( 1996, maxf_ng,  maxforce, r3knarrow, area51,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
+GAME( 1996, maxforce, 0,        cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.05", 0 )
+GAME( 1996, maxf_102, maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force v1.02", 0 )
+GAME( 1996, maxf_ng,  maxforce, cojagr3k,  area51,   maxforce, ROT0, "Atari Games", "Maximum Force (No Gore version)", 0 )
 GAME( 1998, area51mx, 0,        cojag68k,  area51,   area51mx, ROT0, "Atari Games", "Area 51 / Maximum Force Duo v2.0", 0 )
-GAME( 1998, a51mxr3k, area51mx, r3knarrow, area51,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
+GAME( 1998, a51mxr3k, area51mx, cojagr3k,  area51,   a51mxr3k, ROT0, "Atari Games", "Area 51 / Maximum Force Duo (R3000)", 0 )
 GAME( 1996, vcircle,  0,        cojagr3k,  vcircle,  vcircle,  ROT0, "Atari Games", "Vicious Circle (prototype)", 0 )

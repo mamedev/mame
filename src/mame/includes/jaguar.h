@@ -12,6 +12,9 @@
 #endif /* MESS */
 #endif
 
+#define COJAG_PIXEL_CLOCK		XTAL_14_31818MHz
+
+
 
 /*----------- defined in drivers/cojag.c -----------*/
 

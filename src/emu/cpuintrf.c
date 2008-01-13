@@ -115,6 +115,8 @@ void jaguargpu_get_info(UINT32 state, cpuinfo *info);
 void jaguardsp_get_info(UINT32 state, cpuinfo *info);
 void r3000be_get_info(UINT32 state, cpuinfo *info);
 void r3000le_get_info(UINT32 state, cpuinfo *info);
+void r3041be_get_info(UINT32 state, cpuinfo *info);
+void r3041le_get_info(UINT32 state, cpuinfo *info);
 void r4600be_get_info(UINT32 state, cpuinfo *info);
 void r4600le_get_info(UINT32 state, cpuinfo *info);
 void r4650be_get_info(UINT32 state, cpuinfo *info);
@@ -548,6 +550,10 @@ static const struct
 #if (HAS_R3000)
 	{ CPU_R3000BE, r3000be_get_info },
 	{ CPU_R3000LE, r3000le_get_info },
+#endif
+#if (HAS_R3041)
+	{ CPU_R3041BE, r3041be_get_info },
+	{ CPU_R3041LE, r3041le_get_info },
 #endif
 #if (HAS_R4600)
 	{ CPU_R4600BE, r4600be_get_info },

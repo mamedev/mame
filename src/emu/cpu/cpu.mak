@@ -766,8 +766,9 @@ $(CPUOBJ)/pic16c5x/pic16c5x.o:	$(CPUSRC)/pic16c5x/pic16c5x.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_R3000=$(if $(filter R3000,$(CPUS)),1,0)
+CPUDEFS += -DHAS_R3041=$(if $(filter R3041,$(CPUS)),1,0)
 
-ifneq ($(filter R3000,$(CPUS)),)
+ifneq ($(filter R3000 R3041,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/r3000.o
 DBGOBJS += $(CPUOBJ)/mips/r3kdasm.o

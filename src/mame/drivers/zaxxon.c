@@ -316,8 +316,8 @@
  *
  *************************************/
 
-#define MASTER_CLOCK		48660000
-#define SOUND_CLOCK			4000000
+#define MASTER_CLOCK		XTAL_48_66MHz
+#define SOUND_CLOCK			XTAL_4MHz
 
 #define PIXEL_CLOCK			(MASTER_CLOCK/8)
 

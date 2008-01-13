@@ -143,6 +143,8 @@
 #include "jagblit.h"
 
 
+#define ENABLE_BORDERS		0
+
 #define LOG_BLITS			0
 #define LOG_BAD_BLITS		0
 #define LOG_BLITTER_STATS	0
@@ -190,8 +192,10 @@ enum
 static UINT32 blitter_regs[BLITTER_REGS];
 static UINT16 gpu_regs[GPU_REGS];
 
-static emu_timer *vi_timer;
+static emu_timer *object_timer;
 static UINT8 cpu_irq_state;
+
+static mame_bitmap *screen_bitmap;
 
 static pen_t *pen_table;
 
@@ -205,7 +209,7 @@ static pen_t *pen_table;
 
 /* from jagobj.c */
 static void jagobj_init(void);
-static void process_object_list(mame_bitmap *bitmap, const rectangle *cliprect);
+static void process_object_list(int vc, UINT16 *_scanline);
 
 /* from jagblit.c */
 static void generic_blitter(UINT32 command, UINT32 a1flags, UINT32 a2flags);
@@ -229,10 +233,65 @@ static void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT3
  *
  *************************************/
 
-INLINE void get_crosshair_xy(int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	*x = ((readinputport(3 + player * 2) & 0xff) * Machine->screen[0].width) >> 8;
-	*y = ((readinputport(4 + player * 2) & 0xff) * Machine->screen[0].height) >> 8;
+	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
+	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
+	*x = machine->screen[0].visarea.min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
+	*y = machine->screen[0].visarea.min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
+}
+
+
+
+/*************************************
+ *
+ *  Horizontal display values
+ *
+ *************************************/
+
+INLINE int effective_hvalue(int value)
+{
+	if (!(value & 0x400))
+		return value & 0x3ff;
+	else
+		return (value & 0x3ff) + (gpu_regs[HP] & 0x3ff) + 1;
+}
+
+
+
+/*************************************
+ *
+ *  Object processor timer
+ *
+ *************************************/
+
+INLINE int adjust_object_timer(running_machine *machine, int vc)
+{
+	int hdbpix[2];
+	int hdb = 0;
+
+	/* extract the display begin registers */
+	hdbpix[0] = (gpu_regs[HDB1] & 0x7ff) / 2;
+	hdbpix[1] = (gpu_regs[HDB2] & 0x7ff) / 2;
+	
+	/* sort */
+	if (hdbpix[0] > hdbpix[1])
+	{
+		int temp = hdbpix[0];
+		hdbpix[0] = hdbpix[1];
+		hdbpix[1] = temp;
+	}
+
+	/* select the target one */
+	hdb = hdbpix[vc % 2];
+	
+	/* if setting the second one in a line, make sure we will ever actually hit it */
+	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->screen[0].width))
+		return FALSE;
+	
+	/* adjust the timer */
+	timer_adjust(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16), attotime_never);
+	return TRUE;
 }
 
 
@@ -268,16 +327,6 @@ static void update_cpu_irq(void)
 		cpunum_set_input_line(0, cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, ASSERT_LINE);
 	else
 		cpunum_set_input_line(0, cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, CLEAR_LINE);
-}
-
-
-static TIMER_CALLBACK( vi_callback )
-{
-	int scanline = param;
-
-	cpu_irq_state |= 1;
-	update_cpu_irq();
-	timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
 
 
@@ -364,45 +413,25 @@ static void jaguar_set_palette(UINT16 vmode)
 		  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
 	};
 
-	int i, colors = 0;
+	int i;
 
 	/* switch off the mode */
 	switch (vmode & 0x106)
 	{
 		/* YCC full */
 		case 0x000:
-		{
-			/* set color 0 to black */
-			palette_set_color(Machine, colors++, MAKE_RGB(0, 0, 0));
-
-			/* due to the way YCC colorspace maps onto RGB, there are multiple entries for black */
-			/* take advantage of this so we don't have to use all 64k colors */
 			for (i = 0; i < 65536; i++)
 			{
 				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
 				UINT8 g = (grn_lookup[i >> 8] * (i & 0xff)) >> 8;
 				UINT8 b = (blu_lookup[i >> 8] * (i & 0xff)) >> 8;
-
-				if (r == 0 && g == 0 && b == 0)
-					pen_table[i] = 0;
-				else
-				{
-					pen_table[i] = colors;
-					palette_set_color(Machine, colors++, MAKE_RGB(r, g, b));
-				}
+				pen_table[i] = MAKE_RGB(r, g, b);
 			}
 			break;
-		}
 
 		/* YCC/RGB VARMOD */
 		case 0x100:
 		case 0x107:
-		{
-			/* set color 0 to black */
-			palette_set_color(Machine, colors++, MAKE_RGB(0, 0, 0));
-
-			/* due to the way YCC colorspace maps onto RGB, there are multiple entries for black */
-			/* take advantage of this so we don't have to use all 64k colors */
 			for (i = 0; i < 65536; i++)
 			{
 				UINT8 r = (red_lookup[i >> 8] * (i & 0xff)) >> 8;
@@ -419,39 +448,15 @@ static void jaguar_set_palette(UINT16 vmode)
 					g = (g << 3) | (g >> 2);
 					b = (b << 3) | (b >> 2);
 				}
-
-				if (r == 0 && g == 0 && b == 0)
-					pen_table[i] = 0;
-				else
-				{
-					pen_table[i] = colors;
-					palette_set_color(Machine, colors++, MAKE_RGB(r, g, b));
-				}
+				pen_table[i] = MAKE_RGB(r, g, b);
 			}
 			break;
-		}
 
 		/* RGB full */
 		case 0x006:
-		{
-			/* we cheat a little here to squeeze into 65534 colors */
-			palette_set_color(Machine, colors++, MAKE_RGB(0,  0, 0));
-			palette_set_color(Machine, colors++, MAKE_RGB(0,  8, 0));
-			palette_set_color(Machine, colors++, MAKE_RGB(0, 16, 0));
-			pen_table[0] = 0;
-			pen_table[1] = 1;
-			pen_table[2] = 1;
-			pen_table[3] = 2;
-			pen_table[4] = 2;
-
-			/* map the remaining colors normally */
-			for (i = 5; i < 65536; i++)
-			{
-				pen_table[i] = colors;
-				palette_set_color_rgb(Machine, colors++, pal5bit(i >> 11), pal6bit(i >> 0), pal5bit(i >> 6));
-			}
+			for (i = 0; i < 65536; i++)
+				pen_table[i] = MAKE_RGB(pal5bit(i >> 11), pal6bit(i >> 0), pal5bit(i >> 6));
 			break;
-		}
 
 		/* others */
 		default:
@@ -637,19 +642,12 @@ READ16_HANDLER( jaguar_tom_regs_r )
 
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
-	int scanline;
-
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
 
 		switch (offset)
 		{
-			case VI:
-				scanline = (gpu_regs[VI] - gpu_regs[VBE]) / 2;
-				timer_adjust(vi_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
-				break;
-
 			case INT1:
 				cpu_irq_state &= ~(gpu_regs[INT1] >> 8);
 				update_cpu_irq();
@@ -658,6 +656,38 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 			case VMODE:
 				jaguar_set_palette(gpu_regs[VMODE]);
 				break;
+
+			case HP:
+			case HBB:
+			case HBE:
+			case HDB1:
+			case HDB2:
+			case HDE:
+			case VP:
+			case VBB:
+			case VBE:
+			case VDB:
+			case VDE:
+			{
+				int hperiod = 2 * ((gpu_regs[HP] & 0x3ff) + 1);
+				int hbend = effective_hvalue(ENABLE_BORDERS ? gpu_regs[HBE] : MIN(gpu_regs[HDB1], gpu_regs[HDB2]));
+				int hbstart = effective_hvalue(gpu_regs[ENABLE_BORDERS ? HBB : HDE]);
+				int vperiod = (gpu_regs[VP] & 0x7ff) + 1;
+				int vbend = gpu_regs[VBE] & 0x7ff;
+				int vbstart = gpu_regs[VBB] & 0x7ff;
+				
+				/* adjust for the half-lines */
+				if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
+				{
+					rectangle visarea;
+					visarea.min_x = hbend / 2;
+					visarea.max_x = hbstart / 2 - 1;
+					visarea.min_y = vbend / 2;
+					visarea.max_y = vbstart / 2 - 1;
+					video_screen_configure(0, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+				}
+				break;
+			}
 		}
 	}
 
@@ -702,15 +732,11 @@ READ32_HANDLER( cojag_gun_input_r )
 	switch (offset)
 	{
 		case 0:
-			get_crosshair_xy(1, &beamx, &beamy);
-			beamx += 52;
-			beamy += 17;
+			get_crosshair_xy(Machine, 1, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 1:
-			get_crosshair_xy(0, &beamx, &beamy);
-			beamx += 52;
-			beamy += 17;
+			get_crosshair_xy(Machine, 0, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:
@@ -727,13 +753,64 @@ READ32_HANDLER( cojag_gun_input_r )
  *
  *************************************/
 
+static TIMER_CALLBACK( cojag_scanline_update )
+{
+	int vc = param & 0xffff;
+	int hdb = param >> 16;
+
+	/* only run if video is enabled and we are past the "display begin" */
+	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
+	{
+		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc / 2, 0);
+		int maxx = machine->screen[0].visarea.max_x;
+		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
+		UINT16 scanline[360];
+		int x;
+		
+		/* if we are first on this scanline, clear to the border color */
+		if (ENABLE_BORDERS && vc % 2 == 0)
+		{
+			rgb_t border = MAKE_RGB(gpu_regs[BORD1] & 0xff, gpu_regs[BORD1] >> 8, gpu_regs[BORD2] & 0xff);
+			for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
+				dest[x] = border;
+		}
+	
+		/* process the object list for this counter value */
+		process_object_list(vc, scanline);
+
+		/* copy the data to the target, clipping */
+		for (x = 0; x < 360 && hdb <= maxx && hdb < hde; x++, hdb++)
+			dest[hdb] = pen_table[scanline[x]];
+	}
+
+	/* adjust the timer in a loop, to handle missed cases */
+	do
+	{
+		/* handle vertical interrupts */
+		if (vc == gpu_regs[VI])
+		{
+			cpu_irq_state |= 1;
+			update_cpu_irq();
+		}
+
+		/* point to the next counter value */
+		if (++vc / 2 >= machine->screen[0].height)
+			vc = 0;
+
+	} while (!adjust_object_timer(machine, vc));
+}
+
+
 VIDEO_START( cojag )
 {
+	object_timer = timer_alloc(cojag_scanline_update, NULL);
+	adjust_object_timer(machine, 0);
+	
+	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);
+
 	jagobj_init();
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
-
-	vi_timer = timer_alloc(vi_callback, NULL);
 
 	state_save_register_global_pointer(pen_table, 65536);
 	state_save_register_global_array(blitter_regs);
@@ -760,7 +837,7 @@ VIDEO_UPDATE( cojag )
 	}
 
 	/* render the object list */
-	process_object_list(bitmap, cliprect);
+	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 	return 0;
 }
 

@@ -62,4 +62,7 @@ struct r3000_config
 extern void r3000be_get_info(UINT32 state, cpuinfo *info);
 extern void r3000le_get_info(UINT32 state, cpuinfo *info);
 
+extern void r3041be_get_info(UINT32 state, cpuinfo *info);
+extern void r3041le_get_info(UINT32 state, cpuinfo *info);
+
 #endif /* _JAGUAR_H */
