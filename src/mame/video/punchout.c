@@ -9,17 +9,20 @@
 #include "driver.h"
 
 
-static tilemap *toptilemap;
-static tilemap *bottilemap;
+static tilemap *punchout_topTilemap;
+static tilemap *punchout_botTilemap;
+
 static tilemap *spr1tilemap;
+static tilemap *spr1alttilemap;
 static tilemap *spr2tilemap;
 static tilemap *fgtilemap;
 
-UINT8 *punchout_videoram2;
-UINT8 *armwrest_videoram3;
+UINT8 *punchout_topTilemap_ram;
+UINT8 *punchout_botTilemap_ram;
+UINT8 *punchout_botTilemap_scroll_ram;
+UINT8 *armwrest_fgTilemap_ram;
 UINT8 *punchout_bigsprite1ram;
 UINT8 *punchout_bigsprite2ram;
-UINT8 *punchout_scroll;
 UINT8 *punchout_bigsprite1;
 UINT8 *punchout_bigsprite2;
 UINT8 *punchout_palettebank;
@@ -187,17 +190,17 @@ DRIVER_INIT( armwrest )
 ***************************************************************************/
 static TILE_GET_INFO( top_get_info )
 {
-	int code = videoram[tile_index*2] + 256 * (videoram[tile_index*2 + 1] & 0x03);
-	int color = ((videoram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
-	int flipx = videoram[tile_index*2 + 1] & 0x80;
+	int code = punchout_topTilemap_ram[tile_index*2] + 256 * (punchout_topTilemap_ram[tile_index*2 + 1] & 0x03);
+	int color = ((punchout_topTilemap_ram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
+	int flipx = punchout_topTilemap_ram[tile_index*2 + 1] & 0x80;
 	SET_TILE_INFO(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 static TILE_GET_INFO( bot_get_info )
 {
-	int code = punchout_videoram2[tile_index*2] + 256 * (punchout_videoram2[tile_index*2 + 1] & 0x03);
-	int color = ((punchout_videoram2[tile_index*2 + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
-	int flipx = punchout_videoram2[tile_index*2 + 1] & 0x80;
+	int code = punchout_botTilemap_ram[tile_index*2] + 256 * (punchout_botTilemap_ram[tile_index*2 + 1] & 0x03);
+	int color = ((punchout_botTilemap_ram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
+	int flipx = punchout_botTilemap_ram[tile_index*2 + 1] & 0x80;
 	SET_TILE_INFO(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
@@ -219,11 +222,12 @@ static TILE_GET_INFO( bs2_get_info )
 
 VIDEO_START( punchout )
 {
-	toptilemap = tilemap_create(top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
-	bottilemap = tilemap_create(bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
-	tilemap_set_scroll_rows(bottilemap, 32);
+	punchout_topTilemap = tilemap_create(top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	punchout_botTilemap = tilemap_create(bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
+	tilemap_set_scroll_rows(punchout_botTilemap, 32);
 
 	spr1tilemap = tilemap_create(bs1_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
+	spr1alttilemap = tilemap_create(bs1_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
 	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
 
 	fgtilemap = NULL;
@@ -233,17 +237,17 @@ VIDEO_START( punchout )
 
 static TILE_GET_INFO( armwrest_top_get_info )
 {
-	int code = videoram[tile_index*2] + 256 * (videoram[tile_index*2 + 1] & 0x03) +
-								8 * (videoram[tile_index*2 + 1] & 0x80);
-	int color = ((videoram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
+	int code = punchout_topTilemap_ram[tile_index*2] + 256 * (punchout_topTilemap_ram[tile_index*2 + 1] & 0x03) +
+								8 * (punchout_topTilemap_ram[tile_index*2 + 1] & 0x80);
+	int color = ((punchout_topTilemap_ram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * top_palette_bank;
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( armwrest_bot_get_info )
 {
-	int code = punchout_videoram2[tile_index*2] + 256 * (punchout_videoram2[tile_index*2 + 1] & 0x03);
-	int color = 128 + ((punchout_videoram2[tile_index*2 + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
-	int flipx = punchout_videoram2[tile_index*2 + 1] & 0x80;
+	int code = punchout_botTilemap_ram[tile_index*2] + 256 * (punchout_botTilemap_ram[tile_index*2 + 1] & 0x03);
+	int color = 128 + ((punchout_botTilemap_ram[tile_index*2 + 1] & 0x7c) >> 2) + 64 * bottom_palette_bank;
+	int flipx = punchout_botTilemap_ram[tile_index*2 + 1] & 0x80;
 	SET_TILE_INFO(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
@@ -253,20 +257,30 @@ static TILEMAP_MAPPER( armwrest_bs1_scan )
 	return (col/halfcols)*(halfcols*num_rows) + row*halfcols + col%halfcols;
 }
 
+static TILEMAP_MAPPER( armwrest_bs1alt_scan )
+{
+	int halfcols = num_cols/2;
+	col ^=0x10;
+	return (col/halfcols)*(halfcols*num_rows) + row*halfcols + col%halfcols;
+}
+
+
+
 static TILE_GET_INFO( armwrest_fg_get_info )
 {
-	int code = armwrest_videoram3[tile_index*2] + 256 * (armwrest_videoram3[tile_index*2 + 1] & 0x07);
-	int color = ((armwrest_videoram3[tile_index*2 + 1] & 0xf8) >> 3) + 32 * bottom_palette_bank;
-	int flipx = armwrest_videoram3[tile_index*2 + 1] & 0x80;
+	int code = armwrest_fgTilemap_ram[tile_index*2] + 256 * (armwrest_fgTilemap_ram[tile_index*2 + 1] & 0x07);
+	int color = ((armwrest_fgTilemap_ram[tile_index*2 + 1] & 0xf8) >> 3) + 32 * bottom_palette_bank;
+	int flipx = armwrest_fgTilemap_ram[tile_index*2 + 1] & 0x80;
 	SET_TILE_INFO(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
 VIDEO_START( armwrest )
 {
-	toptilemap = tilemap_create(armwrest_top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
-	bottilemap = tilemap_create(armwrest_bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	punchout_topTilemap = tilemap_create(armwrest_top_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	punchout_botTilemap = tilemap_create(armwrest_bot_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
 
 	spr1tilemap = tilemap_create(bs1_get_info, armwrest_bs1_scan, TILEMAP_TYPE_PEN, 8,8, 32,16);
+	spr1alttilemap = tilemap_create(bs1_get_info, armwrest_bs1alt_scan, TILEMAP_TYPE_PEN, 8,8, 32,16);
 	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 16,32);
 
 	fgtilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
@@ -275,21 +289,21 @@ VIDEO_START( armwrest )
 
 
 
-WRITE8_HANDLER( punchout_videoram_w )
+WRITE8_HANDLER( punchout_topTilemap_ram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(toptilemap, offset/2);
+	punchout_topTilemap_ram[offset] = data;
+	tilemap_mark_tile_dirty(punchout_topTilemap, offset/2);
 }
 
-WRITE8_HANDLER( punchout_videoram2_w )
+WRITE8_HANDLER( punchout_botTilemap_ram_w )
 {
-	punchout_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(bottilemap, offset/2);
+	punchout_botTilemap_ram[offset] = data;
+	tilemap_mark_tile_dirty(punchout_botTilemap, offset/2);
 }
 
-WRITE8_HANDLER( armwrest_videoram3_w )
+WRITE8_HANDLER( armwrest_fgTilemap_ram_w )
 {
-	armwrest_videoram3[offset] = data;
+	armwrest_fgTilemap_ram[offset] = data;
 	tilemap_mark_tile_dirty(fgtilemap, offset/2);
 }
 
@@ -297,6 +311,7 @@ WRITE8_HANDLER( punchout_bigsprite1ram_w )
 {
 	punchout_bigsprite1ram[offset] = data;
 	tilemap_mark_tile_dirty(spr1tilemap, offset/4);
+	if (spr1alttilemap) tilemap_mark_tile_dirty(spr1alttilemap, offset/4);
 }
 
 WRITE8_HANDLER( punchout_bigsprite2ram_w )
@@ -314,14 +329,14 @@ WRITE8_HANDLER( punchout_palettebank_w )
 	if (top_palette_bank != ((data >> 1) & 0x01))
 	{
 		top_palette_bank = (data >> 1) & 0x01;
-		tilemap_mark_all_tiles_dirty(toptilemap);
+		tilemap_mark_all_tiles_dirty(punchout_topTilemap);
 	}
 	if (bottom_palette_bank != ((data >> 0) & 0x01))
 	{
 		bottom_palette_bank = (data >> 0) & 0x01;
 		if (fgtilemap != NULL)
 			tilemap_mark_all_tiles_dirty(fgtilemap);
-		tilemap_mark_all_tiles_dirty(bottilemap);
+		tilemap_mark_all_tiles_dirty(punchout_botTilemap);
 		tilemap_mark_all_tiles_dirty(spr1tilemap);
 		tilemap_mark_all_tiles_dirty(spr2tilemap);
 	}
@@ -336,13 +351,13 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 	zoom = punchout_bigsprite1[0] + 256 * (punchout_bigsprite1[1] & 0x0f);
 	if (zoom)
 	{
-		mame_bitmap *sprbitmap = tilemap_get_pixmap(spr1tilemap);
+		mame_bitmap *sprbitmap;
 		int sx,sy;
 		UINT32 startx,starty;
 		int incxx,incyy;
 
 		sx = 4096 - (punchout_bigsprite1[2] + 256 * (punchout_bigsprite1[3] & 0x0f));
-		if (sx > 4096-4*127) sx -= 4096;
+		if (sx > 2048) sx -= 4096;
 
 		sy = -(punchout_bigsprite1[4] + 256 * (punchout_bigsprite1[5] & 1));
 		if (sy <= -256 + zoom/0x40) sy += 512;
@@ -356,9 +371,12 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 		startx += 3740 * zoom;	/* adjustment to match the screen shots */
 		starty -= 178 * zoom;	/* and make the hall of fame picture nice */
 
+ 		sprbitmap = tilemap_get_pixmap(spr1tilemap);
+
 		if (punchout_bigsprite1[6] & 1)	/* flip x */
 		{
-			startx = (sprbitmap->width << 16) - startx - 1;
+			sprbitmap = tilemap_get_pixmap(spr1alttilemap); // when you catch the money bag in armwrest it either expects wraparound, or a different layout..
+			startx = (bitmap->width << 16) - startx - 1;
 			incxx = -incxx;
 		}
 
@@ -392,7 +410,7 @@ VIDEO_UPDATE( punchout )
 {
 	if (screen == 1)
 	{
-		tilemap_draw(bitmap, cliprect, toptilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
 			draw_big_sprite(bitmap, cliprect);
@@ -403,9 +421,9 @@ VIDEO_UPDATE( punchout )
 
 		/* copy the character mapped graphics */
 		for (offs = 0;offs < 32;offs++)
-			tilemap_set_scrollx(bottilemap, offs, 58 + punchout_scroll[2*offs] + 256 * (punchout_scroll[2*offs + 1] & 0x01));
+			tilemap_set_scrollx(punchout_botTilemap, offs, 58 + punchout_botTilemap_scroll_ram[2*offs] + 256 * (punchout_botTilemap_scroll_ram[2*offs + 1] & 0x01));
 
-		tilemap_draw(bitmap, cliprect, bottilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, punchout_botTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			draw_big_sprite(bitmap, cliprect);
@@ -419,14 +437,14 @@ VIDEO_UPDATE( armwrest )
 {
 	if (screen == 1)
 	{
-		tilemap_draw(bitmap, cliprect, toptilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
 			draw_big_sprite(bitmap, cliprect);
 	}
 	else
 	{
-		tilemap_draw(bitmap, cliprect, bottilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, punchout_botTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			draw_big_sprite(bitmap, cliprect);

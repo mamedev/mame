@@ -2,10 +2,13 @@
 
 Punch Out memory map (preliminary)
 Arm Wrestling runs on about the same hardware, but the video board is different.
+ The most significant changes are that Punchout has a larger bottom tilemap,
+ with scrolling, while Arm Wrestling has an additional FG tilemap displayed on
+ the bottom screen.
 
-TODO:
-- The money bag is misplaced in armwrest bonus rounds.
-
+- money bag placement might not be 100% correct in Arm Wrestingly, however,
+  the more serious part of armwrest35b9yel (unplayable bonus round after rounds
+  5 and 9) is now fixed.
 
 driver by Nicola Salmoria
 
@@ -101,18 +104,18 @@ write:
 
 #include "rendlay.h"
 
-
-extern UINT8 *punchout_videoram2;
-extern UINT8 *armwrest_videoram3;
+extern UINT8 *punchout_topTilemap_ram;
+extern UINT8 *punchout_botTilemap_ram;
+extern UINT8 *punchout_botTilemap_scroll_ram;
+extern UINT8 *armwrest_fgTilemap_ram;
 extern UINT8 *punchout_bigsprite1ram;
 extern UINT8 *punchout_bigsprite2ram;
-extern UINT8 *punchout_scroll;
 extern UINT8 *punchout_bigsprite1;
 extern UINT8 *punchout_bigsprite2;
 extern UINT8 *punchout_palettebank;
-WRITE8_HANDLER( punchout_videoram_w );
-WRITE8_HANDLER( punchout_videoram2_w );
-WRITE8_HANDLER( armwrest_videoram3_w );
+WRITE8_HANDLER( punchout_topTilemap_ram_w );
+WRITE8_HANDLER( punchout_botTilemap_ram_w );
+WRITE8_HANDLER( armwrest_fgTilemap_ram_w );
 WRITE8_HANDLER( punchout_bigsprite1ram_w );
 WRITE8_HANDLER( punchout_bigsprite2ram_w );
 WRITE8_HANDLER( punchout_palettebank_w );
@@ -396,11 +399,11 @@ static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_bigsprite1)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_bigsprite2)
 	AM_RANGE(0xdffd, 0xdffd) AM_READWRITE(MRA8_RAM, punchout_palettebank_w) AM_BASE(&punchout_palettebank)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(MRA8_RAM, punchout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(MRA8_RAM, punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(MRA8_RAM, punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
 	AM_RANGE(0xe800, 0xefff) AM_READWRITE(MRA8_RAM, punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
-	AM_RANGE(0xf000, 0xf03f) AM_RAM AM_BASE(&punchout_scroll)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, punchout_videoram2_w) AM_BASE(&punchout_videoram2)
+	AM_RANGE(0xf000, 0xf03f) AM_RAM AM_BASE(&punchout_botTilemap_scroll_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
 ADDRESS_MAP_END
 
 
@@ -411,12 +414,11 @@ static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_bigsprite1)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_bigsprite2)
 	AM_RANGE(0xdffd, 0xdffd) AM_READWRITE(MRA8_RAM, punchout_palettebank_w) AM_BASE(&punchout_palettebank)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(MRA8_RAM, armwrest_videoram3_w) AM_BASE(&armwrest_videoram3)
+	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(MRA8_RAM, armwrest_fgTilemap_ram_w) AM_BASE(&armwrest_fgTilemap_ram)
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(MRA8_RAM, punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
 	AM_RANGE(0xe800, 0xefff) AM_READWRITE(MRA8_RAM, punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
-	AM_RANGE(0xf000, 0xf03f) AM_RAM AM_BASE(&punchout_scroll)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(MRA8_RAM, punchout_videoram2_w) AM_BASE(&punchout_videoram2)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(MRA8_RAM, punchout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(MRA8_RAM, punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(MRA8_RAM, punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
 ADDRESS_MAP_END
 
 
@@ -427,7 +429,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
 	AM_RANGE(0x03, 0x03) AM_READ(punchout_input_3_r)
 
-	/* protection ports */
+	/* protection ports - Super Punchout only (move to install handler?) */
 	AM_RANGE(0x07, 0x07) AM_READ(spunchout_prot_0_r)
 	AM_RANGE(0x17, 0x17) AM_READ(spunchout_prot_1_r)
 	AM_RANGE(0x27, 0x27) AM_READ(spunchout_prot_2_r)
