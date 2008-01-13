@@ -960,11 +960,9 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
 	{
 		INT32 smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
-		INT32 cycle=LEA(slot)-LSA(slot); // cycle corresponds to 2 pi
 
 		smp<<=0xA; // associate cycle with 1024
 		smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
-		while(smp<0) smp+=cycle; smp%=cycle; // keep modulation sampler within a single cycle
 		if(!PCM8B(slot)) smp<<=1;
 
 		addr1+=smp; addr2+=smp;
