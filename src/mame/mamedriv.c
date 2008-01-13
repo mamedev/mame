@@ -6681,7 +6681,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( inttoote )	/* (c) 1998 Coinmaster */
 
 	/* Seta games (seta2.c) */
-	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( gundamex )	/* (c) 1994 Banpresto */
 	DRIVER( grdians )	/* (c) 1995 Banpresto */
 	DRIVER( mj4simai )	/* (c) 1996 Maboroshi Ware */
