@@ -23,7 +23,7 @@ Year + Game                     PCB         Video Chip  Issues / Notes
 ---------------------------------------------------------------------------
 92  Last Fortress - Toride      VG420       14100
 92  Last Fortress - Toride (Ger)VG460-(A)   14100
-92  Pang Poms                   VG420       14100
+92  Pang Pom's                  VG420       14100
 92  Sky Alert                   VG420       14100
 92  The Karate Tournament       VG460-B     14100
 93? Lady Killer / Moeyo Gonta!! VG460-B     14100
@@ -1681,7 +1681,7 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-                                Pang Poms
+                                Pang Pom's
 ***************************************************************************/
 
 static ADDRESS_MAP_START( pangpoms_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2595,8 +2595,8 @@ static INPUT_PORTS_START( gstrik2 )
 	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -3211,7 +3211,7 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                                Pang Poms
+                                Pang Pom's
 ***************************************************************************/
 
 static INPUT_PORTS_START( pangpoms )
@@ -5509,7 +5509,7 @@ ROM_END
 
 /***************************************************************************
 
-Pang Poms (c) 1992 Metro
+Pang Pom's (c) 1992 Metro
 
 Pcb code:  VG420 (Same as Toride)
 
