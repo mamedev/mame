@@ -6,16 +6,16 @@
 
 
 CPU    :    68000 + [65C02] (only in the earlier games)
-Custom :    X1-001A  X1-002A            Sprites
+Custom :    X1-001A  X1-002A (SDIP64)   Sprites
             X1-001
             X1-002
             X1-003
-            X1-004
+            X1-004           (SDIP52)   Inputs
             X1-005   X0-005
             X1-006   X0-006
-            X1-007
-            X1-010                      Sound: 16 Bit PCM
-            X1-011 [x2]  X1-012 [x2]    Tilemaps
+            X1-007           (SDIP42)   Vide DAC
+            X1-010           (QFP80)    Sound: 16 Bit PCM
+            X1-011   X1-012  (QFP100)   Tilemaps
             X1-014                      Sprites?
 
 -------------------------------------------------------------------------------
@@ -35,6 +35,7 @@ P0-053-A                92 Quiz Kokology                    Tecmo
 P0-055-B                89 Wit's                            Athena
 P0-055-D                90 Thunder & Lightning              Romstar / Visco
 Promat PCB              94 Wiggie Waggie(5)                 --
+P0-058-C                98 Internation Toote (6)            Coinmaster
 P0-063-A                91 Rezon                            Allumer
 P0-068-B (M6100723A)    92 Block Carnival                   Visco
 P0-072-2 (prototype)    92 Blandia (prototype)              Allumer
@@ -62,7 +63,6 @@ P0-117-A?               95 Sokonuke Taisen Game             Sammy Industries
 P0-120-A (BP954KA)      95 Gundhara                         Banpresto
 PO-122-A (SZR-001)      95 Zombie Raid                      American Sammy
 ?                       96 Crazy Fight                      Subsino
-
 -------------------------------------------------------------------------------
 (1) YM2203 + YM3812 instead of X1-010
 (2) wrong colors
@@ -75,6 +75,7 @@ PO-122-A (SZR-001)      95 Zombie Raid                      American Sammy
     there are a few gfx emulation bugs (flipping of some border tiles and
     sprites not leaving the screen correctly) its possible the custom hw
     doesn't behave *exactly* the same as the original seta hw
+(6) To enter test mode press 9 (open door), then F2 (turn function key), then E (bet 3-4).
 
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
@@ -1256,9 +1257,36 @@ ym3812
 
 ***************************************************************************/
 
+/***************************************************************************
+                                Internation Toote
+
+Main PCB (P0-058C):
+
+    TOSHIBA TMP68HC000N-16
+    X1-010
+    X1-001A
+    X1-002A
+    X1-004 (x2)
+    X1-007
+    X1-011
+    X1-012
+    HD63B50P
+
+Horse Race I/O Expansion (PCB-HRE-000):
+
+    MC68B50CP (x2)
+    EF68B21P  (x2)
+	
+Note: on screen copyright is (c)1998 Coinmaster.
+      The I/O board has      (c)1993 Coinmaster.
+
+***************************************************************************/
 
 #include "driver.h"
 #include "seta.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/msm6242.h"
 #include "sound/2203intf.h"
 #include "sound/2612intf.h"
 #include "sound/3812intf.h"
@@ -3069,6 +3097,72 @@ static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00607) AM_RAM AM_BASE(&spriteram16)	// Sprites Y
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP	// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_BASE(&spriteram16_2)	// Sprites Code + X + Attr
+ADDRESS_MAP_END
+
+/***************************************************************************
+                             International Toote
+***************************************************************************/
+
+static READ16_HANDLER( inttoote_dsw_r )
+{
+	int shift = offset * 4;
+	return	((((readinputport(0) >> shift)     & 0xf)) << 0) |
+			((((readinputport(1) >> shift)     & 0xf)) << 4) |
+			((((readinputport(1) >> (shift+8)) & 0xf)) << 8) ;
+}
+
+static UINT16 *inttoote_key_select;
+static READ16_HANDLER( inttoote_key_r )
+{
+	switch( *inttoote_key_select )
+	{
+		case 0x08:	return readinputport(4+0);
+		case 0x10:	return readinputport(4+1);
+		case 0x20:	return readinputport(4+2);
+		case 0x40:	return readinputport(4+3);
+		case 0x80:	return readinputport(4+4);
+	}
+	logerror("%06X: unknown read, select = %04x\n",activecpu_get_pc(),*inttoote_key_select);
+	return 0xffff;
+}
+
+static UINT16 *inttoote_700000;
+static READ16_HANDLER( inttoote_700000_r )
+{
+	return inttoote_700000[offset] & 0x3f;
+}
+
+static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
+
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(inttoote_key_r, MWA16_RAM) AM_BASE(&inttoote_key_select)
+	AM_RANGE(0x200002, 0x200003) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x200010, 0x200011) AM_READWRITE(input_port_3_word_r, MWA16_NOP)
+
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(watchdog_reset16_w)	// Watchdog
+
+	AM_RANGE(0x300010, 0x300011) AM_WRITE(MWA16_NOP)	// lev1 ack
+	AM_RANGE(0x300020, 0x300021) AM_WRITE(MWA16_NOP)	// lev2 ack
+	AM_RANGE(0x300040, 0x300041) AM_WRITE(MWA16_NOP)	// lev4 ack
+	AM_RANGE(0x300060, 0x300061) AM_WRITE(MWA16_NOP)	// lev6 ack
+
+	AM_RANGE(0x500000, 0x500003) AM_READ(inttoote_dsw_r)	// DSW x 3
+
+	AM_RANGE(0x700000, 0x700101) AM_READWRITE(inttoote_700000_r,MWA16_RAM) AM_BASE(&inttoote_700000)
+
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(msm6242_lsb_r,msm6242_lsb_w)   // 6242RTC
+
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE( seta_sound_word_r, seta_sound_word_w		)	// Sound
+
+	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
+	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(MRA16_RAM,seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0&1
+
+	AM_RANGE(0xc00000, 0xc00001) AM_RAM		// ? 0x4000
+
+	AM_RANGE(0xd00000, 0xd00607) AM_RAM	AM_BASE(&spriteram16		)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE(&spriteram16_2		)	// Sprites Code + X + Attr
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 
@@ -6249,6 +6343,231 @@ static INPUT_PORTS_START( crazyfgt )
 	PORT_DIPSETTING(      0x0000, "3" )
 INPUT_PORTS_END
 
+/***************************************************************************
+                             International Toote
+***************************************************************************/
+
+static INPUT_PORTS_START( inttoote )
+	PORT_START_TAG("IN0")	// DSW 1
+	PORT_DIPNAME( 0x03, 0x03, "Max Bet" )
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "99" )
+//	PORT_DIPSETTING(    0x00, "99" )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 1-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 1-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 1-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("IN1")	// DSW 2&3
+	PORT_DIPNAME( 0x0001, 0x0001, "Unknown 2-0" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Unknown 2-1" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Unknown 2-2" )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0018, 0x0018, "Betting Clock Speed" )
+	PORT_DIPSETTING(      0x0018, "Slowest" )
+	PORT_DIPSETTING(      0x0010, "Slower" )
+	PORT_DIPSETTING(      0x0008, "Faster" )
+	PORT_DIPSETTING(      0x0000, "Fastest" )
+	PORT_DIPNAME( 0x01e0, 0x01e0, "Payout Rate" )
+	PORT_DIPSETTING(      0x01e0, "80%" )
+	PORT_DIPSETTING(      0x01c0, "81%" )
+	PORT_DIPSETTING(      0x01a0, "82%" )
+	PORT_DIPSETTING(      0x0180, "83%" )
+	PORT_DIPSETTING(      0x0160, "84%" )
+	PORT_DIPSETTING(      0x0140, "85%" )
+	PORT_DIPSETTING(      0x0120, "86%" )
+	PORT_DIPSETTING(      0x0100, "87%" )
+	PORT_DIPSETTING(      0x00e0, "88%" )
+	PORT_DIPSETTING(      0x00c0, "89%" )
+	PORT_DIPSETTING(      0x00a0, "90%" )
+	PORT_DIPSETTING(      0x0080, "91%" )
+	PORT_DIPSETTING(      0x0060, "92%" )
+	PORT_DIPSETTING(      0x0040, "93%" )
+	PORT_DIPSETTING(      0x0020, "94%" )
+	PORT_DIPSETTING(      0x0000, "95%" )
+	PORT_DIPNAME( 0x0200, 0x0200, "Unknown 3-1" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, "Payout" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Horses" )
+	PORT_DIPSETTING(      0x0800, "Random" )
+	PORT_DIPSETTING(      0x0000, "Cyclic" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Higher Odds" )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Unknown 3-5" )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Unknown 3-6" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 3-7" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL ) // P1 coin out
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL )	// P2 coin out
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Door Open") PORT_TOGGLE
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Question Mark")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x1000, IP_ACTIVE_LOW )	// Function menu (electronic key switch, fitted beneath the front panel)
+	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // Battery (0 = OK, 1 = NG)
+/*
+	Betting Panel         (keys)
+
+    1 1-2 2-3 3-4 4-5 5-6 (1QWERT)
+    2 1-3 2-4 3-5 4-6     (2ASDF)
+    3 1-4 2-5 3-6         (3ZXC)
+    4 1-5 2-6             (4YU)
+    5 1-6                 (5H)
+    6                     (6)
+*/
+	PORT_START_TAG("IN4")	// 200000.w (0x08)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 5") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN5")	// 200000.w (0x10)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Collect")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Cancel")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Collect") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Cancel") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN6")	// 200000.w (0x20)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-4") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-5") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 1-6") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-2") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-3") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-4") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-5") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 1-6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN7")	// 200000.w (0x40)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 2-6") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-3") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-4") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-5") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 2-6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-4") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN8")	// 200000.w (0x80)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 3-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 4-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 Bet 5-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-5") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 3-6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-5") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 4-6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P2 Bet 5-6") //PORT_CODE(KEYCODE_)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 /***************************************************************************
 
@@ -6482,7 +6801,14 @@ static GFXDECODE_START( crazyfgt )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
 GFXDECODE_END
 
+/***************************************************************************
+                             International Toote
+***************************************************************************/
 
+static GFXDECODE_START( inttoote )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_planes,             0,       32 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_planes_2roms_split, 16*32*0, 32 ) // [1] Layer 1
+GFXDECODE_END
 
 /***************************************************************************
 
@@ -7954,6 +8280,62 @@ static MACHINE_DRIVER_START( crazyfgt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+/***************************************************************************
+                             International Toote
+***************************************************************************/
+
+// Test mode shows a 16ms and 2ms counters
+static INTERRUPT_GEN( inttoote_interrupt )
+{
+	switch (cpu_getiloops())
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:		cpunum_set_input_line(0, 6, HOLD_LINE);	break;
+
+		case 8:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
+
+		case 9:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
+
+		case 10:	cpunum_set_input_line(0, 4, HOLD_LINE);	break;
+	}
+}
+
+static MACHINE_DRIVER_START( inttoote )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(inttoote_map,0)
+	MDRV_CPU_VBLANK_INT(inttoote_interrupt,8+1+1+1)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+	MDRV_GFXDECODE(inttoote)
+	MDRV_PALETTE_LENGTH(512 * 1)	/* sprites, layer1, layer2 */
+
+	MDRV_PALETTE_INIT(inttoote)
+	MDRV_VIDEO_START(seta_1_layer)
+	MDRV_VIDEO_UPDATE(seta)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(X1_010, 16000000)
+	MDRV_SOUND_CONFIG(seta_sound_intf)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
 
 
 /***************************************************************************
@@ -9003,6 +9385,43 @@ ROM_START( crazyfgt )
 	ROM_LOAD( "rom.u85",  0x00000, 0x40000, CRC(7b95d0bb) SHA1(f16dfd639eed6856e3ab93704caef592a07ba367) )
 ROM_END
 
+ROM_START( inttoote )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "p523.v01_horse_prog_2.002", 0x000000, 0x10000, CRC(6ce6f1ad) SHA1(82e7100721ca5b1a736f6523610b1f1edf225c12) )
+	ROM_LOAD16_BYTE( "p523.v01_horse_prog_1.003", 0x000001, 0x10000, CRC(921fcff5) SHA1(cabc4e9936621132a6fbaa1a925d205c5f04a2ae) )
+	ROM_FILL(                                     0x020000, 0x60000, 0xff )
+	ROM_LOAD16_WORD_SWAP( "ya_002_001.u18",       0x100000, 0x80000, CRC(dd108016) SHA1(1554de4cc1a9436a1e62400cd96c9752a2098f99) )
+	ROM_FILL(                                     0x180000, 0x80000, 0xff )
+
+	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "ya_011_004.u10",             0x000000, 0x80000, CRC(eb74d2e0) SHA1(221ff6cc03ce57a7fcbe418f1c12a293990f8a7d) )
+	ROM_LOAD( "p523.v01_horse_fore_1.u135", 0x070000, 0x10000, CRC(3a75df30) SHA1(f3b3a7428e3e125921686bc9aacde6b28b1947b5) )
+
+	ROM_LOAD( "ya_011_005.u17",             0x080000, 0x80000, CRC(4a6c804b) SHA1(b596b9b0b3b453c26f9c7f976ff4d56eac4fac04) )
+	ROM_LOAD( "p523.v01_horse_fore_2.u134", 0x0f0000, 0x10000, CRC(26fb0339) SHA1(a134ecef00f690c82c8bddf26498b357ccf8d5c3) )
+
+	ROM_LOAD( "ya_011_006.u22",             0x100000, 0x80000, CRC(bfae01a5) SHA1(3be83972c3987e9bf722cd6db7770f074587301c) )
+	ROM_LOAD( "p523.v01_horse_fore_3.u133", 0x170000, 0x10000, CRC(c38596af) SHA1(d27141e28d8f8352f065c55121412e604c199a9a) )
+
+	ROM_LOAD( "ya_011_007.u27",             0x180000, 0x80000, CRC(2dc7a294) SHA1(97f2aa9939a45aaa94d4aeb2fcd5b7f30204b942) )
+	ROM_LOAD( "p523.v01_horse_fore_4.u132", 0x1f0000, 0x10000, CRC(64ef345e) SHA1(ef5d9f293ded44a2be91278549f5db8673fc7571) )
+
+	ROM_REGION( 0xc0000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_LOAD( "ya_011_008.u35",             0x000000, 0x40000, CRC(4b890f83) SHA1(fde6544898a0691b550f3045803f2e81cfeb5fe9) )
+	ROM_LOAD( "p523.v01_horse_back_1.u137", 0x040000, 0x20000, CRC(39b221ea) SHA1(3b3367430733ed36d6a981cd2ec6df731d07c089) )
+
+	ROM_LOAD( "ya_011_009.u41",             0x060000, 0x40000, CRC(caa5e3c1) SHA1(63cccc5479040a02872febc8d7f2d46096e138d1) )
+	ROM_LOAD( "p523.v01_horse_back_2.u136", 0x0a0000, 0x20000, CRC(9c5e32a0) SHA1(964734a626b5c7b9d7130addc642895df520dcb7) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )	/* Colours */
+	ROM_LOAD16_BYTE( "ya-010.prom",  0x000, 0x200, CRC(778094b3) SHA1(270329a0d544dc7a8240d6dab08ccd54ea87ab70) )
+	ROM_LOAD16_BYTE( "ya-011.prom",  0x001, 0x200, CRC(bd4fe2f6) SHA1(83d9f9db3fbfa2d172f5227c397ea4d5a9687015) )
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "ya_011_013.u71", 0x00000, 0x80000, CRC(2bccaf47) SHA1(1658643444d575410f11b648e0d7ae6c43fcf1ea) )
+	ROM_LOAD( "ya_011_012.u64", 0x80000, 0x80000, CRC(a8015ce6) SHA1(bb0b589856ec82e1fd42be9af89b07ba1d17e595) )
+ROM_END
+
 
 static READ16_HANDLER( twineagl_debug_r )
 {
@@ -9239,12 +9658,57 @@ static DRIVER_INIT( crazyfgt )
 }
 
 /***************************************************************************
+                             International Toote
+***************************************************************************/
+
+static const pia6821_interface inttoote_pia0_intf =
+{
+	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
+	0, 0, 0, 0, 0, 0,
+
+	/* PIA outputs: A, B, CA2, CB2 */
+	0, 0, 0, 0,
+
+	/* PIA IRQs: A, B */
+	0, 0
+};
+
+static const pia6821_interface inttoote_pia1_intf =
+{
+	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
+	0, 0, 0, 0, 0, 0,
+
+	/* PIA outputs: A, B, CA2, CB2 */
+	0, 0, 0, 0,
+
+	/* PIA IRQs: A, B */
+	0, 0
+};
+
+static DRIVER_INIT( inttoote )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+	static UINT16 seta_vregs_unused[3] = {0,0,0};
+
+	// missing / unused video regs
+	seta_vregs = seta_vregs_unused;
+
+	// code patches (to be removed...)
+	ROM[0x4de0/2] = 0x4e71;	// hardware test errors
+	ROM[0x4de2/2] = 0x4e71;
+
+	ROM[0x368a/2] = 0x50f9;	// betting count down
+
+	/* Initializing PIAs... (to be done) */
+	pia_config(0, &inttoote_pia0_intf);
+	pia_config(1, &inttoote_pia1_intf);
+}
+
+/***************************************************************************
 
                                 Game Drivers
 
 ***************************************************************************/
-
-/* Working Games: */
 
 /* 68000 + 65C02 */
 GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "[Seta] (Taito license)", "Thundercade / Twin Formation" , 0) // Title/License: DSW
@@ -9295,3 +9759,4 @@ GAME( 1995, gundhara, 0,        gundhara, gundhara, 0,        ROT270, "Banpresto
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, zombraid, 0,        gundhara, zombraid, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, inttoote, 0,        inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )

@@ -6622,7 +6622,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ryouran )	/* (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( teljan )	/* (c) 1999 Electro Design Co. (Japan) */
 
-	/* Seta games */
+	/* Seta games (seta.c) */
 	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( speedatk )	/* CB-0 (c) SetaKikaku */
 	DRIVER( srmp1 )		/* UB or UC?? (c) 1987 */
@@ -6678,7 +6678,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sokonuke )	/* (c) 1995 Sammy Industries */
 	DRIVER( zombraid )	/* (c) 1995 American Sammy */
 	DRIVER( crazyfgt )	/* (c) 1998 Subsino */
+	DRIVER( inttoote )	/* (c) 1998 Coinmaster */
 
+	/* Seta games (seta2.c) */
+	DRIVER( hanaawas )	/* (c) SetaKikaku */
 	DRIVER( gundamex )	/* (c) 1994 Banpresto */
 	DRIVER( grdians )	/* (c) 1995 Banpresto */
 	DRIVER( mj4simai )	/* (c) 1996 Maboroshi Ware */

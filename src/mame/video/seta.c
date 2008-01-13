@@ -608,8 +608,16 @@ PALETTE_INIT( zingzip )
 			colortable[color * 64 + pen + 32*16*2] = ((color * 16 + pen)%(32*16)) + 32*16*2;
 }
 
-
-
+// color prom
+PALETTE_INIT( inttoote )
+{
+	int x;
+	for (x = 0; x < 0x200 ; x++)
+	{
+		int data = (color_prom[x*2] <<8) | color_prom[x*2+1];
+		palette_set_color_rgb(machine, x, pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	}
+}
 
 PALETTE_INIT( usclssic )
 {
