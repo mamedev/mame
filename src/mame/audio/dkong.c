@@ -17,6 +17,10 @@
  *
  ****************************************************************/
 
+/* Set to 1 to disable DAC and post-mixer filters */
+#define		DK_NO_FILTERS	(0)
+
+
 #define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
 
 /* Needed for dkongjr ... FIXME */
@@ -99,10 +103,6 @@
  *
  ****************************************************************/
 
-/* Variable components */
-
-#define DK_VR1		RES_K(10)
-
 /* Resistors */
 
 #define DK_R1 		RES_K(47)
@@ -166,7 +166,7 @@
 #define DK_C30		CAP_U(10)
 #define DK_C32		CAP_U(10)
 #define DK_C34		CAP_N(10)
-#define DK_C160		CAP_N(100)
+#define DK_C159		CAP_N(0)		/* 100nF in Schematics but sound is way off */
 
 
 /*
@@ -215,8 +215,8 @@ static const discrete_mixer_desc dkong_mixer_desc =
 		{DK_R2, DK_R24, DK_R1, DK_R14},
 		{0,0,0},	// no variable resistors
 		{0,0,0},  // no node capacitors
-		0, DK_VR1,
-		DK_C160,
+		0, 0, 
+		DK_C159,
 		DK_C12,
 		0, 1};
 
@@ -345,7 +345,11 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_FILTER2(NODE_73, 1, NODE_71, 1916, (1.0/0.74), DISC_FILTER_LOWPASS)
 
 	/* Adjustment VR2 */
+#if DK_NO_FILTERS
+	DISCRETE_MULTIPLY(DS_OUT_DAC, 1, NODE_71, DS_ADJ_DAC)
+#else
 	DISCRETE_MULTIPLY(DS_OUT_DAC, 1, NODE_73, DS_ADJ_DAC)
+#endif
 
 	/************************************************/
 	/* Amplifier                                    */
@@ -356,9 +360,16 @@ static DISCRETE_SOUND_START(dkong2b)
 	// Amplifier: internal amplifier
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
-	DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
-	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 3)
+	DISCRETE_CRFILTER(NODE_295,1,NODE_294, RES_K(50), DK_C13)
+	// EZV20 equivalent filter circuit ...
+	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
 
+#if DK_NO_FILTERS
+	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
+#else
+	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3)
+#endif
+	
 DISCRETE_SOUND_END
 
 /****************************************************************
@@ -635,6 +646,8 @@ DISCRETE_SOUND_END
 #define JR_R9		RES_K(47)
 #define JR_R10		RES_K(10)
 #define JR_R11		RES_K(20)
+#define JR_R12		RES_K(10)
+#define JR_R13		RES_K(47)
 #define JR_R14		RES_K(30)
 #define JR_R17		RES_K(47)
 #define JR_R18		RES_K(100)
@@ -644,6 +657,7 @@ DISCRETE_SOUND_END
 #define JR_R25		RES_K(47)
 #define JR_R27		RES_K(10)
 #define JR_R28		RES_K(100)
+
 
 #define JR_C13		CAP_U(4.7)
 #define JR_C14		CAP_U(4.7)
@@ -656,6 +670,7 @@ DISCRETE_SOUND_END
 #define JR_C21		CAP_N(56)
 #define JR_C22		CAP_N(220)
 #define JR_C23		CAP_U(0.47)
+#define JR_C24		CAP_U(47)
 #define JR_C25		CAP_U(1)
 #define JR_C26		CAP_U(47)
 #define JR_C27		CAP_U(22)
@@ -687,14 +702,10 @@ static const discrete_mixer_desc dkongjr_mixer_desc =
 		{JR_R5, JR_R3, JR_R6, JR_R4, JR_R25},
 		{0,0,0,0,0},	// no variable resistors
 		{0,0,0,0,0},  // no node capacitors
-		0, RES_M(1), // Dummy,
+		0, 0, 
 		JR_C155,
 		JR_C161,
 		0, 1};
-
-#define JR_R12		RES_K(10)
-#define JR_R13		RES_K(47)
-#define JR_C24		CAP_U(47)
 
 static const discrete_mixer_desc dkongjr_s1_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
@@ -866,12 +877,20 @@ static SOUND_RESET( dkong )
 	dkong_state *state = machine->driver_data;
 
 	state->mcustatus = 0;
-	state->page = 0;
+	state->page = 0x47;
+	state->portT = 0;
 
 	I8035_T_W_AL(0,0);
 	I8035_T_W_AL(1,0);
-	I8035_P1_W(255);
-	I8035_P2_W(255);
+	I8035_P1_W(0xFF);
+	I8035_P2_W(0xFF);
+	soundlatch_w(0,0x0F);
+}
+
+static SOUND_RESET( dkongjr )
+{
+	sound_reset_dkong(machine);
+	soundlatch_w(0,0x00);
 }
 
 /****************************************************************
@@ -1311,7 +1330,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
 
 	MDRV_SOUND_START(dkong)
-	MDRV_SOUND_RESET(dkong)
+	MDRV_SOUND_RESET(dkongjr)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
