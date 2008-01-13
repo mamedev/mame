@@ -1238,7 +1238,7 @@ $(MAMEOBJ)/snk.a: \
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \
-	$(DRIVERS)/berzerk.o $(AUDIO)/berzerk.o \
+	$(DRIVERS)/berzerk.o \
 	$(DRIVERS)/cliffhgr.o $(AUDIO)/cliffhgr.o \
 	$(DRIVERS)/mazerbla.o \
 	$(DRIVERS)/supdrapo.o \

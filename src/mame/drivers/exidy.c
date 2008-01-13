@@ -129,9 +129,6 @@
 #include "exidy.h"
 #include "targ.h"
 #include "machine/6821pia.h"
-#include "sound/custom.h"
-#include "sound/samples.h"
-#include "sound/hc55516.h"
 
 
 static UINT8 last_dial;
@@ -287,38 +284,6 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5213, 0x5217) AM_WRITE(MWA8_NOP)		/* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
-	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
-	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_WRITE(exidy_sfxctrl_w)
-	AM_RANGE(0x5800, 0x7fff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cvsd_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(mtrap_voiceio_r, mtrap_voiceio_w)
 ADDRESS_MAP_END
 
 
@@ -809,21 +774,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound  definitions
- *
- *************************************/
-
-static const struct CustomSound_interface exidy_custom_interface =
-{
-	exidy_sh_start,
-	0,
-	exidy_sh_reset
-};
-
-
-
-/*************************************
- *
  *  Machine drivers
  *
  *************************************/
@@ -899,18 +849,10 @@ static MACHINE_DRIVER_START( venture )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(exidy_map,venture_map)
 
-	/* audio CPU */
-	MDRV_CPU_ADD(M6502, 3579545/4)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-
 	MDRV_INTERLEAVE(10)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(exidy_custom_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_IMPORT_FROM(venture_audio)
 MACHINE_DRIVER_END
 
 
@@ -928,15 +870,10 @@ static MACHINE_DRIVER_START( mtrap )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(venture)
 
-	MDRV_CPU_ADD(Z80, 3579545/2)
-	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
-	MDRV_CPU_IO_MAP(cvsd_iomap,0)
-
 	MDRV_INTERLEAVE(32)
 
-	/* sound hardware */
-	MDRV_SOUND_ADD(HC55516, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	/* audio hardware */
+	MDRV_IMPORT_FROM(mtrap_cvsd_audio)
 MACHINE_DRIVER_END
 
 

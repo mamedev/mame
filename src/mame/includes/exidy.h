@@ -24,16 +24,9 @@
 
 /*----------- defined in audio/exidy.c -----------*/
 
-void *exidy_sh_start(int clock, const struct CustomSound_interface *config);
-void exidy_sh_reset(void *token);
-WRITE8_HANDLER( exidy_shriot_w );
-WRITE8_HANDLER( exidy_sfxctrl_w );
-WRITE8_HANDLER( exidy_sh8253_w );
-WRITE8_HANDLER( exidy_sh6840_w );
-WRITE8_HANDLER( exidy_sound_filter_w );
-READ8_HANDLER( exidy_shriot_r );
-READ8_HANDLER( exidy_sh8253_r );
-READ8_HANDLER( exidy_sh6840_r );
+MACHINE_DRIVER_EXTERN( venture_audio );
+
+MACHINE_DRIVER_EXTERN( mtrap_cvsd_audio );
 
 MACHINE_DRIVER_EXTERN( victory_audio );
 READ8_HANDLER( victory_sound_response_r );
@@ -43,9 +36,6 @@ WRITE8_HANDLER( victory_sound_command_w );
 MACHINE_DRIVER_EXTERN( berzerk_audio );
 WRITE8_HANDLER( berzerk_audio_w );
 READ8_HANDLER( berzerk_audio_r );
-
-WRITE8_HANDLER( mtrap_voiceio_w );
-READ8_HANDLER( mtrap_voiceio_r );
 
 
 /*----------- defined in video/exidy.c -----------*/

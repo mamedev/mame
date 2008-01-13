@@ -145,7 +145,7 @@ static void set_colors(running_machine *machine)
  *
  *************************************/
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(void)
 {
 	offs_t offs;
 
@@ -183,9 +183,9 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 				for (i = 0; i < 8; i++)
 				{
 					if (data1 & 0x80)
-						*BITMAP_ADDR16(bitmap, y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
+						*BITMAP_ADDR16(background_bitmap, y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
 					else
-						*BITMAP_ADDR16(bitmap, y, x) = off_pen;
+						*BITMAP_ADDR16(background_bitmap, y, x) = off_pen;
 
 					x = x + 1;
 					data1 = data1 << 1;
@@ -199,7 +199,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 				for (i = 0; i < 8; i++)
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = (data & 0x80) ? on_pen_1 : off_pen;
+					*BITMAP_ADDR16(background_bitmap, y, x) = (data & 0x80) ? on_pen_1 : off_pen;
 
 					x = x + 1;
 					data = data << 1;
@@ -230,19 +230,19 @@ INLINE int sprite_1_enabled(void)
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* draw sprite 2 first */
-	int enable_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
+	int sprite_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
 
 	int sx = 236 - *exidy_sprite2_xpos - 4;
 	int sy = 244 - *exidy_sprite2_ypos - 4;
 
 	drawgfx(bitmap, machine->gfx[0],
-			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 1,
+			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 1,
 			0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 
 	/* draw sprite 1 next */
 	if (sprite_1_enabled())
 	{
-		int enable_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
+		int sprite_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
 
 		sx = 236 - *exidy_sprite1_xpos - 4;
 		sy = 244 - *exidy_sprite1_ypos - 4;
@@ -250,7 +250,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if (sy < 0) sy = 0;
 
 		drawgfx(bitmap, machine->gfx[0],
-				(*exidy_spriteno & 0x0f) + 16 * enable_set_1, 0,
+				(*exidy_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 	}
 
@@ -280,6 +280,7 @@ static TIMER_CALLBACK( collision_irq_callback )
 {
 	/* latch the collision bits */
 	latch_condition(param);
+popmessage("Collision %02X", param);
 
 	/* set the IRQ line */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
@@ -288,10 +289,9 @@ static TIMER_CALLBACK( collision_irq_callback )
 
 static void check_collision(running_machine *machine)
 {
-	UINT8 enable_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
-	UINT8 enable_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
+	UINT8 sprite_set_1 = ((*exidy_sprite_enable & 0x20) != 0);
+	UINT8 sprite_set_2 = ((*exidy_sprite_enable & 0x40) != 0);
     static const rectangle clip = { 0, 15, 0, 15 };
-    int bgmask = machine->gfx[0]->color_granularity - 1;
     int org_1_x = 0, org_1_y = 0;
     int org_2_x = 0, org_2_y = 0;
     int sx, sy;
@@ -308,7 +308,7 @@ static void check_collision(running_machine *machine)
 		org_1_x = 236 - *exidy_sprite1_xpos - 4;
 		org_1_y = 244 - *exidy_sprite1_ypos - 4;
 		drawgfx(motion_object_1_vid, machine->gfx[0],
-				(*exidy_spriteno & 0x0f) + 16 * enable_set_1, 0,
+				(*exidy_spriteno & 0x0f) + 16 * sprite_set_1, 0,
 				0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 	}
 
@@ -317,7 +317,7 @@ static void check_collision(running_machine *machine)
 	org_2_x = 236 - *exidy_sprite2_xpos - 4;
 	org_2_y = 244 - *exidy_sprite2_ypos - 4;
 	drawgfx(motion_object_2_vid, machine->gfx[0],
-			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
+			((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 			0, 0, 0, 0, &clip, TRANSPARENCY_PEN, 0);
 
 	/* draw sprite 2 clipped to sprite 1's location */
@@ -327,7 +327,7 @@ static void check_collision(running_machine *machine)
 		sx = org_2_x - org_1_x;
 		sy = org_2_y - org_1_y;
 		drawgfx(motion_object_2_clip, machine->gfx[0],
-				((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * enable_set_2, 0,
+				((*exidy_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
 				0, 0, sx, sy, &clip, TRANSPARENCY_PEN, 0);
 	}
 
@@ -337,26 +337,26 @@ static void check_collision(running_machine *machine)
 		{
     		if (*BITMAP_ADDR16(motion_object_1_vid, sy, sx) != 0xff)
 			{
-				UINT8 collision_mask = 0;
+				UINT8 current_collision_mask = 0;
 
 				/* check for background collision (M1CHAR) */
-				if (((*BITMAP_ADDR16(background_bitmap, org_1_y + sy, org_1_x + sx) - 4) & bgmask) != 0)
-					collision_mask |= 0x04;
+				if (*BITMAP_ADDR16(background_bitmap, org_1_y + sy, org_1_x + sx) != 0)
+					current_collision_mask |= 0x04;
 
 				/* check for motion object collision (M1M2) */
 				if (*BITMAP_ADDR16(motion_object_2_clip, sy, sx) != 0xff)
-					collision_mask |= 0x10;
+					current_collision_mask |= 0x10;
 
 				/* if we got one, trigger an interrupt */
-				if ((collision_mask & collision_mask) && count++ < 128)
-					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), NULL, collision_mask, collision_irq_callback);
+				if ((current_collision_mask & collision_mask) && (count++ < 128))
+					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
 			}
 
 			if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
 			{
 				/* check for background collision (M2CHAR) */
-				if (((*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) - 4) & bgmask) != 0)
-					if ((collision_mask & 0x08) && count++ < 128)
+				if (*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) != 0)
+					if ((collision_mask & 0x08) && (count++ < 128))
 						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
 			}
 		}
@@ -376,7 +376,7 @@ VIDEO_UPDATE( exidy )
 	set_colors(machine);
 
 	/* update the background and draw it */
-	draw_background(machine, background_bitmap, NULL);
+	draw_background();
 	copybitmap(bitmap, background_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
 
 	/* draw the sprites */

@@ -115,33 +115,6 @@ static double freq_to_step;
 
 /*************************************
  *
- *  PIA interface
- *
- *************************************/
-
-static void update_irq_state(int);
-
-
-/* PIA 0 */
-static const pia6821_interface pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_1_portb_w, pia_1_porta_w, pia_1_cb1_w, pia_1_ca1_w,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 1 */
-static const pia6821_interface pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_0_portb_w, pia_0_porta_w, pia_0_cb1_w, pia_0_ca1_w,
-	/*irqs   : A/B             */ 0, update_irq_state
-};
-
-
-
-/*************************************
- *
  *  Interrupt generation helper
  *
  *************************************/
@@ -374,18 +347,18 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 static TIMER_CALLBACK( riot_interrupt );
 
-static void *common_sh_start(void)
+static void *common_sh_start(int _has_sh8253, int _has_tms5220)
 {
 	int sample_rate = SH8253_CLOCK;
 	int i;
 
+	has_sh8253  = _has_sh8253;
+	has_tms5220 = _has_tms5220;
+
 	/* determine which sound hardware is installed */
 	has_hc55516 = FALSE;
-	has_tms5220 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->drv->sound[i].type == SOUND_TMS5220)
-			has_tms5220 = TRUE;
 		if (Machine->drv->sound[i].type == SOUND_HC55516)
 			has_hc55516 = TRUE;
 	}
@@ -403,15 +376,6 @@ static void *common_sh_start(void)
 	freq_to_step = (double)(1 << 24) / (double)sample_rate;
 
 	return auto_malloc(1);
-}
-
-
-void *exidy_sh_start(int clock, const struct CustomSound_interface *config)
-{
-	pia_config(0, &pia_0_intf);
-	pia_config(1, &pia_1_intf);
-	has_sh8253 = TRUE;
-	return common_sh_start();
 }
 
 
@@ -455,12 +419,6 @@ static void common_sh_reset(void)
 }
 
 
-void exidy_sh_reset(void *token)
-{
-	common_sh_reset();
-}
-
-
 
 /*************************************
  *
@@ -499,7 +457,7 @@ static TIMER_CALLBACK( riot_interrupt )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_shriot_w )
+static WRITE8_HANDLER( exidy_shriot_w )
 {
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
@@ -574,7 +532,7 @@ WRITE8_HANDLER( exidy_shriot_w )
  *
  *************************************/
 
-READ8_HANDLER( exidy_shriot_r )
+static READ8_HANDLER( exidy_shriot_r )
 {
 	/* I/O is done if A2 == 0 */
 	if ((offset & 0x04) == 0)
@@ -643,7 +601,7 @@ READ8_HANDLER( exidy_shriot_r )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_sh8253_w )
+static WRITE8_HANDLER( exidy_sh8253_w )
 {
 	int chan;
 
@@ -679,9 +637,10 @@ WRITE8_HANDLER( exidy_sh8253_w )
 }
 
 
-READ8_HANDLER( exidy_sh8253_r )
+static READ8_HANDLER( exidy_sh8253_r )
 {
-    logerror("8253(R): %x\n",offset);
+	logerror("8253(R): %x\n",offset);
+
 	return 0;
 }
 
@@ -693,14 +652,15 @@ READ8_HANDLER( exidy_sh8253_r )
  *
  *************************************/
 
-READ8_HANDLER( exidy_sh6840_r )
+static READ8_HANDLER( exidy_sh6840_r )
 {
 	fatalerror("exidy_sh6840_r - unexpected read");
-    return 0;
+
+	return 0;
 }
 
 
-WRITE8_HANDLER( exidy_sh6840_w )
+static WRITE8_HANDLER( exidy_sh6840_w )
 {
 	/* force an update of the stream */
 	stream_update(exidy_stream);
@@ -760,7 +720,7 @@ WRITE8_HANDLER( exidy_sh6840_w )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_sfxctrl_w )
+static WRITE8_HANDLER( exidy_sfxctrl_w )
 {
 	stream_update(exidy_stream);
 
@@ -795,11 +755,83 @@ WRITE8_HANDLER( exidy_sound_filter_w )
 
 /*************************************
  *
+ *  Venture, etc.
+ *
+ *************************************/
+
+static const pia6821_interface venture_pia_0_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ pia_1_portb_w, pia_1_porta_w, pia_1_cb1_w, pia_1_ca1_w,
+	/*irqs   : A/B             */ 0, 0
+};
+
+
+static const pia6821_interface venture_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ pia_0_portb_w, pia_0_porta_w, pia_0_cb1_w, pia_0_ca1_w,
+	/*irqs   : A/B             */ 0, update_irq_state
+};
+
+
+static void *venture_sh_start(int clock, const struct CustomSound_interface *config)
+{
+	pia_config(0, &venture_pia_0_intf);
+	pia_config(1, &venture_pia_1_intf);
+
+	return common_sh_start(TRUE, FALSE);
+}
+
+
+static void venture_sh_reset(void *token)
+{
+	common_sh_reset();
+}
+
+
+static const struct CustomSound_interface venture_custom_interface =
+{
+	venture_sh_start,
+	0,
+	venture_sh_reset
+};
+
+
+static ADDRESS_MAP_START( venture_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
+	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x5800, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( venture_audio )
+
+	MDRV_CPU_ADD(M6502, 3579545/4)
+	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(venture_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
  *  CVSD sound for Mouse Trap
  *
  *************************************/
 
-WRITE8_HANDLER( mtrap_voiceio_w )
+static WRITE8_HANDLER( mtrap_voiceio_w )
 {
 	if (!(offset & 0x10))
 	{
@@ -812,7 +844,7 @@ WRITE8_HANDLER( mtrap_voiceio_w )
 }
 
 
-READ8_HANDLER( mtrap_voiceio_r )
+static READ8_HANDLER( mtrap_voiceio_r )
 {
 	if (!(offset & 0x80))
 	{
@@ -832,6 +864,30 @@ READ8_HANDLER( mtrap_voiceio_r )
 	}
 	return 0;
 }
+
+
+static ADDRESS_MAP_START( cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( cvsd_iomap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0xff) AM_READWRITE(mtrap_voiceio_r, mtrap_voiceio_w)
+ADDRESS_MAP_END
+
+
+MACHINE_DRIVER_START( mtrap_cvsd_audio )
+
+	MDRV_CPU_ADD(Z80, 3579545/2)
+	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
+	MDRV_CPU_IO_MAP(cvsd_iomap,0)
+
+	/* audio hardware */
+	MDRV_SOUND_ADD(HC55516, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
 
 
 
@@ -903,19 +959,6 @@ static WRITE8_HANDLER( victory_main_ack_w )
 }
 
 
-static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
-	AM_RANGE(0x4000, 0x4fff) AM_NOP
-	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_WRITE(exidy_sfxctrl_w)
-	AM_RANGE(0x7000, 0xafff) AM_NOP
-	AM_RANGE(0xb000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
 static const pia6821_interface victory_pia_e5_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
@@ -927,11 +970,10 @@ static const pia6821_interface victory_pia_e5_intf =
 static void *victory_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	pia_config(1, &victory_pia_e5_intf);
-	has_sh8253 = TRUE;
 
 	state_save_register_global(victory_sound_response_ack_clk);
 
-	return common_sh_start();
+	return common_sh_start(TRUE, TRUE);
 }
 
 
@@ -956,6 +998,19 @@ static const struct CustomSound_interface victory_custom_interface =
 	0,
 	victory_sh_reset,
 };
+
+
+static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_READWRITE(exidy_shriot_r, exidy_shriot_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x4000, 0x4fff) AM_NOP
+	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_READWRITE(exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_WRITE(exidy_sfxctrl_w)
+	AM_RANGE(0x7000, 0xafff) AM_NOP
+	AM_RANGE(0xb000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( victory_audio )
@@ -989,8 +1044,7 @@ MACHINE_DRIVER_END
 
 static void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	has_sh8253 = FALSE;
-	return common_sh_start();
+	return common_sh_start(FALSE, FALSE);
 }
 
 
