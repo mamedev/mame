@@ -160,9 +160,14 @@ WRITE16_HANDLER( midxunit_io_w )
 WRITE16_HANDLER( midxunit_unknown_w )
 {
 	int offs = offset / 0x40000;
+
+	if (offs == 1 && ACCESSING_LSB)
+		dcs_reset_w(data & 2);
+
 	if (ACCESSING_LSB && offset % 0x40000 == 0)
 		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", activecpu_get_pc(), offs, data & 0xff);
 }
+
 
 
 /*************************************
@@ -246,7 +251,7 @@ void midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpunum_set_input_line(1, 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(0, 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
