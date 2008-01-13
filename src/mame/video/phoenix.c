@@ -236,6 +236,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	{
 		/* set memory bank */
 		current_videoram_pg_index = data & 1;
+		memory_set_bank(1, current_videoram_pg_index);
 		current_videoram_pg = current_videoram_pg_index ? videoram_pg2 : videoram_pg1;
 
 		cocktail_mode = current_videoram_pg_index && (input_port_3_r(0) & 0x01);
