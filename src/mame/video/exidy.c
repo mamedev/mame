@@ -280,7 +280,6 @@ static TIMER_CALLBACK( collision_irq_callback )
 {
 	/* latch the collision bits */
 	latch_condition(param);
-popmessage("Collision %02X", param);
 
 	/* set the IRQ line */
 	cpunum_set_input_line(0, 0, ASSERT_LINE);
