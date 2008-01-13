@@ -12,6 +12,8 @@
  *
  ****************************************************************/
 
+#define USE_8039	(0)			/* set to 1 to try 8039 hack */
+
 #define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
@@ -228,26 +230,26 @@ DISCRETE_SOUND_END
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data;
+#if USE_8039
+	UINT8 *SND = memory_region(REGION_CPU2);
 
+	SND[1] = 0x01;
+#endif
+	
 	state_save_register_global(state->last);
 	state_save_register_global(state->portT);
-	soundlatch_clear_w(0,0);
-	soundlatch2_clear_w(0,0);
-	soundlatch3_clear_w(0,0);
-	soundlatch4_clear_w(0,0);
-	I8035_P1_W(0xf0); /* Port is in high impedance state after reset */
-	I8035_P2_W(0xff); /* Port is in high impedance state after reset */
-	/*
-	 * The code below will play the correct start up sound according
-	 * to mametesters.
-	 * However, it is not backed by hardware at all.  The LS393 latch 
-	 */
-	//soundlatch_w(0,2);
 }
 
 static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data;
+
+	soundlatch_clear_w(0,0);
+	soundlatch2_clear_w(0,0);
+	soundlatch3_clear_w(0,0);
+	soundlatch4_clear_w(0,0);
+	I8035_P1_W(0x00); /* Input port */
+	I8035_P2_W(0xff); /* Port is in high impedance state after reset */
 
 	state->last = 0;
 }
@@ -280,8 +282,12 @@ static READ8_HANDLER( mario_sh_t1_r )
 
 static READ8_HANDLER( mario_sh_ea_r )
 {
+#if USE_8039
+	return 1;
+#else
 	int p2 = (I8035_P2_R() >> 5) & 1;
 	return p2 ^ 1;
+#endif
 }
 
 static READ8_HANDLER( mario_sh_tune_r )
@@ -400,7 +406,7 @@ static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
 	AM_RANGE(I8039_t0, I8039_t0) AM_READ(mario_sh_t0_r)
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(mario_sh_t1_r)
-	AM_RANGE(I8039_ea, I8039_ea) AM_READ(mario_sh_ea_r)
+	AM_RANGE(I8039_ea, I8039_ea) AM_READ(mario_sh_ea_r)	/* only for documentation purposes right now */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masao_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -430,7 +436,11 @@ static const struct AY8910interface ay8910_interface =
 
 MACHINE_DRIVER_START( mario_audio )
 
+#if USE_8039
+	MDRV_CPU_ADD(I8039, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+#else
 	MDRV_CPU_ADD(M58715, I8035_CLOCK)  /* audio CPU */         /* 730 kHz */
+#endif
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
 

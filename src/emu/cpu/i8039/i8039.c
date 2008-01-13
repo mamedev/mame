@@ -63,8 +63,8 @@ static int Ext_IRQ(void);
 static int Timer_IRQ(void);
 
 #define M_RDMEM(A)		I8039_RDMEM(A)
-#define M_RDOP(A)		I8039_RDOP(A)
-#define M_RDOP_ARG(A)	I8039_RDOP_ARG(A)
+//#define M_RDOP(A)		I8039_RDOP(A)
+//#define M_RDOP_ARG(A)	I8039_RDOP_ARG(A)
 #define M_IN(A)			I8039_In(A)
 #define M_OUT(A,V)		I8039_Out(A,V)
 
@@ -94,6 +94,7 @@ typedef struct
 	UINT8	EA;				/* latched EA input */
 	UINT8	cpu_feature;	/* process feature */
 	UINT8	ram_mask;		/* internal ram size - 1 */
+	UINT16	int_rom_size;	/* internal rom size */
 	UINT8	pending_irq, irq_executing, masterClock, regPtr;
 	UINT8	t_flag, timer, timerON, countON, xirq_en, tirq_en;
 	UINT16	A11;
@@ -140,6 +141,22 @@ INLINE UINT8 ea_r(void)
 {
 	R.EA = I8039_In(I8039_ea);
 	return R.EA;
+}
+
+INLINE UINT8 M_RDOP(int A)
+{
+	if (R.cpu_feature & FEATURE_M58715)
+		if ((A<R.int_rom_size) && !ea_r())
+			return 0x00;
+	return I8039_RDOP(A);
+}
+
+INLINE UINT8 M_RDOP_ARG(int A)
+{
+	if (R.cpu_feature & FEATURE_M58715)
+		if ((A<R.int_rom_size) && !ea_r())
+			return 0x00;
+	return I8039_RDOP_ARG(A);
 }
 
 INLINE void CLR (UINT8 flag) { R.PSW &= ~flag; }
@@ -596,6 +613,7 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	
 	R.cpu_feature = 0;
 	R.ram_mask = 0x7F;
+	R.int_rom_size = 0x800;
 	/* not changed on reset*/
 	memset(R.RAM, 0x00, 128);
 	R.timer = 0;
@@ -605,6 +623,7 @@ static void i8035_init (int index, int clock, const void *config, int (*irqcallb
 {
 	i8039_init(index, clock, config, irqcallback);
 	R.ram_mask = 0x3F;
+	R.int_rom_size = 0x400;
 }
 
 static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
@@ -635,7 +654,7 @@ static void i8039_reset (void)
 
 	if (R.cpu_feature & FEATURE_M58715) 
 	{
-		R.timerON = 1;  /* Mario Bros. doesn't work without this */
+		//R.timerON = 1;  /* Mario Bros. doesn't work without this */
 		//R.PSW |= C_FLAG; //MB will play startup sound, but wrong # */
 	}
 	R.irq_extra_cycles = 0;
