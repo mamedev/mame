@@ -26,13 +26,6 @@
 
 void *exidy_sh_start(int clock, const struct CustomSound_interface *config);
 void exidy_sh_reset(void *token);
-
-void *victory_sh_start(int clock, const struct CustomSound_interface *config);
-void victory_sh_reset(void *token);
-
-void *berzerk_sh_start(int clock, const struct CustomSound_interface *config);
-void berzerk_sh_reset(void *token);
-
 WRITE8_HANDLER( exidy_shriot_w );
 WRITE8_HANDLER( exidy_sfxctrl_w );
 WRITE8_HANDLER( exidy_sh8253_w );
@@ -42,21 +35,17 @@ READ8_HANDLER( exidy_shriot_r );
 READ8_HANDLER( exidy_sh8253_r );
 READ8_HANDLER( exidy_sh6840_r );
 
+MACHINE_DRIVER_EXTERN( victory_audio );
 READ8_HANDLER( victory_sound_response_r );
 READ8_HANDLER( victory_sound_status_r );
 WRITE8_HANDLER( victory_sound_command_w );
 
+MACHINE_DRIVER_EXTERN( berzerk_audio );
+WRITE8_HANDLER( berzerk_audio_w );
+READ8_HANDLER( berzerk_audio_r );
+
 WRITE8_HANDLER( mtrap_voiceio_w );
 READ8_HANDLER( mtrap_voiceio_r );
-
-
-/*----------- defined in audio/targ.c -----------*/
-
-extern UINT8 targ_spec_flag;
-
-void targ_sh_start(void);
-
-WRITE8_HANDLER( targ_sh_w );
 
 
 /*----------- defined in video/exidy.c -----------*/

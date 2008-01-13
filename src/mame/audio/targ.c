@@ -1,6 +1,6 @@
 /*************************************************************************
 
-    Exidy 6502 hardware
+    Targ hardware
 
 *************************************************************************/
 
@@ -12,150 +12,205 @@
 */
 
 #include "driver.h"
-#include "exidy.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
+#include "targ.h"
 
-UINT8 targ_spec_flag;
-static UINT8 targ_sh_ctrl0=0;
-static UINT8 targ_sh_ctrl1=0;
+
+
+#define SPECTAR_MAXFREQ		525000
+#define TARG_MAXFREQ		125000
+
+
+static int max_freq;
+
+static UINT8 port_1_last;
+static UINT8 port_2_last;
+
+static UINT8 tone_freq;
 static UINT8 tone_active;
-
-#define MAXFREQ_A_TARG 125000
-#define MAXFREQ_A_SPECTAR 525000
-
-static int sound_a_freq;
 static UINT8 tone_pointer;
-static UINT8 tone_offset;
 
-static const UINT8 tone_prom[32] =
+
+static const INT16 sine_wave[32] =
 {
-    0xE5,0xE5,0xED,0xED,0xE5,0xE5,0xED,0xED,0xE7,0xE7,0xEF,0xEF,0xE7,0xE7,0xEF,0xEF,
-    0xC1,0xE1,0xC9,0xE9,0xC5,0xE5,0xCD,0xED,0xC3,0xE3,0xCB,0xEB,0xC7,0xE7,0xCF,0xEF
+	 0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
+	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
 };
 
-/* waveforms for the audio hardware */
-static const INT16 waveform1[32] =
-{
-	/* sine-wave */
-	0x0F0F, 0x0F0F, 0x0F0F, 0x0606, 0x0606, 0x0909, 0x0909, 0x0606, 0x0606, 0x0909, 0x0606, 0x0D0D, 0x0F0F, 0x0F0F, 0x0D0D, 0x0000,
-	-0x191A, -0x2122, -0x1E1F, -0x191A, -0x1314, -0x191A, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1E1F, -0x1E1F, -0x1819
-};
 
 /* some macros to make detecting bit changes easier */
-#define RISING_EDGE(bit)  ((data & bit) && !(targ_sh_ctrl0 & bit))
-#define FALLING_EDGE(bit) (!(data & bit) && (targ_sh_ctrl0 & bit))
+#define RISING_EDGE(bit)  ( (data & bit) && !(port_1_last & bit))
+#define FALLING_EDGE(bit) (!(data & bit) &&  (port_1_last & bit))
 
 
-static void targ_tone_generator(int data)
+
+static void adjust_sample(UINT8 freq)
 {
-	int maxfreq;
+	tone_freq = freq;
 
-
-	if (targ_spec_flag) maxfreq = MAXFREQ_A_TARG;
-	else maxfreq = MAXFREQ_A_SPECTAR;
-
-    sound_a_freq = data;
-    if (sound_a_freq == 0xFF || sound_a_freq == 0x00)
+	if ((tone_freq == 0xff) || (tone_freq == 0x00))
+		sample_set_volume(3, 0);
+	else
 	{
-		sample_set_volume(3,0);
-    }
-    else
-	{
-		sample_set_freq(3,maxfreq/(0xFF-sound_a_freq));
-		sample_set_volume(3,tone_active*1.0);
+		sample_set_freq(3, 1.0 * max_freq / (0xff - tone_freq));
+		sample_set_volume(3, tone_active);
 	}
 }
 
-void targ_sh_start(void)
+
+WRITE8_HANDLER( targ_audio_1_w )
 {
-	tone_pointer=0;
-	tone_offset=0;
-	tone_active=0;
-	sound_a_freq = 0x00;
-	sample_set_volume(3,0);
-	sample_start_raw(3,waveform1,32,1000,1);
+	/* CPU music */
+	if ((data & 0x01) != (port_1_last & 0x01))
+		DAC_data_w(0,(data & 0x01) * 0xff);
+
+	/* shot */
+	if (FALLING_EDGE(0x02) && !sample_playing(0))  sample_start(0,1,0);
+	if (RISING_EDGE(0x02)) sample_stop(0);
+
+	/* crash */
+	if (RISING_EDGE(0x20))
+	{
+		if (data & 0x40)
+			sample_start(1,2,0);
+		else
+			sample_start(1,0,0);
+	}
+
+	/* Sspec */
+	if (data & 0x10)
+		sample_stop(2);
+	else
+	{
+		if ((data & 0x08) != (port_1_last & 0x08))
+		{
+			if (data & 0x08)
+				sample_start(2,3,1);
+			else
+				sample_start(2,4,1);
+		}
+	}
+
+	/* Game (tone generator enable) */
+	if (FALLING_EDGE(0x80))
+	{
+		tone_pointer = 0;
+		tone_active = 0;
+
+		adjust_sample(tone_freq);
+	}
+
+	if (RISING_EDGE(0x80))
+		tone_active=1;
+
+	port_1_last = data;
 }
 
-WRITE8_HANDLER( targ_sh_w )
+
+WRITE8_HANDLER( targ_audio_2_w )
 {
-	int maxfreq;
+	if ((data & 0x01) && !(port_2_last & 0x01))
+	{
+		UINT8 *prom = memory_region(TARG_TONE_REGION);
 
+		tone_pointer = (tone_pointer + 1) & 0x0f;
 
-	if (targ_spec_flag) maxfreq = MAXFREQ_A_TARG;
-	else maxfreq = MAXFREQ_A_SPECTAR;
+		adjust_sample(prom[((data & 0x02) << 3) | tone_pointer]);
+	}
 
-    if (offset) {
-        if (targ_spec_flag) {
-            if (data & 0x02)
-                tone_offset=16;
-            else
-                tone_offset=0;
-
-            if ((data & 0x01) && !(targ_sh_ctrl1 & 0x01)) {
-                tone_pointer++;
-                if (tone_pointer > 15) tone_pointer = 0;
-                targ_tone_generator(tone_prom[tone_pointer+tone_offset]);
-            }
-       }
-       else {
-            targ_tone_generator(data);
-       }
-       targ_sh_ctrl1=data;
-    }
-    else
-    {
-        /* cpu music */
-        if ((data & 0x01) != (targ_sh_ctrl0 & 0x01)) {
-            DAC_data_w(0,(data & 0x01) * 0xFF);
-        }
-        /* Shoot */
-        if FALLING_EDGE(0x02) {
-            if (!sample_playing(0))  sample_start(0,1,0);
-        }
-        if RISING_EDGE(0x02) {
-            sample_stop(0);
-        }
-
-        /* Crash */
-        if RISING_EDGE(0x20) {
-            if (data & 0x40) {
-                sample_start(1,2,0); }
-            else {
-                sample_start(1,0,0); }
-        }
-
-        /* Sspec */
-        if (data & 0x10) {
-            sample_stop(2);
-        }
-        else {
-            if ((data & 0x08) != (targ_sh_ctrl0 & 0x08)) {
-            if (data & 0x08) {
-                sample_start(2,3,1); }
-            else {
-                sample_start(2,4,1); }
-            }
-        }
-
-        /* Game (tone generator enable) */
-        if FALLING_EDGE(0x80) {
-           tone_pointer=0;
-           tone_active=0;
-           if (sound_a_freq == 0xFF || sound_a_freq == 0x00)
-		   {
-				sample_set_volume(3,0);
-           }
-           else
-		   {
-             sample_set_freq(3,maxfreq/(0xFF-sound_a_freq));
-             sample_set_volume(3,0);
-		   }
-        }
-        if RISING_EDGE(0x80) {
-            tone_active=1;
-        }
-        targ_sh_ctrl0 = data;
-    }
+	port_2_last = data;
 }
 
+
+WRITE8_HANDLER( spectar_audio_2_w )
+{
+	adjust_sample(data);
+}
+
+
+static const char *const sample_names[] =
+{
+	"*targ",
+	"expl.wav",
+	"shot.wav",
+	"sexpl.wav",
+	"spslow.wav",
+	"spfast.wav",
+	0
+};
+
+
+static void common_audio_start(int freq)
+{
+	max_freq = freq;
+
+	tone_freq = 0;
+	tone_active = 0;
+
+	sample_set_volume(3, 0);
+	sample_start_raw(3, sine_wave, 32, 1000, 1);
+
+	state_save_register_global(port_1_last);
+	state_save_register_global(port_2_last);
+	state_save_register_global(tone_freq);
+	state_save_register_global(tone_active);
+}
+
+
+static void spectar_audio_start(void)
+{
+	common_audio_start(SPECTAR_MAXFREQ);
+}
+
+
+static void targ_audio_start(void)
+{
+	common_audio_start(TARG_MAXFREQ);
+
+	tone_pointer = 0;
+
+	state_save_register_global(tone_pointer);
+}
+
+
+static const struct Samplesinterface spectar_samples_interface =
+{
+	4,	/* number of channel */
+	sample_names,
+	spectar_audio_start
+};
+
+
+static const struct Samplesinterface targ_samples_interface =
+{
+	4,	/* number of channel */
+	sample_names,
+	targ_audio_start
+};
+
+
+MACHINE_DRIVER_START( spectar_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(spectar_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( targ_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(targ_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD(DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END

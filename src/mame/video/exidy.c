@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "exidy.h"
 
 
 UINT8 *exidy_videoram;

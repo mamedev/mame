@@ -43,6 +43,7 @@ static struct
 /* from what I can tell, this should be divided by 32, not 8  */
 /* but the interrupt test does some precise timing, and fails */
 /* if it's not 8 */
+#define VICTORY_MICRO_STATE_CLOCK	(XTAL_11_289MHz)
 #define MICRO_STATE_CLOCK_PERIOD	ATTOTIME_IN_HZ(VICTORY_MICRO_STATE_CLOCK / 8)
 
 

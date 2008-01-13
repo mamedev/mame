@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "berzerk.h"
+#include "exidy.h"
 #include "machine/74181.h"
 #include "video/resnet.h"
 
