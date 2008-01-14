@@ -1508,8 +1508,9 @@ static DRIVER_INIT( devzone )
 static DRIVER_INIT( nomnlnd )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, MWA8_NOP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x480a, 0x480a, 0, 0, DAC_0_data_w);
 }
 
 
