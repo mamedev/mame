@@ -257,11 +257,17 @@ static INPUT_PORTS_START( narc )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(narc_talkback_strobe_r, NULL)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED ) /* memory protect interlock */
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) ) /* Is this a REAL dip or toggle? or software enable? */
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
+/*
+	Test mode indicates "Cut for French" and "Cut for German", hinting that these
+	are jumpers or wires that can be modified on the PCB. However, there are no
+	French or German strings in the ROMs, and this "feature" was clearly never
+	actually implemented
+	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( French ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( German ) )
-//  PORT_DIPSETTING(      0x0000, DEF_STR( Unknown ) )
+*/
 
 	PORT_START
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(narc_talkback_data_r, NULL)
