@@ -624,7 +624,7 @@ ROM_END
 ROM_START( nss_smw )
 	NSS_BIOS
 	ROM_REGION( 0x100000, REGION_USER3, ROMREGION_DISPOSE )
-	ROM_LOAD( "nss-mw-0_prg.ic1", 0x000000, 0x100000, CRC(971ff812) SHA1(4e8f5f0d160ca3e14db3d88c00f2e7e2dce4dca6) )
+	ROM_LOAD( "nss-mw-0_prg.ic1", 0x000000, 0x80000, CRC(c46766f2) SHA1(06a6efc246c6fdb83efab1d402d61d2179a84494) )
 
 	/* instruction / data rom for bios */
 	ROM_REGION( 0x8000, REGION_USER4, 0 )
