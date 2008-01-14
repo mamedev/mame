@@ -301,7 +301,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			timer_rate = (double)cpunum_get_clock(0) * 0.5;
+			timer_rate = (double)(cpunum_get_clock(0) * 0.5);
 		else
 			timer_rate = 10000000.;
 	}
