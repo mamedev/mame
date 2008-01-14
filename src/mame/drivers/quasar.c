@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_CPU_IO_MAP(quasar_io,0)
 	MDRV_CPU_VBLANK_INT(quasar_interrupt,1)
 
-	MDRV_CPU_ADD_TAG("sound",I8035,6000000/15)			/* 6MHz crystal divide by 15 in CPU */
+	MDRV_CPU_ADD_TAG("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)

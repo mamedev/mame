@@ -1321,7 +1321,7 @@ static DRIVER_INIT( zwackery )
 	mcr68_common_init(MCR_CHIP_SQUEAK_DELUXE, 0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * (256 + 16));
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 }
 
 
@@ -1330,7 +1330,7 @@ static DRIVER_INIT( xenophob )
 	mcr68_common_init(MCR_SOUNDS_GOOD, 0, 0);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * (256 + 16));
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* install control port handler */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, xenophobe_control_w);
@@ -1342,7 +1342,7 @@ static DRIVER_INIT( spyhunt2 )
 	mcr68_common_init(MCR_TURBO_CHIP_SQUEAK | MCR_SOUNDS_GOOD, 0, -6);
 
 	/* Spy Hunter 2 doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * (256 + 16));
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* analog port handling is a bit tricky */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, spyhunt2_control_w);
@@ -1358,7 +1358,7 @@ static DRIVER_INIT( blasted )
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
 	/* after the 493; we also allow 16 E clocks for latency  */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * (256 + 16));
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* handle control writes */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
@@ -1374,7 +1374,7 @@ static DRIVER_INIT( archrivl )
 	mcr68_common_init(MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * (256 + 16));
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* handle control writes */
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, archrivl_control_w);
@@ -1393,7 +1393,7 @@ static DRIVER_INIT( pigskin )
 	mcr68_common_init(MCR_WILLIAMS_SOUND, 16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * 115);
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * 115);
 
 	state_save_register_global_array(protection_data);
 }
@@ -1406,7 +1406,7 @@ static DRIVER_INIT( trisport )
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */
 	/* after the 493 */
-	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(machine->drv->cpu[0].clock / 10) * 115);
+	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * 115);
 }
 
 

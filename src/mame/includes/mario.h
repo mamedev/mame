@@ -26,8 +26,7 @@
 #define Z80_CLOCK				(Z80_MASTER_CLOCK / 2) /* verified on pcb */
 
 #define I8035_MASTER_CLOCK		XTAL_11MHz /* verified on pcb: 730Khz */
-#define I8035_DIVIDER			(15)
-#define I8035_CLOCK				(I8035_MASTER_CLOCK/I8035_DIVIDER)
+#define I8035_CLOCK				(I8035_MASTER_CLOCK)
 
 #define MARIO_PALETTE_LENGTH	(256)
 

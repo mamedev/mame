@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( bigtwin )
 	MDRV_CPU_PROGRAM_MAP(bigtwin_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz */
+	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1006,7 +1006,7 @@ static MACHINE_DRIVER_START( wbeachvl )
 	MDRV_CPU_PROGRAM_MAP(wbeachvl_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-//  MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))   /* 3MHz */
+//  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1041,7 +1041,7 @@ static MACHINE_DRIVER_START( excelsr )
 	MDRV_CPU_PROGRAM_MAP(excelsr_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz */
+	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1074,7 +1074,7 @@ static MACHINE_DRIVER_START( hotmind )
 	MDRV_CPU_PROGRAM_MAP(hotmind_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))	/* 3MHz */
+	MDRV_CPU_ADD(PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
@@ -1109,7 +1109,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-//  MDRV_CPU_ADD(PIC16C57, (12000000/PIC16C5x_CLOCK_DIVIDER))   /* 3MHz */
+//  MDRV_CPU_ADD(PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 

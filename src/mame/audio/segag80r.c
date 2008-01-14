@@ -821,7 +821,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( monsterb_sound_board )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(N7751, 6000000/15)
+	MDRV_CPU_ADD(N7751, 6000000)
 	MDRV_CPU_PROGRAM_MAP(monsterb_7751_map,0)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
 

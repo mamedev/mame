@@ -332,7 +332,7 @@ static MACHINE_DRIVER_START( lkage )
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD(M68705,4000000/M68705_CLOCK_DIVIDER)	/* ??? */
+	MDRV_CPU_ADD(M68705,4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

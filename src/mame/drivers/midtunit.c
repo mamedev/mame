@@ -603,7 +603,7 @@ static const tms34010_config tms_config =
 static MACHINE_DRIVER_START( tunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, CPU_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, CPU_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 

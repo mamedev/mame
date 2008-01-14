@@ -29,7 +29,7 @@
 #include "cpuintrf.h"
 
 
-/* The i8x41/i8x42 input clock is divided by 15. Use it with your CPU speed */
+/* The i8x41/i8x42 input clock is divided by 15 */
 #define I8X41_CLOCK_DIVIDER		15
 
 /* Note:

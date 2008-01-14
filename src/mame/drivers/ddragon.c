@@ -1051,7 +1051,7 @@ static MACHINE_DRIVER_START( darktowr )
  	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-	MDRV_CPU_ADD(M68705,8000000/2/M68705_CLOCK_DIVIDER)  /* ? MHz */
+	MDRV_CPU_ADD(M68705,8000000/2)  /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)

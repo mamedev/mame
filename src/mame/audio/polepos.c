@@ -63,7 +63,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 	}
 
 	/* determine the effective clock rate */
-	clock = (Machine->drv->cpu[0].clock / 16) * ((sample_msb + 1) * 64 + sample_lsb + 1) / (64*64);
+	clock = (cpunum_get_clock(0) / 16) * ((sample_msb + 1) * 64 + sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */

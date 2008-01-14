@@ -506,7 +506,7 @@ static const struct AY8910interface ay8912_interface =
 static MACHINE_START( tenpindx )
 {
 	/* initialize the CTC */
-	ctc_intf.baseclock = machine->drv->cpu[0].clock;
+	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
 	machine_start_astrocde(machine);
 }

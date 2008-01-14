@@ -1923,7 +1923,7 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map,0)
 
-	MDRV_CPU_ADD(M68705,3000000/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD(M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map,0)
 MACHINE_DRIVER_END
 

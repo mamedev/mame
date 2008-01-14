@@ -14,11 +14,6 @@
 #include "driver.h"
 
 
-/* the TMS34010 input clock is divided by 8; the 34020 by 4 */
-#define TMS34010_CLOCK_DIVIDER		8
-#define TMS34020_CLOCK_DIVIDER		4
-
-
 /* register indexes for get_reg and set_reg */
 enum
 {

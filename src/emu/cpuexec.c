@@ -215,7 +215,7 @@ void cpuexec_init(running_machine *machine)
 		/* initialize the cpuinfo struct */
 		memset(&cpu[cpunum], 0, sizeof(cpu[cpunum]));
 		cpu[cpunum].suspend = SUSPEND_REASON_RESET;
-		cpu[cpunum].clock = machine->drv->cpu[cpunum].clock;
+		cpu[cpunum].clock = (UINT64)machine->drv->cpu[cpunum].clock * cputype_clock_multiplier(cputype) / cputype_clock_divider(cputype);
 		cpu[cpunum].clockscale = 1.0;
 		cpu[cpunum].localtime = attotime_zero;
 

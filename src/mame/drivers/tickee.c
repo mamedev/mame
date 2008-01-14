@@ -304,7 +304,7 @@ static const tms34010_config tms_config =
 static MACHINE_DRIVER_START( tickee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tickee_map,0)
 

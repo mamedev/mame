@@ -189,7 +189,7 @@ static const struct YM2151interface adpcm_ym2151_interface =
 ****************************************************************************/
 
 MACHINE_DRIVER_START( williams_cvsd_sound )
-	MDRV_CPU_ADD_TAG("cvsd", M6809E, CVSD_MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("cvsd", M6809E, CVSD_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -207,10 +207,10 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( williams_narc_sound )
-	MDRV_CPU_ADD_TAG("narc1", M6809E, NARC_MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("narc1", M6809E, NARC_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_master_map,0)
 
-	MDRV_CPU_ADD_TAG("narc2", M6809E, NARC_MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("narc2", M6809E, NARC_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_slave_map,0)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -235,7 +235,7 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( williams_adpcm_sound )
-	MDRV_CPU_ADD_TAG("adpcm", M6809E, ADPCM_MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("adpcm", M6809E, ADPCM_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_adpcm_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")

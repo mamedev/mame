@@ -387,7 +387,7 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000/M68705_CLOCK_DIVIDER) /* xtal is 4MHz, divided by 4 internally */
+	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 	MDRV_CPU_VBLANK_INT(mexico86_m68705_interrupt,2)
 

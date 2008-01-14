@@ -1003,7 +1003,7 @@ static const tms34010_config yunit_tms_config =
 static MACHINE_DRIVER_START( zunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(TMS34010, FAST_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(zunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1036,7 +1036,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, SLOW_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, SLOW_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(yunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1071,7 +1071,7 @@ static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	/* video hardware */
@@ -1096,7 +1096,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1109,7 +1109,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_faster )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FASTER_MASTER_CLOCK/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_REPLACE("main", TMS34010, FASTER_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */

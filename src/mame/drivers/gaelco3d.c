@@ -632,7 +632,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* calculate how long until we generate an interrupt */
 
 			/* period per each bit sent */
-			sample_period = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[2].clock), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
+			sample_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(2)), 2 * (adsp_control_regs[S1_SCLKDIV_REG] + 1));
 
 			/* now put it down to samples, so we know what the channel frequency has to be */
 			sample_period = attotime_mul(sample_period, 16 * SOUND_CHANNELS);

@@ -90,7 +90,7 @@ static void tmp68301_update_timer( int i )
 		{
 			int scale = (TCR & 0x3c00)>>10;			// P4..1
 			if (scale > 8) scale = 8;
-			duration = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock), (1 << scale) * max);
+			duration = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(0)), (1 << scale) * max);
 		}
 		break;
 	}

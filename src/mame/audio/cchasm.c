@@ -179,7 +179,7 @@ SOUND_START( cchasm )
     sound_flags = 0;
     output[0] = 0; output[1] = 0;
 
-	ctc_intf.baseclock = machine->drv->cpu[1].clock;
+	ctc_intf.baseclock = cpunum_get_clock(1);
 	z80ctc_init (0, &ctc_intf);
 
 	timer_pulse(attotime_make(0, machine->screen[0].refresh), NULL, 0, cchasm_sh_update);

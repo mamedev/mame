@@ -346,7 +346,7 @@ static PALETTE_INIT(pipeline)
 
 static MACHINE_RESET( pipeline )
 {
-	ctc_intf.baseclock = machine->drv->cpu[0].clock;
+	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
 	ppi8255_init(&ppi8255_intf);
 }
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_CPU_PROGRAM_MAP(cpu1_mem, 0)
 	MDRV_CPU_IO_MAP(sound_port, 0)
 
-	MDRV_CPU_ADD(M68705, 7372800/2/M68705_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

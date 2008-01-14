@@ -596,7 +596,7 @@ static MACHINE_DRIVER_START( lsasquad )
 	/* audio CPU */	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD(M68705,4000000/M68705_CLOCK_DIVIDER)	/* ? */
+	MDRV_CPU_ADD(M68705,4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

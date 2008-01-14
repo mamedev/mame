@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( drgnmst )
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
 	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
 
-	MDRV_CPU_ADD(PIC16C55, ((32000000/8)/PIC16C5x_CLOCK_DIVIDER))	/* Confirmed */
+	MDRV_CPU_ADD(PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(drgnmst_sound_io_map, 0)
 

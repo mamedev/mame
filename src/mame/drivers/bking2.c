@@ -598,7 +598,7 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map,0)
 
-	MDRV_CPU_ADD(M68705, XTAL_3MHz/M68705_CLOCK_DIVIDER)      /* xtal is 3MHz, divided by 4 internally */
+	MDRV_CPU_ADD(M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
 	MDRV_MACHINE_RESET(buggychl)

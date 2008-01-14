@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( megazone )
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(I8039,(14318000/2)/I8039_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(I8039,14318000/2)
 	/* audio CPU */	/* 1/2 14MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)

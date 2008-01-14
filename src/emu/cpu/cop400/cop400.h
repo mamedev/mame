@@ -16,8 +16,6 @@
 #define INLINE static inline
 #endif
 
-#define COP400_CLOCK_DIVIDER	4
-
 #define COP400_PORT_L	0x100
 #define COP400_PORT_G	0x101
 #define COP400_PORT_D	0x102

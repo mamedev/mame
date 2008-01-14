@@ -439,7 +439,7 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
-	MDRV_CPU_ADD(M68705,8000000/2/M68705_CLOCK_DIVIDER)  /* 4 MHz */
+	MDRV_CPU_ADD(M68705,8000000/2)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

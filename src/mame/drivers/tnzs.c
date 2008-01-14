@@ -1373,7 +1373,7 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(I8X41,(12000000/2)/I8X41_CLOCK_DIVIDER)	/* 400KHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_ADD(I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
 	MDRV_CPU_IO_MAP(i8742_readport,i8742_writeport)
 

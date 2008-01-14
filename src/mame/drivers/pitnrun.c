@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( pitnrun )
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(M68705,3000000/M68705_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(M68705,3000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_MACHINE_RESET(pitnrun)

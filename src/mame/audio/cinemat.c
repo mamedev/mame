@@ -1508,7 +1508,7 @@ static MACHINE_RESET( demon_sound )
 	generic_init(machine, demon_sound_w);
 
 	/* initialize the CTC interface */
-	demon_z80ctc_interface.baseclock = machine->drv->cpu[1].clock;
+	demon_z80ctc_interface.baseclock = cpunum_get_clock(1);
 	z80ctc_init(0, &demon_z80ctc_interface);
 
 	/* reset the FIFO */

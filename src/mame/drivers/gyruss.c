@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( gyruss )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
-	MDRV_CPU_ADD(I8039,8000000/15)
+	MDRV_CPU_ADD(I8039,8000000)
 	/* audio CPU */	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)

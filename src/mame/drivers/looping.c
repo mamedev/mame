@@ -66,7 +66,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 
 #define MAIN_CPU_CLOCK		(12000000)
 #define SOUND_CLOCK			(8000000)
-#define COP_CLOCK			(1000000)		/* unknown */
+#define COP_CLOCK			(SOUND_CLOCK/2)		/* unknown guess */
 #define TMS_CLOCK			(640000)
 
 /* the schematics are very blurry here and don't actually specify the clock */

@@ -81,6 +81,7 @@ enum
 	CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
 	CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
 	CPUINFO_INT_ENDIANNESS,								/* R/O: either CPU_IS_BE or CPU_IS_LE */
+	CPUINFO_INT_CLOCK_MULTIPLIER,						/* R/O: internal clock multiplier */
 	CPUINFO_INT_CLOCK_DIVIDER,							/* R/O: internal clock divider */
 	CPUINFO_INT_MIN_INSTRUCTION_BYTES,					/* R/O: minimum bytes per instruction */
 	CPUINFO_INT_MAX_INSTRUCTION_BYTES,					/* R/O: maximum bytes per instruction */
@@ -332,6 +333,7 @@ offs_t activecpu_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *
 #define activecpu_output_lines()				activecpu_get_info_int(CPUINFO_INT_OUTPUT_LINES)
 #define activecpu_default_irq_vector()			activecpu_get_info_int(CPUINFO_INT_DEFAULT_IRQ_VECTOR)
 #define activecpu_endianness()					activecpu_get_info_int(CPUINFO_INT_ENDIANNESS)
+#define activecpu_clock_multiplier()			activecpu_get_info_int(CPUINFO_INT_CLOCK_MULTIPLIER)
 #define activecpu_clock_divider()				activecpu_get_info_int(CPUINFO_INT_CLOCK_DIVIDER)
 #define activecpu_min_instruction_bytes()		activecpu_get_info_int(CPUINFO_INT_MIN_INSTRUCTION_BYTES)
 #define activecpu_max_instruction_bytes()		activecpu_get_info_int(CPUINFO_INT_MAX_INSTRUCTION_BYTES)
@@ -402,6 +404,7 @@ offs_t cpunum_dasm(int cpunum, char *buffer, offs_t pc, const UINT8 *oprom, cons
 #define cpunum_output_lines(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_OUTPUT_LINES)
 #define cpunum_default_irq_vector(cpunum)		cpunum_get_info_int(cpunum, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
 #define cpunum_endianness(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_ENDIANNESS)
+#define cpunum_clock_multiplier(cpunum)			cpunum_get_info_int(cpunum, CPUINFO_INT_CLOCK_MULTIPLIER)
 #define cpunum_clock_divider(cpunum)			cpunum_get_info_int(cpunum, CPUINFO_INT_CLOCK_DIVIDER)
 #define cpunum_min_instruction_bytes(cpunum)	cpunum_get_info_int(cpunum, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
 #define cpunum_max_instruction_bytes(cpunum)	cpunum_get_info_int(cpunum, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
@@ -442,6 +445,7 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 #define cputype_output_lines(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_OUTPUT_LINES)
 #define cputype_default_irq_vector(cputype)		cputype_get_info_int(cputype, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
 #define cputype_endianness(cputype)				cputype_get_info_int(cputype, CPUINFO_INT_ENDIANNESS)
+#define cputype_clock_multiplier(cputype)		cputype_get_info_int(cputype, CPUINFO_INT_CLOCK_MULTIPLIER)
 #define cputype_clock_divider(cputype)			cputype_get_info_int(cputype, CPUINFO_INT_CLOCK_DIVIDER)
 #define cputype_min_instruction_bytes(cputype)	cputype_get_info_int(cputype, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
 #define cputype_max_instruction_bytes(cputype)	cputype_get_info_int(cputype, CPUINFO_INT_MAX_INSTRUCTION_BYTES)

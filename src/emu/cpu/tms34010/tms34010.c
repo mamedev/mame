@@ -1508,7 +1508,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			/* have an IRQ handler. For this reason, we return it signalled a bit early in order */
 			/* to make it past these loops. */
 			if (SMART_IOREG(VCOUNT) + 1 == SMART_IOREG(DPYINT) &&
-				attotime_compare(timer_timeleft(state.scantimer), ATTOTIME_IN_HZ(40000000/TMS34010_CLOCK_DIVIDER/3)) < 0)
+				attotime_compare(timer_timeleft(state.scantimer), ATTOTIME_IN_HZ(40000000/8/3)) < 0)
 				result |= TMS34010_DI;
 			return result;
 	}
@@ -1798,7 +1798,8 @@ void tms34010_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = TMS34010_CLOCK_DIVIDER;		break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 8;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
@@ -1946,7 +1947,8 @@ void tms34020_get_info(UINT32 _state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = TMS34020_STATE_SIZE;			break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = TMS34020_CLOCK_DIVIDER;		break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms34020_get_context; break;

@@ -267,7 +267,7 @@ static z80sio_interface nflfoot_sio_intf =
 MACHINE_START( mcr )
 {
 	/* initialize the CTC */
-	ctc_intf.baseclock = machine->drv->cpu[0].clock;
+	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
 
 	state_save_register_global(mcr_cocktail_flip);
@@ -277,16 +277,16 @@ MACHINE_START( mcr )
 MACHINE_START( nflfoot )
 {
 	/* initialize the CTC */
-	ctc_intf.baseclock = machine->drv->cpu[0].clock;
+	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
 
-	nflfoot_ctc_intf.baseclock = machine->drv->cpu[3].clock;
+	nflfoot_ctc_intf.baseclock = cpunum_get_clock(3);
 	z80ctc_init(1, &nflfoot_ctc_intf);
 
 	z80pio_init(0, &nflfoot_pio_intf);
 	z80pio_init(1, &nflfoot_pio_intf);
 
-	nflfoot_sio_intf.baseclock = machine->drv->cpu[3].clock;
+	nflfoot_sio_intf.baseclock = cpunum_get_clock(3);
 	z80sio_init(0, &nflfoot_sio_intf);
 
 	/* allocate a timer for the IPU watchdog */
@@ -364,7 +364,7 @@ static void mcr68_common_init(void)
 	}
 
 	/* initialize the clock */
-	m6840_internal_counter_period = ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock / 10);
+	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpunum_get_clock(0) / 10);
 
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;

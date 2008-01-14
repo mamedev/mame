@@ -19,16 +19,6 @@
 
 
 
-/**************************************************************************
- *  Internal Clock divisor
- *
- *  External Clock is divided internally by 4, to produce the states
- *  used in carrying out an instruction (machine) cycle.
- */
-
-#define TMS32010_CLOCK_DIVIDER		4
-
-
 /****************************************************************************
  * Use this in the I/O port address fields of your driver for the BIO pin
  * i.e,

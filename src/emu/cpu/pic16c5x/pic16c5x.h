@@ -20,11 +20,9 @@
  *  Internal Clock divisor
  *
  *  External Clock is divided internally by 4 for the instruction cycle
- *  times. (Each instruction cycle passes through 4 machine states).
+ *  times. (Each instruction cycle passes through 4 machine states). This
+ *	is handled by the cpu execution engine.
  */
-
-#define PIC16C5x_CLOCK_DIVIDER		4
-
 
 enum {
 	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,

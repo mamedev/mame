@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( junofrst )
 	/* audio CPU */	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
-	MDRV_CPU_ADD(I8039,8000000/I8039_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(I8039,8000000)
 	/* audio CPU */	/* 8MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)

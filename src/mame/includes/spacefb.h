@@ -12,7 +12,7 @@
 
 #define SPACEFB_MASTER_CLOCK			(20160000)
 #define SPACEFB_MAIN_CPU_CLOCK			(6000000 / 2)
-#define SPACEFB_AUDIO_CPU_CLOCK			(6000000 / 15)	/* this goes to X2, pixel clock goes to X1 */
+#define SPACEFB_AUDIO_CPU_CLOCK			(6000000)	/* this goes to X2, pixel clock goes to X1 */
 #define SPACEFB_PIXEL_CLOCK				(SPACEFB_MASTER_CLOCK / 2)
 #define SPACEFB_HTOTAL					(0x280)
 #define SPACEFB_HBEND					(0x000)

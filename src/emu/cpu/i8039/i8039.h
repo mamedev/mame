@@ -25,9 +25,6 @@
     (Each instruction cycle passes through 5 machine states).
 */
 
-#define I8039_CLOCK_DIVIDER		(3*5)
-
-
 
 enum { I8039_PC=1, I8039_SP, I8039_PSW, I8039_A,  I8039_TC,
 	   I8039_P1,   I8039_P2, I8039_R0,  I8039_R1, I8039_R2,
@@ -75,7 +72,6 @@ extern void i8039_get_info(UINT32 state, cpuinfo *info);
 #define I8035_R6				I8039_R6
 #define I8035_R7				I8039_R7
 
-#define I8035_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
 #define i8035_ICount			i8039_ICount
 
 extern void i8035_get_info(UINT32 state, cpuinfo *info);
@@ -101,7 +97,6 @@ extern void i8035_get_info(UINT32 state, cpuinfo *info);
 #define I8048_R6				I8039_R6
 #define I8048_R7				I8039_R7
 
-#define I8048_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
 #define i8048_ICount			i8039_ICount
 
 extern void i8048_get_info(UINT32 state, cpuinfo *info);
@@ -127,59 +122,6 @@ extern void i8048_get_info(UINT32 state, cpuinfo *info);
 #define N7751_R6				I8039_R6
 #define N7751_R7				I8039_R7
 
-#define N7751_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
-#define n7751_ICount			i8039_ICount
-
-extern void n7751_get_info(UINT32 state, cpuinfo *info);
-#endif
-
-/**************************************************************************
- * N7751 section
- **************************************************************************/
-#if (HAS_N7751)
-#define N7751_PC				I8039_PC
-#define N7751_SP				I8039_SP
-#define N7751_PSW				I8039_PSW
-#define N7751_A 				I8039_A
-#define N7751_TC				I8039_TC
-#define N7751_P1				I8039_P1
-#define N7751_P2				I8039_P2
-#define N7751_R0				I8039_R0
-#define N7751_R1				I8039_R1
-#define N7751_R2				I8039_R2
-#define N7751_R3				I8039_R3
-#define N7751_R4				I8039_R4
-#define N7751_R5				I8039_R5
-#define N7751_R6				I8039_R6
-#define N7751_R7				I8039_R7
-
-#define N7751_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
-#define n7751_ICount			i8039_ICount
-
-extern void n7751_get_info(UINT32 state, cpuinfo *info);
-#endif
-
-/**************************************************************************
- * N7751 section
- **************************************************************************/
-#if (HAS_N7751)
-#define N7751_PC				I8039_PC
-#define N7751_SP				I8039_SP
-#define N7751_PSW				I8039_PSW
-#define N7751_A 				I8039_A
-#define N7751_TC				I8039_TC
-#define N7751_P1				I8039_P1
-#define N7751_P2				I8039_P2
-#define N7751_R0				I8039_R0
-#define N7751_R1				I8039_R1
-#define N7751_R2				I8039_R2
-#define N7751_R3				I8039_R3
-#define N7751_R4				I8039_R4
-#define N7751_R5				I8039_R5
-#define N7751_R6				I8039_R6
-#define N7751_R7				I8039_R7
-
-#define N7751_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
 #define n7751_ICount			i8039_ICount
 
 extern void n7751_get_info(UINT32 state, cpuinfo *info);
@@ -205,7 +147,6 @@ extern void n7751_get_info(UINT32 state, cpuinfo *info);
 #define MB8884_R6				I8039_R6
 #define MB8884_R7				I8039_R7
 
-#define MB8884_CLOCK_DIVIDER		I8039_CLOCK_DIVIDER
 #define mb8884_ICount			i8039_ICount
 
 extern void mb8884_get_info(UINT32 state, cpuinfo *info);
@@ -231,7 +172,6 @@ extern void mb8884_get_info(UINT32 state, cpuinfo *info);
 #define M58715_R6				I8039_R6
 #define M58715_R7				I8039_R7
 
-#define m58715_CLOCK_DIVIDER	I8039_CLOCK_DIVIDER
 #define m58715_ICount			i8039_ICount
 
 extern void m58715_get_info(UINT32 state, cpuinfo *info);

@@ -69,7 +69,7 @@ void senjyo_sh_start(void)
     int i;
 
 	/* z80 ctc init */
-	ctc_intf.baseclock = Machine->drv->cpu[1].clock;
+	ctc_intf.baseclock = cpunum_get_clock(1);
 	z80ctc_init (0, &ctc_intf);
 
 	/* z80 pio init */

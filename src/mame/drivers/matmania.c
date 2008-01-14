@@ -400,7 +400,7 @@ static MACHINE_DRIVER_START( maniach )
 	/* audio CPU */	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(maniach_sound_readmem,maniach_sound_writemem)
 								/* IRQs are caused by the main CPU */
-	MDRV_CPU_ADD(M68705, 1500000*2/M68705_CLOCK_DIVIDER)	/* (don't know really how fast, but it doesn't need to even be this fast) */
+	MDRV_CPU_ADD(M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

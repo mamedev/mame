@@ -1319,7 +1319,7 @@ static void uPD71054_update_timer( int no )
 	UINT16 max = uPD71054.max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime_mul(ATTOTIME_IN_HZ(Machine->drv->cpu[0].clock), 16 * max);
+		attotime period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(0)), 16 * max);
 		timer_adjust( uPD71054.timer[no], period, no, attotime_zero );
 	} else {
 		timer_adjust( uPD71054.timer[no], attotime_never, no, attotime_never);

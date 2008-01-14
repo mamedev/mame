@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( carnival_audio )
-	MDRV_CPU_ADD(I8039,( ( 3579545 / 5 ) / 3 ))
+	MDRV_CPU_ADD(I8039, 3579545)
 	MDRV_CPU_PROGRAM_MAP(carnival_audio_map,0)
 	MDRV_CPU_IO_MAP(carnival_audio_io_map,0)
 

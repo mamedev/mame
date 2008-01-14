@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( xsleena )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
-//  MDRV_CPU_ADD(M68705, 3000000/M68705_CLOCK_DIVIDER)    /* Confirmed 3MHz */
+//  MDRV_CPU_ADD(M68705, 3000000)    /* Confirmed 3MHz */
 //  MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_MACHINE_START(xsleena)

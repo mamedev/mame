@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( bub68705 )
 	MDRV_IMPORT_FROM(bublbobl)
 	MDRV_CPU_REMOVE("mcu")
 
-	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000/M68705_CLOCK_DIVIDER)	// xtal is 4MHz, divided by 4 internally
+	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map, 0)
 	MDRV_CPU_VBLANK_INT(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
 MACHINE_DRIVER_END

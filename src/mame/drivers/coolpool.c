@@ -682,11 +682,11 @@ static const tms34010_config tms_config_coolpool =
 static MACHINE_DRIVER_START( amerdart )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD(TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_amerdart)
 	MDRV_CPU_PROGRAM_MAP(amerdart_map,0)
 
-	MDRV_CPU_ADD(TMS32010, 15000000/8)
+	MDRV_CPU_ADD(TMS32010, 15000000/2)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
 
@@ -714,7 +714,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coolpool )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000/TMS34010_CLOCK_DIVIDER)
+	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config_coolpool)
 	MDRV_CPU_PROGRAM_MAP(coolpool_map,0)
 
