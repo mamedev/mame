@@ -515,7 +515,6 @@ static void state_save_register(void)
 static void video_start_common(running_machine *machine, tilemap_mapper_callback get_memory_offset)
 {
 	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,TILEMAP_TYPE_PEN,8,8,32,32);
-	tilemap_set_scrolldx(bg_tilemap, 0, -128);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 
