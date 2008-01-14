@@ -112,7 +112,7 @@ static void scanline_update(running_machine *machine, int screen, mame_bitmap *b
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 

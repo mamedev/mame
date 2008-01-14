@@ -351,7 +351,7 @@ void artmagic_scanline(running_machine *machine, int screen, mame_bitmap *bitmap
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	UINT16 *vram = address_to_vram(&offset);
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 

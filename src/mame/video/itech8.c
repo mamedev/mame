@@ -573,7 +573,7 @@ VIDEO_UPDATE( itech8_2layer )
 {
 	UINT32 page_offset;
 	int x, y;
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -609,7 +609,7 @@ VIDEO_UPDATE( itech8_2page )
 {
 	UINT32 page_offset;
 	int x, y;
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -640,7 +640,7 @@ VIDEO_UPDATE( itech8_2page_large )
 {
 	UINT32 page_offset;
 	int x, y;
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);

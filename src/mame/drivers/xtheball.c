@@ -49,7 +49,7 @@ static void xtheball_scanline_update(running_machine *machine, int screen, mame_
 {
 	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr;
 	int x;
 

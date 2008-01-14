@@ -348,7 +348,7 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	UINT16 *bg1_base = &btoads_vram_bg1[(fulladdr + (yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &vram_fg_display[fulladdr & 0x3fc00];
 	UINT32 *dst = BITMAP_ADDR32(bitmap, scanline, 0);
-	rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens();
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 

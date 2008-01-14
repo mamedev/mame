@@ -9,7 +9,7 @@
 
 void tlc34076_reset(int dacwidth);
 
-pen_t *tlc34076_get_pens(void);
+const pen_t *tlc34076_get_pens(void);
 
 READ8_HANDLER( tlc34076_r );
 WRITE8_HANDLER( tlc34076_w );

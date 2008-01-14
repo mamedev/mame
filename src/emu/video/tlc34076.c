@@ -38,7 +38,7 @@ static rgb_t pens[0x100];
  *
  *************************************/
 
-pen_t *tlc34076_get_pens(void)
+const pen_t *tlc34076_get_pens(void)
 {
 	offs_t i;
 
