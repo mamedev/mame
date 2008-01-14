@@ -78,7 +78,8 @@ static TIMER_CALLBACK( nvram_write_timeout );
 static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t pens[16];
 	int coladdr = params->coladdr;
 	int x;
 
@@ -87,16 +88,16 @@ static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap 
 		for (x = 0; x < 16; x++)
 		{
 			UINT16 pal = vram_base[x];
-			palette_set_color_rgb(machine, scanline * 16 + x, pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
+			pens[x] = MAKE_RGB(pal4bit(pal >> 4), pal4bit(pal >> 8), pal4bit(pal >> 12));
 		}
 
 	for (x = params->heblnk; x < params->hsblnk; x += 4)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = scanline * 16 + ((pixels >> 0) & 15);
-		dest[x + 1] = scanline * 16 + ((pixels >> 4) & 15);
-		dest[x + 2] = scanline * 16 + ((pixels >> 8) & 15);
-		dest[x + 3] = scanline * 16 + ((pixels >> 12) & 15);
+		dest[x + 0] = pens[(pixels >> 0) & 15];
+		dest[x + 1] = pens[(pixels >> 4) & 15];
+		dest[x + 2] = pens[(pixels >> 8) & 15];
+		dest[x + 3] = pens[(pixels >> 12) & 15];
 	}
 }
 
@@ -104,15 +105,16 @@ static void amerdart_scanline(running_machine *machine, int screen, mame_bitmap 
 static void coolpool_scanline(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
 		UINT16 pixels = vram[coladdr++ & 0xff];
-		dest[x + 0] = pixels & 0xff;
-		dest[x + 1] = pixels >> 8;
+		dest[x + 0] = pens[pixels & 0xff];
+		dest[x + 1] = pens[pixels >> 8];
 	}
 }
 
@@ -686,7 +688,7 @@ static MACHINE_DRIVER_START( amerdart )
 	MDRV_CPU_CONFIG(tms_config_amerdart)
 	MDRV_CPU_PROGRAM_MAP(amerdart_map,0)
 
-	MDRV_CPU_ADD(TMS32010, 15000000/2)
+	MDRV_CPU_ADD(TMS32010, 15000000/8)
 	MDRV_CPU_FLAGS(CPU_DISABLE)
 	MDRV_CPU_PROGRAM_MAP(amerdart_dsp_map,0)
 
@@ -695,13 +697,11 @@ static MACHINE_DRIVER_START( amerdart )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(16*256)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(40000000/6, 212*2, 0, 161*2, 262, 0, 241)
-
-	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -727,13 +727,11 @@ static MACHINE_DRIVER_START( coolpool )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(40000000/6, 424, 0, 320, 262, 0, 240)
-
-	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

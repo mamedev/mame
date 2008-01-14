@@ -162,9 +162,9 @@ static UINT32 grom_size;
  *
  *************************************/
 
-static void generate_interrupt(int state)
+static void generate_interrupt(running_machine *machine, int state)
 {
-	itech8_update_interrupts(-1, state, -1);
+	itech8_update_interrupts(machine, -1, state, -1);
 
 	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", video_screen_get_vpos(0));
 }
@@ -189,7 +189,7 @@ static const struct tms34061_interface tms34061intf =
 VIDEO_START( itech8 )
 {
 	/* initialize TMS34061 emulation */
-    tms34061_start(&tms34061intf);
+    tms34061_start(machine, &tms34061intf);
 
 	/* get the TMS34061 display state */
 	tms34061_get_display_state(&tms_state);
@@ -443,7 +443,7 @@ static TIMER_CALLBACK( blitter_done )
 {
 	/* turn off blitting and generate an interrupt */
 	blit_in_progress = 0;
-	itech8_update_interrupts(-1, -1, 1);
+	itech8_update_interrupts(machine, -1, -1, 1);
 
 	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", video_screen_get_vpos(0));
 }
@@ -469,7 +469,7 @@ READ8_HANDLER( itech8_blitter_r )
 	/* a read from offset 3 clears the interrupt and returns the status */
 	if (offset == 3)
 	{
-		itech8_update_interrupts(-1, -1, 0);
+		itech8_update_interrupts(Machine, -1, -1, 0);
 		if (blit_in_progress)
 			result |= 0x80;
 		else
@@ -573,6 +573,7 @@ VIDEO_UPDATE( itech8_2layer )
 {
 	UINT32 page_offset;
 	int x, y;
+	rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -592,12 +593,12 @@ VIDEO_UPDATE( itech8_2layer )
 	{
 		UINT8 *base0 = &tms_state.vram[(0x00000 + page_offset + y * 256) & 0x3ffff];
 		UINT8 *base2 = &tms_state.vram[(0x20000 + page_offset + y * 256) & 0x3ffff];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			int pix0 = base0[x] & 0x0f;
-			dest[x] = pix0 ? pix0 : base2[x];
+			dest[x] = pens[pix0 ? pix0 : base2[x]];
 		}
 	}
 	return 0;
@@ -608,6 +609,7 @@ VIDEO_UPDATE( itech8_2page )
 {
 	UINT32 page_offset;
 	int x, y;
+	rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -625,10 +627,10 @@ VIDEO_UPDATE( itech8_2page )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-			dest[x] = base[x];
+			dest[x] = pens[base[x]];
 	}
 	return 0;
 }
@@ -638,6 +640,7 @@ VIDEO_UPDATE( itech8_2page_large )
 {
 	UINT32 page_offset;
 	int x, y;
+	rgb_t *pens = tlc34076_get_pens();
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -658,12 +661,12 @@ VIDEO_UPDATE( itech8_2page_large )
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
 		UINT8 *latch = &tms_state.latchram[(page_offset + y * 256) & 0x3ffff];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{
-			dest[x + 0] = (latch[x/2] & 0xf0) | (base[x/2] >> 4);
-			dest[x + 1] = ((latch[x/2] << 4) & 0xf0) | (base[x/2] & 0x0f);
+			dest[x + 0] = pens[(latch[x/2] & 0xf0) | (base[x/2] >> 4)];
+			dest[x + 1] = pens[((latch[x/2] << 4) & 0xf0) | (base[x/2] & 0x0f)];
 		}
 	}
 	return 0;

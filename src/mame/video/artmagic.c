@@ -8,6 +8,7 @@
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
+#include "video/tlc34076.h"
 #include "artmagic.h"
 
 
@@ -349,11 +350,12 @@ void artmagic_scanline(running_machine *machine, int screen, mame_bitmap *bitmap
 {
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	UINT16 *vram = address_to_vram(&offset);
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	vram += offset;
 	for (x = params->heblnk; x < params->hsblnk; x++)
-		dest[x] = vram[coladdr++ & 0x1ff] & 0xff;
+		dest[x] = pens[vram[coladdr++ & 0x1ff] & 0xff];
 }

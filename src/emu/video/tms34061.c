@@ -35,6 +35,7 @@ struct tms34061_data
 	UINT8 *			shiftreg;
 	emu_timer *		timer;
 	struct tms34061_interface intf;
+	running_machine *machine;
 };
 
 
@@ -74,10 +75,11 @@ static TIMER_CALLBACK( tms34061_interrupt );
  *
  *************************************/
 
-void tms34061_start(const struct tms34061_interface *interface)
+void tms34061_start(running_machine *machine, const struct tms34061_interface *interface)
 {
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
+	tms34061.machine = machine;
 	tms34061.intf = *interface;
 	tms34061.vrammask = tms34061.intf.vramsize - 1;
 
@@ -135,9 +137,9 @@ INLINE void update_interrupts(void)
 	{
 		/* if the status bit is set, and ints are enabled, turn it on */
 		if ((tms34061.regs[TMS34061_STATUS] & 0x0001) && (tms34061.regs[TMS34061_CONTROL1] & 0x0400))
-			(*tms34061.intf.interrupt)(ASSERT_LINE);
+			(*tms34061.intf.interrupt)(tms34061.machine, ASSERT_LINE);
 		else
-			(*tms34061.intf.interrupt)(CLEAR_LINE);
+			(*tms34061.intf.interrupt)(tms34061.machine, CLEAR_LINE);
 	}
 }
 

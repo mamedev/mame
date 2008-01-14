@@ -7,7 +7,7 @@
 
 /*----------- defined in drivers/itech8.c -----------*/
 
-void itech8_update_interrupts(int periodic, int tms34061, int blitter);
+void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter);
 
 
 /*----------- defined in machine/slikshot.c -----------*/

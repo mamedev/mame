@@ -1606,7 +1606,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/thayers.o \
 	$(DRIVERS)/thedeep.o $(VIDEO)/thedeep.o \
 	$(DRIVERS)/tiamc1.o $(VIDEO)/tiamc1.o $(AUDIO)/tiamc1.o \
-	$(DRIVERS)/tickee.o $(VIDEO)/tickee.o \
+	$(DRIVERS)/tickee.o \
 	$(DRIVERS)/truco.o $(VIDEO)/truco.o \
 	$(DRIVERS)/trucocl.o $(VIDEO)/trucocl.o \
 	$(DRIVERS)/trvmadns.o \

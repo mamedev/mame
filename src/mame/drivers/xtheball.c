@@ -48,7 +48,8 @@ static MACHINE_RESET( xtheball )
 static void xtheball_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
-	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t *pens = tlc34076_get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -63,8 +64,8 @@ static void xtheball_scanline_update(running_machine *machine, int screen, mame_
 			UINT16 fgpix = srcfg[coladdr & 0xff];
 			UINT16 bgpix = srcbg[coladdr & 0xff];
 
-			dest[x + 0] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff);
-			dest[x + 1] = ((fgpix & 0xff00) != 0) ? (fgpix >> 8) : (bgpix >> 8);
+			dest[x + 0] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff)];
+			dest[x + 1] = pens[((fgpix & 0xff00) != 0) ? (fgpix >> 8) : (bgpix >> 8)];
 		}
 	}
 	else
@@ -78,8 +79,8 @@ static void xtheball_scanline_update(running_machine *machine, int screen, mame_
 			UINT16 fgpix = srcfg[(coladdr >> 1) & 0xff] >> (8 * (coladdr & 1));
 			UINT16 bgpix = srcbg[coladdr & 0xff];
 
-			dest[x + 0] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff);
-			dest[x + 1] = ((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix >> 8);
+			dest[x + 0] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix & 0xff)];
+			dest[x + 1] = pens[((fgpix & 0x00ff) != 0) ? (fgpix & 0xff) : (bgpix >> 8)];
 		}
 	}
 
@@ -365,15 +366,13 @@ static MACHINE_DRIVER_START( xtheball )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512,256)
 	MDRV_SCREEN_VISIBLE_AREA(0,511, 24,247)
 	MDRV_SCREEN_REFRESH_RATE(60)
-
-	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

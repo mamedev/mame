@@ -18,12 +18,119 @@
 #include "cpu/tms34010/tms34010.h"
 #include "machine/ticket.h"
 #include "video/tlc34076.h"
-#include "tickee.h"
 #include "sound/ay8910.h"
 
 
-UINT16 *tickee_control;
 
+/* local variables */
+static UINT16 *tickee_control;
+static UINT16 *tickee_vram;
+static emu_timer *setup_gun_timer;
+
+
+
+/*************************************
+ *
+ *  Compute X/Y coordinates
+ *
+ *************************************/
+
+INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
+{
+	*x = (((readinputport(4 + player * 2) & 0xff) * (machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x)) >> 8) + machine->screen[0].visarea.min_x;
+	*y = (((readinputport(5 + player * 2) & 0xff) * (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y)) >> 8) + machine->screen[0].visarea.min_y;
+}
+
+
+
+/*************************************
+ *
+ *  Light gun interrupts
+ *
+ *************************************/
+
+static TIMER_CALLBACK( trigger_gun_interrupt )
+{
+	/* fire the IRQ at the correct moment */
+	cpunum_set_input_line(0, param, ASSERT_LINE);
+}
+
+
+static TIMER_CALLBACK( clear_gun_interrupt )
+{
+	/* clear the IRQ on the next scanline? */
+	cpunum_set_input_line(0, param, CLEAR_LINE);
+}
+
+
+static TIMER_CALLBACK( setup_gun_interrupts )
+{
+	int beamx, beamy;
+
+	/* set a timer to do this again next frame */
+	timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+
+	/* only do work if the palette is flashed */
+	if (!tickee_control[2])
+		return;
+
+	/* generate interrupts for player 1's gun */
+	get_crosshair_xy(machine, 0, &beamx, &beamy);
+	timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
+
+	/* generate interrupts for player 2's gun */
+	get_crosshair_xy(machine, 1, &beamx, &beamy);
+	timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
+}
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+static VIDEO_START( tickee )
+{
+	/* start a timer going on the first scanline of every frame */
+	setup_gun_timer = timer_alloc(setup_gun_interrupts, NULL);
+	timer_adjust(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static void scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+{
+	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
+	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t *pens = tlc34076_get_pens();
+	int coladdr = params->coladdr << 1;
+	int x;
+
+	/* blank palette: fill with pen 255 */
+	if (tickee_control[2])
+	{
+		for (x = params->heblnk; x < params->hsblnk; x++)
+			dest[x] = pens[0xff];
+	}
+	else
+		/* copy the non-blanked portions of this scanline */
+		for (x = params->heblnk; x < params->hsblnk; x += 2)
+		{
+			UINT16 pixels = src[coladdr++ & 0xff];
+			dest[x + 0] = pens[pixels & 0xff];
+			dest[x + 1] = pens[pixels >> 8];
+		}
+}
 
 
 /*************************************
@@ -287,7 +394,7 @@ static const tms34010_config tms_config =
 	0,								/* the screen operated on */
 	14318180/2,						/* pixel clock */
 	1,								/* pixels per clock */
-	tickee_scanline_update,			/* scanline callback */
+	scanline_update,				/* scanline callback */
 	NULL,							/* generate interrupt */
 	NULL,							/* write to shiftreg function */
 	NULL							/* read from shiftreg function */
@@ -313,14 +420,12 @@ static MACHINE_DRIVER_START( tickee )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(14318180/2, 444, 0, 320, 233, 0, 200)
-
 	MDRV_VIDEO_START(tickee)
 	MDRV_VIDEO_UPDATE(tms340x0)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(14318180/2, 444, 0, 320, 233, 0, 200)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

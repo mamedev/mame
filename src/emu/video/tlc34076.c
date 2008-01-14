@@ -16,6 +16,7 @@ static UINT8 palettedata[3];
 static UINT8 writeindex, readindex;
 static UINT8 dacbits;
 
+static rgb_t pens[0x100];
 
 #define PALETTE_WRITE_ADDR	0x00
 #define PALETTE_DATA		0x01
@@ -33,29 +34,42 @@ static UINT8 dacbits;
 
 /*************************************
  *
- *  Palette update
+ *  Retrieve Current Palette
  *
  *************************************/
 
-static void update_palette(int which)
+pen_t *tlc34076_get_pens(void)
 {
-	int totalcolors = (Machine->drv->total_colors <= 256) ? Machine->drv->total_colors : 256;
-	int i, mask = regs[PIXEL_READ_MASK];
+	offs_t i;
 
-	for (i = 0; i < totalcolors; i++)
-		if (which == -1 || (i & mask) == which)
+	for (i = 0; i < 0x100; i++)
+	{
+		int r, g, b;
+
+		if ((i & regs[PIXEL_READ_MASK]) == i)
 		{
-			int r = local_paletteram[3 * i + 0];
-			int g = local_paletteram[3 * i + 1];
-			int b = local_paletteram[3 * i + 2];
+			r = local_paletteram[3 * i + 0];
+			g = local_paletteram[3 * i + 1];
+			b = local_paletteram[3 * i + 2];
+
 			if (dacbits == 6)
 			{
 				r = pal6bit(r);
 				g = pal6bit(g);
 				b = pal6bit(b);
 			}
-			palette_set_color(Machine, i, MAKE_RGB(r, g, b));
 		}
+		else
+		{
+			r = 0;
+			g = 0;
+			b = 0;
+		}
+
+		pens[i] = MAKE_RGB(r, g, b);
+	}
+
+	return pens;
 }
 
 
@@ -68,13 +82,9 @@ static void update_palette(int which)
 
 void tlc34076_reset(int dacwidth)
 {
-	/* set the DAC width */
+	assert_always((dacbits == 6) || (dacbits != 8), "tlc34076_reset: dacwidth must be 6 or 8!");
+
 	dacbits = dacwidth;
-	if (dacbits != 6 && dacbits != 8)
-	{
-		logerror("tlc34076_reset: dacwidth must be 6 or 8!\n");
-		dacbits = 6;
-	}
 
 	/* reset the registers */
 	regs[PIXEL_READ_MASK]		= 0xff;
@@ -156,7 +166,6 @@ WRITE8_HANDLER( tlc34076_w )
 				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 0] = palettedata[0];
 				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 1] = palettedata[1];
 				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 2] = palettedata[2];
-				update_palette(regs[PALETTE_WRITE_ADDR]);
 				writeindex = 0;
 				regs[PALETTE_WRITE_ADDR]++;
 			}
@@ -217,11 +226,6 @@ WRITE8_HANDLER( tlc34076_w )
                 X X X 1 0 1 SCLK frequency = DOTCLK frequency/32
                 X X X 1 1 X SCLK output held at logic level low (default condition)
             */
-			break;
-
-		case PIXEL_READ_MASK:
-		case PALETTE_PAGE:
-			update_palette(-1);
 			break;
 
 		case RESET_STATE:

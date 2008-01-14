@@ -37,26 +37,26 @@ enum
 /* interface structure */
 struct tms34061_interface
 {
-	int				scrnum;						/* the screen we are acting on */
-	UINT8			rowshift;					/* VRAM address is (row << rowshift) | col */
-	UINT32			vramsize;					/* size of video RAM */
-	void			(*interrupt)(int state);	/* interrupt gen callback */
+	int		scrnum;			/* the screen we are acting on */
+	UINT8	rowshift;		/* VRAM address is (row << rowshift) | col */
+	UINT32	vramsize;		/* size of video RAM */
+	void	(*interrupt)(running_machine *machine, int state);	/* interrupt gen callback */
 };
 
 
 /* display state structure */
 struct tms34061_display
 {
-	UINT8			blanked;					/* true if blanked */
-	UINT8 *			vram;						/* base of VRAM */
-	UINT8 *			latchram;					/* base of latch RAM */
-	UINT16 *		regs;						/* pointer to array of registers */
-	offs_t			dispstart;					/* display start */
+	UINT8	blanked;		/* true if blanked */
+	UINT8	*vram;			/* base of VRAM */
+	UINT8	*latchram;		/* base of latch RAM */
+	UINT16	*regs;			/* pointer to array of registers */
+	offs_t	dispstart;		/* display start */
 };
 
 
 /* starts/stops the emulator */
-void tms34061_start(const struct tms34061_interface *interface);
+void tms34061_start(running_machine *machine, const struct tms34061_interface *interface);
 
 /* reads/writes to the 34061 */
 UINT8 tms34061_r(int col, int row, int func);

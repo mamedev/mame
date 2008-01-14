@@ -347,7 +347,8 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 	UINT16 *bg0_base = &btoads_vram_bg0[(fulladdr + (yscroll0 << 10)) & 0x3fc00];
 	UINT16 *bg1_base = &btoads_vram_bg1[(fulladdr + (yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &vram_fg_display[fulladdr & 0x3fc00];
-	UINT16 *dst = BITMAP_ADDR16(bitmap, scanline, 0);
+	UINT32 *dst = BITMAP_ADDR32(bitmap, scanline, 0);
+	rgb_t *pens = tlc34076_get_pens();
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 
@@ -369,8 +370,8 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 				if (sprpix && !(sprpix & 0x80))
 				{
-					dst[x + 0] = sprpix;
-					dst[x + 1] = sprpix;
+					dst[x + 0] = pens[sprpix];
+					dst[x + 1] = pens[sprpix];
 				}
 				else
 				{
@@ -379,22 +380,22 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 					UINT8 sprpix = spr_base[coladdr & 0xff];
 
 					if (bg1pix & 0x80)
-						dst[x + 0] = bg1pix & 0xff;
+						dst[x + 0] = pens[bg1pix & 0xff];
 					else if (sprpix)
-						dst[x + 0] = sprpix;
+						dst[x + 0] = pens[sprpix];
 					else if (bg1pix & 0xff)
-						dst[x + 0] = bg1pix & 0xff;
+						dst[x + 0] = pens[bg1pix & 0xff];
 					else
-						dst[x + 0] = bg0pix & 0xff;
+						dst[x + 0] = pens[bg0pix & 0xff];
 
 					if (bg1pix & 0x8000)
-						dst[x + 1] = bg1pix >> 8;
+						dst[x + 1] = pens[bg1pix >> 8];
 					else if (sprpix)
-						dst[x + 1] = sprpix;
+						dst[x + 1] = pens[sprpix];
 					else if (bg1pix >> 8)
-						dst[x + 1] = bg1pix >> 8;
+						dst[x + 1] = pens[bg1pix >> 8];
 					else
-						dst[x + 1] = bg0pix >> 8;
+						dst[x + 1] = pens[bg0pix >> 8];
 				}
 			}
 			break;
@@ -414,8 +415,8 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 				if (sprpix && !(sprpix & 0x80))
 				{
-					dst[x + 0] = sprpix;
-					dst[x + 1] = sprpix;
+					dst[x + 0] = pens[sprpix];
+					dst[x + 1] = pens[sprpix];
 				}
 				else
 				{
@@ -423,22 +424,22 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 
 					if (bg0pix & 0xff)
-						dst[x + 0] = bg0pix & 0xff;
+						dst[x + 0] = pens[bg0pix & 0xff];
 					else if (bg1pix & 0x80)
-						dst[x + 0] = bg1pix & 0xff;
+						dst[x + 0] = pens[bg1pix & 0xff];
 					else if (sprpix)
-						dst[x + 0] = sprpix;
+						dst[x + 0] = pens[sprpix];
 					else
-						dst[x + 0] = bg1pix & 0xff;
+						dst[x + 0] = pens[bg1pix & 0xff];
 
 					if (bg0pix >> 8)
-						dst[x + 1] = bg0pix >> 8;
+						dst[x + 1] = pens[bg0pix >> 8];
 					else if (bg1pix & 0x8000)
-						dst[x + 1] = bg1pix >> 8;
+						dst[x + 1] = pens[bg1pix >> 8];
 					else if (sprpix)
-						dst[x + 1] = sprpix;
+						dst[x + 1] = pens[sprpix];
 					else
-						dst[x + 1] = bg1pix >> 8;
+						dst[x + 1] = pens[bg1pix >> 8];
 				}
 			}
 			break;
@@ -456,8 +457,8 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 
 				if (sprpix)
 				{
-					dst[x + 0] = sprpix;
-					dst[x + 1] = sprpix;
+					dst[x + 0] = pens[sprpix];
+					dst[x + 1] = pens[sprpix];
 				}
 				else
 				{
@@ -465,14 +466,14 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 					UINT16 bg1pix = bg1_base[(coladdr + xscroll1) & 0xff];
 
 					if (bg1pix & 0xff)
-						dst[x + 0] = bg1pix & 0xff;
+						dst[x + 0] = pens[bg1pix & 0xff];
 					else
-						dst[x + 0] = bg0pix & 0xff;
+						dst[x + 0] = pens[bg0pix & 0xff];
 
 					if (bg1pix >> 8)
-						dst[x + 1] = bg1pix >> 8;
+						dst[x + 1] = pens[bg1pix >> 8];
 					else
-						dst[x + 1] = bg0pix >> 8;
+						dst[x + 1] = pens[bg0pix >> 8];
 				}
 			}
 			break;
@@ -493,26 +494,26 @@ void btoads_scanline_update(running_machine *machine, int screen, mame_bitmap *b
 				UINT8 sprpix = spr_base[coladdr & 0xff];
 
 				if (bg1pix & 0x80)
-					dst[x + 0] = bg1pix & 0xff;
+					dst[x + 0] = pens[bg1pix & 0xff];
 				else if (sprpix & 0x80)
-					dst[x + 0] = sprpix;
+					dst[x + 0] = pens[sprpix];
 				else if (bg1pix & 0xff)
-					dst[x + 0] = bg1pix & 0xff;
+					dst[x + 0] = pens[bg1pix & 0xff];
 				else if (sprpix)
-					dst[x + 0] = sprpix;
+					dst[x + 0] = pens[sprpix];
 				else
-					dst[x + 0] = bg0pix & 0xff;
+					dst[x + 0] = pens[bg0pix & 0xff];
 
 				if (bg1pix & 0x8000)
-					dst[x + 1] = bg1pix >> 8;
+					dst[x + 1] = pens[bg1pix >> 8];
 				else if (sprpix & 0x80)
-					dst[x + 1] = sprpix;
+					dst[x + 1] = pens[sprpix];
 				else if (bg1pix >> 8)
-					dst[x + 1] = bg1pix >> 8;
+					dst[x + 1] = pens[bg1pix >> 8];
 				else if (sprpix)
-					dst[x + 1] = sprpix;
+					dst[x + 1] = pens[sprpix];
 				else
-					dst[x + 1] = bg0pix >> 8;
+					dst[x + 1] = pens[bg0pix >> 8];
 			}
 			break;
 	}

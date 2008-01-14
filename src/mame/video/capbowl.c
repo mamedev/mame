@@ -21,7 +21,7 @@ static offs_t blitter_addr;
  *
  *************************************/
 
-static void generate_interrupt(int state)
+static void generate_interrupt(running_machine *machine, int state)
 {
 	cpunum_set_input_line(0, M6809_FIRQ_LINE, state);
 }
@@ -45,7 +45,7 @@ static const struct tms34061_interface tms34061intf =
 VIDEO_START( capbowl )
 {
 	/* initialize TMS34061 emulation */
-    tms34061_start(&tms34061intf);
+    tms34061_start(machine, &tms34061intf);
 }
 
 
@@ -156,6 +156,14 @@ READ8_HANDLER( bowlrama_blitter_r )
  *
  *************************************/
 
+INLINE rgb_t pen_for_pixel(UINT8 *src, UINT8 pix)
+{
+	return MAKE_RGB(pal4bit(src[(pix << 1) + 0] >> 0),
+					pal4bit(src[(pix << 1) + 1] >> 4),
+					pal4bit(src[(pix << 1) + 1] >> 0));
+}
+
+
 VIDEO_UPDATE( capbowl )
 {
 	struct tms34061_display state;
@@ -174,23 +182,14 @@ VIDEO_UPDATE( capbowl )
 	/* now regenerate the bitmap */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 		UINT8 *src = &state.vram[256 * y];
-		int ybase = 16 * y;
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
-		/* first update the palette for this scanline */
-		for (x = 0; x < 16; x++)
-		{
-			palette_set_color_rgb(machine, ybase + x, pal4bit(src[0]), pal4bit(src[1] >> 4), pal4bit(src[1]));
-			src += 2;
-		}
-
-		/* expand row to 8bpp */
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{
-			int pix = src[x/2];
-			*dest++ = ybase + (pix >> 4);
-			*dest++ = ybase + (pix & 0x0f);
+			UINT8 pix = src[32 + (x / 2)];
+			*dest++ = pen_for_pixel(src, pix >> 4);
+			*dest++ = pen_for_pixel(src, pix & 0x0f);
 		}
 	}
 	return 0;

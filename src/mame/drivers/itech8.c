@@ -463,7 +463,6 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include <math.h>
 
 
 #define FULL_LOGGING	0
@@ -538,7 +537,7 @@ static const struct via6522_interface via_interface =
  *
  *************************************/
 
-void itech8_update_interrupts(int periodic, int tms34061, int blitter)
+void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
 	/* update the states */
 	if (periodic != -1) periodic_int = periodic;
@@ -546,7 +545,7 @@ void itech8_update_interrupts(int periodic, int tms34061, int blitter)
 	if (blitter != -1) blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (Machine->drv->cpu[0].type == CPU_M6809)
+	if (machine->drv->cpu[0].type == CPU_M6809)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) cpunum_set_input_line(0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -582,8 +581,8 @@ void itech8_update_interrupts(int periodic, int tms34061, int blitter)
 static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
-	itech8_update_interrupts(1, -1, -1);
-	itech8_update_interrupts(0, -1, -1);
+	itech8_update_interrupts(machine, 1, -1, -1);
+	itech8_update_interrupts(machine, 0, -1, -1);
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(0));
 }
@@ -1774,11 +1773,10 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 263)
-	MDRV_PALETTE_LENGTH(256)
-
 	MDRV_VIDEO_START(itech8)
+
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(512, 263)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
