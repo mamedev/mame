@@ -12,7 +12,7 @@ UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
 UINT16* tatsumi_sprite_control_ram;
 static UINT16* roundup5_vram;
 
-extern UINT16 bigfight_a20000[8], bigfight_a40000[2], bigfight_a60000[8];
+extern UINT16 bigfight_a40000[2];
 static UINT16 bigfight_bank, bigfight_last_bank;
 
 static UINT8 roundupt_crt_selected_reg;

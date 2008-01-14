@@ -148,7 +148,9 @@ UINT16 *roundup5_d0000_ram, *roundup5_e0000_ram;
 UINT8 *tatsumi_rom_sprite_lookup1, *tatsumi_rom_sprite_lookup2;
 UINT8 *tatsumi_rom_clut0, *tatsumi_rom_clut1;
 UINT16 *roundup5_unknown0, *roundup5_unknown1, *roundup5_unknown2;
-UINT16 bigfight_a20000[8], bigfight_a40000[2], bigfight_a60000[2];
+static UINT16 bigfight_a20000[8];
+UINT16 bigfight_a40000[2];
+static UINT16 bigfight_a60000[2];
 extern UINT16 bigfight_bank;
 static UINT8 *apache3_bg_ram;
 

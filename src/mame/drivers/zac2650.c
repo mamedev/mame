@@ -15,7 +15,7 @@
 #include "tinv2650.lh"
 
 WRITE8_HANDLER( tinvader_videoram_w );
-WRITE8_HANDLER( tinvader_sound_w );
+static WRITE8_HANDLER( tinvader_sound_w );
 READ8_HANDLER( zac_s2636_r );
 READ8_HANDLER( tinvader_port_0_r );
 
@@ -343,7 +343,7 @@ static MACHINE_DRIVER_START( tinvader )
 	/* sound hardware */
 MACHINE_DRIVER_END
 
-WRITE8_HANDLER( tinvader_sound_w )
+static WRITE8_HANDLER( tinvader_sound_w )
 {
     /* sounds are NOT the same as space invaders */
 

@@ -173,7 +173,7 @@ static MACHINE_RESET( irem )
  *              0x06: SAUCER HIT
  */
 
-WRITE8_HANDLER( iremm10_ctrl_w )
+static WRITE8_HANDLER( iremm10_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -250,7 +250,7 @@ WRITE8_HANDLER( iremm10_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm11_ctrl_w )
+static WRITE8_HANDLER( iremm11_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -283,7 +283,7 @@ WRITE8_HANDLER( iremm11_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm15_ctrl_w )
+static WRITE8_HANDLER( iremm15_ctrl_w )
 {
 	irem_state *state = Machine->driver_data;
 
@@ -311,7 +311,7 @@ WRITE8_HANDLER( iremm15_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-WRITE8_HANDLER( iremm10_a500_w )
+static WRITE8_HANDLER( iremm10_a500_w )
 {
 #if DEBUG
 	if (data & 0xFC)
@@ -319,7 +319,7 @@ WRITE8_HANDLER( iremm10_a500_w )
 #endif
 }
 
-WRITE8_HANDLER( iremm11_a100_w )
+static WRITE8_HANDLER( iremm11_a100_w )
 {
 	static int last = 0x00;
 	int raising_bits = data & ~last;
@@ -353,7 +353,7 @@ WRITE8_HANDLER( iremm11_a100_w )
 
 }
 
-WRITE8_HANDLER( iremm15_a100_w )
+static WRITE8_HANDLER( iremm15_a100_w )
 {
 	static int last = 0x00;
 	//int raising_bits = data & ~last;
@@ -411,14 +411,14 @@ WRITE8_HANDLER( iremm15_a100_w )
 	last = data;
 }
 
-READ8_HANDLER( iremm10_a700_r )
+static READ8_HANDLER( iremm10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 	return 0x00;
 }
 
-READ8_HANDLER( iremm11_a700_r )
+static READ8_HANDLER( iremm11_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	return 0x00;
@@ -430,7 +430,7 @@ READ8_HANDLER( iremm11_a700_r )
  *
  *************************************/
 
-TIMER_CALLBACK( skychut_callback )
+static TIMER_CALLBACK( skychut_callback )
 {
     if (param==0)
     {
@@ -447,7 +447,7 @@ TIMER_CALLBACK( skychut_callback )
 
 }
 
-INTERRUPT_GEN( iremm11_interrupt )
+static INTERRUPT_GEN( iremm11_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -458,7 +458,7 @@ INTERRUPT_GEN( iremm11_interrupt )
     }
 }
 
-INTERRUPT_GEN( iremm10_interrupt )
+static INTERRUPT_GEN( iremm10_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -466,7 +466,7 @@ INTERRUPT_GEN( iremm10_interrupt )
 		cpunum_set_input_line(0, 0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN( iremm15_interrupt )
+static INTERRUPT_GEN( iremm15_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
@@ -543,7 +543,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
-INPUT_PORTS_START( skychut )
+static INPUT_PORTS_START( skychut )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -584,7 +584,7 @@ INPUT_PORTS_START( skychut )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( ipminvad )
+static INPUT_PORTS_START( ipminvad )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -625,7 +625,7 @@ INPUT_PORTS_START( ipminvad )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( spacebeam )
+static INPUT_PORTS_START( spacebeam )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -659,7 +659,7 @@ INPUT_PORTS_START( spacebeam )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-INPUT_PORTS_START( headoni )
+static INPUT_PORTS_START( headoni )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )

@@ -138,8 +138,8 @@ VIDEO_UPDATE( iremm10 )
 {
 	irem_state *state = machine->driver_data;
 	int offs;
-	int color[4]= { 3, 3, 5, 5};
-	int xpos[4] = { 4*8, 26*8, 7*8, 6*8} ;
+	static const int color[4]= { 3, 3, 5, 5 };
+	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
 	int i;
 
 	fillbitmap(bitmap,machine->pens[7],cliprect);

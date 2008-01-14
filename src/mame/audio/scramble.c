@@ -370,7 +370,7 @@ static int ad2083_speech_rom_read_bit(void)
 
 static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 {
-	int tbl[8] = {0,4,2,6,1,5,3,7};
+	static const int tbl[8] = {0,4,2,6,1,5,3,7};
 
 	speech_rom_bit = tbl[data & 0x07];
 	switch (data>>3)

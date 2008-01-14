@@ -131,7 +131,7 @@ static int imola_draw_mode;
 static void
 InitializeColors( void )
 { /* optional runtime remapping of colors */
-	const UINT8 color[0x10][3] =
+	static const UINT8 color[0x10][3] =
 	{ /* wrong! need color-accurate screenshots to fix */
 		{ 0x44,0x44,0x00 },
 		{ 0x7f,0xff,0xff },

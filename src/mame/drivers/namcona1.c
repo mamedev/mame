@@ -646,7 +646,7 @@ static WRITE16_HANDLER( namcona1_mcu_w )
  */
 static void write_version_info( void )
 {
-	const UINT16 source[0x8] =
+	static const UINT16 source[0x8] =
 	{ /* "NSA-BIOS ver"... */
 		0x534e,0x2d41,0x4942,0x534f,0x7620,0x7265,0x2e31,0x3133
 	};
@@ -778,7 +778,7 @@ static READ16_HANDLER( custom_key_r )
 		if( offset==4 ) keyseq = 0;
 		if( offset==3 )
 		{
-			const UINT16 data[] =
+			static const UINT16 data[] =
 			{
 				0x0000,0x2000,0x2100,0x2104,0x0106,0x0007,0x4003,0x6021,
 				0x61a0,0x31a4,0x9186,0x9047,0xc443,0x6471,0x6db0,0x39bc,

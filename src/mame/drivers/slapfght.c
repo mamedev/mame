@@ -1649,7 +1649,7 @@ static int slapfigh_prot_pos;
 static READ8_HANDLER( slapfigh_mcu_r )
 {
 	/* pass initial checks */
-	int protvalues[] = { 0xc7, 0x55, -1 };
+	static const int protvalues[] = { 0xc7, 0x55, -1 };
 
 	if ((activecpu_get_pc()==0x1369) || // slapfigh
 		(activecpu_get_pc()==0x136d)) // slapfiga

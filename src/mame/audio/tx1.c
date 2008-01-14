@@ -275,9 +275,9 @@ static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_samp
 
 void *tx1_sh_start(int clock, const struct CustomSound_interface *config)
 {
-	const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
-	const int r1[3] = { 180e3, 390e3, 56e3 };
-	const int r2[3] = { 390e3, 390e3, 180e3 };
+	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
+	static const int r1[3] = { 180e3, 390e3, 56e3 };
+	static const int r2[3] = { 390e3, 390e3, 180e3 };
 
 
 	/* Allocate the stream */

@@ -1110,7 +1110,7 @@ DRIVER_INIT( bakutotu )
 #if 0
 	// resolves CPU deadlocks caused by sloppy coding(see driver\namcos1.c)
 	{
-		UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
+		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
 		rombase = memory_region(REGION_USER1);

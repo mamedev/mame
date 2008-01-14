@@ -145,7 +145,7 @@ void ppu2c0x_init_palette(running_machine *machine, int first_entry )
 	double Ku = 2.029;
 	double Kv = 1.140;
 
-	double brightness[3][4] =
+	static const double brightness[3][4] =
 	{
 		{ 0.50, 0.75, 1.0, 1.0 },
 		{ 0.29, 0.45, 0.73, 0.9 },

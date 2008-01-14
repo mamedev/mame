@@ -2262,7 +2262,7 @@ MACHINE_DRIVER_END
 
 
 
-DRIVER_INIT(rdx_v33)
+static DRIVER_INIT(rdx_v33)
 {
 	memory_set_bankptr(1,&memory_region(REGION_CPU1)[0x020000]);
 	memory_set_bankptr(2,&memory_region(REGION_CPU1)[0x030000]);

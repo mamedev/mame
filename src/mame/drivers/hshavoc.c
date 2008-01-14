@@ -214,7 +214,7 @@ static DRIVER_INIT(hshavoc)
 	int x;
 	UINT16 *src = (UINT16 *)memory_region(REGION_CPU1);
 
-	UINT16 typedat[16] = {
+	static const UINT16 typedat[16] = {
 		1,1,1,1, 1,1,1,1,
 		1,0,0,1, 1,0,1,1
 		};

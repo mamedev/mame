@@ -663,7 +663,7 @@ static int lastoffset=0;
 
 static int decrypt(int game, int key, int high_word, int low_word)
 {
-	int swaps[4][16] =
+	static const int swaps[4][16] =
 	{
 		{ 5,7,9,12,2,14,13,15,3,6,8,11,4,10,0,1 },
 		{ 11,2,5,14,8,13,10,4,7,12,0,6,15,9,1,3 },
@@ -673,7 +673,7 @@ static int decrypt(int game, int key, int high_word, int low_word)
 
 	int dst[16],carry[16];
 	int i;
-	int *s = swaps[key & 3];
+	const int *s = swaps[key & 3];
 	int flag1 = BIT(high_word, 9) ^ BIT(high_word, 12) ^ 1;
 	int flag2 = game ? BIT(high_word, 10) : (BIT(high_word, 9) ^ BIT(high_word, 10));
 

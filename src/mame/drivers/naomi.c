@@ -520,33 +520,33 @@ static INTERRUPT_GEN( naomi_vblank )
 	dc_vblank();
 }
 
-READ64_HANDLER( naomi_arm_r )
+static READ64_HANDLER( naomi_arm_r )
 {
 	return *((UINT64 *)dc_sound_ram+offset);
 }
 
-WRITE64_HANDLER( naomi_arm_w )
+static WRITE64_HANDLER( naomi_arm_w )
 {
 	COMBINE_DATA((UINT64 *)dc_sound_ram + offset);
 }
 
-READ64_HANDLER( naomi_unknown1_r )
+static READ64_HANDLER( naomi_unknown1_r )
 {
 	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
 		return -1;
 	return 0;
 }
 
-WRITE64_HANDLER( naomi_unknown1_w )
+static WRITE64_HANDLER( naomi_unknown1_w )
 {
 }
 
-READ32_HANDLER( dc_aica_arm_r )
+static READ32_HANDLER( dc_aica_arm_r )
 {
 	return 0;
 }
 
-WRITE32_HANDLER( dc_aica_arm_w )
+static WRITE32_HANDLER( dc_aica_arm_w )
 {
 }
 
@@ -572,7 +572,7 @@ WRITE32_HANDLER( dc_aica_arm_w )
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
 
-READ64_HANDLER( naomi_rom_board_r )
+static READ64_HANDLER( naomi_rom_board_r )
 {
 	UINT8 *ROM = (UINT8 *)memory_region(REGION_USER1);
 
@@ -595,7 +595,7 @@ READ64_HANDLER( naomi_rom_board_r )
 	return U64(0xffffffffffffffff);
 }
 
-WRITE64_HANDLER( naomi_rom_board_w )
+static WRITE64_HANDLER( naomi_rom_board_w )
 {
 	if ((offset == 1) && ((mem_mask & U64(0xffff)) == 0))
 	{
@@ -652,7 +652,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
 ADDRESS_MAP_END
 
-READ32_HANDLER( test1 )
+static READ32_HANDLER( test1 )
 {
 	return -1;
 }

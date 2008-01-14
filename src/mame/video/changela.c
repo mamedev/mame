@@ -768,7 +768,7 @@ WRITE8_HANDLER( changela_colors_w )
         111     |   3.819   (2.2k)
     Which were normalized to produce the following table: */
 
-	UINT8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
+	static const UINT8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
 
 	int r, g, b;
 	UINT32 c, color_index;

@@ -1142,7 +1142,7 @@ static VIDEO_UPDATE(cps3)
 				int xsizedraw2 = ((value3 & 0x007f0000)>>16);
 				int xx,yy;
 
-				int tilestable[4] = { 8,1,2,4 };
+				static const int tilestable[4] = { 8,1,2,4 };
 				int ysize2 = ((value3 & 0x0000000c)>>2);
 				int xsize2 = ((value3 & 0x00000003)>>0);
 				UINT32 xinc,yinc;
@@ -1966,11 +1966,6 @@ static WRITE32_HANDLER( cps3_ss_pal_base_w )
 	//  printf("cps3_ss_pal_base LSB32 used %04x \n", data);
 	}
 }
-
-static UINT32* tilemap20_regs_base;
-static UINT32* tilemap30_regs_base;
-static UINT32* tilemap40_regs_base;
-static UINT32* tilemap50_regs_base;
 
 //<ElSemi> +0 X  +2 Y +4 unknown +6 enable (&0x8000) +8 low part tilemap base, high part linescroll base
 //<ElSemi> (a word each)

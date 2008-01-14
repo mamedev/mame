@@ -2112,7 +2112,7 @@ handle_unknown:
 	sprintf(s, "???");
 }
 
-int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode)
+static int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode)
 {
 	UINT8 op;
 

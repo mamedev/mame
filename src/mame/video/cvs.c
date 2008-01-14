@@ -210,7 +210,7 @@ void cvs_scroll_stars(void)
 
 VIDEO_UPDATE( cvs )
 {
-	const int ram_based_char_start_indecies[] = { 0xe0, 0xc0, 0x100, 0x80 };
+	static const int ram_based_char_start_indices[] = { 0xe0, 0xc0, 0x100, 0x80 };
 	int code;
 	offs_t offs;
 	int scroll[8];
@@ -232,7 +232,7 @@ VIDEO_UPDATE( cvs )
 	character_banking_mode = cvs_get_character_banking_mode();
 
 	/* ROM based tiles first */
-	for (code = 0; code < ram_based_char_start_indecies[character_banking_mode]; code++)
+	for (code = 0; code < ram_based_char_start_indices[character_banking_mode]; code++)
 		decodechar(machine->gfx[0], code, memory_region(REGION_GFX1));
 
 	/* now the RAM based ones */

@@ -113,7 +113,7 @@ static MACHINE_RESET( uapce )
 	jamma_if_control_latch = 0;
 };
 
-ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE( jamma_if_control_latch_w )

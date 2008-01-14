@@ -360,7 +360,7 @@ WRITE64_HANDLER( ta_fifo_yuv_w )
 }
 
 /* test video start */
-UINT32 dilate0(UINT32 value,int bits) // dilate first "bits" bits in "value"
+static UINT32 dilate0(UINT32 value,int bits) // dilate first "bits" bits in "value"
 {
 	UINT32 x,m1,m2,m3;
 	int a;
@@ -376,7 +376,7 @@ UINT32 dilate0(UINT32 value,int bits) // dilate first "bits" bits in "value"
 	return x;
 }
 
-UINT32 dilate1(UINT32 value,int bits) // dilate first "bits" bits in "value"
+static UINT32 dilate1(UINT32 value,int bits) // dilate first "bits" bits in "value"
 {
 	UINT32 x,m1,m2,m3;
 	int a;
@@ -392,7 +392,7 @@ UINT32 dilate1(UINT32 value,int bits) // dilate first "bits" bits in "value"
 	return x;
 }
 
-void computedilated(void)
+static void computedilated(void)
 {
 	int a,b;
 
@@ -406,7 +406,7 @@ void computedilated(void)
 			dilatechose[(b << 3) + a]=3+(a < b ? a : b);
 }
 
-void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
+static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int cs,x,y,dx,dy,xi,yi,a;
 	float iu,iv,u,v;

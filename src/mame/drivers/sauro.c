@@ -336,11 +336,12 @@ static const gfx_layout sauro_spritelayout =
     16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-const struct sp0256_interface sauro_sp256 =
+static const struct sp0256_interface sauro_sp256 =
 {
 	lrq_callback,
 	0,
-	REGION_SOUND1};
+	REGION_SOUND1
+};
 
 static GFXDECODE_START( sauro )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 64 )

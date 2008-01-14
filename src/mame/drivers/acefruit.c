@@ -84,7 +84,7 @@ static VIDEO_UPDATE( acefruit )
 			{
 				int y;
 				int x;
-				int spriteskip[] = { 1, 2, 4 };
+				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
 				const gfx_element *gfx = machine->gfx[ 0 ];
 

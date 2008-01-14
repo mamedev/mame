@@ -89,14 +89,14 @@ WRITE8_HANDLER( tiamc1_palette_w )
 PALETTE_INIT( tiamc1 )
 {
 	// Voltage computed by Proteus
-	//const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
-	//const float r_v[8]={1.37f,1.13f,1.00f,0.75f,0.63f,0.38f,0.25f,0.00f};
-	//const float b_v[4]={1.16f,0.75f,0.42f,0.00f};
+	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
+	//static const float r_v[8]={1.37f,1.13f,1.00f,0.75f,0.63f,0.38f,0.25f,0.00f};
+	//static const float b_v[4]={1.16f,0.75f,0.42f,0.00f};
 
 	// Voltage adjusted by Shiru
-	const float g_v[8] = { 1.2071f,0.9971f,0.9259f,0.7159f,0.4912f,0.2812f,0.2100f,0.0000f};
-	const float r_v[8] = { 1.5937f,1.3125f,1.1562f,0.8750f,0.7187f,0.4375f,0.2812f,0.0000f};
-	const float b_v[4] = { 1.3523f,0.8750f,0.4773f,0.0000f};
+	static const float g_v[8] = { 1.2071f,0.9971f,0.9259f,0.7159f,0.4912f,0.2812f,0.2100f,0.0000f};
+	static const float r_v[8] = { 1.5937f,1.3125f,1.1562f,0.8750f,0.7187f,0.4375f,0.2812f,0.0000f};
+	static const float b_v[4] = { 1.3523f,0.8750f,0.4773f,0.0000f};
 
 	int col;
 	int r, g, b, ir, ig, ib;
