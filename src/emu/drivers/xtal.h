@@ -52,6 +52,7 @@ enum
 	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_6MHz    		= 6000000,
+	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_8MHz    		= 8000000,
 	XTAL_10MHz   		= 10000000,
@@ -122,6 +123,8 @@ enum
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
+	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */		
+	XTAL_455kHz			= 455000,	/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000
 };
 

@@ -1832,7 +1832,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bakubrkr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* TMP68HC000-12 */
+	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
 	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1856,15 +1856,15 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/6)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2027,7 +2027,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mgcrystl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)
+	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
 	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -2051,15 +2051,15 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_12MHz/6) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_intf_eeprom)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(OKIM6295, 12000000/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ADD(OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

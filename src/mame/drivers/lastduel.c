@@ -296,8 +296,8 @@ static MACHINE_DRIVER_START( madgear )
 	MDRV_CPU_PROGRAM_MAP(madgear_readmem,madgear_writemem)
 	MDRV_CPU_VBLANK_INT(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */ /* Accurate */
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	/* audio CPU */ 
 	MDRV_CPU_PROGRAM_MAP(mg_sound_readmem,mg_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -318,15 +318,15 @@ static MACHINE_DRIVER_START( madgear )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(YM2203, 3579545)
+	MDRV_SOUND_ADD(YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(OKIM6295, 1024188)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_10MHz/10)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
 MACHINE_DRIVER_END
 

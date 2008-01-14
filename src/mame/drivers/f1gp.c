@@ -565,15 +565,15 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( f1gp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD_TAG("main",M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD(M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,8000000/2)	/* 4 MHz ??? */
+	MDRV_CPU_ADD(Z80,XTAL_20MHz/4)	/* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
@@ -595,7 +595,7 @@ static MACHINE_DRIVER_START( f1gp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2610, 8000000)
+	MDRV_SOUND_ADD(YM2610, XTAL_8MHz)
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)

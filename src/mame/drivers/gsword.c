@@ -687,17 +687,17 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( gsword )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000)
+	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_IO_MAP(cpu1_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 3000000)
+	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 	MDRV_CPU_VBLANK_INT(gsword_snd_interrupt,4)
 
-	MDRV_CPU_ADD(Z80, 3000000)
+	MDRV_CPU_ADD(Z80, XTAL_18MHz/6) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 
@@ -728,14 +728,14 @@ static MACHINE_DRIVER_START( gsword )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_18MHz/12) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD(MSM5205, XTAL_400kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END

@@ -200,7 +200,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( troangel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3000000)	/* 3 MHz ??? */
+	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(troangel_readmem,troangel_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 

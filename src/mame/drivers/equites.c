@@ -95,7 +95,6 @@ Hardware Deficiencies
 
 The following ROMs need redump:
 
-- Bull Fighter's RGB PROMs (the ones in use are fake make-up's)
 - The Koukouyakyuh's epr-6706.bin (the one in use is patched)
 
 
@@ -106,10 +105,10 @@ Emulation Deficiencies
 - Scale factors in High Voltage and Splendor Blast are inaccurate. Actual values are believed
   to be in the three unknown ROM s3.8l, 1.9j and 4.7m but the equations are unknown.
 
-- MSM5232 clock speed and capacitor values are not known.
-- There seems to be a rheostat on Equites' soundboard to adjust the MSM5232's music pitch.
-- It hasn't been confirmed whether music tempos are the same across all games.
-
+- MSM5232 capacitor values are not known.
+- There is a potentiometer on the soundboard to adjust the MSM5232's music pitch.  Clock speed ranges
+  from 6.144mhz (OSC value) to few khz
+- All games have the same sound board with only rom swaps
 
 * Special Thanks to:
 
@@ -143,18 +142,19 @@ SNK/Eastern  1985 (ACT) Gekisoh          ????
 
 // Common Hardware Start
 #define EQUITES_ADD_SOUNDBOARD7 \
-	MDRV_CPU_ADD(8085A, 5000000) \
+	MDRV_CPU_ADD(8085A, XTAL_6_144MHz/2) /* verified on pcb */ \
 	/* audio CPU */ \
 	MDRV_CPU_PROGRAM_MAP(equites_s_readmem, equites_s_writemem) \
 	MDRV_CPU_IO_MAP(0, equites_s_writeport) \
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) \
 	MDRV_SPEAKER_STANDARD_MONO("mono") \
 	\
-	MDRV_SOUND_ADD(MSM5232, 2500000) \
+	MDRV_SOUND_ADD(MSM5232, XTAL_6_144MHz/2) \
+/* OSC is connected to a pot which varies the frequency of M5232 from 6.144mhz to few Khz. Here I assume a value which gives a good pitch */ \
 	MDRV_SOUND_CONFIG(equites_5232intf) \
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75) \
 	\
-	MDRV_SOUND_ADD(AY8910, 6144444/4) \
+	MDRV_SOUND_ADD(AY8910, XTAL_6_144MHz/4) /* verified on pcb */ \
 	MDRV_SOUND_CONFIG(equites_8910intf) \
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) \
 	\
@@ -686,7 +686,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( equites )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000/2) // OSC: 12Mhz
+	MDRV_CPU_ADD(M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(equites_readmem, equites_writemem)
 	MDRV_CPU_VBLANK_INT(equites_interrupt, 2)
 
@@ -713,7 +713,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( splndrbt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000/2) // OSC: 12Mhz
+	MDRV_CPU_ADD(M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(splndrbt_readmem, splndrbt_writemem)
 	MDRV_CPU_VBLANK_INT(splndrbt_interrupt, 2)
 
