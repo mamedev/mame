@@ -464,7 +464,7 @@ static READ8_HANDLER( bank_r )
 	UINT8* game = memory_region(REGION_CPU1);
 
 	if(game_banksel == 0x142) // Genesis I/O
-		return megaplay_genesis_io_r((offset/2) & 0x1f, 0xffff);
+		return megaplay_genesis_io_r((offset & 0x1f) / 2, 0xffff);
 
 	if(bios_mode & MP_ROM)
 	{
@@ -497,7 +497,7 @@ static READ8_HANDLER( bank_r )
 static WRITE8_HANDLER ( bank_w )
 {
 	if(game_banksel == 0x142) // Genesis I/O
-		genesis_io_w((offset/2) & 0x1f, data, 0xffff);
+		genesis_io_w((offset & 0x1f) / 2, data, 0xffff);
 
 	if(offset <= 0x1fff && (bios_width & 0x08))
 		ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
