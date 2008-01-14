@@ -130,7 +130,7 @@ typedef struct
     UINT8 irq_mask;     /* interrupt enable/disable */
     UINT8 timer_status; /* timer status */
 	UINT8 timer_ack;	/* timer acknowledge */
-	UINT8 clocks_per_cycle;	/* 3 = low speed mode, 1 = high speed mode */
+    UINT8 clocks_per_cycle; /* 4 = low speed mode, 1 = high speed mode */
     INT32 timer_value;    /* timer interrupt */
     INT32 timer_load;		/* reload value */
     UINT8 nmi_state;
@@ -209,7 +209,7 @@ static void h6280_reset(void)
 	CHANGE_PC;
 
 	/* CPU starts in low speed mode */
-	h6280.clocks_per_cycle = 3;
+    h6280.clocks_per_cycle = 4;
 
 	/* timer off by default */
 	h6280.timer_status=0;

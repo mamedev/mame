@@ -1375,5 +1375,5 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  * CSL Set CPU in low speed mode
  ***************************************************************/
 #define CSL														\
-	h6280.clocks_per_cycle = 3;
+    h6280.clocks_per_cycle = 4;
 
