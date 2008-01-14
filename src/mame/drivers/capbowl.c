@@ -349,12 +349,12 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( capbowl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M6809E, MASTER_CLOCK/4)
+	MDRV_CPU_ADD_TAG("main", M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(capbowl_map,0)
 	MDRV_CPU_VBLANK_INT(capbowl_interrupt,1)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(M6809E, MASTER_CLOCK/4)
+	MDRV_CPU_ADD(M6809E, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(capbowl)
