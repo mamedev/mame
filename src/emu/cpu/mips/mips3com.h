@@ -193,7 +193,7 @@ struct _mips3_state
 	UINT32			system_clock;
 	UINT32			cpu_clock;
 	UINT64			count_zero_time;
-	emu_timer *	compare_int_timer;
+	emu_timer *		compare_int_timer;
 
 	/* memory accesses */
 	UINT8			bigendian;

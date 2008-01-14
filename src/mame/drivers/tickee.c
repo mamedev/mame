@@ -21,6 +21,10 @@
 #include "sound/ay8910.h"
 
 
+#define CPU_CLOCK			XTAL_40MHz
+#define VIDEO_CLOCK			XTAL_14_31818MHz
+
+
 
 /* local variables */
 static UINT16 *tickee_control;
@@ -392,7 +396,7 @@ static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
 	0,								/* the screen operated on */
-	14318180/2,						/* pixel clock */
+	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
 	scanline_update,				/* scanline callback */
 	NULL,							/* generate interrupt */
@@ -411,7 +415,7 @@ static const tms34010_config tms_config =
 static MACHINE_DRIVER_START( tickee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
+	MDRV_CPU_ADD_TAG("main", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tickee_map,0)
 
@@ -425,16 +429,16 @@ static MACHINE_DRIVER_START( tickee )
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(14318180/2, 444, 0, 320, 233, 0, 200)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD(YM2149, VIDEO_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD(AY8910, 14318180/8)
+	MDRV_SOUND_ADD(YM2149, VIDEO_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
