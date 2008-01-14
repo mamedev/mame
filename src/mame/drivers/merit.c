@@ -1188,6 +1188,25 @@ ROM_START( phrcrazs )
 	ROM_LOAD( "sex1_1a.bin",  0x90000, 0x8000, CRC(ed7604b8) SHA1(b1e841b50b8ef6ae95fafac1c34b6d0337a05d18) )
 ROM_END
 
+ROM_START( dodge )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "2131-82.u5",     0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) )
+
+	ROM_REGION( 0x18000, REGION_GFX1, 0 )
+    /*
+    dodge.u37        1ST AND 2ND HALF IDENTICAL
+    dodge.u38        1ST AND 2ND HALF IDENTICAL
+    dodge.u39        1ST AND 2ND HALF IDENTICAL */
+
+	ROM_LOAD( "dodge.u39",    0x00000, 0x8000, CRC(3b3376a1) SHA1(6880cdc29686ff7328717c3833ff826c278b023e) )
+	ROM_LOAD( "dodge.u38",    0x08000, 0x8000, CRC(654d5b00) SHA1(9e16330b2dc8821fc20a39eb42176fda23085bfc) )
+	ROM_LOAD( "dodge.u37",    0x10000, 0x8000, CRC(bc9e63d4) SHA1(2320f5a0545f18e1e42a3a45fedce912c36fbe13) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_ERASEFF )
+    /* socket at position u40 is unpopulated */
+ROM_END
+
+
 
 static DRIVER_INIT( key_0 )
 {
@@ -1228,3 +1247,4 @@ GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic 
 GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze",                                GAME_WRONG_COLORS )
 GAME( 1986, phrcrazs, 0,       phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit)",                      GAME_WRONG_COLORS )
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games ?",                           GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1986, dodge,    0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Dodge City",                                  GAME_WRONG_COLORS | GAME_NOT_WORKING )

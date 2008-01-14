@@ -7734,6 +7734,7 @@ Other Sun games
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
 	DRIVER( phrcrazs )	/* (c) 1986 Merit */
 	DRIVER( bigappg )	/* (c) 1986 Merit */
+	DRIVER( dodge )		/* (c) 1986 Merit */
 	DRIVER( couple )	/* (c) 1988 Merit */
 	DRIVER( couplep )	/* (c) 1988 Merit */
 	DRIVER( couplei )	/* (c) 1988 Merit */
