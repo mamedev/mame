@@ -272,7 +272,7 @@ static INPUT_PORTS_START( ltcasino )
 
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ltcasin2 )
+static INPUT_PORTS_START( ltcasinn )
 	PORT_START /* Q in service */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) //start?
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -687,7 +687,7 @@ ROM_START( ltcasino )
 ROM_END
 
 
-ROM_START( ltcasin2 )
+ROM_START( ltcasinn )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "lc2_ra.bin", 0x8000, 0x1000, CRC(1a595442) SHA1(b8fe3e5ed2024a57187c0ce547c1bbef2429ed63) )
 	ROM_LOAD( "lc2_rb.bin", 0x9000, 0x1000, CRC(4f5502c1) SHA1(cd1b7c08d26fed71c45e44ebd208bd18dc262e8f) )
@@ -722,6 +722,6 @@ static DRIVER_INIT(mv4in1)
 
 
 
-GAME( 1982, ltcasino, 0, ltcasino, ltcasino, 0, ROT0, "Digital Controls Inc.", "Little Casino", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
+GAME( 1982, ltcasino, 0, ltcasino, ltcasino, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
 GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, mv4in1, ROT0, "Entertainment Enterprises", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, ltcasin2, 0, ltcasino, ltcasin2, 0, ROT0, "Digital Controls Inc.", "Little Casino 2", GAME_NOT_WORKING )
+GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", GAME_NOT_WORKING )

@@ -20,17 +20,14 @@ Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
       as USA (TSU) had an red stripe on the sticker.  The intermixing
       of TSE and TSU roms in the parent set is correct and verified.
 Note: Euro set simply states the game cannot be operated in Japan....
+Note: These issues have been verified on a real PCB and are not emulation bugs:
+	  - misplaced sprites ( see beginning of level 1 or 2 for example )
+      - sprite / sprite priority ( see level 2 the reflectors )
+      - sprite / background priority ( see level 1: birds walk through
+        branches of different trees )
+      - see the beginning of level 3: background screwed
 
 ToDo:
-- finish video driver
-    Some attributes are unknown. I don't remember the original game but
-    seems there are some problems:
-    - misplaced sprites ? ( see beginning of level 1 or 2 for example )
-    - sprite / sprite priority ? ( see level 2 the reflectors )
-    - sprite / background priority ? ( see level 1: birds walk through
-        branches of different trees )
-    - see the beginning of level 3: is the background screwed ?
-
 - get rid of input port hack
 
     Controls appear to be mapped at 0xFE4000, alongside dip switches, but there
