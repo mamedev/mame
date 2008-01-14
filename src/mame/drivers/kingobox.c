@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( video_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) /* work ram */
     AM_RANGE(0xa000, 0xa7ff) AM_READ(video_shared_r) /* shared with main */
-    AM_RANGE(0xc000, 0xc0ff) AM_READ(videoram_r) /* background vram */
-    AM_RANGE(0xc400, 0xc4ff) AM_READ(colorram_r) /* background colorram */
+    AM_RANGE(0xc000, 0xc0ff) AM_READ(MRA8_RAM) /* background vram */
+    AM_RANGE(0xc400, 0xc4ff) AM_READ(MRA8_RAM) /* background colorram */
     AM_RANGE(0xc800, 0xcbff) AM_READ(MRA8_RAM) /* foreground vram */
     AM_RANGE(0xcc00, 0xcfff) AM_READ(MRA8_RAM) /* foreground colorram */
 ADDRESS_MAP_END
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( sprite_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) /* work ram */
     AM_RANGE(0xa000, 0xa7ff) AM_READ(sprite_shared_r) /* shared with main */
-    AM_RANGE(0xc000, 0xc3ff) AM_READ(spriteram_r) /* sprite ram */
+    AM_RANGE(0xc000, 0xc3ff) AM_READ(MRA8_RAM) /* sprite ram */
     AM_RANGE(0xc400, 0xc43f) AM_READ(MRA8_RAM) /* something related to scroll? */
 ADDRESS_MAP_END
 
@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( rk_video_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) /* work ram */
     AM_RANGE(0xc000, 0xc7ff) AM_READ(video_shared_r) /* shared with main */
-    AM_RANGE(0xa800, 0xa8ff) AM_READ(videoram_r) /* background vram */
-    AM_RANGE(0xac00, 0xacff) AM_READ(colorram_r) /* background colorram */
+    AM_RANGE(0xa800, 0xa8ff) AM_READ(MRA8_RAM) /* background vram */
+    AM_RANGE(0xac00, 0xacff) AM_READ(MRA8_RAM) /* background colorram */
     AM_RANGE(0xa000, 0xa3ff) AM_READ(MRA8_RAM) /* foreground vram */
     AM_RANGE(0xa400, 0xa7ff) AM_READ(MRA8_RAM) /* foreground colorram */
 ADDRESS_MAP_END
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( rk_sprite_readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) /* work ram */
     AM_RANGE(0xc800, 0xcfff) AM_READ(sprite_shared_r) /* shared with main */
-    AM_RANGE(0xa000, 0xa3ff) AM_READ(spriteram_r) /* sprite ram */
+    AM_RANGE(0xa000, 0xa3ff) AM_READ(MRA8_RAM) /* sprite ram */
     AM_RANGE(0xa400, 0xa43f) AM_READ(MRA8_RAM) /* something related to scroll? */
 ADDRESS_MAP_END
 

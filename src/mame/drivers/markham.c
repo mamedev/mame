@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(spriteram_r)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_READ(markham_sharedram_r)
 

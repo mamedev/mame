@@ -207,20 +207,6 @@ VIDEO_UPDATE( ninjaw );
 
 static UINT16 cpua_ctrl = 0xff;
 
-static size_t sharedram_size;
-static UINT16 *sharedram;
-
-
-static READ16_HANDLER( sharedram_r )
-{
-	return sharedram[offset];
-}
-
-static WRITE16_HANDLER( sharedram_w )
-{
-	COMBINE_DATA(&sharedram[offset]);
-}
-
 static void parse_control(void)	/* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
@@ -301,8 +287,6 @@ static ADDRESS_MAP_START( ninjaw_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READ(TC0220IOC_halfword_portreg_r)
 	AM_RANGE(0x200002, 0x200003) AM_READ(TC0220IOC_halfword_port_r)
 	AM_RANGE(0x220000, 0x220003) AM_READ(ninjaw_sound_r)
-	AM_RANGE(0x240000, 0x24ffff) AM_READ(sharedram_r)
-	AM_RANGE(0x260000, 0x263fff) AM_READ(MRA16_RAM)			/* sprite ram */
 	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_READ(TC0100SCN_ctrl_word_0_r)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_READ(TC0100SCN_word_1_r)	/* tilemaps (2nd screen) */
@@ -321,8 +305,8 @@ static ADDRESS_MAP_START( ninjaw_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_WRITE(TC0220IOC_halfword_port_w)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_WRITE(ninjaw_sound_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
-	AM_RANGE(0x260000, 0x263fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_WRITE(TC0100SCN_word_1_w)	/* tilemaps (2nd screen) */
@@ -342,8 +326,6 @@ static ADDRESS_MAP_START( ninjaw_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(MRA16_RAM)	/* main ram */
 	AM_RANGE(0x200000, 0x200001) AM_READ(TC0220IOC_halfword_portreg_r)
 	AM_RANGE(0x200002, 0x200003) AM_READ(TC0220IOC_halfword_port_r)
-	AM_RANGE(0x240000, 0x24ffff) AM_READ(sharedram_r)
-	AM_RANGE(0x260000, 0x263fff) AM_READ(spriteram16_r)	/* sprite ram */
 	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
 	AM_RANGE(0x340000, 0x340007) AM_READ(TC0110PCR_word_r)		/* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_READ(TC0110PCR_word_1_r)	/* palette (2nd screen) */
@@ -355,8 +337,8 @@ static ADDRESS_MAP_START( ninjaw_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(TC0220IOC_halfword_portreg_w)
 	AM_RANGE(0x200002, 0x200003) AM_WRITE(TC0220IOC_halfword_port_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x260000, 0x263fff) AM_WRITE(spriteram16_w)
+	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
 	AM_RANGE(0x340000, 0x340007) AM_WRITE(TC0110PCR_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_WRITE(TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
@@ -370,8 +352,6 @@ static ADDRESS_MAP_START( darius2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_READ(TC0220IOC_halfword_portreg_r)
 	AM_RANGE(0x200002, 0x200003) AM_READ(TC0220IOC_halfword_port_r)
 	AM_RANGE(0x220000, 0x220003) AM_READ(ninjaw_sound_r)
-	AM_RANGE(0x240000, 0x24ffff) AM_READ(sharedram_r)
-	AM_RANGE(0x260000, 0x263fff) AM_READ(MRA16_RAM)	/* sprite ram */
 	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_READ(TC0100SCN_ctrl_word_0_r)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_READ(TC0100SCN_word_1_r)	/* tilemaps (2nd screen) */
@@ -390,8 +370,8 @@ static ADDRESS_MAP_START( darius2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200002, 0x200003) AM_WRITE(TC0220IOC_halfword_port_w)
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_WRITE(ninjaw_sound_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
-	AM_RANGE(0x260000, 0x263fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_WRITE(TC0100SCN_word_1_w)	/* tilemaps (2nd screen) */
@@ -408,8 +388,6 @@ static ADDRESS_MAP_START( darius2_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(MRA16_RAM)	/* main ram */
 	AM_RANGE(0x200000, 0x200001) AM_READ(TC0220IOC_halfword_portreg_r)
 	AM_RANGE(0x200002, 0x200003) AM_READ(TC0220IOC_halfword_port_r)
-	AM_RANGE(0x240000, 0x24ffff) AM_READ(sharedram_r)
-	AM_RANGE(0x260000, 0x263fff) AM_READ(spriteram16_r)	/* sprite ram */
 	AM_RANGE(0x280000, 0x293fff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps (1st screen) */
 ADDRESS_MAP_END
 
@@ -418,8 +396,8 @@ static ADDRESS_MAP_START( darius2_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(TC0220IOC_halfword_portreg_w)
 	AM_RANGE(0x200002, 0x200003) AM_WRITE(TC0220IOC_halfword_port_w)
-	AM_RANGE(0x240000, 0x24ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x260000, 0x263fff) AM_WRITE(spriteram16_w)
+	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x280000, 0x293fff) AM_WRITE(TC0100SCN_triple_screen_w)	/* tilemaps (all screens) */
 ADDRESS_MAP_END
 

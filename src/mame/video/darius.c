@@ -60,11 +60,6 @@ VIDEO_START( darius )
 
 /***************************************************************************/
 
-READ16_HANDLER( darius_fg_layer_r )
-{
-	return darius_fg_ram[offset];
-}
-
 WRITE16_HANDLER( darius_fg_layer_w )
 {
 	COMBINE_DATA(&darius_fg_ram[offset]);

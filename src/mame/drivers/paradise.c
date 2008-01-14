@@ -104,11 +104,11 @@ static ADDRESS_MAP_START( paradise_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2022, 0x2022) AM_READ(input_port_2_r		)	// P1
 	AM_RANGE(0x2023, 0x2023) AM_READ(input_port_3_r		)	// P2
 	AM_RANGE(0x2024, 0x2024) AM_READ(input_port_4_r		)	// Coins
-	AM_RANGE(0x8000, 0xffff) AM_READ(videoram_r			)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_RAM			)	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(paradise_palette_w	)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_WRITE(paradise_palette_w	) AM_BASE(&paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( paradise_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w	)	// OKI 1 samples bank
 	AM_RANGE(0x2010, 0x2010) AM_WRITE(OKIM6295_data_0_w		)	// OKI 0
 	AM_RANGE(0x2030, 0x2030) AM_WRITE(OKIM6295_data_1_w		)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(paradise_pixmap_w		)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(paradise_pixmap_w		) AM_BASE(&videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 

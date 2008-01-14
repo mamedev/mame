@@ -344,56 +344,6 @@ VIDEO_UPDATE( generic_bitmapped )
 
 
 /***************************************************************************
-    GENERIC READ/WRITE HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    videoram_r - 8-bit read access to videoram
--------------------------------------------------*/
-
-READ8_HANDLER( videoram_r )
-{
-	return videoram[offset];
-}
-
-
-/*-------------------------------------------------
-    colorram_r - 8-bit read access to colorram
--------------------------------------------------*/
-
-READ8_HANDLER( colorram_r )
-{
-	return colorram[offset];
-}
-
-
-/*-------------------------------------------------
-    spriteram_r - 8-bit read access to spriteram
--------------------------------------------------*/
-
-READ8_HANDLER( spriteram_r )
-{
-	return spriteram[offset];
-}
-
-
-/*-------------------------------------------------
-    spriteram16_r/w - 16-bit access to spriteram16
--------------------------------------------------*/
-
-READ16_HANDLER( spriteram16_r )
-{
-	return spriteram16[offset];
-}
-
-WRITE16_HANDLER( spriteram16_w )
-{
-	COMBINE_DATA(spriteram16+offset);
-}
-
-
-
-/***************************************************************************
     GENERIC SPRITE BUFFERING
 ***************************************************************************/
 

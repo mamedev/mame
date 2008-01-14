@@ -106,21 +106,6 @@ VIDEO_UPDATE( generic_bitmapped );
 
 
 
-/* ----- core video/color/spriteram access ----- */
-
-/* video RAM read handlers */
-READ8_HANDLER( videoram_r );
-
-/* color RAM read handlers */
-READ8_HANDLER( colorram_r );
-
-/* sprite RAM read/write handlers */
-READ8_HANDLER( spriteram_r );
-READ16_HANDLER( spriteram16_r );
-WRITE16_HANDLER( spriteram16_w );
-
-
-
 /* ----- sprite buffering ----- */
 
 /* buffered sprite RAM write handlers */

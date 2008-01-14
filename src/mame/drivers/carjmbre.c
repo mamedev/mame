@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( carjmbre_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x8800, 0x8800) AM_READ(MRA8_NOP)			//?? possibly watchdog
-	AM_RANGE(0x9000, 0x97ff) AM_READ(videoram_r)
+	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_2_r)

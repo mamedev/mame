@@ -39,7 +39,7 @@ extern UINT8 *kncljoe_scrollregs;
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(videoram_r)		/* videoram */
+	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM)		/* videoram */
 	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r) /* IN 0 */
 	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r) /* IN 1 */
 	AM_RANGE(0xd802, 0xd802) AM_READ(input_port_2_r) /* IN 2 */

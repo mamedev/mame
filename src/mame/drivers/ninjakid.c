@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( ninjakid_secondary_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
 	AM_RANGE(0xa002, 0xa002) AM_READ(ninjakun_io_A002_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(videoram_r)		/* tilemaps */
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)		/* tilemaps */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(ninjakid_bg_videoram_r)
     AM_RANGE(0xd800, 0xd9ff) AM_READ(paletteram_r)
     AM_RANGE(0xe000, 0xe7ff) AM_READ(shareram_r)

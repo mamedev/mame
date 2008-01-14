@@ -63,7 +63,7 @@ READ8_HANDLER( tagteam_mirrorvideoram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return videoram_r(offset);
+	return videoram[offset];
 }
 
 READ8_HANDLER( tagteam_mirrorcolorram_r )
@@ -75,7 +75,7 @@ READ8_HANDLER( tagteam_mirrorcolorram_r )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	return colorram_r(offset);
+	return colorram[offset];
 }
 
 WRITE8_HANDLER( tagteam_mirrorvideoram_w )
