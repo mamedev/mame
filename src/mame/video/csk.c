@@ -10,14 +10,11 @@
 
 #define CPK_VIDEO_SIZE	0x800
 
-static UINT8 * cpk_colorram;
-static UINT8 * cpk_videoram;
+UINT8 * cpk_colorram;
+UINT8 * cpk_videoram;
+UINT8 * cpk_expram;
 static UINT8 * cpk_palette;
 static UINT8 * cpk_palette2;
-static UINT8 * cpk_expram;
-
-static UINT8 * dirtybuffer1;
-static mame_bitmap *tmpbitmap2;
 
 static int hopperOK = 0;
 static int intstate1 = 0;	/* unknown */
@@ -48,34 +45,6 @@ WRITE8_HANDLER( cpk_palette2_w )
 
 /* Video handling */
 
-READ8_HANDLER( cpk_videoram_r )
-{
-	return cpk_videoram[offset];
-}
-
-WRITE8_HANDLER( cpk_videoram_w )
-{
-	if (cpk_videoram[offset] != data)
-	{
-		cpk_videoram[offset] = data;
-		dirtybuffer[offset] = 1;
-	}
-}
-
-READ8_HANDLER( cpk_colorram_r )
-{
-	return cpk_colorram[offset];
-}
-
-WRITE8_HANDLER( cpk_colorram_w )
-{
-	if (cpk_colorram[offset] != data)
-	{
-		cpk_colorram[offset] = data;
-		dirtybuffer[offset] = 1;
-	}
-}
-
 READ8_HANDLER( cpk_expansion_r )
 {
 	UINT8 * RAM = memory_region(REGION_GFX3);
@@ -83,32 +52,14 @@ READ8_HANDLER( cpk_expansion_r )
 }
 
 
-WRITE8_HANDLER( cpk_expansion_w )
-{
-	if (cpk_expram[offset] != data)
-	{
-		cpk_expram[offset] = data;
-		dirtybuffer1[offset] = 1;
-	}
-}
-
 /* Machine init/deinit  */
 
 VIDEO_START( cska )
 {
 	int i;
 
-	dirtybuffer  = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
-	dirtybuffer1 = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
-	cpk_colorram = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
-	cpk_videoram = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
-	cpk_expram   = auto_malloc(CPK_VIDEO_SIZE * sizeof(UINT8));
-
 	cpk_palette  = auto_malloc(0x800 * sizeof(UINT8));
 	cpk_palette2 = auto_malloc(0x800 * sizeof(UINT8));
-
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* leave everything at the default, but map all foreground 0 pens as transparent */
 	for (i = 0;i < 16;i++)
@@ -144,8 +95,6 @@ MACHINE_RESET (cpk)
 	memset(cpk_videoram, 0, CPK_VIDEO_SIZE);
 	memset(cpk_colorram, 0, CPK_VIDEO_SIZE);
 	memset(cpk_expram, 0, CPK_VIDEO_SIZE);
-	memset(dirtybuffer, 1, CPK_VIDEO_SIZE);
-	memset(dirtybuffer1, 0, CPK_VIDEO_SIZE);
 	memset(cpk_palette, 0, 0x800);
 	memset(cpk_palette2, 0, 0x800);
 
@@ -198,14 +147,6 @@ VIDEO_UPDATE( cska )
 //             memset(&palette_used_colors[64 * color + 1],PALETTE_COLOR_USED,63);
 	}
 
-	if (abilityflag)
-//                memset(&palette_used_colors[0], PALETTE_COLOR_USED, 64);
-
-//        if (palette_recalc())
-	{
-		memset(dirtybuffer, 1, CPK_VIDEO_SIZE);
-	}
-
 #if 0
 	if (keyboard_pressed(KEYCODE_9))
 	{
@@ -223,25 +164,19 @@ VIDEO_UPDATE( cska )
 	{
 		for (offs = (CPK_VIDEO_SIZE)-1; offs >= 0; offs--)
 		{
-			if (dirtybuffer1[offs] || dirtybuffer[offs])
-			{
-				int sx,sy;
+			int sx,sy;
 
 
-				dirtybuffer1[offs] = 0;
+			sx = offs % 64;
+			sy = offs / 64;
 
-				sx = offs % 64;
-				sy = offs / 64;
-
-				drawgfx(tmpbitmap2,machine->gfx[1+(offs % 4)],
-						cpk_expram[offs],
-						0,
-						0,0,
-						8*sx,32*sy,
-						0,TRANSPARENCY_NONE,0);
-			}
+			drawgfx(bitmap,machine->gfx[1+(offs % 4)],
+					cpk_expram[offs],
+					0,
+					0,0,
+					8*sx,32*sy,
+					cliprect,TRANSPARENCY_NONE,0);
 		}
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 	}
 
 	for (offs = CPK_VIDEO_SIZE-1; offs >= 0; offs--)
@@ -249,25 +184,20 @@ VIDEO_UPDATE( cska )
 		int tile = cpk_videoram[offs] + ((cpk_colorram[offs] & 0x1f) << 8);
 		int color = (tile != 0x1fff) ? (((cpk_colorram[offs] & 0xe0) >> 4) + 1) : 0;
 
-		if (dirtybuffer[offs])
-		{
-			int sx,sy;
+		int sx,sy;
 
 
-			dirtybuffer[offs] = 0;
+		sx = offs % 64;
+		sy = offs / 64;
 
-			sx = offs % 64;
-			sy = offs / 64;
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					tile,
-					color,
-					0,0,
-					8*sx,8*sy,
-					0, TRANSPARENCY_NONE, 0);
-		}
+		drawgfx(bitmap,machine->gfx[0],
+				tile,
+				color,
+				0,0,
+				8*sx,8*sy,
+				cliprect,
+				(abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect, (abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
 	return 0;
 }

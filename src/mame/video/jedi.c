@@ -11,7 +11,6 @@
 /* globals */
 UINT8 *jedi_backgroundram;
 size_t jedi_backgroundram_size;
-UINT8 *jedi_PIXIRAM;
 
 
 /* local variables */
@@ -19,7 +18,6 @@ static UINT32 jedi_vscroll;
 static UINT32 jedi_hscroll;
 static UINT32 jedi_alpha_bank;
 static UINT8 video_off, smooth_table;
-static UINT8 *fgdirty, *bgdirty;
 static mame_bitmap *fgbitmap, *mobitmap, *bgbitmap, *bgexbitmap;
 
 
@@ -30,29 +28,14 @@ static mame_bitmap *fgbitmap, *mobitmap, *bgbitmap, *bgexbitmap;
  *
  *************************************/
 
-static void jedi_postload(void)
-{
-	memset(fgdirty, 1, videoram_size);
-	memset(bgdirty, 1, jedi_backgroundram_size);
-}
-
-
 VIDEO_START( jedi )
 {
-	/* allocate dirty buffer for the foreground characters */
-	fgdirty = dirtybuffer = auto_malloc(videoram_size);
-	memset(fgdirty, 1, videoram_size);
-
 	/* allocate an 8bpp bitmap for the raw foreground characters */
 	fgbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	/* allocate an 8bpp bitmap for the motion objects */
 	mobitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	fillbitmap(mobitmap, 0, &machine->screen[0].visarea);
-
-	/* allocate dirty buffer for the background characters */
-	bgdirty = auto_malloc(jedi_backgroundram_size);
-	memset(bgdirty, 1, jedi_backgroundram_size);
 
 	/* the background area is 256x256, doubled by the hardware*/
 	bgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
@@ -69,7 +52,6 @@ VIDEO_START( jedi )
 	state_save_register_global(jedi_alpha_bank);
 	state_save_register_global(video_off);
 	state_save_register_global(smooth_table);
-	state_save_register_func_postload(jedi_postload);
 }
 
 
@@ -123,34 +105,13 @@ WRITE8_HANDLER( jedi_paletteram_w )
 
 /*************************************
  *
- *  Background access
- *
- *************************************/
-
-WRITE8_HANDLER( jedi_backgroundram_w )
-{
-	if (jedi_backgroundram[offset] != data)
-	{
-		bgdirty[offset] = 1;
-		jedi_backgroundram[offset] = data;
-	}
-}
-
-
-
-/*************************************
- *
  *  Foreground banking
  *
  *************************************/
 
 WRITE8_HANDLER( jedi_alpha_banksel_w )
 {
-	if (jedi_alpha_bank != 2 * (data & 0x80))
-	{
-		jedi_alpha_bank = 2 * (data & 0x80);
-		memset(fgdirty, 1, videoram_size);
-	}
+	jedi_alpha_bank = 2 * (data & 0x80);
 }
 
 
@@ -189,7 +150,6 @@ WRITE8_HANDLER( jedi_video_off_w )
 WRITE8_HANDLER( jedi_PIXIRAM_w )
 {
 	smooth_table = data & 0x03;
-	memset(bgdirty, 1, jedi_backgroundram_size);
 }
 
 
@@ -200,12 +160,12 @@ WRITE8_HANDLER( jedi_PIXIRAM_w )
  *
  *************************************/
 
-static void update_smoothing(int bgtilerow, int first, int last)
+static void update_smoothing(int bgtilerow)
 {
 	UINT8 *prom = memory_region(REGION_PROMS) + smooth_table * 0x100;
 	UINT8 bgscan[2][256];
 	UINT8 *bgcurr = bgscan[0], *bglast = bgscan[1];
-	int xstart, xstop, x, y;
+	int x, y;
 
 	/*
         smoothing notes:
@@ -217,10 +177,6 @@ static void update_smoothing(int bgtilerow, int first, int last)
             * odd pixels blend the current (X) and next (X+1) pixels
             * therefore, if we modify source pixels 8-15, we must update dest pixels 15-31
     */
-
-	/* compute x start/stop in destination coordinates */
-	xstart = first * 16 - 1;
-	xstop = last * 16 + 15;
 
 	/* extract the previous bg scanline */
 	extract_scanline8(bgbitmap, 0, ((bgtilerow * 16 - 1) & 0x1ff) / 2, 256, bgcurr);
@@ -239,7 +195,7 @@ static void update_smoothing(int bgtilerow, int first, int last)
 		extract_scanline8(bgbitmap, 0, curry / 2, 256, bgcurr);
 
 		/* loop over columns */
-		for (x = xstart; x <= xstop; x++)
+		for (x = -1; x <= 511; x++)
 		{
 			int tr = bglast[((x + 1) & 0x1ff) / 2];
 			int br = bgcurr[((x + 1) & 0x1ff) / 2];
@@ -269,7 +225,6 @@ static void update_smoothing(int bgtilerow, int first, int last)
 
 VIDEO_UPDATE( jedi )
 {
-	int bgexdirty[32][2];
 	int offs;
 
 
@@ -289,50 +244,34 @@ VIDEO_UPDATE( jedi )
 
     /* update foreground bitmap as a raw bitmap*/
     for (offs = videoram_size - 1; offs >= 0; offs--)
-		if (fgdirty[offs])
-		{
-			int sx = offs % 64;
-			int sy = offs / 64;
+	{
+		int sx = offs % 64;
+		int sy = offs / 64;
 
-			fgdirty[offs] = 0;
-
-			drawgfx(fgbitmap, machine->gfx[0], videoram[offs] + jedi_alpha_bank,
-					0, 0, 0, 8*sx, 8*sy, &machine->screen[0].visarea, TRANSPARENCY_NONE_RAW, 0);
-		}
-
-	/* reset the expanded dirty array */
-	for (offs = 0; offs < 32; offs++)
-		bgexdirty[offs][0] = bgexdirty[offs][1] = -1;
+		drawgfx(fgbitmap, machine->gfx[0], videoram[offs] + jedi_alpha_bank,
+				0, 0, 0, 8*sx, 8*sy, &machine->screen[0].visarea, TRANSPARENCY_NONE_RAW, 0);
+	}
 
     /* update background bitmap as a raw bitmap */
 	for (offs = jedi_backgroundram_size / 2 - 1; offs >= 0; offs--)
-		if (bgdirty[offs] || bgdirty[offs + 0x400])
-		{
-			int sx = offs % 32;
-			int sy = offs / 32;
-			int code = (jedi_backgroundram[offs] & 0xFF);
-			int bank = (jedi_backgroundram[offs + 0x400] & 0x0F);
+	{
+		int sx = offs % 32;
+		int sy = offs / 32;
+		int code = (jedi_backgroundram[offs] & 0xFF);
+		int bank = (jedi_backgroundram[offs + 0x400] & 0x0F);
 
-			/* shuffle the bank bits in */
-			code |= (bank & 0x01) << 8;
-			code |= (bank & 0x08) << 6;
-			code |= (bank & 0x02) << 9;
+		/* shuffle the bank bits in */
+		code |= (bank & 0x01) << 8;
+		code |= (bank & 0x08) << 6;
+		code |= (bank & 0x02) << 9;
 
-			bgdirty[offs] = bgdirty[offs + 0x400] = 0;
-
-			/* update expanded dirty status (assumes we go right-to-left) */
-			if (bgexdirty[sy][1] == -1)
-				bgexdirty[sy][1] = sx;
-			bgexdirty[sy][0] = sx;
-
-			drawgfx(bgbitmap, machine->gfx[1], code,
-					0, bank & 0x04, 0, 8*sx, 8*sy, 0, TRANSPARENCY_NONE_RAW, 0);
-		}
+		drawgfx(bgbitmap, machine->gfx[1], code,
+				0, bank & 0x04, 0, 8*sx, 8*sy, 0, TRANSPARENCY_NONE_RAW, 0);
+	}
 
 	/* update smoothed version of background */
 	for (offs = 0; offs < 32; offs++)
-		if (bgexdirty[offs][1] != -1)
-			update_smoothing(offs, bgexdirty[offs][0], bgexdirty[offs][1]);
+		update_smoothing(offs);
 
 	/* draw the motion objects */
     for (offs = 0; offs < 0x30; offs++)

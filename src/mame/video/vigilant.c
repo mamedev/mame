@@ -40,8 +40,6 @@ static mame_bitmap *bg_bitmap;
 
 VIDEO_START( vigilant )
 {
-	video_start_generic(machine);
-
 	bg_bitmap = auto_bitmap_alloc(512*4,256,machine->screen[0].format);
 }
 
@@ -322,20 +320,13 @@ VIDEO_UPDATE( kikcubic )
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		if (dirtybuffer[offs] || dirtybuffer[offs+1])
-		{
-			dirtybuffer[offs] = dirtybuffer[offs+1] = 0;
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					tile_number,
-					color,
-					0,0,
-					sx,sy,
-					0,TRANSPARENCY_NONE,0);
-		}
+		drawgfx(bitmap,machine->gfx[0],
+				tile_number,
+				color,
+				0,0,
+				sx,sy,
+				cliprect,TRANSPARENCY_NONE,0);
 	}
-
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 
 	draw_sprites(machine,bitmap,cliprect);
 	return 0;

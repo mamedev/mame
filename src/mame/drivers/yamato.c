@@ -246,8 +246,8 @@ static ADDRESS_MAP_START( yamato_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8800, 0x88ff) AM_WRITE(cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 	AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)  /* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-//AM_RANGE(0x9400, 0x97ff) AM_WRITE(videoram_w) /* mirror address, used by Crazy Climber to draw windows */
+	AM_RANGE(0x9000, 0x93ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+//AM_RANGE(0x9400, 0x97ff) AM_WRITE(MWA8_RAM) /* mirror address, used by Crazy Climber to draw windows */
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_column_scroll)

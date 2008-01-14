@@ -27,7 +27,6 @@ extern UINT8 *naughtyb_videoram2;
 extern UINT8 *naughtyb_scrollreg;
 extern int naughtyb_cocktail;
 
-WRITE8_HANDLER( naughtyb_videoram2_w );
 WRITE8_HANDLER( naughtyb_videoreg_w );
 WRITE8_HANDLER( popflame_videoreg_w );
 

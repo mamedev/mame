@@ -122,8 +122,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x081b, 0x081b) AM_WRITE(MWA8_NOP)		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(MWA8_RAM) AM_BASE(&finalizr_colorram2)
 	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&finalizr_videoram2)
 	AM_RANGE(0x3000, 0x31ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)

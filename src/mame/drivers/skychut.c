@@ -486,7 +486,7 @@ INTERRUPT_GEN( iremm15_interrupt )
 static ADDRESS_MAP_START( iremm10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( iremm11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(iremm11_a100_w) /* sound writes ???? */
@@ -514,7 +514,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( iremm15_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM, videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(MRA8_RAM, iremm15_chargen_w) AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_3_r)

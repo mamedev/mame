@@ -67,11 +67,7 @@ VIDEO_START( snk )
 {
 	snk_blink_parity = 0;
 
-	dirtybuffer = auto_malloc( MAX_VRAM_SIZE );
-
 	tmpbitmap = auto_bitmap_alloc( 512, 512, machine->screen[0].format );
-
-	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
 }
 
 /**************************************************************************************/
@@ -91,29 +87,23 @@ static void tnk3_draw_background(running_machine *machine, mame_bitmap *bitmap, 
 		tile_number = videoram[offs];
 		attributes  = videoram[offs+1];
 
-		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
+		if(bg_type == 0)
 		{
-			dirtybuffer[offs]   = tile_number;
-			dirtybuffer[offs+1] = attributes;
-
-			if(bg_type == 0)
-			{
-					/* type tnk3 */
-					tile_number |= (attributes & 0x30) << 4;
-					color = (attributes & 0xf) ^ 8;
-			}
-			else
-			{
-					/* type ikari */
-					tile_number |= (attributes & 0x03) << 8;
-					color = attributes >> 4;
-			}
-
-			sx = x * 512 / x_size;
-			sy = y * 512 / y_size;
-
-			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
+				/* type tnk3 */
+				tile_number |= (attributes & 0x30) << 4;
+				color = (attributes & 0xf) ^ 8;
 		}
+		else
+		{
+				/* type ikari */
+				tile_number |= (attributes & 0x03) << 8;
+				color = attributes >> 4;
+		}
+
+		sx = x * 512 / x_size;
+		sy = y * 512 / y_size;
+
+		drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 }
@@ -251,9 +241,7 @@ VIDEO_UPDATE( tnk3 )
 
 VIDEO_START( sgladiat )
 {
-	dirtybuffer = auto_malloc( MAX_VRAM_SIZE );
 	tmpbitmap = auto_bitmap_alloc( 512, 256, machine->screen[0].format );
-	memset( dirtybuffer, 0xff, MAX_VRAM_SIZE );
 }
 
 static void sgladiat_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
@@ -268,16 +256,11 @@ static void sgladiat_draw_background(running_machine *machine, mame_bitmap *bitm
 		offs = (x<<5)+y;
 		tile_number = videoram[offs];
 
-		if(tile_number != dirtybuffer[offs])
-		{
-			dirtybuffer[offs] = tile_number;
+		color = 0;
+		sx = x << 3;
+		sy = y << 3;
 
-			color = 0;
-			sx = x << 3;
-			sy = y << 3;
-
-			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
-		}
+		drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
 }
@@ -391,22 +374,17 @@ static void tdfever_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 		tile_number = source[offs];
 		attributes  = source[offs+1];
 
-		if(tile_number != dirtybuffer[offs] || attributes != dirtybuffer[offs+1])
-		{
-			dirtybuffer[offs]   = tile_number;
-			dirtybuffer[offs+1] = attributes;
-			tile_number |= (attributes & 0xf) << 8;
+		tile_number |= (attributes & 0xf) << 8;
 
-			color = attributes >> 4;
-			sx = x << 4;
-			sy = y << 4;
+		color = attributes >> 4;
+		sx = x << 4;
+		sy = y << 4;
 
-			// intercept overflown tile indices
-			if(tile_number >= gfx->total_elements)
-				plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen(machine));
-			else
-				drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
-		}
+		// intercept overflown tile indices
+		if(tile_number >= gfx->total_elements)
+			plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen(machine));
+		else
+			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
 	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,cliprect,TRANSPARENCY_NONE,0);
 }

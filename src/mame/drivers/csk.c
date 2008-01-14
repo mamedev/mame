@@ -134,8 +134,6 @@ Palette3*:  585D (low), 5899 (high), len = 60   (used alternatively with pal3)
 
 extern UINT8 * cpk_colorram;
 extern UINT8 * cpk_videoram;
-extern UINT8 * cpk_palette;
-extern UINT8 * cpk_palette2;
 extern UINT8 * cpk_expram;
 
 
@@ -146,12 +144,7 @@ VIDEO_START( cska );
 
 WRITE8_HANDLER( cpk_palette_w );
 WRITE8_HANDLER( cpk_palette2_w );
-READ8_HANDLER( cpk_videoram_r );
-WRITE8_HANDLER( cpk_videoram_w );
-READ8_HANDLER( cpk_colorram_r );
-WRITE8_HANDLER( cpk_colorram_w );
 READ8_HANDLER( cpk_expansion_r );
-WRITE8_HANDLER( cpk_expansion_w );
 
 
 
@@ -207,9 +200,9 @@ static ADDRESS_MAP_START( csk227_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
 	AM_RANGE(0x5091, 0x5091) AM_READ(input_port_7_r)		/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
-	AM_RANGE(0x6800, 0x6fff) AM_WRITE(cpk_expansion_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(cpk_videoram_r,cpk_videoram_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(cpk_colorram_r,cpk_colorram_w)
+	AM_RANGE(0x6800, 0x6fff) AM_WRITE(MWA8_RAM) AM_BASE(&cpk_expram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_READ(cpk_expansion_r)
 ADDRESS_MAP_END
 
@@ -226,9 +219,9 @@ static ADDRESS_MAP_START( csk234_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* used for protection and other */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
-	AM_RANGE(0x6800, 0x6fff) AM_WRITE(cpk_expansion_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(cpk_videoram_r,cpk_videoram_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(cpk_colorram_r,cpk_colorram_w)
+	AM_RANGE(0x6800, 0x6fff) AM_WRITE(MWA8_RAM) AM_BASE(&cpk_expram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_READ(cpk_expansion_r)
 ADDRESS_MAP_END
 

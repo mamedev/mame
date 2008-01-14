@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( redalert_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x0fff) AM_WRITE(MWA8_RAM) /* ? */
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(MWA8_RAM) /* Scratchpad video RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(redalert_backram_w) AM_BASE(&redalert_backram)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(redalert_spriteram1_w) AM_BASE(&redalert_spriteram1)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(redalert_characterram_w) AM_BASE(&redalert_characterram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(redalert_spriteram2_w) AM_BASE(&redalert_spriteram2)
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( demoneye_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(redalert_spriteram1_w) AM_BASE(&redalert_spriteram1)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(redalert_characterram2_w) AM_BASE(&redalert_characterram2)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(redalert_spriteram2_w) AM_BASE(&redalert_spriteram2)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x5400, 0x57ff) AM_WRITE(redalert_spriteram3_w) AM_BASE(&redalert_spriteram3)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(MWA8_RAM) //???
 	AM_RANGE(0x5c00, 0x5fff) AM_WRITE(MWA8_RAM) //???

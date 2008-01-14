@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( vigilant_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc020, 0xc0df) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(vigilant_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( kikcubic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xcaff) AM_WRITE(vigilant_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 

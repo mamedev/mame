@@ -91,31 +91,10 @@ PALETTE_INIT( wiz )
 	}
 }
 
-WRITE8_HANDLER( wiz_attributes_w )
-{
-	if ((offset & 1) && wiz_attributesram[offset] != data)
-	{
-		int i;
-
-
-		for (i = offset / 2;i < videoram_size;i += 32)
-		{
-			dirtybuffer[i] = 1;
-		}
-	}
-
-	wiz_attributesram[offset] = data;
-}
-
 WRITE8_HANDLER( wiz_palettebank_w )
 {
-	if (palbank[offset] != (data & 1))
-	{
-		palbank[offset] = data & 1;
-		palette_bank = palbank[0] + 2 * palbank[1];
-
-		memset(dirtybuffer,1,videoram_size);
-	}
+	palbank[offset] = data & 1;
+	palette_bank = palbank[0] + 2 * palbank[1];
 }
 
 WRITE8_HANDLER( wiz_bgcolor_w )
@@ -125,32 +104,18 @@ WRITE8_HANDLER( wiz_bgcolor_w )
 
 WRITE8_HANDLER( wiz_char_bank_select_w )
 {
-	if (char_bank[offset] != (data & 1))
-	{
-		char_bank[offset] = data & 1;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	char_bank[offset] = data & 1;
 }
 
 WRITE8_HANDLER( wiz_flipx_w )
 {
-    if (flipx != data)
-    {
-		flipx = data;
-
-		memset(dirtybuffer, 1, videoram_size);
-    }
+	flipx = data;
 }
 
 
 WRITE8_HANDLER( wiz_flipy_w )
 {
-    if (flipy != data)
-    {
-		flipy = data;
-
-		memset(dirtybuffer, 1, videoram_size);
-    }
+	flipy = data;
 }
 
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, int colortype)

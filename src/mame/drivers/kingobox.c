@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( sprite_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) /* work ram */
     AM_RANGE(0xa000, 0xa7ff) AM_WRITE(sprite_shared_w) AM_BASE(&sprite_shared) /* shared with main */
-    AM_RANGE(0xc000, 0xc3ff) AM_WRITE(spriteram_w) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
+    AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
     AM_RANGE(0xc400, 0xc43f) AM_WRITE(MWA8_RAM)  /* something related to scroll? */
 ADDRESS_MAP_END
 
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( rk_sprite_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
     AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) /* work ram */
     AM_RANGE(0xc800, 0xcfff) AM_WRITE(sprite_shared_w) AM_BASE(&sprite_shared) /* shared with main */
-    AM_RANGE(0xa000, 0xa3ff) AM_WRITE(spriteram_w) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
+    AM_RANGE(0xa000, 0xa3ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite ram */
     AM_RANGE(0xa400, 0xa43f) AM_WRITE(MWA8_RAM)  /* something related to scroll? */
 ADDRESS_MAP_END
 

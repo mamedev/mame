@@ -12,8 +12,6 @@
 
 UINT8 *naughtyb_videoram2;
 
-static int videoreg;
-
 /* use these to draw charset B */
 UINT8 *naughtyb_scrollreg;
 
@@ -150,27 +148,12 @@ PALETTE_INIT( naughtyb )
 ***************************************************************************/
 VIDEO_START( naughtyb )
 {
-	videoreg = palreg = bankreg = 0;
+	palreg = bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	dirtybuffer = auto_malloc(videoram_size);
-	memset(dirtybuffer, 1, videoram_size);
-
 	tmpbitmap = auto_bitmap_alloc(68*8,28*8,machine->screen[0].format);
 }
 
-
-
-
-WRITE8_HANDLER( naughtyb_videoram2_w )
-{
-	if (naughtyb_videoram2[offset] != data)
-	{
-		dirtybuffer[offset] = 1;
-
-		naughtyb_videoram2[offset] = data;
-	}
-}
 
 
 
@@ -180,18 +163,11 @@ WRITE8_HANDLER( naughtyb_videoreg_w )
 
 	pleiads_sound_control_c_w(offset,data);
 
-    if ((videoreg & 0x0f) != (data & 0x0f))
-	{
-		videoreg = data;
-
-		naughtyb_cocktail =
-			( ( input_port_2_r(0) & 0x80 ) &&	// cabinet == cocktail
-			  ( data & 0x01 ) );				// handling player 2
-		palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
-		bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
-
-		memset (dirtybuffer, 1, videoram_size);
-	}
+	naughtyb_cocktail =
+		( ( input_port_2_r(0) & 0x80 ) &&	// cabinet == cocktail
+		  ( data & 0x01 ) );				// handling player 2
+	palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
 }
 
 WRITE8_HANDLER( popflame_videoreg_w )
@@ -200,18 +176,11 @@ WRITE8_HANDLER( popflame_videoreg_w )
 
 	pleiads_sound_control_c_w(offset,data);
 
-    if ((videoreg & 0x0f) != (data & 0x0f))
-	{
-		videoreg = data;
-
-		naughtyb_cocktail =
-			( ( input_port_2_r(0) & 0x80 ) &&	// cabinet == cocktail
-			  ( data & 0x01 ) );				// handling player 2
-		palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
-		bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
-
-		memset (dirtybuffer, 1, videoram_size);
-	}
+	naughtyb_cocktail =
+		( ( input_port_2_r(0) & 0x80 ) &&	// cabinet == cocktail
+		  ( data & 0x01 ) );				// handling player 2
+	palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
+	bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
 }
 
 
@@ -264,58 +233,52 @@ VIDEO_UPDATE( naughtyb )
 {
 	int offs;
 
-	// for every character in the Video RAM, check if it has been modified
-	// since last time and update it accordingly.
+	// for every character in the Video RAM
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy;
+
+		if ( naughtyb_cocktail )
 		{
-			int sx,sy;
-
-			dirtybuffer[offs] = 0;
-
-			if ( naughtyb_cocktail )
+			if (offs < 0x700)
 			{
-				if (offs < 0x700)
-				{
-					sx = 63 - offs % 64;
-					sy = 27 - offs / 64;
-				}
-				else
-				{
-					sx = 64 + ( 3 - (offs - 0x700) % 4 );
-					sy = 27 - (offs - 0x700) / 4;
-				}
+				sx = 63 - offs % 64;
+				sy = 27 - offs / 64;
 			}
 			else
 			{
-				if (offs < 0x700)
-				{
-					sx = offs % 64;
-					sy = offs / 64;
-				}
-				else
-				{
-					sx = 64 + (offs - 0x700) % 4;
-					sy = (offs - 0x700) / 4;
-				}
+				sx = 64 + ( 3 - (offs - 0x700) % 4 );
+				sy = 27 - (offs - 0x700) / 4;
 			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					naughtyb_videoram2[offs] + 256 * bankreg,
-					(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
-					naughtyb_cocktail,naughtyb_cocktail,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
-
-			drawgfx(tmpbitmap,machine->gfx[1],
-					videoram[offs] + 256*bankreg,
-					(videoram[offs] >> 5) + 8 * palreg,
-					naughtyb_cocktail,naughtyb_cocktail,
-					8*sx,8*sy,
-					0,TRANSPARENCY_PEN,0);
 		}
+		else
+		{
+			if (offs < 0x700)
+			{
+				sx = offs % 64;
+				sy = offs / 64;
+			}
+			else
+			{
+				sx = 64 + (offs - 0x700) % 4;
+				sy = (offs - 0x700) / 4;
+			}
+		}
+
+		drawgfx(tmpbitmap,machine->gfx[0],
+				naughtyb_videoram2[offs] + 256 * bankreg,
+				(naughtyb_videoram2[offs] >> 5) + 8 * palreg,
+				naughtyb_cocktail,naughtyb_cocktail,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
+
+		drawgfx(tmpbitmap,machine->gfx[1],
+				videoram[offs] + 256*bankreg,
+				(videoram[offs] >> 5) + 8 * palreg,
+				naughtyb_cocktail,naughtyb_cocktail,
+				8*sx,8*sy,
+				0,TRANSPARENCY_PEN,0);
 	}
 
 	// copy the temporary bitmap to the screen

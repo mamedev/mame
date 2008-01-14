@@ -29,8 +29,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(&AY8910_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(&AY8910_write_port_0_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(&AY8910_control_port_1_w)
@@ -184,7 +184,6 @@ static MACHINE_DRIVER_START( pkunwar )
 	MDRV_COLORTABLE_LENGTH(32*16)
 
 	MDRV_PALETTE_INIT(nova2001)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(pkunwar)
 
 	/* sound hardware */

@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_ROM)	/* Super Bagman only */
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
+									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0xa800, 0xa805) AM_WRITE(bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITE(MWA8_NOP)	/* written to, but unused */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( pickin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(MWA8_RAM) AM_BASE(&bagman_video_enable)
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
-									/* writes are handled by colorram_w */
+									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITE(MWA8_NOP)	/* written to, but unused */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 #if 0

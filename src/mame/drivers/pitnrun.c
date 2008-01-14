@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x8800, 0x8fff) AM_WRITE(pitnrun_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(pitnrun_videoram2_w) AM_BASE(&pitnrun_videoram2)
-	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(spriteram_w) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa800, 0xa807) AM_WRITE(MWA8_NOP) /* Analog Sound */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(pitnrun_color_select_w)

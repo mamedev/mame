@@ -39,8 +39,6 @@ WRITE8_HANDLER( matmania_paletteram_w );
 PALETTE_INIT( matmania );
 VIDEO_UPDATE( matmania );
 VIDEO_UPDATE( maniach );
-WRITE8_HANDLER( matmania_videoram3_w );
-WRITE8_HANDLER( matmania_colorram3_w );
 VIDEO_START( matmania );
 VIDEO_UPDATE( matmania );
 
@@ -95,10 +93,10 @@ static ADDRESS_MAP_START( matmania_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0780, 0x07df) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
 	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_WRITE(matmania_videoram3_w) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_WRITE(matmania_colorram3_w) AM_BASE(&matmania_colorram3)
+	AM_RANGE(0x2000, 0x21ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_colorram3)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(matmania_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_scroll)
@@ -125,10 +123,10 @@ static ADDRESS_MAP_START( maniach_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0780, 0x07df) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_videoram2) AM_SIZE(&matmania_videoram2_size)
 	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_WRITE(matmania_videoram3_w) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_WRITE(matmania_colorram3_w) AM_BASE(&matmania_colorram3)
+	AM_RANGE(0x2000, 0x21ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_videoram3) AM_SIZE(&matmania_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_colorram3)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_WRITE(MWA8_RAM) AM_BASE(&matmania_scroll)

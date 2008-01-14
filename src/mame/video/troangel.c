@@ -110,11 +110,7 @@ WRITE8_HANDLER( troangel_flipscreen_w )
 	/* screen flip is handled both by software and hardware */
 	data ^= ~readinputport(4) & 1;
 
-	if (flipscreen != (data & 1))
-	{
-		flipscreen = data & 1;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	flipscreen = data & 1;
 
 	coin_counter_w(0,data & 0x02);
 	coin_counter_w(1,data & 0x20);
@@ -130,35 +126,30 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 	for (offs = videoram_size - 2;offs >= 0;offs -= 2)
 	{
-		if (dirtybuffer[offs] || dirtybuffer[offs+1])
+		int sx,sy,code,attr,flipx,flipy;
+
+
+		sx = (offs/2) % 32;
+		sy = (offs/2) / 32;
+
+		attr = videoram[offs+0];
+		code = videoram[offs+1] | ((attr & 0xc0) << 2);
+		flipx = attr & 0x20;
+		flipy = (attr & 0x10) >> 4;
+
+		if (flipscreen)
 		{
-			int sx,sy,code,attr,flipx,flipy;
-
-
-			dirtybuffer[offs] = dirtybuffer[offs+1] = 0;
-
-			sx = (offs/2) % 32;
-			sy = (offs/2) / 32;
-
-			attr = videoram[offs+0];
-			code = videoram[offs+1] | ((attr & 0xc0) << 2);
-			flipx = attr & 0x20;
-			flipy = (attr & 0x10) >> 4;
-
-			if (flipscreen)
-			{
-				sx = 31 - sx;
-				sy = 31 - sy;
-				flipx = !flipx;
-			}
-
-			drawgfx(tmpbitmap,gfx,
-				code,
-				attr & 0x0f,
-				flipx,flipy ^ flipscreen,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			sy = 31 - sy;
+			flipx = !flipx;
 		}
+
+		drawgfx(tmpbitmap,gfx,
+			code,
+			attr & 0x0f,
+			flipx,flipy ^ flipscreen,
+			8*sx,8*sy,
+			0,TRANSPARENCY_NONE,0);
 	}
 
 	{

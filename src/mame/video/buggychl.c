@@ -28,12 +28,10 @@ PALETTE_INIT( buggychl )
 
 VIDEO_START( buggychl )
 {
-	dirtybuffer = auto_malloc(videoram_size);
 	dirtychar = auto_malloc(256 * sizeof(*dirtychar));
 	tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 	tmpbitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
-	memset(dirtybuffer,1,videoram_size);
 	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
 }
 
@@ -114,23 +112,18 @@ static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectang
 	{
 		int code = videoram[0x400+offs];
 
-		if (dirtybuffer[0x400+offs] || dirtychar[code])
-		{
-			int sx = offs % 32;
-			int sy = offs / 32;
+		int sx = offs % 32;
+		int sy = offs / 32;
 
-			dirtybuffer[0x400+offs] = 0;
+		if (flip_screen_x) sx = 31 - sx;
+		if (flip_screen_y) sy = 31 - sy;
 
-			if (flip_screen_x) sx = 31 - sx;
-			if (flip_screen_y) sy = 31 - sy;
-
-			drawgfx(tmpbitmap1,machine->gfx[0],
-					code,
-					2,
-					flip_screen_x,flip_screen_y,
-					8*sx,8*sy,
-					NULL,TRANSPARENCY_NONE,0);
-		}
+		drawgfx(tmpbitmap1,machine->gfx[0],
+				code,
+				2,
+				flip_screen_x,flip_screen_y,
+				8*sx,8*sy,
+				NULL,TRANSPARENCY_NONE,0);
 	}
 
 	/* first copy to a temp bitmap doing column scroll */

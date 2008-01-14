@@ -68,12 +68,6 @@ PALETTE_INIT( finalizr )
 
 VIDEO_START( finalizr )
 {
-	dirtybuffer = 0;
-	tmpbitmap = 0;
-
-	dirtybuffer = auto_malloc(videoram_size);
-	memset(dirtybuffer,1,videoram_size);
-
 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
 }
 
@@ -81,11 +75,7 @@ VIDEO_START( finalizr )
 
 WRITE8_HANDLER( finalizr_videoctrl_w )
 {
-	if (charbank != (data & 3))
-	{
-		charbank = data & 3;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	charbank = data & 3;
 
 	spriterambank = data & 8;
 
@@ -99,27 +89,21 @@ VIDEO_UPDATE( finalizr )
 	int offs;
 
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
+	/* for every character in the Video RAM */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
-		{
-			int sx,sy;
+		int sx,sy;
 
 
-			dirtybuffer[offs] = 0;
+		sx = offs % 32;
+		sy = offs / 32;
 
-			sx = offs % 32;
-			sy = offs / 32;
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
-					(colorram[offs] & 0x0f),
-					colorram[offs] & 0x10,colorram[offs] & 0x20,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
-		}
+		drawgfx(tmpbitmap,machine->gfx[0],
+				videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
+				(colorram[offs] & 0x0f),
+				colorram[offs] & 0x10,colorram[offs] & 0x20,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 

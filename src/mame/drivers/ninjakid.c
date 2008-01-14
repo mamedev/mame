@@ -96,7 +96,6 @@ static ADDRESS_MAP_START( ninjakid_primary_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_READ(ninjakun_io_A002_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)	/* tilemaps */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(ninjakid_bg_videoram_r)
-    AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)	/* spriteram */
     AM_RANGE(0xd800, 0xd9ff) AM_READ(paletteram_r)
     AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
@@ -109,7 +108,7 @@ static ADDRESS_MAP_START( ninjakid_primary_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ninjakun_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(ninjakid_fg_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(ninjakid_bg_videoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xd800, 0xd9ff) AM_WRITE(ninjakun_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&shareram)
 ADDRESS_MAP_END
@@ -123,7 +122,6 @@ static ADDRESS_MAP_START( ninjakid_secondary_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_READ(ninjakun_io_A002_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(videoram_r)		/* tilemaps */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(ninjakid_bg_videoram_r)
-    AM_RANGE(0xd000, 0xd7ff) AM_READ(spriteram_r)	/* shareram */
     AM_RANGE(0xd800, 0xd9ff) AM_READ(paletteram_r)
     AM_RANGE(0xe000, 0xe7ff) AM_READ(shareram_r)
 ADDRESS_MAP_END
@@ -135,7 +133,7 @@ static ADDRESS_MAP_START( ninjakid_secondary_writemem, ADDRESS_SPACE_PROGRAM, 8 
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ninjakun_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(ninjakid_fg_videoram_w)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(ninjakid_bg_videoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(spriteram_w)	/* shareram */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xd800, 0xd9ff) AM_WRITE(ninjakun_paletteram_w)
     AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shareram_w)
 ADDRESS_MAP_END

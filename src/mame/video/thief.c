@@ -4,9 +4,6 @@
 
 #include "driver.h"
 
-static mame_bitmap *thief_page0;
-static mame_bitmap *thief_page1;
-
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;
 
@@ -46,11 +43,6 @@ WRITE8_HANDLER( thief_context_bank_w ){
 /***************************************************************************/
 
 WRITE8_HANDLER( thief_video_control_w ){
-	if( (data^thief_video_control)&1 ){
-		/* screen flipped */
-		memset( dirtybuffer, 0x00, 0x2000*2 );
-	}
-
 	thief_video_control = data;
 /*
     bit 0: screen flip
@@ -97,13 +89,8 @@ READ8_HANDLER( thief_videoram_r ){
 
 WRITE8_HANDLER( thief_videoram_w ){
 	UINT8 *dest = &videoram[offset];
-	if( thief_video_control&0x02 ){
+	if( thief_video_control&0x02 )
 		dest+=0x2000*4; /* foreground/background */
-		dirtybuffer[offset+0x2000] = 1;
-	}
-	else {
-		dirtybuffer[offset] = 1;
-	}
 	if( thief_write_mask&0x1 ) dest[0x2000*0] = data;
 	if( thief_write_mask&0x2 ) dest[0x2000*1] = data;
 	if( thief_write_mask&0x4 ) dest[0x2000*2] = data;
@@ -115,14 +102,8 @@ WRITE8_HANDLER( thief_videoram_w ){
 VIDEO_START( thief ){
 	memset( &thief_coprocessor, 0x00, sizeof(thief_coprocessor) );
 
-	thief_page0	= auto_bitmap_alloc( 256,256,machine->screen[0].format );
-	thief_page1	= auto_bitmap_alloc( 256,256,machine->screen[0].format );
-
 	videoram = auto_malloc( 0x2000*4*2 );
 	memset( videoram, 0, 0x2000*4*2 );
-
-	dirtybuffer = auto_malloc( 0x2000*2 );
-	memset( dirtybuffer, 1, 0x2000*2 );
 
 	thief_coprocessor.image_ram = auto_malloc( 0x2000 );
 	thief_coprocessor.context_ram = auto_malloc( 0x400 );
@@ -132,52 +113,40 @@ VIDEO_UPDATE( thief ){
 	UINT32 offs;
 	int flipscreen = thief_video_control&1;
 	const pen_t *pal_data = machine->pens;
-	UINT8 *dirty = dirtybuffer;
 	const UINT8 *source = videoram;
-	mame_bitmap *page;
 
-	if( thief_video_control&4 ){ /* visible page */
-		dirty += 0x2000;
+	if( thief_video_control&4 ) /* visible page */
 		source += 0x2000*4;
-		page = thief_page1;
-	}
-	else {
-		page = thief_page0;
-	}
 
 	for( offs=0; offs<0x2000; offs++ ){
-		if( dirty[offs] ){
-			int ypos = offs/32;
-			int xpos = (offs%32)*8;
-			int plane0 = source[0x2000*0+offs];
-			int plane1 = source[0x2000*1+offs];
-			int plane2 = source[0x2000*2+offs];
-			int plane3 = source[0x2000*3+offs];
-			int bit;
-			if( flipscreen ){
-				for( bit=0; bit<8; bit++ ){
-					*BITMAP_ADDR16(page, 0xff - ypos, 0xff - (xpos+bit)) =
-						pal_data[
-							(((plane0<<bit)&0x80)>>7) |
-							(((plane1<<bit)&0x80)>>6) |
-							(((plane2<<bit)&0x80)>>5) |
-							(((plane3<<bit)&0x80)>>4)];
-				}
+		int ypos = offs/32;
+		int xpos = (offs%32)*8;
+		int plane0 = source[0x2000*0+offs];
+		int plane1 = source[0x2000*1+offs];
+		int plane2 = source[0x2000*2+offs];
+		int plane3 = source[0x2000*3+offs];
+		int bit;
+		if( flipscreen ){
+			for( bit=0; bit<8; bit++ ){
+				*BITMAP_ADDR16(bitmap, 0xff - ypos, 0xff - (xpos+bit)) =
+					pal_data[
+						(((plane0<<bit)&0x80)>>7) |
+						(((plane1<<bit)&0x80)>>6) |
+						(((plane2<<bit)&0x80)>>5) |
+						(((plane3<<bit)&0x80)>>4)];
 			}
-			else {
-				for( bit=0; bit<8; bit++ ){
-					*BITMAP_ADDR16(page, ypos, xpos+bit) =
-						pal_data[
-							(((plane0<<bit)&0x80)>>7) |
-							(((plane1<<bit)&0x80)>>6) |
-							(((plane2<<bit)&0x80)>>5) |
-							(((plane3<<bit)&0x80)>>4)];
-				}
+		}
+		else {
+			for( bit=0; bit<8; bit++ ){
+				*BITMAP_ADDR16(bitmap, ypos, xpos+bit) =
+					pal_data[
+						(((plane0<<bit)&0x80)>>7) |
+						(((plane1<<bit)&0x80)>>6) |
+						(((plane2<<bit)&0x80)>>5) |
+						(((plane3<<bit)&0x80)>>4)];
 			}
-			dirty[offs] = 0;
 		}
 	}
-	copybitmap(bitmap,page,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 	return 0;
 }
 

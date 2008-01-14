@@ -55,7 +55,6 @@
 UINT8 *tunhunt_ram;
 
 extern WRITE8_HANDLER( tunhunt_videoram_w );
-extern WRITE8_HANDLER( tunhunt_mott_w );
 
 extern PALETTE_INIT( tunhunt );
 extern VIDEO_START( tunhunt );
@@ -165,7 +164,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(MWA8_RAM) /* SHEL1H */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(MWA8_RAM) /* MOBJV */
 	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE(&videoram)	/* ALPHA */
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(tunhunt_mott_w) AM_BASE(&spriteram)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_NOP) /* watchdog */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(MWA8_NOP) /* INT ACK */
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(tunhunt_control_w)

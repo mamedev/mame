@@ -55,15 +55,6 @@ WRITE8_HANDLER( tunhunt_videoram_w )
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-WRITE8_HANDLER( tunhunt_mott_w )
-{
-	if( spriteram[offset]!=data )
-	{
-		spriteram[offset] = data;
-		dirtybuffer[offset>>4] = 1;
-	}
-}
-
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int attr = videoram[tile_index];
@@ -81,9 +72,6 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	dirtybuffer = auto_malloc(64);
-
-	memset( dirtybuffer, 1, 64 );
 	tmpbitmap = auto_bitmap_alloc( 256, 64, machine->screen[0].format );
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
@@ -226,27 +214,19 @@ static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, co
 
 	for( line=0; line<64; line++ )
 	{
-		if( dirtybuffer[line] )
+		x = 0;
+		source = &spriteram[line*0x10];
+		for( span=0; span<0x10; span++ )
 		{
-			dirtybuffer[line] = 0;
-			x = 0;
-			source = &spriteram[line*0x10];
-			for( span=0; span<0x10; span++ )
-			{
-				span_data = source[span];
-				if( span_data == 0xff ) break;
-				color = ((span_data>>6)&0x3)^0x3;
-				count = (span_data&0x1f)+1;
-				while( count-- && x < 256 )
-				{
-					*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[color];
-				}
-			}
-			while( x<256 )
-			{
-				*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[0];
-			}
-		} /* dirty line */
+			span_data = source[span];
+			if( span_data == 0xff ) break;
+			color = ((span_data>>6)&0x3)^0x3;
+			count = (span_data&0x1f)+1;
+			while( count-- && x < 256 )
+				*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[color];
+		}
+		while( x<256 )
+			*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[0];
 	} /* next line */
 
 	switch( tunhunt_ram[VSTRLO] )

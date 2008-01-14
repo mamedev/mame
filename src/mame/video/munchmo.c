@@ -39,20 +39,12 @@ PALETTE_INIT( mnchmobl )
 
 WRITE8_HANDLER( mnchmobl_palette_bank_w )
 {
-	if( mnchmobl_palette_bank!=(data&0x3) )
-	{
-		memset( dirtybuffer, 1, 0x100 );
-		mnchmobl_palette_bank = data&0x3;
-	}
+	mnchmobl_palette_bank = data&0x3;
 }
 
 WRITE8_HANDLER( mnchmobl_flipscreen_w )
 {
-	if( flipscreen!=data )
-	{
-		memset( dirtybuffer, 1, 0x100 );
-		flipscreen = data;
-	}
+	flipscreen = data;
 }
 
 
@@ -67,24 +59,7 @@ WRITE8_HANDLER( mnchmobl_sprite_tile_w ){ mnchmobl_sprite_tile[offset] = data; }
 
 VIDEO_START( mnchmobl )
 {
-	dirtybuffer = auto_malloc(0x100);
-	memset( dirtybuffer, 1, 0x100 );
 	tmpbitmap = auto_bitmap_alloc(512,512,machine->screen[0].format);
-}
-
-READ8_HANDLER( mnchmobl_videoram_r )
-{
-	return videoram[offset];
-}
-
-WRITE8_HANDLER( mnchmobl_videoram_w )
-{
-	offset = offset&0xff; /* mirror the two banks? */
-	if( videoram[offset]!=data )
-	{
-		videoram[offset] = data;
-		dirtybuffer[offset] = 1;
-	}
 }
 
 static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -126,24 +101,21 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 	for( offs=0; offs<0x100; offs++ )
 	{
-		if( dirtybuffer[offs] )
+		int sy = (offs%16)*32;
+		int sx = (offs/16)*32;
+		int tile_number = videoram[offs];
+		int row,col;
+
+		for( row=0; row<4; row++ )
 		{
-			int sy = (offs%16)*32;
-			int sx = (offs/16)*32;
-			int tile_number = videoram[offs];
-			int row,col;
-			dirtybuffer[offs] = 0;
-			for( row=0; row<4; row++ )
+			for( col=0; col<4; col++ )
 			{
-				for( col=0; col<4; col++ )
-				{
-					drawgfx( tmpbitmap,gfx,
-						rom[col+tile_number*4+row*0x400],
-						mnchmobl_palette_bank,
-						0,0, /* flip */
-						sx+col*8, sy+row*8,
-						0, TRANSPARENCY_NONE, 0 );
-				}
+				drawgfx( tmpbitmap,gfx,
+					rom[col+tile_number*4+row*0x400],
+					mnchmobl_palette_bank,
+					0,0, /* flip */
+					sx+col*8, sy+row*8,
+					0, TRANSPARENCY_NONE, 0 );
 			}
 		}
 	}

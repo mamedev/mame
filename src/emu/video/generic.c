@@ -51,10 +51,6 @@ size_t spriteram_size;		/* ... here just for convenience */
 size_t spriteram_2_size;
 size_t spriteram_3_size;
 
-UINT8 *dirtybuffer;
-UINT16 *dirtybuffer16;
-UINT32 *dirtybuffer32;
-
 UINT8 *paletteram;
 UINT16 *paletteram16;
 UINT32 *paletteram32;
@@ -296,9 +292,6 @@ void generic_video_init(running_machine *machine)
 	spriteram_size = 0;		/* ... here just for convenience */
 	spriteram_2_size = 0;
 	spriteram_3_size = 0;
-	dirtybuffer = NULL;
-	dirtybuffer16 = NULL;
-	dirtybuffer32 = NULL;
 	tmpbitmap = NULL;
 	flip_screen_x = flip_screen_y = 0;
 }
@@ -310,34 +303,15 @@ void generic_video_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_generic_postload - post-load callback
-    that marks all videoram as dirty
--------------------------------------------------*/
-
-static void video_generic_postload(void)
-{
-	memset(dirtybuffer, 1, videoram_size);
-}
-
-
-/*-------------------------------------------------
     video_start_generic - general video system
-    with dirty buffer support
 -------------------------------------------------*/
 
 VIDEO_START( generic )
 {
 	assert_always(videoram_size != 0, "VIDEO_START(generic) requires non-zero videoram_size");
 
-	/* allocate memory for the dirty buffer */
-	dirtybuffer = auto_malloc(videoram_size);
-	memset(dirtybuffer, 1, videoram_size);
-
 	/* allocate the temporary bitmap */
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-
-	/* on a restore, we automatically zap the dirty buffer */
-	state_save_register_func_postload(video_generic_postload);
 }
 
 
@@ -374,8 +348,7 @@ VIDEO_UPDATE( generic_bitmapped )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    videoram_r/w - 8-bit access to videoram with
-    dirty buffer marking
+    videoram_r - 8-bit read access to videoram
 -------------------------------------------------*/
 
 READ8_HANDLER( videoram_r )
@@ -383,16 +356,9 @@ READ8_HANDLER( videoram_r )
 	return videoram[offset];
 }
 
-WRITE8_HANDLER( videoram_w )
-{
-	dirtybuffer[offset] = 1;
-	videoram[offset] = data;
-}
-
 
 /*-------------------------------------------------
-    colorram_r/w - 8-bit access to colorram with
-    dirty buffer marking
+    colorram_r - 8-bit read access to colorram
 -------------------------------------------------*/
 
 READ8_HANDLER( colorram_r )
@@ -400,25 +366,14 @@ READ8_HANDLER( colorram_r )
 	return colorram[offset];
 }
 
-WRITE8_HANDLER( colorram_w )
-{
-	dirtybuffer[offset] = 1;
-	colorram[offset] = data;
-}
-
 
 /*-------------------------------------------------
-    spriteram_r/w - 8-bit access to spriteram
+    spriteram_r - 8-bit read access to spriteram
 -------------------------------------------------*/
 
 READ8_HANDLER( spriteram_r )
 {
 	return spriteram[offset];
-}
-
-WRITE8_HANDLER( spriteram_w )
-{
-	spriteram[offset] = data;
 }
 
 
@@ -434,21 +389,6 @@ READ16_HANDLER( spriteram16_r )
 WRITE16_HANDLER( spriteram16_w )
 {
 	COMBINE_DATA(spriteram16+offset);
-}
-
-
-/*-------------------------------------------------
-    spriteram_r/w - 8-bit access to spriteram2
--------------------------------------------------*/
-
-READ8_HANDLER( spriteram_2_r )
-{
-	return spriteram_2[offset];
-}
-
-WRITE8_HANDLER( spriteram_2_w )
-{
-	spriteram_2[offset] = data;
 }
 
 

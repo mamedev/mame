@@ -168,7 +168,6 @@ extern UINT8 *wiz_attributesram2;
 extern UINT8 *wiz_sprite_bank;
 
 WRITE8_HANDLER( wiz_char_bank_select_w );
-WRITE8_HANDLER( wiz_attributes_w );
 WRITE8_HANDLER( wiz_palettebank_w );
 WRITE8_HANDLER( wiz_bgcolor_w );
 WRITE8_HANDLER( wiz_flipx_w );
@@ -246,9 +245,9 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&wiz_colorram2)
 	AM_RANGE(0xd800, 0xd83f) AM_WRITE(MWA8_RAM) AM_BASE(&wiz_attributesram2)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe800, 0xe83f) AM_WRITE(wiz_attributes_w) AM_BASE(&wiz_attributesram)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0xe800, 0xe83f) AM_WRITE(MWA8_RAM) AM_BASE(&wiz_attributesram)
 	AM_RANGE(0xe840, 0xe85f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_RAM) AM_BASE(&wiz_sprite_bank)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)

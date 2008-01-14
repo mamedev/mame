@@ -64,11 +64,7 @@ PALETTE_INIT( wiping )
 
 WRITE8_HANDLER( wiping_flipscreen_w )
 {
-	if (flipscreen != (data & 1))
-	{
-		flipscreen = (data & 1);
-		memset(dirtybuffer,1,videoram_size);
-	}
+	flipscreen = (data & 1);
 }
 
 
@@ -78,46 +74,40 @@ VIDEO_UPDATE( wiping )
 
 	for (offs = videoram_size - 1; offs > 0; offs--)
 	{
-		if (dirtybuffer[offs])
+		int mx,my,sx,sy;
+
+		mx = offs % 32;
+		my = offs / 32;
+
+		if (my < 2)
 		{
-			int mx,my,sx,sy;
+			sx = my + 34;
+			sy = mx - 2;
+		}
+		else if (my >= 30)
+		{
+			sx = my - 30;
+			sy = mx - 2;
+		}
+		else
+		{
+			sx = mx + 2;
+			sy = my - 2;
+		}
 
-			dirtybuffer[offs] = 0;
+		if (flipscreen)
+		{
+			sx = 35 - sx;
+			sy = 27 - sy;
+		}
 
-	        mx = offs % 32;
-			my = offs / 32;
-
-			if (my < 2)
-			{
-				sx = my + 34;
-				sy = mx - 2;
-			}
-			else if (my >= 30)
-			{
-				sx = my - 30;
-				sy = mx - 2;
-			}
-			else
-			{
-				sx = mx + 2;
-				sy = my - 2;
-			}
-
-			if (flipscreen)
-			{
-				sx = 35 - sx;
-				sy = 27 - sy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					videoram[offs],
-					colorram[offs] & 0x3f,
-					flipscreen,flipscreen,
-					sx*8,sy*8,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-        	}
+		drawgfx(bitmap,machine->gfx[0],
+				videoram[offs],
+				colorram[offs] & 0x3f,
+				flipscreen,flipscreen,
+				sx*8,sy*8,
+				cliprect,TRANSPARENCY_NONE,0);
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 
 	/* Note, we're counting up on purpose ! */
 	/* This way the vacuum cleaner is always on top */

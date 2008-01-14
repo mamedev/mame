@@ -14,7 +14,6 @@ UINT8 *xxmissio_fgram;
 
 static UINT8 xxmissio_xscroll,xxmissio_yscroll;
 static UINT8 flipscreen;
-static UINT8 xxmissio_bg_redraw;
 
 
 WRITE8_HANDLER( xxmissio_scroll_x_w )
@@ -28,11 +27,7 @@ WRITE8_HANDLER( xxmissio_scroll_y_w )
 
 WRITE8_HANDLER( xxmissio_flipscreen_w )
 {
-	if ((data & 0x01) != flipscreen)
-	{
-		flipscreen = data & 0x01;
-		xxmissio_bg_redraw = 1;
-	}
+	flipscreen = data & 0x01;
 }
 
 WRITE8_HANDLER( xxmissio_videoram_w )
@@ -42,7 +37,6 @@ WRITE8_HANDLER( xxmissio_videoram_w )
 	offs |= x;
 
 	videoram[offs] = data;
-	dirtybuffer[offs & 0x3ff] = 1;
 }
 READ8_HANDLER( xxmissio_videoram_r )
 {
@@ -56,9 +50,6 @@ READ8_HANDLER( xxmissio_videoram_r )
 WRITE8_HANDLER( xxmissio_paletteram_w )
 {
 	paletteram_BBGGRRII_w(offset,data);
-
-	if (offset >= 0x200)
-		xxmissio_bg_redraw = 1;
 }
 
 /****************************************************************************/
@@ -71,9 +62,6 @@ VIDEO_UPDATE( xxmissio )
 
 	int size = videoram_size/2;
 
-	if (xxmissio_bg_redraw==1)
-		memset(dirtybuffer,1,size);
-
 /* draw BG layer */
 
 	for (y=0; y<32; y++)
@@ -85,25 +73,20 @@ VIDEO_UPDATE( xxmissio )
 			if (flipscreen!=0)
 				offs = (size-1)-offs;
 
-			if (dirtybuffer[offs] != 0)
-			{
-				dirtybuffer[offs]=0;
+			px = x*16;
+			py = y*8;
 
-				px = x*16;
-				py = y*8;
+			chr = videoram[ offs ] ;
+			col = videoram[ offs + size];
+			chr = chr + ((col & 0xc0) << 2 );
+			col = col & 0x0f;
 
-				chr = videoram[ offs ] ;
-				col = videoram[ offs + size];
-				chr = chr + ((col & 0xc0) << 2 );
-				col = col & 0x0f;
-
-				drawgfx(tmpbitmap,machine->gfx[2],
-					chr,
-					col,
-					flipscreen,flipscreen,
-					px,py,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-			}
+			drawgfx(tmpbitmap,machine->gfx[2],
+				chr,
+				col,
+				flipscreen,flipscreen,
+				px,py,
+				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
 		}
 	}
 
@@ -119,7 +102,6 @@ VIDEO_UPDATE( xxmissio )
 	}
 
 	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	xxmissio_bg_redraw = 0;
 
 /* draw sprites */
 

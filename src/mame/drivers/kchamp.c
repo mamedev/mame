@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(kchamp_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(kchamp_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(spriteram_w) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( kc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(kchamp_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(kchamp_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xea00, 0xeaff) AM_WRITE(spriteram_w) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xea00, 0xeaff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xeb00, 0xffff) AM_WRITE(MWA8_RAM)
 ADDRESS_MAP_END
 

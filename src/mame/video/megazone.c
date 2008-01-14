@@ -85,21 +85,11 @@ PALETTE_INIT( megazone )
 
 WRITE8_HANDLER( megazone_flipscreen_w )
 {
-	if (flipscreen != (data & 1))
-	{
-		flipscreen = data & 1;
-		memset(dirtybuffer,1,videoram_size);
-	}
+	flipscreen = data & 1;
 }
 
 VIDEO_START( megazone )
 {
-	dirtybuffer = 0;
-	tmpbitmap = 0;
-
-	dirtybuffer = auto_malloc(videoram_size);
-	memset(dirtybuffer,1,videoram_size);
-
 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
 }
 
@@ -109,35 +99,29 @@ VIDEO_UPDATE( megazone )
 	int offs;
 	int x,y;
 
-	/* for every character in the Video RAM, check if it has been modified */
-	/* since last time and update it accordingly. */
+	/* for every character in the Video RAM */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
-		if (dirtybuffer[offs])
+		int sx,sy,flipx,flipy;
+
+		sx = offs % 32;
+		sy = offs / 32;
+		flipx = colorram[offs] & (1<<6);
+		flipy = colorram[offs] & (1<<5);
+		if (flipscreen)
 		{
-			int sx,sy,flipx,flipy;
-
-			dirtybuffer[offs] = 0;
-
-			sx = offs % 32;
-			sy = offs / 32;
-			flipx = colorram[offs] & (1<<6);
-			flipy = colorram[offs] & (1<<5);
-			if (flipscreen)
-			{
-				sx = 31 - sx;
-				sy = 31 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			drawgfx(tmpbitmap,machine->gfx[0],
-					((int)videoram[offs]) + ((colorram[offs] & (1<<7) ? 256 : 0) ),
-					(colorram[offs] & 0x0f) + 0x10,
-					flipx,flipy,
-					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+			sx = 31 - sx;
+			sy = 31 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
 		}
+
+		drawgfx(tmpbitmap,machine->gfx[0],
+				((int)videoram[offs]) + ((colorram[offs] & (1<<7) ? 256 : 0) ),
+				(colorram[offs] & 0x0f) + 0x10,
+				flipx,flipy,
+				8*sx,8*sy,
+				0,TRANSPARENCY_NONE,0);
 	}
 
 	/* copy the temporary bitmap to the screen */

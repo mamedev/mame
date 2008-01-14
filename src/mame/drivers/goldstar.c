@@ -16,9 +16,6 @@ extern UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
 extern size_t goldstar_video_size;
 extern UINT8 *goldstar_scroll1, *goldstar_scroll2, *goldstar_scroll3;
 
-WRITE8_HANDLER( goldstar_video1_w );
-WRITE8_HANDLER( goldstar_video2_w );
-WRITE8_HANDLER( goldstar_video3_w );
 WRITE8_HANDLER( goldstar_fa00_w );
 VIDEO_START( goldstar );
 VIDEO_UPDATE( goldstar );
@@ -59,13 +56,12 @@ static READ8_HANDLER( protection_r )
 static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc800, 0xd9ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(MRA8_RAM,goldstar_video2_w) AM_BASE(&goldstar_video2)
-	AM_RANGE(0xd800, 0xd9ff) AM_READWRITE(MRA8_RAM,goldstar_video1_w) AM_BASE(&goldstar_video1) AM_SIZE(&goldstar_video_size)
-	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(goldstar_video3_w) AM_BASE(&goldstar_video3)
+	AM_RANGE(0xc000, 0xc7ff) AM_ROM
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM AM_BASE(&goldstar_video1) AM_SIZE(&goldstar_video_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&goldstar_video2)
+	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_video3)
 	AM_RANGE(0xf040, 0xf07f) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_scroll1)
 	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_0_r)
 	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)	/* Test Mode */
