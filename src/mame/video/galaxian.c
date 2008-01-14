@@ -680,6 +680,7 @@ VIDEO_START( darkplnt )
 {
 	video_start_galaxian_plain(machine);
 
+	tilemap_set_scrolldx(bg_tilemap, 0, 0);
 	draw_bullets = darkplnt_draw_bullets;
 }
 
