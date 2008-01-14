@@ -1003,12 +1003,12 @@ void cpuintrf_init(running_machine *machine)
 	totalcpu = 0;
 
 	/* compute information about the CPUs now if we have a machine */
-	if (Machine != NULL)
+	if (machine != NULL)
 	{
 		/* loop over all defined CPUs */
 		for (totalcpu = 0; totalcpu < CPU_COUNT; totalcpu++)
 		{
-			cpu_type cputype = Machine->drv->cpu[totalcpu].type;
+			cpu_type cputype = machine->drv->cpu[totalcpu].type;
 			char familyname[256];
 			int j;
 
