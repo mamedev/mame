@@ -257,10 +257,6 @@ static GFXDECODE_START( dynduke )
 	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,  0x300, 32 )
 GFXDECODE_END
 
-/* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
-
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
-
 /* Interrupt Generator */
 
 static INTERRUPT_GEN( dynduke_interrupt )

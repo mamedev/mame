@@ -263,8 +263,6 @@ static GFXDECODE_START( goodejan )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0x100, 0x10 ) /* Text */
 GFXDECODE_END
 
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
-
 static INTERRUPT_GEN( goodejan_interrupt )
 {
 	if (cpu_getiloops())

@@ -263,12 +263,6 @@ static GFXDECODE_START( deadang )
 	GFXDECODE_ENTRY( REGION_GFX5, 0x000000, spritelayout,    0, 16 )
 GFXDECODE_END
 
-/* Sound Interfaces */
-
-SEIBU_SOUND_SYSTEM_YM2203_HARDWARE
-
-SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE
-
 /* Interrupt Generators */
 
 static INTERRUPT_GEN( deadang_interrupt )

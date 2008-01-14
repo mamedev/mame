@@ -425,10 +425,6 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-/* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
-
-
 static const struct MSM5205interface msm5205_interface =
 {
 	toki_adpcm_int,	/* interrupt function */

@@ -513,11 +513,6 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static const struct YM2151interface ym2151_interface =
-{
-	seibu_ym3812_irqhandler
-};
-
 static void irqhandler(int irq)
 {
 	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
@@ -527,8 +522,6 @@ static const struct YM2151interface cabalbl_ym2151_interface =
 {
 	irqhandler
 };
-
-SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE
 
 static const struct MSM5205interface msm5205_interface_1 =
 {
@@ -573,16 +566,15 @@ static MACHINE_DRIVER_START( cabal )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(YM2151, 3579580) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(seibu_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
 	MDRV_SOUND_ADD(CUSTOM, 8000)
-	MDRV_SOUND_CONFIG(adpcm_interface)
+	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
-
 	MDRV_SOUND_ADD(CUSTOM, 8000)
-	MDRV_SOUND_CONFIG(adpcm_interface)
+	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_DRIVER_END
 

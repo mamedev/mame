@@ -521,10 +521,6 @@ static GFXDECODE_START( weststry )
 	GFXDECODE_ENTRY( REGION_GFX3, 0x00000, weststry_spritelayout,    0*16,  0x10 )
 GFXDECODE_END
 
-/* Sound Interfaces */
-
-// Parameters: YM3812 frequency, Oki frequency, Oki memory region
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
 
 /* Machine Drivers */
 

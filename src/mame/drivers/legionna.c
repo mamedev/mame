@@ -3459,13 +3459,6 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-/* Parameters: YM3812 frequency, Oki frequency, Oki memory region */
-SEIBU_SOUND_SYSTEM_YM3812_HARDWARE
-
-SEIBU_SOUND_SYSTEM_YM2151_HARDWARE
-
-/*****************************************************************************/
-
 static MACHINE_DRIVER_START( legionna )
 
 	/* basic machine hardware */

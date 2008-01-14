@@ -29,13 +29,10 @@
 #include "sound/okim6295.h"
 #include "sound/custom.h"
 
-ADDRESS_MAP_EXTERN(seibu_sound_readmem);
-ADDRESS_MAP_EXTERN(seibu_sound_writemem);
-ADDRESS_MAP_EXTERN(seibu2_sound_readmem);
-ADDRESS_MAP_EXTERN(seibu2_sound_writemem);
-ADDRESS_MAP_EXTERN(seibu3_sound_readmem);
-ADDRESS_MAP_EXTERN(seibu3_sound_writemem);
-ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_writemem);
+ADDRESS_MAP_EXTERN(seibu_sound_map);
+ADDRESS_MAP_EXTERN(seibu2_sound_map);
+ADDRESS_MAP_EXTERN(seibu3_sound_map);
+ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map);
 
 READ16_HANDLER( seibu_main_word_r );
 READ8_HANDLER( seibu_main_v30_r );
@@ -59,13 +56,16 @@ MACHINE_RESET( seibu_sound_1 );
 MACHINE_RESET( seibu_sound_2 );
 void seibu_sound_decrypt(int cpu_region,int length);
 
-void *seibu_adpcm_start(int clock, const struct CustomSound_interface *config);
-void seibu_adpcm_stop(void *token);
 void seibu_adpcm_decrypt(int region);
 WRITE8_HANDLER( seibu_adpcm_adr_1_w );
 WRITE8_HANDLER( seibu_adpcm_ctl_1_w );
 WRITE8_HANDLER( seibu_adpcm_adr_2_w );
 WRITE8_HANDLER( seibu_adpcm_ctl_2_w );
+
+extern const struct YM3812interface seibu_ym3812_interface;
+extern const struct CustomSound_interface seibu_adpcm_interface;
+extern const struct YM2151interface seibu_ym2151_interface;
+extern const struct YM2203interface seibu_ym2203_interface;
 
 /**************************************************************************/
 
@@ -74,60 +74,28 @@ WRITE8_HANDLER( seibu_adpcm_ctl_2_w );
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)			\
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)
 
-#define SEIBU_SOUND_SYSTEM_YM3812_HARDWARE							\
-																	\
-static const struct YM3812interface ym3812_interface =				\
-{																	\
-	seibu_ym3812_irqhandler											\
-};
-
-#define SEIBU_SOUND_SYSTEM_ADPCM_HARDWARE							\
-																	\
-static const struct CustomSound_interface adpcm_interface =			\
-{																	\
-	seibu_adpcm_start,												\
-	seibu_adpcm_stop												\
-};
-
-#define SEIBU_SOUND_SYSTEM_YM2151_HARDWARE							\
-																	\
-static const struct YM2151interface ym2151_interface =				\
-{																	\
-	seibu_ym2151_irqhandler											\
-};
-
-#define SEIBU_SOUND_SYSTEM_YM2203_HARDWARE							\
-																	\
-static const struct YM2203interface ym2203_interface =				\
-{																	\
-	0,0,0,0,seibu_ym2203_irqhandler									\
-};
 
 #define SEIBU_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD(Z80, freq)											\
-	/* audio CPU */									\
-	MDRV_CPU_PROGRAM_MAP(seibu_sound_readmem,seibu_sound_writemem)		\
+	MDRV_CPU_PROGRAM_MAP(seibu_sound_map,0)							\
 
 #define SEIBU2_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD(Z80, freq)											\
-	/* audio CPU */									\
-	MDRV_CPU_PROGRAM_MAP(seibu2_sound_readmem,seibu2_sound_writemem)		\
+	MDRV_CPU_PROGRAM_MAP(seibu2_sound_map,0)						\
 
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD(Z80, freq)											\
-	/* audio CPU */									\
-	MDRV_CPU_PROGRAM_MAP(seibu3_sound_readmem,seibu3_sound_writemem)		\
+	MDRV_CPU_PROGRAM_MAP(seibu3_sound_map,0)						\
 
 #define SEIBU3A_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD(Z80, freq)											\
-	/* audio CPU */									\
-	MDRV_CPU_PROGRAM_MAP(seibu3_sound_readmem,seibu3_adpcm_sound_writemem)		\
+	MDRV_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map,0)					\
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2,region)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
 	MDRV_SOUND_ADD(YM3812, freq1)									\
-	MDRV_SOUND_CONFIG(ym3812_interface)								\
+	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
 	MDRV_SOUND_ADD(OKIM6295, freq2)									\
@@ -138,18 +106,18 @@ static const struct YM2203interface ym2203_interface =				\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
 	MDRV_SOUND_ADD(YM3812, freq1)									\
-	MDRV_SOUND_CONFIG(ym3812_interface)								\
+	MDRV_SOUND_CONFIG(seibu_ym3812_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 																	\
 	MDRV_SOUND_ADD(OKIM6295, freq2)									\
-	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7high)	\
+	MDRV_SOUND_CONFIG(okim6295_interface_region_##region##_pin7high)\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)						\
 
 #define SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(freq1,freq2,region)		\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
 	MDRV_SOUND_ADD(YM2151, freq1)									\
-	MDRV_SOUND_CONFIG(ym2151_interface)								\
+	MDRV_SOUND_CONFIG(seibu_ym2151_interface)						\
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)								\
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)								\
 																	\
@@ -161,7 +129,7 @@ static const struct YM2203interface ym2203_interface =				\
 	MDRV_SPEAKER_STANDARD_MONO("mono")								\
 																	\
 	MDRV_SOUND_ADD(YM2203, freq)									\
-	MDRV_SOUND_CONFIG(ym2203_interface)								\
+	MDRV_SOUND_CONFIG(seibu_ym2203_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)						\
 																	\
 	MDRV_SOUND_ADD(YM2203, freq)									\
@@ -169,11 +137,11 @@ static const struct YM2203interface ym2203_interface =				\
 
 #define SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE							\
 	MDRV_SOUND_ADD(CUSTOM, 8000)	 								\
-	MDRV_SOUND_CONFIG(adpcm_interface)								\
+	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40) 					\
 																	\
 	MDRV_SOUND_ADD(CUSTOM, 8000) 									\
-	MDRV_SOUND_CONFIG(adpcm_interface)								\
+	MDRV_SOUND_CONFIG(seibu_adpcm_interface)						\
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)						\
 
 
