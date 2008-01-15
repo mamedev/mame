@@ -4,27 +4,35 @@ Crazy Ballooon
 
 *************************************************************************/
 
-#include "sound/discrete.h"
 
-#define CRBALOON_LAUGH_EN		NODE_01
-#define CRBALOON_MUSIC_EN		NODE_02
-#define CRBALOON_MUSIC_DATA		NODE_03
+#define CRBALOON_MASTER_XTAL	(XTAL_9_987MHz)
 
 
 /*----------- defined in audio/crbaloon.c -----------*/
 
-DISCRETE_SOUND_EXTERN( crbaloon );
+void crbaloon_audio_set_music_freq(UINT8 freq);
+void crbaloon_audio_set_music_enable(int enabled);
+void crbaloon_audio_set_explosion_enable(int enabled);
+void crbaloon_audio_set_breath_enable(int enabled);
+void crbaloon_audio_set_appear_enable(int enabled);
+void crbaloon_audio_set_laugh_enable(int enabled);
+
+MACHINE_DRIVER_EXTERN( crbaloon_audio );
+
 
 /*----------- defined in video/crbaloon.c -----------*/
 
-extern INT8 crbaloon_collision;
-
-WRITE8_HANDLER( crbaloon_videoram_w );
-WRITE8_HANDLER( crbaloon_colorram_w );
-WRITE8_HANDLER( crbaloon_spritectrl_w );
-WRITE8_HANDLER( crbaloon_flipscreen_w );
+extern UINT8 *crbaloon_videoram;
+extern UINT8 *crbaloon_colorram;
+extern UINT8 *crbaloon_spriteram;
 
 PALETTE_INIT( crbaloon );
 VIDEO_START( crbaloon );
 VIDEO_UPDATE( crbaloon );
+
+WRITE8_HANDLER( crbaloon_videoram_w );
+WRITE8_HANDLER( crbaloon_colorram_w );
+
+UINT16 crbaloon_get_collision_address(void);
+void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear);
 

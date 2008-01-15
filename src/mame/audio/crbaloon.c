@@ -1,23 +1,75 @@
+/***************************************************************************
+
+    Taito Crazy Balloon hardware
+
+    Analog emulation - Jan 2006, Derrick Renaud
+
+***************************************************************************/
+
 #include "driver.h"
 #include "crbaloon.h"
+#include "sound/sn76477.h"
+#include "sound/discrete.h"
 
 
-/************************************************************************
-* crbaloon Sound System Analog emulation
-* Jan 2006, Derrick Renaud
-************************************************************************/
+/* timing sources */
+#define CRBALOON_16H			(CRBALOON_MASTER_XTAL/2/2/16)
 
+/* enables */
+#define CRBALOON_LAUGH_EN		NODE_01
+#define CRBALOON_MUSIC_EN		NODE_02
+#define CRBALOON_MUSIC_DATA		NODE_03
 
-/* Timing Sources */
-#define CRBALOON_16H			9987000.0/2/2/16
-
-/* Nodes - Adjusters */
+/* nodes - adjusters */
 #define CRBALOON_VR2			NODE_05
 #define CRBALOON_VR3			NODE_06
 
-/* Nodes - Sounds */
+/* nodes - sounds */
 #define CRBALOON_LAUGH_SND		NODE_80
 #define CRBALOON_MUSIC_SND		NODE_81
+
+
+
+void crbaloon_audio_set_music_freq(UINT8 freq)
+{
+	discrete_sound_w(CRBALOON_MUSIC_DATA, freq);
+}
+
+
+void crbaloon_audio_set_music_enable(int enabled)
+{
+	discrete_sound_w(CRBALOON_MUSIC_EN, enabled);
+}
+
+
+void crbaloon_audio_set_explosion_enable(int enabled)
+{
+	SN76477_enable_w(0, enabled);
+}
+
+
+void crbaloon_audio_set_breath_enable(int enabled)
+{
+	/* changes slf_res to 10k (middle of two 10k resistors)
+       it also puts a tantal capacitor against GND on the output,
+       but this section of the schematics is not readable. */
+	SN76477_slf_res_w(0, enabled ? RES_K(10) : RES_K(20) );
+}
+
+
+void crbaloon_audio_set_appear_enable(int enabled)
+{
+	/* APPEAR is connected to MIXER B */
+	SN76477_mixer_b_w(0, enabled);
+}
+
+
+void crbaloon_audio_set_laugh_enable(int enabled)
+{
+	discrete_sound_w(CRBALOON_LAUGH_EN, enabled);
+}
+
+
 
 static const discrete_555_desc desc_crbaloon_laugh_osc =
 {
@@ -26,6 +78,7 @@ static const discrete_555_desc desc_crbaloon_laugh_osc =
 	DEFAULT_555_VALUES
 };
 
+
 static const discrete_dac_r1_ladder desc_crbaloon_music_dac =
 {
 	3,
@@ -33,7 +86,9 @@ static const discrete_dac_r1_ladder desc_crbaloon_music_dac =
 	5, RES_K(470), 0, 0
 };
 
-DISCRETE_SOUND_START(crbaloon)
+
+
+static DISCRETE_SOUND_START(crbaloon)
 
 	/************************************************
     * Input register mapping
@@ -78,3 +133,47 @@ DISCRETE_SOUND_START(crbaloon)
 	DISCRETE_OUTPUT(NODE_91, 65000.0/12)
 
 DISCRETE_SOUND_END
+
+
+
+static const struct SN76477interface sn76477_interface =
+{
+	RES_K( 47),	/*  4 noise_res          */
+	RES_K(330),	/*  5 filter_res         */
+	CAP_P(470),	/*  6 filter_cap         */
+	RES_K(220),	/*  7 decay_res          */
+	CAP_U(1.0),	/*  8 attack_decay_cap   */
+	RES_K(4.7),	/* 10 attack_res         */
+	RES_M(  1),	/* 11 amplitude_res      */
+	RES_K(200),	/* 12 feedback_res       */
+	5.0,		/* 16 vco_voltage        */
+	CAP_P(470),	/* 17 vco_cap            */
+	RES_K(330),	/* 18 vco_res            */
+	5.0,		/* 19 pitch_voltage      */
+	RES_K( 20),	/* 20 slf_res (variable) */
+	CAP_P(420),	/* 21 slf_cap            */
+	CAP_U(1.0),	/* 23 oneshot_cap        */
+	RES_K( 47),	/* 24 oneshot_res        */
+	0,			/* 22 vco                */
+	0,			/* 26 mixer A            */
+	0,			/* 25 mixer B (variable) */
+	1,			/* 27 mixer C            */
+	1,			/* 1  envelope 1         */
+	0,			/* 28 envelope 2         */
+	0			/* 9  enable (variable)  */
+};
+
+
+
+MACHINE_DRIVER_START( crbaloon_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(SN76477, 0)
+	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+
+	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(crbaloon)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END

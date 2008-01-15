@@ -9,11 +9,15 @@
 #include "driver.h"
 #include "includes/crbaloon.h"
 
-static UINT8 spritectrl[3];
 
-INT8 crbaloon_collision;
+UINT8 *crbaloon_videoram;
+UINT8 *crbaloon_colorram;
+UINT8 *crbaloon_spriteram;
 
+static UINT16 crbaloon_collision_address;
+static UINT8 crbaloon_collision_address_clear;
 static tilemap *bg_tilemap;
+
 
 /***************************************************************************
 
@@ -27,6 +31,7 @@ static tilemap *bg_tilemap;
   bit 0 RED
 
 ***************************************************************************/
+
 PALETTE_INIT( crbaloon )
 {
 	int i;
@@ -34,134 +39,124 @@ PALETTE_INIT( crbaloon )
 	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int intensity,r,g,b;
+		int h = (~i & 0x08) ? 0xff : 0x55;
 
+		int r = h * ((~i >> 0) & 1);
+		int g = h * ((~i >> 1) & 1);
+		int b = h * ((~i >> 2) & 1);
 
-		intensity = (~i & 0x08) ? 0xff : 0x55;
-
-		/* red component */
-		r = intensity * ((~i >> 0) & 1);
-		/* green component */
-		g = intensity * ((~i >> 1) & 1);
-		/* blue component */
-		b = intensity * ((~i >> 2) & 1);
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
-	for (i = 0;i < TOTAL_COLORS(0);i += 2)
+	for (i = 0; i < TOTAL_COLORS(0); i += 2)
 	{
-		COLOR(0,i) = 15;		/* black background */
-		COLOR(0,i + 1) = i / 2;	/* colored foreground */
+		COLOR(0, i + 0) = 0x0f;		/* black background */
+		COLOR(0, i + 1) = i / 2;	/* colored foreground */
 	}
 }
 
+
 WRITE8_HANDLER( crbaloon_videoram_w )
 {
-	videoram[offset] = data;
+	crbaloon_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( crbaloon_colorram_w )
 {
-	colorram[offset] = data;
+	crbaloon_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-WRITE8_HANDLER( crbaloon_spritectrl_w )
-{
-	spritectrl[offset] = data;
-}
-
-WRITE8_HANDLER( crbaloon_flipscreen_w )
-{
-	if (flip_screen != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = colorram[tile_index] & 0x0f;
+	int code = crbaloon_videoram[tile_index];
+	int color = crbaloon_colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( crbaloon )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_flip_xy,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_flip_xy, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-
-	state_save_register_global_array(spritectrl);
-	state_save_register_global(crbaloon_collision);
+	state_save_register_global(crbaloon_collision_address);
+	state_save_register_global(crbaloon_collision_address_clear);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+
+UINT16 crbaloon_get_collision_address(void)
 {
-	int x,y;
+	return crbaloon_collision_address_clear ? 0xffff : crbaloon_collision_address;
+}
 
-	/* Check Collision - Draw balloon in background colour, if no */
-    /* collision occured, bitmap will be same as tmpbitmap        */
 
-	int bx = spritectrl[1];
-	int by = spritectrl[2] - 32;
+void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear)
+{
+	crbaloon_collision_address_clear = !_crbaloon_collision_address_clear; /* active LO */
+}
 
-	tilemap_draw(tmpbitmap, 0, bg_tilemap, 0, 0);
+
+
+static void draw_sprite_and_check_collision(running_machine *machine, mame_bitmap *bitmap)
+{
+	int y;
+	UINT8 code = crbaloon_spriteram[0] & 0x0f;
+	UINT8 color = crbaloon_spriteram[0] >> 4;
+	UINT8 sy = crbaloon_spriteram[2] - 32;
+
+	UINT8 *gfx = memory_region(REGION_GFX2) + (code << 7);
+
 
 	if (flip_screen)
+		sy += 32;
+
+	/* assume no collision */
+    crbaloon_collision_address = 0xffff;
+
+	for (y = 0x1f; y >= 0; y--)
 	{
-		by += 32;
-	}
+		int x;
+		UINT8 data = 0;
+		UINT8 sx = crbaloon_spriteram[1];
 
-	drawgfx(bitmap,machine->gfx[1],
-			spritectrl[0] & 0x0f,
-			15,
-			0,0,
-			bx,by,
-			cliprect,TRANSPARENCY_PEN,0);
+		for (x = 0x1f; x >= 0; x--)
+		{
+			int bit;
 
-    crbaloon_collision = 0;
+			if ((x & 0x07) == 0x07)
+				/* get next byte to draw, but no drawing in VBLANK */
+				data = (sy >= 0xe0) ? 0 : gfx[((x >> 3) << 5) | y];
 
-	for (x = bx; x < bx + machine->gfx[1]->width; x++)
-	{
-		for (y = by; y < by + machine->gfx[1]->height; y++)
-        {
-			if ((x < machine->screen[0].visarea.min_x) ||
-			    (x > machine->screen[0].visarea.max_x) ||
-			    (y < machine->screen[0].visarea.min_y) ||
-			    (y > machine->screen[0].visarea.max_y))
+			bit = data & 0x80;
+
+			/* draw the current pixel, but check collision first */
+			if (bit)
 			{
-				continue;
+				if (*BITMAP_ADDR16(bitmap, sy, sx) != 0x0f)
+					/* compute the collision address -- the +1 is via observation
+                       of the game code, probably wrong for cocktail mode */
+					crbaloon_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
+
+				*BITMAP_ADDR16(bitmap, sy, sx) = color;
 			}
 
-        	if (*BITMAP_ADDR16(bitmap, y, x) != *BITMAP_ADDR16(tmpbitmap, y, x))
-        	{
-				crbaloon_collision = -1;
-				break;
-			}
+			sx = sx + 1;
+			data = data << 1;
         }
+
+        sy = sy + 1;
 	}
-
-
-	/* actually draw the balloon */
-
-	drawgfx(bitmap,machine->gfx[1],
-			spritectrl[0] & 0x0f,
-			(spritectrl[0] & 0xf0) >> 4,
-			0,0,
-			bx,by,
-			cliprect,TRANSPARENCY_PEN,0);
 }
+
 
 VIDEO_UPDATE( crbaloon )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+
+	draw_sprite_and_check_collision(machine, bitmap);
+
 	return 0;
 }
