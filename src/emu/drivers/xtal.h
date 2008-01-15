@@ -55,6 +55,7 @@ enum
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_8MHz    		= 8000000,
+	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
@@ -123,7 +124,7 @@ enum
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
-	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */		
+	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */
 	XTAL_455kHz			= 455000,	/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000
 };
