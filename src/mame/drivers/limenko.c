@@ -802,23 +802,13 @@ ROM_START( spotty )
 	ROM_LOAD( "sou_rom1",     0x000000, 0x40000, CRC(5791195b) SHA1(de0df8f89f395cbf3508b01aeea05675e110ad04) )
 ROM_END
 
-static int irq_active(void)
-{
-	UINT32 FCR = activecpu_get_reg(27);
-	if( !(FCR&(1<<28)) ) // int 1 (irq 5)
-		return 1;
-	else
-		return 0;
-}
+
 
 static READ32_HANDLER( dynabomb_speedup_r )
 {
 	if(activecpu_get_pc() == 0xc25b8)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
-		else
-			activecpu_eat_cycles(50);
+		activecpu_eat_cycles(50);
 	}
 
 	return mainram[0xe2784/4];
@@ -828,10 +818,7 @@ static READ32_HANDLER( legendoh_speedup_r )
 {
 	if(activecpu_get_pc() == 0x23e32)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
-		else
-			activecpu_eat_cycles(50);
+		activecpu_eat_cycles(50);
 	}
 
 	return mainram[0x32ab0/4];
@@ -841,10 +828,7 @@ static READ32_HANDLER( sb2003_speedup_r )
 {
 	if(activecpu_get_pc() == 0x26da4)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
-		else
-			activecpu_eat_cycles(50);
+		activecpu_eat_cycles(50);
 	}
 
 	return mainram[0x135800/4];
@@ -854,10 +838,7 @@ static READ32_HANDLER( spotty_speedup_r )
 {
 	if(activecpu_get_pc() == 0x8560)
 	{
-		if(irq_active())
-			cpu_spinuntil_int();
-		else
-			activecpu_eat_cycles(50);
+		activecpu_eat_cycles(50);
 	}
 
 	return mainram[0x6626c/4];
