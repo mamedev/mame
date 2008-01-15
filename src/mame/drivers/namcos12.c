@@ -1496,7 +1496,7 @@ static DRIVER_INIT( golgo13 )
 
 static MACHINE_DRIVER_START( coh700 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_100MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 

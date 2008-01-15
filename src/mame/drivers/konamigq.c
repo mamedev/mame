@@ -373,7 +373,7 @@ static MACHINE_RESET( konamigq )
 
 static MACHINE_DRIVER_START( konamigq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 

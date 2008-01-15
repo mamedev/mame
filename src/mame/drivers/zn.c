@@ -621,7 +621,7 @@ static const struct QSound_interface qsound_interface =
 
 static MACHINE_DRIVER_START( coh1000c )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -664,7 +664,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh1002c )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -873,7 +873,7 @@ static MACHINE_RESET( coh3002c )
 
 static MACHINE_DRIVER_START( coh3002c )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -1314,7 +1314,7 @@ static const struct YM2610interface ym2610_interface =
 
 static MACHINE_DRIVER_START( coh1000ta )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
 
@@ -1421,7 +1421,7 @@ static NVRAM_HANDLER( coh1000tb )
 
 static MACHINE_DRIVER_START( coh1000tb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
 
@@ -1611,7 +1611,7 @@ static MACHINE_RESET( coh3002t )
 
 static MACHINE_DRIVER_START( coh3002t )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -1825,7 +1825,7 @@ static MACHINE_RESET( coh1000w )
 
 static MACHINE_DRIVER_START( coh1000w )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -2067,7 +2067,7 @@ static const struct YMF271interface ymf271_interface =
 
 static MACHINE_DRIVER_START( coh1002e )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -2412,7 +2412,7 @@ static MACHINE_RESET( coh1000a )
 
 static MACHINE_DRIVER_START( coh1000a )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -2579,7 +2579,7 @@ static MACHINE_RESET( coh1001l )
 
 static MACHINE_DRIVER_START( coh1001l )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -2668,7 +2668,7 @@ static INTERRUPT_GEN( coh1002v_vblank )
 
 static MACHINE_DRIVER_START( coh1002v )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( coh1002v_vblank, 1 )
 
@@ -2937,7 +2937,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static MACHINE_DRIVER_START( coh1002m )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -2969,7 +2969,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh1002msnd )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -3011,7 +3011,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh1002ml )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 

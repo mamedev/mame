@@ -377,7 +377,7 @@ static MACHINE_RESET( namcos10 )
 
 static MACHINE_DRIVER_START( namcos10 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, 33868800 / 2 ) /* 33MHz ?? */
+	MDRV_CPU_ADD( PSXCPU, XTAL_100MHz / 2 )
 	MDRV_CPU_PROGRAM_MAP( namcos10_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
