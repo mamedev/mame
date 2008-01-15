@@ -2927,7 +2927,7 @@ ROM_START( roadrunm )
 	ROM_LOAD( "9316.1h",    0x0000, 0x0800, CRC(c0030d7c) SHA1(4d0a3a59d4f8181c6e30966a6b1d19ba5b29c398) )
 	ROM_LOAD( "9316.1g",    0x0800, 0x0800, CRC(1ddde10b) SHA1(8fb8e85844a8ec6c0722883013ecdd4eeaeb08c1) )
 	ROM_LOAD( "9316.1f",    0x1000, 0x0800, CRC(808e46f1) SHA1(1cc4e9b0aa7e9546c133bd40d40ede6f2fbe93ba) )
-	ROM_LOAD( "9316.1e",    0x1800, 0x0800, BAD_DUMP CRC(d5adff14) SHA1(39e5bf5b9846073d2e909542e394244b8c31dc5a) )
+	ROM_LOAD( "9316.1e",    0x1800, 0x0800, CRC(db5996a5) SHA1(cbc784e3ff9c7ad4954f3af8bfd786d3d17d1e0c) )
 ROM_END
 
 
@@ -3098,7 +3098,7 @@ ROM_END
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+/* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
 /* 622 */ GAME( 1977, lagunar,  0,        zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
 /* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, 0, ROT0,   "Taito / Midway", "Missile X / Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
