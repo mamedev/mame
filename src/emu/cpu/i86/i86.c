@@ -522,6 +522,10 @@ void i80186_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_EXECUTE:						info->execute = i80186_execute;			break;
 

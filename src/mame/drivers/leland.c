@@ -47,6 +47,12 @@
 #include "sound/custom.h"
 
 
+#define MASTER_CLOCK		XTAL_12MHz
+#define VIDEO_CLOCK			XTAL_14_31818MHz
+#define MCU_CLOCK			XTAL_16MHz
+
+
+
 /*************************************
  *
  *  Master CPU memory handlers
@@ -733,12 +739,12 @@ static const struct CustomSound_interface redline_custom_interface =
 static MACHINE_DRIVER_START( leland )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("master", Z80, 6000000)
+	MDRV_CPU_ADD_TAG("master", Z80, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(master_map_program,0)
 	MDRV_CPU_IO_MAP(master_map_io,0)
 	MDRV_CPU_VBLANK_INT(leland_master_interrupt,1)
 
-	MDRV_CPU_ADD_TAG("slave", Z80, 6000000)
+	MDRV_CPU_ADD_TAG("slave", Z80, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(slave_small_map_program,0)
 	MDRV_CPU_IO_MAP(slave_map_io,0)
 
@@ -781,8 +787,8 @@ static MACHINE_DRIVER_START( redline )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(leland)
-	MDRV_CPU_ADD_TAG("sound", I80186, 16000000/2)
-	/* audio CPU */
+
+	MDRV_CPU_ADD_TAG("sound", I80186, MCU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
 	MDRV_CPU_IO_MAP(redline_80186_map_io,0)
 
@@ -797,6 +803,7 @@ static MACHINE_DRIVER_START( quarterb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(redline)
+
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(leland_80186_map_io,0)
 
@@ -811,6 +818,7 @@ static MACHINE_DRIVER_START( lelandi )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(quarterb)
+
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_large_map_program,0)
 MACHINE_DRIVER_END

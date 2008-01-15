@@ -3828,6 +3828,8 @@ void h8_3002_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);						break;
 	case CPUINFO_STR_FLAGS:						strcpy(info->s, h8_get_ccr_str());				break;
 	case CPUINFO_INT_ENDIANNESS:				info->i = CPU_IS_BE;							break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:			info->i = 1;									break;
+	case CPUINFO_INT_CLOCK_DIVIDER:				info->i = 1;									break;
 	case CPUINFO_INT_INPUT_LINES:				info->i = 16;									break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:		info->i = -1;									break;
 

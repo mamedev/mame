@@ -155,7 +155,7 @@ WRITE8_HANDLER( alleymas_joystick_kludge )
 {
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
-	if (safe_activecpu_get_pc() == 0x1827)
+	if (activecpu_get_previouspc() == 0x1827)
 		*alleymas_kludge_mem = 1;
 	else
 		*alleymas_kludge_mem = data;

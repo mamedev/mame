@@ -33,6 +33,10 @@
 #include "sound/custom.h"
 
 
+#define MASTER_CLOCK		XTAL_28_63636MHz
+#define MCU_CLOCK			XTAL_16MHz
+
+
 
 /*************************************
  *
@@ -334,7 +338,7 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_CPU_PROGRAM_MAP(slave_map_program,0)
 	MDRV_CPU_IO_MAP(slave_map_io,0)
 
-	MDRV_CPU_ADD_TAG("sound", I80186, 16000000/2)
+	MDRV_CPU_ADD_TAG("sound", I80186, XTAL_16MHz)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program,0)
 	MDRV_CPU_IO_MAP(ataxx_80186_map_io,0)
