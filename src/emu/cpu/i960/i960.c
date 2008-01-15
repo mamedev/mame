@@ -593,9 +593,9 @@ static void do_ret(void)
 		x = program_read_dword(i960.r[I960_FP]-16);
 		y = program_read_dword(i960.r[I960_FP]-12);
 		do_ret_0();
-		i960.AC = x;
+		i960.AC = y;
 		// #### test supervisor
-		i960.PC = y;
+		i960.PC = x;
 
 		// check for another IRQ now that we're back
 		check_irqs();
