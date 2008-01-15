@@ -7,7 +7,7 @@
 #include "cpu/z80/z80daisy.h"
 
 /* constants */
-#define MAIN_OSC_MCR_I		19968000
+#define MAIN_OSC_MCR_I		XTAL_19_968MHz
 
 
 /*----------- defined in drivers/mcr.c -----------*/

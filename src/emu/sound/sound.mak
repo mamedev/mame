@@ -581,13 +581,15 @@ endif
 #-------------------------------------------------
 
 SOUNDDEFS += -DHAS_TMS5110=$(if $(filter TMS5110,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_TMS0285=$(if $(filter TMS0285,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_TMS5200=$(if $(filter TMS5200,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_TMS5220=$(if $(filter TMS5220,$(SOUNDS)),1,0)
 
 ifneq ($(filter TMS5110,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5110.o $(SOUNDOBJ)/5110intf.o
 endif
 
-ifneq ($(filter TMS5220,$(SOUNDS)),)
+ifneq ($(filter TMS0285 TMS5200 TMS5220,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5220.o $(SOUNDOBJ)/5220intf.o
 endif
 

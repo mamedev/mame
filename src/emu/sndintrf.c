@@ -108,6 +108,8 @@ void namcona_get_info(void *token, UINT32 state, sndinfo *info);
 void tms36xx_get_info(void *token, UINT32 state, sndinfo *info);
 void tms3615_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5110_get_info(void *token, UINT32 state, sndinfo *info);
+void tms0285_get_info(void *token, UINT32 state, sndinfo *info);
+void tms5200_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5220_get_info(void *token, UINT32 state, sndinfo *info);
 void vlm5030_get_info(void *token, UINT32 state, sndinfo *info);
 void adpcm_get_info(void *token, UINT32 state, sndinfo *info);
@@ -286,6 +288,12 @@ static const struct
 #endif
 #if (HAS_TMS5110)
 	{ SOUND_TMS5110, tms5110_get_info },
+#endif
+#if (HAS_TMS0285)
+	{ SOUND_TMS0285, tms0285_get_info },
+#endif
+#if (HAS_TMS5200)
+	{ SOUND_TMS5200, tms5200_get_info },
 #endif
 #if (HAS_TMS5220)
 	{ SOUND_TMS5220, tms5220_get_info },

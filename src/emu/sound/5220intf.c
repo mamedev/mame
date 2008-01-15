@@ -73,6 +73,14 @@ static void *tms5220_start(int sndindex, int clock, const void *config)
 }
 
 
+static void *tms5200_start(int sndindex, int clock, const void *config)
+{
+	struct tms5220_info *info = tms5220_start(sndindex, clock, config);
+	tms5220_set_variant(info->chip, variant_tms0285);
+	return info;
+}
+
+
 
 /**********************************************************************************************
 
@@ -244,6 +252,7 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case SNDINFO_INT_ALIAS:							info->i = SOUND_TMS5220;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = tms5220_set_info;		break;
@@ -257,6 +266,26 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+
+void tms0285_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = tms5200_start;			break;
+		case SNDINFO_STR_NAME:							info->s = "TMS0285";					break;
+		default: 										tms5220_get_info(token, state, info);	break;
+	}
+}
+
+void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
+{
+	switch (state)
+	{
+		case SNDINFO_PTR_START:							info->start = tms5200_start;			break;
+		case SNDINFO_STR_NAME:							info->s = "TMS5200";					break;
+		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }
 

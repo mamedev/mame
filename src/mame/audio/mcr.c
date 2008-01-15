@@ -25,11 +25,11 @@
  *
  *************************************/
 
-#define SSIO_CLOCK			16000000
-#define CSDELUXE_CLOCK		15000000
-#define SOUNDSGOOD_CLOCK	16000000
-#define TURBOCS_CLOCK		8000000
-#define SQUAWKTALK_CLOCK	3580000
+#define SSIO_CLOCK			XTAL_16MHz
+#define CSDELUXE_CLOCK		XTAL_16MHz
+#define SOUNDSGOOD_CLOCK	XTAL_16MHz
+#define TURBOCS_CLOCK		XTAL_8MHz
+#define SQUAWKTALK_CLOCK	XTAL_3_579545MHz
 
 
 
@@ -791,7 +791,7 @@ static const pia6821_interface turbocs_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_DRIVER_START(turbo_chip_squeak)
-	MDRV_CPU_ADD_TAG("tcs", M6809, TURBOCS_CLOCK/4)
+	MDRV_CPU_ADD_TAG("tcs", M6809E, TURBOCS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(turbocs_map,0)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -818,7 +818,7 @@ MACHINE_DRIVER_END
  *
  *  MCR Squawk n Talk communications
  *
- *  MC6802, 2 PIAs, TMS5220, AY8912 (not used), 8-bit DAC (not used)
+ *  MC6802, 2 PIAs, TMS5200, AY8912 (not used), 8-bit DAC (not used)
  *
  *************************************/
 
@@ -840,10 +840,10 @@ static WRITE8_HANDLER( squawkntalk_porta2_w )
 
 static WRITE8_HANDLER( squawkntalk_portb2_w )
 {
-	/* bits 0-1 select read/write strobes on the TMS5220 */
+	/* bits 0-1 select read/write strobes on the TMS5200 */
 	data &= 0x03;
 
-	/* write strobe -- pass the current command to the TMS5220 */
+	/* write strobe -- pass the current command to the TMS5200 */
 	if (((data ^ squawkntalk_tms_strobes) & 0x02) && !(data & 0x02))
 	{
 		tms5220_data_w(offset, squawkntalk_tms_command);
@@ -853,7 +853,7 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 		pia_1_ca2_w(0, 0);
 	}
 
-	/* read strobe -- read the current status from the TMS5220 */
+	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
 		pia_1_porta_w(0, tms5220_status_r(offset));
@@ -941,7 +941,7 @@ MACHINE_DRIVER_START(squawk_n_talk)
 	MDRV_CPU_PROGRAM_MAP(squawkntalk_map,0)
 
 	/* only used on Discs of Tron, which is stereo */
-	MDRV_SOUND_ADD_TAG("snt", TMS5220, 640000)
+	MDRV_SOUND_ADD_TAG("snt", TMS5200, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 

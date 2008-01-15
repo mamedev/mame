@@ -878,7 +878,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zwackery )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 7652400)
+	MDRV_CPU_ADD(M68000, 7652400)	/* should be XTAL_16MHz/2 */
 	MDRV_CPU_PROGRAM_MAP(zwackery_map,0)
 	MDRV_CPU_VBLANK_INT(mcr68_interrupt,1)
 
