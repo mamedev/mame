@@ -391,6 +391,8 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
 
+	MDRV_MACHINE_START( cvs )
+
 	MDRV_SCREEN_REFRESH_RATE(50)							/* From dot clock */
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)

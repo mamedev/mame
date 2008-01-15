@@ -472,7 +472,7 @@ static WRITE8_HANDLER( audio_command_w )
  *
  *************************************/
 
-static MACHINE_START( cvs )
+MACHINE_START( cvs )
 {
 	/* allocate memory */
 	cvs_color_ram = auto_malloc(0x400);
@@ -651,9 +651,9 @@ static const gfx_layout charlayout =
 
 static GFXDECODE_START( cvs )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,                  0, 256+3 )	/* chars */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )	/* s2636 #1  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )	/* s2636 #2  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )    /* s2636 #3  */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )	/* s2636 #1 */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )	/* s2636 #2 */
+  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout, (256+3)*8, 8        )   /* s2636 #3 */
 GFXDECODE_END
 
 
