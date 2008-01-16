@@ -7,7 +7,9 @@
 ***************************************************************************/
 #include "driver.h"
 
-#ifdef MAME_DEBUG
+#define NYCAPTOR_DEBUG	0
+
+#if NYCAPTOR_DEBUG
 static  int nycaptor_mask=0;
 #endif
 
@@ -52,7 +54,7 @@ static TILE_GET_INFO( get_tile_info )
   if((!nycaptor_spot())&&(pal==6))tileinfo->group=1;
 	if(((nycaptor_spot()==3)&&(pal==8))||((nycaptor_spot()==1)&&(pal==0xc)))tileinfo->group=2;
 	if((nycaptor_spot()==1)&&(tileinfo->category==2))tileinfo->group=3;
-#ifdef MAME_DEBUG
+#if NYCAPTOR_DEBUG
   if(nycaptor_mask&(1<<tileinfo->category))
   {
     if(nycaptor_spot())pal=0xe;else pal=4;
@@ -160,7 +162,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			priori=(pr&0xe0)>>5;
       if(priori==pri)
       {
-#ifdef MAME_DEBUG
+#if NYCAPTOR_DEBUG
       if(nycaptor_mask&(1<<(pri+4)))pal=0xd;
 #endif
 			flipx = ((nycaptor_spriteram[offs+1]&0x40)>>6);
@@ -192,7 +194,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 
 
-#ifdef MAME_DEBUG
+#if NYCAPTOR_DEBUG
 /*
  Keys :
    q/w/e/r - bg priority display select
@@ -226,7 +228,7 @@ static void nycaptor_setmask(void)
 
 VIDEO_UPDATE( nycaptor )
 {
-#ifdef MAME_DEBUG
+#if NYCAPTOR_DEBUG
   nycaptor_setmask();
   if(nycaptor_mask&0x1000)
   {
