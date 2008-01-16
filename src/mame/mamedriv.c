@@ -7897,12 +7897,13 @@ Other Sun games
 	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
-    DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
-    DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
-    DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
+	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */
+	DRIVER( peps0615 )	/* (c) 1996 IGT - International Gaming Technology */
 	DRIVER( peps0716 )	/* (c) 1996 IGT - International Gaming Technology */
-    DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
-    DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexp0019 )	/* (c) 1995 IGT - International Gaming Technology */
+	DRIVER( pexs0006 )	/* (c) 1997 IGT - International Gaming Technology */
+	DRIVER( pexmp006 )	/* (c) 1997 IGT - International Gaming Technology */
 	DRIVER( mirage )	/* (c) 1994 Mitchell */
 	DRIVER( dominob )	/* (c) 1990 Wonwoo Systems */
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
