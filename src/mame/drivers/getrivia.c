@@ -726,6 +726,7 @@ ROM_START( gepoker3 ) /* v50.02 with control dated 9-30-84 */
 	ROM_LOAD( "high_icb_6-25a",    0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
 	/* Banked roms */
 	ROM_LOAD( "jokerpoker_cb_10-19-88",    0x10000, 0x2000, CRC(a590af75) SHA1(63bc64fbc9ac0c489b1f4894d77a4be13d7251e7) )
+	ROM_LOAD( "horserace_icb_1-1-87",      0x12000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
 ROM_END
 
 GAME( 1982, m075,     0,        gselect,  gselect,  0, ROT0, "Greyhound Electronics", "M075 Poker (Version 16.03B)",            GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
