@@ -7,14 +7,12 @@
     Games supported:
         * Lethal Justice
         * Egg Venture
+        * Ripper Ribit
+        * Chicken Farm
+        * Crazzy Clownz
 
     Known bugs:
         * some DIP switches not understood
-
-    Note:
-    Even though Egg Venture looks like it has a few extra scanlines at
-    the bottom, the video hardware is explicitly programmed to only
-    display 236 lines. Altering this will lead to bad flickering.
 
 ****************************************************************************
 
@@ -46,10 +44,70 @@ Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
 #include "lethalj.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 
-#define VIDEO_CLOCK			11289600
-#define VIDEO_CLOCK_LETHALJ	11059200
+
+#define MASTER_CLOCK		XTAL_40MHz
+#define SOUND_CLOCK			XTAL_2MHz
+
+#define VIDEO_CLOCK			XTAL_11_289MHz
+#define VIDEO_CLOCK_LETHALJ	XTAL_11_0592MHz
+
+
+
+/*************************************
+ *
+ *  Custom inputs
+ *
+ *************************************/
+
+static CUSTOM_INPUT( ticket_status )
+{
+	return ticket_dispenser_0_r(0) >> 7;
+}
+
+
+static CUSTOM_INPUT( cclownz_paddle )
+{
+	int value = readinputportbytag("PADDLE");
+	return ((value << 4) & 0xf00) | (value & 0x00f);
+}
+
+
+
+/*************************************
+ *
+ *  Output controls
+ *
+ *************************************/
+
+static WRITE16_HANDLER( ripribit_control_w )
+{
+	coin_counter_w(0, data & 1);
+	ticket_dispenser_0_w(0, ((data >> 1) & 1) << 7);
+	output_set_lamp_value(0, (data >> 2) & 1);
+}
+
+
+static WRITE16_HANDLER( cfarm_control_w )
+{
+	ticket_dispenser_0_w(0, ((data >> 0) & 1) << 7);
+	output_set_lamp_value(0, (data >> 2) & 1);
+	output_set_lamp_value(1, (data >> 3) & 1);
+	output_set_lamp_value(2, (data >> 4) & 1);
+	coin_counter_w(0, (data >> 7) & 1);
+}
+
+
+static WRITE16_HANDLER( cclownz_control_w )
+{
+	ticket_dispenser_0_w(0, ((data >> 0) & 1) << 7);
+	output_set_lamp_value(0, (data >> 2) & 1);
+	output_set_lamp_value(1, (data >> 4) & 1);
+	output_set_lamp_value(2, (data >> 5) & 1);
+	coin_counter_w(0, (data >> 6) & 1);
+}
 
 
 
@@ -64,13 +122,13 @@ static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000000, 0x0400000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x04000010, 0x0400001f) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
 	AM_RANGE(0x04100000, 0x0410000f) AM_READWRITE(OKIM6295_status_2_lsb_r, OKIM6295_data_2_lsb_w)
-	AM_RANGE(0x04100010, 0x0410001f) AM_READNOP		/* read but never examined */
+//	AM_RANGE(0x04100010, 0x0410001f) AM_READNOP		/* read but never examined */
 	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
 	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04500010, 0x0450001f) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x04600000, 0x0460000f) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x04700000, 0x047000ff) AM_WRITE(lethalj_blitter_w)
+	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP	/* seems to be a bug in their code, one of many. */
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION(REGION_USER1, 0)
@@ -252,213 +310,171 @@ static INPUT_PORTS_START( eggvntdx )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( laigames )
-	/* No Idea about the inputs */
+static INPUT_PORTS_START( ripribit )
+	PORT_START
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
+	PORT_DIPNAME( 0x0700, 0x0200, "Starting Jackpot" )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0200, "10" )
+	PORT_DIPSETTING(      0x0300, "15" )
+	PORT_DIPSETTING(      0x0400, "20" )
+	PORT_DIPSETTING(      0x0500, "25" )
+	PORT_DIPSETTING(      0x0600, "30" )
+	PORT_DIPSETTING(      0x0700, "35" )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x1000, "2" )
+	PORT_DIPSETTING(      0x1800, "3" )
+	PORT_DIPNAME( 0xe000, 0x8000, "Points per Ticket" )
+	PORT_DIPSETTING(      0xe000, "200" )
+	PORT_DIPSETTING(      0xc000, "300" )
+	PORT_DIPSETTING(      0xa000, "400" )
+	PORT_DIPSETTING(      0x8000, "500" )
+	PORT_DIPSETTING(      0x6000, "600" )
+	PORT_DIPSETTING(      0x4000, "700" )
+	PORT_DIPSETTING(      0x2000, "800" )
+	PORT_DIPSETTING(      0x0000, "1000" )
 
+	PORT_START				/* fake analog X */
+	PORT_START				/* fake analog Y */
+	PORT_START				/* fake analog X */
+	PORT_START				/* fake analog Y */
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( cfarm )
 	PORT_START
-    PORT_DIPNAME( 0x0001, 0x0001, "1" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
     PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
+    PORT_DIPNAME( 0x0700, 0x0300, "Starting Jackpot" )
+    PORT_DIPSETTING(      0x0000, "0" )
+    PORT_DIPSETTING(      0x0100, "5" )
+    PORT_DIPSETTING(      0x0200, "8" )
+    PORT_DIPSETTING(      0x0300, "10" )
+    PORT_DIPSETTING(      0x0400, "12" )
+    PORT_DIPSETTING(      0x0500, "15" )
+    PORT_DIPSETTING(      0x0600, "18" )
+    PORT_DIPSETTING(      0x0700, "20" )
+    PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0000, "0" )
+    PORT_DIPSETTING(      0x0800, "1" )
+    PORT_DIPSETTING(      0x1000, "2" )
+    PORT_DIPSETTING(      0x1800, "3" )
+    PORT_DIPNAME( 0xe000, 0x8000, "Eggs per Ticket" )
+    PORT_DIPSETTING(      0xe000, "1" )
+    PORT_DIPSETTING(      0xc000, "2" )
+    PORT_DIPSETTING(      0xa000, "3" )
+    PORT_DIPSETTING(      0x8000, "4" )
+    PORT_DIPSETTING(      0x6000, "5" )
+    PORT_DIPSETTING(      0x4000, "6" )
+    PORT_DIPSETTING(      0x2000, "8" )
+    PORT_DIPSETTING(      0x0000, "10" )
+
+	PORT_START
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
+ 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+ 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+ 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START				/* fake analog X */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
 	PORT_START				/* fake analog Y */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-
 	PORT_START				/* fake analog X */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
 	PORT_START				/* fake analog Y */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( ripribit )
-	/* No Idea about the inputs */
-	PORT_START
-    PORT_DIPNAME( 0x0001, 0x0001, "0" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
- 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
+static INPUT_PORTS_START( cclownz )
 	PORT_START
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0018, IP_ACTIVE_LOW, IPT_UNUSED )
+    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
     PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
+    PORT_DIPNAME( 0x0700, 0x0700, "Starting Jackpot" )
+    PORT_DIPSETTING(      0x0000, "0" )
+    PORT_DIPSETTING(      0x0100, "2" )
+    PORT_DIPSETTING(      0x0200, "5" )
+    PORT_DIPSETTING(      0x0300, "8" )
+    PORT_DIPSETTING(      0x0400, "10" )
+    PORT_DIPSETTING(      0x0500, "15" )
+    PORT_DIPSETTING(      0x0600, "20" )
+    PORT_DIPSETTING(      0x0700, "30" )
+    PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x0000, "0" )
+    PORT_DIPSETTING(      0x0800, "1" )
+    PORT_DIPSETTING(      0x1000, "2" )
+    PORT_DIPSETTING(      0x1800, "3" )
+    PORT_DIPNAME( 0xe000, 0x8000, "Points per Ticket" )
+    PORT_DIPSETTING(      0xe000, "700" )
+    PORT_DIPSETTING(      0xc000, "900" )
+    PORT_DIPSETTING(      0xa000, "1200" )
+    PORT_DIPSETTING(      0x8000, "1500" )
+    PORT_DIPSETTING(      0x6000, "1800" )
+    PORT_DIPSETTING(      0x4000, "2100" )
+    PORT_DIPSETTING(      0x2000, "2400" )
+    PORT_DIPSETTING(      0x0000, "3000" )
+
+	PORT_START
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cclownz_paddle, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
+	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
+ 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START				/* fake analog X */
-
 	PORT_START				/* fake analog Y */
-
 	PORT_START				/* fake analog X */
-
 	PORT_START				/* fake analog Y */
+
+	PORT_START_TAG("PADDLE")
+ 	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CENTERDELTA(0) PORT_REVERSE
 INPUT_PORTS_END
 
 
@@ -504,12 +520,12 @@ static const tms34010_config tms_config_lethalj =
 static MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", TMS34010, 40000000)
+	MDRV_CPU_ADD_TAG("main", TMS34010, MASTER_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_SCREEN_ADD("main", 0)
@@ -522,15 +538,15 @@ static MACHINE_DRIVER_START( gameroom )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 2000000)
+	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD(OKIM6295, 2000000)
+	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_SOUND_ADD(OKIM6295, 2000000)
+	MDRV_SOUND_ADD(OKIM6295, SOUND_CLOCK)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_3_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
@@ -654,7 +670,7 @@ ROM_START( eggvntdx )
 ROM_END
 
 
-ROM_START( cclown )
+ROM_START( cclownz )
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "cc-v1-vc8.bin", 0x000000, 0x080000, CRC(433fe6ac) SHA1(dea7aede9882ee52be88927418b7395418757d12) )
 	ROM_LOAD16_BYTE( "cc-v1-vc9.bin", 0x000001, 0x080000, CRC(9d1b3dae) SHA1(44a97c38bc9685e97721722c67505832fa06b44d) )
@@ -684,6 +700,7 @@ ROM_START( cclown )
 	ROM_LOAD( "vc-24.jed", 0x0000, 0x3efa, CRC(c054cb13) SHA1(1a45548747712112e2457bd933db5ced70dae72e) )
 	/* 25 / 26 are secure? */
 ROM_END
+
 
 ROM_START( ripribit )
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* 34010 code */
@@ -715,6 +732,7 @@ ROM_START( ripribit )
 	ROM_LOAD( "vc-24.jed", 0x0000, 0x3efa, CRC(c054cb13) SHA1(1a45548747712112e2457bd933db5ced70dae72e) )
 	/* 25 / 26 are secure? */
 ROM_END
+
 
 ROM_START( cfarm )
 	ROM_REGION16_LE( 0x100000, REGION_USER1, 0 )		/* 34010 code */
@@ -751,14 +769,42 @@ ROM_END
 
 /*************************************
  *
+ *  Driver-specific initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( ripribit )
+{
+	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
+}
+
+
+static DRIVER_INIT( cfarm )
+{
+	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
+}
+
+
+static DRIVER_INIT( cclownz )
+{
+	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
+}
+
+
+
+/*************************************
+ *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0, ROT0,  "The Game Room", "Lethal Justice", 0 )
-GAME( 1997, eggventr, 0,        gameroom, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0, ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0, ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit, 0,        gameroom, ripribit, 0, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", GAME_NOT_WORKING )
-GAME( 1999, cfarm,    0,        gameroom, laigames, 0, ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", GAME_NOT_WORKING )
-GAME( 1999, cclown,   0,        gameroom, laigames, 0, ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", GAME_NOT_WORKING )
+GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
+GAME( 1997, eggventr, 0,        gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
+GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
+GAME( 1997, ripribit, 0,        gameroom, ripribit, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
+GAME( 1999, cfarm,    0,        gameroom, cfarm,    cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
+GAME( 1999, cclownz,  0,        gameroom, cclownz,  cclownz,  ROT0,  "LAI Games",     "Crazzy Clownz (Version 1.0)", 0 )

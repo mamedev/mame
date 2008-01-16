@@ -7642,7 +7642,7 @@ Other Sun games
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */
 	DRIVER( ripribit )	/* (c) 1997 LAI Games */
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
-	DRIVER( cclown )	/* (c) 1999 LAI Games */
+	DRIVER( cclownz )	/* (c) 1999 LAI Games */
 	DRIVER( rotaryf )
 	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
 	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */

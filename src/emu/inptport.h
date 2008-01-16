@@ -35,6 +35,10 @@
 #define IP_ACTIVE_LOW		0xffffffff
 
 
+/* macros for a timer callback functions */
+#define CUSTOM_INPUT(name)	UINT32 name(void *param)
+
+
 /* sequence types for input_port_seq() call */
 enum _input_seq_type
 {
@@ -43,6 +47,7 @@ enum _input_seq_type
 	SEQ_TYPE_DECREMENT = 2
 };
 typedef enum _input_seq_type input_seq_type;
+
 
 /* conditions for DIP switches */
 enum

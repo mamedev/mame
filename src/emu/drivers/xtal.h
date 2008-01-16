@@ -59,6 +59,7 @@ enum
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
+	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_12MHz   		= 12000000,
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
