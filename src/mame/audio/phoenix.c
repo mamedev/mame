@@ -48,7 +48,7 @@
 #define VMIN    0
 #define VMAX	32767
 
-static int sound_latch_a;
+static UINT8 sound_latch_a;
 
 static sound_stream * channel;
 
@@ -386,6 +386,11 @@ WRITE8_HANDLER( phoenix_sound_control_a_w )
 	sound_latch_a = data;
 }
 
+SOUND_START( phoenix)
+{
+	state_save_register_global(sound_latch_a);
+}
+
 WRITE8_HANDLER( phoenix_sound_control_b_w )
 {
 	discrete_sound_w(PHOENIX_EFFECT_1_DATA, data & 0x0f);
@@ -420,6 +425,8 @@ void *phoenix_sh_start(int clock, const struct CustomSound_interface *config)
 
 	channel = stream_create(0, 1, Machine->sample_rate, 0, phoenix_sound_update);
 
+	state_save_register_global_pointer(poly18, (1ul << (18-5)) );
+	
 	/* a dummy token */
 	return auto_malloc(1);
 }

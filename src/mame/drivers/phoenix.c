@@ -664,8 +664,8 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( phoenix )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 16*4, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout, 0, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( pleiads )
@@ -720,26 +720,24 @@ static MACHINE_RESET( phoenix )
 static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", 8085A, 11000000/4)	/* 2.75 MHz */
+	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MDRV_CPU_PROGRAM_MAP(phoenix_readmem,phoenix_writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION	/* frames per second, vblank duration */)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	MDRV_MACHINE_RESET(phoenix)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 26*8-1)
 	MDRV_GFXDECODE(phoenix)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16*4+16*4)
 
 	MDRV_PALETTE_INIT(phoenix)
 	MDRV_VIDEO_START(phoenix)
 	MDRV_VIDEO_UPDATE(phoenix)
+
+	MDRV_SOUND_START(phoenix)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -770,6 +768,7 @@ static MACHINE_DRIVER_START( pleiads )
 	MDRV_COLORTABLE_LENGTH(32*4+32*4)
 
 	MDRV_PALETTE_INIT(pleiads)
+	MDRV_VIDEO_START(pleiads)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("tms", TMS36XX, 247)
@@ -1307,18 +1306,18 @@ static DRIVER_INIT( survival )
 
 
 
-GAME( 1980, phoenix,  0,       phoenix,  phoenix,  0,        ROT90, "Amstar", "Phoenix (Amstar)", 0 )
-GAME( 1980, phoenixa, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri), Set 1", 0 )
-GAME( 1980, phoenixb, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri), Set 2", 0 )
-GAME( 1980, phoenixt, phoenix, phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", 0 )
-GAME( 1980, phoenix3, phoenix, phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", 0 )
-GAME( 1981, phoenixc, phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", 0 )
+GAME( 1980, phoenix,  0,       phoenix,  phoenix,  0,        ROT90, "Amstar", "Phoenix (Amstar)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenixa, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri), Set 1", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenixb, phoenix, phoenix,  phoenixa, 0,        ROT90, "Amstar (Centuri license)", "Phoenix (Centuri), Set 2", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenixt, phoenix, phoenix,  phoenixt, 0,        ROT90, "Taito", "Phoenix (Taito)", GAME_SUPPORTS_SAVE )
+GAME( 1980, phoenix3, phoenix, phoenix,  phoenix3, 0,        ROT90, "bootleg", "Phoenix (T.P.N.)", GAME_SUPPORTS_SAVE )
+GAME( 1981, phoenixc, phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg?", "Phoenix (IRECSA, G.G.I Corp)", GAME_SUPPORTS_SAVE )
 
 
 GAME( 1981, condor,   phoenix, condor,   condor,   condor,   ROT90, "Sidam (bootleg)",      "Condor (bootleg of Phoenix)", 0 )
 // the following 2 were common bootlegs in england & france respectively
-GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg",              "Falcon (bootleg of Phoenix) (set 1)", 0 )
-GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "Jeutel (bootleg)",     "Vautour (bootleg of Phoenix) (set 1)", 0 )
+GAME( 1980, falcon,   phoenix, phoenix,  phoenixt, 0,        ROT90, "bootleg",              "Falcon (bootleg of Phoenix) (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1980, vautour,  phoenix, phoenix,  phoenixt, 0,        ROT90, "Jeutel (bootleg)",     "Vautour (bootleg of Phoenix) (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, vautour2, phoenix, condor,   condor,   condor,   ROT90, "bootleg",              "Vautour (bootleg of Phoenix) (set 2)", 0 )
 // fenix is an italian bootleg based on vautour
 GAME( 1980, fenix,    phoenix, condor,   condor,   condor,   ROT90, "bootleg",              "Fenix (bootleg of Phoenix)", GAME_NOT_WORKING )
