@@ -764,7 +764,7 @@ static int i8039_execute(int cycles)
 				{
 					R.timer++;
 					if (R.timer == 0)
-						timerInt = 0;
+						timerInt = 1;
 				}
 				R.Old_T1 = T1;
 			}
