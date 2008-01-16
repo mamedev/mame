@@ -951,7 +951,7 @@ ADDRESS_MAP_END
                                 Twin Eagle II
 ***************************************************************************/
 
-/* standalone board based on SSV hardware */
+/* comes as either a standalone board or a standard SSV rom board (verified) */
 
 static ADDRESS_MAP_START( twineag2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x010000, 0x03ffff) AM_READ(MRA16_RAM				)	// More RAM
