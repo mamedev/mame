@@ -365,7 +365,7 @@ static MACHINE_DRIVER_START( redalert )
 			/* IRQ is hooked to a 555 timer, whose freq is 1150 Hz */
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,1150)
 
-	MDRV_CPU_ADD(8085A, 1000000)
+	MDRV_CPU_ADD(8085A, 2000000)
 	/* audio CPU */	   /* 1 MHz? */
 	MDRV_CPU_PROGRAM_MAP(redalert_voice_readmem,redalert_voice_writemem)
 

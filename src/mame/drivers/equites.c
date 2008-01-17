@@ -142,7 +142,7 @@ SNK/Eastern  1985 (ACT) Gekisoh          ????
 
 // Common Hardware Start
 #define EQUITES_ADD_SOUNDBOARD7 \
-	MDRV_CPU_ADD(8085A, XTAL_6_144MHz/2) /* verified on pcb */ \
+	MDRV_CPU_ADD(8085A, XTAL_6_144MHz) /* verified on pcb */ \
 	/* audio CPU */ \
 	MDRV_CPU_PROGRAM_MAP(equites_s_readmem, equites_s_writemem) \
 	MDRV_CPU_IO_MAP(0, equites_s_writeport) \
