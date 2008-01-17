@@ -143,7 +143,7 @@ static WRITE32_HANDLER( eeprom_w )
 	cpunum_set_input_line(1, INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-static UINT32 eeprom_bit_r(void *param)
+static CUSTOM_INPUT( eeprom_bit_r )
 {
 	return EEPROM_read_bit();
 }

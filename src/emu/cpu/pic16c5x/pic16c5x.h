@@ -21,7 +21,7 @@
  *
  *  External Clock is divided internally by 4 for the instruction cycle
  *  times. (Each instruction cycle passes through 4 machine states). This
- *	is handled by the cpu execution engine.
+ *  is handled by the cpu execution engine.
  */
 
 enum {

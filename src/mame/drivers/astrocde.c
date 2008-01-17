@@ -244,7 +244,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
  *
  *************************************/
 
-static UINT32 ebases_trackball_r(void *param)
+static CUSTOM_INPUT( ebases_trackball_r )
 {
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
 	return readinputportbytag(names[input_select]);
@@ -460,7 +460,7 @@ static READ8_HANDLER( demndrgn_io_r )
 }
 
 
-static UINT32 demndragn_joystick_r(void *param)
+static CUSTOM_INPUT( demndragn_joystick_r )
 {
 	static const char *const names[] = { "MOVEX", "MOVEY" };
 	return readinputportbytag(names[input_select]);

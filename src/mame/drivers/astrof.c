@@ -632,11 +632,11 @@ static INPUT_PORTS_START( astrof )
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-//	PORT_START_TAG("WIREMOD")
-//	PORT_CONFNAME( 0x01, 0x00, "Wire Mod for Background Color" )
-//	PORT_CONFSETTING(    0x00, "Blue Background" )
-//	PORT_CONFSETTING(    0x01, "Black Background" )
-//	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+//  PORT_START_TAG("WIREMOD")
+//  PORT_CONFNAME( 0x01, 0x00, "Wire Mod for Background Color" )
+//  PORT_CONFSETTING(    0x00, "Blue Background" )
+//  PORT_CONFSETTING(    0x01, "Black Background" )
+//  PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 

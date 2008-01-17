@@ -149,19 +149,19 @@ static WRITE8_HANDLER( yawdim_oki_bank_w )
  *
  *************************************/
 
-static UINT32 narc_talkback_strobe_r(void *param)
+static CUSTOM_INPUT( narc_talkback_strobe_r )
 {
 	return (williams_narc_talkback_r() >> 8) & 1;
 }
 
 
-static UINT32 narc_talkback_data_r(void *param)
+static CUSTOM_INPUT( narc_talkback_data_r )
 {
 	return williams_narc_talkback_r() & 0xff;
 }
 
 
-static UINT32 adpcm_irq_state_r(void *param)
+static CUSTOM_INPUT( adpcm_irq_state_r )
 {
 	return williams_adpcm_sound_irq_r() & 1;
 }
@@ -259,14 +259,14 @@ static INPUT_PORTS_START( narc )
 	PORT_BIT( 0x3000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 /*
-	Test mode indicates "Cut for French" and "Cut for German", hinting that these
-	are jumpers or wires that can be modified on the PCB. However, there are no
-	French or German strings in the ROMs, and this "feature" was clearly never
-	actually implemented
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) )
-	PORT_DIPSETTING(      0xc000, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( French ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( German ) )
+    Test mode indicates "Cut for French" and "Cut for German", hinting that these
+    are jumpers or wires that can be modified on the PCB. However, there are no
+    French or German strings in the ROMs, and this "feature" was clearly never
+    actually implemented
+    PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Language ) )
+    PORT_DIPSETTING(      0xc000, DEF_STR( English ) )
+    PORT_DIPSETTING(      0x8000, DEF_STR( French ) )
+    PORT_DIPSETTING(      0x4000, DEF_STR( German ) )
 */
 
 	PORT_START

@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000000, 0x0400000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x04000010, 0x0400001f) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
 	AM_RANGE(0x04100000, 0x0410000f) AM_READWRITE(OKIM6295_status_2_lsb_r, OKIM6295_data_2_lsb_w)
-//	AM_RANGE(0x04100010, 0x0410001f) AM_READNOP		/* read but never examined */
+//  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
 	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
 	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP	/* clocks bits through here */

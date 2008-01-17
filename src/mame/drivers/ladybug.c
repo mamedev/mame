@@ -119,12 +119,12 @@ static INTERRUPT_GEN( ladybug_interrupt )
 #define LADYBUG_P1_CONTROL_PORT_TAG	("CONTP1")
 #define LADYBUG_P2_CONTROL_PORT_TAG	("CONTP2")
 
-static UINT32 ladybug_p1_control_r(void *param)
+static CUSTOM_INPUT( ladybug_p1_control_r )
 {
 	return readinputportbytag(LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
-static UINT32 ladybug_p2_control_r(void *param)
+static CUSTOM_INPUT( ladybug_p2_control_r )
 {
 	UINT32 ret;
 

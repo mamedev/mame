@@ -297,7 +297,7 @@ static MACHINE_DRIVER_START( madgear )
 	MDRV_CPU_VBLANK_INT(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */ 
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(mg_sound_readmem,mg_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

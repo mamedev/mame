@@ -446,7 +446,7 @@ static WRITE32_HANDLER( tms32031_control_w )
  *
  *************************************/
 
-static UINT32 custom_49way_r(void *param)
+static CUSTOM_INPUT( custom_49way_r )
 {
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = param;
@@ -462,7 +462,7 @@ static WRITE32_HANDLER( keypad_select_w )
 }
 
 
-static UINT32 keypad_r(void *param)
+static CUSTOM_INPUT( keypad_r )
 {
 	UINT32 bits = readinputportbytag(param);
 	UINT8 select = keypad_select;

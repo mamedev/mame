@@ -220,7 +220,7 @@ static void ttl74123_output_changed(int output)
 }
 
 
-static UINT32 get_ttl74123_output(void *param)
+static CUSTOM_INPUT( get_ttl74123_output )
 {
 	return ttl74123_output;
 }

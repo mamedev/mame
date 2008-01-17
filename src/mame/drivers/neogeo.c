@@ -325,7 +325,7 @@ static void select_controller(UINT8 data)
 }
 
 
-static UINT32 multiplexed_controller_r(void *param)
+static CUSTOM_INPUT( multiplexed_controller_r )
 {
 	char tag[6];
 
@@ -335,7 +335,7 @@ static UINT32 multiplexed_controller_r(void *param)
 }
 
 
-static UINT32 mahjong_controller_r(void *param)
+static CUSTOM_INPUT( mahjong_controller_r )
 {
 	UINT32 ret;
 
@@ -441,7 +441,7 @@ static void calendar_clock(void)
 }
 
 
-static UINT32 get_calendar_status(void)
+static CUSTOM_INPUT( get_calendar_status )
 {
 	return (pd4990a_databit_r(0) << 1) | pd4990a_testbit_r(0);
 }
@@ -500,7 +500,7 @@ static void memcard_init(void)
 }
 
 
-static UINT32 get_memcard_status(void *param)
+static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
        write protect status (we are always write enabled) */
@@ -596,7 +596,7 @@ static WRITE8_HANDLER( audio_result_w )
 }
 
 
-static UINT32 get_audio_result(void)
+static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 

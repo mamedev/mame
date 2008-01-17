@@ -120,7 +120,7 @@ static void do_blit(void)
 	int height = (UINT16)blitter_data[7];
 	int y;
 /*
-	logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
+    logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
             blitter_data[0], blitter_data[1], blitter_data[2], blitter_data[3],
             blitter_data[4], blitter_data[5], blitter_data[6], blitter_data[7]);
 */

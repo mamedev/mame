@@ -46,7 +46,7 @@ WRITE8_HANDLER( profpac_screenram_ctrl_w );
 extern const char *const wow_sample_names[];
 
 READ8_HANDLER( wow_speech_r );
-UINT32 wow_speech_status_r(void *param);
+CUSTOM_INPUT( wow_speech_status_r );
 
 
 /*----------- defined in audio/gorf.c -----------*/
@@ -54,4 +54,4 @@ UINT32 wow_speech_status_r(void *param);
 extern const char *const gorf_sample_names[];
 
 READ8_HANDLER( gorf_speech_r );
-UINT32 gorf_speech_status_r(void *param);
+CUSTOM_INPUT( gorf_speech_status_r );

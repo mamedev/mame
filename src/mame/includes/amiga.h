@@ -379,7 +379,7 @@ void amiga_machine_config(const amiga_machine_interface *intf);
 MACHINE_RESET( amiga );
 INTERRUPT_GEN( amiga_scanline_callback );
 
-UINT32 amiga_joystick_convert(void *param);
+CUSTOM_INPUT( amiga_joystick_convert );
 
 READ16_HANDLER( amiga_cia_r );
 WRITE16_HANDLER( amiga_cia_w );

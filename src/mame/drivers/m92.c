@@ -297,7 +297,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 	}
 }
 
-static UINT32 m92_sprite_busy_r(void *param)
+static CUSTOM_INPUT( m92_sprite_busy_r )
 {
 	return m92_sprite_buffer_busy;
 }

@@ -82,7 +82,7 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
  *
  *************************************/
 
-static UINT32 arcadia_coin_counter_r(void *param)
+static CUSTOM_INPUT( arcadia_coin_counter_r )
 {
 	/* return coin counter values */
 	return *(UINT8 *)param & 3;

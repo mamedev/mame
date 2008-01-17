@@ -108,7 +108,7 @@ struct tms5220
 	UINT8 data_register;				/* data register, used by read command */
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
-	/* flag for variant tms0285/tms5200 emulation */
+	/* flag for variant tmc0285/tms5200 emulation */
 	/* The TMC0285 AKA TMS5200 is an early variant of the TMS5220 used in
        the early releases of the Speech Module for the TI-99/4(a) computer,
        in Zaccaria's 'Money Money', and in a few other places.
@@ -308,7 +308,7 @@ void tms5220_set_read_and_branch(void *chip, void (*func)(void))
 
 /**********************************************************************************************
 
-     tms5220_set_variant -- sets the tms5220 core to emulate its buggy forerunner, the tms0285
+     tms5220_set_variant -- sets the tms5220 core to emulate its buggy forerunner, the tmc0285
 
 ***********************************************************************************************/
 
@@ -906,12 +906,12 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
 		return 1;
 //  WARNING: This code below breaks Victory's power-on test! If you change it
 //  make sure you test Victory.
-//	{
-//	    if (DEBUG_5220) logerror("Buffer Empty set - Last frame stop frame\n");
+//  {
+//      if (DEBUG_5220) logerror("Buffer Empty set - Last frame stop frame\n");
 
-//		tms->buffer_empty = 1;
-//		return 1;
-//	}
+//      tms->buffer_empty = 1;
+//      return 1;
+//  }
 
 	if (tms->speak_external)
     	/* count the total number of bits available */
@@ -984,7 +984,7 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
         tms->new_k[0] = k1table[extract_bits(tms, 5)];
         tms->new_k[1] = k2table[extract_bits(tms, 5)];
         tms->new_k[2] = k3table[extract_bits(tms, 4)];
-		if (tms->variant == variant_tms0285)
+		if (tms->variant == variant_tmc0285)
 			tms->new_k[3] = k3table[extract_bits(tms, 4)];	/* ??? */
 		else
 			tms->new_k[3] = k4table[extract_bits(tms, 4)];
@@ -1004,7 +1004,7 @@ static int parse_frame(struct tms5220 *tms, int the_first_frame)
     tms->new_k[0] = k1table[extract_bits(tms, 5)];
     tms->new_k[1] = k2table[extract_bits(tms, 5)];
     tms->new_k[2] = k3table[extract_bits(tms, 4)];
-	if (tms->variant == variant_tms0285)
+	if (tms->variant == variant_tmc0285)
 		tms->new_k[3] = k3table[extract_bits(tms, 4)];	/* ??? */
 	else
 		tms->new_k[3] = k4table[extract_bits(tms, 4)];

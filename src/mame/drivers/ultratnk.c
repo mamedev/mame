@@ -20,13 +20,13 @@ static int da_latch;
 
 
 
-static UINT32 get_collision(void *param)
+static CUSTOM_INPUT( get_collision )
 {
 	return ultratnk_collision[(FPTR) param];
 }
 
 
-static UINT32 get_joystick(void* param)
+static CUSTOM_INPUT( get_joystick )
 {
 	UINT8 joy = readinputportbytag(param) & 3;
 

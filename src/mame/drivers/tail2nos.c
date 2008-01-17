@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,XTAL_20MHz/4)	/* verified on pcb */
-	/* audio CPU */	
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 								/* IRQs are triggered by the YM2608 */

@@ -95,7 +95,7 @@ INTERRUPT_GEN( eolith_speedup )
 	}
 }
 
-UINT32 eolith_speedup_getvblank(void *param)
+CUSTOM_INPUT( eolith_speedup_getvblank )
 {
 	return eolith_vblank&1;
 }

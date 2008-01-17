@@ -1276,7 +1276,7 @@ Horse Race I/O Expansion (PCB-HRE-000):
 
     MC68B50CP (x2)
     EF68B21P  (x2)
-	
+
 Note: on screen copyright is (c)1998 Coinmaster.
       The I/O board has      (c)1993 Coinmaster.
 
@@ -6353,7 +6353,7 @@ static INPUT_PORTS_START( inttoote )
 	PORT_DIPSETTING(    0x03, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
 	PORT_DIPSETTING(    0x01, "99" )
-//	PORT_DIPSETTING(    0x00, "99" )
+//  PORT_DIPSETTING(    0x00, "99" )
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
@@ -6468,7 +6468,7 @@ static INPUT_PORTS_START( inttoote )
 	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) // Battery (0 = OK, 1 = NG)
 /*
-	Betting Panel         (keys)
+    Betting Panel         (keys)
 
     1 1-2 2-3 3-4 4-5 5-6 (1QWERT)
     2 1-3 2-4 3-5 4-6     (2ASDF)

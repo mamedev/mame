@@ -139,7 +139,7 @@ static VIDEO_UPDATE( acefruit )
 	return 0;
 }
 
-static UINT32 sidewndr_payout_r(void *param)
+static CUSTOM_INPUT( sidewndr_payout_r )
 {
 	int bit_mask = (FPTR)param;
 
@@ -155,7 +155,7 @@ static UINT32 sidewndr_payout_r(void *param)
 	}
 }
 
-static UINT32 starspnr_coinage_r(void *param)
+static CUSTOM_INPUT( starspnr_coinage_r )
 {
 	int bit_mask = (FPTR)param;
 
@@ -175,7 +175,7 @@ static UINT32 starspnr_coinage_r(void *param)
 	}
 }
 
-static UINT32 starspnr_payout_r(void *param)
+static CUSTOM_INPUT( starspnr_payout_r )
 {
 	int bit_mask = (FPTR)param;
 

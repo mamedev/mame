@@ -226,7 +226,7 @@ static void alg_potgo_w(UINT16 data)
 }
 
 
-static UINT32 lightgun_pos_r(void *param)
+static CUSTOM_INPUT( lightgun_pos_r )
 {
 	int x = 0, y = 0;
 
@@ -236,14 +236,14 @@ static UINT32 lightgun_pos_r(void *param)
 }
 
 
-static UINT32 lightgun_trigger_r(void *param)
+static CUSTOM_INPUT( lightgun_trigger_r )
 {
 	/* read the trigger control based on the input select */
 	return (readinputportbytag("TRIGGERS") >> input_select) & 1;
 }
 
 
-static UINT32 lightgun_holster_r(void *param)
+static CUSTOM_INPUT( lightgun_holster_r )
 {
 	/* read the holster control based on the input select */
 	return (readinputportbytag("TRIGGERS") >> (2 + input_select)) & 1;

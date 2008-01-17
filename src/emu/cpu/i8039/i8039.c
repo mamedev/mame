@@ -63,8 +63,8 @@ static int Ext_IRQ(void);
 static int Timer_IRQ(void);
 
 #define M_RDMEM(A)		I8039_RDMEM(A)
-//#define M_RDOP(A)		I8039_RDOP(A)
-//#define M_RDOP_ARG(A)	I8039_RDOP_ARG(A)
+//#define M_RDOP(A)     I8039_RDOP(A)
+//#define M_RDOP_ARG(A) I8039_RDOP_ARG(A)
 #define M_IN(A)			I8039_In(A)
 #define M_OUT(A,V)		I8039_Out(A,V)
 
@@ -289,16 +289,16 @@ static void anl_a_xr0(void)	 { R.A &= INTRAM_R(R0); }
 static void anl_a_xr1(void)	 { R.A &= INTRAM_R(R1); }
 static void anl_bus_n(void)	 { bus_w( bus_r() & M_RDMEM_OPCODE() ); }
 
-static void anl_p1_n(void)	 
+static void anl_p1_n(void)
 {
-	R.P1 &= M_RDMEM_OPCODE(); 
-	port_w( 1, R.P1 ); 
+	R.P1 &= M_RDMEM_OPCODE();
+	port_w( 1, R.P1 );
 }
 
-static void anl_p2_n(void)	 
+static void anl_p2_n(void)
 {
-	R.P2 &= M_RDMEM_OPCODE(); 
-	port_w( 2, R.P2 ); 
+	R.P2 &= M_RDMEM_OPCODE();
+	port_w( 2, R.P2 );
 }
 
 static void anld_p4_a(void)	 { port_w( 4, (port_r(4) & M_RDMEM_OPCODE()) & 0x0f ); }
@@ -463,16 +463,16 @@ static void orl_a_r7(void)	 { R.A |= R7; }
 static void orl_a_xr0(void)	 { R.A |= INTRAM_R(R0); }
 static void orl_a_xr1(void)	 { R.A |= INTRAM_R(R1); }
 static void orl_bus_n(void)	 { bus_w( bus_r() | M_RDMEM_OPCODE() ); }
-static void orl_p1_n(void)	 
+static void orl_p1_n(void)
 {
 	R.P1 |= M_RDMEM_OPCODE();
-	port_w(1, R.P1); 
+	port_w(1, R.P1);
 }
 
-static void orl_p2_n(void)	 
+static void orl_p2_n(void)
 {
 	R.P2 |= M_RDMEM_OPCODE();
-	port_w(2, R.P2); 
+	port_w(2, R.P2);
 }
 
 static void orld_p4_a(void)	 { port_w(4, port_r(4) | R.A ); }
@@ -610,7 +610,7 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.irq_state);
 	state_save_register_item("i8039", index, R.irq_extra_cycles);
 	state_save_register_item("i8039", index, R.Old_T1);
-	
+
 	R.cpu_feature = 0;
 	R.ram_mask = 0x7F;
 	R.int_rom_size = 0x800;
@@ -652,7 +652,7 @@ static void i8039_reset (void)
 	R.tirq_en = R.xirq_en = 0;
 	R.timerON = R.countON = 0;
 
-	if (R.cpu_feature & FEATURE_M58715) 
+	if (R.cpu_feature & FEATURE_M58715)
 	{
 		//R.timerON = 1;  /* Mario Bros. doesn't work without this */
 		//R.PSW |= C_FLAG; //MB will play startup sound, but wrong # */
@@ -735,7 +735,7 @@ static int i8039_execute(int cycles)
 {
 	unsigned opcode, T1, timerInt;
 	int count;
-	
+
 	i8039_ICount = (cycles - R.irq_extra_cycles);
 	R.irq_extra_cycles = 0;
 
@@ -775,11 +775,11 @@ static int i8039_execute(int cycles)
 			if (R.masterClock >= 32) {	/* NS990113 */
 				R.masterClock -= 32;
 				R.timer++;
-				if (R.timer == 0) 
+				if (R.timer == 0)
 					timerInt = 1;
 			}
 		}
-		
+
 		if (timerInt)
 		{
 			count = Timer_IRQ();	/* Handle Timer IRQ */

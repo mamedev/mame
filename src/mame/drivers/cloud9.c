@@ -152,7 +152,7 @@ static TIMER_CALLBACK( clock_irq )
 }
 
 
-static UINT32 get_vblank(void *param)
+static CUSTOM_INPUT( get_vblank )
 {
 	int scanline = video_screen_get_vpos(0);
 	return (~syncprom[scanline & 0xff] >> 1) & 1;

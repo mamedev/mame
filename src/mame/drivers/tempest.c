@@ -313,7 +313,7 @@ static WRITE8_HANDLER( wdclr_w )
  *
  *************************************/
 
-static UINT32 tempest_knob_r(void *param)
+static CUSTOM_INPUT( tempest_knob_r )
 {
 	UINT32 ret;
 
@@ -329,7 +329,7 @@ static UINT32 tempest_knob_r(void *param)
 	return ret;
 }
 
-static UINT32 tempest_buttons_r(void *param)
+static CUSTOM_INPUT( tempest_buttons_r )
 {
 	UINT32 ret;
 

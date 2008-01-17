@@ -236,7 +236,7 @@ static WRITE8_HANDLER( input_port_4_f0_w )
 	input_port_4_f0 = data >> 4;
 }
 
-static UINT32 input_port_4_f0_r(void *param)
+static CUSTOM_INPUT( input_port_4_f0_r )
 {
 	return input_port_4_f0;
 }
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 /* seems the most logical way to do the gears */
 static UINT8 kikstart_gears[2];
 
-static int kikstart_gear_r(void *param)
+static CUSTOM_INPUT( kikstart_gear_r )
 {
 	const char *port_tag;
 

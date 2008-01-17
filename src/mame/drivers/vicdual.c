@@ -82,7 +82,7 @@ static void assert_coin_status(void)
 }
 
 
-static UINT32 vicdual_read_coin_status(void *param)
+static CUSTOM_INPUT( vicdual_read_coin_status )
 {
 	UINT32 coin_input = readinputportbytag(COIN_PORT_TAG);
 
@@ -143,19 +143,19 @@ static int get_vcounter(void)
 }
 
 
-static UINT32 vicdual_get_64v(void *param)
+static CUSTOM_INPUT( vicdual_get_64v )
 {
 	return (get_vcounter() >> 6) & 0x01;
 }
 
 
-static UINT32 vicdual_get_vblank_comp(void *param)
+static CUSTOM_INPUT( vicdual_get_vblank_comp )
 {
 	return (get_vcounter() < VICDUAL_VBSTART);
 }
 
 
-static UINT32 vicdual_get_composite_blank_comp(void *param)
+static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
 	return (vicdual_get_vblank_comp(0) && !video_screen_get_hblank(0));
 }
@@ -167,7 +167,7 @@ static TIMER_CALLBACK( vicdual_timer_callback )
 }
 
 
-static UINT32 vicdual_get_timer_value(void *param)
+static CUSTOM_INPUT( vicdual_get_timer_value )
 {
 	/* start the timer, if this is the first call */
 	if (!timer_started)
@@ -2030,8 +2030,9 @@ static WRITE8_HANDLER( samurai_protection_w )
 }
 
 
-static UINT32 samurai_protection_r(int offset)
+static CUSTOM_INPUT( samurai_protection_r )
 {
+	int offset = (FPTR)param;
 	UINT32 answer = 0;
 
 	if (samurai_protection_data == 0xab)

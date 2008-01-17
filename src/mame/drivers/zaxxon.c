@@ -414,7 +414,7 @@ static READ8_HANDLER( razmataz_counter_r )
 }
 
 
-static UINT32 razmataz_dial_r(void *param)
+static CUSTOM_INPUT( razmataz_dial_r )
 {
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;

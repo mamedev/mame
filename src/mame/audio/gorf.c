@@ -180,7 +180,7 @@ READ8_HANDLER( gorf_speech_r )
 }
 
 
-UINT32 gorf_speech_status_r(void *param)
+CUSTOM_INPUT( gorf_speech_status_r )
 {
 	return !sample_playing(0);
 }

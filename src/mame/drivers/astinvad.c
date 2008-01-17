@@ -111,7 +111,7 @@ static void plot_byte(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 c
 {
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
 	UINT8 flip_xor = screen_flip & 7;
-	
+
 	*BITMAP_ADDR32(bitmap, y, x + (0 ^ flip_xor)) = (data & 0x01) ? fore_pen : RGB_BLACK;
 	*BITMAP_ADDR32(bitmap, y, x + (1 ^ flip_xor)) = (data & 0x02) ? fore_pen : RGB_BLACK;
 	*BITMAP_ADDR32(bitmap, y, x + (2 ^ flip_xor)) = (data & 0x04) ? fore_pen : RGB_BLACK;
@@ -176,7 +176,7 @@ static TIMER_CALLBACK( kamikaze_int_off )
 {
 	cpunum_set_input_line(0, 0, CLEAR_LINE);
 }
- 
+
 
 static TIMER_CALLBACK( kamizake_int_gen )
 {
@@ -217,7 +217,7 @@ static INTERRUPT_GEN( spaceint_interrupt )
 static READ8_HANDLER( kamikaze_ppi_r )
 {
 	UINT8 result = 0xff;
-	
+
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
 		result &= ppi8255_0_r(offset);
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x04) sample_start(5, SND_FLEET3, 0);
 	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
 	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
-	
+
 	screen_flip = (readinputport(3) & data & 0x20) ? 0xff : 0x00;
 }
 
@@ -501,7 +501,7 @@ static MACHINE_DRIVER_START( kamikaze )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kamikaze_map,0)
 	MDRV_CPU_IO_MAP(kamikaze_portmap,0)
-	
+
 	MDRV_MACHINE_START(kamikaze)
 
 	/* video hardware */

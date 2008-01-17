@@ -443,7 +443,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
  *
  *************************************/
 
-UINT32 amiga_joystick_convert(void *param)
+CUSTOM_INPUT( amiga_joystick_convert )
 {
 	UINT8 bits = readinputportbytag(param);
 	int up = (bits >> 0) & 1;

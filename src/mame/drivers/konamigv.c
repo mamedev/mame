@@ -155,7 +155,7 @@ static NVRAM_HANDLER( konamigv_93C46 )
 	}
 }
 
-static UINT32 eeprom_bit_r(void *param)
+static CUSTOM_INPUT( eeprom_bit_r )
 {
 	return EEPROM_read_bit();
 }

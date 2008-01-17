@@ -325,7 +325,7 @@ static TIMER_CALLBACK( clock_irq )
 }
 
 
-static UINT32 get_vblank(void *param)
+static CUSTOM_INPUT( get_vblank )
 {
 	int v = scanline_to_v(video_screen_get_vpos(0));
 	return v < 24;

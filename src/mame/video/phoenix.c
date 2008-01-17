@@ -58,7 +58,7 @@ static const res_net_info phoenix_net_info =
 	{
 		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } },
 		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } }  
+		{ RES_NET_AMP_NONE, 270, 270, 2, { 270, 1 } }
 	}
 };
 
@@ -76,7 +76,7 @@ PALETTE_INIT( phoenix )
 		int col;
 		col = ((t[i & 0x03] << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0x60);
 		palette_set_color(machine,i,rgb[col]);
-	}	
+	}
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 	free(rgb);
 

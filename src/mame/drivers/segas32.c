@@ -584,7 +584,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT32 eeprom_bit_r(void *param)
+static CUSTOM_INPUT( eeprom_bit_r )
 {
 	return EEPROM_read_bit();
 }

@@ -314,7 +314,7 @@ static READ8_HANDLER( spinner_input_r )
  *
  *************************************/
 
-static UINT32 elim4_joint_coin_r(void *param)
+static CUSTOM_INPUT( elim4_joint_coin_r )
 {
 	return (readinputportbytag("COINS") & 0xf) != 0xf;
 }

@@ -215,7 +215,7 @@ static const discrete_mixer_desc dkong_mixer_desc =
 		{DK_R2, DK_R24, DK_R1, DK_R14},
 		{0,0,0},	// no variable resistors
 		{0,0,0},  // no node capacitors
-		0, 0, 
+		0, 0,
 		DK_C159,
 		DK_C12,
 		0, 1};
@@ -369,7 +369,7 @@ static DISCRETE_SOUND_START(dkong2b)
 #else
 	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3)
 #endif
-	
+
 DISCRETE_SOUND_END
 
 /****************************************************************
@@ -702,7 +702,7 @@ static const discrete_mixer_desc dkongjr_mixer_desc =
 		{JR_R5, JR_R3, JR_R6, JR_R4, JR_R25},
 		{0,0,0,0,0},	// no variable resistors
 		{0,0,0,0,0},  // no node capacitors
-		0, 0, 
+		0, 0,
 		JR_C155,
 		JR_C161,
 		0, 1};

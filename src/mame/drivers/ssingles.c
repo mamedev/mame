@@ -2,7 +2,7 @@
  'Swinging Singles' by Ent. Ent. Ltd
  driver by Tomasz Slanina
 
- 
+
  Crap XXX game.
  Three roms contains text "BY YACHIYO"
 
@@ -35,7 +35,7 @@ static pen_t pens[NUM_PENS];
 
 //fake palette
 static const UINT8 ssingles_colors[NUM_PENS*3]=
-{	
+{
 	0x00,0x00,0x00,	0xff,0xff,0xff, 0xff,0x00,0x00,	0x80,0x00,0x00,
 	0x00,0x00,0x00,	0xf0,0xf0,0xf0,	0xff,0xff,0x00, 0x40,0x40,0x40,
 	0x00,0x00,0x00,	0xff,0xff,0xff,	0xff,0x00,0x00,	0xff,0xff,0x00,
@@ -53,16 +53,16 @@ static void update_row(mame_bitmap *bitmap, const rectangle *cliprect,
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	
+
 	for(cx=0;cx<x_count;++cx)
 	{
 		int address=((ma>>1)+(cx>>1))&0xff;
 
 		cell=ssingles_videoram[address]+(ssingles_colorram[address]<<8);
-		
+
 		tile_address=((cell&0x3ff)<<4)+ra;
 		palette=(cell>>10)&0x1c;
-		
+
 		if(cx&1)
 		{
 			b0=memory_region(REGION_GFX1)[tile_address+0x0000]; /*  9.bin */
@@ -73,7 +73,7 @@ static void update_row(mame_bitmap *bitmap, const rectangle *cliprect,
 			b0=memory_region(REGION_GFX1)[tile_address+0x4000]; /* 10.bin */
 			b1=memory_region(REGION_GFX1)[tile_address+0xc000]; /* 12.bin */
 		}
-		
+
 		for(x=7;x>=0;--x)
 		{
 			*BITMAP_ADDR32(bitmap, y, (cx<<3)|(x)) = pens[palette+((b1&1)|((b0&1)<<1))];
@@ -88,10 +88,10 @@ static const crtc6845_interface crtc6845_intf =
 		0,
 		1000000, /* ? MHz */
 		8,
-		NULL,             
-		update_row,            
-		NULL,             
-		NULL              
+		NULL,
+		update_row,
+		NULL,
+		NULL
 };
 
 static WRITE8_HANDLER(ssingles_videoram_w)
@@ -107,7 +107,7 @@ static WRITE8_HANDLER(ssingles_colorram_w)
 static VIDEO_START(ssingles)
 {
 	crtc6845_config(0, &crtc6845_intf);
-	
+
 	{
 		int i;
 		for(i=0;i<NUM_PENS;++i)
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-	
+
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 

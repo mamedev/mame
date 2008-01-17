@@ -26,7 +26,7 @@ static UINT8 dorachan_flip_screen;
  *
  *************************************/
 
-static READ8_HANDLER( dorachan_protection_r )
+static CUSTOM_INPUT( dorachan_protection_r )
 {
 	UINT8 ret = 0;
 
@@ -114,7 +114,7 @@ static WRITE8_HANDLER(dorachan_ctrl_w)
 }
 
 
-static READ8_HANDLER( dorachan_v128_r )
+static CUSTOM_INPUT( dorachan_v128_r )
 {
 	/* to avoid resetting (when player 2 starts) bit 0 need to be
        inverted when screen is flipped */

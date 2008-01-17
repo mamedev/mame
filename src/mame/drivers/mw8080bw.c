@@ -317,7 +317,7 @@ static WRITE8_HANDLER( seawolf_periscope_lamp_w )
 }
 
 
-static UINT32 seawolf_erase_input_r(void *param)
+static CUSTOM_INPUT( seawolf_erase_input_r )
 {
 	return readinputportbytag(SEAWOLF_ERASE_SW_PORT_TAG) &
 		   readinputportbytag(SEAWOLF_ERASE_DIP_PORT_TAG);
@@ -548,13 +548,13 @@ UINT8 tornbase_get_cabinet_type()
 }
 
 
-static UINT32 tornbase_hit_left_input_r(void *param)
+static CUSTOM_INPUT( tornbase_hit_left_input_r )
 {
 	return readinputportbytag(TORNBASE_L_HIT_PORT_TAG);
 }
 
 
-static UINT32 tornbase_hit_right_input_r(void *param)
+static CUSTOM_INPUT( tornbase_hit_right_input_r )
 {
 	UINT32 ret;
 
@@ -575,7 +575,7 @@ static UINT32 tornbase_hit_right_input_r(void *param)
 }
 
 
-static UINT32 tornbase_pitch_left_input_r(void *param)
+static CUSTOM_INPUT( tornbase_pitch_left_input_r )
 {
 	UINT32 ret;
 
@@ -596,13 +596,13 @@ static UINT32 tornbase_pitch_left_input_r(void *param)
 }
 
 
-static UINT32 tornbase_pitch_right_input_r(void *param)
+static CUSTOM_INPUT( tornbase_pitch_right_input_r )
 {
 	return readinputportbytag(TORNBASE_L_PITCH_PORT_TAG);
 }
 
 
-static UINT32 tornbase_score_input_r(void *param)
+static CUSTOM_INPUT( tornbase_score_input_r )
 {
 	return readinputportbytag(TORNBASE_SCORE_SW_PORT_TAG) &
 		   readinputportbytag(TORNBASE_SCORE_DIP_PORT_TAG);
@@ -1177,7 +1177,7 @@ void desertgun_set_controller_select(UINT8 data)
 }
 
 
-static UINT32 desertgu_gun_input_r(void *param)
+static CUSTOM_INPUT( desertgu_gun_input_r )
 {
 	UINT32 ret;
 
@@ -1190,7 +1190,7 @@ static UINT32 desertgu_gun_input_r(void *param)
 }
 
 
-static UINT32 desertgu_dip_sw_0_1_r(void *param)
+static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 {
 	UINT32 ret;
 
@@ -1304,7 +1304,7 @@ MACHINE_DRIVER_END
 #define DPLAY_CAB_TYPE_COCKTAIL		(1)
 
 
-static UINT32 dplay_pitch_left_input_r(void *param)
+static CUSTOM_INPUT( dplay_pitch_left_input_r )
 {
 	UINT32 ret;
 
@@ -1317,7 +1317,7 @@ static UINT32 dplay_pitch_left_input_r(void *param)
 }
 
 
-static UINT32 dplay_pitch_right_input_r(void *param)
+static CUSTOM_INPUT( dplay_pitch_right_input_r )
 {
 	return readinputportbytag(DPLAY_L_PITCH_PORT_TAG);
 }
@@ -1692,7 +1692,7 @@ void clowns_set_controller_select(UINT8 data)
 }
 
 
-static UINT32 clowns_controller_r(void *param)
+static CUSTOM_INPUT( clowns_controller_r )
 {
 	UINT32 ret;
 
@@ -2479,7 +2479,7 @@ void invaders_set_flip_screen(UINT8 data)
 }
 
 
-static UINT32 invaders_coin_input_r(void *param)
+static CUSTOM_INPUT( invaders_coin_input_r )
 {
 	UINT32 ret = readinputportbytag(INVADERS_COIN_INPUT_PORT_TAG);
 
@@ -2489,7 +2489,7 @@ static UINT32 invaders_coin_input_r(void *param)
 }
 
 
-static UINT32 invaders_sw6_sw7_r(void *param)
+static CUSTOM_INPUT( invaders_sw6_sw7_r )
 {
 	UINT32 ret;
 
@@ -2505,7 +2505,7 @@ static UINT32 invaders_sw6_sw7_r(void *param)
 }
 
 
-static UINT32 invaders_sw5_r(void *param)
+static CUSTOM_INPUT( invaders_sw5_r )
 {
 	UINT32 ret;
 
@@ -2521,7 +2521,7 @@ static UINT32 invaders_sw5_r(void *param)
 }
 
 
-static UINT32 invaders_in0_control_r(void *param)
+static CUSTOM_INPUT( invaders_in0_control_r )
 {
 	UINT32 ret;
 
@@ -2537,7 +2537,7 @@ static UINT32 invaders_in0_control_r(void *param)
 }
 
 
-UINT32 invaders_in2_control_r(void *param)
+CUSTOM_INPUT( invaders_in2_control_r )
 {
 	UINT32 ret;
 
@@ -2679,7 +2679,7 @@ MACHINE_DRIVER_END
 #define BLUESHRK_COIN_INPUT_PORT_TAG	("COIN")
 
 
-static UINT32 blueshrk_coin_input_r(void *param)
+static CUSTOM_INPUT( blueshrk_coin_input_r )
 {
 	UINT32 ret = readinputportbytag(BLUESHRK_COIN_INPUT_PORT_TAG);
 

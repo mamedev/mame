@@ -397,7 +397,7 @@ static WRITE8_HANDLER( led_den2_w )
  *
  *************************************/
 
-static UINT32 laserdisc_status_r(void *param)
+static CUSTOM_INPUT( laserdisc_status_r )
 {
 	if (discinfo == NULL)
 		return 0;
@@ -417,7 +417,7 @@ static UINT32 laserdisc_status_r(void *param)
 }
 
 
-static UINT32 laserdisc_command_r(void *param)
+static CUSTOM_INPUT( laserdisc_command_r )
 {
 	if (discinfo == NULL)
 		return 0;

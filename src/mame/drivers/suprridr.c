@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG	("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG	("CONTP2")
 
-static UINT32 suprridr_control_r(void *param)
+static CUSTOM_INPUT( suprridr_control_r )
 {
 	UINT32 ret;
 

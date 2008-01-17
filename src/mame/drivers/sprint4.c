@@ -33,7 +33,7 @@ static int steer_FF2[4];
 static int gear[4];
 
 
-static UINT32 get_lever(void* param)
+static CUSTOM_INPUT( get_lever )
 {
 	int n = (FPTR) param;
 
@@ -41,7 +41,7 @@ static UINT32 get_lever(void* param)
 }
 
 
-static UINT32 get_wheel(void* param)
+static CUSTOM_INPUT( get_wheel )
 {
 	int n = (FPTR) param;
 
@@ -49,7 +49,7 @@ static UINT32 get_wheel(void* param)
 }
 
 
-static UINT32 get_collision(void *param)
+static CUSTOM_INPUT( get_collision )
 {
 	int n = (FPTR) param;
 

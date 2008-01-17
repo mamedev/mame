@@ -235,7 +235,7 @@ static SOUND_START( mario )
 
 	SND[1] = 0x01;
 #endif
-	
+
 	state_save_register_global(state->last);
 	state_save_register_global(state->portT);
 }

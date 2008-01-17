@@ -76,7 +76,7 @@ static void *tms5220_start(int sndindex, int clock, const void *config)
 static void *tms5200_start(int sndindex, int clock, const void *config)
 {
 	struct tms5220_info *info = tms5220_start(sndindex, clock, config);
-	tms5220_set_variant(info->chip, variant_tms0285);
+	tms5220_set_variant(info->chip, variant_tmc0285);
 	return info;
 }
 
@@ -269,12 +269,12 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void tms0285_get_info(void *token, UINT32 state, sndinfo *info)
+void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
 	{
 		case SNDINFO_PTR_START:							info->start = tms5200_start;			break;
-		case SNDINFO_STR_NAME:							info->s = "TMS0285";					break;
+		case SNDINFO_STR_NAME:							info->s = "TMC0285";					break;
 		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }

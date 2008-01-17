@@ -175,7 +175,7 @@ READ8_HANDLER( wow_speech_r )
 }
 
 
-UINT32 wow_speech_status_r(void *param)
+CUSTOM_INPUT( wow_speech_status_r )
 {
 	return !sample_playing(0);
 }

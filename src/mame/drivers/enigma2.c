@@ -376,13 +376,13 @@ static WRITE8_HANDLER( enigma2_flip_screen_w )
 }
 
 
-static UINT32 p1_controls_r(void *param)
+static CUSTOM_INPUT( p1_controls_r )
 {
 	return readinputportbytag("P1CONTROLS");
 }
 
 
-static UINT32 p2_controls_r(void *param)
+static CUSTOM_INPUT( p2_controls_r )
 {
 	if (engima2_flip_screen)
 		return readinputportbytag("P2CONTROLS");

@@ -273,7 +273,7 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 	/* extract the display begin registers */
 	hdbpix[0] = (gpu_regs[HDB1] & 0x7ff) / 2;
 	hdbpix[1] = (gpu_regs[HDB2] & 0x7ff) / 2;
-	
+
 	/* sort */
 	if (hdbpix[0] > hdbpix[1])
 	{
@@ -284,11 +284,11 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 
 	/* select the target one */
 	hdb = hdbpix[vc % 2];
-	
+
 	/* if setting the second one in a line, make sure we will ever actually hit it */
 	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->screen[0].width))
 		return FALSE;
-	
+
 	/* adjust the timer */
 	timer_adjust(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16), attotime_never);
 	return TRUE;
@@ -675,7 +675,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				int vperiod = (gpu_regs[VP] & 0x7ff) + 1;
 				int vbend = gpu_regs[VBE] & 0x7ff;
 				int vbstart = gpu_regs[VBB] & 0x7ff;
-				
+
 				/* adjust for the half-lines */
 				if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
 				{
@@ -766,7 +766,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
 		UINT16 scanline[360];
 		int x;
-		
+
 		/* if we are first on this scanline, clear to the border color */
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
@@ -774,7 +774,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 			for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
 				dest[x] = border;
 		}
-	
+
 		/* process the object list for this counter value */
 		process_object_list(vc, scanline);
 
@@ -805,7 +805,7 @@ VIDEO_START( cojag )
 {
 	object_timer = timer_alloc(cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
-	
+
 	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);
 
 	jagobj_init();
