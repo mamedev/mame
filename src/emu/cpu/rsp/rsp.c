@@ -49,6 +49,7 @@ typedef struct
 	VECTOR_REG v[32];
 	UINT16 flag[4];
 	UINT32 sr;
+    UINT32 step_count;
 
 	INT64 accum[8];
 	INT32 square_root_res;
@@ -344,7 +345,8 @@ static const int vector_elements_2[16][8] =
 
 static void rsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	//int regIdx, accumIdx;
+    // int regIdx;
+    int accumIdx;
 	config = (rsp_config *)_config;
 
 #if LOG_INSTRUCTION_EXECUTION
@@ -352,16 +354,14 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
 #endif
 
 	rsp.irq_callback = irqcallback;
+
 #if 0
+    // Do not enable!  RSP registers are in a *random* state at powerup...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
 	{
 		rsp.r[regIdx] = 0;
 		rsp.v[regIdx].d[0] = 0;
 		rsp.v[regIdx].d[1] = 0;
-	}
-	for(accumIdx = 0; accumIdx < 8; accumIdx++ )
-	{
-		rsp.accum[accumIdx] = 0;
 	}
 	rsp.flag[0] = 0;
 	rsp.flag[1] = 0;
@@ -372,7 +372,15 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
 	rsp.reciprocal_res = 0;
 	rsp.reciprocal_high = 0;
 #endif
+
+    // ...except for the accumulators.
+    for(accumIdx = 0; accumIdx < 8; accumIdx++ )
+    {
+        rsp.accum[accumIdx] = 0;
+    }
+
 	rsp.sr = RSP_STATUS_HALT;
+    rsp.step_count = 0;
 }
 
 static void rsp_exit(void)
@@ -2783,7 +2791,14 @@ static int rsp_execute(int cycles)
 
 		if( rsp.sr & RSP_STATUS_SSTEP )
 		{
-			rsp.sr |= RSP_STATUS_BROKE;
+            if( rsp.step_count )
+            {
+                rsp.step_count--;
+            }
+            else
+            {
+                rsp.sr |= RSP_STATUS_BROKE;
+            }
 		}
 
 		if( rsp.sr & ( RSP_STATUS_HALT | RSP_STATUS_BROKE ) )
@@ -2869,7 +2884,13 @@ static void rsp_set_info(UINT32 state, cpuinfo *info)
         case CPUINFO_INT_REGISTER + RSP_R30:            rsp.r[30] = info->i;        break;
         case CPUINFO_INT_SP:
         case CPUINFO_INT_REGISTER + RSP_R31:            rsp.r[31] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_SR:             rsp.sr = info->i;        break;
+        case CPUINFO_INT_REGISTER + RSP_SR:
+            rsp.sr = info->i;
+            if( info->i & RSP_STATUS_SSTEP )
+            {
+                rsp.step_count = 1;
+            }
+            break;
         case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp.nextpc = info->i;        break;
 	}
 }
