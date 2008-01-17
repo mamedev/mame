@@ -4078,6 +4078,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( acombat )	/* bootleg */
 	DRIVER( acombato )	/* bootleg */
 	DRIVER( sstarbtl )	/* bootleg */
+	DRIVER( spfghmk2 )	/* (c) [1980] Data East Corporation */
+	DRIVER( spfgmk22 )	/* (c) [1980] Data East Corporation */
 	DRIVER( tomahawk )	/* (c) 1980 Data East, Inc. */
 	DRIVER( tomahaw1 )	/* (c) 1980 Data East, Inc. */
 	DRIVER( progolf )	/* (c) 1981 */

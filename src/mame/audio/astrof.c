@@ -193,6 +193,24 @@ MACHINE_DRIVER_END
 
 /*************************************
  *
+ *  Space Fighter
+ *
+ *************************************/
+
+WRITE8_HANDLER( spfghmk2_audio_w )
+{
+	/* nothing yet */
+}
+
+
+MACHINE_DRIVER_START( spfghmk2_audio )
+	/* nothing yet */
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
  *  Tomahawk
  *
  *************************************/
