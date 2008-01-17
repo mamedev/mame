@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( tceptor )
 	MDRV_CPU_PROGRAM_MAP(m68k_map,0)
 	MDRV_CPU_VBLANK_INT(m68k_vb_interrupt,1)
 
-	MDRV_CPU_ADD(HD63701, 49152000/32)	/* or compatible 6808 with extra instructions */
+	MDRV_CPU_ADD(HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT(mcu_vb_interrupt,1)

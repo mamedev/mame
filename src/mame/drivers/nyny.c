@@ -77,9 +77,9 @@
 #define PIXEL_CLOCK				(MAIN_CPU_MASTER_CLOCK / 2)
 #define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
 #define AUDIO_1_MASTER_CLOCK	(4000000)
-#define AUDIO_CPU_1_CLOCK		(AUDIO_1_MASTER_CLOCK / 4)	/* internal divisor */
+#define AUDIO_CPU_1_CLOCK		(AUDIO_1_MASTER_CLOCK)
 #define AUDIO_2_MASTER_CLOCK	(4000000)
-#define AUDIO_CPU_2_CLOCK		(AUDIO_2_MASTER_CLOCK / 4)	/* internal divisor */
+#define AUDIO_CPU_2_CLOCK		(AUDIO_2_MASTER_CLOCK)
 
 
 static UINT8 *nyny_videoram_1;

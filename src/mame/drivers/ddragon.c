@@ -995,7 +995,7 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(ddragon_interrupt,272)
 
-	MDRV_CPU_ADD(HD63701, 3579545 / 3) /* This divider seems correct by comparison to real board */
+	MDRV_CPU_ADD(HD63701, 3579545) /* This divider seems correct by comparison to real board */
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 
  	MDRV_CPU_ADD(HD6309, 3579545)
@@ -1044,7 +1044,7 @@ static MACHINE_DRIVER_START( darktowr )
 	MDRV_CPU_PROGRAM_MAP(darktowr_readmem,darktowr_writemem)
 	MDRV_CPU_VBLANK_INT(ddragon_interrupt,272)
 
- 	MDRV_CPU_ADD(HD63701, 3579545 / 3)
+ 	MDRV_CPU_ADD(HD63701, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 
  	MDRV_CPU_ADD(HD6309, 3579545)

@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( bublbobl )
 	/* audio CPU */	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0) // IRQs are triggered by the YM2203
 
-	MDRV_CPU_ADD_TAG("mcu", M6801, 4000000/4)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
+	MDRV_CPU_ADD_TAG("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1) // comes from the same clock that latches the INT pin on the second Z80
 

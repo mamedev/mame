@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( irem_audio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6803, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD(M6803, XTAL_3_579545MHz) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(irem_sound_readmem,irem_sound_writemem)
 	MDRV_CPU_IO_MAP(irem_sound_readport,irem_sound_writeport)

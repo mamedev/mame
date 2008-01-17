@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( qix )
 	MDRV_CPU_ADD_TAG("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(video_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", M6802, SOUND_CLOCK_OSC/2/4)	/* 0.92 MHz */
+	MDRV_CPU_ADD_TAG("sound", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* high interleave needed to ensure correct text in service mode */

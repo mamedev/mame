@@ -455,7 +455,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_CPU_PROGRAM_MAP(skykid_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
-	MDRV_CPU_ADD(HD63701,49152000/32)	/* or compatible 6808 with extra instructions */
+	MDRV_CPU_ADD(HD63701,49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)

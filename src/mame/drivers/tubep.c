@@ -936,7 +936,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
 
-	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000 / 2)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -980,7 +980,7 @@ static MACHINE_DRIVER_START( tubepb )
 
 	MDRV_CPU_REMOVE("nsc")
 
-	MDRV_CPU_ADD(M6802,6000000/4) /* ? MHz Xtal */
+	MDRV_CPU_ADD(M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 MACHINE_DRIVER_END
@@ -1002,7 +1002,7 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)
 
-	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000/4)	/* 6 MHz Xtal - divided internally ??? */
+	MDRV_CPU_ADD_TAG("nsc",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

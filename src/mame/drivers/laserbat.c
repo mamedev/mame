@@ -701,7 +701,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_IO_MAP(catnmous_io_map,0)
 	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
 
-	MDRV_CPU_ADD(M6802,3580000/4) /* ? */
+	MDRV_CPU_ADD(M6802,3580000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
 
