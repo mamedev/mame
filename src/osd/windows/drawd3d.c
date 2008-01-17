@@ -515,8 +515,8 @@ static int drawd3d_window_init(win_window_info *window)
 		goto error;
 
 	// create the device immediately for the full screen case (defer for window mode)
-//  if (window->fullscreen && device_create(window))
-//      goto error;
+	if (window->fullscreen && device_create(window))
+		goto error;
 
 	return 0;
 
