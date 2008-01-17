@@ -33,10 +33,12 @@ static UINT8 blank_palette;
  *
  *************************************/
 
-INLINE void get_crosshair_xy(int player, int *x, int *y)
+INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	*x = ((readinputport(2 + player * 2) & 0xff) * Machine->screen[0].width) / 255;
-	*y = ((readinputport(3 + player * 2) & 0xff) * Machine->screen[0].height) / 255;
+	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
+	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
+	*x = ((readinputport(2 + player * 2) & 0xff) * width) / 255;
+	*y = ((readinputport(3 + player * 2) & 0xff) * height) / 255;
 }
 
 
@@ -57,14 +59,14 @@ READ16_HANDLER( lethalj_gun_r )
 		case 4:
 		case 5:
 			/* latch the crosshair position */
-			get_crosshair_xy(offset - 4, &beamx, &beamy);
+			get_crosshair_xy(Machine, offset - 4, &beamx, &beamy);
 			gunx = beamx;
 			guny = beamy;
 			blank_palette = 1;
 			break;
 
 		case 6:
-			result = gunx/2;
+			result = gunx / 2;
 			break;
 
 		case 7:
