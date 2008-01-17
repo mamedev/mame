@@ -35,7 +35,7 @@
 #define IP_ACTIVE_LOW		0xffffffff
 
 
-/* macros for a timer callback functions */
+/* macro for a custom callback functions (PORT_CUSTOM) */
 #define CUSTOM_INPUT(name)	UINT32 name(void *param)
 
 
