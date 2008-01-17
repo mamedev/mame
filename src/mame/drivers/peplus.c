@@ -1119,7 +1119,7 @@ static DRIVER_INIT( pexp0019 )
 	// For testing only, cannot stay in final driver
 	program_ram[0xc1e4] = 0x22; // RET - Disable Memory Test
 	program_ram[0xc15f] = 0x22; // RET - Disable Program Checksum
-    program_ram[0xc421] = 0x22; // RET - Disable 2nd Memory Test
+	program_ram[0xc421] = 0x22; // RET - Disable 2nd Memory Test
 }
 
 static DRIVER_INIT( pexs0006 )
@@ -1128,7 +1128,7 @@ static DRIVER_INIT( pexs0006 )
 
 	// For testing only, cannot stay in final driver
 	program_ram[0x9bd4] = 0x22; // RET - Disable Memory Test
-    program_ram[0x9e9c] = 0x22; // RET - Disable 2nd Memory Test
+	program_ram[0x9e9c] = 0x22; // RET - Disable 2nd Memory Test
 }
 
 static DRIVER_INIT( pexmp006 )
@@ -1137,7 +1137,7 @@ static DRIVER_INIT( pexmp006 )
 
 	// For testing only, cannot stay in final driver
 	program_ram[0xbfc6] = 0x22; // RET - Disable Memory Test
-    program_ram[0xc2a2] = 0x22; // RET - Disable 2nd Memory Test
+	program_ram[0xc2a2] = 0x22; // RET - Disable 2nd Memory Test
 }
 
 
@@ -1145,8 +1145,8 @@ static DRIVER_INIT( pexmp006 )
 *        Rom Load        *
 *************************/
 
-ROM_START( peset038 )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 ) /* Normal board : Set Chip (Set038) */
+ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
