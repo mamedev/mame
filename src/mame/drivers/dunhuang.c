@@ -54,6 +54,8 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 
+#define DUNHUANG_DEBUG	0
+
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
@@ -113,7 +115,7 @@ static VIDEO_UPDATE( dunhuang )
 {
 	int layers_ctrl = -1;
 
-#ifdef MAME_DEBUG
+#if DUNHUANG_DEBUG
 if (input_code_pressed(KEYCODE_Z))
 {
 	int msk = 0;

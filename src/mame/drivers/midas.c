@@ -49,6 +49,8 @@
 #include "sound/ymz280b.h"
 #include "machine/eeprom.h"
 
+#define MIDAS_DEBUG	0
+
 static UINT16 *livequiz_gfxram, *livequiz_gfxregs;
 
 static VIDEO_START( livequiz );
@@ -158,7 +160,7 @@ static VIDEO_UPDATE( livequiz )
 {
 	int layers_ctrl = -1;
 
-#ifdef MAME_DEBUG
+#if MIDAS_DEBUG
 	if ( input_code_pressed(KEYCODE_Z) )
 	{
 		int msk = 0;

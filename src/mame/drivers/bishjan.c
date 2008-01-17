@@ -48,6 +48,8 @@ Notes:
 #include "driver.h"
 #include "cpu/h83002/h83002.h"
 
+#define BISHJAN_DEBUG	0
+
 /***************************************************************************
                                 Video Hardware
 ***************************************************************************/
@@ -89,7 +91,7 @@ static VIDEO_UPDATE( bishjan )
 	int scroll2_x = ((bishjan_scroll[2] & 0x0f)<<8) | (bishjan_scroll[1] & 0xff);
 	int scroll2_y = ((bishjan_scroll[2] & 0xf0)<<4) | (bishjan_scroll[2] >> 8);
 
-#ifdef MAME_DEBUG
+#if BISHJAN_DEBUG
 if (input_code_pressed(KEYCODE_Z))
 {
 	int msk = 0;

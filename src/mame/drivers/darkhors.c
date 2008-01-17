@@ -58,6 +58,8 @@ To do:
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 
+#define DARKHORS_DEBUG	0
+
 /***************************************************************************
 
 
@@ -151,7 +153,7 @@ static VIDEO_UPDATE( darkhors )
 {
 	int layers_ctrl = -1;
 
-#ifdef MAME_DEBUG
+#if DARKHORS_DEBUG
 	if (input_code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;
@@ -174,7 +176,7 @@ static VIDEO_UPDATE( darkhors )
 
 	if (layers_ctrl & 4)	draw_sprites(machine,bitmap,cliprect);
 
-#ifdef MAME_DEBUG
+#if DARKHORS_DEBUG
 #if 0
 	popmessage("%04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X %04X-%04X",
 		darkhors_tmapscroll[0] >> 16, darkhors_tmapscroll[0] & 0xffff,
