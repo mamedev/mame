@@ -2252,7 +2252,7 @@ GAME( 1982, myqbert,  qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb"
 GAME( 1982, qberttst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert (early test version)", 0 )
 GAME( 1982, qbtrktst, qbert,    qbert,    qbert,    0,        ROT270, "Gottlieb", "Q*bert Board Input Test Rom", 0 )
 GAME( 1982, insector, 0,        gottlieb, insector, 0,        ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,     0,        gottlieb, tylz,     0,        ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1982, tylz,     0,        qbert,    tylz,     0,        ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
 GAME( 1984, argusg,   0,        krull,    argusg,   0,        ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
 GAME( 1983, mplanets, 0,        gottlieb, mplanets, 0,        ROT270, "Gottlieb", "Mad Planets", 0 )
 GAME( 1983, mplanuk,  mplanets, gottlieb, mplanets, 0,        ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
