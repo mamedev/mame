@@ -2685,7 +2685,19 @@ static int rsp_execute(int cycles)
 						// ------------------------------------------------
 						//
 
-						if (RTREG) RTVAL = rsp.flag[RDREG];
+                        if (RTREG)
+                        {
+                            if (RDREG == 2)
+                            {
+                                // Anciliary clipping flags
+                                RTVAL = rsp.flag[RDREG] & 0x00ff;
+                            }
+                            else
+                            {
+                                // All other flags are 16 bits but sign-extended at retrieval
+                                RTVAL = (UINT32)rsp.flag[RDREG] | ( ( rsp.flag[RDREG] & 0x8000 ) ? 0xffff0000 : 0 );
+                            }
+                        }
 						break;
 					}
 					case 0x04:	/* MTC2 */
@@ -2890,8 +2902,8 @@ static void rsp_set_info(UINT32 state, cpuinfo *info)
             rsp.sr = info->i;
             if( info->i & RSP_STATUS_SSTEP )
             {
-                // Heaven help me for putting this check here, but it's accurate to the hardware.
-                rsp.step_count = ( cpu_getactivecpu() == 0 ) ? 1 : 0;
+                // Heaven help me for putting this check here, but it's accurate to the hardware and works.
+                rsp.step_count = ( cpu_getactivecpu() == 0 ) ? 0 : 1;
             }
             break;
         case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp.nextpc = info->i;        break;

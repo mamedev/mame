@@ -282,7 +282,7 @@ READ32_HANDLER( n64_sp_reg_r )
             return 0;
 
         case 0x40000/4:     // PC
-            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_PC);
+            return cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_PC) & 0x00000fff;
 
         default:
             logerror("sp_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
