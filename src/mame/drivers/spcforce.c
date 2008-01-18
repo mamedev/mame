@@ -274,7 +274,6 @@ static MACHINE_DRIVER_START( spcforce )
 	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MDRV_PALETTE_INIT(spcforce)
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(spcforce)
 
 	/* sound hardware */

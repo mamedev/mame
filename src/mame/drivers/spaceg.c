@@ -174,13 +174,6 @@ static UINT8 unkram[65536];
 static int io9400;
 static int io9401;
 
-static VIDEO_UPDATE( spaceg )
-{
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
-
-	return 0;
-}
-
 static PALETTE_INIT( spaceg )
 {
 	int i;
@@ -433,7 +426,7 @@ static MACHINE_DRIVER_START( spaceg )
 	MDRV_PALETTE_LENGTH(16+128-16)
 	MDRV_PALETTE_INIT( spaceg )
 	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE( spaceg )
+	MDRV_VIDEO_UPDATE( generic_bitmapped )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

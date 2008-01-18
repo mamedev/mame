@@ -200,7 +200,6 @@ static MACHINE_DRIVER_START( ambush )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(ambush)
-	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(ambush)
 
 	/* sound hardware */

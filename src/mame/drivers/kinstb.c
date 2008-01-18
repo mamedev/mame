@@ -237,7 +237,6 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_MACHINE_RESET( snes )
 
 	/* video hardware */
-	MDRV_VIDEO_START( generic_bitmapped )
 	MDRV_VIDEO_UPDATE( snes )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
