@@ -48,15 +48,30 @@
 #define VMIN    0
 #define VMAX	32767
 
-static UINT8 sound_latch_a;
+struct c_state
+{
+	INT32 counter;
+	INT32 level;
+};
 
-static sound_stream * channel;
+struct n_state
+{
+	INT32 counter;
+	INT32 polyoffs;
+	INT32 polybit;
+	INT32 lowpass_counter;
+	INT32 lowpass_polybit;
+};
 
-static UINT32 *poly18 = NULL;
+static struct c_state 		c24_state;
+static struct c_state 		c25_state;
+static struct n_state 		noise_state;
+static UINT8 				sound_latch_a;
+static sound_stream * 		channel;
+static UINT32 *				poly18;
 
 INLINE int update_c24(int samplerate)
 {
-	static int counter, level;
 	/*
      * Noise frequency control (Port B):
      * Bit 6 lo charges C24 (6.8u) via R51 (330) and when
@@ -69,38 +84,37 @@ INLINE int update_c24(int samplerate)
 	#define R52 20000
 	if( sound_latch_a & 0x40 )
 	{
-		if (level > VMIN)
+		if (c24_state.level > VMIN)
 		{
-			counter -= (int)((level - VMIN) / (R52 * C24));
-			if( counter <= 0 )
+			c24_state.counter -= (int)((c24_state.level - VMIN) / (R52 * C24));
+			if( c24_state.counter <= 0 )
 			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				if( (level -= n) < VMIN)
-					level = VMIN;
+				int n = -c24_state.counter / samplerate + 1;
+				c24_state.counter += n * samplerate;
+				if( (c24_state.level -= n) < VMIN)
+					c24_state.level = VMIN;
 			}
 		}
     }
 	else
 	{
-		if (level < VMAX)
+		if (c24_state.level < VMAX)
 		{
-			counter -= (int)((VMAX - level) / ((R51+R49) * C24));
-			if( counter <= 0 )
+			c24_state.counter -= (int)((VMAX - c24_state.level) / ((R51+R49) * C24));
+			if( c24_state.counter <= 0 )
 			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				if( (level += n) > VMAX)
-					level = VMAX;
+				int n = -c24_state.counter / samplerate + 1;
+				c24_state.counter += n * samplerate;
+				if( (c24_state.level += n) > VMAX)
+					c24_state.level = VMAX;
 			}
 		}
     }
-	return VMAX - level;
+	return VMAX - c24_state.level;
 }
 
 INLINE int update_c25(int samplerate)
 {
-	static int counter, level;
 	/*
      * Bit 7 hi charges C25 (6.8u) over a R50 (1k) and R53 (330) and when
      * bit 7 is lo, C25 is discharged through R54 (47k)
@@ -113,39 +127,38 @@ INLINE int update_c25(int samplerate)
 
 	if( sound_latch_a & 0x80 )
 	{
-		if (level < VMAX)
+		if (c25_state.level < VMAX)
 		{
-			counter -= (int)((VMAX - level) / ((R50+R53) * C25));
-			if( counter <= 0 )
+			c25_state.counter -= (int)((VMAX - c25_state.level) / ((R50+R53) * C25));
+			if( c25_state.counter <= 0 )
 			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				if( (level += n) > VMAX )
-					level = VMAX;
+				int n = -c25_state.counter / samplerate + 1;
+				c25_state.counter += n * samplerate;
+				if( (c25_state.level += n) > VMAX )
+					c25_state.level = VMAX;
 			}
 		}
 	}
 	else
 	{
-		if (level > VMIN)
+		if (c25_state.level > VMIN)
 		{
-			counter -= (int)((level - VMIN) / (R54 * C25));
-			if( counter <= 0 )
+			c25_state.counter -= (int)((c25_state.level - VMIN) / (R54 * C25));
+			if( c25_state.counter <= 0 )
 			{
-				int n = -counter / samplerate + 1;
-				counter += n * samplerate;
-				if( (level -= n) < VMIN )
-					level = VMIN;
+				int n = -c25_state.counter / samplerate + 1;
+				c25_state.counter += n * samplerate;
+				if( (c25_state.level -= n) < VMIN )
+					c25_state.level = VMIN;
 			}
 		}
 	}
-	return level;
+	return c25_state.level;
 }
 
 
 INLINE int noise(int samplerate)
 {
-	static int counter, polyoffs, polybit, lowpass_counter, lowpass_polybit;
 	int vc24 = update_c24(samplerate);
 	int vc25 = update_c25(samplerate);
 	int sum = 0, level, frequency;
@@ -168,25 +181,25 @@ INLINE int noise(int samplerate)
      * R71 (2700 Ohms) parallel to R73 (47k Ohms) = approx. 2553 Ohms
      * maxfreq = 1.44 / ((2553+2*1000) * 0.05e-6) = approx. 6325 Hz
      */
-	counter -= frequency;
-	if( counter <= 0 )
+	noise_state.counter -= frequency;
+	if( noise_state.counter <= 0 )
 	{
-		int n = (-counter / samplerate) + 1;
-		counter += n * samplerate;
-		polyoffs = (polyoffs + n) & 0x3ffff;
-		polybit = (poly18[polyoffs>>5] >> (polyoffs & 31)) & 1;
+		int n = (-noise_state.counter / samplerate) + 1;
+		noise_state.counter += n * samplerate;
+		noise_state.polyoffs = (noise_state.polyoffs + n) & 0x3ffff;
+		noise_state.polybit = (poly18[noise_state.polyoffs>>5] >> (noise_state.polyoffs & 31)) & 1;
 	}
-	if (!polybit)
+	if (!noise_state.polybit)
 		sum += vc24;
 
 	/* 400Hz crude low pass filter: this is only a guess!! */
-	lowpass_counter -= 400;
-	if( lowpass_counter <= 0 )
+	noise_state.lowpass_counter -= 400;
+	if( noise_state.lowpass_counter <= 0 )
 	{
-		lowpass_counter += samplerate;
-		lowpass_polybit = polybit;
+		noise_state.lowpass_counter += samplerate;
+		noise_state.lowpass_polybit = noise_state.polybit;
 	}
-	if (!lowpass_polybit)
+	if (!noise_state.lowpass_polybit)
 		sum += vc25;
 
 	return sum;
@@ -373,10 +386,7 @@ DISCRETE_SOUND_START(phoenix)
 DISCRETE_SOUND_END
 
 WRITE8_HANDLER( phoenix_sound_control_a_w )
-{
-	if( data == sound_latch_a )
-		return;
-
+{	
 	discrete_sound_w(PHOENIX_EFFECT_2_DATA, data & 0x0f);
 	discrete_sound_w(PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 //  discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
@@ -388,7 +398,22 @@ WRITE8_HANDLER( phoenix_sound_control_a_w )
 
 SOUND_START( phoenix)
 {
+	sound_latch_a = 0;
+	memset(&c24_state, 0, sizeof(c24_state));
+	memset(&c25_state, 0, sizeof(c25_state));
+	memset(&noise_state, 0, sizeof(noise_state));	
+
 	state_save_register_global(sound_latch_a);
+	state_save_register_global(c24_state.counter);
+	state_save_register_global(c24_state.level);
+	state_save_register_global(c25_state.counter);
+	state_save_register_global(c25_state.level);
+	state_save_register_global(noise_state.counter);
+	state_save_register_global(noise_state.polybit);
+	state_save_register_global(noise_state.polyoffs);
+	state_save_register_global(noise_state.lowpass_counter);
+	state_save_register_global(noise_state.lowpass_polybit);
+	
 }
 
 WRITE8_HANDLER( phoenix_sound_control_b_w )
