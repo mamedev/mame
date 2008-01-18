@@ -952,7 +952,7 @@ int memory_get_log_unmap(int spacenum)
 void *_memory_install_read_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if ((handler < 0) || (handler >= STATIC_COUNT))
+	if (handler < 0 || handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_read_handler()");
 	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)handler, 0, handler_name);
 	mem_dump();
@@ -1000,7 +1000,7 @@ UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t start, o
 void *_memory_install_write_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if ((handler < 0) || (handler >= STATIC_COUNT))
+	if (handler < 0 || handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_write_handler()");
 	install_mem_handler(space, 1, space->dbits, 0, start, end, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
@@ -1041,6 +1041,59 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, 
 
 
 /*-------------------------------------------------
+    memory_install_readwriteX_handler - install 
+    dynamic read and write handlers for X-bit case
+-------------------------------------------------*/
+
+void *_memory_install_readwrite_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler < 0 || rhandler >= STATIC_COUNT || whandler < 0 || whandler >= STATIC_COUNT)
+		fatalerror("fatal: can only use static banks with memory_install_readwrite_handler()");
+	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)rhandler, 0, rhandler_name);
+	install_mem_handler(space, 1, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)whandler, 0, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
+}
+
+UINT8 *_memory_install_readwrite8_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_handler rhandler, write8_handler whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	install_mem_handler(space, 0, 8, 0, start, end, mask, mirror, (genf *)rhandler, 0, rhandler_name);
+	install_mem_handler(space, 1, 8, 0, start, end, mask, mirror, (genf *)whandler, 0, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
+}
+
+UINT16 *_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_handler rhandler, write16_handler whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	install_mem_handler(space, 0, 16, 0, start, end, mask, mirror, (genf *)rhandler, 0, rhandler_name);
+	install_mem_handler(space, 1, 16, 0, start, end, mask, mirror, (genf *)whandler, 0, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
+}
+
+UINT32 *_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_handler rhandler, write32_handler whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	install_mem_handler(space, 0, 32, 0, start, end, mask, mirror, (genf *)rhandler, 0, rhandler_name);
+	install_mem_handler(space, 1, 32, 0, start, end, mask, mirror, (genf *)whandler, 0, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
+}
+
+UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_handler rhandler, write64_handler whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	install_mem_handler(space, 0, 64, 0, start, end, mask, mirror, (genf *)rhandler, 0, rhandler_name);
+	install_mem_handler(space, 1, 64, 0, start, end, mask, mirror, (genf *)whandler, 0, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, 0, SPACE_SHIFT(space, start));
+}
+
+
+/*-------------------------------------------------
     memory_install_readX_matchmask_handler -
     install dynamic match/mask read handler for
     X-bit case
@@ -1049,7 +1102,7 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, 
 void *_memory_install_read_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if ((handler < 0) || (handler >= STATIC_COUNT))
+	if (handler < 0 || handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_read_matchmask_handler()");
 	install_mem_handler(space, 0, space->dbits, 1, matchval, maskval, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
@@ -1098,7 +1151,7 @@ UINT64 *_memory_install_read64_matchmask_handler(int cpunum, int spacenum, offs_
 void *_memory_install_write_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if ((handler < 0) || (handler >= STATIC_COUNT))
+	if (handler < 0 || handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_write_matchmask_handler()");
 	install_mem_handler(space, 1, space->dbits, 1, matchval, maskval, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
