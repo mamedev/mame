@@ -270,7 +270,6 @@ static MACHINE_DRIVER_START( momoko )
 	MDRV_GFXDECODE(momoko)
 	MDRV_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(momoko)
 
 	/* sound hardware */

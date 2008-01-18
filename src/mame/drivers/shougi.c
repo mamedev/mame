@@ -91,13 +91,9 @@ PROM  : Type MB7051
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-//VIDEO_START( shougi )
-//{
-//  generic_vh_start();
-//}
-
 #include "video/resnet.h"
+
+
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -180,8 +176,7 @@ int offs;
 			*BITMAP_ADDR16(bitmap, 255-sy, 255-(sx*4 + x)) = color*4 + data;
 		}
 	}
-	/* copy the character mapped graphics */
-	//copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+
 	return 0;
 }
 
@@ -385,7 +380,6 @@ static MACHINE_DRIVER_START( shougi )
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(shougi)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(shougi)
 
 	/* sound hardware */

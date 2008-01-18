@@ -215,7 +215,6 @@ static MACHINE_DRIVER_START( subs )
 
 
 	MDRV_PALETTE_INIT(subs)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(subs)
 
 

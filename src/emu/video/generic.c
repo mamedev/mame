@@ -308,8 +308,6 @@ void generic_video_init(running_machine *machine)
 
 VIDEO_START( generic )
 {
-	assert_always(videoram_size != 0, "VIDEO_START(generic) requires non-zero videoram_size");
-
 	/* allocate the temporary bitmap */
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }

@@ -256,7 +256,6 @@ static MACHINE_DRIVER_START( rollrace )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(wiz)
-	MDRV_VIDEO_START(generic)
 	MDRV_VIDEO_UPDATE(rollrace)
 
 	/* sound hardware */
