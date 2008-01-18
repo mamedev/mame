@@ -3851,40 +3851,6 @@ ROM_START( heatbrlu )
 	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
 ROM_END
 
-ROM_START( hetbrlu2 )
-	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
-	ROM_LOAD32_BYTE( "hb1",   0x00000, 0x20000, CRC(16a3754f) SHA1(3e070f2d004fc17d8ae9171955dc48ec5d14cf8a) )
-	ROM_LOAD32_BYTE( "hb2",   0x00001, 0x20000, CRC(b34dc60c) SHA1(f9d1438469bf0d36d53d3f148bdf7f04dee5eae0) )
-	ROM_LOAD32_BYTE( "hb3",   0x00002, 0x20000, CRC(3b035081) SHA1(b7ecbacd85102eda21dd162427a0e57cc6d24661) )
-	ROM_LOAD32_BYTE( "hb4",   0x00003, 0x20000, CRC(fae85c88) SHA1(1b0316e66d4e0c5b3aa4045d6bfcc8a5464dc74e) )
-
-	ROM_REGION( 0x20000*2, REGION_CPU2, 0 )	/* Z80 code, banked data */
-	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
-	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
-
-	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD( "barrel.5",   0x010000, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
-
-	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
-	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
-
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )	/* MBK tiles */
-	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
-
-	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* not used */
-
-	ROM_REGION( 0x080000, REGION_GFX5, ROMREGION_DISPOSE )	/* BK3 tiles */
-	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
-
-	ROM_REGION( 0x080000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK tiles */
-	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
-
-	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* ADPCM samples */
-	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
-ROM_END
-
 /*
 
 Godzilla
@@ -4407,7 +4373,6 @@ GAME( 1992, legionnu, legionna, legionna, legionna, legionna, ROT0, "Tad (Fabtek
 GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (World old version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, hetbrlu2, heatbrl,  heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (US set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, sdgndmrb, 0,        sdgndmrb, sdgndmrb, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
