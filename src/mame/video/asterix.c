@@ -48,11 +48,6 @@ VIDEO_START( asterix )
 	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, asterix_tile_callback, 1);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER, asterix_sprite_callback);
 
-	K056832_set_LayerOffset(0, 89, 0);
-	K056832_set_LayerOffset(1, 91, 0);
-	K056832_set_LayerOffset(2, 89, 0);
-	K056832_set_LayerOffset(3, 95, 0);
-
 	K053245_set_SpriteOffset(0,-3,-1);
 }
 
@@ -76,6 +71,23 @@ VIDEO_UPDATE( asterix )
 {
 	static const int K053251_CI[4] = { K053251_CI0, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[3], plane, new_colorbase;
+
+	/* Layer offsets are different if horizontally flipped */
+	if (K056832_read_register(0x0) & 0x10)
+	{
+		K056832_set_LayerOffset(0, 89-176, 0);
+		K056832_set_LayerOffset(1, 91-176, 0);
+		K056832_set_LayerOffset(2, 89-176, 0);
+		K056832_set_LayerOffset(3, 95-176, 0);
+	}
+	else
+	{
+		K056832_set_LayerOffset(0, 89, 0);
+		K056832_set_LayerOffset(1, 91, 0);
+		K056832_set_LayerOffset(2, 89, 0);
+		K056832_set_LayerOffset(3, 95, 0);
+	}
+	
 
 	tilebanks[0] = (K056832_get_lookup(0) << 10);
 	tilebanks[1] = (K056832_get_lookup(1) << 10);
