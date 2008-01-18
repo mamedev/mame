@@ -16,12 +16,13 @@
 VIDEO_START( stadhero );
 VIDEO_UPDATE( stadhero );
 
-extern UINT16 *stadhero_pf1_data,*stadhero_pf2_data;
+extern UINT16 *stadhero_pf1_data;
+extern UINT16 *stadhero_pf2_control_0;
+extern UINT16 *stadhero_pf2_control_1;
 
 WRITE16_HANDLER( stadhero_pf1_data_w );
+READ16_HANDLER( stadhero_pf2_data_r );
 WRITE16_HANDLER( stadhero_pf2_data_w );
-WRITE16_HANDLER( stadhero_pf2_control_0_w );
-WRITE16_HANDLER( stadhero_pf2_control_1_w );
 
 /******************************************************************************/
 
@@ -59,37 +60,19 @@ static WRITE16_HANDLER( stadhero_control_w )
 	}
 }
 
-static WRITE16_HANDLER( spriteram_mirror_w )
-{
-	spriteram16[offset]=data;
-}
-
-static READ16_HANDLER( stadhero_pf1_data_r ) { return stadhero_pf1_data[offset]; }
-static READ16_HANDLER( stadhero_pf2_data_r ) { return stadhero_pf2_data[offset]; }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( stadhero_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x200000, 0x2007ff) AM_READ(stadhero_pf1_data_r)
-	AM_RANGE(0x260000, 0x261fff) AM_READ(stadhero_pf2_data_r)
-	AM_RANGE(0x30c000, 0x30c00b) AM_READ(stadhero_control_r)
-	AM_RANGE(0x310000, 0x3107ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READ(MRA16_RAM) /* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_READ(MRA16_RAM) /* Sprites */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( stadhero_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(stadhero_pf1_data_w) AM_BASE(&stadhero_pf1_data)
-	AM_RANGE(0x240000, 0x240007) AM_WRITE(stadhero_pf2_control_0_w)
-	AM_RANGE(0x240010, 0x240017) AM_WRITE(stadhero_pf2_control_1_w)
-	AM_RANGE(0x260000, 0x261fff) AM_WRITE(stadhero_pf2_data_w) AM_BASE(&stadhero_pf2_data)
-	AM_RANGE(0x30c000, 0x30c00b) AM_WRITE(stadhero_control_w)
-	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0xffc800, 0xffcfff) AM_WRITE(spriteram_mirror_w)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x200000, 0x2007ff) AM_READWRITE(MRA16_RAM, stadhero_pf1_data_w) AM_BASE(&stadhero_pf1_data)
+	AM_RANGE(0x240000, 0x240007) AM_READWRITE(MRA16_RAM, MWA16_RAM) AM_BASE(&stadhero_pf2_control_0)
+	AM_RANGE(0x240010, 0x240017) AM_WRITE(MWA16_RAM) AM_BASE(&stadhero_pf2_control_1)
+	AM_RANGE(0x260000, 0x261fff) AM_READWRITE(stadhero_pf2_data_r, stadhero_pf2_data_w)
+	AM_RANGE(0x30c000, 0x30c00b) AM_READWRITE(stadhero_control_r, stadhero_control_w)
+	AM_RANGE(0x310000, 0x3107ff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM /* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_MIRROR(0x000800) AM_RAM AM_BASE(&spriteram16)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -118,19 +101,13 @@ static WRITE8_HANDLER( YM2203_w )
 	}
 }
 
-static ADDRESS_MAP_START( stadhero_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( stadhero_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_WRITE(YM2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_WRITE(YM3812_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x3800, 0x3800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -280,12 +257,12 @@ static MACHINE_DRIVER_START( stadhero )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(stadhero_readmem,stadhero_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)/* VBL */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(stadhero_s_readmem,stadhero_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))

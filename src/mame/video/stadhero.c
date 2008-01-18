@@ -11,12 +11,12 @@
 
 #include "driver.h"
 
-UINT16 *stadhero_pf1_data,*stadhero_pf2_data;
+UINT16 *stadhero_pf1_data;
+static UINT16 *stadhero_pf2_data;
+UINT16 *stadhero_pf2_control_0;
+UINT16 *stadhero_pf2_control_1;
 static tilemap *pf1_tilemap,*pf2_tilemap;
 static int flipscreen;
-
-static UINT16 stadhero_pf2_control_0[8];
-static UINT16 stadhero_pf2_control_1[8];
 
 /******************************************************************************/
 
@@ -61,7 +61,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flipscreen) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -106,21 +106,17 @@ WRITE16_HANDLER( stadhero_pf1_data_w )
 	tilemap_mark_tile_dirty(pf1_tilemap,offset);
 }
 
+READ16_HANDLER( stadhero_pf2_data_r )
+{
+	return stadhero_pf2_data[((stadhero_pf2_control_0[2] & 0x01) ? 0x1000 : 0) | offset];
+}
+
 WRITE16_HANDLER( stadhero_pf2_data_w )
 {
-	COMBINE_DATA(&stadhero_pf2_data[offset]);
+	COMBINE_DATA(&stadhero_pf2_data[((stadhero_pf2_control_0[2] & 0x01) ? 0x1000 : 0) | offset]);
 	tilemap_mark_tile_dirty(pf2_tilemap,offset);
 }
 
-WRITE16_HANDLER( stadhero_pf2_control_0_w )
-{
-	COMBINE_DATA(&stadhero_pf2_control_0[offset]);
-}
-
-WRITE16_HANDLER( stadhero_pf2_control_1_w )
-{
-	COMBINE_DATA(&stadhero_pf2_control_1[offset]);
-}
 
 /******************************************************************************/
 
@@ -134,7 +130,7 @@ static TILE_GET_INFO( get_pf2_tile_info )
 {
 	int tile,color;
 
-	tile=stadhero_pf2_data[tile_index];
+	tile=stadhero_pf2_data[((stadhero_pf2_control_0[2] & 0x01) ? 0x1000 : 0) | tile_index];
 	color=tile >> 12;
 	tile=tile&0xfff;
 
@@ -162,6 +158,8 @@ VIDEO_START( stadhero )
 {
 	pf1_tilemap =     tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 	pf2_tilemap =     tilemap_create(get_pf2_tile_info,stadhero_scan,TILEMAP_TYPE_PEN,     16,16,64,64);
+
+	stadhero_pf2_data = auto_malloc(0x2000 * 2);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 }
