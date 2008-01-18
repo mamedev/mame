@@ -453,7 +453,7 @@ ROM_START( sauro )
 
 	ROM_REGION( 0x10000, REGION_SOUND1, 0 )
 	/* SP0256 mask rom */
-	ROM_LOAD( "sp0256int.bin",   0x1000, 0x0800, BAD_DUMP CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
+	ROM_LOAD( "sp0256-al2.bin",   0x1000, 0x0800, CRC(df8de0b0) SHA1(86fb6d9fef955ac0bc76e0c45c66585946d278a1) )
 ROM_END
 
 ROM_START( trckydoc )
