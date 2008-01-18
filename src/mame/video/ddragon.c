@@ -44,11 +44,11 @@ Sprite layout.
 
 
 UINT8 *ddragon_bgvideoram,*ddragon_fgvideoram;
-int ddragon_scrollx_hi, ddragon_scrolly_hi;
+UINT16 ddragon_scrollx_hi, ddragon_scrolly_hi;
 UINT8 *ddragon_scrollx_lo;
 UINT8 *ddragon_scrolly_lo;
 UINT8 *ddragon_spriteram;
-int technos_video_hw;
+UINT8 technos_video_hw;
 
 static tilemap *fg_tilemap,*bg_tilemap;
 
@@ -109,6 +109,13 @@ VIDEO_START( ddragon )
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_scrolldx(fg_tilemap, 0, 384 - 256);
+	tilemap_set_scrolldx(bg_tilemap, 0, 384 - 256);
+	tilemap_set_scrolldy(fg_tilemap, -8, -8);
+	tilemap_set_scrolldy(bg_tilemap, -8, -8);
+	
+	state_save_register_global(ddragon_scrollx_hi);
+	state_save_register_global(ddragon_scrolly_hi);
 }
 
 VIDEO_START( chinagat )
@@ -117,6 +124,9 @@ VIDEO_START( chinagat )
 	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
+	
+	state_save_register_global(ddragon_scrollx_hi);
+	state_save_register_global(ddragon_scrolly_hi);
 }
 
 
@@ -166,7 +176,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rec
 		int attr = src[i+1];
 		if ( attr & 0x80 ) { /* visible */
 			int sx = 240 - src[i+4] + ( ( attr & 2 ) << 7 );
-			int sy = 240 - src[i+0] + ( ( attr & 1 ) << 8 );
+			int sy = 232 - src[i+0] + ( ( attr & 1 ) << 8 );
 			int size = ( attr & 0x30 ) >> 4;
 			int flipx = ( attr & 8 );
 			int flipy = ( attr & 4 );
@@ -194,7 +204,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rec
 			if (flip_screen)
 			{
 				sx = 240 - sx;
-				sy = 240 - sy;
+				sy = 256 - sy;
 				flipx = !flipx;
 				flipy = !flipy;
 				dx = -dx;

@@ -2123,7 +2123,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ghostb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)
+	MDRV_CPU_ADD(HD6309, 3000000*4)
 	MDRV_CPU_PROGRAM_MAP(ghostb_readmem,ghostb_writemem)
 	MDRV_CPU_VBLANK_INT(ghostb_interrupt,1)
 
@@ -2203,7 +2203,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gondo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000) /* HD63C09EP */
+	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(gondo_readmem,gondo_writemem)
 	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
 
@@ -2243,11 +2243,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( oscar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_readmem,oscar_writemem)
 	MDRV_CPU_VBLANK_INT(oscar_interrupt,1)
 
-	MDRV_CPU_ADD(HD6309, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD(HD6309, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(oscar_sub_readmem,oscar_sub_writemem)
 
 	MDRV_CPU_ADD(M6502, XTAL_12MHz/8)
@@ -2417,7 +2417,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( garyoret )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309,3000000) /* HD63C09EP */
+	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP */
 	MDRV_CPU_PROGRAM_MAP(garyoret_readmem,garyoret_writemem)
 	MDRV_CPU_VBLANK_INT(gondo_interrupt,1)
 

@@ -659,7 +659,7 @@ static const struct upd7759_interface upd7759_interface =
 static MACHINE_DRIVER_START( combasc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)	/* 3 MHz? */
+	MDRV_CPU_ADD(HD6309, 3000000*4)	/* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(combasc_readmem,combasc_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
@@ -702,7 +702,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( combascb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)	/* 3 MHz? */
+	MDRV_CPU_ADD(HD6309, 3000000*4)	/* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(combascb_readmem,combascb_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 

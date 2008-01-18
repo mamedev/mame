@@ -333,7 +333,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(HD6309, 3000000)		/* ? */
+	MDRV_CPU_ADD(HD6309, 3000000*4)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(battlnts_readmem,battlnts_writemem)
 	MDRV_CPU_VBLANK_INT(battlnts_interrupt,1)
 
