@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( superman_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0x900000, 0x9007ff) AM_READ(cchip1_ram_r)
 	AM_RANGE(0x900802, 0x900803) AM_READ(cchip1_ctrl_r)
-	AM_RANGE(0xb00000, 0xb00fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0xb00000, 0xb00fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd00000, 0xd007ff) AM_READ(MRA16_RAM)	/* video attribute ram */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(MRA16_RAM)	/* object ram */
 	AM_RANGE(0xf00000, 0xf03fff) AM_READ(MRA16_RAM)	/* Main RAM */
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( daisenpu_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
-	AM_RANGE(0xb00000, 0xb00fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0xb00000, 0xb00fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd00000, 0xd00fff) AM_READ(MRA16_RAM)	/* video attribute ram */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(MRA16_RAM)	/* object ram */
 	AM_RANGE(0xf00000, 0xf03fff) AM_READ(MRA16_RAM)	/* Main RAM */
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( gigandes_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
-	AM_RANGE(0xb00000, 0xb00fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0xb00000, 0xb00fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd00000, 0xd007ff) AM_READ(MRA16_RAM)	/* video attribute ram */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(MRA16_RAM)	/* object ram */
 	AM_RANGE(0xf00000, 0xf03fff) AM_READ(MRA16_RAM)	/* Main RAM */
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( ballbros_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
-	AM_RANGE(0xb00000, 0xb00fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0xb00000, 0xb00fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd00000, 0xd007ff) AM_READ(MRA16_RAM)	/* video attribute ram */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(MRA16_RAM)	/* object ram */
 	AM_RANGE(0xf00000, 0xf03fff) AM_READ(MRA16_RAM)	/* Main RAM */

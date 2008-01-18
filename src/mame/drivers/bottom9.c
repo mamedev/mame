@@ -52,7 +52,7 @@ static WRITE8_HANDLER( bottom9_bankedram1_w )
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
 	if (K052109_selected) return K052109_051960_r(offset + 0x2000);
-	else return paletteram_r(offset);
+	else return paletteram[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )

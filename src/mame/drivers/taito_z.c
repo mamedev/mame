@@ -1558,7 +1558,7 @@ static ADDRESS_MAP_START( bshark_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x113fff) AM_READ(sharedram_r)
 	AM_RANGE(0x400000, 0x40000f) AM_READ(TC0220IOC_halfword_r)
 	AM_RANGE(0x800000, 0x800007) AM_READ(bshark_stick_r)
-	AM_RANGE(0xa00000, 0xa01fff) AM_READ(paletteram16_word_r)	/* palette */
+	AM_RANGE(0xa00000, 0xa01fff) AM_READ(MRA16_RAM)	/* palette */
 	AM_RANGE(0xc00000, 0xc00fff) AM_READ(MRA16_RAM)	/* spriteram */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_READ(TC0100SCN_ctrl_word_0_r)
@@ -1613,7 +1613,7 @@ static ADDRESS_MAP_START( sci_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20000f) AM_READ(TC0220IOC_halfword_r)
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 	AM_RANGE(0x420000, 0x420003) AM_READ(taitoz_sound_r)
-	AM_RANGE(0x800000, 0x801fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x800000, 0x801fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_READ(TC0100SCN_ctrl_word_0_r)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READ(MRA16_RAM)	/* spriteram */	// Raine draws only 0x1000
@@ -1796,7 +1796,7 @@ static ADDRESS_MAP_START( dblaxle_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40000f) AM_READ(TC0510NIO_halfword_wordswap_r)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x620000, 0x620003) AM_READ(taitoz_sound_r)
-	AM_RANGE(0x800000, 0x801fff) AM_READ(paletteram16_word_r)	/* palette */
+	AM_RANGE(0x800000, 0x801fff) AM_READ(MRA16_RAM)	/* palette */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(TC0480SCP_word_r)	  /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_READ(TC0480SCP_ctrl_word_r)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READ(MRA16_RAM)	/* spriteram */
@@ -1842,7 +1842,7 @@ static ADDRESS_MAP_START( racingb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30000f) AM_READ(TC0510NIO_halfword_wordswap_r)
 	AM_RANGE(0x300010, 0x30001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x520000, 0x520003) AM_READ(taitoz_sound_r)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(paletteram16_word_r)	/* palette */
+	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)	/* palette */
 	AM_RANGE(0x900000, 0x90ffff) AM_READ(TC0480SCP_word_r)	  /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_READ(TC0480SCP_ctrl_word_r)
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(MRA16_RAM)	/* spriteram */

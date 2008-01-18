@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20000f) AM_READ(calendar_r)
 	AM_RANGE(0x300004, 0x300007) AM_READ(othldrby_videoram_r)
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
-	AM_RANGE(0x400000, 0x400fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x400000, 0x400fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_0_word_r)

@@ -97,7 +97,7 @@ extern int sys18_sound_info[4*2];
 extern void sys16_patch_code( int offset, int data );
 
 #define SYS16_MWA16_PALETTERAM	sys16_paletteram_w
-#define SYS16_MRA16_PALETTERAM	paletteram16_word_r
+#define SYS16_MRA16_PALETTERAM	MRA16_RAM
 
 #define SYS16_MRA16_WORKINGRAM	MRA16_RAM
 #define SYS16_MWA16_WORKINGRAM	MWA16_RAM

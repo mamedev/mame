@@ -460,7 +460,7 @@ static void ide_interrupt(int state)
 static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_READWRITE(paletteram32_r, paletteram32_w)		// COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_READWRITE(MRA32_RAM, paletteram32_w)		// COLOR RAM
 	                             AM_BASE(&paletteram32)
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)				// SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_READWRITE(K056832_long_r, K056832_long_w)		// VIDEO REG (tilemap)

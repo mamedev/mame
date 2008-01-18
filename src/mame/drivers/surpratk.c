@@ -33,9 +33,9 @@ static READ8_HANDLER( bankedram_r )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			return paletteram_r(offset + 0x0800);
+			return paletteram[offset + 0x0800];
 		else
-			return paletteram_r(offset);
+			return paletteram[offset];
 	}
 	else if (videobank & 0x01)
 		return K053245_r(offset);

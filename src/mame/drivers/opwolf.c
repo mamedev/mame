@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( opwolf_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f07ff) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_data_r)
 	AM_RANGE(0x0f0802, 0x0f0803) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_status_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READ(MRA16_RAM)	/* RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x200000, 0x200fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(MRA16_NOP)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( opwolfb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)	/* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READ(cchip_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READ(MRA16_RAM)	/* RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x200000, 0x200fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(MRA16_NOP)

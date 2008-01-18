@@ -311,7 +311,7 @@ WRITE16_HANDLER( midxunit_paletteram_w )
 
 READ16_HANDLER( midxunit_paletteram_r )
 {
-	return paletteram16_word_r(offset / 2, 0);
+	return paletteram16[offset / 2];
 }
 
 

@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_READ(MRA16_NOP)				/* ??? */
 	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_8_word_r)	/* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ(input_port_9_word_r)	/* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x700000, 0x7003ff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x800000, 0x800001) AM_READ(MRA16_NOP)				/* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READ(srmp2_input_1_r)		/* I/O port 1 */
 	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */

@@ -49,7 +49,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 
 	/* bit 5 = memory bank select */
 	if (data & 0x20){
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, paletteram_r);							/* palette */
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_RAM);							/* palette */
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);	/* palette */
 		if (K051316_readroms){
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r);	/* 051316 #1 (ROM test) */

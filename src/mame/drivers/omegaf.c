@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( omegaf_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcbff) AM_READ(omegaf_bg1_videoram_r)	/* BG1 video RAM */
 	AM_RANGE(0xcc00, 0xcfff) AM_READ(omegaf_bg2_videoram_r)	/* BG2 video RAM */
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)				/* FG RAM */
-	AM_RANGE(0xd800, 0xdfff) AM_READ(paletteram_r)			/* palette RAM */
+	AM_RANGE(0xd800, 0xdfff) AM_READ(MRA8_RAM)				/* palette RAM */
 	AM_RANGE(0xe000, 0xf9ff) AM_READ(MRA8_RAM)				/* RAM */
 	AM_RANGE(0xfa00, 0xffff) AM_READ(MRA8_RAM)				/* sprite RAM */
 ADDRESS_MAP_END
@@ -437,7 +437,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( robokid_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(paletteram_r)			/* paletrte RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)				/* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)				/* FG RAM */
 	AM_RANGE(0xd000, 0xd3ff) AM_READ(omegaf_bg2_videoram_r)
 	AM_RANGE(0xd400, 0xd7ff) AM_READ(omegaf_bg1_videoram_r)

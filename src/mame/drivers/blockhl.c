@@ -45,7 +45,7 @@ static INTERRUPT_GEN( blockhl_interrupt )
 static READ8_HANDLER( bankedram_r )
 {
 	if (palette_selected)
-		return paletteram_r(offset);
+		return paletteram[offset];
 	else
 		return ram[offset];
 }

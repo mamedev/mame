@@ -96,7 +96,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( paradise_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(paletteram_r			)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM			)	// Palette
 	AM_RANGE(0x2010, 0x2010) AM_READ(OKIM6295_status_0_r	)	// OKI 0
 	AM_RANGE(0x2030, 0x2030) AM_READ(OKIM6295_status_1_r	)	// OKI 1
 	AM_RANGE(0x2020, 0x2020) AM_READ(input_port_0_r		)	// DSW 1

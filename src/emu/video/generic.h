@@ -139,14 +139,7 @@ PALETTE_INIT( RRRR_GGGG_BBBB );
 
 
 
-/* ----- generic palette RAM read/write handlers ----- */
-
-/* read handlers */
-READ8_HANDLER( paletteram_r );
-READ8_HANDLER( paletteram_2_r );
-READ16_HANDLER( paletteram16_word_r );
-READ16_HANDLER( paletteram16_2_word_r );
-READ32_HANDLER( paletteram32_r );
+/* ----- generic palette RAM write handlers, use MRAx_RAM to read ----- */
 
 /* 3-3-2 RGB palette write handlers */
 WRITE8_HANDLER( paletteram_BBGGGRRR_w );

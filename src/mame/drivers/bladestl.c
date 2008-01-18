@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( bladestl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x245f) AM_READ(paletteram_r)		/* Palette */
+	AM_RANGE(0x2400, 0x245f) AM_READ(MRA8_RAM)			/* Palette */
 	AM_RANGE(0x2e01, 0x2e01) AM_READ(input_port_3_r)		/* 1P controls */
 	AM_RANGE(0x2e02, 0x2e02) AM_READ(input_port_4_r)		/* 2P controls */
 	AM_RANGE(0x2e03, 0x2e03) AM_READ(input_port_1_r)		/* DISPW #2 */

@@ -45,7 +45,7 @@ static UINT8 *ram,*pmcram;
 static READ8_HANDLER( scontra_bankedram_r )
 {
 	if (palette_selected)
-		return paletteram_r(offset);
+		return paletteram[offset];
 	else
 		return ram[offset];
 }
@@ -76,7 +76,7 @@ static READ8_HANDLER( thunderx_bankedram_r )
 		}
 	}
 	else
-		return paletteram_r(offset);
+		return paletteram[offset];
 }
 
 static WRITE8_HANDLER( thunderx_bankedram_w )

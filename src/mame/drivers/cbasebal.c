@@ -55,7 +55,7 @@ static READ8_HANDLER( bankedram_r )
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
-			return paletteram_r(offset);
+			return paletteram[offset];
 		else return 0;
 	}
 	else

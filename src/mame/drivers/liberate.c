@@ -88,7 +88,7 @@ static READ8_HANDLER( deco16_io_r )
  *************************************/
 
 static ADDRESS_MAP_START( prosport_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x021f) AM_READ(paletteram_r)
+	AM_RANGE(0x0200, 0x021f) AM_READ(MRA8_RAM)
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x8000, 0x800f) AM_READ(deco16_io_r)

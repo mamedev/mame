@@ -453,7 +453,7 @@ static WRITE8_HANDLER( topspeed_msm5205_stop_w )
 static ADDRESS_MAP_START( topspeed_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(sharedram_r)	// all shared ??
-	AM_RANGE(0x500000, 0x503fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x500000, 0x503fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(MRA16_NOP)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0x800000, 0x8003ff) AM_READ(MRA16_RAM)	/* raster line color control */

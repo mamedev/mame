@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( gcpinbal_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA16_ROM)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READ(gcpinbal_tilemaps_word_r)
 	AM_RANGE(0xc80000, 0xc80fff) AM_READ(MRA16_RAM)	/* sprite ram */
-	AM_RANGE(0xd00000, 0xd00fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0xd00000, 0xd00fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd80000, 0xd800ff) AM_READ(ioc_r)
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)	/* RAM */
 ADDRESS_MAP_END

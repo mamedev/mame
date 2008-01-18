@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd406, 0xd406) AM_READ(input_port_2_r)
 	AM_RANGE(0xd407, 0xd407) AM_READ(input_port_3_r)
 
-	AM_RANGE(0xd800, 0xdbff) AM_READ(paletteram_r)
+	AM_RANGE(0xd800, 0xdbff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xe000, 0xe3ff) AM_READ(MRA8_RAM) /* text */
 
 	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK1)

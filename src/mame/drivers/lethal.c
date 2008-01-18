@@ -281,7 +281,7 @@ static READ8_HANDLER( le_4800_r )
 {
 	if (cur_control2 & 0x10)	// RAM enable
 	{
-		return paletteram_r(offset);
+		return paletteram[offset];
 	}
 	else
 	{

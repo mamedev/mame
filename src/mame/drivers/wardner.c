@@ -159,7 +159,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		else {
 			memory_set_bankptr(1,&RAM[0x0000]);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xadff, 0, 0, paletteram_r);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xadff, 0, 0, MRA8_RAM);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xae00, 0xafff, 0, 0, MRA8_BANK2);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0, MRA8_BANK3);
 			memory_set_bankptr(2, rambase_ae00);

@@ -665,7 +665,7 @@ static ADDRESS_MAP_START( wgp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x501fff) AM_READ(MRA16_RAM)	/* unknown/unused */
 	AM_RANGE(0x502000, 0x517fff) AM_READ(wgp_pivram_word_r)	/* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_READ(wgp_piv_ctrl_word_r)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wgp_writemem, ADDRESS_SPACE_PROGRAM, 16 )

@@ -229,8 +229,8 @@ WRITE8_HANDLER( pang_paletteram_w )
 
 READ8_HANDLER( pang_paletteram_r )
 {
-	if (paletteram_bank) return paletteram_r(offset + 0x800);
-	return paletteram_r(offset);
+	if (paletteram_bank) return paletteram[offset + 0x800];
+	return paletteram[offset];
 }
 
 WRITE8_HANDLER( mgakuen_paletteram_w )
@@ -240,7 +240,7 @@ WRITE8_HANDLER( mgakuen_paletteram_w )
 
 READ8_HANDLER( mgakuen_paletteram_r )
 {
-	return paletteram_r(offset);
+	return paletteram[offset];
 }
 
 

@@ -491,7 +491,7 @@ static void crimfght_banking( int lines )
 
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20){
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, paletteram_r);							/* palette */
+		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, MRA8_RAM);							/* palette */
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);	/* palette */
 	}
 	else{

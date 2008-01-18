@@ -44,7 +44,7 @@ static READ8_HANDLER( spy_bankedram1_r )
 {
 	if (rambank & 1)
 	{
-		return paletteram_r(offset);
+		return paletteram[offset];
 	}
 	else if (rambank & 2)
 	{

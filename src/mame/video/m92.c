@@ -129,7 +129,7 @@ WRITE16_HANDLER( m92_videocontrol_w )
 
 READ16_HANDLER( m92_paletteram_r )
 {
-	return paletteram16_word_r(offset + 0x400 * m92_palette_bank, mem_mask);
+	return paletteram16[offset + 0x400 * m92_palette_bank];
 }
 
 WRITE16_HANDLER( m92_paletteram_w )

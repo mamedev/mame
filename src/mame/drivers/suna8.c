@@ -811,7 +811,7 @@ static ADDRESS_MAP_START( hardhea2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r					)	// DSW 1
 	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r					)	// DSW 2
 	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_4_r					)	// vblank?
-	AM_RANGE(0xc600, 0xc7ff) AM_READ(paletteram_r					)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_READ(MRA8_RAM						)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_READ(MRA8_BANK2						)	// RAM (Banked?)
 	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r		)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -971,7 +971,7 @@ static ADDRESS_MAP_START( sparkman_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r			)	// DSW 2
 	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_4_r			)	// Buttons
 	AM_RANGE(0xc0a3, 0xc0a3) AM_READ(sparkman_c0a3_r			)	// ???
-	AM_RANGE(0xc600, 0xc7ff) AM_READ(paletteram_r				)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_READ(MRA8_RAM					)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_READ(MRA8_RAM					)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READ(suna8_banked_spriteram_r	)	// Sprites (Banked)
 ADDRESS_MAP_END

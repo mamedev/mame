@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( volfied_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_READ(MRA16_RAM)    /* main    */
 	AM_RANGE(0x200000, 0x203fff) AM_READ(PC090OJ_word_0_r)
 	AM_RANGE(0x400000, 0x47ffff) AM_READ(volfied_video_ram_r)
-	AM_RANGE(0x500000, 0x503fff) AM_READ(paletteram16_word_r)
+	AM_RANGE(0x500000, 0x503fff) AM_READ(MRA16_RAM)
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(volfied_video_ctrl_r)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ(taitosound_comm16_lsb_r)
 	AM_RANGE(0xf00000, 0xf007ff) AM_READ(volfied_cchip_ram_r)

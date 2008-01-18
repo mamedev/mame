@@ -588,51 +588,6 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 
 
 /***************************************************************************
-    GENERIC PALETTE READ HANDLERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    8-bit read handlers
--------------------------------------------------*/
-
-READ8_HANDLER( paletteram_r )
-{
-	return paletteram[offset];
-}
-
-READ8_HANDLER( paletteram_2_r )
-{
-	return paletteram_2[offset];
-}
-
-
-/*-------------------------------------------------
-    16-bit read handlers
--------------------------------------------------*/
-
-READ16_HANDLER( paletteram16_word_r )
-{
-	return paletteram16[offset];
-}
-
-READ16_HANDLER( paletteram16_2_word_r )
-{
-	return paletteram16_2[offset];
-}
-
-
-/*-------------------------------------------------
-    32-bit read handlers
--------------------------------------------------*/
-
-READ32_HANDLER( paletteram32_r )
-{
-	return paletteram32[offset];
-}
-
-
-
-/***************************************************************************
     3-3-2 RGB PALETTE WRITE HANDLERS
 ***************************************************************************/
 

@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( cobra_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_READ(dec8_pf0_data_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(dec8_pf1_data_r)
 	AM_RANGE(0x1800, 0x2fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x31ff) AM_READ(paletteram_r)
+	AM_RANGE(0x3000, 0x31ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r) /* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_1_r) /* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ(input_port_3_r) /* Dip 1 */
@@ -636,8 +636,8 @@ static ADDRESS_MAP_START( gondo_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(paletteram_r)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x2800, 0x2bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM)          /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_7_r)   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_8_r)   /* Dip 2 */
@@ -672,7 +672,7 @@ static ADDRESS_MAP_START( oscar_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2800, 0x2fff) AM_READ(dec8_pf0_data_r)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM) /* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_READ(paletteram_r)
+	AM_RANGE(0x3800, 0x3bff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3c00, 0x3c00) AM_READ(input_port_0_r)
 	AM_RANGE(0x3c01, 0x3c01) AM_READ(input_port_1_r)
 	AM_RANGE(0x3c02, 0x3c02) AM_READ(input_port_2_r) /* VBL & coins */
@@ -716,8 +716,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -735,8 +735,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -754,8 +754,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -769,8 +769,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmiss_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -784,8 +784,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -801,8 +801,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -819,8 +819,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ(input_port_2_r)
@@ -837,8 +837,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -856,8 +856,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_0_r)
 	AM_RANGE(0x1803, 0x1803) AM_READ(input_port_2_r)
@@ -875,8 +875,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3) AM_BASE(&paletteram)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4) AM_BASE(&paletteram_2)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
@@ -893,8 +893,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(paletteram_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(4)
 	AM_RANGE(0x1803, 0x1803) AM_READ(input_port_2_r)
 	AM_RANGE(0x1804, 0x1804) AM_READ(input_port_4_r)
 	AM_RANGE(0x1805, 0x1805) AM_READ(input_port_3_r)
@@ -907,8 +907,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE(3)
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE(4)
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
@@ -923,8 +923,8 @@ static ADDRESS_MAP_START( garyoret_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(dec8_pf0_data_r)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(paletteram_r)
-	AM_RANGE(0x2c00, 0x2fff) AM_READ(paletteram_2_r)
+	AM_RANGE(0x2800, 0x2bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM)          /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_3_r)   /* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ(input_port_4_r)   /* Dip 2 */
