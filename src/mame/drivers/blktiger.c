@@ -53,48 +53,35 @@ static WRITE8_HANDLER( blktiger_bankswitch_w )
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
-	coin_lockout_w(0,~data & 0x01);
-	coin_lockout_w(1,~data & 0x02);
+	if (readinputportbytag("COIN_LOCKOUT") & 0x01)
+	{
+		coin_lockout_w(0,~data & 0x01);
+		coin_lockout_w(1,~data & 0x02);
+	}
 }
 
 
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(blktiger_bgvideoram_r)
-	AM_RANGE(0xd000, 0xffff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK1, MWA8_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(MRA8_RAM, blktiger_txvideoram_w) AM_BASE(&blktiger_txvideoram)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(blktiger_txvideoram_w) AM_BASE(&blktiger_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0xe000, 0xfdff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xfe00, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r)
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_5_r)
-	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(blktiger_bankswitch_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP) /* Software protection (7) */
+	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITE(MWA8_NOP) /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
@@ -102,30 +89,19 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0xe003, 0xe003) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0xe002, 0xe002) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
+	AM_RANGE(0xe003, 0xe003) AM_READWRITE(YM2203_read_port_1_r, YM2203_write_port_1_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2203_write_port_1_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( blktiger )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
@@ -135,7 +111,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
@@ -145,7 +121,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")	/* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
@@ -155,8 +131,8 @@ static INPUT_PORTS_START( blktiger )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW0")	/* DSW0 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )		PORT_DIPLOCATION( "SW1:1,2,3" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -165,7 +141,7 @@ static INPUT_PORTS_START( blktiger )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )		PORT_DIPLOCATION( "SW1:4,5,6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
@@ -174,18 +150,20 @@ static INPUT_PORTS_START( blktiger )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION( "SW1:7" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) )			PORT_DIPLOCATION( "SW1:8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* DSW1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_START_TAG("DSW1")      /* DSW1 */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION( "SW2:1,2" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7")
-	PORT_DIPNAME( 0x1c, 0x0c, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1c, 0x0c, DEF_STR( Difficulty ) )	PORT_DIPLOCATION( "SW2:3,4,5" )
 	PORT_DIPSETTING(    0x1c, "1 (Easiest)")
 	PORT_DIPSETTING(    0x18, "2" )
 	PORT_DIPSETTING(    0x14, "3" )
@@ -194,20 +172,25 @@ static INPUT_PORTS_START( blktiger )
 	PORT_DIPSETTING(    0x08, "6" )
 	PORT_DIPSETTING(    0x04, "7" )
 	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION( "SW2:6" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION( "SW2:7" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION( "SW2:8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
-	PORT_START
+	PORT_START_TAG("FREEZE")
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )	/* could be VBLANK */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("COIN_LOCKOUT")
+	PORT_CONFNAME( 0x01, 0x01, "Coin Lockout Hardware Present" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Yes ) )
+	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
 INPUT_PORTS_END
 
 
@@ -269,13 +252,13 @@ static MACHINE_DRIVER_START( blktiger )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
+	MDRV_CPU_IO_MAP(port_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_mem_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
