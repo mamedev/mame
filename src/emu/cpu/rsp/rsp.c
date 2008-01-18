@@ -345,7 +345,7 @@ static const int vector_elements_2[16][8] =
 
 static void rsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-    // int regIdx;
+    int regIdx;
     int accumIdx;
 	config = (rsp_config *)_config;
 
@@ -355,8 +355,8 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
 
 	rsp.irq_callback = irqcallback;
 
-#if 0
-    // Do not enable!  RSP registers are in a *random* state at powerup...
+#if 1
+    // Inaccurate.  RSP registers power on to a random state...
 	for(regIdx = 0; regIdx < 32; regIdx++ )
 	{
 		rsp.r[regIdx] = 0;
@@ -374,6 +374,8 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
 #endif
 
     // ...except for the accumulators.
+    // We're not calling mame_rand() because initializing something with mame_rand()
+    //   makes me retch uncontrollably.
     for(accumIdx = 0; accumIdx < 8; accumIdx++ )
     {
         rsp.accum[accumIdx] = 0;
@@ -2888,7 +2890,8 @@ static void rsp_set_info(UINT32 state, cpuinfo *info)
             rsp.sr = info->i;
             if( info->i & RSP_STATUS_SSTEP )
             {
-                rsp.step_count = 1;
+                // Heaven help me for putting this check here, but it's accurate to the hardware.
+                rsp.step_count = ( cpu_getactivecpu() == 0 ) ? 1 : 0;
             }
             break;
         case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp.nextpc = info->i;        break;
