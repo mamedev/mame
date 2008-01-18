@@ -395,7 +395,6 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 
 static const struct TMS5110interface ad2083_tms5110_interface =
 {
-	TMS5110_IS_5110A,
 	-1,							/* rom_region */
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };
@@ -455,7 +454,7 @@ MACHINE_DRIVER_START( ad2083_audio )
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MDRV_SOUND_ADD(TMS5110, AD2083_TMS5110_CLOCK)
+	MDRV_SOUND_ADD(TMS5110A, AD2083_TMS5110_CLOCK)
 	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

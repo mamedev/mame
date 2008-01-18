@@ -107,7 +107,13 @@ void namco_63701x_get_info(void *token, UINT32 state, sndinfo *info);
 void namcona_get_info(void *token, UINT32 state, sndinfo *info);
 void tms36xx_get_info(void *token, UINT32 state, sndinfo *info);
 void tms3615_get_info(void *token, UINT32 state, sndinfo *info);
+void tms5100_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5110_get_info(void *token, UINT32 state, sndinfo *info);
+void tms5110a_get_info(void *token, UINT32 state, sndinfo *info);
+void cd2801_get_info(void *token, UINT32 state, sndinfo *info);
+void tmc0281_get_info(void *token, UINT32 state, sndinfo *info);
+void cd2802_get_info(void *token, UINT32 state, sndinfo *info);
+void m58817_get_info(void *token, UINT32 state, sndinfo *info);
 void tmc0285_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5200_get_info(void *token, UINT32 state, sndinfo *info);
 void tms5220_get_info(void *token, UINT32 state, sndinfo *info);
@@ -286,11 +292,26 @@ static const struct
 #if (HAS_TMS3615)
 	{ SOUND_TMS3615, tms3615_get_info },
 #endif
+#if (HAS_TMS5100)
+	{ SOUND_TMS5100, tms5100_get_info },
+#endif
 #if (HAS_TMS5110)
 	{ SOUND_TMS5110, tms5110_get_info },
 #endif
-#if (HAS_TMC0285)
-	{ SOUND_TMC0285, tmc0285_get_info },
+#if (HAS_TMS5110A)
+	{ SOUND_TMS5110A, tms5110a_get_info },
+#endif
+#if (HAS_CD2801)
+	{ SOUND_CD2801, cd2801_get_info },
+#endif
+#if (HAS_TMC0281)
+	{ SOUND_TMC0281, tmc0281_get_info },
+#endif
+#if (HAS_CD2802)
+	{ SOUND_CD2802, cd2802_get_info },
+#endif
+#if (HAS_M58817)
+	{ SOUND_M58817, m58817_get_info },
 #endif
 #if (HAS_TMS5200)
 	{ SOUND_TMS5200, tms5200_get_info },

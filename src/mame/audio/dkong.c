@@ -1273,7 +1273,6 @@ static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
 static struct TMS5110interface tms5110_interface =
 {
-	TMS5110_IS_M58817,
 	REGION_SOUND1,		/* Sample Rom */
 	NULL,
 	NULL
@@ -1317,7 +1316,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
-	MDRV_SOUND_ADD(TMS5110, XTAL_640kHz)
+	MDRV_SOUND_ADD(M58817, XTAL_640kHz)
 	MDRV_SOUND_CONFIG(tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

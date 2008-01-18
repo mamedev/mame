@@ -85,7 +85,11 @@ struct tms5100_coeffs
 struct tms5110
 {
 	/* coefficient tables */
+	int variant;				/* Variant of the 5110 - see tms5110.h */
+
+	/* coefficient tables */
 	const struct tms5100_coeffs *coeff;
+	
 	/* these contain data that describes the 64 bits FIFO */
 	UINT8 fifo[FIFO_SIZE];
 	UINT8 fifo_head;
@@ -149,13 +153,9 @@ static void parse_frame(struct tms5110 *tms);
 
 #define DEBUG_5110	0
 
-
-void *tms5110_create(int index, int variant)
+void tms5110_set_variant(void *chip, int variant)
 {
-	struct tms5110 *tms;
-
-	tms = malloc_or_die(sizeof(*tms));
-	memset(tms, 0, sizeof(*tms));
+	struct tms5110 *tms = chip;
 
 	switch (variant)
 	{
@@ -172,6 +172,18 @@ void *tms5110_create(int index, int variant)
 			fatalerror("Unknown variant in tms5110_create\n");
 	}
 
+	tms->variant = variant;
+}
+	
+void *tms5110_create(int index, int variant)
+{
+	struct tms5110 *tms;
+
+	tms = malloc_or_die(sizeof(*tms));
+	memset(tms, 0, sizeof(*tms));
+	
+	tms5110_set_variant(tms, variant);
+	
 	state_save_register_item_array("tms5110", index, tms->fifo);
 	state_save_register_item("tms5110", index, tms->fifo_head);
 	state_save_register_item("tms5110", index, tms->fifo_tail);

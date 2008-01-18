@@ -430,8 +430,6 @@ static int speech_rom_read_bit(void)
 
 static const struct TMS5110interface tms5100_interface =
 {
-	//TMS5110_IS_5110A,
-	TMS5110_IS_5100,
 	-1,					 /* ROM region */
 	speech_rom_read_bit, /* M0 callback function. Called whenever chip requests a single bit of data */
 	NULL
@@ -707,7 +705,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD(TMS5110, 640000)
+	MDRV_SOUND_ADD(TMS5100, 640000)
 	MDRV_SOUND_CONFIG(tms5100_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

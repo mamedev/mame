@@ -580,6 +580,13 @@ endif
 # Texas Instruments TMS5110 speech synthesizers
 #-------------------------------------------------
 
+SOUNDDEFS += -DHAS_TMS5100=$(if $(filter TMS5100,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_TMS5110=$(if $(filter TMS5110,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_TMS5110A=$(if $(filter TMS5110A,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_CD2801=$(if $(filter CD2801,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_TMC0281=$(if $(filter TMC0281,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_CD2802=$(if $(filter CD2802,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_M58817=$(if $(filter M58817,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_TMS5110=$(if $(filter TMS5110,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_TMC0285=$(if $(filter TMC0285,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_TMS5200=$(if $(filter TMS5200,$(SOUNDS)),1,0)

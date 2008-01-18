@@ -28,6 +28,8 @@
 void *tms5110_create(int index, int variant);
 void tms5110_destroy(void *chip);
 
+void tms5110_set_variant(void *chip, int variant);
+
 void tms5110_reset_chip(void *chip);
 void tms5110_set_M0_callback(void *chip, int (*func)(void));
 void tms5110_set_load_address(void *chip, void (*func)(int));
