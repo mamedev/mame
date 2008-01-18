@@ -4464,7 +4464,7 @@ static int EditCheatMenu(CheatEntry * entry, int index, int selection)
 				}
 				else
 				{
-					int	code = input_code_poll_keyboard_switches(FALSE);
+					int	code = input_code_poll_switches(FALSE);
 
 					if(code == KEYCODE_ESC)
 					{

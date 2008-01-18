@@ -381,6 +381,7 @@ static void init_cpudata(void);
 static void init_addrspace(UINT8 cpunum, UINT8 spacenum);
 static void preflight_memory(void);
 static void populate_memory(void);
+static void install_mem_handler_private(addrspace_data *space, int iswrite, int databits, int ismatchmask, offs_t start, offs_t end, offs_t mask, offs_t mirror, genf *handler, int isfixed, const char *handler_name);
 static void install_mem_handler(addrspace_data *space, int iswrite, int databits, int ismatchmask, offs_t start, offs_t end, offs_t mask, offs_t mirror, genf *handler, int isfixed, const char *handler_name);
 static genf *assign_dynamic_bank(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mirror, int isfixed, int ismasked);
 static UINT8 get_handler_index(handler_data *table, genf *handler, const char *handler_name, offs_t start, offs_t end, offs_t mask);
@@ -1452,12 +1453,48 @@ static void populate_memory(void)
 							int ismatchmask = ((map->flags & AM_FLAGS_MATCH_MASK) != 0);
 							int isfixed = (map->memory != NULL) || (map->share != 0);
 							if (map->read.handler != NULL)
-								install_mem_handler(space, 0, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->read.handler, isfixed, map->read_name);
+								install_mem_handler_private(space, 0, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->read.handler, isfixed, map->read_name);
 							if (map->write.handler != NULL)
-								install_mem_handler(space, 1, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->write.handler, isfixed, map->write_name);
+								install_mem_handler_private(space, 1, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->write.handler, isfixed, map->write_name);
 						}
 				}
 			}
+}
+
+
+/*-------------------------------------------------
+    install_mem_handler_private - wrapper for
+    install_mem_handler which is used at
+    initialization time and converts RAM/ROM
+    banks to dynamically assigned banks
+-------------------------------------------------*/
+
+static void install_mem_handler_private(addrspace_data *space, int iswrite, int databits, int ismatchmask, offs_t start, offs_t end, offs_t mask, offs_t mirror, genf *handler, int isfixed, const char *handler_name)
+{
+	/* translate ROM to RAM/UNMAP here */
+	if (HANDLER_IS_ROM(handler))
+		handler = iswrite ? (genf *)STATIC_UNMAP : (genf *)MRA8_RAM;
+
+	/* assign banks for RAM/ROM areas */
+	if (HANDLER_IS_RAM(handler))
+	{
+		int ismasked = (mask != 0);
+		offs_t temp_start = start;
+		offs_t temp_end = end;
+		offs_t temp_mask = mask;
+		offs_t temp_mirror = mirror;
+		
+		/* adjust the incoming addresses (temporarily) */
+		adjust_addresses(space, ismatchmask, &temp_start, &temp_end, &temp_mask, &temp_mirror);
+
+		/* assign a bank to the adjusted addresses */
+		handler = (genf *)assign_dynamic_bank(space->cpunum, space->spacenum, temp_start, temp_end, temp_mirror, isfixed, ismasked);
+		if (!bank_ptr[HANDLER_TO_BANK(handler)])
+			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, iswrite, temp_start);
+	}
+	
+	/* then do a normal installation */
+	install_mem_handler(space, iswrite, databits, ismatchmask, start, end, mask, mirror, handler, isfixed, handler_name);
 }
 
 
@@ -1472,10 +1509,11 @@ static void install_mem_handler(addrspace_data *space, int iswrite, int databits
 	table_data *tabledata = iswrite ? &space->write : &space->read;
 	UINT8 idx, prev_entry = STATIC_INVALID;
 	int cur_index, prev_index = 0;
-	int ismasked = (mask != 0);
 	int i;
 
 	/* sanity check */
+	if (HANDLER_IS_ROM(handler) || HANDLER_IS_RAM(handler))
+		fatalerror("fatal: install_mem_handler called with ROM or RAM after initialization");
 	if (space->dbits != databits)
 		fatalerror("fatal: install_mem_handler called with a %d-bit handler for a %d-bit address space", databits, space->dbits);
 	if (start > end)
@@ -1507,22 +1545,6 @@ static void install_mem_handler(addrspace_data *space, int iswrite, int databits
 
 	/* adjust the incoming addresses */
 	adjust_addresses(space, ismatchmask, &start, &end, &mask, &mirror);
-
-	/* sanity check */
-	if (HANDLER_IS_RAM(handler))
-		assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "RAM/ROM memory handlers can only be installed at init time");
-
-	/* translate ROM to RAM/UNMAP here */
-	if (HANDLER_IS_ROM(handler))
-		handler = iswrite ? (genf *)STATIC_UNMAP : (genf *)MRA8_RAM;
-
-	/* assign banks for RAM/ROM areas */
-	if (HANDLER_IS_RAM(handler))
-	{
-		handler = (genf *)assign_dynamic_bank(space->cpunum, space->spacenum, start, end, mirror, isfixed, ismasked);
-		if (!bank_ptr[HANDLER_TO_BANK(handler)])
-			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, iswrite, start);
-	}
 
 	/* if this ended up a bank handler, tag it for reads or writes */
 	if (HANDLER_IS_BANK(handler))
