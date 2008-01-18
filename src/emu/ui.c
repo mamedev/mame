@@ -979,7 +979,7 @@ static int sprintf_warnings(char *buffer)
 		/* add one line per warning flag */
 #ifdef MESS
 		if (Machine->gamedrv->flags & GAME_COMPUTER)
-			bufptr += sprintf(bufptr, "%s\n\n%s\n", ui_getstring(UI_comp1), ui_getstring(UI_comp2));
+			bufptr += sprintf(bufptr, "%s\n\n%s\n", "The emulated system is a computer: ", "The keyboard emulation may not be 100% accurate.");
 #endif
 		if (Machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
 			bufptr += sprintf(bufptr, "The colors aren't 100%% accurate.\n");

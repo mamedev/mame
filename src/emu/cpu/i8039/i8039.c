@@ -619,18 +619,22 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	R.timer = 0;
 }
 
+#if (HAS_I8035)
 static void i8035_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8039_init(index, clock, config, irqcallback);
 	R.ram_mask = 0x3F;
 	R.int_rom_size = 0x400;
 }
+#endif /* HAS_I8035 */
 
+#if (HAS_M58715)
 static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8039_init(index, clock, config, irqcallback);
 	R.cpu_feature = FEATURE_M58715;
 }
+#endif /* HAS_M58715 */
 
 /****************************************************************************
  * Reset registers to their initial values
