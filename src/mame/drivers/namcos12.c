@@ -979,21 +979,7 @@ static READ16_HANDLER( sharedram_sub_r )
 	return shared16[BYTE_XOR_LE(offset)];
 }
 
-static UINT32 m_n_bankoffset, m_n_bankoffseth;
-
-// called after a state load to properly set things up again
-static void s12_resetbank(void)
-{
-	if( strcmp( Machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "g13knd" ) == 0 )
-	{
-		memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ((m_n_bankoffseth << 23) | (m_n_bankoffset << 21)) );
-	}
-	else
-	{
-		memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ( m_n_bankoffset * 0x200000 ) );
-	}
-}
+static UINT32 m_n_bankoffset;
 
 static WRITE32_HANDLER( bankoffset_w )
 {
@@ -1001,14 +987,13 @@ static WRITE32_HANDLER( bankoffset_w )
 	if( strcmp( Machine->gamedrv->name, "golgo13" ) == 0 ||
 		strcmp( Machine->gamedrv->name, "g13knd" ) == 0 )
 	{
-		if (data & 8)
+		if( ( data & 8 ) != 0 )
 		{
-			m_n_bankoffseth = data & 0x6;
-			m_n_bankoffset = 0;
+			m_n_bankoffset = ( data & 0x6 ) << 2;
 		}
 		else
 		{
-			m_n_bankoffset = data & 0x7;
+			m_n_bankoffset = ( m_n_bankoffset & ~0x7 ) | ( data & 0x7 );
 		}
 	}
 	else
@@ -1016,7 +1001,7 @@ static WRITE32_HANDLER( bankoffset_w )
 		m_n_bankoffset = data;
 	}
 
-	s12_resetbank();
+	memory_set_bank( 1, m_n_bankoffset );
 
 	verboselog( 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1181,15 +1166,6 @@ static void system11gun_install( void )
 {
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
-}
-
-static MACHINE_START( namcos12 )
-{
-	state_save_register_global( m_n_dmaoffset );
-	state_save_register_global( m_n_dmabias );
-	state_save_register_global( m_n_bankoffset );
-	state_save_register_global( m_n_bankoffseth );
-	state_save_register_func_postload( s12_resetbank );
 }
 
 static UINT8 kcram[ 12 ];
@@ -1404,8 +1380,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
  *
  * Note: The H8/3002's ADC is 10 bits wide, but
  * it expects the 10-bit value to be left-justified
- * within the 16-bit word.  Hence the odd shifting
- * here.
+ * within the 16-bit word.
  */
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
@@ -1413,14 +1388,14 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 	int index = port_tag_to_index("IN3");
 	if( index != -1 )
 	{
-		int rv = readinputport( index );
+		int rv = readinputport( index ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
-			return ( rv & 0x3 ) << 6;
+			return rv;
 		}
 
-		return ( rv & 0x3fc ) >> 2;
+		return rv >> 8;
 	}
 
 	// if game has no lightgun ports, return 0
@@ -1432,14 +1407,14 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 	int index = port_tag_to_index("IN4");
 	if( index != -1 )
 	{
-		int rv = readinputport( index );
+		int rv = readinputport( index ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
-			return ( rv & 0x3 ) << 6;
+			return rv;
 		}
 
-		return ( rv & 0x3fc ) >> 2;
+		return rv >> 8;
 	}
 
 	// if game has no lightgun ports, return 0
@@ -1470,6 +1445,14 @@ static DRIVER_INIT( namcos12 )
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
 	at28c16_init( 0, NULL, NULL );
+
+	memory_configure_bank( 1, 0, memory_region_length( REGION_USER2 ) / 0x200000, memory_region( REGION_USER2 ), 0x200000 );
+	m_n_bankoffset = 0;
+	memory_set_bank( 1, 0 );
+
+	state_save_register_global( m_n_dmaoffset );
+	state_save_register_global( m_n_dmabias );
+	state_save_register_global( m_n_bankoffset );
 }
 
 static DRIVER_INIT( ptblank2 )
@@ -1489,11 +1472,6 @@ static DRIVER_INIT( ghlpanic )
 	system11gun_install();
 }
 
-static DRIVER_INIT( golgo13 )
-{
-	driver_init_namcos12(machine);
-}
-
 static MACHINE_DRIVER_START( coh700 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( PSXCPU, XTAL_100MHz )
@@ -1508,7 +1486,6 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
-	MDRV_MACHINE_START( namcos12 )
 	MDRV_MACHINE_RESET( namcos12 )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
 
@@ -2390,7 +2367,6 @@ GAME( 1998, soulclbc,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1998, soulclbd,  soulclbr, coh700,   namcos12, namcos12, ROT0, "Namco",         "Soul Calibur (SOC11/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) /* KC020 */
 GAME( 1998, ehrgeiz,   0,        coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG3/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
 GAME( 1998, ehrgeiza,  ehrgeiz,  coh700,   namcos12, namcos12, ROT0, "Square/Namco",  "Ehrgeiz (EG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC021 */
-GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Kaiun Quiz (KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1998, mdhorse,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Derby Quiz My Dream Horse (MDH1/VER.A2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC035 */
 GAME( 1998, sws98,     0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium '98 (SS81/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC0?? */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12, namcos12, ROT90, "Namco",        "Tenkomori Shooting (TKM2/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC036 */
@@ -2406,10 +2382,10 @@ GAME( 1999, tektagtc,  tektagt,  coh700,   namcos12, namcos12, ROT0, "Namco",   
 GAME( 1999, ghlpanic,  0,        coh700,   ghlpanic, ghlpanic, ROT0, "Namco",         "Ghoul Panic (OB2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC045 */
 GAME( 1999, pacapp2,   0,        coh700,   namcos12, namcos12, ROT0, "Produce/Namco", "Paca Paca Passion 2 (PKS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC046 */
 GAME( 1999, mrdrillr,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Mr Driller (DRI1/VER.A2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC048 */
+GAME( 1999, kaiunqz,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Kaiun Quiz (KW1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC050 */
 GAME( 1999, pacappsp,  0,        coh700,   namcos12, namcos12, ROT0, "Produce/Namco", "Paca Paca Passion Special (PSP1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC052 */
 GAME( 1999, aquarush,  0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Aqua Rush (AQ1/VER.A1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC053 */
-GAME( 1999, golgo13,   0,        coh700,   golgo13,  golgo13,  ROT0, "Raizing/Namco", "Golgo 13 (GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
-GAME( 1999, g13knd,    0,        coh700,   golgo13,  golgo13,  ROT0, "Raizing/Namco", "Golgo 13 Kiseki no Dandou (GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
+GAME( 1999, golgo13,   0,        coh700,   golgo13,  namcos12, ROT0, "Raizing/Namco", "Golgo 13 (GLG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC054 */
+GAME( 1999, g13knd,    0,        coh700,   golgo13,  namcos12, ROT0, "Raizing/Namco", "Golgo 13 Kiseki no Dandou (GLS1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium 2000 (SS01/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC055 */
 GAME( 2001, sws2001,   sws2000,  coh700,   namcos12, namcos12, ROT0, "Namco",         "Super World Stadium 2001 (SS11/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC061 */
-
