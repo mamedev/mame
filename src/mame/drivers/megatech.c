@@ -286,7 +286,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
 			memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
@@ -353,7 +353,7 @@ static void megatech_set_genz80_as_sms_standard_map(void)
 	/* fixed rom bank area */
 	sms_rom = auto_malloc(0x400000);
 	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK5);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_ROM);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MWA8_UNMAP);
 	memory_set_bankptr( 5, sms_rom );
 
 	memcpy(sms_rom, memory_region(REGION_CPU1), 0x400000);
