@@ -23,38 +23,65 @@ WRITE8_HANDLER( atarifb_out1_w )
 	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
 	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
 	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+}
 
-	if (GAME_IS_SOCCER)
+
+WRITE8_HANDLER( atarifb4_out1_w )
+{
+	CTRLD = data;
+
+	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+
+	coin_counter_w (1, data & 0x80);
+}
+
+
+WRITE8_HANDLER( abaseb_out1_w )
+{
+	CTRLD = data;
+
+	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+
+	if (data & 0x80)
 	{
-		/* bit 0 = whistle */
-		/* bit 1 = hit */
-		/* bit 2 = kicker */
-		/* bit 3 = unused */
-		/* bit 4 = 2/4 Player LED */	// Say what?
-		/* bit 5-6 = trackball CTRL bits */
-		/* bit 7 = Rule LED */
-//      set_led_status(0,data & 0x10);  // !!!!!!!!!! Is this correct????
-		set_led_status(1,data & 0x80);
+		/* Invert video */
+		palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
-
-	if (GAME_IS_FOOTBALL4)
-		coin_counter_w (1, data & 0x80);
-
-	if (GAME_IS_BASEBALL)
+	else
 	{
-		if (data & 0x80)
-		{
-			/* Invert video */
-			palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-			palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-		}
-		else
-		{
-			/* Regular video */
-			palette_set_color(Machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-			palette_set_color(Machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
-		}
+		/* Regular video */
+		palette_set_color(Machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(Machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
+}
+
+
+WRITE8_HANDLER( soccer_out1_w )
+{
+	CTRLD = data;
+
+	/* bit 0 = whistle */
+	/* bit 1 = hit */
+	/* bit 2 = kicker */
+	/* bit 3 = unused */
+	/* bit 4 = 2/4 Player LED */	// Say what?
+	/* bit 5-6 = trackball CTRL bits */
+	/* bit 7 = Rule LED */
+
+	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+
+//  set_led_status(0,data & 0x10);  // !!!!!!!!!! Is this correct????
+	set_led_status(1,data & 0x80);
 }
 
 
@@ -63,13 +90,18 @@ WRITE8_HANDLER( atarifb_out2_w )
 	discrete_sound_w(ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
-
-	if (GAME_IS_SOCCER)
-	{
-		coin_counter_w (1, data & 0x20);
-		coin_counter_w (2, data & 0x40);
-	}
 }
+
+
+WRITE8_HANDLER( soccer_out2_w )
+{
+	discrete_sound_w(ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+
+	coin_counter_w (0, data & 0x10);
+	coin_counter_w (1, data & 0x20);
+	coin_counter_w (2, data & 0x40);
+}
+
 
 
 /*************************************

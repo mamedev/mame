@@ -111,9 +111,6 @@
 #include "abaseb.lh"
 
 
-int atarifb_game;
-
-
 
 /*************************************
  *
@@ -153,10 +150,10 @@ static PALETTE_INIT( atarifb )
 static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_alphap1_vram) AM_SIZE(&atarifb_alphap1_vram_size)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_alphap2_vram) AM_SIZE(&atarifb_alphap2_vram_size)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
@@ -171,17 +168,60 @@ static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0260, 0x039f) AM_RAM
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
+	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
+	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
+	AM_RANGE(0x3000, 0x3000) AM_READ(MRA8_RAM)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb4_in0_r)
+	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)
+	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb4_in2_r)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0260, 0x039f) AM_RAM
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
+	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
+	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
+	AM_RANGE(0x3000, 0x3000) AM_READ(MRA8_RAM)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
+	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_alphap1_vram) AM_SIZE(&atarifb_alphap1_vram_size)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_alphap2_vram) AM_SIZE(&atarifb_alphap2_vram_size)
-	AM_RANGE(0x0800, 0x0bbf) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x0800, 0x0bbf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
-	AM_RANGE(0x1002, 0x1002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
+	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
 	AM_RANGE(0x1004, 0x1004) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
 	AM_RANGE(0x1005, 0x1005) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(atarifb4_in0_r)
@@ -485,7 +525,7 @@ static const gfx_layout spritelayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8
 };
 
@@ -498,7 +538,7 @@ static const gfx_layout spritemasklayout =
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8
 };
 
@@ -543,7 +583,7 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_PALETTE_LENGTH(12)
 
 	MDRV_PALETTE_INIT(atarifb)
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(atarifb)
 	MDRV_VIDEO_UPDATE(atarifb)
 
 	/* sound hardware */
@@ -555,10 +595,23 @@ static MACHINE_DRIVER_START( atarifb )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( atarifb4 )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(atarifb)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(atarifb4_map,0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( abaseb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
+	MDRV_CPU_PROGRAM_MAP(abaseb_map,0)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(abaseb)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
@@ -577,6 +630,7 @@ static MACHINE_DRIVER_START( soccer )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(soccer)
+	MDRV_VIDEO_UPDATE(soccer)
 MACHINE_DRIVER_END
 
 
@@ -729,44 +783,6 @@ ROM_START( soccer )
 ROM_END
 
 
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-static DRIVER_INIT( atarifb )
-{
-	/* Tell the video code to draw the plays for this version */
-	atarifb_game = 1;
-}
-
-
-static DRIVER_INIT( atarifb4 )
-{
-	/* Tell the video code to draw the plays for this version */
-	atarifb_game = 2;
-
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4000, 0, 0, atarifb4_in0_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4001, 0x4001, 0, 0, input_port_1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4002, 0x4002, 0, 0, atarifb4_in2_r);
-}
-
-
-static DRIVER_INIT( abaseb )
-{
-	/* Tell the video code to draw the plays for this version */
-	atarifb_game = 3;
-}
-
-
-static DRIVER_INIT( soccer )
-{
-	/* Tell the video code to draw the plays for this version */
-	atarifb_game = 4;
-}
-
-
 
 /*************************************
  *
@@ -774,10 +790,10 @@ static DRIVER_INIT( soccer )
  *
  *************************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT      MONITOR  */
-GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 2)", 0, layout_atarifb )
-GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  atarifb,  ROT0, "Atari", "Atari Football (revision 1)", 0, layout_atarifb )
-GAMEL( 1979, atarifb4, atarifb, atarifb,  atarifb4, atarifb4, ROT0, "Atari", "Atari Football (4 players)", 0, layout_atarifb4 )
-GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 1)", 0, layout_abaseb )
-GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   abaseb,   ROT0, "Atari", "Atari Baseball (set 2)", 0, layout_abaseb )
-GAME ( 1980, soccer,   0,       soccer,   soccer,   soccer,   ROT0, "Atari", "Atari Soccer", 0 )
+/*     YEAR  NAME      PARENT   MACHINE   INPUT */
+GAMEL( 1978, atarifb,  0,       atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 2)", 0, layout_atarifb )
+GAMEL( 1978, atarifb1, atarifb, atarifb,  atarifb,  0, ROT0, "Atari", "Atari Football (revision 1)", 0, layout_atarifb )
+GAMEL( 1979, atarifb4, atarifb, atarifb4, atarifb4, 0, ROT0, "Atari", "Atari Football (4 players)", 0, layout_atarifb4 )
+GAMEL( 1979, abaseb,   0,       abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 1)", 0, layout_abaseb )
+GAMEL( 1979, abaseb2,  abaseb,  abaseb,   abaseb,   0, ROT0, "Atari", "Atari Baseball (set 2)", 0, layout_abaseb )
+GAME ( 1980, soccer,   0,       soccer,   soccer,   0, ROT0, "Atari", "Atari Soccer", 0 )
