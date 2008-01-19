@@ -4,17 +4,30 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
+static UINT8 port1,port2;
+
+
+static SOUND_START( irem_audio )
+{
+	state_save_register_global(port1);
+	state_save_register_global(port2);
+}
+
 
 WRITE8_HANDLER( irem_sound_cmd_w )
 {
 	if ((data & 0x80) == 0)
-		soundlatch_w(0,data & 0x7f);
+		soundlatch_w(0, data & 0x7f);
 	else
-		cpunum_set_input_line(1,0,HOLD_LINE);
+		cpunum_set_input_line(1, 0, ASSERT_LINE);
 }
 
 
-static int port1,port2;
+static WRITE8_HANDLER( irem_sound_irq_ack_w )
+{
+	cpunum_set_input_line(1, 0, CLEAR_LINE);
+}
+
 
 static WRITE8_HANDLER( irem_port1_w )
 {
@@ -128,35 +141,27 @@ static const struct MSM5205interface irem_msm5205_interface_2 =
 
 
 
-static ADDRESS_MAP_START( irem_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x4000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( irem_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(MWA8_NOP)    /* IACK */
+static ADDRESS_MAP_START( irem_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0800, 0x0800) AM_WRITENOP
 	AM_RANGE(0x0801, 0x0802) AM_WRITE(irem_adpcm_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(MWA8_NOP)    /* IACK */
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(irem_sound_irq_ack_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( irem_sound_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READ(irem_port1_r)
-	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READ(irem_port2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( irem_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_WRITE(irem_port1_w)
-	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_WRITE(irem_port2_w)
+static ADDRESS_MAP_START( irem_sound_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(irem_port1_r, irem_port1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(irem_port2_r, irem_port2_w)
 ADDRESS_MAP_END
 
 
 MACHINE_DRIVER_START( irem_audio )
 
+	MDRV_SOUND_START(irem_audio)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6803, XTAL_3_579545MHz) /* verified on pcb */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(irem_sound_readmem,irem_sound_writemem)
-	MDRV_CPU_IO_MAP(irem_sound_readport,irem_sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(irem_sound_map,0)
+	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

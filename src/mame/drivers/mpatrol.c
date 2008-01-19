@@ -41,7 +41,12 @@ are supported. What should really be filled in for each mode?
 #include "cpu/z80/z80.h"
 
 
+#define MASTER_CLOCK		XTAL_18_432MHz
+#define SOUND_CLOCK			XTAL_3_579545MHz
 
+
+
+READ8_HANDLER( mpatrol_protection_r );
 WRITE8_HANDLER( mpatrol_scroll_w );
 WRITE8_HANDLER( mpatrol_bg1xpos_w );
 WRITE8_HANDLER( mpatrol_bg1ypos_w );
@@ -58,176 +63,95 @@ VIDEO_UPDATE( mpatrol );
 
 
 
-/* this looks like some kind of protection. The game does strange things */
-/* if a read from this address doesn't return the value it expects. */
-static READ8_HANDLER( mpatrol_protection_r )
+static CUSTOM_INPUT( coin_mode )
 {
-	return activecpu_get_reg(Z80_DE) & 0xff;
-}
-
-
-static READ8_HANDLER( mpatrol_input_port_3_r )
-{
-	int ret = input_port_3_r(0);
-
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_4_r(0) & 0x04)
-	{
-		/* Mode 1 */
-		ret	|= (input_port_5_r(0) << 4);
-	}
-	else
-	{
-		/* Mode 2 */
-		ret	|= (input_port_5_r(0) & 0xf0);
-	}
-
-	return ret;
+	UINT8 port5 = readinputport(5);
+	return (readinputport(4) & 0x04) ? (port5 & 0x0f) : (port5 >> 4);
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(mpatrol_protection_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)          /* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)          /* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)          /* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ(mpatrol_input_port_3_r)  /* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)          /* DSW2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, mpatrol_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, mpatrol_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(mpatrol_protection_r)
+	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_WRITE(irem_sound_cmd_w)
+	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
+	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")
+	AM_RANGE(0xd002, 0xd002) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")
+	AM_RANGE(0xd003, 0xd003) AM_MIRROR(0x07f8) AM_READ_PORT("DSW0")
+	AM_RANGE(0xd004, 0xd004) AM_MIRROR(0x07f8) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mpatrol_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(mpatrol_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xc8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_alpha1v, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x6fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(mpatrol_protection_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)          /* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)          /* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)          /* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ(mpatrol_input_port_3_r)  /* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)          /* DSW2 */
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_alpha1v, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x6fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mpatrol_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(mpatrol_colorram_w) AM_BASE(&colorram)
+static ADDRESS_MAP_START( alpha1v_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x6fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, mpatrol_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, mpatrol_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) AM_SHARE(1) // bigger or mirrored?
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM) // bigger or mirrored?
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_WRITE(irem_sound_cmd_w)
+	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
+	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW0")
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe000, 0xefff) AM_RAM // bigger or mirrored?
 ADDRESS_MAP_END
 
 
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x10, 0x1f) AM_WRITE(mpatrol_scroll_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(mpatrol_bg1xpos_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mpatrol_bg1ypos_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mpatrol_bg2xpos_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(mpatrol_bg2ypos_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(mpatrol_bgcontrol_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(mpatrol_scroll_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg1xpos_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg1ypos_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg2xpos_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg2ypos_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bgcontrol_w)
 ADDRESS_MAP_END
 
-#define MPATROL_COMMON\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )\
-	/* coin input must be active for ? frames to be consistently recognized */\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(17)\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_START_TAG("IN1")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )\
-	PORT_START_TAG("IN2")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )\
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-#define MPATROL_COMMON2\
-	PORT_START_TAG("DSW1")\
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )\
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )\
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )\
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )\
-	PORT_DIPSETTING(    0x04, "Mode 1" )\
-	PORT_DIPSETTING(    0x00, "Mode 2" )\
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )\
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
-	/* In stop mode, press 2 to stop and 1 to restart */\
-	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)")\
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x20, 0x20, "Sector Selection (Cheat)")\
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")\
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )\
-	/* Fake port to support the two different coin modes */\
-	PORT_START_TAG("FAKE")\
-	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Mode 1" )   /* mapped on coin mode 1 */\
-	PORT_DIPSETTING(    0x09, DEF_STR( 7C_1C ) )\
-	PORT_DIPSETTING(    0x0a, DEF_STR( 6C_1C ) )\
-	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )\
-	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )\
-	PORT_DIPSETTING(    0x0d, DEF_STR( 3C_1C ) )\
-	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )\
-	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )\
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )\
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )\
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )\
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )\
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )\
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_7C ) )\
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_8C ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )\
- 	PORT_DIPNAME( 0x30, 0x30, "Coin A  Mode 2" )   /* mapped on coin mode 2 */\
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )\
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )\
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )\
-	PORT_DIPNAME( 0xc0, 0xc0, "Coin B  Mode 2" )\
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )\
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )\
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )\
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mpatrol )
-MPATROL_COMMON
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	/* coin input must be active for ? frames to be consistently recognized */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(17)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )
@@ -240,141 +164,154 @@ MPATROL_COMMON
 	PORT_DIPSETTING(    0x08, "20000 40000 60000" )
 	PORT_DIPSETTING(    0x04, "10000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Gets filled in based on the coin mode */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_mode, NULL)
+		 /* Gets filled in based on the coin mode */
 
-MPATROL_COMMON2
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
+	PORT_DIPSETTING(    0x04, "Mode 1" )
+	PORT_DIPSETTING(    0x00, "Mode 2" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* In stop mode, press 2 to stop and 1 to restart */
+	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Sector Selection (Cheat)")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	
+	/* Fake port to support the two different coin modes */
+	PORT_START_TAG("FAKE")
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Mode 1" )   /* mapped on coin mode 1 */
+	PORT_DIPSETTING(    0x09, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+ 	PORT_DIPNAME( 0x30, 0x30, "Coin A  Mode 2" )   /* mapped on coin mode 2 */
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Coin B  Mode 2" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 INPUT_PORTS_END
 
-/* Identical to mpatrol, the only difference is the number of lives */
-static INPUT_PORTS_START( mpatrolw )
-MPATROL_COMMON
 
-	PORT_START_TAG("DSW0")
+static INPUT_PORTS_START( mpatrolw )
+	PORT_INCLUDE(mpatrol)
+
+	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10000 30000 50000" )
-	PORT_DIPSETTING(    0x08, "20000 40000 60000" )
-	PORT_DIPSETTING(    0x04, "10000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Gets filled in based on the coin mode */
-
-MPATROL_COMMON2
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( alpha1v )
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	/* coin input must be active for ? frames to be consistently recognized */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(17)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(mpatrol)
 
-	PORT_START_TAG("IN1")\
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("IN2")
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START_TAG("DSW0")
+	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "10000 30000 50000" )
-	PORT_DIPSETTING(    0x08, "20000 40000 60000" )
-	PORT_DIPSETTING(    0x04, "10000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )  /* Gets filled in based on the coin mode */
-
-MPATROL_COMMON2
 INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	2,      /* 2 bits per pixel */
-	{ 0, 512*8*8 }, /* the two bitplanes are separated */
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ STEP8(0,1) },
 	{ STEP8(0,8) },
-	8*8     /* every char takes 8 consecutive bytes */
+	8*8
 };
+
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	128,    /* 128 sprites */
-	2,      /* 2 bits per pixel */
-	{ 0, 128*16*16 },       /* the two bitplanes are separated */
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ STEP8(0,1), STEP8(16*8,1) },
 	{ STEP16(0,8) },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8
 };
 
 static const UINT32 bgcharlayout_xoffset[256] =
 {
-	STEP4(0x000,1), STEP4(0x008,1),
-	STEP4(0x010,1), STEP4(0x018,1),
-	STEP4(0x020,1), STEP4(0x028,1),
-	STEP4(0x030,1), STEP4(0x038,1),
-	STEP4(0x040,1), STEP4(0x048,1),
-	STEP4(0x050,1), STEP4(0x058,1),
-	STEP4(0x060,1), STEP4(0x068,1),
-	STEP4(0x070,1), STEP4(0x078,1),
-	STEP4(0x080,1), STEP4(0x088,1),
-	STEP4(0x090,1), STEP4(0x098,1),
-	STEP4(0x0a0,1), STEP4(0x0a8,1),
-	STEP4(0x0b0,1), STEP4(0x0b8,1),
-	STEP4(0x0c0,1), STEP4(0x0c8,1),
-	STEP4(0x0d0,1), STEP4(0x0d8,1),
-	STEP4(0x0e0,1), STEP4(0x0e8,1),
-	STEP4(0x0f0,1), STEP4(0x0f8,1),
-	STEP4(0x100,1), STEP4(0x108,1),
-	STEP4(0x110,1), STEP4(0x118,1),
-	STEP4(0x120,1), STEP4(0x128,1),
-	STEP4(0x130,1), STEP4(0x138,1),
-	STEP4(0x140,1), STEP4(0x148,1),
-	STEP4(0x150,1), STEP4(0x158,1),
-	STEP4(0x160,1), STEP4(0x168,1),
-	STEP4(0x170,1), STEP4(0x178,1),
-	STEP4(0x180,1), STEP4(0x188,1),
-	STEP4(0x190,1), STEP4(0x198,1),
-	STEP4(0x1a0,1), STEP4(0x1a8,1),
-	STEP4(0x1b0,1), STEP4(0x1b8,1),
-	STEP4(0x1c0,1), STEP4(0x1c8,1),
-	STEP4(0x1d0,1), STEP4(0x1d8,1),
-	STEP4(0x1e0,1), STEP4(0x1e8,1),
-	STEP4(0x1f0,1), STEP4(0x1f8,1)
+	STEP4(0x000,1), STEP4(0x008,1), STEP4(0x010,1), STEP4(0x018,1),
+	STEP4(0x020,1), STEP4(0x028,1), STEP4(0x030,1), STEP4(0x038,1),
+	STEP4(0x040,1), STEP4(0x048,1), STEP4(0x050,1), STEP4(0x058,1),
+	STEP4(0x060,1), STEP4(0x068,1), STEP4(0x070,1), STEP4(0x078,1),
+	STEP4(0x080,1), STEP4(0x088,1), STEP4(0x090,1), STEP4(0x098,1),
+	STEP4(0x0a0,1), STEP4(0x0a8,1), STEP4(0x0b0,1), STEP4(0x0b8,1),
+	STEP4(0x0c0,1), STEP4(0x0c8,1), STEP4(0x0d0,1), STEP4(0x0d8,1),
+	STEP4(0x0e0,1), STEP4(0x0e8,1), STEP4(0x0f0,1), STEP4(0x0f8,1),
+	STEP4(0x100,1), STEP4(0x108,1), STEP4(0x110,1), STEP4(0x118,1),
+	STEP4(0x120,1), STEP4(0x128,1), STEP4(0x130,1), STEP4(0x138,1),
+	STEP4(0x140,1), STEP4(0x148,1), STEP4(0x150,1), STEP4(0x158,1),
+	STEP4(0x160,1), STEP4(0x168,1), STEP4(0x170,1), STEP4(0x178,1),
+	STEP4(0x180,1), STEP4(0x188,1), STEP4(0x190,1), STEP4(0x198,1),
+	STEP4(0x1a0,1), STEP4(0x1a8,1), STEP4(0x1b0,1), STEP4(0x1b8,1),
+	STEP4(0x1c0,1), STEP4(0x1c8,1), STEP4(0x1d0,1), STEP4(0x1d8,1),
+	STEP4(0x1e0,1), STEP4(0x1e8,1), STEP4(0x1f0,1), STEP4(0x1f8,1)
 };
 
 static const UINT32 bgcharlayout_yoffset[64] =
 {
-	STEP32(0x0000,0x200),
-	STEP32(0x4000,0x200)
+	STEP32(0x0000,0x200), STEP32(0x4000,0x200)
 };
 
 static const gfx_layout bgcharlayout =
@@ -391,7 +328,6 @@ static const gfx_layout bgcharlayout =
 };
 
 
-
 static GFXDECODE_START( mpatrol )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,                0, 128 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,          128*4,  16 )
@@ -402,27 +338,29 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( mpatrol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)        /* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(0,writeport)
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)	/* accurate frequency, measured on a real board, is 56.75Hz. */)
-				/* the Lode Runner manual (similar but different hardware) */
-				/* talks about 55Hz and 1790ms vblank duration. */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 32*8-1)
 	MDRV_GFXDECODE(mpatrol)
 	MDRV_PALETTE_LENGTH(512+32+32)
 	MDRV_COLORTABLE_LENGTH(128*4+16*4+3*4)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_INIT(mpatrol)
 	MDRV_VIDEO_START(mpatrol)
@@ -434,43 +372,20 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( alpha1v )
+	MDRV_IMPORT_FROM(mpatrol)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)        /* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem_alpha1v,writemem_alpha1v)
-	MDRV_CPU_IO_MAP(0,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)	/* accurate frequency, measured on a real board, is 56.75Hz. */)
-				/* the Lode Runner manual (similar but different hardware) */
-				/* talks about 55Hz and 1790ms vblank duration. */
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 32*8-1)
-//  MDRV_GFXDECODE(alpha1v)
-	MDRV_GFXDECODE(mpatrol)
-	MDRV_PALETTE_LENGTH(512+32+32)
-	MDRV_COLORTABLE_LENGTH(128*4+16*4+3*4)
-
-	MDRV_PALETTE_INIT(mpatrol)
-	MDRV_VIDEO_START(mpatrol)
-	MDRV_VIDEO_UPDATE(mpatrol)
-
-	/* sound hardware */
-	MDRV_IMPORT_FROM(irem_audio)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(alpha1v_map,0)
 MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( mpatrol )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -583,6 +498,12 @@ ROM_END
 
 
 
-GAME( 1982, mpatrol,  0,       mpatrol, mpatrol,  0, ROT0, "Irem", "Moon Patrol", 0 )
-GAME( 1982, mpatrolw, mpatrol, mpatrol, mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", 0 )
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1982, mpatrol,  0,       mpatrol, mpatrol,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol, mpatrol, mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
 GAME( 1988, alpha1v,  0,       alpha1v, alpha1v,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -198,19 +198,18 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( mpatrol )
 {
-	int y;
-
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
-
+	tilemap_set_scrolldx(bg_tilemap, 128 - 1, -1);
+	tilemap_set_scrolldy(bg_tilemap, 16, 16);
 	tilemap_set_scroll_rows(bg_tilemap, 4); /* only lines 192-256 scroll */
-
-	/* Set the first 3 quarters of the screen to 255 */
-	for (y=0;y<3;y++)
-	{
-		tilemap_set_scrollx(bg_tilemap, y, 255);
-	}
+	
+	state_save_register_global(bg1xpos);
+	state_save_register_global(bg1ypos);
+	state_save_register_global(bg2xpos);
+	state_save_register_global(bg2ypos);
+	state_save_register_global(bgcontrol);
 }
 
 
@@ -223,8 +222,11 @@ WRITE8_HANDLER( mpatrol_scroll_w )
     with a NAND gate on the V64 and V128 lines to control when it's read, and when
     255 (via 8 pull up resistors) is used.
 
-    So we set the first 3 quarters to 255 (done in VIDEO_START) and the last to the scroll value
+    So we set the first 3 quarters to 255 and the last to the scroll value
 */
+	tilemap_set_scrollx(bg_tilemap, 0, 255);
+	tilemap_set_scrollx(bg_tilemap, 1, 255);
+	tilemap_set_scrollx(bg_tilemap, 2, 255);
 	tilemap_set_scrollx(bg_tilemap, 3, -data);
 }
 
@@ -244,6 +246,19 @@ WRITE8_HANDLER( mpatrol_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
+
+/* This looks like some kind of protection implemented by a custom chip on the
+   scroll board. It mangles the value written to the port mpatrol_bg1xpos_w, as
+   follows: result = popcount(value & 0x7f) ^ (value >> 7) */
+READ8_HANDLER( mpatrol_protection_r )
+{
+	int popcount = 0;
+	int temp;
+	
+	for (temp = bg1xpos & 0x7f; temp != 0; temp >>= 1)
+		popcount += temp & 1;
+	return popcount ^ (bg1xpos >> 7);
+}
 
 
 WRITE8_HANDLER( mpatrol_bg1ypos_w )
@@ -284,12 +299,14 @@ WRITE8_HANDLER( mpatrol_flipscreen_w )
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-
+	
 	if (flip_screen)
 	{
 		xpos = 255 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
 	}
+
+	xpos += 128;
 
 	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
@@ -337,17 +354,13 @@ VIDEO_UPDATE( mpatrol )
 	if (!(bgcontrol & 0x20))
 	{
 		if (!(bgcontrol & 0x10))
-		{
 			draw_background(machine, bitmap, cliprect, bg2xpos, bg2ypos, 2); /* distant mountains */
-		}
+
 		if (!(bgcontrol & 0x02))
-		{
 			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 3); /* hills */
-		}
+
 		if (!(bgcontrol & 0x04))
-		{
 			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 4); /* cityscape */
-		}
 	}
 
 	tilemap_set_flip(bg_tilemap, flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -355,37 +368,48 @@ VIDEO_UPDATE( mpatrol )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-
-	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = 0xfc; offs >= 0; offs -= 4)
 	{
-		int sx,sy,flipx,flipy;
+		int sy = 257 - spriteram[offs];
+		int color = spriteram[offs + 1] & 0x3f;
+		int flipx = spriteram[offs + 1] & 0x40;
+		int flipy = spriteram[offs + 1] & 0x80;
+		int code = spriteram[offs + 2];
+		int sx = spriteram[offs + 3];
+		rectangle clip;
+		
+		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
+		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
+		clip = *cliprect;
+		if (!(offs & 0x80))
+			clip.min_y = 0, clip.max_y = 127;
+		else
+			clip.min_y = 128, clip.max_y = 255;
 
-		if (!(offs & 0x60))
-		{
-			continue; /* some addresses in sprite RAM are skipped? */
-		}
-
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs];
-		flipx = spriteram[offs + 1] & 0x40;
-		flipy = spriteram[offs + 1] & 0x80;
-
+		/* adjust for flipping */
 		if (flip_screen)
 		{
+			int temp = clip.min_y;
+			clip.min_y = 255 - clip.max_y;
+			clip.max_y = 255 - temp;
 			flipx = !flipx;
 			flipy = !flipy;
 			sx = 240 - sx;
-			sy = 240 - sy;
+			sy = 257 + 11 - sy;
 		}
-
-		sy++; /* odd */
+		
+		sx += 128;
+		
+		/* in theory anyways; in practice, some of the molecule-looking guys get clipped */
+#ifdef SPLIT_SPRITES
+		sect_rect(&clip, cliprect);
+#else
+		clip = *cliprect;
+#endif
 
 		drawgfx(bitmap, machine->gfx[1],
-			spriteram[offs + 2],
-			spriteram[offs + 1] & 0x3f,
-			flipx, flipy,
-			sx, sy,
-			cliprect, TRANSPARENCY_COLOR, 512+32);
+			code, color, flipx, flipy, sx, sy,
+			&clip, TRANSPARENCY_COLOR, 512+32);
 	}
 	return 0;
 }
