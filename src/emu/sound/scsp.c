@@ -40,8 +40,9 @@
 
 
 #define EG_SHIFT	16
-#define FM_DELAY    4    // delay in number of slots processed before samples are written to the FM ring buffer
-
+#define FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
+			 // driver code indicates should be 4, but sounds distorted then
+		
 // include the LFO handling code
 #include "scsplfo.c"
 
@@ -1009,7 +1010,8 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	}
 
  	for (addr_select=0;addr_select<2;addr_select++)
-  	{
+ 	{
+		INT32 rem_addr;
  		switch(LPCTL(slot))
   		{
  		case 0:	//no loop
@@ -1021,26 +1023,35 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
  			break;
  		case 1: //normal loop
  			if(*addr[addr_select]>=LEA(slot))
- 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+			{
+				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
+				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
+			}
  			break;
  		case 2:	//reverse loop
  			if((*addr[addr_select]>=LSA(slot)) && !(slot->Backwards))
  			{
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+				rem_addr = *slot_addr[addr_select] - (LSA(slot)<<SHIFT);
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
  				slot->Backwards=1;
  			}
- 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)
+			{
+				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
+			}
  			break;
  		case 3: //ping-pong
  			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
  			{
- 				*slot_addr[addr_select]=LEA(slot)<<SHIFT;
+				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT); 
+				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
  				slot->Backwards=1;
  			}
- 			if((*addr[addr_select]<=LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
+			else if((*addr[addr_select]<LSA(slot) || (*slot_addr[addr_select]&0x80000000)) && slot->Backwards)//reached start or negative
  			{
- 				*slot_addr[addr_select]=LSA(slot)<<SHIFT;
+				rem_addr = (LSA(slot)<<SHIFT) - *slot_addr[addr_select];
+				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
  				slot->Backwards=0;
  			}
  			break;
