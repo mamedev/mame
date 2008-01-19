@@ -142,9 +142,11 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 		wardner_membank = data;
 
-		if (data) {
+		if (data)
+		{
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, MRA8_BANK1);
-			switch (data) {
+			switch (data)
+			{
 				case 2:  bankaddress = 0x10000; break;
 				case 3:  bankaddress = 0x18000; break;
 				case 4:  bankaddress = 0x20000; break;
@@ -156,14 +158,16 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 			}
 			memory_set_bankptr(1,&RAM[bankaddress]);
 		}
-		else {
-			memory_set_bankptr(1,&RAM[0x0000]);
+		else
+		{
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xadff, 0, 0, MRA8_RAM);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xadff, 0, 0, MRA8_BANK4);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xae00, 0xafff, 0, 0, MRA8_BANK2);
 			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc7ff, 0, 0, MRA8_BANK3);
+			memory_set_bankptr(1, &RAM[0x0000]);
 			memory_set_bankptr(2, rambase_ae00);
 			memory_set_bankptr(3, rambase_c000);
+			memory_set_bankptr(4, paletteram);
 		}
 	}
 }

@@ -48,23 +48,20 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	memory_set_bankptr(4,&RAM[bankaddress]);
 
 	/* bit 5 = memory bank select */
-	if (data & 0x20){
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_RAM);							/* palette */
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);	/* palette */
-		if (K051316_readroms){
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r);	/* 051316 #1 (ROM test) */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_w);		/* 051316 #1 */
-		}
-		else{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_r);		/* 051316 #1 */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_w);		/* 051316 #1 */
-		}
+	if (data & 0x20)
+	{
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_set_bankptr(5, paletteram);
+
+		if (K051316_readroms)
+			memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r, K051316_0_w);	/* 051316 #1 (ROM test) */
+		else
+			memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_r, K051316_0_w);		/* 051316 #1 */
 	}
-	else{
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, MRA8_BANK1);				/* RAM */
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, MWA8_BANK1);				/* RAM */
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_BANK2);				/* RAM */
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MWA8_BANK2);				/* RAM */
+	else
+	{
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, MRA8_BANK1, MWA8_BANK1);				/* RAM */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_BANK2, MWA8_BANK2);				/* RAM */
 	}
 
 	/* other bits unknown/unused */
