@@ -518,6 +518,10 @@ int tilemap_get_scrolldy(tilemap *tmap);
 void tilemap_set_scrollx(tilemap *tmap, int row, int value);
 void tilemap_set_scrolly(tilemap *tmap, int col, int value);
 
+/* return the scroll value for a row/column unit */
+int tilemap_get_scrollx(tilemap *tmap, int row);
+int tilemap_get_scrolly(tilemap *tmap, int col);
+
 
 
 /* ----- internal map access ----- */

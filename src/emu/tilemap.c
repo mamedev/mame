@@ -655,6 +655,34 @@ void tilemap_set_scrolly(tilemap *tmap, int which, int value)
 }
 
 
+/*-------------------------------------------------
+    tilemap_get_scrollx - return the scroll value
+    for a row unit
+-------------------------------------------------*/
+
+int tilemap_get_scrollx(tilemap *tmap, int which)
+{
+	if (which < tmap->scrollrows)
+		return tmap->rowscroll[which];
+	else
+		return 0;
+}
+
+
+/*-------------------------------------------------
+    tilemap_get_scrolly - return the scroll value
+    for a column unit
+-------------------------------------------------*/
+
+int tilemap_get_scrolly(tilemap *tmap, int which)
+{
+	if (which < tmap->scrollcols)
+		return tmap->colscroll[which];
+	else
+		return 0;
+}
+
+
 
 /***************************************************************************
     INTERNAL MAP ACCESS
