@@ -7895,8 +7895,11 @@ Other Sun games
 	DRIVER( eshb )		/* (c) 1984 Funai / Gakken */
 	DRIVER( comebaby )	/* (c) 2000 ExPotato */
 	DRIVER( peset038 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0065 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0158 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0188 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0250 )	/* (c) 1987 IGT - International Gaming Technology */
+	DRIVER( pepp0447 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pepp0516 )	/* (c) 1987 IGT - International Gaming Technology */
 	DRIVER( pebe0014 )	/* (c) 1994 IGT - International Gaming Technology */
 	DRIVER( peke1012 )	/* (c) 1994 IGT - International Gaming Technology */

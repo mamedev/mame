@@ -83,8 +83,11 @@ Additional notes
 
           gamename  method
           --------  ------
+          pepp0065     1
           pepp0158     2
           pepp0188     1
+          pepp0250     1
+          pepp0447     2
           pepp0516     1
           pebe0014     1
           peke1012     1
@@ -92,6 +95,7 @@ Additional notes
           peps0716     2
           pexp0019     2
           pexs0006     2
+          pexmp006     2
 
 
 2) Configuration
@@ -443,20 +447,6 @@ static READ8_HANDLER( peplus_duart_r )
 
 static READ8_HANDLER( peplus_cmos_r )
 {
-	switch (offset)
-	{
-		case 0x00db:
-			if ((readinputportbytag_safe("DOOR",0xff) & 0x01) == 0) {
-				cmos_ram[offset] = 0x00;
-			}
-			break;
-		case 0x0b8d:
-			if ((readinputportbytag_safe("DOOR",0xff) & 0x02) == 1) {
-				cmos_ram[offset] = 0x01;
-			}
-			break;
-	}
-
 	return cmos_ram[offset];
 }
 
@@ -1043,6 +1033,15 @@ static DRIVER_INIT( peset038 )
 	program_ram[0x289f] = 0x22; // RET - Disable Program Checksum
 }
 
+static DRIVER_INIT( pepp0065 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x88d6] = 0x22; // RET - Disable Memory Test
+	program_ram[0xd949] = 0x22; // RET - Disable Program Checksum
+}
+
 static DRIVER_INIT( pepp0158 )
 {
 	peplus_init();
@@ -1063,6 +1062,24 @@ static DRIVER_INIT( pepp0188 )
 	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
 
 	autohold_addr = 0x742f;
+}
+
+static DRIVER_INIT( pepp0250 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x4ebb] = 0x22; // RET - Disable Memory Test
+	program_ram[0x878b] = 0x22; // RET - Disable Program Checksum
+}
+
+static DRIVER_INIT( pepp0447 )
+{
+	peplus_init();
+
+	// For testing only, cannot stay in final driver
+	program_ram[0x90dc] = 0x22; // RET - Disable Memory Test
+	program_ram[0xe475] = 0x22; // RET - Disable Program Checksum
 }
 
 static DRIVER_INIT( pepp0516 )
@@ -1159,6 +1176,20 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
+ROM_START( pepp0065 ) /* Normal board : Jokers Wild Poker (PP0065) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "pp0065.u68",   0x00000, 0x10000, CRC(76c1a367) SHA1(ea8be9241e9925b5a4206db6875e1572f85fa5fe) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
+
 ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pp0158.u68",   0x00000, 0x10000, CRC(5976cd19) SHA1(6a461ea9ddf78dffa3cf8b65903ebf3127f23d45) )
@@ -1176,6 +1207,34 @@ ROM_END
 ROM_START( pepp0188 ) /* Normal board : Standard Draw Poker (PP0188) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "pp0188.u68",   0x00000, 0x10000, CRC(cf36a53c) SHA1(99b578538ab24d9ff91971b1f77599272d1dbfc6) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
+
+ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "pp0250.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
+	ROM_LOAD( "mgo-cg740.u73",	 0x08000, 0x8000, CRC(7437254a) SHA1(bba166dece8af58da217796f81117d0b05752b87) )
+	ROM_LOAD( "mbo-cg740.u74",	 0x10000, 0x8000, CRC(92e8c33e) SHA1(05344664d6fdd3f4205c50fa4ca76fc46c18cf8f) )
+	ROM_LOAD( "mxo-cg740.u75",	 0x18000, 0x8000, CRC(ce4cbe0b) SHA1(4bafcd68be94a5deaae9661584fa0fc940b834bb) )
+
+	ROM_REGION( 0x100, REGION_PROMS, 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
+
+ROM_START( pepp0447 ) /* Normal board : Standard Draw Poker (PP0447) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "pp0447.u68",   0x00000, 0x10000, CRC(0ef0bb6c) SHA1(d0ef7a83417054f05d32d0a93ed0d5d618f4dfb9) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mro-cg740.u72",	 0x00000, 0x8000, CRC(72667f6c) SHA1(89843f472cc0329317cfc643c63bdfd11234b194) )
@@ -1318,8 +1377,11 @@ ROM_END
 GAMEL(1987, peset038, 0,      peplus,  peplus_schip, peset038, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (Set038) Set Chip",                      0,   layout_pe_schip )
 
 /* Normal board : poker */
+GAMEL(1987, pepp0065, 0,      peplus,  peplus_pokah, pepp0065, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0065) Jokers Wild Poker",             0,   layout_pe_poker )
 GAMEL(1987, pepp0158, 0,      peplus,  peplus_pokah, pepp0158, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker",       0,   layout_pe_poker )
 GAMEL(1987, pepp0188, 0,      peplus,  peplus_pokah, pepp0188, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0188) Standard Draw Poker",           0,   layout_pe_poker )
+GAMEL(1987, pepp0250, 0,      peplus,  peplus_pokah, pepp0250, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker",        0,   layout_pe_poker )
+GAMEL(1987, pepp0447, 0,      peplus,  peplus_pokah, pepp0447, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0447) Standard Draw Poker",           0,   layout_pe_poker )
 GAMEL(1987, pepp0516, 0,      peplus,  peplus_pokah, pepp0516, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0516) Double Bonus Poker",            0,   layout_pe_poker )
 
 /* Normal board : blackjack */
