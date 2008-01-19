@@ -638,28 +638,10 @@ static TIMER_CALLBACK( mcu_timer )
 }
 
 static UINT32 m_n_bankoffset;
-static UINT32 m_p_n_bankoffset[ 8 ];
-
-INLINE void bankswitch_update( int n_bank )
-{
-	verboselog( 1, "bankswitch_update( %d ) = %08x\n", n_bank, m_p_n_bankoffset[ n_bank ] );
-	memory_set_bankptr( 1 + n_bank, memory_region( REGION_USER2 ) + m_p_n_bankoffset[ n_bank ] );
-}
-
-static void bankswitch_update_all( void )
-{
-	int n_bank;
-
-	for( n_bank = 0; n_bank < 8; n_bank++ )
-	{
-		bankswitch_update( n_bank );
-	}
-}
 
 INLINE void bankswitch_rom8( int n_bank, int n_data )
 {
-	m_p_n_bankoffset[ n_bank ] = ( ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) ) * 1024 * 1024;
-	bankswitch_update( n_bank );
+	memory_set_bank( n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom32_w )
@@ -693,8 +675,7 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 INLINE void bankswitch_rom64( int n_bank, int n_data )
 {
 	/* todo: verify behaviour */
-	m_p_n_bankoffset[ n_bank ] = ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) * 1024 * 1024;
-	bankswitch_update( n_bank );
+	memory_set_bank( n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom64_w )
@@ -752,14 +733,6 @@ static READ32_HANDLER( lightgun_r )
 
 static ADDRESS_MAP_START( namcos11_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE(1) AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
-	AM_RANGE(0x1f000000, 0x1f0fffff) AM_ROMBANK(1) /* banked roms */
-	AM_RANGE(0x1f100000, 0x1f1fffff) AM_ROMBANK(2)
-	AM_RANGE(0x1f200000, 0x1f2fffff) AM_ROMBANK(3)
-	AM_RANGE(0x1f300000, 0x1f3fffff) AM_ROMBANK(4)
-	AM_RANGE(0x1f400000, 0x1f4fffff) AM_ROMBANK(5)
-	AM_RANGE(0x1f500000, 0x1f5fffff) AM_ROMBANK(6)
-	AM_RANGE(0x1f600000, 0x1f6fffff) AM_ROMBANK(7)
-	AM_RANGE(0x1f700000, 0x1f7fffff) AM_ROMBANK(8)
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
@@ -842,14 +815,22 @@ static DRIVER_INIT( namcos11 )
 			}
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{
-				int n_bank;
+				int bank;
 
-				m_n_bankoffset = 0;
-				for( n_bank = 0; n_bank < 8; n_bank++ )
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f0fffff, 0, 0, MRA32_BANK1 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f100000, 0x1f1fffff, 0, 0, MRA32_BANK2 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f200000, 0x1f2fffff, 0, 0, MRA32_BANK3 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f300000, 0x1f3fffff, 0, 0, MRA32_BANK4 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f4fffff, 0, 0, MRA32_BANK5 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f500000, 0x1f5fffff, 0, 0, MRA32_BANK6 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6fffff, 0, 0, MRA32_BANK7 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f700000, 0x1f7fffff, 0, 0, MRA32_BANK8 );
+
+				for( bank = 0; bank < 8; bank++ )
 				{
-					m_p_n_bankoffset[ n_bank ] = 0;
+					memory_configure_bank( bank + 1, 0, memory_region_length( REGION_USER2 ) / ( 1024 * 1024 ), memory_region( REGION_USER2 ), 1024 * 1024 );
+					memory_set_bank( bank + 1, 0 );
 				}
-				bankswitch_update_all();
 
 				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )
 				{
@@ -857,13 +838,12 @@ static DRIVER_INIT( namcos11 )
 				}
 				if( namcos11_config_table[ n_game ].n_daughterboard == 64 )
 				{
+					m_n_bankoffset = 0;
 					memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
 					memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom64_w );
 					memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, MRA32_NOP );
+					state_save_register_global( m_n_bankoffset );
 				}
-				state_save_register_global( m_n_bankoffset );
-				state_save_register_global_array( m_p_n_bankoffset );
-				state_save_register_func_postload( bankswitch_update_all );
 			}
 			else
 			{
@@ -889,7 +869,6 @@ static MACHINE_RESET( namcos11 )
 {
 	memset( namcos11_keycus, 0, namcos11_keycus_size );
 	psx_machine_init();
-	bankswitch_update_all();
 }
 
 NAMCO_C7X_HARDWARE
@@ -1338,7 +1317,7 @@ ROM_START( ptblnk2a )
 	ROM_LOAD16_BYTE( "gnb3vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
 	ROM_LOAD16_BYTE( "gnb3vera.2f",  0x0200001, 0x100000, CRC(2bb7eb6d) SHA1(d1b1e031a28443140ac8652dfd77a65a042b67fc) )
 
-	ROM_REGION32_LE( 0x1000000, REGION_USER2, 0 ) /* main data */
+	ROM_REGION32_LE( 0x2000000, REGION_USER2, 0 ) /* main data */
 	ROM_LOAD16_BYTE( "gnb1prg0l.ic2", 0x000000, 0x800000, CRC(78746037) SHA1(d130ca1153a730e3c967945248f00662f9fab304) )
 	ROM_LOAD16_BYTE( "gnb1prg0u.ic5", 0x000001, 0x800000, CRC(697d3279) SHA1(40302780f7494d9413888b2d1da38bd14a9a444f) )
 
