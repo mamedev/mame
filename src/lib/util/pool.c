@@ -143,6 +143,9 @@ object_pool *pool_alloc(void (*fail)(const char *message))
 		return NULL;
 	memset(pool, 0, sizeof(*pool));
 
+	/* set the failure handler */
+	pool->fail = fail;
+
 	/* register the built-in types */
 	pool_type_register(pool, OBJTYPE_MEMORY, "Memory", memory_destruct);
 
