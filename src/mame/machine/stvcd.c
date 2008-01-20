@@ -1560,7 +1560,9 @@ void stvcd_exit(running_machine* machine)
 
 	if (cdrom)
 	{
+		#ifndef MESS
 		cdrom_close(cdrom);
+		#endif
 		cdrom = (cdrom_file *)NULL;
 	}
 }
