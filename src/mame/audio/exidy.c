@@ -27,7 +27,8 @@
 #define SH8253_CLOCK			(CRYSTAL_OSC/2)
 #define SH6840_CLOCK			(CRYSTAL_OSC/4)
 #define SH6532_CLOCK			(CRYSTAL_OSC/4)
-#define CVSD_CLOCK_FREQ 		(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
+#define CVSD_CLOCK				(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
+#define CVSD_Z80_CLOCK 			(CRYSTAL_OSC/2)
 #define BASE_VOLUME				(32767 / 6)
 
 enum
@@ -834,10 +835,7 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( mtrap_voiceio_w )
 {
 	if (!(offset & 0x10))
-	{
-		hc55516_digit_clock_clear_w(0,data);
-		hc55516_clock_set_w(0,data);
-	}
+		hc55516_digit_w(0, data & 1);
 
 	if (!(offset & 0x20))
 		riot_portb_data = data & 1;
@@ -856,12 +854,8 @@ static READ8_HANDLER( mtrap_voiceio_r )
 	}
 
 	if (!(offset & 0x40))
-	{
-		attotime curtime = timer_get_time();
-		int clock_pulse = curtime.attoseconds / HZ_TO_ATTOSECONDS(2 * CVSD_CLOCK_FREQ);
+		return hc55516_clock_edge_r(0) << 7;
 
-		return (clock_pulse & 1) << 7;
-	}
 	return 0;
 }
 
@@ -880,12 +874,12 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( mtrap_cvsd_audio )
 
-	MDRV_CPU_ADD(Z80, 3579545/2)
+	MDRV_CPU_ADD(Z80, CVSD_Z80_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
 	MDRV_CPU_IO_MAP(cvsd_iomap,0)
 
 	/* audio hardware */
-	MDRV_SOUND_ADD(HC55516, 0)
+	MDRV_SOUND_ADD(HC55516, CVSD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
