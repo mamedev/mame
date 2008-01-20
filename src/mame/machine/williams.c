@@ -47,6 +47,8 @@ static READ8_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
 static WRITE8_HANDLER( williams2_snd_cmd_w );
+static void mysticm_main_irq(int state);
+static void tshoot_main_irq(int state);
 
 /* Lotto Fun-specific code */
 static READ8_HANDLER( lottofun_input_port_0_r );
@@ -209,7 +211,15 @@ const pia6821_interface mysticm_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ williams_main_firq, williams_main_irq
+	/*irqs   : A/B             */ williams_main_firq, mysticm_main_irq
+};
+
+/* Mystic Marathon PIA 1 */
+const pia6821_interface mysticm_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_2_r, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, williams2_snd_cmd_w, 0, pia_2_ca1_w,
+	/*irqs   : A/B             */ mysticm_main_irq, mysticm_main_irq
 };
 
 /* Turkey Shoot PIA 0 */
@@ -217,7 +227,15 @@ const pia6821_interface tshoot_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ tshoot_input_port_0_3_r, input_port_1_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, tshoot_lamp_w, williams_port_select_w, 0,
-	/*irqs   : A/B             */ williams_main_irq, williams_main_irq
+	/*irqs   : A/B             */ tshoot_main_irq, tshoot_main_irq
+};
+
+/* Turkey Shoot PIA 1 */
+const pia6821_interface tshoot_pia_1_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ input_port_2_r, 0, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ 0, williams2_snd_cmd_w, 0, pia_2_ca1_w,
+	/*irqs   : A/B             */ tshoot_main_irq, tshoot_main_irq
 };
 
 /* Turkey Shoot PIA 2 */
@@ -283,8 +301,10 @@ static TIMER_CALLBACK( williams_count240_callback )
 
 static void williams_main_irq(int state)
 {
+	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
+
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(0, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -297,8 +317,35 @@ static void williams_main_firq(int state)
 
 static void williams_snd_irq(int state)
 {
+	int combined_state = pia_get_irq_a(2) | pia_get_irq_b(2);
+
 	/* IRQ to the sound CPU */
-	cpunum_set_input_line(1, M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(1, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Newer Williams interrupts
+ *
+ *************************************/
+
+static void mysticm_main_irq(int state)
+{
+	int combined_state = pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
+
+	/* IRQ to the main CPU */
+	cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+static void tshoot_main_irq(int state)
+{
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
+
+	/* IRQ to the main CPU */
+	cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

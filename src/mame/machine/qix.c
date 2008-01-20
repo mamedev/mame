@@ -385,15 +385,19 @@ static WRITE8_HANDLER( sync_pia_4_porta_w )
 
 static void qix_pia_dint(int state)
 {
+	int combined_state = pia_get_irq_a(3) | pia_get_irq_b(3);
+
 	/* DINT is connected to the data CPU's IRQ line */
-	cpunum_set_input_line(0, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void qix_pia_sint(int state)
 {
+	int combined_state = pia_get_irq_a(4) | pia_get_irq_b(4);
+
 	/* SINT is connected to the sound CPU's IRQ line */
-	cpunum_set_input_line(2, M6802_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(2, M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

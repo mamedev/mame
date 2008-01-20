@@ -36,7 +36,9 @@ extern const pia6821_interface williams2_snd_pia_intf;
 
 /* Game-specific later-Williams PIA interfaces */
 extern const pia6821_interface mysticm_pia_0_intf;
+extern const pia6821_interface mysticm_pia_1_intf;
 extern const pia6821_interface tshoot_pia_0_intf;
+extern const pia6821_interface tshoot_pia_1_intf;
 extern const pia6821_interface tshoot_snd_pia_intf;
 extern const pia6821_interface joust2_pia_1_intf;
 

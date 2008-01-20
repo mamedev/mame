@@ -118,8 +118,10 @@ static WRITE8_HANDLER( port_b_u1_w )
 
 static void main_cpu_irq(int state)
 {
-logerror("GEN IRQ: %x\n", state);
-	cpunum_set_input_line(0, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
+
+logerror("GEN IRQ: %x\n", combined_state);
+	cpunum_set_input_line(0, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -604,9 +604,9 @@ WRITE8_HANDLER( zwackery_ca2_w )
 }
 
 
-void zwackery_pia_irq(int state)
+static void zwackery_pia_irq(int state)
 {
-	v493_irq_state = state;
+	v493_irq_state = pia_get_irq_a(2) | pia_get_irq_b(2);
 	update_mcr68_interrupts();
 }
 

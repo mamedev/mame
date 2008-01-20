@@ -441,19 +441,42 @@ static MACHINE_RESET( mpu4 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void cpu0_irq(int state)
+static void pia_cpu0_irq(int state)
 {
+	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) |
+						 pia_get_irq_a(1) | pia_get_irq_b(1) |
+						 pia_get_irq_a(2) | pia_get_irq_b(2) |
+						 pia_get_irq_a(3) | pia_get_irq_b(3) |
+						 pia_get_irq_a(4) | pia_get_irq_b(4) |
+						 pia_get_irq_a(5) | pia_get_irq_b(5);
+
 	if (!serial_card_connected)
 	{
-		cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
-		LOG(("6809 int%d \n",state));
+		cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
-		LOG(("6809 fint%d \n",state));
+		cpunum_set_input_line(0, M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		LOG(("6809 fint%d \n", combined_state));
 	}
 }
+
+
+static void ptm_cpu0_irq(int state)
+{
+	if (!serial_card_connected)
+	{
+		cpunum_set_input_line(0, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		LOG(("6809 int%d \n", state));
+	}
+	else
+	{
+		cpunum_set_input_line(0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		LOG(("6809 fint%d \n", state));
+	}
+}
+
 
 ///////////////////////////////////////////////////////////////////////////
 static WRITE8_HANDLER( bankswitch_w )
@@ -490,7 +513,7 @@ static const ptm6840_interface ptm_ic2_intf =
 	MPU4_MASTER_CLOCK/4,
 	{ 0,0,0 },
 	{ ic2_o1_callback, ic2_o2_callback, ic2_o3_callback },
-	cpu0_irq
+	ptm_cpu0_irq
 };
 
 /***************************************************************************
@@ -542,7 +565,7 @@ static const pia6821_interface pia_ic3_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic3_porta_w, pia_ic3_portb_w, pia_ic3_ca2_w, pia_ic3_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 /*---------------------------------------
@@ -672,7 +695,7 @@ static const pia6821_interface pia_ic4_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, pia_ic4_portb_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic4_porta_w, 0, pia_ic4_ca2_w, 0,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 //IC5
@@ -768,7 +791,7 @@ static const pia6821_interface pia_ic5_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic5_porta_r, pia_ic5_portb_r, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, 0, pia_ic5_ca2_w,  pia_ic5_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 //IC6
@@ -826,7 +849,7 @@ static const pia6821_interface pia_ic6_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic6_porta_w, pia_ic6_portb_w, pia_ic6_ca2_w, pia_ic6_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 //IC7
@@ -902,7 +925,7 @@ static const pia6821_interface pia_ic7_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ pia_ic7_porta_w, pia_ic7_portb_w, pia_ic7_ca2_w, pia_ic7_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 static READ8_HANDLER( pia_ic8_porta_r )
@@ -950,7 +973,7 @@ static const pia6821_interface pia_ic8_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ pia_ic8_porta_r, 0, 0, 0, 0, 0,
 	/*outputs: A/B,CA/B2       */ 0, pia_ic8_portb_w, pia_ic8_ca2_w, pia_ic8_cb2_w,
-	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
+	/*irqs   : A/B             */ pia_cpu0_irq, pia_cpu0_irq
 };
 
 
