@@ -210,7 +210,7 @@ static void ninjakd2_init_samples(void)
 	for (i = 0; i < length; ++i)
 		sampledata[i] = rom[i] << 7;
 
-	ninjakd2_sampledata = sampledata;
+	ninjakd2_sampledata = (INT16*)sampledata;
 }
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
