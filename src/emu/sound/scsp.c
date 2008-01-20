@@ -334,7 +334,7 @@ static TIMER_CALLBACK( timerB_cb )
 	SCSP->TimCnt[1] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x80;
 	SCSP->udata.data[0x1a/2]&=0xff00;
-	SCSP->udata.data[0x1a/2]|=SCSP->TimCnt[0]>>8;
+	SCSP->udata.data[0x1a/2]|=SCSP->TimCnt[1]>>8;
 
 	CheckPendingIRQ(SCSP);
 }
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( timerC_cb )
 	SCSP->TimCnt[2] = 0xFFFF;
 	SCSP->udata.data[0x20/2]|=0x100;
 	SCSP->udata.data[0x1c/2]&=0xff00;
-	SCSP->udata.data[0x1c/2]|=SCSP->TimCnt[0]>>8;
+	SCSP->udata.data[0x1c/2]|=SCSP->TimCnt[2]>>8;
 
 	CheckPendingIRQ(SCSP);
 }
