@@ -119,8 +119,6 @@ TODO:
 
 - What does the "credit service" dip switch do in Ninja Kid II?
 
-- What does the "free game" dip switch do in Mutant Night?
-
 ******************************************************************************/
 
 #include "driver.h"
@@ -622,7 +620,7 @@ static INPUT_PORTS_START( mnight )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, "Difficult" )
-	PORT_DIPNAME( 0x08, 0x08, "Free Game" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Infinite Lives" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off )  )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet) ) PORT_DIPLOCATION("SW1:5")
