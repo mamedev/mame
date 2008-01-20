@@ -81,7 +81,7 @@ WRITE8_HANDLER( mario_videoram_w )
 {
 	mario_state	*state = Machine->driver_data;
 
-	videoram[offset] = data;
+	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
@@ -116,16 +116,26 @@ WRITE8_HANDLER( mario_scroll_w )
 
 WRITE8_HANDLER( mario_flip_w )
 {
-	flip_screen_set(data & 0x01);
+	mario_state	*state = Machine->driver_data;
+
+	if (state->flip != (data & 0x01))
+	{
+		state->flip = data & 0x01;
+		if (state->flip)
+			tilemap_set_flip(ALL_TILEMAPS, TILEMAP_FLIPX | TILEMAP_FLIPY);
+		else
+			tilemap_set_flip(ALL_TILEMAPS, 0);
+		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	mario_state	*state = Machine->driver_data;
-	int code = videoram[tile_index] + 256 * state->gfx_bank;
+	int code = state->videoram[tile_index] + 256 * state->gfx_bank;
 	int color;
 
-	color =  ((videoram[tile_index] >> 2) & 0x38) | 0x40 | (state->palette_bank<<7) | (state->monitor<<8);
+	color =  ((state->videoram[tile_index] >> 2) & 0x38) | 0x40 | (state->palette_bank<<7) | (state->monitor<<8);
 	color = color >> 2;
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -143,7 +153,7 @@ VIDEO_START( mario )
 	state_save_register_global(state->gfx_bank);
 	state_save_register_global(state->palette_bank);
 	state_save_register_global(state->gfx_scroll);
-	state_save_register_global(flip_screen);
+	state_save_register_global(state->flip);
 }
 
 /*
@@ -156,29 +166,29 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	mario_state	*state = Machine->driver_data;
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 4)
+	for (offs = 0;offs < state->spriteram_size;offs += 4)
 	{
-		if (spriteram[offs])
+		if (state->spriteram[offs])
 		{
 			int x, y;
 
 			// from schematics ....
-			y = (spriteram[offs] + (flip_screen ? 0xF7 : 0xF9) + 1) & 0xFF;
-			x = spriteram[offs+3];
+			y = (state->spriteram[offs] + (state->flip ? 0xF7 : 0xF9) + 1) & 0xFF;
+			x = state->spriteram[offs+3];
 			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
 			y = 240 - y; /* logical screen position */
 
-			y = y ^ (flip_screen ? 0xFF : 0x00); /* physical screen location */
-			x = x ^ (flip_screen ? 0xFF : 0x00); /* physical screen location */
+			y = y ^ (state->flip ? 0xFF : 0x00); /* physical screen location */
+			x = x ^ (state->flip ? 0xFF : 0x00); /* physical screen location */
 
-			if (flip_screen)
+			if (state->flip)
 			{
-				y -= 6;
+				y -= 14;
 				x -= 7;
 				drawgfx(bitmap,machine->gfx[1],
-						spriteram[offs + 2],
-						(spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
-						!(spriteram[offs + 1] & 0x80),!(spriteram[offs + 1] & 0x40),
+						state->spriteram[offs + 2],
+						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
+						!(state->spriteram[offs + 1] & 0x80),!(state->spriteram[offs + 1] & 0x40),
 						x, y,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
@@ -187,9 +197,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				y += 1;
 				x -= 8;
 				drawgfx(bitmap,machine->gfx[1],
-						spriteram[offs + 2],
-						(spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
-						(spriteram[offs + 1] & 0x80),(spriteram[offs + 1] & 0x40),
+						state->spriteram[offs + 2],
+						(state->spriteram[offs + 1] & 0x0f) + 16 * state->palette_bank + 32 * state->monitor,
+						(state->spriteram[offs + 1] & 0x80),(state->spriteram[offs + 1] & 0x40),
 						x, y,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
@@ -208,9 +218,12 @@ VIDEO_UPDATE( mario )
 		state->monitor = t;
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen ? (HTOTAL-HBSTART) : 0);
-	tilemap_set_scrolly(state->bg_tilemap, 0, state->gfx_scroll);
+	
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ? (HTOTAL-HBSTART) : 0);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->gfx_scroll - (state->flip ? 8 : 0));
+
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);
+	
 	return 0;
 }

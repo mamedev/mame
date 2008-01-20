@@ -74,30 +74,41 @@
 /****************************************************************
  *
  * Mario Discrete Sound Interface
+ * 
+ * verified against picture of a TMA1-04-CPU Board. Some
+ * of the values were hard to read, though.
  *
  ****************************************************************/
+	
+#define MR_R6		RES_K(4.7)		/* verified 							*/
+#define MR_R7		RES_K(4.7)		/* verified 							*/
+#define MR_R17		RES_K(27)		/* verified, 30K in schematics			*/
+#define MR_R18		RES_K(27)		/* verified, 30K in schematics			*/
+#define MR_R19		RES_K(22)		/* verified 							*/
+#define MR_R20		RES_K(22)		/* verified 							*/
+#define MR_R40		RES_K(22)		/* verified 							*/
+#define MR_R41		RES_K(100)		/* verified, hard to read 				*/
+#define MR_R61		RES_K(47)		/* verified, hard to read 				*/
+#define MR_R64		RES_K(20)		/* verified 							*/
+#define MR_R65		RES_K(10)		/* verified 							*/
 
-#define MR_R6		RES_K(4.7)
-#define MR_R7		RES_K(4.7)
-#define MR_R17		RES_K(30)
-#define MR_R18		RES_K(30)
-#define MR_R61		RES_K(47)
-#define MR_R64		RES_K(20)
-#define MR_R65		RES_K(10)
+#define MR_C3		CAP_U(10)		/* verified 							*/
+#define MR_C4		CAP_U(47)		/* illegible, 4.7 or 47 pcb/schematics	*/
+#define MR_C5		CAP_N(39)		/* illegible on pcb 					*/
+#define MR_C6		CAP_N(3.9)		/* illegible on pcb 					*/
+#define MR_C14		CAP_U(4.7)		/* verified 							*/
+#define MR_C15		CAP_U(4.7)		/* verified 							*/
+#define MR_C16		CAP_N(6.8)		/* verified 							*/
+#define MR_C17		CAP_N(22)		/* illegible on pcb 					*/
+#define MR_C31		CAP_U(0.022)	/* not found 							*/
+#define MR_C32		CAP_U(1)		/* illegible on pcb 					*/
+#define MR_C39		CAP_N(4.7)		/* not found 							*/
+#define MR_C40		CAP_N(22)		/* verified 							*/
+#define MR_C41		CAP_U(4.7)		/* verified, hard to read 				*/
+#define MR_C43		CAP_U(3.3)		/* verified 							*/
+#define MR_C44		CAP_U(3.3)		/* verified 							*/
 
-#define MR_C3		CAP_U(10)
-#define MR_C4		CAP_U(47)
-#define MR_C5		CAP_N(39)
-#define MR_C6		CAP_N(3.9)
-#define MR_C14		CAP_U(4.7)
-#define MR_C15		CAP_U(4.7)
-#define MR_C16		CAP_N(6.8)
-#define MR_C17		CAP_N(22)
-#define MR_C39		CAP_N(4.7)
-#define MR_C40		CAP_N(22)
-#define MR_C41		CAP_U(4.7)
-#define MR_C43		CAP_U(3.3)
-#define MR_C44		CAP_U(3.3)
+
 
 /* KT = 0.25 for diode circuit, 0.33 else */
 
@@ -109,21 +120,13 @@
 #define DISCRETE_BITSET(_N, _N1, _B) DISCRETE_TRANSFORM3(_N, 1, _N1, 1 << ((_B)-1), 0, "01&2>")
 #define DISCRETE_ENERGY_NAND(_N, _E, _N1, _N2) DISCRETE_TRANSFORM3(_N, _E, _N1, _N2, 1, "201*-")
 
-#define MR_R20		RES_K(22)
-#define MR_R19		RES_K(22)
-
-#define MR_R41		RES_K(100)
-#define MR_R40		RES_K(22)
-
-#define MR_C32		CAP_U(1)
-#define MR_C31		CAP_U(0.022)
 
 static const discrete_mixer_desc mario_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{MR_R20, MR_R19, MR_R41, MR_R40},
 		{0,0,0,0,0},	// no variable resistors
 		{0,0,0,0,0},  // no node capacitors
-		0, RES_M(1), // Dummy,
+		0, 0, 
 		MR_C31,
 		MR_C32,
 		0, 1};
@@ -175,7 +178,7 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND1, 1, NODE_25, TTL_HIGH)
 
 	/************************************************/
-	/* SOUND7                              */
+	/* SOUND7                                       */
 	/************************************************/
 
 	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
@@ -217,7 +220,10 @@ static DISCRETE_SOUND_START(mario)
 	/* Amplifier: internal amplifier
      * Just a 1:n amplifier without filters and no output capacitor
      */
-	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 3 )
+	// EZV20 equivalent filter circuit ...
+	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
+	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3 )
+	//DISCRETE_WAVELOG1(DS_OUT_DAC, 32767/5.0)
 
 DISCRETE_SOUND_END
 
