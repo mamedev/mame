@@ -2148,6 +2148,27 @@ ROM_START( nstocker )
 	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
 ROM_END
 
+ROM_START( nstockr2 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
+	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
+	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(27a728b5) SHA1(c72634112a04d58a695fb43bf30f44e3f7ba7de2) )
+	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(2999cdf2) SHA1(a64ae04f264ad286a87069cfb176e7511df08e78) )
+	ROM_LOAD( "cd01.u4a",  0x20000, 0x4000, CRC(75e9b51a) SHA1(dbe575d37836245746ea85ffe85e8e6665ec37ea) )
+	ROM_LOAD( "cd23.u3a",  0x24000, 0x4000, CRC(0a32e0a5) SHA1(dedbe08aed483bae27e1a607334e24cdfcb2f851) )
+	ROM_LOAD( "cd45.u2a",  0x28000, 0x4000, CRC(9bb292fe) SHA1(6fc7abcc110c2cf7399d11a478cfdadb3439b6ab) )
+	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(c77d2302) SHA1(2b0956a7d6bdff5e4f77084149a9528fb07154dc) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* 64k for Z80 */
+	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "gr01.u4c", 0x00000, 0x4000, CRC(fd0c38be) SHA1(b9e12e76f44f2b2b3ca6a57c58f0cbb019b1971f) )
+	ROM_LOAD( "gr23.u3c", 0x04000, 0x4000, CRC(35d4433e) SHA1(399d04c2a29d993f77d0d5c2d62915081d4a85dd) )
+	ROM_LOAD( "gr45.u2c", 0x08000, 0x4000, CRC(734b858a) SHA1(71763789807021938b840a88af34aad7f4751298) )
+	ROM_LOAD( "gr67.u1c", 0x0c000, 0x4000, CRC(3311f9c0) SHA1(63b185c761b258113c31cc269ce0b1462bf37f40) )
+ROM_END
+
 
 ROM_START( sfootbal )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2461,6 +2482,7 @@ GAME( 1985, minigol2, minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente
 GAME( 1985, toggle,   0,        balsente, toggle,   toggle,   ROT0, "Bally/Sente", "Toggle (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1986, nametune, 0,        balsente, nametune, nametune, ROT0, "Bally/Sente", "Name That Tune", GAME_SUPPORTS_SAVE )
 GAME( 1986, nstocker, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente", "Night Stocker", GAME_SUPPORTS_SAVE )
+GAME( 1986, nstockr2, 0,        balsente, nstocker, nstocker, ROT0, "Bally/Sente", "Night Stocker (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente", "Street Football", GAME_SUPPORTS_SAVE )
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente", "Spiker", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente", "Stompin'", GAME_SUPPORTS_SAVE )
