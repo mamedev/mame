@@ -51,6 +51,7 @@ enum
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
 	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
+	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7_3728MHz   	= 7372800,

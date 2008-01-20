@@ -5871,7 +5871,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ninjak2b )	/* UPL-????? (c) 1987 */
 	DRIVER( rdaction )	/* UPL-87003?(c) 1987 + World Games license */
 	DRIVER( mnight )	/* UPL-????? (c) 1987 distributed by Kawakus */
-	DRIVER( arkarea )	/* UPL-87007 (c) [1988?] */
+	DRIVER( arkarea )	/* UPL-87007 (c) [1987] */
 	DRIVER( robokid )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokidj )	/* UPL-88013 (c) 1988 */
 	DRIVER( robokdj2 )	/* UPL-88013 (c) 1988 */
