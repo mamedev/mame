@@ -58,7 +58,7 @@ configuration is 2 chips of 16*16 tiles, 1 of 8*8.
         bit 7 (0x80) set in playfield 1 is reverse screen (set via dip-switch)
         bit 7 (0x80) in other playfields unknown
    2: unknown (00 in bg, 03 in fg+text - maybe controls pf transparency?)
-   4: unknown (always 00)
+   4: unknown (always 00) [Used to access 2nd bank of tiles in Stadium Hero)
    6: playfield shape: 00 = 4x1, 01 = 2x2, 02 = 1x4 (low 4 bits only)
 
    bank 1:
