@@ -126,8 +126,8 @@
  * DISCRETE_INPUT_NOT(NODE)
  * DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)
  * DISCRETE_INPUT_PULSE(NODE,INIT)
- * DISCRETE_INPUT_STREAM(NODE)
- * DISCRETE_INPUTX_STREAM(NODE,GAIN,OFFSET)
+ * DISCRETE_INPUT_STREAM(NODE, NUM)
+ * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
  *
  * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)
  * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK)
@@ -349,20 +349,16 @@
  *
  ***********************************************************************
  *
- * !!!!! NOT WORKING YET !!!!!
- *
- * DISCRETE_INPUT_STREAM(NODE)              - Accepts a stream input
- * DISCRETE_INPUTX_STREAM(NODE,GAIN,OFFSET) - Accepts a stream input and
- *                                            applies a gain and offset.
+ * DISCRETE_INPUT_STREAM(NODE,NUM)              - Accepts stream input NUM
+ * DISCRETE_INPUTX_STREAM(NODE,NUM,GAIN,OFFSET) - Accepts a stream input and
+ *                                                applies a gain and offset.
  *
  *  Declaration syntax
  *
- *     DISCRETE_INPUT_STREAM (name of node)
- *     DISCRETE_INPUTX_STREAM(name of node, gain, offset)
+ *     DISCRETE_INPUT_STREAM (name of node, stream number, )
+ *     DISCRETE_INPUTX_STREAM(name of node, stream nubmer, gain, offset)
  *
- * Note: These inputs must be defined in the same order that the sound routes
- *       are defined in the game's MACHINE_DRIVER.
- *       The discrete system is floating point based.  So when routing a stream
+ * Note: The discrete system is floating point based.  So when routing a stream
  *       set it's gain to 100% and then use DISCRETE_INPUTX_STREAM to adjust
  *       it if needed.
  *
@@ -3828,8 +3824,8 @@ enum
 #define DISCRETE_INPUT_NOT(NODE)                                        { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,0 }, NULL, "Input Not" },
 #define DISCRETE_INPUTX_NOT(NODE,GAIN,OFFSET,INIT)                      { NODE, DSS_INPUT_NOT   , 3, { NODE_NC,NODE_NC,NODE_NC }, { GAIN,OFFSET,INIT }, NULL, "InputX Not" },
 #define DISCRETE_INPUT_PULSE(NODE,INIT)                                 { NODE, DSS_INPUT_PULSE , 3, { NODE_NC,NODE_NC,NODE_NC }, { 1,0,INIT }, NULL, "Input Pulse" },
-#define DISCRETE_INPUT_STREAM(NODE)                                     { NODE, DSS_INPUT_STREAM, 2, { NODE_NC,NODE_NC }, { 1,0 }, NULL, "Input Stream" },
-#define DISCRETE_INPUTX_STREAM(NODE,GAIN,OFFSET)                        { NODE, DSS_INPUT_STREAM, 2, { NODE_NC,NODE_NC }, { GAIN,OFFSET }, NULL, "InputX Stream" },
+#define DISCRETE_INPUT_STREAM(NODE, NUM)                                { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,1,0 }, NULL, "Input Stream" },
+#define DISCRETE_INPUTX_STREAM(NODE, NUM, GAIN,OFFSET)                  { NODE, DSS_INPUT_STREAM, 3, { NUM,NODE_NC,NODE_NC }, { NUM,GAIN,OFFSET }, NULL, "InputX Stream" },
 
 /* from disc_wav.c */
 /* generic modules */

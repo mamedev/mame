@@ -74,7 +74,7 @@ struct _discrete_info
 
 	/* the input streams */
 	int discrete_input_streams;
-	stream_sample_t **input_stream_data[DISCRETE_MAX_OUTPUTS];
+	stream_sample_t *input_stream_data[DISCRETE_MAX_OUTPUTS];
 
 	/* output node tracking */
 	int discrete_outputs;
@@ -175,7 +175,7 @@ static const discrete_module module_list[] =
 	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
 	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
 	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
-	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM",0                                      ,NULL                  ,dss_input_stream_step},
+	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM",0                                      ,dss_input_stream_reset,dss_input_stream_step},
 
 	/* from disc_wav.c */
 	/* Generic modules */
@@ -443,7 +443,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 	/* Setup any input streams */
 	for (nodenum = 0; nodenum < info->discrete_input_streams; nodenum++)
 	{
-		*info->input_stream_data[nodenum] = inputs[nodenum];
+		info->input_stream_data[nodenum] = inputs[nodenum];
 	}
 
 	/* Now we must do length iterations of the node list, one output for each step */
@@ -499,6 +499,12 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 
 				wav_add_data_16lr(info->disc_wav_file[outputnum], &wave_data_l, &wave_data_r, 1);
 			}
+		}
+		
+		/* advance input streams */
+		for (nodenum = 0; nodenum < info->discrete_input_streams; nodenum++)
+		{
+			info->input_stream_data[nodenum]++;
 		}
 	}
 
@@ -616,7 +622,9 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			if (info->discrete_input_streams == DISCRETE_MAX_OUTPUTS)
 				fatalerror("init_nodes() - There can not be more then %d input stream nodes", DISCRETE_MAX_OUTPUTS);
 			/* we will use the node's context pointer to point to the input stream data */
-			*info->input_stream_data[info->discrete_input_streams++] = (stream_sample_t *)&node->context;
+			//node->context = &info->input_stream_data[info->discrete_input_streams++];
+			node->context = NULL;
+			info->discrete_input_streams++;
 		}
 	}
 

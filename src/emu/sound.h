@@ -36,6 +36,7 @@ struct _sound_route
 	int			output;					/* output ID */
 	const char *target;					/* tag of the target */
 	float		gain;					/* gain */
+	int			input;					/* input ID, -1 is default behavior */
 };
 
 

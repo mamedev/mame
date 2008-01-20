@@ -255,7 +255,16 @@ void dss_input_pulse_step(node_description *node)
 void dss_input_stream_step(node_description *node)
 {
 	// the context pointer is set to point to the current input stream data in discrete_stream_update
-	stream_sample_t *data = node->context;
+	stream_sample_t **ptr = node->context;
+	stream_sample_t *data = *ptr;
+	
+	node->output = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
+}
 
-	node->output = data ? *data++ * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
+void dss_input_stream_reset(node_description *node)
+{
+	int istream = DSS_INPUT_STREAM__STREAM;
+	/* we will use the node's context pointer to point to the input stream data */
+	assert(istream < discrete_current_context->discrete_input_streams);
+	node->context = &discrete_current_context->input_stream_data[istream];
 }

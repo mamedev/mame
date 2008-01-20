@@ -489,9 +489,20 @@ static void route_sound(void)
 			/* if it's a sound chip, set the input */
 			else
 			{
-				for (outputnum = 0; outputnum < info->outputs; outputnum++)
-					if (mroute->output == outputnum || mroute->output == ALL_OUTPUTS)
-						stream_set_input(sound->output[0].stream, 0, info->output[outputnum].stream, info->output[outputnum].output, mroute->gain);
+				if (mroute->input < 0)
+				{
+					for (outputnum = 0; outputnum < info->outputs; outputnum++)
+						if (mroute->output == outputnum || mroute->output == ALL_OUTPUTS)
+							stream_set_input(sound->output[0].stream, 0, info->output[outputnum].stream, info->output[outputnum].output, mroute->gain);
+				}
+				else
+				{
+					assert(mroute->output != ALL_OUTPUTS);
+					for (outputnum = 0; outputnum < info->outputs; outputnum++)
+						if (mroute->output == outputnum)
+							stream_set_input(sound->output[0].stream, mroute->input, info->output[outputnum].stream, info->output[outputnum].output, mroute->gain);
+				}
+					
 			}
 		}
 	}

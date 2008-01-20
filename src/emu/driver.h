@@ -493,15 +493,18 @@ struct _game_driver
 		sound->routes = 0;												\
 	}																	\
 
-#define MDRV_SOUND_ROUTE(_output, _target, _gain)						\
+#define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input)			\
 	if (sound)															\
 	{																	\
 		sound->route[sound->routes].output = (_output);					\
 		sound->route[sound->routes].target = (_target);					\
 		sound->route[sound->routes].gain = (_gain);						\
+		sound->route[sound->routes].input = (_input);					\
 		sound->routes++;												\
 	}																	\
 
+#define MDRV_SOUND_ROUTE(_output, _target, _gain)						\
+	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, -1)					\
 
 
 /***************************************************************************
