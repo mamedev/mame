@@ -72,6 +72,7 @@ VIDEO_START( jailbrek )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	tilemap_set_scrolldx(bg_tilemap, 0, 396 - 256);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
