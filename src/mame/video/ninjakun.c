@@ -1,6 +1,9 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 
+
+UINT8 *ninjakun_fg_videoram;
+UINT8 *ninjakun_bg_videoram;
 static tilemap *bg_tilemap, *fg_tilemap;
 static UINT8 flipscreen;
 static UINT8 ninjakun_xscroll,ninjakun_yscroll;
@@ -13,8 +16,8 @@ static UINT8 ninjakun_io_8000_ctrl[4];
 *******************************************************************************/
 
 static TILE_GET_INFO( get_fg_tile_info ){
-	UINT32 tile_number = videoram[tile_index] & 0xFF;
-	UINT8 attr  = videoram[tile_index+0x400];
+	UINT32 tile_number = ninjakun_fg_videoram[tile_index] & 0xFF;
+	UINT8 attr  = ninjakun_fg_videoram[tile_index+0x400];
 	tile_number += (attr & 0x20) << 3; /* bank */
 	SET_TILE_INFO(
 			0,
@@ -24,8 +27,8 @@ static TILE_GET_INFO( get_fg_tile_info ){
 }
 
 static TILE_GET_INFO( get_bg_tile_info ){
-	UINT32 tile_number = videoram[tile_index+0x800] & 0xFF;
-	UINT8 attr  = videoram[tile_index+0xc00];
+	UINT32 tile_number = ninjakun_bg_videoram[tile_index] & 0xFF;
+	UINT8 attr  = ninjakun_bg_videoram[tile_index+0x400];
 	tile_number += (attr & 0xC0) << 2; /* bank */
 	SET_TILE_INFO(
 			1,
@@ -34,28 +37,28 @@ static TILE_GET_INFO( get_bg_tile_info ){
 			0);
 }
 
-WRITE8_HANDLER( ninjakid_fg_videoram_w ){
-	videoram[offset] = data;
+WRITE8_HANDLER( ninjakun_fg_videoram_w ){
+	ninjakun_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap,offset&0x3ff);
 }
 
-WRITE8_HANDLER( ninjakid_bg_videoram_w ){
+WRITE8_HANDLER( ninjakun_bg_videoram_w ){
 
 	int y = (offset + ((ninjakun_yscroll & 0xf8) << 2) ) & 0x3e0;
 	int x = (offset + (ninjakun_xscroll >> 3) ) & 0x1f;
 	int offs = x+y+(offset & 0x400);
 
-	videoram[0x800+offs] = data;
+	ninjakun_bg_videoram[offs] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,x+y);
 }
 
-READ8_HANDLER( ninjakid_bg_videoram_r )
+READ8_HANDLER( ninjakun_bg_videoram_r )
 {
 	int y = (offset + ((ninjakun_yscroll & 0xf8) << 2) ) & 0x3e0;
 	int x = (offset + (ninjakun_xscroll >> 3) ) & 0x1f;
 	int offs = x+y+(offset & 0x400);
 
-	return videoram[0x800+offs];
+	return ninjakun_bg_videoram[offs];
 }
 
 /******************************************************************************/
@@ -113,13 +116,13 @@ READ8_HANDLER( ninjakun_io_8000_r ){
         if ((new_row == ((old_row - 1) & 0xff)) || ((!old_row) && (new_row == 0x1f)))
         {
             for( i=0x400-0x21; i>=0; i-- ){
-                ninjakid_bg_videoram_w( i+0x20, videoram[0x800+i] );
+                ninjakun_bg_videoram_w( i+0x20, ninjakun_bg_videoram[i] );
             }
         }
         else if ((new_row == ((old_row + 1) & 0xff)) || ((old_row == 0x1f) && (!new_row)))
         {
             for( i=0x20; i<0x400; i++ ){
-                ninjakid_bg_videoram_w( i-0x20, videoram[0x800+i] );
+                ninjakun_bg_videoram_w( i-0x20, ninjakun_bg_videoram[i] );
             }
         }
 
@@ -196,7 +199,7 @@ WRITE8_HANDLER( ninjakun_paletteram_w )
  vh_start / vh_refresh
 *******************************************************************************/
 
-VIDEO_START( ninjakid ){
+VIDEO_START( ninjakun ){
     fg_tilemap = tilemap_create( get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	bg_tilemap = tilemap_create( get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 	tilemap_set_transparent_pen( fg_tilemap,0 );
@@ -256,7 +259,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-VIDEO_UPDATE( ninjakid )
+VIDEO_UPDATE( ninjakun )
 {
 	int offs,chr,col,px,py,x,y;
 
@@ -269,8 +272,8 @@ VIDEO_UPDATE( ninjakid )
 		for (x=0; x<32; x++)
 		{
 			offs = y*32+x;
-			chr = videoram[offs];
-			col = videoram[offs + 0x400];
+			chr = ninjakun_fg_videoram[offs];
+			col = ninjakun_fg_videoram[offs + 0x400];
 			chr +=  (col & 0x20) << 3;
 
 			if ((col & 0x10) == 0)

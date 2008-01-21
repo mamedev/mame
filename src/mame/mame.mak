@@ -1435,7 +1435,7 @@ $(MAMEOBJ)/univers.a: \
 
 $(MAMEOBJ)/upl.a: \
 	$(DRIVERS)/mouser.o $(VIDEO)/mouser.o \
-	$(DRIVERS)/ninjakid.o $(VIDEO)/ninjakid.o \
+	$(DRIVERS)/ninjakun.o $(VIDEO)/ninjakun.o \
 	$(DRIVERS)/ninjakd2.o $(VIDEO)/ninjakd2.o \
 	$(DRIVERS)/nova2001.o $(VIDEO)/nova2001.o \
 	$(DRIVERS)/pkunwar.o $(VIDEO)/pkunwar.o \

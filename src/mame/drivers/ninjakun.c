@@ -4,10 +4,10 @@
  Driver by David Haywood
  with help from Steph and Phil Stroffolino
 
- Last Changes: 5 Mar 2001
+ Last Changes: 21 Jan 2008
 
  This driver was started after interest was shown in the game by a poster at
- various messageboards going under the name of 'ninjakid'  I decided to attempt
+ various messageboards going under the name of 'ninjakun'  I decided to attempt
  a driver for this game to gain some experience with Z80 & Multi-processor
  games.
 
@@ -23,34 +23,35 @@ Change Log:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-extern WRITE8_HANDLER( ninjakid_bg_videoram_w );
-extern WRITE8_HANDLER( ninjakid_fg_videoram_w );
-extern READ8_HANDLER( ninjakid_bg_videoram_r );
 
-extern READ8_HANDLER( ninjakun_io_8000_r );
-extern WRITE8_HANDLER( ninjakun_io_8000_w );
+extern UINT8 *ninjakun_fg_videoram;
+extern UINT8 *ninjakun_bg_videoram;
 
-extern VIDEO_START( ninjakid );
-extern VIDEO_UPDATE( ninjakid );
-extern WRITE8_HANDLER( ninjakun_flipscreen_w );
+WRITE8_HANDLER( ninjakun_bg_videoram_w );
+WRITE8_HANDLER( ninjakun_fg_videoram_w );
+READ8_HANDLER( ninjakun_bg_videoram_r );
 
-extern WRITE8_HANDLER( ninjakun_paletteram_w );
+READ8_HANDLER( ninjakun_io_8000_r );
+WRITE8_HANDLER( ninjakun_io_8000_w );
+
+VIDEO_START( ninjakun );
+VIDEO_UPDATE( ninjakun );
+WRITE8_HANDLER( ninjakun_flipscreen_w );
+
+WRITE8_HANDLER( ninjakun_paletteram_w );
+
 
 /******************************************************************************/
-
-static UINT8 *ninjakid_gfx_rom;
-
-static READ8_HANDLER( ninjakid_shared_rom_r ){
-	return ninjakid_gfx_rom[offset];
-}
 
 /* working RAM is shared, but an address line is inverted */
 static UINT8 *shareram;
 
-static WRITE8_HANDLER( shareram_w ){
+static WRITE8_HANDLER( shareram_w )
+{
 	shareram[offset^0x400] = data;
 }
-static READ8_HANDLER( shareram_r ){
+static READ8_HANDLER( shareram_r )
+{
 	return shareram[offset^0x400];
 }
 
@@ -60,16 +61,19 @@ static READ8_HANDLER( shareram_r ){
 
 static UINT8 ninjakun_io_a002_ctrl;
 
-static READ8_HANDLER( ninjakun_io_A002_r ){
+static READ8_HANDLER( ninjakun_io_A002_r )
+{
 	return ninjakun_io_a002_ctrl | readinputport(2); /* vblank */
 }
 
-static WRITE8_HANDLER( cpu1_A002_w ){
+static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )
+{
 	if( data == 0x80 ) ninjakun_io_a002_ctrl |= 0x04;
 	if( data == 0x40 ) ninjakun_io_a002_ctrl &= ~0x08;
 }
 
-static WRITE8_HANDLER( cpu2_A002_w ){
+static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
+{
 	if( data == 0x40 ) ninjakun_io_a002_ctrl |= 0x08;
 	if( data == 0x80 ) ninjakun_io_a002_ctrl &= ~0x04;
 }
@@ -78,7 +82,7 @@ static WRITE8_HANDLER( cpu2_A002_w ){
  Init
 *******************************************************************************/
 
-static MACHINE_START( ninjakid )
+static MACHINE_START( ninjakun )
 {
 	/* Save State Stuff */
 	state_save_register_global(ninjakun_io_a002_ctrl);
@@ -88,54 +92,34 @@ static MACHINE_START( ninjakid )
  Memory Maps
 *******************************************************************************/
 
-static ADDRESS_MAP_START( ninjakid_primary_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8003) AM_READ(ninjakun_io_8000_r)
+static ADDRESS_MAP_START( ninjakun_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8003) AM_READWRITE(ninjakun_io_8000_r, ninjakun_io_8000_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(ninjakun_io_A002_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)	/* tilemaps */
-	AM_RANGE(0xc800, 0xcfff) AM_READ(ninjakid_bg_videoram_r)
-    AM_RANGE(0xd800, 0xd9ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-    AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ninjakid_primary_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x7fff) AM_WRITE(MWA8_ROM) AM_BASE(&ninjakid_gfx_rom)
-	AM_RANGE(0x8000, 0x8003) AM_WRITE(ninjakun_io_8000_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(cpu1_A002_w)
+	AM_RANGE(0xa002, 0xa002) AM_READWRITE(ninjakun_io_A002_r, ninjakun_cpu1_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ninjakun_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(ninjakid_fg_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(ninjakid_bg_videoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
-	AM_RANGE(0xd800, 0xd9ff) AM_WRITE(ninjakun_paletteram_w) AM_SHARE(1) AM_BASE(&paletteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&shareram)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(MRA8_RAM, ninjakun_fg_videoram_w) AM_BASE(&ninjakun_fg_videoram) AM_SHARE(2)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(&ninjakun_bg_videoram) AM_SHARE(3)
+    AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SHARE(4)
+    AM_RANGE(0xd800, 0xd9ff) AM_READWRITE(MRA8_RAM, ninjakun_paletteram_w) AM_BASE(&paletteram) AM_SHARE(5)
+    AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&shareram) AM_SHARE(6)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjakid_secondary_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-    AM_RANGE(0x2000, 0x7fff) AM_READ(ninjakid_shared_rom_r)
-	AM_RANGE(0x8000, 0x8003) AM_READ(ninjakun_io_8000_r)
+static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION(REGION_CPU1, 0x2000)
+	AM_RANGE(0x8000, 0x8003) AM_READWRITE(ninjakun_io_8000_r, ninjakun_io_8000_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(ninjakun_io_A002_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)		/* tilemaps */
-	AM_RANGE(0xc800, 0xcfff) AM_READ(ninjakid_bg_videoram_r)
-    AM_RANGE(0xd800, 0xd9ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-    AM_RANGE(0xe000, 0xe7ff) AM_READ(shareram_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ninjakid_secondary_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8003) AM_WRITE(ninjakun_io_8000_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(cpu2_A002_w)
+	AM_RANGE(0xa002, 0xa002) AM_READWRITE(ninjakun_io_A002_r, ninjakun_cpu2_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ninjakun_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(ninjakid_fg_videoram_w)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(ninjakid_bg_videoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xd800, 0xd9ff) AM_WRITE(ninjakun_paletteram_w) AM_SHARE(1)
-    AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shareram_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(MRA8_RAM, ninjakun_fg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE(3)
+    AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(4)
+    AM_RANGE(0xd800, 0xd9ff) AM_READWRITE(MRA8_RAM, ninjakun_paletteram_w) AM_SHARE(5)
+    AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shareram_r, shareram_w) AM_SHARE(6)
 ADDRESS_MAP_END
 
 /*******************************************************************************
@@ -170,7 +154,7 @@ static const gfx_layout sprite_layout =
 	1024
 };
 
-static GFXDECODE_START( ninjakid )
+static GFXDECODE_START( ninjakun )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout,		0x000, 0x10 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, tile_layout,		0x100, 0x10 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, sprite_layout,	0x200, 0x10 )
@@ -180,20 +164,20 @@ GFXDECODE_END
  Machine Driver Structure(s)
 *******************************************************************************/
 
-static MACHINE_DRIVER_START( ninjakid )
+static MACHINE_DRIVER_START( ninjakun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3000000) /* 3.00MHz */
-	MDRV_CPU_PROGRAM_MAP(ninjakid_primary_readmem,ninjakid_primary_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 3000000) /* 3.00MHz */
-	MDRV_CPU_PROGRAM_MAP(ninjakid_secondary_readmem,ninjakid_secondary_writemem)
+	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu2_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4) /* ? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-	MDRV_MACHINE_START(ninjakid)
+	MDRV_MACHINE_START(ninjakun)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame */
 
@@ -202,11 +186,11 @@ static MACHINE_DRIVER_START( ninjakid )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, (32-4)*8-1 )
-	MDRV_GFXDECODE(ninjakid)
+	MDRV_GFXDECODE(ninjakun)
 	MDRV_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(ninjakid)
-	MDRV_VIDEO_UPDATE(ninjakid)
+	MDRV_VIDEO_START(ninjakun)
+	MDRV_VIDEO_UPDATE(ninjakun)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -252,7 +236,7 @@ ROM_END
  2 Sets of Dipsiwtches
 *******************************************************************************/
 
-static INPUT_PORTS_START( ninjakid )
+static INPUT_PORTS_START( ninjakun )
 	PORT_START_TAG("IN0")	/* 0xa000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,	IPT_JOYSTICK_LEFT ) PORT_2WAY /* "XPOS1" */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,	IPT_JOYSTICK_RIGHT ) PORT_2WAY
@@ -331,4 +315,4 @@ INPUT_PORTS_END
  Game Drivers
 *******************************************************************************/
 
-GAME( 1984, ninjakun, 0, ninjakid, ninjakid, 0, ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 )
+GAME( 1984, ninjakun, 0, ninjakun, ninjakun, 0, ROT0, "[UPL] (Taito license)", "Ninjakun Majou no Bouken", 0 )
