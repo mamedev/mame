@@ -473,12 +473,33 @@ static void route_sound(void)
 						char namebuf[256];
 						int index;
 
-						sndnum_to_sndti(sndnum, &index);
+						sound_type sndtype = sndnum_to_sndti(sndnum, &index);
+
+						/* built the display name */
+                        namebuf[0] = '\0';
+
+                        /* speaker name, if more than one speaker */
+						if (totalspeakers > 1)
+							sprintf(namebuf, "%sSpeaker '%s': ", namebuf, speaker->speaker->tag);
+
+                        /* device name */
+						sprintf(namebuf, "%s%s ", namebuf, sndnum_name(sndnum));
+
+						/* device index, if more than one of this type */
+						if (sndtype_count(sndtype) > 1)
+							sprintf(namebuf, "%s#%d ", namebuf, index);
+
+						/* channel number, if more than channel for this device */
+						if (info->outputs > 1)
+							sprintf(namebuf, "%sCh.%d", namebuf, outputnum);
+
+						/* remove final space */
+						if (namebuf[strlen(namebuf) - 1] == ' ')
+	                        namebuf[strlen(namebuf) - 1] = '\0';
 
 						/* fill in the input data on this speaker */
 						speaker->input[speaker->inputs].gain = mroute->gain;
 						speaker->input[speaker->inputs].default_gain = mroute->gain;
-						sprintf(namebuf, "%s:%s #%d.%d", speaker->speaker->tag, sndnum_name(sndnum), index, outputnum);
 						speaker->input[speaker->inputs].name = auto_strdup(namebuf);
 
 						/* connect the output to the input */
@@ -502,7 +523,7 @@ static void route_sound(void)
 						if (mroute->output == outputnum)
 							stream_set_input(sound->output[0].stream, mroute->input, info->output[outputnum].stream, info->output[outputnum].output, mroute->gain);
 				}
-					
+
 			}
 		}
 	}

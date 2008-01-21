@@ -290,6 +290,7 @@ void sndintrf_register_token(void *token);
 int sndti_exists(sound_type sndtype, int sndindex);
 int sndti_to_sndnum(sound_type type, int index);
 sound_type sndnum_to_sndti(int sndnum, int *index);
+int sndtype_count(sound_type sndtype);
 
 
 #endif	/* __SNDINTRF_H__ */

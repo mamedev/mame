@@ -50,8 +50,8 @@ typedef struct _sndintrf_data sndintrf_data;
 struct _sndintrf_data
 {
 	sound_interface	intf;	 		/* copy of the interface data */
-	sound_type			sndtype; 		/* type index of this sound chip */
-	sound_type			aliastype;		/* aliased type index of this sound chip */
+	sound_type		sndtype; 		/* type index of this sound chip */
+	sound_type		aliastype;		/* aliased type index of this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
 	void *			token;			/* dynamically allocated token data */
@@ -185,7 +185,7 @@ static sound_interface sndintrf[SOUND_COUNT];
 static const struct
 {
 	sound_type	sndtype;
-	void	(*get_info)(void *token, UINT32 state, sndinfo *info);
+	void		(*get_info)(void *token, UINT32 state, sndinfo *info);
 } sndintrf_map[] =
 {
 	{ SOUND_DUMMY, dummy_sound_get_info },
@@ -670,6 +670,24 @@ sound_type sndnum_to_sndti(int sndnum, int *index)
 	if (index != NULL)
 		*index = sound[sndnum].index;
 	return sound[sndnum].aliastype;
+}
+
+
+/*-------------------------------------------------
+    sndtype_count - count the number of a
+    given type
+-------------------------------------------------*/
+
+int sndtype_count(sound_type sndtype)
+{
+	int index;
+	int count = 0;
+
+	for (index = 0; index < totalsnd; index++)
+		if (sound[index].sndtype == sndtype)
+			count++;
+
+	return count;
 }
 
 

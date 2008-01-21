@@ -154,6 +154,7 @@ static INT32 slider_xoffset(INT32 newval, char *buffer, int arg);
 static INT32 slider_yoffset(INT32 newval, char *buffer, int arg);
 static INT32 slider_flicker(INT32 newval, char *buffer, int arg);
 static INT32 slider_beam(INT32 newval, char *buffer, int arg);
+static char *slider_get_screen_desc(int arg);
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(INT32 newval, char *buffer, int arg);
 static INT32 slider_crossoffset(INT32 newval, char *buffer, int arg);
@@ -1655,7 +1656,7 @@ static INT32 slider_volume(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		sound_set_attenuation(newval);
-		sprintf(buffer, "Volume %3ddB", sound_get_attenuation());
+		sprintf(buffer, "Master Volume %3ddB", sound_get_attenuation());
 	}
 	return sound_get_attenuation();
 }
@@ -1723,7 +1724,7 @@ static INT32 slider_refresh(INT32 newval, char *buffer, int arg)
 	{
 		screen_state *state = &Machine->screen[arg];
 		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "Screen %d Refresh rate %.3f", arg, ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
+		sprintf(buffer, "%s Refresh rate %.3f", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh));
 	}
 	refresh = ATTOSECONDS_TO_HZ(Machine->screen[arg].refresh);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
@@ -1741,7 +1742,7 @@ static INT32 slider_brightness(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_brightness(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d Brightness %.3f", arg, render_container_get_brightness(container));
+		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(arg), render_container_get_brightness(container));
 	}
 	return floor(render_container_get_brightness(container) * 1000.0f + 0.5f);
 }
@@ -1758,7 +1759,7 @@ static INT32 slider_contrast(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_contrast(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d Contrast %.3f", arg, render_container_get_contrast(container));
+		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(arg), render_container_get_contrast(container));
 	}
 	return floor(render_container_get_contrast(container) * 1000.0f + 0.5f);
 }
@@ -1774,7 +1775,7 @@ static INT32 slider_gamma(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_gamma(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d Gamma %.3f", arg, render_container_get_gamma(container));
+		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(arg), render_container_get_gamma(container));
 	}
 	return floor(render_container_get_gamma(container) * 1000.0f + 0.5f);
 }
@@ -1791,7 +1792,7 @@ static INT32 slider_xscale(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_xscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, "Horiz stretch", render_container_get_xscale(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Horiz Stretch", render_container_get_xscale(container));
 	}
 	return floor(render_container_get_xscale(container) * 1000.0f + 0.5f);
 }
@@ -1808,7 +1809,7 @@ static INT32 slider_yscale(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_yscale(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, "Vert stretch", render_container_get_yscale(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Vert Stretch", render_container_get_yscale(container));
 	}
 	return floor(render_container_get_yscale(container) * 1000.0f + 0.5f);
 }
@@ -1825,7 +1826,7 @@ static INT32 slider_xoffset(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_xoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, "Horiz position", render_container_get_xoffset(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Horiz Position", render_container_get_xoffset(container));
 	}
 	return floor(render_container_get_xoffset(container) * 1000.0f + 0.5f);
 }
@@ -1842,7 +1843,7 @@ static INT32 slider_yoffset(INT32 newval, char *buffer, int arg)
 	if (buffer != NULL)
 	{
 		render_container_set_yoffset(container, (float)newval * 0.001f);
-		sprintf(buffer, "Screen %d %s %.3f", arg, "Vert position", render_container_get_yoffset(container));
+		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(arg), "Vert Position", render_container_get_yoffset(container));
 	}
 	return floor(render_container_get_yoffset(container) * 1000.0f + 0.5f);
 }
@@ -1877,6 +1878,30 @@ static INT32 slider_beam(INT32 newval, char *buffer, int arg)
 		sprintf(buffer, "%s %1.2f", "Beam Width", vector_get_beam());
 	}
 	return floor(vector_get_beam() * 100.0f + 0.5f);
+}
+
+
+/*-------------------------------------------------
+    slider_get_screen_desc - returns the
+    description for a given screen index
+-------------------------------------------------*/
+
+static char *slider_get_screen_desc(int arg)
+{
+	static char descbuf[256];
+	int item;
+	int screen_count = 0;
+
+	for (item = 0; item < MAX_SCREENS; item++)
+		if (Machine->drv->screen[item].tag != NULL)
+			screen_count++;
+
+	if (screen_count > 1)
+		sprintf(descbuf, "Screen #%d", arg);
+	else
+		strcpy(descbuf, "Screen");
+
+	return descbuf;
 }
 
 
