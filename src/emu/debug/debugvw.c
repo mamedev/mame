@@ -2096,6 +2096,7 @@ static int memory_alloc(debug_view *view)
 	view->supports_cursor = TRUE;
 
 	/* start out with 16 bytes in a single column */
+	memdata->bytes_per_chunk = 1;
 	memdata->chunks_displayed = 16;
 
 	return 1;
@@ -2664,8 +2665,13 @@ static void memory_update(debug_view *view)
 		addrmask = cpuinfo->space[memdata->spacenum].logbytemask;
 
 		/* clamp the bytes per chunk */
-		if (memdata->bytes_per_chunk < (1 << cpuinfo->space[memdata->spacenum].addr2byte_lshift))
-			memdata->bytes_per_chunk = (1 << cpuinfo->space[memdata->spacenum].addr2byte_lshift);
+		while (memdata->bytes_per_chunk < (1 << cpuinfo->space[memdata->spacenum].addr2byte_lshift))
+		{
+			memdata->bytes_per_chunk *= 2;
+			memdata->chunks_displayed /= 2;
+			if (memdata->chunks_displayed == 0)
+				memdata->chunks_displayed = 1;
+		}
 	}
 
 	/* determine how many characters we need for an address and set the divider */
