@@ -14,6 +14,7 @@
 
 #include "sndintrf.h"
 #include "streams.h"
+#include "hc55516.h"
 #include <math.h>
 
 
@@ -35,12 +36,12 @@ struct hc55516_data
 	int		active_clock_hi;
 
 	UINT8	last_clock_state;
-	UINT8	databit;
-	UINT8	new_databit;
+	UINT8	digit;
+	UINT8	new_digit;
 	UINT8	shiftreg;
 
-	INT16	curr_value;
-	INT16	next_value;
+	INT16	curr_sample;
+	INT16	next_sample;
 
 	UINT32	update_count;
 
@@ -69,18 +70,19 @@ static void *start_common(int sndindex, int clock, const void *config, int _acti
 	decay = pow(exp(-1), 1.0 / (FILTER_DECAY_TC * 16000.0));
 	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
-	/* create the stream */
 	chip->clock = clock;
 	chip->active_clock_hi = _active_clock_hi;
 	chip->last_clock_state = 0;
+
+	/* create the stream */
 	chip->channel = stream_create(0, 1, SAMPLE_RATE, chip, hc55516_update);
 
 	state_save_register_item("hc55516", sndindex, chip->last_clock_state);
-	state_save_register_item("hc55516", sndindex, chip->databit);
-	state_save_register_item("hc55516", sndindex, chip->new_databit);
+	state_save_register_item("hc55516", sndindex, chip->digit);
+	state_save_register_item("hc55516", sndindex, chip->new_digit);
 	state_save_register_item("hc55516", sndindex, chip->shiftreg);
-	state_save_register_item("hc55516", sndindex, chip->curr_value);
-	state_save_register_item("hc55516", sndindex, chip->next_value);
+	state_save_register_item("hc55516", sndindex, chip->curr_sample);
+	state_save_register_item("hc55516", sndindex, chip->next_sample);
 	state_save_register_item("hc55516", sndindex, chip->update_count);
 	state_save_register_item("hc55516", sndindex, chip->filter);
 	state_save_register_item("hc55516", sndindex, chip->integrator);
@@ -116,6 +118,12 @@ static void hc55516_reset(void *chip)
 
 
 
+INLINE int is_external_osciallator(struct hc55516_data *chip)
+{
+	return chip->clock != 0;
+}
+
+
 INLINE int is_active_clock_transition(struct hc55516_data *chip, int clock_state)
 {
 	return (( chip->active_clock_hi && !chip->last_clock_state &&  clock_state) ||
@@ -129,12 +137,12 @@ INLINE int current_clock_state(struct hc55516_data *chip)
 }
 
 
-static void process_bit(struct hc55516_data *chip)
+static void process_digit(struct hc55516_data *chip)
 {
 	double integrator = chip->integrator, temp;
 
 	/* move the estimator up or down a step based on the bit */
-	if (chip->databit)
+	if (chip->digit)
 	{
 		chip->shiftreg = ((chip->shiftreg << 1) | 1) & 7;
 		integrator += chip->filter;
@@ -170,9 +178,9 @@ static void process_bit(struct hc55516_data *chip)
 
 	/* compress the sample range to fit better in a 16-bit word */
 	if (temp < 0)
-		chip->next_value = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
+		chip->next_sample = (int)(temp / (-temp * (1.0 / 32768.0) + 1.0));
 	else
-		chip->next_value = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));
+		chip->next_sample = (int)(temp / (temp * (1.0 / 32768.0) + 1.0));
 }
 
 
@@ -181,47 +189,47 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 	struct hc55516_data *chip = param;
 	stream_sample_t *buffer = _buffer[0];
 	int i;
-	INT32 data, slope;
+	INT32 sample, slope;
 
 	/* zero-length? bail */
 	if (length == 0)
 		return;
 
-	if (chip->clock == 0)
+	if (!is_external_osciallator(chip))
 	{
 		/* track how many samples we've updated without a clock */
 		chip->update_count += length;
 		if (chip->update_count > SAMPLE_RATE / 32)
 		{
 			chip->update_count = SAMPLE_RATE;
-			chip->next_value = 0;
+			chip->next_sample = 0;
 		}
 	}
 
 	/* compute the interpolation slope */
-	data = chip->curr_value;
-	slope = ((INT32)chip->next_value - data) / length;
-	chip->curr_value = chip->next_value;
+	sample = chip->curr_sample;
+	slope = ((INT32)chip->next_sample - sample) / length;
+	chip->curr_sample = chip->next_sample;
 
-	if (chip->clock != 0)
+	if (is_external_osciallator(chip))
 	{
 		/* external oscillator */
-		for (i = 0; i < length; i++, data += slope)
+		for (i = 0; i < length; i++, sample += slope)
 		{
 			UINT8 clock_state;
 
-			*buffer++ = data;
+			*buffer++ = sample;
 
 			chip->update_count++;
 
 			clock_state = current_clock_state(chip);
 
-			/* pull in next data bit on the appropriate edge of the clock */
+			/* pull in next digit on the appropriate edge of the clock */
 			if (is_active_clock_transition(chip, clock_state))
 			{
-				chip->databit = chip->new_databit;
+				chip->digit = chip->new_digit;
 
-				process_bit(chip);
+				process_digit(chip);
 			}
 
 			chip->last_clock_state = clock_state;
@@ -230,8 +238,8 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 	/* software driven clock */
 	else
-		for (i = 0; i < length; i++, data += slope)
-			*buffer++ = data;
+		for (i = 0; i < length; i++, sample += slope)
+			*buffer++ = sample;
 }
 
 
@@ -240,7 +248,8 @@ void hc55516_clock_w(int num, int state)
 	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
 	UINT8 clock_state = state ? TRUE : FALSE;
 
-	assert(chip->clock == 0);
+	/* only makes sense for setups with a software driven clock */
+	assert(!is_external_osciallator(chip));
 
 	/* speech clock changing? */
 	if (is_active_clock_transition(chip, clock_state))
@@ -251,7 +260,7 @@ void hc55516_clock_w(int num, int state)
 		/* clear the update count */
 		chip->update_count = 0;
 
-		process_bit(chip);
+		process_digit(chip);
 	}
 
 	/* update the clock */
@@ -259,36 +268,36 @@ void hc55516_clock_w(int num, int state)
 }
 
 
-void hc55516_digit_w(int num, int data)
+void hc55516_digit_w(int num, int digit)
 {
 	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
 
-	if (chip->clock != 0)
+	if (is_external_osciallator(chip))
 	{
 		stream_update(chip->channel);
-		chip->new_databit = data & 1;
+		chip->new_digit = digit & 1;
 	}
 	else
-		chip->databit = data & 1;
+		chip->digit = digit & 1;
 }
 
 
-void hc55516_clock_clear_w(int num, int data)
+void hc55516_clock_clear_w(int num)
 {
 	hc55516_clock_w(num, 0);
 }
 
 
-void hc55516_clock_set_w(int num, int data)
+void hc55516_clock_set_w(int num)
 {
 	hc55516_clock_w(num, 1);
 }
 
 
-void hc55516_digit_clock_clear_w(int num, int data)
+void hc55516_digit_clock_clear_w(int num, int digit)
 {
 	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
-	chip->databit = data & 1;
+	chip->digit = digit & 1;
 	hc55516_clock_w(num, 0);
 }
 
@@ -297,7 +306,8 @@ int hc55516_clock_state_r(int num)
 {
 	struct hc55516_data *chip = sndti_token(SOUND_HC55516, num);
 
-	assert(chip->clock != 0);
+	/* only makes sense for setups with an external oscillator */
+	assert(is_external_osciallator(chip));
 
 	stream_update(chip->channel);
 
@@ -306,18 +316,18 @@ int hc55516_clock_state_r(int num)
 
 
 
-WRITE8_HANDLER( hc55516_0_digit_w )	{ hc55516_digit_w(0,data); }
-WRITE8_HANDLER( hc55516_0_clock_w )	{ hc55516_clock_w(0,data); }
-WRITE8_HANDLER( hc55516_0_clock_clear_w )	{ hc55516_clock_clear_w(0,data); }
-WRITE8_HANDLER( hc55516_0_clock_set_w )		{ hc55516_clock_set_w(0,data); }
-WRITE8_HANDLER( hc55516_0_digit_clock_clear_w )	{ hc55516_digit_clock_clear_w(0,data); }
+WRITE8_HANDLER( hc55516_0_digit_w )	{ hc55516_digit_w(0, data); }
+WRITE8_HANDLER( hc55516_0_clock_w )	{ hc55516_clock_w(0, data); }
+WRITE8_HANDLER( hc55516_0_clock_clear_w )	{ hc55516_clock_clear_w(0); }
+WRITE8_HANDLER( hc55516_0_clock_set_w )		{ hc55516_clock_set_w(0); }
+WRITE8_HANDLER( hc55516_0_digit_clock_clear_w )	{ hc55516_digit_clock_clear_w(0, data); }
 READ8_HANDLER ( hc55516_0_clock_state_r )	{ return hc55516_clock_state_r(0); }
 
-WRITE8_HANDLER( hc55516_1_digit_w ) { hc55516_digit_w(1,data); }
-WRITE8_HANDLER( hc55516_1_clock_w ) { hc55516_clock_w(1,data); }
-WRITE8_HANDLER( hc55516_1_clock_clear_w ) { hc55516_clock_clear_w(1,data); }
-WRITE8_HANDLER( hc55516_1_clock_set_w )  { hc55516_clock_set_w(1,data); }
-WRITE8_HANDLER( hc55516_1_digit_clock_clear_w ) { hc55516_digit_clock_clear_w(1,data); }
+WRITE8_HANDLER( hc55516_1_digit_w ) { hc55516_digit_w(1, data); }
+WRITE8_HANDLER( hc55516_1_clock_w ) { hc55516_clock_w(1, data); }
+WRITE8_HANDLER( hc55516_1_clock_clear_w ) { hc55516_clock_clear_w(1); }
+WRITE8_HANDLER( hc55516_1_clock_set_w )  { hc55516_clock_set_w(1); }
+WRITE8_HANDLER( hc55516_1_digit_clock_clear_w ) { hc55516_digit_clock_clear_w(1, data); }
 READ8_HANDLER ( hc55516_1_clock_state_r )	{ return hc55516_clock_state_r(1); }
 
 
