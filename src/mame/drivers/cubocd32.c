@@ -104,7 +104,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_BANK1);
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_ROM);
+			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, MWA32_UNMAP);
 	}
 }
 

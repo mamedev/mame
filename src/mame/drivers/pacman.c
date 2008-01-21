@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1,MWA8_ROM)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
@@ -846,7 +846,7 @@ static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_2_r)	/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ(input_port_3_r)	/* DSW2 */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK1,MWA8_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
 ADDRESS_MAP_END
 
 
@@ -936,7 +936,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_READWRITE(MRA8_BANK1,MWA8_ROM)
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
@@ -1069,7 +1069,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1,MWA8_ROM)
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
@@ -1091,7 +1091,7 @@ static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_2_r)	/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ(input_port_3_r)	/* DSW2 */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK2,MWA8_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crushs_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -5377,8 +5377,8 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MRA8_RAM);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MWA8_RAM);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MRA8_BANK5, MWA8_BANK5);
+	memory_set_bankptr(5, auto_malloc(0x400));
 
 	/* protection? */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);

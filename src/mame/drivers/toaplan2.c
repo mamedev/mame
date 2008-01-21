@@ -300,6 +300,7 @@ static UINT8 *toaplan2_shared_ram;
 static UINT8 *raizing_shared_ram;		/* Shared ram used in Shippumd and Mahoudai */
 static UINT16 *toaplan2_shared_ram16;	/* Really 8bit RAM connected to Z180 */
 static UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
+static UINT16 *fixeight_sec_cpu_mem;
 
 /************ Video RAM related values ************/
 extern UINT16 *toaplan2_txvideoram16;
@@ -454,8 +455,8 @@ static DRIVER_INIT( T2_noZ80 )
 
 static DRIVER_INIT( fixeight )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, MRA16_RAM );
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, MWA16_RAM );
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, MRA16_BANK2, MWA16_BANK2 );
+	memory_set_bankptr(2, fixeight_sec_cpu_mem);
 
 	toaplan2_sub_cpu = CPU_2_V25;
 }
@@ -953,14 +954,11 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28f003, 0, 0, MRA16_RAM);
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_5_word_r);	/* Dip Switch A - Wrong !!! */
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_6_word_r);	/* Dip Switch B - Wrong !!! */
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_7_word_r);	/* Territory Jumper block - Wrong !!! */
-			memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f00a, 0x28fbff, 0, 0, MRA16_RAM);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28f003, 0, 0, MWA16_RAM);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f009, 0, 0, MWA16_NOP);
-			memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f00a, 0x28fbff, 0, 0, MWA16_RAM);
+			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, MRA16_BANK2, MWA16_BANK2);
+			memory_set_bankptr(2, fixeight_sec_cpu_mem);
+			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_5_word_r, MWA16_NOP);	/* Dip Switch A - Wrong !!! */
+			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_6_word_r, MWA16_NOP);	/* Dip Switch B - Wrong !!! */
+			memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_7_word_r, MWA16_NOP);	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}
@@ -1552,7 +1550,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
 #else
 	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
-	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w)	/* V25+ Command/Status port */
+	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w) AM_BASE(&fixeight_sec_cpu_mem)	/* V25+ Command/Status port */
 //  AM_RANGE(0x28f002, 0x28f003) AM_READ(MRA16_RAM)             /* part of shared ram */
 //  AM_RANGE(0x28f004, 0x28f005) AM_READ_PORT("DSWA") /* Dip Switch A - Wrong !!! */
 //  AM_RANGE(0x28f006, 0x28f007) AM_READ_PORT("DSWB") /* Dip Switch B - Wrong !!! */

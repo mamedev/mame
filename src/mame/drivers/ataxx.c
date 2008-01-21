@@ -826,8 +826,8 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(1);
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, MRA8_RAM);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, MWA8_RAM);
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, MRA8_BANK4, MWA8_BANK4);
+	memory_set_bankptr(4, auto_malloc(0x1000));
 
 	/* set up additional input ports */
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);

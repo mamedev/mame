@@ -122,7 +122,7 @@ static void arcadia_cia_0_porta_w(UINT8 data)
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_ROM);
+		memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, MWA16_UNMAP);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);

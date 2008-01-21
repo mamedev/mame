@@ -384,8 +384,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 		}
 		else
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK1);	/* banked ROM */
-			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MWA8_ROM);
+			memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_UNMAP);	/* banked ROM */
 		}
 	}
 }
