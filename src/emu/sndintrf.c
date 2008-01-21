@@ -124,6 +124,8 @@ void msm5205_get_info(void *token, UINT32 state, sndinfo *info);
 void msm5232_get_info(void *token, UINT32 state, sndinfo *info);
 void upd7759_get_info(void *token, UINT32 state, sndinfo *info);
 void hc55516_get_info(void *token, UINT32 state, sndinfo *info);
+void mc3417_get_info(void *token, UINT32 state, sndinfo *info);
+void mc3418_get_info(void *token, UINT32 state, sndinfo *info);
 void k005289_get_info(void *token, UINT32 state, sndinfo *info);
 void k007232_get_info(void *token, UINT32 state, sndinfo *info);
 void k051649_get_info(void *token, UINT32 state, sndinfo *info);
@@ -336,6 +338,8 @@ static const struct
 #endif
 #if (HAS_HC55516)
 	{ SOUND_HC55516, hc55516_get_info },
+	{ SOUND_MC3417, mc3417_get_info },
+	{ SOUND_MC3418, mc3418_get_info },
 #endif
 #if (HAS_K005289)
 	{ SOUND_K005289, k005289_get_info },

@@ -105,7 +105,7 @@ static struct sh8253_timer_channel sh8253_timer[3];
 static UINT8 has_sh8253;
 
 /* 5220/CVSD variables */
-static UINT8 has_hc55516;
+static UINT8 has_mc3417;
 static UINT8 has_tms5220;
 
 /* sound streaming variables */
@@ -357,11 +357,11 @@ static void *common_sh_start(int _has_sh8253, int _has_tms5220)
 	has_tms5220 = _has_tms5220;
 
 	/* determine which sound hardware is installed */
-	has_hc55516 = FALSE;
+	has_mc3417 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->drv->sound[i].type == SOUND_HC55516)
-			has_hc55516 = TRUE;
+		if (Machine->drv->sound[i].type == SOUND_MC3417)
+			has_mc3417 = TRUE;
 	}
 
 	/* allocate the stream */
@@ -466,7 +466,7 @@ static WRITE8_HANDLER( exidy_shriot_w )
 		switch (offset & 0x03)
 		{
 			case 0:	/* port A */
-				if (has_hc55516)
+				if (has_mc3417)
 					cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				riot_porta_data = (riot_porta_data & ~riot_porta_ddr) | (data & riot_porta_ddr);
 				break;
@@ -854,7 +854,7 @@ static READ8_HANDLER( mtrap_voiceio_r )
 	}
 
 	if (!(offset & 0x40))
-		return hc55516_clock_edge_r(0) << 7;
+		return hc55516_clock_state_r(0) << 7;
 
 	return 0;
 }
@@ -879,7 +879,7 @@ MACHINE_DRIVER_START( mtrap_cvsd_audio )
 	MDRV_CPU_IO_MAP(cvsd_iomap,0)
 
 	/* audio hardware */
-	MDRV_SOUND_ADD(HC55516, CVSD_CLOCK)
+	MDRV_SOUND_ADD(MC3417, CVSD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
