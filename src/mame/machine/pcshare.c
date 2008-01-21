@@ -43,7 +43,7 @@
 #include "machine/pc_fdc.h"
 
 #include "includes/pclpt.h"
-#include "includes/centroni.h"
+#include "machine/centroni.h"
 
 #include "machine/pc_hdc.h"
 #include "machine/nec765.h"
