@@ -202,7 +202,7 @@ static void ninjakd2_init_samples(void)
 
 	const int length = memory_region_length(REGION_SOUND1);
 
-	UINT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
+	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
 
 	int i;
 
@@ -210,7 +210,7 @@ static void ninjakd2_init_samples(void)
 	for (i = 0; i < length; ++i)
 		sampledata[i] = rom[i] << 7;
 
-	ninjakd2_sampledata = (INT16*)sampledata;
+	ninjakd2_sampledata = sampledata;
 }
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
