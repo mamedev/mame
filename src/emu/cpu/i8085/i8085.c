@@ -144,6 +144,7 @@ typedef struct {
 	INT8	irq_state[4];
 	int 	(*irq_callback)(int);
 	void	(*sod_callback)(int state);
+	int		(*sid_callback)(void);
 }	i8085_Regs;
 
 static int i8085_ICount = 0;
@@ -313,6 +314,8 @@ INLINE void execute_one(int opcode)
 			if( I.cputype ) {
 				i8085_ICount -= 7;		/* RIM  */
 				I.AF.b.h = I.IM;
+				if (I.sid_callback)
+					I.AF.b.h = (I.AF.b.h & 0x7f) | ((*I.sid_callback)() ? 0x80 : 0);
 				I.AF.b.h |= RIM_IEN; RIM_IEN = 0; //AT: read and clear IEN status latch
 			} else {
 				i8085_ICount -= 4;		/* NOP undocumented */
@@ -1340,12 +1343,18 @@ static void i8085_init(int index, int clock, const void *config, int (*irqcallba
 static void i8085_reset(void)
 {
 	int (*save_irqcallback)(int);
+	void (*save_sodcallback)(int);
+	int (*save_sidcallback)(void);
 	int cputype_bak = I.cputype;
 
 	init_tables();
 	save_irqcallback = I.irq_callback;
+	save_sodcallback = I.sod_callback;
+	save_sidcallback = I.sid_callback;
 	memset(&I, 0, sizeof(i8085_Regs));
 	I.irq_callback = save_irqcallback;
+	I.sod_callback = save_sodcallback;
+	I.sid_callback = save_sidcallback;
 	change_pc(I.PC.d);
 
 	I.cputype = cputype_bak;
@@ -1612,6 +1621,7 @@ static void i8085_set_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_I8085_SOD_CALLBACK:			I.sod_callback = (void (*)(int))info->f; break;
+		case CPUINFO_PTR_I8085_SID_CALLBACK:			I.sid_callback = (int (*)(void))info->f; break;
 	}
 }
 
