@@ -2301,32 +2301,59 @@ static void handle_vector_ops(UINT32 op)
 			}
 			else
 			{
-				int negative = 0;
+				int sign = 0;
+				int exp = 0;
+				int mantissa = 0;
+
 				if (rec < 0)
 				{
-					rec = ~rec+1;
-					negative = 1;
+					rec = -rec;	// rec = MINUS rec
+					sign = 1;
 				}
-				for (i = 15; i > 0; i--)
+
+				// restrict to 10-bit mantissa
+				for (i = 15; i >= 0; i--)
 				{
 					if (rec & (1 << i))
 					{
-						rec &= ((0xffc0) >> (15 - i));
-						i = 0;
+						exp = i;
+						mantissa = (rec << (15 - i)) >> 6;
+						break;
 					}
 				}
-				rec = (INT32)(0x7fffffff / (double)rec);
-				for (i = 31; i > 0; i--)
+
+				if (mantissa == 0x200)
 				{
-					if (rec & (1 << i))
-					{
-						rec &= ((0xffff8000) >> (31 - i));
-						i = 0;
-					}
+					rec = 0x7fffffff;
 				}
-				if (negative)
+				else
 				{
-					rec = ~rec;
+					rec = 0xffffffffU / mantissa;
+
+					//
+					// simulate rounding error
+					//
+					// This has been verified on the real hardware.
+					//
+					// I was able to replicate this exact behaviour by using a five-round
+					// Newton reciprocal method using floorf() on intermediate results
+					// to force the use of IEEE 754 32bit floats.
+					// However, for the sake of portability, we'll use integer arithmetic.
+					//
+					if (rec & 0x800)
+						rec += 1;
+
+					rec <<= 8;
+				}
+
+				// restrict result to 17 significant bits
+				rec &= 0x7fffc000;
+
+				rec >>= exp;
+
+				if (sign)
+				{
+					rec = ~rec;	// rec = BITWISE NOT rec
 				}
 			}
 
