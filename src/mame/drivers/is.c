@@ -454,7 +454,7 @@ static MACHINE_DRIVER_START( igrosoft )
 MACHINE_DRIVER_END
 
 
-#include "igrodrvr.c"
+#include "isdrvr.c"
 
 
 
