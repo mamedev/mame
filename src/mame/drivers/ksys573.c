@@ -263,16 +263,16 @@ static NVRAM_HANDLER( konami573 )
 {
 	int i;
 
-	nvram_handler_timekeeper_0( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(timekeeper_0);
 
 	if( nvram_handler_security_cart_0 != NULL )
 	{
-		nvram_handler_security_cart_0( machine, file, read_or_write );
+		NVRAM_HANDLER_CALL(security_cart_0);
 	}
 
 	if( nvram_handler_security_cart_1 != NULL )
 	{
-		nvram_handler_security_cart_1( machine, file, read_or_write );
+		NVRAM_HANDLER_CALL(security_cart_1);
 	}
 
 	for( i = 0; i < flash_chips; i++ )
