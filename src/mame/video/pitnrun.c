@@ -185,7 +185,6 @@ VIDEO_START(pitnrun)
 	tmp_bitmap[2] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	tmp_bitmap[3] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	pitnrun_spotlights();
-	VIDEO_START_CALL(generic);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )

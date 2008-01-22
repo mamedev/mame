@@ -14,7 +14,7 @@ UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
 size_t goldstar_video_size;
 UINT8 *goldstar_scroll1, *goldstar_scroll2, *goldstar_scroll3;
 
-static mame_bitmap *tmpbitmap1, *tmpbitmap2, *tmpbitmap3;
+static mame_bitmap *tmpbitmap1, *tmpbitmap2, *tmpbitmap3, *tmpbitmap4;
 static int bgcolor;
 
 
@@ -28,12 +28,11 @@ VIDEO_START( goldstar )
 {
 //        int i;
 
-	VIDEO_START_CALL(generic);
-
 	/* the background area is half as high as the screen */
 	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tmpbitmap3 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap4 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	/* leave everything at the default, but map all foreground 0 pens as transparent */
 //        for (i = 0;i < 16;i++) palette_used_colors[8 * i] = PALETTE_COLOR_TRANSPARENT;
@@ -70,7 +69,7 @@ VIDEO_UPDATE( goldstar )
 		sx = offs % 64;
 		sy = offs / 64;
 
-		drawgfx(tmpbitmap,machine->gfx[0],
+		drawgfx(tmpbitmap4,machine->gfx[0],
 				videoram[offs] + ((colorram[offs] & 0xf0) << 4),
 				colorram[offs] & 0x0f,
 				0,0,
@@ -78,7 +77,7 @@ VIDEO_UPDATE( goldstar )
 				0,TRANSPARENCY_NONE,0);
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap4,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
 
 
 	for (offs = goldstar_video_size - 1;offs >= 0;offs--)
@@ -116,19 +115,19 @@ VIDEO_UPDATE( goldstar )
 			scrolly[i] = -goldstar_scroll1[i];
 
 		copyscrollbitmap(bitmap,tmpbitmap1,0,0,64,scrolly,&visible1,TRANSPARENCY_NONE,0);
-                copybitmap(bitmap,tmpbitmap,0,0,0,0,&visible1,TRANSPARENCY_PEN,0);
+		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible1,TRANSPARENCY_PEN,0);
 
 		for (i= 0;i < 64;i++)
 			scrolly[i] = -goldstar_scroll2[i];
 
 		copyscrollbitmap(bitmap,tmpbitmap2,0,0,64,scrolly,&visible2,TRANSPARENCY_NONE,0);
-                copybitmap(bitmap,tmpbitmap,0,0,0,0,&visible2,TRANSPARENCY_PEN,0);
+		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible2,TRANSPARENCY_PEN,0);
 
 		for (i= 0;i < 64;i++)
 			scrolly[i] = -goldstar_scroll3[i];
 
 		copyscrollbitmap(bitmap,tmpbitmap3,0,0,64,scrolly,&visible3,TRANSPARENCY_NONE,0);
-                copybitmap(bitmap,tmpbitmap,0,0,0,0,&visible3,TRANSPARENCY_PEN,0);
+		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible3,TRANSPARENCY_PEN,0);
 	}
 	return 0;
 }

@@ -37,8 +37,6 @@ static int palette_bank;
 
 VIDEO_START( wiz )
 {
-	VIDEO_START_CALL(generic);
-
 	state_save_register_global_array(char_bank);
 	state_save_register_global_array(palbank);
 	state_save_register_global(flipx);

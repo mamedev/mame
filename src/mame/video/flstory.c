@@ -54,7 +54,6 @@ VIDEO_START( flstory )
 
 	paletteram = auto_malloc(0x200);
 	paletteram_2 = auto_malloc(0x200);
-	VIDEO_START_CALL(generic);
 }
 
 VIDEO_START( victnine )
@@ -64,7 +63,6 @@ VIDEO_START( victnine )
 
 	paletteram = auto_malloc(0x200);
 	paletteram_2 = auto_malloc(0x200);
-	VIDEO_START_CALL(generic);
 }
 
 WRITE8_HANDLER( flstory_videoram_w )
