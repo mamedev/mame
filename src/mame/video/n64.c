@@ -17,9 +17,9 @@ extern UINT32 *rsp_imem;
 extern UINT32 *rsp_dmem;
 extern void dp_full_sync(void);
 
-extern UINT32 vi_origin;
-extern UINT32 vi_width;
-extern UINT32 vi_control;
+extern UINT32 n64_vi_origin;
+extern UINT32 n64_vi_width;
+extern UINT32 n64_vi_control;
 
 extern UINT32 dp_start;
 extern UINT32 dp_end;
@@ -313,9 +313,9 @@ VIDEO_START(n64)
 VIDEO_UPDATE(n64)
 {
 	int i, j;
-	int height = (vi_control & 0x40) ? 479 : 239;
+    int height = (n64_vi_control & 0x40) ? 479 : 239;
 
-	switch (vi_control & 0x3)
+    switch (n64_vi_control & 0x3)
 	{
 		case 0:		// blank/no signal
 		{
@@ -324,7 +324,7 @@ VIDEO_UPDATE(n64)
 
 		case 2:		// RGBA5551
 		{
-			UINT16 *frame_buffer = (UINT16*)&rdram[vi_origin / 4];
+            UINT16 *frame_buffer = (UINT16*)&rdram[n64_vi_origin / 4];
 			if (frame_buffer)
 			{
 				for (j=0; j <height; j++)
@@ -345,7 +345,7 @@ VIDEO_UPDATE(n64)
 
 		case 3:		// RGBA8888
 		{
-			UINT32 *frame_buffer = (UINT32*)&rdram[vi_origin / 4];
+            UINT32 *frame_buffer = (UINT32*)&rdram[n64_vi_origin / 4];
 			if (frame_buffer)
 			{
 				for (j=0; j < height; j++)
@@ -361,7 +361,7 @@ VIDEO_UPDATE(n64)
 			break;
 		}
 
-		default:	fatalerror("Unknown framebuffer format %d\n", vi_control & 0x3);
+        default:    fatalerror("Unknown framebuffer format %d\n", n64_vi_control & 0x3);
 	}
 	return 0;
 }

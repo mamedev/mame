@@ -565,54 +565,54 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-UINT32 vi_width;
-UINT32 vi_origin;
-UINT32 vi_control;
-static UINT32 vi_burst, vi_vsync, vi_hsync, vi_leap, vi_hstart, vi_vstart;
-static UINT32 vi_intr, vi_vburst, vi_xscale, vi_yscale;
+UINT32 n64_vi_width;
+UINT32 n64_vi_origin;
+UINT32 n64_vi_control;
+static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;
+static UINT32 n64_vi_intr,  n64_vi_vburst, n64_vi_xscale, n64_vi_yscale;
 
 READ32_HANDLER( n64_vi_reg_r )
 {
 	switch (offset)
 	{
 		case 0x04/4:		// VI_ORIGIN_REG
-			return vi_origin;
+            return n64_vi_origin;
 
 		case 0x08/4:		// VI_WIDTH_REG
-			return vi_width;
+            return n64_vi_width;
 
 		case 0x0c/4:
-			return vi_intr;
+            return n64_vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
 			return video_screen_get_vpos(0);
 
 		case 0x14/4:		// VI_BURST_REG
-			return vi_burst;
+            return n64_vi_burst;
 
 		case 0x18/4:		// VI_V_SYNC_REG
-			return vi_vsync;
+            return n64_vi_vsync;
 
 		case 0x1c/4:		// VI_H_SYNC_REG
-			return vi_hsync;
+            return n64_vi_hsync;
 
 		case 0x20/4:		// VI_LEAP_REG
-			return vi_leap;
+            return n64_vi_leap;
 
 		case 0x24/4:		// VI_H_START_REG
-			return vi_hstart;
+            return n64_vi_hstart;
 
 		case 0x28/4:		// VI_V_START_REG
-			return vi_vstart;
+            return n64_vi_vstart;
 
 		case 0x2c/4:		// VI_V_BURST_REG
-			return vi_vburst;
+            return n64_vi_vburst;
 
 		case 0x30/4:		// VI_X_SCALE_REG
-			return vi_xscale;
+            return n64_vi_xscale;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
-			return vi_yscale;
+            return n64_vi_yscale;
 
 		default:
 			logerror("vi_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
@@ -626,34 +626,34 @@ WRITE32_HANDLER( n64_vi_reg_w )
 	switch (offset)
 	{
 		case 0x00/4:		// VI_CONTROL_REG
-			if ((vi_control & 0x40) != (data & 0x40))
+            if ((n64_vi_control & 0x40) != (data & 0x40))
 			{
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_y = (data & 0x40) ? 479 : 239;
 				video_screen_configure(0, state->width, visarea.max_y + 1, &visarea, Machine->screen[0].refresh);
 			}
-			vi_control = data;
+            n64_vi_control = data;
 			break;
 
 		case 0x04/4:		// VI_ORIGIN_REG
-			vi_origin = data & 0xffffff;
+            n64_vi_origin = data & 0xffffff;
 			break;
 
 		case 0x08/4:		// VI_WIDTH_REG
-			if (vi_width != data && data > 0)
+            if (n64_vi_width != data && data > 0)
 			{
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_x = data-1;
 				video_screen_configure(0, visarea.max_x + 1, state->height, &visarea, Machine->screen[0].refresh);
 			}
-			vi_width = data;
-		        fb_width = data;
+            n64_vi_width = data;
+		    fb_width = data;
 			break;
 
 		case 0x0c/4:		// VI_INTR_REG
-			vi_intr = data;
+            n64_vi_intr = data;
 			break;
 
 		case 0x10/4:		// VI_CURRENT_REG
@@ -661,47 +661,47 @@ WRITE32_HANDLER( n64_vi_reg_w )
 			break;
 
 		case 0x14/4:		// VI_BURST_REG
-			vi_burst = data;
+            n64_vi_burst = data;
 			break;
 
 		case 0x18/4:		// VI_V_SYNC_REG
-			vi_vsync = data;
+            n64_vi_vsync = data;
 			break;
 
 		case 0x1c/4:		// VI_H_SYNC_REG
-			vi_hsync = data;
+            n64_vi_hsync = data;
 			break;
 
 		case 0x20/4:		// VI_LEAP_REG
-			vi_leap = data;
+            n64_vi_leap = data;
 			break;
 
 		case 0x24/4:		// VI_H_START_REG
-			vi_hstart = data;
+            n64_vi_hstart = data;
 			break;
 
 		case 0x28/4:		// VI_V_START_REG
-			vi_vstart = data;
+            n64_vi_vstart = data;
 			break;
 
 		case 0x2c/4:		// VI_V_BURST_REG
-			vi_vburst = data;
+            n64_vi_vburst = data;
 			break;
 
 		case 0x30/4:		// VI_X_SCALE_REG
-			vi_xscale = data;
+            n64_vi_xscale = data;
 			break;
 
 		case 0x34/4:		// VI_Y_SCALE_REG
-			vi_yscale = data;
+            n64_vi_yscale = data;
 			break;
 
         /*
         Uncomment this for convenient homebrew debugging
-        */
         case 0x44/4:        // TEMP DEBUG
             printf( "E Ping: %08x\n", data );
             break;
+        */
 
 		default:
 			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
