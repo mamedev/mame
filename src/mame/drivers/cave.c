@@ -4295,7 +4295,7 @@ static DRIVER_INIT( pwrinst2 )
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
        problem? does the Japan set need it or not? */
-	driver_init_pwrins2j(machine);
+	DRIVER_INIT_CALL(pwrins2j);
 
 #if 1		//ROM PATCH
 	{

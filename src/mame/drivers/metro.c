@@ -4562,7 +4562,7 @@ int i;
 for (i = 0;i < (0x20000*3)/2;i++)
 	RAM[i] = mame_rand(machine);
 
-	driver_init_metro(machine);
+	DRIVER_INIT_CALL(metro);
 }
 
 static DRIVER_INIT( daitorid )
@@ -4618,7 +4618,7 @@ static DRIVER_INIT( dharmak )
 		src[i+3] = dat;
 	}
 
-	driver_init_metro(machine);
+	DRIVER_INIT_CALL(metro);
 }
 
 static DRIVER_INIT( blzntrnd )

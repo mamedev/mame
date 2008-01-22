@@ -3806,7 +3806,7 @@ static DRIVER_INIT( sanjeon )
 	}
 
 
-	driver_init_sasissu(Machine);
+	DRIVER_INIT_CALL(sasissu);
 }
 
 GAME( 1996, stvbios,   0, stv, stv,  stv,       ROT0,   "Sega",                      "ST-V Bios", GAME_IS_BIOS_ROOT )

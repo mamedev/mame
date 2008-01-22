@@ -1010,7 +1010,7 @@ static DRIVER_INIT (megaplay)
 	ic37_ram = auto_malloc(0x10000);
 	genesis_io_ram = auto_malloc(0x20);
 
-	driver_init_megadrij(machine);
+	DRIVER_INIT_CALL(megadrij);
 	megplay_stat();
 
 	/* for now ... */

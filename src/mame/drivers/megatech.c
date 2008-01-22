@@ -101,7 +101,7 @@ extern void machine_reset_megadriv(running_machine *machine);
 extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
 extern void video_eof_megatech_bios(running_machine *machine);
 extern void machine_reset_megatech_bios(running_machine *machine);
-extern void driver_init_megatech_bios(running_machine *machine);
+extern DRIVER_INIT(megatech_bios);
 
 
 /* not currently used */
@@ -597,8 +597,8 @@ ADDRESS_MAP_END
 static DRIVER_INIT(mtnew)
 {
 	megatech_banked_ram = auto_malloc(0x1000*8);
-	driver_init_megadriv(Machine);
-	driver_init_megatech_bios(Machine);
+	DRIVER_INIT_CALL(megadriv);
+	DRIVER_INIT_CALL(megatech_bios);
 }
 
 static VIDEO_START(mtnew)

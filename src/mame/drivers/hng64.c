@@ -1409,13 +1409,13 @@ static DRIVER_INIT( hng64 )
 static DRIVER_INIT(hng64_fght)
 {
 	no_machine_error_code=0x01010101;
-	driver_init_hng64(machine);
+	DRIVER_INIT_CALL(hng64);
 }
 
 static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02020202;
-	driver_init_hng64(machine);
+	DRIVER_INIT_CALL(hng64);
 }
 
 

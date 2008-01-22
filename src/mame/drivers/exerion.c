@@ -473,7 +473,7 @@ static DRIVER_INIT( exerionb )
 		ram[addr] = (ram[addr] & 0xf9) | ((ram[addr] & 2) << 1) | ((ram[addr] & 4) >> 1);
 
 	/* also convert the gfx as in Exerion */
-	driver_init_exerion(machine);
+	DRIVER_INIT_CALL(exerion);
 }
 
 

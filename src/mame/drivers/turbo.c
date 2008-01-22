@@ -1542,7 +1542,7 @@ static DRIVER_INIT( turbo )
 static DRIVER_INIT( turbo_enc )
 {
 	turbo_rom_decode();
-	driver_init_turbo(machine);
+	DRIVER_INIT_CALL(turbo);
 }
 
 
@@ -1580,7 +1580,7 @@ static DRIVER_INIT( buckrog )
 static DRIVER_INIT( buckrog_enc )
 {
 	buckrog_decode();
-	driver_init_buckrog(machine);
+	DRIVER_INIT_CALL(buckrog);
 }
 
 

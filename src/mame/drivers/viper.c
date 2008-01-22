@@ -700,7 +700,7 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
-	driver_init_viper(machine);
+	DRIVER_INIT_CALL(viper);
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r );
 	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_w );
@@ -710,7 +710,7 @@ static DRIVER_INIT(vipercf)
 
 static DRIVER_INIT(ppp2nd)
 {
-	driver_init_viper(machine);
+	DRIVER_INIT_CALL(viper);
 
 	/*
     backup_ram[0x0000] = 0x50;  // P

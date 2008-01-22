@@ -1333,7 +1333,7 @@ static DRIVER_INIT( tokiob )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 
-	driver_init_tokio(machine);
+	DRIVER_INIT_CALL(tokio);
 }
 
 

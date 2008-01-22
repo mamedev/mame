@@ -5994,35 +5994,35 @@ static DRIVER_INIT( generic_5797 )
 static DRIVER_INIT( aliensy3_5358 )
 {
 	void fd1089_decrypt_0033(void);
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0033();
 }
 
 
 static DRIVER_INIT( altbeast_5521 )
 {
-	driver_init_generic_5521(machine);
+	DRIVER_INIT_CALL(generic_5521);
 	i8751_vblank_hook = altbeast_i8751_sim;
 }
 
 
 static DRIVER_INIT( altbeasj_5521 )
 {
-	driver_init_generic_5521(machine);
+	DRIVER_INIT_CALL(generic_5521);
 	i8751_vblank_hook = altbeasj_i8751_sim;
 }
 
 
 static DRIVER_INIT( altbeas5_5521 )
 {
-	driver_init_generic_5521(machine);
+	DRIVER_INIT_CALL(generic_5521);
 	i8751_vblank_hook = altbeas5_i8751_sim;
 }
 
 
 static DRIVER_INIT( altbeas4_5521 )
 {
-	driver_init_generic_5521(machine);
+	DRIVER_INIT_CALL(generic_5521);
 	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
 }
 
@@ -6030,7 +6030,7 @@ static DRIVER_INIT( altbeas4_5521 )
 static DRIVER_INIT( aurail1_5704 )
 {
 	void fd1089_decrypt_0168(void);
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	fd1089_decrypt_0168();
 }
 
@@ -6038,14 +6038,14 @@ static DRIVER_INIT( aurail1_5704 )
 static DRIVER_INIT( aurailj_5704 )
 {
 	void fd1089_decrypt_0167(void);
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	fd1089_decrypt_0167();
 }
 
 
 static DRIVER_INIT( ddux_5704 )
 {
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	i8751_vblank_hook = ddux_i8751_sim;
 }
 
@@ -6053,7 +6053,7 @@ static DRIVER_INIT( ddux_5704 )
 static DRIVER_INIT( dunkshot_5358 )
 {
 	void fd1089_decrypt_0022(void);
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0022();
 	custom_io_r = dunkshot_custom_io_r;
 }
@@ -6061,14 +6061,14 @@ static DRIVER_INIT( dunkshot_5358 )
 
 static DRIVER_INIT( exctleag_5358 )
 {
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	custom_io_r = sdi_custom_io_r;
 }
 
 
 static DRIVER_INIT( goldnaxe_5704 )
 {
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	goldnaxe_i8751_init();
 	i8751_vblank_hook = goldnaxe_i8751_sim;
 }
@@ -6076,7 +6076,7 @@ static DRIVER_INIT( goldnaxe_5704 )
 
 static DRIVER_INIT( goldnaxe_5797 )
 {
-	driver_init_generic_5797(machine);
+	DRIVER_INIT_CALL(generic_5797);
 	goldnaxe_i8751_init();
 	i8751_vblank_hook = goldnaxe_i8751_sim;
 }
@@ -6084,7 +6084,7 @@ static DRIVER_INIT( goldnaxe_5797 )
 
 static DRIVER_INIT( hwchamp_5521 )
 {
-	driver_init_generic_5521(machine);
+	DRIVER_INIT_CALL(generic_5521);
 	custom_io_r = hwchamp_custom_io_r;
 	custom_io_w = hwchamp_custom_io_w;
 }
@@ -6092,14 +6092,14 @@ static DRIVER_INIT( hwchamp_5521 )
 
 static DRIVER_INIT( sdi_5358 )
 {
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	custom_io_r = sdi_custom_io_r;
 }
 
 static DRIVER_INIT( defense_5358 )
 {
 	void fd1089_decrypt_0028(void);
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_0028();
 	custom_io_r = sdi_custom_io_r;
 }
@@ -6107,7 +6107,7 @@ static DRIVER_INIT( defense_5358 )
 
 static DRIVER_INIT( shinobi3_5358 )
 {
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	mc8123_decrypt_rom(1, memory_region(REGION_USER2), 0, 0);
 }
 
@@ -6115,7 +6115,7 @@ static DRIVER_INIT( shinobi3_5358 )
 static DRIVER_INIT( sjryuko_5358 )
 {
 	void fd1089_decrypt_5021(void);
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	fd1089_decrypt_5021();
 	custom_io_r = sjryuko_custom_io_r;
 	custom_io_w = sjryuko_custom_io_w;
@@ -6124,34 +6124,34 @@ static DRIVER_INIT( sjryuko_5358 )
 
 static DRIVER_INIT( passshtj_5358 )
 {
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	custom_io_r = passshtj_custom_io_r;
 }
 
 static DRIVER_INIT( tturf_5704 )
 {
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	i8751_vblank_hook = tturf_i8751_sim;
 }
 
 
 static DRIVER_INIT( tturf_5358 )
 {
-	driver_init_generic_5358(machine);
+	DRIVER_INIT_CALL(generic_5358);
 	i8751_vblank_hook = tturf_i8751_sim;
 }
 
 
 static DRIVER_INIT( wb3_5704 )
 {
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	i8751_vblank_hook = wb3_i8751_sim;
 }
 
 
 static DRIVER_INIT( wrestwar_8751 )
 {
-	driver_init_generic_5704(machine);
+	DRIVER_INIT_CALL(generic_5704);
 	i8751_vblank_hook = wrestwar_i8751_sim;
 }
 

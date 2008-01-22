@@ -3033,7 +3033,7 @@ static DRIVER_INIT (galaga)
 
 static DRIVER_INIT (gatsbee)
 {
-	driver_init_galaga(machine);
+	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
@@ -3071,7 +3071,7 @@ static DRIVER_INIT( xevios )
 		rom[A] = BITSWAP8(rom[A],3,7,5,1,2,6,4,0);
 	}
 
-	driver_init_xevious(machine);
+	DRIVER_INIT_CALL(xevious);
 }
 
 
@@ -3083,7 +3083,7 @@ static DRIVER_INIT( battles )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x700f, 0, 0, battles_customio_data0_w );
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7100, 0x7100, 0, 0, battles_customio0_w );
 
-	driver_init_xevious(machine);
+	DRIVER_INIT_CALL(xevious);
 }
 
 

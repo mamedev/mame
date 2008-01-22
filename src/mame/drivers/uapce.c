@@ -224,7 +224,7 @@ ROM_END
 
 static DRIVER_INIT(uapce)
 {
-	driver_init_pce(machine);
+	DRIVER_INIT_CALL(pce);
 };
 
 GAME( 1989, blazlaz, 0, uapce, uapce, uapce, ROT0, "Hudson Soft", "Blazing Lazers", GAME_IMPERFECT_SOUND )

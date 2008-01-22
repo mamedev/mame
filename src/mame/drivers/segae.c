@@ -2353,7 +2353,7 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 
 static DRIVER_INIT( ridleofp )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
@@ -2362,7 +2362,7 @@ static DRIVER_INIT( ridleofp )
 
 static DRIVER_INIT( hangonjr )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
@@ -2370,21 +2370,21 @@ static DRIVER_INIT( hangonjr )
 
 static DRIVER_INIT( opaopa )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 1, 8);
 }
 
 static DRIVER_INIT( fantzn2 )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	mc8123_decrypt_rom(0, memory_region(REGION_USER1), 0, 0);
 }
 
 static DRIVER_INIT( astrofl )
 {
-	driver_init_segasyse(machine);
+	DRIVER_INIT_CALL(segasyse);
 
 	astrofl_decode();
 }

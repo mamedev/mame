@@ -1029,7 +1029,7 @@ static DRIVER_INIT(thrilld)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	driver_init_nwktr(machine);
+	DRIVER_INIT_CALL(nwktr);
 }
 
 static DRIVER_INIT(racingj)
@@ -1063,7 +1063,7 @@ static DRIVER_INIT(racingj)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	driver_init_nwktr(machine);
+	DRIVER_INIT_CALL(nwktr);
 }
 
 static DRIVER_INIT(racingj2)
@@ -1097,7 +1097,7 @@ static DRIVER_INIT(racingj2)
 	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
 	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
 
-	driver_init_nwktr(machine);
+	DRIVER_INIT_CALL(nwktr);
 }
 
 

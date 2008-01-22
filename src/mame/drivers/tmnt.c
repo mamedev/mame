@@ -3917,7 +3917,7 @@ static DRIVER_INIT( mia )
 	UINT8 *temp;
 
 
-	driver_init_gfx(machine);
+	DRIVER_INIT_CALL(gfx);
 
 	/*
         along with the normal byte reordering, TMNT also needs the bits to
@@ -4012,7 +4012,7 @@ static DRIVER_INIT( tmnt )
 	UINT8 *temp;
 
 
-	driver_init_gfx(machine);
+	DRIVER_INIT_CALL(gfx);
 
 	/*
         along with the normal byte reordering, TMNT also needs the bits to

@@ -923,7 +923,7 @@ static DRIVER_INIT( prosport )
 
 static DRIVER_INIT( yellowcb )
 {
-	driver_init_prosport(machine);
+	DRIVER_INIT_CALL(prosport);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, input_port_0_r);
 }

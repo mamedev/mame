@@ -974,5 +974,5 @@ DRIVER_INIT( cps2crpt )
 		++k;
 	}
 
-	driver_init_cps2_video(machine);
+	DRIVER_INIT_CALL(cps2_video);
 }

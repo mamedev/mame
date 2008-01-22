@@ -26,7 +26,7 @@ static DRIVER_INIT( ssf2ghw )
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
 
-	driver_init_megadrij(machine);
+	DRIVER_INIT_CALL(megadrij);
 
 }
 

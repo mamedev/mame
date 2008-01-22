@@ -3120,9 +3120,9 @@ static DRIVER_INIT( jojo )
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
 	cps3_use_fastboot = 0;
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 
 }
@@ -3146,9 +3146,9 @@ static DRIVER_INIT (jojoba)
 //  rom[0x1fec8/4]^=0x00000070; // DEV mode
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0;
 }
@@ -3172,9 +3172,9 @@ static DRIVER_INIT( warzard )
 	                            // any actual NCD dumps to compare (or it expects SCSI to report there being
 	                            // no cd drive?)
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0; // required due to cd check, even with ASIA NO CD selected, not req. with CD emulation
 }
@@ -3200,9 +3200,9 @@ static DRIVER_INIT( sfiii )
 
 	cps3_use_fastboot = 0;
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 }
 
@@ -3224,9 +3224,9 @@ static DRIVER_INIT( sfiii2 )
 
 	cps3_use_fastboot = 0; // not required
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 }
 
 
@@ -3246,9 +3246,9 @@ static DRIVER_INIT( sfiii3 )
 //  rom[0x1fec8/4]^=0x00000001; // region
 //  rom[0x1fecc/4]^=0x01000000; // nocd
 
-	driver_init_cps3crpt(machine);
-	driver_init_cps3_speedups(machine);
-	driver_init_cps3_testhacks(machine);
+	DRIVER_INIT_CALL(cps3crpt);
+	DRIVER_INIT_CALL(cps3_speedups);
+	DRIVER_INIT_CALL(cps3_testhacks);
 
 	cps3_use_fastboot = 0;
 }

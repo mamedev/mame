@@ -9654,7 +9654,7 @@ static DRIVER_INIT( crazyfgt )
 	seta_vregs = (UINT16*)auto_malloc(sizeof(UINT16)*3);
 	seta_vregs[0] = seta_vregs[1] = seta_vregs[2] = 0;
 
-	driver_init_blandia(machine);
+	DRIVER_INIT_CALL(blandia);
 }
 
 /***************************************************************************

@@ -1695,7 +1695,7 @@ static DRIVER_INIT( polepos2 )
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
 	memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 
-	driver_init_polepos(machine);
+	DRIVER_INIT_CALL(polepos);
 }
 
 

@@ -7285,25 +7285,25 @@ ROM_END
 static DRIVER_INIT( wof )
 {
 	wof_decode();
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( dino )
 {
 	dino_decode();
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( punisher )
 {
 	punisher_decode();
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( slammast )
 {
 	slammast_decode();
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 
 static DRIVER_INIT( pang3 )
@@ -7327,7 +7327,7 @@ static DRIVER_INIT( pang3 )
 		rom[A/2] = dst;
 	}
 
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 #endif
 

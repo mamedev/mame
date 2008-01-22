@@ -406,7 +406,7 @@ DRIVER_INIT( mooncrst )
 	for (i = 0;i < memory_region_length(REGION_CPU1);i++)
 		rom[i] = decode_mooncrst(rom[i],i);
 
-	driver_init_mooncrsu(machine);
+	DRIVER_INIT_CALL(mooncrsu);
 }
 
 DRIVER_INIT( mooncrgx )
@@ -493,7 +493,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( gteikob2 )
 {
-	driver_init_pisces(machine);
+	DRIVER_INIT_CALL(pisces);
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7006, 0x7006, 0, 0, gteikob2_flip_screen_x_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7007, 0x7007, 0, 0, gteikob2_flip_screen_y_w);
@@ -501,7 +501,7 @@ DRIVER_INIT( gteikob2 )
 
 DRIVER_INIT( azurian )
 {
-	driver_init_pisces(machine);
+	DRIVER_INIT_CALL(pisces);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6800, 0x6800, 0, 0, azurian_IN1_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0, azurian_IN2_r);

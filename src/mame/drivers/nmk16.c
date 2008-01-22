@@ -4735,7 +4735,7 @@ static DRIVER_INIT( ssmissin )
 
 static DRIVER_INIT( bjtwin )
 {
-	driver_init_nmk(machine);
+	DRIVER_INIT_CALL(nmk);
 
 	/* Patch rom to enable test mode */
 

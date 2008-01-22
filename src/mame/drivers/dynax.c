@@ -5125,7 +5125,7 @@ static DRIVER_INIT( mjelct3a )
 		}
 		free(rom1);
 
-	driver_init_mjelct3(machine);
+	DRIVER_INIT_CALL(mjelct3);
 }
 
 

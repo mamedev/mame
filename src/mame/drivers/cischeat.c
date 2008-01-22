@@ -2687,7 +2687,7 @@ static DRIVER_INIT( wildplt )
 {
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
 
-	driver_init_f1gpstar(machine);
+	DRIVER_INIT_CALL(f1gpstar);
 }
 
 

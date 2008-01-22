@@ -3208,7 +3208,7 @@ ROM_END
 
 static DRIVER_INIT( shogwarr )
 {
-	driver_init_kaneko16(machine);
+	DRIVER_INIT_CALL(kaneko16);
 
 /*
     ROM test at 2237e:

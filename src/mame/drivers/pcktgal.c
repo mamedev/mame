@@ -461,8 +461,8 @@ static DRIVER_INIT( graphics )
 
 static DRIVER_INIT( pcktgal )
 {
-	driver_init_deco222(machine);
-	driver_init_graphics(machine);
+	DRIVER_INIT_CALL(deco222);
+	DRIVER_INIT_CALL(graphics);
 }
 
 /***************************************************************************/

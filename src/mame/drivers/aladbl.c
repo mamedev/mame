@@ -158,7 +158,7 @@ static DRIVER_INIT( aladbl )
 	// 220000 = writes to mcu? 330000 = reads?
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x220000, 0x220001, 0, 0, aladbl_w);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x330000, 0x330001, 0, 0, aladbl_r);
-	driver_init_megadrij(machine);
+	DRIVER_INIT_CALL(megadrij);
 }
 
 GAME( 1993, aladbl ,  0,   megadriv,    aladbl,       aladbl,  ROT0,   "bootleg / Sega", "Aladdin (bootleg of Japanese Megadrive version)", 0)
