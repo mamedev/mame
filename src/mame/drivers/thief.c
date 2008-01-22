@@ -199,23 +199,15 @@ static ADDRESS_MAP_START( thief_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe0c0, 0xe0c0) AM_WRITE(thief_context_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x31, 0x31) AM_READ(thief_io_r) // 8255
-	AM_RANGE(0x41, 0x41) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x43, 0x43) AM_READ(AY8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(thief_input_select_w) // 8255
+	AM_RANGE(0x31, 0x31) AM_READ(thief_io_r) // 8255
 	AM_RANGE(0x33, 0x33) AM_WRITE(tape_control_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE(AY8910_0_r, AY8910_0_w)
+	AM_RANGE(0x42, 0x43) AM_READWRITE(AY8910_1_r, AY8910_1_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(thief_color_plane_w)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(thief_vtcsel_w)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(thief_color_map_w)
@@ -470,7 +462,7 @@ static MACHINE_DRIVER_START( sharkatt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sharkatt_readmem,sharkatt_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT(thief_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -506,7 +498,7 @@ static MACHINE_DRIVER_START( thief )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_readmem,thief_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT(thief_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -542,7 +534,7 @@ static MACHINE_DRIVER_START( natodef )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_readmem,thief_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT(thief_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

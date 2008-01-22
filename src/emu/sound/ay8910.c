@@ -240,6 +240,54 @@ static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 
 
 /* AY8910 interface */
+static UINT8 ay8910_r(int which, offs_t offset)
+{
+	UINT8 ret;
+	struct AY8910 *PSG = sndti_token(SOUND_AY8910, which);
+
+	if (offset & 0x01)
+		ret = ay8910_read_ym(PSG);
+	else
+		/* return whatever the chip returns for a write
+           when BC1 = 0 and BDIR = 0 */
+		ret = 0x00;
+
+	return ret;
+}
+
+
+READ8_HANDLER( AY8910_0_r ) { return ay8910_r(0, offset); }
+READ8_HANDLER( AY8910_1_r ) { return ay8910_r(1, offset); }
+READ8_HANDLER( AY8910_2_r ) { return ay8910_r(2, offset); }
+READ8_HANDLER( AY8910_3_r ) { return ay8910_r(3, offset); }
+READ8_HANDLER( AY8910_4_r ) { return ay8910_r(4, offset); }
+READ16_HANDLER( AY8910_0_lsb_r ) { return ay8910_r(0, offset); }
+READ16_HANDLER( AY8910_1_lsb_r ) { return ay8910_r(1, offset); }
+READ16_HANDLER( AY8910_2_lsb_r ) { return ay8910_r(2, offset); }
+READ16_HANDLER( AY8910_3_lsb_r ) { return ay8910_r(3, offset); }
+READ16_HANDLER( AY8910_4_lsb_r ) { return ay8910_r(4, offset); }
+READ16_HANDLER( AY8910_0_msb_r ) { return ay8910_r(0, offset) << 8; }
+READ16_HANDLER( AY8910_1_msb_r ) { return ay8910_r(1, offset) << 8; }
+READ16_HANDLER( AY8910_2_msb_r ) { return ay8910_r(2, offset) << 8; }
+READ16_HANDLER( AY8910_3_msb_r ) { return ay8910_r(3, offset) << 8; }
+READ16_HANDLER( AY8910_4_msb_r ) { return ay8910_r(4, offset) << 8; }
+
+READ8_HANDLER( AY8910_0_inv_a0_r ) { return ay8910_r(0, offset ^ 1); }
+READ8_HANDLER( AY8910_1_inv_a0_r ) { return ay8910_r(1, offset ^ 1); }
+READ8_HANDLER( AY8910_2_inv_a0_r ) { return ay8910_r(2, offset ^ 1); }
+READ8_HANDLER( AY8910_3_inv_a0_r ) { return ay8910_r(3, offset ^ 1); }
+READ8_HANDLER( AY8910_4_inv_a0_r ) { return ay8910_r(4, offset ^ 1); }
+READ16_HANDLER( AY8910_0_lsb_inv_a0_r ) { return ay8910_r(0, offset ^ 1); }
+READ16_HANDLER( AY8910_1_lsb_inv_a0_r ) { return ay8910_r(1, offset ^ 1); }
+READ16_HANDLER( AY8910_2_lsb_inv_a0_r ) { return ay8910_r(2, offset ^ 1); }
+READ16_HANDLER( AY8910_3_lsb_inv_a0_r ) { return ay8910_r(3, offset ^ 1); }
+READ16_HANDLER( AY8910_4_lsb_inv_a0_r ) { return ay8910_r(4, offset ^ 1); }
+READ16_HANDLER( AY8910_0_msb_inv_a0_r ) { return ay8910_r(0, offset ^ 1) << 8; }
+READ16_HANDLER( AY8910_1_msb_inv_a0_r ) { return ay8910_r(1, offset ^ 1) << 8; }
+READ16_HANDLER( AY8910_2_msb_inv_a0_r ) { return ay8910_r(2, offset ^ 1) << 8; }
+READ16_HANDLER( AY8910_3_msb_inv_a0_r ) { return ay8910_r(3, offset ^ 1) << 8; }
+READ16_HANDLER( AY8910_4_msb_inv_a0_r ) { return ay8910_r(4, offset ^ 1) << 8; }
+
 READ8_HANDLER( AY8910_read_port_0_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 0)); }
 READ8_HANDLER( AY8910_read_port_1_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 1)); }
 READ8_HANDLER( AY8910_read_port_2_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 2)); }
@@ -255,6 +303,38 @@ READ16_HANDLER( AY8910_read_port_1_msb_r ) { return ay8910_read_ym(sndti_token(S
 READ16_HANDLER( AY8910_read_port_2_msb_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 2)) << 8; }
 READ16_HANDLER( AY8910_read_port_3_msb_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 3)) << 8; }
 READ16_HANDLER( AY8910_read_port_4_msb_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 4)) << 8; }
+
+WRITE8_HANDLER( AY8910_0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data); }
+WRITE8_HANDLER( AY8910_1_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 1), offset & 1, data); }
+WRITE8_HANDLER( AY8910_2_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 2), offset & 1, data); }
+WRITE8_HANDLER( AY8910_3_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 3), offset & 1, data); }
+WRITE8_HANDLER( AY8910_4_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 4), offset & 1, data); }
+WRITE16_HANDLER( AY8910_0_lsb_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_1_lsb_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 1), offset & 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_2_lsb_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 2), offset & 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_3_lsb_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 3), offset & 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_4_lsb_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 4), offset & 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_0_msb_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data >> 8); }
+WRITE16_HANDLER( AY8910_1_msb_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data >> 8); }
+WRITE16_HANDLER( AY8910_2_msb_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data >> 8); }
+WRITE16_HANDLER( AY8910_3_msb_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data >> 8); }
+WRITE16_HANDLER( AY8910_4_msb_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), offset & 1, data >> 8); }
+
+WRITE8_HANDLER( AY8910_0_inv_a0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data); }
+WRITE8_HANDLER( AY8910_1_inv_a0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 1), (offset & 1) ^ 1, data); }
+WRITE8_HANDLER( AY8910_2_inv_a0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 2), (offset & 1) ^ 1, data); }
+WRITE8_HANDLER( AY8910_3_inv_a0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 3), (offset & 1) ^ 1, data); }
+WRITE8_HANDLER( AY8910_4_inv_a0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 4), (offset & 1) ^ 1, data); }
+WRITE16_HANDLER( AY8910_0_lsb_inv_a0_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_1_lsb_inv_a0_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 1), (offset & 1) ^ 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_2_lsb_inv_a0_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 2), (offset & 1) ^ 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_3_lsb_inv_a0_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 3), (offset & 1) ^ 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_4_lsb_inv_a0_w ) { if (ACCESSING_LSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 4), (offset & 1) ^ 1, data & 0xff); }
+WRITE16_HANDLER( AY8910_0_msb_inv_a0_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data >> 8); }
+WRITE16_HANDLER( AY8910_1_msb_inv_a0_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data >> 8); }
+WRITE16_HANDLER( AY8910_2_msb_inv_a0_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data >> 8); }
+WRITE16_HANDLER( AY8910_3_msb_inv_a0_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data >> 8); }
+WRITE16_HANDLER( AY8910_4_msb_inv_a0_w ) { if (ACCESSING_MSB) ay8910_write_ym(sndti_token(SOUND_AY8910, 0), (offset & 1) ^ 1, data >> 8); }
 
 WRITE8_HANDLER( AY8910_control_port_0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 0),0,data); }
 WRITE8_HANDLER( AY8910_control_port_1_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 1),0,data); }

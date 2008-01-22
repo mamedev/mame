@@ -61,10 +61,12 @@ enum
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
+	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_12MHz   		= 12000000,
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
+	XTAL_12_5MHz   		= 12500000,		/* Red Alert audio board */
 	XTAL_13_3MHz  		= 13300000,		/* BMC bowling */
 	XTAL_13_33056MHz 	= 13330560,		/* Taito L */
 	XTAL_13_4MHz		= 13400000,		/* TNK3, Ikari Warriors h/w */
