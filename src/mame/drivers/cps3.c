@@ -1206,8 +1206,8 @@ static VIDEO_UPDATE(cps3)
 
 					ypos2+=((ysizedraw2+1)/2);
 
-					if (!flipx) xpos2-= (xsize2+1)*((16*xinc)>>16);
-					else  xpos2+= (xsize2)*((16*xinc)>>16);
+					if (!flipx) xpos2-= ((xsize2+1)*16*xinc)>>16;
+					else  xpos2+= (xsize2*16*xinc)>>16;
 
 					if (flipy) ypos2-= ysize2*((16*yinc)>>16);
 
@@ -1217,8 +1217,8 @@ static VIDEO_UPDATE(cps3)
 						{
 							int current_xpos;
 
-							if (!flipx) current_xpos = (xpos+xpos2+xx* ((16*xinc)>>16)  );
-							else current_xpos = (xpos+xpos2-xx*((16*xinc)>>16));
+							if (!flipx) current_xpos = (xpos+xpos2+((xx*16*xinc)>>16)  );
+							else current_xpos = (xpos+xpos2-((xx*16*xinc)>>16));
 							//current_xpos +=  rand()&0x3ff;
 							current_xpos += gscrollx;
 							current_xpos += 1;
