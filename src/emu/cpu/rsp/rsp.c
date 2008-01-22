@@ -2289,7 +2289,7 @@ static void handle_vector_ops(UINT32 op)
 			// Calculates reciprocal
 
 			int del = (VS1REG & 7);
-			int sel = VEC_EL_2(EL, del);
+			int sel = EL & 7;
 			INT32 rec;
 
 			rec = (INT16)(R_VREG_S(VS2REG, sel));
@@ -2925,15 +2925,9 @@ static void rsp_set_info(UINT32 state, cpuinfo *info)
         case CPUINFO_INT_REGISTER + RSP_R30:            rsp.r[30] = info->i;        break;
         case CPUINFO_INT_SP:
         case CPUINFO_INT_REGISTER + RSP_R31:            rsp.r[31] = info->i;        break;
-        case CPUINFO_INT_REGISTER + RSP_SR:
-            rsp.sr = info->i;
-            if( info->i & RSP_STATUS_SSTEP )
-            {
-                // Heaven help me for putting this check here, but it's accurate to the hardware and works.
-                rsp.step_count = ( cpu_getactivecpu() == 0 ) ? 0 : 1;
-            }
-            break;
-        case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp.nextpc = info->i;        break;
+        case CPUINFO_INT_REGISTER + RSP_SR:             rsp.sr = info->i;           break;
+        case CPUINFO_INT_REGISTER + RSP_NEXTPC:         rsp.nextpc = info->i;       break;
+        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        rsp.step_count = info->i;   break;
 	}
 }
 
@@ -3005,6 +2999,7 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + RSP_R31:			info->i = rsp.r[31];					break;
 		case CPUINFO_INT_REGISTER + RSP_SR:             info->i = rsp.sr;                       break;
 		case CPUINFO_INT_REGISTER + RSP_NEXTPC:         info->i = rsp.nextpc;                   break;
+        case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp.step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = rsp_get_context;		break;
@@ -3065,5 +3060,6 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + RSP_R31:			sprintf(info->s, "R31: %08X", rsp.r[31]); break;
 		case CPUINFO_STR_REGISTER + RSP_SR:             sprintf(info->s, "SR: %08X",  rsp.sr);    break;
 		case CPUINFO_STR_REGISTER + RSP_NEXTPC:         sprintf(info->s, "NPC: %08X", rsp.nextpc);break;
+        case CPUINFO_STR_REGISTER + RSP_STEPCNT:        sprintf(info->s, "STEP: %d",  rsp.step_count);  break;
 	}
 }

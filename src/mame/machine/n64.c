@@ -125,7 +125,7 @@ static UINT32 sp_semaphore;
 static void sp_dma(int direction)
 {
 	UINT8 *src, *dst;
-	int i;
+	int i, c;
 	//int cpu = cpu_getactivecpu();
 
 	if (sp_dma_length == 0)
@@ -134,12 +134,11 @@ static void sp_dma(int direction)
 	}
 
 	sp_dma_length++;
-
 	if ((sp_dma_length & 3) != 0)
 	{
 		//fatalerror("sp_dma (%s): sp_dma_length unaligned %08X\n", cpu ? "RSP" : "R4300i", sp_dma_length);
-		sp_dma_length = sp_dma_length & ~3;
-        //sp_dma_length = (sp_dma_length + 3) & ~3;
+		//sp_dma_length = sp_dma_length & ~3;
+        sp_dma_length = (sp_dma_length + 3) & ~3;
 
 		//sp_dma_length &= ~3;
 	}
@@ -153,23 +152,16 @@ static void sp_dma(int direction)
 	}
 	if (sp_dram_addr & 0x3)
 	{
-        //sp_dram_addr = (sp_dram_addr + 3) & ~3;
-        sp_dram_addr = sp_dram_addr & ~3;
-        // sp_dram_addr &= ~0x3;
-        // fatalerror("sp_dma (%s): sp_dram_addr unaligned: %08X\n", cpu ? "RSP" : "R4300i", sp_dram_addr);
-
-        // Diddy Kong Racing does unaligned DMA?
-        //sp_dram_addr &= ~0x3;
-        //sp_dram_addr = (sp_dram_addr + 3) & ~0x3;
+        sp_dram_addr = sp_dram_addr & ~7;
 	}
 
 	if (sp_dma_count > 0)
 	{
-		fatalerror("sp_dma: dma_count = %d\n", sp_dma_count);
+		// fatalerror("sp_dma: dma_count = %d\n", sp_dma_count);
 	}
 	if (sp_dma_skip > 0)
 	{
-		fatalerror("sp_dma: dma_skip = %d\n", sp_dma_skip);
+		// fatalerror("sp_dma: dma_skip = %d\n", sp_dma_skip);
 	}
 
 	if ((sp_mem_addr & 0xfff) + (sp_dma_length) > 0x1000)
@@ -179,45 +171,39 @@ static void sp_dma(int direction)
 
 	if (direction == 0)		// RDRAM -> I/DMEM
 	{
-		src = (UINT8*)&rdram[sp_dram_addr / 4];
-		dst = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
-
-		//mame_printf_debug("sp_dma: %08X to %08X, length %08X\n", sp_dram_addr, sp_mem_addr, sp_dma_length);
-
-		for (i=0; i < sp_dma_length; i++)
-		{
-			dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
-		}
-
-		/*dst = (sp_mem_addr & 0x1000) ? (UINT8*)rsp_imem : (UINT8*)rsp_dmem;
-        for (i=0; i <= sp_dma_length; i++)
+        for (c=0; c <= sp_dma_count; c++)
         {
-            dst[BYTE4_XOR_BE(sp_mem_addr+i) & 0xfff] = src[BYTE4_XOR_BE(i)];
-        }*/
+            src = (UINT8*)&rdram[sp_dram_addr / 4];
+            dst = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
 
-        sp_mem_addr += sp_dma_length;
-        sp_dram_addr += sp_dma_length;
+            for (i=0; i < sp_dma_length; i++)
+            {
+                dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
+            }
+
+            sp_mem_addr += sp_dma_length;
+            sp_dram_addr += sp_dma_length;
+
+            sp_mem_addr += sp_dma_skip;
+        }
 	}
 	else					// I/DMEM -> RDRAM
 	{
-		src = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
-		dst = (UINT8*)&rdram[sp_dram_addr / 4];
-
-//      mame_printf_debug("sp_dma: %08X to %08X, length %08X\n", sp_mem_addr, sp_dram_addr, sp_dma_length);
-
-		for (i=0; i < sp_dma_length; i++)
-		{
-			dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
-		}
-
-		/*src = (sp_mem_addr & 0x1000) ? (UINT8*)rsp_imem : (UINT8*)rsp_dmem;
-        for (i=0; i <= sp_dma_length; i++)
+        for (c=0; c <= sp_dma_count; c++)
         {
-            dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(sp_mem_addr+i) & 0xfff];
-        }*/
+            src = (sp_mem_addr & 0x1000) ? (UINT8*)&rsp_imem[(sp_mem_addr & 0xfff) / 4] : (UINT8*)&rsp_dmem[(sp_mem_addr & 0xfff) / 4];
+            dst = (UINT8*)&rdram[sp_dram_addr / 4];
 
-        sp_mem_addr += sp_dma_length;
-        sp_dram_addr += sp_dma_length;
+            for (i=0; i < sp_dma_length; i++)
+            {
+                dst[BYTE4_XOR_BE(i)] = src[BYTE4_XOR_BE(i)];
+            }
+
+            sp_mem_addr += sp_dma_length;
+            sp_dram_addr += sp_dma_length;
+
+            sp_dram_addr += sp_dma_skip;
+        }
 	}
 }
 
@@ -370,6 +356,10 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 {
                     //printf( "Setting RSP_STATUS_SSTEP\n" );
                     cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_SSTEP );
+                    if( !( cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ( RSP_STATUS_BROKE | RSP_STATUS_HALT ) ) )
+                    {
+                        cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_STEPCNT, 1 );
+                    }
                     // RSP_STATUS |= RSP_STATUS_SSTEP;      // set single step
                 }
                 if (data & 0x00000080)
@@ -575,7 +565,7 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-static UINT32 vi_width;
+UINT32 vi_width;
 UINT32 vi_origin;
 UINT32 vi_control;
 static UINT32 vi_burst, vi_vsync, vi_hsync, vi_leap, vi_hstart, vi_vstart;
@@ -708,10 +698,10 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
         /*
         Uncomment this for convenient homebrew debugging
+        */
         case 0x44/4:        // TEMP DEBUG
             printf( "E Ping: %08x\n", data );
             break;
-        */
 
 		default:
 			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
@@ -974,10 +964,10 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			int i;
 			UINT32 dma_length = (data + 1);
 
-			/*if (dma_length & 3)
+			if (dma_length & 3)
             {
                 dma_length = (dma_length + 3) & ~3;
-            }*/
+            }
 
 			//mame_printf_debug("PI DMA: %08X to %08X, length %08X\n", pi_cart_addr, pi_dram_addr, dma_length);
 

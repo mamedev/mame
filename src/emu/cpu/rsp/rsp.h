@@ -48,6 +48,7 @@ enum
     RSP_R31,
     RSP_SR,
     RSP_NEXTPC,
+    RSP_STEPCNT,
 };
 
 #define RSP_STATUS_HALT          0x0001
