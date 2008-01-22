@@ -441,14 +441,14 @@ void atarirle_command_w(int map, UINT8 command)
 
 
 /*---------------------------------------------------------------
-    video_eof_atarirle: Flush remaining changes.
+    VIDEO_EOF(atarirle): Flush remaining changes.
 ---------------------------------------------------------------*/
 
 VIDEO_EOF( atarirle )
 {
 	int i;
 
-//logerror("video_eof_atarirle\n");
+//logerror("VIDEO_EOF(atarirle)\n");
 
 	/* loop over all RLE handlers */
 	for (i = 0; i < ATARIRLE_MAX; i++)

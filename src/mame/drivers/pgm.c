@@ -2057,7 +2057,7 @@ static MACHINE_RESET( killbld )
 {
 	int i;
 
-	machine_reset_pgm(machine);
+	MACHINE_RESET_CALL(pgm);
 
 	/* fill the protection ram with a5 */
 	for (i = 0;i < 0x4000/2;i++)
@@ -2198,7 +2198,7 @@ static MACHINE_RESET( olds )
 //  UINT16 *mem16_a = (UINT16 *)memory_region(REGION_CPU1);
 	int i;
 
-	machine_reset_pgm(machine);
+	MACHINE_RESET_CALL(pgm);
 
 	/* populate shared protection ram with data read from pcb .. */
 

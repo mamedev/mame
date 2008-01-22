@@ -53,7 +53,7 @@ static void draw_8pix_sprite(UINT8 *dest, UINT8 chip, UINT16 tile, UINT8 line);
 *******************************************************************************/
 
 /* starts vdp for bios screen only */
-void megaplay_start_video_normal(running_machine *machine)
+VIDEO_START( megaplay_normal )
 {
 	palette_base = 0x40;
 
@@ -62,7 +62,7 @@ void megaplay_start_video_normal(running_machine *machine)
 	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
 }
 
-void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+VIDEO_UPDATE( megaplay_normal )
 {
 	int miny = (cliprect->min_y < 16) ? 16 : cliprect->min_y;
 	int maxy = (cliprect->max_y > 16+192-1) ? 16+192-1 : cliprect->max_y;
@@ -76,6 +76,7 @@ void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap,
 	for (i = miny;i <= maxy;i++)
 		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&machine->pens[palette_base],0);
 
+	return 0;
 }
 
 /*******************************************************************************

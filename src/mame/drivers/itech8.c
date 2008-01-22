@@ -618,7 +618,7 @@ static MACHINE_START( itech8 )
 
 static MACHINE_START( sstrike )
 {
-	machine_start_itech8(machine);
+	MACHINE_START_CALL(itech8);
 
 	/* we need to update behind the beam as well */
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 32, behind_the_beam_update);

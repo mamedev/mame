@@ -107,14 +107,14 @@ VIDEO_START( midtunit )
 
 VIDEO_START( midwunit )
 {
-	video_start_midtunit(machine);
+	VIDEO_START_CALL(midtunit);
 	midtunit_gfx_rom_large = 1;
 }
 
 
 VIDEO_START( midxunit )
 {
-	video_start_midtunit(machine);
+	VIDEO_START_CALL(midtunit);
 	midtunit_gfx_rom_large = 1;
 	videobank_select = 1;
 }

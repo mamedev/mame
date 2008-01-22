@@ -951,7 +951,7 @@ static NVRAM_HANDLER( model3 )
 	{
 		eeprom_handler(file, read_or_write);
 	} else {
-		nvram_handler_93C46(machine, file, read_or_write);
+		NVRAM_HANDLER_CALL(93C46);
 	}
 
 	if (read_or_write)

@@ -97,7 +97,7 @@ VIDEO_START( iremm10 )
 	for (i=0;i<32*8;i++)
 		extyoffs[i] = i*8;
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 
 	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,32,32);
 	tilemap_set_transparent_pen(tx_tilemap, 0x07);
@@ -120,7 +120,7 @@ VIDEO_START( iremm15 )
 
 	decodegfx(machine->gfx[0], state->chargen,0,256);
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 
 	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,32,32);
 	tilemap_set_scrolldx(tx_tilemap, 0, 116);

@@ -135,7 +135,7 @@ VIDEO_START( galpani2 )
 	galpani2_bg8_bitmap_0 = auto_bitmap_alloc(512, 256, BITMAP_FORMAT_INDEXED16);
 	galpani2_bg8_bitmap_1 = auto_bitmap_alloc(512, 256, BITMAP_FORMAT_INDEXED16);
 
-	video_start_kaneko16_sprites(machine);
+	VIDEO_START_CALL(kaneko16_sprites);
 }
 
 

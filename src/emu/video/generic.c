@@ -303,7 +303,7 @@ void generic_video_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_start_generic - general video system
+    VIDEO_START( generic ) - general video system
 -------------------------------------------------*/
 
 VIDEO_START( generic )
@@ -314,7 +314,7 @@ VIDEO_START( generic )
 
 
 /*-------------------------------------------------
-    video_start_generic_bitmapped - general video
+    VIDEO_START( generic_bitmapped ) - general video
     system with a bitmap
 -------------------------------------------------*/
 
@@ -329,7 +329,7 @@ VIDEO_START( generic_bitmapped )
 
 
 /*-------------------------------------------------
-    video_update_generic_bitmapped - blast the
+    VIDEO_UPDATE( generic_bitmapped ) - blast the
     generic bitmap to the screen
 -------------------------------------------------*/
 

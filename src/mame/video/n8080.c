@@ -46,7 +46,7 @@ PALETTE_INIT( helifire )
 {
 	int i;
 
-	palette_init_n8080(machine, NULL, NULL);
+	PALETTE_INIT_CALL(n8080);
 
 	for (i = 0; i < 0x100; i++)
 	{

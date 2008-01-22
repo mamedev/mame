@@ -126,7 +126,7 @@ VIDEO_START( quasar )
 	effect_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	background_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	video_start_cvs(machine);
+	VIDEO_START_CALL(cvs);
 }
 
 VIDEO_UPDATE( quasar )

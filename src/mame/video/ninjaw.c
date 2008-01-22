@@ -48,7 +48,7 @@ static VIDEO_START( ninjaw_core )
 VIDEO_START( ninjaw )
 {
 	taito_hide_pixels = 22;
-	video_start_ninjaw_core(machine);
+	VIDEO_START_CALL(ninjaw_core);
 }
 
 /************************************************************

@@ -335,7 +335,7 @@ static MACHINE_RESET( itech32 )
 
 static MACHINE_RESET( drivedge )
 {
-	machine_reset_itech32(machine);
+	MACHINE_RESET_CALL(itech32);
 
 	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
 	cpunum_set_input_line(3, INPUT_LINE_RESET, ASSERT_LINE);
@@ -832,8 +832,8 @@ static NVRAM_HANDLER( itech020 )
 
 static NVRAM_HANDLER( tournament )
 {
-	nvram_handler_itech020( machine, file, read_or_write );
-	nvram_handler_timekeeper_0( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(itech020);
+	NVRAM_HANDLER_CALL(timekeeper_0);
 }
 
 

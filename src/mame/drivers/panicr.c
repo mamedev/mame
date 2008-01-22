@@ -71,7 +71,7 @@ static PALETTE_INIT( panicr )
 	int i;
 
 
-	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 	color_prom += 256*3;
 
 	// txt lookup table

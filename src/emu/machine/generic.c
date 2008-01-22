@@ -316,7 +316,7 @@ void nvram_save(void)
 
 
 /*-------------------------------------------------
-    nvram_handler_generic_0fill - generic NVRAM
+    NVRAM_HANDLER( generic_0fill ) - generic NVRAM
     with a 0 fill
 -------------------------------------------------*/
 
@@ -332,7 +332,7 @@ NVRAM_HANDLER( generic_0fill )
 
 
 /*-------------------------------------------------
-    nvram_handler_generic_1fill - generic NVRAM
+    NVRAM_HANDLER( generic_1fill ) - generic NVRAM
     with a 1 fill
 -------------------------------------------------*/
 
@@ -348,7 +348,7 @@ NVRAM_HANDLER( generic_1fill )
 
 
 /*-------------------------------------------------
-    nvram_handler_generic_randfill - generic NVRAM
+    NVRAM_HANDLER( generic_randfill ) - generic NVRAM
     with a random fill
 -------------------------------------------------*/
 

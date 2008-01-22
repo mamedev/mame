@@ -256,7 +256,7 @@ static void copro_fifoout_push(UINT32 data)
 
 static NVRAM_HANDLER( model2 )
 {
-	nvram_handler_93C46(machine, file, read_or_write);
+	NVRAM_HANDLER_CALL(93C46);
 
 	if (read_or_write)
 	{
@@ -355,7 +355,7 @@ static MACHINE_RESET(model2_common)
 
 static MACHINE_RESET(model2o)
 {
-	machine_reset_model2_common(machine);
+	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
@@ -374,8 +374,8 @@ static MACHINE_RESET(model2_scsp)
 
 static MACHINE_RESET(model2)
 {
-	machine_reset_model2_common(machine);
-	machine_reset_model2_scsp(machine);
+	MACHINE_RESET_CALL(model2_common);
+	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
@@ -385,8 +385,8 @@ static MACHINE_RESET(model2)
 
 static MACHINE_RESET(model2b)
 {
-	machine_reset_model2_common(machine);
-	machine_reset_model2_scsp(machine);
+	MACHINE_RESET_CALL(model2_common);
+	MACHINE_RESET_CALL(model2_scsp);
 
 	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
 
@@ -400,8 +400,8 @@ static MACHINE_RESET(model2b)
 
 static MACHINE_RESET(model2c)
 {
-	machine_reset_model2_common(machine);
-	machine_reset_model2_scsp(machine);
+	MACHINE_RESET_CALL(model2_common);
+	MACHINE_RESET_CALL(model2_scsp);
 
 	dsp_type = DSP_TYPE_TGPX4;
 }

@@ -885,29 +885,29 @@ VIDEO_START( system18old ){
 		8,8,
 		64*2,32*2 );
 
-	video_start_system16(machine);
+	VIDEO_START_CALL(system16);
 
-			tilemap_set_transparent_pen( foreground2, 0 );
+	tilemap_set_transparent_pen( foreground2, 0 );
 
-			if(sys18_splittab_fg_x){
-				tilemap_set_scroll_rows( foreground , 64 );
-				tilemap_set_scroll_rows( foreground2 , 64 );
-			}
-			if(sys18_splittab_bg_x){
-				tilemap_set_scroll_rows( background , 64 );
-				tilemap_set_scroll_rows( background2 , 64 );
-			}
+	if(sys18_splittab_fg_x){
+		tilemap_set_scroll_rows( foreground , 64 );
+		tilemap_set_scroll_rows( foreground2 , 64 );
+	}
+	if(sys18_splittab_bg_x){
+		tilemap_set_scroll_rows( background , 64 );
+		tilemap_set_scroll_rows( background2 , 64 );
+	}
 
-			sys16_textlayer_lo_min=0;
-			sys16_textlayer_lo_max=0x1f;
-			sys16_textlayer_hi_min=0x20;
-			sys16_textlayer_hi_max=0xff;
+	sys16_textlayer_lo_min=0;
+	sys16_textlayer_lo_max=0x1f;
+	sys16_textlayer_hi_min=0x20;
+	sys16_textlayer_hi_max=0xff;
 
-			sys16_18_mode=1;
-			sys16_bg_priority_mode=3;
-			sys16_fg_priority_mode=3;
-			sys16_bg_priority_value=0x1800;
-			sys16_fg_priority_value=0x2000;
+	sys16_18_mode=1;
+	sys16_bg_priority_mode=3;
+	sys16_fg_priority_mode=3;
+	sys16_bg_priority_value=0x1800;
+	sys16_fg_priority_value=0x2000;
 }
 
 /***************************************************************************/

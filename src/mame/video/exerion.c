@@ -163,7 +163,7 @@ VIDEO_START( exerion )
 		}
 	}
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 

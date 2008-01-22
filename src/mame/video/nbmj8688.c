@@ -713,7 +713,7 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	if(screen==0) video_update_mbmj8688(machine,screen,bitmap,cliprect);
+	if(screen==0) VIDEO_UPDATE_CALL(mbmj8688);
 
 	if (screen==1)
 	{

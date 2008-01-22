@@ -1517,7 +1517,7 @@ VIDEO_UPDATE( batsugun_1 )
 
 VIDEO_UPDATE( truxton2_0 )
 {
-	video_update_toaplan2_0(machine,screen,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(toaplan2_0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

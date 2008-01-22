@@ -391,7 +391,7 @@ static void toaplan2_reset(void)
 		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static MACHINE_RESET( toaplan2 )		/* machine_reset_toaplan2(); */
+static MACHINE_RESET( toaplan2 )
 {
 	mcu_data = 0x00;
 
@@ -405,20 +405,20 @@ static MACHINE_RESET( toaplan2 )		/* machine_reset_toaplan2(); */
 
 static MACHINE_RESET( ghox )
 {
-	machine_reset_toaplan2(machine);
+	MACHINE_RESET_CALL(toaplan2);
 	old_p1_paddle_h = 0;
 	old_p2_paddle_h = 0;
 }
 
 static MACHINE_RESET( dogyuun )
 {
-	machine_reset_toaplan2(machine);
+	MACHINE_RESET_CALL(toaplan2);
 	mcu_data = 0xffaa;
 }
 
 static MACHINE_RESET( vfive )
 {
-	machine_reset_toaplan2(machine);
+	MACHINE_RESET_CALL(toaplan2);
 	mcu_data = 0xffaa;
 }
 
@@ -430,7 +430,7 @@ static MACHINE_RESET( bgaregga )
 	current_bank = 2;
 	memory_set_bankptr(1, &Z80[0x10000]);
 
-	machine_reset_toaplan2(machine);
+	MACHINE_RESET_CALL(toaplan2);
 }
 
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */

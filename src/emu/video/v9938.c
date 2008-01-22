@@ -135,7 +135,7 @@ PALETTE_INIT( v9958 )
 	UINT8 pal[19268*3];
 
 	/* init v9938 512-color palette */
-	palette_init_v9938(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(v9938);
 
 	/* set up YJK table */
 		pal_indYJK = auto_malloc(0x20000 * sizeof(UINT16));
@@ -430,7 +430,7 @@ void v9938_init (running_machine *machine, int model, int vram_size, void (*call
 	else
 		vdp.vram_exp = NULL;
 
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 }
 
 void v9938_reset (void)

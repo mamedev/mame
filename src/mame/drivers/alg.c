@@ -76,7 +76,7 @@ static VIDEO_START( alg )
 	add_exit_callback(machine, video_cleanup);
 
 	/* standard video start */
-	video_start_amiga(machine);
+	VIDEO_START_CALL(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	render_container_set_palette_alpha(render_container_get_screen(0), 4096, 0x00);
@@ -152,7 +152,7 @@ static MACHINE_START( alg )
 
 static MACHINE_RESET( alg )
 {
-	machine_reset_amiga(machine);
+	MACHINE_RESET_CALL(amiga);
 	laserdisc_reset(discinfo, 0);
 }
 

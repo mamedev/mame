@@ -98,21 +98,21 @@ static MACHINE_START( m72 )
 static MACHINE_RESET( m72 )
 {
 	m72_irq_base = 0x20;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 static MACHINE_RESET( xmultipl )
 {
 	m72_irq_base = 0x08;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_irq_base = 0x18;
-	machine_reset_m72_sound(machine);
+	MACHINE_RESET_CALL(m72_sound);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 

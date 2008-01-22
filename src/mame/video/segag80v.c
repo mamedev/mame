@@ -331,13 +331,13 @@ VIDEO_START( sega )
 	min_x =machine->screen[0].visarea.min_x;
 	min_y =machine->screen[0].visarea.min_y;
 
-	video_start_vector(machine);
+	VIDEO_START_CALL(vector);
 }
 
 
 VIDEO_UPDATE( sega )
 {
 	sega_generate_vector_list();
-	video_update_vector(machine,screen,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(vector);
 	return 0;
 }

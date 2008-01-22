@@ -715,7 +715,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( zeropt )
 {
-	machine_reset_unico(machine);
+	MACHINE_RESET_CALL(unico);
 }
 
 static MACHINE_DRIVER_START( zeropnt )

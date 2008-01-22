@@ -103,14 +103,14 @@ MACHINE_RESET( kaneko16 )
 
 static MACHINE_RESET( berlwall )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_type = 2;	// like type 0, but using 16 instead of 8 bytes
 }
 
 static MACHINE_RESET( blazeon )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_xoffs = 0x10000 - 0x680;
 	kaneko16_sprite_yoffs = 0x000;
@@ -162,7 +162,7 @@ static MACHINE_RESET( bonkadv )
 
 static MACHINE_RESET( bakubrkr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_priority.sprite[0] = 8;	// above all
 	kaneko16_priority.sprite[1] = 8;	// above all
@@ -174,7 +174,7 @@ static MACHINE_RESET( bakubrkr )
 
 static MACHINE_RESET( gtmr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_type = 1;
 
@@ -186,7 +186,7 @@ static MACHINE_RESET( gtmr )
 
 static MACHINE_RESET( mgcrystl )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 /*
     Sx = Sprites with priority x, x = tiles with priority x,
     Sprites - Tiles Order:
@@ -215,7 +215,7 @@ static MACHINE_RESET( mgcrystl )
 
 static MACHINE_RESET( shogwarr )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	calc3_mcu_init();
 }

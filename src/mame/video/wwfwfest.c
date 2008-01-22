@@ -237,7 +237,7 @@ VIDEO_START( wwfwfest )
 
 VIDEO_START( wwfwfstb )
 {
-	video_start_wwfwfest(machine);
+	VIDEO_START_CALL(wwfwfest);
 
 	sprite_xoff = 2;
 	bg0_dx = bg1_dx[0] = -4;

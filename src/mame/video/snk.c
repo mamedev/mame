@@ -36,7 +36,7 @@ int snk_blink_parity = 0;
 PALETTE_INIT( snk_3bpp_shadow )
 {
 	int i;
-	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 
 	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
@@ -51,7 +51,7 @@ PALETTE_INIT( snk_3bpp_shadow )
 PALETTE_INIT( snk_4bpp_shadow )
 {
 	int i;
-	palette_init_RRRR_GGGG_BBBB(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 
 	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");

@@ -939,7 +939,7 @@ MACHINE_START( joust2 )
 MACHINE_RESET( joust2 )
 {
 	/* standard init */
-	machine_reset_williams2(machine);
+	MACHINE_RESET_CALL(williams2);
 	pia_set_input_ca1(3, 1);
 	state_save_register_global(joust2_current_sound_data);
 }

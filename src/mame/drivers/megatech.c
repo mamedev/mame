@@ -92,16 +92,16 @@ UINT32 bios_ctrl_inputs;
 #define MASTER_CLOCK		53693100
 
 /* give us access to the megadriv start and update functions so that we can call them */
-extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_start_megadriv(running_machine *machine);
-extern void video_eof_megadriv(running_machine *machine);
-extern void machine_reset_megadriv(running_machine *machine);
+VIDEO_UPDATE( megadriv );
+VIDEO_START( megadriv );
+VIDEO_EOF( megadriv );
+MACHINE_RESET( megadriv );
 
 /* in drivers/segae.c */
-extern UINT32 video_update_megatech_bios(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_eof_megatech_bios(running_machine *machine);
-extern void machine_reset_megatech_bios(running_machine *machine);
-extern DRIVER_INIT(megatech_bios);
+VIDEO_UPDATE( megatech_bios );
+VIDEO_EOF( megatech_bios );
+MACHINE_RESET( megatech_bios );
+DRIVER_INIT( megatech_bios );
 
 
 /* not currently used */
@@ -604,7 +604,7 @@ static DRIVER_INIT(mtnew)
 static VIDEO_START(mtnew)
 {
 	init_for_megadrive(); // create an sms vdp too, for comptibility mode
-	video_start_megadriv(Machine);
+	VIDEO_START_CALL(megadriv);
 }
 //attotime_never
 static VIDEO_UPDATE(mtnew)
@@ -612,25 +612,25 @@ static VIDEO_UPDATE(mtnew)
 	if (screen ==0)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
-		if (!current_game_is_sms) video_update_megadriv(machine,0,bitmap,cliprect);
-		else video_update_megatech_md_sms(machine,0,bitmap,cliprect);
+		if (!current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
+		else VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
-	else if (screen ==1) video_update_megatech_bios(machine, 1, bitmap,cliprect);
+	else if (screen ==1) VIDEO_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 
 static VIDEO_EOF(mtnew)
 {
-	if (!current_game_is_sms) video_eof_megadriv(Machine);
-	else video_eof_megatech_md_sms(Machine);
-	video_eof_megatech_bios(Machine);
+	if (!current_game_is_sms) VIDEO_EOF_CALL(megadriv);
+	else VIDEO_EOF_CALL(megatech_md_sms);
+	VIDEO_EOF_CALL(megatech_bios);
 }
 
 static MACHINE_RESET(mtnew)
 {
-	machine_reset_megadriv(Machine);
-	machine_reset_megatech_bios(Machine);
-	machine_reset_megatech_md_sms(Machine);
+	MACHINE_RESET_CALL(megadriv);
+	MACHINE_RESET_CALL(megatech_bios);
+	MACHINE_RESET_CALL(megatech_md_sms);
 	megatech_select_game(0);
 }
 

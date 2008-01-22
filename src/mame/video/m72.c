@@ -173,7 +173,7 @@ VIDEO_START( rtype2 )
 
 VIDEO_START( poundfor )
 {
-	video_start_rtype2(machine);
+	VIDEO_START_CALL(rtype2);
 
 	tilemap_set_scrolldx(fg_tilemap,6,0);
 	tilemap_set_scrolldx(bg_tilemap,6,0);

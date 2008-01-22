@@ -754,7 +754,7 @@ VIDEO_UPDATE( gunnail )
 	}
 	tilemap_set_scrolly(bg_tilemap,0,gunnail_scrolly);
 
-	video_update_macross(machine,screen,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(macross);
 	return 0;
 }
 

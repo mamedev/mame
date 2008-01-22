@@ -107,7 +107,7 @@ static void video_cleanup(running_machine *machine)
 static VIDEO_UPDATE( cliff )
 {
 	/* update the TMS9928A video */
-	video_update_tms9928a( machine, screen, bitmap, cliprect );
+	VIDEO_UPDATE_CALL(tms9928a);
 
 	if (discinfo != NULL)
 	{

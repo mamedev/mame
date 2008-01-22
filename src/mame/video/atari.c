@@ -766,7 +766,7 @@ VIDEO_START( atari )
 		memset(antic.video[i], 0, sizeof(VIDEO));
     }
 
-    video_start_generic_bitmapped(machine);
+    VIDEO_START_CALL(generic_bitmapped);
 }
 
 /************************************************************************
@@ -778,7 +778,7 @@ VIDEO_UPDATE( atari )
 {
 	UINT32 new_tv_artifacts;
 
-	video_update_generic_bitmapped(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(generic_bitmapped);
 
 	new_tv_artifacts = readinputportbytag_safe("artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )

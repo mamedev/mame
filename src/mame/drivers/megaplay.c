@@ -665,25 +665,25 @@ ADDRESS_MAP_END
 
 
 /* in video/segasyse.c */
-void megaplay_start_video_normal(running_machine *machine);
-void megaplay_update_video_normal(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+VIDEO_START( megaplay_normal );
+VIDEO_UPDATE( megaplay_normal );
 
 /* give us access to the megadriv start and update functions so that we can call them */
-extern UINT32 video_update_megadriv(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
-extern void video_start_megadriv(running_machine *machine);
+VIDEO_START( megadriv );
+VIDEO_UPDATE( megadriv );
 
 static VIDEO_START(megplay)
 {
 	//printf("megplay vs\n");
-	video_start_megadriv(Machine);
-	megaplay_start_video_normal(Machine);
+	VIDEO_START_CALL(megadriv);
+	VIDEO_START_CALL(megaplay_normal);
 }
 
 static VIDEO_UPDATE(megplay)
 {
 	//printf("megplay vu\n");
-	video_update_megadriv(machine,0,bitmap,cliprect);
-	megaplay_update_video_normal(machine, bitmap,cliprect);
+	VIDEO_UPDATE_CALL(megadriv);
+	VIDEO_UPDATE_CALL(megaplay_normal);
 	return 0;
 }
 

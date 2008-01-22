@@ -444,7 +444,7 @@ INPUT_PORTS_END
 
 static NVRAM_HANDLER( simpbowl )
 {
-	nvram_handler_konamigv_93C46( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(konamigv_93C46);
 	nvram_handler_intelflash( machine, 0, file, read_or_write );
 	nvram_handler_intelflash( machine, 1, file, read_or_write );
 	nvram_handler_intelflash( machine, 2, file, read_or_write );
@@ -626,7 +626,7 @@ static WRITE32_HANDLER( btc_trackball_w )
 
 static NVRAM_HANDLER( btchamp )
 {
-	nvram_handler_konamigv_93C46( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(konamigv_93C46);
 	nvram_handler_intelflash( machine, 0, file, read_or_write );
 }
 

@@ -224,7 +224,7 @@ PALETTE_INIT( galaxian )
 
 PALETTE_INIT( scramble )
 {
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/* blue background - 390 ohm resistor */
@@ -233,7 +233,7 @@ PALETTE_INIT( scramble )
 
 PALETTE_INIT( moonwar )
 {
-	palette_init_scramble(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(scramble);
 
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
@@ -245,7 +245,7 @@ PALETTE_INIT( turtles )
 	int i;
 
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/*  The background color generator is connected this way:
@@ -269,7 +269,7 @@ PALETTE_INIT( stratgyx )
 	int i;
 
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/*  The background color generator is connected this way:
@@ -290,7 +290,7 @@ PALETTE_INIT( stratgyx )
 
 PALETTE_INIT( frogger )
 {
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/* blue background - 470 ohm resistor */
@@ -384,7 +384,7 @@ PALETTE_INIT( minefld )
 	int i;
 
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/* set up background colors */
@@ -415,7 +415,7 @@ PALETTE_INIT( rescue )
 	int i;
 
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/* set up background colors */
@@ -436,7 +436,7 @@ PALETTE_INIT( mariner )
 	int i;
 
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/* set up background colors */
@@ -465,7 +465,7 @@ PALETTE_INIT( dambustr )
 {
 	int i;
 
-	palette_init_galaxian(machine, colortable, color_prom);
+	PALETTE_INIT_CALL(galaxian);
 
 
 	/*
@@ -559,7 +559,7 @@ VIDEO_START( galaxian_plain )
 
 VIDEO_START( galaxian )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_stars = galaxian_draw_stars;
 
@@ -568,7 +568,7 @@ VIDEO_START( galaxian )
 
 VIDEO_START( gmgalax )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = gmgalax_modify_charcode;
 	modify_spritecode = gmgalax_modify_spritecode;
@@ -577,7 +577,7 @@ VIDEO_START( gmgalax )
 
 VIDEO_START( mooncrst )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = mooncrst_modify_charcode;
 	modify_spritecode = mooncrst_modify_spritecode;
@@ -585,7 +585,7 @@ VIDEO_START( mooncrst )
 
 VIDEO_START( mooncrgx )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = mooncrgx_modify_charcode;
 	modify_spritecode = mooncrgx_modify_spritecode;
@@ -593,7 +593,7 @@ VIDEO_START( mooncrgx )
 
 VIDEO_START( moonqsr )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = moonqsr_modify_charcode;
 	modify_spritecode = moonqsr_modify_spritecode;
@@ -601,7 +601,7 @@ VIDEO_START( moonqsr )
 
 VIDEO_START( mshuttle )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = mshuttle_modify_charcode;
 	modify_spritecode = mshuttle_modify_spritecode;
@@ -609,7 +609,7 @@ VIDEO_START( mshuttle )
 
 VIDEO_START( pisces )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = pisces_modify_charcode;
 	modify_spritecode = pisces_modify_spritecode;
@@ -617,14 +617,14 @@ VIDEO_START( pisces )
 
 VIDEO_START( gteikob2 )
 {
-	video_start_pisces(machine);
+	VIDEO_START_CALL(pisces);
 
 	draw_bullets = gteikob2_draw_bullets;
 }
 
 VIDEO_START( batman2 )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	modify_charcode   = batman2_modify_charcode;
 	modify_spritecode = batman2_modify_spritecode;
@@ -633,7 +633,7 @@ VIDEO_START( batman2 )
 
 VIDEO_START( scramble )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	/* FIXME: This most probably needs to be adjusted
      * again when RAW video params are added to scramble
@@ -663,21 +663,21 @@ VIDEO_START( sfx )
 
 VIDEO_START( turtles )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_background = turtles_draw_background;
 }
 
 VIDEO_START( theend )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	draw_bullets = theend_draw_bullets;
 }
 
 VIDEO_START( darkplnt )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	tilemap_set_scrolldx(bg_tilemap, 0, 0);
 	draw_bullets = darkplnt_draw_bullets;
@@ -685,7 +685,7 @@ VIDEO_START( darkplnt )
 
 VIDEO_START( rescue )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	draw_stars = rescue_draw_stars;
 
@@ -694,7 +694,7 @@ VIDEO_START( rescue )
 
 VIDEO_START( minefld )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	draw_stars = rescue_draw_stars;
 
@@ -703,21 +703,21 @@ VIDEO_START( minefld )
 
 VIDEO_START( stratgyx )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_background = stratgyx_draw_background;
 }
 
 VIDEO_START( ckongs )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	modify_spritecode = mshuttle_modify_spritecode;
 }
 
 VIDEO_START( calipso )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_bullets = scramble_draw_bullets;
 
@@ -728,7 +728,7 @@ VIDEO_START( calipso )
 
 VIDEO_START( mariner )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_stars = mariner_draw_stars;
 
@@ -741,7 +741,7 @@ VIDEO_START( mariner )
 
 VIDEO_START( froggers )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_background = frogger_draw_background;
 	modify_color = frogger_modify_color;
@@ -749,14 +749,14 @@ VIDEO_START( froggers )
 
 VIDEO_START( frogger )
 {
-	video_start_froggers(machine);
+	VIDEO_START_CALL(froggers);
 
 	modify_ypos = frogger_modify_ypos;
 }
 
 VIDEO_START( jumpbug )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	draw_stars = jumpbug_draw_stars;
 
@@ -766,7 +766,7 @@ VIDEO_START( jumpbug )
 
 VIDEO_START( azurian )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	draw_stars = galaxian_draw_stars;
 	draw_bullets = scramble_draw_bullets; /* Shots are yellow like in Scramble */
@@ -774,7 +774,7 @@ VIDEO_START( azurian )
 
 VIDEO_START( mimonkey )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	modify_charcode   = mimonkey_modify_charcode;
 	modify_spritecode = mimonkey_modify_spritecode;
@@ -782,7 +782,7 @@ VIDEO_START( mimonkey )
 
 VIDEO_START( dkongjrm )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	modify_charcode   = pisces_modify_charcode;
 	modify_spritecode = dkongjrm_modify_spritecode;
@@ -792,7 +792,7 @@ VIDEO_START( dkongjrm )
 
 VIDEO_START( newsin7 )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	spritevisiblearea      = &_spritevisibleareaflipx;
 	spritevisibleareaflipx = &_spritevisiblearea;
@@ -800,7 +800,7 @@ VIDEO_START( newsin7 )
 
 VIDEO_START( scorpion )
 {
-	video_start_scramble(machine);
+	VIDEO_START_CALL(scramble);
 
 	modify_spritecode = batman2_modify_spritecode;
 }
@@ -817,7 +817,7 @@ static void rockclim_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int
 
 VIDEO_START( rockclim )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 	rockclim_tilemap = tilemap_create(rockclim_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
 	draw_background = rockclim_draw_background;
 	modify_charcode = mooncrst_modify_charcode;
@@ -976,7 +976,7 @@ VIDEO_START( racknrol )
 
 VIDEO_START( bongo )
 {
-	video_start_galaxian_plain(machine);
+	VIDEO_START_CALL(galaxian_plain);
 
 	modify_spritecode = batman2_modify_spritecode;
 }
@@ -1003,7 +1003,7 @@ static TILE_GET_INFO( dambustr_get_tile_info2 )
 
 VIDEO_START( dambustr )
 {
-	video_start_galaxian(machine);
+	VIDEO_START_CALL(galaxian);
 
 	dambustr_bg_split_line = 0;
 	dambustr_bg_color_1 = 0;

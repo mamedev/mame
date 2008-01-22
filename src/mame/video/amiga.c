@@ -156,7 +156,7 @@ VIDEO_START( amiga )
 	/* reset the genlock color */
 	genlock_color = 0xffff;
 
-	video_start_generic_bitmapped(machine);
+	VIDEO_START_CALL(generic_bitmapped);
 }
 
 

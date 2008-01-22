@@ -508,7 +508,7 @@ static MACHINE_START( tenpindx )
 	/* initialize the CTC */
 	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
-	machine_start_astrocde(machine);
+	MACHINE_START_CALL(astrocde);
 }
 
 

@@ -71,7 +71,7 @@ VIDEO_START( leland )
 VIDEO_START( ataxx )
 {
 	/* first do the standard stuff */
-	video_start_leland(machine);
+	VIDEO_START_CALL(leland);
 
 	/* allocate memory */
 	ataxx_qram = auto_malloc(QRAM_SIZE);

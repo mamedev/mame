@@ -131,14 +131,14 @@ static MACHINE_START( segac2 )
 	state_save_register_global(prot_write_buf);
 	state_save_register_global(prot_read_buf);
 
-	machine_start_genesis(machine);
+	MACHINE_START_CALL(genesis);
 }
 
 
 static MACHINE_RESET( segac2 )
 {
 	/* set up interrupts and such */
-	machine_reset_genesis(machine);
+	MACHINE_RESET_CALL(genesis);
 
 	/* determine how many sound banks */
 	sound_banks = 0;

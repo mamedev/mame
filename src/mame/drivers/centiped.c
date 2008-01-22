@@ -483,7 +483,7 @@ static MACHINE_RESET( centiped )
 
 static MACHINE_RESET( magworm )
 {
-	machine_reset_centiped(machine);
+	MACHINE_RESET_CALL(centiped);
 
 	/* kludge: clear RAM so that magworm can be reset cleanly */
 	memset(rambase, 0, 0x400);

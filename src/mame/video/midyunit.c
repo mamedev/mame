@@ -100,7 +100,7 @@ VIDEO_START( midyunit_4bit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 4-bit */
 	for (i = 0; i < 65536; i++)
@@ -113,7 +113,7 @@ VIDEO_START( midyunit_6bit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 6-bit */
 	for (i = 0; i < 65536; i++)
@@ -124,7 +124,7 @@ VIDEO_START( midyunit_6bit )
 
 VIDEO_START( mkyawdim )
 {
-	video_start_midyunit_6bit(machine);
+	VIDEO_START_CALL(midyunit_6bit);
 	yawdim_dma = 1;
 }
 
@@ -133,7 +133,7 @@ VIDEO_START( midzunit )
 {
 	int i;
 
-	video_start_common(machine);
+	VIDEO_START_CALL(common);
 
 	/* init for 8-bit */
 	for (i = 0; i < 65536; i++)

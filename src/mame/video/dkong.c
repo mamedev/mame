@@ -886,7 +886,7 @@ VIDEO_START( dkong )
 {
 	dkong_state *state = machine->driver_data;
 
-	video_start_dkong_base(machine);
+	VIDEO_START_CALL(dkong_base);
 
 	switch (state->hardware_type)
 	{

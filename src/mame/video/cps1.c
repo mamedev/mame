@@ -1139,7 +1139,7 @@ static VIDEO_START( cps )
 {
 	int i;
 
-    machine_reset_cps(machine);
+    MACHINE_RESET_CALL(cps);
 
 	cps1_bg_tilemap[0] = tilemap_create(get_tile0_info,tilemap0_scan,TILEMAP_TYPE_PEN, 8, 8,64,64);
 	cps1_bg_tilemap[1] = tilemap_create(get_tile1_info,tilemap1_scan,TILEMAP_TYPE_PEN,16,16,64,64);
@@ -1201,7 +1201,7 @@ static VIDEO_START( cps )
 VIDEO_START( cps1 )
 {
     cps_version=1;
-    video_start_cps(machine);
+    VIDEO_START_CALL(cps);
 }
 
 VIDEO_START( cps2 )
@@ -1210,7 +1210,7 @@ VIDEO_START( cps2 )
     {
         cps_version=2;
     }
-    video_start_cps(machine);
+    VIDEO_START_CALL(cps);
 }
 
 /***************************************************************************

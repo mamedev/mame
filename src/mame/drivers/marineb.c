@@ -43,13 +43,13 @@ write
 static MACHINE_RESET( marineb )
 {
 	marineb_active_low_flipscreen = 0;
-	machine_reset_espial(machine);
+	MACHINE_RESET_CALL(espial);
 }
 
 static MACHINE_RESET( springer )
 {
 	marineb_active_low_flipscreen = 1;
-	machine_reset_espial(machine);
+	MACHINE_RESET_CALL(espial);
 }
 
 static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )

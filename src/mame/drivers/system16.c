@@ -653,7 +653,7 @@ static MACHINE_RESET( bayroute )
 
 static DRIVER_INIT( bayrtbl1 )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 /***************************************************************************/
 
@@ -812,7 +812,7 @@ static DRIVER_INIT( dduxbl )
 		0,2,0,0
 	};
 
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	sys16_video_config(dduxbl_update_proc, -0x48, bank);
 }
 /***************************************************************************/
@@ -939,7 +939,7 @@ static MACHINE_RESET( eswatbl )
 
 static DRIVER_INIT( eswatbl )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	sys16_rowscroll_scroll=0x8000;
 	sys18_splittab_fg_x=&sys16_textram[0x0f80];
 }
@@ -1063,7 +1063,7 @@ static MACHINE_RESET( fpointbl )
 
 static DRIVER_INIT( fpointbl )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 	sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 }
 /***************************************************************************/
@@ -1297,7 +1297,7 @@ static MACHINE_RESET( goldnaxe )
 
 static DRIVER_INIT( goldnabl )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 /***************************************************************************/
@@ -1510,12 +1510,12 @@ static MACHINE_RESET( passht4b )
 
 static DRIVER_INIT( passsht )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 static DRIVER_INIT( passht4b )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 /***************************************************************************/
@@ -1774,7 +1774,7 @@ static MACHINE_RESET( shinobl )
 static DRIVER_INIT( shinobl )
 {
 	shinobl_kludge = 1;
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 
@@ -1857,7 +1857,7 @@ static MACHINE_RESET( tetrisbl )
 
 static DRIVER_INIT( tetrisbl )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 
@@ -2063,7 +2063,7 @@ static DRIVER_INIT( tturfbl )
 {
 	UINT8 *mem;
 
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 
 	mem = memory_region(REGION_CPU2);
 	memcpy(mem, mem+0x10000, 0x8000);
@@ -2225,7 +2225,7 @@ static MACHINE_RESET( wb3bbl )
 
 static DRIVER_INIT( wb3bbl )
 {
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 }
 
 /***************************************************************************/

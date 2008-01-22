@@ -71,7 +71,7 @@ static UINT16 *galpani2_ram, *galpani2_ram2;
 
 static MACHINE_RESET( galpani2 )
 {
-	machine_reset_kaneko16(machine);
+	MACHINE_RESET_CALL(kaneko16);
 
 	kaneko16_sprite_type = 1;
 

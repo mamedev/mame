@@ -771,7 +771,7 @@ VIDEO_START( hnoridur )
 
 VIDEO_START( mcnpshnt )
 {
-	video_start_hnoridur(machine);
+	VIDEO_START_CALL(hnoridur);
 	priority_table = priority_mcnpshnt;
 }
 
@@ -826,7 +826,7 @@ VIDEO_START( mjdialq2 )
 
 VIDEO_START( mjelctrn )
 {
-	video_start_hnoridur(machine);
+	VIDEO_START_CALL(hnoridur);
 
 	priority_table = priority_mjelctrn;
 	update_irq_func = mjelctrn_update_irq;
@@ -834,7 +834,7 @@ VIDEO_START( mjelctrn )
 
 VIDEO_START( neruton )
 {
-	video_start_hnoridur(machine);
+	VIDEO_START_CALL(hnoridur);
 
 //  priority_table = priority_mjelctrn;
 	update_irq_func = neruton_update_irq;
@@ -1256,8 +1256,8 @@ static mame_bitmap *framebuffer;
 
 VIDEO_START(htengoku)
 {
-	video_start_ddenlovr(machine);
-	video_start_hnoridur(machine);
+	VIDEO_START_CALL(ddenlovr);
+	VIDEO_START_CALL(hnoridur);
 	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
@@ -1266,7 +1266,7 @@ VIDEO_EOF(htengoku)
 	int layer,x,y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let video_eof_ddenlovr do the final compositing (priorities + palettes)
+	// format and let VIDEO_EOF(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
 		fillbitmap(framebuffer,0,&machine->screen[0].visarea);
@@ -1276,5 +1276,5 @@ VIDEO_EOF(htengoku)
 			for (x=0; x < 512; x++)
 				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(framebuffer, y,x));
 	}
-	video_eof_ddenlovr(machine);
+	VIDEO_EOF_CALL(ddenlovr);
 }

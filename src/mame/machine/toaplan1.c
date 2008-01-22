@@ -307,13 +307,13 @@ void toaplan1_driver_savestate(void)
 
 MACHINE_RESET( zerozone )	/* Hack for ZeroWing and OutZone. See the video driver */
 {
-	machine_reset_toaplan1(machine);
+	MACHINE_RESET_CALL(toaplan1);
 	toaplan1_unk_reset_port = 1;
 }
 
 MACHINE_RESET( demonwld )
 {
-	machine_reset_toaplan1(machine);
+	MACHINE_RESET_CALL(toaplan1);
 	dsp_addr_w = 0;
 	main_ram_seg = 0;
 	dsp_execute = 0;
@@ -330,7 +330,7 @@ void demonwld_driver_savestate(void)
 
 MACHINE_RESET( vimana )
 {
-	machine_reset_toaplan1(machine);
+	MACHINE_RESET_CALL(toaplan1);
 	vimana_credits = 0;
 	vimana_latch = 0;
 }

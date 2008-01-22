@@ -153,13 +153,13 @@ VIDEO_START( nekkyoku )
 
 VIDEO_START( pipedrm )
 {
-	video_start_fromance(machine);
+	VIDEO_START_CALL(fromance);
 	scrolly_ofs = 0x00;
 }
 
 VIDEO_START( hatris )
 {
-	video_start_fromance(machine);
+	VIDEO_START_CALL(fromance);
 	scrollx_ofs = 0xB9;
 	scrolly_ofs = 0x00;
 }

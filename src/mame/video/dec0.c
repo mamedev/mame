@@ -713,7 +713,7 @@ VIDEO_START( dec0_nodma )
 
 VIDEO_START( dec0 )
 {
-	video_start_dec0_nodma(machine);
+	VIDEO_START_CALL(dec0_nodma);
 	dec0_spriteram=auto_malloc(0x800);
 }
 

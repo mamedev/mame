@@ -362,7 +362,7 @@ READ32_HANDLER( atarigen_eeprom_upper32_r )
 
 
 /*---------------------------------------------------------------
-    nvram_handler_atarigen: Loads the EEPROM data.
+    NVRAM_HANDLER( atarigen ): Loads the EEPROM data.
 ---------------------------------------------------------------*/
 
 NVRAM_HANDLER( atarigen )

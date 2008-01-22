@@ -338,7 +338,7 @@ static MACHINE_RESET(mquake)
 	/* set ES5503 wave memory (this is banked in 64k increments) */
 	ES5503_set_base_0(memory_region(REGION_SOUND1));
 
-	machine_reset_amiga(machine);
+	MACHINE_RESET_CALL(amiga);
 }
 
 /*************************************

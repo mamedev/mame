@@ -20,7 +20,7 @@ static UINT8 security_2B_counter;
 
 MACHINE_RESET( scramble )
 {
-	machine_reset_galaxian(machine);
+	MACHINE_RESET_CALL(galaxian);
 
 	if (cpu_gettotalcpu() > 1)
 	{
@@ -32,7 +32,7 @@ MACHINE_RESET( scramble )
 
 MACHINE_RESET( sfx )
 {
-	machine_reset_scramble(machine);
+	MACHINE_RESET_CALL(scramble);
 
 	sfx_sh_init();
 }
@@ -49,7 +49,7 @@ MACHINE_RESET( monsterz )
 
     ROM[0xc5bc] = 0xaf;
 */
-	machine_reset_scramble(machine);
+	MACHINE_RESET_CALL(scramble);
 
 	sfx_sh_init();
 
@@ -61,7 +61,7 @@ MACHINE_RESET( explorer )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
-	machine_reset_galaxian(machine);
+	MACHINE_RESET_CALL(galaxian);
 }
 
 static READ8_HANDLER( scrambls_input_port_2_r )

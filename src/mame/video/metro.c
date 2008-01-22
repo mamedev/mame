@@ -459,7 +459,7 @@ VIDEO_START( metro_14300 )
 
 VIDEO_START( blzntrnd )
 {
-	video_start_metro_14220(machine);
+	VIDEO_START_CALL(metro_14220);
 
 	has_zoom = 1;
 
@@ -476,7 +476,7 @@ VIDEO_START( blzntrnd )
 
 VIDEO_START( gstrik2 )
 {
-	video_start_metro_14220(machine);
+	VIDEO_START_CALL(metro_14220);
 
 	has_zoom = 1;
 

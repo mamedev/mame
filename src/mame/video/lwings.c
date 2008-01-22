@@ -112,7 +112,7 @@ VIDEO_START( trojan )
 
 VIDEO_START( avengers )
 {
-	video_start_trojan(machine);
+	VIDEO_START_CALL(trojan);
 	bAvengersHardware = 1;
 }
 

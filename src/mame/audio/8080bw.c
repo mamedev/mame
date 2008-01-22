@@ -884,7 +884,7 @@ MACHINE_START( schaser )
 {
 	schaser_effect_555_timer = timer_alloc(schaser_effect_555_cb, NULL);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -896,7 +896,7 @@ MACHINE_RESET( schaser )
 	schaser_sh_port_2_w(0, 0);
 	schaser_effect_555_time_remain = attotime_zero;
 
-	machine_reset_mw8080bw(machine);
+	MACHINE_RESET_CALL(mw8080bw);
 }
 
 

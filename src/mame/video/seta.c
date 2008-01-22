@@ -537,7 +537,7 @@ VIDEO_START( seta_no_layers )
 
 VIDEO_START( oisipuzl_2_layers )
 {
-	video_start_seta_2_layers(machine);
+	VIDEO_START_CALL(seta_2_layers);
 	tilemaps_flip = 1;
 }
 

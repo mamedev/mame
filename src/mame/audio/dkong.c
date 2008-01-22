@@ -889,7 +889,7 @@ static SOUND_RESET( dkong )
 
 static SOUND_RESET( dkongjr )
 {
-	sound_reset_dkong(machine);
+	SOUND_RESET_CALL(dkong);
 	soundlatch_w(0,0x00);
 }
 

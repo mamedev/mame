@@ -199,7 +199,7 @@ VIDEO_START( ssv )
 
 VIDEO_START( eaglshot )
 {
-	video_start_ssv(machine);
+	VIDEO_START_CALL(ssv);
 
 	eaglshot_gfxram		=	(UINT16*)auto_malloc(16 * 0x40000);
 	eaglshot_dirty_tile	=	(char*)auto_malloc(16 * 0x40000 / (16*8));
@@ -221,7 +221,7 @@ WRITE16_HANDLER( gdfs_tmapram_w )
 
 VIDEO_START( gdfs )
 {
-	video_start_ssv(machine);
+	VIDEO_START_CALL(ssv);
 
 	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 
@@ -936,7 +936,7 @@ VIDEO_UPDATE( eaglshot )
 		}
 	}
 
-	video_update_ssv(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(ssv);
 	return 0;
 }
 
@@ -1107,7 +1107,7 @@ VIDEO_UPDATE( gdfs )
 {
 	int tile, pri;
 
-	video_update_ssv(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(ssv);
 
 	// Decode zooming sprites tiles from ram
 	if (eaglshot_dirty)

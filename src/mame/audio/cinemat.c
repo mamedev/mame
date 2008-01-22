@@ -96,7 +96,7 @@ WRITE8_HANDLER( cinemat_sound_control_w )
 static void generic_init(running_machine *machine, void (*callback)(UINT8, UINT8))
 {
 	/* call the standard init */
-	machine_reset_cinemat(machine);
+	MACHINE_RESET_CALL(cinemat);
 
 	/* set the sound handler */
 	sound_handler = callback;
@@ -1593,7 +1593,7 @@ static WRITE8_HANDLER( qb3_sound_w )
 
 static MACHINE_RESET( qb3_sound )
 {
-	machine_reset_demon_sound(machine);
+	MACHINE_RESET_CALL(demon_sound);
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, qb3_sound_w);
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */

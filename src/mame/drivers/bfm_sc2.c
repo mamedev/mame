@@ -1554,7 +1554,7 @@ static void decode_mainrom(int rom_region)
 static MACHINE_RESET( init )
 {
 	// reset adder2
-	machine_reset_adder2(machine);
+	MACHINE_RESET_CALL(adder2);
 
 	// reset the board //////////////////////////////////////////////////////
 
@@ -1571,7 +1571,7 @@ static VIDEO_UPDATE( addersc2 )
 		output_set_value("door",( Scorpion2_GetSwitchState(sc2_door_state>>4, sc2_door_state & 0x0F) ) );
 	}
 
-	return video_update_adder2(machine,screen,bitmap,cliprect);
+	return VIDEO_UPDATE_CALL(adder2);
 }
 
 // memory map for scorpion2 board video addon /////////////////////////////

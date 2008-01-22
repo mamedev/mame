@@ -532,7 +532,7 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 /*************************************
  *
- *  video_update_slikshot
+ *  VIDEO_UPDATE( slishot )
  *
  *************************************/
 
@@ -542,7 +542,7 @@ VIDEO_UPDATE( slikshot )
 	int temp, i;
 
 	/* draw the normal video first */
-	video_update_itech8_2page(machine, screen, bitmap, cliprect);
+	VIDEO_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
 	xbuffer[ybuffer_next % YBUFFER_COUNT] = readinputportbytag_safe("FAKEX", 0);

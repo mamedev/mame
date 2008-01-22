@@ -184,14 +184,14 @@ VIDEO_START(ddenlovr)
 
 static VIDEO_START(mmpanic)
 {
-	video_start_ddenlovr(machine);
+	VIDEO_START_CALL(ddenlovr);
 
 	extra_layers = 1;
 }
 
 static VIDEO_START(hanakanz)
 {
-	video_start_ddenlovr(machine);
+	VIDEO_START_CALL(ddenlovr);
 
 	ddenlovr_blit_rom_bits = 16;
 	ddenlovr_blit_commands = hanakanz_commands;
@@ -199,7 +199,7 @@ static VIDEO_START(hanakanz)
 
 static VIDEO_START(mjflove)
 {
-	video_start_ddenlovr(machine);
+	VIDEO_START_CALL(ddenlovr);
 
 	ddenlovr_blit_commands = mjflove_commands;
 }

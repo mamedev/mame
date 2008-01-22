@@ -2222,7 +2222,7 @@ static void namcos22_exit(running_machine *machine)
 	poly_free(poly);
 }
 
-static void video_start_common(running_machine *machine)
+static VIDEO_START( common )
 {
 	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
@@ -2249,7 +2249,7 @@ static void video_start_common(running_machine *machine)
 VIDEO_START( namcos22 )
 {
    mbSuperSystem22 = 0;
-   video_start_common(machine);
+   VIDEO_START_CALL(common);
 }
 
 VIDEO_START( namcos22s )
@@ -2259,7 +2259,7 @@ VIDEO_START( namcos22s )
    namcos22_czram[1] = auto_malloc( 0x200 );
    namcos22_czram[2] = auto_malloc( 0x200 );
    namcos22_czram[3] = auto_malloc( 0x200 );
-   video_start_common(machine);
+   VIDEO_START_CALL(common);
 }
 
 VIDEO_UPDATE( namcos22s )

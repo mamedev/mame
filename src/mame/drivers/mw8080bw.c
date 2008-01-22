@@ -882,7 +882,7 @@ static MACHINE_START( maze )
 	state_save_register_global(maze_tone_timing_state);
 	state_save_register_func_postload(maze_update_discrete);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -967,7 +967,7 @@ static MACHINE_START( boothill )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -1167,7 +1167,7 @@ static MACHINE_START( desertgu )
 	/* setup for save states */
 	state_save_register_global(desertgu_controller_select);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -1493,7 +1493,7 @@ static MACHINE_START( gmissile )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -1585,7 +1585,7 @@ static MACHINE_START( m4 )
 	/* setup for save states */
 	state_save_register_global(rev_shift_res);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -1682,7 +1682,7 @@ static MACHINE_START( clowns )
 	/* setup for save states */
 	state_save_register_global(clowns_controller_select);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -2059,7 +2059,7 @@ static MACHINE_START( spcenctr )
 	state_save_register_global_array(spcenctr_trench_slope);
 	state_save_register_func_postload(adjust_strobe_timers);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -2226,7 +2226,7 @@ static MACHINE_START( phantom2 )
 	/* setup for save states */
 	state_save_register_global(phantom2_cloud_counter);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 
@@ -2463,7 +2463,7 @@ static MACHINE_START( invaders )
 	/* setup for save states */
 	state_save_register_global(invaders_flip_screen);
 
-	machine_start_mw8080bw(machine);
+	MACHINE_START_CALL(mw8080bw);
 }
 
 

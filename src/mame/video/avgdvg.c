@@ -1466,7 +1466,7 @@ static VIDEO_START( avg_common )
 	vg->ydac_xor = 0x200;
 
 	register_state ();
-	video_start_vector(machine);
+	VIDEO_START_CALL(vector);
 }
 
 VIDEO_START( dvg )
@@ -1481,48 +1481,48 @@ VIDEO_START( dvg )
 	vg_run_timer = timer_alloc(run_state_machine, NULL);
 
 	register_state ();
-	video_start_vector(machine);
+	VIDEO_START_CALL(vector);
 }
 
 VIDEO_START( avg )
 {
 	vgc = &avg_default;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_starwars )
 {
 	vgc = &avg_starwars;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_mhavoc )
 {
 	vgc = &avg_mhavoc;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_bzone )
 {
 	vgc = &avg_bzone;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 
 VIDEO_START( avg_quantum )
 {
 	vgc = &avg_quantum;
 	vg = &vgd;
-	video_start_avg_common(machine);
+	VIDEO_START_CALL(avg_common);
 }
 

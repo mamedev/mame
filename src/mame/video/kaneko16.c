@@ -130,7 +130,7 @@ VIDEO_START( kaneko16_sprites )
 
 VIDEO_START( kaneko16_1xVIEW2 )
 {
-	video_start_kaneko16_sprites(machine);
+	VIDEO_START_CALL(kaneko16_sprites);
 
 	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
 										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
@@ -176,7 +176,7 @@ VIDEO_START( kaneko16_1xVIEW2 )
 
 VIDEO_START( kaneko16_2xVIEW2 )
 {
-	video_start_kaneko16_1xVIEW2(machine);
+	VIDEO_START_CALL(kaneko16_1xVIEW2);
 
 	kaneko16_tmap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
 										TILEMAP_TYPE_PEN, 16,16, 0x20,0x20	);
@@ -216,7 +216,7 @@ VIDEO_START( kaneko16_2xVIEW2 )
 
 VIDEO_START( sandscrp_1xVIEW2 )
 {
-	video_start_kaneko16_1xVIEW2(machine);
+	VIDEO_START_CALL(kaneko16_1xVIEW2);
 	pandora_start(0,0,0);
 
 	tilemap_set_scrolldy( kaneko16_tmap_0, 0, 256 - 1 );
@@ -281,12 +281,12 @@ VIDEO_START( berlwall )
 			*BITMAP_ADDR16(kaneko16_bg15_bitmap, y, sx * 256 + x) = machine->pens[2048 + ((g << 10) | (r << 5) | b)];
 	  }
 
-	video_start_kaneko16_1xVIEW2(machine);
+	VIDEO_START_CALL(kaneko16_1xVIEW2);
 }
 
 VIDEO_START( galsnew )
 {
-	video_start_kaneko16_1xVIEW2(machine);
+	VIDEO_START_CALL(kaneko16_1xVIEW2);
 }
 
 /***************************************************************************
@@ -948,7 +948,7 @@ static void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, 
 		fillbitmap(bitmap,machine->pens[0],cliprect);
 }
 
-static void kaneko16_video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static VIDEO_UPDATE( common )
 {
 	int i;
 
@@ -962,6 +962,8 @@ static void kaneko16_video_update_common(running_machine *machine, mame_bitmap *
 		kaneko16_render_first_tilemap_chip(machine,bitmap,cliprect,i);
 		kaneko16_render_second_tilemap_chip(machine,bitmap,cliprect,i);
 	}
+
+	return 0;
 }
 
 VIDEO_UPDATE(berlwall)
@@ -972,7 +974,7 @@ VIDEO_UPDATE(berlwall)
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
-	kaneko16_video_update_common(machine,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(common);
 	kaneko16_render_sprites(machine,bitmap,cliprect);
 	return 0;
 }
@@ -986,7 +988,7 @@ VIDEO_UPDATE( kaneko16 )
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
-	kaneko16_video_update_common(machine,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(common);
 	kaneko16_render_sprites(machine,bitmap,cliprect);
 	return 0;
 }
@@ -1033,7 +1035,7 @@ VIDEO_UPDATE( galsnew )
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
-	kaneko16_video_update_common(machine,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(common);
 
 	kaneko16_render_sprites(machine,bitmap,cliprect);
 	return 0;
@@ -1047,7 +1049,7 @@ VIDEO_UPDATE( sandscrp )
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
-	kaneko16_video_update_common(machine,bitmap,cliprect);
+	VIDEO_UPDATE_CALL(common);
 
 	// copy sprite bitmap to screen
 	pandora_update(machine,bitmap,cliprect);

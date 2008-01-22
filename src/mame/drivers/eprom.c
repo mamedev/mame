@@ -76,7 +76,7 @@ static MACHINE_RESET( klaxp )
 
 static MACHINE_RESET( eprom )
 {
-	machine_reset_klaxp(machine);
+	MACHINE_RESET_CALL(klaxp);
 	state_save_register_global_pointer(sync_data, 2);
 }
 

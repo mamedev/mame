@@ -29,13 +29,13 @@ int percuss_hardware;
 static MACHINE_RESET( zodiack )
 {
 	percuss_hardware = 0;
-	machine_reset_espial(machine);
+	MACHINE_RESET_CALL(espial);
 }
 
 static MACHINE_RESET( percuss )
 {
 	percuss_hardware = 1;
-	machine_reset_espial(machine);
+	MACHINE_RESET_CALL(espial);
 }
 
 

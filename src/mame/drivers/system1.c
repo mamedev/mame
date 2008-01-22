@@ -33,7 +33,7 @@ static MACHINE_RESET( system1 )
 
 static MACHINE_RESET( system1_banked )
 {
-	machine_reset_system1(machine);
+	MACHINE_RESET_CALL(system1);
 	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 }
 

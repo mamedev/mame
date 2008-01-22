@@ -205,7 +205,7 @@ static const ppi8255_interface single_ppi_intf =
 static void system16a_generic_init(running_machine *machine)
 {
 	/* call the generic init */
-	machine_reset_sys16_onetime(machine);
+	MACHINE_RESET_CALL(sys16_onetime);
 
 	/* init the FD1094 */
 	fd1094_driver_init(NULL);

@@ -200,7 +200,7 @@ static UINT32 akiko_nvram_read(void)
 
 NVRAM_HANDLER( cd32 )
 {
-	nvram_handler_i2cmem_0( machine, file, read_or_write );
+	NVRAM_HANDLER_CALL(i2cmem_0);
 }
 
 /*************************************

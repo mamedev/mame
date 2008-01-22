@@ -435,7 +435,7 @@ static MACHINE_START( astrof )
 	state_save_register_global(screen_off);
 	state_save_register_global(astrof_palette_bank);
 
-	machine_start_astrof_audio(machine);
+	MACHINE_START_CALL(astrof_audio);
 }
 
 
@@ -444,7 +444,7 @@ static MACHINE_START( abattle )
 	/* register for state saving */
 	state_save_register_global(abattle_count);
 
-	machine_start_astrof(machine);
+	MACHINE_START_CALL(astrof);
 }
 
 
@@ -494,7 +494,7 @@ static MACHINE_RESET( astrof )
 
 static MACHINE_RESET( abattle )
 {
-	machine_reset_astrof(machine);
+	MACHINE_RESET_CALL(astrof);
 
 	abattle_count = 0;
 }

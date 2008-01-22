@@ -28,7 +28,7 @@ VIDEO_START( goldstar )
 {
 //        int i;
 
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 
 	/* the background area is half as high as the screen */
 	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);

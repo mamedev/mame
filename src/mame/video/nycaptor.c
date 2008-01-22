@@ -82,7 +82,7 @@ VIDEO_START( nycaptor )
 	paletteram = auto_malloc(0x200);
 	paletteram_2 = auto_malloc(0x200);
 	tilemap_set_scroll_cols(bg_tilemap,32);
-	video_start_generic(machine);
+	VIDEO_START_CALL(generic);
 }
 
 WRITE8_HANDLER( nycaptor_videoram_w )

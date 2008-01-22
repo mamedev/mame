@@ -93,7 +93,7 @@ static MACHINE_START( midzeus )
 static MACHINE_START( midzeus2 )
 {
 	timekeeper_init(0, TIMEKEEPER_MIDZEUS2, NULL);
-	machine_start_midzeus(machine);
+	MACHINE_START_CALL(midzeus);
 }
 
 
@@ -202,7 +202,7 @@ static WRITE32_HANDLER( zpram_w )
 
 static NVRAM_HANDLER( midzeus2 )
 {
-	nvram_handler_timekeeper_0(machine, file, read_or_write);
+	NVRAM_HANDLER_CALL(timekeeper_0);
 
 	if (read_or_write)
 		mame_fwrite(file, zpram, zpram_size);

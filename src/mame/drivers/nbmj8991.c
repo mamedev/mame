@@ -83,7 +83,7 @@ static MACHINE_RESET( nbmj8991 )
 		memory_configure_bank(1, 0, 4, memory_region(REGION_CPU2) + 0x8000, 0x8000);
 		memory_set_bank(1, 0);
 	}
-	machine_reset_nb1413m3(machine);
+	MACHINE_RESET_CALL(nb1413m3);
 }
 
 static DRIVER_INIT( pstadium )
