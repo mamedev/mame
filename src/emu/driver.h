@@ -19,37 +19,55 @@
     MACROS (must be *before* the includes below)
 ***************************************************************************/
 
-#define DRIVER_INIT(name)		void driver_init_##name(running_machine *machine)
+#define DRIVER_INIT(name)			void driver_init_##name(running_machine *machine)
+#define DRIVER_INIT_CALL(name)		driver_init_##name(machine)
 
-#define NVRAM_HANDLER(name)		void nvram_handler_##name(running_machine *machine, mame_file *file, int read_or_write)
+#define NVRAM_HANDLER(name)			void nvram_handler_##name(running_machine *machine, mame_file *file, int read_or_write)
+#define NVRAM_HANDLER_CALL(name)	nvram_handler_##name(machine, file, read_or_write)
 
-#define MEMCARD_HANDLER(name)	void memcard_handler_##name(running_machine *machine, mame_file *file, int action)
+#define MEMCARD_HANDLER(name)		void memcard_handler_##name(running_machine *machine, mame_file *file, int action)
+#define MEMCARD_HANDLER_CALL(name)	memcard_handler_##name(machine, file, action)
 
-#define MACHINE_START(name)		void machine_start_##name(running_machine *machine)
-#define MACHINE_RESET(name)		void machine_reset_##name(running_machine *machine)
+#define MACHINE_START(name)			void machine_start_##name(running_machine *machine)
+#define MACHINE_START_CALL(name)	machine_start_##name(machine)
 
-#define SOUND_START(name)		void sound_start_##name(running_machine *machine)
-#define SOUND_RESET(name)		void sound_reset_##name(running_machine *machine)
+#define MACHINE_RESET(name)			void machine_reset_##name(running_machine *machine)
+#define MACHINE_RESET_CALL(name)	machine_reset_##name(machine)
 
-#define VIDEO_START(name)		void video_start_##name(running_machine *machine)
-#define VIDEO_RESET(name)		void video_reset_##name(running_machine *machine)
+#define SOUND_START(name)			void sound_start_##name(running_machine *machine)
+#define SOUND_START_CALL(name)		sound_start_##name(machine)
 
-#define PALETTE_INIT(name)		void palette_init_##name(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom)
-#define VIDEO_EOF(name)			void video_eof_##name(running_machine *machine)
-#define VIDEO_UPDATE(name)		UINT32 video_update_##name(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect)
+#define SOUND_RESET(name)			void sound_reset_##name(running_machine *machine)
+#define SOUND_RESET_CALL(name)		sound_reset_##name(machine)
+
+#define VIDEO_START(name)			void video_start_##name(running_machine *machine)
+#define VIDEO_START_CALL(name)		video_start_##name(machine)
+
+#define VIDEO_RESET(name)			void video_reset_##name(running_machine *machine)
+#define VIDEO_RESET_CALL(name)		video_reset_##name(machine)
+
+#define PALETTE_INIT(name)			void palette_init_##name(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom)
+#define PALETTE_INIT_CALL(name)		palette_init_##name(machine, colortable, color_prom)
+
+#define VIDEO_EOF(name)				void video_eof_##name(running_machine *machine)
+#define VIDEO_EOF_CALL(name)		video_eof_##name(machine)
+
+#define VIDEO_UPDATE(name)			UINT32 video_update_##name(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect)
+#define VIDEO_UPDATE_CALL(name)		video_update_##name(machine, screen, bitmap, cliprect)
+
 
 /* NULL versions */
-#define nvram_handler_NULL 		NULL
-#define memcard_handler_NULL	NULL
-#define machine_start_NULL 		NULL
-#define machine_reset_NULL 		NULL
-#define sound_start_NULL 		NULL
-#define sound_reset_NULL 		NULL
-#define video_start_NULL 		NULL
-#define video_reset_NULL 		NULL
-#define palette_init_NULL		NULL
-#define video_eof_NULL 			NULL
-#define video_update_NULL 		NULL
+#define nvram_handler_NULL 			NULL
+#define memcard_handler_NULL		NULL
+#define machine_start_NULL 			NULL
+#define machine_reset_NULL 			NULL
+#define sound_start_NULL 			NULL
+#define sound_reset_NULL 			NULL
+#define video_start_NULL 			NULL
+#define video_reset_NULL 			NULL
+#define palette_init_NULL			NULL
+#define video_eof_NULL 				NULL
+#define video_update_NULL 			NULL
 
 
 
