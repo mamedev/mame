@@ -166,7 +166,7 @@
 #define DK_C30		CAP_U(10)
 #define DK_C32		CAP_U(10)
 #define DK_C34		CAP_N(10)
-#define DK_C159		CAP_N(0)		/* 100nF in Schematics but sound is way off */
+#define DK_C159		CAP_N(100)
 
 
 /*
@@ -367,7 +367,7 @@ static DISCRETE_SOUND_START(dkong2b)
 #if DK_NO_FILTERS
 	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
 #else
-	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 3)
+	DISCRETE_OUTPUT(NODE_296, 32767.0/5.0 * 2)
 #endif
 
 DISCRETE_SOUND_END
