@@ -698,29 +698,86 @@ MACHINE_DRIVER_END
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
 
+/* BIOS info:
 
+Revisions A through C can handle game carts only
+Revisions D and later can also handle GD-Rom board
+Revisions F and later can also handle GD-Rom board and or the network GD-Rom board
+
+F355 has it's own BIOS (3 screen version) and different JVS I/O Board
+
+Info from roms starting at 0x1ffd60
+
+EPR-21576g - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
+EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
+EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
+EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export)
+EPR-21579  - No known dump (Korea)
+EPR-21580  - No known dump (Australia)
+EPR-22851  - NAOMI BOOT ROM 1999 08/30  1.35 (Multisystem 3 screen)
+
+EPR-21577e & EPR-2178e differ by 7 bytes:
+
+0x53e20 is the region byte (only one region byte)
+0x1ffffa-0x1fffff is the BIOS checksum
+
+
+Region byte encoding is as follows:
+
+0x00 = Japan
+0x01 = USA
+0x02 = Export
+???? = Korea
+???? = Australia
+
+Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for the region byte.
+  NOTE: this doesn't work for the multi screen boot rom
+
+*/
 
 #define NAOMI_BIOS \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21577" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21577.bin",   0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576d" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) /*also found as epr21578d */ \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21578" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21578.bin",   0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576g" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) /* might be naomi2 */ \
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21578a" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21578a.bin",  0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
+	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21577e" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576g" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-22851" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-22851.bin",   0x000000, 0x200000, CRC(62483677) SHA1(3e3bcacf5f972c376b569f45307ee7fd0b5031b7) ) \
 
 
+/* NAOMI2 BIOS:
+
+EPR-23609  - NAOMI BOOT ROM 2001 01/19  1.50
+EPR-2360xB - NAOMI BOOT ROM 2001 09/10  1.70
+
+EPR-23605B, EPR-23607B & EPR-23608B all differ by 6 bytes:
+
+0x0553a0 is the first region byte
+0x1ecf40 is a second region byte (value is the same as the first region byte )
+0x1fffc-1ffff is the BIOS rom checksum (might be 0x1ffffa-0x1fffff)
+
+EPR-23609  - Japan  (region = 0x00)
+EPR-23605b - Japan  (region = 0x00)
+EPR-23607b - USA    (region = 0x01)
+EPR-23608b - Export (region = 0x02)
+
+*/
 
 #define NAOMI2_BIOS \
-	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23605b" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23608b" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23607b" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "epr-23608b" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
+	ROM_SYSTEM_BIOS( 2, "bios2", "epr-23605b" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-23609" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23609.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) ) /* might be naomi1 */ \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23609.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) ) \
 
 /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 #define AW_BIOS \
