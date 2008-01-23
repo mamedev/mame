@@ -1,289 +1,237 @@
 /***************************************************************************
 
-  video.c
+    Irem Red Alert hardware
 
-  Functions to emulate the video hardware of the machine.
+    If you have any questions about how this driver works, don't hesitate to
+    ask.  - Mike Balfour (mab22@po.cwru.edu)
 
-***************************************************************************/
+****************************************************************************/
 
 #include "driver.h"
-
-UINT8 *redalert_backram;
-UINT8 *redalert_spriteram1;
-UINT8 *redalert_spriteram2;
-UINT8 *redalert_spriteram3;
-UINT8 *redalert_characterram;
-UINT8 *redalert_characterram2;
-
-static UINT8 redalert_dirtyback[0x400];
-static UINT8 redalert_dirtycharacter[0x100];
-static UINT8 redalert_dirtycharacter2[0x100];
-static UINT8 redalert_backcolor[0x400];
+#include "video/resnet.h"
 
 
-/* There might be a color PROM that dictates this? */
-/* These guesses are based on comparing the color bars on the test
-   screen with the picture in the manual */
-static const UINT8 color_lookup[] = {
-	1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,
-	1,1,1,1,1,1,1,1,3,3,3,3,3,3,3,3,
-	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-	1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+#define NUM_CHARMAP_PENS	0x200
+#define NUM_BITMAP_PENS		8
 
-	1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,
-	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-	2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,
-	1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,3,
-	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3
-};
 
-static int backcolor, flip=0;
 
-WRITE8_HANDLER( redalert_c040_w )
+/*************************************
+ *
+ *  Global variables
+ *
+ *************************************/
+
+UINT8 *redalert_bitmap_videoram;
+UINT8 *redalert_bitmap_color;
+UINT8 *redalert_charmap_videoram;
+
+UINT8 *redalert_video_control;
+
+
+
+/*************************************
+ *
+ *  Local variable
+ *
+ *************************************/
+
+static UINT8 *redalert_bitmap_colorram;
+
+
+
+/*************************************
+ *
+ *  Bitmap videoram write handler
+ *
+ *************************************/
+
+WRITE8_HANDLER( redalert_bitmap_videoram_w )
 {
-	/* Only seems to load D0-D3 into a flip-flop. */
-	/* D0/D1 seem to head off to unconnected circuits */
-	/* D2 connects to a "NL" line, and NOTted to a "NH" line */
-	/* D3 connects to a "YI" line */
-
-	/*
-        D0 == 1             -> 1 player
-        D1 == 1 and D0 == 1 -> 2 players
-    */
-	flip = !(data & 0x04);
+	redalert_bitmap_videoram[offset     ] = data;
+	redalert_bitmap_colorram[offset >> 3] = *redalert_bitmap_color & 0x07;
 }
 
-WRITE8_HANDLER( redalert_backcolor_w )
+
+
+/*************************************
+ *
+ *  Color generation
+ *
+ *************************************/
+
+static void get_pens(pen_t *pens)
 {
-	/* Only seems to load D0-D2 into a flip-flop. */
-	/* Outputs feed into RAM which seems to feed to RGB lines. */
-	backcolor = data & 0x07;
-}
+	static const int resistances_bitmap[]     = { 100 };
+	static const int resistances_charmap_rg[] = { 390, 220, 180 };
+	static const int resistances_charmap_b[]  = { 220, 100 };
+	static const int resistances_back_r[]     = { 1000 + 100 };
+	static const int resistances_back_gb[]    = { 100 + 470 };
 
-WRITE8_HANDLER( demoneye_c040_w )
-{
-	/*
-        D0 == 1             -> 1 player
-        D1 == 1 and D0 == 1 -> 2 players
-    */
-	flip = data & 0x04;
-}
+	offs_t offs;
+	double scaler;
+	double bitmap_weight[1];
+	double charmap_rg_weights[3];
+	double charmap_b_weights[2];
+	double back_r_weight[1];
+	double back_gb_weight[1];
 
-/***************************************************************************
-redalert_backram_w
-***************************************************************************/
+	scaler = compute_resistor_weights(0, 0xff, -1,
+									  1, resistances_bitmap,     bitmap_weight,      470, 0,
+									  3, resistances_charmap_rg, charmap_rg_weights, 470, 0,
+									  2, resistances_charmap_b,  charmap_b_weights,  470, 0);
 
-WRITE8_HANDLER( redalert_backram_w )
-{
-	int charnum;
+			 compute_resistor_weights(0, 0xff, scaler,
+									  1, resistances_back_r,     back_r_weight,      470, 0,
+									  1, resistances_back_gb,    back_gb_weight,     470, 0,
+									  0, 0, 0, 0, 0);
 
-	charnum = offset / 8 % 0x400;
-
-	if ((redalert_backram[offset] != data) ||
-		(redalert_backcolor[charnum] != backcolor))
+	/* the character layer colors come from the PROM */
+	for (offs = 0; offs < NUM_CHARMAP_PENS; offs++)
 	{
-		redalert_dirtyback[charnum] = 1;
-		redalert_backcolor[charnum] = backcolor;
+		UINT8 data = memory_region(REGION_PROMS)[offs];
 
-		redalert_backram[offset] = data;
-	}
-}
+		/* very strange mapping */
+		UINT8 r0_bit = (data >> 2) & 0x01;
+		UINT8 r1_bit = (data >> 6) & 0x01;
+		UINT8 r2_bit = (data >> 4) & 0x01;
+		UINT8 g0_bit = (data >> 1) & 0x01;
+		UINT8 g1_bit = (data >> 3) & 0x01;
+		UINT8 g2_bit = (data >> 5) & 0x01;
+		UINT8 b0_bit = (data >> 0) & 0x01;
+		UINT8 b1_bit = (data >> 7) & 0x01;
 
-/***************************************************************************
-redalert_spriteram1_w
-***************************************************************************/
+		UINT8 r = combine_3_weights(charmap_rg_weights, r0_bit, r1_bit, r2_bit);
+		UINT8 g = combine_3_weights(charmap_rg_weights, g0_bit, g1_bit, g2_bit);
+		UINT8 b = combine_2_weights(charmap_b_weights,  b0_bit, b1_bit);
 
-WRITE8_HANDLER( redalert_spriteram1_w )
-{
-	if (redalert_spriteram1[offset] != data)
-	{
-		redalert_dirtycharacter[((offset / 8) % 0x80) + 0x80] = 1;
-
-		redalert_spriteram1[offset] = data;
-	}
-}
-
-/***************************************************************************
-redalert_spriteram2_w
-***************************************************************************/
-
-WRITE8_HANDLER( redalert_spriteram2_w )
-{
-	if (redalert_spriteram2[offset] != data)
-	{
-
-		redalert_dirtycharacter[((offset / 8) % 0x80) + 0x80] = 1;
-
-		redalert_spriteram2[offset] = data;
-	}
-}
-
-/***************************************************************************
-redalert_characterram_w
-***************************************************************************/
-
-WRITE8_HANDLER( redalert_characterram_w )
-{
-	if (redalert_characterram[offset] != data)
-	{
-		redalert_dirtycharacter[((offset / 8) % 0x80)] = 1;
-
-		redalert_characterram[offset] = data;
-	}
-}
-
-WRITE8_HANDLER( redalert_characterram2_w )
-{
-	if (redalert_characterram2[offset] != data)
-	{
-		redalert_dirtycharacter[((offset / 8) % 0x80)] = 1;
-
-		redalert_characterram2[offset] = data;
-	}
-}
-
-WRITE8_HANDLER( redalert_spriteram3_w )
-{
-	if (redalert_spriteram3[offset] != data)
-	{
-		redalert_dirtycharacter2[((offset / 8) % 0x80) + 0x80] = 1;
-
-		redalert_spriteram3[offset] = data;
+		pens[offs] = MAKE_RGB(r, g, b);
 	}
 
+	/* the bitmap layer colors are directly mapped */
+	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
+	{
+		UINT8 r_bit = (offs >> 2) & 0x01;
+		UINT8 g_bit = (offs >> 1) & 0x01;
+		UINT8 b_bit = (offs >> 0) & 0x01;
+
+		UINT8 r = bitmap_weight[r_bit];
+		UINT8 g = bitmap_weight[g_bit];
+		UINT8 b = bitmap_weight[b_bit];
+
+		pens[NUM_CHARMAP_PENS + offs] = MAKE_RGB(r, g, b);
+	}
+
+	/* background color */
+	pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS] = MAKE_RGB(back_r_weight[0], back_gb_weight[0], back_gb_weight[0]);
 }
 
 
-VIDEO_UPDATE( redalert )
+
+/*************************************
+ *
+ *  Video hardware start
+ *
+ *************************************/
+
+static VIDEO_START( redalert )
 {
-	int offs,i;
+	redalert_bitmap_colorram = auto_malloc(0x0400);
 
-	/* for every character in the Video RAM  */
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	state_save_register_global_pointer(redalert_bitmap_colorram, 0x0400);
+}
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
+static VIDEO_UPDATE( redalert )
+{
+	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
+	offs_t offs;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < 0x2000; offs++)
 	{
-		int charcode;
-		int stat_transparent;
-		int sx,sy,color;
+		int i;
+		UINT8 charmap_data_1;
+		UINT8 charmap_data_2;
 
-		charcode = videoram[offs];
+		UINT8 y = offs & 0xff;
+		UINT8 x = (~offs >> 8) << 3;
 
-		/* decode modified background */
-		if (redalert_dirtyback[offs] == 1)
+		UINT8 bitmap_data = redalert_bitmap_videoram[offs];
+		UINT8 bitmap_color = redalert_bitmap_colorram[offs >> 3];
+
+		UINT8 charmap_code = redalert_charmap_videoram[offs >> 3];
+		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
+
+		/* D7 of the char code selects the char set to use */
+		if (charmap_code & 0x80)
 		{
-			decodechar(machine->gfx[0],offs,redalert_backram);
-			redalert_dirtyback[offs] = 2;
+			charmap_data_1 = redalert_charmap_videoram[0x0400 | charmap_data_base];
+			charmap_data_2 = redalert_charmap_videoram[0x0c00 | charmap_data_base];
+		}
+		else
+		{
+			charmap_data_1 = 0; /* effectively disables A0 of the color PROM */
+			charmap_data_2 = redalert_charmap_videoram[0x0800 | charmap_data_base];
 		}
 
-		/* decode modified characters */
-		if (redalert_dirtycharacter[charcode] == 1)
+		for (i = 0; i < 8; i++)
 		{
-			if (charcode < 0x80)
-				decodechar(machine->gfx[1],charcode,redalert_characterram);
+			pen_t pen;
+
+			int bitmap_bit = bitmap_data & 0x80;
+			UINT8 color_prom_a0_a1 = ((charmap_data_2 & 0x80) >> 6) | ((charmap_data_1 & 0x80) >> 7);
+
+			/* determine priority */
+			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
+				pen = bitmap_bit ? pens[NUM_CHARMAP_PENS + bitmap_color] : pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS];
 			else
-				decodechar(machine->gfx[2],charcode-0x80,redalert_spriteram1);
-			redalert_dirtycharacter[charcode] = 2;
-		}
+				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-		if (redalert_dirtycharacter2[charcode] == 1)
-		{
-			decodechar(machine->gfx[3],charcode-0x80,redalert_spriteram3);
-			redalert_dirtycharacter2[charcode] = 2;
-		}
+			if (*redalert_video_control & 0x04)
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y ^ 0xff, x ^ 0xff) = pen;
 
-		sx = 31 - offs / 32;
-		sy = offs % 32;
+			/* next pixel */
+			x = x + 1;
 
-		stat_transparent = TRANSPARENCY_NONE;
-
-		/* First layer of color */
-		if (charcode >= 0xC0)
-		{
-			stat_transparent = TRANSPARENCY_COLOR;
-
-			color = color_lookup[charcode];
-
-			drawgfx(tmpbitmap,machine->gfx[2],
-					charcode-0x80,
-					color,
-					0,0,
-					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-
-			if( redalert_dirtycharacter2[charcode] != 0 )
-				drawgfx(tmpbitmap,machine->gfx[3],
-						charcode-0x80,
-						color,
-						0,0,
-						8*sx,8*sy,
-						&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-
-		}
-
-		/* Second layer - background */
-		color = redalert_backcolor[offs];
-		drawgfx(tmpbitmap,machine->gfx[0],
-				offs,
-				color,
-				0,0,
-				8*sx,8*sy,
-				&machine->screen[0].visarea,stat_transparent,0);
-
-		/* Third layer - alphanumerics & sprites */
-		if (charcode < 0x80)
-		{
-			color = color_lookup[charcode];
-			drawgfx(tmpbitmap,machine->gfx[1],
-					charcode,
-					color,
-					0,0,
-					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-		}
-		else if (charcode < 0xC0)
-		{
-			color = color_lookup[charcode];
-			drawgfx(tmpbitmap,machine->gfx[2],
-					charcode-0x80,
-					color,
-					0,0,
-					8*sx,8*sy,
-					&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-
-			if( redalert_dirtycharacter2[charcode] != 0 )
-				drawgfx(tmpbitmap,machine->gfx[3],
-						charcode-0x80,
-						color,
-						0,0,
-						8*sx,8*sy,
-						&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-
+			bitmap_data    = bitmap_data    << 1;
+			charmap_data_1 = charmap_data_1 << 1;
+			charmap_data_2 = charmap_data_2 << 1;
 		}
 	}
-
-	for (i = 0;i < 256;i++)
-	{
-		if (redalert_dirtycharacter[i] == 2)
-			redalert_dirtycharacter[i] = 0;
-
-		if (redalert_dirtycharacter2[i] == 2)
-			redalert_dirtycharacter2[i] = 0;
-	}
-
-	for (i = 0;i < 0x400;i++)
-	{
-		if (redalert_dirtyback[i] == 2)
-			redalert_dirtyback[i] = 0;
-	}
-
-	/* copy the character mapped graphics */
-	copybitmap(bitmap,tmpbitmap,flip,flip,0,0,cliprect,TRANSPARENCY_NONE,0);
 
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( redalert_video )
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(redalert)
+	MDRV_VIDEO_UPDATE(redalert)
+
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+MACHINE_DRIVER_END

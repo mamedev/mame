@@ -1,0 +1,26 @@
+/***************************************************************************
+
+    Irem Red Alert hardware
+
+    If you have any questions about how this driver works, don't hesitate to
+    ask.  - Mike Balfour (mab22@po.cwru.edu)
+
+****************************************************************************/
+
+/*----------- defined in audio/redalert.c -----------*/
+
+WRITE8_HANDLER( redalert_audio_command_w );
+WRITE8_HANDLER( redalert_voice_command_w );
+
+MACHINE_DRIVER_EXTERN( redalert_audio );
+
+
+/*----------- defined in video/redalert.c -----------*/
+
+extern UINT8 *redalert_bitmap_videoram;
+extern UINT8 *redalert_bitmap_color;
+extern UINT8 *redalert_charmap_videoram;
+extern UINT8 *redalert_video_control;
+WRITE8_HANDLER( redalert_bitmap_videoram_w );
+
+MACHINE_DRIVER_EXTERN( redalert_video );

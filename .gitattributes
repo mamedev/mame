@@ -2246,6 +2246,7 @@ src/mame/includes/psx.h svneol=native#text/plain
 src/mame/includes/qix.h svneol=native#text/plain
 src/mame/includes/rampart.h svneol=native#text/plain
 src/mame/includes/realbrk.h svneol=native#text/plain
+src/mame/includes/redalert.h svneol=native#text/plain
 src/mame/includes/relief.h svneol=native#text/plain
 src/mame/includes/rescap.h svneol=native#text/plain
 src/mame/includes/segag80r.h svneol=native#text/plain
