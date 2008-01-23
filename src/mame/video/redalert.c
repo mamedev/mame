@@ -145,7 +145,7 @@ static VIDEO_START( redalert )
 
 /*************************************
  *
- *  Video update
+ *  Red Alert video update
  *
  *************************************/
 
@@ -168,7 +168,7 @@ static VIDEO_UPDATE( redalert )
 		UINT8 bitmap_data = redalert_bitmap_videoram[offs];
 		UINT8 bitmap_color = redalert_bitmap_colorram[offs >> 3];
 
-		UINT8 charmap_code = redalert_charmap_videoram[offs >> 3];
+		UINT8 charmap_code = redalert_charmap_videoram[0x0000 | (offs >> 3)];
 		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
 
 		/* D7 of the char code selects the char set to use */
@@ -217,7 +217,83 @@ static VIDEO_UPDATE( redalert )
 
 /*************************************
  *
- *  Machine driver
+ *  Demoneye-X video update
+ *
+ *************************************/
+
+static VIDEO_UPDATE( demoneye )
+{
+	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
+	offs_t offs;
+
+	get_pens(pens);
+
+	for (offs = 0; offs < 0x2000; offs++)
+	{
+		int i;
+		UINT8 charmap_data_1;
+		UINT8 charmap_data_2;
+
+		UINT8 y = offs & 0xff;
+		UINT8 x = (~offs >> 8) << 3;
+
+		UINT8 bitmap_data = redalert_bitmap_videoram[offs];
+		UINT8 bitmap_color = redalert_bitmap_colorram[offs >> 3];
+
+		UINT8 charmap_code = redalert_charmap_videoram[0x1000 | (offs >> 3)];
+		offs_t charmap_data_base = ((charmap_code & 0x7f) << 3) | (offs & 0x07);
+
+		/* D7 of the char code selects the char set to use */
+		if (charmap_code & 0x80)
+		{
+			charmap_data_1 = redalert_charmap_videoram[0x0400 | charmap_data_base];
+			charmap_data_2 = redalert_charmap_videoram[0x0c00 | charmap_data_base];
+		}
+		else
+		{
+			charmap_data_1 = redalert_charmap_videoram[0x0000 | charmap_data_base];
+			charmap_data_2 = redalert_charmap_videoram[0x0800 | charmap_data_base];
+		}
+
+		/* this is the mapping of the 3rd char set */
+		//charmap_data_1 = redalert_charmap_videoram[0x1400 | charmap_data_base];
+		//charmap_data_2 = redalert_charmap_videoram[0x1c00 | charmap_data_base];
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen;
+
+			int bitmap_bit = bitmap_data & 0x80;
+			UINT8 color_prom_a0_a1 = ((charmap_data_2 & 0x80) >> 6) | ((charmap_data_1 & 0x80) >> 7);
+
+			/* determine priority */
+			if ((color_prom_a0_a1 == 0) || (bitmap_bit && ((charmap_code & 0xc0) == 0xc0)))
+				pen = bitmap_bit ? pens[NUM_CHARMAP_PENS + bitmap_color] : pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS];
+			else
+				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
+
+			if (*redalert_video_control & 0x04)
+				*BITMAP_ADDR32(bitmap, y ^ 0xff, x ^ 0xff) = pen;
+			else
+				*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			/* next pixel */
+			x = x + 1;
+
+			bitmap_data    = bitmap_data    << 1;
+			charmap_data_1 = charmap_data_1 << 1;
+			charmap_data_2 = charmap_data_2 << 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Red Alert machine driver
  *
  *************************************/
 
@@ -229,6 +305,29 @@ MACHINE_DRIVER_START( redalert_video )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_START(redalert)
 	MDRV_VIDEO_UPDATE(redalert)
+
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  Demoneye-X machine driver
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( demoneye_video )
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(redalert)
+	MDRV_VIDEO_UPDATE(demoneye)
 
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
