@@ -129,6 +129,7 @@ enum
 
 	XTAL_384kHz			= 384000,
 	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
+	XTAL_455kHz			= 455000,		/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000,
 	XTAL_1_056MHz		= 1056000 		/* used on Trio The Punch */
 };
