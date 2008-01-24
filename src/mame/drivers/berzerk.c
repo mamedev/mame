@@ -494,8 +494,8 @@ static WRITE8_HANDLER( berzerk_audio_w )
 		{
 			/* volume and frequency control goes here */
 			/* mame_printf_debug("TODO: VSU-1000 Control write (ignored for now)\n");*/
-		  S14001A_set_volume(((data & 0x38) >> 3) + 1);
-		  S14001A_set_rate((16 - (data & 0x07)) * 16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
+			S14001A_set_volume(((data & 0x38) >> 3) + 1);
+			S14001A_set_rate((16 - (data & 0x07)) * 16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
 		}
 		else if ((data & 0xc0) != 0x00)
 			/* vsu-1000 ignores these writes entirely */
@@ -516,8 +516,8 @@ static WRITE8_HANDLER( berzerk_audio_w )
 		}
 		break;
 
+	/* everything else writes to the 6840 */
 	default:
-		/* everything else writes to the 6840 */
 		exidy_sh6840_w(offset, data);
 		break;
 
