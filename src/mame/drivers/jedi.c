@@ -143,8 +143,8 @@ static TIMER_CALLBACK( generate_interrupt )
 	int scanline = param;
 
 	/* IRQ is set by /32V */
-	cpunum_set_input_line(0, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(1, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* set up for the next */
 	scanline += 32;
@@ -156,13 +156,13 @@ static TIMER_CALLBACK( generate_interrupt )
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
-	cpunum_set_input_line(0, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(1, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( rom_banksel_w )
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

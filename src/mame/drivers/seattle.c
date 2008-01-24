@@ -583,7 +583,7 @@ static MACHINE_RESET( seattle )
 
 static void ide_interrupt(int state)
 {
-	cpunum_set_input_line(0, IDE_IRQ_NUM, state);
+	cpunum_set_input_line(Machine, 0, IDE_IRQ_NUM, state);
 }
 
 
@@ -607,7 +607,7 @@ static void ethernet_interrupt(int state)
 	{
 		UINT8 assert = ethernet_irq_state && (*interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(0, ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else if (board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq();
@@ -629,7 +629,7 @@ static const struct smc91c9x_interface ethernet_intf =
 
 static void ioasic_irq(int state)
 {
-	cpunum_set_input_line(0, IOASIC_IRQ_NUM, state);
+	cpunum_set_input_line(Machine, 0, IOASIC_IRQ_NUM, state);
 }
 
 
@@ -664,7 +664,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (vblank_irq_num != 0)
-		cpunum_set_input_line(0, vblank_irq_num, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -675,7 +675,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (widget.irq_num != 0)
-			cpunum_set_input_line(0, widget.irq_num, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -687,7 +687,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(0, ethernet_irq_num, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;
@@ -732,7 +732,7 @@ static void update_vblank_irq(void)
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
 	if (vblank_latch && (*interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	cpunum_set_input_line(0, vblank_irq_num, state);
+	cpunum_set_input_line(Machine, 0, vblank_irq_num, state);
 }
 
 
@@ -893,7 +893,7 @@ static void update_galileo_irqs(void)
 	/* if any unmasked interrupts are live, we generate */
 	if (galileo.reg[GREG_INT_STATE] & galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	cpunum_set_input_line(0, GALILEO_IRQ_NUM, state);
+	cpunum_set_input_line(Machine, 0, GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -1511,7 +1511,7 @@ static void update_widget_irq(void)
 
 	/* update the IRQ state */
 	if (widget.irq_num != 0)
-		cpunum_set_input_line(0, widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

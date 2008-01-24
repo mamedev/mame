@@ -590,9 +590,9 @@ static INTERRUPT_GEN( darkhors )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:	cpunum_set_input_line(0, 3, HOLD_LINE);	break;
-		case 1:	cpunum_set_input_line(0, 4, HOLD_LINE);	break;
-		case 2:	cpunum_set_input_line(0, 5, HOLD_LINE);	break;
+		case 0:	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
+		case 1:	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
+		case 2:	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);	break;
 	}
 }
 

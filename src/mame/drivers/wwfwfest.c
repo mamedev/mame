@@ -199,7 +199,7 @@ static WRITE8_HANDLER( oki_bankswitch_w )
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
 	soundlatch_w(1,data & 0xff);
-	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************
@@ -369,9 +369,9 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( wwfwfest_interrupt ) {
 	if( cpu_getiloops() == 0 )
-		cpunum_set_input_line(0, 3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 /*******************************************************************************
@@ -382,7 +382,7 @@ static INTERRUPT_GEN( wwfwfest_interrupt ) {
 
 static void dd3_ymirq_handler(int irq)
 {
-	cpunum_set_input_line( 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

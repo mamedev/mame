@@ -279,10 +279,10 @@ static READ16_HANDLER(unk_read)
 static INTERRUPT_GEN( lockon_irq )
 {
         if(main_inten)
-        	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x60/4);
+        	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x60/4);
 
           // Ground CPU takes an interrupt on BUFEND - this is incorrect.
-          cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0x60/4);
+          cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x60/4);
 }
 
 /*
@@ -308,20 +308,20 @@ static WRITE16_HANDLER(adrst_w)
 		v30_obj_addr = (data & 0x18) >> 3;
 
 		if (data & 0x04)
-			cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 		else
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 
 		if (data & 0x20)
-			cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 		else
-			cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
 
 		/* Suspend the Z80 when writing to shared RAM */
 		if (data & 0x40)
-			cpunum_set_input_line(3, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
 		else
-			cpunum_set_input_line(3, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 3, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -564,7 +564,7 @@ GFXDECODE_END
 
 static void YM2203_irq(int irq)
 {
-	cpunum_set_input_line(3, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 3, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_HANDLER(YM2203_out_b)

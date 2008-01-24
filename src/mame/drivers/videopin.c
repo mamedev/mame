@@ -36,14 +36,10 @@ static void update_plunger(void)
 			time_released = timer_get_time();
 
 			if (!mask)
-			{
-				cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-			}
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-		{
 			time_pushed = timer_get_time();
-		}
 
 		prev = val;
 	}
@@ -56,7 +52,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 	update_plunger();
 
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	scanline = scanline + 32;
 
@@ -135,11 +131,9 @@ static WRITE8_HANDLER( videopin_led_w )
 	output_set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-	{
 		set_led_status(0, data & 8);   /* start button */
-	}
 
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -157,9 +151,7 @@ static WRITE8_HANDLER( videopin_out1_w )
 	mask = ~data & 0x10;
 
 	if (mask)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
-	}
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(~data & 0x08);
 

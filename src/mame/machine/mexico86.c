@@ -20,11 +20,11 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
  	if (Machine->drv->cpu[2].type != CPU_DUMMY)
 	{
 		// mexico 86, knight boy
-		cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -156,7 +156,7 @@ INTERRUPT_GEN( kikikai_interrupt )
 		mcu_simulate();
 
 	cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-	cpunum_set_input_line(0,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,0,HOLD_LINE);
 }
 
 
@@ -223,9 +223,9 @@ INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
 	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(2,0,CLEAR_LINE);
+		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 	else
-		cpunum_set_input_line(2,0,ASSERT_LINE);
+		cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
 }
 
 
@@ -313,8 +313,8 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
 		cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-		//cpunum_set_input_line(0,0,PULSE_LINE);
-		cpunum_set_input_line(0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		//cpunum_set_input_line(Machine, 0,0,PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

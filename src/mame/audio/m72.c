@@ -100,9 +100,9 @@ static TIMER_CALLBACK( setvector_callback )
 
 	cpunum_set_input_line_vector(1,0,irqvector);
 	if (irqvector == 0xff)	/* no IRQs pending */
-		cpunum_set_input_line(1,0,CLEAR_LINE);
+		cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line(1,0,ASSERT_LINE);
+		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
 }
 
 MACHINE_RESET( m72_sound )

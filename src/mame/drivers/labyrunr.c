@@ -27,12 +27,12 @@ static INTERRUPT_GEN( labyrunr_interrupt )
 	if (cpu_getiloops() == 0)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x02)
-			cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops() % 2)
 	{
 		if (K007121_ctrlram[0][0x07] & 0x01)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

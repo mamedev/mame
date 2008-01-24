@@ -710,7 +710,7 @@ static void irq_raise(int level)
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	last_irq = level;
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 }
 
 static int irq_callback(int irqline)
@@ -733,7 +733,7 @@ static int irq_callback(int irqline)
 
 static void irq_init(void)
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
@@ -750,7 +750,7 @@ static INTERRUPT_GEN(model1_interrupt)
 		// if the FIFO has something in it, signal the 68k too
 		if (fifo_rptr != fifo_wptr)
 		{
-			cpunum_set_input_line(1, 2, HOLD_LINE);
+			cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
 		}
 	}
 }
@@ -879,7 +879,7 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
-	cpunum_set_input_line(1, 2, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);
 	// give the 68k time to reply
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 }

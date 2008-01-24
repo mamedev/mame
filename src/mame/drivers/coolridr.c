@@ -149,13 +149,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( system_h1 )
 {
 	if (cpu_getiloops())
-	{
-		cpunum_set_input_line(0, 4, HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 	else
-	{
-		cpunum_set_input_line(0, 3, HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 }
 
 // not sure on SH-1
@@ -163,19 +159,19 @@ static INTERRUPT_GEN( system_h1_sub )
 {
 	if (cpu_getiloops())
 	{
-//      cpunum_set_input_line(2, 4, HOLD_LINE);
+//      cpunum_set_input_line(machine, 2, 4, HOLD_LINE);
 	}
 	else
 	{
-//      cpunum_set_input_line(2, 3, HOLD_LINE);
+//      cpunum_set_input_line(machine, 2, 3, HOLD_LINE);
 	}
 }
 
 static MACHINE_RESET ( coolridr )
 {
 
-//  cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+//  cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 }
 

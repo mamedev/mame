@@ -166,12 +166,12 @@ static void update_irq_state(void)
 		{
 			if (irq & (1 << i))
 			{
-				cpunum_set_input_line(0, metro_irq_levels[i]&7, ASSERT_LINE);
+				cpunum_set_input_line(Machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
 				return;
 			}
 			i++;
 		}
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
 	}
 	else
 	{
@@ -180,7 +180,7 @@ static void update_irq_state(void)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(0, irq_line, state);
+		cpunum_set_input_line(Machine, 0, irq_line, state);
 	}
 }
 
@@ -319,7 +319,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 
 static void ymf278b_interrupt(int active)
 {
-	cpunum_set_input_line(0, 2, active);
+	cpunum_set_input_line(Machine, 0, 2, active);
 }
 
 /***************************************************************************
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_int();
 		busy_sndcpu = 1;
 	}
@@ -514,7 +514,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 static void metro_sound_irq_handler(int state)
 {
-	cpunum_set_input_line(1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -1925,7 +1925,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
 	soundlatch_w(offset, data>>8);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -1939,7 +1939,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 
 static void blzntrnd_irqhandler(int irq)
 {
-	cpunum_set_input_line(1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface blzntrnd_ym2610_interface =

@@ -53,7 +53,7 @@ WRITE8_HANDLER( flower_sound2_w );
 
 static WRITE8_HANDLER( flower_irq_ack )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -63,13 +63,13 @@ static WRITE8_HANDLER( sn_irq_enable_w )
 {
 	sn_irq_enable = data & 1;
 
-	cpunum_set_input_line(2, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( sn_irq )
 {
 	if (sn_irq_enable)
-		cpunum_set_input_line(2, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sn_nmi_enable_w )
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(0,data);
 	if (sn_nmi_enable)
-		cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1, ADDRESS_SPACE_PROGRAM, 8 )

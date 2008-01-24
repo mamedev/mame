@@ -23,7 +23,7 @@ WRITE16_HANDLER( aztarac_sound_w )
 		soundlatch_w(offset, data);
 		sound_status ^= 0x21;
 		if (sound_status & 0x20)
-			cpunum_set_input_line(1, 0, HOLD_LINE);
+			cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -49,7 +49,7 @@ INTERRUPT_GEN( aztarac_snd_timed_irq )
     sound_status ^= 0x10;
 
     if (sound_status & 0x10)
-        cpunum_set_input_line(1,0,HOLD_LINE);
+        cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 

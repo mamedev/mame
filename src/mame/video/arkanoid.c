@@ -67,7 +67,7 @@ WRITE8_HANDLER( arkanoid_d008_w )
      which resets itself).  This bit is the likely candidate as it is flipped
      early in bootup just prior to accessing the MCU for the first time. */
 	if (cpu_gettotalcpu()>1) // Bootlegs don't have the MCU but still set this bit
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

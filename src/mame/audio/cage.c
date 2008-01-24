@@ -183,7 +183,7 @@ void cage_reset_w(int state)
 {
 	if (state)
 		cage_control_w(0);
-	cpunum_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -212,7 +212,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpunum_set_input_line(cage_cpu, TMS32031_DINT, ASSERT_LINE);
+	cpunum_set_input_line(machine, cage_cpu, TMS32031_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
@@ -281,7 +281,7 @@ static TIMER_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpunum_set_input_line(cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
+	cpunum_set_input_line(machine, cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -466,7 +466,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", activecpu_get_pc(), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines();
-	cpunum_set_input_line(cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -514,7 +514,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
 	update_control_lines();
-	cpunum_set_input_line(cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
 }
 
 
@@ -546,7 +546,7 @@ void cage_control_w(UINT16 data)
 	/* CPU is reset if both control lines are 0 */
 	if (!(cage_control & 3))
 	{
-		cpunum_set_input_line(cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
@@ -563,7 +563,7 @@ void cage_control_w(UINT16 data)
 		cage_to_cpu_ready = 0;
 	}
 	else
-		cpunum_set_input_line(cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
 	update_control_lines();

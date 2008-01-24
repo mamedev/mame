@@ -723,7 +723,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i80186.intr.poll_status = 0x8000 | new_vector;
 	if (!i80186.intr.pending)
-		cpunum_set_input_line(2, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
 	i80186.intr.pending = 1;
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
 }
@@ -1667,14 +1667,14 @@ WRITE8_HANDLER( leland_80186_control_w )
 	}
 
 	/* /RESET */
-	cpunum_set_input_line(2, INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  cpunum_set_input_line(2, INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	if (data & 0x20)

@@ -124,14 +124,14 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m72_irq_base + 2);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, m72_irq_base + 0);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 0);
 	}
 
 	/* adjust for next scanline */

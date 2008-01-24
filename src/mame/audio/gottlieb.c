@@ -81,13 +81,13 @@ WRITE8_HANDLER( gottlieb_sh_w )
 		{
 		case 2:
 			/* Revision 1 sound board */
-			cpunum_set_input_line(1,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 		case 3:
 		case 4:
 			/* Revision 2 & 3 sound board */
-			cpunum_set_input_line(cpu_gettotalcpu()-1,M6502_IRQ_LINE,HOLD_LINE);
-			cpunum_set_input_line(cpu_gettotalcpu()-2,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(Machine, cpu_gettotalcpu()-1,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(Machine, cpu_gettotalcpu()-2,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 		}
 	}
@@ -108,7 +108,7 @@ void gottlieb_knocker(void)
 /* callback for the timer */
 static TIMER_CALLBACK( gottlieb_nmi_generate )
 {
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static const char *const PhonemeTable[0x40] =
@@ -225,7 +225,7 @@ WRITE8_HANDLER( stooges_8910_latch_w )
 /* callback for the timer */
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpunum_set_input_line(cpu_gettotalcpu()-1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, cpu_gettotalcpu()-1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( common_sound_control_w )
@@ -296,5 +296,5 @@ WRITE8_HANDLER( gottlieb_nmi_rate_w )
 
 WRITE8_HANDLER( gottlieb_cause_dac_nmi_w )
 {
-	cpunum_set_input_line(cpu_gettotalcpu()-2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, cpu_gettotalcpu()-2, INPUT_LINE_NMI, PULSE_LINE);
 }

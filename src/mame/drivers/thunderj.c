@@ -34,7 +34,7 @@ static UINT16 *rom_base[2];
  *
  *************************************/
 
-static void update_interrupts(void)
+static void update_interrupts(running_machine *machine)
 {
 	int newstate = 0;
 	int newstate2 = 0;
@@ -45,14 +45,14 @@ static void update_interrupts(void)
 		newstate |= 6;
 
 	if (newstate)
-		cpunum_set_input_line(0, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 
 	if (newstate2)
-		cpunum_set_input_line(1, newstate2, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, newstate2, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 7, CLEAR_LINE);
 }
 
 
@@ -95,9 +95,9 @@ static WRITE16_HANDLER( latch_w )
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (thunderj_alpha_tile_bank != ((data >> 2) & 7))

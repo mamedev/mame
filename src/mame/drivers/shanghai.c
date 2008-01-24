@@ -735,7 +735,7 @@ static VIDEO_UPDATE( shanghai )
 
 static INTERRUPT_GEN( shanghai_interrupt )
 {
-	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0x80);
+	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x80);
 }
 
 static WRITE16_HANDLER( shanghai_coin_w )

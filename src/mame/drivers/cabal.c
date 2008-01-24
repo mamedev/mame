@@ -113,7 +113,7 @@ static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 {
-	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -515,7 +515,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface cabalbl_ym2151_interface =

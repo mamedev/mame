@@ -86,7 +86,7 @@ static WRITE8_HANDLER( shared_w )
 static WRITE8_HANDLER( tbowl_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -151,7 +151,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( readmem_6206C, ADDRESS_SPACE_PROGRAM, 8 )
@@ -557,7 +557,7 @@ GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(2,0,linestate);
+	cpunum_set_input_line(Machine, 2,0,linestate);
 }
 
 static const struct YM3526interface ym3812_interface =

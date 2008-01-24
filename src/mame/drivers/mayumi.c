@@ -25,7 +25,7 @@ static int input_sel;
 static INTERRUPT_GEN( mayumi_interrupt )
 {
 	if (int_enable)
-		 cpunum_set_input_line(0, 0, HOLD_LINE);
+		 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( bank_sel_w )

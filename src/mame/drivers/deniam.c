@@ -56,7 +56,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_MSB)
 	{
 		soundlatch_w(offset,(data >> 8) & 0xff);
-		cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -308,7 +308,7 @@ static void irqhandler(int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
 	if (Machine->drv->cpu[1].type != CPU_DUMMY)
-		cpunum_set_input_line(1,0,linestate);
+		cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

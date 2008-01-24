@@ -940,12 +940,12 @@ static void update_nile_irqs(void)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cpunum_set_input_line(0, MIPS3_IRQ0 + i, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cpunum_set_input_line(0, MIPS3_IRQ0 + i, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");

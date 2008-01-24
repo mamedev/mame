@@ -236,13 +236,13 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	cpunum_set_input_line(0, 5, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, cadash_interrupt5);
-	cpunum_set_input_line(0, 4, HOLD_LINE);  /* interrupt vector 4 */
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 
@@ -812,7 +812,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

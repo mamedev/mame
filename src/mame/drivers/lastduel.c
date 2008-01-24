@@ -231,7 +231,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -241,14 +241,18 @@ static const struct YM2203interface ym2203_interface =
 
 static INTERRUPT_GEN( lastduel_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 2, HOLD_LINE); /* VBL */
-	else cpunum_set_input_line(0, 4, HOLD_LINE); /* Controls */
+	if (cpu_getiloops() == 0)
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE); /* VBL */
+	else
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); /* Controls */
 }
 
 static INTERRUPT_GEN( madgear_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 5, HOLD_LINE); /* VBL */
-	else cpunum_set_input_line(0, 6, HOLD_LINE); /* Controls */
+	if (cpu_getiloops() == 0)
+		cpunum_set_input_line(machine, 0, 5, HOLD_LINE); /* VBL */
+	else
+		cpunum_set_input_line(machine, 0, 6, HOLD_LINE); /* Controls */
 }
 
 static MACHINE_DRIVER_START( lastduel )

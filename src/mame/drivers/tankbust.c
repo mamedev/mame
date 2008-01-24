@@ -70,7 +70,7 @@ static TIMER_CALLBACK( soundirqline_callback )
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
 		if ((param&1) == 0)
-			cpunum_set_input_line(1, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 

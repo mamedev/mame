@@ -176,12 +176,12 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( drill_interrupt )
 {
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(0,5,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0,5,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

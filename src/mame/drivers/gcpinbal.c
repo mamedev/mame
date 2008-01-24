@@ -46,7 +46,7 @@ static int start, end, bank;
 
 static TIMER_CALLBACK( gcpinbal_interrupt1 )
 {
-	cpunum_set_input_line(0,1,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,1,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -55,7 +55,7 @@ static TIMER_CALLBACK( gcpinbal_interrupt3 )
 	// IRQ3 is from the M6585
 //  if (!ADPCM_playing(0))
 	{
-		cpunum_set_input_line(0,3,HOLD_LINE);
+		cpunum_set_input_line(machine, 0,3,HOLD_LINE);
 	}
 }
 #endif
@@ -66,7 +66,7 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, gcpinbal_interrupt1);
 //  timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, gcpinbal_interrupt3);
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 

@@ -67,7 +67,7 @@ PALETTE_INIT( playch10 )
 
 static void ppu_irq( int num, int *ppu_regs )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 	pc10_int_detect = 1;
 }
 

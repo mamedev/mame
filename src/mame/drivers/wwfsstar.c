@@ -144,7 +144,7 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
 	soundlatch_w(1,data & 0xff);
-	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
@@ -155,10 +155,10 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
 	if(offset == 0)
-		cpunum_set_input_line(0, 6, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 6, CLEAR_LINE);
 
 	else
-		cpunum_set_input_line(0, 5, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 5, CLEAR_LINE);
 }
 
 /*
@@ -192,14 +192,14 @@ static INTERRUPT_GEN( wwfsstars_interrupt )
 	else if (scanline==240)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line(0, 6, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 6, ASSERT_LINE);
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline%16 == 0)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line(0, 5, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 5, ASSERT_LINE);
 	}
 }
 
@@ -344,7 +344,7 @@ GFXDECODE_END
 
 static void wwfsstar_ymirq_handler(int irq)
 {
-	cpunum_set_input_line( 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

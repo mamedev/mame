@@ -837,8 +837,8 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 {
 	switch (cpu_getiloops())
 	{
-		case 0: 	cpunum_set_input_line(0, 1, HOLD_LINE);	break;
-		case 1: 	cpunum_set_input_line(0, 2, HOLD_LINE);	break;
+		case 0: 	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 1: 	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -1008,7 +1008,7 @@ MACHINE_DRIVER_END
 
 static void bestbest_ym3526_irqhandler(int state)
 {
-	cpunum_set_input_line(1, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, state);
 }
 
 static const struct YM3526interface bestbest_ym3526_interface =

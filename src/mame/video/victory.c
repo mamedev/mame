@@ -103,9 +103,9 @@ VIDEO_START( victory )
 static void victory_update_irq(void)
 {
 	if (vblank_irq || fgcoll || (bgcoll && (video_control & 0x20)))
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 

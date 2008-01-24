@@ -1117,9 +1117,9 @@ READ8_HANDLER( dkong_audio_status_r )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( dkong_snd_disc_w )

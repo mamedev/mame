@@ -795,13 +795,13 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
-	cpunum_set_input_line(0,6,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, taitof2_interrupt6);
-	cpunum_set_input_line(0, 5, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 }
 
 
@@ -845,7 +845,7 @@ static INT32 driveout_sound_latch = 0;
 
 static READ8_HANDLER( driveout_sound_command_r)
 {
-	cpunum_set_input_line(1,0,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n",driveout_sound_latch);
 	return driveout_sound_latch;
 }
@@ -886,7 +886,7 @@ static WRITE16_HANDLER ( driveout_sound_command_w )
 			else
 			{
 				driveout_sound_latch = ((data<<4) & 0xf0) | (driveout_sound_latch & 0x0f);
-				cpunum_set_input_line (1, 0, ASSERT_LINE);
+				cpunum_set_input_line (Machine, 1, 0, ASSERT_LINE);
 			}
 		}
 	}
@@ -3820,7 +3820,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

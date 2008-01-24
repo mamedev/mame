@@ -74,12 +74,12 @@
 /****************************************************************
  *
  * Mario Discrete Sound Interface
- * 
+ *
  * verified against picture of a TMA1-04-CPU Board. Some
  * of the values were hard to read, though.
  *
  ****************************************************************/
-	
+
 #define MR_R6		RES_K(4.7)		/* verified 							*/
 #define MR_R7		RES_K(4.7)		/* verified 							*/
 #define MR_R17		RES_K(27)		/* verified, 30K in schematics			*/
@@ -126,7 +126,7 @@ static const discrete_mixer_desc mario_mixer_desc =
 		{MR_R20, MR_R19, MR_R41, MR_R40},
 		{0,0,0,0,0},	// no variable resistors
 		{0,0,0,0,0},  // no node capacitors
-		0, 0, 
+		0, 0,
 		MR_C31,
 		MR_C32,
 		0, 1};
@@ -336,7 +336,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 	}
 
 	state->last = data;
@@ -368,9 +368,9 @@ WRITE8_HANDLER( mario_sh3_w )
 	{
 		case 0: /* death */
 			if (data)
-				cpunum_set_input_line(1,0,ASSERT_LINE);
+				cpunum_set_input_line(Machine, 1,0,ASSERT_LINE);
 			else
-				cpunum_set_input_line(1,0,CLEAR_LINE);
+				cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
 			I8035_T_W_AH(0,data & 1);

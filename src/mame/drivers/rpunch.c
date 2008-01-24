@@ -146,7 +146,7 @@ WRITE16_HANDLER( rpunch_crtc_register_w );
 static void ym2151_irq_gen(int state)
 {
 	ym2151_irq = state;
-	cpunum_set_input_line(1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -180,7 +180,7 @@ static TIMER_CALLBACK( sound_command_w_callback )
 {
 	sound_busy = 1;
 	sound_data = param;
-	cpunum_set_input_line(1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sound_command_w )
 static READ8_HANDLER( sound_command_r )
 {
 	sound_busy = 0;
-	cpunum_set_input_line(1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return sound_data;
 }
 

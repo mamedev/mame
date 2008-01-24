@@ -197,12 +197,12 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 	switch (cpu_getiloops())
 	{
 		case 0:
-			cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
 			break;
 
 		default:
 			if (cuebrick_snd_irqlatch)
-				cpunum_set_input_line(0, MC68000_IRQ_6, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
 			break;
 	}
 }
@@ -254,7 +254,7 @@ static WRITE16_HANDLER( glfgreat_sound_w )
 		K053260_0_w(offset, (data >> 8) & 0xff);
 
 	if (offset)
-		cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static READ16_HANDLER( prmrsocr_sound_r )
@@ -274,7 +274,7 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
@@ -344,7 +344,7 @@ static int sound_nmi_enabled;
 
 static void sound_nmi_callback( int param )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	sound_nmi_enabled = 0;
 }
@@ -352,13 +352,13 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -636,7 +636,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (last == 0 && (data & 0x20) != 0)
-			cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+			cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 		last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
 	/* I think this is more than just a trigger */
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2612,7 +2612,7 @@ MACHINE_DRIVER_END
 
 static void sound_nmi(void)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct K054539interface k054539_interface =

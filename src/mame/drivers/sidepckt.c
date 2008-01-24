@@ -33,7 +33,7 @@ static int i8751_return;
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
     soundlatch_w(offset,data);
-    cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+    cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ8_HANDLER( sidepckt_i8751_r )
@@ -48,7 +48,7 @@ static WRITE8_HANDLER( sidepckt_i8751_w )
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
 	static int current_ptr=0,current_table=0,in_math=0,math_param;
 
-	cpunum_set_input_line(0,M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (in_math==1) {
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 	static int current_ptr=0,current_table=0,in_math,math_param;
 
-	cpunum_set_input_line(0,M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (in_math==1) {
@@ -279,7 +279,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

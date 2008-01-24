@@ -452,12 +452,12 @@ static void pia_cpu0_irq(int state)
 
 	if (!serial_card_connected)
 	{
-		cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", combined_state));
 	}
 }
@@ -467,12 +467,12 @@ static void ptm_cpu0_irq(int state)
 {
 	if (!serial_card_connected)
 	{
-		cpunum_set_input_line(0, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", state));
 	}
 	else
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", state));
 	}
 }

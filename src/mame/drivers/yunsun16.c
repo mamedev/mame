@@ -168,7 +168,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data&0xff)!=0x3a)
 		{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -516,7 +516,7 @@ GFXDECODE_END
 
 static void soundirq(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(Machine, 1, 0, state);
 }
 
 static const struct YM3812interface magicbub_ym3812_intf =

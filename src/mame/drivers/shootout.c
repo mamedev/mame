@@ -61,7 +61,7 @@ static WRITE8_HANDLER( shootout_bankswitch_w )
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	soundlatch_w( offset, data );
-	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
@@ -264,12 +264,12 @@ GFXDECODE_END
 
 static void shootout_snd_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static void shootout_snd2_irq(int linestate)
 {
-	cpunum_set_input_line(0,0,linestate);
+	cpunum_set_input_line(Machine, 0,0,linestate);
 }
 
 static const struct YM2203interface ym2203_interface =

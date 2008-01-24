@@ -144,7 +144,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( M79_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);  /* RST 08h */
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
 static DRIVER_INIT( m79amb )

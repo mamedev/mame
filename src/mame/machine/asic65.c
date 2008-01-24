@@ -143,7 +143,7 @@ void asic65_reset(int state)
 {
 	/* rom-based means reset and clear states */
 	if (asic65_type == ASIC65_ROMBASED)
-		cpunum_set_input_line(asic65_cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, asic65_cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
 	else
@@ -179,7 +179,7 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 	asic65_tfull = 1;
 	asic65_cmd = param >> 16;
 	asic65_tdata = param;
-	cpunum_set_input_line(asic65_cpunum, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, asic65_cpunum, 0, ASSERT_LINE);
 }
 
 
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65_tfull = 0;
-	cpunum_set_input_line(asic65_cpunum, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, asic65_cpunum, 0, CLEAR_LINE);
 	return asic65_tdata;
 }
 

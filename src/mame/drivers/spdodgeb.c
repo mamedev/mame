@@ -46,7 +46,7 @@ static int adpcm_pos[2],adpcm_end[2],adpcm_idle[2];
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,M6809_IRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( spd_adpcm_w )
@@ -413,7 +413,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM3812interface ym3812_interface =

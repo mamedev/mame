@@ -273,7 +273,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
     if( namcond1_h8_irq5_enabled )
     {
-    	cpunum_set_input_line(1, H8_IRQ5, PULSE_LINE);
+    	cpunum_set_input_line(machine, 1, H8_IRQ5, PULSE_LINE);
     }
 }
 

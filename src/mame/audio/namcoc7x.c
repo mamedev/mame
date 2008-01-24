@@ -168,8 +168,8 @@ ADDRESS_MAP_END
 INTERRUPT_GEN( namcoc7x_interrupt )
 {
 	if (cpu_getiloops() == 0)
- 		cpunum_set_input_line(1, M37710_LINE_IRQ0, HOLD_LINE);
+ 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
 	else
-		cpunum_set_input_line(1, M37710_LINE_IRQ2, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ2, HOLD_LINE);
 }
 

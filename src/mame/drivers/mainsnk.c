@@ -99,7 +99,7 @@ static WRITE8_HANDLER( sound_command_w )
 	sound_fetched = 0;
 	sound_command = data;
 	sound_cpu_ready = 0;
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )

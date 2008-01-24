@@ -76,12 +76,12 @@ static const struct TTL74148_interface irq_encoder =
 static void update_irq(void)
 {
 	if (irq_state < 7)
-		cpunum_set_input_line(0, irq_state ^ 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, irq_state ^ 7, CLEAR_LINE);
 
 	irq_state = TTL74148_output_r(0);
 
 	if (irq_state < 7)
-		cpunum_set_input_line(0, irq_state ^ 7, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, irq_state ^ 7, ASSERT_LINE);
 }
 
 static void update_irq_encoder(int line, int state)
@@ -100,7 +100,7 @@ static void v_irq4_w(int level)
 static void v_irq3_w(int level)
 {
 	if (level)
-		cpunum_set_input_line(1, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, level);
 }
@@ -153,16 +153,16 @@ WRITE16_HANDLER( vertigo_wsot_w )
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( sound_command_w )
 {
 	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
-	cpunum_set_input_line(1, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, ASSERT_LINE);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting

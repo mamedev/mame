@@ -23,7 +23,7 @@ static int xcenter, ycenter;
 
 static TIMER_CALLBACK( cchasm_refresh_end )
 {
-    cpunum_set_input_line (0, 2, ASSERT_LINE);
+    cpunum_set_input_line (machine, 0, 2, ASSERT_LINE);
 }
 
 static void cchasm_refresh (void)
@@ -114,7 +114,7 @@ WRITE16_HANDLER( cchasm_refresh_control_w )
 			cchasm_refresh();
 			break;
 		case 0xf7:
-			cpunum_set_input_line (0, 2, CLEAR_LINE);
+			cpunum_set_input_line (Machine, 0, 2, CLEAR_LINE);
 			break;
 		}
 	}

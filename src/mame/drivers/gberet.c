@@ -534,13 +534,13 @@ static INTERRUPT_GEN( gberet_interrupt )
 	if (cpu_getiloops() == 0)
 	{
 		if (enable_IRQ)
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 
 	if (cpu_getiloops() % 2)
 	{
 		if (enable_NMI)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

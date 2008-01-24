@@ -162,7 +162,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 			}
 
 			if (!(data & 0x40))
-				cpunum_set_input_line(0, MC68000_IRQ_5, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, MC68000_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -192,7 +192,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	if (ACCESSING_MSB)
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
@@ -206,7 +206,7 @@ static READ16_HANDLER( sound_status_msb_r )
 static INTERRUPT_GEN(rng_interrupt)
 {
 	if (rng_sysreg[0x0c/2] & 0x09)
-		cpunum_set_input_line(0, MC68000_IRQ_5, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, MC68000_IRQ_5, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( rngreadmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -265,14 +265,14 @@ static WRITE8_HANDLER( z80ctrl_w )
 	memory_set_bankptr(2, memory_region(REGION_CPU2) + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
 {
 	if (rng_z80_control & 0x80) return;
 
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */

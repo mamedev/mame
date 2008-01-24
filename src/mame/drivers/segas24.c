@@ -692,14 +692,14 @@ static void reset_reset(void)
 	int changed = resetcontrol ^ prev_resetcontrol;
 	if(changed & 2) {
 		if(resetcontrol & 2) {
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          DEBUGGER_BREAK;
 			s24_fd1094_machine_init();
 
 		} else
-			cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
 		sndti_reset(SOUND_YM2151, 0);
@@ -824,9 +824,9 @@ static TIMER_CALLBACK( irq_timer_cb )
 {
 	irq_timer_pend0 = irq_timer_pend1 = 1;
 	if(irq_allow0 & (1 << IRQ_TIMER))
-		cpunum_set_input_line(0, IRQ_TIMER+1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, ASSERT_LINE);
 	if(irq_allow1 & (1 << IRQ_TIMER))
-		cpunum_set_input_line(1, IRQ_TIMER+1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, ASSERT_LINE);
 }
 
 static void irq_init(void)
@@ -869,13 +869,13 @@ static WRITE16_HANDLER(irq_w)
 		break;
 	case 2:
 		irq_allow0 = data;
-		cpunum_set_input_line(0, IRQ_TIMER+1, irq_timer_pend0 && (irq_allow0 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, IRQ_TIMER+1, irq_timer_pend0 && (irq_allow0 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data;
-		cpunum_set_input_line(1, IRQ_TIMER+1, irq_timer_pend1 && (irq_allow1 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, IRQ_TIMER+1, irq_timer_pend1 && (irq_allow1 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -886,7 +886,7 @@ static int ggground_kludge;
   don't get uploaded correctly and you see nothing */
 static TIMER_CALLBACK( gground_generate_kludge_irq )
 {
-		cpunum_set_input_line(1, 5, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 5, HOLD_LINE);
 }
 
 
@@ -907,7 +907,7 @@ static READ16_HANDLER(irq_r)
 		if (activecpu_get_pc()==0x084ba)
 		{
 			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(1, 5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, 5, CLEAR_LINE);
 
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
@@ -931,7 +931,7 @@ static READ16_HANDLER(irq_r)
 		if (activecpu_get_pc()==0x084bc)
 		{
 			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(1, 5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, 5, CLEAR_LINE);
 
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
@@ -946,11 +946,11 @@ static READ16_HANDLER(irq_r)
 	switch(offset) {
 	case 2:
 		irq_timer_pend0 = 0;
-		cpunum_set_input_line(0, IRQ_TIMER+1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		cpunum_set_input_line(1, IRQ_TIMER+1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	return 0xffff;
@@ -962,10 +962,10 @@ static INTERRUPT_GEN(irq_vbl)
 	int mask = 1 << irq;
 
 	if(irq_allow0 & mask)
-		cpunum_set_input_line(0, 1+irq, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1+irq, HOLD_LINE);
 
 	if(irq_allow1 & mask)
-		cpunum_set_input_line(1, 1+irq, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 1+irq, HOLD_LINE);
 
 	if(!cpu_getiloops()) {
 		// Ensure one index pulse every 20 frames
@@ -980,8 +980,8 @@ static INTERRUPT_GEN(irq_vbl)
 static void irq_ym(int irq)
 {
 	irq_yms = irq;
-	cpunum_set_input_line(0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1265,7 +1265,7 @@ static MACHINE_START( system24 )
 
 static MACHINE_RESET(system24)
 {
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	prev_resetcontrol = resetcontrol = 0x06;
 	fdc_init();
 	curbank = 0;

@@ -145,7 +145,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	if (data==0x26) {
 		i8751_current_command=0;
 		i8751_return=0xff; /* This value is XOR'd and must equal 0 */
-		cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0xff);
 		return;
 	}
 
@@ -192,14 +192,14 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0xff);
 	i8751_current_command=data;
 }
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -228,7 +228,7 @@ static void firetrap_adpcm_int (int data)
 
 	toggle ^= 1;
 	if (firetrap_irq_enable && toggle)
-		cpunum_set_input_line (1, M6502_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line (Machine, 1, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
@@ -555,19 +555,19 @@ static INTERRUPT_GEN( firetrap )
             definitely doesn't expect them as it locks out the coin routine */
 		if (coin_command_pending && !i8751_current_command) {
 			i8751_return=coin_command_pending;
-			cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xff);
+			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
 			coin_command_pending=0;
 		}
 	}
 
 	if (firetrap_nmi_enable && !cpu_getiloops())
-		cpunum_set_input_line (0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line (machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( bootleg )
 {
 	if (firetrap_nmi_enable)
-		cpunum_set_input_line (0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line (machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( firetrap )

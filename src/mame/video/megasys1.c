@@ -449,13 +449,13 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 
 		case 0x300/2   :	megasys1_screen_flag = new_data;
 							if (new_data & 0x10)
-								cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+								cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+								cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x308/2   :	soundlatch_word_w(0,new_data,0);
-							cpunum_set_input_line(1,4,HOLD_LINE);
+							cpunum_set_input_line(Machine, 1,4,HOLD_LINE);
 							break;
 
 		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -500,14 +500,14 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 
 		case 0x2308/2   :	megasys1_screen_flag = new_data;
 							if (new_data & 0x10)
-								cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+								cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+								cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
 							soundlatch_word_w(0,new_data,0);
-							cpunum_set_input_line(1,2,HOLD_LINE);
+							cpunum_set_input_line(Machine, 1,2,HOLD_LINE);
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);

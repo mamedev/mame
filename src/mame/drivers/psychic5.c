@@ -361,9 +361,9 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 static INTERRUPT_GEN( psychic5_interrupt )
 {
 	if (cpu_getiloops() == 0)
-	   cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);		/* RST 10h */
+	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);		/* RST 10h */
 	else
-   	   cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);		/* RST 08h */
+   	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);		/* RST 08h */
 }
 
 
@@ -536,7 +536,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

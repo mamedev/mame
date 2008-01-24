@@ -700,13 +700,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN(srmp6_interrupt)
 {
 	if(!cpu_getiloops())
-	{
-		cpunum_set_input_line(0,3,HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0,3,HOLD_LINE);
 	else
-	{
-		cpunum_set_input_line(0,4,HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( srmp6 )

@@ -508,9 +508,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( acommand_irq )
 {
 	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	else if (cpu_getiloops() == 1)
-		cpunum_set_input_line(0, 3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( acommand )

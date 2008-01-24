@@ -185,7 +185,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 	coin_counter_w(0,data & 0x01);
 
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	flip_screen_set(data & 0x80);
 }

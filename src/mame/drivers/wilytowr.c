@@ -217,7 +217,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cpunum_set_input_line(1, 0, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, 0, PULSE_LINE);
 }
 
 

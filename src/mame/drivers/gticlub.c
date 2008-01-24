@@ -78,12 +78,12 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static void voodoo_vblank_0(int param)
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(int param)
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
@@ -330,11 +330,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
 			{
-				cpunum_set_input_line(0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40000000)	/* CG Board 0 IRQ Ack */
 			{
-				cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 
 			adc1038_di_w((data >> 24) & 1);
@@ -377,7 +377,7 @@ static void K056230_w(int reg, UINT8 data)
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(Machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpunum_set_input_line(0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
 				}
 			}
 			break;
@@ -724,7 +724,7 @@ INPUT_PORTS_END
 */
 static INTERRUPT_GEN( gticlub_vblank )
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -745,7 +745,7 @@ static const struct RF5C400interface rf5c400_interface =
 
 static MACHINE_RESET( gticlub )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( gticlub )
@@ -789,8 +789,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hangplt )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( hangplt )
@@ -985,13 +985,9 @@ ROM_END
 static void sound_irq_callback(int irq)
 {
 	if (irq == 0)
-	{
-		cpunum_set_input_line(1, INPUT_LINE_IRQ1, PULSE_LINE);
-	}
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
 	else
-	{
-		cpunum_set_input_line(1, INPUT_LINE_IRQ2, PULSE_LINE);
-	}
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
 static DRIVER_INIT(gticlub)

@@ -161,7 +161,7 @@ static READ8_HANDLER( toypop_main_interrupt_enable_r )
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
 	cpu_interrupt_enable(0,1);
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
@@ -172,7 +172,7 @@ static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
 	cpu_interrupt_enable(1,1);
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 static INTERRUPT_GEN( toypop_main_interrupt )
 {
 	irq0_line_assert(machine, cpunum);	// this also checks if irq is enabled - IMPORTANT!
-						// so don't replace with cpunum_set_input_line(0, 0, ASSERT_LINE);
+						// so don't replace with cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	namcoio_set_irq_line(0,PULSE_LINE);
 	namcoio_set_irq_line(1,PULSE_LINE);
@@ -192,30 +192,30 @@ static INTERRUPT_GEN( toypop_main_interrupt )
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_assert_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_clear_w )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_assert_w )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( disable_interrupts )
 {
 	cpu_interrupt_enable(0,0);
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	cpu_interrupt_enable(1,0);
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	interrupt_enable_68k = 0;
 }
 
@@ -229,7 +229,7 @@ static MACHINE_RESET( toypop )
 static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
 	if (interrupt_enable_68k)
-		cpunum_set_input_line(2, 6, HOLD_LINE);
+		cpunum_set_input_line(machine, 2, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )

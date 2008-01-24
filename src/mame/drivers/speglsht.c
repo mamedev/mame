@@ -250,7 +250,7 @@ static const struct ST0016interface st0016_interface =
 
  static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(1, R3000_IRQ4, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, R3000_IRQ4, ASSERT_LINE);
 }
 
 static const struct r3000_config config =

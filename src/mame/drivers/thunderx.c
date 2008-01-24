@@ -29,12 +29,12 @@ static UINT8 thunderx_1f98_data = 0;
 static INTERRUPT_GEN( scontra_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		cpunum_set_input_line(0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( thunderx_firq_callback )
 {
-	cpunum_set_input_line(0, KONAMI_FIRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 
 static WRITE8_HANDLER( thunderx_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( scontra_snd_bankswitch_w )

@@ -97,7 +97,7 @@ PALETTE_INIT( exctsccr )
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 WRITE8_HANDLER( exctsccr_videoram_w )

@@ -214,13 +214,9 @@ static const struct AY8910interface ay8912_interface_3 =
 static INTERRUPT_GEN( ettrivia_interrupt )
 {
 	if( readinputport(2) & 0x01 )
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	else
-	{
-		cpunum_set_input_line(0, 0, HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( ettrivia )

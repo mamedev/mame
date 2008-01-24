@@ -60,7 +60,7 @@ INTERRUPT_GEN( zodiac_master_interrupt )
 WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
 	soundlatch_w(offset, data);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 

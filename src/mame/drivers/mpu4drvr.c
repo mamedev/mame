@@ -223,7 +223,7 @@ static MACHINE_RESET( mpu4_vid )
 {
 	ROC10937_reset(0);	// reset display1
 
-//  cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+//  cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	mpu4_stepper_reset();
 
 	lamp_strobe    = 0;
@@ -275,12 +275,12 @@ static void update_mpu68_interrupts(void)
 	if (newstate)
 	{
 		LOGSTUFF(("68k IRQ, %x\n", newstate));
-		cpunum_set_input_line(1, newstate, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, newstate, ASSERT_LINE);
 	}
 	else
 	{
 		LOGSTUFF(("68k IRQ Clear, %x\n", newstate));
-		cpunum_set_input_line(1, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 7, CLEAR_LINE);
 	}
 }
 
@@ -292,7 +292,7 @@ For now, it's fixed to the frequency set by the PTM on initialisation.*/
 static void m6809_acia_irq(int state)
 {
 	m68k_acia_cts = state;
-	cpunum_set_input_line(0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 static void m68k_acia_irq(int state)

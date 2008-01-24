@@ -62,29 +62,29 @@ static UINT32 ts;
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cpunum_set_input_line(2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_TEST, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( halt_math_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_TEST, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger an interrupt itself */
 static WRITE8_HANDLER( z80_intreq_w )
 {
-	cpunum_set_input_line(2, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */
 static INTERRUPT_GEN( z80_irq )
 {
-	cpunum_set_input_line(2, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( z80_shared_r )

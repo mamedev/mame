@@ -189,7 +189,7 @@ static WRITE8_HANDLER( cliff_coin_counter_w )
 static READ8_HANDLER( cliff_irq_ack_r )
 {
 	/* deassert IRQ on the CPU */
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -249,14 +249,14 @@ static TIMER_CALLBACK( cliff_irq_callback )
 
 	/* if we have a valid code, trigger an IRQ */
 	if ( phillips_code & 0x800000 )
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_zero);
 }
 
 static void vdp_interrupt (int state)
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

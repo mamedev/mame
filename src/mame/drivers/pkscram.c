@@ -87,7 +87,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 
 	if (!(out & 0x2000) && interrupt_line_active)
 	{
-	    cpunum_set_input_line(0, 1, CLEAR_LINE);
+	    cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 		interrupt_line_active = 0;
 	}
 
@@ -211,14 +211,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (param==interrupt_scanline)
 	{
     	if (out&0x2000)
-    		cpunum_set_input_line(0, 1, ASSERT_LINE);
+    		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param+1, 0), param+1, attotime_zero);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
-	    	cpunum_set_input_line(0, 1, CLEAR_LINE);
+	    	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, interrupt_scanline, 0), interrupt_scanline, attotime_zero);
 		interrupt_line_active = 0;
 	}
@@ -261,7 +261,7 @@ GFXDECODE_END
 static void irqhandler(int irq)
 {
 	if(out & 0x10)
-		cpunum_set_input_line(0,2,irq ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0,2,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

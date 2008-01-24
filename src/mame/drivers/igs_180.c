@@ -59,12 +59,12 @@ W(8)
 
 static WRITE8_HANDLER( nmi_ack_w )
 {
-//  cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+//  cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( irq0_ack_w )
 {
-//  cpunum_set_input_line(0, 0, CLEAR_LINE);
+//  cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( ff_r )
@@ -117,9 +117,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( igs_180_interrupt )
 {
 	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);//ASSERT_LINE);    /* ???? */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);//ASSERT_LINE);    /* ???? */
 	else
-		cpunum_set_input_line(0, 0, HOLD_LINE);//ASSERT_LINE);          /* ???? */
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);//ASSERT_LINE);          /* ???? */
 }
 
 static MACHINE_DRIVER_START( igs_180 )

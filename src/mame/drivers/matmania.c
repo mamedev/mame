@@ -60,7 +60,7 @@ READ8_HANDLER( maniach_mcu_status_r );
 static WRITE8_HANDLER( matmania_sh_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,M6502_IRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( matmania_dac_w )
@@ -72,7 +72,7 @@ static WRITE8_HANDLER( matmania_dac_w )
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,M6809_IRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,HOLD_LINE);
 }
 
 
@@ -378,7 +378,7 @@ MACHINE_DRIVER_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,1,linestate);
+	cpunum_set_input_line(Machine, 1,1,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

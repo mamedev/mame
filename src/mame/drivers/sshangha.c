@@ -82,14 +82,14 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
-		//cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		//cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
 	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -328,7 +328,7 @@ GFXDECODE_END
 
 static void irqhandler(int state)
 {
-	cpunum_set_input_line(1,0,state);
+	cpunum_set_input_line(Machine, 1,0,state);
 }
 
 static const struct YM2203interface ym2203_interface =

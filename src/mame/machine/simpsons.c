@@ -101,7 +101,7 @@ WRITE8_HANDLER( simpsons_coin_counter_w )
 
 READ8_HANDLER( simpsons_sound_interrupt_r )
 {
-	cpunum_set_input_line_and_vector( 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 

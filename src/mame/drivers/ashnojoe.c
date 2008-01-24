@@ -110,7 +110,7 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	{
 		soundlatch_w(0,data & 0xff);
 		//needed?
-		cpunum_set_input_line(1,0,HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -310,7 +310,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER(writeA)
@@ -327,7 +327,7 @@ static WRITE8_HANDLER(writeB)
 
 static void ashnojoe_adpcm_int (int data)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface msm5205_interface =

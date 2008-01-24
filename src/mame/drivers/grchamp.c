@@ -95,7 +95,7 @@ static INTERRUPT_GEN( grchamp_cpu0_interrupt )
 	grchamp_state *state = machine->driver_data;
 
 	if (state->cpu0_out[0] & 0x01)
-		cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, cpunum, 0, ASSERT_LINE);
 }
 
 
@@ -104,7 +104,7 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 	grchamp_state *state = machine->driver_data;
 
 	if (state->cpu1_out[4] & 0x01)
-		cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, cpunum, 0, ASSERT_LINE);
 }
 
 
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				cpunum_set_input_line(0, 0, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
 				state->collide = state->collmode = 0;
 			break;
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
 			soundlatch_w(0, data);
-			cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 		case 0x04:	/* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				cpunum_set_input_line(1, 0, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 			break;
 
 		case 0x05:	/* OUT5 - unused */

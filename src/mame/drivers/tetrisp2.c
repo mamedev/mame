@@ -1003,23 +1003,23 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static TIMER_CALLBACK( rockn_timer_level4_callback )
 {
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level4_callback )
 {
-	cpunum_set_input_line(1, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( rockn_timer_level1_callback )
 {
-	cpunum_set_input_line(0, 1, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 {
-	cpunum_set_input_line(1, 1, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 }
 
 static void init_rockn_timer(running_machine *machine)

@@ -69,7 +69,7 @@ static WRITE16_HANDLER( fantland_nmi_enable_16_w )
 static WRITE8_HANDLER( fantland_soundlatch_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( fantland_soundlatch_16_w )
@@ -700,12 +700,12 @@ static MACHINE_RESET( fantland )
 static INTERRUPT_GEN( fantland_irq )
 {
 	if (fantland_nmi_enable & 8)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( fantland_sound_irq )
 {
-	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0x80/4);
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x80/4);
 }
 
 static MACHINE_DRIVER_START( fantland )
@@ -752,7 +752,7 @@ MACHINE_DRIVER_END
 
 static void galaxygn_sound_irq(int line)
 {
-	cpunum_set_input_line_and_vector(1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	cpunum_set_input_line_and_vector(Machine, 1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const struct YM2151interface galaxygn_ym2151_interface =

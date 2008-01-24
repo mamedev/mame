@@ -149,7 +149,7 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
 static void sound_w(UINT8 data)
 {
 	soundlatch_w(0, data & 0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -555,7 +555,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(2, 1, PULSE_LINE);
+	cpunum_set_input_line(Machine, 2, 1, PULSE_LINE);
 }
 
 

@@ -65,7 +65,7 @@ PALETTE_INIT( rockrage );
 static INTERRUPT_GEN( rockrage_interrupt )
 {
 	if (K007342_is_INT_enabled())
-        cpunum_set_input_line(0, HD6309_IRQ_LINE, HOLD_LINE);
+        cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( rockrage_bankswitch_w )
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
 	soundlatch_w(offset, data);
-	cpunum_set_input_line(1,M6809_IRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static READ8_HANDLER( rockrage_VLM5030_busy_r ) {

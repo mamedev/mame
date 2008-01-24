@@ -111,7 +111,7 @@ static UINT8 last_trackball_val[2];
 static INTERRUPT_GEN( capbowl_interrupt )
 {
 	if (readinputport(4) & 1)	/* get status of the F2 key */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
 
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( track_reset_w )
 
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(offset, data);
 }
 
@@ -206,7 +206,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 
 static void firqhandler(int irq)
 {
-	cpunum_set_input_line(1, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

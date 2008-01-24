@@ -62,7 +62,7 @@ static WRITE16_HANDLER( pushman_68705_w )
 
 	if (offset==1)
 	{
-        cpunum_set_input_line(2,M68705_IRQ_LINE,HOLD_LINE);
+        cpunum_set_input_line(Machine, 2,M68705_IRQ_LINE,HOLD_LINE);
 		cpu_spin();
 		new_latch=0;
 	}
@@ -420,7 +420,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-    cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+    cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

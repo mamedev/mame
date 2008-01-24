@@ -393,7 +393,7 @@ static MACHINE_START( gpworld )
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( vblank_callback_gpworld )
@@ -403,11 +403,11 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	{
 		laserdisc_data_w(discinfo,ldp_write_latch);
 		ldp_read_latch  = laserdisc_data_r(discinfo);
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 
 	laserdisc_vsync(discinfo);

@@ -51,19 +51,19 @@
     Driver by Bryan McPhail and David Haywood.
 
     Todo:
-        * Sprite priorities aren't verified to be 100% accurate.  
+        * Sprite priorities aren't verified to be 100% accurate.
 		  (Addendum - all known issues seem to be correct - see Sprite Priority Notes below).
         * There may be some kind of fullscreen palette effect (controlled by bit 3 in priority
           word - used at end of each level, and on final boss).
         * A shadow effect (used in level 1) is not implemented.
 
 	Sprite Priority Notes:
-		* On the Imperial Science Museum level at the beginning, you fly behind a wall, but your 
+		* On the Imperial Science Museum level at the beginning, you fly behind a wall, but your
 		  shots go in front of it.  This is verified to be correct behavior by Guru.
-		* There's a level where the player passes through several columns in a building and the 
+		* There's a level where the player passes through several columns in a building and the
 		  player goes behind every 2nd one. That is correct as well.
 	    * There is a fire hydrant with an odd-looking spray of water on various levels.
-		  If you drop the hydrant in front of an enemy (a tank, for example), the priorities are 
+		  If you drop the hydrant in front of an enemy (a tank, for example), the priorities are
 		  wrong.  This is actual PCB behavior.  Also, the strange-looking water spray is correct.
 
 	Alpha Blend Note:
@@ -284,7 +284,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

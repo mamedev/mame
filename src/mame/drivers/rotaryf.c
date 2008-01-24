@@ -28,9 +28,9 @@ static size_t rotaryf_videoram_size;
 static INTERRUPT_GEN( rotaryf_interrupt )
 {
 	if (video_screen_get_vblank(0))
-		cpunum_set_input_line(0, I8085_RST55_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 0, I8085_RST55_LINE, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, I8085_RST75_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 0, I8085_RST75_LINE, HOLD_LINE);
 
 }
 

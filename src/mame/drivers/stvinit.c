@@ -272,7 +272,7 @@ static READ32_HANDLER( hanagumi_speedup_r )
 static READ32_HANDLER( hanagumi_slave_off )
 {
 	/* just turn the slave off, i don't think the game needs it */
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	return stv_workram_h[0x015438/4];
 }
@@ -617,7 +617,7 @@ static READ32_HANDLER( bakubaku_speedup_r )
 
 static READ32_HANDLER( bakubaku_speedup2_r )
 {
-	if (activecpu_get_pc()==0x06033762) 	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	if (activecpu_get_pc()==0x06033762) 	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	return stv_workram_h[0x0033762/4];
 }
@@ -669,7 +669,7 @@ static READ32_HANDLER( groovef_speedup_r )
 /*
 static READ32_HANDLER( groovef_second_cpu_off_r )
 {
-    if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+    if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
     return 0;
 }
 */

@@ -19,13 +19,13 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(0, data & 0x7f);
 	else
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( irem_sound_irq_ack_w )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( irem_adpcm_w )
 
 static void irem_adpcm_int(int data)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	MSM5205_vclk_w(1,1);

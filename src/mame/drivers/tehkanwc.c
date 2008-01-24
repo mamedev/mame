@@ -119,9 +119,9 @@ extern VIDEO_UPDATE( tehkanwc );
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
 	if (data)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -165,12 +165,12 @@ static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
 {
-	cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_answer_w )

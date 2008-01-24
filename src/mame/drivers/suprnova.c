@@ -449,7 +449,7 @@ static READ32_HANDLER( skns_hit_r )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	cpunum_set_input_line(0,param,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,param,HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)
@@ -474,7 +474,7 @@ static INTERRUPT_GEN(skns_interrupt)
 			interrupt = 1; // SPC
 			break;
 	}
-	cpunum_set_input_line(0,interrupt,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,interrupt,HOLD_LINE);
 }
 
 /**********************************************************************************
@@ -740,21 +740,21 @@ static WRITE32_HANDLER( skns_io_w )
 		if(((mem_mask & 0x0000ff00) == 0))
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
-                cpunum_set_input_line(0,1,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,1,CLEAR_LINE);
             if(data&0x02)
-                cpunum_set_input_line(0,3,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,3,CLEAR_LINE);
             if(data&0x04)
-                cpunum_set_input_line(0,5,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,5,CLEAR_LINE);
             if(data&0x08)
-                cpunum_set_input_line(0,7,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,7,CLEAR_LINE);
             if(data&0x10)
-                cpunum_set_input_line(0,9,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,9,CLEAR_LINE);
             if(data&0x20)
-                cpunum_set_input_line(0,0xb,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,0xb,CLEAR_LINE);
             if(data&0x40)
-                cpunum_set_input_line(0,0xd,CLEAR_LINE);
+                cpunum_set_input_line(Machine, 0,0xd,CLEAR_LINE);
             if(data&0x80)
-                cpunum_set_input_line(0,0xf,CLEAR_LINE);*/
+                cpunum_set_input_line(Machine, 0,0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (activecpu_get_pc()==0x04013B44)

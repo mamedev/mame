@@ -167,7 +167,7 @@ static const pia6821_interface pia1_intf =
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	timer_set(video_screen_get_frame_period(0), NULL, 0, interrupt_gen);
 }
 

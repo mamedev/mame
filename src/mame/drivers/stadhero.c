@@ -52,7 +52,7 @@ static WRITE16_HANDLER( stadhero_control_w )
 			break;
 		case 6: /* 6502 sound cpu */
 			soundlatch_w(0,data & 0xff);
-			cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+			cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",activecpu_get_pc(),data,0x30c010+offset);
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

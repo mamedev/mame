@@ -253,7 +253,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[3]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[4]&0xffff;
 
-	cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_irq_controller_r )
@@ -262,7 +262,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
 	switch (offset) {
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpunum_set_input_line(0, ARM_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller
@@ -316,7 +316,7 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 static WRITE32_HANDLER( deco32_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1,0,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_71_r )
@@ -606,9 +606,9 @@ static WRITE32_HANDLER( tattass_control_w )
 
 	/* Sound board reset control */
 	if (data&0x80)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bit 0x4 fade cancel? */
 	/* bit 0x8 ?? */
@@ -655,7 +655,7 @@ static WRITE32_HANDLER( nslasher_prot_w )
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 		soundlatch_w(0,(data>>16)&0xff);
 		nslasher_sound_irq |= 0x02;
-		cpunum_set_input_line(1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1133,7 +1133,7 @@ static WRITE8_HANDLER(deco32_bsmt0_w)
 static WRITE8_HANDLER(deco32_bsmt1_w)
 {
 	BSMT2000_data_0_w(offset^ 0xff, ((bsmt_latch<<8)|data), 0);
-	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
 }
 
 static READ8_HANDLER(deco32_bsmt_status_r)
@@ -1179,7 +1179,7 @@ static READ8_HANDLER(latch_r)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	nslasher_sound_irq &= ~0x02;
-	cpunum_set_input_line(1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return soundlatch_r(0);
 }
 
@@ -1779,7 +1779,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
 }
 
 static void sound_irq_nslasher(int state)
@@ -1789,7 +1789,7 @@ static void sound_irq_nslasher(int state)
 		nslasher_sound_irq |= 0x01;
 	else
 		nslasher_sound_irq &= ~0x01;
-	cpunum_set_input_line(1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -1864,12 +1864,12 @@ static MACHINE_RESET( deco32 )
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( tattass_snd_interrupt )
 {
-	cpunum_set_input_line(1, M6809_FIRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( captaven )

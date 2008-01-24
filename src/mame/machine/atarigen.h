@@ -28,7 +28,7 @@
     TYPES & STRUCTURES
 ***************************************************************************/
 
-typedef void (*atarigen_int_callback)(void);
+typedef void (*atarigen_int_callback)(running_machine *machine);
 
 typedef void (*atarigen_scanline_callback)(running_machine *machine, int scrnum, int scanline);
 

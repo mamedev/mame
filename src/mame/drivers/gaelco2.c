@@ -256,13 +256,13 @@ static WRITE16_HANDLER( clr_gun_int_w )
 static INTERRUPT_GEN( bang_interrupt )
 {
 	if (cpu_getiloops() == 0){
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 
 		clr_gun_int = 0;
 	}
 	else if (cpu_getiloops() % 2){
 		if (clr_gun_int){
-			cpunum_set_input_line(0, 4, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 		}
 	}
 }

@@ -168,7 +168,7 @@ GFXDECODE_END
 /* verify */
 static INTERRUPT_GEN( jackpool_interrupt )
 {
-	cpunum_set_input_line(0, cpu_getiloops()+1, HOLD_LINE);	/* IRQs 3, 2, and 1 */
+	cpunum_set_input_line(machine, 0, cpu_getiloops()+1, HOLD_LINE);	/* IRQs 3, 2, and 1 */
 }
 
 

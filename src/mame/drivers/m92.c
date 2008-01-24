@@ -243,14 +243,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	if (scanline == m92_raster_irq_position)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M92_IRQ_2);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine->screen[0].visarea.max_y + 1)
 	{
 		video_screen_update_partial(0, scanline);
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M92_IRQ_0);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -323,9 +323,9 @@ static TIMER_CALLBACK( setvector_callback )
 		cpunum_set_input_line_vector(1, 0, 0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m92_soundlatch_w )
@@ -353,7 +353,7 @@ static WRITE16_HANDLER( m92_sound_irq_ack_w )
 static WRITE16_HANDLER( m92_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M92_IRQ_3);
+	cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, M92_IRQ_3);
 }
 
 /*****************************************************************************/
@@ -947,7 +947,7 @@ static const struct IremGA20_interface iremGA20_interface =
 
 void m92_sprite_interrupt(void)
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, M92_IRQ_1);
+	cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_DRIVER_START( m92 )

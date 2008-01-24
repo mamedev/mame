@@ -254,12 +254,12 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
-	cpunum_set_input_line(param, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, param, 0, CLEAR_LINE);
 }
 
 static void namco_50xx_irq_set(int cpunum)
 {
-	cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, cpunum, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.

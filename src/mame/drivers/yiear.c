@@ -82,7 +82,7 @@ static WRITE8_HANDLER( yiear_VLM5030_control_w )
 static INTERRUPT_GEN( yiear_nmi_interrupt )
 {
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
-	if (yiear_nmi_enable) cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	if (yiear_nmi_enable) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

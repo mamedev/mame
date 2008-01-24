@@ -183,9 +183,9 @@ INTERRUPT_GEN( vball_interrupt )
 {
 	int line = 31 - cpu_getiloops();
 	if (line < 13)
-		cpunum_set_input_line(0, M6502_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
 	else if (line == 13)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	//save the scroll x register value
 	if(line<32) scrollx[31-line] = (vb_scrollx_hi + vb_scrollx_lo+4);
 }

@@ -1200,7 +1200,7 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				}
 				break;
 			case 0xe: /* B #offs */
-                if( insn & THUMB_BLOP_LO )
+                if( opcode  & THUMB_BLOP_LO )
                 {
                     addr = ( ( opcode & THUMB_BLOP_OFFS ) << 1 ) & 0xfffc;
                     pBuf += sprintf( pBuf, "BLX (LO) %08x", addr );

@@ -483,7 +483,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(mstworld_sound_w)
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1,0,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 }
 
 extern WRITE8_HANDLER( mstworld_gfxctrl_w );
@@ -1418,7 +1418,7 @@ static void spangbl_adpcm_int(int data)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -182,7 +182,7 @@ static void service_switch(void *param, UINT32 oldval, UINT32 newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

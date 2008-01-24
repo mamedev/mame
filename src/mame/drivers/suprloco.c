@@ -32,7 +32,7 @@ READ8_HANDLER( suprloco_control_r );
 static WRITE8_HANDLER( suprloco_soundport_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }

@@ -252,7 +252,7 @@ INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 
 static TIMER_CALLBACK( int_timer_callback )
 {
-	cpunum_set_input_line(0, 2, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 }
 
 

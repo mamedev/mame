@@ -103,7 +103,7 @@ static UINT8 grudge_last_steering[3];
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -116,7 +116,7 @@ static TIMER_CALLBACK( interrupt_timer )
 		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, param + 64, 0), param + 64, attotime_zero);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), NULL, 0, irq_off);
@@ -448,12 +448,12 @@ static void m6850_update_io(void)
 	/* apply the change */
 	if (new_state && !(m6850_status & 0x80))
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 		m6850_status |= 0x80;
 	}
 	else if (!new_state && (m6850_status & 0x80))
 	{
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 		m6850_status &= ~0x80;
 	}
 
@@ -466,12 +466,12 @@ static void m6850_update_io(void)
 	/* apply the change */
 	if (new_state && !(m6850_sound_status & 0x80))
 	{
-		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 		m6850_sound_status |= 0x80;
 	}
 	else if (!new_state && (m6850_sound_status & 0x80))
 	{
-		cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 		m6850_sound_status &= ~0x80;
 	}
 }
@@ -756,7 +756,7 @@ static void counter_set_out(int which, int out)
 {
 	/* OUT on counter 2 is hooked to the /INT line on the Z80 */
 	if (which == 2)
-		cpunum_set_input_line(1, 0, out ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, out ? ASSERT_LINE : CLEAR_LINE);
 
 	/* OUT on counter 0 is hooked to the GATE line on counter 1 */
 	else if (which == 0)

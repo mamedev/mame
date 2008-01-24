@@ -261,13 +261,13 @@ static UINT8 input_override[64];// bit pattern, bit set means this input is over
 */
 ///////////////////////////////////////////////////////////////////////////
 
-static void send_to_adder(int data)
+static void send_to_adder(running_machine *machine, int data)
 {
 	adder2_data_from_sc2 = 1;
 	adder2_sc2data       = data;
 
 	adder2_acia_triggered = 1;
-	cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE );
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
@@ -518,7 +518,7 @@ static INTERRUPT_GEN( timer_irq )
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
 
-		cpunum_set_input_line(0, M6809_IRQ_LINE, PULSE_LINE );
+		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, PULSE_LINE );
 	}
 }
 
@@ -680,7 +680,7 @@ static WRITE8_HANDLER( mmtr_w )
 		}
 	}
 
-	if ( data & 0x1F ) cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1141,7 +1141,7 @@ static WRITE8_HANDLER( uart2data_w )
 
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
-	send_to_adder(data);
+	send_to_adder(Machine, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////

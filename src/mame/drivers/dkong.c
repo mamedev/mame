@@ -329,7 +329,7 @@ static const struct dma8257_interface hb_dma =
 
 static INTERRUPT_GEN( hunchbkd_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -697,13 +697,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 

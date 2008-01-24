@@ -296,14 +296,14 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x04)>>4;
 	video_screen_update_partial(0, param);
-	cpunum_set_input_line(0, irqlevel, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x02);
 	video_screen_update_partial(0, param);
-	cpunum_set_input_line(0, irqlevel, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
 } /* namconb2_TriggerPOSIRQ */
 
 static INTERRUPT_GEN( namconb2_interrupt )
@@ -339,7 +339,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
      */
 	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
 	int irqlevel = GetCPURegister(0x00);
-	cpunum_set_input_line( 0, irqlevel, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, irqlevel, HOLD_LINE);
 
 	if( scanline<0 )
 	{
@@ -388,7 +388,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
      */
 	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
 	int irqlevel = GetCPURegister(0x04)&0xf;
-	cpunum_set_input_line( 0, irqlevel, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, irqlevel, HOLD_LINE);
 	if( scanline<0 )
 	{
 		scanline = 0;

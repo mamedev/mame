@@ -63,7 +63,7 @@ INLINE UINT8 reverse_nibble(UINT8 nibble)
 */
 static TIMER_CALLBACK( interrupt_callback )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xff);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xff);
 	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
 }
 

@@ -141,13 +141,13 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpunum_set_input_line( 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
 {
 	soundlatch_w( offset, data );
-	cpunum_set_input_line( 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(Machine, 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -457,7 +457,7 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 static void chinagat_irq_handler(int irq) {
-	cpunum_set_input_line( 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -475,8 +475,8 @@ static const struct MSM5205interface msm5205_interface =
 
 static INTERRUPT_GEN( chinagat_interrupt )
 {
-	cpunum_set_input_line(0, 1, HOLD_LINE);	/* hold the FIRQ line */
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
+	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	/* hold the FIRQ line */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
 }
 
 /* This is only on the second bootleg board */

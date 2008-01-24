@@ -830,7 +830,7 @@ static TIMER_CALLBACK( nmi_generate )
 	{
 		LOG(("NMI cpu %d\n",nmi_cpu[param]));
 
-		cpunum_set_input_line(nmi_cpu[param], INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, nmi_cpu[param], INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		LOG(("NMI not generated because cpu %d is suspended\n",nmi_cpu[param]));

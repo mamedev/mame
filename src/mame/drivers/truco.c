@@ -137,7 +137,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	{
 		if ( trigger == 0 )
 		{
-			cpunum_set_input_line( 0, M6809_IRQ_LINE, PULSE_LINE );
+			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, PULSE_LINE );
 			trigger++;
 		}
 	} else

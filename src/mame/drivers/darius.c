@@ -157,7 +157,7 @@ static void parse_control( void )	/* assumes Z80 sandwiched between 68Ks */
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -519,9 +519,7 @@ ADDRESS_MAP_END
 static void darius_adpcm_int (int data)
 {
 	if (nmi_enable)
-	{
-		cpunum_set_input_line(3, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(Machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface msm5205_interface =
@@ -806,7 +804,7 @@ GFXDECODE_END
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface_1 =

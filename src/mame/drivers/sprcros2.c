@@ -276,19 +276,19 @@ static INTERRUPT_GEN( sprcros2_m_interrupt )
 	if (cpu_getiloops() == 0)
 	{
 		if(sprcros2_m_port7&0x01)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		if(sprcros2_m_port7&0x08)
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 }
 
 static INTERRUPT_GEN( sprcros2_s_interrupt )
 {
 	if(sprcros2_s_port3&0x01)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( sprcros2 )

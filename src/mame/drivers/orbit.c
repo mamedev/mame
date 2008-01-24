@@ -30,9 +30,7 @@ static UINT8 orbit_misc_flags;
 static INTERRUPT_GEN( orbit_interrupt )
 {
 	if (orbit_nmi_enable)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

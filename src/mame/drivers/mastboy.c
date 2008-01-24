@@ -640,7 +640,7 @@ static void mastboy_adpcm_int(int data)
 
 	mastboy_m5205_part ^= 1;
 	if(!mastboy_m5205_part)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -655,14 +655,14 @@ static const struct MSM5205interface msm5205_interface =
 static WRITE8_HANDLER( mastboy_irq0_ack_w )
 {
 	mastboy_irq0_ack = data;
-	if ((data&1)==1) cpunum_set_input_line(0,0, CLEAR_LINE);
+	if ((data&1)==1) cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mastboy_interrupt )
 {
 	if ((mastboy_irq0_ack&1)==1)
 	{
-		cpunum_set_input_line(0,0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0,0, ASSERT_LINE);
 	}
 }
 

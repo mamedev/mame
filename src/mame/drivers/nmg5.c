@@ -245,7 +245,7 @@ static WRITE16_HANDLER( nmg5_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -958,7 +958,7 @@ GFXDECODE_END
 
 static void soundirq(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(Machine, 1, 0, state);
 }
 
 static const struct YM3812interface ym3812_intf =

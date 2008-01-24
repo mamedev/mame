@@ -44,7 +44,7 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 static WRITE8_HANDLER( thedeep_sound_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;
@@ -322,7 +322,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface thedeep_ym2203_intf =
@@ -347,14 +347,14 @@ static INTERRUPT_GEN( thedeep_interrupt )
 				protection_irq = 1;
 		}
 		if (protection_irq)
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
 		if (nmi_enable)
 		{
-			cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }

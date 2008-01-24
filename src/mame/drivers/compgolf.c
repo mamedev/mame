@@ -195,7 +195,7 @@ GFXDECODE_END
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(0,0,linestate);
+	cpunum_set_input_line(Machine, 0,0,linestate);
 }
 
 static const struct YM2203interface ym2203_interface =

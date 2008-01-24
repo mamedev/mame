@@ -281,24 +281,24 @@ static WRITE8_HANDLER( cntsteer_background_w )
 static WRITE8_HANDLER( gekitsui_int_w )
 {
 //  if (errorlog) fprintf(errorlog,"%04x: CPU 2 causes NMI\n",cpu_get_pc());
-	cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 }
 static WRITE8_HANDLER( gekitsui_int2_w ) // not used..
 {
 //  if (errorlog) fprintf(errorlog,"%04x: CPU 1 causes IRQ\n",cpu_get_pc());
-	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 #if 0
 static WRITE8_HANDLER( cntsteer_int_w )
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -310,11 +310,11 @@ static WRITE8_HANDLER( cntsteer_sound_w )
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
 	logerror("CTRL: %04x: %04x: %04x\n",activecpu_get_pc(),offset,data);
-//  if (offset==0) cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset==0) cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset==1) cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset==2) cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset==1) cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset==2) cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 #if 0
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 static int nmimask;
 static WRITE8_HANDLER( nmimask_w ) { nmimask = data & 0x80; }
 
-static INTERRUPT_GEN ( sound_interrupt ) { if (!nmimask) cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE); }
+static INTERRUPT_GEN ( sound_interrupt ) { if (!nmimask) cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE); }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM

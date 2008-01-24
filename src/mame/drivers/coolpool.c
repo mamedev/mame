@@ -220,7 +220,7 @@ static WRITE16_HANDLER( amerdart_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bits 10-15 are counted down over time */
 	if (data & 0x0400) amerdart_iop_echo = 1;
@@ -233,7 +233,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 	iop_answer = iop_cmd;
 	if (amerdart_iop_echo && iop_cmd != 0x19)
 	{
-		cpunum_set_input_line(0, 1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 		return;
 	}
 	amerdart_iop_echo = 0;
@@ -271,7 +271,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 			break;
 	}
 
-	cpunum_set_input_line(0, 1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 }
 
 
@@ -297,7 +297,7 @@ static WRITE16_HANDLER( coolpool_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -313,7 +313,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 {
 	iop_cmd = param;
 	cmd_pending = 1;
-	cpunum_set_input_line(1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 										/* the DSP polls the status bit so it isn't strictly */
 										/* necessary to also have an IRQ */
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
@@ -330,7 +330,7 @@ static WRITE16_HANDLER( coolpool_iop_w )
 static READ16_HANDLER( coolpool_iop_r )
 {
 	logerror("%08x:IOP read %04x\n",activecpu_get_pc(),iop_answer);
-	cpunum_set_input_line(0, 1, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 
 	return iop_answer;
 }
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( dsp_answer_w )
 {
 	logerror("%08x:IOP answer %04x\n",activecpu_get_pc(),data);
 	iop_answer = data;
-	cpunum_set_input_line(0, 1, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
 }
 
 

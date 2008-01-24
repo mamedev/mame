@@ -561,7 +561,7 @@ static void tms7000_service_timer1( void )
         if( --tms7000.t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
-			cpunum_set_input_line( cpu_getactivecpu(), TMS7000_IRQ2_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, cpu_getactivecpu(), TMS7000_IRQ2_LINE, HOLD_LINE);
             //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
 			//tick = activecpu_gettotalcycles() );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */

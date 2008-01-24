@@ -96,7 +96,7 @@ static void update_irq_state(void)
 {
 	int irq = requested_int & ~*hypr_irq_enable;
 
-	cpunum_set_input_line(0, 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ16_HANDLER( hyprduel_irq_cause_r )
@@ -127,24 +127,24 @@ static WRITE16_HANDLER( hypr_subcpu_control_w )
 		{
 			if (pc != 0x95f2)
 			{
-				cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 				subcpu_resetline = 1;
 			} else {
-				cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+				cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 				subcpu_resetline = -1;
 			}
 		}
 	} else {
 		if (subcpu_resetline == 1 && (data != 0x0c))
 		{
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			subcpu_resetline = 0;
 			if (pc == 0xbb0 || pc == 0x9d30 || pc == 0xb19c)
 				cpu_spinuntil_time(ATTOTIME_IN_USEC(15000));		/* sync semaphore */
 		}
 		else if (subcpu_resetline == -1)
 		{
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 			subcpu_resetline = 0;
 		}
 	}
@@ -182,7 +182,7 @@ static WRITE16_HANDLER( hypr_scrollreg_init_w )
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	requested_int &= ~param;
-	cpunum_set_input_line(1, 2, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hyprduel_interrupt )
@@ -193,8 +193,8 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 	{
 		requested_int |= 0x01;		/* vblank */
 		requested_int |= 0x20;
-		cpunum_set_input_line(0, 2, HOLD_LINE);
-		cpunum_set_input_line(1, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 		/* the duration is a guess */
 		timer_set(ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
 		rastersplit = 0;
@@ -209,7 +209,7 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 static MACHINE_RESET( hyprduel )
 {
 	/* start with cpu2 halted */
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	subcpu_resetline = 1;
 }
 
@@ -692,7 +692,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1, 1, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 1, HOLD_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

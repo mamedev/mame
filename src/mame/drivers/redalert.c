@@ -87,15 +87,15 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 {
 	if( readinputport(3) )
 		/* the service coin as conntected to the CPU's RDY pin as well */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
-	cpunum_set_input_line(0, M6502_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( redalert_interrupt_clear_r )
 {
-	cpunum_set_input_line(0, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
 	return video_screen_get_vpos(0);

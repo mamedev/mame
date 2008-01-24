@@ -426,9 +426,9 @@ static void update_irqs(void)
 
 	/* set the highest IRQ line */
 	if (irq >= 0)
-		cpunum_set_input_line(0, irq, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( amiga_irq_proc )

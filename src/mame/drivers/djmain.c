@@ -228,7 +228,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }
@@ -430,7 +430,7 @@ static INTERRUPT_GEN( vb_interrupt )
 	}
 
 	//logerror("V-Blank interrupt\n");
-	cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 }
 
 
@@ -439,12 +439,12 @@ static void ide_interrupt(int state)
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		cpunum_set_input_line(0, MC68000_IRQ_1, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, MC68000_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		cpunum_set_input_line(0, MC68000_IRQ_1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, MC68000_IRQ_1, CLEAR_LINE);
 	}
 }
 

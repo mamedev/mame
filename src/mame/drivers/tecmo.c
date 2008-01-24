@@ -79,7 +79,7 @@ static WRITE8_HANDLER( tecmo_bankswitch_w )
 static WRITE8_HANDLER( tecmo_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static int adpcm_pos,adpcm_end;
@@ -546,7 +546,7 @@ GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3526interface ym3812_interface =

@@ -161,7 +161,7 @@ static READ16_HANDLER( mcatadv_dsw_r )
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
 	soundlatch_w(0, data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -479,7 +479,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( int irq )
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const struct YM2610interface mcatadv_ym2610_interface =
 {

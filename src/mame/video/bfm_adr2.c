@@ -262,7 +262,7 @@ INTERRUPT_GEN( adder2_vbl )
 	if ( adder2_c101 & 0x01 )
 	{
 		adder_vbl_triggered = 1;
-		cpunum_set_input_line(1, M6809_IRQ_LINE, HOLD_LINE );
+		cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE );
 	}
 }
 

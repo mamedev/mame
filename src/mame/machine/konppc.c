@@ -141,40 +141,27 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				dsp_shared_ram_bank[cgboard_id] = (data >> 24) & 0x1;
 
 				if (data & 0x80000000)
-				{
 					dsp_state[cgboard_id] |= 0x10;
-				}
 
 				pci_bridge_enable[cgboard_id] = (data & 0x20000000) ? 1 : 0;
 
 				if (data & 0x10000000)
-				{
-					cpunum_set_input_line(dsp, INPUT_LINE_RESET, CLEAR_LINE);
-				}
+					cpunum_set_input_line(Machine, dsp, INPUT_LINE_RESET, CLEAR_LINE);
 				else
-				{
-					cpunum_set_input_line(dsp, INPUT_LINE_RESET, ASSERT_LINE);
-				}
+					cpunum_set_input_line(Machine, dsp, INPUT_LINE_RESET, ASSERT_LINE);
 
 				if (data & 0x02000000)
-				{
-					cpunum_set_input_line(dsp, INPUT_LINE_IRQ0, ASSERT_LINE);
-				}
+					cpunum_set_input_line(Machine, dsp, INPUT_LINE_IRQ0, ASSERT_LINE);
+
 				if (data & 0x04000000)
-				{
-					cpunum_set_input_line(dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
-				}
+					cpunum_set_input_line(Machine, dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
 			if (!(mem_mask & 0x000000ff))
-			{
 				dsp_comm_ppc[cgboard_id][offset] = data & 0xff;
-			}
 		}
 		else
-		{
 			dsp_comm_ppc[cgboard_id][offset] = data;
-		}
 	}
 }
 
@@ -222,7 +209,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
+			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
 			cpuintrf_push_context(2);
 			sharc_set_flag_input(0, ASSERT_LINE);
 			cpuintrf_pop_context();
@@ -230,9 +217,7 @@ static void dsp_comm_sharc_w(int board, int offset, UINT32 data)
 			if (offset == 1)
 			{
 				if (data & 0x03)
-				{
-					cpunum_set_input_line(2, INPUT_LINE_IRQ2, ASSERT_LINE);
-				}
+					cpunum_set_input_line(Machine, 2, INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}

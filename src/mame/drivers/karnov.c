@@ -86,7 +86,7 @@ static void karnov_i8751_w(int data)
 
 //  if (!i8751_return && data!=0x300) logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
 
-	cpunum_set_input_line(0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -140,7 +140,7 @@ static void wndrplnt_i8751_w(int data)
 	if (data==0x501) i8751_return=0x6bf8;
 	if (data==0x500) i8751_return=0x4e75;
 
-	cpunum_set_input_line(0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -250,7 +250,7 @@ static void chelnov_i8751_w(int data)
 
 //  logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
 
-	cpunum_set_input_line(0,6,HOLD_LINE); /* Signal main cpu task is complete */
+	cpunum_set_input_line(Machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
 }
 
@@ -261,14 +261,14 @@ static WRITE16_HANDLER( karnov_control_w )
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset<<1) {
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			cpunum_set_input_line(0,6,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,6,CLEAR_LINE);
 
 			if (i8751_needs_ack) {
 				/* If a command and coin insert happen at once, then the i8751 will queue the
                     coin command until the previous command is ACK'd */
 				if (i8751_coin_pending) {
 					i8751_return=i8751_coin_pending;
-					cpunum_set_input_line(0,6,HOLD_LINE);
+					cpunum_set_input_line(Machine, 0,6,HOLD_LINE);
 					i8751_coin_pending=0;
 				} else if (i8751_command_queue) {
 					/* Pending control command - just write it back as SECREQ */
@@ -283,7 +283,7 @@ static WRITE16_HANDLER( karnov_control_w )
 
 		case 2: /* SONREQ (Sound CPU byte) */
 			soundlatch_w(0,data&0xff);
-			cpunum_set_input_line (1, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line (Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
@@ -314,7 +314,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			cpunum_set_input_line(0,7,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,7,CLEAR_LINE);
 			break;
 	}
 }
@@ -657,18 +657,18 @@ static INTERRUPT_GEN( karnov_interrupt )
 			i8751_coin_pending=readinputport(3) | 0x8000;
 		} else {
 			i8751_return=readinputport(3) | 0x8000;
-			cpunum_set_input_line(0,6,HOLD_LINE);
+			cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 			i8751_needs_ack=1;
 		}
 		latch=0;
 	}
 
-	cpunum_set_input_line(0,7,HOLD_LINE);	/* VBL */
+	cpunum_set_input_line(machine, 0,7,HOLD_LINE);	/* VBL */
 }
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* IRQ */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
 }
 
 static const struct YM3526interface ym3526_interface =

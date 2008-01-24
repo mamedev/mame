@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 
 static void cchasm_6840_irq(int state)
 {
-	cpunum_set_input_line(0, 4, state?ASSERT_LINE:CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 4, state?ASSERT_LINE:CLEAR_LINE);
 }
 static const ptm6840_interface cchasm_6840_intf =
 {

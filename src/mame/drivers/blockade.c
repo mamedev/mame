@@ -70,7 +70,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 	if ((input_port_0_r(0) & 0x80) == 0)
 	{
 		just_been_reset = 1;
-		cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

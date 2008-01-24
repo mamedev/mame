@@ -548,9 +548,9 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (machine->drv->cpu[0].type == CPU_M6809)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) cpunum_set_input_line(0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) cpunum_set_input_line(0, M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) cpunum_set_input_line(0, M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
@@ -564,9 +564,9 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 
 		/* update it */
 		if (level)
-			cpunum_set_input_line(0, level, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
 		else
-			cpunum_set_input_line(0, 7, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 	}
 }
 
@@ -591,13 +591,13 @@ static INTERRUPT_GEN( generate_nmi )
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(int state)
 {
-	cpunum_set_input_line(1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -779,7 +779,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
-	cpunum_set_input_line(1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -802,7 +802,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -817,9 +817,9 @@ static READ8_HANDLER( sound_data_r )
 static void via_irq(int state)
 {
 	if (state)
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

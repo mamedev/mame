@@ -439,7 +439,7 @@ static WRITE32_HANDLER( esc_w )
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cpunum_set_input_line(0, 4, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
 		}
 	}
 	else
@@ -558,13 +558,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -628,14 +628,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (!(mem_mask & 0xff000000))
 		{
-			cpunum_set_input_line(0, 1, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (!(mem_mask & 0x0000ff00))
 		{
-			cpunum_set_input_line(0, 2, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -665,7 +665,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// lower OBJINT-REQ flag and trigger interrupt
 		gx_rdport1_3 &= ~0x80;
-		cpunum_set_input_line(0, 3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 	}
 }
 
@@ -699,7 +699,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(0, 1, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 		}
 	}
 
@@ -721,7 +721,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(0, 1, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 		}
 	}
 
@@ -744,7 +744,7 @@ static INTERRUPT_GEN(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				cpunum_set_input_line(0, 2, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 			}
 		}
 	}
@@ -823,7 +823,7 @@ INLINE void write_snd_020(int reg, int val)
 
 	if (reg == 7)
 	{
-		cpunum_set_input_line(1, 1, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 1, HOLD_LINE);
 	}
 }
 
@@ -1096,7 +1096,7 @@ static WRITE32_HANDLER( type4_prot_w )
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cpunum_set_input_line(0, 4, HOLD_LINE);
+					cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -3444,7 +3444,7 @@ static MACHINE_RESET(konamigx)
 	tms57002_init();
 
 	// sound CPU initially disabled?
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{

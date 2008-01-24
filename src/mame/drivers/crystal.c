@@ -147,7 +147,7 @@ static void IntReq(int num)
 	{
 		IntPend|=(1<<num);
 		program_write_dword_32le(0x01800c0c,IntPend);
-		cpunum_set_input_line(0,SE3208_INT,ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0,SE3208_INT,ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
@@ -205,7 +205,7 @@ static WRITE32_HANDLER(IntAck_w)
 		IntPend&=~(1<<(data&0x1f));
 		program_write_dword_32le(0x01800c0c,IntPend);
 		if(!IntPend)
-			cpunum_set_input_line(0,SE3208_INT,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,SE3208_INT,CLEAR_LINE);
 	}
 	if((~mem_mask)&0xff00)
 		IntHigh=(data>>8)&7;

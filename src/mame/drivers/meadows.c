@@ -217,7 +217,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 
     /* fake something toggling the sense input line of the S2650 */
 	main_sense_state ^= 1;
-	cpunum_set_input_line(0, 1, main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* check the fake coin input */
 	if (readinputport(3) & 0x01)
@@ -225,7 +225,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 		if (!coin1_state)
 		{
 			coin1_state = 1;
-			cpunum_set_input_line_and_vector(0, 0, PULSE_LINE, 0x82);
+			cpunum_set_input_line_and_vector(machine, 0, 0, PULSE_LINE, 0x82);
 		}
 	}
 	else
@@ -245,7 +245,7 @@ static INTERRUPT_GEN( minferno_interrupt )
 	/* preserve the actual cycle count */
 	cycles_at_vsync = cpunum_gettotalcycles(0);
 	minferno_sense++;
-	cpunum_set_input_line(0, 1, (minferno_sense & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, 1, (minferno_sense & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -327,7 +327,7 @@ static INTERRUPT_GEN( sound_interrupt )
 {
     /* fake something toggling the sense input line of the S2650 */
 	sound_sense_state ^= 1;
-	cpunum_set_input_line(1, 1, sound_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 1, sound_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

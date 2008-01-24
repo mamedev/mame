@@ -62,7 +62,7 @@ static WRITE16_HANDLER( mugsmash_reg2_w )
 	{
 	case 1:
 		soundlatch_w(1,data&0xff);
-		cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -418,7 +418,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line( 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

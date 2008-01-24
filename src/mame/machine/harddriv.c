@@ -147,7 +147,7 @@ static UINT32 *dataptr[MAX_MSP_SYNC];
 static UINT32 dataval[MAX_MSP_SYNC];
 static int next_msp_sync;
 
-static void hd68k_update_interrupts(void);
+static void hd68k_update_interrupts(running_machine *machine);
 static TIMER_CALLBACK( duart_callback );
 
 
@@ -181,9 +181,9 @@ MACHINE_RESET( harddriv )
 	atarigen_interrupt_reset(hd68k_update_interrupts);
 
 	/* halt several of the DSPs to start */
-	if (hdcpu_adsp != -1) cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
-	if (hdcpu_dsp32 != -1) cpunum_set_input_line(hdcpu_dsp32, INPUT_LINE_HALT, ASSERT_LINE);
-	if (hdcpu_sounddsp != -1) cpunum_set_input_line(hdcpu_sounddsp, INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_adsp != -1) cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_dsp32 != -1) cpunum_set_input_line(machine, hdcpu_dsp32, INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_sounddsp != -1) cpunum_set_input_line(machine, hdcpu_sounddsp, INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* if we found a 6502, reset the JSA board */
 	if (hdcpu_jsa != -1)
@@ -216,7 +216,7 @@ MACHINE_RESET( harddriv )
  *
  *************************************/
 
-static void hd68k_update_interrupts(void)
+static void hd68k_update_interrupts(running_machine *machine)
 {
 	int newstate = 0;
 
@@ -234,9 +234,9 @@ static void hd68k_update_interrupts(void)
 		newstate = 6;
 
 	if (newstate)
-		cpunum_set_input_line(hdcpu_main, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, hdcpu_main, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(hdcpu_main, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, hdcpu_main, 7, CLEAR_LINE);
 }
 
 
@@ -532,12 +532,12 @@ WRITE16_HANDLER( hd68k_nwr_w )
 		case 6:	/* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
 			if (hdcpu_gsp != -1)
-				cpunum_set_input_line(hdcpu_gsp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(Machine, hdcpu_gsp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7:	/* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
 			if (hdcpu_msp != -1)
-				cpunum_set_input_line(hdcpu_msp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(Machine, hdcpu_msp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -983,10 +983,10 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			adsp_br = !val;
 			logerror("ADSP /BR = %d\n", !adsp_br);
 			if (adsp_br || adsp_halt)
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
@@ -1000,10 +1000,10 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			adsp_halt = !val;
 			logerror("ADSP /HALT = %d\n", !adsp_halt);
 			if (adsp_br || adsp_halt)
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
@@ -1013,7 +1013,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 7:
 			logerror("ADSP reset = %d\n", val);
-			cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			cpu_yield();
 			break;
 
@@ -1129,9 +1129,9 @@ static void update_ds3_irq(void)
 {
 	/* update the IRQ2 signal to the ADSP2101 */
 	if (!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
-		cpunum_set_input_line(hdcpu_adsp, ADSP2100_IRQ2, ASSERT_LINE);
+		cpunum_set_input_line(Machine, hdcpu_adsp, ADSP2100_IRQ2, ASSERT_LINE);
 	else
-		cpunum_set_input_line(hdcpu_adsp, ADSP2100_IRQ2, CLEAR_LINE);
+		cpunum_set_input_line(Machine, hdcpu_adsp, ADSP2100_IRQ2, CLEAR_LINE);
 }
 
 
@@ -1154,10 +1154,10 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 			/* the ADSP at the next instruction boundary */
 			adsp_br = !val;
 			if (adsp_br)
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
@@ -1166,7 +1166,7 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 			break;
 
 		case 3:
-			cpunum_set_input_line(hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			if (val && !ds3_reset)
 			{
 				ds3_gflag = 0;
@@ -1348,7 +1348,7 @@ WRITE16_HANDLER( hdds3_special_w )
 		case 1:
 			logerror("%04X:ADSP sets interrupt = %d\n", activecpu_get_previouspc(), (data >> 1) & 1);
 			adsp_irq_state = (data >> 1) & 1;
-			hd68k_update_interrupts();
+			hd68k_update_interrupts(Machine);
 			break;
 
 		case 2:
@@ -1438,7 +1438,7 @@ WRITE16_HANDLER( hd68k_ds3_program_w )
 void hddsk_update_pif(UINT32 pins)
 {
 	atarigen_sound_int_state = ((pins & DSP32_OUTPUT_PIF) != 0);
-	hd68k_update_interrupts();
+	hd68k_update_interrupts(Machine);
 }
 
 
@@ -1455,11 +1455,11 @@ WRITE16_HANDLER( hd68k_dsk_control_w )
 	switch (offset & 7)
 	{
 		case 0:	/* DSPRESTN */
-			cpunum_set_input_line(hdcpu_dsp32, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, hdcpu_dsp32, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 1:	/* DSPZN */
-			cpunum_set_input_line(hdcpu_dsp32, INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, hdcpu_dsp32, INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 2:	/* ZW1 */

@@ -301,7 +301,7 @@ static WRITE16_HANDLER( io_w )
 		case 0:
 			// sound data
 			if (ACCESSING_LSB)
-				cpunum_set_input_line(2, 0, HOLD_LINE);
+				cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
@@ -542,8 +542,8 @@ static INTERRUPT_GEN( master_irq )
 {
 	switch(cpu_getiloops())
 	{
-		case 0: cpunum_set_input_line(0,1,HOLD_LINE); break;
-		case 1: cpunum_set_input_line(0,3,HOLD_LINE); break;
+		case 0: cpunum_set_input_line(machine, 0,1,HOLD_LINE); break;
+		case 1: cpunum_set_input_line(machine, 0,3,HOLD_LINE); break;
 	}
 }
 
@@ -551,8 +551,8 @@ static INTERRUPT_GEN( slave_irq )
 {
 	switch(cpu_getiloops())
 	{
-		case 0: cpunum_set_input_line(0,3,HOLD_LINE); break;
-		case 1: cpunum_set_input_line(0,1,HOLD_LINE); break;
+		case 0: cpunum_set_input_line(machine, 0,3,HOLD_LINE); break;
+		case 1: cpunum_set_input_line(machine, 0,1,HOLD_LINE); break;
 	}
 }
 

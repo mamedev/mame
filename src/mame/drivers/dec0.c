@@ -67,7 +67,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			if (ACCESSING_LSB)
 			{
 				soundlatch_w(0,data & 0xff);
-				cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+				cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( slyspy_control_w )
 			if (ACCESSING_LSB)
 			{
 				soundlatch_w(0,data & 0xff);
-				cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+				cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -117,7 +117,7 @@ static WRITE16_HANDLER( midres_sound_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -904,12 +904,12 @@ GFXDECODE_END
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* IRQ */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
 }
 
 static void sound_irq2(int linestate)
 {
-	cpunum_set_input_line(1,1,linestate); /* IRQ2 */
+	cpunum_set_input_line(Machine, 1,1,linestate); /* IRQ2 */
 }
 
 static const struct YM3812interface ym3812_interface =

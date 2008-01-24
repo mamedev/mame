@@ -581,7 +581,7 @@ UINT32 old;
 MACHINE_RESET( dc )
 {
 	/* halt the ARM7 */
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(sysctrl_regs, 0, sizeof(sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
@@ -615,12 +615,12 @@ WRITE64_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		}
         }
 	mame_printf_verbose("AICA REG: write %llx to %x, mask %llx\n", data, offset, mem_mask);

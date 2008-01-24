@@ -42,7 +42,7 @@
 #define EG_SHIFT	16
 #define FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
 			 // driver code indicates should be 4, but sounds distorted then
-		
+
 // include the LFO handling code
 #include "scsplfo.c"
 
@@ -1044,7 +1044,7 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
  		case 3: //ping-pong
  			if(*addr[addr_select]>=LEA(slot)) //reached end, reverse till start
  			{
-				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT); 
+				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LEA(slot)<<SHIFT) - rem_addr;
  				slot->Backwards=1;
  			}
@@ -1192,7 +1192,7 @@ static void dma_scsp(struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpunum_set_input_line(2,dma_transfer_end,HOLD_LINE);
+	cpunum_set_input_line(Machine, 2,dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1307,7 +1307,7 @@ WRITE16_HANDLER( SCSP_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpunum_set_input_line_and_vector(0, 9, HOLD_LINE , 0x46);
+				cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

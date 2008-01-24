@@ -465,13 +465,13 @@ static INTERRUPT_GEN( chl_interrupt )
 
 //    video_screen_update_partial(0, video_screen_get_vpos(0));
 
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, vector);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
 
 	/* it seems the V8 == Vblank and it is connected to the INT on the 68705 */
 	//so we should cause an INT on the cpu 1 here, as well.
 	//but only once per frame !
 	if (vector == 0xdf) /* only on vblank */
-		cpunum_set_input_line(1, 0, PULSE_LINE );
+		cpunum_set_input_line(machine, 1, 0, PULSE_LINE );
 
 }
 

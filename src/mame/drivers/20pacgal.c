@@ -104,7 +104,7 @@ static WRITE8_HANDLER( irqack_w )
 	int bit = data & 1;
 	cpu_interrupt_enable(0,bit);
 	if (!bit)
-		cpunum_set_input_line( 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( flipscreen_w )

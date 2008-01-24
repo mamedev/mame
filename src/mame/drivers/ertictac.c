@@ -154,7 +154,7 @@ static TIMER_CALLBACK( ertictacTimer )
 	IRQSTA|=0x40;
 	if(IRQMSKA&0x40)
 	{
-		cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 	}
 	startTimer();
 }
@@ -355,7 +355,7 @@ static INTERRUPT_GEN( ertictac_interrupt )
 	IRQSTA|=0x08;
 	if(IRQMSKA&0x08)
 	{
-		cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 	}
 }
 

@@ -619,7 +619,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 		if( ( SHRAM( 0xbe88 ) & 0x0000ffff ) == 2 )
 		{
-			cpunum_set_input_line( 0, INPUT_LINE_RESET, PULSE_LINE );
+			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE );
 			memset( namcos11_keycus, 0, namcos11_keycus_size );
 
 			SHRAM( 0xbe88 ) = ( SHRAM( 0xbe88 ) & 0xffff0000 );

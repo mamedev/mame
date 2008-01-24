@@ -48,7 +48,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			xxmissio_status &= ~0x08;
-			cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0x10);
 			break;
 
 		case 0x80:
@@ -71,7 +71,7 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			xxmissio_status &= ~0x04;
-			cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0x10);
 			break;
 	}
 }
@@ -79,13 +79,13 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_status &= ~0x20;
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_status &= ~0x10;
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static MACHINE_START( xxmissio )

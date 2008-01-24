@@ -38,13 +38,13 @@ WRITE8_HANDLER( K005885_1_w );
 static INTERRUPT_GEN( ddrible_interrupt_0 )
 {
 	if (ddrible_int_enable_0)
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( ddrible_interrupt_1 )
 {
 	if (ddrible_int_enable_1)
-		cpunum_set_input_line(1, M6809_FIRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 

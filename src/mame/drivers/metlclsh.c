@@ -63,12 +63,12 @@ static WRITE8_HANDLER( sharedram_w )	{ sharedram[offset] = data; }
 
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
-	cpunum_set_input_line(1,M6809_IRQ_LINE,ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
-	cpunum_set_input_line(0,INPUT_LINE_NMI,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0,INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -114,17 +114,17 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
-	cpunum_set_input_line(0,INPUT_LINE_NMI,ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0,INPUT_LINE_NMI,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
-	cpunum_set_input_line(1,M6809_IRQ_LINE,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
-	cpunum_set_input_line(1,INPUT_LINE_NMI,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )
@@ -288,7 +288,7 @@ GFXDECODE_END
 
 static void metlclsh_irqhandler(int linestate)
 {
-	cpunum_set_input_line(0,M6809_IRQ_LINE,linestate);
+	cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =
@@ -302,7 +302,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 		return;
 	/* generate NMI on coin insertion */
 	if ((~readinputport(2) & 0xc0) || (~readinputport(3) & 0x40))
-		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_RESET( metlclsh )

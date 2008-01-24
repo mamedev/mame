@@ -80,7 +80,7 @@ WRITE8_HANDLER( redalert_audio_command_w )
 	/* D7 is also connected to the NMI input of the CPU -
        the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -159,7 +159,7 @@ WRITE8_HANDLER( redalert_voice_command_w )
 {
 	soundlatch2_w(0, (data & 0x78) >> 3);
 
-	cpunum_set_input_line(2, I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -248,7 +248,7 @@ WRITE8_HANDLER( demoneye_audio_command_w )
 	/* the byte is connected to port A of the AY8910 */
 	soundlatch_w(0, data);
 
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

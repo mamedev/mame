@@ -47,14 +47,14 @@ static TIMER_CALLBACK( battles_nmi_generate )
 
 	if( battles_customio_command & 0x10 ){
 		if( battles_customio_command_count == 0 ){
-			cpunum_set_input_line(3, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 		}else{
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-			cpunum_set_input_line(3, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}else{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-		cpunum_set_input_line(3, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }
@@ -180,6 +180,6 @@ READ8_HANDLER( battles_input_port_r )
 
 INTERRUPT_GEN( battles_interrupt_4 )
 {
-	cpunum_set_input_line(3, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 3, 0, HOLD_LINE);
 }
 

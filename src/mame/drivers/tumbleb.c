@@ -339,14 +339,14 @@ static READ16_HANDLER( tumblepb_prot_r )
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 #endif
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line( 1, 0, ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE );
 }
 
 /******************************************************************************/
@@ -460,7 +460,7 @@ static void tumbleb2_playmusic(void)
 
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
-	cpunum_set_input_line(0, 6, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
 	tumbleb2_playmusic();
 }
 
@@ -768,7 +768,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( jumpkids_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1,0,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 }
 
 
@@ -895,7 +895,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(jumppop_z80latch_r)
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 	return soundlatch_r(0);
 }
 
@@ -2155,7 +2155,7 @@ MACHINE_DRIVER_END
 
 static void semicom_irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

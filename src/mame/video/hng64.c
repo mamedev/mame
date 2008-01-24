@@ -1278,8 +1278,8 @@ VIDEO_UPDATE( hng64 )
 	/* hack to enable 2nd cpu when key is pressed */
 //  if ( input_code_pressed_once(KEYCODE_L) )
 //  {
-//      cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-//      cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+//      cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+//      cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 //  }
 
 	/* AJG */

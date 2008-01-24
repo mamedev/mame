@@ -202,7 +202,7 @@ static UINT16 *ssv_mainram;
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(void)
 {
-	cpunum_set_input_line(0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static int ssv_irq_callback(int level)

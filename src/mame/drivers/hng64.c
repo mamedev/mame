@@ -1429,7 +1429,7 @@ static const struct mips3_config config =
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( irq_start )
@@ -1447,7 +1447,7 @@ static INTERRUPT_GEN( irq_start )
 		break;
 	}
 
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 }
 
@@ -1462,8 +1462,8 @@ static MACHINE_RESET(hyperneo)
 	UINT8 *RAM = (UINT8*)hng64_soundram;
 	memory_set_bankptr(1,&RAM[0x1e0000]);
 	memory_set_bankptr(2,&RAM[0x001000]); // where..
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 
 	/* Comm CPU */
@@ -1480,8 +1480,8 @@ static MACHINE_RESET(hyperneo)
 	KL5C80_virtual_mem_sync();
 	memory_set_opbase_handler(2, KL5C80_opbase_handler);
 
-	cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
-//  cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
+//  cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 
 

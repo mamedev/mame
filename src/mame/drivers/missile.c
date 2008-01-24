@@ -315,7 +315,7 @@ static TIMER_CALLBACK( clock_irq )
 
 	/* assert the IRQ if not already asserted */
 	irq_state = (~curv >> 5) & 1;
-	cpunum_set_input_line(0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	video_screen_update_partial(0, v_to_scanline(curv));
@@ -410,7 +410,7 @@ static MACHINE_START( missile )
 
 static MACHINE_RESET( missile )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	irq_state = 0;
 }
 
@@ -617,7 +617,7 @@ static WRITE8_HANDLER( missile_w )
 	{
 		if (irq_state)
 		{
-			cpunum_set_input_line(0, 0, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 			irq_state = 0;
 		}
 	}

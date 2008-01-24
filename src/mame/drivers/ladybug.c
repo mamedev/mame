@@ -110,9 +110,9 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( ladybug_interrupt )
 {
 	if (readinputport(5) & 1)	/* Left Coin */
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	else if (readinputport(5) & 2)	/* Right Coin */
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 

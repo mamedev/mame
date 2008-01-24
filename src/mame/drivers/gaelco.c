@@ -77,7 +77,7 @@ static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
 	if (ACCESSING_LSB){
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,M6809_FIRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
 	}
 }
 

@@ -111,7 +111,7 @@ static void poly17_init(void);
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -124,7 +124,7 @@ static TIMER_CALLBACK( irq_timer )
 		timer_set(video_screen_get_time_until_pos(0, param + 64, 0), NULL, param + 64, irq_timer);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), NULL, 0, irq_off);
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( irq_timer )
 
 static TIMER_CALLBACK( firq_off )
 {
-	cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -143,7 +143,7 @@ static TIMER_CALLBACK( firq_timer )
 	timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
-	cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer_set(video_screen_get_time_until_pos(0, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);

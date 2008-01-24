@@ -122,14 +122,14 @@ static UINT32 mux_outputlatch;
 INLINE void z80_bank(int num, int data);
 
 
-static void update_irqs(void)
+static void update_irqs(running_machine *machine)
 {
 	int newstate = blitter_irq || vblank_irq || acia_irq;
 
 	if (newstate != irq_state)
 	{
 		irq_state = newstate;
-		cpunum_set_input_line(0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -647,7 +647,7 @@ static READ8_HANDLER( chipset_r )
 			val = 0x1;
 
 			/* TODO */
-			update_irqs();
+			update_irqs(Machine);
 			break;
 		}
 		case 0x1C:
@@ -1155,7 +1155,7 @@ static WRITE8_HANDLER( meter_w )
 		if ( changed & (1 << i) )
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpunum_set_input_line(1, M6809_FIRQ_LINE, PULSE_LINE );
+			cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }
@@ -1357,12 +1357,12 @@ static void init_ram(void)
 static void z80_acia_irq(int state)
 {
 	acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
-	update_irqs();
+	update_irqs(Machine);
 }
 
 static void m6809_data_irq(int state)
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*
@@ -1483,14 +1483,14 @@ static const struct upd7759_interface upd7759_interface =
 /* TODO */
 static INTERRUPT_GEN( timer_irq )
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, PULSE_LINE);
 }
 
 /* TODO */
 static INTERRUPT_GEN( vblank_gen )
 {
 	vblank_irq = 1;
-	update_irqs();
+	update_irqs(machine);
 }
 
 static MACHINE_DRIVER_START( bfcobra )

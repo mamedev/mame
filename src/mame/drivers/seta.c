@@ -1335,7 +1335,7 @@ static void uPD71054_update_timer( int no )
 ------------------------------*/
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
-	cpunum_set_input_line( 0, 4, HOLD_LINE );
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE );
 	uPD71054_update_timer( param );
 }
 
@@ -1418,7 +1418,7 @@ static const struct x1_010_interface seta_sound_intf2 =
 
 static void utoukond_ym3438_interrupt(int linestate)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, linestate);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, linestate);
 }
 
 static const struct YM3438interface utoukond_ym3438_intf =
@@ -1492,7 +1492,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			if (ACCESSING_LSB)
 			{
 				if ( !(old_data&1) && (data&1) )
-					cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+					cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 				old_data = data;
 			}
 			break;
@@ -1675,7 +1675,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_word_w(0,data,mem_mask);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
@@ -2713,7 +2713,7 @@ static READ8_HANDLER( wiggie_soundlatch_r )
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
 	wiggie_soundlatch = data >> 8;
-	cpunum_set_input_line(1,0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
 }
 
 
@@ -2771,7 +2771,7 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		cpunum_set_input_line(1,0,HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 		soundlatch_w(0,data & 0xff);
 	}
 }
@@ -6822,8 +6822,8 @@ static INTERRUPT_GEN( seta_interrupt_1_and_2 )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
+		case 0:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -6831,8 +6831,8 @@ static INTERRUPT_GEN( seta_interrupt_2_and_4 )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(0, 4, HOLD_LINE);	break;
+		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 1:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
 	}
 }
 
@@ -6843,8 +6843,8 @@ static INTERRUPT_GEN( seta_sub_interrupt )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);	break;
-		case 1:		cpunum_set_input_line(1, 0, HOLD_LINE);				break;
+		case 0:		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);	break;
+		case 1:		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);				break;
 	}
 }
 
@@ -6864,9 +6864,9 @@ static const struct YM2203interface tndrcade_ym2203_interface =
 static INTERRUPT_GEN( tndrcade_sub_interrupt )
 {
 	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	else if (cpu_getiloops() == 0)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( tndrcade )
@@ -7015,8 +7015,8 @@ static INTERRUPT_GEN( calibr50_interrupt )
 		case 0:
 		case 1:
 		case 2:
-		case 3:		cpunum_set_input_line(0, 4, HOLD_LINE);	break;
-		case 4:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
+		case 3:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
+		case 4:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -7488,7 +7488,7 @@ MACHINE_DRIVER_END
 #if __uPD71054_TIMER
 static INTERRUPT_GEN( wrofaero_interrupt )
 {
-	cpunum_set_input_line( 0, 2, HOLD_LINE );
+	cpunum_set_input_line(machine, 0, 2, HOLD_LINE );
 }
 
 static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
@@ -8241,8 +8241,8 @@ static INTERRUPT_GEN( crazyfgt_interrupt )
 {
 	switch (cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
-		default:	cpunum_set_input_line(0, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
+		case 0:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		default:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
 	}
 }
 
@@ -8296,13 +8296,13 @@ static INTERRUPT_GEN( inttoote_interrupt )
 		case 4:
 		case 5:
 		case 6:
-		case 7:		cpunum_set_input_line(0, 6, HOLD_LINE);	break;
+		case 7:		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
 
-		case 8:		cpunum_set_input_line(0, 2, HOLD_LINE);	break;
+		case 8:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
 
-		case 9:		cpunum_set_input_line(0, 1, HOLD_LINE);	break;
+		case 9:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
 
-		case 10:	cpunum_set_input_line(0, 4, HOLD_LINE);	break;
+		case 10:	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
 	}
 }
 

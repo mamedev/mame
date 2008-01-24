@@ -238,7 +238,7 @@ WRITE8_HANDLER( cvs_s2636_3_or_character_ram_w )
 static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 {
 	cpunum_set_input_line_vector(CVS_MAIN_CPU_INDEX, 0, 0x03);
-	cpunum_set_input_line(CVS_MAIN_CPU_INDEX, 0, PULSE_LINE);
+	cpunum_set_input_line(machine, CVS_MAIN_CPU_INDEX, 0, PULSE_LINE);
 
 	cvs_scroll_stars();
 }
@@ -247,7 +247,7 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 static void cvs_dac_cpu_interrupt(void)
 {
 	cpunum_set_input_line_vector(CVS_DAC_CPU_INDEX, 0, 0x03);
-	cpunum_set_input_line(CVS_DAC_CPU_INDEX, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, CVS_DAC_CPU_INDEX, 0, HOLD_LINE);
 }
 
 

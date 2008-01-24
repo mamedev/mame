@@ -329,7 +329,7 @@ static VIDEO_UPDATE( madalien )
 
 static INTERRUPT_GEN( madalien_interrupt )
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI,
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,
 		(readinputportbytag("PLAYER2") & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -466,7 +466,7 @@ static WRITE8_HANDLER( madalien_output_w )
 
 static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	cpunum_set_input_line(1, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 
 	soundlatch_w(offset, data);
 }
@@ -474,7 +474,7 @@ static WRITE8_HANDLER( madalien_sound_command_w )
 
 static READ8_HANDLER(madalien_sound_command_r )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 
 	return soundlatch_r(offset);
 }

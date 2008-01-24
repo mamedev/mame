@@ -114,16 +114,16 @@ static UINT8 *rambase;
 
 /*
 	Based on the Solar Warrior schematics, vertical timing counts as follows:
-	
+
 		08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
 		08,09,....
-		
+
 	Thus, it counts from 08 to FF, then resets to E8 and counts to FF again.
 	This gives (256 - 8) + (256 - 232) = 248 + 24 = 272 total scanlines.
-	
+
 	VBLK is signalled starting when the counter hits F8, and continues through
 	the reset to E8 and through until the next reset to 08 again.
-	
+
 	Since MAME's video timing is 0-based, we need to convert this.
 */
 
@@ -142,18 +142,18 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 	int scanline = param;
 	int vcount_old = scanline_to_vcount((scanline == 0) ? machine->screen[0].height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
-	
+
 	/* update to the current point */
 	video_screen_update_partial(0, scanline - 1);
-	
+
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
-	
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cpunum_set_input_line(0, M6809_FIRQ_LINE, ASSERT_LINE);
-	
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
@@ -178,7 +178,7 @@ static MACHINE_START( ddragon )
 
 	/* determine the sound CPU index */
 	snd_cpu = mame_find_cpu_index(machine, "sound");
-	
+
 	/* register for save states */
 	state_save_register_global(dd_sub_cpu_busy);
 	state_save_register_global_array(adpcm_pos);
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(1, (data & 0xe0) >> 5);
 }
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 {
 	logerror("BankWrite %05x %08x %08x\n", activecpu_get_pc(), offset, data);
 
-	if (offset == 0x1400 || offset == 0) 
+	if (offset == 0x1400 || offset == 0)
 	{
 		darktowr_mcu_ports[1] = BITSWAP8(data,0,1,2,3,4,5,6,7);
 		logerror("MCU PORT 1 -> %04x (from %04x)\n", BITSWAP8(data,0,1,2,3,4,5,6,7), data);
@@ -288,7 +288,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(1, newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -307,23 +307,23 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 
 static WRITE8_HANDLER( ddragon_interrupt_w )
 {
-	switch (offset) 
+	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
-			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: /* 380c - FIRQ ack */
-			cpunum_set_input_line(0, M6809_FIRQ_LINE, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 2: /* 380d - IRQ ack */
-			cpunum_set_input_line(0, M6809_IRQ_LINE, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 380e - SND irq */
 			soundlatch_w(0, data);
-			cpunum_set_input_line(snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			cpunum_set_input_line(Machine, snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -335,19 +335,19 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 static WRITE8_HANDLER( ddragon2_sub_irq_ack_w )
 {
-	cpunum_set_input_line(1, sprite_irq, CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, sprite_irq, CLEAR_LINE );
 }
 
 
 static WRITE8_HANDLER( ddragon2_sub_irq_w )
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line( snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -381,15 +381,15 @@ static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
 {
 	/* I don't know why port 0x17 is used..  Doesn't seem to be a standard MCU port */
-	if (offset == 0x17) 
+	if (offset == 0x17)
 	{
 		/* This is a guess, but makes sense.. The mcu definitely interrupts the main cpu.
         I don't know what bit is the assert and what is the clear though (in comparison
         it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
-			cpunum_set_input_line(0, M6809_IRQ_LINE, ASSERT_LINE);
-			cpunum_set_input_line(1, sprite_irq, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -567,8 +567,8 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 static WRITE8_HANDLER( ddragnba_port_w )
 {
-	cpunum_set_input_line(0,M6809_IRQ_LINE,ASSERT_LINE);
-	cpunum_set_input_line(1,sprite_irq, CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1,sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragnba_sub_portmap, ADDRESS_SPACE_IO, 8 )
@@ -636,7 +636,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-	
+
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -985,7 +985,7 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 272, 0, 240)
@@ -1051,7 +1051,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 384, 0, 256, 272, 0, 240)

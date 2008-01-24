@@ -350,7 +350,7 @@ static PALETTE_INIT( cultures )
 static INTERRUPT_GEN( cultures_interrupt )
 {
 	if (irq_enable)
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 

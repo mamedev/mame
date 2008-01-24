@@ -17,7 +17,7 @@ static UINT8 sound_data_from_68k, sound_data_from_6502;
 static UINT8 sound_data_from_68k_ready, sound_data_from_6502_ready;
 
 
-static void update_sound_68k_interrupts(void);
+static void update_sound_68k_interrupts(running_machine *machine);
 
 
 
@@ -63,7 +63,7 @@ WRITE8_HANDLER( cyberbal_sound_bank_select_w )
 	memory_set_bankptr(8, &bank_base[0x1000 * ((data >> 6) & 3)]);
 	coin_counter_w(1, (data >> 5) & 1);
 	coin_counter_w(0, (data >> 4) & 1);
-	cpunum_set_input_line(3, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x01)) sndti_reset(SOUND_YM2151, 0);
 
 }
@@ -84,7 +84,7 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
 	if (!io_68k_int)
 	{
 		io_68k_int = 1;
-		update_sound_68k_interrupts();
+		update_sound_68k_interrupts(Machine);
 	}
 }
 
@@ -96,7 +96,7 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
  *
  *************************************/
 
-static void update_sound_68k_interrupts(void)
+static void update_sound_68k_interrupts(running_machine *machine)
 {
 	int newstate = 0;
 
@@ -106,9 +106,9 @@ static void update_sound_68k_interrupts(void)
 		newstate |= 2;
 
 	if (newstate)
-		cpunum_set_input_line(3, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, 3, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(3, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 3, 7, CLEAR_LINE);
 }
 
 
@@ -117,7 +117,7 @@ INTERRUPT_GEN( cyberbal_sound_68k_irq_gen )
 	if (!fast_68k_int)
 	{
 		fast_68k_int = 1;
-		update_sound_68k_interrupts();
+		update_sound_68k_interrupts(machine);
 	}
 }
 
@@ -127,7 +127,7 @@ WRITE16_HANDLER( cyberbal_io_68k_irq_ack_w )
 	if (io_68k_int)
 	{
 		io_68k_int = 0;
-		update_sound_68k_interrupts();
+		update_sound_68k_interrupts(Machine);
 	}
 }
 
@@ -161,6 +161,6 @@ WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 	if (fast_68k_int)
 	{
 		fast_68k_int = 0;
-		update_sound_68k_interrupts();
+		update_sound_68k_interrupts(Machine);
 	}
 }

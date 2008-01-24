@@ -743,17 +743,15 @@ profiler_mark(PROFILER_VIDEO);
 			}
 
 			if (irq_vector)
-			{
 				/* quizchq */
-				cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, irq_vector);
-			}
+				cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (ddenlovr_blitter_irq_enable)
 				{
 					ddenlovr_blitter_irq_flag = 1;
-					cpunum_set_input_line(0,1,HOLD_LINE);
+					cpunum_set_input_line(Machine, 0,1,HOLD_LINE);
 				}
 			}
 			break;
@@ -913,7 +911,7 @@ profiler_mark(PROFILER_VIDEO);
 				#endif
 			}
 
-			cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, irq_vector);
+			cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
@@ -1967,7 +1965,7 @@ static WRITE8_HANDLER( mmpanic_rombank_w )
 static WRITE8_HANDLER( mmpanic_soundlatch_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
@@ -6621,15 +6619,15 @@ static INTERRUPT_GEN( quizchq_irq )
 		return;
 
 	if ((++count % 60) == 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfc);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfc);
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xee);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xee);
 }
 
 /*
 static INTERRUPT_GEN( rtc_irq )
 {
-    cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfc);
+    cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfc);
 }
 */
 
@@ -6699,9 +6697,9 @@ static INTERRUPT_GEN( mmpanic_irq )
 		return;
 
 	if ((++count % 60) == 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xe7);	// RST 20, clock
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xe7);	// RST 20, clock
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);	// RST 08, vblank
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	// RST 08, vblank
 }
 
 static MACHINE_DRIVER_START( mmpanic )
@@ -6769,9 +6767,9 @@ static INTERRUPT_GEN( hanakanz_irq )
 		return;
 
 	if ((++count % 60) == 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xe2);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xe2);
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xe0);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xe0);
 }
 
 static MACHINE_DRIVER_START( hanakanz )
@@ -6842,9 +6840,9 @@ static INTERRUPT_GEN( mjchuuka_irq )
 		return;
 
 	if ((++count % 60) == 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfa);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfa);
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xf8);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xf8);
 }
 
 
@@ -6901,14 +6899,14 @@ static INTERRUPT_GEN( mjmyster_irq )
 
 	switch( cpu_getiloops() )
 	{
-		case 0:	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xf8);	break;
-		case 1:	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xfa);	break;
+		case 0:	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xf8);	break;
+		case 1:	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfa);	break;
 	}
 }
 
 static INTERRUPT_GEN( rtc_nmi_irq )
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct AY8910interface mjmyster_ay8910_interface =
@@ -6954,9 +6952,9 @@ static INTERRUPT_GEN( hginga_irq )
 		return;
 
 	if ((++count % 60) == 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xee);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xee);
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xf8);
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xf8);
 }
 
 static const struct AY8910interface hginga_ay8910_interface =
@@ -7035,11 +7033,11 @@ static INTERRUPT_GEN( mjflove_irq )
 	{
 		case 0:
 			mjflove_irq_cause &= 1 << 5;
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 			break;
 		case 1:
 			mjflove_irq_cause &= 1 << 6;
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 			break;
 	}
 }
@@ -7062,7 +7060,7 @@ MACHINE_DRIVER_END
     0xee is vblank  */
 static INTERRUPT_GEN( hparadis_irq )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xee);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xee);
 }
 
 static MACHINE_DRIVER_START( hparadis )

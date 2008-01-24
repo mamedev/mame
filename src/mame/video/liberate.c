@@ -99,11 +99,11 @@ WRITE8_HANDLER( deco16_io_w )
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cpunum_set_input_line(0,DECO16_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0,DECO16_IRQ_LINE,CLEAR_LINE);
 			break;
 		case 9: /* Sound */
 			soundlatch_w(0,data);
-			cpunum_set_input_line(1,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 	}
 }

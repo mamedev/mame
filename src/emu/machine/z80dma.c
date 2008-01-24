@@ -312,7 +312,7 @@ static void z80dma_update_status(int which)
 	if (dma[which].intf && dma[which].intf->cpunum >= 0)
 	{
 		//FIXME: Synchronization is done by BUSREQ!
-		cpunum_set_input_line(dma[which].intf->cpunum, INPUT_LINE_HALT,
+		cpunum_set_input_line(Machine, dma[which].intf->cpunum, INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

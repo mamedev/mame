@@ -66,12 +66,12 @@ static void update_irq_state(void)
 	for (i = 4; i >= 0; i--)
 		if (irq_state[i])
 		{
-			cpunum_set_input_line(0, i, ASSERT_LINE);
+			cpunum_set_input_line(Machine, 0, i, ASSERT_LINE);
 			return;
 		}
 
 	/* otherwise, clear them all */
-	cpunum_set_input_line(0, 7, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -157,7 +157,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 		soundlatch_w(0, data & 0xff);
 	}
 }
@@ -174,7 +174,7 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 	return soundlatch_r(0);
 }
 

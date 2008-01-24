@@ -304,41 +304,41 @@ static MACHINE_START( looping )
 
 static INTERRUPT_GEN( looping_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 4);
+	cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
-		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 4);
+		cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 
 static void looping_spcint(int state)
 {
-	cpunum_set_input_line_and_vector(1, 0, state, 6);
+	cpunum_set_input_line_and_vector(Machine, 1, 0, state, 6);
 }
 
 
 static WRITE8_HANDLER( looping_soundlatch_w )
 {
 	soundlatch_w(offset, data);
-	cpunum_set_input_line_and_vector(1, 0, ASSERT_LINE, 4);
+	cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 4);
 }
 
 

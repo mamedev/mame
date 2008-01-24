@@ -656,7 +656,7 @@ static DRIVER_INIT( djboyj )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
@@ -715,7 +715,7 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
@@ -821,7 +821,7 @@ static INTERRUPT_GEN( djboy_interrupt )
 { /* CPU1 uses interrupt mode 2. For now, just alternate the two interrupts. */
 	static int addr = 0xff;
 	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, addr);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, addr);
 }
 
 static MACHINE_DRIVER_START( djboy )

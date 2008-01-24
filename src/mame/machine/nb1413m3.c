@@ -54,7 +54,7 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 
 		if (nb1413m3_nmi_enable)
 		{
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 			nb1413m3_nmi_count++;
 		}
 
@@ -198,11 +198,11 @@ INTERRUPT_GEN( nb1413m3_interrupt )
 	{
 //      nb1413m3_busyflag = 1;
 //      nb1413m3_busyctr = 0;
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	if (nb1413m3_nmi_enable)
 	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	#if NB1413M3_CHEAT
@@ -211,7 +211,7 @@ INTERRUPT_GEN( nb1413m3_interrupt )
 #else
 //  nb1413m3_busyflag = 1;
 //  nb1413m3_busyctr = 0;
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 
 #if NB1413M3_DEBUG
 	popmessage("NMI SW:%01X CLOCK:%02X COUNT:%02X", nb1413m3_nmi_enable, nb1413m3_nmi_clock, nb1413m3_nmi_count);

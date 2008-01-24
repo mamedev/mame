@@ -80,7 +80,7 @@ static WRITE8_HANDLER( champbas_dac_w )
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
 	data &= 1;
-	cpunum_set_input_line(2, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* champbja another protection */

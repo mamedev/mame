@@ -78,10 +78,10 @@ WRITE8_HANDLER( gyruss_filter1_w )
 WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
 {
 	/* writing to this register triggers IRQ on the sound CPU */
-	cpunum_set_input_line_and_vector(2,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
 }
 
 WRITE8_HANDLER( gyruss_i8039_irq_w )
 {
-	cpunum_set_input_line(3, 0, PULSE_LINE);
+	cpunum_set_input_line(Machine, 3, 0, PULSE_LINE);
 }

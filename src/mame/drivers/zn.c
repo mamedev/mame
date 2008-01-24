@@ -593,13 +593,13 @@ static WRITE8_HANDLER( qsound_bankswitch_w )
 
 static INTERRUPT_GEN( qsound_interrupt )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
 	soundlatch_w(0, data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static DRIVER_INIT( coh1000c )
@@ -1266,7 +1266,7 @@ ADDRESS_MAP_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =
@@ -1879,13 +1879,9 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
 	if (offset)
-	{
-		cpunum_set_input_line(1, 2, HOLD_LINE);	// irq 2 on the 68k
-	}
+		cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-	{
 		soundlatch_w(0, data);
-	}
 }
 
 static DRIVER_INIT( coh1002e )

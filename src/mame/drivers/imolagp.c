@@ -112,7 +112,7 @@ static WRITE8_HANDLER( transmit_data_w )
 }
 static READ8_HANDLER( trigger_slave_nmi_r )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -365,7 +365,7 @@ static INTERRUPT_GEN( master_interrupt )
 		memcpy( &slave_workram[0x80], mComData, mComCount );
 		mComCount = 0;
 #endif
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 	else
 	{
@@ -386,7 +386,7 @@ static INTERRUPT_GEN( master_interrupt )
 			{
 				oldsteer = (oldsteer+1)&0xf;
 			}
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 } /* master_interrupt */

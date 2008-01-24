@@ -114,8 +114,9 @@ static TIMER_CALLBACK( equites_synth_callback )
 {
 	static int parity = 0;
 
-	if (parity^=1) cpunum_set_input_line(1, I8085_INTR_LINE, HOLD_LINE);
-	cpunum_set_input_line(1, I8085_RST75_LINE, HOLD_LINE);
+	if (parity^=1)
+		cpunum_set_input_line(machine, 1, I8085_INTR_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, I8085_RST75_LINE, HOLD_LINE);
 }
 
 // Optimized Mersenne Twister - courtesy of Shawn J. Cokus, University of Washington

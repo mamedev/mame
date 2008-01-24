@@ -153,7 +153,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	if (last == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 	}
 
 	last = data;
@@ -162,14 +162,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	cpunum_set_input_line(2, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(2, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 

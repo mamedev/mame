@@ -70,7 +70,7 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,0,ASSERT_LINE);		// Generate an IRQ
+		cpunum_set_input_line(Machine, 1,0,ASSERT_LINE);		// Generate an IRQ
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
 	}
 }
@@ -285,7 +285,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( esd16_sound_command_r )
 {
 	/* Clear IRQ only after reading the command, or some get lost */
-	cpunum_set_input_line(1,0,CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
 	return soundlatch_r(0);
 }
 

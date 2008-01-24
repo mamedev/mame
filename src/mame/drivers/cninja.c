@@ -59,13 +59,13 @@ static UINT16 *cninja_ram;
 static WRITE16_HANDLER( cninja_sound_w )
 {
 	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(1,0,HOLD_LINE);
+	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 }
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
 	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
@@ -83,7 +83,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[3]&0xffff;
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[4]&0xffff;
 
-	cpunum_set_input_line(0, (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
 	timer_adjust(raster_irq_timer,attotime_never,0,attotime_zero);
 }
 
@@ -95,8 +95,8 @@ static READ16_HANDLER( cninja_irq_r )
 		return cninja_scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpunum_set_input_line(0, 3, CLEAR_LINE);
-		cpunum_set_input_line(0, 4, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 3, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 4, CLEAR_LINE);
 		return 0;
 	}
 
@@ -752,12 +752,12 @@ static MACHINE_RESET( cninja )
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
 }
 
 static void sound_irq2(int state)
 {
-	cpunum_set_input_line(1,0,state);
+	cpunum_set_input_line(Machine, 1,0,state);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

@@ -214,7 +214,7 @@ static PALETTE_INIT( cham24 )
 
 static void ppu_irq( int num, int *ppu_regs )
 {
-	cpunum_set_input_line(num, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, num, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

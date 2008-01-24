@@ -466,7 +466,7 @@ These games don't have VBlank interrupts.
 Interrupts are still used by the game, coin insertion generates an IRQ.
 
 ***************************************************************************/
-static void btime_interrupt(int generated_interrupt, int active_high)
+static void btime_interrupt(running_machine *machine, int generated_interrupt, int active_high)
 {
 	static int coin;
 	int port;
@@ -479,7 +479,7 @@ static void btime_interrupt(int generated_interrupt, int active_high)
 		if (coin == 0)
 		{
 			coin = 1;
-			cpunum_set_input_line(0, generated_interrupt, (generated_interrupt == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			cpunum_set_input_line(machine, 0, generated_interrupt, (generated_interrupt == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 		}
 	}
 	else coin = 0;
@@ -487,23 +487,23 @@ static void btime_interrupt(int generated_interrupt, int active_high)
 
 static INTERRUPT_GEN( btime_irq_interrupt )
 {
-	btime_interrupt(0, 1);
+	btime_interrupt(machine, 0, 1);
 }
 
 static INTERRUPT_GEN( zoar_irq_interrupt )
 {
-	btime_interrupt(0, 0);
+	btime_interrupt(machine, 0, 0);
 }
 
 static INTERRUPT_GEN( btime_nmi_interrupt )
 {
-	btime_interrupt(INPUT_LINE_NMI, 0);
+	btime_interrupt(machine, INPUT_LINE_NMI, 0);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 #define COMMON_INPUTS\

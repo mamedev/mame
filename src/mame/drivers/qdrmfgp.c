@@ -279,13 +279,13 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 	{
 		case 0:
 			if (control & 0x0001)
-				cpunum_set_input_line(0, 1, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 			break;
 
 		case 1:
 			/* trigger V-blank interrupt */
 			if (control & 0x0004)
-				cpunum_set_input_line(0, 3, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 			break;
 	}
 }
@@ -295,9 +295,9 @@ static void ide_interrupt(int state)
 	if (control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			cpunum_set_input_line(0, 4, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
 		else
-			cpunum_set_input_line(0, 4, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 4, CLEAR_LINE);
 	}
 }
 
@@ -306,14 +306,14 @@ static void ide_interrupt(int state)
 static TIMER_CALLBACK( gp2_timer_callback )
 {
 	if (control & 0x0004)
-		cpunum_set_input_line(0, 3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
 {
 	/* trigger V-blank interrupt */
 	if (control & 0x0008)
-		cpunum_set_input_line(0, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(int state)
@@ -325,9 +325,9 @@ static void gp2_ide_interrupt(int state)
 			if (gp2_irq_control)
 				gp2_irq_control = 0;
 			else
-				cpunum_set_input_line(0, 5, HOLD_LINE);
+				cpunum_set_input_line(Machine, 0, 5, HOLD_LINE);
 		} else {
-			cpunum_set_input_line(0, 5, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 5, CLEAR_LINE);
 		}
 	}
 }
@@ -613,7 +613,7 @@ static const struct ide_interface gp2_ide_intf =
 static void sound_irq(void)
 {
 	if (control & 0x0001)
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(Machine, 0, 1, HOLD_LINE);
 }
 
 static const struct K054539interface k054539_interface =

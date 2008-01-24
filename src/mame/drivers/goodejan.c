@@ -266,9 +266,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( goodejan_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0x208/4);
+		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x208/4);
 	else
-		cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0x00c/4);
+		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x00c/4);
 }
 
 static MACHINE_DRIVER_START( goodejan )

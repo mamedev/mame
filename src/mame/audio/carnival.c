@@ -228,20 +228,14 @@ WRITE8_HANDLER( carnival_audio_2_w )
 	port2State = data;
 
 	if ( bitsGoneLow & OUT_PORT_2_BEAR )
-	{
 		PLAY( SND_BEAR, 0 );
-	}
 
 	if ( bitsGoneLow & OUT_PORT_2_RANKING )
-	{
 		PLAY( SND_RANKING, 0 );
-	}
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
-	{
 		/* reset output is no longer asserted active low */
-		cpunum_set_input_line(CPU_MUSIC_ID, INPUT_LINE_RESET, PULSE_LINE );
-	}
+		cpunum_set_input_line(Machine, CPU_MUSIC_ID, INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

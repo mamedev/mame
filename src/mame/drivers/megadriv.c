@@ -512,13 +512,9 @@ static void megadrive_vdp_set_register(int regnum, UINT8 value)
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-			{
-				cpunum_set_input_line(0,4,HOLD_LINE);
-			}
+				cpunum_set_input_line(Machine, 0,4,HOLD_LINE);
 			else
-			{
-				cpunum_set_input_line(0,4,CLEAR_LINE);
-			}
+				cpunum_set_input_line(Machine, 0,4,CLEAR_LINE);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -533,13 +529,9 @@ static void megadrive_vdp_set_register(int regnum, UINT8 value)
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE)
-			{
-				cpunum_set_input_line(0,6,HOLD_LINE);
-			}
+				cpunum_set_input_line(Machine, 0,6,HOLD_LINE);
 			else
-			{
-				cpunum_set_input_line(0,6,CLEAR_LINE);
-			}
+				cpunum_set_input_line(Machine, 0,6,CLEAR_LINE);
 		}
 
 		/* ??? */
@@ -2261,13 +2253,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 
 		}
 	}
@@ -2277,13 +2269,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 	else // word access
@@ -2292,13 +2284,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 }
@@ -2311,13 +2303,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2327,13 +2319,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 
 		}
@@ -2344,13 +2336,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -4318,11 +4310,11 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 		if (genesis_scanline_counter==megadrive_z80irq_scanline)
 		{
-			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpunum_set_input_line(1,0,HOLD_LINE);
+			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		}
 		if (genesis_scanline_counter==megadrive_z80irq_scanline+1)
 		{
-			cpunum_set_input_line(1,0,CLEAR_LINE);
+			cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
 		}
 
 
@@ -4340,14 +4332,14 @@ static TIMER_CALLBACK( irq6_on_callback )
 
 	{
 //      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE) cpunum_set_input_line(0,6,HOLD_LINE);
+		if (MEGADRIVE_REG01_IRQ6_ENABLE) cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 	}
 }
 
 static TIMER_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cpunum_set_input_line(0,4,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -4395,9 +4387,9 @@ MACHINE_RESET( megadriv )
 
 
 	genz80.z80_is_reset = 1;
-	cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	genz80.z80_has_bus = 1;
-	cpunum_set_input_line(genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+	cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 	genz80.z80_bank_pos = 0;
 	genz80.z80_bank_addr = 0;
 	genesis_scanline_counter = -1;
@@ -4453,9 +4445,9 @@ VIDEO_EOF(megadriv)
 	megadrive_sprite_collision=0;//? when to reset this ..
 	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	megadrive_imode_odd_frame^=1;
-//  cpunum_set_input_line(1,0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+//  cpunum_set_input_line(machine, 1,0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (MD_RESET_BUTTON)  cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+	if (MD_RESET_BUTTON)  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;

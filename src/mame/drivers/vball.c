@@ -143,7 +143,7 @@ static WRITE8_HANDLER( vb_bankswitch_w )
 
 static WRITE8_HANDLER( cpu_sound_command_w ) {
 	soundlatch_w( offset, data );
-	cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -388,7 +388,7 @@ GFXDECODE_END
 
 static void vball_irq_handler(int irq)
 {
-	cpunum_set_input_line( 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

@@ -269,7 +269,7 @@ static void update_irq(void)
 
 	if (curr_level != last_irq_level)
 	{
-		cpunum_set_input_line(0,curr_level,curr_level ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0,curr_level,curr_level ? ASSERT_LINE : CLEAR_LINE);
 		last_irq_level = curr_level;
 	}
 }
@@ -681,7 +681,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

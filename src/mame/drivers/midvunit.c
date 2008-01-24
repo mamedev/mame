@@ -146,7 +146,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpunum_set_input_line(0, 3, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else
@@ -157,7 +157,7 @@ static READ32_HANDLER( midvunit_adc_r )
 
 static TIMER_CALLBACK( adc_ready )
 {
-	cpunum_set_input_line(0, 3, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
 }
 
 

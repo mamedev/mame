@@ -375,17 +375,17 @@ static void megatech_set_genz80_as_sms_standard_map(void)
 
 }
 
-static void megatech_select_game(int gameno)
+static void megatech_select_game(running_machine *machine, int gameno)
 {
 	UINT8* game_region;
 	UINT8* bios_region;
 
 	printf("game 0 selected\n");
 
-	cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	sndti_reset(SOUND_YM2612, 0);
 
 	game_region = memory_region(REGION_USER1 + (gameno*2) + 0);
@@ -409,8 +409,8 @@ static void megatech_select_game(int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map();
-			cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -419,8 +419,8 @@ static void megatech_select_game(int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80();
-			cpunum_set_input_line(0, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -429,10 +429,10 @@ static void megatech_select_game(int gameno)
 	}
 	else
 	{
-		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
-		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	//  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(REGION_CPU3)+0x8000, 0x00, 0x8000);
@@ -454,7 +454,7 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 	mt_cart_select_reg = data;
 
 
-	megatech_select_game(mt_cart_select_reg);
+	megatech_select_game(Machine, mt_cart_select_reg);
 
 /*
     if (mt_cart_select_reg==2)
@@ -631,7 +631,7 @@ static MACHINE_RESET(mtnew)
 	MACHINE_RESET_CALL(megadriv);
 	MACHINE_RESET_CALL(megatech_bios);
 	MACHINE_RESET_CALL(megatech_md_sms);
-	megatech_select_game(0);
+	megatech_select_game(machine, 0);
 }
 
 static MACHINE_DRIVER_START( megatech )

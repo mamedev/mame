@@ -94,7 +94,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 			segae_hintpending = 1;
 
 			if  ((segae_vdp_regs[0][0] & 0x10)) {
-				cpunum_set_input_line(2, 0, HOLD_LINE);
+				cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 				return;
 			}
 
@@ -107,7 +107,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 		hintcount = segae_vdp_regs[0][10];
 
 		if ( (sline<0xe0) && (segae_vintpending) ) {
-			cpunum_set_input_line(2, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 		}
 	}
 
@@ -531,7 +531,7 @@ static READ8_HANDLER( megaplay_bios_6404_r )
 static WRITE8_HANDLER( megaplay_bios_6404_w )
 {
 	if(((bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
-		cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 	bios_6404 = data;
 
 //  logerror("BIOS: 0x6404 write: 0x%02x\n",data);

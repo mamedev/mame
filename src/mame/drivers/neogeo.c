@@ -197,7 +197,7 @@ void neogeo_set_display_counter_lsb(UINT16 data)
 }
 
 
-static void update_interrupts(void)
+static void update_interrupts(running_machine *machine)
 {
 	int level = 0;
 
@@ -208,9 +208,9 @@ static void update_interrupts(void)
 
 	/* either set or clear the appropriate lines */
 	if (level)
-		cpunum_set_input_line(0, level, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -220,7 +220,7 @@ void neogeo_acknowledge_interrupt(UINT16 data)
 	if (data & 0x02) display_position_interrupt_pending = 0;
 	if (data & 0x04) vblank_interrupt_pending = 0;
 
-	update_interrupts();
+	update_interrupts(Machine);
 }
 
 
@@ -232,7 +232,7 @@ static TIMER_CALLBACK( display_position_interrupt_callback )
 		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
 		display_position_interrupt_pending = 1;
 
-		update_interrupts();
+		update_interrupts(machine);
 	}
 
 	if (display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_REPEAT)
@@ -265,7 +265,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 
 	vblank_interrupt_pending = 1;
 
-	update_interrupts();
+	update_interrupts(machine);
 
 	/* set timer for next screen */
 	timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, attotime_zero);
@@ -296,19 +296,19 @@ static void start_interrupt_timers(void)
 
 static void audio_cpu_irq(int assert)
 {
-	cpunum_set_input_line(1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_assert_nmi(void)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -748,7 +748,7 @@ static void _set_audio_cpu_rom_source(void)
 	{
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
-		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_activecpu_get_pc(), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
@@ -1014,7 +1014,7 @@ static MACHINE_RESET( neogeo )
 	start_interrupt_timers();
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
-	update_interrupts();
+	update_interrupts(machine);
 }
 
 

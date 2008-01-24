@@ -323,16 +323,16 @@ static MACHINE_START( lgp )
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( vblank_callback_lgp )
 {
 	// NMI
-	//cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	//cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	// IRQ
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 
 	laserdisc_vsync(discinfo);

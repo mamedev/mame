@@ -66,7 +66,7 @@ static WRITE32_HANDLER( soundr3k_w )
 		sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			cpunum_set_input_line( 1, 1, HOLD_LINE );
+			cpunum_set_input_line(Machine, 1, 1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_LSW32 )
@@ -140,7 +140,7 @@ static WRITE32_HANDLER( eeprom_w )
 	EEPROM_write_bit( ( data & 0x01 ) ? 1 : 0 );
 	EEPROM_set_clock_line( ( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
 	EEPROM_set_cs_line( ( data & 0x02 ) ? CLEAR_LINE : ASSERT_LINE );
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static CUSTOM_INPUT( eeprom_bit_r )

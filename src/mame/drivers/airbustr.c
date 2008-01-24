@@ -274,7 +274,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void airbustr_bankswitch(int cpunum, int data)
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( soundcommand_w )
 {
 	soundlatch_w(0, data);
 	soundlatch_status = 1;	// soundlatch has been written
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
@@ -570,7 +570,7 @@ static INTERRUPT_GEN( master_interrupt )
 	static int addr = 0xff;
 
 	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, addr);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
@@ -578,7 +578,7 @@ static INTERRUPT_GEN( slave_interrupt )
 	static int addr = 0xfd;
 
 	addr ^= 0x02;
-	cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, addr);
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, addr);
 }
 
 /* Machine Initialization */

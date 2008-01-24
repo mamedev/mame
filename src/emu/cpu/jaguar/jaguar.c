@@ -496,7 +496,7 @@ static int jaguargpu_execute(int cycles)
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -542,7 +542,7 @@ static int jaguardsp_execute(int cycles)
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -1362,7 +1362,7 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			jaguar.ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpunum_set_input_line(cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
 				if (cpu_getexecutingcpu() >= 0)
 					cpu_yield();
 			}
@@ -1477,7 +1477,7 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			jaguar.ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpunum_set_input_line(cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
 				if (cpu_getexecutingcpu() >= 0)
 					cpu_yield();
 			}

@@ -223,9 +223,9 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 static void exidy440_update_firq(void)
 {
 	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
-		cpunum_set_input_line(0, 1, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 }
 
 

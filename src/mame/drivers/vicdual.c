@@ -92,7 +92,7 @@ static CUSTOM_INPUT( vicdual_read_coin_status )
 		coin_counter_w(0, 1);
 		coin_counter_w(0, 0);
 
-		cpunum_set_input_line(0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
 		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(0))), NULL, 0, clear_coin_status);

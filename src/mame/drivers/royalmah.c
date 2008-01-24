@@ -3354,7 +3354,7 @@ MACHINE_DRIVER_END
 static INTERRUPT_GEN( suzume_irq )
 {
 	if ( suzume_bank & 0x40 )
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( suzume )
@@ -3404,9 +3404,9 @@ static INTERRUPT_GEN( janptr96_interrupt )
 {
 	switch(cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x80);	break;	// vblank
-		case 1:		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x82);	break;	// rtc
-		default:	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x84);			// demo
+		case 0:		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x80);	break;	// vblank
+		case 1:		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x82);	break;	// rtc
+		default:	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x84);			// demo
 	}
 }
 
@@ -3447,8 +3447,8 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 {
 	switch(cpu_getiloops())
 	{
-		case 0:		cpunum_set_input_line(0, INPUT_LINE_IRQ0, HOLD_LINE);	break;	// vblank
-		case 1:		cpunum_set_input_line(0, INPUT_LINE_IRQ1, HOLD_LINE);	break;	// rtc
+		case 0:		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);	break;	// vblank
+		case 1:		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, HOLD_LINE);	break;	// rtc
 	}
 }
 

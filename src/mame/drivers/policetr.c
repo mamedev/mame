@@ -121,13 +121,13 @@ static offs_t speedup_pc;
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cpunum_set_input_line(0, R3000_IRQ5, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, R3000_IRQ5, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(0, R3000_IRQ4, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, R3000_IRQ4, ASSERT_LINE);
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, irq5_gen);
 }
 

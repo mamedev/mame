@@ -112,9 +112,7 @@ static INTERRUPT_GEN( sprint2 )
 	watchdog_enable(machine, !service_mode());
 
 	if (!service_mode())
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

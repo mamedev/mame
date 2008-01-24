@@ -76,12 +76,12 @@ static INTERRUPT_GEN( dbz_interrupt )
 	switch (cpu_getiloops())
 	{
 		case 0:
-			cpunum_set_input_line(0, MC68000_IRQ_2, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
 			break;
 
 		case 1:
 			if (K053246_is_IRQ_enabled())
-				cpunum_set_input_line(0, MC68000_IRQ_4, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 			break;
 	}
 }
@@ -134,15 +134,15 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq(int irq)
 {
 	if (irq)
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )

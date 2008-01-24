@@ -33,9 +33,9 @@ extern VIDEO_EOF( exedexes );
 static INTERRUPT_GEN( exedexes_interrupt )
 {
 	if (cpu_getiloops() != 0)
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	else
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
 
 

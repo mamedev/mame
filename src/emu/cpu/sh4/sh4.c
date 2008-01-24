@@ -4406,7 +4406,7 @@ static void sh4_set_irln_input(int cpunum, int value)
 	if (sh4.irln == value)
 		return;
 	sh4.irln = value;
-	cpunum_set_input_line(cpunum, SH4_IRLn, PULSE_LINE);
+	cpunum_set_input_line(Machine, cpunum, SH4_IRLn, PULSE_LINE);
 }
 
 static void set_irq_line(int irqline, int state) // set state of external interrupt line

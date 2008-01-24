@@ -474,7 +474,7 @@ static NVRAM_HANDLER( simpl156 )
 
 static INTERRUPT_GEN( simpl156_vbl_interrupt )
 {
-	cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 

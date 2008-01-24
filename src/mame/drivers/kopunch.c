@@ -19,17 +19,17 @@ static INTERRUPT_GEN( kopunch_interrupt )
 	{
 		if (~input_port_1_r(0) & 0x80)	/* coin 1 */
 		{
-			cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xf7);	/* RST 30h */
+			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
 		else if (~input_port_1_r(0) & 0x08)	/* coin 2 */
 		{
-			cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xef);	/* RST 28h */
+			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
 		}
 	}
 
-	cpunum_set_input_line_and_vector(0,0,HOLD_LINE,0xff);	/* RST 38h */
+	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);	/* RST 38h */
 }
 
 static READ8_HANDLER( kopunch_in_r )

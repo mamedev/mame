@@ -94,18 +94,18 @@ static UINT8 unknown_irq;
 static UINT8 agallet_vblank_irq;
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sound_irq || unknown_irq)
-		cpunum_set_input_line(0, irq_level, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, irq_level, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, irq_level, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, irq_level, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( cave_vblank_start )
 {
 	vblank_irq = 1;
-	update_irq_state();
+	update_irq_state(machine);
 	cave_get_sprite_info(machine);
 	agallet_vblank_irq = 1;
 }
@@ -115,7 +115,7 @@ static TIMER_CALLBACK( cave_vblank_end )
 	if(cave_kludge == 3)	/* mazinger metmqstr */
 	{
 		unknown_irq = 1;
-		update_irq_state();
+		update_irq_state(machine);
 	}
 	agallet_vblank_irq = 0;
 }
@@ -131,7 +131,7 @@ static INTERRUPT_GEN( cave_interrupt )
 static void sound_irq_gen(int state)
 {
 	sound_irq = (state != 0);
-	update_irq_state();
+	update_irq_state(Machine);
 }
 
 
@@ -161,7 +161,7 @@ static READ16_HANDLER( cave_irq_cause_r )
 	if (offset == 4/2)	vblank_irq = 0;
 	if (offset == 6/2)	unknown_irq = 0;
 
-	update_irq_state();
+	update_irq_state(Machine);
 
 /*
     sailormn and agallet wait for bit 2 of $b80001 to go 1 -> 0.
@@ -221,7 +221,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
 	soundlatch_word_w(offset,data,mem_mask);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
@@ -1994,7 +1994,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

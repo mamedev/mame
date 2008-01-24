@@ -53,9 +53,9 @@ static WRITE8_HANDLER( coins_w )
 static WRITE8_HANDLER( snd_irq_w )
 {
 	if(data == 1)
-		cpunum_set_input_line_and_vector(1, 0, ASSERT_LINE, 0x38);
+		cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 0x38);
 	else
-		cpunum_set_input_line_and_vector(1, 0, CLEAR_LINE, 0x38);
+		cpunum_set_input_line_and_vector(Machine, 1, 0, CLEAR_LINE, 0x38);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

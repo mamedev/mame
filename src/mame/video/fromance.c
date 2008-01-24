@@ -292,7 +292,7 @@ WRITE8_HANDLER( fromance_scroll_w )
 
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	if (param != 0)
 		timer_adjust(crtc_timer, attotime_make(0, machine->screen[0].refresh / param), 0, attotime_make(0, machine->screen[0].refresh / param));
 }

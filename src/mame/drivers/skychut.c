@@ -414,7 +414,7 @@ static WRITE8_HANDLER( iremm15_a100_w )
 static READ8_HANDLER( iremm10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	return 0x00;
 }
 
@@ -434,26 +434,26 @@ static TIMER_CALLBACK( skychut_callback )
 {
     if (param==0)
     {
-	    cpunum_set_input_line(0, 0, ASSERT_LINE);
+	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	    timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+16, 0), NULL, 1,skychut_callback);
     }
     if (param==1)
     {
-	    cpunum_set_input_line(0, 0, ASSERT_LINE);
+	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
     	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+24, 0), NULL, 2,skychut_callback);
     }
     if (param==-1)
-	    cpunum_set_input_line(0, 0, CLEAR_LINE);
+	    cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 }
 
 static INTERRUPT_GEN( iremm11_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     else
     {
-    	cpunum_set_input_line(0, 0, ASSERT_LINE);
+    	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
     	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,skychut_callback);
     }
 }
@@ -461,18 +461,18 @@ static INTERRUPT_GEN( iremm11_interrupt )
 static INTERRUPT_GEN( iremm10_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     else
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( iremm15_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     else
     {
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
     	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,skychut_callback);
     }
 }

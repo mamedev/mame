@@ -482,7 +482,7 @@ static WRITE8_HANDLER( demndrgn_sound_w )
 
 static void ctc_interrupt(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(Machine, 1, 0, state);
 }
 
 
@@ -515,7 +515,7 @@ static MACHINE_START( tenpindx )
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
 	soundlatch_w(offset, data);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

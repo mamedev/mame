@@ -451,7 +451,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 	switch (cpu_getiloops())
 	{
 		case 0:
-			cpunum_set_input_line(0, 0, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 			break;
 		default:
 			h8_3002_InterruptRequest(24);

@@ -601,7 +601,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( statriv2_interrupt )
 {
-	cpunum_set_input_line(0, I8085_RST75_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, I8085_RST75_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( statriv2 )

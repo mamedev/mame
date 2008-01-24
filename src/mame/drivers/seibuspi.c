@@ -840,7 +840,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cpunum_set_input_line( 0, 0,CLEAR_LINE );
+	cpunum_set_input_line(Machine, 0, 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -912,9 +912,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( !(mem_mask & 0x000000ff) ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
-			cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE );
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE );
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -1107,13 +1107,9 @@ static WRITE8_HANDLER( flashrom_write )
 static void irqhandler(int state)
 {
 	if (state)
-	{
-		cpunum_set_input_line_and_vector(1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
-	}
+		cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-	{
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
-	}
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 static const struct YMF271interface ymf271_interface =
@@ -1731,7 +1727,7 @@ static NVRAM_HANDLER( sxx2f )
 
 static INTERRUPT_GEN( spi_interrupt )
 {
-	cpunum_set_input_line( 0, 0, ASSERT_LINE );
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
 }
 
 static int spi_irq_callback(int irq)
@@ -1749,7 +1745,7 @@ static MACHINE_RESET( spi )
 	UINT8 *rombase = memory_region(REGION_USER1);
 	UINT8 flash_data = rombase[0x1ffffc];
 
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 	cpunum_set_irq_callback(0, spi_irq_callback);
 
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sound_fifo_r);

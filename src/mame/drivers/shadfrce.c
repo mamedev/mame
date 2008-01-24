@@ -212,7 +212,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 	if (ACCESSING_MSB)
 	{
 		soundlatch_w(1,data >> 8);
-		cpunum_set_input_line( 1, INPUT_LINE_NMI, PULSE_LINE );
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -533,7 +533,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line( 1, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -543,9 +543,9 @@ static const struct YM2151interface ym2151_interface =
 
 static INTERRUPT_GEN( shadfrce_interrupt ) {
 	if( cpu_getiloops() == 0 )
-		cpunum_set_input_line(0, 3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 

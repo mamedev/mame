@@ -64,13 +64,13 @@ static UINT32 *gunbustr_ram;
 
 static TIMER_CALLBACK( gunbustr_interrupt5 )
 {
-	cpunum_set_input_line(0,5,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, gunbustr_interrupt5);
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( gunbustr_palette_w )

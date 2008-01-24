@@ -84,7 +84,7 @@ static READ8_HANDLER( triothep_control_r )
 static WRITE8_HANDLER( actfancr_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -377,7 +377,7 @@ GFXDECODE_END
 
 static void sound_irq(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate); /* IRQ */
+	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
 }
 
 static const struct YM3812interface ym3812_interface =

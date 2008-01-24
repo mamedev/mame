@@ -274,7 +274,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(1,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
 	}
 }
 
@@ -370,7 +370,7 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -3672,7 +3672,7 @@ static const struct YM2203interface ym2203_nmk004_interface =
 
 static void ym2203_irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -3682,8 +3682,8 @@ static const struct YM2203interface ym2203_interface =
 
 static INTERRUPT_GEN( nmk_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(0, 4, HOLD_LINE);
-	else cpunum_set_input_line(0, 2, HOLD_LINE);
+	if (cpu_getiloops() == 0) cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	else cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 
@@ -4987,7 +4987,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface afega_ym2151_intf =

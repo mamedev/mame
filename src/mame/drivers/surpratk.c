@@ -25,7 +25,7 @@ static UINT8 *ram;
 
 static INTERRUPT_GEN( surpratk_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) cpunum_set_input_line(0,0,HOLD_LINE);
+	if (K052109_is_IRQ_enabled()) cpunum_set_input_line(machine, 0,0,HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -223,7 +223,7 @@ INPUT_PORTS_END
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(0,KONAMI_FIRQ_LINE,linestate);
+	cpunum_set_input_line(Machine, 0,KONAMI_FIRQ_LINE,linestate);
 }
 
 static const struct YM2151interface ym2151_interface =

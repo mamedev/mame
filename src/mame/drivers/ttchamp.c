@@ -217,7 +217,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( ttchamp )

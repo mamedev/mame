@@ -41,13 +41,13 @@ extern int (*const cpu_irq_callbacks[])(int);
  *************************************/
 
 /* Set the logical state (ASSERT_LINE/CLEAR_LINE) of the an input line on a CPU */
-void cpunum_set_input_line(int cpunum, int line, int state);
+void cpunum_set_input_line(running_machine *machine, int cpunum, int line, int state);
 
 /* Set the vector to be returned during a CPU's interrupt acknowledge cycle */
 void cpunum_set_input_line_vector(int cpunum, int irqline, int vector);
 
 /* Set the logical state (ASSERT_LINE/CLEAR_LINE) of the an input line on a CPU and its associated vector */
-void cpunum_set_input_line_and_vector(int cpunum, int line, int state, int vector);
+void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int line, int state, int vector);
 
 /* Install a driver callback for IRQ acknowledge */
 void cpunum_set_irq_callback(int cpunum, int (*callback)(int irqline));

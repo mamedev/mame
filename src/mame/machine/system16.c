@@ -55,7 +55,7 @@ GFXDECODE_END
 
 static void sound_cause_nmi( int chip ){
 	/* upd7759 callback */
-	cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

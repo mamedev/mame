@@ -34,7 +34,7 @@ void signal_rcp_interrupt(int interrupt)
 	{
 		mi_interrupt |= interrupt;
 
-		cpunum_set_input_line(0, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -44,7 +44,7 @@ void clear_rcp_interrupt(int interrupt)
 
 	//if (!mi_interrupt)
 	{
-		cpunum_set_input_line(0, INPUT_LINE_IRQ0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -216,7 +216,7 @@ static void sp_set_status(UINT32 status)
 	{
 		//cpu_trigger(Machine, 6789);
 
-		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT);
 		//rsp_sp_status |= SP_STATUS_HALT;
 	}
@@ -316,7 +316,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                     //  cpu_spinuntil_trigger(6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cpunum_set_input_line(1, INPUT_LINE_HALT, CLEAR_LINE);
+                        cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
                         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_HALT );
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
@@ -328,7 +328,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+                    cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
                     cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT );
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }
@@ -1560,7 +1560,7 @@ void n64_machine_reset(void)
 	audio_timer = timer_alloc(audio_timer_callback, NULL);
 	timer_adjust(audio_timer, attotime_never, 0, attotime_never);
 
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
     // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
     boot_checksum = 0;

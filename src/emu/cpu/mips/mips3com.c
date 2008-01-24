@@ -724,7 +724,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 
 static TIMER_CALLBACK( compare_int_callback )
 {
-	cpunum_set_input_line(param, MIPS3_IRQ5, ASSERT_LINE);
+	cpunum_set_input_line(machine, param, MIPS3_IRQ5, ASSERT_LINE);
 }
 
 

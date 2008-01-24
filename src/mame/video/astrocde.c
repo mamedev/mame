@@ -426,11 +426,11 @@ VIDEO_UPDATE( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
-void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
+static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback, UINT8 hfeedback)
 {
 	/* both bits 1 and 4 enable lightpen interrupts; bit 4 enables them even in horizontal */
 	/* blanking regions; we treat them both the same here */
@@ -438,12 +438,12 @@ void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback)
 	{
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
-			cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, interrupt_vector & 0xf0);
+			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector & 0xf0);
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
+			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 
@@ -474,19 +474,19 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
-			cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, interrupt_vector);
+			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector);
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, interrupt_vector);
+			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 	}
 
 	/* on some games, the horizontal drive line is conected to the lightpen interrupt */
 	else if (astrocade_video_config & AC_LIGHTPEN_INTS)
-		astrocade_trigger_lightpen(astrocade_scanline, 8);
+		astrocade_trigger_lightpen(machine, astrocade_scanline, 8);
 
 	/* advance to the next scanline */
 	scanline++;

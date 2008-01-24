@@ -94,9 +94,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_w )
 	else
 	{
 		if (data & 0x100)
-		{
-			cpunum_set_input_line_and_vector(1, 0, HOLD_LINE, 0xff);
-		}
+			cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff);
 	}
 }
 

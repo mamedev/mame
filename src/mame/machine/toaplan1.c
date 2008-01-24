@@ -30,7 +30,7 @@ UINT8 *toaplan1_sharedram;
 INTERRUPT_GEN( toaplan1_interrupt )
 {
 	if (toaplan1_intenable)
-		cpunum_set_input_line(0, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 WRITE16_HANDLER( toaplan1_intenable_w )
@@ -98,7 +98,7 @@ WRITE16_HANDLER( demonwld_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			logerror("Turning 68000 on\n");
-			cpunum_set_input_line(0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		demonwld_dsp_BIO = ASSERT_LINE;
@@ -117,15 +117,15 @@ static void demonwld_dsp(int enable)
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(2, 0, ASSERT_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		cpunum_set_input_line(2, 0, CLEAR_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 static void demonwld_restore_dsp(void)
@@ -228,7 +228,7 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 		if (Machine->drv->sound[0].type == SOUND_YM3812)
 			sndti_reset(SOUND_YM3812, 0);
 		if (Machine->drv->cpu[1].type == CPU_Z80)
-			cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

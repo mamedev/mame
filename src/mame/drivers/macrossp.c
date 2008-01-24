@@ -279,7 +279,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
 		soundlatch_word_w(0,data >> 16,0);
 		sndpending = 1;
-		cpunum_set_input_line(1,2,HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 	}
@@ -516,7 +516,7 @@ static void irqhandler(int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpunum_set_input_line(1,1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(Machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct ES5506interface es5506_interface =

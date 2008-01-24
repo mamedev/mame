@@ -49,7 +49,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static WRITE8_HANDLER( sound_reset_w )
 {
 	if ( data & 1 )
-		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE );
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -250,7 +250,7 @@ static const struct AY8910interface ay8910_interface =
 
 static INTERRUPT_GEN( timelimt_irq ) {
 	if ( nmi_enabled )
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/

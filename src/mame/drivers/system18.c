@@ -181,7 +181,7 @@ static void shdancbl_msm5205_callback(int data)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface shdancbl_msm5205_interface =
@@ -195,7 +195,7 @@ static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected p
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_LSB ){
 		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line( 1, 0, HOLD_LINE );
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
 	}
 }
 
@@ -339,7 +339,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( sound_command_nmi_w ){
 	if( ACCESSING_LSB ){
 		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

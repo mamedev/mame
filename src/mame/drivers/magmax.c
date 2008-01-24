@@ -33,13 +33,13 @@ static WRITE16_HANDLER( magmax_sound_w )
 	if (ACCESSING_LSB)
 	{
 		sound_latch = (data & 0xff) << 1;
-		cpunum_set_input_line(1, 0, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( magmax_sound_irq_ack )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 	return 0;
 }
 

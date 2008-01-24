@@ -106,8 +106,8 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 	tankbatt_sound_enable = !data;
 	if (data != 0)
 	{
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
-		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
 	if (data) sample_stop (2);
@@ -119,8 +119,8 @@ static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 	tankbatt_nmi_enable = data;
 	if (data != 0)
 	{
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
-		cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 //  interrupt_enable_w (offset, data);
 }
@@ -176,8 +176,8 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
-	if ((readinputport (0) & 0x60) == 0) cpunum_set_input_line(0,0,HOLD_LINE);
-	else if (tankbatt_nmi_enable) cpunum_set_input_line(0,INPUT_LINE_NMI,PULSE_LINE);
+	if ((readinputport (0) & 0x60) == 0) cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	else if (tankbatt_nmi_enable) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )

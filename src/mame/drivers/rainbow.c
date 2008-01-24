@@ -267,7 +267,7 @@ static WRITE16_HANDLER( jumping_sound_w )
 	if (ACCESSING_LSB)
 	{
 		jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		cpunum_set_input_line(1,0,HOLD_LINE);
+		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -598,7 +598,7 @@ GFXDECODE_END
 
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

@@ -28,7 +28,7 @@ static INTERRUPT_GEN( blockout_interrupt )
 	/* interrupt 6 is vblank */
 	/* interrupt 5 reads coin inputs - might have to be triggered only */
 	/* when a coin is inserted */
-	cpunum_set_input_line(0, 6 - cpu_getiloops(), HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 6 - cpu_getiloops(), HOLD_LINE);
 }
 
 static WRITE16_HANDLER( blockout_sound_command_w )
@@ -36,7 +36,7 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -303,7 +303,7 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 static void blockout_irq_handler(int irq)
 {
-	cpunum_set_input_line_and_vector(1,0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
 }
 
 static const struct YM2151interface ym2151_interface =

@@ -47,7 +47,7 @@ static TIMER_CALLBACK( tmp68301_timer_callback )
 		tmp68301_irq_vector[level]	=	IVNR & 0x00e0;
 		tmp68301_irq_vector[level]	+=	4+i;
 
-		cpunum_set_input_line(0,level,HOLD_LINE);
+		cpunum_set_input_line(machine, 0,level,HOLD_LINE);
 	}
 
 	if (TCR & 0x0080)	// N/1
@@ -145,7 +145,7 @@ static void update_irq_state(void)
 
 			tmp68301_IE[i] = 0;		// Interrupts are edge triggerred
 
-			cpunum_set_input_line(0,level,HOLD_LINE);
+			cpunum_set_input_line(Machine, 0,level,HOLD_LINE);
 		}
 	}
 }

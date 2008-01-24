@@ -478,7 +478,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpunum_set_input_line(0, ARM_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 

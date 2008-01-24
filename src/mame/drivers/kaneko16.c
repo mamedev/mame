@@ -261,7 +261,7 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 	if (ACCESSING_MSB)
 	{
 		soundlatch_w(0, (data & 0xff00) >> 8 );
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1750,9 +1750,9 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 2:  cpunum_set_input_line(0, 3, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(0, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(0, 5, HOLD_LINE); break;
+		case 2:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+		case 1:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
+		case 0:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
 	}
 }
 
@@ -2086,9 +2086,9 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 2:  cpunum_set_input_line(0, 2, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(0, 3, HOLD_LINE); break;
-//      case 0:  cpunum_set_input_line(0, 4, HOLD_LINE); break;
+		case 2:  cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
+		case 1:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+//      case 0:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
 	}
 }
 

@@ -38,7 +38,7 @@ static INTERRUPT_GEN( lasso_interrupt )
 {
 	// VBlank
 	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 	{
 		UINT8 coins_new;
@@ -48,7 +48,7 @@ static INTERRUPT_GEN( lasso_interrupt )
 
 		if ( ((coins_new & 0x10) && !(coins_old & 0x10)) ||
 			 ((coins_new & 0x20) && !(coins_old & 0x20)) )
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 		coins_old = coins_new;
 	}
@@ -64,13 +64,13 @@ static UINT8 *lasso_chip_data;
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1, 0, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, 0, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )

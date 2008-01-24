@@ -272,7 +272,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -308,7 +308,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		cpunum_set_input_line(0, 5, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 	}
 }
 
@@ -321,7 +321,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 		case 0:
 			// IRQ 6 is for test mode only
 			if (cur_control2 & 0x0020)
-				cpunum_set_input_line(0, 6, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
 		break;
 
 		case 1:
@@ -337,7 +337,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and
 			// vital game logics that shouldn't be interfered by frame-drop.
 			if (cur_control2 & 0x0800)
-				cpunum_set_input_line(0, 4, HOLD_LINE);
+				cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 		break;
 	}
 }

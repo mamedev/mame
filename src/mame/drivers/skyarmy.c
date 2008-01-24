@@ -143,7 +143,7 @@ static int skyarmy_nmi=0;
 
 static INTERRUPT_GEN( skyarmy_nmi_source )
 {
-	 if(skyarmy_nmi) cpunum_set_input_line(0,INPUT_LINE_NMI, PULSE_LINE)	;
+	 if(skyarmy_nmi) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI, PULSE_LINE)	;
 }
 
 

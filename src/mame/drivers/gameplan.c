@@ -272,7 +272,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(0, 0, param);
+	cpunum_set_input_line(machine, 0, 0, param);
 }
 
 
@@ -387,7 +387,7 @@ static UINT8 sound_cmd;
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -425,7 +425,7 @@ static const struct via6522_interface via_2_interface =
 
 static void r6532_irq(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(Machine, 1, 0, state);
 }
 
 

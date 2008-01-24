@@ -33,12 +33,12 @@ static INTERRUPT_GEN( finalizr_interrupt )
 	if (cpu_getiloops() == 0)
 	{
 		if (*finalizr_interrupt_enable & 2)
-			cpunum_set_input_line(0, M6809_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops() % 2)
 	{
 		if (*finalizr_interrupt_enable & 1)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -50,7 +50,7 @@ static WRITE8_HANDLER( finalizr_coin_w )
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
-	cpunum_set_input_line(1, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
@@ -61,7 +61,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )

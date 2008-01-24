@@ -231,26 +231,26 @@ static int use_input_cp_hack = 0;
 static const UINT32 dial_8_gray[8]   = { 0x0a,0x08,0x0c,0x04,0x05,0x01,0x03,0x0f };
 
 // see IRQ notes in drivers\marvins.c
-static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(param, 0, HOLD_LINE); }
+static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(machine, param, 0, HOLD_LINE); }
 
 INTERRUPT_GEN( snk_irq_AB )
 {
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 1, irq_trigger_callback);
 }
 
 INTERRUPT_GEN( snk_irq_BA )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 0, irq_trigger_callback);
 }
 
 // NMI handshakes between CPUs are determined to be much simpler
-READ8_HANDLER ( snk_cpuA_nmi_trigger_r ) { cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuA_nmi_ack_w ) { cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE); }
+READ8_HANDLER ( snk_cpuA_nmi_trigger_r ) { cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
+WRITE8_HANDLER( snk_cpuA_nmi_ack_w ) { cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE); }
 
-READ8_HANDLER ( snk_cpuB_nmi_trigger_r ) { cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuB_nmi_ack_w ) { cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE); }
+READ8_HANDLER ( snk_cpuB_nmi_trigger_r ) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
+WRITE8_HANDLER( snk_cpuB_nmi_ack_w ) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE); }
 
 /*********************************************************************/
 

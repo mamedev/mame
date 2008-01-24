@@ -110,11 +110,11 @@ static void update_main_irqs(void)
 	/* assert the lines that are live, or clear everything if nothing is live */
 	if (irq != 0)
 	{
-		cpunum_set_input_line(0, irq, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -132,7 +132,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 223)
 	{
 		vblank_irq_state = update = 1;
-		cpunum_set_input_line(1, 4, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 4, ASSERT_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -141,7 +141,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		vblank_irq_state = 0;
 		update = 1;
-		cpunum_set_input_line(1, 4, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 4, CLEAR_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -172,7 +172,7 @@ static void timer_ack_callback(void)
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	soundlatch_w(0, param);
-	cpunum_set_input_line(2, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -184,13 +184,13 @@ static void sound_data_w(UINT8 data)
 
 static void sound_cpu_irq(int state)
 {
-	cpunum_set_input_line(2, 0, state);
+	cpunum_set_input_line(Machine, 2, 0, state);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(offset);
 }
 
@@ -204,7 +204,7 @@ static READ8_HANDLER( sound_data_r )
 
 static void xboard_reset(void)
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
@@ -351,7 +351,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(0,0);
 			segaic16_set_display_enable(data & 0x20);
-			cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:

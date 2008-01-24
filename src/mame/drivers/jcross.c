@@ -55,7 +55,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	sound_cpu_busy = 0x20;
 	soundlatch_w(0, data);
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )
@@ -66,7 +66,7 @@ static READ8_HANDLER( sound_command_r )
 
 static READ8_HANDLER( sound_nmi_ack_r )
 {
-	cpunum_set_input_line(2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 

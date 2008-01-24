@@ -437,7 +437,7 @@ static void parse_control(void)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
 }
@@ -463,20 +463,20 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 /*
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
-    cpunum_set_input_line(0,4,HOLD_LINE);
+    cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 */
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {
-	cpunum_set_input_line(0,6,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 }
 
 /* 68000 B */
 
 static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
-	cpunum_set_input_line(2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cpunum_set_input_line(machine, 2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -489,7 +489,7 @@ static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 static INTERRUPT_GEN( wgp_cpub_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, wgp_cpub_interrupt6);
-	cpunum_set_input_line(2, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 2, 4, HOLD_LINE);
 }
 
 
@@ -948,7 +948,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)	// assumes Z80 sandwiched between 68Ks
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

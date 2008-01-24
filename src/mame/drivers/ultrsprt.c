@@ -107,7 +107,7 @@ static READ32_HANDLER(control2_r)
 
 static WRITE32_HANDLER(int_ack_w)
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ1, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( ultrsprt_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -259,7 +259,7 @@ static const struct K054539interface k054539_interface =
 
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
-	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static MACHINE_RESET( ultrsprt )
@@ -309,17 +309,17 @@ static void sound_irq_callback(int irq)
 {
 	if (irq == 0)
 	{
-		//cpunum_set_input_line(1, INPUT_LINE_IRQ5, PULSE_LINE);
+		//cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ5, PULSE_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(1, INPUT_LINE_IRQ6, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ6, PULSE_LINE);
 	}
 }
 
 static DRIVER_INIT( ultrsprt )
 {
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	K056800_init(sound_irq_callback);
 }

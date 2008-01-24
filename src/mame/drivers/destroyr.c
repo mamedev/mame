@@ -37,7 +37,7 @@ static TIMER_CALLBACK( destroyr_dial_callback	)
 
 	if (destroyr_potmask[dial])
 	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 

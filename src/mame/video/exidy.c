@@ -80,7 +80,7 @@ INTERRUPT_GEN( exidy_vblank_interrupt )
 	int_condition &= ~0x80;
 
 	/* set the IRQ line */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -91,14 +91,14 @@ INTERRUPT_GEN( teetert_vblank_interrupt )
 		exidy_vblank_interrupt(machine, cpunum);
 
 	/* plus a pulse on the NMI line */
-	cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 READ8_HANDLER( exidy_interrupt_r )
 {
 	/* clear any interrupts */
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return int_condition;
@@ -282,7 +282,7 @@ static TIMER_CALLBACK( collision_irq_callback )
 	latch_condition(param);
 
 	/* set the IRQ line */
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 

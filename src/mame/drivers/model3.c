@@ -789,7 +789,7 @@ static UINT32 scsi_fetch(UINT32 dsp)
 static void scsi_irq_callback(void)
 {
 	model3_irq_state |= model3_irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
-	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -4014,7 +4014,7 @@ static void scsp_irq(int irq)
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(1, irq, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, irq, PULSE_LINE);
 	}
 }
 
@@ -4051,7 +4051,7 @@ static INTERRUPT_GEN(model3_interrupt)
 	} else {
 		model3_irq_state = 0x0d;
 	}
-	cpunum_set_input_line(0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 
 	model3_vblank++;
 	model3_vblank &= 1;

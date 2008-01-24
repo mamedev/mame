@@ -184,7 +184,7 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 	{
 		if(activecpu_get_previouspc()==0x29e9)// || activecpu_get_previouspc()==0x1b3f) //29f5
 		{
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 		}
 //      else
 //          printf("%x \n", activecpu_get_previouspc());

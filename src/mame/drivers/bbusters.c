@@ -268,7 +268,7 @@ static READ16_HANDLER( kludge_r )
 static WRITE16_HANDLER( sound_cpu_w )
 {
 	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ16_HANDLER( mechatt_gun_r )
@@ -639,7 +639,7 @@ GFXDECODE_END
 
 static void sound_irq( int irq )
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2608interface ym2608_interface =
@@ -673,9 +673,9 @@ static NVRAM_HANDLER( bbusters )
 static INTERRUPT_GEN( bbuster )
 {
 	if (cpu_getiloops()==0)
-		cpunum_set_input_line(0, 6, HOLD_LINE); /* VBL */
+		cpunum_set_input_line(machine, 0, 6, HOLD_LINE); /* VBL */
 	else
-		cpunum_set_input_line(0, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
 }
 
 static VIDEO_EOF( bbuster )

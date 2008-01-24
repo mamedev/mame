@@ -170,7 +170,7 @@ static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
 	soundlatch_w(0, data >> 8);
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -807,7 +807,7 @@ GFXDECODE_END
 
 static void sound_irq(int state)
 {
-	cpunum_set_input_line(2, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_IRQ0, state);
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -817,7 +817,7 @@ static const struct YM2151interface ym2151_interface =
 
 static INTERRUPT_GEN( roundup5_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static MACHINE_DRIVER_START( apache3 )
@@ -1188,7 +1188,7 @@ static DRIVER_INIT( apache3 )
 	UINT8 *src2 = memory_region(REGION_GFX3);
 	int i;
 
-	cpunum_set_input_line(3, INPUT_LINE_HALT, ASSERT_LINE); // ?
+	cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, ASSERT_LINE); // ?
 
 	for (i=0; i<0x100000; i+=32) {
 		memcpy(dst,src1,32);

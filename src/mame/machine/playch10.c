@@ -101,12 +101,12 @@ WRITE8_HANDLER( pc10_DOGDI_w )
 
 WRITE8_HANDLER( pc10_GAMERES_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_GAMESTOP_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_PPURES_w )
@@ -659,7 +659,7 @@ static void gboard_scanline_cb( int num, int scanline, int vblank, int blanked )
 		if ( --gboard_scanline_counter == -1 )
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			cpunum_set_input_line( 1, 0, PULSE_LINE );
+			cpunum_set_input_line(Machine, 1, 0, PULSE_LINE );
 		}
 	}
 }

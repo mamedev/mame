@@ -469,7 +469,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	scanline += 16;
@@ -486,7 +486,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	leland_last_scanline_int = scanline;
 
 	/* interrupts generated according to the interrupt control register */
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 
 	/* set a timer for the next one */
 	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
@@ -497,7 +497,7 @@ INTERRUPT_GEN( leland_master_interrupt )
 {
 	/* check for coins here */
 	if ((readinputport(1) & 0x0e) != 0x0e)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1159,7 +1159,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x02:	/* /GIN2 */
 		case 0x12:
-			cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 0x03:	/* /IGID */
@@ -1190,10 +1190,10 @@ WRITE8_HANDLER( leland_master_output_w )
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */
-			cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			wcol_enable = (data & 0x02);
-			cpunum_set_input_line(1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line  (1, 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
@@ -1268,9 +1268,9 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x05:	/* /SLV0 */
-			cpunum_set_input_line(1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x08:	/*  */

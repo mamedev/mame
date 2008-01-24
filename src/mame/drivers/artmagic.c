@@ -48,7 +48,7 @@ static void (*protection_handler)(running_machine *);
  *
  *************************************/
 
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	int irq_lines = 0;
 
@@ -58,16 +58,16 @@ static void update_irq_state(void)
 		irq_lines |= 5;
 
 	if (irq_lines)
-		cpunum_set_input_line(0, irq_lines, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, irq_lines, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
 static void m68k_gen_int(int state)
 {
 	tms_irq = state;
-	update_irq_state();
+	update_irq_state(Machine);
 }
 
 
@@ -81,7 +81,7 @@ static void m68k_gen_int(int state)
 static MACHINE_RESET( artmagic )
 {
 	tms_irq = hack_irq = 0;
-	update_irq_state();
+	update_irq_state(machine);
 	tlc34076_reset(6);
 }
 
@@ -137,9 +137,9 @@ static READ16_HANDLER( ultennis_hack_r )
 	if (activecpu_get_pc() == 0x18c2)
 	{
 		hack_irq = 1;
-		update_irq_state();
+		update_irq_state(Machine);
 		hack_irq = 0;
-		update_irq_state();
+		update_irq_state(Machine);
 	}
 	return readinputport(0);
 }

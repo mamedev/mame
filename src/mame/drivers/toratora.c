@@ -121,7 +121,7 @@ static void main_cpu_irq(int state)
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
 logerror("GEN IRQ: %x\n", combined_state);
-	cpunum_set_input_line(0, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -142,7 +142,7 @@ static UINT8 last = 0;
 	if (last != (input_port_0_r(0) & 0x0f))
 	{
 		last = input_port_0_r(0) & 0x0f;
-		cpunum_set_input_line(0, 0, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 	}
 	pia_set_input_a(0, input_port_0_r(0) & 0x0f, 0);
 

@@ -77,16 +77,16 @@ static void update_main_irqs(void)
 	/* assert the lines that are live, or clear everything if nothing is live */
 	if (irq != 0)
 	{
-		cpunum_set_input_line(0, irq, ASSERT_LINE);
-		cpunum_set_input_line(1, irq, ASSERT_LINE);
-		cpunum_set_input_line(2, irq, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, irq, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 2, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
 	{
-		cpunum_set_input_line(0, 7, CLEAR_LINE);
-		cpunum_set_input_line(1, 7, CLEAR_LINE);
-		cpunum_set_input_line(2, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 7, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2, 7, CLEAR_LINE);
 	}
 }
 
@@ -203,14 +203,14 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(int state)
 {
-	cpunum_set_input_line(3, 0, state);
+	cpunum_set_input_line(Machine, 3, 0, state);
 }
 
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	soundlatch_w(0, param);
-	cpunum_set_input_line(3, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -223,7 +223,7 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(3, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 3, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(offset);
 }
 
@@ -314,9 +314,9 @@ static WRITE16_HANDLER( io_chip_w )
             */
 			segaic16_set_display_enable(data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(0,0);
-			cpunum_set_input_line(3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			cpunum_set_input_line(2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */

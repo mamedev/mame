@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_54xx_irq_clear )
 {
-	cpunum_set_input_line(param, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, param, 0, CLEAR_LINE);
 }
 
 void namco_54xx_write(UINT8 data)
@@ -121,7 +121,7 @@ void namco_54xx_write(UINT8 data)
 
 	timer_call_after_resynch(NULL, data, namco_54xx_latch_callback);
 
-	cpunum_set_input_line(cpunum, 0, ASSERT_LINE);
+	cpunum_set_input_line(Machine, cpunum, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.

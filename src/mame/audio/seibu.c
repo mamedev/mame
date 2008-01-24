@@ -287,7 +287,7 @@ enum
 	RST18_CLEAR
 };
 
-static void update_irq_lines(int param)
+static void update_irq_lines(running_machine *machine, int param)
 {
 	static int irq1,irq2;
 
@@ -315,14 +315,14 @@ static void update_irq_lines(int param)
 	}
 
 	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
-		cpunum_set_input_line(sound_cpu,0,CLEAR_LINE);
+		cpunum_set_input_line(machine, sound_cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line_and_vector(sound_cpu,0,ASSERT_LINE,irq1 & irq2);
+		cpunum_set_input_line_and_vector(machine, sound_cpu,0,ASSERT_LINE,irq1 & irq2);
 }
 
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
-	update_irq_lines(VECTOR_INIT);
+	update_irq_lines(Machine, VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -332,22 +332,22 @@ WRITE8_HANDLER( seibu_rst10_ack_w )
 
 WRITE8_HANDLER( seibu_rst18_ack_w )
 {
-	update_irq_lines(RST18_CLEAR);
+	update_irq_lines(Machine, RST18_CLEAR);
 }
 
 void seibu_ym3812_irqhandler(int linestate)
 {
-	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 void seibu_ym2151_irqhandler(int linestate)
 {
-	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 void seibu_ym2203_irqhandler(int linestate)
 {
-	update_irq_lines(linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 /***************************************************************************/
@@ -359,7 +359,7 @@ MACHINE_RESET( seibu_sound_1 )
 	UINT8 *rom = memory_region(REGION_CPU2);
 
 	sound_cpu=1;
-	update_irq_lines(VECTOR_INIT);
+	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 		memory_configure_bank(1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 }
@@ -371,7 +371,7 @@ MACHINE_RESET( seibu_sound_2 )
 	UINT8 *rom = memory_region(REGION_CPU3);
 
 	sound_cpu=2;
-	update_irq_lines(VECTOR_INIT);
+	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 		memory_configure_bank(1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 }
@@ -442,7 +442,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(RST18_ASSERT);
+				update_irq_lines(Machine, RST18_ASSERT);
 				break;
 			case 6:
 				/* just a guess */
@@ -473,7 +473,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(RST18_ASSERT);
+	update_irq_lines(Machine, RST18_ASSERT);
 }
 
 /***************************************************************************/

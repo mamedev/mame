@@ -646,12 +646,12 @@ static const struct YM2151interface ym2151_interface =
 
 static INTERRUPT_GEN( m90_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x60/4);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x60/4);
 }
 
 static INTERRUPT_GEN( bomblord_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x50/4);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x50/4);
 }
 
 

@@ -33,7 +33,7 @@ static UINT8 *pmcram;
 static INTERRUPT_GEN( spy_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		cpunum_set_input_line(0, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 
@@ -323,7 +323,7 @@ for (i = 0;i < 0xfe;i++)
 */
 		spy_collision();
 //ZT
-		cpunum_set_input_line(0,M6809_FIRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 	}
 
 	old = data;
@@ -332,7 +332,7 @@ for (i = 0;i < 0xfe;i++)
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )
@@ -522,7 +522,7 @@ static const struct K007232_interface k007232_interface_2 =
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, linestate);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

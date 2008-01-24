@@ -81,7 +81,7 @@ static WRITE8_HANDLER( bking2_soundlatch_w )
 		if (data & (1 << i)) code |= 0x80 >> i;
 
 	soundlatch_w(offset,code);
-	if (sndnmi_enable) cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+	if (sndnmi_enable) cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( bking3_addr_l_w )
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( bking3_68705_portB_w )
 	if (~data & 0x02)
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(2,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
 		main_sent = 0;
 	}
 

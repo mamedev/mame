@@ -255,18 +255,18 @@ static int splndrbt_flip;
 static INTERRUPT_GEN( equites_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 // Splendor Blast Hareware
 static INTERRUPT_GEN( splndrbt_interrupt )
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 /******************************************************************************/

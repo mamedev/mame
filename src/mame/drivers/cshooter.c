@@ -198,18 +198,12 @@ static VIDEO_UPDATE(cshooter)
 static INTERRUPT_GEN( cshooter_interrupt )
 {
 	if(cpu_getiloops())
-	{
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x08);
-	}
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x08);
 	else
-	{
-      cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x10);
-	}
+      cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x10);
 
 	if(mainram!=NULL)
-	{
 		ar_coin_hack();
-	}
 
 }
 

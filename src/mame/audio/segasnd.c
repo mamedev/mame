@@ -215,7 +215,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 	speech_latch = data;
 
 	/* the high bit goes directly to the INT line */
-	cpunum_set_input_line(1, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* a clock on the high bit clocks a 1 into T0 */
 	if (!(old & 0x80) && (data & 0x80))
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( increment_t1_clock )
 void sega_usb_reset(UINT8 t1_clock_mask)
 {
 	/* halt the USB CPU at reset time */
-	cpunum_set_input_line(usb.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(Machine, usb.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
 	timer_pulse(attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 	int data = param;
 
 	/* look for rising/falling edges of bit 7 to control the RESET line */
-	cpunum_set_input_line(usb.cpunum, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, usb.cpunum, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* if the CLEAR line is set, the low 7 bits of the input are ignored */
 	if ((usb.last_p2_value & 0x40) == 0)

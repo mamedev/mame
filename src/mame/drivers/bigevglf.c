@@ -141,7 +141,7 @@ static READ8_HANDLER(soundstate_r)
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+	if (sound_nmi_enable) cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
 	sound_state &= ~1;
 }
@@ -167,7 +167,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }

@@ -27,8 +27,6 @@ VIDEO_START( profpac );
 VIDEO_UPDATE( astrocde );
 VIDEO_UPDATE( profpac );
 
-void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback);
-
 WRITE8_HANDLER( astrocade_pattern_board_w );
 READ8_HANDLER( astrocade_data_chip_register_r );
 WRITE8_HANDLER( astrocade_data_chip_register_w );

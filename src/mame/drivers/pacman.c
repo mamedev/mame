@@ -387,7 +387,7 @@ static MACHINE_RESET( mschamp )
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
 	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -683,7 +683,7 @@ static READ8_HANDLER( bigbucks_question_r )
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0x03);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
 }
 
 static WRITE8_HANDLER( porky_banking_w )

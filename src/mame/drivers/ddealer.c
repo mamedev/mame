@@ -180,7 +180,7 @@ static MACHINE_RESET (ddealer)
 
 static INTERRUPT_GEN( ddealer_interrupt )
 {
-	cpunum_set_input_line(0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 
 }

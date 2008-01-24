@@ -69,7 +69,7 @@ WRITE8_HANDLER( cop01_vreg_w );
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )

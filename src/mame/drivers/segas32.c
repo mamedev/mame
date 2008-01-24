@@ -396,7 +396,7 @@ static MACHINE_RESET( system32 )
 	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback, NULL);
 
 	/* clear IRQ lines */
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -417,13 +417,13 @@ static void update_irq_state(void)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, vector);
+			cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -691,7 +691,7 @@ static void common_io_chip_w(int which, offs_t offset, UINT16 data, UINT16 mem_m
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -1036,13 +1036,13 @@ static void update_sound_irq_state(void)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(1, 0, ASSERT_LINE, 2 * vector);
+			cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cpunum_set_input_line(1, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 

@@ -90,7 +90,7 @@ static const UINT8 led_map[16] =
 
 static void dleuro_interrupt(int state)
 {
-	cpunum_set_input_line(0, 0, state);
+	cpunum_set_input_line(Machine, 0, 0, state);
 }
 
 

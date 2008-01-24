@@ -336,7 +336,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0, data);
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0, data);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -2030,7 +2030,7 @@ static const struct YM2203interface ym2203_interface =
 
 static void YM3812_irq(int param)
 {
-	cpunum_set_input_line(1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct YM3812interface ym3812_interface =
@@ -2041,9 +2041,9 @@ static const struct YM3812interface ym3812_interface =
 static INTERRUPT_GEN( alpha68k_interrupt )
 {
 	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 //ZT
 

@@ -37,9 +37,9 @@ static UINT8 vblank_irq;
 static void update_irq_state(void)
 {
 	if (vblank_irq || sprite_irq || unknown_irq)
-		cpunum_set_input_line(0, 1, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 }
 
 
@@ -129,7 +129,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	{
 		latch1_full = 1;
 		soundlatch_w(0, data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
@@ -350,7 +350,7 @@ GFXDECODE_END
 
 static void irq_handler(int irq)
 {
-	cpunum_set_input_line(1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_intf_sandscrp =

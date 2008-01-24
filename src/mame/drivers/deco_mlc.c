@@ -205,7 +205,7 @@ static READ32_HANDLER( mlc_scanline_r )
 static TIMER_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(0), info.i);
-	cpunum_set_input_line(0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
@@ -217,7 +217,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpunum_set_input_line(0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */

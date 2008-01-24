@@ -561,8 +561,8 @@ static const struct SN76477interface sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static void zaccaria_irq0a(int state) { cpunum_set_input_line(1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(int state) { cpunum_set_input_line(1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(int state) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(int state) { cpunum_set_input_line(Machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a;
 
@@ -646,7 +646,7 @@ static MACHINE_RESET( catnmous )
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
-	cpunum_set_input_line_and_vector(0,0,PULSE_LINE,0x0a);
+	cpunum_set_input_line_and_vector(machine, 0,0,PULSE_LINE,0x0a);
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )

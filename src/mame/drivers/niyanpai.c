@@ -186,7 +186,7 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 static void ctc0_interrupt(int state)
 {
-	cpunum_set_input_line(1, 0, state);
+	cpunum_set_input_line(Machine, 1, 0, state);
 }
 
 static z80ctc_interface ctc_intf =
@@ -836,7 +836,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	cpunum_set_input_line(0, 1, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 static const struct z80_irq_daisy_chain daisy_chain_sound[] =

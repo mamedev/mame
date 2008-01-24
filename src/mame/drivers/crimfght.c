@@ -31,7 +31,7 @@ static WRITE8_HANDLER( crimfght_coin_w )
 static WRITE8_HANDLER( crimfght_sh_irqtrigger_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( crimfght_snd_bankswitch_w )

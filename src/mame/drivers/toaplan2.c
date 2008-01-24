@@ -388,7 +388,7 @@ void batsugun_okisnd_w(int data);
 static void toaplan2_reset(void)
 {
 	if ( cpu_gettotalcpu() > 1 )
-		cpunum_set_input_line(1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( toaplan2 )
@@ -583,7 +583,7 @@ static READ16_HANDLER( toaplan2_inputport_0_word_r )
 
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cpunum_set_input_line(0, param, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(int irq_line)
@@ -1049,7 +1049,7 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(offset, data & 0xff);
-		cpunum_set_input_line(1, 0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -1177,7 +1177,7 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(offset, data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1187,7 +1187,7 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch2_w(offset, data & 0xff);
-		cpunum_set_input_line(1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1203,20 +1203,20 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpunum_set_input_line(0, raizing_sndirq_line, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpunum_set_input_line(0, raizing_sndirq_line, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, raizing_sndirq_line, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpunum_set_input_line(1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1342,7 +1342,7 @@ static void bbakraid_irqhandler (int state)
 
 static INTERRUPT_GEN( bbakraid_snd_interrupt )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 
@@ -3273,7 +3273,7 @@ GFXDECODE_END
 
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,0,linestate);
+	cpunum_set_input_line(Machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

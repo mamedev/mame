@@ -242,20 +242,20 @@ static VIDEO_UPDATE( kinst )
 
 static TIMER_CALLBACK( irq0_stop )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( irq0_start )
 {
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
 }
 
 
 static void ide_interrupt(int state)
 {
-	cpunum_set_input_line(0, 1, state);
+	cpunum_set_input_line(Machine, 0, 1, state);
 }
 
 

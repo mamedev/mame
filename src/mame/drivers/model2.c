@@ -239,7 +239,7 @@ static void copro_fifoout_push(UINT32 data)
 			sharc_set_flag_input(1, ASSERT_LINE);
 			cpuintrf_pop_context();
 
-			//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
@@ -247,7 +247,7 @@ static void copro_fifoout_push(UINT32 data)
 			sharc_set_flag_input(1, CLEAR_LINE);
 			cpuintrf_pop_context();
 
-			//cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -313,7 +313,7 @@ static void model2_timer_exp(int tnum, int bit)
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 0, I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
@@ -358,7 +358,7 @@ static MACHINE_RESET(model2o)
 	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
-	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -378,7 +378,7 @@ static MACHINE_RESET(model2)
 	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
-	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -388,12 +388,12 @@ static MACHINE_RESET(model2b)
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
-	cpunum_set_input_line(2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	cpunum_set_input_line(2, SHARC_INPUT_FLAG0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	cpunum_set_input_line(2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
 
 	dsp_type = DSP_TYPE_SHARC;
 }
@@ -529,7 +529,7 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-				cpunum_set_input_line(2, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -658,7 +658,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         else
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
-            cpunum_set_input_line(3, INPUT_LINE_HALT, CLEAR_LINE);
+            cpunum_set_input_line(Machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
@@ -915,7 +915,7 @@ static void snd_latch_to_68k_w(int data)
 
 	to_68k = data;
 
-	cpunum_set_input_line(1, 2, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);
 
 	// give the 68k time to notice
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1527,14 +1527,14 @@ static INTERRUPT_GEN(model2_interrupt)
 			model2_intreq |= (1<<10);
 			if (model2_intena & (1<<10))
 			{
-				cpunum_set_input_line(0, I960_IRQ3, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, I960_IRQ3, ASSERT_LINE);
 			}
 			break;
 		case 1:
 			model2_intreq |= (1<<0);
 			if (model2_intena & (1<<0))
 			{
-				cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
 			}
 			break;
 	}
@@ -1547,18 +1547,18 @@ static INTERRUPT_GEN(model2c_interrupt)
 		case 0:
 			model2_intreq |= (1<<10);
 			if (model2_intena & (1<<10))
-				cpunum_set_input_line(0, I960_IRQ3, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, I960_IRQ3, ASSERT_LINE);
 			break;
 		case 1:
 			model2_intreq |= (1<<2);
 			if (model2_intena & (1<<2))
-				cpunum_set_input_line(0, I960_IRQ2, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
 
 			break;
 		case 2:
 			model2_intreq |= (1<<0);
 			if (model2_intena & (1<<0))
-				cpunum_set_input_line(0, I960_IRQ0, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
 			break;
 	}
 }
@@ -1691,7 +1691,7 @@ static void scsp_irq(int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(1, irq, PULSE_LINE);
+		cpunum_set_input_line(Machine, 1, irq, PULSE_LINE);
 	}
 }
 

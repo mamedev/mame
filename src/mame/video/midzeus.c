@@ -654,9 +654,9 @@ static void zeus_register_update(offs_t offset)
                 we simply assert immediately if this is enabled. invasn needs this for proper
                 operations */
 			if (zeusbase[0x80] & 0x02000000)
-				cpunum_set_input_line(0, 2, ASSERT_LINE);
+				cpunum_set_input_line(Machine, 0, 2, ASSERT_LINE);
 			else
-				cpunum_set_input_line(0, 2, CLEAR_LINE);
+				cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 			break;
 
 		case 0x84:

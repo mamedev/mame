@@ -49,7 +49,7 @@ static WRITE8_HANDLER( b_via_0_ca2_w )
 
 static void b_via_0_irq (int level)
 {
-	cpunum_set_input_line(0, M6809_IRQ_LINE, level);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, level);
 }
 
 static READ8_HANDLER( b_via_0_pb_r )
@@ -60,9 +60,9 @@ static READ8_HANDLER( b_via_0_pb_r )
 static WRITE8_HANDLER( b_via_0_pa_w )
 {
 	if ((data & 0x08) == 0)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
@@ -91,7 +91,7 @@ static WRITE8_HANDLER( b_via_0_pb_w )
 
 static void b_via_1_irq (int level)
 {
-	cpunum_set_input_line(1, M6809_IRQ_LINE, level);
+	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, level);
 }
 
 static READ8_HANDLER( b_via_1_pa_r )

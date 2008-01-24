@@ -103,7 +103,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static INTERRUPT_GEN( main_nmi_gen )
 {
 	if (nmi_enable)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -117,7 +117,7 @@ static INTERRUPT_GEN( main_nmi_gen )
 static TIMER_CALLBACK( delayed_sound_w )
 {
 	sound_data = param;
-	cpunum_set_input_line(1, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 }
 
 
@@ -135,7 +135,7 @@ static READ8_HANDLER( sound_data_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 

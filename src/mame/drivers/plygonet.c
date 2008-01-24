@@ -154,9 +154,9 @@ static READ32_HANDLER( psac_rom_r )
 static INTERRUPT_GEN(polygonet_interrupt)
 {
 	if (cpu_getiloops())
-		cpunum_set_input_line(0, MC68000_IRQ_5, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, MC68000_IRQ_3, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, MC68000_IRQ_3, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -184,7 +184,7 @@ static WRITE32_HANDLER( sound_w )
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(2, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
 }
 
 
@@ -639,7 +639,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

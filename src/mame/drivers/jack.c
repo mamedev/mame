@@ -72,7 +72,7 @@ static READ8_HANDLER( timer_r )
 static WRITE8_HANDLER( jack_sh_command_w )
 {
 	soundlatch_w(0,data);
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 
@@ -914,13 +914,11 @@ MACHINE_DRIVER_END
 static INTERRUPT_GEN( joinem_interrupts )
 {
 	if(cpu_getiloops() > 0)
-	{
-		cpunum_set_input_line(0, 0, HOLD_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 	{
 		if(!(readinputport(4) & 0x80))
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

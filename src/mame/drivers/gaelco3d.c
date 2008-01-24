@@ -178,7 +178,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq );
  *
  *************************************/
 
-static void init_machine_common(void)
+static MACHINE_RESET( common )
 {
 	UINT16 *src;
 	int i;
@@ -203,7 +203,7 @@ static void init_machine_common(void)
 	memory_set_bank(1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
-	cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Save state support */
 	state_save_register_global(sound_data);
@@ -219,7 +219,7 @@ static void init_machine_common(void)
 
 static MACHINE_RESET( gaelco3d )
 {
-	init_machine_common();
+	MACHINE_RESET_CALL( common );
 	tms_offset_xor = 0;
 	state_save_register_global(tms_offset_xor);
 }
@@ -227,7 +227,7 @@ static MACHINE_RESET( gaelco3d )
 
 static MACHINE_RESET( gaelco3d2 )
 {
-	init_machine_common();
+	MACHINE_RESET_CALL( common );
 	tms_offset_xor = BYTE_XOR_BE(0);
 	state_save_register_global(tms_offset_xor);
 }
@@ -243,13 +243,13 @@ static MACHINE_RESET( gaelco3d2 )
 static INTERRUPT_GEN( vblank_gen )
 {
 	gaelco3d_render();
-	cpunum_set_input_line(0, 2, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 }
 
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(0, 2, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 }
 static WRITE32_HANDLER( irq_ack_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) irq_ack_w(offset, data >> 16, mem_mask >> 16); }
 
@@ -307,7 +307,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	logerror("delayed_sound_w(%02X)\n", param);
 	sound_data = param;
-	cpunum_set_input_line(2, ADSP2115_IRQ2, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, ADSP2115_IRQ2, ASSERT_LINE);
 }
 
 
@@ -323,7 +323,7 @@ static WRITE32_HANDLER( sound_data_020_w ) { if ((mem_mask & 0xffff0000) != 0xff
 static READ16_HANDLER( sound_data_r )
 {
 	logerror("sound_data_r(%02X)\n", sound_data);
-	cpunum_set_input_line(2, ADSP2115_IRQ2, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, ADSP2115_IRQ2, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -426,7 +426,7 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 static void iack_w(UINT8 state, offs_t addr)
 {
 	logerror("iack_w(%d) - %06X\n", state, addr);
-	cpunum_set_input_line(1, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
 
 
@@ -442,7 +442,7 @@ static WRITE16_HANDLER( tms_reset_w )
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 static WRITE32_HANDLER( tms_reset_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_reset_w(offset, data, mem_mask); }
 
@@ -453,7 +453,7 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* done after uploading, and after modifying the comm area */
 	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 	if (!(mem_mask & 0xff))
-		cpunum_set_input_line(1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 static WRITE32_HANDLER( tms_irq_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_irq_w(offset, data, mem_mask); }
 
@@ -584,7 +584,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 		reg = adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpunum_set_input_line(2, ADSP2105_IRQ1, PULSE_LINE);
+		cpunum_set_input_line(machine, 2, ADSP2105_IRQ1, PULSE_LINE);
 	}
 
 	/* store it */

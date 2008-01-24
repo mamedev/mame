@@ -371,11 +371,11 @@ static WRITE16_HANDLER( irqctrl_w )
 
 		// Bit 0 : SUBINT
 		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cpunum_set_input_line(1,4,HOLD_LINE);
+			cpunum_set_input_line(Machine, 1,4,HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)   cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE  );
-		else                    cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE );
+		if (data & 2)   cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE  );
+		else                    cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST
@@ -651,7 +651,7 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xFF);
-		cpunum_set_input_line(2,0, HOLD_LINE);
+		cpunum_set_input_line(Machine, 2,0, HOLD_LINE);
 	}
 }
 
@@ -719,7 +719,7 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 	if (ACCESSING_LSB)
 	{
 		soundlatch_w(0,data & 0xFF);
-		cpunum_set_input_line(2,M6809_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(Machine, 2,M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -1094,9 +1094,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( wecleman_interrupt )
 {
 	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(0, 4, HOLD_LINE);	/* once */
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	/* once */
 	else
-		cpunum_set_input_line(0, 5, HOLD_LINE);	/* to read input ports */
+		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);	/* to read input ports */
 }
 
 static const struct K007232_interface wecleman_k007232_interface =
@@ -1162,7 +1162,7 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( hotchase_sound_timer )
 {
-	cpunum_set_input_line( 2, M6809_FIRQ_LINE, PULSE_LINE );
+	cpunum_set_input_line(machine, 2, M6809_FIRQ_LINE, PULSE_LINE );
 }
 
 static MACHINE_DRIVER_START( hotchase )

@@ -395,7 +395,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 static WRITE16_HANDLER( powerbls_sound_w )
 {
 	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(1,I8051_INT1_LINE,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,I8051_INT1_LINE,PULSE_LINE);
 }
 
 /* Memory Maps */

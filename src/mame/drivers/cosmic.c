@@ -191,12 +191,10 @@ static INTERRUPT_GEN( panic_interrupt )
     	if ((input_port_3_r(0) & 0xc0) != 0xc0)
         	panic_sound_output_w(17,1);
 
-		cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
     else
-    {
-        cpunum_set_input_line_and_vector(0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
-    }
+        cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static INTERRUPT_GEN( cosmica_interrupt )
@@ -206,7 +204,7 @@ static INTERRUPT_GEN( cosmica_interrupt )
     if (pixel_clock == 0)
     {
 		if (readinputport(3) & 1)	/* Left Coin */
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
 
@@ -220,36 +218,26 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     as I have no Cosmic Guerilla console :-) . */
 
 	if ((readinputport(2) & 1)) /* Coin */
-	{
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
-		cpunum_set_input_line_and_vector(0, 0, ASSERT_LINE, 6);
-	}
+		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
 	else
-	{
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( magspot2_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
 	if (input_port_4_r(0) & 0x01)
-	{
-  		cpunum_set_input_line(0, 0, HOLD_LINE);
-	}
+  		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else if (input_port_4_r(0) & 0x02)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
 	if (input_port_4_r(0) & 0x01)
-	{
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

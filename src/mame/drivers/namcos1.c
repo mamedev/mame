@@ -394,17 +394,17 @@ DRIVER_INIT( tankfrce );
 
 static WRITE8_HANDLER( namcos1_sub_firq_w )
 {
-	cpunum_set_input_line(1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(cpu_getactivecpu(), 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, cpu_getactivecpu(), 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	cpunum_set_input_line(cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(Machine, cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -971,7 +971,7 @@ GFXDECODE_END
 
 static void namcos1_sound_interrupt( int irq )
 {
-	cpunum_set_input_line( 2, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2, M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

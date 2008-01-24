@@ -158,7 +158,7 @@ static WRITE8_HANDLER( tp84_filter_w )
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(2,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
 }
 
 

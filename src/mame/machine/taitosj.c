@@ -57,7 +57,7 @@ MACHINE_RESET( taitosj )
 	zready = 0;
 	busreq = 0;
  	if (machine->drv->cpu[2].type != CPU_DUMMY)
-	cpunum_set_input_line(2,0,CLEAR_LINE);
+	cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 
 	spacecr_prot_value = 0;
 }
@@ -116,7 +116,7 @@ READ8_HANDLER( taitosj_mcu_data_r )
 static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
 	zready = 1;
-	cpunum_set_input_line(2,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
 	fromz80 = param;
 }
 
@@ -202,7 +202,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(NULL, 0,taitosj_mcu_data_real_r);
-		cpunum_set_input_line(2,0,CLEAR_LINE);
+		cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
 		portA_in = fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n",activecpu_get_pc(),portA_in));
 	}

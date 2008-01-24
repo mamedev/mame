@@ -75,19 +75,19 @@ static WRITE8_HANDLER( grndtour_prot_w )
 static INTERRUPT_GEN( iqblock_interrupt )
 {
 	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);	/* ???? */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* ???? */
 	else
-		cpunum_set_input_line(0, 0, ASSERT_LINE);			/* ???? */
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);			/* ???? */
 }
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( iqblock_irqack_r )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	return 0;
 }
 

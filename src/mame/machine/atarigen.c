@@ -158,7 +158,7 @@ void atarigen_interrupt_reset(atarigen_int_callback update_int)
 
 void atarigen_update_interrupts(void)
 {
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 
@@ -182,7 +182,7 @@ void atarigen_scanline_int_set(int scrnum, int scanline)
 INTERRUPT_GEN( atarigen_scanline_int_gen )
 {
 	atarigen_scanline_int_state = 1;
-	(*update_int_callback)();
+	(*update_int_callback)(machine);
 }
 
 
@@ -194,13 +194,13 @@ INTERRUPT_GEN( atarigen_scanline_int_gen )
 WRITE16_HANDLER( atarigen_scanline_int_ack_w )
 {
 	atarigen_scanline_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w )
 {
 	atarigen_scanline_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 
@@ -212,7 +212,7 @@ WRITE32_HANDLER( atarigen_scanline_int_ack32_w )
 INTERRUPT_GEN( atarigen_sound_int_gen )
 {
 	atarigen_sound_int_state = 1;
-	(*update_int_callback)();
+	(*update_int_callback)(machine);
 }
 
 
@@ -224,13 +224,13 @@ INTERRUPT_GEN( atarigen_sound_int_gen )
 WRITE16_HANDLER( atarigen_sound_int_ack_w )
 {
 	atarigen_sound_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 WRITE32_HANDLER( atarigen_sound_int_ack32_w )
 {
 	atarigen_sound_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 
@@ -242,7 +242,7 @@ WRITE32_HANDLER( atarigen_sound_int_ack32_w )
 INTERRUPT_GEN( atarigen_video_int_gen )
 {
 	atarigen_video_int_state = 1;
-	(*update_int_callback)();
+	(*update_int_callback)(machine);
 }
 
 
@@ -254,13 +254,13 @@ INTERRUPT_GEN( atarigen_video_int_gen )
 WRITE16_HANDLER( atarigen_video_int_ack_w )
 {
 	atarigen_video_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 WRITE32_HANDLER( atarigen_video_int_ack32_w )
 {
 	atarigen_video_int_state = 0;
-	(*update_int_callback)();
+	(*update_int_callback)(Machine);
 }
 
 
@@ -693,7 +693,7 @@ WRITE8_HANDLER( atarigen_6502_sound_w )
 READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_cpu_to_sound_ready = 0;
-	cpunum_set_input_line(sound_cpu_num, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, sound_cpu_num, INPUT_LINE_NMI, CLEAR_LINE);
 	return atarigen_cpu_to_sound;
 }
 
@@ -708,9 +708,9 @@ READ8_HANDLER( atarigen_6502_sound_r )
 void update_6502_irq(void)
 {
 	if (timed_int || ym2151_int)
-		cpunum_set_input_line(sound_cpu_num, M6502_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(Machine, sound_cpu_num, M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(sound_cpu_num, M6502_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(Machine, sound_cpu_num, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -724,8 +724,8 @@ static TIMER_CALLBACK( delayed_sound_reset )
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		cpunum_set_input_line(sound_cpu_num, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(sound_cpu_num, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -752,7 +752,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	atarigen_cpu_to_sound = param;
 	atarigen_cpu_to_sound_ready = 1;
-	cpunum_set_input_line(sound_cpu_num, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1311,7 +1311,7 @@ WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)Machine->screen[0].width;
 	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(0)) * fraction), NULL, 0, unhalt_cpu);
-	cpunum_set_input_line(0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1399,7 +1399,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 static TIMER_CALLBACK( unhalt_cpu )
 {
-	cpunum_set_input_line(param, INPUT_LINE_HALT, CLEAR_LINE);
+	cpunum_set_input_line(machine, param, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

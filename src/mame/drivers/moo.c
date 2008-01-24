@@ -168,7 +168,7 @@ static void moo_objdma(int type)
 static TIMER_CALLBACK( dmaend_callback )
 {
 	if (cur_control2 & 0x800)
-		cpunum_set_input_line(0, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(moo_interrupt)
@@ -183,7 +183,7 @@ static INTERRUPT_GEN(moo_interrupt)
 
 	// trigger V-blank interrupt
 	if (cur_control2 & 0x20)
-		cpunum_set_input_line(0, 5, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(moobl_interrupt)
@@ -194,7 +194,7 @@ static INTERRUPT_GEN(moobl_interrupt)
 	timer_set(ATTOTIME_IN_USEC(MOO_DMADELAY), NULL, 0, dmaend_callback);
 
 	// trigger V-blank interrupt
-	cpunum_set_input_line(0, 5, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( sound_cmd1_w )
@@ -214,7 +214,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )

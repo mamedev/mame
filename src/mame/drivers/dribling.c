@@ -55,7 +55,7 @@ static UINT8 di;
 static INTERRUPT_GEN( dribling_irq_gen )
 {
 	if (di)
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( misc_w )
 	/* bit 7 = di */
 	di = (data >> 7) & 1;
 	if (!di)
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 

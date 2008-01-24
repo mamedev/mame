@@ -401,9 +401,9 @@ static UINT16 *jchan_spriteram;
 static INTERRUPT_GEN( jchan_vblank )
 {
 	if (!cpu_getiloops())
-		cpunum_set_input_line(0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 	else
-		cpunum_set_input_line(0, 2, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
 
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( main2sub_cmd_w )
 {
 	COMBINE_DATA(&main2sub_cmd);
 	logerror("cpu #%d (PC=%06X): write cmd %04x to subcpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), main2sub_cmd);
-	cpunum_set_input_line(1, 4, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, 4, HOLD_LINE);
 }
 static READ16_HANDLER ( main2sub_status_r )
 {
@@ -513,7 +513,7 @@ static WRITE16_HANDLER( sub2main_cmd_w )
 {
 	COMBINE_DATA(&sub2main_cmd);
 	logerror("cpu #%d (PC=%06X): write cmd %04x to maincpu\n", cpu_getactivecpu(), activecpu_get_previouspc(), sub2main_cmd);
-	cpunum_set_input_line(0, 3, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, 3, HOLD_LINE);
 }
 static READ16_HANDLER ( sub2main_cmd_r )
 {

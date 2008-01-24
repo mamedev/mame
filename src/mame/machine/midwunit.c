@@ -251,7 +251,7 @@ void midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpunum_set_input_line(0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

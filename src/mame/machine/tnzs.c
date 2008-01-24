@@ -670,7 +670,7 @@ INTERRUPT_GEN( arknoid2_interrupt )
 			break;
 	}
 
-	cpunum_set_input_line(0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 MACHINE_RESET( tnzs )
@@ -721,9 +721,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	memory_set_bankptr (1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
@@ -743,7 +743,7 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				if (data & 0x04)
 				{
 					if (Machine->drv->cpu[2].type == CPU_I8X41)
-						cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);
+						cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

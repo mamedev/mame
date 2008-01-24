@@ -1075,7 +1075,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 {
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
-	if (offset == 4) cpunum_set_input_line(1, M37710_LINE_IRQ0, HOLD_LINE);
+	if (offset == 4) cpunum_set_input_line(Machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 }
@@ -1193,7 +1193,7 @@ static WRITE8_HANDLER( port4_w )
 		logerror("launching 68k, PC=%x\n", activecpu_get_pc());
 
 		// reset and launch the 68k
-		cpunum_set_input_line(0, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	mcu_port4 = data;
@@ -1272,7 +1272,7 @@ static MACHINE_START( namcona1 )
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
 static MACHINE_RESET( namcona1_mcu )
 {
-	cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
 
 	mcu_port5 = 1;
 }
@@ -1315,7 +1315,7 @@ static INTERRUPT_GEN( namcona1_interrupt )
 	{
 		if( (namcona1_vreg[0x1a/2]&(1<<level))==0 )
 		{
-			cpunum_set_input_line(0, level+1, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, level+1, HOLD_LINE);
 		}
 	}
 }
@@ -1327,10 +1327,10 @@ static INTERRUPT_GEN( namcona1_interrupt )
 static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops() == 0)
- 		cpunum_set_input_line(1, M37710_LINE_IRQ1, HOLD_LINE);
+ 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ1, HOLD_LINE);
 	else if (cpu_getiloops() == 1)
 	{
-		cpunum_set_input_line(1, M37710_LINE_ADC, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 

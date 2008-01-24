@@ -223,7 +223,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( raiden_interrupt )
 {
-	cpunum_set_input_line_and_vector(cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static VIDEO_EOF( raiden )

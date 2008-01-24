@@ -143,11 +143,11 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 				watchdog_reset_w(0, data);
 			else{
 				if (firq_enable)	/* Cause interrupt on slave CPU */
-					cpunum_set_input_line(1, M6809_FIRQ_LINE, HOLD_LINE);
+					cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(2, 0, HOLD_LINE);
+			cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
 			soundlatch_w(offset,data);
@@ -218,5 +218,5 @@ MACHINE_RESET( ajax )
 INTERRUPT_GEN( ajax_interrupt )
 {
 	if (K051960_is_IRQ_enabled())
-		cpunum_set_input_line(0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
 }

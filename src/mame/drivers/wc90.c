@@ -110,7 +110,7 @@ static WRITE8_HANDLER( wc90_bankswitch1_w )
 static WRITE8_HANDLER( wc90_sound_command_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(2,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -333,7 +333,7 @@ GFXDECODE_END
 /* handler called by the 2608 emulator when the internal timers cause an IRQ */
 static void irqhandler(int irq)
 {
-	cpunum_set_input_line(2,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2608interface ym2608_interface =

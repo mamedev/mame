@@ -18,9 +18,7 @@ static int starshp1_analog_in_select;
 static INTERRUPT_GEN( starshp1_interrupt )
 {
 	if ((readinputport(0) & 0x90) != 0x90)
-	{
-		cpunum_set_input_line(0, 0, PULSE_LINE);
-	}
+		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 }
 
 

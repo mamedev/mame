@@ -63,7 +63,7 @@ static WRITE8_HANDLER( sgladiat_soundlatch_w )
 	soundlatch_w( offset, data );
 
 	/* trigger NMI on sound CPU */
-	cpunum_set_input_line(2, INPUT_LINE_NMI, PULSE_LINE);	// safer because NMI can be lost in rare occations
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// safer because NMI can be lost in rare occations
 }
 
 static READ8_HANDLER( sgladiat_soundlatch_r )
@@ -74,7 +74,7 @@ static READ8_HANDLER( sgladiat_soundlatch_r )
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 {
-//  cpunum_set_input_line(2, INPUT_LINE_NMI, CLEAR_LINE);
+//  cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 

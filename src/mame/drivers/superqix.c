@@ -290,7 +290,7 @@ static WRITE8_HANDLER( mcu_p3_w )
 
 static READ8_HANDLER( nmi_ack_r )
 {
-	cpunum_set_input_line(0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -344,7 +344,7 @@ static TIMER_CALLBACK( delayed_z80_mcu_w )
 logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
-	cpunum_set_input_line(1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
 }
 

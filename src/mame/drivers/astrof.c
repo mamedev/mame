@@ -89,7 +89,7 @@ static UINT16 abattle_count;
 
 static READ8_HANDLER( irq_ack_r )
 {
-	cpunum_set_input_line(0, 0, CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -97,7 +97,7 @@ static READ8_HANDLER( irq_ack_r )
 
 static TIMER_CALLBACK( irq_callback )
 {
-	cpunum_set_input_line(0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
 }
@@ -129,7 +129,7 @@ static INTERRUPT_GEN( coin_nmi )
 
 	/* both the coin input and the serice credit generates an NMI */
 	if (coin || service)
-		cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the coin input is also connected to the coin counter */
 	if (coin)

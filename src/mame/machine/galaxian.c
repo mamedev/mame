@@ -32,7 +32,7 @@ static void galaxian_7474_9M_2_callback(void)
 static void galaxian_7474_9M_1_callback(void)
 {
 	/* Q goes to the NMI line */
-	cpunum_set_input_line(0, irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 0, irq_line, TTL7474_output_r(1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const struct TTL7474_interface galaxian_7474_9M_2_intf =
@@ -526,7 +526,7 @@ DRIVER_INIT( 4in1 )
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )
 {
-	cpunum_set_input_line_and_vector(0,0,PULSE_LINE,0x03);
+	cpunum_set_input_line_and_vector(machine, 0,0,PULSE_LINE,0x03);
 }
 
 DRIVER_INIT( ladybugg )
@@ -558,6 +558,6 @@ INTERRUPT_GEN( gmgalax_vh_interrupt )
 		/* Ghost Muncher never clears this */
 		galaxian_stars_enable_w(0, 0);
 
-		cpunum_set_input_line(0, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }

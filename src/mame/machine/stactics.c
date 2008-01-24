@@ -84,7 +84,7 @@ INTERRUPT_GEN( stactics_interrupt )
             stactics_vert_pos++;
     }
 
-    cpunum_set_input_line(0,0,HOLD_LINE);
+    cpunum_set_input_line(machine, 0,0,HOLD_LINE);
 }
 
 WRITE8_HANDLER( stactics_coin_lockout_w )

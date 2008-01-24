@@ -901,7 +901,7 @@ MACHINE_DRIVER_END
 
 static void set_gate_a20(int a20)
 {
-	cpunum_set_input_line(0, INPUT_LINE_A20, a20);
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(int state)

@@ -182,27 +182,27 @@ static void bankselect_postload(void);
  *
  *************************************/
 
-static void update_interrupts(void)
+static void update_interrupts(running_machine *machine)
 {
 	if (atarigen_video_int_state)
-		cpunum_set_input_line(0, 3, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 3, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
 
 	if (atarigen_scanline_int_state)
-		cpunum_set_input_line(0, 2, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 2, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
 
 	if (p2portwr_state)
-		cpunum_set_input_line(0, 1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 
 	if (p2portrd_state)
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -302,7 +302,7 @@ static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
 	if (ACCESSING_LSB)
-		cpunum_set_input_line(1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

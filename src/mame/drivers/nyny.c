@@ -115,13 +115,13 @@ static void main_cpu_irq(int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1) | pia_get_irq_b(2);
 
-	cpunum_set_input_line(0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void main_cpu_firq(int state)
 {
-	cpunum_set_input_line(0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -431,14 +431,14 @@ static VIDEO_START( nyny )
 static WRITE8_HANDLER( audio_1_command_w )
 {
 	soundlatch_w(0, data);
-	cpunum_set_input_line(1, M6802_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 1, M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_1_answer_w )
 {
 	soundlatch3_w(0, data);
-	cpunum_set_input_line(0, M6809_IRQ_LINE, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -482,7 +482,7 @@ static const struct AY8910interface ay8910_64_interface =
 static WRITE8_HANDLER( audio_2_command_w )
 {
 	soundlatch2_w(0, (data & 0x60) >> 5);
-	cpunum_set_input_line(2, M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(Machine, 2, M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

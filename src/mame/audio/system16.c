@@ -28,7 +28,7 @@ static TIMER_CALLBACK( trigger_7751_sound )
 
 	port_8255_c03 = (data>>5);
 
-	cpunum_set_input_line(2, 0, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, 0, PULSE_LINE);
 }
 
 // I'm sure this must be wrong, but it seems to work for quartet music.
@@ -38,7 +38,7 @@ WRITE8_HANDLER( sys16_7751_audio_8255_w )
 
 	if ((data & 0x0f) != 8)
 	{
-		cpunum_set_input_line(2, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 		timer_set(ATTOTIME_IN_USEC(300), NULL, data, trigger_7751_sound);
 	}
 }

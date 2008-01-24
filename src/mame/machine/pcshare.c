@@ -413,7 +413,7 @@ static void pc_pic_set_int_line(int which, int interrupt)
 	{
 		case 0:
 			/* Master */
-			cpunum_set_input_line(0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 			break;
 
 		case 1:

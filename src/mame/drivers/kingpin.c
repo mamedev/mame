@@ -132,7 +132,7 @@ static INTERRUPT_GEN( kingpin_video_interrupt )
 
 static void vdp_interrupt (int state)
 {
-	cpunum_set_input_line(0,0, HOLD_LINE);
+	cpunum_set_input_line(Machine, 0,0, HOLD_LINE);
 }
 
 static const TMS9928a_interface tms9928a_interface =

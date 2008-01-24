@@ -87,7 +87,7 @@ static WRITE8_HANDLER( darwin_0803_w )
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	soundlatch_w(offset,data);
-	cpunum_set_input_line(1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -147,13 +147,13 @@ static INTERRUPT_GEN( brkthru_interrupt )
 	if (cpu_getiloops() == 0)
 	{
 		if (nmi_enable)
-			cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		/* generate IRQ on coin insertion */
 		if ((readinputportbytag("IN2") & 0xe0) != 0xe0)
-			cpunum_set_input_line(0, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	}
 }
 
@@ -386,7 +386,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(int linestate)
 {
-	cpunum_set_input_line(1,M6809_IRQ_LINE,linestate);
+	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

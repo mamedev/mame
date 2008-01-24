@@ -267,16 +267,16 @@ static NVRAM_HANDLER( exidy440 )
  *
  *************************************/
 
-static void handle_coins(void)
+static void handle_coins(running_machine *machine)
 {
 	int coins;
 
 	/* if we got a coin, set the IRQ on the main CPU */
 	coins = readinputport(3) & 3;
 	if (((coins ^ last_coins) & 0x01) && (coins & 0x01) == 0)
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	if (((coins ^ last_coins) & 0x02) && (coins & 0x02) == 0)
-		cpunum_set_input_line(0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	last_coins = coins;
 }
 
@@ -284,7 +284,7 @@ static void handle_coins(void)
 static INTERRUPT_GEN( main_interrupt )
 {
 	/* generate coin interrupts */
-	handle_coins();
+	handle_coins(machine);
 	exidy440_vblank_interrupt(machine, cpunum);
 }
 
@@ -381,7 +381,7 @@ static READ8_HANDLER( io_r )
 			result = readinputport(3) ^ port_3_xor;
 
 			/* I/O1 accesses clear the CIRQ flip/flop */
-			cpunum_set_input_line(0, 0, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x40:										/* clear coin counters I/O2 */
@@ -434,7 +434,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
-	cpunum_set_input_line(1, 1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, 1, ASSERT_LINE);
 }
 
 
@@ -452,7 +452,7 @@ static WRITE8_HANDLER( io_w )
 		case 0x20:										/* coin bits I/O1 */
 
 			/* accesses here clear the CIRQ flip/flop */
-			cpunum_set_input_line(0, 0, CLEAR_LINE);
+			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x40:										/* coin counter I/O2 */
