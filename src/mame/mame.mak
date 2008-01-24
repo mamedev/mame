@@ -365,6 +365,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/orca.a \
 	$(MAMEOBJ)/pacific.a \
 	$(MAMEOBJ)/pacman.a \
+	$(MAMEOBJ)/pce.a \
 	$(MAMEOBJ)/phoenix.a \
 	$(MAMEOBJ)/playmark.a \
 	$(MAMEOBJ)/psikyo.a \
@@ -1091,6 +1092,11 @@ $(MAMEOBJ)/pacman.a: \
 	$(MACHINE)/pacplus.o \
 	$(MACHINE)/theglobp.o \
 
+$(MAMEOBJ)/pce.a: \
+	$(DRIVERS)/uapce.o \
+	$(DRIVERS)/paranoia.o \
+	$(MACHINE)/pcecommn.o $(VIDEO)/vdc.o \
+
 $(MAMEOBJ)/phoenix.a: \
 	$(DRIVERS)/naughtyb.o $(VIDEO)/naughtyb.o \
 	$(DRIVERS)/phoenix.o $(AUDIO)/phoenix.o $(VIDEO)/phoenix.o \
@@ -1625,8 +1631,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
-	$(DRIVERS)/is.o \
-	$(DRIVERS)/uapce.o $(DRIVERS)/paranoia.o $(VIDEO)/vdc.o $(MACHINE)/pcecommn.o \
 
 
 #-------------------------------------------------

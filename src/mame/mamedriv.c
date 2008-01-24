@@ -7469,28 +7469,6 @@ Other Sun games
 	DRIVER( scrabble )	/* (c) 1997 */
 	DRIVER( hngmnjpm )	/* (c) 1998 */
 
-	/* Igrosoft */
-
-	/* Multifish */
-	DRIVER( i_mf )
-	DRIVER( i_mf_2 )
-	DRIVER( i_mf_2a )
-	DRIVER( i_mf_3 )
-	DRIVER( i_mf_4 )
-	DRIVER( i_mf_5 )
-	DRIVER( i_mf_6 )
-	DRIVER( i_mf_7 )
-	DRIVER( i_mf_8 )
-	DRIVER( i_mf_9 )
-	DRIVER( i_mf_10 )
-	DRIVER( i_mf_11 )
-	DRIVER( i_mf_12 )
-	DRIVER( i_mf_13 )
-
-	/* Rollfruit */
-	DRIVER( i_rf )
-	DRIVER( i_rf_2 )
-
 	/* Other Games */
 	DRIVER( astinvad )	/* (c) 1980 Stern */
 	DRIVER( kosmokil )	/* bootleg */
