@@ -818,7 +818,7 @@ static MACHINE_DRIVER_START( rohga )
 	MDRV_CPU_PROGRAM_MAP(rohga_readmem,rohga_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_CPU_PROGRAM_MAP(wizdfire_readmem,wizdfire_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3)
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -904,7 +904,7 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_CPU_PROGRAM_MAP(nitrobal_readmem,nitrobal_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)
@@ -947,7 +947,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	MDRV_CPU_PROGRAM_MAP(schmeisr_readmem,schmeisr_writemem)
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
 
-	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(58)

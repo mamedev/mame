@@ -1198,7 +1198,7 @@ static MACHINE_DRIVER_START( slyspy )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_12MHz/2/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)
@@ -1241,7 +1241,7 @@ static MACHINE_DRIVER_START( midres )
 	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_24MHz/4/3)
-	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, pin 14 (HSM) is high so XIN/3 */
+	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(midres_s_readmem,midres_s_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(57.41)

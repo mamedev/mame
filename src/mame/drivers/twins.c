@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( twinsa )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30, 8000000)
+	MDRV_CPU_ADD(V30, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(twins_map, 0)
 	MDRV_CPU_IO_MAP(twinsa_io,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( twinsa )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 2000000)
+	MDRV_SOUND_ADD(AY8910, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

@@ -23,7 +23,7 @@ Ordered by Board        Year + Game                         Licensed To
 -------------------------------------------------------------------------------
 P0-029-A (M6100287A)    88 Thundercade / Twin Formation (1) Taito
 ?        (M6100326A)    88 Twin Eagle                       Taito
-?                       89 DownTown                         Taito / RomStar
+P0-045-A (M6100429A)    89 DownTown                         Taito / RomStar
 ?        (M6100430A)    89 U.S. Classic(2)                  Taito / RomStar
 ?                       88 Caliber 50                       Taito / RomStar
 ?                       89 Arbalester                       Taito / RomStar
@@ -6964,11 +6964,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( downtown )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
 	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
+	MDRV_CPU_ADD(M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(downtown_sub_readmem,downtown_sub_writemem)
 	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 

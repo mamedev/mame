@@ -83,7 +83,7 @@ enum
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
 	XTAL_20MHz   		= 20000000,
 	XTAL_21_3MHz  		= 21300000,
-	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling */
+	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
 	XTAL_24MHz   		= 24000000,		/* Mario, 80's Data East games, 80's Konami games */
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
@@ -128,9 +128,9 @@ enum
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
 	XTAL_384kHz			= 384000,
-	XTAL_400kHz			= 400000,	/* Used on Great Swordman h/w */
-	XTAL_455kHz			= 455000,	/* Used on Gladiator h/w */
-	XTAL_640kHz			= 640000
+	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
+	XTAL_640kHz			= 640000,
+	XTAL_1_056MHz		= 1056000 		/* used on Trio The Punch */
 };
 
 
