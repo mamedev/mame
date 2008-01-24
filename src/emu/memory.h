@@ -57,6 +57,7 @@ typedef void			(*write64_handler)(ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 
 typedef offs_t			(*opbase_handler) (ATTR_UNUSED offs_t address);
 
 /* ----- this struct contains pointers to the live read/write routines ----- */
+typedef struct _data_accessors data_accessors;
 struct _data_accessors
 {
 	UINT8			(*read_byte)(offs_t offset);
@@ -69,7 +70,6 @@ struct _data_accessors
 	void			(*write_dword)(offs_t offset, UINT32 data);
 	void			(*write_qword)(offs_t offset, UINT64 data);
 };
-typedef struct _data_accessors data_accessors;
 
 
 
@@ -591,7 +591,7 @@ struct _address_space
 	UINT8 *				writelookup;		/* write table lookup */
 	handler_data *		readhandlers;		/* read handlers */
 	handler_data *		writehandlers;		/* write handlers */
-	const data_accessors *	accessors;			/* pointers to the data access handlers */
+	const data_accessors *accessors;		/* pointers to the data access handlers */
 };
 
 

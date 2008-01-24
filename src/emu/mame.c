@@ -142,7 +142,7 @@ struct _mame_private
 	UINT8			exit_pending;
 	const game_driver *new_driver_pending;
 	astring *		saveload_pending_file;
-	emu_timer *	soft_reset_timer;
+	emu_timer *		soft_reset_timer;
 	mame_file *		logfile;
 
 	/* callbacks */
