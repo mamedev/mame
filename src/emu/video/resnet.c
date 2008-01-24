@@ -50,6 +50,9 @@
 #include "driver.h"
 #include "resnet.h"
 
+#define VERBOSE 0
+
+
 double compute_resistor_weights(
 	int minval, int maxval, double scaler,
 	int count_1, const int * resistances_1, double * weights_1, int pulldown_1, int pullup_1,
@@ -109,11 +112,7 @@ double compute_resistor_weights(
 
 		/* parameters validity check */
 		if (count > MAX_RES_PER_NET)
-		{
-			logerror(" ERROR: res_net.h: compute_resistor_weights(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
-			/* quit */
-			return (0.0);
-		}
+			fatalerror("compute_resistor_weights(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
 
 
 		if (count > 0)
@@ -130,11 +129,7 @@ double compute_resistor_weights(
 		}
 	}
 	if (networks_no < 1)
-	{
-		/* error - no networks to anaylse */
-		logerror(" ERROR: res_net.h: compute_resistor_weights(): no input data\n");
-		return (0.0);
-	}
+		fatalerror("compute_resistor_weights(): no input data\n");
 
 	/* calculate outputs for all given networks */
 	for( i = 0; i < networks_no; i++ )
@@ -208,7 +203,7 @@ double compute_resistor_weights(
 	}
 
 /* debug code */
-#ifdef MAME_DEBUG
+#if VERBOSE
 	logerror("compute_resistor_weights():  scaler = %15.10f\n",scale);
 	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
@@ -301,13 +296,7 @@ double compute_resistor_net_outputs(
 
 		/* parameters validity check */
 		if (count > MAX_RES_PER_NET)
-		{
-			logerror(" ERROR: res_net.h: compute_resistor_net_outputs(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
-			/* quit */
-			free(o);
-			free(os);
-			return (0.0);
-		}
+			fatalerror("compute_resistor_net_outputs(): too many resistors in net #%i. The maximum allowed is %i, the number requested was: %i\n",n, MAX_RES_PER_NET, count);
 
 		if (count > 0)
 		{
@@ -324,13 +313,7 @@ double compute_resistor_net_outputs(
 	}
 
 	if (networks_no<1)
-	{
-		/* error - no networks to anaylse */
-		logerror(" ERROR: res_net.h: compute_resistor_net_outputs(): no input data\n");
-		free(o);
-		free(os);
-		return (0.0);
-	}
+		fatalerror("compute_resistor_net_outputs(): no input data\n");
 
 	/* calculate outputs for all given networks */
 	for( i = 0; i < networks_no; i++ )
@@ -413,7 +396,7 @@ double compute_resistor_net_outputs(
 	}
 
 /* debug code */
-#ifdef MAME_DEBUG
+#if VERBOSE
 	logerror("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
 	logerror("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
