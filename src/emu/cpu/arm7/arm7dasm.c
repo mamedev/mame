@@ -1200,17 +1200,26 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 				}
 				break;
 			case 0xe: /* B #offs */
-				offs = ( opcode & THUMB_BRANCH_OFFS ) << 1;
-				if( offs & 0x00000800 )
-				{
-					offs |= 0xfffff800;
-				}
-				pBuf += sprintf( pBuf, "B #%08x (%08x)", offs, pc + 4 + offs);
+                if( insn & THUMB_BLOP_LO )
+                {
+                    addr = ( ( opcode & THUMB_BLOP_OFFS ) << 1 ) & 0xfffc;
+                    pBuf += sprintf( pBuf, "BLX (LO) %08x", addr );
+                    dasmflags = DASMFLAG_STEP_OVER;
+                }
+                else
+                {
+                    offs = ( opcode & THUMB_BRANCH_OFFS ) << 1;
+                    if( offs & 0x00000800 )
+                    {
+                        offs |= 0xfffff800;
+                    }
+                    pBuf += sprintf( pBuf, "B #%08x (%08x)", offs, pc + 4 + offs);
+                }
 				break;
 			case 0xf: /* BL */
 				if( opcode & THUMB_BLOP_LO )
 				{
-					pBuf += sprintf( pBuf, "BL (LO) %04x", ( opcode & THUMB_BLOP_OFFS ) << 1 );
+					pBuf += sprintf( pBuf, "BL (LO) %08x", ( opcode & THUMB_BLOP_OFFS ) << 1 );
 					dasmflags = DASMFLAG_STEP_OVER;
 				}
 				else
@@ -1220,7 +1229,7 @@ UINT32 thumb_disasm( char *pBuf, UINT32 pc, UINT16 opcode )
 					{
 						addr |= 0xff800000;
 					}
-					pBuf += sprintf( pBuf, "BL (HI) %04x", ( opcode & THUMB_BLOP_OFFS ) << 12 );
+					pBuf += sprintf( pBuf, "BL (HI) %08x", addr );
 					dasmflags = DASMFLAG_STEP_OVER;
 				}
 				break;

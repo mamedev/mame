@@ -1109,12 +1109,23 @@
 				}
 				break;
 			case 0xe: /* B #offs */
-				offs = ( insn & THUMB_BRANCH_OFFS ) << 1;
-				if( offs & 0x00000800 )
-				{
-					offs |= 0xfffff800;
-				}
-				R15 += 4 + offs;
+                if( insn & THUMB_BLOP_LO )
+                {
+                    addr = GET_REGISTER(14);
+                    addr += ( insn & THUMB_BLOP_OFFS ) << 1;
+                    addr &= 0xfffffffc;
+                    SET_REGISTER( 14, ( R15 + 4 ) | 1 );
+                    R15 = addr;
+                }
+                else
+                {
+                    offs = ( insn & THUMB_BRANCH_OFFS ) << 1;
+                    if( offs & 0x00000800 )
+                    {
+                        offs |= 0xfffff800;
+                    }
+                    R15 += 4 + offs;
+                }
 				break;
 			case 0xf: /* BL */
 				if( insn & THUMB_BLOP_LO )
