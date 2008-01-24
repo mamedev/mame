@@ -1930,6 +1930,29 @@ ROM_START( triviag1 )
 	ROM_LOAD( "tpg1-gr5.bin", 0x0a000, 0x2000, CRC(067bfd66) SHA1(32f5973f2f0aed67c8f9b5886f52b9dc516a611e) )
 ROM_END
 
+ROM_START( trivia12 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "ab0.u9a", 0x10000, 0x2000, CRC(41ca9a81) SHA1(127beee924d4213de874f7def9875fd3a26c6b5f) )
+	ROM_LOAD( "ab1.u8a", 0x12000, 0x2000, CRC(b3b48a3d) SHA1(e9554887430014116ff8e5e3d0ef5678d13f224c) )
+	ROM_LOAD( "ab2.u7a", 0x14000, 0x2000, CRC(ab652ce9) SHA1(06f47c274b94f046a59a1dc432c55ee8f450a246) )
+	ROM_LOAD( "ab3.u6a", 0x16000, 0x2000, CRC(4b382c77) SHA1(4a14166c90542ecec3677d9098a26723be6a26e2) )
+	ROM_LOAD( "ab4.u5a", 0x18000, 0x2000, CRC(9b4a8c4e) SHA1(c0354862b428ad8a5b1d229cadfcfc7e688b06c1) )
+	ROM_LOAD( "ab5.u4a", 0x1a000, 0x2000, CRC(499773a4) SHA1(c0c0ad2a63a9dbb7585cab7e21162bbc58fec0d8) )
+	ROM_LOAD( "cd.u3a",  0x2c000, 0x2000, CRC(12d870ba) SHA1(b86a8cbf8037df78437056f5ff57e7b8b5e4c94e) )
+	ROM_LOAD( "ef.u2a",  0x2e000, 0x2000, CRC(d902ee28) SHA1(18e3c96e1ac50f847d1b9f4f868f19e074d147ff) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* 64k for Z80 */
+	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, 0 )		/* up to 64k of sprites */
+	ROM_LOAD( "gr0.u9b", 0x00000, 0x2000, CRC(20c9217a) SHA1(79ef058633149da8d2835405954ac31c661bf660) )
+	ROM_LOAD( "gr1.u8b", 0x02000, 0x2000, CRC(d7f44504) SHA1(804dbc4c006b20bdb01bdf02754e0d98f6fbacbe) )
+	ROM_LOAD( "gr2.u7b", 0x04000, 0x2000, CRC(4e59a15d) SHA1(c584bae32e2e5d8b5a48c44a31272b4f9dadfcd1) )
+	ROM_LOAD( "gr3.u6b", 0x06000, 0x2000, CRC(323a8640) SHA1(7ec6f8f9bcfa5de442dce4f6e81e697da34dbab8) )
+	ROM_LOAD( "gr4.u5b", 0x08000, 0x2000, CRC(673acf42) SHA1(7b36a86441732ba14576f9c1dd14fe0da575d4bf) )
+	ROM_LOAD( "gr5.u4b", 0x0a000, 0x2000, CRC(d17d5431) SHA1(b92741f6eda01f2e360e73a9f4df728fc44d7e1b) )
+ROM_END
+
 
 ROM_START( triviag2 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -2470,7 +2493,8 @@ GAME( 1984, otwalls,  0,        balsente, otwalls,  otwalls,  ROT0, "Bally/Sente
 GAME( 1984, snakepit, 0,        balsente, snakepit, snakepit, ROT0, "Bally/Sente", "Snake Pit", GAME_SUPPORTS_SAVE )
 GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente", "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
 GAME( 1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente", "Stocker", GAME_SUPPORTS_SAVE )
-GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente", "Trivial Pursuit (Genus I)", GAME_SUPPORTS_SAVE )
+GAME( 1984, triviag1, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente", "Trivial Pursuit (Genus I) (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, trivia12, 0,        balsente, triviag1, triviag1, ROT0, "Bally/Sente", "Trivial Pursuit (Genus I) (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviag2, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente", "Trivial Pursuit (Genus II)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviasp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente", "Trivial Pursuit (All Star Sports Edition)", GAME_SUPPORTS_SAVE )
 GAME( 1984, triviayp, 0,        balsente, triviag1, triviag2, ROT0, "Bally/Sente", "Trivial Pursuit (Young Players Edition)", GAME_SUPPORTS_SAVE )

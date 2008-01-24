@@ -1303,6 +1303,7 @@ const game_driver * const drivers[] =
 	DRIVER( snakjack )	/* (c) 1984 */
 	DRIVER( stocker )	/* (c) 1984 */
 	DRIVER( triviag1 )	/* (c) 1984 */
+	DRIVER( trivia12 )	/* (c) 1984 */
 	DRIVER( triviag2 )	/* (c) 1984 */
 	DRIVER( triviasp )	/* (c) 1984 */
 	DRIVER( triviayp )	/* (c) 1984 */
