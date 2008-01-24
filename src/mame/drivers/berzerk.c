@@ -20,7 +20,7 @@
 #define MASTER_CLOCK				(XTAL_10MHz)
 #define MAIN_CPU_CLOCK  			(MASTER_CLOCK / 4)
 #define PIXEL_CLOCK  				(MASTER_CLOCK / 2)
-#define S14001A_CLOCK   			(MASTER_CLOCK / 2)
+#define S14001_CLOCK				(MASTER_CLOCK / 4)
 #define HTOTAL						(0x140)
 #define HBEND						(0x000)
 #define HBSTART						(0x100)
@@ -481,39 +481,47 @@ static const struct CustomSound_interface berzerk_custom_interface =
 
 static WRITE8_HANDLER( berzerk_audio_w )
 {
+	int clock_divisor;
+
 	switch (offset)
 	{
+	/* offset 4 writes to the S14001A */
+	case 4:
+		switch (data >> 6)
+		{
+		/* write data to the S14001 */
+		case 0:
+			/* only if not busy */
+			if (!S14001A_bsy_0_r())
+			{
+				S14001A_reg_0_w(data & 0x3f);
+
+				/* clock the chip -- via a 555 timer */
+				S14001A_rst_0_w(1);
+				S14001A_rst_0_w(0);
+			}
+
+			break;
+
+		case 1:
+			/* volume */
+			S14001A_set_volume(((data & 0x38) >> 3) + 1);
+
+			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
+               giving a final clock from 19.5kHz to 34.7kHz */
+			clock_divisor = 16 - (data & 0x07);
+
+			S14001A_set_clock(S14001_CLOCK / clock_divisor / 8);
+			break;
+
+		default: break; /* 2 and 3 are not connected */
+		}
+
+		break;
+
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
 		exidy_sfxctrl_w(data >> 6, data);
-		break;
-
-	/* offset 4 writes to the S14001A */
-	case 4:
-		if ((data & 0xc0) == 0x40) /* VSU-1000 control write */
-		{
-			/* volume and frequency control goes here */
-			/* mame_printf_debug("TODO: VSU-1000 Control write (ignored for now)\n");*/
-			S14001A_set_volume(((data & 0x38) >> 3) + 1);
-			S14001A_set_rate((16 - (data & 0x07)) * 16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
-		}
-		else if ((data & 0xc0) != 0x00)
-			/* vsu-1000 ignores these writes entirely */
-			mame_printf_debug("bogus write ignored\n");
-		else
-		{
-			/* select word input */
-			if (S14001A_bsy_0_r()) /* skip if busy... */
-			{
-				mame_printf_debug("S14001A busy, ignoring write\n");
-				break;
-			}
-
-			/* write to the register */
-			S14001A_reg_0_w(data & 0x3f);
-			S14001A_rst_0_w(1);
-			S14001A_rst_0_w(0);
-		}
 		break;
 
 	/* everything else writes to the 6840 */
@@ -528,6 +536,14 @@ static WRITE8_HANDLER( berzerk_audio_w )
 static READ8_HANDLER( berzerk_audio_r )
 {
 	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
+}
+
+
+
+static SOUND_RESET(berzerk)
+{
+	/* clears the flip-flop controlling the volume and freq on the speech chip */
+	berzerk_audio_w(4, 0x40);
 }
 
 
@@ -866,7 +882,9 @@ static MACHINE_DRIVER_START( berzerk )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(S14001A, S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
+	MDRV_SOUND_RESET(berzerk)
+
+	MDRV_SOUND_ADD(S14001A, 0)	/* placeholder - the clock is software controllable */
 	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
