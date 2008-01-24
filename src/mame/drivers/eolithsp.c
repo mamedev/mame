@@ -86,7 +86,7 @@ INTERRUPT_GEN( eolith_speedup )
 
 	if (eolith_scanline==eolith_speedup_resume_scanline)
 	{
-		cpu_trigger(1000);
+		cpu_trigger(machine, 1000);
 	}
 
 	if (eolith_scanline==240)

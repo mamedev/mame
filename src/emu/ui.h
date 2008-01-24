@@ -86,13 +86,13 @@ enum
 int ui_init(running_machine *machine);
 
 /* display the startup screens */
-int ui_display_startup_screens(int first_time, int show_disclaimer);
+int ui_display_startup_screens(running_machine *machine, int first_time, int show_disclaimer);
 
 /* set the current text to display at startup */
-void ui_set_startup_text(const char *text, int force);
+void ui_set_startup_text(running_machine *machine, const char *text, int force);
 
 /* once-per-frame update and render */
-void ui_update_and_render(void);
+void ui_update_and_render(running_machine *machine);
 
 /* returns the current UI font */
 render_font *ui_get_font(void);

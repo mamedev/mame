@@ -804,7 +804,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 	cpuintrf_pop_context();
 
 	/* generate triggers so that spin loops can key off them */
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 }
 
 

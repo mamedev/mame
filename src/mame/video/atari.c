@@ -1142,13 +1142,13 @@ static TIMER_CALLBACK( antic_line_done )
     {
 		LOG(("           @cycle #%3d release WSYNC\n", cycle()));
         /* release the CPU if it was actually waiting for HSYNC */
-        cpu_trigger(TRIGGER_HSYNC);
+        cpu_trigger(machine, TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
 	LOG(("           @cycle #%3d release CPU\n", cycle()));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	cpu_trigger(TRIGGER_STEAL);
+	cpu_trigger(machine, TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
     antic_linerefresh();

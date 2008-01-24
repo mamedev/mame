@@ -263,7 +263,7 @@ enum
 void cpuexec_init(running_machine *machine);
 
 /* Execute for a single timeslice */
-void cpuexec_timeslice(void);
+void cpuexec_timeslice(running_machine *machine);
 
 
 
@@ -274,11 +274,11 @@ void cpuexec_timeslice(void);
  *************************************/
 
 /* bang on the watchdog */
-void watchdog_reset(void);
+void watchdog_reset(running_machine *machine);
 
 /* watchdog enabled when TRUE */
 /* timer is set to reset state when going from disable to enable */
-void watchdog_enable(int enable);
+void watchdog_enable(running_machine *machine, int enable);
 
 
 
@@ -320,14 +320,14 @@ attotime cpunum_get_localtime(int cpunum);
 int cpunum_get_clock(int cpunum);
 
 /* Sets the current CPU's clock speed and then adjusts for scaling */
-void cpunum_set_clock(int cpunum, int clock);
-void cpunum_set_clock_period(int cpunum, attoseconds_t clock_period);
+void cpunum_set_clock(running_machine *machine, int cpunum, int clock);
+void cpunum_set_clock_period(running_machine *machine, int cpunum, attoseconds_t clock_period);
 
 /* Returns the current scaling factor for a CPU's clock speed */
 double cpunum_get_clockscale(int cpunum);
 
 /* Sets the current scaling factor for a CPU's clock speed */
-void cpunum_set_clockscale(int cpunum, double clockscale);
+void cpunum_set_clockscale(running_machine *machine, int cpunum, double clockscale);
 
 /* Temporarily boosts the interleave factor */
 void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration);
@@ -371,7 +371,7 @@ int cpu_scalebyfcount(int value);
 /***** These functions may eventually go away. */
 
 /* Recomputes the VBLANK timing after, e.g., a visible area change */
-void cpu_compute_vblank_timing(void);
+void cpu_compute_vblank_timing(running_machine *machine);
 
 /* Returns the number of the video frame we are currently playing */
 int cpu_getcurrentframe(void);
@@ -385,13 +385,13 @@ int cpu_getcurrentframe(void);
  *************************************/
 
 /* generate a trigger now */
-void cpu_trigger(int trigger);
+void cpu_trigger(running_machine *machine, int trigger);
 
 /* generate a trigger after a specific period of time */
 void cpu_triggertime(attotime duration, int trigger);
 
 /* generate a trigger corresponding to an interrupt on the given CPU */
-void cpu_triggerint(int cpunum);
+void cpu_triggerint(running_machine *machine, int cpunum);
 
 /* burn CPU cycles until a timer trigger */
 void cpu_spinuntil_trigger(int trigger);

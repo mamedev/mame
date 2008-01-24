@@ -4417,8 +4417,8 @@ MACHINE_RESET( megadriv )
 	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
 
 //  set_refresh_rate(megadriv_framerate);
-	cpunum_set_clockscale(0, 0.9950f); /* Fatal Rewind is very fussy... */
-//  cpunum_set_clockscale(0, 0.3800f); /* Fatal Rewind is very fussy... */
+	cpunum_set_clockscale(machine, 0, 0.9950f); /* Fatal Rewind is very fussy... */
+//  cpunum_set_clockscale(machine, 0, 0.3800f); /* Fatal Rewind is very fussy... */
 
 	memset(megadrive_ram,0x00,0x10000);
 

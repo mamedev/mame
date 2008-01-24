@@ -66,7 +66,7 @@ void ui_menu_init(running_machine *machine);
 int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const menu_extra *extra);
 
 /* master handler */
-UINT32 ui_menu_ui_handler(UINT32 state);
+UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state);
 
 /* menu keyboard handling */
 int ui_menu_generic_keys(UINT32 *selected, int num_items, int visible_items);

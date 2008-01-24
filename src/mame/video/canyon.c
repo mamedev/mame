@@ -91,7 +91,7 @@ VIDEO_UPDATE( canyon )
 	draw_bombs(bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(!(readinputport(2) & 0x10));
+	watchdog_enable(machine, !(readinputport(2) & 0x10));
 
 	return 0;
 }

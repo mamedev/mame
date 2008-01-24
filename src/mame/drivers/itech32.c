@@ -253,8 +253,8 @@ static UINT32 *tms1_ram, *tms2_ram;
 static UINT32 *tms1_boot;
 static UINT8 tms_spinning[2];
 
-#define START_TMS_SPINNING(n) do { cpu_spinuntil_trigger(7351 + n); tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(n)  do { cpu_trigger(7351 + n); tms_spinning[n] = 0; } while (0)
+#define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(7351 + n); tms_spinning[n] = 1; } while (0)
+#define STOP_TMS_SPINNING(machine, n)  	do { cpu_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
 
 
 
@@ -339,8 +339,8 @@ static MACHINE_RESET( drivedge )
 
 	cpunum_set_input_line(2, INPUT_LINE_RESET, ASSERT_LINE);
 	cpunum_set_input_line(3, INPUT_LINE_RESET, ASSERT_LINE);
-	STOP_TMS_SPINNING(0);
-	STOP_TMS_SPINNING(1);
+	STOP_TMS_SPINNING(machine, 0);
+	STOP_TMS_SPINNING(machine, 1);
 }
 
 
@@ -692,12 +692,12 @@ static WRITE32_HANDLER( tms_reset_clear_w )
 	if ((tms1_ram[0] & 0xff000000) == 0)
 	{
 		cpunum_set_input_line(2, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(0);
+		STOP_TMS_SPINNING(Machine, 0);
 	}
 	if ((tms2_ram[0] & 0xff000000) == 0)
 	{
 		cpunum_set_input_line(3, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(1);
+		STOP_TMS_SPINNING(Machine, 1);
 	}
 }
 
@@ -706,7 +706,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(tms1_boot);
-	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(0);
+	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(Machine, 0);
 	if (!tms_spinning[0])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
@@ -715,7 +715,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 static WRITE32_HANDLER( tms2_68k_ram_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(1);
+	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(Machine, 1);
 	if (!tms_spinning[1])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }

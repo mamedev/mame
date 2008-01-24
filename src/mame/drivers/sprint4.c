@@ -115,7 +115,7 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	watchdog_enable(readinputport(0) & 0x40);
+	watchdog_enable(machine, readinputport(0) & 0x40);
 
 	if (readinputport(0) & 0x40)
 	{

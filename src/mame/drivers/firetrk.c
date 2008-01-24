@@ -39,13 +39,13 @@ static DRIVER_INIT( montecar )
 }
 
 
-static void set_firetrk_service(int enable)
+static void set_firetrk_service(running_machine *machine, int enable)
 {
 	/* watchdog is disabled during service mode */
-	watchdog_enable(!enable);
+	watchdog_enable(machine, !enable);
 
 	/* change CPU clock speed according to service switch change */
-	cpunum_set_clock(0, enable ? FIRETRK_CPU_CLOCK_750KZ : FIRETRK_CPU_CLOCK_1MHZ);
+	cpunum_set_clock(machine, 0, enable ? FIRETRK_CPU_CLOCK_750KZ : FIRETRK_CPU_CLOCK_1MHZ);
 }
 
 
@@ -58,7 +58,7 @@ static INTERRUPT_GEN( firetrk_interrupt )
 		firetrk_service = readinputport(4) & 0x80;
 		if (firetrk_service != last_service)
 		{
-			set_firetrk_service(firetrk_service);
+			set_firetrk_service(machine, firetrk_service);
 
 			last_service = firetrk_service;
 		}
@@ -71,7 +71,7 @@ static INTERRUPT_GEN( firetrk_interrupt )
 		firetrk_service = readinputport(6) & 0x04;
 		if (firetrk_service != last_service)
 		{
-			set_firetrk_service(firetrk_service);
+			set_firetrk_service(machine, firetrk_service);
 
 			last_service = firetrk_service;
 		}
@@ -232,13 +232,13 @@ static MACHINE_RESET( firetrk )
 	{
 		write_output(0);
 		last_service = readinputport(6) & 0x04;
-		set_firetrk_service(last_service);
+		set_firetrk_service(machine, last_service);
 	}
 	else
 	if (GAME_IS_FIRETRUCK)
 	{
 		last_service = readinputport(4) & 0x80;
-		set_firetrk_service(last_service);
+		set_firetrk_service(machine, last_service);
 	}
 
 	timer_call_after_resynch(NULL, 0, periodic_callback);

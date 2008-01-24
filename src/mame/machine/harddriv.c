@@ -772,7 +772,7 @@ static TIMER_CALLBACK( stmsp_sync_update )
 	offs_t offset = (param >> 16) & 0xfff;
 	UINT16 data = param;
 	stmsp_sync[which][offset] = data;
-	cpu_triggerint(hdcpu_msp);
+	cpu_triggerint(machine, hdcpu_msp);
 }
 
 
@@ -872,7 +872,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", activecpu_get_previouspc(), data);
 		timer_call_after_resynch(NULL, 0, 0);
-		cpu_triggerint(hdcpu_adsp);
+		cpu_triggerint(Machine, hdcpu_adsp);
 	}
 	else
 		logerror("%06X:ADSP W@%04X (%04X)\n", activecpu_get_previouspc(), offset, data);
@@ -1264,7 +1264,7 @@ WRITE16_HANDLER( hd68k_ds3_gdata_w )
 	COMBINE_DATA(&ds3_g68data);
 	ds3_g68flag = 1;
 	ds3_gcmd = offset & 1;
-	cpu_triggerint(hdcpu_adsp);
+	cpu_triggerint(Machine, hdcpu_adsp);
 	update_ds3_irq();
 }
 
@@ -1342,7 +1342,7 @@ WRITE16_HANDLER( hdds3_special_w )
 			update_ds3_irq();
 
 			/* once we've written data, trigger the main CPU to wake up again */
-			cpu_trigger(DS3_TRIGGER);
+			cpu_trigger(Machine, DS3_TRIGGER);
 			break;
 
 		case 1:
@@ -1797,7 +1797,7 @@ WRITE16_HANDLER( hdgsp_speedup1_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (hdgsp_speedup_addr[0][offset] == 0xffff)
-		cpu_triggerint(hdcpu_gsp);
+		cpu_triggerint(Machine, hdcpu_gsp);
 }
 
 
@@ -1807,7 +1807,7 @@ WRITE16_HANDLER( hdgsp_speedup2_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (hdgsp_speedup_addr[1][offset] == 0xffff)
-		cpu_triggerint(hdcpu_gsp);
+		cpu_triggerint(Machine, hdcpu_gsp);
 }
 
 
@@ -1840,7 +1840,7 @@ WRITE16_HANDLER( rdgsp_speedup1_w )
 {
 	COMBINE_DATA(&hdgsp_speedup_addr[0][offset]);
 	if (cpu_getactivecpu() != hdcpu_gsp)
-		cpu_triggerint(hdcpu_gsp);
+		cpu_triggerint(Machine, hdcpu_gsp);
 }
 
 
@@ -1874,7 +1874,7 @@ WRITE16_HANDLER( hdmsp_speedup_w )
 {
 	COMBINE_DATA(&hdmsp_speedup_addr[offset]);
 	if (offset == 0 && hdmsp_speedup_addr[offset] != 0)
-		cpu_triggerint(hdcpu_msp);
+		cpu_triggerint(Machine, hdcpu_msp);
 }
 
 

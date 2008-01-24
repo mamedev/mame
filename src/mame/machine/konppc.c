@@ -196,7 +196,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		cpu_trigger(10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
+		cpu_trigger(Machine, 10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
 		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }

@@ -304,7 +304,7 @@ static TIMER_CALLBACK( dmaend_callback )
 	if (cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
-		if (suspension_active) { suspension_active = 0; cpu_trigger(resume_trigger); }
+		if (suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 static INTERRUPT_GEN( xexex_interrupt )
 {
-	if (suspension_active) { suspension_active = 0; cpu_trigger(resume_trigger); }
+	if (suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
 
 	switch (cpu_getiloops())
 	{

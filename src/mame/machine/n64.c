@@ -214,7 +214,7 @@ static void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//cpu_trigger(6789);
+		//cpu_trigger(Machine, 6789);
 
 		cpunum_set_input_line(1, INPUT_LINE_HALT, ASSERT_LINE);
         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT);

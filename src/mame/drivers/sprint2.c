@@ -109,7 +109,7 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(!service_mode());
+	watchdog_enable(machine, !service_mode());
 
 	if (!service_mode())
 	{

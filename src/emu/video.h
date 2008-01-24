@@ -117,7 +117,7 @@ int video_screen_exists(int scrnum);
 /* ----- global rendering ----- */
 
 /* update the screen, handling frame skipping and rendering */
-void video_frame_update(int debug);
+void video_frame_update(running_machine *machine, int debug);
 
 
 /* ----- throttling/frameskipping/performance ----- */

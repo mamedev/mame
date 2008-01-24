@@ -185,7 +185,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			break;
 
 		case 0x0d:	/* OUT13 */
-			watchdog_reset();
+			watchdog_reset(Machine);
 			break;
 
 		case 0x0e:	/* OUT14 */

@@ -276,7 +276,7 @@ static TIMER_CALLBACK( m37710_timer_a0_cb)
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[12]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA0, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -289,7 +289,7 @@ static TIMER_CALLBACK( m37710_timer_a1_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[11]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA1, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -302,7 +302,7 @@ static TIMER_CALLBACK( m37710_timer_a2_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[10]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA2, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -315,7 +315,7 @@ static TIMER_CALLBACK( m37710_timer_a3_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[9]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA3, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -328,7 +328,7 @@ static TIMER_CALLBACK( m37710_timer_a4_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[8]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERA4, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -341,7 +341,7 @@ static TIMER_CALLBACK( m37710_timer_b0_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[7]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB0, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -354,7 +354,7 @@ static TIMER_CALLBACK( m37710_timer_b1_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[6]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB1, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 
@@ -367,7 +367,7 @@ static TIMER_CALLBACK( m37710_timer_b2_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[5]] |= 0x04;
 	m37710_set_irq_line(M37710_LINE_TIMERB2, PULSE_LINE);
-	cpu_triggerint(cpunum);
+	cpu_triggerint(machine, cpunum);
 	cpuintrf_pop_context();
 }
 

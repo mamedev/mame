@@ -197,7 +197,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem);
 static void init_tmu_shared(tmu_shared_state *s);
 static void init_tmu(voodoo_state *v, tmu_state *t, int type, voodoo_reg *reg, void *memory, int tmem);
 static void soft_reset(voodoo_state *v);
-static void check_stalled_cpu(voodoo_state *v, attotime current_time);
+static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotime current_time);
 static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK( stall_cpu_callback );
 static void stall_cpu(voodoo_state *v, int state, attotime current_time);
@@ -1019,7 +1019,7 @@ static void swap_buffers(voodoo_state *v)
 
 	/* we may be able to unstall now */
 	if (v->pci.stall_state != NOT_STALLED)
-		check_stalled_cpu(v, timer_get_time());
+		check_stalled_cpu(Machine, v, timer_get_time());
 
 	/* periodically log rasterizer info */
 	v->stats.swaps++;
@@ -2141,11 +2141,11 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 
 static TIMER_CALLBACK( stall_cpu_callback )
 {
-	check_stalled_cpu(ptr, timer_get_time());
+	check_stalled_cpu(machine, ptr, timer_get_time());
 }
 
 
-static void check_stalled_cpu(voodoo_state *v, attotime current_time)
+static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotime current_time)
 {
 	int resume = FALSE;
 
@@ -2188,7 +2188,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 		if (v->pci.stall_callback)
 			(*v->pci.stall_callback)(FALSE);
 		else
-			cpu_trigger(v->trigger);
+			cpu_trigger(machine, v->trigger);
 	}
 
 	/* if not, set a timer for the next one */

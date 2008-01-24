@@ -345,9 +345,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		cpunum_set_clock(0, MASTER_CLOCK/16);
+		cpunum_set_clock(machine, 0, MASTER_CLOCK/16);
 	else
-		cpunum_set_clock(0, MASTER_CLOCK/8);
+		cpunum_set_clock(machine, 0, MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -610,7 +610,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset();
+		watchdog_reset(Machine);
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)

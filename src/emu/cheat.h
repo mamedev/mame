@@ -18,7 +18,7 @@
 
 void cheat_init(running_machine *machine);
 
-int cheat_menu(int selection);
+int cheat_menu(running_machine *machine, int selection);
 
 void cheat_display_watches(void);
 

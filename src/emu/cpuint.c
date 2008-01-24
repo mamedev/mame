@@ -250,7 +250,7 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 
 			/* generate a trigger to unsuspend any CPUs waiting on the interrupt */
 			if (state != CLEAR_LINE)
-				cpu_triggerint(cpunum);
+				cpu_triggerint(machine, cpunum);
 		}
 	}
 

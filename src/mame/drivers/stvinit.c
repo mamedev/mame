@@ -463,7 +463,7 @@ static WRITE32_HANDLER(dnmtdeka_cmd_write)
 
 	if ( data != 0 ) dnmtdeka_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, dnmtdeka_pending_commands );
-	cpu_trigger(1000);
+	cpu_trigger(Machine, 1000);
 }
 
 static READ32_HANDLER(dnmtdeka_cmd_read)
@@ -513,7 +513,7 @@ static WRITE32_HANDLER(diehard_cmd_write)
 
 	if ( data != 0 ) diehard_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, diehard_pending_commands );
-	cpu_trigger(1000);
+	cpu_trigger(Machine, 1000);
 }
 
 static READ32_HANDLER(diehard_cmd_read)
@@ -537,7 +537,7 @@ static READ32_HANDLER(diehard_cmd_ack_read)
 	if ( (stv_workram_h[0x000e0dd8/4] & 0xff000000) == 0 &&
 		 diehard_pending_commands == 0 )
 	{
-		cpu_trigger(1000);
+		cpu_trigger(Machine, 1000);
 	}
 	return stv_workram_h[0x000e0dd8/4];
 }
@@ -556,7 +556,7 @@ static WRITE32_HANDLER(diehard_cmd_ack_write_cpu0)
 {
 	//logerror( "CMDACK: Write by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, diehard_pending_commands );
 	COMBINE_DATA(&stv_workram_h[0x000e0dd8/4]);
-	cpu_trigger(1000);
+	cpu_trigger(Machine, 1000);
 }
 
 DRIVER_INIT(diehard)

@@ -690,7 +690,7 @@ static DRIVER_INIT( backfire )
 	deco56_decrypt(REGION_GFX1); /* 141 */
 	deco56_decrypt(REGION_GFX2); /* 141 */
 	decrypt156();
-	cpunum_set_clockscale(0, 4.0f); /* core timings aren't accurate */
+	cpunum_set_clockscale(machine, 0, 4.0f); /* core timings aren't accurate */
 	descramble_sound();
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }

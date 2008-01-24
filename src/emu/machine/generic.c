@@ -685,24 +685,24 @@ INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(cpunum, 7, ASSERT_LINE); }
     8-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(); return 0xff; }
+WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(Machine); }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(Machine); return 0xff; }
 
 
 /*-------------------------------------------------
     16-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(); return 0xffff; }
+WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(Machine); }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(Machine); return 0xffff; }
 
 
 /*-------------------------------------------------
     32-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(); return 0xffffffff; }
+WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(Machine); }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(Machine); return 0xffffffff; }
 
 
 

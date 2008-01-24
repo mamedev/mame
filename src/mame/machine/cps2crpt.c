@@ -673,7 +673,7 @@ static void cps2_decrypt(const UINT32 *master_key, UINT32 upper_limit)
 		{
 			char loadingMessage[256]; // for displaying with UI
 			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			ui_set_startup_text(loadingMessage,FALSE);
+			ui_set_startup_text(Machine, loadingMessage,FALSE);
 		}
 
 

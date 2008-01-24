@@ -344,7 +344,7 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 #ifdef PGMARM7SPEEDHACK
 //  cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	if (data!=0xaa) cpu_spinuntil_trigger(1000);
-	cpu_trigger(1002);
+	cpu_trigger(Machine, 1002);
 #else
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
@@ -375,7 +375,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-	cpu_trigger(1000);
+	cpu_trigger(Machine, 1000);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
 	cpu_spinuntil_trigger(1002);
 #else

@@ -533,7 +533,7 @@ static UINT8 stv_SMPC_r8 (int offset)
 	return return_data;
 }
 
-static void stv_SMPC_w8 (int offset, UINT8 data)
+static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 {
 	mame_system_time systime;
 
@@ -629,7 +629,7 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpu_trigger(1000);
+				cpu_trigger(Machine, 1000);
 				cpunum_set_input_line(1, INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -654,17 +654,17 @@ static void stv_SMPC_w8 (int offset, UINT8 data)
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cpunum_set_clock(0, MASTER_CLOCK_352/2);
-				cpunum_set_clock(1, MASTER_CLOCK_352/2);
-				cpunum_set_clock(2, MASTER_CLOCK_352/5);
+				cpunum_set_clock(machine, 0, MASTER_CLOCK_352/2);
+				cpunum_set_clock(machine, 1, MASTER_CLOCK_352/2);
+				cpunum_set_clock(machine, 2, MASTER_CLOCK_352/5);
 				cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cpunum_set_clock(0, MASTER_CLOCK_320/2);
-				cpunum_set_clock(1, MASTER_CLOCK_320/2);
-				cpunum_set_clock(2, MASTER_CLOCK_320/5);
+				cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
+				cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
+				cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
 				cpunum_set_input_line(0, INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
@@ -793,7 +793,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(offset,writedata);
+	stv_SMPC_w8(Machine, offset,writedata);
 }
 
 
@@ -2051,7 +2051,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
-	cpu_trigger(1000);
+	cpu_trigger(Machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
@@ -2722,9 +2722,9 @@ static MACHINE_RESET( stv )
 	NMI_reset = 1;
 	smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 
-	cpunum_set_clock(0, MASTER_CLOCK_320/2);
-	cpunum_set_clock(1, MASTER_CLOCK_320/2);
-	cpunum_set_clock(2, MASTER_CLOCK_320/5);
+	cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
+	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
+	cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
 
 	stvcd_reset();
 }

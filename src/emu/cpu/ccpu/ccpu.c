@@ -569,7 +569,7 @@ static int ccpu_execute(int cycles)
 
 			/* CST */
 			case 0xf7:
-				watchdog_reset();
+				watchdog_reset(Machine);
 			/* ADDP */
 			case 0xe7:
 				tempval = RDMEM(ccpu.I);

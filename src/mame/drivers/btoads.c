@@ -67,7 +67,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(1);
+	cpu_triggerint(machine, 1);
 
 	/* use a timer to make long transfers faster */
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);

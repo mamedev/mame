@@ -1376,7 +1376,7 @@ static void voodoo_stall(int stall)
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
-			cpu_trigger(45678);
+			cpu_trigger(Machine, 45678);
 		}
 	}
 }

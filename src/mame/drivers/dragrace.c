@@ -30,7 +30,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(readinputport(0) & 0x20);
+	watchdog_enable(machine, readinputport(0) & 0x20);
 }
 
 

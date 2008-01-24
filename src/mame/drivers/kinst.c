@@ -379,7 +379,7 @@ static WRITE32_HANDLER( kinst_control_w )
 
 static TIMER_CALLBACK( end_spin )
 {
-	cpu_triggerint(0);
+	cpu_triggerint(machine, 0);
 }
 
 

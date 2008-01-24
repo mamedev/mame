@@ -56,7 +56,7 @@ WRITE8_HANDLER( docastle_shared0_w )
 
 	if (offset == 8)
 		/* awake the master CPU */
-		cpu_trigger(500);
+		cpu_trigger(Machine, 500);
 }
 
 

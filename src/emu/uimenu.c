@@ -684,7 +684,7 @@ UINT32 ui_menu_stack_pop(void)
     and calls the menu handler
 -------------------------------------------------*/
 
-UINT32 ui_menu_ui_handler(UINT32 state)
+UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state)
 {
 	UINT32 newstate;
 
@@ -1264,7 +1264,7 @@ static UINT32 menu_game_info(UINT32 state)
 
 static UINT32 menu_cheat(UINT32 state)
 {
-	int result = cheat_menu(state);
+	int result = cheat_menu(Machine, state);
 	if (result == 0)
 		return ui_menu_stack_pop();
 	return result;

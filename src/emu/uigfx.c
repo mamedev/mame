@@ -149,7 +149,7 @@ static void ui_gfx_exit(running_machine *machine)
     ui_gfx_ui_handler - primary UI handler
 -------------------------------------------------*/
 
-UINT32 ui_gfx_ui_handler(UINT32 uistate)
+UINT32 ui_gfx_ui_handler(running_machine *machine, UINT32 uistate)
 {
 	ui_gfx_state *state = &ui_gfx;
 

@@ -53,8 +53,8 @@ static config_type *typelist;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int config_load_xml(mame_file *file, int type);
-static int config_save_xml(mame_file *file, int type);
+static int config_load_xml(running_machine *machine, mame_file *file, int type);
+static int config_save_xml(running_machine *machine, mame_file *file, int type);
 
 
 
@@ -111,7 +111,7 @@ void config_register(const char *nodename, config_callback load, config_callback
  *
  *************************************/
 
-int config_load_settings(void)
+int config_load_settings(running_machine *machine)
 {
 	const char *controller = options_get_string(mame_options(), OPTION_CTRLR);
 	file_error filerr;
@@ -136,7 +136,7 @@ int config_load_settings(void)
 			fatalerror("Could not load controller file %s.cfg", controller);
 
 		/* load the XML */
-		if (!config_load_xml(file, CONFIG_TYPE_CONTROLLER))
+		if (!config_load_xml(machine, file, CONFIG_TYPE_CONTROLLER))
 			fatalerror("Could not load controller file %s.cfg", controller);
 		mame_fclose(file);
 	}
@@ -145,18 +145,18 @@ int config_load_settings(void)
 	filerr = mame_fopen(SEARCHPATH_CONFIG, "default.cfg", OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
-		config_load_xml(file, CONFIG_TYPE_DEFAULT);
+		config_load_xml(machine, file, CONFIG_TYPE_DEFAULT);
 		mame_fclose(file);
 	}
 
 	/* finally, load the game-specific file */
-	fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cfg");
+	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cfg");
 	filerr = mame_fopen(SEARCHPATH_CONFIG, astring_c(fname), OPEN_FLAG_READ, &file);
 	astring_free(fname);
 
 	if (filerr == FILERR_NONE)
 	{
-		loaded = config_load_xml(file, CONFIG_TYPE_GAME);
+		loaded = config_load_xml(machine, file, CONFIG_TYPE_GAME);
 		mame_fclose(file);
 	}
 
@@ -170,7 +170,7 @@ int config_load_settings(void)
 }
 
 
-void config_save_settings(void)
+void config_save_settings(running_machine *machine)
 {
 	file_error filerr;
 	config_type *type;
@@ -185,18 +185,18 @@ void config_save_settings(void)
 	filerr = mame_fopen(SEARCHPATH_CONFIG, "default.cfg", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
-		config_save_xml(file, CONFIG_TYPE_DEFAULT);
+		config_save_xml(machine, file, CONFIG_TYPE_DEFAULT);
 		mame_fclose(file);
 	}
 
 	/* finally, save the game-specific file */
-	fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cfg");
+	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cfg");
 	filerr = mame_fopen(SEARCHPATH_CONFIG, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	astring_free(fname);
 
 	if (filerr == FILERR_NONE)
 	{
-		config_save_xml(file, CONFIG_TYPE_GAME);
+		config_save_xml(machine, file, CONFIG_TYPE_GAME);
 		mame_fclose(file);
 	}
 
@@ -213,7 +213,7 @@ void config_save_settings(void)
  *
  *************************************/
 
-static int config_load_xml(mame_file *file, int which_type)
+static int config_load_xml(running_machine *machine, mame_file *file, int which_type)
 {
 	xml_data_node *root, *confignode, *systemnode;
 	config_type *type;
@@ -236,13 +236,13 @@ static int config_load_xml(mame_file *file, int which_type)
 		goto error;
 
 	/* strip off all the path crap from the source filename */
-	srcfile = strrchr(Machine->gamedrv->source_file, '/');
+	srcfile = strrchr(machine->gamedrv->source_file, '/');
 	if (!srcfile)
-		srcfile = strrchr(Machine->gamedrv->source_file, '\\');
+		srcfile = strrchr(machine->gamedrv->source_file, '\\');
 	if (!srcfile)
-		srcfile = strrchr(Machine->gamedrv->source_file, ':');
+		srcfile = strrchr(machine->gamedrv->source_file, ':');
 	if (!srcfile)
-		srcfile = Machine->gamedrv->source_file;
+		srcfile = machine->gamedrv->source_file;
 	else
 		srcfile++;
 
@@ -258,7 +258,7 @@ static int config_load_xml(mame_file *file, int which_type)
 		{
 			case CONFIG_TYPE_GAME:
 				/* only match on the specific game name */
-				if (strcmp(name, Machine->gamedrv->name) != 0)
+				if (strcmp(name, machine->gamedrv->name) != 0)
 					continue;
 				break;
 
@@ -273,9 +273,9 @@ static int config_load_xml(mame_file *file, int which_type)
 				const game_driver *clone_of;
 				/* match on: default, game name, source file name, parent name, grandparent name */
 				if (strcmp(name, "default") != 0 &&
-					strcmp(name, Machine->gamedrv->name) != 0 &&
+					strcmp(name, machine->gamedrv->name) != 0 &&
 					strcmp(name, srcfile) != 0 &&
-					((clone_of = driver_get_clone(Machine->gamedrv)) == NULL || strcmp(name, clone_of->name) != 0) &&
+					((clone_of = driver_get_clone(machine->gamedrv)) == NULL || strcmp(name, clone_of->name) != 0) &&
 					(clone_of == NULL || ((clone_of = driver_get_clone(clone_of)) == NULL) || strcmp(name, clone_of->name) != 0))
 					continue;
 				break;
@@ -314,7 +314,7 @@ error:
  *
  *************************************/
 
-static int config_save_xml(mame_file *file, int which_type)
+static int config_save_xml(running_machine *machine, mame_file *file, int which_type)
 {
 	xml_data_node *root = xml_file_create();
 	xml_data_node *confignode, *systemnode;
@@ -334,7 +334,7 @@ static int config_save_xml(mame_file *file, int which_type)
 	systemnode = xml_add_child(confignode, "system", NULL);
 	if (!systemnode)
 		goto error;
-	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : Machine->gamedrv->name);
+	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine->gamedrv->name);
 
 	/* create the input node and write it out */
 	/* loop over all registrants and call their save function */
