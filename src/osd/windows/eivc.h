@@ -12,13 +12,24 @@
 #ifndef __EIVC__
 #define __EIVC__
 
-#ifdef PTR64
+#if (_MSC_VER >= 1400)
 #include <intrin.h>
-#pragma intrinsic(_BitScanReverse)
 #else
+long __cdecl _InterlockedIncrement(long volatile *);
+long __cdecl _InterlockedDecrement(long volatile *);
+long _InterlockedExchange(long volatile *, long);
+long _InterlockedCompareExchange (long volatile *, long, long);
+long _InterlockedExchangeAdd(long volatile *, long);
+unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mask);
+#endif
+
+#pragma intrinsic(_InterlockedIncrement)
+#pragma intrinsic(_InterlockedDecrement)
 #pragma intrinsic(_InterlockedCompareExchange)
 #pragma intrinsic(_InterlockedExchange)
 #pragma intrinsic(_InterlockedExchangeAdd)
+#if (_MSC_VER >= 1310)
+#pragma intrinsic(_BitScanReverse)
 #endif
 
 

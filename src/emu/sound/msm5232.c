@@ -186,7 +186,7 @@ static void msm5232_init_tables( MSM5232 *chip )
 	{
 		double clockscale = (double)chip->clock / 2119040.0;
 		double time = (ATBL[i] / 1000.0) / clockscale;	/* attack time in seconds */
-		chip->ar_tbl[i] = (float)0.50 * ( (1.0/time) / (double)chip->rate );
+		chip->ar_tbl[i] = 0.50 * ( (1.0/time) / (double)chip->rate );
 		/* logerror("ATBL[%i] = %20.16f time = %f s\n",i, chip->ar_tbl[i], time); */
 	}
 
@@ -194,7 +194,7 @@ static void msm5232_init_tables( MSM5232 *chip )
 	{
 		double clockscale = (double)chip->clock / 2119040.0;
 		double time = (DTBL[i] / 1000.0) / clockscale;	/* decay time in seconds */
-		chip->dr_tbl[i] = (float)0.50 * ( (1.0/time) / (double)chip->rate );
+		chip->dr_tbl[i] = 0.50 * ( (1.0/time) / (double)chip->rate );
 		/* logerror("DTBL[%i] = %20.16f time = %f s\n",i, chip->dr_tbl[i], time); */
 	}
 }

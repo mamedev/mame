@@ -19,11 +19,11 @@
 #define SHOOT_LENGTH 13000
 
 #define TOOTHSAW_LENGTH 16
-#define TOOTHSAW_VOLUME 36
+#define TOOTHSAW_VOLUME 0.36f
 #define STEPS 16
-#define LFO_VOLUME 0.06
-#define SHOOT_VOLUME 0.50
-#define NOISE_VOLUME 0.50
+#define LFO_VOLUME 0.06f
+#define SHOOT_VOLUME 0.50f
+#define NOISE_VOLUME 0.50f
 #define NOISE_AMPLITUDE (70*256)
 #define TOOTHSAW_AMPLITUDE (64*256)
 
@@ -344,7 +344,7 @@ static void galaxian_sh_start(void)
 	vol = 0;
 
 	tone_stream = stream_create(0,1,SOUND_CLOCK/STEPS,NULL,tone_update);
-	stream_set_output_gain(tone_stream, 0, TOOTHSAW_VOLUME / 100.0);
+	stream_set_output_gain(tone_stream, 0, TOOTHSAW_VOLUME);
 
 	sample_set_volume(CHANNEL_NOISE,0);
 	sample_start_raw(CHANNEL_NOISE,noisewave,NOISE_LENGTH,NOISE_RATE,1);

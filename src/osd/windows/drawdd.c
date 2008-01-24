@@ -1261,7 +1261,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 
 	// if refresh is smaller than we'd like, it only scores up to 0.1
 	if ((double)desc->dwRefreshRate < einfo->target_refresh)
-		refresh_score *= 0.1;
+		refresh_score *= 0.1f;
 
 	// if we're looking for a particular refresh, make sure it matches
 	if (desc->dwRefreshRate == einfo->window->refresh)

@@ -706,7 +706,7 @@ matrix3d_Multiply( float A[4][4], float B[4][4] )
 	{
 		for(col=0;col<4;col++)
 		{
-			float sum = 0.0;
+			float sum = 0.0f;
 			int i;
 			for( i=0; i<4; i++ )
 			{

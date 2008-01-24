@@ -1929,18 +1929,18 @@ static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds)
 	if (xml_get_attribute(boundsnode, "left") != NULL)
 	{
 		/* left/right/top/bottom format */
-		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "left", 0.0);
-		bounds->x1 = xml_get_attribute_float_with_subst(boundsnode, "right", 1.0);
-		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "top", 0.0);
-		bounds->y1 = xml_get_attribute_float_with_subst(boundsnode, "bottom", 1.0);
+		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "left", 0.0f);
+		bounds->x1 = xml_get_attribute_float_with_subst(boundsnode, "right", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "top", 0.0f);
+		bounds->y1 = xml_get_attribute_float_with_subst(boundsnode, "bottom", 1.0f);
 	}
 	else if (xml_get_attribute(boundsnode, "x") != NULL)
 	{
 		/* x/y/width/height format */
-		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "x", 0.0);
-		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(boundsnode, "width", 1.0);
-		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "y", 0.0);
-		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(boundsnode, "height", 1.0);
+		bounds->x0 = xml_get_attribute_float_with_subst(boundsnode, "x", 0.0f);
+		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(boundsnode, "width", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(boundsnode, "y", 0.0f);
+		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(boundsnode, "height", 1.0f);
 	}
 	else
 	{

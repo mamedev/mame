@@ -130,7 +130,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 
 WRITE8_HANDLER( bwing_paletteram_w )
 {
-	static const float rgb[4][3]={{0.85,0.95,1.00},{0.90,1.00,1.00},{0.80,1.00,1.00},{0.75,0.90,1.10}};
+	static const float rgb[4][3]={{0.85f,0.95f,1.00f},{0.90f,1.00f,1.00f},{0.80f,1.00f,1.00f},{0.75f,0.90f,1.10f}};
 	int r, g, b, i;
 
 	paletteram[offset] = data;

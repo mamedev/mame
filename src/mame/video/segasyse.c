@@ -465,7 +465,7 @@ static void draw_sprite_line(UINT8 *dest, UINT8 chip, UINT8 line)
 
 		if ( (line >= ypos) && (line < ypos+sheight) ) {
 			int xpos;
-			UINT8 sprnum;
+			UINT16 sprnum;
 			UINT8 spline;
 
 			spline = line - ypos;

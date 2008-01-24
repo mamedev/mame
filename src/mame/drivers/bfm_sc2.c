@@ -763,7 +763,7 @@ static WRITE8_HANDLER( volume_override_w )
 
 	if ( old != volume_override )
 	{
-		float percent = volume_override?1.0:(32-global_volume)/32.0;
+		float percent = volume_override? 1.0f : (32-global_volume)/32.0f;
 
 		sndti_set_output_gain(SOUND_YM2413,  0, 0, percent);
 		sndti_set_output_gain(SOUND_YM2413,  0, 1, percent);
@@ -875,7 +875,7 @@ static WRITE8_HANDLER( expansion_latch_w )
 			}
 
 			{
-				float percent = volume_override?1.0:(32-global_volume)/32.0;
+				float percent = volume_override ? 1.0f : (32-global_volume)/32.0f;
 
 				sndti_set_output_gain(SOUND_YM2413,  0, 0, percent);
 				sndti_set_output_gain(SOUND_YM2413,  0, 1, percent);

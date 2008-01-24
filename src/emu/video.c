@@ -1552,7 +1552,7 @@ static void update_frameskip(void)
 	/* if we're throttling and autoframeskip is on, adjust */
 	if (effective_throttle() && effective_autoframeskip() && global.frameskip_counter == 0)
 	{
-		float speed = global.speed * 0.01;
+		double speed = global.speed * 0.01;
 
 		/* if we're too fast, attempt to increase the frameskip */
 		if (global.speed_percent >= 0.995 * speed)

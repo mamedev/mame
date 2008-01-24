@@ -7254,11 +7254,11 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 				break;
 
 			case kMenu_XPosition:
-				entry->x -= 0.01;
+				entry->x -= 0.01f;
 				break;
 
 			case kMenu_YPosition:
-				entry->y -= 0.01;
+				entry->y -= 0.01f;
 				break;
 
 			case kMenu_Skip:
@@ -7349,11 +7349,11 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 				break;
 
 			case kMenu_XPosition:
-				entry->x += 0.01;
+				entry->x += 0.01f;
 				break;
 
 			case kMenu_YPosition:
-				entry->y += 0.01;
+				entry->y += 0.01f;
 				break;
 
 			case kMenu_Skip:

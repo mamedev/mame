@@ -454,15 +454,15 @@ struct _game_driver
 	screen->defstate.visarea.max_y = (maxy);							\
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	screen->xoffset = (_xoffs);											\
-	screen->xscale = (_xscale);											\
-	screen->yoffset = (_yoffs);											\
-	screen->yscale = (_yscale);											\
+	screen->xoffset = (float)(_xoffs);									\
+	screen->xscale = (float)(_xscale);									\
+	screen->yoffset = (float)(_yoffs);									\
+	screen->yscale = (float)(_yscale);									\
 
 
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(tag, x, y, z)									\
-	driver_add_speaker(machine, (tag), (x), (y), (z));					\
+	driver_add_speaker(machine, (tag), (float)(x), (float)(y), (float)(z));	\
 
 #define MDRV_SPEAKER_REMOVE(tag)										\
 	driver_remove_speaker(machine, (tag));								\
@@ -505,7 +505,7 @@ struct _game_driver
 	sound = driver_find_sound(machine, tag);							\
 	if (sound)															\
 	{																	\
-		sound->type = SOUND_##_type;								\
+		sound->type = SOUND_##_type;									\
 		sound->clock = (_clock);										\
 		sound->config = NULL;											\
 		sound->routes = 0;												\
@@ -516,7 +516,7 @@ struct _game_driver
 	{																	\
 		sound->route[sound->routes].output = (_output);					\
 		sound->route[sound->routes].target = (_target);					\
-		sound->route[sound->routes].gain = (_gain);						\
+		sound->route[sound->routes].gain = (float)(_gain);				\
 		sound->route[sound->routes].input = (_input);					\
 		sound->routes++;												\
 	}																	\

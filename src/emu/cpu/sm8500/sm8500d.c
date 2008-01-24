@@ -372,6 +372,7 @@ unsigned sm8500_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *
 		case AM_r1:
 			ea = oprom[pos++];
 			switch( ea & 0xC0 ) {
+			case 0x00:
 				dst += sprintf( dst, "@r%02Xh", (ea >> 3 ) & 0x07 );
 				break;
 			case 0x40:

@@ -156,10 +156,10 @@ void filterTableInit(void)
 	UINT16 uk;
 	/* Parameter calculation has not been moved to a separate function */
 	/* by purpose. */
-	const float filterRefFreq = 44100.0;
+	const float filterRefFreq = 44100.0f;
 
-	float yMax = 1.0;
-	float yMin = 0.01;
+	float yMax = 1.0f;
+	float yMin = 0.01f;
 	float yAdd;
 	float yTmp, rk, rk2;
 
@@ -183,9 +183,9 @@ void filterTableInit(void)
 	}
 
 	/*extern float bandPassParam[0x800]; */
-	yMax = 0.22;
-	yMin = 0.05;  /* less for some R1/R4 chips */
-	yAdd = (yMax-yMin)/2048.0;
+	yMax = 0.22f;
+	yMin = 0.05f;  /* less for some R1/R4 chips */
+	yAdd = (yMax-yMin)/2048.0f;
 	yTmp = yMin;
 	uk = 0;
 	/* Some C++ compilers still have non-local scope! */
@@ -197,8 +197,8 @@ void filterTableInit(void)
 	}
 
 	/*extern float filterResTable[16]; */
-	resDyMax = 1.0;
-	resDyMin = 2.0;
+	resDyMax = 1.0f;
+	resDyMin = 2.0f;
 	resDy = resDyMin;
 	for ( uk = 0; uk < 16; uk++ )
 	{
@@ -282,12 +282,12 @@ void sid6581_port_w (SID6581 *This, int offset, int data)
 			{
 				This->filter.Value = 0x7ff & ( (This->reg[0x15]&7) | ( (UINT16)This->reg[0x16] << 3 ));
 				if (This->filter.Type == 0x20)
-					This->filter.Dy = bandPassParam ? bandPassParam[This->filter.Value] : 0.0;
+					This->filter.Dy = bandPassParam ? bandPassParam[This->filter.Value] : 0.0f;
 				else
-					This->filter.Dy = lowPassParam ? lowPassParam[This->filter.Value] : 0.0;
+					This->filter.Dy = lowPassParam ? lowPassParam[This->filter.Value] : 0.0f;
 				This->filter.ResDy = filterResTable[This->reg[0x17] >> 4] - This->filter.Dy;
-				if ( This->filter.ResDy < 1.0 )
-					This->filter.ResDy = 1.0;
+				if ( This->filter.ResDy < 1.0f )
+					This->filter.ResDy = 1.0f;
 			}
 
 			sidEmuSet( &This->optr1 );

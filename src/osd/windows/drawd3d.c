@@ -1241,7 +1241,7 @@ static void pick_best_mode(win_window_info *window)
 	INT32 target_width, target_height;
 	d3d_info *d3d = window->drawdata;
 	INT32 minwidth, minheight;
-	float best_score = 0.0;
+	float best_score = 0.0f;
 	int maxmodes;
 	int modenum;
 
@@ -1295,7 +1295,7 @@ static void pick_best_mode(win_window_info *window)
 
 		// if refresh is smaller than we'd like, it only scores up to 0.1
 		if ((double)mode.RefreshRate < target_refresh)
-			refresh_score *= 0.1;
+			refresh_score *= 0.1f;
 
 		// if we're looking for a particular refresh, make sure it matches
 		if (mode.RefreshRate == window->refresh)

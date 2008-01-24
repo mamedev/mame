@@ -623,9 +623,9 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 
 	/* configure the groups */
 	if (palette->shadow_group != 0)
-		palette_group_set_contrast(machine->palette, palette->shadow_group, PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_group_set_contrast(machine->palette, palette->shadow_group, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
 	if (palette->hilight_group != 0)
-		palette_group_set_contrast(machine->palette, palette->hilight_group, PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
+		palette_group_set_contrast(machine->palette, palette->hilight_group, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 
 	/* set the initial colors to a standard rainbow */
 	for (index = 0; index < machine->drv->total_colors; index++)
@@ -726,7 +726,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[0].base = table;
 			palette->shadow_table[2].base = table + 32768;
-			configure_rgb_shadows(machine, 0, PALETTE_DEFAULT_SHADOW_FACTOR);
+			configure_rgb_shadows(machine, 0, (float)PALETTE_DEFAULT_SHADOW_FACTOR);
 		}
 	}
 
@@ -749,7 +749,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 		{
 			palette->shadow_table[1].base = table;
 			palette->shadow_table[3].base = table + 32768;
-			configure_rgb_shadows(machine, 1, PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
+			configure_rgb_shadows(machine, 1, (float)PALETTE_DEFAULT_HIGHLIGHT_FACTOR);
 		}
 	}
 

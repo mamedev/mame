@@ -32,9 +32,7 @@ void sidInitMixerEngine(void)
 	INT32 si, sj    ;
 
 	/* 8-bit volume modulation tables. */
-	float filterAmpl = 1.0;
-
-	filterAmpl = 0.7;
+	float filterAmpl = 0.7f;
 
 	ampMod1x8=(INT8*) auto_malloc(256*256);
 

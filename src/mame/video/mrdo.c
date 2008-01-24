@@ -59,7 +59,7 @@ PALETTE_INIT( mrdo )
 	const int pull = 200;
 	float pot[16];
 	int weight[16];
-	const float potadjust = 0.2;	/* diode voltage drop */
+	const float potadjust = 0.2f;	/* diode voltage drop */
 
 	for (i = 15;i >= 0;i--)
 	{

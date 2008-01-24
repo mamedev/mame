@@ -76,19 +76,25 @@ static mame_bitmap *sprite_border_collision_bitmap;
 PALETTE_INIT( carpolo )
 {
 	/* thanks to Jarek Burczynski for analyzing the circuit */
-//  const static float MAX_VOLTAGE = 6.9620;
-	const static float MIN_VOLTAGE = 1.7434;
-	const static float MAX_VOLTAGE = 5.5266;
+	//static const float MAX_VOLTAGE = 6.9620f;
+	static const float MIN_VOLTAGE = 1.7434f;
+	static const float MAX_VOLTAGE = 5.5266f;
 
-	const static float r_voltage[] = { 1.7434, 2.1693, 2.5823, 3.0585,
-									   3.4811, 4.0707, 4.7415, 5.4251 };
+	static const float r_voltage[] =
+	{
+		1.7434f, 2.1693f, 2.5823f, 3.0585f, 3.4811f, 4.0707f, 4.7415f, 5.4251f
+	};
 
-	const static float g_voltage[] = { 1.7434, 2.1693, 2.5823, 3.0585,
-									   3.4811, 4.0707, 4.7415, 5.4251 };
-//  const static float g_voltage[] = { 4.7871, 5.0613, 5.3079, 5.6114,
-//                                     5.7940, 6.1608, 6.5436, 6.9620 };
+	static const float g_voltage[] =
+	{
+		1.7434f, 2.1693f, 2.5823f, 3.0585f, 3.4811f, 4.0707f, 4.7415f, 5.4251f
+		//4.7871f, 5.0613f, 5.3079f, 5.6114f, 5.7940f, 6.1608f, 6.5436f, 6.9620f
+	};
 
-	const static float b_voltage[] = { 1.9176, 2.8757, 3.9825, 5.5266 };
+	static const float b_voltage[] =
+	{
+		1.9176f, 2.8757f, 3.9825f, 5.5266f
+	};
 
 
 	int i;

@@ -120,9 +120,9 @@ typedef struct
 #define S_ACCUM_M				(2 << 4)
 #define S_ACCUM_L				(1 << 4)
 
-#define M_ACCUM_H				((INT64)0x0000FFFFll << S_ACCUM_H)
-#define M_ACCUM_M				((INT64)0x0000FFFFll << S_ACCUM_M)
-#define M_ACCUM_L				((INT64)0x0000FFFFll << S_ACCUM_L)
+#define M_ACCUM_H				(((INT64)0x0000FFFF) << S_ACCUM_H)
+#define M_ACCUM_M				(((INT64)0x0000FFFF) << S_ACCUM_M)
+#define M_ACCUM_L				(((INT64)0x0000FFFF) << S_ACCUM_L)
 
 #define R_ACCUM_H(x)			((INT16)((ACCUM(x) >> S_ACCUM_H) & 0x00FFFF))
 #define R_ACCUM_M(x)			((INT16)((ACCUM(x) >> S_ACCUM_M) & 0x00FFFF))

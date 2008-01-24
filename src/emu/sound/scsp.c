@@ -232,7 +232,7 @@ static void dma_scsp(struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
 #define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
 #define dma_transfer_end	((scsp_regs[0x24/2] & 0x10)>>4)|(((scsp_regs[0x26/2] & 0x10)>>4)<<1)|(((scsp_regs[0x28/2] & 0x10)>>4)<<2)
 
-static const float SDLT[8]={-1000000.0,-36.0,-30.0,-24.0,-18.0,-12.0,-6.0,0.0};
+static const float SDLT[8]={-1000000.0f,-36.0f,-30.0f,-24.0f,-18.0f,-12.0f,-6.0f,0.0f};
 
 static stream_sample_t *bufferl;
 static stream_sample_t *bufferr;
@@ -502,7 +502,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 	slot->udata.data[0]&=~0x800;
 }
 
-#define log_base_2(n) (log((float) n)/log((float) 2))
+#define log_base_2(n) (log((double)(n))/log(2.0))
 
 static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int sndindex)
 {
@@ -541,15 +541,15 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 
 	for(i=0;i<0x400;++i)
 	{
-		//float fcent=(double) 1200.0*log_base_2((double)(((double) 1024.0+(double)i)/(double)1024.0));
+		//float fcent=(double) 1200.0*log_base_2((1024.0+(double)i)/1024.0);
 		//fcent=(double) 44100.0*pow(2.0,fcent/1200.0);
-		float fcent=44100.0*(1024.0+(double) i)/1024.0;
+		float fcent=44100.0f*(1024.0f+(float)i)/1024.0f;
 		FNS_Table[i]=(float) (1<<SHIFT) *fcent;
 	}
 
 	for(i=0;i<0x400;++i)
 	{
-		float envDB=((float)(3*(i-0x3ff)))/32.0;
+		float envDB=((float)(3*(i-0x3ff)))/32.0f;
 		float scale=(float)(1<<SHIFT);
 		EG_TABLE[i]=(INT32)(pow(10.0,envDB/20.0)*scale);
 	}
@@ -559,28 +559,28 @@ static void SCSP_Init(struct _SCSP *SCSP, const struct SCSPinterface *intf, int 
 		int iTL =(i>>0x0)&0xff;
 		int iPAN=(i>>0x8)&0x1f;
 		int iSDL=(i>>0xD)&0x07;
-		float TL=1.0;
-		float SegaDB=0;
-		float fSDL=1.0;
-		float PAN=1.0;
+		float TL=1.0f;
+		float SegaDB=0.0f;
+		float fSDL=1.0f;
+		float PAN=1.0f;
 		float LPAN,RPAN;
 
-		if(iTL&0x01) SegaDB-=0.4;
-		if(iTL&0x02) SegaDB-=0.8;
-		if(iTL&0x04) SegaDB-=1.5;
-		if(iTL&0x08) SegaDB-=3;
-		if(iTL&0x10) SegaDB-=6;
-		if(iTL&0x20) SegaDB-=12;
-		if(iTL&0x40) SegaDB-=24;
-		if(iTL&0x80) SegaDB-=48;
+		if(iTL&0x01) SegaDB-=0.4f;
+		if(iTL&0x02) SegaDB-=0.8f;
+		if(iTL&0x04) SegaDB-=1.5f;
+		if(iTL&0x08) SegaDB-=3.0f;
+		if(iTL&0x10) SegaDB-=6.0f;
+		if(iTL&0x20) SegaDB-=12.0f;
+		if(iTL&0x40) SegaDB-=24.0f;
+		if(iTL&0x80) SegaDB-=48.0f;
 
 		TL=pow(10.0,SegaDB/20.0);
 
 		SegaDB=0;
-		if(iPAN&0x1) SegaDB-=3;
-		if(iPAN&0x2) SegaDB-=6;
-		if(iPAN&0x4) SegaDB-=12;
-		if(iPAN&0x8) SegaDB-=24;
+		if(iPAN&0x1) SegaDB-=3.0f;
+		if(iPAN&0x2) SegaDB-=6.0f;
+		if(iPAN&0x4) SegaDB-=12.0f;
+		if(iPAN&0x8) SegaDB-=24.0f;
 
 		if((iPAN&0xf)==0xf) PAN=0.0;
 		else PAN=pow(10.0,SegaDB/20.0);
