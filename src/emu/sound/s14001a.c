@@ -465,7 +465,7 @@ static void *s14001a_start(int sndindex, int clock, const void *config)
 
 	chip->SpeechRom = memory_region(intf->region);
 
-	chip->stream = stream_create(0, 1, Machine->sample_rate, chip, s14001a_pcm_update);
+	chip->stream = stream_create(0, 1, clock ? clock : Machine->sample_rate, chip, s14001a_pcm_update);
 
 	return chip;
 }
