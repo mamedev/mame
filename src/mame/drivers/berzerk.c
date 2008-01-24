@@ -9,16 +9,18 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "berzerk.h"
 #include "exidy.h"
 #include "machine/74181.h"
+#include "sound/s14001a.h"
 #include "video/resnet.h"
 
 
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
 
-#define MAIN_CPU_CLOCK  			(BERZERK_MASTER_CLOCK / 4)
-#define PIXEL_CLOCK  				(BERZERK_MASTER_CLOCK / 2)
+#define MASTER_CLOCK				(XTAL_10MHz)
+#define MAIN_CPU_CLOCK  			(MASTER_CLOCK / 4)
+#define PIXEL_CLOCK  				(MASTER_CLOCK / 2)
+#define S14001A_CLOCK   			(MASTER_CLOCK / 2)
 #define HTOTAL						(0x140)
 #define HBEND						(0x000)
 #define HBSTART						(0x100)
@@ -459,6 +461,79 @@ static VIDEO_UPDATE( berzerk )
 
 /*************************************
  *
+ *  Audio system
+ *
+ *************************************/
+
+static const struct S14001A_interface berzerk_s14001a_interface =
+{
+	REGION_SOUND1	/* voice data region */
+};
+
+
+static const struct CustomSound_interface berzerk_custom_interface =
+{
+	exidy_sh6840_sh_start,
+	0,
+	exidy_sh6840_sh_reset
+};
+
+
+static WRITE8_HANDLER( berzerk_audio_w )
+{
+	switch (offset)
+	{
+	/* offset 6 writes to the sfxcontrol latch */
+	case 6:
+		exidy_sfxctrl_w(data >> 6, data);
+		break;
+
+	/* offset 4 writes to the S14001A */
+	case 4:
+		if ((data & 0xc0) == 0x40) /* VSU-1000 control write */
+		{
+			/* volume and frequency control goes here */
+			/* mame_printf_debug("TODO: VSU-1000 Control write (ignored for now)\n");*/
+		  S14001A_set_volume(((data & 0x38) >> 3) + 1);
+		  S14001A_set_rate((16 - (data & 0x07)) * 16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
+		}
+		else if ((data & 0xc0) != 0x00)
+			/* vsu-1000 ignores these writes entirely */
+			mame_printf_debug("bogus write ignored\n");
+		else
+		{
+			/* select word input */
+			if (S14001A_bsy_0_r()) /* skip if busy... */
+			{
+				mame_printf_debug("S14001A busy, ignoring write\n");
+				break;
+			}
+
+			/* write to the register */
+			S14001A_reg_0_w(data & 0x3f);
+			S14001A_rst_0_w(1);
+			S14001A_rst_0_w(0);
+		}
+		break;
+
+	default:
+		/* everything else writes to the 6840 */
+		exidy_sh6840_w(offset, data);
+		break;
+
+	}
+}
+
+
+static READ8_HANDLER( berzerk_audio_r )
+{
+	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
+}
+
+
+
+/*************************************
+ *
  *  Memory handlers
  *
  *************************************/
@@ -789,8 +864,15 @@ static MACHINE_DRIVER_START( berzerk )
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(berzerk_audio)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_ADD(S14001A, S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
+	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(CUSTOM, 0)
+	MDRV_SOUND_CONFIG(berzerk_custom_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -800,7 +882,6 @@ static MACHINE_DRIVER_START( frenzy )
 	MDRV_IMPORT_FROM(berzerk)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(frenzy_map,0)
-
 MACHINE_DRIVER_END
 
 

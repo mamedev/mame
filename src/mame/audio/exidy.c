@@ -11,9 +11,7 @@
 #include "machine/6821pia.h"
 #include "sound/hc55516.h"
 #include "sound/5220intf.h"
-#include "sound/s14001a.h"
 #include "sound/custom.h"
-#include "berzerk.h"
 
 
 
@@ -24,11 +22,11 @@
  *************************************/
 
 #define CRYSTAL_OSC				(XTAL_3_579545MHz)
-#define SH8253_CLOCK			(CRYSTAL_OSC/2)
-#define SH6840_CLOCK			(CRYSTAL_OSC/4)
-#define SH6532_CLOCK			(CRYSTAL_OSC/4)
+#define SH8253_CLOCK			(CRYSTAL_OSC / 2)
+#define SH6840_CLOCK			(CRYSTAL_OSC / 4)
+#define SH6532_CLOCK			(CRYSTAL_OSC / 4)
 #define CVSD_CLOCK				(1.0 / (0.693 * (RES_K(2.4) + 2.0 * RES_K(20)) * CAP_P(2200)))
-#define CVSD_Z80_CLOCK 			(CRYSTAL_OSC/2)
+#define CVSD_Z80_CLOCK 			(CRYSTAL_OSC / 2)
 #define BASE_VOLUME				(32767 / 6)
 
 enum
@@ -102,15 +100,25 @@ struct sh8253_timer_channel
 	UINT32	fraction;
 };
 static struct sh8253_timer_channel sh8253_timer[3];
-static UINT8 has_sh8253;
+static int has_sh8253;
 
 /* 5220/CVSD variables */
-static UINT8 has_mc3417;
-static UINT8 has_tms5220;
+static int has_mc3417;
+static int has_tms5220;
 
 /* sound streaming variables */
 static sound_stream *exidy_stream;
 static double freq_to_step;
+
+
+
+/*************************************
+ *
+ *  Prototypes
+ *
+ *************************************/
+
+static TIMER_CALLBACK( riot_interrupt );
 
 
 
@@ -342,39 +350,23 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
 
 /*************************************
  *
- *  Sound startup routines
+ *  Audio startup routines
  *
  *************************************/
 
-static TIMER_CALLBACK( riot_interrupt );
-
-static void *common_sh_start(int _has_sh8253, int _has_tms5220)
+void *exidy_sh6840_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	int sample_rate = SH8253_CLOCK;
-	int i;
 
-	has_sh8253  = _has_sh8253;
-	has_tms5220 = _has_tms5220;
-
-	/* determine which sound hardware is installed */
-	has_mc3417 = FALSE;
-	for (i = 0; i < MAX_SOUND; i++)
-	{
-		if (Machine->drv->sound[i].type == SOUND_MC3417)
-			has_mc3417 = TRUE;
-	}
+	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
 	exidy_stream = stream_create(0, 1, sample_rate, NULL, exidy_stream_update);
 
-	/* 6532 */
-    riot_timer = timer_alloc(riot_interrupt, NULL);
-
-	/* 6840 */
-	sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
-
-	/* 8253 */
-	freq_to_step = (double)(1 << 24) / (double)sample_rate;
+	/* indicate no additional hardware */
+	has_sh8253  = FALSE;
+	has_tms5220 = FALSE;
+	has_mc3417 = FALSE;
 
 	return auto_malloc(1);
 }
@@ -383,30 +375,12 @@ static void *common_sh_start(int _has_sh8253, int _has_tms5220)
 
 /*************************************
  *
- *  Sound reset routines
+ *  Audio reset routines
  *
  *************************************/
 
-static void common_sh_reset(void)
+void exidy_sh6840_sh_reset(void *token)
 {
-	/* PIA */
-	pia_reset();
-
-	/* LFSR */
-	sh6840_LFSR_oldxor = 0;
-	sh6840_LFSR_0 = 0xffffffff;
-	sh6840_LFSR_1 = 0xffffffff;
-	sh6840_LFSR_2 = 0xffffffff;
-	sh6840_LFSR_3 = 0xffffffff;
-
-	/* 6532 */
-	riot_irq_flag = 0;
-	riot_timer_irq_enable = 0;
-	riot_porta_data = 0xff;
-	riot_portb_data = 0xff;
-	riot_clock_divisor = 1;
-	riot_state = RIOT_IDLE;
-
 	/* 6840 */
 	memset(sh6840_timer, 0, sizeof(sh6840_timer));
 	sh6840_MSB = 0;
@@ -415,8 +389,12 @@ static void common_sh_reset(void)
 	sh6840_volume[2] = 0;
 	exidy_sfxctrl = 0;
 
-	/* 8253 */
-	memset(sh8253_timer, 0, sizeof(sh8253_timer));
+	/* LFSR */
+	sh6840_LFSR_oldxor = 0;
+	sh6840_LFSR_0 = 0xffffffff;
+	sh6840_LFSR_1 = 0xffffffff;
+	sh6840_LFSR_2 = 0xffffffff;
+	sh6840_LFSR_3 = 0xffffffff;
 }
 
 
@@ -661,7 +639,7 @@ static READ8_HANDLER( exidy_sh6840_r )
 }
 
 
-static WRITE8_HANDLER( exidy_sh6840_w )
+WRITE8_HANDLER( exidy_sh6840_w )
 {
 	/* force an update of the stream */
 	stream_update(exidy_stream);
@@ -721,7 +699,7 @@ static WRITE8_HANDLER( exidy_sh6840_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( exidy_sfxctrl_w )
+WRITE8_HANDLER( exidy_sfxctrl_w )
 {
 	stream_update(exidy_stream);
 
@@ -776,18 +754,59 @@ static const pia6821_interface venture_pia_1_intf =
 };
 
 
+static void *venture_common_sh_start(int clock, const struct CustomSound_interface *config, int _has_tms5220)
+{
+	int i;
+
+	void *ret = exidy_sh6840_sh_start(clock, config);
+
+	has_sh8253  = TRUE;
+	has_tms5220 = _has_tms5220;
+
+	/* determine which sound hardware is installed */
+	has_mc3417 = FALSE;
+	for (i = 0; i < MAX_SOUND; i++)
+	{
+		if (Machine->drv->sound[i].type == SOUND_MC3417)
+			has_mc3417 = TRUE;
+	}
+
+	/* 6532 */
+    riot_timer = timer_alloc(riot_interrupt, NULL);
+
+	/* 8253 */
+	freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
+
+	return ret;
+}
+
+
 static void *venture_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	pia_config(0, &venture_pia_0_intf);
 	pia_config(1, &venture_pia_1_intf);
 
-	return common_sh_start(TRUE, FALSE);
+	return venture_common_sh_start(clock, config, FALSE);
 }
 
 
 static void venture_sh_reset(void *token)
 {
-	common_sh_reset();
+	exidy_sh6840_sh_reset(token);
+
+	/* PIA */
+	pia_reset();
+
+	/* 6532 */
+	riot_irq_flag = 0;
+	riot_timer_irq_enable = 0;
+	riot_porta_data = 0xff;
+	riot_portb_data = 0xff;
+	riot_clock_divisor = 1;
+	riot_state = RIOT_IDLE;
+
+	/* 8253 */
+	memset(sh8253_timer, 0, sizeof(sh8253_timer));
 }
 
 
@@ -967,13 +986,13 @@ static void *victory_sh_start(int clock, const struct CustomSound_interface *con
 
 	state_save_register_global(victory_sound_response_ack_clk);
 
-	return common_sh_start(TRUE, TRUE);
+	return venture_common_sh_start(clock, config, TRUE);
 }
 
 
 static void victory_sh_reset(void *token)
 {
-	common_sh_reset();
+	venture_sh_reset(token);
 
 	/* the flip-flop @ F4 is reset */
 	victory_sound_response_ack_clk = 0;
@@ -1021,114 +1040,3 @@ MACHINE_DRIVER_START( victory_audio )
 	MDRV_SOUND_ADD(TMS5220, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
-
-
-
-/*************************************
- *
- *  Berzerk
- *
- *  Copyright Alex Judd 1997/98
- *  V1.1 for Mame 0.31 13March98
- *
- *************************************/
-
-#define BERZERK_S14001A_CLOCK	(BERZERK_MASTER_CLOCK / 2)
-
-
-static void *berzerk_sh_start(int clock, const struct CustomSound_interface *config)
-{
-	return common_sh_start(FALSE, FALSE);
-}
-
-
-static void berzerk_sh_reset(void *token)
-{
-	common_sh_reset();
-}
-
-
-static const struct S14001A_interface berzerk_s14001a_interface =
-{
-	REGION_SOUND1	/* voice data region */
-};
-
-
-static const struct CustomSound_interface berzerk_custom_interface =
-{
-	berzerk_sh_start,
-	0,
-	berzerk_sh_reset,
-};
-
-
-MACHINE_DRIVER_START( berzerk_audio )
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD(S14001A, BERZERK_S14001A_CLOCK)	/* CPU clock divided by 16 divided by a programmable TTL setup */
-	MDRV_SOUND_CONFIG(berzerk_s14001a_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD(CUSTOM, 0)
-	MDRV_SOUND_CONFIG(berzerk_custom_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
-
-
-WRITE8_HANDLER( berzerk_audio_w )
-{
-	switch (offset)
-	{
-	/* offsets 0-3, 5 and 7 write to the 6840 */
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-	case 5:
-	case 7:
-		exidy_sh6840_w(offset, data);
-		break;
-
-	/* offset 6 writes to the sfxcontrol latch */
-	case 6:
-		exidy_sfxctrl_w(data >> 6, data);
-		break;
-
-	/* offset 4 writes to the S14001A */
-	case 4:
-		if ((data & 0xc0) == 0x40) /* VSU-1000 control write */
-		{
-			/* volume and frequency control goes here */
-			/* mame_printf_debug("TODO: VSU-1000 Control write (ignored for now)\n");*/
-		  S14001A_set_volume(((data&0x38)>>3)+1);
-		  S14001A_set_rate((16-(data&0x07))*16); /* second LS161 has load triggered by its own TC(when it equals 16) long before the first ls161 will TC and fire again, so effectively it only divides by 15 and not 16. If the clock, as opposed to the E enable, had been tied to the first LS161's TC instead, it would divide by 16 as expected */
-		}
-		else if ((data & 0xc0) != 0x00)
-		{
-			/* vsu-1000 ignores these writes entirely */
-			mame_printf_debug("bogus write ignored\n");
-		}
-		else
-		{
-			/* select word input */
-			if (S14001A_bsy_0_r()) /* skip if busy... */
-			{
-				mame_printf_debug("S14001A busy, ignoring write\n");
-				break;
-			}
-
-			/* write to the register */
-			S14001A_reg_0_w(data & 0x3f);
-			S14001A_rst_0_w(1);
-			S14001A_rst_0_w(0);
-		}
-		break;
-	}
-}
-
-
-READ8_HANDLER( berzerk_audio_r )
-{
-	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
-}
