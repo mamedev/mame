@@ -300,68 +300,69 @@ const UINT8 inthunt_decryption_table[256] = {
 
 
 const UINT8 gussun_decryption_table[256] = {
-	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//      !!!!                                     ^^^^ !!!!                !!!!
-	xxxx,xxxx,0x75,0x24,0x01,0x83,0x32,0xe9, xxxx,0x78,xxxx,0x19,0x22,xxxx,0xac,xxxx, /* 10 */
-//                     !!!! ????      ^^^^            ????      ???? !!!!      ^^^^
-	0x5d,0xa5,0x10,0x51,0x0a,xxxx,0x19,xxxx ,0xf8,0x90,0x91,0x40,0x28,0x22,0x03,0x5f, /* 20 */
-//                ????      !!!!      ????       ^^^^ ???? ^^^^ gggg gggg ????
+	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0x20,xxxx,xxxx, /* 00 */
+//	!!!!                                     ^^^^ !!!!                !!!!
+	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
+//	               !!!! ????      ^^^^            pppp      gggg !!!!      ^^^^
+	0x5d,0xa5,0x11,0x51,0x0a,xxxx,0x19,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x10,0x03,0x5f, /* 20 */
+//	          pppp      !!!!      ????       ^^^^ pppp ^^^^ gggg gggg pppp
 	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
 //
-	xxxx,0x19,0xc6,xxxx,xxxx,0x3a,0x10,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x19,xxxx, /* 40 */
-//           ????                     ????                 !!!!                ????
-	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7f,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//                !!!! ^^^^      ^^^^                 gggg ???? !!!!                !!!!
-	0xb0,xxxx,0x28,0x7e,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//                ???? gggg                                !!!! ^^^^
+	xxxx,0x01,0xc6,xxxx,xxxx,0x3a,0x29,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x29,xxxx, /* 40 */
+//	     ????                     ????                 !!!!                ????
+	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x76,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
+//	          !!!! ^^^^      ^^^^                 gggg ???? !!!!                !!!!
+	0xb0,xxxx,0x28,0x7d,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
+//	          ???? gggg                                !!!! ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//                          ^^^^
-	xxxx,0x86,xxxx,0xb7,0x30,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//                     ???? ????                           ^^^^      !!!!      !!!!
-	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x19, /* 90 */
-//                ^^^^                     ^^^^  !!!! ^^^^      !!!!                ????
-	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x42,0x80,0x8c,0xd4,xxxx, /* a0 */
-//                                         gggg                 ????      gggg !!!!
-	xxxx,0x11,0x11,0x11,0x77,0x3d,0x3e,xxxx, xxxx,xxxx,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//           ???? ???? ???? gggg                           ????
-	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x11,0xb2, /* c0 */
-//                ^^^^                           ^^^^                     ^^^^ ????
+//	                    ^^^^
+	xxxx,0x86,xxxx,0xb5,0x30,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
+//	               ???? ????                           ^^^^      !!!!      !!!!
+	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x01, /* 90 */
+//	          !!!!                     ^^^^  !!!! ^^^^      !!!!                ????
+	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x41,0x80,0x8c,0xd4,xxxx, /* a0 */
+//	                                   gggg                 ????      gggg !!!!
+	xxxx,0x19,0x20,0x19,0x77,0x3d,0x3e,xxxx, xxxx,xxxx,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
+//	     ???? ???? ???? gggg                           pppp
+	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
+//	          ^^^^                           ^^^^                     ^^^^ ????
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
-//           ^^^^                                               ????
+//	     ^^^^                                               ????
 	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x19,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//                                    ????                      ^^^^                !!!!
-	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x70,0xf7,0xbd,0x39,0x7f,0xbf,xxxx, /* f0 */
-//      !!!!                                          ????      !!!!      gggg
+//	                              ????                      !!!!                !!!!
+	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x7c,0xf7,0xbd,0x39,0x7f,0xbf,xxxx, /* f0 */
+//	!!!!                                          ????      !!!!      gggg
 };
 
 
 /*
 missing opcode:
-
-1**14 -> 09? (2097b - 20980 (01 09 11 31
-+++19 -> 79? (2282f - routine from 2281f to 22871) (78, 79, 7a, 7b)
-0++1b -> 19? (1d8f9 - routine from 1d8c7 to 1d8fc) - three bytes (09,11,21,29,31 - 01,19)
-01+22 -> 00? (1deff - routine from 1dee8 to 1df26) no 08,18,20,30 - ok 00,10
-0++26 -> 29? (14ed_ , 198e_
-01*29 -> 48? (1df22 - routine from 1df1d to
-01+2d -> 1a? (1df1d - routine from 1dee8 to 1df26) (00,01,10,11,12,13,20,21,28,29,30,31 - 08,09,18,19
----41 -> 19?
-///46 -> 10? (1461b
----4e -> 19? (208ac -
-1//5a -> 76? (222fc - routine from 222ed to ) (7x j...) 70 76 78 7a 7c
+N**14 -> 08? (2097b 20980 - routine from 2097a) (00 01 08 09 30 31) probably 08 - after the start and before the menu
+             - to handle the player number
+N++26 -> 29? (14ed_ , 198e_
+N--41 -> 19?
+N//46 -> 10? (1461b
+N--4e -> 19? (208ac -
+Y//5a -> 76? (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71,77,79,7a,7b,7d,7f - ok 76 78 7c 7e
 1//62 -> 28? (1cf86 1cfa3 - routine from 1cf61 to 1cff4)  (water in level 1)
-1--83 -> b7? (194cd - routine from
-0**84 -> 18? (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (00,08,10,18,20,28,30)
+1--83 -> b7? (194cd - routine from) no b7,b3,b4 ok b6,b5
+0**84 -> 18? (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (00,08,18,20,28,30)
 ---9f -> 19? (
 ///ab -> 42?
 ---b1 -> 19?
----b2 -> 19? (20a8c - 20acd
+---b2 -> 20. (20a8b - 20acc             probably 20 - after the start and before the menu - to handle the player number
 ///b3 -> 19? (216b6 - 216cf
-///ba -> 4b? (1094d, 10b28 - routine from 10948 to 10b73) one byte (4b
-01+ce -> 11? (10236 - routine from 1017e to 10254) (01, 09, 11, 19, 21, 29, 31)
+01+ce -> 01? (10236 - routine from 1017e to 10254) (01, 09, 19, 21, 29, 31) -> probably 01
 ///db ->     (16992
-///f9 -> 71? (16598 - 165a1 - 18de7 - routine from 18dc4 to ) 70,71
+///eb -> 
+///f9 -> 7c? (16598 - 165a1 - 18de7 - routine from 18dc4 to ) no 71,72,76,78 ok 70,73,77,79,7a
 
+rz probably:
+19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) ok 79,7d,7f -> 79
+22 -> 11 (1deff - routine from 1dee8 to 1df26) -> 11 - to handle sprite animation
+2d -> 10 (1df1d - routine from 1dee8 to 1df26) -> 10 - to handle sprite animation
+29 -> 98 (1df22 - routine from 1dee8 to 1df26) -> 98 - to handle sprite animation
+ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
 
 rz guess:
 2b -> 40 (1d4d2 1db81 1dba9 - routine from 1d4b2 to 1d4de) (ok 40,48,96) -> 40
@@ -369,6 +370,7 @@ rz guess:
 2c -> 28 (20333 - routine from 2032a to 20366)
 59 -> 2c (220cf - 2037f - routine from 2202f to ) 2bytes (2c,
 63 -> 7d (1df7f, 1df8c, 1df95,21f08 - routine from 1df1d to ) - two bytes j..
+1b -> 8f (1d8f9 - routine from 1d8c7 to 1d8fc) - three bytes (pop instruction for the push in 1d8e6)
 a7 -> b4 (2029a - routine from 20290 to
 ad -> 8c (1d559, 1d8d4 - routine from 1d547 - ; routine from 1d8b8 to 1d8fc)
 b4 -> 77 (1d03a, 1d57a - routine from 1d4df ) 7f,7d,7b  -  79 - "77"
@@ -779,14 +781,40 @@ void irem_cpu_decrypt(int cpu,const UINT8 *decryption_table)
 	for (A = 0;A < size; A++)
 		irem_cpu_decrypted[A] = decryption_table[rom[A]];
 
-	// RZ note:
-	// for "gussun" and "riskchal" an hack to not decrypt a not encrypted routine
+	// Roberto Zandonà note:
+	// for "gussun" and "riskchal" is necessary an hack to not decrypt not encrypted routines
 	// we need a real nec v25+/35+ core to support 0x63 (brkn for "break native") instruction
-	// for now we use "cd" (int) instruction + hack (to force to not decrypt the code from 0xa8fd to 0xa90b)
+	// for now we use "cd" (int) instruction + hack
 
-	if (m90_game_kludge==1) // for gussun and riskchal
-		for (A = 0xa8fd;A < 0xa90c; A++)
-			irem_cpu_decrypted[A] = rom[A];
+	if (m90_game_kludge==1) // for riskchal
+		{
+			for (A = 0xa8fd;A < 0xa90c; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x12b3a;A < 0x12b4b; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x13500;A < 0x13510; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x14be5;A < 0x14bf5; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x130de;A < 0x130eb; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x147a4;A < 0x147bf; A++)
+				irem_cpu_decrypted[A] = rom[A];
+
+		}
+	if (m90_game_kludge==2) // for gussun
+		{
+			for (A = 0xa8fd;A < 0xa90c; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x1369c;A < 0x136ac; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x14ec8;A < 0x14ed8; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x13246;A < 0x13253; A++)
+				irem_cpu_decrypted[A] = rom[A];
+			for (A = 0x14a7d;A < 0x14a98; A++)
+				irem_cpu_decrypted[A] = rom[A];
+		}
 
 /*
     for (A=0; A<256; A++) {

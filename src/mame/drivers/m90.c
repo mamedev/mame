@@ -22,10 +22,9 @@ Notes:
   selection moves too fast with the clock set at 16 MHz. It's still fast at
   8 MHz, but at least it's usable.
 
-- Probably all the encrypted games use a nec V35+ cpu: for gussun and risky challenge
+- Probably all games use a nec V35+ cpu: for gussun and risky challenge
   we need a proper V35+ core for the use of the 0x63 instruction (brkn, to call a unencrypted
   routine from encrypted code); for simulate the instruction there's an hack (m90_game_kludge).
-  For both the games, the unencrypted routine is from 0x0a8fd to 0x0a90b
 
 *****************************************************************************/
 
@@ -1170,6 +1169,12 @@ static DRIVER_INIT( riskchal )
 	irem_cpu_decrypt(0,gussun_decryption_table);
 }
 
+static DRIVER_INIT( gussun )
+{
+	m90_game_kludge=2;
+	irem_cpu_decrypt(0,gussun_decryption_table);
+}
+
 static DRIVER_INIT( matchit2 )
 {
 	m90_game_kludge=0;
@@ -1208,6 +1213,6 @@ GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  bbmanw,   ROT0, "Irem Americ
 GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_NOT_WORKING )
 GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1993, riskchal, 0,        m90,      riskchal, riskchal, ROT0, "Irem", "Risky Challenge", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1993, gussun,   riskchal, m90,      riskchal, riskchal, ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
+GAME( 1993, gussun,   riskchal, m90,      riskchal, gussun,   ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
 GAME( 1993, matchit2, 0,        quizf1,   matchit2, matchit2, ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
 GAME( 1993, shisen2,  matchit2, quizf1,   shisen2,  matchit2, ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )
