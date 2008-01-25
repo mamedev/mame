@@ -9,9 +9,8 @@
 
 ***************************************************************************/
 
-#include <math.h>
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "mips3com.h"
 
 
