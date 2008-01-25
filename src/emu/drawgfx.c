@@ -4712,77 +4712,6 @@ DECLARE(blockmove_NtoN_opaque_noremap_flipx,(
 	}
 })
 
-DECLARE(blockmove_NtoN_opaque_remap,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		const pen_t *paldata),
-{
-	DATA_TYPE *end;
-
-	srcmodulo -= srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			dstdata[0] = paldata[srcdata[0]];
-			dstdata[1] = paldata[srcdata[1]];
-			dstdata[2] = paldata[srcdata[2]];
-			dstdata[3] = paldata[srcdata[3]];
-			dstdata[4] = paldata[srcdata[4]];
-			dstdata[5] = paldata[srcdata[5]];
-			dstdata[6] = paldata[srcdata[6]];
-			dstdata[7] = paldata[srcdata[7]];
-			dstdata += 8;
-			srcdata += 8;
-		}
-		while (dstdata < end)
-			*(dstdata++) = paldata[*(srcdata++)];
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-})
-
-DECLARE(blockmove_NtoN_opaque_remap_flipx,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		const pen_t *paldata),
-{
-	DATA_TYPE *end;
-
-	srcmodulo += srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			srcdata -= 8;
-			dstdata[0] = paldata[srcdata[8]];
-			dstdata[1] = paldata[srcdata[7]];
-			dstdata[2] = paldata[srcdata[6]];
-			dstdata[3] = paldata[srcdata[5]];
-			dstdata[4] = paldata[srcdata[4]];
-			dstdata[5] = paldata[srcdata[3]];
-			dstdata[6] = paldata[srcdata[2]];
-			dstdata[7] = paldata[srcdata[1]];
-			dstdata += 8;
-		}
-		while (dstdata < end)
-			*(dstdata++) = paldata[*(srcdata--)];
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-})
-
-
 DECLARE(blockmove_NtoN_blend_noremap,(
 		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
 		DATA_TYPE *dstdata,int dstmodulo,
@@ -5205,10 +5134,6 @@ DECLARE(copybitmap_core,(
 
 		switch (transparency)
 		{
-			case TRANSPARENCY_NONE:
-				BLOCKMOVE(NtoN_opaque_remap,flipx,(sd,sw,sh,sm,dd,dm,Machine->pens));
-				break;
-
 			case TRANSPARENCY_NONE_RAW:
 				BLOCKMOVE(NtoN_opaque_noremap,flipx,(sd,sw,sh,sm,dd,dm));
 				break;
