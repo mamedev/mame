@@ -5,15 +5,19 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "includes/starfire.h"
+
+
+#define	NUM_PENS	(0x40)
+
+
+UINT8 *starfire_videoram;
+UINT8 *starfire_colorram;
 
 /* local allocated storage */
-static UINT8 *scanline_dirty;
-
 static UINT8 starfire_vidctrl;
 static UINT8 starfire_vidctrl1;
 static UINT8 starfire_color;
+static UINT16 starfire_colors[NUM_PENS];
 
 
 
@@ -25,16 +29,11 @@ static UINT8 starfire_color;
 
 VIDEO_START( starfire )
 {
-	/* make a temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-
-	/* make a dirty array */
-	scanline_dirty = auto_malloc(STARFIRE_VTOTAL);
-
-	/* reset videoram */
-	memset(starfire_videoram, 0, 0x2000);
-	memset(starfire_colorram, 0, 0x2000);
-	memset(scanline_dirty, 1, 256);
+	/* register for state saving */
+	state_save_register_global(starfire_vidctrl);
+	state_save_register_global(starfire_vidctrl1);
+	state_save_register_global(starfire_color);
+	state_save_register_global_array(starfire_colors);
 }
 
 
@@ -74,12 +73,17 @@ WRITE8_HANDLER( starfire_colorram_w )
 		starfire_colorram[offset & ~0x100] = data;
 		starfire_colorram[offset |  0x100] = data;
 
-		/* don't modify the palette unless the TRANS bit is set */
 		starfire_color = data & 0x1f;
-		if (!(starfire_vidctrl1 & 0x40))
-			return;
 
-		palette_set_color_rgb(Machine, palette_index, pal3bit((data << 1) & 0x06) | ((offset >> 8) & 0x01), pal3bit(data >> 5), pal3bit(data >> 2));
+		/* don't modify the palette unless the TRANS bit is set */
+		if (starfire_vidctrl1 & 0x40)
+		{
+			video_screen_update_partial(0, video_screen_get_vpos(0));
+
+			starfire_colors[palette_index] = ((((data << 1) & 0x06) | ((offset >> 8) & 0x01)) << 6) |
+											 (((data >> 5) & 0x07) << 3) |
+											 ((data >> 2) & 0x07);
+		}
 	}
 
 	/* handle writes to the rest of color RAM */
@@ -87,14 +91,8 @@ WRITE8_HANDLER( starfire_colorram_w )
 	{
 		/* set RAM based on CDRM */
 		starfire_colorram[offset] = (starfire_vidctrl1 & 0x80) ? starfire_color : (data & 0x1f);
-		scanline_dirty[offset & 0xff] = 1;
 		starfire_color = data & 0x1f;
 	}
-}
-
-READ8_HANDLER( starfire_colorram_r )
-{
-	return starfire_colorram[offset];
 }
 
 
@@ -174,7 +172,6 @@ WRITE8_HANDLER( starfire_videoram_w )
 	/* final output */
 	starfire_videoram[offset1] = dalu >> 8;
 	starfire_videoram[offset2] = dalu;
-	scanline_dirty[offset1 & 0xff] = 1;
 
 	/* color output */
 	if (!(offset & 0x2000) && !(starfire_vidctrl1 & 0x80))
@@ -220,58 +217,53 @@ READ8_HANDLER( starfire_videoram_r )
 
 /*************************************
  *
- *  Periodic screen refresh callback
+ *  Standard screen refresh callback
  *
  *************************************/
 
-void starfire_video_update(int scanline, int count)
+static void get_pens(pen_t *pens)
 {
-	UINT8 *pix = &starfire_videoram[scanline];
-	UINT8 *col = &starfire_colorram[scanline];
+	offs_t offs;
+
+	for (offs = 0; offs < NUM_PENS; offs++)
+	{
+		UINT16 color = starfire_colors[offs];
+
+		pens[offs] = MAKE_RGB(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
+	}
+}
+
+
+VIDEO_UPDATE( starfire )
+{
+	pen_t pens[NUM_PENS];
+
+	UINT8 *pix = &starfire_videoram[cliprect->min_y - 32];
+	UINT8 *col = &starfire_colorram[cliprect->min_y - 32];
 	int x, y;
 
-	/* update any dirty scanlines in this range */
+	get_pens(pens);
+
 	for (x = 0; x < 256; x += 8)
 	{
-		for (y = 0; y < count; y++)
-			if ((scanline + y) < STARFIRE_VTOTAL && scanline_dirty[scanline + y])
-			{
-				int data = pix[y];
-				int color = col[y];
+		for (y = cliprect->min_y; y <= cliprect->max_y ; y++)
+		{
+			int data = pix[y];
+			int color = col[y];
 
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 0) = color | ((data >> 2) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 1) = color | ((data >> 1) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 2) = color | ((data >> 0) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 3) = color | ((data << 1) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 4) = color | ((data << 2) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 5) = color | ((data << 3) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 6) = color | ((data << 4) & 0x20);
-				*BITMAP_ADDR16(tmpbitmap, scanline + y, x + 7) = color | ((data << 5) & 0x20);
-			}
+			*BITMAP_ADDR32(bitmap, y, x + 0) = pens[color | ((data >> 2) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 1) = pens[color | ((data >> 1) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 2) = pens[color | ((data >> 0) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 3) = pens[color | ((data << 1) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 4) = pens[color | ((data << 2) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 5) = pens[color | ((data << 3) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 6) = pens[color | ((data << 4) & 0x20)];
+			*BITMAP_ADDR32(bitmap, y, x + 7) = pens[color | ((data << 5) & 0x20)];
+		}
 
 		pix += 256;
 		col += 256;
 	}
 
-	/* mark them not dirty anymore */
-	for (y = 0; y < count; y++)
-		if ((scanline + y) < STARFIRE_VTOTAL)
-			scanline_dirty[scanline + y] = 0;
-}
-
-
-
-/*************************************
- *
- *  Standard screen refresh callback
- *
- *************************************/
-
-VIDEO_UPDATE( starfire )
-{
-	/* copy the bitmap, remapping the colors */
-	copybitmap_remap(bitmap, tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
 	return 0;
 }
-
-

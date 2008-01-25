@@ -49,39 +49,8 @@ starfira has one less rom in total than starfire but everything passes as
 
 
 
-UINT8 *starfire_videoram;
-UINT8 *starfire_colorram;
-
 static UINT8 fireone_select;
 static read8_handler input_read;
-
-
-
-/*************************************
- *
- *  Video updates
- *
- *************************************/
-
-#define SCANLINE_UPDATE_CHUNK	8
-
-static TIMER_CALLBACK( update_callback )
-{
-	int scanline = param;
-
-	/* update the previous chunk of scanlines */
-	starfire_video_update(scanline, SCANLINE_UPDATE_CHUNK);
-	scanline += SCANLINE_UPDATE_CHUNK;
-	if (scanline >= machine->screen[0].height)
-		scanline = 32;
-	timer_set(video_screen_get_time_until_pos(0, scanline + SCANLINE_UPDATE_CHUNK - 1, 0), NULL, scanline, update_callback);
-}
-
-
-static MACHINE_RESET( starfire )
-{
-	timer_set(video_screen_get_time_until_pos(0, 32 + SCANLINE_UPDATE_CHUNK - 1, 0), NULL, 32, update_callback);
-}
 
 
 
@@ -181,18 +150,11 @@ static READ8_HANDLER( fireone_input_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(starfire_scratch_r)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(starfire_colorram_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(starfire_videoram_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(starfire_scratch_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(starfire_colorram_w) AM_BASE(&starfire_colorram)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(starfire_videoram_w) AM_BASE(&starfire_videoram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(starfire_scratch_r, starfire_scratch_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(MRA8_RAM, starfire_colorram_w) AM_BASE(&starfire_colorram)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(starfire_videoram_r, starfire_videoram_w) AM_BASE(&starfire_videoram)
 ADDRESS_MAP_END
 
 
@@ -302,21 +264,18 @@ static MACHINE_DRIVER_START( starfire )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, STARFIRE_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
-
-	MDRV_MACHINE_RESET(starfire)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
-	MDRV_PALETTE_LENGTH(64)
 
 	MDRV_VIDEO_START(starfire)
 	MDRV_VIDEO_UPDATE(starfire)
 
-	/* sound hardware */
+	/* audio hardware */
 MACHINE_DRIVER_END
 
 
@@ -406,6 +365,9 @@ static DRIVER_INIT( starfire )
 static DRIVER_INIT( fireone )
 {
 	input_read = fireone_input_r;
+
+	/* register for state saving */
+	state_save_register_global(fireone_select);
 }
 
 
@@ -416,7 +378,7 @@ static DRIVER_INIT( fireone )
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire, ROT0, "Exidy", "Star Fire (set 1)", GAME_NO_SOUND )
-GAME( 1979, starfira, starfire, starfire, starfire, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_NO_SOUND )
-GAME( 1979, fireone,  0,        starfire, fireone,  fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire, ROT0, "Exidy", "Star Fire 2", GAME_NO_SOUND )
+GAME( 1979, starfire, 0,        starfire, starfire, starfire, ROT0, "Exidy", "Star Fire (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, starfira, starfire, starfire, starfire, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        starfire, fireone,  fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, starfir2, 0,        starfire, starfire, starfire, ROT0, "Exidy", "Star Fire 2", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
