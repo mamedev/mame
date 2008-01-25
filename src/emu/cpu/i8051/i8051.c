@@ -606,7 +606,7 @@ int i8051_execute(int cycles)
 		if(PC != PPC)	op = cpu_readop(PC);
 
 		//Update Timer (if any timers are running)
-		if((GET_IT0 && GET_ET0) || (GET_IT1 && GET_ET1))
+		if((GET_TR0 && GET_ET0) || (GET_TR1 && GET_ET1))
 			update_timer(i8051.prev_used_cycles);
 
 		//Update Serial (if serial port sending data)
