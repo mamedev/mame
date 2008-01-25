@@ -5,6 +5,7 @@ Atari Tank 8 video emulation
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/tank8.h"
 
 

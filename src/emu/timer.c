@@ -13,7 +13,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "pool.h"
-#include <math.h>
+#include "deprecat.h"
 
 
 /***************************************************************************

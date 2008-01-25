@@ -1,6 +1,6 @@
 #include "driver.h"
-#include "state.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "cdp1802.h"
 
 typedef struct

@@ -151,6 +151,7 @@ Stephh's log (2007.11.28) :
 ***********************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "cpu/i8051/i8051.h"
 #include "machine/i2cmem.h"

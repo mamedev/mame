@@ -22,7 +22,7 @@
 #include "mame.h"
 #include "emuopts.h"
 #include "profiler.h"
-#include <ctype.h>
+#include "deprecat.h"
 
 
 

@@ -1,5 +1,6 @@
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "flt_vol.h"
 
 

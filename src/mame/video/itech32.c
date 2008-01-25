@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "cpu/m68000/m68000.h"
 #include "itech32.h"

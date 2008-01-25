@@ -6,6 +6,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/timekpr.h"
 
 struct timekeeper_chip

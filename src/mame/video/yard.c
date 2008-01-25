@@ -12,6 +12,7 @@ J Clegg
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8 *yard_scroll_x_low;
 UINT8 *yard_scroll_x_high;

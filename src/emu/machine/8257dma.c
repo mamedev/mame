@@ -25,6 +25,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "8257dma.h"
 

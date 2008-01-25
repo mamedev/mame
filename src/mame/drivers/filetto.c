@@ -62,6 +62,7 @@ AH
 ******************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"

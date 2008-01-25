@@ -175,6 +175,7 @@
 
 #include "driver.h"
 #include "memconv.h"
+#include "deprecat.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"

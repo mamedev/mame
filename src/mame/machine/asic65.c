@@ -5,10 +5,10 @@
  *************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/atarig42.h"
 #include "cpu/tms32010/tms32010.h"
 #include "asic65.h"
-#include <math.h>
 
 
 #define LOG_ASIC		0

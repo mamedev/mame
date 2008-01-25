@@ -12,8 +12,7 @@
   MOS-8580 R5 combined waveforms recorded by Dennis "Deadman" Lindroos.
 */
 
-#include <math.h>
-
+#include "deprecat.h"
 #include "sndintrf.h"
 #include "sidvoice.h"
 #include "sidenvel.h"

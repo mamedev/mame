@@ -182,6 +182,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/tait8741.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"

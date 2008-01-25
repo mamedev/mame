@@ -29,8 +29,8 @@
  *    Everything else! :)
  */
 
-#include <ctype.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "namcond1.h"   // only while debugging
 #include "video/ygv608.h"
 
@@ -1380,7 +1380,7 @@ void nvsram( offs_t offset, UINT16 data )
     if( i%16 == 0 )
       logerror( "%04X: ", offset );
     logerror( "%02X ", data );
-    ascii[i%16] = ( isprint( data ) ? data : '.' );
+    ascii[i%16] = ( data > 0x20) ? data : '.' );
     if( i%16 == 15 )
       logerror( "| %-16.16s\n", ascii );
   }
@@ -1644,7 +1644,7 @@ READ16_HANDLER( ygv608_debug_trigger )
     if( i % 16 == 0 )
       logerror( "$%04X : ", i );
     logerror( "%02X ", ygv608.pattern_name_table[i] );
-    if( isprint( ygv608.pattern_name_table[i] ) )
+    if( ygv608.pattern_name_table[i] >= 0x20)
       ascii[i%16] = ygv608.pattern_name_table[i];
     else
       ascii[i%16] = '.';
@@ -1663,7 +1663,7 @@ READ16_HANDLER( ygv608_debug_trigger )
     if( i % 16 == 0 )
       logerror( "$%04X : ", i );
     logerror( "%02X ", ygv608.scroll_data_table[0][i] );
-    if( isprint( ygv608.scroll_data_table[0][i] ) )
+    if( ygv608.scroll_data_table[0][i] >= 0x20 )
       ascii[i%16] = ygv608.scroll_data_table[0][i];
     else
       ascii[i%16] = '.';

@@ -1,6 +1,6 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
-//#include "f1gp.h"
 
 
 UINT16 *f1gp_spr1vram,*f1gp_spr2vram,*f1gp_spr1cgram,*f1gp_spr2cgram;

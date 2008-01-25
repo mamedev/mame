@@ -22,7 +22,7 @@
 /*====================================================================*/
 
 #include "driver.h"
-//#include "machine/ds1215.h"
+#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "cpu/i8051/i8051.h"

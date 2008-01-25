@@ -26,9 +26,8 @@
    added interrupt functionality
  */
 
-#include <stdio.h>
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "f8.h"
 
 #define S	0x01

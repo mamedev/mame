@@ -103,6 +103,7 @@ Few words about protection:
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT16 *shared_ram;
 

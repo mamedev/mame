@@ -67,6 +67,7 @@ Dumped 06/15/2000
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT16* tileram;
 static UINT8* dirty_tileram;

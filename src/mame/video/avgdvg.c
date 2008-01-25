@@ -12,6 +12,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "avgdvg.h"
 #include "video/vector.h"
 

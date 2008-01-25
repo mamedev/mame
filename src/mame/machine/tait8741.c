@@ -8,6 +8,7 @@ Taito 8741 emulation
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "tait8741.h"
 
 #define VERBOSE 0

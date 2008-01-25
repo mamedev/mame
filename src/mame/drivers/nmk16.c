@@ -145,6 +145,7 @@ Afega Games
 ********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"

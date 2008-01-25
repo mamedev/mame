@@ -434,6 +434,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 

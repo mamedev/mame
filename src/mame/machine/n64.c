@@ -1,6 +1,7 @@
 /* machine/n64.c - contains N64 hardware emulation shared between MAME and MESS */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "sound/custom.h"
 #include "streams.h"

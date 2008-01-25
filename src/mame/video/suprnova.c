@@ -15,6 +15,7 @@ Tilemap flip flags were reversed
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
 

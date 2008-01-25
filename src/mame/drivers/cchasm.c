@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/vector.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"

@@ -36,8 +36,9 @@
 /**   Split fetch and execute cycles.                       **/
 /**                                                         **/
 /*************************************************************/
-#include "z80gb.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "z80gb.h"
 
 #define FLAG_Z	0x80
 #define FLAG_N  0x40

@@ -108,6 +108,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/pokey.h"
 
 static int cloak_nvram_enabled;

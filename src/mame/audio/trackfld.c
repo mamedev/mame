@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/vlm5030.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"

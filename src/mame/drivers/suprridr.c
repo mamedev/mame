@@ -80,6 +80,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "suprridr.h"
 #include "sound/ay8910.h"
 

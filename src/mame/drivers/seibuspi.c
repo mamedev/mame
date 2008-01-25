@@ -669,6 +669,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/ds2404.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"

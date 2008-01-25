@@ -166,6 +166,7 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvcd.h"

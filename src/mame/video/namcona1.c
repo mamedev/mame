@@ -1,6 +1,7 @@
 /*  Namco System NA1/2 Video Hardware */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcona1.h"
 
 #define NAMCONA1_NUM_TILEMAPS 4

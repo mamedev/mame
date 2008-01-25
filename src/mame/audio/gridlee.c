@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "streams.h"
 #include "gridlee.h"
+#include "deprecat.h"
 #include "sound/custom.h"
 #include "sound/samples.h"
 

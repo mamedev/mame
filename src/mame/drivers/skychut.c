@@ -102,6 +102,7 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/samples.h"
 
 #include "skychut.h"

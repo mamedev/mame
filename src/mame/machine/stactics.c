@@ -1,5 +1,6 @@
 
 #include "driver.h"
+#include "deprecat.h"
 
 /* needed in video/stactics.c */
 int stactics_vert_pos;

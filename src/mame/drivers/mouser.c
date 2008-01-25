@@ -13,6 +13,7 @@
 *******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static UINT8 mouser_sound_byte;

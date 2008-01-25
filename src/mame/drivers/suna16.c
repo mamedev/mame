@@ -22,6 +22,7 @@ Year + Game                 By      Board      Hardware
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 #include "sound/ay8910.h"

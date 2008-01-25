@@ -20,6 +20,7 @@ o Layer mixing
 =====================================================================*/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 static UINT16 *lockon_vram0;

@@ -188,7 +188,7 @@ struct _running_machine
 	const pen_t *			pens;				/* remapped palette pen numbers */
 	struct _colortable_t *	colortable;			/* global colortable for remapping */
 	const UINT16 *			game_colortable;	/* lookup table used to map gfx pen numbers to color numbers */
-	const pen_t *			remapped_colortable;/* the above, already remapped through Machine->pens */
+	const pen_t *			remapped_colortable;/* the above, already remapped through machine->pens */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
 
 	/* audio-related information */
@@ -248,7 +248,6 @@ struct _mame_system_time
     GLOBAL VARAIBLES
 ***************************************************************************/
 
-extern running_machine *Machine;
 extern const char mame_disclaimer[];
 extern char giant_string_buffer[];
 

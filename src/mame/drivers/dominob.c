@@ -151,7 +151,7 @@ ADDRESS_MAP_END
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
 static READ8_HANDLER( dominob_unk_port02_r )
 {
-	return 0xff;//mame_rand(Machine);
+	return 0xff;
 }
 
 static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )

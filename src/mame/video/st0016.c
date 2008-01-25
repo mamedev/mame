@@ -4,6 +4,7 @@
 ************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "st0016.h"
 
 UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;

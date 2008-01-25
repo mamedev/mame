@@ -120,6 +120,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/pokey.h"
 #include "ccastles.h"
 

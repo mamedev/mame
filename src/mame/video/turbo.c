@@ -5,9 +5,9 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "turbo.h"
 #include "video/resnet.h"
-#include <math.h>
 
 
 

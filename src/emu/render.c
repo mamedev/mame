@@ -44,7 +44,7 @@
 #include "config.h"
 #include "output.h"
 #include "xmlfile.h"
-#include <math.h>
+#include "deprecat.h"
 
 
 

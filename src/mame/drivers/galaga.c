@@ -697,6 +697,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"

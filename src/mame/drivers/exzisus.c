@@ -28,6 +28,7 @@ TODO:
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"

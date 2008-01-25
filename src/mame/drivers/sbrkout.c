@@ -31,6 +31,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/dac.h"
 
 #include "sbrkout.lh"

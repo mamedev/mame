@@ -1096,7 +1096,7 @@ static void hng64_drawtilemap3(running_machine *machine, mame_bitmap *bitmap, co
 
 //  usrintf_showmessage("%d", hng64_hackTm3Count) ;
 
-	if (hng64_hackTm3Count/4 < Machine->screen[0].visarea.max_y)
+	if (hng64_hackTm3Count/4 < machine->screen[0].visarea.max_y)
 	{
 		for (i = 0; i < hng64_hackTm3Count/4; i++)
 		{

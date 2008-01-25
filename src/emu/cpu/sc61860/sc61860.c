@@ -27,8 +27,8 @@
  *         Extended execute procudure with HLT-mode of CPU.
  *****************************************************************************/
 
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 #include "sc61860.h"
 #include "sc.h"

@@ -140,6 +140,7 @@ Rowscroll style:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "deco16ic.h"
 #include "ui.h"
 

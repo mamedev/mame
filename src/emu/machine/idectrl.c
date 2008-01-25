@@ -7,6 +7,7 @@
 #include "driver.h"
 #include "idectrl.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 
 /*************************************

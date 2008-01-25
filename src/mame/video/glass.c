@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT16 *glass_spriteram;
 UINT16 *glass_vregs;

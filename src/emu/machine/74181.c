@@ -6,6 +6,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "74181.h"
 
 

@@ -1,8 +1,8 @@
 /*  Video hardware for Taito Grand Champion */
 
 /* updated by Hans Andersson, dec 2005     */
-#include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "video/resnet.h"
 #include "includes/grchamp.h"
 

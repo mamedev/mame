@@ -50,6 +50,7 @@ Changelog:
 
 ******************************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/scudsp.h"
 #include "osd_cpu.h"
 

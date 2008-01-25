@@ -458,6 +458,7 @@ or Fatal Fury for example).
 
 #define MASTER_CLOCK	50000000
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 
 static UINT32 *rombase;

@@ -103,6 +103,7 @@
 *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "hd6309.h"
 
 #define VERBOSE 0

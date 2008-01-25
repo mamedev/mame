@@ -49,6 +49,7 @@ Note: SW2, SW3 & SW4 not populated
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 
 /* video/funybubl.c */

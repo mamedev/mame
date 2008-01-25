@@ -269,6 +269,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "cpu/m6805/m6805.h"

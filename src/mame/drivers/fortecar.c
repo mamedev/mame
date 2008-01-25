@@ -19,6 +19,7 @@ dip 1X8
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8 *fortecar_ram;
 

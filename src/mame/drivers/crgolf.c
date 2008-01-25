@@ -27,6 +27,7 @@ WHO AM I?      (In place of "ARIES ELECA")
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "crgolf.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"

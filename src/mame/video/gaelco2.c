@@ -77,6 +77,7 @@ Multi monitor notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT16 *gaelco2_vregs;
 static UINT16 *gaelco2_videoram;

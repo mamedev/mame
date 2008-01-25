@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cloak.h"
 
 static mame_bitmap *tmpbitmap2;

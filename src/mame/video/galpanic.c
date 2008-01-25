@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "kan_pand.h"
 
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;

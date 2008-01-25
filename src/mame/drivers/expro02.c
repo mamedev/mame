@@ -119,6 +119,7 @@ U78 (22CV10)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 

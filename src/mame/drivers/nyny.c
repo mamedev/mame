@@ -63,6 +63,7 @@
 
 #include "driver.h"
 #include "rescap.h"
+#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "video/crtc6845.h"

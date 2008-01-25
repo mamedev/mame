@@ -54,6 +54,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "megasys1.h"
 
 /* Variables only used here: */

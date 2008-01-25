@@ -95,6 +95,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static UINT32 *gstream_vram;

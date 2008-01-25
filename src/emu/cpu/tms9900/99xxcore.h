@@ -86,10 +86,9 @@ Other references can be found on spies.com:
 */
 
 
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "tms9900.h"
-#include <math.h>
 
 
 #if (TMS99XX_MODEL == TI990_10_ID)

@@ -15,6 +15,7 @@ Todo:
 
 #include "driver.h"
 #include "render.h"
+#include "deprecat.h"
 #include "machine/laserdsc.h"
 #include "cpu/cop400/cop400.h"
 

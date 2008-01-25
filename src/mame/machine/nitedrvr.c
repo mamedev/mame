@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "nitedrvr.h"
 #include "sound/discrete.h"
 

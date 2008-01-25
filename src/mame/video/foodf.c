@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "foodf.h"
 #include "video/resnet.h"

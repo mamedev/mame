@@ -12,6 +12,7 @@ Todo: Priority between tree0 and tree1.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 extern UINT8 changela_tree0_col;

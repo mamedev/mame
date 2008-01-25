@@ -4,6 +4,7 @@
 
 ****************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "render.h"
 #include "cpu/i86/i86.h"

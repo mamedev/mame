@@ -12,6 +12,7 @@ segac2.c
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100

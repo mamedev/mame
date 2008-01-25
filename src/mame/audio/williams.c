@@ -23,6 +23,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
 #include "williams.h"

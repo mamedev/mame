@@ -6,6 +6,7 @@ to be honest i think some of these cause more problems than they're worth ...
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvprot.h"

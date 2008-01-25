@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/arkanoid.h"
 
 static UINT8 gfxbank, palettebank;

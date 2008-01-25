@@ -36,6 +36,7 @@ DD10 DD14  DD18     H5            DD21
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8* dderby_vid;
 

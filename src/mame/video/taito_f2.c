@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/taitoic.h"
 #include "includes/taito_f2.h"
 

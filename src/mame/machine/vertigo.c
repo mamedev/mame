@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "vertigo.h"
 #include "exidy440.h"
 #include "machine/74148.h"

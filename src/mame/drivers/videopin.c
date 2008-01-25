@@ -11,6 +11,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "videopin.h"
 #include "videopin.lh"
 #include "sound/discrete.h"

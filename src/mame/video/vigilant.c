@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 static const rectangle bottomvisiblearea =

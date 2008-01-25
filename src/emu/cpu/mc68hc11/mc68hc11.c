@@ -5,6 +5,7 @@
  */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "mc68hc11.h"
 
 enum {

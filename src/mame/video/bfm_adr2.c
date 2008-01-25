@@ -91,6 +91,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"

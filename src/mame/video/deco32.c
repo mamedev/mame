@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "deco16ic.h"
 #include "deco32.h"
 

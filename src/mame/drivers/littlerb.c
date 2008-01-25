@@ -59,6 +59,7 @@ Dip sw.2
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT16 littlerb_vdp_address_low;
 static UINT16 littlerb_vdp_address_high;

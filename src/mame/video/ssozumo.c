@@ -8,6 +8,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8 *ssozumo_videoram2;
 UINT8 *ssozumo_colorram2;

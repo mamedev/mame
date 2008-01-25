@@ -10,6 +10,7 @@ the most protected of the DE102 games?
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "decocrpt.h"
 #include "deco16ic.h"

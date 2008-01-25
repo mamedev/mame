@@ -54,6 +54,7 @@ bootleg todo:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "decocrpt.h"
 #include "decoprot.h"
 #include "deco16ic.h"

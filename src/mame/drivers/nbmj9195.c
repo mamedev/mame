@@ -20,6 +20,7 @@ Notes:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"

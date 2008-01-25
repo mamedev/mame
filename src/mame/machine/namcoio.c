@@ -133,6 +133,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
 #include "sound/namco52.h"

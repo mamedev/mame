@@ -12,6 +12,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static READ8_HANDLER( unk_r )
 {

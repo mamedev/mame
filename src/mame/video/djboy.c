@@ -4,6 +4,7 @@
  * video hardware for DJ Boy
  */
 #include "driver.h"
+#include "deprecat.h"
 #include "kan_pand.h"
 
 static UINT8 djboy_videoreg, djboy_scrollx, djboy_scrolly;

@@ -11,6 +11,7 @@ as well.
 ****************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *compgolf_bg_ram;

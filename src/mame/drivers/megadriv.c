@@ -43,6 +43,7 @@ Known Non-Issues (confirmed on Real Genesis)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"

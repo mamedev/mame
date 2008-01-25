@@ -86,6 +86,7 @@ ROM text showed...
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 

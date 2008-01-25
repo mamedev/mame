@@ -14,6 +14,7 @@
 #include "cheat.h"
 #include "uimenu.h"
 #include "audit.h"
+#include "deprecat.h"
 
 #ifdef MESS
 #include "uimess.h"

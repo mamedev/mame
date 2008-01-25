@@ -136,6 +136,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "seta.h"
 #ifdef MAME_DEBUG
 #include "ui.h"

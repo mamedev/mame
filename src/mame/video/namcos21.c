@@ -7,6 +7,7 @@ Namco System 21 Video Hardware
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcos2.h"
 #include "namcoic.h"
 #include "namcos21.h"

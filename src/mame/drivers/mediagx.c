@@ -64,6 +64,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"

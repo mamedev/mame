@@ -1,7 +1,6 @@
 #include "filter.h"
 #include "sndintrf.h"
-
-#include <math.h>
+#include "deprecat.h"
 
 static filter* filter_alloc(void) {
 	filter* f = malloc_or_die(sizeof(filter));

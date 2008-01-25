@@ -3,6 +3,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;

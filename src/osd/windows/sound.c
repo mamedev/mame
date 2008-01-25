@@ -20,6 +20,7 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "osdepend.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"

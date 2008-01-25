@@ -11,6 +11,7 @@ TO DO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/hd6309/hd6309.h"
 #include "sound/2151intf.h"

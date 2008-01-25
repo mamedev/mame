@@ -10,6 +10,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/tms32031/tms32031.h"
 #include "sound/dmadac.h"
 #include "cage.h"

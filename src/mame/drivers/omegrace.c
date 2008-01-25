@@ -217,6 +217,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"

@@ -12,8 +12,7 @@
 #include "driver.h"
 #include "config.h"
 #include "generic.h"
-#include <stdarg.h>
-#include <ctype.h>
+#include "deprecat.h"
 
 
 

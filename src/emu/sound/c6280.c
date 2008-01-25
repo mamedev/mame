@@ -53,10 +53,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include <math.h>
-
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "c6280.h"
 
 typedef struct {

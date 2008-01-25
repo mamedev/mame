@@ -170,6 +170,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 *******************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/3812intf.h"
 
 static tilemap *tx_tilemap;

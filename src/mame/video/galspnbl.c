@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 
 UINT16 *galspnbl_bgvideoram,*galspnbl_videoram,*galspnbl_colorram;

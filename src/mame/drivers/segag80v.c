@@ -133,6 +133,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/segasnd.h"

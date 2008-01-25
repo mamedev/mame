@@ -144,6 +144,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcos22.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/m37710/m37710.h"

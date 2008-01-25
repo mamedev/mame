@@ -21,6 +21,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 extern WRITE8_HANDLER( redclash_videoram_w );

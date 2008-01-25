@@ -8,6 +8,7 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "dogfgt.h"
 #include "sound/ay8910.h"
 

@@ -1,6 +1,7 @@
 /* video hardware for Namco System II */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcos2.h"
 #include "namcoic.h"
 

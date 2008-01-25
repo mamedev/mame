@@ -75,6 +75,7 @@ chirp 12-..: vokume   0   : silent
 */
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "vlm5030.h"
 
 /* interpolator per frame   */

@@ -50,6 +50,7 @@ Grndtour:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "iqblock.h"
 #include "sound/2413intf.h"

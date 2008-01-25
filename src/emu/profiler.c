@@ -12,6 +12,7 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "profiler.h"
+#include "deprecat.h"
 
 
 /* in usrintf.c */

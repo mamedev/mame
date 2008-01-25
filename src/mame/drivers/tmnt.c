@@ -64,8 +64,8 @@ Updates:
 
 ***************************************************************************/
 
-#include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"

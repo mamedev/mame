@@ -98,6 +98,7 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 
 #define ID_DAIKAIJU 0x5a

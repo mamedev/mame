@@ -12,6 +12,7 @@
 #include "driver.h"
 #include "tilemap.h"
 #include "profiler.h"
+#include "deprecat.h"
 
 
 /***************************************************************************

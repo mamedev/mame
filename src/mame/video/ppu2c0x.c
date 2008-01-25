@@ -24,9 +24,9 @@ NES-specific:
 
 ******************************************************************************/
 
-#include <math.h>
 #include "driver.h"
 #include "profiler.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 
 /* constant definitions */

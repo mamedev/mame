@@ -3,8 +3,9 @@
 *               (initial work based on David Hedley's pcemu)                *
 ****************************************************************************/
 
-#include "host.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "host.h"
 
 
 #define VERBOSE 0

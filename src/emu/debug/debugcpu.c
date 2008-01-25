@@ -17,6 +17,7 @@
 #include "debugcon.h"
 #include "express.h"
 #include "debugvw.h"
+#include "deprecat.h"
 #include <ctype.h>
 
 

@@ -134,6 +134,7 @@ connector, but of course, I can be wrong.
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "genesis.h"
 
 

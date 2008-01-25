@@ -27,6 +27,7 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"

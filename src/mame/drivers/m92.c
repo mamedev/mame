@@ -189,6 +189,7 @@ Notes:
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/m92.h"
 #include "drivers/m92.h"
 #include "machine/irem_cpu.h"

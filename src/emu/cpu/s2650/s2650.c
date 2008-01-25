@@ -13,6 +13,7 @@
  *************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "s2650.h"
 #include "s2650cpu.h"
 

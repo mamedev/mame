@@ -72,6 +72,7 @@ Notes:
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 

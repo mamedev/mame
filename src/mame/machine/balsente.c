@@ -7,10 +7,10 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "balsente.h"
 #include "sound/cem3394.h"
-#include <math.h>
 
 
 #define LOG_CEM_WRITES		0

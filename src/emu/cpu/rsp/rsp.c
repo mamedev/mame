@@ -5,9 +5,9 @@
 */
 
 #include "cpuintrf.h"
-#include "rsp.h"
 #include "debugger.h"
-#include <math.h>	// sqrt
+#include "deprecat.h"
+#include "rsp.h"
 
 #define LOG_INSTRUCTION_EXECUTION		0
 #define SAVE_DISASM						0

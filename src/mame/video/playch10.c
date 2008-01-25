@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 
 /* from machine */

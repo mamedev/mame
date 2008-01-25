@@ -16,6 +16,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "rtc65271.h"
 
 static void field_interrupts(void);

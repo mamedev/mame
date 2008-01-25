@@ -514,7 +514,7 @@ static int totalsnd;
 /*-------------------------------------------------
     sndintrf_init - discover all linked sound
     systems and build a matrix for sound
-    (type,index) pairs for the current Machine
+    (type,index) pairs for the current machine
 -------------------------------------------------*/
 
 void sndintrf_init(running_machine *machine)

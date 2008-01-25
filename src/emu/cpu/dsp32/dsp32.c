@@ -27,8 +27,8 @@
 
 ***************************************************************************/
 
-#include <math.h>
 #include "debugger.h"
+#include "deprecat.h"
 #include "dsp32.h"
 
 

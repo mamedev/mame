@@ -149,6 +149,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/262intf.h"
 #include "sound/ymf278b.h"
 

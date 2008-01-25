@@ -36,6 +36,7 @@ Notes:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 

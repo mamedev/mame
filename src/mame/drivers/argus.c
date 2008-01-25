@@ -84,6 +84,7 @@ Known issues :
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 

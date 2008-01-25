@@ -11,6 +11,7 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "triplhnt.h"
 
 static UINT8 triplhnt_cmos[16];

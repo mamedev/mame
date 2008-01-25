@@ -124,6 +124,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "sound/2610intf.h"
 #include "crshrace.h"

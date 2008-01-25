@@ -23,6 +23,7 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "cp1610.h"
 
 #define S  0x80

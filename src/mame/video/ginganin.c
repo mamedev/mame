@@ -58,6 +58,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 /* Variables only used here */
 static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;

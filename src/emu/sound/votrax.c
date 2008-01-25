@@ -18,6 +18,7 @@ the variable VotraxBaseFrequency, this is defaulted to 8000
 
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "samples.h"
 
 

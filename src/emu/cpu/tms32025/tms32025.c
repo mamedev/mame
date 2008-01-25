@@ -118,8 +118,9 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 
 
-#include "tms32025.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "tms32025.h"
 
 
 #define CLK 4	/* 1 cycle equals 4 clock ticks */		/* PE/DI */

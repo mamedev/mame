@@ -34,6 +34,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"

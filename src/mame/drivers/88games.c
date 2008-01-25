@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/konami/konami.h"
 #include "cpu/z80/z80.h"
 #include "video/konamiic.h"

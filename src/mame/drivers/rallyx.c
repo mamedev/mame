@@ -180,6 +180,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"

@@ -1,8 +1,8 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/samples.h"
-#include <math.h>
 
 
 /* z80 pio */

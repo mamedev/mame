@@ -78,6 +78,7 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 
 */
 #include "driver.h"
+#include "deprecat.h"
 #include "genesis.h"
 #include "rendlay.h"
 #include "megadriv.h"
@@ -306,12 +307,12 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( md_sms_ioport_dc_r )
 {
-	return 0xff;//mame_rand(Machine);
+	return 0xff;
 }
 
 READ8_HANDLER( md_sms_ioport_dd_r )
 {
-	return 0xff;//mame_rand(Machine);
+	return 0xff;
 }
 #endif
 

@@ -204,6 +204,7 @@ Playfield tile info:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taito_f3.h"
 #include "ui.h"
 

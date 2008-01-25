@@ -17,6 +17,7 @@ TODO:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
 #include "video/s2636.h"

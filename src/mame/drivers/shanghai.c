@@ -20,6 +20,7 @@ TS 20050212:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 
 /* the on-chip FIFO is 16 bytes long, but we use a larger one to simplify */

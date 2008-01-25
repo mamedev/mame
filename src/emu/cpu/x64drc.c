@@ -65,7 +65,9 @@
 #include "x64drc.h"
 #include "debugger.h"
 
-#include <stddef.h>
+#ifdef MAME_DEBUG
+#include "deprecat.h"
+#endif
 
 
 

@@ -15,6 +15,7 @@ Notes:
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 
 static UINT8 *strnskil_sharedram;

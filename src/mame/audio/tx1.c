@@ -4,10 +4,11 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "streams.h"
+#include "deprecat.h"
 #include "includes/tx1.h"
 #include "video/resnet.h"
 #include "sound/custom.h"
-#include "streams.h"
 
 /*************************************
  *

@@ -23,6 +23,7 @@
 #include "render.h"
 #include "rendutil.h"
 #include "options.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"

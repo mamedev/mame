@@ -130,6 +130,7 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namco50.h"
 #include "cpu/mb88xx/mb88xx.h"
 

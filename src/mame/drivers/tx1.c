@@ -41,6 +41,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/custom.h"
 #include "cpu/i86/i86.h"

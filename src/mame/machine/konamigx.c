@@ -7,9 +7,9 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/konamigx.h"
-#include <math.h>
 
 #define GX_DEBUG 0
 

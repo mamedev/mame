@@ -75,6 +75,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 
 #include "driver.h"
 #include "render.h"
+#include "deprecat.h"
 #include "machine/laserdsc.h"
 #include "video/tms9928a.h"
 #include "sound/discrete.h"

@@ -91,10 +91,10 @@
 
 #include "driver.h"
 #include "profiler.h"
+#include "deprecat.h"
 #ifdef MAME_DEBUG
 #include "debug/debugcpu.h"
 #endif
-#include <stdarg.h>
 
 
 #define MEM_DUMP		(0)

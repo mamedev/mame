@@ -22,6 +22,7 @@
 
 #include "driver.h"
 #include "render.h"
+#include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
 

@@ -64,6 +64,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "i8051.h"
 
 #define VERBOSE 0

@@ -15,6 +15,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "v9938.h"
 
 typedef struct {

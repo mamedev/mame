@@ -8,6 +8,7 @@
 ***********************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "genesis.h"
 
 /* in video/segasyse.c */

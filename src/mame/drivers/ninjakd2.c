@@ -122,6 +122,7 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
 #include "machine/mc8123.h"

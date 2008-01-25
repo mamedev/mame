@@ -25,6 +25,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"

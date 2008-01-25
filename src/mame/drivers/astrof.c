@@ -49,6 +49,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "astrof.h"
 
 

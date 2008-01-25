@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/tmp68301.h"
 
 UINT16 *tmp68301_regs;

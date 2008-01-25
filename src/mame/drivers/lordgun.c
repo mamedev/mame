@@ -26,6 +26,7 @@ To do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"

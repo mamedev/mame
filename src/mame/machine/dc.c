@@ -4,8 +4,8 @@
 
 */
 
-#include "mamecore.h"
 #include "driver.h"
+#include "deprecat.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
 

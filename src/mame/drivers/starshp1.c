@@ -8,6 +8,7 @@ Atari Starship 1 driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/starshp1.h"
 
 int starshp1_attract;

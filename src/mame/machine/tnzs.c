@@ -13,6 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8x41/i8x41.h"
 #include "includes/tnzs.h"
 

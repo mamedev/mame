@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "exidy440.h"
 
 #define SPRITE_COUNT		40

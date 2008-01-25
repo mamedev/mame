@@ -271,6 +271,7 @@ CPU68 PCB:
   JP3
 */
 #include "driver.h"
+#include "deprecat.h"
 #include "namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"

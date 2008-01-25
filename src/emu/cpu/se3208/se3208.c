@@ -1,4 +1,5 @@
 #include "debugger.h"
+#include "deprecat.h"
 #include "se3208.h"
 
 /*

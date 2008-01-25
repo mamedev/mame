@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/nes_apu.h"

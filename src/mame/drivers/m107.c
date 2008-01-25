@@ -14,6 +14,7 @@
 *******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "m107.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"

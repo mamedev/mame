@@ -81,6 +81,7 @@ EB26IC73.BIN    27C240      /  Main Program
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "sound/2610intf.h"
 

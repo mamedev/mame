@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "jaguar.h"
 
 #define LOG_GPU_IO		0

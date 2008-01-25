@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/mcr.h"
 #include "audio/williams.h"
 #include "cpu/m6800/m6800.h"

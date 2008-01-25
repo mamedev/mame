@@ -17,6 +17,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/pacman.h"
 #include "video/resnet.h"
 

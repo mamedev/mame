@@ -28,6 +28,7 @@
 ****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "h83002.h"
 #include "h8priv.h"
 

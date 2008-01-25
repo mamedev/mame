@@ -179,6 +179,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "slapstic.h"
 #include "cpu/m68000/m68000.h"
 

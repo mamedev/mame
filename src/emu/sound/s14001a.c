@@ -128,10 +128,10 @@
  *
  */
 
-#include <math.h>
 #include "sndintrf.h"
-#include "s14001a.h"
 #include "streams.h"
+#include "deprecat.h"
+#include "s14001a.h"
 
 typedef struct
 {

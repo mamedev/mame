@@ -33,6 +33,7 @@ Merge with other Video System games ?
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "gstriker.h"
 #include "sound/2610intf.h"
 

@@ -15,6 +15,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "hitme.h"
 #include "sound/discrete.h"
 

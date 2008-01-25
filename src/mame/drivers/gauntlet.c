@@ -119,6 +119,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"

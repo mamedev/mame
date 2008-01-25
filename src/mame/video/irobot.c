@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "irobot.h"
 
 #define BITMAP_WIDTH	256

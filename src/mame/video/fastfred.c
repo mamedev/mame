@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "fastfred.h"
 
 extern UINT8 galaxian_stars_on;

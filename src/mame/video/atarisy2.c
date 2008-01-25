@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "slapstic.h"
 #include "atarisy2.h"

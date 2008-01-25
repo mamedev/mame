@@ -67,7 +67,7 @@ static READ8_HANDLER( hotblock_port4_r )
 {
 
 //  mame_printf_debug("port4_r\n");
-	return 0x00;//return mame_rand(Machine); // WHAT HERE?
+	return 0x00;
 }
 
 

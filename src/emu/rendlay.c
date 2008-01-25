@@ -61,6 +61,7 @@
 #include "output.h"
 #include "xmlfile.h"
 #include "png.h"
+#include "deprecat.h"
 
 
 

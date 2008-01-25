@@ -42,6 +42,8 @@ The PCB is Spanish and manufacured by Gamart.
 */
 
 #include "driver.h"
+#include "deprecat.h"
+
 static UINT16 *peno_vram;
 
 

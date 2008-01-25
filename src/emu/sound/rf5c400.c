@@ -17,8 +17,8 @@
 
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "rf5c400.h"
-#include <math.h>
 
 struct rf5c400_info
 {

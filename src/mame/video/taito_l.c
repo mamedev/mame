@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 
 extern UINT8 *taitol_rambanks;

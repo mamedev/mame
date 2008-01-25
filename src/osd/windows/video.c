@@ -30,6 +30,7 @@
 #include "render.h"
 #include "rendutil.h"
 #include "ui.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"

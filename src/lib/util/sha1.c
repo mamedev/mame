@@ -24,7 +24,6 @@
  */
 
 #include "sha1.h"
-//#include "macros.h"
 
 #include <assert.h>
 #include <stdlib.h>

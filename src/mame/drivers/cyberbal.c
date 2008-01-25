@@ -20,6 +20,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "rendlay.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"

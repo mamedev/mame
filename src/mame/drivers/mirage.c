@@ -31,6 +31,7 @@ MR_01-.3A    [a0b758aa]
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "decocrpt.h"
 #include "decoprot.h"
 #include "deco16ic.h"

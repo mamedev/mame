@@ -22,6 +22,7 @@ Todo:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "render.h"
 #include "machine/laserdsc.h"
 

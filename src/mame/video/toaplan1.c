@@ -119,6 +119,7 @@ Abnormalities:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "toaplan1.h"
 #include "cpu/m68000/m68000.h"
 

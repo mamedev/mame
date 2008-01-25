@@ -25,7 +25,7 @@
 #include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
-#include <math.h>
+#include "deprecat.h"
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS 	0

@@ -75,7 +75,6 @@ static WRITE16_HANDLER( jackpool_layer2_videoram_w )
 
 static READ16_HANDLER( jackpool_io_r )
 {
-//  return mame_rand(Machine);
 	return 0xffff;
 }
 

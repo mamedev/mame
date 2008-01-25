@@ -133,6 +133,7 @@ Timming
 ****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "alph8201.h"
 
 /* instruction cycle count */

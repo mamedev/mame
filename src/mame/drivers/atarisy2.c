@@ -124,6 +124,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/t11/t11.h"
 #include "machine/atarigen.h"
 #include "slapstic.h"
@@ -131,7 +132,6 @@
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"
 #include "sound/pokey.h"
-#include <math.h>
 
 
 #define MASTER_CLOCK		XTAL_20MHz

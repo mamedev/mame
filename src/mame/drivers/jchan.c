@@ -199,6 +199,7 @@ there are 9 PALS on the pcb (not dumped)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ymz280b.h"
 
 extern UINT32* skns_spc_regs;

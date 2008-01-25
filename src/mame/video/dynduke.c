@@ -1,5 +1,6 @@
 
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *bg_layer,*fg_layer,*tx_layer;
 UINT16 *dynduke_back_data,*dynduke_fore_data,*dynduke_scroll_ram;

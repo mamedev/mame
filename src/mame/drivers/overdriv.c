@@ -19,6 +19,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/eeprom.h"
 #include "cpu/m6809/m6809.h"

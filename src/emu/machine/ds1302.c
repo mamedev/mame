@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "ds1302.h"
 
 /********************

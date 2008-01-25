@@ -112,6 +112,7 @@ CN4               CN5
 ******************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/segacrpt.h"

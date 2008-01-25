@@ -18,6 +18,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "sound/sn76477.h"
 

@@ -46,6 +46,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/konamigx.h"

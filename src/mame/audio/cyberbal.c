@@ -5,10 +5,10 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "sound/dac.h"
 #include "includes/cyberbal.h"
-#include <math.h>
 
 
 static UINT8 *bank_base;

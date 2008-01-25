@@ -5,6 +5,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/k054539.h"
 #include "machine/eeprom.h"

@@ -17,12 +17,10 @@
  * based on info found on an artikel for the tandy trs80 pc2
  *
  *****************************************************************************/
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 #include "lh5801.h"
-
-//typedef int bool;
 
 #define VERBOSE 0
 

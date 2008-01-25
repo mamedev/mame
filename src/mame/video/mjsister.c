@@ -8,6 +8,7 @@ Video hardware
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 int mjsister_screen_redraw;
 int mjsister_flip_screen;

@@ -4,6 +4,7 @@ Omori Electric CAD (OEC) 1981
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *carjmbre_tilemap;
 

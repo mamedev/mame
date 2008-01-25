@@ -23,6 +23,7 @@ Year + Game         PCB             Notes
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "unico.h"
 #include "sound/2151intf.h"

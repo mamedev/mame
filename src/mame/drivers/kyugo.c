@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "kyugo.h"
 #include "sound/ay8910.h"
 

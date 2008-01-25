@@ -23,7 +23,7 @@ Todo:
 */
 
 #include "driver.h"
-#include "render.h"
+#include "deprecat.h"
 #include "machine/laserdsc.h"
 
 /* From daphne */

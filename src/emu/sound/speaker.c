@@ -9,6 +9,7 @@
 
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "speaker.h"
 
 static const INT16 default_levels[2] = {0,32767};

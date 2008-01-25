@@ -40,6 +40,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 ********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"

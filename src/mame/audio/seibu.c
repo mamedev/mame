@@ -34,6 +34,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/2151intf.h"

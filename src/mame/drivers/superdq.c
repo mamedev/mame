@@ -22,6 +22,7 @@
 
 #include "driver.h"
 #include "render.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/custom.h"
 #include "machine/laserdsc.h"

@@ -5,6 +5,7 @@
 
 #include "driver.h"
 #include "memconv.h"
+#include "deprecat.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"

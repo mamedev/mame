@@ -45,10 +45,10 @@ ClawGrip, Jul 2006
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-//#include "sound/msm5205.h"
 #include "sound/okim6295.h"
 
 extern WRITE8_HANDLER( pokechmp_videoram_w );

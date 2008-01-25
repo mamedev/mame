@@ -90,6 +90,7 @@ write:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80dma.h"
 
 #include "mario.h"

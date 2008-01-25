@@ -15,7 +15,7 @@
 #include "debughlp.h"
 #include "debugvw.h"
 #include "textbuf.h"
-#include <stdarg.h>
+#include "deprecat.h"
 #include <ctype.h>
 
 

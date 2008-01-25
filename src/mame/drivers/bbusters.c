@@ -171,6 +171,7 @@ after adding the mechanized attack u.s. roms i suspect that there is more than j
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 

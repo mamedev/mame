@@ -27,6 +27,7 @@ TODO:
 
 **********************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/arm/arm.h"
 
 static UINT32 *ertictac_mainram;

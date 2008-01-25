@@ -101,6 +101,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "sh2.h"
 
 /* speed up delay loops, bail out of tight loops */

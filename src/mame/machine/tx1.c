@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "debugger.h"
 #include "machine/8255ppi.h"
 #include "tx1.h"

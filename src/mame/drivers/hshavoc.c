@@ -35,6 +35,7 @@ Unfortunately it's read protected.
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100

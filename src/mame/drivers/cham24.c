@@ -55,6 +55,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/ppu2c0x.h"
 #include "sound/nes_apu.h"
 #include "cpu/m6502/m6502.h"

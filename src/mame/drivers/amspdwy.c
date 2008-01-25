@@ -14,6 +14,7 @@ Sound:  YM2151
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2151intf.h"
 
 /* Variables & functions defined in video: */

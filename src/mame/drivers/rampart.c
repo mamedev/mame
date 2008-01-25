@@ -23,6 +23,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "rampart.h"
 #include "sound/okim6295.h"

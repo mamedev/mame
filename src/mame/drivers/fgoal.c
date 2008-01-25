@@ -17,6 +17,7 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/fgoal.h"
 
 UINT8* fgoal_video_ram;

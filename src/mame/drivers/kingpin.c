@@ -20,6 +20,7 @@ Todo:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
 

@@ -73,6 +73,7 @@
 
 #include "driver.h"
 #include "memconv.h"
+#include "deprecat.h"
 #include "machine/mc146818.h"
 
 

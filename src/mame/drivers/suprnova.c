@@ -174,6 +174,7 @@ NEP-16
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ymz280b.h"
 
 #define BIOS_SKIP 1 // Skip Bios as it takes too long and doesn't complete atm.

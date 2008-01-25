@@ -421,6 +421,7 @@ Milipede:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/atari_vg.h"
 #include "centiped.h"

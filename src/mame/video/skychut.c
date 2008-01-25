@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "skychut.h"
 
 static tilemap *		tx_tilemap;

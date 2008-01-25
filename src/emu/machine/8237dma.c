@@ -19,6 +19,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "8237dma.h"
 

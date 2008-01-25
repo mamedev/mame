@@ -98,6 +98,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/asap/asap.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"

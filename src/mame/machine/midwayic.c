@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "debugger.h"
 #include "midwayic.h"
 #include "machine/idectrl.h"

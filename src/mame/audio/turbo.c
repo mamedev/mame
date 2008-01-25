@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "turbo.h"
 #include "sound/samples.h"
 

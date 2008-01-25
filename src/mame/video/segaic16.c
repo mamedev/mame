@@ -351,6 +351,7 @@ Quick review of the system16 hardware:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "segaic16.h"
 #include "video/resnet.h"
 

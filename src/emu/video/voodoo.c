@@ -142,7 +142,7 @@ bits(7:4) and bit(24)), X, and Y:
 #include "voodoo.h"
 #include "vooddefs.h"
 #include "ui.h"
-#include <math.h>
+#include "deprecat.h"
 
 
 /*************************************

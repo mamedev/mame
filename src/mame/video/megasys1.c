@@ -192,6 +192,7 @@ actual code sent to the hardware.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "megasys1.h"
 
 /* Variables defined here, that have to be shared: */

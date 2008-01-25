@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "generic.h"
+#include "deprecat.h"
 
 
 

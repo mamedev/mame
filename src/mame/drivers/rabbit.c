@@ -80,6 +80,7 @@ Custom: Imagetek 15000 (2ch video & 2ch sound)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 
 #define VERBOSE_AUDIO_LOG (0)	// enable to show audio writes (very noisy when music is playing)

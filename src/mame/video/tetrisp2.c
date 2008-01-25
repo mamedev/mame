@@ -39,6 +39,7 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 extern UINT16 tetrisp2_systemregs[0x10];

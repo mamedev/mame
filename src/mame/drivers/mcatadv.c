@@ -136,6 +136,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2610intf.h"
 
 VIDEO_UPDATE( mcatadv );

@@ -121,6 +121,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/arm7/arm7core.h"
 
 enum

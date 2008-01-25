@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/poly.h"
 
 UINT8 *taitojc_texture;

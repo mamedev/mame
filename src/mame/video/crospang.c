@@ -10,6 +10,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static int xsproff, ysproff; // sprite offsets
 static tilemap *bg_layer,*fg_layer;

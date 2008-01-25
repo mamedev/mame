@@ -96,6 +96,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 

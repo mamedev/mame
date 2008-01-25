@@ -2,6 +2,7 @@
 /* Nothing else is known about this set / game */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static VIDEO_START(gtipoker)
 {

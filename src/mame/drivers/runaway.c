@@ -11,6 +11,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 

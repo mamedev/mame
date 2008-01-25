@@ -5,6 +5,7 @@ Atari Poolshark Driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "poolshrk.h"
 #include "sound/discrete.h"
 

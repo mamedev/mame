@@ -80,6 +80,7 @@ driver modified by Eisuke Watanabe
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/eeprom.h"

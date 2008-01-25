@@ -36,6 +36,7 @@ COR_x are LN60G resitor packs
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 

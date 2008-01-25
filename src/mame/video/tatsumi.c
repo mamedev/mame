@@ -1,6 +1,6 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "tatsumi.h"
-#include <math.h>
 
 static tilemap *tx_layer;
 static tilemap *layer0, *layer1, *layer2, *layer3;

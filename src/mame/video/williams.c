@@ -92,6 +92,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/resnet.h"
 #include "williams.h"
 

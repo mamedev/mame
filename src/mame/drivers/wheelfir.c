@@ -49,6 +49,8 @@ something is missing, currently needs a hack to boot
 
 
 #include "driver.h"
+#include "deprecat.h"
+
 static int toggle_bit;
 
 static READ16_HANDLER( wheelfir_rand1 )

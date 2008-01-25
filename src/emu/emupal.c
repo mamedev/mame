@@ -10,7 +10,7 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include <math.h>
+#include "deprecat.h"
 
 #define VERBOSE 0
 

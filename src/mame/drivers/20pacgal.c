@@ -37,6 +37,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/z180/z180.h"
 #include "pacman.h"

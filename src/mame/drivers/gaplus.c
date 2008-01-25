@@ -150,6 +150,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 #include "sound/samples.h"

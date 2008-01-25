@@ -26,6 +26,7 @@
 #include "debugcpu.h"
 #include "debugvw.h"
 #include "info.h"
+#include "deprecat.h"
 #include <zlib.h>
 
 

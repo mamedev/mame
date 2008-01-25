@@ -125,7 +125,6 @@
 
 #include "driver.h"
 #include "video/crtc6845.h"
-//#include "machine/6821pia.h"
 
 
 /*************************

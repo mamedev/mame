@@ -143,6 +143,7 @@ REF. 970429
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"

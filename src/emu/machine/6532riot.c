@@ -12,6 +12,7 @@ The timer seems to follow these rules:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/6532riot.h"
 
 struct riot6532

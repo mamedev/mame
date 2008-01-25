@@ -330,6 +330,7 @@ Notes:
 
 #include "driver.h"
 #include "cdrom.h"
+#include "deprecat.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/intelfsh.h"
 #include "includes/cps3.h"

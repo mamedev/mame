@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "machine/8255ppi.h"
 

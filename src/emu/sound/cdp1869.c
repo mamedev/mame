@@ -11,8 +11,9 @@
 ****************************************************************************/
 
 #include "sndintrf.h"
-#include "sound/cdp1869.h"
 #include "streams.h"
+#include "deprecat.h"
+#include "sound/cdp1869.h"
 
 struct CDP1869
 {

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/m72.h"
 #include "m72.h"
 

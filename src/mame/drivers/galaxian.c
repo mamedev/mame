@@ -355,6 +355,7 @@ TO DO :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
 #include "galaxian.h"

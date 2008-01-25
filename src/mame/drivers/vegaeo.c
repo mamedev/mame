@@ -13,6 +13,7 @@
  *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/at28c16.h"
 #include "eolithsp.h"
 

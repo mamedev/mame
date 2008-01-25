@@ -14,6 +14,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 extern UINT16 twin16_custom_video;
 extern UINT16 *twin16_gfx_rom;

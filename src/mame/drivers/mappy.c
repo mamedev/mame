@@ -547,6 +547,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "sound/dac.h"
 #include "sound/namco.h"

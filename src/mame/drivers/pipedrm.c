@@ -104,11 +104,11 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "fromance.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
-#include <math.h>
 
 
 static UINT8 pending_command;

@@ -28,6 +28,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/segaic16.h"
 #include "system16.h"
 #include "genesis.h"

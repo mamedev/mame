@@ -30,8 +30,8 @@
  *
  **************************************************************************** */
 
-#include <math.h>
 #include "rendutil.h"
+#include "deprecat.h"
 #include "vector.h"
 
 

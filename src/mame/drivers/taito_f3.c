@@ -36,6 +36,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "taito_f3.h"
 #include "sound/es5506.h"

@@ -47,6 +47,7 @@ is a YM2413 compatible chip.
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "video/v9938.h"
 #include "sound/2413intf.h"

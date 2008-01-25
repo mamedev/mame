@@ -9,6 +9,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static int crtindex;
 static int crtdata[256];

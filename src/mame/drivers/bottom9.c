@@ -9,6 +9,7 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "video/konamiic.h"
 #include "sound/k007232.h"

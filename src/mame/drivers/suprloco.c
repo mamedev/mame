@@ -12,6 +12,7 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/system1.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"

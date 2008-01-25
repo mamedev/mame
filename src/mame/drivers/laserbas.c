@@ -17,6 +17,7 @@
 ********************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8 *vram1,*vram2;
 static int vrambank=0;

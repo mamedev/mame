@@ -18,6 +18,7 @@ Magic's 10 instruction for the 1st boot:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static tilemap *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;

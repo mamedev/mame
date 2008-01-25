@@ -4,9 +4,10 @@
    Written by Ville Linde
 */
 
+#include "debugger.h"
+#include "deprecat.h"
 #include "cpuintrf.h"
 #include "tms32051.h"
-#include "debugger.h"
 
 static void delay_slot(UINT16 startpc);
 static void save_interrupt_context(void);

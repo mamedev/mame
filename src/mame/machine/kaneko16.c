@@ -13,6 +13,7 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results

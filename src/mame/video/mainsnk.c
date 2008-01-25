@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8 bg_color,  old_bg_color;
 #define mainsnk_offset 8

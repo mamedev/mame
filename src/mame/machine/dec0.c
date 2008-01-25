@@ -7,6 +7,7 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 *******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "dec0.h"
 #include "cpu/h6280/h6280.h"
 

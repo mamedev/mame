@@ -5,8 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/n8080.h"
-#include <math.h>
 
 int spacefev_red_screen;
 int spacefev_red_cannon;

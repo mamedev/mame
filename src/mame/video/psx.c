@@ -17,8 +17,8 @@
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/psx.h"
 
 #define STOP_ON_ERROR ( 0 )

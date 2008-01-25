@@ -77,6 +77,7 @@
 /****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "8080bw.h"
 #include "mw8080bw.h"
 #include "machine/mb14241.h"

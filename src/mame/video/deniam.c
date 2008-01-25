@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 
 UINT16 *deniam_videoram,*deniam_textram;

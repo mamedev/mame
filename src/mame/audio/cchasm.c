@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "cchasm.h"

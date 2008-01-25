@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include <math.h>
+#include "deprecat.h"
 
 UINT16 *nemesis_videoram1b;
 UINT16 *nemesis_videoram2b;

@@ -46,6 +46,7 @@ sprite RAM
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoic.h"
 
 

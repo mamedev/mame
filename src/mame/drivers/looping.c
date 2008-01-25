@@ -52,6 +52,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/5220intf.h"

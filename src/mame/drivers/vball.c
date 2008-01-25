@@ -88,6 +88,7 @@ VBlank = 58Hz
   *********************************************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"

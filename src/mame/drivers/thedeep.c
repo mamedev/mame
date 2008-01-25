@@ -25,6 +25,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "thedeep.h"
 #include "sound/2203intf.h"
 

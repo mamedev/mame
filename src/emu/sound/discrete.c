@@ -37,10 +37,9 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "inptport.h"
+#include "deprecat.h"
 #include "wavwrite.h"
 #include "discrete.h"
-#include <stdarg.h>
-#include <math.h>
 
 
 /*************************************

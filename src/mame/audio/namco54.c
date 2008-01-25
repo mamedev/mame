@@ -49,6 +49,7 @@ The command format is very simple:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namco54.h"
 #include "cpu/mb88xx/mb88xx.h"
 

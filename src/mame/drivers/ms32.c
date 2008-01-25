@@ -165,6 +165,7 @@ Games marked * need dumping / redumping
 /********** BITS & PIECES **********/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ymf271.h"
 
 extern UINT32 *ms32_fce00000;

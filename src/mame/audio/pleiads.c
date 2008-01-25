@@ -8,6 +8,7 @@
  ****************************************************************************/
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "sound/custom.h"
 #include "sound/tms36xx.h"
 #include "includes/phoenix.h"

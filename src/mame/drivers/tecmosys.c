@@ -102,6 +102,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68k.h"
 #include "sound/okim6295.h"

@@ -95,6 +95,7 @@ Todo:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/dec0.h"
 
 static tilemap *pf1_tilemap_0,*pf1_tilemap_1,*pf1_tilemap_2;

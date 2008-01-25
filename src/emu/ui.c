@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uigfx.h"
+#include "deprecat.h"
 
 #ifdef MESS
 #include "mess.h"
@@ -27,8 +28,6 @@
 #endif
 
 #include <ctype.h>
-#include <stdarg.h>
-#include <math.h>
 
 
 

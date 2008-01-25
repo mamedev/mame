@@ -6,6 +6,7 @@
 ****************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *fg_tilemap, *bg_tilemap;
 static UINT8 vram_bank;

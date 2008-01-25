@@ -84,6 +84,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 
 static UINT8* cshooter_txram;

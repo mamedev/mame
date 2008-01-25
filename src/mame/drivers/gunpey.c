@@ -46,6 +46,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT16 *unkram;
 static UINT16 *mainram;

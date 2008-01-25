@@ -84,6 +84,7 @@
 #include "render.h"
 #include "ui.h"
 #include "uimenu.h"
+#include "deprecat.h"
 
 #ifdef MAME_DEBUG
 #include "debug/debugcon.h"

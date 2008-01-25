@@ -9,6 +9,7 @@ drivers by Acho A. Tang
 // Directives
 
 #include "driver.h"
+#include "deprecat.h"
 
 #define BW_DEBUG 0
 

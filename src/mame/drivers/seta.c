@@ -1283,6 +1283,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "seta.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"

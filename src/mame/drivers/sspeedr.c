@@ -5,6 +5,7 @@ Taito Super Speed Race driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "sspeedr.lh"
 

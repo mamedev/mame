@@ -9,8 +9,9 @@
   Code by Wilbert Pol
 */
 
-#include "sm8500.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "sm8500.h"
 
 #define FLAG_C	0x80
 #define FLAG_Z	0x40

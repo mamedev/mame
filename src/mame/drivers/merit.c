@@ -31,6 +31,7 @@ Notes: it's important that REGION_USER1 is 0xa0000 bytes with empty space filled
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 

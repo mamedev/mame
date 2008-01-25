@@ -150,12 +150,11 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "dcs.h"
 #include "sound/dmadac.h"
 #include "machine/midwayic.h"
-
-#include <math.h>
 
 
 #define LOG_DCS_TRANSFERS			(0)

@@ -324,6 +324,7 @@ Notes:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h83002.h"
 #include "sound/c352.h"

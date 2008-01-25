@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 static int homerun_gfx_ctrl;
 static int homerun_gc_up,homerun_gc_down;

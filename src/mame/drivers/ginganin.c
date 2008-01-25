@@ -49,6 +49,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
 

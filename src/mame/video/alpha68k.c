@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *fix_tilemap;
 static int bank_base,flipscreen;

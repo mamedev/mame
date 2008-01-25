@@ -5,6 +5,7 @@ Atari Destroyer Driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 extern VIDEO_UPDATE( destroyr );
 

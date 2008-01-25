@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "segag80r.h"
 #include "rescap.h"
 #include "video/resnet.h"

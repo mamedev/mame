@@ -14,6 +14,7 @@
 #include "avcomp.h"
 #include "profiler.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "sound/custom.h"
 
 

@@ -5,6 +5,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "includes/midzeus.h"
 #include "video/poly.h"

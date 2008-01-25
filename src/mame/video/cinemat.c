@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/vector.h"
 #include "cpu/ccpu/ccpu.h"
 #include "cinemat.h"

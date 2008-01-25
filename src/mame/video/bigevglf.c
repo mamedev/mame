@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 
 
 UINT8 *bigevglf_spriteram1;

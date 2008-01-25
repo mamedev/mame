@@ -13,6 +13,7 @@
 ****************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *tryout_gfx_control;

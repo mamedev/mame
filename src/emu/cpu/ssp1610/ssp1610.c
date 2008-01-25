@@ -7,8 +7,8 @@
 *********************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "ssp1610.h"
-#include "osd_cpu.h"
 
 #define READ_OP(addr)	       (cpu_readop16(addr<<1))
 

@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "segag80r.h"
 #include "machine/8255ppi.h"

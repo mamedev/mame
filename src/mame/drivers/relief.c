@@ -18,6 +18,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "relief.h"
 #include "sound/okim6295.h"

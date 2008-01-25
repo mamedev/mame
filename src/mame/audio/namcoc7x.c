@@ -27,6 +27,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/namcoc7x.h"
 
 static UINT16 *namcoc7x_mcuram;

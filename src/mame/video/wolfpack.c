@@ -5,6 +5,7 @@ Atari Wolf Pack (prototype) video emulation
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 int wolfpack_collision;
 

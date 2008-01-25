@@ -127,6 +127,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/custom.h"
 #include "includes/warpwarp.h"
 #include "geebee.lh"

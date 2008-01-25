@@ -25,10 +25,10 @@
     * January 5, 2007   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
 */
 
-#include <math.h>
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "deprecat.h"
 #include "scsp.h"
 #include "scspdsp.h"
 

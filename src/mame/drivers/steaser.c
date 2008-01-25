@@ -35,6 +35,7 @@ ROMs
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 static VIDEO_START(steaser)
 {

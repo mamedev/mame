@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"
 #include "machine/8255ppi.h"

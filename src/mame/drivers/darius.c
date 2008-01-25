@@ -126,9 +126,8 @@ sounds.
 
 ***************************************************************************/
 
-#include <stdarg.h>
-#include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "video/taitoic.h"
 #include "cpu/z80/z80.h"
 #include "audio/taitosnd.h"

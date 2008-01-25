@@ -14,6 +14,7 @@ likewise be a 2 screen game
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "machine/eeprom.h"
 #include "cpu/z80/z80.h"

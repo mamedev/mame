@@ -41,6 +41,7 @@ sprites.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 //static int scroll1[4];
 static int scroll2[4];

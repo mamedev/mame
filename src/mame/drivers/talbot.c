@@ -8,6 +8,7 @@ ALPHA 8201 MCU handling by Tatsuyuki satoh
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static tilemap *bg_tilemap;

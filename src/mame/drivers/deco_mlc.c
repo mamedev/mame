@@ -96,6 +96,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"
 #include "decoprot.h"

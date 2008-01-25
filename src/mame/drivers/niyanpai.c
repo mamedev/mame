@@ -33,6 +33,7 @@ Memo:
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/m68kfmly.h"
 #include "machine/z80ctc.h"
 #include "nb1413m3.h"

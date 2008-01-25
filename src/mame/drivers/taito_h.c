@@ -128,6 +128,7 @@ Recordbr: loads of unmapped IOC reads and writes.
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoipt.h"
 #include "audio/taitosnd.h"
 #include "video/taitoic.h"

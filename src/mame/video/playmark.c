@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 UINT16 *bigtwin_bgvideoram;
 UINT16 *wbeachvl_videoram1,*wbeachvl_videoram2,*wbeachvl_videoram3;

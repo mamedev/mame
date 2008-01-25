@@ -21,6 +21,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "z80dma.h"
 

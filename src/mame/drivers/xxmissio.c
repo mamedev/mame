@@ -9,6 +9,7 @@ XX Mission (c) 1986 UPL
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 VIDEO_UPDATE( xxmissio );

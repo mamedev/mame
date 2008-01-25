@@ -145,6 +145,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "turbo.h"
 #include "machine/segacrpt.h"

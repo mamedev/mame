@@ -140,10 +140,10 @@ popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%0
 #endif
 	if (k007121_flip_screen)
 	{
-		k007121_clip[0] = Machine->screen[0].visarea;
+		k007121_clip[0] = machine->screen[0].visarea;
 		k007121_clip[0].max_x -= 40;
 
-		k007121_clip[1] = Machine->screen[0].visarea;
+		k007121_clip[1] = machine->screen[0].visarea;
 		k007121_clip[1].min_x = k007121_clip[1].max_x-40;
 
 		tilemap_set_scrollx(k007121_tilemap[0],0,K007121_ctrlram[0][0x00] - 56 );

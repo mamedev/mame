@@ -5,11 +5,11 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/sn76477.h"
 #include "sound/dac.h"
 #include "includes/n8080.h"
-#include <math.h>
 
 static int n8080_hardware;
 

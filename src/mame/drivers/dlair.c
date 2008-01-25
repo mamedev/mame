@@ -34,6 +34,7 @@
 
 #include "driver.h"
 #include "render.h"
+#include "deprecat.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/laserdsc.h"
 #include "machine/z80ctc.h"

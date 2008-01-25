@@ -82,6 +82,7 @@ C004      76489 #4 trigger
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
 

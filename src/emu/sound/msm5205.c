@@ -14,10 +14,9 @@
  *  separate MSM5205 emulator form adpcm.c and some fix
  */
 
-#include <math.h>
-
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "msm5205.h"
 
 /*

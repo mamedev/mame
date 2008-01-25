@@ -625,6 +625,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "system16.h"
 #include "video/segaic24.h"

@@ -313,6 +313,7 @@ TODO:
 #define WELLTRIS_4P_HACK 0
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2610intf.h"
 
 UINT16 *welltris_spriteram;

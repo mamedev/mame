@@ -328,6 +328,7 @@ Boards:
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pacman.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/namco.h"

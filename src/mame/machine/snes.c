@@ -12,8 +12,8 @@
 ***************************************************************************/
 #define __MACHINE_SNES_C
 
-#include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/snes.h"
 #include "cpu/g65816/g65816.h"
 #ifdef MESS

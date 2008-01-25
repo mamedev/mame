@@ -119,6 +119,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 #include "deco16ic.h"
 #include "sound/2203intf.h"

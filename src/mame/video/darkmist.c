@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 /*defined in drivers/darkmist.c */
 

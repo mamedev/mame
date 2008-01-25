@@ -71,6 +71,7 @@ TODO:
 *********************************************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/dynax.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/msm6242.h"

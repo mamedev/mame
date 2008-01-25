@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "atarigen.h"
 #include "slapstic.h"
 #include "cpu/m6502/m6502.h"

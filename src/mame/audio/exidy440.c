@@ -9,8 +9,8 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "exidy440.h"
-#include <math.h>
 
 
 #define MAKE_WAVES		0

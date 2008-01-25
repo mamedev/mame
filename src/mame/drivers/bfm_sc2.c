@@ -137,6 +137,7 @@ Adder hardware:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 
 #include "video/bfm_adr2.h"
@@ -145,8 +146,6 @@ Adder hardware:
 #include "sound/upd7759.h"
 
 /* fruit machines only */
-//#include "video/bfm_dm01.h"
-//#include "video/awpvid.h"
 #include "machine/steppers.h" // stepper motor
 
 #include "machine/bfm_bd1.h"  // vfd

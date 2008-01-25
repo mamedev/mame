@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "irem.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"

@@ -99,6 +99,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pacman.h"
 #include "sound/namco.h"
 

@@ -16,6 +16,7 @@
 extern void decrypt156(void);
 
 #include "driver.h"
+#include "deprecat.h"
 #include "decocrpt.h"
 #include "deco32.h"
 #include "machine/eeprom.h"

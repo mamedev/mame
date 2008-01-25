@@ -34,6 +34,7 @@ dip: 6.7 7.7
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/custom.h"
 

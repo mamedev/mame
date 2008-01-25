@@ -15,6 +15,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT16 tumblepb_control_0[8];
 UINT16 *tumblepb_pf1_data,*tumblepb_pf2_data;

@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "jalblend.c"
 
 #define	BG_SCROLLX_LSB		0x308

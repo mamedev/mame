@@ -42,6 +42,7 @@ Emulation Notes:
 #define MASTER_CLOCK 22118400
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "video/crtc6845.h"
 

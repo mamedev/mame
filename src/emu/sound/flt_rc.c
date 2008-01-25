@@ -1,7 +1,7 @@
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "flt_rc.h"
-#include <math.h>
 
 struct filter_rc_info
 {

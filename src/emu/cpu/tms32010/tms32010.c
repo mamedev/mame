@@ -53,8 +53,9 @@
 
 
 
-#include "tms32010.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "tms32010.h"
 
 
 #define CLK  1		/* Moved the clock timing back into the driver */

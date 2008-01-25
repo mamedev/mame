@@ -98,7 +98,7 @@
 #include "profiler.h"
 #include "inputseq.h"
 #include "ui.h"
-#include <math.h>
+#include "deprecat.h"
 #include <ctype.h>
 #include <time.h>
 

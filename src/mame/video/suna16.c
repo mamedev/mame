@@ -58,6 +58,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static int color_bank;
 

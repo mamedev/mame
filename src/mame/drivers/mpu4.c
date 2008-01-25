@@ -246,7 +246,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "machine/6840ptm.h"
 
 // MPU4
-#include "ui.h"
+#include "deprecat.h"
 #include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"

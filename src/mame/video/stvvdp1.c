@@ -17,6 +17,7 @@ Framebuffer todo:
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 static int vdp1_sprite_log = 0;
 

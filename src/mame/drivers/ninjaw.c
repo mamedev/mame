@@ -190,6 +190,7 @@ rumbling on a subwoofer in the cabinet.)
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"

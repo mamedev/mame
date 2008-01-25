@@ -40,7 +40,7 @@ Dumping Notes:
 
 
 #include "driver.h"
-#include "render.h"
+#include "deprecat.h"
 #include "machine/laserdsc.h"
 
 /* Assumed to be the same as segald hardware */

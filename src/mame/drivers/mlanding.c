@@ -4,6 +4,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"

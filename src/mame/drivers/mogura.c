@@ -1,6 +1,7 @@
 /* Mogura Desse */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/dac.h"
 
 static UINT8 *mogura_tileram;

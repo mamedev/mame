@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 
 UINT16 *taitob_scroll;

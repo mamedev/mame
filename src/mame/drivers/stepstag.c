@@ -8,7 +8,7 @@
  */
 
 #include "driver.h"
-//#include "random.h"
+#include "deprecat.h"
 
 static READ16_HANDLER( unknown_read_0xc00000 )
 {

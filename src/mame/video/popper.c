@@ -4,6 +4,7 @@ Omori Electric CAD (OEC) 1983
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *popper_p123_tilemap, *popper_p0_tilemap, *popper_ol_p123_tilemap, *popper_ol_p0_tilemap;
 UINT8 *popper_videoram, *popper_attribram, *popper_ol_videoram, *popper_ol_attribram, *popper_spriteram;

@@ -119,6 +119,7 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "megasys1.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"

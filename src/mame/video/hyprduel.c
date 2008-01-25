@@ -55,6 +55,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0

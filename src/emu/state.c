@@ -22,6 +22,7 @@
 
 #include "driver.h"
 #include "astring.h"
+#include "deprecat.h"
 #include <zlib.h>
 
 

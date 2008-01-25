@@ -301,6 +301,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/segacrpt.h"
 #include "machine/8255ppi.h"
 #include "audio/segasnd.h"

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/taitoic.h"
 
 #define TC0100SCN_GFX_NUM 1

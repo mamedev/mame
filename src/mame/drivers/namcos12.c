@@ -921,8 +921,8 @@ Notes:
       Point Blank 2 (GNB5/VER.A)
 */
 
-#include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/h83002/h83002.h"
 #include "includes/psx.h"

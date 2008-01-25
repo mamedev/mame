@@ -112,7 +112,6 @@ static READ16_HANDLER ( varia_crom_read )
 
 static READ16_HANDLER ( varia_random )
 {
-//  return mame_rand(Machine);  // dips etc.. weird
 	return 0xffff;
 }
 

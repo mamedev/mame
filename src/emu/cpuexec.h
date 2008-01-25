@@ -252,7 +252,6 @@ enum
 
 
 
-
 /*************************************
  *
  *  Core CPU execution
@@ -356,25 +355,6 @@ void activecpu_eat_cycles(int cycles);
 
 /* Scales a given value by the ratio of fcount / fperiod */
 int cpu_scalebyfcount(int value);
-
-
-
-/*************************************
- *
- *  Video timing
- *
- *************************************/
-
-/***** OBSOLETE NOTICE: these functions are no longer considered */
-/***** to be the authority on scanline timing. Please use the */
-/***** video_screen_* functions in video.c for newer drivers. */
-/***** These functions may eventually go away. */
-
-/* Recomputes the VBLANK timing after, e.g., a visible area change */
-void cpu_compute_vblank_timing(running_machine *machine);
-
-/* Returns the number of the video frame we are currently playing */
-int cpu_getcurrentframe(void);
 
 
 

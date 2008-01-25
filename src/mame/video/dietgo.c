@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "deco16ic.h"
 
 static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect)

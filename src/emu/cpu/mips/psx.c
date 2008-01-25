@@ -13,10 +13,10 @@
  *
  */
 
-#include "ui.h"
 #include "debugger.h"
-#include "psx.h"
+#include "deprecat.h"
 #include "osd_cpu.h"
+#include "psx.h"
 
 #define LOG_BIOSCALL ( 0 )
 

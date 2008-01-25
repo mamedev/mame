@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "6526cia.h"
+#include "deprecat.h"
 
 
 

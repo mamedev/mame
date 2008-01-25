@@ -30,6 +30,7 @@
 #include <math.h>		/* for pow() */
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "sn76477.h"
 
 
@@ -255,7 +256,7 @@ struct SN76477
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
 	UINT32 index;
-	int sample_rate; 					/* from Machine->sample_rate */
+	int sample_rate; 					/* from machine->sample_rate */
 
 #if LOG_WAV
 	wav_file *file;						/* handle of the wave file to produce */

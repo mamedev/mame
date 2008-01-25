@@ -79,6 +79,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "cpu/i86/i186intf.h"
 #include "cpu/z80/z80.h"
 #include "leland.h"

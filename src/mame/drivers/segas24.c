@@ -332,6 +332,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m68000/m68k.h"
 #include "segas24.h"
 #include "system16.h"

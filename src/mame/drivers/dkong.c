@@ -248,12 +248,12 @@ Changes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
-#include <math.h>
 
 /*************************************
  *

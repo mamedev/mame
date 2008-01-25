@@ -533,6 +533,7 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS

@@ -31,6 +31,7 @@
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "tms7000.h"
+#include "deprecat.h"
 
 #define VERBOSE 0
 

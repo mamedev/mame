@@ -114,6 +114,7 @@ BG0 palette intensity ( $C47F, $C4FF )
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #include "jalblend.c"
 

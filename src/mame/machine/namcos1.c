@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ym2151.h"
 #include "sound/namco.h"
 

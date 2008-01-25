@@ -10,6 +10,7 @@
 
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #ifdef MESS
 #include "messdrv.h"
 #include "utils.h"

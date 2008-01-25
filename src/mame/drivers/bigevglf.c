@@ -56,6 +56,7 @@ J1100072A
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "cpu/m6805/m6805.h"

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "sid6581.h"
 #include "sid.h"
 

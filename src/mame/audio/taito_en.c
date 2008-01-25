@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "taito_en.h"

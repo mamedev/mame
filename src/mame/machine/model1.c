@@ -3,8 +3,8 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "debugger.h"
-#include <math.h>
 #include "cpu/mb86233/mb86233.h"
 
 enum {FIFO_SIZE = 256};

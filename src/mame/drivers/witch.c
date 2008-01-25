@@ -190,6 +190,7 @@ TODO :
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/es8712.h"
 #include "sound/2203intf.h"
 

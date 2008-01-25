@@ -14,6 +14,7 @@
 #include "streams.h"
 #include "config.h"
 #include "profiler.h"
+#include "deprecat.h"
 #include "sound/wavwrite.h"
 
 

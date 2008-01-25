@@ -41,6 +41,7 @@ Note about version levels using Mutant Fighter as the example:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cninja.h"
 #include "cpu/h6280/h6280.h"
 #include "deco16ic.h"

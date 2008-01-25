@@ -71,7 +71,7 @@
 
 ******************************************************************************/
 #include "driver.h"
-#include "debugger.h"
+#include "deprecat.h"
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "cpu/z80/z80.h"

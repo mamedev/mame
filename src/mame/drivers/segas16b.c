@@ -829,6 +829,7 @@ WW.B11    Object 5 - Even
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "system16.h"
 #include "machine/segaic16.h"
 #include "machine/fd1094.h"

@@ -70,6 +70,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #define TILEMAPS 0
 

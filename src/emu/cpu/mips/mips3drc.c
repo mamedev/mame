@@ -16,6 +16,7 @@
 #include "debugger.h"
 #include "mips3com.h"
 #include "mips3fe.h"
+#include "deprecat.h"
 #include "cpu/x86log.h"
 #include "cpu/drcfe.h"
 

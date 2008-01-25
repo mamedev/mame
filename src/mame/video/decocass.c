@@ -5,6 +5,7 @@
  ***********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/decocass.h"
 
 static INT32 watchdog_count;

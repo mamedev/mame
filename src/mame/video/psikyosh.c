@@ -90,6 +90,7 @@ sol divide doesn't seem to make much use of tilemaps at all, it uses them to fad
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "psikyosh.h"
 

@@ -35,6 +35,7 @@ Tomasz Slanina 20050225
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 

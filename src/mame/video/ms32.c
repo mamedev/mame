@@ -13,6 +13,7 @@ priority should be given to
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 //UINT32 *ms32_fce00000;
 UINT32 *ms32_roz_ctrl;

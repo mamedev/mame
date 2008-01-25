@@ -59,6 +59,7 @@ Word | Bit(s)           | Use
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 
 

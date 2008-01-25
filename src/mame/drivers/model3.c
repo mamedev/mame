@@ -359,6 +359,7 @@ ALL VROM ROMs are 16M MASK
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/eeprom.h"
 #include "machine/53c810.h"

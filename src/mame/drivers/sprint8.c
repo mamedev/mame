@@ -5,6 +5,7 @@ Atari Sprint 8 driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/sprint8.h"
 
 static int steer_dir[8];

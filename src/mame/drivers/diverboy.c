@@ -47,6 +47,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/okim6295.h"
 
 extern UINT16 *diverboy_spriteram;

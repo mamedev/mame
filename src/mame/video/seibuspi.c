@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 
 static tilemap *text_layer;
 static tilemap *back_layer;

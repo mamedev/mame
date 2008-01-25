@@ -1,6 +1,6 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/segaic24.h"
-#include <math.h>
 
 #define LOG_TGP_VIDEO 0
 

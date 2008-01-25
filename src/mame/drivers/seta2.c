@@ -291,6 +291,7 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/tmp68301.h"
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"

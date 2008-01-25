@@ -135,6 +135,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "machine/atarigen.h"
 #include "cpu/mips/r3000.h"

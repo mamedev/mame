@@ -1,5 +1,6 @@
 // system 16 - 7751 emulation, based on monster bash code.
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 

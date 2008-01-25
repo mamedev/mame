@@ -1,6 +1,7 @@
 /* Diver Boy - Video Hardware */
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT16 *diverboy_spriteram;
 size_t diverboy_spriteram_size;

@@ -12,6 +12,7 @@ drivers by Acho A. Tang
 // Directives
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"

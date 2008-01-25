@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "sound/samples.h"
 #include "includes/galaxian.h"
 

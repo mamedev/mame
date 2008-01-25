@@ -89,6 +89,7 @@ type1       type0           function
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "system16.h"
 #include "video/resnet.h"
 

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "video/konamiic.h"
 

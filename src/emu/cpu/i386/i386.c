@@ -11,6 +11,7 @@
 */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "i386.h"
 #include "i386intf.h"
 

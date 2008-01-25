@@ -121,6 +121,7 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 
 

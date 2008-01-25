@@ -1149,6 +1149,7 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0

@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/msm6242.h"
 
 static UINT8 msm6264_reg[3] = { 0, 0, 0 };

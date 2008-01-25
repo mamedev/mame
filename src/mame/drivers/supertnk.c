@@ -96,6 +96,7 @@ CRU lines:
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 

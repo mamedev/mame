@@ -6,6 +6,7 @@ todo - convert to tilemap
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8* funybubl_banked_videoram;
 UINT8 *funybubl_paletteram;

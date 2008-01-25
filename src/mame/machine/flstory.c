@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 extern UINT8 *onna34ro_workram;
 extern UINT8 *victnine_workram;

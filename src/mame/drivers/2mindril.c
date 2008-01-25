@@ -51,6 +51,7 @@ DAC               -26.6860Mhz
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2610intf.h"
 
 static UINT16 *unkram;

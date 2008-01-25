@@ -64,6 +64,7 @@ zooming might be wrong
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2610intf.h"
 
 #define TAOTAIDO_SHOW_ALL_INPUTS	0

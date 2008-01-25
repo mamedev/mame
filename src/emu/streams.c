@@ -45,7 +45,7 @@
 
 #include "driver.h"
 #include "streams.h"
-#include <math.h>
+#include "deprecat.h"
 
 
 

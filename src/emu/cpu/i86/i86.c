@@ -4,9 +4,10 @@
 ****************************************************************************/
 /* 26.March 2000 PeT changed set_irq_line */
 
-#include "host.h"
 #include "debugger.h"
+#include "deprecat.h"
 
+#include "host.h"
 #include "i86.h"
 #include "i86intf.h"
 

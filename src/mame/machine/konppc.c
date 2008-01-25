@@ -1,6 +1,7 @@
 /* Konami PowerPC-based 3D games common functions */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "video/voodoo.h"
 #include "konppc.h"

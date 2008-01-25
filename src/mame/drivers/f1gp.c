@@ -20,6 +20,7 @@ f1gp2:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 #include "f1gp.h"
 #include "sound/2610intf.h"

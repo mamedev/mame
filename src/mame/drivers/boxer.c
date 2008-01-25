@@ -9,6 +9,7 @@ Atari Boxer (prototype) driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 extern UINT8* boxer_tile_ram;
 extern UINT8* boxer_sprite_ram;

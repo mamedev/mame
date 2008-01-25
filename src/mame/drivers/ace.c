@@ -38,6 +38,7 @@ A1                   2101            2101
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 static UINT8 *ace_scoreram;

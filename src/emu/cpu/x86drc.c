@@ -9,9 +9,9 @@
 
 ***************************************************************************/
 
-#include "cpuintrf.h"
-#include "x86drc.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "x86drc.h"
 
 #define LOG_DISPATCHES				0
 #define BREAK_ON_MODIFIED_CODE		0

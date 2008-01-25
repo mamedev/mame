@@ -205,6 +205,7 @@ the prog rom. Doesn't seem to cause problems though.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/crtc6845.h"
 #include "sound/ay8910.h"
 

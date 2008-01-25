@@ -281,6 +281,7 @@ Notes:
 #define PGMARM7SPEEDHACK 1
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ics2115.h"
 #include "cpu/arm7/arm7core.h"
 

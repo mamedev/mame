@@ -8,12 +8,11 @@
 ***************************************************************************/
 
 #include <stddef.h>
-#include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
+#include "osd_cpu.h"
 #include "tms34010.h"
 #include "34010ops.h"
-#include "osd_cpu.h"
-#include "driver.h"
 
 
 /***************************************************************************

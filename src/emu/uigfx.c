@@ -14,6 +14,7 @@
 #include "rendfont.h"
 #include "rendutil.h"
 #include "uigfx.h"
+#include "deprecat.h"
 
 
 

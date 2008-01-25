@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;

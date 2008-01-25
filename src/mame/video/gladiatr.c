@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8 *gladiatr_videoram, *gladiatr_colorram, *gladiatr_textram;
 

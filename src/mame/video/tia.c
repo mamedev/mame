@@ -5,9 +5,9 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "tia.h"
 #include "sound/tiaintf.h"
-#include <math.h>
 
 #define HMOVE_INACTIVE		-200
 #define PLAYER_GFX_SLOTS	4

@@ -173,6 +173,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "namcona1.h"
 #include "sound/c140.h"
 #include "sound/namcona.h"

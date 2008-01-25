@@ -5,6 +5,7 @@ Atari Tank 8 driver
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "tank8.h"
 #include "sound/discrete.h"
 
