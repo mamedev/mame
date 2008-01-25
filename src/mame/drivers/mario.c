@@ -183,8 +183,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( masao_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, mario_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_MEMBER(mario_state, spriteram) AM_SIZE_MEMBER(mario_state, spriteram_size) /* physical sprite ram */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, mario_videoram_w) AM_BASE_MEMBER(mario_state, videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE(mario_scroll_w)
