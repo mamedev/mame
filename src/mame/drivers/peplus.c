@@ -943,8 +943,27 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( peplus )
 {
+/*  
+    AutoHold Feature Currently Disabled
+
+    // pepp0158
+	program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
+	program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+	autohold_addr = 0x5ffe; // AutoHold Address
+
+    // pepp0188
+  	program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
+	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+	autohold_addr = 0x742f; // AutoHold Address
+
+    // pepp0516
+	program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
+	program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+	autohold_addr = 0x5e7e; // AutoHold Address
+
 	if (autohold_addr)
 		program_ram[autohold_addr] = readinputportbytag_safe("AUTOHOLD",0x00) & 0x01;
+*/
 }
 
 
@@ -1003,8 +1022,19 @@ static void peplus_init(void)
 	autohold_addr = 0;
 }
 
+
+/*************************
+*      Driver Init       *
+*************************/
+
+/* Normal board */
+static DRIVER_INIT( peplus )
+{
+	peplus_init();
+}
+
 /* Superboard */
-static void peplussb_init(void)
+static DRIVER_INIT( peplussb )
 {
     UINT8 *super_data = memory_region(REGION_USER1);
 
@@ -1018,145 +1048,6 @@ static void peplussb_init(void)
 
 	peplus_init();
 }
-
-
-/*************************
-*      Driver Init       *
-*************************/
-
-static DRIVER_INIT( peset038 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x302] = 0x22;  // RET - Disable Memory Test
-	program_ram[0x289f] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0065 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x88d6] = 0x22; // RET - Disable Memory Test
-	program_ram[0xd949] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0158 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-	program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
-
-	autohold_addr = 0x5ffe;
-}
-
-static DRIVER_INIT( pepp0188 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
-
-	autohold_addr = 0x742f;
-}
-
-static DRIVER_INIT( pepp0250 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x4ebb] = 0x22; // RET - Disable Memory Test
-	program_ram[0x878b] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0447 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x90dc] = 0x22; // RET - Disable Memory Test
-	program_ram[0xe475] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pepp0516 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-	program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
-
-	autohold_addr = 0x5e7e;
-}
-
-static DRIVER_INIT( pebe0014 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x75e7] = 0x22; // RET - Disable Memory Test
-	program_ram[0xc3ab] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peke1012 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x59e7] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbe01] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peps0615 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x84be] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbfd8] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( peps0716 )
-{
-	peplus_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x7f99] = 0x22; // RET - Disable Memory Test
-	program_ram[0xbaa9] = 0x22; // RET - Disable Program Checksum
-}
-
-static DRIVER_INIT( pexp0019 )
-{
-	peplussb_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0xc1e4] = 0x22; // RET - Disable Memory Test
-	program_ram[0xc15f] = 0x22; // RET - Disable Program Checksum
-	program_ram[0xc421] = 0x22; // RET - Disable 2nd Memory Test
-}
-
-static DRIVER_INIT( pexs0006 )
-{
-	peplussb_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0x9bd4] = 0x22; // RET - Disable Memory Test
-	program_ram[0x9e9c] = 0x22; // RET - Disable 2nd Memory Test
-}
-
-static DRIVER_INIT( pexmp006 )
-{
-	peplussb_init();
-
-	// For testing only, cannot stay in final driver
-	program_ram[0xbfc6] = 0x22; // RET - Disable Memory Test
-	program_ram[0xc2a2] = 0x22; // RET - Disable 2nd Memory Test
-}
-
 
 /*************************
 *        Rom Load        *
@@ -1374,31 +1265,31 @@ ROM_END
 /*    YEAR  NAME      PARENT  MACHINE   INPUT         INIT      ROT    COMPANY                                  FULLNAME                                                  FLAGS   LAYOUT */
 
 /* Set chips */
-GAMEL(1987, peset038, 0,      peplus,  peplus_schip, peset038, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (Set038) Set Chip",                      0,   layout_pe_schip )
+GAMEL(1987, peset038, 0,      peplus,  peplus_schip, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (Set038) Set Chip",                      0,   layout_pe_schip )
 
 /* Normal board : poker */
-GAMEL(1987, pepp0065, 0,      peplus,  peplus_pokah, pepp0065, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0065) Jokers Wild Poker",             0,   layout_pe_poker )
-GAMEL(1987, pepp0158, 0,      peplus,  peplus_pokah, pepp0158, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker",       0,   layout_pe_poker )
-GAMEL(1987, pepp0188, 0,      peplus,  peplus_pokah, pepp0188, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0188) Standard Draw Poker",           0,   layout_pe_poker )
-GAMEL(1987, pepp0250, 0,      peplus,  peplus_pokah, pepp0250, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker",        0,   layout_pe_poker )
-GAMEL(1987, pepp0447, 0,      peplus,  peplus_pokah, pepp0447, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0447) Standard Draw Poker",           0,   layout_pe_poker )
-GAMEL(1987, pepp0516, 0,      peplus,  peplus_pokah, pepp0516, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0516) Double Bonus Poker",            0,   layout_pe_poker )
+GAMEL(1987, pepp0065, 0,      peplus,  peplus_poker, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0065) Jokers Wild Poker",             0,   layout_pe_poker )
+GAMEL(1987, pepp0158, 0,      peplus,  peplus_pokah, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0158) 4 of a Kind Bonus Poker",       0,   layout_pe_poker )
+GAMEL(1987, pepp0188, 0,      peplus,  peplus_pokah, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0188) Standard Draw Poker",           0,   layout_pe_poker )
+GAMEL(1987, pepp0250, 0,      peplus,  peplus_poker, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0250) Double Down Stud Poker",        0,   layout_pe_poker )
+GAMEL(1987, pepp0447, 0,      peplus,  peplus_poker, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0447) Standard Draw Poker",           0,   layout_pe_poker )
+GAMEL(1987, pepp0516, 0,      peplus,  peplus_pokah, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PP0516) Double Bonus Poker",            0,   layout_pe_poker )
 
 /* Normal board : blackjack */
-GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, pebe0014, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (BE0014) Blackjack",                     0,   layout_pe_bjack )
+GAMEL(1994, pebe0014, 0,      peplus,  peplus_bjack, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (BE0014) Blackjack",                     0,   layout_pe_bjack )
 
 /* Normal board : keno */
-GAMEL(1994, peke1012, 0,      peplus,  peplus_keno,  peke1012, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (KE1012) Keno",                          0,   layout_pe_keno )
+GAMEL(1994, peke1012, 0,      peplus,  peplus_keno,  peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (KE1012) Keno",                          0,   layout_pe_keno )
 
 /* Normal board : slots machine */
-GAMEL(1996, peps0615, 0,      peplus,  peplus_slots, peps0615, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0,   layout_pe_slots )
-GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peps0716, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) Quarter Mania Slots",           0,   layout_pe_slots )
+GAMEL(1996, peps0615, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0615) Chaos Slots",                   0,   layout_pe_slots )
+GAMEL(1996, peps0716, 0,      peplus,  peplus_slots, peplus,   ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (PS0716) Quarter Mania Slots",           0,   layout_pe_slots )
 
 /* Superboard : poker */
-GAMEL(1995, pexp0019, 0,      peplus,  peplus_poker, pexp0019, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",           0,   layout_pe_poker )
+GAMEL(1995, pexp0019, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XP000019) Deuces Wild Poker",           0,   layout_pe_poker )
 
 /* Superboard : multi-poker */
-GAMEL(1995, pexmp006, 0,      peplus,  peplus_poker, pexmp006, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00006) Multi-Poker",                 0,   layout_pe_poker )
+GAMEL(1995, pexmp006, 0,      peplus,  peplus_poker, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XMP00006) Multi-Poker",                 0,   layout_pe_poker )
 
 /* Superboard : slots machine */
-GAMEL(1997, pexs0006, 0,      peplus,  peplus_slots, pexs0006, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XS000006) Triple Triple Diamond Slots", 0,   layout_pe_slots )
+GAMEL(1997, pexs0006, 0,      peplus,  peplus_slots, peplussb, ROT0,  "IGT - International Gaming Technology", "Player's Edge Plus (XS000006) Triple Triple Diamond Slots", 0,   layout_pe_slots )
