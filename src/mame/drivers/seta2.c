@@ -1240,14 +1240,14 @@ static INPUT_PORTS_START( pzlbowl )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_2C ) )
-//	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )        /* This setting is not defined in the manual */
+//  PORT_DIPSETTING(      0x0002, DEF_STR( 1C_1C ) )        /* This setting is not defined in the manual */
 	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_5C ) )
 	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
-//	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )        /* This setting is not defined in the manual */
+//  PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )        /* This setting is not defined in the manual */
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x000b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )

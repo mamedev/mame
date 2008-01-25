@@ -80,33 +80,33 @@
  *
  ****************************************************************/
 
-#define MR_R6		RES_K(4.7)		/* verified 							*/
-#define MR_R7		RES_K(4.7)		/* verified 							*/
-#define MR_R17		RES_K(27)		/* verified, 30K in schematics			*/
-#define MR_R18		RES_K(27)		/* verified, 30K in schematics			*/
-#define MR_R19		RES_K(22)		/* verified 							*/
-#define MR_R20		RES_K(22)		/* verified 							*/
-#define MR_R40		RES_K(22)		/* verified 							*/
-#define MR_R41		RES_K(100)		/* verified, hard to read 				*/
-#define MR_R61		RES_K(47)		/* verified, hard to read 				*/
-#define MR_R64		RES_K(20)		/* verified 							*/
-#define MR_R65		RES_K(10)		/* verified 							*/
+#define MR_R6		RES_K(4.7)		/* verified                             */
+#define MR_R7		RES_K(4.7)		/* verified                             */
+#define MR_R17		RES_K(27)		/* verified, 30K in schematics          */
+#define MR_R18		RES_K(27)		/* verified, 30K in schematics          */
+#define MR_R19		RES_K(22)		/* verified                             */
+#define MR_R20		RES_K(22)		/* verified                             */
+#define MR_R40		RES_K(22)		/* verified                             */
+#define MR_R41		RES_K(100)		/* verified, hard to read               */
+#define MR_R61		RES_K(47)		/* verified, hard to read               */
+#define MR_R64		RES_K(20)		/* verified                             */
+#define MR_R65		RES_K(10)		/* verified                             */
 
-#define MR_C3		CAP_U(10)		/* verified 							*/
-#define MR_C4		CAP_U(47)		/* illegible, 4.7 or 47 pcb/schematics	*/
-#define MR_C5		CAP_N(39)		/* illegible on pcb 					*/
-#define MR_C6		CAP_N(3.9)		/* illegible on pcb 					*/
-#define MR_C14		CAP_U(4.7)		/* verified 							*/
-#define MR_C15		CAP_U(4.7)		/* verified 							*/
-#define MR_C16		CAP_N(6.8)		/* verified 							*/
-#define MR_C17		CAP_N(22)		/* illegible on pcb 					*/
-#define MR_C31		CAP_U(0.022)	/* not found 							*/
-#define MR_C32		CAP_U(1)		/* illegible on pcb 					*/
-#define MR_C39		CAP_N(4.7)		/* not found 							*/
-#define MR_C40		CAP_N(22)		/* verified 							*/
-#define MR_C41		CAP_U(4.7)		/* verified, hard to read 				*/
-#define MR_C43		CAP_U(3.3)		/* verified 							*/
-#define MR_C44		CAP_U(3.3)		/* verified 							*/
+#define MR_C3		CAP_U(10)		/* verified                             */
+#define MR_C4		CAP_U(47)		/* illegible, 4.7 or 47 pcb/schematics  */
+#define MR_C5		CAP_N(39)		/* illegible on pcb                     */
+#define MR_C6		CAP_N(3.9)		/* illegible on pcb                     */
+#define MR_C14		CAP_U(4.7)		/* verified                             */
+#define MR_C15		CAP_U(4.7)		/* verified                             */
+#define MR_C16		CAP_N(6.8)		/* verified                             */
+#define MR_C17		CAP_N(22)		/* illegible on pcb                     */
+#define MR_C31		CAP_U(0.022)	/* not found                            */
+#define MR_C32		CAP_U(1)		/* illegible on pcb                     */
+#define MR_C39		CAP_N(4.7)		/* not found                            */
+#define MR_C40		CAP_N(22)		/* verified                             */
+#define MR_C41		CAP_U(4.7)		/* verified, hard to read               */
+#define MR_C43		CAP_U(3.3)		/* verified                             */
+#define MR_C44		CAP_U(3.3)		/* verified                             */
 
 
 

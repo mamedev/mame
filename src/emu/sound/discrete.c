@@ -500,7 +500,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
 				wav_add_data_16lr(info->disc_wav_file[outputnum], &wave_data_l, &wave_data_r, 1);
 			}
 		}
-		
+
 		/* advance input streams */
 		for (nodenum = 0; nodenum < info->discrete_input_streams; nodenum++)
 		{

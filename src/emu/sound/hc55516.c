@@ -2,7 +2,7 @@
 
     Harris HC-55516 (and related) emulator
 
-	Copyright Nicola Salmoria and the MAME Team
+    Copyright Nicola Salmoria and the MAME Team
 
     Notes:
         * The only difference between MC3417 and MC3418 is the number

@@ -68,7 +68,7 @@ static const res_net_info pleiades_net_info =
 	{
 		{ RES_NET_AMP_NONE, 150, 270, 2, { 270, 1 } },
 		{ RES_NET_AMP_NONE, 150, 270, 2, { 270, 1 } },
-		{ RES_NET_AMP_NONE, 150, 270, 2, { 270, 1 } }  
+		{ RES_NET_AMP_NONE, 150, 270, 2, { 270, 1 } }
 	}
 };
 
@@ -78,7 +78,7 @@ static const res_net_info survival_net_info =
 	{
 		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } },
 		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } },
-		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } }  
+		{ RES_NET_AMP_NONE, 270, 270, 2, { 180, 1 } }
 	}
 };
 
@@ -128,7 +128,7 @@ PALETTE_INIT( pleiads )
 		int col;
 		col = ((i << 3 ) & 0x18) | ((i>>2) & 0x07) | (i & 0xE0);
 		palette_set_color(machine,i,rgb[col]);
-	}	
+	}
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 	free(rgb);
 }

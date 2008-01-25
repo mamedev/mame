@@ -191,7 +191,7 @@ static INPUT_PORTS_START( mpatrol )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-	
+
 	/* Fake port to support the two different coin modes */
 	PORT_START_TAG("FAKE")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Mode 1" )   /* mapped on coin mode 1 */

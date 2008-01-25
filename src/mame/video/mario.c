@@ -218,12 +218,12 @@ VIDEO_UPDATE( mario )
 		state->monitor = t;
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
-	
+
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ? (HTOTAL-HBSTART) : 0);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->gfx_scroll - (state->flip ? 8 : 0));
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);
-	
+
 	return 0;
 }

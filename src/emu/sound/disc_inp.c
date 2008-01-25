@@ -257,7 +257,7 @@ void dss_input_stream_step(node_description *node)
 	// the context pointer is set to point to the current input stream data in discrete_stream_update
 	stream_sample_t **ptr = node->context;
 	stream_sample_t *data = *ptr;
-	
+
 	node->output = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
 }
 

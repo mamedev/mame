@@ -113,7 +113,7 @@ VIDEO_START( ddragon )
 	tilemap_set_scrolldx(bg_tilemap, 0, 384 - 256);
 	tilemap_set_scrolldy(fg_tilemap, -8, -8);
 	tilemap_set_scrolldy(bg_tilemap, -8, -8);
-	
+
 	state_save_register_global(ddragon_scrollx_hi);
 	state_save_register_global(ddragon_scrolly_hi);
 }
@@ -124,7 +124,7 @@ VIDEO_START( chinagat )
 	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-	
+
 	state_save_register_global(ddragon_scrollx_hi);
 	state_save_register_global(ddragon_scrolly_hi);
 }

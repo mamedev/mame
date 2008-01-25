@@ -113,18 +113,18 @@ static UINT8 *rambase;
  *************************************/
 
 /*
-	Based on the Solar Warrior schematics, vertical timing counts as follows:
+    Based on the Solar Warrior schematics, vertical timing counts as follows:
 
-		08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
-		08,09,....
+        08,09,0A,0B,...,FC,FD,FE,FF,E8,E9,EA,EB,...,FC,FD,FE,FF,
+        08,09,....
 
-	Thus, it counts from 08 to FF, then resets to E8 and counts to FF again.
-	This gives (256 - 8) + (256 - 232) = 248 + 24 = 272 total scanlines.
+    Thus, it counts from 08 to FF, then resets to E8 and counts to FF again.
+    This gives (256 - 8) + (256 - 232) = 248 + 24 = 272 total scanlines.
 
-	VBLK is signalled starting when the counter hits F8, and continues through
-	the reset to E8 and through until the next reset to 08 again.
+    VBLK is signalled starting when the counter hits F8, and continues through
+    the reset to E8 and through until the next reset to 08 again.
 
-	Since MAME's video timing is 0-based, we need to convert this.
+    Since MAME's video timing is 0-based, we need to convert this.
 */
 
 INLINE int scanline_to_vcount(int scanline)

@@ -371,16 +371,16 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_DIPSETTING(      0x4000, "15 Balls" )
 	PORT_DIPSETTING(      0x3000, "20 Balls" )
 	PORT_DIPSETTING(      0x0000, "30 Balls" )
-//	PORT_DIPSETTING(      0x1000, "30 Balls" ) /* Duplicate Setting for 30 balls */
-//	PORT_DIPSETTING(      0x2000, "30 Balls" ) /* Duplicate Setting for 30 balls */
+//  PORT_DIPSETTING(      0x1000, "30 Balls" ) /* Duplicate Setting for 30 balls */
+//  PORT_DIPSETTING(      0x2000, "30 Balls" ) /* Duplicate Setting for 30 balls */
 	PORT_DIPSETTING(      0xf000, "40 Balls" )
 	PORT_DIPSETTING(      0xe000, "50 Balls" )
 	PORT_DIPSETTING(      0xd000, "60 Balls" )
 	PORT_DIPSETTING(      0xc000, "80 Balls" )
 	PORT_DIPSETTING(      0x8000, "100 Balls" )
-//	PORT_DIPSETTING(      0x9000, "100 Balls" ) /* Duplicate Setting for 100 balls */
-//	PORT_DIPSETTING(      0xa000, "100 Balls" ) /* Duplicate Setting for 100 balls */
-//	PORT_DIPSETTING(      0xb000, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0x9000, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0xa000, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0xb000, "100 Balls" ) /* Duplicate Setting for 100 balls */
 
 	PORT_START
 	PORT_BIT(     0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -455,16 +455,16 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_DIPSETTING(      0x0040, "15 Balls" )
 	PORT_DIPSETTING(      0x0030, "20 Balls" )
 	PORT_DIPSETTING(      0x0000, "30 Balls" )
-//	PORT_DIPSETTING(      0x0010, "30 Balls" ) /* Duplicate Setting for 30 balls */
-//	PORT_DIPSETTING(      0x0020, "30 Balls" ) /* Duplicate Setting for 30 balls */
+//  PORT_DIPSETTING(      0x0010, "30 Balls" ) /* Duplicate Setting for 30 balls */
+//  PORT_DIPSETTING(      0x0020, "30 Balls" ) /* Duplicate Setting for 30 balls */
 	PORT_DIPSETTING(      0x00f0, "40 Balls" )
 	PORT_DIPSETTING(      0x00e0, "50 Balls" )
 	PORT_DIPSETTING(      0x00d0, "60 Balls" )
 	PORT_DIPSETTING(      0x00c0, "80 Balls" )
 	PORT_DIPSETTING(      0x0080, "100 Balls" )
-//	PORT_DIPSETTING(      0x0090, "100 Balls" ) /* Duplicate Setting for 100 balls */
-//	PORT_DIPSETTING(      0x00a0, "100 Balls" ) /* Duplicate Setting for 100 balls */
-//	PORT_DIPSETTING(      0x00b0, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0x0090, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0x00a0, "100 Balls" ) /* Duplicate Setting for 100 balls */
+//  PORT_DIPSETTING(      0x00b0, "100 Balls" ) /* Duplicate Setting for 100 balls */
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

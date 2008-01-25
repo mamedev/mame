@@ -87,7 +87,7 @@ VIDEO_UPDATE( asterix )
 		K056832_set_LayerOffset(2, 89, 0);
 		K056832_set_LayerOffset(3, 95, 0);
 	}
-	
+
 
 	tilebanks[0] = (K056832_get_lookup(0) << 10);
 	tilebanks[1] = (K056832_get_lookup(1) << 10);

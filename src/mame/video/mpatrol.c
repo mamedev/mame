@@ -204,7 +204,7 @@ VIDEO_START( mpatrol )
 	tilemap_set_scrolldx(bg_tilemap, 128 - 1, -1);
 	tilemap_set_scrolldy(bg_tilemap, 16, 16);
 	tilemap_set_scroll_rows(bg_tilemap, 4); /* only lines 192-256 scroll */
-	
+
 	state_save_register_global(bg1xpos);
 	state_save_register_global(bg1ypos);
 	state_save_register_global(bg2xpos);
@@ -254,7 +254,7 @@ READ8_HANDLER( mpatrol_protection_r )
 {
 	int popcount = 0;
 	int temp;
-	
+
 	for (temp = bg1xpos & 0x7f; temp != 0; temp >>= 1)
 		popcount += temp & 1;
 	return popcount ^ (bg1xpos >> 7);
@@ -299,7 +299,7 @@ WRITE8_HANDLER( mpatrol_flipscreen_w )
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-	
+
 	if (flip_screen)
 	{
 		xpos = 255 - xpos;
@@ -377,7 +377,7 @@ VIDEO_UPDATE( mpatrol )
 		int code = spriteram[offs + 2];
 		int sx = spriteram[offs + 3];
 		rectangle clip;
-		
+
 		/* sprites from offsets $00-$7F are processed in the upper half of the frame */
 		/* sprites from offsets $80-$FF are processed in the lower half of the frame */
 		clip = *cliprect;
@@ -397,9 +397,9 @@ VIDEO_UPDATE( mpatrol )
 			sx = 240 - sx;
 			sy = 257 + 11 - sy;
 		}
-		
+
 		sx += 128;
-		
+
 		/* in theory anyways; in practice, some of the molecule-looking guys get clipped */
 #ifdef SPLIT_SPRITES
 		sect_rect(&clip, cliprect);

@@ -1041,7 +1041,7 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, 
 
 
 /*-------------------------------------------------
-    memory_install_readwriteX_handler - install 
+    memory_install_readwriteX_handler - install
     dynamic read and write handlers for X-bit case
 -------------------------------------------------*/
 
@@ -1536,7 +1536,7 @@ static void install_mem_handler_private(addrspace_data *space, int iswrite, int 
 		offs_t temp_end = end;
 		offs_t temp_mask = mask;
 		offs_t temp_mirror = mirror;
-		
+
 		/* adjust the incoming addresses (temporarily) */
 		adjust_addresses(space, ismatchmask, &temp_start, &temp_end, &temp_mask, &temp_mirror);
 
@@ -1545,7 +1545,7 @@ static void install_mem_handler_private(addrspace_data *space, int iswrite, int 
 		if (!bank_ptr[HANDLER_TO_BANK(handler)])
 			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, iswrite, temp_start);
 	}
-	
+
 	/* then do a normal installation */
 	install_mem_handler(space, iswrite, databits, ismatchmask, start, end, mask, mirror, handler, isfixed, handler_name);
 }

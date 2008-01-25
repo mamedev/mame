@@ -943,26 +943,26 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( peplus )
 {
-/*  
+/*
     AutoHold Feature Currently Disabled
 
     // pepp0158
-	program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-	program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
-	autohold_addr = 0x5ffe; // AutoHold Address
+    program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
+    program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+    autohold_addr = 0x5ffe; // AutoHold Address
 
     // pepp0188
-  	program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-	program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
-	autohold_addr = 0x742f; // AutoHold Address
+    program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
+    program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+    autohold_addr = 0x742f; // AutoHold Address
 
     // pepp0516
-	program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-	program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
-	autohold_addr = 0x5e7e; // AutoHold Address
+    program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
+    program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+    autohold_addr = 0x5e7e; // AutoHold Address
 
-	if (autohold_addr)
-		program_ram[autohold_addr] = readinputportbytag_safe("AUTOHOLD",0x00) & 0x01;
+    if (autohold_addr)
+        program_ram[autohold_addr] = readinputportbytag_safe("AUTOHOLD",0x00) & 0x01;
 */
 }
 

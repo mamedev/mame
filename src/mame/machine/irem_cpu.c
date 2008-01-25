@@ -301,37 +301,37 @@ const UINT8 inthunt_decryption_table[256] = {
 
 const UINT8 gussun_decryption_table[256] = {
 	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0x20,xxxx,xxxx, /* 00 */
-//	!!!!                                     ^^^^ !!!!                !!!!
+//  !!!!                                     ^^^^ !!!!                !!!!
 	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//	               !!!! ????      ^^^^            pppp      gggg !!!!      ^^^^
+//                 !!!! ????      ^^^^            pppp      gggg !!!!      ^^^^
 	0x5d,0xa5,0x11,0x51,0x0a,xxxx,0x19,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x10,0x03,0x5f, /* 20 */
-//	          pppp      !!!!      ????       ^^^^ pppp ^^^^ gggg gggg pppp
+//            pppp      !!!!      ????       ^^^^ pppp ^^^^ gggg gggg pppp
 	0x26,xxxx,xxxx,0x8b,xxxx,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
 //
 	xxxx,0x01,0xc6,xxxx,xxxx,0x3a,0x29,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x29,xxxx, /* 40 */
-//	     ????                     ????                 !!!!                ????
+//       ????                     ????                 !!!!                ????
 	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x76,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//	          !!!! ^^^^      ^^^^                 gggg ???? !!!!                !!!!
+//            !!!! ^^^^      ^^^^                 gggg ???? !!!!                !!!!
 	0xb0,xxxx,0x28,0x7d,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//	          ???? gggg                                !!!! ^^^^
+//            ???? gggg                                !!!! ^^^^
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//	                    ^^^^
+//                      ^^^^
 	xxxx,0x86,xxxx,0xb5,0x30,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//	               ???? ????                           ^^^^      !!!!      !!!!
+//                 ???? ????                           ^^^^      !!!!      !!!!
 	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x01, /* 90 */
-//	          !!!!                     ^^^^  !!!! ^^^^      !!!!                ????
+//            !!!!                     ^^^^  !!!! ^^^^      !!!!                ????
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x41,0x80,0x8c,0xd4,xxxx, /* a0 */
-//	                                   gggg                 ????      gggg !!!!
+//                                     gggg                 ????      gggg !!!!
 	xxxx,0x19,0x20,0x19,0x77,0x3d,0x3e,xxxx, xxxx,xxxx,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//	     ???? ???? ???? gggg                           pppp
+//       ???? ???? ???? gggg                           pppp
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
-//	          ^^^^                           ^^^^                     ^^^^ ????
+//            ^^^^                           ^^^^                     ^^^^ ????
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,xxxx,xxxx,0x1f,0x23,xxxx, /* d0 */
-//	     ^^^^                                               ????
+//       ^^^^                                               ????
 	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x19,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//	                              ????                      !!!!                !!!!
+//                                ????                      !!!!                !!!!
 	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x7c,0xf7,0xbd,0x39,0x7f,0xbf,xxxx, /* f0 */
-//	!!!!                                          ????      !!!!      gggg
+//  !!!!                                          ????      !!!!      gggg
 };
 
 
@@ -354,7 +354,7 @@ Y//5a -> 76? (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71,77,79,
 ///b3 -> 19? (216b6 - 216cf
 01+ce -> 01? (10236 - routine from 1017e to 10254) (01, 09, 19, 21, 29, 31) -> probably 01
 ///db ->     (16992
-///eb -> 
+///eb ->
 ///f9 -> 7c? (16598 - 165a1 - 18de7 - routine from 18dc4 to ) no 71,72,76,78 ok 70,73,77,79,7a
 
 rz probably:
@@ -781,7 +781,7 @@ void irem_cpu_decrypt(int cpu,const UINT8 *decryption_table)
 	for (A = 0;A < size; A++)
 		irem_cpu_decrypted[A] = decryption_table[rom[A]];
 
-	// Roberto Zandonà note:
+	// Roberto Zandon? note:
 	// for "gussun" and "riskchal" is necessary an hack to not decrypt not encrypted routines
 	// we need a real nec v25+/35+ core to support 0x63 (brkn for "break native") instruction
 	// for now we use "cd" (int) instruction + hack

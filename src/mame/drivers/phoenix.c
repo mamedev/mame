@@ -297,7 +297,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( capitol )
 	PORT_INCLUDE( phoenix )
-	
+
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION( "SW1:7" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
@@ -488,24 +488,24 @@ static MACHINE_DRIVER_START( survival )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
-	
+
 	/* schematics fairly identical to phoenix, however the interesting
-	 * page is missing
-	 */
+     * page is missing
+     */
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	
+
 	MDRV_MACHINE_RESET(phoenix)
-	
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_GFXDECODE(phoenix)
 	MDRV_PALETTE_LENGTH(256)
-	
+
 	MDRV_PALETTE_INIT(survival)
 	MDRV_VIDEO_START(phoenix)
 	MDRV_VIDEO_UPDATE(phoenix)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

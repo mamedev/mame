@@ -89,7 +89,7 @@ struct tms5110
 
 	/* coefficient tables */
 	const struct tms5100_coeffs *coeff;
-	
+
 	/* these contain data that describes the 64 bits FIFO */
 	UINT8 fifo[FIFO_SIZE];
 	UINT8 fifo_head;
@@ -174,16 +174,16 @@ void tms5110_set_variant(void *chip, int variant)
 
 	tms->variant = variant;
 }
-	
+
 void *tms5110_create(int index, int variant)
 {
 	struct tms5110 *tms;
 
 	tms = malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
-	
+
 	tms5110_set_variant(tms, variant);
-	
+
 	state_save_register_item_array("tms5110", index, tms->fifo);
 	state_save_register_item("tms5110", index, tms->fifo_head);
 	state_save_register_item("tms5110", index, tms->fifo_tail);

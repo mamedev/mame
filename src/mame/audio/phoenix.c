@@ -386,7 +386,7 @@ DISCRETE_SOUND_START(phoenix)
 DISCRETE_SOUND_END
 
 WRITE8_HANDLER( phoenix_sound_control_a_w )
-{	
+{
 	discrete_sound_w(PHOENIX_EFFECT_2_DATA, data & 0x0f);
 	discrete_sound_w(PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 //  discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
@@ -401,7 +401,7 @@ SOUND_START( phoenix)
 	sound_latch_a = 0;
 	memset(&c24_state, 0, sizeof(c24_state));
 	memset(&c25_state, 0, sizeof(c25_state));
-	memset(&noise_state, 0, sizeof(noise_state));	
+	memset(&noise_state, 0, sizeof(noise_state));
 
 	state_save_register_global(sound_latch_a);
 	state_save_register_global(c24_state.counter);
@@ -413,7 +413,7 @@ SOUND_START( phoenix)
 	state_save_register_global(noise_state.polyoffs);
 	state_save_register_global(noise_state.lowpass_counter);
 	state_save_register_global(noise_state.lowpass_polybit);
-	
+
 }
 
 WRITE8_HANDLER( phoenix_sound_control_b_w )

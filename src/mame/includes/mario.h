@@ -48,7 +48,7 @@ struct _mario_state
 	UINT8	flip;
 
 	/* driver general */
-	
+
 	UINT8	*spriteram;
 	UINT8	*videoram;
 	size_t	spriteram_size;
