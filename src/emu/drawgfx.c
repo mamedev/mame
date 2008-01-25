@@ -444,7 +444,6 @@ INLINE void blockmove_NtoN_transpen_noremap_flipx8(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 	srcdata -= 3;
 
 	trans4 = transpen * 0x01010101;
@@ -533,7 +532,6 @@ INLINE void blockmove_NtoN_transpen_noremap_flipx16(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -590,7 +588,6 @@ INLINE void blockmove_NtoN_transpen_noremap_flipx32(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -819,10 +816,10 @@ int pdrawgfx_shadow_lowpri = 0;
 #undef alpha_blend
 
 /* 32-bit version */
-//* AAT032503: added limited 32-bit shadow and highlight support
-INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c) {
-	c = (c>>9&0x7c00) | (c>>6&0x03e0) | (c>>3&0x001f);
-	return(shadow_table[c]); }
+INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
+{
+	return shadow_table[((c >> 9) & 0x7c00) | ((c >> 6) & 0x03e0) | ((c >> 3) & 0x001f)];
+}
 
 #define DATA_TYPE UINT32
 #define DEPTH 32
@@ -938,7 +935,7 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c) {
   transparency == TRANSPARENCY_PENS - as above, but transparent_color is a mask of
                                      transparent pens.
   transparency == TRANSPARENCY_COLOR - bits whose _remapped_ palette index (taken from
-                                     Machine->game_colortable) is == transparent_color
+                                     machine->game_colortable) is == transparent_color
 
   transparency == TRANSPARENCY_PEN_TABLE - the transparency condition is same as TRANSPARENCY_PEN
                     A special drawing is done according to gfx_drawmode_table[source pixel].
@@ -1025,13 +1022,14 @@ void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
 
 /***************************************************************************
 
-  Use drawgfx() to copy a bitmap onto another at the given position.
-  This function will very likely change in the future.
+  Use copybitmap() to copy a bitmap onto another at the given position.
 
 ***************************************************************************/
 void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color)
 {
+	profiler_mark(PROFILER_COPYBITMAP);
+
 	/* translate to proper transparency here */
 	if (transparency == TRANSPARENCY_NONE)
 		transparency = TRANSPARENCY_NONE_RAW;
@@ -1042,15 +1040,6 @@ void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,in
 		transparent_color = Machine->pens[transparent_color];
 		transparency = TRANSPARENCY_PEN_RAW;
 	}
-
-	copybitmap_remap(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
-}
-
-
-void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color)
-{
-	profiler_mark(PROFILER_COPYBITMAP);
 
 	if (dest->bpp == 8)
 		copybitmap_core8(dest,src,flipx,flipy,sx,sy,clip,transparency,transparent_color);
@@ -1081,6 +1070,9 @@ void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
 		int rows,const int *rowscroll,int cols,const int *colscroll,
 		const rectangle *clip,int transparency,int transparent_color)
 {
+	int srcwidth,srcheight,destwidth,destheight;
+	rectangle orig_clip;
+
 	/* translate to proper transparency here */
 	if (transparency == TRANSPARENCY_NONE)
 		transparency = TRANSPARENCY_NONE_RAW;
@@ -1091,17 +1083,6 @@ void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
 		transparent_color = Machine->pens[transparent_color];
 		transparency = TRANSPARENCY_PEN_RAW;
 	}
-
-	copyscrollbitmap_remap(dest,src,rows,rowscroll,cols,colscroll,clip,transparency,transparent_color);
-}
-
-void copyscrollbitmap_remap(mame_bitmap *dest,mame_bitmap *src,
-		int rows,const int *rowscroll,int cols,const int *colscroll,
-		const rectangle *clip,int transparency,int transparent_color)
-{
-	int srcwidth,srcheight,destwidth,destheight;
-	rectangle orig_clip;
-
 
 	if (clip)
 	{
@@ -1124,8 +1105,6 @@ void copyscrollbitmap_remap(mame_bitmap *dest,mame_bitmap *src,
 		copybitmap(dest,src,0,0,0,0,clip,transparency,transparent_color);
 		return;
 	}
-
-	profiler_mark(PROFILER_COPYBITMAP);
 
 	srcwidth = src->width;
 	srcheight = src->height;
@@ -1324,8 +1303,6 @@ void copyscrollbitmap_remap(mame_bitmap *dest,mame_bitmap *src,
 			row += cons;
 		}
 	}
-
-	profiler_mark(PROFILER_END);
 }
 
 
@@ -1420,8 +1397,8 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
     */
 
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	if(clip)
+	/* force clip to bitmap boundary */
+	if (clip)
 	{
 		myclip.min_x = clip->min_x;
 		myclip.max_x = clip->max_x;
@@ -1433,11 +1410,11 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		if (myclip.min_y < 0) myclip.min_y = 0;
 		if (myclip.max_y >= dest_bmp->height) myclip.max_y = dest_bmp->height-1;
 
-		clip=&myclip;
+		clip = &myclip;
 	}
 
 
-	/* ASG 980209 -- added 16-bit version */
+	/* 8-bit destination bitmap */
 	if (dest_bmp->bpp == 8)
 	{
 		if( gfx )
@@ -2031,7 +2008,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		}
 	}
 
-	/* ASG 980209 -- new 16-bit part */
+	/* 16-bit destination bitmap */
 	else if (dest_bmp->bpp == 16)
 	{
 		if( gfx )
@@ -2733,6 +2710,8 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 			}
 		}
 	}
+
+	/* 32-bit destination bitmap */
 	else
 	{
 		if( gfx )
@@ -4707,7 +4686,6 @@ DECLARE(blockmove_NtoN_opaque_noremap_flipx,(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -4778,7 +4756,6 @@ DECLARE(blockmove_NtoN_opaque_remap_flipx,(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -4850,7 +4827,6 @@ DECLARE(blockmove_NtoN_blend_noremap_flipx,(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -4925,7 +4901,6 @@ DECLARE(blockmove_NtoN_blend_remap_flipx,(
 
 	srcmodulo += srcwidth;
 	dstmodulo -= srcwidth;
-	//srcdata += srcwidth-1;
 
 	while (srcheight)
 	{
@@ -5215,7 +5190,6 @@ DECLARE(copybitmap_core,(
 
 		if (flipx)
 		{
-			//if ((sx-ox) == 0) sd += gfx->width - sw;
 			sd += src->width -1 -(sx-ox);
 		}
 		else
@@ -5223,9 +5197,6 @@ DECLARE(copybitmap_core,(
 
 		if (flipy)
 		{
-			//if ((sy-oy) == 0) sd += sm * (gfx->height - sh);
-			//dd += dm * (sh - 1);
-			//dm = -dm;
 			sd += sm * (src->height -1 -(sy-oy));
 			sm = -sm;
 		}

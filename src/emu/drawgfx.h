@@ -242,12 +242,7 @@ void extract_scanline32(mame_bitmap *bitmap,int x,int y,int length,UINT32 *dst);
 
 void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color);
-void copybitmap_remap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color);
 void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
-		int rows,const int *rowscroll,int cols,const int *colscroll,
-		const rectangle *clip,int transparency,int transparent_color);
-void copyscrollbitmap_remap(mame_bitmap *dest,mame_bitmap *src,
 		int rows,const int *rowscroll,int cols,const int *colscroll,
 		const rectangle *clip,int transparency,int transparent_color);
 
