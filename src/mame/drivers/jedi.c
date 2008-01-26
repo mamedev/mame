@@ -8,7 +8,7 @@
         * Return of the Jedi
 
     Known bugs:
-        * none at this time
+        * smoothing PROMs were dumped at half size
 
 ****************************************************************************
 
@@ -308,7 +308,7 @@ static READ8_HANDLER( soundstat_r )
 
 static WRITE8_HANDLER( jedi_coin_counter_w )
 {
-	coin_counter_w(offset, data >> 7);
+	coin_counter_w(offset, data);
 }
 
 
@@ -382,15 +382,15 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x1e80, 0x1e81) AM_WRITE(jedi_coin_counter_w)
 	AM_RANGE(0x1e82, 0x1e83) AM_WRITE(MWA8_NOP)	/* LED control; not used */
-	AM_RANGE(0x1e84, 0x1e84) AM_WRITE(jedi_alpha_banksel_w)
+	AM_RANGE(0x1e84, 0x1e84) AM_WRITE(MWA8_RAM) AM_BASE(&jedi_foreground_bank)
 	AM_RANGE(0x1e86, 0x1e86) AM_WRITE(sound_reset_w)
 	AM_RANGE(0x1e87, 0x1e87) AM_WRITE(jedi_video_off_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(sound_latch_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(rom_banksel_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&jedi_backgroundram) AM_SIZE(&jedi_backgroundram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(MRA8_RAM, jedi_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&jedi_backgroundram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&jedi_paletteram)
+	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_BASE(&jedi_foregroundram)
+	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_BASE(&jedi_spriteram)
 	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(jedi_vscroll_w)
 	AM_RANGE(0x3d00, 0x3d01) AM_WRITE(jedi_hscroll_w)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(jedi_PIXIRAM_w)
@@ -459,57 +459,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Graphics layouts
- *
- *************************************/
-
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	2,
-	{ 0, 1 },
-	{ 0, 2, 4, 6, 8, 10, 12, 14 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
-
-static const gfx_layout pflayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 4, RGN_FRAC(1,2), RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
-
-
-static const gfx_layout spritelayout =
-{
-	8,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 0, 4, RGN_FRAC(1,2), RGN_FRAC(1,2)+4 },
-	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3},
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	32*8
-};
-
-
-static GFXDECODE_START( jedi )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,	  0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, pflayout,	  0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,  0, 1 )
-GFXDECODE_END
-
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -532,11 +481,9 @@ static MACHINE_DRIVER_START( jedi )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(37*8, 262) /* verify vert size */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(64*8, 262) /* verify vert size */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(jedi)
-	MDRV_PALETTE_LENGTH(1024+1)
 
 	MDRV_VIDEO_START(jedi)
 	MDRV_VIDEO_UPDATE(jedi)
@@ -583,22 +530,22 @@ ROM_START( jedi )
 	ROM_LOAD( "136030-133.01c",  0x8000, 0x4000, CRC(6c601c69) SHA1(618b77800bbbb4db34a53ca974a71bdaf89b5930) )
 	ROM_LOAD( "136030-134.01a",  0xC000, 0x4000, CRC(5e36c564) SHA1(4b0afceb9a1d912f1d5c1f26928d244d5b14ea4a) )
 
-	ROM_REGION( 0x02000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_REGION( 0x02000, REGION_GFX1,0 )
 	ROM_LOAD( "136030-215.11t",  0x00000, 0x2000, CRC(3e49491f) SHA1(ade5e846069c2fa6edf667469d13ce5a6a45c06d) ) /* Alphanumeric */
 
-	ROM_REGION( 0x10000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, REGION_GFX2,0 )
 	ROM_LOAD( "136030-126.06r",  0x00000, 0x8000, CRC(9c55ece8) SHA1(b8faa23314bb0d199ef46199bfabd9cb17510dd3) ) /* Playfield */
 	ROM_LOAD( "136030-127.06n",  0x08000, 0x8000, CRC(4b09dcc5) SHA1(d46b5f4fb69c4b8d823dd9c4d92f8713badfa44a) )
 
-	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, REGION_GFX3, 0 )
 	ROM_LOAD( "136030-130.01h",  0x00000, 0x8000, CRC(2646a793) SHA1(dcb5fd50eafbb27565bce099a884be83a9d82285) ) /* Sprites */
 	ROM_LOAD( "136030-131.01f",  0x08000, 0x8000, CRC(60107350) SHA1(ded03a46996d3f2349df7f59fd435a7ad6ed465e) )
 	ROM_LOAD( "136030-128.01m",  0x10000, 0x8000, CRC(24663184) SHA1(5eba142ed926671ee131430944e59f21a55a5c57) )
 	ROM_LOAD( "136030-129.01k",  0x18000, 0x8000, CRC(ac86b98c) SHA1(9f86c8801a7293fa46e9432f1651dd85bf00f4b9) )
 
-	ROM_REGION( 0x0800, REGION_PROMS, 0 )	/* background smoothing */
-	ROM_LOAD( "136030-117.bin",   0x0000, 0x0400, CRC(9831bd55) SHA1(12945ef2d1582914125b9ee591567034d71d6573) )
-	ROM_LOAD( "136030-118.bin",   0x0400, 0x0400, CRC(261fbfe7) SHA1(efc65a74a3718563a07b718e34d8a7aa23339a69) )
+	ROM_REGION( 0x1000, REGION_PROMS, 0 )	/* background smoothing */
+	ROM_LOAD( "136030-117.bin",   0x0000, 0x0800, BAD_DUMP CRC(9831bd55) SHA1(12945ef2d1582914125b9ee591567034d71d6573) )
+	ROM_LOAD( "136030-118.bin",   0x0800, 0x0800, BAD_DUMP CRC(261fbfe7) SHA1(efc65a74a3718563a07b718e34d8a7aa23339a69) )
 ROM_END
 
 
@@ -609,4 +556,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, jedi, 0, jedi, jedi, 0, ROT0, "Atari", "Return of the Jedi", GAME_SUPPORTS_SAVE )
+GAME( 1984, jedi, 0, jedi, jedi, 0, ROT0, "Atari", "Return of the Jedi", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

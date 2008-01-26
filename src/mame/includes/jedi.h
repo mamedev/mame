@@ -6,8 +6,11 @@
 
 /*----------- defined in video/jedi.c -----------*/
 
+extern UINT8 *jedi_foregroundram;
 extern UINT8 *jedi_backgroundram;
-extern size_t jedi_backgroundram_size;
+extern UINT8 *jedi_spriteram;
+extern UINT8 *jedi_paletteram;
+extern UINT8 *jedi_foreground_bank;
 
 VIDEO_START( jedi );
 VIDEO_UPDATE( jedi );
