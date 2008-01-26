@@ -1332,7 +1332,7 @@ static const struct m68k_encryption_interface cps2_encryption =
 static MACHINE_DRIVER_START( cps2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 11800000)
+	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
 	MDRV_CPU_VBLANK_INT(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
@@ -7191,6 +7191,8 @@ static DRIVER_INIT( cps2 )
 	/* Decrypt the game - see machine/cps2crpt.c */
 	DRIVER_INIT_CALL(cps2crpt);
 	cps2networkpresent = 0;
+
+	cpunum_set_clockscale(machine, 0, 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )
