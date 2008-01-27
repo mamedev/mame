@@ -13,26 +13,29 @@
 
     Year  Game                       Developer         Protection Chip  Board
     ====  ====================       ================  ===============  =====
-    1989  Bloxeed                    Sega / Elorg                       C
-    1990  Columns                    Sega                               C
-    1990  Columns II                 Sega                               C
-    1990  Borench                    Sega                               C2
-    1990  ThunderForce AC            Sega / Technosoft                  C2
-    1991  Twin Squash                Sega                               C2
-    1992  Ribbit!                    Sega                               C2
-    1992  Tant-R (Japan)             Sega              317-0211         C2
-    1992  Tant-R (Korea)             Sega                               C2
+    1989  Bloxeed                    Sega / Elorg      n/a              C
+    1990  Columns                    Sega              317-0149         C
+    1990  Columns II                 Sega              317-0160         C
+    1990  ThunderForce AC            Sega / Technosoft 317-0172         C2
+    1990  Borench                    Sega              317-0173         C2
+    1991  Twin Squash                Sega              317-0193         C2
+    1992  Ribbit!                    Sega              317-0178         C2
     1992  Puyo Puyo                  Sega / Compile    317-0203         C2
-    1994  Ichidant-R (World)         Sega                               C2
-    1994  Ichidant-R (Japan)         Sega                               C2
-    1994  Ichidant-R (Korea)         Sega                               C2
-    1994  PotoPoto (Japan)           Sega                               C2
-    1994  Puyo Puyo 2                Compile                            C2
+    1992  Tant-R (Japan)             Sega              317-0211         C2
+    1992  Tant-R (Korea)             Sega              ?                C2
+    1994  PotoPoto (Japan)           Sega              317-0218         C2
+    1994  Stack Columns (Japan)      Sega              317-0219         C2
     1994  Stack Columns (World)      Sega              317-0223         C2
-    1994  Stack Columns (Japan)      Sega                               C2
-    1994  Zunzunkyou No Yabou        Sega                               C2
+    1994  Ichidant-R (Japan)         Sega              317-0224         C2
+    1994  Ichidant-R (World)         Sega              ?                C2
+    1994  Ichidant-R (Korea)         Sega              ?                C2
+    1994  Puyo Puyo 2                Compile           317-0228         C2
+    1994  Zunzunkyou No Yabou        Sega              ?                C2
 
-        + Print Club Vols 1,2,4,5 (and 3?)
+    1995  Print Club (Vol.1)         Atlus             ?                C2
+    1995  Print Club (Vol.2)         Atlus             ?                C2
+    1996  Print Club (Vol.4)         Atlus             ?                C2
+    1996  Print Club (Vol.5)         Atlus             ?                C2
 
 
      Notes:
@@ -101,7 +104,7 @@
 static UINT8 		misc_io_data[0x10];	/* holds values written to the I/O chip */
 
 /* protection-related tracking */
-static const UINT32 *prot_table;		/* table of protection values */
+static int (*prot_func)(int in);		/* emulation of protection chip */
 static UINT8 		prot_write_buf;		/* remembers what was written */
 static UINT8		prot_read_buf;		/* remembers what was returned */
 
@@ -518,7 +521,7 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", activecpu_get_previouspc(), prot_table ? prot_read_buf : 0xff);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", activecpu_get_previouspc(), prot_func ? prot_read_buf : 0xff);
 	return prot_read_buf | 0xf0;
 }
 
@@ -541,8 +544,8 @@ static WRITE16_HANDLER( prot_w )
 	prot_write_buf = data & 0x0f;
 
 	/* determine the value to return, should a read occur */
-	if (prot_table)
-		prot_read_buf = (prot_table[table_index >> 3] << (4 * (table_index & 7))) >> 28;
+	if (prot_func)
+		prot_read_buf = prot_func(table_index);
 	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", activecpu_get_previouspc(), data & 0x0f, prot_read_buf);
 
 	/* if the palette changed, force an update */
@@ -1731,20 +1734,258 @@ ROM_END
     Machine Init Functions
 *******************************************************************************
 
-    All of the Sega C/C2 games apart from Bloxeed used a protection chip.
-    The games contain various checks which make sure this protection chip is
-    present and returning the expected values.  The chip uses a table of
-    256x4-bit values to produce its results.  It appears that different
-    tables are used for Japanese vs. English variants of some games
-    (Puzzle & Action 2) but not others (Columns).
+All of the Sega C/C2 games apart from Bloxeed used a protection chip.
+The games contain various checks which make sure this protection chip is
+present and returning the expected values. It appears that different
+tables are used for Japanese vs. English variants of some games
+(Puzzle & Action 2) but not others (Columns).
+
+
+The basic operation in the EPM5032 macrocell (that is, without using the expander
+products) is:
+
+out = x1 XOR (x2 OR x3 OR x4)
+
+where x1, x2, x3, and x4 are the AND of any number of input bits. Each input can
+be inverted. The inputs come either from the external pins or from feedback from
+the output pins.
+
+Expander products (64 in total) are the NOT of the AND of any number of input bits
+(optionally inverted). It's not clear whether the I/O feedback is available to
+the expander or not. Looking at bit 1 of prot_func_tfrceac(), it would seem that
+it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-static void segac2_common_init(const UINT32 *table)
+static void segac2_common_init(int (*func)(int in))
 {
-	prot_table = table;
+	prot_func = func;
 	bloxeed_sound = 0;
 }
+
+
+
+/* 317-0149 */
+static int prot_func_columns(int in)
+{
+	int const b0 = BIT( in,2) ^ ((BIT(~in,0) && BIT( in,7)) || (BIT( in,4) && BIT( in,6)));
+	int const b1 = BIT(~in,0) ^ (BIT( in,2) || (BIT( in,5) && BIT(~in,6) && BIT( in,7)));
+	int const b2 = BIT( in,3) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6)));
+	int const b3 = BIT( in,1) ^ ((BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,5)) || (BIT(~in,6) && BIT( in,7)));	// 1 repeated
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0160 */
+static int prot_func_columns2(int in)
+{
+	int const b0 =  BIT( in,2) ^ (BIT( in,1) || (BIT( in,4) && BIT( in,5)));
+	int const b1 = (BIT( in,0) && BIT( in,3) && BIT( in,4)) ^ (BIT( in,6) || (BIT( in,5) && BIT( in,7)));
+	int const b2 = (BIT( in,3) && BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) || (BIT( in,0) && BIT( in,1)) || (BIT( in,4) && BIT( in,6)));	// 4 repeated
+	int const b3 = (BIT( in,1) && BIT( in,0) && BIT( in,2)) ^ ((BIT( in,4) && BIT(~in,6)) || (BIT( in,6) && BIT( in,7)));	// 6 repeated
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0172 */
+static int prot_func_tfrceac(int in)
+{
+	int const b0 = BIT(~in,2) ^ ((BIT( in,0) && BIT(~in,7)) || (BIT( in,3) && BIT( in,4)));
+	int const b1 = (BIT( in,4) && BIT(~in,5) && BIT( in,7)) ^ ((BIT(~in,0) || BIT(~in,3)) && (BIT(~in,6) || BIT(~in,7)));	// not in the form x1 XOR (x2 OR x3 OR x4)
+	int const b2 = BIT( in,2) ^ ((BIT( in,4) && BIT(~in,5) && BIT( in,7)) || (BIT(~in,1) && BIT( in,6)));
+	int const b3 = BIT( in,0) ^ ((BIT( in,1) && BIT( in,4) && BIT( in,6)) || (BIT( in,1) && BIT( in,4) && BIT( in,7)));	// 1,4 repeated
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0173 */
+static int prot_func_borench(int in)
+{
+	int const b0 = (BIT( in,1) && BIT( in,2) && BIT( in,3) && BIT( in,7))   ^ (BIT( in,5) || (BIT(~in,0) && BIT(~in,4)));
+	int const b1 = (BIT(~in,2) && BIT( in,3) && BIT( in,5))                 ^ (BIT( in,1) || (BIT( in,0) && BIT(~in,4)));
+	int const b2 = (BIT( in,1) && BIT(~in,4) && BIT(~in,6))                 ^ (BIT( in,2) || BIT( in,3) || (BIT( in,5) && BIT( in,7)));
+	int const b3 = (BIT(~in,0) && BIT( in,5) && (BIT( in,6) || BIT( in,7))) ^ (BIT( in,1) || (BIT( in,3) && BIT( in,4)));	// not in the form x1 XOR (x2 OR x3 OR x4)
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0178 */
+static int prot_func_ribbit(int in)
+{
+	int const b0 = (BIT( in,0) && BIT( in,4)) ^ ((BIT( in,1) && BIT( in,2)) || BIT( in,3) || BIT(~in,5));
+	int const b1 = (BIT( in,1) && BIT( in,5)) ^ ((BIT( in,2) && BIT( in,3)) || BIT( in,0) || BIT(~in,6));
+	int const b2 = (BIT( in,2) && BIT( in,7)) ^ ((BIT( in,3) && BIT( in,0)) || BIT(~in,1) || BIT( in,7));
+	int const b3 = (BIT( in,3) && BIT( in,6)) ^ ((BIT( in,0) && BIT( in,1)) || BIT(~in,2) || BIT( in,4));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0193 */
+static int prot_func_twinsqua(int in)
+{
+	int const b0 = (BIT( in,2) && BIT(~in,5)) ^ (BIT( in,3) || BIT(~in,4));
+	int const b1 = (BIT( in,0) && BIT(~in,2) && BIT( in,4)) ^ (BIT(~in,0) || BIT(~in,4) || BIT(~in,6));	// 0,4 repeated
+	int const b2 = (BIT( in,3) && BIT(~in,5)) ^ (BIT( in,4) && BIT( in,7));
+	int const b3 =  BIT( in,1) ^ ((BIT(~in,3) && BIT(~in,6)) || (BIT( in,4) && BIT(~in,6)) || (BIT(~in,1) && BIT( in,3) && BIT(~in,4)));	// 1,3,4,6 repeated
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0203 */
+static int prot_func_puyo(int in)
+{
+	int const b0 = (BIT(~in,3) && BIT( in,7)) ^ ((BIT(~in,0) && BIT(~in,1)) || (BIT(~in,1) && BIT(~in,4)));	// 1 repeated
+	int const b1 = (BIT( in,3) && BIT( in,5)) ^ (BIT(~in,2) || BIT( in,4) || BIT( in,6));
+	int const b2 = (BIT(~in,2) && BIT(~in,5)) ^ (BIT( in,1) || BIT(~in,3) || BIT(~in,6));
+	int const b3 =  BIT( in,1)                ^ ((BIT( in,0) && BIT( in,3) && BIT( in,7)) || BIT( in,4));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0211 */
+static int prot_func_tantr(int in)
+{
+	int const b0 = (BIT( in,0) && BIT( in,4)) ^ ( BIT( in,5) || BIT(~in,6)  || (BIT(~in,3) && BIT( in,7)));
+	int const b1 = (BIT( in,2) && BIT( in,6)) ^ ((BIT( in,1) && BIT( in,5)) || (BIT( in,3) && BIT( in,4)));
+	int const b2 = (BIT(~in,0) && BIT( in,2)) ^ ( BIT( in,4) || BIT( in,7)  || (BIT( in,1) && BIT(~in,5)));
+	int const b3 = (BIT(~in,2) && BIT( in,7)) ^ ( BIT(~in,0) || BIT( in,1)  || (BIT( in,3) && BIT( in,6)));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-???? */
+static int prot_func_tantrkor(int in)
+{
+	int const b0 = (BIT(~in,1) && BIT(~in,7)) ^ (BIT(~in,2) && BIT(~in,4));
+	int const b1 = (BIT( in,2) && BIT( in,6)) ^ (BIT( in,0) && BIT( in,1));
+	int const b2 = (BIT(~in,3) && BIT(~in,6)) ^ (BIT( in,1) || BIT(~in,4));
+	int const b3 = (BIT(~in,0) && BIT(~in,2)) ^ (BIT( in,5) && BIT(~in,6));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0218 */
+static int prot_func_potopoto(int in)
+{
+	int const b0 = (BIT(~in,2) && BIT(~in,4)) ^ (BIT(~in,1) && BIT( in,3));
+	int const b1 = (BIT( in,0) && BIT( in,5)) ^ (BIT( in,2) || BIT(~in,7));
+	int const b2 = (BIT( in,0) && BIT( in,6)) ^ (BIT(~in,1) && BIT( in,7));
+	int const b3 = (BIT( in,0) && BIT(~in,7)) ^ (BIT(~in,1) && BIT(~in,6));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0219 */
+static int prot_func_stkclmnj(int in)
+{
+	int const b0 = (BIT( in,1) && BIT( in,4)) ^ (BIT( in,5) && BIT( in,2));
+	int const b1 = (BIT(~in,2) && BIT( in,6)) ^ (BIT(~in,5) && BIT( in,7));
+	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,1));
+	int const b3 = (BIT(~in,3) && BIT( in,5)) ^ (BIT(~in,6) || BIT(~in,7));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0223 */
+static int prot_func_stkclmns(int in)
+{
+	int const b0 = (BIT( in,2) && BIT( in,4)) ^ (BIT( in,1) || BIT(~in,3));
+	int const b1 = (BIT( in,0) && BIT( in,5)) ^ (BIT( in,2) && BIT( in,7));
+	int const b2 = (BIT( in,0) && BIT(~in,6)) ^ (BIT( in,1) && BIT(~in,7));
+	int const b3 = (BIT( in,0) && BIT(~in,7)) ^ (BIT(~in,1) && BIT( in,6));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0224 */
+static int prot_func_ichirj(int in)
+{
+	int const b0 = (BIT( in,2) && BIT( in,4)) ^ (BIT(~in,5) && BIT(~in,2));
+	int const b1 = (BIT( in,2) && BIT(~in,6)) ^ (BIT( in,5) && BIT( in,7));
+	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,1));
+	int const b3 = (BIT(~in,1) && BIT( in,5)) ^ (BIT(~in,5) && BIT( in,7));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-???? */
+static int prot_func_ichir(int in)
+{
+	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) && BIT(~in,2));
+	int const b1 = (BIT( in,1) && BIT( in,6)) ^ (BIT( in,5) || BIT( in,7));
+	int const b2 = (BIT(~in,3) && BIT( in,6)) ^ (BIT(~in,5) && BIT(~in,3));
+	int const b3 = (BIT( in,0) && BIT(~in,5)) ^ (BIT( in,5) && BIT( in,7));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-???? */
+static int prot_func_ichirk(int in)
+{
+	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,5) && BIT(~in,1));
+	int const b1 = (BIT( in,0) && BIT( in,6)) ^ (BIT( in,5) && BIT( in,4));
+	int const b2 = (BIT(~in,1) && BIT(~in,6)) ^ (BIT(~in,5) && BIT( in,3));
+	int const b3 = (BIT( in,1) && BIT( in,5)) ^ (BIT( in,6) && BIT( in,7));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+/* 317-0228 */
+static int prot_func_puyopuy2(int in)
+{
+	int const b0 = (BIT(~in,0) && BIT(~in,7)) ^ (BIT( in,1) || BIT(~in,4) || BIT(~in,6));
+	int const b1 = (BIT( in,0) && BIT(~in,6)) ^ (BIT( in,3) && BIT( in,5));
+	int const b2 = (BIT(~in,4) && BIT(~in,7)) ^ (BIT( in,0) || BIT(~in,6));
+	int const b3 = (BIT(~in,1) && BIT( in,4)) ^ (BIT( in,2) && BIT(~in,3));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+static int prot_func_zunkyou(int in)
+{
+	int const b0 = (BIT(~in,1) && BIT( in,6)) ^ (BIT(~in,5) && BIT( in,7));
+	int const b1 = (BIT( in,0) && BIT(~in,5)) ^ (BIT(~in,3) || BIT( in,4));
+	int const b2 = (BIT( in,2) && BIT(~in,3)) ^ (BIT( in,4) && BIT(~in,5));
+	int const b3 = (BIT( in,0) && BIT(~in,4)) ^ (BIT(~in,2) && BIT(~in,6));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+static int prot_func_pclub(int in)
+{
+	return 0xf;
+}
+
+static int prot_func_pclubjv2(int in)
+{
+	int const b0 = (BIT( in,3) && BIT(~in,4)) ^ ((BIT(~in,1) && BIT(~in,7)) || BIT( in,6));
+	int const b1 = (BIT( in,0) && BIT( in,5)) ^  (BIT( in,2) && BIT(~in,6));
+	int const b2 = (BIT(~in,1) && BIT( in,6)) ^  (BIT( in,3) || BIT(~in,5)  || BIT(~in,1));	// 1 repeated
+	int const b3 = (BIT(~in,2) && BIT(~in,7)) ^  (BIT(~in,0) || BIT(~in,4));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+static int prot_func_pclubjv4(int in)
+{
+	int const b0 = (BIT(~in,2) && BIT( in,4)) ^ (BIT( in,1) && BIT(~in,6) && BIT(~in,3));
+	int const b1 = (BIT(~in,3) && BIT(~in,4)) ^ (BIT( in,0) && BIT( in,5) && BIT(~in,6));
+	int const b2 =  BIT(~in,0)                ^ (BIT( in,3) && BIT( in,4));
+	int const b3 = (BIT(~in,1) && BIT( in,7)) ^ (BIT( in,5) && BIT(~in,7));	// 7 repeated
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
+static int prot_func_pclubjv5(int in)
+{
+	int const b0 = (BIT(~in,1) && BIT( in,5)) ^ (BIT(~in,2) && BIT(~in,6));
+	int const b1 = (BIT(~in,0) && BIT( in,4)) ^ (BIT(~in,3) && BIT(~in,7));
+	int const b2 = (BIT(~in,3) && BIT( in,7)) ^ (BIT(~in,0) || BIT(~in,4));
+	int const b3 = (BIT(~in,2) && BIT( in,6)) ^ (BIT(~in,1) && BIT(~in,5));
+
+	return (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
+}
+
 
 
 static DRIVER_INIT( c2boot )
@@ -1752,82 +1993,26 @@ static DRIVER_INIT( c2boot )
 	segac2_common_init(NULL);
 }
 
-
 static DRIVER_INIT( bloxeedc )
 {
 	segac2_common_init(NULL);
 	bloxeed_sound = 1;
 }
 
-
 static DRIVER_INIT( columns )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x20a41397, 0x64e057d3, 0x20a41397, 0x64e057d3,
-		0x20a41397, 0x64e057d3, 0xa8249b17, 0xec60df53,
-		0x20a41397, 0x64e057d3, 0x75f546c6, 0x31b10282,
-		0x20a41397, 0x64e057d3, 0xfd75ce46, 0xb9318a02,
-		0xb8348b07, 0xfc70cf43, 0xb8348b07, 0xfc70cf43,
-		0x9a168b07, 0xde52cf43, 0x9a168b07, 0xde52cf43,
-		0x30b40387, 0x74f047c3, 0x75f546c6, 0x31b10282,
-		0x30b40387, 0x74f047c3, 0xfd75ce46, 0xb9318a02
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_columns);
 }
-
 
 static DRIVER_INIT( columns2 )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x0015110c, 0x0015110c, 0x889d9984, 0xcedb9b86,
-		0x4455554c, 0x4455554c, 0xddddccc4, 0x9b9bcec6,
-		0x2237332e, 0x2237332e, 0x6677776e, 0x2031756c,
-		0x6677776e, 0x6677776e, 0x7777666e, 0x3131646c,
-		0x0015110c, 0x0015110c, 0x889d9984, 0xcedb9b86,
-		0x6677776e, 0x6677776e, 0xffffeee6, 0xb9b9ece4,
-		0xaabfbba6, 0xaabfbba6, 0xeeffffe6, 0xa8b9fde4,
-		0xeeffffe6, 0xeeffffe6, 0xffffeee6, 0xb9b9ece4
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_columns2);
 }
-
-
-static DRIVER_INIT( borench )
-{
-	/* 317-0173 */
-	static const UINT32 table[256/8] =
-	{
-		0x12fe56ba, 0x56ba56ba, 0x00aa44ee, 0xcceeccee,
-		0x13ff57bb, 0x759957bb, 0x11bb55ff, 0xffddddff,
-		0x12ba56fe, 0x56fe56fe, 0x00aa44ee, 0xcceeccee,
-		0x933bd77f, 0xf55dd77f, 0x913bd57f, 0x7f5d5d7f,
-		0x12fe56ba, 0x56ba56ab, 0x00aa44ee, 0xcceeccff,
-		0xd73bd73b, 0xf519d72a, 0xd57fd57f, 0x7f5d5d6e,
-		0x12ba56fe, 0x56fe56ef, 0x00aa44ee, 0xcceeccff,
-		0xd77fd77f, 0xf55dd76e, 0xd57fd57f, 0x7f5d5d6e
-	};
-	segac2_common_init(table);
-}
-
 
 static DRIVER_INIT( tfrceac )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x3a3a6f6f, 0x38386d6d, 0x3a3a6f6f, 0x28287d7d,
-		0x3a3a6f6f, 0x38386d6d, 0x3a3a6f6f, 0x28287d7d,
-		0x7e3a2b6f, 0x7c38296d, 0x7eb22be7, 0x6ca039f5,
-		0x7e3a2b6f, 0x7c38296d, 0x7eb22be7, 0x6ca039f5,
-		0x3b3b6e6e, 0x39396c6c, 0x5dd50880, 0x4ec61b93,
-		0x3b3b6e6e, 0x39396c6c, 0x3bb36ee6, 0x28a07df5,
-		0x5d19084c, 0x5d19084c, 0x7ff72aa2, 0x6ee63bb3,
-		0x5d19084c, 0x5d19084c, 0x5d9108c4, 0x4c8019d5
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_tfrceac);
 }
-
 
 static DRIVER_INIT( tfrceacb )
 {
@@ -1836,141 +2021,66 @@ static DRIVER_INIT( tfrceacb )
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, MWA16_NOP);
 }
 
+static DRIVER_INIT( borench )
+{
+	segac2_common_init(prot_func_borench);
+}
 
 static DRIVER_INIT( twinsqua )
 {
-	static const UINT32 table[256/8] =
-	{
-		0xbb33aa22, 0xffffeeee, 0xa820bb33, 0xfd75ee66,
-		0xbb33bb33, 0xbbbbbbbb, 0xa820aa22, 0xb931bb33,
-		0x33bb22aa, 0xffffeeee, 0x22aa31b9, 0x77ff64ec,
-		0x33bb33bb, 0xbbbbbbbb, 0x22aa20a8, 0x33bb31b9,
-		0xbb33aa22, 0xffffeeee, 0xec64ff77, 0xb931aa22,
-		0xbb33bb33, 0xbbbbbbbb, 0xec64ee66, 0xfd75ff77,
-		0x33bb22aa, 0xffffeeee, 0x66ee75fd, 0x33bb20a8,
-		0x33bb33bb, 0xbbbbbbbb, 0x66ee64ec, 0x77ff75fd
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_twinsqua);
 }
-
 
 static DRIVER_INIT( ribbit )
 {
-	static const UINT32 table[256/8] =
-	{
-		0xffbb773b, 0xffbf773f, 0xfebafeba, 0xfebefebe,
-		0xee886619, 0xff9d771d, 0xef89ef98, 0xfe9cfe9c,
-		0xdf9b571b, 0x5717ffb7, 0xde9ade9a, 0x56167636,
-		0xcea84639, 0x5735ff95, 0xcfa9cfb8, 0x56347614,
-		0xffff333b, 0xffff333b, 0xfefebaba, 0xfefebaba,
-		0xeecc2219, 0xffdd3319, 0xefcdab98, 0xfedcba98,
-		0xdfdf131b, 0x5757bbb3, 0xdede9a9a, 0x56563232,
-		0xceec0239, 0x5775bb91, 0xcfed8bb8, 0x56743210
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_ribbit);
 }
-
-
-static DRIVER_INIT( tantr )
-{
-	/* 317-0211 */
-	static const UINT32 table[256/8] =
-	{
-		0x91ddd19d, 0x91ddd19d, 0xd4dc949c, 0xf6feb6be,
-		0x91bbd1fb, 0x91bbd1fb, 0xd4fe94be, 0xf6feb6be,
-		0x80cce2ae, 0x88cceaae, 0xc5cda7af, 0xefef8d8d,
-		0x91bbf3d9, 0x99bbfbd9, 0xd4feb69c, 0xfefe9c9c,
-		0x5d55959d, 0x5d55959d, 0x5c54949c, 0x7e76b6be,
-		0x5d7795bf, 0x5d7795bf, 0x5c7694be, 0x7e76b6be,
-		0x5d55b7bf, 0x4444aeae, 0x5c54b6be, 0x67678d8d,
-		0x5d77b79d, 0x5577bf9d, 0x5c76b69c, 0x76769c9c
-	};
-	segac2_common_init(table);
-}
-
-
-static DRIVER_INIT( tantrkor )
-{
-	static const UINT32 table[256/8] =
-	{
-		0x80931102, 0xc4d75546, 0xd5825502, 0x91c61146,
-		0x081b998a, 0x4c5fddce, 0x5d0add8a, 0x194e99ce,
-		0xc4d77764, 0xc4d77764, 0x91c63364, 0x91c63364,
-		0xc4d77764, 0xc4d77764, 0x91c63364, 0x91c63364,
-		0x91930002, 0xd5d74446, 0xc4824402, 0x80c60046,
-		0x191b888a, 0x5d5fccce, 0x4c0acc8a, 0x084e88ce,
-		0xd5d76664, 0xd5d76664, 0x80c62264, 0x80c62264,
-		0xd5d76664, 0xd5d76664, 0x80c62264, 0x80c62264
-	};
-	segac2_common_init(table);
-}
-
 
 static DRIVER_INIT( puyo )
 {
-	/* 317-0203 */
-	static const UINT32 table[256/8] =
-	{
-		0x33aa55cc, 0x33aa55cc, 0xba22fe66, 0xba22fe66,
-		0x77ee55cc, 0x55cc77ee, 0xfe66fe66, 0xdc44dc44,
-		0x33aa77ee, 0x77aa33ee, 0xba22fe66, 0xfe22ba66,
-		0x77ee77ee, 0x11cc11cc, 0xfe66fe66, 0x98449844,
-		0x22bb44dd, 0x3ba25dc4, 0xab33ef77, 0xba22fe66,
-		0x66ff44dd, 0x5dc47fe6, 0xef77ef77, 0xdc44dc44,
-		0x22bb66ff, 0x7fa23be6, 0xab33ef77, 0xfe22ba66,
-		0x66ff66ff, 0x19c419c4, 0xef77ef77, 0x98449844
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_puyo);
+}
+
+static DRIVER_INIT( tantr )
+{
+	segac2_common_init(prot_func_tantr);
+}
+
+static DRIVER_INIT( tantrkor )
+{
+	segac2_common_init(prot_func_tantrkor);
+}
+
+static DRIVER_INIT( potopoto )
+{
+	segac2_common_init(prot_func_potopoto);
+}
+
+static DRIVER_INIT( stkclmns )
+{
+	segac2_common_init(prot_func_stkclmns);
+}
+
+static DRIVER_INIT( stkclmnj )
+{
+	segac2_common_init(prot_func_stkclmnj);
 }
 
 static DRIVER_INIT( ichir )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x4c4c4c4c, 0x08080808, 0x5d5d4c4c, 0x19190808,
-		0x33332222, 0x33332222, 0x22222222, 0x22222222,
-		0x082a082a, 0x082a082a, 0x193b082a, 0x193b082a,
-		0x77556644, 0x33112200, 0x66446644, 0x22002200,
-		0x6e6e6e6e, 0x2a2a2a2a, 0x7f7f6e6e, 0x3b3b2a2a,
-		0xbbbbaaaa, 0xbbbbaaaa, 0xaaaaaaaa, 0xaaaaaaaa,
-		0x2a082a08, 0x2a082a08, 0x3b192a08, 0x3b192a08,
-		0xffddeecc, 0xbb99aa88, 0xeecceecc, 0xaa88aa88
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_ichir);
 }
 
 static DRIVER_INIT( ichirk )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x44004400, 0x00440044,	0x55114400, 0x11550044,
-		0x55885588, 0x55885588,	0x66bb77aa, 0x66bb77aa,
-		0x02020202, 0x46464646,	0x13130202, 0x57574646,
-		0x138a138a, 0x138a138a,	0x20b931a8, 0x20b931a8,
-		0x44004400, 0x00440044,	0x55114400, 0x11550044,
-		0x55885588, 0x55885588,	0x66bb77aa, 0x66bb77aa,
-		0x8a8a8a8a, 0xcececece,	0x9b9b8a8a, 0xdfdfcece,
-		0x9b029b02, 0x9b029b02,	0xa831b920, 0xa831b920
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_ichirk);
 }
 
 static DRIVER_INIT( ichirj )
 {
-	/* 317-0224 */
-	static const UINT32 table[256/8] =
-	{
-		0x55116622, 0x55116622, 0x55117733, 0x55117733,
-		0x8800aa22, 0x8800aa22, 0x8800bb33, 0x8800bb33,
-		0x11550044, 0x55114400, 0x11551155, 0x55115511,
-		0xcc44cc44, 0x88008800, 0xcc44dd55, 0x88009911,
-		0xdd99eeaa, 0xdd99eeaa, 0xdd99ffbb, 0xdd99ffbb,
-		0xaa228800, 0xaa228800, 0xaa229911, 0xaa229911,
-		0x99dd88cc, 0xdd99cc88, 0x99dd99dd, 0xdd99dd99,
-		0xee66ee66, 0xaa22aa22, 0xee66ff77, 0xaa22bb33
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_ichirj);
 }
+
 static DRIVER_INIT( ichirjbl )
 {
 	/* when did this actually work? - the protection is patched but the new check fails? */
@@ -1978,107 +2088,20 @@ static DRIVER_INIT( ichirjbl )
 	rom[0x390/2] = 0x6600;
 }
 
-
-static DRIVER_INIT( stkclmns )
-{
-	static const UINT32 table[256/8] =
-	{
-		0x1d591d59, 0x0c590c59, 0x1d590c48, 0x0c591d48,
-		0x1f5b1f5b, 0x0e5b0e5b, 0x1f5b0e4a, 0x0e5b1f4a,
-		0x915d915d, 0x805d805d, 0x915d804c, 0x805d914c,
-		0x935f935f, 0x825f825f, 0x935f824e, 0x825f934e,
-		0x15153737, 0x04152637, 0x15152626, 0x04153726,
-		0x17173535, 0x06172435, 0x17172424, 0x06173524,
-		0x9911bb33, 0x8811aa33, 0x9911aa22, 0x8811bb22,
-		0x9b13b931, 0x8a13a831, 0x9b13a820, 0x8a13b920
-	};
-	segac2_common_init(table);
-}
-
-static DRIVER_INIT( stkclmnj )
-{
-	static const UINT32 table[256/8] =
-	{
-		0xcc88cc88, 0xcc88cc88, 0xcc99cc99, 0xcc99cc99,
-		0x00001111, 0x88889999, 0x00111100, 0x88999988,
-		0xaaee88cc, 0xeeaacc88, 0xaaff88dd, 0xeebbcc99,
-		0x66665555, 0xaaaa9999, 0x66775544, 0xaabb9988,
-		0xeeaaeeaa, 0xeeaaeeaa, 0xeebbeebb, 0xeebbeebb,
-		0x00001111, 0x88889999, 0x00111100, 0x88999988,
-		0x00442266, 0x44006622, 0x00552277, 0x44116633,
-		0xeeeedddd, 0x22221111, 0xeeffddcc, 0x22331100
-	};
-	segac2_common_init(table);
-}
-
-
 static DRIVER_INIT( puyopuy2 )
 {
-	/* 317-0228 */
-	static const UINT32 table[256/8] =
-	{
-		0x03038b8b, 0x03030303, 0xcf4747cf, 0xcf47cf47,
-		0x03038b8b, 0x21212121, 0xcf4747cf, 0xed65ed65,
-		0x4141c9c9, 0x41414141, 0x9c05148d, 0x9c059c05,
-		0x4141c9c9, 0x63636363, 0x9c05148d, 0xbe27be27,
-		0x5757dfdf, 0x57575757, 0xdf5757df, 0xdf57df57,
-		0x5757dfdf, 0x75757575, 0xdf5757df, 0xfd75fd75,
-		0x15159d9d, 0x15151515, 0x8c15049d, 0x8c158c15,
-		0x15159d9d, 0x37373737, 0x8c15049d, 0xae37ae37
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_puyopuy2);
 }
-
-
-static DRIVER_INIT( potopoto )
-{
-	/* 317-0218 */
-	static const UINT32 table[256/8] =
-	{
-		0xb33ba22a, 0xa23bb32a, 0xa22aa22a, 0xb32ab32a,
-		0xb139a028, 0xa039b128, 0xa028a028, 0xb128b128,
-		0x3f3f2e2e, 0x2e3f3f2e, 0x2e2e2e2e, 0x3f2e3f2e,
-		0x3d3d2c2c, 0x2c3d3d2c, 0x2c2c2c2c, 0x3d2c3d2c,
-		0xdd11ee22, 0xcc11ff22, 0xcc00ee22, 0xdd00ff22,
-		0xdf13ec20, 0xce13fd20, 0xce02ec20, 0xdf02fd20,
-		0x51156226, 0x40157326, 0x40046226, 0x51047326,
-		0x53176024, 0x42177124, 0x42066024, 0x53067124
-	};
-	segac2_common_init(table);
-}
-
 
 static DRIVER_INIT( zunkyou )
 {
-	static const UINT32 table[256/8] =
-	{
-		0xa0a06c6c, 0x82820a0a, 0xecec2020, 0xecec6464,
-		0xa2a26e6e, 0x80800808, 0xaaaa6666, 0xaaaa2222,
-		0x39287d6c, 0x1b0a1b0a, 0x75643120, 0x75647564,
-		0x3b2a7f6e, 0x19081908, 0x33227766, 0x33223322,
-		0xb1b17d7d, 0x93931b1b, 0xfdfd3131, 0xfdfd7575,
-		0xa2a26e6e, 0x80800808, 0xaaaa6666, 0xaaaa2222,
-		0x28396c7d, 0x0a1b0a1b, 0x64752031, 0x64756475,
-		0x3b2a7f6e, 0x19081908, 0x33227766, 0x33223322
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_zunkyou);
 }
 
 
 static DRIVER_INIT( pclub )
 {
-	static const UINT32 table[256/8] =
-	{
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_pclub);
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2087,18 +2110,7 @@ static DRIVER_INIT( pclub )
 
 static DRIVER_INIT( pclubjv2 )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x5544ffee, 0x4455eeff, 0x5d4cf7e6, 0x5d4cf7e6,
-		0x5702fda8, 0x4657ecfd, 0x5f0af5a0, 0x5f4ef5e4,
-		0x115599dd, 0x004488cc, 0x195d91d5, 0x195d91d5,
-		0x13139b9b, 0x02468ace, 0x1b1b9393, 0x1b5f93d7,
-		0xcccceeee, 0xddddffff, 0xc4c4e6e6, 0xc4c4e6e6,
-		0xce8aeca8, 0xdfdffdfd, 0xc682e4a0, 0xc6c6e4e4,
-		0x99dd99dd, 0x88cc88cc, 0x91d591d5, 0x91d591d5,
-		0x9b9b9b9b, 0x8ace8ace, 0x93939393, 0x93d793d7
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_pclubjv2);
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2107,18 +2119,7 @@ static DRIVER_INIT( pclubjv2 )
 
 static DRIVER_INIT( pclubjv4 )
 {
-	static const UINT32 table[256/8] =
-	{
-		0x62736273, 0x40404040, 0x51404051, 0x15150404,
-		0xe8f9e8f9, 0xcacacaca,	0xdbcacadb, 0x9f9f8e8e,
-		0x62626262, 0x40404040,	0x51514040, 0x15150404,
-		0xeaeaeaea, 0xc8c8c8c8,	0xd9d9c8c8, 0x9d9d8c8c,
-		0xea73ea73, 0xc840c840,	0xd940c851, 0x9d158c04,
-		0xe871e871, 0xca42ca42,	0xdb42ca53, 0x9f178e06,
-		0xea62ea62, 0xc840c840,	0xd951c840, 0x9d158c04,
-		0xea62ea62, 0xc840c840,	0xd951c840, 0x9d158c04
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_pclubjv4);
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2127,18 +2128,7 @@ static DRIVER_INIT( pclubjv4 )
 
 static DRIVER_INIT( pclubjv5 )
 {
-	static const UINT32 table[256/8] =
-	{
-		0xff77ee66, 0xdd55cc44,	0xdb53ca42, 0xf971e860,
-		0x66777766, 0x44555544,	0x42535342, 0x60717160,
-		0x66eeee66, 0x44cccc44,	0x42caca42, 0x60e8e860,
-		0xffee7766, 0xddcc5544,	0xdbca5342, 0xf9e87160,
-		0x99118800, 0xdd55cc44,	0xbd35ac24, 0xf971e860,
-		0x00111100, 0x44555544,	0x24353524, 0x60717160,
-		0x00888800, 0x44cccc44,	0x24acac24, 0x60e8e860,
-		0x99881100, 0xddcc5544,	0xbdac3524, 0xf9e87160
-	};
-	segac2_common_init(table);
+	segac2_common_init(prot_func_pclubjv5);
 
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2174,29 +2164,29 @@ GAME( 1990, columns2, 0,        segac,    columns2, columns2, ROT0, "Sega",     
 GAME( 1990, column2j, columns2, segac,    columns2, columns2, ROT0, "Sega",                   "Columns II: The Voyage Through Time (Japan)", 0 )
 
 /* System C-2 Games */
-GAME( 1990, borench,  0,        segac2,   borench,  borench,  ROT0, "Sega",                   "Borench", 0 )
 GAME( 1990, tfrceac,  0,        segac2,   tfrceac,  tfrceac,  ROT0, "Sega / Technosoft",      "ThunderForce AC", 0 )
 GAME( 1990, tfrceacj, tfrceac,  segac2,   tfrceac,  tfrceac,  ROT0, "Sega / Technosoft",      "ThunderForce AC (Japan)", 0 )
 GAME( 1990, tfrceacb, tfrceac,  segac2,   tfrceac,  tfrceacb, ROT0, "bootleg",                "ThunderForce AC (bootleg)", 0 )
+GAME( 1990, borench,  0,        segac2,   borench,  borench,  ROT0, "Sega",                   "Borench", 0 )
 GAME( 1991, twinsqua, 0,        segac2,   twinsqua, twinsqua, ROT0, "Sega",                   "Twin Squash", 0 )
 GAME( 1991, ribbit,   0,        segac2,   ribbit,   ribbit,   ROT0, "Sega",                   "Ribbit!", 0 )
+GAME( 1992, puyo,     0,        segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (World)", 0 )
+GAME( 1992, puyobl,   puyo,     segac2,   puyo,     puyo,     ROT0, "bootleg",                "Puyo Puyo (World, bootleg)", 0 )
+GAME( 1992, puyoj,    puyo,     segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (Japan)", 0 )
+GAME( 1992, puyoja,   puyo,     segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (Japan, Rev A)", 0 )
 GAME( 1992, tantr,    0,        segac2,   ichir,    tantr,    ROT0, "Sega",                   "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor, tantr,    segac2,   ichir,    tantrkor, ROT0, "Sega",                   "Puzzle & Action: Tant-R (Korea)", 0 )
 GAME( 1992, tantrbl,  tantr,    segac2,   ichir,    c2boot,   ROT0, "bootleg",                "Puzzle & Action: Tant-R (Japan) (bootleg set 1)", 0 )
 GAME( 1994, tantrbl2, tantr,    segac,    ichir,    tantr,    ROT0, "bootleg",                "Puzzle & Action: Tant-R (Japan) (bootleg set 2)", 0 ) // Common bootleg in Europe, C board, no samples
 GAME( 1994, tantrbl3, tantr,    segac,    ichir,    tantr,    ROT0, "bootleg",                "Puzzle & Action: Tant-R (Japan) (bootleg set 3)", 0 ) // Common bootleg in Europe, C board, no samples
-GAME( 1992, puyo,     0,        segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (World)", 0 )
-GAME( 1992, puyobl,   puyo,     segac2,   puyo,     puyo,     ROT0, "bootleg",                "Puyo Puyo (World, bootleg)", 0 )
-GAME( 1992, puyoj,    puyo,     segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (Japan)", 0 )
-GAME( 1992, puyoja,   puyo,     segac2,   puyo,     puyo,     ROT0, "Sega / Compile",         "Puyo Puyo (Japan, Rev A)", 0 )
+GAME( 1994, potopoto, 0,        segac2,   potopoto, potopoto, ROT0, "Sega",                   "Poto Poto (Japan)", 0 )
+GAME( 1994, stkclmns, 0,        segac2,   stkclmns, stkclmns, ROT0, "Sega",                   "Stack Columns (World)", 0 )
+GAME( 1994, stkclmnj, stkclmns, segac2,   stkclmns, stkclmnj, ROT0, "Sega",                   "Stack Columns (Japan)", 0 )
 GAME( 1994, ichir,    0,        segac2,   ichir,    ichir,    ROT0, "Sega",                   "Puzzle & Action: Ichidant-R (World)", 0 )
 GAME( 1994, ichirk,   ichir,    segac2,   ichir,    ichirk,   ROT0, "Sega",                   "Puzzle & Action: Ichidant-R (Korea)", 0 )
 GAME( 1994, ichirj,   ichir,    segac2,   ichir,    ichirj,   ROT0, "Sega",                   "Puzzle & Action: Ichidant-R (Japan)", 0 )
 GAME( 1994, ichirjbl, ichir,    segac,    ichir,    ichirjbl, ROT0, "bootleg",                "Puzzle & Action: Ichidant-R (Japan) (bootleg)", 0 ) // C board, no samples
-GAME( 1994, stkclmns, 0,        segac2,   stkclmns, stkclmns, ROT0, "Sega",                   "Stack Columns (World)", 0 )
-GAME( 1994, stkclmnj, stkclmns, segac2,   stkclmns, stkclmnj, ROT0, "Sega",                   "Stack Columns (Japan)", 0 )
 GAME( 1994, puyopuy2, 0,        segac2,   puyopuy2, puyopuy2, ROT0, "Compile (Sega license)", "Puyo Puyo 2 (Japan)", 0 )
-GAME( 1994, potopoto, 0,        segac2,   potopoto, potopoto, ROT0, "Sega",                   "Poto Poto (Japan)", 0 )
 GAME( 1994, zunkyou,  0,        segac2,   zunkyou,  zunkyou,  ROT0, "Sega",                   "Zunzunkyou No Yabou (Japan)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
