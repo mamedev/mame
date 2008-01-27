@@ -465,8 +465,6 @@ MACHINE_RESET( ataxx )
 static TIMER_CALLBACK( leland_interrupt_callback )
 {
 	int scanline = param;
-	extern UINT8 leland_last_scanline_int;
-	leland_last_scanline_int = scanline;
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
@@ -483,8 +481,6 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 static TIMER_CALLBACK( ataxx_interrupt_callback )
 {
 	int scanline = param;
-	extern UINT8 leland_last_scanline_int;
-	leland_last_scanline_int = scanline;
 
 	/* interrupts generated according to the interrupt control register */
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
@@ -1215,7 +1211,7 @@ WRITE8_HANDLER( leland_master_output_w )
 		case 0x0d:	/* /BKXH */
 		case 0x0e:	/* /BKYL */
 		case 0x0f:	/* /BKYH */
-			leland_gfx_port_w(offset - 0x0c, data);
+			leland_scroll_w(offset - 0x0c, data);
 			break;
 
 		default:
@@ -1257,7 +1253,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 		case 0x01:	/* /BKXH */
 		case 0x02:	/* /BKYL */
 		case 0x03:	/* /BKYH */
-			leland_gfx_port_w(offset, data);
+			leland_scroll_w(offset, data);
 			break;
 
 		case 0x04:	/* /MBNK */
@@ -1374,13 +1370,8 @@ READ8_HANDLER( leland_sound_port_r )
 
 WRITE8_HANDLER( leland_sound_port_w )
 {
-	int gfx_banks = Machine->gfx[0]->total_elements / 0x400;
-	int gfx_bank_mask = (gfx_banks - 1) << 4;
-	int diff = data ^ leland_gfx_control;
-
-    /* update the graphics banking if necessary */
-    if ((diff & 0x08) || (diff & gfx_bank_mask))
-    	leland_gfx_port_w(-1, data);
+    /* update the graphics banking */
+   	leland_gfx_port_w(0, data);
 
 	/* set the new value */
     leland_gfx_control = data;
