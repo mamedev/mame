@@ -121,7 +121,7 @@ static VIDEO_START( crgolf )
 
 static VIDEO_UPDATE( crgolf )
 {
-//	int flip = *crgolf_screen_flip & 1;
+	int flip = *crgolf_screen_flip & 1;
 
 	offs_t offs;
 	pen_t pens[NUM_PENS];
@@ -133,8 +133,8 @@ static VIDEO_UPDATE( crgolf )
 	{
 		int i;
 
-		int x = (offs & 0x001f) << 3;
-		int y = (offs & 0x1fe0) >> 5;
+		UINT8 y = (offs & 0x1fe0) >> 5;
+		UINT8 x = (offs & 0x001f) << 3;
 
 		UINT8 data_a0 = crgolf_videoram_a[0x2000 | offs];
 		UINT8 data_a1 = crgolf_videoram_a[0x0000 | offs];
@@ -142,6 +142,12 @@ static VIDEO_UPDATE( crgolf )
 		UINT8 data_b0 = crgolf_videoram_b[0x2000 | offs];
 		UINT8 data_b1 = crgolf_videoram_b[0x0000 | offs];
 		UINT8 data_b2 = crgolf_videoram_b[0x4000 | offs];
+
+		if (flip)
+		{
+			y = ~y;
+			x = ~x;
+		}
 
 		/* for each pixel in the byte */
 		for (i = 0; i < 8; i++)
@@ -176,7 +182,10 @@ static VIDEO_UPDATE( crgolf )
 			data_b1 = data_b1 << 1;
 			data_b2 = data_b2 << 1;
 
-			x = x + 1;
+			if (flip)
+				x = x - 1;
+			else
+				x = x + 1;
 		}
 	}
 
