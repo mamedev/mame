@@ -26,6 +26,7 @@ OBJDIRS += \
 FILE2STR = $(BUILDOUT)/file2str$(EXE)
 PNG2BDC = $(BUILDOUT)/png2bdc$(EXE)
 
+ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(FILE2STR) \
 	$(PNG2BDC) \
@@ -55,3 +56,6 @@ PNG2BDCOBJS = \
 $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+endif
+

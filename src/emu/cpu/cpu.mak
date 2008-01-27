@@ -1019,6 +1019,7 @@ OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kmame.o $(CPUOBJ)/m68000/m68kops.o
 DBGOBJS += $(CPUOBJ)/m68000/m68kdasm.o
 endif
+M68KMAKE = $(CPUOBJ)/m68000/m68kmake$(EXE)
 
 # when we compile source files we need to include generated files from the OBJ directory
 $(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c
@@ -1031,14 +1032,16 @@ $(CPUOBJ)/m68000/%.o: $(CPUOBJ)/m68000/%.c
 	$(CC) $(CDEFS) $(CFLAGS) -I$(CPUSRC)/m68000 -c $< -o $@
 
 # rule to generate the C files
-$(CPUOBJ)/m68000/m68kops.c: $(CPUOBJ)/m68000/m68kmake$(EXE) $(CPUSRC)/m68000/m68k_in.c
+$(CPUOBJ)/m68000/m68kops.c: $(M68KMAKE) $(CPUSRC)/m68000/m68k_in.c
 	@echo Generating M68K source files...
-	$(CPUOBJ)/m68000/m68kmake$(EXE) $(CPUOBJ)/m68000 $(CPUSRC)/m68000/m68k_in.c
+	$(M68KMAKE) $(CPUOBJ)/m68000 $(CPUSRC)/m68000/m68k_in.c
 
 # rule to build the generator
-$(CPUOBJ)/m68000/m68kmake$(EXE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
+ifneq ($(CROSS_BUILD),1)
+$(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
+endif
 
 # rule to ensure we build the header before building the core CPU file
 $(CPUOBJ)/m68000/m68kcpu.o: $(CPUOBJ)/m68000/m68kops.c

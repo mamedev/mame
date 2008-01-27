@@ -290,6 +290,8 @@ $(LEDUTIL): $(LEDUTILOBJS) $(LIBOCORE)
 #-------------------------------------------------
 
 VERINFO = $(WINOBJ)/verinfo$(EXE)
+
+ifneq ($(CROSS_BUILD),1)
 BUILD += $(VERINFO)
 
 VERINFOOBJS = \
@@ -298,7 +300,7 @@ VERINFOOBJS = \
 $(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
+endif
 
 
 
