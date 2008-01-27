@@ -7918,5 +7918,6 @@ Other Sun games
 	DRIVER( drw80pkr )
 	DRIVER( blazlaz )
 	DRIVER( paranoia )
+	DRIVER( galgbios )  /* (c) 1998 Creative Electonics */
 
 #endif	/* DRIVER_RECURSIVE */
