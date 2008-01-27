@@ -284,12 +284,12 @@ Ram M2 are LGS GM76C8128ALLFW70
 KUP-U06-I03 U06 Program rom ST27C4001 (even)
 KUP-U07-I03 U07 Program rom ST27C4001 (odd)
 
-KUS-U18-I00 U18 Mask rom (Samples 23C8001 16Mbit)
+KUS-U18-I00 U18 Mask rom (Samples 23C32000 32Mbit)
 
-KUC-U38-I00 U38 Mask rom (Graphics 23C8001 16Mbit)
-KUC-U39-I00 U39 Mask rom (Graphics 23C8001 16Mbit)
-KUC-U40-I00 U40 Mask rom (Graphics 23C8001 16Mbit)
-KUC-U41-I00 U41 Mask rom (Graphics 23C8001 16Mbit)
+KUC-U38-I00 U38 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U39-I00 U39 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U40-I00 U40 Mask rom (Graphics 23C32000 32Mbit)
+KUC-U41-I00 U41 Mask rom (Graphics 23C32000 32Mbit)
 
 ***************************************************************************/
 
