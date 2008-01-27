@@ -104,4 +104,4 @@ ROM_END
 
 /* System board BIOS */
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT MONITOR COMPANY                FULLNAME             FLAGS */
-GAME( 1998, galgbios, 0,      galgames, galgames, 0,   ROT0,   "Creative Electonics", "Galaxy Games BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1998, galgbios, 0,      galgames, galgames, 0,   ROT0,   "Creative Electonics", "Galaxy Games BIOS", GAME_NOT_WORKING | GAME_IS_BIOS_ROOT )
