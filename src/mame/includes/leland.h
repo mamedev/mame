@@ -127,9 +127,7 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io);
 extern UINT8 *ataxx_qram;
 extern UINT8 leland_last_scanline_int;
 
-VIDEO_START( leland );
-VIDEO_START( ataxx );
-
+WRITE8_HANDLER( leland_scroll_w );
 WRITE8_HANDLER( leland_gfx_port_w );
 
 WRITE8_HANDLER( leland_master_video_addr_w );
@@ -145,6 +143,5 @@ WRITE8_HANDLER( ataxx_svram_port_w );
 READ8_HANDLER( ataxx_mvram_port_r );
 READ8_HANDLER( ataxx_svram_port_r );
 
-VIDEO_EOF( leland );
-VIDEO_UPDATE( leland );
-VIDEO_UPDATE( ataxx );
+MACHINE_DRIVER_EXTERN( leland_video );
+MACHINE_DRIVER_EXTERN( ataxx_video );
