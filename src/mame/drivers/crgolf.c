@@ -239,9 +239,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(MWA8_RAM) AM_BASE(&crgolf_screena_enable)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(crgolf_videoram_bit1_r, crgolf_videoram_bit1_w)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(crgolf_videoram_bit0_r, crgolf_videoram_bit0_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(crgolf_videoram_bit2_r, crgolf_videoram_bit2_w)
+	AM_RANGE(0xa000, 0xffff) AM_READWRITE(crgolf_videoram_r, crgolf_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -372,22 +370,11 @@ static MACHINE_DRIVER_START( crgolf )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
-
 	MDRV_MACHINE_START(crgolf)
 	MDRV_INTERLEAVE(100)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
-	MDRV_PALETTE_LENGTH(32)
-
-	MDRV_PALETTE_INIT(crgolf)
-	MDRV_VIDEO_START(crgolf)
-	MDRV_VIDEO_UPDATE(crgolf)
+	MDRV_IMPORT_FROM(crgolf_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

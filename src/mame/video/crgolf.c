@@ -8,6 +8,10 @@
 #include "crgolf.h"
 
 
+#define NUM_PENS		(0x20)
+#define VIDEORAM_SIZE	(0x2000 * 3)
+
+
 /* globals */
 UINT8 *crgolf_color_select;
 UINT8 *crgolf_screen_flip;
@@ -17,167 +21,74 @@ UINT8 *crgolf_screena_enable;
 
 
 /* local variables */
-static mame_bitmap *screena;
-static mame_bitmap *screenb;
-static mame_bitmap *highbit;
+static UINT8 *crgolf_videoram_a;
+static UINT8 *crgolf_videoram_b;
 
 
 
 /*************************************
  *
- *  Video RAM writes
+ *  Video RAM access
  *
  *************************************/
 
-WRITE8_HANDLER( crgolf_videoram_bit0_w )
+WRITE8_HANDLER( crgolf_videoram_w )
 {
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *dest = (UINT16 *)screen->base + screen->rowpixels * y + x;
-
-	dest[0] = (dest[0] & ~0x01) | ((data >> 7) & 0x01);
-	dest[1] = (dest[1] & ~0x01) | ((data >> 6) & 0x01);
-	dest[2] = (dest[2] & ~0x01) | ((data >> 5) & 0x01);
-	dest[3] = (dest[3] & ~0x01) | ((data >> 4) & 0x01);
-	dest[4] = (dest[4] & ~0x01) | ((data >> 3) & 0x01);
-	dest[5] = (dest[5] & ~0x01) | ((data >> 2) & 0x01);
-	dest[6] = (dest[6] & ~0x01) | ((data >> 1) & 0x01);
-	dest[7] = (dest[7] & ~0x01) | ((data >> 0) & 0x01);
+	if (*crgolf_screen_select & 1)
+		crgolf_videoram_b[offset] = data;
+	else
+		crgolf_videoram_a[offset] = data;
 }
 
 
-WRITE8_HANDLER( crgolf_videoram_bit1_w )
+READ8_HANDLER( crgolf_videoram_r )
 {
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *dest = (UINT16 *)screen->base + screen->rowpixels * y + x;
+	UINT8 ret;
 
-	dest[0] = (dest[0] & ~0x02) | ((data >> 6) & 0x02);
-	dest[1] = (dest[1] & ~0x02) | ((data >> 5) & 0x02);
-	dest[2] = (dest[2] & ~0x02) | ((data >> 4) & 0x02);
-	dest[3] = (dest[3] & ~0x02) | ((data >> 3) & 0x02);
-	dest[4] = (dest[4] & ~0x02) | ((data >> 2) & 0x02);
-	dest[5] = (dest[5] & ~0x02) | ((data >> 1) & 0x02);
-	dest[6] = (dest[6] & ~0x02) | ((data >> 0) & 0x02);
-	dest[7] = (dest[7] & ~0x02) | ((data << 1) & 0x02);
-}
+	if (*crgolf_screen_select & 1)
+		ret = crgolf_videoram_b[offset];
+	else
+		ret = crgolf_videoram_a[offset];
 
-
-WRITE8_HANDLER( crgolf_videoram_bit2_w )
-{
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *dest = (UINT16 *)screen->base + screen->rowpixels * y + x;
-
-	dest[0] = (dest[0] & ~0x04) | ((data >> 5) & 0x04);
-	dest[1] = (dest[1] & ~0x04) | ((data >> 4) & 0x04);
-	dest[2] = (dest[2] & ~0x04) | ((data >> 3) & 0x04);
-	dest[3] = (dest[3] & ~0x04) | ((data >> 2) & 0x04);
-	dest[4] = (dest[4] & ~0x04) | ((data >> 1) & 0x04);
-	dest[5] = (dest[5] & ~0x04) | ((data >> 0) & 0x04);
-	dest[6] = (dest[6] & ~0x04) | ((data << 1) & 0x04);
-	dest[7] = (dest[7] & ~0x04) | ((data << 2) & 0x04);
+	return ret;
 }
 
 
 
 /*************************************
  *
- *  Video RAM reads
+ *  Palette handling
  *
  *************************************/
 
-READ8_HANDLER( crgolf_videoram_bit0_r )
+static void get_pens(pen_t *pens)
 {
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *source = (UINT16 *)screen->base + screen->rowpixels * y + x;
+	offs_t offs;
 
-	return	((source[0] & 0x01) << 7) |
-			((source[1] & 0x01) << 6) |
-			((source[2] & 0x01) << 5) |
-			((source[3] & 0x01) << 4) |
-			((source[4] & 0x01) << 3) |
-			((source[5] & 0x01) << 2) |
-			((source[6] & 0x01) << 1) |
-			((source[7] & 0x01) << 0);
-}
-
-
-READ8_HANDLER( crgolf_videoram_bit1_r )
-{
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *source = (UINT16 *)screen->base + screen->rowpixels * y + x;
-
-	return	((source[0] & 0x02) << 6) |
-			((source[1] & 0x02) << 5) |
-			((source[2] & 0x02) << 4) |
-			((source[3] & 0x02) << 3) |
-			((source[4] & 0x02) << 2) |
-			((source[5] & 0x02) << 1) |
-			((source[6] & 0x02) << 0) |
-			((source[7] & 0x02) >> 1);
-}
-
-
-READ8_HANDLER( crgolf_videoram_bit2_r )
-{
-	mame_bitmap *screen = (*crgolf_screen_select & 1) ? screenb : screena;
-	int x = (offset % 32) * 8;
-	int y = offset / 32;
-	UINT16 *source = (UINT16 *)screen->base + screen->rowpixels * y + x;
-
-	return	((source[0] & 0x04) << 5) |
-			((source[1] & 0x04) << 4) |
-			((source[2] & 0x04) << 3) |
-			((source[3] & 0x04) << 2) |
-			((source[4] & 0x04) << 1) |
-			((source[5] & 0x04) << 0) |
-			((source[6] & 0x04) >> 1) |
-			((source[7] & 0x04) >> 2);
-}
-
-
-
-/*************************************
- *
- *  Color PROM decoding
- *
- *************************************/
-
-PALETTE_INIT( crgolf )
-{
-	int i;
-
-	for (i = 0; i < 32; i++)
+	for (offs = 0; offs < NUM_PENS; offs++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
+		UINT8 data = memory_region(REGION_PROMS)[offs];
+
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (data >> 0) & 0x01;
+		bit1 = (data >> 1) & 0x01;
+		bit2 = (data >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (data >> 3) & 0x01;
+		bit1 = (data >> 4) & 0x01;
+		bit2 = (data >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
+		bit0 = (data >> 6) & 0x01;
+		bit1 = (data >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
+		pens[offs] = MAKE_RGB(r, g, b);
 	}
 }
 
@@ -189,22 +100,15 @@ PALETTE_INIT( crgolf )
  *
  *************************************/
 
-VIDEO_START( crgolf )
+static VIDEO_START( crgolf )
 {
-	/* allocate temporary bitmaps */
-	screena = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-	screenb = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-	highbit = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-
-	/* initialize the "high bit" bitmap */
-	fillbitmap(screena, 0, NULL);
-	fillbitmap(screenb, 8, NULL);
-	fillbitmap(highbit, 16, NULL);
+	/* allocate memory for the two bitmaps */
+	crgolf_videoram_a = auto_malloc(VIDEORAM_SIZE);
+	crgolf_videoram_b = auto_malloc(VIDEORAM_SIZE);
 
 	/* register for save states */
-	state_save_register_bitmap("video", 0, "screena", screena);
-	state_save_register_bitmap("video", 0, "screenb", screenb);
-	state_save_register_bitmap("video", 0, "highbit", highbit);
+	state_save_register_global_pointer(crgolf_videoram_a, VIDEORAM_SIZE);
+	state_save_register_global_pointer(crgolf_videoram_b, VIDEORAM_SIZE);
 }
 
 
@@ -215,22 +119,87 @@ VIDEO_START( crgolf )
  *
  *************************************/
 
-VIDEO_UPDATE( crgolf )
+static VIDEO_UPDATE( crgolf )
 {
-	int flip = *crgolf_screen_flip & 1;
+//	int flip = *crgolf_screen_flip & 1;
 
-	/* draw screen b if enabled */
-	if (~*crgolf_screenb_enable & 1)
-		copybitmap(bitmap, screenb, flip, flip, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	else
-		fillbitmap(bitmap, 8, cliprect);
+	offs_t offs;
+	pen_t pens[NUM_PENS];
 
-	/* draw screen a if enabled */
-	if (~*crgolf_screena_enable & 1)
-		copybitmap(bitmap, screena, flip, flip, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+	get_pens(pens);
 
-	/* apply the color select bit */
-	if (*crgolf_color_select)
-		copybitmap(bitmap, highbit, 0, 0, 0, 0, cliprect, TRANSPARENCY_BLEND, 0);
+	/* for each byte in the video RAM */
+	for (offs = 0; offs < VIDEORAM_SIZE / 3; offs++)
+	{
+		int i;
+
+		int x = (offs & 0x001f) << 3;
+		int y = (offs & 0x1fe0) >> 5;
+
+		UINT8 data_a0 = crgolf_videoram_a[0x2000 | offs];
+		UINT8 data_a1 = crgolf_videoram_a[0x0000 | offs];
+		UINT8 data_a2 = crgolf_videoram_a[0x4000 | offs];
+		UINT8 data_b0 = crgolf_videoram_b[0x2000 | offs];
+		UINT8 data_b1 = crgolf_videoram_b[0x0000 | offs];
+		UINT8 data_b2 = crgolf_videoram_b[0x4000 | offs];
+
+		/* for each pixel in the byte */
+		for (i = 0; i < 8; i++)
+		{
+			offs_t color;
+			UINT8 data_b = 0;
+			UINT8 data_a = 0;
+
+			if (~*crgolf_screena_enable & 1)
+				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
+
+			if (~*crgolf_screenb_enable & 1)
+				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
+
+			/* screen A has priority over B */
+			if (data_a)
+				color = data_a;
+			else
+				color = data_b | 0x08;
+
+			/* add HI bit if enabled */
+			if (*crgolf_color_select)
+				color = color | 0x10;
+
+			*BITMAP_ADDR32(bitmap, y, x) = pens[color];
+
+			/* next pixel */
+			data_a0 = data_a0 << 1;
+			data_a1 = data_a1 << 1;
+			data_a2 = data_a2 << 1;
+			data_b0 = data_b0 << 1;
+			data_b1 = data_b1 << 1;
+			data_b2 = data_b2 << 1;
+
+			x = x + 1;
+		}
+	}
+
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( crgolf_video )
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(crgolf)
+	MDRV_VIDEO_UPDATE(crgolf)
+
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+MACHINE_DRIVER_END

@@ -12,14 +12,7 @@ extern UINT8 *crgolf_screen_select;
 extern UINT8 *crgolf_screenb_enable;
 extern UINT8 *crgolf_screena_enable;
 
-WRITE8_HANDLER( crgolf_videoram_bit0_w );
-WRITE8_HANDLER( crgolf_videoram_bit1_w );
-WRITE8_HANDLER( crgolf_videoram_bit2_w );
+WRITE8_HANDLER( crgolf_videoram_w );
+READ8_HANDLER( crgolf_videoram_r );
 
-READ8_HANDLER( crgolf_videoram_bit0_r );
-READ8_HANDLER( crgolf_videoram_bit1_r );
-READ8_HANDLER( crgolf_videoram_bit2_r );
-
-PALETTE_INIT( crgolf );
-VIDEO_START( crgolf );
-VIDEO_UPDATE( crgolf );
+MACHINE_DRIVER_EXTERN( crgolf_video );
