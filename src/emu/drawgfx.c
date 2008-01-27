@@ -1073,17 +1073,6 @@ void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
 	int srcwidth,srcheight,destwidth,destheight;
 	rectangle orig_clip;
 
-	/* translate to proper transparency here */
-	if (transparency == TRANSPARENCY_NONE)
-		transparency = TRANSPARENCY_NONE_RAW;
-	else if (transparency == TRANSPARENCY_PEN)
-		transparency = TRANSPARENCY_PEN_RAW;
-	else if (transparency == TRANSPARENCY_COLOR)
-	{
-		transparent_color = Machine->pens[transparent_color];
-		transparency = TRANSPARENCY_PEN_RAW;
-	}
-
 	if (clip)
 	{
 		orig_clip.min_x = clip->min_x;
@@ -4712,156 +4701,6 @@ DECLARE(blockmove_NtoN_opaque_noremap_flipx,(
 	}
 })
 
-DECLARE(blockmove_NtoN_blend_noremap,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		int srcshift),
-{
-	DATA_TYPE *end;
-
-	srcmodulo -= srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			dstdata[0] |= srcdata[0] << srcshift;
-			dstdata[1] |= srcdata[1] << srcshift;
-			dstdata[2] |= srcdata[2] << srcshift;
-			dstdata[3] |= srcdata[3] << srcshift;
-			dstdata[4] |= srcdata[4] << srcshift;
-			dstdata[5] |= srcdata[5] << srcshift;
-			dstdata[6] |= srcdata[6] << srcshift;
-			dstdata[7] |= srcdata[7] << srcshift;
-			dstdata += 8;
-			srcdata += 8;
-		}
-		while (dstdata < end)
-			*(dstdata++) |= *(srcdata++) << srcshift;
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-})
-
-DECLARE(blockmove_NtoN_blend_noremap_flipx,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		int srcshift),
-{
-	DATA_TYPE *end;
-
-	srcmodulo += srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			srcdata -= 8;
-			dstdata[0] |= srcdata[8] << srcshift;
-			dstdata[1] |= srcdata[7] << srcshift;
-			dstdata[2] |= srcdata[6] << srcshift;
-			dstdata[3] |= srcdata[5] << srcshift;
-			dstdata[4] |= srcdata[4] << srcshift;
-			dstdata[5] |= srcdata[3] << srcshift;
-			dstdata[6] |= srcdata[2] << srcshift;
-			dstdata[7] |= srcdata[1] << srcshift;
-			dstdata += 8;
-		}
-		while (dstdata < end)
-			*(dstdata++) |= *(srcdata--) << srcshift;
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-})
-
-DECLARE(blockmove_NtoN_blend_remap,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		const pen_t *paldata,int srcshift),
-{
-	DATA_TYPE *end;
-
-	srcmodulo -= srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			dstdata[0] = paldata[dstdata[0] | (srcdata[0] << srcshift)];
-			dstdata[1] = paldata[dstdata[1] | (srcdata[1] << srcshift)];
-			dstdata[2] = paldata[dstdata[2] | (srcdata[2] << srcshift)];
-			dstdata[3] = paldata[dstdata[3] | (srcdata[3] << srcshift)];
-			dstdata[4] = paldata[dstdata[4] | (srcdata[4] << srcshift)];
-			dstdata[5] = paldata[dstdata[5] | (srcdata[5] << srcshift)];
-			dstdata[6] = paldata[dstdata[6] | (srcdata[6] << srcshift)];
-			dstdata[7] = paldata[dstdata[7] | (srcdata[7] << srcshift)];
-			dstdata += 8;
-			srcdata += 8;
-		}
-		while (dstdata < end)
-		{
-			*dstdata = paldata[*dstdata | (*(srcdata++) << srcshift)];
-			dstdata++;
-		}
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-
-})
-
-DECLARE(blockmove_NtoN_blend_remap_flipx,(
-		const DATA_TYPE *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		DATA_TYPE *dstdata,int dstmodulo,
-		const pen_t *paldata,int srcshift),
-{
-	DATA_TYPE *end;
-
-	srcmodulo += srcwidth;
-	dstmodulo -= srcwidth;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (dstdata <= end - 8)
-		{
-			srcdata -= 8;
-			dstdata[0] = paldata[dstdata[0] | (srcdata[8] << srcshift)];
-			dstdata[1] = paldata[dstdata[1] | (srcdata[7] << srcshift)];
-			dstdata[2] = paldata[dstdata[2] | (srcdata[6] << srcshift)];
-			dstdata[3] = paldata[dstdata[3] | (srcdata[5] << srcshift)];
-			dstdata[4] = paldata[dstdata[4] | (srcdata[4] << srcshift)];
-			dstdata[5] = paldata[dstdata[5] | (srcdata[3] << srcshift)];
-			dstdata[6] = paldata[dstdata[6] | (srcdata[2] << srcshift)];
-			dstdata[7] = paldata[dstdata[7] | (srcdata[1] << srcshift)];
-			dstdata += 8;
-		}
-		while (dstdata < end)
-		{
-			*dstdata = paldata[*dstdata | (*(srcdata--) << srcshift)];
-			dstdata++;
-		}
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-})
-
-
-
-
 
 DECLARE(drawgfx_core,(
 		mame_bitmap *dest,const gfx_element *gfx,
@@ -5118,9 +4957,7 @@ DECLARE(copybitmap_core,(
 		int dm = dest->rowpixels;												/* dest modulo */
 
 		if (flipx)
-		{
 			sd += src->width -1 -(sx-ox);
-		}
 		else
 			sd += (sx-ox);
 
@@ -5140,14 +4977,6 @@ DECLARE(copybitmap_core,(
 
 			case TRANSPARENCY_PEN_RAW:
 				BLOCKMOVE(NtoN_transpen_noremap,flipx,(sd,sw,sh,sm,dd,dm,transparent_color));
-				break;
-
-			case TRANSPARENCY_BLEND:
-				BLOCKMOVE(NtoN_blend_remap,flipx,(sd,sw,sh,sm,dd,dm,Machine->pens,transparent_color));
-				break;
-
-			case TRANSPARENCY_BLEND_RAW:
-				BLOCKMOVE(NtoN_blend_noremap,flipx,(sd,sw,sh,sm,dd,dm,transparent_color));
 				break;
 
 			default:
