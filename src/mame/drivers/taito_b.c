@@ -85,7 +85,7 @@ List of known B-System games:
     Ryujin                          (YM2610 sound)
 
     Violence Fight                  (YM2203 sound, 1xMSM6295 )
-    Hit The Ice                     (YM2203 sound, 2xMSM6295 )
+    Hit The Ice                     (YM2203 sound, 1xMSM6295 )
     Master of Weapons               (YM2203 sound)
 
     Quiz Sekai wa SHOW by shobai    (YM2610-B sound, MB87078 - electronic volume control)
@@ -1034,24 +1034,13 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hitice_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( viofight_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hitice_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(OKIM6295_data_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2835,11 +2824,11 @@ static MACHINE_DRIVER_START( hitice )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(hitice_readmem,hitice_writemem)
+	MDRV_CPU_PROGRAM_MAP(hitice_readmem, hitice_writemem)
 	MDRV_CPU_VBLANK_INT(hitice_interrupt,1)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(hitice_sound_readmem,hitice_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -2871,10 +2860,6 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_SOUND_ADD(OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_ADD(OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_DRIVER_END
 
 
@@ -3117,7 +3102,7 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_CPU_VBLANK_INT(viofight_interrupt,1)
 
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz verified */
-	MDRV_CPU_PROGRAM_MAP(hitice_sound_readmem, viofight_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(viofight_sound_readmem, viofight_sound_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
