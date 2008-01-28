@@ -8,6 +8,10 @@ driver by Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 Up'n Down, Mister Viking, Flicky, SWAT, Water Match and Bull Fight are known
 to run on IDENTICAL hardware (they were sold by Bally-Midway as ROM swaps).
 
+DIP locations verified from manual for:
+      - wboy
+	  - chplft
+
 TODO: - background is misplaced in wbmlju
       - sprites stick in Pitfall II
       - sprite priorities are probably wrong
@@ -417,13 +421,14 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define DSW1_PORT \
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) \
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW A:1,2,3,4") \
 	PORT_DIPSETTING(	0x07, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(	0x08, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(	0x09, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(	0x05, "2 Coins/1 Credit 5/3 6/4" ) \
+	PORT_DIPSETTING(	0x05, "2 Coins/1 Credit 4/2 5/3 6/4" ) \
 	PORT_DIPSETTING(	0x04, "2 Coins/1 Credit 4/3" ) \
 	PORT_DIPSETTING(	0x0f, DEF_STR( 1C_1C ) ) \
+/*	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
 	PORT_DIPSETTING(	0x03, "1 Coin/1 Credit 5/6" ) \
 	PORT_DIPSETTING(	0x02, "1 Coin/1 Credit 4/5" ) \
 	PORT_DIPSETTING(	0x01, "1 Coin/1 Credit 2/3" ) \
@@ -433,14 +438,14 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x0c, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(	0x0b, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(	0x0a, DEF_STR( 1C_6C ) ) \
-/*  PORT_DIPSETTING(    0x00, "1/1" ) */ \
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) \
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW A:5,6,7,8") \
 	PORT_DIPSETTING(	0x70, DEF_STR( 4C_1C ) ) \
 	PORT_DIPSETTING(	0x80, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(	0x50, "2 Coins/1 Credit 5/3 6/4" ) \
+	PORT_DIPSETTING(	0x50, "2 Coins/1 Credit 4/2 5/3 6/4" ) \
 	PORT_DIPSETTING(	0x40, "2 Coins/1 Credit 4/3" ) \
 	PORT_DIPSETTING(	0xf0, DEF_STR( 1C_1C ) ) \
+/*	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
 	PORT_DIPSETTING(	0x30, "1 Coin/1 Credit 5/6" ) \
 	PORT_DIPSETTING(	0x20, "1 Coin/1 Credit 4/5" ) \
 	PORT_DIPSETTING(	0x10, "1 Coin/1 Credit 2/3" ) \
@@ -450,7 +455,6 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(	0xb0, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(	0xa0, DEF_STR( 1C_6C ) )
-/*  PORT_DIPSETTING(    0x00, "1/1" ) */
 
 /* If you don't like the description, feel free to change it */
 #define DSW0_BIT7 \
@@ -1568,33 +1572,33 @@ static INPUT_PORTS_START( chplft )
 	PORT_START  /* IN0 */
 	IN0_PORT
 
+	PORT_START	  /* DSW0 */
+	DSW1_PORT
+
 	PORT_START  /* DSW1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW B:2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(	0x08, "2" )
 	PORT_DIPSETTING(	0x0c, "3" )
 	PORT_DIPSETTING(	0x04, "4" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPSETTING(	0x10, "20k 70k 120k 170k" )
+	PORT_DIPSETTING(	0x00, "50k 100k 150k 200k" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x00, "20000 70000" )
-	PORT_DIPSETTING(	0x20, "50000 100000" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-
-	PORT_START	  /* DSW0 */
-	DSW1_PORT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( 4dwarrio )
@@ -1831,27 +1835,80 @@ static INPUT_PORTS_START( wboy )
 	DSW1_PORT
 
 	PORT_START  /* DSW0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW B:2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(	0x0c, "3" )
 	PORT_DIPSETTING(	0x08, "4" )
 	PORT_DIPSETTING(	0x04, "5" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(	0x10, "30k 100k 170k 240k" )
 	PORT_DIPSETTING(	0x00, "30k 120k 210k 300k" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW B:8")
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wboy3 )
+	PORT_START  /* IN1 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* down - unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* up - unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+
+	PORT_START  /* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* down - unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* up - unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+
+	PORT_START  /* IN0 */
+	IN0_PORT
+
+	PORT_START	  /* DSW1 */
+	DSW1_PORT
+
+	PORT_START  /* DSW0 */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:1")
+	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW B:2")
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:3,4")
+	PORT_DIPSETTING(	0x0c, "1" )
+	PORT_DIPSETTING(	0x08, "2" )
+	PORT_DIPSETTING(	0x04, "3" )
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:5")
+	PORT_DIPSETTING(	0x10, "30k 100k 170k 240k" )
+	PORT_DIPSETTING(	0x00, "30k 120k 210k 300k" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:6")
+	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:7")
+	PORT_DIPSETTING(	0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1881,27 +1938,27 @@ static INPUT_PORTS_START( wboysys2 )
 	IN0_PORT
 
 	PORT_START  /* DSW0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW B:2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(	0x0c, "3" )
 	PORT_DIPSETTING(	0x08, "4" )
 	PORT_DIPSETTING(	0x04, "5" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(	0x10, "30k 100k 170k 240k" )
 	PORT_DIPSETTING(	0x00, "30k 120k 210k 300k" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -1939,27 +1996,27 @@ static INPUT_PORTS_START( wbdeluxe )
 	DSW1_PORT
 
 	PORT_START  /* DSW0 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW B:1")
 	PORT_DIPSETTING(	0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW B:2")
 	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW B:3,4")
 	PORT_DIPSETTING(	0x0c, "3" )
 	PORT_DIPSETTING(	0x08, "4" )
 	PORT_DIPSETTING(	0x04, "5" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW B:5")
 	PORT_DIPSETTING(	0x10, "30k 100k 170k 240k" )
 	PORT_DIPSETTING(	0x00, "30k 120k 210k 300k" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW B:6")
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW B:7")
 	PORT_DIPSETTING(	0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x80, 0x00, "Energy Consumption" )
+	PORT_DIPNAME( 0x80, 0x00, "Energy Consumption" ) PORT_DIPLOCATION("SW B:8")
 	PORT_DIPSETTING(	0x00, "Slow" )
 	PORT_DIPSETTING(	0x80, "Fast" )
 INPUT_PORTS_END
@@ -4871,7 +4928,7 @@ GAME( 1986, wboy,     0,        system1,  wboy,     wboy,     ROT0,   "Sega (Esc
 GAME( 1986, wboyo,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2,    wboy,     system1,  wboy,     wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,   wboy,     system1,  wboy,     0,        ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy3,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy3,    wboy,     system1,  wboy3,    hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (set 4, 315-5162)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Escape license)", "Wonder Boy (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )

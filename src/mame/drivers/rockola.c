@@ -14,6 +14,11 @@
         * Pioneer Balloon               G-204
         * Nibbler                   G-208
 
+	DIP locations verified from manual for:
+		* Zarzon
+		* Vanguard
+		* Nibbler
+
 ****************************************************************************
 
 Vanguard memory map (preliminary)
@@ -364,6 +369,53 @@ static INPUT_PORTS_START( sasuke )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* connected to a binary counter */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( zarzon )
+	PORT_START  // IN0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+
+	PORT_START	// IN1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x7C, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* music0 playing */
+
+	PORT_START  /* DSW */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0a, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:!2,!4")
+	PORT_DIPSETTING (   0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING (   0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING (   0x02, DEF_STR( 1C_2C ) )
+	/* 0x0a gives 2/1 again */
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING (   0x04, "5000" )
+	PORT_DIPSETTING (   0x00, "10000" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6") /* manual says 4 is the default value */
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x10, "4" )
+	PORT_DIPSETTING (   0x20, "5" )
+	/* 0x30 gives 3 again */
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "RAM Test" ) PORT_DIPLOCATION("SW1:!8") /* unused according to manual */
+	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
+
+	PORT_START  // IN2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* NC */
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* connected to a binary counter */
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( satansat )
 	PORT_START  // IN0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -433,34 +485,29 @@ static INPUT_PORTS_START( vanguard )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START	// DSW0
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x4e, 0x02, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x42, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x48, "1 Coin/2 Credits 2/5" )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x44, "1 Coin/3 Credits 2/7" )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x4c, "1 Coin/6 Credits 2/13" )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
-/*
-    PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x0a, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x40, "1 Coin/1 Credit + Bonus" )
-    PORT_DIPSETTING(    0x46, "1 Coin/1 Credit + Bonus" )
-    PORT_DIPSETTING(    0x4a, "1 Coin/1 Credit + Bonus" )
-    PORT_DIPSETTING(    0x4e, "1 Coin/1 Credit + Bonus" )
-*/
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:!2,!3,!4") /* unused according to manual */
+	PORT_DIPSETTING(    0x00, "25c= 1C/2C 50c= 1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0x02, "25c= 1C/1C 2C/3C 50c= 2C/2C" )
+	PORT_DIPSETTING(    0x04, "25c= 1C/4C 50c= 1C/3C 2C/7C" )
+	PORT_DIPSETTING(    0x06, "25c= 1C/2C 50c= 1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0x08, "25c= 1C/3C 50c= 1C/2C 2C/5C" )
+	PORT_DIPSETTING(    0x0a, "25c= 1C/2C 50c= 1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0x0c, "25c= 1C/7C 50c= 1C/6C 2C/13C" )
+	PORT_DIPSETTING(    0x0e, "25c= 1C/2C 50c= 1C/1C 2C/3C" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 /*  PORT_DIPSETTING(    0x30, "3" ) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, "25c / game" )
+	PORT_DIPSETTING(    0x40, "50c / game" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	// IN2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
@@ -559,26 +606,28 @@ static INPUT_PORTS_START( nibbler )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START	// DSW0
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Pause at Corners" )
+	PORT_DIPNAME( 0x04, 0x00, "Pause at Corners" ) PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(    0xc0, "2C/1C 4C/3C" )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x80, "1C/1C 2C/3C" )
 
 	PORT_START	// IN2
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
@@ -1598,10 +1647,10 @@ ROM_END
 GAME( 1980, sasuke,   0,        sasuke,   sasuke,   0, ROT90, "SNK", "Sasuke vs. Commander", 0 )
 GAME( 1981, satansat, 0,        satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1981, satansaa, satansat, satansat, satansat, 0, ROT90, "SNK", "Satan of Saturn (set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1981, zarzon,   satansat, satansat, satansat, 0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND )
+GAME( 1981, zarzon,   satansat, satansat, zarzon,   0, ROT90, "[SNK] (Taito America license)", "Zarzon", GAME_IMPERFECT_SOUND )
 GAME( 1981, vanguard, 0,        vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (SNK)", 0 )
 GAME( 1981, vangrdce, vanguard, vanguard, vanguard, 0, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", 0 )
-GAME( 1981, vanguarj,  vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 )
+GAME( 1981, vanguarj, vanguard, vanguard, vanguard, 0, ROT90, "SNK", "Vanguard (Japan)", 0 )
 GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (World)", 0 )
 GAME( 1981, fantasyu, fantasy,  fantasy,  fantasy,  0, ROT90, "[SNK] (Rock-Ola license)", "Fantasy (US)", 0 )
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (Japan)", 0 )

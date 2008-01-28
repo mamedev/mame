@@ -163,7 +163,7 @@
  *
  *************************************/
 
-#define MASTER_CLOCK		(19968000)
+#define MASTER_CLOCK		(XTAL_19_968MHz)
 
 #define PIXEL_CLOCK			(MASTER_CLOCK/4*TURBO_X_SCALE)
 

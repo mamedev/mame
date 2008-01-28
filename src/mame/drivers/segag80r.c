@@ -411,30 +411,14 @@ static INPUT_PORTS_START( g80r_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )					/* P1.21 */
 
 	PORT_START_TAG("D3D2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(	0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(	0x00, DEF_STR( On ))
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:5" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:4" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:3" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:2" ) /* Listed as "Unused" (astrob) */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:1" ) /* Listed as "Unused" (astrob) */
 
 	PORT_START_TAG("D1D0")
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW2:8,7,6,5")
@@ -512,7 +496,7 @@ static INPUT_PORTS_START( astrob )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet )) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x08, 0x00, "Demo Speech" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x00, "Demo Speech" ) PORT_DIPLOCATION("SW1:5") /* Listed as "Unused" */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
@@ -533,16 +517,6 @@ static INPUT_PORTS_START( astrob2 )
 	PORT_DIPSETTING(    0x01, "3" )
   //PORT_DIPSETTING(    0x02, "3" )
   //PORT_DIPSETTING(    0x03, "3" )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( astrob1 )
-	PORT_INCLUDE(astrob)
-
-	PORT_MODIFY("D3D2")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown )) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
 
 
@@ -567,11 +541,6 @@ static INPUT_PORTS_START( 005 )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet )) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ))
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:5" )
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:4" )
-	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:3" )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:1" )
 
 	PORT_MODIFY("FC")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -1584,7 +1553,7 @@ static DRIVER_INIT( sindbadm )
 GAME( 1981, astrob,   0,       astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 3)", 0 )
 GAME( 1981, astrob2,  astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2)", 0 )
 GAME( 1981, astrob2a, astrob,  astrob,   astrob2,  astrob,   ROT270, "Sega", "Astro Blaster (version 2a)", 0 )
-GAME( 1981, astrob1,  astrob,  astrob,   astrob1,  astrob,   ROT270, "Sega", "Astro Blaster (version 1)", GAME_NOT_WORKING )
+GAME( 1981, astrob1,  astrob,  astrob,   astrob,   astrob,   ROT270, "Sega", "Astro Blaster (version 1)", GAME_NOT_WORKING )
 GAME( 1981, 005,      0,       005,      005,      005,      ROT270, "Sega", "005", GAME_IMPERFECT_SOUND )
 
 /* basic G-80 system with individual background boards */
