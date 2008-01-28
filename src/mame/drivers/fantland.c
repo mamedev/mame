@@ -1,4 +1,4 @@
-/***************************************************************************
+/***************************************************************************************
 
                       -= Electronic Devices / International Games =-
 
@@ -12,8 +12,9 @@ Video   :   2 x I.G.1BB 48844758V
 ----------------------------------------------------------------------------------------
 Year + Game             Main CPU    Sound CPU    Sound            Video
 ----------------------------------------------------------------------------------------
->=1987  Born To Fight   8086?       8086?        YM2151 + DAC     ?
->=1987  Fantasy Land    V20         8088         4 x MSM5205      2 x I.G.1BB 48844758V
+>=1987  Born To Fight   V20         8088         4 x MSM5205      2 x I.G.1BB 48844758V
+>=1987  Fantasy Land    8086?       8086?        YM2151 + DAC     ?
+1988?   Wheels Runner   V20         Z80          YM3526 + ?       2 x PLCC84 FPGA
 1989    Galaxy Gunners  8086?       8086?        YM2151           ?
 ----------------------------------------------------------------------------------------
 
@@ -35,11 +36,17 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 - Verify sound. Also speech is a bit garbled / low volume (rom 15)
 - Trackball controls don't work well
 
-***************************************************************************/
+[wheelrun]
+
+- On a car hit / crash the game tries to produce sound through ports b000 & c000,
+  probably connected to the EP1210. This is not emulated.
+
+***************************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/2151intf.h"
+#include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 
@@ -109,22 +116,19 @@ static WRITE16_HANDLER( spriteram2_16_w )
 		spriteram_2[2*offset+1] = data >> 8;
 }
 
-static ADDRESS_MAP_START( fantland_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0xa4000, 0xa67ff) AM_READ(spriteram_16_r			)	// not actually read
-	AM_RANGE(0xc0000, 0xcffff) AM_READ(spriteram2_16_r			)	// ""
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA16_ROM			)
-ADDRESS_MAP_END
+static ADDRESS_MAP_START( fantland_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
+	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
-static ADDRESS_MAP_START( fantland_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa2000, 0xa21ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16 )
-	AM_RANGE(0xa3000, 0xa3001) AM_READ(input_port_0_word_r	)
-	AM_RANGE(0xa3002, 0xa3003) AM_READ(input_port_1_word_r	)
-	AM_RANGE(0xa3000, 0xa3001) AM_WRITE(fantland_nmi_enable_16_w)
-	AM_RANGE(0xa3002, 0xa3003) AM_WRITE(fantland_soundlatch_16_w)
-	AM_RANGE(0xa4000, 0xa67ff) AM_WRITE(spriteram_16_w) AM_BASE((UINT16 **)&spriteram)
-	AM_RANGE(0xc0000, 0xcffff) AM_WRITE(spriteram2_16_w) AM_BASE((UINT16 **)&spriteram_2)
+	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE( &paletteram16 )
+
+	AM_RANGE( 0xa3000, 0xa3001 ) AM_READWRITE( input_port_0_word_r, fantland_nmi_enable_16_w )
+	AM_RANGE( 0xa3002, 0xa3003 ) AM_READWRITE( input_port_1_word_r, fantland_soundlatch_16_w )
+
+	AM_RANGE( 0xa4000, 0xa67ff ) AM_READWRITE( spriteram_16_r,  spriteram_16_w  ) AM_BASE( (UINT16 **)&spriteram   )
+	AM_RANGE( 0xc0000, 0xcffff ) AM_READWRITE( spriteram2_16_r, spriteram2_16_w ) AM_BASE( (UINT16 **)&spriteram_2 )
+
+	AM_RANGE( 0xe0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -132,27 +136,22 @@ ADDRESS_MAP_END
                                 Galaxy Gunners
 ***************************************************************************/
 
-static ADDRESS_MAP_START( galaxygn_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ(MRA8_RAM			)
-	AM_RANGE(0x10000, 0x2ffff) AM_READ(MRA8_ROM			)
-	AM_RANGE(0x52000, 0x521ff) AM_READ(MRA8_RAM			)	// not actually read
-	AM_RANGE(0x53000, 0x53000) AM_READ(input_port_0_r	)
-	AM_RANGE(0x53001, 0x53001) AM_READ(input_port_1_r	)
-	AM_RANGE(0x53002, 0x53002) AM_READ(input_port_2_r	)
-	AM_RANGE(0x53003, 0x53003) AM_READ(input_port_3_r	)
-	AM_RANGE(0x54000, 0x567ff) AM_READ(MRA8_RAM			)	// not actually read
-	AM_RANGE(0x60000, 0x6ffff) AM_READ(MRA8_RAM			)	// ""
-	AM_RANGE(0x70000, 0x7ffff) AM_READ(MRA8_ROM			)
-	AM_RANGE(0xf0000, 0xfffff) AM_READ(MRA8_ROM			)
-ADDRESS_MAP_END
+static ADDRESS_MAP_START( galaxygn_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
+	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-static ADDRESS_MAP_START( galaxygn_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE(MWA8_RAM					)
-	AM_RANGE(0x52000, 0x521ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram	)
-	AM_RANGE(0x53000, 0x53000) AM_WRITE(fantland_nmi_enable_w	)
-	AM_RANGE(0x53002, 0x53002) AM_WRITE(fantland_soundlatch_w	)
-	AM_RANGE(0x54000, 0x567ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram	)
-	AM_RANGE(0x60000, 0x6ffff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2	)
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+
+	AM_RANGE( 0x53000, 0x53000 ) AM_READWRITE( input_port_0_r, fantland_nmi_enable_w )
+	AM_RANGE( 0x53001, 0x53001 ) AM_READ( input_port_1_r )
+	AM_RANGE( 0x53002, 0x53002 ) AM_READWRITE( input_port_2_r, fantland_soundlatch_w )
+	AM_RANGE( 0x53003, 0x53003 ) AM_READ( input_port_3_r)
+
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE( &spriteram )
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE( &spriteram_2 )
+
+	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
+	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -216,31 +215,52 @@ static READ8_HANDLER( borntofi_inputs_r )
 	return ret[offset];
 }
 
-static ADDRESS_MAP_START( borntofi_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_READ( MRA8_RAM			)
-	AM_RANGE(0x10000, 0x2ffff) AM_READ( MRA8_ROM			)
-//  AM_RANGE(0x52000, 0x521ff) AM_READ( MRA8_RAM            )   // not actually read
-	AM_RANGE(0x53000, 0x53001) AM_READ( borntofi_inputs_r	)
-	AM_RANGE(0x53002, 0x53002) AM_READ( input_port_6_r		)
-	AM_RANGE(0x53003, 0x53003) AM_READ( input_port_7_r		)
-//  AM_RANGE(0x54000, 0x567ff) AM_READ( MRA8_RAM            )   // not actually read
-	AM_RANGE(0x57000, 0x57000) AM_READ( input_port_8_r		)
-	AM_RANGE(0x57001, 0x57001) AM_READ( input_port_9_r		)
-	AM_RANGE(0x57002, 0x57002) AM_READ( input_port_10_r		)
-	AM_RANGE(0x57003, 0x57003) AM_READ( input_port_11_r		)
-//  AM_RANGE(0x60000, 0x6ffff) AM_READ( MRA8_RAM            )   // not actually read
-	AM_RANGE(0x70000, 0x7ffff) AM_READ( MRA8_ROM			)
-	AM_RANGE(0xf0000, 0xfffff) AM_READ( MRA8_ROM			)
+static ADDRESS_MAP_START( borntofi_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
+	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
+
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE( borntofi_inputs_r, borntofi_nmi_enable_w )
+	AM_RANGE( 0x53002, 0x53002 ) AM_READWRITE( input_port_6_r,    fantland_soundlatch_w )
+	AM_RANGE( 0x53003, 0x53003 ) AM_READ( input_port_7_r )
+
+	AM_RANGE( 0x54000, 0x567ff ) AM_RAM AM_BASE( &spriteram )
+
+	AM_RANGE( 0x57000, 0x57000 ) AM_READ( input_port_8_r  )
+	AM_RANGE( 0x57001, 0x57001 ) AM_READ( input_port_9_r  )
+	AM_RANGE( 0x57002, 0x57002 ) AM_READ( input_port_10_r )
+	AM_RANGE( 0x57003, 0x57003 ) AM_READ( input_port_11_r )
+
+	AM_RANGE( 0x60000, 0x6ffff ) AM_RAM AM_BASE( &spriteram_2 )
+
+	AM_RANGE( 0x70000, 0x7ffff ) AM_ROM
+	AM_RANGE( 0xf0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( borntofi_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_WRITE( MWA8_RAM						)
-	AM_RANGE(0x52000, 0x521ff) AM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
-	AM_RANGE(0x53000, 0x53000) AM_WRITE( borntofi_nmi_enable_w			)
-	AM_RANGE(0x53002, 0x53002) AM_WRITE( fantland_soundlatch_w			)
-	AM_RANGE(0x54000, 0x567ff) AM_WRITE( MWA8_RAM						) AM_BASE(&spriteram	)
-	AM_RANGE(0x60000, 0x6ffff) AM_WRITE( MWA8_RAM						) AM_BASE(&spriteram_2	)
+
+/***************************************************************************
+                           Wheels Runner
+***************************************************************************/
+
+static ADDRESS_MAP_START( wheelrun_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+
+	AM_RANGE(0x30000, 0x3ffff) AM_ROM
+	AM_RANGE(0x70000, 0x7ffff) AM_ROM
+
+	AM_RANGE(0x52000, 0x521ff) AM_READWRITE(MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
+
+	AM_RANGE(0x53000, 0x53000) AM_READWRITE( input_port_0_r, borntofi_nmi_enable_w )
+	AM_RANGE(0x53001, 0x53001) AM_READ( input_port_1_r )
+	AM_RANGE(0x53002, 0x53002) AM_READWRITE( input_port_2_r, fantland_soundlatch_w )
+	AM_RANGE(0x53003, 0x53003) AM_READWRITE( input_port_3_r, MWA8_NOP)
+
+	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_BASE(&spriteram	)
+	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_BASE(&spriteram_2	)
+
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
+
 
 
 /***************************************************************************
@@ -249,27 +269,17 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( fantland_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x80000, 0x9ffff) AM_READ(MRA8_ROM	)
-	AM_RANGE(0xc0000, 0xfffff) AM_READ(MRA8_ROM	)
+static ADDRESS_MAP_START( fantland_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x01fff ) AM_RAM
+	AM_RANGE( 0x80000, 0x9ffff ) AM_ROM
+	AM_RANGE( 0xc0000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantland_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_WRITE(MWA8_RAM	)
-	AM_RANGE(0x80000, 0x9ffff) AM_WRITE(MWA8_ROM	)
-	AM_RANGE(0xc0000, 0xfffff) AM_WRITE(MWA8_ROM	)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fantland_sound_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0080, 0x0080) AM_READ(soundlatch_r				)
-	AM_RANGE(0x0101, 0x0101) AM_READ(YM2151_status_port_0_r	)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fantland_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0100, 0x0100) AM_WRITE(YM2151_register_port_0_w	)
-	AM_RANGE(0x0101, 0x0101) AM_WRITE(YM2151_data_port_0_w		)
-	AM_RANGE(0x0180, 0x0180) AM_WRITE(DAC_0_data_w				)
+static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
+	AM_RANGE( 0x0100, 0x0100 ) AM_WRITE( YM2151_register_port_0_w )
+	AM_RANGE( 0x0101, 0x0101 ) AM_READWRITE( YM2151_status_port_0_r, YM2151_data_port_0_w )
+	AM_RANGE( 0x0180, 0x0180 ) AM_WRITE( DAC_0_data_w )
 ADDRESS_MAP_END
 
 
@@ -358,16 +368,29 @@ static void borntofi_adpcm_int(int voice)
 	}
 }
 
-static ADDRESS_MAP_START( borntofi_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x003ff) AM_READ( MRA8_RAM		)
-	AM_RANGE(0x04000, 0x04000) AM_READ( soundlatch_r	)
-	AM_RANGE(0x08000, 0x0ffff) AM_READ( MRA8_ROM		)
-	AM_RANGE(0xf8000, 0xfffff) AM_READ( MRA8_ROM		)
+static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
+	AM_RANGE( 0x04000, 0x04000 ) AM_READ( soundlatch_r	)
+	AM_RANGE( 0x04000, 0x0401f ) AM_WRITE( borntofi_msm5205_w )
+	AM_RANGE( 0x08000, 0x0ffff ) AM_ROM
+	AM_RANGE( 0xf8000, 0xfffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( borntofi_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x003ff) AM_WRITE( MWA8_RAM			)
-	AM_RANGE(0x04000, 0x0401f) AM_WRITE( borntofi_msm5205_w	)
+
+/***************************************************************************
+                           Wheels Runner
+***************************************************************************/
+
+static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE( YM3526_status_port_0_r, YM3526_control_port_0_w )
+	AM_RANGE(0xa001, 0xa001) AM_WRITE( YM3526_write_port_0_w )
+
+	AM_RANGE(0xb000, 0xb000) AM_WRITE( MWA8_NOP )	// on a car crash / hit
+	AM_RANGE(0xc000, 0xc000) AM_WRITE( MWA8_NOP )	// ""
+
+	AM_RANGE(0xd000, 0xd000) AM_READ( soundlatch_r )	// during NMI
 ADDRESS_MAP_END
 
 
@@ -386,22 +409,22 @@ static INPUT_PORTS_START( fantland )
 	PORT_START	/* IN0 - a3000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1			)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1			)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1			)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2			)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1		)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2		)
 
 	/* IN1 - a3001 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2			)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2			)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP		) PORT_PLAYER(2)	// used in test mode only
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_PLAYER(2)	// used in test mode only
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1			) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2			) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1		) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2		) PORT_PLAYER(2)
 
 	PORT_START	/* IN2 - a3002 */
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
@@ -667,6 +690,81 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+                           Wheels Runner
+***************************************************************************/
+
+static CUSTOM_INPUT( wheelrun_wheel_r )
+{
+	int player = (FPTR)param;
+	int delta = readinputport(4 + player);
+	delta = (delta & 0x7f) - (delta & 0x80) + 4;
+
+	if		(delta > 7)	delta = 7;
+	else if	(delta < 1)	delta = 1;
+
+//	if (player == 0)	popmessage("%x",delta);
+	return delta;
+}
+
+static INPUT_PORTS_START( wheelrun )
+	PORT_START	/* IN0 - 53000 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1	)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wheelrun_wheel_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+
+	PORT_START	/* IN1 - 53001 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN2	)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wheelrun_wheel_r, 1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN	)
+
+	PORT_START	/* IN2 - 53002 */
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START	/* IN3 - 53003 */
+	PORT_DIPNAME( 0xff, 0xdf, "Wheel Sensitivity" )
+	PORT_DIPSETTING(    0x7f, "0" )
+	PORT_DIPSETTING(    0xbf, "1" )
+	PORT_DIPSETTING(    0xdf, "2" )
+	PORT_DIPSETTING(    0xef, "3" )
+	PORT_DIPSETTING(    0xf7, "4" )
+	PORT_DIPSETTING(    0xfb, "5" )
+	PORT_DIPSETTING(    0xfd, "6" )
+	PORT_DIPSETTING(    0xfe, "7" )
+
+	PORT_START	/* IN4 */
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+	PORT_START	/* IN5 */
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+/***************************************************************************
 
                             Graphics Layouts
 
@@ -712,13 +810,13 @@ static INTERRUPT_GEN( fantland_sound_irq )
 static MACHINE_DRIVER_START( fantland )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8086, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_readmem, fantland_writemem)
+	MDRV_CPU_PROGRAM_MAP(fantland_map, 0)
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
 	MDRV_CPU_ADD(I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_sound_readmem, fantland_sound_writemem)
-	MDRV_CPU_IO_MAP(fantland_sound_readport,fantland_sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
+	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
 	MDRV_CPU_PERIODIC_INT(fantland_sound_irq, 8000)
 	// NMI when soundlatch is written
 
@@ -764,13 +862,13 @@ static const struct YM2151interface galaxygn_ym2151_interface =
 static MACHINE_DRIVER_START( galaxygn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(galaxygn_readmem, galaxygn_writemem)
+	MDRV_CPU_PROGRAM_MAP(galaxygn_map, 0)
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
 	MDRV_CPU_ADD(I8088, 8000000)        // ?
-	MDRV_CPU_PROGRAM_MAP(fantland_sound_readmem, fantland_sound_writemem)
-	MDRV_CPU_IO_MAP(fantland_sound_readport,fantland_sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(fantland_sound_map, 0)
+	MDRV_CPU_IO_MAP(fantland_sound_iomap, 0)
 	// IRQ by YM2151, NMI when soundlatch is written
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -818,12 +916,12 @@ static MACHINE_RESET( borntofi )
 static MACHINE_DRIVER_START( borntofi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
-	MDRV_CPU_PROGRAM_MAP(borntofi_readmem, borntofi_writemem)
+	MDRV_CPU_PROGRAM_MAP(borntofi_map, 0)
 	MDRV_CPU_VBLANK_INT(fantland_irq,1)
 
 	/* audio CPU */
 	MDRV_CPU_ADD(I8088, 18432000/3)        // 8088 - AMD P8088-2 CPU, running at 6.144MHz [18.432/3]
-	MDRV_CPU_PROGRAM_MAP(borntofi_sound_readmem, borntofi_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(borntofi_sound_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(54)	// 54 Hz
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -848,6 +946,53 @@ static MACHINE_DRIVER_START( borntofi )
 	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD(MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+
+
+static void wheelrun_ym3526_irqhandler(int state)
+{
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, state);
+}
+
+static const struct YM3526interface wheelrun_ym3526_interface =
+{
+	wheelrun_ym3526_irqhandler
+};
+
+static MACHINE_DRIVER_START( wheelrun )
+	/* basic machine hardware */
+	MDRV_CPU_ADD(V20, XTAL_18MHz/2)		// D701080C-8 (V20)
+	MDRV_CPU_PROGRAM_MAP(wheelrun_map, 0)
+	MDRV_CPU_VBLANK_INT(fantland_irq,1)
+
+	/* audio CPU */
+	MDRV_CPU_ADD(Z80, XTAL_18MHz/2)		// Z8400BB1 (Z80B)
+	MDRV_CPU_PROGRAM_MAP(wheelrun_sound_map, 0)
+	// IRQ by YM3526, NMI when soundlatch is written
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_RESET(fantland)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256,224)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MDRV_GFXDECODE(fantland)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_VIDEO_UPDATE(fantland)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM3526, XTAL_14MHz/4)
+	MDRV_SOUND_CONFIG(wheelrun_ym3526_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -1118,7 +1263,91 @@ ROM_START( borntofi )
 	ROMX_LOAD( "63.bin",  0x1b0000, 0x10000, CRC(5f530559) SHA1(d1d3edc2082985ccec9fe8ca0b27810623cb5b89), ROM_SKIP(2) )
 ROM_END
 
-GAME( 19??, borntofi, 0,        borntofi, borntofi, 0, ROT0,  "International Games",      "Born To Fight"       , 0 )
-GAME( 19??, fantland, 0,        fantland, fantland, 0, ROT0,  "Electronic Devices Italy", "Fantasy Land (set 1)", 0 )
-GAME( 19??, fantlnda, fantland, fantland, fantland, 0, ROT0,  "Electronic Devices Italy", "Fantasy Land (set 2)", 0 )
-GAME( 1989, galaxygn, 0,        galaxygn, galaxygn, 0, ROT90, "Electronic Devices Italy", "Galaxy Gunners"      , 0 )
+/***************************************************************************
+
+Wheels Runner by International Games
+
+PCB:
+(revision 8801)
+
+1x NEC D70108C-8 (NEC V20)
+1x SGS Z8400BB1 (Z80B)
+1x YM3526 (sound)
+1x Y3014B (DAC)
+1x LM324A (sound)
+1x TDA2002 (sound)
+1x oscillator 18.000
+1x oscillator 14.000
+1x ALTERA EP1210PC
+2x INGA (black quad chips with 84 legs, maybe FPGA)
+
+ROMs:
+
+15x M27512
+3x PAL16R6CN (read protected)
+2x PAL20L8aCNS (read protected)
+5x TIBPAL16l8-25CN (read protected)
+4x TIBPAL16r4-25CN (read protected)
+1x TIBPAL16r8-25CN (read protected)
+eprom location 2,5,6 are empty
+
+Notes:
+
+1x JAMMA edge connector
+1x trimmer (volume)
+2x 8 bit dip switch
+
+Hardware info by f205v
+
+***************************************************************************/
+
+ROM_START( wheelrun )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 ) // V20
+	ROM_LOAD( "4.4", 0x30000, 0x10000, CRC(359303df) SHA1(583b70f65b775e99856ffda61334be3b85046ed1) )
+	ROM_LOAD( "3.3", 0x70000, 0x10000, CRC(c28d0b31) SHA1(add8c4ffe529755c101b72a3b0530e796948876b) )
+	ROM_COPY( REGION_CPU1, 0x70000, 0xf0000, 0x10000 )
+
+	ROM_REGION( 0x100000, REGION_CPU2, 0 ) // Z80
+	ROM_LOAD( "1.1", 0x00000, 0x10000, CRC(67b5f31f) SHA1(5553b132077686221fb7a21a0246fd55cb443332) )	// 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0xc0000, REGION_GFX1,0 ) // gfx
+	ROMX_LOAD( "7.7",   0x00000, 0x10000, CRC(e0e5ff64) SHA1(e2ed5ea5b75ed627a9d305864196160267cad438), ROM_SKIP(2) )
+	ROMX_LOAD( "11.11", 0x00001, 0x10000, CRC(ce9718fb) SHA1(ade47deedd5d0c927fdf8626aa1b0fac470f03a0), ROM_SKIP(2) )
+	ROMX_LOAD( "15.15", 0x00002, 0x10000, CRC(f6665f31) SHA1(e308a049697622bcda9d3c630e061d30c2b70687), ROM_SKIP(2) )
+
+	ROMX_LOAD( "8.8",   0x30000, 0x10000, CRC(fa1ec091) SHA1(bd436788651fc2f679897ccd0f7ec51014eb9e90), ROM_SKIP(2) )
+	ROMX_LOAD( "12.12", 0x30001, 0x10000, CRC(8923dce4) SHA1(a8f8aeb6f214454c6125a36043aebdf7cc79c253), ROM_SKIP(2) )
+	ROMX_LOAD( "16.16", 0x30002, 0x10000, CRC(49801733) SHA1(4d8f79afbb5bf33787ad437d04b95a17e4008894), ROM_SKIP(2) )
+
+	ROMX_LOAD( "9.9",   0x60000, 0x10000, CRC(9fea30d0) SHA1(308caa360f556e085ce05f35e26856d6944b03af), ROM_SKIP(2) )
+	ROMX_LOAD( "13.13", 0x60001, 0x10000, CRC(8b0aae8d) SHA1(413821fdbf599004b57f3588360ccf881547e104), ROM_SKIP(2) )
+	ROMX_LOAD( "17.17", 0x60002, 0x10000, CRC(be8ab48d) SHA1(1520d70eb9c65f84deddc2d7c8de7ae2cbb1ec09), ROM_SKIP(2) )
+
+	ROMX_LOAD( "10.10", 0x90000, 0x10000, CRC(c5bdd367) SHA1(c432762d23b8799643fd5f1775a44d31582e7290), ROM_SKIP(2) )	// 1111xxxxxxxxxxxx = 0x00
+	ROMX_LOAD( "14.14", 0x90001, 0x10000, CRC(e592302f) SHA1(d4f668d259ec649e3126db27d990a2e5fa9cad8d), ROM_SKIP(2) )
+	ROMX_LOAD( "18.18", 0x90002, 0x10000, CRC(6bd42d8e) SHA1(0745428a54da85707d4435f20cc2094576a95e5b), ROM_SKIP(2) )	// 1111xxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x144, REGION_PLDS,0 ) // pals
+	ROM_LOAD( "pal16r6cn.pal3",        0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r6cn.pal4",        0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal16r6cn.pal5",        0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8-25cn.pal1",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8-25cn.pal13", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8-25cn.pal14", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8-25cn.pal7",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16l8-25cn.pal8",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16r4-25cn.pal10", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16r4-25cn.pal15", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16r4-25cn.pal6",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16r4-25cn.pal9",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "tibpal16r8-25cn.pal2",  0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "pal20l8acns.pal11",     0x000, 0x144, NO_DUMP )
+	ROM_LOAD( "pal20l8acns.pal12",     0x000, 0x144, NO_DUMP )
+ROM_END
+
+
+GAME( 19??, borntofi, 0,        borntofi, borntofi, 0, ROT0,  "International Games",       "Born To Fight",        0 )
+GAME( 19??, fantland, 0,        fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", 0 )
+GAME( 19??, fantlnda, fantland, fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", 0 )
+GAME( 19??, wheelrun, 0,        wheelrun, wheelrun, 0, ROT0,  "International Games",       "Wheels Runner",        0 )
+GAME( 1989, galaxygn, 0,        galaxygn, galaxygn, 0, ROT90, "Electronics Devices Italy", "Galaxy Gunners",       GAME_IMPERFECT_SOUND )

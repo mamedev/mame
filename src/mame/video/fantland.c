@@ -1,4 +1,4 @@
-/***************************************************************************
+/***************************************************************************************
 
                       -= Electronic Devices / International Games =-
 
@@ -7,7 +7,7 @@
     This game has sprites only:
 
     tiles are 16 x 16 x 6. There are 0x400 sprites, each one is allotted
-    8 bytes of memory in spriteram (but only 5 are used) :
+    8 bytes of memory (but only 5 are used) in spriteram (0x54000):
 
     Offset:     Bits:           Value:
 
@@ -28,8 +28,8 @@
 
     Then 2 tables follow, 0x400 bytes each:
 
-    - the first table contains 1 byte per sprite: an index in the second table
-    - the second table is either an x,y offset or an index in spriteram_2:
+    - the first table  (0x56000) contains 1 byte per sprite: an index in the second table
+    - the second table (0x56400) is either an x,y offset or an index in spriteram_2 (0x60000):
 
         0                       X offset (low bits)
 
@@ -47,14 +47,16 @@
 
         0                       Y offset (low bits)
 
-        1       7654 321-       Code offset
+        1       7--- ----       Flip X (xor with that in spriteram)
+				-6-- ----       Flip Y ""
+				--54 321-       Code offset
                 ---- ---0       Y offset (high bit)
 
         2                       X offset (low bits)
 
         3                       X offset (high bit)
 
-***************************************************************************/
+***************************************************************************************/
 
 #include "driver.h"
 
@@ -64,6 +66,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			*offs_ram	=	spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2
 			*ram		=	spriteram,			// current sprite pointer in spriteram
 			*ram2		=	indx_ram;			// current sprite pointer in indx_ram
+
+	// wheelrun is the only game with a smaller visible area
+	int special = (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1) < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)
 	{
@@ -76,8 +81,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		y		=	ram[4];
 
 		color	=	(attr & 0x03);
-		flipy	=	(attr & 0x10);
-		flipx	=	(attr & 0x20);
+		flipy	=	(attr & 0x10) ? 1 : 0;
+		flipx	=	(attr & 0x20) ? 1 : 0;
 
 		y		+=	(attr & 0x40) << 2;
 		x		+=	(attr & 0x80) << 1;
@@ -97,7 +102,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			yoffs	=	spriteram_2[idx + 0] + (spriteram_2[idx + 1] << 8);
 			xoffs	=	spriteram_2[idx + 2] + (spriteram_2[idx + 3] << 8);
 
-			code	+=	yoffs >> 9;
+			code	+=	(yoffs & 0x3e00) >> 9;
+			flipy	^=	(yoffs & 0x4000) ? 1 : 0;
+			flipx	^=	(yoffs & 0x8000) ? 1 : 0;
 		}
 		else
 		{
@@ -107,13 +114,17 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			xoffs	=	((offs_ram[idx + 2] & 0x01) << 8) + offs_ram[idx + 0];
 		}
 
-		yoffs		=	(yoffs & 0xff) - (yoffs & 0x100);
-		xoffs		=	(xoffs & 0x1ff);
+		yoffs	=	(yoffs & 0xff) - (yoffs & 0x100);
+		xoffs	=	(xoffs & 0x1ff);
 
 		if (xoffs >= 0x180)		xoffs -= 0x200;
 
 		y		+=	yoffs;
 		x		+=	xoffs;
+
+		// wheelrun needs y=0xf0 & yoffs=0x50 to be rendered at screen y 0x40
+		if (special && y > 0)
+			y &= 0xff;
 
 		y		=	(y & 0xff) - (y & 0x100);
 		x		=	(x & 0x1ff);

@@ -7346,6 +7346,7 @@ Other Sun games
 	DRIVER( stlforce )	/* (c) 1994 Electronic Devices (Italy) / Ecogames S.L. (Spain) */
 	DRIVER( fantland )	/* (c) 198? Electronic Devices Italy */
 	DRIVER( fantlnda )	/* (c) 198? Electronic Devices Italy */
+	DRIVER( wheelrun )	/* (c) 1988? International Games */
 	DRIVER( galaxygn )	/* (c) 1989 Electronic Devices Italy */
 	DRIVER( borntofi )	/* (c) International Games? */
 	DRIVER( diverboy )	/* (c) 1992 Electronic Devices */
