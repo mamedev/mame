@@ -1,67 +1,61 @@
 /***************************************************************************
 
-Moon Patrol memory map
+	Irem M52 hardware
 
-driver by Nicola Salmoria
+****************************************************************************
 
-0000-3fff ROM
-8000-83ff Video RAM
-8400-87ff Color RAM
-e000-e7ff RAM
+	Moon Patrol memory map
+
+	driver by Nicola Salmoria
+
+	0000-3fff ROM
+	8000-83ff Video RAM
+	8400-87ff Color RAM
+	e000-e7ff RAM
 
 
-read:
-8800      protection
-d000      IN0
-d001      IN1
-d002      IN2
-d003      DSW1
-d004      DSW2
+	read:
+	8800      protection
+	d000      IN0
+	d001      IN1
+	d002      IN2
+	d003      DSW1
+	d004      DSW2
 
-write:
-c800-c8ff sprites
-d000      sound command
-d001      flip screen
+	write:
+	c800-c8ff sprites
+	d000      sound command
+	d001      flip screen
 
-I/O ports
-write:
-10-1f     scroll registers
-40        background #1 x position
-60        background #1 y position
-80        background #2 x position
-a0        background #2 y position
-c0        background control
+	I/O ports
+	write:
+	10-1f     scroll registers
+	40        background #1 x position
+	60        background #1 y position
+	80        background #2 x position
+	a0        background #2 y position
+	c0        background control
 
-NOTE: It may be possible to remove the fake port now that conditional DIPS
-are supported. What should really be filled in for each mode?
+	NOTE: It may be possible to remove the fake port now that conditional DIPS
+	are supported. What should really be filled in for each mode?
+
 ***************************************************************************/
 
 #include "driver.h"
+#include "m52.h"
 #include "audio/irem.h"
 #include "cpu/z80/z80.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
-#define SOUND_CLOCK			XTAL_3_579545MHz
 
 
 
-READ8_HANDLER( mpatrol_protection_r );
-WRITE8_HANDLER( mpatrol_scroll_w );
-WRITE8_HANDLER( mpatrol_bg1xpos_w );
-WRITE8_HANDLER( mpatrol_bg1ypos_w );
-WRITE8_HANDLER( mpatrol_bg2xpos_w );
-WRITE8_HANDLER( mpatrol_bg2ypos_w );
-WRITE8_HANDLER( mpatrol_bgcontrol_w );
-WRITE8_HANDLER( mpatrol_flipscreen_w );
-WRITE8_HANDLER( mpatrol_videoram_w );
-WRITE8_HANDLER( mpatrol_colorram_w );
-
-PALETTE_INIT( mpatrol );
-VIDEO_START( mpatrol );
-VIDEO_UPDATE( mpatrol );
-
-
+/*************************************
+ *
+ *  Custom input ports
+ *
+ *************************************/
 
 static CUSTOM_INPUT( coin_mode )
 {
@@ -80,12 +74,12 @@ static CUSTOM_INPUT( coin_mode )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, mpatrol_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, mpatrol_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(mpatrol_protection_r)
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, m52_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, m52_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(m52_protection_r)
 	AM_RANGE(0xc800, 0xcbff) AM_MIRROR(0x0400) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07fc) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07fc) AM_WRITE(m52_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x07f8) AM_READ_PORT("IN0")
 	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")
 	AM_RANGE(0xd002, 0xd002) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")
@@ -97,11 +91,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alpha1v_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, mpatrol_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, mpatrol_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, m52_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, m52_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) AM_SHARE(1) // bigger or mirrored?
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0") AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(mpatrol_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1") AM_WRITE(m52_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW1")
@@ -111,12 +105,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(mpatrol_scroll_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg1xpos_w)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg1ypos_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg2xpos_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bg2ypos_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(mpatrol_bgcontrol_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(m52_scroll_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(m52_bg1xpos_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_WRITE(m52_bg1ypos_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(m52_bg2xpos_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(m52_bg2ypos_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(m52_bgcontrol_w)
 ADDRESS_MAP_END
 
 
@@ -328,7 +322,7 @@ static const gfx_layout bgcharlayout =
 };
 
 
-static GFXDECODE_START( mpatrol )
+static GFXDECODE_START( m52 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,                0, 128 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,          128*4,  16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, bgcharlayout, 128*4+16*4+0*4,   1 )
@@ -344,7 +338,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( mpatrol )
+static MACHINE_DRIVER_START( m52 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
@@ -354,25 +348,24 @@ static MACHINE_DRIVER_START( mpatrol )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(mpatrol)
-	MDRV_PALETTE_LENGTH(512+32+32)
-	MDRV_COLORTABLE_LENGTH(128*4+16*4+3*4)
+	MDRV_GFXDECODE(m52)
+	MDRV_PALETTE_LENGTH(128*4+16*4+3*4)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
-	MDRV_PALETTE_INIT(mpatrol)
-	MDRV_VIDEO_START(mpatrol)
-	MDRV_VIDEO_UPDATE(mpatrol)
+	MDRV_PALETTE_INIT(m52)
+	MDRV_VIDEO_START(m52)
+	MDRV_VIDEO_UPDATE(m52)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(irem_audio)
+	MDRV_IMPORT_FROM(m52_small_audio)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( alpha1v )
-	MDRV_IMPORT_FROM(mpatrol)
+	MDRV_IMPORT_FROM(m52)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
@@ -394,8 +387,8 @@ ROM_START( mpatrol )
 	ROM_LOAD( "mpa-3.3k",      0x2000, 0x1000, CRC(2e1a598c) SHA1(112c3c9678db8a8540a8df3708020c87fd10c91b) )
 	ROM_LOAD( "mpa-4.3j",      0x3000, 0x1000, CRC(dd05b587) SHA1(727961b0dafa4a96b580d51013336db2a18aff1e) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mp-s1.1a",     0xf000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mpe-5.3e",     0x0000, 0x1000, CRC(e3ee7f75) SHA1(b03d0d56150d3e9da4a4c871338097b4f450b649) )       /* chars */
@@ -428,8 +421,8 @@ ROM_START( mpatrolw )
 	ROM_LOAD( "mpa-3w.3k",    0x2000, 0x1000, CRC(9b249fe5) SHA1(c01e0d572c4c163f3cf4b2aa9f4246427811b78d) )
 	ROM_LOAD( "mpa-4w.3j",    0x3000, 0x1000, CRC(fee76972) SHA1(c3166b027f89f61964ead804d3c2da387454c4c2) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mp-s1.1a",     0xf000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "mp-s1.1a",     0x7000, 0x1000, CRC(561d3108) SHA1(4998c68a9e9a8002251fa8f07aa1082444a9dc80) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mpe-5w.3e",    0x0000, 0x1000, CRC(f56e01fe) SHA1(93f582d63b9cd5c6dca207aa57b213c939cdda1d) )       /* chars */
@@ -466,8 +459,8 @@ ROM_START( alpha1v )
 	ROM_LOAD( "7-f3",      0x5000, 0x1000, CRC(99db9781) SHA1(a56a675cc4cbc9681bfe8052f51f19336eb2a0a6) )
 	ROM_LOAD( "7a e3",     0x6000, 0x1000, CRC(3b0b4b0d) SHA1(0d8eea1e2db269943611289b3490a578ee347f85) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "1-a1",      0xf000, 0x1000, CRC(9e07fdd5) SHA1(ed4f462fcfe91fa8e88bfeaaba0a0c11fa0b4601) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "1-a1",      0x7000, 0x1000, CRC(9e07fdd5) SHA1(ed4f462fcfe91fa8e88bfeaaba0a0c11fa0b4601) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "14-e3",     0x0000, 0x1000, CRC(cf00c737) SHA1(415e90289039cac4d04cb1d559f1378ca6a32132) )       /* chars */
@@ -504,6 +497,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, mpatrol,  0,       mpatrol, mpatrol,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
-GAME( 1982, mpatrolw, mpatrol, mpatrol, mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
+GAME( 1982, mpatrol,  0,       m52,     mpatrol,  0, ROT0, "Irem", "Moon Patrol", GAME_SUPPORTS_SAVE )
+GAME( 1982, mpatrolw, mpatrol, m52,     mpatrolw, 0, ROT0, "Irem (Williams license)", "Moon Patrol (Williams)", GAME_SUPPORTS_SAVE )
 GAME( 1988, alpha1v,  0,       alpha1v, alpha1v,  0, ROT0, "Vision Electronics", "Alpha One (Vision Electronics / Kyle Hodgetts)", GAME_NOT_WORKING|GAME_NO_SOUND )

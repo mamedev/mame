@@ -65,26 +65,20 @@ VIDEO_UPDATE( shtrider );
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)        /* Video and Color ram */
-	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0xd003, 0xd003) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)	/* DSW2 */
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(travrusa_videoram_w) AM_BASE(&travrusa_videoram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(MRA8_RAM, travrusa_videoram_w) AM_BASE(&travrusa_videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
 	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)	/* IN0 */
+	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)	/* IN1 */
+	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)	/* IN2 */
+	AM_RANGE(0xd003, 0xd003) AM_READ(input_port_3_r)	/* DSW1 */
+	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)	/* DSW2 */
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 #define TRAV_COMMON\
@@ -333,7 +327,7 @@ static MACHINE_DRIVER_START( travrusa )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(56.75)
@@ -356,7 +350,7 @@ static MACHINE_DRIVER_START( travrusa )
 	MDRV_VIDEO_UPDATE(travrusa)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(irem_audio)
+	MDRV_IMPORT_FROM(m52_small_audio)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( shtrider )
@@ -385,8 +379,8 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-6a.k3", 0x4000, 0x2000, CRC(e1b51383) SHA1(34f4476c1bcc28c53c8ffa7b614f443a329aae13) )
 	ROM_LOAD( "zr1-7.j3", 0x6000, 0x2000, CRC(85cd1a51) SHA1(7eb046514845cb9d2507ee24d1b2f7cc5402ac02) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mr10.1a",      0xf000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "mr10.1a",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "zippyrac.001", 0x00000, 0x2000, CRC(aa8994dd) SHA1(9b326ce52a03d723e5c3c1b5fd4aa8fa7f70f904) )
@@ -411,8 +405,8 @@ ROM_START( motorace )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
 	ROM_LOAD( "mr3.3j",       0x6000, 0x2000, CRC(2f04c341) SHA1(ae990d9d4abdd7d6ef9d21aa62125fe2e0067623) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "mr10.1a",      0xf000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "mr10.1a",      0x7000, 0x1000, CRC(a02ad8a0) SHA1(aff80b506dbecabed2a36eb743693940f6a22d16) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "mr7.3e",       0x00000, 0x2000, CRC(492a60be) SHA1(9a3d6407b834eb7c3e3c8bb292ff124550a2787c) )
@@ -438,8 +432,8 @@ ROM_START( shtrider )
 	ROM_LOAD( "sr03a.bin", 0x4000, 0x2000, CRC(3ade11b9) SHA1(70b9dbd510cf6192194acf6876856d4c19bdf279) )
 	ROM_LOAD( "sr04a.bin", 0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "sr11a.bin", 0xe000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "sr11a.bin", 0x6000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "sr05a.bin", 0x0000, 0x2000, CRC(34449f79) SHA1(30aa9da07bf32282d213f63e50c564a336fd0102) )
@@ -465,8 +459,8 @@ ROM_START( shtridra )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(78d051cd) SHA1(e1dc2dcfc4af35bdd5245d23977e8640d81a43f1) )
 	ROM_LOAD( "4.bin",   0x6000, 0x2000, CRC(02b96eaa) SHA1(ba4d61cf57142192684c45dd22720234d3521241) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "11.bin",   0xe000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )
+	ROM_LOAD( "11.bin",   0x6000, 0x2000, CRC(a8396b76) SHA1(614151fb1d25930e9fee4ab290a63f8fe97adbe6) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(34449f79) SHA1(30aa9da07bf32282d213f63e50c564a336fd0102) )

@@ -92,7 +92,10 @@ static WRITE8_HANDLER( irem_msm5205_w )
 
 static WRITE8_HANDLER( irem_adpcm_w )
 {
-	MSM5205_data_w(offset,data);
+	if (offset & 1)
+		MSM5205_data_w(0, data);
+	if (offset & 2)
+		MSM5205_data_w(1, data);
 }
 
 static void irem_adpcm_int(int data)
@@ -142,12 +145,29 @@ static const struct MSM5205interface irem_msm5205_interface_2 =
 
 
 
-static ADDRESS_MAP_START( irem_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0800, 0x0800) AM_WRITENOP
-	AM_RANGE(0x0801, 0x0802) AM_WRITE(irem_adpcm_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(irem_sound_irq_ack_w)
+/* complete address map verified from Moon Patrol/10 Yard Fight schematics */
+/* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
+static ADDRESS_MAP_START( m52_small_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(irem_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(irem_sound_irq_ack_w)
+	AM_RANGE(0x2000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m52_large_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(irem_adpcm_w)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(irem_sound_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+
+/* complete address map verified from Kid Niki schematics */
+static ADDRESS_MAP_START( m62_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(irem_sound_irq_ack_w)
+	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_WRITE(irem_adpcm_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( irem_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(irem_port1_r, irem_port1_w)
@@ -155,13 +175,12 @@ static ADDRESS_MAP_START( irem_sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( irem_audio )
+MACHINE_DRIVER_START( irem_audio_base )
 
 	MDRV_SOUND_START(irem_audio)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6803, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(irem_sound_map,0)
+	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 
 	/* sound hardware */
@@ -183,3 +202,32 @@ MACHINE_DRIVER_START( irem_audio )
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( m52_small_audio )
+	MDRV_IMPORT_FROM(irem_audio_base)
+	
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("iremsound")
+	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( m52_large_audio )	/* 10 yard fight */
+	MDRV_IMPORT_FROM(irem_audio_base)
+	
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("iremsound")
+	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map,0)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( m62_audio )
+	MDRV_IMPORT_FROM(irem_audio_base)
+	
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("iremsound")
+	MDRV_CPU_PROGRAM_MAP(m62_sound_map,0)
+MACHINE_DRIVER_END
+
+

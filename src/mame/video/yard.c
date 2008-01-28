@@ -23,21 +23,8 @@ static mame_bitmap *scroll_panel_bitmap;
 static tilemap *bg_tilemap;
 
 #define SCROLL_PANEL_WIDTH  (14*4)
-#define RADAR_PALETTE_BASE (256+16)
-#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+#define RADAR_PALETTE_BASE (256+256)
 
-static const rectangle clippanel =
-{
-	26*8, 32*8-1,
-	1*8, 31*8-1
-};
-
-static const rectangle clippanelflip =
-{
-	0*8, 6*8-1,
-	1*8, 31*8-1
-};
 
 /***************************************************************************
 
@@ -65,6 +52,8 @@ PALETTE_INIT( yard )
 {
 	int i;
 
+	machine->colortable = colortable_alloc(machine, 256+16+256);
+	
 	/* character palette */
 	for (i = 0;i < 256;i++)
 	{
@@ -86,7 +75,8 @@ PALETTE_INIT( yard )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_entry_set_value(machine->colortable,i,i);
 
 		color_prom++;
 	}
@@ -115,7 +105,7 @@ PALETTE_INIT( yard )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+256,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,256+i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -124,8 +114,8 @@ PALETTE_INIT( yard )
 	/* color_prom now points to the beginning of the sprite lookup table */
 
 	/* sprite lookup table */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 256 + (*(color_prom++) & 0x0f);
+	for (i = 0;i < 256;i++)
+		colortable_entry_set_value(machine->colortable,256+i,256+(*color_prom++ & 0x0f));
 
 	/* color_prom now points to the beginning of the radar palette */
 
@@ -150,7 +140,8 @@ PALETTE_INIT( yard )
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+256+16,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,256+16+i,MAKE_RGB(r,g,b));
+		colortable_entry_set_value(machine->colortable,256+256+i,256+16+i);
 
 		color_prom++;
 	}
@@ -180,7 +171,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		*BITMAP_ADDR16(scroll_panel_bitmap, sy, sx + i) = Machine->pens[RADAR_PALETTE_BASE + (sy & 0xfc) + col];
+		*BITMAP_ADDR16(scroll_panel_bitmap, sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
 	}
 }
 
@@ -206,13 +197,14 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 
 VIDEO_START( yard )
 {
-	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	tilemap_set_scrolldx(bg_tilemap, machine->screen[0].visarea.min_x, machine->screen[0].width - (machine->screen[0].visarea.max_x + 1));
+	tilemap_set_scrolldy(bg_tilemap, machine->screen[0].visarea.min_y - 8, machine->screen[0].height + 16 - (machine->screen[0].visarea.max_y + 1));
 
 	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, machine->screen[0].height, machine->screen[0].format);
 }
 
-#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_COLOR, 256);
+#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PENS, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 256));
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
@@ -228,7 +220,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = spriteram[offs + 3];
-		int sy1 = 241 - spriteram[offs];
+		int sy1 = 233 - spriteram[offs];
 		int sy2 = 0;
 
 		if (flipy)
@@ -244,7 +236,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if (flip_screen)
 		{
 			sx = 240 - sx;
-			sy2 = 224 - sy1;
+			sy2 = 192 - sy1;
 			sy1 = sy2 + 0x10;
 			flipx = !flipx;
 			flipy = !flipy;
@@ -254,19 +246,34 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			sy2 = sy1 + 0x10;
 		}
 
-		DRAW_SPRITE(code1 + 256 * bank, sy1)
-		DRAW_SPRITE(code2 + 256 * bank, sy2)
+		DRAW_SPRITE(code1 + 256 * bank, machine->screen[0].visarea.min_y + sy1)
+		DRAW_SPRITE(code2 + 256 * bank, machine->screen[0].visarea.min_y + sy2)
 	}
 }
 
-static void draw_panel( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	if (! *yard_score_panel_disabled)
 	{
+		static const rectangle clippanel =
+		{
+			26*8, 32*8-1,
+			1*8, 31*8-1
+		};
+		static const rectangle clippanelflip =
+		{
+			0*8, 6*8-1,
+			1*8, 31*8-1
+		};
+		rectangle clip = flip_screen ? clippanelflip : clippanel;
 		int sx = flip_screen ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
+		int yoffs = flip_screen ? -40 : -16;
+		
+		clip.min_y += machine->screen[0].visarea.min_y + yoffs;
+		clip.max_y += machine->screen[0].visarea.max_y + yoffs;
 
-		copybitmap(bitmap, scroll_panel_bitmap, flip_screen, flip_screen, sx, 0,
-			flip_screen ? &clippanelflip : &clippanel, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, scroll_panel_bitmap, flip_screen, flip_screen, sx, machine->screen[0].visarea.min_y + yoffs,
+			&clip, TRANSPARENCY_NONE, 0);
 	}
 }
 
@@ -277,6 +284,6 @@ VIDEO_UPDATE( yard )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);
-	draw_panel(bitmap, cliprect);
+	draw_panel(machine, bitmap, cliprect);
 	return 0;
 }

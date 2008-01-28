@@ -1,77 +1,85 @@
 /****************************************************************************
 
-Tropical Angel
+	Irem M57 hardware
 
-driver by Phil Stroffolino
+*****************************************************************************
 
-IREM M57 board stack with a M52-SOUND-E sound PCB.
+	Tropical Angel
 
-M57-A-A:
- TA-A-xx roms and proms
- NEC D780C (Z80) CPU
- NANAO KNA6032601 custom chip
- NANAO KNA6032701 custom chip
- 8-way dipswitch (x2)
- M58725P RAM (x3)
- CN1 - Ribbon cable connector
- CN2 - Ribbon cable connector
- Ribbon cable connector to sound PCB
+	driver by Phil Stroffolino
 
-M57-B-A:
- TA-B-xx roms and proms
- 18.432 MHz OSC
- CN1 - Ribbon cable connector
- CN2 - Ribbon cable connector
+	IREM M57 board stack with a M52-SOUND-E sound PCB.
 
-M52:
- HD6803 CPU
- AY-3-9810 (x2) sound chips
- MSM5205 OKI sound chip (and an unpopulated socket for a second MSM5202)
- 3.579545 MHz OSC
- 2764 Program rom labeled "TA S-1A-"
- Ribbon cable connector to M57-A-A PCB
+	M57-A-A:
+	 TA-A-xx roms and proms
+	 NEC D780C (Z80) CPU
+	 NANAO KNA6032601 custom chip
+	 NANAO KNA6032701 custom chip
+	 8-way dipswitch (x2)
+	 M58725P RAM (x3)
+	 CN1 - Ribbon cable connector
+	 CN2 - Ribbon cable connector
+	 Ribbon cable connector to sound PCB
 
-New Tropical Angel:
- Roms where found on an official IREM board with genuine IREM Tropical Angel
- license seal and genuine IREM serial number sticker.
- The "new" roms have hand written labels, while those that match the current
- Tropical Angel set look to be factory labeled chips.
+	M57-B-A:
+	 TA-B-xx roms and proms
+	 18.432 MHz OSC
+	 CN1 - Ribbon cable connector
+	 CN2 - Ribbon cable connector
+
+	M52:
+	 HD6803 CPU
+	 AY-3-9810 (x2) sound chips
+	 MSM5205 OKI sound chip (and an unpopulated socket for a second MSM5202)
+	 3.579545 MHz OSC
+	 2764 Program rom labeled "TA S-1A-"
+	 Ribbon cable connector to M57-A-A PCB
+
+	New Tropical Angel:
+	 Roms where found on an official IREM board with genuine IREM Tropical Angel
+	 license seal and genuine IREM serial number sticker.
+	 The "new" roms have hand written labels, while those that match the current
+	 Tropical Angel set look to be factory labeled chips.
 
 ****************************************************************************/
+
 #include "driver.h"
+#include "m57.h"
 #include "audio/irem.h"
 
-extern UINT8 *troangel_scroll;
-WRITE8_HANDLER( troangel_flipscreen_w );
-PALETTE_INIT( troangel );
-VIDEO_UPDATE( troangel );
+
+#define MASTER_CLOCK		XTAL_18_432MHz
 
 
 
-static ADDRESS_MAP_START( troangel_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x90ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)
-	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)
-	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)
-	AM_RANGE(0xd003, 0xd003) AM_READ(input_port_3_r)
-	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
-static ADDRESS_MAP_START( troangel_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-//  AM_RANGE(0x8800, 0x8fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9000, 0x91ff) AM_WRITE(MWA8_RAM) AM_BASE(&troangel_scroll)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, m57_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&m57_scroll)
 	AM_RANGE(0xc820, 0xc8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(troangel_flipscreen_w)	/* + coin counters */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
+	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
+	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
 
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( troangel )
 	PORT_START_TAG("IN0")
@@ -161,47 +169,41 @@ INPUT_PORTS_END
 
 
 
-static const gfx_layout charlayout =
-{
-	8,8, /* character size */
-	1024, /* number of characters */
-	3, /* bits per pixel */
-	{ 0, 1024*8*8, 2*1024*8*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* character offset */
-};
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout spritelayout =
 {
-	16,32, /* sprite size */
-	64, /* number of sprites */
-	3, /* bits per pixel */
-	{ 0, 0x4000*8, 2*0x4000*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8,
-			256*64+0*8, 256*64+1*8, 256*64+2*8, 256*64+3*8, 256*64+4*8, 256*64+5*8, 256*64+6*8, 256*64+7*8,
-			256*64+8*8, 256*64+9*8, 256*64+10*8, 256*64+11*8, 256*64+12*8, 256*64+13*8, 256*64+14*8, 256*64+15*8 },
-	32*8	/* character offset */
+	16,32,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8), STEP16(256*64,8) },
+	32*8
 };
 
-static GFXDECODE_START( troangel )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 32*8, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, spritelayout, 32*8, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x2000, spritelayout, 32*8, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x3000, spritelayout, 32*8, 32 )
+static GFXDECODE_START( m57 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_8x8x3_planar,    0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,     32*8, 32 )
 GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( troangel )
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( m57 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(troangel_readmem,troangel_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
@@ -214,20 +216,24 @@ static MACHINE_DRIVER_START( troangel )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(troangel)
-	MDRV_PALETTE_LENGTH(32*8+16)
-	MDRV_COLORTABLE_LENGTH(32*8+32*8)
+	MDRV_GFXDECODE(m57)
+	MDRV_PALETTE_LENGTH(32*8+32*8)
 
-	MDRV_PALETTE_INIT(troangel)
-	MDRV_VIDEO_START(generic)
-	MDRV_VIDEO_UPDATE(troangel)
+	MDRV_PALETTE_INIT(m57)
+	MDRV_VIDEO_START(m57)
+	MDRV_VIDEO_UPDATE(m57)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(irem_audio)
+	MDRV_IMPORT_FROM(m52_small_audio)
 MACHINE_DRIVER_END
 
 
 
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( troangel )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* main CPU */
@@ -236,13 +242,13 @@ ROM_START( troangel )
 	ROM_LOAD( "ta-a-3n", 0x4000, 0x2000, CRC(de3dea44) SHA1(1290755ffc04dc3b3667e063118669a0eab6fb79) )
 	ROM_LOAD( "ta-a-3q", 0x6000, 0x2000, CRC(fff0fc2a) SHA1(82f3f5a8817e956192323eb555daa85b7766676d) )
 
-	ROM_REGION(  0x10000 , REGION_CPU2, 0 )	/* sound CPU */
-	ROM_LOAD( "ta-s-1a", 0xe000, 0x2000, CRC(15a83210) SHA1(8ada510db689ffa372b2f4dc4bd1b1c69a0c5307) )
+	ROM_REGION(  0x8000 , REGION_CPU2, 0 )	/* sound CPU */
+	ROM_LOAD( "ta-s-1a", 0x6000, 0x2000, CRC(15a83210) SHA1(8ada510db689ffa372b2f4dc4bd1b1c69a0c5307) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ta-a-3c", 0x00000, 0x2000, CRC(7ff5482f) SHA1(fe8c181fed113007d69d11e8aa467e86a6357ffb) )	/* characters */
+	ROM_LOAD( "ta-a-3e", 0x00000, 0x2000, CRC(e49f7ad8) SHA1(915de1084fd3c5fc81dd8c80107c28cc57b33226) )
 	ROM_LOAD( "ta-a-3d", 0x02000, 0x2000, CRC(06eef241) SHA1(4f327a54169046d8d84b5f5cf5d9f45e1df4dae6) )
-	ROM_LOAD( "ta-a-3e", 0x04000, 0x2000, CRC(e49f7ad8) SHA1(915de1084fd3c5fc81dd8c80107c28cc57b33226) )
+	ROM_LOAD( "ta-a-3c", 0x04000, 0x2000, CRC(7ff5482f) SHA1(fe8c181fed113007d69d11e8aa467e86a6357ffb) )	/* characters */
 
 	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "ta-b-5j", 0x00000, 0x2000, CRC(86895c0c) SHA1(b42b041e3e20dadd8411805d492133d371426ebf) )	/* sprites */
@@ -266,13 +272,13 @@ ROM_START( newtangl ) /* Offical "upgrade" or hack? */
 	ROM_LOAD( "3n",	0x4000, 0x2000, CRC(17b5a775) SHA1(d85c3371080bea82f19ac96fa0f1b332e1c86e27) )
 	ROM_LOAD( "3q",	0x6000, 0x2000, CRC(2e5fa773) SHA1(9a34fa43bde021fc7b00d8c3762c248e7b96dbf1) )
 
-	ROM_REGION(  0x10000 , REGION_CPU2, 0 )	/* sound CPU */
-	ROM_LOAD( "ta-s-1a-", 0xe000, 0x2000, CRC(ea8a05cb) SHA1(5683e4dca93066ee788287ab73a766fa303ebe84) )
+	ROM_REGION(  0x8000 , REGION_CPU2, 0 )	/* sound CPU */
+	ROM_LOAD( "ta-s-1a-", 0x6000, 0x2000, CRC(ea8a05cb) SHA1(5683e4dca93066ee788287ab73a766fa303ebe84) )
 
 	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "ta-a-3c", 0x00000, 0x2000, CRC(7ff5482f) SHA1(fe8c181fed113007d69d11e8aa467e86a6357ffb) )	/* characters */
+	ROM_LOAD( "ta-a-3e", 0x00000, 0x2000, CRC(e49f7ad8) SHA1(915de1084fd3c5fc81dd8c80107c28cc57b33226) )
 	ROM_LOAD( "ta-a-3d", 0x02000, 0x2000, CRC(06eef241) SHA1(4f327a54169046d8d84b5f5cf5d9f45e1df4dae6) )
-	ROM_LOAD( "ta-a-3e", 0x04000, 0x2000, CRC(e49f7ad8) SHA1(915de1084fd3c5fc81dd8c80107c28cc57b33226) )
+	ROM_LOAD( "ta-a-3c", 0x04000, 0x2000, CRC(7ff5482f) SHA1(fe8c181fed113007d69d11e8aa467e86a6357ffb) )	/* characters */
 
 	ROM_REGION( 0x0c000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "5j",	     0x00000, 0x2000, CRC(89409130) SHA1(3f37f820b1b86166cde7c039d657ebd036d490dd) )	/* sprites */
@@ -291,5 +297,11 @@ ROM_END
 
 
 
-GAME( 1983, troangel,        0, troangel, troangel, 0, ROT0, "Irem", "Tropical Angel", 0 )
-GAME( 1983, newtangl, troangel, troangel, troangel, 0, ROT0, "Irem", "New Tropical Angel", 0 )
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1983, troangel,        0, m57, troangel, 0, ROT0, "Irem", "Tropical Angel", 0 )
+GAME( 1983, newtangl, troangel, m57, troangel, 0, ROT0, "Irem", "New Tropical Angel", 0 )

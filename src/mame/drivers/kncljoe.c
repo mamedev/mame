@@ -37,28 +37,21 @@ extern WRITE8_HANDLER(kncljoe_scroll_w);
 extern UINT8 *kncljoe_scrollregs;
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM)		/* videoram */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(MRA8_RAM, kncljoe_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE(&kncljoe_scrollregs)
 	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r) /* IN 0 */
 	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r) /* IN 1 */
 	AM_RANGE(0xd802, 0xd802) AM_READ(input_port_2_r) /* IN 2 */
 	AM_RANGE(0xd803, 0xd803) AM_READ(input_port_3_r)	/* DSW A */
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)	/* DSW B */
-	AM_RANGE(0xd807, 0xd807) AM_READ(MRA8_NOP)		/* unknown read */
-	AM_RANGE(0xd817, 0xd817) AM_READ(MRA8_NOP)		/* unknown read */
-	AM_RANGE(0xe800, 0xefff) AM_READ(MRA8_RAM)		/* spriteram */
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(kncljoe_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE(&kncljoe_scrollregs)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd801, 0xd803) AM_WRITE(kncljoe_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd807, 0xd807) AM_READ(MRA8_NOP)		/* unknown read */
+	AM_RANGE(0xd817, 0xd817) AM_READ(MRA8_NOP)		/* unknown read */
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -181,7 +174,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	/* basic machine hardware */
 //  MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz */
 	MDRV_CPU_ADD(Z80, 5500000) /* 4 MHz is too low. The game loop never finishes a frame in time. */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -201,7 +194,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_VIDEO_UPDATE(kncljoe)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(irem_audio)
+	MDRV_IMPORT_FROM(m52_small_audio)
 MACHINE_DRIVER_END
 
 
@@ -212,8 +205,8 @@ ROM_START( kncljoe )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64k for audio code */
-	ROM_LOAD( "kj-13.bin",0xe000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )  /* 64k for audio code */
+	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "kj-10.bin", 0x0000,  0x4000, CRC(74d3ba33) SHA1(c7887d690cb7f7a7b24d59d490ffc088fb6cc49c) )
@@ -244,8 +237,8 @@ ROM_START( kncljoea )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64k for audio code */
-	ROM_LOAD( "kj-13.bin",0xe000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )  /* 64k for audio code */
+	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "kj-10.bin", 0x0000,  0x4000, CRC(74d3ba33) SHA1(c7887d690cb7f7a7b24d59d490ffc088fb6cc49c) )
@@ -276,8 +269,8 @@ ROM_START( bcrusher )
 	ROM_LOAD( "bcrush2.bin", 0x4000, 0x4000, CRC(1be4c731) SHA1(11f3a33263d66172902dfb6f3fe2d0ab5cad38d7) )
 	ROM_LOAD( "bcrush3.bin", 0x8000, 0x4000, CRC(0772d993) SHA1(430f0319bd4765add2f1ee197e7217fdf9ae79c8) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )  /* 64k for audio code */
-	ROM_LOAD( "kj-13.bin",0xe000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
+	ROM_REGION( 0x8000, REGION_CPU2, 0 )  /* 64k for audio code */
+	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )	/* tiles */
 	ROM_LOAD( "bcrush10.bin", 0x0000,  0x4000, CRC(a62f4572) SHA1(4e38e175e25a955e5f83cac8c935163e2e861e94) )

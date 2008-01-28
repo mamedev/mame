@@ -14,6 +14,7 @@ Tile/sprite priority system (for the Kung Fu Master M62 board):
 ***************************************************************************/
 
 #include "driver.h"
+#include "m62.h"
 #include "video/resnet.h"
 
 UINT8 *m62_tileram;

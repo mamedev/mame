@@ -1,12 +1,11 @@
 /***************************************************************************
 
-  video.c
-
-  Functions to emulate the video hardware of the machine.
+	Irem M52 hardware
 
 ***************************************************************************/
 
 #include "driver.h"
+#include "m52.h"
 
 #define BGHEIGHT 64
 
@@ -52,19 +51,16 @@ static tilemap* bg_tilemap;
   bit 0 -- 1  kohm resistor  -- BLUE
 
 ***************************************************************************/
-PALETTE_INIT( mpatrol )
+PALETTE_INIT( m52 )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	machine->colortable = colortable_alloc(machine, 512+32+32);
 
 	/* character palette */
 	for (i = 0;i < 512;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
-
-		COLOR(0, i) = i;
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -82,7 +78,8 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_entry_set_value(machine->colortable,i,i);
 		color_prom++;
 	}
 
@@ -91,7 +88,6 @@ PALETTE_INIT( mpatrol )
 	{
 		int bit0,bit1,bit2,r,g,b;
 
-
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
 		bit1 = (*color_prom >> 1) & 0x01;
@@ -108,7 +104,7 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+512,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i+512,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
@@ -119,7 +115,6 @@ PALETTE_INIT( mpatrol )
 	{
 		int bit0,bit1,bit2,r,g,b;
 
-
 		/* red component */
 		bit0 = 0;
 		bit1 = (*color_prom >> 6) & 0x01;
@@ -136,16 +131,16 @@ PALETTE_INIT( mpatrol )
 		bit2 = (*color_prom >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+512+32,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable,i+512+32,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
 
 	/* color_prom now points to the beginning of the sprite lookup table */
 
 	/* sprite lookup table */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	for (i = 0;i < 16*4;i++)
 	{
-		COLOR(1,i) = 512+32 + (*color_prom++);
+		colortable_entry_set_value(machine->colortable, 512+i, 512+32+(*color_prom++));
 		if (i % 4 == 3) color_prom += 4;	/* half of the PROM is unused */
 	}
 
@@ -155,18 +150,18 @@ PALETTE_INIT( mpatrol )
 	/* xbb00: mountains */
 	/* 0xxbb: hills */
 	/* 1xxbb: city */
-	COLOR(2,0) = 512;
-	COLOR(2,1) = 512+4;
-	COLOR(2,2) = 512+8;
-	COLOR(2,3) = 512+12;
-	COLOR(3,0) = 512;
-	COLOR(3,1) = 512+1;
-	COLOR(3,2) = 512+2;
-	COLOR(3,3) = 512+3;
-	COLOR(4,0) = 512;
-	COLOR(4,1) = 512+16+1;
-	COLOR(4,2) = 512+16+2;
-	COLOR(4,3) = 512+16+3;
+	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+0, 512);
+	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+1, 512+4);
+	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+2, 512+8);
+	colortable_entry_set_value(machine->colortable, 512+16*4+0*4+3, 512+12);
+	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+0, 512);
+	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+1, 512+1);
+	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+2, 512+2);
+	colortable_entry_set_value(machine->colortable, 512+16*4+1*4+3, 512+3);
+	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+0, 512);
+	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+1, 512+16+1);
+	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+2, 512+16+2);
+	colortable_entry_set_value(machine->colortable, 512+16*4+2*4+3, 512+16+3);
 }
 
 
@@ -196,7 +191,7 @@ static TILE_GET_INFO( get_tile_info )
 
 
 
-VIDEO_START( mpatrol )
+VIDEO_START( m52 )
 {
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
@@ -214,7 +209,7 @@ VIDEO_START( mpatrol )
 
 
 
-WRITE8_HANDLER( mpatrol_scroll_w )
+WRITE8_HANDLER( m52_scroll_w )
 {
 
 /*
@@ -232,7 +227,7 @@ WRITE8_HANDLER( mpatrol_scroll_w )
 
 
 
-WRITE8_HANDLER( mpatrol_videoram_w )
+WRITE8_HANDLER( m52_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -240,7 +235,7 @@ WRITE8_HANDLER( mpatrol_videoram_w )
 
 
 
-WRITE8_HANDLER( mpatrol_colorram_w )
+WRITE8_HANDLER( m52_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -248,9 +243,9 @@ WRITE8_HANDLER( mpatrol_colorram_w )
 
 
 /* This looks like some kind of protection implemented by a custom chip on the
-   scroll board. It mangles the value written to the port mpatrol_bg1xpos_w, as
+   scroll board. It mangles the value written to the port m52_bg1xpos_w, as
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
-READ8_HANDLER( mpatrol_protection_r )
+READ8_HANDLER( m52_protection_r )
 {
 	int popcount = 0;
 	int temp;
@@ -261,30 +256,30 @@ READ8_HANDLER( mpatrol_protection_r )
 }
 
 
-WRITE8_HANDLER( mpatrol_bg1ypos_w )
+WRITE8_HANDLER( m52_bg1ypos_w )
 {
 	bg1ypos = data;
 }
-WRITE8_HANDLER( mpatrol_bg1xpos_w )
+WRITE8_HANDLER( m52_bg1xpos_w )
 {
 	bg1xpos = data;
 }
-WRITE8_HANDLER( mpatrol_bg2xpos_w )
+WRITE8_HANDLER( m52_bg2xpos_w )
 {
 	bg2xpos = data;
 }
-WRITE8_HANDLER( mpatrol_bg2ypos_w )
+WRITE8_HANDLER( m52_bg2ypos_w )
 {
 	bg2ypos = data;
 }
-WRITE8_HANDLER( mpatrol_bgcontrol_w )
+WRITE8_HANDLER( m52_bgcontrol_w )
 {
 	bgcontrol = data;
 }
 
 
 
-WRITE8_HANDLER( mpatrol_flipscreen_w )
+WRITE8_HANDLER( m52_flipscreen_w )
 {
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x20);
@@ -345,7 +340,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 
 
-VIDEO_UPDATE( mpatrol )
+VIDEO_UPDATE( m52 )
 {
 	int offs;
 
@@ -409,7 +404,8 @@ VIDEO_UPDATE( mpatrol )
 
 		drawgfx(bitmap, machine->gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			&clip, TRANSPARENCY_COLOR, 512+32);
+			&clip, TRANSPARENCY_PENS, 
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512+32));
 	}
 	return 0;
 }
