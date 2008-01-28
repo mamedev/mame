@@ -430,7 +430,7 @@ static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *clipr
 	}
 }
 
-static void drawbs2(mame_bitmap *bitmap, const rectangle *cliprect)
+static void drawbs2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	mame_bitmap *sprbitmap = tilemap_get_pixmap(spr2tilemap);
 	int sx,sy;
@@ -442,10 +442,7 @@ static void drawbs2(mame_bitmap *bitmap, const rectangle *cliprect)
 	sy = -punchout_bigsprite2[2] + 256 * (punchout_bigsprite2[3] & 1);
 	sy += 3;	/* adjustment to match the screen shots */
 
-	copybitmap(bitmap,sprbitmap,
-			punchout_bigsprite2[4] & 1,0,
-			sx,sy,
-			cliprect,TRANSPARENCY_COLOR,1024);
+	copybitmap_trans(bitmap,sprbitmap, punchout_bigsprite2[4] & 1, 0, sx, sy, cliprect, machine->pens[1024]);
 }
 
 VIDEO_UPDATE( punchout )
@@ -469,7 +466,7 @@ VIDEO_UPDATE( punchout )
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			draw_big_sprite(bitmap, cliprect);
-		drawbs2(bitmap, cliprect);
+		drawbs2(machine, bitmap, cliprect);
 	}
 	return 0;
 }
@@ -490,7 +487,7 @@ VIDEO_UPDATE( armwrest )
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			armwrest_draw_big_sprite(bitmap, cliprect);
-		drawbs2(bitmap, cliprect);
+		drawbs2(machine, bitmap, cliprect);
 
 		tilemap_draw(bitmap, cliprect, fgtilemap, 0, 0);
 	}

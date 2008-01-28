@@ -182,8 +182,8 @@ VIDEO_UPDATE( quasar )
 
     /* Update screen */
 
-	copybitmap(bitmap,effect_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copybitmap(bitmap,background_bitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+	copybitmap      (bitmap,effect_bitmap,    0,0,0,0,cliprect);
+	copybitmap_trans(bitmap,background_bitmap,0,0,0,0,cliprect,0);
 
     /* 2636's */
 

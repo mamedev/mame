@@ -443,7 +443,7 @@ VIDEO_UPDATE( ninjakd2 )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	copybitmap(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
@@ -458,7 +458,7 @@ VIDEO_UPDATE( robokid )
 
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 
-	copybitmap(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
 
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
 
@@ -477,7 +477,7 @@ VIDEO_UPDATE( omegaf )
 
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
 
-	copybitmap(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 

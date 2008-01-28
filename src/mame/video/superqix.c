@@ -254,7 +254,7 @@ VIDEO_UPDATE( pbillian )
 VIDEO_UPDATE( superqix )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap(bitmap,fg_bitmap[show_bitmap],flip_screen,flip_screen,0,0,cliprect,TRANSPARENCY_PEN,0);
+	copybitmap_trans(bitmap,fg_bitmap[show_bitmap],flip_screen,flip_screen,0,0,cliprect,0);
 	superqix_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

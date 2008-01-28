@@ -239,7 +239,7 @@ VIDEO_START( hyhoo )
 VIDEO_UPDATE( hyhoo )
 {
 	if (hyhoo_dispflag)
-		copybitmap(bitmap, hyhoo_tmpbitmap, hyhoo_flipscreen, hyhoo_flipscreen, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, hyhoo_tmpbitmap, hyhoo_flipscreen, hyhoo_flipscreen, 0, 0, cliprect);
 	else
 		fillbitmap(bitmap, RGB_BLACK, cliprect);
 

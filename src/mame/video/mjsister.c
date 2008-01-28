@@ -103,8 +103,8 @@ VIDEO_UPDATE( mjsister )
 				*BITMAP_ADDR16(bitmap, i, 256+j) = machine->pens[mjsister_colorbank * 0x20];
 		}
 
-		copybitmap(bitmap,mjsister_tmpbitmap0,f,f,0,0,cliprect,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,mjsister_tmpbitmap1,f,f,2,0,cliprect,TRANSPARENCY_PEN,0);
+		copybitmap      (bitmap,mjsister_tmpbitmap0,f,f,0,0,cliprect);
+		copybitmap_trans(bitmap,mjsister_tmpbitmap1,f,f,2,0,cliprect,0);
 	}
 	else
 		fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);

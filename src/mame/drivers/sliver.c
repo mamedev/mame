@@ -447,8 +447,8 @@ static VIDEO_START(sliver)
 
 static VIDEO_UPDATE(sliver)
 {
-	copybitmap(bitmap, sliver_bitmap_bg, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	copybitmap(bitmap, sliver_bitmap_fg, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+	copybitmap      (bitmap, sliver_bitmap_bg, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, sliver_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
 	return 0;
 }
 

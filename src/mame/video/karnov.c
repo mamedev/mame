@@ -136,7 +136,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		scrolly=scrolly+256;
 		scrollx=scrollx+256;
 	}
-	copyscrollbitmap(bitmap,bitmap_f,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,bitmap_f,1,&scrollx,1,&scrolly,cliprect);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)

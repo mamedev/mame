@@ -612,7 +612,7 @@ VIDEO_UPDATE( taitob )
     int scrolly = -pixel_scroll[1]; //+240;
     /* bit 15 of pixel_scroll[0] is probably flip screen */
 
-    copyscrollbitmap(bitmap,pixel_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_COLOR,b_fg_color_base * 16);
+    copyscrollbitmap_trans(bitmap,pixel_bitmap,1,&scrollx,1,&scrolly,cliprect,machine->pens[b_fg_color_base * 16]);
   }
 
   draw_framebuffer(machine, bitmap,cliprect,0);

@@ -90,7 +90,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( bigevglf )
 {
-	copybitmap(bitmap,tmp_bitmap[ plane_visible ],0,0,0,0,cliprect,TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap,tmp_bitmap[ plane_visible ],0,0,0,0,cliprect);
 	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }

@@ -800,7 +800,7 @@ VIDEO_UPDATE( bioship )
 		}
 	}
 
-	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	nmk16_draw_sprites(machine, bitmap,cliprect,3);

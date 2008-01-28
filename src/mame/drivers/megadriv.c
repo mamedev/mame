@@ -2609,7 +2609,7 @@ VIDEO_START(megadriv)
 VIDEO_UPDATE(megadriv)
 {
 	/* Copy our screen buffer here */
-	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
 
 //  int xxx;
 	/* reference */

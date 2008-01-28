@@ -838,7 +838,7 @@ VIDEO_UPDATE( cojag )
 	}
 
 	/* render the object list */
-	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, screen_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

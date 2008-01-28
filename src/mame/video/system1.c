@@ -458,9 +458,9 @@ static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 
 		/* copy the temporary bitmap to the screen */
 		if (flip_screen)
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,cliprect,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,cliprect);
 		else
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,cliprect,TRANSPARENCY_NONE,0);
+			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,cliprect);
 	}
 	else
 	{
@@ -608,13 +608,13 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 				for (i = 0; i < 32; i++)
 					scrollx_row_flip[31-i] = (256-scrollx_row[i]) & 0xff;
 
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row_flip,0,0,cliprect,TRANSPARENCY_NONE,0);
+				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row_flip,0,0,cliprect);
 			}
 			else
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row,0,0,cliprect,TRANSPARENCY_NONE,0);
+				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row,0,0,cliprect);
 		}
 		else
-			copybitmap(bitmap,tmp_bitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+			copybitmap(bitmap,tmp_bitmap,0,0,0,0,cliprect);
 	}
 	else
 	{

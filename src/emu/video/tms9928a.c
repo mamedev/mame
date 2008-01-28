@@ -398,7 +398,7 @@ VIDEO_UPDATE( tms9928a )
 	{
 		(*ModeHandlers[TMS_MODE])(machine, tms.tmpbmp, cliprect);
 
-		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect);
 		{
 			rectangle rt;
 

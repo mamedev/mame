@@ -141,7 +141,7 @@ VIDEO_UPDATE( megazone )
 		}
 
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 	}
 
 
@@ -165,7 +165,7 @@ VIDEO_UPDATE( megazone )
 					spriteram[offs + 0] & 0x0f,
 					flipx,flipy,
 					sx,sy,
-					&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+					cliprect,TRANSPARENCY_COLOR,0);
 		}
 	}
 
@@ -198,7 +198,7 @@ VIDEO_UPDATE( megazone )
 					(megazone_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,
 					8*sx,8*sy,
-					0,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 			offs++;
 		}
 	}

@@ -284,8 +284,7 @@ VIDEO_START( tia )
 VIDEO_UPDATE( tia )
 {
 	screen_height = machine->screen[0].height;
-	copybitmap(bitmap, helper[2], 0, 0, 0, 0,
-		cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, helper[2], 0, 0, 0, 0, cliprect);
 	return 0;
 }
 

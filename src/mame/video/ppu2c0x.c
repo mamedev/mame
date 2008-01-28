@@ -1345,7 +1345,7 @@ void ppu2c0x_render( int num, mame_bitmap *bitmap, int flipx, int flipy, int sx,
 		return;
 	}
 
-	copybitmap( bitmap, chips[num].bitmap, flipx, flipy, sx, sy, 0, TRANSPARENCY_NONE, 0 );
+	copybitmap( bitmap, chips[num].bitmap, flipx, flipy, sx, sy, 0 );
 }
 
 /*************************************

@@ -270,7 +270,7 @@ static VIDEO_UPDATE(mlanding)
 		int i;
 		for(i=0;i<7;i++)
 		{
-			copybitmap(bitmap,ml_bitmap[i], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+			copybitmap_trans(bitmap,ml_bitmap[i], 0, 0, 0, 0, cliprect, 0);
 		}
 	}
 	status_bit=0;

@@ -346,34 +346,23 @@ VIDEO_UPDATE( dday )
 	if (sl_enable)
 	{
 		/* apply shadow */
-
-		mame_bitmap *sl_bitmap;
 		int x, y;
 
-
-		sl_bitmap = tilemap_get_pixmap(sl_tilemap);
+		mame_bitmap *sl_bitmap = tilemap_get_pixmap(sl_tilemap);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-		{
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 			{
-				UINT32 src_pixel;
-
-
-				src_pixel = *BITMAP_ADDR16(main_bitmap, y, x);
+				UINT16 src_pixel = *BITMAP_ADDR16(main_bitmap, y, x);
 
 				if (*BITMAP_ADDR16(sl_bitmap, y, x) == 0xff)
-				{
 					src_pixel += machine->drv->total_colors;
-				}
 
 				*BITMAP_ADDR16(bitmap, y, x) = src_pixel;
 			}
-		}
 	}
 	else
-	{
-		copybitmap(bitmap,main_bitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
-	}
+		copybitmap(bitmap,main_bitmap,0,0,0,0,cliprect);
+
 	return 0;
 }

@@ -1710,7 +1710,7 @@ static void dambustr_draw_upper_background(mame_bitmap *bitmap)
 		clip.max_x = dambustr_bg_split_line;
 		clip.min_y = 0;
 		clip.max_y = 255;
-		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip);
 	}
 	else
 	{
@@ -1718,7 +1718,7 @@ static void dambustr_draw_upper_background(mame_bitmap *bitmap)
 		clip.max_x = 254 - dambustr_bg_split_line;
 		clip.min_y = 0;
 		clip.max_y = 255;
-		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, dambustr_tmpbitmap, 0, 0, 0, 0, &clip);
 	}
 }
 
@@ -2214,7 +2214,7 @@ VIDEO_UPDATE( dambustr )
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &machine->screen[0].visarea);
 
 	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
 

@@ -116,9 +116,9 @@ static void draw_playfield_and_alpha(running_machine *machine, mame_bitmap *bitm
 	scroll_x[0] = - *atarifb_scroll_register + 32 + playfield_x_offset;
 	scroll_y[0] = 8 + playfield_y_offset;
 
-	copybitmap(bitmap, tilemap_get_pixmap(alpha1_tilemap), 0, 0, 35*8, 1*8, NULL, TRANSPARENCY_NONE, 0);
-	copybitmap(bitmap, tilemap_get_pixmap(alpha2_tilemap), 0, 0,  0*8, 1*8, NULL, TRANSPARENCY_NONE, 0);
-	copyscrollbitmap(bitmap, tilemap_get_pixmap(field_tilemap),  1, scroll_x, 1, scroll_y, &bigfield_area, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tilemap_get_pixmap(alpha1_tilemap), 0, 0, 35*8, 1*8, NULL);
+	copybitmap(bitmap, tilemap_get_pixmap(alpha2_tilemap), 0, 0,  0*8, 1*8, NULL);
+	copyscrollbitmap(bitmap, tilemap_get_pixmap(field_tilemap),  1, scroll_x, 1, scroll_y, &bigfield_area);
 }
 
 

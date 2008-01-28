@@ -51,14 +51,11 @@
 enum
 {
 	TRANSPARENCY_NONE,			/* opaque with remapping */
-	TRANSPARENCY_NONE_RAW,		/* opaque with no remapping */
 	TRANSPARENCY_PEN,			/* single pen transparency with remapping */
 	TRANSPARENCY_PEN_RAW,		/* single pen transparency with no remapping */
 	TRANSPARENCY_PENS,			/* multiple pen transparency with remapping */
-	TRANSPARENCY_PENS_RAW,		/* multiple pen transparency with no remapping */
 	TRANSPARENCY_COLOR,			/* single remapped pen transparency with remapping */
 	TRANSPARENCY_PEN_TABLE,		/* special pen remapping modes (see DRAWMODE_xxx below) with remapping */
-	TRANSPARENCY_PEN_TABLE_RAW,	/* special pen remapping modes (see DRAWMODE_xxx below) with no remapping */
 	TRANSPARENCY_BLEND_RAW,		/* blend two bitmaps, shifting the source and ORing to the dest with no remapping */
 	TRANSPARENCY_ALPHA,			/* single pen transparency, other pens alpha */
 	TRANSPARENCY_ALPHARANGE,	/* single pen transparency, multiple pens alpha depending on array, see psikyosh.c */
@@ -239,11 +236,20 @@ void extract_scanline16(mame_bitmap *bitmap,int x,int y,int length,UINT16 *dst);
 void extract_scanline32(mame_bitmap *bitmap,int x,int y,int length,UINT32 *dst);
 
 
-void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,int sx,int sy,
-		const rectangle *clip,int transparency,int transparent_color);
+void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,
+				int sx,int sy,const rectangle *clip);
+
+void copybitmap_trans(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,
+					  int sx,int sy,const rectangle *clip,pen_t transparent_pen);
+
 void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
-		int rows,const int *rowscroll,int cols,const int *colscroll,
-		const rectangle *clip,int transparency,int transparent_color);
+					  int rows,const int *rowscroll,int cols,const int *colscroll,
+					  const rectangle *clip);
+
+void copyscrollbitmap_trans(mame_bitmap *dest,mame_bitmap *src,
+					 		int rows,const int *rowscroll,int cols,const int *colscroll,
+					 		const rectangle *clip,pen_t transparent_pen);
+
 
 /*
   Copy a bitmap applying rotation, zooming, and arbitrary distortion.

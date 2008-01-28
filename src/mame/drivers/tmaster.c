@@ -142,7 +142,7 @@ static VIDEO_START( tmaster )
 static VIDEO_UPDATE( tmaster )
 {
 	// double buffering
-	copybitmap(bitmap,tmaster_bitmap[(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmaster_bitmap[(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,cliprect);
 
 	show_touchscreen();
 	return 0;

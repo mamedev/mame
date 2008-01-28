@@ -905,7 +905,7 @@ static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitma
 	{
 		/* keep sprites on screen */
 		kaneko16_draw_sprites(machine,sprites_bitmap,cliprect);
-		copybitmap(bitmap,sprites_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,0);
+		copybitmap_trans(bitmap,sprites_bitmap,0,0,0,0,cliprect,0);
 	}
 	else
 	{
@@ -928,11 +928,7 @@ static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *
 		sx		=	(select & 0x1f) * 256;
 		sy		=	0;
 
-		copybitmap(
-			bitmap, kaneko16_bg15_bitmap,
-			flip, flip,
-			-sx, -sy,
-			cliprect, TRANSPARENCY_NONE,0 );
+		copybitmap(bitmap, kaneko16_bg15_bitmap, flip, flip, -sx, -sy, cliprect);
 
 //      flag = 0;
 	}

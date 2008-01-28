@@ -124,9 +124,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		int scrollx = -(mnchmobl_vreg[6]*2+(mnchmobl_vreg[7]>>7))-64-128-16;
 		int scrolly = 0;
 
-		copyscrollbitmap(bitmap,tmpbitmap,
-			1,&scrollx,1,&scrolly,
-			cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap, 1,&scrollx,1,&scrolly, cliprect);
 	}
 }
 

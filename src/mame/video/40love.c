@@ -333,9 +333,9 @@ static void draw_pixram( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 
 	if (pixram_sel)
-		copybitmap(bitmap,pixel_bitmap1,f,f,fortyl_xoffset,0,cliprect,TRANSPARENCY_NONE,0);
+		copybitmap(bitmap,pixel_bitmap1,f,f,fortyl_xoffset,0,cliprect);
 	else
-		copybitmap(bitmap,pixel_bitmap2,f,f,fortyl_xoffset,0,cliprect,TRANSPARENCY_NONE,0);
+		copybitmap(bitmap,pixel_bitmap2,f,f,fortyl_xoffset,0,cliprect);
 }
 
 VIDEO_UPDATE( fortyl )

@@ -105,7 +105,7 @@ static void tnk3_draw_background(running_machine *machine, mame_bitmap *bitmap, 
 
 		drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 }
 
 void tnk3_draw_text(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
@@ -262,7 +262,7 @@ static void sgladiat_draw_background(running_machine *machine, mame_bitmap *bitm
 
 		drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 }
 
 VIDEO_UPDATE( sgladiat )
@@ -386,7 +386,7 @@ static void tdfever_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 		else
 			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
 	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,cliprect);
 }
 
 /*

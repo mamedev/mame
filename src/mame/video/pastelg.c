@@ -293,12 +293,9 @@ VIDEO_UPDATE( pastelg )
 	}
 
 	if (pastelg_dispflag)
-	{
-		copybitmap(bitmap, pastelg_tmpbitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-	}
+		copybitmap(bitmap, pastelg_tmpbitmap, 0, 0, 0, 0, cliprect);
 	else
-	{
 		fillbitmap(bitmap, machine->pens[0x00], 0);
-	}
+
 	return 0;
 }

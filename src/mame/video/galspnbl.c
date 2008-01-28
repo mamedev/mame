@@ -114,7 +114,7 @@ VIDEO_UPDATE( galspnbl )
 
 
 	/* copy the temporary bitmap to the screen */
-	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,cliprect);
 
 	draw_sprites(machine,bitmap,cliprect,0);
 

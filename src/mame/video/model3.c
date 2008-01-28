@@ -413,7 +413,7 @@ VIDEO_UPDATE( model3 )
 //          fillbitmap(bitmap3d, 0x8000, cliprect);
 //          real3d_traverse_display_list();
 //      }
-		copybitmap(bitmap, bitmap3d, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0x8000);
+		copybitmap_trans(bitmap, bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	if (!(debug_layer_disable & 0x2))

@@ -490,7 +490,7 @@ VIDEO_UPDATE( gaelco3d )
 	else
 	{
 		if (video_changed)
-			copybitmap(bitmap, screenbits, 0,1, 0,0, cliprect, TRANSPARENCY_NONE, 0);
+			copybitmap(bitmap, screenbits, 0,1, 0,0, cliprect);
 		ret = video_changed;
 		video_changed = FALSE;
 	}

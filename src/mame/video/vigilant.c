@@ -229,7 +229,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea);
 }
 
 

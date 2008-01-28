@@ -584,7 +584,7 @@ VIDEO_UPDATE( bnj )
         scroll = (bnj_scroll1 & 0x02) * 128 + 511 - bnj_scroll2;
         if (!flip_screen)
             scroll = 767-scroll;
-        copyscrollbitmap (bitmap, background_bitmap, 1, &scroll, 0, 0, cliprect,TRANSPARENCY_NONE, 0);
+        copyscrollbitmap (bitmap, background_bitmap, 1, &scroll, 0, 0, cliprect);
 
         /* copy the low priority characters followed by the sprites
            then the high priority characters */

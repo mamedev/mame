@@ -53,7 +53,7 @@ PALETTE_INIT( yard )
 	int i;
 
 	machine->colortable = colortable_alloc(machine, 256+16+256);
-	
+
 	/* character palette */
 	for (i = 0;i < 256;i++)
 	{
@@ -268,12 +268,12 @@ static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rec
 		rectangle clip = flip_screen ? clippanelflip : clippanel;
 		int sx = flip_screen ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
 		int yoffs = flip_screen ? -40 : -16;
-		
+
 		clip.min_y += machine->screen[0].visarea.min_y + yoffs;
 		clip.max_y += machine->screen[0].visarea.max_y + yoffs;
 
-		copybitmap(bitmap, scroll_panel_bitmap, flip_screen, flip_screen, sx, machine->screen[0].visarea.min_y + yoffs,
-			&clip, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, scroll_panel_bitmap, flip_screen, flip_screen,
+				   sx, machine->screen[0].visarea.min_y + yoffs, &clip);
 	}
 }
 

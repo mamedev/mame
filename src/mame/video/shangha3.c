@@ -264,6 +264,6 @@ else
 
 VIDEO_UPDATE( shangha3 )
 {
-	copybitmap(bitmap,rawbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,rawbitmap,0,0,0,0,cliprect);
 	return 0;
 }

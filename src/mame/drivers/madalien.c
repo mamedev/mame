@@ -321,8 +321,7 @@ static VIDEO_UPDATE( madalien )
 		}
 	}
 
-	copybitmap(bitmap, tmp_bitmap, flip_screen, flip_screen,
-		0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, tmp_bitmap, flip_screen, flip_screen, 0, 0, cliprect);
 
 	return 0;
 }

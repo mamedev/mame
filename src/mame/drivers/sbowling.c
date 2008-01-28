@@ -96,7 +96,7 @@ static VIDEO_UPDATE(sbowling)
 {
 	fillbitmap(bitmap,machine->pens[0x18],cliprect);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect, TRANSPARENCY_PEN, color_prom_address);
+	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect, color_prom_address);
 	return 0;
 }
 

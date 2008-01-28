@@ -69,6 +69,6 @@ VIDEO_START( eolith )
 
 VIDEO_UPDATE( eolith )
 {
-	copybitmap(bitmap,bitmaps[eolith_buffer ^ 1],0,0,0,0,cliprect,TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap,bitmaps[eolith_buffer ^ 1],0,0,0,0,cliprect);
 	return 0;
 }

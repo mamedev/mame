@@ -130,13 +130,13 @@ static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectang
 	for (offs = 0;offs < 256;offs++)
 		scroll[offs] = -buggychl_scrollv[offs/8];
 
-	copyscrollbitmap(tmpbitmap2,tmpbitmap1,1,&bg_scrollx,256,scroll,NULL,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(tmpbitmap2,tmpbitmap1,1,&bg_scrollx,256,scroll,NULL);
 
 	/* then copy to the screen doing row scroll */
 	for (offs = 0;offs < 256;offs++)
 		scroll[offs] = -buggychl_scrollh[offs];
 
-	copyscrollbitmap(bitmap,tmpbitmap2,256,scroll,0,0,cliprect,TRANSPARENCY_COLOR,32);
+	copyscrollbitmap_trans(bitmap,tmpbitmap2,256,scroll,0,0,cliprect,machine->pens[32]);
 }
 
 

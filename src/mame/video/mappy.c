@@ -538,7 +538,7 @@ VIDEO_UPDATE( superpac )
 
 	fillbitmap(sprite_bitmap,15,cliprect);
 	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,15);
-	copybitmap(bitmap,sprite_bitmap,0,0,0,0,cliprect,TRANSPARENCY_PEN,15);
+	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

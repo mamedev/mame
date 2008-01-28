@@ -220,7 +220,7 @@ VIDEO_UPDATE( atarig1 )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* copy the motion objects on top */
-	copybitmap(bitmap, atarirle_get_vram(0, 0), 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+	copybitmap_trans(bitmap, atarirle_get_vram(0, 0), 0, 0, 0, 0, cliprect, 0);
 
 	/* add the alpha on top */
 	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);

@@ -296,14 +296,14 @@ VIDEO_UPDATE( kangaroo )
 	if (*kangaroo_bank_select & 0x01)
 	{
 		/* Plane B is primary */
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_COLOR,8);
+		copybitmap(bitmap,tmpbitmap2,0,0,0,0,cliprect);
+		copyscrollbitmap_trans(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect,machine->pens[8]);
 	}
 	else
 	{
 		/* Plane A is primary */
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,tmpbitmap2,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,16);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
+		copybitmap_trans(bitmap,tmpbitmap2,0,0,0,0,cliprect,machine->pens[16]);
 	}
 	return 0;
 }

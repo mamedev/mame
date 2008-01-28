@@ -77,7 +77,7 @@ VIDEO_UPDATE( goldstar )
 				0,TRANSPARENCY_NONE,0);
 	}
 
-	copybitmap(bitmap,tmpbitmap4,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap4,0,0,0,0,cliprect);
 
 
 	for (offs = goldstar_video_size - 1;offs >= 0;offs--)
@@ -114,20 +114,20 @@ VIDEO_UPDATE( goldstar )
 		for (i= 0;i < 64;i++)
 			scrolly[i] = -goldstar_scroll1[i];
 
-		copyscrollbitmap(bitmap,tmpbitmap1,0,0,64,scrolly,&visible1,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible1,TRANSPARENCY_PEN,0);
+		copyscrollbitmap(bitmap,tmpbitmap1,0,0,64,scrolly,&visible1);
+		copybitmap_trans(bitmap,tmpbitmap4,0,0,0,0,&visible1,0);
 
 		for (i= 0;i < 64;i++)
 			scrolly[i] = -goldstar_scroll2[i];
 
-		copyscrollbitmap(bitmap,tmpbitmap2,0,0,64,scrolly,&visible2,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible2,TRANSPARENCY_PEN,0);
+		copyscrollbitmap(bitmap,tmpbitmap2,0,0,64,scrolly,&visible2);
+		copybitmap_trans(bitmap,tmpbitmap4,0,0,0,0,&visible2,0);
 
 		for (i= 0;i < 64;i++)
 			scrolly[i] = -goldstar_scroll3[i];
 
-		copyscrollbitmap(bitmap,tmpbitmap3,0,0,64,scrolly,&visible3,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,tmpbitmap4,0,0,0,0,&visible3,TRANSPARENCY_PEN,0);
+		copyscrollbitmap(bitmap,tmpbitmap3,0,0,64,scrolly,&visible3);
+		copybitmap_trans(bitmap,tmpbitmap4,0,0,0,0,&visible3,0);
 	}
 	return 0;
 }

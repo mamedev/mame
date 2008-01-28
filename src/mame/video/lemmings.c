@@ -183,14 +183,14 @@ VIDEO_UPDATE( lemmings )
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((lemmings_control_data[6]&2)==0) {
-		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,cliprect,TRANSPARENCY_PEN,0x100);
+		copyscrollbitmap_trans(bitmap,bitmap0,1,&x1,1,&y,cliprect,0x100);
 	} else {
 		rect.max_x=159;
 		rect.min_x=0;
-		copyscrollbitmap(bitmap,bitmap0,1,&x0,1,&y,&rect,TRANSPARENCY_PEN,0x100);
+		copyscrollbitmap_trans(bitmap,bitmap0,1,&x0,1,&y,&rect,0x100);
 		rect.max_x=319;
 		rect.min_x=160;
-		copyscrollbitmap(bitmap,bitmap0,1,&x1,1,&y,&rect,TRANSPARENCY_PEN,0x100);
+		copyscrollbitmap_trans(bitmap,bitmap0,1,&x1,1,&y,&rect,0x100);
 	}
 	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x0000);
 	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x2000);

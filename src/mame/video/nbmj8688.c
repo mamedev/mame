@@ -698,8 +698,8 @@ VIDEO_UPDATE( mbmj8688 )
 		if (mjsikaku_flipscreen) scrolly =   mjsikaku_scrolly;
 		else                     scrolly = (-mjsikaku_scrolly) & 0xff;
 
-		copybitmap(bitmap, mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect, TRANSPARENCY_NONE, 0);
-		copybitmap(bitmap, mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
+		copybitmap(bitmap, mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
 	else
 	{

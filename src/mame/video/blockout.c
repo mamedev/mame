@@ -108,7 +108,7 @@ WRITE16_HANDLER( blockout_videoram_w )
 
 VIDEO_UPDATE( blockout )
 {
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 
 	{
 		int x,y;

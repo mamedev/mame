@@ -395,7 +395,7 @@ VIDEO_UPDATE( cclimber )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
 	}
 
 
@@ -502,7 +502,7 @@ VIDEO_UPDATE( cannonb )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
 	}
 
 
@@ -606,7 +606,7 @@ VIDEO_UPDATE( swimmer )
 				scroll[offs] = -cclimber_column_scroll[offs];
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
 	}
 
 
@@ -724,7 +724,7 @@ VIDEO_UPDATE( yamato )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect,TRANSPARENCY_PEN,0);
+		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
 	}
 
 

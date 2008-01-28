@@ -288,8 +288,8 @@ VIDEO_UPDATE( cvs )
     scroll[6] = 0;
     scroll[7] = 0;
 
-	copyscrollbitmap(bitmap,background_bitmap,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-	copyscrollbitmap(scrolled_background,cvs_collision_background,0,0,8,scroll,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,background_bitmap,0,0,8,scroll,&machine->screen[0].visarea);
+	copyscrollbitmap(scrolled_background,cvs_collision_background,0,0,8,scroll,&machine->screen[0].visarea);
 
     /* 2636's */
 

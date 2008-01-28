@@ -167,7 +167,7 @@ VIDEO_UPDATE( gomoku )
 	if (gomoku_bg_dispsw)
 	{
 		/* copy bg bitmap */
-		copybitmap(bitmap, gomoku_bg_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+		copybitmap(bitmap, gomoku_bg_bitmap, 0, 0, 0, 0, cliprect);
 
 		// stone
 		for (y = 0; y < 256; y++)

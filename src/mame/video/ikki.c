@@ -119,7 +119,7 @@ VIDEO_UPDATE( ikki )
 			col,
 			f,f,
 			px,py,
-			&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+			cliprect,TRANSPARENCY_NONE,0);
 	}
 
 /* draw sprites */
@@ -156,10 +156,10 @@ VIDEO_UPDATE( ikki )
 			col,
 			f,f,
 			px,py,
-			&machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+			cliprect,TRANSPARENCY_COLOR,0);
 	}
 
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_COLOR,256);
+	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect,machine->pens[256]);
 
 
 	/* mask sprites */
@@ -193,7 +193,7 @@ VIDEO_UPDATE( ikki )
 				col,
 				f,f,
 				px,py,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 		}
 	}
 

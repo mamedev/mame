@@ -714,7 +714,7 @@ static void taitosj_copy_layer(running_machine *machine, mame_bitmap *bitmap, co
 				scrolly[i]      = -taitosj_colscrolly[32 * which + i] - taitosj_scroll[2 * which + 1];
 		}
 
-		copyscrollbitmap(bitmap, taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, cliprect, TRANSPARENCY_COLOR,0);
+		copyscrollbitmap_trans(bitmap, taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, cliprect, machine->pens[0]);
 
 		/* store parts covered with sprites for sprites/layers collision detection */
 		for (i = 0; i < 0x20; i++)
@@ -722,7 +722,7 @@ static void taitosj_copy_layer(running_machine *machine, mame_bitmap *bitmap, co
 			if ((i >= 0x10) && (i <= 0x17)) continue; /* no sprites here */
 
 			if (sprites_on[i])
-				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, &sprite_areas[i], TRANSPARENCY_NONE,0);
+				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 1, &scrollx, 32, scrolly, &sprite_areas[i]);
 		}
 	}
 }
@@ -758,7 +758,7 @@ static void kikstart_copy_layer(running_machine *machine, mame_bitmap *bitmap, c
 		}
 
 		scrolly = taitosj_scroll[2 * which + 1];	/* always 0 */
-		copyscrollbitmap(bitmap, taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, cliprect, TRANSPARENCY_COLOR, 0);
+		copyscrollbitmap_trans(bitmap, taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, cliprect, machine->pens[0]);
 
 		/* store parts covered with sprites for sprites/layers collision detection */
 		for (i = 0; i < 0x20; i++)
@@ -766,7 +766,7 @@ static void kikstart_copy_layer(running_machine *machine, mame_bitmap *bitmap, c
 			if ((i >= 0x10) && (i <= 0x17)) continue; /* no sprites here */
 
 			if (sprites_on[i])
-				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, &sprite_areas[i], TRANSPARENCY_NONE,0);
+				copyscrollbitmap(sprite_layer_collbitmap2[which], taitosj_layer_bitmap[which], 32 * 8, scrollx, 1, &scrolly, &sprite_areas[i]);
 		}
 	}
 }

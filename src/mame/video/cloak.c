@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_UPDATE( cloak )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	copybitmap(bitmap, (bmap ? tmpbitmap2 : tmpbitmap),flip_screen,flip_screen,0,0,cliprect,TRANSPARENCY_COLOR,16);
+	copybitmap_trans(bitmap, (bmap ? tmpbitmap2 : tmpbitmap),flip_screen,flip_screen,0,0,cliprect,machine->pens[16]);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

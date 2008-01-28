@@ -531,7 +531,7 @@ VIDEO_UPDATE( stactics )
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    cliprect,TRANSPARENCY_NONE,0);
             dirty_videoram_d[offs] = 0;
         }
 
@@ -559,7 +559,7 @@ VIDEO_UPDATE( stactics )
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    cliprect,TRANSPARENCY_NONE,0);
             dirty_videoram_e[offs] = 0;
         }
 
@@ -587,7 +587,7 @@ VIDEO_UPDATE( stactics )
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    cliprect,TRANSPARENCY_NONE,0);
             dirty_videoram_f[offs] = 0;
         }
 
@@ -615,7 +615,7 @@ VIDEO_UPDATE( stactics )
                     color_code,
                     0,0,
                     sx*8,sy*8,
-                    &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                    cliprect,TRANSPARENCY_NONE,0);
             dirty_videoram_b[offs] = 0;
         }
 
@@ -623,19 +623,14 @@ VIDEO_UPDATE( stactics )
 
     /* Now, composite the four layers together */
 
-    copyscrollbitmap(tmpbitmap2,bitmap_D,0,0,1,&d_offset,
-                     &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-    copyscrollbitmap(tmpbitmap2,bitmap_E,0,0,1,&e_offset,
-                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-    copyscrollbitmap(tmpbitmap2,bitmap_F,0,0,1,&f_offset,
-                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
-    copybitmap(tmpbitmap2,bitmap_B,0,0,0,0,
-                     &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+    copyscrollbitmap      (tmpbitmap2,bitmap_D,0,0,1,&d_offset,NULL);
+    copyscrollbitmap_trans(tmpbitmap2,bitmap_E,0,0,1,&e_offset,NULL,machine->pens[0]);
+    copyscrollbitmap_trans(tmpbitmap2,bitmap_F,0,0,1,&f_offset,NULL,machine->pens[0]);
+    copybitmap_trans      (tmpbitmap2,bitmap_B,0,0,0,0,NULL,machine->pens[0]);
 
     /* Now flip X & simulate the monitor motion */
-    fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
-    copybitmap(bitmap,tmpbitmap2,1,0,stactics_horiz_pos,stactics_vert_pos,
-                &visible_screen_area,TRANSPARENCY_NONE,0);
+    fillbitmap(bitmap, machine->pens[0], cliprect);
+    copybitmap(bitmap,tmpbitmap2,1,0,stactics_horiz_pos,stactics_vert_pos,&visible_screen_area);
 
     /* Finally, draw stuff that is on the console or on top of the monitor (LED's) */
 
@@ -650,7 +645,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
     drawgfx(bitmap,machine->gfx[5],
@@ -658,7 +653,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the digits */
     for(i=1;i<7;i++)
@@ -668,7 +663,7 @@ VIDEO_UPDATE( stactics )
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                cliprect,TRANSPARENCY_NONE,0);
         pixel_x+=6;
     }
 
@@ -682,7 +677,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
     drawgfx(bitmap,machine->gfx[5],
@@ -690,7 +685,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=7;i<9;i++)
@@ -700,7 +695,7 @@ VIDEO_UPDATE( stactics )
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                cliprect,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -714,7 +709,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
     drawgfx(bitmap,machine->gfx[5],
@@ -722,7 +717,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=9;i<12;i++)
@@ -732,7 +727,7 @@ VIDEO_UPDATE( stactics )
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                cliprect,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -745,7 +740,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw a colon */
     drawgfx(bitmap,machine->gfx[5],
@@ -753,7 +748,7 @@ VIDEO_UPDATE( stactics )
             0,
             0,0,
             pixel_x,pixel_y,
-            &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+            cliprect,TRANSPARENCY_NONE,0);
     pixel_x+=6;
     /* Draw the pips */
     for(i=12;i<16;i++)
@@ -763,7 +758,7 @@ VIDEO_UPDATE( stactics )
                 16,
                 0,0,
                 pixel_x,pixel_y,
-                &machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+                cliprect,TRANSPARENCY_NONE,0);
         pixel_x+=2;
     }
 
@@ -810,13 +805,13 @@ VIDEO_UPDATE( stactics )
                     16*2,  /* Make it green */
                     0,0,
                     pixel_x,pixel_y,
-                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    cliprect,TRANSPARENCY_COLOR,0);
             drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i]&0x7f,
                     16*2,  /* Make it green */
                     1,0,
                     255-pixel_x,pixel_y,
-                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    cliprect,TRANSPARENCY_COLOR,0);
             pixel_x+=14;
             pixel_y-=7;
         }
@@ -828,13 +823,13 @@ VIDEO_UPDATE( stactics )
                     16*2,  /* Make it green */
                     0,0,
                     pixel_x,pixel_y,
-                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    cliprect,TRANSPARENCY_COLOR,0);
             drawgfx(bitmap,machine->gfx[4],
                     beamdata[firebeam_state*8+i],
                     16*2,  /* Make it green */
                     1,0,
                     255-pixel_x,pixel_y,
-                    &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                    cliprect,TRANSPARENCY_COLOR,0);
             pixel_x+=16;
             pixel_y-=8;
         }
@@ -853,7 +848,7 @@ VIDEO_UPDATE( stactics )
                 16, /* red */
                 0,0,
                 pixel_x,pixel_y,
-                &machine->screen[0].visarea,TRANSPARENCY_COLOR,0);
+                cliprect,TRANSPARENCY_COLOR,0);
     }
 
     /* Update vblank counter */

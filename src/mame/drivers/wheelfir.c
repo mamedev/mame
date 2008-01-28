@@ -301,9 +301,9 @@ static VIDEO_UPDATE(wheelfir)
     if (base<0x000000) base = 0x000000;
     if (base>0x3c0000) base = 0x3c0000;
 
-    copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-    //copybitmap(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
-    copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+    copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect);
+    //copybitmap_trans(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, 0);
+    copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
     fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
     if ( input_code_pressed(KEYCODE_R) )
@@ -325,8 +325,8 @@ static VIDEO_UPDATE(wheelfir)
     }
     */
 
-	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
-	copybitmap(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+	copybitmap(bitmap, render_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
 
 	{
 		int x;

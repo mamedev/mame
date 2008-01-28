@@ -204,7 +204,7 @@ VIDEO_UPDATE( glass )
 
 	/* draw layers + sprites */
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
-	copybitmap(bitmap,screen_bitmap,0,0,0x18,0x24,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,screen_bitmap,0,0,0x18,0x24,cliprect);
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);
 	draw_sprites(machine,bitmap,cliprect);

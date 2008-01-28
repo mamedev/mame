@@ -501,12 +501,12 @@ static VIDEO_UPDATE( marinedt )
 	fillbitmap(bitmap, machine->pens[0], NULL);
 
 	if (marinedt_pd & 0x02)
-		copybitmap(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
+		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, machine->pens[0]);
 
 	if (marinedt_pd & 0x01)
-		copybitmap(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
+		copybitmap_trans(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, machine->pens[0]);
 
-	copybitmap(bitmap, tile, 0, 0, 0, 0, cliprect, TRANSPARENCY_COLOR, machine->pens[0]);
+	copybitmap_trans(bitmap, tile, 0, 0, 0, 0, cliprect, machine->pens[0]);
 
 	coll = cx = cyr = cyq = 0;
 	if (marinedt_pd & 0x01)

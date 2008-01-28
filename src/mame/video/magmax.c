@@ -122,7 +122,7 @@ VIDEO_UPDATE( magmax )
 	/* copy the background graphics */
 	if (magmax_vreg & 0x40)		/* background disable */
 	{
-		fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+		fillbitmap(bitmap, machine->pens[0], cliprect);
 	}
 	else
 	{
@@ -334,13 +334,12 @@ VIDEO_UPDATE( magmax )
 					color,
 					flipx, flipy,
 					sx, sy,
-					&machine->screen[0].visarea, TRANSPARENCY_COLOR, 31);
+					cliprect, TRANSPARENCY_COLOR, 31);
 		}
 	}
+
 	if (!(magmax_vreg & 0x40))		/* background disable */
-	{
-		copybitmap(bitmap, tmpbitmap, flipscreen,flipscreen,0,0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
-	}
+		copybitmap_trans(bitmap, tmpbitmap, flipscreen,flipscreen,0,0, cliprect, 0);
 
 
 	/* draw the foreground characters */
@@ -366,7 +365,7 @@ VIDEO_UPDATE( magmax )
 					0,
 					flipscreen, flipscreen,
 					8 * sx, 8 * sy,
-					&machine->screen[0].visarea, TRANSPARENCY_PEN, 15);
+					cliprect, TRANSPARENCY_PEN, 15);
 		}
 	}
 	return 0;

@@ -329,6 +329,6 @@ VIDEO_UPDATE( ojankoc )
 		ojankoc_screen_refresh = 0;
 	}
 
-	copybitmap(bitmap, ojankoc_tmpbitmap, 0, 0, 0, 0, cliprect, TRANSPARENCY_NONE, 0);
+	copybitmap(bitmap, ojankoc_tmpbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -99,7 +99,7 @@ static VIDEO_UPDATE( quizo )
 			}
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 	dirty=0;
 	return 0;
 }

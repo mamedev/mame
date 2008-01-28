@@ -365,7 +365,7 @@ static void screenrefresh(running_machine *machine, mame_bitmap *bitmap,const re
 	scrollx=-HuC6270_registers[7];
 	scrolly=-HuC6270_registers[8]+clip->min_y-1;
 
-	copyscrollbitmap(bitmap,tile_bitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_NONE,0);
+	copyscrollbitmap(bitmap,tile_bitmap,1,&scrollx,1,&scrolly,clip);
 
 	/* Todo:  Background enable (not used anyway) */
 
@@ -373,7 +373,7 @@ static void screenrefresh(running_machine *machine, mame_bitmap *bitmap,const re
 	if (sb_enable) draw_sprites(machine,bitmap,clip,0);
 
 	/* Render background over sprites */
-	copyscrollbitmap(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,TRANSPARENCY_COLOR,256);
+	copyscrollbitmap_trans(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,machine->pens[256]);
 
 	/* Render high priority sprites, if enabled */
 	if (sb_enable) draw_sprites(machine,bitmap,clip,1);

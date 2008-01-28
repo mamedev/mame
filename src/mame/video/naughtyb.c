@@ -285,11 +285,11 @@ VIDEO_UPDATE( naughtyb )
 	{
 		int scrollx;
 
-		copybitmap(bitmap,tmpbitmap,0,0,-66*8,0,&leftvisiblearea,TRANSPARENCY_NONE,0);
-		copybitmap(bitmap,tmpbitmap,0,0,-30*8,0,&rightvisiblearea,TRANSPARENCY_NONE,0);
+		copybitmap(bitmap,tmpbitmap,0,0,-66*8,0,&leftvisiblearea);
+		copybitmap(bitmap,tmpbitmap,0,0,-30*8,0,&rightvisiblearea);
 
 		scrollx = ( naughtyb_cocktail ) ? *naughtyb_scrollreg - 239 : -*naughtyb_scrollreg + 16;
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,0,0,&scrollvisiblearea,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,0,0,&scrollvisiblearea);
 	}
 	return 0;
 }

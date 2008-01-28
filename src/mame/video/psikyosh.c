@@ -329,8 +329,8 @@ static void draw_bglayerscroll(running_machine *machine, int layer, mame_bitmap 
 		}
 		/* Only ever seems to use one linescroll value, ok for now */
 		/* Disabled for now, as they doesn't even support alpha :( */
-//      copyscrollbitmap(bitmap,zoom_bitmap,1,bg_scrollx,512,bg_scrolly,cliprect,TRANSPARENCY_PEN,0);
-//      copyscrollbitmap(bitmap,zoom_bitmap,256,bg_scrollx,0,bg_scrolly,cliprect,TRANSPARENCY_PEN,0);
+//      copyscrollbitmap_trans(bitmap,zoom_bitmap,1,bg_scrollx,512,bg_scrolly,cliprect,0);
+//      copyscrollbitmap_trans(bitmap,zoom_bitmap,256,bg_scrollx,0,bg_scrolly,cliprect,0);
 	}
 }
 

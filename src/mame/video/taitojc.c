@@ -265,7 +265,7 @@ VIDEO_UPDATE( taitojc )
 		}
 	}
 
-	copybitmap(bitmap, framebuffer, 0, 0, 0, 0, cliprect, TRANSPARENCY_PEN, 0);
+	copybitmap_trans(bitmap, framebuffer, 0, 0, 0, 0, cliprect, 0);
 
 	for (i=(0xc00/4)-2; i >= 0; i-=2)
 	{

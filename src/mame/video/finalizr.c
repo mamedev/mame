@@ -114,7 +114,7 @@ VIDEO_UPDATE( finalizr )
 
 		scroll = -*finalizr_scroll + 16;
 
-		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,cliprect,TRANSPARENCY_NONE,0);
+		copyscrollbitmap(bitmap,tmpbitmap,1,&scroll,0,0,cliprect);
 	}
 
 

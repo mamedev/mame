@@ -120,7 +120,7 @@ static VIDEO_UPDATE( lastfght )
 #endif
 #endif
 
-	copybitmap(bitmap,lastfght_bitmap[lastfght_dest^1],0,0,0,0,&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+	copybitmap(bitmap,lastfght_bitmap[lastfght_dest^1],0,0,0,0,cliprect);
 
 	return 0;
 }

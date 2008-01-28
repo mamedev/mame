@@ -743,10 +743,10 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 VIDEO_UPDATE( changela )
 {
-	copybitmap(bitmap, river_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
-	copybitmap(bitmap, obj0_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
-	copybitmap(bitmap, tree0_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
-	copybitmap(bitmap, tree1_bitmap, 0, 0, 0, 0, &machine->screen[0].visarea, TRANSPARENCY_PEN, 0);
+	copybitmap      (bitmap, river_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap_trans(bitmap, obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(bitmap, tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
 	draw_obj1(machine, bitmap);
 
 	return 0;

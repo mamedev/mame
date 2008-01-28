@@ -373,7 +373,7 @@ VIDEO_START( pce )
 VIDEO_UPDATE( pce )
 {
 	/* copy our rendering buffer to the display */
-	copybitmap (bitmap,vce.bmp,0,0,0,0,cliprect,TRANSPARENCY_NONE,0);
+	copybitmap (bitmap,vce.bmp,0,0,0,0,cliprect);
 	return 0;
 }
 
