@@ -2093,6 +2093,7 @@ src/mame/drivers/zodiack.c svneol=native#text/plain
 src/mame/drivers/zr107.c svneol=native#text/plain
 src/mame/etc/fd1094dp.c svneol=native#text/plain
 src/mame/etc/jrcrypt.c svneol=native#text/plain
+src/mame/includes/20pacgal.h svneol=native#text/plain
 src/mame/includes/8080bw.h svneol=native#text/plain
 src/mame/includes/amiga.h svneol=native#text/plain
 src/mame/includes/appoooh.h svneol=native#text/plain
