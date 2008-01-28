@@ -1385,10 +1385,10 @@ ROM_END
 (c)1997 Jaleco
 
 CPU:    68000-12
-Sound:  YMZ280B-F
+Sound:  YMZ280B-F / YAC516-M (on sound rom board)
 OSC:    12.000MHz
         48.0000MHz
-        16.9344MHz
+        16.9344MHz (on sound rom board)
 
 Custom: SS91022-03
         GS91022-04
@@ -1481,6 +1481,42 @@ ROM_START( rockn2 )
 
 ROM_END
 
+/***************************************************************************
+
+
+PCB Layout (sound rom board only)
+----------
+
+JALECO 99004 SL-99352 EB-00-20128-0
++------------------------------------------------------+
+|                                                      |
+| mr99029-02 mr99029-10 mr99029-18 mr99029-01  IC36*   |
+| mr99029-03 mr99029-11 mr99029-19  IC29*      IC37*   |
+| mr99029-04 mr99029-12 mr99029-20                     |
+| mr99029-05 mr99029-13 mr99029-21                     |
+| mr99029-06 mr99029-14  IC23*        YMZ280B-F        |
+| mr99029-07 mr99029-15  IC24*      16.9344MHz         |
+| mr99029-08 mr99029-16  IC25*        XC9572           |
+| mr99029-09 mr99029-17  IC26*                         |
+|                       YAC516-M                       |
+|   CN1        CN2                       CN4           |
++-||||||||---||||||||----------------------------------+
+
+Notes:
+  All chip sockets are marked as 27C3200 (read as 27C322)
+  Chips are OKI M72C3252C2 mounted on Jaleco PCB EB-00-40051-0 42 pin converters
+
+* Unpopulated sockets
+
+Sound chips: Yamaha YMZ280B-F & Yamaha YAC516-M
+ Other chip: Sigma XILINX XC9572
+        OSC: 16.9344MHz
+
+  CN1 - 8 pin header
+  CN2 - 8 pin header
+  CN4 - 34 pin dual row ribbon connection
+
+***************************************************************************/
 
 ROM_START( rockn3 )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
@@ -1501,28 +1537,32 @@ ROM_START( rockn3 )
 	ROM_LOAD( "front", 0x000000, 0x080000, CRC(8100039e) SHA1(e07b1e2f3cbcb1c086edd628d20423ecd4f74860)  )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(e2f69042) SHA1(deb361a53ed6a9033e21c2f805f327cc3e9b11c6)  ) // COMMON AREA
-	ROM_FILL(                 0x0400000, 0x0c00000, 0xff ) 		 // BANK AREA
-	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(b328b18f) SHA1(22edebcabd6c8ed65d8c9e501621991d404c430d)  ) // bank 0
-	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(f46438e3) SHA1(718f54fc0e3689f5ab29bef2ec13eb2aa9b117fc)  ) // bank 0
-	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(b979e887) SHA1(10852ceb1b9e24fb87cf9339bc9fb4ae066a1221)  ) // bank 0
-	ROM_LOAD( "sound04", 0x1c00000, 0x0400000, CRC(0bb2c212) SHA1(4f8ab3c96c3e1aa337a3fe871cffc04ec603f8c0)  ) // bank 1
-	ROM_LOAD( "sound05", 0x2000000, 0x0400000, CRC(3116e437) SHA1(f1b06592a6f0eba92eb4511d3ca03a3bb51e8c9d)  ) // bank 1
-	ROM_LOAD( "sound06", 0x2400000, 0x0400000, CRC(26b37ef6) SHA1(f7090f3ec81f0c651c53d460b476e63f52dd06dc)  ) // bank 1
-	ROM_LOAD( "sound07", 0x2800000, 0x0400000, CRC(1dd3f4e3) SHA1(8474e00b962368164c717e5fe2e926852f3b4426)  ) // bank 2
-	ROM_LOAD( "sound08", 0x2c00000, 0x0400000, CRC(a1b03d67) SHA1(95f89a37e97d62706e15fd5571ff2e70dd98fee2)  ) // bank 2
-	ROM_LOAD( "sound09", 0x3000000, 0x0400000, CRC(35107aac) SHA1(d56a66e15c46c33cf6c9c28edf48b730b681d21a)  ) // bank 2
-	ROM_LOAD( "sound10", 0x3400000, 0x0400000, CRC(059ec592) SHA1(205210af558eb7e8e1399b2a506ef0285c5feda3)  ) // bank 3
-	ROM_LOAD( "sound11", 0x3800000, 0x0400000, CRC(84d4badb) SHA1(fc20f97a008f000a49e7cadd559789516643704a)  ) // bank 3
-	ROM_LOAD( "sound12", 0x3c00000, 0x0400000, CRC(4527a9b7) SHA1(a73ebece5c84bf14f8d25bbd869b7b43b1fcd042)  ) // bank 3
-	ROM_LOAD( "sound13", 0x4000000, 0x0400000, CRC(bfa4b7ce) SHA1(4100f2deabb8994e8e3ff897a1db13693ab64c11)  ) // bank 4
-	ROM_LOAD( "sound14", 0x4400000, 0x0400000, CRC(a2ccd2ce) SHA1(fc6325219f7b8e68c22a129f5ec4e900e326fb9d)  ) // bank 4
-	ROM_LOAD( "sound15", 0x4800000, 0x0400000, CRC(95baf678) SHA1(f7b39a3379f16df0560a22d4f42165ebbe05cebe)  ) // bank 4
-	ROM_LOAD( "sound16", 0x4c00000, 0x0400000, CRC(5883c84b) SHA1(54aec4e1e2f5edc198aebc4788caf5062f9a5b6c)  ) // bank 5
-	ROM_LOAD( "sound17", 0x5000000, 0x0400000, CRC(f92098ce) SHA1(9b13cd37ad5d7baf36b20218c4bced956084ec45)  ) // bank 5
-	ROM_LOAD( "sound18", 0x5400000, 0x0400000, CRC(dbb2c228) SHA1(f7cd24026236e2c616376c695b9e986cc221f36d)  ) // bank 5
-	ROM_LOAD( "sound19", 0x5800000, 0x0400000, CRC(9efdae1c) SHA1(6158a1804fbaa9ce27ae7e12cfda5f49084b4998)  ) // bank 6
-	ROM_LOAD( "sound20", 0x5c00000, 0x0400000, CRC(5f301b83) SHA1(e24e85c43a62871360545aa42dfa439045334b79)  ) // bank 6
+	ROM_LOAD( "mr99029-01.ic28", 0x0000000, 0x0400000, CRC(e2f69042) SHA1(deb361a53ed6a9033e21c2f805f327cc3e9b11c6)  ) // COMMON AREA  (alt PCB number 25)
+	ROM_FILL(                    0x0400000, 0x0c00000, 0xff )		// BANK AREA (unpopulated IC29, IC36 & IC37 (alt PCB numbers 26, 27 & 28 repectively)
+	ROM_LOAD( "mr99029-02.ic1",  0x1000000, 0x0400000, CRC(b328b18f) SHA1(22edebcabd6c8ed65d8c9e501621991d404c430d)  ) // bank 0 (alt PCB number 1)
+	ROM_LOAD( "mr99029-03.ic2",  0x1400000, 0x0400000, CRC(f46438e3) SHA1(718f54fc0e3689f5ab29bef2ec13eb2aa9b117fc)  ) // bank 0 (alt PCB number 2)
+	ROM_LOAD( "mr99029-04.ic3",  0x1800000, 0x0400000, CRC(b979e887) SHA1(10852ceb1b9e24fb87cf9339bc9fb4ae066a1221)  ) // bank 0 (alt PCB number 3)
+	ROM_LOAD( "mr99029-05.ic4",  0x1c00000, 0x0400000, CRC(0bb2c212) SHA1(4f8ab3c96c3e1aa337a3fe871cffc04ec603f8c0)  ) // bank 1 (alt PCB number 4)
+	ROM_LOAD( "mr99029-06.ic5",  0x2000000, 0x0400000, CRC(3116e437) SHA1(f1b06592a6f0eba92eb4511d3ca03a3bb51e8c9d)  ) // bank 1 (alt PCB number 5)
+	ROM_LOAD( "mr99029-07.ic6",  0x2400000, 0x0400000, CRC(26b37ef6) SHA1(f7090f3ec81f0c651c53d460b476e63f52dd06dc)  ) // bank 1 (alt PCB number 6)
+	ROM_LOAD( "mr99029-08.ic7",  0x2800000, 0x0400000, CRC(1dd3f4e3) SHA1(8474e00b962368164c717e5fe2e926852f3b4426)  ) // bank 2 (alt PCB number 7)
+	ROM_LOAD( "mr99029-09.ic8",  0x2c00000, 0x0400000, CRC(a1b03d67) SHA1(95f89a37e97d62706e15fd5571ff2e70dd98fee2)  ) // bank 2 (alt PCB number 8)
+	ROM_LOAD( "mr99029-10.ic10", 0x3000000, 0x0400000, CRC(35107aac) SHA1(d56a66e15c46c33cf6c9c28edf48b730b681d21a)  ) // bank 2 (alt PCB number 9)
+	ROM_LOAD( "mr99029-11.ic11", 0x3400000, 0x0400000, CRC(059ec592) SHA1(205210af558eb7e8e1399b2a506ef0285c5feda3)  ) // bank 3 (alt PCB number 10)
+	ROM_LOAD( "mr99029-12.ic12", 0x3800000, 0x0400000, CRC(84d4badb) SHA1(fc20f97a008f000a49e7cadd559789516643704a)  ) // bank 3 (alt PCB number 11)
+	ROM_LOAD( "mr99029-13.ic13", 0x3c00000, 0x0400000, CRC(4527a9b7) SHA1(a73ebece5c84bf14f8d25bbd869b7b43b1fcd042)  ) // bank 3 (alt PCB number 12)
+	ROM_LOAD( "mr99029-14.ic14", 0x4000000, 0x0400000, CRC(bfa4b7ce) SHA1(4100f2deabb8994e8e3ff897a1db13693ab64c11)  ) // bank 4 (alt PCB number 13)
+	ROM_LOAD( "mr99029-15.ic15", 0x4400000, 0x0400000, CRC(a2ccd2ce) SHA1(fc6325219f7b8e68c22a129f5ec4e900e326fb9d)  ) // bank 4 (alt PCB number 14)
+	ROM_LOAD( "mr99029-16.ic16", 0x4800000, 0x0400000, CRC(95baf678) SHA1(f7b39a3379f16df0560a22d4f42165ebbe05cebe)  ) // bank 4 (alt PCB number 15)
+	ROM_LOAD( "mr99029-17.ic17", 0x4c00000, 0x0400000, CRC(5883c84b) SHA1(54aec4e1e2f5edc198aebc4788caf5062f9a5b6c)  ) // bank 5 (alt PCB number 16)
+	ROM_LOAD( "mr99029-18.ic19", 0x5000000, 0x0400000, CRC(f92098ce) SHA1(9b13cd37ad5d7baf36b20218c4bced956084ec45)  ) // bank 5 (alt PCB number 17)
+	ROM_LOAD( "mr99029-19.ic20", 0x5400000, 0x0400000, CRC(dbb2c228) SHA1(f7cd24026236e2c616376c695b9e986cc221f36d)  ) // bank 5 (alt PCB number 18)
+	ROM_LOAD( "mr99029-20.ic21", 0x5800000, 0x0400000, CRC(9efdae1c) SHA1(6158a1804fbaa9ce27ae7e12cfda5f49084b4998)  ) // bank 6 (alt PCB number 19)
+	ROM_LOAD( "mr99029-21.ic22", 0x5c00000, 0x0400000, CRC(5f301b83) SHA1(e24e85c43a62871360545aa42dfa439045334b79)  ) // bank 6 (alt PCB number 20)
+//	ROM_LOAD( "ic23",            0x6000000, ) // bank 6 ( ** unpopulated **  -  alt PCB number 21)
+//	ROM_LOAD( "ic24",            0x6400000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 22)
+//	ROM_LOAD( "ic25",            0x6800000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 23)
+//	ROM_LOAD( "ic26",            0x6c00000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 24)
 
 ROM_END
 
