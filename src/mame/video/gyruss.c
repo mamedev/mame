@@ -40,44 +40,39 @@ static UINT32 scanline;
 PALETTE_INIT( gyruss )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 
 	for (i = 0;i < machine->drv->total_colors;i++)
 	{
+		UINT8 data;
 		int bit0,bit1,bit2,r,g,b;
 
+		if (i < 0x40)
+			/* characters */
+			data = color_prom[(color_prom[0x120 + i] & 0x0f) | 0x10];
+		else
+			/* sprites */
+			data = color_prom[color_prom[0x20 + (i - 0x40)] & 0x0f];
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (data >> 0) & 0x01;
+		bit1 = (data >> 1) & 0x01;
+		bit2 = (data >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (data >> 3) & 0x01;
+		bit1 = (data >> 4) & 0x01;
+		bit2 = (data >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (data >> 6) & 0x01;
+		bit2 = (data >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
 	}
-
-	/* color_prom now points to the beginning of the sprite lookup table */
-
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = *(color_prom++) & 0x0f;
-
-	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
 }
 
 

@@ -35,8 +35,6 @@ static tilemap *bg_tilemap;
 
 PALETTE_INIT( ampoker2 )
 {
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	int i;
 
 /*    - bits -
