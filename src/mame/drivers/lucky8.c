@@ -31,47 +31,34 @@ static tilemap *bg_tilemap;
 
 static PALETTE_INIT( lucky8 )
 {
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	int i;
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		// red component
+		UINT8 pen = color_prom[0x20 + i] & 0x0f;
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-
+		/* red component */
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// green component
-
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		/* green component */
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
 
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		// blue component
-
+		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-
+		bit1 = (color_prom[pen] >> 6) & 0x01;
+		bit2 = (color_prom[pen] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-
-		color_prom++;
-	}
-
-	for (i = 0; i < 0x100; i++)
-	{
-		COLOR(0, i) = (*color_prom) & 0x0f;
-		color_prom++;
 	}
 }
 
@@ -381,8 +368,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(lucky8)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_PALETTE_INIT(lucky8)
 	MDRV_VIDEO_START(lucky8)

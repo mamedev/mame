@@ -25,75 +25,57 @@ static tilemap *bg2_tilemap, *bg_tilemap, *fg_tilemap;
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT( 1943 )
 {
 	int i;
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
+		UINT8 pen;
 		int bit0, bit1, bit2, bit3, r, g, b;
 
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
+		if (i < 0x80)
+			/* characters use colors 64-79 */
+			pen = ((color_prom[0x300 + (i - 0x000)] & 0x0f) << 0) | 0x40;
+		else if (i < 0x180)
+			/* foreground tiles use colors 0-63 */
+			pen = ((color_prom[0x500 + (i - 0x080)] & 0x03) << 4) |
+				  ((color_prom[0x400 + (i - 0x080)] & 0x0f) << 0) | 0x00;
+		else if (i < 0x280)
+			/* background tiles use colors 0-63 */
+			pen = ((color_prom[0x700 + (i - 0x180)] & 0x03) << 4) |
+				  ((color_prom[0x600 + (i - 0x180)] & 0x0f) << 0) | 0x00;
+		else
+			/* sprites use colors 128-255
+               bit 3 of BMPROM.07 selects priority over the background,
+               but we handle it differently for speed reasons */
+			pen = ((color_prom[0x900 + (i - 0x280)] & 0x07) << 4) |
+				  ((color_prom[0x800 + (i - 0x280)] & 0x0f) << 0) | 0x80;
 
+		/* red component */
+		bit0 = (color_prom[pen + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[pen + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[pen + 0x000] >> 2) & 0x01;
+		bit3 = (color_prom[pen + 0x000] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
-
+		/* green component */
+		bit0 = (color_prom[pen + 0x100] >> 0) & 0x01;
+		bit1 = (color_prom[pen + 0x100] >> 1) & 0x01;
+		bit2 = (color_prom[pen + 0x100] >> 2) & 0x01;
+		bit3 = (color_prom[pen + 0x100] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
-
+		/* blue component */
+		bit0 = (color_prom[pen + 0x200] >> 0) & 0x01;
+		bit1 = (color_prom[pen + 0x200] >> 1) & 0x01;
+		bit2 = (color_prom[pen + 0x200] >> 2) & 0x01;
+		bit3 = (color_prom[pen + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
-
-	color_prom += 3*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the lookup table */
-
-	/* characters use colors 64-79 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) + 64;
-	color_prom += 128;	/* skip the bottom half of the PROM - not used */
-
-	/* foreground tiles use colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-	{
-		/* color 0 MUST map to pen 0 in order for transparency to work */
-		if (i % machine->gfx[1]->color_granularity == 0)
-			COLOR(1,i) = 0;
-		else
-			COLOR(1,i) = color_prom[0] + 16 * (color_prom[256] & 0x03);
-		color_prom++;
-	}
-	color_prom += TOTAL_COLORS(1);
-
-	/* background tiles use colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		COLOR(2,i) = color_prom[0] + 16 * (color_prom[256] & 0x03);
-		color_prom++;
-	}
-	color_prom += TOTAL_COLORS(2);
-
-	/* sprites use colors 128-255 */
-	/* bit 3 of BMPROM.07 selects priority over the background, but we handle */
-	/* it differently for speed reasons */
-	for (i = 0;i < TOTAL_COLORS(3);i++)
-	{
-		COLOR(3,i) = color_prom[0] + 16 * (color_prom[256] & 0x07) + 128;
-		color_prom++;
-	}
-	color_prom += TOTAL_COLORS(3);
 }
 
 WRITE8_HANDLER( c1943_videoram_w )

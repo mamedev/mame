@@ -22,30 +22,24 @@ PALETTE_INIT( gotya )
 	{
 		int bit0, bit1, bit2, r, g, b;
 
-		UINT8 data = color_prom[color_prom[0x20 + i]];
+		UINT8 pen = color_prom[0x20 + i] & 0x1f;
 
 		/* red component */
-
-		bit0 = (data >> 0) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		bit2 = (data >> 2) & 0x01;
-
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
-
-		bit0 = (data >> 3) & 0x01;
-		bit1 = (data >> 4) & 0x01;
-		bit2 = (data >> 5) & 0x01;
-
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
-
 		bit0 = 0;
-		bit1 = (data >> 6) & 0x01;
-		bit2 = (data >> 7) & 0x01;
-
+		bit1 = (color_prom[pen] >> 6) & 0x01;
+		bit2 = (color_prom[pen] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));

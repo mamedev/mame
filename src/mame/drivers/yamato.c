@@ -71,89 +71,65 @@
 static PALETTE_INIT( yamato )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
-
 
 	/* chars - 12 bits RGB */
-	for (i = 0;i < 64;i++)
+	for (i = 0; i < 0x40; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
+		int bit0, bit1, bit2, bit3, r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* green component */
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* blue component */
-		bit0 = (color_prom[64] >> 0) & 0x01;
-		bit1 = (color_prom[64] >> 1) & 0x01;
-		bit2 = (color_prom[64] >> 2) & 0x01;
-		bit3 = (color_prom[64] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x40] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x40] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x40] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x40] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
-	color_prom += 64;
 
 	/* big sprite - 8 bits RGB */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[i + 0x80] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[i + 0x80] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 4) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 6) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+64,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-
-	/* character and sprite lookup table */
-	/* they use colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
-		/* pen 0 always uses color 0 (background in River Patrol and Silver Land) */
-		if (i % 4 == 0) COLOR(0,i) = 0;
-		else COLOR(0,i) = i;
-	}
-
-	/* big sprite lookup table */
-	/* it uses colors 64-95 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		if (i % 4 == 0) COLOR(2,i) = 0;
-		else COLOR(2,i) = i + 64;
+		palette_set_color(machine, i + 0x40, MAKE_RGB(r, g, b));
 	}
 
 	/* fake colors for bg gradient */
-	for (i = 0;i < 256;i++)
-	{
-		palette_set_color(machine,i+16*4+8*4,MAKE_RGB(0,0,i));
-	}
+	for (i = 0; i < 0x100; i++)
+		palette_set_color(machine, i + 0x60, MAKE_RGB(0, 0, i));
 }
 
 static PALETTE_INIT( toprollr )
@@ -553,7 +529,6 @@ static MACHINE_DRIVER_START( yamato )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(yamato)
 	MDRV_PALETTE_LENGTH(96+256)
-	MDRV_COLORTABLE_LENGTH(16*4+8*4)
 
 	MDRV_PALETTE_INIT(yamato)
 	MDRV_VIDEO_START(generic)

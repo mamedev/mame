@@ -671,6 +671,8 @@ VIDEO_UPDATE( yamato )
 	}
 
 
+	fillbitmap(tmpbitmap, 0, NULL);
+
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy,flipx,flipy;
@@ -698,7 +700,7 @@ VIDEO_UPDATE( yamato )
 				colorram[offs] & 0x0f,
 				flipx,flipy,
 				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+				NULL,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -724,7 +726,7 @@ VIDEO_UPDATE( yamato )
 			}
 		}
 
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
+		copyscrollbitmap_trans(bitmap,tmpbitmap,0,0,32,scroll,cliprect,0);
 	}
 
 

@@ -18,44 +18,38 @@ static tilemap *bg_tilemap;
 static PALETTE_INIT( olibochu )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 pen;
+		int bit0, bit1, bit2, r, g, b;
 
+		if (i < 0x100)
+			/* characters */
+			pen = (color_prom[0x020 + (i - 0x000)] & 0x0f) | 0x10;
+		else
+			/* sprites */
+			pen = (color_prom[0x120 + (i - 0x100)] & 0x0f) | 0x00;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
+		bit0 = (color_prom[pen] >> 6) & 0x01;
+		bit1 = (color_prom[pen] >> 7) & 0x01;
 		b = 0x4f * bit0 + 0xa8 * bit1;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
-
-	/* color_prom now points to the beginning of the lookup table */
-
-
-	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
-
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = (*(color_prom++) & 0x0f);
 }
 
 static WRITE8_HANDLER( olibochu_videoram_w )
@@ -389,8 +383,7 @@ static MACHINE_DRIVER_START( olibochu )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(olibochu)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(512)
+	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(olibochu)
 	MDRV_VIDEO_START(olibochu)
