@@ -67,6 +67,7 @@ enum
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
 	XTAL_12_5MHz   		= 12500000,		/* Red Alert audio board */
+	XTAL_12_9792MHz		= 12979200,		/* Exidy 440 */
 	XTAL_13_3MHz  		= 13300000,		/* BMC bowling */
 	XTAL_13_33056MHz 	= 13330560,		/* Taito L */
 	XTAL_13_4MHz		= 13400000,		/* TNK3, Ikari Warriors h/w */

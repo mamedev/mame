@@ -8,14 +8,12 @@
 
 
 #include "driver.h"
+#include "tutankhm.h"
 
 
 #define NUM_PENS	(0x10)
 
 
-UINT8 *tutankhm_videoram;
-size_t tutankhm_videoram_size;
-UINT8 *tutankhm_paletteram;
 UINT8 *tutankhm_scroll;
 
 static UINT8 junofrst_blitterdata[4];
@@ -42,10 +40,18 @@ static void get_pens(pen_t *pens)
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = tutankhm_paletteram[i];
+		UINT8 data = paletteram[i];
 
 		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
+}
+
+
+VIDEO_START( tutankhm )
+{
+	state_save_register_global_array(junofrst_blitterdata);
+	state_save_register_global(tutankhm_flip_screen_x);
+	state_save_register_global(tutankhm_flip_screen_y);
 }
 
 
@@ -56,11 +62,11 @@ VIDEO_UPDATE( tutankhm )
 
 	get_pens(pens);
 
-	for (offs = 0; offs < tutankhm_videoram_size; offs++)
+	for (offs = 0; offs < videoram_size; offs++)
 	{
 		int i;
 
-		UINT8 data = tutankhm_videoram[offs];
+		UINT8 data = videoram[offs];
 
 		UINT8 y = offs >> 7;
 		UINT8 x = offs << 1;
@@ -150,9 +156,9 @@ WRITE8_HANDLER( junofrst_blitter_w )
 						data = 0;
 
 					if (dest & 1)
-						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0x0f) | (data << 4);
+						videoram[dest >> 1] = (videoram[dest >> 1] & 0x0f) | (data << 4);
 					else
-						tutankhm_videoram[dest >> 1] = (tutankhm_videoram[dest >> 1] & 0xf0) | data;
+						videoram[dest >> 1] = (videoram[dest >> 1] & 0xf0) | data;
 				}
 
 				dest = dest + 1;

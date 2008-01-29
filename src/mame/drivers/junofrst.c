@@ -79,6 +79,7 @@ Blitter source graphics
 
 #include "driver.h"
 #include "deprecat.h"
+#include "tutankhm.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/i8039/i8039.h"
 #include "cpu/z80/z80.h"
@@ -89,17 +90,7 @@ Blitter source graphics
 
 void konami1_decode(void);
 
-extern UINT8 *tutankhm_videoram;
-extern size_t tutankhm_videoram_size;
-extern UINT8 *tutankhm_paletteram;
-extern UINT8 *tutankhm_scroll;
-
 static int i8039_status;
-
-WRITE8_HANDLER( tutankhm_flip_screen_x_w );
-WRITE8_HANDLER( tutankhm_flip_screen_y_w );
-WRITE8_HANDLER( junofrst_blitter_w );
-VIDEO_UPDATE( tutankhm );
 
 WRITE8_HANDLER( tutankhm_sh_irqtrigger_w );
 
@@ -190,8 +181,8 @@ static WRITE8_HANDLER( junofrst_coin_counter_w )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&tutankhm_videoram) AM_SIZE(&tutankhm_videoram_size)
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE(&tutankhm_paletteram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE(&paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ(input_port_0_r)	/* DSW2 (inverted bits) */
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ(input_port_1_r)	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
@@ -366,6 +357,7 @@ static MACHINE_DRIVER_START( junofrst )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
 
+	MDRV_VIDEO_START(tutankhm)
 	MDRV_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */

@@ -1,14 +1,8 @@
 #include "driver.h"
+#include "timeplt.h"
 
-UINT8 *timeplt_videoram,*timeplt_colorram;
 static tilemap *bg_tilemap;
-
-/*
-sprites are multiplexed, so we have to buffer the spriteram
-scanline by scanline.
-*/
-static UINT8 *sprite_mux_buffer,*sprite_mux_buffer_2;
-static int scanline;
+static emu_timer *scanline_timer;
 
 
 /***************************************************************************
@@ -40,49 +34,46 @@ static int scanline;
 ***************************************************************************/
 PALETTE_INIT( timeplt )
 {
+	rgb_t palette[32];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < 32;i++)
 	{
 		int bit0,bit1,bit2,bit3,bit4,r,g,b;
 
-
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
-		bit2 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
-		bit3 = (color_prom[i + machine->drv->total_colors] >> 4) & 0x01;
-		bit4 = (color_prom[i + machine->drv->total_colors] >> 5) & 0x01;
+		bit0 = (color_prom[i + 1*32] >> 1) & 0x01;
+		bit1 = (color_prom[i + 1*32] >> 2) & 0x01;
+		bit2 = (color_prom[i + 1*32] >> 3) & 0x01;
+		bit3 = (color_prom[i + 1*32] >> 4) & 0x01;
+		bit4 = (color_prom[i + 1*32] >> 5) & 0x01;
 		r = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 6) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 7) & 0x01;
-		bit2 = (color_prom[i] >> 0) & 0x01;
-		bit3 = (color_prom[i] >> 1) & 0x01;
-		bit4 = (color_prom[i] >> 2) & 0x01;
+		bit0 = (color_prom[i + 1*32] >> 6) & 0x01;
+		bit1 = (color_prom[i + 1*32] >> 7) & 0x01;
+		bit2 = (color_prom[i + 0*32] >> 0) & 0x01;
+		bit3 = (color_prom[i + 0*32] >> 1) & 0x01;
+		bit4 = (color_prom[i + 0*32] >> 2) & 0x01;
 		g = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		bit3 = (color_prom[i] >> 6) & 0x01;
-		bit4 = (color_prom[i] >> 7) & 0x01;
+		bit0 = (color_prom[i + 0*32] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0*32] >> 4) & 0x01;
+		bit2 = (color_prom[i + 0*32] >> 5) & 0x01;
+		bit3 = (color_prom[i + 0*32] >> 6) & 0x01;
+		bit4 = (color_prom[i + 0*32] >> 7) & 0x01;
 		b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette[i] = MAKE_RGB(r,g,b);
 	}
 
-	color_prom += 2*machine->drv->total_colors;
+	color_prom += 2*32;
 	/* color_prom now points to the beginning of the lookup table */
 
 
 	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = *(color_prom++) & 0x0f;
+	for (i = 0;i < 64*4;i++)
+		palette_set_color(machine, 32*4 + i, palette[*color_prom++ & 0x0f]);
 
 	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
+	for (i = 0;i < 32*4;i++)
+		palette_set_color(machine, i, palette[(*color_prom++ & 0x0f) + 0x10]);
 }
 
 
@@ -95,13 +86,13 @@ PALETTE_INIT( timeplt )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = timeplt_colorram[tile_index];
+	UINT8 attr = colorram[tile_index];
 	tileinfo->category = (attr & 0x10) >> 4;
 	SET_TILE_INFO(
 			0,
-			timeplt_videoram[tile_index] + ((attr & 0x20) << 3),
+			videoram[tile_index] + ((attr & 0x20) << 3),
 			attr & 0x1f,
-			TILE_FLIPYX((attr & 0xc0) >> 6));
+			TILE_FLIPYX(attr >> 6));
 }
 
 
@@ -112,12 +103,25 @@ static TILE_GET_INFO( get_tile_info )
 
 ***************************************************************************/
 
+static TIMER_CALLBACK( scanline_interrupt )
+{
+	int scanline = param;
+	
+	video_screen_update_partial(0, scanline - 1);
+
+	scanline++;
+	if (scanline > machine->screen[0].visarea.max_y)
+		scanline = machine->screen[0].visarea.min_y;
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
+}
+
+
 VIDEO_START( timeplt )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-
-	sprite_mux_buffer = auto_malloc(256 * spriteram_size);
-	sprite_mux_buffer_2 = auto_malloc(256 * spriteram_size);
+	
+	scanline_timer = timer_alloc(scanline_interrupt, NULL);
+	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 
@@ -130,13 +134,13 @@ VIDEO_START( timeplt )
 
 WRITE8_HANDLER( timeplt_videoram_w )
 {
-	timeplt_videoram[offset] = data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( timeplt_colorram_w )
 {
-	timeplt_colorram[offset] = data;
+	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
@@ -145,10 +149,9 @@ WRITE8_HANDLER( timeplt_flipscreen_w )
 	flip_screen_set(~data & 1);
 }
 
-/* Return the current video scan line */
 READ8_HANDLER( timeplt_scanline_r )
 {
-	return scanline;
+	return video_screen_get_vpos(0);
 }
 
 
@@ -162,44 +165,26 @@ READ8_HANDLER( timeplt_scanline_r )
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[1];
-	rectangle clip = *cliprect;
 	int offs;
-	int line;
 
-
-	for (line = 0;line < 256;line++)
+	for (offs = 0x3e;offs >= 0x10;offs -= 2)
 	{
-		if (line >= cliprect->min_y && line <= cliprect->max_y)
-		{
-			UINT8 *sr,*sr2;
+		int code,color,sx,sy,flipx,flipy;
 
-			sr = sprite_mux_buffer + line * spriteram_size;
-			sr2 = sprite_mux_buffer_2 + line * spriteram_size;
-			clip.min_y = clip.max_y = line;
+		sx = spriteram[offs];
+		sy = 240 - spriteram_2[offs + 1];
 
-			for (offs = spriteram_size - 2;offs >= 0;offs -= 2)
-			{
-				int code,color,sx,sy,flipx,flipy;
+		code = spriteram[offs + 1];
+		color = spriteram_2[offs] & 0x3f;
+		flipx = ~spriteram_2[offs] & 0x40;
+		flipy = spriteram_2[offs] & 0x80;
 
-				sx = sr[offs];
-				sy = 241 - sr2[offs + 1];
-
-				if (sy > line-16 && sy <= line)
-				{
-					code = sr[offs + 1];
-					color = sr2[offs] & 0x3f;
-					flipx = ~sr2[offs] & 0x40;
-					flipy = sr2[offs] & 0x80;
-
-					drawgfx(bitmap,gfx,
-							code,
-							color,
-							flipx,flipy,
-							sx,sy,
-							&clip,TRANSPARENCY_PEN,0);
-				}
-			}
-		}
+		drawgfx(bitmap,gfx,
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -209,16 +194,4 @@ VIDEO_UPDATE( timeplt )
 	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	return 0;
-}
-
-
-INTERRUPT_GEN( timeplt_interrupt )
-{
-	scanline = 255 - cpu_getiloops();
-
-	memcpy(sprite_mux_buffer + scanline * spriteram_size,spriteram,spriteram_size);
-	memcpy(sprite_mux_buffer_2 + scanline * spriteram_size,spriteram_2,spriteram_size);
-
-	if (scanline == 255)
-		nmi_line_pulse(machine, cpunum);
 }
