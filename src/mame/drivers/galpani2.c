@@ -217,56 +217,37 @@ static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 }
 
 
-static ADDRESS_MAP_START( galpani2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM					)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM					)	// Work RAM
-	AM_RANGE(0x300000, 0x301fff) AM_READ(MRA16_RAM					)	// ?
-	AM_RANGE(0x302000, 0x303fff) AM_READ(MRA16_RAM					)	// Sprites
-	AM_RANGE(0x304000, 0x30401f) AM_READ(MRA16_RAM					)	// Sprites Regs
-	AM_RANGE(0x310000, 0x3101ff) AM_READ(MRA16_RAM					)	// Background Palette
-	AM_RANGE(0x318000, 0x318001) AM_READ(galpani2_eeprom_r			)	// EEPROM
-	AM_RANGE(0x380000, 0x38ffff) AM_READ(MRA16_RAM					)	// ? + Sprites Palette
-	AM_RANGE(0x400000, 0x43ffff) AM_READ(MRA16_RAM					)	// Background 0
-	AM_RANGE(0x440000, 0x440001) AM_READ(MRA16_RAM					)	// Background 0 Scroll X
-	AM_RANGE(0x480000, 0x480001) AM_READ(MRA16_RAM					)	// Background 0 Scroll Y
-	AM_RANGE(0x500000, 0x53ffff) AM_READ(MRA16_RAM					)	// Background 1
-	AM_RANGE(0x540000, 0x540001) AM_READ(MRA16_RAM					)	// Background 1 Scroll X
-	AM_RANGE(0x580000, 0x580001) AM_READ(MRA16_RAM					)	// Background 1 Scroll Y
-	AM_RANGE(0x780000, 0x780001) AM_READ(input_port_0_word_r		)	// Input Ports
-	AM_RANGE(0x780002, 0x780003) AM_READ(input_port_1_word_r		)	//
-	AM_RANGE(0x780004, 0x780005) AM_READ(input_port_2_word_r		)	//
-	AM_RANGE(0x780006, 0x780007) AM_READ(input_port_3_word_r		)	//
-	AM_RANGE(0xc00000, 0xc00001) AM_READ(OKIM6295_status_0_lsb_r	)	// 2 x OKIM6295
-	AM_RANGE(0xc40000, 0xc40001) AM_READ(OKIM6295_status_1_lsb_r	)	//
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( galpani2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM								)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_ram				)	// Work RAM
-	AM_RANGE(0x300000, 0x301fff) AM_WRITE(MWA16_RAM								)	// ?
-	AM_RANGE(0x302000, 0x303fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size			)	// Sprites
-	AM_RANGE(0x304000, 0x30401f) AM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs	)	// Sprites Regs
+static ADDRESS_MAP_START( galpani2_mem1, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM												// ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&galpani2_ram				)		// Work RAM
+	AM_RANGE(0x300000, 0x301fff) AM_RAM												// ?
+	AM_RANGE(0x302000, 0x303fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0x304000, 0x30401f) AM_READWRITE(MRA16_RAM, kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs	)	// Sprites Regs
+//  AM_RANGE(0x308000, 0x308001) AM_WRITE(MWA16_NOP                             )   // ? 0 at startup
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITE(MWA16_NOP								)	// ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_WRITE(galpani2_palette_0_w) AM_BASE(&galpani2_palette_0		)	// ?
+	AM_RANGE(0x310000, 0x3101ff) AM_READWRITE(MRA16_RAM, galpani2_palette_0_w) AM_BASE(&galpani2_palette_0	)	// ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITE(MWA16_NOP								)	// ? flip backgrounds ?
-	AM_RANGE(0x318000, 0x318001) AM_WRITE(galpani2_eeprom_w						)	// EEPROM
-	AM_RANGE(0x380000, 0x387fff) AM_WRITE(MWA16_RAM								)	// Palette?
-	AM_RANGE(0x388000, 0x38ffff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x400000, 0x43ffff) AM_WRITE(galpani2_bg8_0_w) AM_BASE(&galpani2_bg8_0		)	// Background 0
-	AM_RANGE(0x440000, 0x440001) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_bg8_0_scrollx	)	// Background 0 Scroll X
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_bg8_0_scrolly	)	// Background 0 Scroll Y
+	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w	)	// EEPROM
+	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
+	AM_RANGE(0x388000, 0x38ffff) AM_READWRITE(MRA16_RAM, paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x400000, 0x43ffff) AM_READWRITE(MRA16_RAM, galpani2_bg8_0_w) AM_BASE(&galpani2_bg8_0	)	// Background 0
+	AM_RANGE(0x440000, 0x440001) AM_RAM AM_BASE(&galpani2_bg8_0_scrollx	)			// Background 0 Scroll X
+	AM_RANGE(0x480000, 0x480001) AM_RAM AM_BASE(&galpani2_bg8_0_scrolly	)			// Background 0 Scroll Y
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITE(MWA16_NOP								)	// ? 0 at startup only
-	AM_RANGE(0x500000, 0x53ffff) AM_WRITE(galpani2_bg8_1_w) AM_BASE(&galpani2_bg8_1		)	// Background 1
-	AM_RANGE(0x540000, 0x540001) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_bg8_1_scrollx	)	// Background 1 Scroll X
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_bg8_1_scrolly	)	// Background 1 Scroll Y
+	AM_RANGE(0x500000, 0x53ffff) AM_READWRITE(MRA16_RAM, galpani2_bg8_1_w) AM_BASE(&galpani2_bg8_1	)	// Background 1
+	AM_RANGE(0x540000, 0x540001) AM_RAM AM_BASE(&galpani2_bg8_1_scrollx	)			// Background 1 Scroll X
+	AM_RANGE(0x580000, 0x580001) AM_RAM AM_BASE(&galpani2_bg8_1_scrolly	)			// Background 1 Scroll Y
 	AM_RANGE(0x5c0000, 0x5c0001) AM_WRITE(MWA16_NOP								)	// ? 0 at startup only
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(MWA16_NOP								)	// Watchdog
 //  AM_RANGE(0x640000, 0x640001) AM_WRITE(MWA16_NOP                             )   // ? 0 before resetting and at startup
-//  AM_RANGE(0x680000, 0x680001) AM_WRITE(MWA16_NOP                             )   // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
-AM_RANGE(0x680000, 0x680001) AM_WRITE(galpani2_mcu_nmi_w	)	// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+    AM_RANGE(0x680000, 0x680001) AM_WRITE(galpani2_mcu_nmi_w	)					// ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(galpani2_coin_lockout_w				)	// Coin + Card Lockout
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(OKIM6295_data_0_lsb_w					)	// 2 x OKIM6295
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(OKIM6295_data_1_lsb_w					)	//
+	AM_RANGE(0x780000, 0x780001) AM_READ(input_port_0_word_r		)				// Input Ports
+	AM_RANGE(0x780002, 0x780003) AM_READ(input_port_1_word_r		)				//
+	AM_RANGE(0x780004, 0x780005) AM_READ(input_port_2_word_r		)				//
+	AM_RANGE(0x780006, 0x780007) AM_READ(input_port_3_word_r		)				//
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// 2 x OKIM6295
+	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w	)	//
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(galpani2_oki_0_bank_w					)	//
 	AM_RANGE(0xcc0000, 0xcc0001) AM_WRITE(galpani2_oki_1_bank_w					)	//
 ADDRESS_MAP_END
@@ -293,20 +274,11 @@ static READ16_HANDLER( galpani2_bankedrom_r )
 	else				return 0xffff;
 }
 
-
-static ADDRESS_MAP_START( galpani2_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM					)	// ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_READ(MRA16_RAM					)	// Work RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_READ(MRA16_RAM					)	// bg15
-	AM_RANGE(0x500000, 0x5fffff) AM_READ(MRA16_RAM					)	// bg15
-	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)	// Banked ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( galpani2_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM						)	// ROM
-	AM_RANGE(0x100000, 0x13ffff) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_ram2		)	// Work RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_WRITE(galpani2_bg15_w) AM_BASE(&galpani2_bg15	)	// bg15
-	AM_RANGE(0x500000, 0x5fffff) AM_WRITE(MWA16_RAM							)	// bg15
+static ADDRESS_MAP_START( galpani2_mem2, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM																// ROM
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE(&galpani2_ram2)										// Work RAM
+	AM_RANGE(0x400000, 0x4fffff) AM_READWRITE(MRA16_RAM, galpani2_bg15_w) AM_BASE(&galpani2_bg15)	// bg15
+	AM_RANGE(0x500000, 0x5fffff) AM_RAM																// bg15
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(MWA16_NOP						)	// ? 0 at startup only
 	AM_RANGE(0x640000, 0x640001) AM_WRITE(MWA16_NOP						)	// ? 0 at startup only
 	AM_RANGE(0x680000, 0x680001) AM_WRITE(MWA16_NOP						)	// ? 0 at startup only
@@ -314,8 +286,8 @@ static ADDRESS_MAP_START( galpani2_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(MWA16_NOP						)	// Watchdog
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(MWA16_NOP						)	// ? 0 -> 1 -> 0 (lev 5)
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(MWA16_RAM) AM_BASE(&galpani2_rombank	)	// Rom Bank
+	AM_RANGE(0x800000, 0xffffff) AM_READ(galpani2_bankedrom_r		)		// Banked ROM
 ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -326,29 +298,29 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( galpani2 )
-	PORT_START_TAG("IN0")	// IN0 - DSW + Player - 780000.w
-	PORT_DIPNAME( 0x0007, 0x0007, "Unknown 2-0&1&2*" )
-	PORT_DIPSETTING(      0x007, "7" )
-	PORT_DIPSETTING(      0x006, "6" )
-	PORT_DIPSETTING(      0x005, "5" )
-	PORT_DIPSETTING(      0x004, "4" )
-	PORT_DIPSETTING(      0x003, "3" )
-	PORT_DIPSETTING(      0x002, "2" )
-	PORT_DIPSETTING(      0x001, "1" )
-	PORT_DIPSETTING(      0x000, "0" )
-	PORT_DIPNAME( 0x0008, 0x0008, "Unknown 2-3*" )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0030, 0x0030, "Unknown 2-4&5" )	// from?
-	PORT_DIPSETTING(      0x0030, "3" )	// 2
-	PORT_DIPSETTING(      0x0020, "2" )	// 0
-	PORT_DIPSETTING(      0x0010, "1" )	// 3
-	PORT_DIPSETTING(      0x0000, "0" )	// 4
-	PORT_DIPNAME( 0x00c0, 0x00c0, "Unknown 2-6&7" )	// to?
-	PORT_DIPSETTING(      0x00c0, "3" )	// 9
-	PORT_DIPSETTING(      0x0080, "2" )	// 1
-	PORT_DIPSETTING(      0x0040, "1" )	// 4
-	PORT_DIPSETTING(      0x0000, "0" )	// 6
+	PORT_START_TAG("IN0")	// IN0 - DSW + Player 1 - 780000.w
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x007, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x006, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(      0x005, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x004, "Normal +" )
+	PORT_DIPSETTING(      0x003, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x002, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(      0x001, "Ultra Hard" )
+	PORT_DIPSETTING(      0x000, "God Hands" )
+	PORT_DIPNAME( 0x0008, 0x0008, "Picture Mode" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "Adult" )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0030, "3" )
+	PORT_DIPSETTING(      0x0020, "1" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPNAME( 0x00c0, 0x00c0, "Max Unit of Players" )
+	PORT_DIPSETTING(      0x00c0, "9" )
+	PORT_DIPSETTING(      0x0080, "1" )
+	PORT_DIPSETTING(      0x0040, "4" )
+	PORT_DIPSETTING(      0x0000, "6" )
 
 	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -359,7 +331,7 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START_TAG("IN1")	// IN1 - DSW + Player - 780002.w
+	PORT_START_TAG("IN1")	// IN1 - DSW + Player 2 - 780002.w
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x000f, "1 Coin/1 Credit  1/1" )
 	PORT_DIPSETTING(      0x000e, "2 Coin/1 Credit  2/1" )
@@ -377,9 +349,9 @@ static INPUT_PORTS_START( galpani2 )
 	PORT_DIPSETTING(      0x0002, "1 Coin/2 Credit  1/2" )
 	PORT_DIPSETTING(      0x0001, "1 Coin/3 Credit  1/3" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Unknown 1-4*" )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Card Dispenser" )
+	PORT_DIPSETTING(      0x0010, "Used" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -431,7 +403,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*
-    16x16x8 made of four 8x8x8 tiles arrenged like: 01
+    16x16x8 made of four 8x8x8 tiles arranged like: 01
                                                     23
 */
 static const gfx_layout layout_16x16x8 =
@@ -488,11 +460,11 @@ static MACHINE_DRIVER_START( galpani2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(galpani2_readmem,galpani2_writemem)
+	MDRV_CPU_PROGRAM_MAP(galpani2_mem1, 0)
 	MDRV_CPU_VBLANK_INT(galpani2_interrupt,GALPANI2_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16MHz */
-	MDRV_CPU_PROGRAM_MAP(galpani2_readmem2,galpani2_writemem2)
+	MDRV_CPU_PROGRAM_MAP(galpani2_mem2, 0)
 	MDRV_CPU_VBLANK_INT(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -533,6 +505,15 @@ MACHINE_DRIVER_END
 
 
 ***************************************************************************/
+
+//POST's displayed checksums
+//
+//galpani2 = 6A6C
+//galpan2g = 15A3
+//galpan2t = 18A3
+//galpan2j = 08E1 / A582
+//gp2quiz  = 78D6 / 84A0
+//gp2se    = 6D8C / FCE4
 
 /***************************************************************************
 
@@ -599,8 +580,8 @@ ROM_START( galpani2 )
 	ROM_LOAD16_BYTE( "g003a2.u63-1", 0x000001, 0x020000, CRC(0d30725d) SHA1(d4614f9ffb930c4ea36cb3fbacffe63060e92402) )
 
 	ROM_REGION16_BE( 0x1500000, REGION_USER1, 0 )	/* Backgrounds (CPU2) */
-	ROM_LOAD16_BYTE( "gp2-300b.053", 0x0000000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD16_BYTE( "gp2-300a.052", 0x0000001, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
+	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
+	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
 	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
 	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
@@ -696,8 +677,8 @@ ROM_START( galpan2t )
 	ROM_LOAD16_BYTE( "g003t1.126", 0x000001, 0x020000, CRC(20d3a2ad) SHA1(93450e5a23456c242ebf1a3560013a17c6b05354) )
 
 	ROM_REGION16_BE( 0x1500000, REGION_USER1, 0 )	/* Backgrounds (CPU2) */
-	ROM_LOAD16_BYTE( "gp2-300b.053", 0x0000000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD16_BYTE( "gp2-300a.052", 0x0000001, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
+	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
+	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
 	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
 	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
 	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
@@ -883,6 +864,6 @@ ROM_END
 GAME( 1993, galpani2, 0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Asia)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, galpan2g, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (German)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, galpan2t, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Taiwan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1993, galpan2j, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // was previously 'quiz edition' but the title screen doesn't say that??
+GAME( 1993, galpan2j, galpani2, galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // it is a 'quiz edition' but the title screen doesn't say that??
 GAME( 1993, gp2quiz,  0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II - Quiz Version (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION ) // this one has 'quiz edition' on the title screen
 GAME( 1994, gp2se,    0,        galpani2, galpani2, 0, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
