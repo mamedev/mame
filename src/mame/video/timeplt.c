@@ -1,3 +1,11 @@
+/***************************************************************************
+
+	Time Pilot 
+
+	driver by Nicola Salmoria
+
+***************************************************************************/
+
 #include "driver.h"
 #include "timeplt.h"
 
@@ -32,6 +40,7 @@ static emu_timer *scanline_timer;
   bit 0 -- not connected
 
 ***************************************************************************/
+
 PALETTE_INIT( timeplt )
 {
 	rgb_t palette[32];
@@ -78,37 +87,39 @@ PALETTE_INIT( timeplt )
 
 
 
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
+/*************************************
+ *
+ *  Tilemap info callback
+ *
+ *************************************/
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 attr = colorram[tile_index];
+	int attr = colorram[tile_index];
+	int code = videoram[tile_index] + 8 * (attr & 0x20);
+	int color = attr & 0x1f;
+	int flags = TILE_FLIPYX(attr >> 6);
+
 	tileinfo->category = (attr & 0x10) >> 4;
-	SET_TILE_INFO(
-			0,
-			videoram[tile_index] + ((attr & 0x20) << 3),
-			attr & 0x1f,
-			TILE_FLIPYX(attr >> 6));
+	SET_TILE_INFO(0, code, color, flags);
 }
 
 
 
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
+/*************************************
+ *
+ *  Per-scanline callback
+ *
+ *************************************/
 
 static TIMER_CALLBACK( scanline_interrupt )
 {
 	int scanline = param;
 	
-	video_screen_update_partial(0, scanline - 1);
+	/* we need to use partial updates to handle multiplexed sprites */
+	video_screen_update_partial(0, scanline);
 
+	/* only need to hit on visible scanlines */
 	scanline++;
 	if (scanline > machine->screen[0].visarea.max_y)
 		scanline = machine->screen[0].visarea.min_y;
@@ -116,21 +127,29 @@ static TIMER_CALLBACK( scanline_interrupt )
 }
 
 
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
 VIDEO_START( timeplt )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
 	
+	/* create a timer for scanline updates */
 	scanline_timer = timer_alloc(scanline_interrupt, NULL);
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 
 
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
+/*************************************
+ *
+ *  Memory write handlers
+ *
+ *************************************/
 
 WRITE8_HANDLER( timeplt_videoram_w )
 {
@@ -138,16 +157,19 @@ WRITE8_HANDLER( timeplt_videoram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
+
 WRITE8_HANDLER( timeplt_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
+
 WRITE8_HANDLER( timeplt_flipscreen_w )
 {
 	flip_screen_set(~data & 1);
 }
+
 
 READ8_HANDLER( timeplt_scanline_r )
 {
@@ -156,30 +178,27 @@ READ8_HANDLER( timeplt_scanline_r )
 
 
 
-/***************************************************************************
-
-  Display refresh
-
-***************************************************************************/
+/*************************************
+ *
+ *  Sprite rendering
+ *
+ *************************************/
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	const gfx_element *gfx = machine->gfx[1];
 	int offs;
 
 	for (offs = 0x3e;offs >= 0x10;offs -= 2)
 	{
-		int code,color,sx,sy,flipx,flipy;
+		int sx = spriteram[offs];
+		int sy = 241 - spriteram_2[offs + 1];
 
-		sx = spriteram[offs];
-		sy = 240 - spriteram_2[offs + 1];
+		int code = spriteram[offs + 1];
+		int color = spriteram_2[offs] & 0x3f;
+		int flipx = ~spriteram_2[offs] & 0x40;
+		int flipy = spriteram_2[offs] & 0x80;
 
-		code = spriteram[offs + 1];
-		color = spriteram_2[offs] & 0x3f;
-		flipx = ~spriteram_2[offs] & 0x40;
-		flipy = spriteram_2[offs] & 0x80;
-
-		drawgfx(bitmap,gfx,
+		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -187,6 +206,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 VIDEO_UPDATE( timeplt )
 {

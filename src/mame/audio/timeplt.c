@@ -20,12 +20,14 @@
 #define MASTER_CLOCK		XTAL_14_31818MHz
 
 
-static READ8_HANDLER( timeplt_portB_r );
-static WRITE8_HANDLER( timeplt_filter_w );
+static UINT8 timeplt_last_irq_state;
 
 
-static int timeplt_last_irq_state;
-
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
 
 static SOUND_START( timeplt )
 {
@@ -33,6 +35,94 @@ static SOUND_START( timeplt )
 	state_save_register_global(timeplt_last_irq_state);
 }
 
+
+
+/*************************************
+ *
+ *  Sound timer
+ *
+ *************************************/
+
+/* The timer clock which feeds the upper 4 bits of                      */
+/* AY-3-8910 port A is based on the same clock                          */
+/* feeding the sound CPU Z80.  It is a divide by                        */
+/* 5120, formed by a standard divide by 512,                            */
+/* followed by a divide by 10 using a 4 bit                             */
+/* bi-quinary count sequence. (See LS90 data sheet                      */
+/* for an example).                                                     */
+/*                                                                      */
+/* Bit 4 comes from the output of the divide by 1024                    */
+/*       0, 1, 0, 1, 0, 1, 0, 1, 0, 1                                   */
+/* Bit 5 comes from the QC output of the LS90 producing a sequence of   */
+/*       0, 0, 1, 1, 0, 0, 1, 1, 1, 0                                   */
+/* Bit 6 comes from the QD output of the LS90 producing a sequence of   */
+/*       0, 0, 0, 0, 1, 0, 0, 0, 0, 1                                   */
+/* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
+/*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
+
+static READ8_HANDLER( timeplt_portB_r )
+{
+	static const int timeplt_timer[10] =
+	{
+		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
+	};
+	return timeplt_timer[(activecpu_gettotalcycles64() / 512) % 10];
+}
+
+
+
+/*************************************
+ *
+ *  Filter controls
+ *
+ *************************************/
+
+static void filter_w(int chip, int channel, int data)
+{
+	int C = 0;
+
+	if (data & 1) C += 220000;	/* 220000pF = 0.220uF */
+	if (data & 2) C +=  47000;	/*  47000pF = 0.047uF */
+	filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
+}
+
+
+static WRITE8_HANDLER( timeplt_filter_w )
+{
+	filter_w(0, 0, (offset >>  6) & 3);
+	filter_w(0, 1, (offset >>  8) & 3);
+	filter_w(0, 2, (offset >> 10) & 3);
+	filter_w(1, 0, (offset >>  0) & 3);
+	filter_w(1, 1, (offset >>  2) & 3);
+	filter_w(1, 2, (offset >>  4) & 3);
+}
+
+
+
+/*************************************
+ *
+ *  External interfaces
+ *
+ *************************************/
+
+WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
+{
+	if (timeplt_last_irq_state == 0 && data)
+	{
+		/* setting bit 0 low then high triggers IRQ on the sound CPU */
+		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	}
+
+	timeplt_last_irq_state = data;
+}
+
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( timeplt_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
@@ -56,6 +146,13 @@ static ADDRESS_MAP_START( locomotn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
+/*************************************
+ *
+ *  Sound chip interfaces
+ *
+ *************************************/
+
 static const struct AY8910interface timeplt_ay8910_interface =
 {
 	soundlatch_r,
@@ -63,66 +160,12 @@ static const struct AY8910interface timeplt_ay8910_interface =
 };
 
 
-/* The timer clock which feeds the upper 4 bits of                      */
-/* AY-3-8910 port A is based on the same clock                          */
-/* feeding the sound CPU Z80.  It is a divide by                        */
-/* 5120, formed by a standard divide by 512,                            */
-/* followed by a divide by 10 using a 4 bit                             */
-/* bi-quinary count sequence. (See LS90 data sheet                      */
-/* for an example).                                                     */
-/*                                                                      */
-/* Bit 4 comes from the output of the divide by 1024                    */
-/*       0, 1, 0, 1, 0, 1, 0, 1, 0, 1                                   */
-/* Bit 5 comes from the QC output of the LS90 producing a sequence of   */
-/*       0, 0, 1, 1, 0, 0, 1, 1, 1, 0                                   */
-/* Bit 6 comes from the QD output of the LS90 producing a sequence of   */
-/*       0, 0, 0, 0, 1, 0, 0, 0, 0, 1                                   */
-/* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
-/*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-static const int timeplt_timer[10] =
-{
-	0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
-};
-
-static READ8_HANDLER( timeplt_portB_r )
-{
-	return timeplt_timer[(activecpu_gettotalcycles64() / 512) % 10];
-}
-
-
-static void filter_w(int chip, int channel, int data)
-{
-	int C = 0;
-
-	if (data & 1) C += 220000;	/* 220000pF = 0.220uF */
-	if (data & 2) C +=  47000;	/*  47000pF = 0.047uF */
-	filter_rc_set_RC(3*chip + channel,FLT_RC_LOWPASS, 1000,5100,0,CAP_P(C));
-}
-
-static WRITE8_HANDLER( timeplt_filter_w )
-{
-	filter_w(0, 0, (offset >>  6) & 3);
-	filter_w(0, 1, (offset >>  8) & 3);
-	filter_w(0, 2, (offset >> 10) & 3);
-	filter_w(1, 0, (offset >>  0) & 3);
-	filter_w(1, 1, (offset >>  2) & 3);
-	filter_w(1, 2, (offset >>  4) & 3);
-}
-
-
-WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
-{
-	if (timeplt_last_irq_state == 0 && data)
-	{
-		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
-	}
-
-	timeplt_last_irq_state = data;
-}
-
-
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 MACHINE_DRIVER_START( timeplt_sound )
 

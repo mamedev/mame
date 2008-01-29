@@ -22,6 +22,12 @@ static UINT8 tutankhm_flip_screen_y;
 
 
 
+/*************************************
+ *
+ *  Write handlers
+ *
+ *************************************/
+
 WRITE8_HANDLER( tutankhm_flip_screen_x_w )
 {
 	tutankhm_flip_screen_x = data & 0x01;
@@ -33,6 +39,13 @@ WRITE8_HANDLER( tutankhm_flip_screen_y_w )
 	tutankhm_flip_screen_y = data & 0x01;
 }
 
+
+
+/*************************************
+ *
+ *  Palette management
+ *
+ *************************************/
 
 static void get_pens(pen_t *pens)
 {
@@ -47,6 +60,13 @@ static void get_pens(pen_t *pens)
 }
 
 
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
 VIDEO_START( tutankhm )
 {
 	state_save_register_global_array(junofrst_blitterdata);
@@ -55,42 +75,34 @@ VIDEO_START( tutankhm )
 }
 
 
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
+
 VIDEO_UPDATE( tutankhm )
 {
+	int xorx = tutankhm_flip_screen_x ? 255 : 0;
+	int xory = tutankhm_flip_screen_y ? 255 : 0;
 	pen_t pens[NUM_PENS];
-	offs_t offs;
+	int x, y;
 
 	get_pens(pens);
-
-	for (offs = 0; offs < videoram_size; offs++)
+	
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int i;
-
-		UINT8 data = videoram[offs];
-
-		UINT8 y = offs >> 7;
-		UINT8 x = offs << 1;
-
-		for (i = 0; i < 2; i++)
+		UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
+		
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			UINT8 sy = y;
-			UINT8 sx = x;
-
-			pen_t pen = pens[data & 0x0f];
-
-			/* adjust for scrolling */
-			if (x < 192)
-			{
-				sy = sy - *tutankhm_scroll;
-			}
-
-			if (tutankhm_flip_screen_y)	sy = 255 - sy;
-			if (tutankhm_flip_screen_x)	sx = 255 - sx;
-
-			*BITMAP_ADDR32(bitmap, sy, sx) = pen;
-
-			x = x + 1;
-			data = data >> 4;
+			UINT8 effx = x ^ xorx;
+			UINT8 yscroll = (effx < 192) ? *tutankhm_scroll : 0;
+			UINT8 effy = (y ^ xory) + yscroll;
+			UINT8 vrambyte = videoram[effy * 128 + effx / 2];
+			UINT8 shifted = vrambyte >> (4 * (effx % 2));
+			dst[x] = pens[shifted & 0x0f];
 		}
 	}
 
