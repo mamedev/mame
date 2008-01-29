@@ -13,6 +13,5 @@ WRITE8_HANDLER( timeplt_flipscreen_w );
 VIDEO_START( timeplt );
 PALETTE_INIT( timeplt );
 VIDEO_UPDATE( timeplt );
-INTERRUPT_GEN( timeplt_interrupt );
 
 

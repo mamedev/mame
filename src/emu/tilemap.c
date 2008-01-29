@@ -265,15 +265,18 @@ INLINE tilemap *indexed_tilemap(int index)
 
 void tilemap_init(running_machine *machine)
 {
-	screen_width	= Machine->screen[0].width;
-	screen_height	= Machine->screen[0].height;
+	screen_width	= machine->screen[0].width;
+	screen_height	= machine->screen[0].height;
 
-	tilemap_list	 = NULL;
-	tilemap_tailptr  = &tilemap_list;
-	tilemap_instance = 0;
-
-	priority_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
-	add_exit_callback(machine, tilemap_exit);
+	if (screen_width != 0 && screen_height != 0)
+	{
+		tilemap_list	 = NULL;
+		tilemap_tailptr  = &tilemap_list;
+		tilemap_instance = 0;
+	
+		priority_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+		add_exit_callback(machine, tilemap_exit);
+	}
 }
 
 
