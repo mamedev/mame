@@ -1,14 +1,15 @@
 /***************************************************************************
 
-  video.c
-
-  Functions to emulate the video hardware of the machine.
+	Pooyan
 
 ***************************************************************************/
 
 #include "driver.h"
+#include "pooyan.h"
 
 static tilemap *bg_tilemap;
+
+
 
 /***************************************************************************
 
@@ -30,15 +31,12 @@ static tilemap *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( pooyan )
 {
+	rgb_t palette[32];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < 32;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
-
 
 		/* red component */
 		bit0 = (*color_prom >> 0) & 0x01;
@@ -56,19 +54,19 @@ PALETTE_INIT( pooyan )
 		bit2 = (*color_prom >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette[i] = MAKE_RGB(r,g,b);
 		color_prom++;
 	}
 
 	/* color_prom now points to the beginning of the char lookup table */
 
 	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = *(color_prom++) & 0x0f;
+	for (i = 0;i < 16*16;i++)
+		palette_set_color(machine, 16*16+i, palette[*color_prom++ & 0x0f]);
 
 	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
+	for (i = 0;i < 16*16;i++)
+		palette_set_color(machine, i, palette[(*color_prom++ & 0x0f) + 0x10]);
 }
 
 WRITE8_HANDLER( pooyan_videoram_w )
@@ -112,9 +110,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 {
 	int offs;
 
-	for (offs = 0;offs < spriteram_size;offs += 2)
+	for (offs = 0x10;offs < 0x40;offs += 2)
 	{
-		/* TRANSPARENCY_COLOR is needed for the scores */
 		/* Sprite flipscreen is supported by software */
 		drawgfx(bitmap,machine->gfx[1],
 			spriteram[offs + 1],
@@ -122,7 +119,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			spriteram_2[offs] & 0x40, ~spriteram_2[offs] & 0x80,
 			240-spriteram[offs], spriteram_2[offs + 1],
 			cliprect,
-			TRANSPARENCY_COLOR, 0);
+			TRANSPARENCY_PEN, 0);
 	}
 }
 

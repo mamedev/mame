@@ -1,103 +1,90 @@
 /***************************************************************************
 
-Notes:
-- Several people claim that colors are wrong, but the way the color PROMs
-  are used seems correct.
+	Pooyan
 
-
-Pooyan memory map (preliminary)
-
-driver by Allard Van Der Bas
-
-Thanks must go to Mike Cuddy for providing information on this one.
-
-Sound processor memory map.
-0x3000-0x33ff RAM.
-AY-8910 #1 : reg 0x5000
-         wr  0x4000
-             rd  0x4000
-
-AY-8910 #2 : reg 0x7000
-         wr  0x6000
-             rd  0x6000
-
-Main processor memory map.
-0000-7fff ROM
-8000-83ff color RAM
-8400-87ff video RAM
-8800-8fff RAM
-9000-97ff sprite RAM (only areas 0x9010 and 0x9410 are used).
-
-memory mapped ports:
-
-read:
-0xA000  Dipswitch 2 adddbtll
-        a = attract mode
-        ddd = difficulty 0=easy, 7=hardest.
-        b = bonus setting (easy/hard)
-        t = table / upright
-        ll = lives: 11=3, 10=4, 01=5, 00=255.
-
-0xA0E0  llllrrrr
-        l == left coin mech, r = right coinmech.
-
-0xA080  IN0 Port
-0xA0A0  IN1 Port
-0xA0C0  IN2 Port
-
-write:
-0xA100  command for the audio CPU.
-0xA180  NMI enable. (0xA180 == 1 = deliver NMI to CPU).
-
-0xA181  interrupt trigger on audio CPU.
-
-0xA183  maybe reset sound cpu?
-
-0xA184  ????
-
-0xA187  Flip screen
-
-interrupts:
-standard NMI at 0x66
+	Original driver by Allard Van Der Bas
+	
+	This hardware is very similar to Time Pilot.
 
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
+#include "pooyan.h"
 #include "audio/timeplt.h"
 
 
-extern WRITE8_HANDLER( pooyan_videoram_w );
-extern WRITE8_HANDLER( pooyan_colorram_w );
-extern WRITE8_HANDLER( pooyan_flipscreen_w );
-
-extern PALETTE_INIT( pooyan );
-extern VIDEO_START( pooyan );
-extern VIDEO_UPDATE( pooyan );
+#define MASTER_CLOCK		XTAL_18_432MHz
 
 
-static ADDRESS_MAP_START( pooyan_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+static UINT8 irq_enable;
+
+
+/*************************************
+ *
+ *  Interrupts
+ *
+ *************************************/
+
+static MACHINE_START( pooyan )
+{
+	state_save_register_global(irq_enable);
+}
+
+
+static INTERRUPT_GEN( pooyan_interrupt )
+{
+	if (irq_enable)
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+static WRITE8_HANDLER( irq_enable_w )
+{
+	irq_enable = data & 1;
+	if (!irq_enable)
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(pooyan_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(pooyan_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9010, 0x903f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9410, 0x943f) AM_RAM AM_BASE(&spriteram_2)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_4_r) AM_WRITENOP	/* DSW2 */	/* watchdog reset? */
-	AM_RANGE(0xa028, 0xa028) AM_WRITENOP // ???
-	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0xa0a0, 0xa0a0) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0xa0e0, 0xa0e0) AM_READ(input_port_3_r)	/* DSW1 */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xa180, 0xa180) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xa181, 0xa181) AM_WRITE(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0xa183, 0xa183) AM_WRITENOP // ???
-	AM_RANGE(0xa187, 0xa187) AM_WRITE(pooyan_flipscreen_w)
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x5e1f) AM_READ_PORT("IN0")
+	AM_RANGE(0xa0a0, 0xa0a0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN1")
+	AM_RANGE(0xa0c0, 0xa0c0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN2")
+	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_WRITE(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
+	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(pooyan_flipscreen_w)
 ADDRESS_MAP_END
 
 
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
 static INPUT_PORTS_START( pooyan )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -105,21 +92,21 @@ static INPUT_PORTS_START( pooyan )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START	/* DSW0 */
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -154,7 +141,7 @@ static INPUT_PORTS_START( pooyan )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -182,29 +169,33 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	4,	/* 4 bits per pixel */
-	{ 0x1000*8+4, 0x1000*8+0, 4, 0 },
-	{ 0, 1, 2, 3, 8*8+0,8*8+1,8*8+2,8*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 consecutive bytes */
-};
-static const gfx_layout spritelayout =
-{
-	16,16,	/* 16*16 sprites */
-	64,	/* 64 sprites */
-	4,	/* 4 bits per pixel */
-	{ 0x1000*8+4, 0x1000*8+0, 4, 0 },
-	{ 0, 1, 2, 3,  8*8+0, 8*8+1, 8*8+2, 8*8+3,
-			16*8+0, 16*8+1, 16*8+2, 16*8+3,  24*8+0, 24*8+1, 24*8+2, 24*8+3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8	/* every sprite takes 64 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1), STEP4(8*8,1) },
+	{ STEP8(0,8) },
+	16*8
 };
 
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0, 4, 0 },
+	{ STEP4(0,1), STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1) },
+	{ STEP8(0,8), STEP8(32*8,8) },
+	64*8
+};
 
 
 static GFXDECODE_START( pooyan )
@@ -214,15 +205,22 @@ GFXDECODE_END
 
 
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( pooyan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pooyan_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_ADD(Z80, MASTER_CLOCK/3/2)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_VBLANK_INT(pooyan_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	
+	MDRV_MACHINE_START(pooyan)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -230,8 +228,7 @@ static MACHINE_DRIVER_START( pooyan )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(pooyan)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(16*16+16*16)
+	MDRV_PALETTE_LENGTH(16*16+16*16)
 
 	MDRV_PALETTE_INIT(pooyan)
 	MDRV_VIDEO_START(pooyan)
@@ -243,11 +240,11 @@ MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( pooyan )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -326,6 +323,12 @@ ROM_END
 
 
 
-GAME( 1982, pooyan,  0,      pooyan, pooyan, 0, ROT270, "Konami", "Pooyan", 0 )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0, ROT270, "[Konami] (Stern license)", "Pooyan (Stern)", 0 )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0, ROT270, "bootleg", "Pootan", 0 )
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1982, pooyan,  0,      pooyan, pooyan, 0, ROT270, "Konami", "Pooyan", GAME_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, 0, ROT270, "[Konami] (Stern license)", "Pooyan (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, 0, ROT270, "bootleg", "Pootan", GAME_SUPPORTS_SAVE )

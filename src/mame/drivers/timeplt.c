@@ -45,6 +45,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "timeplt.h"
 #include "audio/timeplt.h"
 
@@ -53,9 +54,40 @@
 
 
 
+static UINT8 irq_enable;
+
+
 /*************************************
  *
- *  Memory maps
+ *  Interrupts
+ *
+ *************************************/
+
+static MACHINE_START( timeplt )
+{
+	state_save_register_global(irq_enable);
+}
+
+
+static INTERRUPT_GEN( timeplt_interrupt )
+{
+	if (irq_enable)
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+static WRITE8_HANDLER( irq_enable_w )
+{
+	irq_enable = data & 1;
+	if (!irq_enable)
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Outputs
  *
  *************************************/
 
@@ -82,7 +114,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
@@ -291,9 +323,11 @@ static MACHINE_DRIVER_START( timeplt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT(timeplt_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
+	
+	MDRV_MACHINE_START(timeplt)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
