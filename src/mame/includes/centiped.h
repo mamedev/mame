@@ -8,8 +8,6 @@
 
 extern UINT8 centiped_flipscreen, *bullsdrt_tiles_bankram;
 
-PALETTE_INIT( centiped );
-PALETTE_INIT( milliped );
 PALETTE_INIT( warlords );
 
 VIDEO_START( centiped );

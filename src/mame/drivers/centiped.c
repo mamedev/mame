@@ -9,26 +9,22 @@
         * Maze Invaders (prototype)
         * Bulls Eye Darts
 
-    Centipede sync-prom added by HIGHWAYMAN.
-    The prom pcb location is:P4 and is 256x4
-    (i need to update the dump, this one is read in 8bit-mode)
+    Known ROMs (listed in the manual) that need to be dumped/verified:
 
-Known roms (listed in the manual) that need to be dumped/verified:
+    Centipede:
+      136001-203.d1  <-- Are these the proper labels for the timed version???
+      136001-204.e1
+      136001-205.fh1
+      136001-206.j1
 
-Centipede:
-  136001-203.d1  <-- Are these the proper labels for the timed version???
-  136001-204.e1
-  136001-205.fh1
-  136001-206.j1
+      136001-303.d1  <-- Revision 3 set for the above listed roms
+      136001-304.e1
+      136001-305.fh1
+      136001-306.j1
 
-  136001-303.d1  <-- Revision 3 set for the above listed roms
-  136001-304.e1
-  136001-305.fh1
-  136001-306.j1
-
-Milipede:
-  136013-109.5p
-  136013-110.5r
+    Milipede:
+      136013-109.5p
+      136013-110.5r
 
 ****************************************************************************
 
@@ -1647,10 +1643,8 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(centiped)
-	MDRV_PALETTE_LENGTH(4+4)
-	MDRV_COLORTABLE_LENGTH(4+4*4*4*4)
+	MDRV_PALETTE_LENGTH(4+4*4*4*4)
 
-	MDRV_PALETTE_INIT(centiped)
 	MDRV_VIDEO_START(centiped)
 	MDRV_VIDEO_UPDATE(centiped)
 
@@ -1683,7 +1677,7 @@ static MACHINE_DRIVER_START( centipdb )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 10.0)
 MACHINE_DRIVER_END
 
 
@@ -1696,7 +1690,7 @@ static MACHINE_DRIVER_START( magworm )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 15.0)
 MACHINE_DRIVER_END
 
 
@@ -1709,10 +1703,8 @@ static MACHINE_DRIVER_START( milliped )
 
 	/* video hardware */
 	MDRV_GFXDECODE(milliped)
-	MDRV_PALETTE_LENGTH(4*4+4*4)
-	MDRV_COLORTABLE_LENGTH(4*4+4*4*4*4*4)
+	MDRV_PALETTE_LENGTH(4*4+4*4*4*4*4)
 
-	MDRV_PALETTE_INIT(milliped)
 	MDRV_VIDEO_START(milliped)
 	MDRV_VIDEO_UPDATE(milliped)
 
@@ -1736,8 +1728,7 @@ static MACHINE_DRIVER_START( warlords )
 
 	/* video hardware */
 	MDRV_GFXDECODE(warlords)
-	MDRV_PALETTE_LENGTH(128)
-	MDRV_COLORTABLE_LENGTH(8*4+8*4)
+	MDRV_PALETTE_LENGTH(8*4+8*4)
 
 	MDRV_PALETTE_INIT(warlords)
 	MDRV_VIDEO_START(warlords)
@@ -1777,9 +1768,7 @@ static MACHINE_DRIVER_START( bullsdrt )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MDRV_GFXDECODE(centiped)
-	MDRV_PALETTE_LENGTH(4+4)
-	MDRV_COLORTABLE_LENGTH(4+4*4*4*4)
-	MDRV_PALETTE_INIT(centiped)
+	MDRV_PALETTE_LENGTH(4+4*4*4*4)
 
 	MDRV_VIDEO_START(bullsdrt)
 	MDRV_VIDEO_UPDATE(bullsdrt)
@@ -1879,6 +1868,7 @@ ROM_START( centipdb )
 	ROM_LOAD( "136001-213.p4",   0x0000, 0x0100, CRC(6fa3093a) SHA1(2b7aeca74c1ae4156bf1878453a047330f96f0a8) )
 ROM_END
 
+
 ROM_START( millpac )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "millpac1.1d",  0x2000, 0x0800, CRC(4dd6913d) SHA1(9eca634e1a827f9bbcf3c532d44e175ac4751755) )
@@ -1926,7 +1916,7 @@ ROM_END
 
 
 ROM_START( mazeinv )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "005.011",      0x3000, 0x1000, CRC(37129536) SHA1(356cb986a40b332100e00fb72194fd4dade2cba7) )
 	ROM_LOAD( "004.011",      0x4000, 0x1000, CRC(2d0fbf2f) SHA1(9d4c2bc9f80604d1ff5c5bf5a4a78378efdd8b33) )
 	ROM_LOAD( "003.011",      0x5000, 0x1000, CRC(0ff3747c) SHA1(1a7e1c487c24875dada967fb3a9ceaca25b7e2a7) )
@@ -2028,4 +2018,4 @@ GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",  
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
 
-GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
