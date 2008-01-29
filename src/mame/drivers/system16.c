@@ -142,8 +142,8 @@ Notes:
         MVP
         Ryukyu
         Super Leagu
-        Turbo Outrun
-        Turbo Outrun (Set 2)
+        Turbo Outrun (set 1)
+        Turbo Outrun (set 2)
 */
 
 #include "driver.h"

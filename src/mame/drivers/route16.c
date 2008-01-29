@@ -953,7 +953,7 @@ static DRIVER_INIT( route16a )
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16,  route16,  ROT270, "Tehkan/Sun (Centuri license)", "Route 16", 0 )
+GAME( 1981, route16,  0,        route16,  route16,  route16,  ROT270, "Tehkan/Sun (Centuri license)", "Route 16 (set 1)", 0 )
 GAME( 1981, route16a, route16,  route16,  route16,  route16a, ROT270, "Tehkan/Sun (Centuri license)", "Route 16 (set 2)", 0 )
 GAME( 1981, route16b, route16,  route16,  route16,  0,        ROT270, "bootleg", "Route 16 (bootleg)", 0 )
 GAME( 1981, routex,   route16,  routex,   route16,  0,        ROT270, "bootleg", "Route X (bootleg)", 0 )

@@ -2513,37 +2513,37 @@ static DRIVER_INIT( pigout )
  *************************************/
 
 /* small master banks, small slave banks */
-GAME( 1985, cerberus, 0,       leland,  cerberus, cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
-GAME( 1985, mayhem,   0,       leland,  mayhem,   mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
-GAME( 1985, powrplay, 0,       leland,  mayhem,   powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
-GAME( 1985, wseries,  0,       leland,  wseries,  wseries,  ROT0,   "Cinematronics", "World Series: The Season", 0 )
-GAME( 1986, alleymas, 0,       leland,  alleymas, alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
-GAME( 1987, upyoural, 0,       leland,  upyoural, upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
+GAME( 1985, cerberus, 0,       leland,   cerberus, cerberus, ROT0,   "Cinematronics", "Cerberus", 0 )
+GAME( 1985, mayhem,   0,       leland,   mayhem,   mayhem,   ROT0,   "Cinematronics", "Mayhem 2002", 0 )
+GAME( 1985, powrplay, 0,       leland,   mayhem,   powrplay, ROT0,   "Cinematronics", "Power Play", 0 )
+GAME( 1985, wseries,  0,       leland,   wseries,  wseries,  ROT0,   "Cinematronics", "World Series: The Season", 0 )
+GAME( 1986, alleymas, 0,       leland,   alleymas, alleymas, ROT270, "Cinematronics", "Alley Master", 0 )
+GAME( 1987, upyoural, 0,       leland,   upyoural, upyoural, ROT270, "Cinematronics", "Up Your Alley", 0 )
 
 /* odd master banks, small slave banks */
-GAME( 1986, dangerz,  0,       leland,  dangerz,  dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
+GAME( 1986, dangerz,  0,       leland,   dangerz,  dangerz,  ROT0,   "Cinematronics", "Danger Zone", 0 )
 
 /* small master banks + extra top board, small slave banks */
-GAME( 1987, basebal2, 0,       leland,  basebal2, basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
-GAME( 1987, dblplay,  0,       leland,  basebal2, dblplay,  ROT0,   "Leland Corp. / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
-GAME( 1988, strkzone, 0,       leland,  basebal2, strkzone, ROT0,   "Leland Corp.", "Strike Zone Baseball", 0 )
+GAME( 1987, basebal2, 0,       leland,   basebal2, basebal2, ROT0,   "Cinematronics", "Baseball: The Season II", 0 )
+GAME( 1987, dblplay,  0,       leland,   basebal2, dblplay,  ROT0,   "Leland Corp. / Tradewest", "Super Baseball Double Play Home Run Derby", 0 )
+GAME( 1988, strkzone, 0,       leland,   basebal2, strkzone, ROT0,   "Leland Corp.", "Strike Zone Baseball", 0 )
 
 /* large master banks, small slave banks, 80186 sound */
-GAME( 1987, redlin2p, 0,       redline, redline,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
-GAME( 1987, quarterb, 0,       quarterb,quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback", 0 )
-GAME( 1987, quartrba, quarterb,quarterb,quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
+GAME( 1987, redlin2p, 0,       redline,  redline,  redlin2p, ROT270, "Cinematronics (Tradewest license)", "Redline Racer (2 players)", 0 )
+GAME( 1987, quarterb, 0,       quarterb, quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 1)", 0 )
+GAME( 1987, quartrba, quarterb,quarterb, quarterb, quarterb, ROT270, "Leland Corp.", "Quarterback (set 2)", 0 )
 
 /* large master banks, large slave banks, 80186 sound */
-GAME( 1988, viper,    0,       lelandi, dangerz,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )
-GAME( 1988, teamqb,   0,       lelandi, teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback", 0 )
-GAME( 1988, teamqb2,  teamqb,  lelandi, teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 2)", 0 )
-GAME( 1989, aafb,     0,       lelandi, teamqb,   aafb,     ROT270, "Leland Corp.", "All American Football (rev E)", 0 )
-GAME( 1989, aafbd2p,  aafb,    lelandi, aafb2p,   aafbd2p,  ROT270, "Leland Corp.", "All American Football (rev D, 2 Players)", 0 )
-GAME( 1989, aafbc,    aafb,    lelandi, teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev C)", 0 )
-GAME( 1989, aafbb,    aafb,    lelandi, teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev B)", 0 )
+GAME( 1988, viper,    0,       lelandi,  dangerz,  viper,    ROT0,   "Leland Corp.", "Viper", 0 )
+GAME( 1988, teamqb,   0,       lelandi,  teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 1)", 0 )
+GAME( 1988, teamqb2,  teamqb,  lelandi,  teamqb,   teamqb,   ROT270, "Leland Corp.", "John Elway's Team Quarterback (set 2)", 0 )
+GAME( 1989, aafb,     0,       lelandi,  teamqb,   aafb,     ROT270, "Leland Corp.", "All American Football (rev E)", 0 )
+GAME( 1989, aafbd2p,  aafb,    lelandi,  aafb2p,   aafbd2p,  ROT270, "Leland Corp.", "All American Football (rev D, 2 Players)", 0 )
+GAME( 1989, aafbc,    aafb,    lelandi,  teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev C)", 0 )
+GAME( 1989, aafbb,    aafb,    lelandi,  teamqb,   aafbb,    ROT270, "Leland Corp.", "All American Football (rev B)", 0 )
 
 /* huge master banks, large slave banks, 80186 sound */
-GAME( 1989, offroad,  0,       lelandi, offroad,  offroad,  ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road", 0 )
-GAME( 1989, offroadt, 0,       lelandi, offroad,  offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
-GAME( 1990, pigout,   0,       lelandi, pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine!", 0 )
-GAME( 1990, pigouta,  pigout,  lelandi, pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 2)", 0 )
+GAME( 1989, offroad,  0,       lelandi,  offroad,  offroad,  ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road", 0 )
+GAME( 1989, offroadt, 0,       lelandi,  offroad,  offroadt, ROT0,   "Leland Corp.", "Ironman Ivan Stewart's Super Off-Road Track-Pak", 0 )
+GAME( 1990, pigout,   0,       lelandi,  pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 1)", 0 )
+GAME( 1990, pigouta,  pigout,  lelandi,  pigout,   pigout,   ROT0,   "Leland Corp.", "Pig Out: Dine Like a Swine! (set 2)", 0 )

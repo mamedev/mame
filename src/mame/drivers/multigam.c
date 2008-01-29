@@ -333,5 +333,5 @@ ROM_START( multigmb )
 ROM_END
 
 
-GAME( 1992, multigam, 0, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
+GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 2)", 0 )
