@@ -1,19 +1,26 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 
 static int layer_colorbase[2];
 extern int bladestl_spritebank;
 
-PALETTE_INIT( bladestl )
-{
-	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	/* build the lookup table for sprites. Palette is dynamic. */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 0x20 + (*(color_prom++) & 0x0f);
+WRITE8_HANDLER( bladestl_palette_ram_w )
+{
+	paletteram_xBBBBBGGGGGRRRRR_be_w(offset, data);
+
+	/* if it's a sprite color, modify the pens that reference this color */
+	if (offset >= 0x40)
+	{
+		int i;
+
+		for (i = 0; i < 0x100; i++)
+			if ((memory_region(REGION_PROMS)[i] & 0x0f) == ((offset >> 1) & 0x0f))
+				palette_set_color(Machine, i + 0x30, palette_get_color(Machine, offset >> 1));
+	}
 }
+
 
 /***************************************************************************
 

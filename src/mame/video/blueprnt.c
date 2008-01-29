@@ -19,30 +19,27 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( blueprnt )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < 16;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int r = ((i >> 0) & 1) * ((i & 0x08) ? 0xbf : 0xff);
-		int g = ((i >> 2) & 1) * ((i & 0x08) ? 0xbf : 0xff);
-		int b = ((i >> 1) & 1) * ((i & 0x08) ? 0xbf : 0xff);
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-	}
+		UINT8 pen;
+		int r, g, b;
 
-	/* chars */
-	for (i = 0;i < 128;i++)
-	{
-		int base =  (i & 0x40) ? 8 : 0;
-		COLOR(0,4*i+0) = base + 0;
-		COLOR(0,4*i+1) = base + ((i >> 0) & 7);
-		COLOR(0,4*i+2) = base + ((i >> 3) & 7);
-		COLOR(0,4*i+3) = base + (((i >> 0) & 7) | ((i >> 3) & 7));
-	}
+		if (i < 0x200)
+			/* characters */
+			pen = ((i & 0x100) >> 5) |
+				  ((i & 0x002) ? ((i & 0x0e0) >> 5) : 0) |
+				  ((i & 0x001) ? ((i & 0x01c) >> 2) : 0);
+		else
+			/* sprites */
+			pen = i - 0x200;
 
-	/* sprites */
-	for (i = 0;i < 8;i++)
-		COLOR(1,i) = i;
+		r = ((pen >> 0) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		g = ((pen >> 2) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+		b = ((pen >> 1) & 1) * ((pen & 0x08) ? 0xbf : 0xff);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
 }
 
 WRITE8_HANDLER( blueprnt_videoram_w )
