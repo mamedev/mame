@@ -31,6 +31,7 @@ int  ptm6840_read(   int which, int offset);
 void ptm6840_write(  int which, int offset, int data);
 
 int ptm6840_get_status(int which, int clock);	// get whether timer is enabled
+int ptm6840_get_irq(int which);				// get IRQ state
 void ptm6840_set_g1(int which, int state);	// set gate1  state
 void ptm6840_set_c1(int which, int state);	// set clock1 state
 

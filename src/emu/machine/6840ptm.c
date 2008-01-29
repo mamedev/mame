@@ -6,7 +6,7 @@
     This function is a simple emulation of up to 4 MC6840
     Programmable Timer Modules
 
-    Written By El Condor based on previous work by Aaron Giles,
+    Written By J.Wallace based on previous work by Aaron Giles,
    'Re-Animator' and Mathis Rosenhauer.
 
     Todo:
@@ -119,6 +119,18 @@ int ptm6840_get_status(int which, int clock)
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
+// ptm6840_get_irq: get IRQ state                                        //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+int ptm6840_get_irq(int which)
+{
+	ptm6840 *p = ptm + which;
+	return p->IRQ;
+}
+
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
 // Subtract from Counter                                                 //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
@@ -197,18 +209,24 @@ static void subtract_from_counter(int counter, int count, int which)
 
 INLINE void update_interrupts(int which)
 {
+	int new_state;
 	ptm6840 *currptr = ptm + which;
-	currptr->status_reg &= ~0x80;
 
-	if ((currptr->status_reg & 0x01) && (currptr->control_reg[0] & 0x40)) currptr->status_reg |= 0x80;
-	if ((currptr->status_reg & 0x02) && (currptr->control_reg[1] & 0x40)) currptr->status_reg |= 0x80;
-	if ((currptr->status_reg & 0x04) && (currptr->control_reg[2] & 0x40)) currptr->status_reg |= 0x80;
+	new_state = (((currptr->status_reg & 0x01) && (currptr->control_reg[0] & 0x40)) || ((currptr->status_reg & 0x02) && (currptr->control_reg[1] & 0x40))
+				||((currptr->status_reg & 0x04) && (currptr->control_reg[2] & 0x80)));
 
-	currptr->IRQ = currptr->status_reg >> 7;
-
-	if ( currptr->intf->irq_func )
+	if (new_state != currptr->IRQ)
 	{
-		currptr->intf->irq_func(currptr->IRQ);
+		currptr->IRQ = new_state;
+		if (currptr->IRQ)
+		{
+			currptr->status_reg |= 0x80;
+		}
+		else
+		{
+			currptr->status_reg &= ~0x80;
+		}
+		if (currptr->intf->irq_func) (currptr->intf->irq_func)(currptr->IRQ);
 	}
 }
 
@@ -292,7 +310,7 @@ static void reload_count(int idx, int which)
 
 	currptr->fired[idx]=0;
 
-	if ((currptr->mode[idx] == 4)|(currptr->mode[idx] == 6))
+	if ((currptr->mode[idx] == 4)||(currptr->mode[idx] == 6))
 	{
 		currptr->output[idx] = 1;
 		if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](0, currptr->output[idx]);
@@ -645,7 +663,7 @@ void ptm6840_set_g3(int which, int state) { ptm6840_set_gate(which, state, 2); }
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
-// ptm6840_set_clock: set clock status (0 or 1)                         //
+// ptm6840_set_clock: set clock status (0 or 1)                          //
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
@@ -665,7 +683,7 @@ void ptm6840_set_c1(int which, int state) { ptm6840_set_clock(which, state, 0); 
 void ptm6840_set_c2(int which, int state) { ptm6840_set_clock(which, state, 1); }
 void ptm6840_set_c3(int which, int state) { ptm6840_set_clock(which, state, 2); }
 
-///////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 
 READ8_HANDLER( ptm6840_0_r ) { return ptm6840_read(0, offset); }
 READ8_HANDLER( ptm6840_1_r ) { return ptm6840_read(1, offset); }
