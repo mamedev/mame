@@ -15,8 +15,10 @@ WRITE8_HANDLER( bladestl_palette_ram_w )
 	{
 		int i;
 
+		UINT8 *lookup_prom = memory_region(REGION_PROMS);
+
 		for (i = 0; i < 0x100; i++)
-			if ((memory_region(REGION_PROMS)[i] & 0x0f) == ((offset >> 1) & 0x0f))
+			if ((lookup_prom[i] & 0x0f) == ((offset >> 1) & 0x0f))
 				palette_set_color(Machine, i + 0x30, palette_get_color(Machine, offset >> 1));
 	}
 }
