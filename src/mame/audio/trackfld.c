@@ -23,7 +23,7 @@ static int SN76496_latch;
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-    int clock = activecpu_gettotalcycles() / TIMER_RATE;
+    UINT32 clock = activecpu_gettotalcycles() / TIMER_RATE;
 
     return clock & 0xF;
 }
@@ -56,7 +56,7 @@ WRITE8_HANDLER( trackfld_sound_w )
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-    int clock = activecpu_gettotalcycles() / TIMER_RATE;
+    UINT32 clock = activecpu_gettotalcycles() / TIMER_RATE;
 
     return (clock & 0x3) | (VLM5030_BSY()? 0x04 : 0);
 }

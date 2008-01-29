@@ -132,7 +132,7 @@
  *
  *************************************/
 
-static UINT32 cycles_at_vsync;
+static UINT64 cycles_at_vsync;
 static UINT8 main_sense_state;
 static UINT8 sound_sense_state;
 static UINT8 coin1_state;

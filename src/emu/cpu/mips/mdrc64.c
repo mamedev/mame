@@ -229,7 +229,7 @@ struct _mips3drc_data
 	UINT32				abs32mask[4];
 
 	/* C functions */
-	x86code *			activecpu_gettotalcycles64;
+	x86code *			activecpu_gettotalcycles;
 	x86code *			mips3com_update_cycle_counting;
 	x86code *			mips3com_tlbr;
 	x86code *			mips3com_tlbwi;
@@ -441,7 +441,7 @@ static void mips3drc_init(void)
 	mips3.drcdata->abs32mask[0] = 0x7fffffff;
 
 	/* get pointers to C functions */
-	mips3.drcdata->activecpu_gettotalcycles64 = (x86code *)activecpu_gettotalcycles64;
+	mips3.drcdata->activecpu_gettotalcycles = (x86code *)activecpu_gettotalcycles;
 	mips3.drcdata->mips3com_update_cycle_counting = (x86code *)mips3com_update_cycle_counting;
 	mips3.drcdata->mips3com_tlbr = (x86code *)mips3com_tlbr;
 	mips3.drcdata->mips3com_tlbwi = (x86code *)mips3com_tlbwi;
@@ -3049,7 +3049,7 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 		case COP0_Count:
 			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(COP0_Count), REG_EAX);						// mov  [Count],eax
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles));			// call activecpu_gettotalcycles
 			emit_mov_r32_m32(DRCTOP, REG_EDX, CPR0ADDR(COP0_Count));						// mov  edx,[Count]
 			emit_sub_r64_r64(DRCTOP, REG_RAX, REG_RDX);										// sub  rax,rdx
 			emit_sub_r64_r64(DRCTOP, REG_RAX, REG_RDX);										// sub  rax,rdx
@@ -3099,7 +3099,7 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 		case COP0_Count:
 			compiler->cycles += MIPS3_COUNT_READ_CYCLES;
 			emit_flush_cycles_before_instruction(drc, compiler, desc, MIPS3_COUNT_READ_CYCLES);
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles));			// call activecpu_gettotalcycles
 			emit_sub_r64_m64(DRCTOP, REG_RAX, MDRC(&mips3.core->count_zero_time));			// sub  rax,[count_zero_time]
 			emit_shr_r64_imm(DRCTOP, REG_RAX, 1);											// shr  rax,1
 			emit_movsxd_r64_r32(DRCTOP, REG_RAX, REG_EAX);									// movsxd rax,eax
@@ -3112,7 +3112,7 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 
 		case COP0_Random:
 			emit_flush_cycles_before_instruction(drc, compiler, desc, 1);
-			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles64));		// call activecpu_gettotalcycles64
+			emit_call_m64(DRCTOP, MDRC(&mips3.drcdata->activecpu_gettotalcycles));			// call activecpu_gettotalcycles
 			emit_mov_r32_m32(DRCTOP, REG_ECX, CPR0ADDR(COP0_Wired));						// mov  ecx,[Wired]
 			emit_mov_r32_imm(DRCTOP, REG_R8D, 48);											// mov  r8d,48
 			emit_and_r32_imm(DRCTOP, REG_ECX, 0x3f);										// and  ecx,0x3f

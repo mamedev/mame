@@ -190,11 +190,11 @@ static UINT8 *palette_ram;
 static UINT8 *io_port;
 
 /* Coin, Door, Hopper and EEPROM States */
-static UINT32 last_cycles;
+static UINT64 last_cycles;
 static UINT8 coin_state = 0;
-static UINT32 last_door;
+static UINT64 last_door;
 static UINT8 door_open = 0;
-static UINT32 last_coin_out;
+static UINT64 last_coin_out;
 static UINT8 coin_out_state = 0;
 static int sda_dir = 0;
 
@@ -522,7 +522,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
-	UINT32 curr_cycles = activecpu_gettotalcycles();
+	UINT64 curr_cycles = activecpu_gettotalcycles();
 
 	UINT8 sda = 0;
 	if(!sda_dir)

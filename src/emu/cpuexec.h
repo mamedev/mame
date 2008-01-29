@@ -343,12 +343,10 @@ void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration);
 int cycles_currently_ran(void);
 
 /* Returns the total number of CPU cycles */
-UINT32 activecpu_gettotalcycles(void);
-UINT64 activecpu_gettotalcycles64(void);
+UINT64 activecpu_gettotalcycles(void);
 
 /* Returns the total number of CPU cycles for a given CPU */
-UINT32 cpunum_gettotalcycles(int cpunum);
-UINT64 cpunum_gettotalcycles64(int cpunum);
+UINT64 cpunum_gettotalcycles(int cpunum);
 
 /* Safely eats cycles so we don't cross a timeslice boundary */
 void activecpu_eat_cycles(int cycles);

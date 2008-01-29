@@ -471,7 +471,7 @@ static emu_timer *m_p_timer_root[ 3 ];
 static UINT16 m_p_n_root_count[ 3 ];
 static UINT16 m_p_n_root_mode[ 3 ];
 static UINT16 m_p_n_root_target[ 3 ];
-static UINT32 m_p_n_root_start[ 3 ];
+static UINT64 m_p_n_root_start[ 3 ];
 
 #define RC_STOP ( 0x01 )
 #define RC_RESET ( 0x04 ) /* guess */
@@ -482,7 +482,7 @@ static UINT32 m_p_n_root_start[ 3 ];
 #define RC_CLC ( 0x100 )
 #define RC_DIV ( 0x200 )
 
-static UINT32 psxcpu_gettotalcycles( void )
+static UINT64 psxcpu_gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
 	return cpunum_gettotalcycles(0) * 2;
@@ -514,7 +514,7 @@ static UINT16 root_current( int n_counter )
 	}
 	else
 	{
-		UINT32 n_current;
+		UINT64 n_current;
 		n_current = psxcpu_gettotalcycles() - m_p_n_root_start[ n_counter ];
 		n_current /= root_divider( n_counter );
 		n_current += m_p_n_root_count[ n_counter ];

@@ -40,7 +40,7 @@ static UINT8 *rombase;
 static UINT32 romsize;
 static UINT16 *comram;
 
-static UINT32 last_bio_cycles;
+static UINT64 last_bio_cycles;
 
 
 
@@ -309,7 +309,7 @@ WRITE16_HANDLER( hdsnd68k_320com_w )
 
 READ16_HANDLER( hdsnddsp_get_bio )
 {
-	UINT32 cycles_since_last_bio = activecpu_gettotalcycles() - last_bio_cycles;
+	UINT64 cycles_since_last_bio = activecpu_gettotalcycles() - last_bio_cycles;
 	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
 
 	/* if we're not at the next BIO yet, advance us there */

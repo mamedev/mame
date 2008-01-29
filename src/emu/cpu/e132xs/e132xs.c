@@ -603,7 +603,7 @@ static void hyperstone_set_trap_entry(int which)
 
 static UINT32 compute_tr(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	return hyperstone.tr_base_value + (clocks_since_base / hyperstone.tr_clocks_per_tick);
 }
@@ -619,12 +619,12 @@ static void update_timer_prescale(void)
 	hyperstone.clock_cycles_6 = 6 << hyperstone.clock_scale;
 	hyperstone.tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	hyperstone.tr_base_value = prevtr;
-	hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+	hyperstone.tr_base_cycles = activecpu_gettotalcycles();
 }
 
 static void adjust_timer_interrupt(void)
 {
-	UINT64 cycles_since_base = activecpu_gettotalcycles64() - hyperstone.tr_base_cycles;
+	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << hyperstone.clock_scale);
 	int cpunum = cpu_getactivecpu();
@@ -799,7 +799,7 @@ INLINE void set_global_register(UINT8 code, UINT32 val)
 */
 			case TR_REGISTER:
 				hyperstone.tr_base_value = val;
-				hyperstone.tr_base_cycles = activecpu_gettotalcycles64();
+				hyperstone.tr_base_cycles = activecpu_gettotalcycles();
 				adjust_timer_interrupt();
 				break;
 

@@ -141,7 +141,7 @@ typedef struct
 
 	UINT16 	frc;
 	UINT16 	ocra, ocrb, icr;
-	UINT32 	frc_base;
+	UINT64 	frc_base;
 
 	int		frt_input;
 	int 	internal_irq_level;
@@ -2396,7 +2396,7 @@ static void sh2_set_context(void *src)
 static void sh2_timer_resync(void)
 {
 	int divider = div_tab[(sh2.m[5] >> 8) & 3];
-	UINT32 cur_time = cpunum_gettotalcycles(sh2.cpu_number);
+	UINT64 cur_time = cpunum_gettotalcycles(sh2.cpu_number);
 
 	if(divider)
 		sh2.frc += (cur_time - sh2.frc_base) >> divider;

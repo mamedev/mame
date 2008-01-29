@@ -311,7 +311,7 @@ struct _dcs_state
 	UINT16		input_data;
 	UINT16		output_data;
 	UINT16		output_control;
-	UINT32		output_control_cycles;
+	UINT64		output_control_cycles;
 	UINT8		last_output_full;
 	UINT8		last_input_empty;
 	void		(*output_full_cb)(int);
@@ -1686,7 +1686,7 @@ static void update_timer_count(void)
 		return;
 
 	/* count cycles */
-	elapsed_cycles = cpunum_gettotalcycles64(dcs.cpunum) - dcs.timer_start_cycles;
+	elapsed_cycles = cpunum_gettotalcycles(dcs.cpunum) - dcs.timer_start_cycles;
 	elapsed_clocks = elapsed_cycles / dcs.timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
@@ -1712,7 +1712,7 @@ static TIMER_CALLBACK( internal_timer_callback )
 	/* we do this to avoid drifting */
 	dcs.timers_fired++;
 	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (dcs.timer_period + 1));
-	target_cycles -= cpunum_gettotalcycles64(dcs.cpunum);
+	target_cycles -= cpunum_gettotalcycles(dcs.cpunum);
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
@@ -1728,7 +1728,7 @@ static void reset_timer(void)
 		return;
 
 	/* compute the time until the first firing */
-	dcs.timer_start_cycles = cpunum_gettotalcycles64(dcs.cpunum);
+	dcs.timer_start_cycles = cpunum_gettotalcycles(dcs.cpunum);
 	dcs.timers_fired = 0;
 
 	/* if this is the first timer, check the IRQ routine for the DRAM refresh stub */

@@ -540,12 +540,12 @@ static READ32_HANDLER( gpu_jump_r )
 
 static UINT32 *main_speedup;
 static int main_speedup_hits;
-static UINT32 main_speedup_last_cycles;
-static UINT32 main_speedup_max_cycles;
+static UINT64 main_speedup_last_cycles;
+static UINT64 main_speedup_max_cycles;
 
 static READ32_HANDLER( cojagr3k_main_speedup_r )
 {
-	UINT32 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = activecpu_gettotalcycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - main_speedup_last_cycles < main_speedup_max_cycles)
@@ -620,7 +620,7 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 static WRITE32_HANDLER( area51_main_speedup_w )
 {
-	UINT32 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = activecpu_gettotalcycles();
 
 	/* store the data */
 	COMBINE_DATA(main_speedup);
@@ -654,7 +654,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 
 static WRITE32_HANDLER( area51mx_main_speedup_w )
 {
-	UINT32 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = activecpu_gettotalcycles();
 
 	/* store the data */
 	COMBINE_DATA(&main_speedup[offset]);

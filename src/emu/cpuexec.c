@@ -792,21 +792,7 @@ int cycles_currently_ran(void)
  *
  *************************************/
 
-/*--------------------------------------------------------------
-
-    IMPORTANT: this value wraps around in a relatively short
-    time. For example, for a 6MHz CPU, it will wrap around in
-    2^32/6000000 = 716 seconds = 12 minutes.
-
-    Make sure you don't do comparisons between values returned
-    by this function, but only use the difference (which will
-    be correct regardless of wraparound).
-
-    Alternatively, use the new 64-bit variants instead.
-
---------------------------------------------------------------*/
-
-UINT32 activecpu_gettotalcycles(void)
+UINT64 activecpu_gettotalcycles(void)
 {
 	VERIFY_ACTIVECPU(activecpu_gettotalcycles);
 	if (activecpu == cpu_getexecutingcpu())
@@ -815,28 +801,9 @@ UINT32 activecpu_gettotalcycles(void)
 		return cpu[activecpu].totalcycles;
 }
 
-UINT32 cpunum_gettotalcycles(int cpunum)
+UINT64 cpunum_gettotalcycles(int cpunum)
 {
 	VERIFY_CPUNUM(cpunum_gettotalcycles);
-	if (cpunum == cpu_getexecutingcpu())
-		return cpu[cpunum].totalcycles + cycles_currently_ran();
-	else
-		return cpu[cpunum].totalcycles;
-}
-
-
-UINT64 activecpu_gettotalcycles64(void)
-{
-	VERIFY_ACTIVECPU(activecpu_gettotalcycles64);
-	if (activecpu == cpu_getexecutingcpu())
-		return cpu[activecpu].totalcycles + cycles_currently_ran();
-	else
-		return cpu[activecpu].totalcycles;
-}
-
-UINT64 cpunum_gettotalcycles64(int cpunum)
-{
-	VERIFY_CPUNUM(cpunum_gettotalcycles64);
 	if (cpunum == cpu_getexecutingcpu())
 		return cpu[cpunum].totalcycles + cycles_currently_ran();
 	else
