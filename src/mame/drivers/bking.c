@@ -34,46 +34,46 @@ extern WRITE8_HANDLER( buggychl_mcu_w );
 extern READ8_HANDLER( buggychl_mcu_r );
 extern READ8_HANDLER( buggychl_mcu_status_r );
 
-extern PALETTE_INIT( bking2 );
+extern PALETTE_INIT( bking );
 
-extern VIDEO_START( bking2 );
-extern VIDEO_UPDATE( bking2 );
-extern VIDEO_EOF( bking2 );
+extern VIDEO_START( bking );
+extern VIDEO_UPDATE( bking );
+extern VIDEO_EOF( bking );
 
-extern WRITE8_HANDLER( bking2_xld1_w );
-extern WRITE8_HANDLER( bking2_yld1_w );
-extern WRITE8_HANDLER( bking2_xld2_w );
-extern WRITE8_HANDLER( bking2_yld2_w );
-extern WRITE8_HANDLER( bking2_xld3_w );
-extern WRITE8_HANDLER( bking2_yld3_w );
-extern WRITE8_HANDLER( bking2_msk_w );
-extern WRITE8_HANDLER( bking2_cont1_w );
-extern WRITE8_HANDLER( bking2_cont2_w );
-extern WRITE8_HANDLER( bking2_cont3_w );
-extern WRITE8_HANDLER( bking2_hitclr_w );
-extern WRITE8_HANDLER( bking2_playfield_w );
+extern WRITE8_HANDLER( bking_xld1_w );
+extern WRITE8_HANDLER( bking_yld1_w );
+extern WRITE8_HANDLER( bking_xld2_w );
+extern WRITE8_HANDLER( bking_yld2_w );
+extern WRITE8_HANDLER( bking_xld3_w );
+extern WRITE8_HANDLER( bking_yld3_w );
+extern WRITE8_HANDLER( bking_msk_w );
+extern WRITE8_HANDLER( bking_cont1_w );
+extern WRITE8_HANDLER( bking_cont2_w );
+extern WRITE8_HANDLER( bking_cont3_w );
+extern WRITE8_HANDLER( bking_hitclr_w );
+extern WRITE8_HANDLER( bking_playfield_w );
 
-extern READ8_HANDLER( bking2_input_port_5_r );
-extern READ8_HANDLER( bking2_input_port_6_r );
-extern READ8_HANDLER( bking2_pos_r );
+extern READ8_HANDLER( bking_input_port_5_r );
+extern READ8_HANDLER( bking_input_port_6_r );
+extern READ8_HANDLER( bking_pos_r );
 
-UINT8 *bking2_playfield_ram;
+UINT8 *bking_playfield_ram;
 
 static int bking3_addr_h, bking3_addr_l;
 static int sndnmi_enable = 1;
 
-static READ8_HANDLER( bking2_sndnmi_disable_r )
+static READ8_HANDLER( bking_sndnmi_disable_r )
 {
 	sndnmi_enable = 0;
 	return 0;
 }
 
-static WRITE8_HANDLER( bking2_sndnmi_enable_w )
+static WRITE8_HANDLER( bking_sndnmi_enable_w )
 {
 	sndnmi_enable = 1;
 }
 
-static WRITE8_HANDLER( bking2_soundlatch_w )
+static WRITE8_HANDLER( bking_soundlatch_w )
 {
 	int i,code;
 
@@ -114,48 +114,48 @@ static READ8_HANDLER( bking3_ext_check_r )
 	return 0x31; //no "bad rom.", no "bad ext."
 }
 
-static ADDRESS_MAP_START( bking2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bking_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(bking2_playfield_w) AM_BASE(&bking2_playfield_ram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_WRITE(bking_playfield_w) AM_BASE(&bking_playfield_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bking2_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bking_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking2_xld1_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking2_yld1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking2_xld2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking2_yld2_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking2_xld3_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(bking2_input_port_5_r, bking2_yld3_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(bking2_input_port_6_r, bking2_msk_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking_xld3_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(bking_input_port_5_r, bking_yld3_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(bking_input_port_6_r, bking_msk_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(bking2_cont1_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(bking2_cont2_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking2_cont3_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking2_soundlatch_w)
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking2_eport2_w)   this is not shown to be connected anywhere
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking2_hitclr_w)
-	AM_RANGE(0x07, 0x1f) AM_READ(bking2_pos_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(bking_cont1_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(bking_cont2_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking_cont3_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
+//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
+	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking2_xld1_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking2_yld1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking2_xld2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking2_yld2_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking2_xld3_w)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(bking2_input_port_5_r, bking2_yld3_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(bking2_input_port_6_r, bking2_msk_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_3_r, bking_yld2_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, bking_xld3_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(bking_input_port_5_r, bking_yld3_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(bking_input_port_6_r, bking_msk_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(bking2_cont1_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(bking2_cont2_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking2_cont3_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking2_soundlatch_w)
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking2_eport2_w)   this is not shown to be connected anywhere
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking2_hitclr_w)
-	AM_RANGE(0x07, 0x1f) AM_READ(bking2_pos_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(bking_cont1_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(bking_cont2_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking_cont3_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
+//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
+	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 	AM_RANGE(0x2f, 0x2f) AM_READWRITE(buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0x4f, 0x4f) AM_READWRITE(buggychl_mcu_status_r, unk_w)
 	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( bking3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bking_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x4403, 0x4403) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
 	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_r)
-	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking2_sndnmi_disable_r, bking2_sndnmi_enable_w)
+	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
 ADDRESS_MAP_END
 
@@ -523,7 +523,7 @@ static const gfx_layout balllayout =
 	16*8    /* every sprite takes 16 consecutive bytes */
 };
 
-static GFXDECODE_START( bking2 )
+static GFXDECODE_START( bking )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout, 0,           4  ) /* playfield */
 	GFXDECODE_ENTRY( REGION_GFX2, 0, crowlayout, 4*8,         4  ) /* crow */
 	GFXDECODE_ENTRY( REGION_GFX3, 0, balllayout, 4*8+4*4,     4  ) /* ball 1 */
@@ -545,21 +545,21 @@ static const struct AY8910interface ay8910_interface =
 	portb_w
 };
 
-static MACHINE_DRIVER_START( bking2 )
+static MACHINE_DRIVER_START( bking )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(bking2_map,0)
-	MDRV_CPU_IO_MAP(bking2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(bking_map,0)
+	MDRV_CPU_IO_MAP(bking_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, XTAL_6MHz/2)	/* 3 MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-			/* interrupts (from Jungle King hardware, might be wrong): */
-			/* - no interrupts synced with vblank */
-			/* - NMI triggered by the main CPU */
-			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
+	MDRV_CPU_PROGRAM_MAP(bking_audio_map,0)
+	/* interrupts (from Jungle King hardware, might be wrong): */
+	/* - no interrupts synced with vblank */
+	/* - NMI triggered by the main CPU */
+	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -570,14 +570,13 @@ static MACHINE_DRIVER_START( bking2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bking2)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_COLORTABLE_LENGTH(4*8+4*4+4*2+4*2)
+	MDRV_GFXDECODE(bking)
+	MDRV_PALETTE_LENGTH(4*8+4*4+4*2+4*2)
 
-	MDRV_PALETTE_INIT(bking2)
-	MDRV_VIDEO_START(bking2)
-	MDRV_VIDEO_UPDATE(bking2)
-	MDRV_VIDEO_EOF(bking2)
+	MDRV_PALETTE_INIT(bking)
+	MDRV_VIDEO_START(bking)
+	MDRV_VIDEO_UPDATE(bking)
+	MDRV_VIDEO_EOF(bking)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -594,7 +593,7 @@ static MACHINE_DRIVER_START( bking2 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bking3 )
-	MDRV_IMPORT_FROM(bking2)
+	MDRV_IMPORT_FROM(bking)
 
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map,0)
@@ -895,6 +894,6 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */
 ROM_END
 
-GAME( 1982, bking,  0, bking2, bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 )
-GAME( 1983, bking2, 0, bking2, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
+GAME( 1982, bking,  0, bking,  bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 )
+GAME( 1983, bking2, 0, bking,  bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
 GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_WRONG_COLORS )

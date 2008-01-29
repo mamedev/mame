@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  bking2.c
+  bking.c
 
   Functions to emulate the video hardware of the machine.
 
@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-extern UINT8* bking2_playfield_ram;
+extern UINT8* bking_playfield_ram;
 
 
 static int pc3259_output[4];
@@ -51,93 +51,85 @@ static tilemap* bg_tilemap;
   bit 0 -- 220 ohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT( bking2 )
+
+PALETTE_INIT( bking )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 pen;
+		int bit0, bit1, bit2, r, g, b;
 
+		/* color PROM A7-A8 is the palette select */
+		if (i < 0x20)
+			/* characters - image bits go to A0-A2 of the color PROM */
+			pen = (((i - 0x00) << 4) & 0x180) | ((i - 0x00) & 0x07);
+		else if (i < 0x30)
+			/* crow - image bits go to A5-A6. */
+			pen = (((i - 0x20) << 5) & 0x180) | (((i - 0x20) & 0x03) << 5);
+		else if (i < 0x38)
+			/* ball #1 - image bit goes to A3 */
+			pen = (((i - 0x30) << 6) & 0x180) | (((i - 0x30) & 0x01) << 3);
+		else
+			/* ball #2 - image bit goes to A4 */
+			pen = (((i - 0x38) << 6) & 0x180) | (((i - 0x38) & 0x01) << 4);
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
 		r = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
 		g = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
+
 		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
+		bit0 = (color_prom[pen] >> 6) & 0x01;
+		bit1 = (color_prom[pen] >> 7) & 0x01;
 		bit2 = 0;
 		b = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-	/* color PROM A7-A8 is the palette select */
-
-	/* character colors. Image bits go to A0-A2 of the color PROM */
-	for (i = 0; i < TOTAL_COLORS(0); i++)
-	{
-		COLOR(0,i) = ((i << 4) & 0x180) | (i & 0x07);
-	}
-
-	/* crow colors. Image bits go to A5-A6. */
-	for (i = 0; i < TOTAL_COLORS(1); i++)
-	{
-		COLOR(1,i) = ((i << 5) & 0x180) | ((i & 0x03) << 5);
-	}
-
-	/* ball colors. Ball 1 image bit goes to A3. Ball 2 to A4. */
-	for (i = 0; i < TOTAL_COLORS(2); i++)
-	{
-		COLOR(2,i) = ((i << 6) & 0x180) | ((i & 0x01) << 3);
-		COLOR(3,i) = ((i << 6) & 0x180) | ((i & 0x01) << 4);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
 
-WRITE8_HANDLER( bking2_xld1_w )
+WRITE8_HANDLER( bking_xld1_w )
 {
 	xld1 = -data;
 }
 
-WRITE8_HANDLER( bking2_yld1_w )
+WRITE8_HANDLER( bking_yld1_w )
 {
 	yld1 = -data;
 }
 
-WRITE8_HANDLER( bking2_xld2_w )
+WRITE8_HANDLER( bking_xld2_w )
 {
 	xld2 = -data;
 }
 
-WRITE8_HANDLER( bking2_yld2_w )
+WRITE8_HANDLER( bking_yld2_w )
 {
 	yld2 = -data;
 }
 
-WRITE8_HANDLER( bking2_xld3_w )
+WRITE8_HANDLER( bking_xld3_w )
 {
 	xld3 = -data;
 }
 
-WRITE8_HANDLER( bking2_yld3_w )
+WRITE8_HANDLER( bking_yld3_w )
 {
 	yld3 = -data;
 }
 
 
-WRITE8_HANDLER( bking2_cont1_w )
+WRITE8_HANDLER( bking_cont1_w )
 {
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
@@ -156,7 +148,7 @@ WRITE8_HANDLER( bking2_cont1_w )
 	crow_pic = (data >> 4) & 0x0f;
 }
 
-WRITE8_HANDLER( bking2_cont2_w )
+WRITE8_HANDLER( bking_cont2_w )
 {
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
@@ -169,7 +161,7 @@ WRITE8_HANDLER( bking2_cont2_w )
 	hit = data >> 6;
 }
 
-WRITE8_HANDLER( bking2_cont3_w )
+WRITE8_HANDLER( bking_cont3_w )
 {
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
@@ -188,13 +180,13 @@ WRITE8_HANDLER( bking2_cont3_w )
 }
 
 
-WRITE8_HANDLER( bking2_msk_w )
+WRITE8_HANDLER( bking_msk_w )
 {
 	pc3259_mask++;
 }
 
 
-WRITE8_HANDLER( bking2_hitclr_w )
+WRITE8_HANDLER( bking_hitclr_w )
 {
 	pc3259_mask = 0;
 
@@ -205,24 +197,24 @@ WRITE8_HANDLER( bking2_hitclr_w )
 }
 
 
-WRITE8_HANDLER( bking2_playfield_w )
+WRITE8_HANDLER( bking_playfield_w )
 {
-	bking2_playfield_ram[offset] = data;
+	bking_playfield_ram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 
-READ8_HANDLER( bking2_input_port_5_r )
+READ8_HANDLER( bking_input_port_5_r )
 {
 	return readinputport(controller ? 7 : 5);
 }
 
-READ8_HANDLER( bking2_input_port_6_r )
+READ8_HANDLER( bking_input_port_6_r )
 {
 	return readinputport(controller ? 8 : 6);
 }
 
-READ8_HANDLER( bking2_pos_r )
+READ8_HANDLER( bking_pos_r )
 {
 	return pc3259_output[offset / 8] << 4;
 }
@@ -230,8 +222,8 @@ READ8_HANDLER( bking2_pos_r )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	UINT8 code0 = bking2_playfield_ram[2 * tile_index + 0];
-	UINT8 code1 = bking2_playfield_ram[2 * tile_index + 1];
+	UINT8 code0 = bking_playfield_ram[2 * tile_index + 0];
+	UINT8 code1 = bking_playfield_ram[2 * tile_index + 1];
 
 	int flags = 0;
 
@@ -242,7 +234,7 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-VIDEO_START( bking2 )
+VIDEO_START( bking )
 {
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, 0, 8, 8, 32, 32);
 	helper0 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
@@ -250,7 +242,7 @@ VIDEO_START( bking2 )
 }
 
 
-VIDEO_UPDATE( bking2 )
+VIDEO_UPDATE( bking )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -282,7 +274,7 @@ VIDEO_UPDATE( bking2 )
 }
 
 
-VIDEO_EOF( bking2 )
+VIDEO_EOF( bking )
 {
 	static const rectangle rect = { 0, 7, 0, 15 };
 

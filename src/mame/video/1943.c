@@ -1,8 +1,5 @@
 #include "driver.h"
 
-#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 UINT8 *c1943_scrollx;
 UINT8 *c1943_scrolly;
 UINT8 *c1943_bgscrollx;
