@@ -233,6 +233,7 @@ VIDEO_UPDATE( tharrier );
 VIDEO_UPDATE( hachamf );
 VIDEO_UPDATE( tdragon );
 VIDEO_EOF( nmk );
+VIDEO_EOF( strahl );
 
 /* Variables defined in video: */
 
@@ -4208,7 +4209,7 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(strahl)
-	MDRV_VIDEO_EOF(nmk)
+	MDRV_VIDEO_EOF(strahl)
 	MDRV_VIDEO_UPDATE(strahl)
 
 	/* sound hardware */

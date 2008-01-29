@@ -854,6 +854,19 @@ VIDEO_EOF( nmk )
 	memcpy(spriteram_old2,nmk16_mainram+0x8000/2,0x1000);
 }
 
+VIDEO_EOF( strahl )
+{
+	/* sprites are DMA'd from Main RAM to a private buffer automatically
+       (or at least this is how I interpret the datasheet) */
+
+	/* -- I actually see little evidence to support this, sprite lag
+          in some games should be checked on real boards */
+
+	/* strahl sprites are allocated in memory range FF000-FFFFF */
+
+	memcpy(spriteram_old2,nmk16_mainram+0xF000/2,0x1000);
+}
+
 
 
 /* Variables needed by drivers: */
