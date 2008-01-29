@@ -756,7 +756,10 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	}
 
 	/* recompute the VBLANK timing */
-	cpu_compute_vblank_timing(Machine);
+	{
+		extern void cpu_compute_vblank_timing(running_machine *machine);
+		cpu_compute_vblank_timing(Machine);
+	}
 
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */

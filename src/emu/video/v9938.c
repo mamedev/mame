@@ -601,7 +601,7 @@ static void v9938_register_write (int reg, int data)
 
  READ8_HANDLER (v9938_status_r)
 	{
-	int reg, n;
+	int reg;
 	UINT8 ret;
 
 	vdp.cmd_write_first = 0;
@@ -625,8 +625,14 @@ static void v9938_register_write (int reg, int data)
 			break;
 		case 2:
 			/*v9938_update_command ();*/
+/*
+	WTF is this? Whatever this was intended to do, it is nonsensical.
+	Might as well pick a random number....
 			n = cycles_currently_ran ();
 			if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
+			else vdp.statReg[2] &= ~0x20;
+*/
+			if (mame_rand(Machine) & 1) vdp.statReg[2] |= 0x20;
 			else vdp.statReg[2] &= ~0x20;
 			ret = vdp.statReg[2];
 			break;

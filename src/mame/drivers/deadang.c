@@ -35,6 +35,7 @@ HSync 15.37kHz
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"

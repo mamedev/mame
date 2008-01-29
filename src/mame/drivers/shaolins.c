@@ -7,6 +7,7 @@ driver by Allard Van Der Bas
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 
 

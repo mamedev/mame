@@ -41,6 +41,7 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/tmp68301.h"
 #include "realbrk.h"
 #include "sound/2413intf.h"

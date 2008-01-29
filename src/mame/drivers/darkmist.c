@@ -24,6 +24,7 @@ TODO:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/t5182.h"
 
 

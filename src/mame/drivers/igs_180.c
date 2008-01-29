@@ -2,6 +2,7 @@
 /* also see iqblock.c and tarzan.c */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z180/z180.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"

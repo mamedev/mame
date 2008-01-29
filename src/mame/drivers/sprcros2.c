@@ -55,6 +55,7 @@ Notes:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 
 extern UINT8 *sprcros2_fgvideoram, *sprcros2_spriteram, *sprcros2_bgvideoram;

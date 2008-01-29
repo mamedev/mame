@@ -12,6 +12,7 @@ Devil Zone      - 8022
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
 #include "sound/dac.h"

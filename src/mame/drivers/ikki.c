@@ -9,6 +9,7 @@ Ikki (c) 1985 Sun Electronics
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/sn76496.h"
 
 PALETTE_INIT( ikki );

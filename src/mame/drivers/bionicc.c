@@ -54,6 +54,7 @@ ToDo:
 ********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2151intf.h"
 
 

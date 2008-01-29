@@ -8,6 +8,7 @@ Todo:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 #include "st0016.h"

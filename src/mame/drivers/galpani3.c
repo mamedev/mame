@@ -64,6 +64,7 @@ Dumped by Uki
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ymz280b.h"
 
 extern UINT32* skns_spc_regs;

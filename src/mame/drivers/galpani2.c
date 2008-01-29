@@ -22,6 +22,7 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "kaneko16.h"
 #include "sound/okim6295.h"

@@ -225,15 +225,6 @@ struct _input_port_init_params
 	int					current_port;/* current port index */
 };
 
-/* Support for eXtended INP format */
-struct ext_header
-{
-	char header[7];  // must be "XINP" followed by NULLs
-	char shortname[9];  // game shortname
-	char version[32];  // MAME version string
-	UINT32 starttime;  // approximate INP start time
-	char dummy[32];  // for possible future expansion
-};
 
 
 /***************************************************************************
@@ -272,12 +263,13 @@ static input_port_entry *input_ports_default;
 /* recorded speed read from an INP file */
 static double rec_speed;
 
-/* set to 1 if INP file being played is a standard MAME INP file */
-static int no_extended_inp;
+/* set to TRUE if INP file being played is an extended INP file */
+static int extended_inp;
 
 /* for average speed calculations */
 static int framecount;
 static double totalspeed;
+
 
 
 /***************************************************************************
@@ -1155,10 +1147,10 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 static void setup_playback(running_machine *machine)
 {
 	const char *filename = options_get_string(mame_options(), OPTION_PLAYBACK);
+	ext_inp_header extinpheader;
 	inp_header inpheader;
 	file_error filerr;
 	time_t started_time;
-	struct ext_header xheader;
 	char check[7];
 
 	/* if no file, nothing to do */
@@ -1169,16 +1161,14 @@ static void setup_playback(running_machine *machine)
 	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &machine->playback_file);
 	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
 
-	// read first four bytes to check INP type
-	mame_fread(Machine->playback_file, check, 7);
-	mame_fseek(Machine->playback_file, 0, SEEK_SET);
+	/* read first four bytes to check INP type */
+	mame_fread(machine->playback_file, check, 7);
+	mame_fseek(machine->playback_file, 0, SEEK_SET);
 
 	/* Check if input file is an eXtended INP file */
-	if (strncmp(check,"XINP\0\0\0",7) != 0)
+	extended_inp = (memcmp(check, "XINP\0\0\0", 7) == 0);
+	if (extended_inp)
 	{
-		no_extended_inp = 1;
-		mame_printf_info("This INP file is not an extended INP file, extra info not available\n");
-
 		/* read playback header */
 		mame_fread(machine->playback_file, &inpheader, sizeof(inpheader));
 
@@ -1196,24 +1186,21 @@ static void setup_playback(running_machine *machine)
 	}
  	else
 	{
-		no_extended_inp = 0;
+		/* read playback header */
+		mame_fread(machine->playback_file, &extinpheader, sizeof(extinpheader));
+
+		/* output info to console */
 		mame_printf_info("Extended INP file info:\n");
-
-		// read header
-		mame_fread(Machine->playback_file, &xheader, sizeof(struct ext_header));
-
-		// output info to console
-		mame_printf_info("Version string: %s\n",xheader.version);
-		started_time = (time_t)xheader.starttime;
+		mame_printf_info("Version string: %s\n", extinpheader.version);
+		started_time = (time_t)extinpheader.starttime;
 		mame_printf_info("Start time: %s\n", ctime(&started_time));
 
-		// verify header against current game
-		if (strcmp(machine->gamedrv->name, xheader.shortname) != 0)
-			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", xheader.shortname, machine->gamedrv->name);
+		/* verify header against current game */
+		if (strcmp(machine->gamedrv->name, extinpheader.shortname) != 0)
+			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", extinpheader.shortname, machine->gamedrv->name);
 		else
 			mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
 	}
-
 }
 
 
@@ -2790,12 +2777,12 @@ static void update_playback_record(int portnum, UINT32 portvalue)
 		{
 			mame_fclose(Machine->playback_file);
 			Machine->playback_file = NULL;
-			if(no_extended_inp)
+			if (!extended_inp)
 				popmessage("End of playback");
 			else
 			{
-				popmessage("End of playback - %i frames - Average speed %f%%",framecount,(double)totalspeed/framecount);
-				printf("End of playback - %i frames - Average speed %f%%\n",framecount,(double)totalspeed/framecount);
+				popmessage("End of playback - %i frames - Average speed %f%%", framecount, (double)totalspeed/framecount);
+				printf("End of playback - %i frames - Average speed %f%%\n", framecount, (double)totalspeed/framecount);
 			}
 		}
 	}
@@ -3008,7 +2995,7 @@ profiler_mark(PROFILER_INPUT);
 	}
 
 	/* store speed read from INP file, if extended INP */
-	if (Machine->playback_file != NULL && !no_extended_inp)
+	if (Machine->playback_file != NULL && extended_inp)
 	{
 		UINT32 dummy;
 		mame_fread(Machine->playback_file, &rec_speed, sizeof(rec_speed));

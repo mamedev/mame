@@ -43,10 +43,26 @@ extern running_machine *Machine;
  *
  *************************************/
 
-/* Recomputes the VBLANK timing after, e.g., a visible area change */
-void cpu_compute_vblank_timing(running_machine *machine);
-
 /* Returns the number of the video frame we are currently playing */
 int cpu_getcurrentframe(void);
+
+
+
+/*************************************
+ *
+ *  Core timing
+ *
+ *************************************/
+
+/* Returns the number of times the interrupt handler will be called before
+   the end of the current video frame. This is can be useful to interrupt
+   handlers to synchronize their operation. If you call this from outside
+   an interrupt handler, add 1 to the result, i.e. if it returns 0, it means
+   that the interrupt handler will be called once. */
+int cpu_getiloops(void);
+
+/* Scales a given value by the ratio of fcount / fperiod */
+int cpu_scalebyfcount(int value);
+
 
 #endif	/* __DEPRECAT_H__ */

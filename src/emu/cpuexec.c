@@ -21,11 +21,9 @@
 
 
 
-/*************************************
- *
- *  Debug logging
- *
- *************************************/
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
 
 #define VERBOSE 0
 
@@ -33,11 +31,9 @@
 
 
 
-/*************************************
- *
- *  Macros to help verify active CPU
- *
- *************************************/
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 #define VERIFY_ACTIVECPU(name) \
 	int activecpu = cpu_getactivecpu(); \
@@ -52,12 +48,11 @@
 
 
 
-/*************************************
- *
- *  Triggers for the timer system
- *
- *************************************/
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
+/* internal trigger IDs */
 enum
 {
 	TRIGGER_TIMESLICE 	= -1000,
@@ -68,63 +63,54 @@ enum
 
 
 
-/*************************************
- *
- *  Internal CPU info structure
- *
- *************************************/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
+/* Internal CPU info structure */
 typedef struct _cpuexec_data cpuexec_data;
 struct _cpuexec_data
 {
-	UINT8	saveable;				/* true if saveable */
+	UINT8		saveable;				/* true if saveable */
 
-	UINT8	suspend;				/* suspend reason mask (0 = not suspended) */
-	UINT8	nextsuspend;			/* pending suspend reason mask */
-	UINT8	eatcycles;				/* true if we eat cycles while suspended */
-	UINT8	nexteatcycles;			/* pending value */
-	INT32	trigger;				/* pending trigger to release a trigger suspension */
+	UINT8		suspend;				/* suspend reason mask (0 = not suspended) */
+	UINT8		nextsuspend;			/* pending suspend reason mask */
+	UINT8		eatcycles;				/* true if we eat cycles while suspended */
+	UINT8		nexteatcycles;			/* pending value */
+	INT32		trigger;				/* pending trigger to release a trigger suspension */
 
-	INT32 	iloops; 				/* number of interrupts remaining this frame */
+	INT32 		iloops; 				/* number of interrupts remaining this frame */
 
-	UINT64 	totalcycles;			/* total CPU cycles executed */
-	attotime localtime;				/* local time, relative to the timer system's global time */
-	INT32	clock;					/* current active clock */
-	double	clockscale;				/* current active clock scale factor */
+	UINT64 		totalcycles;			/* total CPU cycles executed */
+	attotime 	localtime;				/* local time, relative to the timer system's global time */
+	INT32		clock;					/* current active clock */
+	double		clockscale;				/* current active clock scale factor */
 
-	INT32	vblankint_countdown;	/* number of vblank callbacks left until we interrupt */
-	INT32 	vblankint_multiplier;	/* number of vblank callbacks per interrupt */
-	void *	vblankint_timer;		/* reference to elapsed time counter */
+	INT32		vblankint_countdown;	/* number of vblank callbacks left until we interrupt */
+	INT32 		vblankint_multiplier;	/* number of vblank callbacks per interrupt */
+	emu_timer *	vblankint_timer;		/* reference to elapsed time counter */
 
-	void *	timedint_timer;			/* reference to this CPU's timer */
-	attotime timedint_period; 		/* timing period of the timed interrupt */
+	emu_timer *	timedint_timer;			/* reference to this CPU's timer */
+	attotime 	timedint_period; 		/* timing period of the timed interrupt */
 };
 
 
 
-/*************************************
- *
- *  General CPU variables
- *
- *************************************/
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
+/* general CPU variables */
 static cpuexec_data cpu[MAX_CPU];
 
 static UINT8 vblank;
 static UINT32 current_frame;
-static INT32 watchdog_counter;
 
 static int cycles_running;
 static int cycles_stolen;
 
 
-
-/*************************************
- *
- *  Timer variables
- *
- *************************************/
-
+/* timer variables */
 static emu_timer *vblank_timer;
 static INT32 vblank_countdown;
 static INT32 vblank_multiplier;
@@ -142,15 +128,16 @@ static emu_timer *interleave_boost_timer;
 static emu_timer *interleave_boost_timer_end;
 static attotime perfect_interleave;
 
+/* watchdog state */
+static UINT8 watchdog_enabled;
+static INT32 watchdog_counter;
 static emu_timer *watchdog_timer;
 
 
 
-/*************************************
- *
- *  Static prototypes
- *
- *************************************/
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 static void cpuexec_exit(running_machine *machine);
 static void cpuexec_reset(running_machine *machine);
@@ -160,33 +147,19 @@ static TIMER_CALLBACK( cpu_vblankcallback );
 static TIMER_CALLBACK( cpu_updatecallback );
 static TIMER_CALLBACK( end_interleave_boost );
 static void compute_perfect_interleave(running_machine *machine);
-static void watchdog_setup(running_machine *machine, int alloc_new);
+
+void cpu_compute_vblank_timing(running_machine *machine);
 
 
 
-/*************************************
- *
- *  Watchdog Flags
- *
- *************************************/
+/***************************************************************************
+    CORE CPU EXECUTION
+***************************************************************************/
 
-#define WATCHDOG_IS_STARTED_DISABLED	-1
-#define WATCHDOG_IS_DISABLED			-2
-#define WATCHDOG_IS_TIMER_BASED			-3
-#define WATCHDOG_IS_INVALID				-4
-#define WATCHDOG_IS_BEING_STARTED		-5
-
-
-
-#if 0
-#pragma mark CORE CPU
-#endif
-
-/*************************************
- *
- *  Initialize all the CPUs
- *
- *************************************/
+/*-------------------------------------------------
+    cpuexec_init - initialize internal states of
+    all CPUs
+-------------------------------------------------*/
 
 void cpuexec_init(running_machine *machine)
 {
@@ -266,18 +239,17 @@ void cpuexec_init(running_machine *machine)
 	state_save_push_tag(0);
 	state_save_register_item("cpu", 0, vblank);
 	state_save_register_item("cpu", 0, current_frame);
+	state_save_register_item("cpu", 0, watchdog_enabled);
 	state_save_register_item("cpu", 0, watchdog_counter);
 	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
 }
 
 
-
-/*************************************
- *
- *  Prepare the system for execution
- *
- *************************************/
+/*-------------------------------------------------
+    cpuexec_reset - reset CPU states on a soft
+    reset
+-------------------------------------------------*/
 
 static void cpuexec_reset(running_machine *machine)
 {
@@ -285,8 +257,10 @@ static void cpuexec_reset(running_machine *machine)
 
 	/* initialize the various timers (suspends all CPUs at startup) */
 	cpu_inittimers(machine);
-	watchdog_counter = WATCHDOG_IS_INVALID;
-	watchdog_setup(machine, TRUE);
+	
+	/* set up the watchdog timer; only start off enabled if explicitly configured */
+	watchdog_enabled = (machine->drv->watchdog_vblank_count != 0 || attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0);
+	watchdog_reset(machine);
 
 	/* first pass over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -311,12 +285,9 @@ static void cpuexec_reset(running_machine *machine)
 }
 
 
-
-/*************************************
- *
- *  Deinitialize all the CPUs
- *
- *************************************/
+/*-------------------------------------------------
+    cpuexec_exit - cleanup all CPUs on exit
+-------------------------------------------------*/
 
 static void cpuexec_exit(running_machine *machine)
 {
@@ -328,137 +299,10 @@ static void cpuexec_exit(running_machine *machine)
 }
 
 
-
-
-#if 0
-#pragma mark -
-#pragma mark WATCHDOG
-#endif
-
-/*************************************
- *
- *  Watchdog timer callback
- *
- *************************************/
-
-static TIMER_CALLBACK( watchdog_callback )
-{
-	logerror("reset caused by the (time) watchdog\n");
-	mame_schedule_soft_reset(machine);
-}
-
-
-
-/*************************************
- *
- *  Watchdog setup routine
- *
- *************************************/
-
-static void watchdog_setup(running_machine *machine, int alloc_new)
-{
-	if (watchdog_counter != WATCHDOG_IS_DISABLED)
-	{
-		if (machine->drv->watchdog_vblank_count)
-		{
-			/* Start a vblank based watchdog. */
-			watchdog_counter = machine->drv->watchdog_vblank_count;
-		}
-		else if (attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0)
-		{
-			/* Start a time based watchdog. */
-			if (alloc_new)
-				watchdog_timer = timer_alloc(watchdog_callback, NULL);
-			timer_adjust(watchdog_timer, machine->drv->watchdog_time, 0, attotime_zero);
-			watchdog_counter = WATCHDOG_IS_TIMER_BASED;
-		}
-		else if (watchdog_counter == WATCHDOG_IS_INVALID)
-		{
-			/* The watchdog was not initialized in the MACHINE_DRIVER,
-             * so we will start with it disabled.
-             */
-			watchdog_counter = WATCHDOG_IS_STARTED_DISABLED;
-		}
-		else
-		{
-			/* The watchdog was not initialized in the MACHINE_DRIVER.
-             * But it has been manually started, so we will default to
-             * using a vblank watchdog.  We will set up a default time
-             * of 3 times the refresh rate.  Which is 3 seconds @ 60Hz
-             * refresh.
-
-             * The 3 seconds delay is targeted at qzshowby, which otherwise
-             * would reset at the start of a game.
-             */
-			watchdog_counter = 3 * ATTOSECONDS_TO_HZ(machine->screen[0].refresh);
-		}
-	}
-}
-
-
-
-/*************************************
- *
- *  Watchdog reset
- *
- *************************************/
-
-void watchdog_reset(running_machine *machine)
-{
-	if (watchdog_counter == WATCHDOG_IS_TIMER_BASED)
-	{
-		timer_reset(watchdog_timer, machine->drv->watchdog_time);
-	}
-	else
-	{
-		if (watchdog_counter == WATCHDOG_IS_STARTED_DISABLED)
-		{
-			watchdog_counter = WATCHDOG_IS_BEING_STARTED;
-			logerror("(vblank) watchdog armed by reset\n");
-		}
-
-		watchdog_setup(machine, FALSE);
-	}
-}
-
-
-
-/*************************************
- *
- *  Watchdog enable/disable
- *
- *************************************/
-
-void watchdog_enable(running_machine *machine, int enable)
-{
-	if (!enable)
-	{
-		// Disable all timers
-		watchdog_counter = WATCHDOG_IS_DISABLED;
-	}
-	else
-	// Setup only on change from disable to enable.
-	// Do not setup if watchdog is disabled from machine init.
-	if (watchdog_counter == WATCHDOG_IS_DISABLED)
-	{
-		watchdog_counter = WATCHDOG_IS_BEING_STARTED;
-		watchdog_setup(machine, FALSE);
-	}
-}
-
-
-
-#if 0
-#pragma mark -
-#pragma mark CPU SCHEDULING
-#endif
-
-/*************************************
- *
- *  Execute all the CPUs for one
- *  timeslice
- *
- *************************************/
+/*-------------------------------------------------
+    cpuexec_timeslice - execute all CPUs for a 
+    single timeslice
+-------------------------------------------------*/
 
 void cpuexec_timeslice(running_machine *machine)
 {
@@ -552,201 +396,14 @@ void cpuexec_timeslice(running_machine *machine)
 
 
 
-/*************************************
- *
- *  Abort the timeslice for the
- *  active CPU
- *
- *************************************/
+/***************************************************************************
+    CPU SCHEDULING
+***************************************************************************/
 
-void activecpu_abort_timeslice(void)
-{
-	int current_icount;
-
-	VERIFY_EXECUTINGCPU(activecpu_abort_timeslice);
-	LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpu_getexecutingcpu(), activecpu_get_icount() + 1));
-
-	/* swallow the remaining cycles */
-	current_icount = activecpu_get_icount() + 1;
-	cycles_stolen += current_icount;
-	cycles_running -= current_icount;
-	activecpu_adjust_icount(-current_icount);
-}
-
-
-
-/*************************************
- *
- *  Return the current local time for
- *  a CPU, relative to the current
- *  timeslice
- *
- *************************************/
-
-attotime cpunum_get_localtime(int cpunum)
-{
-	attotime result;
-
-	VERIFY_CPUNUM(cpunum_get_localtime);
-
-	/* if we're active, add in the time from the current slice */
-	result = cpu[cpunum].localtime;
-	if (cpunum == cpu_getexecutingcpu())
-	{
-		int cycles = cycles_currently_ran();
-		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, cpunum));
-	}
-	return result;
-}
-
-
-
-/*************************************
- *
- *  Set a suspend reason for the
- *  given CPU
- *
- *************************************/
-
-void cpunum_suspend(int cpunum, int reason, int eatcycles)
-{
-	VERIFY_CPUNUM(cpunum_suspend);
-	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
-
-	/* set the pending suspend bits, and force a resync */
-	cpu[cpunum].nextsuspend |= reason;
-	cpu[cpunum].nexteatcycles = eatcycles;
-	if (cpu_getexecutingcpu() >= 0)
-		activecpu_abort_timeslice();
-}
-
-
-
-/*************************************
- *
- *  Clear a suspend reason for a
- *  given CPU
- *
- *************************************/
-
-void cpunum_resume(int cpunum, int reason)
-{
-	VERIFY_CPUNUM(cpunum_resume);
-	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
-
-	/* clear the pending suspend bits, and force a resync */
-	cpu[cpunum].nextsuspend &= ~reason;
-	if (cpu_getexecutingcpu() >= 0)
-		activecpu_abort_timeslice();
-}
-
-
-
-/*************************************
- *
- *  Return true if a given CPU is
- *  suspended
- *
- *************************************/
-
-int cpunum_is_suspended(int cpunum, int reason)
-{
-	VERIFY_CPUNUM(cpunum_suspend);
-	return ((cpu[cpunum].nextsuspend & reason) != 0);
-}
-
-
-
-/*************************************
- *
- *  Gets the current CPU's clock speed
- *
- *************************************/
-
-int cpunum_get_clock(int cpunum)
-{
-	VERIFY_CPUNUM(cpunum_get_clock);
-	return cpu[cpunum].clock;
-}
-
-
-
-/*************************************
- *
- *  Sets the current CPU's clock speed
- *
- *************************************/
-
-void cpunum_set_clock(running_machine *machine, int cpunum, int clock)
-{
-	VERIFY_CPUNUM(cpunum_set_clock);
-
-	cpu[cpunum].clock = clock;
-	cycles_per_second[cpunum] = (double)clock * cpu[cpunum].clockscale;
-	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)clock * cpu[cpunum].clockscale);
-
-	/* re-compute the perfect interleave factor */
-	compute_perfect_interleave(machine);
-}
-
-
-
-void cpunum_set_clock_period(running_machine *machine, int cpunum, attoseconds_t clock_period)
-{
-	VERIFY_CPUNUM(cpunum_set_clock);
-
-	cpu[cpunum].clock = ATTOSECONDS_PER_SECOND / clock_period;
-	cycles_per_second[cpunum] = (double) (ATTOSECONDS_PER_SECOND / clock_period) * cpu[cpunum].clockscale;
-	attoseconds_per_cycle[cpunum] = clock_period;
-
-	/* re-compute the perfect interleave factor */
-	compute_perfect_interleave(machine);
-}
-
-
-
-/*************************************
- *
- *  Returns the current scaling factor
- *  for a CPU's clock speed
- *
- *************************************/
-
-double cpunum_get_clockscale(int cpunum)
-{
-	VERIFY_CPUNUM(cpunum_get_clockscale);
-	return cpu[cpunum].clockscale;
-}
-
-
-
-/*************************************
- *
- *  Sets the current scaling factor
- *  for a CPU's clock speed
- *
- *************************************/
-
-void cpunum_set_clockscale(running_machine *machine, int cpunum, double clockscale)
-{
-	VERIFY_CPUNUM(cpunum_set_clockscale);
-
-	cpu[cpunum].clockscale = clockscale;
-	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * clockscale;
-	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * clockscale);
-
-	/* re-compute the perfect interleave factor */
-	compute_perfect_interleave(machine);
-}
-
-
-
-/*************************************
- *
- *  Temporarily boosts the interleave
- *  factor
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_boost_interleave - temporarily boosts the 
+    interleave factor
+-------------------------------------------------*/
 
 void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration)
 {
@@ -765,59 +422,211 @@ void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration)
 }
 
 
+/*-------------------------------------------------
+    activecpu_abort_timeslice - abort execution
+    for the current timeslice, allowing other
+    CPUs to run before we run again
+-------------------------------------------------*/
 
-#if 0
-#pragma mark -
-#pragma mark TIMING HELPERS
-#endif
-
-/*************************************
- *
- *  Return cycles ran this iteration
- *
- *************************************/
-
-int cycles_currently_ran(void)
+void activecpu_abort_timeslice(void)
 {
-	VERIFY_EXECUTINGCPU(cycles_currently_ran);
-	return cycles_running - activecpu_get_icount();
+	int current_icount;
+
+	VERIFY_EXECUTINGCPU(activecpu_abort_timeslice);
+	LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpu_getexecutingcpu(), activecpu_get_icount() + 1));
+
+	/* swallow the remaining cycles */
+	current_icount = activecpu_get_icount() + 1;
+	cycles_stolen += current_icount;
+	cycles_running -= current_icount;
+	activecpu_adjust_icount(-current_icount);
+}
+
+
+/*-------------------------------------------------
+    cpunum_suspend - set a suspend reason for the
+	given CPU
+-------------------------------------------------*/
+
+void cpunum_suspend(int cpunum, int reason, int eatcycles)
+{
+	VERIFY_CPUNUM(cpunum_suspend);
+	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
+
+	/* set the pending suspend bits, and force a resync */
+	cpu[cpunum].nextsuspend |= reason;
+	cpu[cpunum].nexteatcycles = eatcycles;
+	if (cpu_getexecutingcpu() >= 0)
+		activecpu_abort_timeslice();
+}
+
+
+/*-------------------------------------------------
+    cpunum_resume - clear a suspend reason for the
+	given CPU
+-------------------------------------------------*/
+
+void cpunum_resume(int cpunum, int reason)
+{
+	VERIFY_CPUNUM(cpunum_resume);
+	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
+
+	/* clear the pending suspend bits, and force a resync */
+	cpu[cpunum].nextsuspend &= ~reason;
+	if (cpu_getexecutingcpu() >= 0)
+		activecpu_abort_timeslice();
+}
+
+
+/*-------------------------------------------------
+    cpunum_is_suspended - returns true if the 
+    given CPU is suspended for any of the given 
+    reasons
+-------------------------------------------------*/
+
+int cpunum_is_suspended(int cpunum, int reason)
+{
+	VERIFY_CPUNUM(cpunum_suspend);
+	return ((cpu[cpunum].nextsuspend & reason) != 0);
 }
 
 
 
-/*************************************
- *
- *  Return total number of CPU cycles
- *  for the active CPU or for a given CPU.
- *
- *************************************/
+/***************************************************************************
+    CPU CLOCK MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    update_clock_information - recomputes clock
+    information for the specified CPU
+-------------------------------------------------*/
+
+static void update_clock_information(running_machine *machine, int cpunum)
+{
+	/* recompute cps and spc */
+	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * cpu[cpunum].clockscale;
+	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * cpu[cpunum].clockscale);
+
+	/* re-compute the perfect interleave factor */
+	compute_perfect_interleave(machine);
+} 
+
+
+/*-------------------------------------------------
+    cpunum_get_clock - gets the given CPU's 
+    clock speed
+-------------------------------------------------*/
+
+int cpunum_get_clock(int cpunum)
+{
+	VERIFY_CPUNUM(cpunum_get_clock);
+	return cpu[cpunum].clock;
+}
+
+
+/*-------------------------------------------------
+    cpunum_set_clock - sets the given CPU's 
+    clock speed
+-------------------------------------------------*/
+
+void cpunum_set_clock(running_machine *machine, int cpunum, int clock)
+{
+	VERIFY_CPUNUM(cpunum_set_clock);
+
+	cpu[cpunum].clock = clock;
+	update_clock_information(machine, cpunum);
+}
+
+
+/*-------------------------------------------------
+    cpunum_get_clockscale - returns the current 
+    scaling factor for a CPU's clock speed
+-------------------------------------------------*/
+
+double cpunum_get_clockscale(int cpunum)
+{
+	VERIFY_CPUNUM(cpunum_get_clockscale);
+	return cpu[cpunum].clockscale;
+}
+
+
+/*-------------------------------------------------
+    cpunum_set_clockscale - sets the current 
+    scaling factor for a CPU's clock speed
+-------------------------------------------------*/
+
+void cpunum_set_clockscale(running_machine *machine, int cpunum, double clockscale)
+{
+	VERIFY_CPUNUM(cpunum_set_clockscale);
+
+	cpu[cpunum].clockscale = clockscale;
+	update_clock_information(machine, cpunum);
+}
+
+
+
+/***************************************************************************
+    CPU TIMING
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpunum_get_localtime - returns the current 
+    local time for a CPU
+-------------------------------------------------*/
+
+attotime cpunum_get_localtime(int cpunum)
+{
+	attotime result;
+
+	VERIFY_CPUNUM(cpunum_get_localtime);
+
+	/* if we're active, add in the time from the current slice */
+	result = cpu[cpunum].localtime;
+	if (cpunum == cpu_getexecutingcpu())
+	{
+		int cycles = cycles_running - activecpu_get_icount();
+		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, cpunum));
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    activecpu_gettotalcycles - return the total
+    number of CPU cycles executed on the active
+    CPU
+-------------------------------------------------*/
 
 UINT64 activecpu_gettotalcycles(void)
 {
 	VERIFY_ACTIVECPU(activecpu_gettotalcycles);
 	if (activecpu == cpu_getexecutingcpu())
-		return cpu[activecpu].totalcycles + cycles_currently_ran();
+		return cpu[activecpu].totalcycles + cycles_running - activecpu_get_icount();
 	else
 		return cpu[activecpu].totalcycles;
 }
+
+
+/*-------------------------------------------------
+    cpunum_gettotalcycles - return the total
+    number of CPU cycles executed on the 
+    specified CPU
+-------------------------------------------------*/
 
 UINT64 cpunum_gettotalcycles(int cpunum)
 {
 	VERIFY_CPUNUM(cpunum_gettotalcycles);
 	if (cpunum == cpu_getexecutingcpu())
-		return cpu[cpunum].totalcycles + cycles_currently_ran();
+		return cpu[cpunum].totalcycles + cycles_running - activecpu_get_icount();
 	else
 		return cpu[cpunum].totalcycles;
 }
 
 
-
-/*************************************
- *
- *  Safely eats cycles so we don't
- *  cross a timeslice boundary
- *
- *************************************/
+/*-------------------------------------------------
+    activecpu_eat_cycles - safely eats cycles so
+    we don't cross a timeslice boundary
+-------------------------------------------------*/
 
 void activecpu_eat_cycles(int cycles)
 {
@@ -829,97 +638,112 @@ void activecpu_eat_cycles(int cycles)
 
 
 
-/*************************************
- *
- *  Scales a given value by the fraction
- *  of time elapsed between refreshes
- *
- *************************************/
+/***************************************************************************
+    SYNCHRONIZATION HELPERS
+***************************************************************************/
 
-int cpu_scalebyfcount(int value)
+/*-------------------------------------------------
+    cpu_suspend_until_trigger - suspend execution
+    until the given trigger fires
+-------------------------------------------------*/
+
+static void cpunum_suspend_until_trigger(int cpunum, int trigger, int eatcycles)
 {
-	attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
-	int result;
+	/* suspend the CPU immediately if it's not already */
+	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, eatcycles);
 
-	/* shift off some bits to ensure no overflow */
-	if (value < 65536)
-		result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
-	else
-		result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
-	if (value >= 0)
-		return (result < value) ? result : value;
-	else
-		return (result > value) ? result : value;
+	/* set the trigger */
+	cpu[cpunum].trigger = TRIGGER_TIMESLICE;
+}
+
+
+/*-------------------------------------------------
+    cpu_yield - yield our current timeslice
+-------------------------------------------------*/
+
+void cpu_yield(void)
+{
+	int cpunum = cpu_getexecutingcpu();
+	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
+	cpunum_suspend_until_trigger(cpunum, TRIGGER_TIMESLICE, FALSE);
+}
+
+
+/*-------------------------------------------------
+    cpu_spin - burn CPU cycles until our timeslice 
+    is up
+-------------------------------------------------*/
+
+void cpu_spin(void)
+{
+	int cpunum = cpu_getexecutingcpu();
+	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
+	cpunum_suspend_until_trigger(cpunum, TRIGGER_TIMESLICE, TRUE);
+}
+
+
+/*-------------------------------------------------
+    cpu_spinuntil_trigger - burn CPU cycles until 
+    a timer trigger
+-------------------------------------------------*/
+
+void cpu_spinuntil_trigger(int trigger)
+{
+	int cpunum = cpu_getexecutingcpu();
+	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
+	cpunum_suspend_until_trigger(cpunum, trigger, TRUE);
+}
+
+
+/*-------------------------------------------------
+    cpunum_spinuntil_trigger - burn specified CPU 
+    cycles until a timer trigger
+-------------------------------------------------*/
+
+void cpunum_spinuntil_trigger(int cpunum, int trigger)
+{
+	VERIFY_CPUNUM(cpunum_spinuntil_trigger);
+	cpunum_suspend_until_trigger(cpunum, trigger, TRUE);
+}
+
+
+/*-------------------------------------------------
+    cpu_spinuntil_int - burn CPU cycles until the 
+    next interrupt
+-------------------------------------------------*/
+
+void cpu_spinuntil_int(void)
+{
+	int cpunum = cpu_getexecutingcpu();
+	VERIFY_EXECUTINGCPU(cpu_spinuntil_int);
+	cpunum_suspend_until_trigger(cpunum, TRIGGER_INT + cpunum, TRUE);
+}
+
+
+/*-------------------------------------------------
+    cpu_spinuntil_time - burn CPU cycles for a 
+    specific period of time
+-------------------------------------------------*/
+
+void cpu_spinuntil_time(attotime duration)
+{
+	static int timetrig = 0;
+	int cpunum = cpu_getexecutingcpu();
+	VERIFY_EXECUTINGCPU(cpu_spinuntil_time);
+	cpunum_suspend_until_trigger(cpunum, TRIGGER_SUSPENDTIME + timetrig, TRUE);
+	cpu_triggertime(duration, TRIGGER_SUSPENDTIME + timetrig);
+	timetrig = (timetrig + 1) % 256;
 }
 
 
 
-#if 0
-#pragma mark -
-#pragma mark VIDEO TIMING
-#endif
+/***************************************************************************
+    TRIGGERS
+***************************************************************************/
 
-/*************************************
- *
- *  Computes the VBLANK timing
- *
- *************************************/
-
-void cpu_compute_vblank_timing(running_machine *machine)
-{
-	refresh_period = attotime_make(0, machine->screen[0].refresh);
-
-	/* recompute the vblank period */
-	vblank_period = attotime_make(0, machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
-	if (vblank_timer != NULL && timer_enable(vblank_timer, FALSE))
-	{
-		attotime remaining = timer_timeleft(vblank_timer);
-		if (remaining.seconds == 0 && remaining.attoseconds == 0)
-			remaining = vblank_period;
-		timer_adjust(vblank_timer, remaining, 0, vblank_period);
-	}
-
-	LOG(("cpu_compute_vblank_timing: refresh=%s vblank=%s\n", attotime_string(refresh_period, 9), attotime_string(vblank_period, 9)));
-}
-
-
-
-/*************************************
- *
- *  Returns the VBLANK state
- *
- *************************************/
-
-int cpu_getvblank(void)
-{
-	return vblank;
-}
-
-
-
-/*************************************
- *
- *  Returns the current frame count
- *
- *************************************/
-
-int cpu_getcurrentframe(void)
-{
-	return current_frame;
-}
-
-
-
-#if 0
-#pragma mark -
-#pragma mark SYNCHRONIZATION
-#endif
-
-/*************************************
- *
- *  Generate a specific trigger
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_trigger - generate a trigger now
+-------------------------------------------------*/
 
 void cpu_trigger(running_machine *machine, int trigger)
 {
@@ -946,12 +770,10 @@ void cpu_trigger(running_machine *machine, int trigger)
 }
 
 
-
-/*************************************
- *
- *  Generate a trigger in the future
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_triggertime - generate a trigger after a 
+    specific period of time
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_triggertime_callback )
 {
@@ -965,12 +787,10 @@ void cpu_triggertime(attotime duration, int trigger)
 }
 
 
-
-/*************************************
- *
- *  Generate a trigger for an int
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_triggerint - generate a trigger 
+    corresponding to an interrupt on the given CPU
+-------------------------------------------------*/
 
 void cpu_triggerint(running_machine *machine, int cpunum)
 {
@@ -979,121 +799,114 @@ void cpu_triggerint(running_machine *machine, int cpunum)
 
 
 
-/*************************************
- *
- *  Burn/yield CPU cycles until a trigger
- *
- *************************************/
+/***************************************************************************
+    WATCHDOG TIMERS
+***************************************************************************/
 
-void cpu_spinuntil_trigger(int trigger)
+/*-------------------------------------------------
+    watchdog_callback - watchdog timer callback
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( watchdog_callback )
 {
-	int cpunum = cpu_getexecutingcpu();
-
-	VERIFY_EXECUTINGCPU(cpu_spinuntil_trigger);
-
-	/* suspend the CPU immediately if it's not already */
-	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, 1);
-
-	/* set the trigger */
-	cpu[cpunum].trigger = trigger;
-}
-
-void cpunum_spinuntil_trigger( int cpunum, int trigger )
-{
-	VERIFY_CPUNUM(cpunum_spinuntil_trigger);
-
-	/* suspend the CPU immediately if it's not already */
-	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, 1);
-
-	/* set the trigger */
-	cpu[cpunum].trigger = trigger;
+	logerror("reset caused by the (time) watchdog\n");
+	mame_schedule_soft_reset(machine);
 }
 
 
+/*-------------------------------------------------
+    watchdog_reset - reset the watchdog timer
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Burn/yield CPU cycles until an
- *  interrupt
- *
- *************************************/
-
-void cpu_spinuntil_int(void)
+void watchdog_reset(running_machine *machine)
 {
-	VERIFY_EXECUTINGCPU(cpu_spinuntil_int);
-	cpu_spinuntil_trigger(TRIGGER_INT + activecpu);
+	/* if we're not enabled, skip it */
+	if (!watchdog_enabled)
+		timer_adjust(watchdog_timer, attotime_never, 0, attotime_zero);
+	
+	/* VBLANK-based watchdog? */
+	else if (machine->drv->watchdog_vblank_count != 0)
+		watchdog_counter = machine->drv->watchdog_vblank_count;
+
+	/* timer-based watchdog? */
+	else if (attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0)
+		timer_adjust(watchdog_timer, machine->drv->watchdog_time, 0, attotime_zero);
+	
+	/* default to an obscene amount of time (3 seconds) */
+	else
+		timer_adjust(watchdog_timer, ATTOTIME_IN_SEC(3), 0, attotime_zero);
 }
 
 
+/*-------------------------------------------------
+    watchdog_enable - reset the watchdog timer
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Burn/yield CPU cycles until the
- *  end of the current timeslice
- *
- *************************************/
-
-void cpu_spin(void)
+void watchdog_enable(running_machine *machine, int enable)
 {
-	cpu_spinuntil_trigger(TRIGGER_TIMESLICE);
-}
-
-
-void cpu_yield(void)
-{
-	int cpunum = cpu_getexecutingcpu();
-
-	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
-
-	/* suspend the CPU immediately if it's not already */
-	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, 0);
-
-	/* set the trigger */
-	cpu[cpunum].trigger = TRIGGER_TIMESLICE;
+	/* when re-enabled, we reset our state */
+	if (watchdog_enabled != enable)
+	{
+		watchdog_enabled = enable;
+		watchdog_reset(machine);
+	}
 }
 
 
 
-/*************************************
- *
- *  Burn/yield CPU cycles for a
- *  specific period of time
- *
- *************************************/
+/***************************************************************************
+    CHEESY FAKE VIDEO TIMING
+***************************************************************************/
 
-void cpu_spinuntil_time(attotime duration)
+/*-------------------------------------------------
+    cpu_compute_vblank_timing - recompute cheesy
+    VBLANK timing after a video change
+-------------------------------------------------*/
+
+void cpu_compute_vblank_timing(running_machine *machine)
 {
-	static int timetrig = 0;
+	refresh_period = attotime_make(0, machine->screen[0].refresh);
 
-	cpu_spinuntil_trigger(TRIGGER_SUSPENDTIME + timetrig);
-	cpu_triggertime(duration, TRIGGER_SUSPENDTIME + timetrig);
-	timetrig = (timetrig + 1) & 255;
+	/* recompute the vblank period */
+	vblank_period = attotime_make(0, machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
+	if (vblank_timer != NULL && timer_enable(vblank_timer, FALSE))
+	{
+		attotime remaining = timer_timeleft(vblank_timer);
+		if (remaining.seconds == 0 && remaining.attoseconds == 0)
+			remaining = vblank_period;
+		timer_adjust(vblank_timer, remaining, 0, vblank_period);
+	}
+
+	LOG(("cpu_compute_vblank_timing: refresh=%s vblank=%s\n", attotime_string(refresh_period, 9), attotime_string(vblank_period, 9)));
 }
 
 
+/*-------------------------------------------------
+    cpu_scalebyfcount - scale by time between
+    refresh timers
+-------------------------------------------------*/
 
-#if 0
-#pragma mark -
-#pragma mark CORE TIMING
-#endif
+int cpu_scalebyfcount(int value)
+{
+	attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
+	int result;
 
-/*************************************
- *
- *  Returns the number of times the
- *  interrupt handler will be called
- *  before the end of the current
- *  video frame.
- *
- *************************************/
+	/* shift off some bits to ensure no overflow */
+	if (value < 65536)
+		result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
+	else
+		result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
+	if (value >= 0)
+		return (result < value) ? result : value;
+	else
+		return (result > value) ? result : value;
+}
 
-/*--------------------------------------------------------------
 
-    This can be useful to interrupt handlers to synchronize
-    their operation. If you call this from outside an interrupt
-    handler, add 1 to the result, i.e. if it returns 0, it means
-    that the interrupt handler will be called once.
-
---------------------------------------------------------------*/
+/*-------------------------------------------------
+    cpu_getiloops - return the cheesy VBLANK
+    interrupt counter (deprecated)
+-------------------------------------------------*/
 
 int cpu_getiloops(void)
 {
@@ -1102,13 +915,37 @@ int cpu_getiloops(void)
 }
 
 
+/*-------------------------------------------------
+    cpu_getvblank - return the cheesy VBLANK
+    state (deprecated)
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Hook for updating things on the
- *  real VBLANK (once per frame)
- *
- *************************************/
+int cpu_getvblank(void)
+{
+	return vblank;
+}
+
+
+/*-------------------------------------------------
+    cpu_getcurrentframe - return the current
+    frame count (deprecated)
+-------------------------------------------------*/
+
+int cpu_getcurrentframe(void)
+{
+	return current_frame;
+}
+
+
+
+/***************************************************************************
+    INTERNAL TIMING
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpu_vblankreset - hook for updating things on 
+    cheesy fake VBLANK (once per frame)
+-------------------------------------------------*/
 
 static void cpu_vblankreset(running_machine *machine)
 {
@@ -1121,14 +958,8 @@ static void cpu_vblankreset(running_machine *machine)
 	input_port_vblank_start();
 
 	/* check the watchdog */
-	if (watchdog_counter > 0)
-	{
-		if (--watchdog_counter == 0)
-		{
-			logerror("reset caused by the (vblank) watchdog\n");
-			mame_schedule_soft_reset(machine);
-		}
-	}
+	if (machine->drv->watchdog_vblank_count != 0 && --watchdog_counter == 0)
+		watchdog_callback(machine, NULL, 0);
 
 	/* reset the cycle counters */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -1141,12 +972,10 @@ static void cpu_vblankreset(running_machine *machine)
 }
 
 
-
-/*************************************
- *
- *  First-run callback for VBLANKs
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_firstvblankcallback - timer callback for
+    the first fake VBLANK
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_firstvblankcallback )
 {
@@ -1158,12 +987,10 @@ static TIMER_CALLBACK( cpu_firstvblankcallback )
 }
 
 
-
-/*************************************
- *
- *  VBLANK core handler
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_vblankcallback - timer callback for
+    subsequent fake VBLANKs
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_vblankcallback )
 {
@@ -1231,12 +1058,10 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 }
 
 
-
-/*************************************
- *
- *  End-of-VBLANK callback
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_updatecallback - timer callback for
+    the fake end of VBLANK
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_updatecallback )
 {
@@ -1256,18 +1081,15 @@ static TIMER_CALLBACK( cpu_updatecallback )
 }
 
 
-
-/*************************************
- *
- *  Callback for timed interrupts
- *  (not tied to a VBLANK)
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_timedintcallback - timer callback for
+    timed interrupts
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_timedintcallback )
 {
 	/* bail if there is no routine */
-	if (machine->drv->cpu[param].timed_interrupt && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (machine->drv->cpu[param].timed_interrupt != NULL && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		cpuintrf_push_context(param);
 		(*machine->drv->cpu[param].timed_interrupt)(machine, param);
@@ -1276,12 +1098,10 @@ static TIMER_CALLBACK( cpu_timedintcallback )
 }
 
 
-
-/*************************************
- *
- *  Callback to force a timeslice
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_timeslicecallback - timer callback for
+    timeslicing
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( cpu_timeslicecallback )
 {
@@ -1289,13 +1109,10 @@ static TIMER_CALLBACK( cpu_timeslicecallback )
 }
 
 
-
-/*************************************
- *
- *  Callback to end a temporary
- *  interleave boost
- *
- *************************************/
+/*-------------------------------------------------
+    end_interleave_boost - timer callback to end
+    temporary interleave boost
+-------------------------------------------------*/
 
 static TIMER_CALLBACK( end_interleave_boost )
 {
@@ -1304,13 +1121,10 @@ static TIMER_CALLBACK( end_interleave_boost )
 }
 
 
-
-/*************************************
- *
- *  Compute the "perfect" interleave
- *  interval
- *
- *************************************/
+/*-------------------------------------------------
+    compute_perfect_interleave - compute the 
+    "perfect" interleave interval
+-------------------------------------------------*/
 
 static void compute_perfect_interleave(running_machine *machine)
 {
@@ -1340,17 +1154,17 @@ static void compute_perfect_interleave(running_machine *machine)
 }
 
 
-
-/*************************************
- *
- *  Setup all the core timers
- *
- *************************************/
+/*-------------------------------------------------
+    cpu_inittimers - set up all the core timers
+-------------------------------------------------*/
 
 static void cpu_inittimers(running_machine *machine)
 {
 	attotime first_time;
 	int cpunum, max, ipf;
+
+	/* allocate a timer for the watchdog */
+	watchdog_timer = timer_alloc(watchdog_callback, NULL);
 
 	/* allocate a dummy timer at the minimum frequency to break things up */
 	ipf = machine->drv->cpu_slices_per_frame;
@@ -1449,4 +1263,3 @@ static void cpu_inittimers(running_machine *machine)
 	/* reset the refresh timer to get ourself back in sync */
 	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);
 }
-

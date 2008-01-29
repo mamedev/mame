@@ -85,6 +85,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"

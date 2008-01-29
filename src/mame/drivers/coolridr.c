@@ -68,8 +68,8 @@ SEGA CUSTOM IC :
 
 */
 
-#include <stdio.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/scsp.h"
 
 /* video */

@@ -9,6 +9,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/eolithsp.h"
 
 static int eolith_speedup_address;

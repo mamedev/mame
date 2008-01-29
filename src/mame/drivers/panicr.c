@@ -60,6 +60,7 @@ D.9B         [f99cac4b] /
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "audio/t5182.h"
 
 static tilemap *bgtilemap, *txttilemap;

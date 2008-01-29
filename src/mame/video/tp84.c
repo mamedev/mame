@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 UINT8 *tp84_videoram2, *tp84_colorram2;
 

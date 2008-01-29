@@ -597,7 +597,7 @@ struct _input_port_entry
 #ifdef MESS
 	struct
 	{
-		unicode_char chars[3];/* (MESS-specific) unicode key data */
+		unicode_char chars[3];	/* (MESS-specific) unicode key data */
 	} keyboard;
 #endif /* MESS */
 };
@@ -606,9 +606,20 @@ struct _input_port_entry
 typedef struct _inp_header inp_header;
 struct _inp_header
 {
-	char name[9];      /* 8 bytes for game->name + NUL */
-	char version[3];   /* byte[0] = 0, byte[1] = version byte[2] = beta_version */
-	char reserved[20]; /* for future use, possible store game options? */
+	char 	name[9];      		/* 8 bytes for game->name + NUL */
+	char 	version[3];   		/* byte[0] = 0, byte[1] = version byte[2] = beta_version */
+	char 	reserved[20]; 		/* for future use, possible store game options? */
+};
+
+
+typedef struct _ext_inp_header ext_inp_header;
+struct _ext_inp_header
+{
+	char 	header[7];			/* must be "XINP" followed by NULLs */
+	char 	shortname[9];		/* game shortname */
+	char 	version[32];		/* MAME version string */
+	UINT32 starttime;			/* approximate INP start time */
+	char 	dummy[32];			/* for possible future expansion */
 };
 
 

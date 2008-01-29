@@ -18,7 +18,32 @@
 #include "timer.h"
 
 
-/* Enum listing all the CPUs */
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* flags for MDRV_CPU_FLAGS */
+enum
+{
+	/* set this flag to disable execution of a CPU (if one is there for documentation */
+	/* purposes only, for example */
+	CPU_DISABLE = 0x0001
+};
+
+
+/* suspension reasons for cpunum_suspend */
+enum
+{
+	SUSPEND_REASON_HALT 	= 0x0001,
+	SUSPEND_REASON_RESET 	= 0x0002,
+	SUSPEND_REASON_SPIN 	= 0x0004,
+	SUSPEND_REASON_TRIGGER 	= 0x0008,
+	SUSPEND_REASON_DISABLE 	= 0x0010,
+	SUSPEND_ANY_REASON 		= ~0
+};
+
+
+/* list of all possible CPUs we might be compiled with */
 enum _cpu_type
 {
 	CPU_DUMMY,
@@ -214,162 +239,102 @@ enum _cpu_type
 typedef enum _cpu_type cpu_type;
 
 
-/*************************************
- *
- *  CPU description for drivers
- *
- *************************************/
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+/* CPU description for drivers */
 typedef struct _cpu_config cpu_config;
 struct _cpu_config
 {
-	cpu_type		type;					/* index for the CPU type */
-	int			flags;					/* flags; see #defines below */
-	int			clock;					/* in Hertz */
+	cpu_type		type;						/* index for the CPU type */
+	int				flags;						/* flags; see #defines below */
+	int				clock;						/* in Hertz */
 	construct_map_t construct_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
-	void 		(*vblank_interrupt)(running_machine *machine, int cpunum);	/* for interrupts tied to VBLANK */
-	int 		vblank_interrupts_per_frame;/* usually 1 */
-	void 		(*timed_interrupt)(running_machine *machine, int cpunum);	/* for interrupts not tied to VBLANK */
-	attoseconds_t timed_interrupt_period;	/* period for periodic interrupts */
-	const void *reset_param;				/* parameter for cpu_reset */
-	const char *tag;
+	void 			(*vblank_interrupt)(running_machine *machine, int cpunum);	/* for interrupts tied to VBLANK */
+	int 			vblank_interrupts_per_frame;/* usually 1 */
+	void 			(*timed_interrupt)(running_machine *machine, int cpunum);	/* for interrupts not tied to VBLANK */
+	attoseconds_t 	timed_interrupt_period;		/* period for periodic interrupts */
+	const void *	reset_param;				/* parameter for cpu_reset */
+	const char *	tag;
 };
 
 
 
-/*************************************
- *
- *  CPU flag constants
- *
- *************************************/
-
-enum
-{
-	/* set this flag to disable execution of a CPU (if one is there for documentation */
-	/* purposes only, for example */
-	CPU_DISABLE = 0x0001
-};
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 
+/* ----- core CPU execution ----- */
 
-/*************************************
- *
- *  Core CPU execution
- *
- *************************************/
-
-/* Prepare CPUs for execution */
+/* prepare CPUs for execution */
 void cpuexec_init(running_machine *machine);
 
-/* Execute for a single timeslice */
+/* execute for a single timeslice */
 void cpuexec_timeslice(running_machine *machine);
 
 
 
-/*************************************
- *
- *  Optional watchdog
- *
- *************************************/
+/* ----- CPU scheduling----- */
 
-/* bang on the watchdog */
-void watchdog_reset(running_machine *machine);
-
-/* watchdog enabled when TRUE */
-/* timer is set to reset state when going from disable to enable */
-void watchdog_enable(running_machine *machine, int enable);
-
-
-
-/*************************************
- *
- *  CPU scheduling
- *
- *************************************/
-
-/* Suspension reasons */
-enum
-{
-	SUSPEND_REASON_HALT 	= 0x0001,
-	SUSPEND_REASON_RESET 	= 0x0002,
-	SUSPEND_REASON_SPIN 	= 0x0004,
-	SUSPEND_REASON_TRIGGER 	= 0x0008,
-	SUSPEND_REASON_DISABLE 	= 0x0010,
-	SUSPEND_ANY_REASON 		= ~0
-};
-
-/* Suspend the given CPU for a specific reason */
-void cpunum_suspend(int cpunum, int reason, int eatcycles);
-
-/* Suspend the given CPU for a specific reason */
-void cpunum_resume(int cpunum, int reason);
-
-/* Returns true if the given CPU is suspended for any of the given reasons */
-int cpunum_is_suspended(int cpunum, int reason);
-
-/* Aborts the timeslice for the active CPU */
-void activecpu_abort_timeslice(void);
-
-/* Returns the current local time for a CPU */
-attotime cpunum_get_localtime(int cpunum);
-
-/* Returns the current CPU's unscaled running clock speed */
-/* If you want to know the current effective running clock
- * after scaling it is just the double sec_to_cycles[cpunum] */
-int cpunum_get_clock(int cpunum);
-
-/* Sets the current CPU's clock speed and then adjusts for scaling */
-void cpunum_set_clock(running_machine *machine, int cpunum, int clock);
-void cpunum_set_clock_period(running_machine *machine, int cpunum, attoseconds_t clock_period);
-
-/* Returns the current scaling factor for a CPU's clock speed */
-double cpunum_get_clockscale(int cpunum);
-
-/* Sets the current scaling factor for a CPU's clock speed */
-void cpunum_set_clockscale(running_machine *machine, int cpunum, double clockscale);
-
-/* Temporarily boosts the interleave factor */
+/* temporarily boosts the interleave factor */
 void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration);
 
+/* aborts the timeslice for the active CPU */
+void activecpu_abort_timeslice(void);
+
+/* suspend the given CPU for a specific reason */
+void cpunum_suspend(int cpunum, int reason, int eatcycles);
+
+/* resume the given CPU for a specific reason */
+void cpunum_resume(int cpunum, int reason);
+
+/* returns true if the given CPU is suspended for any of the given reasons */
+int cpunum_is_suspended(int cpunum, int reason);
 
 
-/*************************************
- *
- *  Timing helpers
- *
- *************************************/
 
-/* Returns the number of cycles run so far this timeslice */
-int cycles_currently_ran(void);
+/* ----- CPU clock management ----- */
 
-/* Returns the total number of CPU cycles */
+/* returns the current CPU's unscaled running clock speed */
+int cpunum_get_clock(int cpunum);
+
+/* sets the current CPU's clock speed and then adjusts for scaling */
+void cpunum_set_clock(running_machine *machine, int cpunum, int clock);
+
+/* returns the current scaling factor for a CPU's clock speed */
+double cpunum_get_clockscale(int cpunum);
+
+/* sets the current scaling factor for a CPU's clock speed */
+void cpunum_set_clockscale(running_machine *machine, int cpunum, double clockscale);
+
+
+
+/* ----- CPU timing ----- */
+
+/* returns the current local time for a CPU */
+attotime cpunum_get_localtime(int cpunum);
+
+/* returns the total number of CPU cycles */
 UINT64 activecpu_gettotalcycles(void);
 
-/* Returns the total number of CPU cycles for a given CPU */
+/* returns the total number of CPU cycles for a given CPU */
 UINT64 cpunum_gettotalcycles(int cpunum);
 
-/* Safely eats cycles so we don't cross a timeslice boundary */
+/* safely eats cycles so we don't cross a timeslice boundary */
 void activecpu_eat_cycles(int cycles);
 
-/* Scales a given value by the ratio of fcount / fperiod */
-int cpu_scalebyfcount(int value);
 
 
+/* ----- synchronization helpers ----- */
 
-/*************************************
- *
- *  Synchronization
- *
- *************************************/
+/* yield our current timeslice */
+void cpu_yield(void);
 
-/* generate a trigger now */
-void cpu_trigger(running_machine *machine, int trigger);
-
-/* generate a trigger after a specific period of time */
-void cpu_triggertime(attotime duration, int trigger);
-
-/* generate a trigger corresponding to an interrupt on the given CPU */
-void cpu_triggerint(running_machine *machine, int cpunum);
+/* burn CPU cycles until our timeslice is up */
+void cpu_spin(void);
 
 /* burn CPU cycles until a timer trigger */
 void cpu_spinuntil_trigger(int trigger);
@@ -380,29 +345,32 @@ void cpunum_spinuntil_trigger(int cpunum, int trigger);
 /* burn CPU cycles until the next interrupt */
 void cpu_spinuntil_int(void);
 
-/* burn CPU cycles until our timeslice is up */
-void cpu_spin(void);
-
-/* yield our current timeslice */
-void cpu_yield(void);
-
 /* burn CPU cycles for a specific period of time */
 void cpu_spinuntil_time(attotime duration);
 
 
 
-/*************************************
- *
- *  Core timing
- *
- *************************************/
+/* ----- triggers ----- */
 
-/* Returns the number of times the interrupt handler will be called before
-   the end of the current video frame. This is can be useful to interrupt
-   handlers to synchronize their operation. If you call this from outside
-   an interrupt handler, add 1 to the result, i.e. if it returns 0, it means
-   that the interrupt handler will be called once. */
-int cpu_getiloops(void);
+/* generate a trigger now */
+void cpu_trigger(running_machine *machine, int trigger);
+
+/* generate a trigger after a specific period of time */
+void cpu_triggertime(attotime duration, int trigger);
+
+/* generate a trigger corresponding to an interrupt on the given CPU */
+void cpu_triggerint(running_machine *machine, int cpunum);
+
+
+
+/* ----- watchdog timers ----- */
+
+/* reset the watchdog */
+void watchdog_reset(running_machine *machine);
+
+/* enable/disable the watchdog */
+void watchdog_enable(running_machine *machine, int enable);
+
 
 
 #endif	/* __CPUEXEC_H__ */

@@ -47,6 +47,7 @@ Runs in interrupt mode 0, the interrupt vectors are 0xcf (RST 08h) and
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 

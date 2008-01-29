@@ -59,6 +59,7 @@ SOFT  PSG & VOICE  BY M.C & S.H
 
 */
 #include "driver.h"
+#include "deprecat.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
