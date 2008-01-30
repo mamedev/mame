@@ -29,6 +29,9 @@
         * Correct CPU speed... Zilog says Z180 comes in 6, 8, 10, 20 & 33MHz.
           20MHz is used as it "seems" right based on the music in Galaga
 
+	CPU is a Z8S18020VSC (20MHz part)
+	OSC is 73.728MHz (is the clock divide 3 or 4?)
+
 ***************************************************************************/
 
 #include "driver.h"
