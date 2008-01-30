@@ -108,28 +108,6 @@ static TILE_GET_INFO( get_tile_info )
 
 /*************************************
  *
- *  Per-scanline callback
- *
- *************************************/
-
-static TIMER_CALLBACK( scanline_interrupt )
-{
-	int scanline = param;
-	
-	/* we need to use partial updates to handle multiplexed sprites */
-	video_screen_update_partial(0, scanline);
-
-	/* only need to hit on visible scanlines */
-	scanline++;
-	if (scanline > machine->screen[0].visarea.max_y)
-		scanline = machine->screen[0].visarea.min_y;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
-}
-
-
-
-/*************************************
- *
  *  Video startup
  *
  *************************************/
@@ -137,10 +115,6 @@ static TIMER_CALLBACK( scanline_interrupt )
 VIDEO_START( timeplt )
 {
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	
-	/* create a timer for scanline updates */
-	scanline_timer = timer_alloc(scanline_interrupt, NULL);
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
 }
 
 

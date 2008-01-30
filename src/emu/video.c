@@ -29,7 +29,7 @@
 ***************************************************************************/
 
 #define LOG_THROTTLE				(0)
-#define VERBOSE					(0)
+#define VERBOSE						(0)
 #define LOG_PARTIAL_UPDATES(x)		do { if (VERBOSE) logerror x; } while (0)
 
 
@@ -68,6 +68,7 @@ struct _internal_screen_info
 	attoseconds_t			pixeltime;			/* attoseconds per pixel */
 	attotime 				vblank_time;		/* time of last VBLANK start */
 	emu_timer *				scanline0_timer;	/* scanline 0 timer */
+	emu_timer *				scanline_timer;		/* scanline timer */
 
 	/* movie recording */
 	mame_file *				movie_file;			/* handle to the open movie file */
@@ -176,6 +177,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 
 /* global rendering */
 static TIMER_CALLBACK( scanline0_callback );
+static TIMER_CALLBACK( scanline_update_callback );
 static int finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
@@ -305,7 +307,7 @@ void video_init(running_machine *machine)
 
 			/* allocate a timer to reset partial updates */
 			info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
-
+			
 			/* make pointers back to the config and state */
 			info->config = &machine->drv->screen[scrnum];
 			info->state = &machine->screen[scrnum];
@@ -325,6 +327,13 @@ void video_init(running_machine *machine)
 
 			/* reset VBLANK timing */
 			info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
+
+			/* allocate a timer to generate per-scanline updates */
+			if (machine->drv->video_attributes & VIDEO_UPDATE_SCANLINE)
+			{
+				info->scanline_timer = timer_alloc(scanline_update_callback, NULL);
+				timer_adjust(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_never);
+			}
 
 			/* register for save states */
 			state_save_register_item("video", scrnum, info->vblank_time.seconds);
@@ -1029,6 +1038,28 @@ static TIMER_CALLBACK( scanline0_callback )
 	global.partial_updates_this_frame = 0;
 
 	timer_adjust(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
+}
+
+
+/*-------------------------------------------------
+    scanline_update_callback - perform partial
+    updates on each scanline
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( scanline_update_callback )
+{
+	video_private *viddata = machine->video_data;
+	int scrnum = param & 0xff;
+	int scanline = param >> 8;
+	
+	/* force a partial update to the current scanline */
+	video_screen_update_partial(scrnum, scanline);
+	
+	/* compute the next visible scanline */
+	scanline++;
+	if (scanline > machine->screen[scrnum].visarea.max_y)
+		scanline = machine->screen[scrnum].visarea.min_y;
+	timer_adjust(viddata->scrinfo[scrnum].scanline_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), (scanline << 8) | scrnum, attotime_never);
 }
 
 
