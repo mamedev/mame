@@ -1418,13 +1418,8 @@ static void update_throttle(attotime emutime)
 	/* apply speed factor to emu time */
 	if (global.speed != 0 && global.speed != 100)
 	{
-		/* multiply emutime by 100 */
-		emutime = attotime_mul(emutime, 100);
-
-		/* divide emutime by the global speed factor */
-		emutime.attoseconds /= global.speed;
-		emutime.attoseconds += (emutime.seconds % global.speed) * (ATTOSECONDS_PER_SECOND / global.speed);
-		emutime.seconds /= global.speed;
+		/* multiply emutime by 100, then divide by the global speed factor */
+		emutime = attotime_div(attotime_mul(emutime, 100), global.speed);
 	}
 
 	/* compute conversion factors up front */
