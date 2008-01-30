@@ -112,6 +112,7 @@ struct _stream_output
 struct _sound_stream
 {
 	/* linking information */
+	running_machine *	machine;				/* owning machine object */
 	sound_stream *		next;					/* next stream in the chain */
 	void *				tag;					/* tag (used for identification) */
 	int					index;					/* index for save states */
@@ -207,7 +208,7 @@ INLINE INT32 time_to_sampindex(const streams_private *strdata, const sound_strea
 
 
 /***************************************************************************
-    CORE IMPLEMENTATION
+    SYSTEM-LEVEL MANAGEMENT
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -232,6 +233,18 @@ void streams_init(running_machine *machine, attoseconds_t update_attoseconds)
 	/* register global states */
 	state_save_register_global(strdata->last_update.seconds);
 	state_save_register_global(strdata->last_update.attoseconds);
+}
+
+
+/*-------------------------------------------------
+    streams_set_tag - set the tag to be associated
+    with all streams allocated from now on
+-------------------------------------------------*/
+
+void streams_set_tag(running_machine *machine, void *streamtag)
+{
+	streams_private *strdata = machine->streams_data;
+	strdata->current_tag = streamtag;
 }
 
 
@@ -326,17 +339,10 @@ void streams_update(running_machine *machine)
 }
 
 
-/*-------------------------------------------------
-    streams_set_tag - set the tag to be associated
-    with all streams allocated from now on
--------------------------------------------------*/
 
-void streams_set_tag(running_machine *machine, void *streamtag)
-{
-	streams_private *strdata = machine->streams_data;
-	strdata->current_tag = streamtag;
-}
-
+/***************************************************************************
+    STREAM CONFIGURATION AND SETUP
+***************************************************************************/
 
 /*-------------------------------------------------
     stream_create - create a new stream
@@ -356,6 +362,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	VPRINTF(("stream_create(%d, %d, %d) => %p\n", inputs, outputs, sample_rate, stream));
 
 	/* fill in the data */
+	stream->machine = Machine;
 	stream->tag = strdata->current_tag;
 	stream->index = strdata->stream_index++;
 	stream->sample_rate = sample_rate;
@@ -450,7 +457,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 		input->source->dependents++;
 
 	/* update sample rates now that we know the input */
-	recompute_sample_rate_data(Machine->streams_data, stream);
+	recompute_sample_rate_data(stream->machine->streams_data, stream);
 }
 
 
@@ -461,7 +468,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 
 void stream_update(sound_stream *stream)
 {
-	streams_private *strdata = Machine->streams_data;
+	streams_private *strdata = stream->machine->streams_data;
 	INT32 update_sampindex = time_to_sampindex(strdata, stream, timer_get_time());
 
 	/* generate samples to get us up to the appropriate time */
@@ -473,6 +480,85 @@ void stream_update(sound_stream *stream)
 	stream->output_sampindex = update_sampindex;
 }
 
+
+/*-------------------------------------------------
+    stream_get_output_since_last_update - return a
+    pointer to the output buffer and the number of
+    samples since the last global update
+-------------------------------------------------*/
+
+const stream_sample_t *stream_get_output_since_last_update(sound_stream *stream, int outputnum, int *numsamples)
+{
+	stream_output *output = &stream->output[outputnum];
+
+	/* force an update on the stream */
+	stream_update(stream);
+
+	/* compute the number of samples and a pointer to the output buffer */
+	*numsamples = stream->output_sampindex - stream->output_update_sampindex;
+	return output->buffer + (stream->output_update_sampindex - stream->output_base_sampindex);
+}
+
+
+
+/***************************************************************************
+    STREAM TIMING
+***************************************************************************/
+
+/*-------------------------------------------------
+    stream_get_sample_rate - return the currently 
+    set sample rate on a given stream
+-------------------------------------------------*/
+
+int stream_get_sample_rate(sound_stream *stream)
+{
+	/* take into account any pending sample rate changes */
+	return (stream->new_sample_rate != 0) ? stream->new_sample_rate : stream->sample_rate;
+}
+
+
+/*-------------------------------------------------
+    stream_set_sample_rate - set the sample rate
+    on a given stream
+-------------------------------------------------*/
+
+void stream_set_sample_rate(sound_stream *stream, int sample_rate)
+{
+	/* we will update this on the next global update */
+	if (sample_rate != stream_get_sample_rate(stream))
+		stream->new_sample_rate = sample_rate;
+}
+
+
+/*-------------------------------------------------
+    stream_get_time - return the emulation time 
+    of the next sample to be generated on the 
+    stream
+-------------------------------------------------*/
+
+attotime stream_get_time(sound_stream *stream)
+{
+	streams_private *strdata = stream->machine->streams_data;
+	attotime base = attotime_make(strdata->last_update.seconds, 0);
+	return attotime_add_attoseconds(base, stream->output_sampindex * stream->attoseconds_per_sample);
+}
+
+
+/*-------------------------------------------------
+    stream_get_sample_period - return the duration 
+    of a single sample for a stream
+-------------------------------------------------*/
+
+attotime stream_get_sample_period(sound_stream *stream)
+{
+	return attotime_make(0, stream->attoseconds_per_sample);
+}
+
+
+
+/***************************************************************************
+    STREAM INFORMATION AND CONTROL
+***************************************************************************/
 
 /*-------------------------------------------------
     stream_find_by_tag - find a stream using a
@@ -535,38 +621,6 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
 {
 	stream_update(stream);
 	stream->output[output].gain = (int)(0x100 * gain);
-}
-
-
-/*-------------------------------------------------
-    stream_set_sample_rate - set the sample rate
-    on a given stream
--------------------------------------------------*/
-
-void stream_set_sample_rate(sound_stream *stream, int sample_rate)
-{
-	/* we will update this on the next global update */
-	if ((stream->new_sample_rate == 0 && sample_rate != stream->sample_rate) || (stream->new_sample_rate != 0 && sample_rate != stream->new_sample_rate))
-		stream->new_sample_rate = sample_rate;
-}
-
-
-/*-------------------------------------------------
-    stream_get_output_since_last_update - return a
-    pointer to the output buffer and the number of
-    samples since the last global update
--------------------------------------------------*/
-
-const stream_sample_t *stream_get_output_since_last_update(sound_stream *stream, int outputnum, int *numsamples)
-{
-	stream_output *output = &stream->output[outputnum];
-
-	/* force an update on the stream */
-	stream_update(stream);
-
-	/* compute the number of samples and a pointer to the output buffer */
-	*numsamples = stream->output_sampindex - stream->output_update_sampindex;
-	return output->buffer + (stream->output_update_sampindex - stream->output_base_sampindex);
 }
 
 
