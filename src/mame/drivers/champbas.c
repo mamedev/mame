@@ -60,14 +60,15 @@ e000-e3ff   RAM
 #include "sound/dac.h"
 
 
-extern WRITE8_HANDLER( champbas_videoram_w );
-extern WRITE8_HANDLER( champbas_colorram_w );
-extern WRITE8_HANDLER( champbas_gfxbank_w );
-extern WRITE8_HANDLER( champbas_flipscreen_w );
+WRITE8_HANDLER( champbas_videoram_w );
+WRITE8_HANDLER( champbas_colorram_w );
+WRITE8_HANDLER( champbas_gfxbank_w );
+WRITE8_HANDLER( champbas_palette_bank_w );
+WRITE8_HANDLER( champbas_flipscreen_w );
 
-extern PALETTE_INIT( champbas );
-extern VIDEO_START( champbas );
-extern VIDEO_UPDATE( champbas );
+PALETTE_INIT( champbas );
+VIDEO_START( champbas );
+VIDEO_UPDATE( champbas );
 
 static WRITE8_HANDLER( champbas_dac_w )
 {
@@ -123,10 +124,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(champbas_videoram_w) AM_READ(MRA8_RAM) AM_BASE(&videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITE(champbas_colorram_w) AM_READ(MRA8_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_WRITE(MWA8_RAM) AM_READ(MRA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w) AM_READ(input_port_0_r)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(champbas_palette_bank_w)
 	AM_RANGE(0xa005, 0xa005) AM_NOP
 
 	AM_RANGE(0xa040, 0xa040)                            AM_READ(input_port_1_r)
@@ -244,10 +246,10 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( champbas )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, spritelayout, 0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, spritelayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, spritelayout, 0, 128 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, spritelayout, 0, 128 )
 GFXDECODE_END
 
 
@@ -281,8 +283,7 @@ static MACHINE_DRIVER_START( champbas )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(champbas)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(64*4)
+	MDRV_PALETTE_LENGTH(128*4)
 
 	MDRV_PALETTE_INIT(champbas)
 	MDRV_VIDEO_START(champbas)
@@ -330,7 +331,7 @@ ROM_START( champbas )
 	ROM_LOAD( "champbb.2",    0x2000, 0x2000, CRC(5ddd872e) SHA1(68e21572e27707c991180b1bd0a6b31f7b64abf6) )
 	ROM_LOAD( "champbb.3",    0x4000, 0x2000, CRC(f39a7046) SHA1(3097bffe84ac74ce9e6481028a0ebbe8b1d6eaf9) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the speech CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "champbb.6",    0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "champbb.7",    0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "champbb.8",    0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -352,7 +353,7 @@ ROM_START( champbbj )
 	ROM_LOAD( "12.2g",      0x2000, 0x2000, CRC(7b4e5faa) SHA1(b7201816a819ef313ddc81f312d26982b83ef1c7) )
 	ROM_LOAD( "13.2h",      0x4000, 0x2000, CRC(b201e31f) SHA1(bba3b611ff60ad8d5dd8484df4cfc2026f4fd344) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the speech CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "16.2k",      0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
 	ROM_LOAD( "17.2l",      0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n",      0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
@@ -374,7 +375,7 @@ ROM_START( champbja )
 	ROM_LOAD( "09",         0x2000, 0x2000, CRC(9d39e5b3) SHA1(11c1a1d2296c0bf16d7610eaa79b034bfd813740) )
 	ROM_LOAD( "08",         0x4000, 0x2000, CRC(53468a0f) SHA1(d4b5ea48b27754eebe593c8b4fcf5bf117f27ae4) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* 64k for the speech CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "16.2k",      0x0000, 0x2000, CRC(24c482ee) SHA1(c25bdf77014e095fc11a9a6b17f16858f19db451) )
 	ROM_LOAD( "17.2l",      0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n",      0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
@@ -397,7 +398,7 @@ ROM_START( champbb2 )
 	ROM_LOAD( "epr5930",      0x4000, 0x2000, CRC(b6570a90) SHA1(5a2651aeac986000913b5854792b2d81df6b2fc6) )
 	ROM_LOAD( "epr5931",      0x7800, 0x0800, CRC(0592434d) SHA1(a7f61546c39ffdbff46c4db485c9b3f6eefcf1ac) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the speech CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "epr5933",      0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "epr5934",      0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935",      0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -421,7 +422,7 @@ ROM_START( champb2a )
 	ROM_LOAD( "4.bin",        0x7800, 0x0800, NO_DUMP )
 
 	/* not in this set, but probably the same */
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* 64k for the speech CPU */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "epr5933",      0x0000, 0x2000, CRC(26ab3e16) SHA1(019b9d34233a6b7a53e204154b782ceb42915d2b) )
 	ROM_LOAD( "epr5934",      0x2000, 0x2000, CRC(7c01715f) SHA1(b15b2001b8c110f2599eee3aeed79f67686ebd7e) )
 	ROM_LOAD( "epr5935",      0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
@@ -437,10 +438,10 @@ ROM_START( champb2a )
 	ROM_LOAD( "pr5956",       0x0020, 0x100, CRC(872dd450) SHA1(6c1e2c4a2fc072f4bf4996c731adb0b01b347506) ) /* look-up table */
 ROM_END
 
-GAME( 1983, champbas, 0,        champbas, champbas, 0, ROT0, "Sega",			 "Champion Baseball", 0 )
-GAME( 1983, champbbj, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 1)", 0 )
-GAME( 1983, champbja, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball (Japan set 2)", 0 )
-GAME( 1983, champbb2, 0,        champbb2, champbas, champbb2, ROT0, "Sega",			 "Champion Baseball II (set 1)", 0 )
+GAME( 1983, champbas, 0,        champbas, champbas, 0,        ROT0, "Sega", "Champion Base Ball", 0 )
+GAME( 1983, champbbj, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Base Ball (Japan set 1)", 0 )
+GAME( 1983, champbja, champbas, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Base Ball (Japan set 2)", 0 )
+GAME( 1983, champbb2, 0,        champbb2, champbas, champbb2, ROT0, "Sega",	"Champion Base Ball Part-2: Pair Play (set 1)", 0 )
 
 /* NO DUMP */
 GAME( 1983, champb2a, champbb2, champbb2, champbas, champbb2, ROT0, "Alpha Denshi Co.", "Champion Baseball II (set 2)", GAME_NOT_WORKING)

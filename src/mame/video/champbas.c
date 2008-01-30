@@ -8,18 +8,16 @@
 
 #include "driver.h"
 
-static int gfxbank;
+static UINT8 gfxbank;
+static UINT8 palette_bank;
 
 static tilemap *bg_tilemap;
+static UINT8 *pen_mask;
+
 
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
-
-  Pac Man has a 16 bytes palette PROM and a 128 bytes color lookup table PROM.
-
-  Pengo has a 32 bytes palette PROM and a 256 bytes color lookup table PROM
-  (actually that's 512 bytes, but the high address bit is grounded).
 
   The palette PROM is connected to the RGB output this way:
 
@@ -36,44 +34,40 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( champbas )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	pen_mask = auto_malloc(128 * sizeof(UINT8));
+	memset(pen_mask, 0, 128 * sizeof(UINT8));
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
+		UINT8 pen = ((i & 0x100) >> 4) | (color_prom[0x20 + (i & 0xff)] & 0x0f);
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[pen] >> 0) & 0x01;
+		bit1 = (color_prom[pen] >> 1) & 0x01;
+		bit2 = (color_prom[pen] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[pen] >> 3) & 0x01;
+		bit1 = (color_prom[pen] >> 4) & 0x01;
+		bit2 = (color_prom[pen] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[pen] >> 6) & 0x01;
+		bit2 = (color_prom[pen] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+
+		/* set the mask, color 0 is transparent */
+		if (color_prom[pen] == 0)
+			pen_mask[i >> 2] |= (1 << (i & 0x03));
 	}
-
-	/* color_prom now points to the beginning of the lookup table */
-
-	/* TODO: there are 32 colors in the palette, but we are suing only 16 */
-	/* the only difference between the two banks is color #14, grey instead of green */
-
-	/* character lookup table */
-	/* sprites use the same color lookup table as characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f);
 }
 
 WRITE8_HANDLER( champbas_videoram_w )
@@ -97,6 +91,15 @@ WRITE8_HANDLER( champbas_gfxbank_w )
 	}
 }
 
+WRITE8_HANDLER( champbas_palette_bank_w )
+{
+	if (palette_bank != (data & 0x01))
+	{
+		palette_bank = data & 0x01;
+		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	}
+}
+
 WRITE8_HANDLER( champbas_flipscreen_w )
 {
 	if (flip_screen != data)
@@ -109,15 +112,14 @@ WRITE8_HANDLER( champbas_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
-	int color = (colorram[tile_index] & 0x1f) + 32;
+	int color = (palette_bank << 6) | 0x20 | (colorram[tile_index] & 0x1f);
 
 	SET_TILE_INFO(gfxbank, code, color, 0);
 }
 
 VIDEO_START( champbas )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -127,7 +129,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	for (offs = spriteram_size - 2; offs >= 0; offs -= 2)
 	{
 		int code = spriteram[offs] >> 2;
-		int color = spriteram[offs + 1];
+		int color = (palette_bank << 6) | (spriteram[offs + 1] & 0x3f);
 		int flipx = spriteram[offs] & 0x01;
 		int flipy = spriteram[offs] & 0x02;
 		int sx = ((256 + 16 - spriteram_2[offs + 1]) & 0xff) - 16;
@@ -139,7 +141,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			flipx, flipy,
 			sx, sy,
 			cliprect,
-			TRANSPARENCY_COLOR, 0);
+			TRANSPARENCY_PENS, pen_mask[color]);
 	}
 }
 
