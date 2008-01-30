@@ -10,7 +10,6 @@
 #include "timeplt.h"
 
 static tilemap *bg_tilemap;
-static emu_timer *scanline_timer;
 
 
 /***************************************************************************
