@@ -1,141 +1,3 @@
-#if TIME_LOOP_HACKS
-
-#define CHECK_BC_LOOP												\
-if( _BC > 1 && _PCD < 0xfffc ) {									\
-	UINT8 op1 = cpu_readop(_PCD);									\
-	UINT8 op2 = cpu_readop(_PCD+1); 								\
-	if( (op1==0x78 && op2==0xb1) || (op1==0x79 && op2==0xb0) )		\
-	{																\
-		UINT8 op3 = cpu_readop(_PCD+2); 							\
-		UINT8 op4 = cpu_readop(_PCD+3); 							\
-		if( op3==0x20 && op4==0xfb )								\
-		{															\
-			int cnt =												\
-				cc[Z180_TABLE_op][0x78] +							\
-				cc[Z180_TABLE_op][0xb1] +							\
-				cc[Z180_TABLE_op][0x20] +							\
-				cc[Z180_TABLE_ex][0x20];							\
-			while( _BC > 0 && z180_icount > cnt )					\
-			{														\
-				BURNODD( cnt, 4, cnt ); 							\
-				_BC--;												\
-			}														\
-		}															\
-		else														\
-		if( op3 == 0xc2 )											\
-		{															\
-			UINT8 ad1 = cpu_readop_arg(_PCD+3); 					\
-			UINT8 ad2 = cpu_readop_arg(_PCD+4); 					\
-			if( (ad1 + 256 * ad2) == (_PCD - 1) )					\
-			{														\
-				int cnt =											\
-					cc[Z180_TABLE_op][0x78] +						\
-					cc[Z180_TABLE_op][0xb1] +						\
-					cc[Z180_TABLE_op][0xc2] +						\
-					cc[Z180_TABLE_ex][0xc2];						\
-				while( _BC > 0 && z180_icount > cnt )				\
-				{													\
-					BURNODD( cnt, 4, cnt ); 						\
-					_BC--;											\
-				}													\
-			}														\
-		}															\
-	}																\
-}
-
-#define CHECK_DE_LOOP												\
-if( _DE > 1 && _PCD < 0xfffc ) {									\
-	UINT8 op1 = cpu_readop(_PCD);									\
-	UINT8 op2 = cpu_readop(_PCD+1); 								\
-	if( (op1==0x7a && op2==0xb3) || (op1==0x7b && op2==0xb2) )		\
-	{																\
-		UINT8 op3 = cpu_readop(_PCD+2); 							\
-		UINT8 op4 = cpu_readop(_PCD+3); 							\
-		if( op3==0x20 && op4==0xfb )								\
-		{															\
-			int cnt =												\
-				cc[Z180_TABLE_op][0x7a] +							\
-				cc[Z180_TABLE_op][0xb3] +							\
-				cc[Z180_TABLE_op][0x20] +							\
-				cc[Z180_TABLE_ex][0x20];							\
-			while( _DE > 0 && z180_icount > cnt )					\
-			{														\
-				BURNODD( cnt, 4, cnt ); 							\
-				_DE--;												\
-			}														\
-		}															\
-		else														\
-		if( op3==0xc2 ) 											\
-		{															\
-			UINT8 ad1 = cpu_readop_arg(_PCD+3); 					\
-			UINT8 ad2 = cpu_readop_arg(_PCD+4); 					\
-			if( (ad1 + 256 * ad2) == (_PCD - 1) )					\
-			{														\
-				int cnt =											\
-					cc[Z180_TABLE_op][0x7a] +						\
-					cc[Z180_TABLE_op][0xb3] +						\
-					cc[Z180_TABLE_op][0xc2] +						\
-					cc[Z180_TABLE_ex][0xc2];						\
-				while( _DE > 0 && z180_icount > cnt )				\
-				{													\
-					BURNODD( cnt, 4, cnt ); 						\
-					_DE--;											\
-				}													\
-			}														\
-		}															\
-	}																\
-}
-
-#define CHECK_HL_LOOP												\
-if( _HL > 1 && _PCD < 0xfffc ) {									\
-	UINT8 op1 = cpu_readop(_PCD);									\
-	UINT8 op2 = cpu_readop(_PCD+1); 								\
-	if( (op1==0x7c && op2==0xb5) || (op1==0x7d && op2==0xb4) )		\
-	{																\
-		UINT8 op3 = cpu_readop(_PCD+2); 							\
-		UINT8 op4 = cpu_readop(_PCD+3); 							\
-		if( op3==0x20 && op4==0xfb )								\
-		{															\
-			int cnt =												\
-				cc[Z180_TABLE_op][0x7c] +							\
-				cc[Z180_TABLE_op][0xb5] +							\
-				cc[Z180_TABLE_op][0x20] +							\
-				cc[Z180_TABLE_ex][0x20];							\
-			while( _HL > 0 && z180_icount > cnt )					\
-			{														\
-				BURNODD( cnt, 4, cnt ); 							\
-				_HL--;												\
-			}														\
-		}															\
-		else														\
-		if( op3==0xc2 ) 											\
-		{															\
-			UINT8 ad1 = cpu_readop_arg(_PCD+3); 					\
-			UINT8 ad2 = cpu_readop_arg(_PCD+4); 					\
-			if( (ad1 + 256 * ad2) == (_PCD - 1) )					\
-			{														\
-				int cnt =											\
-					cc[Z180_TABLE_op][0x7c] +						\
-					cc[Z180_TABLE_op][0xb5] +						\
-					cc[Z180_TABLE_op][0xc2] +						\
-					cc[Z180_TABLE_ex][0xc2];						\
-				while( _HL > 0 && z180_icount > cnt )				\
-				{													\
-					BURNODD( cnt, 4, cnt ); 						\
-					_HL--;											\
-				}													\
-			}														\
-		}															\
-	}																\
-}
-
-#else
-
-#define CHECK_BC_LOOP
-#define CHECK_DE_LOOP
-#define CHECK_HL_LOOP
-
-#endif
 
 /**********************************************************
  * main opcodes
@@ -152,7 +14,7 @@ OP(op,07) { RLCA;													} /* RLCA             */
 OP(op,08) { EX_AF;													} /* EX   AF,AF'      */
 OP(op,09) { ADD16(HL,BC);											} /* ADD  HL,BC       */
 OP(op,0a) { _A = RM(_BC);											} /* LD   A,(BC)      */
-OP(op,0b) { _BC--; CHECK_BC_LOOP;									} /* DEC  BC          */
+OP(op,0b) { _BC--;													} /* DEC  BC          */
 OP(op,0c) { _C = INC(_C);											} /* INC  C           */
 OP(op,0d) { _C = DEC(_C);											} /* DEC  C           */
 OP(op,0e) { _C = ARG(); 											} /* LD   C,n         */
@@ -170,7 +32,7 @@ OP(op,17) { RLA;													} /* RLA              */
 OP(op,18) { JR();													} /* JR   o           */
 OP(op,19) { ADD16(HL,DE);											} /* ADD  HL,DE       */
 OP(op,1a) { _A = RM(_DE);											} /* LD   A,(DE)      */
-OP(op,1b) { _DE--; CHECK_DE_LOOP;									} /* DEC  DE          */
+OP(op,1b) { _DE--;				;									} /* DEC  DE          */
 OP(op,1c) { _E = INC(_E);											} /* INC  E           */
 OP(op,1d) { _E = DEC(_E);											} /* DEC  E           */
 OP(op,1e) { _E = ARG(); 											} /* LD   E,n         */
@@ -188,7 +50,7 @@ OP(op,27) { DAA;													} /* DAA              */
 OP(op,28) { JR_COND( _F & ZF, 0x28 );								} /* JR   Z,o         */
 OP(op,29) { ADD16(HL,HL);											} /* ADD  HL,HL       */
 OP(op,2a) { EA = ARG16(); RM16( EA, &Z180.HL ); 					} /* LD   HL,(w)      */
-OP(op,2b) { _HL--; CHECK_HL_LOOP;									} /* DEC  HL          */
+OP(op,2b) { _HL--;													} /* DEC  HL          */
 OP(op,2c) { _L = INC(_L);											} /* INC  L           */
 OP(op,2d) { _L = DEC(_L);											} /* DEC  L           */
 OP(op,2e) { _L = ARG(); 											} /* LD   L,n         */

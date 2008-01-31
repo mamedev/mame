@@ -1,4 +1,3 @@
-#if Z180_EXACT
 /* tmp1 value for ini/inir/outi/otir for [C.1-0][io.1-0] */
 static const UINT8 irep_tmp1[4][4] = {
 	{0,0,1,0},{0,1,0,1},{1,0,1,1},{0,1,1,0}
@@ -28,7 +27,6 @@ static const UINT8 breg_tmp2[256] = {
 	1,1,0,0,1,0,1,1,0,0,1,1,0,1,0,0,
 	1,0,1,1,0,1,0,0,1,1,0,0,1,0,1,1
 };
-#endif
 
 static const UINT8 cc_op[0x100] = {
 /*-0 -1 -2 -3 -4 -5 -6 -7 -8 -9 -a -b -c -d -e -f */

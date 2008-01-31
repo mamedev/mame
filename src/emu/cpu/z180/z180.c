@@ -60,15 +60,6 @@
 /* use big flag arrays (4*64K) for ADD/ADC/SUB/SBC/CP results */
 #define BIG_FLAGS_ARRAY 	1
 
-/* Set to 1 for a more exact (but somewhat slower) Z180 emulation */
-#define Z180_EXACT			1
-
-/* on JP and JR opcodes check for tight loops */
-#define BUSY_LOOP_HACKS 	0
-
-/* check for delay loops counting down BC */
-#define TIME_LOOP_HACKS 	0
-
 static void set_irq_line(int irqline, int state);
 
 /****************************************************************************/
@@ -749,8 +740,8 @@ static UINT8 SZHV_inc[256]; /* zero, sign, half carry and overflow flags INC r8 
 static UINT8 SZHV_dec[256]; /* zero, sign, half carry and overflow flags DEC r8 */
 
 #if BIG_FLAGS_ARRAY
-static UINT8 *SZHVC_add = 0;
-static UINT8 *SZHVC_sub = 0;
+static UINT8 *SZHVC_add;
+static UINT8 *SZHVC_sub;
 #endif
 
 /****************************************************************************
@@ -1913,65 +1904,55 @@ static void z180_reset(void)
 	int (*save_irqcallback)(int);
 	int i, p;
 #if BIG_FLAGS_ARRAY
-	if( !SZHVC_add || !SZHVC_sub )
+	int oldval, newval, val;
+	UINT8 *padd, *padc, *psub, *psbc;
+	/* allocate big flag arrays once */
+	SZHVC_add = (UINT8 *)auto_malloc(2*256*256);
+	SZHVC_sub = (UINT8 *)auto_malloc(2*256*256);
+	padd = &SZHVC_add[	0*256];
+	padc = &SZHVC_add[256*256];
+	psub = &SZHVC_sub[	0*256];
+	psbc = &SZHVC_sub[256*256];
+	for (oldval = 0; oldval < 256; oldval++)
 	{
-		int oldval, newval, val;
-		UINT8 *padd, *padc, *psub, *psbc;
-		/* allocate big flag arrays once */
-		SZHVC_add = (UINT8 *)auto_malloc(2*256*256);
-		SZHVC_sub = (UINT8 *)auto_malloc(2*256*256);
-		padd = &SZHVC_add[	0*256];
-		padc = &SZHVC_add[256*256];
-		psub = &SZHVC_sub[	0*256];
-		psbc = &SZHVC_sub[256*256];
-		for (oldval = 0; oldval < 256; oldval++)
+		for (newval = 0; newval < 256; newval++)
 		{
-			for (newval = 0; newval < 256; newval++)
-			{
-				/* add or adc w/o carry set */
-				val = newval - oldval;
-				*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-#if Z180_EXACT
-				*padd |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
-#endif
-				if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
-				if( newval < oldval ) *padd |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
-				padd++;
+			/* add or adc w/o carry set */
+			val = newval - oldval;
+			*padd = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
+			*padd |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
 
-				/* adc with carry set */
-				val = newval - oldval - 1;
-				*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
-#if Z180_EXACT
-				*padc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
-#endif
-				if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
-				if( newval <= oldval ) *padc |= CF;
-				if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
-				padc++;
+			if( (newval & 0x0f) < (oldval & 0x0f) ) *padd |= HF;
+			if( newval < oldval ) *padd |= CF;
+			if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padd |= VF;
+			padd++;
 
-				/* cp, sub or sbc w/o carry set */
-				val = oldval - newval;
-				*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-#if Z180_EXACT
-				*psub |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
-#endif
-				if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
-				if( newval > oldval ) *psub |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
-				psub++;
+			/* adc with carry set */
+			val = newval - oldval - 1;
+			*padc = (newval) ? ((newval & 0x80) ? SF : 0) : ZF;
+			*padc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			if( (newval & 0x0f) <= (oldval & 0x0f) ) *padc |= HF;
+			if( newval <= oldval ) *padc |= CF;
+			if( (val^oldval^0x80) & (val^newval) & 0x80 ) *padc |= VF;
+			padc++;
 
-				/* sbc with carry set */
-				val = oldval - newval - 1;
-				*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
-#if Z180_EXACT
-				*psbc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
-#endif
-				if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
-				if( newval >= oldval ) *psbc |= CF;
-				if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
-				psbc++;
-			}
+			/* cp, sub or sbc w/o carry set */
+			val = oldval - newval;
+			*psub = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
+			*psub |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			if( (newval & 0x0f) > (oldval & 0x0f) ) *psub |= HF;
+			if( newval > oldval ) *psub |= CF;
+			if( (val^oldval) & (oldval^newval) & 0x80 ) *psub |= VF;
+			psub++;
+
+			/* sbc with carry set */
+			val = oldval - newval - 1;
+			*psbc = NF | ((newval) ? ((newval & 0x80) ? SF : 0) : ZF);
+			*psbc |= (newval & (YF | XF));	/* undocumented flag bits 5+3 */
+			if( (newval & 0x0f) >= (oldval & 0x0f) ) *psbc |= HF;
+			if( newval >= oldval ) *psbc |= CF;
+			if( (val^oldval) & (oldval^newval) & 0x80 ) *psbc |= VF;
+			psbc++;
 		}
 	}
 #endif
@@ -1987,13 +1968,9 @@ static void z180_reset(void)
 		if( i&0x40 ) ++p;
 		if( i&0x80 ) ++p;
 		SZ[i] = i ? i & SF : ZF;
-#if Z180_EXACT
 		SZ[i] |= (i & (YF | XF));		/* undocumented flag bits 5+3 */
-#endif
 		SZ_BIT[i] = i ? i & SF : ZF | PF;
-#if Z180_EXACT
 		SZ_BIT[i] |= (i & (YF | XF));	/* undocumented flag bits 5+3 */
-#endif
 		SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
 		SZHV_inc[i] = SZ[i];
 		if( i == 0x80 ) SZHV_inc[i] |= VF;
@@ -2595,7 +2572,7 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Z180");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Zilog Z8x180");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.3");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.4");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
 

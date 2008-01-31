@@ -163,46 +163,10 @@ void z180_setOPbase(int pc)
 /***************************************************************
  * JP
  ***************************************************************/
-#if BUSY_LOOP_HACKS
-#define JP {													\
-	unsigned oldpc = _PCD-1;									\
-	_PCD = ARG16(); 											\
-	z180_change_pc(_PCD);										\
-	/* speed up busy loop */									\
-	if( _PCD == oldpc ) 										\
-	{															\
-		if( !Z180.after_EI ) 									\
-			BURNODD( z180_icount, 1, cc[Z180_TABLE_op][0xc3] ); \
-	}															\
-	else														\
-	{															\
-		UINT8 op = cpu_readop(_PCD);							\
-		if( _PCD == oldpc-1 )									\
-		{														\
-			/* NOP - JP $-1 or EI - JP $-1 */					\
-			if ( op == 0x00 || op == 0xfb ) 					\
-			{													\
-				if( !Z180.after_EI ) 							\
-					BURNODD( z180_icount-cc[Z180_TABLE_op][0x00],\
-						2, cc[Z180_TABLE_op][0x00]+cc[Z180_TABLE_op][0xc3]); \
-			}													\
-		}														\
-		else													\
-		/* LD SP,#xxxx - JP $-3 (Galaga) */ 					\
-		if( _PCD == oldpc-3 && op == 0x31 ) 					\
-		{														\
-			if( !Z180.after_EI ) 								\
-				BURNODD( z180_icount-cc[Z180_TABLE_op][0x31],	\
-					2, cc[Z180_TABLE_op][0x31]+cc[Z180_TABLE_op][0xc3]); \
-		}														\
-	}															\
-}
-#else
 #define JP {													\
 	_PCD = ARG16(); 											\
 	z180_change_pc(_PCD);										\
 }
-#endif
 
 /***************************************************************
  * JP_COND
@@ -392,66 +356,36 @@ INLINE UINT8 DEC(UINT8 value)
 /***************************************************************
  * RLCA
  ***************************************************************/
-#if Z180_EXACT
 #define RLCA													\
 	_A = (_A << 1) | (_A >> 7); 								\
 	_F = (_F & (SF | ZF | PF)) | (_A & (YF | XF | CF))
-#else
-#define RLCA													\
-	_A = (_A << 1) | (_A >> 7); 								\
-	_F = (_F & (SF | ZF | YF | XF | PF)) | (_A & CF)
-#endif
 
 /***************************************************************
  * RRCA
  ***************************************************************/
-#if Z180_EXACT
 #define RRCA													\
 	_F = (_F & (SF | ZF | PF)) | (_A & (YF | XF | CF)); 		\
 	_A = (_A >> 1) | (_A << 7)
-#else
-#define RRCA													\
-	_F = (_F & (SF | ZF | YF | XF | PF)) | (_A & CF);			\
-	_A = (_A >> 1) | (_A << 7)
-#endif
 
 /***************************************************************
  * RLA
  ***************************************************************/
-#if Z180_EXACT
 #define RLA {													\
 	UINT8 res = (_A << 1) | (_F & CF);							\
 	UINT8 c = (_A & 0x80) ? CF : 0; 							\
 	_F = (_F & (SF | ZF | PF)) | c | (res & (YF | XF)); 		\
 	_A = res;													\
 }
-#else
-#define RLA {													\
-	UINT8 res = (_A << 1) | (_F & CF);							\
-	UINT8 c = (_A & 0x80) ? CF : 0; 							\
-	_F = (_F & (SF | ZF | YF | XF | PF)) | c;					\
-	_A = res;													\
-}
-#endif
 
 /***************************************************************
  * RRA
  ***************************************************************/
-#if Z180_EXACT
 #define RRA {													\
 	UINT8 res = (_A >> 1) | (_F << 7);							\
 	UINT8 c = (_A & 0x01) ? CF : 0; 							\
 	_F = (_F & (SF | ZF | PF)) | c | (res & (YF | XF)); 		\
 	_A = res;													\
 }
-#else
-#define RRA {													\
-	UINT8 res = (_A >> 1) | (_F << 7);							\
-	UINT8 c = (_A & 0x01) ? CF : 0; 							\
-	_F = (_F & (SF | ZF | YF | XF | PF)) | c;					\
-	_A = res;													\
-}
-#endif
 
 /***************************************************************
  * RRD
@@ -811,12 +745,8 @@ INLINE UINT8 SRL(UINT8 value)
 /***************************************************************
  * BIT  bit,(IX/Y+o)
  ***************************************************************/
-#if Z180_EXACT
 #define BIT_XY(bit,reg) 										\
 	_F = (_F & CF) | HF | (SZ_BIT[reg & (1<<bit)] & ~(YF|XF)) | ((EA>>8) & (YF|XF))
-#else
-#define BIT_XY	BIT
-#endif
 
 /***************************************************************
  * RES  bit,r8
@@ -837,7 +767,6 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 /***************************************************************
  * LDI
  ***************************************************************/
-#if Z180_EXACT
 #define LDI {													\
 	UINT8 io = RM(_HL); 										\
 	WM( _DE, io );												\
@@ -847,19 +776,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	_HL++; _DE++; _BC--;										\
 	if( _BC ) _F |= VF; 										\
 }
-#else
-#define LDI {													\
-	WM( _DE, RM(_HL) ); 										\
-	_F &= SF | ZF | YF | XF | CF;								\
-	_HL++; _DE++; _BC--;										\
-	if( _BC ) _F |= VF; 										\
-}
-#endif
 
 /***************************************************************
  * CPI
  ***************************************************************/
-#if Z180_EXACT
 #define CPI {													\
 	UINT8 val = RM(_HL);										\
 	UINT8 res = _A - val;										\
@@ -870,20 +790,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if( res & 0x08 ) _F |= XF; /* bit 3 -> flag 3 */			\
 	if( _BC ) _F |= VF; 										\
 }
-#else
-#define CPI {													\
-	UINT8 val = RM(_HL);										\
-	UINT8 res = _A - val;										\
-	_HL++; _BC--;												\
-	_F = (_F & CF) | SZ[res] | ((_A ^ val ^ res) & HF) | NF;	\
-	if( _BC ) _F |= VF; 										\
-}
-#endif
 
 /***************************************************************
  * INI
  ***************************************************************/
-#if Z180_EXACT
 #define INI {													\
 	UINT8 io = IN(_BC); 										\
 	_B--;														\
@@ -898,19 +808,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 		 (io >> 2)) & 1 )										\
 		_F |= PF;												\
 }
-#else
-#define INI {													\
-	_B--;														\
-	WM( _HL, IN(_BC) ); 										\
-	_HL++;														\
-	_F = (_B) ? NF : NF | ZF;									\
-}
-#endif
 
 /***************************************************************
  * OUTI
  ***************************************************************/
-#if Z180_EXACT
 #define OUTI {													\
 	UINT8 io = RM(_HL); 										\
 	_B--;														\
@@ -925,19 +826,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 		 (io >> 2)) & 1 )										\
 		_F |= PF;												\
 }
-#else
-#define OUTI {													\
-	_B--;														\
-	OUT( _BC, RM(_HL) );										\
-	_HL++;														\
-	_F = (_B) ? NF : NF | ZF;									\
-}
-#endif
 
 /***************************************************************
  * LDD
  ***************************************************************/
-#if Z180_EXACT
 #define LDD {													\
 	UINT8 io = RM(_HL); 										\
 	WM( _DE, io );												\
@@ -947,19 +839,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	_HL--; _DE--; _BC--;										\
 	if( _BC ) _F |= VF; 										\
 }
-#else
-#define LDD {													\
-	WM( _DE, RM(_HL) ); 										\
-	_F &= SF | ZF | YF | XF | CF;								\
-	_HL--; _DE--; _BC--;										\
-	if( _BC ) _F |= VF; 										\
-}
-#endif
 
 /***************************************************************
  * CPD
  ***************************************************************/
-#if Z180_EXACT
 #define CPD {													\
 	UINT8 val = RM(_HL);										\
 	UINT8 res = _A - val;										\
@@ -970,20 +853,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 	if( res & 0x08 ) _F |= XF; /* bit 3 -> flag 3 */			\
 	if( _BC ) _F |= VF; 										\
 }
-#else
-#define CPD {													\
-	UINT8 val = RM(_HL);										\
-	UINT8 res = _A - val;										\
-	_HL--; _BC--;												\
-	_F = (_F & CF) | SZ[res] | ((_A ^ val ^ res) & HF) | NF;	\
-	if( _BC ) _F |= VF; 										\
-}
-#endif
 
 /***************************************************************
  * IND
  ***************************************************************/
-#if Z180_EXACT
 #define IND {													\
 	UINT8 io = IN(_BC); 										\
 	_B--;														\
@@ -998,19 +871,10 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 		 (io >> 2)) & 1 )										\
 		_F |= PF;												\
 }
-#else
-#define IND {													\
-	_B--;														\
-	WM( _HL, IN(_BC) ); 										\
-	_HL--;														\
-	_F = (_B) ? NF : NF | ZF;									\
-}
-#endif
 
 /***************************************************************
  * OUTD
  ***************************************************************/
-#if Z180_EXACT
 #define OUTD {													\
 	UINT8 io = RM(_HL); 										\
 	_B--;														\
@@ -1025,14 +889,6 @@ INLINE UINT8 SET(UINT8 bit, UINT8 value)
 		 (io >> 2)) & 1 )										\
 		_F |= PF;												\
 }
-#else
-#define OUTD {													\
-	_B--;														\
-	OUT( _BC, RM(_HL) );										\
-	_HL--;														\
-	_F = (_B) ? NF : NF | ZF;									\
-}
-#endif
 
 /***************************************************************
  * LDIR
