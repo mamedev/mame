@@ -100,11 +100,8 @@ extern UINT8 williams_cocktail;
 
 
 WRITE8_HANDLER( williams_blitter_w );
-WRITE8_HANDLER( williams_paletteram_w );
 WRITE8_HANDLER( blaster_remap_select_w );
-WRITE8_HANDLER( blaster_palette_0_w );
 WRITE8_HANDLER( blaster_video_control_w );
-WRITE8_HANDLER( blaster_scanline_control_w );
 READ8_HANDLER( williams_video_counter_r );
 READ8_HANDLER( williams2_video_counter_r );
 
@@ -118,7 +115,6 @@ VIDEO_UPDATE( williams2 );
 
 
 WRITE8_HANDLER( williams2_tileram_w );
-READ8_HANDLER( williams2_paletteram_r );
 WRITE8_HANDLER( williams2_paletteram_w );
 WRITE8_HANDLER( williams2_fg_select_w );
 WRITE8_HANDLER( williams2_bg_select_w );

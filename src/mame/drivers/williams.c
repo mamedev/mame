@@ -523,17 +523,15 @@ ADDRESS_MAP_END
 void defender_install_io_space(void)
 {
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc00f, 0, 0x03e0, williams_paletteram_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc400, 0xc4ff, 0, 0x0300, MRA8_BANK3);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc400, 0xc4ff, 0, 0x0300, williams_cmos_w);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcc03, 0, 0x03e0, pia_1_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcc03, 0, 0x03e0, pia_1_w);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc04, 0xcc07, 0, 0x03e0, pia_0_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc04, 0xcc07, 0, 0x03e0, pia_0_w);
+	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc00f, 0, 0x03e0, MWA8_BANK4);
+	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
+	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
+	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc400, 0xc4ff, 0, 0x0300, MRA8_BANK3, williams_cmos_w);
+	memory_install_read8_handler      (0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
+	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcc03, 0, 0x03e0, pia_1_r, pia_1_w);
+	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc04, 0xcc07, 0, 0x03e0, pia_0_r, pia_0_w);
 	memory_set_bankptr(3, generic_nvram);
+	memory_set_bankptr(4, paletteram);
 }
 
 
@@ -547,7 +545,7 @@ void defender_install_io_space(void)
 static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(williams_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(williams_vram_select_w)
@@ -562,7 +560,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(williams_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(sinistar_vram_select_w)
@@ -585,10 +583,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x4000, 0x8fff) AM_READWRITE(MRA8_BANK2, MWA8_RAM)
-	AM_RANGE(0xbb00, 0xbbff) AM_WRITE(blaster_palette_0_w) AM_BASE(&blaster_palette_0)
-	AM_RANGE(0xbc00, 0xbcff) AM_WRITE(blaster_scanline_control_w) AM_BASE(&blaster_scanline_control)
+	AM_RANGE(0xbb00, 0xbbff) AM_WRITE(MWA8_RAM) AM_BASE(&blaster_palette_0)
+	AM_RANGE(0xbc00, 0xbcff) AM_WRITE(MWA8_RAM) AM_BASE(&blaster_scanline_control)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(williams_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc93f) AM_WRITE(blaster_vram_select_w)
@@ -1416,11 +1414,10 @@ static MACHINE_DRIVER_START( defender )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_SCANLINE)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 10, 304, 260, 7, 245)
 
 	MDRV_VIDEO_START(williams)
@@ -1516,8 +1513,6 @@ static MACHINE_DRIVER_START( blaster )
 	MDRV_MACHINE_RESET(blaster)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(16+256)
-
 	MDRV_VIDEO_START(blaster)
 	MDRV_VIDEO_UPDATE(blaster)
 MACHINE_DRIVER_END
@@ -1536,12 +1531,12 @@ static MACHINE_DRIVER_START( williams2 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_GFXDECODE(williams2)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_SCANLINE)
 	MDRV_PALETTE_LENGTH(1024)
+	MDRV_GFXDECODE(williams2)
 
 	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 8, 284, 260, 8, 248)
 
 	MDRV_VIDEO_START(williams2)

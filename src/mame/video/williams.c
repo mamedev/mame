@@ -129,9 +129,6 @@ UINT8 williams_cocktail;
  *
  *************************************/
 
-/* RAM variable */
-static UINT8 *williams2_paletteram;
-
 /* palette variables */
 static rgb_t *palette_lookup;
 
@@ -143,7 +140,7 @@ static const UINT8 *blitter_remap;
 static UINT8 *blitter_remap_lookup;
 
 /* Blaster-specific variables */
-static UINT8 blaster_color0;
+static rgb_t blaster_color0;
 static UINT8 blaster_video_control;
 
 /* tilemap variables */
@@ -206,8 +203,8 @@ VIDEO_START( williams2 )
 	blitter_init(williams_blitter_config, NULL);
 
 	/* allocate paletteram */
-	williams2_paletteram = auto_malloc(0x400 * 2);
-	state_save_register_global_pointer(williams2_paletteram, 0x400 * 2);
+	paletteram = auto_malloc(0x400 * 2);
+	state_save_register_global_pointer(paletteram, 0x400 * 2);
 
 	/* create the tilemap */
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 24,16, 128,16);
@@ -226,20 +223,25 @@ VIDEO_START( williams2 )
 
 VIDEO_UPDATE( williams )
 {
+	rgb_t pens[16];
 	int x, y;
+	
+	/* precompute the palette */
+	for (x = 0; x < 16; x++)
+		pens[x] = palette_lookup[paletteram[x]];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *source = &williams_videoram[y];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* loop over columns */
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
 		{
 			int pix = source[(x/2) * 256];
-			dest[x+0] = pix >> 4;
-			dest[x+1] = pix & 0x0f;
+			dest[x+0] = pens[pix >> 4];
+			dest[x+1] = pens[pix & 0x0f];
 		}
 	}
 	return 0;
@@ -248,22 +250,27 @@ VIDEO_UPDATE( williams )
 
 VIDEO_UPDATE( blaster )
 {
+	rgb_t pens[16];
 	int x, y;
+
+	/* precompute the palette */
+	for (x = 0; x < 16; x++)
+		pens[x] = palette_lookup[paletteram[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect->min_y == machine->screen[0].visarea.min_y || !(blaster_video_control & 1))
-		blaster_color0 = 0;
+		blaster_color0 = pens[0];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int erase_behind = blaster_video_control & blaster_scanline_control[y] & 2;
 		UINT8 *source = &williams_videoram[y];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* latch a new color0 pen? */
 		if (blaster_video_control & blaster_scanline_control[y] & 1)
-			blaster_color0 = 16 + y;
+			blaster_color0 = palette_lookup[blaster_palette_0[y] ^ 0xff];
 
 		/* loop over columns */
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
@@ -275,8 +282,8 @@ VIDEO_UPDATE( blaster )
 				source[(x/2) * 256] = 0;
 
 			/* now draw */
-			dest[x+0] = (pix & 0xf0) ? (pix >> 4) : blaster_color0;
-			dest[x+1] = (pix & 0x0f) ? (pix & 0x0f) : blaster_color0;
+			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : blaster_color0;
+			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : blaster_color0;
 		}
 	}
 	return 0;
@@ -285,19 +292,21 @@ VIDEO_UPDATE( blaster )
 
 VIDEO_UPDATE( williams2 )
 {
-	int x, y, basecolor;
+	rgb_t pens[16];
+	int x, y;
 
 	/* draw the background */
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	/* copy the bitmap data on top of that */
-	basecolor = williams2_fg_color * 16;
+	/* fetch the relevant pens */
+	for (x = 1; x < 16; x++)
+		pens[x] = palette_get_color(machine, williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *source = &williams_videoram[y];
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* loop over columns */
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
@@ -305,9 +314,9 @@ VIDEO_UPDATE( williams2 )
 			int pix = source[(x/2) * 256];
 
 			if (pix & 0xf0)
-				dest[x+0] = basecolor + (pix >> 4);
+				dest[x+0] = pens[pix >> 4];
 			if (pix & 0x0f)
-				dest[x+1] = basecolor + (pix & 0x0f);
+				dest[x+1] = pens[pix & 0x0f];
 		}
 	}
 	return 0;
@@ -364,19 +373,6 @@ static void create_palette_lookup(void)
 }
 
 
-WRITE8_HANDLER( williams_paletteram_w )
-{
-	paletteram[offset] = data;
-	palette_set_color(Machine, offset, palette_lookup[data]);
-}
-
-
-READ8_HANDLER( williams2_paletteram_r )
-{
-	return williams2_paletteram[offset];
-}
-
-
 WRITE8_HANDLER( williams2_paletteram_w )
 {
 	static const UINT8 ztable[16] =
@@ -387,11 +383,11 @@ WRITE8_HANDLER( williams2_paletteram_w )
 	UINT8 entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
-	williams2_paletteram[offset] = data;
+	paletteram[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = williams2_paletteram[offset & ~1];
-	entry_hi = williams2_paletteram[offset |  1];
+	entry_lo = paletteram[offset & ~1];
+	entry_hi = paletteram[offset |  1];
 
 	/* update the palette entry */
 	i = ztable[(entry_hi >> 4) & 15];
@@ -404,7 +400,6 @@ WRITE8_HANDLER( williams2_paletteram_w )
 
 WRITE8_HANDLER( williams2_fg_select_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
 	williams2_fg_color = data & 0x3f;
 }
 
@@ -471,8 +466,6 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( williams2_bg_select_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-
 	/* based on the tilemap config, only certain bits are used */
 	/* the rest are determined by other factors */
 	switch (williams2_tilemap_config)
@@ -505,7 +498,6 @@ WRITE8_HANDLER( williams2_tileram_w )
 
 WRITE8_HANDLER( williams2_xscroll_low_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
 	tilemap_xscroll = (tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
 	tilemap_set_scrollx(bg_tilemap, 0, (tilemap_xscroll & 7) + ((tilemap_xscroll >> 3) * 6));
 }
@@ -513,7 +505,6 @@ WRITE8_HANDLER( williams2_xscroll_low_w )
 
 WRITE8_HANDLER( williams2_xscroll_high_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
 	tilemap_xscroll = (tilemap_xscroll & 0x00f) | (data << 4);
 	tilemap_set_scrollx(bg_tilemap, 0, (tilemap_xscroll & 7) + ((tilemap_xscroll >> 3) * 6));
 }
@@ -528,7 +519,6 @@ WRITE8_HANDLER( williams2_xscroll_high_w )
 
 WRITE8_HANDLER( blaster_remap_select_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
 	blitter_remap_index = data;
 	blitter_remap = blitter_remap_lookup + data * 256;
 }
@@ -536,23 +526,7 @@ WRITE8_HANDLER( blaster_remap_select_w )
 
 WRITE8_HANDLER( blaster_video_control_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
 	blaster_video_control = data;
-}
-
-
-WRITE8_HANDLER( blaster_scanline_control_w )
-{
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-	blaster_scanline_control[offset] = data;
-}
-
-
-WRITE8_HANDLER( blaster_palette_0_w )
-{
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-	blaster_palette_0[offset] = data;
-	palette_set_color(Machine, 16 + offset, palette_lookup[data ^ 0xff]);
 }
 
 

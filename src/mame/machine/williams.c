@@ -270,11 +270,8 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* the IRQ signal comes into CB1, and is set to VA11 */
 	pia_1_cb1_w(0, scanline & 0x20);
 
-	/* update the screen while we're here */
-	video_screen_update_partial(0, scanline - 1);
-
 	/* set a timer for the next update */
-	scanline++;
+	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
@@ -402,11 +399,8 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	pia_0_cb1_w(0, scanline & 0x20);
 	pia_1_ca1_w(0, scanline & 0x20);
 
-	/* update the screen while we're here */
-	video_screen_update_partial(0, scanline);
-
 	/* set a timer for the next update */
-	scanline++;
+	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
 	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
 }
@@ -514,9 +508,10 @@ WRITE8_HANDLER( williams2_bank_select_w )
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, williams2_paletteram_r);
+			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, MRA8_BANK4);
 			memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, williams2_paletteram_w);
 			memory_set_bank(1, 1 + ((vram_bank & 4) >> 1));
+			memory_set_bankptr(4, paletteram);
 			break;
 	}
 }
