@@ -856,7 +856,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-07.8f",    0x3000, 0x1000, CRC(75a74d2d) SHA1(d433e8fcf3819b845936e7e107fef414f72bfc16) )
 	ROM_LOAD( "a24-08.7f",    0x4000, 0x1000, CRC(9fe07cf9) SHA1(23fdae48e519a171bf4adeeadf2fdfedfd56f4ea) )
 	ROM_LOAD( "a24-09.5f",    0x5000, 0x1000, CRC(51545ced) SHA1(4addad527c6fd675506bf584ec8670a23767787c) )
-	ROM_LOAD( "a24-01.4f",    0x6000, 0x1000, CRC(a86b3e62) SHA1(f97a13e31e622b5ac55c23458c65a49c2998196a) ) //another one: a24-10.4f
+	ROM_LOAD( "a24-10.4f",    0x6000, 0x1000, CRC(a86b3e62) SHA1(f97a13e31e622b5ac55c23458c65a49c2998196a) )
 	ROM_LOAD( "a24-11.2f",    0x7000, 0x1000, CRC(b39db430) SHA1(4f48a34f3aaa1e998a4a5656bc3f399d9e6633c4) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Sound ROMs */
@@ -888,7 +888,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "82s123.2c",    0x0000, 0x0020, CRC(4cb5bd32) SHA1(8851bae033ba67516d5ff6888e5daef10c2116ee) ) /* collision detection */
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "a24_03.2d",    0x0000, 0x0200, CRC(61b7a9ff) SHA1(4302de0c0dad2b871ad4719ad934beaee05a0c40) )	/* palette */
+	ROM_LOAD( "a24_03.2d",    0x0000, 0x0200, CRC(599a6cbe) SHA1(eed8592aaba7b2b6d06f26a2b8720a288f9ad90f) )	/* palette */
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */
@@ -896,4 +896,4 @@ ROM_END
 
 GAME( 1982, bking,  0, bking,  bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 )
 GAME( 1983, bking2, 0, bking,  bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
-GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", GAME_WRONG_COLORS )
+GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", 0 )

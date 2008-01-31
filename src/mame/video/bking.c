@@ -7,6 +7,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
+
 
 extern UINT8* bking_playfield_ram;
 
@@ -54,11 +56,20 @@ static tilemap* bg_tilemap;
 
 PALETTE_INIT( bking )
 {
+	static const int resistances_rg[3] = { 220, 390, 820 };
+	static const int resistances_b [2] = { 220, 390 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 0, 0,
+			3, &resistances_rg[0], gweights, 0, 0,
+			2, &resistances_b[0],  bweights, 0, 0);
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		UINT8 pen;
+		UINT16 pen;
 		int bit0, bit1, bit2, r, g, b;
 
 		/* color PROM A7-A8 is the palette select */
@@ -79,19 +90,18 @@ PALETTE_INIT( bking )
 		bit0 = (color_prom[pen] >> 0) & 0x01;
 		bit1 = (color_prom[pen] >> 1) & 0x01;
 		bit2 = (color_prom[pen] >> 2) & 0x01;
-		r = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
 		/* green component */
 		bit0 = (color_prom[pen] >> 3) & 0x01;
 		bit1 = (color_prom[pen] >> 4) & 0x01;
 		bit2 = (color_prom[pen] >> 5) & 0x01;
-		g = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
 
 		/* blue component */
 		bit0 = (color_prom[pen] >> 6) & 0x01;
 		bit1 = (color_prom[pen] >> 7) & 0x01;
-		bit2 = 0;
-		b = 0x92 * bit0 + 0x46 * bit1 + 0x27 * bit2;
+		b = combine_2_weights(gweights, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
