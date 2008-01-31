@@ -17,20 +17,17 @@
           (c) 2000 Cosmodog, Ltd.
           >
           and it listens for incoming characters.
+        * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
 
     Known issues/to-do's:
-        * Crashed on reset - Z180 core problem?
+        * Crashes on reset - Z180 core problem?
         * ROM banking is not understood.  Shouldn't require copying and other
           trickey
         * Starfield missing
         * Check the ASCI interface, there probably is fully working debug code.
         * The timed interrupt is a kludge; it is supposed to be generated internally by
           the Z180, but the cpu core doesn't support that yet.
-        * Correct CPU speed... Zilog says Z180 comes in 6, 8, 10, 20 & 33MHz.
-          20MHz is used as it "seems" right based on the music in Galaga
-
-	CPU is a Z8S18020VSC (20MHz part)
-	OSC is 73.728MHz (is the clock divide 3 or 4?)
+        * Is the clock divide 3 or 4?
 
 ***************************************************************************/
 
@@ -40,6 +37,18 @@
 #include "sound/namco.h"
 #include "sound/dac.h"
 #include "20pacgal.h"
+
+
+
+/*************************************
+ *
+ *  Clocks
+ *
+ *************************************/
+
+#define MASTER_CLOCK		(XTAL_73_728MHz)
+#define MAIN_CPU_CLOCK		(MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
+#define NAMCO_AUDIO_CLOCK	(MASTER_CLOCK / 4 /  6 / 32)
 
 
 
@@ -280,7 +289,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_DRIVER_DATA(_20pacgal_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z180,20000000)	/* 20MHz ??? Needs to be verified! */
+	MDRV_CPU_ADD(Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_io_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
@@ -293,7 +302,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD(NAMCO, NAMCO_AUDIO_CLOCK)
 	MDRV_SOUND_CONFIG(namco_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

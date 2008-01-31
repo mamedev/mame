@@ -122,7 +122,7 @@ enum
 	XTAL_61_44MHz		= 61440000,		/* dkong */
 	XTAL_64MHz   		= 64000000,		/* BattleToads */
 	XTAL_66_6667MHz   	= 66666700,		/* later Midway games */
-	XTAL_67_7376MHz  	= 67737600,		/* PSX-based h/w, Sony ZN1-2-based */
+	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
 	XTAL_100MHz  		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
 	XTAL_101_4912MHz  	= 101491200,	/* PSX-based Namco System 10 */
 
