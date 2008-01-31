@@ -20,7 +20,6 @@
         * CPU is a Z8S18020VSC (20MHz part), OSC is 73.728MHz
 
     Known issues/to-do's:
-        * Crashes on reset - Z180 core problem?
         * ROM banking is not understood.  Shouldn't require copying and other
           trickey
         * Starfield missing
