@@ -4,12 +4,6 @@
 
     Copyright Nicola Salmoria and the MAME Team
 
-    Notes:
-        * The only difference between MC3417 and MC3418 is the number
-          of bits checked for the Coincidence Output.  For the MC3417,
-          it is three bits, while for the MC3418 it is four.
-          This is not emulated.
-
 *****************************************************************************/
 
 #include "sndintrf.h"
@@ -34,6 +28,7 @@ struct hc55516_data
 	sound_stream *channel;
 	int		clock;		/* 0 = software driven, non-0 = oscillator */
 	int		active_clock_hi;
+	UINT8   shiftreg_mask;
 
 	UINT8	last_clock_state;
 	UINT8	digit;
@@ -57,7 +52,8 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 
 
-static void *start_common(int sndindex, int clock, const void *config, int _active_clock_hi)
+static void *start_common(int sndindex, int clock, const void *config,
+						  UINT8 _shiftreg_mask, int _active_clock_hi)
 {
 	struct hc55516_data *chip;
 
@@ -71,6 +67,7 @@ static void *start_common(int sndindex, int clock, const void *config, int _acti
 	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
 	chip->clock = clock;
+	chip->shiftreg_mask = _shiftreg_mask;
 	chip->active_clock_hi = _active_clock_hi;
 	chip->last_clock_state = 0;
 
@@ -94,19 +91,19 @@ static void *start_common(int sndindex, int clock, const void *config, int _acti
 
 static void *hc55516_start(int sndindex, int clock, const void *config)
 {
-	return start_common(sndindex, clock, config, TRUE);
+	return start_common(sndindex, clock, config, 0x07, TRUE);
 }
 
 
 static void *mc3417_start(int sndindex, int clock, const void *config)
 {
-	return start_common(sndindex, clock, config, FALSE);
+	return start_common(sndindex, clock, config, 0x07, FALSE);
 }
 
 
 static void *mc3418_start(int sndindex, int clock, const void *config)
 {
-	return start_common(sndindex, clock, config, FALSE);
+	return start_common(sndindex, clock, config, 0x0f, FALSE);
 }
 
 
@@ -141,25 +138,24 @@ static void process_digit(struct hc55516_data *chip)
 {
 	double integrator = chip->integrator, temp;
 
+	/* shift the bit into the shift register */
+	chip->shiftreg = (chip->shiftreg << 1) | chip->digit;
+
 	/* move the estimator up or down a step based on the bit */
 	if (chip->digit)
-	{
-		chip->shiftreg = ((chip->shiftreg << 1) | 1) & 7;
 		integrator += chip->filter;
-	}
 	else
-	{
-		chip->shiftreg = (chip->shiftreg << 1) & 7;
 		integrator -= chip->filter;
-	}
 
 	/* simulate leakage */
 	integrator *= leak;
 
 	/* if we got all 0's or all 1's in the last n bits, bump the step up */
-	if (chip->shiftreg == 0 || chip->shiftreg == 7)
+	if (((chip->shiftreg & chip->shiftreg_mask) == 0) ||
+		((chip->shiftreg & chip->shiftreg_mask) == chip->shiftreg_mask))
 	{
 		chip->filter = FILTER_MAX - ((FILTER_MAX - chip->filter) * charge);
+
 		if (chip->filter > FILTER_MAX)
 			chip->filter = FILTER_MAX;
 	}
@@ -168,6 +164,7 @@ static void process_digit(struct hc55516_data *chip)
 	else
 	{
 		chip->filter *= decay;
+
 		if (chip->filter < FILTER_MIN)
 			chip->filter = FILTER_MIN;
 	}
@@ -350,7 +347,7 @@ void hc55516_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "HC-55516";					break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "CVSD";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "2.0";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "2.1";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
