@@ -15,13 +15,15 @@
 #include "exidy440.h"
 #include "machine/pit8253.h"
 
+
+
 /*************************************
  *
  *  Main CPU memory handlers
  *
  *************************************/
 
-static ADDRESS_MAP_START( vertigo_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( vertigo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
 	AM_RANGE(0x002000, 0x003fff) AM_RAM AM_BASE(&vertigo_vectorram)
@@ -38,21 +40,7 @@ static ADDRESS_MAP_START( vertigo_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
 
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
 
-static ADDRESS_MAP_START( vertigo_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x8016) AM_READWRITE(exidy440_m6844_r,exidy440_m6844_w) AM_BASE(&exidy440_m6844_data)
-	AM_RANGE(0x8400, 0x8407) AM_READWRITE(MRA8_RAM, exidy440_sound_volume_w) AM_BASE(&exidy440_sound_volume)
-	AM_RANGE(0x8800, 0x8800) AM_READ(exidy440_sound_command_r)
-	AM_RANGE(0x9400, 0x9403) AM_RAM AM_BASE(&exidy440_sound_banks)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(MRA8_NOP,exidy440_sound_interrupt_clear_w)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
 
 /*************************************
  *
@@ -66,6 +54,8 @@ static ADDRESS_MAP_START( vertigo_motor, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x080, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 #endif
+
+
 
 /*************************************
  *
@@ -101,21 +91,11 @@ static INPUT_PORTS_START( vertigo )
 
 INPUT_PORTS_END
 
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
 
-static const struct CustomSound_interface custom_interface =
-{
-	exidy440_sh_start,
-	exidy440_sh_stop
-};
 
 /*************************************
  *
- *  Machine drivers
+ *  Machine driver
  *
  *************************************/
 
@@ -123,12 +103,10 @@ static MACHINE_DRIVER_START( vertigo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(vertigo_main,0)
+	MDRV_CPU_PROGRAM_MAP(vertigo_map,0)
 	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
-	/* audio CPU */
-	MDRV_CPU_ADD(M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(vertigo_sound,0)
+	MDRV_IMPORT_FROM(exidy440_audio)
 
 	/* motor controller */
 	/*
@@ -141,7 +119,6 @@ static MACHINE_DRIVER_START( vertigo )
 	MDRV_MACHINE_RESET(vertigo)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_VECTOR )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -151,20 +128,13 @@ static MACHINE_DRIVER_START( vertigo )
 
 	MDRV_VIDEO_START(vector)
 	MDRV_VIDEO_UPDATE(vector)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(CUSTOM, 1000000/16)
-	MDRV_SOUND_CONFIG(custom_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
-
 MACHINE_DRIVER_END
+
+
 
 /*************************************
  *
- *  ROM definitions
+ *  ROM definition
  *
  *************************************/
 
@@ -227,9 +197,11 @@ ROM_START( topgunnr )
 	ROM_LOAD( "vga3_4.bd1",	 0x080, 0x780, CRC(a50dde56) SHA1(ef13f4cf01c9d483f2dc829a2e23965a6053f37a) )
 ROM_END
 
+
+
 /*************************************
  *
- *  Game drivers
+ *  Game driver
  *
  *************************************/
 

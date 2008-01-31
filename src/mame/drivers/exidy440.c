@@ -521,7 +521,7 @@ static READ8_HANDLER( showdown_bank0_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&exidy440_imageram)
 	AM_RANGE(0x2000, 0x209f) AM_READWRITE(MRA8_RAM, exidy440_spriteram_w) AM_BASE(&spriteram)
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM
@@ -535,24 +535,6 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, bankram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x8016) AM_READWRITE(exidy440_m6844_r, exidy440_m6844_w) AM_BASE(&exidy440_m6844_data)
-	AM_RANGE(0x8400, 0x8407) AM_READWRITE(MRA8_RAM, exidy440_sound_volume_w) AM_BASE(&exidy440_sound_volume)
-	AM_RANGE(0x8800, 0x8800) AM_READ(exidy440_sound_command_r)
-	AM_RANGE(0x9400, 0x9403) AM_WRITE(MWA8_RAM) AM_BASE(&exidy440_sound_banks)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(MRA8_NOP, exidy440_sound_interrupt_clear_w)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1037,21 +1019,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound definitions
- *
- *************************************/
-
-static const struct CustomSound_interface custom_interface =
-{
-	exidy440_sh_start,
-	exidy440_sh_stop
-};
-
-
-
-/*************************************
- *
- *  Machine driver
+ *  Machine drivers
  *
  *************************************/
 
@@ -1059,12 +1027,8 @@ static MACHINE_DRIVER_START( exidy440 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,EXIDY440_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(exidy440_map,0)
 	MDRV_CPU_VBLANK_INT(main_interrupt,1)
-
-	MDRV_CPU_ADD(M6809,EXIDY440_MASTER_CLOCK/4/4)
-	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
 	MDRV_MACHINE_RESET(exidy440)
 	MDRV_NVRAM_HANDLER(exidy440)
@@ -1079,13 +1043,8 @@ static MACHINE_DRIVER_START( exidy440 )
 	MDRV_VIDEO_EOF(exidy440)
 	MDRV_VIDEO_UPDATE(exidy440)
 
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(CUSTOM, EXIDY440_MASTER_CLOCK/256)
-	MDRV_SOUND_CONFIG(custom_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	/* audio hardware */
+	MDRV_IMPORT_FROM(exidy440_audio)
 MACHINE_DRIVER_END
 
 

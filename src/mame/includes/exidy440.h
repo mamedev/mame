@@ -31,23 +31,12 @@ extern UINT8 exidy440_topsecret;
 void exidy440_bank_select(UINT8 bank);
 
 
-
 /*----------- defined in audio/exidy440.c -----------*/
 
 extern UINT8 exidy440_sound_command;
 extern UINT8 exidy440_sound_command_ack;
-extern UINT8 *exidy440_m6844_data;
-extern UINT8 *exidy440_sound_banks;
-extern UINT8 *exidy440_sound_volume;
 
-void *exidy440_sh_start(int clock, const struct CustomSound_interface *config);
-void exidy440_sh_stop(void *token);
-
-READ8_HANDLER( exidy440_m6844_r );
-WRITE8_HANDLER( exidy440_m6844_w );
-READ8_HANDLER( exidy440_sound_command_r );
-WRITE8_HANDLER( exidy440_sound_volume_w );
-WRITE8_HANDLER( exidy440_sound_interrupt_clear_w );
+MACHINE_DRIVER_EXTERN( exidy440_audio );
 
 
 /*----------- defined in video/exidy440.c -----------*/

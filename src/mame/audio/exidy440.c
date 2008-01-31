@@ -13,7 +13,6 @@
 #include "exidy440.h"
 
 
-#define MAKE_WAVES		0
 #define	SOUND_LOG		0
 #define	FADE_TO_ZERO	1
 
@@ -70,13 +69,13 @@ typedef struct sound_cache_entry
 
 
 /* globals */
-UINT8 *exidy440_m6844_data;
-UINT8 *exidy440_sound_banks;
-UINT8 *exidy440_sound_volume;
 UINT8 exidy440_sound_command;
 UINT8 exidy440_sound_command_ack;
 
 /* local allocated storage */
+static UINT8 *sound_banks;
+static UINT8 *m6844_data;
+static UINT8 *sound_volume;
 static INT32 *mixer_buffer_left;
 static INT32 *mixer_buffer_right;
 static sound_cache_entry *sound_cache;
@@ -121,26 +120,6 @@ static void decode_and_filter_cvsd(UINT8 *data, int bytes, int maskbits, int fre
 static void fir_filter(INT32 *input, INT16 *output, int count);
 
 
-/* debugging */
-#if MAKE_WAVES
-
-#ifdef LSB_FIRST
-#define intelShort(x) (x)
-#define intelLong(x) (x)
-#else
-#define intelShort(x) (((x) << 8) | ((x) >> 8))
-#define intelLong(x) ((((x) << 24) | (((UINT32) (x)) >> 24) | (( (x) & 0x0000ff00) << 8) | (( (x) & 0x00ff0000) >> 8)))
-#endif
-
-static FILE *wavfile;
-static int wavlength;
-
-static void write_wav_header(int frequency);
-static void finish_wav_file(void);
-
-#endif
-
-
 
 /*************************************
  *
@@ -148,7 +127,7 @@ static void finish_wav_file(void);
  *
  *************************************/
 
-void *exidy440_sh_start(int clock, const struct CustomSound_interface *config)
+static void *exidy440_sh_start(int clock, const struct CustomSound_interface *config)
 {
 	int i, length;
 
@@ -206,7 +185,7 @@ void *exidy440_sh_start(int clock, const struct CustomSound_interface *config)
  *
  *************************************/
 
-void exidy440_sh_stop(void *token)
+static void exidy440_sh_stop(void *token)
 {
 	if (SOUND_LOG && debuglog)
 		fclose(debuglog);
@@ -316,12 +295,12 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
 		samples = (left > channel->remaining) ? channel->remaining : left;
 
 		/* get a pointer to the sample data and copy to the left */
-		volume = exidy440_sound_volume[2 * ch + 0];
+		volume = sound_volume[2 * ch + 0];
 		if (volume)
 			add_and_scale_samples(ch, mixer_buffer_left, samples, volume);
 
 		/* get a pointer to the sample data and copy to the left */
-		volume = exidy440_sound_volume[2 * ch + 1];
+		volume = sound_volume[2 * ch + 1];
 		if (volume)
 			add_and_scale_samples(ch, mixer_buffer_right, samples, volume);
 
@@ -354,7 +333,7 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
  *
  *************************************/
 
-READ8_HANDLER( exidy440_sound_command_r )
+static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
 	cpunum_set_input_line(Machine, 1, 1, CLEAR_LINE);
@@ -371,7 +350,7 @@ READ8_HANDLER( exidy440_sound_command_r )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy440_sound_volume_w )
+static WRITE8_HANDLER( sound_volume_w )
 {
 	if (SOUND_LOG && debuglog)
 		fprintf(debuglog, "Volume %02X=%02X\n", offset, data);
@@ -380,7 +359,7 @@ WRITE8_HANDLER( exidy440_sound_volume_w )
 	stream_update(stream);
 
 	/* set the new volume */
-	exidy440_sound_volume[offset] = ~data;
+	sound_volume[offset] = ~data;
 }
 
 
@@ -391,7 +370,7 @@ WRITE8_HANDLER( exidy440_sound_volume_w )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy440_sound_interrupt_clear_w )
+static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
 	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
 }
@@ -411,7 +390,7 @@ static void exidy440_m6844_update(void)
 }
 
 
-void m6844_finished(int ch)
+static void m6844_finished(int ch)
 {
 	m6844_channel_data *channel = &m6844_channel[ch];
 
@@ -435,7 +414,7 @@ void m6844_finished(int ch)
  *
  *************************************/
 
-READ8_HANDLER( exidy440_m6844_r )
+static READ8_HANDLER( m6844_r )
 {
 	int result = 0;
 
@@ -516,7 +495,7 @@ READ8_HANDLER( exidy440_m6844_r )
 }
 
 
-WRITE8_HANDLER( exidy440_m6844_w )
+static WRITE8_HANDLER( m6844_w )
 {
 	int i;
 
@@ -623,13 +602,13 @@ WRITE8_HANDLER( exidy440_m6844_w )
  *
  *************************************/
 
-void reset_sound_cache(void)
+static void reset_sound_cache(void)
 {
 	sound_cache_end = sound_cache;
 }
 
 
-INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits, int frequency)
+static INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits, int frequency)
 {
 	sound_cache_entry *current = sound_cache_end;
 
@@ -656,7 +635,7 @@ INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits, int f
 }
 
 
-INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
+static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
 {
 	sound_cache_entry *current;
 
@@ -675,7 +654,7 @@ INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int frequen
  *
  *************************************/
 
-void play_cvsd(int ch)
+static void play_cvsd(int ch)
 {
 	sound_channel_data *channel = &sound_channel[ch];
 	int address = m6844_channel[ch].address;
@@ -683,13 +662,13 @@ void play_cvsd(int ch)
 	INT16 *base;
 
 	/* add the bank number to the address */
-	if (exidy440_sound_banks[ch] & 1)
+	if (sound_banks[ch] & 1)
 		address += 0x00000;
-	else if (exidy440_sound_banks[ch] & 2)
+	else if (sound_banks[ch] & 2)
 		address += 0x08000;
-	else if (exidy440_sound_banks[ch] & 4)
+	else if (sound_banks[ch] & 4)
 		address += 0x10000;
-	else if (exidy440_sound_banks[ch] & 8)
+	else if (sound_banks[ch] & 8)
 		address += 0x18000;
 
 	/* compute the base address in the converted samples array */
@@ -709,8 +688,8 @@ void play_cvsd(int ch)
 
 	if (SOUND_LOG && debuglog)
 		fprintf(debuglog, "Sound channel %d play at %02X,%04X, length = %04X, volume = %02X/%02X\n",
-				ch, exidy440_sound_banks[ch], m6844_channel[ch].address,
-				m6844_channel[ch].counter, exidy440_sound_volume[ch * 2], exidy440_sound_volume[ch * 2 + 1]);
+				ch, sound_banks[ch], m6844_channel[ch].address,
+				m6844_channel[ch].counter, sound_volume[ch * 2], sound_volume[ch * 2 + 1]);
 
 	/* set the pointer and count */
 	channel->base = base;
@@ -722,7 +701,7 @@ void play_cvsd(int ch)
 }
 
 
-void stop_cvsd(int ch)
+static void stop_cvsd(int ch)
 {
 	/* the DMA channel is marked inactive; that will kill the audio */
 	sound_channel[ch].remaining = 0;
@@ -740,7 +719,7 @@ void stop_cvsd(int ch)
  *
  *************************************/
 
-void fir_filter(INT32 *input, INT16 *output, int count)
+static void fir_filter(INT32 *input, INT16 *output, int count)
 {
 	while (count--)
 	{
@@ -775,7 +754,7 @@ void fir_filter(INT32 *input, INT16 *output, int count)
  *
  *************************************/
 
-void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency, INT16 *output)
+static void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency, INT16 *output)
 {
 	INT32 buffer[SAMPLE_BUFFER_LENGTH + FIR_HISTORY_LENGTH];
 	int total_samples = bytes * 8;
@@ -784,16 +763,6 @@ void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency
 	double charge, decay, gain;
 	int steps;
 	int chunk_start;
-
-#if MAKE_WAVES
-{
-	static int file_index;
-	char file_name[100];
-	sprintf(file_name, "cvsd%03d.wav", file_index++);
-	wavfile = fopen(file_name, "wb");
-	write_wav_header(frequency);
-}
-#endif
 
 	/* compute the charge, decay, and leak constants */
 	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * (double)frequency));
@@ -883,30 +852,12 @@ void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency
 			}
 		}
 
-#if MAKE_WAVES
-		for (ind = 0; ind < chunk_bytes * 8; ind++)
-		{
-			int sample = buffer[FIR_HISTORY_LENGTH + ind];
-			INT16 temp;
-			if (sample > 32767) sample = 32767;
-			else if (sample < -32768) sample = -32768;
-			temp = intelShort(sample);
-			fwrite(&temp, 1, 2, wavfile);
-		}
-		wavlength += chunk_bytes * 8 * 2;
-#endif
-
 		/* all done with this chunk, run the filter on it */
 		fir_filter(&buffer[FIR_HISTORY_LENGTH], &output[chunk_start], chunk_bytes * 8);
 
 		/* copy the last few input samples down to the start for a new history */
 		memcpy(&buffer[0], &buffer[SAMPLE_BUFFER_LENGTH], FIR_HISTORY_LENGTH * sizeof(INT32));
 	}
-
-#if MAKE_WAVES
-	finish_wav_file();
-	fclose(wavfile);
-#endif
 
 	/* make sure the volume goes smoothly to 0 over the last 512 samples */
 	if (FADE_TO_ZERO)
@@ -927,55 +878,52 @@ void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int frequency
 
 /*************************************
  *
- *  Debugging
+ *  Memory handlers
  *
  *************************************/
 
-#if MAKE_WAVES
+static ADDRESS_MAP_START( exidy440_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x8000, 0x8016) AM_READWRITE(m6844_r, m6844_w) AM_BASE(&m6844_data)
+	AM_RANGE(0x8400, 0x8407) AM_READWRITE(MRA8_RAM, sound_volume_w) AM_BASE(&sound_volume)
+	AM_RANGE(0x8800, 0x8800) AM_READ(sound_command_r)
+	AM_RANGE(0x9400, 0x9403) AM_WRITE(MWA8_RAM) AM_BASE(&sound_banks)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(MRA8_NOP, sound_interrupt_clear_w)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
-static void write_wav_header(int frequency)
+
+
+/*************************************
+ *
+ *  Audio definitions
+ *
+ *************************************/
+
+static const struct CustomSound_interface custom_interface =
 {
-	UINT32 temp32;
-	UINT16 temp16;
-
-	fwrite("RIFF", 1, 4, wavfile);
-	temp32 = intelLong(0);
-	fwrite(&temp32, 1, 4, wavfile);
-	fwrite("WAVE", 1, 4, wavfile);
-
-	fwrite("fmt ", 1, 4, wavfile);
-	temp32 = intelLong(16);
-	fwrite(&temp32, 1, 4, wavfile);
-	temp16 = intelShort(1);				/* format: PCM */
-	fwrite(&temp16, 1, 2, wavfile);
-	temp16 = intelShort(1);				/* channels: 1 */
-	fwrite(&temp16, 1, 2, wavfile);
-	temp32 = intelLong(frequency);		/* sample rate */
-	fwrite(&temp32, 1, 4, wavfile);
-	temp32 = intelLong(frequency * 2);	/* bytes/second */
-	fwrite(&temp32, 1, 4, wavfile);
-	temp16 = intelShort(2);				/* block align */
-	fwrite(&temp16, 1, 2, wavfile);
-	temp16 = intelShort(16);			/* bits/sample */
-	fwrite(&temp16, 1, 2, wavfile);
-
-	fwrite("data", 1, 4, wavfile);
-	temp32 = intelLong(0);
-	fwrite(&temp32, 1, 4, wavfile);
-}
+	exidy440_sh_start,
+	exidy440_sh_stop
+};
 
 
-static void finish_wav_file(void)
-{
-	UINT32 temp32;
 
-	fseek(wavfile, 4, SEEK_SET);
-	temp32 = intelLong(wavlength + 4 + 8 + 16 + 8);
-	fwrite(&temp32, 1, 4, wavfile);
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
-	fseek(wavfile, 40, SEEK_SET);
-	temp32 = intelLong(wavlength);
-	fwrite(&temp32, 1, 4, wavfile);
-}
+MACHINE_DRIVER_START( exidy440_audio )
 
-#endif
+	MDRV_CPU_ADD(M6809,EXIDY440_MASTER_CLOCK/4/4)
+	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map,0)
+	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(CUSTOM, EXIDY440_MASTER_CLOCK/256)
+	MDRV_SOUND_CONFIG(custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
