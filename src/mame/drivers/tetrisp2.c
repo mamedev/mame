@@ -1395,6 +1395,9 @@ Custom: SS91022-03
         GS91022-05
         SS91022-05
 
+Other:  Sigma XILINX XCS30
+        Sigma XILINX XC9536 (socketted and stamped SL4)
+
 ***************************************************************************/
 
 ROM_START( rockna )
@@ -1483,6 +1486,71 @@ ROM_END
 
 /***************************************************************************
 
+Jaleco Rock'n 3
+Board marked in copper and silk screen:
+
+	JALECO VJ-98344
+	98053 EB-00-20120-0
+	MADE IN JAPAN
+
+CPU: TMP68HC000P-12
+OSC: 48MHz & 12MHz (next to 68000)
+DIP: Two 8-way dipswitches
+BAT: CR-2032
+
+IC19 	27c040 labeled
+		Rock'n 3
+		VJ-98344
+		10
+		Ver 1.0
+
+IC59 	27c040 labeled
+		Rock'n 3
+		VJ-98344
+		4
+		Ver 1.0
+
+IC65 	27c040 labeled
+		Rock'n 3
+		VJ-98344
+		1	
+		Ver 1.0
+
+IC43	Xilinx 17s30pc
+
+IC14	ICT 18cv8p labeled	saved in jedec format
+		PS96019-02
+
+IC57	ICT 18cv8p labeled	saved in jedec format
+		PS96019-01
+
+IC58	ICT 18cv8p labeled	saved in jedec format
+		PS96019-04
+
+IC10	27c160 Labeled
+		Rock'n 3
+		VJ-98344
+		13	
+		Ver 1.0
+
+IC33	27c160 Labeled
+		Rock'n 3
+		VJ-98344
+		9	
+		Ver 1.0
+
+IC32	27c160 Labeled
+		Rock'n 3
+		VJ-98344
+		8	
+		Ver 1.0
+
+IC38	27c160 Labeled
+		Rock'n 3
+		VJ-98344
+		6	
+		Ver 1.0
+
 
 PCB Layout (sound rom board only)
 ----------
@@ -1520,23 +1588,23 @@ Sound chips: Yamaha YMZ280B-F & Yamaha YAC516-M
 
 ROM_START( rockn3 )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x80000, CRC(abc6ab4a) SHA1(2f1983b95cd9e42d709edac5613b1f0b450df4ba) )
-	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x80000, CRC(3ecba46e) SHA1(64ff5b7932a8d8dc01c649b9dcc1d55cf1e43387) )
+	ROM_LOAD16_BYTE( "rock_n_3_VJ-98344_1_v1.0", 0x000001, 0x80000, CRC(abc6ab4a) SHA1(2f1983b95cd9e42d709edac5613b1f0b450df4ba) ) /* IC65 (alt PCB number 1) */
+	ROM_LOAD16_BYTE( "rock_n_3_VJ-98344_4_v1.0", 0x000000, 0x80000, CRC(3ecba46e) SHA1(64ff5b7932a8d8dc01c649b9dcc1d55cf1e43387) ) /* IC59 (alt PCB number 4) */
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )	/* 8x8x8 (Sprites) */
-	ROM_LOAD32_WORD( "spr1", 0x000002, 0x200000, CRC(468bf696) SHA1(d58e399ff876ab0f4ef52aaa85d86d72db307b6a) )
-	ROM_LOAD32_WORD( "spr0", 0x000000, 0x200000, CRC(8a61fc18) SHA1(4e895a2014e711d044ed5d8bff8a91766f14b307) )
+	ROM_LOAD32_WORD( "rock_n_3_VJ-98344_8_v1.0", 0x000002, 0x200000, CRC(468bf696) SHA1(d58e399ff876ab0f4ef52aaa85d86d72db307b6a) ) /* IC32 (alt PCB number 8) */
+	ROM_LOAD32_WORD( "rock_n_3_VJ-98344_9_v1.0", 0x000000, 0x200000, CRC(8a61fc18) SHA1(4e895a2014e711d044ed5d8bff8a91766f14b307) ) /* IC33 (alt PCB number 9) */
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x8 (Background) */
-	ROM_LOAD16_WORD( "back", 0x000000, 0x200000, CRC(e01bf471) SHA1(4485c71770bdb8800ded4afb37814c2d287b78be)  )
+	ROM_LOAD16_WORD( "rock_n_3_VJ-98344_13_v1.0", 0x000000, 0x200000, CRC(e01bf471) SHA1(4485c71770bdb8800ded4afb37814c2d287b78be)  ) /* IC10 (alt PCB number 13) */
 
 	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE )	/* 16x16x8 (Rotation) */
-	ROM_LOAD( "rot", 0x000000, 0x200000, CRC(4e146de5) SHA1(5971cbb91da5fde652786d82d0143197518bad9b)  )
+	ROM_LOAD( "rock_n_3_VJ-98344_6_v1.0", 0x000000, 0x200000, CRC(4e146de5) SHA1(5971cbb91da5fde652786d82d0143197518bad9b)  ) /* IC38 (alt PCB number 6) */
 
 	ROM_REGION( 0x080000, REGION_GFX4, ROMREGION_DISPOSE )	/* 8x8x8 (Foreground) */
-	ROM_LOAD( "front", 0x000000, 0x080000, CRC(8100039e) SHA1(e07b1e2f3cbcb1c086edd628d20423ecd4f74860)  )
+	ROM_LOAD( "rock_n_3_VJ-98344_10_v1.0", 0x000000, 0x080000, CRC(8100039e) SHA1(e07b1e2f3cbcb1c086edd628d20423ecd4f74860)  ) /* IC19 (alt PCB number 10) */
 
-	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples - On seperate ROM board with YMZ280B-F sound chip */
 	ROM_LOAD( "mr99029-01.ic28", 0x0000000, 0x0400000, CRC(e2f69042) SHA1(deb361a53ed6a9033e21c2f805f327cc3e9b11c6)  ) // COMMON AREA  (alt PCB number 25)
 	ROM_FILL(                    0x0400000, 0x0c00000, 0xff )		// BANK AREA (unpopulated IC29, IC36 & IC37 (alt PCB numbers 26, 27 & 28 repectively)
 	ROM_LOAD( "mr99029-02.ic1",  0x1000000, 0x0400000, CRC(b328b18f) SHA1(22edebcabd6c8ed65d8c9e501621991d404c430d)  ) // bank 0 (alt PCB number 1)
