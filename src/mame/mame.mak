@@ -757,6 +757,7 @@ $(MAMEOBJ)/igs.a: \
 $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/m52.o $(VIDEO)/m52.o \
 	$(DRIVERS)/m57.o $(VIDEO)/m57.o \
+	$(DRIVERS)/m58.o $(VIDEO)/m58.o \
 	$(DRIVERS)/m62.o $(VIDEO)/m62.o \
 	$(DRIVERS)/m72.o $(AUDIO)/m72.o $(VIDEO)/m72.o \
 	$(DRIVERS)/m90.o $(VIDEO)/m90.o \
@@ -769,7 +770,6 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
 	$(DRIVERS)/wilytowr.o \
-	$(DRIVERS)/yard.o $(VIDEO)/yard.o \
 	$(MACHINE)/irem_cpu.o \
 	$(AUDIO)/fghtbskt.o \
 	$(AUDIO)/irem.o \
