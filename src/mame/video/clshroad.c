@@ -64,45 +64,32 @@ PALETTE_INIT( clshroad )
 PALETTE_INIT( firebatl )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-#if 1
-	for (i = 0;i < 256;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[i + 256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[i + 2*256] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*256] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*256] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
-#endif
 
-	color_prom += 3*256;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
+	for (i = 0; i < 0x200; i++)
+		colortable_entry_set_value(machine->colortable, i, i & 0xff);
 
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-		COLOR(2,i) = ((color_prom[i] & 0x0f) << 4) + (color_prom[i+256] & 0x0f);
+	for (i = 0x200; i < 0x300; i++)
+	{
+		UINT8 ctabentry = ((color_prom[(i - 0x200) + 0x000] & 0x0f) << 4) |
+						   (color_prom[(i - 0x200) + 0x100] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 
@@ -200,11 +187,12 @@ static TILEMAP_MAPPER( tilemap_scan_rows_extra )
 static TILE_GET_INFO( get_tile_info_fb1 )
 {
 	UINT8 code	=	clshroad_vram_1[ tile_index + 0x000 ];
-	UINT8 color	=	clshroad_vram_1[ tile_index + 0x400 ];
+	UINT8 color	=	clshroad_vram_1[ tile_index + 0x400 ] & 0x3f;
+	tileinfo->group = color;
 	SET_TILE_INFO(
 			2,
 			code,
-			color & 0x3f,
+			color,
 			0);
 }
 
@@ -229,10 +217,10 @@ WRITE8_HANDLER( clshroad_vram_1_w )
 VIDEO_START( firebatl )
 {
 	/* These 2 use the graphics and scroll value */
-	tilemap_0a = tilemap_create(get_tile_info_0a,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,0x20,0x10);
+	tilemap_0a = tilemap_create(get_tile_info_0a,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,0x20,0x10);
 	tilemap_0b = tilemap_create(get_tile_info_0b,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,0x20,0x10);
 	/* Text (No scrolling) */
-	tilemap_1  = tilemap_create(get_tile_info_fb1,tilemap_scan_rows_extra,TILEMAP_TYPE_COLORTABLE,8,8,0x24,0x20);
+	tilemap_1  = tilemap_create(get_tile_info_fb1,tilemap_scan_rows_extra,TILEMAP_TYPE_PEN,8,8,0x24,0x20);
 
 	tilemap_set_scroll_rows( tilemap_0a, 1);
 	tilemap_set_scroll_rows( tilemap_0b, 1);
@@ -246,13 +234,13 @@ VIDEO_START( firebatl )
 	tilemap_set_scrolldx( tilemap_0b, -0x30, -0xb5);
 
 	tilemap_set_transparent_pen( tilemap_0b, 0 );
-	tilemap_set_transparent_pen( tilemap_1,  0x0f );
+	colortable_configure_tilemap_groups(machine->colortable, tilemap_1, machine->gfx[2], 0x0f);
 }
 
 VIDEO_START( clshroad )
 {
 	/* These 2 use the graphics and scroll value */
-	tilemap_0a = tilemap_create(get_tile_info_0a,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,0x20,0x10);
+	tilemap_0a = tilemap_create(get_tile_info_0a,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,0x20,0x10);
 	tilemap_0b = tilemap_create(get_tile_info_0b,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,0x20,0x10);
 	/* Text (No scrolling) */
 	tilemap_1  = tilemap_create(get_tile_info_1,tilemap_scan_rows_extra,TILEMAP_TYPE_PEN,8,8,0x24,0x20);
