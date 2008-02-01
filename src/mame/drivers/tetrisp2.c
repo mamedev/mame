@@ -28,8 +28,8 @@ To Do:
 
 Notes:
 
--   The Japan set doesn't seem to have (or use) NVRAM. I can't enter
-    a test mode or use the service coin either !?
+-   The Japan set of Tetris Plus 2 doesn't seem to have (or use) NVRAM. I can't
+    enter a test mode or use the service coin either !?
 
 ***************************************************************************/
 
@@ -595,48 +595,46 @@ ADDRESS_MAP_END
                             Tetris Plus 2 (World)
 ***************************************************************************/
 
-#define TETPLUS2_COMMON\
-	PORT_START_TAG("IN0") /*$be0002.w*/ \
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)\
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNUSED )\
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)\
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)\
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)\
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)\
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)\
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)\
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)\
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )\
-	PORT_START_TAG("IN1") /*$be0004.w*/\
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1   )\
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_START2   )\
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )\
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_COIN1    )\
-	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_COIN2    )\
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_SPECIAL  )	/* ?*/\
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SPECIAL  )	/* ?*/\
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )\
+static INPUT_PORTS_START( tetrisp2 )
+
+	PORT_START_TAG("IN0") /*$be0002.w*/
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("IN1") /*$be0004.w*/
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1   )
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_START2   )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_COIN2    )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_SPECIAL  )	/* ?*/
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SPECIAL  )	/* ?*/
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-
-static INPUT_PORTS_START( tetrisp2 )
-TETPLUS2_COMMON
-
 	PORT_START_TAG("IN2") //$be0008.w
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -645,7 +643,7 @@ TETPLUS2_COMMON
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
@@ -654,31 +652,31 @@ TETPLUS2_COMMON
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Vs Mode Rounds" )
+	PORT_DIPNAME( 0x0400, 0x0400, "Vs Mode Rounds" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0400, "3" )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Language ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "F.B.I Logo" )
+	PORT_DIPNAME( 0x1000, 0x1000, "F.B.I Logo" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Voice" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Voice" ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -687,63 +685,26 @@ INPUT_PORTS_END
 
 /***************************************************************************
                             Tetris Plus 2 (Japan)
+
+    The code for checking the "service mode" and "free play"
+    DSWs is (deliberately?) bugged in this set
+
 ***************************************************************************/
 
-
 static INPUT_PORTS_START( teplus2j )
-TETPLUS2_COMMON
+	PORT_INCLUDE(tetrisp2)
 
-/*
-    The code for checking the "service mode" and "free play" DSWs
-    is (deliberately?) bugged in this set
-*/
-	PORT_START_TAG("IN2")	// $be0008.w
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 1-6" )
+	PORT_MODIFY("IN2")	// $be0008.w
+	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 1-7" ) PORT_DIPLOCATION("SW1:7") /* Free Play in "World" set */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-7" )
+	PORT_DIPNAME( 0x0080, 0x0080, "Unknown 1-8" ) PORT_DIPLOCATION("SW1:8") /* Test Mode in "World" set */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Vs Mode Rounds" )
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0x0400, "3" )
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED  ) // Language dip
-	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 2-4" )	// F.B.I. Logo (in the USA set?)
+	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0010, "SW2:4" ) /* Language Select in "World" set */
+	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 2-5" ) PORT_DIPLOCATION("SW2:5") /* F.B.I. Logo in "World" set */
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Voice" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -1229,9 +1190,9 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-                                Tetris Plus 2
+                            Tetris Plus 2 (World & Japan sets)
 
-(C) Jaleco 1996
+(c)1997 Jaleco / The Tetris Company
 
 TP-97222
 96019 EB-00-20117-0
@@ -1239,11 +1200,14 @@ MDK332V-0
 
 BRIEF HARDWARE OVERVIEW
 
-Toshiba TMP68HC000P-12
-Yamaha YMZ280B-F
-OSC: 12.000MHz, 48.000MHz, 16.9344MHz
+CPU:    Toshiba TMP68HC000P-12
+Sound:  Yamaha YMZ280B-F & Yamaha  YAC516-M
+OSC:    12.000MHz
+        48.0000MHz
+        16.9344MHz
+DIPS:   Two 8-way dipswitches
 
-Listing of custom chips. (Some on scan are hard to read).
+Listing of custom chips:
 
 IC38    JALECO SS91022-03 9428XX001
 IC31    JALECO SS91022-05 9347EX002
@@ -1252,10 +1216,21 @@ IC30    JALECO GS91022-04 9721PD008
 IC39    XILINX XC5210 PQ240C X68710M AKJ9544
 IC49    XILINX XC7336 PC44ACK9633 A63458A
 
+World set:
+  Supports English or Japanese language
+  Optional showing of US FBI Logo
+  Full Test Mode via dipswitch
+  EEPROM used
+
+Japan Set:
+  Japanese language only
+  No optional FBI Logo
+  No way to enter a Test Mode
+  No support for EEPROM
+
 ***************************************************************************/
 
-ROM_START( tetrisp2 )
-
+ROM_START( tetrisp2 ) /* Unknown version */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "t2p_04.rom", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
 	ROM_LOAD16_BYTE( "t2p_01.rom", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
@@ -1263,10 +1238,9 @@ ROM_START( tetrisp2 )
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "96019-01.9", 0x000000, 0x400000, CRC(06f7dc64) SHA1(722c51b707b9854c0293afdff18b27ec7cae6719) )
 	ROM_LOAD32_WORD( "96019-02.8", 0x000002, 0x400000, CRC(3e613bed) SHA1(038b5e43fa3d69654107c8093126eeb2e8fa4ddc) )
-	/* If t2p_m01&2 from this board were correctly read, since they
-       hold the same data of the above but with swapped halves, it
-       means they had to invert the top bit of the "page select"
-       register in the sprite's hardware on this board! */
+
+	/* If t2p_m01&2 from this board were correctly read, since they hold the same data of the above but with swapped halves, it
+           means they had to invert the top bit of the "page select" register in the sprite's hardware on this board! */
 
 	ROM_REGION( 0x800000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x8 (Background) */
 	ROM_LOAD( "96019-06.13", 0x000000, 0x400000, CRC(16f7093c) SHA1(2be77c6a692c5d762f5553ae24e8c415ab194cc6) )
@@ -1280,36 +1254,11 @@ ROM_START( tetrisp2 )
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
-
 ROM_END
 
-
-/***************************************************************************
-
-                            Tetris Plus 2 (Japan)
-
-(c)1997 Jaleco / The Tetris Company
-
-TP-97222
-96019 EB-00-20117-0
-
-CPU:    68000-12
-Sound:  YMZ280B-F
-OSC:    12.000MHz
-        48.0000MHz
-        16.9344MHz
-
-Custom: SS91022-03
-        GS91022-04
-        GS91022-05
-        SS91022-05
-
-***************************************************************************/
-
-ROM_START( teplus2j )
-
+ROM_START( teplus2j ) /* Version 2.2 */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "tet2-4v2.2", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )	// v2.2
+	ROM_LOAD16_BYTE( "tet2-4v2.2", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
 	ROM_LOAD16_BYTE( "tet2-1v2.2", 0x000001, 0x080000, CRC(919116d0) SHA1(3e1c0fd4c9175b2900a4717fbb9e8b591c5f534d) )
 
 	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_DISPOSE )	/* 8x8x8 (Sprites) */
@@ -1327,16 +1276,77 @@ ROM_START( teplus2j )
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
-
 ROM_END
 
-/***
+/***************************************************************************
 
-Rock 'n' Tread
+                            Rock'n Tread 1 (Japan)
+                            Rock'n Tread 2 (Japan)
+                            Rock'n MegaSession (Japan)
+                            Rock'n 3 (Japan)
+                            Rock'n 4 (Japan)
 
-***/
+(c)1999-2000 Jaleco
+
+Main board marked in copper and silk screen:
+
+	JALECO VJ-98344
+	98053 EB-00-20120-0
+	MADE IN JAPAN
+
+CPU:    TMP68HC000P-12
+Sound:  YMZ280B-F / YAC516-M (on sound rom board)
+OSC:    12.0000MHz (next to 68000)
+        48.0000MHz
+        16.9344MHz (on sound rom board)
+DIPS:   Two 8-way dipswitches
+BAT:    CR-2032
+
+Custom: SS91022-03
+        GS91022-04
+        GS91022-05
+        SS91022-05
+
+Other:  Sigma XILINX XCS30
+        Sigma XILINX XC9536 (socketted and stamped SL4)
+
+
+PCB Layout for sound rom board (from Rock'n 3):
+
+JALECO 99004 SL-99352 EB-00-20128-0
++------------------------------------------------------+
+|                                                      |
+| mr99029-02 mr99029-10 mr99029-18 mr99029-01  IC36*   |
+| mr99029-03 mr99029-11 mr99029-19  IC29*      IC37*   |
+| mr99029-04 mr99029-12 mr99029-20                     |
+| mr99029-05 mr99029-13 mr99029-21                     |
+| mr99029-06 mr99029-14  IC23*        YMZ280B-F        |
+| mr99029-07 mr99029-15  IC24*      16.9344MHz         |
+| mr99029-08 mr99029-16  IC25*        XC9572           |
+| mr99029-09 mr99029-17  IC26*                         |
+|                       YAC516-M                       |
+|   CN1        CN2                       CN4           |
++-||||||||---||||||||----------------------------------+
+
+Notes:
+  All chip sockets are marked as 27C3200 (read as 27C322)
+  Chips are OKI M72C3252C2 mounted on Jaleco PCB EB-00-40051-0 42 pin converters
+
+* Unpopulated sockets
+
+Sound chips: Yamaha YMZ280B-F & Yamaha YAC516-M
+ Other chip: Sigma XILINX XC9572
+        OSC: 16.9344MHz
+
+  CN1 - 8 pin header
+  CN2 - 8 pin header
+  CN4 - 34 pin dual row ribbon connection
+
+***************************************************************************/
+
+/***  Rock 'n' Tread  ***/
+
 ROM_START( rockn )
-
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_1.bin", 0x000001, 0x80000, CRC(4cf79e58) SHA1(f50e596d43c9ab2072ae0476169eee2a8512fd8d) )
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_4.bin", 0x000000, 0x80000, CRC(caa33f79) SHA1(8ccff67091dac5ad871cae6cdb31e1fc37c1a4c2) )
@@ -1374,36 +1384,10 @@ ROM_START( rockn )
 	ROM_LOAD( "sound14", 0x4400000, 0x0400000, CRC(b26f9a81) SHA1(0d1c8e382eb5877f9a748ff289be97cbdb73b0cc)  ) // bank 4
 ROM_END
 
-/***************************************************************************
-
-                            Rock'n Tread 1 (Japan)
-                            Rock'n Tread 2 (Japan)
-                            Rock'n MegaSession (Japan)
-                            Rock'n 3 (Japan)
-                            Rock'n 4 (Japan)
-
-(c)1997 Jaleco
-
-CPU:    68000-12
-Sound:  YMZ280B-F / YAC516-M (on sound rom board)
-OSC:    12.000MHz
-        48.0000MHz
-        16.9344MHz (on sound rom board)
-
-Custom: SS91022-03
-        GS91022-04
-        GS91022-05
-        SS91022-05
-
-Other:  Sigma XILINX XCS30
-        Sigma XILINX XC9536 (socketted and stamped SL4)
-
-***************************************************************************/
-
 ROM_START( rockna )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x80000, CRC(6078fa48) SHA1(e98c1a1abf026f2d5b5035ccbc9d412a08ca1f02) )
-	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x80000, CRC(c8310bd0) SHA1(1efee954cc94b668b7d9f28a099b8d1c83d3093f) )
+	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_1", 0x000001, 0x80000, CRC(6078fa48) SHA1(e98c1a1abf026f2d5b5035ccbc9d412a08ca1f02) )
+	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_4", 0x000000, 0x80000, CRC(c8310bd0) SHA1(1efee954cc94b668b7d9f28a099b8d1c83d3093f) )
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )	/* 8x8x8 (Sprites) */
 	ROM_LOAD32_WORD( "rock_n_1_vj-98344_8.bin", 0x000002, 0x200000, CRC(fa3f6f9c) SHA1(586dcc690a1a4aa7c97932ad496382def6a074a4) )
@@ -1435,9 +1419,7 @@ ROM_START( rockna )
 	ROM_LOAD( "sound12", 0x3c00000, 0x0400000, CRC(aae8d59c) SHA1(ccca1f511ce0ea8d452f3b1d24350b5cee402ad2)  ) // bank 3
 	ROM_LOAD( "sound13", 0x4000000, 0x0400000, CRC(9ec1459b) SHA1(10e08a47636dec431cdb8e105cf61287fe9c6637)  ) // bank 4
 	ROM_LOAD( "sound14", 0x4400000, 0x0400000, CRC(b26f9a81) SHA1(0d1c8e382eb5877f9a748ff289be97cbdb73b0cc)  ) // bank 4
-
 ROM_END
-
 
 ROM_START( rockn2 )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
@@ -1459,7 +1441,7 @@ ROM_START( rockn2 )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(4e9611a3) SHA1(2a9b1d5afc0ea9a3285f9fc6b49a1c3abd8cd2a5)  ) // COMMON AREA
-	ROM_FILL(              0x0400000, 0x0c00000, 0xff ) 		  // BANK AREA
+	ROM_FILL(            0x0400000, 0x0c00000, 0xff )		// BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(ec600f13) SHA1(151cb0a16782c8bba223d0f6881b80c1e43bc9bc)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(8306f302) SHA1(8c0437d7ab8d74d4d15f4a641d30602e39cdd99d)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(3fda842c) SHA1(2b9e7c548b689bab491237e36a2dcf4782a81d79)  ) // bank 0
@@ -1481,22 +1463,14 @@ ROM_START( rockn2 )
 	ROM_LOAD( "sound19", 0x5800000, 0x0400000, CRC(33c89e53) SHA1(7d216f5db6b30c9b05a9a77030498ff68ae6fbad)  ) // bank 6
 	ROM_LOAD( "sound20", 0x5c00000, 0x0400000, CRC(89c1b088) SHA1(9b4118815959a5fb65b2a293015f592a46f4126f)  ) // bank 6
 	ROM_LOAD( "sound21", 0x6000000, 0x0400000, CRC(13db74bd) SHA1(ab87438bbac97d46b1b8195b61dca1d72172a621)  ) // bank 6
-
+//	ROM_LOAD( "sound22", 0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC24)
+//	ROM_LOAD( "sound23", 0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC25)
+//	ROM_LOAD( "sound24", 0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC26)
 ROM_END
 
 /***************************************************************************
 
 Jaleco Rock'n 3
-Board marked in copper and silk screen:
-
-	JALECO VJ-98344
-	98053 EB-00-20120-0
-	MADE IN JAPAN
-
-CPU: TMP68HC000P-12
-OSC: 48MHz & 12MHz (next to 68000)
-DIP: Two 8-way dipswitches
-BAT: CR-2032
 
 Labeled on the chips like:
 
@@ -1511,6 +1485,7 @@ ROM ID       Label                    Rom type
 IC19    Rock'n 3 VJ-98344 10 Ver 1.0    27C040
 IC59    Rock'n 3 VJ-98344 4  Ver 1.0    27C040
 IC65    Rock'n 3 VJ-98344 1  Ver 1.0    27C040
+
 IC10    Rock'n 3 VJ-98344 13 Ver 1.0    27C160
 IC33    Rock'n 3 VJ-98344 9  Ver 1.0    27C160
 IC32    Rock'n 3 VJ-98344 8  Ver 1.0    27C160
@@ -1521,39 +1496,6 @@ IC14    PS96019-02              ICT 18CV8P PAL
 IC58    PS96019-04              ICT 18CV8P PAL
 
 IC43   (no label) XILINX 17S30PC  Serial Config rom
-
-
-PCB Layout (sound rom board only)
-----------
-
-JALECO 99004 SL-99352 EB-00-20128-0
-+------------------------------------------------------+
-|                                                      |
-| mr99029-02 mr99029-10 mr99029-18 mr99029-01  IC36*   |
-| mr99029-03 mr99029-11 mr99029-19  IC29*      IC37*   |
-| mr99029-04 mr99029-12 mr99029-20                     |
-| mr99029-05 mr99029-13 mr99029-21                     |
-| mr99029-06 mr99029-14  IC23*        YMZ280B-F        |
-| mr99029-07 mr99029-15  IC24*      16.9344MHz         |
-| mr99029-08 mr99029-16  IC25*        XC9572           |
-| mr99029-09 mr99029-17  IC26*                         |
-|                       YAC516-M                       |
-|   CN1        CN2                       CN4           |
-+-||||||||---||||||||----------------------------------+
-
-Notes:
-  All chip sockets are marked as 27C3200 (read as 27C322)
-  Chips are OKI M72C3252C2 mounted on Jaleco PCB EB-00-40051-0 42 pin converters
-
-* Unpopulated sockets
-
-Sound chips: Yamaha YMZ280B-F & Yamaha YAC516-M
- Other chip: Sigma XILINX XC9572
-        OSC: 16.9344MHz
-
-  CN1 - 8 pin header
-  CN2 - 8 pin header
-  CN4 - 34 pin dual row ribbon connection
 
 ***************************************************************************/
 
@@ -1598,35 +1540,33 @@ ROM_START( rockn3 )
 	ROM_LOAD( "mr99029-19.ic20", 0x5400000, 0x0400000, CRC(dbb2c228) SHA1(f7cd24026236e2c616376c695b9e986cc221f36d)  ) // bank 5 (alt PCB number 18)
 	ROM_LOAD( "mr99029-20.ic21", 0x5800000, 0x0400000, CRC(9efdae1c) SHA1(6158a1804fbaa9ce27ae7e12cfda5f49084b4998)  ) // bank 6 (alt PCB number 19)
 	ROM_LOAD( "mr99029-21.ic22", 0x5c00000, 0x0400000, CRC(5f301b83) SHA1(e24e85c43a62871360545aa42dfa439045334b79)  ) // bank 6 (alt PCB number 20)
-//	ROM_LOAD( "ic23",            0x6000000, ) // bank 6 ( ** unpopulated **  -  alt PCB number 21)
-//	ROM_LOAD( "ic24",            0x6400000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 22)
-//	ROM_LOAD( "ic25",            0x6800000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 23)
-//	ROM_LOAD( "ic26",            0x6c00000, ) // bank 7 ( ** unpopulated **  -  alt PCB number 24)
-
+//	ROM_LOAD( "ic23",            0x6000000, 0x0400000 ) // bank 6 ( ** unpopulated **  -  alt PCB number 21)
+//	ROM_LOAD( "ic24",            0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 22)
+//	ROM_LOAD( "ic25",            0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 23)
+//	ROM_LOAD( "ic26",            0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 24)
 ROM_END
 
-
-ROM_START( rockn4 )
+ROM_START( rockn4 ) /* Prototype */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x80000, CRC(c666caea) SHA1(57018de40d71fe214a6b5cc33c8ad5e88622d010) )
-	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x80000, CRC(cc94e557) SHA1(d38abed04239d9eecf1b1be7a9f765a1b7aa0d8d) )
+	ROM_LOAD16_BYTE( "rock_n_4_vj-98344_1.bin", 0x000001, 0x80000, CRC(c666caea) SHA1(57018de40d71fe214a6b5cc33c8ad5e88622d010) )
+	ROM_LOAD16_BYTE( "rock_n_4_vj-98344_4.bin", 0x000000, 0x80000, CRC(cc94e557) SHA1(d38abed04239d9eecf1b1be7a9f765a1b7aa0d8d) )
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )	/* 8x8x8 (Sprites) */
-	ROM_LOAD32_WORD( "spr1", 0x000002, 0x200000, CRC(5eeae537) SHA1(6bb8c658a2985c3919f0590a0147eead995c01c9) )
-	ROM_LOAD32_WORD( "spr0", 0x000000, 0x200000, CRC(3fedddc9) SHA1(4bd8f402ecf8e6255326927e825179fa6d300e73) )
+	ROM_LOAD32_WORD( "rock_n_4_vj-98344_8.bin", 0x000002, 0x200000, CRC(5eeae537) SHA1(6bb8c658a2985c3919f0590a0147eead995c01c9) )
+	ROM_LOAD32_WORD( "rock_n_4_vj-98344_9.bin", 0x000000, 0x200000, CRC(3fedddc9) SHA1(4bd8f402ecf8e6255326927e825179fa6d300e73) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x8 (Background) */
-	ROM_LOAD16_WORD( "back", 0x000000, 0x200000, CRC(ead41e79) SHA1(9c24b1e52b6ed43d5b5a1caf48f2974b8fa61f4a)  )
+	ROM_LOAD16_WORD( "rock_n_4_vj-98344_13.bin", 0x000000, 0x200000, CRC(ead41e79) SHA1(9c24b1e52b6ed43d5b5a1caf48f2974b8fa61f4a)  )
 
 	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE )	/* 16x16x8 (Rotation) */
-	ROM_LOAD( "rot", 0x000000, 0x200000, CRC(eb16fc67) SHA1(5be40f2c9a5693785268eafcfcf348f147533463)  )
+	ROM_LOAD( "rock_n_4_vj-98344_6.bin", 0x000000, 0x200000, CRC(eb16fc67) SHA1(5be40f2c9a5693785268eafcfcf348f147533463)  )
 
 	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE )	/* 8x8x8 (Foreground) */
-	ROM_LOAD( "front", 0x000000, 0x100000, CRC(37d50259) SHA1(fd02f98a981470c47889f0b2f813ce59373a4b42)  )
+	ROM_LOAD( "rock_n_4_vj-98344_10.bin", 0x000000, 0x100000, CRC(37d50259) SHA1(fd02f98a981470c47889f0b2f813ce59373a4b42)  )
 
 	ROM_REGION( 0x7000000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "sound00", 0x0000000, 0x0400000, CRC(918ea8eb) SHA1(0cd82859634635b6ce49db36fb91ed3365a101eb)  ) // COMMON AREA
-	ROM_FILL(              0x0400000, 0x0c00000, 0xff ) 		  // BANK AREA
+	ROM_FILL(            0x0400000, 0x0c00000, 0xff ) 		  // BANK AREA
 	ROM_LOAD( "sound01", 0x1000000, 0x0400000, CRC(c548e51e) SHA1(4fe1e35c9ed4366dce98b4f4c00f94e202ef15dc)  ) // bank 0
 	ROM_LOAD( "sound02", 0x1400000, 0x0400000, CRC(ffda0253) SHA1(9b8ae98accc2f72a1cd881086f89e647e4904ad9)  ) // bank 0
 	ROM_LOAD( "sound03", 0x1800000, 0x0400000, CRC(1f813af5) SHA1(a72d842e39b9fc955a2fc6721673b34b1b591e4a)  ) // bank 0
@@ -1637,7 +1577,6 @@ ROM_START( rockn4 )
 	ROM_LOAD( "sound08", 0x2c00000, 0x0400000, CRC(6e7e3f23) SHA1(4b9b959f79254d0633f1c4324b7ee6a17e222308)  ) // bank 2
 	ROM_LOAD( "sound09", 0x3000000, 0x0400000, CRC(39fa512f) SHA1(d07426bc74492496756b67b8ded1b507726720c7)  ) // bank 2
 ROM_END
-
 
 ROM_START( rocknms )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* 68000 Code */
@@ -1707,12 +1646,12 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World?)", GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1997, teplus2j, tetrisp2, tetrisp2, teplus2j, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1999, rockn,    0,        rockn,    rockn,   rockn,    ROT270, "Jaleco", "Rock'n Tread (Japan)", GAME_SUPPORTS_SAVE)
 GAME( 1999, rockna,   rockn,    rockn,    rockn,   rockn1,   ROT270, "Jaleco", "Rock'n Tread (Japan, alternate)", GAME_SUPPORTS_SAVE)
 GAME( 1999, rockn2,   0,        rockn2,   rockn,   rockn2,   ROT270, "Jaleco", "Rock'n Tread 2 (Japan)", GAME_SUPPORTS_SAVE)
-GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0, "Jaleco", "Rock'n MegaSession (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0,   "Jaleco", "Rock'n MegaSession (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1999, rockn3,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco", "Rock'n 3 (Japan)", GAME_SUPPORTS_SAVE)
 GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco (PCCWJ)", "Rock'n 4 (Japan, prototype)", GAME_SUPPORTS_SAVE)
