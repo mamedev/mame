@@ -118,7 +118,7 @@ static TILE_GET_INFO( get_ms32_tx0_tile_info )
 	int tileno, colour;
 
 	tileno = ms32_tx0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_tx0_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_tx0_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(3,tileno,colour,0);
 }
@@ -128,7 +128,7 @@ static TILE_GET_INFO( get_ms32_tx1_tile_info )
 	int tileno, colour;
 
 	tileno = ms32_tx1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_tx1_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_tx1_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(7,tileno,colour,0);
 }
@@ -152,7 +152,7 @@ static TILE_GET_INFO( get_ms32_bg0_tile_info )
 	int tileno,colour;
 
 	tileno = ms32_bg0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_bg0_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_bg0_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(2,tileno,colour,0);
 }
@@ -162,7 +162,7 @@ static TILE_GET_INFO( get_ms32_bg1_tile_info )
 	int tileno,colour;
 
 	tileno = ms32_bg1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_bg1_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_bg1_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(6,tileno,colour,0);
 }
@@ -271,7 +271,7 @@ static TILE_GET_INFO( get_ms32_roz0_tile_info )
 	int tileno,colour;
 
 	tileno = ms32_roz0_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_roz0_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_roz0_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(1,tileno,colour,0);
 }
@@ -281,7 +281,7 @@ static TILE_GET_INFO( get_ms32_roz1_tile_info )
 	int tileno,colour;
 
 	tileno = ms32_roz1_ram[tile_index *2+0] & 0x0000ffff;
-	colour = ms32_roz1_ram[tile_index *2+1] & 0x000000f0;
+	colour = ms32_roz1_ram[tile_index *2+1] & 0x0000000f;
 
 	SET_TILE_INFO(5,tileno,colour,0);
 }
@@ -1406,12 +1406,12 @@ ROM_START( bnstars1 )
 	ROM_LOAD32_WORD( "mr96004-08.31",   0x0c00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
 
 	/* Roz Tiles #1 (Screen 1) */
-	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
-	ROM_LOAD( "mr96004-09.1", 0x000000, 0x200000, BAD_DUMP CRC(603143e8) SHA1(197ff72d4a6bf9cc5e89505c1a25edad104a9a65) )
+	ROM_REGION( 0x400000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr96004-09.1", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* Roz Tiles #2 (Screen 2) */
-	ROM_REGION( 0x200000, REGION_GFX3, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
-	ROM_LOAD( "mr96004-09.7", 0x000000, 0x200000, BAD_DUMP CRC(603143e8) SHA1(197ff72d4a6bf9cc5e89505c1a25edad104a9a65) )
+	ROM_REGION( 0x400000, REGION_GFX3, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr96004-09.7", 0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
 
 	/* BG Tiles #1 (Screen 1?) */
 	ROM_REGION( 0x200000, REGION_GFX4, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
@@ -1436,11 +1436,11 @@ ROM_START( bnstars1 )
 
 	/* Samples #1 (Screen 1?) */
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples - 8-bit signed PCM */
-	ROM_LOAD( "mr96004-10.1",  0x000000, 0x200000, BAD_DUMP CRC(125661cd) SHA1(7c5fd952fb756364cc0ab6a53072f5cf8a04486c) )
+	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 
 	/* Samples #2 (Screen 2?) */
 	ROM_REGION( 0x400000, REGION_SOUND2, 0 ) /* samples - 8-bit signed PCM */
-	ROM_LOAD( "mr96004-10.1",  0x000000, 0x200000, BAD_DUMP CRC(125661cd) SHA1(7c5fd952fb756364cc0ab6a53072f5cf8a04486c) )
+	ROM_LOAD( "mr96004-10.1",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 ROM_END
 
 
