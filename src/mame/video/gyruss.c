@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "video/resnet.h"
 
 
 static UINT8 flipscreen;
@@ -40,39 +41,61 @@ static UINT32 scanline;
 ***************************************************************************/
 PALETTE_INIT( gyruss )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors; i++)
-	{
-		UINT8 pen;
-		int bit0, bit1, bit2, r, g, b;
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 470, 0,
+			3, &resistances_rg[0], gweights, 470, 0,
+			2, &resistances_b[0],  bweights, 470, 0);
 
-		if (i < 0x40)
-			/* characters */
-			pen = (color_prom[0x120 + (i - 0x00)] & 0x0f) | 0x10;
-		else
-			/* sprites */
-			pen = (color_prom[0x020 + (i - 0x40)] & 0x0f) | 0x00;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 32);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[pen] >> 0) & 0x01;
-		bit1 = (color_prom[pen] >> 1) & 0x01;
-		bit2 = (color_prom[pen] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
 		/* green component */
-		bit0 = (color_prom[pen] >> 3) & 0x01;
-		bit1 = (color_prom[pen] >> 4) & 0x01;
-		bit2 = (color_prom[pen] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
 
 		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[pen] >> 6) & 0x01;
-		bit2 = (color_prom[pen] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 32;
+
+	/* sprites map to the lower 16 palette entries */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* characters map to the upper 16 palette entries */
+	for (i = 0x100; i < 0x140; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry + 0x10);
 	}
 }
 
@@ -126,7 +149,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 			sy = 241 - sr[offs + 3];
 			if (sy > line-16 && sy <= line)
 			{
-				drawgfx(bitmap,machine->gfx[1 + (sr[offs + 1] & 1)],
+				drawgfx(bitmap,machine->gfx[sr[offs + 1] & 1],
 						sr[offs + 1]/2 + 4*(sr[offs + 2] & 0x20),
 						sr[offs + 2] & 0x0f,
 						!(sr[offs + 2] & 0x40),sr[offs + 2] & 0x80,
@@ -161,7 +184,7 @@ VIDEO_UPDATE( gyruss )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,machine->gfx[2],
 				videoram[offs] + 8 * (colorram[offs] & 0x20),
 				colorram[offs] & 0x0f,
 				flipx,flipy,
@@ -192,7 +215,7 @@ VIDEO_UPDATE( gyruss )
 		}
 
 		if ((colorram[offs] & 0x10) != 0)
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[2],
 					videoram[offs] + 8 * (colorram[offs] & 0x20),
 					colorram[offs] & 0x0f,
 					flipx,flipy,

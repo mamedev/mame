@@ -27,51 +27,72 @@ PALETTE_INIT( 1943 )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
-	{
-		UINT8 pen;
-		int bit0, bit1, bit2, bit3, r, g, b;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-		if (i < 0x80)
-			/* characters use colors 64-79 */
-			pen = ((color_prom[0x300 + (i - 0x000)] & 0x0f) << 0) | 0x40;
-		else if (i < 0x180)
-			/* foreground tiles use colors 0-63 */
-			pen = ((color_prom[0x500 + (i - 0x080)] & 0x03) << 4) |
-				  ((color_prom[0x400 + (i - 0x080)] & 0x0f) << 0) | 0x00;
-		else if (i < 0x280)
-			/* background tiles use colors 0-63 */
-			pen = ((color_prom[0x700 + (i - 0x180)] & 0x03) << 4) |
-				  ((color_prom[0x600 + (i - 0x180)] & 0x0f) << 0) | 0x00;
-		else
-			/* sprites use colors 128-255
-               bit 3 of BMPROM.07 selects priority over the background,
-               but we handle it differently for speed reasons */
-			pen = ((color_prom[0x900 + (i - 0x280)] & 0x07) << 4) |
-				  ((color_prom[0x800 + (i - 0x280)] & 0x0f) << 0) | 0x80;
+	for (i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[pen + 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[pen + 0x000] >> 1) & 0x01;
-		bit2 = (color_prom[pen + 0x000] >> 2) & 0x01;
-		bit3 = (color_prom[pen + 0x000] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* green component */
-		bit0 = (color_prom[pen + 0x100] >> 0) & 0x01;
-		bit1 = (color_prom[pen + 0x100] >> 1) & 0x01;
-		bit2 = (color_prom[pen + 0x100] >> 2) & 0x01;
-		bit3 = (color_prom[pen + 0x100] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
 		/* blue component */
-		bit0 = (color_prom[pen + 0x200] >> 0) & 0x01;
-		bit1 = (color_prom[pen + 0x200] >> 1) & 0x01;
-		bit2 = (color_prom[pen + 0x200] >> 2) & 0x01;
-		bit3 = (color_prom[pen + 0x200] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
+
+	/* characters use colors 0x40-0x4f */
+	for (i = 0x00; i < 0x80; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x40;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* foreground tiles use colors 0x00-0x3f */
+	for (i = 0x80; i < 0x180; i++)
+	{
+		UINT8 ctabentry = ((color_prom[0x200 + (i - 0x080)] & 0x03) << 4) |
+				  		  ((color_prom[0x100 + (i - 0x080)] & 0x0f) << 0);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* background tiles also use colors 0x00-0x3f */
+	for (i = 0x180; i < 0x280; i++)
+	{
+		UINT8 ctabentry = ((color_prom[0x400 + (i - 0x180)] & 0x03) << 4) |
+				  		  ((color_prom[0x300 + (i - 0x180)] & 0x0f) << 0);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* sprites use colors 0x80-0xff
+       bit 3 of BMPROM.07 selects priority over the background,
+       but we handle it differently for speed reasons */
+	for (i = 0x280; i < 0x380; i++)
+	{
+		UINT8 ctabentry = ((color_prom[0x600 + (i - 0x280)] & 0x07) << 4) |
+				  		  ((color_prom[0x500 + (i - 0x280)] & 0x0f) << 0) | 0x80;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -144,6 +165,7 @@ static TILE_GET_INFO( c1943_get_bg_tile_info )
 	int color = (attr & 0x3c) >> 2;
 	int flags = TILE_FLIPYX((attr & 0xc0) >> 6);
 
+	tileinfo->group = color;
 	SET_TILE_INFO(1, code, color, flags);
 }
 
@@ -167,7 +189,7 @@ VIDEO_START( 1943 )
 	fg_tilemap = tilemap_create(c1943_get_fg_tile_info, tilemap_scan_rows,
 		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(bg_tilemap, 0);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[1], 0x0f);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
