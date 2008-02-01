@@ -114,7 +114,7 @@ Interrupts: VBlank causes an IRQ. Coin insertion causes a NMI.
 
 Stephh's notes (based on the games M6502 code and some tests) :
 
-1)  'vanguard' and clones
+1a) 'vanguard'
 
   - There are 5 different coinage settings according to the game code
     which are based on DSW bits 1 to 3 :
@@ -127,14 +127,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
        ON      ON      OFF      1C_6C
 
     The 3 other combinaisons give 1C_1C
-    
   - From the manual, it says that DSW bit 6 determines the cost of a game :
       * bit 6 = 0 : "25c / game"
       * bit 6 = 1 : "50c / game"
     When you look at the game code, it appears to be some of "Bonus Coinage" :
       * bit 6 = 0 : you get an additional credit each time you insert 1 coin
       * bit 6 = 1 : you get an additional credit each time you insert 2 coins
-
   - So, instead of having something like this :
         PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:!2,!3,!4")
         PORT_DIPSETTING(    0x02, "25c= 1C/1C 2C/3C 50c= 2C/2C" )
@@ -151,14 +149,32 @@ Stephh's notes (based on the games M6502 code and some tests) :
         PORT_DIPSETTING(    0x00, "25c / game" )
         PORT_DIPSETTING(    0x40, "50c / game" )
 	or using conditional Dip Switches, I've coded this the way I did.
+  - You can always continue, provided you're on the 1st pattern.
+    The continue text is in English !
+  - 10 letters when you enter your initials
+
+1b) 'vangrdce'
+
+  - Code for coinage is the same as for 'vanguard'.
+  - You can always continue, provided you're on the 1st pattern.
+    The continue text is in English !
+  - 3 letters when you enter your initials
+
+1c) 'vanguarj'
+
+  - Code for coinage is the same as for 'vanguard'.
+  - You can always continue, provided you're on the 1st pattern.
+    The continue text is in Japanese !
+  - 10 letters when you enter your initials
 
 2a) 'fantasy'
 
   - Code for coinage is the same as for 'vanguard'.
-  - I can't tell if it's an ingame bug or not, but there's a mix
-    between "COIN" and "CREDIT" ("COCR" is displayed)
   - You can always continue, provided you're on the 1st pattern.
     Note that the continue text is in German !
+  - 3 letters when you enter your initials
+  - I can't tell if it's an ingame bug or not, but there's a mix
+    between "COIN" and "CREDIT" ("COCR" is displayed)
 
 2b) 'fantasyu'
 
@@ -167,6 +183,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     where you have a sword and an easier maze.
   - Code has been added to test DSW bit 7 to allow or not a continue play.
     Note that the continue play is only available on the 1st pattern.
+  - 3 letters when you enter your initials
   - "Fantasy" is written with different "font" and color
   - "CREDIT" is displayed instead of "COIN"
 
@@ -178,6 +195,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
   - Code has been added to test DSW bit 7 to allow or not a continue play.
     Note that the continue play is only available on the 1st pattern.
     Also note that the continue text is still in English !
+  - 3 letters when you enter your initials
   - "COIN" is correctly displayed.
 
 3)  'pballoon'
@@ -185,6 +203,8 @@ Stephh's notes (based on the games M6502 code and some tests) :
   - Code for coinage is the same as for 'vanguard'.
   - The "Language" Dip Switch only has an effect at the end of the pattern
     when it displays "LAND HERE" or what I suppose to be same in Japanese.
+  - 3 letters when you enter your initials
+  - "CREDIT" is displayed
 
 4a) 'nibbler'
 
