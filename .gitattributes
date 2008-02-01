@@ -2207,6 +2207,7 @@ src/mame/includes/lwings.h svneol=native#text/plain
 src/mame/includes/m107.h svneol=native#text/plain
 src/mame/includes/m52.h svneol=native#text/plain
 src/mame/includes/m57.h svneol=native#text/plain
+src/mame/includes/m58.h svneol=native#text/plain
 src/mame/includes/m62.h svneol=native#text/plain
 src/mame/includes/m72.h svneol=native#text/plain
 src/mame/includes/m92.h svneol=native#text/plain

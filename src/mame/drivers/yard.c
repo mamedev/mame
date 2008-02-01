@@ -1,32 +1,27 @@
 /****************************************************************************
-10 Yard Fight Driver.
 
-L Taylor
-J Clegg
+	Irem M58 hardware
 
-Loosely based on the Kung Fu Master driver.
+	L Taylor
+	J Clegg
+
+	Loosely based on the Kung Fu Master driver.
 
 ****************************************************************************/
 
 #include "driver.h"
+#include "m58.h"
 #include "audio/irem.h"
 
 #define MASTER_CLOCK		XTAL_18_432MHz
 
 
-extern UINT8 *yard_scroll_x_low;
-extern UINT8 *yard_scroll_x_high;
-extern UINT8 *yard_scroll_y_low;
-extern UINT8 *yard_score_panel_disabled;
 
-extern WRITE8_HANDLER( yard_videoram_w );
-extern WRITE8_HANDLER( yard_scroll_panel_w );
-
-extern PALETTE_INIT( yard );
-extern VIDEO_START( yard );
-extern VIDEO_UPDATE( yard );
-
-/* Read/Write Handlers */
+/*************************************
+ *
+ *  Outputs
+ *
+ *************************************/
 
 static WRITE8_HANDLER( yard_flipscreen_w )
 {
@@ -36,7 +31,13 @@ static WRITE8_HANDLER( yard_flipscreen_w )
 	coin_counter_w(1, data & 0x20);
 }
 
-/* Memory Map */
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( yard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
@@ -55,7 +56,13 @@ static ADDRESS_MAP_START( yard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-/* Input Ports */
+
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( yard )
 	PORT_START_TAG("IN0")
@@ -160,18 +167,13 @@ static INPUT_PORTS_START( vsyard )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-/* Graphics Layouts */
 
-static const gfx_layout charlayout =
-{
-	8, 8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
+
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout spritelayout =
 {
@@ -179,22 +181,24 @@ static const gfx_layout spritelayout =
 	RGN_FRAC(1,3),
 	3,
 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	  16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	{ STEP8(0,1), STEP8(16*8,1) },
+	{ STEP16(0,8) },
 	32*8
 };
 
-/* Graphics Decode Information */
 
 static GFXDECODE_START( yard )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,     0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 256, 32 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x3_planar,   0, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,     512, 32 )
 GFXDECODE_END
 
 
-/* Machine Driver */
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( yard )
 
@@ -221,7 +225,13 @@ static MACHINE_DRIVER_START( yard )
 MACHINE_DRIVER_END
 
 
-/* ROMs */
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
+
 ROM_START( 10yard )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "yf-a-3p-b",    0x0000, 0x2000, CRC(2e205ec2) SHA1(fcfa08f45423b35f2c99d4e6b5474ab1b3a84fec) )
@@ -358,7 +368,13 @@ ROM_START( vs10yarj )
 	ROM_LOAD( "yard.2m",      0x0420, 0x0100, CRC(45384397) SHA1(e4c662ee81aef63efd8b4a45f85c4a78dc2d419e) ) /* radar palette high 4 bits */
 ROM_END
 
-/* Game Drivers */
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME( 1983, 10yard,        0, yard, yard,   0, ROT0, "Irem", "10-Yard Fight (World)", 0 )
 GAME( 1983, 10yardj,  10yard, yard, yard,   0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 )

@@ -349,24 +349,9 @@ static void create_palette_lookup(void)
 	palette_lookup = auto_malloc(256 * sizeof(*palette_lookup));
 	for (i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = (i >> 0) & 0x01;
-		bit1 = (i >> 1) & 0x01;
-		bit2 = (i >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
-
-		/* green component */
-		bit0 = (i >> 3) & 0x01;
-		bit1 = (i >> 4) & 0x01;
-		bit2 = (i >> 5) & 0x01;
-		g = combine_3_weights(weights_g, bit0, bit1, bit2);
-
-		/* blue component */
-		bit0 = (i >> 6) & 0x01;
-		bit1 = (i >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
+		int g = combine_3_weights(weights_g, BIT(i,3), BIT(i,4), BIT(i,5));
+		int b = combine_2_weights(weights_b, BIT(i,6), BIT(i,7));
 
 		palette_lookup[i] = MAKE_RGB(r, g, b);
 	}

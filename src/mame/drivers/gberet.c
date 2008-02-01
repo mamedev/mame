@@ -84,7 +84,25 @@ extern VIDEO_UPDATE( gberet );
 extern VIDEO_UPDATE( gberetb );
 
 
-static int enable_NMI, enable_IRQ;
+static UINT8 nmi_enable, irq_enable;
+
+
+/* Interrupt Generators */
+
+static INTERRUPT_GEN( gberet_interrupt )
+{
+	if (cpu_getiloops() == 0)
+	{
+		if (irq_enable)
+			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	}
+
+	if (cpu_getiloops() % 2)
+	{
+		if (nmi_enable)
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	}
+}
 
 
 /* Read/Write Handlers */
@@ -98,8 +116,8 @@ static WRITE8_HANDLER( gberet_coin_counter_w )
 
 static WRITE8_HANDLER( gberet_flipscreen_w )
 {
-	enable_NMI = data & 0x01;
-	enable_IRQ = data & 0x04;
+	nmi_enable = data & 0x01;
+	irq_enable = data & 0x04;
 
 	flip_screen_set(data & 0x08);
 }
@@ -119,8 +137,8 @@ static WRITE8_HANDLER( mrgoemon_coin_counter_w )
 
 static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 {
-	enable_NMI = data & 0x01;
-	enable_IRQ = data & 0x02;
+	nmi_enable = data & 0x01;
+	irq_enable = data & 0x02;
 
 	flip_screen_set(data & 0x08);
 }
@@ -527,23 +545,6 @@ static GFXDECODE_START( gberetb )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, gberetb_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, gberetb_spritelayout, 16*16, 16 )
 GFXDECODE_END
-
-/* Interrupt Generators */
-
-static INTERRUPT_GEN( gberet_interrupt )
-{
-	if (cpu_getiloops() == 0)
-	{
-		if (enable_IRQ)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	}
-
-	if (cpu_getiloops() % 2)
-	{
-		if (enable_NMI)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
 
 /* Machine Drivers */
 

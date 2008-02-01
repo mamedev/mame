@@ -27,66 +27,70 @@ static tilemap* bg_tilemap;
 
 PALETTE_INIT( m52 )
 {
+	const UINT8 *char_pal = color_prom + 0x000;
+	const UINT8 *back_pal = color_prom + 0x200;
+	const UINT8 *sprite_pal = color_prom + 0x220;
+	const UINT8 *sprite_table = color_prom + 0x240;
 	static const int resistances_3[3] = { 1000, 470, 220 };
 	static const int resistances_2[2]  = { 470, 220 };
-	double weights_r[3], weights_g[3], weights_b[3];
+	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
 
 	machine->colortable = colortable_alloc(machine, 512+32+32);
 
 	/* compute palette information for characters/backgrounds */
-	compute_resistor_weights(0,	255, -1.0,
+	scale = compute_resistor_weights(0,	255, -1.0,
 			3, resistances_3, weights_r, 0, 0,
 			3, resistances_3, weights_g, 0, 0,
-			2, resistances_2,  weights_b, 0, 0);
+			2, resistances_2, weights_b, 0, 0);
 
 	/* character palette */
-	for (i = 0;i < 512;i++)
+	for (i = 0; i < 512; i++)
 	{
-		UINT8 promval = color_prom[i];
+		UINT8 promval = char_pal[i];
 		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
 	}
 
 	/* background palette */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 32; i++)
 	{
-		UINT8 promval = color_prom[512+i];
+		UINT8 promval = back_pal[i];
 		int r = combine_3_weights(weights_r, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_2_weights(weights_b, BIT(promval,6), BIT(promval,7));
 
-		colortable_palette_set_color(machine->colortable,i+512,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, 512+i, MAKE_RGB(r,g,b));
 	}
 
 	/* compute palette information for sprites */
-	compute_resistor_weights(0,	255, -1.0,
+	compute_resistor_weights(0,	255, scale,
 			2, resistances_2, weights_r, 470, 0,
 			3, resistances_3, weights_g, 470, 0,
 			3, resistances_3, weights_b, 470, 0);
 
 	/* sprite palette */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 32; i++)
 	{
-		UINT8 promval = color_prom[512+32+i];
+		UINT8 promval = sprite_pal[i];
 		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
 		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
 		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		colortable_palette_set_color(machine->colortable,i+512+32,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, 512+32+i, MAKE_RGB(r,g,b));
 	}
 
 	/* character lookup table */
-	for (i = 0;i < 512;i++)
-		colortable_entry_set_value(machine->colortable,i,i);
+	for (i = 0; i < 512; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* sprite lookup table */
-	for (i = 0;i < 16*4;i++)
+	for (i = 0; i < 16*4; i++)
 	{
-		UINT8 promval = color_prom[512+32+32+((i & 3) | ((i & ~3) << 1))];
+		UINT8 promval = sprite_table[(i & 3) | ((i & ~3) << 1)];
 		colortable_entry_set_value(machine->colortable, 512+i, 512+32+promval);
 	}
 

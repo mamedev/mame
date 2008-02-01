@@ -1,18 +1,13 @@
 /***************************************************************************
 
-  video.c
-
-  10 Yard Fight
-
-L Taylor
-J Clegg
-
-  Functions to emulate the video hardware of the machine.
+	Irem M58 hardware
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
+#include "m58.h"
+#include "video/resnet.h"
 
 UINT8 *yard_scroll_x_low;
 UINT8 *yard_scroll_x_high;
@@ -23,135 +18,106 @@ static mame_bitmap *scroll_panel_bitmap;
 static tilemap *bg_tilemap;
 
 #define SCROLL_PANEL_WIDTH  (14*4)
-#define RADAR_PALETTE_BASE (256+256)
+#define RADAR_PALETTE_BASE	(256)
 
 
-/***************************************************************************
 
-  Convert the color PROMs into a more useable format.
+/*************************************
+ *
+ *  Palette configuration
+ *
+ *************************************/
 
-  10 Yard Fight has two 256x4 character palette PROMs, one 32x8 sprite
-  palette PROM, one 256x4 sprite color lookup table PROM, and two 256x4
-  radar palette PROMs.
-
-  I don't know for sure how the palette PROMs are connected to the RGB
-  output, but it's probably something like this; note that RED and BLUE
-  are swapped wrt the usual configuration.
-
-  bit 7 -- 220 ohm resistor  -- RED
-        -- 470 ohm resistor  -- RED
-        -- 220 ohm resistor  -- GREEN
-        -- 470 ohm resistor  -- GREEN
-        -- 1  kohm resistor  -- GREEN
-        -- 220 ohm resistor  -- BLUE
-        -- 470 ohm resistor  -- BLUE
-  bit 0 -- 1  kohm resistor  -- BLUE
-
-***************************************************************************/
 PALETTE_INIT( yard )
 {
+	const UINT8 *char_lopal = color_prom + 0x000;
+	const UINT8 *char_hipal = color_prom + 0x100;
+	const UINT8 *sprite_pal = color_prom + 0x200;
+	const UINT8 *sprite_table = color_prom + 0x220;
+	const UINT8 *radar_lopal = color_prom + 0x320;
+	const UINT8 *radar_hipal = color_prom + 0x420;
+	static const int resistances_3[3] = { 1000, 470, 220 };
+	static const int resistances_2[2]  = { 470, 220 };
+	double weights_r[3], weights_g[3], weights_b[3], scale;
 	int i;
 
-	machine->colortable = colortable_alloc(machine, 256+16+256);
+	machine->colortable = colortable_alloc(machine, 256+256+16);
+
+	/* compute palette information for characters/radar */
+	scale = compute_resistor_weights(0,	255, -1.0,
+			2, resistances_2, weights_r, 0, 0,
+			3, resistances_3, weights_g, 0, 0,
+			3, resistances_3, weights_b, 0, 0);
 
 	/* character palette */
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
+		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		/* red component */
-		bit0 = 0;
-		bit1 = (color_prom[256] >> 2) & 0x01;
-		bit2 = (color_prom[256] >> 3) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[256] >> 0) & 0x01;
-		bit2 = (color_prom[256] >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		colortable_palette_set_color(machine->colortable,i,MAKE_RGB(r,g,b));
-		colortable_entry_set_value(machine->colortable,i,i);
-
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r,g,b));
 	}
-
-	color_prom += 256;
-	/* color_prom now points to the beginning of the sprite palette */
-
-	/* sprite palette */
-	for (i = 0;i < 16;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-
-		colortable_palette_set_color(machine->colortable,256+i,MAKE_RGB(r,g,b));
-
-		color_prom++;
-	}
-
-	color_prom += 16;
-	/* color_prom now points to the beginning of the sprite lookup table */
-
-	/* sprite lookup table */
-	for (i = 0;i < 256;i++)
-		colortable_entry_set_value(machine->colortable,256+i,256+(*color_prom++ & 0x0f));
-
-	/* color_prom now points to the beginning of the radar palette */
 
 	/* radar palette */
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
+		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		/* red component */
-		bit0 = 0;
-		bit1 = (color_prom[256] >> 2) & 0x01;
-		bit2 = (color_prom[256] >> 3) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[256] >> 0) & 0x01;
-		bit2 = (color_prom[256] >> 1) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		colortable_palette_set_color(machine->colortable, 256+i, MAKE_RGB(r,g,b));
+	}
 
-		colortable_palette_set_color(machine->colortable,256+16+i,MAKE_RGB(r,g,b));
-		colortable_entry_set_value(machine->colortable,256+256+i,256+16+i);
+	/* compute palette information for sprites */
+	scale = compute_resistor_weights(0,	255, scale,
+			2, resistances_2, weights_r, 470, 0,
+			3, resistances_3, weights_g, 470, 0,
+			3, resistances_3, weights_b, 470, 0);
 
-		color_prom++;
+	/* sprite palette */
+	for (i = 0; i < 16; i++)
+	{
+		UINT8 promval = sprite_pal[i];
+		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+
+		colortable_palette_set_color(machine->colortable, 256+256+i, MAKE_RGB(r,g,b));
+	}
+
+	/* character lookup table */
+	for (i = 0; i < 256; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* radar lookup table */
+	for (i = 0; i < 256; i++)
+		colortable_entry_set_value(machine->colortable, 256+i, 256+i);
+
+	/* sprite lookup table */
+	for (i = 0; i < 256; i++)
+	{
+		UINT8 promval = sprite_table[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, 256+256+i, 256+256+promval);
 	}
 }
+
+
+
+/*************************************
+ *
+ *  Video RAM access
+ *
+ *************************************/
 
 WRITE8_HANDLER( yard_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
+
 
 WRITE8_HANDLER( yard_scroll_panel_w )
 {
@@ -175,6 +141,14 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 	}
 }
 
+
+
+/*************************************
+ *
+ *  Tilemap info callback
+ *
+ *************************************/
+
 static TILE_GET_INFO( yard_get_bg_tile_info )
 {
 	int offs = tile_index * 2;
@@ -186,6 +160,7 @@ static TILE_GET_INFO( yard_get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, flags);
 }
 
+
 static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, UINT32 num_rows )
 {
 	/* logical (col,row) -> memory offset */
@@ -194,6 +169,14 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 	else
 		return row*32 + col;
 }
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
 
 VIDEO_START( yard )
 {
@@ -204,7 +187,15 @@ VIDEO_START( yard )
 	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, machine->screen[0].height, machine->screen[0].format);
 }
 
-#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PENS, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 256));
+
+
+/*************************************
+ *
+ *  Sprite rendering
+ *
+ *************************************/
+
+#define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PENS, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512));
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
@@ -251,6 +242,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
+
+
+/*************************************
+ *
+ *  Radar panel rendering
+ *
+ *************************************/
+
 static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	if (! *yard_score_panel_disabled)
@@ -276,6 +275,14 @@ static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rec
 				   sx, machine->screen[0].visarea.min_y + yoffs, &clip);
 	}
 }
+
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 VIDEO_UPDATE( yard )
 {
