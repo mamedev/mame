@@ -21,10 +21,10 @@ Devil Zone      - 8022
 PALETTE_INIT( panic );
 PALETTE_INIT( cosmica );
 PALETTE_INIT( cosmicg );
-PALETTE_INIT( magspot2 );
+PALETTE_INIT( magspot );
 PALETTE_INIT( nomnlnd );
 VIDEO_UPDATE( panic );
-VIDEO_UPDATE( magspot2 );
+VIDEO_UPDATE( magspot );
 VIDEO_UPDATE( devzone );
 VIDEO_UPDATE( cosmica );
 VIDEO_UPDATE( cosmicg );
@@ -225,7 +225,7 @@ static INTERRUPT_GEN( cosmicg_interrupt )
 		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
-static INTERRUPT_GEN( magspot2_interrupt )
+static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
 	if (input_port_4_r(0) & 0x01)
@@ -255,7 +255,7 @@ static READ8_HANDLER( cosmicg_port_0_r )
 	return (input_port_0_r(0) & 0xf0) | ((video_screen_get_vpos(0) & 0xf0) >> 4);
 }
 
-static READ8_HANDLER( magspot2_coinage_dip_r )
+static READ8_HANDLER( magspot_coinage_dip_r )
 {
 	return (input_port_5_r(0) & (1 << (7 - offset))) ? 0 : 1;
 }
@@ -354,9 +354,9 @@ static ADDRESS_MAP_START( cosmicg_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magspot2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( magspot_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x3800, 0x3807) AM_READ(magspot2_coinage_dip_r)
+	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ(input_port_1_r)
 	AM_RANGE(0x5002, 0x5002) AM_READ(input_port_2_r)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( magspot2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magspot2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( magspot_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(DAC_0_data_w)
@@ -538,7 +538,7 @@ static INPUT_PORTS_START( cosmicg )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( magspot2 )
+static INPUT_PORTS_START( magspot )
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
@@ -923,13 +923,13 @@ static const gfx_layout cosmic_spritelayout32 =
 
 
 static GFXDECODE_START( panic )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16,  0, 8 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32,  0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16, 16, 8 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32, 16, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( cosmica )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16,  0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32,  0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout16,  8, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, cosmic_spritelayout32,  8, 16 )
 GFXDECODE_END
 
 
@@ -1010,8 +1010,7 @@ static MACHINE_DRIVER_START( panic )
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(8*4)
+	MDRV_PALETTE_LENGTH(16+8*4)
 
 	MDRV_PALETTE_INIT(panic)
 	MDRV_VIDEO_UPDATE(panic)
@@ -1039,8 +1038,7 @@ static MACHINE_DRIVER_START( cosmica )
 
 	/* video hardware */
 	MDRV_GFXDECODE(cosmica)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(16*4)
+	MDRV_PALETTE_LENGTH(8+16*4)
 
 	MDRV_PALETTE_INIT(cosmica)
 	MDRV_VIDEO_UPDATE(cosmica)
@@ -1083,22 +1081,21 @@ static MACHINE_DRIVER_START( cosmicg )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( magspot2 )
+static MACHINE_DRIVER_START( magspot )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("main")
 
-	MDRV_CPU_PROGRAM_MAP(magspot2_readmem,magspot2_writemem)
-	MDRV_CPU_VBLANK_INT(magspot2_interrupt,1)
+	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
+	MDRV_CPU_VBLANK_INT(magspot_interrupt,1)
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(8*4)
+	MDRV_PALETTE_LENGTH(16+8*4)
 
-	MDRV_PALETTE_INIT(magspot2)
-	MDRV_VIDEO_UPDATE(magspot2)
+	MDRV_PALETTE_INIT(magspot)
+	MDRV_VIDEO_UPDATE(magspot)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1111,7 +1108,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( devzone )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magspot2)
+	MDRV_IMPORT_FROM(magspot)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(devzone)
@@ -1124,13 +1121,12 @@ static MACHINE_DRIVER_START( nomnlnd )
 	MDRV_IMPORT_FROM(cosmic)
 	MDRV_CPU_MODIFY("main")
 
-	MDRV_CPU_PROGRAM_MAP(magspot2_readmem,magspot2_writemem)
+	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
 	MDRV_CPU_VBLANK_INT(nomnlnd_interrupt,1)
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8*4)
+	MDRV_PALETTE_LENGTH(16+8*4)
 
 	MDRV_PALETTE_INIT(nomnlnd)
 	MDRV_VIDEO_UPDATE(nomnlnd)
@@ -1478,13 +1474,6 @@ static DRIVER_INIT( cosmicg )
 
         memory_region(REGION_CPU1)[offs] = normal;
     }
-
-
-    /* Patch to avoid crash - Seems like duff romcheck routine */
-    /* I would expect it to be bitrot, but have two romsets    */
-    /* from different sources with the same problem!           */
-    memory_region(REGION_CPU1)[0x1e9e] = 0x04;
-    memory_region(REGION_CPU1)[0x1e9f] = 0xc0;
 }
 
 
@@ -1511,8 +1500,8 @@ GAME( 1980, panic2,   panic,   panic,    panic,    0,       ROT270, "Universal",
 GAME( 1980, panic3,   panic,   panic,    panic,    0,       ROT270, "Universal", "Space Panic (set 3)", 0 )
 GAME( 1980, panich,   panic,   panic,    panic,    0,       ROT270, "Universal", "Space Panic (harder)", 0 )
 GAME( 1980, panicger, panic,   panic,    panic,    0,       ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", 0 )
-GAME( 1980, magspot,  0,	   magspot2, magspot2, 0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
-GAME( 1980, magspot2, 0,       magspot2, magspot2, 0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND )
+GAME( 1980, magspot,  0,	   magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
+GAME( 1980, magspot2, 0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot II", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )

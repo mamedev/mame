@@ -1,27 +1,44 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 static int layer_colorbase[2];
 extern int bladestl_spritebank;
 
 
-WRITE8_HANDLER( bladestl_palette_ram_w )
+PALETTE_INIT( bladestl )
 {
-	paletteram_xBBBBBGGGGGRRRRR_be_w(offset, data);
+	int i;
 
-	/* if it's a sprite color, modify the pens that reference this color */
-	if (offset >= 0x40)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x30);
+
+	/* characters use pens 0x00-0x1f, no look-up table */
+	for (i = 0; i < 0x20; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* sprites use pens 0x20-0x2f */
+	for (i = 0x20; i < 0x120; i++)
 	{
-		int i;
-
-		UINT8 *lookup_prom = memory_region(REGION_PROMS);
-
-		for (i = 0; i < 0x100; i++)
-			if ((lookup_prom[i] & 0x0f) == ((offset >> 1) & 0x0f))
-				palette_set_color(Machine, i + 0x30, palette_get_color(Machine, offset >> 1));
+		UINT8 ctabentry = (color_prom[i - 0x20] & 0x0f) | 0x20;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x60; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
 
 
 /***************************************************************************
@@ -73,6 +90,8 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
+	set_pens(machine);
+
 	K007342_tilemap_update();
 
 	K007342_tilemap_draw( bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE ,0);

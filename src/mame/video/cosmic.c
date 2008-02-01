@@ -26,12 +26,8 @@ WRITE8_HANDLER( cosmic_color_register_w )
 
 static pen_t panic_map_color(UINT8 x, UINT8 y)
 {
-	offs_t offs;
-	pen_t pen;
-
-
-	offs = (color_registers[0] << 9) | (color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
-	pen = memory_region(REGION_USER1)[offs];
+	offs_t offs = (color_registers[0] << 9) | (color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
+	pen_t pen = memory_region(REGION_USER1)[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -41,12 +37,8 @@ static pen_t panic_map_color(UINT8 x, UINT8 y)
 
 static pen_t cosmica_map_color(UINT8 x, UINT8 y)
 {
-	offs_t offs;
-	pen_t pen;
-
-
-	offs = (color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
-	pen = memory_region(REGION_USER1)[offs];
+	offs_t offs = (color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
+	pen_t pen = memory_region(REGION_USER1)[offs];
 
 	if (color_registers[0])		/* yes, 0 again according to the schematics */
 		pen >>= 4;
@@ -56,26 +48,18 @@ static pen_t cosmica_map_color(UINT8 x, UINT8 y)
 
 static pen_t cosmicg_map_color(UINT8 x, UINT8 y)
 {
-	offs_t offs;
-	pen_t pen;
-
-
-	offs = (color_registers[0] << 8) | (color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen = memory_region(REGION_USER1)[offs];
+	offs_t offs = (color_registers[0] << 8) | (color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
+	pen_t pen = memory_region(REGION_USER1)[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
 
 	return pen & 0x0f;
 }
 
-static pen_t magspot2_map_color(UINT8 x, UINT8 y)
+static pen_t magspot_map_color(UINT8 x, UINT8 y)
 {
-	offs_t offs;
-	pen_t pen;
-
-
-	offs = (color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
-	pen = memory_region(REGION_USER1)[offs];
+	offs_t offs = (color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
+	pen_t pen = memory_region(REGION_USER1)[offs];
 
 	if (color_registers[1])
 		pen >>= 4;
@@ -99,25 +83,30 @@ static pen_t magspot2_map_color(UINT8 x, UINT8 y)
 PALETTE_INIT( panic )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
 	{
-		int r = 0xff * ((i >> 0) & 1);
-		int g = 0xff * ((i >> 1) & 1);
-		int b;
-		if ((i & 0x0c) == 0x08)
-			b = 0xaa;
-		else
-			b = 0xff * ((i >> 2) & 1);
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		int r = pal1bit(i >> 0);
+		int g = pal1bit(i >> 1);
+		int b = ((i & 0x0c) == 0x08) ? 0xaa : pal1bit(i >> 2);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	/* background uses colors 0x00-0x0f */
+	for (i = 0; i < 0x0f; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) & 0x07;
-
+	/* sprites use colors 0x00-0x07 */
+	for (i = 0x10; i < 0x30; i++)
+	{
+		UINT8 ctabentry = color_prom[i - 0x10] & 0x07;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
     map_color = panic_map_color;
 }
@@ -136,19 +125,30 @@ PALETTE_INIT( cosmica )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x08);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
-		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
-
-
-	for (i = 0;i < TOTAL_COLORS(0)/2;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x08; i++)
 	{
-		COLOR(0,i)                     =  * color_prom          & 0x07;
-		COLOR(0,i+(TOTAL_COLORS(0)/2)) = (*(color_prom++) >> 4) & 0x07;
+		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		colortable_palette_set_color(machine->colortable, i, color);
 	}
 
+	/* background and sprites use colors 0x00-0x07 */
+	for (i = 0; i < 0x08; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	for (i = 0x08; i < 0x28; i++)
+	{
+		UINT8 ctabentry;
+
+		ctabentry = (color_prom[i - 0x08] >> 0) & 0x07;
+		colortable_entry_set_value(machine->colortable, i + 0x00, ctabentry);
+
+		ctabentry = (color_prom[i - 0x08] >> 4) & 0x07;
+		colortable_entry_set_value(machine->colortable, i + 0x20, ctabentry);
+	}
 
     map_color = cosmica_map_color;
 }
@@ -163,56 +163,52 @@ PALETTE_INIT( cosmica )
  * It's possible that the background is dark gray and not black, as the
  * resistor chain would never drop to zero, Anybody know ?
  */
-
 PALETTE_INIT( cosmicg )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int r,g,b;
+		int r = (i > 8) ? 0xff : 0xaa * ((i >> 0) & 1);
+		int g = 0xaa * ((i >> 1) & 1);
+		int b = 0xaa * ((i >> 2) & 1);
 
-    	if (i > 8) r = 0xff;
-        else r = 0xaa * ((i >> 0) & 1);
-
-		g = 0xaa * ((i >> 1) & 1);
-		b = 0xaa * ((i >> 2) & 1);
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
-
 
     map_color = cosmicg_map_color;
 }
 
-PALETTE_INIT( magspot2 )
+
+PALETTE_INIT( magspot )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
 	{
-		int r,g,b;
+		int r = ((i & 0x09) == 0x08) ? 0xaa : pal1bit(i >> 0);
+		int g = pal1bit(i >> 1);
+		int b = pal1bit(i >> 2);
 
-		if ((i & 0x09) == 0x08)
-			r = 0xaa;
-	 	else
-			r = 0xff * ((i >> 0) & 1);
-
-		g = 0xff * ((i >> 1) & 1);
-		b = 0xff * ((i >> 2) & 1);
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	/* background uses colors 0x00-0x0f */
+	for (i = 0; i < 0x0f; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	/* sprites use colors 0x00-0x0f */
+	for (i = 0x10; i < 0x30; i++)
 	{
-		COLOR(0,i) = *(color_prom++) & 0x0f;
+		UINT8 ctabentry = color_prom[i - 0x10] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-
-    map_color = magspot2_map_color;
+    map_color = magspot_map_color;
     magspot_pen_mask = 0x0f;
 }
 
@@ -220,21 +216,29 @@ PALETTE_INIT( magspot2 )
 PALETTE_INIT( nomnlnd )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
-		palette_set_color_rgb(machine,i,pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2));
-
-
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
 	{
-		COLOR(0,i) = *(color_prom++) & 0x07;
+		rgb_t color = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		colortable_palette_set_color(machine->colortable, i, color);
 	}
 
+	/* background uses colors 0x00-0x07 */
+	for (i = 0; i < 0x07; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-    map_color = magspot2_map_color;
+	/* sprites use colors 0x00-0x07 */
+	for (i = 0x10; i < 0x30; i++)
+	{
+		UINT8 ctabentry = color_prom[i - 0x10] & 0x07;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+    map_color = magspot_map_color;
     magspot_pen_mask = 0x07;
 }
 
@@ -249,33 +253,28 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rec
 {
 	offs_t offs;
 
-
 	for (offs = 0; offs < videoram_size; offs++)
 	{
+		int i;
 		UINT8 data = videoram[offs];
 
-		if (data != 0)	/* optimization, not absolutely neccessary */
+		UINT8 x = offs << 3;
+		UINT8 y = offs >> 5;
+
+		pen_t pen = machine->pens[map_color(x, y)];
+
+		for (i = 0; i < 8; i++)
 		{
-			int i;
-			UINT8 x = offs << 3;
-			UINT8 y = offs >> 5;
-
-			pen_t pen = machine->pens[map_color(x, y)];
-
-
-			for (i = 0; i < 8; i++)
+			if (data & 0x80)
 			{
-				if (data & 0x80)
-				{
-					if (flip_screen)
-						*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
-					else
-						*BITMAP_ADDR16(bitmap, y, x) = pen;
-				}
-
-				x++;
-				data <<= 1;
+				if (flip_screen)
+					*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
+				else
+					*BITMAP_ADDR16(bitmap, y, x) = pen;
 			}
+
+			x++;
+			data <<= 1;
 		}
 	}
 }
@@ -284,7 +283,6 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rec
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int extra_sprites)
 {
 	int offs;
-
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{
@@ -296,30 +294,22 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			color = ~spriteram[offs+3] & color_mask;
 
 			if (extra_sprites)
-			{
 				code |= (spriteram[offs+3] & 0x08) << 3;
-			}
 
             if (spriteram[offs] & 0x80)
-            {
                 /* 16x16 sprite */
-
 			    drawgfx(bitmap,machine->gfx[0],
 					    code, color,
 					    0, ~spriteram[offs] & 0x40,
 				    	256-spriteram[offs+2],spriteram[offs+1],
 				        cliprect,TRANSPARENCY_PEN,0);
-            }
             else
-            {
                 /* 32x32 sprite */
-
 			    drawgfx(bitmap,machine->gfx[1],
 					    code >> 2, color,
 					    0, ~spriteram[offs] & 0x40,
 				    	256-spriteram[offs+2],spriteram[offs+1],
 				        cliprect,TRANSPARENCY_PEN,0);
-            }
         }
 	}
 }
@@ -331,12 +321,10 @@ static void cosmica_draw_starfield(running_machine *machine, mame_bitmap *bitmap
 	UINT8 map = 0;
 	UINT8 *PROM = memory_region(REGION_USER2);
 
-
 	while (1)
 	{
 		int va  =  y       & 0x01;
 		int vb  = (y >> 1) & 0x01;
-
 
 		UINT8 x = 0;
 
@@ -345,23 +333,17 @@ static void cosmica_draw_starfield(running_machine *machine, mame_bitmap *bitmap
 			UINT8 x1;
 			int hc, hb_;
 
-
 			if (flip_screen)
 				x1 = x - cpu_getcurrentframe();
 			else
 				x1 = x + cpu_getcurrentframe();
 
-
 			hc  = (x1 >> 2) & 0x01;
 			hb_ = (x  >> 5) & 0x01;  /* not a bug, this one is the real x */
 
-
 			if ((x1 & 0x1f) == 0)
-			{
 				// flip-flop at IC11 is clocked
 				map = PROM[(x1 >> 5) | (y >> 1 << 3)];
-			}
-
 
 			if ((!(hc & va) & (vb ^ hb_)) &&			/* right network */
 			    (((x1 ^ map) & (hc | 0x1e)) == 0x1e))	/* left network */
@@ -372,11 +354,9 @@ static void cosmica_draw_starfield(running_machine *machine, mame_bitmap *bitmap
 				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[col];
 			}
 
-
 			x++;
 			if (x == 0)  break;
 		}
-
 
 		y++;
 		if (y == 0)  break;
@@ -395,38 +375,29 @@ static void devzone_draw_grid(running_machine *machine, mame_bitmap *bitmap, con
 	UINT8 horz_data = 0;
 	UINT8 vert_data;
 
-
 	for (y = 32; y < 224; y++)
 	{
 		UINT8 x = 0;
-
 
 		while (1)
 		{
 			int x1;
 
-
 			/* for the vertical lines, each bit indicates
                if there should be a line at the x position */
 			vert_data = vert_PROM[x >> 3];
-
 
 			/* the horizontal (perspective) lines are RLE encoded.
                When the screen is flipped, the address should be
                decrementing.  But since it's just a mirrored image,
                this is easier. */
 			if (count == 0)
-			{
 				count = horz_PROM[horz_addr++];
-			}
 
 			count++;
 
 			if (count == 0)
-			{
 				horz_data = horz_PROM[horz_addr++];
-			}
-
 
 			for (x1 = 0; x1 < 8; x1++)
 			{
@@ -446,7 +417,6 @@ static void devzone_draw_grid(running_machine *machine, mame_bitmap *bitmap, con
 				x++;
 			}
 
-
 			if (x == 0)  break;
 		}
 	}
@@ -459,11 +429,9 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 	UINT8 water = cpu_getcurrentframe();
 	UINT8 *PROM = memory_region(REGION_USER2);
 
-
 	/* all positioning is via logic gates:
 
        tree is displayed where
-
        __          __
        HD' ^ HC' ^ HB'
 
@@ -471,13 +439,12 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
         __          __              __
        (VB' ^ VC' ^ VD')  X  (VB' ^ VC' ^ VD')
 
-
        water is displayed where
              __         __
        HD' ^ HC' ^ HB ^ HA'
 
        and vertically the same equation as the trees,
-       but final result inverted.
+       but the final result is inverted.
 
 
        The colors are coded in logic gates:
@@ -488,7 +455,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
          G = Plane2              0  1  010
          B = Plane1 ^ ~Plane2    1  0  100
                                  1  1  011
-
        water:
                                 P1 P2  BGR or
          R = Plane1 ^ Plane2     0  0  100 000
@@ -498,7 +464,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 
          Not sure about B, the logic seems convulated for such
          a simple result.
-
     */
 
 	while (1)
@@ -509,7 +474,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 
 		UINT8 x = 0;
 
-
 		while (1)
 		{
 			int color = 0;
@@ -519,7 +483,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 			int hb_ = (x >> 5) & 0x01;
 			int hc_ = (x >> 6) & 0x01;
 			int hd_ =  x >> 7;
-
 
 			if ((!vb_ & vc_ & !vd_) ^ (vb_ & !vc_ & vd_))
 			{
@@ -559,7 +522,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 				}
 			}
 
-
 			if (color != 0)
 			{
 				pen_t pen = machine->pens[color];
@@ -570,7 +532,6 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 					*BITMAP_ADDR16(bitmap, y, x) = pen;
 			}
 
-
 			x++;
 			if (x == 0)  break;
 		}
@@ -578,10 +539,7 @@ static void nomnlnd_draw_background(running_machine *machine, mame_bitmap *bitma
 
 		// this is obviously wrong
 //      if (vb_)
-//      {
 			water++;
-//      }
-
 
 		y++;
 		if (y == 0)  break;
@@ -622,7 +580,7 @@ VIDEO_UPDATE( cosmica )
 }
 
 
-VIDEO_UPDATE( magspot2 )
+VIDEO_UPDATE( magspot )
 {
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
@@ -638,9 +596,7 @@ VIDEO_UPDATE( devzone )
 	fillbitmap(bitmap, machine->pens[0], cliprect);
 
     if (background_enable)
-    {
     	devzone_draw_grid(machine, bitmap, cliprect);
-	}
 
 	draw_bitmap(machine, bitmap, cliprect);
 
@@ -660,9 +616,8 @@ VIDEO_UPDATE( nomnlnd )
 
 	draw_sprites(machine, bitmap, cliprect, 0x07, 0);
 
-    if (background_enable)
-    {
-    	nomnlnd_draw_background(machine, bitmap, cliprect);
-	}
+	if (background_enable)
+		nomnlnd_draw_background(machine, bitmap, cliprect);
+
 	return 0;
 }

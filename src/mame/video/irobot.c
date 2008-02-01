@@ -73,9 +73,7 @@ PALETTE_INIT( irobot )
 
 	/* text */
     for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
 		COLOR(0,i) = ((i & 0x18) | ((i & 0x01) << 2) | ((i & 0x06) >> 1)) + 64;
-	}
 }
 
 
@@ -93,7 +91,7 @@ WRITE8_HANDLER( irobot_paletteram_w )
     g = 12 * bits * intensity;
     bits = (color >> 7) & 0x03;
     r = 12 * bits * intensity;
-    palette_set_color(Machine,(offset >> 1) & 0x3F,MAKE_RGB(r,g,b));
+    palette_set_color(Machine,(offset >> 1) & 0x3f,MAKE_RGB(r,g,b));
 }
 
 
@@ -372,20 +370,20 @@ VIDEO_UPDATE( irobot )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &bitmap_base[y * BITMAP_WIDTH], machine->pens, -1);
 
-	/* redraw the non-zero characters in the alpha layer */
+	/* redraw the characters in the alpha layer */
 	for (y = offs = 0; y < 32; y++)
 		for (x = 0; x < 32; x++, offs++)
-			if (videoram[offs] != 0)
-			{
-				int code = videoram[offs] & 0x3f;
-				int color = ((videoram[offs] & 0xC0) >> 6) | (irobot_alphamap >> 3);
-				int transp=color + 64;
+		{
+			int code = videoram[offs] & 0x3f;
+			int color = ((videoram[offs] & 0xc0) >> 6) | (irobot_alphamap >> 3);
+			int transp = color + 64;
 
-				drawgfx(bitmap,machine->gfx[0],
-						code, color,
-						0,0,
-						8*x,8*y,
-						cliprect,TRANSPARENCY_COLOR,transp);
-			}
+			drawgfx(bitmap,machine->gfx[0],
+					code, color,
+					0,0,
+					8*x,8*y,
+					cliprect,TRANSPARENCY_COLOR,transp);
+		}
+
 	return 0;
 }

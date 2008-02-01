@@ -25,14 +25,36 @@ static tilemap *fg_tilemap,*bg_tilemap;
 PALETTE_INIT( ddrible )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x40);
 
-	/* build the lookup table for sprites. Palette is dynamic. */
-	for (i = 0;i < TOTAL_COLORS(3);i++)
-		COLOR(3,i) = (*(color_prom++) & 0x0f);
+	for (i = 0x10; i < 0x40; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* sprite #2 uses pens 0x00-0x0f */
+	for (i = 0x40; i < 0x140; i++)
+	{
+		UINT8 ctabentry = color_prom[i - 0x40] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x80; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
 
 WRITE8_HANDLER( K005885_0_w )
 {
@@ -230,6 +252,8 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( ddrible )
 {
+	set_pens(machine);
+
 	tilemap_set_flip(fg_tilemap, (ddribble_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	tilemap_set_flip(bg_tilemap, (ddribble_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 

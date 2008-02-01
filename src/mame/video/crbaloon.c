@@ -35,25 +35,23 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( crbaloon )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 
 	for (i = 0; i < machine->drv->total_colors; i++)
 	{
-		int h = (~i & 0x08) ? 0xff : 0x55;
+		UINT8 pen;
+		int h, r, g, b;
 
-		int r = h * ((~i >> 0) & 1);
-		int g = h * ((~i >> 1) & 1);
-		int b = h * ((~i >> 2) & 1);
+		if (i & 0x01)
+			pen = i >> 1;
+		else
+			pen = 0x0f;
+
+		h = (~pen & 0x08) ? 0xff : 0x55;
+		r = h * ((~pen >> 0) & 1);
+		g = h * ((~pen >> 1) & 1);
+		b = h * ((~pen >> 2) & 1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-	}
-
-	for (i = 0; i < TOTAL_COLORS(0); i += 2)
-	{
-		COLOR(0, i + 0) = 0x0f;		/* black background */
-		COLOR(0, i + 1) = i / 2;	/* colored foreground */
 	}
 }
 
@@ -135,12 +133,12 @@ static void draw_sprite_and_check_collision(running_machine *machine, mame_bitma
 			/* draw the current pixel, but check collision first */
 			if (bit)
 			{
-				if (*BITMAP_ADDR16(bitmap, sy, sx) != 0x0f)
+				if (*BITMAP_ADDR16(bitmap, sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
                        of the game code, probably wrong for cocktail mode */
 					crbaloon_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
-				*BITMAP_ADDR16(bitmap, sy, sx) = color;
+				*BITMAP_ADDR16(bitmap, sy, sx) = (color << 1) | 1;
 			}
 
 			sx = sx + 1;

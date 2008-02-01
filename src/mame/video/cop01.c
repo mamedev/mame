@@ -20,50 +20,43 @@ static tilemap *bg_tilemap,*fg_tilemap;
 PALETTE_INIT( cop01 )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the lookup tables */
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	/* characters use colors 0-15 (or 0-127, but the eight rows are identical) */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
+	/* characters use colors 0x00-0x0f (or 0x00-0x7f, but the eight rows are identical) */
+	for (i = 0; i < 0x10; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-	/* background tiles use colors 192-255 */
+	/* background tiles use colors 0xc0-0xff */
 	/* I don't know how much of the lookup table PROM is hooked up, */
 	/* I'm only using the first 32 bytes because the rest is empty. */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 0xc0 + (i & 0x30) + (color_prom[((i & 0x40) >> 2) + (i & 0x0f)] & 0x0f);
-	color_prom += 256;
+	for (i = 0x10; i < 0x90; i++)
+	{
+		UINT8 ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
+						  (color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
-	/* sprites use colors 128-143 (or 128-191, but the four rows are identical) */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-		COLOR(2,i) = 0x80 + (*(color_prom++) & 0x0f);
+	/* sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical) */
+	for (i = 0x90; i < 0x190; i++)
+	{
+		UINT8 ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 
