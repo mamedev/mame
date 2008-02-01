@@ -313,7 +313,8 @@ static MACHINE_DRIVER_START( irobot )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)
 	MDRV_GFXDECODE(irobot)
-	MDRV_PALETTE_LENGTH(64 + 32)	/* 64 for polygons, 32 for text */
+	MDRV_PALETTE_LENGTH(64 + 32)
+	MDRV_COLORTABLE_LENGTH(64 + 32)	/* 64 for polygons, 32 for text */
 
 	MDRV_PALETTE_INIT(irobot)
 	MDRV_VIDEO_START(irobot)
