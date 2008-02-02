@@ -1503,7 +1503,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/acefruit.o \
 	$(DRIVERS)/adp.o \
 	$(DRIVERS)/ambush.o $(VIDEO)/ambush.o \
-	$(DRIVERS)/ampoker.o $(VIDEO)/ampoker.o \
+	$(DRIVERS)/ampoker2.o $(VIDEO)/ampoker2.o \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
@@ -1519,7 +1519,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
-	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
 	$(DRIVERS)/dgpix.o \
@@ -1643,7 +1642,7 @@ $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
-$(DRIVERS)/ampoker.o:	$(LAYOUT)/ampoker.lh \
+$(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 						$(LAYOUT)/sigmapkr.lh \
 
 $(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh

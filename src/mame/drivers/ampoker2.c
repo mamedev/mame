@@ -297,7 +297,7 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "ampoker.lh"
+#include "ampoker2.lh"
 #include "sigmapkr.lh"
 
 /* from video */
@@ -876,7 +876,6 @@ static MACHINE_DRIVER_START( ampoker2 )
 
 	MDRV_GFXDECODE(ampoker2)
 	MDRV_PALETTE_LENGTH(512)
-	MDRV_COLORTABLE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(ampoker2)
 	MDRV_VIDEO_START(ampoker2)
@@ -1001,11 +1000,11 @@ ROM_END
 *************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY       FULLNAME                             FLAGS             LAYOUT      */
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,    ROT0, "Novomatic",  "American Poker II",                  0,                layout_ampoker )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 1)", 0,                layout_ampoker )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 2)", 0,                layout_ampoker )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 3)", 0,                layout_ampoker )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,    ROT0, "Bootleg",    "American Poker 95",                  0,                layout_ampoker )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "Poker De Win",                       0,                layout_ampoker )
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,    ROT0, "Novomatic",  "American Poker II",                  0,                layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 1)", 0,                layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 2)", 0,                layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 3)", 0,                layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,    ROT0, "Bootleg",    "American Poker 95",                  0,                layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "Poker De Win",                       0,                layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,    ROT0, "Sigma Inc.", "Sigma Poker",                        0,                layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigmapkr, 0,    ROT0, "Sigma Inc.", "Sigma Poker 2000",                   GAME_NOT_WORKING, layout_sigmapkr )
