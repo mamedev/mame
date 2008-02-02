@@ -353,7 +353,7 @@ VIDEO_UPDATE( alpha68k_I )
 {
 	int yshift = (alpha68k_microcontroller_id == 0x890a) ? 1 : 0; // The Next Space is 1 pixel off
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites_I(machine, bitmap,cliprect,2,0x0800,yshift);
@@ -366,72 +366,56 @@ VIDEO_UPDATE( alpha68k_I )
 
 PALETTE_INIT( kyros )
 {
-	int i,bit0,bit1,bit2,bit3,r,g,b;
+	int i;
 
-	for (i = 0;i < 256;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0x100] >> 0) & 0x01;
-		bit1 = (color_prom[0x100] >> 1) & 0x01;
-		bit2 = (color_prom[0x100] >> 2) & 0x01;
-		bit3 = (color_prom[0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[0x200] >> 0) & 0x01;
-		bit1 = (color_prom[0x200] >> 1) & 0x01;
-		bit2 = (color_prom[0x200] >> 2) & 0x01;
-		bit3 = (color_prom[0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 0x200;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		*colortable++ = ((color_prom[0] & 0x0f) << 4) | (color_prom[0x100] & 0x0f);
-		color_prom++;
+		UINT8 ctabentry = ((color_prom[i] & 0x0f) << 4) | (color_prom[i + 0x100] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
 PALETTE_INIT( paddlem )
 {
-	int i,bit0,bit1,bit2,bit3,r,g,b;
+	int i;
 
-	for (i = 0;i < 256;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0x100] >> 0) & 0x01;
-		bit1 = (color_prom[0x100] >> 1) & 0x01;
-		bit2 = (color_prom[0x100] >> 2) & 0x01;
-		bit3 = (color_prom[0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[0x200] >> 0) & 0x01;
-		bit1 = (color_prom[0x200] >> 1) & 0x01;
-		bit2 = (color_prom[0x200] >> 2) & 0x01;
-		bit3 = (color_prom[0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* Fill in clut */
-	color_prom += 0x200;
-	for (i=0; i<1024; i++) colortable[i] = color_prom[i]|(color_prom[i+0x400]<<4);
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
+
+	for (i = 0; i < 0x400; i++)
+	{
+		UINT8 ctabentry = ((color_prom[i + 0x400] & 0x0f) << 4) | (color_prom[i] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 void kyros_video_banking(int *bank, int data)
@@ -495,7 +479,8 @@ static void kyros_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 
 VIDEO_UPDATE( kyros )
 {
-	fillbitmap(bitmap,*videoram16 & 0xff,cliprect); //AT
+	colortable_entry_set_value(machine->colortable, 0x100, *videoram16 & 0xff);
+	fillbitmap(bitmap, machine->pens[0x100], cliprect); //AT
 
 	kyros_draw_sprites(machine, bitmap,cliprect,2,0x0800);
 	kyros_draw_sprites(machine, bitmap,cliprect,3,0x0c00);
@@ -552,7 +537,8 @@ static void sstingry_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 VIDEO_UPDATE( sstingry )
 {
-	fillbitmap(bitmap,*videoram16 & 0xff,cliprect); //AT
+	colortable_entry_set_value(machine->colortable, 0x100, *videoram16 & 0xff);
+	fillbitmap(bitmap, machine->pens[0x100], cliprect); //AT
 
 	sstingry_draw_sprites(machine, bitmap,cliprect,2,0x0800);
 	sstingry_draw_sprites(machine, bitmap,cliprect,3,0x0c00);

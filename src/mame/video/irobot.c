@@ -45,36 +45,19 @@ static int ir_xmin, ir_ymin, ir_xmax, ir_ymax; /* clipping area */
 PALETTE_INIT( irobot )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	/* Convert the color prom for the text palette */
-	for (i = 0;i < 32;i++)
+	/* convert the color prom for the text palette */
+	for (i = 0; i < 32; i++)
 	{
-	    int r,g,b;
-		int bits,intensity;
-	    UINT32 color;
+	    int intensity = color_prom[i] & 0x03;
 
-	    color = *color_prom;
-	    intensity = color & 0x03;
-	    bits = (color >> 6) & 0x03;
-	    r = 28 * bits * intensity;
-	    bits = (color >> 4) & 0x03;
-	    g = 28 * bits * intensity;
-	    bits = (color >> 2) & 0x03;
-	    b = 28 * bits * intensity;
-		palette_set_color(machine,i+64,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
+	    int r = 28 * ((color_prom[i] >> 6) & 0x03) * intensity;
+	    int g = 28 * ((color_prom[i] >> 4) & 0x03) * intensity;
+	    int b = 28 * ((color_prom[i] >> 2) & 0x03) * intensity;
 
-	/* polygons */
-    for (i = 0;i < 64;i++)
-         colortable[i] = i;
+		int swapped_i = BITSWAP8(i,7,6,5,4,3,0,1,2);
 
-	/* text */
-    for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
-		COLOR(0,i) = ((i & 0x18) | ((i & 0x01) << 2) | ((i & 0x06) >> 1)) + 64;
+		palette_set_color(machine, swapped_i + 64, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -248,22 +231,22 @@ void irobot_run_video(void)
 		polybitmap = polybitmap1;
 
 	lpnt=0;
-	while (lpnt < 0x7FF)
+	while (lpnt < 0x7ff)
 	{
 		d1 = combase16[lpnt++];
-		if (d1 == 0xFFFF) break;
-		spnt = d1 & 0x07FF;
-		shp = (d1 & 0xF000) >> 12;
+		if (d1 == 0xffff) break;
+		spnt = d1 & 0x07ff;
+		shp = (d1 & 0xf000) >> 12;
 
-		/* Pixel */
+		/* pixel */
 		if (shp == 0x8)
 		{
-			while (spnt < 0x7FF)
+			while (spnt < 0x7ff)
 			{
 				sx = combase16[spnt];
-				if (sx == 0xFFFF) break;
+				if (sx == 0xffff) break;
 				sy = combase16[spnt+1];
-				color = sy & 0x3F;
+				color = sy & 0x3f;
 				sx = ROUND_TO_PIXEL(sx);
 				sy = ROUND_TO_PIXEL(sy);
 	        	if (sx >= ir_xmin && sx < ir_xmax && sy >= ir_ymin && sy < ir_ymax)
@@ -272,16 +255,16 @@ void irobot_run_video(void)
 			}//while object
 		}//if point
 
-		/* Line */
-		if (shp == 0xC)
+		/* line */
+		if (shp == 0xc)
 		{
-			while (spnt < 0x7FF)
+			while (spnt < 0x7ff)
 			{
 				ey = combase16[spnt];
-				if (ey == 0xFFFF) break;
+				if (ey == 0xffff) break;
 				ey = ROUND_TO_PIXEL(ey);
 				sy = combase16[spnt+1];
-				color = sy & 0x3F;
+				color = sy & 0x3f;
 				sy = ROUND_TO_PIXEL(sy);
 				sx = combase16[spnt+3];
 				word1 = (INT16)combase16[spnt+2];
@@ -291,21 +274,21 @@ void irobot_run_video(void)
 			}//while object
 		}//if line
 
-		/* Polygon */
+		/* polygon */
 		if (shp == 0x4)
 		{
-			spnt2 = combase16[spnt] & 0x7FF;
+			spnt2 = combase16[spnt] & 0x7ff;
 
 			sx = combase16[spnt+1];
 			sx2 = combase16[spnt+2];
 			sy = combase16[spnt+3];
-			color = sy & 0x3F;
+			color = sy & 0x3f;
 			sy = ROUND_TO_PIXEL(sy);
 			spnt+=4;
 
 			word1 = (INT16)combase16[spnt];
 			ey = combase16[spnt+1];
-			if (word1 != -1 || ey != 0xFFFF)
+			if (word1 != -1 || ey != 0xffff)
 			{
 				ey = ROUND_TO_PIXEL(ey);
 				spnt+=2;
@@ -338,7 +321,7 @@ void irobot_run_video(void)
 					{
 						word1 = (INT16)combase16[spnt];
 						ey = combase16[spnt+1];
-						if (word1 == -1 && ey == 0xFFFF)
+						if (word1 == -1 && ey == 0xffff)
 							break;
 						ey = ROUND_TO_PIXEL(ey);
 						spnt+=2;
@@ -375,17 +358,15 @@ VIDEO_UPDATE( irobot )
 	/* redraw the non-zero characters in the alpha layer */
 	for (y = offs = 0; y < 32; y++)
 		for (x = 0; x < 32; x++, offs++)
-			if (videoram[offs] != 0)
-			{
-				int code = videoram[offs] & 0x3f;
-				int color = ((videoram[offs] & 0xC0) >> 6) | (irobot_alphamap >> 3);
-				int transp=color + 64;
+		{
+			int code = videoram[offs] & 0x3f;
+			int color = ((videoram[offs] & 0xc0) >> 6) | (irobot_alphamap >> 3);
 
-				drawgfx(bitmap,machine->gfx[0],
-						code, color,
-						0,0,
-						8*x,8*y,
-						cliprect,TRANSPARENCY_COLOR,transp);
-			}
+			drawgfx(bitmap,machine->gfx[0],
+					code, color,
+					0,0,
+					8*x,8*y,
+					cliprect,TRANSPARENCY_PEN,0);
+		}
 	return 0;
 }
