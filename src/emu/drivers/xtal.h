@@ -83,6 +83,7 @@ enum
 	XTAL_18_432MHz  	= 18432000,
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
 	XTAL_20MHz   		= 20000000,
+	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */
 	XTAL_22MHz   		= 22000000,
