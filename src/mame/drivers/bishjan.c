@@ -440,7 +440,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 }
 
 static MACHINE_DRIVER_START( bishjan )
-	MDRV_CPU_ADD(H83002, 44100000/3)
+	MDRV_CPU_ADD(H83044, 44100000/3)
 	MDRV_CPU_PROGRAM_MAP( bishjan_map, 0 )
 	MDRV_CPU_VBLANK_INT(bishjan_interrupt,2)
 

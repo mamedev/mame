@@ -906,9 +906,10 @@ VIDEO_UPDATE( metro )
 	}
 
 
-#if 0
+#if MAME_DEBUG
 if (input_code_pressed(KEYCODE_Z))
-{	int msk = 0;
+{
+	int msk = 0;
 	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
 	if (input_code_pressed(KEYCODE_W))	msk |= 2;
 	if (input_code_pressed(KEYCODE_E))	msk |= 4;
@@ -920,7 +921,8 @@ if (input_code_pressed(KEYCODE_Z))
 	popmessage("l %x-%x-%x r %04x %04x %04x",
 				(metro_videoregs[0x10/2]&0x30)>>4,(metro_videoregs[0x10/2]&0xc)>>2,metro_videoregs[0x10/2]&3,
 				metro_videoregs[0x02/2], metro_videoregs[0x12/2],
-				*metro_screenctrl);					}
+				*metro_screenctrl);
+}
 #endif
 
 	if (has_zoom) K053936_0_zoom_draw(bitmap,cliprect,metro_K053936_tilemap,0,0);

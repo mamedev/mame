@@ -11,13 +11,14 @@
 #include "debugger.h"
 #include "h83002.h"
 
-static const char *const bit_instr[8] = {"bset", "bnot", "bclr", "btst", "bor", "bxor", "band", "bld"};
-static const char *const bit_instr2[8] = {"bset", "bnot", "bclr", "btst", "bior", "bixor", "biand", "bild"};
-static const char *const imm32l_instr[8] = {"mov", "add", "cmp", "sub", "or", "xor", "and", "?"};
-static const char *const branch_instr[16] = {"bt", "bf", "bhi", "bls", "bcc", "bcs", "bne", "beq", "bvc", "bvs", "bpl", "bmi", "bge", "blt", "bgt", "ble"};
-static const char *const reg_names32[8] = {"ER0", "ER1", "ER2", "ER3", "ER4", "ER5", "ER6", "SP"};
-static const char *const reg_names16[16] = {"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"};
-static const char *const reg_names8[16] = {"R0H", "R1H", "R2H", "R3H", "R4H", "R5H", "R6H", "R7H","R0L", "R1L", "R2L", "R3L", "R4L", "R5L", "R6L", "R7L"};
+static const char *const bit_instr[8]		=	{"bset", "bnot", "bclr", "btst", "bor", "bxor", "band", "bld"};
+static const char *const bit_instr2[8]		=	{"bset", "bnot", "bclr", "btst", "bior", "bixor", "biand", "bild"};
+static const char *const imm32l_instr[8]	=	{"mov", "add", "cmp", "sub", "or", "xor", "and", "?"};
+static const char *const branch_instr[16]	=	{"bt", "bf", "bhi", "bls", "bcc", "bcs", "bne", "beq", "bvc", "bvs", "bpl", "bmi", "bge", "blt", "bgt", "ble"};
+
+static const char *const reg_names32[8]		=	{"ER0", "ER1", "ER2", "ER3", "ER4", "ER5", "ER6", "SP"};
+static const char *const reg_names16[16]	=	{"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "E0", "E1", "E2", "E3", "E4", "E5", "E6", "E7"};
+static const char *const reg_names8[16]		=	{"R0H", "R1H", "R2H", "R3H", "R4H", "R5H", "R6H", "R7H","R0L", "R1L", "R2L", "R3L", "R4L", "R5L", "R6L", "R7L"};
 
 static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT8 *oprom);
 static UINT32 h8disasm_1(UINT32 address, UINT32 opcode, char *output, const UINT8 *oprom);
@@ -248,10 +249,24 @@ static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT
 			break;
 			// 01f0 and.l prefix
 		case 0xf:
-			// and.l rs, rd
+			// or.l/xor.l/and.l rs, rd
 			data16 = h8_mem_read16(2);
-			sprintf(output, "%4.4x and.l %s, %s", opcode, reg_names16[(data16>>4) & 0x7], reg_names16[data16 & 0x7]);
-			size = 2;
+			size = 4;
+			switch((data16>>8)&0xff)
+			{
+			case 0x64:	// or.l ERs, ERd
+				sprintf(output, "%4.4x or.l %s, %s", opcode, reg_names32[(data16>>4) & 0x7], reg_names32[data16 & 0x7]);
+				break;
+			case 0x65:	// xor.l ERs, ERd
+				sprintf(output, "%4.4x xor.l %s, %s", opcode, reg_names32[(data16>>4) & 0x7], reg_names32[data16 & 0x7]);
+				break;
+			case 0x66:	// and.l ERs, ERd
+				sprintf(output, "%4.4x and.l %s, %s", opcode, reg_names32[(data16>>4) & 0x7], reg_names32[data16 & 0x7]);
+				break;
+			default:
+				sprintf(output, "%4.4x default", opcode);
+				break;
+			}
 			break;
 		default:
 			sprintf(output, "%4.4x default", opcode);
@@ -355,7 +370,7 @@ static UINT32 h8disasm_0(UINT32 address, UINT32 opcode, char *output, const UINT
 			sprintf(output, "%4.4x adds.l #2, %s", opcode, reg_names32[opcode & 0x7]);
 			break;
 		case 9:
-			sprintf(output, "%4.4x adds.l #3, %s", opcode, reg_names32[opcode & 0x7]);
+			sprintf(output, "%4.4x adds.l #4, %s", opcode, reg_names32[opcode & 0x7]);
 			break;
 		case 0xd:
 			sprintf(output, "%4.4x inc.w #2, %s", opcode, reg_names16[opcode & 0xf]);
@@ -1196,15 +1211,43 @@ static UINT32 h8disasm_7(UINT32 address, UINT32 opcode, char *output, const UINT
 	case 0xc:
 	case 0xd:
 		data16 = h8_mem_read16(2);
-		if(((data16>>4)&0x8) == 0)
-		{
-			sprintf(output, "%4.4x %s.b #%1.1x, @%s", opcode, bit_instr[(data16>>8)&7], (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
-		}
-		else
-		{
-			sprintf(output, "%4.4x %s.b #%1.1x, @%s", opcode, bit_instr2[(opcode>>4)&7], (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
-		}
 		size = 4;
+		switch(data16>>8)
+		{
+			case 0x60:	// bset/bnot/bclr.b rn, @erd
+			case 0x61:
+			case 0x62:
+				if (((opcode & 0x8f)!=0)||((data16 & 0x0f)!=0))
+				{
+					sprintf(output, "%4.4x default", opcode);
+					break;
+				}
+				sprintf(output, "%4.4x %s.b %s, @%s", opcode, bit_instr[(data16>>8)&7], reg_names16[(data16>>4)&0xf], reg_names32[(opcode>>4) & 0x7]);
+				break;
+
+			case 0x67:	// bst/bist.b #xx:3, @erd
+				if (((opcode & 0x8f)!=0)||((data16 & 0x0f)!=0))
+				{
+					sprintf(output, "%4.4x default", opcode);
+					break;
+				}
+				if ((data16 & 0x80)!=0)
+					sprintf(output, "%4.4x bist.b #%1.1x, @%s", opcode, (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
+				else
+					sprintf(output, "%4.4x bst.b #%1.1x, @%s", opcode, (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
+				break;
+
+			case 0x70:	// bset/bnot/bclr.b #xx:3, @erd
+			case 0x71:
+			case 0x72:
+				if (((opcode & 0x8f)!=0)||((data16 & 0x8f)!=0))
+				{
+					sprintf(output, "%4.4x default", opcode);
+					break;
+				}
+				sprintf(output, "%4.4x %s.b #%1.1x, @%s", opcode, bit_instr[(data16>>8)&7], (data16>>4)&7, reg_names32[(opcode>>4) & 0x7]);
+				break;
+		}
 		break;
 		// bxx.b #imm, @aa:8
 	case 0xe:

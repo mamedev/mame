@@ -5,7 +5,7 @@
                     driver by   Luca Elia (l.elia@tin.it)
 
 
-Main  CPU    :  MC68000
+Main  CPU    :  MC68000 Or H8/3007
 
 Video Chips  :  Imagetek 14100 052 9227KK701    Or
                 Imagetek 14220 071 9338EK707    Or
@@ -45,6 +45,7 @@ Year + Game                     PCB         Video Chip  Issues / Notes
 98  Mahjong Gakuensai 2         VG340-A     14300       No sound CPU
 96  Mouja                       VG410-B     14300       No sound CPU
 99  Battle Bubble v2.00         LM2D-Y      14220       No sound CPU
+00  Puzzlet                     VG2200-(B)  14300       PIC? Protection?
 ---------------------------------------------------------------------------
 
 Not dumped yet:
@@ -81,9 +82,10 @@ driver modified by Eisuke Watanabe
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/konamiic.h"
+#include "cpu/h83002/h83002.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/eeprom.h"
+#include "video/konamiic.h"
 #include "sound/2610intf.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
@@ -207,6 +209,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 	if (ACCESSING_LSB)
 	{
 		data &= ~*metro_irq_enable;
+
 		if (data & 0x01)	requested_int[0] = 0;
 		if (data & 0x02)	requested_int[1] = 0;	// DAITORIDE, BALCUBE, KARATOUR, MOUJA
 		if (data & 0x04)	requested_int[2] = 0;
@@ -2089,6 +2092,86 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                Puzzlet
+***************************************************************************/
+
+static READ16_HANDLER( puzzlet_dsw_r )
+{
+	return readinputport(3);
+}
+
+static WRITE16_HANDLER( puzzlet_irq_enable_w )
+{
+	if (ACCESSING_LSB)
+		*metro_irq_enable = data^0xffff;
+}
+
+// H8/3007 CPU
+static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
+	AM_RANGE( 0x430000, 0x433fff ) AM_RAM
+	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
+
+	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( OKIM6295_status_0_msb_r, OKIM6295_data_0_msb_w )
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( YM2413_register_port_0_msb_w )
+	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( YM2413_data_port_0_msb_w )
+
+	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( MRA16_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
+	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( MRA16_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
+	AM_RANGE( 0x740000, 0x75ffff ) AM_READWRITE( MRA16_RAM, metro_vram_2_w ) AM_BASE( &metro_vram_2 )	// Layer 2
+	AM_RANGE( 0x774000, 0x774fff ) AM_RAM	AM_BASE( &spriteram16 )	AM_SIZE( &spriteram_size )			// Sprites
+
+	AM_RANGE( 0x760000, 0x76ffff ) AM_READ( metro_bankedrom_r )	// Banked ROM
+
+//	AM_RANGE( 0x772000, 0x773fff ) AM_RAM
+	AM_RANGE( 0x770000, 0x773fff ) AM_READWRITE( MRA16_RAM, metro_paletteram_w ) AM_BASE( &paletteram16 )	// Palette
+
+	AM_RANGE( 0x775000, 0x777fff ) AM_RAM
+
+	AM_RANGE( 0x778000, 0x7787ff ) AM_READWRITE( MRA16_RAM, MWA16_RAM )	AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size		)	// Tiles Set
+	AM_RANGE( 0x778800, 0x778813 ) AM_WRITE( MWA16_RAM )		AM_BASE( &metro_videoregs )	// Video Registers
+	AM_RANGE( 0x778840, 0x77884f ) AM_WRITE( metro_blitter_w )	AM_BASE( &metro_blitter_regs )	// Tiles Blitter
+	AM_RANGE( 0x778860, 0x77886b ) AM_WRITE( metro_window_w )	AM_BASE( &metro_window )	// Tilemap Window
+	AM_RANGE( 0x778870, 0x77887b ) AM_WRITE( MWA16_RAM )		AM_BASE( &metro_scroll )	// Scroll
+	AM_RANGE( 0x778890, 0x778891 ) AM_WRITE( MWA16_NOP )	// ? increasing
+	AM_RANGE( 0x7788a2, 0x7788a3 ) AM_WRITE( metro_irq_cause_w )	// IRQ Cause
+	AM_RANGE( 0x7788a4, 0x7788a5 ) AM_WRITE( puzzlet_irq_enable_w ) AM_BASE( &metro_irq_enable )	// IRQ Enable
+
+	AM_RANGE( 0x7788aa, 0x7788ab ) AM_WRITE( MWA16_RAM )		AM_BASE( &metro_rombank	)		// Rom Bank
+	AM_RANGE( 0x7788ac, 0x7788ad ) AM_WRITE( MWA16_RAM )		AM_BASE( &metro_screenctrl )	// Screen Control
+
+	AM_RANGE( 0x7f2000, 0x7f3fff ) AM_RAM
+
+	AM_RANGE( 0x7f8880, 0x7f8881 ) AM_READ(	input_port_1_word_r )
+	AM_RANGE( 0x7f8884, 0x7f8885 ) AM_READ( puzzlet_dsw_r )
+	AM_RANGE( 0x7f8886, 0x7f8887 ) AM_READ( puzzlet_dsw_r )
+
+	AM_RANGE( 0x7f88a2, 0x7f88a3 ) AM_READ( metro_irq_cause_r )	// IRQ Cause
+ADDRESS_MAP_END
+
+static READ8_HANDLER( puzzlet_port7_r )
+{
+	return input_port_2_word_r(0,0);
+}
+
+static READ8_HANDLER( puzzlet_serB_r )
+{
+	return input_port_0_word_r(0,0);	// coin
+}
+
+static WRITE8_HANDLER( puzzlet_portb_w )
+{
+//	popmessage("PORTB %02x",data);
+}
+
+static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( H8_PORT7,		H8_PORT7	)	AM_READ( puzzlet_port7_r )
+	AM_RANGE( H8_SERIAL_B,	H8_SERIAL_B	)	AM_READ( puzzlet_serB_r )
+	AM_RANGE( H8_PORTB,		H8_PORTB	)	AM_READWRITE( input_port_3_r, puzzlet_portb_w )
+ADDRESS_MAP_END
+
+
+/***************************************************************************
 
 
                                 Input Ports
@@ -3301,6 +3384,71 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
+                                Puzzlet
+***************************************************************************/
+
+static INPUT_PORTS_START( puzzlet )
+	PORT_START	// IN0 - ser B
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START	// IN1 - 7f8880.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	// Next
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// Rotate CW
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// Push
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START	// IN2 - port 7
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START	// IN3 - dsw?
+	PORT_DIPUNKNOWN( 0x0001, 0x0001 )
+	PORT_DIPUNKNOWN( 0x0002, 0x0002 )
+	PORT_DIPUNKNOWN( 0x0004, 0x0004 )
+	PORT_DIPUNKNOWN( 0x0008, 0x0008 )
+	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
+	PORT_DIPUNKNOWN( 0x0020, 0x0020 )
+	PORT_DIPUNKNOWN( 0x0040, 0x0040 )
+	PORT_DIPUNKNOWN( 0x0080, 0x0080 )
+
+	PORT_DIPUNKNOWN( 0x0100, 0x0100 )
+	PORT_DIPUNKNOWN( 0x0200, 0x0200 )
+	PORT_DIPUNKNOWN( 0x0400, 0x0400 )
+	PORT_DIPUNKNOWN( 0x0800, 0x0800 )
+	PORT_DIPUNKNOWN( 0x1000, 0x1000 )
+	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
+	PORT_DIPUNKNOWN( 0x4000, 0x4000 )
+	PORT_DIPUNKNOWN( 0x8000, 0x8000 )
+INPUT_PORTS_END
+
+
+/***************************************************************************
                                 Puzzli
 ***************************************************************************/
 
@@ -4501,6 +4649,75 @@ static MACHINE_DRIVER_START( gstrik2 )
 MACHINE_DRIVER_END
 
 
+static INTERRUPT_GEN( puzzlet_interrupt )
+{
+	switch ( cpu_getiloops() )
+	{
+		case 0:
+			requested_int[1] = 1;
+			update_irq_state();
+			break;
+
+		case 1:
+			requested_int[3] = 1;
+			update_irq_state();
+			break;
+
+		case 2:
+			requested_int[5] = 1;
+			update_irq_state();
+			break;
+
+		case 3:
+			requested_int[2] = 1;
+			update_irq_state();
+			break;
+
+		default:
+			// timer
+			h8_3002_InterruptRequest(24);
+			break;
+	}
+}
+static MACHINE_DRIVER_START( puzzlet )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+
+	MDRV_CPU_PROGRAM_MAP(puzzlet_map,0)
+	MDRV_CPU_IO_MAP(puzzlet_io_map,0)
+	MDRV_CPU_VBLANK_INT(puzzlet_interrupt, 5)
+
+	MDRV_SCREEN_REFRESH_RATE(58)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_MACHINE_RESET(metro)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 256-32)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MDRV_GFXDECODE(14300)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(metro_14300)
+	MDRV_VIDEO_UPDATE(metro)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD(OKIM6295, XTAL_20MHz/5)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+
+	MDRV_SOUND_ADD(YM2413, XTAL_20MHz/5)
+	MDRV_SOUND_ROUTE(0, "left", 0.90)
+	MDRV_SOUND_ROUTE(1, "right", 0.90)
+MACHINE_DRIVER_END
+
+
 /***************************************************************************
 
 
@@ -4642,6 +4859,12 @@ static DRIVER_INIT( gakusai )
 	blitter_bit = 3;
 }
 
+static DRIVER_INIT( puzzlet )
+{
+	metro_common();
+	irq_line = 0;
+	blitter_bit = 0;
+}
 
 /***************************************************************************
 
@@ -5622,6 +5845,62 @@ ROM_END
 
 /***************************************************************************
 
+Puzzlet
+2000 Yunizu Corporation
+
+Very small PCB using Metro-like hardware with
+Imagetek GFX chip and H8/3007 CPU
+
+PCB Layout
+----------
+VG2200-(B)
+|--------------------------------------------|
+|TA7222     YM2413B  SOUND4   PRG1           |
+|  VOL  JRC3403              DSW1(8)         |
+|             M6295          DSW2(8) CG2 CG3 |
+|          20MHz                             |
+|  MM1035             |---------|            |
+|      H8/3007        |IMAGETEK |    CY7C199 |
+|TD62307     HM6216255|14300    |            |
+|TD62064              |         | CY7C199    |
+|                     |         |            |
+|  DIP18              |---------| CY7C199    |
+|        JAMMA              26.666MHz        |
+|--------------------------------------------|
+Notes:
+      H8/3007   - Hitachi HD6413007F20 CPU. Clock 20MHz
+      M6295     - Clock 4MHz [20/5]. Pin7 LOW
+      14300     - Imagetek 14300 Graphics Generator IC
+      VSync     - 58Hz
+      HSync     - 15.26kHz
+      DIP18     - unknown chip with scratched surface. Probably a PIC.
+      HM6216255 - Hitachi 4M high speed SRAM (256-kword x16-bit)
+      CY7C199   - 32k x8 SRAM
+      YM2413B   - Clock 4MHz [20/5]
+      MM1035    - System Reset IC with Watchdog Timer
+      TD62307   - 7 Channel Low Saturation Driver
+      TD62064   - 4 Channel High Current Darlington Driver
+      TA7222    - 40V 4.5A 12.5W 5.8W Audio Power Amplifier IC
+
+      All ROMs 27C160
+
+***************************************************************************/
+
+ROM_START( puzzlet )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 )	/* H8/3007 Code */
+	ROM_LOAD16_WORD_SWAP( "prg1_ver2.u9", 0x000000, 0x200000, CRC(592760da) SHA1(08f7493d2e50831438f53bbf0ae211ec40057da7) )
+
+	ROM_REGION( 0x400000, REGION_GFX1, 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "cg2.u2", 0x000000, 0x200000, CRC(7720f2d8) SHA1(8e0ccd1e8efe00df909327aefdb1e23e50487524), ROM_GROUPWORD | ROM_SKIP(2))
+	ROMX_LOAD( "cg3.u1", 0x000002, 0x200000, CRC(77d39d12) SHA1(4bb339e479f0425931cff4eef3a6bc6ad1fac1f5), ROM_GROUPWORD | ROM_SKIP(2))
+
+	ROM_REGION( 0x200000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "sound4.u23", 0x000000, 0x200000, CRC(9a611369) SHA1(97b9188354292b120a1bd0f01b4d884461bfa298) )
+ROM_END
+
+
+/***************************************************************************
+
 Puzzli
 Metro/Banpresto 1995
 
@@ -5877,35 +6156,34 @@ ROM_END
 
 ***************************************************************************/
 
-/*     year  rom       clone     machine   inputs    init */
-GAME( 1992, karatour, 0,        karatour, karatour, karatour, ROT0,   "Mitchell",                   "The Karate Tournament",           GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, pangpoms, 0,        pangpoms, pangpoms, metro,    ROT0,   "Metro",                      "Pang Pom's"                         , 0 )
-GAME( 1992, pangpomm, pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",   "Pang Pom's (Mitchell)"              , 0 )
-GAME( 1992, skyalert, 0,        skyalert, skyalert, metro,    ROT270, "Metro",                      "Sky Alert"                          , 0 )
-GAME( 1993?,ladykill, 0,        karatour, ladykill, karatour, ROT90,  "Yanyaka (Mitchell license)", "Lady Killer",                     GAME_IMPERFECT_GRAPHICS )
-GAME( 1993?,moegonta, ladykill, karatour, moegonta, karatour, ROT90,  "Yanyaka",                    "Moeyo Gonta!! (Japan)",           GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, poitto,   0,        poitto,   poitto,   metro,    ROT0,   "Metro / Able Corp.",         "Poitto!"                            , 0 )
-GAME( 1994, dharma,   0,        dharma,   dharma,   metro,    ROT0,   "Metro",                      "Dharma Doujou"                      , 0 )
-GAME( 1994, dharmak,  dharma,   dharma,   dharma,   dharmak,  ROT0,   "Metro",                      "Dharma Doujou (Korea)"              , 0 )
-GAME( 1994, lastfort, 0,        lastfort, lastfort, metro,    ROT0,   "Metro",                      "Last Fortress - Toride"             , 0 )
-GAME( 1994, lastfero, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                      "Last Fortress - Toride (Erotic)"    , 0 )
-GAME( 1994, lastforg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                      "Last Fortress - Toride (German)"    , 0 )
-GAME( 1994, toride2g, 0,        toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II Adauchi Gaiden",        GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                      "Toride II (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                      "Gun Master"                      , 0 )
-GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                      "Daitoride",                       GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading", "Mahjong Doukyuusei"        , 0 )
-GAME( 1995, dokyusp,  0,        dokyusp,  gakusai,  gakusai,  ROT0,   "Make Software / Elf / Media Trading", "Mahjong Doukyuusei Special", 0 )
-GAME( 1995, pururun,  0,        pururun,  pururun,  daitorid, ROT0,   "Metro / Banpresto",          "Pururun"                            , 0 )
-GAME( 1995, puzzli,   0,        daitorid, puzzli,   daitorid, ROT0,   "Metro / Banpresto",          "Puzzli",                          GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, 3kokushi, 0,        3kokushi, 3kokushi, karatour, ROT0,   "Mitchell",                   "Sankokushi (Japan)",              GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, balcube,  0,        balcube,  balcube,  balcube,  ROT0,   "Metro",                      "Bal Cube"                           , 0 )
-GAME( 1996, bangball, 0,        bangball, bangball, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse", "Bang Bang Ball (v1.05)" , 0 )
-GAME( 1999, batlbubl, bangball, batlbubl, batlbubl, balcube,  ROT0,   "Limenko",                    "Battle Bubble (v2.00)" , 0 )
-GAME( 1996, mouja,    0,        mouja,    mouja,    mouja,    ROT0,   "Etona",                      "Mouja (Japan)",                   GAME_NO_COCKTAIL )
-GAME( 1997, gakusai,  0,        gakusai,  gakusai,  gakusai,  ROT0,   "MakeSoft",                   "Mahjong Gakuensai (Japan)",       GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, gakusai2, 0,        gakusai2, gakusai,  gakusai,  ROT0,   "MakeSoft",                   "Mahjong Gakuensai 2 (Japan)"        , 0 )
-
-GAME( 1994, blzntrnd, 0,        blzntrnd, blzntrnd, blzntrnd, ROT0,   "Human Amusement",            "Blazing Tornado",                 GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, gstrik2,  0,        gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",            "Grand Striker 2 (Japan)",			GAME_IMPERFECT_GRAPHICS ) // priority between rounds
+GAME( 1992, karatour, 0,        karatour, karatour, karatour, ROT0,   "Mitchell",                               "The Karate Tournament",             GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, pangpoms, 0,        pangpoms, pangpoms, metro,    ROT0,   "Metro",                                  "Pang Pom's",                        0 )
+GAME( 1992, pangpomm, pangpoms, pangpoms, pangpoms, metro,    ROT0,   "Metro (Mitchell license)",               "Pang Pom's (Mitchell)",             0 )
+GAME( 1992, skyalert, 0,        skyalert, skyalert, metro,    ROT270, "Metro",                                  "Sky Alert",                         0 )
+GAME( 1993?,ladykill, 0,        karatour, ladykill, karatour, ROT90,  "Yanyaka (Mitchell license)",             "Lady Killer",                       GAME_IMPERFECT_GRAPHICS )
+GAME( 1993?,moegonta, ladykill, karatour, moegonta, karatour, ROT90,  "Yanyaka",                                "Moeyo Gonta!! (Japan)",             GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, poitto,   0,        poitto,   poitto,   metro,    ROT0,   "Metro / Able Corp.",                     "Poitto!",                           0 )
+GAME( 1994, blzntrnd, 0,        blzntrnd, blzntrnd, blzntrnd, ROT0,   "Human Amusement",                        "Blazing Tornado",                   GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, dharma,   0,        dharma,   dharma,   metro,    ROT0,   "Metro",                                  "Dharma Doujou",                     0 )
+GAME( 1994, dharmak,  dharma,   dharma,   dharma,   dharmak,  ROT0,   "Metro",                                  "Dharma Doujou (Korea)",             0 )
+GAME( 1994, lastfort, 0,        lastfort, lastfort, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride",            0 )
+GAME( 1994, lastfero, lastfort, lastfort, lastfero, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic)",   0 )
+GAME( 1994, lastforg, lastfort, lastforg, ladykill, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   0 )
+GAME( 1994, toride2g, 0,        toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        0 )
+GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei",                0 )
+GAME( 1995, dokyusp,  0,        dokyusp,  gakusai,  gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei Special",        0 )
+GAME( 1995, pururun,  0,        pururun,  pururun,  daitorid, ROT0,   "Metro / Banpresto",                      "Pururun",                           0 )
+GAME( 1995, puzzli,   0,        daitorid, puzzli,   daitorid, ROT0,   "Metro / Banpresto",                      "Puzzli",                            GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, 3kokushi, 0,        3kokushi, 3kokushi, karatour, ROT0,   "Mitchell",                               "Sankokushi (Japan)",                GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, balcube,  0,        balcube,  balcube,  balcube,  ROT0,   "Metro",                                  "Bal Cube",                          0 )
+GAME( 1996, bangball, 0,        bangball, bangball, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse", "Bang Bang Ball (v1.05)",            0 )
+GAME( 1996, gstrik2,  0,        gstrik2,  gstrik2,  blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Japan)",           GAME_IMPERFECT_GRAPHICS ) // priority between rounds
+GAME( 1999, batlbubl, bangball, batlbubl, batlbubl, balcube,  ROT0,   "Limenko",                                "Battle Bubble (v2.00)",             0 )
+GAME( 1996, mouja,    0,        mouja,    mouja,    mouja,    ROT0,   "Etona",                                  "Mouja (Japan)",                     GAME_NO_COCKTAIL )
+GAME( 1997, gakusai,  0,        gakusai,  gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai (Japan)",         GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, gakusai2, 0,        gakusai2, gakusai,  gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai 2 (Japan)",       0 )
+GAME( 2000, puzzlet,  0,        puzzlet,  puzzlet,  puzzlet,  ROT0,   "Yunizu Corporation",                     "Puzzlet (Japan)",                   GAME_NOT_WORKING | GAME_NO_SOUND )

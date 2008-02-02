@@ -6955,6 +6955,7 @@ Other Sun games
 	DRIVER( hyprduel )	/* (c) 1993 Technosoft (World) */
 	DRIVER( hyprdelj )	/* (c) 1993 Technosoft (Japan) */
 	DRIVER( magerror )	/* (c) 199? Technosoft (Japan) */
+	DRIVER( puzzlet )	/* (c) 2000 Yunizu Corporation (Japan) */
 
 	/* Venture Line games */
 	DRIVER( spcforce )	/* (c) 1980 Venture Line */

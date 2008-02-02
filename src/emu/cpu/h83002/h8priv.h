@@ -36,9 +36,19 @@ typedef struct
 
 extern h83002_state h8;
 
+UINT8 h8_register_read8(UINT32 address);
+UINT8 h8_3007_register_read8(UINT32 address);
+UINT8 h8_3007_register1_read8(UINT32 address);
+void h8_register_write8(UINT32 address, UINT8 val);
+void h8_3007_register_write8(UINT32 address, UINT8 val);
+void h8_3007_register1_write8(UINT32 address, UINT8 val);
+
 void h8_itu_init(void);
+void h8_3007_itu_init(void);
 void h8_itu_reset(void);
 UINT8 h8_itu_read8(UINT8 reg);
+UINT8 h8_3007_itu_read8(UINT8 reg);
 void h8_itu_write8(UINT8 reg, UINT8 val);
+void h8_3007_itu_write8(UINT8 reg, UINT8 val);
 
 #endif

@@ -161,6 +161,8 @@ void pentium_get_info(UINT32 state, cpuinfo *info);
 void mediagx_get_info(UINT32 state, cpuinfo *info);
 void i960_get_info(UINT32 state, cpuinfo *info);
 void h8_3002_get_info(UINT32 state, cpuinfo *info);
+void h8_3007_get_info(UINT32 state, cpuinfo *info);
+void h8_3044_get_info(UINT32 state, cpuinfo *info);
 void v810_get_info(UINT32 state, cpuinfo *info);
 void m37702_get_info(UINT32 state, cpuinfo *info);
 void m37710_get_info(UINT32 state, cpuinfo *info);
@@ -674,6 +676,8 @@ static const struct
 #endif
 #if (HAS_H83002)
 	{ CPU_H83002, h8_3002_get_info },
+	{ CPU_H83007, h8_3007_get_info },
+	{ CPU_H83044, h8_3044_get_info },
 #endif
 #if (HAS_V810)
 	{ CPU_V810, v810_get_info },
