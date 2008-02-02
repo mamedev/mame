@@ -7336,7 +7336,7 @@ Other Sun games
 	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
 	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( lockon )	/* (c) 1986 Tatsumi */
-	DRIVER( lockone )	/* (c) 1986 Tatsumi */
+	DRIVER( lockonc )	/* (c) 1986 Tatsumi */
 	/* Gray Out */		/* (c) 1987 Tatsumi */
 	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
 	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
