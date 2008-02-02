@@ -1357,9 +1357,9 @@ $(MAMEOBJ)/taito.a: \
 	$(VIDEO)/taitoic.o \
 
 $(MAMEOBJ)/tatsumi.a: \
-	$(DRIVERS)/lockon.o \
-	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
 	$(DRIVERS)/tx1.o $(MACHINE)/tx1.o $(AUDIO)/tx1.o $(VIDEO)/tx1.o \
+	$(DRIVERS)/lockon.o $(VIDEO)/lockon.o \
+	$(DRIVERS)/tatsumi.o $(MACHINE)/tatsumi.o $(VIDEO)/tatsumi.o \
 
 $(MAMEOBJ)/tch.a: \
 	$(DRIVERS)/kickgoal.o $(VIDEO)/kickgoal.o \
@@ -1519,6 +1519,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
+	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
 	$(DRIVERS)/dgpix.o \

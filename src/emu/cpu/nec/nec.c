@@ -152,6 +152,7 @@ typedef struct
 	UINT32	pending_irq;
 	UINT32	nmi_state;
 	UINT32	irq_state;
+	UINT32	poll_state;
 	UINT8	no_interrupt;
 
 	int     (*irq_callback)(int irqline);
@@ -224,6 +225,8 @@ static void nec_reset (void)
 		Mod_RM.RM.w[i] = (WREGS)( i & 7 );
 		Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
     }
+
+	I.poll_state = 1;
 }
 
 static void nec_exit (void)
@@ -637,7 +640,7 @@ OP( 0x97, i_xchg_axdi ) { XchgAWReg(IY); CLK(3); }
 OP( 0x98, i_cbw       ) { I.regs.b[AH] = (I.regs.b[AL] & 0x80) ? 0xff : 0;		CLK(2);	}
 OP( 0x99, i_cwd       ) { I.regs.w[DW] = (I.regs.b[AH] & 0x80) ? 0xffff : 0;	CLK(4);	}
 OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	FETCHWORD(tmp); FETCHWORD(tmp2); PUSH(I.sregs[PS]); PUSH(I.ip); I.ip = (WORD)tmp; I.sregs[PS] = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,I.regs.w[SP]); }
-OP( 0x9b, i_wait      ) { logerror("%06x: Hardware POLL\n",activecpu_get_pc()); }
+OP( 0x9b, i_wait      ) { if (!I.poll_state) I.ip--; CLK(5); }
 OP( 0x9c, i_pushf     ) { UINT16 tmp = CompressFlags(); PUSH( tmp ); CLKS(12,8,3); }
 OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); ExpandFlags(tmp); CLKS(12,8,5); if (I.TF) nec_trap(); }
 OP( 0x9e, i_sahf      ) { UINT32 tmp = (CompressFlags() & 0xff00) | (I.regs.b[AH] & 0xd5); ExpandFlags(tmp); CLKS(3,3,2); }
@@ -998,6 +1001,11 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
+static void set_poll_line(int state)
+{
+	I.poll_state = state;
+}
+
 #ifdef MAME_DEBUG
 static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
@@ -1022,6 +1030,7 @@ static void nec_init(int index, int clock, const void *config, int (*irqcallback
 	state_save_register_item(names[type], index, I.pending_irq);
 	state_save_register_item(names[type], index, I.nmi_state);
 	state_save_register_item(names[type], index, I.irq_state);
+	state_save_register_item(names[type], index, I.poll_state);
 	state_save_register_item(names[type], index, I.AuxVal);
 	state_save_register_item(names[type], index, I.OverVal);
 	state_save_register_item(names[type], index, I.ZeroVal);
@@ -1252,8 +1261,9 @@ static void nec_set_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(0, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(0, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:	set_poll_line(info->i);					break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + NEC_PC:
@@ -1330,8 +1340,9 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (I.pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = I.nmi_state;					break;
+		case CPUINFO_INT_INPUT_STATE + 0:					info->i = (I.pending_irq & INT_IRQ) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = I.nmi_state;				break;
+		case CPUINFO_INT_INPUT_STATE + NEC_INPUT_LINE_POLL:	info->i = I.poll_state;				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not supported */						break;
 

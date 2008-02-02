@@ -7332,9 +7332,11 @@ Other Sun games
 	/* Tatsumi Games */
 	DRIVER( tx1 )		/* (c) 1983 Tatsumi */
 	DRIVER( tx1a )		/* (c) 1983 Tatsumi */
+	/* TX-1 V8 */		/* (c) 1984 Tatsumi */
 	DRIVER( buggyboy )	/* (c) 1985 Tatsumi */
 	DRIVER( buggybjr )	/* (c) 1986 Tatsumi */
 	DRIVER( lockon )	/* (c) 1986 Tatsumi */
+	DRIVER( lockone )	/* (c) 1986 Tatsumi */
 	/* Gray Out */		/* (c) 1987 Tatsumi */
 	DRIVER( apache3 )	/* (c) 1988 Tatsumi */
 	DRIVER( roundup5 )	/* (c) 1989 Tatsumi */
