@@ -298,13 +298,13 @@ static int mips3_translate(int space, offs_t *address)
 }
 
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	/* common disassemble */
 	return mips3com_dasm(&mips3.core, buffer, pc, oprom, opram);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1681,7 +1681,7 @@ int mips3_execute(int cycles)
 
 		/* debugging */
 		mips3.ppc = mips3.core.pc;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(mips3.core.pc);
 
 		/* instruction fetch */
 		op = ROPCODE(mips3.pcbase | (mips3.core.pc & 0xfff));
@@ -2138,7 +2138,7 @@ void mips3_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
 #endif
 		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;

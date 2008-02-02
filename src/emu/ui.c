@@ -1246,11 +1246,8 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 		return ui_set_handler(ui_menu_ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
-#ifdef MAME_DEBUG
-	if (!Machine->debug_mode)
-#endif
-		if (input_ui_pressed(IPT_UI_ON_SCREEN_DISPLAY))
-			return ui_set_handler(handler_slider, 0);
+	if (!Machine->debug_mode && input_ui_pressed(IPT_UI_ON_SCREEN_DISPLAY))
+		return ui_set_handler(handler_slider, 0);
 
 	/* handle a reset request */
 	if (input_ui_pressed(IPT_UI_RESET_MACHINE))

@@ -2943,7 +2943,7 @@ TABLE_FUNCTION(int, execute, (int clocks))
 		do
 		{
 			REG_PPC = REG_PC;
-			M37710_CALL_DEBUGGER;
+			M37710_CALL_DEBUGGER(REG_PC);
 			REG_PC++;
 			REG_IR = read_8_IMM(REG_PB | REG_PPC);
 			FTABLE_OPCODES[REG_IR]();

@@ -47,7 +47,7 @@
     ARM7_ICOUNT = cycles;
     do
     {
-    	CALL_MAME_DEBUG;
+    	CALL_DEBUGGER(R15);
 
 	/* handle Thumb instructions if active */
 	if( T_IS_SET(GET_CPSR) )

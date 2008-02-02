@@ -117,7 +117,7 @@ static int sc61860_execute(int cycles)
 	{
 		sc61860.oldpc = sc61860.pc;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(sc61860.pc);
 
 		sc61860_instruction();
 
@@ -214,9 +214,9 @@ void sc61860_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = sc61860_reset;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sc61860_execute;				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sc61860_dasm;					break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

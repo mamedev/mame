@@ -215,7 +215,7 @@ int m65ce02_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PCD);
 
 		/* if an irq is pending, take it now */
 		if( m65ce02.pending_irq )
@@ -373,7 +373,7 @@ const char *m65ce02_info(void *context, int regnum)
 
 unsigned int m65ce02_dasm(char *buffer, unsigned pc)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	return Dasm65ce02( buffer, pc );
 #else
 	sprintf( buffer, "$%02X", cpu_readop(pc) );

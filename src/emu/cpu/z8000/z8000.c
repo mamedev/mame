@@ -480,7 +480,7 @@ static int z8000_execute(int cycles)
         if (IRQ_REQ)
 			Interrupt();
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 
 		if (IRQ_REQ & Z8000_HALT)
         {
@@ -689,9 +689,9 @@ void z8000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = z8000_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = z8000_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z8000_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z8000_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

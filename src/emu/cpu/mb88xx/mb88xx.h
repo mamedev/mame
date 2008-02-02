@@ -71,7 +71,7 @@ void mb8842_get_info(UINT32 state, cpuinfo *info);
 void mb8843_get_info(UINT32 state, cpuinfo *info);
 void mb8844_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

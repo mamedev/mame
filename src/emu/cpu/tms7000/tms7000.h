@@ -47,9 +47,9 @@ extern void tms7000_A6EC1( void ); /* External event counter */
 extern void tms7000_get_info(UINT32 state, cpuinfo *info);
 extern void tms7000_exl_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern unsigned tms7000_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 #endif /* _TMS7000_H */
 

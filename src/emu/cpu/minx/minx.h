@@ -10,7 +10,7 @@ enum {
         MINX_XI, MINX_YI,
 };
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern unsigned minx_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 #endif
 

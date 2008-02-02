@@ -2166,7 +2166,7 @@ static int cp1610_execute(int cycles)
 
     do
     {
-        CALL_MAME_DEBUG;
+        CALL_DEBUGGER(cp1610.r[7]);
 
 		cp1610.mask_interrupts = 0;
 
@@ -3491,9 +3491,9 @@ void cp1610_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_EXECUTE:						info->execute = cp1610_execute;			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cp1610_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cp1610_icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

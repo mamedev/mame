@@ -216,7 +216,7 @@ extern void m58715_get_info(UINT32 state, cpuinfo *info);
  */
 #define I8039_RDOP_ARG(A) ((unsigned)cpu_readop_arg(A))
 
-#ifdef  MAME_DEBUG
+#ifdef  ENABLE_DEBUGGER
 offs_t i8039_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

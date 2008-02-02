@@ -249,7 +249,7 @@ $(WINOBJ)/drawdd.o : 	$(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
 
 # add debug-specific files
-ifdef DEBUG
+ifdef DEBUGGER
 OSDOBJS += \
 	$(WINOBJ)/debugwin.o
 endif

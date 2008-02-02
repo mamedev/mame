@@ -706,10 +706,9 @@ static void set_cpu_reg(UINT32 ref, UINT64 value)
     before executing each instruction
 -------------------------------------------------*/
 
-void mame_debug_hook(void)
+void mame_debug_hook(offs_t curpc)
 {
 	int cpunum = cpu_getactivecpu();
-	offs_t curpc = activecpu_get_pc();
 	debug_cpu_info *info = &debug_cpuinfo[cpunum];
 
 	/* update the history */

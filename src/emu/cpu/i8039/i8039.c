@@ -748,7 +748,7 @@ static int i8039_execute(int cycles)
 	{
 		R.PREVPC = R.PC;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(R.PC.w.l);
 
 		opcode=M_RDOP(R.PC.w.l);
 
@@ -943,9 +943,9 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = i8039_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8039_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8039_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8039_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

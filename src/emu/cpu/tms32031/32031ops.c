@@ -85,7 +85,7 @@ static UINT32 defval;
 
 static void illegal(void)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	logerror("Illegal op @ %06X: %08X (tbl=%03X)\n", tms32031.pc - 1, OP, OP >> 21);
 	DEBUGGER_BREAK;
 #endif
@@ -100,7 +100,7 @@ static void unimplemented(void)
 
 INLINE void execute_one(void)
 {
-	CALL_MAME_DEBUG;
+	CALL_DEBUGGER(tms32031.pc);
 	OP = ROPCODE(tms32031.pc);
 	tms32031_icount -= 2;	/* 2 clocks per cycle */
 	tms32031.pc++;

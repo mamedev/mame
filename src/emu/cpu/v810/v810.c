@@ -974,7 +974,7 @@ static int v810_execute(int cycles)
 	while(v810_ICount>=0)
 	{
 		v810.PPC=PC;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 		OP=R_OP(PC);
 		PC+=2;
 		v810_ICount-= OpCodeTable[OP>>10]();
@@ -1183,9 +1183,9 @@ void v810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = v810_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v810_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v810_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

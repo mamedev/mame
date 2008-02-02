@@ -262,7 +262,7 @@ static void set_cop0_reg(int reg, UINT32 data)
 
 static void unimplemented_opcode(UINT32 op)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	char string[200];
 	rsp_dasm_one(string, rsp.ppc, op);
 	mame_printf_debug("%08X: %s\n", rsp.ppc, string);
@@ -2596,7 +2596,7 @@ static int rsp_execute(int cycles)
 	while (rsp_icount > 0)
 	{
 		rsp.ppc = rsp.pc;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(rsp.pc);
 
 		op = ROPCODE(rsp.pc);
 		if (rsp.nextpc != ~0)
@@ -2875,13 +2875,13 @@ static void rsp_set_context(void *src)
 
 /*****************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t rsp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 op = LITTLE_ENDIANIZE_INT32(*(UINT32 *)opram);
 	return rsp_dasm_one(buffer, pc, op);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 /*****************************************************************************/
 
@@ -3010,9 +3010,9 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = rsp_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = rsp_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = rsp_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &rsp_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

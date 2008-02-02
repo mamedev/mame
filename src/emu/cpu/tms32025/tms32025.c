@@ -1982,7 +1982,7 @@ static int tms32025_execute(int cycles)
 	while (R.idle && tms32025_icount > 0)
 		process_timer(tms32025_icount);
 
-	if (tms32025_icount <= 0) CALL_MAME_DEBUG;
+	if (tms32025_icount <= 0) CALL_DEBUGGER(R.PC);
 
 
 	while (tms32025_icount > 0)
@@ -1995,7 +1995,7 @@ static int tms32025_execute(int cycles)
 
 		R.PREVPC = R.PC;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;
@@ -2020,7 +2020,7 @@ static int tms32025_execute(int cycles)
 		if (R.init_load_addr == 2) {		/* Repeat next instruction */
 			R.PREVPC = R.PC;
 
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(R.PC);
 
 			R.opcode.d = M_RDOP(R.PC);
 			R.PC++;
@@ -2385,9 +2385,9 @@ void tms32025_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms32025_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms32025_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32025_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_READ:							info->read = tms32025_read;				break;
 		case CPUINFO_PTR_WRITE:							info->write = tms32025_write;			break;
 		case CPUINFO_PTR_READOP:						info->readop = tms32025_readop;			break;

@@ -58,9 +58,9 @@ typedef struct
 	void (*crc)(int addr, int data);
 } SATURN_CONFIG;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 unsigned saturn_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 void saturn_get_info(UINT32 state, cpuinfo *info);
 

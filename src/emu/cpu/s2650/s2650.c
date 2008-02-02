@@ -865,7 +865,7 @@ static int s2650_execute(int cycles)
 	{
 		S.ppc = S.page + S.iar;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(S.page + S.iar);
 
 		S.ir = ROP();
 		S.r = S.ir & 3; 		/* register / value */
@@ -1569,9 +1569,9 @@ void s2650_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = s2650_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = s2650_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = s2650_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &s2650_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

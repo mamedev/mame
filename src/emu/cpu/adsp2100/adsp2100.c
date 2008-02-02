@@ -951,7 +951,7 @@ static int adsp2100_execute(int cycles)
 
 		/* debugging */
 		adsp2100.ppc = adsp2100.pc;	/* copy PC to previous PC */
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(adsp2100.pc);
 
 #if TRACK_HOTSPOTS
 		pcbucket[adsp2100.pc & 0x3fff]++;
@@ -1691,9 +1691,9 @@ static int adsp2100_execute(int cycles)
     DEBUGGER DEFINITIONS
 ***************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern offs_t adsp2100_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1948,9 +1948,9 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = adsp2100_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = adsp2100_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = adsp2100_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp2100_icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

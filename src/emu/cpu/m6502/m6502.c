@@ -227,7 +227,7 @@ static int m6502_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PCD);
 
 		/* if an irq is pending, take it now */
 		if( m6502.pending_irq )
@@ -446,7 +446,7 @@ static int m65c02_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PCD);
 
 		op = RDOP();
 		(*m6502.insn[op])();
@@ -617,7 +617,7 @@ static int deco16_execute(int cycles)
 		UINT8 op;
 		PPC = PCD;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PCD);
 
 		op = RDOP();
 		(*m6502.insn[op])();
@@ -744,7 +744,7 @@ void m6502_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m6502_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6502_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;
@@ -828,7 +828,7 @@ void m6510_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6510_set_info;			break;
 		case CPUINFO_PTR_INIT:							info->init = m6510_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m6510_reset;				break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6510_dasm;			break;
 #endif
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map = construct_map_m6510_mem; break;
@@ -926,7 +926,7 @@ void m65c02_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = m65c02_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = m65c02_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m65c02_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65c02_dasm;		break;
 #endif
 
@@ -950,7 +950,7 @@ void m65sc02_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = m65sc02_init;				break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65sc02_dasm;		break;
 #endif
 
@@ -998,7 +998,7 @@ void deco16_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INIT:							info->init = deco16_init;				break;
 		case CPUINFO_PTR_RESET:							info->reset = deco16_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = deco16_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = deco16_dasm;		break;
 #endif
 

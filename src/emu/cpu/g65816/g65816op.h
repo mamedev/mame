@@ -2435,7 +2435,7 @@ TABLE_FUNCTION(int, execute, (int clocks))
 			g65816i_check_maskable_interrupt();
 
 			REGISTER_PPC = REGISTER_PC;
-			G65816_CALL_DEBUGGER;
+			G65816_CALL_DEBUGGER(REGISTER_PC);
 
 			REGISTER_PC++;
 			REGISTER_IR = read_8_IMM(REGISTER_PB | REGISTER_PPC);

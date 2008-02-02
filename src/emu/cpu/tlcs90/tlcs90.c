@@ -1330,7 +1330,7 @@ static int t90_execute(int cycles)
 	do
 	{
 		T90.prvpc.d = T90.pc.d;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(T90.pc.d);
 
 		check_interrupts();
 
@@ -2784,7 +2784,7 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:										info->exit = t90_exit;				break;
 		case CPUINFO_PTR_EXECUTE:									info->execute = t90_execute;		break;
 		case CPUINFO_PTR_BURN:										info->burn = t90_burn;				break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = t90_dasm;		break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;

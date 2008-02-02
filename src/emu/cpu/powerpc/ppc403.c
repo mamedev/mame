@@ -177,7 +177,7 @@ static int ppc403_execute(int cycles)
 	{
 		UINT32 opcode;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(ppc.pc);
 		ppc.pc = ppc.npc;
 		ppc.npc += 4;
 		opcode = ROPCODE(ppc.pc);

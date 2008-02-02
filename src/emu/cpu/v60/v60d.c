@@ -1460,7 +1460,7 @@ static int (*const dasm_optable[256])(unsigned ipc, unsigned pc, char *out) =
 	/* 0xFF */ dopCLRTLB
 };
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t v60_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	rombase = oprom;

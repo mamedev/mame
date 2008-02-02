@@ -265,7 +265,7 @@ enum
 #define ONE_MORE_INSN() {		\
 	UINT8 ireg; 							\
 	pPPC = pPC; 							\
-	CALL_MAME_DEBUG;						\
+	CALL_DEBUGGER(PCD);						\
 	ireg=M_RDOP(PCD);						\
 	PC++;									\
 	(*m6800.insn[ireg])();					\
@@ -988,7 +988,7 @@ static int m6800_execute(int cycles)
 		else
 		{
 			pPPC = pPC;
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -1335,7 +1335,7 @@ static int m6803_execute(int cycles)
 		else
 		{
 			pPPC = pPC;
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -1675,7 +1675,7 @@ static int hd63701_execute(int cycles)
 		else
 		{
 			pPPC = pPC;
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -2007,7 +2007,7 @@ static int nsc8105_execute(int cycles)
 		else
 		{
 			pPPC = pPC;
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -2653,9 +2653,9 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = m6800_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6800_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6800_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6800_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2705,9 +2705,9 @@ void m6801_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = m6801_init;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6803_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6801_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
@@ -2732,9 +2732,9 @@ void m6802_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = m6802_init;				break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6802_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
@@ -2762,9 +2762,9 @@ void m6803_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = m6803_init;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = m6803_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6803_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_m6803_mem; break;
 
@@ -2791,9 +2791,9 @@ void m6808_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = m6808_init;				break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6808_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
@@ -2821,9 +2821,9 @@ void hd63701_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = hd63701_init;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hd63701_execute;		break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd63701_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
@@ -2849,9 +2849,9 @@ void nsc8105_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = nsc8105_init;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = nsc8105_execute;		break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nsc8105_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;

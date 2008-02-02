@@ -223,7 +223,7 @@ static int cop420_execute(int cycles)
 	{
 		prevPC = PC;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 
 		opcode = ROM(PC);
 
@@ -380,9 +380,9 @@ void cop420_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = cop420_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = cop420_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop420_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop420_ICount;			break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
  			info->internal_map = construct_map_cop420_RAM;										break;

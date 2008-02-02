@@ -195,7 +195,7 @@ enum
 /* OP_COP0 */
 #define CF_RFE ( 16 )
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram );
 #endif
 

@@ -1236,6 +1236,28 @@ $(CPUOBJ)/upd7810/upd7810.o:	$(CPUSRC)/upd7810/upd7810.c \
 
 
 #-------------------------------------------------
+# Nintendo Minx
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_MINX=$(if $(filter MINX,$(CPUS)),1,0)
+
+ifneq ($(filter MINX,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/minx
+CPUOBJS += $(CPUOBJ)/minx/minx.o
+DBGOBJS += $(CPUOBJ)/minx/minxd.o
+endif
+
+$(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
+							$(CPUSRC)/minx/minx.h \
+							$(CPUSRC)/minx/minxd.c \
+							$(CPUSRC)/minx/minxopce.h \
+							$(CPUSRC)/minx/minxopcf.h \
+							$(CPUSRC)/minx/minxops.h \
+							$(CPUSRC)/minx/minxfunc.h
+
+
+
+#-------------------------------------------------
 # Nintendo/SGI RSP (R3000-based + vector processing)
 #-------------------------------------------------
 
@@ -1611,6 +1633,25 @@ $(CPUOBJ)/z80/z80.o:	$(CPUSRC)/z80/z80.c \
 
 
 #-------------------------------------------------
+# Game Boy Z-80
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_Z80GB=$(if $(filter Z80GB,$(CPUS)),1,0)
+
+ifneq ($(filter Z80GB,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/z80gb
+CPUOBJS += $(CPUOBJ)/z80gb/z80gb.o
+DBGOBJS += $(CPUOBJ)/z80gb/z80gbd.o
+endif
+
+$(CPUOBJ)/z80gb/z80gb.o:	$(CPUSRC)/z80gb/z80gb.c \
+							$(CPUSRC)/z80gb/z80gb.h \
+							$(CPUSRC)/z80gb/opc_cb.h \
+							$(CPUSRC)/z80gb/opc_main.h
+
+
+
+#-------------------------------------------------
 # Zilog Z180
 #-------------------------------------------------
 
@@ -1654,44 +1695,3 @@ $(CPUOBJ)/z8000/z8000.o:	$(CPUSRC)/z8000/z8000.c \
 							$(CPUSRC)/z8000/z8000dab.h \
 							$(CPUSRC)/z8000/z8000ops.c \
 							$(CPUSRC)/z8000/z8000tbl.c
-
-
-
-#-------------------------------------------------
-# Game Boy Z-80
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_Z80GB=$(if $(filter Z80GB,$(CPUS)),1,0)
-
-ifneq ($(filter Z80GB,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/z80gb
-CPUOBJS += $(CPUOBJ)/z80gb/z80gb.o
-DBGOBJS += $(CPUOBJ)/z80gb/z80gbd.o
-endif
-
-$(CPUOBJ)/z80gb/z80gb.o:	$(CPUSRC)/z80gb/z80gb.c \
-							$(CPUSRC)/z80gb/z80gb.h \
-							$(CPUSRC)/z80gb/opc_cb.h \
-							$(CPUSRC)/z80gb/opc_main.h
-
-#-------------------------------------------------
-# Nintendo Minx
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_MINX=$(if $(filter MINX,$(CPUS)),1,0)
-
-ifneq ($(filter MINX,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/minx
-CPUOBJS += $(CPUOBJ)/minx/minx.o
-DBGOBJS += $(CPUOBJ)/minx/minxd.o
-endif
-
-$(CPUOBJ)/minx/minx.o:		$(CPUSRC)/minx/minx.c \
-							$(CPUSRC)/minx/minx.h \
-							$(CPUSRC)/minx/minxd.c \
-							$(CPUSRC)/minx/minxopce.h \
-							$(CPUSRC)/minx/minxopcf.h \
-							$(CPUSRC)/minx/minxops.h \
-							$(CPUSRC)/minx/minxfunc.h
-
-

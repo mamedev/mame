@@ -26,7 +26,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef MAME_DEBUG					/* Compile interface to MAME */
+#ifdef ENABLE_DEBUGGER					/* Compile interface to MAME */
 #include "cpuintrf.h"
 static const UINT8 *rombase;
 static const UINT8 *rambase;

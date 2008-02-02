@@ -31,7 +31,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 #define LOG_CODE				(0)
 #define SINGLE_INSTRUCTION_MODE	(0)
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #define COMPARE_AGAINST_C		(0)
 #else
 #define COMPARE_AGAINST_C		(0)
@@ -303,12 +303,12 @@ static int mips3_translate(int space, offs_t *address)
     mips3_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return mips3com_dasm(mips3.core, buffer, pc, oprom, opram);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -569,9 +569,9 @@ static void mips3_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = mips3_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -913,7 +913,7 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
     DISASSEMBLERS
 ***************************************************************************/
 
-#if !defined(MAME_DEBUG) && (LOG_CODE)
+#if !defined(ENABLE_DEBUGGER) && (LOG_CODE)
 #include "mips3dsm.c"
 #endif
 

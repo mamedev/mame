@@ -143,7 +143,7 @@ static int ssp1610_execute(int cycles)
 
 		PPC = PC;	/* copy PC to previous PC */
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 
 		op = READ_OP(PC);
 
@@ -690,12 +690,12 @@ static void ssp1610_set_context(void *regs)
 		ssp1610 = *(ssp1610_regs *)regs;
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t ssp1610_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return dasm_ssp1610( buffer, pc, oprom);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 #if (HAS_SSP1610)
 
@@ -818,9 +818,9 @@ void ssp1610_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = ssp1610_exit;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = ssp1610_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ssp1610_dasm;	break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ssp1610_ICount;		break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map = 0;	break;

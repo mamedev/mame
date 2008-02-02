@@ -2747,7 +2747,7 @@ static void sharcop_idle(void)
 
 static void sharcop_unimplemented(void)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	char dasm[1000];
 	sharc_dasm(dasm, sharc.pc, NULL, NULL);
 	mame_printf_debug("SHARC: %08X: %s\n", sharc.pc, dasm);

@@ -331,7 +331,7 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_RESET:	info->reset = tms7000_reset;	break;
         case CPUINFO_PTR_EXECUTE:	info->execute = tms7000_execute;	break;
         case CPUINFO_PTR_BURN:	info->burn = NULL;	/* Not supported */break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
         case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = tms7000_dasm;	break;
 #endif
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
@@ -471,7 +471,7 @@ static int tms7000_execute(int cycles)
 
 	do
 	{
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(pPC);
 
 		if( tms7000.idle_state == 0 )
 		{
@@ -510,7 +510,7 @@ static int tms7000_exl_execute(int cycles)
 
 	do
 	{
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(pPC);
 
 		if( tms7000.idle_state == 0 )
 		{

@@ -509,7 +509,7 @@ INLINE void fetch_instruction(void)
 {
 	/* debugging */
 	asap.ppc = asap.pc;
-	CALL_MAME_DEBUG;
+	CALL_DEBUGGER(asap.pc);
 
 	/* instruction fetch */
 	asap.op.d = ROPCODE(asap.pc);
@@ -565,9 +565,9 @@ static int asap_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern offs_t asap_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 
@@ -1807,9 +1807,9 @@ void asap_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = asap_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = asap_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = asap_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &asap_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

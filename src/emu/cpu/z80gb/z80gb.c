@@ -307,7 +307,7 @@ static int z80gb_execute (int cycles)
 		} else {
 			/* Fetch and count cycles */
 			z80gb_ProcessInterrupts ();
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(Regs.w.PC);
 			if ( Regs.w.enable & HALTED ) {
 				CYCLES_PASSED( Cycles[0x76] );
 				Regs.w.execution_state = 1;
@@ -466,7 +466,7 @@ void z80gb_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_EXECUTE:						info->execute = z80gb_execute;			break;
 	case CPUINFO_PTR_BURN:							info->burn = z80gb_burn;						break;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z80gb_dasm;	break;
 #endif
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z80gb_ICount;			break;

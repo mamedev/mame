@@ -141,7 +141,7 @@ static int minx_execute( int cycles ) {
 	minx_icount = cycles;
 
 	do {
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(minx_PC);
 		oldpc = minx_PC;
 		op = rdop();
 		insnminx[op]();
@@ -279,7 +279,7 @@ void minx_get_info( UINT32 state, cpuinfo *info ) {
 	case CPUINFO_PTR_EXIT:					info->exit = minx_exit; break;
 	case CPUINFO_PTR_EXECUTE:				info->execute = minx_execute; break;
 	case CPUINFO_PTR_BURN:					info->burn = minx_burn; break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = minx_dasm; break;
 #endif
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &minx_icount; break;

@@ -7,9 +7,9 @@
 #include "deprecat.h"
 #include "debugger.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static void sharc_dma_exec(int channel);
 static void check_interrupts(void);
@@ -407,7 +407,7 @@ void sharc_external_dma_write(UINT32 address, UINT64 data)
 	}
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT64 op = 0;
@@ -420,7 +420,7 @@ static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 	flags = sharc_dasm_one(buffer, pc, op);
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 static void sharc_init(int index, int clock, const void *config, int (*irqcallback)(int))
@@ -593,7 +593,7 @@ static int sharc_execute(int cycles)
 		}
 
 		sharc_icount = 0;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(sharc.daddr);
 
 		return cycles;
 	}
@@ -628,7 +628,7 @@ static int sharc_execute(int cycles)
 		// fetch next instruction
 		sharc.fetch_opcode = ROPCODE(sharc.faddr);
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(sharc.pc);
 
 		// handle looping
 		if (sharc.pc == (sharc.laddr & 0xffffff))
@@ -1096,9 +1096,9 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = sharc_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sharc_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sharc_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sharc_icount;			break;
 		case CPUINFO_PTR_READ:							info->read = sharc_debug_read;			break;
 		case CPUINFO_PTR_READOP:						info->readop = sharc_debug_readop;		break;

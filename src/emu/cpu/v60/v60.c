@@ -426,7 +426,7 @@ static int v60_execute(int cycles)
 		v60_try_irq();
 	while(v60_ICount >= 0) {
 		v60.PPC = PC;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 		v60_ICount -= 8;	/* fix me -- this is just an average */
 		inc = OpCodeTable[OpRead8(PC)]();
 		PC += inc;
@@ -453,10 +453,10 @@ static void v60_set_context(void *src)
 }
 
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t v60_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t v70_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 /**************************************************************************
@@ -642,9 +642,9 @@ void v60_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = v60_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = v60_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v60_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v60_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -733,9 +733,9 @@ void v70_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = v70_init;					break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v70_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V70");					break;

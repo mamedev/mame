@@ -408,7 +408,7 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 		ExitProcess(100);
 	already_hit = 1;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 {
 extern void debug_flush_traces(void);
 debug_flush_traces();

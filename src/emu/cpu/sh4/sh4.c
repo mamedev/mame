@@ -314,7 +314,7 @@ UINT32 z;
 }
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static void sh4_syncronize_register_bank(int to)
 {
 int s;
@@ -426,7 +426,7 @@ INLINE void sh4_exception(const char *message, int exception) // handle exceptio
 	sh4.sgr = sh4.r[15];
 
 	sh4.sr |= MD;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 #endif
 	if (!(sh4.sr & sRB))
@@ -1093,7 +1093,7 @@ INLINE void JSR(UINT32 m)
 /*  LDC     Rm,SR */
 INLINE void LDCSR(UINT32 m)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 #endif
 	if ((sh4.r[m] & sRB) != (sh4.sr & sRB))
@@ -1122,7 +1122,7 @@ UINT32 old;
 	old = sh4.sr;
 	sh4.ea = sh4.r[m];
 	sh4.sr = RL( sh4.ea ) & FLAGS;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	sh4_syncronize_register_bank((old & sRB) >> 29);
 #endif
 	if ((old & sRB) != (sh4.sr & sRB))
@@ -1709,7 +1709,7 @@ INLINE void RTE(void)
 {
 	sh4.delay = sh4.pc;
 	sh4.pc = sh4.ea = sh4.spc;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 #endif
 	if ((sh4.ssr & sRB) != (sh4.sr & sRB))
@@ -3561,7 +3561,7 @@ static int sh4_execute(int cycles)
 		else
 			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(sh4.pc);
 
 		sh4.delay = 0;
 		sh4.pc += 2;
@@ -4527,12 +4527,12 @@ static void sh4_parse_configuration(const struct sh4_config *conf)
 	}
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static void sh4_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -4981,9 +4981,9 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = sh4_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

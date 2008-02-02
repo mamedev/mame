@@ -5,7 +5,7 @@
 void tms32051_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t tms32051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

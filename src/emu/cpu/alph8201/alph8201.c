@@ -785,7 +785,7 @@ mame_printf_debug("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
 
 		/* run */
 		R.PREVPC = PC;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 		opcode =M_RDOP(PC);
 #if TRACE_PC
 mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
@@ -949,9 +949,9 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = ALPHA8201_reset;			break;
 		case CPUINFO_PTR_EXIT:							info->exit = ALPHA8201_exit;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ALPHA8201_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ALPHA8201_ICount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

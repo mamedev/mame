@@ -65,7 +65,7 @@
 #include "x64drc.h"
 #include "debugger.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "deprecat.h"
 #endif
 
@@ -175,7 +175,7 @@ drc_core *drc_init(UINT8 cpunum, drc_config *config)
 		goto error;
 
 	/* get pointers to external C functions */
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	drc->mame_debug_hook = (x86code *)mame_debug_hook;
 #endif
 	drc->recompile_code = (x86code *)recompile_code;
@@ -421,7 +421,7 @@ void drc_invalidate_code_range(drc_core *drc, UINT32 startpc, UINT32 endpc)
 
 void drc_append_call_debugger(drc_core *drc)
 {
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	if (Machine->debug_mode)
 		emit_call_m64(DRCTOP, MDRC(&drc->mame_debug_hook));							// call mame_debug_hook
 #endif

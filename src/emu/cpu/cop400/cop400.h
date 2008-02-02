@@ -42,9 +42,9 @@ extern void cop410_get_info(UINT32 state, cpuinfo *info);
 extern void cop411_get_info(UINT32 state, cpuinfo *info);
 extern void cop420_get_info(UINT32 state, cpuinfo *info);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 #endif  /* _COP400_H */

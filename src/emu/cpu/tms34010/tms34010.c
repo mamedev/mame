@@ -835,8 +835,8 @@ static int tms34010_execute(int cycles)
 	do
 	{
 
-		#ifdef	MAME_DEBUG
-		if (Machine->debug_mode) { state.st = GET_ST(); mame_debug_hook(); }
+		#ifdef	ENABLE_DEBUGGER
+		if (Machine->debug_mode) { state.st = GET_ST(); mame_debug_hook(PC); }
 		#endif
 		state.op = ROPCODE();
 		(*opcode_table[state.op >> 4])();
@@ -1864,9 +1864,9 @@ void tms34010_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = tms34010_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = tms34010_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms34010_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms34010_ICount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1953,9 +1953,9 @@ void tms34020_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms34020_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms34020_set_context; break;
 		case CPUINFO_PTR_RESET:							info->reset = tms34020_reset;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms34020_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS34020");			break;

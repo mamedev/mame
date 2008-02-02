@@ -254,7 +254,7 @@ static int ppc602_execute(int cycles)
 	while( ppc_icount > 0 )
 	{
 		ppc.pc = ppc.npc;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(ppc.pc);
 
 		if (MSR & MSR_IR)
 			opcode = ppc_readop_translated(ppc.pc);

@@ -19,26 +19,6 @@
 
 
 /***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-#ifdef MAME_DEBUG
-#define CPUREADOP_SAFETY_NONE		0
-#define CPUREADOP_SAFETY_PARTIAL	0
-#define CPUREADOP_SAFETY_FULL		1
-#elif defined(MESS)
-#define CPUREADOP_SAFETY_NONE		0
-#define CPUREADOP_SAFETY_PARTIAL	1
-#define CPUREADOP_SAFETY_FULL		0
-#else
-#define CPUREADOP_SAFETY_NONE		1
-#define CPUREADOP_SAFETY_PARTIAL	0
-#define CPUREADOP_SAFETY_FULL		0
-#endif
-
-
-
-/***************************************************************************
     BASIC TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -1030,15 +1010,7 @@ extern address_space	active_address_space[];		/* address spaces */
 #define ACCESSING_MSB32				((mem_mask & 0xff000000) == 0)
 
 /* ----- opcode range safety checks ----- */
-#if CPUREADOP_SAFETY_NONE
-#define address_is_unsafe(A)		(0)
-#elif CPUREADOP_SAFETY_PARTIAL
-#define address_is_unsafe(A)		(UNEXPECTED((A) > opcode_memory_max))
-#elif CPUREADOP_SAFETY_FULL
 #define address_is_unsafe(A)		((UNEXPECTED((A) < opcode_memory_min) || UNEXPECTED((A) > opcode_memory_max)))
-#else
-#error Must set either CPUREADOP_SAFETY_NONE, CPUREADOP_SAFETY_PARTIAL or CPUREADOP_SAFETY_FULL
-#endif
 
 /* ----- dynamic memory installation ----- */
 #define memory_install_read_handler(cpu, space, start, end, mask, mirror, handler)						\

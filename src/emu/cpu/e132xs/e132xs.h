@@ -77,7 +77,7 @@ void gms30c2216_get_info(UINT32 state, cpuinfo *info);
 void gms30c2232_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp);
 #endif
 

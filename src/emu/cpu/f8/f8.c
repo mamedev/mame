@@ -1576,7 +1576,7 @@ static int f8_execute(int cycles)
     do
     {
 	UINT8 op=f8.dbus;
-        CALL_MAME_DEBUG;
+        CALL_DEBUGGER((f8.pc0 - 1) & 0xffff);
 
 	switch( op )
         {
@@ -1891,9 +1891,9 @@ static void f8_set_context (void *src)
 		f8 = *(f8_Regs *) src;
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 unsigned f8_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static void f8_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -2116,9 +2116,9 @@ void f8_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_EXECUTE:						info->execute = f8_execute;				break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = f8_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &f8_icount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

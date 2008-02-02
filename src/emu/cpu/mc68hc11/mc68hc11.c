@@ -389,7 +389,7 @@ static int hc11_execute(int cycles)
 		UINT8 op;
 
 		hc11.ppc = hc11.pc;
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(hc11.pc);
 
 		op = FETCH();
 		hc11_optable[op]();
@@ -462,9 +462,9 @@ void mc68hc11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = hc11_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = hc11_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hc11_disasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hc11.icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -43,7 +43,7 @@ extern void t11_get_info(UINT32 state, cpuinfo *info);
 #define T11_WRMEM(A,V) (program_write_byte_16le(A,V))
 #define T11_WRMEM_WORD(A,V) (program_write_word_16le(A,V))
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t t11_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

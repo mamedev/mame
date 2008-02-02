@@ -1621,7 +1621,7 @@ static int upd7810_execute (int cycles)
 	{
 		int cc = 0;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(PC);
 
 		PPC = PC;
 		RDOP(OP);
@@ -1919,9 +1919,9 @@ void upd7810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = upd7810_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = upd7810_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7810_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &upd7810_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2007,9 +2007,9 @@ void upd7807_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = upd7807_reset;			break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7807_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;

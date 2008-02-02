@@ -841,7 +841,7 @@ static int pic16C5x_execute(int cycles)
 		if (PD == 0)						/* Sleep Mode */
 		{
 			inst_cycles = (1*CLK);
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(R.PC);
 			if (WDTE) {
 				pic16C5x_update_watchdog(1*CLK);
 			}
@@ -850,7 +850,7 @@ static int pic16C5x_execute(int cycles)
 		{
 			R.PREVPC = R.PC;
 
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(R.PC);
 
 			R.opcode.d = M_RDOP(R.PC);
 			R.PC++;
@@ -1013,9 +1013,9 @@ static void pic16C5x_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = pic16C5x_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = pic16C5x_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = pic16C5x_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pic16C5x_icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

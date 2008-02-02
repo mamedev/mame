@@ -19,7 +19,7 @@ enum {
 	H6280_PC=1, H6280_S, H6280_P, H6280_A, H6280_X, H6280_Y,
 	H6280_IRQ_MASK, H6280_TIMER_STATE,
 	H6280_NMI_STATE, H6280_IRQ1_STATE, H6280_IRQ2_STATE, H6280_IRQT_STATE
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
     ,
 	H6280_M1, H6280_M2, H6280_M3, H6280_M4,
 	H6280_M5, H6280_M6, H6280_M7, H6280_M8
@@ -47,7 +47,7 @@ WRITE8_HANDLER( H6280_timer_w );
 UINT8 h6280io_get_buffer(void);
 void h6280io_set_buffer(UINT8);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t h6280_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

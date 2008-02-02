@@ -211,7 +211,7 @@ static void cdp1802_run(void)
 
 		cdp1802_ICount -= CDP1802_CYCLES_RESET;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -236,7 +236,7 @@ static void cdp1802_run(void)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -713,7 +713,7 @@ static void cdp1802_run(void)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -801,7 +801,7 @@ static void cdp1802_run(void)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(cdp1802.r[cdp1802.p]);
 
 		break;
 	}
@@ -1002,9 +1002,9 @@ void cdp1802_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = cdp1802_reset;			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = cdp1802_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cdp1802_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cdp1802_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

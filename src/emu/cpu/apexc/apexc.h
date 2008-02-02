@@ -28,9 +28,9 @@ without danger */
 #define apexc_writemem_masked(address, data, mask)	cpu_writemem13_32masked((address), (data), (mask))
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 unsigned apexc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 #define apexc_readop(address)	apexc_readmem(address)
 

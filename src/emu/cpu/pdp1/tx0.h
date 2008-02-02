@@ -44,7 +44,7 @@ void tx0_8kw_get_info(UINT32 state, cpuinfo *info);
 #define READ_TX0_18BIT(A) ((signed)program_read_dword_32be((A)<<2))
 #define WRITE_TX0_18BIT(A,V) (program_write_dword_32be((A)<<2,(V)))
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 unsigned tx0_dasm_64kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 unsigned tx0_dasm_8kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */

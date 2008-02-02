@@ -152,7 +152,7 @@ static void mips_exception( int exception );
 static void mips_stop( void )
 {
 	DEBUGGER_BREAK;
-	CALL_MAME_DEBUG;
+	CALL_DEBUGGER(mipscpu.pc);
 }
 
 #if LOG_BIOSCALL
@@ -987,7 +987,7 @@ static int mips_execute( int cycles )
 		log_bioscall();
 #endif
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(mipscpu.pc);
 
 		mipscpu.op = cpu_readop32( mipscpu.pc );
 		switch( INS_OP( mipscpu.op ) )
@@ -2261,12 +2261,12 @@ static void set_irq_line( int irqline, int state )
  * Return a formatted string for a register
  ****************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t mips_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	return DasmMIPS( buffer, pc, opram );
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 /* preliminary gte code */
 
@@ -3475,9 +3475,9 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = mips_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mips_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

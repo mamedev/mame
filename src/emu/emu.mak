@@ -81,7 +81,7 @@ EMUOBJS += \
 	$(EMUOBJ)/profiler.o
 endif
 
-ifdef DEBUG
+ifdef DEBUGGER
 EMUOBJS += \
 	$(EMUOBJ)/debug/debugcmd.o \
 	$(EMUOBJ)/debug/debugcmt.o \
@@ -190,7 +190,7 @@ include $(EMUSRC)/cpu/cpu.mak
 
 $(LIBCPU): $(CPUOBJS)
 
-ifdef DEBUG
+ifdef DEBUGGER
 $(LIBCPU): $(DBGOBJS)
 endif
 

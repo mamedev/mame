@@ -15,7 +15,7 @@
 #include "profiler.h"
 #include "debugger.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #endif
 
@@ -1050,7 +1050,7 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 		/* reset the counter */
 		vblank_countdown = vblank_multiplier;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		/* notify the debugger */
 		debug_vblank_hook();
 #endif

@@ -93,7 +93,10 @@ endif
 # for details
 #-------------------------------------------------
 
-# uncomment next line to include the debugger
+# uncomment next line to enable the debugger
+# DEBUGGER = 1
+
+# uncomment next line to build a debug version
 # DEBUG = 1
 
 # uncomment next line to include the internal profiler
@@ -197,8 +200,8 @@ RM = @rm -f
 # form the name of the executable
 #-------------------------------------------------
 
-# debug builds just get the 'd' suffix and nothing more
-ifdef DEBUG
+# debugger builds just get the 'd' suffix and nothing more
+ifdef DEBUGGER
 DEBUGSUFFIX = d
 endif
 
@@ -255,6 +258,11 @@ endif
 # define PTR64 if we are a 64-bit target
 ifdef PTR64
 DEFS += -DPTR64
+endif
+
+# define ENABLE_DEBUGGER if we are a debugger-enabled build
+ifdef DEBUGGER
+DEFS += -DENABLE_DEBUGGER
 endif
 
 # define MAME_DEBUG if we are a debugging build

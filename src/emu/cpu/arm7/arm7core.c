@@ -125,7 +125,7 @@ WRITE32_HANDLER((*arm7_coproc_rt_w_callback));  //holder for the co processor Re
 void (*arm7_coproc_dt_r_callback)(UINT32 insn, UINT32* prn, UINT32 (*read32)(int addr));
 void (*arm7_coproc_dt_w_callback)(UINT32 insn, UINT32* prn, void (*write32)(int addr, UINT32 data));
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 //custom dasm callback handlers for co-processor instructions
 char *(*arm7_dasm_cop_dt_callback)( char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0 );
 char *(*arm7_dasm_cop_rt_callback)( char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0 );

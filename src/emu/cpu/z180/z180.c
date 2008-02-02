@@ -2179,7 +2179,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(_PCD);
 
 			z180_dma0();
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2192,7 +2192,7 @@ again:
 				Z180.after_EI = 0;
 
 				_PPC = _PCD;
-				CALL_MAME_DEBUG;
+				CALL_DEBUGGER(_PCD);
 				_R++;
 
 				EXEC_INLINE(op,ROP());
@@ -2219,7 +2219,7 @@ again:
 			Z180.after_EI = 0;
 
 			_PPC = _PCD;
-			CALL_MAME_DEBUG;
+			CALL_DEBUGGER(_PCD);
 			_R++;
 			EXEC_INLINE(op,ROP());
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2557,9 +2557,9 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = z180_reset;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = z180_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = z180_burn;					break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z180_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z180_icount;			break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = z180_translate;		break;
 		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: info->p = (void *)cc[Z180_TABLE_op];			break;

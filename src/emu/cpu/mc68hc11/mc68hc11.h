@@ -3,7 +3,7 @@
 
 #include "cpuintrf.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t hc11_disasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

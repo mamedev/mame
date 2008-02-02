@@ -86,7 +86,7 @@
 #include "uimenu.h"
 #include "deprecat.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcon.h"
 #endif
 
@@ -1297,7 +1297,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	parse_ini_file(options, CONFIGNAME);
 
 	/* debug builds: parse "debug.ini" as well */
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	parse_ini_file(options, "debug");
 #endif
 
@@ -1447,7 +1447,7 @@ static void reset_machine(running_machine *machine)
 	machine->playback_file = NULL;
 
 	/* debugger-related information */
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	machine->debug_mode = options_get_bool(mame_options(), OPTION_DEBUG);
 #else
 	machine->debug_mode = 0;
@@ -1544,7 +1544,7 @@ static void init_machine(running_machine *machine)
 	devices_init(machine);
 #endif
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	/* initialize the debugger */
 	if (machine->debug_mode)
 		mame_debug_init(machine);

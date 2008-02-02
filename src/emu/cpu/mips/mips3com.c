@@ -156,7 +156,7 @@ void mips3com_reset(mips3_state *mips)
     CPU
 -------------------------------------------------*/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern unsigned dasmmips3(char *, unsigned, UINT32);
@@ -167,7 +167,7 @@ offs_t mips3com_dasm(mips3_state *mips, char *buffer, offs_t pc, const UINT8 *op
 		op = LITTLE_ENDIANIZE_INT32(op);
 	return dasmmips3(buffer, pc, op);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 
 

@@ -10,7 +10,7 @@
 
 #define INPUT_LINE_A20		1
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 #endif
 

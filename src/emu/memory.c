@@ -92,7 +92,7 @@
 #include "driver.h"
 #include "profiler.h"
 #include "deprecat.h"
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #endif
 
@@ -152,7 +152,7 @@
 
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #define DEBUG_HOOK_READ(a,b,c) if (debug_hook_read) (*debug_hook_read)(a, b, c)
 #define DEBUG_HOOK_WRITE(a,b,c,d) if (debug_hook_write) (*debug_hook_write)(a, b, c, d)
 #else
@@ -291,7 +291,7 @@ static int					log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
 static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
 static bank_data 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static debug_hook_read_ptr	debug_hook_read;				/* pointer to debugger callback for memory reads */
 static debug_hook_write_ptr	debug_hook_write;				/* pointer to debugger callback for memory writes */
 #endif
@@ -540,7 +540,7 @@ void memory_set_context(int activecpu)
 
 	opbasefunc = cpudata[activecpu].opbase;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	if (activecpu != -1)
 		debug_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
 	else

@@ -324,7 +324,7 @@ static int arm_execute( int cycles )
 	arm_icount = cycles;
 	do
 	{
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(R15);
 
 		/* load instruction */
 		pc = R15;
@@ -503,13 +503,13 @@ static void set_irq_line(int irqline, int state)
 	arm_check_irq_state();
 }
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t arm_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	return 4 | arm_disasm(buffer, pc, opcode);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 static void arm_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -1532,9 +1532,9 @@ void arm_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = arm_exit;					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = arm_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = arm_dasm;			break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &arm_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

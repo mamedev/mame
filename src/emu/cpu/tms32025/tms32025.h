@@ -71,7 +71,7 @@ extern void tms32025_get_info(UINT32 state, cpuinfo *info);
 extern void tms32026_get_info(UINT32 state, cpuinfo *info);
 
 
-#ifdef	MAME_DEBUG
+#ifdef	ENABLE_DEBUGGER
 offs_t tms32025_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 

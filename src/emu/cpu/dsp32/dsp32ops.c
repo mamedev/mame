@@ -130,7 +130,7 @@ static void unimplemented(void)
 INLINE void execute_one(void)
 {
 	PROCESS_DEFERRED_MEMORY();
-	CALL_MAME_DEBUG;
+	CALL_DEBUGGER(dsp32.PC);
 	OP = ROPCODE(dsp32.PC);
 	dsp32_icount -= 4;	/* 4 clocks per cycle */
 	dsp32.PC += 4;

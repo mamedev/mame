@@ -11,7 +11,7 @@
 
 #include "driver.h"
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
 #endif
 
@@ -364,7 +364,7 @@ INLINE int cpu_irq_callback(int cpunum, int line)
 	if (drv_irq_callbacks[cpunum])
 		vector = (*drv_irq_callbacks[cpunum])(line);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	/* notify the debugger */
 	debug_interrupt_hook(cpunum, line);
 #endif

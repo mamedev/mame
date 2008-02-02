@@ -907,7 +907,7 @@ static int mb86233_execute(int cycles)
 		UINT32		val;
 		UINT32		opcode;
 
-		CALL_MAME_DEBUG;
+		CALL_DEBUGGER(GETPC());
 
 		opcode = ROPCODE(GETPC());
 
@@ -1523,7 +1523,7 @@ static int mb86233_execute(int cycles)
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static offs_t mb86233_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	extern UINT32 dasm_mb86233(char *, UINT32);
@@ -1532,7 +1532,7 @@ static offs_t mb86233_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UI
 	op = LITTLE_ENDIANIZE_INT32(op);
 	return dasm_mb86233(buffer, op);
 }
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 
 /***************************************************************************
     Information Setters
@@ -1643,9 +1643,9 @@ void mb86233_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = mb86233_execute;		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mb86233_dasm;		break;
-#endif /* MAME_DEBUG */
+#endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mb86233_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

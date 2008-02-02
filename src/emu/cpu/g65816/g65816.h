@@ -89,7 +89,7 @@ enum
 void g65816_get_info(UINT32 state, cpuinfo *info);
 
 #undef G65816_CALL_DEBUGGER
-#define G65816_CALL_DEBUGGER CALL_MAME_DEBUG
+#define G65816_CALL_DEBUGGER CALL_DEBUGGER
 
 #define g65816_read_8(addr) 			program_read_byte_8(addr)
 #define g65816_write_8(addr,data)		program_write_byte_8(addr,data)
