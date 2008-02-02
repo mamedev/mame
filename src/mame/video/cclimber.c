@@ -7,16 +7,16 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "includes/cclimber.h"
+#include "video\resnet.h"
 
 
 UINT8 *cclimber_bsvideoram;
 size_t cclimber_bsvideoram_size;
 UINT8 *cclimber_bigspriteram;
 UINT8 *cclimber_column_scroll;
-static int palettebank;
-static int sidepanel_enabled;
+UINT8 *swimmer_bgcolor;
+UINT8 *swimmer_sidepanel_enabled;
+UINT8 *swimmer_palettebank;
 
 
 /***************************************************************************
@@ -38,52 +38,47 @@ static int sidepanel_enabled;
 ***************************************************************************/
 PALETTE_INIT( cclimber )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 0, 0,
+			3, &resistances_rg[0], gweights, 0, 0,
+			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->drv->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		UINT8 data;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
+		if (i & 0x07)
+			data = color_prom[i];
+		else
+			/* River Patrol shows that background is pen 0 */
+			data = color_prom[0];
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (data >> 0) & 0x01;
+		bit1 = (data >> 1) & 0x01;
+		bit2 = (data >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (data >> 3) & 0x01;
+		bit1 = (data >> 4) & 0x01;
+		bit2 = (data >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
 		/* blue component */
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (data >> 6) & 0x01;
+		bit1 = (data >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-
-	/* character and sprite lookup table */
-	/* they use colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
-		/* pen 0 always uses color 0 (background in River Patrol and Silver Land) */
-		if (i % 4 == 0) COLOR(0,i) = 0;
-		else COLOR(0,i) = i;
-	}
-
-	/* big sprite lookup table */
-	/* it uses colors 64-95 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		if (i % 4 == 0) COLOR(2,i) = 0;
-		else COLOR(2,i) = i + 64;
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -124,91 +119,87 @@ PALETTE_INIT( cclimber )
 
 ***************************************************************************/
 
-#define BGPEN (256+32)
-#define SIDEPEN (256+32+1)
-
 PALETTE_INIT( swimmer )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
-
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 0x200; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		rgb_t color;
 
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
-		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i+256] >> 0) & 0x01;
-		bit2 = (color_prom[i+256] >> 1) & 0x01;
-		g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = (color_prom[i+256] >> 2) & 0x01;
-		bit2 = (color_prom[i+256] >> 3) & 0x01;
-		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-
-		/* side panel */
-		if (i % 8)
+		/* non-backgrond pens */
+		if (i & 0x07)
 		{
-			COLOR(0,i) = i;
-		    COLOR(0,i+256) = i;
+			int bit0, bit1, bit2;
+			int r, g, b;
+
+			/* red component */
+			bit0 = (color_prom[(i & 0xff) + 0x000] >> 0) & 0x01;
+			bit1 = (color_prom[(i & 0xff) + 0x000] >> 1) & 0x01;
+			bit2 = (color_prom[(i & 0xff) + 0x000] >> 2) & 0x01;
+			r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+			/* green component */
+			bit0 = (color_prom[(i & 0xff) + 0x000] >> 3) & 0x01;
+			bit1 = (color_prom[(i & 0xff) + 0x100] >> 0) & 0x01;
+			bit2 = (color_prom[(i & 0xff) + 0x100] >> 1) & 0x01;
+			g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+			/* blue component */
+			bit0 = 0;
+			bit1 = (color_prom[(i & 0xff) + 0x100] >> 2) & 0x01;
+			bit2 = (color_prom[(i & 0xff) + 0x100] >> 3) & 0x01;
+			b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
+			color = MAKE_RGB(r,g,b);
 		}
+
+		/* backgrond pen */
 		else
 		{
-			/* background */
-			COLOR(0,i) = BGPEN;
-			COLOR(0,i+256) = SIDEPEN;
+			if (i & 0x100)
+				/* side panel */
+#if 0
+				// values calculated from the resistors don't seem to match the real board
+				color = MAKE_RGB(0x24, 0x5d, 0x4e);
+#endif
+				color = MAKE_RGB(0x20, 0x98, 0x79);
+			else
+				/* 'water' background -- will be modified dynamically later */
+				color = RGB_BLACK;
 		}
+
+		palette_set_color(machine, i, color);
 	}
 
-	color_prom += 2 * 256;
+	color_prom += 0x200;
 
 	/* big sprite */
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine,i+256,MAKE_RGB(r,g,b));
-
-		if (i % 8 == 0) COLOR(2,i) = BGPEN;  /* enforce transparency */
-		else COLOR(2,i) = i+256;
+		palette_set_color(machine, i + 0x200, MAKE_RGB(r, g, b));
 	}
-
-	/* background */
-	palette_set_color(machine,BGPEN,MAKE_RGB(0,0,0));
-	/* side panel background color */
-#if 0
-	// values calculated from the resistors don't seem to match the real board
-	palette_set_color(machine,SIDEPEN,MAKE_RGB(0x24,0x5d,0x4e));
-#endif
-	palette_set_color(machine,SIDEPEN,MAKE_RGB(0x20,0x98,0x79));
 }
 
 
@@ -229,31 +220,37 @@ PALETTE_INIT( swimmer )
   bit 0 -- 1  kohm resistor  -- BLUE
 
 ***************************************************************************/
-WRITE8_HANDLER( swimmer_bgcolor_w )
-{
-	int bit0,bit1,bit2;
-	int r,g,b;
 
+static void swimmer_set_background_pen(running_machine *machine)
+{
+	int i;
+	pen_t color;
+	int bit0, bit1, bit2;
+	int r, g, b;
 
 	/* red component */
 	bit0 = 0;
-	bit1 = (data >> 6) & 0x01;
-	bit2 = (data >> 7) & 0x01;
+	bit1 = (*swimmer_bgcolor >> 6) & 0x01;
+	bit2 = (*swimmer_bgcolor >> 7) & 0x01;
 	r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	/* green component */
-	bit0 = (data >> 3) & 0x01;
-	bit1 = (data >> 4) & 0x01;
-	bit2 = (data >> 5) & 0x01;
+	bit0 = (*swimmer_bgcolor >> 3) & 0x01;
+	bit1 = (*swimmer_bgcolor >> 4) & 0x01;
+	bit2 = (*swimmer_bgcolor >> 5) & 0x01;
 	g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	/* blue component */
-	bit0 = (data >> 0) & 0x01;
-	bit1 = (data >> 1) & 0x01;
-	bit2 = (data >> 2) & 0x01;
+	bit0 = (*swimmer_bgcolor >> 0) & 0x01;
+	bit1 = (*swimmer_bgcolor >> 1) & 0x01;
+	bit2 = (*swimmer_bgcolor >> 2) & 0x01;
 	b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	palette_set_color(Machine,BGPEN,MAKE_RGB(r,g,b));
+	color = MAKE_RGB(r, g, b);
+
+	/* set pen 0 if each color code */
+	for (i = 0; i < 0x100; i += 8)
+		palette_set_color(machine, i, color);
 }
 
 
@@ -263,31 +260,8 @@ WRITE8_HANDLER( cclimber_colorram_w )
 	/* bit 5 of the address is not used for color memory. There is just */
 	/* 512 bytes of memory; every two consecutive rows share the same memory */
 	/* region. */
-	offset &= 0xffdf;
-
 	colorram[offset] = data;
-	colorram[offset + 0x20] = data;
-}
-
-
-
-WRITE8_HANDLER( cclimber_bigsprite_videoram_w )
-{
-	cclimber_bsvideoram[offset] = data;
-}
-
-
-
-WRITE8_HANDLER( swimmer_palettebank_w )
-{
-	palettebank = data & 1;
-}
-
-
-
-WRITE8_HANDLER( swimmer_sidepanel_enable_w )
-{
-	sidepanel_enabled = data & 1;
+	colorram[offset ^ 0x20] = data;
 }
 
 
@@ -553,6 +527,8 @@ VIDEO_UPDATE( swimmer )
 {
 	int offs;
 
+	swimmer_set_background_pen(machine);
+
 	for (offs = videoram_size - 1;offs >= 0;offs--)
 	{
 		int sx,sy,flipx,flipy,color;
@@ -564,8 +540,8 @@ VIDEO_UPDATE( swimmer )
 		/* vertical flipping flips two adjacent characters */
 		if (flipy) sy ^= 1;
 
-		color = (colorram[offs] & 0x0f) + 0x10 * palettebank;
-		if (sx >= 24 && sidepanel_enabled)
+		color = (colorram[offs] & 0x0f) + 0x10 * (*swimmer_palettebank & 0x01);
+		if (sx >= 24 && (*swimmer_sidepanel_enabled & 0x01))
 		{
 			color += 32;
 		}
@@ -639,7 +615,7 @@ VIDEO_UPDATE( swimmer )
 
 		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0x3f) | (spriteram[offs + 1] & 0x10) << 2,
-				(spriteram[offs + 1] & 0x0f) + 0x10 * palettebank,
+				(spriteram[offs + 1] & 0x0f) + 0x10 * (*swimmer_palettebank & 0x01),
 				flipx,flipy,
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);

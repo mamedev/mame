@@ -212,12 +212,12 @@ static WRITE8_HANDLER( custom_cocktail_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)
-	AM_RANGE(0xc200, 0xc200) AM_READ(input_port_1_r)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ(input_port_0_r)
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ(input_port_1_r)
 	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE(&custom_cpu_ram)
 	AM_RANGE(0xd7f0, 0xd7ff) AM_READWRITE(custom_cpu_r, MWA8_RAM)
-	AM_RANGE(0xe000, 0xe07f) AM_WRITE(arabian_blitter_w) AM_BASE(&spriteram)
+	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE(&arabian_blitter)
 ADDRESS_MAP_END
 
 
@@ -229,8 +229,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_WRITE(AY8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -363,8 +363,7 @@ static MACHINE_DRIVER_START( arabian )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 11, 244)
-	MDRV_PALETTE_LENGTH(64)
-	MDRV_COLORTABLE_LENGTH(256*32)
+	MDRV_PALETTE_LENGTH(256*32)
 
 	MDRV_PALETTE_INIT(arabian)
 	MDRV_VIDEO_START(arabian)

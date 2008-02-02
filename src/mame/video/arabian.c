@@ -21,6 +21,7 @@ static UINT8 *converted_gfx;
 
 
 /* Globals */
+UINT8 *arabian_blitter;
 UINT8 arabian_video_control;
 UINT8 arabian_flip_screen;
 
@@ -36,18 +37,11 @@ PALETTE_INIT( arabian )
 {
 	int i;
 
-	/* there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
-	for (i = 0; i < 64; i++)
-	{
-		palette_set_color_rgb(machine, i,
-			((i >> 5) & 1) * (153*192/255) + ((i >> 4) & 1) * (102*192/255) + ((i & 0x30) ? 63 : 0),
-			((i >> 3) & 1) * (156*192/255) + ((i >> 2) & 1) * (99*192/255) + ((i & 0x0c) ? 63 : 0),
-			((i >> 1) & 1) * 192 + ((i >> 0) & 1) * 63);
-	}
-
 	/* there are 13 color table bits */
 	for (i = 0; i < (1 << 13); i++)
 	{
+		int r, g, b;
+
 		int ena = (i >> 12) & 1;
 		int enb = (i >> 11) & 1;
 		int abhf = (~i >> 10) & 1;
@@ -146,9 +140,19 @@ PALETTE_INIT( arabian )
 		int bhi = ab;
 		int bbase = (!abhf & az) ? 0 : ab;
 
-		*colortable++ = (rhi << 5) | (rlo << 4) |
-						(ghi << 3) | (glo << 2) |
-						(bhi << 1) | bbase;
+		/* convert an RGB color -
+           there are effectively 6 bits of color: 2 red, 2 green, 2 blue */
+		r = ( rhi * (int)(((153.0 * 192) / 255) + 0.5)) +
+			( rlo * (int)(((102.0 * 192) / 255) + 0.5)) +
+			((rhi | rlo) ? 63 : 0);
+
+		g = ( ghi * (int)(((156.0 * 192) / 255) + 0.5)) +
+			( glo * (int)((( 99.0 * 192) / 255) + 0.5)) +
+			((ghi | glo) ? 63 : 0);
+
+		b = (bhi * 192) + (bbase * 63);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -272,19 +276,18 @@ static void blit_area(UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8
 WRITE8_HANDLER( arabian_blitter_w )
 {
 	/* write the data */
-	offset &= 7;
-	spriteram[offset] = data;
+	arabian_blitter[offset] = data;
 
 	/* watch for a write to offset 6 -- that triggers the blit */
-	if ((offset & 0x07) == 6)
+	if (offset == 6)
 	{
 		/* extract the data */
-		int plane = spriteram[offset - 6];
-		int src   = spriteram[offset - 5] | (spriteram[offset - 4] << 8);
-		int x     = spriteram[offset - 2] << 2;
-		int y     = spriteram[offset - 3];
-		int sx    = spriteram[offset - 0];
-		int sy    = spriteram[offset - 1];
+		int plane = arabian_blitter[0];
+		int src   = arabian_blitter[1] | (arabian_blitter[2] << 8);
+		int x     = arabian_blitter[4] << 2;
+		int y     = arabian_blitter[3];
+		int sx    = arabian_blitter[6];
+		int sy    = arabian_blitter[5];
 
 		/* blit it */
 		blit_area(plane, src, x, y, sx, sy);
@@ -304,7 +307,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	UINT8 *base;
 	UINT8 x, y;
 
-	/* determine X/Y and mark the area dirty */
+	/* determine X/Y */
 	x = (offset >> 8) << 2;
 	y = offset & 0xff;
 
@@ -324,7 +327,7 @@ WRITE8_HANDLER( arabian_videoram_w )
     */
 
 	/* enable writes to AZ/AR */
-	if (spriteram[0] & 0x08)
+	if (arabian_blitter[0] & 0x08)
 	{
 		base[0] = (base[0] & ~0x03) | ((data & 0x10) >> 3) | ((data & 0x01) >> 0);
 		base[1] = (base[1] & ~0x03) | ((data & 0x20) >> 4) | ((data & 0x02) >> 1);
@@ -333,7 +336,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to AG/AB */
-	if (spriteram[0] & 0x04)
+	if (arabian_blitter[0] & 0x04)
 	{
 		base[0] = (base[0] & ~0x0c) | ((data & 0x10) >> 1) | ((data & 0x01) << 2);
 		base[1] = (base[1] & ~0x0c) | ((data & 0x20) >> 2) | ((data & 0x02) << 1);
@@ -342,7 +345,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to BZ/BR */
-	if (spriteram[0] & 0x02)
+	if (arabian_blitter[0] & 0x02)
 	{
 		base[0] = (base[0] & ~0x30) | ((data & 0x10) << 1) | ((data & 0x01) << 4);
 		base[1] = (base[1] & ~0x30) | ((data & 0x20) << 0) | ((data & 0x02) << 3);
@@ -351,7 +354,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 	}
 
 	/* enable writes to BG/BB */
-	if (spriteram[0] & 0x01)
+	if (arabian_blitter[0] & 0x01)
 	{
 		base[0] = (base[0] & ~0xc0) | ((data & 0x10) << 3) | ((data & 0x01) << 6);
 		base[1] = (base[1] & ~0xc0) | ((data & 0x20) << 2) | ((data & 0x02) << 5);
@@ -370,7 +373,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 
 VIDEO_UPDATE( arabian )
 {
-	const pen_t *colortable = &machine->remapped_colortable[(arabian_video_control >> 3) << 8];
+	const pen_t *pens = &machine->pens[(arabian_video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */
@@ -378,7 +381,7 @@ VIDEO_UPDATE( arabian )
 	{
 		/* non-flipped case */
 		if (!arabian_flip_screen)
-			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], colortable, -1);
+			draw_scanline8(bitmap, 0, y, BITMAP_WIDTH, &main_bitmap[y * BITMAP_WIDTH], pens, -1);
 
 		/* flipped case */
 		else
@@ -387,7 +390,7 @@ VIDEO_UPDATE( arabian )
 			int x;
 			for (x = 0; x < BITMAP_WIDTH; x++)
 				scanline[BITMAP_WIDTH - 1 - x] = main_bitmap[y * BITMAP_WIDTH + x];
-			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, colortable, -1);
+			draw_scanline8(bitmap, 0, BITMAP_HEIGHT - 1 - y, BITMAP_WIDTH, scanline, pens, -1);
 		}
 	}
 	return 0;

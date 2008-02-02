@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( cclimber_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM				/* Crazy Kong only */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(MRA8_RAM, cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 	AM_RANGE(0x8900, 0x8bff) AM_RAM				/* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6bff) AM_RAM		    	/* Crazy Kong only, Cannon Ball also */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READNOP		 	/* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(MRA8_RAM, cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 //AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)  /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
@@ -233,7 +233,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( swimmer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_WRITE(cclimber_bigsprite_videoram_w) AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_column_scroll)
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -242,11 +242,11 @@ static ADDRESS_MAP_START( swimmer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(flip_screen_x_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(swimmer_sidepanel_enable_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(swimmer_palettebank_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_sidepanel_enabled)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_palettebank)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, swimmer_bgcolor_w)  /* river color in Swimmer */
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, MWA8_RAM) AM_BASE(&swimmer_bgcolor)
 	AM_RANGE(0xb880, 0xb880) AM_READ(input_port_4_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					/* ??? used by Guzzler */
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */
@@ -504,7 +504,7 @@ static INPUT_PORTS_START( ckongb )
 	CKONGIN2
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( rpatrolb )
+static INPUT_PORTS_START( rpatrol )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -798,8 +798,7 @@ static MACHINE_DRIVER_START( cclimber )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(cclimber)
-	MDRV_PALETTE_LENGTH(96)
-	MDRV_COLORTABLE_LENGTH(16*4+8*4)
+	MDRV_PALETTE_LENGTH(16*4+8*4)
 
 	MDRV_PALETTE_INIT(cclimber)
 	MDRV_VIDEO_START(generic)
@@ -852,8 +851,7 @@ static MACHINE_DRIVER_START( swimmer )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(swimmer)
-	MDRV_PALETTE_LENGTH(256+32+2)
-	MDRV_COLORTABLE_LENGTH(64*8+4*8)
+	MDRV_PALETTE_LENGTH(64*8+4*8)
 
 	MDRV_PALETTE_INIT(swimmer)
 	MDRV_VIDEO_START(generic)
@@ -1310,7 +1308,7 @@ ROM_END
    I think the board was a half-converted board as 'Water Gage' and 'Bon Voyage' don't really fit the theme
    of Silver Land so I'm loading the River Patrol GFX instead as they fit better
 */
-ROM_START( rpatrolo )
+ROM_START( rpatrol )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "sci1.bin",       0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) )
 	ROM_LOAD( "sci2.bin",       0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
@@ -1550,18 +1548,18 @@ GAME( 1980, cclimber, 0,        cclimber, cclimber, cclimber, ROT0,   "Nichibuts
 GAME( 1980, cclimbrj, cclimber, cclimber, cclimbrj, cclimbrj, ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
 GAME( 1980, ccboot,   cclimber, cclimber, cclimber, cclimbrj, ROT0,   "bootleg", "Crazy Climber (bootleg set 1)", 0 )
 GAME( 1980, ccboot2,  cclimber, cclimber, cclimber, cclimbrj, ROT0,   "bootleg", "Crazy Climber (bootleg set 2)", 0 )
-GAME( 1981, ckong,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong (set 1)", 0 )
-GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong (set 2)", 0 )
-GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Jeutel bootleg)", 0 )
+GAME( 1981, ckong,    0,        cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 1)", 0 )
+GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", "Crazy Kong Part II (set 2)", 0 )
+GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong Part II (Jeutel bootleg)", 0 )
 GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Orca bootleg)", 0 )
 GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 198?, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
-GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong (Alternative levels)", 0 )
+GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
 
-GAME( 1981, rpatrolb, 0,        cclimber, rpatrolb, 0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
-GAME( 1981, rpatrolo, rpatrolb, cclimber, rpatrolb, 0,        ROT0,   "Orca",  "River Patrol (Orca)", 0 )
-GAME( 1981, silvland, rpatrolb, cclimber, rpatrolb, 0,        ROT0,   "Falcon", "Silver Land", 0 )
+GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
+GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
+GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
 
 GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Climber hardware, set 1)" , GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Climber hardware, set 2)", 0 )

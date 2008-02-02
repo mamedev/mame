@@ -8,6 +8,7 @@
 
 /*----------- defined in video/arabian.c -----------*/
 
+extern UINT8 *arabian_blitter;
 extern UINT8 arabian_video_control;
 extern UINT8 arabian_flip_screen;
 

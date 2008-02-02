@@ -340,8 +340,8 @@ const game_driver * const drivers[] =
 	DRIVER( ckongalc )	/* bootleg */
 	DRIVER( bigkong )	/* bootleg */
 	DRIVER( monkeyd )	/* bootleg */
+	DRIVER( rpatrol )	/* Orca, from a suspicious set */
 	DRIVER( rpatrolb )	/* bootleg */
-	DRIVER( rpatrolo )	/* Orca, from a suspicious set */
 	DRIVER( silvland )	/* Falcon */
 	DRIVER( yamato )	/* (c) 1983 Sega */
 	DRIVER( yamato2 )	/* (c) 1983 Sega */
