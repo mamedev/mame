@@ -7686,6 +7686,7 @@ Other Sun games
 	DRIVER( promutrv )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( promutra )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( promutrb )	/* (c) 1985 Enerdyne Technologies Inc */
+	DRIVER( promutrc )	/* (c) 1985 Enerdyne Technologies Inc */
 	DRIVER( strvmstr )	/* (c) 1986 Enerdyne Technologies Inc */
 	DRIVER( dorachan )	/* (c) 1980 Craul Denshi */
 	DRIVER( ladyfrog )	/* (c) 1990 Mondial Games */

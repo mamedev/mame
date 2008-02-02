@@ -15,6 +15,13 @@ Supported games:
 
  driver by Pierpaolo Prazzoli, thanks to Tomasz Slanina too.
 
+Notes:
+
+ You can swap the question ROMs arbitrarily on these boards. This means 
+  the ROMsets in this driver aren't true sets per se, they're just how 
+  boards were found "in the wild."
+ ROMs with music questions come in hi|lo pairs.
+
 */
 
 #include "driver.h"
@@ -343,6 +350,37 @@ ROM_START( promutrb )
 	ROM_LOAD( "pal16l8a-ep-0.u9",  0x0200, 0x0104, CRC(180e95ad) SHA1(9c8dbe159aaf2595b9934fd4afff16b2e9ab584c) )
 ROM_END
 
+ROM_START( promutrc )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "mt44.ic44",    0x0000, 0x1000, CRC(8d543ea4) SHA1(86ab848a45851540d5d3315e15b92f7b2ac0b77c) )
+	ROM_LOAD( "mt46.ic46",    0x1000, 0x1000, CRC(6d6e1f68) SHA1(e8196ecd915a2528122407d31a7078f177be0beb) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "mt48.ic48",    0x0000, 0x1000, CRC(f2efe300) SHA1(419e889b2f4d038ae64e3ccf4e2498add80b4c9f) )
+	ROM_LOAD( "mt50.ic50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "dm74s287n.ic63",     0x0000, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette low bits */
+	ROM_LOAD( "dm74s287n.ic64",     0x0100, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette high bits */
+
+	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
+	ROM_LOAD( "sports.lo0.u8",   0x00000, 0x8000, CRC(bb28fa92) SHA1(a3c4c67be0e31793d68b0b048f3a73e9ce1d5859) )
+	ROM_LOAD( "sports2.hi0.u7",  0x08000, 0x8000, CRC(4d0107d7) SHA1(4cbef1bc5faaca52ce6bb490560f213d60a96191) )
+	ROM_LOAD( "expert.lo1.u6",   0x10000, 0x8000, CRC(19153d1a) SHA1(a2f2bbabbd1c68aae58ff29a43cb02b0e8867f5a) )
+	ROM_LOAD( "potpouri.hi1.u5", 0x18000, 0x8000, CRC(cbfa6491) SHA1(74120ea6b3678d54737c37ec3b4b309c346c460e) )
+	ROM_LOAD( "country.lo2.u4",  0x20000, 0x8000, CRC(44673138) SHA1(4e5a3181300bd5f0e9336c2d0ddf900a9b4256d9) )
+	ROM_LOAD( "country.hi2.u3",  0x28000, 0x8000, CRC(3d35a612) SHA1(9d17477c8097b1110ed752caa6d280160368eac1) )
+	ROM_LOAD( "sex3.lo3.u2",     0x30000, 0x8000, CRC(1a2322be) SHA1(22f930dc29e2b9a2c5fbf16479bc213e94df5620) )
+	ROM_LOAD( "geninfo.hi3.u1",  0x38000, 0x8000, CRC(2747fd74) SHA1(d34ac30349dc965ecd8b05b3f1cb7ee24627f369) )
+
+	ROM_REGION( 0x0400, REGION_PLDS, 0 )
+	ROM_LOAD( "pal16l8a-ep-0.u10", 0x0000, 0x0104, CRC(ccbd5f41) SHA1(49e815dc3377b7ed4312c3c9c215c1a6fbce2769) )
+	ROM_LOAD( "pal16l8a-ep-0.u9",  0x0200, 0x0104, CRC(180e95ad) SHA1(9c8dbe159aaf2595b9934fd4afff16b2e9ab584c) )
+ROM_END
+
 ROM_START( strvmstr )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "stm16.u16",    0x0000, 0x8000, CRC(ae734db9) SHA1(1bacdfdebaa1f250bfbd49053c3910f1396afe11) )
@@ -373,4 +411,5 @@ ROM_END
 GAME( 1985, promutrv, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 1)", 0 )
 GAME( 1985, promutra, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 2)", 0 )
 GAME( 1985, promutrb, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 3)", 0 )
+GAME( 1985, promutrc, promutrv, ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Progressive Music Trivia (Question set 4)", 0 )
 GAME( 1986, strvmstr, 0,        ettrivia, ettrivia, 0, ROT270, "Enerdyne Technologies Inc.", "Super Trivia Master", GAME_WRONG_COLORS )
