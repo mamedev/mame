@@ -2203,9 +2203,11 @@ static void build_optable(void)
 
 								/* make sure we match the disassembler */
 								{
+									char dummybuffer[40];
 									UINT8 instrbuffer[10];
 									instrbuffer[0] = (opnum | eabits) >> 8;
 									instrbuffer[1] = (opnum | eabits);
+									dummybuffer[0] = 0;
 									assert(length == (m68k_disassemble_raw(dummybuffer, 0, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000) & 0xff) / 2);
 								}
 
