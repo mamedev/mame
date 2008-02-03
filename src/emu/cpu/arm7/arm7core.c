@@ -1202,10 +1202,10 @@ static void HandlePSRTransfer( UINT32 insn )
 	newval |= 0x10;
 
         //Update the Register
-        SET_REGISTER(reg, val);
+        SET_REGISTER(reg, newval);
 
         //Switch to new mode if changed
-        if( (val & MODE_FLAG) != oldmode)
+        if( (newval & MODE_FLAG) != oldmode)
             SwitchMode(GET_MODE);
 
     }
