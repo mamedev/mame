@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    version.c
+    cop410.c
 
     National Semiconductor COP410 Emulator.
 

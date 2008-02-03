@@ -11,13 +11,13 @@
 
     Since there has been confusion in the past over the order of
     initialization and other such things, here it is, all spelled out
-    as of February, 2006:
+    as of January, 2008:
 
     main()
         - does platform-specific init
-        - calls run_game() [mame.c]
+        - calls mame_execute() [mame.c]
 
-        run_game() [mame.c]
+        mame_execute() [mame.c]
             - calls mame_validitychecks() [validity.c] to perform validity checks on all compiled drivers
             - calls setjmp to prepare for deep error handling
             - begins resource tracking (level 1)
@@ -29,6 +29,7 @@
                 - calls sndintrf_init() [sndintrf.c] to determine which sound chips are available
                 - calls fileio_init() [fileio.c] to initialize file I/O info
                 - calls config_init() [config.c] to initialize configuration system
+                - calls input_init() [input.c] to initialize the input system
                 - calls output_init() [output.c] to initialize the output system
                 - calls state_init() [state.c] to initialize save state system
                 - calls state_save_allow_registration() [state.c] to allow registrations
@@ -41,12 +42,12 @@
                 - calls generic_sound_init() [audio/generic.c] to initialize generic sound structures
                 - calls timer_init() [timer.c] to reset the timer system
                 - calls osd_init() [osdepend.h] to do platform-specific initialization
-                - calls code_init() [input.c] to initialize the input system
                 - calls input_port_init() [inptport.c] to set up the input ports
                 - calls rom_init() [romload.c] to load the game's ROMs
                 - calls memory_init() [memory.c] to process the game's memory maps
                 - calls cpuexec_init() [cpuexec.c] to initialize the CPUs
                 - calls cpuint_init() [cpuint.c] to initialize the CPU interrupts
+                - calls mame_debug_init() [debugcpu.c] to set up the debugger
                 - calls the driver's DRIVER_INIT callback
                 - calls video_init() [video.c] to start the video system
                 - calls sound_init() [sound.c] to start the audio system
@@ -54,11 +55,10 @@
                 - disposes of regions marked as disposable
                 - calls saveload_init() [mame.c] to set up for save/load
                 - calls cheat_init() [cheat.c] to initialize the cheat system
-                - calls mame_debug_init() [debugcpu.c] to set up the debugger
 
             - calls config_load_settings() [config.c] to load the configuration file
             - calls nvram_load [machine/generic.c] to load NVRAM
-            - calls ui_init() [ui.c] to initialize the user interface
+            - calls ui_display_startup_screens() [ui.c] to display the the startup screens
             - begins resource tracking (level 2)
             - calls soft_reset() [mame.c] to reset all systems
 

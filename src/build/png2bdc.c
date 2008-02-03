@@ -1,5 +1,7 @@
 /***************************************************************************
 
+    png2bdc.c
+
     Super-simple PNG to BDC file generator
 
     Copyright Nicola Salmoria and the MAME Team.

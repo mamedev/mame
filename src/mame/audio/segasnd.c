@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    segag80.c
+    segasnd.c
 
     Sound boards for early Sega G-80 based games.
 

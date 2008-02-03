@@ -1,5 +1,7 @@
 /***************************************************************************
 
+    chd.c
+
     MAME Compressed Hunks of Data file format
 
     Copyright Nicola Salmoria and the MAME Team.

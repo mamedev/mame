@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    audio/mcr.c
+    audio/mcr.h
 
     Functions to emulate general the various MCR sound cards.
 

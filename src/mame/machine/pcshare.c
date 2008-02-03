@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    machine/pc.c
+    machine/pcshare.c
 
     Functions to emulate general aspects of the machine
     (RAM, ROM, interrupts, I/O ports)

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    dsp56kops.c
+    dsp56ops.c
     Core implementation for the portable Motorola/Freescale DSP56k emulator.
     Written by Andrew Gardner
 

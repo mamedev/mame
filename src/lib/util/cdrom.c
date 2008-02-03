@@ -1,5 +1,7 @@
 /***************************************************************************
 
+    cdrom.c
+
     Generic MAME CD-ROM utilties - build IDE and SCSI CD-ROMs on top of this
 
     Copyright Nicola Salmoria and the MAME Team.

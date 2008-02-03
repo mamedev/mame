@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    polynew.c
+    poly.c
 
     Helper routines for polygon rendering.
 

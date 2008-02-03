@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    debugcmd.h
+    debugcmd.c
 
     Debugger command interface engine.
 

@@ -1,5 +1,7 @@
 /***************************************************************************
 
+    hardisk.c
+
     Generic MAME hard disk implementation, with differencing files
 
     Copyright Nicola Salmoria and the MAME Team.
