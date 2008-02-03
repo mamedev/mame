@@ -8,6 +8,17 @@
 ** Version 1.0
 **
 
+   Features as listed in LSI-212413A2 data sheet:
+    1. FM Sound Generator for real sound creation.
+    2. Two Selectable modes: 9 simultaneous sounds or 6 melody sounds plus 5 rhythm sounds
+       (different tones can be used together in either case).
+    3. Built-in Instruments data (15 melody tones, 5 rhythm tones, "CAPTAIN and TELETEXT applicalbe tones).
+    4. Built-in DA Converter.
+    5. Built-in Quartz Oscillator.
+    6. Built-in Vibrato Oscillator/AM Oscillator
+    7. TTL Compatible Input.
+    8. Si-Gate NMOS LSI
+    9. A single 5V power source.
 
 to do:
 
