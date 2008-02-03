@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( labyrunr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)	/* Sprite RAM */
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(labyrunr_vram1_w) AM_BASE(&labyrunr_videoram1)
@@ -252,8 +252,7 @@ static MACHINE_DRIVER_START( labyrunr )
 	MDRV_SCREEN_SIZE(37*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(labyrunr)
-	MDRV_PALETTE_LENGTH(128)
-	MDRV_COLORTABLE_LENGTH(2*8*16*16)
+	MDRV_PALETTE_LENGTH(2*8*16*16)
 
 	MDRV_PALETTE_INIT(labyrunr)
 	MDRV_VIDEO_START(labyrunr)

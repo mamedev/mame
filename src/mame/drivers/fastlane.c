@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( fastlane_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_WRITE(fastlane_K007232_write_port_0_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_WRITE(fastlane_K007232_write_port_1_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)/* palette RAM */
 	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)				/* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(fastlane_vram1_w) AM_BASE(&fastlane_videoram1)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(fastlane_vram2_w) AM_BASE(&fastlane_videoram2)
@@ -290,8 +290,7 @@ static MACHINE_DRIVER_START( fastlane )
 	MDRV_SCREEN_SIZE(37*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(fastlane)
-	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(1024*16)
+	MDRV_PALETTE_LENGTH(1024*16)
 
 	MDRV_PALETTE_INIT(fastlane)
 	MDRV_VIDEO_START(fastlane)

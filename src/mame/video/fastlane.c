@@ -8,16 +8,39 @@ static rectangle clip0, clip1;
 
 PALETTE_INIT( fastlane )
 {
-	int pal,col;
+	int pal;
 
-	for (pal = 0;pal < 16;pal++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x400);
+
+	for (pal = 0; pal < 0x10; pal++)
 	{
-		for (col = 0;col < 1024;col++)
+		int i;
+
+		for (i = 0; i < 0x400; i++)
 		{
-			*(colortable++) = (col & ~0x0f) | color_prom[16 * pal + (col & 0x0f)];
+			UINT8 ctabentry = (i & 0x3f0) | color_prom[(pal << 4) | (i & 0x0f)];
+			colortable_entry_set_value(machine->colortable, (pal << 10) | i, ctabentry);
 		}
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x800; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
+
 
 /***************************************************************************
 
@@ -129,6 +152,8 @@ VIDEO_UPDATE( fastlane )
 
 	sect_rect(&finalclip0, cliprect);
 	sect_rect(&finalclip1, cliprect);
+
+	set_pens(machine);
 
 	/* set scroll registers */
 	xoffs = K007121_ctrlram[0][0x00];

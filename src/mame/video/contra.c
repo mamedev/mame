@@ -30,26 +30,47 @@ static rectangle bg_clip, fg_clip, tx_clip;
 
 PALETTE_INIT( contra )
 {
-	int i,chip,pal,clut;
+	int chip;
 
-	for (chip = 0;chip < 2;chip++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x80);
+
+	for (chip = 0; chip < 2; chip++)
 	{
-		for (pal = 0;pal < 8;pal++)
+		int pal;
+
+		for (pal = 0; pal < 8; pal++)
 		{
-			clut = (pal & 1) + 2 * chip;
-			for (i = 0;i < 256;i++)
+			int i;
+			int clut = (chip << 1) | (pal & 1);
+
+			for (i = 0; i < 0x100; i++)
 			{
-				if ((pal & 1) == 0)	/* sprites */
-				{
-					if (color_prom[256 * clut + i] == 0)
-						*(colortable++) = 0;
-					else
-						*(colortable++) = 16 * pal + color_prom[256 * clut + i];
-				}
+				UINT8 ctabentry;
+
+				if (((pal & 0x01) == 0) && (color_prom[(clut << 8) | i] == 0))
+					ctabentry = 0;
 				else
-					*(colortable++) = 16 * pal + color_prom[256 * clut + i];
+					ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
+
+				colortable_entry_set_value(machine->colortable, (chip << 11) | (pal << 8) | i, ctabentry);
 			}
 		}
+	}
+}
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x100; i += 2)
+	{
+		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
 	}
 }
 
@@ -266,6 +287,8 @@ VIDEO_UPDATE( contra )
 	sect_rect(&bg_finalclip, cliprect);
 	sect_rect(&fg_finalclip, cliprect);
 	sect_rect(&tx_finalclip, cliprect);
+
+	set_pens(machine);
 
 	tilemap_set_scrollx( fg_tilemap,0, K007121_ctrlram[0][0x00] - 40 );
 	tilemap_set_scrolly( fg_tilemap,0, K007121_ctrlram[0][0x02] );

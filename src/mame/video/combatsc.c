@@ -28,11 +28,18 @@ static UINT8 *combasc_scrollram;
 
 PALETTE_INIT( combasc )
 {
-	int i,pal,clut = 0;
-	for( pal=0; pal<8; pal++ )
+	int pal;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x80);
+
+	for (pal = 0; pal < 8; pal++)
 	{
-		switch( pal )
+		int i, clut;
+
+		switch (pal)
 		{
+			default:
 			case 0: /* other sprites */
 			case 2: /* other sprites(alt) */
 			clut = 1;	/* 0 is wrong for Firing Range III targets */
@@ -54,35 +61,64 @@ PALETTE_INIT( combasc )
 			break;
 		}
 
-		for( i=0; i<256; i++ )
+		for (i = 0; i < 0x100; i++)
 		{
-			if ((pal & 1) == 0)	/* sprites */
-			{
-				if (color_prom[256 * clut + i] == 0)
-					*(colortable++) = 0;
-				else
-					*(colortable++) = 16 * pal + color_prom[256 * clut + i];
-			}
-			else	/* chars */
-				*(colortable++) = 16 * pal + color_prom[256 * clut + i];
+			UINT8 ctabentry;
+
+			if (((pal & 0x01) == 0) && (color_prom[(clut << 8) | i] == 0))
+				ctabentry = 0;
+			else
+				ctabentry = (pal << 4) | (color_prom[(clut << 8) | i] & 0x0f);
+
+			colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
 
+
 PALETTE_INIT( combascb )
 {
-	int i,pal;
-	for( pal=0; pal<8; pal++ )
+	int pal;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x80);
+
+	for (pal = 0; pal < 8; pal++)
 	{
-		for( i=0; i<256; i++ )
+		int i;
+
+		for (i = 0; i < 0x100; i++)
 		{
-			if ((pal & 1) == 0)	/* sprites */
-				*(colortable++) = 16 * pal + (color_prom[i] ^ 0x0f);
-			else	/* chars */
-				*(colortable++) = 16 * pal + (i & 0x0f);	/* no lookup? */
+			UINT8 ctabentry;
+
+			if ((pal & 1) == 0)
+				/* sprites */
+				ctabentry = (pal << 4) | (~color_prom[i] & 0x0f);
+			else
+				/* chars - no lookup? */
+				ctabentry = (pal << 4) | (i & 0x0f);	/* no lookup? */
+
+			colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
 		}
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x100; i += 2)
+	{
+		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
+
 
 /***************************************************************************
 
@@ -453,6 +489,7 @@ VIDEO_UPDATE( combasc )
 {
 	int i;
 
+	set_pens(machine);
 
 	if (K007121_ctrlram[0][0x01] & 0x02)
 	{
@@ -611,6 +648,8 @@ static void bootleg_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 VIDEO_UPDATE( combascb )
 {
 	int i;
+
+	set_pens(machine);
 
 	for( i=0; i<32; i++ )
 	{

@@ -8,25 +8,56 @@ static rectangle clip0, clip1;
 
 PALETTE_INIT( labyrunr )
 {
-	int i,pal;
+	int pal;
 
-	for (pal = 0;pal < 8;pal++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x80);
+
+	for (pal = 0; pal < 8; pal++)
 	{
-		if (pal & 1)	/* chars, no lookup table */
+		/* chars, no lookup table */
+		if (pal & 1)
 		{
-			for (i = 0;i < 256;i++)
-				*(colortable++) = 16 * pal + (i & 0x0f);
+			int i;
+
+			for (i = 0; i < 0x100; i++)
+				colortable_entry_set_value(machine->colortable, (pal << 8) | i, (pal << 4) | (i & 0x0f));
 		}
-		else	/* sprites */
+		/* sprites */
+		else
 		{
-			for (i = 0;i < 256;i++)
+			int i;
+
+			for (i = 0; i < 0x100; i++)
+			{
+				UINT8 ctabentry;
+
 				if (color_prom[i] == 0)
-					*(colortable++) = 0;
+					ctabentry = 0;
 				else
-					*(colortable++) = 16 * pal + color_prom[i];
+					ctabentry = (pal << 4) | (color_prom[i] & 0x0f);
+
+				colortable_entry_set_value(machine->colortable, (pal << 8) | i, ctabentry);
+			}
 		}
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0x00; i < 0x100; i += 2)
+	{
+		UINT16 data = paletteram[i | 1] | (paletteram[i] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
 
 
 /***************************************************************************
@@ -141,6 +172,8 @@ WRITE8_HANDLER( labyrunr_vram2_w )
 VIDEO_UPDATE( labyrunr )
 {
 	rectangle finalclip0, finalclip1;
+
+	set_pens(machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);
