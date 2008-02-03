@@ -25,6 +25,12 @@ static UINT8* robokid_bg1_videoram;
 static UINT8* robokid_bg2_videoram;
 
 
+/*************************************
+ *
+ *  Callbacks for the TileMap code
+ *
+ *************************************/
+
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int const lo = ninjakd2_fg_videoram[(tile_index << 1)];
@@ -113,6 +119,12 @@ static TILE_GET_INFO( robokid_get_bg2_tile_info )
 
 
 
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
 static void videoram_alloc(const running_machine* const machine, int const size)
 {
 	if (size)
@@ -193,6 +205,12 @@ VIDEO_START( omegaf )
 }
 
 
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
 
 WRITE8_HANDLER( ninjakd2_bgvideoram_w )
 {
@@ -309,6 +327,13 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
 	next_sprite_overdraw_enabled = data & 1;
 }
 
+
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 static void draw_sprites(running_machine* const machine, mame_bitmap* const bitmap, const rectangle* const cliprect)
 {

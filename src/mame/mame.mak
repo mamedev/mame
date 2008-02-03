@@ -1441,11 +1441,8 @@ $(MAMEOBJ)/univers.a: \
 
 $(MAMEOBJ)/upl.a: \
 	$(DRIVERS)/mouser.o $(VIDEO)/mouser.o \
-	$(DRIVERS)/ninjakun.o $(VIDEO)/ninjakun.o \
 	$(DRIVERS)/ninjakd2.o $(VIDEO)/ninjakd2.o \
 	$(DRIVERS)/nova2001.o $(VIDEO)/nova2001.o \
-	$(DRIVERS)/pkunwar.o $(VIDEO)/pkunwar.o \
-	$(DRIVERS)/raiders5.o $(VIDEO)/raiders5.o \
 	$(DRIVERS)/xxmissio.o $(VIDEO)/xxmissio.o \
 
 $(MAMEOBJ)/valadon.a: \
