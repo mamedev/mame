@@ -24,8 +24,49 @@ static void blitter_execute(void);
 
 VIDEO_START( kangaroo )
 {
-	videoram = auto_malloc(256 * 256);
-	state_save_register_global_pointer(videoram, 256 * 256);
+	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
+	videoram32 = auto_malloc(256 * 64 * 4);
+	state_save_register_global_pointer(videoram32, 256 * 64);
+}
+
+
+
+/*************************************
+ *
+ *  Video RAM accesses
+ *
+ *************************************/
+
+static void videoram_write(UINT16 offset, UINT8 data, UINT8 mask)
+{
+	UINT32 expdata, layermask;
+
+	/* data contains 4 2-bit values packed as DCBADCBA; expand these into 4 8-bit values */
+	expdata = 0;
+	if (data & 0x01) expdata |= 0x00000055;
+	if (data & 0x10) expdata |= 0x000000aa;
+	if (data & 0x02) expdata |= 0x00005500;
+	if (data & 0x20) expdata |= 0x0000aa00;
+	if (data & 0x04) expdata |= 0x00550000;
+	if (data & 0x40) expdata |= 0x00aa0000;
+	if (data & 0x08) expdata |= 0x55000000;
+	if (data & 0x80) expdata |= 0xaa000000;
+	
+	/* determine which layers are enabled */
+	layermask = 0;
+	if (mask & 0x08) layermask |= 0x30303030;
+	if (mask & 0x04) layermask |= 0xc0c0c0c0;
+	if (mask & 0x02) layermask |= 0x03030303;
+	if (mask & 0x01) layermask |= 0x0c0c0c0c;
+
+	/* update layers */
+	videoram32[offset] = (videoram32[offset] & ~layermask) | (expdata & layermask);
+}
+
+
+WRITE8_HANDLER( kangaroo_videoram_w )
+{
+	videoram_write(offset, data, kangaroo_video_control[8]);
 }
 
 
@@ -62,100 +103,29 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 
 static void blitter_execute(void)
 {
-	int src,dest;
-	int x,y,width,height,old_bank_select,new_bank_select;
+	UINT32 gfxhalfsize = memory_region_length(REGION_GFX1) / 2;
+	const UINT8 *gfxbase = memory_region(REGION_GFX1);
+	UINT16 src = kangaroo_video_control[0] + 256 * kangaroo_video_control[1];
+	UINT16 dst = kangaroo_video_control[2] + 256 * kangaroo_video_control[3];
+	UINT8 height = kangaroo_video_control[5];
+	UINT8 width = kangaroo_video_control[4];
+	UINT8 mask = kangaroo_video_control[8];
+	int x, y;
+	
+	/* during DMA operations, the top 2 bits are ORed together, as well as the bottom 2 bits */
+	/* adjust the mask to account for this */
+	if (mask & 0x0c) mask |= 0x0c;
+	if (mask & 0x03) mask |= 0x03;
 
-	src = kangaroo_video_control[0] + 256 * kangaroo_video_control[1];
-	dest = kangaroo_video_control[2] + 256 * kangaroo_video_control[3];
-
-	width = kangaroo_video_control[5];
-	height = kangaroo_video_control[4];
-
-	old_bank_select = new_bank_select = kangaroo_video_control[8];
-
-	if (new_bank_select & 0x0c)  new_bank_select |= 0x0c;
-	if (new_bank_select & 0x03)  new_bank_select |= 0x03;
-
-	kangaroo_video_control_w(8, new_bank_select & 0x05);
-
-	for (x = 0; x <= width; x++)
-	{
-		for (y = 0; y <= height; y++)
-			program_write_byte(dest + y, program_read_byte(src++));
-
-		dest += 256;
-	}
-
-	src = kangaroo_video_control[0] + 256 * kangaroo_video_control[1];
-	dest = kangaroo_video_control[2] + 256 * kangaroo_video_control[3];
-
-	kangaroo_video_control_w(8, new_bank_select & 0x0a);
-
-	for (x = 0; x <= width; x++)
-	{
-		for (y = 0; y <= height; y++)
-			program_write_byte(dest + y, program_read_byte(src++));
-
-		dest += 256;
-	}
-
-	kangaroo_video_control_w(8, old_bank_select);
-}
-
-
-
-/*************************************
- *
- *  Video RAM writes
- *
- *************************************/
-
-WRITE8_HANDLER( kangaroo_videoram_w )
-{
-	int sx, sy, offs;
-
-	sx = (offset / 256) * 4;
-	sy = offset % 256;
-	offs = sy * 256 + sx;
-
-	/* rearrange the bits to a more convenient pattern (from DCBADCBA to DDCCBBAA) */
-	data = BITSWAP8(data, 7,3,6,2,5,1,4,0);
-
-	/* B layer, green & blue bits */
-	if (kangaroo_video_control[8] & 0x08)
-	{
-		videoram[offs  ] = (videoram[offs  ] & 0xcf) | (((data >> 0) & 3) << 4);
-		videoram[offs+1] = (videoram[offs+1] & 0xcf) | (((data >> 2) & 3) << 4);
-		videoram[offs+2] = (videoram[offs+2] & 0xcf) | (((data >> 4) & 3) << 4);
-		videoram[offs+3] = (videoram[offs+3] & 0xcf) | (((data >> 6) & 3) << 4);
-	}
-
-	/* B layer, Z & red bits */
-	if (kangaroo_video_control[8] & 0x04)
-	{
-		videoram[offs  ] = (videoram[offs  ] & 0x3f) | (((data >> 0) & 3) << 6);
-		videoram[offs+1] = (videoram[offs+1] & 0x3f) | (((data >> 2) & 3) << 6);
-		videoram[offs+2] = (videoram[offs+2] & 0x3f) | (((data >> 4) & 3) << 6);
-		videoram[offs+3] = (videoram[offs+3] & 0x3f) | (((data >> 6) & 3) << 6);
-	}
-
-	/* A layer, green & blue bits */
-	if (kangaroo_video_control[8] & 0x02)
-	{
-		videoram[offs  ] = (videoram[offs  ] & 0xfc) | (((data >> 0) & 3) << 0);
-		videoram[offs+1] = (videoram[offs+1] & 0xfc) | (((data >> 2) & 3) << 0);
-		videoram[offs+2] = (videoram[offs+2] & 0xfc) | (((data >> 4) & 3) << 0);
-		videoram[offs+3] = (videoram[offs+3] & 0xfc) | (((data >> 6) & 3) << 0);
-	}
-
-	/* A layer, Z & red bits */
-	if (kangaroo_video_control[8] & 0x01)
-	{
-		videoram[offs  ] = (videoram[offs  ] & 0xf3) | (((data >> 0) & 3) << 2);
-		videoram[offs+1] = (videoram[offs+1] & 0xf3) | (((data >> 2) & 3) << 2);
-		videoram[offs+2] = (videoram[offs+2] & 0xf3) | (((data >> 4) & 3) << 2);
-		videoram[offs+3] = (videoram[offs+3] & 0xf3) | (((data >> 6) & 3) << 2);
-	}
+	/* loop over height, then width */
+	for (y = 0; y <= height; y++, dst += 256)
+		for (x = 0; x <= width; x++)
+		{
+			UINT16 effdst = (dst + x) & 0x3fff;
+			UINT16 effsrc = src++ & (gfxhalfsize - 1);
+			videoram_write(effdst, gfxbase[0*gfxhalfsize + effsrc], mask & 0x05);
+			videoram_write(effdst, gfxbase[1*gfxhalfsize + effsrc], mask & 0x0a);
+		}
 }
 
 
@@ -196,16 +166,18 @@ VIDEO_UPDATE( kangaroo )
 			UINT8 effya = scrolly + (y ^ xora);
 			UINT8 effxb = (x / 2) ^ xorb;
 			UINT8 effyb = y ^ xorb;
-			UINT8 pixa = videoram[effya * 256 + effxa] & 0x0f;
-			UINT8 pixb = videoram[effyb * 256 + effxb] >> 4;
+			UINT8 pixa = (videoram32[effya + 256 * (effxa / 4)] >> (8 * (effxa % 4) + 0)) & 0x0f;
+			UINT8 pixb = (videoram32[effyb + 256 * (effxb / 4)] >> (8 * (effxb % 4) + 4)) & 0x0f;
 			UINT8 finalpens;
 
+			/* for each layer, contribute bits if (a) enabled, and (b) either has priority or the opposite plane is 0 */
 			finalpens = 0;
 			if (enaa && (pria || pixb == 0))
 				finalpens |= pixa;
 			if (enab && (prib || pixa == 0))
 				finalpens |= pixb;
 
+			/* store the first of two pixels, which is always full brightness */
 			dest[x + 0] = pens[finalpens & 7];
 
 			/* KOS1 alternates at 5MHz, offset from the pixel clock by 1/2 clock */
@@ -222,6 +194,7 @@ VIDEO_UPDATE( kangaroo )
 				finalpens |= pixb;
 			}
 
+			/* store the second of two pixels, which is affected by KOS1 and the A/B masks */
 			dest[x + 1] = pens[finalpens & 7];
 		}
 	}
