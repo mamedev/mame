@@ -163,7 +163,7 @@ VIDEO_UPDATE( fastlane )
 	tilemap_set_scrolly( layer0, 0, K007121_ctrlram[0][0x02] );
 
 	tilemap_draw(bitmap,&finalclip0,layer0,0,0);
-	K007121_sprites_draw(machine,0,bitmap,cliprect,spriteram,0,40,0,-1);
+	K007121_sprites_draw(0,bitmap,machine->gfx,machine->colortable,cliprect,spriteram,0,40,0,-1);
 	tilemap_draw(bitmap,&finalclip1,layer1,0,0);
 	return 0;
 }

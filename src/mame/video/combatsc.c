@@ -481,7 +481,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 {
 	int base_color = (circuit*4)*16+(K007121_ctrlram[circuit][6]&0x10)*2;
 
-	K007121_sprites_draw(machine,circuit,bitmap,cliprect,source,base_color,0,0,pri_mask);
+	K007121_sprites_draw(circuit,bitmap,machine->gfx,machine->colortable,cliprect,source,base_color,0,0,pri_mask);
 }
 
 

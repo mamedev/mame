@@ -1299,14 +1299,14 @@ WRITE8_HANDLER( K007121_ctrl_1_w )
  *
  */
 
-void K007121_sprites_draw(running_machine *machine, int chip,mame_bitmap *bitmap,const rectangle *cliprect,
-		const UINT8 *source,int base_color,int global_x_offset,int bank_base,
-		UINT32 pri_mask)
+void K007121_sprites_draw(int chip,mame_bitmap *bitmap,gfx_element **gfxs, colortable_t *ctable,
+						  const rectangle *cliprect, const UINT8 *source,int base_color,
+						  int global_x_offset,int bank_base, UINT32 pri_mask)
 {
-	const gfx_element *gfx = machine->gfx[chip];
+	const gfx_element *gfx = gfxs[chip];
 	int flipscreen = K007121_flipscreen[chip];
 	int i,num,inc,offs[5],trans;
-	int is_flakatck = K007121_ctrlram[chip][0x06] & 0x04;	/* WRONG!!!! */
+	int is_flakatck = (ctable == NULL);
 
 #if 0
 popmessage("%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x  %02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x",
@@ -1386,7 +1386,7 @@ if (input_code_pressed(KEYCODE_D))
 		if (trans == TRANSPARENCY_PEN)
 			transparent_color = 0;
 		else
-			transparent_color = colortable_get_transpen_mask(machine->colortable, gfx, color, 0);
+			transparent_color = colortable_get_transpen_mask(ctable, gfx, color, 0);
 
 		if (!is_flakatck || source[0x00])	/* Flak Attack needs this */
 		{
