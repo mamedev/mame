@@ -10,6 +10,9 @@ Birdie King / Birdie King II / Birdie King III Memory Map
 9000-97ff Playfield RAM
 a000-bfff Unused?
 
+DIP Locations verified for:
+	- bking2
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -269,33 +272,33 @@ static INPUT_PORTS_START( bking )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Not Connected */
 
-	PORT_START  /* IN2 - DIP Switch A */
-	PORT_DIPNAME( 0x01, 0x00, "Bonus Holes Awarded" )
-	PORT_DIPSETTING(    0x00, "Fewer" )
-	PORT_DIPSETTING(    0x01, "More" )
-	PORT_DIPNAME( 0x02, 0x02, "Holes Awarded for Hole-in-One" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x02, "9" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Free_Play) )
+	PORT_START_TAG("DSWA")  /* IN2 - DIP Switch A */
+	PORT_DIPNAME( 0x01, 0x00, "Holes Awarded" ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x00, "Par Play: 0 Holes/Birdie: 1 Hole/Eagle: 2 Holes/Double Eagle: 4 Holes" )
+	PORT_DIPSETTING(    0x01, "Par Play: 1 Hole/Birdie: 2 Holes/Eagle: 3 Holes/Double Eagle: 4 Holes" )
+	PORT_DIPNAME( 0x02, 0x02, "Holes Awarded For Hole-in-One" ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x00, "3 Holes" )
+	PORT_DIPSETTING(    0x02, "9 Holes" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Free_Play) ) PORT_DIPLOCATION("SWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x18, 0x18, "Holes (Lives)" )
+	PORT_DIPNAME( 0x18, 0x18, "Holes Per Play" ) PORT_DIPLOCATION("SWA:4,5")
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "9" )
-	PORT_DIPNAME( 0x20, 0x20, "Self Test" )
+	PORT_DIPNAME( 0x20, 0x20, "Self Test" ) PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Flip_Screen) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Flip_Screen) ) PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Cabinet) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Cabinet) ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )
 	PORT_DIPSETTING(    0x80, DEF_STR(Cocktail) )
 
-	PORT_START  /* IN3 - DIP Switch B */
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSWB")  /* IN3 - DIP Switch B */
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWB:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
@@ -312,7 +315,7 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWB:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
@@ -330,30 +333,28 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START  /* IN4 - DIP Switch C */
-	PORT_DIPNAME( 0x01, 0x01, "Crow" )
+	PORT_START_TAG("DSWC")  /* IN4 - DIP Switch C */
+	PORT_DIPNAME( 0x01, 0x01, "Appearance of Crow" ) PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, "Crow Flight Pattern" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x06, "4" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unused) )
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
+	PORT_DIPNAME( 0x06, 0x02, "Crow Flight Pattern" ) PORT_DIPLOCATION("SWC:2,3") /* "The hole from which a crow appears and flys with drawing a circle or a 8-shape in the air." */
+	PORT_DIPSETTING(    0x00, "1" ) /* Circle 1,7,11,15,18 / 8-shape 3,5,9,13,17 */
+	PORT_DIPSETTING(    0x02, "2" ) /* Circle 1,10,16,18 / 8-shape 4,7,13,17 */
+	PORT_DIPSETTING(    0x04, "3" ) /* Circle 4,7,13,18 / 8-shape 1,10,16,17 */
+	PORT_DIPSETTING(    0x06, "4" ) /* Circle 3,5,9,13,18 / 8-shape 1,7,11,15,17 */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SWC:4" ) /* Listed as "Unused" */
+	PORT_DIPNAME( 0x10, 0x10, "Coin Display" ) PORT_DIPLOCATION("SWC:5")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off))
 	PORT_DIPSETTING(    0x10, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
+	PORT_DIPNAME( 0x20, 0x20, "Year Display" ) PORT_DIPLOCATION("SWC:6")
 	PORT_DIPSETTING(    0x00, DEF_STR(Off))
 	PORT_DIPSETTING(    0x20, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x40, "Check" )
+	PORT_DIPNAME( 0x40, 0x40, "Check" ) PORT_DIPLOCATION("SWC:7")
 	PORT_DIPSETTING(    0x00, "Check" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Chutes" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPNAME( 0x80, 0x00, "Coin System" ) PORT_DIPLOCATION("SWC:8") /* Default is "1 Way" according to manual */
+	PORT_DIPSETTING(    0x00, "1 Way" )
+	PORT_DIPSETTING(    0x80, "2 Way" )
 
 	PORT_START  /* IN5 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
@@ -369,119 +370,11 @@ static INPUT_PORTS_START( bking )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bking2 )
-	PORT_START  /* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_INCLUDE( bking )
 
-	PORT_START  /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) /* Continue 1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) /* Continue 2 */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Not Connected */
-
-	PORT_START  /* IN2 - DIP Switch A */
-	PORT_DIPNAME( 0x01, 0x00, "Bonus Holes Awarded" )
-	PORT_DIPSETTING(    0x00, "Fewer" )
-	PORT_DIPSETTING(    0x01, "More" )
-	PORT_DIPNAME( 0x02, 0x02, "Holes Awarded for Hole-in-One" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x02, "9" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Free_Play) )
-	PORT_DIPSETTING(    0x04, DEF_STR(Off))
-	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x18, 0x18, "Holes (Lives)" )
-	PORT_DIPSETTING(    0x18, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x00, "9" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unused) )
-	PORT_DIPSETTING(    0x20, DEF_STR(Off))
-	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Flip_Screen) )
-	PORT_DIPSETTING(    0x40, DEF_STR(Off))
-	PORT_DIPSETTING(    0x00, DEF_STR(On))
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Cabinet) )
-	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )
-	PORT_DIPSETTING(    0x80, DEF_STR(Cocktail) )
-
-	PORT_START  /* IN3 - DIP Switch B */
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x90, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
-
-	PORT_START  /* IN4 - DIP Switch C */
-	PORT_DIPNAME( 0x01, 0x01, "Crow" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x04, "Crow Flight Pattern" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x06, "4" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unused) )
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x10, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x20, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x40, "Check" )
-	PORT_DIPSETTING(    0x00, "Check" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Chutes" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x80, "2" )
-
-	PORT_START  /* IN5 */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
-
-	PORT_START  /* IN6 */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE /* Sensitivity, clip, min, max */
-
-	PORT_START  /* IN7 */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL /* Sensitivity, clip, min, max */
-
-	PORT_START  /* IN8 */
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL /* Sensitivity, clip, min, max */
+	PORT_MODIFY("DSWA")
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWA:6" ) /* Listed as "Unused" */
 INPUT_PORTS_END
-
 
 static const gfx_layout charlayout =
 {
