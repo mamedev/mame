@@ -626,11 +626,11 @@ static void v9938_register_write (int reg, int data)
 		case 2:
 			/*v9938_update_command ();*/
 /*
-	WTF is this? Whatever this was intended to do, it is nonsensical.
-	Might as well pick a random number....
-			n = cycles_currently_ran ();
-			if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
-			else vdp.statReg[2] &= ~0x20;
+    WTF is this? Whatever this was intended to do, it is nonsensical.
+    Might as well pick a random number....
+            n = cycles_currently_ran ();
+            if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
+            else vdp.statReg[2] &= ~0x20;
 */
 			if (mame_rand(Machine) & 1) vdp.statReg[2] |= 0x20;
 			else vdp.statReg[2] &= ~0x20;

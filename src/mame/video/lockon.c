@@ -269,7 +269,7 @@ static void scene_draw(void)
 				UINT32 tileidx;
 				UINT16 addr = ((y_offs & ~7) << 3) + ((x_offs >> 3) & 0x3f);
 				UINT16 ram_val = lockon_scene_ram[addr & ram_mask];
-				
+
 				colour = (clut[ram_val & 0x7fff] & 0x3f) << 3;
 				tileidx = ((ram_val & 0x0fff) << 3) + y_gran;
 
@@ -353,7 +353,7 @@ static void ground_draw(void)
 	/* ROM pointers */
 	const UINT8 *const gfx_rom  = memory_region(REGION_GFX4);
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
-	const UINT8 *const clut_rom = gfx_rom + 0x50000;	
+	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
 	UINT32 lut_a15_14	= (ground_ctrl & 0x3) << 14;
 	UINT32 clut_a14_12	= (ground_ctrl & 0x70) << 8;
@@ -523,7 +523,7 @@ static void objects_draw(void)
 		ypos -=1;
 
 		for (y = 0; y < FRAMEBUFFER_MAX_Y; y++)
-		{			
+		{
 			UINT32	cy = (y + ypos) & 0x3ff;
 			UINT32	optab;
 			UINT32	lutaddr;
@@ -532,7 +532,7 @@ static void objects_draw(void)
 			UINT32	yidx;
 			UINT16	*line = BITMAP_ADDR16(back_buffer, y, 0);
 			UINT32	px = xpos;
-			
+
 			/* Outside the limits? */
 			if (cy & 0x300)
 				continue;
@@ -557,7 +557,7 @@ static void objects_draw(void)
 				cnt ^= (0xf >> (3 - ysize)) * (1 << xsize);
 
 			cnt = (cnt + (opsta & 0xff));
-			
+
 			/* Draw! */
 			for (tile = 0; tile < (1 << xsize); ++tile)
 			{
@@ -573,7 +573,7 @@ static void objects_draw(void)
 				tileaddr = (chklut[opsta15_8 + cnt] & 0x7fff);
 				bank = ((tileaddr >> 12) & 3) * 0x40000;
 				tileaddr = bank + ((tileaddr & ~0xf000) << 3);
-			
+
 				if (xflip)
 					--cnt;
 				else
@@ -648,7 +648,7 @@ static void objects_draw(void)
 
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
 WRITE16_HANDLER( lockon_tza112_w )
-{	
+{
 	if (iden)
 	{
 		obj_pal_latch = data & 0xff;
@@ -740,7 +740,7 @@ static void rotate_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 	/* Accumulator values and deltas */
 	UINT8 axy  = x0ll & 0xff;
-	UINT8 daxy = dx0ll & 0xff;	
+	UINT8 daxy = dx0ll & 0xff;
 	UINT8 ayy  = y0ll & 0xff;
 	UINT8 dayy = dy0ll & 0xff;
 	UINT8 dayx = dyll & 0xff;
@@ -755,7 +755,7 @@ static void rotate_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 	for (y = 0; y <= cliprect->max_y; ++y)
 	{
-		UINT32 carry;		
+		UINT32 carry;
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 		UINT32 x;
 
@@ -878,7 +878,7 @@ static void hud_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			UINT32 xt;
 			UINT32 cy;
-			
+
 			cy = y_pos + y;
 
 			if (cy < 0x200)
@@ -985,5 +985,5 @@ VIDEO_EOF( lockon )
 	scene_draw();
 	ground_draw();
 	objects_draw();
-	
+
 }

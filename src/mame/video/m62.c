@@ -56,31 +56,31 @@ static INT32 spelunkr_palbank;
   The schematics also exhibit one pulldown for the sprite color guns.
   Since only either the sprite or tile gun is active, i.e. the other is
   in tri-state, this pulldown resistor also applies to the tile color guns.
-  
+
   Which of the sprite/tilemap color guns is in tri-state mode is determined
-  by a pal. There is no good dump of this pal. If both sprite and tilemap 
-  should be active (i.e. not in tristate) at a time, this would due to the 
+  by a pal. There is no good dump of this pal. If both sprite and tilemap
+  should be active (i.e. not in tristate) at a time, this would due to the
   pulldown resistor have slightly darker colors as a consequence.
-  
-  This can explain the spelunkr bug m62_0116u4gre. 
-  
+
+  This can explain the spelunkr bug m62_0116u4gre.
+
   The kidnike bug kidniki0104u3gre even looks worse and may imho only explained
-  by subpixel effects, i.e. delays when switching the proms into tristate. 
-  
+  by subpixel effects, i.e. delays when switching the proms into tristate.
+
   Since there are no dumps of the "priority" pal, the above is
-  speculation. 
-  
+  speculation.
+
   Priority PAL
-  
+
   The PAL is at location 4F on the "T" board. The PAL's input are 3 bits
   from tilemap 0, 3 bits from tilemap 1 and A11-A14:
 
-  CB0A =>   7     20  GND 
+  CB0A =>   7     20  GND
   CB1A =>   8?    14  ==> PROM CS
   CB2A =>   9  P  19  ==> Tilemap select 0/1 / to connector
-  C14A =>  12  A  11  <== Sprite priority out / to connector 
-  C13A =>   4  L  18? ==> Sprite priority in / to connector  
-  C12A =>   5     10  GND 
+  C14A =>  12  A  11  <== Sprite priority out / to connector
+  C13A =>   4  L  18? ==> Sprite priority in / to connector
+  C12A =>   5     10  GND
   C11A =>   6
   CB0D =>   1
   CB1D =>   2

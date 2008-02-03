@@ -7,17 +7,17 @@
     Known bugs:
         * none at this time
 
-	DIP locations verified from manual for:
-		* aceattaa
-		* aliensyn
-		* aliensy1
-		* pshot16a
-		* quartet
-		* quart2
-		* shinobi
-		* tetris
-		* timescan
-		* wb3
+    DIP locations verified from manual for:
+        * aceattaa
+        * aliensyn
+        * aliensy1
+        * pshot16a
+        * quartet
+        * quart2
+        * shinobi
+        * tetris
+        * timescan
+        * wb3
 
 ***************************************************************************
 
@@ -1624,8 +1624,8 @@ static INPUT_PORTS_START( tetris )
 
 	PORT_MODIFY("DSW2")
 	/* SW2:1,3,4,7,8 Unused according to manual.
-	From the code SW2:3,4 looks like some kind of difficulty level,
-	but all 4 levels points to the same place so it doesn't actually change anything!! */
+    From the code SW2:3,4 looks like some kind of difficulty level,
+    but all 4 levels points to the same place so it doesn't actually change anything!! */
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

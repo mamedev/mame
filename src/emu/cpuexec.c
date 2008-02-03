@@ -257,7 +257,7 @@ static void cpuexec_reset(running_machine *machine)
 
 	/* initialize the various timers (suspends all CPUs at startup) */
 	cpu_inittimers(machine);
-	
+
 	/* set up the watchdog timer; only start off enabled if explicitly configured */
 	watchdog_enabled = (machine->drv->watchdog_vblank_count != 0 || attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0);
 	watchdog_reset(machine);
@@ -300,7 +300,7 @@ static void cpuexec_exit(running_machine *machine)
 
 
 /*-------------------------------------------------
-    cpuexec_timeslice - execute all CPUs for a 
+    cpuexec_timeslice - execute all CPUs for a
     single timeslice
 -------------------------------------------------*/
 
@@ -401,7 +401,7 @@ void cpuexec_timeslice(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_boost_interleave - temporarily boosts the 
+    cpu_boost_interleave - temporarily boosts the
     interleave factor
 -------------------------------------------------*/
 
@@ -445,7 +445,7 @@ void activecpu_abort_timeslice(void)
 
 /*-------------------------------------------------
     cpunum_suspend - set a suspend reason for the
-	given CPU
+    given CPU
 -------------------------------------------------*/
 
 void cpunum_suspend(int cpunum, int reason, int eatcycles)
@@ -463,7 +463,7 @@ void cpunum_suspend(int cpunum, int reason, int eatcycles)
 
 /*-------------------------------------------------
     cpunum_resume - clear a suspend reason for the
-	given CPU
+    given CPU
 -------------------------------------------------*/
 
 void cpunum_resume(int cpunum, int reason)
@@ -479,8 +479,8 @@ void cpunum_resume(int cpunum, int reason)
 
 
 /*-------------------------------------------------
-    cpunum_is_suspended - returns true if the 
-    given CPU is suspended for any of the given 
+    cpunum_is_suspended - returns true if the
+    given CPU is suspended for any of the given
     reasons
 -------------------------------------------------*/
 
@@ -509,11 +509,11 @@ static void update_clock_information(running_machine *machine, int cpunum)
 
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave(machine);
-} 
+}
 
 
 /*-------------------------------------------------
-    cpunum_get_clock - gets the given CPU's 
+    cpunum_get_clock - gets the given CPU's
     clock speed
 -------------------------------------------------*/
 
@@ -525,7 +525,7 @@ int cpunum_get_clock(int cpunum)
 
 
 /*-------------------------------------------------
-    cpunum_set_clock - sets the given CPU's 
+    cpunum_set_clock - sets the given CPU's
     clock speed
 -------------------------------------------------*/
 
@@ -539,7 +539,7 @@ void cpunum_set_clock(running_machine *machine, int cpunum, int clock)
 
 
 /*-------------------------------------------------
-    cpunum_get_clockscale - returns the current 
+    cpunum_get_clockscale - returns the current
     scaling factor for a CPU's clock speed
 -------------------------------------------------*/
 
@@ -551,7 +551,7 @@ double cpunum_get_clockscale(int cpunum)
 
 
 /*-------------------------------------------------
-    cpunum_set_clockscale - sets the current 
+    cpunum_set_clockscale - sets the current
     scaling factor for a CPU's clock speed
 -------------------------------------------------*/
 
@@ -570,7 +570,7 @@ void cpunum_set_clockscale(running_machine *machine, int cpunum, double clocksca
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpunum_get_localtime - returns the current 
+    cpunum_get_localtime - returns the current
     local time for a CPU
 -------------------------------------------------*/
 
@@ -609,7 +609,7 @@ UINT64 activecpu_gettotalcycles(void)
 
 /*-------------------------------------------------
     cpunum_gettotalcycles - return the total
-    number of CPU cycles executed on the 
+    number of CPU cycles executed on the
     specified CPU
 -------------------------------------------------*/
 
@@ -670,7 +670,7 @@ void cpu_yield(void)
 
 
 /*-------------------------------------------------
-    cpu_spin - burn CPU cycles until our timeslice 
+    cpu_spin - burn CPU cycles until our timeslice
     is up
 -------------------------------------------------*/
 
@@ -683,7 +683,7 @@ void cpu_spin(void)
 
 
 /*-------------------------------------------------
-    cpu_spinuntil_trigger - burn CPU cycles until 
+    cpu_spinuntil_trigger - burn CPU cycles until
     a timer trigger
 -------------------------------------------------*/
 
@@ -696,7 +696,7 @@ void cpu_spinuntil_trigger(int trigger)
 
 
 /*-------------------------------------------------
-    cpunum_spinuntil_trigger - burn specified CPU 
+    cpunum_spinuntil_trigger - burn specified CPU
     cycles until a timer trigger
 -------------------------------------------------*/
 
@@ -708,7 +708,7 @@ void cpunum_spinuntil_trigger(int cpunum, int trigger)
 
 
 /*-------------------------------------------------
-    cpu_spinuntil_int - burn CPU cycles until the 
+    cpu_spinuntil_int - burn CPU cycles until the
     next interrupt
 -------------------------------------------------*/
 
@@ -721,7 +721,7 @@ void cpu_spinuntil_int(void)
 
 
 /*-------------------------------------------------
-    cpu_spinuntil_time - burn CPU cycles for a 
+    cpu_spinuntil_time - burn CPU cycles for a
     specific period of time
 -------------------------------------------------*/
 
@@ -771,7 +771,7 @@ void cpu_trigger(running_machine *machine, int trigger)
 
 
 /*-------------------------------------------------
-    cpu_triggertime - generate a trigger after a 
+    cpu_triggertime - generate a trigger after a
     specific period of time
 -------------------------------------------------*/
 
@@ -788,7 +788,7 @@ void cpu_triggertime(attotime duration, int trigger)
 
 
 /*-------------------------------------------------
-    cpu_triggerint - generate a trigger 
+    cpu_triggerint - generate a trigger
     corresponding to an interrupt on the given CPU
 -------------------------------------------------*/
 
@@ -823,7 +823,7 @@ void watchdog_reset(running_machine *machine)
 	/* if we're not enabled, skip it */
 	if (!watchdog_enabled)
 		timer_adjust(watchdog_timer, attotime_never, 0, attotime_zero);
-	
+
 	/* VBLANK-based watchdog? */
 	else if (machine->drv->watchdog_vblank_count != 0)
 		watchdog_counter = machine->drv->watchdog_vblank_count;
@@ -831,7 +831,7 @@ void watchdog_reset(running_machine *machine)
 	/* timer-based watchdog? */
 	else if (attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0)
 		timer_adjust(watchdog_timer, machine->drv->watchdog_time, 0, attotime_zero);
-	
+
 	/* default to an obscene amount of time (3 seconds) */
 	else
 		timer_adjust(watchdog_timer, ATTOTIME_IN_SEC(3), 0, attotime_zero);
@@ -943,7 +943,7 @@ int cpu_getcurrentframe(void)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_vblankreset - hook for updating things on 
+    cpu_vblankreset - hook for updating things on
     cheesy fake VBLANK (once per frame)
 -------------------------------------------------*/
 
@@ -1122,7 +1122,7 @@ static TIMER_CALLBACK( end_interleave_boost )
 
 
 /*-------------------------------------------------
-    compute_perfect_interleave - compute the 
+    compute_perfect_interleave - compute the
     "perfect" interleave interval
 -------------------------------------------------*/
 

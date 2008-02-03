@@ -532,27 +532,27 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 	UINT16 count = (h8.per_regs[base + 0x2]<<8) | h8.per_regs[base + 0x3];
 	count++;
 
-//	logerror("h8/3007 timer %d count = %04x\n",tnum,count);
+//  logerror("h8/3007 timer %d count = %04x\n",tnum,count);
 
 	 // GRA match
 	if ((h8.per_regs[base + 0x1] & 0x03) && (count == ((h8.per_regs[base + 0x4]<<8) | h8.per_regs[base + 0x5])))
 	{
 		if ((h8.per_regs[base + 0x0] & 0x60) == 0x20)
 		{
-//			logerror("h8/3007 timer %d GRA match, restarting\n",tnum);
+//          logerror("h8/3007 timer %d GRA match, restarting\n",tnum);
 			count = 0;
 			h8_3007_itu_refresh_timer(tnum);
 		}
 		else
 		{
-//			logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
+//          logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
 			timer_adjust(h8.timer[tnum], attotime_never, 0, attotime_zero);
 		}
 
 		h8.per_regs[0x64] |= 1<<tnum;
 		if(h8.per_regs[0x64] & (4<<tnum))	// interrupt enable
 		{
-//			logerror("h8/3007 timer %d GRA INTERRUPT\n",tnum);
+//          logerror("h8/3007 timer %d GRA INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(24+tnum*4);
 		}
 	}
@@ -561,31 +561,31 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 	{
 		if ((h8.per_regs[base + 0x0] & 0x60) == 0x40)
 		{
-//			logerror("h8/3007 timer %d GRB match, restarting\n",tnum);
+//          logerror("h8/3007 timer %d GRB match, restarting\n",tnum);
 			count = 0;
 			h8_3007_itu_refresh_timer(tnum);
 		}
 		else
 		{
-//			logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
+//          logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
 			timer_adjust(h8.timer[tnum], attotime_never, 0, attotime_zero);
 		}
 
 		h8.per_regs[0x65] |= 1<<tnum;
 		if(h8.per_regs[0x65] & (4<<tnum))	// interrupt enable
 		{
-//			logerror("h8/3007 timer %d GRB INTERRUPT\n",tnum);
+//          logerror("h8/3007 timer %d GRB INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(25+tnum*4);
 		}
 	}
 	// Overflow
 	if (((h8.per_regs[base + 0x1] & 0x33) == 0) && (count == 0))
 	{
-//		logerror("h8/3007 timer %d OVF match, restarting\n",tnum);
+//      logerror("h8/3007 timer %d OVF match, restarting\n",tnum);
 		h8.per_regs[0x66] |= 1<<tnum;
 		if(h8.per_regs[0x66] & (4<<tnum))	// interrupt enable
 		{
-//			logerror("h8/3007 timer %d OVF INTERRUPT\n",tnum);
+//          logerror("h8/3007 timer %d OVF INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(26+tnum*4);
 		}
 	}
@@ -627,7 +627,7 @@ UINT8 h8_3007_itu_read8(UINT8 reg)
 
 void h8_3007_itu_write8(UINT8 reg, UINT8 val)
 {
-//	logerror("%06x: h8/3007 reg %02x = %02x\n",activecpu_get_pc(),reg,val);
+//  logerror("%06x: h8/3007 reg %02x = %02x\n",activecpu_get_pc(),reg,val);
 	h8.per_regs[reg] = val;
 	switch(reg)
 	{

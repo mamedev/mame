@@ -702,7 +702,7 @@ static CUSTOM_INPUT( wheelrun_wheel_r )
 	if		(delta > 7)	delta = 7;
 	else if	(delta < 1)	delta = 1;
 
-//	if (player == 0)	popmessage("%x",delta);
+//  if (player == 0)    popmessage("%x",delta);
 	return delta;
 }
 

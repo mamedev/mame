@@ -1,43 +1,43 @@
 /***************************************************************************
 
-	Irem M52 hardware
+    Irem M52 hardware
 
 ****************************************************************************
 
-	Moon Patrol memory map
+    Moon Patrol memory map
 
-	driver by Nicola Salmoria
+    driver by Nicola Salmoria
 
-	0000-3fff ROM
-	8000-83ff Video RAM
-	8400-87ff Color RAM
-	e000-e7ff RAM
+    0000-3fff ROM
+    8000-83ff Video RAM
+    8400-87ff Color RAM
+    e000-e7ff RAM
 
 
-	read:
-	8800      protection
-	d000      IN0
-	d001      IN1
-	d002      IN2
-	d003      DSW1
-	d004      DSW2
+    read:
+    8800      protection
+    d000      IN0
+    d001      IN1
+    d002      IN2
+    d003      DSW1
+    d004      DSW2
 
-	write:
-	c800-c8ff sprites
-	d000      sound command
-	d001      flip screen
+    write:
+    c800-c8ff sprites
+    d000      sound command
+    d001      flip screen
 
-	I/O ports
-	write:
-	10-1f     scroll registers
-	40        background #1 x position
-	60        background #1 y position
-	80        background #2 x position
-	a0        background #2 y position
-	c0        background control
+    I/O ports
+    write:
+    10-1f     scroll registers
+    40        background #1 x position
+    60        background #1 y position
+    80        background #2 x position
+    a0        background #2 y position
+    c0        background control
 
-	NOTE: It may be possible to remove the fake port now that conditional DIPS
-	are supported. What should really be filled in for each mode?
+    NOTE: It may be possible to remove the fake port now that conditional DIPS
+    are supported. What should really be filled in for each mode?
 
 ***************************************************************************/
 

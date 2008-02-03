@@ -4637,7 +4637,7 @@ static INPUT_PORTS_START( msgunda1 )
 	PORT_MODIFY("IN2") // IN2 - Coins - $400004.w
 	/* this set seems to be a japan set, english mode doesn't work correctly */
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Language ) )
-//	PORT_DIPSETTING(      0x0080, DEF_STR( English ) )
+//  PORT_DIPSETTING(      0x0080, DEF_STR( English ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
@@ -5962,7 +5962,7 @@ static INPUT_PORTS_START( zingzip )
 INPUT_PORTS_END
 
 /*************************************
-		Pairs Love
+        Pairs Love
 *************************************/
 
 static INPUT_PORTS_START( pairlove )

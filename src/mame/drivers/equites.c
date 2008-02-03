@@ -187,8 +187,8 @@ static MACHINE_DRIVER_START( equites_sound )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(MSM5232, XTAL_6_144MHz/2)
-		/* OSC is connected to a pot which varies the frequency of M5232 
-		   from 6.144mhz to few Khz. Here I assume a value which gives a good pitch */
+		/* OSC is connected to a pot which varies the frequency of M5232
+           from 6.144mhz to few Khz. Here I assume a value which gives a good pitch */
 	MDRV_SOUND_CONFIG(equites_5232intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

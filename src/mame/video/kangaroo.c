@@ -39,13 +39,13 @@ VIDEO_START( kangaroo )
 WRITE8_HANDLER( kangaroo_video_control_w )
 {
 	kangaroo_video_control[offset] = data;
-	
+
 	switch (offset)
 	{
 		case 5:	/* blitter start */
 			blitter_execute();
 			break;
-	
+
 		case 8:	/* bank select */
 			memory_set_bank(1, (data & 0x05) ? 0 : 1);
 			break;
@@ -117,7 +117,7 @@ WRITE8_HANDLER( kangaroo_videoram_w )
 	sx = (offset / 256) * 4;
 	sy = offset % 256;
 	offs = sy * 256 + sx;
-	
+
 	/* rearrange the bits to a more convenient pattern (from DCBADCBA to DDCCBBAA) */
 	data = BITSWAP8(data, 7,3,6,2,5,1,4,0);
 
@@ -180,16 +180,16 @@ VIDEO_UPDATE( kangaroo )
 	UINT8 prib = (~kangaroo_video_control[9] & 0x01);
 	rgb_t pens[8];
 	int x, y;
-	
+
 	/* build up the pens arrays */
 	for (x = 0; x < 8; x++)
 		pens[x] = MAKE_RGB(pal1bit(x >> 2), pal1bit(x >> 1), pal1bit(x >> 0));
 
-	/* iterate over pixels */	
+	/* iterate over pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
-		
+
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{
 			UINT8 effxa = scrollx + ((x / 2) ^ xora);
@@ -199,7 +199,7 @@ VIDEO_UPDATE( kangaroo )
 			UINT8 pixa = videoram[effya * 256 + effxa] & 0x0f;
 			UINT8 pixb = videoram[effyb * 256 + effxb] >> 4;
 			UINT8 finalpens;
-			
+
 			finalpens = 0;
 			if (enaa && (pria || pixb == 0))
 				finalpens |= pixa;
@@ -225,6 +225,6 @@ VIDEO_UPDATE( kangaroo )
 			dest[x + 1] = pens[finalpens & 7];
 		}
 	}
-	
+
 	return 0;
 }

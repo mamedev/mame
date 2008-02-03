@@ -300,37 +300,37 @@ const UINT8 inthunt_decryption_table[256] = {
 
 const UINT8 gussun_decryption_table[256] = {
 	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//	0x63                          gggg            gggg                gggg
+//  0x63                          gggg            gggg                gggg
 	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x7d,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//	                    ????                      pppp      gggg               
+//                      ????                      pppp      gggg
 	0x5d,0xa5,0x11,0x51,0x0a,0x29,0x01,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
-//	          gggg           pppp ????       gggg gggg      gggg gggg pppp
+//            gggg           pppp ????       gggg gggg      gggg gggg pppp
 	0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
-//	                    gggg                                          0x90
+//                      gggg                                          0x90
 	xxxx,0x19,0xc6,xxxx,xxxx,0x3a,0x01,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x01,xxxx, /* 40 */
-//	     ????                     ????                                     ????
+//       ????                     ????                                     ????
 	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7e,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//	          gggg           ????                 gggg pppp gggg                    
+//            gggg           ????                 gggg pppp gggg
 	0xb0,xxxx,0x28,0x79,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//	          ???? pppp           gggg                 gggg 
+//            ???? pppp           gggg                 gggg
 	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//	               gggg                                     ????
+//                 gggg                                     ????
 	xxxx,0x86,0x76,0x7f,0x08,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//	          ???? pppp ????      ????       gggg                              
+//            ???? pppp ????      ????       gggg
 	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x19, /* 90 */
-//	          ????                     gggg                                     ????
+//            ????                     gggg                                     ????
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
-//	                                   gggg                 ????      gggg gggg
+//                                     gggg                 ????      gggg gggg
 	xxxx,0x19,0x00,0x19,0x77,0x3d,0x3e,xxxx, xxxx,0xb6,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//	     ???? ???? ???? gggg      ????            ???? pppp
+//       ???? ???? ???? gggg      ????            ???? pppp
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
-//	          ????                                                         pppp
+//            ????                                                         pppp
 	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4a,xxxx,0x1f,0x23,xxxx, /* d0 */
-//	                                                        ????
+//                                                          ????
 	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x11,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//	                              ????                      ????                gggg
+//                                ????                      ????                gggg
 	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x7d,0xf7,0xbd,0x39,0x71,0xbf,xxxx, /* f0 */
-//	                                              pppp      gggg      pppp
+//                                                pppp      gggg      pppp
 };
 
 /*
@@ -352,20 +352,20 @@ j19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70
 j5a -> 7e (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71(ok),77,79,7a,7b,7d,7f ok 76,78,7c,7e
 .62 -> 28 (1cf86 1cfa3 - routine from 1cf61 to 1cff4)  (water in level 1) (01 11 19 29)
 j63 -> 78 (1df7f, 1df8c, 1df95, 21f08 - routine from 1df27 to ) no 71(ok),77(ok),7f(ok) ok 70,76,78,79 7a,7b,7c,7d,7e
-j82 -> 76 (76,78,7c,7e) -> 
+j82 -> 76 (76,78,7c,7e) ->
 .84 -> 18 (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (00,08,18,28,30) (sprite animation)
 .9f -> 19 (
 ab -> 42
 .b1 -> 19
 .b2 -> 20 (20a8b - 20acc             probably 20 - after the start and before the menu - to handle the player number
 .b3 -> 19 (216b6 - 216cf
-b9 -> b5 (21210 - ) 2 bytes - 
+b9 -> b5 (21210 - ) 2 bytes -
 db ->    (16992
 jf9 -> 7c (16d02(f 16cfa)-16598-165a1-18de7(f 18dc4) no 71,77(ok),(icons? 70,76,78,7a,7c,7e),7f maybe 79,7b,7d
 
 rz probably:
 2d -> 00 (1df1d - routine from 1dee8 to 1df26) -> 00 - to handle sprite animation
-83 -> 7f (194cd - routine from) no 70,71,76,78,79,7a,7c,7d,7e ok 77(no),7b(white rocks) ok 7f 
+83 -> 7f (194cd - routine from) no 70,71,76,78,79,7a,7c,7d,7e ok 77(no),7b(white rocks) ok 7f
 b4 -> 77 (1d03a, 1d57a - routine from 1d4df ) no 70,71,76,78,79,7a,7b,7c,7d,7e,7f ok 77
 ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
 c2 -> 47 (22881, 220ff - routine from 22872 to 22885) (4f?)
@@ -382,7 +382,7 @@ rz guess:
 28 -> f8 (
 29 -> 98 (1df22 - routine from 1dee8 to 1df26) -> 98 - to handle sprite animation
 2b -> 40 (1d4d2 1db81 1dba9 - routine from 1d4b2 to 1d4de) -> 40
-2c -> 28 (20333 - routine from 2032a to 20366) 
+2c -> 28 (20333 - routine from 2032a to 20366)
 34 -> 2f (20381 - routine from 2037b to 20391) - used to handle number of lives and game over
 52 -> a0
 59 -> 2c (220cf - 2037f - routine from 2202f to ) 2bytes (2c,

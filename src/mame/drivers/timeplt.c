@@ -1,46 +1,46 @@
 /***************************************************************************
 
-	Time Pilot 
+    Time Pilot
 
-	driver by Nicola Salmoria
+    driver by Nicola Salmoria
 
 ****************************************************************************
 
-	memory map (preliminary)
+    memory map (preliminary)
 
-	Main processor memory map.
-	0000-5fff ROM
-	a000-a3ff Color RAM
-	a400-a7ff Video RAM
-	a800-afff RAM
-	b000-b7ff sprite RAM (only areas 0xb010 and 0xb410 are used).
+    Main processor memory map.
+    0000-5fff ROM
+    a000-a3ff Color RAM
+    a400-a7ff Video RAM
+    a800-afff RAM
+    b000-b7ff sprite RAM (only areas 0xb010 and 0xb410 are used).
 
-	memory mapped ports:
+    memory mapped ports:
 
-	read:
-	c000      video scan line. This is used by the program to multiplex the cloud
-	          sprites, drawing them twice offset by 128 pixels.
-	c200      DSW2
-	c300      IN0
-	c320      IN1
-	c340      IN2
-	c360      DSW1
+    read:
+    c000      video scan line. This is used by the program to multiplex the cloud
+              sprites, drawing them twice offset by 128 pixels.
+    c200      DSW2
+    c300      IN0
+    c320      IN1
+    c340      IN2
+    c360      DSW1
 
-	write:
-	c000      command for the audio CPU
-	c200      watchdog reset
-	c300      interrupt enable
-	c302      flip screen
-	c304      trigger interrupt on audio CPU
-	c308      Protection ???  Stuffs in some values computed from ROM content
-	c30a      coin counter 1
-	c30c      coin counter 2
+    write:
+    c000      command for the audio CPU
+    c200      watchdog reset
+    c300      interrupt enable
+    c302      flip screen
+    c304      trigger interrupt on audio CPU
+    c308      Protection ???  Stuffs in some values computed from ROM content
+    c30a      coin counter 1
+    c30c      coin counter 2
 
-	interrupts:
-	standard NMI at 0x66
+    interrupts:
+    standard NMI at 0x66
 
-	SOUND BOARD:
-	same as Pooyan
+    SOUND BOARD:
+    same as Pooyan
 
 ***************************************************************************/
 
@@ -142,7 +142,7 @@ static INPUT_PORTS_START( timeplt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( timeplt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( timeplt )
 	MDRV_CPU_VBLANK_INT(timeplt_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	
+
 	MDRV_MACHINE_START(timeplt)
 
 	/* video hardware */

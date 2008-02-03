@@ -6,28 +6,28 @@
 
     Known bugs:
         * none at this time
-	
-	DIP locations verified from manual for:
-		* aceattac
-		* aliensyn
-		* altbeast
-		* atomicp
-		* aurail
-		* bayroute
-		* cotton
-		* ddux
-		* eswat
-		* fpoint
-		* goldnaxe
-		* mvp
-		* passsht
-		* shinobi
-		* sonicbom
-		* tetris
-		* timescan
-		* toryumon
-		* wb3
-		* wrestwar
+
+    DIP locations verified from manual for:
+        * aceattac
+        * aliensyn
+        * altbeast
+        * atomicp
+        * aurail
+        * bayroute
+        * cotton
+        * ddux
+        * eswat
+        * fpoint
+        * goldnaxe
+        * mvp
+        * passsht
+        * shinobi
+        * sonicbom
+        * tetris
+        * timescan
+        * toryumon
+        * wb3
+        * wrestwar
 
 ****************************************************************************
 
@@ -2152,8 +2152,8 @@ static INPUT_PORTS_START( bullet )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
 /*
-	PORT_MODIFY("DSW2")
-	PORT_DIPUNUSED( 0x01, 0x01 )	// 2p vs. 3p
+    PORT_MODIFY("DSW2")
+    PORT_DIPUNUSED( 0x01, 0x01 )    // 2p vs. 3p
 */
 INPUT_PORTS_END
 
@@ -2417,16 +2417,16 @@ static INPUT_PORTS_START( goldnaxe )
 	PORT_DIPSETTING(    0x2c, DEF_STR( Harder ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( Hardest ) )
 /*
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x0c, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Energy Meter" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
+    PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+    PORT_DIPSETTING(    0x08, "1" )
+    PORT_DIPSETTING(    0x0c, "2" )
+    PORT_DIPSETTING(    0x04, "3" )
+    PORT_DIPSETTING(    0x00, "5" )
+    PORT_DIPNAME( 0x30, 0x30, "Energy Meter" ) PORT_DIPLOCATION("SW2:5,6")
+    PORT_DIPSETTING(    0x20, "2" )
+    PORT_DIPSETTING(    0x30, "3" )
+    PORT_DIPSETTING(    0x10, "4" )
+    PORT_DIPSETTING(    0x00, "5" )
 */
 INPUT_PORTS_END
 
@@ -2856,8 +2856,8 @@ static INPUT_PORTS_START( tetris )
 
 	PORT_MODIFY("DSW2")
 	/* SW2:1,3,4,7,8 Unused according to manual.
-	From the code SW2:3,4 looks like some kind of difficulty level,
-	but all 4 levels points to the same place so it doesn't actually change anything!! */
+    From the code SW2:3,4 looks like some kind of difficulty level,
+    but all 4 levels points to the same place so it doesn't actually change anything!! */
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

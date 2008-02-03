@@ -10,7 +10,7 @@ to run on IDENTICAL hardware (they were sold by Bally-Midway as ROM swaps).
 
 DIP locations verified from manual for:
       - wboy
-	  - chplft
+      - chplft
 
 TODO: - background is misplaced in wbmlju
       - sprites stick in Pitfall II
@@ -428,7 +428,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x05, "2 Coins/1 Credit 4/2 5/3 6/4" ) \
 	PORT_DIPSETTING(	0x04, "2 Coins/1 Credit 4/3" ) \
 	PORT_DIPSETTING(	0x0f, DEF_STR( 1C_1C ) ) \
-/*	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
+/*  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
 	PORT_DIPSETTING(	0x03, "1 Coin/1 Credit 5/6" ) \
 	PORT_DIPSETTING(	0x02, "1 Coin/1 Credit 4/5" ) \
 	PORT_DIPSETTING(	0x01, "1 Coin/1 Credit 2/3" ) \
@@ -445,7 +445,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x50, "2 Coins/1 Credit 4/2 5/3 6/4" ) \
 	PORT_DIPSETTING(	0x40, "2 Coins/1 Credit 4/3" ) \
 	PORT_DIPSETTING(	0xf0, DEF_STR( 1C_1C ) ) \
-/*	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
+/*  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */ \
 	PORT_DIPSETTING(	0x30, "1 Coin/1 Credit 5/6" ) \
 	PORT_DIPSETTING(	0x20, "1 Coin/1 Credit 4/5" ) \
 	PORT_DIPSETTING(	0x10, "1 Coin/1 Credit 2/3" ) \

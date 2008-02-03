@@ -10,9 +10,9 @@
         * Ixion
         * Congo Bongo
 
-	DIP locations verified from manual for:
-		* Zaxxon
-		* Congo Bongo
+    DIP locations verified from manual for:
+        * Zaxxon
+        * Congo Bongo
 
     Known bugs:
         * discrete sound emulation

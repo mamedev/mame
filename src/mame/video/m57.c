@@ -1,6 +1,6 @@
 /****************************************************************************
 
-	Irem M57 hardware
+    Irem M57 hardware
 
 ****************************************************************************/
 
@@ -149,7 +149,7 @@ WRITE8_HANDLER( m57_flipscreen_w )
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int y;
-	
+
 	for (y = 0; y < 256; y++)
 		tilemap_set_scrollx(bg_tilemap, y, (y < 64) ? 0 : (y < 128) ? m57_scroll[64] : m57_scroll[y]);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

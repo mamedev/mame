@@ -90,11 +90,11 @@ VIDEO_UPDATE( tutankhm )
 	int x, y;
 
 	get_pens(pens);
-	
+
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT32 *dst = BITMAP_ADDR32(bitmap, y, 0);
-		
+
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			UINT8 effx = x ^ xorx;

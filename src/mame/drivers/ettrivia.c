@@ -17,8 +17,8 @@ Supported games:
 
 Notes:
 
- You can swap the question ROMs arbitrarily on these boards. This means 
-  the ROMsets in this driver aren't true sets per se, they're just how 
+ You can swap the question ROMs arbitrarily on these boards. This means
+  the ROMsets in this driver aren't true sets per se, they're just how
   boards were found "in the wild."
  ROMs with music questions come in hi|lo pairs.
 

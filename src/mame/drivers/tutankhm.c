@@ -1,14 +1,14 @@
 /***************************************************************************
 
-	Tutankham
+    Tutankham
 
-	driver by Mirko Buffoni
-	based on original work by Rob Jarrett
+    driver by Mirko Buffoni
+    based on original work by Rob Jarrett
 
-	I include here the document based on Rob Jarrett's research because it's
-	really exaustive.
+    I include here the document based on Rob Jarrett's research because it's
+    really exaustive.
 
-	Sound board: uses the same board as Pooyan.
+    Sound board: uses the same board as Pooyan.
 
 ***************************************************************************/
 

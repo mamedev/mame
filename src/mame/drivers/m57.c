@@ -1,45 +1,45 @@
 /****************************************************************************
 
-	Irem M57 hardware
+    Irem M57 hardware
 
 *****************************************************************************
 
-	Tropical Angel
+    Tropical Angel
 
-	driver by Phil Stroffolino
+    driver by Phil Stroffolino
 
-	IREM M57 board stack with a M52-SOUND-E sound PCB.
+    IREM M57 board stack with a M52-SOUND-E sound PCB.
 
-	M57-A-A:
-	 TA-A-xx roms and proms
-	 NEC D780C (Z80) CPU
-	 NANAO KNA6032601 custom chip
-	 NANAO KNA6032701 custom chip
-	 8-way dipswitch (x2)
-	 M58725P RAM (x3)
-	 CN1 - Ribbon cable connector
-	 CN2 - Ribbon cable connector
-	 Ribbon cable connector to sound PCB
+    M57-A-A:
+     TA-A-xx roms and proms
+     NEC D780C (Z80) CPU
+     NANAO KNA6032601 custom chip
+     NANAO KNA6032701 custom chip
+     8-way dipswitch (x2)
+     M58725P RAM (x3)
+     CN1 - Ribbon cable connector
+     CN2 - Ribbon cable connector
+     Ribbon cable connector to sound PCB
 
-	M57-B-A:
-	 TA-B-xx roms and proms
-	 18.432 MHz OSC
-	 CN1 - Ribbon cable connector
-	 CN2 - Ribbon cable connector
+    M57-B-A:
+     TA-B-xx roms and proms
+     18.432 MHz OSC
+     CN1 - Ribbon cable connector
+     CN2 - Ribbon cable connector
 
-	M52:
-	 HD6803 CPU
-	 AY-3-9810 (x2) sound chips
-	 MSM5205 OKI sound chip (and an unpopulated socket for a second MSM5202)
-	 3.579545 MHz OSC
-	 2764 Program rom labeled "TA S-1A-"
-	 Ribbon cable connector to M57-A-A PCB
+    M52:
+     HD6803 CPU
+     AY-3-9810 (x2) sound chips
+     MSM5205 OKI sound chip (and an unpopulated socket for a second MSM5202)
+     3.579545 MHz OSC
+     2764 Program rom labeled "TA S-1A-"
+     Ribbon cable connector to M57-A-A PCB
 
-	New Tropical Angel:
-	 Roms where found on an official IREM board with genuine IREM Tropical Angel
-	 license seal and genuine IREM serial number sticker.
-	 The "new" roms have hand written labels, while those that match the current
-	 Tropical Angel set look to be factory labeled chips.
+    New Tropical Angel:
+     Roms where found on an official IREM board with genuine IREM Tropical Angel
+     license seal and genuine IREM serial number sticker.
+     The "new" roms have hand written labels, while those that match the current
+     Tropical Angel set look to be factory labeled chips.
 
 ****************************************************************************/
 

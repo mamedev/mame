@@ -225,7 +225,7 @@ VIDEO_UPDATE( williams )
 {
 	rgb_t pens[16];
 	int x, y;
-	
+
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
 		pens[x] = palette_lookup[paletteram[x]];

@@ -506,7 +506,7 @@ const stream_sample_t *stream_get_output_since_last_update(sound_stream *stream,
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stream_get_sample_rate - return the currently 
+    stream_get_sample_rate - return the currently
     set sample rate on a given stream
 -------------------------------------------------*/
 
@@ -531,8 +531,8 @@ void stream_set_sample_rate(sound_stream *stream, int sample_rate)
 
 
 /*-------------------------------------------------
-    stream_get_time - return the emulation time 
-    of the next sample to be generated on the 
+    stream_get_time - return the emulation time
+    of the next sample to be generated on the
     stream
 -------------------------------------------------*/
 
@@ -545,7 +545,7 @@ attotime stream_get_time(sound_stream *stream)
 
 
 /*-------------------------------------------------
-    stream_get_sample_period - return the duration 
+    stream_get_sample_period - return the duration
     of a single sample for a stream
 -------------------------------------------------*/
 

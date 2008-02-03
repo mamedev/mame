@@ -48,8 +48,8 @@
         0                       Y offset (low bits)
 
         1       7--- ----       Flip X (xor with that in spriteram)
-				-6-- ----       Flip Y ""
-				--54 321-       Code offset
+                -6-- ----       Flip Y ""
+                --54 321-       Code offset
                 ---- ---0       Y offset (high bit)
 
         2                       X offset (low bits)

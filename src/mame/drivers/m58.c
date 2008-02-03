@@ -1,11 +1,11 @@
 /****************************************************************************
 
-	Irem M58 hardware
+    Irem M58 hardware
 
-	L Taylor
-	J Clegg
+    L Taylor
+    J Clegg
 
-	Loosely based on the Kung Fu Master driver.
+    Loosely based on the Kung Fu Master driver.
 
 ****************************************************************************/
 

@@ -13,61 +13,61 @@
 
 ****************************************************************************
 
-	0000-0fff tvg75
-	1000-1fff tvg76
-	2000-2fff tvg77
-	3000-3fff tvg78
-	4000-4fff tvg79
-	5000-5fff tvg80
-	8000-bfff VIDEO RAM (four banks)
-	c000-cfff tvg83/84 (banked)
-	d000-dfff tvg85/86 (banked)
-	e000-e3ff RAM
+    0000-0fff tvg75
+    1000-1fff tvg76
+    2000-2fff tvg77
+    3000-3fff tvg78
+    4000-4fff tvg79
+    5000-5fff tvg80
+    8000-bfff VIDEO RAM (four banks)
+    c000-cfff tvg83/84 (banked)
+    d000-dfff tvg85/86 (banked)
+    e000-e3ff RAM
 
 
-	memory mapped ports:
-	read:
-	e400      DSW 0
-	ec00      IN 0
-	ed00      IN 1
-	ee00      IN 2
-	efxx      (4 bits wide) security chip in. It seems to work like a clock.
+    memory mapped ports:
+    read:
+    e400      DSW 0
+    ec00      IN 0
+    ed00      IN 1
+    ee00      IN 2
+    efxx      (4 bits wide) security chip in. It seems to work like a clock.
 
-	write:
-	e800-e801 low/high byte start address of data in picture ROM for DMA
-	e802-e803 low/high byte start address in bitmap RAM (where picture is to be
-	          written) during DMA
-	e804-e805 picture size for DMA, and DMA start
-	e806      vertical scroll of playfield
-	e807      horizontal scroll of playfield
-	e808      bank select latch
-	e809      A & B bitmap control latch (A=playfield B=motion)
-	          bit 5 FLIP A
-	          bit 4 FLIP B
-	          bit 3 EN A
-	          bit 2 EN B
-	          bit 1 PRI A
-	          bit 0 PRI B
-	e80a      color shading latch
-	ec00      command to sound CPU
-	ed00      coin counters
-	efxx      (4 bits wide) security chip out
+    write:
+    e800-e801 low/high byte start address of data in picture ROM for DMA
+    e802-e803 low/high byte start address in bitmap RAM (where picture is to be
+              written) during DMA
+    e804-e805 picture size for DMA, and DMA start
+    e806      vertical scroll of playfield
+    e807      horizontal scroll of playfield
+    e808      bank select latch
+    e809      A & B bitmap control latch (A=playfield B=motion)
+              bit 5 FLIP A
+              bit 4 FLIP B
+              bit 3 EN A
+              bit 2 EN B
+              bit 1 PRI A
+              bit 0 PRI B
+    e80a      color shading latch
+    ec00      command to sound CPU
+    ed00      coin counters
+    efxx      (4 bits wide) security chip out
 
-	---------------------------------------------------------------------------
-	CPU #1 (sound)
+    ---------------------------------------------------------------------------
+    CPU #1 (sound)
 
-	0000 0fff tvg81
-	4000 43ff RAM
-	6000      command from main CPU
+    0000 0fff tvg81
+    4000 43ff RAM
+    6000      command from main CPU
 
-	I/O ports:
-	7000      AY-3-8910 write
-	8000      AY-3-8910 control
-	---------------------------------------------------------------------------
+    I/O ports:
+    7000      AY-3-8910 write
+    8000      AY-3-8910 control
+    ---------------------------------------------------------------------------
 
-	interrupts:
-	(CPU#0) standard IM 1 interrupt mode (rst #38 every vblank)
-	(CPU#1) same here
+    interrupts:
+    (CPU#0) standard IM 1 interrupt mode (rst #38 every vblank)
+    (CPU#1) same here
 
 ****************************************************************************
 
@@ -107,14 +107,14 @@ static UINT8 kangaroo_clock;
  *************************************/
 
 static MACHINE_START( kangaroo )
-{	
+{
 	memory_configure_bank(1, 0, 2, memory_region(REGION_GFX1), 0x2000);
 	state_save_register_global(kangaroo_clock);
 }
 
 
 static MACHINE_START( kangaroo_mcu )
-{	
+{
 	MACHINE_START_CALL(kangaroo);
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
 	kangaroo_clock = 0;
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( nomcu )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_UPDATE_SCANLINE)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	
+
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 

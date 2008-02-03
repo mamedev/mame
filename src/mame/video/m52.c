@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Irem M52 hardware
+    Irem M52 hardware
 
 ***************************************************************************/
 
@@ -407,7 +407,7 @@ VIDEO_UPDATE( m52 )
 
 		drawgfx(bitmap, machine->gfx[1],
 			code, color, flipx, flipy, sx, sy,
-			&clip, TRANSPARENCY_PENS, 
+			&clip, TRANSPARENCY_PENS,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512+32));
 	}
 	return 0;

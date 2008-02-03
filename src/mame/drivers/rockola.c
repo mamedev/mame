@@ -14,10 +14,10 @@
         * Pioneer Balloon                         G-204
         * Nibbler                  [4 sets]       G-208
 
-	DIP locations verified from manual for:
-		* Zarzon    (Satan of Saturn uses the same code, so I guess locations are the same)
-		* Vanguard
-		* Nibbler
+    DIP locations verified from manual for:
+        * Zarzon    (Satan of Saturn uses the same code, so I guess locations are the same)
+        * Vanguard
+        * Nibbler
 
 ****************************************************************************
 
@@ -148,7 +148,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
         PORT_DIPNAME( 0x40, 0x00, "Game Cost" ) PORT_DIPLOCATION("SW1:!7")
         PORT_DIPSETTING(    0x00, "25c / game" )
         PORT_DIPSETTING(    0x40, "50c / game" )
-	or using conditional Dip Switches, I've coded this the way I did.
+    or using conditional Dip Switches, I've coded this the way I did.
   - You can always continue, provided you're on the 1st pattern.
     The continue text is in English !
   - 10 letters when you enter your initials
@@ -510,9 +510,9 @@ static INPUT_PORTS_START( rockola_generic_joy8way )
 	PORT_DIPSETTING (   0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING (   0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING (   0x0c, DEF_STR( 1C_6C ) )
-/*	PORT_DIPSETTING (   0x06, DEF_STR( 1C_1C ) ) */
-/*	PORT_DIPSETTING (   0x0a, DEF_STR( 1C_1C ) ) */
-/*	PORT_DIPSETTING (   0x0e, DEF_STR( 1C_1C ) ) */
+/*  PORT_DIPSETTING (   0x06, DEF_STR( 1C_1C ) ) */
+/*  PORT_DIPSETTING (   0x0a, DEF_STR( 1C_1C ) ) */
+/*  PORT_DIPSETTING (   0x0e, DEF_STR( 1C_1C ) ) */
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
@@ -554,7 +554,7 @@ static INPUT_PORTS_START( satansat )
 	PORT_DIPSETTING (   0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING (   0x02, DEF_STR( 1C_2C ) )
-/*	PORT_DIPSETTING (   0x0a, DEF_STR( 2C_1C ) ) */
+/*  PORT_DIPSETTING (   0x0a, DEF_STR( 2C_1C ) ) */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!3")
 	PORT_DIPSETTING (   0x04, "5000" )
 	PORT_DIPSETTING (   0x00, "10000" )
@@ -639,7 +639,7 @@ static INPUT_PORTS_START( nibbler )
 	PORT_INCLUDE(rockola_generic_joy8way)
 
 	/* There are no buttons on a real "Nibbler" cabinet, but I guess that the game was tested
-	   with a "Vanguard" cabinet so they have been mapped with debug features. */
+       with a "Vanguard" cabinet so they have been mapped with debug features. */
 #if NIBBLER_HACK
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Debug 0") PORT_CODE(KEYCODE_Z) // slow down

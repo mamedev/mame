@@ -1290,9 +1290,9 @@ ROM_END
 
 Main board marked in copper and silk screen:
 
-	JALECO VJ-98344
-	98053 EB-00-20120-0
-	MADE IN JAPAN
+    JALECO VJ-98344
+    98053 EB-00-20120-0
+    MADE IN JAPAN
 
 CPU:    TMP68HC000P-12
 Sound:  YMZ280B-F / YAC516-M (on sound rom board)
@@ -1463,9 +1463,9 @@ ROM_START( rockn2 )
 	ROM_LOAD( "sound19", 0x5800000, 0x0400000, CRC(33c89e53) SHA1(7d216f5db6b30c9b05a9a77030498ff68ae6fbad)  ) // bank 6
 	ROM_LOAD( "sound20", 0x5c00000, 0x0400000, CRC(89c1b088) SHA1(9b4118815959a5fb65b2a293015f592a46f4126f)  ) // bank 6
 	ROM_LOAD( "sound21", 0x6000000, 0x0400000, CRC(13db74bd) SHA1(ab87438bbac97d46b1b8195b61dca1d72172a621)  ) // bank 6
-//	ROM_LOAD( "sound22", 0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC24)
-//	ROM_LOAD( "sound23", 0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC25)
-//	ROM_LOAD( "sound24", 0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC26)
+//  ROM_LOAD( "sound22", 0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC24)
+//  ROM_LOAD( "sound23", 0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC25)
+//  ROM_LOAD( "sound24", 0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  IC26)
 ROM_END
 
 /***************************************************************************
@@ -1474,10 +1474,10 @@ Jaleco Rock'n 3
 
 Labeled on the chips like:
 
-	Rock'n 3
-	VJ-98344
-	10
-	Ver 1.0
+    Rock'n 3
+    VJ-98344
+    10
+    Ver 1.0
 
 
 ROM ID       Label                    Rom type
@@ -1540,10 +1540,10 @@ ROM_START( rockn3 )
 	ROM_LOAD( "mr99029-19.ic20", 0x5400000, 0x0400000, CRC(dbb2c228) SHA1(f7cd24026236e2c616376c695b9e986cc221f36d)  ) // bank 5 (alt PCB number 18)
 	ROM_LOAD( "mr99029-20.ic21", 0x5800000, 0x0400000, CRC(9efdae1c) SHA1(6158a1804fbaa9ce27ae7e12cfda5f49084b4998)  ) // bank 6 (alt PCB number 19)
 	ROM_LOAD( "mr99029-21.ic22", 0x5c00000, 0x0400000, CRC(5f301b83) SHA1(e24e85c43a62871360545aa42dfa439045334b79)  ) // bank 6 (alt PCB number 20)
-//	ROM_LOAD( "ic23",            0x6000000, 0x0400000 ) // bank 6 ( ** unpopulated **  -  alt PCB number 21)
-//	ROM_LOAD( "ic24",            0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 22)
-//	ROM_LOAD( "ic25",            0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 23)
-//	ROM_LOAD( "ic26",            0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 24)
+//  ROM_LOAD( "ic23",            0x6000000, 0x0400000 ) // bank 6 ( ** unpopulated **  -  alt PCB number 21)
+//  ROM_LOAD( "ic24",            0x6400000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 22)
+//  ROM_LOAD( "ic25",            0x6800000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 23)
+//  ROM_LOAD( "ic26",            0x6c00000, 0x0400000 ) // bank 7 ( ** unpopulated **  -  alt PCB number 24)
 ROM_END
 
 ROM_START( rockn4 ) /* Prototype */

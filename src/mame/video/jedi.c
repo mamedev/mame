@@ -148,7 +148,7 @@ WRITE8_HANDLER( jedi_video_off_w )
 WRITE8_HANDLER( jedi_PIXIRAM_w )
 {
 	/* this should really be 0x07, but the PROMs were
-	   dumped at half size */
+       dumped at half size */
 	smoothing_table = data & 0x03;
 }
 

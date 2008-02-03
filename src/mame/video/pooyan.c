@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Pooyan
+    Pooyan
 
 ***************************************************************************/
 
@@ -144,12 +144,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	{
 		int sx = spriteram[offs];
 		int sy = 240 - spriteram_2[offs + 1];
-	
+
 		int code = spriteram[offs + 1];
 		int color = spriteram_2[offs] & 0x0f;
 		int flipx = ~spriteram_2[offs] & 0x40;
 		int flipy = spriteram_2[offs] & 0x80;
-	
+
 		/* Sprite flipscreen is supported by software */
 		drawgfx(bitmap,machine->gfx[1],
 			code,

@@ -172,7 +172,7 @@ MACHINE_DRIVER_START( timeplt_sound )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("tpsound",Z80,MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(timeplt_sound_map,0)
-	
+
 	MDRV_SOUND_START(timeplt)
 
 	/* sound hardware */

@@ -1,10 +1,10 @@
 /***************************************************************************
 
-	Pooyan
+    Pooyan
 
-	Original driver by Allard Van Der Bas
-	
-	This hardware is very similar to Time Pilot.
+    Original driver by Allard Van Der Bas
+
+    This hardware is very similar to Time Pilot.
 
 ***************************************************************************/
 
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( pooyan )
 	MDRV_CPU_VBLANK_INT(pooyan_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	
+
 	MDRV_MACHINE_START(pooyan)
 
 	/* video hardware */

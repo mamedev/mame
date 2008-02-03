@@ -206,7 +206,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( m52_small_audio )
 	MDRV_IMPORT_FROM(irem_audio_base)
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
@@ -215,7 +215,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( m52_large_audio )	/* 10 yard fight */
 	MDRV_IMPORT_FROM(irem_audio_base)
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map,0)
@@ -224,7 +224,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( m62_audio )
 	MDRV_IMPORT_FROM(irem_audio_base)
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m62_sound_map,0)

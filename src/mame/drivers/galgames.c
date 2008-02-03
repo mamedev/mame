@@ -17,7 +17,7 @@ Board silkscreend  237-0211-00
 
 Cartridge based mother board
 Holds up to 4 cartridges
-Chips labeled 
+Chips labeled
     GALAXY U1 V1.90 12/1/98
     GALAXY U2 V1.90 12/1/98
 
@@ -30,14 +30,14 @@ Motorola MC68HC000FN12
 Xilinx XC5206
 Xilinx XC5202
 BT481AKPJ110
-NKK N341024SJ-15	x8  (128kb RAM)
+NKK N341024SJ-15    x8  (128kb RAM)
 OKI M6295 8092352-2
 
-PAL16V8H-15 @ U24	Blue dot on it
-PAL16V8H-15 @ U25	Yellow dot on it
-PAL16V8H-15 @ U26	Red dot on it
-PAL16V8H-15 @ U27	Green dot on it
-PAL16V8H-15 @ U45	red dot on it
+PAL16V8H-15 @ U24   Blue dot on it
+PAL16V8H-15 @ U25   Yellow dot on it
+PAL16V8H-15 @ U26   Red dot on it
+PAL16V8H-15 @ U27   Green dot on it
+PAL16V8H-15 @ U45   red dot on it
 
 ----
 
@@ -58,16 +58,16 @@ static READ16_HANDLER( dummy_read_01 )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-/*	AM_RANGE(0x01a900, 0x01a9ff) AM_RAM							Need to install memory handlers
-	...															in the middle of the ROM space?
-	AM_RANGE(0x01f700, 0x01f7ff) AM_RAM	*/
+/*  AM_RANGE(0x01a900, 0x01a9ff) AM_RAM                         Need to install memory handlers
+    ...                                                         in the middle of the ROM space?
+    AM_RANGE(0x01f700, 0x01f7ff) AM_RAM */
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM							/* 2x N341024SJ-15 */
-	AM_RANGE(0x400000, 0x400001) AM_RAM							
-	AM_RANGE(0x600000, 0x600001) AM_READ(dummy_read_01)			
+	AM_RANGE(0x400000, 0x400001) AM_RAM
+	AM_RANGE(0x600000, 0x600001) AM_READ(dummy_read_01)
 	AM_RANGE(0x700000, 0x700001) AM_RAM							/* Writes a 0x0002 here early, reads it later */
 	AM_RANGE(0x900000, 0x900001) AM_NOP							/* Writes 0xffff here before each test memory access. */
 	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM							/* 4x N341024SJ-15 */
-	AM_RANGE(0xd00000, 0xd00001) AM_RAM							
+	AM_RANGE(0xd00000, 0xd00001) AM_RAM
 ADDRESS_MAP_END
 
 

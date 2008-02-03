@@ -307,7 +307,7 @@ void video_init(running_machine *machine)
 
 			/* allocate a timer to reset partial updates */
 			info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
-			
+
 			/* make pointers back to the config and state */
 			info->config = &machine->drv->screen[scrnum];
 			info->state = &machine->screen[scrnum];
@@ -1051,10 +1051,10 @@ static TIMER_CALLBACK( scanline_update_callback )
 	video_private *viddata = machine->video_data;
 	int scrnum = param & 0xff;
 	int scanline = param >> 8;
-	
+
 	/* force a partial update to the current scanline */
 	video_screen_update_partial(scrnum, scanline);
-	
+
 	/* compute the next visible scanline */
 	scanline++;
 	if (scanline > machine->screen[scrnum].visarea.max_y)

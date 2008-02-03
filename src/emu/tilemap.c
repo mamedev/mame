@@ -273,7 +273,7 @@ void tilemap_init(running_machine *machine)
 		tilemap_list	 = NULL;
 		tilemap_tailptr  = &tilemap_list;
 		tilemap_instance = 0;
-	
+
 		priority_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
 	}

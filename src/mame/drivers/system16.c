@@ -47,7 +47,7 @@ DIP locations verified from manual for:
 - shinobi
 - tetris
 - wb3
-  
+
   */
 
 /***************************************************************************/
@@ -1325,16 +1325,16 @@ static INPUT_PORTS_START( goldnaxe )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Listed as "Unused" */
 
-/*	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x0c, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, "Energy Meter" ) PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
+/*  PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+    PORT_DIPSETTING(    0x08, "1" )
+    PORT_DIPSETTING(    0x0c, "2" )
+    PORT_DIPSETTING(    0x04, "3" )
+    PORT_DIPSETTING(    0x00, "5" )
+    PORT_DIPNAME( 0x30, 0x30, "Energy Meter" ) PORT_DIPLOCATION("SW2:5,6")
+    PORT_DIPSETTING(    0x20, "2" )
+    PORT_DIPSETTING(    0x30, "3" )
+    PORT_DIPSETTING(    0x10, "4" )
+    PORT_DIPSETTING(    0x00, "5" )
 */
 INPUT_PORTS_END
 
@@ -1879,7 +1879,7 @@ static INPUT_PORTS_START( tetris )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* From the code SW2:3,4 looks like some kind of difficulty level,
-	but all 4 levels points to the same place so it doesn't actually change anything!! */
+    but all 4 levels points to the same place so it doesn't actually change anything!! */
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" ) /* Listed as "Unused" */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")

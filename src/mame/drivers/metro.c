@@ -2123,7 +2123,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x760000, 0x76ffff ) AM_READ( metro_bankedrom_r )	// Banked ROM
 
-//	AM_RANGE( 0x772000, 0x773fff ) AM_RAM
+//  AM_RANGE( 0x772000, 0x773fff ) AM_RAM
 	AM_RANGE( 0x770000, 0x773fff ) AM_READWRITE( MRA16_RAM, metro_paletteram_w ) AM_BASE( &paletteram16 )	// Palette
 
 	AM_RANGE( 0x775000, 0x777fff ) AM_RAM
@@ -2161,7 +2161,7 @@ static READ8_HANDLER( puzzlet_serB_r )
 
 static WRITE8_HANDLER( puzzlet_portb_w )
 {
-//	popmessage("PORTB %02x",data);
+//  popmessage("PORTB %02x",data);
 }
 
 static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )

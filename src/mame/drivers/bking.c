@@ -11,7 +11,7 @@ Birdie King / Birdie King II / Birdie King III Memory Map
 a000-bfff Unused?
 
 DIP Locations verified for:
-	- bking2
+    - bking2
 
 ***************************************************************************/
 

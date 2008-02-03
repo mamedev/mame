@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( main_v30, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x09000, 0x09fff) AM_READWRITE(MRA16_RAM, lockon_char_w) AM_BASE(&lockon_char_ram)
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(adrst_w)
 	AM_RANGE(0x0b000, 0x0bfff) AM_WRITE(lockon_rotate_w)
-	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(lockon_fb_clut_w) 
+	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(lockon_fb_clut_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(inten_w)
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(emres_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(MRA16_NOP, tst_w)
@@ -289,10 +289,10 @@ static INPUT_PORTS_START( lockon )
  	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_6C ) )
 
 	/*
-		Wire jumper beside the dipswitches on PCB TF011.
-		To access the menu, press the service coin during
-		test mode.
-	*/
+        Wire jumper beside the dipswitches on PCB TF011.
+        To access the menu, press the service coin during
+        test mode.
+    */
 	PORT_DIPNAME( 0x4000, 0x4000, "Enable H/W Tests Menu" )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -342,7 +342,7 @@ static INPUT_PORTS_START( lockone )
 
 	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On )  ) 	
+	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unused ) )
  	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
@@ -512,7 +512,7 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_SOUND_ROUTE(2, "f2203.2l", 1.0)
 	MDRV_SOUND_ROUTE(2, "f2203.2r", 1.0)
 	MDRV_SOUND_ROUTE(3, "f2203.3l", 1.0)
-	MDRV_SOUND_ROUTE(3, "f2203.3r", 1.0)	
+	MDRV_SOUND_ROUTE(3, "f2203.3r", 1.0)
 
 	MDRV_SOUND_ADD_TAG("f2203.1l", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
