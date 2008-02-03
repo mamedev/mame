@@ -22,7 +22,7 @@
                              Enabled DSP again.
     * December 16, 2007 (kingshriek) Many EG bug fixes, implemented effects mixer,
                              implemented FM.
-    * January 5, 2007   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
+    * January 5, 2008   (kingshriek+RB) Working, good-sounding FM, removed obsolete non-USEDSP code.
 */
 
 #include "sndintrf.h"
