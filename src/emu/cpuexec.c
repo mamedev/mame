@@ -653,7 +653,7 @@ static void cpunum_suspend_until_trigger(int cpunum, int trigger, int eatcycles)
 	cpunum_suspend(cpunum, SUSPEND_REASON_TRIGGER, eatcycles);
 
 	/* set the trigger */
-	cpu[cpunum].trigger = TRIGGER_TIMESLICE;
+	cpu[cpunum].trigger = trigger;
 }
 
 
