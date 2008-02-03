@@ -26,7 +26,6 @@ NES-specific:
 
 #include "driver.h"
 #include "profiler.h"
-#include "deprecat.h"
 #include "video/ppu2c0x.h"
 
 /* constant definitions */
@@ -798,14 +797,12 @@ static void update_scanline(int num )
 				// with the palette entry at the VRAM address instead of the usual background
 				// pen. Micro Machines makes use of this feature.
 				int penNum;
+
 				if (this_ppu->videoram_addr & 0x03)
-				{
 					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f1f] & 0x3f;
-				}
 				else
-				{
 					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f00] & 0x3f;
-				}
+
 				back_pen = chips[num].machine->pens[penNum + intf->color_base[num]];
 			}
 			else
@@ -825,15 +822,13 @@ static void update_scanline(int num )
 			UINT16 tmp;
 			tmp = ( this_ppu->refresh_data & 0x03e0 ) + 0x20;
 			this_ppu->refresh_data &= 0x7c1f;
+
 			/* handle bizarro scrolling rollover at the 30th (not 32nd) vertical tile */
 			if ( tmp == 0x03c0 )
-			{
 				this_ppu->refresh_data ^= 0x0800;
-			}
 			else
-			{
 				this_ppu->refresh_data |= ( tmp & 0x03e0 );
-			}
+
 //logerror("updating refresh_data: %04x\n", this_ppu->refresh_data);
 	    }
 	}
@@ -1324,10 +1319,14 @@ void ppu2c0x_spriteram_dma (int num, const UINT8 page)
 	// Because the DMA is only useful during vblank, this may not be strictly necessary since
 	// the scanline timers should catch us up before drawing actually happens.
 #if 0
-	scanline_callback(Machine, num);
-	scanline_callback(Machine, num);
-	scanline_callback(Machine, num);
-	scanline_callback(Machine, num);
+{
+	ppu2c0x_chip* this_ppu = &chips[num];
+
+	scanline_callback(this_ppu->machine, num);
+	scanline_callback(this_ppu->machine, num);
+	scanline_callback(this_ppu->machine, num);
+	scanline_callback(this_ppu->machine, num);
+}
 #endif
 }
 
