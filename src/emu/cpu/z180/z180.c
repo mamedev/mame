@@ -67,7 +67,12 @@ Example from Ms.Pac-Man/Galaga - 20 year Reunion hardare (see src/mame/drivers/2
 
    CPU is Z8S18020VSC = Z180, 20MHz, 68-Pin PLCC, 0C to +70C, Plastic Standard
 
-Compatible chips:  Hatachi HD647180 series
+
+Other CPUs that use a compatible Z180 core:
+
+Hitachi HD647180 series:
+  Available in QFP80, PLCC84 & DIP90 packages (the QFP80 is not pinout compatible)
+  The HD647180 also has an internal ROM
 
  *****************************************************************************/
 
