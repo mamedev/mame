@@ -14,6 +14,20 @@ Revision History:
  - thanks to Olivier Galibert and Chris Hardy for YMF262 and YAC512 chips
  - thanks to Stiletto for the datasheets
 
+   Features as listed in 4MF262A6 data sheet:
+    1. Registers are compatible with YM3812 (OPL2) FM sound source.
+    2. Up to six sounds can be used as four-operator melody sounds for variety.
+    3. 18 simultaneous melody sounds, or 15 melody sounds with 5 rhythm sounds (with two operators).
+    4. 6 four-operator melody sounds and 6 two-operator melody sounds, or 6 four-operator melody
+       sounds, 3 two-operator melody sounds and 5 rhythm sounds (with four operators).
+    5. 8 selectable waveforms.
+    6. 4-channel sound output.
+    7. YMF262 compabile DAC (YAC512) is available.
+    8. LFO for vibrato and tremolo effedts.
+    9. 2 programable timers.
+   10. Shorter register access time compared with YM3812.
+   11. 5V single supply silicon gate CMOS process.
+   12. 24 Pin SOP Package (YMF262-M), 48 Pin SQFP Package (YMF262-S).
 
 
 differences between OPL2 and OPL3 not documented in Yamaha datahasheets:
