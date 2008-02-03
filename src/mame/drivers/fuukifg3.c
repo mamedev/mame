@@ -148,6 +148,15 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 
 ***************************************************************************/
 
+/* Define clocks based on actual OSC on the PCB */
+
+#define CPU_CLOCK		(XTAL_40MHz / 2)		/* clock for 68020 */
+#define SOUND_CPU_CLOCK		(XTAL_12MHz / 2)		/* clock for Z80 sound CPU */
+#define FM_SOUND_CLOCK		(XTAL_33_8688MHz / 2)		/* FM clock */
+
+/* NOTE: YMF278B_STD_CLOCK is defined in /src/emu/sound/ymf278b.h */
+
+
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/262intf.h"
@@ -591,10 +600,10 @@ static const struct YMF262interface ymf262_interface =
 static MACHINE_DRIVER_START( fuuki32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68EC020, 20000000) /* verified */
+	MDRV_CPU_ADD(M68EC020, CPU_CLOCK) /* 20MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_readmem,fuuki32_writemem)
 
-	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* verified */
+	MDRV_CPU_ADD_TAG("sound", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_readmem,fuuki32_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki32_sound_readport,fuuki32_sound_writeport)
 
@@ -618,7 +627,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YMF262, 33868800/2) /* OSC divided by 2 is 16.9344MHz */
+	MDRV_SOUND_ADD(YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
 	MDRV_SOUND_CONFIG(ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
@@ -641,19 +650,9 @@ MACHINE_DRIVER_END
 
 /***************************************************************************
 
-                                Asura Blade
-Fuuki, 1999
+                 Asura Blade - Sword of Dynasty (Japan)
 
-This dump is taken from a ROM board with number FG-3J ROM-J
-There's nothing on the board except some 4M EPROMs and several
-surface mounted MASK ROMs.
-
-The connectors on the board and the size of the board is similar
-to Jaleco Megasys32, however it's not compatible with it due to the
-connector spacing being different. The physical size of the board
-is too large to fit an SSV board.
-So, I have no idea what the main hardware is, the game probably
-runs on a custom Fuuki system board named 'FG-3'?
+Fuuki, 1999   Consists of a FG-3J MAIN-J mainboard &  FG-3J ROM-J combo
 
 ***************************************************************************/
 
@@ -691,6 +690,14 @@ ROM_START( asurabld )
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) // OPL4 samples
 	ROM_LOAD( "pcm.u6", 0x00000, 0x400000, CRC(ac72225a) SHA1(8d16399ed34ac5bd69dbf43b2de2b0db9ac1c610) )
 ROM_END
+
+/***************************************************************************
+
+                 Asura Buster - Eternal Warriors (Japan)
+
+Fuuki, 2000   Consists of a FG-3J MAIN-J mainboard &  FG-3J ROM-J combo
+
+***************************************************************************/
 
 ROM_START( asurabus )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* M68020 */

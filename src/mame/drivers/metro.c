@@ -5168,21 +5168,37 @@ ROM_END
 Dharma Doujou
 Metro 1994
 
+MTR5260-A
+|-----------------------------------------------|
+|TA7222            3.579545MHz                  |
+|            YM3012                      6116   |
+|C3403  C3403      YM2151  M6295                |
+|       26.666MHz                JA-7     JA-8  |
+|            6264                               |
+|J           6264           |--------|  D78C10  |
+|A           6264           |IMAGETEK|          |
+|M                          |14220   |          |
+|M               MM1035     |        |          |
+|A         |------------|   |--------|          |
+|          |    68000   |                 JB-1  |
+|          |------------|                       |
+|                                         JB-2  |
+|              24MHz                            |
+|       MACH110                           JB-3  |
+|                  6264                         |
+|DSW1              6264                   JB-4  |
+|DSW2     JC-6      JC-5                        |
+|-----------------------------------------------|
+Notes:
+      68000 clock     - 12.000MHz [24/2]
+      D78C10 clock    - 12.000MHz [24/2]
+      YM2151 clock    - 3.579545MHz
+      Oki M6295 clock - 1.200MHz [24/20], sample rate = 1200000 / 132
+      VSync - 60Hz
+      HSync - 15.55kHz
 
-                  M6395  JA-7 JA-8
 
-     26.666MHz          NEC78C10
-      7C199
-      7C199
-      7C199               JB-1
-                          JB-2
-                          JB-3
-           68000-12       JB-4
-
-           24MHz
-                  6264
-                  6264
-           JC-5 JC-6
+Korean version of Dharma runs on Metro hardware PCB Number - METRO CORP. MTR527
 
 ***************************************************************************/
 
@@ -5204,24 +5220,6 @@ ROM_START( dharma )
 	ROM_REGION( 0x040000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "ja-7", 0x000000, 0x040000, CRC(7ce817eb) SHA1(9dfb79021a552877fbc26049cca853c0b93735b5) )
 ROM_END
-
-/*
-
-This is a Korean version of Dharma
-Runs on Metro hardware.
-PCB Number - METRO CORP. MTR527
-Imagetek 14220 gfx chip
-68000 CPU
-XTALs 26.666MHz, 24.0MHz, 3.579545MHz
-YM2413
-OKI M6295
-D78C10
-MACH110
-8-position DSW x2
-6116 SRAM x1
-6264 SRAM x5
-
-*/
 
 ROM_START( dharmak )
 	ROM_REGION( 0x040000, REGION_CPU1, 0 )		/* 68000 Code */
@@ -5281,16 +5279,7 @@ Notes:
       VSync - 60Hz
       HSync - 15.55kHz
 
-68000 @ 12MHz
-NEC D78C10
-AMD Mach110
-Imagetek 14220
-YM2151 + M6295 + YM3012
 RAM - CY7C199 (x2), 6164 (x2), LH5168 (x2), 6116 (x1)
-DIPSW 8-position (x2)
-XTAL - 3.579545MHz (near YM2151 & M6295)
-OSC - 24MHz (near 68000 & Mach110)
-OSC - 26.666MHz (near 14220)
 ROMs 5+6 = Main Prg
 ROMs 7+8 = Sound Data
 ROMs 1-4 = GFX Data
