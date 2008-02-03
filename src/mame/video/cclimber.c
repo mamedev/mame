@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video\resnet.h"
+#include "video/resnet.h"
 
 
 UINT8 *cclimber_bsvideoram;
