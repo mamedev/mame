@@ -43,6 +43,34 @@
  *
  *****************************************************************************/
 
+/*****************************************************************************
+
+Z180 Info:
+
+Known clock speeds (from ZiLOG): 6, 8, 10, 20 & 33MHz
+
+ZiLOG Z180 codes:
+
+  Speed: 10 = 10MHZ
+         20 = 20MHz
+         33 = 33MHz
+Package: P = 60-Pin Plastic DIP
+         V = 68-Pin PLCC
+         F = 80-Pin QFP
+   Temp: S = 0C to +70C
+         E = -40C to +85C
+
+Environmanetal Flow: C = Plastic Standard
+
+
+Example from Ms.Pac-Man/Galaga - 20 year Reunion hardare (see src/mame/drivers/20pacgal.c):
+
+   CPU is Z8S18020VSC = Z180, 20MHz, 68-Pin PLCC, 0C to +70C, Plastic Standard
+
+Compatible chips:  Hatachi HD647180 series
+
+ *****************************************************************************/
+
 #include "debugger.h"
 #include "deprecat.h"
 #include "z180.h"
