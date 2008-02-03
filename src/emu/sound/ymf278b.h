@@ -1,7 +1,7 @@
 #ifndef __YMF278B_H__
 #define __YMF278B_H__
 
-#define YMF278B_STD_CLOCK (33868800)			/* standard clock for OPL4 */
+#define YMF278B_STD_CLOCK	XTAL_33_8688MHz			/* standard clock for OPL4 */
 
 struct YMF278B_interface {
 	int region;			/* memory region of sample ROMs */
