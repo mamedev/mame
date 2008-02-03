@@ -278,8 +278,8 @@ ROM_START( promutrv )
 	ROM_LOAD( "mt50ic.50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "ic63.prm",     0x0000, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette low bits */
-	ROM_LOAD( "ic64.prm",     0x0100, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette high bits */
+	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
+	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
 
 	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "movie-tv.lo0", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
@@ -305,8 +305,8 @@ ROM_START( promutra )
 	ROM_LOAD( "mt50ic.50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "ic63.prm",     0x0000, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette low bits */
-	ROM_LOAD( "ic64.prm",     0x0100, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette high bits */
+	ROM_LOAD( "ic64.prm",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
+	ROM_LOAD( "ic63.prm",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
 
 	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "movie-tv.lo0", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
@@ -332,8 +332,8 @@ ROM_START( promutrb )
 	ROM_LOAD( "mt50.ic50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "dm74s287n.ic63",     0x0000, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette low bits */
-	ROM_LOAD( "dm74s287n.ic64",     0x0100, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette high bits */
+	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
+	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
 
 	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "movie-tv.lo0.u8", 0x00000, 0x8000, CRC(dbf03e62) SHA1(0210442ff80cce8fe39ba5e373bca0f47bb389c4) )
@@ -363,8 +363,8 @@ ROM_START( promutrc )
 	ROM_LOAD( "mt50.ic50",    0x1000, 0x1000, CRC(ee89d24e) SHA1(e3536df549278040255657201433ab23e0386533) )
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "dm74s287n.ic63",     0x0000, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette low bits */
-	ROM_LOAD( "dm74s287n.ic64",     0x0100, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette high bits */
+	ROM_LOAD( "dm74s287n.ic64",     0x0000, 0x0100, CRC(1cf9c914) SHA1(4c39b10c1be889d6ef4313b2112f4216d34f7327) ) /* palette low bits */
+	ROM_LOAD( "dm74s287n.ic63",     0x0100, 0x0100, CRC(749da5a8) SHA1(8e30f5b014bc8ff2dc4986ef35a979e525681cb9) ) /* palette high bits */
 
 	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "sports.lo0.u8",   0x00000, 0x8000, CRC(bb28fa92) SHA1(a3c4c67be0e31793d68b0b048f3a73e9ce1d5859) )
@@ -394,8 +394,8 @@ ROM_START( strvmstr )
 	ROM_LOAD( "stm50.rom",    0x1000, 0x1000, CRC(cfc1a1d1) SHA1(9ef38f12360dd946651e67770742ca72fa6846f1) )
 
 	ROM_REGION( 0x0200, REGION_PROMS, 0 )
-	ROM_LOAD( "stm63.prm",    0x0000, 0x0100, BAD_DUMP CRC(305271cf) SHA1(6fd5fe085d79ca7aa57010cffbdb2a85b9c24701) ) /* palette low bits */
-	ROM_LOAD( "stm64.prm",    0x0100, 0x0100, BAD_DUMP CRC(69ebc0b8) SHA1(de2b936e3246e3bfc7e2ff9546c1854ec3504cc2) ) /* palette high bits */
+	ROM_LOAD( "stm64.prm",    0x0000, 0x0100, BAD_DUMP CRC(69ebc0b8) SHA1(de2b936e3246e3bfc7e2ff9546c1854ec3504cc2) ) /* palette low bits */
+	ROM_LOAD( "stm63.prm",    0x0100, 0x0100, BAD_DUMP CRC(305271cf) SHA1(6fd5fe085d79ca7aa57010cffbdb2a85b9c24701) ) /* palette high bits */
 
 	ROM_REGION( 0x40000, REGION_USER1, 0 ) /* Question roms */
 	ROM_LOAD( "sex2.lo0",     0x00000, 0x8000, CRC(9c68b277) SHA1(34bc9d7b973fe482abd5e34a058b72eb5ec8db64) )
