@@ -5,7 +5,7 @@
 int fd1094_set_state(UINT8 *key,int state);
 int fd1094_decode(int address,int val,UINT8 *key,int vector_fetch);
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 
 typedef struct _fd1094_constraint fd1094_constraint;
 struct _fd1094_constraint

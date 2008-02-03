@@ -143,7 +143,7 @@ void fd1094_machine_init(void)
 }
 
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 static void key_changed(void)
 {
 	int addr;
@@ -188,7 +188,7 @@ void fd1094_driver_init(void (*set_decrypted)(UINT8 *))
 	}
 	fd1094_current_cacheposition = 0;
 
-#ifdef MAME_DEBUG
+#ifdef ENABLE_DEBUGGER
 	/* key debugging */
 	if (Machine->debug_mode && memory_region(REGION_USER2) != NULL)
 	{

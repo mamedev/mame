@@ -906,7 +906,7 @@ VIDEO_UPDATE( metro )
 	}
 
 
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 if (input_code_pressed(KEYCODE_Z))
 {
 	int msk = 0;
