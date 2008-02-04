@@ -56,7 +56,6 @@ enum
 	TRANSPARENCY_PENS,			/* multiple pen transparency with remapping */
 	TRANSPARENCY_COLOR,			/* single remapped pen transparency with remapping */
 	TRANSPARENCY_PEN_TABLE,		/* special pen remapping modes (see DRAWMODE_xxx below) with remapping */
-	TRANSPARENCY_BLEND_RAW,		/* blend two bitmaps, shifting the source and ORing to the dest with no remapping */
 	TRANSPARENCY_ALPHA,			/* single pen transparency, other pens alpha */
 	TRANSPARENCY_ALPHARANGE,	/* single pen transparency, multiple pens alpha depending on array, see psikyosh.c */
 
