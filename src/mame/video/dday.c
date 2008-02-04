@@ -31,7 +31,7 @@ static int timer_value;
 
 READ8_HANDLER( dday_countdown_timer_r )
 {
-    return ((timer_value / 10) << 4) | (timer_value % 10);
+	return ((timer_value / 10) << 4) | (timer_value % 10);
 }
 
 static TIMER_CALLBACK( countdown_timer_callback )
@@ -39,9 +39,7 @@ static TIMER_CALLBACK( countdown_timer_callback )
 	timer_value--;
 
 	if (timer_value < 0)
-	{
 		timer_value = 99;
-	}
 }
 
 static void start_countdown_timer(void)
@@ -62,111 +60,97 @@ PALETTE_INIT( dday )
 {
 	int i;
 
+	palette_set_shadow_factor(machine, 1.0 / 8);
 
-	palette_set_shadow_factor(machine, 1.0/8);	/* this matches the previous version of the driver (>>3) */
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* HACK!!! This table is handgenerated, but it matches the screenshot.
        I have no clue how it really works */
+	colortable_entry_set_value(machine->colortable, 0*8+0+0, 0x00);
+	colortable_entry_set_value(machine->colortable, 0*8+0+1, 0x01);
+	colortable_entry_set_value(machine->colortable, 0*8+0+2, 0x15);
+	colortable_entry_set_value(machine->colortable, 0*8+0+3, 0x02);
+	colortable_entry_set_value(machine->colortable, 0*8+4+0, 0x00);
+	colortable_entry_set_value(machine->colortable, 0*8+4+1, 0x01);
+	colortable_entry_set_value(machine->colortable, 0*8+4+2, 0x15);
+	colortable_entry_set_value(machine->colortable, 0*8+4+3, 0x02);
 
-	colortable[0*8+0] = 0;
-	colortable[0*8+1] = 1;
-	colortable[0*8+2] = 21;
-	colortable[0*8+3] = 2;
-	colortable[0*8+4+0] = 0;
-	colortable[0*8+4+1] = 1;
-	colortable[0*8+4+2] = 21;
-	colortable[0*8+4+3] = 2;
+	colortable_entry_set_value(machine->colortable, 1*8+0+0, 0x04);
+	colortable_entry_set_value(machine->colortable, 1*8+0+1, 0x05);
+	colortable_entry_set_value(machine->colortable, 1*8+0+2, 0x03);
+	colortable_entry_set_value(machine->colortable, 1*8+0+3, 0x07);
+	colortable_entry_set_value(machine->colortable, 1*8+4+0, 0x04);
+	colortable_entry_set_value(machine->colortable, 1*8+4+1, 0x05);
+	colortable_entry_set_value(machine->colortable, 1*8+4+2, 0x03);
+	colortable_entry_set_value(machine->colortable, 1*8+4+3, 0x07);
 
-	colortable[1*8+0] = 4;
-	colortable[1*8+1] = 5;
-	colortable[1*8+2] = 3;
-	colortable[1*8+3] = 7;
-	colortable[1*8+4+0] = 4;
-	colortable[1*8+4+1] = 5;
-	colortable[1*8+4+2] = 3;
-	colortable[1*8+4+3] = 7;
+	colortable_entry_set_value(machine->colortable, 2*8+0+0, 0x08);
+	colortable_entry_set_value(machine->colortable, 2*8+0+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 2*8+0+2, 0x0a);
+	colortable_entry_set_value(machine->colortable, 2*8+0+3, 0x03);
+	colortable_entry_set_value(machine->colortable, 2*8+4+0, 0x08);
+	colortable_entry_set_value(machine->colortable, 2*8+4+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 2*8+4+2, 0x0a);
+	colortable_entry_set_value(machine->colortable, 2*8+4+3, 0x03);
 
-	colortable[2*8+0] = 8;
-	colortable[2*8+1] = 21;
-	colortable[2*8+2] = 10;
-	colortable[2*8+3] = 3;
-	colortable[2*8+4+0] = 8;
-	colortable[2*8+4+1] = 21;
-	colortable[2*8+4+2] = 10;
-	colortable[2*8+4+3] = 3;
+	colortable_entry_set_value(machine->colortable, 3*8+0+0, 0x08);
+	colortable_entry_set_value(machine->colortable, 3*8+0+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 3*8+0+2, 0x0a);
+	colortable_entry_set_value(machine->colortable, 3*8+0+3, 0x03);
+	colortable_entry_set_value(machine->colortable, 3*8+4+0, 0x08);
+	colortable_entry_set_value(machine->colortable, 3*8+4+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 3*8+4+2, 0x0a);
+	colortable_entry_set_value(machine->colortable, 3*8+4+3, 0x03);
 
-	colortable[3*8+0] = 8;
-	colortable[3*8+1] = 21;
-	colortable[3*8+2] = 10;
-	colortable[3*8+3] = 3;
-	colortable[3*8+4+0] = 8;
-	colortable[3*8+4+1] = 21;
-	colortable[3*8+4+2] = 10;
-	colortable[3*8+4+3] = 3;
+	colortable_entry_set_value(machine->colortable, 4*8+0+0, 0x10);
+	colortable_entry_set_value(machine->colortable, 4*8+0+1, 0x11);
+	colortable_entry_set_value(machine->colortable, 4*8+0+2, 0x12);
+	colortable_entry_set_value(machine->colortable, 4*8+0+3, 0x07);
+	colortable_entry_set_value(machine->colortable, 4*8+4+0, 0x10);
+	colortable_entry_set_value(machine->colortable, 4*8+4+1, 0x11);
+	colortable_entry_set_value(machine->colortable, 4*8+4+2, 0x12);
+	colortable_entry_set_value(machine->colortable, 4*8+4+3, 0x07);
 
-	colortable[4*8+0] = 16;
-	colortable[4*8+1] = 17;
-	colortable[4*8+2] = 18;
-	colortable[4*8+3] = 7;
-	colortable[4*8+4+0] = 16;
-	colortable[4*8+4+1] = 17;
-	colortable[4*8+4+2] = 18;
-	colortable[4*8+4+3] = 7;
+	colortable_entry_set_value(machine->colortable, 5*8+0+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 5*8+0+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 5*8+0+2, 0x16);
+	colortable_entry_set_value(machine->colortable, 5*8+0+3, 0x1b);
+	colortable_entry_set_value(machine->colortable, 5*8+4+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 5*8+4+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 5*8+4+2, 0x16);
+	colortable_entry_set_value(machine->colortable, 5*8+4+3, 0x1b);
 
-	colortable[5*8+0] = 29;
-	colortable[5*8+1] = 21;
-	colortable[5*8+2] = 22;
-	colortable[5*8+3] = 27;
-	colortable[5*8+4+0] = 29;
-	colortable[5*8+4+1] = 21;
-	colortable[5*8+4+2] = 22;
-	colortable[5*8+4+3] = 27;
+	colortable_entry_set_value(machine->colortable, 6*8+0+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 6*8+0+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 6*8+0+2, 0x1a);
+	colortable_entry_set_value(machine->colortable, 6*8+0+3, 0x1b);
+	colortable_entry_set_value(machine->colortable, 6*8+4+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 6*8+4+1, 0x15);
+	colortable_entry_set_value(machine->colortable, 6*8+4+2, 0x1a);
+	colortable_entry_set_value(machine->colortable, 6*8+4+3, 0x1b);
 
-	colortable[6*8+0] = 29;
-	colortable[6*8+1] = 21;
-	colortable[6*8+2] = 26;
-	colortable[6*8+3] = 27;
-	colortable[6*8+4+0] = 29;
-	colortable[6*8+4+1] = 21;
-	colortable[6*8+4+2] = 26;
-	colortable[6*8+4+3] = 27;
-
-	colortable[7*8+0] = 29;
-	colortable[7*8+1] = 2;
-	colortable[7*8+2] = 4;
-	colortable[7*8+3] = 27;
-	colortable[7*8+4+0] = 29;
-	colortable[7*8+4+1] = 2;
-	colortable[7*8+4+2] = 4;
-	colortable[7*8+4+3] = 27;
+	colortable_entry_set_value(machine->colortable, 7*8+0+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 7*8+0+1, 0x02);
+	colortable_entry_set_value(machine->colortable, 7*8+0+2, 0x04);
+	colortable_entry_set_value(machine->colortable, 7*8+0+3, 0x1b);
+	colortable_entry_set_value(machine->colortable, 7*8+4+0, 0x1d);
+	colortable_entry_set_value(machine->colortable, 7*8+4+1, 0x02);
+	colortable_entry_set_value(machine->colortable, 7*8+4+2, 0x04);
+	colortable_entry_set_value(machine->colortable, 7*8+4+3, 0x1b);
 }
 
 
@@ -216,14 +200,9 @@ static TILE_GET_INFO( get_sl_tile_info )
 
 	code = sl_map[flipx ? tile_index ^ 0x0f : tile_index];
 
-	if (sl_flipx != flipx)
-	{
-		if (code & 0x80)
-		{
-			/* no mirroring, draw dark spot */
-			code = 1;
-		}
-	}
+	if ((sl_flipx != flipx) && (code & 0x80))
+		/* no mirroring, draw dark spot */
+		code = 1;
 
 	SET_TILE_INFO(3, code & 0x3f, 0, flipx ? TILE_FLIPX : 0);
 }
@@ -280,20 +259,17 @@ WRITE8_HANDLER( dday_colorram_w )
 {
 	int i;
 
-
 	offset &= 0x03e0;
 
-    dday_colorram[offset & 0x3e0] = data;
+	dday_colorram[offset & 0x3e0] = data;
 
-    for (i = 0; i < 0x20; i++)
-    {
+	for (i = 0; i < 0x20; i++)
 		tilemap_mark_tile_dirty(fg_tilemap, offset + i);
-	}
 }
 
 READ8_HANDLER( dday_colorram_r )
 {
-    return dday_colorram[offset & 0x03e0];
+	return dday_colorram[offset & 0x03e0];
 }
 
 

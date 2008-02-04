@@ -1,12 +1,11 @@
 #include "driver.h"
-#include "deprecat.h"
 
 /*defined in drivers/darkmist.c */
-
-extern UINT8 * darkmist_scroll;
 extern int darkmist_hw;
 
-static int spritebank;
+
+UINT8 *darkmist_scroll;
+UINT8 *darkmist_spritebank;
 
 /* vis. flags */
 
@@ -77,64 +76,49 @@ PALETTE_INIT(darkmist)
 {
 	int i;
 
-	/* black color */
-	palette_set_color(machine, 0x100, MAKE_RGB(0,0,0));
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x101);
 
-	/* color lookup tables */
-
-	for (i = 0;i < 256;i++)
+	for (i = 0; i < 0x400; i++)
 	{
-		if (*color_prom & 0x40)
-			*(colortable++) = 0x100;
-		else
-			*(colortable++) = (*color_prom & 0x3f) + 0x80;
-		color_prom++;
-	}
+		int ctabentry;
 
-	for (i = 0;i < 256;i++)
-	{
-		if (*color_prom & 0x40)
-			*(colortable++) = 0x100;
+		if (color_prom[i] & 0x40)
+			ctabentry = 0x100;
 		else
-			*(colortable++) = (*color_prom & 0x3f) + 0x00;
-		color_prom++;
-	}
+		{
+			ctabentry = (color_prom[i] & 0x3f);
 
-	for (i = 0;i < 256;i++)
-	{
-		if (*color_prom & 0x40)
-			*(colortable++) = 0x100;
-		else
-			*(colortable++) = (*color_prom & 0x3f) + 0x40;
-		color_prom++;
-	}
+			switch (i & 0x300)
+			{
+			case 0x000:  ctabentry = ctabentry | 0x80; break;
+			case 0x100:  ctabentry = ctabentry | 0x00; break;
+			case 0x200:  ctabentry = ctabentry | 0x40; break;
+			case 0x300:  ctabentry = ctabentry | 0xc0; break;
+			}
+		}
 
-	for (i = 0;i < 256;i++)
-	{
-		if (*color_prom & 0x40)
-			*(colortable++) = 0x100;
-		else
-			*(colortable++) = (*color_prom & 0x3f) + 0xc0;
-		color_prom++;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
-WRITE8_HANDLER(darkmist_palette_w)
+
+static void set_pens(running_machine *machine)
 {
-	paletteram[offset]=data;
-	offset&=0xff;
-	palette_set_color_rgb(Machine, offset, pal4bit(paletteram[offset+0x200]), pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]));
+	int i;
+
+	for (i = 0; i < 0x100; i++)
+	{
+		int r = pal4bit(paletteram[i | 0x200] >> 0);
+		int g = pal4bit(paletteram[i | 0x000] >> 4);
+		int b = pal4bit(paletteram[i | 0x000] >> 0);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	colortable_palette_set_color(machine->colortable, 0x100, RGB_BLACK);
 }
 
-READ8_HANDLER(darkmist_palette_r)
-{
-	return paletteram[offset];
-}
-
-WRITE8_HANDLER(darkmist_spritebank_w)
-{
-	spritebank=data<<8;
-}
 
 VIDEO_START(darkmist)
 {
@@ -150,6 +134,8 @@ VIDEO_UPDATE( darkmist)
 
 #define DM_GETSCROLL(n) (((darkmist_scroll[(n)]<<1)&0xff) + ((darkmist_scroll[(n)]&0x80)?1:0) +( ((darkmist_scroll[(n)-1]<<4) | (darkmist_scroll[(n)-1]<<12) )&0xff00))
 
+	set_pens(machine);
+
 	tilemap_set_scrollx(bgtilemap, 0, DM_GETSCROLL(0x2));
 	tilemap_set_scrolly(bgtilemap, 0, DM_GETSCROLL(0x6));
 	tilemap_set_scrollx(fgtilemap, 0, DM_GETSCROLL(0xa));
@@ -158,15 +144,10 @@ VIDEO_UPDATE( darkmist)
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
 
 	if(darkmist_hw & DISPLAY_BG)
-	{
 		tilemap_draw(bitmap,cliprect,bgtilemap, 0,0);
-	}
-
 
 	if(darkmist_hw & DISPLAY_FG)
-	{
 		tilemap_draw(bitmap,cliprect,fgtilemap, 0,0);
-	}
 
 	if(darkmist_hw & DISPLAY_SPR)
 	{
@@ -190,9 +171,7 @@ VIDEO_UPDATE( darkmist)
 		tile=spriteram[i+0];
 
 		if(spriteram[i+1]&0x20)
-		{
-			tile+=spritebank;
-		}
+			tile += (*darkmist_spritebank << 8);
 
 		palette=((spriteram[i+1])>>1)&0xf;
 
@@ -222,5 +201,3 @@ VIDEO_UPDATE( darkmist)
 
 	return 0;
 }
-
-

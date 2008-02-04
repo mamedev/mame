@@ -33,10 +33,6 @@ WRITE8_HANDLER( drmicro_videoram_w )
 		tilemap_mark_tile_dirty(drmicro_bg1,(offset & 0x3ff));
 }
 
-READ8_HANDLER( drmicro_videoram_r )
-{
-	return drmicro_videoram[offset];
-}
 
 /****************************************************************************/
 
@@ -74,29 +70,44 @@ PALETTE_INIT( drmicro )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	for (i=0; i<machine->drv->color_table_len; i++)
-		colortable[i] = color_prom[i] & 0x0f;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	for (i = 0; i < 0x200; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 VIDEO_START( drmicro)

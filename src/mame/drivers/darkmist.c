@@ -28,14 +28,12 @@ TODO:
 #include "audio/t5182.h"
 
 
-READ8_HANDLER(darkmist_palette_r);
-WRITE8_HANDLER(darkmist_palette_w);
-WRITE8_HANDLER(darkmist_spritebank_w);
 VIDEO_START(darkmist);
 VIDEO_UPDATE(darkmist);
 PALETTE_INIT(darkmist);
 
-UINT8 * darkmist_scroll;
+extern UINT8 *darkmist_scroll;
+extern UINT8 *darkmist_spritebank;
 static UINT8 * darkmist_workram;
 
 int darkmist_hw;
@@ -66,11 +64,11 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc802, 0xc802) AM_READ(input_port_1_r)
 	AM_RANGE(0xc803, 0xc803) AM_READ(input_port_2_r)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(darkmist_hw_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(darkmist_spritebank_w)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE(MWA8_RAM) AM_BASE(&darkmist_spritebank)
 	AM_RANGE(0xc806, 0xc806) AM_READ(input_port_3_r)
 	AM_RANGE(0xc807, 0xc807) AM_READ(input_port_4_r)
 	AM_RANGE(0xc808, 0xc808) AM_READ(input_port_5_r)
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(darkmist_palette_w) AM_READ(darkmist_palette_r) AM_BASE(&paletteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&paletteram)
 	AM_RANGE(0xd400, 0xd41f) AM_RAM AM_BASE(&darkmist_scroll)
 	AM_RANGE(0xd600, 0xd67f) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0xd680, 0xd680) AM_WRITE(t5182_sound_irq_w)
@@ -266,9 +264,8 @@ static MACHINE_DRIVER_START( darkmist )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 	MDRV_GFXDECODE(darkmist)
-	MDRV_PALETTE_LENGTH(0x100+1)
 	MDRV_PALETTE_INIT(darkmist)
-	MDRV_COLORTABLE_LENGTH(0x100*4)
+	MDRV_PALETTE_LENGTH(0x100*4)
 	MDRV_VIDEO_START(darkmist)
 	MDRV_VIDEO_UPDATE(darkmist)
 

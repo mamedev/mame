@@ -21,7 +21,6 @@ VIDEO_UPDATE( drmicro );
 WRITE8_HANDLER( drmicro_flipscreen_w );
 WRITE8_HANDLER( drmicro_priority_w );
 
-READ8_HANDLER( drmicro_videoram_r );
 WRITE8_HANDLER( drmicro_videoram_w );
 
 extern void drmicro_flip_w( int flip );
@@ -77,7 +76,7 @@ static WRITE8_HANDLER( pcm_set_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(drmicro_videoram_r)
+	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
 ADDRESS_MAP_END
 
@@ -245,8 +244,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(drmicro)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(512)
+	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_PALETTE_INIT(drmicro)
 	MDRV_VIDEO_START(drmicro)

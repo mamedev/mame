@@ -67,75 +67,40 @@ static const rectangle rightvisiblearea =
 ***************************************************************************/
 PALETTE_INIT( naughtyb )
 {
-	int i;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	/* note: there is no resistor on second PROM so we define second resistance as 0 */
 	static const int resistances[2] = { 270, 0 };
-	double weights_r[2], weights_g[2], weights_b[2];
+	double rweights[2], gweights[2], bweights[2];
+	int i;
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			2, resistances, rweights, 270, 270,
+			2, resistances, gweights, 270, 270,
+			2, resistances, bweights, 270, 270);
 
-	compute_resistor_weights(0,	255,	-1.0,
-			2,	resistances,	weights_r,	270,	270,
-			2,	resistances,	weights_g,	270,	270,
-			2,	resistances,	weights_b,	270,	270);
-
-
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,r,g,b;
+		int bit0, bit1;
+		int r, g, b;
+		int swapped_i;
 
+		/* red component */
+		bit0 = (color_prom[i | 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i | 0x100] >> 0) & 0x01;
+		r = combine_2_weights(rweights, bit0, bit1);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
+		/* green component */
+		bit0 = (color_prom[i | 0x000] >> 2) & 0x01;
+		bit1 = (color_prom[i | 0x100] >> 2) & 0x01;
+		g = combine_2_weights(gweights, bit0, bit1);
 
-		/*r = 0x55 * bit0 + 0xaa * bit1;*/
-		r = combine_2_weights(weights_r, bit0, bit1);
+		/* blue component */
+		bit0 = (color_prom[i | 0x000] >> 1) & 0x01;
+		bit1 = (color_prom[i | 0x100] >> 1) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
 
-		bit0 = (color_prom[0] >> 2) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-
-		/*g = 0x55 * bit0 + 0xaa * bit1;*/
-		g = combine_2_weights(weights_g, bit0, bit1);
-
-		bit0 = (color_prom[0] >> 1) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-
-		/*b = 0x55 * bit0 + 0xaa * bit1;*/
-		b = combine_2_weights(weights_b, bit0, bit1);
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-	/* first bank of characters use colors 0-31, 64-95, 128-159 and 192-223 */
-	for (i = 0;i < 8;i++)
-	{
-		int j;
-
-
-		for (j = 0;j < 4;j++)
-		{
-			COLOR(0,4*i + j*4*8) = i + j*64;
-			COLOR(0,4*i + j*4*8 + 1) = 8 + i + j*64;
-			COLOR(0,4*i + j*4*8 + 2) = 2*8 + i + j*64;
-			COLOR(0,4*i + j*4*8 + 3) = 3*8 + i + j*64;
-		}
-	}
-
-	/* second bank of characters use colors 32-63, 96-127, 160-191 and 224-255 */
-	for (i = 0;i < 8;i++)
-	{
-		int j;
-
-
-		for (j = 0;j < 4;j++)
-		{
-			COLOR(1,4*i + j*4*8) = i + 32 + j*64;
-			COLOR(1,4*i + j*4*8 + 1) = 8 + i + 32 + j*64;
-			COLOR(1,4*i + j*4*8 + 2) = 2*8 + i + 32 + j*64;
-			COLOR(1,4*i + j*4*8 + 3) = 3*8 + i + 32 + j*64;
-		}
+		swapped_i = BITSWAP8(i,5,7,6,2,1,0,4,3);
+		palette_set_color(machine, swapped_i, MAKE_RGB(r, g, b));
 	}
 }
 
