@@ -1,15 +1,24 @@
-extern UINT8 *s2636_1_ram;
-extern UINT8 *s2636_2_ram;
-extern UINT8 *s2636_3_ram;
+/**********************************************************************
 
-extern mame_bitmap *s2636_1_bitmap;
-extern mame_bitmap *s2636_2_bitmap;
-extern mame_bitmap *s2636_3_bitmap;
+    Signetics 2636 video chip
 
-extern int s2636_x_offset;
-extern int s2636_y_offset;
+**********************************************************************/
 
-extern const gfx_layout s2636_gfx_layout;
+#ifndef S2636
+#define S2636
 
-void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *workram,int Graphics_Bank,mame_bitmap *collision_bitmap);
 
+typedef struct _s2636_t s2636_t;
+
+/* helpful macros to parse the bitmap returned by s2636_update */
+#define S2636_IS_PIXEL_DRAWN(p)		(((p) & 0x08) ? TRUE : FALSE)
+#define S2636_PIXEL_COLOR(p)		((p) & 0x07)
+
+s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset);
+
+/* returns a BITMAP_FORMAT_INDEXED8 bitmap the size of the screen
+   D0-D2 of each pixel is the pixel color
+   D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
+mame_bitmap *s2636_update(s2636_t *s2636, const rectangle *cliprect);
+
+#endif

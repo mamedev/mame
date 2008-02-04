@@ -14,6 +14,7 @@
 
 #include "tinv2650.lh"
 
+extern UINT8 *zac2650_s2636_0_ram;
 WRITE8_HANDLER( tinvader_videoram_w );
 static WRITE8_HANDLER( tinvader_sound_w );
 READ8_HANDLER( zac_s2636_r );
@@ -43,7 +44,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1d00, 0x1dff) AM_WRITE(MWA8_RAM)
     AM_RANGE(0x1e80, 0x1e80) AM_WRITE(tinvader_sound_w)
 	AM_RANGE(0x1e86, 0x1e86) AM_WRITE(MWA8_NOP)				/* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_1_ram)
+	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&zac2650_s2636_0_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
@@ -236,12 +237,10 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( zac2650 )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
-	colortable[0] = 0;
-	colortable[1] = 1;
-	colortable[2] = 0;
-	colortable[3] = 0;
+	palette_set_color(machine,0,RGB_BLACK);
+	palette_set_color(machine,1,RGB_WHITE);
+	palette_set_color(machine,2,RGB_BLACK);
+	palette_set_color(machine,3,RGB_BLACK);
 }
 
 /************************************************************************************************
@@ -333,8 +332,7 @@ static MACHINE_DRIVER_START( tinvader )
 	MDRV_SCREEN_SIZE(30*24, 32*24)
 	MDRV_SCREEN_VISIBLE_AREA(0, 719, 0, 767)
 	MDRV_GFXDECODE(tinvader)
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_COLORTABLE_LENGTH(4)
+	MDRV_PALETTE_LENGTH(4)
 
 	MDRV_PALETTE_INIT(zac2650)
 	MDRV_VIDEO_START(tinvader)

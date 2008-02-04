@@ -7,6 +7,8 @@
 #include "driver.h"
 #include "video/s2636.h"
 
+
+UINT8 *zac2650_s2636_0_ram;
 static mame_bitmap *spritebitmap;
 
 static int CollisionBackground;
@@ -29,7 +31,7 @@ WRITE8_HANDLER( tinvader_videoram_w )
 
 READ8_HANDLER( zac_s2636_r )
 {
-	if(offset!=0xCB) return s2636_1_ram[offset];
+	if(offset!=0xCB) return zac2650_s2636_0_ram[offset];
     else return CollisionSprite;
 }
 
@@ -47,10 +49,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	int Checksum=0;
 	int x,y;
 
-    if((s2636_1_ram[first * 0x10 + 10] < 0xf0) && (s2636_1_ram[second * 0x10 + 10] < 0xf0))
+    if((zac2650_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (zac2650_s2636_0_ram[second * 0x10 + 10] < 0xf0))
     {
-    	int fx     = (s2636_1_ram[first * 0x10 + 10] * 4)-22;
-        int fy     = (s2636_1_ram[first * 0x10 + 12] * 3)+3;
+    	int fx     = (zac2650_s2636_0_ram[first * 0x10 + 10] * 4)-22;
+        int fy     = (zac2650_s2636_0_ram[first * 0x10 + 12] * 3)+3;
 		int expand = (first==1) ? 2 : 1;
 
         /* Draw first sprite */
@@ -86,7 +88,7 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 			    second * 2,
 			    1,
 			    0,0,
-			    (s2636_1_ram[second * 0x10 + 10] * 4)-22,(s2636_1_ram[second * 0x10 + 12] * 3) + 3,
+			    (zac2650_s2636_0_ram[second * 0x10 + 10] * 4)-22,(zac2650_s2636_0_ram[second * 0x10 + 12] * 3) + 3,
 			    0, TRANSPARENCY_PEN, 0);
 
         /* Remove fingerprint */
@@ -158,19 +160,19 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
-    	if((s2636_1_ram[offs+10]<0xF0) && (offs!=0x30))
+    	if((zac2650_s2636_0_ram[offs+10]<0xF0) && (offs!=0x30))
 		{
             int spriteno = (offs / 8);
-			int expand   = ((s2636_1_ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
-            int bx       = (s2636_1_ram[offs+10] * 4) - 22;
-            int by       = (s2636_1_ram[offs+12] * 3) + 3;
+			int expand   = ((zac2650_s2636_0_ram[0xc0] & (spriteno*2))!=0) ? 2 : 1;
+            int bx       = (zac2650_s2636_0_ram[offs+10] * 4) - 22;
+            int by       = (zac2650_s2636_0_ram[offs+12] * 3) + 3;
             int x,y;
 
 			/* 16x8 version */
-			decodechar(machine->gfx[1],spriteno,s2636_1_ram);
+			decodechar(machine->gfx[1],spriteno,zac2650_s2636_0_ram);
 
 			/* 16x16 version */
-			decodechar(machine->gfx[2],spriteno,s2636_1_ram);
+			decodechar(machine->gfx[2],spriteno,zac2650_s2636_0_ram);
 
             /* Sprite->Background collision detection */
 			drawgfx(bitmap,machine->gfx[expand],

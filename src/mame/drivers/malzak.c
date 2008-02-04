@@ -49,6 +49,8 @@ extern int malzak_x;
 extern int malzak_y;
 
 extern UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
+extern UINT8 *malzak_s2636_0_ram;
+extern UINT8 *malzak_s2636_1_ram;
 
 // in video/malzak.c
 VIDEO_START( malzak );
@@ -68,7 +70,7 @@ static WRITE8_HANDLER( saa5050_w )
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	return (s2636_1_ram[0xcb] & 0x3f) + (video_screen_get_vblank(0)*0x40);
+	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(0)*0x40);
 }
 
 static READ8_HANDLER( ram_mirror_r )
@@ -144,8 +146,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1100, 0x11ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1200, 0x12ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1300, 0x13ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_1_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(MWA8_RAM) AM_BASE(&s2636_2_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_WRITE(MWA8_RAM) AM_BASE(&malzak_s2636_0_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_WRITE(MWA8_RAM) AM_BASE(&malzak_s2636_1_ram)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(playfield_w)
 	AM_RANGE(0x1600, 0x16ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x1700, 0x17ff) AM_WRITE(MWA8_RAM)
@@ -360,11 +362,9 @@ static const gfx_layout saa5050_lolayout =
 	8 * 10
 };
 
-//add s2636 decodes here (i.e. from zac2650) and maybe re-arrange them
+
 static GFXDECODE_START( malzak )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,         0,  16 )
-  	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #1  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x0000, s2636_gfx_layout,   0,   8 )	/* s2636 #2  */
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_charlayout, 0, 128 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_hilayout,   0, 128 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, saa5050_lolayout,   0, 128 )

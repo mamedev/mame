@@ -31,6 +31,10 @@ extern WRITE8_HANDLER( laserbat_csound2_w );
 static tilemap *bg_tilemap;
 static int laserbat_video_page = 0;
 static int laserbat_input_mux = 0;
+static s2636_t *s2636_0, *s2636_1, *s2636_2;
+static UINT8 *s2636_0_ram;
+static UINT8 *s2636_1_ram;
+static UINT8 *s2636_2_ram;
 
 static mame_bitmap *collision_bitmap;
 
@@ -182,9 +186,9 @@ static ADDRESS_MAP_START( laserbat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_1_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_2_ram)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_3_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_0_ram)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_1_ram)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&s2636_2_ram)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(laserbat_videoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
@@ -489,9 +493,6 @@ static const gfx_layout sprites_layout =
 
 static GFXDECODE_START( laserbat )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,       0, 256 )	/* Rom chars */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1500, s2636_gfx_layout, 0,   8 )	/* s2636 #1  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1600, s2636_gfx_layout, 0,   8 )	/* s2636 #2  */
-	GFXDECODE_ENTRY( REGION_CPU1, 0x1700, s2636_gfx_layout, 0,   8 )	/* s2636 #3  */
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, sprites_layout,   0,   8 )	/* Sprites   */
 GFXDECODE_END
 
@@ -510,24 +511,56 @@ static VIDEO_START( laserbat )
 
 	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
 
-	s2636_x_offset = -19;
+	/* configure the S2636 chips */
+	s2636_0 = s2636_config(s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
+	s2636_1 = s2636_config(s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
+	s2636_2 = s2636_config(s2636_2_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
 }
 
 static VIDEO_UPDATE( laserbat )
 {
+	int y;
+	mame_bitmap *s2636_0_bitmap;
+	mame_bitmap *s2636_1_bitmap;
+	mame_bitmap *s2636_2_bitmap;
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	s2636_update_bitmap(machine,bitmap,s2636_1_ram,1,collision_bitmap);
-	s2636_update_bitmap(machine,bitmap,s2636_2_ram,2,collision_bitmap);
-	s2636_update_bitmap(machine,bitmap,s2636_3_ram,3,collision_bitmap);
+    /* update the S2636 chips */
+	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
+
+	/* copy the S2636 images into the main bitmap */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		int x;
+
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		{
+			int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
+			int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
+			int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
+
+			if (S2636_IS_PIXEL_DRAWN(pixel0))
+				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel0)];
+
+			if (S2636_IS_PIXEL_DRAWN(pixel1))
+				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel1)];
+
+			if (S2636_IS_PIXEL_DRAWN(pixel2))
+				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel2)];
+		}
+	}
 
 	if(sprite_info.enable)
-		drawgfx(bitmap,machine->gfx[4],
+		drawgfx(bitmap,machine->gfx[1],
 		        sprite_info.code,
 				sprite_info.color,
 				0,0,
 				sprite_info.x - 6,sprite_info.y,
 				cliprect,TRANSPARENCY_PEN,0);
+
 	return 0;
 }
 
@@ -677,7 +710,6 @@ static MACHINE_DRIVER_START( laserbat )
 
 	MDRV_GFXDECODE(laserbat)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(4096)
 
 	MDRV_VIDEO_START(laserbat)
 	MDRV_VIDEO_UPDATE(laserbat)

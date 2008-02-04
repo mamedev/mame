@@ -1,278 +1,317 @@
-/*************************************************************
- *                                                           *
- * Signetics 2636 video chip                                 *
- *                                                           *
- *************************************************************
+/**********************************************************************
 
- PVI REGISTER DESCRIPTION
- ------------------------
+    Signetics 2636 video chip
 
-       |              bit              |R/W| description
- byte  | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |   |
-       |                               |   |
- FC0   | size 4| size 3| size 2| size 1| W | size of the 4 objects(=sprites)
-       |                               |   |
- FC1   |       |C1 |C2 |C3 |C1 |C2 |C3 | W | colours of the 4 objects
-       |       |  colour 1 |  colour 2 |   |
- FC2   |       |C1 |C2 |C3 |C1 |C2 |C3 | W |
-       |       |  colour 3 |  colour 4 |   |
-       |                               |   |
- FC3   |                       |sh |pos| W | 1=shape 0=position
-       |                               |   | display format and position
- FC4   |            (free)             |   |
- FC5   |            (free)             |   |
-       |                               |   |
- FC6   |   |C1 |C2 |C3 |BG |scrn colr  | W | background lock and colour
-       |   |backg colr |enb|C1 |C2 |C3 |   | 3="enable"
-       |                               |   |
- FC7   |            sound              | W | squarewave output
-       |                               |   |
- FC8   |       N1      |      N2       | W | range of the 4 display digits
- FC9   |       N3      |      N4       | W |
-       |                               |   |
-       |obj/backgrnd   |complete object| R |
- FCA   | 1 | 2 | 3 | 4 | 1 | 2 | 3 | 4 |   |
-       |                               |   |
- FCB   |   |VR-|   object collisions   | R | Composition of object and back-
-       |   |LE |1/2|1/3|1/3|1/4|2/4|3/4|   | ground,collision detection and
-       |                               |   | object display as a state display
-       |                               |   | for the status register.Set VRLE.
-       |                               |   | wait for VRST.Read out or transmit
-       |                               |   | [copy?] all bits until reset by
-       |                               |   | VRST.
-       |                               |   |
- FCC   |            PORT1              | R | PORT1 and PORT2 for the range of
- FCD   |            PORT2              |   | the A/D conversion.Cleared by VRST
- FCE   |            (free)             |   |
- FCF   |            (free)             |   |
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 
- Size control by byte FC0
+    PVI REGISTER DESCRIPTION
+    ------------------------
 
-  bit  matrix
- |0|0|  8x10
- |0|1| 16x20
- |1|0| 32x40
- |1|1| 64x80
+          |              bit              |R/W| description
+    byte  | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |   |
+          |                               |   |
+    FC0   | size 4| size 3| size 2| size 1| W | size of the 4 objects(=sprites)
+          |                               |   |
+    FC1   |       |C1 |C2 |C3 |C1 |C2 |C3 | W | colors of the 4 objects
+          |       |  color 1  |  color 2  |   |
+    FC2   |       |C1 |C2 |C3 |C1 |C2 |C3 | W |
+          |       |  color 3  |  color 4  |   |
+          |                               |   |
+    FC3   |                       |sh |pos| W | 1=shape 0=position
+          |                               |   | display format and position
+    FC4   |            (free)             |   |
+    FC5   |            (free)             |   |
+          |                               |   |
+    FC6   |   |C1 |C2 |C3 |BG |scrn colr  | W | background lock and color
+          |   |backg colr |enb|C1 |C2 |C3 |   | 3="enable"
+          |                               |   |
+    FC7   |            sound              | W | squarewave output
+          |                               |   |
+    FC8   |       N1      |      N2       | W | range of the 4 display digits
+    FC9   |       N3      |      N4       | W |
+          |                               |   |
+          |obj/backgrnd   |complete object| R |
+    FCA   | 1 | 2 | 3 | 4 | 1 | 2 | 3 | 4 |   |
+          |                               |   |
+    FCB   |   |VR-|   object collisions   | R | Composition of object and back-
+          |   |LE |1/2|1/3|1/3|1/4|2/4|3/4|   | ground,collision detection and
+          |                               |   | object display as a state display
+          |                               |   | for the status register.Set VRLE.
+          |                               |   | wait for VRST.Read out or transmit
+          |                               |   | [copy?] all bits until reset by
+          |                               |   | VRST.
+          |                               |   |
+    FCC   |            PORT1              | R | PORT1 and PORT2 for the range of
+    FCD   |            PORT2              |   | the A/D conversion.Cleared by VRST
+    FCE   |            (free)             |   |
+    FCF   |            (free)             |   |
 
- CE1 and not-CE2 are outputs from the PVI.$E80..$EFF also controls the
- analogue multiplexer.
+
+    Size control by byte FC0
+
+     bit  matrix
+    |0|0|  8x10
+    |0|1| 16x20
+    |1|0| 32x40
+    |1|1| 64x80
+
+    CE1 and not-CE2 are outputs from the PVI.$E80..$EFF also controls the
+    analog multiplexer.
 
 
- SPRITES
- -------
+    SPRITES
+    -------
 
- each object field: (=sprite data structure)
+    each object field: (=sprite data structure)
 
- 0 \ 10 bytes of bitmap (Each object is 8 pixels wide.)
- 9 /
- A   HC  horizontal object coordinate
- B   HCB horizontal dublicate coordinate
- C   VC  vertical object coordinate
- D   VCB vertical dublicate coordinate
+    0 \ 10 bytes of bitmap (Each object is 8 pixels wide.)
+    9 /
+    A   HC  horizontal object coordinate
+    B   HCB horizontal duplicate coordinate
+    C   VC  vertical object coordinate
+    D   VCB vertical duplicate coordinate
 
- *************************************************************/
+*************************************************************/
 
 #include "driver.h"
 #include "s2636.h"
 
-static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40};
 
-/* To adjust sprites against bitmap */
 
-UINT8 *s2636_1_ram;
-UINT8 *s2636_2_ram;
-UINT8 *s2636_3_ram;
+/*************************************
+ *
+ *  Constants
+ *
+ *************************************/
 
-mame_bitmap *s2636_1_bitmap;
-mame_bitmap *s2636_2_bitmap;
-mame_bitmap *s2636_3_bitmap;
+#define SPRITE_WIDTH	(8)
+#define SPRITE_HEIGHT	(10)
 
-int s2636_x_offset;
-int s2636_y_offset;
+static const int sprite_offsets[4] = { 0x00, 0x10, 0x20, 0x40 };
 
-const gfx_layout s2636_gfx_layout =
+
+
+/*************************************
+ *
+ *  Internal S2636 data structure
+ *
+ *************************************/
+
+struct _s2636_t
 {
-	8,10,
-	5,
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-   	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8, 9*8 },
-	8*16
+	UINT8 *work_ram;
+	int y_offset;
+	int x_offset;
+
+	mame_bitmap *bitmap;
+	mame_bitmap *collision_bitmap;
 };
 
 
-/*****************************************/
-/* Check for Collision between 2 sprites */
-/*****************************************/
 
-static int SpriteCheck(running_machine *machine, int first,int second,UINT8 *workram,int Graphics_Bank,mame_bitmap *collision_bitmap)
+/*************************************
+ *
+ *  Configuration
+ *
+ *************************************/
+
+s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset)
 {
-	int Checksum=0;
-	int x,y;
+	s2636_t *s2636;
 
-    // Does not check shadow sprites yet
+	/* allocate the object that holds the state */
+	s2636 = auto_malloc(sizeof(*s2636));
 
-    if((workram[sprite_offsets[first] + 10] != 0xff) && (workram[sprite_offsets[second] + 10] != 0xff))
-    {
-    	int fx1 = workram[sprite_offsets[first] + 10] + s2636_x_offset;
-        int fy1 = workram[sprite_offsets[first] + 12] + s2636_y_offset;
-		int fx2 = workram[sprite_offsets[second] + 10] + s2636_x_offset;
-		int fy2 = workram[sprite_offsets[second] + 12] + s2636_y_offset;
+	s2636->work_ram = work_ram;
+	s2636->y_offset = y_offset;
+	s2636->x_offset = x_offset;
 
-        if((fx1>=0) && (fy1>=0) && (fx2>=0) && (fy2>=0))
-		{
-  		    int expand1 = 1 << (16+((workram[0xC0]>>(first<<1)) & 3));
-  		    int expand2 = 1 << (16+((workram[0xC0]>>(second<<1)) & 3));
+	s2636->bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+	s2636->collision_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 
-    	    int char1   = sprite_offsets[first]>>4;
-    	    int char2   = sprite_offsets[second]>>4;
-
-            /* Draw first sprite */
-
-		    drawgfxzoom(collision_bitmap,machine->gfx[Graphics_Bank],
-		                char1,
-			            1,
-		                0,0,
-		                fx1,fy1,
-		                &machine->screen[0].visarea, TRANSPARENCY_PEN, 0,
-				        expand1,expand1);
-
-            /* Get fingerprint */
-
-	        for (x = fx1; x < fx1 + machine->gfx[Graphics_Bank]->width; x++)
-	        {
-		        for (y = fy1; y < fy1 + machine->gfx[Graphics_Bank]->height; y++)
-                {
-			        if ((x < machine->screen[0].visarea.min_x) ||
-			            (x > machine->screen[0].visarea.max_x) ||
-			            (y < machine->screen[0].visarea.min_y) ||
-			            (y > machine->screen[0].visarea.max_y))
-			        {
-				        continue;
-			        }
-
-        	        Checksum += *BITMAP_ADDR8(collision_bitmap, y, x);
-                }
-	        }
-
-            /* Blackout second sprite */
-
-		    drawgfxzoom(collision_bitmap,machine->gfx[Graphics_Bank],
-		                char2,
-			            0,
-		                0,0,
-				        fx2,fy2,
-		                &machine->screen[0].visarea, TRANSPARENCY_PEN, 0,
-				        expand2,expand2);
-
-            /* Remove fingerprint */
-
-	        for (x = fx1; x < fx1 + machine->gfx[Graphics_Bank]->width; x++)
-	        {
-		        for (y = fy1; y < fy1 + machine->gfx[Graphics_Bank]->height; y++)
-                {
-			        if ((x < machine->screen[0].visarea.min_x) ||
-			            (x > machine->screen[0].visarea.max_x) ||
-			            (y < machine->screen[0].visarea.min_y) ||
-			            (y > machine->screen[0].visarea.max_y))
-			        {
-				        continue;
-			        }
-
-        	        Checksum -= *BITMAP_ADDR8(collision_bitmap, y, x);
-                }
-	        }
-
-            /* Zero bitmap */
-
-		    drawgfxzoom(collision_bitmap,machine->gfx[Graphics_Bank],
-		                char1,
-			            0,
-		                0,0,
-		                fx1,fy1,
-		                &machine->screen[0].visarea, TRANSPARENCY_PEN, 0,
-				        expand1,expand1);
-            }
-    }
-
-	return Checksum;
+	return s2636;
 }
 
-void s2636_update_bitmap(running_machine *machine,mame_bitmap *bitmap,UINT8 *workram,int Graphics_Bank,mame_bitmap *collision_bitmap)
+
+
+/*************************************
+ *
+ *  Draw a sprite
+ *
+ *************************************/
+
+static void draw_sprite(UINT8 *gfx, int color, int y, int x, int expand,
+						int or_mode, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	int CollisionSprite = 0;
-    int spriteno;
-    int offs;
+	int sy;
 
-    for(spriteno=0;spriteno<4;spriteno++)
-    {
-    	offs = sprite_offsets[spriteno];
+	/* for each row */
+	for (sy = 0; sy < SPRITE_HEIGHT; sy++)
+	{
+		int sx;
 
-    	if(workram[offs+10]!=0xFF)
+		/* for each pixel on the row */
+		for (sx = 0; sx < SPRITE_WIDTH; sx++)
 		{
-			int charno   = offs>>4;
-	  		int expand   = 1 << (16+((workram[0xC0]>>(spriteno<<1)) & 3));
-            int bx       = workram[offs+10] + s2636_x_offset;
-            int by       = workram[offs+12] + s2636_y_offset;
+			int ey;
 
-            if((bx >= 0) && (by >= 0))
-            {
-                /* Get colour and mask correct bits */
+			/* each pixel can be expanded */
+			for (ey = 0; ey <= expand; ey++)
+			{
+				int ex;
 
-                int colour   = workram[0xC1 + (spriteno >> 1)];
+				for (ex = 0; ex <= expand; ex++)
+				{
+					/* compute effective destination pixel */
+					int ty = y + sy * (expand + 1) + ey;
+					int tx = x + sx * (expand + 1) + ex;
 
-                if((spriteno & 1)==0) colour >>= 3;
+					/* get out if outside the drawing region */
+					if ((tx < cliprect->min_x) ||
+						(tx > cliprect->max_x) ||
+						(ty < cliprect->min_y) ||
+						(ty > cliprect->max_y))
+						continue;
 
-                colour = (colour & 7) + 7;
+					/* get out if current image bit is transparent */
+					if (((gfx[sy] << sx) & 0x80) == 0x00)
+						continue;
 
-				decodechar(machine->gfx[Graphics_Bank],charno,workram);
+					if (or_mode)
+						*BITMAP_ADDR8(bitmap, ty, tx) = 0x08 | *BITMAP_ADDR8(bitmap, ty, tx) | color;
+					else
+						*BITMAP_ADDR8(bitmap, ty, tx) = 0x08 | color;
+				}
+			}
+		}
+	}
+}
 
-		        drawgfxzoom(bitmap,machine->gfx[Graphics_Bank],
-			                charno,
-				            colour,
-			                0,0,
-			                bx,by,
-			                &machine->screen[0].visarea,
-							TRANSPARENCY_BLEND_RAW, 0,
-					        expand,expand);
 
-                /* Shadow Sprites */
 
-                if((workram[offs+11]!=0xff) && (workram[offs+13]!=0xfe))
-                {
-            	    bx=workram[offs+11] + s2636_x_offset;
+/*************************************
+ *
+ *  Collision detection
+ *
+ *************************************/
 
-                    if(bx >= 0)
-                    {
-	            	    for(;by < 255;)
-					    {
-						    by=by+10+workram[offs+13];
+static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const rectangle *cliprect)
+{
+	int checksum = 0;
 
-				            drawgfxzoom(bitmap,machine->gfx[Graphics_Bank],
-					                    charno,
-						                colour,
-				    	                0,0,
-				        	            bx,by,
-				            	        &machine->screen[0].visarea,
-										TRANSPARENCY_BLEND_RAW, 0,
-						        	    expand,expand);
-	                    }
-                    }
-                }
-            }
-        }
-    }
+	UINT8* attr1 = &s2636->work_ram[sprite_offsets[spriteno1]];
+	UINT8* attr2 = &s2636->work_ram[sprite_offsets[spriteno2]];
 
-    /* Sprite->Sprite collision detection */
+	/* TODO: does not check shadow sprites yet */
 
-    if(SpriteCheck(machine,0,1,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x20;
-    if(SpriteCheck(machine,0,2,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x10;
-    if(SpriteCheck(machine,0,3,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x08;
-    if(SpriteCheck(machine,1,2,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x04;
-    if(SpriteCheck(machine,1,3,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x02;
-    if(SpriteCheck(machine,2,3,workram,Graphics_Bank,collision_bitmap)) CollisionSprite |= 0x01;
+	fillbitmap(s2636->collision_bitmap, 0, cliprect);
 
-    workram[0xCB] = CollisionSprite;
+	if ((attr1[0x0a] != 0xff) && (attr2[0x0a] != 0xff))
+	{
+		int x, y;
+
+		int x1 = attr1[0x0a] + s2636->x_offset;
+		int y1 = attr1[0x0c] + s2636->y_offset;
+		int x2 = attr2[0x0a] + s2636->x_offset;
+		int y2 = attr2[0x0c] + s2636->y_offset;
+
+		int expand1 = (s2636->work_ram[0xc0] >> (spriteno1 << 1)) & 0x03;
+		int expand2 = (s2636->work_ram[0xc0] >> (spriteno2 << 1)) & 0x03;
+
+		/* draw first sprite */
+		draw_sprite(attr1, 1, y1, x1, expand1, FALSE, s2636->collision_bitmap, cliprect);
+
+		/* get fingerprint */
+		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
+			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
+			{
+				if ((x < cliprect->min_x) ||
+					(x > cliprect->max_x) ||
+					(y < cliprect->min_y) ||
+					(y > cliprect->max_y))
+					continue;
+
+				checksum = checksum + *BITMAP_ADDR8(s2636->collision_bitmap, y, x);
+			}
+
+		/* black out second sprite */
+		draw_sprite(attr2, 0, y2, x2, expand2, FALSE, s2636->collision_bitmap, cliprect);
+
+		/* remove fingerprint */
+		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
+			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
+			{
+				if ((x < cliprect->min_x) ||
+					(x > cliprect->max_x) ||
+					(y < cliprect->min_y) ||
+					(y > cliprect->max_y))
+					continue;
+
+				checksum = checksum - *BITMAP_ADDR8(s2636->collision_bitmap, y, x);
+			}
+	}
+
+	return (checksum != 0);
+}
+
+
+
+/*************************************
+ *
+ *  Main drawing
+ *
+ *************************************/
+
+mame_bitmap *s2636_update(s2636_t *s2636, const rectangle *cliprect)
+{
+	UINT8 collision = 0;
+	int spriteno;
+
+	fillbitmap(s2636->bitmap, 0, cliprect);
+
+	for (spriteno = 0; spriteno < 4; spriteno++)
+	{
+		int color, expand, x, y;
+
+		UINT8* attr = &s2636->work_ram[sprite_offsets[spriteno]];
+
+		/* get out if sprite is turned off */
+		if (attr[0x0a] == 0xff)
+			continue;
+
+		x = attr[0x0a] + s2636->x_offset;
+		y = attr[0x0c] + s2636->y_offset;
+
+		color = (s2636->work_ram[0xc1 + (spriteno >> 1)] >> ((spriteno & 1) ? 0 : 3)) & 0x07;
+		expand = (s2636->work_ram[0xc0] >> (spriteno << 1)) & 0x03;
+
+		draw_sprite(attr, color, y, x, expand, TRUE, s2636->bitmap, cliprect);
+
+		/* bail if no shadow sprites */
+		if ((attr[0x0b] == 0xff) || (attr[0x0d] == 0xfe))
+			continue;
+
+		x = attr[0x0b] + s2636->x_offset;
+
+		while (y < 0xff)
+		{
+			y = y + SPRITE_HEIGHT + attr[0x0d];
+
+			draw_sprite(attr, color, y, x, expand, TRUE, s2636->bitmap, cliprect);
+		}
+	}
+
+	/* collision detection */
+	if (check_collision(s2636, 0, 1, cliprect))  collision |= 0x20;
+	if (check_collision(s2636, 0, 2, cliprect))  collision |= 0x10;
+	if (check_collision(s2636, 0, 3, cliprect))  collision |= 0x08;
+	if (check_collision(s2636, 1, 2, cliprect))  collision |= 0x04;
+	if (check_collision(s2636, 1, 3, cliprect))  collision |= 0x02;
+	if (check_collision(s2636, 2, 3, cliprect))  collision |= 0x01;
+
+	s2636->work_ram[0xcb] = collision;
+
+	return s2636->bitmap;
 }

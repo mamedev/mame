@@ -71,10 +71,10 @@ VIDEO_START( quasar );
 
 
 extern UINT8 *quasar_effectram;
-extern int quasar_effectcontrol;
+extern UINT8 quasar_effectcontrol;
 
-static int page = 0;
-static int IOpage = 8;
+static UINT8 page = 0;
+static UINT8 IOpage = 8;
 
 
 /************************************************************************
@@ -87,44 +87,14 @@ static int IOpage = 8;
 
 ************************************************************************/
 
-static WRITE8_HANDLER( page_0_w )
+static WRITE8_HANDLER( video_page_select_w )
 {
-	page = 0;
+	page = offset & 0x03;
 }
 
-static WRITE8_HANDLER( page_1_w )
+static WRITE8_HANDLER( io_page_select_w )
 {
-	page = 1;
-}
-
-static WRITE8_HANDLER( page_2_w )
-{
-	page = 2;
-}
-
-static WRITE8_HANDLER( page_3_w )
-{
-	page = 3;
-}
-
-static WRITE8_HANDLER( page_8_w )
-{
-	IOpage = 8;
-}
-
-static WRITE8_HANDLER( page_9_w )
-{
-	IOpage = 9;
-}
-
-static WRITE8_HANDLER( page_A_w )
-{
-	IOpage = 10;
-}
-
-static WRITE8_HANDLER( page_B_w )
-{
-	IOpage = 11;
+	IOpage = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
@@ -140,12 +110,12 @@ static WRITE8_HANDLER( quasar_video_w )
 
 static READ8_HANDLER( quasar_IO_r )
 {
-	UINT32 ans = 0;
+	UINT8 ans = 0;
 
-	if (IOpage == 8) ans = input_port_0_r(0);
-	if (IOpage == 9) ans = input_port_1_r(0);
-	if (IOpage == 10) ans = input_port_2_r(0);
-	if (IOpage == 11) ans = input_port_3_r(0);
+	if (IOpage == 0) ans = input_port_0_r(0);
+	if (IOpage == 1) ans = input_port_1_r(0);
+	if (IOpage == 2) ans = input_port_2_r(0);
+	if (IOpage == 3) ans = input_port_3_r(0);
 
 	return ans;
 }
@@ -198,9 +168,9 @@ static WRITE8_HANDLER( Quasar_DAC_w )
 static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
     AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE(&cvs_bullet_ram)
-    AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w) AM_BASE(&s2636_1_ram)
-    AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w) AM_BASE(&s2636_2_ram)
-    AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_3_or_character_ram_r, cvs_s2636_3_or_character_ram_w) AM_BASE(&s2636_3_ram)
+    AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w) AM_BASE(&cvs_s2636_0_ram)
+    AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w) AM_BASE(&cvs_s2636_1_ram)
+    AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w) AM_BASE(&cvs_s2636_2_ram)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE(&cvs_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
@@ -209,14 +179,8 @@ static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quasar_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(quasar_IO_r, page_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(page_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(page_2_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(page_3_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(page_8_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(page_9_w)
-	AM_RANGE(0x0A, 0x0A) AM_WRITE(page_A_w)
-	AM_RANGE(0x0B, 0x0B) AM_WRITE(page_B_w)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(quasar_IO_r, video_page_select_w)
+	AM_RANGE(0x08, 0x0b) AM_WRITE(io_page_select_w)
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
 	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, MWA8_NOP)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
@@ -364,10 +328,7 @@ static const gfx_layout charlayout =
 /* S2636 Mappings */
 
 static GFXDECODE_START( quasar )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,           0, 256 )	/* Rom chars */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #1  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #2  */
-  	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, s2636_gfx_layout,  2072,   8 )	/* s2636 #3  */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout, 0, 64+1 )	/* ROM chars */
 GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )
@@ -404,8 +365,7 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 
 	MDRV_GFXDECODE(quasar)
-	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(4096)
+	MDRV_PALETTE_LENGTH((64+1)*8+(4*256))
 
 	MDRV_PALETTE_INIT(quasar)
 	MDRV_VIDEO_START(quasar)

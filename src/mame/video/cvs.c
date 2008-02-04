@@ -12,26 +12,19 @@
 #include "cvs.h"
 
 
-#define MAX_STARS        250
-#define STARS_COLOR_BASE 16
+#define SPRITE_PEN_BASE		(0x820)
+#define BULLET_STAR_PEN		(0x828)
+
+#define MAX_STARS        	250
+#define STARS_COLOR_BASE 	16
 
 
-#ifdef LSB_FIRST
-#define BL0 0
-#define BL1 1
-#define BL2 2
-#define BL3 3
-#define WL0 0
-#define WL1 1
-#else
-#define BL0 3
-#define BL1 2
-#define BL2 1
-#define BL3 0
-#define WL0 1
-#define WL1 0
-#endif
+static s2636_t *s2636_0, *s2636_1, *s2636_2;
+static mame_bitmap *background_bitmap;
+mame_bitmap *cvs_collision_background;
+static mame_bitmap *scrolled_collision_background;
 
+int cvs_collision_register;
 
 struct star
 {
@@ -45,13 +38,6 @@ static int    stars_on;
 static UINT8  scroll_reg;
 static int    stars_scroll;
 
-static mame_bitmap *background_bitmap;
-mame_bitmap *cvs_collision_bitmap;
-mame_bitmap *cvs_collision_background;
-static mame_bitmap *scrolled_background;
-
-int cvs_collision_register;
-
 
 /******************************************************
  * Convert Colour prom to format for Mame Colour Map  *
@@ -64,45 +50,57 @@ int cvs_collision_register;
 
 PALETTE_INIT( cvs )
 {
-	int attr,col,map;
+	int i, attr;
 
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
 
-	/* Colour Mapping Prom */
-
-	for(attr = 0;attr < 256; attr++)
+	/* color mapping PROM */
+	for (attr = 0; attr < 0x100; attr++)
 	{
-		for(col = 0; col < 8; col++)
+		for (i = 0; i < 8; i++)
 		{
-			map = color_prom[(col * 256) + attr];
+			UINT8 ctabentry = color_prom[(i << 8) | attr] & 0x07;
 
 			/* bits 0 and 2 are swapped */
+			ctabentry = BITSWAP8(ctabentry,7,6,5,4,3,0,1,2);
 
-			COLOR(0,attr*8 + col) = ((map & 1) << 2) + (map & 2) + ((map & 4) >> 2);
+			colortable_entry_set_value(machine->colortable, (attr << 3) | i, ctabentry);
 		}
 	}
 
-	/* Background Collision Map */
-
-	for(map=0;map<8;map++)
+	/* background collision map */
+	for (i = 0; i < 8; i++)
 	{
-		COLOR(0,2048+map) = (map & 4) >> 2;
-		COLOR(0,2056+map) = (map & 2) >> 1;
-		COLOR(0,2064+map) = ((map & 2) >> 1) || ((map & 4) >> 2);
+		colortable_entry_set_value(machine->colortable, 0x800 + i, 0);
+		colortable_entry_set_value(machine->colortable, 0x808 + i, i & 0x04);
+		colortable_entry_set_value(machine->colortable, 0x810 + i, i & 0x02);
+		colortable_entry_set_value(machine->colortable, 0x818 + i, i & 0x06);
 	}
 
-	/* Sprites */
+	/* sprites */
+	for (i = 0; i < 8; i++)
+		colortable_entry_set_value(machine->colortable, SPRITE_PEN_BASE + i, i | 0x08);
 
-	for(map=0;map<8;map++)
-	{
-		COLOR(1,map*2+0) = 0;
-		COLOR(1,map*2+1) = 8 + map;
-	}
-
-    /* set the sprite chip offsets */
-	s2636_x_offset = -26;
-	s2636_y_offset = 3;
+	/* bullet */
+	colortable_entry_set_value(machine->colortable, BULLET_STAR_PEN, 7);
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0; i < 0x10; i++)
+	{
+		int r = pal2bit(~cvs_palette_ram[i] >> 0);
+		int g = pal3bit(~cvs_palette_ram[i] >> 2);
+		int b = pal3bit(~cvs_palette_ram[i] >> 5);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+}
+
 
 
 WRITE8_HANDLER( cvs_video_fx_w )
@@ -185,18 +183,15 @@ VIDEO_START( cvs )
 		}
 	}
 
-
-	/* create the bitmaps for the S2636 chips */
-	s2636_1_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
-	s2636_2_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
-	s2636_3_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
-
+	/* configure the S2636 chips */
+	s2636_0 = s2636_config(cvs_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_1 = s2636_config(cvs_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_2 = s2636_config(cvs_s2636_2_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
 	background_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	cvs_collision_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
-	cvs_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
-	scrolled_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8);
+	cvs_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	scrolled_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 }
 
 
@@ -215,16 +210,11 @@ VIDEO_UPDATE( cvs )
 	offs_t offs;
 	int scroll[8];
 	UINT8 character_banking_mode;
+	mame_bitmap *s2636_0_bitmap;
+	mame_bitmap *s2636_1_bitmap;
+	mame_bitmap *s2636_2_bitmap;
 
-
-	/* set the palette */
-	for (offs = 0; offs < 0x10; offs++)
-	{
-		UINT8 data = cvs_palette_ram[offs];
-
-		palette_set_color_rgb(machine, offs, pal2bit(~data >> 0), pal3bit(~data >> 2), pal3bit(~data >> 5));
-	}
-
+	set_pens(machine);
 
 	/* create our background character set, which is a software
        selectable mixture of RAM and ROM based tiles */
@@ -239,11 +229,10 @@ VIDEO_UPDATE( cvs )
 	for (; code < 0x100; code++)
 		decodechar(machine->gfx[0], code, cvs_character_ram);
 
-
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
 	{
-		int collision_color = 0;
+		int collision_color = 0x100;
 
 		UINT8 code = cvs_video_ram[offs];
 		UINT8 color = cvs_color_ram[offs];
@@ -259,21 +248,20 @@ VIDEO_UPDATE( cvs )
 
 		/* foreground for collision detection */
 		if (color & 0x80)
-			collision_color = 258;
+			collision_color = 0x103;
 		else
 		{
-			if ((color & 0x03) == 3)
-				collision_color = 256;
-			else if((color & 0x01) == 0)
-				collision_color = 257;
+			if ((color & 0x03) == 0x03)
+				collision_color = 0x101;
+			else if ((color & 0x01) == 0)
+				collision_color = 0x102;
 		}
 
-		if (collision_color)
-			drawgfx(cvs_collision_background, machine->gfx[0],
-					code, collision_color,
-					0, 0,
-					x, y,
-					0, TRANSPARENCY_NONE, 0);
+		drawgfx(cvs_collision_background, machine->gfx[0],
+				code, collision_color,
+				0, 0,
+				x, y,
+				0, TRANSPARENCY_NONE, 0);
 	}
 
 
@@ -288,22 +276,15 @@ VIDEO_UPDATE( cvs )
     scroll[6] = 0;
     scroll[7] = 0;
 
-	copyscrollbitmap(bitmap,background_bitmap,0,0,8,scroll,&machine->screen[0].visarea);
-	copyscrollbitmap(scrolled_background,cvs_collision_background,0,0,8,scroll,&machine->screen[0].visarea);
+	copyscrollbitmap(bitmap, background_bitmap, 0, 0, 8, scroll, cliprect);
+	copyscrollbitmap(scrolled_collision_background, cvs_collision_background, 0, 0, 8, scroll, cliprect);
 
-    /* 2636's */
-
-	fillbitmap(s2636_1_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_1_bitmap,s2636_1_ram,1,cvs_collision_bitmap);
-
-	fillbitmap(s2636_2_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_2_bitmap,s2636_2_ram,2,cvs_collision_bitmap);
-
-	fillbitmap(s2636_3_bitmap,0,0);
-	s2636_update_bitmap(machine,s2636_3_bitmap,s2636_3_ram,3,cvs_collision_bitmap);
+    /* update the S2636 chips */
+	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
     /* Bullet Hardware */
-
     for (offs = 8; offs < 256; offs++ )
     {
         if (cvs_bullet_ram[offs] != 0)
@@ -314,72 +295,54 @@ VIDEO_UPDATE( cvs )
             	int bx=255-7-cvs_bullet_ram[offs]-ct;
 
             	/* Bullet/Object Collision */
-				if ((*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) ||
-					(*BITMAP_ADDR8(s2636_3_bitmap, offs, bx) != 0))
-					cvs_collision_register |= 8;
+				if ((*BITMAP_ADDR8(s2636_0_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR8(s2636_1_bitmap, offs, bx) != 0) ||
+					(*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0))
+					cvs_collision_register |= 0x08;
 
             	/* Bullet/Background Collision */
-				if (*BITMAP_ADDR8(scrolled_background, offs, bx) != machine->pens[0])
+				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, offs, bx)))
                    	cvs_collision_register |= 0x80;
 
-				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
+				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[BULLET_STAR_PEN];
             }
         }
     }
 
-	/* Update 2636 images */
 
+	/* mix and copy the S2636 images into the main bitmap, also check for collision */
 	{
-		int x;
-		UINT32 S1,S2,S3,SB,pen;
+		int y;
 
-		for(x=255;x>7;x--)
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
-			UINT32 *sp1 = (UINT32 *)BITMAP_ADDR8(s2636_1_bitmap, x, 0);
-			UINT32 *sp2 = (UINT32 *)BITMAP_ADDR8(s2636_2_bitmap, x, 0);
-			UINT32 *sp3 = (UINT32 *)BITMAP_ADDR8(s2636_3_bitmap, x, 0);
-			UINT64 *dst = (UINT64 *)BITMAP_ADDR16(bitmap, x, 0);
-			UINT8  *spb = (UINT8  *)BITMAP_ADDR8(scrolled_background, x, 0);
+			int x;
 
-			for(offs=0;offs<62;offs++)
+			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				S1 = (*sp1++);
-				S2 = (*sp2++);
-				S3 = (*sp3++);
+				int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
+				int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
+				int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
 
-				pen = S1 | S2 | S3;
+				int pixel = pixel0 | pixel1 | pixel2;
 
-				if(pen)
+				if (S2636_IS_PIXEL_DRAWN(pixel))
 				{
-					UINT16 *address = (UINT16 *)dst;
-					if (pen & 0xff000000) address[BL3] = machine->pens[(pen >> 24) & 15];
-					if (pen & 0x00ff0000) address[BL2] = machine->pens[(pen >> 16) & 15];
-					if (pen & 0x0000ff00) address[BL1] = machine->pens[(pen >>  8) & 15];
-					if (pen & 0x000000ff) address[BL0] = machine->pens[(pen & 15)];
+					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[SPRITE_PEN_BASE + S2636_PIXEL_COLOR(pixel)];
 
-					/* Collision Detection */
+					/* S2636 vs. S2636 collision detection */
+					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) cvs_collision_register |= 0x01;
+					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x02;
+					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x04;
 
-					SB = 0;
-					if (spb[BL3] != machine->pens[0]) SB =  0x08000000;
-					if (spb[BL2] != machine->pens[0]) SB |= 0x00080000;
-					if (spb[BL1] != machine->pens[0]) SB |= 0x00000800;
-					if (spb[BL0] != machine->pens[0]) SB |= 0x00000008;
-
-					if (S1 & S2) cvs_collision_register |= 1;
-					if (S2 & S3) cvs_collision_register |= 2;
-					if (S1 & S3) cvs_collision_register |= 4;
-
-					if (SB)
+					/* S2636 vs. background collision detection */
+					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, y, x)))
 					{
-						if (S1 & SB) cvs_collision_register |= 16;
-						if (S2 & SB) cvs_collision_register |= 32;
-						if (S3 & SB) cvs_collision_register |= 64;
+						if (S2636_IS_PIXEL_DRAWN(pixel0)) cvs_collision_register |= 0x10;
+						if (S2636_IS_PIXEL_DRAWN(pixel1)) cvs_collision_register |= 0x20;
+						if (S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x40;
 					}
 				}
-
-				dst++;
-				spb+=4;
 			}
 		}
 	}
@@ -405,15 +368,12 @@ VIDEO_UPDATE( cvs )
 					if (flip_screen_y)
 						y = ~y;
 
-					if (*BITMAP_ADDR16(bitmap, y, x) == machine->pens[0])
-					{
-						*BITMAP_ADDR16(bitmap, y, x) = machine->pens[7];
-					}
+					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)
+						*BITMAP_ADDR16(bitmap, y, x) = machine->pens[BULLET_STAR_PEN];
 				}
 			}
 		}
 	}
-
 
 	return 0;
 }
