@@ -7924,5 +7924,7 @@ Other Sun games
 	DRIVER( blazlaz )
 	DRIVER( paranoia )
 	DRIVER( galgbios )  /* (c) 1998 Creative Electonics */
+	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
+	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
 
 #endif	/* DRIVER_RECURSIVE */

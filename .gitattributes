@@ -2032,6 +2032,7 @@ src/mame/drivers/vamphalf.c svneol=native#text/plain
 src/mame/drivers/vaportra.c svneol=native#text/plain
 src/mame/drivers/vastar.c svneol=native#text/plain
 src/mame/drivers/vball.c svneol=native#text/plain
+src/mame/drivers/vcombat.c svneol=native#text/plain
 src/mame/drivers/vegaeo.c svneol=native#text/plain
 src/mame/drivers/vegas.c svneol=native#text/plain
 src/mame/drivers/vendetta.c svneol=native#text/plain
