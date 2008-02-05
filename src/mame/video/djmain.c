@@ -173,7 +173,7 @@ VIDEO_UPDATE( djmain )
 				order[j] = temp;
 			}
 
-	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{

@@ -443,7 +443,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 			{
 				for (xtile = xstart; xtile != xend; xtile += xinc )
 				{
-					const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+					const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 					int source_base = ((code + code_offset++) % gfx->total_elements) * gfx->height;
 
 					int x_index_base, y_index, sx, sy, ex, ey;
@@ -707,7 +707,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		/* Start drawing */
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 
 			int sprite_screen_height = ((high*gfx->height*(0x400*0x400))/zoomy + 0x200)>>10; /* Round up to nearest pixel */
 			int sprite_screen_width = ((wide*gfx->width*(0x400*0x400))/zoomx + 0x200)>>10;

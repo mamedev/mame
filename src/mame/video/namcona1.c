@@ -278,7 +278,7 @@ static void pdraw_masked_tile(running_machine *machine,
 		mask = machine->gfx[1];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
+		paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 		mask_addr = mask->gfxdata + code * mask->char_modulo;
@@ -413,7 +413,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 		gfx = machine->gfx[0];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
+		paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 
@@ -575,7 +575,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	gfx_element *pGfx;
 
 	pGfx = machine->gfx[0];
-	paldata = &machine->remapped_colortable[pGfx->color_base + pGfx->color_granularity * tilemap_palette_bank[which]];
+	paldata = &machine->pens[pGfx->color_base + pGfx->color_granularity * tilemap_palette_bank[which]];
 
 	/* draw one scanline at a time */
 	clip.min_x = cliprect->min_x;

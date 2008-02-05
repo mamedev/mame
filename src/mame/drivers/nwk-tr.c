@@ -545,7 +545,7 @@ static VIDEO_START( nwktr )
 
 static VIDEO_UPDATE( nwktr )
 {
-	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	voodoo_update(0, bitmap, cliprect);
 

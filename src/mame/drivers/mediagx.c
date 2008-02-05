@@ -169,7 +169,7 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;
@@ -183,15 +183,11 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-			{
-				p[i] = Machine->remapped_colortable[gfx->color_base + (att & 0xf)];
-			}
+				p[i] = machine->pens[gfx->color_base + (att & 0xf)];
 			else
 			{
 				if (((att >> 4) & 7) > 0)
-				{
-					p[i] = Machine->remapped_colortable[gfx->color_base + ((att >> 4) & 0x7)];
-				}
+					p[i] = machine->pens[gfx->color_base + ((att >> 4) & 0x7)];
 			}
 		}
 	}
@@ -304,8 +300,8 @@ static void draw_cga(running_machine *machine, mame_bitmap *bitmap, const rectan
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}

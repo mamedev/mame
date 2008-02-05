@@ -938,7 +938,7 @@ void K001005_swap_buffers(void)
 
 	//if (K001005_status == 2)
 	{
-		fillbitmap(K001005_bitmap[K001005_bitmap_page], Machine->remapped_colortable[0], &K001005_cliprect);
+		fillbitmap(K001005_bitmap[K001005_bitmap_page], Machine->pens[0], &K001005_cliprect);
 		fillbitmap(K001005_zbuffer, 0xffffffff, &K001005_cliprect);
 	}
 }

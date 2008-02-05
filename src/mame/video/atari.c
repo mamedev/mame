@@ -804,10 +804,10 @@ static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 	UINT8 n, bits = 0;
 	UINT8 b = gtia.w.colbk & 0xf0;
 	UINT8 c = gtia.w.colpf1 & 0x0f;
-	UINT8 atari_A = Machine->remapped_colortable[((b+0x30)&0xf0)+c];
-	UINT8 atari_B = Machine->remapped_colortable[((b+0x70)&0xf0)+c];
-	UINT8 atari_C = Machine->remapped_colortable[b+c];
-	UINT8 atari_D = Machine->remapped_colortable[gtia.w.colbk];
+	UINT8 atari_A = Machine->pens[((b+0x30)&0xf0)+c];
+	UINT8 atari_B = Machine->pens[((b+0x70)&0xf0)+c];
+	UINT8 atari_C = Machine->pens[b+c];
+	UINT8 atari_D = Machine->pens[gtia.w.colbk];
 
 	for( x = 0; x < width * 4; x++ )
 	{
@@ -878,10 +878,10 @@ static void artifacts_txt(UINT8 * src, UINT8 * dst, int width)
 	UINT8 n, bits = 0;
 	UINT8 b = gtia.w.colpf2 & 0xf0;
 	UINT8 c = gtia.w.colpf1 & 0x0f;
-	UINT8 atari_A = Machine->remapped_colortable[((b+0x30)&0xf0)+c];
-	UINT8 atari_B = Machine->remapped_colortable[((b+0x70)&0xf0)+c];
-	UINT8 atari_C = Machine->remapped_colortable[b+c];
-	UINT8 atari_D = Machine->remapped_colortable[gtia.w.colpf2];
+	UINT8 atari_A = Machine->pens[((b+0x30)&0xf0)+c];
+	UINT8 atari_B = Machine->pens[((b+0x70)&0xf0)+c];
+	UINT8 atari_C = Machine->pens[b+c];
+	UINT8 atari_D = Machine->pens[gtia.w.colpf2];
 
 	for( x = 0; x < width * 4; x++ )
 	{

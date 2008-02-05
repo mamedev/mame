@@ -360,7 +360,7 @@ VIDEO_UPDATE( namcos86 )
 
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	fillbitmap(bitmap,machine->remapped_colortable[machine->gfx[0]->color_base + 8*backcolor+7],cliprect);
+	fillbitmap(bitmap,machine->pens[machine->gfx[0]->color_base + 8*backcolor+7],cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{

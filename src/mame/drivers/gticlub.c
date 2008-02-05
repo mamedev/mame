@@ -102,7 +102,7 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
-	fillbitmap(bitmap, machine->remapped_colortable[0], cliprect);
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
 	K001604_tile_update(screen);
 //  K001604_draw_back_layer(bitmap, cliprect);

@@ -269,7 +269,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 	skip = sprite_base[SPR_SKIP_LO] + (sprite_base[SPR_SKIP_HI] << 8);
 
 	height = sprite_base[SPR_Y_BOTTOM] - sprite_base[SPR_Y_TOP];
-	sprite_palette = Machine->remapped_colortable + 0x10 * spr_number;
+	sprite_palette = Machine->pens + 0x10 * spr_number;
 
 	sy = sprite_base[SPR_Y_TOP] + 1;
 

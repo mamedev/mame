@@ -63,7 +63,7 @@ static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 }
 #endif
 
-static void mlc_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void mlc_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int use8bpp,
 		int scalex, int scaley)
@@ -98,7 +98,7 @@ static void mlc_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			int source_base1 = (code1 % gfx->total_elements) * gfx->height;
 			int source_base2 = (code2 % gfx->total_elements) * gfx->height;
 

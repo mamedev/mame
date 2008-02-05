@@ -1364,7 +1364,7 @@ INLINE void draw_scanlines(running_machine *machine,
 		UINT32 orient,
 		int skip_layer_num)
 {
-	const pen_t *clut = &machine->remapped_colortable[0];
+	const pen_t *clut = &machine->pens[0];
 	UINT32 bgcolor=clut[0];
 	int length;
 
@@ -2668,7 +2668,7 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 	if( gfx )
 	{
-		const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		int source_base = (code % gfx->total_elements) * 16;
 
 		{
@@ -2832,7 +2832,7 @@ INLINE void f3_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 	if( gfx )
 	{
-		const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 		int source_base = (code % gfx->total_elements) * 16;
 
 		{

@@ -209,7 +209,7 @@ static void draw_sprite(running_machine *machine,
 	int shadow,
 	int shadow_pen, int eos )
 {
-	const pen_t *shadow_base = machine->remapped_colortable + machine->gfx[0]->color_base + (machine->drv->total_colors/2);
+	const pen_t *shadow_base = machine->pens + machine->gfx[0]->color_base + (machine->drv->total_colors/2);
 	const UINT8 *source;
 	int full_shadow=shadow&SYS16_SPR_SHADOW;
 	int partial_shadow=shadow&SYS16_SPR_PARTIAL_SHADOW;
@@ -340,7 +340,7 @@ static void draw_sprite(running_machine *machine,
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
 {
-	const pen_t *base_pal = machine->remapped_colortable + machine->gfx[0]->color_base;
+	const pen_t *base_pal = machine->pens + machine->gfx[0]->color_base;
 	const UINT8 *base_gfx = memory_region(REGION_GFX2);
 	const int gfx_rom_size = memory_region_length(REGION_GFX2);
 	const UINT16 *source = sys16_spriteram;

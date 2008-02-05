@@ -91,7 +91,7 @@ static void jal_blend_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		{
 			for (xtile = xstart; xtile != xend; xtile += xinc )
 			{
-				const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+				const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 				const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
 				int source_base = ((code + code_offset++) % gfx->total_elements) * gfx->height;
 

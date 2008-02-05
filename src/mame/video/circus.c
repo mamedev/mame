@@ -65,19 +65,11 @@ static void draw_line(running_machine *machine, mame_bitmap *bitmap, const recta
 		skip = 1;
 
 	if (x1 == x2)
-	{
 		for (count = y2; count >= y1; count -= skip)
-		{
 			*BITMAP_ADDR16(bitmap, count, x1) = machine->pens[1];
-		}
-	}
 	else
-	{
 		for (count = x2; count >= x1; count -= skip)
-		{
 			*BITMAP_ADDR16(bitmap, y1, count) = machine->pens[1];
-		}
-	}
 }
 
 static void draw_robot_box (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x, int y)
@@ -202,10 +194,9 @@ VIDEO_UPDATE( crash )
 static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx;
-	const pen_t *pal_ptr;
 	UINT8  *src_lineptr, *src_pixptr;
 	UINT16 *dst_lineptr, *dst_lineend;
-	UINT32 code, color;
+	UINT32 code;
 	int sx, sy;
 	int src_pitch, dst_width, dst_height, dst_pitch, dst_pixoffs, dst_pixend;
 	int collision, eax, edx;
@@ -213,7 +204,6 @@ static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap,
 	gfx = machine->gfx[0];
 
 	code = clown_z;
-	color = 0;
 
 	sx = clown_y;
 	sy = clown_x - 1;
@@ -222,7 +212,6 @@ static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap,
 	edx = 1;
 
 	gfx = machine->gfx[1];
-	pal_ptr = &machine->remapped_colortable[gfx->color_base + color * gfx->color_granularity];
 	src_lineptr = gfx->gfxdata + code * gfx->char_modulo;
 	src_pitch = gfx->line_modulo;
 	dst_pitch = bitmap->rowpixels;
@@ -244,7 +233,7 @@ static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap,
 			src_pixptr ++;
 			if (eax)
 			{
-				eax = pal_ptr[eax];
+				eax = machine->pens[eax];
 				collision |= dst_lineptr[dst_pixoffs];
 				dst_lineptr[dst_pixoffs] = eax;
 			}

@@ -67,12 +67,10 @@ static VIDEO_START(gamecstl)
 {
 	int i;
 	for (i=0; i < 16; i++)
-	{
 		palette_set_color(machine, i, cga_palette[i]);
-	}
 }
 
-static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;
@@ -82,17 +80,14 @@ static void draw_char(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_
 	for (j=y; j < y+8; j++)
 	{
 		UINT16 *p = BITMAP_ADDR16(bitmap, j, 0);
+
 		for (i=x; i < x+8; i++)
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-			{
-				p[i] = Machine->remapped_colortable[gfx->color_base + (att & 0xf)];
-			}
+				p[i] = machine->pens[gfx->color_base + (att & 0xf)];
 			else
-			{
-				p[i] = Machine->remapped_colortable[gfx->color_base  + ((att >> 4) & 0x7)];
-			}
+				p[i] = machine->pens[gfx->color_base  + ((att >> 4) & 0x7)];
 		}
 	}
 }
@@ -115,8 +110,8 @@ static VIDEO_UPDATE(gamecstl)
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}

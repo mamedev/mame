@@ -332,11 +332,11 @@ static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
-					p[i] = alpha_blend16(p[i], Machine->remapped_colortable[gfx->color_base + global_pen]);
+					p[i] = alpha_blend16(p[i], Machine->pens[gfx->color_base + global_pen]);
 				}
 				else
 				{
-					p[i] = Machine->remapped_colortable[gfx->color_base + global_pen];
+					p[i] = Machine->pens[gfx->color_base + global_pen];
 				}
 			}
 			dp_i += xd;
@@ -598,11 +598,11 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 				UINT8 alpha = alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend16(*d, machine->remapped_colortable[pen]);
+					*d = alpha_blend16(*d, machine->pens[pen]);
 				}
 				else
 				{
-					*d = machine->remapped_colortable[pen];
+					*d = machine->pens[pen];
 				}
 			}
 			++d;

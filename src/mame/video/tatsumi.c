@@ -271,7 +271,7 @@ INLINE void roundupt_drawgfxzoomrotate( mame_bitmap *dest_bmp,const gfx_element 
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			const UINT8 *shadow_pens = shadow_pen_array + (gfx->color_granularity * (color % gfx->total_colors));
 			int source_base = (code % gfx->total_elements) * gfx->height;
 

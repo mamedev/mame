@@ -490,7 +490,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			int source_base = (code % gfx->total_elements) * gfx->height;
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -1414,9 +1414,9 @@ VIDEO_UPDATE( fghthist )
 */
 static void mixDualAlphaSprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
-	const pen_t *pal0 = &machine->remapped_colortable[gfx0->color_base];
-	const pen_t *pal1 = &machine->remapped_colortable[gfx1->color_base];
-	const pen_t *pal2 = &machine->remapped_colortable[(deco32_pri&1) ? machine->gfx[1]->color_base : machine->gfx[2]->color_base];
+	const pen_t *pal0 = &machine->pens[gfx0->color_base];
+	const pen_t *pal1 = &machine->pens[gfx1->color_base];
+	const pen_t *pal2 = &machine->pens[(deco32_pri&1) ? machine->gfx[1]->color_base : machine->gfx[2]->color_base];
 	int x,y;
 
 	/* Mix sprites into main bitmap, based on priority & alpha */

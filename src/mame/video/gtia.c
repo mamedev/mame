@@ -42,19 +42,19 @@ static void gtia_state_postload(void);
  * set both color clocks equal for one color
  **********************************************/
 #define SETCOL_B(o,d) \
-	antic.color_lookup[o] = (Machine->remapped_colortable[d] << 8) | Machine->remapped_colortable[d]
+	antic.color_lookup[o] = (Machine->pens[d] << 8) | Machine->pens[d]
 
 /**********************************************
  * set left color clock for one color
  **********************************************/
 #define SETCOL_L(o,d) \
-	*((UINT8*)&antic.color_lookup[o] + 0) = Machine->remapped_colortable[d]
+	*((UINT8*)&antic.color_lookup[o] + 0) = Machine->pens[d]
 
 /**********************************************
  * set right color clock for one color
  **********************************************/
 #define SETCOL_R(o,d) \
-	*((UINT8*)&antic.color_lookup[o] + 1) = Machine->remapped_colortable[d]
+	*((UINT8*)&antic.color_lookup[o] + 1) = Machine->pens[d]
 
 
 

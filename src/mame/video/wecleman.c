@@ -106,7 +106,7 @@ static struct sprite *sprite_list_create(int num_sprites)
 
 static void get_sprite_info(running_machine *machine)
 {
-	const pen_t *base_pal = machine->remapped_colortable;
+	const pen_t *base_pal = machine->pens;
 	UINT8 *base_gfx = memory_region(REGION_GFX1);
 	int gfx_max     = memory_region_length(REGION_GFX1);
 
@@ -566,7 +566,7 @@ static void wecleman_draw_road(running_machine *machine, mame_bitmap *bitmap, co
 	int scrollx, sy, sx;
 	int mdy, tdy, i;
 
-	rgb_ptr = machine->remapped_colortable;
+	rgb_ptr = machine->pens;
 
 	if (priority == 0x02)
 	{
@@ -683,7 +683,7 @@ static void draw_cloud(running_machine *machine, mame_bitmap *bitmap,
 	dst_pitch = bitmap->rowpixels;
 	dst_base = (UINT16 *)bitmap->base + (y0+dy)*dst_pitch + (x0+dx);
 
-	pal_base = machine->remapped_colortable + pal_offset * gfx->color_granularity;
+	pal_base = machine->pens + pal_offset * gfx->color_granularity;
 
 	alpha <<= 6;
 
@@ -1022,7 +1022,7 @@ VIDEO_UPDATE ( wecleman )
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = machine->remapped_colortable;
+	mrct = machine->pens;
 
 	video_on = wecleman_irqctrl & 0x40;
 

@@ -190,7 +190,7 @@ static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rect
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
 	height		= spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
-	spr_palette	= machine->remapped_colortable + 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
+	spr_palette	= machine->pens + 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 

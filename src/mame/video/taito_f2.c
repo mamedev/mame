@@ -374,7 +374,7 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int scalex, int scaley)
 {
-	const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
