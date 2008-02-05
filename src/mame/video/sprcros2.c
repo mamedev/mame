@@ -12,33 +12,53 @@ extern UINT8 sprcros2_m_port7;
 
 PALETTE_INIT( sprcros2 )
 {
-	int i,bit0,bit1,bit2,r,g,b;
+	int i;
 
-	for (i = 0;i < machine->drv->total_colors; i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x47 * bit1 + 0xb8 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = 0x47 * bit0 + 0xb8 * bit1;
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	//cluts
-	for (i = 0;i < 0x100; i++)
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	/* bg */
+	for (i = 0; i < 0x100; i++)
 	{
-		colortable[i]=color_prom[i+0x20]+(color_prom[i+0x120]<<4);		//bg
-		colortable[i+0x100]=color_prom[i+0x220];						//sprites
-		colortable[i+0x200]=color_prom[i+0x320];						//fg
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | ((color_prom[i + 0x100] & 0x0f) << 4);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* sprites & fg */
+	for (i = 0x100; i < 0x300; i++)
+	{
+		UINT8 ctabentry = color_prom[i + 0x100];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -91,6 +111,9 @@ static TILE_GET_INFO( get_sprcros2_fgtile_info )
 {
 	UINT32 tile_number = sprcros2_fgvideoram[tile_index];
 	UINT8 attr = sprcros2_fgvideoram[tile_index+0x400];
+	int color = (attr&0xfc)>>2;
+
+	tileinfo->group = color;
 
 	//attr
 	//76543210
@@ -102,21 +125,21 @@ static TILE_GET_INFO( get_sprcros2_fgtile_info )
 	SET_TILE_INFO(
 			2,
 			tile_number,
-			(attr&0xfc)>>2,
+			color,
 			0);
 }
 
 VIDEO_START( sprcros2 )
 {
 	sprcros2_bgtilemap = tilemap_create( get_sprcros2_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
-	sprcros2_fgtilemap = tilemap_create( get_sprcros2_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_COLORTABLE,8,8,32,32 );
+	sprcros2_fgtilemap = tilemap_create( get_sprcros2_fgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
 
-	tilemap_set_transparent_pen(sprcros2_fgtilemap,0);
+	colortable_configure_tilemap_groups(machine->colortable, sprcros2_fgtilemap, machine->gfx[2], 0);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
-	int offs,sx,sy,flipx,flipy;
+	int offs,sx,sy,color,flipx,flipy;
 
 	for (offs = sprcros2_spriteram_size-4; offs >= 0; offs -= 4)
 	{
@@ -139,6 +162,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 			sx = ((sprcros2_spriteram[offs+3]+0x10)%0x100)-0x10;
 			sy = 225-(((sprcros2_spriteram[offs+2]+0x10)%0x100)-0x10);
+			color = (sprcros2_spriteram[offs+1]&0x38)>>3;
 			flipx = sprcros2_spriteram[offs+1]&0x02;
 			flipy = 0;
 
@@ -152,10 +176,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 			drawgfx(bitmap,machine->gfx[1],
 				sprcros2_spriteram[offs],
-				(sprcros2_spriteram[offs+1]&0x38)>>3,
+				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0);
+				cliprect,TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}
 }

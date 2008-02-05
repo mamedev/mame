@@ -40,46 +40,53 @@ static int stfight_sprite_base = 0;
 PALETTE_INIT( stfight )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	/* unique color for transparency */
-	palette_set_color(machine,256,MAKE_RGB(0x04,0x04,0x04));
-
-	/* text uses colors 192-207 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	/* text uses colors 0xc0-0xcf */
+	for (i = 0; i < 0x40; i++)
 	{
-		if ((*color_prom & 0x0f) == 0x0f) COLOR(0,i) = 256;	/* transparent */
-		else COLOR(0,i) = (*color_prom & 0x0f) + 0xc0;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xc0;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-	color_prom += 256 - TOTAL_COLORS(0);	/* rest of the PROM is unused */
 
-	/* fg uses colors 64-127 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	/* fg uses colors 0x40-0x7f */
+	for (i = 0x40; i < 0x140; i++)
 	{
-		COLOR(1,i) = (color_prom[256] & 0x0f) + 16 * (color_prom[0] & 0x03) + 0x40;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i + 0x1c0] & 0x0f) | ((color_prom[i + 0x0c0] & 0x03) << 4) | 0x40;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-	color_prom += 256;
 
-	/* bg uses colors 0-63 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
+	/* bg uses colors 0-0x3f */
+	for (i = 0x140; i < 0x240; i++)
 	{
-		COLOR(2,i) = (color_prom[256] & 0x0f) + 16 * (color_prom[0] & 0x03) + 0x00;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i + 0x2c0] & 0x0f) | ((color_prom[i + 0x1c0] & 0x03) << 4);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-	color_prom += 256;
 
-	/* sprites use colors 128-191 */
-	for (i = 0;i < TOTAL_COLORS(4);i++)
+	/* bg uses colors 0x80-0xbf */
+	for (i = 0x240; i < 0x340; i++)
 	{
-		COLOR(4,i) = (color_prom[256] & 0x0f) + 16 * (color_prom[0] & 0x03) + 0x80;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i + 0x3c0] & 0x0f) | ((color_prom[i + 0x2c0] & 0x03) << 4) | 0x80;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-	color_prom += 256;
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT16 data = paletteram[i] | (paletteram_2[i] << 8);
+		rgb_t color = MAKE_RGB(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+
+		colortable_palette_set_color(machine->colortable, i, color);
+	}
+}
+
 
 /***************************************************************************
 
@@ -135,6 +142,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	UINT8 attr = stfight_text_attr_ram[tile_index];
+	int color = attr & 0x0f;
+
+	tileinfo->group = color;
 
 	SET_TILE_INFO(
 			0,
@@ -154,11 +164,10 @@ VIDEO_START( stfight )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,     16,16,128,256);
 	fg_tilemap = tilemap_create(get_fg_tile_info,fg_scan,TILEMAP_TYPE_PEN,16,16,128,256);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,
-			TILEMAP_TYPE_COLORTABLE,8,8,32,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows, TILEMAP_TYPE_PEN,8,8,32,32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0x0F);
-	tilemap_set_transparent_pen(tx_tilemap,256);
+	tilemap_set_transparent_pen(fg_tilemap,0x0f);
+	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0xcf);
 }
 
 
@@ -285,6 +294,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( stfight )
 {
+	set_pens(machine);
+
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	fillbitmap(bitmap,machine->pens[0],cliprect);	/* in case bg_tilemap is disabled */

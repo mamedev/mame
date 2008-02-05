@@ -280,8 +280,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram_2)
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(stfight_adpcm_control_w)    /* voice control */
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
@@ -506,8 +506,7 @@ static MACHINE_DRIVER_START( stfight )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(stfight)
-	MDRV_PALETTE_LENGTH(256+1)
-	MDRV_COLORTABLE_LENGTH(16*4+16*16+16*16+16*16)
+	MDRV_PALETTE_LENGTH(16*4+16*16+16*16+16*16)
 
 	MDRV_PALETTE_INIT(stfight)
 	MDRV_VIDEO_START(stfight)

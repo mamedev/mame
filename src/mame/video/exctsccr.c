@@ -19,80 +19,79 @@ static tilemap *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( exctsccr )
 {
-	int i,idx;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
+		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += machine->drv->total_colors;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
 	/* characters */
-	idx = 0;
-	for (i = 0;i < 32;i++)
+	for (i = 0; i < 0x80; i++)
 	{
-		COLOR(0,idx++) = color_prom[256+0+(i*4)];
-		COLOR(0,idx++) = color_prom[256+1+(i*4)];
-		COLOR(0,idx++) = color_prom[256+2+(i*4)];
-		COLOR(0,idx++) = color_prom[256+3+(i*4)];
-		COLOR(0,idx++) = color_prom[256+128+0+(i*4)];
-		COLOR(0,idx++) = color_prom[256+128+1+(i*4)];
-		COLOR(0,idx++) = color_prom[256+128+2+(i*4)];
-		COLOR(0,idx++) = color_prom[256+128+3+(i*4)];
+		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
+		UINT8 ctabentry = color_prom[0x100 + swapped_i];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
 	/* sprites */
-
-	idx=0;
-
-	for (i = 0;i < 15*16;i++)
+	for (i = 0; i < 0xf0; i++)
 	{
-		if ( (i%16) < 8 )
+		if ((i & 0x08) == 0)
 		{
-			COLOR(2,idx) = color_prom[i]+16;
-			idx++;
+			int swapped_i = BITSWAP8(i,3,7,6,5,4,2,1,0);
+			UINT8 ctabentry = color_prom[i] | 0x10;
+			colortable_entry_set_value(machine->colortable, swapped_i + 0x80, ctabentry);
 		}
 	}
-	for (i = 15*16;i < 16*16;i++)
+
+	for (i = 0xf0; i < 0x100; i++)
 	{
-		if ( (i%16) > 7 )
+		if (i & 0x08)
 		{
-			COLOR(2,idx) = color_prom[i]+16;
-			idx++;
+			int swapped_i = BITSWAP8(i,3,7,6,5,4,2,1,0);
+			UINT8 ctabentry = color_prom[i] | 0x10;
+			colortable_entry_set_value(machine->colortable, swapped_i + 0x80, ctabentry);
 		}
 	}
-	for (i = 16;i < 32;i++)
+
+	for (i = 0x80; i < 0x100; i++)
 	{
-		COLOR(2,idx++) = color_prom[256+0+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+1+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+2+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+3+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+128+0+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+128+1+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+128+2+(i*4)]+16;
-		COLOR(2,idx++) = color_prom[256+128+3+(i*4)]+16;
+		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
+		UINT8 ctabentry = color_prom[0x100 + swapped_i] | 0x10;
+		colortable_entry_set_value(machine->colortable, i + 0x80, ctabentry);
 	}
 
-	/* Patch for goalkeeper */
-	COLOR(2,29*8+7) = 16;
-
+	/* patch for goalkeeper - but of course, this is totally wrong */
+	colortable_entry_set_value(machine->colortable, 0x80+(0x1d*8)+7, 0x10);
 }
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
@@ -133,7 +132,10 @@ WRITE8_HANDLER( exctsccr_flipscreen_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
-	int color = colorram[tile_index] & 0x1f;
+
+	/* ZV 02052008 - this used to be "& 0x1f," but that's not supported by the
+       color PROM decoding, so I am using 0x0f.  I don't see any glitches */
+	int color = colorram[tile_index] & 0x0f;
 
 	SET_TILE_INFO(gfx_bank, code, color, 0);
 }
@@ -209,6 +211,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			color += 6;
 		}
+
 		if ( color==0x1d && gfx_bank==1 )
 		{
 			drawgfx(bitmap,machine->gfx[3],
@@ -218,23 +221,26 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				sx,sy,
 				cliprect,
 				TRANSPARENCY_PEN,0);
+
 			drawgfx(bitmap,machine->gfx[4],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
 				cliprect,
-				TRANSPARENCY_COLOR, 16);
+				TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[4], color, 0x10));
 
-		} else
+		}
+		else
 		{
-		drawgfx(bitmap,machine->gfx[bank],
-				code,
-				color,
-				flipx, flipy,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,machine->gfx[bank],
+					code,
+					color,
+					flipx, flipy,
+					sx,sy,
+					cliprect,
+					TRANSPARENCY_PEN,0);
 		}
 	}
 }

@@ -322,8 +322,7 @@ static MACHINE_DRIVER_START( sprcros2 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(sprcros2)
-	MDRV_PALETTE_LENGTH(18)
-	MDRV_COLORTABLE_LENGTH(768)
+	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_PALETTE_INIT(sprcros2)
 	MDRV_VIDEO_START(sprcros2)
@@ -415,5 +414,5 @@ ROM_START( sprcrs2a )
 	ROM_LOAD( "sc-60.4k",    0x0320, 0x0100, CRC(d7a4e57d) SHA1(6db02ec6aa55b05422cb505e63c71e36b4b11b4a) )	//fg clut
 ROM_END
 
-GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, 0, ROT0, "GM Shoji", "Super Cross 2 (Japan set 1)", 0 )
-GAME( 1986, sprcrs2a, sprcros2, sprcros2, sprcros2, 0, ROT0, "GM Shoji", "Super Cross 2 (Japan set 2)", 0 )
+GAME( 1986, sprcros2, 0,        sprcros2, sprcros2, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 1)", 0 )
+GAME( 1986, sprcrs2a, sprcros2, sprcros2, sprcros2, 0, ROT0, "GM Shoji", "Super Cross II (Japan, set 2)", 0 )

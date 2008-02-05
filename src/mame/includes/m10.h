@@ -27,8 +27,8 @@
 #define IREMM15_VBSTART			(240)
 #define IREMM15_VBEND			(16)
 
-typedef struct _irem_state irem_state;
-struct _irem_state
+typedef struct _m10_state m10_state;
+struct _m10_state
 {
 	/* memory pointers */
 	UINT8 *			chargen;
@@ -47,15 +47,15 @@ struct _irem_state
 };
 
 
-/*----------- defined in video/skychut.c -----------*/
+/*----------- defined in video/m10.c -----------*/
 
 
-WRITE8_HANDLER( skychut_colorram_w );
-WRITE8_HANDLER( iremm15_chargen_w );
+WRITE8_HANDLER( m10_colorram_w );
+WRITE8_HANDLER( m15_chargen_w );
 
-VIDEO_UPDATE( iremm10 );
-VIDEO_UPDATE( iremm15 );
+VIDEO_UPDATE( m10 );
+VIDEO_UPDATE( m15 );
 
-VIDEO_START( iremm10 );
-VIDEO_START( iremm15 );
+VIDEO_START( m10 );
+VIDEO_START( m15 );
 

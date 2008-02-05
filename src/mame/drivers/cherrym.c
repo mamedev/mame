@@ -89,7 +89,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			int flipy = attr & 0x20;
 
 			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_COLOR, 0);
+				cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
 }

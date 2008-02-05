@@ -110,7 +110,6 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 attr = circusc_colorram[tile_index];
 	tileinfo->category = (attr & 0x10) >> 4;
-	tileinfo->group = attr & 0x0f;
 
 	SET_TILE_INFO(0,
 				  circusc_videoram[tile_index] + ((attr & 0x20) << 3),

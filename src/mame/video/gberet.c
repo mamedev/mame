@@ -30,39 +30,56 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( gberet )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	for (i = 0; i < 0x100; i++)
 	{
-		if (*color_prom & 0x0f) COLOR(1,i) = *color_prom & 0x0f;
-		else COLOR(1,i) = 0;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+
+	for (i = 0x100; i < 0x200; i++)
 	{
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
+		UINT8 ctabentry;
+
+		if (color_prom[i] & 0x0f)
+			ctabentry = color_prom[i] & 0x0f;
+		else
+			ctabentry = 0;
+
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -100,6 +117,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int color = attr & 0x0f;
 	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
+	tileinfo->group = color;
 	tileinfo->category = (attr & 0x80) >> 7;
 
 	SET_TILE_INFO(0, code, color, flags);
@@ -107,10 +125,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( gberet )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_COLORTABLE, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
 
-	tilemap_set_transparent_pen(bg_tilemap, 0x10);
+	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 0x10);
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
 
@@ -145,7 +162,8 @@ static void gberet_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			}
 
 			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_COLOR, 0);
+				cliprect, TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}
 }
@@ -197,7 +215,8 @@ static void gberetb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 			}
 
 			drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-				cliprect, TRANSPARENCY_COLOR, 0);
+				cliprect, TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 		}
 	}
 }

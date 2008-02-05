@@ -755,6 +755,7 @@ $(MAMEOBJ)/igs.a: \
 	$(MACHINE)/pgmy2ks.o \
 
 $(MAMEOBJ)/irem.a: \
+	$(DRIVERS)/m10.o $(VIDEO)/m10.o \
 	$(DRIVERS)/m52.o $(VIDEO)/m52.o \
 	$(DRIVERS)/m57.o $(VIDEO)/m57.o \
 	$(DRIVERS)/m58.o $(VIDEO)/m58.o \
@@ -766,7 +767,6 @@ $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/olibochu.o \
 	$(DRIVERS)/redalert.o $(AUDIO)/redalert.o $(VIDEO)/redalert.o \
 	$(DRIVERS)/shisen.o $(VIDEO)/shisen.o \
-	$(DRIVERS)/skychut.o $(VIDEO)/skychut.o \
 	$(DRIVERS)/travrusa.o $(VIDEO)/travrusa.o \
 	$(DRIVERS)/vigilant.o $(VIDEO)/vigilant.o \
 	$(DRIVERS)/wilytowr.o \

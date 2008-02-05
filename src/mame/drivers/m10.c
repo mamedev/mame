@@ -1,9 +1,8 @@
 /***************************************************************************
 
-  IPM Invader (M10 m10 hardware)
-  Sky Chuter By IREM
-  Space Beam (M15 m15 hardware)
-  Green Beret (?M15 ?m15 hardware)
+    Irem M10/M11/M15 hardware
+
+****************************************************************************
 
   (c) 12/2/1998 Lee Taylor
 
@@ -104,8 +103,8 @@ Notes (couriersud)
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/samples.h"
+#include "m10.h"
 
-#include "skychut.h"
 
 /*************************************
  *
@@ -121,29 +120,26 @@ Notes (couriersud)
  *
  *************************************/
 
-static PALETTE_INIT( skychut )
+static PALETTE_INIT( m10 )
 {
 	int i;
 
-	palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff));
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0x00));
-	palette_set_color(machine,2,MAKE_RGB(0xff,0x00,0xff));
-	palette_set_color(machine,3,MAKE_RGB(0xff,0x00,0x00));
-	palette_set_color(machine,4,MAKE_RGB(0x00,0xff,0xff));
-	palette_set_color(machine,5,MAKE_RGB(0x00,0xff,0x00));
-	palette_set_color(machine,6,MAKE_RGB(0x00,0x00,0xff));
-	palette_set_color(machine,7,MAKE_RGB(0x00,0x00,0x00));
-
-	for (i = 0;i < 8;i++)
+	for (i = 0; i < 0x10; i++)
 	{
-		colortable[2*i+0] = 7;
-		colortable[2*i+1] = i;
+		rgb_t color;
+
+		if (i & 0x01)
+			color = MAKE_RGB(pal1bit(~i >> 3), pal1bit(~i >> 2), pal1bit(~i >> 1));
+		else
+			color = RGB_BLACK;
+
+		palette_set_color(machine, i, color);
 	}
 }
 
 static MACHINE_RESET( irem )
 {
-	irem_state *state = Machine->driver_data;
+	m10_state *state = Machine->driver_data;
 
 	state_save_register_global(state->bottomline);
 	state_save_register_global(state->flip);
@@ -174,9 +170,9 @@ static MACHINE_RESET( irem )
  *              0x06: SAUCER HIT
  */
 
-static WRITE8_HANDLER( iremm10_ctrl_w )
+static WRITE8_HANDLER( m10_ctrl_w )
 {
-	irem_state *state = Machine->driver_data;
+	m10_state *state = Machine->driver_data;
 
 #if DEBUG
 	if (data & 0x40)
@@ -251,9 +247,9 @@ static WRITE8_HANDLER( iremm10_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( iremm11_ctrl_w )
+static WRITE8_HANDLER( m11_ctrl_w )
 {
-	irem_state *state = Machine->driver_data;
+	m10_state *state = Machine->driver_data;
 
 #if DEBUG
 	if (data & 0x4C)
@@ -284,9 +280,9 @@ static WRITE8_HANDLER( iremm11_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( iremm15_ctrl_w )
+static WRITE8_HANDLER( m15_ctrl_w )
 {
-	irem_state *state = Machine->driver_data;
+	m10_state *state = Machine->driver_data;
 
 #if DEBUG
 	if (data & 0xF0)
@@ -312,7 +308,7 @@ static WRITE8_HANDLER( iremm15_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( iremm10_a500_w )
+static WRITE8_HANDLER( m10_a500_w )
 {
 #if DEBUG
 	if (data & 0xFC)
@@ -320,7 +316,7 @@ static WRITE8_HANDLER( iremm10_a500_w )
 #endif
 }
 
-static WRITE8_HANDLER( iremm11_a100_w )
+static WRITE8_HANDLER( m11_a100_w )
 {
 	static int last = 0x00;
 	int raising_bits = data & ~last;
@@ -354,7 +350,7 @@ static WRITE8_HANDLER( iremm11_a100_w )
 
 }
 
-static WRITE8_HANDLER( iremm15_a100_w )
+static WRITE8_HANDLER( m15_a100_w )
 {
 	static int last = 0x00;
 	//int raising_bits = data & ~last;
@@ -412,14 +408,14 @@ static WRITE8_HANDLER( iremm15_a100_w )
 	last = data;
 }
 
-static READ8_HANDLER( iremm10_a700_r )
+static READ8_HANDLER( m10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	return 0x00;
 }
 
-static READ8_HANDLER( iremm11_a700_r )
+static READ8_HANDLER( m11_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(0));
 	return 0x00;
@@ -431,35 +427,35 @@ static READ8_HANDLER( iremm11_a700_r )
  *
  *************************************/
 
-static TIMER_CALLBACK( skychut_callback )
+static TIMER_CALLBACK( interrupt_callback )
 {
     if (param==0)
     {
 	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	    timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+16, 0), NULL, 1,skychut_callback);
+	    timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
     }
     if (param==1)
     {
 	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+24, 0), NULL, 2,skychut_callback);
+    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
     }
     if (param==-1)
 	    cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 }
 
-static INTERRUPT_GEN( iremm11_interrupt )
+static INTERRUPT_GEN( m11_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     else
     {
     	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,skychut_callback);
+    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
     }
 }
 
-static INTERRUPT_GEN( iremm10_interrupt )
+static INTERRUPT_GEN( m10_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
@@ -467,14 +463,14 @@ static INTERRUPT_GEN( iremm10_interrupt )
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( iremm15_interrupt )
+static INTERRUPT_GEN( m15_interrupt )
 {
 	if (readinputport(2) & 1)	/* Left Coin */
         cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     else
     {
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,skychut_callback);
+    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
     }
 }
 
@@ -484,45 +480,45 @@ static INTERRUPT_GEN( iremm15_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( iremm10_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
+static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
 	AM_RANGE(0xa300, 0xa300) AM_READ(input_port_0_r)
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(iremm10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa500, 0xa500) AM_WRITE(iremm10_a500_w)	/* ??? */
-	AM_RANGE(0xa700, 0xa700) AM_READ(iremm10_a700_r)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)	/* ??? */
+	AM_RANGE(0xa700, 0xa700) AM_READ(m10_a700_r)
 	AM_RANGE(0xfc00, 0xffff) AM_READ(MRA8_ROM)	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iremm11_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
+static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(iremm11_a100_w) /* sound writes ???? */
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
+	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
 	AM_RANGE(0xa300, 0xa300) AM_READ(input_port_0_r)
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(iremm11_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa700, 0xa700) AM_READ(iremm11_a700_r)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa700, 0xa700) AM_READ(m11_a700_r)
 	AM_RANGE(0xfc00, 0xffff) AM_READ(MRA8_ROM)	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iremm15_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(irem_state, memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x33ff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(irem_state, rom)
+static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x33ff) AM_READ(MRA8_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, skychut_colorram_w) AM_BASE(&colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(MRA8_RAM, iremm15_chargen_w) AM_BASE_MEMBER(irem_state, chargen) /* background ????? */
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(MRA8_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(MRA8_RAM, m15_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_3_r)
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(iremm15_a100_w) /* sound writes ???? */
+	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
 	AM_RANGE(0xa300, 0xa300) AM_READ(input_port_0_r)
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(iremm15_ctrl_w)	/* sound, flip screen */
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)	/* sound, flip screen */
 	AM_RANGE(0xfc00, 0xffff) AM_READ(MRA8_ROM)	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
@@ -626,7 +622,7 @@ static INPUT_PORTS_START( ipminvad )
 	CAB_PORTENV
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( spacebeam )
+static INPUT_PORTS_START( spacbeam )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -717,7 +713,7 @@ static const gfx_layout charlayout =
 };
 
 
-static GFXDECODE_START( skychut )
+static GFXDECODE_START( m10 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
 
@@ -727,7 +723,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *iremm10_sample_names[] =
+static const char *m10_sample_names[] =
 {
 	"*ipminvad",
 	"1.wav",		/* shot/missle */
@@ -744,10 +740,10 @@ static const char *iremm10_sample_names[] =
 };
 
 
-static struct Samplesinterface iremm10_samples_interface =
+static struct Samplesinterface m10_samples_interface =
 {
 	6,	/* 6 channels */
-	iremm10_sample_names
+	m10_sample_names
 };
 
 /*************************************
@@ -756,104 +752,98 @@ static struct Samplesinterface iremm10_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( iremm10 )
+static MACHINE_DRIVER_START( m10 )
 
-	MDRV_DRIVER_DATA(irem_state)
+	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("Main", M6502,IREMM10_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(iremm10_main,0)
+	MDRV_CPU_ADD_TAG("main", M6502,IREMM10_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(m10_main,0)
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT(iremm10_interrupt,1)
+	MDRV_CPU_VBLANK_INT(m10_interrupt,1)
 
 	MDRV_SCREEN_RAW_PARAMS(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(skychut)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*8)
+	MDRV_GFXDECODE(m10)
+	MDRV_PALETTE_LENGTH(2*8)
 
-	MDRV_PALETTE_INIT(skychut)
-	MDRV_VIDEO_START(iremm10)
-	MDRV_VIDEO_UPDATE(iremm10)
+	MDRV_PALETTE_INIT(m10)
+	MDRV_VIDEO_START(m10)
+	MDRV_VIDEO_UPDATE(m10)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(iremm10_samples_interface)
+	MDRV_SOUND_CONFIG(m10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( iremm11 )
+static MACHINE_DRIVER_START( m11 )
 
-	MDRV_DRIVER_DATA(irem_state)
+	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(iremm10)
-	MDRV_CPU_REPLACE("Main", M6502,IREMM10_CPU_CLOCK / 2)
-	//MDRV_CPU_MODIFY("Main")
-	MDRV_CPU_PROGRAM_MAP(iremm11_main,0)
-	MDRV_CPU_VBLANK_INT(iremm11_interrupt,1)
+	MDRV_IMPORT_FROM(m10)
+	MDRV_CPU_REPLACE("main", M6502,IREMM10_CPU_CLOCK / 2)
+	//MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(m11_main,0)
+	MDRV_CPU_VBLANK_INT(m11_interrupt,1)
 
 	/* sound hardware */
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( greenberet )
+static MACHINE_DRIVER_START( m15 )
 
-	MDRV_DRIVER_DATA(irem_state)
+	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502,IREMM15_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(iremm15_main,0)
+	MDRV_CPU_PROGRAM_MAP(m15_main,0)
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT(iremm15_interrupt,1)
+	MDRV_CPU_VBLANK_INT(m15_interrupt,1)
 
 	MDRV_SCREEN_RAW_PARAMS(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*8)
+	MDRV_PALETTE_LENGTH(2*8)
 
-	MDRV_PALETTE_INIT(skychut)
-	MDRV_VIDEO_START( iremm15 )
-	MDRV_VIDEO_UPDATE(iremm15)
+	MDRV_PALETTE_INIT(m10)
+	MDRV_VIDEO_START( m15 )
+	MDRV_VIDEO_UPDATE(m15)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SAMPLES, 0)
-	MDRV_SOUND_CONFIG(iremm10_samples_interface)
+	MDRV_SOUND_CONFIG(m10_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( headoni )
-	MDRV_IMPORT_FROM(greenberet)
+	MDRV_IMPORT_FROM(m15)
 	MDRV_CPU_REPLACE("main", M6502,11730000/16)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( andromed )
 {
 	int i;
-	irem_state *state = machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 	for (i=0x1c00;i<0x2000;i++)
 		state->rom[i]=0x60;
-}
-
-static DRIVER_INIT( iremm15 )
-{
 }
 
 
@@ -949,9 +939,9 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed, 0, iremm11,   skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
-GAME( 1979?,ipminvad, 0, iremm10,   ipminvad,   0, ROT270, "Irem", "IPM Invader", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
-GAME( 1980, skychut,  0, iremm11,    skychut,   0, ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, spacbeam, 0, greenberet, spacebeam, iremm15, ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979?,headoni,  0, headoni,    headoni,   iremm15, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1980, greenber, 0, greenberet, spacebeam, iremm15, ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1979, andromed, 0, m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
+GAME( 1979?,ipminvad, 0, m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
+GAME( 1980, skychut,  0, m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, spacbeam, 0, m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979?,headoni,  0, headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1980, greenber, 0, m15,     spacbeam, 0,        ROT270, "Irem", "Green Beret (Irem)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )

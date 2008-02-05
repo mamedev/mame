@@ -20,54 +20,43 @@ static tilemap *bg_tilemap,*fg_tilemap;
 PALETTE_INIT( retofinv )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[i + 0*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0*machine->drv->total_colors] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[i + 1*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 1*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 1*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 1*machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[i + 2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + 2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + 2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + 2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 3*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
+
 
 	/* fg chars (1bpp) */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	for (i = 0; i < 0x200; i++)
 	{
-		if (i % 2)
-			COLOR(0,i) = i/2;
+		UINT8 ctabentry;
+
+		if (i & 0x01)
+			ctabentry = i >> 1;
 		else
-			COLOR(0,i) = 0;
+			ctabentry = 0;
+
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	/* sprites */
-	for(i = 0;i < TOTAL_COLORS(2);i++)
-		COLOR(2,i) = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
-
-	/* bg tiles */
-	for(i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = BITSWAP8(color_prom[TOTAL_COLORS(2) + i],4,5,6,7,3,2,1,0);
+	/* sprites and bg tiles */
+	for (i = 0; i < 0x800; i++)
+	{
+		UINT8 ctabentry = BITSWAP8(color_prom[i],4,5,6,7,3,2,1,0);
+		colortable_entry_set_value(machine->colortable, i + 0x200, ctabentry);
+	}
 }
 
 
@@ -92,7 +81,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 static TILE_GET_INFO( bg_get_tile_info )
 {
 	SET_TILE_INFO(
-			1,
+			2,
 			retofinv_bg_videoram[tile_index] + 256 * bg_bank,
 			retofinv_bg_videoram[0x400 + tile_index] & 0x3f,
 			0);
@@ -101,10 +90,14 @@ static TILE_GET_INFO( bg_get_tile_info )
 static TILE_GET_INFO( fg_get_tile_info )
 {
 	/* not sure about the transparency thing, but it makes sense */
+	int color = retofinv_fg_videoram[0x400 + tile_index];
+
+	tileinfo->group = color;
+
 	SET_TILE_INFO(
 			0,
 			retofinv_fg_videoram[tile_index] + 256 * fg_bank,
-			retofinv_fg_videoram[0x400 + tile_index],
+			color,
 			(tile_index < 0x40 || tile_index >= 0x3c0) ? TILE_FORCE_LAYER0 : 0);
 }
 
@@ -119,9 +112,9 @@ static TILE_GET_INFO( fg_get_tile_info )
 VIDEO_START( retofinv )
 {
 	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan,TILEMAP_TYPE_COLORTABLE,8,8,36,28);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
 
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	colortable_configure_tilemap_groups(machine->colortable, fg_tilemap, machine->gfx[0], 0);
 
 	spriteram = retofinv_sharedram + 0x0780;
 	spriteram_2 = retofinv_sharedram + 0x0f80;
@@ -225,12 +218,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx(bitmap,machine->gfx[1],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					&spritevisiblearea,TRANSPARENCY_COLOR,0xff);
+					&spritevisiblearea,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0xff));
 			}
 		}
 	}

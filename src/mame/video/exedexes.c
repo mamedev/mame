@@ -39,55 +39,49 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 PALETTE_INIT( exedexes )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	/* characters use colors 192-207 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*color_prom++) + 192;
-
-	/* 32x32 tiles use colors 0-15 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = (*color_prom++);
-
-	/* 16x16 tiles use colors 64-79 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-		COLOR(2,i) = (*color_prom++) + 64;
-
-	/* sprites use colors 128-191 in four banks */
-	for (i = 0;i < TOTAL_COLORS(3);i++)
+	/* characters use colors 0xc0-0xcf */
+	for (i = 0; i < 0x100; i++)
 	{
-		COLOR(3,i) = color_prom[0] + 128 + 16 * color_prom[256];
-		color_prom++;
+		UINT8 ctabentry = color_prom[i] | 0xc0;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* 32x32 tiles use colors 0-0x0f */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = color_prom[i];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* 16x16 tiles use colors 0x40-0x4f */
+	for (i = 0x200; i < 0x300; i++)
+	{
+		UINT8 ctabentry = color_prom[i] | 0x40;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* sprites use colors 0x80-0xbf in four banks */
+	for (i = 0x300; i < 0x400; i++)
+	{
+		UINT8 ctabentry = color_prom[i] | (color_prom[i + 0x100] << 4) | 0x80;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -157,6 +151,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 	int code = videoram[tile_index] + 2 * (colorram[tile_index] & 0x80);
 	int color = colorram[tile_index] & 0x3f;
 
+	tileinfo->group = color;
+
 	SET_TILE_INFO(0, code, color, 0);
 }
 
@@ -181,10 +177,10 @@ VIDEO_START( exedexes )
 		TILEMAP_TYPE_PEN, 16, 16, 128, 128);
 
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_COLORTABLE, 8, 8, 32, 32);
+		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_transparent_pen(tx_tilemap, 207);
+	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0xcf);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
@@ -242,9 +238,8 @@ VIDEO_UPDATE( exedexes )
 	draw_sprites(machine, bitmap, cliprect, 0);
 
 	if (chon)
-	{
 		tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
-	}
+
 	return 0;
 }
 
