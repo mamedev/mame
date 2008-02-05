@@ -103,14 +103,17 @@ static void debug_comment_free(void);
 
 int debug_comment_init(running_machine *machine)
 {
-	/* allocate enough comment groups for the total # of cpu's */
-	debug_comments = (comment_group*) auto_malloc(cpu_gettotalcpu() * sizeof(comment_group));
-	memset(debug_comments, 0, cpu_gettotalcpu() * sizeof(comment_group));
+	if (cpu_gettotalcpu() > 0)
+	{
+		/* allocate enough comment groups for the total # of cpu's */
+		debug_comments = (comment_group*) auto_malloc(cpu_gettotalcpu() * sizeof(comment_group));
+		memset(debug_comments, 0, cpu_gettotalcpu() * sizeof(comment_group));
 
-	/* automatically load em up */
-	debug_comment_load();
+		/* automatically load em up */
+		debug_comment_load();
 
-	add_exit_callback(machine, debug_comment_exit);
+		add_exit_callback(machine, debug_comment_exit);
+	}
 
 	return 1;
 }
