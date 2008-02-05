@@ -261,6 +261,7 @@ static void cpuexec_reset(running_machine *machine)
 	/* set up the watchdog timer; only start off enabled if explicitly configured */
 	watchdog_enabled = (machine->drv->watchdog_vblank_count != 0 || attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0);
 	watchdog_reset(machine);
+	watchdog_enabled = TRUE;
 
 	/* first pass over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
