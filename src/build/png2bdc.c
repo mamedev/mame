@@ -50,7 +50,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "osdcore.h"
 #include "png.h"
 
 

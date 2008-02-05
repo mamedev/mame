@@ -53,9 +53,9 @@ $(FILE2STR): $(FILE2STROBJS)
 PNG2BDCOBJS = \
 	$(BUILDOBJ)/png2bdc.o \
 
-$(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+$(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBUTIL) $(LIBOCORE) $(ZLIB) -o $@
 
 #-------------------------------------------------
 # rule for making the verinfo tool
