@@ -111,13 +111,6 @@
                 raw pen value and looking it up in a table to determine
                 which layer(s) each pixel belongs to
 
-            TILEMAP_TYPE_COLORTABLE - this is less common and
-                will eventually be deprecated; it means that transparency
-                is determined by taking the raw pen value, looking it up
-                in the machine's colortable, and then looking that value
-                up in a table to determine which layer(s) each pixel
-                belongs to
-
         tilewidth = the width, in pixels, of each individual tile
 
         tileheight = the height, in pixels, of each individual tile
@@ -259,12 +252,6 @@
             of type TILEMAP_TYPE_PEN, and then call
             tilemap_set_transparent_pen() to specify which pen is
             transparent; all other pens will map to layer 0.
-
-        TILEMAP_TRANSPARENT_COLOR: This works just like before and
-            even has the same type name. Create a tilemap of type
-            TILEMAP_TYPE_COLORTABLE and call
-            tilemap_set_transparent_pen() to specify which remapped pen
-            is transparent.
 
         TILEMAP_BITMASK: This type is no longer special; with the new
             code, any tile_get_info callback can specify a bitmask which
@@ -410,7 +397,6 @@ typedef struct _tilemap tilemap;
 enum _tilemap_type
 {
 	TILEMAP_TYPE_PEN,				/* pen-to-layer mapping is determined by pen lookup */
-	TILEMAP_TYPE_COLORTABLE			/* pen-to-layer mapping is determined by colortable[pen] lookup */
 };
 typedef enum _tilemap_type tilemap_type;
 
