@@ -1537,7 +1537,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fortecar.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funworld.o $(VIDEO)/funworld.o \
-	$(DRIVERS)/galgames.o \
 	$(DRIVERS)/gamecstl.o \
 	$(DRIVERS)/gdrawpkr.o $(VIDEO)/gdrawpkr.o \
 	$(DRIVERS)/gtipoker.o \

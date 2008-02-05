@@ -1,6 +1,6 @@
 /***************************************************************************
 
-                          -=  Touch Master Games =-
+                      -= Touch Master / Galaxy Games =-
 
                     driver by   Luca Elia (l.elia@tin.it)
 
@@ -8,10 +8,11 @@
 CPU:    68000
 Video:  Blitter, double framebuffer
 Sound:  OKI6295
+
+[Touch Master]
+
 Input:  Pressure sensitive touch screen
 Other:  Dallas NVRAM + optional RTC
-
-
 To Do:
 
 - Proper touchscreen controller emulation. Currently it's flakey and
@@ -21,12 +22,20 @@ To Do:
 - RTC emulation (there's code to check the upper bytes of NVRAM to see if
   the real time clock is present, and to only use it in that case)
 
+[Galaxy Games]
+
+Input:  Trackballs and buttons
+Other:  EEPROM
+To Do:
+
+- Coin optics
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
+#include "machine/eeprom.h"
 
 /***************************************************************************
 
@@ -125,34 +134,109 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
 
                                 Video & Blitter
 
+
+    Offset:     Bits:           Value:
+
+        02      
+                fedc ba-- ---- ----
+                ---- --9- ---- ----       Layer 1 Buffer To Display
+                ---- ---8 ---- ----       Layer 0 Buffer To Display
+                ---- ---- 7654 3210
+
+        04                                Width
+        06                                X
+
+        08                                Height - 1
+        0A                                Y
+
+        0C                                Source Address (low)
+        0E                                Source Address (mid)
+
+        10      fedc ba98 ---- ---- 
+                ---- ---- 7--- ----       Layer
+                ---- ---- -6-- ----       Buffer
+                ---- ---- --5- ----       Solid Fill
+                ---- ---- ---4 ----       flipped by lev.3 interrupt routine
+                ---- ---- ---- 3---       flipped by lev.2 interrupt routine
+                ---- ---- ---- -2--       flipped by lev.1 interrupt routine
+                ---- ---- ---- --1-       Flip Y
+                ---- ---- ---- ---0       Flip X
+
+        12      fedc ba98 ---- ----       Solid Fill Pen
+                ---- ---- 7654 3210       Source Address (high)
+
+    A write to the source address (high) triggers the blit.
+    A the end of the blit, a level 2 IRQ is issued.
+
 ***************************************************************************/
 
-static mame_bitmap *tmaster_bitmap[2];
+static mame_bitmap *tmaster_bitmap[2][2];	// 2 layers, 2 buffers per layer
 static UINT16 *tmaster_regs;
 static UINT16 tmaster_color;
 static UINT16 tmaster_addr;
+static int (*compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
+
+int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+{
+	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
+}
+
+int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+{
+	return reg_low | (reg_mid << 16);
+}
 
 static VIDEO_START( tmaster )
 {
-	int i;
-	for (i = 0; i < 2; i++)
-		tmaster_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	int layer, buffer;
+	for (layer = 0; layer < 2; layer++)
+	{
+		for (buffer = 0; buffer < 2; buffer++)
+		{
+			tmaster_bitmap[layer][buffer] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+			bitmap_fill(tmaster_bitmap[layer][buffer], NULL, 0xff);
+		}
+	}
+
+	compute_addr = tmaster_compute_addr;
+}
+
+static VIDEO_START( galgames )
+{
+	VIDEO_START_CALL( tmaster );
+	compute_addr = galgames_compute_addr;
 }
 
 static VIDEO_UPDATE( tmaster )
 {
-	// double buffering
-	copybitmap(bitmap,tmaster_bitmap[(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,cliprect);
+	int layers_ctrl = -1;
 
-	show_touchscreen();
+#if MAME_DEBUG
+	if (input_code_pressed(KEYCODE_Z))
+	{
+		int mask = 0;
+		if (input_code_pressed(KEYCODE_Q))	mask |= 1;
+		if (input_code_pressed(KEYCODE_W))	mask |= 2;
+		if (mask != 0) layers_ctrl &= mask;
+	}
+#endif
+
+	
+	if (layers_ctrl & 1)	copybitmap			(bitmap,tmaster_bitmap[0][(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,&machine->screen[0].visarea);
+	else					fillbitmap(bitmap,get_black_pen(machine),cliprect);
+
+	if (layers_ctrl & 2)	copybitmap_trans	(bitmap,tmaster_bitmap[1][(tmaster_regs[0x02/2]>>9)&1],0,0,0,0,&machine->screen[0].visarea,0xff);
+
 	return 0;
 }
 
 static WRITE16_HANDLER( tmaster_color_w )
 {
 	COMBINE_DATA( &tmaster_color );
+#if 0
 	if (tmaster_color & ~7)
 		logerror("%06x: color %04x\n", activecpu_get_pc(), tmaster_color);
+#endif
 }
 
 static WRITE16_HANDLER( tmaster_addr_w )
@@ -162,7 +246,7 @@ static WRITE16_HANDLER( tmaster_addr_w )
 
 static void tmaster_draw(void)
 {
-	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, dest;
+	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
 	UINT8 *gfxdata	=	memory_region( REGION_GFX1 );
 	size_t size		=	memory_region_length( REGION_GFX1 );
@@ -171,17 +255,19 @@ static void tmaster_draw(void)
 
 	mame_bitmap *bitmap;
 
-	dest	=	 (tmaster_regs[0x02/2] >> 8) & 1;
- 	sw		=	  tmaster_regs[0x04/2];
-	sx		=	  tmaster_regs[0x06/2];
-	sh		=	  tmaster_regs[0x08/2] + 1;
-	sy		=	  tmaster_regs[0x0a/2];
-	addr	=	( tmaster_regs[0x0c/2] & 0xff) |
-				((tmaster_regs[0x0e/2] & 0x1ff) << 8) | (tmaster_addr << 17);
-	mode	=	  tmaster_regs[0x10/2];
+	buffer	=	(tmaster_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
+ 	sw		=	 tmaster_regs[0x04/2];
+	sx		=	 tmaster_regs[0x06/2];
+	sh		=	 tmaster_regs[0x08/2] + 1;
+	sy		=	 tmaster_regs[0x0a/2];
+	addr	=	compute_addr(
+				 tmaster_regs[0x0c/2],
+				 tmaster_regs[0x0e/2], tmaster_addr);
+	mode	=	 tmaster_regs[0x10/2];
 
-	dest	^=	(mode >> 6) & 1;
-	bitmap	=	tmaster_bitmap[dest];
+	layer	=	(mode >> 7) & 1;	// layer to draw to
+	buffer	=	((mode >> 6) & 1) ^ ((buffer >> layer) & 1);	// bit 6 selects whether to use the opposite buffer to that displayed
+	bitmap	=	tmaster_bitmap[layer][buffer];
 
 	addr <<= 1;
 
@@ -200,13 +286,18 @@ static void tmaster_draw(void)
 	if (flipy)	{ y0 = sh-1;	y1 = -1;	dy = -1;	sy -= sh-1;	}
 	else		{ y0 = 0;		y1 = sh;	dy = +1;	}
 
+	sx = (sx & 0x7fff) - (sx & 0x8000);
+	sy = (sy & 0x7fff) - (sy & 0x8000);
+
+	color = (tmaster_color & 7) << 8;
+
 	switch (mode & 0x20)
 	{
 		case 0x00:							// blit with transparency
-			if (addr > (size - sw*sh))
+			if (addr > size - sw*sh)
 			{
 				logerror("%06x: blit error, addr %06x out of bounds\n", activecpu_get_pc(),addr);
-				return;
+				addr = size - sw*sh;
 			}
 
 			for (y = y0; y != y1; y += dy)
@@ -216,19 +307,19 @@ static void tmaster_draw(void)
 					data = gfxdata[addr++];
 
 					if ((data != 0xff) && (sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						*BITMAP_ADDR16(bitmap, sy + y, sx + x) = data + ((tmaster_color & 7) << 8);
+						*BITMAP_ADDR16(bitmap, sy + y, sx + x) = data + color;
 				}
 			}
 			break;
 
 		case 0x20:							// solid fill
-			data = tmaster_addr & 0xff;
+			data = ((tmaster_addr >> 8) & 0xff) + color;
 			for (y = y0; y != y1; y += dy)
 			{
 				for (x = x0; x != x1; x += dx)
 				{
 					if ((sx + x >= 0) && (sx + x < 400) && (sy + y >= 0) && (sy + y < 256))
-						*BITMAP_ADDR16(bitmap, sy + y, sx + x) = data + ((tmaster_color & 7) << 8);
+						*BITMAP_ADDR16(bitmap, sy + y, sx + x) = data;
 				}
 			}
 			break;
@@ -257,6 +348,10 @@ static READ16_HANDLER( tmaster_blitter_r )
 
                                 Memory Maps
 
+***************************************************************************/
+
+/***************************************************************************
+                                Touch Master
 ***************************************************************************/
 
 static READ16_HANDLER( tmaster_coins_r )
@@ -296,6 +391,186 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
+                                Galaxy Games
+***************************************************************************/
+
+// NVRAM
+
+static const struct EEPROM_interface galgames_eeprom_interface =
+{
+	10,					// address bits 10
+	8,					// data bits    8
+	"*1100",			// read         110 0aaaaaaaaaa
+	"*1010",			// write        101 0aaaaaaaaaa dddddddd
+	"*1110",			// erase        111 0aaaaaaaaaa
+	"*10000xxxxxxxxx",	// lock         100 00xxxxxxxxx
+	"*10011xxxxxxxxx",	// unlock       100 11xxxxxxxxx
+	0,					// multi_read
+	1					// reset_delay
+};
+
+static READ16_HANDLER( galgames_eeprom_r )
+{
+	return EEPROM_read_bit() ? 0x80 : 0x00;
+}
+
+static WRITE16_HANDLER( galgames_eeprom_w )
+{
+	if (data & ~0x0003)
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+
+	if ( ACCESSING_LSB )
+	{
+		// latch the bit
+		EEPROM_write_bit(data & 0x0001);
+
+		// clock line asserted: write latch or select next bit to read
+		EEPROM_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
+	}
+}
+
+static NVRAM_HANDLER( galgames )
+{
+	if (read_or_write)
+		EEPROM_save(file);
+	else
+	{
+		EEPROM_init(&galgames_eeprom_interface);
+		if (file)	EEPROM_load(file);
+	}
+}
+
+// BT481A Palette RAMDAC
+static UINT32 palette_offset;
+static UINT8 palette_index;
+static UINT8 palette_data[3];
+
+static WRITE16_HANDLER( galgames_palette_offset_w )
+{
+	if (ACCESSING_LSB)
+	{
+		palette_offset = data & 0xff;
+		palette_index = 0;
+	}
+}
+static WRITE16_HANDLER( galgames_palette_data_w )
+{
+	if (ACCESSING_LSB)
+	{
+		palette_data[palette_index] = data & 0xff;
+		if (++palette_index == 3)
+		{
+			palette_set_color(Machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_index = 0;
+			palette_offset++;
+		}
+	}
+}
+
+// Sound
+static READ16_HANDLER( galgames_okiram_r )
+{
+	return memory_region(REGION_SOUND1)[offset] | 0xff00;
+}
+static WRITE16_HANDLER( galgames_okiram_w )
+{
+	if (ACCESSING_LSB)
+		memory_region(REGION_SOUND1)[offset] = data & 0xff;
+}
+
+
+// Carts communication (preliminary, no cart is dumped yet)
+
+static WRITE16_HANDLER( galgames_cart_sel_w )
+{
+	// cart selection (0 1 2 3 4 7)
+
+	// 7 resets the eeprom
+	if (ACCESSING_LSB)
+		EEPROM_set_cs_line(((data&0xff) == 0x07) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static READ16_HANDLER( galgames_cart_clock_r )
+{
+	return 0x0080;
+}
+
+static WRITE16_HANDLER( galgames_cart_clock_w )
+{
+	if (ACCESSING_LSB)
+	{
+		// bit 3 = clock
+
+		// ROM/RAM banking
+		if ((data & 0xf7) == 0x05)
+		{
+			memory_set_bank(1, 1);	// ram
+			memory_set_bank(3, 0);	// rom
+			logerror("%06x: romram bank = %04x\n", activecpu_get_pc(), data);
+		}
+		else
+		{
+			memory_set_bank(1, 0);	// rom
+			logerror("%06x: unknown romram bank = %04x\n", activecpu_get_pc(), data);
+		}
+	}
+}
+
+static READ16_HANDLER( galgames_cart_data_r )
+{
+	return 0;
+}
+static WRITE16_HANDLER( galgames_cart_data_w )
+{
+}
+
+
+static READ16_HANDLER( dummy_read_01 )
+{
+	return 0x3;	// Pass the check at PC = 0xfae & a later one
+}
+
+static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
+
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(MRA16_BANK1, MWA16_BANK2)
+	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
+	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(MRA16_BANK3, MWA16_BANK4)
+	AM_RANGE( 0x240000, 0x3fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
+
+	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
+	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE( tmaster_addr_w )
+	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE( tmaster_color_w )
+	AM_RANGE( 0x400020, 0x400021 ) AM_READ ( tmaster_blitter_r )
+
+	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( dummy_read_01, MWA16_NOP )
+	AM_RANGE( 0x700000, 0x700001 ) AM_READWRITE( dummy_read_01, MWA16_NOP )
+	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
+	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
+
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )
+	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
+
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE( galgames_palette_offset_w )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE( galgames_palette_data_w )
+
+	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ ( input_port_0_word_r )	// trackball p1 x
+	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITE( MWA16_NOP )
+	AM_RANGE( 0xd00002, 0xd00003 ) AM_READ ( input_port_1_word_r )	// trackball p1 y
+	AM_RANGE( 0xd00004, 0xd00005 ) AM_READ ( input_port_2_word_r )	// trackball p2 x
+	AM_RANGE( 0xd00006, 0xd00007 ) AM_READ ( input_port_3_word_r )	// trackball p2 y
+	AM_RANGE( 0xd00008, 0xd00009 ) AM_READ ( input_port_4_word_r )
+	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ ( input_port_5_word_r )
+	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READWRITE( input_port_6_word_r, MWA16_NOP )
+
+	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE ( galgames_cart_sel_w )
+	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE( galgames_eeprom_r, galgames_eeprom_w )
+	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE( galgames_cart_data_r, galgames_cart_data_w )
+	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE( galgames_cart_clock_r, galgames_cart_clock_w )
+
+ADDRESS_MAP_END
+
+
+/***************************************************************************
 
                                 Input Ports
 
@@ -327,6 +602,51 @@ static INPUT_PORTS_START( tmaster )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2		)	// e. coin 2
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3		)	// e. coin 3
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4		)	// e. coin 4
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( galgames )
+	PORT_START_TAG("TRACKBALL_1_X")
+    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
+	PORT_START_TAG("TRACKBALL_1_Y")
+    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_RESET
+
+	PORT_START_TAG("TRACKBALL_2_X")
+    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
+	PORT_START_TAG("TRACKBALL_2_Y")
+    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(5) PORT_PLAYER(2) PORT_RESET
+
+	PORT_START_TAG("IN4")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// Button A (right)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	// Button B (left)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN5")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// Button A (right)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	// Button B (left)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1)					// DBA (coin)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN6")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )	// CS 1 (coin)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )	// CS 2 (coin)
+	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )	// System Check
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -407,6 +727,55 @@ static MACHINE_DRIVER_START( tm )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+static INTERRUPT_GEN( galgames_interrupt )
+{
+	switch (cpu_getiloops())
+	{
+		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
+					// lev 2 triggered at the end of a blit
+		default:	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+	}
+}
+
+static MACHINE_RESET( galgames )
+{
+	memory_set_bank(1, 0);	// rom
+	memory_set_bank(3, 1);	// ram
+
+	memory_set_bank(2, 0);	// ram
+	memory_set_bank(4, 0);	// ram
+}
+
+static MACHINE_DRIVER_START( galgames )
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz / 2)
+	MDRV_CPU_PROGRAM_MAP(galgames_map,0)
+	MDRV_CPU_VBLANK_INT(galgames_interrupt, 1+20)	// ??
+
+	MDRV_NVRAM_HANDLER( galgames )
+	MDRV_MACHINE_RESET( galgames )
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_SCREEN_SIZE(400, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 256-1)
+	MDRV_PALETTE_LENGTH(0x800)	// only 0x100 used
+
+	MDRV_VIDEO_START(galgames)
+	MDRV_VIDEO_UPDATE(tmaster)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, XTAL_24MHz / 8)	// ??
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -543,6 +912,62 @@ ROM_START( tm4k )
 	ROM_LOAD( "tm4k_u8.bin", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) )
 ROM_END
 
+/***************************************************************************
+
+Galaxy Games BIOS v. 1.90
+
+This is a multi-game cocktail cabinet released in 1998.  Namco seems to have
+made some cartridges for it (or at least licensed their IP).
+
+Trackball-based. 'BIOS' has 7 built-in games. There are two LEDs on the PCB.
+
+More information here : http://www.cesgames.com/museum/galaxy/index.html
+
+----
+
+Board silkscreend  237-0211-00
+                   REV.-D
+
+Cartridge based mother board
+Holds up to 4 cartridges
+Chips labeled 
+    GALAXY U1 V1.90 12/1/98
+    GALAXY U2 V1.90 12/1/98
+
+NAMCO 307 Cartridge has surface mount Flash chips in it (not dumped).
+
+Motorola MC68HC000FN12
+24 MHz oscillator
+Xilinx XC5206
+Xilinx XC5202
+BT481AKPJ110 (Palette RAMDAC)
+NKK N341024SJ-15	x8  (128kB RAM)
+OKI M6295 8092352-2
+
+PAL16V8H-15 @ U24	Blue dot on it
+PAL16V8H-15 @ U25	Yellow dot on it
+PAL16V8H-15 @ U26	Red dot on it
+PAL16V8H-15 @ U27	Green dot on it
+PAL16V8H-15 @ U45	red dot on it
+
+***************************************************************************/
+
+ROM_START( galgbios )
+	ROM_REGION( 0x200000 + 0x40000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "galaxy.u2", 0x1c0000, 0x020000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083) )
+	ROM_CONTINUE(                 0x000000, 0x0e0000 )
+	ROM_LOAD16_BYTE( "galaxy.u1", 0x1c0001, 0x020000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760) )
+	ROM_CONTINUE(                 0x000001, 0x0e0000 )
+	ROM_FILL(                     0x200000, 0x040000, 0)	// RAM
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD16_BYTE( "galaxy.u2", 0x000000, 0x100000, CRC(e51ff184) SHA1(aaa795f2c15ec29b3ceeb5c917b643db0dbb7083) )
+	ROM_LOAD16_BYTE( "galaxy.u1", 0x000001, 0x100000, CRC(c6d7bc6d) SHA1(93c032f9aa38cbbdda59a8a25ff9f38f7ad9c760) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, ROMREGION_ERASE )
+	// RAM, filled by the 68000 and fed to the OKI
+ROM_END
+
 static DRIVER_INIT( tm3k )
 {
 	// try this if you need to calibrate
@@ -569,6 +994,17 @@ static DRIVER_INIT( tm4k )
 	ROM[0x8346C/2] = 0x6002;
 }
 
-GAME( 1996, tm,   0, tm,   tmaster, 0,    ROT0, "Midway", "Touchmaster",              GAME_NOT_WORKING )
-GAME( 1997, tm3k, 0, tm3k, tmaster, tm3k, ROT0, "Midway", "Touchmaster 3000 (v5.01)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS)
-GAME( 1998, tm4k, 0, tm3k, tmaster, tm4k, ROT0, "Midway", "Touchmaster 4000 (v6.02)", GAME_NOT_WORKING )
+static DRIVER_INIT( galgames )
+{
+	// configure memory banks
+	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1)+0x1c0000, 0x40000);
+	memory_configure_bank(3, 0, 2, memory_region(REGION_CPU1)+0x1c0000, 0x40000);
+
+	memory_configure_bank(2, 0, 1, memory_region(REGION_CPU1)+0x200000, 0x40000);
+	memory_configure_bank(4, 0, 1, memory_region(REGION_CPU1)+0x200000, 0x40000);
+}
+
+GAME( 1996, tm,       0, tm,       tmaster,  0,        ROT0, "Midway",                         "Touchmaster",               GAME_NOT_WORKING )
+GAME( 1997, tm3k,     0, tm3k,     tmaster,  tm3k,     ROT0, "Midway",                         "Touchmaster 3000 (v5.01)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
+GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02)",  GAME_NOT_WORKING )
+GAME( 1998, galgbios, 0, galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )

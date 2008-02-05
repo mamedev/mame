@@ -6063,10 +6063,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gauntd24 )	/* (c) 1999 Midway Games */
 	DRIVER( cartfury )	/* (c) 2000 Midway Games */
 
-	/* Midway Touchmaster games */
+	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
 	DRIVER( tm3k )		/* (c) 1996 Midway Games */
 	DRIVER( tm4k )		/* (c) 1996 Midway Games */
+	DRIVER( galgbios )  /* (c) 1998 Creative Electonics & Software (CES) */
 
 	/* Cinematronics raster games */
 	DRIVER( embargo )
@@ -7925,7 +7926,6 @@ Other Sun games
 	DRIVER( drw80pkr )
 	DRIVER( blazlaz )
 	DRIVER( paranoia )
-	DRIVER( galgbios )  /* (c) 1998 Creative Electonics */
 	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
 
