@@ -57,5 +57,17 @@ $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
-endif
+#-------------------------------------------------
+# rule for making the verinfo tool
+#-------------------------------------------------
 
+VERINFO = $(BUILDOBJ)/verinfo$(EXE)
+
+VERINFOOBJS = \
+	$(BUILDOBJ)/verinfo.o
+
+$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+endif

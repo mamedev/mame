@@ -289,17 +289,8 @@ $(LEDUTIL): $(LEDUTILOBJS) $(LIBOCORE)
 # rule for making the verinfo tool
 #-------------------------------------------------
 
-VERINFO = $(WINOBJ)/verinfo$(EXE)
-
 ifneq ($(CROSS_BUILD),1)
 BUILD += $(VERINFO)
-
-VERINFOOBJS = \
-	$(WINOBJ)/verinfo.o
-
-$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 endif
 
 
