@@ -1167,7 +1167,7 @@ static void setup_playback(running_machine *machine)
 
 	/* Check if input file is an eXtended INP file */
 	extended_inp = (memcmp(check, "XINP\0\0\0", 7) == 0);
-	if (extended_inp)
+	if (!extended_inp)
 	{
 		/* read playback header */
 		mame_fread(machine->playback_file, &inpheader, sizeof(inpheader));
