@@ -91,6 +91,7 @@ void crtc6845_config(int which, const crtc6845_interface *intf)
 {
 	crtc6845_state *chip = &crtc6845;
 
+	memset(chip, 0, sizeof(*chip));
 	crtc6845_init();
 
 	chip->intf = intf;

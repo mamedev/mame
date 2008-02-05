@@ -30,8 +30,8 @@ static SOUND_START( irem_audio )
 
 /*************************************
  *
- *  External writes to the sound 
- *	command register
+ *  External writes to the sound
+ *  command register
  *
  *************************************/
 
