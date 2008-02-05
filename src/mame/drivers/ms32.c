@@ -1,5 +1,8 @@
 /* Jaleco MegaSystem 32 (Preliminary Driver)
 
+--- this driver is about to undergo a major update
+     based on actual hardware tests ---
+
 
 Used by Jaleco in the Mid-90's this system, based on the V70 processor consisted
 of a two board set up, the first a standard mainboard and the second a 'cartridge'
@@ -1999,6 +2002,42 @@ ROM_START( tp2m32 )
 	ROM_LOAD( "tp2m3205.22", 0x000000, 0x200000, CRC(74aa5c31) SHA1(7e3f86198fb678244fab76bee9c72bbdfc818118) )
 ROM_END
 
+
+
+ROM_START( bnstars ) /* ver 1.1 */
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* V70 code */
+ 	ROM_LOAD32_BYTE( "vsjanshi26.37", 0x000003, 0x80000, CRC(75eeec8f) SHA1(26315381baa0abb470203dc565ad98c52fe17b20) )
+	ROM_LOAD32_BYTE( "vsjanshi27.38", 0x000002, 0x80000, CRC(69f24ab9) SHA1(e019a444111e4ed7f9a378d6e2d13ddb9324bc49) )
+	ROM_LOAD32_BYTE( "vsjanshi28.39", 0x000001, 0x80000, CRC(d075cfb6) SHA1(f70741e9f536d5c7604126d36c7aa8ed8f25c329) )
+	ROM_LOAD32_BYTE( "vsjanshi29.40", 0x000000, 0x80000, CRC(bc395b50) SHA1(84d7cc492a11a5a9402e929f0bd138ad63e3d079) )
+
+	ROM_REGION( 0x1000000, REGION_GFX1, 0 ) /* sprites, don't dispose since we use GFX_RAW */
+	ROM_LOAD32_WORD( "mr96004-01.13", 0x000000, 0x200000, CRC(3366d104) SHA1(2de0cabe2ead777b5b02cade7f2003ef7f90b75b) )
+	ROM_LOAD32_WORD( "mr96004-02.1",  0x000002, 0x200000, CRC(ad556664) SHA1(4b36f8d8d9efa37cf515af41d14433e7eafa27a2) )
+	ROM_LOAD32_WORD( "mr96004-03.14", 0x400000, 0x200000, CRC(b399e2b1) SHA1(9b6a00a219db8d66dcf592160b7b5f7a86b8f0c9) )
+	ROM_LOAD32_WORD( "mr96004-04.2",  0x400002, 0x200000, CRC(f4f4cf4a) SHA1(fe497989cf96c68602f68f14920aed44fd934573) )
+	ROM_LOAD32_WORD( "mr96004-05.15", 0x800000, 0x200000, CRC(cd6c357e) SHA1(44cd2d0607c7ccd80f701cf1675fd283acb07252) )
+	ROM_LOAD32_WORD( "mr96004-06.3",  0x800002, 0x200000, CRC(fc6daad7) SHA1(99f14ac6b06ad9a8a3d2e9f69b693c7ce420a47d) )
+	ROM_LOAD32_WORD( "mr96004-07.16", 0xc00000, 0x200000, CRC(177e32fa) SHA1(3ca1f397dc28f1fa3a4136705b92c63e4e438f05) )
+	ROM_LOAD32_WORD( "mr96004-08.4",  0xc00002, 0x200000, CRC(f6df27b2) SHA1(60590976020d86bdccd4eaf57b349ea31bec6830) )
+
+	ROM_REGION( 0x400000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr96004-09.11",  0x000000, 0x400000, CRC(7f8ea9f0) SHA1(f1fe682dcb884f1aa4a5536e17ab94157a99f519) )
+
+	ROM_REGION( 0x200000, REGION_GFX3, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr96004-11.10", 0x000000, 0x200000,  CRC(e6da552c) SHA1(69a5af3015883793c7d1343243ccae23db9ef77c) )
+
+	ROM_REGION( 0x080000, REGION_GFX4, 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "vsjanshi30.41",  0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
+
+	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* z80 program */
+	ROM_LOAD( "vsjanshi21.30",  0x000000, 0x040000, CRC(d622bce1) SHA1(059fcc3c7216d3ea4f3a4226a06219375ce8c2bf) )
+	ROM_RELOAD(              0x010000, 0x40000 )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples - 8-bit signed PCM */
+	ROM_LOAD( "mr96004-10.22",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
+ROM_END
+
 /********** DECRYPT **********/
 
 /* 4 known types */
@@ -2216,6 +2255,14 @@ static DRIVER_INIT (f1superb)
 	DRIVER_INIT_CALL(ss92046_01);
 }
 
+static DRIVER_INIT (bnstars)
+{
+//  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
+	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
+
+	DRIVER_INIT_CALL(ss92046_01);
+}
+
 /********** GAME DRIVERS **********/
 
 
@@ -2234,6 +2281,7 @@ GAME( 1996, gratia,   0,        ms32, gratia,   ss92047_01, ROT0,   "Jaleco", "G
 GAME( 1996, gratiaa,  gratia,   ms32, gratia,   ss91022_10, ROT0,   "Jaleco", "Gratia - Second Earth (91022-10 version)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1996, kirarast, 0,        ms32, kirarast, kirarast,   ROT0,   "Jaleco", "Ryuusei Janshi Kirara Star", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1997, tp2m32,   tetrisp2, ms32, tp2m32,   ss91022_10, ROT0,   "Jaleco", "Tetris Plus 2 (MegaSystem 32 Version)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, bnstars,  bnstars1, ms32, 47pie2,   bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* these boot and show something */
 GAME( 1994, f1superb, 0,        ms32, f1superb, f1superb, ROT0,   "Jaleco", "F1 Super Battle", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
