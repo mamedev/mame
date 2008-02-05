@@ -440,7 +440,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	tx_tilemap = tilemap_create(get_tile_info,tilemap_scan,8,8,36,28);
 	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0x1f);
 
 	galaga_gfxbank = 0;

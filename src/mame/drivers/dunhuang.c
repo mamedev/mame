@@ -95,10 +95,10 @@ static TILE_GET_INFO( get_tile_info2 )
 static VIDEO_START(dunhuang)
 {
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
-							TILEMAP_TYPE_PEN, 8,8, 0x40,0x20	);
+							8,8, 0x40,0x20	);
 
 	tmap2 = tilemap_create(	get_tile_info2, tilemap_scan_rows,
-							TILEMAP_TYPE_PEN, 8,32, 0x40,0x8	);
+							8,32, 0x40,0x8	);
 
 	tilemap_set_transparent_pen(tmap,   0);
 	tilemap_set_transparent_pen(tmap2,  0);

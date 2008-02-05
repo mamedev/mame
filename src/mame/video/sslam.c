@@ -142,9 +142,9 @@ WRITE16_HANDLER( powerbls_bg_tileram_w )
 
 VIDEO_START(sslam)
 {
-	sslam_bg_tilemap = tilemap_create(get_sslam_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	sslam_md_tilemap = tilemap_create(get_sslam_md_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	sslam_tx_tilemap = tilemap_create(get_sslam_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	sslam_bg_tilemap = tilemap_create(get_sslam_bg_tile_info,tilemap_scan_rows,16,16,32,32);
+	sslam_md_tilemap = tilemap_create(get_sslam_md_tile_info,tilemap_scan_rows,16,16,32,32);
+	sslam_tx_tilemap = tilemap_create(get_sslam_tx_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(sslam_md_tilemap,0);
 	tilemap_set_transparent_pen(sslam_tx_tilemap,0);
@@ -155,7 +155,7 @@ VIDEO_START(sslam)
 
 VIDEO_START(powerbls)
 {
-	sslam_bg_tilemap = tilemap_create(get_powerbls_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	sslam_bg_tilemap = tilemap_create(get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	sprites_x_offset = -21;
 	state_save_register_global(sprites_x_offset);

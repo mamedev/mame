@@ -70,8 +70,8 @@ static void all_tiles_dirty(void)
 
 VIDEO_START( renegade )
 {
-	bg_tilemap = tilemap_create(get_bg_tilemap_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,     16, 16, 64, 16);
-	fg_tilemap = tilemap_create(get_fg_tilemap_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,  8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tilemap_info, tilemap_scan_rows,      16, 16, 64, 16);
+	fg_tilemap = tilemap_create(get_fg_tilemap_info, tilemap_scan_rows,   8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 256, 0);

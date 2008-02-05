@@ -61,8 +61,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( citycon )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,citycon_scan,TILEMAP_TYPE_PEN,8,8,128,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,citycon_scan,TILEMAP_TYPE_PEN,     8,8,128,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,citycon_scan,8,8,128,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,citycon_scan,     8,8,128,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scroll_rows(fg_tilemap,32);

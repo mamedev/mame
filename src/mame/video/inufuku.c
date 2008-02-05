@@ -222,8 +222,8 @@ WRITE16_HANDLER( inufuku_text_videoram_w )
 
 VIDEO_START( inufuku )
 {
-	inufuku_bg_tilemap = tilemap_create(get_inufuku_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-	inufuku_text_tilemap = tilemap_create(get_inufuku_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	inufuku_bg_tilemap = tilemap_create(get_inufuku_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
+	inufuku_text_tilemap = tilemap_create(get_inufuku_text_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(inufuku_bg_tilemap, 255);
 	tilemap_set_transparent_pen(inufuku_text_tilemap, 255);

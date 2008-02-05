@@ -67,9 +67,9 @@ WRITE16_HANDLER( oneshot_fg_videoram_w )
 
 VIDEO_START( oneshot )
 {
-	oneshot_bg_tilemap = tilemap_create(get_oneshot_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
-	oneshot_mid_tilemap = tilemap_create(get_oneshot_mid_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
-	oneshot_fg_tilemap = tilemap_create(get_oneshot_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	oneshot_bg_tilemap = tilemap_create(get_oneshot_bg_tile_info,tilemap_scan_rows, 16, 16,32,32);
+	oneshot_mid_tilemap = tilemap_create(get_oneshot_mid_tile_info,tilemap_scan_rows, 16, 16,32,32);
+	oneshot_fg_tilemap = tilemap_create(get_oneshot_fg_tile_info,tilemap_scan_rows, 16, 16,32,32);
 
 	tilemap_set_transparent_pen(oneshot_bg_tilemap,0);
 	tilemap_set_transparent_pen(oneshot_mid_tilemap,0);

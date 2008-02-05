@@ -47,7 +47,7 @@ static TILE_GET_INFO( get_usg_tile_info )
 
 VIDEO_START(usg)
 {
-	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	usg_tilemap = tilemap_create(get_usg_tile_info,tilemap_scan_rows, 8, 8,64,32);
 }
 
 

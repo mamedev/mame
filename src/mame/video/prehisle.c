@@ -95,13 +95,13 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( prehisle )
 {
 	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 1024, 32);
+		 16, 16, 1024, 32);
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 256, 32);
+		 16, 16, 256, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 15);
 	tilemap_set_transparent_pen(fg_tilemap, 15);

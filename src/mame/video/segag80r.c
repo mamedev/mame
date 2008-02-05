@@ -228,19 +228,19 @@ VIDEO_START( segag80r )
 		/* and one vertically scrolling */
 		case G80_BACKGROUND_SPACEOD:
 			spaceod_bg_init_palette(machine);
-			spaceod_bg_htilemap = tilemap_create(spaceod_get_tile_info, spaceod_scan_rows, TILEMAP_TYPE_PEN, 8,8, 128,32);
-			spaceod_bg_vtilemap = tilemap_create(spaceod_get_tile_info, spaceod_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,128);
+			spaceod_bg_htilemap = tilemap_create(spaceod_get_tile_info, spaceod_scan_rows,  8,8, 128,32);
+			spaceod_bg_vtilemap = tilemap_create(spaceod_get_tile_info, spaceod_scan_rows,  8,8, 32,128);
 			break;
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,memory_region_length(REGION_GFX2) / 32);
+			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 32,memory_region_length(REGION_GFX2) / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 128,memory_region_length(REGION_GFX2) / 128);
+			bg_tilemap = tilemap_create(bg_get_tile_info, tilemap_scan_rows,  8,8, 128,memory_region_length(REGION_GFX2) / 128);
 			break;
 	}
 

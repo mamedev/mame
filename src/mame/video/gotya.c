@@ -111,7 +111,7 @@ static TILEMAP_MAPPER( tilemap_scan_rows_thehand )
 VIDEO_START( gotya )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows_thehand,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 }
 
 static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int col)

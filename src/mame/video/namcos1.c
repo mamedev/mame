@@ -108,12 +108,12 @@ VIDEO_START( namcos1 )
 	namcos1_spriteram = auto_malloc(0x1000);
 
 	/* initialize playfields */
-	bg_tilemap[0] = tilemap_create(bg_get_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	bg_tilemap[1] = tilemap_create(bg_get_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	bg_tilemap[2] = tilemap_create(bg_get_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	bg_tilemap[3] = tilemap_create(bg_get_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
-	bg_tilemap[4] = tilemap_create(fg_get_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,36,28);
-	bg_tilemap[5] = tilemap_create(fg_get_info5,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap[0] = tilemap_create(bg_get_info0,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap[1] = tilemap_create(bg_get_info1,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap[2] = tilemap_create(bg_get_info2,tilemap_scan_rows,8,8,64,64);
+	bg_tilemap[3] = tilemap_create(bg_get_info3,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[4] = tilemap_create(fg_get_info4,tilemap_scan_rows,8,8,36,28);
+	bg_tilemap[5] = tilemap_create(fg_get_info5,tilemap_scan_rows,8,8,36,28);
 
 	tilemap_set_scrolldx(bg_tilemap[4],73,512-73);
 	tilemap_set_scrolldx(bg_tilemap[5],73,512-73);

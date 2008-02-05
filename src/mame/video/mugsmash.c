@@ -140,10 +140,10 @@ WRITE16_HANDLER (mugsmash_reg_w)
 VIDEO_START( mugsmash )
 {
 
-	mugsmash_tilemap1 = tilemap_create(get_mugsmash_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	mugsmash_tilemap1 = tilemap_create(get_mugsmash_tile_info1,tilemap_scan_rows, 16, 16,32,32);
 	tilemap_set_transparent_pen(mugsmash_tilemap1,0);
 
-	mugsmash_tilemap2 = tilemap_create(get_mugsmash_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	mugsmash_tilemap2 = tilemap_create(get_mugsmash_tile_info2,tilemap_scan_rows, 16, 16,32,32);
 }
 
 VIDEO_UPDATE( mugsmash )

@@ -155,18 +155,18 @@ VIDEO_START(realbrk)
 {
 	/* Backgrounds */
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,
+
 								16,16,
 								0x40, 0x20);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,
+
 								16,16,
 								0x40, 0x20);
 
 	/* Text */
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,
+
 								8,8,
 								0x40, 0x20);
 

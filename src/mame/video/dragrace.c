@@ -50,7 +50,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( dragrace )
 {
 	bg_tilemap = tilemap_create(
-		get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
+		get_tile_info, tilemap_scan_rows,  16, 16, 16, 16);
 }
 
 

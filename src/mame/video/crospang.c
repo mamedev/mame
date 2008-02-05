@@ -191,8 +191,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( crospang )
 {
-	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_layer = tilemap_create(get_bg_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_layer = tilemap_create(get_fg_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_layer,0);
 	bestri_tilebank = 0;

@@ -288,13 +288,10 @@ void tilemap_init(running_machine *machine)
     tilemap_create - allocate a new tilemap
 -------------------------------------------------*/
 
-tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, tilemap_type type, int tilewidth, int tileheight, int cols, int rows)
+tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
 	int group;
-
-	/* just to avoid an 'unused variable' warning */
-	(void)type;
 
 	/* allocate the tilemap itself */
 	tmap = malloc_or_die(sizeof(tilemap));

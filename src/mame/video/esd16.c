@@ -133,14 +133,14 @@ WRITE16_HANDLER( esd16_tilemap0_color_w )
 VIDEO_START( esd16 )
 {
 	esdtilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,			8,8,	0x80,0x40);
+											8,8,	0x80,0x40);
 
 	esdtilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	8,8,	0x80,0x40);
+									8,8,	0x80,0x40);
 
 	/* hedpanic changes tilemap 1 to 16x16 at various times */
 	esdtilemap_1_16x16 = tilemap_create(	get_tile_info_1_16x16, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40,0x40);
+									16,16,	0x40,0x40);
 
 	tilemap_set_scrolldx(esdtilemap_0, -0x60 + 2, -0x60     );
 	tilemap_set_scrolldx(esdtilemap_1, -0x60    , -0x60 + 2 );

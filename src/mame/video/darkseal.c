@@ -268,9 +268,9 @@ WRITE16_HANDLER( darkseal_control_1_w )
 
 VIDEO_START( darkseal )
 {
-	pf1_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
-	pf2_tilemap = tilemap_create(get_bg_tile_info2,darkseal_scan,    TILEMAP_TYPE_PEN,16,16,64,64);
-	pf3_tilemap = tilemap_create(get_bg_tile_info3,darkseal_scan,    TILEMAP_TYPE_PEN,     16,16,64,64);
+	pf1_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,64,64);
+	pf2_tilemap = tilemap_create(get_bg_tile_info2,darkseal_scan,    16,16,64,64);
+	pf3_tilemap = tilemap_create(get_bg_tile_info3,darkseal_scan,         16,16,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

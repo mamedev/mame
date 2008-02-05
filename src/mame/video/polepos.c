@@ -201,8 +201,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( polepos )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,16);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_cols,8,8,64,16);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0x2f);
 }

@@ -482,10 +482,10 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8,64,32 );
-	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
-	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
-	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 16,16,32,32 );
+	text_layer	= tilemap_create( get_text_tile_info, tilemap_scan_rows,  8,8,64,32 );
+	back_layer	= tilemap_create( get_back_tile_info, tilemap_scan_cols,  16,16,32,32 );
+	mid_layer	= tilemap_create( get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
+	fore_layer	= tilemap_create( get_fore_tile_info, tilemap_scan_cols,  16,16,32,32 );
 
 	tilemap_set_transparent_pen(text_layer, 31);
 	tilemap_set_transparent_pen(mid_layer, 63);

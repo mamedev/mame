@@ -104,13 +104,6 @@
             column and row to a memory index; several standard mappers
             are provided, with tilemap_scan_rows being the most common
 
-        type = the type of tilemap this is;
-
-            TILEMAP_TYPE_PEN - this is the most common type,
-                and means that transparency is determined by taking the
-                raw pen value and looking it up in a table to determine
-                which layer(s) each pixel belongs to
-
         tilewidth = the width, in pixels, of each individual tile
 
         tileheight = the height, in pixels, of each individual tile
@@ -198,7 +191,6 @@
             tmap = tilemap_create(
                     my_get_info,            // pointer to your get_info
                     tilemap_scan_rows,      // standard row-major mapper
-                    TILEMAP_TYPE_PEN, // transparency from pens
                     8,8,                    // 8x8 tiles
                     64,32);                 // 64 columns, 32 rows
 
@@ -248,8 +240,7 @@
             transparent pen for them; this no longer works.
 
         TILEMAP_TRANSPARENT: This described a tilemap with a single
-            transparent pen. To create the same effect, make a new tilemap
-            of type TILEMAP_TYPE_PEN, and then call
+            transparent pen. To create the same effect, call
             tilemap_set_transparent_pen() to specify which pen is
             transparent; all other pens will map to layer 0.
 
@@ -263,8 +254,7 @@
             also allowed for you to choose one of 4 mappings on a per-tile
             basis. All of this functionality is now expanded: you can
             specify one of 3 layers and can choose from one of 256 mappings
-            on a per-tile basis. You just create a tilemap of type
-            TILEMAP_TYPE_PEN and call tilemap_set_transmask(),
+            on a per-tile basis. You just call tilemap_set_transmask(),
             which still exists but maps onto the new behavior. The "front"
             layer is now "layer 0" and the "back" layer is now "layer 1".
 
@@ -393,20 +383,12 @@ typedef UINT32 tilemap_memory_index;
 typedef struct _tilemap tilemap;
 
 
-/* tilemap types */
-enum _tilemap_type
-{
-	TILEMAP_TYPE_PEN,				/* pen-to-layer mapping is determined by pen lookup */
-};
-typedef enum _tilemap_type tilemap_type;
-
-
 /* tile_data is filled in by the get_tile_info callback */
 typedef struct _tile_data tile_data;
 struct _tile_data
 {
 	const UINT8 *	pen_data;		/* required */
-	const UINT8 *	mask_data;		/* required for TILEMAP_TYPE_PEN */
+	const UINT8 *	mask_data;		/* required */
 	pen_t			palette_base;	/* defaults to 0 */
 	UINT8 			category;		/* defaults to 0; range from 0..15 */
 	UINT8			group;			/* defaults to 0; range from 0..TILEMAP_NUM_GROUPS */
@@ -445,7 +427,7 @@ void tilemap_init(running_machine *machine);
 /* ----- tilemap creation and configuration ----- */
 
 /* create a new tilemap; note that tilemaps are tracked by the core so there is no dispose */
-tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, tilemap_type type, int tilewidth, int tileheight, int cols, int rows);
+tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, int tilewidth, int tileheight, int cols, int rows);
 
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);

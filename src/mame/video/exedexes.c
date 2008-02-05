@@ -171,13 +171,13 @@ static TILEMAP_MAPPER( exedexes_fg_tilemap_scan )
 VIDEO_START( exedexes )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, exedexes_bg_tilemap_scan,
-		TILEMAP_TYPE_PEN, 32, 32, 64, 64);
+		 32, 32, 64, 64);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, exedexes_fg_tilemap_scan,
-		TILEMAP_TYPE_PEN, 16, 16, 128, 128);
+		 16, 16, 128, 128);
 
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0xcf);

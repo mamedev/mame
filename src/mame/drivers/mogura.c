@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_mogura_tile_info )
 
 static VIDEO_START( mogura )
 {
-	mogura_tilemap = tilemap_create(get_mogura_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64, 32);
+	mogura_tilemap = tilemap_create(get_mogura_tile_info,tilemap_scan_rows,8,8,64, 32);
 }
 
 static VIDEO_UPDATE( mogura )

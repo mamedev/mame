@@ -567,10 +567,10 @@ VIDEO_START( f3 )
 	f3_game_config=pCFG;
 
 	if (f3_game_config->extend) {
-		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,16,16,64,32);
+		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,16,16,64,32);
+		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,16,16,64,32);
+		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,16,16,64,32);
 
 		f3_pf_data_1=f3_pf_data+0x0000;
 		f3_pf_data_2=f3_pf_data+0x0800;
@@ -582,10 +582,10 @@ VIDEO_START( f3 )
 		twidth_mask_bit=6;
 
 	} else {
-		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+		pf1_tilemap = tilemap_create(get_tile_info1,tilemap_scan_rows,16,16,32,32);
+		pf2_tilemap = tilemap_create(get_tile_info2,tilemap_scan_rows,16,16,32,32);
+		pf3_tilemap = tilemap_create(get_tile_info3,tilemap_scan_rows,16,16,32,32);
+		pf4_tilemap = tilemap_create(get_tile_info4,tilemap_scan_rows,16,16,32,32);
 
 		f3_pf_data_1=f3_pf_data+0x0000;
 		f3_pf_data_2=f3_pf_data+0x0400;
@@ -600,8 +600,8 @@ VIDEO_START( f3 )
 	spriteram32_buffered = (UINT32 *)auto_malloc(0x10000);
 	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
 	sprite_end = spritelist;
-	vram_layer = tilemap_create(get_tile_info_vram,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pixel_layer = tilemap_create(get_tile_info_pixel,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	vram_layer = tilemap_create(get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
+	pixel_layer = tilemap_create(get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));

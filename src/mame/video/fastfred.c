@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( fastfred )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
@@ -377,9 +377,9 @@ WRITE8_HANDLER( imago_charbank_w )
 
 VIDEO_START( imago )
 {
-	web_tilemap = tilemap_create(imago_get_tile_info_web,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
-	bg_tilemap   = tilemap_create(imago_get_tile_info_bg, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	fg_tilemap   = tilemap_create(imago_get_tile_info_fg, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	web_tilemap = tilemap_create(imago_get_tile_info_web,tilemap_scan_rows,     8,8,32,32);
+	bg_tilemap   = tilemap_create(imago_get_tile_info_bg, tilemap_scan_rows,8,8,32,32);
+	fg_tilemap   = tilemap_create(imago_get_tile_info_fg, tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

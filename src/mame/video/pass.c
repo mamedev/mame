@@ -59,8 +59,8 @@ VIDEO_UPDATE( pass )
 
 VIDEO_START( pass )
 {
-	pass_bg_tilemap = tilemap_create(get_pass_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pass_fg_tilemap = tilemap_create(get_pass_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 4, 4,128,64);
+	pass_bg_tilemap = tilemap_create(get_pass_bg_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	pass_fg_tilemap = tilemap_create(get_pass_fg_tile_info,tilemap_scan_rows, 4, 4,128,64);
 
 	tilemap_set_transparent_pen(pass_fg_tilemap,255);
 }

@@ -511,9 +511,9 @@ static TILE_GET_INFO( get_cobracom_fix_tile_info )
 
 VIDEO_START( cobracom )
 {
-	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,0,16,16,32,32);
-	dec8_pf1_tilemap = tilemap_create(get_bac1_tile_info,bac0_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	dec8_fix_tilemap = tilemap_create(get_cobracom_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,16,16,32,32);
+	dec8_pf1_tilemap = tilemap_create(get_bac1_tile_info,bac0_scan_rows,16,16,32,32);
+	dec8_fix_tilemap = tilemap_create(get_cobracom_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dec8_pf1_tilemap,0);
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
@@ -559,8 +559,8 @@ static TILE_GET_INFO( get_ghostb_fix_tile_info )
 
 VIDEO_START( ghostb )
 {
-	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,0,16,16,32,32);
-	dec8_fix_tilemap = tilemap_create(get_ghostb_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,16,16,32,32);
+	dec8_fix_tilemap = tilemap_create(get_ghostb_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 
 	game_uses_priority=0;
@@ -599,8 +599,8 @@ static TILE_GET_INFO( get_oscar_fix_tile_info )
 
 VIDEO_START( oscar )
 {
-	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	dec8_fix_tilemap = tilemap_create(get_oscar_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_bac0_tile_info,bac0_scan_rows,16,16,32,32);
+	dec8_fix_tilemap = tilemap_create(get_oscar_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	tilemap_set_transmask(dec8_pf0_tilemap,0,0x00ff,0xff00); /* Bottom 8 pens */
@@ -672,8 +672,8 @@ static TILE_GET_INFO( get_lastmiss_fix_tile_info )
 
 VIDEO_START( lastmiss )
 {
-	dec8_pf0_tilemap = tilemap_create(get_lastmiss_tile_info,lastmiss_scan_rows,0,16,16,32,32);
-	dec8_fix_tilemap = tilemap_create(get_lastmiss_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_lastmiss_tile_info,lastmiss_scan_rows,16,16,32,32);
+	dec8_fix_tilemap = tilemap_create(get_lastmiss_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	game_uses_priority=0;
@@ -681,8 +681,8 @@ VIDEO_START( lastmiss )
 
 VIDEO_START( shackled )
 {
-	dec8_pf0_tilemap = tilemap_create(get_lastmiss_tile_info,lastmiss_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	dec8_fix_tilemap = tilemap_create(get_lastmiss_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_lastmiss_tile_info,lastmiss_scan_rows,16,16,32,32);
+	dec8_fix_tilemap = tilemap_create(get_lastmiss_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	tilemap_set_transmask(dec8_pf0_tilemap,0,0x000f,0xfff0); /* Bottom 12 pens */
@@ -737,8 +737,8 @@ static TILE_GET_INFO( get_srdarwin_tile_info )
 
 VIDEO_START( srdarwin )
 {
-	dec8_pf0_tilemap = tilemap_create(get_srdarwin_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,16);
-	dec8_fix_tilemap = tilemap_create(get_srdarwin_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	dec8_pf0_tilemap = tilemap_create(get_srdarwin_tile_info,tilemap_scan_rows,16,16,32,16);
+	dec8_fix_tilemap = tilemap_create(get_srdarwin_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	tilemap_set_transmask(dec8_pf0_tilemap,0,0xffff,0x0000); //* draw as background only
@@ -804,8 +804,8 @@ static TILE_GET_INFO( get_gondo_tile_info )
 
 VIDEO_START( gondo )
 {
-	dec8_fix_tilemap=tilemap_create(get_gondo_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	dec8_pf0_tilemap=tilemap_create(get_gondo_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	dec8_fix_tilemap=tilemap_create(get_gondo_fix_tile_info,tilemap_scan_rows,8,8,32,32);
+	dec8_pf0_tilemap=tilemap_create(get_gondo_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	tilemap_set_transmask(dec8_pf0_tilemap,0,0x00ff,0xff00); /* Bottom 8 pens */
@@ -814,8 +814,8 @@ VIDEO_START( gondo )
 
 VIDEO_START( garyoret )
 {
-	dec8_fix_tilemap=tilemap_create(get_gondo_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	dec8_pf0_tilemap=tilemap_create(get_gondo_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	dec8_fix_tilemap=tilemap_create(get_gondo_fix_tile_info,tilemap_scan_rows,8,8,32,32);
+	dec8_pf0_tilemap=tilemap_create(get_gondo_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(dec8_fix_tilemap,0);
 	game_uses_priority=1;

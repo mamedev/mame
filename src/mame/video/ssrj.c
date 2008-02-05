@@ -232,9 +232,9 @@ static const int fakecols[4*4][8][3]=
 
 VIDEO_START( ssrj )
 {
-	tilemap1 = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
-	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
-	tilemap4 = tilemap_create( get_tile_info4,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	tilemap1 = tilemap_create( get_tile_info1,tilemap_scan_rows,8,8,32,32 );
+	tilemap2 = tilemap_create( get_tile_info2,tilemap_scan_rows,8,8,32,32 );
+	tilemap4 = tilemap_create( get_tile_info4,tilemap_scan_rows,8,8,32,32 );
 	tilemap_set_transparent_pen(tilemap2,0);
 	tilemap_set_transparent_pen(tilemap4,0);
 }

@@ -180,10 +180,10 @@ static TILE_GET_INFO( get_sc1_tile_info )
 
 static VIDEO_START( jalmah )
 {
-	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,256,32);
+	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,16,16,256,32);
+	sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,16,16,256,32);
+	sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,16,16,256,32);
+	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
 
 	jm_scrollram = auto_malloc(0x80);
 	jm_vregs = auto_malloc(0x40);

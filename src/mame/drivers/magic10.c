@@ -295,9 +295,9 @@ static TILE_GET_INFO( get_layer2_tile_info )
 
 static VIDEO_START( magic10 )
 {
-	layer0_tilemap = tilemap_create(get_layer0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
-	layer1_tilemap = tilemap_create(get_layer1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	layer2_tilemap = tilemap_create(get_layer2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	layer0_tilemap = tilemap_create(get_layer0_tile_info,tilemap_scan_rows,16,16,32,32);
+	layer1_tilemap = tilemap_create(get_layer1_tile_info,tilemap_scan_rows,16,16,32,32);
+	layer2_tilemap = tilemap_create(get_layer2_tile_info,tilemap_scan_rows, 8, 8,64,64);
 
 	tilemap_set_transparent_pen(layer1_tilemap,0);
 	tilemap_set_transparent_pen(layer2_tilemap,0);

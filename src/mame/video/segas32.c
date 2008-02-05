@@ -303,7 +303,7 @@ static void common_start(int multi32)
 	{
 		struct cache_entry *entry = auto_malloc(sizeof(struct cache_entry));
 
-		entry->tmap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16,16, 32,16);
+		entry->tmap = tilemap_create(get_tile_info, tilemap_scan_rows,  16,16, 32,16);
 		entry->page = 0xff;
 		entry->bank = 0;
 		entry->next = cache_head;

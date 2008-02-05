@@ -56,9 +56,9 @@ static void dirty_piv_tilemaps(void)
 
 static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 {
-	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	wgp_piv_tilemap[0] = tilemap_create(get_piv0_tile_info,tilemap_scan_rows,16,16,64,64);
+	wgp_piv_tilemap[1] = tilemap_create(get_piv1_tile_info,tilemap_scan_rows,16,16,64,64);
+	wgp_piv_tilemap[2] = tilemap_create(get_piv2_tile_info,tilemap_scan_rows,16,16,64,64);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 

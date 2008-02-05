@@ -110,7 +110,7 @@ VIDEO_START( fortyl )
 	pixel_bitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 	pixel_bitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
 
-	background  = tilemap_create(get_bg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8,8,64,32);
+	background  = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8,8,64,32);
 
 	tilemap_set_scroll_rows(background,32);
 	tilemap_set_transparent_pen(background,0);

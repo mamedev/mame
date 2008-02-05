@@ -261,9 +261,9 @@ VIDEO_START( combasc )
 {
 	combasc_vreg = -1;
 
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	textlayer =  tilemap_create(get_text_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,32,32);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,8,8,32,32);
+	textlayer =  tilemap_create(get_text_info, tilemap_scan_rows,     8,8,32,32);
 
 	private_spriteram[0] = auto_malloc(0x800);
 	private_spriteram[1] = auto_malloc(0x800);
@@ -281,9 +281,9 @@ VIDEO_START( combascb )
 {
 	combasc_vreg = -1;
 
-	bg_tilemap[0] = tilemap_create(get_tile_info0_bootleg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1_bootleg,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	textlayer =  tilemap_create(get_text_info_bootleg, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap[0] = tilemap_create(get_tile_info0_bootleg,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1_bootleg,tilemap_scan_rows,8,8,32,32);
+	textlayer =  tilemap_create(get_text_info_bootleg, tilemap_scan_rows,8,8,32,32);
 
 	private_spriteram[0] = auto_malloc(0x800);
 	private_spriteram[1] = auto_malloc(0x800);

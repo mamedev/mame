@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( olibochu )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

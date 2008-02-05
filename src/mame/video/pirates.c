@@ -40,11 +40,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(pirates)
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,36,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,8,8,36,32);
 
 	/* Not sure how big they can be, Pirates uses only 32 columns, Genix 44 */
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_cols,     8,8,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);

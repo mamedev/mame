@@ -90,7 +90,7 @@ static TILEMAP_MAPPER( funkybee_tilemap_scan )
 VIDEO_START( funkybee )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, funkybee_tilemap_scan,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

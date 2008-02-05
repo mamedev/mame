@@ -756,10 +756,10 @@ WRITE32_HANDLER ( skns_v3_regs_w )
 
 VIDEO_START(skns)
 {
-	skns_tilemap_A = tilemap_create(get_tilemap_A_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64, 64);
+	skns_tilemap_A = tilemap_create(get_tilemap_A_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_A,0);
 
-	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64, 64);
+	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
 	machine->gfx[2]->color_granularity=256;

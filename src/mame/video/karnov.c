@@ -240,7 +240,7 @@ VIDEO_START( karnov )
 	dirty_f=auto_malloc(0x800);
 	memset(dirty_f,1,0x800);
 
-	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
@@ -253,7 +253,7 @@ VIDEO_START( wndrplnt )
 	dirty_f=auto_malloc(0x800);
 	memset(dirty_f,1,0x800);
 
-	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

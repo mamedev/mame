@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( arkanoid )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		 8, 8, 32, 32);
 
 	state_save_register_global(gfxbank);
 	state_save_register_global(palettebank);

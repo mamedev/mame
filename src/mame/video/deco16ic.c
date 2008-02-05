@@ -520,22 +520,22 @@ static void deco16_video_init(int pf12_only, int split, int full_width)
 {
 	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
 
-	pf1_tilemap_16x16 =	tilemap_create(get_pf1_tile_info,   deco16_scan_rows, TILEMAP_TYPE_PEN,16,16,64,32);
-	pf1_tilemap_8x8 =	tilemap_create(get_pf1_tile_info_b, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	pf1_tilemap_16x16 =	tilemap_create(get_pf1_tile_info,   deco16_scan_rows, 16,16,64,32);
+	pf1_tilemap_8x8 =	tilemap_create(get_pf1_tile_info_b, tilemap_scan_rows,8,8,64,32);
 
 	if (split)
-		pf2_tilemap_16x16 =	tilemap_create(get_pf2_tile_info,   deco16_scan_rows, TILEMAP_TYPE_PEN,16,16,full_width ? 64 : 32,32);
+		pf2_tilemap_16x16 =	tilemap_create(get_pf2_tile_info,   deco16_scan_rows, 16,16,full_width ? 64 : 32,32);
 	else
-		pf2_tilemap_16x16 =	tilemap_create(get_pf2_tile_info,   deco16_scan_rows, TILEMAP_TYPE_PEN,16,16,full_width ? 64 : 32,32);
-	pf2_tilemap_8x8 =	tilemap_create(get_pf2_tile_info_b, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,full_width ? 64 : 32,32);
+		pf2_tilemap_16x16 =	tilemap_create(get_pf2_tile_info,   deco16_scan_rows, 16,16,full_width ? 64 : 32,32);
+	pf2_tilemap_8x8 =	tilemap_create(get_pf2_tile_info_b, tilemap_scan_rows,8,8,full_width ? 64 : 32,32);
 
 	dirty_palette = auto_malloc(4096);
 	deco16_raster_display_list=auto_malloc(20 * 256);
 
 	if (!pf12_only)
 	{
-		pf4_tilemap_16x16 =	tilemap_create(get_pf4_tile_info,   deco16_scan_rows, TILEMAP_TYPE_PEN,16,16,full_width ? 64 : 32,32);
-		pf3_tilemap_16x16 =	tilemap_create(get_pf3_tile_info,   deco16_scan_rows, TILEMAP_TYPE_PEN,16,16,full_width ? 64 : 32,32);
+		pf4_tilemap_16x16 =	tilemap_create(get_pf4_tile_info,   deco16_scan_rows, 16,16,full_width ? 64 : 32,32);
+		pf3_tilemap_16x16 =	tilemap_create(get_pf3_tile_info,   deco16_scan_rows, 16,16,full_width ? 64 : 32,32);
 	}
 	else
 	{

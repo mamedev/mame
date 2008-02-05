@@ -116,10 +116,10 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( airbustr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+		 16, 16, 32, 32);
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 16, 16, 32, 32);
+		 16, 16, 32, 32);
 
 	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

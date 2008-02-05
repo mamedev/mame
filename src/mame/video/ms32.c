@@ -72,9 +72,9 @@ static int brt_r,brt_g,brt_b;
 
 VIDEO_START( ms32 )
 {
-	ms32_tx_tilemap = tilemap_create(get_ms32_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
-	ms32_bg_tilemap = tilemap_create(get_ms32_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	ms32_roz_tilemap = tilemap_create(get_ms32_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,128,128);
+	ms32_tx_tilemap = tilemap_create(get_ms32_tx_tile_info,tilemap_scan_rows,8, 8,64,64);
+	ms32_bg_tilemap = tilemap_create(get_ms32_bg_tile_info,tilemap_scan_rows,16,16,64,64);
+	ms32_roz_tilemap = tilemap_create(get_ms32_roz_tile_info,tilemap_scan_rows,16,16,128,128);
 
 	tilemap_set_transparent_pen(ms32_tx_tilemap,0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap,0);

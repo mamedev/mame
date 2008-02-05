@@ -181,17 +181,17 @@ static TILE_GET_INFO( warpwarp_get_tile_info )
 
 VIDEO_START( geebee )
 {
-	bg_tilemap = tilemap_create(geebee_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
+	bg_tilemap = tilemap_create(geebee_get_tile_info,tilemap_scan,8,8,34,28);
 }
 
 VIDEO_START( navarone )
 {
-	bg_tilemap = tilemap_create(navarone_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
+	bg_tilemap = tilemap_create(navarone_get_tile_info,tilemap_scan,8,8,34,28);
 }
 
 VIDEO_START( warpwarp )
 {
-	bg_tilemap = tilemap_create(warpwarp_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,34,28);
+	bg_tilemap = tilemap_create(warpwarp_get_tile_info,tilemap_scan,8,8,34,28);
 }
 
 

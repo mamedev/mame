@@ -290,8 +290,8 @@ VIDEO_START( firetrk )
 	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
-	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 16, 16);
+	tilemap1 = tilemap_create(get_tile_info1, tilemap_scan_rows,  16, 16, 16, 16);
+	tilemap2 = tilemap_create(get_tile_info2, tilemap_scan_rows,  16, 16, 16, 16);
 
 	memset(&car[0], 0, sizeof (struct sprite_data));
 	memset(&car[1], 0, sizeof (struct sprite_data));

@@ -268,8 +268,8 @@ VIDEO_START( gaelco2 )
 	gaelco2_videoram = spriteram16;
 
 	/* create tilemaps */
-	pant[0] = tilemap_create(get_tile_info_gaelco2_screen0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pant[1] = tilemap_create(get_tile_info_gaelco2_screen1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	pant[0] = tilemap_create(get_tile_info_gaelco2_screen0,tilemap_scan_rows,16,16,64,32);
+	pant[1] = tilemap_create(get_tile_info_gaelco2_screen1,tilemap_scan_rows,16,16,64,32);
 
 	/* set tilemap properties */
 	tilemap_set_transparent_pen(pant[0],0);
@@ -288,8 +288,8 @@ VIDEO_START( gaelco2_dual )
 	gaelco2_videoram = spriteram16;
 
 	/* create tilemaps */
-	pant[0] = tilemap_create(get_tile_info_gaelco2_screen0_dual,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	pant[1] = tilemap_create(get_tile_info_gaelco2_screen1_dual,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
+	pant[0] = tilemap_create(get_tile_info_gaelco2_screen0_dual,tilemap_scan_rows,16,16,64,32);
+	pant[1] = tilemap_create(get_tile_info_gaelco2_screen1_dual,tilemap_scan_rows,16,16,64,32);
 
 	/* set tilemap properties */
 	tilemap_set_transparent_pen(pant[0],0);

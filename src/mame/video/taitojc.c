@@ -205,7 +205,7 @@ VIDEO_START( taitojc )
 
 	assert(taitojc_gfx_index != MAX_GFX_ELEMENTS);
 
-	taitojc_tilemap = tilemap_create(taitojc_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 64, 64);
+	taitojc_tilemap = tilemap_create(taitojc_tile_info, tilemap_scan_rows,  16, 16, 64, 64);
 	taitojc_dirty_map = auto_malloc(TAITOJC_NUM_TILES);
 
 	tilemap_set_transparent_pen(taitojc_tilemap, 0);

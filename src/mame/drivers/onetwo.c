@@ -242,7 +242,7 @@ GFXDECODE_END
 
 static VIDEO_START( onetwo )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 static VIDEO_UPDATE( onetwo )

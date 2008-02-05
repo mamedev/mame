@@ -105,7 +105,7 @@ static TILE_GET_INFO( equites_charinfo )
 
 VIDEO_START( equites )
 {
-	charmap0 = tilemap_create(equites_charinfo, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	charmap0 = tilemap_create(equites_charinfo, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);
 	tilemap_set_scrolldx(charmap0, BMPAD, BMPAD);
 	tilemap_set_scrolldy(charmap0, BMPAD, BMPAD);
@@ -232,12 +232,12 @@ VIDEO_START( splndrbt )
 
 	tmpbitmap = auto_bitmap_alloc(BMW, BMW, machine->screen[0].format);
 
-	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);
 	tilemap_set_scrolldx(charmap0, 8, 8);
 	tilemap_set_scrolldy(charmap0, 32, 32);
 
-	charmap1 = tilemap_create(splndrbt_char1info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	charmap1 = tilemap_create(splndrbt_char1info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap1, 0);
 	tilemap_set_scrolldx(charmap1, 8, 8);
 	tilemap_set_scrolldy(charmap1, 32, 32);

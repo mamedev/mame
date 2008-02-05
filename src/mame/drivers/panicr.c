@@ -188,9 +188,9 @@ ADDRESS_MAP_END
 
 static VIDEO_START( panicr )
 {
-	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,1024,16 );
+	bgtilemap = tilemap_create( get_bgtile_info,tilemap_scan_rows,16,16,1024,16 );
 
-	txttilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+	txttilemap = tilemap_create( get_txttile_info,tilemap_scan_rows,8,8,32,32 );
 	colortable_configure_tilemap_groups(machine->colortable, txttilemap, machine->gfx[0], 0);
 }
 

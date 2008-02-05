@@ -72,8 +72,8 @@ static TILE_GET_INFO( get_tile_info_B )
 
 VIDEO_START( flkatck )
 {
-	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	k007121_tilemap[0] = tilemap_create(get_tile_info_A,tilemap_scan_rows,8,8,32,32);
+	k007121_tilemap[1] = tilemap_create(get_tile_info_B,tilemap_scan_rows,8,8,32,32);
 
 }
 

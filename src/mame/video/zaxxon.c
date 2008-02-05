@@ -136,8 +136,8 @@ static void video_start_common(running_machine *machine, tile_get_info_callback 
 	memset(congo_custom, 0, sizeof(congo_custom));
 
 	/* create a background and foreground tilemap */
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,512);
-	fg_tilemap = tilemap_create(fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  8,8, 32,512);
+	fg_tilemap = tilemap_create(fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
 	tilemap_set_transparent_pen(fg_tilemap, 0);

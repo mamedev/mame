@@ -157,30 +157,30 @@ static TILE_GET_INFO( raiders5_get_fg_tile_info )
 
 VIDEO_START( nova2001 )
 {
-	bg_tilemap = tilemap_create(nova2001_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
-	fg_tilemap = tilemap_create(nova2001_get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(nova2001_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(nova2001_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, -7);
 }
 
 VIDEO_START( pkunwar )
 {
-	bg_tilemap = tilemap_create(pkunwar_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(pkunwar_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
 VIDEO_START( ninjakun )
 {
-	bg_tilemap = tilemap_create(ninjakun_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
-	fg_tilemap = tilemap_create(ninjakun_get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(ninjakun_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(ninjakun_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 7, 0);
 }
 
 VIDEO_START( raiders5 )
 {
-	bg_tilemap = tilemap_create(raiders5_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
-	fg_tilemap = tilemap_create(raiders5_get_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(raiders5_get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	fg_tilemap = tilemap_create(raiders5_get_fg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 7, 0);
 }

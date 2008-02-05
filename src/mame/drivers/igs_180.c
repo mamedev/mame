@@ -18,7 +18,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START(igs_180)
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 static VIDEO_UPDATE(igs_180)

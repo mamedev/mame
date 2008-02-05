@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( jailbrek )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 	tilemap_set_scrolldx(bg_tilemap, 0, 396 - 256);
 }
 

@@ -623,7 +623,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( peplus )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 40, 25);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 	palette_ram = auto_malloc(0x3000);
 	memset(palette_ram, 0, 0x3000);
 }

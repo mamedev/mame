@@ -167,7 +167,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( miniboy7 )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 37, 37);
+		8, 8, 37, 37);
 }
 
 static VIDEO_UPDATE( miniboy7 )

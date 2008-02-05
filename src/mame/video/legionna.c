@@ -155,10 +155,10 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START( legionna )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
+	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
 	legionna_scrollram16 = auto_malloc(0x60);
 
@@ -170,10 +170,10 @@ VIDEO_START( legionna )
 
 VIDEO_START( denjinmk )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info_denji,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	midground_layer =  tilemap_create(get_mid_tile_info_denji, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	foreground_layer = tilemap_create(get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
+	midground_layer =  tilemap_create(get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
+	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
 	legionna_scrollram16 = auto_malloc(0x60);
 
@@ -185,10 +185,10 @@ VIDEO_START( denjinmk )
 
 VIDEO_START( cupsoc )
 {
-	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	midground_layer =  tilemap_create(get_mid_tile_info_cupsoc, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,  8,8,64,32);
+	background_layer = tilemap_create(get_back_tile_info,tilemap_scan_rows,16,16,32,32);
+	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
+	midground_layer =  tilemap_create(get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
+	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
 	legionna_scrollram16 = auto_malloc(0x60);
 

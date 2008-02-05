@@ -396,9 +396,9 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 
 static VIDEO_START(varia)
 {
-	vmetal_texttilemap = tilemap_create(get_vmetal_texttilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      8, 8, 256,256);
-	vmetal_mid1tilemap = tilemap_create(get_vmetal_mid1tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16,16, 256,256);
-	vmetal_mid2tilemap = tilemap_create(get_vmetal_mid2tilemap_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      16,16, 256,256);
+	vmetal_texttilemap = tilemap_create(get_vmetal_texttilemap_tile_info,tilemap_scan_rows, 8, 8, 256,256);
+	vmetal_mid1tilemap = tilemap_create(get_vmetal_mid1tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
+	vmetal_mid2tilemap = tilemap_create(get_vmetal_mid2tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
 	tilemap_set_transparent_pen(vmetal_texttilemap,0);
 	tilemap_set_transparent_pen(vmetal_mid1tilemap,0);
 	tilemap_set_transparent_pen(vmetal_mid2tilemap,0);

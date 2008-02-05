@@ -77,8 +77,8 @@ static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machi
 VIDEO_START( fromance )
 {
 	/* allocate tilemaps */
-	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8,4, 64,64);
-	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,4, 64,64);
+	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
+	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
 	/* allocate local videoram */
 	local_videoram[0] = auto_malloc(0x1000 * 3);
@@ -116,8 +116,8 @@ VIDEO_START( fromance )
 VIDEO_START( nekkyoku )
 {
 	/* allocate tilemaps */
-	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      8,4, 64,64);
-	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,4, 64,64);
+	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
+	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
 	/* allocate local videoram */
 	local_videoram[0] = auto_malloc(0x1000 * 3);

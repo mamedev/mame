@@ -230,7 +230,7 @@ VIDEO_START( gdfs )
 	eaglshot_dirty_tile	=	(char*)auto_malloc(4 * 0x100000 / (16*8));
 
 	gdfs_tmap			=	tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-											TILEMAP_TYPE_PEN, 16,16, 0x100,0x100	);
+											 16,16, 0x100,0x100	);
 
 	tilemap_set_transparent_pen(gdfs_tmap, 0);
 }

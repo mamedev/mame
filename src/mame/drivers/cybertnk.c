@@ -193,7 +193,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( cybertnk )
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
 }
 
 static VIDEO_UPDATE( cybertnk )

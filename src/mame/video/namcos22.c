@@ -2224,7 +2224,7 @@ static void namcos22_exit(running_machine *machine)
 
 static VIDEO_START( common )
 {
-	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
+	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
 		tilemap_set_transparent_pen( bgtilemap, 0xf );
 
 	mbDSPisActive = 0;

@@ -71,9 +71,9 @@ WRITE16_HANDLER( bbuster_pf2_w )
 
 VIDEO_START( bbuster )
 {
-	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,128,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,128,32);
+	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,16,16,128,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,16,16,128,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);
@@ -81,9 +81,9 @@ VIDEO_START( bbuster )
 
 VIDEO_START( mechatt )
 {
-	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,256,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,16,16,256,32);
+	fix_tilemap = tilemap_create(get_bbuster_tile_info,tilemap_scan_rows,8,8,32,32);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_cols,16,16,256,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_cols,16,16,256,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap, 15);
 	tilemap_set_transparent_pen(fix_tilemap, 15);

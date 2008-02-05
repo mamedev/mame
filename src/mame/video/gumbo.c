@@ -38,8 +38,8 @@ static TILE_GET_INFO( get_gumbo_fg_tile_info )
 
 VIDEO_START( gumbo )
 {
-	gumbo_bg_tilemap = tilemap_create(get_gumbo_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,      8, 8, 64,32);
-	gumbo_fg_tilemap = tilemap_create(get_gumbo_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 4, 4,128,64);
+	gumbo_bg_tilemap = tilemap_create(get_gumbo_bg_tile_info,tilemap_scan_rows,      8, 8, 64,32);
+	gumbo_fg_tilemap = tilemap_create(get_gumbo_fg_tile_info,tilemap_scan_rows, 4, 4,128,64);
 	tilemap_set_transparent_pen(gumbo_fg_tilemap,0xff);
 }
 

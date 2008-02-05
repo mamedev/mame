@@ -177,8 +177,8 @@ PALETTE_INIT (pitnrun)
 
 VIDEO_START(pitnrun)
 {
-	fg = tilemap_create( get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
-	bg = tilemap_create( get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32*4,32 );
+	fg = tilemap_create( get_tile_info1,tilemap_scan_rows,8,8,32,32 );
+	bg = tilemap_create( get_tile_info2,tilemap_scan_rows,8,8,32*4,32 );
 	tilemap_set_transparent_pen( fg, 0 );
 	tmp_bitmap[0] = auto_bitmap_alloc(128,128,machine->screen[0].format);
 	tmp_bitmap[1] = auto_bitmap_alloc(128,128,machine->screen[0].format);

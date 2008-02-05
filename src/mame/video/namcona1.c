@@ -228,7 +228,7 @@ VIDEO_START( namcona1 )
 		bg_tilemap[i] = tilemap_create(
 			get_info[i],
 			tilemap_scan_rows,
-			TILEMAP_TYPE_PEN,8,8,64,64 );
+			8,8,64,64 );
 
 		tilemap_palette_bank[i] = -1;
 	}

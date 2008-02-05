@@ -111,7 +111,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static void video_start_common(running_machine *machine, UINT32 tile_transmask)
 {
-	docastle_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+	docastle_tilemap = tilemap_create(get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_transmask(docastle_tilemap, 0, tile_transmask, 0x0000);
 }
 

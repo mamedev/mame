@@ -72,10 +72,10 @@ static VIDEO_START( skylncr )
 {
 
 	tmap = tilemap_create(	get_tile_info, tilemap_scan_rows,
-							TILEMAP_TYPE_PEN, 8,8, 0x40,0x20	);
+							8,8, 0x40,0x20	);
 
 	tmap2 = tilemap_create(	get_tile_info2, skylncr_tilemap_scan_pages,
-							TILEMAP_TYPE_PEN, 8,32,
+							8,32,
 							TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y );
 
 	tilemap_set_transparent_pen(tmap,  0);

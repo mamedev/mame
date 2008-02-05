@@ -80,21 +80,21 @@ static TILE_GET_INFO( get_ikari3_tile_info )
 
 VIDEO_START( pow )
 {
-	fix_tilemap = tilemap_create(get_pow_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap = tilemap_create(get_pow_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
 
 VIDEO_START( searchar )
 {
-	fix_tilemap = tilemap_create(get_sar_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap = tilemap_create(get_sar_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }
 
 VIDEO_START( ikari3 )
 {
-	fix_tilemap = tilemap_create(get_ikari3_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap = tilemap_create(get_ikari3_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

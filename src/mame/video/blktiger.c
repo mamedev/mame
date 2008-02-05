@@ -74,9 +74,9 @@ VIDEO_START( blktiger )
 {
 	scroll_ram = auto_malloc(BGRAM_BANK_SIZE * BGRAM_BANKS);
 
-	tx_tilemap =    tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-	bg_tilemap8x4 = tilemap_create(get_bg_tile_info,bg8x4_scan,       TILEMAP_TYPE_PEN,   16,16,128,64);
-	bg_tilemap4x8 = tilemap_create(get_bg_tile_info,bg4x8_scan,       TILEMAP_TYPE_PEN,   16,16,64,128);
+	tx_tilemap =    tilemap_create(get_tx_tile_info,tilemap_scan_rows,8,8,32,32);
+	bg_tilemap8x4 = tilemap_create(get_bg_tile_info,bg8x4_scan,          16,16,128,64);
+	bg_tilemap4x8 = tilemap_create(get_bg_tile_info,bg4x8_scan,          16,16,64,128);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 

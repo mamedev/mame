@@ -103,13 +103,13 @@ WRITE16_HANDLER( fof_txt_tileram_w )
 
 VIDEO_START(fitfight)
 {
-	fof_bak_tilemap = tilemap_create(get_fof_bak_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
+	fof_bak_tilemap = tilemap_create(get_fof_bak_tile_info,tilemap_scan_cols,8,8,128, 32);
 	/* opaque */
 
-	fof_mid_tilemap = tilemap_create(get_fof_mid_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
+	fof_mid_tilemap = tilemap_create(get_fof_mid_tile_info,tilemap_scan_cols,8,8,128, 32);
 	tilemap_set_transparent_pen(fof_mid_tilemap,0);
 
-	fof_txt_tilemap = tilemap_create(get_fof_txt_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,128, 32);
+	fof_txt_tilemap = tilemap_create(get_fof_txt_tile_info,tilemap_scan_cols,8,8,128, 32);
 	tilemap_set_transparent_pen(fof_txt_tilemap,0);
 }
 

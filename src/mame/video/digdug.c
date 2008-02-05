@@ -149,8 +149,8 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( digdug )
 {
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,     8,8,36,28);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan,     8,8,36,28);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan,8,8,36,28);
 
 	tilemap_set_transparent_pen(tx_tilemap, 0);
 

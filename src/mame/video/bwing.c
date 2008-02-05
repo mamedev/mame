@@ -197,9 +197,9 @@ VIDEO_START( bwing )
 	UINT32 *dwptr;
 	int i;
 
-	charmap = tilemap_create(get_charinfo,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8,32,32);
-	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,TILEMAP_TYPE_PEN,16,16,64,64);
-	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,TILEMAP_TYPE_PEN,16,16,64,64);
+	charmap = tilemap_create(get_charinfo,tilemap_scan_cols, 8, 8,32,32);
+	fgmap = tilemap_create(get_fgtileinfo,bwing_scan_cols,16,16,64,64);
+	bgmap = tilemap_create(get_bgtileinfo,bwing_scan_cols,16,16,64,64);
 	srxlat = auto_malloc(0x8000);
 
 	scrollmap[0] = fgmap;

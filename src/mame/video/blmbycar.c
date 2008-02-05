@@ -127,10 +127,10 @@ WRITE16_HANDLER( blmbycar_vram_1_w )
 VIDEO_START( blmbycar )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 16,16, DIM_NX, DIM_NY );
+								 16,16, DIM_NX, DIM_NY );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 16,16, DIM_NX, DIM_NY );
+								 16,16, DIM_NX, DIM_NY );
 
 		tilemap_set_scroll_rows(tilemap_0,1);
 		tilemap_set_scroll_cols(tilemap_0,1);

@@ -406,9 +406,9 @@ static TILE_GET_INFO( get_text_tile_info )
 ***************************************************************************/
 static void create_tilemaps_0(void)
 {
-	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	fg_tilemap[0] = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	bg_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap[0] = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(top_tilemap[0],0);
 	tilemap_set_transparent_pen(fg_tilemap[0],0);
@@ -417,9 +417,9 @@ static void create_tilemaps_0(void)
 
 static void create_tilemaps_1(void)
 {
-	top_tilemap[1] = tilemap_create(get_top1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	fg_tilemap[1] = tilemap_create(get_fg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	bg_tilemap[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	top_tilemap[1] = tilemap_create(get_top1_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap[1] = tilemap_create(get_fg1_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap[1] = tilemap_create(get_bg1_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transparent_pen(top_tilemap[1],0);
 	tilemap_set_transparent_pen(fg_tilemap[1],0);
@@ -428,10 +428,10 @@ static void create_tilemaps_1(void)
 
 static void truxton2_create_tilemaps_0(void)
 {
-	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
-	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	fg_tilemap[0] = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	bg_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,8,8,64,32);
+	top_tilemap[0] = tilemap_create(get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap[0] = tilemap_create(get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap[0] = tilemap_create(get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_scroll_rows(tx_tilemap,8*32);	/* line scrolling */
 	tilemap_set_scroll_cols(tx_tilemap,1);
@@ -444,10 +444,10 @@ static void truxton2_create_tilemaps_0(void)
 
 static void batrider_create_tilemaps_0(void)
 {
-	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
-	top_tilemap[0] = tilemap_create(batrider_get_top0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	fg_tilemap[0] = tilemap_create(batrider_get_fg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	bg_tilemap[0] = tilemap_create(batrider_get_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	tx_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,8,8,64,32);
+	top_tilemap[0] = tilemap_create(batrider_get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap[0] = tilemap_create(batrider_get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap[0] = tilemap_create(batrider_get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_scroll_rows(tx_tilemap,8*32);	/* line scrolling */
 	tilemap_set_scroll_cols(tx_tilemap,1);

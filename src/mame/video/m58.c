@@ -180,7 +180,7 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 
 VIDEO_START( yard )
 {
-	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
 	tilemap_set_scrolldx(bg_tilemap, machine->screen[0].visarea.min_x, machine->screen[0].width - (machine->screen[0].visarea.max_x + 1));
 	tilemap_set_scrolldy(bg_tilemap, machine->screen[0].visarea.min_y - 8, machine->screen[0].height + 16 - (machine->screen[0].visarea.max_y + 1));
 

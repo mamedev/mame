@@ -788,28 +788,28 @@ VIDEO_START( system16 ){
 		background = tilemap_create(
 			get_bg_tile_info,
 			sys16_bg_map,
-			TILEMAP_TYPE_PEN,
+
 			8,8,
 			64*2,32*2 );
 	else
 		background = tilemap_create(
 			get_bg_tile_info,
 			sys16_bg_map,
-			TILEMAP_TYPE_PEN,
+
 			8,8,
 			64*2,32*2 );
 
 	foreground = tilemap_create(
 		get_fg_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_PEN,
+
 		8,8,
 		64*2,32*2 );
 
 	text_layer = tilemap_create(
 		get_text_tile_info,
 		sys16_text_map,
-		TILEMAP_TYPE_PEN,
+
 		8,8,
 		40,28 );
 
@@ -875,14 +875,14 @@ VIDEO_START( system18old ){
 	background2 = tilemap_create(
 		get_bg2_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_PEN,
+
 		8,8,
 		64*2,32*2 );
 
 	foreground2 = tilemap_create(
 		get_fg2_tile_info,
 		sys16_bg_map,
-		TILEMAP_TYPE_PEN,
+
 		8,8,
 		64*2,32*2 );
 

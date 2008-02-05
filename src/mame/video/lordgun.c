@@ -123,16 +123,16 @@ WRITE16_HANDLER( lordgun_vram_3_w )
 VIDEO_START( lordgun )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 0x100, 0x40 );
+								 8,8, 0x100, 0x40 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 16,16, 0x80,0x20 );
+								 16,16, 0x80,0x20 );
 
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 32,32, 0x40,0x40 );
+								 32,32, 0x40,0x40 );
 
 	tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 0x40,0x20 );
+								 8,8, 0x40,0x20 );
 
 	tilemap_set_scroll_rows(tilemap_0,1);
 	tilemap_set_scroll_cols(tilemap_0,1);

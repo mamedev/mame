@@ -79,7 +79,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 VIDEO_START( blueprnt )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flip_x,
-		TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scroll_cols(bg_tilemap, 32);

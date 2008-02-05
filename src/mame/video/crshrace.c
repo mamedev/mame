@@ -41,8 +41,8 @@ static TILE_GET_INFO( get_tile_info2 )
 
 VIDEO_START( crshrace )
 {
-	tilemap1 = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	tilemap2 = tilemap_create(get_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	tilemap1 = tilemap_create(get_tile_info1,tilemap_scan_rows,16,16,64,64);
+	tilemap2 = tilemap_create(get_tile_info2,tilemap_scan_rows, 8, 8,64,64);
 
 	K053936_wraparound_enable(0, 1);
 	K053936_set_offset(0, -48, -21);

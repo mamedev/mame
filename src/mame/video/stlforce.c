@@ -181,10 +181,10 @@ VIDEO_UPDATE( stlforce )
 
 VIDEO_START( stlforce )
 {
-	stlforce_bg_tilemap    = tilemap_create(get_stlforce_bg_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_PEN,      16,16,64,16);
-	stlforce_mlow_tilemap  = tilemap_create(get_stlforce_mlow_tile_info, tilemap_scan_cols,TILEMAP_TYPE_PEN, 16,16,64,16);
-	stlforce_mhigh_tilemap = tilemap_create(get_stlforce_mhigh_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 16,16,64,16);
-	stlforce_tx_tilemap    = tilemap_create(get_stlforce_tx_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_PEN,  8, 8,64,32);
+	stlforce_bg_tilemap    = tilemap_create(get_stlforce_bg_tile_info,   tilemap_scan_cols,      16,16,64,16);
+	stlforce_mlow_tilemap  = tilemap_create(get_stlforce_mlow_tile_info, tilemap_scan_cols, 16,16,64,16);
+	stlforce_mhigh_tilemap = tilemap_create(get_stlforce_mhigh_tile_info,tilemap_scan_cols, 16,16,64,16);
+	stlforce_tx_tilemap    = tilemap_create(get_stlforce_tx_tile_info,   tilemap_scan_rows,  8, 8,64,32);
 
 	tilemap_set_transparent_pen(stlforce_mlow_tilemap,0);
 	tilemap_set_transparent_pen(stlforce_mhigh_tilemap,0);

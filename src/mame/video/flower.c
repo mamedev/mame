@@ -138,10 +138,10 @@ static TILE_GET_INFO( get_text_tile_info )
 
 VIDEO_START(flower)
 {
-	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,16,16);
-	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,16);
-	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
-	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN, 8, 8, 2,32);
+	flower_bg0_tilemap        = tilemap_create(get_bg0_tile_info, tilemap_scan_rows,     16,16,16,16);
+	flower_bg1_tilemap        = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,16,16,16,16);
+	flower_text_tilemap       = tilemap_create(get_text_tile_info,tilemap_scan_rows, 8, 8,32,32);
+	flower_text_right_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_cols, 8, 8, 2,32);
 
 	tilemap_set_transparent_pen(flower_bg1_tilemap,15);
 	tilemap_set_transparent_pen(flower_text_tilemap,3);

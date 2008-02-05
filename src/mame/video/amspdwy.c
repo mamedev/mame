@@ -79,7 +79,7 @@ static TILEMAP_MAPPER( tilemap_scan_cols_back )
 VIDEO_START( amspdwy )
 {
 	bg_tilemap	=	tilemap_create(	get_tile_info,	tilemap_scan_cols_back,
-								TILEMAP_TYPE_PEN,	8,8,	0x20, 0x20 );
+									8,8,	0x20, 0x20 );
 }
 
 

@@ -922,19 +922,19 @@ VIDEO_START( wecleman )
 
 	bg_tilemap = tilemap_create(wecleman_get_bg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	/* We draw part of the road below */
+									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
 	fg_tilemap = tilemap_create(wecleman_get_fg_tile_info,
 								tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,
+
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
 	txt_tilemap = tilemap_create(wecleman_get_txt_tile_info,
 								 tilemap_scan_rows,
-								 TILEMAP_TYPE_PEN,
+
 								 8,8,
 								 PAGE_NX * 1, PAGE_NY * 1);
 

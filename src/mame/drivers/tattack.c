@@ -49,7 +49,7 @@ static VIDEO_UPDATE( tattack )
 
 static VIDEO_START( tattack )
 {
-		tmap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+		tmap = tilemap_create( get_tile_info,tilemap_scan_rows,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )

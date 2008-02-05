@@ -142,13 +142,13 @@ static int sprites_scrolldx, sprites_scrolldy;
 VIDEO_START( unico )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	tilemap_2 = tilemap_create(	get_tile_info_2,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	sprites_scrolldx = -0x3f;
 	sprites_scrolldy = -0x0e;
@@ -169,13 +169,13 @@ VIDEO_START( unico )
 VIDEO_START( zeropnt2 )
 {
 	tilemap_0 = tilemap_create(	get_tile_info32_0,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	tilemap_1 = tilemap_create(	get_tile_info32_1,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	tilemap_2 = tilemap_create(	get_tile_info32_2,tilemap_scan_rows,
-								TILEMAP_TYPE_PEN,	16,16,	0x40, 0x40);
+									16,16,	0x40, 0x40);
 
 	sprites_scrolldx = -0x3f;
 	sprites_scrolldy = -0x0e;

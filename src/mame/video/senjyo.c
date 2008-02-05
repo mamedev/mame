@@ -118,19 +118,19 @@ static TILE_GET_INFO( get_bg3_tile_info )
 
 VIDEO_START( senjyo )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	if (senjyo)
 	{
-		bg1_tilemap = tilemap_create(senjyo_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,32);
-		bg2_tilemap = tilemap_create(get_bg2_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,48);	/* only 16x32 used by Star Force */
-		bg3_tilemap = tilemap_create(get_bg3_tile_info,   tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,56);	/* only 16x32 used by Star Force */
+		bg1_tilemap = tilemap_create(senjyo_bg1_tile_info,tilemap_scan_rows,16,16,16,32);
+		bg2_tilemap = tilemap_create(get_bg2_tile_info,   tilemap_scan_rows,16,16,16,48);	/* only 16x32 used by Star Force */
+		bg3_tilemap = tilemap_create(get_bg3_tile_info,   tilemap_scan_rows,16,16,16,56);	/* only 16x32 used by Star Force */
 	}
 	else
 	{
-		bg1_tilemap = tilemap_create(starforc_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,32);
-		bg2_tilemap = tilemap_create(get_bg2_tile_info,     tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,32);	/* only 16x32 used by Star Force */
-		bg3_tilemap = tilemap_create(get_bg3_tile_info,     tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,16,32);	/* only 16x32 used by Star Force */
+		bg1_tilemap = tilemap_create(starforc_bg1_tile_info,tilemap_scan_rows,16,16,16,32);
+		bg2_tilemap = tilemap_create(get_bg2_tile_info,     tilemap_scan_rows,16,16,16,32);	/* only 16x32 used by Star Force */
+		bg3_tilemap = tilemap_create(get_bg3_tile_info,     tilemap_scan_rows,16,16,16,32);	/* only 16x32 used by Star Force */
 	}
 
 	tilemap_set_transparent_pen(fg_tilemap,0);

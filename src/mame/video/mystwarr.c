@@ -180,7 +180,7 @@ VIDEO_START(gaiapols)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -10,  0); // floor tiles in demo loop2 (Elaine vs. boss)
 
-	ult_936_tilemap = tilemap_create(get_gai_936_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 512, 512);
+	ult_936_tilemap = tilemap_create(get_gai_936_tile_info, tilemap_scan_rows,  16, 16, 512, 512);
 	tilemap_set_transparent_pen(ult_936_tilemap, 0);
 }
 
@@ -224,7 +224,7 @@ VIDEO_START(dadandrn)
 	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -8, 0); // Brainy's laser
 
-	ult_936_tilemap = tilemap_create(get_ult_936_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 512, 512);
+	ult_936_tilemap = tilemap_create(get_ult_936_tile_info, tilemap_scan_rows,  16, 16, 512, 512);
 	tilemap_set_transparent_pen(ult_936_tilemap, 0);
 }
 

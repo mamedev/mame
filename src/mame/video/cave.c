@@ -410,28 +410,28 @@ static void cave_vh_start(running_machine *machine, int num)
 	{
 		case 4:
 			tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 8,8, 512/8,512/8 );
+										 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_3, 0);
 			tilemap_set_scroll_rows(tilemap_3, 1);
 			tilemap_set_scroll_cols(tilemap_3, 1);
 
 		case 3:
 			tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 8,8, 512/8,512/8 );
+										 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_2, 0);
 			tilemap_set_scroll_rows(tilemap_2, 1);
 			tilemap_set_scroll_cols(tilemap_2, 1);
 
 		case 2:
 			tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 8,8, 512/8,512/8 );
+										 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_1, 0);
 			tilemap_set_scroll_rows(tilemap_1, 1);
 			tilemap_set_scroll_cols(tilemap_1, 1);
 
 		case 1:
 			tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-										TILEMAP_TYPE_PEN, 8,8, 512/8,512/8 );
+										 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_0, 0);
 			tilemap_set_scroll_rows(tilemap_0, 1);
 			tilemap_set_scroll_cols(tilemap_0, 1);
@@ -479,7 +479,7 @@ VIDEO_START( sailormn_3_layers )
 
 	/* Layer 2 (8x8) needs to be handled differently */
 	tilemap_2 = tilemap_create(	sailormn_get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 512/8,512/8 );
+								 8,8, 512/8,512/8 );
 	tilemap_set_transparent_pen(tilemap_2, 0);
 	tilemap_set_scroll_rows(tilemap_2, 1);
 	tilemap_set_scroll_cols(tilemap_2, 1);

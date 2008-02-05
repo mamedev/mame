@@ -364,7 +364,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 static VIDEO_START( powerbal )
 {
-	bg_tilemap = tilemap_create(powerbal_get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	bg_tilemap = tilemap_create(powerbal_get_bg_tile_info,tilemap_scan_rows,8, 8,64,32);
 
 	xoffset = -20;
 

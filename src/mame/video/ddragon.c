@@ -105,8 +105,8 @@ static TILE_GET_INFO( get_fg_16color_tile_info )
 
 VIDEO_START( ddragon )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_PEN,     16,16,32,32);
-	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scrolldx(fg_tilemap, 0, 384 - 256);
@@ -120,8 +120,8 @@ VIDEO_START( ddragon )
 
 VIDEO_START( chinagat )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,  TILEMAP_TYPE_PEN,     16,16,32,32);
-	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,background_scan,16,16,32,32);
+	fg_tilemap = tilemap_create(get_fg_16color_tile_info,tilemap_scan_rows,8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_scrolldy(fg_tilemap, -8, -8);

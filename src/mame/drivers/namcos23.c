@@ -370,7 +370,7 @@ static WRITE32_HANDLER( namcos23_textram_w )
 
 static VIDEO_START( ss23 )
 {
-	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64 );
+	bgtilemap = tilemap_create( TextTilemapGetInfo,tilemap_scan_rows,16,16,64,64 );
 	tilemap_set_transparent_pen( bgtilemap, 0xf );
 }
 

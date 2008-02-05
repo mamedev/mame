@@ -280,7 +280,7 @@ VIDEO_START( glfgreat )
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
-	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,512,512);
+	roz_tilemap = tilemap_create(glfgreat_get_roz_tile_info,tilemap_scan_rows,16,16,512,512);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 
@@ -301,7 +301,7 @@ VIDEO_START( prmrsocr )
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 
-	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,512,256);
+	roz_tilemap = tilemap_create(prmrsocr_get_roz_tile_info,tilemap_scan_rows,16,16,512,256);
 
 	tilemap_set_transparent_pen(roz_tilemap,0);
 

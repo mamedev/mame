@@ -71,9 +71,9 @@ VIDEO_START( fstarfrc )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,16,16,32,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);
@@ -93,9 +93,9 @@ VIDEO_START( ginkun )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);
@@ -113,9 +113,9 @@ VIDEO_START( riot )
 	/* set up sprites */
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 
-	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,tilemap_scan_rows,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,tilemap_scan_rows,16,16,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tilemap_scan_rows, 8, 8,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);

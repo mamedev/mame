@@ -105,9 +105,9 @@ VIDEO_START(mainsnk)
 	old_bg_color = -1;
 	stuff_palette( machine, 0, 0, 16*8 );
 	stuff_palette( machine, 16*8*3, 16*8, 16*8 );
-	me_fg_tilemap = tilemap_create(get_me_fg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32, 32);
+	me_fg_tilemap = tilemap_create(get_me_fg_tile_info,tilemap_scan_cols,8,8,32, 32);
 	tilemap_set_transparent_pen(me_fg_tilemap,15);
-	me_bg_tilemap = tilemap_create(get_me_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32, 32);
+	me_bg_tilemap = tilemap_create(get_me_bg_tile_info,tilemap_scan_cols,8,8,32, 32);
 	tilemap_set_scrollx( me_fg_tilemap, 0, -mainsnk_offset );
 	tilemap_set_scrollx( me_bg_tilemap, 0, -mainsnk_offset );
 }

@@ -120,7 +120,7 @@ VIDEO_START( atarig42 )
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarig42_playfield_scan, TILEMAP_TYPE_PEN, 8,8, 128,64);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, atarig42_playfield_scan,  8,8, 128,64);
 
 	/* initialize the motion objects */
 	adjusted_modesc.palettebase = atarig42_motion_object_base;
@@ -129,7 +129,7 @@ VIDEO_START( atarig42 )
 	atarirle_init(0, &adjusted_modesc);
 
 	/* initialize the alphanumerics */
-	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 64,32);
+	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
 
 	/* reset statics */

@@ -67,7 +67,7 @@ static void VS920A_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		VS920A[i].tmap = tilemap_create(VS920A_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+		VS920A[i].tmap = tilemap_create(VS920A_get_tile_info,tilemap_scan_rows,8,8,64,32);
 
 		tilemap_set_transparent_pen(VS920A[i].tmap, 0);
 	}
@@ -225,7 +225,7 @@ static void MB60553_init(int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		MB60553[i].tmap = tilemap_create(MB60553_get_tile_info,twc94_scan,TILEMAP_TYPE_PEN, 16,16,128,64);
+		MB60553[i].tmap = tilemap_create(MB60553_get_tile_info,twc94_scan, 16,16,128,64);
 
 		tilemap_set_transparent_pen(MB60553[i].tmap, 0);
 	}

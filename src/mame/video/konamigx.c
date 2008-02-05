@@ -273,7 +273,7 @@ VIDEO_START(konamigx_type3)
 
 	_gxcommoninit(machine);
 
-	gx_psac_tilemap = tilemap_create(get_gx_psac3_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 256, 1024);
+	gx_psac_tilemap = tilemap_create(get_gx_psac3_tile_info, tilemap_scan_rows,  16, 16, 256, 1024);
 	gx_rozenable = 1;
 
 	K053936_wraparound_enable(0, 1);
@@ -286,7 +286,7 @@ VIDEO_START(konamigx_type4)
 
 	_gxcommoninit(machine);
 
-	gx_psac_tilemap = tilemap_create(get_gx_psac_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
+	gx_psac_tilemap = tilemap_create(get_gx_psac_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	gx_rozenable = 1;
 
 	K053936_wraparound_enable(0, 0);
@@ -321,8 +321,8 @@ VIDEO_START(opengolf)
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = tilemap_create(get_gx_psac1a_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
-	gx_psac_tilemap2 = tilemap_create(get_gx_psac1b_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
+	gx_psac_tilemap = tilemap_create(get_gx_psac1a_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
+	gx_psac_tilemap2 = tilemap_create(get_gx_psac1b_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	tilemap_set_transparent_pen(gx_psac_tilemap, 0);
 	tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
 
@@ -341,8 +341,8 @@ VIDEO_START(racinfrc)
 	K056832_set_LayerOffset(2,  2+1, 0);
 	K056832_set_LayerOffset(3,  3+1, 0);
 
-	gx_psac_tilemap = tilemap_create(get_gx_psac1a_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
-	gx_psac_tilemap2 = tilemap_create(get_gx_psac1b_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 16, 16, 128, 128);
+	gx_psac_tilemap = tilemap_create(get_gx_psac1a_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
+	gx_psac_tilemap2 = tilemap_create(get_gx_psac1b_tile_info, tilemap_scan_rows,  16, 16, 128, 128);
 	tilemap_set_transparent_pen(gx_psac_tilemap, 0);
 	tilemap_set_transparent_pen(gx_psac_tilemap2, 0);
 

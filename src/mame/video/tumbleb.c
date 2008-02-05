@@ -459,9 +459,9 @@ static TILE_GET_INFO( pangpang_get_fg_tile_info )
 
 VIDEO_START( pangpang )
 {
-	pf1_tilemap =     tilemap_create(pangpang_get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1_alt_tilemap = tilemap_create(pangpang_get_bg1_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap =     tilemap_create(pangpang_get_bg2_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap =     tilemap_create(pangpang_get_fg_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf1_alt_tilemap = tilemap_create(pangpang_get_bg1_tile_info,tumblep_scan,16,16,64,32);
+	pf2_tilemap =     tilemap_create(pangpang_get_bg2_tile_info,tumblep_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
@@ -474,9 +474,9 @@ VIDEO_START( pangpang )
 
 VIDEO_START( tumblepb )
 {
-	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,16,16,64,32);
+	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
@@ -488,9 +488,9 @@ VIDEO_START( tumblepb )
 
 VIDEO_START( sdfight )
 {
-	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
-	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,64,64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
+	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,16,16,64,32);
+	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
@@ -503,9 +503,9 @@ VIDEO_START( sdfight )
 
 VIDEO_START( fncywld )
 {
-	pf1_tilemap =     tilemap_create(get_fncywld_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1_alt_tilemap = tilemap_create(get_fncywld_bg1_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap =     tilemap_create(get_fncywld_bg2_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap =     tilemap_create(get_fncywld_fg_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf1_alt_tilemap = tilemap_create(get_fncywld_bg1_tile_info,tumblep_scan,16,16,64,32);
+	pf2_tilemap =     tilemap_create(get_fncywld_bg2_tile_info,tumblep_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(pf1_tilemap,15);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,15);
@@ -517,10 +517,10 @@ VIDEO_START( fncywld )
 
 VIDEO_START( jumppop )
 {
-	pf1_tilemap =     tilemap_create(get_jumppop_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,128,64);
-	pf1_alt_tilemap = tilemap_create(get_jumppop_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	pf2_tilemap =     tilemap_create(get_jumppop_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,64,64);
-	pf2_alt_tilemap =     tilemap_create(get_jumppop_bg2_alt_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     8,8,128,64);
+	pf1_tilemap =     tilemap_create(get_jumppop_fg_tile_info, tilemap_scan_rows, 8, 8,128,64);
+	pf1_alt_tilemap = tilemap_create(get_jumppop_bg1_tile_info,tilemap_scan_rows,16,16,64,64);
+	pf2_tilemap =     tilemap_create(get_jumppop_bg2_tile_info,tilemap_scan_rows,     16,16,64,64);
+	pf2_alt_tilemap =     tilemap_create(get_jumppop_bg2_alt_tile_info,tilemap_scan_rows,     8,8,128,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
@@ -830,9 +830,9 @@ VIDEO_UPDATE( pangpang )
 
 VIDEO_START( suprtrio )
 {
-	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	pf1_tilemap =     tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8,64,32);
+	pf1_alt_tilemap = tilemap_create(get_bg1_tile_info,tumblep_scan,16,16,64,32);
+	pf2_tilemap =     tilemap_create(get_bg2_tile_info,tumblep_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(pf1_alt_tilemap,0);
 	bcstory_tilebank = 0;

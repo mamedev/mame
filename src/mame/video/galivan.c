@@ -203,8 +203,8 @@ VIDEO_START( galivan )
 	UINT8 *rombase = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 2, &rombase[0x10000], 0x2000);
 
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,   16,16,128,128);
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,   16,16,128,128);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
@@ -222,8 +222,8 @@ VIDEO_START( ninjemak )
 	UINT8 *rombase = memory_region(REGION_CPU1);
 	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x2000);
 
-	bg_tilemap = tilemap_create(ninjemak_get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,   16,16,512,32);
-	tx_tilemap = tilemap_create(ninjemak_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(ninjemak_get_bg_tile_info,tilemap_scan_cols,   16,16,512,32);
+	tx_tilemap = tilemap_create(ninjemak_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 

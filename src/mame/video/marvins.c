@@ -161,9 +161,9 @@ VIDEO_START( marvins )
 	stuff_palette( machine, 0, 0, 16*8 ); /* load sprite colors */
 	stuff_palette( machine, 16*8*3, 16*8, 16*8 ); /* load text colors */
 
-	fg_tilemap = tilemap_create(get_fg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
-	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fg_tilemap = tilemap_create(get_fg_tilemap_info,tilemap_scan_cols,8,8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tilemap_info,tilemap_scan_cols,8,8,64,32);
+	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,8,8,32,32);
 
 	{
 		tilemap_clip = machine->screen[0].visarea;

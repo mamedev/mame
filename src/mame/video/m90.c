@@ -55,10 +55,10 @@ static TILE_GET_INFO( get_pf2w_tile_info ) { get_tile_info(machine,tileinfo,tile
 
 VIDEO_START( m90 )
 {
-	pf1_layer =      tilemap_create(get_pf1_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pf1_wide_layer = tilemap_create(get_pf1w_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
-	pf2_layer =      tilemap_create(get_pf2_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pf2_wide_layer = tilemap_create(get_pf2w_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
+	pf1_layer =      tilemap_create(get_pf1_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf1_wide_layer = tilemap_create(get_pf1w_tile_info,tilemap_scan_rows,8,8,128,64);
+	pf2_layer =      tilemap_create(get_pf2_tile_info, tilemap_scan_rows,8,8,64,64);
+	pf2_wide_layer = tilemap_create(get_pf2w_tile_info,tilemap_scan_rows,8,8,128,64);
 
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);

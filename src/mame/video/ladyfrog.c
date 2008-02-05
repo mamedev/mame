@@ -137,7 +137,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_START( ladyfrog )
 {
   ladyfrog_spriteram = auto_malloc (160);
-  bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32 );
+  bg_tilemap = tilemap_create( get_tile_info,tilemap_scan_rows,8,8,32,32 );
 
   paletteram = auto_malloc(0x200);
   paletteram_2 = auto_malloc(0x200);

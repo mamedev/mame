@@ -797,13 +797,13 @@ void PC080SN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int y_inver
 
 		if (!PC080SN_dblwidth)	/* standard tilemaps */
 		{
-			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
+			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
 		}
 		else	/* double width tilemaps */
 		{
-			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
-			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
+			PC080SN_tilemap[i][0] = tilemap_create(PC080SN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
+			PC080SN_tilemap[i][1] = tilemap_create(PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
 		}
 
 		PC080SN_ram[i] = auto_malloc(PC080SN_RAM_SIZE);
@@ -1534,8 +1534,8 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 	TC0080VCO_bg_flip_yoffs = bg_flip_yoffs;	/* usually -2 */
 	TC0080VCO_has_tx = has_fg0;	/* for debugging only */
 
-	TC0080VCO_tilemap[0] = tilemap_create(TC0080VCO_get_bg0_tile_info_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	TC0080VCO_tilemap[1] = tilemap_create(TC0080VCO_get_bg1_tile_info_0,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	TC0080VCO_tilemap[0] = tilemap_create(TC0080VCO_get_bg0_tile_info_0,tilemap_scan_rows,16,16,64,64);
+	TC0080VCO_tilemap[1] = tilemap_create(TC0080VCO_get_bg1_tile_info_0,tilemap_scan_rows,16,16,64,64);
 	TC0080VCO_ram = auto_malloc(TC0080VCO_RAM_SIZE);
 
 	memset( TC0080VCO_ram,0,TC0080VCO_RAM_SIZE );
@@ -1558,7 +1558,7 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 
 	/* Perform extra initialisations for text layer */
 	{
-		TC0080VCO_tilemap[2] = tilemap_create(TC0080VCO_get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		TC0080VCO_tilemap[2] = tilemap_create(TC0080VCO_get_tx_tile_info,tilemap_scan_rows,8,8,64,64);
 		TC0080VCO_char_dirty = auto_malloc(TC0080VCO_TOTAL_CHARS);
 
 		TC0080VCO_dirty_chars();
@@ -2292,14 +2292,14 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		TC0100SCN_dblwidth[i]=0;
 
 		/* Single width versions */
-		TC0100SCN_tilemap[i][0][0] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-		TC0100SCN_tilemap[i][1][0] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-		TC0100SCN_tilemap[i][2][0] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		TC0100SCN_tilemap[i][0][0] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,64,64);
+		TC0100SCN_tilemap[i][1][0] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,64,64);
+		TC0100SCN_tilemap[i][2][0] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,64,64);
 
 		/* Double width versions */
-		TC0100SCN_tilemap[i][0][1] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
-		TC0100SCN_tilemap[i][1][1] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,64);
-		TC0100SCN_tilemap[i][2][1] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,128,32);
+		TC0100SCN_tilemap[i][0][1] = tilemap_create(TC0100SCN_get_tile_info[i][0],tilemap_scan_rows,8,8,128,64);
+		TC0100SCN_tilemap[i][1][1] = tilemap_create(TC0100SCN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
+		TC0100SCN_tilemap[i][2][1] = tilemap_create(TC0100SCN_get_tile_info[i][2],tilemap_scan_rows,8,8,128,32);
 
 		/* Set up clipping for multi-TC0100SCN games. We assume
            this code won't ever affect single screen games:
@@ -2787,7 +2787,7 @@ static TILE_GET_INFO( TC0280GRD_get_tile_info )
 void TC0280GRD_vh_start(int gfxnum)
 {
 	TC0280GRD_ram = auto_malloc(TC0280GRD_RAM_SIZE);
-	TC0280GRD_tilemap = tilemap_create(TC0280GRD_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	TC0280GRD_tilemap = tilemap_create(TC0280GRD_get_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	state_save_register_global_pointer(TC0280GRD_ram, TC0280GRD_RAM_SIZE/2);
 	state_save_register_global_array(TC0280GRD_ctrl);
@@ -3165,18 +3165,18 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		TC0480SCP_dblwidth=0;
 
 		/* Single width versions */
-		TC0480SCP_tilemap[0][0] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		TC0480SCP_tilemap[1][0] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		TC0480SCP_tilemap[2][0] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		TC0480SCP_tilemap[3][0] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-		TC0480SCP_tilemap[4][0] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		TC0480SCP_tilemap[0][0] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[1][0] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[2][0] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[3][0] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,16,16,32,32);
+		TC0480SCP_tilemap[4][0] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
 
 		/* Double width versions */
-		TC0480SCP_tilemap[0][1] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		TC0480SCP_tilemap[1][1] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		TC0480SCP_tilemap[2][1] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		TC0480SCP_tilemap[3][1] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,32);
-		TC0480SCP_tilemap[4][1] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+		TC0480SCP_tilemap[0][1] = tilemap_create(tc480_get_tile_info[0],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[1][1] = tilemap_create(tc480_get_tile_info[1],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[2][1] = tilemap_create(tc480_get_tile_info[2],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[3][1] = tilemap_create(tc480_get_tile_info[3],tilemap_scan_rows,16,16,64,32);
+		TC0480SCP_tilemap[4][1] = tilemap_create(tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
 
 		TC0480SCP_ram = auto_malloc(TC0480SCP_RAM_SIZE);
 		TC0480SCP_char_dirty = auto_malloc(TC0480SCP_TOTAL_CHARS);

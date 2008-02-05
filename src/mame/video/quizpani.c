@@ -73,8 +73,8 @@ WRITE16_HANDLER( quizpani_tilesbank_w )
 
 VIDEO_START( quizpani )
 {
-	bg_tilemap  = tilemap_create(bg_tile_info, bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	txt_tilemap = tilemap_create(txt_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
+	bg_tilemap  = tilemap_create(bg_tile_info, bg_scan,16,16,256,32);
+	txt_tilemap = tilemap_create(txt_tile_info,bg_scan,16,16,256,32);
 	tilemap_set_transparent_pen(txt_tilemap,15);
 }
 

@@ -156,13 +156,13 @@ WRITE8_HANDLER( paradise_pixmap_w )
 VIDEO_START( paradise )
 {
 	tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 0x20,0x20 );
+								 8,8, 0x20,0x20 );
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 0x20,0x20 );
+								 8,8, 0x20,0x20 );
 
 	tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-								TILEMAP_TYPE_PEN, 8,8, 0x20,0x20 );
+								 8,8, 0x20,0x20 );
 
 	/* pixmap */
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);

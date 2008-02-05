@@ -322,7 +322,7 @@ static TILE_GET_INFO( mappy_get_tile_info )
 
 VIDEO_START( superpac )
 {
-	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap = tilemap_create(superpac_get_tile_info,superpac_tilemap_scan,8,8,36,28);
 	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
@@ -334,7 +334,7 @@ VIDEO_START( superpac )
 
 VIDEO_START( phozon )
 {
-	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
+	bg_tilemap = tilemap_create(phozon_get_tile_info,superpac_tilemap_scan,8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 15);
 
@@ -345,7 +345,7 @@ VIDEO_START( phozon )
 
 VIDEO_START( mappy )
 {
-	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,60);
+	bg_tilemap = tilemap_create(mappy_get_tile_info,mappy_tilemap_scan,8,8,36,60);
 
 	colortable_configure_tilemap_groups(machine->colortable, bg_tilemap, machine->gfx[0], 31);
 	tilemap_set_scroll_cols(bg_tilemap, 36);

@@ -99,8 +99,8 @@ static TILE_GET_INFO( bjtwin_get_bg_tile_info )
 
 VIDEO_START( bioship )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 	background_bitmap = auto_bitmap_alloc(8192,512,machine->screen[0].format);
@@ -118,9 +118,9 @@ VIDEO_START( bioship )
 
 VIDEO_START( strahl )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	fg_tilemap = tilemap_create(strahl_get_fg_tile_info, bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,16,16,256,32);
+	fg_tilemap = tilemap_create(strahl_get_fg_tile_info, bg_scan,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -136,8 +136,8 @@ VIDEO_START( strahl )
 
 VIDEO_START( macross )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -152,8 +152,8 @@ VIDEO_START( macross )
 
 VIDEO_START( gunnail )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,256,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,16,16,256,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -170,8 +170,8 @@ VIDEO_START( gunnail )
 
 VIDEO_START( macross2 )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,TILEMAP_TYPE_PEN,16,16,1024,128);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan,16,16,1024,128);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -187,8 +187,8 @@ VIDEO_START( macross2 )
 
 VIDEO_START( tdragon2 )
 {
-	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan_td2,TILEMAP_TYPE_PEN,16,16,1024,32);
-	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(macross_get_bg_tile_info,bg_scan_td2,16,16,1024,32);
+	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -204,7 +204,7 @@ VIDEO_START( tdragon2 )
 
 VIDEO_START( bjtwin )
 {
-	bg_tilemap = tilemap_create(bjtwin_get_bg_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,64,32);
+	bg_tilemap = tilemap_create(bjtwin_get_bg_tile_info,tilemap_scan_cols,8,8,64,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
 
@@ -997,12 +997,12 @@ VIDEO_START( afega )
 
 
 	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
-								TILEMAP_TYPE_PEN,
+
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TYPE_PEN,
+
 								8,8,
 								32,32);
 
@@ -1020,12 +1020,12 @@ VIDEO_START( firehawk )
 
 
 	tilemap_0 = tilemap_create(	get_tile_info_0, firehawk_tilemap_scan_pages,
-								TILEMAP_TYPE_PEN,
+
 								16,16,
 								TILES_PER_PAGE_X*FIREHAWK_PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*FIREHAWK_PAGES_PER_TMAP_Y);
 
 	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
-								TILEMAP_TYPE_PEN,
+
 								8,8,
 								32,32);
 

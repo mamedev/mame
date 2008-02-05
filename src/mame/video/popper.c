@@ -156,10 +156,10 @@ static TILE_GET_INFO( get_popper_ol_p0_tile_info )
 
 VIDEO_START( popper )
 {
-	popper_p123_tilemap    = tilemap_create( get_popper_p123_tile_info,   tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,33,32 );
-	popper_p0_tilemap      = tilemap_create( get_popper_p0_tile_info,     tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,33,32 );
-	popper_ol_p123_tilemap = tilemap_create( get_popper_ol_p123_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,2 ,32 );
-	popper_ol_p0_tilemap   = tilemap_create( get_popper_ol_p0_tile_info,  tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,2 ,32 );
+	popper_p123_tilemap    = tilemap_create( get_popper_p123_tile_info,   tilemap_scan_cols,8,8,33,32 );
+	popper_p0_tilemap      = tilemap_create( get_popper_p0_tile_info,     tilemap_scan_cols,8,8,33,32 );
+	popper_ol_p123_tilemap = tilemap_create( get_popper_ol_p123_tile_info,tilemap_scan_cols,8,8,2 ,32 );
+	popper_ol_p0_tilemap   = tilemap_create( get_popper_ol_p0_tile_info,  tilemap_scan_cols,8,8,2 ,32 );
 
 	tilemap_set_transmask(popper_p123_tilemap,   0,0x0f,0x01);
 	tilemap_set_transmask(popper_p123_tilemap,   1,0x01,0x0f);

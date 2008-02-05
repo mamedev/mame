@@ -346,10 +346,10 @@ static VIDEO_START(rabbit)
 	memset(rabbit_tilemap_ram[2], 0, 0x20000);
 	memset(rabbit_tilemap_ram[3], 0, 0x20000);
 
-	rabbit_tilemap[0] = tilemap_create(get_rabbit_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
-	rabbit_tilemap[1] = tilemap_create(get_rabbit_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
-	rabbit_tilemap[2] = tilemap_create(get_rabbit_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 128,32);
-	rabbit_tilemap[3] = tilemap_create(get_rabbit_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     8, 8, 128,32);
+	rabbit_tilemap[0] = tilemap_create(get_rabbit_tilemap0_tile_info,tilemap_scan_rows,16, 16, 128,32);
+	rabbit_tilemap[1] = tilemap_create(get_rabbit_tilemap1_tile_info,tilemap_scan_rows,16, 16, 128,32);
+	rabbit_tilemap[2] = tilemap_create(get_rabbit_tilemap2_tile_info,tilemap_scan_rows,16, 16, 128,32);
+	rabbit_tilemap[3] = tilemap_create(get_rabbit_tilemap3_tile_info,tilemap_scan_rows, 8,  8, 128,32);
 	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
@@ -1136,10 +1136,10 @@ static VIDEO_START(tmmjprd)
 	memset(rabbit_tilemap_ram[2], 0, 0x20000);
 	memset(rabbit_tilemap_ram[3], 0, 0x20000);
 
-	rabbit_tilemap[0] = tilemap_create(get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     8, 8, 64, 64);
-	rabbit_tilemap[1] = tilemap_create(get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
-	rabbit_tilemap[2] = tilemap_create(get_tmmjprd_tilemap2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
-	rabbit_tilemap[3] = tilemap_create(get_tmmjprd_tilemap3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN ,     16, 16, 64, 64);
+	rabbit_tilemap[0] = tilemap_create(get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
+	rabbit_tilemap[1] = tilemap_create(get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,16, 16, 64, 64);
+	rabbit_tilemap[2] = tilemap_create(get_tmmjprd_tilemap2_tile_info,tilemap_scan_rows,16, 16, 64, 64);
+	rabbit_tilemap[3] = tilemap_create(get_tmmjprd_tilemap3_tile_info,tilemap_scan_rows,16, 16, 64, 64);
 	tilemap_set_transparent_pen(rabbit_tilemap[0],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);

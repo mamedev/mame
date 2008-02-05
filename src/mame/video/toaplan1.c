@@ -256,10 +256,10 @@ static TILE_GET_INFO( get_pf4_tile_info )
 
 static void toaplan1_create_tilemaps(void)
 {
-	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pf3_tilemap = tilemap_create(get_pf3_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
-	pf4_tilemap = tilemap_create(get_pf4_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,64);
+	pf1_tilemap = tilemap_create(get_pf1_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf3_tilemap = tilemap_create(get_pf3_tile_info,tilemap_scan_rows,8,8,64,64);
+	pf4_tilemap = tilemap_create(get_pf4_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

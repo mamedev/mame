@@ -173,9 +173,9 @@ static TILE_GET_INFO( get_pf1_8x8_tile_info )
 
 VIDEO_START( sshangha )
 {
-	pf1_8x8_tilemap   = tilemap_create(get_pf1_8x8_tile_info,  tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	pf1_16x16_tilemap = tilemap_create(get_pf1_16x16_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
-	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,    TILEMAP_TYPE_PEN,     16,16,32,32);
+	pf1_8x8_tilemap   = tilemap_create(get_pf1_8x8_tile_info,  tilemap_scan_rows, 8, 8,64,32);
+	pf1_16x16_tilemap = tilemap_create(get_pf1_16x16_tile_info,tilemap_scan_rows,16,16,32,32);
+	pf2_tilemap = tilemap_create(get_pf2_tile_info,tilemap_scan_rows,         16,16,32,32);
 
 	tilemap_set_transparent_pen(pf1_8x8_tilemap,0);
 	tilemap_set_transparent_pen(pf1_16x16_tilemap,0);

@@ -139,10 +139,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 static VIDEO_START( darkhors )
 {
 	darkhors_tmap			=	tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-												TILEMAP_TYPE_PEN, 16,16, 0x40,0x40	);
+												16,16, 0x40,0x40	);
 
 	darkhors_tmap2			=	tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-												TILEMAP_TYPE_PEN, 16,16, 0x40,0x40	);
+												16,16, 0x40,0x40	);
 
 	tilemap_set_transparent_pen(darkhors_tmap, 0);
 	tilemap_set_transparent_pen(darkhors_tmap2, 0);

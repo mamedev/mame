@@ -91,17 +91,17 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( lwings )
 {
-	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
-	bg1_tilemap = tilemap_create(lwings_get_bg1_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,     16,16,32,32);
+	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows, 8, 8,32,32);
+	bg1_tilemap = tilemap_create(lwings_get_bg1_tile_info,tilemap_scan_cols,     16,16,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,3);
 }
 
 VIDEO_START( trojan )
 {
-	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,    TILEMAP_TYPE_PEN,8, 8,32,32);
-	bg1_tilemap = tilemap_create(trojan_get_bg1_tile_info,tilemap_scan_cols,    TILEMAP_TYPE_PEN,     16,16,32,32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,       get_bg2_memory_offset,TILEMAP_TYPE_PEN,    16,16,32,16);
+	fg_tilemap  = tilemap_create(get_fg_tile_info,        tilemap_scan_rows,    8, 8,32,32);
+	bg1_tilemap = tilemap_create(trojan_get_bg1_tile_info,tilemap_scan_cols,         16,16,32,32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,       get_bg2_memory_offset,    16,16,32,16);
 
 		tilemap_set_transparent_pen(fg_tilemap,3);
 		tilemap_set_transmask(bg1_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half */

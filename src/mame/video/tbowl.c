@@ -204,9 +204,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_START( tbowl )
 {
-	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,32);
-	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,128,32);
-	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,128,32);
+	tx_tilemap = tilemap_create(get_tx_tile_info,tilemap_scan_rows, 8, 8,64,32);
+	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows, 16, 16,128,32);
+	bg2_tilemap = tilemap_create(get_bg2_tile_info,tilemap_scan_rows, 16, 16,128,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,0);
 	tilemap_set_transparent_pen(bg_tilemap,0);

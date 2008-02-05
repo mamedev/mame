@@ -174,7 +174,7 @@ static TILE_GET_INFO( pinbo_get_bg_tile_info )
 VIDEO_START( lasso )
 {
 	/* create tilemap */
-	bg_tilemap = tilemap_create(lasso_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	bg_tilemap = tilemap_create(lasso_get_bg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* register for saving */
 	state_save_register_global(gfxbank);
@@ -183,8 +183,8 @@ VIDEO_START( lasso )
 VIDEO_START( wwjgtin )
 {
 	/* create tilemaps */
-	bg_tilemap =    tilemap_create(lasso_get_bg_tile_info,      tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8,  32,  32);
-	track_tilemap = tilemap_create(wwjgtin_get_track_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN,      16,16, 0x80,0x40);
+	bg_tilemap =    tilemap_create(lasso_get_bg_tile_info,      tilemap_scan_rows,  8, 8,  32,  32);
+	track_tilemap = tilemap_create(wwjgtin_get_track_tile_info, tilemap_scan_rows,       16,16, 0x80,0x40);
 
 	tilemap_set_transparent_pen(bg_tilemap,0);
 
@@ -196,7 +196,7 @@ VIDEO_START( wwjgtin )
 VIDEO_START( pinbo )
 {
 	/* create tilemap */
-	bg_tilemap = tilemap_create(pinbo_get_bg_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	bg_tilemap = tilemap_create(pinbo_get_bg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* register for saving */
 	state_save_register_global(gfxbank);

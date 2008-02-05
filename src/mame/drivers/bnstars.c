@@ -467,18 +467,18 @@ static WRITE32_HANDLER( ms32_spramx_w )
 
 static VIDEO_START(bnstars)
 {
-	ms32_tx_tilemap[0] = tilemap_create(get_ms32_tx0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
-	ms32_tx_tilemap[1] = tilemap_create(get_ms32_tx1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,64,64);
+	ms32_tx_tilemap[0] = tilemap_create(get_ms32_tx0_tile_info,tilemap_scan_rows, 8, 8,64,64);
+	ms32_tx_tilemap[1] = tilemap_create(get_ms32_tx1_tile_info,tilemap_scan_rows, 8, 8,64,64);
 	tilemap_set_transparent_pen(ms32_tx_tilemap[0],0);
 	tilemap_set_transparent_pen(ms32_tx_tilemap[1],0);
 
-	ms32_bg_tilemap[0] = tilemap_create(get_ms32_bg0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
-	ms32_bg_tilemap[1] = tilemap_create(get_ms32_bg1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,64,64);
+	ms32_bg_tilemap[0] = tilemap_create(get_ms32_bg0_tile_info,tilemap_scan_rows,16,16,64,64);
+	ms32_bg_tilemap[1] = tilemap_create(get_ms32_bg1_tile_info,tilemap_scan_rows,16,16,64,64);
 	tilemap_set_transparent_pen(ms32_bg_tilemap[0],0);
 	tilemap_set_transparent_pen(ms32_bg_tilemap[1],0);
 
-	ms32_roz_tilemap[0] = tilemap_create(get_ms32_roz0_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,128,128);
-	ms32_roz_tilemap[1] = tilemap_create(get_ms32_roz1_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,128,128);
+	ms32_roz_tilemap[0] = tilemap_create(get_ms32_roz0_tile_info,tilemap_scan_rows,16,16,128,128);
+	ms32_roz_tilemap[1] = tilemap_create(get_ms32_roz1_tile_info,tilemap_scan_rows,16,16,128,128);
 	tilemap_set_transparent_pen(ms32_roz_tilemap[0],0);
 	tilemap_set_transparent_pen(ms32_roz_tilemap[1],0);
 

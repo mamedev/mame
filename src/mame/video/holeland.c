@@ -56,7 +56,7 @@ static TILE_GET_INFO( crzrally_get_tile_info )
 
 VIDEO_START( holeland )
 {
-	bg_tilemap = tilemap_create(holeland_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,16,16,32,32);
+	bg_tilemap = tilemap_create(holeland_get_tile_info,tilemap_scan_rows,16,16,32,32);
 
 	tilemap_set_transmask(bg_tilemap,0,0xff,0x00); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x01,0xfe); /* split type 1 has pen 0? transparent in front half */
@@ -64,7 +64,7 @@ VIDEO_START( holeland )
 
 VIDEO_START( crzrally )
 {
-	bg_tilemap = tilemap_create(crzrally_get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(crzrally_get_tile_info,tilemap_scan_cols,8,8,32,32);
 }
 
 WRITE8_HANDLER( holeland_videoram_w )

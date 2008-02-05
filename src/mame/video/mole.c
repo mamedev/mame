@@ -32,7 +32,7 @@ VIDEO_START( mole )
 	tileram = (UINT16 *)auto_malloc(0x400 * sizeof(UINT16));
 
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		TILEMAP_TYPE_PEN, 8, 8, 40, 25);
+		 8, 8, 40, 25);
 }
 
 WRITE8_HANDLER( mole_videoram_w )

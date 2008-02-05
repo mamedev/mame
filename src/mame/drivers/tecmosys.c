@@ -401,7 +401,7 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32*2,32*2);
+	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
 }
 

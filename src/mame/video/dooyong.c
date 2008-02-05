@@ -630,11 +630,11 @@ VIDEO_START( lastday )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -662,11 +662,11 @@ VIDEO_START( gulfstrm )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -693,11 +693,11 @@ VIDEO_START( pollux )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -724,13 +724,13 @@ VIDEO_START( bluehawk )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -756,11 +756,11 @@ VIDEO_START( flytiger )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(flytiger_get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(bg_tilemap, 15);
@@ -789,11 +789,11 @@ VIDEO_START( primella )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	tx_tilemap = tilemap_create(get_tx_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+		 8, 8, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -823,13 +823,13 @@ VIDEO_START( rshark )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+		 16, 16, 64, 32);
 	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+		 16, 16, 64, 32);
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+		 16, 16, 64, 32);
 	fg2_tilemap = tilemap_create(get_fg2_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 16, 16, 64, 32);
+		 16, 16, 64, 32);
 
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(bg2_tilemap, 15);
@@ -852,7 +852,7 @@ VIDEO_START( popbingo )
 
 	/* Create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		TILEMAP_TYPE_PEN, 32, 32, 32, 8);
+		 32, 32, 32, 8);
 	bg2_tilemap = fg_tilemap = fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
 
 	/* Register for save/restore */

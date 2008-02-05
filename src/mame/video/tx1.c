@@ -477,7 +477,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_START( tx1 )
 {
-	tx1_tilemap = tilemap_create(get_tx1_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
+	tx1_tilemap = tilemap_create(get_tx1_tile_info, tilemap_scan_rows,  8, 8, 128, 64);
 	tilemap_set_transparent_pen(tx1_tilemap, 0xff);
 
 	/* Allocate a large bitmap that covers the three screens */
@@ -1566,7 +1566,7 @@ WRITE16_HANDLER( buggyboy_scolst_w )
 
 VIDEO_START( buggyboy )
 {
-	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
+	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info, tilemap_scan_rows,  8, 8, 128, 64);
 	tilemap_set_transparent_pen(buggyboy_tilemap, 0);
 }
 

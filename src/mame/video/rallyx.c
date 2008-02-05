@@ -257,13 +257,13 @@ VIDEO_START( rallyx )
 
 	if (video_type == TYPE_RALLYX || video_type == TYPE_JUNGLER)
 	{
-		bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-		fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
+		bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+		fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 	}
 	else
 	{
-		bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
-		fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  TILEMAP_TYPE_PEN,8,8, 8,32);
+		bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+		fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 	}
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */

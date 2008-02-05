@@ -318,9 +318,9 @@ VIDEO_START( hyprduel_14220 )
 	hypr_tiletable_old = auto_malloc(hyprduel_tiletable_size);
 	dirtyindex = auto_malloc(hyprduel_tiletable_size/4);
 
-	bg_tilemap[0] = tilemap_create(get_tile_info_0_8bit,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[1] = tilemap_create(get_tile_info_1_8bit,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[2] = tilemap_create(get_tile_info_2_8bit,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[0] = tilemap_create(get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[1] = tilemap_create(get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
+	bg_tilemap[2] = tilemap_create(get_tile_info_2_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 
 	tilemap_set_transparent_pen(bg_tilemap[0],0);
 	tilemap_set_transparent_pen(bg_tilemap[1],0);

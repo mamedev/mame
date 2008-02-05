@@ -115,7 +115,7 @@ PALETTE_INIT( fcombat )
 
 VIDEO_START( fcombat )
 {
-	bgmap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32*8*2,32);
+	bgmap = tilemap_create(get_bg_tile_info,tilemap_scan_rows, 16, 16,32*8*2,32);
 }
 
 

@@ -86,8 +86,8 @@ WRITE16_HANDLER( goodejan_bg_scrolly_w )
 
 VIDEO_START( goodejan )
 {
-	bg_tilemap = tilemap_create(goodejan_bg_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,     16,16,32,32);
-	tx_tilemap = tilemap_create(goodejan_tx_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bg_tilemap = tilemap_create(goodejan_bg_tile_info,tilemap_scan_rows,     16,16,32,32);
+	tx_tilemap = tilemap_create(goodejan_tx_tile_info,tilemap_scan_rows, 8, 8,32,32);
 	tilemap_set_transparent_pen(tx_tilemap,15);
 }
 

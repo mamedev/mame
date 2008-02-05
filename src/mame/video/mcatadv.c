@@ -251,10 +251,10 @@ VIDEO_UPDATE( mcatadv )
 
 VIDEO_START( mcatadv )
 {
-	mcatadv_tilemap1 = tilemap_create(get_mcatadv_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	mcatadv_tilemap1 = tilemap_create(get_mcatadv_tile_info1,tilemap_scan_rows, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap1,0);
 
-	mcatadv_tilemap2 = tilemap_create(get_mcatadv_tile_info2,tilemap_scan_rows,TILEMAP_TYPE_PEN, 16, 16,32,32);
+	mcatadv_tilemap2 = tilemap_create(get_mcatadv_tile_info2,tilemap_scan_rows, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap2,0);
 
 	spriteram_old = auto_malloc(spriteram_size);

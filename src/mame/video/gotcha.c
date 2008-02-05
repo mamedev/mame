@@ -39,8 +39,8 @@ static TILE_GET_INFO( bg_get_tile_info ) { get_tile_info(machine,tileinfo,tile_i
 
 VIDEO_START( gotcha )
 {
-	fg_tilemap = tilemap_create(fg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_PEN,16,16,64,32);
-	bg_tilemap = tilemap_create(bg_get_tile_info,gotcha_tilemap_scan,TILEMAP_TYPE_PEN,     16,16,64,32);
+	fg_tilemap = tilemap_create(fg_get_tile_info,gotcha_tilemap_scan,16,16,64,32);
+	bg_tilemap = tilemap_create(bg_get_tile_info,gotcha_tilemap_scan,     16,16,64,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 

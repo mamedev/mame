@@ -935,7 +935,7 @@ static void hud_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 VIDEO_START( lockon )
 {
-	lockon_tilemap = tilemap_create(get_lockon_tile_info, tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8, 64, 32);
+	lockon_tilemap = tilemap_create(get_lockon_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(lockon_tilemap, 0);
 
 	/* Allocate the two frame buffers for rotation */

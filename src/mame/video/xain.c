@@ -88,9 +88,9 @@ static TILE_GET_INFO( get_char_tile_info )
 
 VIDEO_START( xain )
 {
-	bgram0_tilemap = tilemap_create(get_bgram0_tile_info,back_scan,    TILEMAP_TYPE_PEN,16,16,32,32);
-	bgram1_tilemap = tilemap_create(get_bgram1_tile_info,back_scan,    TILEMAP_TYPE_PEN,16,16,32,32);
-	char_tilemap = tilemap_create(get_char_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN, 8, 8,32,32);
+	bgram0_tilemap = tilemap_create(get_bgram0_tile_info,back_scan,    16,16,32,32);
+	bgram1_tilemap = tilemap_create(get_bgram1_tile_info,back_scan,    16,16,32,32);
+	char_tilemap = tilemap_create(get_char_tile_info,tilemap_scan_rows, 8, 8,32,32);
 
 	tilemap_set_transparent_pen(bgram0_tilemap,0);
 	tilemap_set_transparent_pen(bgram1_tilemap,0);

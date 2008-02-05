@@ -175,27 +175,27 @@ static VIDEO_START( madalien )
 	crtc6845_config(0, &crtc6845_intf);
 
 	tilemap_fg = tilemap_create(get_tile_info_FG,
-		tilemap_scan_cols_flip_x, TILEMAP_TYPE_PEN, 8, 8, 32, 32);
+		tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(tilemap_fg, 0);
 
 	tilemap_edge1[0] = tilemap_create(get_tile_info_BG,
-		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode0, 16, 16, 16, 8);
 	tilemap_edge1[1] = tilemap_create(get_tile_info_BG,
-		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode1, 16, 16, 16, 8);
 	tilemap_edge1[2] = tilemap_create(get_tile_info_BG,
-		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode2, 16, 16, 32, 8);
 	tilemap_edge1[3] = tilemap_create(get_tile_info_BG,
-		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode3, 16, 16, 32, 8);
 
 	tilemap_edge2[0] = tilemap_create(get_tile_info_BG,
-		scan_mode0, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode0, 16, 16, 16, 8);
 	tilemap_edge2[1] = tilemap_create(get_tile_info_BG,
-		scan_mode1, TILEMAP_TYPE_PEN, 16, 16, 16, 8);
+		scan_mode1, 16, 16, 16, 8);
 	tilemap_edge2[2] = tilemap_create(get_tile_info_BG,
-		scan_mode2, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode2, 16, 16, 32, 8);
 	tilemap_edge2[3] = tilemap_create(get_tile_info_BG,
-		scan_mode3, TILEMAP_TYPE_PEN, 16, 16, 32, 8);
+		scan_mode3, 16, 16, 32, 8);
 
 	update_edges(0);
 

@@ -584,9 +584,9 @@ VIDEO_START( decocass )
 	char_dirty = auto_malloc(1024);
 	tile_dirty = auto_malloc(16);
 
-	bg_tilemap_l = tilemap_create( get_bg_l_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_PEN, 16, 16, 32, 32 );
-	bg_tilemap_r = tilemap_create( get_bg_r_tile_info, bgvideoram_scan_cols, TILEMAP_TYPE_PEN, 16, 16, 32, 32 );
-	fg_tilemap = tilemap_create( get_fg_tile_info, fgvideoram_scan_cols, TILEMAP_TYPE_PEN,  8,  8, 32, 32 );
+	bg_tilemap_l = tilemap_create( get_bg_l_tile_info, bgvideoram_scan_cols,  16, 16, 32, 32 );
+	bg_tilemap_r = tilemap_create( get_bg_r_tile_info, bgvideoram_scan_cols,  16, 16, 32, 32 );
+	fg_tilemap = tilemap_create( get_fg_tile_info, fgvideoram_scan_cols,   8,  8, 32, 32 );
 
 	tilemap_set_transparent_pen( bg_tilemap_l, 0 );
 	tilemap_set_transparent_pen( bg_tilemap_r, 0 );

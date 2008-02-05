@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( skydiver )
 {
-	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,32,32);
+	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32,32);
 }
 
 

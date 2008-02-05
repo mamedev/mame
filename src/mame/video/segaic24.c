@@ -149,10 +149,10 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	sys24_char_dirtymap = auto_malloc(SYS24_TILES);
 
-	sys24_tile_layer[0] = tilemap_create(sys24_tile_info_0s, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-	sys24_tile_layer[1] = tilemap_create(sys24_tile_info_0w, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-	sys24_tile_layer[2] = tilemap_create(sys24_tile_info_1s, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
-	sys24_tile_layer[3] = tilemap_create(sys24_tile_info_1w, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 64, 64);
+	sys24_tile_layer[0] = tilemap_create(sys24_tile_info_0s, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[1] = tilemap_create(sys24_tile_info_0w, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[2] = tilemap_create(sys24_tile_info_1s, tilemap_scan_rows,  8, 8, 64, 64);
+	sys24_tile_layer[3] = tilemap_create(sys24_tile_info_1w, tilemap_scan_rows,  8, 8, 64, 64);
 
 	tilemap_set_transparent_pen(sys24_tile_layer[0], 0);
 	tilemap_set_transparent_pen(sys24_tile_layer[1], 0);

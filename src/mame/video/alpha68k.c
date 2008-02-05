@@ -69,7 +69,7 @@ WRITE16_HANDLER( alpha68k_videoram_w )
 
 VIDEO_START( alpha68k )
 {
-	fix_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,TILEMAP_TYPE_PEN,8,8,32,32);
+	fix_tilemap = tilemap_create(get_tile_info,tilemap_scan_cols,8,8,32,32);
 
 	tilemap_set_transparent_pen(fix_tilemap,0);
 }

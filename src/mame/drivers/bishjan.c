@@ -68,10 +68,10 @@ static TILE_GET_INFO( get_tile_info2 )	{	SET_TILE_INFO(0, bishjan_videoram2[ til
 static VIDEO_START(bishjan)
 {
 	tmap1 = tilemap_create(	get_tile_info1, tilemap_scan_rows,
-							TILEMAP_TYPE_PEN, 8,8, 0x80,0x40	);
+							 8,8, 0x80,0x40	);
 
 	tmap2 = tilemap_create(	get_tile_info2, tilemap_scan_rows,
-							TILEMAP_TYPE_PEN, 8,8, 0x80,0x40	);
+							 8,8, 0x80,0x40	);
 
 	tilemap_set_transparent_pen(tmap1, 0);
 	tilemap_set_transparent_pen(tmap2, 0);

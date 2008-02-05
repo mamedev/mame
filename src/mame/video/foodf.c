@@ -43,7 +43,7 @@ VIDEO_START( foodf )
 	static const int resistances[3] = { 1000, 470, 220 };
 
 	/* initialize the playfield */
-	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols, TILEMAP_TYPE_PEN, 8,8, 32,32);
+	atarigen_playfield_tilemap = tilemap_create(get_playfield_tile_info, tilemap_scan_cols,  8,8, 32,32);
 	tilemap_set_transparent_pen(atarigen_playfield_tilemap, 0);
 
 	/* adjust the playfield for the 8 pixel offset */

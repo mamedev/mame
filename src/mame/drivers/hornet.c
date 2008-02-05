@@ -324,13 +324,13 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	if (chip == 0)
 	{
-		K037122_layer[chip][0] = tilemap_create(K037122_0_tile_info_layer0, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
-		K037122_layer[chip][1] = tilemap_create(K037122_0_tile_info_layer1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
+		K037122_layer[chip][0] = tilemap_create(K037122_0_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
+		K037122_layer[chip][1] = tilemap_create(K037122_0_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
 	}
 	else
 	{
-		K037122_layer[chip][0] = tilemap_create(K037122_1_tile_info_layer0, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 256, 64);
-		K037122_layer[chip][1] = tilemap_create(K037122_1_tile_info_layer1, tilemap_scan_rows, TILEMAP_TYPE_PEN, 8, 8, 128, 64);
+		K037122_layer[chip][0] = tilemap_create(K037122_1_tile_info_layer0, tilemap_scan_rows, 8, 8, 256, 64);
+		K037122_layer[chip][1] = tilemap_create(K037122_1_tile_info_layer1, tilemap_scan_rows, 8, 8, 128, 64);
 	}
 
 	tilemap_set_transparent_pen(K037122_layer[chip][0], 0);

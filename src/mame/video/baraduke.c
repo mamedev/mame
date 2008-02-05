@@ -119,9 +119,9 @@ static TILE_GET_INFO( get_tile_info1 )
 
 VIDEO_START( baraduke )
 {
-	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,TILEMAP_TYPE_PEN,8,8,36,28);
-	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,TILEMAP_TYPE_PEN,8,8,64,32);
+	tx_tilemap = tilemap_create(tx_get_tile_info,tx_tilemap_scan,8,8,36,28);
+	bg_tilemap[0] = tilemap_create(get_tile_info0,tilemap_scan_rows,8,8,64,32);
+	bg_tilemap[1] = tilemap_create(get_tile_info1,tilemap_scan_rows,8,8,64,32);
 
 	tilemap_set_transparent_pen(tx_tilemap,3);
 	tilemap_set_transparent_pen(bg_tilemap[0],7);
