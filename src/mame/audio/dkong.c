@@ -21,6 +21,16 @@
 /* Set to 1 to disable DAC and post-mixer filters */
 #define		DK_NO_FILTERS	(0)
 
+/* Issue surrounded by this define need to be analyzed and
+ * reviewed at a lator time.
+ * Currently, the following issues exist:
+ * - although not present on schematics, a 10K resistor is needed
+ *   as RF in the mixer stage. Without this resistor, the DAC
+ *   sound is completely overmodulated.
+ */
+
+// FIXME: Review at a later time
+#define		DK_REVIEW		(1)
 
 #define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
 
@@ -216,7 +226,11 @@ static const discrete_mixer_desc dkong_mixer_desc =
 		{DK_R2, DK_R24, DK_R1, DK_R14},
 		{0,0,0},	// no variable resistors
 		{0,0,0},  // no node capacitors
+#if DK_REVIEW
+		0, RES_K(10),
+#else
 		0, 0,
+#endif
 		DK_C159,
 		DK_C12,
 		0, 1};
@@ -361,10 +375,10 @@ static DISCRETE_SOUND_START(dkong2b)
 	// Amplifier: internal amplifier
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
-	DISCRETE_CRFILTER(NODE_295,1,NODE_294, RES_K(50), DK_C13)
+    DISCRETE_CRFILTER(NODE_295,1,NODE_294, RES_K(50), DK_C13)
+	//DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
 	// EZV20 equivalent filter circuit ...
 	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
-
 #if DK_NO_FILTERS
 	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
 #else
