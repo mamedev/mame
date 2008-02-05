@@ -2,8 +2,9 @@
 
 Formation Z / Aeroboto
 
-Driver by Carlos A. Lozano
+PCB ID: JALECO FZ-8420
 
+Driver by Carlos A. Lozano
 
 TODO:
 - star field
@@ -253,11 +254,11 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( formatz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6809, 1250000) // 1.25MHz
+	MDRV_CPU_ADD(M6809, XTAL_10MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(aeroboto_interrupt,1)
 
-	MDRV_CPU_ADD(M6809, 640000)
+	MDRV_CPU_ADD(M6809, XTAL_10MHz/16) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
@@ -281,11 +282,11 @@ static MACHINE_DRIVER_START( formatz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_10MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

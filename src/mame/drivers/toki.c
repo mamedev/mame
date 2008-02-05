@@ -436,11 +436,11 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,20000000/2) 	/* verified on pcb */
+	MDRV_CPU_ADD(M68000,XTAL_20MHz /2) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(toki_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* VBL */
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)	/* verifed on pcb */
+	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)	/* verifed on pcb */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_MACHINE_RESET(seibu_sound_1)
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 	MDRV_VIDEO_UPDATE(toki)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1000000,1) /* verifed on pcb */
+	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12 ,1) /* verifed on pcb */
 MACHINE_DRIVER_END
 
 

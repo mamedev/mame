@@ -363,12 +363,12 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( magmax )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz */
+	MDRV_CPU_ADD(M68000, XTAL_16MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(magmax_readmem,magmax_writemem)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,10000000/4)
-	/* audio CPU */	/* 2.5 MHz */
+	MDRV_CPU_ADD(Z80,XTAL_20MHz/8) /* verified on pcb */
+	/* audio CPU */	
 	MDRV_CPU_PROGRAM_MAP(magmax_soundreadmem,magmax_soundwritemem)
 	MDRV_CPU_IO_MAP(magmax_soundreadport,magmax_soundwriteport)
 
@@ -394,14 +394,14 @@ static MACHINE_DRIVER_START( magmax )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 10000000/8)
+	MDRV_SOUND_ADD(AY8910, XTAL_20MHz/16) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(AY8910, 10000000/8)
+	MDRV_SOUND_ADD(AY8910, XTAL_20MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD(AY8910, 10000000/8)
+	MDRV_SOUND_ADD(AY8910, XTAL_20MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

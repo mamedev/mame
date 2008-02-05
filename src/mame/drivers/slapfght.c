@@ -936,16 +936,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tigerh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD(Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
 	MDRV_CPU_IO_MAP(tigerh_readport,tigerh_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_CPU_ADD(M68705,4000000)
+	MDRV_CPU_ADD(M68705,XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -970,11 +970,11 @@ static MACHINE_DRIVER_START( tigerh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
@@ -982,12 +982,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( slapfigh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 6000000)
+	MDRV_CPU_ADD_TAG("main",Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
-	MDRV_CPU_ADD(Z80, 6000000)
+	MDRV_CPU_ADD(Z80, XTAL_36MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT(getstar_interrupt, 3)
 
@@ -1013,11 +1013,11 @@ static MACHINE_DRIVER_START( slapfigh )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END

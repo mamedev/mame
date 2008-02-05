@@ -54,7 +54,8 @@ enum
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
-	XTAL_7_3728MHz   	= 7372800,
+	XTAL_7_15909MHz   	= 7159090,		/* Blood Bros */
+	XTAL_7_3728MHz   	= 7372800,		
 	XTAL_8MHz    		= 8000000,
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
