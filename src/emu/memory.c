@@ -541,7 +541,7 @@ void memory_set_context(int activecpu)
 	opbasefunc = cpudata[activecpu].opbase;
 
 #ifdef ENABLE_DEBUGGER
-	if (activecpu != -1)
+	if (activecpu != -1 && Machine->debug_mode)
 		debug_get_memory_hooks(activecpu, &debug_hook_read, &debug_hook_write);
 	else
 	{
