@@ -1598,32 +1598,44 @@ static void e116_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback, scale_mask);
 }
+#endif
 
+#if (HAS_E116T)
 static void e116t_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E116XT)
 static void e116xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E116XS)
 static void e116xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_E116XSR)
 static void e116xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_GMS30C2116)
 static void gms30c2116_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_GMS30C2216)
 static void gms30c2216_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e116_init(index, clock, config, irqcallback, 0);
@@ -1647,42 +1659,58 @@ static void e132_init(int index, int clock, const void *config, int (*irqcallbac
 
 	hyperstone_init(index, clock, config, irqcallback, scale_mask);
 }
+#endif
 
+#if (HAS_E132N)
 static void e132n_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E132T)
 static void e132t_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_E132XN)
 static void e132xn_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E132XT)
 static void e132xt_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 3);
 }
+#endif
 
+#if (HAS_E132XS)
 static void e132xs_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_E132XSR)
 static void e132xsr_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 7);
 }
+#endif
 
+#if (HAS_GMS30C2132)
 static void gms30c2132_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);
 }
+#endif
 
+#if (HAS_GMS30C2232)
 static void gms30c2232_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	e132_init(index, clock, config, irqcallback, 0);

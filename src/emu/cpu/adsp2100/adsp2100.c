@@ -2071,6 +2071,7 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+#if (HAS_ADSP2104||HAS_ADSP2105||HAS_ADSP2115||HAS_ADSP2181)
 static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 {
 	/* see how many words we need to copy */
@@ -2082,6 +2083,7 @@ static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 		dstdata[i] = opcode;
 	}
 }
+#endif
 
 #if (HAS_ADSP2100)
 /**************************************************************************

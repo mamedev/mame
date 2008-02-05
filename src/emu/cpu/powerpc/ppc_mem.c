@@ -66,7 +66,7 @@ INLINE void WRITE64(UINT32 a, UINT64 d)
 
 /***********************************************************************/
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT16 ppc_read16_unaligned(UINT32 a)
 {
 	return ((UINT16)ppc.read8(a+0) << 8) | ((UINT16)ppc.read8(a+1) << 0);
@@ -372,7 +372,7 @@ static offs_t ppc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 
 /***********************************************************************/
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static int ppc_readop(UINT32 offset, int size, UINT64 *value)
 {
 	if (!(ppc.msr & MSR_IR))

@@ -288,7 +288,7 @@
 	t1=RDOPARG();									\
 	t2=RDOPARG();									\
 	t3=RDOPARG();									\
-	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", t1,t2,t3);
+	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", activecpu_get_pc(),t1,t2,t3);
 
 /* 65ce02 ******************************************************
  *  BBR Branch if bit is reset

@@ -32,24 +32,10 @@ enum {
 
 #define M65CE02_IRQ_LINE				M6502_IRQ_LINE
 
-extern int m65ce02_ICount;				/* cycle count */
-
-extern void m65ce02_reset(void *param);
-extern void m65ce02_exit(void);
-extern int	m65ce02_execute(int cycles);
-extern unsigned m65ce02_get_context (void *dst);
-extern void m65ce02_set_context (void *src);
-extern unsigned m65ce02_get_reg (int regnum);
-extern void m65ce02_set_reg (int regnum, unsigned val);
-extern void m65ce02_set_irq_line(int irqline, int state);
-extern void m65ce02_set_irq_callback(int (*callback)(int irqline));
-extern void m65ce02_state_save(void *file);
-extern void m65ce02_state_load(void *file);
-extern const char *m65ce02_info(void *context, int regnum);
-extern unsigned m65ce02_dasm(char *buffer, unsigned pc);
+void m65ce02_get_info(UINT32 state, cpuinfo *info);
 
 #ifdef ENABLE_DEBUGGER
-extern unsigned int Dasm65ce02( char *dst, unsigned pc );
+extern unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 
 #endif /* _M65CE02_H */

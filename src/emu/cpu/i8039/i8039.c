@@ -620,14 +620,14 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	R.timer = 0;
 }
 
-#if (HAS_I8035)
+#if (HAS_I8035||HAS_I8048||HAS_MB8884)
 static void i8035_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8039_init(index, clock, config, irqcallback);
 	R.ram_mask = 0x3F;
 	R.int_rom_size = 0x400;
 }
-#endif /* HAS_I8035 */
+#endif
 
 #if (HAS_M58715)
 static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))

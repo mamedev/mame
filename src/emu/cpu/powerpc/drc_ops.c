@@ -2714,7 +2714,7 @@ static UINT32 recompile_invalid(drc_core *drc, UINT32 op)
 
 /* PowerPC 60x Recompilers */
 
-#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_MPC8240)
+#if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
 static UINT32 recompile_lfs(drc_core *drc,UINT32 op)
 {
 	emit_mov_m32_r32(DRCTOP, MABS(&ppc_icount), REG_EBP);
@@ -3798,7 +3798,9 @@ static UINT32 recompile_tlbli(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);
 }
+#endif
 
+#if (HAS_PPC602||HAS_PPC604||HAS_MPC8240)
 static UINT32 recompile_tlbld(drc_core *drc, UINT32 op)
 {
 	return RECOMPILE_SUCCESSFUL_CP(1,4);

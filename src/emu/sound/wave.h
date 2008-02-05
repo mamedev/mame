@@ -5,7 +5,9 @@
  *  CassetteWave interface
  *****************************************************************************/
 
+#ifdef MESS
 #include "messdrv.h"
+#endif
 
 
 
