@@ -40,9 +40,9 @@ BUILD += \
 FILE2STROBJS = \
 	$(BUILDOBJ)/file2str.o \
 
-$(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
+$(FILE2STR): $(FILE2STROBJS)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ -o $@
 
 
 
@@ -66,8 +66,8 @@ VERINFO = $(BUILDOBJ)/verinfo$(EXE)
 VERINFOOBJS = \
 	$(BUILDOBJ)/verinfo.o
 
-$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
+$(VERINFO): $(VERINFOOBJS)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS) $^ -o $@
 
 endif

@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 #include <stdio.h>
-#include "osdcore.h"
+#include <stdlib.h>
 
 
 /*-------------------------------------------------
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
 	const char *srcfile, *dstfile, *varname, *type;
 	FILE *src, *dst;
-	UINT8 *buffer;
+	unsigned char *buffer;
 	int bytes, offs;
 	int terminate = 1;
 

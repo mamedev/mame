@@ -10,8 +10,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#include "osdcore.h"
+#include <string.h>
+#include <stdlib.h>
 
+#define ARRAY_LENGTH(x)            (sizeof(x) / sizeof(x[0]))
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -194,7 +196,7 @@ int main(int argc, char *argv[])
 	if (buffer == NULL)
 	{
 		fclose(f);
-		fprintf(stderr, "Error allocating %d bytes\n", size + 1);
+		fprintf(stderr, "Error allocating %ld bytes\n", (long) size + 1);
 		return 1;
 	}
 
