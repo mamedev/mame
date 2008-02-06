@@ -74,37 +74,19 @@ PALETTE_INIT( shaolins )
 		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	/* color_prom now points to the beginning of the lookup table,*/
 	color_prom += 0x300;
 
-	/* characters use colors 0x10-0x1f of each 0x20 color bank */
-	for (i = 0; i < 0x100; i++)
+	/* characters use colors 0x10-0x1f of each 0x20 color bank,
+       while sprites use colors 0-0x0f */
+	for (i = 0; i < 0x200; i++)
 	{
 		int j;
 
 		for (j = 0; j < 8; j++)
 		{
-			UINT8 ctabentry = (j << 5) | 0x10 | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine->colortable, (j << 8) | i, ctabentry);
-		}
-	}
-
-	/* characters use colors 0-0x0f of each 0x20 color bank */
-	for (i = 0x100; i < 0x200; i++)
-	{
-		int j;
-
-		for (j = 0; j < 8; j++)
-		{
-			UINT8 ctabentry;
-
-			if ((color_prom[i] & 0x0f))
-				ctabentry = (j << 5) | (color_prom[i] & 0x0f);
-			else
-				/* preserve transparency */
-				ctabentry = 0;
-
-			colortable_entry_set_value(machine->colortable, 0x800 | (j << 8) | (i & 0xff), ctabentry);
+			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			colortable_entry_set_value(machine->colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -176,7 +158,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{
 			int code = spriteram[offs + 8];
-			int color = (spriteram[offs + 9] & 0x0f) + 16 * palettebank;
+			int color = (spriteram[offs + 9] & 0x0f) | (palettebank << 4);
 			int flipx = !(spriteram[offs + 9] & 0x40);
 			int flipy = spriteram[offs + 9] & 0x80;
 			int sx = 240 - spriteram[offs + 6];
@@ -195,7 +177,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				flipx, flipy,
 				sx, sy,
 				cliprect,TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, palettebank << 5));
 		}
 	}
 }

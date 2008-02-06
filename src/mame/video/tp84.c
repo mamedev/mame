@@ -98,34 +98,15 @@ PALETTE_INIT( tp84 )
 	/* color_prom now points to the beginning of the lookup table */
 	color_prom += 0x300;
 
-	/* characters use colors 0x80-0xff */
-	for (i = 0; i < 0x100; i++)
+	/* characters use colors 0x80-0xff, sprites use colors 0-0x7f */
+	for (i = 0; i < 0x200; i++)
 	{
 		int j;
 
 		for (j = 0; j < 8; j++)
 		{
-			UINT8 ctabentry = 0x80 | (j << 4) | (color_prom[i] & 0x0f);
-			colortable_entry_set_value(machine->colortable, (j << 8) | i, ctabentry);
-		}
-	}
-
-	/* sprites use colors 0-0x7f */
-	for (i = 0x100; i < 0x200; i++)
-	{
-		int j;
-
-		for (j = 0; j < 8; j++)
-		{
-			UINT8 ctabentry;
-
-			if ((color_prom[i] & 0x0f))
-				ctabentry = (j << 4) | (color_prom[i] & 0x0f);
-			else
-				/* preserve transparency */
-				ctabentry = 0;
-
-			colortable_entry_set_value(machine->colortable, 0x800 | (j << 8) | (i & 0xff), ctabentry);
+			UINT8 ctabentry = ((~i & 0x100) >> 1) | (j << 4) | (color_prom[i] & 0x0f);
+			colortable_entry_set_value(machine->colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
 }
@@ -263,7 +244,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 						flipx,flipy,
 						sx,sy,
 						&clip,TRANSPARENCY_PENS,
-						colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
+						colortable_get_transpen_mask(machine->colortable, gfx, color, coloffset));
 			}
 		}
 	}
