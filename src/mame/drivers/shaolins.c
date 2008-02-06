@@ -13,15 +13,15 @@ driver by Allard Van Der Bas
 
 UINT8 shaolins_nmi_enable;
 
-extern WRITE8_HANDLER( shaolins_videoram_w );
-extern WRITE8_HANDLER( shaolins_colorram_w );
-extern WRITE8_HANDLER( shaolins_palettebank_w );
-extern WRITE8_HANDLER( shaolins_scroll_w );
-extern WRITE8_HANDLER( shaolins_nmi_w );
+WRITE8_HANDLER( shaolins_videoram_w );
+WRITE8_HANDLER( shaolins_colorram_w );
+WRITE8_HANDLER( shaolins_palettebank_w );
+WRITE8_HANDLER( shaolins_scroll_w );
+WRITE8_HANDLER( shaolins_nmi_w );
 
-extern PALETTE_INIT( shaolins );
-extern VIDEO_START( shaolins );
-extern VIDEO_UPDATE( shaolins );
+PALETTE_INIT( shaolins );
+VIDEO_START( shaolins );
+VIDEO_UPDATE( shaolins );
 
 
 static INTERRUPT_GEN( shaolins_interrupt )
@@ -231,8 +231,7 @@ static MACHINE_DRIVER_START( shaolins )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(shaolins)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16*8*16+16*8*16)
+	MDRV_PALETTE_LENGTH(16*8*16+16*8*16)
 
 	MDRV_PALETTE_INIT(shaolins)
 	MDRV_VIDEO_START(shaolins)
@@ -302,4 +301,4 @@ ROM_END
 
 
 GAME( 1985, kicker,   0,      shaolins, shaolins, 0, ROT90, "Konami", "Kicker", 0 )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, 0, ROT90, "Konami", "Shao-Lin's Road", 0 )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, 0, ROT90, "Konami", "Shao-lin's Road", 0 )
