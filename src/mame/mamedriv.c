@@ -4473,7 +4473,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jailbrek )	/* GX507 (c) 1986 */
 	DRIVER( manhatan )	/* GX507 (c) 1986 (Japan) */
    	DRIVER( jailbrkb )	/* bootleg */
-    DRIVER( scotrsht )	/* GX545 (c) 1985 */
+	DRIVER( scotrsht )	/* GX545 (c) 1985 */
 	DRIVER( finalizr )	/* GX523 (c) 1985 */
 	DRIVER( finalizb )	/* bootleg */
 	DRIVER( ironhors )	/* GX560 (c) 1986 */
@@ -4485,6 +4485,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( topgunbl )	/* bootleg */
 	DRIVER( ddribble )	/* GX690 (c) 1986 */
 	DRIVER( contra )	/* GX633 (c) 1987 */
+	DRIVER( contra1 )	/* GX633 (c) 1987 */
 	DRIVER( contrab )	/* bootleg */
 	DRIVER( contraj )	/* GX633 (c) 1987 (Japan) */
 	DRIVER( contrajb )	/* bootleg */
