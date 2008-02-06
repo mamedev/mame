@@ -719,8 +719,7 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(gsword)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4+64*4)
+	MDRV_PALETTE_LENGTH(64*4+64*4)
 
 	MDRV_PALETTE_INIT(gsword)
 	MDRV_VIDEO_START(gsword)
@@ -767,8 +766,7 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(gsword)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4+64*4)
+	MDRV_PALETTE_LENGTH(64*4+64*4)
 
 	MDRV_PALETTE_INIT(josvolly)
 	MDRV_VIDEO_START(gsword)
@@ -957,10 +955,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 }
 
-static DRIVER_INIT(josvolly)
-{
-}
 
-GAME( 1984, gsword,   0,      gsword,   gsword, gsword,  ROT0,  "Taito Corporation", "Great Swordsman (World?)", 0 )
-GAME( 1984, gsword2,  gsword, gsword,   gsword, gsword2, ROT0,  "Taito Corporation", "Great Swordsman (Japan?)", 0 )
-GAME( 1983, josvolly, 0,      josvolly, josvolly, josvolly,       ROT90, "Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1983, josvolly, 0,      josvolly, josvolly, 0,       ROT90, "Taito Corporation", "Joshi Volleyball", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gsword,   0,      gsword,   gsword,   gsword,  ROT0,  "Taito Corporation", "Great Swordsman (World?)", 0 )
+GAME( 1984, gsword2,  gsword, gsword,   gsword,   gsword2, ROT0,  "Taito Corporation", "Great Swordsman (Japan?)", 0 )

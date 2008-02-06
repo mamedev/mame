@@ -18,93 +18,86 @@ static int charbank, charpalbank, flipscreen;
 
 static tilemap *bg_tilemap;
 
+
+static PALETTE_INIT( common )
+{
+	int i;
+
+	/* characters */
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* sprites */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (BITSWAP8(color_prom[i - 0x100],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+}
+
+
 PALETTE_INIT( josvolly )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-
-		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the sprite lookup table */
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
-
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 0x80 + (BITSWAP8( color_prom[i], 7,6,5,4, 0,1,2,3) & 0xf);
+	PALETTE_INIT_CALL(common);
 }
+
 
 PALETTE_INIT( gsword )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-	for (i = 0;i < 256;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[256+i] >> 0) & 1;
-		bit1 = (color_prom[256+i] >> 1) & 1;
-		bit2 = (color_prom[256+i] >> 2) & 1;
+		bit0 = (color_prom[i + 0x100] >> 0) & 1;
+		bit1 = (color_prom[i + 0x100] >> 1) & 1;
+		bit2 = (color_prom[i + 0x100] >> 2) & 1;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (color_prom[256+i] >> 3) & 1;
-		bit1 = (color_prom[i] >> 0) & 1;
-		bit2 = (color_prom[i] >> 1) & 1;
+		bit0 = (color_prom[i + 0x100] >> 3) & 1;
+		bit1 = (color_prom[i + 0x000] >> 0) & 1;
+		bit2 = (color_prom[i + 0x000] >> 1) & 1;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 2) & 1;
-		bit2 = (color_prom[i] >> 3) & 1;
+		bit1 = (color_prom[i + 0x000] >> 2) & 1;
+		bit2 = (color_prom[i + 0x000] >> 3) & 1;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*256;
-	/* color_prom now points to the beginning of the sprite lookup table */
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x200;
 
-	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
-
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = 0x80 + (BITSWAP8( color_prom[i], 7,6,5,4, 0,1,2,3) & 0xf);
+	PALETTE_INIT_CALL(common);
 }
 
 WRITE8_HANDLER( gsword_videoram_w )
@@ -176,12 +169,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 	for (offs = 0; offs < gsword_spritexy_size - 1; offs+=2)
 	{
-		int sx,sy,flipx,flipy,spritebank,tile;
+		int sx,sy,flipx,flipy,spritebank,tile,color;
 
 		if (gsword_spritexy_ram[offs]!=0xf1)
 		{
 			spritebank = 0;
 			tile = gsword_spritetile_ram[offs];
+			color = gsword_spritetile_ram[offs+1] & 0x3f;
 			sy = 241-gsword_spritexy_ram[offs];
 			sx = gsword_spritexy_ram[offs+1]-56;
 			flipx = gsword_spriteattrib_ram[offs] & 0x02;
@@ -204,10 +198,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			}
 			drawgfx(bitmap,machine->gfx[1+spritebank],
 					tile,
-					gsword_spritetile_ram[offs+1] & 0x3f,
+					color,
 					flipx,flipy,
 					sx,sy,
-					cliprect,TRANSPARENCY_COLOR, 0x8f);
+					cliprect,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[1+spritebank], color, 0x8f));
 		}
 	}
 }

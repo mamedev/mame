@@ -257,7 +257,7 @@ INLINE void K053936GP_copyroz32clip( mame_bitmap *dst_bitmap, mame_bitmap *src_b
 	ecx = tx = -tx;
 
 	tilebpp = (tilebpp-1) & 7;
-	pal_base = Machine->remapped_colortable;
+	pal_base = Machine->pens;
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap->rowpixels;
@@ -522,7 +522,7 @@ INLINE void zdrawgfxzoom32GP( mame_bitmap *bitmap, const gfx_element *gfx, const
 	src_fh    = 16;
 	src_base  = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
-	pal_base  = Machine->remapped_colortable + gfx->color_base + (color % gfx->total_colors) * granularity;
+	pal_base  = Machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = Machine->shadow_table;
 
 	dst_ptr   = bitmap->base;

@@ -17,7 +17,7 @@ PALETTE_INIT( magmax );
 VIDEO_UPDATE( magmax );
 VIDEO_START( magmax );
 
-extern UINT16 magmax_vreg;
+extern UINT16 *magmax_vreg;
 extern UINT16 *magmax_scroll_x;
 extern UINT16 *magmax_scroll_y;
 
@@ -187,7 +187,7 @@ static WRITE16_HANDLER( magmax_vreg_w )
 	/* bit4 - sprite bank LSB (DP0) */
 	/* bit5 - sprite bank MSB (DP1) */
 	/* bit6 - BG display enable (BE)*/
-	COMBINE_DATA(&magmax_vreg);
+	COMBINE_DATA(magmax_vreg);
 }
 
 
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( magmax_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x018000, 0x018fff) AM_WRITE(MWA16_RAM)
 	AM_RANGE(0x020000, 0x0207ff) AM_WRITE(MWA16_RAM) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
 	AM_RANGE(0x028000, 0x0281ff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w)
+	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w) AM_BASE(&magmax_vreg)
 	AM_RANGE(0x030012, 0x030013) AM_WRITE(MWA16_RAM) AM_BASE(&magmax_scroll_x)
 	AM_RANGE(0x030014, 0x030015) AM_WRITE(MWA16_RAM) AM_BASE(&magmax_scroll_y)
 	AM_RANGE(0x03001c, 0x03001d) AM_WRITE(magmax_sound_w)
@@ -368,7 +368,7 @@ static MACHINE_DRIVER_START( magmax )
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,XTAL_20MHz/8) /* verified on pcb */
-	/* audio CPU */	
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(magmax_soundreadmem,magmax_soundwritemem)
 	MDRV_CPU_IO_MAP(magmax_soundreadport,magmax_soundwriteport)
 
@@ -384,8 +384,7 @@ static MACHINE_DRIVER_START( magmax )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(magmax)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1*16 + 16*16)
+	MDRV_PALETTE_LENGTH(1*16 + 16*16 + 256)
 
 	MDRV_PALETTE_INIT(magmax)
 	MDRV_VIDEO_START(magmax)
@@ -407,7 +406,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( magmax )
-	ROM_REGION( 0x14000, REGION_CPU1, 0 ) /* 68000 (main) cpu code */
+	ROM_REGION( 0x14000, REGION_CPU1, 0 )
 	ROM_LOAD16_BYTE( "1.3b", 0x00001, 0x4000, CRC(33793cbb) SHA1(a0bc0e4be434d9fc8115de8d63c92e942334bc85) )
 	ROM_LOAD16_BYTE( "6.3d", 0x00000, 0x4000, CRC(677ef450) SHA1(9003ff1c1c455970c1bd036b0b5e44dae2e379a5) )
 	ROM_LOAD16_BYTE( "2.5b", 0x08001, 0x4000, CRC(1a0c84df) SHA1(77ff21de33392a148d7ca69a77acc654260af0db) )
@@ -415,7 +414,7 @@ ROM_START( magmax )
 	ROM_LOAD16_BYTE( "3.6b", 0x10001, 0x2000, CRC(d06e6cae) SHA1(94047b2bcf030d34295ff8107f95097ce57efe6b) )
 	ROM_LOAD16_BYTE( "8.6d", 0x10000, 0x2000, CRC(790a82be) SHA1(9a25d5a7c87aeef5e736b0f2fb8dde1c9be70039) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "15.17b", 0x00000, 0x2000, CRC(19e7b983) SHA1(b1cd0b728e7cce87d9b1039be179d0915d939a4f) )
 	ROM_LOAD( "16.18b", 0x02000, 0x2000, CRC(055e3126) SHA1(8c9b03eb7588512ef17f8c1b731a2fd7cf372bf8) )
 

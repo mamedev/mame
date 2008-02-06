@@ -7,44 +7,35 @@ static tilemap *bg_tilemap;
 
 PALETTE_INIT( jailbrek )
 {
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 	int i;
 
-	for ( i = 0; i < machine->drv->total_colors; i++ )
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x00] >> 0);
+		int g = pal4bit(color_prom[i + 0x00] >> 4);
+		int b = pal4bit(color_prom[i + 0x20] >> 0);
 
-
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[0] >> 4) & 0x01;
-		bit1 = (color_prom[0] >> 5) & 0x01;
-		bit2 = (color_prom[0] >> 6) & 0x01;
-		bit3 = (color_prom[0] >> 7) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += machine->drv->total_colors;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x40;
 
-	for ( i = 0; i < TOTAL_COLORS(0); i++ )
-		COLOR(0,i) = ( *color_prom++ ) + 0x10;
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
-	for ( i = 0; i < TOTAL_COLORS(1); i++ )
-		COLOR(1,i) = *color_prom++;
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( jailbrek_videoram_w )
@@ -98,7 +89,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		}
 
 		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy,
-			sx, sy, cliprect, TRANSPARENCY_COLOR, 0);
+			sx, sy, cliprect, TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
 
@@ -115,9 +107,7 @@ VIDEO_UPDATE( jailbrek )
 		tilemap_set_scrollx(bg_tilemap, 0, 0);
 
 		for (i = 0; i < 32; i++)
-		{
 			tilemap_set_scrolly(bg_tilemap, i, ((jailbrek_scroll_x[i + 32] << 8) + jailbrek_scroll_x[i]));
-		}
 	}
 	else
 	{
@@ -126,9 +116,7 @@ VIDEO_UPDATE( jailbrek )
 		tilemap_set_scrolly(bg_tilemap, 0, 0);
 
 		for (i = 0; i < 32; i++)
-		{
 			tilemap_set_scrollx(bg_tilemap, i, ((jailbrek_scroll_x[i + 32] << 8) + jailbrek_scroll_x[i]));
-		}
 	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
