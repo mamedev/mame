@@ -89,35 +89,22 @@ C004      76489 #4 trigger
 
 extern UINT8 *tp84_videoram2, *tp84_colorram2;
 
-extern WRITE8_HANDLER( tp84_videoram_w );
-extern WRITE8_HANDLER( tp84_colorram_w );
-extern WRITE8_HANDLER( tp84_videoram2_w );
-extern WRITE8_HANDLER( tp84_colorram2_w );
-extern WRITE8_HANDLER( tp84_scroll_x_w );
-extern WRITE8_HANDLER( tp84_scroll_y_w );
-extern WRITE8_HANDLER( tp84_flipscreen_x_w );
-extern WRITE8_HANDLER( tp84_flipscreen_y_w );
-extern WRITE8_HANDLER( tp84_col0_w );
-extern READ8_HANDLER( tp84_scanline_r );
+WRITE8_HANDLER( tp84_videoram_w );
+WRITE8_HANDLER( tp84_colorram_w );
+WRITE8_HANDLER( tp84_videoram2_w );
+WRITE8_HANDLER( tp84_colorram2_w );
+WRITE8_HANDLER( tp84_scroll_x_w );
+WRITE8_HANDLER( tp84_scroll_y_w );
+WRITE8_HANDLER( tp84_flipscreen_x_w );
+WRITE8_HANDLER( tp84_flipscreen_y_w );
+WRITE8_HANDLER( tp84_col0_w );
+READ8_HANDLER( tp84_scanline_r );
 
-extern PALETTE_INIT( tp84 );
-extern VIDEO_START( tp84 );
-extern VIDEO_UPDATE( tp84 );
+PALETTE_INIT( tp84 );
+VIDEO_START( tp84 );
+VIDEO_UPDATE( tp84 );
 
-extern INTERRUPT_GEN( tp84_6809_interrupt );
-
-
-static UINT8 *sharedram;
-
-static READ8_HANDLER( sharedram_r )
-{
-	return sharedram[offset];
-}
-
-static WRITE8_HANDLER( sharedram_w )
-{
-	sharedram[offset] = data;
-}
+INTERRUPT_GEN( tp84_6809_interrupt );
 
 
 
@@ -172,7 +159,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2860, 0x2860) AM_READ(input_port_3_r)
 	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_4_r)
 	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x5000, 0x57ff) AM_READ(sharedram_r)
+	AM_RANGE(0x5000, 0x57ff) AM_READ(MRA8_RAM) AM_SHARE(1)
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
@@ -191,7 +178,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(tp84_videoram2_w) AM_BASE(&tp84_videoram2)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tp84_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tp84_colorram2_w) AM_BASE(&tp84_colorram2)
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
+	AM_RANGE(0x5000, 0x57ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
@@ -200,7 +187,7 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(tp84_videoram2_w) AM_BASE(&tp84_videoram2)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(tp84_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(tp84_colorram2_w) AM_BASE(&tp84_colorram2)
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1a00, 0x1a00) AM_READWRITE(input_port_0_r, tp84_col0_w)
 	AM_RANGE(0x1a20, 0x1a20) AM_READ(input_port_1_r)
@@ -222,7 +209,7 @@ static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0000, 0x0000) AM_READ(MRA8_RAM)
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(sharedram_r)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
@@ -232,7 +219,7 @@ static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w) /* IRQ enable */
 	AM_RANGE(0x6000, 0x679f) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x67a0, 0x67ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* REAL (multiplexed) */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(sharedram_w)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
 
@@ -495,8 +482,7 @@ static MACHINE_DRIVER_START( tp84 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(tp84)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(4096)
+	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_PALETTE_INIT(tp84)
 	MDRV_VIDEO_START(tp84)

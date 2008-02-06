@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 #include "deprecat.h"
 
 UINT8 *tp84_videoram2, *tp84_colorram2;
@@ -51,68 +52,81 @@ static tilemap *bg_tilemap, *fg_tilemap;
 */
 PALETTE_INIT( tp84 )
 {
+	static const int resistances[4] = { 1000, 470, 220, 100 };
+	double rweights[4], gweights[4], bweights[4];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			4, resistances, rweights, 470, 0,
+			4, resistances, gweights, 470, 0,
+			4, resistances, bweights, 470, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
+		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+
 		/* green component */
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
+		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+
 		/* blue component */
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
+		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-
-	/* characters use colors 128-255 */
-	for (i = 0;i < TOTAL_COLORS(0)/8;i++)
+	/* characters use colors 0x80-0xff */
+	for (i = 0; i < 0x100; i++)
 	{
 		int j;
 
-
-		for (j = 0;j < 8;j++)
-			COLOR(0,i+256*j) = *color_prom + 128 + 16*j;
-
-		color_prom++;
+		for (j = 0; j < 8; j++)
+		{
+			UINT8 ctabentry = 0x80 | (j << 4) | (color_prom[i] & 0x0f);
+			colortable_entry_set_value(machine->colortable, (j << 8) | i, ctabentry);
+		}
 	}
 
-	/* sprites use colors 0-127 */
-	for (i = 0;i < TOTAL_COLORS(1)/8;i++)
+	/* sprites use colors 0-0x7f */
+	for (i = 0x100; i < 0x200; i++)
 	{
 		int j;
 
-
-		for (j = 0;j < 8;j++)
+		for (j = 0; j < 8; j++)
 		{
-			if (*color_prom) COLOR(1,i+256*j) = *color_prom + 16*j;
-			else COLOR(1,i+256*j) = 0;	/* preserve transparency */
-		}
+			UINT8 ctabentry;
 
-		color_prom++;
+			if ((color_prom[i] & 0x0f))
+				ctabentry = (j << 4) | (color_prom[i] & 0x0f);
+			else
+				/* preserve transparency */
+				ctabentry = 0;
+
+			colortable_entry_set_value(machine->colortable, 0x800 | (j << 8) | (i & 0xff), ctabentry);
+		}
 	}
 }
 
@@ -248,7 +262,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 						color,
 						flipx,flipy,
 						sx,sy,
-						&clip,TRANSPARENCY_COLOR,0);
+						&clip,TRANSPARENCY_PENS,
+						colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
 			}
 		}
 	}
