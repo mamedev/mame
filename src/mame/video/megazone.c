@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
 UINT8 *megazone_scrollx;
 UINT8 *megazone_scrolly;
@@ -43,44 +44,62 @@ Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
 ***************************************************************************/
 PALETTE_INIT( megazone )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 1000, 0,
+			3, &resistances_rg[0], gweights, 1000, 0,
+			2, &resistances_b[0],  bweights, 1000, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
 	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = *(color_prom++) & 0x0f;
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
 	/* characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 0x10;
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( megazone_flipscreen_w )
@@ -116,7 +135,7 @@ VIDEO_UPDATE( megazone )
 			flipy = !flipy;
 		}
 
-		drawgfx(tmpbitmap,machine->gfx[0],
+		drawgfx(tmpbitmap,machine->gfx[1],
 				((int)videoram[offs]) + ((colorram[offs] & (1<<7) ? 256 : 0) ),
 				(colorram[offs] & 0x0f) + 0x10,
 				flipx,flipy,
@@ -149,23 +168,27 @@ VIDEO_UPDATE( megazone )
 	{
 		for (offs = spriteram_size-4; offs >= 0;offs -= 4)
 		{
-			int sx,sy,flipx,flipy;
+			int sx = spriteram[offs + 3];
+			int sy = 255-((spriteram[offs + 1]+16)&0xff);
+			int color =  spriteram[offs + 0] & 0x0f;
+			int flipx = ~spriteram[offs + 0] & 0x40;
+			int flipy =  spriteram[offs + 0] & 0x80;
 
+			if (flipscreen)
+			{
+				sx = sx - 11;
+				sy = sy + 2;
+			}
+			else
+				sx = sx + 32;
 
-			sx = spriteram[offs + 3];
-			if (flipscreen) sx-=11; else sx+=4*8;   	  // Sprite y-position correction depending on screen flip
-			sy = 255-((spriteram[offs + 1]+16)&0xff);
-			if (flipscreen) sy+=2; 			  	  // Sprite x-position correction depending on screen flip
-
-			flipx = ~spriteram[offs+0] & 0x40;
-			flipy = spriteram[offs+0] & 0x80;
-
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx(bitmap,machine->gfx[0],
 					spriteram[offs + 2],
-					spriteram[offs + 0] & 0x0f,
+					color,
 					flipx,flipy,
 					sx,sy,
-					cliprect,TRANSPARENCY_COLOR,0);
+					cliprect,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 		}
 	}
 
@@ -193,7 +216,7 @@ VIDEO_UPDATE( megazone )
 
 
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,machine->gfx[1],
 					((int)megazone_videoram2[offs]) + ((megazone_colorram2[offs] & (1<<7) ? 256 : 0) ),
 					(megazone_colorram2[offs] & 0x0f) + 0x10,
 					flipx,flipy,

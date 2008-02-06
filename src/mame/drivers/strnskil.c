@@ -18,27 +18,18 @@ Notes:
 #include "deprecat.h"
 #include "sound/sn76496.h"
 
-static UINT8 *strnskil_sharedram;
-
 /****************************************************************************/
 
-extern WRITE8_HANDLER( strnskil_videoram_w );
-extern WRITE8_HANDLER( strnskil_scroll_x_w );
-extern WRITE8_HANDLER( strnskil_scrl_ctrl_w );
+WRITE8_HANDLER( strnskil_videoram_w );
+WRITE8_HANDLER( strnskil_scrl_ctrl_w );
 
-extern PALETTE_INIT( strnskil );
-extern VIDEO_START( strnskil );
-extern VIDEO_UPDATE( strnskil );
+PALETTE_INIT( strnskil );
+VIDEO_START( strnskil );
+VIDEO_UPDATE( strnskil );
 
-static WRITE8_HANDLER( strnskil_sharedram_w )
-{
-	strnskil_sharedram[offset] = data;
-}
+extern UINT8 *strnskil_xscroll;
 
-static READ8_HANDLER( strnskil_sharedram_r )
-{
-	return strnskil_sharedram[offset];
-}
+
 
 static READ8_HANDLER( strnskil_d800_r )
 {
@@ -100,7 +91,7 @@ static ADDRESS_MAP_START( strnskil_readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_READ(MRA8_ROM)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(strnskil_sharedram_r)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM) /* videoram */
 
 	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
@@ -115,24 +106,24 @@ static ADDRESS_MAP_START( strnskil_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_WRITE(MWA8_ROM)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(strnskil_sharedram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(strnskil_videoram_w) AM_BASE(&videoram)
 
 	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
 	AM_RANGE(0xd809, 0xd809) AM_WRITE(MWA8_NOP) /* coin counter? */
-	AM_RANGE(0xd80a, 0xd80b) AM_WRITE(strnskil_scroll_x_w)
+	AM_RANGE(0xd80a, 0xd80b) AM_WRITE(MWA8_RAM) AM_BASE(&strnskil_xscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM) AM_SHARE(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_BASE(&strnskil_sharedram)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xd802, 0xd802) AM_WRITE(SN76496_1_w)
@@ -362,8 +353,7 @@ static MACHINE_DRIVER_START( strnskil )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(strnskil)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1024)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(strnskil)
 	MDRV_VIDEO_START(strnskil)

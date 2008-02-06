@@ -25,13 +25,8 @@ static int irq_enable_a, irq_enable_b;
 static int firq_old_data_a, firq_old_data_b;
 static int i8039_status;
 
-UINT8 *pandoras_sharedram;
-static UINT8 *pandoras_sharedram2;
-
 /* from video */
 PALETTE_INIT( pandoras );
-READ8_HANDLER( pandoras_vram_r );
-READ8_HANDLER( pandoras_cram_r );
 WRITE8_HANDLER( pandoras_vram_w );
 WRITE8_HANDLER( pandoras_cram_w );
 WRITE8_HANDLER( pandoras_flipscreen_w );
@@ -47,22 +42,6 @@ static INTERRUPT_GEN( pandoras_interrupt_a ){
 static INTERRUPT_GEN( pandoras_interrupt_b ){
 	if (irq_enable_b)
 		cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
-}
-
-static READ8_HANDLER( pandoras_sharedram_r ){
-	return pandoras_sharedram[offset];
-}
-
-static WRITE8_HANDLER( pandoras_sharedram_w ){
-	pandoras_sharedram[offset] = data;
-}
-
-static READ8_HANDLER( pandoras_sharedram2_r ){
-	return pandoras_sharedram2[offset];
-}
-
-static WRITE8_HANDLER( pandoras_sharedram2_w ){
-	pandoras_sharedram2[offset] = data;
 }
 
 static WRITE8_HANDLER( pandoras_int_control_w ){
@@ -135,18 +114,18 @@ static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 
 
 static ADDRESS_MAP_START( pandoras_readmem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(pandoras_sharedram_r)	/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_READ(pandoras_cram_r)		/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_READ(pandoras_vram_r)		/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)	/* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(2) 	/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(3)	/* Video RAM (shared with CPU B) */
 	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_ROM)				/* space for diagnostic ROM */
-	AM_RANGE(0x6000, 0x67ff) AM_READ(pandoras_sharedram2_r)	/* Shared RAM with CPU B */
+	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM) AM_SHARE(4)	/* Shared RAM with CPU B */
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_writemem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(pandoras_sharedram_w) AM_BASE(&pandoras_sharedram)	/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w) AM_BASE(&colorram)					/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w) AM_BASE(&videoram)					/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM) AM_SHARE(1) AM_BASE(&spriteram) /* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w) AM_SHARE(2) AM_BASE(&colorram)					/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w) AM_SHARE(3) AM_BASE(&videoram)					/* Video RAM (shared with CPU B) */
 	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)						/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)							/* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)					/* cause INT on the Z80 */
@@ -154,14 +133,14 @@ static ADDRESS_MAP_START( pandoras_writemem_a, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)					/* cause FIRQ on CPU B */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(watchdog_reset_w)							/* watchdog reset */
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_ROM)									/* see notes */
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(pandoras_sharedram2_w) AM_BASE(&pandoras_sharedram2)/* Shared RAM with CPU B */
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE(MWA8_RAM) AM_SHARE(4) /* Shared RAM with CPU B */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)									/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_readmem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(pandoras_sharedram_r)	/* Work RAM (Shared with CPU A) */
-	AM_RANGE(0x1000, 0x13ff) AM_READ(pandoras_cram_r)		/* Color RAM (shared with CPU A) */
-	AM_RANGE(0x1400, 0x17ff) AM_READ(pandoras_vram_r)		/* Video RAM (shared with CPU A) */
+	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM) AM_SHARE(1)/* Work RAM (Shared with CPU A) */
+	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM) AM_SHARE(2) 		/* Color RAM (shared with CPU A) */
+	AM_RANGE(0x1400, 0x17ff) AM_READ(MRA8_RAM) AM_SHARE(3) 	/* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)			/* DIPSW #1 */
 	AM_RANGE(0x1a00, 0x1a00) AM_READ(input_port_3_r)			/* COINSW */
 	AM_RANGE(0x1a01, 0x1a01) AM_READ(input_port_4_r)			/* 1P inputs */
@@ -169,18 +148,18 @@ static ADDRESS_MAP_START( pandoras_readmem_b, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a03, 0x1a03) AM_READ(input_port_2_r)			/* DIPSW #3 */
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(input_port_1_r)			/* DISPW #2 */
 //  AM_RANGE(0x1e00, 0x1e00) AM_READ(MRA8_NOP)              /* ??? seems to be important */
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(pandoras_sharedram2_r)	/* Shared RAM with the CPU A */
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM) AM_SHARE(4)	/* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_writemem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(pandoras_sharedram_w)	/* Work RAM (Shared with CPU A) */
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w)		/* Color RAM (shared with CPU A) */
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w)		/* Video RAM (shared with CPU A) */
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)	AM_SHARE(1) /* Work RAM (Shared with CPU A) */
+	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w) AM_SHARE(2) 		/* Color RAM (shared with CPU A) */
+	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w) AM_SHARE(3) 		/* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)	/* INT control */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)/* cause FIRQ on CPU A */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(pandoras_sharedram2_w)	/* Shared RAM with the CPU A */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM) AM_SHARE(4)	/* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM */
 ADDRESS_MAP_END
 
@@ -363,8 +342,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( pandoras )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,       0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout,     0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout,   16*16, 16 )
 GFXDECODE_END
 
 /***************************************************************************
@@ -427,8 +406,7 @@ static MACHINE_DRIVER_START( pandoras )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(pandoras)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(16*16+16*16)
+	MDRV_PALETTE_LENGTH(16*16+16*16)
 
 	MDRV_PALETTE_INIT(pandoras)
 	MDRV_VIDEO_START(pandoras)
@@ -468,14 +446,14 @@ ROM_START( pandoras )
 	ROM_REGION( 0x1000, REGION_CPU4, 0 ) /* 4K for the Sound CPU 2 */
 	ROM_LOAD( "pand_7e.snd",	0x00000, 0x01000, CRC(18b0f9d0) SHA1(2a6119423222577a4c2b99ed78f61ba387eec7f8) )
 
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "pand_a18.cpu",	0x00000, 0x02000, CRC(23706d4a) SHA1(cca92e6ff90e3006a79a214f1211fd659771de53) )	/* tiles */
-	ROM_LOAD( "pand_a19.cpu",	0x02000, 0x02000, CRC(a463b3f9) SHA1(549b7ee6e47325b80186441da11879fb8b1b47be) )
-
-	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "pand_j18.cpu",	0x00000, 0x02000, CRC(99a696c5) SHA1(35a27cd5ecc51a9a1acf01eb8078a1028f03be32) )	/* sprites */
 	ROM_LOAD( "pand_j17.cpu",	0x02000, 0x02000, CRC(38a03c21) SHA1(b0c8f642787bab3cd1d76657e56f07f4f6f9073c) )
 	ROM_LOAD( "pand_j16.cpu",	0x04000, 0x02000, CRC(e0708a78) SHA1(9dbd08b6ca8a66a61e128d1806888696273de848) )
+
+	ROM_REGION( 0x4000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "pand_a18.cpu",	0x00000, 0x02000, CRC(23706d4a) SHA1(cca92e6ff90e3006a79a214f1211fd659771de53) )	/* tiles */
+	ROM_LOAD( "pand_a19.cpu",	0x02000, 0x02000, CRC(a463b3f9) SHA1(549b7ee6e47325b80186441da11879fb8b1b47be) )
 
 	ROM_REGION( 0x0220, REGION_PROMS, 0 )
 	ROM_LOAD( "pandora.2a",		0x0000, 0x020, CRC(4d56f939) SHA1(a8dac604bfdaf4b153b75dbf165de113152b6daa) ) /* palette */

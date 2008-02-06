@@ -10,7 +10,8 @@ Video hardware driver by Uki
 
 #include "driver.h"
 
-static UINT8 markham_xscroll[2];
+
+UINT8 *markham_xscroll;
 
 static tilemap *bg_tilemap;
 
@@ -18,39 +19,34 @@ PALETTE_INIT( markham )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
-	{
-		int r = color_prom[0];
-		int g = color_prom[machine->drv->total_colors];
-		int b = color_prom[2*machine->drv->total_colors];
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
 
-		palette_set_color_rgb(machine,i,pal4bit(r),pal4bit(g),pal4bit(b));
-		color_prom++;
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
+	{
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
 	/* sprites lookup table */
-	for (i=0; i<512; i++)
-		*(colortable++) = *(color_prom++);
-
-	/* bg lookup table */
-	for (i=0; i<512; i++)
-		*(colortable++) = *(color_prom++);
-
+	for (i = 0; i < 0x400; i++)
+	{
+		UINT8 ctabentry = color_prom[i];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( markham_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-}
-
-WRITE8_HANDLER( markham_scroll_x_w )
-{
-	markham_xscroll[offset] = data;
 }
 
 WRITE8_HANDLER( markham_flipscreen_w )
@@ -117,7 +113,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			col,
 			fx,fy,
 			px,py,
-			cliprect,TRANSPARENCY_COLOR,0);
+			cliprect,TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], col, 0));
 	}
 }
 

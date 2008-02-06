@@ -11,28 +11,15 @@ Markham (c) 1983 Sun Electronics
 #include "driver.h"
 #include "sound/sn76496.h"
 
-extern WRITE8_HANDLER( markham_videoram_w );
-extern WRITE8_HANDLER( markham_scroll_x_w );
-extern WRITE8_HANDLER( markham_flipscreen_w );
+WRITE8_HANDLER( markham_videoram_w );
+WRITE8_HANDLER( markham_flipscreen_w );
 
-extern PALETTE_INIT( markham );
-extern VIDEO_START( markham );
-extern VIDEO_UPDATE( markham );
+PALETTE_INIT( markham );
+VIDEO_START( markham );
+VIDEO_UPDATE( markham );
 
-static UINT8 *markham_sharedram;
+extern UINT8 *markham_xscroll;
 
-/****************************************************************************/
-
-
-static WRITE8_HANDLER( markham_sharedram_w )
-{
-	markham_sharedram[offset] = data;
-}
-
-static READ8_HANDLER( markham_sharedram_r )
-{
-	return markham_sharedram[offset];
-}
 
 static READ8_HANDLER( markham_e004_r )
 {
@@ -47,7 +34,7 @@ static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(markham_sharedram_r)
+	AM_RANGE(0xd800, 0xdfff) AM_READ(MRA8_RAM) AM_SHARE(1)
 
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_1_r) /* dsw 1 */
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_0_r) /* dsw 2 */
@@ -66,24 +53,24 @@ static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(markham_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(markham_sharedram_w)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(MWA8_NOP) /* coin counter? */
 
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(MWA8_NOP) /* to CPU2 busreq */
 
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(markham_scroll_x_w)
+	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(MWA8_RAM) AM_BASE(&markham_xscroll)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) AM_SHARE(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&markham_sharedram)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
 
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(SN76496_1_w)
@@ -229,8 +216,7 @@ static MACHINE_DRIVER_START( markham )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(markham)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1024)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(markham)
 	MDRV_VIDEO_START(markham)
