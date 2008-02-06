@@ -608,7 +608,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ark1ball )
 	PORT_INCLUDE(arknoidj)
 
-	PORT_START_TAG("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )
 	PORT_DIPSETTING(    0x00, "60K" )
@@ -672,7 +672,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( arktayt2 )
 	PORT_INCLUDE(arknoidj)
 
-	PORT_START_TAG("DSW")
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )
 	PORT_DIPSETTING(    0x00, "60K" )
