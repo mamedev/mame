@@ -329,7 +329,7 @@ static void reset_channel(z80sio *sio, int ch)
 	interrupt_check(sio);
 
 	/* start the receive timer running */
-	timer_adjust(chan->receive_timer, tpc, ((sio - sios) << 1) | ch, tpc);
+	timer_adjust_periodic(chan->receive_timer, tpc, ((sio - sios) << 1) | ch, tpc);
 }
 
 

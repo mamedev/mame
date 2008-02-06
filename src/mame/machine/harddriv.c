@@ -629,7 +629,7 @@ static TIMER_CALLBACK( duart_callback )
 		duart_irq_state = (duart_read_data[0x05] & duart_write_data[0x05]) != 0;
 		atarigen_update_interrupts();
 	}
-	timer_adjust(duart_timer, attotime_mul(duart_clock_period(), 65536), 0, attotime_zero);
+	timer_adjust_oneshot(duart_timer, attotime_mul(duart_clock_period(), 65536), 0);
 }
 
 
@@ -656,14 +656,14 @@ READ16_HANDLER( hd68k_duart_r )
 		case 0x0e:		/* Start-Counter Command 3 */
 		{
 			int reps = (duart_write_data[0x06] << 8) | duart_write_data[0x07];
-			timer_adjust(duart_timer, attotime_mul(duart_clock_period(), reps), 0, attotime_zero);
+			timer_adjust_oneshot(duart_timer, attotime_mul(duart_clock_period(), reps), 0);
 			logerror("DUART timer started (period=%f)\n", attotime_to_double(attotime_mul(duart_clock_period(), reps)));
 			return 0x00ff;
 		}
 		case 0x0f:		/* Stop-Counter Command 3 */
 			{
 				int reps = attotime_to_double(attotime_mul(timer_timeleft(duart_timer), duart_clock()));
-				timer_adjust(duart_timer, attotime_never, 0, attotime_zero);
+				timer_adjust_oneshot(duart_timer, attotime_never, 0);
 				duart_read_data[0x06] = reps >> 8;
 				duart_read_data[0x07] = reps & 0xff;
 				logerror("DUART timer stopped (final count=%04X)\n", reps);

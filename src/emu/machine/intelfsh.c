@@ -335,7 +335,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust( c->timer, ATTOTIME_IN_SEC( 17 ), 0, attotime_zero );
+			timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 17 ), 0 );
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
@@ -360,7 +360,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
 
-			timer_adjust( c->timer, ATTOTIME_IN_SEC( 1 ), 0, attotime_zero );
+			timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 		}
 		else
 		{
@@ -429,7 +429,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 			c->status = 0x00;
 			c->flash_mode = FM_READSTATUS;
 
-			timer_adjust( c->timer, ATTOTIME_IN_SEC( 1 ), 0, attotime_zero );
+			timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 			break;
 		}
 		else

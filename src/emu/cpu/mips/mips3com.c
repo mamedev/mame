@@ -185,10 +185,10 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 cyclesleft = compare - count;
 		attotime newtime = ATTOTIME_IN_CYCLES(((INT64)cyclesleft * 2), cpu_getactivecpu());
-		timer_adjust(mips->compare_int_timer, newtime, cpu_getactivecpu(), attotime_zero);
+		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
 	}
 	else
-		timer_adjust(mips->compare_int_timer, attotime_never, cpu_getactivecpu(), attotime_zero);
+		timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpu_getactivecpu());
 }
 
 

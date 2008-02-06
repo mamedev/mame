@@ -87,7 +87,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;
 	next_vpos = interrupt_lines[next_interrupt_number];
 
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_interrupt_number, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_interrupt_number);
 }
 
 
@@ -100,7 +100,7 @@ static void create_interrupt_timer(void)
 static void start_interrupt_timer(void)
 {
 	int vpos = interrupt_lines[0];
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
 }
 
 

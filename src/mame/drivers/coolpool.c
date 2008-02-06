@@ -184,7 +184,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
 		nvram_write_enable = 1;
-		timer_adjust(nvram_write_timer, ATTOTIME_IN_MSEC(1000), 0, attotime_zero);
+		timer_adjust_oneshot(nvram_write_timer, ATTOTIME_IN_MSEC(1000), 0);
 	}
 }
 

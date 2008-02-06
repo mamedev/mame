@@ -532,7 +532,7 @@ void pc_keyb_set_clock(int on)
 	if (pc_keyb.on != on)
 	{
 		if (on)
-			timer_adjust(pc_keyboard_timer, keyb_delay, 0, attotime_zero);
+			timer_adjust_oneshot(pc_keyboard_timer, keyb_delay, 0);
 		else
 			timer_reset(pc_keyboard_timer, attotime_never);
 

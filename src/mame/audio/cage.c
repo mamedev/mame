@@ -202,7 +202,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 	{
 		if (dma_timer_enabled)
 		{
-			timer_adjust(dma_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(dma_timer, attotime_never, 0);
 			dma_timer_enabled = 0;
 		}
 		return;
@@ -253,7 +253,7 @@ static void update_dma_state(void)
 		if (!dma_timer_enabled)
 		{
 			attotime period = attotime_mul(serial_period_per_word, tms32031_io_regs[DMA_TRANSFER_COUNT]);
-			timer_adjust(dma_timer, period, addr, period);
+			timer_adjust_periodic(dma_timer, period, addr, period);
 			dma_timer_enabled = 1;
 		}
 	}
@@ -261,7 +261,7 @@ static void update_dma_state(void)
 	/* see if we turned off */
 	else if (!enabled && dma_enabled)
 	{
-		timer_adjust(dma_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(dma_timer, attotime_never, 0);
 		dma_timer_enabled = 0;
 	}
 
@@ -303,13 +303,13 @@ static void update_timer(int which)
 		if (tms32031_io_regs[base + TIMER0_GLOBAL_CTL] != 0x2c1)
 			logerror("CAGE TIMER%d: unexpected timer config %08X!\n", which, tms32031_io_regs[base + TIMER0_GLOBAL_CTL]);
 
-		timer_adjust(timer[which], period, which, attotime_never);
+		timer_adjust_oneshot(timer[which], period, which);
 	}
 
 	/* see if we turned off */
 	else if (!enabled && cage_timer_enabled[which])
 	{
-		timer_adjust(timer[which], attotime_never, which, attotime_never);
+		timer_adjust_oneshot(timer[which], attotime_never, which);
 	}
 
 	/* set the new state */
@@ -551,12 +551,12 @@ void cage_control_w(UINT16 data)
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
-		timer_adjust(dma_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(dma_timer, attotime_never, 0);
 
 		cage_timer_enabled[0] = 0;
 		cage_timer_enabled[1] = 0;
-		timer_adjust(timer[0], attotime_never, 0, attotime_never);
-		timer_adjust(timer[1], attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(timer[0], attotime_never, 0);
+		timer_adjust_oneshot(timer[1], attotime_never, 0);
 
 		memset(tms32031_io_regs, 0, 0x60 * 4);
 

@@ -60,7 +60,7 @@ static void TimerHandler_3812(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust(info->timer[c], period, 0, attotime_zero);
+		timer_adjust_oneshot(info->timer[c], period, 0);
 	}
 }
 
@@ -229,7 +229,7 @@ static void TimerHandler_3526(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust(info->timer[c], period, 0, attotime_zero);
+		timer_adjust_oneshot(info->timer[c], period, 0);
 	}
 }
 
@@ -394,7 +394,7 @@ static void TimerHandler_8950(void *param,int c,attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust(info->timer[c], period, 0, attotime_zero);
+		timer_adjust_oneshot(info->timer[c], period, 0);
 	}
 }
 

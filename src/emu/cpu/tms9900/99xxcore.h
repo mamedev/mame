@@ -1815,7 +1815,7 @@ static TIMER_CALLBACK( decrementer_callback )
 */
 static void reset_decrementer(void)
 {
-	timer_adjust(I.timer, attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(I.timer, attotime_never, 0);
 
 	/* reload count */
 	I.decrementer_count = I.decrementer_interval;
@@ -1826,7 +1826,7 @@ static void reset_decrementer(void)
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
 		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpu_getactivecpu());
-		timer_adjust(I.timer, period, 0, period);
+		timer_adjust_periodic(I.timer, period, 0, period);
 	}
 }
 

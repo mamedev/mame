@@ -55,7 +55,7 @@ WRITE8_HANDLER( warpwarp_sound_w )
          * 0.639 * 15k * 1uF -> 0.9585s
          */
         attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
-		timer_adjust(sound_volume_timer, period, 0, period);
+		timer_adjust_periodic(sound_volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -68,7 +68,7 @@ WRITE8_HANDLER( warpwarp_sound_w )
          */
 //      attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 702900), 100000);
         attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 191700), 100000);
-		timer_adjust(sound_volume_timer, period, 0, period);
+		timer_adjust_periodic(sound_volume_timer, period, 0, period);
     }
 }
 
@@ -103,7 +103,7 @@ WRITE8_HANDLER( warpwarp_music2_w )
          * ...I'm sure this is off by one number of magnitude :/
          */
         attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 95850), 100000);
-		timer_adjust(music_volume_timer, period, 0, period);
+		timer_adjust_periodic(music_volume_timer, period, 0, period);
 	}
 	else
 	{
@@ -114,7 +114,7 @@ WRITE8_HANDLER( warpwarp_music2_w )
          */
 //      attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768), 3003300), 100000);
         attotime period = attotime_div(attotime_mul(ATTOTIME_IN_HZ(32768),  300330), 100000);
-		timer_adjust(music_volume_timer, period, 0, period);
+		timer_adjust_periodic(music_volume_timer, period, 0, period);
 	}
 
 }

@@ -442,7 +442,7 @@ void midway_serial_pic2_w(UINT8 data)
 					/* otherwise, flag the time as having just been written for 1/2 second */
 					else
 					{
-						timer_adjust(pic.time_write_timer, ATTOTIME_IN_MSEC(500), 0, attotime_zero);
+						timer_adjust_oneshot(pic.time_write_timer, ATTOTIME_IN_MSEC(500), 0);
 						pic.time_just_written = 1;
 						pic.state = 0;
 					}

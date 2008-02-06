@@ -258,7 +258,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 	/* this value is latched into up-counters, which are clocked at the */
 	/* input clock / 256 */
 	attotime nmi_rate = attotime_mul(ATTOTIME_IN_HZ(4000000), 4096 * (256 - data));
-	timer_adjust(sound_nmi_timer, nmi_rate, 0, nmi_rate);
+	timer_adjust_periodic(sound_nmi_timer, nmi_rate, 0, nmi_rate);
 }
 
 

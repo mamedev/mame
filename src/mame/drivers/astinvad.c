@@ -183,7 +183,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	/* interrupts are asserted on every state change of the 128V line */
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	param ^= 128;
-	timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_never);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, param, 0), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
 	timer_set(double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
@@ -194,7 +194,7 @@ static MACHINE_START( kamikaze )
 {
 	ppi8255_init(&ppi8255_intf);
 	int_timer = timer_alloc(kamizake_int_gen, NULL);
-	timer_adjust(int_timer, video_screen_get_time_until_pos(0, 128, 0), 128, attotime_never);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, 128, 0), 128);
 }
 
 

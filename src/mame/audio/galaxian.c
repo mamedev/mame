@@ -361,7 +361,7 @@ static void galaxian_sh_start(void)
 	sample_start_raw(CHANNEL_LFO+2,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 
 	noisetimer = timer_alloc(noise_timer_cb, NULL);
-	timer_adjust(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
+	timer_adjust_periodic(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
 
 	lfotimer = timer_alloc(lfo_timer_cb, NULL);
 
@@ -443,7 +443,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 #undef Vbe
 #undef Vcc
 	logerror("lfo timer bits:%d%d%d%d r1:%d, r2:%d, re: %d, td: %9.2fsec\n", lfobit[0], lfobit[1], lfobit[2], lfobit[3], (int)r1, (int)r2, (int)Re, td);
-	timer_adjust(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td));
+	timer_adjust_periodic(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / (MAXFREQ-MINFREQ) * td));
 #else
 	double r0, r1, rx = 100000.0;
 
@@ -500,7 +500,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 	rx = rx + 2000000.0 * r0 / (r0+r1);
 
 	LOG(("lfotimer bits:%d%d%d%d r0:%d, r1:%d, rx: %d, time: %9.2fus\n", lfobit[3], lfobit[2], lfobit[1], lfobit[0], (int)r0, (int)r1, (int)rx, 0.639 * rx));
-	timer_adjust(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx));
+	timer_adjust_periodic(lfotimer, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx), 0, attotime_make(0, ATTOSECONDS_PER_SECOND / 1000000000 / (MAXFREQ-MINFREQ) * 639 * rx));
 #endif
 }
 

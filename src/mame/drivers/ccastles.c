@@ -165,7 +165,7 @@ INLINE void schedule_next_irq(int curscanline)
 			break;
 
 	/* next one at the start of this scanline */
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline);
 }
 
 

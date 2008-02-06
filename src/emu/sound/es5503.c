@@ -460,13 +460,13 @@ WRITE8_HANDLER(ES5503_reg_0_w)
 						// ok, we run for this long
 						period = attotime_mul(ATTOTIME_IN_HZ(chip->output_rate), length);
 
-						timer_adjust(chip->oscillators[osc].timer, period, 0, period);
+						timer_adjust_periodic(chip->oscillators[osc].timer, period, 0, period);
 					}
 				}
 				else if (!(chip->oscillators[osc].control & 1) && (data&1))
 				{
 					// key off
-					timer_adjust(chip->oscillators[osc].timer, attotime_never, 0, attotime_never);
+					timer_adjust_oneshot(chip->oscillators[osc].timer, attotime_never, 0);
 				}
 
 				chip->oscillators[osc].control = data;

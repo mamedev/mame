@@ -297,7 +297,7 @@ static void z80dma_update_status(int which)
 		dma[which].is_read = 1;
 		dma[which].cur_cycle = (PORTA_IS_SOURCE(cntx) ? PORTA_CYCLE_LEN(cntx) : PORTB_CYCLE_LEN(cntx));
 		next = ATTOTIME_IN_HZ(dma[which].intf->clockhz);
-		timer_adjust(dma[which].timer,
+		timer_adjust_periodic(dma[which].timer,
 			attotime_zero,
 			which,
 			/* 1 byte transferred in 4 clock cycles */

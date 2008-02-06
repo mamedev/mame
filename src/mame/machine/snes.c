@@ -82,7 +82,7 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	cpunum_set_input_line(machine, 0, G65816_LINE_NMI, HOLD_LINE );
 
 	// don't happen again
-	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
 }
 
 static void snes_hirq_tick(void)
@@ -94,7 +94,7 @@ static void snes_hirq_tick(void)
 	cpunum_set_input_line(Machine, 0, G65816_LINE_IRQ, HOLD_LINE );
 
 	// don't happen again
-	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( snes_hirq_tick_callback )
@@ -148,7 +148,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			}
 			else
 			{
-				timer_adjust(snes_hirq_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, pixel*snes_htmult), 0, attotime_never);
+				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
 			}
 		}
     	}
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if( snes_ram[NMITIMEN] & 0x80 )	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust(snes_nmi_timer, ATTOTIME_IN_CYCLES(12, 0), 0, attotime_zero);
+			timer_adjust_oneshot(snes_nmi_timer, ATTOTIME_IN_CYCLES(12, 0), 0);
 		}
 	}
 
@@ -229,8 +229,8 @@ static TIMER_CALLBACK( snes_scanline_tick )
 
 	cpuintrf_pop_context();
 
-	timer_adjust(snes_scanline_timer, attotime_never, 0, attotime_never);
-	timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0, attotime_never);
+	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
+	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -241,7 +241,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	snes_ppu.beam.current_vert = video_screen_get_vpos(0);
 
 	/* make sure we halt */
-	timer_adjust(snes_hblank_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
 
 	// we must guarantee the 65816's context for HDMA to work
   	cpuintrf_push_context(0);
@@ -273,7 +273,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	timer_adjust(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0, attotime_never);
+	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0);
 }
 
 static void snes_init_ram(void)
@@ -320,18 +320,18 @@ static void snes_init_ram(void)
 
 	/* init timers and stop them */
 	snes_scanline_timer = timer_alloc(snes_scanline_tick, NULL);
-	timer_adjust(snes_scanline_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
 	snes_hblank_timer = timer_alloc(snes_hblank_tick, NULL);
-	timer_adjust(snes_hblank_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
 	snes_nmi_timer = timer_alloc(snes_nmi_tick, NULL);
-	timer_adjust(snes_nmi_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_nmi_timer, attotime_never, 0);
 	snes_hirq_timer = timer_alloc(snes_hirq_tick_callback, NULL);
-	timer_adjust(snes_hirq_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(snes_hirq_timer, attotime_never, 0);
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	hblank_offset = 268;
-	timer_adjust(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0, attotime_never);
+	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
 
 	// check if DSP1 is present (maybe not 100%?)
 	has_dsp1 = ((snes_r_bank1(0xffd6) >= 3) && (snes_r_bank1(0xffd6) <= 5)) ? 1 : 0;

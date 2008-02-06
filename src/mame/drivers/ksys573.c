@@ -463,7 +463,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust(atapi_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
 
 //  verboselog( 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
@@ -508,7 +508,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, attotime_zero);
+		timer_adjust_oneshot(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0);
 	}
 	else
 	{
@@ -734,7 +734,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust( atapi_timer, ATTOTIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0, attotime_zero );
+						timer_adjust_oneshot( atapi_timer, ATTOTIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0 );
 						break;
 				}
 
@@ -906,7 +906,7 @@ static void atapi_init(running_machine *machine)
 	atapi_cdata_wait = 0;
 
 	atapi_timer = timer_alloc( atapi_xfer_end , NULL);
-	timer_adjust(atapi_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
 
 	for( i = 0; i < 2; i++ )
 	{
@@ -973,7 +973,7 @@ static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0, attotime_zero);
+	timer_adjust_oneshot(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0);
 }
 
 static UINT32 m_n_security_control;
@@ -1185,7 +1185,7 @@ static void root_timer_adjust( int n_counter )
 {
 	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
 	{
-		timer_adjust( m_p_timer_root[ n_counter ], attotime_never, n_counter, attotime_zero);
+		timer_adjust_oneshot( m_p_timer_root[ n_counter ], attotime_never, n_counter);
 	}
 	else
 	{
@@ -1199,7 +1199,7 @@ static void root_timer_adjust( int n_counter )
 
 		n_duration *= root_divider( n_counter );
 
-		timer_adjust( m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter, attotime_zero);
+		timer_adjust_oneshot( m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter);
 	}
 }
 

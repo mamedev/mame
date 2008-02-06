@@ -196,7 +196,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 	if (!(newscroll & 0x10))
 		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(0));
 	else
-		timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6, attotime_zero);
+		timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)

@@ -91,7 +91,7 @@ static void dma_reload(audio_channel *chan)
 {
 	chan->curlocation = CUSTOM_REG_LONG(REG_AUD0LCH + chan->index * 8);
 	chan->curlength = CUSTOM_REG(REG_AUD0LEN + chan->index * 8);
-	timer_adjust(chan->irq_timer, ATTOTIME_IN_HZ(15750), chan->index, attotime_zero);
+	timer_adjust_oneshot(chan->irq_timer, ATTOTIME_IN_HZ(15750), chan->index);
 	LOG(("dma_reload(%d): offs=%05X len=%04X\n", chan->index, chan->curlocation, chan->curlength));
 }
 

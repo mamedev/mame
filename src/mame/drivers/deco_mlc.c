@@ -222,7 +222,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0,attotime_never);
+		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0);
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(0));
 		return;
 		break;

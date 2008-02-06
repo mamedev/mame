@@ -2408,7 +2408,7 @@ static void sh2_timer_activate(void)
 	int max_delta = 0xfffff;
 	UINT16 frc;
 
-	timer_adjust(sh2.timer, attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(sh2.timer, attotime_never, 0);
 
 	frc = sh2.frc;
 	if(!(sh2.m[4] & OCFA)) {
@@ -2434,7 +2434,7 @@ static void sh2_timer_activate(void)
 		if(divider) {
 			max_delta <<= divider;
 			sh2.frc_base = cpunum_gettotalcycles(sh2.cpu_number);
-			timer_adjust(sh2.timer, ATTOTIME_IN_CYCLES(max_delta, sh2.cpu_number), sh2.cpu_number, attotime_zero);
+			timer_adjust_oneshot(sh2.timer, ATTOTIME_IN_CYCLES(max_delta, sh2.cpu_number), sh2.cpu_number);
 		} else {
 			logerror("SH2.%d: Timer event in %d cycles of external clock", sh2.cpu_number, max_delta);
 		}
@@ -2554,7 +2554,7 @@ static void sh2_dmac_check(int dma)
 			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh2.m[0x63+4*dma], incs, incd, size));
 
 			sh2.dma_timer_active[dma] = 1;
-			timer_adjust(sh2.dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, sh2.cpu_number), (sh2.cpu_number<<1)|dma, attotime_zero);
+			timer_adjust_oneshot(sh2.dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, sh2.cpu_number), (sh2.cpu_number<<1)|dma);
 
 			src &= AM;
 			dst &= AM;
@@ -2633,7 +2633,7 @@ static void sh2_dmac_check(int dma)
 		if(sh2.dma_timer_active[dma])
 		{
 			logerror("SH2: DMA %d cancelled in-flight", dma);
-			timer_adjust(sh2.dma_timer[dma], attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(sh2.dma_timer[dma], attotime_never, 0);
 			sh2.dma_timer_active[dma] = 0;
 		}
 	}
@@ -2933,13 +2933,13 @@ static void sh2_init(int index, int clock, const void *config, int (*irqcallback
 	const struct sh2_config *conf = config;
 
 	sh2.timer = timer_alloc(sh2_timer_callback, NULL);
-	timer_adjust(sh2.timer, attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(sh2.timer, attotime_never, 0);
 
 	sh2.dma_timer[0] = timer_alloc(sh2_dmac_callback, NULL);
-	timer_adjust(sh2.dma_timer[0], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(sh2.dma_timer[0], attotime_never, 0);
 
 	sh2.dma_timer[1] = timer_alloc(sh2_dmac_callback, NULL);
-	timer_adjust(sh2.dma_timer[1], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(sh2.dma_timer[1], attotime_never, 0);
 
 	sh2.m = auto_malloc(0x200);
 

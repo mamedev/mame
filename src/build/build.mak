@@ -40,7 +40,7 @@ BUILD += \
 FILE2STROBJS = \
 	$(BUILDOBJ)/file2str.o \
 
-$(FILE2STR): $(FILE2STROBJS)
+$(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ -o $@
 
@@ -57,8 +57,10 @@ $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBUTIL) $(LIBOCORE) $(ZLIB) -o $@
 
+
+
 #-------------------------------------------------
-# rule for making the verinfo tool
+# verinfo
 #-------------------------------------------------
 
 VERINFO = $(BUILDOBJ)/verinfo$(EXE)
@@ -66,7 +68,7 @@ VERINFO = $(BUILDOBJ)/verinfo$(EXE)
 VERINFOOBJS = \
 	$(BUILDOBJ)/verinfo.o
 
-$(VERINFO): $(VERINFOOBJS)
+$(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ -o $@
 

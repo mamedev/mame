@@ -466,7 +466,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 			PROCESS_SAMPLE(chip);										\
 		}																\
 	}																	\
-	timer_adjust(chip->rtimer, attotime_never, 0, attotime_zero)
+	timer_adjust_oneshot(chip->rtimer, attotime_never, 0)
 
 #else   /* no HEAVY_MACRO_USAGE */
 /*
@@ -517,7 +517,7 @@ static TIMER_CALLBACK( pokey_pot_trigger );
 			PROCESS_CHANNEL(chip,channel);								\
 		}																\
 	}																	\
-	timer_adjust(chip->rtimer, attotime_never, 0, attotime_zero)
+	timer_adjust_oneshot(chip->rtimer, attotime_never, 0)
 
 #endif
 
@@ -819,7 +819,7 @@ static void pokey_potgo(struct POKEYregisters *p)
 
                 /* final value */
                 p->POTx[pot] = r;
-				timer_adjust(p->ptimer[pot], attotime_mul(AD_TIME, r), pot, attotime_zero);
+				timer_adjust_oneshot(p->ptimer[pot], attotime_mul(AD_TIME, r), pot);
 			}
 		}
 	}
@@ -925,7 +925,7 @@ static int pokey_register_r(int chip, int offs)
 			LOG_RAND(("POKEY #%d adjust %u rand17[$%05x]: $%02x\n", chip, adjust, p->r17, p->RANDOM));
 		}
 		if (adjust > 0)
-        	timer_adjust(p->rtimer, attotime_never, 0, attotime_zero);
+        	timer_adjust_oneshot(p->rtimer, attotime_never, 0);
 		data = p->RANDOM ^ 0xff;
 		break;
 
@@ -1086,9 +1086,9 @@ static void pokey_register_w(int chip, int offs, int data)
         /* first remove any existing timers */
 		LOG_TIMER(("POKEY #%d STIMER $%02x\n", chip, data));
 
-		timer_adjust(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1], attotime_zero);
-		timer_adjust(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2], attotime_zero);
-		timer_adjust(p->timer[TIMER4], attotime_never, p->timer_param[TIMER4], attotime_zero);
+		timer_adjust_oneshot(p->timer[TIMER1], attotime_never, p->timer_param[TIMER1]);
+		timer_adjust_oneshot(p->timer[TIMER2], attotime_never, p->timer_param[TIMER2]);
+		timer_adjust_oneshot(p->timer[TIMER4], attotime_never, p->timer_param[TIMER4]);
 
         /* reset all counters to zero (side effect) */
 		p->polyadjust = 0;
@@ -1106,7 +1106,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #1 _and_ #2 event after timer_div clocks of joined CHAN1+CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2|IRQ_TIMR1;
-				timer_adjust(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
+				timer_adjust_periodic(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
         else
@@ -1117,7 +1117,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #1 event after timer_div clocks of CHAN1 */
 				p->timer_period[TIMER1] = attotime_mul(p->clock_period, p->divisor[CHAN1]);
 				p->timer_param[TIMER1] = (chip<<3)|IRQ_TIMR1;
-				timer_adjust(p->timer[TIMER1], p->timer_period[TIMER1], p->timer_param[TIMER1], p->timer_period[TIMER1]);
+				timer_adjust_periodic(p->timer[TIMER1], p->timer_period[TIMER1], p->timer_param[TIMER1], p->timer_period[TIMER1]);
 			}
 
 			if( p->divisor[CHAN2] > 4 )
@@ -1126,7 +1126,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #2 event after timer_div clocks of CHAN2 */
 				p->timer_period[TIMER2] = attotime_mul(p->clock_period, p->divisor[CHAN2]);
 				p->timer_param[TIMER2] = (chip<<3)|IRQ_TIMR2;
-				timer_adjust(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
+				timer_adjust_periodic(p->timer[TIMER2], p->timer_period[TIMER2], p->timer_param[TIMER2], p->timer_period[TIMER2]);
 			}
         }
 
@@ -1143,7 +1143,7 @@ static void pokey_register_w(int chip, int offs, int data)
 					/* set timer #4 event after timer_div clocks of CHAN4 */
 					p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 					p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
-					timer_adjust(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
+					timer_adjust_periodic(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 				}
             }
         }
@@ -1155,7 +1155,7 @@ static void pokey_register_w(int chip, int offs, int data)
 				/* set timer #4 event after timer_div clocks of CHAN4 */
 				p->timer_period[TIMER4] = attotime_mul(p->clock_period, p->divisor[CHAN4]);
 				p->timer_param[TIMER4] = (chip<<3)|IRQ_TIMR4;
-				timer_adjust(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
+				timer_adjust_periodic(p->timer[TIMER4], p->timer_period[TIMER4], p->timer_param[TIMER4], p->timer_period[TIMER4]);
 			}
         }
 
@@ -1252,7 +1252,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN1] )
 			p->counter[CHAN1] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER1] )
-			timer_adjust(p->timer[TIMER1], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER1], p->timer_period[TIMER1]);
+			timer_adjust_periodic(p->timer[TIMER1], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER1], p->timer_period[TIMER1]);
 		p->audible[CHAN1] = !(
 			(p->AUDC[CHAN1] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN1] & VOLUME_MASK) == 0 ||
@@ -1288,7 +1288,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN2] )
 			p->counter[CHAN2] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER2] )
-			timer_adjust(p->timer[TIMER2], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER2], p->timer_period[TIMER2]);
+			timer_adjust_periodic(p->timer[TIMER2], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER2], p->timer_period[TIMER2]);
 		p->audible[CHAN2] = !(
 			(p->AUDC[CHAN2] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN2] & VOLUME_MASK) == 0 ||
@@ -1353,7 +1353,7 @@ static void pokey_register_w(int chip, int offs, int data)
 		if( new_val < p->counter[CHAN4] )
 			p->counter[CHAN4] = new_val;
 		if( p->interrupt_cb && p->timer[TIMER4] )
-			timer_adjust(p->timer[TIMER4], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER4], p->timer_period[TIMER4]);
+			timer_adjust_periodic(p->timer[TIMER4], attotime_mul(p->clock_period, new_val), p->timer_param[TIMER4], p->timer_period[TIMER4]);
 		p->audible[CHAN4] = !(
 			(p->AUDC[CHAN4] & VOLUME_ONLY) ||
 			(p->AUDC[CHAN4] & VOLUME_MASK) == 0 ||

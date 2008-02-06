@@ -798,7 +798,7 @@ static DRIVER_INIT( namcos11 )
 	emu_timer *timer;
 
 	timer = timer_alloc( mcu_timer , NULL);
-	timer_adjust( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
+	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
 	psx_driver_init();
 	namcoc7x_on_driver_init();

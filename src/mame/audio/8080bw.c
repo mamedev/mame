@@ -800,13 +800,13 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			if (attotime_compare(schaser_effect_555_time_remain, attotime_zero) != 0)
 			{
 				/* timer re-enabled, use up remaining 555 high time */
-				timer_adjust(schaser_effect_555_timer, schaser_effect_555_time_remain, effect, attotime_zero);
+				timer_adjust_oneshot(schaser_effect_555_timer, schaser_effect_555_time_remain, effect);
 			}
 			else if (!schaser_effect_555_is_low)
 			{
 				/* set 555 high time */
 				attotime new_time = attotime_make(0, ATTOSECONDS_PER_SECOND * .8873 * schaser_effect_rc[effect]);
-				timer_adjust(schaser_effect_555_timer, new_time, effect, attotime_zero);
+				timer_adjust_oneshot(schaser_effect_555_timer, new_time, effect);
 			}
 		}
 		else
@@ -815,7 +815,7 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 			if (!schaser_effect_555_is_low)
 			{
 				schaser_effect_555_time_remain = timer_timeleft(schaser_effect_555_timer);
-				timer_adjust(schaser_effect_555_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(schaser_effect_555_timer, attotime_never, 0);
 			}
 		}
 		last_effect = effect;
@@ -874,7 +874,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 		else
 			new_time = attotime_never;
 	}
-	timer_adjust(schaser_effect_555_timer, new_time, effect, attotime_zero);
+	timer_adjust_oneshot(schaser_effect_555_timer, new_time, effect);
 	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
 	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
@@ -891,7 +891,7 @@ MACHINE_START( schaser )
 MACHINE_RESET( schaser )
 {
 	schaser_effect_555_is_low = 0;
-	timer_adjust(schaser_effect_555_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(schaser_effect_555_timer, attotime_never, 0);
 	schaser_sh_port_1_w(0, 0);
 	schaser_sh_port_2_w(0, 0);
 	schaser_effect_555_time_remain = attotime_zero;

@@ -71,7 +71,7 @@ static void tmp68301_update_timer( int i )
 	int max = 0;
 	attotime duration = attotime_zero;
 
-	timer_adjust(tmp68301_timer[i],attotime_never,i,attotime_never);
+	timer_adjust_oneshot(tmp68301_timer[i],attotime_never,i);
 
 	// timers 1&2 only
 	switch( (TCR & 0x0030)>>4 )						// MR2..1
@@ -101,7 +101,7 @@ static void tmp68301_update_timer( int i )
 	if (!(TCR & 0x0002))				// CS
 	{
 		if (attotime_compare(duration, attotime_zero))
-			timer_adjust(tmp68301_timer[i],duration,i,attotime_zero);
+			timer_adjust_oneshot(tmp68301_timer[i],duration,i);
 		else
 			logerror("CPU #0 PC %06X: TMP68301 error, timer %d duration is 0\n",activecpu_get_pc(),i);
 	}

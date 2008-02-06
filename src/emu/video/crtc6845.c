@@ -335,7 +335,7 @@ static void update_timer(crtc6845_state *chip)
 		else
 			duration = attotime_never;
 
-		timer_adjust(chip->display_enable_changed_timer, duration, 0, attotime_never);
+		timer_adjust_oneshot(chip->display_enable_changed_timer, duration, 0);
 	}
 }
 

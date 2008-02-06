@@ -72,7 +72,7 @@ static TIMER_CALLBACK( ds2401_reset )
 	verboselog( 1, "ds2401_reset(%d)\n", which );
 
 	c->state = STATE_RESET;
-	timer_adjust( c->timer, attotime_never, which, attotime_never );
+	timer_adjust_oneshot( c->timer, attotime_never, which );
 }
 
 static TIMER_CALLBACK( ds2401_tick )
@@ -86,7 +86,7 @@ static TIMER_CALLBACK( ds2401_tick )
 		verboselog( 2, "ds2401_tick(%d) state_reset1 %d\n", which, c->rx );
 		c->tx = 0;
 		c->state = STATE_RESET2;
-		timer_adjust( c->timer, c->t_pdl, which, attotime_never );
+		timer_adjust_oneshot( c->timer, c->t_pdl, which );
 		break;
 	case STATE_RESET2:
 		verboselog( 2, "ds2401_tick(%d) state_reset2 %d\n", which, c->rx );
@@ -181,7 +181,7 @@ void ds2401_write( int which, int data )
 			break;
 		case STATE_COMMAND:
 			verboselog( 2, "ds2401_write(%d) state_command\n", which );
-			timer_adjust( c->timer, c->t_samp, which, attotime_never );
+			timer_adjust_oneshot( c->timer, c->t_samp, which );
 			break;
 		case STATE_READROM:
 			if( c->bit == 0 )
@@ -198,13 +198,13 @@ void ds2401_write( int which, int data )
 				c->byte++;
 			}
 			verboselog( 2, "ds2401_write(%d) state_readrom %d\n", which, c->tx );
-			timer_adjust( c->timer, c->t_rdv, which, attotime_never );
+			timer_adjust_oneshot( c->timer, c->t_rdv, which );
 			break;
 		default:
 			verboselog( 0, "ds2401_write(%d) state not handled: %d\n", which, c->state );
 			break;
 		}
-		timer_adjust( c->reset_timer, c->t_rstl, which, attotime_never );
+		timer_adjust_oneshot( c->reset_timer, c->t_rstl, which );
 	}
 	else if( data == 1 && c->rx == 0 )
 	{
@@ -212,10 +212,10 @@ void ds2401_write( int which, int data )
 		{
 		case STATE_RESET:
 			c->state = STATE_RESET1;
-			timer_adjust( c->timer, c->t_pdh, which, attotime_never );
+			timer_adjust_oneshot( c->timer, c->t_pdh, which );
 			break;
 		}
-		timer_adjust( c->reset_timer, attotime_never, which, attotime_never );
+		timer_adjust_oneshot( c->reset_timer, attotime_never, which );
 	}
 	c->rx = data;
 }

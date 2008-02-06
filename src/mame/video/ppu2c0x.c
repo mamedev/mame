@@ -367,7 +367,7 @@ static TIMER_CALLBACK( hblank_callback )
 	if (this_ppu->hblank_callback_proc)
 		(*this_ppu->hblank_callback_proc) (num, this_ppu->scanline, vblank, blanked);
 
-	timer_adjust(chips[num].hblank_timer, attotime_never, num, attotime_never);
+	timer_adjust_oneshot(chips[num].hblank_timer, attotime_never, num);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -379,7 +379,7 @@ static TIMER_CALLBACK( nmi_callback )
 	if (intf->nmi_handler[num])
 		(*intf->nmi_handler[num]) (num, ppu_regs);
 
-	timer_adjust(chips[num].nmi_timer, attotime_never, num, attotime_never);
+	timer_adjust_oneshot(chips[num].nmi_timer, attotime_never, num);
 }
 
 static void draw_background(const int num, UINT8 *line_priority )
@@ -871,7 +871,7 @@ logerror("vlbank starting\n");
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			timer_adjust(this_ppu->nmi_timer, ATTOTIME_IN_CYCLES(4, 0), num, attotime_never);
+			timer_adjust_oneshot(this_ppu->nmi_timer, ATTOTIME_IN_CYCLES(4, 0), num);
 		}
 	}
 
@@ -922,10 +922,10 @@ logerror("vlbank ending\n");
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust(this_ppu->hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num, attotime_never); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	timer_adjust(this_ppu->scanline_timer, video_screen_get_time_until_pos(0, next_scanline * this_ppu->scan_scale, 0), num, attotime_zero);
+	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(0, next_scanline * this_ppu->scan_scale, 0), num);
 }
 
 /*************************************
@@ -950,13 +950,13 @@ void ppu2c0x_reset(int num, int scan_scale )
 	/* set the scan scale (this is for dual monitor vertical setups) */
 	chips[num].scan_scale = scan_scale;
 
-	timer_adjust(chips[num].nmi_timer, attotime_never, num, attotime_never);
+	timer_adjust_oneshot(chips[num].nmi_timer, attotime_never, num);
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust(chips[num].hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num, attotime_never); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(chips[num].hblank_timer, ATTOTIME_IN_CYCLES(86.67, 0), num); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
-	timer_adjust(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 1, 0), num, attotime_zero);
+	timer_adjust_oneshot(chips[num].scanline_timer, video_screen_get_time_until_pos(0, 1, 0), num);
 
 	/* reset the callbacks */
 	chips[num].scanline_callback_proc = 0;

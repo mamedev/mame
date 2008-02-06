@@ -64,7 +64,7 @@ static TIMER_CALLBACK( interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	timer_adjust(int_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_zero);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, param, 0), param);
 
 	TTL7474_update(0);
 }
@@ -86,7 +86,7 @@ static void machine_reset_common( int line )
 
 	/* start a timer to generate interrupts */
 	int_timer = timer_alloc(interrupt_timer, NULL);
-	timer_adjust(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 MACHINE_RESET( galaxian )

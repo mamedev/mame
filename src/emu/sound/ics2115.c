@@ -195,9 +195,9 @@ static void recalc_timer(struct ics2115 *chip, int timer)
 	if(chip->timer[timer].period != period) {
 		chip->timer[timer].period = period;
 		if(period)
-			timer_adjust(chip->timer[timer].timer, ATTOTIME_IN_NSEC(period), 0, ATTOTIME_IN_NSEC(period));
+			timer_adjust_periodic(chip->timer[timer].timer, ATTOTIME_IN_NSEC(period), 0, ATTOTIME_IN_NSEC(period));
 		else
-			timer_adjust(chip->timer[timer].timer, attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(chip->timer[timer].timer, attotime_never, 0);
 	}
 }
 
@@ -532,8 +532,8 @@ static void ics2115_reset(void *_chip)
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));
-	timer_adjust(chip->timer[0].timer, attotime_never, 0, attotime_zero);
-	timer_adjust(chip->timer[1].timer, attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(chip->timer[0].timer, attotime_never, 0);
+	timer_adjust_oneshot(chip->timer[1].timer, attotime_never, 0);
 	chip->timer[0].period = 0;
 	chip->timer[1].period = 0;
 	recalc_irq(chip);

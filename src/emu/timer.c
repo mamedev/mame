@@ -526,12 +526,23 @@ static void timer_remove(emu_timer *which)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    timer_adjust - adjust the time when this
-    timer will fire, and whether or not it will
-    fire periodically
+    timer_adjust_oneshot - adjust the time when this timer 
+    will fire and disable any periodic firings
 -------------------------------------------------*/
 
-void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period)
+void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
+{
+	timer_adjust_periodic(which, duration, param, attotime_never);
+}
+
+
+/*-------------------------------------------------
+    timer_adjust_periodic - adjust the time when 
+    this timer will fire and specify a period for 
+    subsequent firings
+-------------------------------------------------*/
+
+void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, attotime period)
 {
 	attotime time = get_current_time();
 
@@ -557,7 +568,7 @@ void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime per
 	timer_list_insert(which);
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
-	LOG(("timer_adjust %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
+	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
 	if (which == timer_head && cpu_getexecutingcpu() >= 0)
 		activecpu_abort_timeslice();
 }
@@ -577,7 +588,7 @@ void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime per
 void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
 {
 	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, FALSE);
-	timer_adjust(timer, period, param, period);
+	timer_adjust_periodic(timer, period, param, period);
 }
 
 
@@ -589,7 +600,7 @@ void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callba
 void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
 {
 	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, TRUE);
-	timer_adjust(timer, duration, param, attotime_zero);
+	timer_adjust_oneshot(timer, duration, param);
 }
 
 
@@ -604,7 +615,7 @@ void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_callba
 
 void timer_reset(emu_timer *which, attotime duration)
 {
-	timer_adjust(which, duration, which->param, which->period);
+	timer_adjust_periodic(which, duration, which->param, which->period);
 }
 
 

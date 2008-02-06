@@ -832,11 +832,11 @@ static TIMER_CALLBACK( dcs_reset )
 	/* reset timers */
 	dcs.timer_enable = 0;
 	dcs.timer_scale = 1;
-	timer_adjust(dcs.internal_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(dcs.internal_timer, attotime_never, 0);
 
 	/* start the SPORT0 timer */
 	if (dcs.sport_timer)
-		timer_adjust(dcs.sport_timer, ATTOTIME_IN_HZ(1000), 0, ATTOTIME_IN_HZ(1000));
+		timer_adjust_periodic(dcs.sport_timer, ATTOTIME_IN_HZ(1000), 0, ATTOTIME_IN_HZ(1000));
 
 	/* reset the HLE transfer states */
 	transfer.dcs_state = transfer.state = 0;
@@ -1716,7 +1716,7 @@ static TIMER_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer_adjust(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, dcs.cpunum), 0, attotime_zero);
+		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, dcs.cpunum), 0);
 	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_TIMER, PULSE_LINE);
 }
 
@@ -1751,7 +1751,7 @@ static void reset_timer(void)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		timer_adjust(dcs.internal_timer, ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0, attotime_zero);
+		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), dcs.cpunum), 0);
 }
 
 
@@ -1767,7 +1767,7 @@ static void timer_enable_callback(int enable)
 	else
 	{
 //      mame_printf_debug("Timer disabled\n");
-		timer_adjust(dcs.internal_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(dcs.internal_timer, attotime_never, 0);
 	}
 }
 
@@ -1846,7 +1846,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
 			}
 			break;
 
@@ -1855,7 +1855,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(0, dcs.channels, 0);
-				timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
 			}
 			break;
 
@@ -1966,7 +1966,7 @@ static void recompute_sample_rate(void)
 	if (dcs.incs)
 	{
 		attotime period = attotime_div(attotime_mul(sample_period, dcs.size), (2 * dcs.channels * dcs.incs));
-		timer_adjust(dcs.reg_timer, period, 0, period);
+		timer_adjust_periodic(dcs.reg_timer, period, 0, period);
 	}
 }
 
@@ -2019,7 +2019,7 @@ static void sound_tx_callback(int port, INT32 data)
 	dmadac_enable(0, dcs.channels, 0);
 
 	/* remove timer */
-	timer_adjust(dcs.reg_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(dcs.reg_timer, attotime_never, 0);
 }
 
 
@@ -2068,7 +2068,7 @@ static TIMER_CALLBACK( transfer_watchdog_callback )
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
 			preprocess_write((*dcs.fifo_data_r)());
 	}
-	timer_adjust(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left, attotime_zero);
+	timer_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }
 
 
@@ -2298,7 +2298,7 @@ static int preprocess_stage_2(UINT16 data)
 			transfer.sum = 0;
 			if (transfer.hle_enabled)
 			{
-				timer_adjust(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left, attotime_zero);
+				timer_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
 				return 1;
 			}
 			break;
@@ -2325,7 +2325,7 @@ static int preprocess_stage_2(UINT16 data)
 				if (transfer.state == 0)
 				{
 					timer_set(ATTOTIME_IN_USEC(1), NULL, transfer.sum, s2_ack_callback);
-					timer_adjust(transfer.watchdog, attotime_never, 0, attotime_never);
+					timer_adjust_oneshot(transfer.watchdog, attotime_never, 0);
 				}
 				return 1;
 			}

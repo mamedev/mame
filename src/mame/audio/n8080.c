@@ -155,7 +155,7 @@ static void start_mono_flop(int n, attotime expire)
 
 	update_SN76477_status();
 
-	timer_adjust(sound_timer[n], expire, n, attotime_zero);
+	timer_adjust_oneshot(sound_timer[n], expire, n);
 }
 
 
@@ -165,7 +165,7 @@ static void stop_mono_flop(int n)
 
 	update_SN76477_status();
 
-	timer_adjust(sound_timer[n], attotime_never, n, attotime_never);
+	timer_adjust_oneshot(sound_timer[n], attotime_never, n);
 }
 
 

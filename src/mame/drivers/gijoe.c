@@ -173,7 +173,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 		gijoe_objdma();
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
-		timer_adjust(dmadelay_timer, JOE_DMADELAY, 0, attotime_zero);
+		timer_adjust_oneshot(dmadelay_timer, JOE_DMADELAY, 0);
 	}
 
 	// trigger V-blank interrupt

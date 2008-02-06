@@ -97,7 +97,7 @@ static MACHINE_START( sbrkout )
 
 static MACHINE_RESET( sbrkout )
 {
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 
@@ -126,14 +126,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == machine->screen[0].visarea.max_y + 1)
 	{
 		UINT8 potvalue = readinputportbytag("PADDLE");
-		timer_adjust(pot_timer, video_screen_get_time_until_pos(0, 72 + (potvalue / 2), (potvalue % 2) * 128), 0, attotime_never);
+		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(0, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
 	}
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
 	if (scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 

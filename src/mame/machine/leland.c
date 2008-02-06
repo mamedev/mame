@@ -368,7 +368,7 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
-	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, attotime_zero);
+	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
@@ -422,7 +422,7 @@ MACHINE_START( ataxx )
 MACHINE_RESET( ataxx )
 {
 	memset(extra_tram, 0, ATAXX_EXTRA_TRAM_SIZE);
-	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8, attotime_zero);
+	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(0, 8, 0), 8);
 
 	/* initialize the XROM */
 	xrom_length = memory_region_length(REGION_USER1);
@@ -474,7 +474,7 @@ static TIMER_CALLBACK( leland_interrupt_callback )
 	scanline += 16;
 	if (scanline > 248)
 		scanline = 8;
-	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -486,7 +486,7 @@ static TIMER_CALLBACK( ataxx_interrupt_callback )
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 
 	/* set a timer for the next one */
-	timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -1271,7 +1271,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x08:	/*  */
-			timer_adjust(master_int_timer, video_screen_get_time_until_pos(0, data + 1, 0), data + 1, attotime_zero);
+			timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(0, data + 1, 0), data + 1);
 			break;
 
 		default:

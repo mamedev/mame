@@ -115,7 +115,7 @@ static TIMER_CALLBACK( vdp_reload_counter )
 		scanline = 0;
 
 	/* set a timer */
-	timer_adjust(scan_timer, video_screen_get_time_until_pos(0, scanline, 320), scanline, attotime_zero);
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(0, scanline, 320), scanline);
 }
 
 
@@ -174,7 +174,7 @@ MACHINE_RESET( genesis )
 
 	/* set the first scanline 0 timer to go off */
 	scan_timer = timer_alloc(vdp_reload_counter, NULL);
-	timer_adjust(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0, attotime_zero);
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(0, 0, 320), 0);
 }
 
 

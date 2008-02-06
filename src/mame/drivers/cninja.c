@@ -85,7 +85,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[4]&0xffff;
 
 	cpunum_set_input_line(machine, 0, (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
-	timer_adjust(raster_irq_timer,attotime_never,0,attotime_zero);
+	timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 }
 
 static READ16_HANDLER( cninja_irq_r )
@@ -121,9 +121,9 @@ static WRITE16_HANDLER( cninja_irq_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		cninja_scanline=data&0xff;
 		if ((cninja_irq_mask&0x2)==0 && cninja_scanline>0 && cninja_scanline<240)
-			timer_adjust(raster_irq_timer, video_screen_get_time_until_pos(0, cninja_scanline, 0), cninja_scanline, attotime_never);
+			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(0, cninja_scanline, 0), cninja_scanline);
 		else
-			timer_adjust(raster_irq_timer,attotime_never,0,attotime_zero);
+			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		return;
 
 	case 2: /* VBL irq ack */

@@ -273,7 +273,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -293,7 +293,7 @@ static TIMER_CALLBACK( williams_count240_callback )
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0);
 }
 
 
@@ -364,11 +364,11 @@ static void williams_common_init(void)
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams_va11_callback, NULL);
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 240 */
 	scan240_timer = timer_alloc(williams_count240_callback, NULL);
-	timer_adjust(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0);
 
 	state_save_register_global(vram_bank);
 }
@@ -402,7 +402,7 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -422,7 +422,7 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 	timer_set(video_screen_get_time_until_pos(0, 8, 0), NULL, 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0);
 }
 
 
@@ -453,11 +453,11 @@ MACHINE_RESET( williams2 )
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams2_va11_callback, NULL);
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 254 */
 	scan254_timer = timer_alloc(williams2_endscreen_callback, NULL);
-	timer_adjust(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0);
 
 	state_save_register_global(vram_bank);
 	state_save_register_func_postload(williams2_postload);

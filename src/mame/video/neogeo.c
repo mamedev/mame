@@ -251,7 +251,7 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	else
 		auto_animation_frame_counter = auto_animation_frame_counter - 1;
 
-	timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0);
 }
 
 
@@ -263,7 +263,7 @@ static void create_auto_animation_timer(void)
 
 static void start_auto_animation_timer(void)
 {
-	timer_adjust(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0);
 }
 
 
@@ -673,7 +673,7 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -685,7 +685,7 @@ static void create_sprite_line_timer(void)
 
 static void start_sprite_line_timer(void)
 {
-	timer_adjust(sprite_line_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 

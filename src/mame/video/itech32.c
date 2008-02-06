@@ -479,7 +479,7 @@ static void update_interrupts(int fast)
 static TIMER_CALLBACK( scanline_interrupt )
 {
 	/* set timer for next frame */
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0);
 
 	/* set the interrupt bit in the status reg */
 	logerror("-------------- (DISPLAY INT @ %d) ----------------\n", video_screen_get_vpos(0));
@@ -1347,7 +1347,7 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0, attotime_zero);
+			timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, VIDEO_INTSCANLINE, 0), 0);
 			break;
 
 		case 0x32/2:	/* VIDEO_VTOTAL */

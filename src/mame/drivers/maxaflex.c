@@ -202,7 +202,7 @@ static WRITE8_HANDLER( mcu_tcr_w )
 		}
 
 		period = attotime_mul(ATTOTIME_IN_HZ(3579545), divider);
-		timer_adjust( mcu_timer, period, 0, period);
+		timer_adjust_periodic( mcu_timer, period, 0, period);
 	}
 }
 

@@ -165,7 +165,7 @@ static void adjust_display_position_interrupt_timer(void)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
 		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
-		timer_adjust(display_position_interrupt_timer, period, 0, attotime_zero);
+		timer_adjust_oneshot(display_position_interrupt_timer, period, 0);
 	}
 }
 
@@ -253,7 +253,7 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 	}
 
 	/* set timer for next screen */
-	timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, attotime_zero);
+	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
 }
 
 
@@ -269,7 +269,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 	update_interrupts(machine);
 
 	/* set timer for next screen */
-	timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0);
 }
 
 
@@ -283,8 +283,8 @@ static void create_interrupt_timers(void)
 
 static void start_interrupt_timers(void)
 {
-	timer_adjust(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0, attotime_zero);
-	timer_adjust(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0, attotime_zero);
+	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0);
+	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
 }
 
 

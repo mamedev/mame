@@ -351,7 +351,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	timer_adjust(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll, attotime_zero);
+	timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(0, 0, 0), newscroll);
 
 	/* update the data */
 	*atarigen_yscroll = newscroll;
@@ -419,7 +419,7 @@ static TIMER_CALLBACK( int3_callback )
 	atarigen_scanline_int_gen(machine, 0);
 
 	/* set a timer to turn it off */
-	timer_adjust(int3off_timer, video_screen_get_scan_period(0), 0, attotime_zero);
+	timer_adjust_oneshot(int3off_timer, video_screen_get_scan_period(0), 0);
 
 	/* determine the time of the next one */
 	next_timer_scanline = -1;
@@ -498,9 +498,9 @@ static void update_timers(int scanline)
 
 		/* set a new one */
 		if (best != -1)
-			timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, best, 0), best, attotime_zero);
+			timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, best, 0), best);
 		else
-			timer_adjust(scanline_timer, attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(scanline_timer, attotime_never, 0);
 	}
 }
 

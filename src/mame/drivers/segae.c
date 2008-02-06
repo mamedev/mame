@@ -726,7 +726,7 @@ static void *start_vdp(running_machine *machine, int type)
 /* stop timer and clear ram.. used on megatech when we switch between genesis and sms mode */
 void segae_md_sms_stop_scanline_timer(void)
 {
-	timer_adjust(md_sms_vdp->sms_scanline_timer,  attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(md_sms_vdp->sms_scanline_timer,  attotime_never, 0);
 	memset(md_sms_vdp->vram,0x00,0x4000);
 }
 
@@ -1293,7 +1293,7 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
 		chip->sms_scanline_counter++;
-		timer_adjust(chip->sms_scanline_timer, ATTOTIME_IN_HZ(chip->sms_framerate * chip->sms_total_scanlines), 0, attotime_zero);
+		timer_adjust_oneshot(chip->sms_scanline_timer, ATTOTIME_IN_HZ(chip->sms_framerate * chip->sms_total_scanlines), 0);
 
 		if (chip->sms_scanline_counter>sms_mode_table[chip->screen_mode].sms2_height)
 		{
@@ -1458,7 +1458,7 @@ static void end_of_frame(struct sms_vdp *chip)
 
 	chip->sms_scanline_counter = -1;
 	chip->yscroll = chip->regs[0x9]; // this can't change mid-frame
-	timer_adjust(chip->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(chip->sms_scanline_timer, attotime_zero, 0);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1480,7 +1480,7 @@ static VIDEO_START(sms)
 #ifdef UNUSED_FUNCTION
 MACHINE_RESET(sms)
 {
-	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(vdp1->sms_scanline_timer, attotime_zero, 0);
 }
 #endif
 
@@ -1938,18 +1938,18 @@ static UINT8 f7_bank_value;
 
 static MACHINE_RESET(systeme)
 {
-	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
-	timer_adjust(vdp2->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(vdp1->sms_scanline_timer, attotime_zero, 0);
+	timer_adjust_oneshot(vdp2->sms_scanline_timer, attotime_zero, 0);
 }
 
 MACHINE_RESET(megatech_md_sms)
 {
-	timer_adjust(md_sms_vdp->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(md_sms_vdp->sms_scanline_timer, attotime_zero, 0);
 }
 
 MACHINE_RESET(megatech_bios)
 {
-	timer_adjust(vdp1->sms_scanline_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(vdp1->sms_scanline_timer, attotime_zero, 0);
 }
 
 static VIDEO_EOF(systeme)

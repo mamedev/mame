@@ -299,8 +299,8 @@ static void acia6850_ctrl_w(int which, UINT8 data)
 	{
 		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
 		attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-		timer_adjust(acia_p->rx_timer, rx_period, which, rx_period);
-		timer_adjust(acia_p->tx_timer, tx_period, which, tx_period);
+		timer_adjust_periodic(acia_p->rx_timer, rx_period, which, rx_period);
+		timer_adjust_periodic(acia_p->tx_timer, tx_period, which, tx_period);
 	}
 }
 

@@ -147,7 +147,7 @@ INLINE void update_interrupts(void)
 static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
-	timer_adjust(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0, attotime_zero);
+	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( register_w )
 			if (scanline < 0)
 				scanline += tms34061.regs[TMS34061_VERTOTAL];
 
-			timer_adjust(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0, attotime_zero);
+			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
 			break;
 
 		/* XY offset: set the X and Y masks */

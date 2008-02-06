@@ -2345,7 +2345,7 @@ static void t90_start_timer(int i)
 
 	period = attotime_mul(T90.timer_period, prescaler);
 
-	timer_adjust(T90.timer[i], period, i, period);
+	timer_adjust_periodic(T90.timer[i], period, i, period);
 
 	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / attotime_to_double(period));
 }
@@ -2367,7 +2367,7 @@ static void t90_start_timer4(void)
 
 	period = attotime_mul(T90.timer_period, prescaler);
 
-	timer_adjust(T90.timer[4], period, 4, period);
+	timer_adjust_periodic(T90.timer[4], period, 4, period);
 
 	logerror("%04X: CPU Timer 4 started at %lf Hz\n", activecpu_get_pc(), 1.0 / attotime_to_double(period));
 }
@@ -2375,7 +2375,7 @@ static void t90_start_timer4(void)
 
 static void t90_stop_timer(int i)
 {
-	timer_adjust(T90.timer[i], attotime_never, i, attotime_zero);
+	timer_adjust_oneshot(T90.timer[i], attotime_never, i);
 	logerror("%04X: CPU Timer %d stopped\n", activecpu_get_pc(), i);
 }
 

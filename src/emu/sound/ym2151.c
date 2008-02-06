@@ -826,7 +826,7 @@ static TIMER_CALLBACK( irqBoff_callback )
 static TIMER_CALLBACK( timer_callback_a )
 {
 	YM2151 *chip = ptr;
-	timer_adjust(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0, attotime_zero);
+	timer_adjust_oneshot(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0);
 	chip->timer_A_index_old = chip->timer_A_index;
 	if (chip->irq_enable & 0x04)
 	{
@@ -839,7 +839,7 @@ static TIMER_CALLBACK( timer_callback_a )
 static TIMER_CALLBACK( timer_callback_b )
 {
 	YM2151 *chip = ptr;
-	timer_adjust(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0, attotime_zero);
+	timer_adjust_oneshot(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0);
 	chip->timer_B_index_old = chip->timer_B_index;
 	if (chip->irq_enable & 0x08)
 	{
@@ -1133,7 +1133,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
 					if (!timer_enable(chip->timer_B, 1))
 					{
-						timer_adjust(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0, attotime_zero);
+						timer_adjust_oneshot(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0);
 						chip->timer_B_index_old = chip->timer_B_index;
 					}
 				#else
@@ -1158,7 +1158,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 				/* start timer _only_ if it wasn't already started (it will reload time value next round) */
 					if (!timer_enable(chip->timer_A, 1))
 					{
-						timer_adjust(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0, attotime_zero);
+						timer_adjust_oneshot(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0);
 						chip->timer_A_index_old = chip->timer_A_index;
 					}
 				#else

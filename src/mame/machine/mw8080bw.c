@@ -81,7 +81,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
 }
 
 
@@ -94,7 +94,7 @@ static void mw8080bw_create_interrupt_timer(void)
 static void mw8080bw_start_interrupt_timer(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
 }
 
 

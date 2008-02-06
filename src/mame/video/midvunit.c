@@ -61,7 +61,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	if (scanline != -1)
 	{
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline);
 		timer_set(ATTOTIME_IN_HZ(25000000), NULL, -1, scanline_timer_cb);
 	}
 	else
@@ -449,7 +449,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 
 	/* update the scanline timer */
 	if (offset == 0)
-		timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
 	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)

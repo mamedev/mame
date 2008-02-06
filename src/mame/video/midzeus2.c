@@ -535,7 +535,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				zeus_fifo_words = 0;
 
 			/* set the interrupt signal to indicate we can handle more */
-			timer_adjust(int_timer, ATTOTIME_IN_NSEC(500), 0, attotime_zero);
+			timer_adjust_oneshot(int_timer, ATTOTIME_IN_NSEC(500), 0);
 			break;
 
 		case 0x20:

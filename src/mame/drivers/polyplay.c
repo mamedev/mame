@@ -245,10 +245,10 @@ static WRITE8_HANDLER( polyplay_sound_channel )
 static WRITE8_HANDLER( polyplay_start_timer2 )
 {
 	if (data == 0x03)
-		timer_adjust(polyplay_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(polyplay_timer, attotime_never, 0);
 
 	if (data == 0xb5)
-		timer_adjust(polyplay_timer, ATTOTIME_IN_HZ(40), 0, ATTOTIME_IN_HZ(40));
+		timer_adjust_periodic(polyplay_timer, ATTOTIME_IN_HZ(40), 0, ATTOTIME_IN_HZ(40));
 }
 
 static READ8_HANDLER( polyplay_random_read )

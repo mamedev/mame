@@ -268,10 +268,10 @@ void MSM5205_playmode_w(int num,int select)
 		if( prescaler )
 		{
 			attotime period = attotime_mul(ATTOTIME_IN_HZ(voice->clock), prescaler);
-			timer_adjust(voice->timer, period, 0, period);
+			timer_adjust_periodic(voice->timer, period, 0, period);
 		}
 		else
-			timer_adjust(voice->timer, attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(voice->timer, attotime_never, 0);
 	}
 
 	if( voice->bitwidth != bitwidth )

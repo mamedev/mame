@@ -287,7 +287,7 @@ static TIMER_CALLBACK(wd33c93_deassert_cip)
 static void wd33c93_complete_cmd( UINT8 status )
 {
 	/* fire off a timer to complete the command */
-	timer_adjust( scsi_data.cmd_timer, ATTOTIME_IN_USEC(1), status, attotime_zero );
+	timer_adjust_oneshot( scsi_data.cmd_timer, ATTOTIME_IN_USEC(1), status );
 }
 
 /* command handlers */

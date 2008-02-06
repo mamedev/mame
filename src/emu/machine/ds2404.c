@@ -306,7 +306,7 @@ void DS2404_init(int ref_year, int ref_month, int ref_day)
 	ds2404.rtc[ 4 ] = ( current_time >> 24 ) & 0xff;
 
 	timer = timer_alloc( DS2404_tick , NULL);
-	timer_adjust( timer, ATTOTIME_IN_HZ( 256 ), 0, ATTOTIME_IN_HZ( 256 ) );
+	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 256 ), 0, ATTOTIME_IN_HZ( 256 ) );
 }
 
 void DS2404_load(mame_file *file)

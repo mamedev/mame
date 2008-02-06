@@ -49,7 +49,7 @@ static void timer_handler_262(void *param,int timer, attotime period)
 	}
 	else
 	{	/* Start FM Timer */
-		timer_adjust(info->timer[timer], period, 0, attotime_zero);
+		timer_adjust_oneshot(info->timer[timer], period, 0);
 	}
 }
 

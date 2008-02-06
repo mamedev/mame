@@ -373,10 +373,10 @@ static void ymf278b_timer_a_reset(YMF278BChip *chip)
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
 
-		timer_adjust(chip->timer_a, period, 0, period);
+		timer_adjust_periodic(chip->timer_a, period, 0, period);
 	}
 	else
-		timer_adjust(chip->timer_a, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(chip->timer_a, attotime_never, 0);
 }
 
 static void ymf278b_timer_b_reset(YMF278BChip *chip)
@@ -388,10 +388,10 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
 
-		timer_adjust(chip->timer_a, period, 0, period);
+		timer_adjust_periodic(chip->timer_a, period, 0, period);
 	}
 	else
-		timer_adjust(chip->timer_b, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(chip->timer_b, attotime_never, 0);
 }
 
 static void ymf278b_A_w(YMF278BChip *chip, UINT8 reg, UINT8 data)

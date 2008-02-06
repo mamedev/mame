@@ -164,7 +164,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs();
 
 	/* come back at the next appropriate scanline */
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 
 #if TWEAK_IRQ2_SCANLINE
 	if (scanline == 223)
@@ -186,7 +186,7 @@ static TIMER_CALLBACK( scanline_callback )
 static MACHINE_RESET( yboard )
 {
     interrupt_timer = timer_alloc(scanline_callback, NULL);
-    timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223, attotime_zero);
+    timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 223, 0), 223);
 
 	state_save_register_global_array(misc_io_data);
 	state_save_register_global_array(analog_data);

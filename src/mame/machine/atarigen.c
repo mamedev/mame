@@ -171,7 +171,7 @@ void atarigen_update_interrupts(void)
 
 void atarigen_scanline_int_set(int scrnum, int scanline)
 {
-	timer_adjust(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum, attotime_zero);
+	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum);
 }
 
 
@@ -275,7 +275,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	atarigen_scanline_int_gen(machine, 0);
 
 	/* set a new timer to go off at the same scan line next frame */
-	timer_adjust(scanline_interrupt_timer, video_screen_get_frame_period(param), param, attotime_zero);
+	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_frame_period(param), param);
 }
 
 
@@ -853,7 +853,7 @@ void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update
 
 	/* set a timer to go off at scanline 0 */
 	if (scanline_callback != NULL)
-		timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0, attotime_zero);
+		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0);
 }
 
 
@@ -876,7 +876,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		scanline += scanlines_per_callback;
 		if (scanline >= machine->screen[scrnum].height)
 			scanline = 0;
-		timer_adjust(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline, attotime_zero);
+		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline);
 	}
 }
 
@@ -913,7 +913,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 		tilemap_set_scrollx(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_xscroll);
 		tilemap_set_scrolly(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_yscroll);
 	}
-	timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
+	timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 
 	/* use this for debugging the video controller values */
 #if 0
@@ -954,7 +954,7 @@ void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields)
 
 	/* start a timer to go off a little before scanline 0 */
 	if (atarivc_eof_data)
-		timer_adjust(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
+		timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 }
 
 

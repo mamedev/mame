@@ -415,11 +415,11 @@ void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration)
 	LOG(("cpu_boost_interleave(%s, %s)\n", attotime_string(timeslice_time, 9), attotime_string(boost_duration, 9)));
 
 	/* adjust the interleave timer */
-	timer_adjust(interleave_boost_timer, timeslice_time, 0, timeslice_time);
+	timer_adjust_periodic(interleave_boost_timer, timeslice_time, 0, timeslice_time);
 
 	/* adjust the end timer, but only if we are going to extend it */
 	if (!timer_enabled(interleave_boost_timer_end) || attotime_compare(timer_timeleft(interleave_boost_timer_end), boost_duration) < 0)
-		timer_adjust(interleave_boost_timer_end, boost_duration, 0, attotime_never);
+		timer_adjust_oneshot(interleave_boost_timer_end, boost_duration, 0);
 }
 
 
@@ -823,7 +823,7 @@ void watchdog_reset(running_machine *machine)
 {
 	/* if we're not enabled, skip it */
 	if (!watchdog_enabled)
-		timer_adjust(watchdog_timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(watchdog_timer, attotime_never, 0);
 
 	/* VBLANK-based watchdog? */
 	else if (machine->drv->watchdog_vblank_count != 0)
@@ -831,11 +831,11 @@ void watchdog_reset(running_machine *machine)
 
 	/* timer-based watchdog? */
 	else if (attotime_compare(machine->drv->watchdog_time, attotime_zero) != 0)
-		timer_adjust(watchdog_timer, machine->drv->watchdog_time, 0, attotime_zero);
+		timer_adjust_oneshot(watchdog_timer, machine->drv->watchdog_time, 0);
 
 	/* default to an obscene amount of time (3 seconds) */
 	else
-		timer_adjust(watchdog_timer, ATTOTIME_IN_SEC(3), 0, attotime_zero);
+		timer_adjust_oneshot(watchdog_timer, ATTOTIME_IN_SEC(3), 0);
 }
 
 
@@ -875,7 +875,7 @@ void cpu_compute_vblank_timing(running_machine *machine)
 		attotime remaining = timer_timeleft(vblank_timer);
 		if (remaining.seconds == 0 && remaining.attoseconds == 0)
 			remaining = vblank_period;
-		timer_adjust(vblank_timer, remaining, 0, vblank_period);
+		timer_adjust_periodic(vblank_timer, remaining, 0, vblank_period);
 	}
 
 	LOG(("cpu_compute_vblank_timing: refresh=%s vblank=%s\n", attotime_string(refresh_period, 9), attotime_string(vblank_period, 9)));
@@ -981,7 +981,7 @@ static void cpu_vblankreset(running_machine *machine)
 static TIMER_CALLBACK( cpu_firstvblankcallback )
 {
 	/* now that we're synced up, pulse from here on out */
-	timer_adjust(vblank_timer, vblank_period, param, vblank_period);
+	timer_adjust_periodic(vblank_timer, vblank_period, param, vblank_period);
 
 	/* but we need to call the standard routine as well */
 	cpu_vblankcallback(machine, NULL, param);
@@ -1026,13 +1026,13 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 
 				/* reset the countdown and timer */
 				cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier;
-				timer_adjust(cpu[cpunum].vblankint_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(cpu[cpunum].vblankint_timer, attotime_never, 0);
 			}
 		}
 
 		/* else reset the VBLANK timer if this is going to be a real VBLANK */
 		else if (vblank_countdown == 1)
-			timer_adjust(cpu[cpunum].vblankint_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(cpu[cpunum].vblankint_timer, attotime_never, 0);
 	}
 
 	/* is it a real VBLANK? */
@@ -1043,7 +1043,7 @@ static TIMER_CALLBACK( cpu_vblankcallback )
 			video_frame_update(machine, FALSE);
 
 		/* Set the timer to update the screen */
-		timer_adjust(update_timer, attotime_make(0, machine->screen[0].vblank), 0, attotime_zero);
+		timer_adjust_oneshot(update_timer, attotime_make(0, machine->screen[0].vblank), 0);
 
 		/* reset the globals */
 		cpu_vblankreset(machine);
@@ -1078,7 +1078,7 @@ static TIMER_CALLBACK( cpu_updatecallback )
 	current_frame++;
 
 	/* reset the refresh timer */
-	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(refresh_timer, attotime_never, 0);
 }
 
 
@@ -1117,7 +1117,7 @@ static TIMER_CALLBACK( cpu_timeslicecallback )
 
 static TIMER_CALLBACK( end_interleave_boost )
 {
-	timer_adjust(interleave_boost_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(interleave_boost_timer, attotime_never, 0);
 	LOG(("end_interleave_boost\n"));
 }
 
@@ -1173,7 +1173,7 @@ static void cpu_inittimers(running_machine *machine)
 		ipf = 1;
 	timeslice_period = attotime_make(0, machine->screen[0].refresh / ipf);
 	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
-	timer_adjust(timeslice_timer, timeslice_period, 0, timeslice_period);
+	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);
 
 	/* allocate timers to handle interleave boosts */
 	interleave_boost_timer = timer_alloc(NULL, NULL);
@@ -1246,7 +1246,7 @@ static void cpu_inittimers(running_machine *machine)
 		{
 			cpu[cpunum].timedint_period = attotime_make(0, machine->drv->cpu[cpunum].timed_interrupt_period);
 			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback, NULL);
-			timer_adjust(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
+			timer_adjust_periodic(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
 		}
 	}
 
@@ -1262,5 +1262,5 @@ static void cpu_inittimers(running_machine *machine)
 	timer_set(first_time, NULL, 0, cpu_firstvblankcallback);
 
 	/* reset the refresh timer to get ourself back in sync */
-	timer_adjust(refresh_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(refresh_timer, attotime_never, 0);
 }

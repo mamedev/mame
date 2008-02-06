@@ -323,7 +323,7 @@ static TIMER_CALLBACK( force_update )
 	scanline += 64;
 	if (scanline >= machine->screen[0].visarea.max_y)
 		scanline = 0;
-	timer_adjust(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(force_update_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 /*---------------------------------------------------------------
@@ -445,7 +445,7 @@ void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *
 
 	/* start a timer to update a few times during refresh */
 	force_update_timer = timer_alloc(force_update, NULL);
-	timer_adjust(force_update_timer,video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(force_update_timer,video_screen_get_time_until_pos(0, 0, 0), 0);
 
 	init_savestate(map, mo);
 

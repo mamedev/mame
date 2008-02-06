@@ -100,7 +100,7 @@ static TIMER_CALLBACK( irq_callback )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
 }
 
 
@@ -112,7 +112,7 @@ static void create_irq_timer(void)
 
 static void start_irq_timer(void)
 {
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
 }
 
 

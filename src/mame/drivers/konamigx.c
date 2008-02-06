@@ -683,7 +683,7 @@ static void dmastart_callback(int data)
 	}
 
 	// simulate DMA delay
-	timer_adjust(dmadelay_timer, ATTOTIME_IN_USEC(120), 0, attotime_zero);
+	timer_adjust_oneshot(dmadelay_timer, ATTOTIME_IN_USEC(120), 0);
 }
 
 

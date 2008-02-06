@@ -291,7 +291,7 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 		return FALSE;
 
 	/* adjust the timer */
-	timer_adjust(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16), attotime_never);
+	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 

@@ -774,14 +774,14 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 			else
 			{
 				timer->outputtimer = timer_alloc(outputcallback, NULL);
-				timer_adjust(timer->outputtimer, attotime_never, i	| (timerno<<4),	attotime_zero);
+				timer_adjust_oneshot(timer->outputtimer, attotime_never, i	| (timerno<<4));
 			}
 			if (timer->freq_callback ==	NULL)
 				timer->freqtimer = NULL;
 			else
 			{
 				timer->freqtimer = timer_alloc(freqcallback, NULL);
-				timer_adjust(timer->freqtimer,	attotime_never,	i |	(timerno<<4), attotime_zero);
+				timer_adjust_oneshot(timer->freqtimer,	attotime_never,	i |	(timerno<<4));
 			}
 
 			/* set up state save values */

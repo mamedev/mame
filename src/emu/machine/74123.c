@@ -129,7 +129,7 @@ static void start_pulse(TTL74123_state *chip)
 
 		if (attotime_compare(timer_timeelapsed(chip->timer), delay_time) >= 0)
 		{
-			timer_adjust(chip->timer, duration, 0, attotime_never);
+			timer_adjust_oneshot(chip->timer, duration, 0);
 
 			if (LOG) logerror("74123 #%d:  Retriggering pulse.  Duration: %f\n", chip->which, attotime_to_double(duration));
 		}
@@ -141,7 +141,7 @@ static void start_pulse(TTL74123_state *chip)
 	else
 	{
 		/* starting */
-		timer_adjust(chip->timer, duration, 0, attotime_never);
+		timer_adjust_oneshot(chip->timer, duration, 0);
 
 		set_output(chip);
 
@@ -181,7 +181,7 @@ void TTL74123_clear_w(int which, int data)
 	/* clear the output if A=LO, B=HI and falling edge on clear */
 	if (!data && chip->clear && chip->B && !chip->A && !chip->clear)
 	{
-		timer_adjust(chip->timer, attotime_zero, 0, attotime_never);
+		timer_adjust_oneshot(chip->timer, attotime_zero, 0);
 
 		if (LOG) logerror("74123 #%d:  Cleared\n", which);
 	}

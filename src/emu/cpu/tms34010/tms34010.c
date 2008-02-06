@@ -645,7 +645,7 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 
 	/* allocate a scanline timer and set it to go off at the start */
 	state.scantimer = timer_alloc(scanline_callback, NULL);
-	timer_adjust(state.scantimer, attotime_zero, index, attotime_zero);
+	timer_adjust_oneshot(state.scantimer, attotime_zero, index);
 
 	/* allocate the shiftreg */
 	state.shiftreg = auto_malloc(SHIFTREG_SIZE);
@@ -1065,7 +1065,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8), attotime_zero);
+	timer_adjust_oneshot(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8));
 
 	/* restore the context */
 	cpuintrf_pop_context();

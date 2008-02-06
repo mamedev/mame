@@ -196,7 +196,7 @@ static void dma8237_update_status(int which)
 			dma[which].status |= 0x10 << channel;
 			dma[which].status &= ~(0x01 << channel);
 
-			timer_adjust(dma[which].timer,
+			timer_adjust_periodic(dma[which].timer,
 				attotime_zero,
 				which * 4 + channel,
 				double_to_attotime(dma[which].intf->bus_speed));
@@ -237,7 +237,7 @@ static void dma8237_verify(int which)
 
 static void prepare_msb_flip(int which)
 {
-	timer_adjust(dma[which].msbflip_timer, attotime_zero, which, attotime_zero);
+	timer_adjust_oneshot(dma[which].msbflip_timer, attotime_zero, which);
 }
 
 

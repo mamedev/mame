@@ -432,7 +432,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	{
 		int which = (offset >> 4) & 1;
 		if (data & 0x40)
-			timer_adjust(timer[which], attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(timer[which], attotime_never, 0);
 	}
 	else
 		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
@@ -526,7 +526,7 @@ static TIMER_CALLBACK( invasn_gun_callback )
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= machine->screen[0].visarea.max_y && beamy <= gun_y[player] + BEAM_DY)
-		timer_adjust(gun_timer[player], video_screen_get_time_until_pos(0, beamy, MAX(0, gun_x[player] - BEAM_DX)), player, attotime_never);
+		timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(0, beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
@@ -555,7 +555,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 			};
 			gun_x[player] = readinputportbytag(names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
 			gun_y[player] = readinputportbytag(names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
-			timer_adjust(gun_timer[player], video_screen_get_time_until_pos(0, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player, attotime_never);
+			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(0, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }

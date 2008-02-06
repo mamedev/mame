@@ -69,7 +69,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += 128;
 	scanline &= 255;
 
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 static MACHINE_START( magmax )
@@ -86,7 +86,7 @@ static MACHINE_START( magmax )
 
 static MACHINE_RESET( magmax )
 {
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 
 #if 0
 	{

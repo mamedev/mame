@@ -87,7 +87,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	scanline += 32;
 	if (scanline >= 256)
 		scanline -= 256;
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -130,7 +130,7 @@ static MACHINE_RESET( atetris )
 	reset_bank();
 
 	/* start interrupts going (32V clocked by 16V) */
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 48, 0), 48, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 48, 0), 48);
 }
 
 

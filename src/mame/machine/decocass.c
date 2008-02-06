@@ -149,14 +149,14 @@ static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
 	LOG(2,("CPU #%d sound NMI enb -> $%02x\n", cpu_getactivecpu(), data));
-	timer_adjust(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
+	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	UINT8 data = 0xff;
 	LOG(2,("CPU #%d sound NMI enb <- $%02x\n", cpu_getactivecpu(), data));
-	timer_adjust(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
+	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 	return data;
 }
 
@@ -286,7 +286,7 @@ WRITE8_HANDLER( decocass_reset_w )
 
 	/* on reset also remove the sound timer */
 	if (data & 1)
-		timer_adjust(decocass_sound_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(decocass_sound_timer, attotime_never, 0);
 
 	/* 8041 active low reset */
 	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
@@ -1603,7 +1603,7 @@ static void decocass_state_save_postload(void)
 		decocass_w(A, mem[A]);
 	/* restart the timer if the tape was playing */
 	if (0 != tape_dir)
-		timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(tape_timer, attotime_never, 0);
 #endif
 }
 
@@ -1985,7 +1985,7 @@ static void tape_stop(void)
 	/* remember time */
 	tape_time0 = decocass_adjust_tape_time(tape_time0);
 
-	timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(tape_timer, attotime_never, 0);
 }
 
 
@@ -2018,7 +2018,7 @@ WRITE8_HANDLER( i8041_p1_w )
 		{
 			LOG(2,("tape %5.4fs: rewind\n", attotime_to_double(tape_time0)));
 			tape_dir = -1;
-			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(tape_timer, attotime_never, 0);
 			set_led_status(0, 1);
 		}
 		else
@@ -2041,7 +2041,7 @@ WRITE8_HANDLER( i8041_p1_w )
 		{
 			LOG(2,("tape %5.4fs: forward\n", attotime_to_double(tape_time0)));
 			tape_dir = +1;
-			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(tape_timer, attotime_never, 0);
 			set_led_status(0, 1);
 		}
 		else
@@ -2066,14 +2066,14 @@ WRITE8_HANDLER( i8041_p1_w )
 		{
 			LOG(2,("tape: fast rewind %s\n", (0 == (data & 0x04)) ? "on" : "off"));
 			tape_dir = (tape_speed) ? -7 : -1;
-			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(tape_timer, attotime_never, 0);
 		}
 		else
 		if (tape_dir > 0)
 		{
 			LOG(2,("tape: fast forward %s\n", (0 == (data & 0x04)) ? "on" : "off"));
 			tape_dir = (tape_speed) ? +7 : +1;
-			timer_adjust(tape_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(tape_timer, attotime_never, 0);
 		}
 	}
 

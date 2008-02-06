@@ -528,7 +528,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0800) == 0)
 			{
 				dmadac_enable(0, SOUND_CHANNELS, 0);
-				timer_adjust(adsp_autobuffer_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -537,7 +537,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if ((data & 0x0002) == 0)
 			{
 				dmadac_enable(0, SOUND_CHANNELS, 0);
-				timer_adjust(adsp_autobuffer_timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 			}
 			break;
 
@@ -644,7 +644,7 @@ static void adsp_tx_callback(int port, INT32 data)
 			/* fire off a timer wich will hit every half-buffer */
 			sample_period = attotime_div(attotime_mul(sample_period, adsp_size), SOUND_CHANNELS * adsp_incs);
 
-			timer_adjust(adsp_autobuffer_timer, sample_period, 0, sample_period);
+			timer_adjust_periodic(adsp_autobuffer_timer, sample_period, 0, sample_period);
 
 			return;
 		}
@@ -656,7 +656,7 @@ static void adsp_tx_callback(int port, INT32 data)
 	dmadac_enable(0, SOUND_CHANNELS, 0);
 
 	/* remove timer */
-	timer_adjust(adsp_autobuffer_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(adsp_autobuffer_timer, attotime_never, 0);
 }
 
 

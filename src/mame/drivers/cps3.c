@@ -2522,7 +2522,7 @@ static MACHINE_RESET( cps3 )
 	{
 		fastboot_timer = timer_alloc(fastboot_timer_callback, NULL);
 	//  printf("reset\n");
-		timer_adjust(fastboot_timer, attotime_zero, 0, attotime_zero);
+		timer_adjust_oneshot(fastboot_timer, attotime_zero, 0);
 	}
 }
 

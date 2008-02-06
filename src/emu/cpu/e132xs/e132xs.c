@@ -637,7 +637,7 @@ static void adjust_timer_interrupt(void)
 	{
 		UINT64 clocks_until_int = hyperstone.tr_clocks_per_tick - (clocks_since_base % hyperstone.tr_clocks_per_tick);
 		UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-		timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1, attotime_never);
+		timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
@@ -648,19 +648,19 @@ static void adjust_timer_interrupt(void)
 		if (delta > 0x80000000)
 		{
 			if (!hyperstone.timer_int_pending)
-				timer_adjust(hyperstone.timer, attotime_zero, cpunum * 2 + 0, attotime_never);
+				timer_adjust_oneshot(hyperstone.timer, attotime_zero, cpunum * 2 + 0);
 		}
 		else
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, hyperstone.tr_clocks_per_tick);
 			UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-			timer_adjust(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0, attotime_never);
+			timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0);
 		}
 	}
 
 	/* otherwise, disable the timer */
 	else
-		timer_adjust(hyperstone.timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(hyperstone.timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( e132xs_timer_callback )

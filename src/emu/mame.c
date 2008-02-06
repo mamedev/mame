@@ -641,7 +641,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 {
 	mame_private *mame = machine->mame_data;
 
-	timer_adjust(mame->soft_reset_timer, attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(mame->soft_reset_timer, attotime_zero, 0);
 
 	/* we can't be paused since the timer needs to fire */
 	mame_pause(machine, FALSE);

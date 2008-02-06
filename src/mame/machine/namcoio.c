@@ -1005,7 +1005,7 @@ static void namco_06xx_ctrl_w(int chip,int data)
 	if ((customio_command[chip] & 0x0f) == 0)
 	{
 		LOG(("disabling nmi generate timer\n"));
-		timer_adjust(nmi_timer[chip], attotime_never, chip, attotime_never);
+		timer_adjust_oneshot(nmi_timer[chip], attotime_never, chip);
 	}
 	else
 	{
@@ -1015,7 +1015,7 @@ static void namco_06xx_ctrl_w(int chip,int data)
 		// inputs if a transfer terminates at the wrong time.
 		// On the other hand, the time cannot be too short otherwise the 54XX will
 		// not have enough time to process the incoming commands.
-		timer_adjust(nmi_timer[chip], ATTOTIME_IN_USEC(200), chip, ATTOTIME_IN_USEC(200));
+		timer_adjust_periodic(nmi_timer[chip], ATTOTIME_IN_USEC(200), chip, ATTOTIME_IN_USEC(200));
 
 		if (customio_command[chip] & 0x10)
 		{

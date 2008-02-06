@@ -639,7 +639,7 @@ static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 static TIMER_CALLBACK( sound_timer_callback )
 {
 	ad1847_sample_counter = 0;
-	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_transfer(0, 1, 0, 1, dacl_ptr, dacl);
 	dmadac_transfer(1, 1, 0, 1, dacr_ptr, dacr);
@@ -856,7 +856,7 @@ static MACHINE_RESET(mediagx)
 	dacr = auto_malloc(65536 * sizeof(INT16));
 
 	sound_timer = timer_alloc(sound_timer_callback, NULL);
-	timer_adjust(sound_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
 	dmadac_enable(0, 2, 1);
 	ide_controller_reset(0);

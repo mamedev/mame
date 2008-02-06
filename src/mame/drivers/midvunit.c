@@ -298,7 +298,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 		int which = (offset >> 4) & 1;
 //  logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
 		if (data & 0x40)
-			timer_adjust(timer[which], attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(timer[which], attotime_never, 0);
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)

@@ -285,7 +285,7 @@ static TIMER_CALLBACK( mouja_irq_callback )
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2;					/* 0xff=58Hz, 0x80=116Hz? */
-	timer_adjust(mouja_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(freq));
+	timer_adjust_periodic(mouja_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(freq));
 }
 
 static INTERRUPT_GEN( mouja_interrupt )

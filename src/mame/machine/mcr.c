@@ -730,7 +730,7 @@ static void reload_count(int counter)
 	/* counter 0 is self-updating if clocked externally */
 	if (counter == 0 && !(m6840_state[counter].control & 0x02))
 	{
-		timer_adjust(m6840_state[counter].timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(m6840_state[counter].timer, attotime_never, 0);
 		m6840_state[counter].timer_active = 0;
 		return;
 	}
@@ -751,7 +751,7 @@ static void reload_count(int counter)
 	/* set the timer */
 	total_period = attotime_make(0, attotime_to_attoseconds(period) * count);
 LOG(("reload_count(%d): period = %f  count = %d\n", counter, attotime_to_double(period), count));
-	timer_adjust(m6840_state[counter].timer, total_period, (count << 2) + counter, attotime_zero);
+	timer_adjust_oneshot(m6840_state[counter].timer, total_period, (count << 2) + counter);
 	m6840_state[counter].timer_active = 1;
 }
 
@@ -814,7 +814,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			{
 				for (i = 0; i < 3; i++)
 				{
-					timer_adjust(m6840_state[i].timer, attotime_never, 0, attotime_zero);
+					timer_adjust_oneshot(m6840_state[i].timer, attotime_never, 0);
 					m6840_state[i].timer_active = 0;
 				}
 			}
@@ -1016,7 +1016,7 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
-	timer_adjust(ipu_watchdog_timer, ATTOTIME_IN_HZ(7372800 / 16 / 32768), 0, attotime_zero);
+	timer_adjust_oneshot(ipu_watchdog_timer, ATTOTIME_IN_HZ(7372800 / 16 / 32768), 0);
 	return 0xff;
 }
 

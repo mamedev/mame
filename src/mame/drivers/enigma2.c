@@ -108,8 +108,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
-	timer_adjust(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_clear_timer, video_screen_get_time_until_pos(0, vpos + 1, 0), 0);
 }
 
 
@@ -123,7 +123,7 @@ static void create_interrupt_timers(void)
 static void start_interrupt_timers(void)
 {
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	timer_adjust(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_assert_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
 }
 
 

@@ -46,7 +46,7 @@ static struct riot6532 r6532[MAX_R6532];
 
 INLINE void r6532_set_timer(int which, UINT8 count)
 {
-	timer_adjust( r6532[which].counter_timer, attotime_mul(ATTOTIME_IN_HZ(r6532[which].clock), (count << r6532[which].shift) + 1), which, attotime_zero );
+	timer_adjust_oneshot( r6532[which].counter_timer, attotime_mul(ATTOTIME_IN_HZ(r6532[which].clock), (count << r6532[which].shift) + 1), which );
 }
 
 

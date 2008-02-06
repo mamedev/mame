@@ -1087,7 +1087,7 @@ static void adjust_vblank_timer(voodoo_state *v)
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (attotime_compare(vblank_period, attotime_zero) == 0)
 		vblank_period = video_screen_get_frame_period(v->scrnum);
-	timer_adjust(v->fbi.vblank_timer, vblank_period, 0, attotime_never);
+	timer_adjust_oneshot(v->fbi.vblank_timer, vblank_period, 0);
 }
 
 
@@ -2194,7 +2194,7 @@ static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotim
 	/* if not, set a timer for the next one */
 	else
 	{
-		timer_adjust(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0, attotime_never);
+		timer_adjust_oneshot(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0);
 	}
 }
 
@@ -2215,7 +2215,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 		cpu_spinuntil_trigger(v->trigger);
 
 	/* set a timer to clear the stall */
-	timer_adjust(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0, attotime_never);
+	timer_adjust_oneshot(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0);
 }
 
 

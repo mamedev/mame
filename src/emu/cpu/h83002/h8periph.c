@@ -34,7 +34,7 @@
 
 static TIMER_CALLBACK( h8itu_timer_0_cb )
 {
-	timer_adjust(h8.timer[0], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[0], attotime_never, 0);
 	h8.h8TCNT0 = 0;
 	h8.per_regs[TSR0] |= 4;
 	// interrupt on overflow ?
@@ -46,7 +46,7 @@ static TIMER_CALLBACK( h8itu_timer_0_cb )
 
 static TIMER_CALLBACK( h8itu_timer_1_cb )
 {
-	timer_adjust(h8.timer[1], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[1], attotime_never, 0);
 	h8.h8TCNT1 = 0;
 	h8.per_regs[TSR1] |= 4;
 	// interrupt on overflow ?
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( h8itu_timer_1_cb )
 
 static TIMER_CALLBACK( h8itu_timer_2_cb )
 {
-	timer_adjust(h8.timer[2], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[2], attotime_never, 0);
 	h8.h8TCNT2 = 0;
 	h8.per_regs[TSR2] |= 4;
 	// interrupt on overflow ?
@@ -70,7 +70,7 @@ static TIMER_CALLBACK( h8itu_timer_2_cb )
 
 static TIMER_CALLBACK( h8itu_timer_3_cb )
 {
-	timer_adjust(h8.timer[3], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[3], attotime_never, 0);
 	h8.h8TCNT3 = 0;
 	h8.per_regs[TSR3] |= 4;
 	// interrupt on overflow ?
@@ -82,7 +82,7 @@ static TIMER_CALLBACK( h8itu_timer_3_cb )
 
 static TIMER_CALLBACK( h8itu_timer_4_cb )
 {
-	timer_adjust(h8.timer[4], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[4], attotime_never, 0);
 	h8.h8TCNT4 = 0;
 	h8.per_regs[TSR4] |= 4;
 	// interrupt on overflow ?
@@ -130,7 +130,7 @@ static void h8_itu_refresh_timer(int tnum)
 		logerror("H8/3002: Timer %d is using an external clock.  Unsupported!\n", tnum);
 	}
 
-	timer_adjust(h8.timer[tnum], period, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[tnum], period, 0);
 }
 
 static void h8_itu_sync_timers(int tnum)
@@ -523,7 +523,7 @@ static void h8_3007_itu_refresh_timer(int tnum)
 		logerror("H8/3007: Timer %d is using an external clock.  Unsupported!\n", tnum);
 	}
 
-	timer_adjust(h8.timer[tnum], period, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[tnum], period, 0);
 }
 
 INLINE void h8itu_3007_timer_cb(int tnum)
@@ -546,7 +546,7 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 		else
 		{
 //          logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
-			timer_adjust(h8.timer[tnum], attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(h8.timer[tnum], attotime_never, 0);
 		}
 
 		h8.per_regs[0x64] |= 1<<tnum;
@@ -568,7 +568,7 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 		else
 		{
 //          logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
-			timer_adjust(h8.timer[tnum], attotime_never, 0, attotime_zero);
+			timer_adjust_oneshot(h8.timer[tnum], attotime_never, 0);
 		}
 
 		h8.per_regs[0x65] |= 1<<tnum;
@@ -839,9 +839,9 @@ void h8_itu_init(void)
 void h8_itu_reset(void)
 {
 	// stop all the timers
-	timer_adjust(h8.timer[0], attotime_never, 0, attotime_zero);
-	timer_adjust(h8.timer[1], attotime_never, 0, attotime_zero);
-	timer_adjust(h8.timer[2], attotime_never, 0, attotime_zero);
-	timer_adjust(h8.timer[3], attotime_never, 0, attotime_zero);
-	timer_adjust(h8.timer[4], attotime_never, 0, attotime_zero);
+	timer_adjust_oneshot(h8.timer[0], attotime_never, 0);
+	timer_adjust_oneshot(h8.timer[1], attotime_never, 0);
+	timer_adjust_oneshot(h8.timer[2], attotime_never, 0);
+	timer_adjust_oneshot(h8.timer[3], attotime_never, 0);
+	timer_adjust_oneshot(h8.timer[4], attotime_never, 0);
 }

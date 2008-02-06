@@ -456,7 +456,7 @@ static TIMER_CALLBACK( generate_interrupt )
 	if (scanline >= 256)
 		scanline = 0;
 
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -471,7 +471,7 @@ static MACHINE_START( centiped )
 static MACHINE_RESET( centiped )
 {
 	interrupt_timer = timer_alloc(generate_interrupt, NULL);
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;

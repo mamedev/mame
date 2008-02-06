@@ -337,7 +337,7 @@ static void sasuke_start_counter(void)
 	sasuke_counter = 0;
 
 	sasuke_timer = timer_alloc(sasuke_update_counter, NULL);
-	timer_adjust(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11289000/8));	// 1.4 MHz
+	timer_adjust_periodic(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11289000/8));	// 1.4 MHz
 }
 
 

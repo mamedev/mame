@@ -388,7 +388,7 @@ void run_mproc(void)
 		M_STOP--; /* Decrease count */
 	}
 
-	timer_adjust(math_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), mptime), 1, attotime_zero);
+	timer_adjust_oneshot(math_timer, attotime_mul(ATTOTIME_IN_HZ(MASTER_CLOCK), mptime), 1);
 }
 
 

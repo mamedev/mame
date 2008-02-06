@@ -306,7 +306,7 @@ INLINE void schedule_next_irq(int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv);
 }
 
 
@@ -352,7 +352,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* scanline for the next run */
 	curv ^= 224;
-	timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv, attotime_zero);
+	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv);
 }
 
 
@@ -393,7 +393,7 @@ static MACHINE_START( missile )
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);
-	timer_adjust(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0, attotime_zero);
+	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0);
 
 	/* create a timer for IRQs and set up the first callback */
 	irq_timer = timer_alloc(clock_irq, NULL);

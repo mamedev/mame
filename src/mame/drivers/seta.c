@@ -1326,9 +1326,9 @@ static void uPD71054_update_timer( int no )
 
 	if( max != 0 ) {
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(0)), 16 * max);
-		timer_adjust( uPD71054.timer[no], period, no, attotime_zero );
+		timer_adjust_oneshot( uPD71054.timer[no], period, no );
 	} else {
-		timer_adjust( uPD71054.timer[no], attotime_never, no, attotime_never);
+		timer_adjust_oneshot( uPD71054.timer[no], attotime_never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				activecpu_get_pc(), no );
 	}

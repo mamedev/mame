@@ -253,9 +253,9 @@ static WRITE32_HANDLER(Timer0_w)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer0ctrl&2)
-			timer_adjust(Timer0,period,0,period);
+			timer_adjust_periodic(Timer0,period,0,period);
 		else
-			timer_adjust(Timer0,period,0,attotime_zero);
+			timer_adjust_oneshot(Timer0,period,0);
 	}
 	COMBINE_DATA(&Timer0ctrl);
 }
@@ -281,9 +281,9 @@ static WRITE32_HANDLER(Timer1_w)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer1ctrl&2)
-			timer_adjust(Timer1,period,0,period);
+			timer_adjust_periodic(Timer1,period,0,period);
 		else
-			timer_adjust(Timer1,period,0,attotime_zero);
+			timer_adjust_oneshot(Timer1,period,0);
 	}
 	COMBINE_DATA(&Timer1ctrl);
 }
@@ -309,9 +309,9 @@ static WRITE32_HANDLER(Timer2_w)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer2ctrl&2)
-			timer_adjust(Timer2,period,0,period);
+			timer_adjust_periodic(Timer2,period,0,period);
 		else
-			timer_adjust(Timer2,period,0,attotime_zero);
+			timer_adjust_oneshot(Timer2,period,0);
 	}
 	COMBINE_DATA(&Timer2ctrl);
 }
@@ -337,9 +337,9 @@ static WRITE32_HANDLER(Timer3_w)
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timer3ctrl&2)
-			timer_adjust(Timer3,period,0,period);
+			timer_adjust_periodic(Timer3,period,0,period);
 		else
-			timer_adjust(Timer3,period,0,attotime_zero);
+			timer_adjust_oneshot(Timer3,period,0);
 	}
 	COMBINE_DATA(&Timer3ctrl);
 }
@@ -595,16 +595,16 @@ static MACHINE_RESET(crystal)
 	Timer3ctrl=0;
 
 	Timer0=timer_alloc(Timer0cb, NULL);
-	timer_adjust(Timer0,attotime_never,0,attotime_never);
+	timer_adjust_oneshot(Timer0,attotime_never,0);
 
 	Timer1=timer_alloc(Timer1cb, NULL);
-	timer_adjust(Timer1,attotime_never,0,attotime_never);
+	timer_adjust_oneshot(Timer1,attotime_never,0);
 
 	Timer2=timer_alloc(Timer2cb, NULL);
-	timer_adjust(Timer2,attotime_never,0,attotime_never);
+	timer_adjust_oneshot(Timer2,attotime_never,0);
 
 	Timer3=timer_alloc(Timer3cb, NULL);
-	timer_adjust(Timer3,attotime_never,0,attotime_never);
+	timer_adjust_oneshot(Timer3,attotime_never,0);
 
 	VR0_Snd_Set_Areas(textureram,frameram);
 #ifdef IDLE_LOOP_SPEEDUP

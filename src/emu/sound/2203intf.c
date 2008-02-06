@@ -86,7 +86,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 	{	/* Start FM Timer */
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 		if (!timer_enable(info->timer[c], 1))
-			timer_adjust(info->timer[c], period, 0, attotime_zero);
+			timer_adjust_oneshot(info->timer[c], period, 0);
 	}
 }
 

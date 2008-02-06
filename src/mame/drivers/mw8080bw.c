@@ -2029,13 +2029,13 @@ static void adjust_strobe_timers(void)
 		/* multiply by the precentage and divide by 100 to get the ON period */
 		attotime on_period = attotime_div(attotime_mul(SPCENCTR_STROBE_PERIOD, SPCENCTR_DUTY_CYCLE), 100);
 
-		timer_adjust(spcenctr_strobe_on_timer, attotime_zero, 1, SPCENCTR_STROBE_PERIOD);
-		timer_adjust(spcenctr_strobe_off_timer, on_period, 0, SPCENCTR_STROBE_PERIOD);
+		timer_adjust_periodic(spcenctr_strobe_on_timer, attotime_zero, 1, SPCENCTR_STROBE_PERIOD);
+		timer_adjust_periodic(spcenctr_strobe_off_timer, on_period, 0, SPCENCTR_STROBE_PERIOD);
 	}
 	else
 	{
-		timer_adjust(spcenctr_strobe_on_timer, attotime_never, 0, attotime_zero);
-		timer_adjust(spcenctr_strobe_off_timer, attotime_zero, 0, attotime_zero);
+		timer_adjust_oneshot(spcenctr_strobe_on_timer, attotime_never, 0);
+		timer_adjust_oneshot(spcenctr_strobe_off_timer, attotime_zero, 0);
 	}
 }
 

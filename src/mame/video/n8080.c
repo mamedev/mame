@@ -65,7 +65,7 @@ void spacefev_start_red_cannon(void)
 {
 	spacefev_red_cannon = 1;
 
-	timer_adjust(cannon_timer, ATTOTIME_IN_USEC(550 * 68 * 10), 0, attotime_zero);
+	timer_adjust_oneshot(cannon_timer, ATTOTIME_IN_USEC(550 * 68 * 10), 0);
 }
 
 
@@ -73,7 +73,7 @@ static TIMER_CALLBACK( spacefev_stop_red_cannon )
 {
 	spacefev_red_cannon = 0;
 
-	timer_adjust(cannon_timer, attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(cannon_timer, attotime_never, 0);
 }
 
 

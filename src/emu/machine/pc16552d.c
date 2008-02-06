@@ -152,7 +152,7 @@ static TIMER_CALLBACK( tx_fifo_timer_callback )
 	ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
 	check_interrupts(chip, channel);
 
-	timer_adjust(duart[chip].ch[channel].tx_fifo_timer, attotime_never, (chip * 2) + channel, attotime_never);
+	timer_adjust_oneshot(duart[chip].ch[channel].tx_fifo_timer, attotime_never, (chip * 2) + channel);
 }
 
 static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
@@ -164,7 +164,7 @@ static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
 
 	period = attotime_mul(ATTOTIME_IN_HZ(duart[chip].frequency), ch->divisor * 16 * 16 * 8);
 
-	timer_adjust(duart[chip].ch[channel].tx_fifo_timer, period, (chip * 2) + channel, attotime_zero);
+	timer_adjust_oneshot(duart[chip].ch[channel].tx_fifo_timer, period, (chip * 2) + channel);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -395,10 +395,10 @@ void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, in
 
 	// allocate transmit timers
 	duart[chip].ch[0].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback, NULL);
-	timer_adjust(duart[chip].ch[0].tx_fifo_timer, attotime_never, (chip * 2) + 0, attotime_never);
+	timer_adjust_oneshot(duart[chip].ch[0].tx_fifo_timer, attotime_never, (chip * 2) + 0);
 
 	duart[chip].ch[1].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback, NULL);
-	timer_adjust(duart[chip].ch[1].tx_fifo_timer, attotime_never, (chip * 2) + 1, attotime_never);
+	timer_adjust_oneshot(duart[chip].ch[1].tx_fifo_timer, attotime_never, (chip * 2) + 1);
 }
 
 void pc16552d_rx_data(int chip, int channel, UINT8 data)

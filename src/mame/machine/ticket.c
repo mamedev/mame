@@ -97,7 +97,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 		if (!dispenser[0].power)
 		{
 			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
-			timer_adjust(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
+			timer_adjust_oneshot(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), 0);
 			dispenser[0].power = 1;
 
 			dispenser[0].status = ticketnotdispensed;
@@ -108,7 +108,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 		if (dispenser[0].power)
 		{
 			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
-			timer_adjust(dispenser[0].timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(dispenser[0].timer, attotime_never, 0);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
 		}
@@ -123,7 +123,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 		if (!dispenser[1].power)
 		{
 			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
-			timer_adjust(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
+			timer_adjust_oneshot(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), 0);
 			dispenser[1].power = 1;
 
 			dispenser[1].status = ticketnotdispensed;
@@ -134,7 +134,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 		if (dispenser[1].power)
 		{
 			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
-			timer_adjust(dispenser[1].timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(dispenser[1].timer, attotime_never, 0);
 			set_led_status(2,0);
 			dispenser[1].power = 0;
 		}
@@ -158,7 +158,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle )
 	{
 		dispenser->status ^= active_bit;
 		LOG(("Ticket Status Changed to %02X\n", dispenser->status));
-		timer_adjust(dispenser->timer, ATTOTIME_IN_MSEC(time_msec), 0, attotime_zero);
+		timer_adjust_oneshot(dispenser->timer, ATTOTIME_IN_MSEC(time_msec), 0);
 	}
 
 	if (dispenser->status == ticketdispensed)

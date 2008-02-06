@@ -81,7 +81,7 @@ static void update_scanline_irq(void)
 		time = video_screen_get_time_until_pos(0, effscan, 0);
 		if (attotime_compare(time, video_screen_get_scan_period(0)) < 0)
 			time = attotime_add(time, video_screen_get_frame_period(0));
-		timer_adjust(blitter_timer, time, 0, attotime_zero);
+		timer_adjust_oneshot(blitter_timer, time, 0);
 	}
 }
 

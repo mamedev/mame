@@ -288,7 +288,7 @@ static void sslam_play(int track, int data)
 					OKIM6295_data_0_w(0,0x40);
 				OKIM6295_data_0_w(0,(0x80 | data));
 				OKIM6295_data_0_w(0,0x81);
-				timer_adjust(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
+				timer_adjust_periodic(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {

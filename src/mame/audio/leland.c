@@ -819,11 +819,11 @@ static TIMER_CALLBACK( internal_timer_int )
 	if (t->control & 0x0001)
 	{
 		int count = t->maxA ? t->maxA : 0x10000;
-		timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which, attotime_zero);
+		timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), count), which);
 		if (LOG_TIMER) logerror("  Repriming interrupt\n");
 	}
 	else
-		timer_adjust(t->int_timer, attotime_never, which, attotime_never);
+		timer_adjust_oneshot(t->int_timer, attotime_never, which);
 }
 
 
@@ -937,7 +937,7 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
-				timer_adjust(t->time_timer, attotime_never, which, attotime_never);
+				timer_adjust_oneshot(t->time_timer, attotime_never, which);
 				t->time_timer_active = 0;
 				update_int_timer = 1;
 			}
@@ -946,7 +946,7 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 			else if ((diff & 0x8000) && (new_control & 0x8000))
 			{
 				/* start the timing */
-				timer_adjust(t->time_timer, attotime_never, which, attotime_never);
+				timer_adjust_oneshot(t->time_timer, attotime_never, which);
 				t->time_timer_active = 1;
 				update_int_timer = 1;
 			}
@@ -975,11 +975,11 @@ static void internal_timer_update(int which, int new_count, int new_maxA, int ne
 			{
 				int diff = t->maxA - t->count;
 				if (diff <= 0) diff += 0x10000;
-				timer_adjust(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which, attotime_zero);
+				timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
 				if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
 			}
 			else
-				timer_adjust(t->int_timer, attotime_never, which, attotime_never);
+				timer_adjust_oneshot(t->int_timer, attotime_never, which);
 		}
 }
 
@@ -1064,7 +1064,7 @@ static void update_dma_control(int which, int new_control)
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 
 			d->finished = 0;
-			timer_adjust(d->finish_timer, attotime_mul(ATTOTIME_IN_HZ(dac[dacnum].frequency), count), which, attotime_zero);
+			timer_adjust_oneshot(d->finish_timer, attotime_mul(ATTOTIME_IN_HZ(dac[dacnum].frequency), count), which);
 		}
 	}
 
@@ -1607,7 +1607,7 @@ static WRITE16_HANDLER( pit8254_w )
 				if (ctr->count == 0) ctr->count = 0x10000;
 
 				/* reset/start the timer */
-				timer_adjust(ctr->timer, attotime_never, 0, attotime_never);
+				timer_adjust_oneshot(ctr->timer, attotime_never, 0);
 
 				if (LOG_PIT) logerror("PIT counter %d set to %d (%d Hz)\n", which, ctr->count, 4000000 / ctr->count);
 

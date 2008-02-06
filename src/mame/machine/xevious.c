@@ -96,10 +96,10 @@ WRITE8_HANDLER( battles_customio0_w )
 	switch (data)
 	{
 		case 0x10:
-			timer_adjust(nmi_timer, attotime_never, 0, attotime_never);
+			timer_adjust_oneshot(nmi_timer, attotime_never, 0);
 			return; /* nop */
 	}
-	timer_adjust(nmi_timer, ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
+	timer_adjust_periodic(nmi_timer, ATTOTIME_IN_USEC(166), 0, ATTOTIME_IN_USEC(166));
 
 }
 

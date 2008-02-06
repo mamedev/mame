@@ -51,7 +51,7 @@ static MACHINE_START( m107 )
 
 static MACHINE_RESET( m107 )
 {
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 /*****************************************************************************/
@@ -77,7 +77,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 

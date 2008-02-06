@@ -316,7 +316,7 @@ void timekeeper_init( int chip, int type, UINT8 *data )
 
 	timer = timer_alloc( timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);
-	timer_adjust( timer, duration, 0, duration );
+	timer_adjust_periodic( timer, duration, 0, duration );
 }
 
 static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )

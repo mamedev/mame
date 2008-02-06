@@ -418,14 +418,14 @@ static TIMER_CALLBACK( riot_interrupt )
 
 		/* now start counting clock cycles down */
 		riot_state = RIOT_POST_COUNT;
-		timer_adjust(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), 0xff), 0, attotime_zero);
+		timer_adjust_oneshot(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), 0xff), 0);
 	}
 
 	/* if not, we are done counting down */
 	else
 	{
 		riot_state = RIOT_IDLE;
-		timer_adjust(riot_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(riot_timer, attotime_never, 0);
 	}
 }
 
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( exidy_shriot_w )
 
 		/* set a new timer */
 		riot_clock_divisor = divisors[offset & 0x03];
-		timer_adjust(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), data * riot_clock_divisor), 0, attotime_zero);
+		timer_adjust_oneshot(riot_timer, attotime_mul(ATTOTIME_IN_HZ(SH6532_CLOCK), data * riot_clock_divisor), 0);
 		riot_state = RIOT_COUNT;
 	}
 }

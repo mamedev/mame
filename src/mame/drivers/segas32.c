@@ -482,7 +482,7 @@ static void int_control_w(int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_0_CLOCK)) * duration);
-				timer_adjust(v60_irq_timer[0], period, MAIN_IRQ_TIMER0, attotime_never);
+				timer_adjust_oneshot(v60_irq_timer[0], period, MAIN_IRQ_TIMER0);
 			}
 			break;
 
@@ -493,7 +493,7 @@ static void int_control_w(int offset, UINT8 data)
 			if (duration)
 			{
 				attotime period = attotime_make(0, attotime_to_attoseconds(ATTOTIME_IN_HZ(TIMER_1_CLOCK)) * duration);
-				timer_adjust(v60_irq_timer[1], period, MAIN_IRQ_TIMER1, attotime_never);
+				timer_adjust_oneshot(v60_irq_timer[1], period, MAIN_IRQ_TIMER1);
 			}
 			break;
 

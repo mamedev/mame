@@ -2037,7 +2037,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	timer_adjust(stars_blink_timer, ATTOTIME_IN_MSEC(period_in_ms), 0, ATTOTIME_IN_MSEC(period_in_ms));
+	timer_adjust_periodic(stars_blink_timer, ATTOTIME_IN_MSEC(period_in_ms), 0, ATTOTIME_IN_MSEC(period_in_ms));
 }
 
 
@@ -2051,7 +2051,7 @@ static TIMER_CALLBACK( stars_scroll_callback )
 
 static void start_stars_scroll_timer()
 {
-	timer_adjust(stars_scroll_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
+	timer_adjust_periodic(stars_scroll_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
 }
 
 

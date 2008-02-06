@@ -198,7 +198,7 @@ static TIMER_CALLBACK( sector_cb )
 	cr3 = (cd_curfad>>16)&0xff;
 	cr4 = cd_curfad;
 
-	timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);
+	timer_adjust_oneshot(sector_timer, ATTOTIME_IN_HZ(150), 0);
 }
 
 // global functions
@@ -274,7 +274,7 @@ void stvcd_reset(void)
 	}
 
 	sector_timer = timer_alloc(sector_cb, NULL);
-	timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);	// 150 sectors / second = 300kBytes/second
+	timer_adjust_oneshot(sector_timer, ATTOTIME_IN_HZ(150), 0);	// 150 sectors / second = 300kBytes/second
 }
 
 static blockT *cd_alloc_block(UINT8 *blknum)
@@ -776,8 +776,8 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 
 			// and do the disc I/O
 			// make sure it doesn't come in too early
-			timer_adjust(sector_timer, attotime_never, 0, attotime_never);
-			timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);	// 150 sectors / second = 300kBytes/second
+			timer_adjust_oneshot(sector_timer, attotime_never, 0);
+			timer_adjust_oneshot(sector_timer, ATTOTIME_IN_HZ(150), 0);	// 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x1100: // disk seek
@@ -1285,7 +1285,7 @@ static void cd_writeWord(UINT32 addr, UINT16 data)
 			playtype = 1;
 
 			// and do the disc I/O
-//          timer_adjust(sector_timer, ATTOTIME_IN_HZ(150), 0, attotime_zero);  // 150 sectors / second = 300kBytes/second
+//          timer_adjust_oneshot(sector_timer, ATTOTIME_IN_HZ(150), 0);  // 150 sectors / second = 300kBytes/second
 			break;
 
 		case 0x7500:

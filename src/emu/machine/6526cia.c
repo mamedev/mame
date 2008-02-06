@@ -324,12 +324,12 @@ static void cia_timer_update(cia_timer *timer, INT32 new_count)
 	{
 		/* timer is on and is connected to clock */
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(timer->cia->clock), (timer->count ? timer->count : 0x10000));
-		timer_adjust(timer->timer, period, 0, attotime_zero);
+		timer_adjust_oneshot(timer->timer, period, 0);
 	}
 	else
 	{
 		/* timer is off or not connected to clock */
-		timer_adjust(timer->timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(timer->timer, attotime_never, 0);
 	}
 }
 

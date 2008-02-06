@@ -158,7 +158,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -192,7 +192,7 @@ static MACHINE_RESET( ddragon )
 {
 	dd_sub_cpu_busy = 1;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0, attotime_never);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
 

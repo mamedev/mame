@@ -916,7 +916,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (galileo.reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer_adjust(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which, attotime_zero);
+		timer_adjust_oneshot(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which);
 	else
 		timer->active = timer->count = 0;
 
@@ -1227,7 +1227,7 @@ static WRITE32_HANDLER( galileo_w )
 						if (which != 0)
 							timer->count &= 0xffffff;
 					}
-					timer_adjust(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which, attotime_zero);
+					timer_adjust_oneshot(timer->timer, attotime_mul(TIMER_PERIOD, timer->count), which);
 					if (LOG_TIMERS)
 						logerror("Adjusted timer to fire in %f secs\n", attotime_to_double(attotime_mul(TIMER_PERIOD, timer->count)));
 				}
@@ -1236,7 +1236,7 @@ static WRITE32_HANDLER( galileo_w )
 					UINT32 elapsed = attotime_to_double(attotime_mul(timer_timeelapsed(timer->timer), SYSTEM_CLOCK));
 					timer->active = 0;
 					timer->count = (timer->count > elapsed) ? (timer->count - elapsed) : 0;
-					timer_adjust(timer->timer, attotime_never, which, attotime_zero);
+					timer_adjust_oneshot(timer->timer, attotime_never, which);
 					if (LOG_TIMERS)
 						logerror("Disabled timer\n");
 				}

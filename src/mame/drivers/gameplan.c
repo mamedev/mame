@@ -312,9 +312,9 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	via_0_ca1_w(0, (UINT8)param);
 
 	if (param)
-		timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
+		timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
 	else
-		timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1, attotime_zero);
+		timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1);
 }
 
 
@@ -326,7 +326,7 @@ static void create_via_0_timer(void)
 
 static void start_via_0_timer(void)
 {
-	timer_adjust(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0, attotime_zero);
+	timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
 }
 
 

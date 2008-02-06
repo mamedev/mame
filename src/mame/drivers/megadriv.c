@@ -2026,7 +2026,7 @@ static void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust(io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0, attotime_zero);
+			timer_adjust_oneshot(io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0);
 		}
 
 	}
@@ -4259,13 +4259,13 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		genesis_scanline_counter++;
 //      mame_printf_debug("scanline %d\n",genesis_scanline_counter);
-		timer_adjust(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0, attotime_zero);
-		timer_adjust(render_timer, ATTOTIME_IN_USEC(1), 0, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(megadriv_framerate), megadrive_total_scanlines), 0);
+		timer_adjust_oneshot(render_timer, ATTOTIME_IN_USEC(1), 0);
 
 		if (genesis_scanline_counter==megadrive_irq6_scanline )
 		{
 		//  mame_printf_debug("x %d",genesis_scanline_counter);
-			timer_adjust(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0, attotime_zero);
+			timer_adjust_oneshot(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0);
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
 		}
@@ -4292,7 +4292,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 				if (MEGADRIVE_REG0_IRQ4_ENABLE)
 				{
-					timer_adjust(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0, attotime_zero);
+					timer_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(1), 0);
 					//mame_printf_debug("irq4 on scanline %d reload %d\n",genesis_scanline_counter,MEGADRIVE_REG0A_HINT_VALUE);
 				}
 			}
@@ -4303,7 +4303,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			else irq4counter=MEGADRIVE_REG0A_HINT_VALUE;
 		}
 
-		//if (genesis_scanline_counter==0) timer_adjust(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0, attotime_zero);
+		//if (genesis_scanline_counter==0) timer_adjust_oneshot(irq4_on_timer,  ATTOTIME_IN_USEC(2), 0);
 
 
 
@@ -4406,8 +4406,8 @@ MACHINE_RESET( megadriv )
 	irq6_on_timer = timer_alloc(irq6_on_callback, NULL);
 	irq4_on_timer = timer_alloc(irq4_on_callback, NULL);
 
-	timer_adjust(frame_timer, attotime_zero, 0, attotime_zero);
-	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
+	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 
 //  set_refresh_rate(megadriv_framerate);
 	cpunum_set_clockscale(machine, 0, 0.9950f); /* Fatal Rewind is very fussy... */
@@ -4420,7 +4420,7 @@ MACHINE_RESET( megadriv )
 
 void megadriv_stop_scanline_timer(void)
 {
-	timer_adjust(scanline_timer,  attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(scanline_timer,  attotime_never, 0);
 }
 
 /*
@@ -4578,8 +4578,8 @@ int megadrive_z80irq_hpos = 320;
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 	}
 
-	timer_adjust(frame_timer,  attotime_zero, 0, attotime_zero);
-	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
+	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 
 }
 

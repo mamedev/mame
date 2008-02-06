@@ -305,9 +305,9 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_adjust(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0,attotime_never);
+			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0);
 		else
-			timer_adjust(raster_irq_timer,attotime_never,0,attotime_zero);
+			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		break;
 	case 2: /* VBL irq ack */
 		break;

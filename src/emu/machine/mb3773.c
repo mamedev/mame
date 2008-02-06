@@ -19,7 +19,7 @@ static TIMER_CALLBACK( watchdog_timeout )
 
 static void reset_timer( void )
 {
-	timer_adjust( watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0, attotime_zero );
+	timer_adjust_oneshot( watchdog_timer, ATTOTIME_IN_SEC( 5 ), 0 );
 }
 
 void mb3773_set_ck( UINT8 new_ck )

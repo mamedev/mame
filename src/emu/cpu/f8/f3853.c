@@ -58,7 +58,7 @@ static void f3853_timer_start(UINT8 value)
 {
 	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(f3853.config.frequency), f3853_value_to_cycle[value]*31) : attotime_never;
 
-	timer_adjust(f3853.timer, period, 0, attotime_never);
+	timer_adjust_oneshot(f3853.timer, period, 0);
 }
 
 static TIMER_CALLBACK( f3853_timer_callback )

@@ -171,7 +171,7 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = (msb << 8) | lsb;
-		timer_adjust(currptr->timer[counter], attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]), which, attotime_zero);
+		timer_adjust_oneshot(currptr->timer[counter], attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]), which);
 	}
 
 	/* word mode */
@@ -197,7 +197,7 @@ static void subtract_from_counter(int counter, int count, int which)
 		currptr->counter[counter] = word;
 		duration = attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]);
 		if (counter == 2) duration = attotime_mul(duration, currptr->t3_divisor);
-		timer_adjust(currptr->timer[counter], duration, which, attotime_zero);
+		timer_adjust_oneshot(currptr->timer[counter], duration, which);
 	}
 }
 
@@ -321,7 +321,7 @@ static void reload_count(int idx, int which)
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 	if (idx == 2) duration = attotime_mul(duration, currptr->t3_divisor);
-	timer_adjust(currptr->timer[idx], duration, which, attotime_zero);
+	timer_adjust_oneshot(currptr->timer[idx], duration, which);
 	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, attotime_to_double(duration)));
 
 	if (!currptr->control_reg[idx] & 0x02)

@@ -331,7 +331,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 				xexex_objdma(0);
 
 				// schedule DMA end interrupt
-				timer_adjust(dmadelay_timer, XE_DMADELAY, 0, attotime_zero);
+				timer_adjust_oneshot(dmadelay_timer, XE_DMADELAY, 0);
 			}
 
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and

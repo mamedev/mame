@@ -43,7 +43,7 @@ static TIMER_CALLBACK( acefruit_refresh )
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	timer_adjust( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0, attotime_never );
+	timer_adjust_oneshot( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0 );
 }
 
 static VIDEO_START( acefruit )
@@ -54,7 +54,7 @@ static VIDEO_START( acefruit )
 static INTERRUPT_GEN( acefruit_vblank )
 {
 	cpunum_set_input_line(machine, 0, 0, HOLD_LINE );
-	timer_adjust( acefruit_refresh_timer, attotime_zero, 0, attotime_never );
+	timer_adjust_oneshot( acefruit_refresh_timer, attotime_zero, 0 );
 }
 
 static VIDEO_UPDATE( acefruit )

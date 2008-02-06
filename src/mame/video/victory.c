@@ -531,13 +531,13 @@ INLINE void count_states(int states)
 
 	if (!micro.timer)
 	{
-		timer_adjust(micro.timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(micro.timer, attotime_never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}
 	else if (attotime_compare(timer_timeelapsed(micro.timer), micro.endtime) > 0)
 	{
-		timer_adjust(micro.timer, attotime_never, 0, attotime_zero);
+		timer_adjust_oneshot(micro.timer, attotime_never, 0);
 		micro.timer_active = 1;
 		micro.endtime = state_time;
 	}

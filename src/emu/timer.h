@@ -106,8 +106,11 @@ int timer_count_anonymous(void);
 /* allocate a permament timer that isn't primed yet */
 emu_timer *_timer_alloc_internal(timer_callback callback, void *param, const char *file, int line, const char *func);
 
-/* adjust the time when this timer will fire, and whether or not it will fire periodically */
-void timer_adjust(emu_timer *which, attotime duration, INT32 param, attotime period);
+/* adjust the time when this timer will fire and disable any periodic firings */
+void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);
+
+/* adjust the time when this timer will fire and specify a period for subsequent firings */
+void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, attotime period);
 
 
 

@@ -211,7 +211,7 @@ static VIDEO_UPDATE( tmaster )
 {
 	int layers_ctrl = -1;
 
-#if MAME_DEBUG
+#ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_Z))
 	{
 		int mask = 0;

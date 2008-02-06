@@ -259,7 +259,7 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 		COMBINE_DATA(&fuuki32_vregs[offset]);
 		if (offset == 0x1c/4)
 		{
-			timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
+			timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(0, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(0));
 		}
 	}
 }
@@ -564,7 +564,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, 5, PULSE_LINE);	// Raster Line IRQ
 	video_screen_update_partial(0, video_screen_get_vpos(0));
-	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(0), 0);
 }
 
 
@@ -578,7 +578,7 @@ static MACHINE_RESET( fuuki32 )
 {
 	timer_set(video_screen_get_time_until_pos(0, 248, 0), NULL, 0, level_1_interrupt_callback);
 	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
-	timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0, attotime_zero);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(0, 0, machine->screen[0].visarea.max_x + 1), 0);
 }
 
 

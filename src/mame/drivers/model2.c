@@ -303,13 +303,13 @@ static WRITE32_HANDLER( timers_w )
 
 	model2_timerorig[offset] = model2_timervals[offset];
 	period = attotime_mul(ATTOTIME_IN_HZ(25000000), model2_timerorig[offset]);
-	timer_adjust(model2_timers[offset], period, 0, attotime_zero);
+	timer_adjust_oneshot(model2_timers[offset], period, 0);
 	model2_timerrun[offset] = 1;
 }
 
 static void model2_timer_exp(int tnum, int bit)
 {
-	timer_adjust(model2_timers[tnum], attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
@@ -348,10 +348,10 @@ static MACHINE_RESET(model2_common)
 	model2_timers[2] = timer_alloc(model2_timer_2_cb, NULL);
 	model2_timers[3] = timer_alloc(model2_timer_3_cb, NULL);
 
-	timer_adjust(model2_timers[0], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[1], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[2], attotime_never, 0, attotime_never);
-	timer_adjust(model2_timers[3], attotime_never, 0, attotime_never);
+	timer_adjust_oneshot(model2_timers[0], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[1], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[2], attotime_never, 0);
+	timer_adjust_oneshot(model2_timers[3], attotime_never, 0);
 }
 
 static MACHINE_RESET(model2o)

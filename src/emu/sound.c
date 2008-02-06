@@ -192,7 +192,7 @@ void sound_init(running_machine *machine)
 
 	/* allocate a global timer for sound timing */
 	sound_update_timer = timer_alloc(sound_update, NULL);
-	timer_adjust(sound_update_timer, update_frequency, 0, update_frequency);
+	timer_adjust_periodic(sound_update_timer, update_frequency, 0, update_frequency);
 
 	/* initialize the streams engine */
 	VPRINTF(("streams_init\n"));

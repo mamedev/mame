@@ -86,7 +86,7 @@ VIDEO_START( qix )
 
 	/* allocate a timer */
 	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1);
 
 	/* set up save states */
 	state_save_register_global_pointer(videoram, 256 * 256);
@@ -115,7 +115,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline += SCANLINE_INCREMENT;
 	if (scanline > machine->screen[0].visarea.max_y)
 		scanline = SCANLINE_INCREMENT;
-	timer_adjust(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline, attotime_zero);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 

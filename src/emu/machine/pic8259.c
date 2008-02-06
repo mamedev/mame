@@ -128,7 +128,7 @@ static TIMER_CALLBACK( pic8259_timerproc )
 
 static void pic8259_set_timer(int which)
 {
-	timer_adjust(pic[which].timer, attotime_zero, which, attotime_zero);
+	timer_adjust_oneshot(pic[which].timer, attotime_zero, which);
 }
 
 

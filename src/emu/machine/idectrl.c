@@ -1388,7 +1388,7 @@ static UINT32 ide_controller_read(struct ide_state *ide, offs_t offset, int size
 			if (attotime_compare(timer_timeelapsed(ide->last_status_timer), TIME_PER_ROTATION) > 0)
 			{
 				result |= IDE_STATUS_HIT_INDEX;
-				timer_adjust(ide->last_status_timer, attotime_never, 0, attotime_zero);
+				timer_adjust_oneshot(ide->last_status_timer, attotime_never, 0);
 			}
 
 			/* clear interrutps only when reading the real status */
@@ -1554,7 +1554,7 @@ static void ide_controller_write(struct ide_state *ide, offs_t offset, int size,
 			{
 				ide->status |= IDE_STATUS_BUSY;
 				ide->status &= ~IDE_STATUS_DRIVE_READY;
-				timer_adjust(ide->reset_timer, ATTOTIME_IN_MSEC(5), 0, attotime_zero);
+				timer_adjust_oneshot(ide->reset_timer, ATTOTIME_IN_MSEC(5), 0);
 			}
 			break;
 	}

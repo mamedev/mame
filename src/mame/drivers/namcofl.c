@@ -182,7 +182,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0, attotime_zero);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0);
 	}
 }
 
@@ -329,7 +329,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	video_screen_update_partial(0, video_screen_get_vpos(0));
 	cpunum_set_input_line(machine, 0, I960_IRQ1, ASSERT_LINE);
-	timer_adjust(raster_interrupt_timer, video_screen_get_frame_period(0), 0, attotime_zero);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(0), 0);
 }
 
 

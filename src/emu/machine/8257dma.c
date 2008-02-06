@@ -220,7 +220,7 @@ static void dma8257_update_status(int which)
 	if (pending_transfer)
 	{
 		next = ATTOTIME_IN_HZ(dma[which].intf->clockhz / 4 );
-		timer_adjust(dma[which].timer,
+		timer_adjust_periodic(dma[which].timer,
 			attotime_zero,
 			which,
 			/* 1 byte transferred in 4 clock cycles */
@@ -247,7 +247,7 @@ static void dma8257_update_status(int which)
 
 static void prepare_msb_flip(int which)
 {
-	timer_adjust(dma[which].msbflip_timer, attotime_zero, which, attotime_zero);
+	timer_adjust_oneshot(dma[which].msbflip_timer, attotime_zero, which);
 }
 
 

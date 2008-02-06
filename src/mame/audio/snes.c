@@ -1154,13 +1154,13 @@ void *snes_sh_start(int clock, const struct CustomSound_interface *config)
 
 	/* Initialize the timers */
 	timers[0].timer = timer_alloc( snes_spc_timer , NULL);
-	timer_adjust( timers[0].timer, ATTOTIME_IN_HZ(8000), 0, ATTOTIME_IN_HZ(8000) );
+	timer_adjust_periodic( timers[0].timer, ATTOTIME_IN_HZ(8000), 0, ATTOTIME_IN_HZ(8000) );
 	timer_enable( timers[0].timer, 0 );
 	timers[1].timer = timer_alloc( snes_spc_timer , NULL);
-	timer_adjust( timers[1].timer, ATTOTIME_IN_HZ(8000), 1, ATTOTIME_IN_HZ(8000) );
+	timer_adjust_periodic( timers[1].timer, ATTOTIME_IN_HZ(8000), 1, ATTOTIME_IN_HZ(8000) );
 	timer_enable( timers[1].timer, 0 );
 	timers[2].timer = timer_alloc( snes_spc_timer , NULL);
-	timer_adjust( timers[2].timer, ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000) );
+	timer_adjust_periodic( timers[2].timer, ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000) );
 	timer_enable( timers[2].timer, 0 );
 
 	DSP_Reset();

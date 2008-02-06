@@ -520,14 +520,14 @@ INLINE void sega005_update_sound_data(void)
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
 		//mame_printf_debug("Stopping timer\n");
-		timer_adjust(sega005_sound_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(sega005_sound_timer, attotime_never, 0);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//mame_printf_debug("Starting timer\n");
-		timer_adjust(sega005_sound_timer, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ));
+		timer_adjust_periodic(sega005_sound_timer, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ), 0, ATTOTIME_IN_HZ(SEGA005_555_TIMER_FREQ));
 	}
 }
 

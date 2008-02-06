@@ -135,7 +135,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
 }
 
 
@@ -147,7 +147,7 @@ static void create_interrupt_timer(void)
 
 static void start_interrupt_timer(void)
 {
-	timer_adjust(interrupt_timer, video_screen_get_time_until_pos(0, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0, attotime_zero);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0);
 }
 
 

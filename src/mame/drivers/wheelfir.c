@@ -577,7 +577,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		scanline_counter++;
 		cpunum_set_input_line(machine, 0, 5, HOLD_LINE); // raster IRQ, changes scroll values for road
-		timer_adjust(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0, attotime_zero);
+		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
 
 		if (scanline_counter<256)
 		{
@@ -608,16 +608,16 @@ static VIDEO_EOF( wheelfir )
 	scanline_counter = -1;
 	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
 
-	timer_adjust(frame_timer,  attotime_zero, 0, attotime_zero);
-	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
+	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 }
 
 static MACHINE_RESET(wheelfir)
 {
 	frame_timer = timer_alloc(frame_timer_callback, NULL);
 	scanline_timer = timer_alloc(scanline_timer_callback, NULL);
-	timer_adjust(frame_timer, attotime_zero, 0, attotime_zero);
-	timer_adjust(scanline_timer,  attotime_zero, 0, attotime_zero);
+	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
+	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 	scanline_counter = -1;
 }
 

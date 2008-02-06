@@ -1500,7 +1500,7 @@ void cheat_init(running_machine *machine)
 	InitStringTable();
 
 	periodic_timer = timer_alloc(cheat_periodic, NULL);
-	timer_adjust(periodic_timer, attotime_make(0, machine->screen[0].refresh), 0, attotime_make(0, machine->screen[0].refresh));
+	timer_adjust_periodic(periodic_timer, attotime_make(0, machine->screen[0].refresh), 0, attotime_make(0, machine->screen[0].refresh));
 
 	add_exit_callback(machine, cheat_exit);
 }

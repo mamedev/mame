@@ -252,7 +252,7 @@ static TIMER_CALLBACK( cliff_irq_callback )
 	if ( phillips_code & 0x800000 )
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, param, 0), param, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, param, 0), param);
 }
 
 static void vdp_interrupt (int state)
@@ -272,7 +272,7 @@ static MACHINE_RESET( cliffhgr )
 {
 	port_bank = 0;
 	phillips_code = 0;
-	timer_adjust(irq_timer, video_screen_get_time_until_pos(0, 17, 0), 17, attotime_zero);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, 17, 0), 17);
 }
 
 /********************************************************/

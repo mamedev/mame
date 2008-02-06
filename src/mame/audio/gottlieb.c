@@ -236,10 +236,10 @@ static WRITE8_HANDLER( common_sound_control_w )
 	{
 		/* base clock is 250kHz divided by 256 */
 		attotime interval = attotime_mul(ATTOTIME_IN_HZ(250000), 256 * (256-nmi_rate));
-		timer_adjust(nmi_timer, interval, 0, interval);
+		timer_adjust_periodic(nmi_timer, interval, 0, interval);
 	}
 	else
-		timer_adjust(nmi_timer, attotime_never, 0, attotime_never);
+		timer_adjust_oneshot(nmi_timer, attotime_never, 0);
 
 	/* Bit 1 controls a LED on the sound board. I'm not emulating it */
 }

@@ -322,7 +322,7 @@ static TIMER_CALLBACK( via_t1_timeout )
     {
 		if (T1_SET_PB7(v->acr))
 			v->out_b ^= 0x80;
-		timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, attotime_zero);
+		timer_adjust_oneshot(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which);
     }
 	else
     {
@@ -719,7 +719,7 @@ void via_write(int which, int offset, int data)
 					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 			}
 		}
-		timer_adjust(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which, attotime_zero);
+		timer_adjust_oneshot(v->t1, v_cycles_to_time(v, TIMER1_VALUE(v) + IFR_DELAY), which);
 		v->t1_active = 1;
 		break;
 
@@ -735,7 +735,7 @@ void via_write(int which, int offset, int data)
 
 		if (!T2_COUNT_PB6(v->acr))
 		{
-			timer_adjust(v->t2, v_cycles_to_time(v, TIMER2_VALUE(v) + IFR_DELAY), which, attotime_zero);
+			timer_adjust_oneshot(v->t2, v_cycles_to_time(v, TIMER2_VALUE(v) + IFR_DELAY), which);
 			v->t2_active = 1;
 		}
 		else
@@ -802,7 +802,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 			}
 			if (T1_CONTINUOUS(data))
 			{
-				timer_adjust(v->t1, v_cycles_to_time(v, counter1 + IFR_DELAY), which, attotime_zero);
+				timer_adjust_oneshot(v->t1, v_cycles_to_time(v, counter1 + IFR_DELAY), which);
 				v->t1_active = 1;
 			}
 		}

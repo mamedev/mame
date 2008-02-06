@@ -228,7 +228,7 @@ static READ16_HANDLER( joystick_r )
 
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
-	timer_adjust(joystick_timer, ATTOTIME_IN_USEC(50), newval, attotime_zero);
+	timer_adjust_oneshot(joystick_timer, ATTOTIME_IN_USEC(50), newval);
 	atarigen_update_interrupts();
 
 	return joystick_value;

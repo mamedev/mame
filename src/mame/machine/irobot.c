@@ -113,7 +113,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 		else
 			logerror("vg start [busy!] ");
 		IR_CPU_STATE;
-		timer_adjust(irvg_timer, ATTOTIME_IN_MSEC(10), 0, attotime_zero);
+		timer_adjust_oneshot(irvg_timer, ATTOTIME_IN_MSEC(10), 0);
 #endif
 		irvg_running=1;
 	}
@@ -851,7 +851,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 #if IR_TIMING
 	if (irmb_running == 0)
 	{
-		timer_adjust(irmb_timer, attotime_mul(ATTOTIME_IN_HZ(12000000), icount), 0, attotime_zero);
+		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_HZ(12000000), icount), 0);
 		logerror("mb start ");
 		IR_CPU_STATE;
 	}
@@ -859,7 +859,7 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		logerror("mb start [busy!] ");
 		IR_CPU_STATE;
-		timer_adjust(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0, attotime_zero);
+		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0);
 	}
 #else
 	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);

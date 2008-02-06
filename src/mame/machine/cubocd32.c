@@ -296,7 +296,7 @@ static void akiko_cdda_play( UINT32 lba, UINT32 num_blocks )
 	if (cddanum != -1)
 	{
 		cdda_start_audio(cddanum, lba, num_blocks);
-		timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+		timer_adjust_oneshot( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
 	}
 }
 
@@ -315,7 +315,7 @@ static void akiko_cdda_pause( int pause )
 			}
 			else
 			{
-				timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+				timer_adjust_oneshot( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
 			}
 		}
 	}
@@ -379,7 +379,7 @@ static TIMER_CALLBACK(akiko_frame_proc)
 			akiko_set_cd_status( 0x80000000 );	/* subcode ready */
 		}
 
-		timer_adjust( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0, attotime_zero );
+		timer_adjust_oneshot( akiko.frame_timer, ATTOTIME_IN_HZ( 75 ), 0 );
 	}
 }
 
@@ -484,7 +484,7 @@ static TIMER_CALLBACK(akiko_dma_proc)
 	if ( akiko.cdrom_readreqmask == 0 )
 		akiko_set_cd_status(0x04000000);
 	else
-		timer_adjust( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, attotime_zero );
+		timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
 
 static void akiko_start_dma( void )
@@ -500,7 +500,7 @@ static void akiko_start_dma( void )
 
 	akiko.cdrom_lba_cur = akiko.cdrom_lba_start;
 
-	timer_adjust( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0, attotime_zero );
+	timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
 
 static void akiko_setup_response( int len, UINT8 *r1 )

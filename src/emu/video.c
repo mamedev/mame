@@ -332,7 +332,7 @@ void video_init(running_machine *machine)
 			if (machine->drv->video_attributes & VIDEO_UPDATE_SCANLINE)
 			{
 				info->scanline_timer = timer_alloc(scanline_update_callback, NULL);
-				timer_adjust(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_never);
+				timer_adjust_oneshot(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 			}
 
 			/* register for save states */
@@ -773,9 +773,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
 	if (video_screen_get_vpos(scrnum) == 0)
-		timer_adjust(info->scanline0_timer, attotime_zero, scrnum, attotime_zero);
+		timer_adjust_oneshot(info->scanline0_timer, attotime_zero, scrnum);
 	else
-		timer_adjust(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
+		timer_adjust_oneshot(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 }
 
 
@@ -1037,7 +1037,7 @@ static TIMER_CALLBACK( scanline0_callback )
 	viddata->scrinfo[scrnum].last_partial_scan = 0;
 	global.partial_updates_this_frame = 0;
 
-	timer_adjust(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum, attotime_zero);
+	timer_adjust_oneshot(viddata->scrinfo[scrnum].scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 }
 
 
@@ -1059,7 +1059,7 @@ static TIMER_CALLBACK( scanline_update_callback )
 	scanline++;
 	if (scanline > machine->screen[scrnum].visarea.max_y)
 		scanline = machine->screen[scrnum].visarea.min_y;
-	timer_adjust(viddata->scrinfo[scrnum].scanline_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), (scanline << 8) | scrnum, attotime_never);
+	timer_adjust_oneshot(viddata->scrinfo[scrnum].scanline_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), (scanline << 8) | scrnum);
 }
 
 
