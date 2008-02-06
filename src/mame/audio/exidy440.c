@@ -17,6 +17,10 @@
 #define	FADE_TO_ZERO	1
 
 
+#define EXIDY440_AUDIO_CLOCK	(EXIDY440_MASTER_CLOCK / 4 / 4)
+#define EXIDY440_MC3418_CLOCK	(EXIDY440_AUDIO_CLOCK / 16)
+#define EXIDY440_MC3417_CLOCK	(EXIDY440_AUDIO_CLOCK / 32)
+
 
 /* internal caching */
 #define	MAX_CACHE_ENTRIES		1024				/* maximum separate samples we expect to ever see */
@@ -383,7 +387,7 @@ static WRITE8_HANDLER( sound_interrupt_clear_w )
  *
  *************************************/
 
-static void exidy440_m6844_update(void)
+static void m6844_update(void)
 {
 	/* update the stream */
 	stream_update(stream);
@@ -419,7 +423,7 @@ static READ8_HANDLER( m6844_r )
 	int result = 0;
 
 	/* first update the current state of the DMA transfers */
-	exidy440_m6844_update();
+	m6844_update();
 
 	/* switch off the offset we were given */
 	switch (offset)
@@ -489,6 +493,9 @@ static READ8_HANDLER( m6844_r )
 		case 0x16:
 			result = m6844_chain;
 			break;
+
+		/* 0x17-0x1f not used */
+		default: break;
 	}
 
 	return result;
@@ -500,7 +507,7 @@ static WRITE8_HANDLER( m6844_w )
 	int i;
 
 	/* first update the current state of the DMA transfers */
-	exidy440_m6844_update();
+	m6844_update();
 
 	/* switch off the offset we were given */
 	switch (offset)
@@ -591,6 +598,9 @@ static WRITE8_HANDLER( m6844_w )
 		case 0x16:
 			m6844_chain = data;
 			break;
+
+		/* 0x17-0x1f not used */
+		default: break;
 	}
 }
 
@@ -883,12 +893,16 @@ static void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int fr
  *************************************/
 
 static ADDRESS_MAP_START( exidy440_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x8016) AM_READWRITE(m6844_r, m6844_w) AM_BASE(&m6844_data)
-	AM_RANGE(0x8400, 0x8407) AM_READWRITE(MRA8_RAM, sound_volume_w) AM_BASE(&sound_volume)
-	AM_RANGE(0x8800, 0x8800) AM_READ(sound_command_r)
-	AM_RANGE(0x9400, 0x9403) AM_WRITE(MWA8_RAM) AM_BASE(&sound_banks)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(MRA8_NOP, sound_interrupt_clear_w)
+	AM_RANGE(0x0000, 0x7fff) AM_NOP
+	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_READWRITE(m6844_r, m6844_w) AM_BASE(&m6844_data)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_READWRITE(MRA8_RAM, sound_volume_w) AM_BASE(&sound_volume)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_READWRITE(sound_command_r, MWA8_NOP)
+	AM_RANGE(0x8c00, 0x93ff) AM_NOP
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&sound_banks)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READWRITE(MRA8_NOP, sound_interrupt_clear_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -916,7 +930,7 @@ static const struct CustomSound_interface custom_interface =
 
 MACHINE_DRIVER_START( exidy440_audio )
 
-	MDRV_CPU_ADD(M6809,EXIDY440_MASTER_CLOCK/4/4)
+	MDRV_CPU_ADD(M6809, EXIDY440_AUDIO_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
@@ -926,4 +940,16 @@ MACHINE_DRIVER_START( exidy440_audio )
 	MDRV_SOUND_CONFIG(custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+//	MDRV_SOUND_ADD(MC3418, EXIDY440_MC3418_CLOCK)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+
+//	MDRV_SOUND_ADD(MC3418, EXIDY440_MC3418_CLOCK)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+
+//	MDRV_SOUND_ADD(MC3417, EXIDY440_MC3417_CLOCK)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+
+//	MDRV_SOUND_ADD(MC3417, EXIDY440_MC3417_CLOCK)
+//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
