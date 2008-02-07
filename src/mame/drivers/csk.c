@@ -1,7 +1,6 @@
 /*****************************************************************************
 
 Champion Poker by IGS   (documented by Mirko Buffoni)
-Is this a Konami board?
 ---
 
 Memory Layout (refers to CSK227IT.  Others may have different addresses)
@@ -89,7 +88,7 @@ Expansion:  8000-ffff   (R)     Used to read from an expansion rom
 
 Unknown:    5080        (RW)    (possibly related to ticket/hopper)
             5090-5091   (RW)    (possibly related to eprom counters)
-            50b0-50b1   (W)     (possibly sound related)
+            50b0-50b1   (W)     (OPL2 compatible chip)
             5083        (W)     (used only at reset, maybe)
             1000-10ff   (W) ???
             6000-67ff   (W) ???
@@ -130,6 +129,7 @@ Palette3*:  585D (low), 5899 (high), len = 60   (used alternatively with pal3)
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/2413intf.h"
 
 
 extern UINT8 * cpk_colorram;
@@ -200,6 +200,8 @@ static ADDRESS_MAP_START( csk227_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
 	AM_RANGE(0x5091, 0x5091) AM_READ(input_port_7_r)		/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(MWA8_RAM) AM_BASE(&cpk_expram)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
@@ -219,6 +221,8 @@ static ADDRESS_MAP_START( csk234_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* used for protection and other */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(MWA8_RAM) AM_BASE(&cpk_expram)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
@@ -569,10 +573,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( csk227it )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",Z80, 3579545)//(4000000?)
+	MDRV_CPU_ADD_TAG("main",Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(csk227_map,0)
-	MDRV_CPU_VBLANK_INT(cska_interrupt,6)
+	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -590,6 +594,11 @@ static MACHINE_DRIVER_START( csk227it )
 	MDRV_VIDEO_UPDATE(cska)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM2413, 3579545)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( csk234it )
@@ -598,7 +607,8 @@ static MACHINE_DRIVER_START( csk234it )
 	MDRV_CPU_MODIFY("main")
 	/* basic machine hardware */
 	MDRV_CPU_IO_MAP(csk234_map,0)
-	MACHINE_DRIVER_END
+
+MACHINE_DRIVER_END
 
 /*  ROM Regions definition
  */
@@ -700,7 +710,7 @@ static DRIVER_INIT( cska )
 	}
 }
 
-GAME( 198?, csk227it, 0,        csk227it, csk227, cska, ROT0, "IGS", "Champion Skill (with Ability)", GAME_NO_SOUND )               /* SU 062 */
-GAME( 198?, csk234it, csk227it, csk234it, csk234, cska, ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", GAME_NO_SOUND )   /* SU 062 */
+GAME( 198?, csk227it, 0,        csk227it, csk227, cska, ROT0, "IGS", "Champion Skill (with Ability)", 0 )               /* SU 062 */
+GAME( 198?, csk234it, csk227it, csk234it, csk234, cska, ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", 0 )   /* SU 062 */
 
-GAME( 1998, stellecu, 0,        csk234it, csk234, 0,    ROT0, "Sure", "Stelle e Cubi (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, stellecu, 0,        csk234it, csk234, 0,    ROT0, "Sure", "Stelle e Cubi (Italy)", GAME_NOT_WORKING )
