@@ -197,7 +197,7 @@ VIDEO_UPDATE( cska )
 				0,0,
 				8*sx,8*sy,
 				cliprect,
-				(abilityflag) ? TRANSPARENCY_COLOR : TRANSPARENCY_NONE, 0);
+				(abilityflag) ? TRANSPARENCY_PEN : TRANSPARENCY_NONE, 0);
 	}
 
 	return 0;
