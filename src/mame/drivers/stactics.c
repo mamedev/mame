@@ -57,15 +57,11 @@ extern UINT8 *stactics_motor_on;
 /* Defined in video/stactics.c */
 VIDEO_START( stactics );
 VIDEO_UPDATE( stactics );
-extern UINT8 *stactics_scroll_ram;
 extern UINT8 *stactics_videoram_b;
-extern UINT8 *stactics_chardata_b;
 extern UINT8 *stactics_videoram_d;
-extern UINT8 *stactics_chardata_d;
 extern UINT8 *stactics_videoram_e;
-extern UINT8 *stactics_chardata_e;
 extern UINT8 *stactics_videoram_f;
-extern UINT8 *stactics_chardata_f;
+extern UINT8 *stactics_palette;
 extern UINT8 *stactics_display_buffer;
 
 PALETTE_INIT( stactics );
@@ -76,14 +72,6 @@ WRITE8_HANDLER( stactics_speed_latch_w );
 WRITE8_HANDLER( stactics_shot_trigger_w );
 WRITE8_HANDLER( stactics_shot_flag_clear_w );
 
-WRITE8_HANDLER( stactics_videoram_b_w );
-WRITE8_HANDLER( stactics_chardata_b_w );
-WRITE8_HANDLER( stactics_videoram_d_w );
-WRITE8_HANDLER( stactics_chardata_d_w );
-WRITE8_HANDLER( stactics_videoram_e_w );
-WRITE8_HANDLER( stactics_chardata_e_w );
-WRITE8_HANDLER( stactics_videoram_f_w );
-WRITE8_HANDLER( stactics_chardata_f_w );
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
@@ -94,17 +82,17 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x8000, 0x8fff) AM_READ(stactics_port_3_r)
     AM_RANGE(0x9000, 0x9fff) AM_READ(stactics_vert_pos_r)
     AM_RANGE(0xa000, 0xafff) AM_READ(stactics_horiz_pos_r)
-
-    AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM)	/* B RAM page */
-    AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)	/* D RAM page */
-    AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)	/* E RAM page */
-    AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)	/* F RAM page */
+    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(&stactics_videoram_b)
+    AM_RANGE(0xc000, 0xcfff) AM_NOP
+    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&stactics_videoram_d)
+    AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&stactics_videoram_e)
+    AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&stactics_videoram_f)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
     AM_RANGE(0x6000, 0x6001) AM_WRITE(stactics_coin_lockout_w)
-    AM_RANGE(0x6006, 0x6007) AM_WRITE(stactics_palette_w)
+    AM_RANGE(0x6006, 0x6007) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_palette)
     /* AM_RANGE(0x6010, 0x601f) AM_WRITE(stactics_sound_w) */
     AM_RANGE(0x6016, 0x6016) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_motor_on)  /* Note: This overlaps rocket sound */
     /* AM_RANGE(0x6020, 0x602f) AM_WRITE(stactics_lamp_latch_w) */
@@ -114,28 +102,9 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6060, 0x606f) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_display_buffer)
     /* AM_RANGE(0x60a0, 0x60ef) AM_WRITE(stactics_sound2_w) */
 
-    AM_RANGE(0x8000, 0x8fff) AM_WRITE(stactics_scroll_ram_w) AM_BASE(&stactics_scroll_ram)
-
-    AM_RANGE(0xb000, 0xb3ff) AM_WRITE(stactics_videoram_b_w) AM_BASE(&stactics_videoram_b) AM_SIZE(&videoram_size)
-    AM_RANGE(0xb400, 0xb7ff) AM_WRITE(MWA8_RAM)   /* Unused, but initialized */
-    AM_RANGE(0xb800, 0xbfff) AM_WRITE(stactics_chardata_b_w) AM_BASE(&stactics_chardata_b)
-
-    AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_NOP) /* according to the schematics, nothing is mapped here */
-                                 /* but, the game still tries to clear this out         */
-
-    AM_RANGE(0xd000, 0xd3ff) AM_WRITE(stactics_videoram_d_w) AM_BASE(&stactics_videoram_d)
-    AM_RANGE(0xd400, 0xd7ff) AM_WRITE(MWA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xd800, 0xdfff) AM_WRITE(stactics_chardata_d_w) AM_BASE(&stactics_chardata_d)
-
-    AM_RANGE(0xe000, 0xe3ff) AM_WRITE(stactics_videoram_e_w) AM_BASE(&stactics_videoram_e)
-    AM_RANGE(0xe400, 0xe7ff) AM_WRITE(MWA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xe800, 0xefff) AM_WRITE(stactics_chardata_e_w) AM_BASE(&stactics_chardata_e)
-
-    AM_RANGE(0xf000, 0xf3ff) AM_WRITE(stactics_videoram_f_w) AM_BASE(&stactics_videoram_f)
-    AM_RANGE(0xf400, 0xf7ff) AM_WRITE(MWA8_RAM)   /* Used as scratch RAM, high scores, etc. */
-    AM_RANGE(0xf800, 0xffff) AM_WRITE(stactics_chardata_f_w) AM_BASE(&stactics_chardata_f)
-
+    AM_RANGE(0x8000, 0x8fff) AM_WRITE(stactics_scroll_ram_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( stactics )
 
@@ -207,40 +176,6 @@ static INPUT_PORTS_START( stactics )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 INPUT_PORTS_END
 
-/* For the character graphics */
-
-static const gfx_layout gfxlayout =
-{
-    8,8,
-    256,
-    1,     /* 1 bit per pixel */
-    { 0 },
-    { 0, 1, 2, 3, 4, 5, 6, 7 },
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-    8*8
-};
-
-/* For the LED Fire Beam (made up) */
-
-static const gfx_layout firelayout =
-{
-    16,9,
-    256,
-    1,     /* 1 bit per pixel */
-    { 0 },
-    { 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7 },
-    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
-    8*9
-};
-
-static GFXDECODE_START( stactics )
-    GFXDECODE_ENTRY( 0, 0, gfxlayout,  0,      64*4 )    /* Dynamically decoded from RAM */
-    GFXDECODE_ENTRY( 0, 0, gfxlayout,  1*2*16, 64*4 )    /* Dynamically decoded from RAM */
-    GFXDECODE_ENTRY( 0, 0, gfxlayout,  2*2*16, 64*4 )    /* Dynamically decoded from RAM */
-    GFXDECODE_ENTRY( 0, 0, gfxlayout,  3*2*16, 64*4 )    /* Dynamically decoded from RAM */
-    GFXDECODE_ENTRY( 0, 0, firelayout, 0, 64*4 )         /* LED Fire beam (synthesized gfx) */
-    GFXDECODE_ENTRY( 0, 0, gfxlayout,  0, 64*4 )         /* LED and Misc. Display characters */
-GFXDECODE_END
 
 static MACHINE_DRIVER_START( stactics )
 
@@ -253,13 +188,11 @@ static MACHINE_DRIVER_START( stactics )
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_ALWAYS_UPDATE)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(stactics)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16*4*4*2)
+	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(stactics)
 	MDRV_VIDEO_START(stactics)
@@ -285,15 +218,15 @@ ROM_START( stactics )
 	ROM_LOAD( "epr-222y",     0x2000, 0x0800, CRC(24dd2bcc) SHA1(f77c59beccc1a77e3bfc2928ff532d6e221ff42d) )
 	ROM_LOAD( "epr-223x",     0x2800, 0x0800, CRC(7fef0940) SHA1(5b2af55f75ef0130f9202b6a916a96dbd601fcfa) )
 
-	ROM_REGION( 0x1060, REGION_GFX1, ROMREGION_DISPOSE )	/* gfx decoded in vh_start */
-	ROM_LOAD( "epr-217",      0x0000, 0x0800, CRC(38259f5f) SHA1(1f4182ffc2d78fca22711526bb2ae2cfe040173c) )      /* LED fire beam data      */
+	ROM_REGION( 0x1060, REGION_PROMS, 0 )
+	ROM_LOAD( "pr54",         0x0000, 0x0800, CRC(9640bd6e) SHA1(dd12952a6591f2056ac1b5688dca0a3a2ef69f2d) )      /* color/priority PROM */
 	ROM_LOAD( "pr55",         0x0800, 0x0800, CRC(f162673b) SHA1(83743780b6c1f8014df24fa0650000b7cb137d92) )      /* timing PROM (unused)    */
 	ROM_LOAD( "pr65",         0x1000, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )      /* timing PROM (unused)    */
 	ROM_LOAD( "pr66",         0x1020, 0x0020, CRC(78dcf300) SHA1(37034cc0cfa4a8ec47937a2a34b77ec56b387a9b) )      /* timing PROM (unused)    */
 	ROM_LOAD( "pr67",         0x1040, 0x0020, CRC(b27874e7) SHA1(c24bc78c4b2ae01aaed5d994ce2e7c5e0f2eece8) )      /* LED timing ROM (unused) */
 
-	ROM_REGION( 0x0800, REGION_PROMS, 0 )
-	ROM_LOAD( "pr54",         0x0000, 0x0800, CRC(9640bd6e) SHA1(dd12952a6591f2056ac1b5688dca0a3a2ef69f2d) )         /* color/priority prom */
+	ROM_REGION( 0x0800, REGION_USER1, 0 )
+	ROM_LOAD( "epr-217",      0x0000, 0x0800, CRC(38259f5f) SHA1(1f4182ffc2d78fca22711526bb2ae2cfe040173c) )      /* LED fire beam data      */
 ROM_END
 
 

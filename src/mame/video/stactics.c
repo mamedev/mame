@@ -71,81 +71,65 @@ int stactics_shot_standby;
 int stactics_shot_arrive;
 
 /* These are needed by driver/stactics.c   */
-UINT8 *stactics_scroll_ram;
 UINT8 *stactics_videoram_b;
-UINT8 *stactics_chardata_b;
 UINT8 *stactics_videoram_d;
-UINT8 *stactics_chardata_d;
 UINT8 *stactics_videoram_e;
-UINT8 *stactics_chardata_e;
 UINT8 *stactics_videoram_f;
-UINT8 *stactics_chardata_f;
+UINT8 *stactics_palette;
 UINT8 *stactics_display_buffer;
 
-static UINT8 *dirty_videoram_b;
-static UINT8 *dirty_chardata_b;
-static UINT8 *dirty_videoram_d;
-static UINT8 *dirty_chardata_d;
-static UINT8 *dirty_videoram_e;
-static UINT8 *dirty_chardata_e;
-static UINT8 *dirty_videoram_f;
-static UINT8 *dirty_chardata_f;
+static UINT8 y_scroll_d;
+static UINT8 y_scroll_e;
+static UINT8 y_scroll_f;
 
-static int d_offset;
-static int e_offset;
-static int f_offset;
-
-static int palette_select;
-
-static mame_bitmap *tmpbitmap2;
-static mame_bitmap *bitmap_B;
-static mame_bitmap *bitmap_D;
-static mame_bitmap *bitmap_E;
-static mame_bitmap *bitmap_F;
-
-static UINT8 *beamdata;
 static int states_per_frame;
 
-#define DIRTY_CHARDATA_SIZE  0x100
-#define BEAMDATA_SIZE        0x800
+
+/* these come via observation of the color PROM */
+#define GREEN_PEN	(0x12)
+#define RED_PEN		(0x16)
+#define YELLOW_PEN	(0x1a)
+
+
 
 /* The first 16 came from the 7448 BCD to 7-segment decoder data sheet */
 /* The rest are made up */
 
-static const UINT8 stactics_special_chars[32*8] = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
-    0x80, 0x80, 0x80, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
-    0xf0, 0x80, 0x80, 0xf0, 0x00, 0x00, 0xf0, 0x00,   /* extras... */
-    0x90, 0x90, 0x90, 0xf0, 0x00, 0x00, 0x00, 0x00,   /* extras... */
-    0x00, 0x00, 0x00, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* extras... */
-    0x00, 0x00, 0x00, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
-    0xf0, 0x90, 0x90, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 9 */
-    0xf0, 0x90, 0x90, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 8 */
-    0xf0, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 7 */
-    0xf0, 0x80, 0x80, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 6 */
-    0xf0, 0x80, 0x80, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 5 */
-    0x90, 0x90, 0x90, 0xf0, 0x10, 0x10, 0x10, 0x00,   /* 4 */
-    0xf0, 0x10, 0x10, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 3 */
-    0xf0, 0x10, 0x10, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* 2 */
-    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 1 */
-    0xf0, 0x90, 0x90, 0x90, 0x90, 0x90, 0xf0, 0x00,   /* 0 */
+static const UINT8 char_gfx[32*8] =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
+	0x80, 0x80, 0x80, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
+	0xf0, 0x80, 0x80, 0xf0, 0x00, 0x00, 0xf0, 0x00,   /* extras... */
+	0x90, 0x90, 0x90, 0xf0, 0x00, 0x00, 0x00, 0x00,   /* extras... */
+	0x00, 0x00, 0x00, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* extras... */
+	0x00, 0x00, 0x00, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
+	0xf0, 0x90, 0x90, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 9 */
+	0xf0, 0x90, 0x90, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 8 */
+	0xf0, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 7 */
+	0xf0, 0x80, 0x80, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 6 */
+	0xf0, 0x80, 0x80, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 5 */
+	0x90, 0x90, 0x90, 0xf0, 0x10, 0x10, 0x10, 0x00,   /* 4 */
+	0xf0, 0x10, 0x10, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 3 */
+	0xf0, 0x10, 0x10, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* 2 */
+	0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 1 */
+	0xf0, 0x90, 0x90, 0x90, 0x90, 0x90, 0xf0, 0x00,   /* 0 */
 
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
-    0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 1 pip */
-    0x60, 0x90, 0x80, 0x60, 0x10, 0x90, 0x60, 0x00,   /* S for Score */
-    0x80, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 2 pips */
-    0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00,   /* 3 pips */
-    0x60, 0x90, 0x80, 0x80, 0x80, 0x90, 0x60, 0x00,   /* C for Credits */
-    0xe0, 0x90, 0x90, 0xe0, 0x90, 0x90, 0xe0, 0x00,   /* B for Barriers */
-    0xe0, 0x90, 0x90, 0xe0, 0xc0, 0xa0, 0x90, 0x00,   /* R for Rounds */
-    0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00,   /* 4 pips */
-    0x00, 0x60, 0x60, 0x00, 0x60, 0x60, 0x00, 0x00,   /* Colon */
-    0x40, 0xe0, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Sight */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00    /* Space */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
+	0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 1 pip */
+	0x60, 0x90, 0x80, 0x60, 0x10, 0x90, 0x60, 0x00,   /* S for Score */
+	0x80, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 2 pips */
+	0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00,   /* 3 pips */
+	0x60, 0x90, 0x80, 0x80, 0x80, 0x90, 0x60, 0x00,   /* C for Credits */
+	0xe0, 0x90, 0x90, 0xe0, 0x90, 0x90, 0xe0, 0x00,   /* B for Barriers */
+	0xe0, 0x90, 0x90, 0xe0, 0xc0, 0xa0, 0x90, 0x00,   /* R for Rounds */
+	0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00,   /* 4 pips */
+	0x00, 0x40, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00,   /* Colon */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00    /* Space */
 };
 
 
@@ -154,64 +138,26 @@ static int old_firebeam_state;
 
 PALETTE_INIT( stactics )
 {
-    int i,j;
+	int i;
 
-    for (i=0;i<16;i++)
-    {
-        int bit0,bit1,bit2, bit3,r,g,b;
+	for (i = 0; i < 0x400; i++)
+	{
+		int bit0 = (color_prom[i] >> 0) & 0x01;
+		int bit1 = (color_prom[i] >> 1) & 0x01;
+		int bit2 = (color_prom[i] >> 2) & 0x01;
+		int bit3 = (color_prom[i] >> 3) & 0x01;
 
-        bit0 = i & 1;
-        bit1 = (i >> 1) & 1;
-        bit2 = (i >> 2) & 1;
-        bit3 = (i >> 3) & 1;
+		/* red component */
+		int r = 0xff * bit0;
 
-        /* red component */
-        r = 0xff * bit0;
+		/* green component */
+		int g = 0xff * bit1 - 0xcc * bit3;
 
-        /* green component */
-        g = 0xff * bit1 - 0xcc * bit3;
+		/* blue component */
+		int b = 0xff * bit2;
 
-        /* blue component */
-        b = 0xff * bit2;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-    }
-
-    /* The color prom in Space Tactics is used for both   */
-    /* color codes, and priority layering of the 4 layers */
-
-    /* Since we are taking care of the layering by our    */
-    /* drawing order, we don't need all of the color prom */
-    /* entries */
-
-    /* For each of 4 color schemes */
-    for(i=0;i<4;i++)
-    {
-        /* For page B - Alphanumerics and alien shots */
-        for(j=0;j<16;j++)
-        {
-            *(colortable++) = 0;
-            *(colortable++) = color_prom[i*0x100+0x01*0x10+j];
-        }
-        /* For page F - Close Aliens (these are all the same color) */
-        for(j=0;j<16;j++)
-        {
-            *(colortable++) = 0;
-            *(colortable++) = color_prom[i*0x100+0x02*0x10];
-        }
-        /* For page E - Medium Aliens (these are all the same color) */
-        for(j=0;j<16;j++)
-        {
-            *(colortable++) = 0;
-            *(colortable++) = color_prom[i*0x100+0x04*0x10+j];
-        }
-        /* For page D - Far Aliens (these are all the same color) */
-        for(j=0;j<16;j++)
-        {
-            *(colortable++) = 0;
-            *(colortable++) = color_prom[i*0x100+0x08*0x10+j];
-        }
-    }
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
 }
 
 /***************************************************************************
@@ -222,646 +168,313 @@ PALETTE_INIT( stactics )
 
 VIDEO_START( stactics )
 {
-    int i,j;
-    const UINT8 *firebeam_data;
-    UINT8 firechar[256*8*9];
+	y_scroll_d = 0;
+	y_scroll_e = 0;
+	y_scroll_f = 0;
 
-    tmpbitmap  = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-    tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-    bitmap_B = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-    bitmap_D = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-    bitmap_E = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-    bitmap_F = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	stactics_vblank_count = 0;
+	stactics_shot_standby = 1;
+	stactics_shot_arrive = 0;
+	firebeam_state = 0;
+	old_firebeam_state = 0;
 
-	/* Allocate dirty buffers */
-	dirty_videoram_b = auto_malloc(videoram_size);
-	dirty_videoram_d = auto_malloc(videoram_size);
-	dirty_videoram_e = auto_malloc(videoram_size);
-	dirty_videoram_f = auto_malloc(videoram_size);
-	dirty_chardata_b = auto_malloc(DIRTY_CHARDATA_SIZE);
-	dirty_chardata_d = auto_malloc(DIRTY_CHARDATA_SIZE);
-	dirty_chardata_e = auto_malloc(DIRTY_CHARDATA_SIZE);
-	dirty_chardata_f = auto_malloc(DIRTY_CHARDATA_SIZE);
-
-    memset(dirty_videoram_b,1,videoram_size);
-    memset(dirty_videoram_d,1,videoram_size);
-    memset(dirty_videoram_e,1,videoram_size);
-    memset(dirty_videoram_f,1,videoram_size);
-    memset(dirty_chardata_b,1,DIRTY_CHARDATA_SIZE);
-    memset(dirty_chardata_d,1,DIRTY_CHARDATA_SIZE);
-    memset(dirty_chardata_e,1,DIRTY_CHARDATA_SIZE);
-    memset(dirty_chardata_f,1,DIRTY_CHARDATA_SIZE);
-
-    d_offset = 0;
-    e_offset = 0;
-    f_offset = 0;
-
-    palette_select = 0;
-    stactics_vblank_count = 0;
-    stactics_shot_standby = 1;
-    stactics_shot_arrive = 0;
-    firebeam_state = 0;
-    old_firebeam_state = 0;
-
-    /* Create a fake character set for LED fire beam */
-
-    memset(firechar,0,sizeof(firechar));
-    for(i=0;i<256;i++)
-    {
-        for(j=0;j<8;j++)
-        {
-            if ((i>>j)&0x01)
-            {
-                firechar[i*9+(7-j)]   |= (0x01<<(7-j));
-                firechar[i*9+(7-j)+1] |= (0x01<<(7-j));
-            }
-        }
-    }
-
-    for(i=0;i<256;i++)
-    {
-        decodechar(machine->gfx[4],
-                   i,
-                   firechar);
-    }
-
-    /* Decode the Fire Beam ROM for later      */
-    /* (I am basically just juggling the bytes */
-    /* and storing it again to make it easier) */
-
-	beamdata = auto_malloc(BEAMDATA_SIZE);
-
-    firebeam_data = memory_region(REGION_GFX1);
-
-    for(i=0;i<256;i++)
-    {
-        beamdata[i*8]   = firebeam_data[i                   ];
-        beamdata[i*8+1] = firebeam_data[i + 1024            ];
-        beamdata[i*8+2] = firebeam_data[i              + 256];
-        beamdata[i*8+3] = firebeam_data[i + 1024       + 256];
-        beamdata[i*8+4] = firebeam_data[i        + 512      ];
-        beamdata[i*8+5] = firebeam_data[i + 1024 + 512      ];
-        beamdata[i*8+6] = firebeam_data[i        + 512 + 256];
-        beamdata[i*8+7] = firebeam_data[i + 1024 + 512 + 256];
-    }
-
-    /* Build some characters for simulating the LED displays */
-
-    for(i=0;i<32;i++)
-    {
-        decodechar(machine->gfx[5],
-                   i,
-                   stactics_special_chars);
-    }
-
-    stactics_vblank_count = 0;
-    stactics_vert_pos = 0;
-    stactics_horiz_pos = 0;
-    *stactics_motor_on = 0;
-}
-
-
-WRITE8_HANDLER( stactics_palette_w )
-{
-    int old_palette_select = palette_select;
-
-    switch (offset)
-    {
-        case 0:
-            palette_select = (palette_select & 0x02) | (data&0x01);
-            break;
-        case 1:
-            palette_select = (palette_select & 0x01) | ((data&0x01)<<1);
-            break;
-        default:
-            return;
-    }
-
-    if (old_palette_select != palette_select)
-    {
-        memset(dirty_videoram_b,1,videoram_size);
-        memset(dirty_videoram_d,1,videoram_size);
-        memset(dirty_videoram_e,1,videoram_size);
-        memset(dirty_videoram_f,1,videoram_size);
-    }
-    return;
+	stactics_vblank_count = 0;
+	stactics_vert_pos = 0;
+	stactics_horiz_pos = 0;
+	*stactics_motor_on = 0;
 }
 
 
 WRITE8_HANDLER( stactics_scroll_ram_w )
 {
-    int temp;
+	switch ((offset & 0x700) >> 8)
+	{
+		case 4:  // Page D
+			if (data&0x01)
+				y_scroll_d = offset&0xff;
+			break;
 
-    if (stactics_scroll_ram[offset] != data)
-    {
-        stactics_scroll_ram[offset] = data;
-        temp = (offset&0x700)>>8;
-        switch(temp)
-        {
-            case 4:  // Page D
-            {
-                if (data&0x01)
-                    d_offset = offset&0xff;
-                break;
-            }
-            case 5:  // Page E
-            {
-                if (data&0x01)
-                    e_offset = offset&0xff;
-                break;
-            }
-            case 6:  // Page F
-            {
-                if (data&0x01)
-                    f_offset = offset&0xff;
-                break;
-            }
-        }
+		case 5:  // Page E
+			if (data&0x01)
+				y_scroll_e = offset&0xff;
+			break;
+
+		case 6:  // Page F
+			if (data&0x01)
+				y_scroll_f = offset&0xff;
+			break;
     }
 }
 
 WRITE8_HANDLER( stactics_speed_latch_w )
 {
-    /* This writes to a shift register which is clocked by   */
-    /* a 555 oscillator.  This value determines the speed of */
-    /* the LED fire beams as follows:                        */
+	/* This writes to a shift register which is clocked by   */
+	/* a 555 oscillator.  This value determines the speed of */
+	/* the LED fire beams as follows:                        */
 
-    /*   555_freq / bits_in_SR * edges_in_SR / states_in_PR67 / frame_rate */
-    /*      = num_led_states_per_frame  */
-    /*   36439 / 8 * x / 32 / 60 ~= 19/8*x */
+	/*   555_freq / bits_in_SR * edges_in_SR / states_in_PR67 / frame_rate */
+	/*      = num_led_states_per_frame  */
+	/*   36439 / 8 * x / 32 / 60 ~= 19/8*x */
 
-    /* Here, we will count the number of rising edges in the shift register */
+	/* Here, we will count the number of rising edges in the shift register */
 
-    int i;
-    int num_rising_edges = 0;
+	int i;
+	int num_rising_edges = 0;
 
-    for(i=0;i<8;i++)
-    {
-        if ( (((data>>i)&0x01) == 1) && (((data>>((i+1)%8))&0x01) == 0))
-            num_rising_edges++;
-    }
+	for(i=0;i<8;i++)
+	{
+		if ( (((data>>i)&0x01) == 1) && (((data>>((i+1)%8))&0x01) == 0))
+			num_rising_edges++;
+	}
 
-    states_per_frame = num_rising_edges*19/8;
+	states_per_frame = num_rising_edges*19/8;
 }
 
 WRITE8_HANDLER( stactics_shot_trigger_w )
 {
-    stactics_shot_standby = 0;
+	stactics_shot_standby = 0;
 }
 
 WRITE8_HANDLER( stactics_shot_flag_clear_w )
 {
-    stactics_shot_arrive = 0;
+	stactics_shot_arrive = 0;
 }
 
-WRITE8_HANDLER( stactics_videoram_b_w )
+
+
+INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 {
-    if (stactics_videoram_b[offset] != data)
-    {
-        stactics_videoram_b[offset] = data;
-        dirty_videoram_b[offset] = 1;
-    }
+	UINT8 code;
+	UINT8 gfx;
+
+	/* compute effective row */
+	y = y - y_scroll;
+
+	/* get the character code at the given pixel */
+	code = videoram[((y >> 3) << 5) | (x >> 3)];
+
+	/* get the gfx byte */
+	gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
+
+	/* return the appropriate pixel within the byte */
+	return (gfx >> (7 - (x & 0x07))) & 0x01;
 }
 
-WRITE8_HANDLER( stactics_chardata_b_w )
+
+static void update_beam(void)
 {
-    if (stactics_chardata_b[offset] != data)
-    {
-        stactics_chardata_b[offset] = data;
-        dirty_chardata_b[offset>>3] = 1;
-    }
+	/* An LED fire beam! */
+	/* (There were 120 green LEDS mounted in the cabinet in the game, */
+	/*  and one red one, for the sight)                               */
+
+	/* First, update the firebeam state */
+
+	old_firebeam_state = firebeam_state;
+	if (stactics_shot_standby == 0)
+		firebeam_state = firebeam_state + states_per_frame;
+
+	/* These are thresholds for the two shots from the LED fire ROM */
+	/* (Note: There are two more for sound triggers, */
+	/*        whenever that gets implemented)        */
+
+	if ((old_firebeam_state < 0x8b) & (firebeam_state >= 0x8b))
+		stactics_shot_arrive = 1;
+
+	if ((old_firebeam_state < 0xca) & (firebeam_state >= 0xca))
+		stactics_shot_arrive = 1;
+
+	if (firebeam_state >= 0x100)
+	{
+		firebeam_state = 0;
+		stactics_shot_standby = 1;
+	}
 }
 
-WRITE8_HANDLER( stactics_videoram_d_w )
+
+static VIDEO_UPDATE( draw_background )
 {
-    if (stactics_videoram_d[offset] != data)
-    {
-        stactics_videoram_d[offset] = data;
-        dirty_videoram_d[offset] = 1;
-    }
+	int y;
+
+	/* for every row */
+	for (y = 0; y < 0x100; y++)
+	{
+		int x;
+
+		/* for every pixel on the row */
+		for (x = 0; x < 0x100; x++)
+		{
+			/* get the pixels for the four planes */
+			int pixel_b = get_pixel_on_plane(stactics_videoram_b, y, x, 0);
+			int pixel_d = get_pixel_on_plane(stactics_videoram_d, y, x, y_scroll_d);
+			int pixel_e = get_pixel_on_plane(stactics_videoram_e, y, x, y_scroll_e);
+			int pixel_f = get_pixel_on_plane(stactics_videoram_f, y, x, y_scroll_f);
+
+			/* get the color for this pixel */
+			UINT8 color = stactics_videoram_b[((y >> 3) << 5) | (x >> 3)] >> 4;
+
+			/* assemble the pen index */
+			int pen = color |
+					  (pixel_b << 4) |
+					  (pixel_f << 5) |
+					  (pixel_e << 6) |
+					  (pixel_d << 7) |
+					  ((stactics_palette[0] & 0x01) << 8) |
+					  ((stactics_palette[1] & 0x01) << 9);
+
+			/* compute the effective pixel coordinate after adjusting for the
+               mirror and the monitor movement */
+			int sy = y + stactics_vert_pos;
+			int sx = (0xff - x) + stactics_horiz_pos;
+
+			/* plot if visible */
+			if ((sy >= 0) && (sy < 0xf0) && (sx >= 0) && (sx < 0x100))
+				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[pen];
+		}
+	}
+
+	return 0;
 }
 
-WRITE8_HANDLER( stactics_chardata_d_w )
+
+static void draw_character(mame_bitmap *bitmap, const rectangle *cliprect, int code, int x, pen_t pen)
 {
-    if (stactics_chardata_d[offset] != data)
-    {
-        stactics_chardata_d[offset] = data;
-        dirty_chardata_d[offset>>3] = 1;
-    }
+	int y;
+
+	for (y = 0; y < 8; y++)
+	{
+		int i;
+		UINT8 gfx_data = char_gfx[(code << 3) | (y & 0x07)];
+
+		for (i = 0; i < 6; i++)
+			if ((gfx_data << i) & 0x80)
+				*BITMAP_ADDR16(bitmap, y + 248, x + i) = pen;
+	}
 }
 
-WRITE8_HANDLER( stactics_videoram_e_w )
+
+static VIDEO_UPDATE( draw_characters )
 {
-    if (stactics_videoram_e[offset] != data)
-    {
-        stactics_videoram_e[offset] = data;
-        dirty_videoram_e[offset] = 1;
-    }
+	int i;
+
+	/* score display */
+	draw_character(bitmap, cliprect, 0x12, 16, machine->pens[YELLOW_PEN]);	/* S */
+	draw_character(bitmap, cliprect, 0x19, 22, machine->pens[YELLOW_PEN]);	/* : */
+
+	for (i = 0x01; i < 0x07; i++)
+	{
+		int code = stactics_display_buffer[i] & 0x0f;
+		draw_character(bitmap, cliprect, code, 28 + ((i - 0x01) * 6), machine->pens[RED_PEN]);
+	}
+
+
+	/* credits indicator */
+	draw_character(bitmap, cliprect, 0x15, 80, machine->pens[YELLOW_PEN]);	/* C */
+	draw_character(bitmap, cliprect, 0x19, 86, machine->pens[YELLOW_PEN]);	/* : */
+
+	for (i = 0x07; i < 0x09; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 92 + ((i - 0x07) * 2), machine->pens[RED_PEN]);
+	}
+
+
+	/* rounds indicator */
+	draw_character(bitmap, cliprect, 0x16, 144, machine->pens[YELLOW_PEN]);	/* R */
+	draw_character(bitmap, cliprect, 0x19, 150, machine->pens[YELLOW_PEN]);	/* : */
+
+	for (i = 0x09; i < 0x0c; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 156 + ((i - 0x09) * 2), machine->pens[RED_PEN]);
+	}
+
+
+	/* barriers indicator */
+	draw_character(bitmap, cliprect, 0x17, 208, machine->pens[YELLOW_PEN]);	/* B */
+	draw_character(bitmap, cliprect, 0x19, 214, machine->pens[YELLOW_PEN]);	/* : */
+
+	for (i = 0x0c; i < 0x10; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 220 + ((i - 0x0c) * 2), machine->pens[RED_PEN]);
+	}
+
+	return 0;
 }
 
-WRITE8_HANDLER( stactics_chardata_e_w )
+
+
+static VIDEO_UPDATE( draw_leds )
 {
-    if (stactics_chardata_e[offset] != data)
-    {
-        stactics_chardata_e[offset] = data;
-        dirty_chardata_e[offset>>3] = 1;
-    }
+	int i;
+	UINT8 *beam_region = memory_region(REGION_USER1);
+
+	int x = 18;
+	int y = 170;
+
+	pen_t pen = machine->pens[GREEN_PEN];
+
+	/* for each LED */
+	for (i = 0; i < 0x40; i++)
+	{
+		offs_t beam_data_offs;
+		UINT8 beam_data;
+
+		/* skip one every so often -- there are only 60 LEDs */
+		if ((i & 0x0f) == 0x0f)  continue;
+
+		beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | firebeam_state;
+		beam_data = beam_region[beam_data_offs];
+
+		/* if the LED is on, draw */
+		if ((beam_data >> (i & 0x07)) & 0x01)
+		{
+			*BITMAP_ADDR16(bitmap, y,     x    ) = pen;
+			*BITMAP_ADDR16(bitmap, y,     x + 1) = pen;
+			*BITMAP_ADDR16(bitmap, y + 1, x    ) = pen;
+			*BITMAP_ADDR16(bitmap, y + 1, x + 1) = pen;
+
+			*BITMAP_ADDR16(bitmap, y,     270 - x) = pen;
+			*BITMAP_ADDR16(bitmap, y,     269 - x) = pen;
+			*BITMAP_ADDR16(bitmap, y + 1, 270 - x) = pen;
+			*BITMAP_ADDR16(bitmap, y + 1, 269 - x) = pen;
+		}
+
+		x = x + 2;
+		y = y - 1;
+	}
+
+	/* draw the sight LED, if on */
+	if (*stactics_motor_on & 0x01)
+	{
+		x = 134;
+		y = 112;
+
+		pen = machine->pens[RED_PEN];
+
+		*BITMAP_ADDR16(bitmap, y,     x + 1) = pen;
+		*BITMAP_ADDR16(bitmap, y + 1, x    ) = pen;
+		*BITMAP_ADDR16(bitmap, y + 1, x + 1) = pen;
+		*BITMAP_ADDR16(bitmap, y + 1, x + 2) = pen;
+		*BITMAP_ADDR16(bitmap, y + 2, x + 1) = pen;
+	}
+
+	return 0;
 }
 
-WRITE8_HANDLER( stactics_videoram_f_w )
-{
-    if (stactics_videoram_f[offset] != data)
-    {
-        stactics_videoram_f[offset] = data;
-        dirty_videoram_f[offset] = 1;
-    }
-}
-
-WRITE8_HANDLER( stactics_chardata_f_w )
-{
-    if (stactics_chardata_f[offset] != data)
-    {
-        stactics_chardata_f[offset] = data;
-        dirty_chardata_f[offset>>3] = 1;
-    }
-}
-
-/* Actual area for visible monitor stuff is only 30*8 lines */
-/* The rest is used for the score, etc. */
-
-static const rectangle visible_screen_area = {0*8, 32*8, 0*8, 30*8};
 
 VIDEO_UPDATE( stactics )
 {
-    int offs, sx, sy, i;
-    int char_number;
-    int color_code;
-    int pixel_x, pixel_y;
+	update_beam();
 
-    int palette_offset = palette_select * 64;
+	/* update vblank counter */
+	stactics_vblank_count++;
 
-    for(offs=0x400-1; offs>=0; offs--)
-    {
-        sx = offs%32;
-        sy = offs/32;
+	fillbitmap(bitmap, machine->pens[0], cliprect);
 
-        color_code = palette_offset + (stactics_videoram_b[offs]>>4);
-
-        /* Draw aliens in Page D */
-
-        char_number = stactics_videoram_d[offs];
-
-        if (dirty_chardata_d[char_number] == 1)
-        {
-            decodechar(machine->gfx[3],
-                       char_number,
-                       stactics_chardata_d);
-            dirty_chardata_d[char_number] = 2;
-            dirty_videoram_d[offs] = 1;
-        }
-        else if (dirty_chardata_d[char_number] == 2)
-        {
-            dirty_videoram_d[offs] = 1;
-        }
-
-        if (dirty_videoram_d[offs])
-        {
-            drawgfx(bitmap_D,machine->gfx[3],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    cliprect,TRANSPARENCY_NONE,0);
-            dirty_videoram_d[offs] = 0;
-        }
-
-        /* Draw aliens in Page E */
-
-        char_number = stactics_videoram_e[offs];
-
-        if (dirty_chardata_e[char_number] == 1)
-        {
-            decodechar(machine->gfx[2],
-                       char_number,
-                       stactics_chardata_e);
-            dirty_chardata_e[char_number] = 2;
-            dirty_videoram_e[offs] = 1;
-        }
-        else if (dirty_chardata_e[char_number] == 2)
-        {
-            dirty_videoram_e[offs] = 1;
-        }
-
-        if (dirty_videoram_e[offs])
-        {
-            drawgfx(bitmap_E,machine->gfx[2],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    cliprect,TRANSPARENCY_NONE,0);
-            dirty_videoram_e[offs] = 0;
-        }
-
-        /* Draw aliens in Page F */
-
-        char_number = stactics_videoram_f[offs];
-
-        if (dirty_chardata_f[char_number] == 1)
-        {
-            decodechar(machine->gfx[1],
-                       char_number,
-                       stactics_chardata_f);
-            dirty_chardata_f[char_number] = 2;
-            dirty_videoram_f[offs] = 1;
-        }
-        else if (dirty_chardata_f[char_number] == 2)
-        {
-            dirty_videoram_f[offs] = 1;
-        }
-
-        if (dirty_videoram_f[offs])
-        {
-            drawgfx(bitmap_F,machine->gfx[1],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    cliprect,TRANSPARENCY_NONE,0);
-            dirty_videoram_f[offs] = 0;
-        }
-
-        /* Draw the page B stuff */
-
-        char_number = stactics_videoram_b[offs];
-
-        if (dirty_chardata_b[char_number] == 1)
-        {
-            decodechar(machine->gfx[0],
-                       char_number,
-                       stactics_chardata_b);
-            dirty_chardata_b[char_number] = 2;
-            dirty_videoram_b[offs] = 1;
-        }
-        else if (dirty_chardata_b[char_number] == 2)
-        {
-            dirty_videoram_b[offs] = 1;
-        }
-
-        if (dirty_videoram_b[offs])
-        {
-            drawgfx(bitmap_B,machine->gfx[0],
-                    char_number,
-                    color_code,
-                    0,0,
-                    sx*8,sy*8,
-                    cliprect,TRANSPARENCY_NONE,0);
-            dirty_videoram_b[offs] = 0;
-        }
-
-    }
-
-    /* Now, composite the four layers together */
-
-    copyscrollbitmap      (tmpbitmap2,bitmap_D,0,0,1,&d_offset,NULL);
-    copyscrollbitmap_trans(tmpbitmap2,bitmap_E,0,0,1,&e_offset,NULL,machine->pens[0]);
-    copyscrollbitmap_trans(tmpbitmap2,bitmap_F,0,0,1,&f_offset,NULL,machine->pens[0]);
-    copybitmap_trans      (tmpbitmap2,bitmap_B,0,0,0,0,NULL,machine->pens[0]);
-
-    /* Now flip X & simulate the monitor motion */
-    fillbitmap(bitmap, machine->pens[0], cliprect);
-    copybitmap(bitmap,tmpbitmap2,1,0,stactics_horiz_pos,stactics_vert_pos,&visible_screen_area);
-
-    /* Finally, draw stuff that is on the console or on top of the monitor (LED's) */
-
-    /***** Draw Score Display *****/
-
-    pixel_x = 16;
-    pixel_y = 248;
-
-    /* Draw an S */
-    drawgfx(bitmap,machine->gfx[5],
-            18,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw a colon */
-    drawgfx(bitmap,machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw the digits */
-    for(i=1;i<7;i++)
-    {
-        drawgfx(bitmap,machine->gfx[5],
-                stactics_display_buffer[i]&0x0f,
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                cliprect,TRANSPARENCY_NONE,0);
-        pixel_x+=6;
-    }
-
-    /***** Draw Credits Indicator *****/
-
-    pixel_x = 64+16;
-
-    /* Draw a C */
-    drawgfx(bitmap,machine->gfx[5],
-            21,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw a colon */
-    drawgfx(bitmap,machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw the pips */
-    for(i=7;i<9;i++)
-    {
-        drawgfx(bitmap,machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                cliprect,TRANSPARENCY_NONE,0);
-        pixel_x+=2;
-    }
-
-    /***** Draw Rounds Indicator *****/
-
-    pixel_x = 128+16;
-
-    /* Draw an R */
-    drawgfx(bitmap,machine->gfx[5],
-            22,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw a colon */
-    drawgfx(bitmap,machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw the pips */
-    for(i=9;i<12;i++)
-    {
-        drawgfx(bitmap,machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                cliprect,TRANSPARENCY_NONE,0);
-        pixel_x+=2;
-    }
-
-    /***** Draw Barriers Indicator *****/
-
-    pixel_x = 192+16;
-    /* Draw a B */
-    drawgfx(bitmap,machine->gfx[5],
-            23,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw a colon */
-    drawgfx(bitmap,machine->gfx[5],
-            25,
-            0,
-            0,0,
-            pixel_x,pixel_y,
-            cliprect,TRANSPARENCY_NONE,0);
-    pixel_x+=6;
-    /* Draw the pips */
-    for(i=12;i<16;i++)
-    {
-        drawgfx(bitmap,machine->gfx[5],
-                16 + (~stactics_display_buffer[i]&0x0f),
-                16,
-                0,0,
-                pixel_x,pixel_y,
-                cliprect,TRANSPARENCY_NONE,0);
-        pixel_x+=2;
-    }
-
-    /* An LED fire beam! */
-    /* (There were 120 green LEDS mounted in the cabinet in the game, */
-    /*  and one red one, for the sight)                               */
-
-    /* First, update the firebeam state */
-
-    old_firebeam_state = firebeam_state;
-    if (stactics_shot_standby == 0)
-    {
-        firebeam_state = (firebeam_state + states_per_frame)%512;
-    }
-
-    /* These are thresholds for the two shots from the LED fire ROM */
-    /* (Note: There are two more for sound triggers, */
-    /*        whenever that gets implemented)        */
-
-    if ((old_firebeam_state < 0x8b) & (firebeam_state >= 0x8b))
-        stactics_shot_arrive = 1;
-
-    if ((old_firebeam_state < 0xca) & (firebeam_state >= 0xca))
-        stactics_shot_arrive = 1;
-
-    if (firebeam_state > 255)
-    {
-        firebeam_state = 0;
-        stactics_shot_standby = 1;
-    }
-
-    /* Now, draw the beam */
-
-    pixel_x = 15;
-    pixel_y = 166;
-
-    for(i=0;i<8;i++)
-    {
-        if ((i%2)==1)
-        {
-            /* Draw 7 LEDS on each side */
-            drawgfx(bitmap,machine->gfx[4],
-                    beamdata[firebeam_state*8+i]&0x7f,
-                    16*2,  /* Make it green */
-                    0,0,
-                    pixel_x,pixel_y,
-                    cliprect,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,machine->gfx[4],
-                    beamdata[firebeam_state*8+i]&0x7f,
-                    16*2,  /* Make it green */
-                    1,0,
-                    255-pixel_x,pixel_y,
-                    cliprect,TRANSPARENCY_COLOR,0);
-            pixel_x+=14;
-            pixel_y-=7;
-        }
-        else
-        {
-            /* Draw 8 LEDS on each side */
-            drawgfx(bitmap,machine->gfx[4],
-                    beamdata[firebeam_state*8+i],
-                    16*2,  /* Make it green */
-                    0,0,
-                    pixel_x,pixel_y,
-                    cliprect,TRANSPARENCY_COLOR,0);
-            drawgfx(bitmap,machine->gfx[4],
-                    beamdata[firebeam_state*8+i],
-                    16*2,  /* Make it green */
-                    1,0,
-                    255-pixel_x,pixel_y,
-                    cliprect,TRANSPARENCY_COLOR,0);
-            pixel_x+=16;
-            pixel_y-=8;
-        }
-
-    }
-
-    /* Red Sight LED */
-
-    pixel_x = 134;
-    pixel_y = 112;
-
-    if (*stactics_motor_on & 0x01)
-    {
-        drawgfx(bitmap,machine->gfx[5],
-                26,
-                16, /* red */
-                0,0,
-                pixel_x,pixel_y,
-                cliprect,TRANSPARENCY_COLOR,0);
-    }
-
-    /* Update vblank counter */
-    stactics_vblank_count++;
-
-    /* reset dirty flags */
-    for(i=0;i<0xff;i++)
-    {
-        dirty_chardata_b[i] &= 0x01;
-        dirty_chardata_d[i] &= 0x01;
-        dirty_chardata_e[i] &= 0x01;
-        dirty_chardata_f[i] &= 0x01;
-    }
+	VIDEO_UPDATE_CALL(draw_background);
+	VIDEO_UPDATE_CALL(draw_leds);
+	VIDEO_UPDATE_CALL(draw_characters);
 
 	return 0;
 }
