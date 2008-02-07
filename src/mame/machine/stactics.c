@@ -48,7 +48,7 @@ READ8_HANDLER( stactics_vert_pos_r )
 
 READ8_HANDLER( stactics_horiz_pos_r )
 {
-    return stactics_horiz_pos+0x80;
+    return stactics_horiz_pos+0x88;
 }
 
 INTERRUPT_GEN( stactics_interrupt )

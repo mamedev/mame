@@ -82,13 +82,17 @@ static UINT8 y_scroll_d;
 static UINT8 y_scroll_e;
 static UINT8 y_scroll_f;
 
-static int states_per_frame;
+static UINT16 beam_state;
+static UINT16 old_beam_state;
+static UINT16 beam_states_per_frame;
+
 
 
 /* these come via observation of the color PROM */
-#define GREEN_PEN	(0x12)
-#define RED_PEN		(0x16)
-#define YELLOW_PEN	(0x1a)
+#define BLACK_PEN	(pens[0x00])
+#define GREEN_PEN	(pens[0x12])
+#define RED_PEN		(pens[0x16])
+#define YELLOW_PEN	(pens[0x1a])
 
 
 
@@ -133,9 +137,6 @@ static const UINT8 char_gfx[32*8] =
 };
 
 
-static int firebeam_state;
-static int old_firebeam_state;
-
 PALETTE_INIT( stactics )
 {
 	int i;
@@ -175,8 +176,8 @@ VIDEO_START( stactics )
 	stactics_vblank_count = 0;
 	stactics_shot_standby = 1;
 	stactics_shot_arrive = 0;
-	firebeam_state = 0;
-	old_firebeam_state = 0;
+	beam_state = 0;
+	old_beam_state = 0;
 
 	stactics_vblank_count = 0;
 	stactics_vert_pos = 0;
@@ -227,7 +228,7 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 			num_rising_edges++;
 	}
 
-	states_per_frame = num_rising_edges*19/8;
+	beam_states_per_frame = num_rising_edges*19/8;
 }
 
 WRITE8_HANDLER( stactics_shot_trigger_w )
@@ -238,6 +239,36 @@ WRITE8_HANDLER( stactics_shot_trigger_w )
 WRITE8_HANDLER( stactics_shot_flag_clear_w )
 {
 	stactics_shot_arrive = 0;
+}
+
+
+
+static void update_beam(void)
+{
+	/* An LED fire beam! */
+	/* (There were 120 green LEDS mounted in the cabinet in the game, */
+	/*  and one red one, for the sight)                               */
+
+	/* First, update the firebeam state */
+
+	old_beam_state = beam_state;
+	if (stactics_shot_standby == 0)
+		beam_state = beam_state + beam_states_per_frame;
+
+	/* These are thresholds for the two shots from the LED fire ROM */
+	/* (Note: There are two more for sound triggers, */
+	/*        whenever that gets implemented)        */
+	if ((old_beam_state < 0x8b) & (beam_state >= 0x8b))
+		stactics_shot_arrive = 1;
+
+	if ((old_beam_state < 0xca) & (beam_state >= 0xca))
+		stactics_shot_arrive = 1;
+
+	if (beam_state >= 0x100)
+	{
+		beam_state = 0;
+		stactics_shot_standby = 1;
+	}
 }
 
 
@@ -261,39 +292,11 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void update_beam(void)
-{
-	/* An LED fire beam! */
-	/* (There were 120 green LEDS mounted in the cabinet in the game, */
-	/*  and one red one, for the sight)                               */
-
-	/* First, update the firebeam state */
-
-	old_firebeam_state = firebeam_state;
-	if (stactics_shot_standby == 0)
-		firebeam_state = firebeam_state + states_per_frame;
-
-	/* These are thresholds for the two shots from the LED fire ROM */
-	/* (Note: There are two more for sound triggers, */
-	/*        whenever that gets implemented)        */
-
-	if ((old_firebeam_state < 0x8b) & (firebeam_state >= 0x8b))
-		stactics_shot_arrive = 1;
-
-	if ((old_firebeam_state < 0xca) & (firebeam_state >= 0xca))
-		stactics_shot_arrive = 1;
-
-	if (firebeam_state >= 0x100)
-	{
-		firebeam_state = 0;
-		stactics_shot_standby = 1;
-	}
-}
-
-
-static VIDEO_UPDATE( draw_background )
+static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, const pen_t *pens)
 {
 	int y;
+
+	fillbitmap(bitmap, BLACK_PEN, cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)
@@ -322,17 +325,15 @@ static VIDEO_UPDATE( draw_background )
 					  ((stactics_palette[1] & 0x01) << 9);
 
 			/* compute the effective pixel coordinate after adjusting for the
-               mirror and the monitor movement */
+               mirror movement - this is mechanical on the real machine */
 			int sy = y + stactics_vert_pos;
-			int sx = (0xff - x) + stactics_horiz_pos;
+			int sx = x - stactics_horiz_pos;
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0xf0) && (sx >= 0) && (sx < 0x100))
-				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[pen];
+				*BITMAP_ADDR16(bitmap, sy, sx) = pens[pen];
 		}
 	}
-
-	return 0;
 }
 
 
@@ -347,72 +348,18 @@ static void draw_character(mame_bitmap *bitmap, const rectangle *cliprect, int c
 
 		for (i = 0; i < 6; i++)
 			if ((gfx_data << i) & 0x80)
-				*BITMAP_ADDR16(bitmap, y + 248, x + i) = pen;
+				*BITMAP_ADDR16(bitmap, y + 248, 255 - (x + i)) = pen;
 	}
 }
 
 
-static VIDEO_UPDATE( draw_characters )
-{
-	int i;
-
-	/* score display */
-	draw_character(bitmap, cliprect, 0x12, 16, machine->pens[YELLOW_PEN]);	/* S */
-	draw_character(bitmap, cliprect, 0x19, 22, machine->pens[YELLOW_PEN]);	/* : */
-
-	for (i = 0x01; i < 0x07; i++)
-	{
-		int code = stactics_display_buffer[i] & 0x0f;
-		draw_character(bitmap, cliprect, code, 28 + ((i - 0x01) * 6), machine->pens[RED_PEN]);
-	}
-
-
-	/* credits indicator */
-	draw_character(bitmap, cliprect, 0x15, 80, machine->pens[YELLOW_PEN]);	/* C */
-	draw_character(bitmap, cliprect, 0x19, 86, machine->pens[YELLOW_PEN]);	/* : */
-
-	for (i = 0x07; i < 0x09; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 92 + ((i - 0x07) * 2), machine->pens[RED_PEN]);
-	}
-
-
-	/* rounds indicator */
-	draw_character(bitmap, cliprect, 0x16, 144, machine->pens[YELLOW_PEN]);	/* R */
-	draw_character(bitmap, cliprect, 0x19, 150, machine->pens[YELLOW_PEN]);	/* : */
-
-	for (i = 0x09; i < 0x0c; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 156 + ((i - 0x09) * 2), machine->pens[RED_PEN]);
-	}
-
-
-	/* barriers indicator */
-	draw_character(bitmap, cliprect, 0x17, 208, machine->pens[YELLOW_PEN]);	/* B */
-	draw_character(bitmap, cliprect, 0x19, 214, machine->pens[YELLOW_PEN]);	/* : */
-
-	for (i = 0x0c; i < 0x10; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 220 + ((i - 0x0c) * 2), machine->pens[RED_PEN]);
-	}
-
-	return 0;
-}
-
-
-
-static VIDEO_UPDATE( draw_leds )
+static void update_artwork(mame_bitmap *bitmap, const rectangle *cliprect, const pen_t *pens)
 {
 	int i;
 	UINT8 *beam_region = memory_region(REGION_USER1);
 
-	int x = 18;
+	int x = 11;
 	int y = 170;
-
-	pen_t pen = machine->pens[GREEN_PEN];
 
 	/* for each LED */
 	for (i = 0; i < 0x40; i++)
@@ -420,24 +367,24 @@ static VIDEO_UPDATE( draw_leds )
 		offs_t beam_data_offs;
 		UINT8 beam_data;
 
-		/* skip one every so often -- there are only 60 LEDs */
+		/* every 15th LED is not present on the real machine */
 		if ((i & 0x0f) == 0x0f)  continue;
 
-		beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | firebeam_state;
+		beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | beam_state;
 		beam_data = beam_region[beam_data_offs];
 
 		/* if the LED is on, draw */
 		if ((beam_data >> (i & 0x07)) & 0x01)
 		{
-			*BITMAP_ADDR16(bitmap, y,     x    ) = pen;
-			*BITMAP_ADDR16(bitmap, y,     x + 1) = pen;
-			*BITMAP_ADDR16(bitmap, y + 1, x    ) = pen;
-			*BITMAP_ADDR16(bitmap, y + 1, x + 1) = pen;
+			*BITMAP_ADDR16(bitmap, y,     x    ) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y,     x + 1) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y + 1, x    ) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y + 1, x + 1) = GREEN_PEN;
 
-			*BITMAP_ADDR16(bitmap, y,     270 - x) = pen;
-			*BITMAP_ADDR16(bitmap, y,     269 - x) = pen;
-			*BITMAP_ADDR16(bitmap, y + 1, 270 - x) = pen;
-			*BITMAP_ADDR16(bitmap, y + 1, 269 - x) = pen;
+			*BITMAP_ADDR16(bitmap, y,     256 - x) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y,     255 - x) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y + 1, 256 - x) = GREEN_PEN;
+			*BITMAP_ADDR16(bitmap, y + 1, 255 - x) = GREEN_PEN;
 		}
 
 		x = x + 2;
@@ -447,19 +394,58 @@ static VIDEO_UPDATE( draw_leds )
 	/* draw the sight LED, if on */
 	if (*stactics_motor_on & 0x01)
 	{
-		x = 134;
+		x = 127;
 		y = 112;
 
-		pen = machine->pens[RED_PEN];
-
-		*BITMAP_ADDR16(bitmap, y,     x + 1) = pen;
-		*BITMAP_ADDR16(bitmap, y + 1, x    ) = pen;
-		*BITMAP_ADDR16(bitmap, y + 1, x + 1) = pen;
-		*BITMAP_ADDR16(bitmap, y + 1, x + 2) = pen;
-		*BITMAP_ADDR16(bitmap, y + 2, x + 1) = pen;
+		*BITMAP_ADDR16(bitmap, y,     x + 1) = RED_PEN;
+		*BITMAP_ADDR16(bitmap, y + 1, x    ) = RED_PEN;
+		*BITMAP_ADDR16(bitmap, y + 1, x + 1) = RED_PEN;
+		*BITMAP_ADDR16(bitmap, y + 1, x + 2) = RED_PEN;
+		*BITMAP_ADDR16(bitmap, y + 2, x + 1) = RED_PEN;
 	}
 
-	return 0;
+	/* score display */
+	draw_character(bitmap, cliprect, 0x12, 16, YELLOW_PEN);	/* S */
+	draw_character(bitmap, cliprect, 0x19, 22, YELLOW_PEN);	/* : */
+
+	for (i = 0x01; i < 0x07; i++)
+	{
+		int code = stactics_display_buffer[i] & 0x0f;
+		draw_character(bitmap, cliprect, code, 28 + ((i - 0x01) * 6), RED_PEN);
+	}
+
+
+	/* credits indicator */
+	draw_character(bitmap, cliprect, 0x15, 80, YELLOW_PEN);	/* C */
+	draw_character(bitmap, cliprect, 0x19, 86, YELLOW_PEN);	/* : */
+
+	for (i = 0x07; i < 0x09; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 92 + ((i - 0x07) * 2), RED_PEN);
+	}
+
+
+	/* rounds indicator */
+	draw_character(bitmap, cliprect, 0x16, 144, YELLOW_PEN);	/* R */
+	draw_character(bitmap, cliprect, 0x19, 150, YELLOW_PEN);	/* : */
+
+	for (i = 0x09; i < 0x0c; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 156 + ((i - 0x09) * 2), RED_PEN);
+	}
+
+
+	/* barriers indicator */
+	draw_character(bitmap, cliprect, 0x17, 208, YELLOW_PEN);	/* B */
+	draw_character(bitmap, cliprect, 0x19, 214, YELLOW_PEN);	/* : */
+
+	for (i = 0x0c; i < 0x10; i++)
+	{
+		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
+		draw_character(bitmap, cliprect, code, 220 + ((i - 0x0c) * 2), RED_PEN);
+	}
 }
 
 
@@ -470,11 +456,8 @@ VIDEO_UPDATE( stactics )
 	/* update vblank counter */
 	stactics_vblank_count++;
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
-
-	VIDEO_UPDATE_CALL(draw_background);
-	VIDEO_UPDATE_CALL(draw_leds);
-	VIDEO_UPDATE_CALL(draw_characters);
+	draw_background(bitmap, cliprect, machine->pens);
+	update_artwork(bitmap, cliprect, machine->pens);
 
 	return 0;
 }
