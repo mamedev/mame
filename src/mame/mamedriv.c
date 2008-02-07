@@ -6370,6 +6370,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kirarast )	/* (c) 1996 */
 	DRIVER( tp2m32 )	/* (c) 1997 */
 	DRIVER( bnstars )	/* (c) 1997 */
+	DRIVER( wpksocv2 )  /* (c) 1997 */
 
 	DRIVER( f1superb )	/* (c) 1994 */
 

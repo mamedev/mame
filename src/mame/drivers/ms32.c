@@ -2038,6 +2038,78 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_LOAD( "mr96004-10.22",  0x000000, 0x400000, CRC(83f4303a) SHA1(90ee010591afe1d35744925ef0e8d9a7e2ef3378) )
 ROM_END
 
+/*
+
+World PK Soccer V2
+(c)1996 Jaleco
+
+MegaSystem32 with I/O subboard OZ-93155
+
+ROM board:
+MB-93138A EB91022-20078-1
+
+25 (actual label is "PK SOCCER V2 ROM 25 VER. 1.1") IC36
+27 (actual label is "PK SOCCER V2 ROM 27 VER. 1.1") IC38
+29 (actual label is "PK SOCCER V2 ROM 29 VER. 1.1") IC40
+31 (actual label is "PK SOCCER V2 ROM 31 VER. 1.1") IC42
+32 (actual label is "PK SOCCER V2 ROM 32 VER. 1.1") IC43
+
+MR92042-01.22 (16M mask) IC33
+MR92042-08.23 (16M mask) IC34
+
+ws-21 25 (actual label is "MB93138 Ver1.0 WS-21") IC30
+
+MR95033-01.13 (16M mask) IC20
+MR95033-02.1  (16M mask) IC3
+MR95033-03.14 (16M mask) IC21
+MR95033-04.2  (16M mask) IC4
+MR95033-05.15 (16M mask) IC22
+MR95033-06.3  (16M mask) IC5
+
+MR95033-07.9  (16M mask) IC11
+
+MR95033-09.11 (16M mask) IC13
+
+Daughter board:
+SE-93139 EB91022-30056
+Custom chip: SS92046-01 9338EV 436091 06441
+
+*/
+
+ROM_START( wpksocv2 )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) /* V70 code */
+	ROM_LOAD32_BYTE( "25", 0x000003, 0x80000, CRC(6c22a56c) SHA1(a03cbcfc024b39d2776f9e9897d1da07df6ae2d7) )
+	ROM_LOAD32_BYTE( "27", 0x000002, 0x80000, CRC(50c594a8) SHA1(454a63d7b2a07399a64449205271b797bca1dec1) )
+	ROM_LOAD32_BYTE( "29", 0x000001, 0x80000, CRC(22acd835) SHA1(0fa96a6dfde737d541842f85dc257776044e15b5) )
+	ROM_LOAD32_BYTE( "31", 0x000000, 0x80000, CRC(f25e50f5) SHA1(b58722f11a8b94ef053caf531ac94a959350288a) )
+
+	ROM_REGION( 0xc00000, REGION_GFX1, 0 ) /* sprites, don't dispose since we use GFX_RAW */
+	ROM_LOAD32_WORD( "mr95033-01.13", 0x000000, 0x200000, CRC(1f76ed57) SHA1(af9076b4b4c26b362825d892f46d2c04b4bb9d07) )
+	ROM_LOAD32_WORD( "mr95033-02.1",  0x000002, 0x200000, CRC(5b119910) SHA1(aff44e355227dd159e388ab85a5b6d48644ff421) )
+	ROM_LOAD32_WORD( "mr95033-03.14", 0x400000, 0x200000, CRC(8b6099ed) SHA1(c514cec1491aed00a5714c0b8d17c96e87ba50aa) )
+	ROM_LOAD32_WORD( "mr95033-04.2",  0x400002, 0x200000, CRC(59144dc6) SHA1(0e192001d668791c91ca2af6b367067a5106a4b2) )
+	ROM_LOAD32_WORD( "mr95033-05.15", 0x800000, 0x200000, CRC(cc5b8d0b) SHA1(70a5b9db600fc168d13ad54653cf1c8d2a45d991) )
+	ROM_LOAD32_WORD( "mr95033-06.3",  0x800002, 0x200000, CRC(2f79942f) SHA1(73417d10f37bcd539b8081312226cf142a5a0d3d) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 ) /* roz tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr95033-07.9", 0x000000, 0x200000, CRC(76cd2e0b) SHA1(41aa18dfb4e06547d1f6d7ce49e5225027d16bbb) )
+
+	ROM_REGION( 0x200000, REGION_GFX3, 0 ) /* bg tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "mr95033-09.11", 0x000000, 0x200000, CRC(8a6dae81) SHA1(e235f2865a9a003330bff1e4d0a017e5d10efd2a) )
+
+	ROM_REGION( 0x080000, REGION_GFX4, 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
+	ROM_LOAD( "32", 0x000000, 0x080000, CRC(becc25c2) SHA1(4ae7665cd45ebd9586068e99327145194ba216fc) )
+
+	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* z80 program */
+	ROM_LOAD( "ws-21", 0x000000, 0x040000, CRC(bdeff5d6) SHA1(920a6fc983d53f09510887e4e81ee89ccd5079e6) )
+	ROM_RELOAD(              0x010000, 0x40000 )
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) /* samples */
+	ROM_LOAD( "mr92042-01.22", 0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) )
+	ROM_LOAD( "mr95033-08.23", 0x200000, 0x200000, CRC(89a291fa) SHA1(7746a0490134fc902ce2dc7b0d33b455d792c105) )
+ROM_END
+
+
 /********** DECRYPT **********/
 
 /* 4 known types */
@@ -2282,6 +2354,8 @@ GAME( 1996, gratiaa,  gratia,   ms32, gratia,   ss91022_10, ROT0,   "Jaleco", "G
 GAME( 1996, kirarast, 0,        ms32, kirarast, kirarast,   ROT0,   "Jaleco", "Ryuusei Janshi Kirara Star", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1997, tp2m32,   tetrisp2, ms32, tp2m32,   ss91022_10, ROT0,   "Jaleco", "Tetris Plus 2 (MegaSystem 32 Version)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1997, bnstars,  bnstars1, ms32, 47pie2,   bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1996, wpksocv2, 0,        ms32, ms32,     ss92046_01, ROT0,   "Jaleco", "World PK Soccer V2 (ver 1.1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // custom IO board not emulated
+
 
 /* these boot and show something */
 GAME( 1994, f1superb, 0,        ms32, f1superb, f1superb, ROT0,   "Jaleco", "F1 Super Battle", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
