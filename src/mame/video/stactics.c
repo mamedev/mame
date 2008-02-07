@@ -45,17 +45,6 @@ tilt the mirror up and down, and the monitor left and right.
 
 ---
 
-As if this wasn't enough, there are also "3D" fire beams made
-of 120 green LED's which are on a mechanism in front of the mirror.
-Along with a single red "sight" LED.  I am reading in the sequence
-ROMS and building up a character set to simulate the LEDS with
-conventional character graphics.
-
-Finally, there is a score display made of 7-segment LEDS, along
-with Credits, Barriers, and Rounds displays made of some other
-type of LED bar graphs.  I'm displaying them the best I can on the
-bottom line of the screen
-
 ***************************************************************************/
 
 #include "driver.h"
@@ -87,55 +76,6 @@ static UINT16 beam_state;
 static UINT16 old_beam_state;
 static UINT16 beam_states_per_frame;
 
-
-
-/* these come via observation of the color PROM */
-#define BLACK_PEN	(pens[0x00])
-#define GREEN_PEN	(pens[0x12])
-#define RED_PEN		(pens[0x16])
-#define YELLOW_PEN	(pens[0x1a])
-
-
-
-/* The first 16 came from the 7448 BCD to 7-segment decoder data sheet */
-/* The rest are made up */
-
-static const UINT8 char_gfx[32*8] =
-{
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
-	0x80, 0x80, 0x80, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
-	0xf0, 0x80, 0x80, 0xf0, 0x00, 0x00, 0xf0, 0x00,   /* extras... */
-	0x90, 0x90, 0x90, 0xf0, 0x00, 0x00, 0x00, 0x00,   /* extras... */
-	0x00, 0x00, 0x00, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* extras... */
-	0x00, 0x00, 0x00, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* extras... */
-	0xf0, 0x90, 0x90, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 9 */
-	0xf0, 0x90, 0x90, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 8 */
-	0xf0, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 7 */
-	0xf0, 0x80, 0x80, 0xf0, 0x90, 0x90, 0xf0, 0x00,   /* 6 */
-	0xf0, 0x80, 0x80, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 5 */
-	0x90, 0x90, 0x90, 0xf0, 0x10, 0x10, 0x10, 0x00,   /* 4 */
-	0xf0, 0x10, 0x10, 0xf0, 0x10, 0x10, 0xf0, 0x00,   /* 3 */
-	0xf0, 0x10, 0x10, 0xf0, 0x80, 0x80, 0xf0, 0x00,   /* 2 */
-	0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x00,   /* 1 */
-	0xf0, 0x90, 0x90, 0x90, 0x90, 0x90, 0xf0, 0x00,   /* 0 */
-
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space */
-	0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 1 pip */
-	0x60, 0x90, 0x80, 0x60, 0x10, 0x90, 0x60, 0x00,   /* S for Score */
-	0x80, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00,   /* 2 pips */
-	0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00,   /* 3 pips */
-	0x60, 0x90, 0x80, 0x80, 0x80, 0x90, 0x60, 0x00,   /* C for Credits */
-	0xe0, 0x90, 0x90, 0xe0, 0x90, 0x90, 0xe0, 0x00,   /* B for Barriers */
-	0xe0, 0x90, 0x90, 0xe0, 0xc0, 0xa0, 0x90, 0x00,   /* R for Rounds */
-	0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00,   /* 4 pips */
-	0x00, 0x40, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00,   /* Colon */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,   /* Space (Unused) */
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00    /* Space */
-};
 
 
 PALETTE_INIT( stactics )
@@ -289,7 +229,7 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 	gfx = videoram[0x800 | (code << 3) | (y & 0x07)];
 
 	/* return the appropriate pixel within the byte */
-	return (gfx >> (7 - (x & 0x07))) & 0x01;
+	return (gfx >> (~x & 0x07)) & 0x01;
 }
 
 
@@ -297,7 +237,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, cons
 {
 	int y;
 
-	fillbitmap(bitmap, BLACK_PEN, cliprect);
+	fillbitmap(bitmap, pens[0], cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)
@@ -331,122 +271,83 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, cons
 			int sx = x - stactics_horiz_pos;
 
 			/* plot if visible */
-			if ((sy >= 0) && (sy < 0xf0) && (sx >= 0) && (sx < 0x100))
+			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
 				*BITMAP_ADDR16(bitmap, sy, sx) = pens[pen];
 		}
 	}
 }
 
 
-static void draw_character(mame_bitmap *bitmap, const rectangle *cliprect, int code, int x, pen_t pen)
+static void set_indicator_leds(int data, const char *output_name, int base_index)
 {
-	int y;
-
-	for (y = 0; y < 8; y++)
+	/* from 7448 datasheet */
+	static const int to_7seg[0x10] =
 	{
-		int i;
-		UINT8 gfx_data = char_gfx[(code << 3) | (y & 0x07)];
+		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x1f, 0x70,
+		0x7f, 0x73, 0x0d, 0x19, 0x23, 0x4b, 0x0f, 0x00
+	};
 
-		for (i = 0; i < 6; i++)
-			if ((gfx_data << i) & 0x80)
-				*BITMAP_ADDR16(bitmap, y + 248, 255 - (x + i)) = pen;
-	}
+	/* decode the data */
+	data = to_7seg[(data ^ 0x0f) & 0x0f];
+
+	/* set the 4 LEDs */
+	output_set_indexed_value(output_name, base_index + 0, (data >> 4) & 0x01);
+	output_set_indexed_value(output_name, base_index + 1, (data >> 0) & 0x01);
+	output_set_indexed_value(output_name, base_index + 2, (data >> 1) & 0x01);
+	output_set_indexed_value(output_name, base_index + 3, (data >> 2) & 0x01);
 }
 
 
-static void update_artwork(mame_bitmap *bitmap, const rectangle *cliprect, const pen_t *pens)
+static void update_artwork(void)
 {
 	int i;
 	UINT8 *beam_region = memory_region(REGION_USER1);
 
-	int x = 11;
-	int y = 170;
+	/* set the lamps first */
+	output_set_indexed_value("base_lamp", 4, stactics_lamps[0] & 0x01);
+	output_set_indexed_value("base_lamp", 3, stactics_lamps[1] & 0x01);
+	output_set_indexed_value("base_lamp", 2, stactics_lamps[2] & 0x01);
+	output_set_indexed_value("base_lamp", 1, stactics_lamps[3] & 0x01);
+	output_set_indexed_value("base_lamp", 0, stactics_lamps[4] & 0x01);
+	output_set_value("start_lamp",   stactics_lamps[5] & 0x01);
+	output_set_value("barrier_lamp", stactics_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
 
-	/* for each LED */
+	/* laser beam - loop for each LED */
 	for (i = 0; i < 0x40; i++)
 	{
 		offs_t beam_data_offs;
 		UINT8 beam_data;
-
-		/* every 15th LED is not present on the real machine */
-		if ((i & 0x0f) == 0x0f)  continue;
+		int on;
 
 		beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | beam_state;
 		beam_data = beam_region[beam_data_offs];
+		on = (beam_data >> (i & 0x07)) & 0x01;
 
-		/* if the LED is on, draw */
-		if ((beam_data >> (i & 0x07)) & 0x01)
-		{
-			*BITMAP_ADDR16(bitmap, y,     x    ) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y,     x + 1) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y + 1, x    ) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y + 1, x + 1) = GREEN_PEN;
-
-			*BITMAP_ADDR16(bitmap, y,     256 - x) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y,     255 - x) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y + 1, 256 - x) = GREEN_PEN;
-			*BITMAP_ADDR16(bitmap, y + 1, 255 - x) = GREEN_PEN;
-		}
-
-		x = x + 2;
-		y = y - 1;
+		output_set_indexed_value("beam_led_left", i, on);
+		output_set_indexed_value("beam_led_right", i, on);
 	}
 
-	/* draw the sight LED, if on */
-	if (*stactics_motor_on & 0x01)
-	{
-		x = 127;
-		y = 112;
-
-		*BITMAP_ADDR16(bitmap, y,     x + 1) = RED_PEN;
-		*BITMAP_ADDR16(bitmap, y + 1, x    ) = RED_PEN;
-		*BITMAP_ADDR16(bitmap, y + 1, x + 1) = RED_PEN;
-		*BITMAP_ADDR16(bitmap, y + 1, x + 2) = RED_PEN;
-		*BITMAP_ADDR16(bitmap, y + 2, x + 1) = RED_PEN;
-	}
+	/* sight LED */
+	output_set_value("sight_led", *stactics_motor_on & 0x01);
 
 	/* score display */
-	draw_character(bitmap, cliprect, 0x12, 16, YELLOW_PEN);	/* S */
-	draw_character(bitmap, cliprect, 0x19, 22, YELLOW_PEN);	/* : */
-
 	for (i = 0x01; i < 0x07; i++)
-	{
-		int code = stactics_display_buffer[i] & 0x0f;
-		draw_character(bitmap, cliprect, code, 28 + ((i - 0x01) * 6), RED_PEN);
-	}
-
+		output_set_indexed_value("score_7seg", i - 1, ~stactics_display_buffer[i] & 0x0f);
 
 	/* credits indicator */
-	draw_character(bitmap, cliprect, 0x15, 80, YELLOW_PEN);	/* C */
-	draw_character(bitmap, cliprect, 0x19, 86, YELLOW_PEN);	/* : */
-
-	for (i = 0x07; i < 0x09; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 92 + ((i - 0x07) * 2), RED_PEN);
-	}
-
-
-	/* rounds indicator */
-	draw_character(bitmap, cliprect, 0x16, 144, YELLOW_PEN);	/* R */
-	draw_character(bitmap, cliprect, 0x19, 150, YELLOW_PEN);	/* : */
-
-	for (i = 0x09; i < 0x0c; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 156 + ((i - 0x09) * 2), RED_PEN);
-	}
-
+	set_indicator_leds(stactics_display_buffer[0x07], "credit_led", 0x00);
+	set_indicator_leds(stactics_display_buffer[0x08], "credit_led", 0x04);
 
 	/* barriers indicator */
-	draw_character(bitmap, cliprect, 0x17, 208, YELLOW_PEN);	/* B */
-	draw_character(bitmap, cliprect, 0x19, 214, YELLOW_PEN);	/* : */
+	set_indicator_leds(stactics_display_buffer[0x09], "barrier_led", 0x00);
+	set_indicator_leds(stactics_display_buffer[0x0a], "barrier_led", 0x04);
+	set_indicator_leds(stactics_display_buffer[0x0b], "barrier_led", 0x08);
 
-	for (i = 0x0c; i < 0x10; i++)
-	{
-		int code = 0x10 | (~stactics_display_buffer[i] & 0x0f);
-		draw_character(bitmap, cliprect, code, 220 + ((i - 0x0c) * 2), RED_PEN);
-	}
+	/* rounds indicator */
+	set_indicator_leds(stactics_display_buffer[0x0c], "round_led", 0x00);
+	set_indicator_leds(stactics_display_buffer[0x0d], "round_led", 0x04);
+	set_indicator_leds(stactics_display_buffer[0x0e], "round_led", 0x08);
+	set_indicator_leds(stactics_display_buffer[0x0f], "round_led", 0x0c);
 }
 
 
@@ -458,7 +359,7 @@ VIDEO_UPDATE( stactics )
 	stactics_vblank_count++;
 
 	draw_background(bitmap, cliprect, machine->pens);
-	update_artwork(bitmap, cliprect, machine->pens);
+	update_artwork();
 
 	return 0;
 }
