@@ -63,6 +63,7 @@ extern UINT8 *stactics_videoram_e;
 extern UINT8 *stactics_videoram_f;
 extern UINT8 *stactics_palette;
 extern UINT8 *stactics_display_buffer;
+extern UINT8 *stactics_lamps;
 
 PALETTE_INIT( stactics );
 
@@ -73,36 +74,34 @@ WRITE8_HANDLER( stactics_shot_trigger_w );
 WRITE8_HANDLER( stactics_shot_flag_clear_w );
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
-    AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
-    AM_RANGE(0x5000, 0x5fff) AM_READ(input_port_0_r)
-    AM_RANGE(0x6000, 0x6fff) AM_READ(input_port_1_r)
-    AM_RANGE(0x7000, 0x7fff) AM_READ(stactics_port_2_r)
-    AM_RANGE(0x8000, 0x8fff) AM_READ(stactics_port_3_r)
-    AM_RANGE(0x9000, 0x9fff) AM_READ(stactics_vert_pos_r)
-    AM_RANGE(0xa000, 0xafff) AM_READ(stactics_horiz_pos_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+    AM_RANGE(0x0000, 0x2fff) AM_ROM
+    AM_RANGE(0x4000, 0x47ff) AM_RAM
+    AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ(input_port_0_r)
+    AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(input_port_1_r)
+    AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
+    AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_palette)
+ /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE(stactics_sound_w) */
+    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_motor_on)  /* Note: This overlaps rocket sound */
+    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_lamps)
+    AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
+    AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
+    AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
+    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_display_buffer)
+    AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITE(MWA8_NOP)
+ /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(stactics_sound2_w) */
+    AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITE(MWA8_NOP)
+    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ(stactics_port_2_r)
+    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ(stactics_port_3_r)
+    AM_RANGE(0x8000, 0x8fff) AM_WRITE(stactics_scroll_ram_w)
+    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(stactics_vert_pos_r)
+    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(stactics_horiz_pos_r)
     AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(&stactics_videoram_b)
     AM_RANGE(0xc000, 0xcfff) AM_NOP
     AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&stactics_videoram_d)
     AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&stactics_videoram_e)
     AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&stactics_videoram_f)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
-    AM_RANGE(0x6000, 0x6001) AM_WRITE(stactics_coin_lockout_w)
-    AM_RANGE(0x6006, 0x6007) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_palette)
-    /* AM_RANGE(0x6010, 0x601f) AM_WRITE(stactics_sound_w) */
-    AM_RANGE(0x6016, 0x6016) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_motor_on)  /* Note: This overlaps rocket sound */
-    /* AM_RANGE(0x6020, 0x602f) AM_WRITE(stactics_lamp_latch_w) */
-    AM_RANGE(0x6030, 0x603f) AM_WRITE(stactics_speed_latch_w)
-    AM_RANGE(0x6040, 0x604f) AM_WRITE(stactics_shot_trigger_w)
-    AM_RANGE(0x6050, 0x605f) AM_WRITE(stactics_shot_flag_clear_w)
-    AM_RANGE(0x6060, 0x606f) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_display_buffer)
-    /* AM_RANGE(0x60a0, 0x60ef) AM_WRITE(stactics_sound2_w) */
-
-    AM_RANGE(0x8000, 0x8fff) AM_WRITE(stactics_scroll_ram_w)
 ADDRESS_MAP_END
 
 
@@ -181,7 +180,7 @@ static MACHINE_DRIVER_START( stactics )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 1933560)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(stactics_interrupt,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)

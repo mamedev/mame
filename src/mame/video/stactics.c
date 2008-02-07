@@ -77,6 +77,7 @@ UINT8 *stactics_videoram_e;
 UINT8 *stactics_videoram_f;
 UINT8 *stactics_palette;
 UINT8 *stactics_display_buffer;
+UINT8 *stactics_lamps;
 
 static UINT8 y_scroll_d;
 static UINT8 y_scroll_e;
