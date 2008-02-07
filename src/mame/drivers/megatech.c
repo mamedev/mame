@@ -129,7 +129,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
     PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test mode") PORT_CODE(KEYCODE_F2)
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START_TAG("BIOS_IN1") // port 6
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // a few coin inputs here
