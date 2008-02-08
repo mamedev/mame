@@ -542,6 +542,44 @@ Driver Note:
   - Any new region sets will need full encryption tables dumped to extract the proper
     keys or they will need to be brute forced. XORs are no longer supported nor wanted.
 
+
+Stephh's inputs notes (based on some tests on the "parent" set) :
+
+0) All games
+
+  - All inputs have been mapped according to the "test mode"
+    (even if some buttons don't physically exist on the machine).
+  - Joysticks and buttons can be fully tested.
+  - COINn sometimes don't show anything but are OK ingame.
+  - Unless I notify something below for some games, there is no extra button !
+
+1) 'mmancp2u'
+
+  - BUTTON3 doesn't physically exist on the machine and has no effect ingame.
+
+2) 'megaman2'
+
+  - BUTTON3 doesn't physically exist on the machine and has no effect ingame.
+
+3) 'mpang'
+
+  - BUTTON2 doesn't physically exist on the machine and can't be seen in the "test mode".
+    However, if you map it where it should be, it has the same effect as BUTTON1.
+
+4) 'pzloop2'
+
+  - Whatever your settings are, the paddle can't be tested in the "test mode" !
+    I can't tell at the moment if it's an emulation or an ingame bug :(
+
+5) 'dimahoo'
+
+  - BUTTON3 doesn't physically exist on the machine.
+    However, it acts like a rapid fire (keep button pressed).
+
+6) 'progear'
+
+  - BUTTON3 doesn't physically exist on the machine and has no effect ingame.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -564,6 +602,13 @@ WRITE16_HANDLER( cps2_qsound_sharedram_w )
 }
 #endif
 
+
+/*************************************
+ *
+ *  Constants
+ *
+ *************************************/
+
 /* Maximum size of Q Sound Z80 region */
 #define QSOUND_SIZE 0x50000
 
@@ -572,8 +617,21 @@ WRITE16_HANDLER( cps2_qsound_sharedram_w )
 #define CODE_SIZE   0x0400000
 
 
+/*************************************
+ *
+ *  Global variables
+ *
+ *************************************/
+
 static int readpaddle;
 static int cps2networkpresent;
+
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
 
 static INTERRUPT_GEN( cps2_interrupt )
 {
@@ -633,6 +691,11 @@ static INTERRUPT_GEN( cps2_interrupt )
 }
 
 
+/*************************************
+ *
+ *  EEPROM
+ *
+ *************************************/
 
 static const struct EEPROM_interface cps2_eeprom_interface =
 {
@@ -656,9 +719,9 @@ static NVRAM_HANDLER( cps2 )
 	}
 }
 
-static READ16_HANDLER( cps2_eeprom_port_r )
+static CUSTOM_INPUT( cps2_eeprom_port_r )
 {
-    return (input_port_2_word_r(offset,0) & 0xfffe) | EEPROM_read_bit();
+    return EEPROM_read_bit();
 }
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
@@ -729,6 +792,13 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
     }
 }
 
+
+/*************************************
+ *
+ *  Sound ?
+ *
+ *************************************/
+
 static READ16_HANDLER( cps2_qsound_volume_r )
 {
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
@@ -742,216 +812,110 @@ static READ16_HANDLER( cps2_qsound_volume_r )
 }
 
 
-static UINT8 CPS2_Read8(offs_t address)
+/*************************************
+ *
+ *  ???
+ *
+ *************************************/
+
+static UINT8  cps2_read8(offs_t address)
 {
 	return m68k_read_pcrelative_8(address);
 }
 
-static UINT16 CPS2_Read16(offs_t address)
+static UINT16 cps2_read16(offs_t address)
 {
 	return m68k_read_pcrelative_16(address);
 }
 
-static UINT32 CPS2_Read32(offs_t address)
+static UINT32 cps2_read32(offs_t address)
 {
 	return m68k_read_pcrelative_32(address);
 }
 
 
+/*************************************
+ *
+ *  Read handlers
+ *
+ *************************************/
 
 static READ16_HANDLER( kludge_r )
 {
 	return 0xffff;
 }
 
+static READ16_HANDLER( joy_or_paddle_r )
+{
+	if (readpaddle != 0)
+		return (readinputportbytag("IN0"));
+	else
+		return (readinputportbytag("PADDLE1") & 0xff) | (readinputportbytag("PADDLE2") << 8);
+}
+
+
+/*************************************
+ *
+ *  Memory map
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( cps2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_READ(MRA16_ROM)				/* 68000 ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_READ(MRA16_RAM)				/* CPS2 object output */
-	AM_RANGE(0x618000, 0x619fff) AM_READ(qsound_sharedram1_r)		/* Q RAM */
-	AM_RANGE(0x662000, 0x662001) AM_READ(MRA16_RAM)				/* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x662008, 0x662009) AM_READ(MRA16_RAM)				/* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x662020, 0x662021) AM_READ(MRA16_RAM)				/* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x660000, 0x663fff) AM_READ(MRA16_RAM)				/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	AM_RANGE(0x664000, 0x664001) AM_READ(MRA16_RAM)				/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x708000, 0x709fff) AM_READ(cps2_objram2_r)			/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_READ(cps2_objram2_r)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_READ(cps2_objram2_r)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_READ(cps2_objram2_r)			/* mirror */
-	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)			/* Output ports mirror (sfa) */
-	AM_RANGE(0x804000, 0x804001) AM_READ(input_port_0_word_r)		/* IN0 */
-	AM_RANGE(0x804010, 0x804011) AM_READ(input_port_1_word_r)		/* IN1 */
-	AM_RANGE(0x804020, 0x804021) AM_READ(cps2_eeprom_port_r)		/* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)		/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)  				/* unknown (xmcotaj hangs if this is 0) */
-	AM_RANGE(0x804100, 0x8041ff) AM_READ(cps1_output_r)			/* CPS1 Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_READ(MRA16_RAM)				/* Video RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)				/* RAM */
+	AM_RANGE(0x000000, 0x3fffff) AM_READ(MRA16_ROM)                   /* 68000 ROM */
+	AM_RANGE(0x400000, 0x40000b) AM_READ(MRA16_RAM)                   /* CPS2 object output */
+	AM_RANGE(0x618000, 0x619fff) AM_READ(qsound_sharedram1_r)         /* Q RAM */
+	AM_RANGE(0x662000, 0x662001) AM_READ(MRA16_RAM)                   /* Network adapter related, accessed in SSF2TB */
+	AM_RANGE(0x662008, 0x662009) AM_READ(MRA16_RAM)                   /* Network adapter related, accessed in SSF2TB */
+	AM_RANGE(0x662020, 0x662021) AM_READ(MRA16_RAM)                   /* Network adapter related, accessed in SSF2TB */
+	AM_RANGE(0x660000, 0x663fff) AM_READ(MRA16_RAM)                   /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
+	AM_RANGE(0x664000, 0x664001) AM_READ(MRA16_RAM)                   /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
+	AM_RANGE(0x708000, 0x709fff) AM_READ(cps2_objram2_r)              /* Object RAM */
+	AM_RANGE(0x70a000, 0x70bfff) AM_READ(cps2_objram2_r)              /* mirror */
+	AM_RANGE(0x70c000, 0x70dfff) AM_READ(cps2_objram2_r)              /* mirror */
+	AM_RANGE(0x70e000, 0x70ffff) AM_READ(cps2_objram2_r)              /* mirror */
+	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)               /* Output ports mirror (sfa) */
+	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                  /* IN0 */
+	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                  /* IN1 */
+	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                  /* IN2 + EEPROM */
+	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)        /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)                    /* unknown (xmcotaj hangs if this is 0) */
+	AM_RANGE(0x804100, 0x8041ff) AM_READ(cps1_output_r)               /* CPS1 Output ports */
+	AM_RANGE(0x900000, 0x92ffff) AM_READ(MRA16_RAM)                   /* Video RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)                   /* RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cps2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(MWA16_ROM)				/* ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_WRITE(MWA16_RAM) AM_BASE(&cps2_output) AM_SIZE(&cps2_output_size)	/* CPS2 output */
-	AM_RANGE(0x618000, 0x619fff) AM_WRITE(qsound_sharedram1_w)		/* Q RAM */
-	AM_RANGE(0x662000, 0x662001) AM_WRITE(MWA16_RAM)				/* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x662008, 0x662009) AM_WRITE(MWA16_RAM)				/* Network adapter related, accessed in SSF2TB (not sure if this port is write only yet)*/
-	AM_RANGE(0x662020, 0x662021) AM_WRITE(MWA16_RAM)				/* Network adapter related, accessed in SSF2TB */
-	AM_RANGE(0x660000, 0x663fff) AM_WRITE(MWA16_RAM)				/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
-	AM_RANGE(0x664000, 0x664001) AM_WRITE(MWA16_RAM)				/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(&cps2_objram1)	/* Object RAM, no game seems to use it directly */
-	AM_RANGE(0x708000, 0x709fff) AM_WRITE(cps2_objram2_w) AM_BASE(&cps2_objram2)	/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_WRITE(cps2_objram2_w)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_WRITE(cps2_objram2_w)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_WRITE(cps2_objram2_w)			/* mirror */
-	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(cps1_output_w)			/* Output ports mirror (sfa) */
-	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)		/* EEPROM */
-	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITE(MWA16_NOP)				/* Unknown (reset once on startup) */
-	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)		/* bit 0 = Object ram bank swap */
-	AM_RANGE(0x804100, 0x8041ff) AM_WRITE(cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* Output ports */
+	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(MWA16_ROM)                  /* ROM */
+	AM_RANGE(0x400000, 0x40000b) AM_WRITE(MWA16_RAM) AM_BASE(&cps2_output) AM_SIZE(&cps2_output_size)    /* CPS2 output */
+	AM_RANGE(0x618000, 0x619fff) AM_WRITE(qsound_sharedram1_w)        /* Q RAM */
+	AM_RANGE(0x662000, 0x662001) AM_WRITE(MWA16_RAM)                  /* Network adapter related, accessed in SSF2TB */
+	AM_RANGE(0x662008, 0x662009) AM_WRITE(MWA16_RAM)                  /* Network adapter related, accessed in SSF2TB (not sure if this port is write only yet)*/
+	AM_RANGE(0x662020, 0x662021) AM_WRITE(MWA16_RAM)                  /* Network adapter related, accessed in SSF2TB */
+	AM_RANGE(0x660000, 0x663fff) AM_WRITE(MWA16_RAM)                  /* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
+	AM_RANGE(0x664000, 0x664001) AM_WRITE(MWA16_RAM)                  /* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE(&cps2_objram1)     /* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x708000, 0x709fff) AM_WRITE(cps2_objram2_w) AM_BASE(&cps2_objram2)     /* Object RAM */
+	AM_RANGE(0x70a000, 0x70bfff) AM_WRITE(cps2_objram2_w)             /* mirror */
+	AM_RANGE(0x70c000, 0x70dfff) AM_WRITE(cps2_objram2_w)             /* mirror */
+	AM_RANGE(0x70e000, 0x70ffff) AM_WRITE(cps2_objram2_w)             /* mirror */
+	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(cps1_output_w)              /* Output ports mirror (sfa) */
+	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)         /* EEPROM */
+	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITE(MWA16_NOP)                  /* Unknown (reset once on startup) */
+	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)         /* bit 0 = Object ram bank swap */
+	AM_RANGE(0x804100, 0x8041ff) AM_WRITE(cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)     /* Output ports */
 	AM_RANGE(0x900000, 0x92ffff) AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM)				/* RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM)                  /* RAM */
 ADDRESS_MAP_END
 
 
+/*************************************
+ *
+ *  Generic port definitions
+ *
+ *************************************/
 
-
-static INPUT_PORTS_START( 19xx )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( cybots )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ssf2 )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ddtod )
-    PORT_START      /* IN0 (0x00) */
+static INPUT_PORTS_START( cps2 )
+    PORT_START_TAG("IN0")      /* IN0 (0x00) */
     PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
     PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -969,7 +933,7 @@ static INPUT_PORTS_START( ddtod )
     PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
     PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-    PORT_START      /* IN1 (0x10) */
+    PORT_START_TAG("IN1")      /* IN1 (0x10) */
     PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
     PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -987,8 +951,8 @@ static INPUT_PORTS_START( ddtod )
     PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
     PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
+    PORT_START_TAG("IN2")      /* IN2 (0x20) */
+    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cps2_eeprom_port_r, NULL)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
     PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1002,292 +966,219 @@ static INPUT_PORTS_START( ddtod )
     PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( avsp )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+/* 4 players and 4 buttons */
+static INPUT_PORTS_START( cps2_4p4b )
+	PORT_INCLUDE(cps2)
 INPUT_PORTS_END
 
+/* 4 players and 3 buttons */
+static INPUT_PORTS_START( cps2_4p3b )
+	PORT_INCLUDE(cps2_4p4b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(4) */
+INPUT_PORTS_END
+
+/* 4 players and 2 buttons */
+static INPUT_PORTS_START( cps2_4p2b )
+	PORT_INCLUDE(cps2_4p3b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(4) */
+INPUT_PORTS_END
+
+/* 3 players and 4 buttons */
+static INPUT_PORTS_START( cps2_3p4b )
+	PORT_INCLUDE(cps2_4p4b)
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(4) inputs */
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )           /* START4 */
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN4 */
+INPUT_PORTS_END
+
+/* 3 players and 3 buttons */
+static INPUT_PORTS_START( cps2_3p3b )
+	PORT_INCLUDE(cps2_3p4b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(3) */
+INPUT_PORTS_END
+
+/* 3 players and 2 buttons */
+static INPUT_PORTS_START( cps2_3p2b )
+	PORT_INCLUDE(cps2_3p3b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
+INPUT_PORTS_END
+
+/* 2 players and 4 buttons */
+static INPUT_PORTS_START( cps2_2p4b )
+	PORT_INCLUDE(cps2_3p4b)
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(3) inputs */
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )           /* START3 */
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN3 */
+INPUT_PORTS_END
+
+/* 2 players and 3 buttons */
+static INPUT_PORTS_START( cps2_2p3b )
+	PORT_INCLUDE(cps2_2p4b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(2) */
+INPUT_PORTS_END
+
+/* 2 players and 2 buttons */
+static INPUT_PORTS_START( cps2_2p2b )
+	PORT_INCLUDE(cps2_2p3b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(2) */
+INPUT_PORTS_END
+
+/* 2 players and 1 button */
+static INPUT_PORTS_START( cps2_2p1b )
+	PORT_INCLUDE(cps2_2p2b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(1) */
+    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON2 PORT_PLAYER(2) */
+INPUT_PORTS_END
+
+/* 2 players and 6 buttons (2 rows of 3 buttons) */
+static INPUT_PORTS_START( cps2_2p6b )
+	PORT_INCLUDE(cps2_2p3b)
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+/* 1 player and 4 buttons */
+static INPUT_PORTS_START( cps2_1p4b )
+	PORT_INCLUDE(cps2_2p4b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )           /* PORT_PLAYER(2) inputs */
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )           /* START2 */
+    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )           /* COIN2 */
+INPUT_PORTS_END
+
+/* 1 player and 3 buttons */
+static INPUT_PORTS_START( cps2_1p3b )
+	PORT_INCLUDE(cps2_1p4b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON4 PORT_PLAYER(1) */
+INPUT_PORTS_END
+
+/* 1 player and 2 buttons */
+static INPUT_PORTS_START( cps2_1p2b )
+	PORT_INCLUDE(cps2_1p3b)
+
+	PORT_MODIFY("IN0")
+    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(1) */
+INPUT_PORTS_END
+
+
+/*************************************
+ *
+ *  Game-specific port definitions
+ *
+ *************************************/
+
+/* According to the "test mode", buttons layout look like a 2 players 6 buttons machine where buttons have been removed */
+static INPUT_PORTS_START( cybots )
+	PORT_INCLUDE(cps2_2p6b)
+
+	PORT_MODIFY("IN1")
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(1) */
+    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(1) */
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON5 PORT_PLAYER(2) */
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )                     /* BUTTON6 PORT_PLAYER(2) */
+INPUT_PORTS_END
+
+/* 2 players, no joysticks which are replaced with 4 buttons, no other buttons */
 static INPUT_PORTS_START( qndream )
-    PORT_START      /* IN0 (0x00) */
+	PORT_INCLUDE(cps2_2p4b)
+
+	PORT_MODIFY("IN0")
     PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
     PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
     PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
     PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
     PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
     PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+    PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( batcir )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+/* 2 players and 1 button - either 2 8-way joysticks, 2 2-way joysticks, or 2 paddles */
+static INPUT_PORTS_START( pzloop2 )
+	PORT_INCLUDE(cps2_2p1b)
 
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START4 )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sgemf )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( cps2 )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( puzloop2 )
-    PORT_START      /* IN0 (0x00) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-
-    PORT_START      /* IN1 (0x10) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-    PORT_START      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL )   /* EEPROM bit */
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-    PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
-    PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START  /* Paddles */
+	PORT_START_TAG("PADDLE1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START
+	PORT_START_TAG("PADDLE2")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
-static READ16_HANDLER( pl2_port_0_word_r )
-{
-	if(readpaddle != 0)
-		return readinputport(0);
-	else
-		return readinputport(3) + (readinputport(4) << 8);
-}
+/* 1 player and 3 buttons, but 2 coins slots */
+static INPUT_PORTS_START( choko )
+	PORT_INCLUDE(cps2_1p3b)
+
+	PORT_MODIFY("IN2")
+    PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN2 )
+INPUT_PORTS_END
 
 
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
 
 static const gfx_layout cps1_layout8x8 =
 {
@@ -1322,12 +1213,24 @@ static GFXDECODE_START( cps2 )
 GFXDECODE_END
 
 
+/*************************************
+ *
+ *  M68K encryption interface
+ *
+ *************************************/
 
 static const struct m68k_encryption_interface cps2_encryption =
 {
-	CPS2_Read8, CPS2_Read16, CPS2_Read32,
-	CPS2_Read16, CPS2_Read32
+	cps2_read8, cps2_read16, cps2_read32,
+	cps2_read16, cps2_read32
 };
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( cps2 )
 
@@ -1367,6 +1270,13 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( 1944 )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */
@@ -7183,8 +7093,11 @@ ROM_START( xmvsfb )
 ROM_END
 
 
-
-
+/*************************************
+ *
+ *  Games initialisation
+ *
+ *************************************/
 
 static DRIVER_INIT( cps2 )
 {
@@ -7206,222 +7119,229 @@ static DRIVER_INIT( ssf2tb )
 
 }
 
-static DRIVER_INIT ( puzloop2 )
+static DRIVER_INIT ( pzloop2 )
 {
 	DRIVER_INIT_CALL(cps2);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, pl2_port_0_word_r);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
-GAME( 1993, ssf2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 930911)", 0 )
-GAME( 1993, ssf2u,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (USA 930911)", 0 )
-GAME( 1993, ssf2a,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 931005)", 0 )
-GAME( 1993, ssf2ar1,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 930914)", 0 )
-GAME( 1993, ssf2j,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 931005)", 0 )
-GAME( 1993, ssf2jr1,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930911)", 0 )
-GAME( 1993, ssf2jr2,  ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930910)", 0 )
-GAME( 1993, ssf2tb,   ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", 0 )	// works, but not in tournament mode
-GAME( 1993, ssf2tbr1, ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", 0 )	// works, but not in tournament mode
-GAME( 1993, ssf2tbj,  ssf2,    cps2, ssf2,    ssf2tb, ROT0, "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", 0 )	// works, but not in tournament mode
-GAME( 1993, ddtod,    0,       cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)", 0 )
-GAME( 1993, ddtodr1,  ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)", 0 )
-GAME( 1993, ddtodu,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)", 0 )
-GAME( 1993, ddtodur1, ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940113)", 0 )
-GAME( 1993, ddtodj,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940125)", 0 )
-GAME( 1993, ddtodjr1, ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940113)", 0 )
-GAME( 1993, ddtoda,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Asia 940113)", 0 )
-GAME( 1993, ddtodh,   ddtod,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Hispanic 940125)", 0 )
-GAME( 1993, ecofghtr, 0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (World 931203)", 0 )
-GAME( 1993, ecofghtu, ecofghtr,cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (USA 940215)", 0 )
-GAME( 1993, ecofgtu1, ecofghtr,cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (USA 931203)", 0 )
-GAME( 1993, uecology, ecofghtr,cps2, sgemf,   cps2, ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)", 0 )
-GAME( 1993, ecofghta, ecofghtr,cps2, sgemf,   cps2, ROT0,   "Capcom", "Eco Fighters (Asia 931203)", 0 )
-GAME( 1994, ssf2t,    ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II Turbo (World 940223)", 0 )
-GAME( 1994, ssf2ta,   ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II Turbo (Asia 940223)", 0 )
-GAME( 1994, ssf2tu,   ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II Turbo (USA 940323)", 0 )
-GAME( 1994, ssf2tur1, ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II Turbo (USA 940223)", 0 )
-GAME( 1994, ssf2xj,   ssf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940223)", 0 )
-GAME( 1994, xmcota,   0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", 0 )
-GAME( 1994, xmcotau,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", 0 )
-GAME( 1994, xmcotah,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", 0 )
-GAME( 1994, xmcotaj,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941222)", 0 )
-GAME( 1994, xmcotaj1, xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941219)", 0 )
-GAME( 1994, xmcotaj2, xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941217)", 0 )
-GAME( 1994, xmcotajr, xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941208 rent version)", 0 )
-GAME( 1994, xmcotaa,  xmcota,  cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941217)", 0 )
-GAME( 1994, armwar,   0,       cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (Euro 941024)", 0 )
-GAME( 1994, armwarr1, armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (Euro 941011)", 0 )
-GAME( 1994, armwaru,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (USA 941024)", 0 )
-GAME( 1994, pgear,    armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 941024)", 0 )
-GAME( 1994, pgearr1,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 940916)", 0 )
-GAME( 1994, armwara,  armwar,  cps2, avsp,    cps2, ROT0,   "Capcom", "Armored Warriors (Asia 940920)", 0 )
-GAME( 1994, avsp,     0,       cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Euro 940520)", 0 )
-GAME( 1994, avspu,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (USA 940520)", 0 )
-GAME( 1994, avspj,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Japan 940520)", 0 )
-GAME( 1994, avspa,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Asia 940520)", 0 )
-GAME( 1994, avsph,    avsp,    cps2, avsp,    cps2, ROT0,   "Capcom", "Alien vs. Predator (Hispanic 940520)", 0 )
-GAME( 1994, dstlk,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Euro 940705)", 0 )
-GAME( 1994, dstlku,   dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940818)", 0 )
-GAME( 1994, dstlkur1, dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940705)", 0 )
-GAME( 1994, dstlka,   dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Asia 940705)", 0 )
-GAME( 1994, vampj,    dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)", 0 )	// one of these two must be a bad dump
-GAME( 1994, vampja,   dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705 alt)", 0 )
-GAME( 1994, vampjr1,  dstlk,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940630)", 0 )
-GAME( 1994, ringdest, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Euro 940902)", 0 )
-GAME( 1994, smbomb,   ringdest,cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940831)", 0 )
-GAME( 1994, smbombr1, ringdest,cps2, ssf2,    cps2, ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940808)", 0 )
-GAME( 1995, cybots,   0,       cps2, cybots,  cps2, ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Euro 950424)", 0 )
-GAME( 1995, cybotsu,  cybots,  cps2, cybots,  cps2, ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (USA 950424)", 0 )
-GAME( 1995, cybotsj,  cybots,  cps2, cybots,  cps2, ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Japan 950420)", 0 )
-GAME( 1995, msh,      0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Euro 951024)", 0 )
-GAME( 1995, mshu,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (USA 951024)", 0 )
-GAME( 1995, mshj,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Japan 951117)", 0 )
-GAME( 1995, mshjr1,   msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Japan 951024)", 0 )
-GAME( 1995, msha,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Asia 951024)", 0 )
-GAME( 1995, mshh,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Hispanic 951117)", 0 )
-GAME( 1995, mshb,     msh,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes (Brazil 951117)", 0 )
-GAME( 1995, nwarr,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Euro 950316)", 0 )
-GAME( 1995, nwarru,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
-GAME( 1995, nwarrh,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", 0 )
-GAME( 1995, nwarrb,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)", 0 )
-GAME( 1995, vhuntj,   nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950316)", 0 )
-GAME( 1995, vhuntjr1, nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)", 0 )
-GAME( 1995, vhuntjr2, nwarr,   cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)", 0 )
-GAME( 1995, sfa,      0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950727)", 0 )
-GAME( 1995, sfar1,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950718)", 0 )
-GAME( 1995, sfar2,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950627)", 0 )
-GAME( 1995, sfar3,    sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950605)", 0 )
-GAME( 1995, sfau,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (USA 950627)", 0 )
-GAME( 1995, sfza,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Asia 950627)", 0 )
-GAME( 1995, sfzj,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950727)", 0 )
-GAME( 1995, sfzjr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950627)", 0 )
-GAME( 1995, sfzjr2,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Japan 950605)", 0 )
-GAME( 1995, sfzh,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", 0 )
-GAME( 1995, sfzb,     sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", 0 )
-GAME( 1995, sfzbr1,   sfa,     cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", 0 )
-GAME( 1995, mmancp2u, megaman, cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man - The Power Battle (CPS2, USA 951006, SAMPLE Version)", 0 )
-GAME( 1995, rmancp2j, megaman, cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman: The Power Battle (CPS2, Japan 950922)", 0 )
-GAME( 1996, 19xx,     0,       cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (USA 951207)", 0 )
-GAME( 1996, 19xxa,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)", 0 )
-GAME( 1996, 19xxj,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951225)", 0 )
-GAME( 1996, 19xxjr1,  19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951207)", 0 )
-GAME( 1996, 19xxh,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Hispanic 951218)", 0 )
-GAME( 1996, 19xxb,    19xx,    cps2, 19xx,    cps2, ROT270, "Capcom", "19XX: The War Against Destiny (Brazil 951218)", 0 )
-GAME( 1996, ddsom,    0,       cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960619)", 0 )
-GAME( 1996, ddsomr1,  ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960223)", 0 )
-GAME( 1996, ddsomr2,  ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960209)", 0 )
-GAME( 1996, ddsomr3,  ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960208)", 0 )
-GAME( 1996, ddsomu,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960619)", 0 )
-GAME( 1996, ddsomur1, ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960209)", 0 )
-GAME( 1996, ddsomj,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960619)", 0 )
-GAME( 1996, ddsomjr1, ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960206)", 0 )
-GAME( 1996, ddsoma,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960619)", 0 )
-GAME( 1996, ddsomb,   ddsom,   cps2, ddtod,   cps2, ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Brazil 960223)", 0 )
-GAME( 1996, megaman2, 0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
-GAME( 1996, megamn2a, megaman2,cps2, sgemf,   cps2, ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
-GAME( 1996, rckman2j, megaman2,cps2, sgemf,   cps2, ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )
-GAME( 1996, qndream,  0,       cps2, qndream, cps2, ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", 0 )
-GAME( 1996, sfa2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 2 (USA 960306)", 0 )
-GAME( 1996, sfz2j,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Japan 960227)", 0 )
-GAME( 1996, sfz2a,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Asia 960227)", 0 )
-GAME( 1996, sfz2b,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960531)", 0 )
-GAME( 1996, sfz2br1,  sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960304)", 0 )
-GAME( 1996, sfz2h,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Hispanic 960304)", 0 )
-GAME( 1996, sfz2n,    sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 (Oceania 960229)", 0 )
-GAME( 1996, sfz2aj,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Japan 960805)", 0 )
-GAME( 1996, sfz2ah,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Hispanic 960813)", 0 )
-GAME( 1996, sfz2ab,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Brazil 960813)", 0 )
-GAME( 1996, sfz2aa,   sfa2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Asia 960826)", 0 )
-GAME( 1996, spf2t,    0,       cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
-GAME( 1996, spf2xj,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
-GAME( 1996, spf2ta,   spf2t,   cps2, 19xx,    cps2, ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
-GAME( 1996, xmvsf,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", 0 )
-GAME( 1996, xmvsfr1,  xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", 0 )
-GAME( 1996, xmvsfu,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)", 0 )
-GAME( 1996, xmvsfur1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961004)", 0 )
-GAME( 1996, xmvsfj,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)", 0 )
-GAME( 1996, xmvsfjr1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)", 0 )
-GAME( 1996, xmvsfjr2, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)", 0 )
-GAME( 1996, xmvsfa,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)", 0 )
-GAME( 1996, xmvsfar1, xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", 0 )
-GAME( 1996, xmvsfh,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)", 0 )
-GAME( 1996, xmvsfb,   xmvsf,   cps2, ssf2,    cps2, ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)", 0 )
-GAME( 1997, batcir,   0,       cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Euro 970319)", 0 )
-GAME( 1997, batcira,  batcir,  cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Asia 970319)", 0 )
-GAME( 1997, batcirj,  batcir,  cps2, batcir,  cps2, ROT0,   "Capcom", "Battle Circuit (Japan 970319)", 0 )
-GAME( 1997, csclub,   0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Euro 970722)", 0 )
-GAME( 1997, cscluba,  csclub,  cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Asia 970722)", 0 )
-GAME( 1997, csclubj,  csclub,  cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Japan 970722)", 0 )
-GAME( 1997, csclubh,  csclub,  cps2, sgemf,   cps2, ROT0,   "Capcom", "Capcom Sports Club (Hispanic 970722)", 0 )
-GAME( 1997, mshvsf,   0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Euro 970625)", 0 )
-GAME( 1997, mshvsfu,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970827)", 0 )
-GAME( 1997, mshvsfu1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970625)", 0 )
-GAME( 1997, mshvsfj,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970707)", 0 )
-GAME( 1997, mshvsfj1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970702)", 0 )
-GAME( 1997, mshvsfj2, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970625)", 0 )
-GAME( 1997, mshvsfh,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Hispanic 970625)", 0 )
-GAME( 1997, mshvsfa,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970625)", 0 )
-GAME( 1997, mshvsfa1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970620)", 0 )
-GAME( 1997, mshvsfb,  mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970827)", 0 )
-GAME( 1997, mshvsfb1, mshvsf,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970625)", 0 )
-GAME( 1997, sgemf,    0,       cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter Mini Mix (USA 970904)", 0 )
-GAME( 1997, pfghtj,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Pocket Fighter (Japan 970904)", 0 )
-GAME( 1997, sgemfa,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Asia 970904)", 0 )
-GAME( 1997, sgemfh,   sgemf,   cps2, sgemf,   cps2, ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)", 0 )
-GAME( 1997, vhunt2,   0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929)", 0 )
-GAME( 1997, vhunt2r1, vhunt2,  cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913)", 0 )
-GAME( 1997, vsav,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Euro 970519)", 0 )
-GAME( 1997, vsavu,    vsav,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (USA 970519)", 0 )
-GAME( 1997, vsavj,    vsav,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Japan 970519)", 0 )
-GAME( 1997, vsava,    vsav,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Asia 970519)", 0 )
-GAME( 1997, vsavh,    vsav,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Hispanic 970519)", 0 )
-GAME( 1997, vsav2,    0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Vampire Savior 2: The Lord of Vampire (Japan 970913)", 0 )
-GAME( 1998, mvsc,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Euro 980112)", 0 )
-GAME( 1998, mvscu,    mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 980123)", 0 )
-GAME( 1998, mvscj,    mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123)", 0 )
-GAME( 1998, mvscjr1,  mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980112)", 0 )
-GAME( 1998, mvsca,    mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980123)", 0 )
-GAME( 1998, mvscar1,  mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980112)", 0 )
-GAME( 1998, mvsch,    mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Hispanic 980123)", 0 )
-GAME( 1998, mvscb,    mvsc,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Brazil 980123)", 0 )
-GAME( 1998, sfa3,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 3 (Euro 980904)", 0 )
-GAME( 1998, sfa3u,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980904)", 0 )
-GAME( 1998, sfa3ur1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980629)", 0 )
-GAME( 1998, sfa3b,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Alpha 3 (Brazil 980629)", 0 )
-GAME( 1998, sfz3j,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980904)", 0 )
-GAME( 1998, sfz3jr1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980727)", 0 )
-GAME( 1998, sfz3jr2,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980629)", 0 )
-GAME( 1998, sfz3a,    sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980904)", 0 )
-GAME( 1998, sfz3ar1,  sfa3,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980701)", 0 )
-GAME( 1999, jyangoku, 0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan 990527)", 0 )
-GAME( 2004, hsf2,     0,       cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Asia 040202)", 0 )
-GAME( 2004, hsf2j,    hsf2,    cps2, ssf2,    cps2, ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", 0 )
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1993, ssf2,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (World 930911)", 0 )
+GAME( 1993, ssf2u,    ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (USA 930911)", 0 )
+GAME( 1993, ssf2a,    ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 931005)", 0 )
+GAME( 1993, ssf2ar1,  ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Asia 930914)", 0 )
+GAME( 1993, ssf2j,    ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 931005)", 0 )
+GAME( 1993, ssf2jr1,  ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930911)", 0 )
+GAME( 1993, ssf2jr2,  ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II: The New Challengers (Japan 930910)", 0 )
+GAME( 1993, ssf2tb,   ssf2,     cps2, cps2_2p6b, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 931119)", 0 )	// works, but not in tournament mode
+GAME( 1993, ssf2tbr1, ssf2,     cps2, cps2_2p6b, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (World 930911)", 0 )	// works, but not in tournament mode
+GAME( 1993, ssf2tbj,  ssf2,     cps2, cps2_2p6b, ssf2tb,   ROT0,   "Capcom", "Super Street Fighter II: The Tournament Battle (Japan 930911)", 0 )	// works, but not in tournament mode
+GAME( 1993, ddtod,    0,        cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940412)", 0 )
+GAME( 1993, ddtodr1,  ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Euro 940113)", 0 )
+GAME( 1993, ddtodu,   ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940125)", 0 )
+GAME( 1993, ddtodur1, ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (USA 940113)", 0 )
+GAME( 1993, ddtodj,   ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940125)", 0 )
+GAME( 1993, ddtodjr1, ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Japan 940113)", 0 )
+GAME( 1993, ddtoda,   ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Asia 940113)", 0 )
+GAME( 1993, ddtodh,   ddtod,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Tower of Doom (Hispanic 940125)", 0 )
+GAME( 1993, ecofghtr, 0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (World 931203)", 0 )
+GAME( 1993, ecofghtu, ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (USA 940215)", 0 )
+GAME( 1993, ecofgtu1, ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (USA 931203)", 0 )
+GAME( 1993, uecology, ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Ultimate Ecology (Japan 931203)", 0 )
+GAME( 1993, ecofghta, ecofghtr, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Eco Fighters (Asia 931203)", 0 )
+GAME( 1994, ssf2t,    ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II Turbo (World 940223)", 0 )
+GAME( 1994, ssf2ta,   ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II Turbo (Asia 940223)", 0 )
+GAME( 1994, ssf2tu,   ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II Turbo (USA 940323)", 0 )
+GAME( 1994, ssf2tur1, ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II Turbo (USA 940223)", 0 )
+GAME( 1994, ssf2xj,   ssf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Street Fighter II X: Grand Master Challenge (Japan 940223)", 0 )
+GAME( 1994, xmcota,   0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Euro 950105)", 0 )
+GAME( 1994, xmcotau,  xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (USA 950105)", 0 )
+GAME( 1994, xmcotah,  xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Hispanic 950331)", 0 )
+GAME( 1994, xmcotaj,  xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941222)", 0 )
+GAME( 1994, xmcotaj1, xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941219)", 0 )
+GAME( 1994, xmcotaj2, xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941217)", 0 )
+GAME( 1994, xmcotajr, xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941208 rent version)", 0 )
+GAME( 1994, xmcotaa,  xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941217)", 0 )
+GAME( 1994, armwar,   0,        cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Armored Warriors (Euro 941024)", 0 )
+GAME( 1994, armwarr1, armwar,   cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Armored Warriors (Euro 941011)", 0 )
+GAME( 1994, armwaru,  armwar,   cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Armored Warriors (USA 941024)", 0 )
+GAME( 1994, pgear,    armwar,   cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 941024)", 0 )
+GAME( 1994, pgearr1,  armwar,   cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Powered Gear: Strategic Variant Armor Equipment (Japan 940916)", 0 )
+GAME( 1994, armwara,  armwar,   cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Armored Warriors (Asia 940920)", 0 )
+GAME( 1994, avsp,     0,        cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Alien vs. Predator (Euro 940520)", 0 )
+GAME( 1994, avspu,    avsp,     cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Alien vs. Predator (USA 940520)", 0 )
+GAME( 1994, avspj,    avsp,     cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Alien vs. Predator (Japan 940520)", 0 )
+GAME( 1994, avspa,    avsp,     cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Alien vs. Predator (Asia 940520)", 0 )
+GAME( 1994, avsph,    avsp,     cps2, cps2_3p3b, cps2,     ROT0,   "Capcom", "Alien vs. Predator (Hispanic 940520)", 0 )
+GAME( 1994, dstlk,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Euro 940705)", 0 )
+GAME( 1994, dstlku,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940818)", 0 )
+GAME( 1994, dstlkur1, dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940705)", 0 )
+GAME( 1994, dstlka,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Asia 940705)", 0 )
+GAME( 1994, vampj,    dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)", 0 )	// one of these two must be a bad dump
+GAME( 1994, vampja,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705 alt)", 0 )
+GAME( 1994, vampjr1,  dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940630)", 0 )
+GAME( 1994, ringdest, 0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Euro 940902)", 0 )
+GAME( 1994, smbomb,   ringdest, cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940831)", 0 )
+GAME( 1994, smbombr1, ringdest, cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Super Muscle Bomber: The International Blowout (Japan 940808)", 0 )
+GAME( 1995, cybots,   0,        cps2, cybots,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Euro 950424)", 0 )
+GAME( 1995, cybotsu,  cybots,   cps2, cybots,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (USA 950424)", 0 )
+GAME( 1995, cybotsj,  cybots,   cps2, cybots,    cps2,     ROT0,   "Capcom", "Cyberbots: Fullmetal Madness (Japan 950420)", 0 )
+GAME( 1995, msh,      0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Euro 951024)", 0 )
+GAME( 1995, mshu,     msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (USA 951024)", 0 )
+GAME( 1995, mshj,     msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Japan 951117)", 0 )
+GAME( 1995, mshjr1,   msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Japan 951024)", 0 )
+GAME( 1995, msha,     msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Asia 951024)", 0 )
+GAME( 1995, mshh,     msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Hispanic 951117)", 0 )
+GAME( 1995, mshb,     msh,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes (Brazil 951117)", 0 )
+GAME( 1995, nwarr,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Euro 950316)", 0 )
+GAME( 1995, nwarru,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
+GAME( 1995, nwarrh,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", 0 )
+GAME( 1995, nwarrb,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)", 0 )
+GAME( 1995, vhuntj,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950316)", 0 )
+GAME( 1995, vhuntjr1, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)", 0 )
+GAME( 1995, vhuntjr2, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)", 0 )
+GAME( 1995, sfa,      0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950727)", 0 )
+GAME( 1995, sfar1,    sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950718)", 0 )
+GAME( 1995, sfar2,    sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950627)", 0 )
+GAME( 1995, sfar3,    sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (Euro 950605)", 0 )
+GAME( 1995, sfau,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha: Warriors' Dreams (USA 950627)", 0 )
+GAME( 1995, sfza,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Asia 950627)", 0 )
+GAME( 1995, sfzj,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950727)", 0 )
+GAME( 1995, sfzjr1,   sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950627)", 0 )
+GAME( 1995, sfzjr2,   sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950605)", 0 )
+GAME( 1995, sfzh,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", 0 )
+GAME( 1995, sfzb,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", 0 )
+GAME( 1995, sfzbr1,   sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", 0 )
+GAME( 1995, mmancp2u, megaman,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS2, USA 951006, SAMPLE Version)", 0 )
+GAME( 1995, rmancp2j, megaman,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS2, Japan 950922)", 0 )
+GAME( 1996, 19xx,     0,        cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (USA 951207)", 0 )
+GAME( 1996, 19xxa,    19xx,     cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Asia 951207)", 0 )
+GAME( 1996, 19xxj,    19xx,     cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951225)", 0 )
+GAME( 1996, 19xxjr1,  19xx,     cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Japan 951207)", 0 )
+GAME( 1996, 19xxh,    19xx,     cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Hispanic 951218)", 0 )
+GAME( 1996, 19xxb,    19xx,     cps2, cps2_2p2b, cps2,     ROT270, "Capcom", "19XX: The War Against Destiny (Brazil 951218)", 0 )
+GAME( 1996, ddsom,    0,        cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960619)", 0 )
+GAME( 1996, ddsomr1,  ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960223)", 0 )
+GAME( 1996, ddsomr2,  ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960209)", 0 )
+GAME( 1996, ddsomr3,  ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Euro 960208)", 0 )
+GAME( 1996, ddsomu,   ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960619)", 0 )
+GAME( 1996, ddsomur1, ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (USA 960209)", 0 )
+GAME( 1996, ddsomj,   ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960619)", 0 )
+GAME( 1996, ddsomjr1, ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Japan 960206)", 0 )
+GAME( 1996, ddsoma,   ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Asia 960619)", 0 )
+GAME( 1996, ddsomb,   ddsom,    cps2, cps2_4p4b, cps2,     ROT0,   "Capcom", "Dungeons & Dragons: Shadow over Mystara (Brazil 960223)", 0 )
+GAME( 1996, megaman2, 0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (USA 960708)", 0 )
+GAME( 1996, megamn2a, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man 2: The Power Fighters (Asia 960708)", 0 )
+GAME( 1996, rckman2j, megaman2, cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Rockman 2: The Power Fighters (Japan 960708)", 0 )
+GAME( 1996, qndream,  0,        cps2, qndream,   cps2,     ROT0,   "Capcom", "Quiz Nanairo Dreams: Nijiirochou no Kiseki (Japan 960826)", 0 )
+GAME( 1996, sfa2,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 2 (USA 960306)", 0 )
+GAME( 1996, sfz2j,    sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Japan 960227)", 0 )
+GAME( 1996, sfz2a,    sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Asia 960227)", 0 )
+GAME( 1996, sfz2b,    sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960531)", 0 )
+GAME( 1996, sfz2br1,  sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Brazil 960304)", 0 )
+GAME( 1996, sfz2h,    sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Hispanic 960304)", 0 )
+GAME( 1996, sfz2n,    sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 (Oceania 960229)", 0 )
+GAME( 1996, sfz2aj,   sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Japan 960805)", 0 )
+GAME( 1996, sfz2ah,   sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Hispanic 960813)", 0 )
+GAME( 1996, sfz2ab,   sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Brazil 960813)", 0 )
+GAME( 1996, sfz2aa,   sfa2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 2 Alpha (Asia 960826)", 0 )
+GAME( 1996, spf2t,    0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (USA 960620)", 0 )
+GAME( 1996, spf2xj,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II X (Japan 960531)", 0 )
+GAME( 1996, spf2ta,   spf2t,    cps2, cps2_2p2b, cps2,     ROT0,   "Capcom", "Super Puzzle Fighter II Turbo (Asia 960529)", 0 )
+GAME( 1996, xmvsf,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 961004)", 0 )
+GAME( 1996, xmvsfr1,  xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Euro 960910)", 0 )
+GAME( 1996, xmvsfu,   xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961023)", 0 )
+GAME( 1996, xmvsfur1, xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (USA 961004)", 0 )
+GAME( 1996, xmvsfj,   xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 961004)", 0 )
+GAME( 1996, xmvsfjr1, xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960910)", 0 )
+GAME( 1996, xmvsfjr2, xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Japan 960909)", 0 )
+GAME( 1996, xmvsfa,   xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 961023)", 0 )
+GAME( 1996, xmvsfar1, xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Asia 960919)", 0 )
+GAME( 1996, xmvsfh,   xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Hispanic 961004)", 0 )
+GAME( 1996, xmvsfb,   xmvsf,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men Vs. Street Fighter (Brazil 961023)", 0 )
+GAME( 1997, batcir,   0,        cps2, cps2_4p2b, cps2,     ROT0,   "Capcom", "Battle Circuit (Euro 970319)", 0 )
+GAME( 1997, batcira,  batcir,   cps2, cps2_4p2b, cps2,     ROT0,   "Capcom", "Battle Circuit (Asia 970319)", 0 )
+GAME( 1997, batcirj,  batcir,   cps2, cps2_4p2b, cps2,     ROT0,   "Capcom", "Battle Circuit (Japan 970319)", 0 )
+GAME( 1997, csclub,   0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Capcom Sports Club (Euro 970722)", 0 )
+GAME( 1997, cscluba,  csclub,   cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Capcom Sports Club (Asia 970722)", 0 )
+GAME( 1997, csclubj,  csclub,   cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Capcom Sports Club (Japan 970722)", 0 )
+GAME( 1997, csclubh,  csclub,   cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Capcom Sports Club (Hispanic 970722)", 0 )
+GAME( 1997, mshvsf,   0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Euro 970625)", 0 )
+GAME( 1997, mshvsfu,  mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970827)", 0 )
+GAME( 1997, mshvsfu1, mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (USA 970625)", 0 )
+GAME( 1997, mshvsfj,  mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970707)", 0 )
+GAME( 1997, mshvsfj1, mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970702)", 0 )
+GAME( 1997, mshvsfj2, mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Japan 970625)", 0 )
+GAME( 1997, mshvsfh,  mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Hispanic 970625)", 0 )
+GAME( 1997, mshvsfa,  mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970625)", 0 )
+GAME( 1997, mshvsfa1, mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Asia 970620)", 0 )
+GAME( 1997, mshvsfb,  mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970827)", 0 )
+GAME( 1997, mshvsfb1, mshvsf,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Super Heroes Vs. Street Fighter (Brazil 970625)", 0 )
+GAME( 1997, sgemf,    0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Super Gem Fighter Mini Mix (USA 970904)", 0 )
+GAME( 1997, pfghtj,   sgemf,    cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Pocket Fighter (Japan 970904)", 0 )
+GAME( 1997, sgemfa,   sgemf,    cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Asia 970904)", 0 )
+GAME( 1997, sgemfh,   sgemf,    cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Super Gem Fighter: Mini Mix (Hispanic 970904)", 0 )
+GAME( 1997, vhunt2,   0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929)", 0 )
+GAME( 1997, vhunt2r1, vhunt2,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913)", 0 )
+GAME( 1997, vsav,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Euro 970519)", 0 )
+GAME( 1997, vsavu,    vsav,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (USA 970519)", 0 )
+GAME( 1997, vsavj,    vsav,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Japan 970519)", 0 )
+GAME( 1997, vsava,    vsav,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Asia 970519)", 0 )
+GAME( 1997, vsavh,    vsav,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior: The Lord of Vampire (Hispanic 970519)", 0 )
+GAME( 1997, vsav2,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Savior 2: The Lord of Vampire (Japan 970913)", 0 )
+GAME( 1998, mvsc,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Euro 980112)", 0 )
+GAME( 1998, mvscu,    mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 980123)", 0 )
+GAME( 1998, mvscj,    mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123)", 0 )
+GAME( 1998, mvscjr1,  mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980112)", 0 )
+GAME( 1998, mvsca,    mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980123)", 0 )
+GAME( 1998, mvscar1,  mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980112)", 0 )
+GAME( 1998, mvsch,    mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Hispanic 980123)", 0 )
+GAME( 1998, mvscb,    mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Brazil 980123)", 0 )
+GAME( 1998, sfa3,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Euro 980904)", 0 )
+GAME( 1998, sfa3u,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980904)", 0 )
+GAME( 1998, sfa3ur1,  sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980629)", 0 )
+GAME( 1998, sfa3b,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Brazil 980629)", 0 )
+GAME( 1998, sfz3j,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980904)", 0 )
+GAME( 1998, sfz3jr1,  sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980727)", 0 )
+GAME( 1998, sfz3jr2,  sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980629)", 0 )
+GAME( 1998, sfz3a,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980904)", 0 )
+GAME( 1998, sfz3ar1,  sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Asia 980701)", 0 )
+GAME( 1999, jyangoku, 0,        cps2, cps2_1p2b, cps2,     ROT0,   "Capcom", "Jyangokushi: Haoh no Saihai (Japan 990527)", 0 )
+GAME( 2004, hsf2,     0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Asia 040202)", 0 )
+GAME( 2004, hsf2j,    hsf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Hyper Street Fighter 2: The Anniversary Edition (Japan 031222)", 0 )
 
 /* Games released on CPS-2 hardware by Takumi */
 
-GAME( 1999, gigawing, 0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (USA 990222)", 0 )
-GAME( 1999, gwingj,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 )
-GAME( 1999, gwinga,   gigawing,cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", 0 )
-GAME( 2000, mmatrix,  0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (USA 000412)", 0 )
-GAME( 2000, mmatrixj, mmatrix, cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", 0 )
+GAME( 1999, gigawing, 0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (USA 990222)", 0 )
+GAME( 1999, gwingj,   gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 )
+GAME( 1999, gwinga,   gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", 0 )
+GAME( 2000, mmatrix,  0,        cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (USA 000412)", 0 )
+GAME( 2000, mmatrixj, mmatrix,  cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", 0 )
 
 /* Games released on CPS-2 hardware by Mitchell */
 
-GAME( 2000, mpang,    0,       cps2, ssf2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (USA 001010)", 0 )
-GAME( 2000, mpangj,   mpang,   cps2, ssf2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Japan 001011)", 0 )
-GAME( 2001, pzloop2,  0,       cps2, puzloop2,puzloop2,ROT0,"Mitchell, distributed by Capcom", "Puzz Loop 2 (Euro 010302)", 0 )
-GAME( 2001, pzloop2j, pzloop2, cps2, puzloop2,puzloop2,ROT0,"Mitchell, distributed by Capcom", "Puzz Loop 2 (Japan 010205)", 0 )
-GAME( 2001, choko,    0,       cps2, cps2,    cps2, ROT0,   "Mitchell, distributed by Capcom", "Choko (Japan 010820)", 0 )
+GAME( 2000, mpang,    0,        cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (USA 001010)", 0 )
+GAME( 2000, mpangj,   mpang,    cps2, cps2_2p1b, cps2,     ROT0,   "Mitchell, distributed by Capcom", "Mighty! Pang (Japan 001011)", 0 )
+GAME( 2001, pzloop2,  0,        cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Euro 010302)", 0 )
+GAME( 2001, pzloop2j, pzloop2,  cps2, pzloop2,   pzloop2,  ROT0,   "Mitchell, distributed by Capcom", "Puzz Loop 2 (Japan 010205)", 0 )
+GAME( 2001, choko,    0,        cps2, choko,     cps2,     ROT0,   "Mitchell, distributed by Capcom", "Choko (Japan 010820)", 0 )
 
 /* Games released on CPS-2 hardware by Eighting/Raizing */
 
-GAME( 2000, dimahoo,  0,       cps2, sgemf,   cps2, ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (Euro 000121)", 0 )
-GAME( 2000, dimahoou, dimahoo, cps2, sgemf,   cps2, ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (USA 000121)", 0 )
-GAME( 2000, gmahou,   dimahoo, cps2, sgemf,   cps2, ROT270, "Eighting/Raizing, distributed by Capcom", "Great Mahou Daisakusen (Japan 000121)", 0 )
-GAME( 2000, 1944,     0,       cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (USA 000620)", 0 )
-GAME( 2000, 1944j,    1944,    cps2, 19xx,    cps2, ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (Japan 000620)", 0 )
+GAME( 2000, dimahoo,  0,        cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (Euro 000121)", 0 )
+GAME( 2000, dimahoou, dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Dimahoo (USA 000121)", 0 )
+GAME( 2000, gmahou,   dimahoo,  cps2, cps2_2p3b, cps2,     ROT270, "Eighting/Raizing, distributed by Capcom", "Great Mahou Daisakusen (Japan 000121)", 0 )
+GAME( 2000, 1944,     0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (USA 000620)", 0 )
+GAME( 2000, 1944j,    1944,     cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Eighting/Raizing", "1944: The Loop Master (Japan 000620)", 0 )
 
 /* Games released on CPS-2 hardware by Cave */
 
-GAME( 2001, progear,  0,       cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear (USA 010117)", 0 )
-GAME( 2001, progearj, progear, cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear no Arashi (Japan 010117)", 0 )
-GAME( 2001, progeara, progear, cps2, sgemf,   cps2, ROT0,   "Capcom, supported by Cave", "Progear (Asia 010117)", 0 )
+GAME( 2001, progear,  0,        cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear (USA 010117)", 0 )
+GAME( 2001, progearj, progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear no Arashi (Japan 010117)", 0 )
+GAME( 2001, progeara, progear,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom, supported by Cave", "Progear (Asia 010117)", 0 )
