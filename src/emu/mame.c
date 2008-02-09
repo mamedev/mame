@@ -143,6 +143,7 @@ struct _mame_private
 	UINT8			exit_pending;
 	const game_driver *new_driver_pending;
 	astring *		saveload_pending_file;
+	const char *	saveload_searchpath;
 	emu_timer *		soft_reset_timer;
 	mame_file *		logfile;
 
@@ -670,6 +671,32 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 
 
 /*-------------------------------------------------
+    set_saveload_filename - specifies the filename
+    for state loading/saving
+-------------------------------------------------*/
+
+static void set_saveload_filename(running_machine *machine, const char *filename)
+{
+	mame_private *mame = machine->mame_data;
+
+	/* free any existing request and allocate a copy of the requested name */
+	if (mame->saveload_pending_file != NULL)
+		astring_free(mame->saveload_pending_file);
+
+	if (osd_is_absolute_path(filename))
+	{
+		mame->saveload_searchpath = NULL;
+		mame->saveload_pending_file = astring_dupc(filename);
+	}
+	else
+	{
+		mame->saveload_searchpath = SEARCHPATH_STATE;
+		mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
+	}
+}
+
+
+/*-------------------------------------------------
     mame_schedule_save - schedule a save to
     occur as soon as possible
 -------------------------------------------------*/
@@ -678,10 +705,8 @@ void mame_schedule_save(running_machine *machine, const char *filename)
 {
 	mame_private *mame = machine->mame_data;
 
-	/* free any existing request and allocate a copy of the requested name */
-	if (mame->saveload_pending_file != NULL)
-		astring_free(mame->saveload_pending_file);
-	mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
+	/* specify the filename to save or load */
+	set_saveload_filename(machine, filename);
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_save;
@@ -701,10 +726,8 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 {
 	mame_private *mame = machine->mame_data;
 
-	/* free any existing request and allocate a copy of the requested name */
-	if (mame->saveload_pending_file != NULL)
-		astring_free(mame->saveload_pending_file);
-	mame->saveload_pending_file = astring_assemble_4(astring_alloc(), machine->basename, PATH_SEPARATOR, filename, ".sta");
+	/* specify the filename to save or load */
+	set_saveload_filename(machine, filename);
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_load;
@@ -1698,7 +1721,7 @@ static void handle_save(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(SEARCHPATH_STATE, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 	if (filerr == FILERR_NONE)
 	{
 		int cpunum;
@@ -1748,6 +1771,7 @@ static void handle_save(running_machine *machine)
 cancel:
 	/* unschedule the save */
 	astring_free(mame->saveload_pending_file);
+	mame->saveload_searchpath = NULL;
 	mame->saveload_pending_file = NULL;
 	mame->saveload_schedule_callback = NULL;
 }
@@ -1784,7 +1808,7 @@ static void handle_load(running_machine *machine)
 	}
 
 	/* open the file */
-	filerr = mame_fopen(SEARCHPATH_STATE, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(mame->saveload_searchpath, astring_c(mame->saveload_pending_file), OPEN_FLAG_READ, &file);
 	if (filerr == FILERR_NONE)
 	{
 		/* start loading */
