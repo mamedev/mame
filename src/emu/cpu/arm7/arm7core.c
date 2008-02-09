@@ -322,6 +322,8 @@ static UINT32 decodeShift( UINT32 insn, UINT32 *pCarry)
         if( k == 0 ) /* Register shift by 0 is a no-op */
         {
 //          LOG(("%08x:  NO-OP Regshift\n",R15));
+            /* TODO this is wrong for at least ROR by reg with with lower
+             *      5 bits 0 but lower 8 bits non zero */
             if (pCarry) *pCarry = GET_CPSR & C_MASK;
             return rm;
         }
@@ -387,11 +389,12 @@ static UINT32 decodeShift( UINT32 insn, UINT32 *pCarry)
         if (k)
         {
             while (k > 32) k -= 32;
-            if (pCarry) *pCarry = rm & SIGN_BIT;
+            if (pCarry) *pCarry = rm & (1 << (k - 1));
             return ROR(rm, k);
         }
         else
         {
+            /* RRX */
             if (pCarry) *pCarry = (rm & 1);
             return LSR(rm, 1) | ((GET_CPSR & C_MASK) << 2);
         }
@@ -514,7 +517,7 @@ static void arm7_core_reset(void)
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(eARM7_MODE_SVC);
-    SET_CPSR(GET_CPSR | I_MASK | F_MASK);
+    SET_CPSR(GET_CPSR | I_MASK | F_MASK | 0x10);
     R15 = 0;
 	change_pc(R15);
 }
@@ -1126,34 +1129,25 @@ static void HandlePSRTransfer( UINT32 insn )
     //MSR ( bit 21 set ) - Copy value to CPSR/SPSR
     if( (insn & 0x00200000) )
     {
-        //MSR (register transfer)?
-        if(insn & 0x10000)
-        {
-            val = GET_REGISTER(insn & 0x0f);
-        }
-        //MSR (register or immediate transfer - flag bits only)
-        else
-        {
-            //Immediate Value?
-            if(insn & INSN_I) {
-                //Value can be specified for a Right Rotate, 2x the value specified.
-                int by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
-                if (by)
-                    val = ROR(insn & INSN_OP2_IMM, by << 1);
-                else
-                    val = insn & INSN_OP2_IMM;
-            }
-            //Value from Register
+        //Immediate Value?
+        if(insn & INSN_I) {
+            //Value can be specified for a Right Rotate, 2x the value specified.
+            int by = (insn & INSN_OP2_ROTATE) >> INSN_OP2_ROTATE_SHIFT;
+            if (by)
+                val = ROR(insn & INSN_OP2_IMM, by << 1);
             else
-	    {
-                val = GET_REGISTER(insn & 0x0f);
-            }
+                val = insn & INSN_OP2_IMM;
+        }
+        //Value from Register
+        else
+	{
+            val = GET_REGISTER(insn & 0x0f);
         }
 
 	// apply field code bits
 	if (reg == eCPSR)
 	{
-		if ((GET_CPSR & 0x1f) > 0x10)
+		if (oldmode != eARM7_MODE_USER)
 		{
 			if (insn & 0x00010000)
 			{
