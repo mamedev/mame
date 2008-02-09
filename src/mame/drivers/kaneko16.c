@@ -28,7 +28,7 @@ Year + Game                    PCB         Notes
 91  The Berlin Wall
     Magical Crystals           Z00FC-02
 92  Bakuretsu Breaker          ZOOFC-02
-    Blaze On                   ATL-67140   2 VU-002 Sprites Chips
+    Blaze On                   Z02AT-002   2 VU-002 Sprites Chips (Atlus PCB ID: ATL-67140)
     Shogun Warriors            ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
     B.Rap Boys                 ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
 94  Great 1000 Miles Rally                 TBSOP01 MCU protection (EEPROM handling etc.)
