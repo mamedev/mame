@@ -140,8 +140,8 @@ VIDEO_UPDATE( kangaroo )
 {
 	UINT8 scrolly = kangaroo_video_control[6];
 	UINT8 scrollx = kangaroo_video_control[7];
-	UINT8 maska = kangaroo_video_control[10] >> 3;
-	UINT8 maskb = kangaroo_video_control[10] >> 0;
+	UINT8 maska = (kangaroo_video_control[10] & 0x28) >> 3;
+	UINT8 maskb = (kangaroo_video_control[10] & 0x07) >> 0;
 	UINT8 xora = (kangaroo_video_control[9] & 0x20) ? 0xff : 0x00;
 	UINT8 xorb = (kangaroo_video_control[9] & 0x10) ? 0xff : 0x00;
 	UINT8 enaa = (kangaroo_video_control[9] & 0x08);
@@ -185,12 +185,12 @@ VIDEO_UPDATE( kangaroo )
 			finalpens = 0;
 			if (enaa && (pria || pixb == 0))
 			{
-				if (!(pixa & 0x08)) pixa &= ~maska;
+				if (!(pixa & 0x08)) pixa &= maska;
 				finalpens |= pixa;
 			}
 			if (enab && (prib || pixa == 0))
 			{
-				if (!(pixb & 0x08)) pixb &= ~maskb;
+				if (!(pixb & 0x08)) pixb &= maskb;
 				finalpens |= pixb;
 			}
 
