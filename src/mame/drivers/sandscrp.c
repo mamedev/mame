@@ -1,6 +1,22 @@
-/* Sand Scorpian
+/*
 
-    Sand Scorpion (by Face)    Kaneko CALC1 MCU protection (collision detection etc.)
+    Sand Scorpion
+
+(C) 1992 FACE
+
+PCB Number: Z03VA-001
+
+      CPU: TMP68HC000N-12
+Sound CPU: Z8400AB1 (Z80A)
+    Sound: OKI6295, YM2203C & Y3014B
+      OSC: 16.000mhz & 12.000mhz
+     Dips: Two 8-way dipswitch banks
+
+Kaneko custom (surfaced scratched):
+   PX79C480FP-3 PANDORA-CHIP (160pin PQFP)  <- Sprites
+   VIEW2-CHIP (144pin PQFP)                 <- Tilemaps
+   HELP1-CHIP (64pin PQFP)
+   CALC1-CHIP (40pin DIP)                   <- Collision Detection etc.
 
 */
 
@@ -413,22 +429,6 @@ MACHINE_DRIVER_END
 
                                 Sand Scorpion
 
-(C) 1992 FACE
-
-PCB Number: Z03VA-001
-
-      CPU: TMP68HC000N-12
-Sound CPU: Z8400AB1 (Z80A)
-    Sound: OKI6295, YM2203C & Y3014B
-      OSC: 16.000mhz & 12.000mhz
-     Dips: Two 8-way dipswitch banks
-
-Kaneko custom (surfaced scratched):
-   VIEW2-CHIP (144pin PQFP)
-   HELP1-CHIP (64pin PQFP)
-   VU-002     (160pin PQFP)
-   CALC1-CHIP (40pin DIP)
-
 SANDSC03.BIN     27C040
 SANDSC04.BIN     27C040
 SANDSC05.BIN     27C040
@@ -462,7 +462,7 @@ ROM_START( sandscrp ) /* Z03VA-003 PCB */
 ROM_END
 
 
-ROM_START( sandscra )
+ROM_START( sandscra ) /* Different rev PCB?? */
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) )
 	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) )
