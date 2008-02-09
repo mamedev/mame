@@ -1,6 +1,6 @@
 /* Sand Scorpian
 
-    Sand Scorpion (by Face)                MCU protection (collision detection etc.)
+    Sand Scorpion (by Face)    Kaneko CALC1 MCU protection (collision detection etc.)
 
 */
 
@@ -413,11 +413,21 @@ MACHINE_DRIVER_END
 
                                 Sand Scorpion
 
-(C) FACE
-68HC000N-12
-Z8400AB1
-OKI6295, YM2203C
-OSC:  16.000mhz,   12.000mhz
+(C) 1992 FACE
+
+PCB Number: Z03VA-001
+
+      CPU: TMP68HC000N-12
+Sound CPU: Z8400AB1 (Z80A)
+    Sound: OKI6295, YM2203C & Y3014B
+      OSC: 16.000mhz & 12.000mhz
+     Dips: Two 8-way dipswitch banks
+
+Kaneko custom (surfaced scratched):
+   VIEW2-CHIP (144pin PQFP)
+   HELP1-CHIP (64pin PQFP)
+   VU-002     (160pin PQFP)
+   CALC1-CHIP (40pin DIP)
 
 SANDSC03.BIN     27C040
 SANDSC04.BIN     27C040
@@ -430,7 +440,7 @@ SANDSC12.BIN     27C2001
 
 ***************************************************************************/
 
-ROM_START( sandscrp )
+ROM_START( sandscrp ) /* Z03VA-003 PCB */
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "sandsc11.bin", 0x000000, 0x040000, CRC(9b24ab40) SHA1(3187422dbe8b15d8053be4cb20e56d3e6afbd5f2) )
 	ROM_LOAD16_BYTE( "sandsc12.bin", 0x000001, 0x040000, CRC(ad12caee) SHA1(83267445b89c3cf4dc317106aa68763d2f29eff7) )

@@ -17,7 +17,7 @@ CUSTOM :  VU-001 046A                  (48pin PQFP)
           VU-003                                        <- High Colour Background
           VIEW2-CHIP 23160-509 9047EAI (144pin PQFP)    <- Tilemaps
           MUX2-CHIP                    (64pin PQFP)
-          HELP1-CHIP
+          HELP1-CHIP                   (64pin PQFP)
           IU-001 9045KP002             (44pin PQFP)
           I/O JAMMA MC-8282 047        (46pin)          <- Inputs
 
@@ -28,7 +28,7 @@ Year + Game                    PCB         Notes
 91  The Berlin Wall
     Magical Crystals           Z00FC-02
 92  Bakuretsu Breaker          ZOOFC-02
-    Blaze On                               2 Sprites Chips !?
+    Blaze On                   ATL-67140   2 VU-002 Sprites Chips
     Shogun Warriors            ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
     B.Rap Boys                 ZO1DK-002   CALC3 MCU protection (EEPROM handling, 68k code snippet, data - palettes, tilemaps, fighters)
 94  Great 1000 Miles Rally                 TBSOP01 MCU protection (EEPROM handling etc.)
@@ -2387,8 +2387,8 @@ CUSTOM:       KANEKO VU-002 x2
  BZ_BG.U2           57C8200       BG CHR
  BZ_SP1.U20         27C8001       OBJ
  BZ_SP2.U21         27C8001       OBJ
- BZ_SP1.U68 ( == BZ_SP1.U20)
- BZ_SP2.U86 ( == BZ_SP2.U21)
+ BZ_SP1.U68         27C8001       OBJ (same as BZ_SP1.U20 for 2nd sprite chip)
+ BZ_SP2.U86         27C8001       OBJ (same as BZ_SP2.U21 for 2nd sprite chip)
 
 ***************************************************************************/
 

@@ -3279,7 +3279,7 @@ static MACHINE_DRIVER_START( atomicp )
 	MDRV_MACHINE_RESET(atomicp)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("2151", YM2413, 4000000)
+	MDRV_SOUND_REPLACE("2151", YM2413, 5000000) /* 20MHz OSC divided by 4 */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_REMOVE("7759")
@@ -3709,8 +3709,16 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Atomic Point
-    CPU: 68000
-    Custom Korean Board - NOT Sega
+
+    Custom Korean Board - NOT Sega:
+
+    CPU: TMP68000P-10
+    OSC: 25.1748MHz & 20MHz
+  Chips: Philko PK8702
+         Philko PK8811
+   Dips: Two 8-way dipswitch banks
+  Sound: Yamaha YM2413
+
 */
 ROM_START( atomicp )
 	ROM_REGION( 0x020000, REGION_CPU1, 0 ) /* 68000 code */
