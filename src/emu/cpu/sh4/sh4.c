@@ -97,6 +97,8 @@ typedef struct
 	int     is_slave, cpu_number;
 	int		cpu_clock, bus_clock, pm_clock;
 	int		fpu_sz, fpu_pr;
+	int		ioport16_pullup, ioport16_direction;
+	int		ioport4_pullup, ioport4_direction;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 } SH4;
@@ -3742,6 +3744,7 @@ static void increment_rtc_time(int mode)
 		sh4.m[RWKCNT] = 0;
 	}
 
+	days = 0;
 	year = (sh4.m[RYRCNT] & 0xf) + ((sh4.m[RYRCNT] & 0xf0) >> 4)*10 + ((sh4.m[RYRCNT] & 0xf00) >> 8)*100 + ((sh4.m[RYRCNT] & 0xf000) >> 12)*1000;
 	leap = 0;
 	if (!(year%100))
@@ -3753,7 +3756,8 @@ static void increment_rtc_time(int mode)
 		leap = 1;
 	if (sh4.m[RMONCNT] != 2)
 		leap = 0;
-	days = daysmonth[(sh4.m[RMONCNT] & 0xf) + ((sh4.m[RMONCNT] & 0xf0) >> 4)*10 - 1];
+	if (sh4.m[RMONCNT])
+		days = daysmonth[(sh4.m[RMONCNT] & 0xf) + ((sh4.m[RMONCNT] & 0xf0) >> 4)*10 - 1];
 
 	sh4.m[RDAYCNT] = sh4.m[RDAYCNT] + carry;
 	if ((sh4.m[RDAYCNT] & 0xf) == 0xa)
@@ -4075,6 +4079,7 @@ int s;
 
 WRITE32_HANDLER( sh4_internal_w )
 {
+	int a;
 	UINT32 old = sh4.m[offset];
 	COMBINE_DATA(sh4.m+offset);
 
@@ -4272,7 +4277,7 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4_exception_recompute();
 		break;
 
-	// DMA
+		// DMA
 	case SAR0:
 	case SAR1:
 	case SAR2:
@@ -4312,6 +4317,40 @@ WRITE32_HANDLER( sh4_internal_w )
 		// Store Queues
 	case QACR0:
 	case QACR1:
+		break;
+
+		// I/O ports
+	case PCTRA:
+		sh4.ioport16_pullup = 0;
+		sh4.ioport16_direction = 0;
+		for (a=0;a < 16;a++) {
+			sh4.ioport16_direction |= (sh4.m[PCTRA] & (1 << (a*2))) >> a;
+			sh4.ioport16_pullup |= (sh4.m[PCTRA] & (1 << (a*2+1))) >> (a+1);
+		}
+		sh4.ioport16_direction &= 0xffff;
+		sh4.ioport16_pullup = (sh4.ioport16_pullup | sh4.ioport16_direction) ^ 0xffff;
+		if (sh4.m[BCR2] & 1)
+			io_write_dword_64le(SH4_IOPORT_16, sh4.m[PDTRA] & sh4.ioport16_direction);
+		break;
+	case PDTRA:
+		if (sh4.m[BCR2] & 1)
+			io_write_dword_64le(SH4_IOPORT_16, sh4.m[PDTRA] & sh4.ioport16_direction);
+		break;
+	case PCTRB:
+		sh4.ioport4_pullup = 0;
+		sh4.ioport4_direction = 0;
+		for (a=0;a < 4;a++) {
+			sh4.ioport4_direction |= (sh4.m[PCTRB] & (1 << (a*2))) >> a;
+			sh4.ioport4_pullup |= (sh4.m[PCTRB] & (1 << (a*2+1))) >> (a+1);
+		}
+		sh4.ioport4_direction &= 0xf;
+		sh4.ioport4_pullup = (sh4.ioport4_pullup | sh4.ioport4_direction) ^ 0xf;
+		if (sh4.m[BCR2] & 1)
+			io_write_dword_64le(SH4_IOPORT_4, sh4.m[PDTRB] & sh4.ioport4_direction);
+		break;
+	case PDTRB:
+		if (sh4.m[BCR2] & 1)
+			io_write_dword_64le(SH4_IOPORT_4, sh4.m[PDTRB] & sh4.ioport4_direction);
 		break;
 
 	case SCBRR2:
@@ -4356,6 +4395,16 @@ READ32_HANDLER( sh4_internal_r )
 			return compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
 		else
 			return sh4.m[TCNT2];
+		break;
+
+		// I/O ports
+	case PDTRA:
+		if (sh4.m[BCR2] & 1)
+			return (io_read_dword_64le(SH4_IOPORT_16) & ~sh4.ioport16_direction) | (sh4.m[PDTRA] & sh4.ioport16_direction);
+		break;
+	case PDTRB:
+		if (sh4.m[BCR2] & 1)
+			return (io_read_dword_64le(SH4_IOPORT_4) & ~sh4.ioport4_direction) | (sh4.m[PDTRB] & sh4.ioport4_direction);
 		break;
 	}
 	return sh4.m[offset];
@@ -4642,6 +4691,7 @@ static void sh4_dma_ddt(struct sh4_ddt_dma *s)
 {
 UINT32 chcr;
 UINT32 *p32bits;
+UINT64 *p32bytes;
 UINT32 pos,len,siz;
 
 	if (sh4.dma_timer_active[s->channel])
@@ -4722,21 +4772,50 @@ UINT32 pos,len,siz;
 				return;
 		sh4_dma_transfer(s->channel, 0, chcr, &s->source, &s->destination, &len);
 	} else {
-		if ((s->direction) == 0) {
-			len = s->length;
-			p32bits = (UINT32 *)(s->buffer);
-			for (pos = 0;pos < len;pos++) {
-				*p32bits = program_read_dword_64le(s->source);
-				p32bits++;
-				s->source = s->source + 4;
+		if (s->size == 4) {
+			if ((s->direction) == 0) {
+				len = s->length;
+				p32bits = (UINT32 *)(s->buffer);
+				for (pos = 0;pos < len;pos++) {
+					*p32bits = program_read_dword_64le(s->source);
+					p32bits++;
+					s->source = s->source + 4;
+				}
+			} else {
+				len = s->length;
+				p32bits = (UINT32 *)(s->buffer);
+				for (pos = 0;pos < len;pos++) {
+					program_write_dword_64le(s->destination, *p32bits);
+					p32bits++;
+					s->destination = s->destination + 4;
+				}
 			}
-		} else {
-			len = s->length;
-			p32bits = (UINT32 *)(s->buffer);
-			for (pos = 0;pos < len;pos++) {
-				program_write_dword_64le(s->destination, *p32bits);
-				p32bits++;
-				s->destination = s->destination + 4;
+		}
+		if (s->size == 32) {
+			if ((s->direction) == 0) {
+				len = s->length * 4;
+				p32bytes = (UINT64 *)(s->buffer);
+				for (pos = 0;pos < len;pos++) {
+#ifdef LSB_FIRST
+					*p32bytes = program_read_qword_64le(s->source);
+#else
+					*p32bytes = program_read_qword_64be(s->source);
+#endif
+					p32bytes++;
+					s->destination = s->destination + 8;
+				}
+			} else {
+				len = s->length * 4;
+				p32bytes = (UINT64 *)(s->buffer);
+				for (pos = 0;pos < len;pos++) {
+#ifdef LSB_FIRST
+					program_write_qword_64le(s->destination, *p32bytes);
+#else
+					program_write_qword_64be(s->destination, *p32bytes);
+#endif
+					p32bytes++;
+					s->destination = s->destination + 8;
+				}
 			}
 		}
 	}
@@ -4931,8 +5010,8 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 0;				break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 		info->i = 0;				break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 		info->i = 0;				break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 64;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_sh4_internal_map; break;

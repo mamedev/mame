@@ -54,6 +54,15 @@ enum
 	CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,
 };
 
+enum
+{
+	SH4_IOPORT_16=8*0,
+	SH4_IOPORT_4=8*1,
+	// future use
+	SH4_IOPORT_SCI=8*2,
+	SH4_IOPORT_SCIF=8*3
+};
+
 struct sh4_config
 {
   int md2;

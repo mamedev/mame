@@ -503,6 +503,8 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 
 #include "driver.h"
 #include "video/generic.h"
+#include "machine/eeprom.h"
+#include "machine/x76f100.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "dc.h"
@@ -513,7 +515,8 @@ static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,
 
 static UINT32 *dc_sound_ram;
 extern UINT64 *dc_texture_ram;
-static UINT32 rom_offset, dma_offset;
+static UINT32 rom_offset, dma_count;
+UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
 {
@@ -587,6 +590,14 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 		return ret;
 	}
+	else if ((offset == 15) && ((mem_mask & U64(0xffff00000000)) == 0)) // boardid read
+	{
+		UINT64 ret;
+
+		ret = x76f100_sda_read( 0 ) << 15;
+
+		return ret << 32;
+	}
 	else
 	{
 		mame_printf_verbose("ROM: read mask %llx @ %x (PC=%x)\n", mem_mask, offset, activecpu_get_pc());
@@ -597,13 +608,13 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 static WRITE64_HANDLER( naomi_rom_board_w )
 {
-	if ((offset == 1) && ((mem_mask & U64(0xffff)) == 0))
+	if ((offset == 1) && ((mem_mask & U64(0xffff00000000)) == 0))
 	{
 		// DMA_OFFSETH
 		dma_offset &= 0xffff;
-		dma_offset |= (data & 0x1fff)<<16;
+		dma_offset |= (data >> 16) & 0x1fff0000;
 	}
-	else if ((offset == 1) && ((mem_mask & U64(0xffff00000000)) == 0))
+	else if ((offset == 2) && ((mem_mask & U64(0xffff)) == 0))
 	{
 		// DMA_OFFSETL
 		dma_offset &= 0xffff0000;
@@ -621,15 +632,65 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		rom_offset &= 0xffff0000;
 		rom_offset |= (data & 0xffff);
 	}
+	else if ((offset == 15) && ((mem_mask & 0xffff) == 0))
+	{
+		// NAOMI_BOARDID_WRITE
+		x76f100_cs_write(0, (data >> 2) & 1 );
+		x76f100_rst_write(0, (data >> 3) & 1 );
+		x76f100_scl_write(0, (data >> 1) & 1 );
+		x76f100_sda_write(0, (data >> 0) & 1 );
+	}
+	else if ((offset == 2) && ((mem_mask & U64(0xffffffff00000000)) == 0))
+	{
+		// NAOMI_DMA_COUNT
+		dma_count = data >> 32;
+	}
 	else
 	{
 		mame_printf_verbose("ROM: write %llx to %x, mask %llx (PC=%x)\n", data, offset, mem_mask, activecpu_get_pc());
 	}
 }
 
+static NVRAM_HANDLER( naomi_eeproms )
+{
+	static UINT8 eeprom_romboard[20+48] = {0x19,0x00,0xaa,0x55,0,0,0,0,0,0,0,0,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d};
+
+	if (read_or_write)
+		/*EEPROM_save(file)*/;
+	else
+	{
+		EEPROM_init(&eeprom_interface_93C46);
+		/*if (file)
+			EEPROM_load(file);
+		else*/
+		EEPROM_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
+		x76f100_init( 0, eeprom_romboard );
+		memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
+	}
+}
+
+static READ64_HANDLER( eeprom_93c46a_r )
+{
+	int res;
+
+	/* bit 3 is EEPROM data */
+	res = EEPROM_read_bit() << 4;
+	return res;
+}
+
+static WRITE64_HANDLER( eeprom_93c46a_w )
+{
+	/* bit 4 is data */
+	/* bit 2 is clock */
+	/* bit 5 is cs */
+	EEPROM_write_bit(data & 0x8);
+	EEPROM_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	EEPROM_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM									// BIOS
-	AM_RANGE(0x00200000, 0x00207fff) AM_RAM									// bios uses it (battery backed ram ?)
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
+	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( naomi_rom_board_r, naomi_rom_board_w )
@@ -640,16 +701,19 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE( dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE( naomi_arm_r, naomi_arm_w ) // sound RAM
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) 	// bios uses it, actual start and end addresses not known
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram ) 			// texture memory
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)							// mirror of texture RAM
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(1)							// mirror of main RAM
+	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)							// another mirror of texture memory
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION(REGION_CPU1, 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
 static READ32_HANDLER( test1 )
@@ -658,9 +722,9 @@ static READ32_HANDLER( test1 )
 }
 
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE( &dc_sound_ram )	/* shared with SH-4 */
-	AM_RANGE(0x00200000, 0x002000ff) AM_READ( test1 )	// for bug (?) in sound bios
-	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE( dc_aica_arm_r, dc_aica_arm_w )	/* shared with SH-4 */
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE( &dc_sound_ram )                /* shared with SH-4 */
+	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE( dc_aica_arm_r, dc_aica_arm_w )   /* shared with SH-4 */
+	AM_RANGE(0x00808000, 0x008080ff) AM_READ( test1 )                               // for bug (?) in sound bios
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( naomi )
@@ -674,15 +738,18 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_CPU_ADD_TAG("main", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
-	MDRV_CPU_VBLANK_INT(naomi_vblank,479)
+	MDRV_CPU_IO_MAP(naomi_port,0)
+	MDRV_CPU_VBLANK_INT(naomi_vblank,1)
 
-	MDRV_CPU_ADD_TAG("sound", ARM7, 45000000)
+	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
 	MDRV_MACHINE_RESET( dc )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+
+	MDRV_NVRAM_HANDLER(naomi_eeproms)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
