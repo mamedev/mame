@@ -411,6 +411,7 @@ static int loadInc ( UINT32 pat, UINT32 rbv, UINT32 s)
     int i,result;
 
     result = 0;
+    rbv &= ~3;
     for( i=0; i<16; i++ )
     {
         if( (pat>>i)&1 )
@@ -434,6 +435,7 @@ static int loadDec( UINT32 pat, UINT32 rbv, UINT32 s)
     int i,result;
 
     result = 0;
+    rbv &= ~3;
     for( i=15; i>=0; i-- )
     {
         if( (pat>>i)&1 )
@@ -547,6 +549,7 @@ static void arm7_check_irq_state(void)
         SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER( 14, pc );                 /* save PC to R14 */
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
+        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x10;                             /* IRQ Vector address */
 	change_pc(R15);
@@ -554,12 +557,12 @@ static void arm7_check_irq_state(void)
         return;
     }
 
-    //FIRQ
+    //FIQ
     if (ARM7.pendingFiq && (cpsr & F_MASK)==0) {
         SwitchMode(eARM7_MODE_FIQ);             /* Set FIQ mode so PC is saved to correct R14 bank */
         SET_REGISTER( 14, pc );                 /* save PC to R14 */
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
-        SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIRQ*/
+        SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x1c;                             /* IRQ Vector address */
 	change_pc(R15);
@@ -583,6 +586,7 @@ static void arm7_check_irq_state(void)
         SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
         SET_REGISTER( 14, pc );                 /* save PC to R14 */
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
+        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x0c;                             /* IRQ Vector address */
 	change_pc(R15);
@@ -595,6 +599,7 @@ static void arm7_check_irq_state(void)
         SwitchMode(eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
         SET_REGISTER( 14, pc );                 /* save PC to R14 */
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
+        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x04;                             /* IRQ Vector address */
 	change_pc(R15);
@@ -615,6 +620,7 @@ static void arm7_check_irq_state(void)
 	        SET_REGISTER( 14, pc );                 /* save PC to R14 */
 	}
         SET_REGISTER( SPSR, cpsr );             /* Save current CPSR */
+        SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);		/* Go to ARM mode */
         R15 = 0x08;				/* Jump to the SWI vector */
 	change_pc(R15);
@@ -848,7 +854,7 @@ static void HandleMemSingle( UINT32 insn )
             {
                 R15 = READ32(rnv);
                 R15 -= 4;
-				change_pc(R15);
+		change_pc(R15);
                 //LDR, PC takes 2S + 2N + 1I (5 total cycles)
                 ARM7_ICOUNT -= 2;
             }
@@ -1166,7 +1172,8 @@ static void HandlePSRTransfer( UINT32 insn )
 		// status flags can be modified regardless of mode
 		if (insn & 0x00080000)
 		{
-			newval = (newval & 0x00ffffff) | (val & 0xff000000);
+			// TODO for non ARMv5E mask should be 0xf0000000 (ie mask Q bit)
+			newval = (newval & 0x00ffffff) | (val & 0xf8000000);
 		}
 	}
 	else	// SPSR has stricter requirements
@@ -1187,7 +1194,8 @@ static void HandlePSRTransfer( UINT32 insn )
 			}
 			if (insn & 0x00080000)
 			{
-				newval = (newval & 0x00ffffff) | (val & 0xff000000);
+				// TODO for non ARMv5E mask should be 0xf0000000 (ie mask Q bit)
+				newval = (newval & 0x00ffffff) | (val & 0xf8000000);
 			}
 		}
 	}
