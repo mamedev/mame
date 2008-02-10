@@ -45,41 +45,6 @@ static UINT8 top_palette_bank,bottom_palette_bank;
   bit 0 -- 2  kohm resistor -- inverter  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-static void convert_palette(running_machine *machine,const UINT8 *color_prom)
-{
-	int i;
-
-
-	for (i = 0;i < 1024;i++)
-	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
-
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 255 - (0x10 * bit0 + 0x21 * bit1 + 0x46 * bit2 + 0x88 * bit3);
-		bit0 = (color_prom[1024] >> 0) & 0x01;
-		bit1 = (color_prom[1024] >> 1) & 0x01;
-		bit2 = (color_prom[1024] >> 2) & 0x01;
-		bit3 = (color_prom[1024] >> 3) & 0x01;
-		g = 255 - (0x10 * bit0 + 0x21 * bit1 + 0x46 * bit2 + 0x88 * bit3);
-		bit0 = (color_prom[2*1024] >> 0) & 0x01;
-		bit1 = (color_prom[2*1024] >> 1) & 0x01;
-		bit2 = (color_prom[2*1024] >> 2) & 0x01;
-		bit3 = (color_prom[2*1024] >> 3) & 0x01;
-		b = 255 - (0x10 * bit0 + 0x21 * bit1 + 0x46 * bit2 + 0x88 * bit3);
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
-
-	/* reserve the last color for the transparent pen (none of the game colors has */
-	/* these RGB components) */
-	palette_set_color(machine,1024,MAKE_RGB(240,240,240));
-}
-
 
 /* these depend on jumpers on the board and change from game to game */
 static int gfx0inv,gfx1inv,gfx2inv,gfx3inv;
@@ -87,69 +52,63 @@ static int gfx0inv,gfx1inv,gfx2inv,gfx3inv;
 PALETTE_INIT( punchout )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
-
-	convert_palette(machine,color_prom);
-
-
-	/* top monitor chars */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i ^ gfx0inv) = i;
-
-	/* bottom monitor chars */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i ^ gfx1inv) = i + 512;
-
-	/* big sprite #1 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
+	for (i = 0; i < 0x800; i++)
 	{
-		if (i % 8 == 0) COLOR(2,i ^ gfx2inv) = 1024;	/* transparent */
-		else COLOR(2,i ^ gfx2inv) = i + 512;
-	}
+		int pen;
+		int r, g, b;
 
-	/* big sprite #2 */
-	for (i = 0;i < TOTAL_COLORS(3);i++)
-	{
-		if (i % 4 == 0) COLOR(3,i ^ gfx3inv) = 1024;	/* transparent */
-		else COLOR(3,i ^ gfx3inv) = i + 512;
+		if (i < 0x200)
+			/* top monitor chars */
+			pen = ((i - 0x000) ^ gfx0inv) | 0x000;
+		else if (i < 0x400)
+			/* bottom monitor chars */
+			pen = ((i - 0x200) ^ gfx1inv) | 0x200;
+		else if (i < 0x600)
+			/* big sprite #1 */
+			pen = ((i - 0x400) ^ gfx2inv) | 0x200;
+		else
+			/* big sprite #2*/
+			pen = ((i - 0x600) ^ gfx3inv) | 0x200;
+
+		r = 255 - pal4bit(color_prom[pen + 0x000]);
+		g = 255 - pal4bit(color_prom[pen + 0x400]);
+		b = 255 - pal4bit(color_prom[pen + 0x800]);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
+
 
 PALETTE_INIT( armwrest )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
-
-	convert_palette(machine,color_prom);
-
-
-	/* top monitor / bottom monitor backround chars */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
-
-	/* bottom monitor foreground chars */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = i + 512;
-
-	/* big sprite #1 */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
+	for (i = 0; i < 0xa00; i++)
 	{
-		if (i % 8 == 7) COLOR(2,i) = 1024;	/* transparent */
-		else COLOR(2,i) = i + 512;
-	}
+		int pen;
+		int r, g, b;
 
-	/* big sprite #2 - pen order is inverted */
-	for (i = 0;i < TOTAL_COLORS(3);i++)
-	{
-		if (i % 4 == 3) COLOR(3,i ^ 3) = 1024;	/* transparent */
-		else COLOR(3,i ^ 3) = i + 512;
+		if (i < 0x400)
+			/* top monitor chars */
+			pen = (i - 0x000) | 0x000;
+		else if (i < 0x600)
+			/* bottom monitor chars */
+			pen = (i - 0x400) | 0x200;
+		else if (i < 0x800)
+			/* big sprite #1 */
+			pen = (i - 0x600) | 0x200;
+		else
+			/* big sprite #2*/
+			pen = ((i - 0x800) ^ 0x03) | 0x200;
+
+		r = 255 - pal4bit(color_prom[pen + 0x000]);
+		g = 255 - pal4bit(color_prom[pen + 0x400]);
+		b = 255 - pal4bit(color_prom[pen + 0x800]);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
-
 
 
 DRIVER_INIT( punchout )
@@ -227,10 +186,12 @@ VIDEO_START( punchout )
 	tilemap_set_scroll_rows(punchout_botTilemap, 32);
 
 	spr1tilemap = tilemap_create(bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
-	spr1alttilemap = tilemap_create(bs1_get_info, tilemap_scan_rows,  8,8, 16,32);
 	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
 
 	fgtilemap = NULL;
+
+	tilemap_set_transparent_pen(spr1tilemap, gfx2inv & 0x07);
+	tilemap_set_transparent_pen(spr2tilemap, gfx3inv & 0x03);
 }
 
 
@@ -282,9 +243,12 @@ VIDEO_START( armwrest )
 	spr1tilemap = tilemap_create(bs1_get_info, armwrest_bs1_scan,  8,8, 32,16);
 	spr1alttilemap = tilemap_create(bs1_get_info, armwrest_bs1alt_scan,  8,8, 32,16);
 	spr2tilemap = tilemap_create(bs2_get_info, tilemap_scan_rows,  8,8, 16,32);
-
 	fgtilemap = tilemap_create(armwrest_fg_get_info, tilemap_scan_rows,  8,8, 32,32);
-	tilemap_set_transparent_pen(fgtilemap, 7);
+
+	tilemap_set_transparent_pen(spr1tilemap, 0x07);
+	tilemap_set_transparent_pen(spr1alttilemap, 0x07);
+	tilemap_set_transparent_pen(spr2tilemap, 0x00);
+	tilemap_set_transparent_pen(fgtilemap, 0x07);
 }
 
 
@@ -351,7 +315,6 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 	zoom = punchout_bigsprite1[0] + 256 * (punchout_bigsprite1[1] & 0x0f);
 	if (zoom)
 	{
-		mame_bitmap *sprbitmap = tilemap_get_pixmap(spr1tilemap);
 		int sx,sy;
 		UINT32 startx,starty;
 		int incxx,incyy;
@@ -373,15 +336,15 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 
 		if (punchout_bigsprite1[6] & 1)	/* flip x */
 		{
-			startx = (sprbitmap->width << 16) - startx - 1;
+			startx = ((16 * 8) << 16) - startx - 1;
 			incxx = -incxx;
 		}
 
-		copyrozbitmap(bitmap,sprbitmap,
+		tilemap_draw_roz(bitmap,cliprect,spr1tilemap,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
-			cliprect,TRANSPARENCY_COLOR,1024,0);
+			0,0);
 	}
 }
 
@@ -393,10 +356,10 @@ static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *clipr
 	zoom = punchout_bigsprite1[0] + 256 * (punchout_bigsprite1[1] & 0x0f);
 	if (zoom)
 	{
-		mame_bitmap *sprbitmap;
 		int sx,sy;
 		UINT32 startx,starty;
 		int incxx,incyy;
+		tilemap *_tilemap;
 
 		sx = 4096 - (punchout_bigsprite1[2] + 256 * (punchout_bigsprite1[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;
@@ -413,27 +376,28 @@ static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *clipr
 		startx += 3740 * zoom;	/* adjustment to match the screen shots */
 		starty -= 178 * zoom;	/* and make the hall of fame picture nice */
 
- 		sprbitmap = tilemap_get_pixmap(spr1tilemap);
-
 		if (punchout_bigsprite1[6] & 1)	/* flip x */
 		{
-			sprbitmap = tilemap_get_pixmap(spr1alttilemap); // when you catch the money bag in armwrest it either expects wraparound, or a different layout..
-			startx = (bitmap->width << 16) - startx - 1;
+			_tilemap = spr1alttilemap;
+			startx = ((32 * 8) << 16) - startx - 1;
 			incxx = -incxx;
 		}
+		else
+			_tilemap = spr1tilemap;
 
-		copyrozbitmap(bitmap,sprbitmap,
+
+		tilemap_draw_roz(bitmap,cliprect,_tilemap,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,	/* zoom, no rotation */
 			0,	/* no wraparound */
-			cliprect,TRANSPARENCY_COLOR,1024,0);
+			0,0);
 	}
 }
 
 static void drawbs2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
-	mame_bitmap *sprbitmap = tilemap_get_pixmap(spr2tilemap);
 	int sx,sy;
+	int incxx;
 
 	sx = 512 - (punchout_bigsprite2[0] + 256 * (punchout_bigsprite2[1] & 1));
 	if (sx > 512-127) sx -= 512;
@@ -442,7 +406,20 @@ static void drawbs2(running_machine *machine, mame_bitmap *bitmap, const rectang
 	sy = -punchout_bigsprite2[2] + 256 * (punchout_bigsprite2[3] & 1);
 	sy += 3;	/* adjustment to match the screen shots */
 
-	copybitmap_trans(bitmap,sprbitmap, punchout_bigsprite2[4] & 1, 0, sx, sy, cliprect, machine->pens[1024]);
+	sx = -sx << 16;
+	sy = -sy << 16;
+
+	if (punchout_bigsprite2[4] & 1)	/* flip x */
+	{
+		sx = ((16 * 8) << 16) - sx - 1;
+		incxx = -1;
+	}
+	else
+		incxx = 1;
+
+	tilemap_draw_roz(bitmap,cliprect,spr2tilemap,
+		sx, sy, incxx << 16, 0, 0, 1 << 16,
+		0, 0, 0);
 }
 
 VIDEO_UPDATE( punchout )
