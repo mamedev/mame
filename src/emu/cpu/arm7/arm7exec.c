@@ -374,7 +374,7 @@
 										}
 										else
 										{
-											if ((rrd>>(rs-1))&1)
+											if ((rrd>>(rrs-1))&1)
 											{
 												SET_CPSR(GET_CPSR | C_MASK);
 											}
@@ -926,31 +926,42 @@
 				}
 				break;
 			case 0xc: /* Multiple Load/Store */
-				if( insn & THUMB_MULTLS ) /* Load */
 				{
+					UINT32 ld_st_address;
+
 					rd = ( insn & THUMB_MULTLS_BASE ) >> THUMB_MULTLS_BASE_SHIFT;
-					for( offs = 0; offs < 8; offs++ )
+					ld_st_address = GET_REGISTER(rd) & 0xfffffffc;
+
+					if( insn & THUMB_MULTLS ) /* Load */
 					{
-						if( insn & ( 1 << offs ) )
+						int rd_in_list;
+
+						rd_in_list = insn & (1 << rd);
+						for( offs = 0; offs < 8; offs++ )
 						{
-							SET_REGISTER( offs, READ32( (GET_REGISTER(rd)&0xfffffffc) ) );
-							SET_REGISTER( rd, GET_REGISTER(rd) + 4 );
+							if( insn & ( 1 << offs ) )
+							{
+								SET_REGISTER(offs, READ32(ld_st_address));
+								ld_st_address += 4;
+							}
 						}
+						if (!rd_in_list)
+							SET_REGISTER(rd, ld_st_address);
+						R15 += 2;
 					}
-					R15 += 2;
-				}
-				else /* Store */
-				{
-					rd = ( insn & THUMB_MULTLS_BASE ) >> THUMB_MULTLS_BASE_SHIFT;
-					for( offs = 0; offs < 8; offs++ )
+					else /* Store */
 					{
-						if( insn & ( 1 << offs ) )
+						for( offs = 0; offs < 8; offs++ )
 						{
-							WRITE32( (GET_REGISTER(rd)&0xfffffffc), GET_REGISTER(offs) );
-							SET_REGISTER( rd, GET_REGISTER(rd) + 4 );
+							if( insn & ( 1 << offs ) )
+							{
+								WRITE32(ld_st_address, GET_REGISTER(offs));
+								ld_st_address += 4;
+							}
 						}
+						SET_REGISTER(rd, ld_st_address);
+						R15 += 2;
 					}
-					R15 += 2;
 				}
 				break;
 			case 0xd: /* Conditional Branch */
@@ -1268,7 +1279,7 @@
                 if( (insn & 0x0c000000) ==0 )   //bits 27-26 == 00 - This check can only exist properly after Multiplication check above
                 {
                     /* PSR Transfer (MRS & MSR) */
-                    if( ((insn&0x0100000)==0) && ((insn&0x01800000)==0x01000000) ) //( S bit must be clear, and bit 24,23 = 10 )
+                    if( ((insn&0x00100000)==0) && ((insn&0x01800000)==0x01000000) ) //( S bit must be clear, and bit 24,23 = 10 )
                     {
                         HandlePSRTransfer(insn);
                         ARM7_ICOUNT += 2;       //PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
