@@ -141,6 +141,7 @@ const game_driver * const drivers[] =
 	DRIVER( galaxiaj )	/* (c) Namco */
 	DRIVER( galmidw )	/* (c) Midway */
 	DRIVER( galmidwo )	/* (c) Midway */
+	DRIVER( galtaito )	/* (c) Taito */
 	DRIVER( superg )	/* hack */
 	DRIVER( galapx )	/* hack */
 	DRIVER( moonaln )	/* [Nichibutsu] (Karateco license) or hack */
