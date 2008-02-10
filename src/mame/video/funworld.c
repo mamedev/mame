@@ -1,38 +1,46 @@
 /**********************************************************************************
 
 
-    FUNWORLD.
-
+    FUNWORLD / TAB.
 
     Original preliminary driver:    Curt Coder, Peter Trauner.
     Rewrite and aditional work:     Roberto Fresca.
 
 
+
     Games running in this hardware:
 
-    * Jolly Card (Austria),                     TAB-Austria,        1985.
-    * Jolly Card (Austria, encrypted),          TAB-Austria,        1985.
-    * Jolly Card (Croatia),                     Soft Design,        1993.
-    * Jolly Card (Italia, encrypted),           bootleg,            199?.
-    * Jolly Card (Austria, Fun World, bootleg), Inter Games,        1995.
-    * Big Deal (Hungary, set 1),                Fun World,          1990.
-    * Big Deal (Hungary, set 2),                Fun World,          1990.
-    * Jolly Card (Austria, Fun World),          Fun World,          1990.
-    * Cuore 1 (Italia),                         C.M.C.,             1996.
-    * Elephant Family (Italia, new),            C.M.C.,             1997.
-    * Elephant Family (Italia, old),            C.M.C.,             1996.
-    * Pool 10 (Italia, set 1),                  C.M.C.,             1996.
-    * Pool 10 (Italia, set 2),                  C.M.C.,             1996.
-    * Tortuga Family (Italia),                  C.M.C.,             1997.
-    * Royal Card (Austria, set 1),              TAB-Austria,        1991.
-    * Royal Card (Austria, set 2),              TAB-Austria,        1991.
-    * Royal Card (Slovakia, encrypted),         Evona Electronic,   1991.
-    * Magic Card II (Bulgaria, bootleg),        Impera,             1996.
-    * Joker Card (Ver.A267BC, encrypted),       Vesely Svet,        1993.
-    * Mongolfier New (Italia),                  bootleg,            199?.
-    * Soccer New (Italia),                      bootleg,            199?.
-    * Snooker 10 (Ver 1.11),                    Sandiy,             1998.
-    * Saloon (France, encrypted),               unknown,            199?.
+    * Jolly Card (austrian),                            TAB-Austria,        1985.
+    * Jolly Card (austrian, encrypted),                 TAB-Austria,        1985.
+    * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
+    * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
+    * Jolly Card (croatian),                            Soft Design,        1993.
+    * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
+    * Jolly Card (austrian, Funworld, bootleg),         Inter Games,        1986.
+    * Big Deal (hungarian, set 1),                      Funworld,           1986.
+    * Big Deal (hungarian, set 2),                      Funworld,           1986.
+    * Jolly Card (austrian, Funworld),                  Funworld,           1986.
+    * Cuore 1 (italian),                                C.M.C.,             1996.
+    * Elephant Family (italian, new),                   C.M.C.,             1997.
+    * Elephant Family (italian, old),                   C.M.C.,             1996.
+    * Pool 10 (italian, set 1),                         C.M.C.,             1996.
+    * Pool 10 (italian, set 2),                         C.M.C.,             1996.
+    * Tortuga Family (italian),                         C.M.C.,             1997.
+    * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
+    * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
+    * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
+    * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
+    * Lucky Lady (4x1 aces),                            TAB-Austria,        1991.
+    * Magic Card II (bulgarian),                        Impera,             1996.
+    * Magic Card II (green TAB or Impera board),        Impera,             1996.
+    * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
+    * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
+    * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
+    * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
+    * Mongolfier New (italian),                         bootleg,            199?.
+    * Soccer New (italian),                             bootleg,            199?.
+    * Snooker 10 (Ver 1.11),                            Sandii',            1998.
+    * Saloon (french, encrypted),                       unknown,            199?.
 
 
 ***********************************************************************************/
@@ -119,6 +127,12 @@ VIDEO_START(magiccrd)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 4, 8, 112, 34);
+}
+
+VIDEO_START(snookr10)
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+		 4, 8, 128, 32);
 }
 
 VIDEO_UPDATE(funworld)

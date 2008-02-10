@@ -7786,24 +7786,32 @@ Other Sun games
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolycdae )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
 	DRIVER( jolycdcr )	/* (c) 1993 Soft Design */
 	DRIVER( jolycdit )	/* 199? bootleg */
-	DRIVER( jolycdat )	/* (c) 1986 Fun World */
-	DRIVER( jolycdab )	/* (c) 1990 Inter Games */
-	DRIVER( bigdeal )	/* (c) 1986 Fun World */
-	DRIVER( bigdealb )	/* (c) 1986 Fun World */
+	DRIVER( jolycdab )	/* (c) 1986 Inter Games */
+	DRIVER( bigdeal )	/* (c) 1986 Funworld */
+	DRIVER( bigdealb )	/* (c) 1986 Funworld */
+	DRIVER( jolycdat )	/* (c) 1986 Funworld */
 	DRIVER( cuoreuno )	/* (c) 1996 C.M.C. */
-	DRIVER( elephfam )	/* (c) 1996 C.M.C. */
+	DRIVER( elephfam )	/* (c) 1997 C.M.C. */
 	DRIVER( elephfmb )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10 )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10b )	/* (c) 1996 C.M.C. */
 	DRIVER( tortufam )	/* (c) 1997 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcdb )	/* (c) 1991 TAB-Austria */
-	DRIVER( royalcdc )	/* (c) 199? Evona Electronic */
+	DRIVER( royalcdc )	/* (c) 1991 Evona Electronic */
+	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
+	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */
 	DRIVER( magiccrd )	/* (c) 1996 Impera */
+	DRIVER( magiccda )	/* (c) 1996 Impera */
+	DRIVER( magiccdb )	/* (c) 1996 Impera */
+	DRIVER( vegasslw )	/* (c) 1993 Funworld */
+	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
-	DRIVER( monglfir )	/* 199? bootleg */
+	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
