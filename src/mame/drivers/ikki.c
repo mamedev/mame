@@ -12,12 +12,16 @@ Ikki (c) 1985 Sun Electronics
 #include "deprecat.h"
 #include "sound/sn76496.h"
 
+
+extern UINT8 *ikki_scroll;
+
 PALETTE_INIT( ikki );
+VIDEO_START( ikki );
 VIDEO_UPDATE( ikki );
+
 
 /****************************************************************************/
 
-WRITE8_HANDLER( ikki_scroll_w );
 WRITE8_HANDLER( ikki_scrn_ctrl_w );
 
 static READ8_HANDLER( ikki_e000_r )
@@ -50,7 +54,7 @@ static ADDRESS_MAP_START( ikki_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe005, 0xe005) AM_READ(input_port_3_r) /* player2 */
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(ikki_scrn_ctrl_w)
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
-	AM_RANGE(0xe00a, 0xe00b) AM_WRITE(ikki_scroll_w)
+	AM_RANGE(0xe00a, 0xe00b) AM_WRITE(MWA8_RAM) AM_BASE(&ikki_scroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikki_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
@@ -208,11 +212,10 @@ static MACHINE_DRIVER_START( ikki )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(ikki)
-	MDRV_PALETTE_LENGTH(256+1)
-	MDRV_COLORTABLE_LENGTH(1024)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_PALETTE_INIT(ikki)
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(ikki)
 	MDRV_VIDEO_UPDATE(ikki)
 
 	/* sound hardware */

@@ -10,41 +10,53 @@ Video hardware driver by Uki
 
 #include "driver.h"
 
-static UINT8 ikki_flipscreen, ikki_scroll[2];
+UINT8 *ikki_scroll;
+
+static mame_bitmap *sprite_bitmap;
+static UINT8 ikki_flipscreen;
+static int punch_through_pen;
 
 PALETTE_INIT( ikki )
 {
 	int i;
 
-	for (i = 0; i<256; i++)
-	{
-		palette_set_color_rgb(machine,i,pal4bit(color_prom[0]),pal4bit(color_prom[256]),pal4bit(color_prom[2*256]));
+	/* allocate the colortable - extra pen for the punch through pen */
+	machine->colortable = colortable_alloc(machine, 0x101);
 
-		color_prom++;
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
+	{
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* 256th color is not drawn on screen */
-	/* this is used for special transparent function */
-	palette_set_color(machine,256,MAKE_RGB(0,0,1));
-
-	color_prom += 2*256;
-
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
 	/* sprites lookup table */
-	for (i=0; i<512; i++)
+	for (i = 0; i < 0x200; i++)
 	{
-		int d = 255-*(color_prom++);
-		if ( ((i % 8) == 7) && (d == 0) )
-			*(colortable++) = 256; /* special transparent */
-		else
-			*(colortable++) = d; /* normal color */
+		UINT16 ctabentry = color_prom[i] ^ 0xff;
+
+		if (((i & 0x07) == 0x07) && (ctabentry == 0))
+		{
+			/* punch through */
+			punch_through_pen = i;
+			ctabentry = 0x100;
+		}
+
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
 	/* bg lookup table */
-	for (i=0; i<512; i++)
-		*(colortable++) = *(color_prom++);
-
+	for (i = 0x200; i < 0x400; i++)
+	{
+		UINT8 ctabentry = color_prom[i];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( ikki_scroll_w )
@@ -57,35 +69,91 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 	ikki_flipscreen = (data >> 2) & 1;
 }
 
+
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	int y;
+	offs_t offs;
+
+	fillbitmap(sprite_bitmap, punch_through_pen, cliprect);
+
+	for (offs = 0; offs < 0x800; offs += 4)
+	{
+		int code = (spriteram[offs + 2] & 0x80) | (spriteram[offs + 1] >> 1);
+		int color = spriteram[offs + 2] & 0x3f;
+
+		int x = spriteram[offs + 3];
+		    y = spriteram[offs + 0];
+
+		if (ikki_flipscreen)
+			x = 240 - x;
+		else
+			y = 224 - y;
+
+		x = x & 0xff;
+		y = y & 0xff;
+
+		if (x > 248)
+			x = x - 256;
+
+		if (y > 240)
+			y = y - 256;
+
+		drawgfx(sprite_bitmap,machine->gfx[1],
+				code, color,
+				ikki_flipscreen,ikki_flipscreen,
+				x,y,
+				cliprect, TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
+	}
+
+	/* copy the sprite bitmap into the main bitmap, skipping the transparent pixels */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		int x;
+
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		{
+			UINT16 pen = *BITMAP_ADDR16(sprite_bitmap, y, x);
+
+			if (colortable_entry_get_value(machine->colortable, pen) != 0x100)
+				*BITMAP_ADDR16(bitmap, y, x) = pen;
+		}
+	}
+}
+
+
+VIDEO_START( ikki )
+{
+	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+}
+
+
 VIDEO_UPDATE( ikki )
 {
-
-	int offs,chr,col,px,py,f,bank,d;
+	offs_t offs;
 	UINT8 *VIDEOATTR = memory_region( REGION_USER1 );
-
-	f = ikki_flipscreen;
 
 	/* draw bg layer */
 
 	for (offs=0; offs<(videoram_size/2); offs++)
 	{
-		int sx,sy;
+		int color, bank;
 
-		sx = offs / 32;
-		sy = offs % 32;
+		int sx = offs / 32;
+		int sy = offs % 32;
+		int y = sy*8;
+		int x = sx*8;
 
-		py = sy*8;
-		px = sx*8;
-
-		d = VIDEOATTR[ sx ];
+		int d = VIDEOATTR[ sx ];
 
 		switch (d)
 		{
 			case 0x02: /* scroll area */
-				px = sx*8 - ikki_scroll[1];
-				if (px<0)
-					px=px+8*22;
-				py = (sy*8 + ~ikki_scroll[0]) & 0xff;
+				x = sx*8 - ikki_scroll[1];
+				if (x<0)
+					x=x+8*22;
+				y = (sy*8 + ~ikki_scroll[0]) & 0xff;
 				break;
 
 			case 0x03: /* non-scroll area */
@@ -104,95 +172,57 @@ VIDEO_UPDATE( ikki )
 				break;
 		}
 
-		if (f != 0)
+		if (ikki_flipscreen)
 		{
-			px = 248-px;
-			py = 248-py;
+			x = 248-x;
+			y = 248-y;
 		}
 
-		col = videoram[offs*2];
-		bank = (col & 0xe0) << 3;
-		col = ((col & 0x1f)<<0) | ((col & 0x80) >> 2);
+		color = videoram[offs*2];
+		bank = (color & 0xe0) << 3;
+		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 		drawgfx(bitmap,machine->gfx[0],
 			videoram[offs*2+1] + bank,
-			col,
-			f,f,
-			px,py,
+			color,
+			ikki_flipscreen,ikki_flipscreen,
+			x,y,
 			cliprect,TRANSPARENCY_NONE,0);
 	}
 
-/* draw sprites */
-
-	fillbitmap(tmpbitmap, machine->pens[256], 0);
-
-	/* c060 - c0ff */
-	for (offs=0x00; offs<0x800; offs +=4)
-	{
-		chr = spriteram[offs+1] >> 1 ;
-		col = spriteram[offs+2];
-
-		px = spriteram[offs+3];
-		py = spriteram[offs+0];
-
-		chr += (col & 0x80);
-		col = (col & 0x3f) >> 0 ;
-
-		if (f==0)
-			py = 224-py;
-		else
-			px = 240-px;
-
-		px = px & 0xff;
-		py = py & 0xff;
-
-		if (px>248)
-			px = px-256;
-		if (py>240)
-			py = py-256;
-
-		drawgfx(tmpbitmap,machine->gfx[1],
-			chr,
-			col,
-			f,f,
-			px,py,
-			cliprect,TRANSPARENCY_COLOR,0);
-	}
-
-	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect,machine->pens[256]);
-
+	draw_sprites(machine, bitmap, cliprect);
 
 	/* mask sprites */
 
 	for (offs=0; offs<(videoram_size/2); offs++)
 	{
-		int sx,sy;
+		int sx = offs / 32;
+		int sy = offs % 32;
 
-		sx = offs / 32;
-		sy = offs % 32;
-
-		d = VIDEOATTR[ sx ];
+		int d = VIDEOATTR[ sx ];
 
 		if ( (d == 0) || (d == 0x0d) )
 		{
-			py = sy*8;
-			px = sx*8;
+			int color, bank;
 
-			if (f != 0)
+			int y = sy*8;
+			int x = sx*8;
+
+			if (ikki_flipscreen)
 			{
-				px = 248-px;
-				py = 248-py;
+				x = 248-x;
+				y = 248-y;
 			}
 
-			col = videoram[offs*2];
-			bank = (col & 0xe0) << 3;
-			col = ((col & 0x1f)<<0) | ((col & 0x80) >> 2);
+			color = videoram[offs*2];
+			bank = (color & 0xe0) << 3;
+			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
 			drawgfx(bitmap,machine->gfx[0],
 				videoram[offs*2+1] + bank,
-				col,
-				f,f,
-				px,py,
+				color,
+				ikki_flipscreen,ikki_flipscreen,
+				x,y,
 				cliprect,TRANSPARENCY_NONE,0);
 		}
 	}
