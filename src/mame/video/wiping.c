@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
 
 static int flipscreen;
@@ -20,44 +21,62 @@ static int flipscreen;
 
 PALETTE_INIT( wiping )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + (offs)])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights, 470, 0,
+			3, &resistances_rg[0], gweights, 470, 0,
+			2, &resistances_b[0],  bweights, 470, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
-		b = 0x4f * bit0 + 0xa8 * bit1;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
 	/* chars use colors 0-15 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i ^ 3) = *(color_prom++) & 0x0f;
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i ^ 0x03] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
 	/* sprites use colors 16-31 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i ^ 3) = (*(color_prom++) & 0x0f) + 0x10;
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (color_prom[i ^ 0x03] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 
@@ -112,10 +131,11 @@ VIDEO_UPDATE( wiping )
 	/* Note, we're counting up on purpose ! */
 	/* This way the vacuum cleaner is always on top */
 	for (offs = 0x0; offs < 128; offs += 2) {
-		int sx,sy,flipx,flipy,otherbank;
+		int sx,sy,color,flipx,flipy,otherbank;
 
 		sx = spriteram[offs+0x100+1] + ((spriteram[offs+0x81] & 0x01) << 8) - 40;
 		sy = 224 - spriteram[offs+0x100];
+		color = spriteram[offs+1] & 0x3f;
 
 		otherbank = spriteram[offs+0x80] & 0x01;
 
@@ -131,10 +151,11 @@ VIDEO_UPDATE( wiping )
 
 		drawgfx(bitmap,machine->gfx[1],
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
-			spriteram[offs+1] & 0x3f,
+			color,
 			flipx,flipy,
 			sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_COLOR,0x1f);
+			&machine->screen[0].visarea,TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f));
 	}
 
 	/* redraw high priority chars */

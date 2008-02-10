@@ -473,8 +473,7 @@ static MACHINE_DRIVER_START( skykid )
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(skykid)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(64*4+128*4+64*8)
+	MDRV_PALETTE_LENGTH(64*4+128*4+64*8)
 
 	MDRV_PALETTE_INIT(skykid)
 	MDRV_VIDEO_START(skykid)
@@ -658,10 +657,10 @@ static DRIVER_INIT( skykid )
 }
 
 GAME( 1984, drgnbstr, 0,      skykid, drgnbstr, skykid,  ROT0,   "Namco", "Dragon Buster", GAME_SUPPORTS_SAVE )
-GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (New Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (Old Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
-GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 Ver.)", GAME_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
+GAME( 1985, skykid,   0,      skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (new version)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykido,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (old version)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykidd,  skykid, skykid, skykid,   skykid,  ROT180, "Namco", "Sky Kid (CUS60 version)", GAME_SUPPORTS_SAVE ) /* Uses CUS60 aka 60a1 */
 
 // no license text is displayed but the PCB was licensed by Namco for production by Sipem (formerly Sidam) with Namco supplying the Custom chips (MCU etc.)
 // the level select is handled in a much more user-friendly way in this set and the dip for it is inverted (although this is displayed incorrectly in the test mode)
-GAME( 1985, skykids,  skykid, skykid, skykids,  skykid,  ROT180, "Namco [Sipem license]", "Sky Kid (Manufactured by Sipem)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */
+GAME( 1985, skykids,  skykid, skykid, skykids,  skykid,  ROT180, "Namco [Sipem license]", "Sky Kid (Sipem)", GAME_SUPPORTS_SAVE ) /* Uses CUS63 aka 63a1 */

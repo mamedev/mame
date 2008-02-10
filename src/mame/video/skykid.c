@@ -23,50 +23,33 @@ static UINT16 scroll_x,scroll_y;
 PALETTE_INIT( skykid )
 {
 	int i;
-	int bit0,bit1,bit2,bit3,r,g,b;
-	int totcolors = machine->drv->total_colors;
 
-	for (i = 0; i < totcolors; i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		/* red component */
-		bit0 = (color_prom[totcolors*0] >> 0) & 0x01;
-		bit1 = (color_prom[totcolors*0] >> 1) & 0x01;
-		bit2 = (color_prom[totcolors*0] >> 2) & 0x01;
-		bit3 = (color_prom[totcolors*0] >> 3) & 0x01;
-		r = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		/* green component */
-		bit0 = (color_prom[totcolors*1] >> 0) & 0x01;
-		bit1 = (color_prom[totcolors*1] >> 1) & 0x01;
-		bit2 = (color_prom[totcolors*1] >> 2) & 0x01;
-		bit3 = (color_prom[totcolors*1] >> 3) & 0x01;
-		g = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
-
-		/* blue component */
-		bit0 = (color_prom[totcolors*2] >> 0) & 0x01;
-		bit1 = (color_prom[totcolors*2] >> 1) & 0x01;
-		bit2 = (color_prom[totcolors*2] >> 2) & 0x01;
-		bit3 = (color_prom[totcolors*2] >> 3) & 0x01;
-		b = 0x0e*bit0 + 0x1f*bit1 + 0x43*bit2 + 0x8f*bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* text palette */
-	for (i = 0; i < 64*4; i++)
-		*(colortable++) = i;
-
-	color_prom += 2*totcolors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-	/* tiles lookup table */
-	for (i = 0; i < 128*4; i++)
-		*(colortable++) = *(color_prom++);
+	/* text palette */
+	for (i = 0; i < 0x100; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-	/* sprites lookup table */
-	for (i = 0;i < 64*8;i++)
-		*(colortable++) = *(color_prom++);
+	/* tiles/sprites */
+	for (i = 0x100; i < 0x500; i++)
+	{
+		UINT8 ctabentry = color_prom[i - 0x100];
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 
@@ -240,7 +223,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					cliprect,TRANSPARENCY_COLOR,0xff);
+					cliprect,TRANSPARENCY_PENS,
+					colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0xff));
 			}
 		}
 	}
