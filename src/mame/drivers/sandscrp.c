@@ -18,6 +18,56 @@ Kaneko custom (surfaced scratched):
    HELP1-CHIP (64pin PQFP)
    CALC1-CHIP (40pin DIP)                   <- Collision Detection etc.
 
+
++-------------------------------------+
+|  VOL   M6295 7.IC55   Z80A   HELP1  |
+|        Y3014B YM2203C 8.IC51        |
+|            DSW1 DSW2 LH5168D  4.IC32|
+|        12MHz 16MHz   LH5168D  3.IC33|
+|J                     LH5168D   IC30*|
+|A                       VIEW2   IC31*|
+|M       LH5116D             M51257AL |
+|M       LH5116D        PAL  M51257AL |
+|A                               2.IC5|
+|         PAL                    1.IC4|
+|         IC15*       PANDORA    68000|
+|  IC14* 5.IC16   M41464 M41464  CALC1|
+|  IC18* 6.IC17   M41464 M41464       |
++-------------------------------------+
+
+IC18 unpopulated 28 pin socket (silkscreened EPROM)
+IC14 & IC15 unpopulated 32 pin socket (silkscreened MASK)
+IC30 & IC31 unpopulated 42 pin socket (silkscreened MASK)
+
+RAM:
+ OKI M41464C-10 (x4)
+ OKI M51257AL-10 (x2)
+ Sharp LH5116D-10 (x2)
+ Sharp LH5168D-10L (x3)
+
+PALS:
+ AMI 18CV8PC-25 (Stamped IC25D located at IC25)
+ AMI 18CV8PC-25 (Stamped IC26 located at IC26)
+
+Chips simply labeled 1 through 8
+
+ROM ID    ROM Type
+===================
+1.ic4     27C2001
+2.ic5     27C2001
+3.ic33    27C040
+4.ic32    27C040
+5.ic16    27C040
+6.ic17    27C040
+7.ic55    27C2001
+8.ic51    27C1001
+
+Alternate Program roms:
+11.ic4    27C2001
+12.ic5    27C2001
+
+Is there an other alt program roms set labeled 9 & 10?
+
 */
 
 #include "driver.h"
@@ -429,47 +479,59 @@ MACHINE_DRIVER_END
 
                                 Sand Scorpion
 
-SANDSC03.BIN     27C040
-SANDSC04.BIN     27C040
-SANDSC05.BIN     27C040
-SANDSC06.BIN     27C040
-SANDSC07.BIN     27C2001
-SANDSC08.BIN     27C1001
-SANDSC11.BIN     27C2001
-SANDSC12.BIN     27C2001
-
 ***************************************************************************/
 
 ROM_START( sandscrp ) /* Z03VA-003 PCB */
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "sandsc11.bin", 0x000000, 0x040000, CRC(9b24ab40) SHA1(3187422dbe8b15d8053be4cb20e56d3e6afbd5f2) )
-	ROM_LOAD16_BYTE( "sandsc12.bin", 0x000001, 0x040000, CRC(ad12caee) SHA1(83267445b89c3cf4dc317106aa68763d2f29eff7) )
+	ROM_LOAD16_BYTE( "11.bin", 0x000000, 0x040000, CRC(9b24ab40) SHA1(3187422dbe8b15d8053be4cb20e56d3e6afbd5f2) ) /* Location is IC4 */
+	ROM_LOAD16_BYTE( "12.bin", 0x000001, 0x040000, CRC(ad12caee) SHA1(83267445b89c3cf4dc317106aa68763d2f29eff7) ) /* Location is IC5 */
 
 	ROM_REGION( 0x24000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "sandsc08.bin", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
-	ROM_CONTINUE(             0x10000, 0x14000             )
+	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
+	ROM_CONTINUE(       0x10000, 0x14000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "sandsc05.bin", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
-	ROM_LOAD( "sandsc06.bin", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
+	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
+	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layers */
-	ROM_LOAD16_BYTE( "sandsc04.bin", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
-	ROM_LOAD16_BYTE( "sandsc03.bin", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
+	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
 
 	ROM_REGION( 0x040000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "sandsc07.bin", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
+	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
+ROM_END
+
+ROM_START( sandscra ) /* Z03VA-003 PCB, earlier program version */
+	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "1.ic4", 0x000000, 0x040000, CRC(c0943ae2) SHA1(04dac4e1f116cd96d6292daa61ef40efc7eba919) )
+	ROM_LOAD16_BYTE( "2.ic5", 0x000001, 0x040000, CRC(6a8e0012) SHA1(2350b11c9bd545c8ba4b3c25cd6547ba2ad474b5) )
+
+	ROM_REGION( 0x24000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
+	ROM_CONTINUE(       0x10000, 0x14000 )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "5.ic16", 0x000000, 0x080000, CRC(9bb675f6) SHA1(c3f6768cfd99a0e19ca2224fff9aa4e27ec0da24) )
+	ROM_LOAD( "6.ic17", 0x080000, 0x080000, CRC(7df2f219) SHA1(e2a59e201bfededa92d6c86f8dc1b212527ef66f) )
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layers */
+	ROM_LOAD16_BYTE( "4.ic32", 0x000000, 0x080000, CRC(b9222ff2) SHA1(a445da3f7f5dea5ff64bb0b048f624f947875a39) )
+	ROM_LOAD16_BYTE( "3.ic33", 0x000001, 0x080000, CRC(adf20fa0) SHA1(67a7a2be774c86916cbb97e4c9b16c2e48125780) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
 
-ROM_START( sandscra ) /* Different rev PCB?? */
+ROM_START( sandscrb ) /* Different rev PCB */
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "11.ic4", 0x000000, 0x040000, CRC(80020cab) SHA1(4f1f4d8ea07ad745f2d6d3f800686f07fe4bf20f) )
 	ROM_LOAD16_BYTE( "12.ic5", 0x000001, 0x040000, CRC(8df1d42f) SHA1(2a9db5c4b99a8a3f62bffa9ddd96a95e2042602b) )
 
 	ROM_REGION( 0x24000, REGION_CPU2, 0 )		/* Z80 Code */
-	ROM_LOAD( "sandsc08.bin", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
-	ROM_CONTINUE(             0x10000, 0x14000             )
+	ROM_LOAD( "8.ic51", 0x00000, 0x0c000, CRC(6f3e9db1) SHA1(06a04fa17f44319986913bff70433510c89e38f1) )
+	ROM_CONTINUE(       0x10000, 0x14000 )
 
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "ss502.ic16", 0x000000, 0x100000, CRC(d8012ebb) SHA1(975bbb3b57a09e41d2257d4fa3a64097144de554) )
@@ -478,9 +540,10 @@ ROM_START( sandscra ) /* Different rev PCB?? */
 	ROM_LOAD16_WORD_SWAP( "ss501.ic30", 0x000000, 0x100000, CRC(0cf9f99d) SHA1(47f7f120d2bc075bedaff0a44306a8f46a1d848c) )
 
 	ROM_REGION( 0x040000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "sandsc07.bin", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
+	ROM_LOAD( "7.ic55", 0x000000, 0x040000, CRC(9870ab12) SHA1(5ea3412cbc57bfaa32a1e2552b2eb46f4ceb5fa8) )
 ROM_END
 
 
-GAME( 1992, sandscrp, 0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (set 1)", 0 )
-GAME( 1992, sandscra, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (set 2)", 0 )
+GAME( 1992, sandscrp, 0,        sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
+GAME( 1992, sandscra, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
+GAME( 1992, sandscrb, sandscrp, sandscrp, sandscrp, 0,          ROT90, "Face",   "Sand Scorpion (Revised Hardware)", 0 )

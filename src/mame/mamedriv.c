@@ -6593,6 +6593,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( blazeon )	/* (c) 1992 Atlus */
 	DRIVER( sandscrp )	/* (c) 1992 Face */
 	DRIVER( sandscra )	/* (c) 1992 Face */
+	DRIVER( sandscrb )	/* (c) 1992 Face */
 	DRIVER( explbrkr )	/* (c) 1992 Kaneko */
 	DRIVER( bakubrkr )	/* (c) 1992 Kaneko */
 	DRIVER( shogwarr )	/* (c) 1992 Kaneko */
