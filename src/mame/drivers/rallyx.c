@@ -192,13 +192,14 @@ WRITE8_HANDLER( rallyx_scrollx_w );
 WRITE8_HANDLER( rallyx_scrolly_w );
 WRITE8_HANDLER( tactcian_starson_w );
 PALETTE_INIT( rallyx );
+PALETTE_INIT( jungler );
 VIDEO_START( rallyx );
+VIDEO_START( jungler );
+VIDEO_START( locomotn );
+VIDEO_START( commsega );
 VIDEO_UPDATE( rallyx );
-DRIVER_INIT( rallyx );
-DRIVER_INIT( jungler );
-DRIVER_INIT( tactcian );
-DRIVER_INIT( locomotn );
-DRIVER_INIT( commsega );
+VIDEO_UPDATE( jungler );
+VIDEO_UPDATE( locomotn );
 
 
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
@@ -327,7 +328,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( locomotn_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jungler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(MRA8_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
@@ -850,8 +851,7 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(rallyx)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(64*4+4)
+	MDRV_PALETTE_LENGTH(64*4+4)
 
 	MDRV_PALETTE_INIT(rallyx)
 	MDRV_VIDEO_START(rallyx)
@@ -870,11 +870,11 @@ static MACHINE_DRIVER_START( rallyx )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( tactcian )
+static MACHINE_DRIVER_START( jungler )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(locomotn_map,0)
+	MDRV_CPU_PROGRAM_MAP(jungler_map,0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -886,25 +886,49 @@ static MACHINE_DRIVER_START( tactcian )
 	MDRV_SCREEN_SIZE(36*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(jungler)
-	MDRV_PALETTE_LENGTH(32+64)
-	MDRV_COLORTABLE_LENGTH(64*4+4)
+	MDRV_PALETTE_LENGTH(64*4+4+64)
 
-	MDRV_PALETTE_INIT(rallyx)
-	MDRV_VIDEO_START(rallyx)
-	MDRV_VIDEO_UPDATE(rallyx)
+	MDRV_PALETTE_INIT(jungler)
+	MDRV_VIDEO_START(jungler)
+	MDRV_VIDEO_UPDATE(jungler)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(locomotn_sound)
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( tactcian )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(jungler)
+
+	/* video hardware */
+	MDRV_VIDEO_START(locomotn)
+	MDRV_VIDEO_UPDATE(locomotn)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( locomotn )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tactcian)
+	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_VIDEO_START(locomotn)
+	MDRV_VIDEO_UPDATE(locomotn)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( commsega )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(jungler)
+
+	/* video hardware */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_VIDEO_START(commsega)
+	MDRV_VIDEO_UPDATE(locomotn)
 MACHINE_DRIVER_END
 
 
@@ -1193,15 +1217,14 @@ ROM_END
 
 
 
-GAME( 1980, rallyx,   0,        rallyx,   rallyx,   rallyx,   ROT0, "Namco", "Rally X", 0 )
-GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   rallyx,   ROT0, "[Namco] (Midway license)", "Rally X (Midway)", 0 )
-GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  rallyx,   ROT0, "Namco", "New Rally X", 0 )
-
-GAME( 1981, jungler,  0,        tactcian, jungler,  jungler,  ROT90, "Konami", "Jungler", 0 )
-GAME( 1981, junglers, jungler,  tactcian, jungler,  jungler,  ROT90, "[Konami] (Stern license)", "Jungler (Stern)", 0 )
-GAME( 1982, tactcian, 0,        tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 1)", 0 )
-GAME( 1981, tactcan2, tactcian, tactcian, tactcian, tactcian, ROT90, "[Konami] (Sega license)", "Tactician (set 2)", 0 )
-GAME( 1982, locomotn, 0,        locomotn, locomotn, locomotn, ROT90, "Konami (Centuri license)", "Loco-Motion", 0 )
-GAME( 1982, gutangtn, locomotn, locomotn, locomotn, locomotn, ROT90, "Konami (Sega license)", "Guttang Gottong", 0 )
-GAME( 1982, cottong,  locomotn, locomotn, locomotn, locomotn, ROT90, "bootleg", "Cotocoto Cottong", 0 )
-GAME( 1983, commsega, 0,        locomotn, commsega, commsega, ROT90, "Sega", "Commando (Sega)", GAME_IMPERFECT_SOUND )
+GAME( 1980, rallyx,   0,        rallyx,   rallyx,   0, ROT0,  "Namco", "Rally X", 0 )
+GAME( 1980, rallyxm,  rallyx,   rallyx,   rallyx,   0, ROT0,  "[Namco] (Midway license)", "Rally X (Midway)", 0 )
+GAME( 1981, nrallyx,  0,        rallyx,   nrallyx,  0, ROT0,  "Namco", "New Rally X", 0 )
+GAME( 1981, jungler,  0,        jungler,  jungler,  0, ROT90, "Konami", "Jungler", 0 )
+GAME( 1981, junglers, jungler,  jungler,  jungler,  0, ROT90, "[Konami] (Stern license)", "Jungler (Stern)", 0 )
+GAME( 1982, tactcian, 0,        tactcian, tactcian, 0, ROT90, "[Konami] (Sega license)", "Tactician (set 1)", 0 )
+GAME( 1981, tactcan2, tactcian, tactcian, tactcian, 0, ROT90, "[Konami] (Sega license)", "Tactician (set 2)", 0 )
+GAME( 1982, locomotn, 0,        locomotn, locomotn, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", 0 )
+GAME( 1982, gutangtn, locomotn, locomotn, locomotn, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", 0 )
+GAME( 1982, cottong,  locomotn, locomotn, locomotn, 0, ROT90, "bootleg", "Cotocoto Cottong", 0 )
+GAME( 1983, commsega, 0,        commsega, commsega, 0, ROT90, "Sega", "Commando (Sega)", GAME_IMPERFECT_SOUND )

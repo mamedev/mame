@@ -28,18 +28,19 @@ needs more color combination to render its graphics.
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
 
 
 UINT8 *rallyx_videoram,*rallyx_radarattr;
 
 static UINT8 *rallyx_radarx,*rallyx_radary;
-static int video_type, spriteram_base;
+static int spriteram_base;
 
 static tilemap *bg_tilemap,*fg_tilemap;
 
 #define MAX_STARS 1000
-#define STARS_COLOR_BASE 32
+#define STARS_COLOR_BASE	(0x104)
 
 static int stars_enable;
 
@@ -49,43 +50,6 @@ struct star
 };
 static struct star stars[MAX_STARS];
 static int total_stars;
-
-
-enum
-{
-	TYPE_RALLYX,
-	TYPE_JUNGLER,
-	TYPE_TACTCIAN,
-	TYPE_LOCOMOTN,
-	TYPE_COMMSEGA
-};
-
-
-DRIVER_INIT( rallyx )
-{
-	video_type = TYPE_RALLYX;
-}
-
-DRIVER_INIT( jungler )
-{
-	video_type = TYPE_JUNGLER;
-}
-
-DRIVER_INIT( tactcian )
-{
-	video_type = TYPE_TACTCIAN;
-}
-
-DRIVER_INIT( locomotn )
-{
-	video_type = TYPE_LOCOMOTN;
-}
-
-DRIVER_INIT( commsega )
-{
-	video_type = TYPE_COMMSEGA;
-}
-
 
 
 /***************************************************************************
@@ -110,77 +74,152 @@ DRIVER_INIT( commsega )
 ***************************************************************************/
 PALETTE_INIT( rallyx )
 {
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, &resistances_rg[0], rweights,    0, 0,
+			3, &resistances_rg[0], gweights,    0, 0,
+			2, &resistances_b[0],  bweights, 1000, 0);
 
-	for (i = 0;i < 32;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
 		/* blue component */
-		if (video_type == TYPE_RALLYX)
-		{
-			bit0 = 0;
-			bit1 = (*color_prom >> 6) & 0x01;
-			bit2 = (*color_prom >> 7) & 0x01;
-			b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		}
-		else
-		{
-			bit0 = (*color_prom >> 6) & 0x01;
-			bit1 = (*color_prom >> 7) & 0x01;
-			b = 0x50 * bit0 + 0xab * bit1;
-		}
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
-	/* character lookup table */
-	/* sprites use the same color lookup table as characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) & 0x0f;
-
-	/* radar dots lookup table */
-	/* they use colors 16-19 */
-	for (i = 0;i < 4;i++)
-		COLOR(2,i) = 16 + i;
-
-	/* Rally X doesn't have the optional starfield generator */
-	if (video_type != TYPE_RALLYX)
+	/* character/sprites lookup table */
+	for (i = 0x000; i < 0x100; i++)
 	{
-		/* now the stars */
-		for (i = 0;i < 64;i++)
-		{
-			int bits,r,g,b;
-			static const int map[4] = { 0x00, 0x47, 0x97, 0xde };
-
-			bits = (i >> 0) & 0x03;
-			r = map[bits];
-			bits = (i >> 2) & 0x03;
-			g = map[bits];
-			bits = (i >> 4) & 0x03;
-			b = map[bits];
-
-			palette_set_color(machine,i + 32,MAKE_RGB(r,g,b));
-		}
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
+
+	/* bullets use colors 0x10-0x13 */
+	for (i = 0x100; i < 0x104; i++)
+		colortable_entry_set_value(machine->colortable, i, (i - 0x100) | 0x10);
+}
+
+
+PALETTE_INIT( jungler )
+{
+	static const int resistances_rg[3]   = { 1000, 470, 220 };
+	static const int resistances_b [2]   = { 470, 220 };
+	static const int resistances_star[3] = { 150, 100 };
+	double rweights[3], gweights[3], bweights[2];
+	double rweights_star[2], gweights_star[2], bweights_star[2];
+	int i;
+
+	/* compute the color output resistor weights */
+	double scale = compute_resistor_weights(0,	255, -1.0,
+						2, resistances_star, rweights_star, 0, 0,
+						2, resistances_star, gweights_star, 0, 0,
+						2, resistances_star, bweights_star, 0, 0);
+
+				   compute_resistor_weights(0,	255, scale,
+						3, resistances_rg, rweights, 1000, 0,
+						3, resistances_rg, gweights, 1000, 0,
+						2, resistances_b,  bweights, 1000, 0);
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x60);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* star pens */
+	for (i = 0x20; i < 0x60; i++)
+	{
+		int bit0, bit1;
+		int r, g, b;
+
+		/* red component */
+		bit0 = ((i - 0x20) >> 0) & 0x01;
+		bit1 = ((i - 0x20) >> 1) & 0x01;
+		r = combine_2_weights(rweights_star, bit0, bit1);
+
+		/* green component */
+		bit0 = ((i - 0x20) >> 2) & 0x01;
+		bit1 = ((i - 0x20) >> 3) & 0x01;
+		g = combine_2_weights(gweights_star, bit0, bit1);
+
+		/* blue component */
+		bit0 = ((i - 0x20) >> 4) & 0x01;
+		bit1 = ((i - 0x20) >> 5) & 0x01;
+		b = combine_2_weights(bweights_star, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+	}
+
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
+	/* character/sprites lookup table */
+	for (i = 0x000; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* bullets use colors 0x10-0x13 */
+	for (i = 0x100; i < 0x104; i++)
+		colortable_entry_set_value(machine->colortable, i, (i - 0x100) | 0x10);
+
+	/* stars */
+	for (i = 0x104; i < 0x144; i++)
+		colortable_entry_set_value(machine->colortable, i, (i - 0x104) + 0x20);
 }
 
 
@@ -251,30 +290,60 @@ static TILE_GET_INFO( locomotn_fg_get_tile_info )
 
 ***************************************************************************/
 
+static void calculate_star_field(void)
+{
+	int generator;
+	int x,y;
+
+	/* precalculate the star background */
+	total_stars = 0;
+	generator = 0;
+
+	for (y = 0;y < 256;y++)
+	{
+		for (x = 0;x < 288;x++)
+		{
+			int bit1,bit2;
+
+			generator <<= 1;
+			bit1 = (~generator >> 17) & 1;
+			bit2 = (generator >> 5) & 1;
+
+			if (bit1 ^ bit2) generator |= 1;
+
+			if (((~generator >> 16) & 1) &&
+					(generator & 0xfe) == 0xfe)
+			{
+				int color;
+
+				color = (~(generator >> 8)) & 0x3f;
+
+				if (color && total_stars < MAX_STARS)
+				{
+					stars[total_stars].x = x;
+					stars[total_stars].y = y;
+					stars[total_stars].color = color;
+
+					total_stars++;
+				}
+			}
+		}
+	}
+}
+
+
 VIDEO_START( rallyx )
 {
 	int i;
 
-	if (video_type == TYPE_RALLYX || video_type == TYPE_JUNGLER)
-	{
-		bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-		fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
-	}
-	else
-	{
-		bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
-		fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
-	}
+	bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
-	if (video_type == TYPE_RALLYX)
-		tilemap_set_scrolldx(bg_tilemap,3,3);
+	tilemap_set_scrolldx(bg_tilemap,3,3);
 
-	/* commsega has more sprites and bullets than the other games */
-	if (video_type == TYPE_COMMSEGA)
-		spriteram_base = 0x00;
-	else
-		spriteram_base = 0x14;
+	spriteram_base = 0x14;
+
 	spriteram = rallyx_videoram + 0x00;
 	spriteram_2 = spriteram + 0x800;
 	rallyx_radarx = rallyx_videoram + 0x20;
@@ -282,57 +351,103 @@ VIDEO_START( rallyx )
 
 	for (i = 0;i < 16;i++)
 		machine->shadow_table[i] = i+16;
+
 	for (i = 16;i < 32;i++)
 		machine->shadow_table[i] = i;
+
 	for (i = 0;i < 3;i++)
 		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+
 	gfx_drawmode_table[3] = DRAWMODE_NONE;
-
-
-	/* Rally X doesn't have the optional starfield generator */
-	if (video_type != TYPE_RALLYX)
-	{
-		int generator;
-		int x,y;
-
-		/* precalculate the star background */
-		/* this comes from the Galaxian hardware, Bosconian is probably different */
-		total_stars = 0;
-		generator = 0;
-
-		for (y = 0;y < 256;y++)
-		{
-			for (x = 0;x < 288;x++)
-			{
-				int bit1,bit2;
-
-
-				generator <<= 1;
-				bit1 = (~generator >> 17) & 1;
-				bit2 = (generator >> 5) & 1;
-
-				if (bit1 ^ bit2) generator |= 1;
-
-				if (((~generator >> 16) & 1) &&
-						(generator & 0xfe) == 0xfe)
-				{
-					int color;
-
-					color = (~(generator >> 8)) & 0x3f;
-					if (color && total_stars < MAX_STARS)
-					{
-						stars[total_stars].x = x;
-						stars[total_stars].y = y;
-						stars[total_stars].color = machine->pens[color + STARS_COLOR_BASE];
-
-						total_stars++;
-					}
-				}
-			}
-		}
-	}
 }
 
+
+VIDEO_START( jungler )
+{
+	int i;
+
+	bg_tilemap = tilemap_create(rallyx_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(rallyx_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+
+	spriteram_base = 0x14;
+
+	spriteram = rallyx_videoram + 0x00;
+	spriteram_2 = spriteram + 0x800;
+	rallyx_radarx = rallyx_videoram + 0x20;
+	rallyx_radary = rallyx_radarx + 0x800;
+
+	for (i = 0;i < 16;i++)
+		machine->shadow_table[i] = i+16;
+
+	for (i = 16;i < 32;i++)
+		machine->shadow_table[i] = i;
+
+	for (i = 0;i < 3;i++)
+		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+
+	gfx_drawmode_table[3] = DRAWMODE_NONE;
+
+	calculate_star_field();
+}
+
+
+VIDEO_START( locomotn )
+{
+	int i;
+
+	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+
+	spriteram_base = 0x14;
+
+	spriteram = rallyx_videoram + 0x00;
+	spriteram_2 = spriteram + 0x800;
+	rallyx_radarx = rallyx_videoram + 0x20;
+	rallyx_radary = rallyx_radarx + 0x800;
+
+	for (i = 0;i < 16;i++)
+		machine->shadow_table[i] = i+16;
+
+	for (i = 16;i < 32;i++)
+		machine->shadow_table[i] = i;
+
+	for (i = 0;i < 3;i++)
+		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+
+	gfx_drawmode_table[3] = DRAWMODE_NONE;
+
+	calculate_star_field();
+}
+
+
+VIDEO_START( commsega )
+{
+	int i;
+
+	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
+	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+
+	/* commsega has more sprites and bullets than the other games */
+	spriteram_base = 0x00;
+
+	spriteram = rallyx_videoram + 0x00;
+	spriteram_2 = spriteram + 0x800;
+	rallyx_radarx = rallyx_videoram + 0x20;
+	rallyx_radary = rallyx_radarx + 0x800;
+
+	for (i = 0;i < 16;i++)
+		machine->shadow_table[i] = i+16;
+
+	for (i = 16;i < 32;i++)
+		machine->shadow_table[i] = i;
+
+	for (i = 0;i < 3;i++)
+		gfx_drawmode_table[i] = DRAWMODE_SHADOW;
+
+	gfx_drawmode_table[3] = DRAWMODE_NONE;
+
+	calculate_star_field();
+}
 
 
 /***************************************************************************
@@ -369,8 +484,6 @@ WRITE8_HANDLER( tactcian_starson_w )
 
 static void plot_star(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int color)
 {
-	int bpen = machine->pens[0];
-
 	if (y < cliprect->min_y ||
 		y > cliprect->max_y ||
 		x < cliprect->min_x ||
@@ -378,15 +491,12 @@ static void plot_star(running_machine *machine, mame_bitmap *bitmap, const recta
 		return;
 
 	if (flip_screen_x)
-	{
 		x = 255 - x;
-	}
-	if (flip_screen_y)
-	{
-		y = 255 - y;
-	}
 
-	if (*BITMAP_ADDR16(bitmap, y, x) == bpen)
+	if (flip_screen_y)
+		y = 255 - y;
+
+	if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x) % 0x144) == 0)
 		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[STARS_COLOR_BASE + color];
 }
 
@@ -396,16 +506,11 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 
 	for (offs = 0;offs < total_stars;offs++)
 	{
-		int x,y;
-
-
-		x = stars[offs].x;
-		y = stars[offs].y;
+		int x = stars[offs].x;
+		int y = stars[offs].y;
 
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
 			plot_star(machine, bitmap, cliprect, x, y, stars[offs].color);
-		}
 	}
 }
 
@@ -418,16 +523,19 @@ static void rallyx_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	{
 		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1) - displacement;
 		int sy = 241 - spriteram_2[offs] - displacement;
+		int color = spriteram_2[offs + 1] & 0x3f;
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
 		if (flip_screen) sx -= 2*displacement;
 
 		pdrawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
-				spriteram_2[offs + 1] & 0x3f,
+				color,
 				flipx,flipy,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0,0x02);
+				cliprect,TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0),
+				0x02);
 	}
 }
 
@@ -439,6 +547,7 @@ static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	{
 		int sx = spriteram[offs + 1] + ((spriteram_2[offs + 1] & 0x80) << 1);
 		int sy = 241 - spriteram_2[offs] - displacement;
+		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
 		/* handle reduced visible area in some games */
@@ -446,10 +555,12 @@ static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		pdrawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
-				spriteram_2[offs + 1] & 0x3f,
+				color,
 				flip,flip,
 				sx,sy,
-				cliprect,TRANSPARENCY_COLOR,0,0x02);
+				cliprect,TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0),
+				0x02);
 	}
 }
 
@@ -547,35 +658,84 @@ VIDEO_UPDATE( rallyx )
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
-	/* tile priority doesn't seem to be supported in Jungler */
-	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,video_type == TYPE_JUNGLER ? 0 : 1);
-	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,video_type == TYPE_JUNGLER ? 0 : 1);
+	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
+	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
 
-	switch (video_type)
-	{
-		case TYPE_RALLYX:
-			rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-			rallyx_draw_sprites(machine, bitmap,cliprect,1);
-			rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
-			break;
+	rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	rallyx_draw_sprites(machine, bitmap,cliprect,1);
+	rallyx_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
 
-		case TYPE_JUNGLER:
-			jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-			rallyx_draw_sprites(machine, bitmap,cliprect,0);
-			jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
-			break;
-
-		case TYPE_TACTCIAN:
-		case TYPE_LOCOMOTN:
-		case TYPE_COMMSEGA:
-			locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
-			locomotn_draw_sprites(machine, bitmap,cliprect,0);
-			locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
-			break;
-	}
-
-	/* Rally X doesn't have the optional starfield generator */
-	if (video_type != TYPE_RALLYX)
-		if (stars_enable) draw_stars(machine, bitmap,cliprect);
 	return 0;
 }
+
+
+VIDEO_UPDATE( jungler )
+{
+	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
+       the screen, and clip it to only the position where it is supposed to be shown */
+	rectangle fg_clip = *cliprect;
+	rectangle bg_clip = *cliprect;
+	if (flip_screen)
+	{
+		bg_clip.min_x = 8*8;
+		fg_clip.max_x = 8*8-1;
+	}
+	else
+	{
+		bg_clip.max_x = 28*8-1;
+		fg_clip.min_x = 28*8;
+	}
+
+	fillbitmap(priority_bitmap,0,cliprect);
+
+	/* tile priority doesn't seem to be supported in Jungler */
+	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
+	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
+	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
+	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
+
+	jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	rallyx_draw_sprites(machine, bitmap,cliprect,0);
+	jungler_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+
+	if (stars_enable)
+		draw_stars(machine, bitmap, cliprect);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( locomotn )
+{
+	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
+       the screen, and clip it to only the position where it is supposed to be shown */
+	rectangle fg_clip = *cliprect;
+	rectangle bg_clip = *cliprect;
+	if (flip_screen)
+	{
+		bg_clip.min_x = 8*8;
+		fg_clip.max_x = 8*8-1;
+	}
+	else
+	{
+		bg_clip.max_x = 28*8-1;
+		fg_clip.min_x = 28*8;
+	}
+
+	fillbitmap(priority_bitmap,0,cliprect);
+
+	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
+	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
+	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,1);
+	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,1);
+
+	locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN);
+	locomotn_draw_sprites(machine, bitmap,cliprect,0);
+	locomotn_draw_bullets(machine, bitmap,cliprect,TRANSPARENCY_PEN_TABLE);
+
+	if (stars_enable)
+		draw_stars(machine, bitmap, cliprect);
+
+	return 0;
+}
+
