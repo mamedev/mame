@@ -1985,7 +1985,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bi
 			zx, 0, 0, zy,
 			0,					/* why no wraparound ?? */
 			&machine->screen[0].visarea,
-			TRANSPARENCY_COLOR, 0, priority);
+			TRANSPARENCY_PEN, 0, priority);
 	}
 }
 
