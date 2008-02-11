@@ -424,7 +424,7 @@ static void zn_machine_init( void )
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
 
@@ -1279,6 +1279,7 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_IMPORT_FROM( zn1_1mb_vram )
 
+	MDRV_CPU_MODIFY( "MAIN" )
 	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
 
 	MDRV_CPU_ADD( Z80, 16000000 / 4 )
@@ -1362,6 +1363,7 @@ static NVRAM_HANDLER( coh1000tb )
 static MACHINE_DRIVER_START( coh1000tb )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
+	MDRV_CPU_MODIFY( "MAIN" )
 	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
 
 	MDRV_MACHINE_RESET( coh1000tb )
@@ -2457,6 +2459,7 @@ static INTERRUPT_GEN( coh1002v_vblank )
 static MACHINE_DRIVER_START( coh1002v )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
+	MDRV_CPU_MODIFY( "MAIN" )
 	MDRV_CPU_VBLANK_INT( coh1002v_vblank, 1 )
 
 	MDRV_MACHINE_RESET( coh1002v )
