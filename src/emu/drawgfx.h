@@ -54,7 +54,6 @@ enum
 	TRANSPARENCY_PEN,			/* single pen transparency with remapping */
 	TRANSPARENCY_PEN_RAW,		/* single pen transparency with no remapping */
 	TRANSPARENCY_PENS,			/* multiple pen transparency with remapping */
-	TRANSPARENCY_COLOR,			/* single remapped pen transparency with remapping */
 	TRANSPARENCY_PEN_TABLE,		/* special pen remapping modes (see DRAWMODE_xxx below) with remapping */
 	TRANSPARENCY_ALPHA,			/* single pen transparency, other pens alpha */
 	TRANSPARENCY_ALPHARANGE,	/* single pen transparency, multiple pens alpha depending on array, see psikyosh.c */

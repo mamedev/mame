@@ -925,9 +925,6 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
                                      transparency.
   transparency == TRANSPARENCY_PENS - as above, but transparent_color is a mask of
                                      transparent pens.
-  transparency == TRANSPARENCY_COLOR - bits whose _remapped_ palette index (taken from
-                                     machine->game_colortable) is == transparent_color
-
   transparency == TRANSPARENCY_PEN_TABLE - the transparency condition is same as TRANSPARENCY_PEN
                     A special drawing is done according to gfx_drawmode_table[source pixel].
                     DRAWMODE_NONE      transparent
@@ -1320,13 +1317,6 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 		transparent_color = -1;
 	}
 
-	/* if necessary, remap the transparent color */
-	if (transparency == TRANSPARENCY_COLOR)
-	{
-		transparency = TRANSPARENCY_PEN;
-		transparent_color = Machine->pens[transparent_color];
-	}
-
 	if (transparency != TRANSPARENCY_PEN)
 	{
 		popmessage("copyrozbitmap unsupported trans %02x",transparency);
@@ -1370,10 +1360,6 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 		transparency = TRANSPARENCY_PEN;
 		transparent_color &= 0xff;
 	}
-
-	if (transparency == TRANSPARENCY_COLOR)
-		transparent_color = Machine->pens[transparent_color];
-
 
 	/*
     scalex and scaley are 16.16 fixed point numbers
@@ -1748,54 +1734,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 					}
 
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = BITMAP_ADDR8(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT8 *dest = BITMAP_ADDR8(dest_bmp, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
+					/* case 3: TRANSPARENCY_PEN_TABLE */
 					if (transparency == TRANSPARENCY_PEN_TABLE)
 					{
 						pen_t *palette_shadow_table = Machine->shadow_table;
@@ -2222,54 +2161,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 					}
 
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
+					/* case 3: TRANSPARENCY_PEN_TABLE */
 					if (transparency == TRANSPARENCY_PEN_TABLE)
 					{
 						pen_t *palette_shadow_table = Machine->shadow_table;
@@ -2712,54 +2604,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						}
 					}
 
-					/* case 3: TRANSPARENCY_COLOR */
-					else if (transparency == TRANSPARENCY_COLOR)
-					{
-						if (pri_buffer)
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color )
-									{
-										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = c;
-										pri[x] = 31;
-									}
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
-								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = pal[source[x_index>>16]];
-									if( c != transparent_color ) dest[x] = c;
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* case 4: TRANSPARENCY_PEN_TABLE */
+					/* case 3: TRANSPARENCY_PEN_TABLE */
 					if (transparency == TRANSPARENCY_PEN_TABLE)
 					{
 						pen_t *palette_shadow_table = Machine->shadow_table;
@@ -3508,132 +3353,6 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS,
 #endif
 
 #if (RAW == 0)
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_transcolor,(COMMON_ARGS,
-		COLOR_ARG,const UINT16 *colortable,int transcolor),
-{
-	pen_t *palette_shadow_table = Machine->shadow_table;
-	ADJUST_8
-
-	(void)palette_shadow_table;
-
-	if (flipx)
-	{
-		DATA_TYPE *end;
-
-		while (dstheight)
-		{
-			end = dstdata - dstwidth*HMODULO;
-			while (dstdata > end)
-			{
-				if (colortable[*srcdata] != transcolor) SETPIXELCOLOR(0,LOOKUP(*srcdata))
-				srcdata++;
-				INCREMENT_DST(-HMODULO)
-			}
-
-			srcdata += srcmodulo;
-			INCREMENT_DST(ydir*VMODULO + dstwidth*HMODULO)
-			dstheight--;
-		}
-	}
-	else
-	{
-		DATA_TYPE *end;
-
-		while (dstheight)
-		{
-			end = dstdata + dstwidth*HMODULO;
-			while (dstdata < end)
-			{
-				if (colortable[*srcdata] != transcolor) SETPIXELCOLOR(0,LOOKUP(*srcdata))
-				srcdata++;
-				INCREMENT_DST(HMODULO)
-			}
-
-			srcdata += srcmodulo;
-			INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
-			dstheight--;
-		}
-	}
-})
-
-DECLARE_SWAP_RAW_PRI(blockmove_4toN_transcolor,(COMMON_ARGS,
-		COLOR_ARG,const UINT16 *colortable,int transcolor),
-{
-	pen_t *palette_shadow_table = Machine->shadow_table;
-	ADJUST_4
-
-	(void)palette_shadow_table;
-
-	if (flipx)
-	{
-		DATA_TYPE *end;
-
-		while (dstheight)
-		{
-			int col;
-
-			end = dstdata - dstwidth*HMODULO;
-			if (leftskip)
-			{
-				col = *(srcdata++)>>4;
-				if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-				INCREMENT_DST(-HMODULO)
-			}
-			while (dstdata > end)
-			{
-				col = *(srcdata)&0x0f;
-				if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-				INCREMENT_DST(-HMODULO)
-				if (dstdata > end)
-				{
-					col = *(srcdata++)>>4;
-					if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-					INCREMENT_DST(-HMODULO)
-				}
-			}
-
-			srcdata += srcmodulo;
-			INCREMENT_DST(ydir*VMODULO + dstwidth*HMODULO)
-			dstheight--;
-		}
-	}
-	else
-	{
-		DATA_TYPE *end;
-
-		while (dstheight)
-		{
-			int col;
-
-			end = dstdata + dstwidth*HMODULO;
-			if (leftskip)
-			{
-				col = *(srcdata++)>>4;
-				if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-				INCREMENT_DST(HMODULO)
-			}
-			while (dstdata < end)
-			{
-				col = *(srcdata)&0x0f;
-				if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-				INCREMENT_DST(HMODULO)
-				if (dstdata < end)
-				{
-					col = *(srcdata++)>>4;
-					if (colortable[col] != transcolor) SETPIXELCOLOR(0,LOOKUP(col))
-					INCREMENT_DST(HMODULO)
-				}
-			}
-
-			srcdata += srcmodulo;
-			INCREMENT_DST(ydir*VMODULO - dstwidth*HMODULO)
-			dstheight--;
-		}
-	}
-})
-#endif
-
-#if (RAW == 0)
 #if DEPTH == 32
 DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
 		COLOR_ARG,int transcolor),
@@ -4138,23 +3857,6 @@ DECLARE(drawgfx_core,(
 					BLOCKMOVEPRI(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
 				else
 					BLOCKMOVELU(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
-				break;
-
-			case TRANSPARENCY_COLOR:
-				if (gfx->flags & GFX_ELEMENT_PACKED)
-				{
-					if (pribuf)
-						BLOCKMOVEPRI(4toN_transcolor,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,Machine->game_colortable + (paldata - Machine->remapped_colortable),transparent_color));
-					else
-						BLOCKMOVELU(4toN_transcolor,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,Machine->game_colortable + (paldata - Machine->remapped_colortable),transparent_color));
-				}
-				else
-				{
-					if (pribuf)
-						BLOCKMOVEPRI(8toN_transcolor,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,Machine->game_colortable + (paldata - Machine->remapped_colortable),transparent_color));
-					else
-						BLOCKMOVELU(8toN_transcolor,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,Machine->game_colortable + (paldata - Machine->remapped_colortable),transparent_color));
-				}
 				break;
 
 			case TRANSPARENCY_PEN_TABLE:
