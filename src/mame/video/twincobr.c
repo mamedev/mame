@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 #include "twincobr.h"
 
 
@@ -190,12 +190,12 @@ void twincobr_flipscreen(int flip)
 
 WRITE16_HANDLER( twincobr_crtc_reg_sel_w )
 {
-//	m6845_address_w(offset, data);
+//	mc6845_address_w(offset, data);
 }
 
 WRITE16_HANDLER( twincobr_crtc_data_w )
 {
-//	m6845_register_w(offset, data);
+//	mc6845_register_w(offset, data);
 }
 
 WRITE16_HANDLER( twincobr_txoffs_w )
@@ -371,12 +371,12 @@ WRITE8_HANDLER( wardner_sprite_w )
 
 WRITE8_HANDLER( wardner_CRTC_reg_sel_w )
 {
-//	m6845_address_w(offset, data);
+//	mc6845_address_w(offset, data);
 }
 
 WRITE8_HANDLER( wardner_CRTC_data_w )
 {
-//	m6845_register_w(0, data);
+//	mc6845_register_w(0, data);
 }
 
 

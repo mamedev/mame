@@ -57,7 +57,7 @@ static PALETTE_INIT( tugboat )
 
 
 
-/* see m6845.c. That file is only a placeholder, I process the writes here
+/* see mc6845.c. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
 static WRITE8_HANDLER( tugboat_hd46505_0_w )
 {

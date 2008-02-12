@@ -23,9 +23,9 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 static UINT8 *ssingles_videoram;
 static UINT8 *ssingles_colorram;
 static UINT8 prot_data;
@@ -84,7 +84,7 @@ static void update_row(mame_bitmap *bitmap, const rectangle *cliprect,
 	}
 }
 
-static const m6845_interface m6845_intf =
+static const mc6845_interface mc6845_intf =
 {
 		0,
 		1000000, /* ? MHz */
@@ -105,21 +105,21 @@ static WRITE8_HANDLER(ssingles_colorram_w)
 	ssingles_colorram[offset]=data;
 }
 
-static WRITE8_HANDLER( ssingles_m6845_address_w )
+static WRITE8_HANDLER( ssingles_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
 
-static WRITE8_HANDLER( ssingles_m6845_register_w )
+static WRITE8_HANDLER( ssingles_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 
 static VIDEO_START(ssingles)
 {
-	m6845 = m6845_config(&m6845_intf);
+	mc6845 = mc6845_config(&mc6845_intf);
 
 	{
 		int i;
@@ -133,7 +133,7 @@ static VIDEO_START(ssingles)
 
 static VIDEO_UPDATE( ssingles )
 {
-	m6845_update(m6845, bitmap, cliprect);
+	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }
@@ -192,8 +192,8 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(ssingles_m6845_address_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ssingles_m6845_register_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(ssingles_mc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(ssingles_mc6845_register_w)
 
 ADDRESS_MAP_END
 

@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 #include "qix.h"
 
 
@@ -17,7 +17,7 @@ UINT8 qix_cocktail_flip;
 
 
 /* Local variables */
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 static UINT8 vram_mask;
 static UINT8 qix_palettebank;
 static UINT8 leds;
@@ -51,7 +51,7 @@ static void qix_update_row(mame_bitmap *bitmap,
  *
  *************************************/
 
-static const m6845_interface m6845_intf =
+static const mc6845_interface mc6845_intf =
 {
 	0,						/* screen we are acting on */
 	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
@@ -66,7 +66,7 @@ static const m6845_interface m6845_intf =
 VIDEO_START( qix )
 {
 	/* configure the CRT controller */
-	m6845 = m6845_config(&m6845_intf);
+	mc6845 = mc6845_config(&mc6845_intf);
 
 	/* allocate memory for the full video RAM */
 	videoram = auto_malloc(256 * 256);
@@ -95,8 +95,8 @@ static void qix_display_enable_changed(int display_enabled)
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
 	{
-		UINT16 ma = m6845_get_ma(m6845);
-		UINT8 ra = m6845_get_ra(m6845);
+		UINT16 ma = mc6845_get_ma(mc6845);
+		UINT8 ra = mc6845_get_ra(mc6845);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -292,21 +292,21 @@ static void get_pens(pen_t *pens)
  *
  *************************************/
 
-WRITE8_HANDLER( qix_m6845_address_w )
+WRITE8_HANDLER( qix_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
 
-READ8_HANDLER( qix_m6845_register_r )
+READ8_HANDLER( qix_mc6845_register_r )
 {
-	return m6845_register_r(m6845);
+	return mc6845_register_r(mc6845);
 }
 
 
-WRITE8_HANDLER( qix_m6845_register_w )
+WRITE8_HANDLER( qix_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 
@@ -362,7 +362,7 @@ static void qix_update_row(mame_bitmap *bitmap, const rectangle *cliprect,
 
 VIDEO_UPDATE( qix  )
 {
-	m6845_update(m6845, bitmap, cliprect);
+	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }

@@ -124,14 +124,14 @@
 #define MASTER_CLOCK	10000000	/* 10MHz */
 
 #include "driver.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 
 
 /*************************
 *     Video Hardware     *
 *************************/
 
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( miniboy7_videoram_w )
@@ -146,19 +146,19 @@ static WRITE8_HANDLER( miniboy7_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static WRITE8_HANDLER( miniboy7_m6845_address_w )
+static WRITE8_HANDLER( miniboy7_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
-static READ8_HANDLER( miniboy7_m6845_register_r )
+static READ8_HANDLER( miniboy7_mc6845_register_r )
 {
-	return m6845_register_r(m6845);
+	return mc6845_register_r(mc6845);
 }
 
-static WRITE8_HANDLER( miniboy7_m6845_register_w )
+static WRITE8_HANDLER( miniboy7_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -182,7 +182,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( miniboy7 )
 {
-	m6845 = m6845_config(NULL);
+	mc6845 = mc6845_config(NULL);
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 37, 37);
 }
 
@@ -203,8 +203,8 @@ static ADDRESS_MAP_START( miniboy7_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_WRITE(miniboy7_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(miniboy7_m6845_address_w)
-	AM_RANGE(0x2801, 0x2801) AM_READWRITE(miniboy7_m6845_register_r, miniboy7_m6845_register_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(miniboy7_mc6845_address_w)
+	AM_RANGE(0x2801, 0x2801) AM_READWRITE(miniboy7_mc6845_register_r, miniboy7_mc6845_register_w)
 //  AM_RANGE(0x3000, 0x3001) ????? R/W
 //  AM_RANGE(0x3080, 0x3083) AM_READWRITE(pia_0_r, pia_0_w)
 //  AM_RANGE(0x3800, 0x3800) ????? R

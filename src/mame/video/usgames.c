@@ -1,11 +1,11 @@
 #include "driver.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 #include "deprecat.h"
 
 UINT8 *usgames_videoram,*usgames_charram;
 
 
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 static tilemap *usgames_tilemap;
 
 
@@ -49,7 +49,7 @@ static TILE_GET_INFO( get_usgames_tile_info )
 
 VIDEO_START(usgames)
 {
-	m6845 = m6845_config(NULL);
+	mc6845 = mc6845_config(NULL);
 	usgames_tilemap = tilemap_create(get_usgames_tile_info,tilemap_scan_rows, 8, 8,64,32);
 }
 
@@ -70,15 +70,15 @@ WRITE8_HANDLER( usgames_charram_w )
 }
 
 
-WRITE8_HANDLER( usgames_m6845_address_w )
+WRITE8_HANDLER( usgames_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
 
-WRITE8_HANDLER( usgames_m6845_register_w )
+WRITE8_HANDLER( usgames_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 

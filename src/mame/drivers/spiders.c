@@ -21,7 +21,7 @@
     $0000-$1bff Video Memory (bit0)
     $4000-$5bff Video Memory (bit1)
     $8000-$9bff Video Memory (bit2)
-    $c000-$c001 6845 CRT Controller (m6845)
+    $c000-$c001 6845 CRT Controller (mc6845)
     $c020-$c027 NVRAM
     $c044-$c047 MC6821 PIA 1 (Control input port - all input)
     $c048-$c04b MC6821 PIA 2 (Sprite data port - see machine/spiders.c)
@@ -36,7 +36,7 @@
     $0000-$1bff Video Memory (bit0)
     $4000-$5bff Video Memory (bit1)
     $8000-$9bff Video Memory (bit2)
-    $c000-$c001 6845 CRT Controller (m6845)
+    $c000-$c001 6845 CRT Controller (mc6845)
     $c044-$c047 MC6821 PIA 1
     $c048-$c04b MC6821 PIA 2 (Video port)
     $c050-$c053 MC6821 PIA 3
@@ -192,7 +192,7 @@
 #include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "spiders.h"
@@ -203,7 +203,7 @@
 #define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
 
 
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 static UINT8 *spiders_ram;
 static UINT8 flipscreen;
 static UINT16 gfx_rom_address;
@@ -410,21 +410,21 @@ static MACHINE_RESET( spiders )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( spiders_m6845_address_w )
+static WRITE8_HANDLER( spiders_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
 
-static READ8_HANDLER( spiders_m6845_register_r )
+static READ8_HANDLER( spiders_mc6845_register_r )
 {
-	return m6845_register_r(m6845);
+	return mc6845_register_r(mc6845);
 }
 
 
-static WRITE8_HANDLER( spiders_m6845_register_w )
+static WRITE8_HANDLER( spiders_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 
@@ -515,7 +515,7 @@ static void display_enable_changed(int display_enabled)
 }
 
 
-static const m6845_interface m6845_intf =
+static const mc6845_interface mc6845_intf =
 {
 	0,						/* screen we are acting on */
 	CRTC_CLOCK, 			/* the clock (pin 21) of the chip */
@@ -530,13 +530,13 @@ static const m6845_interface m6845_intf =
 static VIDEO_START( spiders )
 {
 	/* configure the CRT controller */
-	m6845 = m6845_config(&m6845_intf);
+	mc6845 = mc6845_config(&mc6845_intf);
 }
 
 
 static VIDEO_UPDATE( spiders )
 {
-	m6845_update(m6845, bitmap, cliprect);
+	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }
@@ -591,8 +591,8 @@ static READ8_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spiders_m6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(spiders_m6845_register_r, spiders_m6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(spiders_mc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(spiders_mc6845_register_r, spiders_mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_2_alt_r, pia_2_alt_w)

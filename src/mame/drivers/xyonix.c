@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( port_writemem, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(xyonix_io_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(MWA8_NOP)	// NMI ack?
 	AM_RANGE(0x50, 0x50) AM_WRITE(xyonix_irqack_w)
-	AM_RANGE(0x60, 0x61) AM_WRITE(MWA8_NOP)	// m6845
+	AM_RANGE(0x60, 0x61) AM_WRITE(MWA8_NOP)	// mc6845
 ADDRESS_MAP_END
 
 /* Inputs Ports **************************************************************/

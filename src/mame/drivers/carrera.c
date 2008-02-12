@@ -44,21 +44,21 @@ Emulation Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "video/m6845.h"
+#include "video/mc6845.h"
 
 static UINT8* carrera_tileram;
-static m6845_t *m6845;
+static mc6845_t *mc6845;
 
 
 
-static WRITE8_HANDLER( carrera_m6845_address_w )
+static WRITE8_HANDLER( carrera_mc6845_address_w )
 {
-	m6845_address_w(m6845, data);
+	mc6845_address_w(mc6845, data);
 }
 
-static WRITE8_HANDLER( carrera_m6845_register_w )
+static WRITE8_HANDLER( carrera_mc6845_register_w )
 {
-	m6845_register_w(m6845, data);
+	mc6845_register_w(mc6845, data);
 }
 
 
@@ -71,8 +71,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(carrera_m6845_address_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(carrera_m6845_register_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(carrera_mc6845_address_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(carrera_mc6845_register_w)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&carrera_tileram)
 ADDRESS_MAP_END
 
@@ -259,7 +259,7 @@ GFXDECODE_END
 
 static VIDEO_START(carrera)
 {
-	m6845 = m6845_config(NULL);
+	mc6845 = mc6845_config(NULL);
 }
 
 static VIDEO_UPDATE(carrera)

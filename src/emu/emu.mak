@@ -167,7 +167,7 @@ EMUMACHINEOBJS = \
 EMUVIDEOOBJS = \
  	$(EMUVIDEO)/cdp1869.o \
 	$(EMUVIDEO)/generic.o \
- 	$(EMUVIDEO)/m6845.o \
+ 	$(EMUVIDEO)/mc6845.o \
 	$(EMUVIDEO)/poly.o \
 	$(EMUVIDEO)/resnet.o \
 	$(EMUVIDEO)/s2636.o \

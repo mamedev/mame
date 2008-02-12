@@ -289,8 +289,8 @@ static ADDRESS_MAP_START( video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE(&qix_videoaddress)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(qix_scanline_r)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_m6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_m6845_register_r, qix_m6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -307,8 +307,8 @@ static ADDRESS_MAP_START( zoo_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE(&qix_videoaddress)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(qix_scanline_r)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_m6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_m6845_register_r, qix_m6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
