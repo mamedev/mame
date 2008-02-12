@@ -236,15 +236,17 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "video/crtc6845.h"
 #include "machine/6821pia.h"
 
 /* from video */
-extern WRITE8_HANDLER( gdrawpkr_videoram_w );
-extern WRITE8_HANDLER( gdrawpkr_colorram_w );
-extern PALETTE_INIT( gdrawpkr );
-extern VIDEO_START( gdrawpkr );
-extern VIDEO_UPDATE( gdrawpkr );
+WRITE8_HANDLER( gdrawpkr_videoram_w );
+WRITE8_HANDLER( gdrawpkr_colorram_w );
+WRITE8_HANDLER( gdrawpkr_crtc6845_address_w );
+READ8_HANDLER( gdrawpkr_crtc6845_register_r );
+WRITE8_HANDLER( gdrawpkr_crtc6845_register_w );
+PALETTE_INIT( gdrawpkr );
+VIDEO_START( gdrawpkr );
+VIDEO_UPDATE( gdrawpkr );
 
 
 /*************************
@@ -255,8 +257,8 @@ static ADDRESS_MAP_START( gdrawpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_WRITE(gdrawpkr_crtc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_READWRITE(gdrawpkr_crtc6845_register_r, gdrawpkr_crtc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)
@@ -268,8 +270,8 @@ static ADDRESS_MAP_START( elgrande_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_WRITE(gdrawpkr_crtc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_READWRITE(gdrawpkr_crtc6845_register_r, gdrawpkr_crtc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(gdrawpkr_videoram_w) AM_BASE(&videoram)

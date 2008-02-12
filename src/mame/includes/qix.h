@@ -50,7 +50,11 @@ extern UINT8 *qix_videoaddress;
 extern UINT8 qix_cocktail_flip;
 
 VIDEO_START( qix );
+VIDEO_UPDATE( qix );
 
+WRITE8_HANDLER( qix_crtc6845_address_w );
+READ8_HANDLER( qix_crtc6845_register_r );
+WRITE8_HANDLER( qix_crtc6845_register_w );
 READ8_HANDLER( qix_scanline_r );
 READ8_HANDLER( qix_videoram_r );
 WRITE8_HANDLER( qix_videoram_w );

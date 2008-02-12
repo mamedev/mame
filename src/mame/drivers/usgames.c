@@ -24,22 +24,22 @@ Sound: AY-3-8912
 */
 
 #include "driver.h"
-#include "video/crtc6845.h"
 #include "sound/ay8910.h"
 
 /* video */
-WRITE8_HANDLER( usg_videoram_w );
-WRITE8_HANDLER( usg_charram_w );
-VIDEO_START(usg);
-PALETTE_INIT(usg);
-VIDEO_UPDATE(usg);
-extern tilemap *usg_tilemap;
+WRITE8_HANDLER( usgames_videoram_w );
+WRITE8_HANDLER( usgames_charram_w );
+WRITE8_HANDLER( usgames_crtc6845_address_w );
+WRITE8_HANDLER( usgames_crtc6845_register_w );
+VIDEO_START(usgames);
+PALETTE_INIT(usgames);
+VIDEO_UPDATE(usgames);
 
 
-extern UINT8 *usg_videoram,*usg_charram;
+extern UINT8 *usgames_videoram,*usgames_charram;
 
 
-static WRITE8_HANDLER( usg_rombank_w )
+static WRITE8_HANDLER( usgames_rombank_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( lamps2_w )
 
 
 
-static ADDRESS_MAP_START( usg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( usgames_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)
 
 	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_1_r)
@@ -96,22 +96,22 @@ static ADDRESS_MAP_START( usg185_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( usg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( usgames_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
 	AM_RANGE(0x2030, 0x2030) AM_WRITE(lamps2_w)
 
-	AM_RANGE(0x2040, 0x2040) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x2041, 0x2041) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0x2040, 0x2040) AM_WRITE(usgames_crtc6845_address_w)
+	AM_RANGE(0x2041, 0x2041) AM_WRITE(usgames_crtc6845_register_w)
 
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2401, 0x2401) AM_WRITE(AY8910_write_port_0_w)
 
-	AM_RANGE(0x2060, 0x2060) AM_WRITE(usg_rombank_w)
+	AM_RANGE(0x2060, 0x2060) AM_WRITE(usgames_rombank_w)
 
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(usg_charram_w) AM_BASE(&usg_charram)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(usg_videoram_w) AM_BASE(&usg_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
@@ -122,16 +122,16 @@ static ADDRESS_MAP_START( usg185_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2420, 0x2420) AM_WRITE(lamps1_w)
 	AM_RANGE(0x2430, 0x2430) AM_WRITE(lamps2_w)
 
-	AM_RANGE(0x2440, 0x2440) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x2441, 0x2441) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0x2440, 0x2440) AM_WRITE(usgames_crtc6845_address_w)
+	AM_RANGE(0x2441, 0x2441) AM_WRITE(usgames_crtc6845_register_w)
 
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(AY8910_write_port_0_w)
 
-	AM_RANGE(0x2460, 0x2460) AM_WRITE(usg_rombank_w)
+	AM_RANGE(0x2460, 0x2460) AM_WRITE(usgames_rombank_w)
 
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(usg_charram_w) AM_BASE(&usg_charram)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(usg_videoram_w) AM_BASE(&usg_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
 ADDRESS_MAP_END
@@ -286,11 +286,11 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( usg )
+static MACHINE_DRIVER_START( usg32 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, 2000000) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(usg_readmem,usg_writemem)
+	MDRV_CPU_PROGRAM_MAP(usgames_readmem,usgames_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,5) /* ?? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -307,9 +307,9 @@ static MACHINE_DRIVER_START( usg )
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_COLORTABLE_LENGTH(2*256)
 
-	MDRV_PALETTE_INIT(usg)
-	MDRV_VIDEO_START(usg)
-	MDRV_VIDEO_UPDATE(usg)
+	MDRV_PALETTE_INIT(usgames)
+	MDRV_VIDEO_START(usgames)
+	MDRV_VIDEO_UPDATE(usgames)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -319,7 +319,7 @@ static MACHINE_DRIVER_START( usg )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( usg185 )
-	MDRV_IMPORT_FROM(usg)
+	MDRV_IMPORT_FROM(usg32)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(usg185_readmem,usg185_writemem)
 MACHINE_DRIVER_END
@@ -443,10 +443,10 @@ ROM_START( usg252 )
 ROM_END
 
 
-GAME( 1987, usg32,  0,     usg,    usg32, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
-GAME( 1988, usg83,  0,     usg,    usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
-GAME( 1988, usg83x, usg83, usg,    usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
-GAME( 1988, usg82,  usg83, usg,    usg83, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)	// "Feb.08,1988"
+GAME( 1987, usg32,  0,     usg32,  usg32, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
+GAME( 1988, usg83,  0,     usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
+GAME( 1988, usg83x, usg83, usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
+GAME( 1988, usg82,  usg83, usg32,  usg83, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)	// "Feb.08,1988"
 GAME( 1989, usg182, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
 GAME( 1991, usg185, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
 GAME( 1992, usg252, 0,     usg185, usg83, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )

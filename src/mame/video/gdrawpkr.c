@@ -8,6 +8,9 @@
 ***********************************************************************************/
 
 #include "driver.h"
+#include "video/crtc6845.h"
+
+static crtc6845_t *crtc6845;
 static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( gdrawpkr_videoram_w )
@@ -41,10 +44,25 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
+WRITE8_HANDLER( gdrawpkr_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+READ8_HANDLER( gdrawpkr_crtc6845_register_r )
+{
+	return crtc6845_register_r(crtc6845);
+}
+
+WRITE8_HANDLER( gdrawpkr_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
 VIDEO_START( gdrawpkr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 31);
+	crtc6845 = crtc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
 VIDEO_UPDATE( gdrawpkr )

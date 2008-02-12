@@ -30,6 +30,8 @@ static UINT8 madalien_headlight_pos;
 static UINT8 madalien_shift_count;
 static UINT8 madalien_shift_data;
 
+static crtc6845_t *crtc6845;
+
 static tilemap* tilemap_fg;
 
 static tilemap* tilemap_edge1[4];
@@ -82,6 +84,22 @@ static PALETTE_INIT( madalien )
 			colortable[0x10 + i] ^= 6;
 		}
 	}
+}
+
+
+static WRITE8_HANDLER( madalien_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+static READ8_HANDLER( madalien_crtc6845_register_r )
+{
+	return crtc6845_register_r(crtc6845);
+}
+
+static WRITE8_HANDLER( madalien_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
 }
 
 
@@ -172,7 +190,7 @@ static VIDEO_START( madalien )
 		NULL              /* call back for display state changes */
 	};
 
-	crtc6845_config(0, &crtc6845_intf);
+	crtc6845 = crtc6845_config(&crtc6845_intf);
 
 	tilemap_fg = tilemap_create(get_tile_info_FG,
 		tilemap_scan_cols_flip_x, 8, 8, 32, 32);
@@ -497,8 +515,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_crtc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_crtc6845_register_r, madalien_crtc6845_register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(madalien_screen_control_w)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)

@@ -801,19 +801,21 @@
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "video/crtc6845.h"
 #include "machine/6821pia.h"
 
 #include "funworld.lh"
 
 /* from video */
-extern WRITE8_HANDLER( funworld_videoram_w );
-extern WRITE8_HANDLER( funworld_colorram_w );
-extern PALETTE_INIT( funworld );
-extern VIDEO_START( funworld );
-extern VIDEO_START( magiccrd );
-extern VIDEO_START( snookr10 );
-extern VIDEO_UPDATE( funworld );
+WRITE8_HANDLER( funworld_videoram_w );
+WRITE8_HANDLER( funworld_colorram_w );
+WRITE8_HANDLER( funworld_crtc6845_address_w );
+READ8_HANDLER( funworld_crtc6845_register_r );
+WRITE8_HANDLER( funworld_crtc6845_register_w );
+PALETTE_INIT( funworld );
+VIDEO_START( funworld );
+VIDEO_START( magiccrd );
+VIDEO_START( snookr10 );
+VIDEO_UPDATE( funworld );
 
 
 /**********************
@@ -851,8 +853,8 @@ static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(funworld_crtc6845_address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(funworld_crtc6845_register_r, funworld_crtc6845_register_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
@@ -866,8 +868,8 @@ static ADDRESS_MAP_START( magiccrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(funworld_crtc6845_address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(funworld_crtc6845_register_r, funworld_crtc6845_register_w)
 	AM_RANGE(0x3600, 0x36ff) AM_RAM	// some games use $3603-05 range for protection.
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
@@ -880,8 +882,8 @@ static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(funworld_crtc6845_address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_READWRITE(funworld_crtc6845_register_r, funworld_crtc6845_register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	// some unknown reads
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM	// some games use $3e03-05 range for protection.
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
@@ -895,8 +897,8 @@ static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2a00, 0x2a03) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x2c01, 0x2c01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x2e00, 0x2e00) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x2e01, 0x2e01) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x2e00, 0x2e00) AM_WRITE(funworld_crtc6845_address_w)
+	AM_RANGE(0x2e01, 0x2e01) AM_READWRITE(funworld_crtc6845_register_r, funworld_crtc6845_register_w)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM

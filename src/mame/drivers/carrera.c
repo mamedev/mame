@@ -47,6 +47,20 @@ Emulation Notes:
 #include "video/crtc6845.h"
 
 static UINT8* carrera_tileram;
+static crtc6845_t *crtc6845;
+
+
+
+static WRITE8_HANDLER( carrera_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+static WRITE8_HANDLER( carrera_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
@@ -57,8 +71,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(carrera_crtc6845_address_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(carrera_crtc6845_register_w)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&carrera_tileram)
 ADDRESS_MAP_END
 
@@ -245,6 +259,7 @@ GFXDECODE_END
 
 static VIDEO_START(carrera)
 {
+	crtc6845 = crtc6845_config(NULL);
 }
 
 static VIDEO_UPDATE(carrera)

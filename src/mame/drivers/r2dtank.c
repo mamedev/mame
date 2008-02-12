@@ -48,6 +48,7 @@ RAM = 4116 (x11)
 #define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
 
 
+static crtc6845_t *crtc6845;
 static UINT8 *r2dtank_videoram;
 static UINT8 *r2dtank_colorram;
 static UINT8 flipscreen;
@@ -303,14 +304,25 @@ static MACHINE_RESET( r2dtank )
 #define NUM_PENS	(8)
 
 
+static WRITE8_HANDLER( r2dtank_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+
+static WRITE8_HANDLER( r2dtank_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
+
 static WRITE8_HANDLER( flipscreen_w )
 {
 	flipscreen = !data;
 }
 
 
-static void *begin_update(running_machine *machine, int screen,
-						  mame_bitmap *bitmap, const rectangle *cliprect)
+static void *begin_update(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* create the pens */
 	offs_t i;
@@ -396,7 +408,15 @@ static const crtc6845_interface crtc6845_intf =
 static VIDEO_START( r2dtank )
 {
 	/* configure the CRT controller */
-	crtc6845_config(0, &crtc6845_intf);
+	crtc6845 = crtc6845_config(&crtc6845_intf);
+}
+
+
+static VIDEO_UPDATE( r2dtank )
+{
+	crtc6845_update(crtc6845, bitmap, cliprect);
+
+	return 0;
 }
 
 
@@ -420,8 +440,8 @@ static ADDRESS_MAP_START( r2dtank_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_READWRITE(pia_0_r, pia_comp_0_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(r2dtank_crtc6845_address_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(r2dtank_crtc6845_register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -540,7 +560,7 @@ static MACHINE_DRIVER_START( r2dtank )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_START(r2dtank)
-	MDRV_VIDEO_UPDATE(crtc6845)
+	MDRV_VIDEO_UPDATE(r2dtank)
 
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

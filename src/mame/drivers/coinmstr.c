@@ -29,6 +29,7 @@
 
 
 static UINT8 *attr_ram1, *attr_ram2;
+static crtc6845_t *crtc6845;
 static tilemap *bg_tilemap;
 
 static UINT8 question_adr[4];
@@ -115,6 +116,16 @@ static WRITE8_HANDLER( question_w )
 	question_adr[offset] = data;
 }
 
+static WRITE8_HANDLER( coinmstr_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+static WRITE8_HANDLER( coinmstr_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
 // Common memory map
 
 static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -138,8 +149,8 @@ static ADDRESS_MAP_START( quizmstr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x50, 0x53) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
 	AM_RANGE(0x58, 0x5b) AM_READWRITE(pia_2_r, pia_2_w)
-	AM_RANGE(0x70, 0x70) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(coinmstr_crtc6845_address_w)
+	AM_RANGE(0x71, 0x71) AM_WRITE(coinmstr_crtc6845_register_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -148,8 +159,8 @@ static ADDRESS_MAP_START( trailblz_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(coinmstr_crtc6845_address_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(coinmstr_crtc6845_register_w)
 	AM_RANGE(0x48, 0x48) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x49, 0x49) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(pia_0_r, pia_0_w) //?
@@ -165,8 +176,8 @@ static ADDRESS_MAP_START( supnudg2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x41) AM_READNOP
 	AM_RANGE(0x40, 0x43) AM_WRITENOP
 	AM_RANGE(0x43, 0x43) AM_READNOP
-	AM_RANGE(0x48, 0x48) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x49, 0x49) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0x48, 0x48) AM_WRITE(coinmstr_crtc6845_address_w)
+	AM_RANGE(0x49, 0x49) AM_WRITE(coinmstr_crtc6845_register_w)
 	AM_RANGE(0x50, 0x51) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
 	AM_RANGE(0x53, 0x53) AM_READNOP
@@ -533,6 +544,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( coinmstr )
 {
+	crtc6845 = crtc6845_config(NULL);
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 64);
 }
 

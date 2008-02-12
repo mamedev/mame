@@ -25,6 +25,7 @@
 #include "sound/ay8910.h"
 #include "video/crtc6845.h"
 
+static crtc6845_t *crtc6845;
 static UINT8 *ssingles_videoram;
 static UINT8 *ssingles_colorram;
 static UINT8 prot_data;
@@ -104,9 +105,21 @@ static WRITE8_HANDLER(ssingles_colorram_w)
 	ssingles_colorram[offset]=data;
 }
 
+static WRITE8_HANDLER( ssingles_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+
+static WRITE8_HANDLER( ssingles_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
+
 static VIDEO_START(ssingles)
 {
-	crtc6845_config(0, &crtc6845_intf);
+	crtc6845 = crtc6845_config(&crtc6845_intf);
 
 	{
 		int i;
@@ -115,6 +128,14 @@ static VIDEO_START(ssingles)
 			pens[i]=MAKE_RGB(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
 		}
 	}
+}
+
+
+static VIDEO_UPDATE( ssingles )
+{
+	crtc6845_update(crtc6845, bitmap, cliprect);
+
+	return 0;
 }
 
 
@@ -171,8 +192,8 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(crtc6845_register_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(ssingles_crtc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(ssingles_crtc6845_register_w)
 
 ADDRESS_MAP_END
 
@@ -263,7 +284,7 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_PALETTE_LENGTH(4) //guess
 
 	MDRV_VIDEO_START(ssingles)
-	MDRV_VIDEO_UPDATE(crtc6845)
+	MDRV_VIDEO_UPDATE(ssingles)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

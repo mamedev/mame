@@ -29,7 +29,6 @@
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "cpu/i8039/i8039.h"
-#include "video/crtc6845.h"
 
 static tilemap *bg_tilemap;
 

@@ -4,8 +4,13 @@
 
 **********************************************************************/
 
+#ifndef CRTC6845
+#define CRTC6845
 
+
+typedef struct _crtc6845_t crtc6845_t;
 typedef struct _crtc6845_interface crtc6845_interface;
+
 struct _crtc6845_interface
 {
 	int scrnum;					/* screen we are acting on */
@@ -15,8 +20,7 @@ struct _crtc6845_interface
 	/* if specified, this gets called before any pixel update,
        optionally return a pointer that will be passed to the
        update and tear down callbacks */
-	void * (*begin_update)(running_machine *machine, int screen,
-						   mame_bitmap *bitmap, const rectangle *cliprect);
+	void * (*begin_update)(mame_bitmap *bitmap, const rectangle *cliprect);
 
 	/* this gets called for every row, the driver must output
        x_count * hpixels_per_column pixels */
@@ -31,32 +35,28 @@ struct _crtc6845_interface
 };
 
 
-/* Deprectated - use crtc6845_init to set up for save states only, but not to configure the screen */
-void crtc6845_init(void);
-
-/* use crtc6845_init to set up for save states AND to configure the screen
-   the 'which' argument is currently a dummy as only one instance is supported */
-void crtc6845_config(int which, const crtc6845_interface *intf);
+/* use crtc6845_init to set up for save states.
+   if intf is NULL, the emulator will NOT call video_configure_screen() */
+crtc6845_t *crtc6845_config(const crtc6845_interface *intf);
 
 /* selects one of the registers for reading or writing */
-WRITE8_HANDLER( crtc6845_address_w );
-#define crtc6845_0_address_w  crtc6845_address_w
+void crtc6845_address_w(crtc6845_t *crtc6845, UINT8 data);
 
 /* reads the currently selected register */
-READ8_HANDLER( crtc6845_register_r );
-#define crtc6845_0_register_r  crtc6845_register_r
+UINT8 crtc6845_register_r(crtc6845_t *crtc6845);
 
 /* writes the currently selected register */
-WRITE8_HANDLER( crtc6845_register_w );
-#define crtc6845_0_register_w  crtc6845_register_w
+void crtc6845_register_w(crtc6845_t *crtc6845, UINT8 data);
 
 /* return the current value on the MA0-MA13 pins */
-UINT16 crtc6845_get_ma(int which);
+UINT16 crtc6845_get_ma(crtc6845_t *crtc6845);
 
 /* return the current value on the RA0-RA4 pins */
-UINT8 crtc6845_get_ra(int which);
+UINT8 crtc6845_get_ra(crtc6845_t *crtc6845);
 
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
-VIDEO_UPDATE( crtc6845 );
+void crtc6845_update(crtc6845_t *crtc6845, mame_bitmap *bitmap, const rectangle *cliprect);
+
+#endif

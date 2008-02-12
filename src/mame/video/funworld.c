@@ -47,7 +47,9 @@
 
 
 #include "driver.h"
+#include "video/crtc6845.h"
 
+static crtc6845_t *crtc6845;
 static tilemap *bg_tilemap;
 
 
@@ -94,6 +96,21 @@ WRITE8_HANDLER( funworld_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
+WRITE8_HANDLER( funworld_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+READ8_HANDLER( funworld_crtc6845_register_r )
+{
+	return crtc6845_register_r(crtc6845);
+}
+
+WRITE8_HANDLER( funworld_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
 /**** normal hardware limit ****
     - bits -
     7654 3210
@@ -119,20 +136,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(funworld)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 4, 8, 96, 29);
+	crtc6845 = crtc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
 }
 
 VIDEO_START(magiccrd)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 4, 8, 112, 34);
+	crtc6845 = crtc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
 }
 
 VIDEO_START(snookr10)
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 4, 8, 128, 32);
+//	crtc6845 = crtc6845_config(NULL);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 32);
 }
 
 VIDEO_UPDATE(funworld)

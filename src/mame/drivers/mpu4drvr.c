@@ -191,6 +191,8 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 
 #define VIDEO_MASTER_CLOCK (10000000)
 
+static crtc6845_t *crtc6845;
+
 static UINT8 m6840_irq_state;
 static UINT8 m6850_irq_state;
 static UINT8 scn2674_irq_state;
@@ -434,7 +436,7 @@ static UINT8 IR12_scn2674_split_register_1;
 static UINT8 IR13_scn2674_scroll_end;
 static UINT8 IR13_scn2674_split_register_2;
 
-VIDEO_UPDATE( mpu4_vid )
+static VIDEO_UPDATE( mpu4_vid )
 {
 	int i;
 
@@ -499,12 +501,12 @@ VIDEO_UPDATE( mpu4_vid )
 	return 0;
 }
 
-READ16_HANDLER( mpu4_vid_vidram_r )
+static READ16_HANDLER( mpu4_vid_vidram_r )
 {
 	return mpu4_vid_vidram[offset];
 }
 
-WRITE16_HANDLER( mpu4_vid_vidram_w )
+static WRITE16_HANDLER( mpu4_vid_vidram_w )
 {
 	COMBINE_DATA(&mpu4_vid_vidram[offset]);
 	offset <<= 1;
@@ -877,7 +879,7 @@ static void scn2674_write_command(UINT8 data)
 
 }
 
-READ16_HANDLER( mpu4_vid_scn2674_r )
+static READ16_HANDLER( mpu4_vid_scn2674_r )
 {
 	/*
     Offset:  Purpose
@@ -925,7 +927,7 @@ READ16_HANDLER( mpu4_vid_scn2674_r )
 	return 0xffff;
 }
 
-WRITE16_HANDLER( mpu4_vid_scn2674_w )
+static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 {
 	/*
     Offset:  Purpose
@@ -960,7 +962,7 @@ WRITE16_HANDLER( mpu4_vid_scn2674_w )
 	}
 }
 
-VIDEO_START( mpu4_vid )
+static VIDEO_START( mpu4_vid )
 {
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       maybe we will anyway, but for now we don't need to */
@@ -1252,7 +1254,7 @@ static INPUT_PORTS_START( dealem )
 
 INPUT_PORTS_END
 
-INTERRUPT_GEN(mpu4_vid_irq)
+static INTERRUPT_GEN(mpu4_vid_irq)
 {
 	LOGSTUFF(("scn2674_irq_mask %02x\n",scn2674_irq_mask));
 	if (cpu_getiloops()==0) // vbl
@@ -1465,7 +1467,22 @@ static GFXDECODE_START( dealem )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, dealemcharlayout, 0, 32 )
 GFXDECODE_END
 
-UINT8 *dealem_videoram;
+static UINT8 *dealem_videoram;
+
+static WRITE8_HANDLER( dealem_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+static READ8_HANDLER( dealem_crtc6845_register_r )
+{
+	return crtc6845_register_r(crtc6845);
+}
+
+static WRITE8_HANDLER( dealem_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
 
 /***************************************************************************
 
@@ -1486,7 +1503,7 @@ UINT8 *dealem_videoram;
 
 ***************************************************************************/
 
-PALETTE_INIT( dealem )
+static PALETTE_INIT( dealem )
 {
 	int i;
 	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
@@ -1515,11 +1532,12 @@ PALETTE_INIT( dealem )
 
 }
 
-VIDEO_START(dealem)
+static VIDEO_START(dealem)
 {
+	crtc6845 = crtc6845_config(NULL);
 }
 
-VIDEO_UPDATE(dealem)
+static VIDEO_UPDATE(dealem)
 {
 	int x,y;
 	int count = 0;
@@ -1541,8 +1559,8 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(crtc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(crtc6845_register_r, crtc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(dealem_crtc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_READWRITE(dealem_crtc6845_register_r, dealem_crtc6845_register_w)
 
 //  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
 
@@ -1656,7 +1674,7 @@ static MACHINE_DRIVER_START( dealem )
 
 MACHINE_DRIVER_END
 
-DRIVER_INIT (crmaze)
+static DRIVER_INIT (crmaze)
 {
 	int x;
 	static const UINT8 chr_table[72]={0x00,0x84,0x94,0x3C,0xEC,0x5C,0xEC,0x50,
@@ -1675,7 +1693,7 @@ DRIVER_INIT (crmaze)
 	}
 }
 
-DRIVER_INIT (mating)
+static DRIVER_INIT (mating)
 {
 	int x;
 	static const UINT8 chr_table[72]={0x00,0x18,0xC8,0xA4,0x0C,0x80,0x0C,0x90,

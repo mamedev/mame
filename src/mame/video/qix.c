@@ -7,13 +7,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "qix.h"
 #include "video/crtc6845.h"
-
-
-/* Constants */
-#define SCANLINE_INCREMENT	1
+#include "qix.h"
 
 
 /* Globals */
@@ -22,10 +17,10 @@ UINT8 qix_cocktail_flip;
 
 
 /* Local variables */
+static crtc6845_t *crtc6845;
 static UINT8 vram_mask;
 static UINT8 qix_palettebank;
 static UINT8 leds;
-static emu_timer *scanline_timer;
 static UINT8 scanline_latch;
 
 
@@ -38,12 +33,7 @@ static UINT8 scanline_latch;
 
 static void qix_display_enable_changed(int display_enabled);
 
-static TIMER_CALLBACK( scanline_callback );
-
-static void *qix_begin_update(running_machine *machine,
-							  int screen,
-							  mame_bitmap *bitmap,
-							  const rectangle *cliprect);
+static void *qix_begin_update(mame_bitmap *bitmap, const rectangle *cliprect);
 
 static void qix_update_row(mame_bitmap *bitmap,
 						   const rectangle *cliprect,
@@ -76,7 +66,7 @@ static const crtc6845_interface crtc6845_intf =
 VIDEO_START( qix )
 {
 	/* configure the CRT controller */
-	crtc6845_config(0, &crtc6845_intf);
+	crtc6845 = crtc6845_config(&crtc6845_intf);
 
 	/* allocate memory for the full video RAM */
 	videoram = auto_malloc(256 * 256);
@@ -84,38 +74,12 @@ VIDEO_START( qix )
 	/* initialize the mask for games that don't use it */
 	vram_mask = 0xff;
 
-	/* allocate a timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1);
-
 	/* set up save states */
 	state_save_register_global_pointer(videoram, 256 * 256);
 	state_save_register_global(qix_cocktail_flip);
 	state_save_register_global(vram_mask);
 	state_save_register_global(qix_palettebank);
 	state_save_register_global(leds);
-}
-
-
-
-/*************************************
- *
- *  Scanline caching
- *
- *************************************/
-
-static TIMER_CALLBACK( scanline_callback )
-{
-	int scanline = param;
-
-	/* force a partial update */
-	video_screen_update_partial(0, scanline - 1);
-
-	/* set a timer for the next increment */
-	scanline += SCANLINE_INCREMENT;
-	if (scanline > machine->screen[0].visarea.max_y)
-		scanline = SCANLINE_INCREMENT;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -131,8 +95,8 @@ static void qix_display_enable_changed(int display_enabled)
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
 	{
-		UINT16 ma = crtc6845_get_ma(0);
-		UINT8 ra = crtc6845_get_ra(0);
+		UINT16 ma = crtc6845_get_ma(crtc6845);
+		UINT8 ra = crtc6845_get_ra(crtc6845);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -188,6 +152,10 @@ READ8_HANDLER( qix_videoram_r )
 
 WRITE8_HANDLER( qix_videoram_w )
 {
+	/* update the screen in case the game is writing "behind" the beam -
+       Zookeeper likes to do this */
+	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+
 	/* add in the upper bit of the address latch */
 	offset += (qix_videoaddress[0] & 0x80) << 8;
 
@@ -238,8 +206,41 @@ WRITE8_HANDLER( qix_addresslatch_w )
  *
  *************************************/
 
+#define NUM_PENS	(0x100)
+
+
 WRITE8_HANDLER( qix_paletteram_w )
 {
+	UINT8 old_data = paletteram[offset];
+
+	/* set the palette RAM value */
+	paletteram[offset] = data;
+
+	/* trigger an update if a currently visible pen has changed */
+	if (((offset >> 8) == qix_palettebank) &&
+	    (old_data != data))
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+}
+
+
+WRITE8_HANDLER( qix_palettebank_w )
+{
+	/* set the bank value */
+	if (qix_palettebank != (data & 3))
+	{
+		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+		qix_palettebank = data & 3;
+	}
+
+	/* LEDs are in the upper 6 bits */
+	leds = ~data & 0xfc;
+}
+
+
+static void get_pens(pen_t *pens)
+{
+	offs_t offs;
+
 	/* this conversion table should be about right. It gives a reasonable */
 	/* gray scale in the test screen, and the red, green and blue squares */
 	/* in the same screen are barely visible, as the manual requires. */
@@ -262,57 +263,74 @@ WRITE8_HANDLER( qix_paletteram_w )
 		0xb6,	/* value = 3, intensity = 2 */
 		0xff	/* value = 3, intensity = 3 */
 	};
-	int bits, intensity, red, green, blue;
 
-	/* set the palette RAM value */
-	paletteram[offset] = data;
-
-	/* compute R, G, B from the table */
-	intensity = (data >> 0) & 0x03;
-	bits = (data >> 6) & 0x03;
-	red = table[(bits << 2) | intensity];
-	bits = (data >> 4) & 0x03;
-	green = table[(bits << 2) | intensity];
-	bits = (data >> 2) & 0x03;
-	blue = table[(bits << 2) | intensity];
-
-	/* update the palette */
-	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
-}
-
-
-WRITE8_HANDLER( qix_palettebank_w )
-{
-	/* set the bank value */
-	if (qix_palettebank != (data & 3))
+	for (offs = qix_palettebank << 8; offs < (qix_palettebank << 8) + NUM_PENS; offs++)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
-		qix_palettebank = data & 3;
-	}
+		int bits, intensity, r, g, b;
 
-	/* LEDs are in the upper 6 bits */
-	leds = ~data & 0xfc;
+		UINT8 data = paletteram[offs];
+
+		/* compute R, G, B from the table */
+		intensity = (data >> 0) & 0x03;
+		bits = (data >> 6) & 0x03;
+		r = table[(bits << 2) | intensity];
+		bits = (data >> 4) & 0x03;
+		g = table[(bits << 2) | intensity];
+		bits = (data >> 2) & 0x03;
+		b = table[(bits << 2) | intensity];
+
+		/* update the palette */
+		pens[offs & 0xff] = MAKE_RGB(r, g, b);
+	}
 }
 
 
 
 /*************************************
  *
- *  CRTC callbacks for updating
+ *  M6845 access
+ *
+ *************************************/
+
+WRITE8_HANDLER( qix_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+
+READ8_HANDLER( qix_crtc6845_register_r )
+{
+	return crtc6845_register_r(crtc6845);
+}
+
+
+WRITE8_HANDLER( qix_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
+
+
+/*************************************
+ *
+ *  M6845 callbacks for updating
  *  the screen
  *
  *************************************/
 
-static void *qix_begin_update(running_machine *machine, int screen,
-							  mame_bitmap *bitmap, const rectangle *cliprect)
+static void *qix_begin_update(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 #if 0
 	// note the confusing bit order!
 	popmessage("self test leds: %d%d %d%d%d%d",BIT(leds,7),BIT(leds,5),BIT(leds,6),BIT(leds,4),BIT(leds,2),BIT(leds,3));
 #endif
 
-	/* return the pens we are going to use to update the display */
-	return (void *)&machine->pens[qix_palettebank * 256];
+	/* create the pens */
+	static pen_t pens[NUM_PENS];
+
+	get_pens(pens);
+
+	return pens;
 }
 
 
@@ -332,4 +350,19 @@ static void qix_update_row(mame_bitmap *bitmap, const rectangle *cliprect,
 		scanline[x] = videoram[(offs + x) ^ offs_xor];
 
 	draw_scanline8(bitmap, 0, y, x_count * 8, scanline, pens, -1);
+}
+
+
+
+/*************************************
+ *
+ *  Standard video update
+ *
+ *************************************/
+
+VIDEO_UPDATE( qix  )
+{
+	crtc6845_update(crtc6845, bitmap, cliprect);
+
+	return 0;
 }

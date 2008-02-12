@@ -8,6 +8,8 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "video/crtc6845.h"
+
 
 UINT8 *rockola_videoram2;
 UINT8 *rockola_charram;
@@ -15,7 +17,9 @@ UINT8 *rockola_charram;
 static int charbank;
 static int backcolor;
 
-static tilemap *bg_tilemap, *fg_tilemap;
+static crtc6845_t *crtc6845;
+static tilemap *bg_tilemap;
+static tilemap *fg_tilemap;
 
 static rgb_t palette[64];
 
@@ -110,6 +114,19 @@ WRITE8_HANDLER( rockola_charram_w )
 	}
 }
 
+
+WRITE8_HANDLER( rockola_crtc6845_address_w )
+{
+	crtc6845_address_w(crtc6845, data);
+}
+
+
+WRITE8_HANDLER( rockola_crtc6845_register_w )
+{
+	crtc6845_register_w(crtc6845, data);
+}
+
+
 WRITE8_HANDLER( rockola_flipscreen_w )
 {
 	int bank;
@@ -176,11 +193,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( rockola )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	crtc6845 = crtc6845_config(NULL);
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
@@ -299,11 +315,10 @@ static TILE_GET_INFO( satansat_get_fg_tile_info )
 
 VIDEO_START( satansat )
 {
-	bg_tilemap = tilemap_create(satansat_get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	crtc6845 = crtc6845_config(NULL);
 
-	fg_tilemap = tilemap_create(satansat_get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(satansat_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	fg_tilemap = tilemap_create(satansat_get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
