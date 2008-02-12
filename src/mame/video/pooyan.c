@@ -5,7 +5,9 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 #include "pooyan.h"
+
 
 static tilemap *bg_tilemap;
 
@@ -32,42 +34,62 @@ static tilemap *bg_tilemap;
 
 PALETTE_INIT( pooyan )
 {
-	rgb_t palette[32];
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double rweights[3], gweights[3], bweights[2];
 	int i;
 
-	for (i = 0;i < 32;i++)
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, resistances_rg, rweights, 1000, 0,
+			3, resistances_rg, gweights, 1000, 0,
+			2, resistances_b,  bweights, 1000, 0);
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(rweights, bit0, bit1, bit2);
 
-		palette[i] = MAKE_RGB(r,g,b);
-		color_prom++;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(gweights, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the char lookup table */
-
-	/* sprites */
-	for (i = 0;i < 16*16;i++)
-		palette_set_color(machine, 16*16+i, palette[*color_prom++ & 0x0f]);
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
 	/* characters */
-	for (i = 0;i < 16*16;i++)
-		palette_set_color(machine, i, palette[(*color_prom++ & 0x0f) + 0x10]);
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
+
+	/* sprites */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 
@@ -150,14 +172,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = ~spriteram_2[offs] & 0x40;
 		int flipy = spriteram_2[offs] & 0x80;
 
-		/* Sprite flipscreen is supported by software */
 		drawgfx(bitmap,machine->gfx[1],
 			code,
 			color,
 			flipx, flipy,
 			sx, sy,
 			cliprect,
-			TRANSPARENCY_PEN, 0);
+			TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0));
 	}
 }
 
