@@ -45,12 +45,9 @@ static UINT8 ninjemak_dispdisable;
 
 static tilemap *bg_tilemap, *tx_tilemap;
 
-static const UINT8 *spritepalettebank;
-
 /* Notes:
      write_layers and layers are used in galivan/dangar but not ninjemak
      ninjemak_dispdisable is used in ninjemak but not galivan/dangar
-     spritepalettebank is set at palette init and doesn't need to be saved
 */
 
 
@@ -64,74 +61,75 @@ static const UINT8 *spritepalettebank;
 PALETTE_INIT( galivan )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the lookup tables */
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
-
-	/* characters use colors 0-127 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
+	/* characters use colors 0-0x7f */
+	for (i = 0; i < 0x80; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* I think that */
-	/* background tiles use colors 192-255 in four banks */
+	/* background tiles use colors 0xc0-0xff in four banks */
 	/* the bottom two bits of the color code select the palette bank for */
 	/* pens 0-7; the top two bits for pens 8-15. */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		if (i & 8) COLOR(1,i) = 192 + (i & 0x0f) + ((i & 0xc0) >> 2);
-		else COLOR(1,i) = 192 + (i & 0x0f) + ((i & 0x30) >> 0);
+		UINT8 ctabentry;
+
+		if (i & 0x08)
+			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
+		else
+			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
+
+		colortable_entry_set_value(machine->colortable, 0x80 + i, ctabentry);
 	}
 
-
-	/* sprites use colors 128-191 in four banks */
+	/* sprites use colors 0x80-0xbf in four banks */
 	/* The lookup table tells which colors to pick from the selected bank */
 	/* the bank is selected by another PROM and depends on the top 7 bits of */
 	/* the sprite code. The PROM selects the bank *separately* for pens 0-7 and */
 	/* 8-15 (like for tiles). */
-	for (i = 0;i < TOTAL_COLORS(2)/16;i++)
+	for (i = 0; i < 0x1000; i++)
 	{
-		int j;
+		UINT8 ctabentry;
+		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
 
-		for (j = 0;j < 16;j++)
-		{
-			if (i & 8)
-				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x0c) << 2) + (*color_prom & 0x0f);
-			else
-				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x03) << 4) + (*color_prom & 0x0f);
-		}
+		if (i & 0x80)
+			ctabentry = 0x80 | ((i & 0x0c) << 2) | (color_prom[i >> 4] & 0x0f);
+		else
+			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
 
-		color_prom++;
+		colortable_entry_set_value(machine->colortable, 0x180 + i_swapped, ctabentry);
 	}
 
-	/* color_prom now points to the beginning of the sprite palette bank table */
-	spritepalettebank = color_prom;	/* we'll need it at run time */
+//	for (i = 0;i < TOTAL_COLORS(2)/16;i++)
+//	{
+//		int j;
+
+//		for (j = 0;j < 16;j++)
+//		{
+//			if (i & 8)
+//				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x0c) << 2) + (*color_prom & 0x0f);
+//			else
+//				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x03) << 4) + (*color_prom & 0x0f);
+//		}
+
+//		color_prom++;
+//	}
 }
 
 
@@ -367,6 +365,7 @@ WRITE8_HANDLER( ninjemak_scrolly_w )
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
+	const UINT8 *spritepalettebank = memory_region(REGION_USER1);
 	int offs;
 
 	/* draw the sprites */
