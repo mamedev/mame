@@ -9,7 +9,7 @@
     functionality and not just in speed rating(1):
         * Motorola 6845, 6845-1
         * Hitachi 46505
-        * Rockwell 6545, 6545-1
+        * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
         * Commodore 6545-1
 
     (1) as per the document at
