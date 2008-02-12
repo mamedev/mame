@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( mario_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(z80dma_0_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f07) AM_WRITE(mario_sh3_w) /* Sound port */
-	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW0")	/* DSW */
+	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0x7e00, 0x7e00) AM_WRITE(mario_sh_tuneselect_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( masao_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x7e85, 0x7e85) AM_WRITE(z80dma_0_rdy_w)	/* ==> DMA Chip */
 	AM_RANGE(0x7f00, 0x7f00) AM_WRITE(masao_sh_irqtrigger_w)
-	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW0")	/* DSW */
+	AM_RANGE(0x7f80, 0x7f80) AM_READ_PORT("DSW")	/* DSW */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
