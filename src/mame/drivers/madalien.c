@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "video/crtc6845.h"
+#include "video/m6845.h"
 #include "sound/ay8910.h"
 
 #define MAIN_CLOCK 10595000
@@ -30,7 +30,7 @@ static UINT8 madalien_headlight_pos;
 static UINT8 madalien_shift_count;
 static UINT8 madalien_shift_data;
 
-static crtc6845_t *crtc6845;
+static m6845_t *m6845;
 
 static tilemap* tilemap_fg;
 
@@ -87,19 +87,19 @@ static PALETTE_INIT( madalien )
 }
 
 
-static WRITE8_HANDLER( madalien_crtc6845_address_w )
+static WRITE8_HANDLER( madalien_m6845_address_w )
 {
-	crtc6845_address_w(crtc6845, data);
+	m6845_address_w(m6845, data);
 }
 
-static READ8_HANDLER( madalien_crtc6845_register_r )
+static READ8_HANDLER( madalien_m6845_register_r )
 {
-	return crtc6845_register_r(crtc6845);
+	return m6845_register_r(m6845);
 }
 
-static WRITE8_HANDLER( madalien_crtc6845_register_w )
+static WRITE8_HANDLER( madalien_m6845_register_w )
 {
-	crtc6845_register_w(crtc6845, data);
+	m6845_register_w(m6845, data);
 }
 
 
@@ -179,7 +179,7 @@ static VIDEO_START( madalien )
 {
 	rectangle rect = { 0, 127, 0, 127 };
 
-	static const crtc6845_interface crtc6845_intf =
+	static const m6845_interface m6845_intf =
 	{
 		0,                /* screen we are acting on */
 		PIXEL_CLOCK / 8,  /* the clock of the chip  */
@@ -190,7 +190,7 @@ static VIDEO_START( madalien )
 		NULL              /* call back for display state changes */
 	};
 
-	crtc6845 = crtc6845_config(&crtc6845_intf);
+	m6845 = m6845_config(&m6845_intf);
 
 	tilemap_fg = tilemap_create(get_tile_info_FG,
 		tilemap_scan_cols_flip_x, 8, 8, 32, 32);
@@ -515,8 +515,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_crtc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_crtc6845_register_r, madalien_crtc6845_register_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_m6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_m6845_register_r, madalien_m6845_register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(madalien_screen_control_w)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)

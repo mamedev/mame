@@ -179,7 +179,7 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 #include "machine/6850acia.h"
 #include "sound/saa1099.h"
 //Deal 'Em
-#include "video/crtc6845.h"
+#include "video/m6845.h"
 
 #ifdef MAME_DEBUG
 #define MPU4VIDVERBOSE 1
@@ -191,7 +191,7 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 
 #define VIDEO_MASTER_CLOCK (10000000)
 
-static crtc6845_t *crtc6845;
+static m6845_t *m6845;
 
 static UINT8 m6840_irq_state;
 static UINT8 m6850_irq_state;
@@ -1469,19 +1469,19 @@ GFXDECODE_END
 
 static UINT8 *dealem_videoram;
 
-static WRITE8_HANDLER( dealem_crtc6845_address_w )
+static WRITE8_HANDLER( dealem_m6845_address_w )
 {
-	crtc6845_address_w(crtc6845, data);
+	m6845_address_w(m6845, data);
 }
 
-static READ8_HANDLER( dealem_crtc6845_register_r )
+static READ8_HANDLER( dealem_m6845_register_r )
 {
-	return crtc6845_register_r(crtc6845);
+	return m6845_register_r(m6845);
 }
 
-static WRITE8_HANDLER( dealem_crtc6845_register_w )
+static WRITE8_HANDLER( dealem_m6845_register_w )
 {
-	crtc6845_register_w(crtc6845, data);
+	m6845_register_w(m6845, data);
 }
 
 /***************************************************************************
@@ -1534,7 +1534,7 @@ static PALETTE_INIT( dealem )
 
 static VIDEO_START(dealem)
 {
-	crtc6845 = crtc6845_config(NULL);
+	m6845 = m6845_config(NULL);
 }
 
 static VIDEO_UPDATE(dealem)
@@ -1559,8 +1559,8 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(dealem_crtc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(dealem_crtc6845_register_r, dealem_crtc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(dealem_m6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_READWRITE(dealem_m6845_register_r, dealem_m6845_register_w)
 
 //  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
 

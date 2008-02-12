@@ -95,27 +95,27 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 */
 
 #include "driver.h"
-#include "video/crtc6845.h"
+#include "video/m6845.h"
 
-static crtc6845_t *crtc6845;
+static m6845_t *m6845;
 static UINT8 *murogem_videoram;
 
 
-static WRITE8_HANDLER( murogem_crtc6845_address_w )
+static WRITE8_HANDLER( murogem_m6845_address_w )
 {
-	crtc6845_address_w(crtc6845, data);
+	m6845_address_w(m6845, data);
 }
 
-static WRITE8_HANDLER( murogem_crtc6845_register_w )
+static WRITE8_HANDLER( murogem_m6845_register_w )
 {
-	crtc6845_register_w(crtc6845, data);
+	m6845_register_w(m6845, data);
 }
 
 
 static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(murogem_crtc6845_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(murogem_crtc6845_register_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(murogem_m6845_address_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(murogem_m6845_register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP) // sound? payout?
@@ -180,7 +180,7 @@ static PALETTE_INIT(murogem)
 
 static VIDEO_START(murogem)
 {
-	crtc6845 = crtc6845_config(NULL);
+	m6845 = m6845_config(NULL);
 }
 
 static VIDEO_UPDATE(murogem)
