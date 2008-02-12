@@ -1,6 +1,19 @@
 /**********************************************************************
 
-    Motorola MC6845 CRT controller emulation
+    Motorola MC6845 and compatible CRT controller emulation
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+    The following variations exist that are different in
+    functionality and not just in speed rating(1):
+        * Motorola 6845, 6845-1
+        * Hitachi 46505
+        * Rockwell 6545, 6545-1
+        * Commodore 6545-1
+
+    (1) as per the document at
+    http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
 **********************************************************************/
 
@@ -108,10 +121,18 @@ void mc6845_address_w(mc6845_t *mc6845, UINT8 data)
 
 UINT8 mc6845_register_r(mc6845_t *mc6845)
 {
-	UINT8 ret = 0xff;
+	UINT8 ret = 0;
 
 	switch (mc6845->address_latch)
 	{
+		case 12:
+			/* Motorola version only */
+			ret = mc6845->start_addr >> 8;
+			break;
+		case 13:
+			/* Motorola version only */
+			ret = mc6845->start_addr;
+			break;
 		case 14:
 			ret = mc6845->cursor >> 8;
 			break;
