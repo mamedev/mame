@@ -4094,6 +4094,8 @@ static void init_cave(running_machine *machine)
 	time_vblank_irq = 100;
 
 	irq_level = 1;
+
+	NMK112_init(0);
 }
 
 static DRIVER_INIT( agallet )
@@ -4161,7 +4163,7 @@ static DRIVER_INIT( donpachi )
 	cave_spritetype = 1;	// "different" sprites (no zooming?)
 	time_vblank_irq = 90;
 
-	NMK112_set_paged_table(0, 0);	// chip #0 (music) is not paged
+	NMK112_init(1<<0);	// chip #0 (music) is not paged
 }
 
 static DRIVER_INIT( esprade )

@@ -241,11 +241,18 @@ static GFXDECODE_START( quizpani )
 GFXDECODE_END
 
 
+static MACHINE_RESET( quizpani )
+{
+	NMK112_init(0);
+}
+
 static MACHINE_DRIVER_START( quizpani )
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(quizpani_readmem,quizpani_writemem)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,164) // music tempo
+
+	MDRV_MACHINE_RESET( quizpani )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)

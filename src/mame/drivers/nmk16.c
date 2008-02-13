@@ -259,6 +259,7 @@ VIDEO_UPDATE( firehawk );
 
 static MACHINE_RESET( nmk16 )
 {
+	NMK112_init(0);
 }
 
 static MACHINE_RESET( NMK004 )

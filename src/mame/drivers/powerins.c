@@ -329,6 +329,7 @@ GFXDECODE_END
 static MACHINE_RESET( powerins )
 {
 	oki_bank = -1;	// samples bank "unitialised"
+	NMK112_init(0);
 }
 
 

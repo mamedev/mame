@@ -1549,6 +1549,55 @@ void n64_machine_reset(void)
 	UINT32 *cart = (UINT32*)memory_region(REGION_USER2);
 	UINT64 boot_checksum;
 
+	mi_version = 0;
+	mi_interrupt = 0;
+	mi_intr_mask = 0;
+
+	sp_mem_addr = 0;
+	sp_dram_addr = 0;
+	sp_dma_length = 0;
+	sp_dma_count = 0;
+	sp_dma_skip = 0;
+	sp_semaphore = 0;
+
+	dp_start = 0;
+	dp_end = 0;
+	dp_current = 0;
+	dp_status = 0;
+
+	n64_vi_width = 0;
+	n64_vi_origin = 0;
+	n64_vi_control = 0;
+	n64_vi_burst = n64_vi_vsync = n64_vi_hsync = n64_vi_leap = n64_vi_hstart = n64_vi_vstart = 0;
+	n64_vi_intr = n64_vi_vburst = n64_vi_xscale = n64_vi_yscale = 0;
+
+	ai_dram_addr = 0;
+	ai_len = 0 ;
+	ai_control = 0;
+	ai_dacrate = 0;
+	ai_bitrate = 0;
+	ai_status = 0;
+
+	memset(audio_fifo, 0, sizeof(audio_fifo));
+	audio_fifo_wpos = 0;
+	audio_fifo_rpos = 0;
+	audio_fifo_num = 0;
+
+	pi_dram_addr = 0;
+	pi_cart_addr = 0;
+	pi_first_dma = 1;
+
+	memset(pif_ram, 0, sizeof(pif_ram));
+	memset(pif_cmd, 0, sizeof(pif_cmd));
+	si_dram_addr = 0;
+	si_pif_addr = 0;
+	si_status = 0;
+
+	memset(eeprom, 0, sizeof(eeprom));
+	memset(mempack, 0, sizeof(mempack));
+
+	cic_status = 0;
+
 	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 		/* configure fast RAM regions for DRC */

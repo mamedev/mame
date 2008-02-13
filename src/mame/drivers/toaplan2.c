@@ -431,6 +431,7 @@ static MACHINE_RESET( bgaregga )
 	current_bank = 2;
 	memory_set_bankptr(1, &Z80[0x10000]);
 
+	NMK112_init(0);
 	MACHINE_RESET_CALL(toaplan2);
 }
 

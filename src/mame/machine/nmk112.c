@@ -15,19 +15,21 @@
 #define BANKSIZE 0x10000
 
 /* which chips have their sample address table divided into pages */
-static int has_paged_table[MAXCHIPS] = { 1, 1 };
+static UINT8 page_mask;
 
-static UINT8 current_bank[8] = { ~0, ~0, ~0, ~0, ~0, ~0, ~0, ~0 };
+static UINT8 current_bank[8];
 
-void NMK112_set_paged_table( int chip, int value )
+void NMK112_init(UINT8 disable_page_mask)
 {
-	has_paged_table[chip] = value;
+	memset(current_bank, ~0, sizeof(current_bank));
+	page_mask = ~disable_page_mask;
 }
 
 WRITE8_HANDLER( NMK112_okibank_w )
 {
 	int chip	=	(offset & 4) >> 2;
 	int banknum	=	offset & 3;
+	int paged	=	(page_mask & (1 << chip));
 
 	UINT8 *rom	=	memory_region(REGION_SOUND1 + chip);
 	int size			=	memory_region_length(REGION_SOUND1 + chip) - 0x40000;
@@ -37,13 +39,13 @@ WRITE8_HANDLER( NMK112_okibank_w )
 	current_bank[offset] = data;
 
 	/* copy the samples */
-	if ((has_paged_table[chip]) && (banknum == 0))
+	if ((paged) && (banknum == 0))
 		memcpy(rom + 0x400, rom + 0x40000 + bankaddr+0x400, BANKSIZE-0x400);
 	else
 		memcpy(rom + banknum * BANKSIZE, rom + 0x40000 + bankaddr, BANKSIZE);
 
 	/* also copy the sample address table, if it is paged on this chip */
-	if (has_paged_table[chip])
+	if (paged)
 	{
 		rom += banknum * TABLESIZE;
 		memcpy(rom, rom + 0x40000 + bankaddr, TABLESIZE);
