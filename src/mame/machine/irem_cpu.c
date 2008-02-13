@@ -300,38 +300,39 @@ const UINT8 inthunt_decryption_table[256] = {
 
 const UINT8 gussun_decryption_table[256] = {
 	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//  0x63                          gggg            gggg                gggg
-	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x7d,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//                      ????                      pppp      gggg
-	0x5d,0xa5,0x11,0x51,0x0a,0x29,0x01,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
-//            gggg           pppp ????       gggg gggg      gggg gggg pppp
+//	0x63                          gggg            gggg                gggg
+	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
+//	                    ????                      pppp      gggg               
+	0x5d,0xa5,0x11,0x51,0x0a,0x29,xxxx,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
+//	          gggg           pppp            gggg gggg      gggg gggg pppp
 	0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
-//                      gggg                                          0x90
-	xxxx,0x19,0xc6,xxxx,xxxx,0x3a,0x01,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,0x01,xxxx, /* 40 */
-//       ????                     ????                                     ????
-	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7e,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//            gggg           ????                 gggg pppp gggg
-	0xb0,xxxx,0x28,0x79,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//            ???? pppp           gggg                 gggg
-	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,xxxx,0x3c, /* 70 */
-//                 gggg                                     ????
-	xxxx,0x86,0x76,0x7f,0x08,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//            ???? pppp ????      ????       gggg
-	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,0x19, /* 90 */
-//            ????                     gggg                                     ????
+//	                    gggg                                          0x90
+	0x19,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
+//	????                                                                       
+	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7c,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
+//	          gggg           gggg                 gggg pppp gggg                    
+	0xb0,xxxx,0x29,0x79,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
+//	          ???? pppp           gggg                 gggg 
+	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,0x42,0x3c, /* 70 */
+//	               gggg                                     pppp           ????
+	xxxx,0x86,0x78,0x7d,0x30,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
+//	          ???? pppp ????      pppp       gggg                              
+	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
+//	          gggg                     gggg                                     
 	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
-//                                     gggg                 ????      gggg gggg
-	xxxx,0x19,0x00,0x19,0x77,0x3d,0x3e,xxxx, xxxx,0xb6,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//       ???? ???? ???? gggg      ????            ???? pppp
+//	                                   gggg                 ????      gggg gggg
+	xxxx,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0xb7,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
+//	          gggg ???? gggg      gggg            ???? pppp
 	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
-//            ????                                                         pppp
-	xxxx,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4a,xxxx,0x1f,0x23,xxxx, /* d0 */
-//                                                          ????
-	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,0x11,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//                                ????                      ????                gggg
-	0xfb,xxxx,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x7d,0xf7,0xbd,0x39,0x71,0xbf,xxxx, /* f0 */
-//                                                pppp      gggg      pppp
+//	          gggg                                                         pppp
+	0x01,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4e,xxxx,0x1f,0x23,xxxx, /* d0 */
+//	????                                                    gggg
+	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
+//	                                                        gggg                gggg
+	0xfb,0x20,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x76,0xf7,0xbd,0x39,0x7e,0xbf,xxxx, /* f0 */
+//	     pppp                                     gggg      gggg      gggg
 };
+
 
 /*
 missing opcode:
@@ -342,35 +343,30 @@ missing opcode:
 "????" -> missing
 "0xHH" -> right code (not supported)
 
-14 -> 08 (2097b 20980 - routine from 2097a) (00 01 08 09 30 31) probably 08 - after the start and before the menu
+14 -> 08 (2097b 20980 - routine from 2097a) (08 30) probably 08 - after the start and before the menu
           - to handle the player number
-j19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,71,76,77,78,7a,7b,7c,7e,7f(ok) ok 79,7d
-.26 -> 29 (14ed_ , 198e_
-.41 -> 19
-.46 -> 10 (1461b
-.4e -> 19 (208ac -
-j5a -> 7e (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71(ok),77,79,7a,7b,7d,7f ok 76,78,7c,7e
-.62 -> 28 (1cf86 1cfa3 - routine from 1cf61 to 1cff4)  (water in level 1) (01 11 19 29)
-j63 -> 78 (1df7f, 1df8c, 1df95, 21f08 - routine from 1df27 to ) no 71(ok),77(ok),7f(ok) ok 70,76,78,79 7a,7b,7c,7d,7e
-j82 -> 76 (76,78,7c,7e) ->
+.40 -> ??
+j5a -> 78 (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,79,7a,7b,7d,7f ok 78,7c,7e
+.62 -> ?? (1cf86 1cfa3 - routine from 1cf61 to 1cff4)  (water in level 1) (01 11 19 29)
+7e ->  (1e073 - 
+j82 -> 78 (78,7c,7e) -> 
 .84 -> 18 (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (00,08,18,28,30) (sprite animation)
-.9f -> 19 (
-ab -> 42
-.b1 -> 19
-.b2 -> 20 (20a8b - 20acc             probably 20 - after the start and before the menu - to handle the player number
+ab -> 4f?
 .b3 -> 19 (216b6 - 216cf
-b9 -> b5 (21210 - ) 2 bytes -
-db ->    (16992
-jf9 -> 7c (16d02(f 16cfa)-16598-165a1-18de7(f 18dc4) no 71,77(ok),(icons? 70,76,78,7a,7c,7e),7f maybe 79,7b,7d
+b9 -> b7 (21210 - ) 2 bytes - 
+
 
 rz probably:
+19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
 2d -> 00 (1df1d - routine from 1dee8 to 1df26) -> 00 - to handle sprite animation
-83 -> 7f (194cd - routine from) no 70,71,76,78,79,7a,7c,7d,7e ok 77(no),7b(white rocks) ok 7f
-b4 -> 77 (1d03a, 1d57a - routine from 1d4df ) no 70,71,76,78,79,7a,7b,7c,7d,7e,7f ok 77
+63 -> 7d (1df7f, 1df8c, 1df95, 21f08 - routine from 1df27 to ) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
+7b -> 0d
+83 -> 7f (194cd - routine from) no 70,78,79,7a,7b,7c,7d,7e ok 77(no) ok 7f 
+86 -> 2d
 ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
-c2 -> 47 (22881, 220ff - routine from 22872 to 22885) (4f?)
 ce -> 01 (10236 - routine from 1017e to 10254) (01, 09, 19, 21, 29, 31) -> probably 01
-fd -> 71 (1d659 - routine from 1d63c to 1d65e) no 70,76,77,78,79,7a,7b,7c,7d,7e,7f  ok 71
+f1 -> 20 to handle the player number
+fd -> 7e (1d659 - routine from 1d63c to 1d65e) no 70,76,77,78,79,7a,7b, 7c,7d,7e,7f  ok 7e
 
 rz guess:
 06 -> b1 (22872 - routine from 22872 to 2289d)
@@ -382,21 +378,32 @@ rz guess:
 28 -> f8 (
 29 -> 98 (1df22 - routine from 1dee8 to 1df26) -> 98 - to handle sprite animation
 2b -> 40 (1d4d2 1db81 1dba9 - routine from 1d4b2 to 1d4de) -> 40
-2c -> 28 (20333 - routine from 2032a to 20366)
+2c -> 28 (20333 - routine from 2032a to 20366) (18,28)
 34 -> 2f (20381 - routine from 2037b to 20391) - used to handle number of lives and game over
 52 -> a0
+55 -> 41
 59 -> 2c (220cf - 2037f - routine from 2202f to ) 2bytes (2c,
 5b -> 2b (used in "Service Mode" / "CHARACTER menu")
 66 -> b5 (1daaf - routine from 1da61 to 1daca) - two bytes (colors effect)
 6a -> 27 (20368 - routine from 20368 to 2037a) - used to limit the max lives number
 73 -> 73 (1d4f7 - routine from 1d4df to 1d539) -> (no 70,71,72,74,75,76,77,78,79,7a,7b,7c,7d,7e,7f) - ok 73
 88 -> 9a
+92 -> 9d
 97 -> cb
 a7 -> b4 (2029a - routine from 20290 to
 ad -> 8c (1d559, 1d8d4 - routine from 1d547 - ; routine from 1d8b8 to 1d8fc) ..............................
 ae -> d4 (20215 - ) used when you insert a coin to handle the "coin number" in decimal
+b2 -> 84 (20a8b - 20acc) 20,21,84,85 (scroll down the object)  - to handle the player number
+b4 -> 77 (1d03a, 1d57a - routine from 1d4df ) no 70,71,76,78,79,7a,7b,7c,7d,7e,7f ok 77
+b6 -> 3e
+c2 -> 47 (22881, 220ff - routine from 22872 to 22885)
+db -> 4e (18b1a)
+eb -> 9c
 ef -> 49 (dec CW) (used in "Service Mode" / "CHARACTER menu")
+f9 -> 76 (16d02(f 16cfa)-16598-165a1-18de7(f 18dc4) no 71(no),77(no),(icons? 70,76,78,7a,7c,7e),79,7d,7f(no) maybe 76
 fb -> bd
+
+
 
 missing V35+ core:
 00    -> 63    not supported (229e2 - routine from 229da to 229ec) (for now we use cd instruction + hack)
