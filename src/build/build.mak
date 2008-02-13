@@ -25,11 +25,13 @@ OBJDIRS += \
 
 FILE2STR = $(BUILDOUT)/file2str$(EXE)
 PNG2BDC = $(BUILDOUT)/png2bdc$(EXE)
+VERINFO = $(BUILDOUT)/verinfo$(EXE)
 
 ifneq ($(CROSS_BUILD),1)
 BUILD += \
 	$(FILE2STR) \
 	$(PNG2BDC) \
+	$(VERINFO) \
 
 
 
@@ -62,8 +64,6 @@ $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 #-------------------------------------------------
 # verinfo
 #-------------------------------------------------
-
-VERINFO = $(BUILDOBJ)/verinfo$(EXE)
 
 VERINFOOBJS = \
 	$(BUILDOBJ)/verinfo.o
