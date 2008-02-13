@@ -219,8 +219,7 @@ static MACHINE_DRIVER_START( hanaawas )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(hanaawas)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(32*8)
+	MDRV_PALETTE_LENGTH(32*8)
 
 	MDRV_PALETTE_INIT(hanaawas)
 	MDRV_VIDEO_START(hanaawas)
@@ -262,4 +261,4 @@ ROM_END
 
 
 
-GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Seta", "Hana Awase (Flower Matching)", 0 )
+GAME( 1982, hanaawas, 0, hanaawas, hanaawas, 0, ROT0, "Setakikaku, Ltd.", "Hana Awase", 0 )

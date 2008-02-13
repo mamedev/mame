@@ -22,45 +22,53 @@ WRITE8_HANDLER( higemaru_colorram_w )
 PALETTE_INIT( higemaru )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
 	/* characters use colors 0-15 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) & 0x0f;
-
-	color_prom += 128;	/* the bottom half of the PROM doesn't seem to be used */
+	for (i = 0; i < 0x80; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
 	/* sprites use colors 16-31 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = (*(color_prom++) & 0x0f) + 0x10;
+	for (i = 0x80; i < 0x180; i++)
+	{
+		UINT8 ctabentry = (color_prom[i + 0x80] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( higemaru_c800_w )
@@ -89,8 +97,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( higemaru )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
