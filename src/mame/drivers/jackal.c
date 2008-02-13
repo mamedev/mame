@@ -9,7 +9,7 @@ Notes:
   that the two 4bpp tilemaps from the two chips are merged to form a single
   8bpp tilemap.
 - topgunbl is derived from a completely different version, which supports gun
-  turret rotation. The copyright year is also deiffrent, but this doesn't
+  turret rotation. The copyright year is also different, but this doesn't
   necessarily mean anything.
 
 TODO:
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)	// COLOR RAM (Self test only check 0x4000-0x423f)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)	// self test only checks 0x4000-0x423f)
 	AM_RANGE(0x6000, 0x605f) AM_RAM																	// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -276,8 +276,7 @@ static MACHINE_DRIVER_START( jackal )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(jackal)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_COLORTABLE_LENGTH(256*16+16*16+16*16)
+	MDRV_PALETTE_LENGTH(256*16+16*16+16*16)
 
 	MDRV_PALETTE_INIT(jackal)
 	MDRV_VIDEO_START(jackal)

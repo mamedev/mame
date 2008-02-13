@@ -31,7 +31,7 @@ static tilemap *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( shaolins )
 {
-	static const int resistances[4] = { 1000, 470, 220, 100 };
+	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
 

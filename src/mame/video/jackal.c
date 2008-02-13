@@ -19,29 +19,49 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( jackal )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < TOTAL_COLORS(0);i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x200);
+
+	for (i = 0; i < 0x1000; i++)
 	{
-		COLOR(0,i) = (i & 0xff) + 256;
+		UINT16 ctabentry = (i & 0xff) | 0x100;
+
 		/* this is surely wrong - is there a PROM missing? */
 		if (i & 0x0f)
-			COLOR(0,i) |= i/256;
+			ctabentry = ctabentry | (i >> 8);
+
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	for (i = 0x1000; i < 0x1100; i++)
 	{
-		COLOR(1,i) = (*color_prom & 0x0f);
-		color_prom++;
+		UINT8 ctabentry = color_prom[i - 0x1000] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	for (i = 0;i < TOTAL_COLORS(3);i++)
+	for (i = 0x1100; i < 0x1200; i++)
 	{
-		COLOR(3,i) = (*color_prom & 0x0f) + 16;
-		color_prom++;
+		UINT8 ctabentry = (color_prom[i - 0x1100] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
+
+
+static void set_pens(running_machine *machine)
+{
+	int i;
+
+	for (i = 0; i < 0x400; i += 2)
+	{
+		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(machine->colortable, i >> 1, color);
+	}
+}
+
 
 void jackal_mark_tile_dirty(int offset)
 {
@@ -62,8 +82,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( jackal )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
@@ -86,9 +105,7 @@ static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
 			tilemap_set_scroll_rows(bg_tilemap, 32);
 
 			for (i = 0; i < 32; i++)
-			{
 				tilemap_set_scrollx(bg_tilemap, i, jackal_scrollram[i]);
-			}
 		}
 
 		if (jackal_videoctrl[2] & 0x04)
@@ -211,6 +228,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( jackal )
 {
+	set_pens(machine);
 	draw_background(bitmap, cliprect);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;

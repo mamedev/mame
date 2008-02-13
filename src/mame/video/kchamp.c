@@ -21,8 +21,6 @@ PALETTE_INIT( kchamp )
 		blue = color_prom[2*machine->drv->total_colors+i];
 
 		palette_set_color_rgb(machine,i,pal4bit(red),pal4bit(green),pal4bit(blue));
-
-		*(colortable++) = i;
 	}
 }
 
