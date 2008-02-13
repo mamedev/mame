@@ -15,6 +15,8 @@
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
+    The chip is originally designed by Hitachi, not by Motorola.
+
 **********************************************************************/
 
 #include "driver.h"
