@@ -7150,6 +7150,7 @@ Other Sun games
 	DRIVER( goldstar )	/* (c) 198? IGS */
 	DRIVER( goldstbl )	/* (c) 198? IGS */
 	DRIVER( moonlght )	/* bootleg */
+ 	DRIVER( cpoker )	/* (c) 198? IGS */
 	DRIVER( csk227it )	/* (c) 198? IGS */
 	DRIVER( csk234it )	/* (c) 198? IGS */
 	DRIVER( stellecu )	/* (c) 1998 */

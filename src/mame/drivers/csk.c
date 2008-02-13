@@ -99,7 +99,7 @@ Unknown:    5080        (RW)    (possibly related to ticket/hopper)
 Timing:
 
 Game is synchronized with VBLANK. It uses IRQ & NMI interrupts.
-During a frame, there must be 3 IRQs and 3 NMIs in order to play
+During a frame, there must be 4 IRQs and 4 NMIs in order to play
 to the correct speed.
 
 ---
@@ -138,6 +138,7 @@ extern UINT8 * cpk_expram;
 
 
 MACHINE_RESET (cpk);
+INTERRUPT_GEN( cpoker_interrupt );
 INTERRUPT_GEN( cska_interrupt );
 VIDEO_UPDATE( cska );
 VIDEO_START( cska );
@@ -159,6 +160,7 @@ static WRITE8_HANDLER( custom_io_w )
 {
 	switch (data)
 	{
+		case 0x00: protection_res = readinputport(7); break;
 		case 0x20: protection_res = 0x49; break;
 		case 0x21: protection_res = 0x47; break;
 		case 0x22: protection_res = 0x53; break;
@@ -186,6 +188,27 @@ static WRITE8_HANDLER( custom_io_w )
 static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION(REGION_CPU1, 0xf000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cpoker_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x2000, 0x27ff) AM_WRITE(cpk_palette_w)
+	AM_RANGE(0x2800, 0x2fff) AM_WRITE(cpk_palette2_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)		/* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)		/* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)		/* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)		/* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_4_r)		/* DSW5 */
+	AM_RANGE(0x5081, 0x5081) AM_READ(input_port_5_r)		/* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ(input_port_6_r)		/* Coing & Kbd */
+	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)		/* Keyboard */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_8_r)		/* Not connected */
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x6800, 0x6fff) AM_WRITE(MWA8_RAM) AM_BASE(&cpk_expram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
+	AM_RANGE(0x8000, 0xffff) AM_READ(cpk_expansion_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csk227_map, ADDRESS_SPACE_IO, 8 )
@@ -235,30 +258,30 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( csk227 )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Demo Music" )
+	PORT_DIPNAME( 0x01, 0x01, "Demo Music" ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" ) PORT_DIPLOCATION("SWA:6,7")
 	PORT_DIPSETTING(    0x06, "1" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x18, 0x18, "Max Bet" )
+	PORT_DIPNAME( 0x18, 0x18, "Max Bet" ) PORT_DIPLOCATION("SWA:4,5")
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x10, "20" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" ) PORT_DIPLOCATION("SWA:2,3")
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x20, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x80, "100000" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
 
 	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" )
+	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" ) PORT_DIPLOCATION("SWB:8,7,6")
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "5" )
@@ -267,44 +290,44 @@ static INPUT_PORTS_START( csk227 )
 	PORT_DIPSETTING(    0x02, "40" )
 	PORT_DIPSETTING(    0x01, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" ) PORT_DIPLOCATION("SWB:5,4")
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x10, "20" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x60, 0x60, "W-UP Bonus Target" )
+	PORT_DIPNAME( 0x60, 0x60, "W-UP Bonus Target" ) PORT_DIPLOCATION("SWB:3,2")
 	PORT_DIPSETTING(    0x60, "1500" )
 	PORT_DIPSETTING(    0x40, "3000" )
 	PORT_DIPSETTING(    0x20, "5000" )
 	PORT_DIPSETTING(    0x00, "7500" )
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x80, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
 
 	PORT_START_TAG("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "W-UP Bonus Rate" )
+	PORT_DIPNAME( 0x03, 0x03, "W-UP Bonus Rate" ) PORT_DIPLOCATION("SWC:8,7")
 	PORT_DIPSETTING(    0x03, "200" )
 	PORT_DIPSETTING(    0x02, "300" )
 	PORT_DIPSETTING(    0x01, "500" )
 	PORT_DIPSETTING(    0x00, "800" )
-	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" )
+	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" ) PORT_DIPLOCATION("SWC:6,5")
 	PORT_DIPSETTING(    0x0c, "94%" )
 	PORT_DIPSETTING(    0x08, "96%" )
 	PORT_DIPSETTING(    0x04, "98%" )
 	PORT_DIPSETTING(    0x00, "100%" )
-	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" )
+	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
 	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
-	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" )
+	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Ability" )
+	PORT_DIPNAME( 0x80, 0x00, "Ability" ) PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START_TAG("DSW4")
-	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" )
+	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" ) PORT_DIPLOCATION("SWD:8,7,6,5")
 	PORT_DIPSETTING(    0x0f, "69%" )
 	PORT_DIPSETTING(    0x0e, "72%" )
 	PORT_DIPSETTING(    0x0d, "75%" )
@@ -321,30 +344,30 @@ static INPUT_PORTS_START( csk227 )
 	PORT_DIPSETTING(    0x02, "99%" )
 	PORT_DIPSETTING(    0x01, "101%" )
 	PORT_DIPSETTING(    0x00, "103%" )
-	PORT_DIPNAME( 0x10, 0x00, "Five Jokers" )
+	PORT_DIPNAME( 0x10, 0x00, "Five Jokers" ) PORT_DIPLOCATION("SWD:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Royal Flush" )
+	PORT_DIPNAME( 0x20, 0x00, "Royal Flush" ) PORT_DIPLOCATION("SWD:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" ) PORT_DIPLOCATION("SWD:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Payout Select" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout Select" ) PORT_DIPLOCATION("SWD:1")
 	PORT_DIPSETTING(    0x80, "Ticket" )
 	PORT_DIPSETTING(    0x00, "Hopper" )
 
 	PORT_START_TAG("DSW5")
-	PORT_DIPNAME( 0x07, 0x07, "Key Out Rate" )
+	PORT_DIPNAME( 0x07, 0x07, "Key Out Rate" ) PORT_DIPLOCATION("SWE:8,7,6")
 	PORT_DIPSETTING(    0x07, "1:1" )
 	PORT_DIPSETTING(    0x06, "10:1" )
 	PORT_DIPSETTING(    0x05, "20:1" )
 	PORT_DIPSETTING(    0x04, "50:1" )
 	PORT_DIPSETTING(    0x03, "100:1" )		/* Bits 1-0 are all equivalents */
-	PORT_DIPNAME( 0x08, 0x00, "Card Select" )
+	PORT_DIPNAME( 0x08, 0x00, "Card Select" ) PORT_DIPLOCATION("SWE:5")
 	PORT_DIPSETTING(    0x08, "Poker" )
 	PORT_DIPSETTING(    0x00, "Tetris" )
-	PORT_DIPNAME( 0x70, 0x70, "Ticket Rate" )
+	PORT_DIPNAME( 0x70, 0x70, "Ticket Rate" ) PORT_DIPLOCATION("SWE:4,3,2")
 	PORT_DIPSETTING(    0x70, "1:1" )
 	PORT_DIPSETTING(    0x60, "5:1" )
 	PORT_DIPSETTING(    0x50, "10:1" )
@@ -353,7 +376,7 @@ static INPUT_PORTS_START( csk227 )
 	PORT_DIPSETTING(    0x20, "50:1" )
 	PORT_DIPSETTING(    0x10, "100:1" )
 	PORT_DIPSETTING(    0x00, "200:1" )
-	PORT_DIPNAME( 0x80, 0x80, "Win Table" )
+	PORT_DIPNAME( 0x80, 0x80, "Win Table" ) PORT_DIPLOCATION("SWE:1")
 	PORT_DIPSETTING(    0x80, "Change" )
 	PORT_DIPSETTING(    0x00, "Fixed" )
 
@@ -395,30 +418,30 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( csk234 )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Demo Music" )
+	PORT_DIPNAME( 0x01, 0x01, "Demo Music" ) PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" ) PORT_DIPLOCATION("SWA:7,6")
 	PORT_DIPSETTING(    0x06, "1" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x18, 0x10, "Max Bet" )
+	PORT_DIPNAME( 0x18, 0x10, "Max Bet" ) PORT_DIPLOCATION("SWA:5,4")
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x08, "20" )
 	PORT_DIPSETTING(    0x00, "40" )
-	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" ) PORT_DIPLOCATION("SWA:3,2")
 	PORT_DIPSETTING(    0x60, "1" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x20, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
-	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x80, "5000" )
 	PORT_DIPSETTING(    0x00, "10000" )
 
 	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" )
+	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" ) PORT_DIPLOCATION("SWB:8,7,6")
 	PORT_DIPSETTING(    0x07, "1" )
 	PORT_DIPSETTING(    0x06, "2" )
 	PORT_DIPSETTING(    0x05, "5" )
@@ -427,43 +450,43 @@ static INPUT_PORTS_START( csk234 )
 	PORT_DIPSETTING(    0x02, "40" )
 	PORT_DIPSETTING(    0x01, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" )
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" ) PORT_DIPLOCATION("SWB:5,4")
 	PORT_DIPSETTING(    0x18, "10" )
 	PORT_DIPSETTING(    0x10, "20" )
 	PORT_DIPSETTING(    0x08, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x60, 0x60, "Key Out Rate" )
+	PORT_DIPNAME( 0x60, 0x60, "Key Out Rate" ) PORT_DIPLOCATION("SWB:3,2")
 	PORT_DIPSETTING(    0x60, "1:1" )
 	PORT_DIPSETTING(    0x40, "10:1" )
 	PORT_DIPSETTING(    0x20, "100:1" )
 	PORT_DIPSETTING(    0x00, "100:1" )
-	PORT_DIPNAME( 0x80, 0x80, "Payout" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout" ) PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x80, "Manual" )
 	PORT_DIPSETTING(    0x00, "Auto" )
 
 	PORT_START_TAG("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "W-UP Bonus Target" )
+	PORT_DIPNAME( 0x01, 0x01, "W-UP Bonus Target" ) PORT_DIPLOCATION("SWC:8")
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x00, "5000" )
-	PORT_DIPNAME( 0x02, 0x02, "W-UP Bonus Rate" )
+	PORT_DIPNAME( 0x02, 0x02, "W-UP Bonus Rate" ) PORT_DIPLOCATION("SWC:7")
 	PORT_DIPSETTING(    0x02, "300" )
 	PORT_DIPSETTING(    0x00, "500" )
-	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" )
+	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" ) PORT_DIPLOCATION("SWC:6,5")
 	PORT_DIPSETTING(    0x0c, "94%" )
 	PORT_DIPSETTING(    0x08, "96%" )
 	PORT_DIPSETTING(    0x04, "98%" )
 	PORT_DIPSETTING(    0x00, "100%" )
-	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" )
+	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x20, "High-Low" )
 	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
-	PORT_DIPNAME( 0x40, 0x40, "Card Select" )
+	PORT_DIPNAME( 0x40, 0x40, "Card Select" ) PORT_DIPLOCATION("SWC:2")
 	PORT_DIPSETTING(    0x40, "Poker" )
 	PORT_DIPSETTING(    0x00, "Symbols" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("DSW4")
-	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" )
+	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" ) PORT_DIPLOCATION("SWD:8,7,6,5")
 	PORT_DIPSETTING(    0x0f, "69%" )
 	PORT_DIPSETTING(    0x0e, "72%" )
 	PORT_DIPSETTING(    0x0d, "75%" )
@@ -480,30 +503,164 @@ static INPUT_PORTS_START( csk234 )
 	PORT_DIPSETTING(    0x02, "99%" )
 	PORT_DIPSETTING(    0x01, "101%" )
 	PORT_DIPSETTING(    0x00, "103%" )
-	PORT_DIPNAME( 0x10, 0x00, "Auto Hold" )
+	PORT_DIPNAME( 0x10, 0x00, "Auto Hold" ) PORT_DIPLOCATION("SWD:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Anytime Key-in" )
+	PORT_DIPNAME( 0x20, 0x00, "Anytime Key-in" ) PORT_DIPLOCATION("SWD:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_BIT( 0xC0, IP_ACTIVE_LOW, IPT_UNUSED )			/* Joker and Royal Flush are always enabled */
 
 	PORT_START_TAG("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "Hopper" )
+	PORT_DIPNAME( 0x01, 0x00, "Hopper" ) PORT_DIPLOCATION("SWE:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "Payout Select" )
+	PORT_DIPNAME( 0x02, 0x00, "Payout Select" ) PORT_DIPLOCATION("SWE:7")
 	PORT_DIPSETTING(    0x02, "Hopper" )
 	PORT_DIPSETTING(    0x00, "Ticket" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Ticket Rate" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Ticket Rate" ) PORT_DIPLOCATION("SWE:6,5")
 	PORT_DIPSETTING(    0x0c, "10:1" )
 	PORT_DIPSETTING(    0x08, "20:1" )
 	PORT_DIPSETTING(    0x04, "50:1" )
 	PORT_DIPSETTING(    0x00, "100:1" )
-	PORT_DIPNAME( 0x10, 0x00, "Ability" )
+	PORT_DIPNAME( 0x10, 0x00, "Ability" ) PORT_DIPLOCATION("SWE:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("5081")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_E) PORT_NAME("HPSW")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Payout")
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Statistics")
+
+	PORT_START_TAG("5082")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Key In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Key Down")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START_TAG("5091")	/* Custom IO */
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("50A0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1/High/Low")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5/Bet")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4/Take")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3/W-Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2/Red/Black")
+	PORT_BIT(0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cpoker )
+
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Demo Music" ) PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" ) PORT_DIPLOCATION("SWA:7,6")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x18, 0x10, "Max Bet" ) PORT_DIPLOCATION("SWA:5,4")
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" ) PORT_DIPLOCATION("SWA:3,2")
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x80, "5000" )
+	PORT_DIPSETTING(    0x00, "10000" )
+
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" ) PORT_DIPLOCATION("SWB:8,7,6")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "40" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" ) PORT_DIPLOCATION("SWB:5,4")
+	PORT_DIPSETTING(    0x18, "10" )
+	PORT_DIPSETTING(    0x10, "20" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x60, 0x60, "Key Out Rate" ) PORT_DIPLOCATION("SWB:3,2")
+	PORT_DIPSETTING(    0x60, "1:1" )
+	PORT_DIPSETTING(    0x40, "10:1" )
+	PORT_DIPSETTING(    0x20, "100:1" )
+	PORT_DIPSETTING(    0x00, "100:1" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout" ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x80, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+
+	PORT_START_TAG("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "W-UP Bonus Target" ) PORT_DIPLOCATION("SWC:8")
+	PORT_DIPSETTING(    0x01, "3000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPNAME( 0x02, 0x02, "W-UP Bonus Rate" ) PORT_DIPLOCATION("SWC:7")
+	PORT_DIPSETTING(    0x02, "300" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" ) PORT_DIPLOCATION("SWC:6,5")
+	PORT_DIPSETTING(    0x0c, "94%" )
+	PORT_DIPSETTING(    0x08, "96%" )
+	PORT_DIPSETTING(    0x04, "98%" )
+	PORT_DIPSETTING(    0x00, "100%" )
+	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, "High-Low" )
+	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Anytime Key-in" ) PORT_DIPLOCATION("SWC:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START_TAG("DSW4")
+	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" ) PORT_DIPLOCATION("SWD:8,7,6,5")
+	PORT_DIPSETTING(    0x0f, "69%" )
+	PORT_DIPSETTING(    0x0e, "72%" )
+	PORT_DIPSETTING(    0x0d, "75%" )
+	PORT_DIPSETTING(    0x0c, "78%" )
+	PORT_DIPSETTING(    0x0b, "81%" )
+	PORT_DIPSETTING(    0x0a, "83%" )
+	PORT_DIPSETTING(    0x09, "85%" )
+	PORT_DIPSETTING(    0x08, "87%" )
+	PORT_DIPSETTING(    0x07, "89%" )
+	PORT_DIPSETTING(    0x06, "91%" )
+	PORT_DIPSETTING(    0x05, "93%" )
+	PORT_DIPSETTING(    0x04, "95%" )
+	PORT_DIPSETTING(    0x03, "97%" )
+	PORT_DIPSETTING(    0x02, "99%" )
+	PORT_DIPSETTING(    0x01, "101%" )
+	PORT_DIPSETTING(    0x00, "103%" )
+	PORT_DIPNAME( 0x10, 0x00, "Five Jokers" ) PORT_DIPLOCATION("SWD:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "Royal Flush" ) PORT_DIPLOCATION("SWD:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" ) PORT_DIPLOCATION("SWD:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Hopper" ) PORT_DIPLOCATION("SWD:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START_TAG("DSW5")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("5081")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_E) PORT_NAME("HPSW")
@@ -562,6 +719,10 @@ static const gfx_layout charlayout2 =
 	4*16*8   /* every char takes 32 consecutive bytes */
 };
 
+static GFXDECODE_START( cpoker )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0, 16 )
+GFXDECODE_END
+
 static GFXDECODE_START( csk )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x00000, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x04000, charlayout2,  0, 16 )
@@ -570,13 +731,13 @@ static GFXDECODE_START( csk )
 	GFXDECODE_ENTRY( REGION_GFX2, 0x00000, charlayout2,  0, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( csk227it )
+static MACHINE_DRIVER_START( cpoker )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(map,0)
-	MDRV_CPU_IO_MAP(csk227_map,0)
-	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
+	MDRV_CPU_IO_MAP(cpoker_map,0)
+	MDRV_CPU_VBLANK_INT(cpoker_interrupt,8)
 
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -587,7 +748,7 @@ static MACHINE_DRIVER_START( csk227it )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0, 32*8-1)
-	MDRV_GFXDECODE(csk)
+	MDRV_GFXDECODE(cpoker)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(cska)
@@ -595,23 +756,49 @@ static MACHINE_DRIVER_START( csk227it )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD(YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( csk227it )
+
+	MDRV_IMPORT_FROM(cpoker)
+	MDRV_CPU_MODIFY("main")
+	/* basic machine hardware */
+	MDRV_CPU_IO_MAP(csk227_map,0)
+	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
+	MDRV_GFXDECODE(csk)
+
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( csk234it )
 
-	MDRV_IMPORT_FROM(csk227it)
+	MDRV_IMPORT_FROM(cpoker)
 	MDRV_CPU_MODIFY("main")
 	/* basic machine hardware */
 	MDRV_CPU_IO_MAP(csk234_map,0)
+	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
+	MDRV_GFXDECODE(csk)
 
 MACHINE_DRIVER_END
 
 /*  ROM Regions definition
  */
+
+ROM_START( cpoker )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "v220i1.bin",  0x0000, 0x8000, CRC(b7cae556) SHA1(bb43ee48634879029ed1a7cd4133d7f12413e2ac) )
+	ROM_LOAD( "v220i2.bin",  0x8000, 0x8000, CRC(8245e42c) SHA1(b7e7b9f643e6dc2f4d5aaf7d50d0a9154ed9a4e7) )
+
+	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "220i1.bin",  0x40000, 0x20000, CRC(9c4c0af1) SHA1(7a9808b3093b23bde7ecc7405689b2a28ae34e61) )
+	ROM_LOAD( "220i2.bin",  0x20000, 0x20000, CRC(331fa4b8) SHA1(ddac57251fa5dfecc0988a2ca01eec016ef47f20) )
+	ROM_LOAD( "220i3.bin",  0x00000, 0x20000, CRC(bd2f797c) SHA1(5ca5adae44490dd109f630213a09a68c12f9bd1a) )
+
+	ROM_REGION( 0x10000, REGION_GFX3, 0 )	/* expansion rom - contains backgrounds and pictures charmaps */
+	ROM_LOAD( "220i7.bin",   0x0000, 0x8000, CRC(8a2ff310) SHA1(a415a99dbb1448b4b2b94e17a3973e6347e3be18) )
+ROM_END
 
 ROM_START( csk227it )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -694,6 +881,21 @@ ROM_END
 /*  Decode a simple PAL encryption
  */
 
+static DRIVER_INIT( cpoker )
+{
+	int A;
+	UINT8 *rom = memory_region(REGION_CPU1);
+
+
+	for (A = 0;A < 0x10000;A++)
+	{
+		rom[A] ^= 0x21;
+		if ((A & 0x0030) == 0x0010) rom[A] ^= 0x20;
+		if ((A & 0x0282) == 0x0282) rom[A] ^= 0x01;
+		if ((A & 0x0940) == 0x0940) rom[A] ^= 0x02;
+	}
+}
+
 static DRIVER_INIT( cska )
 {
 	int A;
@@ -710,7 +912,8 @@ static DRIVER_INIT( cska )
 	}
 }
 
-GAME( 198?, csk227it, 0,        csk227it, csk227, cska, ROT0, "IGS", "Champion Skill (with Ability)", 0 )               /* SU 062 */
-GAME( 198?, csk234it, csk227it, csk234it, csk234, cska, ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", 0 )   /* SU 062 */
+GAME( 198?, cpoker,   0,        cpoker,   cpoker, cpoker, ROT0, "IGS", "Champion Poker", 0 )
+GAME( 198?, csk227it, 0,        csk227it, csk227, cska,   ROT0, "IGS", "Champion Skill (with Ability)", 0 )               /* SU 062 */
+GAME( 198?, csk234it, csk227it, csk234it, csk234, cska,   ROT0, "IGS", "Champion Skill (Ability, Poker & Symbols)", 0 )   /* SU 062 */
 
-GAME( 1998, stellecu, 0,        csk234it, csk234, 0,    ROT0, "Sure", "Stelle e Cubi (Italy)", GAME_NOT_WORKING )
+GAME( 1998, stellecu, 0,        csk234it, csk234, 0,      ROT0, "Sure", "Stelle e Cubi (Italy)", GAME_NOT_WORKING )

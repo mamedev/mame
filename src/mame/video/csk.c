@@ -110,6 +110,14 @@ MACHINE_RESET (cpk)
 	}
 }
 
+INTERRUPT_GEN( cpoker_interrupt )
+{
+	if (cpu_getiloops() % 2)
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	else
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 INTERRUPT_GEN( cska_interrupt )
 {
 	UINT8 * RAM = memory_region(REGION_CPU1);
