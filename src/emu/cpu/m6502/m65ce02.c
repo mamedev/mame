@@ -237,7 +237,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
-  
+
 static void m65ce02_set_info(UINT32 state, cpuinfo *info)
 {
 	switch( state )
@@ -264,7 +264,7 @@ static void m65ce02_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_handler) info->f; break;
 	}
 }
-  
+
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
@@ -314,7 +314,7 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER+M65CE02_B:			info->i = m65ce02.zp.b.h;				break;
 		case CPUINFO_INT_REGISTER+M65CE02_EA:			info->i = m65ce02.ea.w.l;				break;
 		case CPUINFO_INT_REGISTER+M65CE02_ZP:			info->i = m65ce02.zp.w.l;				break;
- 
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m65ce02_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m65ce02_get_context;	break;

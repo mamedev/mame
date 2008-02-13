@@ -51,7 +51,7 @@ static void videoram_write(UINT16 offset, UINT8 data, UINT8 mask)
 	if (data & 0x40) expdata |= 0x00aa0000;
 	if (data & 0x08) expdata |= 0x55000000;
 	if (data & 0x80) expdata |= 0xaa000000;
-	
+
 	/* determine which layers are enabled */
 	layermask = 0;
 	if (mask & 0x08) layermask |= 0x30303030;
@@ -111,7 +111,7 @@ static void blitter_execute(void)
 	UINT8 width = kangaroo_video_control[4];
 	UINT8 mask = kangaroo_video_control[8];
 	int x, y;
-	
+
 	/* during DMA operations, the top 2 bits are ORed together, as well as the bottom 2 bits */
 	/* adjust the mask to account for this */
 	if (mask & 0x0c) mask |= 0x0c;

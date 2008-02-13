@@ -62,8 +62,8 @@ VIDEO_START( malzak )
 	saa5050_vidram = auto_malloc(0x800);
 
 	/* configure the S2636 chips */
-//	s2636_0 = s2636_config(malzak_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, -8, -16);
-//	s2636_1 = s2636_config(malzak_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, -9, -16);
+//  s2636_0 = s2636_config(malzak_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, -8, -16);
+//  s2636_1 = s2636_config(malzak_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, -9, -16);
 	s2636_0 = s2636_config(malzak_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -16);
 	s2636_1 = s2636_config(malzak_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -16);
 }

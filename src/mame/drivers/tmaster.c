@@ -137,7 +137,7 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
 
     Offset:     Bits:           Value:
 
-        02      
+        02
                 fedc ba-- ---- ----
                 ---- --9- ---- ----       Layer 1 Buffer To Display
                 ---- ---8 ---- ----       Layer 0 Buffer To Display
@@ -152,7 +152,7 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
         0C                                Source Address (low)
         0E                                Source Address (mid)
 
-        10      fedc ba98 ---- ---- 
+        10      fedc ba98 ---- ----
                 ---- ---- 7--- ----       Layer
                 ---- ---- -6-- ----       Buffer
                 ---- ---- --5- ----       Solid Fill
@@ -221,7 +221,7 @@ static VIDEO_UPDATE( tmaster )
 	}
 #endif
 
-	
+
 	if (layers_ctrl & 1)	copybitmap			(bitmap,tmaster_bitmap[0][(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,&machine->screen[0].visarea);
 	else					fillbitmap(bitmap,get_black_pen(machine),cliprect);
 
@@ -930,7 +930,7 @@ Board silkscreend  237-0211-00
 
 Cartridge based mother board
 Holds up to 4 cartridges
-Chips labeled 
+Chips labeled
     GALAXY U1 V1.90 12/1/98
     GALAXY U2 V1.90 12/1/98
 
@@ -941,14 +941,14 @@ Motorola MC68HC000FN12
 Xilinx XC5206
 Xilinx XC5202
 BT481AKPJ110 (Palette RAMDAC)
-NKK N341024SJ-15	x8  (128kB RAM)
+NKK N341024SJ-15    x8  (128kB RAM)
 OKI M6295 8092352-2
 
-PAL16V8H-15 @ U24	Blue dot on it
-PAL16V8H-15 @ U25	Yellow dot on it
-PAL16V8H-15 @ U26	Red dot on it
-PAL16V8H-15 @ U27	Green dot on it
-PAL16V8H-15 @ U45	red dot on it
+PAL16V8H-15 @ U24   Blue dot on it
+PAL16V8H-15 @ U25   Yellow dot on it
+PAL16V8H-15 @ U26   Red dot on it
+PAL16V8H-15 @ U27   Green dot on it
+PAL16V8H-15 @ U45   red dot on it
 
 ***************************************************************************/
 

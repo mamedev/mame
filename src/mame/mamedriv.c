@@ -2046,6 +2046,7 @@ const game_driver * const drivers[] =
 	DRIVER( hellfir1 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( hellfir2 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( zerowing )	/* TP-015 (c) 1989 Toaplan */
+	DRIVER( zerowng2 )	/* TP-015 (c) 1989 Toaplan */
 	DRIVER( demonwld )	/* TP-016 (c) 1990 Toaplan (+ Taito license when set to Japan) */
 	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
 	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */

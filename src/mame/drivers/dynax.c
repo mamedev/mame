@@ -2484,9 +2484,9 @@ static INPUT_PORTS_START( mcnpshnt )
 	PORT_DIPNAME( 0x10, 0x10, "Buy Screen Bonus Points" ) /* Sets your points to 100 every time you arrive at the screen for buying special items. */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* make your game last at least 4 or 5 minutes.	Continue if necessary. Before the next round you begin, 
-	you will get some sort of message in Japanese stating that it is some sort of lucky time of day for you, and 
-	you get 100 bonus points (for purchasing items). */
+	/* make your game last at least 4 or 5 minutes. Continue if necessary. Before the next round you begin,
+    you will get some sort of message in Japanese stating that it is some sort of lucky time of day for you, and
+    you get 100 bonus points (for purchasing items). */
 	PORT_DIPNAME( 0x20, 0x20, "Lucky Time Of Day Bonus" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -2641,9 +2641,9 @@ static INPUT_PORTS_START( jantouki )
 	PORT_DIPNAME( 0x10, 0x10, "Buy Screen Bonus Points" ) /* Sets your points to 100 every time you arrive at the screen for buying special items. */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* make your game last at least 4 or 5 minutes.	Continue if necessary. Before the next round you begin, 
-	you will get some sort of message in Japanese stating that it is some sort of lucky time of day for you, and 
-	you get 100 bonus points (for purchasing items). */
+	/* make your game last at least 4 or 5 minutes. Continue if necessary. Before the next round you begin,
+    you will get some sort of message in Japanese stating that it is some sort of lucky time of day for you, and
+    you get 100 bonus points (for purchasing items). */
 	PORT_DIPNAME( 0x20, 0x20, "Lucky Time Of Day Bonus" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

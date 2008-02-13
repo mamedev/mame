@@ -252,8 +252,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
 			/*if (pp == 1)
-				if (sysctrl_regs[SB_C2DLEN] == 0x240)
-					pp=pp+1;*/
+                if (sysctrl_regs[SB_C2DLEN] == 0x240)
+                    pp=pp+1;*/
 			cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 			#if DEBUG_SYSCTRL
 			mame_printf_verbose("SYSCTRL: Ch2 dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, sysctrl_regs[SB_C2DSTAT],sysctrl_regs[SB_LMMODE0],sysctrl_regs[SB_LMMODE1]);
@@ -279,7 +279,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	update_interrupt_status();
 
 	#if DEBUG_SYSCTRL
-	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))	// filter out IRQ acks and ch2 dma 
+	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))	// filter out IRQ acks and ch2 dma
 	{
 		mame_printf_verbose("SYSCTRL: write %llx to %x (reg %x), mask %llx\n", data>>shift, offset, reg, /*sysctrl_names[reg],*/ mem_mask);
 	}
@@ -745,9 +745,9 @@ WRITE64_HANDLER( dc_rtc_w )
 
 /*static void dc_rtc_increment(void)
 {
-	dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
-	if (dc_rtcregister[RTC2] == 0)
-		dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
+    dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
+    if (dc_rtcregister[RTC2] == 0)
+        dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
 }*/
 
 MACHINE_RESET( dc )

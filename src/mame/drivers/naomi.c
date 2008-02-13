@@ -661,8 +661,8 @@ static NVRAM_HANDLER( naomi_eeproms )
 	{
 		EEPROM_init(&eeprom_interface_93C46);
 		/*if (file)
-			EEPROM_load(file);
-		else*/
+            EEPROM_load(file);
+        else*/
 		EEPROM_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
 		x76f100_init( 0, eeprom_romboard );
 		memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);

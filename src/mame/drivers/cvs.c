@@ -712,7 +712,7 @@ static INPUT_PORTS_START( darkwar )
 #endif
 
     /* DSW3 bits 0 to 3 are not read */
-INPUT_PORTS_END 
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacefrt )
 	PORT_INCLUDE(cvs)

@@ -526,7 +526,7 @@ static void timer_remove(emu_timer *which)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    timer_adjust_oneshot - adjust the time when this timer 
+    timer_adjust_oneshot - adjust the time when this timer
     will fire and disable any periodic firings
 -------------------------------------------------*/
 
@@ -537,8 +537,8 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 
 
 /*-------------------------------------------------
-    timer_adjust_periodic - adjust the time when 
-    this timer will fire and specify a period for 
+    timer_adjust_periodic - adjust the time when
+    this timer will fire and specify a period for
     subsequent firings
 -------------------------------------------------*/
 

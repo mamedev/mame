@@ -13,57 +13,57 @@ Shadow Fighters (German) (c) Sega? 1989?
 
 ----
 
-There are two boards to this hardware.  The upper, which contains the 
+There are two boards to this hardware.  The upper, which contains the
 graphics ROMs and the i860, and the lower which contains the main
 and sound CPU's.  Virtual Combat sports two upper boards which presumably
 output a different rasterization of the scene for each stereo eye.
 
 UPPER:
-	Intel I860 XR processor
-	MB8298-25P-SK RAMS x12 (silkscreen said 62256)
-	Analog device ADV476KN50E (silkscreen said BT476)
-	20 MHZ Oscillator
-	8-way DIP switch
-	574200D x4
-	PAL palce24v10 x2 (next to the i860)
+    Intel I860 XR processor
+    MB8298-25P-SK RAMS x12 (silkscreen said 62256)
+    Analog device ADV476KN50E (silkscreen said BT476)
+    20 MHZ Oscillator
+    8-way DIP switch
+    574200D x4
+    PAL palce24v10 x2 (next to the i860)
 
 LOWER:
-	Motorola MC68000P12 x2
-	12 MHz Oscillator x2
-	Harris ADC0804LCN x2
-	4 MB8298-25P-SK RAMS (in groups of 2 off by themselves)
-	1 CXK58257SP-10L at each end of the SNDCPU ROMS and the CPU ROMS (4 chips total)
-	Motorola MC6845P CRT controller
-	2x 27C010A containing sound code
-	Xx 27C040 containing sound data (VOC files)
-	Dallas DS1220Y - closest to pin 64 of CPU - read as a 2716 - (silkscreened "6116")
-	Xx 27c040 containing program code, etc.
+    Motorola MC68000P12 x2
+    12 MHz Oscillator x2
+    Harris ADC0804LCN x2
+    4 MB8298-25P-SK RAMS (in groups of 2 off by themselves)
+    1 CXK58257SP-10L at each end of the SNDCPU ROMS and the CPU ROMS (4 chips total)
+    Motorola MC6845P CRT controller
+    2x 27C010A containing sound code
+    Xx 27C040 containing sound data (VOC files)
+    Dallas DS1220Y - closest to pin 64 of CPU - read as a 2716 - (silkscreened "6116")
+    Xx 27c040 containing program code, etc.
 
 ----
 
 NOTES : Shadow Fighters appears to have been dumped from an earlier
-			revision of the hardware.  There are no IC labels, and
-			lots of factory rework has been done to the bottom board.
-		Because the board was so early for Shadow Fighters, there were
-			no IC locations silkscreened on the PCB.  The locations
-			from Virtual Combat have been used.
-		The Shadow Fighters bottom board has an extra 20 mhz xtal on it.
-		The data stored in REGION_SOUND1 is simply a series of 
-			Creative Media VOC files concatenated to eachother.
-		The sound program (REGION_CPU2) is about 640 bytes long.
-		The graphics ROMs have had images successfully extracted from
-			them.  Pictures for Shadow Fighters can be found online.
-		The hardware is said to run at medium resolution.
-		The SRAM module dump can likely be thrown away for both games.
-		The PAL that's dumped for Shadow Fighters looks pretty bad.
-		Websites seem to say Shadow Fighters is a SEGA game, but I
-			couldn't find a SEGA string anywhere in the ROMs.  I also,
-			however, could not find a VR8 string in the Virtual Combat
-			ROMs, so who knows...  Kyle's name is easily found in both
-			though :).
+            revision of the hardware.  There are no IC labels, and
+            lots of factory rework has been done to the bottom board.
+        Because the board was so early for Shadow Fighters, there were
+            no IC locations silkscreened on the PCB.  The locations
+            from Virtual Combat have been used.
+        The Shadow Fighters bottom board has an extra 20 mhz xtal on it.
+        The data stored in REGION_SOUND1 is simply a series of
+            Creative Media VOC files concatenated to eachother.
+        The sound program (REGION_CPU2) is about 640 bytes long.
+        The graphics ROMs have had images successfully extracted from
+            them.  Pictures for Shadow Fighters can be found online.
+        The hardware is said to run at medium resolution.
+        The SRAM module dump can likely be thrown away for both games.
+        The PAL that's dumped for Shadow Fighters looks pretty bad.
+        Websites seem to say Shadow Fighters is a SEGA game, but I
+            couldn't find a SEGA string anywhere in the ROMs.  I also,
+            however, could not find a VR8 string in the Virtual Combat
+            ROMs, so who knows...  Kyle's name is easily found in both
+            though :).
 
-TODO :	This is a skeleton driver.  Nearly everything.
-		i860XR-25 CPU core!
+TODO :  This is a skeleton driver.  Nearly everything.
+        i860XR-25 CPU core!
 
 */
 
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 
 /*
 static ADDRESS_MAP_START( video_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+    AM_RANGE(0x000000, 0x1fffff) AM_ROM
 ADDRESS_MAP_END
 */
 
@@ -96,9 +96,9 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD_TAG("sound", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 /*
-	Virtual combat has an i860 on each of its two upper boards.
-	MDRV_CPU_ADD_TAG("video", i860, XTAL_20MHz)
-	MDRV_CPU_PROGRAM_MAP(video_map,0)
+    Virtual combat has an i860 on each of its two upper boards.
+    MDRV_CPU_ADD_TAG("video", i860, XTAL_20MHz)
+    MDRV_CPU_PROGRAM_MAP(video_map,0)
 */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

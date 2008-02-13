@@ -175,7 +175,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("TA_ALLOC_CTRL    %08x\n", pvrta_regs[TA_ALLOC_CTRL]);
 		mame_printf_verbose("TA_NEXT_OPB_INIT %08x\n", pvrta_regs[TA_NEXT_OPB_INIT]);
 	#endif
-		pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT]; 
+		pvrta_regs[TA_NEXT_OPB] = pvrta_regs[TA_NEXT_OPB_INIT];
 		pvrta_regs[TA_ITP_CURRENT] = pvrta_regs[TA_ISP_BASE];
 		break;
 	}
@@ -305,7 +305,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 			update_interrupt_status();
 			tafifo_listtype= -1; // no list being received
 		}
-		else if (paratype == 1) 
+		else if (paratype == 1)
 		{
 			#if DEBUG_PVRDLIST
 			mame_printf_verbose("Para Type 1 User Tile Clip\n");
@@ -341,7 +341,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 			}
 
 			if ((paratype == 4) || (paratype == 5))
-			{ // quad or polygon			
+			{ // quad or polygon
 				depthcomparemode=(tafifo_buff[1] >> 29) & 7;
 				cullingmode=(tafifo_buff[1] >> 27) & 3;
 				zwritedisable=(tafifo_buff[1] >> 26) & 1;
@@ -403,7 +403,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 					}
 					mame_printf_verbose("\n");
 					#endif
-					if (texture == 1) 
+					if (texture == 1)
 					{
 						#if DEBUG_PVRDLIST
 						mame_printf_verbose(" %f %f %f %f %f %f\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
@@ -580,7 +580,7 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 static void pvr_build_parameterconfig(void)
 {
 	int a,b,c,d,e,p;
-	
+
 	for (a = 0;a <= 63;a++)
 		pvr_parameterconfig[a] = -1;
 	p=0;

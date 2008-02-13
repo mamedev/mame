@@ -13,12 +13,12 @@
 /*    because according to KLOV, Midway was only allowed to make minor      */
 /*    modifications of the Taito code.                                      */
 /*                                                                          */
-/*	- DIP Locations verified from manual for:								*/
-/*		-sitv																*/
-/*		-sicv																*/
-/*		-invadpt2															*/
-/*		-lrescue															*/
-/*		-invasion															*/
+/*  - DIP Locations verified from manual for:                               */
+/*      -sitv                                                               */
+/*      -sicv                                                               */
+/*      -invadpt2                                                           */
+/*      -lrescue                                                            */
+/*      -invasion                                                           */
 /*                                                                          */
 /*  To Do:                                                                  */
 /*  -----                                                                   */
@@ -127,8 +127,8 @@ static INPUT_PORTS_START( sicv )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
-	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun. 
-	Be sure these are always ON */
+	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
+    Be sure these are always ON */
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, 0) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -194,8 +194,8 @@ static INPUT_PORTS_START( sitv )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, "1000" )
 	PORT_DIPSETTING(    0x00, "1500" )
-	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun. 
-	Be sure these are always ON */
+	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
+    Be sure these are always ON */
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, 0) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
@@ -259,8 +259,8 @@ static INPUT_PORTS_START( invadrmr )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "3000" ) /* This is different to invaders */
-	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun. 
-	Be sure these are always ON */
+	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
+    Be sure these are always ON */
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(invaders_in2_control_r, 0) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
