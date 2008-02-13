@@ -143,7 +143,7 @@ void a600xl_mmu(UINT8 new_mmu)
 	{
 		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
 		rbank2 = MRA8_BANK2;
-		wbank2 = MWA8_ROM;
+		wbank2 = MWA8_UNMAP;
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, wbank2);
@@ -162,10 +162,10 @@ void a800xl_mmu(UINT8 new_mmu)
 	{
 		logerror("%s MMU BIOS ROM\n", Machine->gamedrv->name);
 		rbank3 = MRA8_BANK3;
-		wbank3 = MWA8_ROM;
+		wbank3 = MWA8_UNMAP;
 		base3 = memory_region(REGION_CPU1)+0x14000;  /* 8K lo BIOS */
 		rbank4 = MRA8_BANK4;
-		wbank4 = MWA8_ROM;
+		wbank4 = MWA8_UNMAP;
 		base4 = memory_region(REGION_CPU1)+0x15800;  /* 4K FP ROM + 8K hi BIOS */
 	}
 	else
@@ -197,7 +197,7 @@ void a800xl_mmu(UINT8 new_mmu)
 	{
 		logerror("%s MMU BASIC ROM\n", Machine->gamedrv->name);
 		rbank1 = MRA8_BANK1;
-		wbank1 = MWA8_ROM;
+		wbank1 = MWA8_UNMAP;
 		base1 = memory_region(REGION_CPU1)+0x10000;  /* 8K BASIC */
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, rbank1);
@@ -216,7 +216,7 @@ void a800xl_mmu(UINT8 new_mmu)
 	{
 		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
 		rbank2 = MRA8_BANK2;
-		wbank2 = MWA8_ROM;
+		wbank2 = MWA8_UNMAP;
 		base2 = memory_region(REGION_CPU1)+0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2);
