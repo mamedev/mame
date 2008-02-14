@@ -578,7 +578,8 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 
 6) 'progear'
 
-  - BUTTON3 doesn't physically exist on the machine and has no effect ingame.
+  - BUTTON3 acts like a rapid fire (keep button pressed).
+    It has to be enabled in the game settings as it is OFF by default.
 
 ***************************************************************************/
 
