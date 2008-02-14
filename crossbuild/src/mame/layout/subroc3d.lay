@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="digit" defstate="10">
+		<led7seg>
+			<color red="1.0" green="0.3" blue="0.0" />
+		</led7seg>
+	</element>
+	
+	<view name="Simple LEDs">
+		<bounds left="0" top="-0.472" right="4" bottom="3" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="digit4" element="digit">
+			<bounds left="0.166" top="-0.336" right="0.300" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds left="0.350" top="-0.336" right="0.484" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds left="0.534" top="-0.336" right="0.668" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds left="0.718" top="-0.336" right="0.852" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit0" element="digit">
+			<bounds left="0.902" top="-0.336" right="1.036" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds left="1.0860" top="-0.336" right="1.220" bottom="-0.136" />
+		</bezel>
+
+		<bezel name="digit10" element="digit">
+			<bounds left="1.454" top="-0.306" right="1.554" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds left="1.565" top="-0.306" right="1.666" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds left="1.677" top="-0.306" right="1.778" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds left="1.790" top="-0.306" right="1.890" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit6" element="digit">
+			<bounds left="1.902" top="-0.306" right="2.002" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit7" element="digit">
+			<bounds left="2.014" top="-0.306" right="2.114" bottom="-0.136" />
+		</bezel>
+
+		<bezel name="digit16" element="digit">
+			<bounds left="2.333" top="-0.306" right="2.433" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit17" element="digit">
+			<bounds left="2.445" top="-0.306" right="2.545" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit14" element="digit">
+			<bounds left="2.557" top="-0.306" right="2.657" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit15" element="digit">
+			<bounds left="2.669" top="-0.306" right="2.769" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit12" element="digit">
+			<bounds left="2.781" top="-0.306" right="2.881" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds left="2.893" top="-0.306" right="2.993" bottom="-0.136" />
+		</bezel>
+
+		<bezel name="digit22" element="digit">
+			<bounds left="3.211" top="-0.306" right="3.311" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit23" element="digit">
+			<bounds left="3.323" top="-0.306" right="3.423" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit20" element="digit">
+			<bounds left="3.435" top="-0.306" right="3.535" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit21" element="digit">
+			<bounds left="3.547" top="-0.306" right="3.647" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit18" element="digit">
+			<bounds left="3.658" top="-0.306" right="3.758" bottom="-0.136" />
+		</bezel>
+		<bezel name="digit19" element="digit">
+			<bounds left="3.770" top="-0.306" right="3.870" bottom="-0.136" />
+		</bezel>
+
+	</view>	
+</mamelayout>

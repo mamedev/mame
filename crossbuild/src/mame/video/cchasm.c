@@ -1,0 +1,137 @@
+/***************************************************************************
+
+    Cinematronics Cosmic Chasm hardware
+
+***************************************************************************/
+
+#include "driver.h"
+#include "deprecat.h"
+#include "video/vector.h"
+#include "cchasm.h"
+
+#define HALT   0
+#define JUMP   1
+#define COLOR  2
+#define SCALEY 3
+#define POSY   4
+#define SCALEX 5
+#define POSX   6
+#define LENGTH 7
+
+UINT16 *cchasm_ram;
+
+static int xcenter, ycenter;
+
+static TIMER_CALLBACK( cchasm_refresh_end )
+{
+    cpunum_set_input_line (machine, 0, 2, ASSERT_LINE);
+}
+
+static void cchasm_refresh (void)
+{
+
+	int pc = 0;
+    int done = 0;
+    int opcode, data;
+    int currentx = 0, currenty = 0;
+    int scalex = 0, scaley = 0;
+    int color = 0;
+    int total_length = 1;   /* length of all lines drawn in a frame */
+    int move = 0;
+
+	vector_clear_list();
+
+	while (!done)
+	{
+        data = cchasm_ram[pc];
+   		opcode = data >> 12;
+        data &= 0xfff;
+        if ((opcode > COLOR) && (data & 0x800))
+          data |= 0xfffff000;
+
+		pc++;
+
+		switch (opcode)
+		{
+        case HALT:
+            done=1;
+            break;
+        case JUMP:
+            pc = data - 0xb00;
+            logerror("JUMP to %x\n", data);
+            break;
+        case COLOR:
+            color = VECTOR_COLOR444(data ^ 0xfff);
+            break;
+        case SCALEY:
+            scaley = data << 5;
+            break;
+        case POSY:
+            move = 1;
+            currenty = ycenter + (data << 16);
+            break;
+        case SCALEX:
+            scalex = data << 5;
+            break;
+        case POSX:
+            move = 1;
+            currentx = xcenter - (data << 16);
+            break;
+        case LENGTH:
+            if (move)
+            {
+                vector_add_point (currentx, currenty, 0, 0);
+                move = 0;
+            }
+
+            currentx -= data * scalex;
+            currenty += data * scaley;
+
+            total_length += abs(data);
+
+            if (color)
+                vector_add_point (currentx, currenty, color, 0xff);
+            else
+                move = 1;
+            break;
+        default:
+            logerror("Unknown refresh proc opcode %x with data %x at pc = %x\n", opcode, data, pc-2);
+            done = 1;
+            break;
+		}
+	}
+    /* Refresh processor runs with 6 MHz */
+    timer_set (attotime_mul(ATTOTIME_IN_HZ(6000000), total_length), NULL, 0, cchasm_refresh_end);
+}
+
+
+WRITE16_HANDLER( cchasm_refresh_control_w )
+{
+	if (ACCESSING_MSB)
+	{
+		switch (data >> 8)
+		{
+		case 0x37:
+			cchasm_refresh();
+			break;
+		case 0xf7:
+			cpunum_set_input_line (Machine, 0, 2, CLEAR_LINE);
+			break;
+		}
+	}
+}
+
+VIDEO_START( cchasm )
+{
+	int xmin, xmax, ymin, ymax;
+
+	xmin=machine->screen[0].visarea.min_x;
+	ymin=machine->screen[0].visarea.min_y;
+	xmax=machine->screen[0].visarea.max_x;
+	ymax=machine->screen[0].visarea.max_y;
+
+	xcenter=((xmax+xmin)/2) << 16;
+	ycenter=((ymax+ymin)/2) << 16;
+
+	VIDEO_START_CALL(vector);
+}

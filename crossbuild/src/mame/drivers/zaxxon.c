@@ -1,0 +1,1530 @@
+/***************************************************************************
+
+    Sega Zaxxon hardware
+
+    Games supported:
+        * Zaxxon
+        * Super Zaxxon
+        * Future Spy
+        * Razmatazz
+        * Ixion
+        * Congo Bongo
+
+    DIP locations verified from manual for:
+        * Zaxxon
+        * Congo Bongo
+
+    Known bugs:
+        * discrete sound emulation
+
+****************************************************************************
+
+    Zaxxon memory map (preliminary)
+
+    0000-1fff ROM 3
+    2000-3fff ROM 2
+    4000-4fff ROM 1
+    6000-67ff RAM 1
+    6800-6fff RAM 2
+    8000-83ff Video RAM
+    a000-a0ff sprites
+
+    read:
+    c000      IN0
+    c001      IN1
+    c002      DSW0
+    c003      DSW1
+    c100      IN2
+    see the input_ports definition below for details on the input bits
+
+    write:
+    c000      coin A enable
+    c001      coin B enable
+    c002      coin aux enable
+    c003-c004 coin counters
+    c006      flip screen
+    ff3c-ff3f sound (see below)
+    fff0      interrupt enable
+    fff1      character color bank (not used during the game, but used in test mode)
+    fff8-fff9 background playfield position (11 bits)
+    fffa      background color bank (0 = standard  1 = reddish)
+    fffb      background enable
+
+    interrupts:
+    VBlank triggers IRQ, handled with interrupt mode 1
+    NMI enters the test mode.
+
+    Changes:
+    25 Jan 98 LBO
+        * Added crude support for samples based on Frank's info. As of yet, I don't have
+          a set that matches the names - I need a way to edit the .wav files I have.
+          Hopefully I'll be able to create a good set shortly. I also don't know which
+          sounds "loop".
+    26 Jan 98 LBO
+        * Fixed the sound support. I lack explosion samples and the base missile sample so
+          these are untested. I'm also unsure about the background noise. It seems to have
+          a variable volume so I've tried to reproduce that via just 1 sample.
+
+    12 Mar 98 ATJ
+            * For the moment replaced Brad's version of the samples with mine from the Mame/P
+              release. As yet, no variable volume, but I will be combining the features from
+              Brad's driver into mine ASAP.
+
+****************************************************************************
+
+    Ixion Board Info
+
+    Ixion
+    Sega(prototype)  7/1/1983
+
+
+    Board set is a modified Super Zaxxon, similar to Razzmatazz
+
+    [G80 Sound board]
+
+
+
+                            U51
+                            U50
+
+    [834-0214 ZAXXON-SOUNDII]
+
+                                       315-5013  U27 U28 U29
+
+
+             U68 U69      U72
+                                            U98
+
+    [         ZAXXON-VIDEOII]
+
+
+    U77 U78 U79                                U90 U91 U92 U93
+                              U111 U112 U113
+
+****************************************************************************
+
+    Congo Bongo memory map (preliminary)
+
+    0000-1fff ROM 1
+    2000-3fff ROM 2
+    4000-5fff ROM 3
+    6000-7fff ROM 4
+
+    8000-87ff RAM 1
+    8800-8fff RAM 2
+    a000-a3ff Video RAM
+    a400-a7ff Color RAM
+
+    8400-8fff sprites
+
+    read:
+    c000      IN0
+    c001      IN1
+    c002      DSW1
+    c003      DSW2
+    c008      IN2
+
+    write:
+    c000-c002 ?
+    c006      ?
+    c018      coinAen, used to enable input on coin slot A
+    c019      coinBen, used to enable input on coin slot B
+    c01a      serven,  used to enable input on service sw
+    c01b      counterA,coin counter for slot A
+    c01c      counterB,coin counter for slot B
+    c01d      background enable
+    c01e      flip screen
+    c01f      interrupt enable
+
+    c028-c029 background playfield position
+    c031      sprite enable ?
+    c032      sprite start
+    c033      sprite count
+
+
+    interrupts:
+    VBlank triggers IRQ, handled with interrupt mode 1
+    NMI causes a ROM/RAM test.
+
+    ----------------------------------------------------------------------
+
+    There are two different Congo Bongo boardsets. One is a 3-stack (which I have)
+    and the other is a 2-stack.
+
+    The smaller third board is just a dedicated sound board, then later they started
+    making 2-stack boardset versions with merged sound circuits built into the control
+    board.
+
+    The schematic name for the control board on the two-stack set is "Control Board II"
+    my boardset uses control board 1.
+
+    The ROMs that are dumped for MAME are from the 3-stack boardset.
+    The ROMs on control board II are in different socket assignments than the ROMs
+    found on control board 1.
+
+    For example:
+    MAME congo1.bin = ROM 1 at location U35 on the 3-stack control board 1
+    MAME congo1.bin = ROM 1 at location U21 on the 2-stack control board II
+
+    So the locations are different between the two boardsets but they appear to use
+    the same ROM.
+
+    The Video boards are exactly the same between the two boardset versions (bottom
+    board) nothing changed with the video boards.
+
+    The biggest difference to me seems to be the ROM at U87 on Control Board II,
+    The part number for this ROM is different on the control board 1 three-stack
+    set at U68.
+
+    Schematic part number for U68 (3-stack) is TBP28S42 PR-5308, and the chip has a
+    decal with "MR020" on it.
+
+    The 2-stack U87 ROM numbers are TBP28L22 PR-5315. Unknown what the decal or the
+    top of that chip reads. Schematic shows only U87 and the part number.
+
+    ROM locations are different with ROMs 1-5 on control board II and a different
+    numbered ROM in U87.
+
+    Possibly an undumped ROM or just a larger capacity bipolar PROM... (?)
+
+    3-stack control board U68 MR020 =   TBP28S42 PR-5308
+
+    2-stack control board U87 unknown = TBP28L22 PR-5315 *BIPOLAR PROM* Xref=National 74LS471
+
+
+    some pinout differences between the two:
+
+    512*8
+       +------+
+    A0 |1   20| Vcc
+    A1 |2   19| A8
+    A2 |3   18| A7
+    A3 |4   17| A6
+    A4 |5   16| A5
+    O1 |6   15| CE/
+    O2 |7   14| O8
+    O3 |8   13| O7
+    O4 |9   12| O6
+    GND|10  11| O5
+       +------+
+
+    cross ref:
+       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel   Fujitsu
+       ---------     ---     --       ------  --------  ---      --------  -----   -------
+    TS 82S147 (60ns) 6349-1  28S42    7649-5  29621     -        74S472    -       TS MB7124
+       82S147A(45ns) 6349-2  -        7649A-5 29621A    27S29    74S472A   -
+                     63S481
+    OC -             -       -        -       -         -        74S473
+
+
+    ----------------------------------------------------------------------
+
+    256*8
+       +------+
+    A0 |1   20| Vcc
+    A1 |2   19| A7
+    A2 |3   18| A6
+    A3 |4   17| A5
+    A4 |5   16| CE1/
+    O1 |6   15| CE2/
+    O2 |7   14| O8
+    O3 |8   13| O7
+    O4 |9   12| O6
+    GND|10  11| O5
+       +------+
+
+    cross ref:
+       Signetics     MMI     TI       Harris  Raytheon  AMD      National  Intel
+       ---------     ---     --       ------  --------  ---      --------  -----
+    TS 82S135 (45ns) 6309-1  18S22    -       -         -        -         -
+       82LS135(100ns)-       28L22    -       -         -        74LS471   -
+
+
+    ----ROM--NAMES-------------------------------------
+
+
+    THREE STACK BOARDSET
+    control board = 834-5166
+    video board = 834-5167
+    sound board = 834-5168
+
+
+    Current MAME      Schematic Board
+       Names       Names     Location (3-stack)
+    ------------      ---------     -------------------
+
+    congo.u68    =    MR020     U68  control board
+    congo1.bin   =    ROM 1     U35  control board
+    congo2.bin   =    ROM 2     U34  control board
+    congo3.bin   =    ROM 3     U33  control board
+    congo4.bin   =    ROM 4     U32  control board
+    congo5.bin   =    ROM 5     U76  control board
+    congo6.bin   =    ROM 6     U57  video board
+    congo7.bin   =    ROM 7     U58  video board
+    congo8.bin   =    ROM 8     U93  video board
+    congo9.bin   =    ROM 9     U94  video board
+    congo10.bin  =    ROM 10    U95  video board
+    congo11.bin  =    ROM 11    U77  video board
+    congo12.bin  =    ROM 12    U78  video board
+    congo13.bin  =    ROM 13    U79  video board
+    congo14.bin  =    ROM 14    U104 video board
+    congo15.bin  =    ROM 15    U105 video board
+    congo16.bin  =    ROM 16    U106 video board
+    congo17.bin  =    ROM 17    U11  sound board
+
+
+
+    TWO STACK BOARDSET
+    control board II = 834-5212
+    video board = 834-5167
+
+
+    Current MAME      Schematic Board
+       Names       Names     Location (2-stack)
+    ------------      ---------     -------------------
+
+    not dumped (?)          U87  control board
+    congo1.bin   =    ROM 1     U21  control board
+    congo2.bin   =    ROM 2     U22  control board
+    congo3.bin   =    ROM 3     U23  control board
+    congo4.bin   =    ROM 4     U24  control board
+    congo5.bin   =    ROM 5     U77  control board
+    congo6.bin   =    ROM 6     U57  video board
+    congo7.bin   =    ROM 7     U58  video board
+    congo8.bin   =    ROM 8     U93  video board
+    congo9.bin   =    ROM 9     U94  video board
+    congo10.bin  =    ROM 10    U95  video board
+    congo11.bin  =    ROM 11    U77  video board
+    congo12.bin  =    ROM 12    U78  video board
+    congo13.bin  =    ROM 13    U79  video board
+    congo14.bin  =    ROM 14    U104 video board
+    congo15.bin  =    ROM 15    U105 video board
+    congo16.bin  =    ROM 16    U106 video board
+    congo17.bin  =    ROM 17    U19  control board
+
+***************************************************************************/
+
+#include "driver.h"
+#include "deprecat.h"
+#include "machine/segacrpt.h"
+#include "machine/8255ppi.h"
+#include "audio/segasnd.h"
+#include "sound/sn76496.h"
+#include "sound/samples.h"
+#include "zaxxon.h"
+
+
+
+/*************************************
+ *
+ *  Constants
+ *
+ *************************************/
+
+#define MASTER_CLOCK		XTAL_48_66MHz
+#define SOUND_CLOCK			XTAL_4MHz
+
+#define PIXEL_CLOCK			(MASTER_CLOCK/8)
+
+#define HTOTAL				(384)
+#define HBEND				(0)
+#define HBSTART				(256)
+
+#define VTOTAL				(264)
+#define VBEND				(16)
+#define VBSTART				(240)
+
+
+
+/*************************************
+ *
+ *  Global variables
+ *
+ *************************************/
+
+static UINT8 int_enabled;
+
+static UINT8 razmataz_dial_pos[2];
+static UINT16 razmataz_counter;
+
+
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
+
+static void service_switch(void *param, UINT32 oldval, UINT32 newval)
+{
+	/* pressing the service switch sends an NMI */
+	if (newval)
+		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+static INTERRUPT_GEN( vblank_int )
+{
+	if (int_enabled)
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+}
+
+
+static WRITE8_HANDLER( int_enable_w )
+{
+	int_enabled = data & 1;
+	if (!int_enabled)
+		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+static MACHINE_START( zaxxon )
+{
+	/* request a callback if the service switch is pressed */
+	input_port_set_changed_callback(port_tag_to_index("SERVICESW"), 0x01, service_switch, NULL);
+
+	/* register for save states */
+	state_save_register_global(int_enabled);
+}
+
+
+static MACHINE_RESET( razmataz )
+{
+	/* the timer value is unknown, but this seems to work well */
+	sega_usb_reset(0x10);
+}
+
+
+
+/*************************************
+ *
+ *  Input handlers
+ *
+ *************************************/
+
+static READ8_HANDLER( razmataz_counter_r )
+{
+	/* this behavior is really unknown; however, the code is using this */
+	/* counter as a sort of timeout when talking to the sound board */
+	/* it needs to be increasing at a reasonable rate but not too fast */
+	/* or else the sound will mess up */
+	return razmataz_counter++ >> 8;
+}
+
+
+static CUSTOM_INPUT( razmataz_dial_r )
+{
+	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
+	int num = (FPTR)param;
+	int delta, res;
+
+	delta = readinputportbytag(dialname[num]);
+
+	if (delta < 0x80)
+	{
+		// right
+		razmataz_dial_pos[num] -= delta;
+		res = (razmataz_dial_pos[num] << 1) | 1;
+	}
+	else
+	{
+		// left
+		razmataz_dial_pos[num] += delta;
+		res = (razmataz_dial_pos[num] << 1);
+	}
+
+	return res;
+}
+
+
+
+/*************************************
+ *
+ *  Output handlers
+ *
+ *************************************/
+
+static WRITE8_HANDLER( zaxxon_coin_counter_w )
+{
+	coin_counter_w(offset, data & 0x01);
+}
+
+
+static WRITE8_HANDLER( zaxxon_coin_lockout_w )
+{
+	if (offset < 2)
+		coin_lockout_w(offset, ~data & 0x01);
+	else
+		service_coin_lockout_w(offset, ~data & 0x01);
+}
+
+
+
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+
+/* complete memory map derived from schematics */
+static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_READWRITE(MRA8_RAM, zaxxon_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
+	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
+	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
+	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
+	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
+	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_lockout_w)
+	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
+	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
+	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
+	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
+	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
+	AM_RANGE(0xe0fa, 0xe0fa) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_color_w)
+	AM_RANGE(0xe0fb, 0xe0fb) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_enable_w)
+ADDRESS_MAP_END
+
+
+/* complete memory map derived from schematics */
+static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_READWRITE(MRA8_RAM, zaxxon_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_READWRITE(MRA8_RAM, congo_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
+	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
+	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
+	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW03")
+	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("SW100")
+	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_lockout_w)
+	AM_RANGE(0xc01b, 0xc01c) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_counter_w)
+	AM_RANGE(0xc01d, 0xc01d) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_bg_enable_w)
+	AM_RANGE(0xc01e, 0xc01e) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_flipscreen_w)
+	AM_RANGE(0xc01f, 0xc01f) AM_MIRROR(0x1fc0) AM_WRITE(int_enable_w)
+	AM_RANGE(0xc021, 0xc021) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_fg_color_w)
+	AM_RANGE(0xc023, 0xc023) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_bg_color_w)
+	AM_RANGE(0xc026, 0xc026) AM_MIRROR(0x1fc0) AM_WRITE(congo_fg_bank_w)
+	AM_RANGE(0xc027, 0xc027) AM_MIRROR(0x1fc0) AM_WRITE(congo_color_bank_w)
+	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(zaxxon_bg_position_w)
+	AM_RANGE(0xc030, 0xc033) AM_MIRROR(0x1fc4) AM_WRITE(congo_sprite_custom_w)
+	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_WRITE(soundlatch_w)
+ADDRESS_MAP_END
+
+
+/* complete memory map derived from schematics */
+static ADDRESS_MAP_START( congo_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(SN76496_1_w)
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( zaxxon )
+	PORT_START_TAG("SW00")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SW01")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SW100")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+
+	PORT_START_TAG("SERVICESW")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
+
+	PORT_START_TAG("DSW02")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPSETTING(    0x03, "10000" )
+	PORT_DIPSETTING(    0x01, "20000" )
+	PORT_DIPSETTING(    0x02, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, "Sound" ) PORT_DIPLOCATION("SW1:!7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:!8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START_TAG("DSW03")
+	PORT_DIPNAME( 0x0f, 0x03, DEF_STR ( Coin_B ) ) PORT_DIPLOCATION("SW2:!1,!2,!3,!4")
+	PORT_DIPSETTING(    0x0f, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, "2C/1C 5C/3C 6C/4C" )
+	PORT_DIPSETTING(    0x0a, "2C/1C 3C/2C 4C/3C" )
+	PORT_DIPSETTING(    0x03, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, "1C/1C 5C/6C" )
+	PORT_DIPSETTING(    0x0c, "1C/1C 4C/5C" )
+	PORT_DIPSETTING(    0x04, "1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0x0d, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, "1C/2C 5C/11C" )
+	PORT_DIPSETTING(    0x00, "1C/2C 4C/9C" )
+	PORT_DIPSETTING(    0x05, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR ( 1C_5C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR ( 1C_6C ) )
+	PORT_DIPNAME( 0xf0, 0x30, DEF_STR ( Coin_A ) ) PORT_DIPLOCATION("SW2:!5,!6,!7,!8")
+	PORT_DIPSETTING(    0xf0, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, "2C/1C 5C/3C 6C/4C" )
+	PORT_DIPSETTING(    0xa0, "2C/1C 3C/2C 4C/3C" )
+	PORT_DIPSETTING(    0x30, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, "1C/1C 5C/6C" )
+	PORT_DIPSETTING(    0xc0, "1C/1C 4C/5C" )
+	PORT_DIPSETTING(    0x40, "1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0xd0, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, "1C/2C 5C/11C" )
+	PORT_DIPSETTING(    0x00, "1C/2C 4C/9C" )
+	PORT_DIPSETTING(    0x50, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR ( 1C_5C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR ( 1C_6C ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( szaxxon )
+	PORT_INCLUDE(zaxxon)
+
+	PORT_MODIFY("DSW02")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( futspy )
+	PORT_INCLUDE(zaxxon)
+
+	PORT_MODIFY("SW00")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("SW01")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW02")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR ( Coin_A ) )
+	PORT_DIPSETTING(    0x08, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x0a, "2C/1C 5C/3C 6C/4C" )
+	PORT_DIPSETTING(    0x0b, "2C/1C 4C/3C" )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x0e, "1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0x0d, "1C/1C 4C/5C" )
+	PORT_DIPSETTING(    0x0c, "1C/1C 5C/6C" )
+	PORT_DIPSETTING(    0x09, DEF_STR ( 2C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x0f, "1C/2C 5C/11C" )
+	PORT_DIPSETTING(    0x02, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR ( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR ( 1C_6C ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR ( Coin_B ) )
+	PORT_DIPSETTING(    0x80, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0xa0, "2C/1C 5C/3C 6C/4C" )
+	PORT_DIPSETTING(    0xb0, "2C/1C 4C/3C" )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0xe0, "1C/1C 2C/3C" )
+	PORT_DIPSETTING(    0xd0, "1C/1C 4C/5C" )
+	PORT_DIPSETTING(    0xc0, "1C/1C 5C/6C" )
+	PORT_DIPSETTING(    0x90, DEF_STR ( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0xf0, "1C/2C 5C/11C" )
+	PORT_DIPSETTING(    0x20, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR ( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR ( 1C_6C ) )
+
+	PORT_MODIFY("DSW03")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "20K 40K 60K" )
+	PORT_DIPSETTING(    0x10, "30K 60K 90K" )
+	PORT_DIPSETTING(    0x20, "40K 70K 100K" )
+	PORT_DIPSETTING(    0x30, "40K 80K 120K" )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( razmataz )
+	PORT_START_TAG("SW00")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM(razmataz_dial_r, 0)
+
+	PORT_START_TAG("DIAL0")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1)
+
+	PORT_START_TAG("SW01")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("SW04")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SW08")
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM(razmataz_dial_r, 1)
+
+	PORT_START_TAG("DIAL1")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
+
+	PORT_START_TAG("SW0C")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("SW100")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+
+	PORT_START_TAG("SERVICESW")
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
+
+	PORT_START_TAG("DSW02")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPSETTING(    0x01, "100000" )
+	PORT_DIPSETTING(    0x02, "150000" )
+	PORT_DIPSETTING(    0x03, "200000" )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x30, "6" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START_TAG("DSW03")
+	PORT_DIPNAME( 0x07, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR ( 1C_5C ) )
+	PORT_DIPNAME( 0x38, 0x18, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR ( 1C_5C ) )
+	PORT_DIPNAME( 0x40, 0x40, "Test Flip Screen" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ixion )
+	PORT_INCLUDE(zaxxon)
+
+	PORT_MODIFY("SW00")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_RESET
+
+	PORT_MODIFY("SW01")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW02")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPSETTING(    0x01, "60000" )
+	PORT_DIPSETTING(    0x02, "80000" )
+	PORT_DIPSETTING(    0x03, "100000" )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Easier ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW03")
+	PORT_DIPNAME( 0x07, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR ( 1C_5C ) )
+	PORT_DIPNAME( 0x38, 0x18, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR ( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR ( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR ( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR ( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR ( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR ( 1C_4C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR ( 1C_5C ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( congo )
+	PORT_INCLUDE(zaxxon)
+
+	PORT_MODIFY("SW00")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_DIPNAME( 0x20, 0x00, "Test Back and Target" )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("SW01")
+	PORT_DIPNAME( 0x20, 0x00, "Test I/O and Dip SW" )
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW02")
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
+
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
+static const gfx_layout zaxxon_spritelayout =
+{
+	32,32,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,
+			16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
+			24*8+0, 24*8+1, 24*8+2, 24*8+3, 24*8+4, 24*8+5, 24*8+6, 24*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
+			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
+			96*8, 97*8, 98*8, 99*8, 100*8, 101*8, 102*8, 103*8 },
+	128*8
+};
+
+
+static GFXDECODE_START( zaxxon )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfx_8x8x2_planar,	 0, 64*2 )	/* characters */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfx_8x8x3_planar,	 0, 32*2 )	/* background tiles */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, zaxxon_spritelayout,  0, 32*2 )	/* sprites */
+GFXDECODE_END
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( root )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/16)
+	MDRV_CPU_PROGRAM_MAP(zaxxon_map, 0)
+	MDRV_CPU_VBLANK_INT(vblank_int, 1)
+
+	MDRV_MACHINE_START(zaxxon)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_GFXDECODE(zaxxon)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+
+	MDRV_PALETTE_INIT(zaxxon)
+	MDRV_VIDEO_START(zaxxon)
+	MDRV_VIDEO_UPDATE(zaxxon)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( zaxxon )
+	MDRV_IMPORT_FROM(root)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(zaxxon_samples)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( futspy )
+	MDRV_IMPORT_FROM(root)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(futspy)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(zaxxon_samples)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( razmataz )
+	MDRV_IMPORT_FROM(root)
+
+	MDRV_MACHINE_RESET(razmataz)
+
+	/* video hardware */
+	MDRV_VIDEO_START(razmataz)
+	MDRV_VIDEO_UPDATE(razmataz)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_IMPORT_FROM(sega_universal_sound_board_rom)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( congo )
+	MDRV_IMPORT_FROM(root)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(congo_map, 0)
+
+	MDRV_CPU_ADD(Z80, SOUND_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
+
+	/* video hardware */
+	MDRV_PALETTE_LENGTH(512)
+	MDRV_VIDEO_START(congo)
+	MDRV_VIDEO_UPDATE(congo)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(SN76496, SOUND_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD(SN76496, SOUND_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_IMPORT_FROM(congo_samples)
+MACHINE_DRIVER_END
+
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
+
+ROM_START( zaxxon )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "zaxxon3.u27",  0x0000, 0x2000, CRC(6e2b4a30) SHA1(80ac53c554c84226b119cbe3cf3470bcdbcd5762) )
+	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
+	ROM_LOAD( "zaxxon1.u29",  0x4000, 0x1000, CRC(1c123ef9) SHA1(2588be06ea7baca6112d58c78a1eeb98aad8a02e) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
+	ROM_LOAD( "zaxxon.u72",   0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
+ROM_END
+
+ROM_START( zaxxon2 )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "zaxxon3a.u27", 0x0000, 0x2000, CRC(b18e428a) SHA1(d3ff077e37a3ed8a9cc32cba19e1694b79df6b30) )
+	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
+	ROM_LOAD( "zaxxon1a.u29", 0x4000, 0x1000, CRC(1977d933) SHA1(b0100a51a85928b8df3b07b27c9e7e4f929d7893) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
+	ROM_LOAD( "j214a2.72",    0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
+ROM_END
+
+ROM_START( zaxxonb )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "zaxxonb3.u27", 0x0000, 0x2000, CRC(125bca1c) SHA1(f4160966d42e5282736cde8a276204ba8910ca61) )
+	ROM_LOAD( "zaxxonb2.u28", 0x2000, 0x2000, CRC(c088df92) SHA1(c0c6cd8dcf6db65129980331fa9ecc3800b63436) )
+	ROM_LOAD( "zaxxonb1.u29", 0x4000, 0x1000, CRC(e7bdc417) SHA1(209f0d259f60b984c84229bb31af1ef939adc73e) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
+	ROM_LOAD( "zaxxon.u72",   0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
+ROM_END
+
+
+ROM_START( szaxxon )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "suzaxxon3.u27",  0x0000, 0x2000, CRC(af7221da) SHA1(b5d3beb296d52ed69b4ceacf329c20a72e3a1dce) )
+	ROM_LOAD( "suzaxxon2.u28",  0x2000, 0x2000, CRC(1b90fb2a) SHA1(afb2bd2ffee3f5e589064f59b6ac21ed915094df) )
+	ROM_LOAD( "suzaxxon1.u29",  0x4000, 0x1000, CRC(07258b4a) SHA1(91e3a0c0df6c9cf66980d1ffcc3830ffdbef8c2f) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "suzaxxon14.u68", 0x0000, 0x0800, CRC(bccf560c) SHA1(9f92bd15466048a5665bfc2ebc8c6504af9353eb) )
+	ROM_LOAD( "suzaxxon15.u69", 0x0800, 0x0800, CRC(d28c628b) SHA1(42ab7dc0e4e0d09213054597373383cdb6a55699) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "suzaxxon6.u113", 0x0000, 0x2000, CRC(f51af375) SHA1(8682217dc800f43b73cd5e8501dbf3b7cd136dc1) )
+	ROM_LOAD( "suzaxxon5.u112", 0x2000, 0x2000, CRC(a7de021d) SHA1(a1bee07aa906366aa69866d1bdff38e2d90fafdd) )
+	ROM_LOAD( "suzaxxon4.u111", 0x4000, 0x2000, CRC(5bfb3b04) SHA1(f898e42d6bc1fd3629c9caee3c2af27805969ac6) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "suzaxxon11.u77", 0x0000, 0x2000, CRC(1503ae41) SHA1(d4085f15fcbfb9547a7f9e2cb7ce9276c4d6c08d) )
+	ROM_LOAD( "suzaxxon12.u78", 0x2000, 0x2000, CRC(3b53d83f) SHA1(118e9d2b4f5daf96f5a38ccd92d0b046a470b0b2) )
+	ROM_LOAD( "suzaxxon13.u79", 0x4000, 0x2000, CRC(581e8793) SHA1(2b3305dd55dc09d7394ed8ae691773972dba28b9) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "suzaxxon8.u91",  0x0000, 0x2000, CRC(dd1b52df) SHA1(8170dd9f81c41104694951a2c74405d0c6d8b9b6) )
+	ROM_LOAD( "suzaxxon7.u90",  0x2000, 0x2000, CRC(b5bc07f0) SHA1(1e4d460ce8cca66b081ee8ec1a9adb6ef98274ec) )
+	ROM_LOAD( "suzaxxon10.u93", 0x4000, 0x2000, CRC(68e84174) SHA1(b78c44d92078552835a20bcb7125fc9ca8af5048) )
+	ROM_LOAD( "suzaxxon9.u92",  0x6000, 0x2000, CRC(a509994b) SHA1(51541ec78ab3f8241a5ddf7f99a46f5e44292992) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "suzaxxon.u98",   0x0000, 0x0100, CRC(15727a9f) SHA1(42840e9ab303fb64102a1dbae03d66c9cf743a9f) )
+	ROM_LOAD( "suzaxxon.u72",   0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
+ROM_END
+
+
+ROM_START( futspy )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "fs_snd.u27",   0x0000, 0x2000, CRC(7578fe7f) SHA1(ab42bdf74b07c1ba5337c3d34647d3ee16f9db05) )
+	ROM_LOAD( "fs_snd.u28",   0x2000, 0x2000, CRC(8ade203c) SHA1(f095f4019befff7af4203c886ef42357f79592a1) )
+	ROM_LOAD( "fs_snd.u29",   0x4000, 0x1000, CRC(734299c3) SHA1(12acf71d9d00e0e0df29c4d8c397ad407266b364) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "fs_snd.u68",   0x0000, 0x0800, CRC(305fae2d) SHA1(fbe89feff0fb2d4515000d1b73b7c91aac4e0b67) )
+	ROM_LOAD( "fs_snd.u69",   0x0800, 0x0800, CRC(3c5658c0) SHA1(70ac44b9334b086cdecd73f5f7820a0bf8ae2629) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "fs_vid.u113",  0x0000, 0x2000, CRC(36d2bdf6) SHA1(c27835055beedf61ba644070f8920b6008d99040) )
+	ROM_LOAD( "fs_vid.u112",  0x2000, 0x2000, CRC(3740946a) SHA1(e7579dd91628a811a60a8d8a5b407728b74aa17e) )
+	ROM_LOAD( "fs_vid.u111",  0x4000, 0x2000, CRC(4cd4df98) SHA1(3ae4b2d0a79069e0de81596805bcf1a9ae7912cf) )
+
+	ROM_REGION( 0xc000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "fs_vid.u77",   0x0000, 0x4000, CRC(1b93c9ec) SHA1(4b1d3b7e35d65cc3b96eb4f2e98c59e779bcb1c1) )
+	ROM_LOAD( "fs_vid.u78",   0x4000, 0x4000, CRC(50e55262) SHA1(363acbde7b37a2358b3e53cfc08c9bd5dee73d55) )
+	ROM_LOAD( "fs_vid.u79",   0x8000, 0x4000, CRC(bfb02e3e) SHA1(f53bcec46b8c7d26e9ab01c821a8d1578b85f786) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "fs_vid.u91",   0x0000, 0x2000, CRC(86da01f4) SHA1(954e4be1b0e24c8bc88c2b328e3a0e32005bb7b2) )
+	ROM_LOAD( "fs_vid.u90",   0x2000, 0x2000, CRC(2bd41d2d) SHA1(efb74b4bce31c7868ab6438e07b02b0539d35120) )
+	ROM_LOAD( "fs_vid.u93",   0x4000, 0x2000, CRC(b82b4997) SHA1(263f74aab47fc4e516b2111eaa94beea61c5fbe5) )
+	ROM_LOAD( "fs_vid.u92",   0x6000, 0x2000, CRC(af4015af) SHA1(6ed01a42d395ada6f2442b68f901fe61b04c8e44) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "futrprom.u98", 0x0000, 0x0100, CRC(9ba2acaa) SHA1(20e0257ca531ddc398b3aab861c7b5c41b659d40) )
+	ROM_LOAD( "futrprom.u72", 0x0100, 0x0100, CRC(f9e26790) SHA1(339f27e0126312d35211b5ce533f293b58851c1d) )
+ROM_END
+
+
+ROM_START( razmataz )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "u27",           0x0000, 0x2000, CRC(254f350f) SHA1(f8e84778b7ffc4da76e97992f01c742c212480cf) )
+	ROM_LOAD( "u28",           0x2000, 0x2000, CRC(3a1eaa99) SHA1(d1f2a61a8548135c9754097aa468672616244710) )
+	ROM_LOAD( "u29",           0x4000, 0x2000, CRC(0ee67e78) SHA1(c6c703000a4e0da8af65be53b2a6b2ef67860c30) )
+
+	ROM_REGION( 0x1000, REGION_CPU2, 0 )
+	ROM_LOAD( "1924.u51",      0x0000, 0x0800, CRC(a75e0011) SHA1(7d67ce2e8a2de471221b3b565a937ae1a35e1560) )
+	ROM_LOAD( "1923.u50",      0x0800, 0x0800, CRC(59994a51) SHA1(57ccee24a989efe39f8ffc08aab7d72a1cdef3d1) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "1921.u68",      0x0000, 0x0800, CRC(77f8ff5a) SHA1(d535109387559dd5b58dc6432a1eae6535442079) )
+	ROM_LOAD( "1922.u69",      0x0800, 0x0800, CRC(cf63621e) SHA1(60452ad34f2b0e0afa0f09455d9aa84058c54fd5) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "1934.u113",     0x0000, 0x2000, CRC(39bb679c) SHA1(0a384286dbfc8b35e4779119f62769b6cfc93a52) )
+	ROM_LOAD( "1933.u112",     0x2000, 0x2000, CRC(1022185e) SHA1(874d796baea8ade2c642f3640ec7875a9f509a68) )
+	ROM_LOAD( "1932.u111",     0x4000, 0x2000, CRC(c7a715eb) SHA1(8b04558c87c5a5f94a5bab9fbe198a0b8a84ebf4) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "1925.u77",      0x0000, 0x2000, CRC(a7965437) SHA1(24ab3cc9b6d70e8cab4f0a20f84fb98682b321f5) )
+	ROM_LOAD( "1926.u78",      0x2000, 0x2000, CRC(9a3af434) SHA1(0b5b1ac9cf8bee1c3830ef3baffcd7d3a05bf765) )
+	ROM_LOAD( "1927.u79",      0x4000, 0x2000, CRC(0323de2b) SHA1(6f6ceafe6472d59bd0ffecb9dd2d401659157b50) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "1929.u91",      0x0000, 0x2000, CRC(55c7c757) SHA1(ad8d548eb965f343e88bad4b4ad1b5b226f21d71) )
+	ROM_LOAD( "1928.u90",      0x2000, 0x2000, CRC(e58b155b) SHA1(dd6abeae66de69734b7aa5e133dbfb8f8a35578e) )
+	ROM_LOAD( "1931.u93",      0x4000, 0x2000, CRC(55fe0f82) SHA1(391434b41b6235199a4f19a8873a523cbb417f70) )
+	ROM_LOAD( "1930.u92",      0x6000, 0x2000, CRC(f355f105) SHA1(93067b7390c05b71020e77abdd9577b39e486d9f) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "clr.u98",       0x0000, 0x0100, CRC(0fd671af) SHA1(7f26139398754dae7383c9375fca95b7970fcefb) )
+	ROM_LOAD( "clr.u72",       0x0100, 0x0100, CRC(03233bc5) SHA1(30bd690da7eda4e13df90d7ee59dbf744b3541a4) )
+ROM_END
+
+
+ROM_START( ixion )
+	ROM_REGION( 0x6000, REGION_CPU1, 0 )
+	ROM_LOAD( "1937d.u27",      0x0000, 0x2000, CRC(f447aac5) SHA1(f6ec02f20482649ba1765254e0e67a8593075092) )
+	ROM_LOAD( "1938b.u28",      0x2000, 0x2000, CRC(17f48640) SHA1(d661e8ae0747c2c526360cb72e403deba7a98e71) )
+	ROM_LOAD( "1955b.u29",      0x4000, 0x1000, CRC(78636ec6) SHA1(afca6418221e700749031cb3fa738907d77c1566) )
+
+	ROM_REGION( 0x1000, REGION_CPU2, 0 )
+	ROM_LOAD( "1944a.u51",      0x0000, 0x0800, CRC(88215098) SHA1(54bd1c71e7f10f20623e47f4e791f54ce698bc08) )
+	ROM_LOAD( "1943a.u50",      0x0800, 0x0800, CRC(77e5a1f0) SHA1(00152ffb59ebac718b300fdf24314b456748ffbe) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "1939a.u68",      0x0000, 0x0800, CRC(c717ddc7) SHA1(86fdef368f097a27aac6e05bf3208fcdaf7d9da7) )
+	ROM_LOAD( "1940a.u69",      0x0800, 0x0800, CRC(ec4bb3ad) SHA1(8a38bc48cda59b5e76a5153d459bb2d01d6a56f3) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "1952a.u113",     0x0000, 0x2000, CRC(ffb9b03d) SHA1(b7a900166a880ca4a71fec6ad02f5c0ecfc92df8) )
+	ROM_LOAD( "1951a.u112",     0x2000, 0x2000, CRC(db743f1b) SHA1(a5d13d597fe999757137d96fb4bf7c7efc7a3245) )
+	ROM_LOAD( "1950a.u111",     0x4000, 0x2000, CRC(c2de178a) SHA1(0347a751accb02576b9cd8b123b79018cc05268c) )
+
+	ROM_REGION( 0x6000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "1945a.u77",      0x0000, 0x2000, CRC(3a3fbfe7) SHA1(f3a503f476524f9de5b55de49009972124e58601) )
+	ROM_LOAD( "1946a.u78",      0x2000, 0x2000, CRC(f2cb1b53) SHA1(8c2fb58ce7de7876c4d2f1a3d13c6a5efd06d354) )
+	ROM_LOAD( "1947a.u79",      0x4000, 0x2000, CRC(d2421e92) SHA1(07000055ace2c6983c7add180904d6bc20e1bb3b) )
+
+	ROM_REGION( 0x8000, REGION_GFX4, 0 )
+	ROM_LOAD( "1948a.u91",      0x0000, 0x2000, CRC(7a7fcbbe) SHA1(76dffffcadbe446091ee98958873aa76f7b17213) )
+	ROM_LOAD( "1953a.u90",      0x2000, 0x2000, CRC(6b626ea7) SHA1(7e02da0b031a42b077c173d85f15f75242e61e98) )
+	ROM_LOAD( "1949a.u93",      0x4000, 0x2000, CRC(e7722d09) SHA1(c9a0fb4fac798454facd3d5dd02d2c05cfe8e3a6) )
+	ROM_LOAD( "1954a.u92",      0x6000, 0x2000, CRC(a970f5ff) SHA1(0f1f8f329ceefcbd0725f8eeff1b01348f5c9374) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "1942a.u98",       0x0000, 0x0100, CRC(3a8e6f74) SHA1(c2d480f8c8a111c1e23cbf819dea807f8128208d) )
+	ROM_LOAD( "1941a.u72",       0x0100, 0x0100, CRC(a5d0d97e) SHA1(2677508b44f9b7a6c6ee56e49a7b88073e80debe) )
+ROM_END
+
+
+ROM_START( congo )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "congo1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) )
+	ROM_LOAD( "congo2.u34",   0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) )
+	ROM_LOAD( "congo3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) )
+	ROM_LOAD( "congo4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) )
+
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )
+	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, REGION_GFX4, 0 )
+	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
+	ROM_RELOAD(               0x0100, 0x100 )
+ROM_END
+
+ROM_START( tiptop )
+	ROM_REGION( 0x8000, REGION_CPU1, 0 )
+	ROM_LOAD( "tiptop1.u35",  0x0000, 0x2000, CRC(e19dc77b) SHA1(d3782dd55701e0f5cd426ad2771c1bd0264c366a) )
+	ROM_LOAD( "tiptop2.u34",  0x2000, 0x2000, CRC(3fcd3b6e) SHA1(2898807ee36fca7fbc06616c9a070604beb782b9) )
+	ROM_LOAD( "tiptop3.u33",  0x4000, 0x2000, CRC(1c94250b) SHA1(cb70a91d07b0a9c61a093f1b5d37f2e69d1345c1) )
+	ROM_LOAD( "tiptop4.u32",  0x6000, 0x2000, CRC(577b501b) SHA1(5cad98a60a5241ba9467aa03fcd94c7490e6dbbb) )
+
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )
+	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, REGION_GFX4, 0 )
+	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
+	ROM_RELOAD(               0x0100, 0x100 )
+ROM_END
+
+
+
+/*************************************
+ *
+ *  ROM decryption
+ *
+ *************************************/
+
+static void zaxxonb_decode(void)
+{
+/*
+    the values vary, but the translation mask is always laid out like this:
+
+      0 1 2 3 4 5 6 7 8 9 a b c d e f
+    0 A A B B A A B B C C D D C C D D
+    1 A A B B A A B B C C D D C C D D
+    2 E E F F E E F F G G H H G G H H
+    3 E E F F E E F F G G H H G G H H
+    4 A A B B A A B B C C D D C C D D
+    5 A A B B A A B B C C D D C C D D
+    6 E E F F E E F F G G H H G G H H
+    7 E E F F E E F F G G H H G G H H
+    8 H H G G H H G G F F E E F F E E
+    9 H H G G H H G G F F E E F F E E
+    a D D C C D D C C B B A A B B A A
+    b D D C C D D C C B B A A B B A A
+    c H H G G H H G G F F E E F F E E
+    d H H G G H H G G F F E E F F E E
+    e D D C C D D C C B B A A B B A A
+    f D D C C D D C C B B A A B B A A
+
+    (e.g. 0xc0 is XORed with H)
+    therefore in the following tables we only keep track of A, B, C, D, E, F, G and H.
+*/
+	static const UINT8 data_xortable[2][8] =
+	{
+		{ 0x0a,0x0a,0x22,0x22,0xaa,0xaa,0x82,0x82 },	/* ...............0 */
+		{ 0xa0,0xaa,0x28,0x22,0xa0,0xaa,0x28,0x22 },	/* ...............1 */
+	};
+
+	static const UINT8 opcode_xortable[8][8] =
+	{
+		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },	/* .......0...0...0 */
+		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },	/* .......0...0...1 */
+		{ 0x8a,0x8a,0x02,0x02,0x8a,0x8a,0x02,0x02 },	/* .......0...1...0 */
+		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 },	/* .......0...1...1 */
+		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },	/* .......1...0...0 */
+		{ 0x80,0x80,0x08,0x08,0xa8,0xa8,0x20,0x20 },	/* .......1...0...1 */
+		{ 0x88,0x0a,0x88,0x0a,0xaa,0x28,0xaa,0x28 },	/* .......1...1...0 */
+		{ 0x02,0x08,0x2a,0x20,0x20,0x2a,0x08,0x02 } 	/* .......1...1...1 */
+	};
+
+	int A;
+	UINT8 *rom = memory_region(REGION_CPU1);
+	int size = memory_region_length(REGION_CPU1);
+	UINT8 *decrypt = auto_malloc(size);
+
+	memory_set_decrypted_region(0, 0x0000, size - 1, decrypt);
+
+	for (A = 0x0000; A < size; A++)
+	{
+		int i,j;
+		UINT8 src;
+
+		src = rom[A];
+
+		/* pick the translation table from bit 0 of the address */
+		i = A & 1;
+
+		/* pick the offset in the table from bits 1, 3 and 5 of the source data */
+		j = ((src >> 1) & 1) + (((src >> 3) & 1) << 1) + (((src >> 5) & 1) << 2);
+		/* the bottom half of the translation table is the mirror image of the top */
+		if (src & 0x80) j = 7 - j;
+
+		/* decode the ROM data */
+		rom[A] = src ^ data_xortable[i][j];
+
+		/* now decode the opcodes */
+		/* pick the translation table from bits 0, 4, and 8 of the address */
+		i = ((A >> 0) & 1) + (((A >> 4) & 1) << 1) + (((A >> 8) & 1) << 2);
+		decrypt[A] = src ^ opcode_xortable[i][j];
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Driver initialization
+ *
+ *************************************/
+
+static DRIVER_INIT( zaxxon )
+{
+	static const ppi8255_interface ppi_intf =
+	{
+		1,
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ zaxxon_sound_a_w },
+		{ zaxxon_sound_b_w },
+		{ zaxxon_sound_c_w }
+	};
+
+	ppi8255_init(&ppi_intf);
+}
+
+
+static DRIVER_INIT( zaxxonb )
+{
+	zaxxonb_decode();
+	DRIVER_INIT_CALL(zaxxon);
+}
+
+
+static DRIVER_INIT( szaxxon )
+{
+	szaxxon_decode();
+	DRIVER_INIT_CALL(zaxxon);
+}
+
+
+static DRIVER_INIT( futspy )
+{
+	futspy_decode();
+	DRIVER_INIT_CALL(zaxxon);
+}
+
+
+static DRIVER_INIT( razmataz )
+{
+	nprinces_decode();
+	DRIVER_INIT_CALL(zaxxon);
+
+	/* additional input ports are wired */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
+
+	/* unknown behavior expected here */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
+
+	/* connect the universal sound board */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+
+	/* additional state saving */
+	state_save_register_global_array(razmataz_dial_pos);
+	state_save_register_global(razmataz_counter);
+}
+
+
+static DRIVER_INIT( ixion )
+{
+	szaxxon_decode();
+	DRIVER_INIT_CALL(zaxxon);
+
+	/* connect the universal sound board */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+}
+
+
+static DRIVER_INIT( congo )
+{
+	static const ppi8255_interface ppi_intf =
+	{
+		1,
+		{ soundlatch_r },
+		{ 0 },
+		{ 0 },
+		{ 0 },
+		{ congo_sound_b_w },
+		{ congo_sound_c_w }
+	};
+	ppi8255_init(&ppi_intf);
+}
+
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+/* these games run on standard Zaxxon hardware */
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   zaxxon,   ROT90,  "Sega",    "Zaxxon (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   zaxxon,   ROT90,  "Sega",    "Zaxxon (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonb,  ROT90,  "bootleg", "Jackson", GAME_SUPPORTS_SAVE )
+GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon", GAME_SUPPORTS_SAVE )
+GAME( 1984, futspy,   0,      futspy,   futspy,   futspy,   ROT90,  "Sega",    "Future Spy", GAME_SUPPORTS_SAVE )
+
+/* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
+/* G-80 Universal Sound Board */
+GAME( 1983, razmataz, 0,      razmataz, razmataz, razmataz, ROT90,  "Sega",    "Razzmatazz", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "Ixion (prototype)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+
+/* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
+/* custom sprite DMA chip */
+GAME( 1983, congo,    0,      congo,    congo,    congo,    ROT90,  "Sega",    "Congo Bongo", GAME_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,    congo,    congo,    ROT90,  "Sega",    "Tip Top", GAME_SUPPORTS_SAVE )

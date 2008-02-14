@@ -1,0 +1,163 @@
+mos metal oxid semiconductor
+bought by cbm
+
+licence to produce chips
+ rockwell
+
+transistor, logic gate designs:
+NMOS (M65xx)
+CMOS (M65Cxx)
+HMOS (M75xx) hyper? MOS, used in early c16/plus4 series
+H2MOS (M85xx) hyper2 MOS, used in C128, later c16/plus4, late C64
+?SCMOS (M65SCxx) Super? CMOS
+?CE (M65CExx, M45xx) CMOS Enhanced?, used in not released C65
+
+HMOS, H2MOS CPUs have the same core as the NMOS series
+
+6500 / 6501
+mask programable microcontroller
+32 io ports (2 interruptable)
+timer
+64 byte ram
+8 kbyte rom
+
+6502 (used in many designs)
+b-flag always 1! (only pushed as 0 when break executed!)
+memory changing opcodes accesses memory: read, write data, write modified data
+
+6504
+only 12 address pins a11..a0
+
+6508
+8 io pins (p0 bis p7)
+
+6509
+1 megabyte memory management
+(lda,sta (zeropage),y modified, uses 2nd address extension register)
+
+6510/8500 (used in some designs)
+6 io pins (p0 bis p5)
+
+6510T/8503? (used in commodore C1551 floppy)
+8 io pins
+integrated clock generation?
+
+7501/8501 (c16, c116, c232, c264, plus4, c364)
+7 io pins (no p5)
+no nmi
+
+8502 (c128)
+7 io pins (no p7)
+
+the above series is opcode compatible (including illegal opcodes)
+
+
+n2a03 (some arcades, NES)
+-------------------------
+(nintendo variant)
+NMOS based!
+illegal opcodes
+$6c jump indirect low byte overrun problem as in 6502
+no decimal mode
+integrated sound hardware
+
+
+65c02 (used in some designs)
+----------------------------
+fixed jmp ind opcode
+memory changing opcodes accesses memory: read, read, write
+no illegal opcodes from the above series
+so not full compatible to 6502 series
+b flag always 1 as in NMOS Series is not known?
+additional commands
+
+several other CMOS variants
+
+
+65sc02 (where used?)
+--------------------
+65c02 compatible
+additional commands
+
+atari lynx bastian schicks bll
+integrated m65sc02 cpu core
+no bbr bbs instructions, else m65c02 compatible
+
+watara supervision
+integrated m65c02 cpu core (or m65sc02 or m65ce02?)
+
+
+gte65816 (nintendo snes)
+------------------------
+65802 upgrade cpu (c64 and c128 upgrade cpu)
+16 bit wide registers
+24 bit address space
+65c02? compatible mode
+additional commands
+
+
+spc700
+------
+(snes sound processor)
+same register layout?
+same addressing modes?
+heavily modified opcodes
+YA could be combined for 16 bit operations?
+
+
+huc6280 (nec pcengine)
+----------------------
+65sc02 compatible?
+8 memory registers
+(highest 3 bits select memory register, these build a22..a13)
+(so 2 Megabyte address room!)
+additional commands?
+several additional integrated features
+
+
+65ce02 (c65 prototype)
+----------------------
+(scan of documentation available, also use
+c65 m4510 documentation)
+(cpu core to be used in asics)
+65sc02 compatible
+z register
+(65c02 zeropage indexed addressing is now (zeropage),z)
+b bank register, highbyte of all zerozape addressing
+register for stack high byte
+additional command (some from the 65816)
+
+
+m4510 (Commodore C65 CPU)
+-------------------------
+(scan of documentation (in c65 documentation) available)
+65ce02 compatible
+integrated 20 bit memory management (map)
+(aug opcode changed to map opcode)
+2 cia6526 integrated
+1 uart integrated
+
+
+mitsubishi 740 series
+---------------------
+(data book in electronic form available)
+(M507xx, M509xx, M374xx, M38xxx, M375xx)
+NMOS based
+additional operation mode
+(arithmetic instruction not performing on akku (a=a operation addressing mode)
+but on zeropage ([x]=[x] operation addressing mode))
+additional instructions LDM, MUL, DIV, TST, COM, RRF, CLT, SET, WIT, STP, CLP
+BRK 1 byte only?
+BRA CMOS compatible
+BBC, BBR different opcode as CMOS, and also akku addressing
+different TRB, TSB
+no CMOS STZ, JMP ind,x
+STP not in all variants
+MUL, DIV not in all variants
+
+
+Set Overflow Pin
+----------------
+in 6502 and pin compatibles (65C02 65SC02 65SC802 65CE02), M6509
+no SO pin 6510/7501/8500/8501/8502/65sc816
+6510T ?

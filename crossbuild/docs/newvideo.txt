@@ -1,0 +1,146 @@
+This article originally appeared in a slightly different form at
+http://aarongiles.com. You should read this if you are used to how
+MAME's video system worked prior to 0.107 and you want to understand
+how you should configure MAME with the new rendering system in place.
+
+
+The New Video Landscape
+
+Since its inception 9 years ago, MAME's video system has defaulted to
+a mode where it tries to change resolutions on you. And since the
+first port of the core to Windows 5 years ago, it has defaulted to
+using your graphics card to stretch the video to that resolution.
+
+I'm sure a lot of you out there have taken a lot of time to tweak the
+current set of video options to make them work the way you like. But
+every once in a while, you need to take a step back and re-evaluate
+the situation. The current video system has been in place for 5 years
+now without much substantial change. And with the recent rewrite,
+you're almost certainly going to want to rethink the way you have
+things configured.
+
+At the highest level, there are really three different ways you can
+configure the new system. Placing yourself into one of these three
+categories will help you get the initial settings right. From there,
+you can tweak with the settings to figure out what works best.
+
+
+Category 1: Bells and whistles. People who fall into this category
+would include anyone with a modern system and a decent video card
+(decent in this context means at least 16MB of VRAM and built in the
+last 5 years or so -- we're not talking cutting edge here). Any decent
+video card will be able to render the simple MAME graphics at pretty
+much any resolution without breaking a sweat. Configure your desktop
+to the video mode you want (preferably something high like 1024x768
+or greater with a high refresh rate, unless you are running on a
+fixed-mode LCD, in which case just match what your LCD panel is),
+and tell MAME to leave the resolution alone. In this day and age,
+there is little reason to switch resolutions at all, unless you
+fall into Category 3, below. In this mode, you will have full access
+to artwork options, and you'll get your artwork scaled to full
+resolution and with full alpha blending effects. Vector games will
+look crisp, you can use decent fonts, and you can see a whole lot
+more of the world when using the graphics/tilemap viewer. This mode
+uses Direct3D, so you should configure yourself like this:
+
+   -video d3d -noswitchres [-triplebuffer] [-nofilter]
+
+The -noswitchres option tells MAME to just run at the current
+resolution. Although you can let MAME pick a resolution for you, it
+doesn't really make much sense in D3D mode, and in fact I may even
+remove that feature altogether. To avoid tearing artifacts, I
+recommend using the -triplebuffer option as well. Just make sure your
+monitor's refresh rate is higher than the game you are running. If
+you dislike the blurry look of the graphics, you can specify the
+-nofilter option to disable bilinear filtering, though that will
+produce blocky artifacts. Alternatively, you can use the -prescale
+option which is described at the end of this article.
+
+
+Category 2: Like the old days. I really didn't even want to support
+this mode at all, but certain vocal MAMEdevs would have skinned me
+alive otherwise. People who fall into this category include those who
+have weak systems that worked fine with previous versions of MAME,
+but who don't run well with Direct3D rendering. (Note that just
+because Space Invaders runs unthrottled at 2000fps with DirectDraw
+and 1000fps with Direct3D doesn't mean that Direct3D is going to be
+a serious issue when playing at a regular 60fps, so if you're unsure,
+give the Direct3D route a try for a while.) In this mode, MAME will
+draw the game screen and artwork at the game's resolution, just like
+it did in MAME 0.106 and earlier; however, some artwork options,
+such as -artcrop, won't work as you might expect, and some alpha
+blending artwork modes (specifically overlays) will operate with a
+performance penality. MAME will then use your video card to stretch
+the video to the proper aspect ratio.
+
+   -video ddraw -hwstretch [-switchres] [-triplebuffer]
+
+The -switchres is optional here. If your video card is really ancient
+and struggles expanding the screen to fit your desktop resolution,
+you might want to turn it on. Again, to avoid tearing artifacts, I
+recommend using the -triplebuffer option as well, but make sure your
+monitor's refresh rate is higher than the game you are running
+(-switchres will do that for you if you use it). If your video card
+produces blurry pixels which you don't like, try the -prescale option
+described at the end of this article.
+
+
+Category 3: Anal video mode types. These are the guys who have
+generally built their own cabinets and set them up with a CRT display
+where they have several dozen carefully hand-tweaked video modes that
+approximate the original video modes the games ran at. They want MAME
+to pick that hand-tweaked mode and use it, drawing one pixel on the
+screen for each pixel in the original game. They don't give a whit
+about artwork or anything other than the raw pixels going to the
+right place. Fortunately, you can still configure MAME for this case
+as well:
+
+   -video ddraw -nohwstretch -switchres [-triplebuffer]
+
+Obviously in this case, the -switchres is required. You also want to
+disable hardware stretching, otherwise you won't get that "perfect"
+1:1 pixel mapping. Triple buffering may or may not help.
+
+
+So, I recommend starting with these initial options and then tweaking
+from there. One additional option you might want to try in
+combination with the above is the -prescale option. -prescale takes
+an integer parameter from 1 to 8, and specifies a magnification
+amount by which the screen pixels are expanded before they are drawn
+to the screen. Why is this useful? And how much of a performance
+impact does it have? Well, that depends on the mode you are running
+in.
+
+If you are running in Category 1 (-video d3d), then -prescale will
+use your video card to scale the game graphics up before rendering
+them to the screen. Depending on the video card, this is usually a
+small performance hit, but not too significant. The benefit is that
+each prescale factor reduces the blurriness of the pixels.
+-prescale 1 is the default, which does no scaling. -prescale 2 will
+double each pixel, -prescale 3 will triple each pixel, etc. For my
+money, -prescale 2 is sufficient, but people with super high
+resolution displays claim that larger -prescale factors work even
+better.
+
+If you are running in Category 2 (-video ddraw -hwstretch), then
+-prescale will cause MAME to compose the screen graphics at the
+specified scale factor. This is unfortunately done in software, but
+carries the benefit that artwork, fonts, and the graphics viewer can
+take advantage of the additional resolution to produce nicer results.
+The end effect is that you will get less blurry pixels, just like the
+Category 1 case, plus higher quality artwork, fonts, and more visible
+area in the graphics viewer.
+
+If you are running in Category 3 (-video ddraw -nohwstretch), then
+-prescale will cause MAME to pick a video mode that is the prescale
+factor times the raw screen resolution, and then MAME will, in
+software, compose the screen graphics at the specified scale factor.
+This has all the advantages of the Category 2 case, except that since
+there wasn't any pixel blurring to begin with, there is no additional
+crispness that comes about as a result.
+
+Finally, you may be wondering about effects (and yes, scanlines are
+an "effect"). Effects are no longer hard-coded into the system.
+Rather, you can provide a PNG file in the artwork directory that will
+be loaded and overlaid on top of screen bitmaps. See the description
+of -effect in windows.txt for more details.
