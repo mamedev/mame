@@ -5406,6 +5406,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( chopperb )	/* A7003 'KK' (c) 1988 */
 	DRIVER( legofair )	/* A7003 'KK' (c) 1988 */
 	DRIVER( fsoccer )	/* A6006 'FS' (c) 1988 */
+	DRIVER( fsoccerj )	/* A6006 'FS' (c) 1988 */
+
 	DRIVER( fsoccerb )	/*            (c) 1988 */
 	DRIVER( tdfever )	/* A6006 'TD' (c) 1987 */
 	DRIVER( tdfeverj )	/* A6006 'TD' (c) 1987 */
