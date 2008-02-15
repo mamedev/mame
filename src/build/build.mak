@@ -57,7 +57,7 @@ PNG2BDCOBJS = \
 
 $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBUTIL) $(LIBOCORE) $(ZLIB) -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(LIBS) -o $@
 
 
 
