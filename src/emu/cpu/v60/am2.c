@@ -940,13 +940,13 @@ static UINT32 bam2DirectAddressDeferredIndexed(void)
 
 static UINT32 am2Immediate(void)
 {
-	// Fuck off LDPR
+	// ignore LDPR
 	return am1Immediate();
 }
 
 static UINT32 am2ImmediateQuick(void)
 {
-	// fuck off LDPR
+	// ignore LDPR
 	return am1ImmediateQuick();
 }
 
