@@ -11,6 +11,7 @@
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "tx0.h"
+#include "deprecat.h"
 
 #define LOG 0
 #define LOG_EXTRA 0
