@@ -159,7 +159,7 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 {
 	int call_configure_screen = FALSE;
-	if (LOG)  logerror("CRT #0 PC %04x: CRTC6845 reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
+	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
 
 	switch (mc6845->address_latch)
 	{
@@ -265,7 +265,7 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 				visarea.max_x = max_x;
 				visarea.max_y = max_y;
 
-				if (LOG) logerror("CRTC6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
+				if (LOG) logerror("M6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
 								  horiz_total, vert_total, max_x, max_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 				video_screen_configure(mc6845->intf->scrnum, horiz_total, vert_total, &visarea, refresh);

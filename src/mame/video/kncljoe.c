@@ -21,64 +21,58 @@ UINT8 *kncljoe_scrollregs;
 PALETTE_INIT( kncljoe )
 {
 	int i;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	for (i = 0;i < 128;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x90);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x80; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0x100] >> 0) & 0x01;
-		bit1 = (color_prom[0x100] >> 1) & 0x01;
-		bit2 = (color_prom[0x100] >> 2) & 0x01;
-		bit3 = (color_prom[0x100] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[0x200] >> 0) & 0x01;
-		bit1 = (color_prom[0x200] >> 1) & 0x01;
-		bit2 = (color_prom[0x200] >> 2) & 0x01;
-		bit3 = (color_prom[0x200] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*256 + 128;	/* bottom half is not used */
-
-	for (i = 0;i < 16;i++)
+	for (i = 0x80; i < 0x90; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[(i - 0x80) + 0x300] >> 6) & 0x01;
+		bit2 = (color_prom[(i - 0x80) + 0x300] >> 7) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[(i - 0x80) + 0x300] >> 3) & 0x01;
+		bit1 = (color_prom[(i - 0x80) + 0x300] >> 4) & 0x01;
+		bit2 = (color_prom[(i - 0x80) + 0x300] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[(i - 0x80) + 0x300] >> 0) & 0x01;
+		bit1 = (color_prom[(i - 0x80) + 0x300] >> 1) & 0x01;
+		bit2 = (color_prom[(i - 0x80) + 0x300] >> 2) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i+128,MAKE_RGB(r,g,b));
-		color_prom ++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 16;	/* bottom half is not used */
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x320;
+
+	/* chars */
+	for (i = 0; i < 0x80; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* sprite lookup table */
-	for (i = 0;i < 128;i++)
+	for (i = 0x80; i < 0x100; i++)
 	{
-		COLOR(1,i) = 128 + (*(color_prom++) & 0x0f);
+		UINT8 ctabentry = (color_prom[i - 0x80] & 0x0f) | 0x80;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 

@@ -558,7 +558,7 @@ GFXDECODE_END
 static GFXDECODE_START( wwjgtin )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_charlayout,       0, 16 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, lasso_spritelayout,     0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, wwjgtin_tracklayout,	4*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, wwjgtin_tracklayout, 4*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( pinbo )
@@ -643,8 +643,7 @@ static MACHINE_DRIVER_START( wwjgtin )
 	/* video hardware */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
 	MDRV_GFXDECODE(wwjgtin)	// Has 1 additional layer
-	MDRV_PALETTE_LENGTH(0x40+1)
-	MDRV_COLORTABLE_LENGTH(4*16 + 16*16)	// Reserve 1 color for black
+	MDRV_PALETTE_LENGTH(0x40 + 16*16)
 
 	MDRV_PALETTE_INIT(wwjgtin)
 	MDRV_VIDEO_START(wwjgtin)

@@ -632,7 +632,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/kingobox.o $(VIDEO)/kingobox.o \
 	$(DRIVERS)/lemmings.o $(VIDEO)/lemmings.o \
 	$(DRIVERS)/liberate.o $(VIDEO)/liberate.o \
-	$(DRIVERS)/madalien.o \
+	$(DRIVERS)/madalien.o $(VIDEO)/madalien.o \
 	$(DRIVERS)/madmotor.o $(VIDEO)/madmotor.o \
 	$(DRIVERS)/metlclsh.o $(VIDEO)/metlclsh.o \
 	$(DRIVERS)/pcktgal.o $(VIDEO)/pcktgal.o \

@@ -51,6 +51,8 @@ TODO:
 #include "sound/sn76496.h"
 
 
+extern UINT8 *sraider_grid_data;
+
 WRITE8_HANDLER( ladybug_videoram_w );
 WRITE8_HANDLER( ladybug_colorram_w );
 WRITE8_HANDLER( ladybug_flipscreen_w );
@@ -631,7 +633,7 @@ static const gfx_layout gridlayout2 =
 {
 	8,8,	/* 8*8 characters */
 	512,	/* 512 characters */
-	1,	/* 2 bits per pixel */
+	1,	/* 1 bit per pixel */
 	{ 0 },
 	{ 7, 6, 5, 4, 3, 2, 1, 0 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
@@ -645,11 +647,11 @@ static GFXDECODE_START( ladybug )
 GFXDECODE_END
 
 static GFXDECODE_START( sraider )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0,  8 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,  4*8, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2, 4*8, 16 )
-	GFXDECODE_ENTRY( REGION_USER1, 0, gridlayout, 32+64, 1 )
-	GFXDECODE_ENTRY( REGION_USER1, 0, gridlayout2, 32+64, 1 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,              0,  8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout,          4*8, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout2,         4*8, 16 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gridlayout,    4*8+4*16+32,  1 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gridlayout2,   4*8+4*16+32,  1 )
 GFXDECODE_END
 
 
@@ -669,8 +671,7 @@ static MACHINE_DRIVER_START( ladybug )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MDRV_GFXDECODE(ladybug)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(4*24)
+	MDRV_PALETTE_LENGTH(4*8+4*16)
 
 	MDRV_PALETTE_INIT(ladybug)
 	MDRV_VIDEO_START(ladybug)
@@ -710,7 +711,7 @@ static ADDRESS_MAP_START( sraider_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(MRA8_NOP) //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(sraider_grid_data_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(MWA8_RAM) AM_BASE(&sraider_grid_data)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
 ADDRESS_MAP_END
 
@@ -746,8 +747,7 @@ static MACHINE_DRIVER_START( sraider )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 	MDRV_GFXDECODE(sraider)
-	MDRV_PALETTE_LENGTH(65)
-	MDRV_COLORTABLE_LENGTH(32+64+2)
+	MDRV_PALETTE_LENGTH(4*8+4*16+32+2)
 
 	MDRV_PALETTE_INIT(sraider)
 	MDRV_VIDEO_START(sraider)
@@ -969,14 +969,13 @@ ROM_START( sraider )
     ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
 	ROM_LOAD( "sraid-s8.n2",  0x1000, 0x1000, CRC(57ba8888) SHA1(2aa1a5f682d146a55a96e471bb78e5c60da02bf9) )
 
+	ROM_REGION( 0x1000, REGION_GFX3, ROMREGION_DISPOSE )	/* fixed portion of the grid */
+	ROM_LOAD( "sraid-s9.f6",  0x0000, 0x1000, CRC(2380b90f) SHA1(0310554e3f2ec973c2bb6e816d04e5c0c1e0a0b9) )
+
 	ROM_REGION( 0x0060, REGION_PROMS, 0 )
 	ROM_LOAD( "srpr10-1.a2",  0x0000, 0x0020, CRC(121fdb99) SHA1(3bc092da40beb129a4df3db2f55d22bbbcf7bad8) )
 	ROM_LOAD( "srpr10-2.l3",  0x0020, 0x0020, CRC(88b67e70) SHA1(e21ee2939e96dffee101bd92c62ed975b6b64001) )
 	ROM_LOAD( "srpr10-3.c1",  0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
-
-	/* fixed portion of the grid */
-	ROM_REGION( 0x1000, REGION_USER1, 0 )
-	ROM_LOAD( "sraid-s9.f6",  0x0000, 0x1000, CRC(2380b90f) SHA1(0310554e3f2ec973c2bb6e816d04e5c0c1e0a0b9) )
 ROM_END
 
 

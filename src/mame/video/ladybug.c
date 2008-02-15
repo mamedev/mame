@@ -7,13 +7,17 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
+#include "video/resnet.h"
+
+
+UINT8 *sraider_grid_data;
+UINT8 sraider_grid_color;
 
 /* Use the Zero Hour star generator board */
-extern void redclash_set_stars_enable( UINT8 on );
-extern void redclash_update_stars_state(void);
-extern void redclash_set_stars_speed( UINT8 speed );
-extern void redclash_draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+void redclash_set_stars_enable( UINT8 on );
+void redclash_update_stars_state(void);
+void redclash_set_stars_speed( UINT8 speed );
+void redclash_draw_stars(const pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 
 static tilemap *bg_tilemap;
 static tilemap *grid_tilemap;
@@ -36,132 +40,111 @@ static tilemap *grid_tilemap;
   bit 0 -- inverter -- 470 ohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT( ladybug )
+
+static void palette_init_common(running_machine *machine, const UINT8 *color_prom, int colortable_size,
+								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1)
 {
+	static const int resistances[2] = { 470, 220 };
+	double rweights[2], gweights[2], bweights[2];
 	int i;
 
-	for (i = 0;i < 32;i++)
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			2, resistances, rweights, 470, 0,
+			2, resistances, gweights, 470, 0,
+			2, resistances, bweights, 470, 0);
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, colortable_size);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit1,bit2,r,g,b;
+		int bit0, bit1;
+		int r, g, b;
 
+		/* red component */
+		bit0 = (~color_prom[i] >> r_bit0) & 0x01;
+		bit1 = (~color_prom[i] >> r_bit1) & 0x01;
+		r = combine_2_weights(rweights, bit0, bit1);
 
-		bit1 = (~color_prom[i] >> 0) & 0x01;
-		bit2 = (~color_prom[i] >> 5) & 0x01;
-		r = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (~color_prom[i] >> 2) & 0x01;
-		bit2 = (~color_prom[i] >> 6) & 0x01;
-		g = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (~color_prom[i] >> 4) & 0x01;
-		bit2 = (~color_prom[i] >> 7) & 0x01;
-		b = 0x47 * bit1 + 0x97 * bit2;
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		/* green component */
+		bit0 = (~color_prom[i] >> g_bit0) & 0x01;
+		bit1 = (~color_prom[i] >> g_bit1) & 0x01;
+		g = combine_2_weights(gweights, bit0, bit1);
+
+		/* blue component */
+		bit0 = (~color_prom[i] >> b_bit0) & 0x01;
+		bit1 = (~color_prom[i] >> b_bit1) & 0x01;
+		b = combine_2_weights(bweights, bit0, bit1);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
+
 	/* characters */
-	for (i = 0;i < 8;i++)
+	for (i = 0; i < 0x20; i++)
 	{
-		colortable[4 * i] = 0;
-		colortable[4 * i + 1] = i + 0x08;
-		colortable[4 * i + 2] = i + 0x10;
-		colortable[4 * i + 3] = i + 0x18;
+		UINT8 ctabentry = ((i << 3) & 0x18) | ((i >> 2) & 0x07);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
 	/* sprites */
-	for (i = 0;i < 4 * 8;i++)
+	for (i = 0x20; i < 0x40; i++)
 	{
-		int bit0,bit1,bit2,bit3;
+		UINT8 ctabentry = color_prom[(i - 0x20) >> 1];
 
+		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
+		colortable_entry_set_value(machine->colortable, i + 0x00, ctabentry);
 
-		/* low 4 bits are for sprite n */
-		bit0 = (color_prom[i + 32] >> 3) & 0x01;
-		bit1 = (color_prom[i + 32] >> 2) & 0x01;
-		bit2 = (color_prom[i + 32] >> 1) & 0x01;
-		bit3 = (color_prom[i + 32] >> 0) & 0x01;
-		colortable[i + 4 * 8] = 1 * bit0 + 2 * bit1 + 4 * bit2 + 8 * bit3;
-
-		/* high 4 bits are for sprite n + 8 */
-		bit0 = (color_prom[i + 32] >> 7) & 0x01;
-		bit1 = (color_prom[i + 32] >> 6) & 0x01;
-		bit2 = (color_prom[i + 32] >> 5) & 0x01;
-		bit3 = (color_prom[i + 32] >> 4) & 0x01;
-		colortable[i + 4 * 16] = 1 * bit0 + 2 * bit1 + 4 * bit2 + 8 * bit3;
+		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
+		colortable_entry_set_value(machine->colortable, i + 0x20, ctabentry);
 	}
+}
+
+
+PALETTE_INIT( ladybug )
+{
+	palette_init_common(machine, color_prom, 0x20, 0, 5, 2, 6, 4, 7);
 }
 
 PALETTE_INIT( sraider )
 {
 	int i;
 
-	for (i = 0;i < 32;i++)
+	/* the resistor net may be probably different than Lady Bug */
+	palette_init_common(machine, color_prom, 0x41, 3, 0, 5, 4, 7, 6);
+
+	/* star colors */
+	for (i = 0x20; i < 0x40; i++)
 	{
-		int bit1,bit2,r,g,b;
+		int bit0, bit1;
+		int r, g, b;
 
+		/* red component */
+		bit0 = ((i - 0x20) >> 3) & 0x01;
+		bit1 = ((i - 0x20) >> 4) & 0x01;
+		b = 0x47 * bit0 + 0x97 * bit1;
 
-		bit1 = (~color_prom[i] >> 3) & 0x01;
-		bit2 = (~color_prom[i] >> 0) & 0x01;
-		r = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (~color_prom[i] >> 5) & 0x01;
-		bit2 = (~color_prom[i] >> 4) & 0x01;
-		g = 0x47 * bit1 + 0x97 * bit2;
-		bit1 = (~color_prom[i] >> 7) & 0x01;
-		bit2 = (~color_prom[i] >> 6) & 0x01;
-		b = 0x47 * bit1 + 0x97 * bit2;
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		/* green component */
+		bit0 = ((i - 0x20) >> 1) & 0x01;
+		bit1 = ((i - 0x20) >> 2) & 0x01;
+		g = 0x47 * bit0 + 0x97 * bit1;
+
+		/* blue component */
+		bit0 = ((i - 0x20) >> 0) & 0x01;
+		r = 0x47 * bit0;
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* This is for the stars colors */
-	for (i = 32;i < 64;i++)
-	{
-			int bit1,bit2,r,g,b;
-
-
-			bit2 = (i >> 4) & 0x01;
-			bit1 = (i >> 3) & 0x01;
-			b = 0x47 * bit1 + 0x97 * bit2;
-			bit2 = (i >> 2) & 0x01;
-			bit1 = (i >> 1) & 0x01;
-			g = 0x47 * bit1 + 0x97 * bit2;
-			bit1 = i & 0x01;
-			r = 0x47 * bit1;
-			palette_set_color(machine,i,MAKE_RGB(r,g,b));
-	}
-
-	/* This is reserved for the grid color */
-	palette_set_color(machine,64,MAKE_RGB(0,0,0));
-
-	/* characters */
-	for (i = 0;i < 8;i++)
-	{
-		colortable[4 * i] = 0;
-		colortable[4 * i + 1] = i + 0x08;
-		colortable[4 * i + 2] = i + 0x10;
-		colortable[4 * i + 3] = i + 0x18;
-	}
-
-	/* sprites */
-	for (i = 0;i < 4 * 8;i++)
-	{
-		int bit0,bit1,bit2,bit3;
-
-
-		/* low 4 bits are for sprite n */
-		bit0 = (color_prom[i + 32] >> 3) & 0x01;
-		bit1 = (color_prom[i + 32] >> 2) & 0x01;
-		bit2 = (color_prom[i + 32] >> 1) & 0x01;
-		bit3 = (color_prom[i + 32] >> 0) & 0x01;
-		colortable[i + 4 * 8] = 1 * bit0 + 2 * bit1 + 4 * bit2 + 8 * bit3;
-
-		/* high 4 bits are for sprite n + 8 */
-		bit0 = (color_prom[i + 32] >> 7) & 0x01;
-		bit1 = (color_prom[i + 32] >> 6) & 0x01;
-		bit2 = (color_prom[i + 32] >> 5) & 0x01;
-		bit3 = (color_prom[i + 32] >> 4) & 0x01;
-		colortable[i + 4 * 16] = 1 * bit0 + 2 * bit1 + 4 * bit2 + 8 * bit3;
-	}
+	for (i = 0x60; i < 0x80; i++)
+		colortable_entry_set_value(machine->colortable, i, (i - 0x60) + 0x20);
 
 	/* stationary part of grid */
-	colortable[32 + 64] = 0;
-	colortable[32 + 64 + 1] = 64;
+	colortable_entry_set_value(machine->colortable, 0x81, 0x40);
 }
 
 WRITE8_HANDLER( ladybug_videoram_w )
@@ -258,21 +241,6 @@ WRITE8_HANDLER( sraider_misc_w )
 
 ////////////////////////////////////////////////////
 
-static UINT8 gridline[256];
-
-WRITE8_HANDLER( sraider_grid_data_w )
-{
-	static int x = 0;
-
-	if (x == 0)
-	{
-		tilemap_mark_all_tiles_dirty(grid_tilemap);
-		x = 1;
-	}
-	gridline[offset] = data;
-
-}
-
 WRITE8_HANDLER( sraider_io_w )
 {
 	// bit7 = flip
@@ -288,10 +256,7 @@ WRITE8_HANDLER( sraider_io_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	palette_set_color_rgb(Machine,64,
-		              ((data&0x40)>>6)*0xff,
-		              ((data&0x20)>>5)*0xff,
-		              ((data&0x10)>>4)*0xff);
+	sraider_grid_color = data & 0x70;
 
 	redclash_set_stars_enable((data&0x08)>>3);
 
@@ -326,25 +291,19 @@ static TILE_GET_INFO( get_grid_tile_info )
 
 VIDEO_START( ladybug )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(bg_tilemap, 32);
+	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
 VIDEO_START( sraider )
 {
-	grid_tilemap = tilemap_create(get_grid_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
+	grid_tilemap = tilemap_create(get_grid_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_rows(grid_tilemap, 32);
-
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
-	tilemap_set_scroll_rows(bg_tilemap, 32);
-
 	tilemap_set_transparent_pen(grid_tilemap, 0);
+
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_rows(bg_tilemap, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
@@ -403,6 +362,9 @@ VIDEO_UPDATE( ladybug )
 {
 	int offs;
 
+	// clear the bg bitmap
+	fillbitmap(bitmap,machine->pens[0],cliprect);
+
 	for (offs = 0; offs < 32; offs++)
 	{
 		int sx = offs % 4;
@@ -448,20 +410,28 @@ VIDEO_UPDATE( sraider )
 
 	// draw the stars
 	if (flip_screen)
-		redclash_draw_stars(machine,bitmap,cliprect,32,1,0x27,0xff);
+		redclash_draw_stars(machine->pens,bitmap,cliprect,0x60,1,0x27,0xff);
 	else
-		redclash_draw_stars(machine,bitmap,cliprect,32,1,0x00,0xd8);
+		redclash_draw_stars(machine->pens,bitmap,cliprect,0x60,1,0x00,0xd8);
 
-	// draw the horizontal gridlines
+	// draw the gridlines
+	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(sraider_grid_color & 0x40 ? 0xff : 0,
+		              					  							 sraider_grid_color & 0x20 ? 0xff : 0,
+		              					  							 sraider_grid_color & 0x10 ? 0xff : 0));
 	tilemap_draw(bitmap, cliprect, grid_tilemap, 0, flip_screen);
-	for(i=0;i<256;i++)
+
+	for (i = 0; i < 0x100; i++)
 	{
-		if (gridline[i] != 0)
+		if (sraider_grid_data[i] != 0)
 		{
+			UINT8 x = i;
+
+			int height = cliprect->max_y - cliprect->min_y + 1;
+
 			if (flip_screen)
-				plot_box(bitmap,i^0xff,0,1,255,machine->pens[64]);
-			else
-				plot_box(bitmap,i,0,1,255,machine->pens[64]);
+				x = ~x;
+
+			plot_box(bitmap, x, cliprect->min_y, 1, height, machine->pens[0x81]);
 		}
 	}
 

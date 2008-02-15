@@ -25,8 +25,8 @@ TODO:
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 
-extern WRITE8_HANDLER( laserbat_csound1_w );
-extern WRITE8_HANDLER( laserbat_csound2_w );
+WRITE8_HANDLER( laserbat_csound1_w );
+WRITE8_HANDLER( laserbat_csound2_w );
 
 static tilemap *bg_tilemap;
 static int laserbat_video_page = 0;
@@ -35,8 +35,6 @@ static s2636_t *s2636_0, *s2636_1, *s2636_2;
 static UINT8 *s2636_0_ram;
 static UINT8 *s2636_1_ram;
 static UINT8 *s2636_2_ram;
-
-static mame_bitmap *collision_bitmap;
 
 /* information for the single 32x32 sprite displayed */
 static struct sprite_info
@@ -509,8 +507,6 @@ static VIDEO_START( laserbat )
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);
 
-	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-
 	/* configure the S2636 chips */
 	s2636_0 = s2636_config(s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
 	s2636_1 = s2636_config(s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
@@ -752,7 +748,6 @@ static MACHINE_DRIVER_START( catnmous )
 
 	MDRV_GFXDECODE(laserbat)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_COLORTABLE_LENGTH(4096)
 
 	MDRV_VIDEO_START(laserbat)
 	MDRV_VIDEO_UPDATE(laserbat)
