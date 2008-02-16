@@ -22,32 +22,32 @@ static const rectangle flip_spritevisiblearea =
 
 PALETTE_INIT( mermaid )
 {
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
-	// first, the char actor/sprite palette
 	int i;
 
-	for (i = 0; i < TOTAL_COLORS(0); i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x41);
+
+	for (i = 0; i < 0x40; i++)
 	{
-		int r = 0x21 * BIT(*color_prom, 0) + 0x47 * BIT(*color_prom, 1) + 0x97 * BIT(*color_prom, 2);
-		int g = 0x21 * BIT(*color_prom, 3) + 0x47 * BIT(*color_prom, 4) + 0x97 * BIT(*color_prom, 5);
-		int b =                              0x47 * BIT(*color_prom, 6) + 0x97 * BIT(*color_prom, 7);
+		int r = 0x21 * BIT(color_prom[i], 0) + 0x47 * BIT(color_prom[i], 1) + 0x97 * BIT(color_prom[i], 2);
+		int g = 0x21 * BIT(color_prom[i], 3) + 0x47 * BIT(color_prom[i], 4) + 0x97 * BIT(color_prom[i], 5);
+		int b =                                0x47 * BIT(color_prom[i], 6) + 0x97 * BIT(color_prom[i], 7);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	// blue background
-	palette_set_color(machine, TOTAL_COLORS(0), MAKE_RGB(0, 0, 0xff));
+	/* blue background */
+	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(0, 0, 0xff));
 
-	// set up background palette
-    COLOR(2,0) = 32;
-    COLOR(2,1) = 33;
+	/* char/sprite palette */
+	for (i = 0; i < 0x40; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-    COLOR(2,2) = 64;
-    COLOR(2,3) = 33;
+	/* background palette */
+	colortable_entry_set_value(machine->colortable, 0x40, 0x20);
+	colortable_entry_set_value(machine->colortable, 0x41, 0x21);
+	colortable_entry_set_value(machine->colortable, 0x42, 0x40);
+	colortable_entry_set_value(machine->colortable, 0x43, 0x21);
 }
 
 WRITE8_HANDLER( mermaid_videoram2_w )
@@ -141,13 +141,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( mermaid )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(bg_tilemap, 32);
+
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(fg_tilemap, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }

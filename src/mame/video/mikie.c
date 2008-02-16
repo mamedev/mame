@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
 static int palettebank;
 
@@ -29,63 +30,63 @@ static tilemap *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( mikie )
 {
+	static const int resistances[4] = { 2200, 1000, 470, 220 };
+	double rweights[4], gweights[4], bweights[4];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			4, resistances, rweights, 470, 0,
+			4, resistances, gweights, 470, 0,
+			4, resistances, bweights, 470, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
+		/* red component */
+		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
+		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		/* green component */
+		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
+		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		/* blue component */
+		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
+		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
 
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the character lookup table */
+	/* color_prom now points to the beginning of the lookup table,*/
+	color_prom += 0x300;
 
-
-	/* there are eight 32 colors palette banks; sprites use colors 0-15 and */
-	/* characters 16-31 of each bank. */
-	for (i = 0;i < TOTAL_COLORS(0)/8;i++)
+	/* characters use colors 0x10-0x1f of each 0x20 color bank,
+       while sprites use colors 0-0x0f */
+	for (i = 0; i < 0x200; i++)
 	{
 		int j;
 
-
-		for (j = 0;j < 8;j++)
-			COLOR(0,i + j * TOTAL_COLORS(0)/8) = (*color_prom & 0x0f) + 32 * j + 16;
-
-		color_prom++;
-	}
-
-	for (i = 0;i < TOTAL_COLORS(1)/8;i++)
-	{
-		int j;
-
-
-		for (j = 0;j < 8;j++)
-			COLOR(1,i + j * TOTAL_COLORS(1)/8) = (*color_prom & 0x0f) + 32 * j;
-
-		color_prom++;
+		for (j = 0; j < 8; j++)
+		{
+			UINT8 ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			colortable_entry_set_value(machine->colortable, ((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
+		}
 	}
 }
 

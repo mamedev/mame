@@ -45,13 +45,13 @@
 #include "sound/ay8910.h"
 
 
-extern WRITE8_HANDLER(mole_videoram_w);
-extern WRITE8_HANDLER(mole_tilebank_w);
-extern WRITE8_HANDLER(mole_flipscreen_w);
+WRITE8_HANDLER(mole_videoram_w);
+WRITE8_HANDLER(mole_tilebank_w);
+WRITE8_HANDLER(mole_flipscreen_w);
 
-extern PALETTE_INIT(mole);
-extern VIDEO_START(mole);
-extern VIDEO_UPDATE(mole);
+PALETTE_INIT(mole);
+VIDEO_START(mole);
+VIDEO_UPDATE(mole);
 
 
 static READ8_HANDLER( mole_protection_r )
@@ -209,7 +209,6 @@ static MACHINE_DRIVER_START( mole )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
 	MDRV_GFXDECODE(mole)
 	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
 
 	MDRV_PALETTE_INIT(mole)
 	MDRV_VIDEO_START(mole)
