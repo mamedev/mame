@@ -566,7 +566,7 @@ astring *astring_tolower(astring *str)
 {
 	char *text;
 
-	/* just toupper() on all characters */
+	/* just tolower() on all characters */
 	for (text = str->text; *text != 0; text++)
 		*text = tolower(*text);
 
