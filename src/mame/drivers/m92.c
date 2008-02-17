@@ -195,6 +195,7 @@ Notes:
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
+#include "cpu/nec/nec.h"
 
 static UINT8 irqvector;
 static UINT16 sound_status;
@@ -958,7 +959,7 @@ static MACHINE_DRIVER_START( m92 )
 	MDRV_CPU_PROGRAM_MAP(m92_map,0)
 	MDRV_CPU_IO_MAP(m92_portmap,0)
 
-	MDRV_CPU_ADD(V30, 14318180/2)	/* 14.31818 MHz */
+	MDRV_CPU_ADD_TAG("sound" ,V30, 14318180/2)	/* 14.31818 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(m92)
@@ -991,21 +992,106 @@ static MACHINE_DRIVER_START( m92 )
 MACHINE_DRIVER_END
 
 
+static const nec_config gunforce_config ={ 	gunforce_decryption_table, };
+static MACHINE_DRIVER_START( gunforce )
+	MDRV_IMPORT_FROM( m92 )
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(gunforce_config)
+MACHINE_DRIVER_END
+
+static const nec_config bmaster_config ={ bomberman_decryption_table, };
+static MACHINE_DRIVER_START( bmaster )
+	MDRV_IMPORT_FROM( m92 )
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(bmaster_config)
+MACHINE_DRIVER_END
+
+static const nec_config lethalth_config ={ lethalth_decryption_table, };
 static MACHINE_DRIVER_START( lethalth )
 	MDRV_IMPORT_FROM(m92)
-
-	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(lethalth_map,0)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(lethalth_config)
+MACHINE_DRIVER_END
+
+static const nec_config uccops_config ={ dynablaster_decryption_table, };
+static MACHINE_DRIVER_START( uccops )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(uccops_config)
+MACHINE_DRIVER_END
+
+static const nec_config mysticri_config ={ mysticri_decryption_table, };
+static MACHINE_DRIVER_START( mysticri )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(mysticri_config)
+MACHINE_DRIVER_END
+
+static const nec_config majtitl2_config ={ majtitl2_decryption_table, };
+static MACHINE_DRIVER_START( majtitl2 )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(majtitl2_config)
+MACHINE_DRIVER_END
+
+static const nec_config hook_config ={ hook_decryption_table, };
+static MACHINE_DRIVER_START( hook )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(hook_config)
+MACHINE_DRIVER_END
+
+static const nec_config rtypeleo_config ={ rtypeleo_decryption_table, };
+static MACHINE_DRIVER_START( rtypeleo )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(rtypeleo_config)
 MACHINE_DRIVER_END
 
 
+static const nec_config inthunt_config ={ inthunt_decryption_table, };
+static MACHINE_DRIVER_START( inthunt )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(inthunt_config)
+MACHINE_DRIVER_END
+
+
+static const nec_config nbbatman_config ={ leagueman_decryption_table, };
+static MACHINE_DRIVER_START( nbbatman )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(nbbatman_config)
+MACHINE_DRIVER_END
+
+
+static const nec_config psoldier_config ={ psoldier_decryption_table, };
 static MACHINE_DRIVER_START( psoldier )
 	MDRV_IMPORT_FROM(m92)
-
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(psoldier_config)
 	/* video hardware */
 	MDRV_GFXDECODE(2)
 MACHINE_DRIVER_END
+
+static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
+static MACHINE_DRIVER_START( dsccr94j )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(dsoccr94_config)
+	/* video hardware */
+	MDRV_GFXDECODE(2)
+MACHINE_DRIVER_END
+
+static const nec_config gunforc2_config ={ lethalth_decryption_table, };
+static MACHINE_DRIVER_START( gunforc2 )
+	MDRV_IMPORT_FROM(m92)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(gunforc2_config)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************/
 
@@ -1899,7 +1985,7 @@ ROM_START( geostorm )
 ROM_END
 
 
-static void init_m92(running_machine *machine, const UINT8 *decryption_table, int hasbanks)
+static void init_m92(running_machine *machine, int hasbanks)
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
@@ -1922,49 +2008,48 @@ static void init_m92(running_machine *machine, const UINT8 *decryption_table, in
 	m92_sprite_buffer_busy=1;
 
 	setvector_callback(machine, NULL, VECTOR_INIT);
-	irem_cpu_decrypt(1,decryption_table);
 }
 
 static DRIVER_INIT( bmaster )
 {
-	init_m92(machine, bomberman_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( gunforce )
 {
-	init_m92(machine, gunforce_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( hook )
 {
-	init_m92(machine, hook_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( mysticri )
 {
-	init_m92(machine, mysticri_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( uccops )
 {
-	init_m92(machine, dynablaster_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( rtypeleo )
 {
-	init_m92(machine, rtypeleo_decryption_table, 1);
+	init_m92(machine, 1);
 	m92_irq_vectorbase=0x20;
 }
 
 static DRIVER_INIT( rtypelej )
 {
-	init_m92(machine, rtypeleo_decryption_table, 1);
+	init_m92(machine, 1);
 	m92_irq_vectorbase=0x20;
 }
 
 static DRIVER_INIT( majtitl2 )
 {
-	init_m92(machine, majtitl2_decryption_table, 1);
+	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r);
@@ -1975,18 +2060,18 @@ static DRIVER_INIT( majtitl2 )
 
 static DRIVER_INIT( kaiteids )
 {
-	init_m92(machine, inthunt_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( inthunt )
 {
-	init_m92(machine, inthunt_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 
 static DRIVER_INIT( lethalth )
 {
-	init_m92(machine, lethalth_decryption_table, 0);
+	init_m92(machine, 0);
 	m92_irq_vectorbase=0x20;
 
 	/* NOP out the bankswitcher */
@@ -1997,14 +2082,14 @@ static DRIVER_INIT( nbbatman )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
-	init_m92(machine, leagueman_decryption_table, 1);
+	init_m92(machine, 1);
 
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }
 
 static DRIVER_INIT( ssoldier )
 {
-	init_m92(machine, psoldier_decryption_table, 1);
+	init_m92(machine, 1);
 	m92_irq_vectorbase=0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
@@ -2012,7 +2097,7 @@ static DRIVER_INIT( ssoldier )
 
 static DRIVER_INIT( psoldier )
 {
-	init_m92(machine, psoldier_decryption_table, 1);
+	init_m92(machine, 1);
 	m92_irq_vectorbase=0x20;
 	/* main CPU expects an answer even before writing the first command */
 	sound_status = 0x80;
@@ -2020,46 +2105,46 @@ static DRIVER_INIT( psoldier )
 
 static DRIVER_INIT( dsccr94j )
 {
-	init_m92(machine, dsoccr94_decryption_table, 1);
+	init_m92(machine, 1);
 }
 
 static DRIVER_INIT( gunforc2 )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
-	init_m92(machine, lethalth_decryption_table, 1);
+	init_m92(machine, 1);
 	memcpy(RAM+0x80000,RAM+0x100000,0x20000);
 }
 
 /***************************************************************************/
 
-GAME( 1991, gunforce, 0,        m92,      gunforce, gunforce, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", 0 )
-GAME( 1991, gunforcj, gunforce, m92,      gunforce, gunforce, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", 0 )
-GAME( 1991, gunforcu, gunforce, m92,      gunforce, gunforce, ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", 0 )
-GAME( 1991, bmaster,  0,        m92,      bmaster,  bmaster,  ROT0,   "Irem",         "Blade Master (World)", 0 )
-GAME( 1991, crossbld, bmaster,  m92,      bmaster,  bmaster,  ROT0,   "Irem",         "Cross Blades! (Japan)", 0 )
-GAME( 1991, lethalth, 0,        lethalth, lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 )
-GAME( 1991, thndblst, lethalth, lethalth, lethalth, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", 0 )
-GAME( 1992, uccops,   0,        m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (World)", 0 )
-GAME( 1992, uccopsar, uccops,   m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Alpha Renewal Version)", 0 )
-GAME( 1992, uccopsj,  uccops,   m92,      uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
-GAME( 1992, mysticri, 0,        m92,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )
-GAME( 1992, gunhohki, mysticri, m92,      mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )
-GAME( 1992, majtitl2, 0,        m92,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", 0 )
-GAME( 1992, majtit2j, majtitl2, m92,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", 0 )
-GAME( 1992, skingame, majtitl2, m92,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", 0 )
-GAME( 1992, skingam2, majtitl2, m92,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", 0 )
-GAME( 1992, hook,     0,        m92,      hook,     hook,     ROT0,   "Irem",         "Hook (World)", 0 )
-GAME( 1992, hooku,    hook,     m92,      hook,     hook,     ROT0,   "Irem America", "Hook (US)", 0 )
-GAME( 1992, hookj,    hook,     m92,      hook,     hook,     ROT0,   "Irem",         "Hook (Japan)", 0 )
-GAME( 1992, rtypeleo, 0,        m92,      rtypeleo, rtypeleo, ROT0,   "Irem",         "R-Type Leo (World)", 0 )
-GAME( 1992, rtypelej, rtypeleo, m92,      rtypeleo, rtypelej, ROT0,   "Irem",         "R-Type Leo (Japan)", 0 )
-GAME( 1993, inthunt,  0,        m92,      inthunt,  inthunt,  ROT0,   "Irem",         "In The Hunt (World)", 0 )
-GAME( 1993, inthuntu, inthunt,  m92,      inthunt,  inthunt,  ROT0,   "Irem America", "In The Hunt (US)", 0 )
-GAME( 1993, kaiteids, inthunt,  m92,      inthunt,  kaiteids, ROT0,   "Irem",         "Kaitei Daisensou (Japan)", 0 )
-GAME( 1993, nbbatman, 0,        m92,      nbbatman, nbbatman, ROT0,   "Irem America", "Ninja Baseball Batman (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, leaguemn, nbbatman, m92,      nbbatman, nbbatman, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, ssoldier, 0,        psoldier, psoldier, ssoldier, ROT0,   "Irem America", "Superior Soldiers (US)", GAME_IMPERFECT_SOUND )
-GAME( 1993, psoldier, ssoldier, psoldier, psoldier, psoldier, ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1994, dsccr94j, dsoccr94, psoldier, dsccr94j, dsccr94j, ROT0,   "Irem",         "Dream Soccer '94 (Japan)", 0 )
-GAME( 1994, gunforc2, 0,        m92,      gunforc2, gunforc2, ROT0,   "Irem",         "Gunforce 2 (US)", 0 )
-GAME( 1994, geostorm, gunforc2, m92,      gunforc2, gunforc2, ROT0,   "Irem",         "Geostorm (Japan)", 0 )
+GAME( 1991, gunforce, 0,        gunforce,      gunforce, gunforce, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (World)", 0 )
+GAME( 1991, gunforcj, gunforce, gunforce,      gunforce, gunforce, ROT0,   "Irem",         "Gunforce - Battle Fire Engulfed Terror Island (Japan)", 0 )
+GAME( 1991, gunforcu, gunforce, gunforce,      gunforce, gunforce, ROT0,   "Irem America", "Gunforce - Battle Fire Engulfed Terror Island (US)", 0 )
+GAME( 1991, bmaster,  0,        bmaster,       bmaster,  bmaster,  ROT0,   "Irem",         "Blade Master (World)", 0 )
+GAME( 1991, crossbld, bmaster,  bmaster,       bmaster,  bmaster,  ROT0,   "Irem",         "Cross Blades! (Japan)", 0 )
+GAME( 1991, lethalth, 0,        lethalth,      lethalth, lethalth, ROT270, "Irem",         "Lethal Thunder (World)", 0 )
+GAME( 1991, thndblst, lethalth, lethalth,      lethalth, lethalth, ROT270, "Irem",         "Thunder Blaster (Japan)", 0 )
+GAME( 1992, uccops,   0,        uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (World)", 0 )
+GAME( 1992, uccopsar, uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Alpha Renewal Version)", 0 )
+GAME( 1992, uccopsj,  uccops,   uccops,        uccops,   uccops,   ROT0,   "Irem",         "Undercover Cops (Japan)", 0 )
+GAME( 1992, mysticri, 0,        mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Mystic Riders (World)", 0 )
+GAME( 1992, gunhohki, mysticri, mysticri,      mysticri, mysticri, ROT0,   "Irem",         "Gun Hohki (Japan)", 0 )
+GAME( 1992, majtitl2, 0,        majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (World)", 0 )
+GAME( 1992, majtit2j, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem",         "Major Title 2 (Japan)", 0 )
+GAME( 1992, skingame, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 1)", 0 )
+GAME( 1992, skingam2, majtitl2, majtitl2,      majtitl2, majtitl2, ROT0,   "Irem America", "The Irem Skins Game (US set 2)", 0 )
+GAME( 1992, hook,     0,        hook,          hook,     hook,     ROT0,   "Irem",         "Hook (World)", 0 )
+GAME( 1992, hooku,    hook,     hook,          hook,     hook,     ROT0,   "Irem America", "Hook (US)", 0 )
+GAME( 1992, hookj,    hook,     hook,          hook,     hook,     ROT0,   "Irem",         "Hook (Japan)", 0 )
+GAME( 1992, rtypeleo, 0,        rtypeleo,      rtypeleo, rtypeleo, ROT0,   "Irem",         "R-Type Leo (World)", 0 )
+GAME( 1992, rtypelej, rtypeleo, rtypeleo,      rtypeleo, rtypelej, ROT0,   "Irem",         "R-Type Leo (Japan)", 0 )
+GAME( 1993, inthunt,  0,        inthunt,       inthunt,  inthunt,  ROT0,   "Irem",         "In The Hunt (World)", 0 )
+GAME( 1993, inthuntu, inthunt,  inthunt,       inthunt,  inthunt,  ROT0,   "Irem America", "In The Hunt (US)", 0 )
+GAME( 1993, kaiteids, inthunt,  inthunt,       inthunt,  kaiteids, ROT0,   "Irem",         "Kaitei Daisensou (Japan)", 0 )
+GAME( 1993, nbbatman, 0,        nbbatman,      nbbatman, nbbatman, ROT0,   "Irem America", "Ninja Baseball Batman (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, leaguemn, nbbatman, nbbatman,      nbbatman, nbbatman, ROT0,   "Irem",         "Yakyuu Kakutou League-Man (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, ssoldier, 0,        psoldier,      psoldier, ssoldier, ROT0,   "Irem America", "Superior Soldiers (US)", GAME_IMPERFECT_SOUND )
+GAME( 1993, psoldier, ssoldier, psoldier,      psoldier, psoldier, ROT0,   "Irem",         "Perfect Soldiers (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1994, dsccr94j, dsoccr94, dsccr94j,      dsccr94j, dsccr94j, ROT0,   "Irem",         "Dream Soccer '94 (Japan)", 0 )
+GAME( 1994, gunforc2, 0,        gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Gunforce 2 (US)", 0 )
+GAME( 1994, geostorm, gunforc2, gunforc2,      gunforc2, gunforc2, ROT0,   "Irem",         "Geostorm (Japan)", 0 )

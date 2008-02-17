@@ -114,6 +114,13 @@ typedef UINT32 DWORD;
 #include "nec.h"
 #include "necintrf.h"
 
+
+/* default configuration */
+static const nec_config default_config =
+{
+	NULL
+};
+
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom);
 
 /* NEC registers */
@@ -158,6 +165,10 @@ typedef struct
 	int     (*irq_callback)(int irqline);
 
 	memory_interface	mem;
+
+	const nec_config *config;
+
+
 } nec_Regs;
 
 /***************************************************************************/
@@ -185,10 +196,26 @@ static char seg_prefix;		/* prefix segment indicator */
 
 static UINT8 parity_table[256];
 
+#include "cpuintrf.h"
+
+static UINT8 fetchop(void)
+{
+	UINT8 ret = cpu_readop( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
+
+	if (I.MF == 1)
+		if (I.config->v25v35_decryptiontable)
+		{
+			ret = I.config->v25v35_decryptiontable[ret];
+		}
+	return ret;
+}
+
+
 /***************************************************************************/
 
 static void nec_reset (void)
 {
+	const nec_config *config;
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
     int (*save_irqcallback)(int);
@@ -196,9 +223,12 @@ static void nec_reset (void)
 
 	save_irqcallback = I.irq_callback;
 	save_mem = I.mem;
+	config = I.config;
 	memset( &I, 0, sizeof(I) );
 	I.irq_callback = save_irqcallback;
 	I.mem = save_mem;
+	I.config = config;
+
 
 	I.sregs[PS] = 0xffff;
 
@@ -213,6 +243,9 @@ static void nec_reset (void)
 
 	I.ZeroVal = I.ParityVal = 1;
 	SetMD(1);						/* set the mode-flag = native mode */
+
+	/* for v25+ / v35+ there is an internal decryption table */
+	//I.config->v25v35_decryptiontable = gussun_test_decryption_table;
 
     for (i = 0; i < 256; i++)
     {
@@ -262,7 +295,7 @@ static void nec_interrupt(unsigned int_num,BOOLEAN md_flag)
 
 static void nec_trap(void)
 {
-	nec_instruction[FETCHOP]();
+	nec_instruction[fetchop()]();
 	nec_interrupt(1,0);
 }
 
@@ -362,7 +395,7 @@ OP( 0x22, i_and_r8b  ) { DEF_r8b;	ANDB;	RegByte(ModRM)=dst;			CLKM(2,2,2,11,10,6
 OP( 0x23, i_and_r16w ) { DEF_r16w;	ANDW;	RegWord(ModRM)=dst;			CLKR(15,15,8,15,11,6,2,EA);	}
 OP( 0x24, i_and_ald8 ) { DEF_ald8;	ANDB;	I.regs.b[AL]=dst;			CLKS(4,4,2);				}
 OP( 0x25, i_and_axd16) { DEF_axd16;	ANDW;	I.regs.w[AW]=dst;			CLKS(4,4,2);	}
-OP( 0x26, i_es       ) { seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	CLK(2);		nec_instruction[FETCHOP]();	seg_prefix=FALSE; }
+OP( 0x26, i_es       ) { seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	CLK(2);		nec_instruction[fetchop()]();	seg_prefix=FALSE; }
 OP( 0x27, i_daa      ) { ADJ4(6,0x60);									CLKS(3,3,2);	}
 
 OP( 0x28, i_sub_br8  ) { DEF_br8;	SUBB;	PutbackRMByte(ModRM,dst);	CLKM(2,2,2,16,13,7); 		}
@@ -371,7 +404,7 @@ OP( 0x2a, i_sub_r8b  ) { DEF_r8b;	SUBB;	RegByte(ModRM)=dst;			CLKM(2,2,2,11,10,6
 OP( 0x2b, i_sub_r16w ) { DEF_r16w;	SUBW;	RegWord(ModRM)=dst;			CLKR(15,15,8,15,11,6,2,EA);	}
 OP( 0x2c, i_sub_ald8 ) { DEF_ald8;	SUBB;	I.regs.b[AL]=dst;			CLKS(4,4,2); 				}
 OP( 0x2d, i_sub_axd16) { DEF_axd16;	SUBW;	I.regs.w[AW]=dst;			CLKS(4,4,2);	}
-OP( 0x2e, i_cs       ) { seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	CLK(2);		nec_instruction[FETCHOP]();	seg_prefix=FALSE; }
+OP( 0x2e, i_cs       ) { seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	CLK(2);		nec_instruction[fetchop()]();	seg_prefix=FALSE; }
 OP( 0x2f, i_das      ) { ADJ4(-6,-0x60);								CLKS(3,3,2);	}
 
 OP( 0x30, i_xor_br8  ) { DEF_br8;	XORB;	PutbackRMByte(ModRM,dst);	CLKM(2,2,2,16,13,7);		}
@@ -380,7 +413,7 @@ OP( 0x32, i_xor_r8b  ) { DEF_r8b;	XORB;	RegByte(ModRM)=dst;			CLKM(2,2,2,11,10,6
 OP( 0x33, i_xor_r16w ) { DEF_r16w;	XORW;	RegWord(ModRM)=dst;			CLKR(15,15,8,15,11,6,2,EA);	}
 OP( 0x34, i_xor_ald8 ) { DEF_ald8;	XORB;	I.regs.b[AL]=dst;			CLKS(4,4,2); 				}
 OP( 0x35, i_xor_axd16) { DEF_axd16;	XORW;	I.regs.w[AW]=dst;			CLKS(4,4,2);	}
-OP( 0x36, i_ss       ) { seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	CLK(2);		nec_instruction[FETCHOP]();	seg_prefix=FALSE; }
+OP( 0x36, i_ss       ) { seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	CLK(2);		nec_instruction[fetchop()]();	seg_prefix=FALSE; }
 OP( 0x37, i_aaa      ) { ADJB(6, (I.regs.b[AL] > 0xf9) ? 2 : 1);		CLKS(7,7,4); 	}
 
 OP( 0x38, i_cmp_br8  ) { DEF_br8;	SUBB;					CLKM(2,2,2,11,10,6); }
@@ -389,7 +422,7 @@ OP( 0x3a, i_cmp_r8b  ) { DEF_r8b;	SUBB;					CLKM(2,2,2,11,10,6); }
 OP( 0x3b, i_cmp_r16w ) { DEF_r16w;	SUBW;					CLKR(15,15,8,15,11,6,2,EA);	}
 OP( 0x3c, i_cmp_ald8 ) { DEF_ald8;	SUBB;					CLKS(4,4,2); }
 OP( 0x3d, i_cmp_axd16) { DEF_axd16;	SUBW;					CLKS(4,4,2);	}
-OP( 0x3e, i_ds       ) { seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	CLK(2);		nec_instruction[FETCHOP]();	seg_prefix=FALSE; }
+OP( 0x3e, i_ds       ) { seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	CLK(2);		nec_instruction[fetchop()]();	seg_prefix=FALSE; }
 OP( 0x3f, i_aas      ) { ADJB(-6, (I.regs.b[AL] < 6) ? -2 : -1);		CLKS(7,7,4);	}
 
 OP( 0x40, i_inc_ax  ) { IncWordReg(AW);						CLK(2);	}
@@ -464,12 +497,13 @@ OP( 0x62, i_chkind  ) {
  	nec_ICount-=20;
 	logerror("%06x: bound %04x high %04x low %04x tmp\n",activecpu_get_pc(),high,low,tmp);
 }
-OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
+OP( 0x63, i_brkn   ) { nec_interrupt(FETCH,1); CLKS(50,50,24); } // timing not verified, used by riskchal / gussun
+OP( 0x64, i_repnc  ) { 	UINT32 next = fetchop();	UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
-	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = FETCHOP;	CLK(2); break;
+	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = fetchop();	CLK(2); break;
 	}
 
     switch(next) {
@@ -492,12 +526,12 @@ OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
 	seg_prefix=FALSE;
 }
 
-OP( 0x65, i_repc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
+OP( 0x65, i_repc  ) { 	UINT32 next = fetchop();	UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
-	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = FETCHOP;	CLK(2); break;
+	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = fetchop();	CLK(2); break;
 	}
 
     switch(next) {
@@ -749,7 +783,7 @@ OP( 0xcb, i_retf      ) { POP(I.ip); POP(I.sregs[PS]); CHANGE_PC; CLKS(29,29,16)
 OP( 0xcc, i_int3      ) { nec_interrupt(3,0); CLKS(50,50,24); }
 OP( 0xcd, i_int       ) { nec_interrupt(FETCH,0); CLKS(50,50,24); }
 OP( 0xce, i_into      ) { if (OF) { nec_interrupt(4,0); CLKS(52,52,26); } else CLK(3); }
-OP( 0xcf, i_iret      ) { POP(I.ip); POP(I.sregs[PS]); i_popf(); CHANGE_PC; CLKS(39,39,19); }
+OP( 0xcf, i_iret      ) { POP(I.ip); POP(I.sregs[PS]); i_popf(); SetMD(1); CHANGE_PC; CLKS(39,39,19); }
 
 OP( 0xd0, i_rotshft_b ) {
 	UINT32 src, dst; GetModRM; src = (UINT32)GetRMByte(ModRM); dst=src;
@@ -841,12 +875,12 @@ OP( 0xee, i_outdxal  ) { write_port_byte(I.regs.w[DW], I.regs.b[AL]); CLKS(8,8,3
 OP( 0xef, i_outdxax  ) { write_port_word(I.regs.w[DW], I.regs.w[AW]); CLKW(12,12,5,12,8,3,I.regs.w[DW]); }
 
 OP( 0xf0, i_lock     ) { logerror("%06x: Warning - BUSLOCK\n",activecpu_get_pc()); I.no_interrupt=1; CLK(2); }
-OP( 0xf2, i_repne    ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
+OP( 0xf2, i_repne    ) { UINT32 next = fetchop(); UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
-	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = FETCHOP;	CLK(2); break;
+	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = fetchop();	CLK(2); break;
 	}
 
     switch(next) {
@@ -868,12 +902,12 @@ OP( 0xf2, i_repne    ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
     }
 	seg_prefix=FALSE;
 }
-OP( 0xf3, i_repe     ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
+OP( 0xf3, i_repe     ) { UINT32 next = fetchop(); UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
-	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = FETCHOP;	CLK(2); break;
-	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = FETCHOP;	CLK(2); break;
+	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[DS1]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x2e:	seg_prefix=TRUE;	prefix_base=I.sregs[PS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x36:	seg_prefix=TRUE;	prefix_base=I.sregs[SS]<<4;	next = fetchop();	CLK(2); break;
+	    case 0x3e:	seg_prefix=TRUE;	prefix_base=I.sregs[DS0]<<4;	next = fetchop();	CLK(2); break;
 	}
 
     switch(next) {
@@ -1013,9 +1047,15 @@ static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 }
 #endif /* ENABLE_DEBUGGER */
 
-static void nec_init(int index, int clock, const void *config, int (*irqcallback)(int), int type)
+static void nec_init(int index, int clock, const void *_config, int (*irqcallback)(int), int type)
 {
+	const nec_config *config = _config ? _config : &default_config;
+
+
 	static const char *const names[]={"V20","V30","V33"};
+
+	I.config = config;
+
 
 	state_save_register_item_array(names[type], index, I.regs.w);
 	state_save_register_item_array(names[type], index, I.sregs);
@@ -1180,7 +1220,7 @@ static int v20_execute(int cycles)
 			I.no_interrupt--;
 
 		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
-		nec_instruction[FETCHOP]();
+		nec_instruction[fetchop()]();
     }
 	return cycles - nec_ICount;
 }
@@ -1211,7 +1251,7 @@ static int v30_execute(int cycles) {
 			I.no_interrupt--;
 
 		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
-		nec_instruction[FETCHOP]();
+		nec_instruction[fetchop()]();
     }
 	return cycles - nec_ICount;
 }
@@ -1243,7 +1283,7 @@ static int v33_execute(int cycles)
 			I.no_interrupt--;
 
 		CALL_DEBUGGER((I.sregs[PS]<<4) + I.ip);
-		nec_instruction[FETCHOP]();
+		nec_instruction[fetchop()]();
     }
 
 	return cycles - nec_ICount;

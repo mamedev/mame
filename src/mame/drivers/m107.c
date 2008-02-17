@@ -19,6 +19,7 @@
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
 #include "sound/iremga20.h"
+#include "cpu/nec/nec.h"
 
 
 #define M107_IRQ_0 ((m107_irq_vectorbase+0)/4) /* VBL interrupt*/
@@ -475,6 +476,8 @@ static const struct IremGA20_interface iremGA20_interface =
 
 /***************************************************************************/
 
+static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
+
 static MACHINE_DRIVER_START( firebarr )
 
 	/* basic machine hardware */
@@ -482,9 +485,9 @@ static MACHINE_DRIVER_START( firebarr )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 
-	MDRV_CPU_ADD(V30, 14318000/2)
-	/* audio CPU */	/* 14.318 MHz */
+	MDRV_CPU_ADD_TAG("sound", V30, 14318000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_CONFIG(firebarr_config)
 
 	MDRV_MACHINE_START(m107)
 	MDRV_MACHINE_RESET(m107)
@@ -516,15 +519,26 @@ static MACHINE_DRIVER_START( firebarr )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
-
+static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
 static MACHINE_DRIVER_START( dsoccr94 )
 	MDRV_IMPORT_FROM(firebarr)
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(dsoccr94_config)
+
 	/* video hardware */
 	MDRV_GFXDECODE(m107)
+MACHINE_DRIVER_END
+
+
+static const nec_config wpksoc_config ={ leagueman_decryption_table, };
+static MACHINE_DRIVER_START( wpksoc )
+	MDRV_IMPORT_FROM(firebarr)
+	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_CONFIG(wpksoc_config)
 MACHINE_DRIVER_END
 
 /***************************************************************************/
@@ -632,8 +646,6 @@ static DRIVER_INIT( firebarr )
 	RAM = memory_region(REGION_CPU2);
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
 
-	irem_cpu_decrypt(1,rtypeleo_decryption_table);
-
 	m107_irq_vectorbase=0x20;
 	m107_spritesystem = 1;
 }
@@ -647,8 +659,6 @@ static DRIVER_INIT( dsoccr94 )
 
 	RAM = memory_region(REGION_CPU2);
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
-
-	irem_cpu_decrypt(1,dsoccr94_decryption_table);
 
 	m107_irq_vectorbase=0x80;
 	m107_spritesystem = 0;
@@ -664,7 +674,6 @@ static DRIVER_INIT( wpksoc )
 	RAM = memory_region(REGION_CPU2);
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
 
-	irem_cpu_decrypt(1,leagueman_decryption_table);
 
 	m107_irq_vectorbase=0x80;
 	m107_spritesystem = 0;
@@ -672,6 +681,6 @@ static DRIVER_INIT( wpksoc )
 
 /***************************************************************************/
 
-GAME( 1993, firebarr, 0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, firebarr, 0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, dsoccr94, 0, dsoccr94, dsoccr94, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94", 0 )
-GAME( 1995, wpksoc,   0, firebarr, wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, wpksoc,   0, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )

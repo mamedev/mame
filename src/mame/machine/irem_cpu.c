@@ -1,9 +1,10 @@
+
 /*****************************************************************************
 
-    Irem Custom V30 CPU:
-
-    It uses a simple opcode lookup encryption, the painful part is that it's
-    preprogrammed into the cpu and isn't a algorithmic based one.
+    Irem Custom V35+ CPU
+    -- has internal 256 byte lookup table, handled in realtime.  Bomberman
+    World runs encrypted code from RAM,  Risky Challenge expects to be able
+    to run code in emulation (non-encrypted) mode for some subroutines..
 
     Hasamu                             Nanao   08J27261A1 011 9102KK700
     Gunforce                           Nanao   08J27261A1 011 9106KK701
@@ -36,10 +37,11 @@
 
 *****************************************************************************/
 
+
+
 #include "driver.h"
 #include "irem_cpu.h"
 
-int m90_game_kludge;
 
 // CAVEATS:
 // 0x80 and 0x82 pre- opcodes can easily be confused. They perform exactly the same
@@ -299,38 +301,38 @@ const UINT8 inthunt_decryption_table[256] = {
 // 0xb8 (0x2b) not sure, could be 0x1b
 
 const UINT8 gussun_decryption_table[256] = {
-	0xcd,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
-//  0x63                          gggg            gggg                gggg
-	xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//                      ????                      pppp      gggg
-	0x5d,0xa5,0x11,0x51,0x0a,0x29,xxxx,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
-//            gggg           pppp            gggg gggg      gggg gggg pppp
-	0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0xf1,0xb3,xxxx, /* 30 */
-//                      gggg                                          0x90
-	0x19,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
-//  ????
-	xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7c,0x2b,xxxx,xxxx,0xba,0x2a, /* 50 */
-//            gggg           gggg                 gggg pppp gggg
-	0xb0,xxxx,0x29,0x79,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
-//            ???? pppp           gggg                 gggg
-	xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,xxxx,xxxx,0x42,0x3c, /* 70 */
-//                 gggg                                     pppp           ????
-	xxxx,0x86,0x78,0x7d,0x30,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
-//            ???? pppp ????      pppp       gggg
-	xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
-//            gggg                     gggg
-	xxxx,0xa3,xxxx,xxxx,xxxx,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
-//                                     gggg                 ????      gggg gggg
-	xxxx,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0xb7,0x4b,xxxx,xxxx,xxxx,xxxx,xxxx, /* b0 */
-//            gggg ???? gggg      gggg            ???? pppp
-	xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
-//            gggg                                                         pppp
-	0x01,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4e,xxxx,0x1f,0x23,xxxx, /* d0 */
-//  ????                                                    gggg
-	0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
-//                                                          gggg                gggg
-	0xfb,0x20,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x76,0xf7,0xbd,0x39,0x7e,0xbf,xxxx, /* f0 */
-//       pppp                                     gggg      gggg      gggg
+    0x63,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
+//    0x63                          gggg            gggg                gggg
+    xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
+//                        ????                      pppp      gggg
+    0x5d,0xa5,0x11,0x51,0x0a,0x29,xxxx,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
+//              gggg           gggg            gggg gggg      gggg gggg pppp
+    0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
+//                        gggg
+    0x09,xxxx,0xc6,xxxx,xxxx,0x3a,xxxx,xxxx, xxxx,0x74,0x61,xxxx,0x33,xxxx,xxxx,xxxx, /* 40 */
+//    gggg
+    xxxx,0x53,0xa0,0xc0,0xc3,0x41,0xfc,0xe7, xxxx,0x2c,0x7c,0x2b,xxxx,0x4f,0xba,0x2a, /* 50 */
+//              gggg           gggg                 gggg pppp gggg      gggg
+    0xb0,xxxx,0x21,0x7d,xxxx,xxxx,0xb5,0x07, 0xb9,xxxx,0x27,0x46,0xf9,xxxx,xxxx,xxxx, /* 60 */
+//              pppp pppp           gggg                 gggg
+    xxxx,0xea,0x72,0x73,0xad,0xd1,0x3b,0x5e, 0xe5,0x57,xxxx,0x0d,0xfd,xxxx,0x92,0x3c, /* 70 */
+//                   gggg                                     pppp gggg      gggg
+    xxxx,0x86,0x78,0x7f,0x18,0x25,0x2d,xxxx, 0x9a,0xeb,0x04,0x0b,0xa2,0xb8,0xf6,xxxx, /* 80 */
+//              pppp pppp ????      pppp       gggg
+    xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
+//              gggg                     gggg
+    xxxx,0xa3,xxxx,xxxx,0x82,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
+//                        ????           gggg                 ????      gggg gggg
+    0x42,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0xb7,0x4b,xxxx,0xa4,xxxx,xxxx,xxxx, /* b0 */
+//    gggg      gggg ???? gggg      gggg            ???? pppp      gggg
+    xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
+//              gggg                                                         pppp
+    0x85,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4e,xxxx,0x1f,0x23,xxxx, /* d0 */
+//    gggg                                                    gggg
+    0xe8,xxxx,0x89,0xa1,0xd0,xxxx,xxxx,0xe2, 0x38,0xfe,0x50,0x9c,xxxx,xxxx,xxxx,0x49, /* e0 */
+//                                                            gggg                gggg
+    0xfb,0x20,0xf3,xxxx,xxxx,0x0f,xxxx,xxxx, xxxx,0x76,0xf7,0xbd,0x39,0x7e,0xbf,xxxx, /* f0 */
+//         pppp                                     gggg      gggg      gggg
 };
 
 
@@ -752,94 +754,3 @@ const UINT8 test_decryption_table[256] = {
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* F0 */
 };
-
-static const UINT8 byte_count_table[256] = {
-	2,2,2,2,2,3,1,1, 2,2,2,2,2,3,1,0, /* 00 */
-	2,2,2,2,2,3,1,1, 2,2,2,2,2,3,1,1, /* 10 */
-	2,2,2,2,2,3,1,1, 2,2,2,2,2,3,1,1, /* 20 */
-	2,2,2,2,2,3,1,1, 2,2,2,2,2,3,1,1, /* 30 */
-	1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, /* 40 */
-	1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, /* 50 */
-	1,1,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, /* 60 */
-	1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1, /* 70 */
-	3,3,3,3,2,2,2,2, 2,2,2,2,0,0,0,0, /* 80 */
-	1,1,1,1,1,1,1,1, 0,0,0,0,0,0,0,0, /* 90 */
-	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, /* A0 */
-	2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3, /* B0 */
-	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, /* C0 */
-	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, /* D0 */
-	0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, /* E0 */
-	0,0,0,0,0,0,0,0, 1,1,1,1,1,1,0,0, /* F0 */
-};
-
-UINT8 *irem_cpu_decrypted;
-
-void irem_cpu_decrypt(int cpu,const UINT8 *decryption_table)
-{
-	int A,size;
-	UINT8 *rom;
-//  int t[256];
-#ifdef MAME_DEBUG
-//    extern char *opmap1[];
-#endif
-
-	rom = memory_region(cpu+REGION_CPU1);
-	size = memory_region_length(cpu+REGION_CPU1);
-	irem_cpu_decrypted = auto_malloc(size);
-
-	memory_set_decrypted_region(cpu,0,size-1,irem_cpu_decrypted);
-	for (A = 0;A < size; A++)
-		irem_cpu_decrypted[A] = decryption_table[rom[A]];
-
-	// robiza note:
-	// for "gussun" and "riskchal" is necessary an hack to not decrypt not encrypted routines
-	// we need a real nec v25+/35+ core to support 0x63 (brkn for "break native") instruction
-	// for now we use "cd" (int) instruction + hack
-
-	if (m90_game_kludge==1) // for riskchal
-		{
-			for (A = 0xa8fd;A < 0xa90c; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x12b3a;A < 0x12b4b; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x13500;A < 0x13510; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x14be5;A < 0x14bf5; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x130de;A < 0x130eb; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x147a4;A < 0x147bf; A++)
-				irem_cpu_decrypted[A] = rom[A];
-
-		}
-	if (m90_game_kludge==2) // for gussun
-		{
-			for (A = 0xa8fd;A < 0xa90c; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x1369c;A < 0x136ac; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x14ec8;A < 0x14ed8; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x13246;A < 0x13253; A++)
-				irem_cpu_decrypted[A] = rom[A];
-			for (A = 0x14a7d;A < 0x14a98; A++)
-				irem_cpu_decrypted[A] = rom[A];
-		}
-
-/*
-    for (A=0; A<256; A++) {
-        t[A]=0;
-        for (diff=0; diff<256; diff++)
-            if (decryption_table[diff]==A) {
-                t[A]++;
-            }
-#ifdef MAME_DEBUG
-//        if (t[A]==0) logerror("Unused: [%d] %02x\t%s\n",byte_count_table[A],A,opmap1[A]);
-//        if (t[A]>1) logerror("DUPLICATE: %02x\t%s\n",A,opmap1[A]);
-#else
-        if (t[A]==0) logerror("Unused: [%d] %02x\n",byte_count_table[A],A);
-        if (t[A]>1) logerror("DUPLICATE: %02x\n",A);
-#endif
-    }
-*/
-}

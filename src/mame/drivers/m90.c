@@ -22,10 +22,6 @@ Notes:
   selection moves too fast with the clock set at 16 MHz. It's still fast at
   8 MHz, but at least it's usable.
 
-- Probably all games use a nec V35+ cpu: for gussun and risky challenge
-  we need a proper V35+ core for the use of the 0x63 instruction (brkn, to call a unencrypted
-  routine from encrypted code); for simulate the instruction there's an hack (m90_game_kludge).
-
 *****************************************************************************/
 
 #include "driver.h"
@@ -34,12 +30,11 @@ Notes:
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "cpu/nec/nec.h"
 
 static UINT32 bankaddress;
 
 extern UINT16 *m90_video_data;
-
-extern int m90_game_kludge;
 
 VIDEO_UPDATE( m90 );
 VIDEO_UPDATE( m90_bootleg );
@@ -654,11 +649,10 @@ static INTERRUPT_GEN( bomblord_interrupt )
 }
 
 
-
+/* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_DRIVER_START( m90 )
-
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,32000000/4)	/* 8 MHz ??????? */
+	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT(m90_interrupt,1)
@@ -697,18 +691,47 @@ static MACHINE_DRIVER_START( m90 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( quizf1 )
 
+static const nec_config hasamu_config ={ gunforce_decryption_table, };
+static MACHINE_DRIVER_START( hasamu )
 	MDRV_IMPORT_FROM( m90 )
-	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(hasamu_config)
+MACHINE_DRIVER_END
 
+static const nec_config quizf1_config ={ 	lethalth_decryption_table, };
+static MACHINE_DRIVER_START( quizf1 )
+	MDRV_IMPORT_FROM( m90 )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(quizf1_config)
+	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
+MACHINE_DRIVER_END
+
+static const nec_config matchit2_config ={ 	matchit2_decryption_table, };
+static MACHINE_DRIVER_START( matchit2 )
+	MDRV_IMPORT_FROM( m90 )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(matchit2_config)
+	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_DRIVER_END
 
 
+static const nec_config riskchal_config ={ 	gussun_decryption_table, };
+static MACHINE_DRIVER_START( riskchal )
+	MDRV_IMPORT_FROM( m90 )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(riskchal_config)
+	MDRV_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
+MACHINE_DRIVER_END
+
+
+static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
 static MACHINE_DRIVER_START( bombrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,32000000/4)	/* 8 MHz ??????? */
+	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_CONFIG(bomberman_config)
+
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT(m90_interrupt,1)
@@ -746,11 +769,14 @@ static MACHINE_DRIVER_START( bombrman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
+static const nec_config dynablaster_config ={ 	dynablaster_decryption_table, };
 
 static MACHINE_DRIVER_START( bbmanw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",V30,32000000/4)	/* 8 MHz ??????? */
+	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_CONFIG(dynablaster_config)
+
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT(m90_interrupt,1)
@@ -788,18 +814,25 @@ static MACHINE_DRIVER_START( bbmanw )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
+static const nec_config no_table ={ NULL, };
+
+
 static MACHINE_DRIVER_START( bomblord )
 
 	MDRV_IMPORT_FROM( bbmanw )
 	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_CONFIG(no_table)
+
 	MDRV_CPU_VBLANK_INT(bomblord_interrupt,1)
 
 MACHINE_DRIVER_END
 
+
+
 static MACHINE_DRIVER_START( bootleg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,32000000/4)	/* 16 MHz */
+	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(bootleg_main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT(m90_interrupt,1)
@@ -1113,49 +1146,10 @@ ROM_END
 
 
 
-static DRIVER_INIT( hasamu )
-{
-	m90_game_kludge=0;
-	irem_cpu_decrypt(0,gunforce_decryption_table);
-}
 
-static DRIVER_INIT( bombrman )
-{
-	m90_game_kludge=0;
-	irem_cpu_decrypt(0,bomberman_decryption_table);
-}
-
-/* Bomberman World executes encrypted code from RAM! */
-static UINT16 *bbmanw_ram_base;
-extern UINT8 *irem_cpu_decrypted;
-
-static WRITE16_HANDLER( bbmanw_ram_write )
-{
-	COMBINE_DATA(&bbmanw_ram_base[offset]);
-	if (ACCESSING_LSB)
-		irem_cpu_decrypted[0xa0c00+offset*2]=dynablaster_decryption_table[data & 0xff];
-	if (ACCESSING_MSB)
-		irem_cpu_decrypted[0xa0c00+offset*2+1]=dynablaster_decryption_table[(data >> 8) & 0xff];
-}
-
-static READ16_HANDLER( bbmanw_ram_read )
-{
-	return bbmanw_ram_base[offset];
-}
-
-static DRIVER_INIT( bbmanw )
-{
-	m90_game_kludge=0;
-	irem_cpu_decrypt(0,dynablaster_decryption_table);
-
-	bbmanw_ram_base = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0c00, 0xa0cff, 0, 0, bbmanw_ram_write);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa0c00, 0xa0cff, 0, 0, bbmanw_ram_read);
-}
 
 static DRIVER_INIT( quizf1 )
 {
-	m90_game_kludge=0;
-	irem_cpu_decrypt(0,lethalth_decryption_table);
 	bankaddress = 0;
 	set_m90_bank();
 
@@ -1163,30 +1157,13 @@ static DRIVER_INIT( quizf1 )
 	state_save_register_func_postload(set_m90_bank);
 }
 
-static DRIVER_INIT( riskchal )
-{
-	m90_game_kludge=1;
-	irem_cpu_decrypt(0,gussun_decryption_table);
-}
 
-static DRIVER_INIT( gussun )
-{
-	m90_game_kludge=2;
-	irem_cpu_decrypt(0,gussun_decryption_table);
-}
-
-static DRIVER_INIT( matchit2 )
-{
-	m90_game_kludge=0;
-	irem_cpu_decrypt(0,matchit2_decryption_table);
-}
 
 static DRIVER_INIT( bomblord )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 
 	int i;
-	m90_game_kludge=0;
 	for (i=0; i<0x100000; i+=8)
 	{
 		RAM[i+0]=BITSWAP8(RAM[i+0], 6, 4, 7, 3, 1, 2, 0, 5);
@@ -1202,17 +1179,17 @@ static DRIVER_INIT( bomblord )
 
 
 
-GAME( 1991, hasamu,   0,        m90,      hasamu,   hasamu,   ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, dynablst, 0,        bombrman, dynablst, bombrman, ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
-GAME( 1991, bombrman, dynablst, bombrman, bombrman, bombrman, ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
-GAME( 1991, atompunk, dynablst, bombrman, atompunk, bombrman, ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
+GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Hasamu (Japan)", GAME_NO_COCKTAIL )
+GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL )
+GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL )
+GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL )
 GAME( 1991, dynablsb, dynablst, bootleg,  bombrman, 0,        ROT0, "bootleg", "Dynablaster (bootleg)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   bbmanw,   ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
-GAME( 1992, bbmanwj,  bbmanw,   bombrman, bbmanwj,  bbmanw,   ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL )
-GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  bbmanw,   ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL )
+GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_NOT_WORKING )
 GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1993, riskchal, 0,        m90,      riskchal, riskchal, ROT0, "Irem", "Risky Challenge", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1993, gussun,   riskchal, m90,      riskchal, gussun,   ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NOT_WORKING | GAME_NO_COCKTAIL )
-GAME( 1993, matchit2, 0,        quizf1,   matchit2, matchit2, ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
-GAME( 1993, shisen2,  matchit2, quizf1,   shisen2,  matchit2, ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )
+GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
+GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )

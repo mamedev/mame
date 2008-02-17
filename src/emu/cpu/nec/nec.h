@@ -1,5 +1,12 @@
 #include "cpuintrf.h"
 
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
+
+
 typedef enum { DS1, PS, SS, DS0 } SREGS;
 typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
 
@@ -95,7 +102,9 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 #define FETCH_XOR(a)		((a) ^ I.mem.fetch_xor)
 #define FETCH (cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
-#define FETCHOP (cpu_readop(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
+
+
+#define FETCHOP ()
 #define FETCHWORD(var) { var=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip))+(cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip+1))<<8); I.ip+=2; }
 #define PUSH(val) { I.regs.w[SP]-=2; write_word((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
 #define POP(var) { var = read_word((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
