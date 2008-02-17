@@ -434,6 +434,7 @@ endif
 SOUNDDEFS += -DHAS_SEGAPCM=$(if $(filter SEGAPCM,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_MULTIPCM=$(if $(filter MULTIPCM,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_SCSP=$(if $(filter SCSP,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_AICA=$(if $(filter AICA,$(SOUNDS)),1,0)
 
 ifneq ($(filter SEGAPCM,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/segapcm.o
@@ -447,6 +448,9 @@ ifneq ($(filter SCSP,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/scsp.o $(SOUNDOBJ)/scspdsp.o
 endif
 
+ifneq ($(filter AICA,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/aica.o $(SOUNDOBJ)/aicadsp.o
+endif
 
 
 #-------------------------------------------------

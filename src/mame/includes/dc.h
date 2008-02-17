@@ -26,6 +26,9 @@ WRITE64_HANDLER( dc_rtc_w );
 READ64_HANDLER( dc_aica_reg_r );
 WRITE64_HANDLER( dc_aica_reg_w );
 
+READ32_HANDLER( dc_arm_aica_r );
+WRITE32_HANDLER( dc_arm_aica_w );
+
 MACHINE_RESET( dc );
 
 void dc_vblank( void );

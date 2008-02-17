@@ -9,6 +9,7 @@
 #include "debugger.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
+#include "sound/aica.h"
 
 #define DEBUG_REGISTERS	(1)
 
@@ -144,7 +145,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", activecpu_get_pc());
 		#ifdef ENABLE_DEBUGGER
-		mame_debug_break();
+//		mame_debug_break();
 		#endif
 	}
 
@@ -222,7 +223,7 @@ READ64_HANDLER( dc_sysctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
-	if ((reg != 0x40) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
+	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
 		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, activecpu_get_pc());
 	}
@@ -752,7 +753,7 @@ WRITE64_HANDLER( dc_rtc_w )
 
 MACHINE_RESET( dc )
 {
-int a;
+	int a;
 
 	/* halt the ARM7 */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -764,11 +765,12 @@ int a;
 	sysctrl_regs[SB_SBREV] = 0x0b;
 	for (a=0;a < 0x80;a++)
 		maple0x86data1[a]=0x11+a;
+
 	// checksums
-    maple0x86data1[0]=0xb9;
-    maple0x86data1[1]=0xb1;
-    maple0x86data1[18]=0xb8;
-    maple0x86data1[19]=0x8a;
+	maple0x86data1[0]=0xb9;
+	maple0x86data1[1]=0xb1;
+	maple0x86data1[18]=0xb8;
+	maple0x86data1[19]=0x8a;
 }
 
 READ64_HANDLER( dc_aica_reg_r )
@@ -778,8 +780,9 @@ READ64_HANDLER( dc_aica_reg_r )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
-	mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
-	return 0;
+//	mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
+
+	return (UINT64) AICA_0_r(offset*2, 0x0000)<<shift;
 }
 
 WRITE64_HANDLER( dc_aica_reg_w )
@@ -804,5 +807,19 @@ WRITE64_HANDLER( dc_aica_reg_w )
 			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		}
         }
-	mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
+
+	AICA_0_w(offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
+ 	
+//	mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
+
+READ32_HANDLER( dc_arm_aica_r )
+{
+	return AICA_0_r(offset*2, 0x0000);
+}
+
+WRITE32_HANDLER( dc_arm_aica_w )
+{
+	AICA_0_w(offset*2, data, mem_mask&0xffff);
+}
+

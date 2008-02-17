@@ -507,7 +507,9 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 #include "machine/x76f100.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
+#include "sound/aica.h"
 #include "dc.h"
+#include "deprecat.h"
 
 #define CPU_CLOCK 200000000
                                  /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -541,15 +543,6 @@ static READ64_HANDLER( naomi_unknown1_r )
 }
 
 static WRITE64_HANDLER( naomi_unknown1_w )
-{
-}
-
-static READ32_HANDLER( dc_aica_arm_r )
-{
-	return 0;
-}
-
-static WRITE32_HANDLER( dc_aica_arm_w )
 {
 }
 
@@ -721,9 +714,14 @@ static READ32_HANDLER( test1 )
 	return -1;
 }
 
+static void aica_irq(int irq)
+{
+	cpunum_set_input_line(Machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+}
+
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE( &dc_sound_ram )                /* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE( dc_aica_arm_r, dc_aica_arm_w )   /* shared with SH-4 */
+	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
 	AM_RANGE(0x00808000, 0x008080ff) AM_READ( test1 )                               // for bug (?) in sound bios
 ADDRESS_MAP_END
 
@@ -732,6 +730,19 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
 INPUT_PORTS_END
+
+static const struct AICAinterface aica_interface =
+{
+	REGION_CPU1,		// dummy, is fixed up in the reset handler
+	0,
+	aica_irq
+};
+
+static MACHINE_RESET( naomi )
+{
+	MACHINE_RESET_CALL(dc);
+	AICA_set_ram_base(0, dc_sound_ram, 8*1024*1024);
+}
 
 static MACHINE_DRIVER_START( naomi )
 	/* basic machine hardware */
@@ -744,7 +755,7 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
-	MDRV_MACHINE_RESET( dc )
+	MDRV_MACHINE_RESET( naomi )
 
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
@@ -760,6 +771,12 @@ static MACHINE_DRIVER_START( naomi )
 
 	MDRV_VIDEO_START(dc)
 	MDRV_VIDEO_UPDATE(dc)
+
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SOUND_ADD(AICA, 0)
+	MDRV_SOUND_CONFIG(aica_interface)
+	MDRV_SOUND_ROUTE(0, "left", 2.0)
+	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
