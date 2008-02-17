@@ -14,6 +14,7 @@ WRITE8_HANDLER( m52_bg2xpos_w );
 WRITE8_HANDLER( m52_bg2ypos_w );
 WRITE8_HANDLER( m52_bgcontrol_w );
 WRITE8_HANDLER( m52_flipscreen_w );
+WRITE8_HANDLER( alpha1v_flipscreen_w );
 WRITE8_HANDLER( m52_videoram_w );
 WRITE8_HANDLER( m52_colorram_w );
 

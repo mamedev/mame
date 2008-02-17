@@ -270,14 +270,24 @@ WRITE8_HANDLER( m52_bgcontrol_w )
 
 
 
+/*************************************
+ *
+ *  Outputs
+ *
+ *************************************/
+
 WRITE8_HANDLER( m52_flipscreen_w )
 {
+	/* screen flip is handled both by software and hardware */
+	flip_screen_set((data & 0x01) ^ (~readinputportbytag("DSW2") & 0x01));
+
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x20);
+}
 
-	/* screen flip is handled both by software and hardware */
-
-	flip_screen_set((data ^ ~readinputport(4)) & 1);
+WRITE8_HANDLER( alpha1v_flipscreen_w )
+{
+	flip_screen_set(data & 0x01);
 }
 
 
@@ -332,7 +342,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	fillbitmap(bitmap, machine->pens[machine->gfx[image]->color_base + 3], &rect);
+	fillbitmap(bitmap, machine->remapped_colortable[machine->gfx[image]->color_base + 3], &rect);
 }
 
 

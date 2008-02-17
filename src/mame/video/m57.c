@@ -108,6 +108,12 @@ PALETTE_INIT( m57 )
 }
 
 
+/*************************************
+ *
+ *  Tilemap info callback
+ *
+ *************************************/
+
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 attr = videoram[tile_index*2 + 0];
@@ -117,12 +123,24 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
+/*************************************
+ *
+ *  Video RAM access
+ *
+ *************************************/
+
 WRITE8_HANDLER( m57_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
 
 VIDEO_START( m57 )
 {
@@ -131,12 +149,16 @@ VIDEO_START( m57 )
 }
 
 
+/*************************************
+ *
+ *  Outputs
+ *
+ *************************************/
+
 WRITE8_HANDLER( m57_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~readinputport(4) & 1;
-
-	flipscreen = data & 1;
+	flipscreen = (data & 0x01) ^ (~readinputportbytag("DSW2") & 0x01);
 	tilemap_set_flip(bg_tilemap, flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	coin_counter_w(0,data & 0x02);
@@ -144,7 +166,11 @@ WRITE8_HANDLER( m57_flipscreen_w )
 }
 
 
-
+/*************************************
+ *
+ *  Background rendering
+ *
+ *************************************/
 
 static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -154,6 +180,12 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		tilemap_set_scrollx(bg_tilemap, y, (y < 64) ? 0 : (y < 128) ? m57_scroll[64] : m57_scroll[y]);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 }
+
+/*************************************
+ *
+ *  Sprite rendering
+ *
+ *************************************/
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
@@ -191,6 +223,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
+
+/*************************************
+ *
+ *  Video update
+ *
+ *************************************/
 
 VIDEO_UPDATE( m57 )
 {

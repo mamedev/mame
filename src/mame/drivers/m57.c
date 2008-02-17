@@ -41,9 +41,14 @@
      The "new" roms have hand written labels, while those that match the current
      Tropical Angel set look to be factory labeled chips.
 
+*****************************************************************************
+
+    Locations based on m58.c driver
+
 ****************************************************************************/
 
 #include "driver.h"
+#include "iremipt.h"
 #include "m57.h"
 #include "audio/irem.h"
 
@@ -77,94 +82,109 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Port definitions
+ *  Generic port definitions
  *
  *************************************/
 
-static INPUT_PORTS_START( troangel )
+/* Same as m52, m58 and m62 (IREM Z80 hardware) */
+static INPUT_PORTS_START( m57 )
 	PORT_START_TAG("IN0")
+	/* Start 1 & 2 also restarts and freezes the game with stop mode on
+	   and are used in test mode to enter and esc the various tests */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	/* coin input must be active for 19 frames to be consistently recognized */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(19)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(19)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, "Time" )
-	PORT_DIPSETTING(    0x03, "180 160 140" )
-	PORT_DIPSETTING(    0x02, "160 140 120" )
-	PORT_DIPSETTING(    0x01, "140 120 100" )
-	PORT_DIPSETTING(    0x00, "120 100 100" )
-	PORT_DIPNAME( 0x04, 0x04, "Crash Loss Time" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x08, 0x08, "Background Sound" )
-	PORT_DIPSETTING(    0x08, "Boat Motor" )
-	PORT_DIPSETTING(    0x00, "Music" )
-	/* TODO: support the different settings which happen in Coin Mode 2 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) /* mapped on coin mode 1 */
-	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x50, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	/* settings 0x10, 0x20, 0x80, 0x90 all give 1 Coin/1 Credit */
+	/* DSW1 is so different from game to game that it isn't included here */
 
 	PORT_START_TAG("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-/* This activates a different coin mode. Look at the dip switch setting schematic */
-	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
-/* TODO: the following enables an analog accelerator input read from 0xd003 */
-/* however that is the DSW1 input so it must be multiplexed some way */
-	PORT_DIPNAME( 0x08, 0x08, "Analog Accelarator" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
+
+/*************************************
+ *
+ *  Games port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( troangel )
+	PORT_INCLUDE(m57)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP */
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_DOWN PORT_COCKTAIL */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )             /* IPT_JOYSTICK_UP   PORT_COCKTAIL */
+
+	PORT_MODIFY("DSW2")
+	/* TODO: the following enables an analog accelerator input read from 0xd003 */
+	/* however that is the DSW1 input so it must be multiplexed some way */
+	PORT_DIPNAME( 0x08, 0x08, "Analog Accelarator" ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	/* In stop mode, press 2 to stop and 1 to restart */
-	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)")
+	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)") PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Time" ) PORT_DIPLOCATION("SW1:1,2") /* table at 0x6110 - 4 * 8 bytes (B1 B2 bonus A1 A2 bonus M1 M2) */
+	PORT_DIPSETTING(    0x03, "B:180/A:160/M:140/BG:120" )
+	PORT_DIPSETTING(    0x02, "B:160/A:140/M:120/BG:100" )
+	PORT_DIPSETTING(    0x01, "B:140/A:120/M:100/BG:80" )
+	PORT_DIPSETTING(    0x00, "B:120/A:100/M:100/BG:80" )
+	PORT_DIPNAME( 0x04, 0x04, "Crash Loss Time" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x08, 0x08, "Background Sound" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "Boat Motor" )
+	PORT_DIPSETTING(    0x00, "Music" )
+	IREM_Z80_COINAGE_TYPE_2_LOC(SW1)
 INPUT_PORTS_END
 
 
@@ -303,5 +323,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, troangel,        0, m57, troangel, 0, ROT0, "Irem", "Tropical Angel", 0 )
-GAME( 1983, newtangl, troangel, m57, troangel, 0, ROT0, "Irem", "New Tropical Angel", 0 )
+GAME( 1983, troangel, 0,        m57,      troangel, 0, ROT0, "Irem", "Tropical Angel", 0 )
+GAME( 1983, newtangl, troangel, m57,      troangel, 0, ROT0, "Irem", "New Tropical Angel", 0 )

@@ -2185,6 +2185,7 @@ src/mame/includes/harddriv.h svneol=native#text/plain
 src/mame/includes/hitme.h svneol=native#text/plain
 src/mame/includes/homedata.h svneol=native#text/plain
 src/mame/includes/iqblock.h svneol=native#text/plain
+src/mame/includes/iremipt.h svneol=native#text/plain
 src/mame/includes/irobot.h svneol=native#text/plain
 src/mame/includes/itech32.h svneol=native#text/plain
 src/mame/includes/itech8.h svneol=native#text/plain
