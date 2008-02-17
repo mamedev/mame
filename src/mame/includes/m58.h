@@ -13,6 +13,7 @@ extern UINT8 *yard_score_panel_disabled;
 
 WRITE8_HANDLER( yard_videoram_w );
 WRITE8_HANDLER( yard_scroll_panel_w );
+WRITE8_HANDLER( yard_flipscreen_w );
 
 PALETTE_INIT( yard );
 VIDEO_START( yard );

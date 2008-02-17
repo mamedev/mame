@@ -10,27 +10,11 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "iremipt.h"
 #include "m58.h"
 #include "audio/irem.h"
 
 #define MASTER_CLOCK		XTAL_18_432MHz
-
-
-
-/*************************************
- *
- *  Outputs
- *
- *************************************/
-
-static WRITE8_HANDLER( yard_flipscreen_w )
-{
-	flip_screen_set((data & 0x01) ^ (~readinputport(4) & 0x01));
-
-	coin_counter_w(0, data & 0x02);
-	coin_counter_w(1, data & 0x20);
-}
-
 
 
 /*************************************
@@ -48,11 +32,13 @@ static ADDRESS_MAP_START( yard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa200, 0xa200) AM_RAM AM_BASE(&yard_scroll_x_high)
 	AM_RANGE(0xa400, 0xa400) AM_RAM AM_BASE(&yard_scroll_y_low)
 	AM_RANGE(0xa800, 0xa800) AM_RAM AM_BASE(&yard_score_panel_disabled)
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(input_port_0_r, irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_READWRITE(input_port_1_r, yard_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)
-	AM_RANGE(0xd003, 0xd003) AM_READ(input_port_3_r)
-	AM_RANGE(0xd004, 0xd004) AM_READ(input_port_4_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(yard_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
+	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
+	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")
+	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd004, 0xd004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -60,78 +46,43 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Port definitions
+ *  Generic port definitions
  *
  *************************************/
 
-static INPUT_PORTS_START( yard )
+/* Same as m52, m57 and m62 (IREM Z80 hardware) */
+static INPUT_PORTS_START( m58 )
 	PORT_START_TAG("IN0")
+	/* Start 1 & 2 also restarts and freezes the game with stop mode on
+	   and are used in test mode to enter and esc the various tests */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(19) // coin input must be active for 19 frames to be consistently recognized
+	/* coin input must be active for 19 frames to be consistently recognized */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(19)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW1:1") /* Listed as "Unused" */
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Defensive Man Pause" ) PORT_DIPLOCATION("SW1:2") /* Listed as "Unused" */
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Time Reduced by Ball Dead" ) PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, "x1.3" )
-	PORT_DIPSETTING(    0x04, "x1.5" )
-	PORT_DIPSETTING(    0x00, "x1.8" )
-    // coin mode 1
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_CONDITION("DSW2", 0x04, PORTCOND_NOTEQUALS, 0x00) PORT_DIPLOCATION("SW1:5,6,7,8")
-    PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
-    PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
-    PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0xd0, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0xe0, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x60, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x50, DEF_STR( 1C_4C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-    PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-    // coin mode 2
-    PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW2", 0x04, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("SW1:5,6")
-    PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-    PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )       PORT_CONDITION("DSW2", 0x04, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION("SW1:7,8")
-    PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	/* DSW1 is so different from game to game that it isn't included here */
 
 	PORT_START_TAG("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
@@ -143,28 +94,64 @@ static INPUT_PORTS_START( yard )
 	PORT_DIPNAME( 0x04, 0x04, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x08, "Slow Motion" ) PORT_DIPLOCATION("SW2:4") /* Listed as "Unused" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze Picture" ) PORT_DIPLOCATION("SW2:5") /* 2P Start stops gameplay, 1P Start continues */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW2:6") /* Listed as "Unused" */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( vsyard )
+/*************************************
+ *
+ *  Games port definitions
+ *
+ *************************************/
+
+static INPUT_PORTS_START( yard )
+	PORT_INCLUDE(m58)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x08, 0x08, "Slow Motion (Cheat)" ) PORT_DIPLOCATION("SW2:4") /* Listed as "Unused" */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	/* In stop mode, press 2 to stop and 1 to restart */
+	PORT_DIPNAME( 0x10, 0x10, "Stop Mode (Cheat)") PORT_DIPLOCATION("SW2:5") /* Listed as "Unused" */
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Level Select (Cheat)" ) PORT_DIPLOCATION("SW2:6") /* Listed as "Unused" */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START_TAG("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Time Reduced by Ball Dead" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, "x1.3" )
+	PORT_DIPSETTING(    0x04, "x1.5" )
+	PORT_DIPSETTING(    0x00, "x1.8" )
+	IREM_Z80_COINAGE_TYPE_1_LOC(SW1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vs10yarj )
 	PORT_INCLUDE(yard)
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Allow Continue (Vs. Mode)" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( No ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Defensive Man Pause" ) PORT_DIPLOCATION("SW1:2") /* Listed as "Unused" */
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vs10yard )
+	PORT_INCLUDE(vs10yarj)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )           /* additional test at 0x46e0 on interruption - must be 0 */
 INPUT_PORTS_END
 
 
@@ -376,7 +363,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, 10yard,        0, yard, yard,   0, ROT0, "Irem", "10-Yard Fight (World)", 0 )
-GAME( 1983, 10yardj,  10yard, yard, yard,   0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 )
-GAME( 1984, vs10yard, 10yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", 0 )
-GAME( 1984, vs10yarj, 10yard, yard, vsyard, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 )
+GAME( 1983, 10yard,   0,        yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (World)", 0 )
+GAME( 1983, 10yardj,  10yard,   yard,     yard,     0, ROT0, "Irem", "10-Yard Fight (Japan)", 0 )
+GAME( 1984, vs10yard, 10yard,   yard,     vs10yard, 0, ROT0, "Irem", "Vs 10-Yard Fight (World, 11/05/84)", 0 )
+GAME( 1984, vs10yarj, 10yard,   yard,     vs10yarj, 0, ROT0, "Irem", "Vs 10-Yard Fight (Japan)", 0 )
