@@ -246,9 +246,8 @@ WRITE16_HANDLER( afega_vram_0_w );
 WRITE16_HANDLER( afega_vram_1_w );
 //WRITE16_HANDLER( afega_palette_w );
 
-PALETTE_INIT( grdnstrm );
-
 VIDEO_START( afega );
+VIDEO_START( grdnstrm );
 VIDEO_START( firehawk );
 VIDEO_UPDATE( afega );
 VIDEO_UPDATE( redhawkb );
@@ -4962,7 +4961,7 @@ static const gfx_layout layout_16x16x4_swapped =
 };
 
 static GFXDECODE_START( grdnstrm )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8,	256*3, 16 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x8,	256*0, 1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,	256*2, 16 ) // [2] Layer 1
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,	256*1, 16 ) // [0] Sprites
 GFXDECODE_END
@@ -5055,29 +5054,10 @@ static MACHINE_DRIVER_START( grdnstrm )
 
 	/* video hardware */
 	MDRV_GFXDECODE(grdnstrm)
-	MDRV_PALETTE_LENGTH(768)
-	MDRV_COLORTABLE_LENGTH(768 + 16*256)
-
-	MDRV_PALETTE_INIT(grdnstrm)
+	MDRV_VIDEO_START(grdnstrm)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( popspops )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stagger1)
-
-	/* video hardware */
-	MDRV_GFXDECODE(grdnstrm)
-	MDRV_PALETTE_LENGTH(768)
-	MDRV_COLORTABLE_LENGTH(768 + 16*256)
-
-	MDRV_PALETTE_INIT(grdnstrm)
-
-	MDRV_VIDEO_UPDATE(bubl2000)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( bubl2000 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(grdnstrm)
@@ -5085,6 +5065,7 @@ static MACHINE_DRIVER_START( bubl2000 )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(bubl2000)
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( firehawk )
 
@@ -5107,9 +5088,7 @@ static MACHINE_DRIVER_START( firehawk )
 
 	MDRV_GFXDECODE(grdnstrm)
 	MDRV_PALETTE_LENGTH(768)
-	MDRV_COLORTABLE_LENGTH(768 + 16*256)
 
-	MDRV_PALETTE_INIT(grdnstrm)
 	MDRV_VIDEO_START(firehawk)
 	MDRV_VIDEO_UPDATE(firehawk)
 	MDRV_VIDEO_EOF(nmk)
@@ -6944,14 +6923,14 @@ GAME( 1996, airattca, airattck,ssmissin, airattck, ssmissin, ROT270, "Comad",   
 
 // afega & clones
 GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,               "Afega",    "Twin Action",                      0 )
+GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270,             "Afega",    "Stagger I (Japan)",                0 )
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270,             "Afega",    "Red Hawk (US)",                    0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,               "bootleg",  "Red Hawk (bootleg)",               0 )
-GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270,             "Afega",    "Stagger I (Japan)",                0 )
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270,             "Afega",    "Sen Jin - Guardian Storm (Korea)", 0 )
-GAME( 1998, bubl2000, 0,        bubl2000, bubl2000, bubl2000, ROT0,               "Tuning",   "Bubble 2000",                      0 ) // on a tuning board (bootleg?)
-GAME( 1998, hotbubl,  bubl2000, bubl2000, bubl2000, bubl2000, ROT0,               "Pandora",  "Hot Bubble" ,                      0 ) // on an afega board ..
+GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,               "Tuning",   "Bubble 2000",                      0 ) // on a tuning board (bootleg?)
+GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,               "Pandora",  "Hot Bubble" ,                      0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,               "Afega",    "Pop's Pop's",                      0 )
-GAME( 2000, mangchi,  0,        bubl2000, mangchi,  bubl2000, ROT0,               "Afega",    "Mang-Chi",                         0 )
+GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,               "Afega",    "Mang-Chi",                         0 )
 GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech", "Spectrum 2000 (Euro)",             0 )
 GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",      "Fire Hawk",                        0 )
 

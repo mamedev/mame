@@ -287,7 +287,7 @@ static void snes_init_ram(void)
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
 
 	/* Init Colour RAM */
-	memset( (UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE );
+	memset( (UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE + 2);
 
 	/* Init oam RAM */
 	memset( snes_oam, 0xff, SNES_OAM_SIZE );
@@ -303,7 +303,6 @@ static void snes_init_ram(void)
 
 	/* Inititialize registers/variables */
 	snes_ppu.update_windows = 1;
-	snes_ppu.update_palette = 1;
 	snes_ppu.beam.latch_vert = 0;
 	snes_ppu.beam.latch_horz = 0;
 	snes_ppu.beam.current_vert = 0;
@@ -363,7 +362,7 @@ static OPBASE_HANDLER(snes_opbase)
 MACHINE_START( snes )
 {
 	snes_vram = auto_malloc(SNES_VRAM_SIZE);
-	snes_cgram = auto_malloc(SNES_CGRAM_SIZE);
+	snes_cgram = auto_malloc(SNES_CGRAM_SIZE + 2);
 	snes_oam = auto_malloc(SNES_OAM_SIZE);
 	memory_set_opbase_handler(0, snes_opbase);
 	memory_set_opbase_handler(1, spc_opbase);
@@ -997,7 +996,6 @@ WRITE8_HANDLER( snes_w_io )
 	switch( offset )
 	{
 		case INIDISP:	/* Initial settings for screen */
-			snes_ppu.update_palette = 1;
 			break;
 		case OBSEL:		/* Object size and data area designation */
 			snes_ppu.layer[4].data = ((data & 0x3) * 0x2000) << 1;
@@ -1305,7 +1303,6 @@ WRITE8_HANDLER( snes_w_io )
 		case CGDATA:	/* Data for colour RAM */
 			((UINT8 *)snes_cgram)[cgram_address] = data;
 			cgram_address = (cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
-			snes_ppu.update_palette = 1;
 			break;
 		case W12SEL:	/* Window mask settings for BG1-2 */
 		case W34SEL:	/* Window mask settings for BG3-4 */
@@ -1344,7 +1341,7 @@ WRITE8_HANDLER( snes_w_io )
 			{
 				/* Store it in the extra space we made in the CGRAM
                  * It doesn't really go there, but it's as good a place as any. */
-				UINT8 r,g,b,fade;
+				UINT8 r,g,b;
 
 				/* Get existing value. */
 				r = snes_cgram[FIXED_COLOUR] & 0x1f;
@@ -1358,14 +1355,6 @@ WRITE8_HANDLER( snes_w_io )
 				if( data & 0x80 )
 					b = data & 0x1f;
 				snes_cgram[FIXED_COLOUR] = (r | (g << 5) | (b << 10));
-
-				/* set the palette entry, adjusting to the fade setting */
-				fade = (snes_ram[INIDISP] & 0xf) + 1;
-				r = (r * fade) >> 4;
-				g = (g * fade) >> 4;
-				b = (b * fade) >> 4;
-				/* palette hacks! */
-				((pen_t *)Machine->remapped_colortable)[FIXED_COLOUR] = ((r & 0x1f) | ((g & 0x1f) << 5) | ((b & 0x1f) << 10));
 			} break;
 		case SETINI:	/* Screen mode/video select */
 			/* FIXME: We only support line count here */

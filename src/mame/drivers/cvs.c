@@ -664,6 +664,7 @@ static INPUT_PORTS_START( cvs_registration )
 INPUT_PORTS_END
 
 
+
 /*************************************
  *
  *  Games port definitions
@@ -959,6 +960,7 @@ static INPUT_PORTS_START( huncholy )
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )                  /* always 3 lives - table at 0x4531 - 2 bytes */
 	/* DSW2 bit 5 stored at 0x1e7c - code at 0x067d - read back code at 0x2f95 */
 INPUT_PORTS_END
+
 
 
 /*************************************

@@ -435,7 +435,6 @@ struct SNES_PPU_STRUCT
 	} mode7;
 	UINT8 clipmasks[6][SNES_SCR_WIDTH + 8];
 	UINT8 update_windows;
-	UINT8 update_palette;
 	UINT8 update_offsets;
 	UINT8 mode;
 };

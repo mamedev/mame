@@ -877,37 +877,6 @@ UINT16 *afega_vram_1, *afega_scroll_1;
 
 /***************************************************************************
 
-
-                        Palette - RRRRGGGGBBBB????
-
-
-***************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-WRITE16_HANDLER( afega_palette_w )
-{
-	int r,g,b;
-	data = COMBINE_DATA(&paletteram16[offset]);
-	b = ((data & 0x00F0) >> 3 ) + ((data & 0x0002) >> 1);
-	g = ((data & 0x0F00) >> 7 ) + ((data & 0x0004) >> 2);
-	r = ((data & 0xF000) >> 11) + ((data & 0x0008) >> 3);
-	palette_set_color_rgb( Machine, offset, pal5bit(r) , pal5bit(g) , pal5bit(b) );
-}
-#endif
-
-/* This game uses 8 bit tiles, so it ignores the color codes and just
-   uses the same 256 colors for every tile */
-PALETTE_INIT( grdnstrm )
-{
-	int color, pen;
-	for( color = 0; color < 16; color++ )
-		for( pen = 0; pen < 256; pen++ )
-			colortable[color * 256 + pen + 256*3] = 256*0 + pen;
-}
-
-
-/***************************************************************************
-
                                 Tilemaps
 
     Offset:     Bits:                   Value:
@@ -949,13 +918,22 @@ static TILEMAP_MAPPER( firehawk_tilemap_scan_pages )
 
 static tilemap *tilemap_0, *tilemap_1;
 
-static TILE_GET_INFO( get_tile_info_0 )
+static TILE_GET_INFO( get_tile_info_0_4bit )
 {
 	UINT16 code = afega_vram_0[tile_index];
 	SET_TILE_INFO(
 			0,
 			code,
 			(code & 0xf000) >> 12,
+			0);
+}
+static TILE_GET_INFO( get_tile_info_0_8bit )
+{
+	UINT16 code = afega_vram_0[tile_index];
+	SET_TILE_INFO(
+			0,
+			code,
+			0,
 			0);
 }
 static TILE_GET_INFO( get_tile_info_1 )
@@ -996,7 +974,7 @@ VIDEO_START( afega )
 	memset(spriteram_old2,0,0x1000);
 
 
-	tilemap_0 = tilemap_create(	get_tile_info_0, afega_tilemap_scan_pages,
+	tilemap_0 = tilemap_create(	get_tile_info_0_4bit, afega_tilemap_scan_pages,
 
 								16,16,
 								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
@@ -1010,6 +988,27 @@ VIDEO_START( afega )
 }
 
 
+VIDEO_START( grdnstrm )
+{
+	spriteram_old = auto_malloc(0x1000);
+	spriteram_old2 = auto_malloc(0x1000);
+	memset(spriteram_old,0,0x1000);
+	memset(spriteram_old2,0,0x1000);
+
+
+	tilemap_0 = tilemap_create(	get_tile_info_0_8bit, afega_tilemap_scan_pages,
+
+								16,16,
+								TILES_PER_PAGE_X*PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*PAGES_PER_TMAP_Y);
+
+	tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_cols,
+
+								8,8,
+								32,32);
+
+	tilemap_set_transparent_pen(tilemap_1,0xf);
+}
+
 
 VIDEO_START( firehawk )
 {
@@ -1019,7 +1018,7 @@ VIDEO_START( firehawk )
 	memset(spriteram_old2,0,0x1000);
 
 
-	tilemap_0 = tilemap_create(	get_tile_info_0, firehawk_tilemap_scan_pages,
+	tilemap_0 = tilemap_create(	get_tile_info_0_8bit, firehawk_tilemap_scan_pages,
 
 								16,16,
 								TILES_PER_PAGE_X*FIREHAWK_PAGES_PER_TMAP_X,TILES_PER_PAGE_Y*FIREHAWK_PAGES_PER_TMAP_Y);
