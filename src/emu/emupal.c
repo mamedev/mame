@@ -369,6 +369,9 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	colortable_t *ctable;
 	UINT32 index;
 
+	assert(machine != NULL);
+	assert(machine->drv != NULL);
+
 	/* allocate the colortable */
 	ctable = auto_malloc(sizeof(*ctable));
 	memset(ctable, 0, sizeof(*ctable));
@@ -402,6 +405,7 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value)
 {
 	/* ensure values are within range */
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	assert(value < ctable->palentries);
 
@@ -421,6 +425,7 @@ void colortable_entry_set_value(colortable_t *ctable, UINT32 entry, UINT16 value
 
 UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry)
 {
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	return ctable->raw[entry];
 }
@@ -434,6 +439,7 @@ UINT16 colortable_entry_get_value(colortable_t *ctable, UINT32 entry)
 void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t color)
 {
 	/* ensure values are within range */
+	assert(ctable != NULL);
 	assert(entry < ctable->palentries);
 
 	/* alpha doesn't matter */
@@ -461,6 +467,7 @@ void colortable_palette_set_color(colortable_t *ctable, UINT32 entry, rgb_t colo
 
 rgb_t colortable_palette_get_color(colortable_t *ctable, UINT32 entry)
 {
+	assert(ctable != NULL);
 	assert(entry < ctable->palentries);
 	return ctable->palette[entry];
 }
@@ -479,6 +486,7 @@ UINT32 colortable_get_transpen_mask(colortable_t *ctable, const gfx_element *gfx
 	UINT32 count, bit;
 
 	/* make sure we are in range */
+	assert(ctable != NULL);
 	assert(entry < ctable->entries);
 	assert(gfx->color_depth <= 32);
 
@@ -506,11 +514,26 @@ void colortable_configure_tilemap_groups(colortable_t *ctable, tilemap *tmap, co
 {
 	int color;
 
+	assert(ctable != NULL);
+	assert(gfx != NULL);
+	assert(tmap != NULL);
 	assert(gfx->total_colors <= TILEMAP_NUM_GROUPS);
 
 	/* iterate over all colors in the tilemap */
 	for (color = 0; color < gfx->total_colors; color++)
 		tilemap_set_transmask(tmap, color, colortable_get_transpen_mask(ctable, gfx, color, transcolor), 0);
+}
+
+
+/*-------------------------------------------------
+    colortable_palette_get_size -
+    return the number of entries in a colortable
+-------------------------------------------------*/
+
+UINT32 colortable_palette_get_size(colortable_t *ctable)
+{
+	assert(ctable != NULL);
+	return ctable->palentries;
 }
 
 
