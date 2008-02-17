@@ -158,7 +158,7 @@ INLINE UINT32 arm7_cpu_read32(offs_t addr)
 
     if (addr & 3)
     {
-        result = program_read_dword_32le(addr);
+        result = program_read_dword_32le(addr & ~3);
         result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
     }
     else
