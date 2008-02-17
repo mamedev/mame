@@ -46,7 +46,7 @@ PALETTE_INIT( hcastle )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 	int i;
 
@@ -56,7 +56,7 @@ static void set_pens(running_machine *machine)
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(colortable, i >> 1, color);
 	}
 }
 
@@ -210,7 +210,7 @@ VIDEO_UPDATE( hcastle )
 {
 	static int old_pf1,old_pf2;
 
-	set_pens(machine);
+	set_pens(machine->colortable);
 
 	pf1_bankbase = 0x0000;
 	pf2_bankbase = 0x4000 * ((gfx_bank & 2) >> 1);

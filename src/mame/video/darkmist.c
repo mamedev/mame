@@ -103,7 +103,7 @@ PALETTE_INIT(darkmist)
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 	int i;
 
@@ -113,10 +113,10 @@ static void set_pens(running_machine *machine)
 		int g = pal4bit(paletteram[i | 0x000] >> 4);
 		int b = pal4bit(paletteram[i | 0x000] >> 0);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	colortable_palette_set_color(machine->colortable, 0x100, RGB_BLACK);
+	colortable_palette_set_color(colortable, 0x100, RGB_BLACK);
 }
 
 
@@ -134,7 +134,7 @@ VIDEO_UPDATE( darkmist)
 
 #define DM_GETSCROLL(n) (((darkmist_scroll[(n)]<<1)&0xff) + ((darkmist_scroll[(n)]&0x80)?1:0) +( ((darkmist_scroll[(n)-1]<<4) | (darkmist_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(machine);
+	set_pens(machine->colortable);
 
 	tilemap_set_scrollx(bgtilemap, 0, DM_GETSCROLL(0x2));
 	tilemap_set_scrolly(bgtilemap, 0, DM_GETSCROLL(0x6));

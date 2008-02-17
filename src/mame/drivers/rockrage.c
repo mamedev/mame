@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( rockrage_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(K007342_w)				/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_WRITE(K007420_w)				/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_WRITE(K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)/* palette */
+	AM_RANGE(0x2400, 0x247f) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)/* palette */
 	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)/* cause interrupt on audio CPU */
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
@@ -310,8 +310,7 @@ static MACHINE_DRIVER_START( rockrage )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(rockrage)
-	MDRV_PALETTE_LENGTH(64)
-	MDRV_COLORTABLE_LENGTH(64 + 2*16*16)
+	MDRV_PALETTE_LENGTH(64 + 2*16*16)
 
 	MDRV_PALETTE_INIT(rockrage)
 	MDRV_VIDEO_START(rockrage)

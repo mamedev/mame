@@ -48,7 +48,7 @@ PALETTE_INIT( jackal )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 	int i;
 
@@ -58,7 +58,7 @@ static void set_pens(running_machine *machine)
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(colortable, i >> 1, color);
 	}
 }
 
@@ -228,7 +228,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( jackal )
 {
-	set_pens(machine);
+	set_pens(machine->colortable);
 	draw_background(bitmap, cliprect);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;

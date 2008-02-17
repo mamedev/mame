@@ -44,7 +44,7 @@ PALETTE_INIT( labyrunr )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 	int i;
 
@@ -54,7 +54,7 @@ static void set_pens(running_machine *machine)
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine->colortable, i >> 1, color);
+		colortable_palette_set_color(colortable, i >> 1, color);
 	}
 }
 
@@ -173,7 +173,7 @@ VIDEO_UPDATE( labyrunr )
 {
 	rectangle finalclip0, finalclip1;
 
-	set_pens(machine);
+	set_pens(machine->colortable);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,get_black_pen(machine),cliprect);

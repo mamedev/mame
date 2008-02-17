@@ -4,18 +4,46 @@
 static int layer_colorbase[2];
 static int rockrage_vreg;
 
+
 PALETTE_INIT( rockrage )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
-	/* build the lookup table for sprites. Palette is dynamic. */
-	for (i = 0;i < TOTAL_COLORS(0)/2; i++){
-		COLOR(0,i) = 0x00 + (color_prom[i] & 0x0f);
-		COLOR(0,(TOTAL_COLORS(0)/2)+i) = 0x10 + (color_prom[0x100+i] & 0x0f);
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x40);
+
+	/* sprites */
+	for (i = 0x20; i < 0x40; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
+
+	/* characters */
+	for (i = 0x40; i < 0x140; i++)
+	{
+		UINT8 ctabentry;
+
+		ctabentry = (color_prom[(i - 0x40) + 0x000] & 0x0f) | 0x00;
+		colortable_entry_set_value(machine->colortable, i + 0x000, ctabentry);
+
+		ctabentry = (color_prom[(i - 0x40) + 0x100] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i + 0x100, ctabentry);
 	}
 }
+
+
+static void set_pens(colortable_t *colortable)
+{
+	int i;
+
+	for (i = 0x00; i < 0x80; i += 2)
+	{
+		UINT16 data = paletteram[i] | (paletteram[i | 1] << 8);
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+
+		colortable_palette_set_color(colortable, i >> 1, color);
+	}
+}
+
 
 /***************************************************************************
 
@@ -84,6 +112,8 @@ VIDEO_START( rockrage )
 
 VIDEO_UPDATE( rockrage )
 {
+	set_pens(machine->colortable);
+
 	K007342_tilemap_update();
 
 	K007342_tilemap_draw( bitmap,cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);

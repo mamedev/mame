@@ -1018,9 +1018,8 @@ static MACHINE_DRIVER_START( pmpoker )
 
 	MDRV_GFXDECODE(pmpoker)
 
-	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(pottnpkr)
-	MDRV_COLORTABLE_LENGTH(1024)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(pmpoker)
 	MDRV_VIDEO_UPDATE(pmpoker)
@@ -1052,8 +1051,11 @@ ROM_START( pmpoker )
 	ROM_LOAD( "1-2.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "1-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_RELOAD(					    0x0100, 0x0100 )
+	ROM_RELOAD(					    0x0200, 0x0100 )
+	ROM_RELOAD(					    0x0300, 0x0100 )
 ROM_END
 
 /*  the original goldnpkr u40_4a.bin rom is bit corrupted.
@@ -1074,8 +1076,11 @@ ROM_START( goldnpkr )
 	ROM_LOAD( "u40_4a.bin",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
 	ROM_COPY( REGION_GFX1,	0x0800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_RELOAD(					    0x0100, 0x0100 )
+	ROM_RELOAD(					    0x0200, 0x0100 )
+	ROM_RELOAD(					    0x0300, 0x0100 )
 
 /*  pmpoker                 goldnpkr
     1-4.bin                 u38_5a (1st quarter)    96.582031%  \ 1st and 2nd halves are identical.
@@ -1097,8 +1102,11 @@ ROM_START( goldnpkb )
 	ROM_LOAD( "u40.4a.bin",	0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    /* cards deck gfx, bitplane2 */
 	ROM_COPY( REGION_GFX1,	0x0800, 0x4000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the text layer rom */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_RELOAD(					    0x0100, 0x0100 )
+	ROM_RELOAD(					    0x0200, 0x0100 )
+	ROM_RELOAD(					    0x0300, 0x0100 )
 
 /*  pmpoker                 goldnpkb
     1-4.bin                 u38.5a (1st quarter)    96.582031%  \ 1st and 2nd halves are identical.
@@ -1121,8 +1129,11 @@ ROM_START( goldnpkc )	/* Golden Poker without the double up feature */
 	ROM_LOAD( "ic3_8.bin",	0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "ic5_9.bin",	0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tbp24s10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_RELOAD(					    0x0100, 0x0100 )
+	ROM_RELOAD(					    0x0200, 0x0100 )
+	ROM_RELOAD(					    0x0300, 0x0100 )
 
 /*  ic2_7.bin    1ST AND 2ND HALF IDENTICAL
     ic3_8.bin    1ST AND 2ND HALF IDENTICAL
@@ -1147,8 +1158,11 @@ ROM_START( jokerpkr )    /* a Coinmaster game?... seems to be a hack */
 	ROM_LOAD( "vp-2.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "vp-3.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+	ROM_RELOAD(				    0x0100, 0x0100 )
+	ROM_RELOAD(				    0x0200, 0x0100 )
+	ROM_RELOAD(				    0x0300, 0x0100 )
 ROM_END
 
 /* the alternative Jack Potten set is identical, but with different sized roms.
@@ -1177,8 +1191,11 @@ ROM_START( pottnpkr )
 	ROM_LOAD( "pottpok3.bin",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "pottpok2.bin",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_RELOAD(				    0x0100, 0x0100 )
+	ROM_RELOAD(				    0x0200, 0x0100 )
+	ROM_RELOAD(				    0x0300, 0x0100 )
 ROM_END
 
 /*pottpok4.bin                                                 0xxxxxxxxxx = 0x00
@@ -1205,8 +1222,11 @@ ROM_START( pottnpkb )
 	ROM_LOAD( "517.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
 	ROM_LOAD( "517.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
 
-	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "517_mb7052.9c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+	ROM_RELOAD(				    0x0100, 0x0100 )
+	ROM_RELOAD(				    0x0200, 0x0100 )
+	ROM_RELOAD(				    0x0300, 0x0100 )
 ROM_END
 
 
@@ -1230,7 +1250,7 @@ GAMEL( 1981, pmpoker,  0,        pmpoker,  pmpoker,  pmpoker,  ROT0,   "PlayMan"
 GAMEL( 1981, goldnpkr, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Big Boy)",  GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 1981, goldnpkb, pmpoker,  pmpoker,  goldnpkr, pmpoker,  ROT0,   "Bonanza Enterprises, Ltd",       "Golden Poker Double Up (Mini Boy)", GAME_NO_SOUND ,layout_goldnpkr )
 GAMEL( 1981, goldnpkc, pmpoker,  pmpoker,  goldnpkc, pmpoker,  ROT0,   "Bootleg",                        "Golden Poker (no double up)",       GAME_NO_SOUND ,layout_goldnpkr )
-GAMEL( 198?, jokerpkr, pmpoker,  jokerpkr, jokerpkr, pmpoker,  ROT0,   "Bootleg in Coinmaster hardware", "Joker-Poker",                       GAME_NO_SOUND ,layout_pottnpkr )
+GAMEL( 198?, jokerpkr, pmpoker,  jokerpkr, jokerpkr, pmpoker,  ROT0,   "Bootleg on Coinmaster hardware", "Joker-Poker",                       GAME_NO_SOUND ,layout_pottnpkr )
 GAMEL( 198?, pottnpkr, pmpoker,  jokerpkr, pottnpkr, pmpoker,  ROT0,   "Bootleg",                        "Jack Potten's Poker (bootleg)",     GAME_NO_SOUND ,layout_pottnpkr )
 GAMEL( 198?, pottnpkb, pmpoker,  jokerpkr, goldnpkc, pmpoker,  ROT0,   "Bootleg",                        "Jack Potten's Poker (bootleg2)",    GAME_NO_SOUND ,layout_pottnpkr )
 

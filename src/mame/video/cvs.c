@@ -87,7 +87,7 @@ PALETTE_INIT( cvs )
 }
 
 
-static void set_pens(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 	int i;
 
@@ -97,7 +97,7 @@ static void set_pens(running_machine *machine)
 		int g = pal3bit(~cvs_palette_ram[i] >> 2);
 		int b = pal3bit(~cvs_palette_ram[i] >> 5);
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(colortable, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -214,7 +214,7 @@ VIDEO_UPDATE( cvs )
 	mame_bitmap *s2636_1_bitmap;
 	mame_bitmap *s2636_2_bitmap;
 
-	set_pens(machine);
+	set_pens(machine->colortable);
 
 	/* create our background character set, which is a software
        selectable mixture of RAM and ROM based tiles */

@@ -6490,7 +6490,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 		if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
 	}
 
-	pal_ptr    = machine->remapped_colortable;
+	pal_ptr    = machine->pens;
 	src_gfx    = machine->gfx[K056832_gfxnum];
 	src_base   = src_gfx->gfxdata;
 	src_pitch  = src_gfx->line_modulo;
@@ -8285,7 +8285,7 @@ void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = machine->remapped_colortable + (colorbase << 4) % machine->drv->total_colors;
+	pal_base = machine->pens + (colorbase << 4) % machine->drv->total_colors;
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos<=line_end; linedata_offs+=linedata_adv, line_pos++)

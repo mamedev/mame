@@ -441,8 +441,8 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( popeye )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,      0, 16 )	/* chars */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*2, 64 )	/* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,        16, 16 )	/* chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16+16*2, 64 )	/* sprites */
 GFXDECODE_END
 
 
@@ -495,8 +495,7 @@ static MACHINE_DRIVER_START( skyskipr )
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
 	MDRV_GFXDECODE(popeye)
-	MDRV_PALETTE_LENGTH(16+16+256)
-	MDRV_COLORTABLE_LENGTH(16*2+64*4)
+	MDRV_PALETTE_LENGTH(16+16*2+64*4)
 
 	MDRV_PALETTE_INIT(popeye)
 	MDRV_VIDEO_START(skyskipr)
