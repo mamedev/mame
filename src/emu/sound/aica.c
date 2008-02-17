@@ -430,7 +430,7 @@ void InitADPCM(int *PrevSignal, int *PrevQuant)
 	*PrevQuant=0x7f;
 }
 
-signed short inline DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
+signed short INLINE DecodeADPCM(int *PrevSignal, unsigned char Delta, int *PrevQuant)
 {
 	*PrevSignal+=(*PrevQuant*quant_mul[Delta&15])>>(3);
 	*PrevSignal=ICLIP16(*PrevSignal);
@@ -538,22 +538,22 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 		float PAN=1.0;
 		float LPAN,RPAN;
 
-		if(iTL&0x01) SegaDB-=0.4;
-		if(iTL&0x02) SegaDB-=0.8;
-		if(iTL&0x04) SegaDB-=1.5;
-		if(iTL&0x08) SegaDB-=3;
-		if(iTL&0x10) SegaDB-=6;
-		if(iTL&0x20) SegaDB-=12;
-		if(iTL&0x40) SegaDB-=24;
-		if(iTL&0x80) SegaDB-=48;
+		if(iTL&0x01) SegaDB-=0.4f;
+		if(iTL&0x02) SegaDB-=0.8f;
+		if(iTL&0x04) SegaDB-=1.5f;
+		if(iTL&0x08) SegaDB-=3.0f;
+		if(iTL&0x10) SegaDB-=6.0f;
+		if(iTL&0x20) SegaDB-=12.0f;
+		if(iTL&0x40) SegaDB-=24.0f;
+		if(iTL&0x80) SegaDB-=48.0f;
 
 		TL=pow(10.0,SegaDB/20.0);
 
 		SegaDB=0;
-		if(iPAN&0x1) SegaDB-=3;
-		if(iPAN&0x2) SegaDB-=6;
-		if(iPAN&0x4) SegaDB-=12;
-		if(iPAN&0x8) SegaDB-=24;
+		if(iPAN&0x1) SegaDB-=3.0f;
+		if(iPAN&0x2) SegaDB-=6.0f;
+		if(iPAN&0x4) SegaDB-=12.0f;
+		if(iPAN&0x8) SegaDB-=24.0f;
 
 		if((iPAN&0xf)==0xf) PAN=0.0;
 		else PAN=pow(10.0,SegaDB/20.0);

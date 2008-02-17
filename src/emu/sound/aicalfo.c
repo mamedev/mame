@@ -27,10 +27,10 @@ struct _LFO
 
 static int PLFO_TRI[256],PLFO_SQR[256],PLFO_SAW[256],PLFO_NOI[256];
 static int ALFO_TRI[256],ALFO_SQR[256],ALFO_SAW[256],ALFO_NOI[256];
-static float LFOFreq[32]={0.17,0.19,0.23,0.27,0.34,0.39,0.45,0.55,0.68,0.78,0.92,1.10,1.39,1.60,1.87,2.27,
-			  2.87,3.31,3.92,4.79,6.15,7.18,8.60,10.8,14.4,17.2,21.5,28.7,43.1,57.4,86.1,172.3};
-static float ASCALE[8]={0.0,0.4,0.8,1.5,3.0,6.0,12.0,24.0};
-static float PSCALE[8]={0.0,7.0,13.5,27.0,55.0,112.0,230.0,494};
+static const float LFOFreq[32]={0.17f,0.19f,0.23f,0.27f,0.34f,0.39f,0.45f,0.55f,0.68f,0.78f,0.92f,1.10f,1.39f,1.60f,1.87f,2.27f,
+			  2.87f,3.31f,3.92f,4.79f,6.15f,7.18f,8.60f,10.8f,14.4f,17.2f,21.5f,28.7f,43.1f,57.4f,86.1f,172.3f};
+static const float ASCALE[8]={0.0f,0.4f,0.8f,1.5f,3.0f,6.0f,12.0f,24.0f};
+static const float PSCALE[8]={0.0f,7.0f,13.5f,27.0f,55.0f,112.0f,230.0f,494.0f};
 static int PSCALES[8][256];
 static int ASCALES[8][256];
 
