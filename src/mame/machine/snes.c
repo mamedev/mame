@@ -287,7 +287,7 @@ static void snes_init_ram(void)
 	memset( snes_vram, 0, SNES_VRAM_SIZE );
 
 	/* Init Colour RAM */
-	memset( (UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE + 2);
+	memset( (UINT8 *)snes_cgram, 0, SNES_CGRAM_SIZE);
 
 	/* Init oam RAM */
 	memset( snes_oam, 0xff, SNES_OAM_SIZE );
@@ -362,7 +362,7 @@ static OPBASE_HANDLER(snes_opbase)
 MACHINE_START( snes )
 {
 	snes_vram = auto_malloc(SNES_VRAM_SIZE);
-	snes_cgram = auto_malloc(SNES_CGRAM_SIZE + 2);
+	snes_cgram = auto_malloc(SNES_CGRAM_SIZE);
 	snes_oam = auto_malloc(SNES_OAM_SIZE);
 	memory_set_opbase_handler(0, snes_opbase);
 	memory_set_opbase_handler(1, spc_opbase);
