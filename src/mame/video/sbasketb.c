@@ -7,8 +7,9 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "video/resnet.h"
 
-//UINT8 *sbasketb_scroll;
+UINT8 *sbasketb_scroll;
 UINT8 *sbasketb_palettebank;
 UINT8 *sbasketb_spriteram_select;
 
@@ -31,54 +32,69 @@ static tilemap *bg_tilemap;
 ***************************************************************************/
 PALETTE_INIT( sbasketb )
 {
+	static const int resistances[4] = { 2000, 1000, 470, 220 };
+	double rweights[4], gweights[4], bweights[4];
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			4, resistances, rweights, 1000, 0,
+			4, resistances, gweights, 1000, 0,
+			4, resistances, bweights, 1000, 0);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
+		/* red component */
+		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
+		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->drv->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->drv->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		/* green component */
+		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
+		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		/* blue component */
+		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
+		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
-	/* color_prom now points to the beginning of the character lookup table */
+	/* color_prom now points to the beginning of the lookup table,*/
+	color_prom += 0x300;
 
-
-	/* characters use colors 240-255 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = (*(color_prom++) & 0x0f) + 240;
+	/* characters use colors 0xf0-0xff */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0xf0;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
 	/* sprites use colors 0-256 (?) in 16 banks */
-	for (i = 0;i < TOTAL_COLORS(1)/16;i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		int j;
 
-
-		for (j = 0;j < 16;j++)
-			COLOR(1,i + j * TOTAL_COLORS(1)/16) = (*color_prom & 0x0f) + 16 * j;
-
-		color_prom++;
+		for (j = 0; j < 0x10; j++)
+		{
+			UINT8 ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
+			colortable_entry_set_value(machine->colortable, 0x100 + ((j << 8) | i), ctabentry);
+		}
 	}
 }
 
@@ -103,16 +119,6 @@ WRITE8_HANDLER( sbasketb_flipscreen_w )
 	}
 }
 
-WRITE8_HANDLER( sbasketb_scroll_w )
-{
-	int col;
-
-	for (col = 6; col < 32; col++)
-	{
-		tilemap_set_scrolly(bg_tilemap, col, data);
-	}
-}
-
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index] + ((colorram[tile_index] & 0x20) << 3);
@@ -124,8 +130,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( sbasketb )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
@@ -167,6 +172,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( sbasketb )
 {
+	int col;
+
+	for (col = 6; col < 32; col++)
+	{
+		tilemap_set_scrolly(bg_tilemap, col, *sbasketb_scroll);
+	}
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;

@@ -153,6 +153,7 @@ int seta_tiles_offset;
 UINT16 *seta_vram_0, *seta_vctrl_0;
 UINT16 *seta_vram_2, *seta_vctrl_2;
 UINT16 *seta_vregs;
+size_t seta_paletteram_size;
 
 UINT16 *seta_workram; // Used for zombraid crosshair hack
 
@@ -562,11 +563,15 @@ VIDEO_START( oisipuzl_2_layers )
 PALETTE_INIT( blandia )
 {
 	int color, pen;
-	for( color = 0; color < 32; color++ )
-		for( pen = 0; pen < 64; pen++ )
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x600);
+
+	for (color = 0; color < 0x20; color++)
+		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable[color * 64 + pen + 16*32]       = (pen % 16) + color * 0x10 + 16*32*1;
-			colortable[color * 64 + pen + 16*32+64*32] = pen        + 16*32*2;
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + ((color << 4) | (pen & 0x0f)));
+			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x400 + pen);
 		}
 }
 
@@ -577,11 +582,15 @@ PALETTE_INIT( blandia )
 PALETTE_INIT( gundhara )
 {
 	int color, pen;
-	for( color = 0; color < 32; color++ )
-		for( pen = 0; pen < 64; pen++ )
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x600);
+
+	for (color = 0; color < 0x20; color++)
+		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable[color * 64 + pen + 32*16 + 32*64*0] = (((color&~3) * 16 + pen)%(32*16)) + 32*16*2;
-			colortable[color * 64 + pen + 32*16 + 32*64*1] = (((color&~3) * 16 + pen)%(32*16)) + 32*16*1;
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
 
@@ -591,11 +600,15 @@ PALETTE_INIT( gundhara )
 PALETTE_INIT( jjsquawk )
 {
 	int color, pen;
-	for( color = 0; color < 32; color++ )
-		for( pen = 0; pen < 64; pen++ )
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x600);
+
+	for (color = 0; color < 0x20; color++)
+		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable[color * 64 + pen + 32*16 + 32*64*0] = ((color * 16 + pen)%(32*16)) + 32*16*2;
-			colortable[color * 64 + pen + 32*16 + 32*64*1] = ((color * 16 + pen)%(32*16)) + 32*16*1;
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
 		}
 }
 
@@ -604,9 +617,13 @@ PALETTE_INIT( jjsquawk )
 PALETTE_INIT( zingzip )
 {
 	int color, pen;
-	for( color = 0; color < 32; color++ )
-		for( pen = 0; pen < 64; pen++ )
-			colortable[color * 64 + pen + 32*16*2] = ((color * 16 + pen)%(32*16)) + 32*16*2;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x600);
+
+	for (color = 0; color < 0x20; color++)
+		for (pen = 0; pen < 0x40; pen++)
+			colortable_entry_set_value(machine->colortable, 0x400 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
 }
 
 // color prom
@@ -625,24 +642,75 @@ PALETTE_INIT( usclssic )
 	int color, pen;
 	int x;
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x400);
+
 	/* DECODE PROM */
-	for (x = 0x000; x < 0x200 ; x++)
+	for (x = 0; x < 0x200 ; x++)
 	{
-		int data;
+		UINT16 data = (color_prom[x*2] <<8) | color_prom[x*2+1];
 
-		data = (color_prom[x*2] <<8) | color_prom[x*2+1];
+		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-		if (x>=0x100) palette_set_color_rgb(machine,x,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-		else palette_set_color_rgb(machine,x+0x300,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+		if (x >= 0x100)
+			colortable_palette_set_color(machine->colortable, x + 0x000, color);
+		else
+			colortable_palette_set_color(machine->colortable, x + 0x300, color);
 	}
 
-	for( color = 0; color < 32; color++ )
-		for( pen = 0; pen < 64; pen++ )
-			colortable[color * 64 + pen + 512] =  ((((color & 0x1f) * 16 + pen)%512)+512);
-
+	for (color = 0; color < 0x20; color++)
+		for (pen = 0; pen < 0x40; pen++)
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
 }
 
 
+static void set_pens_no_colortable(running_machine *machine)
+{
+	offs_t i;
+
+	for (i = 0; i < seta_paletteram_size / 2; i++)
+	{
+		UINT16 data = paletteram16[i];
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+
+		palette_set_color(machine, i, color);
+	}
+}
+
+
+static void set_pens_colortable(colortable_t *colortable)
+{
+	offs_t i;
+	int palette_size = colortable_palette_get_size(colortable);
+
+	for (i = 0; i < palette_size; i++)
+	{
+		UINT16 data = paletteram16[i];
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+
+		colortable_palette_set_color(colortable, i, color);
+	}
+}
+
+
+static void usclssic_set_pens(colortable_t *colortable)
+{
+	offs_t i;
+
+	for (i = 0; i < 0x200; i++)
+	{
+		UINT16 data = paletteram16[i];
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+
+		if (i >= 0x100)
+			colortable_palette_set_color(colortable, i - 0x100, color);
+		else
+			colortable_palette_set_color(colortable, i + 0x200, color);
+	}
+}
 
 
 
@@ -832,6 +900,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 /* For games without tilemaps */
 VIDEO_UPDATE( seta_no_layers )
 {
+	set_pens_no_colortable(machine);
 	fillbitmap(bitmap,machine->pens[0x1f0],cliprect);
 	draw_sprites(machine,bitmap,cliprect);
 	return 0;
@@ -839,7 +908,7 @@ VIDEO_UPDATE( seta_no_layers )
 
 
 /* For games with 1 or 2 tilemaps */
-VIDEO_UPDATE( seta )
+static VIDEO_UPDATE( seta_layers )
 {
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1, y_0, y_1;
@@ -971,4 +1040,25 @@ if (input_code_pressed(KEYCODE_Z))
 		}
 	}
 	return 0;
+}
+
+
+VIDEO_UPDATE( seta )
+{
+	set_pens_colortable(machine->colortable);
+	return VIDEO_UPDATE_CALL(seta_layers);
+}
+
+
+VIDEO_UPDATE( usclssic )
+{
+	usclssic_set_pens(machine->colortable);
+	return VIDEO_UPDATE_CALL(seta_layers);
+}
+
+
+VIDEO_UPDATE( inttoote )
+{
+	/* no palette to set */
+	return VIDEO_UPDATE_CALL(seta_layers);
 }

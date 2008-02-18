@@ -11,6 +11,7 @@
 extern UINT16 *seta_vram_0, *seta_vctrl_0;
 extern UINT16 *seta_vram_2, *seta_vctrl_2;
 extern UINT16 *seta_vregs;
+extern size_t seta_paletteram_size;
 
 extern UINT16 *seta_workram; // Needed for zombraid Crosshair hack
 
@@ -39,6 +40,8 @@ VIDEO_START( oisipuzl_2_layers );
 
 VIDEO_UPDATE( seta );
 VIDEO_UPDATE( seta_no_layers );
+VIDEO_UPDATE( usclssic );
+VIDEO_UPDATE( inttoote );
 
 
 /*----------- defined in video/seta2.c -----------*/

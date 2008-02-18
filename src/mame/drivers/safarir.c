@@ -86,6 +86,7 @@ static WRITE8_HANDLER( ram_bank_w )
 }
 
 
+
 /*************************************
  *
  *  Video system
@@ -114,12 +115,10 @@ static PALETTE_INIT( safarir )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->drv->total_colors / 2; i++)
 	{
-		palette_set_color_rgb(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
-
-		colortable[(i * 2) + 0] = 0;
-		colortable[(i * 2) + 1] = i;
+		palette_set_color(machine, (i * 2) + 0, RGB_BLACK);
+		palette_set_color(machine, (i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
 	}
 }
 
@@ -272,9 +271,8 @@ static MACHINE_DRIVER_START( safarir )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_START(safarir)
 	MDRV_VIDEO_UPDATE(safarir)
-	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(safarir)
-	MDRV_COLORTABLE_LENGTH(2*8)
+	MDRV_PALETTE_LENGTH(2*8)
 	MDRV_GFXDECODE(safarir)
 
 	MDRV_SCREEN_ADD("main", 0)

@@ -1600,7 +1600,7 @@ static ADDRESS_MAP_START( tndrcade_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(MWA16_NOP						)	// ? 0
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(MWA16_NOP						)	// ? 0 / 1 (sub cpu related?)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP						)	// ? 0 / 1
-	AM_RANGE(0x380000, 0x3803ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x380000, 0x3803ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(MWA16_RAM						)	// ? $4000
 	AM_RANGE(0x600000, 0x600607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0x800000, 0x800007) AM_WRITE(sub_ctrl_w					)	// Sub CPU Control?
@@ -1637,7 +1637,7 @@ static ADDRESS_MAP_START( downtown_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP 					)	// IRQ enable/acknowledge?
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(twineagl_tilebank_w			)	// special tile banking to animate water in twineagl
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(MWA16_NOP						)	// ?
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM Ctrl
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM
 	AM_RANGE(0xa00000, 0xa00007) AM_WRITE(sub_ctrl_w					)	// Sub CPU Control?
@@ -1711,7 +1711,7 @@ static ADDRESS_MAP_START( calibr50_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(MWA16_RAM						)	// NVRAM
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP						)	// ? (random value)
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(MWA16_NOP						)	// ?
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM Ctrl
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM
 	AM_RANGE(0x904000, 0x904fff) AM_WRITE(MWA16_RAM						)	//
@@ -1773,20 +1773,6 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 	}
 }
 
-/* palette can probably be handled in a better way (better colortable / palette init..) */
-
-INLINE void usc_changecolor_xRRRRRGGGGGBBBBB(pen_t color,int data)
-{
-	if (color>=0x100) palette_set_color_rgb(Machine,color-0x100,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-	else palette_set_color_rgb(Machine,color+0x200,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
-}
-
-static WRITE16_HANDLER( usclssic_paletteram16_xRRRRRGGGGGBBBBB_word_w )
-{
-	COMBINE_DATA(&paletteram16[offset]);
-	usc_changecolor_xRRRRRGGGGGBBBBB(offset,paletteram16[offset]);
-}
-
 
 static ADDRESS_MAP_START( usclssic_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM					)	// ROM
@@ -1813,7 +1799,7 @@ static ADDRESS_MAP_START( usclssic_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_RAM						)	// ? $4000
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM Ctrl
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(usclssic_paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xb40000, 0xb40001) AM_WRITE(usclssic_lockout_w			)	// Coin Lockout + Tiles Banking
 	AM_RANGE(0xb40010, 0xb40011) AM_WRITE(calibr50_soundlatch_w			)	// To Sub CPU
 	AM_RANGE(0xb40018, 0xb40019) AM_WRITE(watchdog_reset16_w			)	// Watchdog
@@ -1851,7 +1837,7 @@ static ADDRESS_MAP_START( atehate_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(MWA16_NOP					)	// ? watchdog ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP					)	// ? 0 (irq ack lev 2?)
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(MWA16_NOP					)	// ? (end of lev 1: bit 4 goes 1,0,1)
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xa00000, 0xa00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xe00000, 0xe03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
@@ -1893,7 +1879,7 @@ static ADDRESS_MAP_START( blandia_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(MWA16_RAM						)	// RAM (wrofaero only?)
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM						)	// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x800000, 0x800607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0x880000, 0x880001) AM_WRITE(MWA16_RAM						)	// ? 0xc000
@@ -1948,7 +1934,7 @@ static ADDRESS_MAP_START( blandiap_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(MWA16_RAM						)	// RAM (wrofaero only?)
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM						)	// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(MWA16_RAM						)	// (jjsquawk)
@@ -2044,7 +2030,7 @@ static ADDRESS_MAP_START( wrofaero_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(MWA16_RAM						)	// RAM (wrofaero only?)
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM						)	// (rezon,jjsquawk)
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(MWA16_RAM						)	// (jjsquawk)
@@ -2095,7 +2081,7 @@ static ADDRESS_MAP_START( orbs_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8000f0, 0x8000f1) AM_WRITE(MWA16_RAM					)	// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(MWA16_RAM					)	// NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(seta_sound_word_w			)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xe00000, 0xe00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -2132,7 +2118,7 @@ static ADDRESS_MAP_START( blockcar_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(MWA16_NOP					)	// ? 0/1 (IRQ acknowledge?)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs	)	// Coin Lockout + Sound Enable (bit 4?)
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(seta_sound_word_w			)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xe00000, 0xe00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -2173,7 +2159,7 @@ static ADDRESS_MAP_START( daioh_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM						)	// RAM
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM						)
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(MWA16_RAM						)	//
@@ -2220,7 +2206,7 @@ static ADDRESS_MAP_START( drgnunit_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(MWA16_NOP						)	// Watchdog
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP						)	// ? IRQ Ack
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM Ctrl
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM
 	AM_RANGE(0x904000, 0x90ffff) AM_WRITE(MWA16_NOP						)	// unused (qzkklogy)
@@ -2268,7 +2254,7 @@ static ADDRESS_MAP_START( extdwnhl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(watchdog_reset16_w			)	// Watchdog (sokonuke)
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
 	AM_RANGE(0x500004, 0x500007) AM_WRITE(MWA16_NOP						)	// IRQ Ack (sokonuke)
-	AM_RANGE(0x600400, 0x600fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x600400, 0x600fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x601000, 0x610bff) AM_WRITE(MWA16_RAM						)	//
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(MWA16_RAM						)	//
@@ -2317,7 +2303,7 @@ static ADDRESS_MAP_START( kamenrid_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(MWA16_NOP						)	// ?
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM						)	// Palette RAM (tested)
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x703fff) AM_WRITE(MWA16_RAM	)	// Palette
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x804000, 0x807fff) AM_WRITE(MWA16_RAM	)	// tested
@@ -2361,7 +2347,7 @@ static ADDRESS_MAP_START( madshark_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(watchdog_reset16_w			)	// Watchdog
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITE(MWA16_NOP						)	// ?
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
@@ -2433,7 +2419,7 @@ static ADDRESS_MAP_START( krzybowl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8000f0, 0x8000f1) AM_WRITE(MWA16_RAM					)	// NVRAM
 	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(MWA16_RAM					)	// NVRAM
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(seta_sound_word_w			)	// Sound
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xe00000, 0xe00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -2486,7 +2472,7 @@ static ADDRESS_MAP_START( msgundam_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(MWA16_NOP						)	// Lev 2 IRQ Ack
 	AM_RANGE(0x400004, 0x400005) AM_WRITE(MWA16_NOP						)	// Lev 4 IRQ Ack
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(msgundam_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x800607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0x880000, 0x880001) AM_WRITE(MWA16_RAM						)	// ? 0x4000
 	AM_RANGE(0x900000, 0x903fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
@@ -2544,7 +2530,7 @@ static ADDRESS_MAP_START( oisipuzl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITE(MWA16_RAM						)	// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2		)	// Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2588,7 +2574,7 @@ static ADDRESS_MAP_START( triplfun_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITE(MWA16_RAM						)	// ? 0x4000
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2		)	// Sprites Code + X + Attr
-	AM_RANGE(0xc00400, 0xc00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xc00400, 0xc00fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2651,7 +2637,7 @@ static ADDRESS_MAP_START( kiwame_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2		)	// Sprites Code + X + Attr
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_RAM						)	// ? 0x4000
 	AM_RANGE(0xa00000, 0xa00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16		)	// Sprites Y
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(seta_sound_word_w				)	// Sound
 ADDRESS_MAP_END
 
@@ -2698,7 +2684,7 @@ static ADDRESS_MAP_START( thunderl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_NOP					)	// ?
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w		)	// Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs	)	// Coin Lockout
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xd00000, 0xd00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
 	AM_RANGE(0xe00000, 0xe03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
@@ -2758,7 +2744,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( umanclub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM					)	// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA16_RAM					)	// RAM
-	AM_RANGE(0x300000, 0x3003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x300000, 0x3003ff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x300400, 0x300fff) AM_WRITE(MWA16_RAM					)	//
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(MWA16_NOP					)	// ? (end of lev 2)
 	AM_RANGE(0x400004, 0x400005) AM_WRITE(MWA16_NOP					)	// ? (end of lev 2)
@@ -2802,7 +2788,7 @@ static ADDRESS_MAP_START( utoukond_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM						)	// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA16_RAM						)	// ROM
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// ? Coin Lockout + Video Registers
-	AM_RANGE(0x700400, 0x700fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x700400, 0x700fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
 	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(MWA16_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
@@ -3067,7 +3053,7 @@ static ADDRESS_MAP_START( pairlove_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs	)	// Coin Lockout + Sound Enable (bit 4?)
 	AM_RANGE(0x900000, 0x9001ff) AM_WRITE(pairlove_prot_w)
 	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(seta_sound_word_w			)	// Sound
-	AM_RANGE(0xb00000, 0xb00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0xb00000, 0xb00fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2	)	// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(MWA16_RAM					)	// ? 0x4000
 	AM_RANGE(0xe00000, 0xe00607) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -3091,7 +3077,7 @@ static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x610006, 0x610007) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP	// protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
-	AM_RANGE(0x640400, 0x640fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x640400, 0x640fff) AM_WRITE(MWA16_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
 	AM_RANGE(0x650000, 0x650001) AM_WRITE(YM3812_control_port_0_lsb_w)
 	AM_RANGE(0x650002, 0x650003) AM_WRITE(YM3812_write_port_0_lsb_w)
 	AM_RANGE(0x658000, 0x658001) AM_WRITE(OKIM6295_data_0_lsb_w)
@@ -6867,12 +6853,11 @@ static MACHINE_DRIVER_START( usclssic )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(usclssic)
-	MDRV_PALETTE_LENGTH(16*32+0x200)
-	MDRV_COLORTABLE_LENGTH(16*32 + 64*32)		/* sprites, layer */
+	MDRV_PALETTE_LENGTH(16*32 + 64*32)		/* sprites, layer */
 
 	MDRV_PALETTE_INIT(usclssic)	/* layer is 6 planes deep */
 	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MDRV_VIDEO_UPDATE(usclssic)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -7035,8 +7020,7 @@ static MACHINE_DRIVER_START( blandia )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7068,8 +7052,7 @@ static MACHINE_DRIVER_START( blandiap )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7291,8 +7274,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(zingzip)			/* layer 1 gfx is 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7353,8 +7335,7 @@ static MACHINE_DRIVER_START( gundhara )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7394,8 +7375,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7547,8 +7527,7 @@ static MACHINE_DRIVER_START( madshark )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 
@@ -8008,8 +7987,7 @@ static MACHINE_DRIVER_START( zingzip )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(zingzip)				/* layer 1 gfx is 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -8088,8 +8066,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8-4, 30*8-1-4)
 	MDRV_GFXDECODE(crazyfgt)
-	MDRV_PALETTE_LENGTH(16*32+16*32+16*32)
-	MDRV_COLORTABLE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -8152,7 +8129,7 @@ static MACHINE_DRIVER_START( inttoote )
 
 	MDRV_PALETTE_INIT(inttoote)
 	MDRV_VIDEO_START(seta_1_layer)
-	MDRV_VIDEO_UPDATE(seta)
+	MDRV_VIDEO_UPDATE(inttoote)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -9557,8 +9534,8 @@ GAME( 1991, rezon,    0,        rezon,    rezon,    rezon,    ROT0,   "Allumer",
 GAME( 1992, rezont,   rezon,    rezon,    rezont,   rezon,    ROT0,   "Allumer (Taito license)","Rezon (Taito)", 0 )
 GAME( 1991, stg,      0,        drgnunit, stg,      0,        ROT270, "Athena / Tecmo",         "Strike Gunner S.T.G", 0 )
 GAME( 1991, pairlove, 0,        pairlove, pairlove, 0,        ROT270, "Athena",                 "Pairs Love", 0 )
-GAME( 1992, blandia,  0,        blandia,  blandia,  blandia,  ROT0,   "Allumer",                "Blandia", 0 )
-GAME( 1992, blandiap, blandia,  blandiap, blandia,  0,        ROT0,   "Allumer",                "Blandia (prototype)", 0 )
+GAME( 1992, blandia,  0,        blandia,  blandia,  blandia,  ROT0,   "Allumer",                "Blandia", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, blandiap, blandia,  blandiap, blandia,  0,        ROT0,   "Allumer",                "Blandia (prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, blockcar, 0,        blockcar, blockcar, 0,        ROT90,  "Visco",                  "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
 GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
 GAME( 1992, neobattl, 0,        umanclub, neobattl, 0,        ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )

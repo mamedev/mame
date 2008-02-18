@@ -22,25 +22,25 @@ MAIN BOARD:
 #include "sound/dac.h"
 
 
-extern void konami1_decode(void);
-
 extern UINT8 *sbasketb_scroll;
 extern UINT8 *sbasketb_palettebank;
 extern UINT8 *sbasketb_spriteram_select;
 
-extern WRITE8_HANDLER( sbasketb_videoram_w );
-extern WRITE8_HANDLER( sbasketb_colorram_w );
-extern WRITE8_HANDLER( sbasketb_flipscreen_w );
-extern WRITE8_HANDLER( sbasketb_scroll_w );
+void konami1_decode(void);
 
-extern PALETTE_INIT( sbasketb );
-extern VIDEO_START( sbasketb );
-extern VIDEO_UPDATE( sbasketb );
+WRITE8_HANDLER( sbasketb_videoram_w );
+WRITE8_HANDLER( sbasketb_colorram_w );
+WRITE8_HANDLER( sbasketb_flipscreen_w );
+WRITE8_HANDLER( sbasketb_scroll_w );
 
-extern WRITE8_HANDLER( konami_SN76496_latch_w );
-extern WRITE8_HANDLER( konami_SN76496_0_w );
-extern WRITE8_HANDLER( hyperspt_sound_w );
-extern READ8_HANDLER( hyperspt_sh_timer_r );
+PALETTE_INIT( sbasketb );
+VIDEO_START( sbasketb );
+VIDEO_UPDATE( sbasketb );
+
+WRITE8_HANDLER( konami_SN76496_latch_w );
+WRITE8_HANDLER( konami_SN76496_0_w );
+WRITE8_HANDLER( hyperspt_sound_w );
+READ8_HANDLER( hyperspt_sh_timer_r );
 
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c85, 0x3c85) AM_WRITE(MWA8_RAM) AM_BASE(&sbasketb_spriteram_select)
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(sbasketb_scroll_w)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(MWA8_RAM) AM_BASE(&sbasketb_scroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -255,8 +255,7 @@ static MACHINE_DRIVER_START( sbasketb )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(sbasketb)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(16*16+16*16*16)
+	MDRV_PALETTE_LENGTH(16*16+16*16*16)
 
 	MDRV_PALETTE_INIT(sbasketb)
 	MDRV_VIDEO_START(sbasketb)
