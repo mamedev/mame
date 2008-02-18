@@ -9,30 +9,82 @@ Atari Tank 8 video emulation
 #include "includes/tank8.h"
 
 
-UINT8* tank8_video_ram;
-UINT8* tank8_pos_h_ram;
-UINT8* tank8_pos_v_ram;
-UINT8* tank8_pos_d_ram;
+UINT8 *tank8_video_ram;
+UINT8 *tank8_pos_h_ram;
+UINT8 *tank8_pos_v_ram;
+UINT8 *tank8_pos_d_ram;
+UINT8 *tank8_team;
 
-static tilemap* tilemap1;
-static tilemap* tilemap2;
+static tilemap *tank8_tilemap;
 
-static mame_bitmap* helper1;
-static mame_bitmap* helper2;
-static mame_bitmap* helper3;
+static mame_bitmap *helper1;
+static mame_bitmap *helper2;
+static mame_bitmap *helper3;
 
+
+
+PALETTE_INIT( tank8 )
+{
+	int i;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x0a);
+
+	colortable_palette_set_color(machine->colortable, 8, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine->colortable, 9, MAKE_RGB(0xff, 0xff, 0xff));
+
+	for (i = 0; i < 8; i++)
+	{
+		colortable_entry_set_value(machine->colortable, 2 * i + 0, 8);
+		colortable_entry_set_value(machine->colortable, 2 * i + 1, i);
+	}
+
+	/* walls */
+	colortable_entry_set_value(machine->colortable, 0x10, 8);
+	colortable_entry_set_value(machine->colortable, 0x11, 9);
+
+	/* mines */
+	colortable_entry_set_value(machine->colortable, 0x12, 8);
+	colortable_entry_set_value(machine->colortable, 0x13, 9);
+}
+
+
+static void set_pens(colortable_t *colortable)
+{
+	if (*tank8_team & 0x01)
+	{
+		colortable_palette_set_color(colortable, 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+		colortable_palette_set_color(colortable, 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		colortable_palette_set_color(colortable, 2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
+		colortable_palette_set_color(colortable, 3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
+		colortable_palette_set_color(colortable, 4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
+		colortable_palette_set_color(colortable, 5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
+		colortable_palette_set_color(colortable, 6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
+		colortable_palette_set_color(colortable, 7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
+	}
+	else
+	{
+		colortable_palette_set_color(colortable, 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+		colortable_palette_set_color(colortable, 2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+		colortable_palette_set_color(colortable, 4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+		colortable_palette_set_color(colortable, 6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+		colortable_palette_set_color(colortable, 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		colortable_palette_set_color(colortable, 3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		colortable_palette_set_color(colortable, 5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		colortable_palette_set_color(colortable, 7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+	}
+}
 
 
 WRITE8_HANDLER( tank8_video_ram_w )
 {
 	tank8_video_ram[offset] = data;
-	tilemap_mark_tile_dirty(tilemap1, offset);
-	tilemap_mark_tile_dirty(tilemap2, offset);
+	tilemap_mark_tile_dirty(tank8_tilemap, offset);
 }
 
 
 
-static TILE_GET_INFO( tank8_get_tile_info1 )
+static TILE_GET_INFO( tank8_get_tile_info )
 {
 	UINT8 code = tank8_video_ram[tile_index];
 
@@ -40,48 +92,26 @@ static TILE_GET_INFO( tank8_get_tile_info1 )
 
 	if ((code & 0x38) == 0x28)
 	{
-		color = 9; /* walls & mines */
+		if ((code & 7) != 3)
+			color = 8; /* walls */
+		else
+			color = 9; /* mines */
 	}
 	else
 	{
 		if (tile_index & 0x010)
-		{
 			color |= 1;
-		}
+
 		if (code & 0x80)
-		{
 			color |= 2;
-		}
+
 		if (tile_index & 0x200)
-		{
 			color |= 4;
-		}
 	}
 
 	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
 
-
-static TILE_GET_INFO( tank8_get_tile_info2 )
-{
-	UINT8 code = tank8_video_ram[tile_index];
-
-	int color = 8;
-
-	if ((code & 0x38) == 0x28)
-	{
-		if ((code & 7) != 3)
-		{
-			color = 1; /* walls */
-		}
-		else
-		{
-			color = 2; /* mines */
-		}
-	}
-
-	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
-}
 
 
 VIDEO_START( tank8 )
@@ -90,13 +120,11 @@ VIDEO_START( tank8 )
 	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 	helper3 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
-	tilemap1 = tilemap_create(tank8_get_tile_info1, tilemap_scan_rows,  16, 16, 32, 32);
-	tilemap2 = tilemap_create(tank8_get_tile_info2, tilemap_scan_rows,  16, 16, 32, 32);
+	tank8_tilemap = tilemap_create(tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 
 	/* VBLANK starts on scanline #256 and ends on scanline #24 */
 
-	tilemap_set_scrolly(tilemap1, 0, 2 * 24);
-	tilemap_set_scrolly(tilemap2, 0, 2 * 24);
+	tilemap_set_scrolly(tank8_tilemap, 0, 2 * 24);
 }
 
 
@@ -112,7 +140,7 @@ static int get_y_pos(int n)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -135,7 +163,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 }
 
 
-static void draw_bullets(mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_bullets(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -162,7 +190,7 @@ static void draw_bullets(mame_bitmap* bitmap, const rectangle* cliprect)
 		if (rect.max_y > cliprect->max_y)
 			rect.max_y = cliprect->max_y;
 
-		fillbitmap(bitmap, i, &rect);
+		fillbitmap(bitmap, (i << 1) | 0x01, &rect);
 	}
 }
 
@@ -175,7 +203,8 @@ static TIMER_CALLBACK( tank8_collision_callback )
 
 VIDEO_UPDATE( tank8 )
 {
-	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
+	set_pens(machine->colortable);
+	tilemap_draw(bitmap, cliprect, tank8_tilemap, 0, 0);
 
 	draw_sprites(machine, bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
@@ -185,12 +214,12 @@ VIDEO_UPDATE( tank8 )
 
 VIDEO_EOF( tank8 )
 {
-	const rectangle* clip = &machine->screen[0].visarea;
+	const rectangle *clip = &machine->screen[0].visarea;
 
 	int x;
 	int y;
 
-	tilemap_draw(helper1, clip, tilemap2, 0, 0);
+	tilemap_draw(helper1, clip, tank8_tilemap, 0, 0);
 
 	fillbitmap(helper2, 8, clip);
 	fillbitmap(helper3, 8, clip);
@@ -207,65 +236,62 @@ VIDEO_EOF( tank8 )
 		const UINT16* p3 = BITMAP_ADDR16(helper3, y, 0);
 
 		if (y % 2 != cpu_getcurrentframe() % 2)
-		{
 			continue; /* video display is interlaced */
-		}
 
 		for (x = clip->min_x; x <= clip->max_x; x++)
 		{
 			UINT8 index;
 
-			if (p1[x] == 8)
+			/* neither wall nor mine */
+			if ((p1[x] != 0x11) && (p1[x] != 0x13))
 			{
-				state = 0; continue; /* neither wall nor mine */
-			}
-			if (p2[x] == 8 && p3[x] == 8)
-			{
-				state = 0; continue; /* neither tank nor bullet */
-			}
-			if (p3[x] != 8 && p1[x] == 2)
-			{
-				state = 0; continue; /* bullets cannot hit mines */
-			}
-
-			if (state)
-			{
+				state = 0;
 				continue;
 			}
 
+			/* neither tank nor bullet */
+			if ((p2[x] == 8) && (p3[x] == 8))
+			{
+				state = 0;
+				continue;
+			}
+
+			/* bullets cannot hit mines */
+			if ((p3[x] != 8) && (p1[x] == 0x13))
+			{
+				state = 0;
+				continue;
+			}
+
+			if (state)
+				continue;
+
 			if (p3[x] != 8)
 			{
-				index = p3[x] | 0x18;
+				index = ((p3[x] & ~0x01) >> 1) | 0x18;
 
 				if (1)
-				{
 					index |= 0x20;
-				}
+
 				if (0)
-				{
 					index |= 0x40;
-				}
+
 				if (1)
-				{
 					index |= 0x80;
-				}
 			}
 			else
 			{
-				index = p2[x] | 0x10;
+				int sprite_num = (p2[x] & ~0x01) >> 1;
+				index = sprite_num | 0x10;
 
-				if (p1[x] == 1)
-				{
+				if (p1[x] == 0x11)
 					index |= 0x20;
-				}
-				if (y - get_y_pos(p2[x]) >= 8)
-				{
+
+				if (y - get_y_pos(sprite_num) >= 8)
 					index |= 0x40; /* collision on bottom side */
-				}
-				if (x - get_x_pos(p2[x]) >= 8)
-				{
+
+				if (x - get_x_pos(sprite_num) >= 8)
 					index |= 0x80; /* collision on right side */
-				}
 			}
 
 			timer_set(video_screen_get_time_until_pos(0, y, x), NULL, index, tank8_collision_callback);

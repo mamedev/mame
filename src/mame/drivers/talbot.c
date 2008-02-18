@@ -192,36 +192,45 @@ static PALETTE_INIT( talbot )
 {
 	int i;
 
-	for (i = 0;i < 32;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
 
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
-	/* Colortable entry */
-	for(i = 0; i < 0x100; i++)
-		colortable[i] = color_prom[i];
+	/* characters map to the upper 16 palette entries */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x1f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 static MACHINE_DRIVER_START( talbot )
@@ -244,8 +253,7 @@ static MACHINE_DRIVER_START( talbot )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(talbot)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(talbot)
 	MDRV_VIDEO_START(talbot)

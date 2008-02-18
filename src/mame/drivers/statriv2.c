@@ -139,13 +139,10 @@ static PALETTE_INIT(statriv2)
 {
 	int i;
 
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine,i,pal1bit(i >> 2),pal1bit(i >> 0),pal1bit(i >> 1));
-
 	for (i = 0; i < 64; i++)
 	{
-		colortable[2*i+0] = i % 8;
-		colortable[2*i+1] = i / 8;
+		palette_set_color_rgb(machine,2*i+0,pal1bit(i >> 2),pal1bit(i >> 0),pal1bit(i >> 1));
+		palette_set_color_rgb(machine,2*i+1,pal1bit(i >> 5),pal1bit(i >> 4),pal1bit(i >> 3));
 	}
 }
 
@@ -623,8 +620,7 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
 	MDRV_GFXDECODE(statriv2)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(2*64)
+	MDRV_PALETTE_LENGTH(2*64)
 
 	MDRV_PALETTE_INIT(statriv2)
 	MDRV_VIDEO_START(statriv2)

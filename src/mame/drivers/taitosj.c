@@ -206,7 +206,6 @@ extern UINT8 *taitosj_video_priority;
 extern UINT8 *taitosj_collision_reg;
 extern UINT8 *kikstart_scrollram;
 
-PALETTE_INIT( taitosj );
 READ8_HANDLER( taitosj_gfxrom_r );
 WRITE8_HANDLER( taitosj_videoe_w );
 WRITE8_HANDLER( taitosj_characterram_w );
@@ -1782,10 +1781,10 @@ static const gfx_layout spritelayout =
 
 
 static GFXDECODE_START( taitosj )
-	GFXDECODE_ENTRY( 0, 0x9000, charlayout,   0, 16 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0, 0x9000, spritelayout, 0, 16 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0, 0xa800, charlayout,   0, 16 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( 0, 0xa800, spritelayout, 0, 16 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x9000, charlayout,   0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0x9000, spritelayout, 0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0xa800, charlayout,   0, 8 )    /* the game dynamically modifies this */
+	GFXDECODE_ENTRY( 0, 0xa800, spritelayout, 0, 8 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
 
@@ -1886,9 +1885,7 @@ static MACHINE_DRIVER_START( nomcu )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(taitosj)
 	MDRV_PALETTE_LENGTH(64)
-	MDRV_COLORTABLE_LENGTH(16*8)
 
-	MDRV_PALETTE_INIT(taitosj)
 	MDRV_VIDEO_START(taitosj)
 	MDRV_VIDEO_UPDATE(taitosj)
 

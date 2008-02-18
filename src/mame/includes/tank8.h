@@ -35,14 +35,16 @@ void tank8_set_collision(int index);
 
 /*----------- defined in video/tank8.c -----------*/
 
+PALETTE_INIT( tank8 );
 VIDEO_EOF( tank8 );
 VIDEO_START( tank8 );
 VIDEO_UPDATE( tank8 );
 
 WRITE8_HANDLER( tank8_video_ram_w );
 
-extern UINT8* tank8_video_ram;
-extern UINT8* tank8_pos_h_ram;
-extern UINT8* tank8_pos_v_ram;
-extern UINT8* tank8_pos_d_ram;
+extern UINT8 *tank8_video_ram;
+extern UINT8 *tank8_pos_h_ram;
+extern UINT8 *tank8_pos_v_ram;
+extern UINT8 *tank8_pos_d_ram;
+extern UINT8 *tank8_team;
 

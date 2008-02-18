@@ -8,7 +8,6 @@ Atari Starship 1 driver
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/starshp1.h"
 
 int starshp1_attract;
@@ -20,36 +19,6 @@ static INTERRUPT_GEN( starshp1_interrupt )
 {
 	if ((readinputport(0) & 0x90) != 0x90)
 		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
-}
-
-
-static void starshp1_write_palette(running_machine *machine, int inverse)
-{
-	palette_set_color(machine, inverse ? 7 : 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, inverse ? 6 : 1, MAKE_RGB(0x1e, 0x1e, 0x1e));
-	palette_set_color(machine, inverse ? 5 : 2, MAKE_RGB(0x4e, 0x4e, 0x4e));
-	palette_set_color(machine, inverse ? 4 : 3, MAKE_RGB(0x6c, 0x6c, 0x6c));
-	palette_set_color(machine, inverse ? 3 : 4, MAKE_RGB(0x93, 0x93, 0x93));
-	palette_set_color(machine, inverse ? 2 : 5, MAKE_RGB(0xb1, 0xb1, 0xb1));
-	palette_set_color(machine, inverse ? 1 : 6, MAKE_RGB(0xe1, 0xe1, 0xe1));
-	palette_set_color(machine, inverse ? 0 : 7, MAKE_RGB(0xff, 0xff, 0xff));
-}
-
-
-static PALETTE_INIT( starshp1 )
-{
-	static const UINT16 colortable_source[] =
-	{
-		0, 3,       /* for the alpha numerics */
-		0, 2,       /* for the sprites (Z=0) */
-		0, 5,       /* for the sprites (Z=1) */
-		0, 2, 4, 6, /* for the spaceship (EXPLODE=0) */
-		0, 6, 6, 7  /* for the spaceship (EXPLODE=1) */
-	};
-
-	starshp1_write_palette(machine, 0);
-
-	memcpy(colortable, colortable_source, sizeof(colortable_source));
 }
 
 
@@ -177,7 +146,7 @@ static WRITE8_HANDLER( starshp1_misc_w )
 		starshp1_starfield_kill = data;
 		break;
 	case 4:
-		starshp1_write_palette(Machine, data);
+		starshp1_inverse = data;
 		break;
 	case 5:
 		/* BLACK HOLE, not used */
@@ -341,8 +310,7 @@ static MACHINE_DRIVER_START( starshp1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(STARSHP1_PIXEL_CLOCK, STARSHP1_HTOTAL, STARSHP1_HBEND, STARSHP1_HBSTART, STARSHP1_VTOTAL, STARSHP1_VBEND, STARSHP1_VBSTART)
 	MDRV_GFXDECODE(starshp1)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(14)
+	MDRV_PALETTE_LENGTH(19)
 	MDRV_PALETTE_INIT(starshp1)
 
 	MDRV_VIDEO_START(starshp1)

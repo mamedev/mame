@@ -20,55 +20,6 @@ void tank8_set_collision(int index)
 }
 
 
-static void fill_palette(running_machine *machine, int team)
-{
-	if (team)
-	{
-		palette_set_color(machine,0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		palette_set_color(machine,2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		palette_set_color(machine,4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		palette_set_color(machine,6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		palette_set_color(machine,1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		palette_set_color(machine,3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		palette_set_color(machine,5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		palette_set_color(machine,7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-	}
-	else
-	{
-		palette_set_color(machine,0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-		palette_set_color(machine,1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		palette_set_color(machine,2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
-		palette_set_color(machine,3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
-		palette_set_color(machine,4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
-		palette_set_color(machine,5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
-		palette_set_color(machine,6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
-		palette_set_color(machine,7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
-	}
-}
-
-
-static PALETTE_INIT( tank8 )
-{
-	int i;
-
-	fill_palette(machine,0);
-
-	palette_set_color(machine, 8, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 9, MAKE_RGB(0xff, 0xff, 0xff));
-
-	for (i = 0; i < 8; i++)
-	{
-		colortable[2 * i + 0] = 8;
-		colortable[2 * i + 1] = i;
-	}
-
-	colortable[16] = 8;
-	colortable[17] = 8;
-	colortable[18] = 8;
-	colortable[19] = 9;
-}
-
-
 static MACHINE_RESET( tank8 )
 {
 	collision_index = 0;
@@ -83,12 +34,6 @@ static READ8_HANDLER( tank8_collision_r )
 static WRITE8_HANDLER( tank8_lockout_w )
 {
 	coin_lockout_w(offset, ~data & 1);
-}
-
-
-static WRITE8_HANDLER( tank8_team_w )
-{
-	fill_palette(Machine,~data & 1);
 }
 
 
@@ -179,7 +124,7 @@ static ADDRESS_MAP_START( tank8_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(tank8_explosion_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(tank8_bugle_w)
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(tank8_bug_w)
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(tank8_team_w)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(MWA8_RAM) AM_BASE(&tank8_team)
 	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(tank8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(tank8_motor_w)
 
@@ -377,8 +322,8 @@ static const gfx_layout tank_layout =
 static GFXDECODE_START( tank8 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_1, 0, 10 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tile_layout_2, 0, 10 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tank_layout, 0, 8 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, tank_layout, 0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tank_layout,   0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tank_layout,   0, 8 )
 GFXDECODE_END
 
 
@@ -398,8 +343,7 @@ static MACHINE_DRIVER_START( tank8 )
 	MDRV_SCREEN_SIZE(512, 524)
 	MDRV_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
 	MDRV_GFXDECODE(tank8)
-	MDRV_PALETTE_LENGTH(10)
-	MDRV_COLORTABLE_LENGTH(20)
+	MDRV_PALETTE_LENGTH(20)
 
 	MDRV_PALETTE_INIT(tank8)
 	MDRV_VIDEO_START(tank8)

@@ -55,6 +55,7 @@ extern int starshp1_phasor;
 extern int starshp1_collision_latch;
 extern int starshp1_starfield_kill;
 extern int starshp1_mux;
+extern int starshp1_inverse;
 
 READ8_HANDLER( starshp1_rng_r );
 
@@ -62,6 +63,7 @@ WRITE8_HANDLER( starshp1_sspic_w );
 WRITE8_HANDLER( starshp1_ssadd_w );
 WRITE8_HANDLER( starshp1_playfield_w );
 
+PALETTE_INIT( starshp1 );
 VIDEO_UPDATE( starshp1 );
 VIDEO_EOF( starshp1 );
 VIDEO_START( starshp1 );
