@@ -165,7 +165,7 @@ struct _AICA
 	signed short RINGBUF[64];
 	unsigned char BUFPTR;
 	unsigned char *AICARAM;
-	UINT32 AICARAM_LENGTH, RAM_MASK;
+	UINT32 AICARAM_LENGTH, RAM_MASK, RAM_MASK16;
 	char Master;
 	void (*IntARMCB)(int irq);
 	sound_stream * stream;
@@ -505,6 +505,7 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 			AICA->AICARAM += intf->roffset;
 			AICA->AICARAM_LENGTH = memory_region_length(intf->region); 
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
+			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;
 			AICA->DSP.AICARAM_LENGTH =  memory_region_length(intf->region)/2;
 		}
@@ -1013,8 +1014,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	}
 	else if(PCMS(slot) == 0) 
 	{
-		addr1=(slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK;
-		addr2=(slot->nxt_addr>>(SHIFT-1))&AICA->RAM_MASK;
+		addr1=(slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK16;
+		addr2=(slot->nxt_addr>>(SHIFT-1))&AICA->RAM_MASK16;
 	}
 	else
 	{
@@ -1262,6 +1263,7 @@ void AICA_set_ram_base(int which, void *base, int size)
 		AICA->AICARAM = base;
 		AICA->AICARAM_LENGTH = size;
 		AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
+		AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 		AICA->DSP.AICARAM = base;
 		AICA->DSP.AICARAM_LENGTH = size;
 	}
