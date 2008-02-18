@@ -493,6 +493,7 @@ Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-504
 Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
 *Slash Out                 840-0041C  23341        17         315-6213   317-0286-COM
 *Spawn                     841-0005C  22977B       10         315-6213   317-5051-COM
+Toy Fighter                840-0011B  22035        10         315-6212   317-0257-COM
 Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM
 *Zombie Revenge            840-0003C  21707        19         315-6213   317-0249-COM
 
