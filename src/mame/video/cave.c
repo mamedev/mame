@@ -62,13 +62,13 @@ UINT16 *cave_vram_3, *cave_vctrl_3;
 /* Variables only used here: */
 
 static tilemap *tilemap_0;
-static int             tiledim_0, old_tiledim_0;
+static int tiledim_0, old_tiledim_0;
 static tilemap *tilemap_1;
-static int             tiledim_1, old_tiledim_1;
+static int tiledim_1, old_tiledim_1;
 static tilemap *tilemap_2;
-static int             tiledim_2, old_tiledim_2;
+static int tiledim_2, old_tiledim_2;
 static tilemap *tilemap_3;
-static int             tiledim_3, old_tiledim_3;
+static int tiledim_3, old_tiledim_3;
 
 
 
@@ -137,82 +137,117 @@ PALETTE_INIT( dfeveron )
 {
 	int color, pen;
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x0800);
+
 	/* Fill the 0-3fff range, used by sprites ($40 color codes * $100 pens)
        Here sprites have 16 pens, but the sprite drawing routine always
        multiplies the color code by $100 (for consistency).
        That's why we need this function.    */
 
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 16; pen++ )
-			colortable[color * 256 + pen] = color * 16 + pen;
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x10; pen++)
+			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) | pen);
 }
 
 PALETTE_INIT( ddonpach )
 {
 	int color, pen;
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x8000);
+
 	/* Fill the 8000-83ff range ($40 color codes * $10 pens) for
        layers 0 & 1 which are 4 bits deep rather than 8 bits deep
        like layer 2, but use the first 16 color of every 256 for
        any given color code. */
 
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 16; pen++ )
-			colortable[color * 16 + pen + 0x8000] = 0x4000 + color * 256 + pen;
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x10; pen++)
+			colortable_entry_set_value(machine->colortable, 0x8000 | (color << 4) | pen, 0x4000 | (color << 8) | pen);
 }
 
 PALETTE_INIT( mazinger )
 {
 	int color, pen;
 
-	/* Sprites (encrypted) are 4 bit deep */
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 256; pen++ )
-			colortable[color * 256 + pen] = color * 16 + pen;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x4000);
 
-	/* Layer 0 is 6 bit deep, there are 64 color codes but only $400
+	/* sprites (encrypted) are 4 bit deep */
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x100; pen++)
+			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) + pen);	/* yes, PLUS, not OR */
+
+	/* layer 0 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 64; pen++ )
-			colortable[color * 64 + pen + 0x4400] = 0x400 + (color % (64/4)) * 64 + pen;
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x40; pen++)
+			colortable_entry_set_value(machine->colortable, 0x4400 | (color << 6) | pen, 0x400 | ((color & 0x0f) << 6) | pen);
 }
 
 PALETTE_INIT( sailormn )
 {
 	int color, pen;
 
-	/* Sprites (encrypted) are 4 bit deep */
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 256; pen++ )
-			colortable[color * 256 + pen] = color * 16 + pen;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x2000);
 
-	/* Layer 2 is 6 bit deep, there are 64 color codes but only $400
+	/* sprites (encrypted) are 4 bit deep */
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x100; pen++)
+			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) + pen);	/* yes, PLUS, not OR */
+
+	/* layer 2 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 64; pen++ )
-			colortable[color * 64 + pen + 0x4c00] = 0xc00 + (color % (64/4)) * 64 + pen;
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x40; pen++)
+			colortable_entry_set_value(machine->colortable, 0x4c00 | (color << 6) | pen, 0xc00 | ((color & 0x0f) << 6) | pen);
 }
 
 PALETTE_INIT( pwrinst2 )
 {
 	int color, pen;
 
-	for( color = 0; color < 0x80; color++ )
-		for( pen = 0; pen < 16; pen++ )
-			colortable[color * 256 + pen] = color * 16 + pen;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x2800);
 
-	for( color = 0x8000; color < machine->drv->color_table_len; color++ )
-			colortable[color] = (color - 0x8000) % machine->drv->total_colors;
+	for (color = 0; color < 0x80; color++)
+		for (pen = 0; pen < 0x10; pen++)
+			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) | pen);
+
+	for (pen = 0x8000; pen < 0xa800; pen++)
+			colortable_entry_set_value(machine->colortable, pen, pen - 0x8000);
 }
 
 PALETTE_INIT( korokoro )
 {
 	int color, pen;
 
-	for( color = 0; color < 0x40; color++ )
-		for( pen = 0; pen < 16; pen++ )
-			colortable[color * 256 + pen] = 0x3c00 + color * 16 + pen;
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x4000);
+
+	for (color = 0; color < 0x40; color++)
+		for (pen = 0; pen < 0x10; pen++)
+			colortable_entry_set_value(machine->colortable, (color << 8) | pen, 0x3c00 | (color << 4) | pen);
 }
+
+
+static void set_pens(colortable_t *colortable)
+{
+	offs_t i;
+	int palette_size = colortable_palette_get_size(colortable);
+
+	for (i = 0; i < palette_size; i++)
+	{
+		UINT16 data = paletteram16[i];
+
+		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
+
+		colortable_palette_set_color(colortable, i, color);
+	}
+}
+
 
 /***************************************************************************
 
@@ -409,29 +444,25 @@ static void cave_vh_start(running_machine *machine, int num)
 	switch( num )
 	{
 		case 4:
-			tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows,
-										 8,8, 512/8,512/8 );
+			tilemap_3 = tilemap_create(	get_tile_info_3, tilemap_scan_rows, 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_3, 0);
 			tilemap_set_scroll_rows(tilemap_3, 1);
 			tilemap_set_scroll_cols(tilemap_3, 1);
 
 		case 3:
-			tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows,
-										 8,8, 512/8,512/8 );
+			tilemap_2 = tilemap_create(	get_tile_info_2, tilemap_scan_rows, 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_2, 0);
 			tilemap_set_scroll_rows(tilemap_2, 1);
 			tilemap_set_scroll_cols(tilemap_2, 1);
 
 		case 2:
-			tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
-										 8,8, 512/8,512/8 );
+			tilemap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows, 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_1, 0);
 			tilemap_set_scroll_rows(tilemap_1, 1);
 			tilemap_set_scroll_cols(tilemap_1, 1);
 
 		case 1:
-			tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
-										 8,8, 512/8,512/8 );
+			tilemap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows, 8,8, 512/8,512/8 );
 			tilemap_set_transparent_pen(tilemap_0, 0);
 			tilemap_set_scroll_rows(tilemap_0, 1);
 			tilemap_set_scroll_cols(tilemap_0, 1);
@@ -447,7 +478,6 @@ static void cave_vh_start(running_machine *machine, int num)
 	cave_row_effect_offs_n = -1;
 	cave_row_effect_offs_f = 1;
 
-//  background_color =   machine->drv->gfxdecodeinfo[0].color_codes_start;
 	background_color =	 machine->drv->gfxdecodeinfo[0].color_codes_start +
 						(machine->drv->gfxdecodeinfo[0].total_color_codes-1) *
 						 machine->gfx[0]->color_granularity;
@@ -521,7 +551,7 @@ static void get_sprite_info_cave(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	machine->remapped_colortable + 0;
+	const pen_t          *base_pal	=	machine->pens + 0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -642,7 +672,7 @@ static void get_sprite_info_donpachi(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	machine->remapped_colortable + 0;
+	const pen_t          *base_pal	=	machine->pens + 0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -1406,6 +1436,8 @@ VIDEO_UPDATE( cave )
 	int pri, pri2;
 	int layers_ctrl = -1;
 
+	set_pens(machine->colortable);
+
 	blit.baseaddr = bitmap->base;
 	blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
 
@@ -1490,7 +1522,7 @@ VIDEO_UPDATE( cave )
 
 	cave_sprite_check(machine, cliprect);
 
-	fillbitmap(bitmap,machine->remapped_colortable[background_color],cliprect);
+	fillbitmap(bitmap,machine->pens[background_color],cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with
