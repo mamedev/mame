@@ -16,4 +16,3 @@ extern const UINT8 matchit2_decryption_table[];
 
 extern const UINT8 test_decryption_table[];
 
-extern void irem_cpu_decrypt(int cpu,const UINT8 *decryption_table);
