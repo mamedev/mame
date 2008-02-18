@@ -120,18 +120,17 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
-	machine_config config;
+	machine_config *config = machine_config_alloc(gamedrv->drv);
 	audit_record *record;
 	int sndnum, sampnum;
 	int records = 0;
 
 	/* count the number of sample records attached to this driver */
-	expand_machine_driver(gamedrv->drv, &config);
 #if HAS_SAMPLES
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config.sound); sndnum++)
-		if (config.sound[sndnum].type == SOUND_SAMPLES)
+	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
+		if (config->sound[sndnum].type == SOUND_SAMPLES)
 		{
-			const struct Samplesinterface *intf = (const struct Samplesinterface *)config.sound[sndnum].config;
+			const struct Samplesinterface *intf = (const struct Samplesinterface *)config->sound[sndnum].config;
 
 			if (intf->samplenames != NULL)
 			{
@@ -145,7 +144,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 
 	/* if no records, just quit now */
 	if (records == 0)
-		return records;
+		goto skip;
 
 	/* allocate memory for the records */
 	*audit = malloc_or_die(sizeof(**audit) * records);
@@ -153,10 +152,10 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	record = *audit;
 
 	/* now iterate over sample entries */
-	for (sndnum = 0; sndnum < ARRAY_LENGTH(config.sound); sndnum++)
-		if (config.sound[sndnum].type == SOUND_SAMPLES)
+	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
+		if (config->sound[sndnum].type == SOUND_SAMPLES)
 		{
-			const struct Samplesinterface *intf = (const struct Samplesinterface *)config.sound[sndnum].config;
+			const struct Samplesinterface *intf = (const struct Samplesinterface *)config->sound[sndnum].config;
 			const char *sharedname = NULL;
 
 			if (intf->samplenames != NULL)
@@ -197,6 +196,8 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 				}
 		}
 
+skip:
+	machine_config_free(config);
 	return records;
 }
 

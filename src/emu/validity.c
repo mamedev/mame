@@ -1422,7 +1422,7 @@ int mame_validitychecks(const game_driver *curdriver)
 	{
 		const game_driver *driver = drivers[drivnum];
 		UINT32 region_length[REGION_MAX];
-		machine_config drv;
+		machine_config *config;
 
 /* ASG -- trying this for a while to see if submission failures increase */
 #if 1
@@ -1433,43 +1433,45 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* expand the machine driver */
 		expansion -= osd_profiling_ticks();
-		expand_machine_driver(driver->drv, &drv);
+		config = machine_config_alloc(driver->drv);
 		expansion += osd_profiling_ticks();
 
 		/* validate the driver entry */
 		driver_checks -= osd_profiling_ticks();
-		error = validate_driver(drivnum, &drv) || error;
+		error = validate_driver(drivnum, config) || error;
 		driver_checks += osd_profiling_ticks();
 
 		/* validate the ROM information */
 		rom_checks -= osd_profiling_ticks();
-		error = validate_roms(drivnum, &drv, region_length) || error;
+		error = validate_roms(drivnum, config, region_length) || error;
 		rom_checks += osd_profiling_ticks();
 
 		/* validate the CPU information */
 		cpu_checks -= osd_profiling_ticks();
-		error = validate_cpu(drivnum, &drv, region_length) || error;
+		error = validate_cpu(drivnum, config, region_length) || error;
 		cpu_checks += osd_profiling_ticks();
 
 		/* validate the display */
 		display_checks -= osd_profiling_ticks();
-		error = validate_display(drivnum, &drv) || error;
+		error = validate_display(drivnum, config) || error;
 		display_checks += osd_profiling_ticks();
 
 		/* validate the graphics decoding */
 		gfx_checks -= osd_profiling_ticks();
-		error = validate_gfx(drivnum, &drv, region_length) || error;
+		error = validate_gfx(drivnum, config, region_length) || error;
 		gfx_checks += osd_profiling_ticks();
 
 		/* validate input ports */
 		input_checks -= osd_profiling_ticks();
-		error = validate_inputs(drivnum, &drv, &inputports) || error;
+		error = validate_inputs(drivnum, config, &inputports) || error;
 		input_checks += osd_profiling_ticks();
 
 		/* validate sounds and speakers */
 		sound_checks -= osd_profiling_ticks();
-		error = validate_sound(drivnum, &drv) || error;
+		error = validate_sound(drivnum, config) || error;
 		sound_checks += osd_profiling_ticks();
+		
+		machine_config_free(config);
 	}
 
 #ifdef MESS

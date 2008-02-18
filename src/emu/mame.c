@@ -1329,15 +1329,14 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	{
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+		machine_config *config;
 		astring *sourcename;
-		machine_config drv;
-
-		/* expand the machine driver to look at the info */
-		expand_machine_driver(driver->drv, &drv);
 
 		/* parse "vector.ini" for vector games */
-		if (drv.video_attributes & VIDEO_TYPE_VECTOR)
+		config = machine_config_alloc(driver->drv);
+		if (config->video_attributes & VIDEO_TYPE_VECTOR)
 			parse_ini_file(options, "vector");
+		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		sourcename = core_filename_extract_base(astring_alloc(), driver->source_file, TRUE);
@@ -1411,11 +1410,8 @@ static running_machine *create_machine(const game_driver *driver)
 
 	/* initialize the driver-related variables in the machine */
 	machine->gamedrv = driver;
-	machine->drv = malloc(sizeof(*machine->drv));
-	if (machine->drv == NULL)
-		goto error;
-	machine->basename = mame_strdup(machine->gamedrv->name);
-	expand_machine_driver(machine->gamedrv->drv, (machine_config *)machine->drv);
+	machine->basename = mame_strdup(driver->name);
+	machine->drv = machine_config_alloc(driver->drv);
 
 	/* allocate the driver data */
 	if (machine->drv->driver_data_size != 0)
@@ -1430,7 +1426,7 @@ error:
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
 	if (machine->drv != NULL)
-		free((machine_config *)machine->drv);
+		machine_config_free((machine_config *)machine->drv);
 	if (machine->mame_data != NULL)
 		free(machine->mame_data);
 	if (machine != NULL)
@@ -1499,7 +1495,7 @@ static void destroy_machine(running_machine *machine)
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
 	if (machine->drv != NULL)
-		free((machine_config *)machine->drv);
+		machine_config_free((machine_config *)machine->drv);
 	if (machine->mame_data != NULL)
 		free(machine->mame_data);
 	if (machine->basename != NULL)

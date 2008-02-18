@@ -43,26 +43,44 @@ static int penalty_compare(const char *source, const char *target);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    expand_machine_driver - construct a machine
-    driver from the macroized state
+    machine_config_alloc - allocate a new
+    machine configuration and populate it using
+    the supplied constructor
 -------------------------------------------------*/
 
-void expand_machine_driver(void (*constructor)(machine_config *), machine_config *output)
+machine_config *machine_config_alloc(void (*constructor)(machine_config *))
 {
-	/* initialize the tag on the first screen */
-	memset(output, 0, sizeof(*output));
-	output->watchdog_time = attotime_zero;
-
-	/* keeping this function allows us to pre-init the driver before constructing it */
-	(*constructor)(output);
+	machine_config *config;
+	
+	/* allocate a new configuration object */
+	config = malloc_or_die(sizeof(*config));
+	if (config == NULL)
+		return NULL;
+	memset(config, 0, sizeof(*config));
+	
+	/* call the function to construct the data */
+	(*constructor)(config);
 
 	/* if no screen tagged, tag screen 0 as main */
-	if (output->screen[0].tag == NULL && output->screen[0].defstate.format != BITMAP_FORMAT_INVALID)
-		output->screen[0].tag = "main";
+	if (config->screen[0].tag == NULL && config->screen[0].defstate.format != BITMAP_FORMAT_INVALID)
+		config->screen[0].tag = "main";
 
 	/* if no screens, set a dummy refresh for the main screen */
-	if (output->screen[0].tag == NULL)
-		output->screen[0].defstate.refresh = HZ_TO_ATTOSECONDS(60);
+	if (config->screen[0].tag == NULL)
+		config->screen[0].defstate.refresh = HZ_TO_ATTOSECONDS(60);
+	
+	return config;
+}
+
+
+/*-------------------------------------------------
+    machine_config_free - release memory allocated
+    for a machine configuration
+-------------------------------------------------*/
+
+void machine_config_free(machine_config *config)
+{
+	free(config);
 }
 
 

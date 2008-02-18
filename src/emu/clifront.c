@@ -558,17 +558,14 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 	for (drvindex = 0; drivers[drvindex]; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config drv;
+			machine_config *config = machine_config_alloc(drivers[drvindex]->drv);
 			int sndnum;
 
-			/* expand the machine driver */
-			expand_machine_driver(drivers[drvindex]->drv, &drv);
-
 			/* find samples interfaces */
-			for (sndnum = 0; sndnum < MAX_SOUND && drv.sound[sndnum].type != SOUND_DUMMY; sndnum++)
-				if (drv.sound[sndnum].type == SOUND_SAMPLES)
+			for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
+				if (config->sound[sndnum].type == SOUND_SAMPLES)
 				{
-					const char *const *samplenames = ((const struct Samplesinterface *)drv.sound[sndnum].config)->samplenames;
+					const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */
@@ -578,6 +575,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 				}
 
 			count++;
+			machine_config_free(config);
 		}
 
 	/* clean up our tracked resources */

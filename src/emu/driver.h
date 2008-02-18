@@ -572,7 +572,8 @@ extern const game_driver driver_empty;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void expand_machine_driver(void (*constructor)(machine_config *), machine_config *output);
+machine_config *machine_config_alloc(void (*constructor)(machine_config *));
+void machine_config_free(machine_config *config);
 
 cpu_config *driver_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock);
 cpu_config *driver_find_cpu(machine_config *machine, const char *tag);

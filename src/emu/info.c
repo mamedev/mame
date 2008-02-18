@@ -31,54 +31,53 @@ void print_game_device(FILE* out, const game_driver* game);
 void print_game_ramoptions(FILE* out, const game_driver* game);
 #endif /* MESS */
 
-/* Print a free format string */
 
-static void print_game_switch(FILE* out, const game_driver* game)
+/*-------------------------------------------------
+    print_game_switches - print the DIP switch
+    settings for a game
+-------------------------------------------------*/
+
+static void print_game_switches(FILE *out, const game_driver *game, const input_port_entry *input)
 {
-	const input_port_entry* input;
-
-	begin_resource_tracking();
-
-	input = input_port_allocate(game->ipt, NULL);
-
+	/* iterate over input entries until we run out */
 	while (input->type != IPT_END)
 	{
-		if (input->type==IPT_DIPSWITCH_NAME)
+		/* once we hit a name entry, start outputting */
+		if (input->type == IPT_DIPSWITCH_NAME)
 		{
 			int def = input->default_value;
 
-			fprintf(out, "\t\t<dipswitch");
+			/* output the switch name information */
+			fprintf(out, "\t\t<dipswitch name=\"%s\">\n", xml_normalize_string(input->name));
 
-			fprintf(out, " name=\"%s\"", xml_normalize_string(input->name));
-			++input;
-
-			fprintf(out, ">\n");
-
-			while (input->type==IPT_DIPSWITCH_SETTING)
+			/* loop over settings */
+			for (input++; input->type == IPT_DIPSWITCH_SETTING; input++)
 			{
-				fprintf(out, "\t\t\t<dipvalue");
-				fprintf(out, " name=\"%s\"", xml_normalize_string(input->name));
+				fprintf(out, "\t\t\t<dipvalue name=\"%s\"", xml_normalize_string(input->name));
 				if (def == input->default_value)
 					fprintf(out, " default=\"yes\"");
-
 				fprintf(out, "/>\n");
-
-				++input;
 			}
 
+			/* terminate the switch entry */
 			fprintf(out, "\t\t</dipswitch>\n");
 		}
 		else
 			++input;
 	}
-
-	end_resource_tracking();
 }
 
-static void print_game_input(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_input - print a summary of a game's
+    input
+-------------------------------------------------*/
+
+static void print_game_input(FILE *out, const game_driver *game, const input_port_entry *input)
 {
+	/* fix me -- this needs to be cleaned up to match the core style */
+
 enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal, ENDCONTROLTYPES};
-	const input_port_entry* input;
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
@@ -103,7 +102,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	for (i=0;i<ENDCONTROLTYPES;i++)
 	{
 		control[i].type = control_types[i];
-		control[i].Xway = 0;
+		control[i].Xway = NULL;
 		control[i].analog = 0;
 		control[i].min = 0;
 		control[i].max = 0;
@@ -111,10 +110,6 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		control[i].keydelta = 0;
 		control[i].reverse = 0;
 	}
-
-	begin_resource_tracking();
-
-	input = input_port_allocate(game->ipt, NULL);
 
 	while (input->type != IPT_END)
 	{
@@ -127,7 +122,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			case IPT_JOYSTICK_RIGHT:
 
 				/* if control not defined, start it off as horizontal 2-way */
-				if (!control[cjoy].Xway)
+				if (control[cjoy].Xway == NULL)
 					control[cjoy].Xway = "joy2way";
 				else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
 					;
@@ -146,12 +141,12 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			case IPT_JOYSTICK_DOWN:
 
 				/* if control not defined, start it off as vertical 2-way */
-				if (!control[cjoy].Xway)
-					control[cjoy].Xway= "vjoy2way";
+				if (control[cjoy].Xway == NULL)
+					control[cjoy].Xway = "vjoy2way";
 				else if (strcmp(control[cjoy].Xway,"vjoy2way") == 0)
 					;
 				/* if already defined as horiz, make it 4 or 8way */
-				else if (strcmp(control[cjoy].Xway,"joy2way")==0)
+				else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
 				{
 					if (input->way == 4)
 						control[cjoy].Xway = "joy4way";
@@ -167,8 +162,8 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			case IPT_JOYSTICKLEFT_DOWN:
 
 				/* if control not defined, start it off as vertical 2way */
-				if (!control[cdoublejoy].Xway)
-					control[cdoublejoy].Xway= "vdoublejoy2way";
+				if (control[cdoublejoy].Xway == NULL)
+					control[cdoublejoy].Xway = "vdoublejoy2way";
 				else if (strcmp(control[cdoublejoy].Xway,"vdoublejoy2way") == 0)
 					;
 				/* if already defined as horiz, make it 4 or 8 way */
@@ -188,8 +183,8 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 			case IPT_JOYSTICKLEFT_RIGHT:
 
 				/* if control not defined, start it off as horiz 2-way */
-				if (!control[cdoublejoy].Xway)
-					control[cdoublejoy].Xway="doublejoy2way";
+				if (control[cdoublejoy].Xway == NULL)
+					control[cdoublejoy].Xway = "doublejoy2way";
 				else if (strcmp(control[cdoublejoy].Xway,"doublejoy2way") == 0)
 					;
 				/* if already defined as vertical, make it 4 or 8 way */
@@ -315,24 +310,24 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	}
 
 	fprintf(out, "\t\t<input");
-	fprintf(out, " players=\"%d\"", nplayer );
-	if (nbutton)
-		fprintf(out, " buttons=\"%d\"", nbutton );
-	if (ncoin)
-		fprintf(out, " coins=\"%d\"", ncoin );
-	if (service)
-		fprintf(out, " service=\"%s\"", xml_normalize_string(service) );
-	if (tilt)
-		fprintf(out, " tilt=\"%s\"", xml_normalize_string(tilt) );
+	fprintf(out, " players=\"%d\"", nplayer);
+	if (nbutton != 0)
+		fprintf(out, " buttons=\"%d\"", nbutton);
+	if (ncoin != 0)
+		fprintf(out, " coins=\"%d\"", ncoin);
+	if (service != NULL)
+		fprintf(out, " service=\"%s\"", xml_normalize_string(service));
+	if (tilt != NULL)
+		fprintf(out, " tilt=\"%s\"", xml_normalize_string(tilt));
 	fprintf(out, ">\n");
 
-	for (i=0;i<ENDCONTROLTYPES;i++)
+	for (i = 0; i < ENDCONTROLTYPES; i++)
 	{
-		if (control[i].Xway)
-			fprintf(out, "\t\t\t<control type=\"%s\"/>\n", xml_normalize_string(control[i].Xway) );
+		if (control[i].Xway != NULL)
+			fprintf(out, "\t\t\t<control type=\"%s\"/>\n", xml_normalize_string(control[i].Xway));
 		if (control[i].analog)
 		{
-			fprintf(out, "\t\t\t<control type=\"%s\"", xml_normalize_string(control_types[i]) );
+			fprintf(out, "\t\t\t<control type=\"%s\"", xml_normalize_string(control_types[i]));
 			if (control[i].min || control[i].max)
 			{
 				fprintf(out, " minimum=\"%d\"", control[i].min);
@@ -349,114 +344,131 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		}
 	}
 	fprintf(out, "\t\t</input>\n");
-
-	end_resource_tracking();
 }
 
-static void print_game_bios(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_bios - print the BIOS set for a
+    game
+-------------------------------------------------*/
+
+static void print_game_bios(FILE *out, const game_driver *game)
 {
 	const rom_entry *rom;
 
-	if (game->rom != NULL)
-	{
-		for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
-			if (ROMENTRY_ISSYSTEM_BIOS(rom))
-			{
-				const char *name = ROM_GETHASHDATA(rom);
-				const char *description = name + strlen(name) + 1;
+	/* skip if no ROMs */
+	if (game->rom == NULL)
+		return;
+	
+	/* iterate over ROM entries and look for BIOSes */
+	for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
+		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		{
+			const char *name = ROM_GETHASHDATA(rom);
+			const char *description = name + strlen(name) + 1;
 
-				fprintf(out, "\t\t<biosset");
-				fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-				fprintf(out, " description=\"%s\"", xml_normalize_string(description));
-				if (ROM_GETBIOSFLAGS(rom) == 1)
-					fprintf(out, " default=\"yes\"");
-				fprintf(out, "/>\n");
-			}
-	}
+			/* output extracted name and descriptions */
+			fprintf(out, "\t\t<biosset");
+			fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+			fprintf(out, " description=\"%s\"", xml_normalize_string(description));
+			if (ROM_GETBIOSFLAGS(rom) == 1)
+				fprintf(out, " default=\"yes\"");
+			fprintf(out, "/>\n");
+		}
 }
 
-static void print_game_rom(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_rom - print the roms section of
+    the XML output
+-------------------------------------------------*/
+
+static void print_game_rom(FILE *out, const game_driver *game)
 {
-	const rom_entry *region, *rom, *chunk;
-	const rom_entry *pregion, *prom, *fprom=NULL;
-	const game_driver *clone_of;
+	const game_driver *clone_of = driver_get_clone(game);
 	int rom_type;
 
-	if (!game->rom)
+	/* if no roms, just exit early */
+	if (game->rom == NULL)
 		return;
 
-	clone_of = driver_get_clone(game);
+	/* iterate over 3 different ROM "types": BIOS, ROMs, DISKs */
 	for (rom_type = 0; rom_type < 3; rom_type++)
 	{
-		for (region = rom_first_region(game); region; region = rom_next_region(region))
-			for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		const rom_entry *region;
+
+		/* iterate first through regions */
+		for (region = rom_first_region(game); region != NULL; region = rom_next_region(region))
+		{
+			int is_disk = ROMREGION_ISDISKDATA(region);
+			const rom_entry *rom;
+
+			/* disk regions only work for disks */
+			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
+				continue;
+
+			/* iterate through ROM entries */		
+			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 			{
-				int offset, length, in_parent, is_disk, is_bios, found_bios, i;
-				char name[100], bios_name[100];
+				int is_bios = ROM_GETBIOSFLAGS(rom);
+				const char *name = ROM_GETNAME(rom);
+				int offset = ROM_GETOFFSET(rom);
+				const rom_entry *parent_rom = NULL;
+				const rom_entry *chunk;
+				char bios_name[100];
+				int length;
+				
+				/* BIOS ROMs only apply to bioses */
+				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
+					continue;
 
-				strcpy(name,ROM_GETNAME(rom));
-				offset = ROM_GETOFFSET(rom);
-				is_disk = ROMREGION_ISDISKDATA(region);
-				is_bios = ROM_GETBIOSFLAGS(rom);
-
-				switch (rom_type)
-				{
-					case 0:		/* rom_type 0 = BIOS */
-						if (is_disk || !is_bios)
-							continue;
-						break;
-					case 1:		/* rom_type 1 = ROM */
-						if (is_disk || is_bios)
-							continue;
-						break;
-					case 2:		/* rom_type 1 = DISK */
-						if (!is_disk || is_bios)
-							continue;
-						break;
-				}
-
-				in_parent = 0;
+				/* compute the total length of all chunks */
 				length = 0;
 				for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
 					length += ROM_GETLENGTH(chunk);
 
-				if (!ROM_NOGOODDUMP(rom) && clone_of)
+				/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
+				if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
 				{
-					fprom=NULL;
-					for (pregion = rom_first_region(clone_of); pregion; pregion = rom_next_region(pregion))
-						for (prom = rom_first_file(pregion); prom; prom = rom_next_file(prom))
+					const rom_entry *pregion, *prom;
+					
+					/* scan the clone_of ROM for a matching ROM entry */
+					for (pregion = rom_first_region(clone_of); pregion != NULL; pregion = rom_next_region(pregion))
+						for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
 							if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
 							{
-								if (!fprom || !strcmp(ROM_GETNAME(prom), name))
-									fprom=prom;
-								in_parent = 1;
+								parent_rom = prom;
+								break;
 							}
 				}
 
-				found_bios = 0;
-				if(!is_disk && is_bios)
+				/* scan for a BIOS name */
+				bios_name[0] = 0;
+				if (!is_disk && is_bios)
 				{
-					/* Scan backwards for name */
-					for (prom = rom-1; prom != game->rom; prom--)
-						if (ROMENTRY_ISSYSTEM_BIOS(prom))
+					const rom_entry *brom;
+
+					/* scan backwards through the ROM entries */
+					for (brom = rom - 1; brom != game->rom; brom--)
+						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
-							strcpy(bios_name, ROM_GETHASHDATA(prom));
-							found_bios = 1;
+							strcpy(bios_name, ROM_GETHASHDATA(brom));
 							break;
 						}
 				}
 
-
+				/* opening tag */
 				if (!is_disk)
 					fprintf(out, "\t\t<rom");
 				else
 					fprintf(out, "\t\t<disk");
 
-				if (*name)
+				/* add name, merge, bios, and size tags */
+				if (name != NULL && name[0] != 0)
 					fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-				if (in_parent)
-					fprintf(out, " merge=\"%s\"", xml_normalize_string(ROM_GETNAME(fprom)));
-				if (!is_disk && found_bios)
+				if (parent_rom != NULL)
+					fprintf(out, " merge=\"%s\"", xml_normalize_string(ROM_GETNAME(parent_rom)));
+				if (bios_name[0] != 0)
 					fprintf(out, " bios=\"%s\"", xml_normalize_string(bios_name));
 				if (!is_disk)
 					fprintf(out, " size=\"%d\"", length);
@@ -464,212 +476,223 @@ static void print_game_rom(FILE* out, const game_driver* game)
 				/* dump checksum information only if there is a known dump */
 				if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
 				{
-					for (i=0;i<HASH_NUM_FUNCTIONS;i++)
-					{
-						int func = 1<<i;
-						const char* func_name = hash_function_name(func);
-						char checksum[1000];
-
-						if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), func, checksum))
-						{
-							fprintf(out, " %s=\"%s\"", func_name, checksum);
-						}
-					}
+					char checksum[HASH_BUF_SIZE];
+					int hashtype;
+					
+					/* iterate over hash function types and print out their values */
+					for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
+						if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
+							fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
 				}
 
+				/* append a region name */
 				switch (ROMREGION_GETTYPE(region))
 				{
-					case REGION_CPU1: fprintf(out, " region=\"cpu1\""); break;
-					case REGION_CPU2: fprintf(out, " region=\"cpu2\""); break;
-					case REGION_CPU3: fprintf(out, " region=\"cpu3\""); break;
-					case REGION_CPU4: fprintf(out, " region=\"cpu4\""); break;
-					case REGION_CPU5: fprintf(out, " region=\"cpu5\""); break;
-					case REGION_CPU6: fprintf(out, " region=\"cpu6\""); break;
-					case REGION_CPU7: fprintf(out, " region=\"cpu7\""); break;
-					case REGION_CPU8: fprintf(out, " region=\"cpu8\""); break;
-					case REGION_GFX1: fprintf(out, " region=\"gfx1\""); break;
-					case REGION_GFX2: fprintf(out, " region=\"gfx2\""); break;
-					case REGION_GFX3: fprintf(out, " region=\"gfx3\""); break;
-					case REGION_GFX4: fprintf(out, " region=\"gfx4\""); break;
-					case REGION_GFX5: fprintf(out, " region=\"gfx5\""); break;
-					case REGION_GFX6: fprintf(out, " region=\"gfx6\""); break;
-					case REGION_GFX7: fprintf(out, " region=\"gfx7\""); break;
-					case REGION_GFX8: fprintf(out, " region=\"gfx8\""); break;
-					case REGION_PROMS: fprintf(out, " region=\"proms\""); break;
-					case REGION_PLDS: fprintf(out, " region=\"plds\""); break;
-					case REGION_SOUND1: fprintf(out, " region=\"sound1\""); break;
-					case REGION_SOUND2: fprintf(out, " region=\"sound2\""); break;
-					case REGION_SOUND3: fprintf(out, " region=\"sound3\""); break;
-					case REGION_SOUND4: fprintf(out, " region=\"sound4\""); break;
-					case REGION_SOUND5: fprintf(out, " region=\"sound5\""); break;
-					case REGION_SOUND6: fprintf(out, " region=\"sound6\""); break;
-					case REGION_SOUND7: fprintf(out, " region=\"sound7\""); break;
-					case REGION_SOUND8: fprintf(out, " region=\"sound8\""); break;
-					case REGION_USER1: fprintf(out, " region=\"user1\""); break;
-					case REGION_USER2: fprintf(out, " region=\"user2\""); break;
-					case REGION_USER3: fprintf(out, " region=\"user3\""); break;
-					case REGION_USER4: fprintf(out, " region=\"user4\""); break;
-					case REGION_USER5: fprintf(out, " region=\"user5\""); break;
-					case REGION_USER6: fprintf(out, " region=\"user6\""); break;
-					case REGION_USER7: fprintf(out, " region=\"user7\""); break;
-					case REGION_USER8: fprintf(out, " region=\"user8\""); break;
-					case REGION_USER9: fprintf(out, " region=\"user9\""); break;
-					case REGION_USER10: fprintf(out, " region=\"user10\""); break;
-					case REGION_USER11: fprintf(out, " region=\"user11\""); break;
-					case REGION_USER12: fprintf(out, " region=\"user12\""); break;
-					case REGION_USER13: fprintf(out, " region=\"user13\""); break;
-					case REGION_USER14: fprintf(out, " region=\"user14\""); break;
-					case REGION_USER15: fprintf(out, " region=\"user15\""); break;
-					case REGION_USER16: fprintf(out, " region=\"user16\""); break;
-					case REGION_USER17: fprintf(out, " region=\"user17\""); break;
-					case REGION_USER18: fprintf(out, " region=\"user18\""); break;
-					case REGION_USER19: fprintf(out, " region=\"user19\""); break;
-					case REGION_USER20: fprintf(out, " region=\"user20\""); break;
-					case REGION_DISKS: fprintf(out, " region=\"disks\""); break;
-					default: fprintf(out, " region=\"0x%x\"", (int)ROMREGION_GETTYPE(region)); break;
-			}
-
-			if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
-				fprintf(out, " status=\"nodump\"");
-			if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
-				fprintf(out, " status=\"baddump\"");
-
-			if (!is_disk)
-			{
-				if (ROMREGION_GETFLAGS(region) & ROMREGION_DISPOSE)
-					fprintf(out, " dispose=\"yes\"");
-
-				fprintf(out, " offset=\"%x\"", offset);
-			}
-			else
-			{
-				fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
-			}
-			fprintf(out, "/>\n");
-		}
-	}
-}
-
-static void print_game_sampleof(FILE* out, const game_driver* game)
-{
-#if (HAS_SAMPLES)
-	machine_config drv;
-	int i;
-
-	expand_machine_driver(game->drv, &drv);
-
-	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
-	{
-		const char *const *samplenames = NULL;
-		if( drv.sound[i].type == SOUND_SAMPLES )
-			samplenames = ((const struct Samplesinterface *)drv.sound[i].config)->samplenames;
-		if (samplenames != 0 && samplenames[0] != 0) {
-			int k = 0;
-			if (samplenames[k][0]=='*')
-			{
-				/* output sampleof only if different from game name */
-				if (strcmp(samplenames[k] + 1, game->name)!=0)
-					fprintf(out, " sampleof=\"%s\"", xml_normalize_string(samplenames[k] + 1));
-				++k;
-			}
-		}
-	}
-#endif
-}
-
-static void print_game_sample(FILE* out, const game_driver* game)
-{
-#if (HAS_SAMPLES)
-	machine_config drv;
-	int i;
-
-	expand_machine_driver(game->drv, &drv);
-
-	for( i = 0; i < MAX_SOUND && drv.sound[i].type != SOUND_DUMMY; i++ )
-	{
-		const char *const *samplenames = NULL;
-		if( drv.sound[i].type == SOUND_SAMPLES )
-			samplenames = ((const struct Samplesinterface *)drv.sound[i].config)->samplenames;
-		if (samplenames != 0 && samplenames[0] != 0) {
-			int k = 0;
-			if (samplenames[k][0]=='*')
-			{
-				++k;
-			}
-			while (samplenames[k] != 0) {
-				/* check if is not empty */
-				if (*samplenames[k]) {
-					/* check if sample is duplicate */
-					int l = 0;
-					while (l<k && strcmp(samplenames[k],samplenames[l])!=0)
-						++l;
-					if (l==k)
-						fprintf(out, "\t\t<sample name=\"%s\"/>\n", xml_normalize_string(samplenames[k]));
+					case REGION_CPU1: 	fprintf(out, " region=\"cpu1\"");	break;
+					case REGION_CPU2: 	fprintf(out, " region=\"cpu2\"");	break;
+					case REGION_CPU3: 	fprintf(out, " region=\"cpu3\"");	break;
+					case REGION_CPU4: 	fprintf(out, " region=\"cpu4\"");	break;
+					case REGION_CPU5: 	fprintf(out, " region=\"cpu5\"");	break;
+					case REGION_CPU6: 	fprintf(out, " region=\"cpu6\"");	break;
+					case REGION_CPU7: 	fprintf(out, " region=\"cpu7\"");	break;
+					case REGION_CPU8: 	fprintf(out, " region=\"cpu8\"");	break;
+					case REGION_GFX1: 	fprintf(out, " region=\"gfx1\"");	break;
+					case REGION_GFX2: 	fprintf(out, " region=\"gfx2\"");	break;
+					case REGION_GFX3: 	fprintf(out, " region=\"gfx3\"");	break;
+					case REGION_GFX4: 	fprintf(out, " region=\"gfx4\"");	break;
+					case REGION_GFX5: 	fprintf(out, " region=\"gfx5\"");	break;
+					case REGION_GFX6: 	fprintf(out, " region=\"gfx6\"");	break;
+					case REGION_GFX7: 	fprintf(out, " region=\"gfx7\"");	break;
+					case REGION_GFX8: 	fprintf(out, " region=\"gfx8\"");	break;
+					case REGION_PROMS: 	fprintf(out, " region=\"proms\"");	break;
+					case REGION_PLDS: 	fprintf(out, " region=\"plds\"");	break;
+					case REGION_SOUND1: fprintf(out, " region=\"sound1\"");	break;
+					case REGION_SOUND2: fprintf(out, " region=\"sound2\"");	break;
+					case REGION_SOUND3: fprintf(out, " region=\"sound3\"");	break;
+					case REGION_SOUND4: fprintf(out, " region=\"sound4\"");	break;
+					case REGION_SOUND5: fprintf(out, " region=\"sound5\"");	break;
+					case REGION_SOUND6: fprintf(out, " region=\"sound6\"");	break;
+					case REGION_SOUND7: fprintf(out, " region=\"sound7\"");	break;
+					case REGION_SOUND8: fprintf(out, " region=\"sound8\"");	break;
+					case REGION_USER1: 	fprintf(out, " region=\"user1\"");	break;
+					case REGION_USER2: 	fprintf(out, " region=\"user2\"");	break;
+					case REGION_USER3: 	fprintf(out, " region=\"user3\"");	break;
+					case REGION_USER4: 	fprintf(out, " region=\"user4\"");	break;
+					case REGION_USER5: 	fprintf(out, " region=\"user5\"");	break;
+					case REGION_USER6: 	fprintf(out, " region=\"user6\"");	break;
+					case REGION_USER7: 	fprintf(out, " region=\"user7\"");	break;
+					case REGION_USER8: 	fprintf(out, " region=\"user8\"");	break;
+					case REGION_USER9: 	fprintf(out, " region=\"user9\"");	break;
+					case REGION_USER10: fprintf(out, " region=\"user10\"");	break;
+					case REGION_USER11: fprintf(out, " region=\"user11\"");	break;
+					case REGION_USER12: fprintf(out, " region=\"user12\"");	break;
+					case REGION_USER13: fprintf(out, " region=\"user13\"");	break;
+					case REGION_USER14: fprintf(out, " region=\"user14\"");	break;
+					case REGION_USER15: fprintf(out, " region=\"user15\"");	break;
+					case REGION_USER16: fprintf(out, " region=\"user16\"");	break;
+					case REGION_USER17: fprintf(out, " region=\"user17\"");	break;
+					case REGION_USER18: fprintf(out, " region=\"user18\"");	break;
+					case REGION_USER19: fprintf(out, " region=\"user19\"");	break;
+					case REGION_USER20: fprintf(out, " region=\"user20\"");	break;
+					case REGION_DISKS: 	fprintf(out, " region=\"disks\"");	break;
+					default:	 		fprintf(out, " region=\"0x%x\"", (int)ROMREGION_GETTYPE(region)); break;
 				}
-				++k;
+
+				/* add nodump/baddump flags */
+				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+					fprintf(out, " status=\"nodump\"");
+				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
+					fprintf(out, " status=\"baddump\"");
+
+				/* for non-disk entries, print dispose flag and offset */
+				if (!is_disk)
+				{
+					if (ROMREGION_GETFLAGS(region) & ROMREGION_DISPOSE)
+						fprintf(out, " dispose=\"yes\"");
+					fprintf(out, " offset=\"%x\"", offset);
+				}
+				
+				/* for disk entries, add the disk index */
+				else
+					fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
+				fprintf(out, "/>\n");
 			}
 		}
 	}
+}
+
+
+/*-------------------------------------------------
+    print_game_sampleof - print the 'sampleof'
+    attribute, if appropriate
+-------------------------------------------------*/
+
+static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
+{
+#if (HAS_SAMPLES)
+	int sndnum;
+
+	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
+		if (config->sound[sndnum].type == SOUND_SAMPLES)
+		{
+			const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
+			if (samplenames != NULL)
+			{
+				int sampnum;
+				
+				/* iterate over sample names */
+				for (sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
+				{
+					const char *cursampname = samplenames[sampnum];
+					
+					/* only output sampleof if different from the game name */
+					if (cursampname[0] == '*' && strcmp(cursampname + 1, game->name) != 0)
+						fprintf(out, " sampleof=\"%s\"", xml_normalize_string(cursampname + 1));
+				}
+			}
+		}
 #endif
 }
 
-static void print_game_micro(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_sample - print a list of all 
+    samples referenced by a game_driver
+-------------------------------------------------*/
+
+static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-	machine_config driver;
-	const cpu_config* cpu;
-	const sound_config* sound;
-	int j;
+#if (HAS_SAMPLES)
+	int sndnum;
 
-	expand_machine_driver(game->drv, &driver);
-	cpu = driver.cpu;
-	sound = driver.sound;
+	/* iterate over sound chips looking for samples */
+	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
+		if (config->sound[sndnum].type == SOUND_SAMPLES)
+		{
+			const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
+			if (samplenames != NULL)
+			{
+				int sampnum;
+				
+				/* iterate over sample names */
+				for (sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
+				{
+					const char *cursampname = samplenames[sampnum];
+					int dupnum;
+				
+					/* ignore the special '*' samplename */
+					if (sampnum == 0 && cursampname[0] == '*')
+						continue;
+					
+					/* filter out duplicates */
+					for (dupnum = 0; dupnum < sampnum; dupnum++)
+						if (strcmp(samplenames[dupnum], cursampname) == 0)
+							break;
+					if (dupnum < sampnum)
+						continue;
 
-	for(j=0;j<MAX_CPU;++j)
-	{
-		if (cpu[j].type != CPU_DUMMY)
+					/* output the sample name */
+					fprintf(out, "\t\t<sample name=\"%s\"/>\n", xml_normalize_string(cursampname));
+				}
+			}
+		}
+#endif
+}
+
+
+/*-------------------------------------------------
+    print_game_chips - print a list of CPU and
+    sound chips used by a game
+-------------------------------------------------*/
+
+static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
+{
+	int chipnum;
+
+	/* iterate over CPUs */
+	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->cpu); chipnum++)
+		if (config->cpu[chipnum].type != CPU_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"cpu\"");
-
-			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(cpu[j].type)));
-
-			fprintf(out, " clock=\"%d\"", cpu[j].clock);
+			fprintf(out, " name=\"%s\"", xml_normalize_string(cputype_name(config->cpu[chipnum].type)));
+			fprintf(out, " clock=\"%d\"", config->cpu[chipnum].clock);
 			fprintf(out, "/>\n");
 		}
-	}
 
-	for(j=0;j<MAX_SOUND;++j)
-	{
-		if (sound[j].type != SOUND_DUMMY)
+	/* iterate over sound chips */
+	for (chipnum = 0; chipnum < ARRAY_LENGTH(config->sound); chipnum++)
+		if (config->sound[chipnum].type != SOUND_DUMMY)
 		{
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"audio\"");
-			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(sound[j].type)));
-			if (sound[j].clock)
-				fprintf(out, " clock=\"%d\"", sound[j].clock);
+			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(config->sound[chipnum].type)));
+			if (config->sound[chipnum].clock != 0)
+				fprintf(out, " clock=\"%d\"", config->sound[chipnum].clock);
 			fprintf(out, "/>\n");
 		}
-	}
 }
 
-static void print_game_display(FILE* out, const game_driver* game)
-{
-	machine_config driver;
 
-	int dx;
-	int dy;
+/*-------------------------------------------------
+    print_game_display - print a list of all the
+    displays
+-------------------------------------------------*/
+
+static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
+{
 	int scrnum;
 
-	expand_machine_driver(game->drv, &driver);
-
+	/* iterate over screens */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (driver.screen[scrnum].tag != NULL)
+		if (config->screen[scrnum].tag != NULL)
 		{
 			fprintf(out, "\t\t<display");
+			fprintf(out, " type=\"%s\"", (config->video_attributes & VIDEO_TYPE_VECTOR) ? "vector" : "raster");
 
-			fprintf(out, " type=\"%s\"", (driver.video_attributes & VIDEO_TYPE_VECTOR) ? "vector" : "raster" );
-
-			switch (game->flags & ORIENTATION_MASK) {
+			/* output the orientation as a string */
+			switch (game->flags & ORIENTATION_MASK)
+			{
 				case ORIENTATION_FLIP_X:
 					fprintf(out, " rotate=\"0\" flipx=\"yes\"");
 					break;
@@ -697,65 +720,56 @@ static void print_game_display(FILE* out, const game_driver* game)
 			}
 
 			/* output width and height only for games that are not vector */
-			if (! (driver.video_attributes & VIDEO_TYPE_VECTOR) )
+			if (!(config->video_attributes & VIDEO_TYPE_VECTOR))
 			{
-				dx = driver.screen[scrnum].defstate.visarea.max_x - driver.screen[scrnum].defstate.visarea.min_x + 1;
-				dy = driver.screen[scrnum].defstate.visarea.max_y - driver.screen[scrnum].defstate.visarea.min_y + 1;
+				int dx = config->screen[scrnum].defstate.visarea.max_x - config->screen[scrnum].defstate.visarea.min_x + 1;
+				int dy = config->screen[scrnum].defstate.visarea.max_y - config->screen[scrnum].defstate.visarea.min_y + 1;
 				fprintf(out, " width=\"%d\"", dx);
 				fprintf(out, " height=\"%d\"", dy);
 			}
 
-			fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(driver.screen[scrnum].defstate.refresh));
-
+			/* output refresh rate */
+			fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(config->screen[scrnum].defstate.refresh));
 			fprintf(out, " />\n");
 		}
 }
 
-static void print_game_sound(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_sound - print a list of all the
+    displays
+-------------------------------------------------*/
+
+static void print_game_sound(FILE *out, const game_driver *game, const machine_config *config)
 {
-	machine_config driver;
-	const cpu_config* cpu;
-	const sound_config* sound;
+	int has_sound = FALSE;
+	int speakers = 0;
+	int sndnum;
 
-	/* check if the game have sound emulation */
-	int has_sound = 0;
-	int i;
+	/* see if we have any sound chips to report */
+	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound); sndnum++)
+		if (config->sound[sndnum].type != SOUND_DUMMY)
+		{
+			has_sound = TRUE;
+			break;
+		}
 
-	expand_machine_driver(game->drv, &driver);
-	cpu = driver.cpu;
-	sound = driver.sound;
-
-	i = 0;
-	while (i < MAX_SOUND && !has_sound)
-	{
-		if (sound[i].type != SOUND_DUMMY)
-			has_sound = 1;
-		++i;
-	}
-
-	fprintf(out, "\t\t<sound");
-
-	/* sound channel */
+	/* if we have sound, count the number of speakers */
 	if (has_sound)
-	{
-		int speakers;
-		for (speakers = 0; speakers < MAX_SPEAKER; speakers++)
-			if (driver.speaker[speakers].tag == NULL)
+		for (speakers = 0; speakers < ARRAY_LENGTH(config->speaker); speakers++)
+			if (config->speaker[speakers].tag == NULL)
 				break;
-		fprintf(out, " channels=\"%d\"", speakers);
-	}
-	else
-		fprintf(out, " channels=\"0\"");
 
-	fprintf(out, "/>\n");
+	fprintf(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
 }
 
-static void print_game_driver(FILE* out, const game_driver* game)
+
+/*-------------------------------------------------
+    print_game_driver - print driver status
+-------------------------------------------------*/
+
+static void print_game_driver(FILE *out, const game_driver *game, const machine_config *config)
 {
-	machine_config driver;
-
-	expand_machine_driver(game->drv, &driver);
-
 	fprintf(out, "\t\t<driver");
 
 	/* The status entry is an hint for frontend authors */
@@ -808,89 +822,107 @@ static void print_game_driver(FILE* out, const game_driver* game)
 	else
 		fprintf(out, " savestate=\"unsupported\"");
 
-	fprintf(out, " palettesize=\"%d\"", driver.total_colors);
+	fprintf(out, " palettesize=\"%d\"", config->total_colors);
 
 	fprintf(out, "/>\n");
 }
 
-/* Print the MAME info record for a game */
-static void print_game_info(FILE* out, const game_driver* game)
-{
-	const char *start;
-	const game_driver *clone_of;
 
-	/* No action if not a game */
+/*-------------------------------------------------
+    print_game_info - print the XML information
+    for one particular game driver
+-------------------------------------------------*/
+
+static void print_game_info(FILE *out, const game_driver *game)
+{
+	const input_port_entry *input;
+	const game_driver *clone_of;
+	machine_config *config;
+	const char *start;
+
+	/* no action if not a game */
 	if (game->flags & GAME_NO_STANDALONE)
 		return;
 
-	fprintf(out, "\t<" XML_TOP);
+	/* start tracking resources and allocate the machine and input configs */
+	begin_resource_tracking();
+	config = machine_config_alloc(game->drv);
+	input = input_port_allocate(game->ipt, NULL);
 
+	/* print the header and the game name */
+	fprintf(out, "\t<" XML_TOP);
 	fprintf(out, " name=\"%s\"", xml_normalize_string(game->name) );
 
+	/* strip away any path information from the source_file and output it */
 	start = strrchr(game->source_file, '/');
-	if (!start)
+	if (start == NULL)
 		start = strrchr(game->source_file, '\\');
-	if (!start)
+	if (start == NULL)
 		start = game->source_file - 1;
 	fprintf(out, " sourcefile=\"%s\"", xml_normalize_string(start + 1));
 
+	/* append bios and runnable flags */
 	if (game->flags & GAME_IS_BIOS_ROOT)
 		fprintf(out, " isbios=\"yes\"");
-
 	if (game->flags & GAME_NO_STANDALONE)
 		fprintf(out, " runnable=\"no\"");
 
+	/* display clone information */
 	clone_of = driver_get_clone(game);
-	if (clone_of && !(clone_of->flags & GAME_IS_BIOS_ROOT))
+	if (clone_of != NULL && !(clone_of->flags & GAME_IS_BIOS_ROOT))
 		fprintf(out, " cloneof=\"%s\"", xml_normalize_string(clone_of->name));
-
-	if (clone_of)
+	if (clone_of != NULL)
 		fprintf(out, " romof=\"%s\"", xml_normalize_string(clone_of->name));
 
-	print_game_sampleof(out, game);
-
+	/* display sample information and close the game tag */
+	print_game_sampleof(out, game, config);
 	fprintf(out, ">\n");
 
-	if (game->description)
+	/* output game description */
+	if (game->description != NULL)
 		fprintf(out, "\t\t<description>%s</description>\n", xml_normalize_string(game->description));
 
 	/* print the year only if is a number */
-	if (game->year && strspn(game->year,"0123456789")==strlen(game->year))
-		fprintf(out, "\t\t<year>%s</year>\n", xml_normalize_string(game->year) );
+	if (game->year != NULL && strspn(game->year, "0123456789") == strlen(game->year))
+		fprintf(out, "\t\t<year>%s</year>\n", xml_normalize_string(game->year));
 
-	if (game->manufacturer)
+	/* print the manufacturer information */
+	if (game->manufacturer != NULL)
 		fprintf(out, "\t\t<manufacturer>%s</manufacturer>\n", xml_normalize_string(game->manufacturer));
 
+	/* now print various additional information */
 	print_game_bios(out, game);
 	print_game_rom(out, game);
-	print_game_sample(out, game);
-	print_game_micro(out, game);
-	print_game_display(out, game);
-	print_game_sound(out, game);
-	print_game_input(out, game);
-	print_game_switch(out, game);
-	print_game_driver(out, game);
+	print_game_sample(out, game, config);
+	print_game_chips(out, game, config);
+	print_game_display(out, game, config);
+	print_game_sound(out, game, config);
+	print_game_input(out, game, input);
+	print_game_switches(out, game, input);
+	print_game_driver(out, game, config);
 #ifdef MESS
 	print_game_device(out, game);
 	print_game_ramoptions(out, game);
 #endif
 
+	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
+	
+	/* release resources */
+	end_resource_tracking();
+	machine_config_free(config);
 }
 
-static void print_mame_data(FILE* out, const game_driver* const games[], const char *gamename)
-{
-	int j;
 
-	/* print games */
-	for(j=0;games[j];++j)
-		if (mame_strwildcmp(gamename, games[j]->name) == 0)
-			print_game_info(out, games[j]);
-}
+/*-------------------------------------------------
+    print_mame_xml - print the XML information
+    for all known games
+-------------------------------------------------*/
 
-/* Print the MAME database in XML format */
-void print_mame_xml(FILE* out, const game_driver* const games[], const char *gamename)
+void print_mame_xml(FILE *out, const game_driver *const games[], const char *gamename)
 {
+	int drvnum;
+	
 	fprintf(out,
 		"<?xml version=\"1.0\"?>\n"
 		"<!DOCTYPE " XML_ROOT " [\n"
@@ -1003,7 +1035,9 @@ void print_mame_xml(FILE* out, const game_driver* const games[], const char *gam
 		xml_normalize_string(build_version)
 	);
 
-	print_mame_data(out, games, gamename);
+	for (drvnum = 0; games[drvnum] != NULL; drvnum++)
+		if (mame_strwildcmp(gamename, games[drvnum]->name) == 0)
+			print_game_info(out, games[drvnum]);
 
 	fprintf(out, "</" XML_ROOT ">\n");
 }
