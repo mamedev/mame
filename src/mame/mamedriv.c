@@ -3992,6 +3992,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmgeo )
 	DRIVER( gwing2 )
 	DRIVER( suchie3 )
+	DRIVER( toyfight )
 	DRIVER( pjustic )
 	DRIVER( pstone )
 	DRIVER( pstone2 )
