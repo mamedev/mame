@@ -36,11 +36,11 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "sound/dac.h"
 
 /* from video */
-extern WRITE8_HANDLER( trucocl_videoram_w );
-extern WRITE8_HANDLER( trucocl_colorram_w );
-extern PALETTE_INIT( trucocl );
-extern VIDEO_START( trucocl );
-extern VIDEO_UPDATE( trucocl );
+WRITE8_HANDLER( trucocl_videoram_w );
+WRITE8_HANDLER( trucocl_colorram_w );
+PALETTE_INIT( trucocl );
+VIDEO_START( trucocl );
+VIDEO_UPDATE( trucocl );
 
 
 static WRITE8_HANDLER( irq_enable_w)
@@ -157,7 +157,6 @@ static MACHINE_DRIVER_START( trucocl )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(trucocl)
 	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(trucocl)
 	MDRV_VIDEO_START(trucocl)

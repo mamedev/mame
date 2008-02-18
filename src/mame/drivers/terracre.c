@@ -92,14 +92,14 @@ static UINT8 mAmazonProtReg[6];
 
 extern UINT16 *amazon_videoram;
 
-extern PALETTE_INIT( amazon );
-extern WRITE16_HANDLER( amazon_background_w );
-extern WRITE16_HANDLER( amazon_foreground_w );
-extern WRITE16_HANDLER( amazon_scrolly_w );
-extern WRITE16_HANDLER( amazon_scrollx_w );
-extern WRITE16_HANDLER( amazon_flipscreen_w );
-extern VIDEO_START( amazon );
-extern VIDEO_UPDATE( amazon );
+PALETTE_INIT( amazon );
+WRITE16_HANDLER( amazon_background_w );
+WRITE16_HANDLER( amazon_foreground_w );
+WRITE16_HANDLER( amazon_scrolly_w );
+WRITE16_HANDLER( amazon_scrollx_w );
+WRITE16_HANDLER( amazon_flipscreen_w );
+VIDEO_START( amazon );
+VIDEO_UPDATE( amazon );
 
 static const UINT16 mAmazonProtData[] =
 {
@@ -622,8 +622,7 @@ static MACHINE_DRIVER_START( amazon )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(terracre)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1*16+16*16+16*256)
+	MDRV_PALETTE_LENGTH(1*16+16*16+16*256)
 
 	MDRV_PALETTE_INIT(amazon)
 	MDRV_VIDEO_START(amazon)
@@ -660,8 +659,7 @@ static MACHINE_DRIVER_START( ym3526 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(terracre)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1*16+16*16+16*256)
+	MDRV_PALETTE_LENGTH(1*16+16*16+16*256)
 
 	MDRV_PALETTE_INIT(amazon)
 	MDRV_VIDEO_START(amazon)
@@ -698,8 +696,7 @@ static MACHINE_DRIVER_START( ym2203 )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(terracre)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(1*16+16*16+16*256)
+	MDRV_PALETTE_LENGTH(1*16+16*16+16*256)
 
 	MDRV_PALETTE_INIT(amazon)
 	MDRV_VIDEO_START(amazon)
@@ -755,12 +752,14 @@ ROM_START( terracre )
 	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
 	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0500, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )	/* red component */
 	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )	/* green component */
 	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )	/* blue component */
 	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )	/* sprite lookup table */
-	ROM_LOAD( "tc2a_4e.bin",  0x0400, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
 ROM_END
 
 /**********************************************************/
@@ -796,12 +795,14 @@ ROM_START( terracrb )
 	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
 	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0500, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )	/* red component */
 	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )	/* green component */
 	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )	/* blue component */
 	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )	/* sprite lookup table */
-	ROM_LOAD( "tc2a_4e.bin",  0x0400, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
 ROM_END
 
 /**********************************************************/
@@ -836,12 +837,14 @@ ROM_START( terracra )
 	ROM_LOAD( "2a_6g.rom",    0x08000, 0x4000, CRC(4a9ec3e6) SHA1(0a35b82fb49ecf7edafd02744a48490e744c0a00) )
 	ROM_LOAD( "2a_7g.rom",    0x0c000, 0x4000, CRC(450749fc) SHA1(376ab98ab8db56ed45f7d97a221dfd52e389cb5a) )
 
-	ROM_REGION( 0x0500, REGION_PROMS, 0 )
+	ROM_REGION( 0x0400, REGION_PROMS, 0 )
 	ROM_LOAD( "tc1a_10f.bin", 0x0000, 0x0100, CRC(ce07c544) SHA1(c3691cb420c88f1887a55e3035b5d017decbc17a) )	/* red component */
 	ROM_LOAD( "tc1a_11f.bin", 0x0100, 0x0100, CRC(566d323a) SHA1(fe83585a0d9c7f942a5e54620b627a5a17a0fcf4) )	/* green component */
 	ROM_LOAD( "tc1a_12f.bin", 0x0200, 0x0100, CRC(7ea63946) SHA1(d7b89694a80736c7605b5c83d25d8b706f4504ab) )	/* blue component */
 	ROM_LOAD( "tc2a_2g.bin",  0x0300, 0x0100, CRC(08609bad) SHA1(e5daee3c3fea6620e3c2b91becd93bc4d3cdf011) )	/* sprite lookup table */
-	ROM_LOAD( "tc2a_4e.bin",  0x0400, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "tc2a_4e.bin",  0x0000, 0x0100, CRC(2c43991f) SHA1(312112832bee511b0545524295aa9bc2e756db0f) )	/* sprite palette bank */
 ROM_END
 
 ROM_START( amazon )
@@ -870,15 +873,17 @@ ROM_START( amazon )
 	ROM_LOAD( "6.6g",	0x8000, 0x4000, CRC(936ec941) SHA1(b4891e207d66f8b77c237fc23ffa48f87ab6993a) )
 	ROM_LOAD( "7.7g",	0xc000, 0x4000, CRC(66dd718e) SHA1(80990c6199f63b215e1dead3b09cf6160dd75333) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* unknown, mostly text */
-	ROM_LOAD( "16.18g",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
-
-	ROM_REGION( 0x500, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "clr.10f", 0x000, 0x100, CRC(6440b341) SHA1(ccf89ac889f1653100f5b0a042dcd826c4ac628b) ) /* red */
 	ROM_LOAD( "clr.11f", 0x100, 0x100, CRC(271e947f) SHA1(3d1f44fe92cc5fdff001ef80e07aa46a1ca68fe5) ) /* green */
 	ROM_LOAD( "clr.12f", 0x200, 0x100, CRC(7d38621b) SHA1(7904c3c2c32006d4f4608b6ee84d44ecd601de73) ) /* blue */
 	ROM_LOAD( "2g",		 0x300, 0x100, CRC(44ca16b9) SHA1(1893f24d1c7f4d8e24b5484b19f9284f2ec9be08) ) /* clut */
-	ROM_LOAD( "4e",		 0x400, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "4e",		 0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* unknown, mostly text */
+	ROM_LOAD( "16.18g",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
 ROM_START( amatelas )
@@ -907,15 +912,17 @@ ROM_START( amatelas )
 	ROM_LOAD( "6.6g",	0x8000, 0x4000, CRC(936ec941) SHA1(b4891e207d66f8b77c237fc23ffa48f87ab6993a) )
 	ROM_LOAD( "7.7g",	0xc000, 0x4000, CRC(66dd718e) SHA1(80990c6199f63b215e1dead3b09cf6160dd75333) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* unknown, mostly text */
-	ROM_LOAD( "16.18g",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
-
-	ROM_REGION( 0x500, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "clr.10f", 0x000, 0x100, CRC(6440b341) SHA1(ccf89ac889f1653100f5b0a042dcd826c4ac628b) ) /* red */
 	ROM_LOAD( "clr.11f", 0x100, 0x100, CRC(271e947f) SHA1(3d1f44fe92cc5fdff001ef80e07aa46a1ca68fe5) ) /* green */
 	ROM_LOAD( "clr.12f", 0x200, 0x100, CRC(7d38621b) SHA1(7904c3c2c32006d4f4608b6ee84d44ecd601de73) ) /* blue */
 	ROM_LOAD( "2g",		 0x300, 0x100, CRC(44ca16b9) SHA1(1893f24d1c7f4d8e24b5484b19f9284f2ec9be08) ) /* clut */
-	ROM_LOAD( "4e",		 0x400, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "4e",		 0x000, 0x100, CRC(035f2c7b) SHA1(36e32a50146631e763711b586936b2815600f52d) ) /* ctable */
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* unknown, mostly text */
+	ROM_LOAD( "16.18g",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
 ROM_START( horekid )
@@ -945,15 +952,17 @@ ROM_START( horekid )
 	ROM_LOAD( "horekid.14",	0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
 	ROM_LOAD( "horekid.15",	0x18000, 0x8000, CRC(51105741) SHA1(01c3bb2c03ce1ca959d62d64be3a019e74f677ba) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* unknown, mostly text */
-	ROM_LOAD( "horekid.17",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
-
-	ROM_REGION( 0x500, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) /* red */
 	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) /* green */
 	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) /* blue */
 	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
-	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* unknown, mostly text */
+	ROM_LOAD( "horekid.17",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
 ROM_START( horekidb )
@@ -983,15 +992,17 @@ ROM_START( horekidb )
 	ROM_LOAD( "horekid.14",	0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
 	ROM_LOAD( "horekid.15",	0x18000, 0x8000, CRC(51105741) SHA1(01c3bb2c03ce1ca959d62d64be3a019e74f677ba) )
 
-	ROM_REGION( 0x2000, REGION_USER1, 0 ) /* unknown, mostly text */
-	ROM_LOAD( "horekid.17",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
-
-	ROM_REGION( 0x500, REGION_PROMS, 0 )
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
 	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) /* red */
 	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) /* green */
 	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) /* blue */
 	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
-	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+
+	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* unknown, mostly text */
+	ROM_LOAD( "horekid.17",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
 ROM_END
 
 static DRIVER_INIT( amazon )

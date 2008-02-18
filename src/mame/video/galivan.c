@@ -115,21 +115,6 @@ PALETTE_INIT( galivan )
 
 		colortable_entry_set_value(machine->colortable, 0x180 + i_swapped, ctabentry);
 	}
-
-//  for (i = 0;i < TOTAL_COLORS(2)/16;i++)
-//  {
-//      int j;
-
-//      for (j = 0;j < 16;j++)
-//      {
-//          if (i & 8)
-//              COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x0c) << 2) + (*color_prom & 0x0f);
-//          else
-//              COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x03) << 4) + (*color_prom & 0x0f);
-//      }
-
-//      color_prom++;
-//  }
 }
 
 

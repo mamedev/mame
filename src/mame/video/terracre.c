@@ -11,7 +11,6 @@
 static UINT16 xscroll;
 static UINT16 yscroll;
 static tilemap *background, *foreground;
-static const UINT8 *spritepalettebank;
 
 UINT16 *amazon_videoram;
 
@@ -35,6 +34,7 @@ TILE_GET_INFO( get_fg_tile_info )
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
 {
+	const UINT8 *spritepalettebank = memory_region(REGION_USER1);
 	const gfx_element *pGfx = machine->gfx[2];
 	const UINT16 *pSource = spriteram16;
 	int i;
@@ -95,48 +95,41 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 PALETTE_INIT( amazon )
 {
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 	int i;
-	for( i = 0; i<machine->config->total_colors; i++)
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[machine->config->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[machine->config->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[machine->config->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[machine->config->total_colors] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		bit0 = (color_prom[2*machine->config->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[2*machine->config->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[2*machine->config->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[2*machine->config->total_colors] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->config->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
 
+	/* characters use colors 0-0x0f */
+	for (i = 0; i < 0x10; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
-	/* characters use colors 0-15 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = i;
-
-	/* background tiles use colors 192-255 in four banks */
+	/* background tiles use colors 0xc0-0xff in four banks */
 	/* the bottom two bits of the color code select the palette bank for */
-	/* pens 0-7; the top two bits for pens 8-15. */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
+	/* pens 0-7; the top two bits for pens 8-0x0f. */
+	for (i = 0; i < 0x100; i++)
 	{
-		if (i & 8) COLOR(1,i) = 192 + (i & 0x0f) + ((i & 0xc0) >> 2);
-		else COLOR(1,i) = 192 + (i & 0x0f) + ((i & 0x30) >> 0);
+		UINT8 ctabentry;
+
+		if (i & 0x08)
+			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0xc0) >> 2);
+		else
+			ctabentry = 0xc0 | (i & 0x0f) | ((i & 0x30) >> 0);
+
+		colortable_entry_set_value(machine->colortable, 0x10 + i, ctabentry);
 	}
 
 	/* sprites use colors 128-191 in four banks */
@@ -144,23 +137,18 @@ PALETTE_INIT( amazon )
 	/* the bank is selected by another PROM and depends on the top 8 bits of */
 	/* the sprite code. The PROM selects the bank *separately* for pens 0-7 and */
 	/* 8-15 (like for tiles). */
-	for (i = 0;i < TOTAL_COLORS(2)/16;i++)
+	for (i = 0; i < 0x1000; i++)
 	{
-		int j;
+		UINT8 ctabentry;
+		int i_swapped = ((i & 0x0f) << 8) | ((i & 0xff0) >> 4);
 
-		for (j = 0;j < 16;j++)
-		{
-			if (i & 8)
-				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x0c) << 2) + (*color_prom & 0x0f);
-			else
-				COLOR(2,i + j * (TOTAL_COLORS(2)/16)) = 128 + ((j & 0x03) << 4) + (*color_prom & 0x0f);
-		}
+		if (i & 0x80)
+			ctabentry = 0x80 | ((i & 0x0c) << 2) | (color_prom[i >> 4] & 0x0f);
+		else
+			ctabentry = 0x80 | ((i & 0x03) << 4) | (color_prom[i >> 4] & 0x0f);
 
-		color_prom++;
+		colortable_entry_set_value(machine->colortable, 0x110 + i_swapped, ctabentry);
 	}
-
-	/* color_prom now points to the beginning of the sprite palette bank table */
-	spritepalettebank = color_prom;	/* we'll need it at run time */
 }
 
 WRITE16_HANDLER( amazon_background_w )
@@ -201,7 +189,7 @@ VIDEO_START( amazon )
 {
 	background = tilemap_create(get_bg_tile_info,tilemap_scan_cols,16,16,64,32);
 	foreground = tilemap_create(get_fg_tile_info,tilemap_scan_cols,8,8,64,32);
-		tilemap_set_transparent_pen(foreground,0xf);
+	tilemap_set_transparent_pen(foreground,0xf);
 
 	/* register for saving */
 	state_save_register_global(xscroll);
@@ -211,13 +199,10 @@ VIDEO_START( amazon )
 VIDEO_UPDATE( amazon )
 {
 	if( xscroll&0x2000 )
-	{
 		fillbitmap( bitmap,get_black_pen(machine),cliprect );
-	}
 	else
-	{
 		tilemap_draw( bitmap,cliprect, background, 0, 0 );
-	}
+
 	draw_sprites( machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0 );
 	return 0;

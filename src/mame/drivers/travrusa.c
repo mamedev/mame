@@ -298,7 +298,7 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
-static const gfx_layout sht_spritelayout =
+static const gfx_layout shtrider_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,3),
@@ -316,9 +316,9 @@ static GFXDECODE_START( travrusa )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*8, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( sht )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,          0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, sht_spritelayout, 16*8, 16 )
+static GFXDECODE_START( shtrider )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,               0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, shtrider_spritelayout, 16*8, 16 )
 GFXDECODE_END
 
 
@@ -342,8 +342,7 @@ static MACHINE_DRIVER_START( travrusa )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(travrusa)
 
-	MDRV_PALETTE_LENGTH(128+16)
-	MDRV_COLORTABLE_LENGTH(16*8+16*8)
+	MDRV_PALETTE_LENGTH(16*8+16*8)
 
 	MDRV_PALETTE_INIT(travrusa)
 	MDRV_VIDEO_START(travrusa)
@@ -358,8 +357,7 @@ static MACHINE_DRIVER_START( shtrider )
 	MDRV_IMPORT_FROM(travrusa)
 
 	/* video hardware */
-	MDRV_GFXDECODE(sht)
-
+	MDRV_GFXDECODE(shtrider)
 	MDRV_PALETTE_INIT(shtrider)
 MACHINE_DRIVER_END
 
@@ -392,10 +390,10 @@ ROM_START( travrusa )
 	ROM_LOAD( "zr1-9.l3", 0x02000, 0x2000, CRC(13be6a14) SHA1(47861910fe4c46cd72634cf7d834be2da2a0a4f9) )
 	ROM_LOAD( "zr1-10.k3", 0x04000, 0x2000, CRC(6fcc9fdb) SHA1(88f878b9ebf07c5a16f8cb742016cac971ed3f10) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0320, REGION_PROMS, 0 )
 	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */
-	ROM_LOAD( "tbp18s.2",     0x0100, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
-	ROM_LOAD( "tbp24s10.3",   0x0120, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
+	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
+	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
 ROM_END
 
 ROM_START( motorace )
@@ -418,10 +416,10 @@ ROM_START( motorace )
 	ROM_LOAD( "mr5.3m",       0x02000, 0x2000, CRC(f75f2aad) SHA1(e4a8a3da56cbc04f0c9041afac182d1bfceb1d0d) )
 	ROM_LOAD( "mr6.3k",       0x04000, 0x2000, CRC(518889a0) SHA1(70b417104ce86132cb5542813c1e0509b2260756) )
 
-	ROM_REGION( 0x0220, REGION_PROMS, 0 )
+	ROM_REGION( 0x0320, REGION_PROMS, 0 )
 	ROM_LOAD( "mmi6349.ij",   0x0000, 0x0200, CRC(c9724350) SHA1(1fac20cdc0a53d94e8f67b49d7dd71d1b9f1f7ef) ) /* character palette - last $100 are unused */
-	ROM_LOAD( "tbp18s.2",     0x0100, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
-	ROM_LOAD( "tbp24s10.3",   0x0120, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
+	ROM_LOAD( "tbp18s.2",     0x0200, 0x0020, CRC(a1130007) SHA1(9deb0eed75dd06e86f83c819a3393158be7c9dce) ) /* sprite palette */
+	ROM_LOAD( "tbp24s10.3",   0x0220, 0x0100, CRC(76062638) SHA1(7378a26cf455d9d3df90929dc665870514c34b54) ) /* sprite lookup table */
 ROM_END
 
 /* it's probably a bootleg of the original Seibu version with the roms decrypted (no epoxy block) */

@@ -252,8 +252,8 @@ static const gfx_layout bulletlayout =
 
 
 static GFXDECODE_START( tankbatt )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 64 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, bulletlayout, 0, 64 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   0, 256 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, bulletlayout, 0, 256 )
 GFXDECODE_END
 
 
@@ -292,8 +292,7 @@ static MACHINE_DRIVER_START( tankbatt )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(tankbatt)
-	MDRV_PALETTE_LENGTH(65)
-	MDRV_COLORTABLE_LENGTH(128)
+	MDRV_PALETTE_LENGTH(256*2)
 
 	MDRV_PALETTE_INIT(tankbatt)
 	MDRV_VIDEO_START(tankbatt)

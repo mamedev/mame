@@ -170,9 +170,6 @@ PALETTE_INIT( tubep )
 {
 	int i,r,g,b;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
-
 	/* background/sprites palette variables */
 
 	static const int resistors_0[6] = { 33000, 15000, 8200, 4700, 2200, 1000 };
@@ -225,13 +222,6 @@ PALETTE_INIT( tubep )
 		palette_set_color(machine,i, MAKE_RGB(r,g,b));
 
 		color_prom++;
-	}
-
-	/* text lookup */
-	for (i = 0; i < TOTAL_COLORS(0)/2; i++)
-	{
-		COLOR(0, 2*i+0 ) = 0;		/* transparent "black" */
-		COLOR(0, 2*i+1 ) = i;
 	}
 
 	/* sprites use the second PROM to control 8 x LS368. We copy content of this PROM over here */
@@ -590,26 +580,40 @@ void tubep_vblank_end(void)
 
 VIDEO_UPDATE( tubep )
 {
-	int offs;
 	int DISP_ = DISP^1;
 
-	/* draw background ram */
+	const pen_t *pens = &machine->pens[ 32 ]; //change it later
+
+	UINT32 v;
+	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
+	UINT8 *romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
+
+	/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
+
+	for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
 	{
-		const pen_t *pens = &machine->pens[ 32 ]; //change it later
-
-		UINT32 h,v;
-		UINT8 * romBxx = memory_region(REGION_USER1) + 0x2000*background_romsel;
-
-		/* logerror(" update: from DISP=%i y_min=%3i y_max=%3i\n", DISP_, cliprect->min_y, cliprect->max_y+1); */
-
-		for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
+		UINT32 h;
+		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
+		for (h = 0*8; h < 32*8; h++)
 		{
-			UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
-			for (h = 0*8; h < 32*8; h++)
+			offs_t text_offs;
+			UINT8 text_code;
+			UINT8 text_gfx_data;
+
+			sp_data2 = sp_data1;
+			sp_data1 = sp_data0;
+			sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
+
+			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
+			text_code = tubep_textram[text_offs];
+			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
+
+			if (text_gfx_data & (0x80 >> (h & 0x07)))
+				*BITMAP_ADDR16(bitmap, v, h) = machine->pens[(tubep_textram[text_offs + 1] & 0x0f) | color_A4];
+			else
 			{
 				UINT32 bg_data;
 				UINT32 sp_data;
-				UINT32 sel0,sel1,sel2;
 
 				UINT32 romB_addr = (((h>>1)&0x3f)^((h&0x80)?0x00:0x3f)) | (((v&0x7f)^((v&0x80)?0x00:0x7f))<<6);
 
@@ -638,55 +642,18 @@ VIDEO_UPDATE( tubep )
 
 				romB_data_h>>=2;
 
-				sp_data2 = sp_data1;
-				sp_data1 = sp_data0;
-				sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
-				sel0 = 0;
-				if (sp_data0 != 0x0f)
-					sel0 = 1;
-
-				sel1 = 1;
-				if (sp_data1 != 0x0f)
-					sel1 = 0;
-
-				sel2 = 0;
-				if (sp_data2 != 0x0f)
-					sel2 = 1;
-
-				if (sel0&sel1&sel2)
+				if ((sp_data0 != 0x0f) && (sp_data1 == 0x0f) && (sp_data2 != 0x0f))
 					sp_data = sp_data2;
 				else
 					sp_data = sp_data1;
 
-				if (sp_data!=0x0f)
+				if (sp_data != 0x0f)
 					bg_data = prom2[sp_data | color_A4];
 
 				*BITMAP_ADDR16(bitmap, v, h) = pens[ bg_data*64 + romB_data_h ];
 			}
 		}
 	}
-
-	/* draw the character mapped graphics */
-	for (offs = 0;offs < 0x800; offs+=2)
-	{
-		int sx,sy;
-
-		sx = (offs/2) % 32;
-		//if (flipscreen[0]) sx = 31 - sx;
-		sy = (offs/2) / 32;
-		//if (flipscreen[1]) sy = 31 - sy;
-
-		if ((cliprect->min_y&(~0x07)) == 8*sy)
-		{
-			drawgfx(bitmap,machine->gfx[0],
-				tubep_textram[offs],
-				((tubep_textram[offs+1]) & 0x0f) | color_A4,
-				0,0, /*flipscreen[0],flipscreen[1],*/
-				8*sx,8*sy,
-				cliprect, TRANSPARENCY_PEN, machine->pens[0]);
-		}
-	}
-
 
 	return 0;
 }
@@ -717,8 +684,6 @@ VIDEO_UPDATE( tubep )
 PALETTE_INIT( rjammer )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };
 	static const int resistors_b [2] = { 470, 220 };
@@ -753,14 +718,6 @@ PALETTE_INIT( rjammer )
 
 		color_prom++;
 	}
-
-
-	/* text: colors 0, 17-31 from PROM @16B */
-	for (i = 0; i < TOTAL_COLORS(0)/2; i++)
-	{
-		COLOR(0, 2*i + 0) = 0;		/* transparent "black" */
-		COLOR(0, 2*i + 1) = i+16;	/* /SOFF is on the A4 line */
-	}
 }
 
 
@@ -778,66 +735,62 @@ WRITE8_HANDLER( rjammer_background_page_w )
 
 VIDEO_UPDATE( rjammer )
 {
-	int offs;
 	int DISP_ = DISP^1;
 
-	/* draw background ram */
-	{
-		const pen_t *pens = &machine->pens[ 0x00 ];
+	const pen_t *pens = &machine->pens[ 0x00 ];
 
-		UINT32 h,v;
-		UINT8 * rom13D  = memory_region(REGION_USER1);
-		UINT8 * rom11BD = memory_region(REGION_USER1)+0x1000;
-		UINT8 * rom19C  = memory_region(REGION_USER1)+0x5000;
-
+	UINT32 v;
+	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
+	UINT8 *rom13D  = memory_region(REGION_USER1);
+	UINT8 *rom11BD = memory_region(REGION_USER1)+0x1000;
+	UINT8 *rom19C  = memory_region(REGION_USER1)+0x5000;
 
 	/* this can be optimized further by extracting constants out of the loop */
 	/* especially read from ROM19C can be done once per 8 pixels*/
 	/* and the data could be bitswapped beforehand */
 
-		for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
+	for (v = cliprect->min_y; v <= cliprect->max_y; v++)	/* only for current scanline */
+	{
+		UINT32 h;
+		UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
+		UINT8 pal14h4_pin19;
+		UINT8 pal14h4_pin18;
+		UINT8 pal14h4_pin13;
+
+		UINT32 addr = (v*2) | page;
+		UINT32 ram_data = rjammer_backgroundram[ addr ] + 256*(rjammer_backgroundram[ addr+1 ]&0x2f);
+
+		addr = (v>>3) | ((ls377_data&0x1f)<<5);
+		pal14h4_pin13 = (rom19C[addr] >> ((v&7)^7) ) &1;
+		pal14h4_pin19 = (ram_data>>13) & 1;
+
+		for (h = 0*8; h < 32*8; h++)
 		{
-			UINT32 sp_data0=0,sp_data1=0,sp_data2=0;
-			UINT8 pal14h4_pin19;
-			UINT8 pal14h4_pin18;
-			UINT8 pal14h4_pin13;
+			offs_t text_offs;
+			UINT8 text_code;
+			UINT8 text_gfx_data;
 
-			UINT32 addr = (v*2) | page;
-			UINT32 ram_data = rjammer_backgroundram[ addr ] + 256*(rjammer_backgroundram[ addr+1 ]&0x2f);
+			sp_data2 = sp_data1;
+			sp_data1 = sp_data0;
+			sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
 
-			addr = (v>>3) | ((ls377_data&0x1f)<<5);
-			pal14h4_pin13 = (rom19C[addr] >> ((v&7)^7) ) &1;
-			pal14h4_pin19 = (ram_data>>13) & 1;
+			text_offs = ((v >> 3) << 6) | ((h >> 3) << 1);
+			text_code = tubep_textram[text_offs];
+			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
-			for (h = 0*8; h < 32*8; h++)
+			if (text_gfx_data & (0x80 >> (h & 0x07)))
+				*BITMAP_ADDR16(bitmap, v, h) = machine->pens[0x10 | (tubep_textram[text_offs + 1] & 0x0f)];
+			else
 			{
 				UINT32 sp_data;
-				UINT32 sel0,sel1,sel2;
 
-				sp_data2 = sp_data1;
-				sp_data1 = sp_data0;
-				sp_data0 = spritemap[ h + v*256 +(DISP_*256*256) ];
-				sel0 = 0;
-				if (sp_data0 != 0x0f)
-					sel0 = 1;
-
-				sel1 = 1;
-				if (sp_data1 != 0x0f)
-					sel1 = 0;
-
-				sel2 = 0;
-				if (sp_data2 != 0x0f)
-					sel2 = 1;
-
-				if (sel0&sel1&sel2)
+				if ((sp_data0 != 0x0f) && (sp_data1 == 0x0f) && (sp_data2 != 0x0f))
 					sp_data = sp_data2;
 				else
 					sp_data = sp_data1;
 
-				if (sp_data!=0x0f)
-				{
+				if (sp_data != 0x0f)
 					*BITMAP_ADDR16(bitmap, v, h) = pens[0x00+ sp_data ];
-				}
 				else
 				{
 					UINT32 bg_data;
@@ -864,61 +817,35 @@ VIDEO_UPDATE( rjammer )
 					addr = (h>>3) | (ls377_data<<5);
 					pal14h4_pin18 = (rom19C[addr] >> ((h&7)^7) ) &1;
 
-/*
-    PAL14H4 @15A functions:
+					/*
+                        PAL14H4 @15A funct
 
-        PIN6 = disable color on offscreen area
+                        PIN6 = disable color on offscreen area
+                        PIN19,PIN18,PIN13 = arguments for PIN17 function
+                        PIN17 = background color bank (goes to A4 line on PROM @16A)
+                                formula for PIN17 is:
 
-        PIN19,PIN18,PIN13 = arguments for PIN17 function
+                                PIN17 =  ( PIN13 & PIN8 & PIN9 & !PIN11 &  PIN12 )
+                                       | ( PIN18 & PIN8 & PIN9 &  PIN11 & !PIN12 )
+                                       | ( PIN19 )
+                                where:
+                                PIN 8 = bit 3 of bg_data
+                                PIN 9 = bit 2 of bg_data
+                                PIN 11= bit 1 of bg_data
+                                PIN 12= bit 0 of bg_data
 
-        PIN17 = background color bank (goes to A4 line on PROM @16A)
-        formula for PIN17 is:
+                        not used by now, but for the record:
 
-        PIN17 =  ( PIN13 & PIN8 & PIN9 & !PIN11 &  PIN12 )
-               | ( PIN18 & PIN8 & PIN9 &  PIN11 & !PIN12 )
-               | ( PIN19 )
-
-            where:
-        PIN 8 = bit 3 of bg_data
-        PIN 9 = bit 2 of bg_data
-        PIN 11= bit 1 of bg_data
-        PIN 12= bit 0 of bg_data
-
-
-        not used by now, but for the record:
-
-        PIN15 = select prom @16B (active low)
-        PIN16 = select prom @16A (active low)
-        PINs: 1,2,3,4,5 and 7,14 are used for priority system
-
-*/
+                        PIN15 = select prom @16B (active low)
+                        PIN16 = select prom @16A (active low)
+                        PINs: 1,2,3,4,5 and 7,14 are used for priority system
+					*/
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);
 					*BITMAP_ADDR16(bitmap, v, h) = pens[0x20+ color_bank*0x10 + bg_data ];
 				}
 			}
-		}
-	}
-
-	/* draw the character mapped graphics */
-	for (offs = 0;offs < 0x800; offs+=2)
-	{
-		int sx,sy;
-
-		sx = (offs/2) % 32;
-		//if (flipscreen[0]) sx = 31 - sx;
-		sy = (offs/2) / 32;
-		//if (flipscreen[1]) sy = 31 - sy;
-
-		if ((cliprect->min_y&(~0x07)) == 8*sy)
-		{
-			drawgfx(bitmap,machine->gfx[0],
-				tubep_textram[offs],
-				(tubep_textram[offs+1]) & 0x0f,
-				0,0, /*flipscreen[0],flipscreen[1],*/
-				8*sx,8*sy,
-				cliprect, TRANSPARENCY_PEN, machine->pens[0]);
 		}
 	}
 
