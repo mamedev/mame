@@ -165,7 +165,7 @@ struct _AICA
 	signed short RINGBUF[64];
 	unsigned char BUFPTR;
 	unsigned char *AICARAM;
-	UINT32 AICARAM_LENGTH;
+	UINT32 AICARAM_LENGTH, RAM_MASK;
 	char Master;
 	void (*IntARMCB)(int irq);
 	sound_stream * stream;
@@ -457,7 +457,7 @@ static void AICA_StartSlot(struct _AICA *AICA, struct _SLOT *slot)
 	if (PCMS(slot) >= 2)
 	{
 		slot->curstep = slot->nxtstep = 0;
-		slot->adbase = slot->nxtbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&0x1fffff));
+		slot->adbase = slot->nxtbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&AICA->RAM_MASK));
 		InitADPCM(&(slot->cur_sample), &(slot->cur_quant));
 		InitADPCM(&(slot->nxt_sample), &(slot->nxt_quant));
 	}
@@ -504,6 +504,7 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 			AICA->AICARAM = memory_region(intf->region);
 			AICA->AICARAM += intf->roffset;
 			AICA->AICARAM_LENGTH = memory_region_length(intf->region); 
+			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;
 			AICA->DSP.AICARAM_LENGTH =  memory_region_length(intf->region)/2;
 		}
@@ -641,7 +642,7 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 							AICA_StartSlot(AICA, s2);
 							#if 0
 							printf("StartSlot[%02X]:   SSCTL %01X SA %06X LSA %04X LEA %04X PCMS %01X LPCTL %01X\n",sl,SSCTL(s2),SA(s2),LSA(s2),LEA(s2),PCMS(s2),LPCTL(s2));
-							printf("                 EGHOLD %01X AR %02X D1R %02X D2R %02X RR %02X DL %02X KRS %01X LPSLNK %01X\n",EGHOLD(s2)>>5,AR(s2),D1R(s2),D2R(s2),RR(s2),DL(s2),KRS(s2),LPSLNK(s2)>>14);
+							printf("                 AR %02X D1R %02X D2R %02X RR %02X DL %02X KRS %01X LPSLNK %01X\n",AR(s2),D1R(s2),D2R(s2),RR(s2),DL(s2),KRS(s2),LPSLNK(s2)>>14);
 							printf("                 TL %02X OCT %01X FNS %03X\n",TL(s2),OCT(s2),FNS(s2));
 							printf("                 LFORE %01X LFOF %02X ALFOWS %01X ALFOS %01X PLFOWS %01X PLFOS %01X\n",LFORE(s2),LFOF(s2),ALFOWS(s2),ALFOS(s2),PLFOWS(s2),PLFOS(s2));
 							printf("                 IMXL %01X ISEL %01X DISDL %01X DIPAN %02X\n",IMXL(s2),ISEL(s2),DISDL(s2),DIPAN(s2));
@@ -1012,8 +1013,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	}
 	else if(PCMS(slot) == 0) 
 	{
-		addr1=(slot->cur_addr>>(SHIFT-1))&0x1ffffe;
-		addr2=(slot->nxt_addr>>(SHIFT-1))&0x1ffffe;
+		addr1=(slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK;
+		addr2=(slot->nxt_addr>>(SHIFT-1))&AICA->RAM_MASK;
 	}
 	else
 	{
@@ -1023,8 +1024,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 
 	if(PCMS(slot) == 1)	// 8-bit signed
 	{
-		INT8 *p1=(signed char *) (AICA->AICARAM+(((SA(slot)+addr1))&0x1fffff));
-		INT8 *p2=(signed char *) (AICA->AICARAM+(((SA(slot)+addr2))&0x1fffff));
+		INT8 *p1=(signed char *) (AICA->AICARAM+(((SA(slot)+addr1))&AICA->RAM_MASK));
+		INT8 *p2=(signed char *) (AICA->AICARAM+(((SA(slot)+addr2))&AICA->RAM_MASK));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
 		s=(int) (p1[0]<<8)*((1<<SHIFT)-fpart)+(int) (p2[0]<<8)*fpart;
@@ -1032,8 +1033,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	}
 	else if (PCMS(slot) == 0)	//16 bit signed
 	{
-		INT16 *p1=(signed short *) (AICA->AICARAM+((SA(slot)+addr1)&0x1fffff));
-		INT16 *p2=(signed short *) (AICA->AICARAM+((SA(slot)+addr2)&0x1fffff));
+		INT16 *p1=(signed short *) (AICA->AICARAM+((SA(slot)+addr1)&AICA->RAM_MASK));
+		INT16 *p2=(signed short *) (AICA->AICARAM+((SA(slot)+addr2)&AICA->RAM_MASK));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
 		s=(int) (p1[0])*((1<<SHIFT)-fpart)+(int) (p2[0])*fpart;
@@ -1260,6 +1261,7 @@ void AICA_set_ram_base(int which, void *base, int size)
 	{
 		AICA->AICARAM = base;
 		AICA->AICARAM_LENGTH = size;
+		AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 		AICA->DSP.AICARAM = base;
 		AICA->DSP.AICARAM_LENGTH = size;
 	}
