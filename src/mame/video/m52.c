@@ -310,6 +310,9 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 	xpos += 128;
 
+	/* this may not be correct */
+	ypos = ypos + (22 - 8);
+
 	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
 		flip_screen,
