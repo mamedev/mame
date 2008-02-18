@@ -15,6 +15,32 @@ static mame_bitmap* helper;
 static int collision[2];
 
 
+PALETTE_INIT( sprint2 )
+{
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 4);
+
+	colortable_palette_set_color(machine->colortable, 0, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(machine->colortable, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
+	colortable_palette_set_color(machine->colortable, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
+	colortable_palette_set_color(machine->colortable, 3, MAKE_RGB(0xff, 0xff, 0xff));
+
+	colortable_entry_set_value(machine->colortable, 0x0, 1);	/* black playfield */
+	colortable_entry_set_value(machine->colortable, 0x1, 0);
+	colortable_entry_set_value(machine->colortable, 0x2, 1);	/* white playfield */
+	colortable_entry_set_value(machine->colortable, 0x3, 3);
+
+	colortable_entry_set_value(machine->colortable, 0x4, 1);	/* car #1 */
+	colortable_entry_set_value(machine->colortable, 0x5, 3);
+	colortable_entry_set_value(machine->colortable, 0x6, 1);	/* car #2 */
+	colortable_entry_set_value(machine->colortable, 0x7, 0);
+	colortable_entry_set_value(machine->colortable, 0x8, 1);	/* car #3 */
+	colortable_entry_set_value(machine->colortable, 0x9, 2);
+	colortable_entry_set_value(machine->colortable, 0xa, 1);	/* car #4 */
+	colortable_entry_set_value(machine->colortable, 0xb, 2);
+}
+
+
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = sprint2_video_ram[tile_index];
@@ -58,7 +84,7 @@ WRITE8_HANDLER( sprint2_video_ram_w )
 }
 
 
-static UINT8 collision_check(rectangle* rect)
+static UINT8 collision_check(colortable_t *colortable, rectangle* rect)
 {
 	UINT8 data = 0;
 
@@ -66,21 +92,16 @@ static UINT8 collision_check(rectangle* rect)
 	int y;
 
 	for (y = rect->min_y; y <= rect->max_y; y++)
-	{
 		for (x = rect->min_x; x <= rect->max_x; x++)
 		{
-			pen_t a = *BITMAP_ADDR16(helper, y, x);
+			UINT16 a = colortable_entry_get_value(colortable, *BITMAP_ADDR16(helper, y, x));
 
 			if (a == 0)
-			{
 				data |= 0x40;
-			}
+
 			if (a == 3)
-			{
 				data |= 0x80;
-			}
 		}
-	}
 
 	return data;
 }
@@ -165,12 +186,11 @@ VIDEO_EOF( sprint2 )
 			get_sprite_y(i),
 			&rect, TRANSPARENCY_PEN, 1);
 
-		collision[i] |= collision_check(&rect);
+		collision[i] |= collision_check(machine->colortable, &rect);
 
 		/* check for sprite-sprite collisions */
 
 		for (j = 0; j < 4; j++)
-		{
 			if (j != i)
 			{
 				drawgfx(helper, machine->gfx[1],
@@ -181,7 +201,6 @@ VIDEO_EOF( sprint2 )
 					get_sprite_y(j),
 					&rect, TRANSPARENCY_PEN, 0);
 			}
-		}
 
 		drawgfx(helper, machine->gfx[1],
 			get_sprite_code(i),
@@ -191,6 +210,6 @@ VIDEO_EOF( sprint2 )
 			get_sprite_y(i),
 			&rect, TRANSPARENCY_PEN, 1);
 
-		collision[i] |= collision_check(&rect);
+		collision[i] |= collision_check(machine->colortable, &rect);
 	}
 }

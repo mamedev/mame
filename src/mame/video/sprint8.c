@@ -11,12 +11,68 @@ UINT8* sprint8_video_ram;
 UINT8* sprint8_pos_h_ram;
 UINT8* sprint8_pos_v_ram;
 UINT8* sprint8_pos_d_ram;
+UINT8* sprint8_team;
 
 static tilemap* tilemap1;
 static tilemap* tilemap2;
 
 static mame_bitmap* helper1;
 static mame_bitmap* helper2;
+
+
+PALETTE_INIT( sprint8 )
+{
+	int i;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x12);
+
+	for (i = 0; i < 0x10; i++)
+	{
+		colortable_entry_set_value(machine->colortable, 2 * i + 0, 0x10);
+		colortable_entry_set_value(machine->colortable, 2 * i + 1, i);
+	}
+
+	colortable_entry_set_value(machine->colortable, 0x20, 0x10);
+	colortable_entry_set_value(machine->colortable, 0x21, 0x10);
+	colortable_entry_set_value(machine->colortable, 0x22, 0x10);
+	colortable_entry_set_value(machine->colortable, 0x23, 0x11);
+}
+
+
+static void set_pens(colortable_t *colortable)
+{
+	int i;
+
+	for (i = 0; i < 0x10; i += 8)
+	{
+		if (*sprint8_team & 1)
+		{
+			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
+			colortable_palette_set_color(colortable, i + 3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
+			colortable_palette_set_color(colortable, i + 4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
+			colortable_palette_set_color(colortable, i + 5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
+			colortable_palette_set_color(colortable, i + 6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
+			colortable_palette_set_color(colortable, i + 7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
+		}
+		else
+		{
+			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+			colortable_palette_set_color(colortable, i + 6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
+			colortable_palette_set_color(colortable, i + 7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
+		}
+	}
+
+	colortable_palette_set_color(colortable, 0x10, MAKE_RGB(0x00, 0x00, 0x00));
+	colortable_palette_set_color(colortable, 0x11, MAKE_RGB(0xff, 0xff, 0xff));
+}
 
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -26,23 +82,18 @@ static TILE_GET_INFO( get_tile_info1 )
 	int color = 0;
 
 	if ((code & 0x30) != 0x30) /* ? */
-	{
 		color = 17;
-	}
 	else
 	{
 		if ((tile_index + 1) & 0x010)
-		{
 			color |= 1;
-		}
+
 		if (code & 0x80)
-		{
 			color |= 2;
-		}
+
 		if (tile_index & 0x200)
-		{
 			color |= 4;
-		}
+
 	}
 
 	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
@@ -56,13 +107,9 @@ static TILE_GET_INFO( get_tile_info2 )
 	int color = 0;
 
 	if ((code & 0x38) != 0x28)
-	{
 		color = 16;
-	}
 	else
-	{
 		color = 17;
-	}
 
 	SET_TILE_INFO(code >> 7, code, color, (code & 0x40) ? (TILE_FLIPX | TILE_FLIPY) : 0);
 }
@@ -101,9 +148,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 		int y = sprint8_pos_v_ram[i];
 
 		if (code & 0x80)
-		{
 			x |= 0x100;
-		}
 
 		drawgfx(bitmap, machine->gfx[2],
 			code ^ 7,
@@ -123,8 +168,8 @@ static TIMER_CALLBACK( sprint8_collision_callback )
 
 VIDEO_UPDATE( sprint8 )
 {
+	set_pens(machine->colortable);
 	tilemap_draw(bitmap, cliprect, tilemap1, 0, 0);
-
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
@@ -137,7 +182,7 @@ VIDEO_EOF( sprint8 )
 
 	tilemap_draw(helper2, &machine->screen[0].visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, 16, &machine->screen[0].visarea);
+	fillbitmap(helper1, machine->pens[0x20], &machine->screen[0].visarea);
 
 	draw_sprites(machine, helper1, &machine->screen[0].visarea);
 
@@ -147,11 +192,9 @@ VIDEO_EOF( sprint8 )
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 
 		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
-		{
-			if (p1[x] != 16 && p2[x] != 16)
-			{
-				timer_set(video_screen_get_time_until_pos(0, y + 24, x), NULL, p1[x], sprint8_collision_callback);
-			}
-		}
+			if (p1[x] != 0x20 && p2[x] == 0x23)
+				timer_set(video_screen_get_time_until_pos(0, y + 24, x), NULL,
+						  colortable_entry_get_value(machine->colortable, p1[x]),
+						  sprint8_collision_callback);
 	}
 }

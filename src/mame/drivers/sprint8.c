@@ -39,77 +39,18 @@ static TIMER_CALLBACK( input_callback )
 		signed char delta = (val - dial[i]) & 15;
 
 		if (delta & 8)
-		{
 			delta |= 0xf0; /* extend sign to 8 bits */
-		}
 
 		steer_flag[i] = (delta != 0);
 
 		if (delta > 0)
-		{
 			steer_dir[i] = 0;
-		}
+
 		if (delta < 0)
-		{
 			steer_dir[i] = 1;
-		}
 
 		dial[i] = val;
 	}
-}
-
-
-static void fill_palette(running_machine *machine, int team)
-{
-	int i;
-
-	for (i = 0; i < 16; i += 8)
-	{
-		if (team)
-		{
-			palette_set_color(machine, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			palette_set_color(machine, i + 2, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			palette_set_color(machine, i + 3, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			palette_set_color(machine, i + 4, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			palette_set_color(machine, i + 5, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			palette_set_color(machine, i + 6, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			palette_set_color(machine, i + 7, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-		}
-		else
-		{
-			palette_set_color(machine, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
-			palette_set_color(machine, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
-			palette_set_color(machine, i + 2, MAKE_RGB(0xff, 0xff, 0x00)); /* yellow  */
-			palette_set_color(machine, i + 3, MAKE_RGB(0x00, 0xff, 0x00)); /* green   */
-			palette_set_color(machine, i + 4, MAKE_RGB(0xff, 0x00, 0xff)); /* magenta */
-			palette_set_color(machine, i + 5, MAKE_RGB(0xe0, 0xc0, 0x70)); /* puce    */
-			palette_set_color(machine, i + 6, MAKE_RGB(0x00, 0xff, 0xff)); /* cyan    */
-			palette_set_color(machine, i + 7, MAKE_RGB(0xff, 0xaa, 0xaa)); /* pink    */
-		}
-	}
-
-	palette_set_color(machine, 16, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 17, MAKE_RGB(0xff, 0xff, 0xff));
-}
-
-
-static PALETTE_INIT( sprint8 )
-{
-	int i;
-
-	fill_palette(machine, 0);
-
-	for (i = 0; i < 16; i++)
-	{
-		colortable[2 * i + 0] = 16;
-		colortable[2 * i + 1] = i;
-	}
-
-	colortable[32] = 16;
-	colortable[33] = 16;
-	colortable[34] = 16;
-	colortable[35] = 17;
 }
 
 
@@ -148,12 +89,6 @@ static READ8_HANDLER( sprint8_input_r )
 static WRITE8_HANDLER( sprint8_lockout_w )
 {
 	coin_lockout_w(offset, !(data & 1));
-}
-
-
-static WRITE8_HANDLER( sprint8_team_w )
-{
-	fill_palette(Machine, !(data & 1));
 }
 
 
@@ -200,7 +135,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(sprint8_explosion_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(sprint8_bugle_w)
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(sprint8_bug_w)
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(sprint8_team_w)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(MWA8_RAM) AM_BASE(&sprint8_team)
 	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(sprint8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(sprint8_motor_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(MWA8_NOP) /* probably a watchdog, disabled in service mode */
@@ -541,8 +476,7 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_SCREEN_SIZE(512, 261)
 	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 	MDRV_GFXDECODE(sprint8)
-	MDRV_PALETTE_LENGTH(18)
-	MDRV_COLORTABLE_LENGTH(36)
+	MDRV_PALETTE_LENGTH(36)
 
 	MDRV_PALETTE_INIT(sprint8)
 	MDRV_VIDEO_START(sprint8)

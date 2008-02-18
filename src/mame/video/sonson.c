@@ -8,6 +8,7 @@
 
 #include "driver.h"
 
+UINT8 *sonson_scroll;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -42,47 +43,56 @@ static tilemap *bg_tilemap;
 PALETTE_INIT( sonson )
 {
 	int i;
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x20);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x20; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[i + machine->drv->total_colors] >> 0) & 0x01;
-		bit1 = (color_prom[i + machine->drv->total_colors] >> 1) & 0x01;
-		bit2 = (color_prom[i + machine->drv->total_colors] >> 2) & 0x01;
-		bit3 = (color_prom[i + machine->drv->total_colors] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x20] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x20] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x20] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x20] >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* green component */
-		bit0 = (color_prom[i] >> 4) & 0x01;
-		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 6) & 0x01;
-		bit3 = (color_prom[i] >> 7) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
 		/* blue component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		bit3 = (color_prom[i] >> 3) & 0x01;
+		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 2*machine->drv->total_colors;
 	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x40;
 
-	/* characters use colors 0-15 */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-		COLOR(0,i) = *(color_prom++) & 0x0f;
+	/* characters use colors 0-0x0f */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 
-	/* sprites use colors 16-31 */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-		COLOR(1,i) = (*(color_prom++) & 0x0f) + 0x10;
+	/* sprites use colors 0x10-0x1f */
+	for (i = 0x100; i < 0x200; i++)
+	{
+		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( sonson_videoram_w )
@@ -95,16 +105,6 @@ WRITE8_HANDLER( sonson_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-WRITE8_HANDLER( sonson_scroll_w )
-{
-	int row;
-
-	for (row = 5; row < 32; row++)
-	{
-		tilemap_set_scrollx(bg_tilemap, row, data);
-	}
 }
 
 WRITE8_HANDLER( sonson_flipscreen_w )
@@ -127,8 +127,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( sonson )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
 	tilemap_set_scroll_rows(bg_tilemap, 32);
 }
@@ -165,6 +164,11 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( sonson )
 {
+	int row;
+
+	for (row = 5; row < 32; row++)
+		tilemap_set_scrollx(bg_tilemap, row, *sonson_scroll);
+
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;

@@ -33,34 +33,44 @@ PALETTE_INIT( speedatk )
 {
 	int i;
 
-	for (i = 0;i < 0x10;i++)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x10; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* green component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
 		/* blue component */
 		bit0 = 0;
 		bit1 = (color_prom[i] >> 6) & 0x01;
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	color_prom += 0x10;
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x20;
 
-	/* Colortable entry */
-	for(i = 0; i < 0x100; i++)
-		colortable[i] = color_prom[i];
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] & 0x0f;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( speedatk_videoram_w )
@@ -85,14 +95,8 @@ static TILE_GET_INFO( get_tile_info )
 	int code, color, region;
 
 	code = videoram[tile_index] + ((colorram[tile_index] & 0xe0) << 3);
-	color = colorram[tile_index] & 0x0f;
+	color = colorram[tile_index] & 0x1f;
 	region = (colorram[tile_index] & 0x10) >> 4;
-
-	color += 2;
-	if(region)
-		color += 0x10;
-	if (region == 1)
-		color &= 0x1f;
 
 	SET_TILE_INFO(region, code, color, 0);
 }

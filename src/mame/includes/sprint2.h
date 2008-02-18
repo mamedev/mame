@@ -30,15 +30,16 @@ DISCRETE_SOUND_EXTERN( dominos );
 
 /*----------- defined in video/sprint2.c -----------*/
 
-extern READ8_HANDLER( sprint2_collision1_r );
-extern READ8_HANDLER( sprint2_collision2_r );
+READ8_HANDLER( sprint2_collision1_r );
+READ8_HANDLER( sprint2_collision2_r );
 
-extern WRITE8_HANDLER( sprint2_collision_reset1_w );
-extern WRITE8_HANDLER( sprint2_collision_reset2_w );
-extern WRITE8_HANDLER( sprint2_video_ram_w );
+WRITE8_HANDLER( sprint2_collision_reset1_w );
+WRITE8_HANDLER( sprint2_collision_reset2_w );
+WRITE8_HANDLER( sprint2_video_ram_w );
 
-extern VIDEO_UPDATE( sprint2 );
-extern VIDEO_START( sprint2 );
-extern VIDEO_EOF( sprint2 );
+PALETTE_INIT( sprint2 );
+VIDEO_UPDATE( sprint2 );
+VIDEO_START( sprint2 );
+VIDEO_EOF( sprint2 );
 
 extern UINT8* sprint2_video_ram;

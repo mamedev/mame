@@ -52,14 +52,17 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 
-extern WRITE8_HANDLER( sonson_videoram_w );
-extern WRITE8_HANDLER( sonson_colorram_w );
-extern WRITE8_HANDLER( sonson_scroll_w );
-extern WRITE8_HANDLER( sonson_flipscreen_w );
 
-extern PALETTE_INIT( sonson );
-extern VIDEO_START( sonson );
-extern VIDEO_UPDATE( sonson );
+extern UINT8 *sonson_scroll;
+
+WRITE8_HANDLER( sonson_videoram_w );
+WRITE8_HANDLER( sonson_colorram_w );
+WRITE8_HANDLER( sonson_scroll_w );
+WRITE8_HANDLER( sonson_flipscreen_w );
+
+PALETTE_INIT( sonson );
+VIDEO_START( sonson );
+VIDEO_UPDATE( sonson );
 
 static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 {
@@ -91,7 +94,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sonson_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_WRITE(sonson_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2020, 0x207f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scroll_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_RAM) AM_BASE(&sonson_scroll)
 	AM_RANGE(0x3008, 0x3008) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sonson_flipscreen_w)
@@ -253,8 +256,7 @@ static MACHINE_DRIVER_START( sonson )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
 	MDRV_GFXDECODE(sonson)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(64*4+32*8)
+	MDRV_PALETTE_LENGTH(64*4+32*8)
 
 	MDRV_PALETTE_INIT(sonson)
 	MDRV_VIDEO_START(sonson)

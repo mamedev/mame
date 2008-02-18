@@ -488,8 +488,7 @@ static MACHINE_DRIVER_START( dynamski )
 	MDRV_SCREEN_SIZE(256+32, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255+32, 16, 255-16)
 	MDRV_GFXDECODE(dynamski)
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_COLORTABLE_LENGTH(16*4+16*4)
+	MDRV_PALETTE_LENGTH(16*4+16*4)
 
 	MDRV_PALETTE_INIT(dynamski)
 	MDRV_VIDEO_UPDATE(dynamski)
@@ -987,8 +986,8 @@ ROM_START( dynamski )
 	ROM_REGION( 0x240, REGION_PROMS, 0 )
 	ROM_LOAD( "dynskic.15g",  0x000, 0x020, CRC(9333a5e4) SHA1(11025f53c98c2ae21e9d4f95da86bba4703a52bc) )	/* palette */
 	ROM_LOAD( "dynskic.15f",  0x020, 0x020, CRC(3869514b) SHA1(1ef062284e52777ec6e269368a16b9b357a2647a) )	/* palette */
-	ROM_LOAD( "dynski.11e",   0x040, 0x100, CRC(e625aa09) SHA1(c10371f1adf7245815c0bdcb24458c7b04edd5b9) )	/* lookup table */
-	ROM_LOAD( "dynski.4g",    0x140, 0x100, CRC(761fe465) SHA1(87741a6e4d14440073aaed3a8a15bc5e30b8fcfc) )	/* lookup table */
+	ROM_LOAD( "dynski.4g",    0x040, 0x100, CRC(761fe465) SHA1(87741a6e4d14440073aaed3a8a15bc5e30b8fcfc) )	/* lookup table */
+	ROM_LOAD( "dynski.11e",   0x140, 0x100, CRC(e625aa09) SHA1(c10371f1adf7245815c0bdcb24458c7b04edd5b9) )	/* lookup table */
 ROM_END
 
 

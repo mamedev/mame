@@ -116,29 +116,6 @@ static INTERRUPT_GEN( sprint2 )
 }
 
 
-static PALETTE_INIT( sprint2 )
-{
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 1, MAKE_RGB(0x5b, 0x5b, 0x5b));
-	palette_set_color(machine, 2, MAKE_RGB(0xa4, 0xa4, 0xa4));
-	palette_set_color(machine, 3, MAKE_RGB(0xff, 0xff, 0xff));
-
-	colortable[0x0] = 1;	/* black playfield */
-	colortable[0x1] = 0;
-	colortable[0x2] = 1;	/* white playfield */
-	colortable[0x3] = 3;
-
-	colortable[0x4] = 1;	/* car #1 */
-	colortable[0x5] = 3;
-	colortable[0x6] = 1;	/* car #2 */
-	colortable[0x7] = 0;
-	colortable[0x8] = 1;	/* car #3 */
-	colortable[0x9] = 2;
-	colortable[0xa] = 1;	/* car #4 */
-	colortable[0xb] = 2;
-}
-
-
 static READ8_HANDLER( sprint2_wram_r )
 {
 	return sprint2_video_ram[0x380 + offset % 0x80];
@@ -542,8 +519,7 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_SCREEN_SIZE(512, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 223)
 	MDRV_GFXDECODE(sprint2)
-	MDRV_PALETTE_LENGTH(4)
-	MDRV_COLORTABLE_LENGTH(12)
+	MDRV_PALETTE_LENGTH(12)
 
 	MDRV_PALETTE_INIT(sprint2)
 	MDRV_VIDEO_START(sprint2)

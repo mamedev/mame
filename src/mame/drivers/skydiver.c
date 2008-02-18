@@ -100,7 +100,7 @@ static int skydiver_nmion;
  *
  *************************************/
 
-static const UINT16 colortable_source[] =
+static const int colortable_source[] =
 {
 	0x02, 0x00,
 	0x02, 0x01,
@@ -110,11 +110,21 @@ static const UINT16 colortable_source[] =
 
 static PALETTE_INIT( skydiver )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white */
-	palette_set_color(machine,2,MAKE_RGB(0xa0,0xa0,0xa0)); /* grey */
+	int i;
 
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
+	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
+	{
+		rgb_t color;
+
+		switch (colortable_source[i])
+		{
+		case 0:   color = RGB_BLACK; break;
+		case 1:   color = RGB_WHITE; break;
+		default:  color = MAKE_RGB(0xa0, 0xa0, 0xa0); break; /* grey */
+		}
+
+		palette_set_color(machine, i, color);
+	}
 }
 
 
@@ -373,8 +383,7 @@ static MACHINE_DRIVER_START( skydiver )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(skydiver)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MDRV_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MDRV_PALETTE_INIT(skydiver)
 	MDRV_VIDEO_START(skydiver)

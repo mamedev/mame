@@ -26,13 +26,7 @@ PALETTE_INIT( srmp2 )
 		int col;
 
 		col = (color_prom[i] << 8) + color_prom[i + machine->drv->total_colors];
-
-		palette_set_color_rgb(machine,i,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
-	}
-
-	for (i = 0; i < machine->drv->total_colors; i++)
-	{
-		colortable[i] = i ^ 0x0f;
+		palette_set_color_rgb(machine,i ^ 0x0f,pal5bit(col >> 10),pal5bit(col >> 5),pal5bit(col >> 0));
 	}
 }
 

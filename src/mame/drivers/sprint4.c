@@ -15,15 +15,15 @@ Atari Sprint 4 driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-extern PALETTE_INIT( sprint4 );
+PALETTE_INIT( sprint4 );
 
-extern VIDEO_EOF( sprint4 );
-extern VIDEO_START( sprint4 );
-extern VIDEO_UPDATE( sprint4 );
+VIDEO_EOF( sprint4 );
+VIDEO_START( sprint4 );
+VIDEO_UPDATE( sprint4 );
 
 extern int sprint4_collision[4];
 
-extern WRITE8_HANDLER( sprint4_video_ram_w );
+WRITE8_HANDLER( sprint4_video_ram_w );
 
 static int da_latch;
 
@@ -415,8 +415,7 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, 256, VTOTAL, 0, 224)
 	MDRV_GFXDECODE(sprint4)
-	MDRV_PALETTE_LENGTH(6)
-	MDRV_COLORTABLE_LENGTH(10)
+	MDRV_PALETTE_LENGTH(10)
 
 	MDRV_PALETTE_INIT(sprint4)
 	MDRV_VIDEO_START(sprint4)

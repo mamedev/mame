@@ -229,7 +229,7 @@ GFXDECODE_END
 
 
 /* 1-bit RGB palette */
-static const UINT16 colortable_source[] =
+static const int colortable_source[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
 	0, 0, 1, 2, 3, 4, 5, 6,	 /* not sure about these, but they are only used */
@@ -240,12 +240,18 @@ static const UINT16 colortable_source[] =
 	0, 3, 4, 5, 6, 7, 0, 1,
 	0, 2, 3, 4, 5, 6, 7, 0
 };
+
 static PALETTE_INIT( spcforce )
 {
 	int i;
-	for (i = 0; i < 8; i++)
-		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-	memcpy(colortable,colortable_source,sizeof(colortable_source));
+
+	for (i = 0; i < sizeof(colortable_source) / sizeof(colortable_source[0]); i++)
+	{
+		int data = colortable_source[i];
+		rgb_t color = MAKE_RGB(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
+
+		palette_set_color(machine, i, color);
+	}
 }
 
 
@@ -271,8 +277,7 @@ static MACHINE_DRIVER_START( spcforce )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(spcforce)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MDRV_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
 	MDRV_PALETTE_INIT(spcforce)
 	MDRV_VIDEO_UPDATE(spcforce)
