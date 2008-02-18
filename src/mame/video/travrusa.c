@@ -46,7 +46,7 @@ PALETTE_INIT( travrusa )
 {
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	/* character palette */
@@ -114,7 +114,7 @@ PALETTE_INIT( shtrider )
 {
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 
 	/* character palette */

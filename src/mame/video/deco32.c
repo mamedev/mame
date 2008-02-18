@@ -168,7 +168,7 @@ WRITE32_HANDLER( deco32_buffered_palette_w )
 
 WRITE32_HANDLER( deco32_palette_dma_w )
 {
-	const int m=Machine->drv->total_colors;
+	const int m=Machine->config->total_colors;
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {

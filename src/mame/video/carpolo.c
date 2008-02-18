@@ -99,7 +99,7 @@ PALETTE_INIT( carpolo )
 	};
 
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		UINT8 pen, r, g, b;
 		int bit0, bit1, bit2;

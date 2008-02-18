@@ -51,7 +51,7 @@ typedef struct _internal_screen_info internal_screen_info;
 struct _internal_screen_info
 {
 	/* pointers to screen configuration and state */
-	const screen_config *	config;				/* pointer to the configuration in the Machine->drv */
+	const screen_config *	config;				/* pointer to the configuration in the Machine->config */
 	screen_state *			state;				/* pointer to visible state in Machine structure */
 
 	/* textures and bitmaps */
@@ -300,7 +300,7 @@ void video_init(running_machine *machine)
 
 	/* configure all of the screens */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (machine->drv->screen[scrnum].tag != NULL)
+		if (machine->config->screen[scrnum].tag != NULL)
 		{
 			render_container *container = render_container_get_screen(scrnum);
 			internal_screen_info *info = &viddata->scrinfo[scrnum];
@@ -309,7 +309,7 @@ void video_init(running_machine *machine)
 			info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
 
 			/* make pointers back to the config and state */
-			info->config = &machine->drv->screen[scrnum];
+			info->config = &machine->config->screen[scrnum];
 			info->state = &machine->screen[scrnum];
 
 			/* configure the screen with the default parameters */
@@ -329,7 +329,7 @@ void video_init(running_machine *machine)
 			info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
 
 			/* allocate a timer to generate per-scanline updates */
-			if (machine->drv->video_attributes & VIDEO_UPDATE_SCANLINE)
+			if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 			{
 				info->scanline_timer = timer_alloc(scanline_update_callback, NULL);
 				timer_adjust_oneshot(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
@@ -341,20 +341,20 @@ void video_init(running_machine *machine)
 		}
 
 	/* create spriteram buffers if necessary */
-	if (machine->drv->video_attributes & VIDEO_BUFFERS_SPRITERAM)
+	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
 		init_buffered_spriteram();
 
 	/* convert the gfx ROMs into character sets. This is done BEFORE calling the driver's */
 	/* palette_init() routine because it might need to check the machine->gfx[] data */
-	if (machine->drv->gfxdecodeinfo != NULL)
-		allocate_graphics(machine, machine->drv->gfxdecodeinfo);
+	if (machine->config->gfxdecodeinfo != NULL)
+		allocate_graphics(machine, machine->config->gfxdecodeinfo);
 
 	/* configure the palette */
 	palette_config(machine);
 
 	/* actually decode the graphics */
-	if (machine->drv->gfxdecodeinfo != NULL)
-		decode_graphics(machine, machine->drv->gfxdecodeinfo);
+	if (machine->config->gfxdecodeinfo != NULL)
+		decode_graphics(machine, machine->config->gfxdecodeinfo);
 
 	/* reset video statics and get out of here */
 	pdrawgfx_shadow_lowpri = 0;
@@ -613,7 +613,7 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 
 		/* if we have a remapped colortable, point our local colortable to it */
 		machine->gfx[i]->total_colors = gfxdecodeinfo[i].total_color_codes;
-		machine->gfx[i]->color_base = machine->drv->gfxdecodeinfo[i].color_codes_start;
+		machine->gfx[i]->color_base = machine->config->gfxdecodeinfo[i].color_codes_start;
 	}
 }
 
@@ -680,7 +680,7 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
 
 	/* reallocate bitmap if necessary */
-	if (!(Machine->drv->video_attributes & VIDEO_TYPE_VECTOR))
+	if (!(Machine->config->video_attributes & VIDEO_TYPE_VECTOR))
 	{
 		int curwidth = 0, curheight = 0;
 
@@ -805,7 +805,7 @@ void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int m
 
 int video_screen_exists(int scrnum)
 {
-	return (scrnum >= 0 && scrnum < MAX_SCREENS && Machine->drv->screen[scrnum].tag != NULL);
+	return (scrnum >= 0 && scrnum < MAX_SCREENS && Machine->config->screen[scrnum].tag != NULL);
 }
 
 
@@ -836,7 +836,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%d,%d): ", scrnum, scanline));
 
 	/* these two checks only apply if we're allowed to skip frames */
-	if (!(Machine->drv->video_attributes & VIDEO_ALWAYS_UPDATE))
+	if (!(Machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		/* if skipping this frame, bail */
 		if (global.skipping_this_frame)
@@ -874,8 +874,8 @@ void video_screen_update_partial(int scrnum, int scanline)
 		profiler_mark(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		if (Machine->drv->video_update != NULL)
-			flags = (*Machine->drv->video_update)(Machine, scrnum, info->bitmap[info->curbitmap], &clip);
+		if (Machine->config->video_update != NULL)
+			flags = (*Machine->config->video_update)(Machine, scrnum, info->bitmap[info->curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark(PROFILER_END);
 
@@ -1121,10 +1121,10 @@ void video_frame_update(running_machine *machine, int debug)
 			scanline0_callback(Machine, NULL, 0);
 
 		/* otherwise, call the video EOF callback */
-		else if (Machine->drv->video_eof != NULL)
+		else if (Machine->config->video_eof != NULL)
 		{
 			profiler_mark(PROFILER_VIDEO);
-			(*Machine->drv->video_eof)(Machine);
+			(*Machine->config->video_eof)(Machine);
 			profiler_mark(PROFILER_END);
 		}
 	}
@@ -1145,7 +1145,7 @@ static int finish_screen_updates(running_machine *machine)
 
 	/* finish updating the screens */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (machine->drv->screen[scrnum].tag != NULL)
+		if (machine->config->screen[scrnum].tag != NULL)
 			video_screen_update_partial(scrnum, machine->screen[scrnum].visarea.max_y);
 
 	/* now add the quads for all the screens */
@@ -1158,7 +1158,7 @@ static int finish_screen_updates(running_machine *machine)
 		if (livemask & (1 << scrnum))
 		{
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
-			if ((machine->drv->video_attributes & (VIDEO_TYPE_VECTOR | VIDEO_SELF_RENDER)) == 0)
+			if ((machine->config->video_attributes & (VIDEO_TYPE_VECTOR | VIDEO_SELF_RENDER)) == 0)
 			{
 				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && screen->changed)
@@ -1167,7 +1167,7 @@ static int finish_screen_updates(running_machine *machine)
 					rectangle fixedvis = machine->screen[scrnum].visarea;
 					fixedvis.max_x++;
 					fixedvis.max_y++;
-					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, machine->drv->screen[scrnum].palette_base, screen->format);
+					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, machine->config->screen[scrnum].palette_base, screen->format);
 					screen->curtexture = screen->curbitmap;
 					screen->curbitmap = 1 - screen->curbitmap;
 				}
@@ -1726,7 +1726,7 @@ void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scr
 	png_add_text(&pnginfo, "System", text);
 
 	/* now do the actual work */
-	error = png_write_bitmap(mame_core_file(fp), &pnginfo, machine->video_data->snap_bitmap, machine->drv->total_colors, palette);
+	error = png_write_bitmap(mame_core_file(fp), &pnginfo, machine->video_data->snap_bitmap, machine->config->total_colors, palette);
 
 	/* free any data allocated */
 	png_free(&pnginfo);
@@ -1948,7 +1948,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 
 		/* write the next frame */
 		palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
-		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->drv->total_colors, palette);
+		error = mng_capture_frame(mame_core_file(info->movie_file), &pnginfo, bitmap, machine->config->total_colors, palette);
 		png_free(&pnginfo);
 		if (error != PNGERR_NONE)
 		{

@@ -102,7 +102,7 @@ static TILEMAP_MAPPER( get_tile_offset )
 }
 
 #define layout_total(x) \
-(machine->drv->gfxdecodeinfo[x].gfxlayout->total)
+(machine->config->gfxdecodeinfo[x].gfxlayout->total)
 
 static TILE_GET_INFO( get_tile_info_A_8 )
 {

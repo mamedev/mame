@@ -877,7 +877,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 		int scrcount;
 
 		// count the number of screens
-		for (scrcount = 0; Machine->drv->screen[scrcount].tag != NULL; scrcount++) ;
+		for (scrcount = 0; Machine->config->screen[scrcount].tag != NULL; scrcount++) ;
 
 		// if we have enough screens to be one per monitor, assign in order
 		if (video_config.numscreens >= scrcount)

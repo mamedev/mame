@@ -38,7 +38,7 @@ PALETTE_INIT( snk_3bpp_shadow )
 	int i;
 	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 
-	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
@@ -53,7 +53,7 @@ PALETTE_INIT( snk_4bpp_shadow )
 	int i;
 	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
 
-	if(!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */

@@ -106,7 +106,7 @@ PALETTE_INIT( joinem )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 		bit0 = (color_prom[i] >> 0) & 0x01;

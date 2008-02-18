@@ -1216,10 +1216,10 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->drv->color_table_len / (1 << bpp);
+	if (machine->config->color_table_len)
+		machine->gfx[gfx_index]->total_colors = machine->config->color_table_len / (1 << bpp);
 	else
-		machine->gfx[gfx_index]->total_colors = machine->drv->total_colors / (1 << bpp);
+		machine->gfx[gfx_index]->total_colors = machine->config->total_colors / (1 << bpp);
 }
 
 
@@ -2548,7 +2548,7 @@ void K051960_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
@@ -3041,7 +3041,7 @@ void K053245_vh_start(running_machine *machine,int chip, int gfx_memory_region,i
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 
@@ -3787,12 +3787,12 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 	{
 	if (machine->screen[0].format == BITMAP_FORMAT_RGB32)
 	{
-		if ((machine->drv->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+		if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 	}
 	else
 	{
-		if (!(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+		if (!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 	}
@@ -3929,7 +3929,7 @@ void K055673_vh_start(running_machine *machine, int gfx_memory_region, int layou
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->drv->video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
@@ -4231,9 +4231,9 @@ void K053247_sprites_draw(running_machine *machine, mame_bitmap *bitmap,const re
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->drv->video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->drv->video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -8285,7 +8285,7 @@ void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle
 	linedata_offs += line_start * linedata_adv;		// pre-advance line info offset for the clipped region
 
 	// load physical palette base
-	pal_base = machine->pens + (colorbase << 4) % machine->drv->total_colors;
+	pal_base = machine->pens + (colorbase << 4) % machine->config->total_colors;
 
 	// walk the target bitmap within the visible area vertically or horizontally, one line at a time
 	for (line_pos=line_start; line_pos<=line_end; linedata_offs+=linedata_adv, line_pos++)

@@ -1356,8 +1356,8 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = Machine->drv->screen[scrnum].defstate.visarea.max_x + 1 - Machine->drv->screen[scrnum].defstate.visarea.min_x;
-			den = Machine->drv->screen[scrnum].defstate.visarea.max_y + 1 - Machine->drv->screen[scrnum].defstate.visarea.min_y;
+			num = Machine->config->screen[scrnum].defstate.visarea.max_x + 1 - Machine->config->screen[scrnum].defstate.visarea.min_x;
+			den = Machine->config->screen[scrnum].defstate.visarea.max_y + 1 - Machine->config->screen[scrnum].defstate.visarea.min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", num);
 			return strlen(temp);
@@ -1367,8 +1367,8 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dnativeyaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = Machine->drv->screen[scrnum].defstate.visarea.max_x + 1 - Machine->drv->screen[scrnum].defstate.visarea.min_x;
-			den = Machine->drv->screen[scrnum].defstate.visarea.max_y + 1 - Machine->drv->screen[scrnum].defstate.visarea.min_y;
+			num = Machine->config->screen[scrnum].defstate.visarea.max_x + 1 - Machine->config->screen[scrnum].defstate.visarea.min_x;
+			den = Machine->config->screen[scrnum].defstate.visarea.max_y + 1 - Machine->config->screen[scrnum].defstate.visarea.min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", den);
 			return strlen(temp);
@@ -1378,7 +1378,7 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dwidth~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", Machine->drv->screen[scrnum].defstate.visarea.max_x + 1 - Machine->drv->screen[0].defstate.visarea.min_x);
+			*outputptr += sprintf(*outputptr, "%d", Machine->config->screen[scrnum].defstate.visarea.max_x + 1 - Machine->config->screen[0].defstate.visarea.min_x);
 			return strlen(temp);
 		}
 
@@ -1386,7 +1386,7 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dheight~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", Machine->drv->screen[scrnum].defstate.visarea.max_y + 1 - Machine->drv->screen[0].defstate.visarea.min_y);
+			*outputptr += sprintf(*outputptr, "%d", Machine->config->screen[scrnum].defstate.visarea.max_y + 1 - Machine->config->screen[0].defstate.visarea.min_y);
 			return strlen(temp);
 		}
 	}

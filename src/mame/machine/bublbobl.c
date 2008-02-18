@@ -30,7 +30,7 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (Machine->drv->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
+	if (Machine->config->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
 		cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */

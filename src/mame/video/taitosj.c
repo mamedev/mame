@@ -111,7 +111,7 @@ static int draworder[32][4];
 PALETTE_INIT( taitosj )
 {
 	int i;
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* all gfx elements use the same palette */
 	for (i = 0 ;i < 64; i++)

@@ -157,7 +157,7 @@ VIDEO_START( atarigt )
 
 	/* map pens 1:1 */
 	substitute_pens = auto_malloc(65536 * sizeof(*substitute_pens));
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 		substitute_pens[i] = i;
 	machine->pens = substitute_pens;
 

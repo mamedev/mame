@@ -239,10 +239,10 @@ VIDEO_START( namcona1 )
 
 		gfx0 = allocgfx( &cg_layout );
 		gfx1 = allocgfx( &shape_layout );
-			gfx0->total_colors = machine->drv->total_colors/256;
+			gfx0->total_colors = machine->config->total_colors/256;
 			machine->gfx[0] = gfx0;
 
-			gfx1->total_colors = machine->drv->total_colors/2;
+			gfx1->total_colors = machine->config->total_colors/2;
 			machine->gfx[1] = gfx1;
 } /* namcona1_vh_start */
 

@@ -2306,7 +2306,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
            Thundfox is the only one of those with two chips, and
            we're safe as it uses single width tilemaps. */
 
-		myclip = machine->screen[(machine->drv->screen[i].tag == NULL) ? 0 : i].visarea;
+		myclip = machine->screen[(machine->config->screen[i].tag == NULL) ? 0 : i].visarea;
 
 		TC0100SCN_cliprect[i] = myclip;
 

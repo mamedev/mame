@@ -220,10 +220,10 @@ VIDEO_START( taitojc )
 	machine->gfx[taitojc_gfx_index] = allocgfx(&taitojc_char_layout);
 
 	/* set the color information */
-	if (machine->drv->color_table_len)
-		machine->gfx[taitojc_gfx_index]->total_colors = machine->drv->color_table_len / 16;
+	if (machine->config->color_table_len)
+		machine->gfx[taitojc_gfx_index]->total_colors = machine->config->color_table_len / 16;
 	else
-		machine->gfx[taitojc_gfx_index]->total_colors = machine->drv->total_colors / 16;
+		machine->gfx[taitojc_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	taitojc_texture = auto_malloc(0x400000);
 

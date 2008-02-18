@@ -473,7 +473,7 @@ static void load_effect_overlay(const char *filename)
 
 	// set the overlay on all screens
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->drv->screen[scrnum].tag != NULL)
+		if (Machine->config->screen[scrnum].tag != NULL)
 			render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
 
 	free(tempstr);

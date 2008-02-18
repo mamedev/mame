@@ -1051,15 +1051,15 @@ int sprintf_game_info(char *buffer)
 	bufptr += sprintf(bufptr, "%s\n%s %s\n\nCPU:\n", Machine->gamedrv->description, Machine->gamedrv->year, Machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
 	{
-		cpu_type type = Machine->drv->cpu[cpunum].type;
-		int clock = Machine->drv->cpu[cpunum].clock;
+		cpu_type type = Machine->config->cpu[cpunum].type;
+		int clock = Machine->config->cpu[cpunum].clock;
 
 		/* count how many identical CPUs we have */
 		for (count = 1; cpunum + count < MAX_CPU; count++)
-			if (Machine->drv->cpu[cpunum + count].type != type ||
-		        Machine->drv->cpu[cpunum + count].clock != clock)
+			if (Machine->config->cpu[cpunum + count].type != type ||
+		        Machine->config->cpu[cpunum + count].clock != clock)
 		    	break;
 
 		/* if more than one, prepend a #x in front of the CPU name */
@@ -1078,14 +1078,14 @@ int sprintf_game_info(char *buffer)
 	bufptr += sprintf(bufptr, "\nSound:\n");
 
 	/* loop over all sound chips */
-	for (sndnum = 0; sndnum < MAX_SOUND && Machine->drv->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
+	for (sndnum = 0; sndnum < MAX_SOUND && Machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
 	{
-		sound_type type = Machine->drv->sound[sndnum].type;
+		sound_type type = Machine->config->sound[sndnum].type;
 		int clock = sndnum_clock(sndnum);
 
 		/* count how many identical sound chips we have */
 		for (count = 1; sndnum + count < MAX_SOUND; count++)
-			if (Machine->drv->sound[sndnum + count].type != type ||
+			if (Machine->config->sound[sndnum + count].type != type ||
 		        sndnum_clock(sndnum + count) != clock)
 		    	break;
 
@@ -1104,11 +1104,11 @@ int sprintf_game_info(char *buffer)
 	}
 
 	/* display vector information for vector games */
-	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+	if (Machine->config->video_attributes & VIDEO_TYPE_VECTOR)
 		bufptr += sprintf(bufptr, "\nVector Game\n");
 
 	/* display screen resolution and refresh rate info for raster games */
-	else if (Machine->drv->video_attributes & VIDEO_TYPE_RASTER)
+	else if (Machine->config->video_attributes & VIDEO_TYPE_RASTER)
 		bufptr += sprintf(bufptr,"\nScreen Resolution:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 				Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
 				Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
@@ -1540,12 +1540,12 @@ static void slider_init(void)
 	}
 
 	for (item = 0; item < MAX_SCREENS; item++)
-		if (Machine->drv->screen[item].tag != NULL)
+		if (Machine->config->screen[item].tag != NULL)
 		{
-			int defxscale = floor(Machine->drv->screen[item].xscale * 1000.0f + 0.5f);
-			int defyscale = floor(Machine->drv->screen[item].yscale * 1000.0f + 0.5f);
-			int defxoffset = floor(Machine->drv->screen[item].xoffset * 1000.0f + 0.5f);
-			int defyoffset = floor(Machine->drv->screen[item].yoffset * 1000.0f + 0.5f);
+			int defxscale = floor(Machine->config->screen[item].xscale * 1000.0f + 0.5f);
+			int defyscale = floor(Machine->config->screen[item].yscale * 1000.0f + 0.5f);
+			int defxoffset = floor(Machine->config->screen[item].xoffset * 1000.0f + 0.5f);
+			int defyoffset = floor(Machine->config->screen[item].yoffset * 1000.0f + 0.5f);
 
 			/* add standard brightness/contrast/gamma controls per-screen */
 			slider_config(&slider_list[slider_count++], 100, 1000, 2000, 10, slider_brightness, item);
@@ -1559,7 +1559,7 @@ static void slider_init(void)
 			slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_yoffset, item);
 		}
 
-	if (Machine->drv->video_attributes & VIDEO_TYPE_VECTOR)
+	if (Machine->config->video_attributes & VIDEO_TYPE_VECTOR)
 	{
 		/* add flicker control */
 		slider_config(&slider_list[slider_count++], 0, 0, 1000, 10, slider_flicker, 0);
@@ -1714,7 +1714,7 @@ static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buff
 
 static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	double defrefresh = ATTOSECONDS_TO_HZ(Machine->drv->screen[arg].defstate.refresh);
+	double defrefresh = ATTOSECONDS_TO_HZ(Machine->config->screen[arg].defstate.refresh);
 	double refresh;
 
 	if (buffer != NULL)
@@ -1890,7 +1890,7 @@ static char *slider_get_screen_desc(int arg)
 	int screen_count = 0;
 
 	for (item = 0; item < MAX_SCREENS; item++)
-		if (Machine->drv->screen[item].tag != NULL)
+		if (Machine->config->screen[item].tag != NULL)
 			screen_count++;
 
 	if (screen_count > 1)

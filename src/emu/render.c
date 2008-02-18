@@ -491,7 +491,7 @@ void render_init(running_machine *machine)
 
 	/* create a container for each screen and determine its orientation */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->drv->screen[scrnum].tag != NULL)
+		if (Machine->config->screen[scrnum].tag != NULL)
 		{
 			screen_container[scrnum] = render_container_alloc();
 			render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
@@ -1373,12 +1373,12 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				float xscale, yscale;
 
 				/* we may be called very early, before Machine->visible_area is initialized; handle that case */
-				if ((Machine->drv->video_attributes & VIDEO_TYPE_VECTOR) != 0)
+				if ((Machine->config->video_attributes & VIDEO_TYPE_VECTOR) != 0)
 					visarea = &vectorvis;
 				else if (Machine->screen[item->index].visarea.max_x > Machine->screen[item->index].visarea.min_x)
 					visarea = &Machine->screen[item->index].visarea;
 				else
-					visarea = &Machine->drv->screen[item->index].defstate.visarea;
+					visarea = &Machine->config->screen[item->index].defstate.visarea;
 
 				/* apply target orientation to the bounds */
 				bounds = item->bounds;
@@ -1600,9 +1600,9 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
-	if (Machine->drv->default_layout != NULL)
+	if (Machine->config->default_layout != NULL)
 	{
-		*nextfile = layout_file_load(NULL, Machine->drv->default_layout);
+		*nextfile = layout_file_load(NULL, Machine->config->default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
@@ -1619,7 +1619,7 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	}
 
 	/* now do the built-in layouts for single-screen games */
-	if (Machine->drv->screen[0].tag != NULL && Machine->drv->screen[1].tag == NULL)
+	if (Machine->config->screen[0].tag != NULL && Machine->config->screen[1].tag == NULL)
 	{
 		if (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)
 			*nextfile = layout_file_load(NULL, layout_vertical);

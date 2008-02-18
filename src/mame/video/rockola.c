@@ -24,7 +24,7 @@ static tilemap *fg_tilemap;
 static rgb_t palette[64];
 
 #define TOTAL_COLORS(gfxn) (Machine->gfx[gfxn]->total_colors * Machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (Machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define COLOR(gfxn,offs) (Machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 
@@ -39,7 +39,7 @@ PALETTE_INIT( rockola )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -214,7 +214,7 @@ PALETTE_INIT( satansat )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 

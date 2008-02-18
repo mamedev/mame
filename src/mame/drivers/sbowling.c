@@ -301,7 +301,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

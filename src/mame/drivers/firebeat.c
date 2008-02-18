@@ -604,7 +604,7 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 				visarea.max_y = height-1;
 
 				// only try and update the screen if the driver says we have one
-				if(Machine->drv->screen[screen].tag)
+				if(Machine->config->screen[screen].tag)
 					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, Machine->screen[screen].refresh);
 			}
 			break;

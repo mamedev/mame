@@ -795,7 +795,7 @@ void atarigen_set_vol(running_machine *machine, int volume, sound_type type)
 	int ch;
 
 	for (ch = 0; ch < MAX_SOUND; ch++)
-		if (machine->drv->sound[ch].type == type)
+		if (machine->config->sound[ch].type == type)
 		{
 			int output;
 			for (output = 0; output < 2; output++)

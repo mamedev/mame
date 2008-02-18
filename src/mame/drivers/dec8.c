@@ -3387,7 +3387,7 @@ static DRIVER_INIT( deco222 )
 
 	sound_cpu = 1;
 	/* Oscar has three CPUs */
-	if (machine->drv->cpu[2].type != CPU_DUMMY) sound_cpu = 2;
+	if (machine->config->cpu[2].type != CPU_DUMMY) sound_cpu = 2;
 
 	/* bits 5 and 6 of the opcodes are swapped */
 	rom = memory_region(REGION_CPU1+sound_cpu);

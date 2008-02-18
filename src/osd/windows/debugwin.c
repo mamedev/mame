@@ -2610,7 +2610,7 @@ void console_create_window(void)
 	info->minwidth = 0;
 	info->maxwidth = 0;
 	for (cpunum = MAX_CPU - 1; (INT32)cpunum >= 0; cpunum--)
-		if (Machine->drv->cpu[cpunum].type != CPU_DUMMY)
+		if (Machine->config->cpu[cpunum].type != CPU_DUMMY)
 		{
 			UINT32 regchars, dischars, conchars;
 			UINT32 minwidth, maxwidth;

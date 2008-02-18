@@ -451,7 +451,7 @@ static void region_post_process(rom_load_data *romdata, const rom_entry *regiond
 	/* if this is a CPU region, override with the CPU width and endianness */
 	if (type >= REGION_CPU1 && type < REGION_CPU1 + MAX_CPU)
 	{
-		cpu_type cputype = Machine->drv->cpu[type - REGION_CPU1].type;
+		cpu_type cputype = Machine->config->cpu[type - REGION_CPU1].type;
 		if (cputype != CPU_DUMMY)
 		{
 			datawidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM) / 8;

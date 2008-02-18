@@ -167,7 +167,7 @@ PALETTE_INIT( cosmicg )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		int r = (i > 8) ? 0xff : 0xaa * ((i >> 0) & 1);
 		int g = 0xaa * ((i >> 1) & 1);

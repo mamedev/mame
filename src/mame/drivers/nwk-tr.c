@@ -279,15 +279,15 @@ int K001604_vh_start(running_machine *machine, int chip)
 	machine->gfx[K001604_gfx_index[chip][1]] = allocgfx(&K001604_char_layout_layer_16x16);
 	decodegfx(machine->gfx[K001604_gfx_index[chip][1]], (UINT8*)&K001604_char_ram[chip][0], 0, machine->gfx[K001604_gfx_index[chip][1]]->total_elements);
 
-	if (machine->drv->color_table_len)
+	if (machine->config->color_table_len)
 	{
-		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->color_table_len / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->color_table_len / 16;
+		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->color_table_len / 16;
+		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->config->color_table_len / 16;
 	}
 	else
 	{
-		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->drv->total_colors / 16;
-		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->drv->total_colors / 16;
+		machine->gfx[K001604_gfx_index[chip][0]]->total_colors = machine->config->total_colors / 16;
+		machine->gfx[K001604_gfx_index[chip][1]]->total_colors = machine->config->total_colors / 16;
 	}
 
 	return 0;

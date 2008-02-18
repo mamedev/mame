@@ -182,7 +182,7 @@ void sound_init(running_machine *machine)
 		Machine->sample_rate = 11025;
 
 	/* count the speakers */
-	for (totalspeakers = 0; Machine->drv->speaker[totalspeakers].tag; totalspeakers++) ;
+	for (totalspeakers = 0; Machine->config->speaker[totalspeakers].tag; totalspeakers++) ;
 	VPRINTF(("total speakers = %d\n", totalspeakers));
 
 	/* allocate memory for mix buffers */
@@ -256,7 +256,7 @@ static void sound_exit(running_machine *machine)
 
 	/* stop all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->drv->sound[sndnum].type != SOUND_DUMMY)
+		if (Machine->config->sound[sndnum].type != SOUND_DUMMY)
 			sndintrf_exit_sound(sndnum);
 
 	/* reset variables */
@@ -287,7 +287,7 @@ static void start_sound_chips(void)
 	/* start up all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
 	{
-		const sound_config *msound = &Machine->drv->sound[sndnum];
+		const sound_config *msound = &Machine->config->sound[sndnum];
 		sound_info *info;
 		int num_regs;
 		int index;
@@ -375,7 +375,7 @@ static void start_speakers(void)
 	/* start up all the speakers */
 	for (totalspeakers = 0; totalspeakers < MAX_SPEAKER; totalspeakers++)
 	{
-		const speaker_config *mspeaker = &Machine->drv->speaker[totalspeakers];
+		const speaker_config *mspeaker = &Machine->config->speaker[totalspeakers];
 		speaker_info *info;
 
 		/* stop when we hit an empty entry */
@@ -546,7 +546,7 @@ static void sound_reset(running_machine *machine)
 
 	/* reset all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->drv->sound[sndnum].type != SOUND_DUMMY)
+		if (Machine->config->sound[sndnum].type != SOUND_DUMMY)
 			sndnum_reset(sndnum);
 }
 

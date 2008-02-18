@@ -149,7 +149,7 @@ PALETTE_INIT( mappy )
 	}
 
 	/* sprites map to the lower 16 palette entries */
-	for (i = 64*4; i < machine->drv->total_colors; i++)
+	for (i = 64*4; i < machine->config->total_colors; i++)
 	{
 		UINT8 ctabentry = color_prom[i] & 0x0f;
 		colortable_entry_set_value(machine->colortable, i, ctabentry);

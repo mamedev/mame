@@ -89,7 +89,7 @@ PALETTE_INIT( fuuki16 )
 
 	/* The game does not initialise the palette at startup. It should
        be totally black */
-	for (pen = 0; pen < machine->drv->total_colors; pen++)
+	for (pen = 0; pen < machine->config->total_colors; pen++)
 		palette_set_color(machine,pen,MAKE_RGB(0,0,0));
 }
 #endif

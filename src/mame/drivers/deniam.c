@@ -308,7 +308,7 @@ GFXDECODE_END
 static void irqhandler(int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
-	if (Machine->drv->cpu[1].type != CPU_DUMMY)
+	if (Machine->config->cpu[1].type != CPU_DUMMY)
 		cpunum_set_input_line(Machine, 1,0,linestate);
 }
 

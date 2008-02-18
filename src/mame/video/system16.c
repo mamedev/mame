@@ -209,11 +209,11 @@ static void draw_sprite(running_machine *machine,
 	int shadow,
 	int shadow_pen, int eos )
 {
-	const pen_t *shadow_base = machine->pens + machine->gfx[0]->color_base + (machine->drv->total_colors/2);
+	const pen_t *shadow_base = machine->pens + machine->gfx[0]->color_base + (machine->config->total_colors/2);
 	const UINT8 *source;
 	int full_shadow=shadow&SYS16_SPR_SHADOW;
 	int partial_shadow=shadow&SYS16_SPR_PARTIAL_SHADOW;
-	int shadow_mask=(machine->drv->total_colors/2)-1;
+	int shadow_mask=(machine->config->total_colors/2)-1;
 	int sx, x, xcount;
 	int sy, y, ycount = 0;
 	int dx,dy;
@@ -526,7 +526,7 @@ WRITE16_HANDLER( sys16_paletteram_w )
 
 		palette_set_color( Machine, offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color( Machine, offset+Machine->drv->total_colors/2,MAKE_RGB(rs,gs,bs));
+		palette_set_color( Machine, offset+Machine->config->total_colors/2,MAKE_RGB(rs,gs,bs));
 	}
 }
 
@@ -821,7 +821,7 @@ VIDEO_START( system16 ){
 	{
 		/* initialize all entries to black - needed for Golden Axe*/
 		int i;
-		for( i=0; i<machine->drv->total_colors; i++ ){
+		for( i=0; i<machine->config->total_colors; i++ ){
 			palette_set_color( machine, i, MAKE_RGB(0,0,0) );
 		}
 

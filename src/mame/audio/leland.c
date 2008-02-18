@@ -509,7 +509,7 @@ void *leland_80186_sh_start(int clock, const struct CustomSound_interface *confi
 	/* determine which sound hardware is installed */
 	has_ym2151 = 0;
 	for (i = 0; i < MAX_SOUND; i++)
-		if (Machine->drv->sound[i].type == SOUND_YM2151)
+		if (Machine->config->sound[i].type == SOUND_YM2151)
 			has_ym2151 = 1;
 
 	/* allocate separate streams for the DMA and non-DMA DACs */

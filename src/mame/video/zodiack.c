@@ -58,10 +58,10 @@ PALETTE_INIT( zodiack )
 	int i;
 
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* first, the character/sprite palette */
-	for (i = 0;i < machine->drv->total_colors-1; i++)
+	for (i = 0;i < machine->config->total_colors-1; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -96,7 +96,7 @@ PALETTE_INIT( zodiack )
 
 	/* white for bullets */
 
-	palette_set_color(machine,machine->drv->total_colors-1,MAKE_RGB(0xff,0xff,0xff));
+	palette_set_color(machine,machine->config->total_colors-1,MAKE_RGB(0xff,0xff,0xff));
 
 	for (i = 0;i < TOTAL_COLORS(0);i+=2)
 	{

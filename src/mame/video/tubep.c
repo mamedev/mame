@@ -171,7 +171,7 @@ PALETTE_INIT( tubep )
 	int i,r,g,b;
 
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	/* background/sprites palette variables */
 
@@ -718,7 +718,7 @@ PALETTE_INIT( rjammer )
 {
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->drv->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
 
 	static const int resistors_rg[3] = { 1000, 470, 220 };
 	static const int resistors_b [2] = { 470, 220 };
@@ -730,7 +730,7 @@ PALETTE_INIT( rjammer )
 			2,	resistors_b,	weights_b,	470,	0,
 			0,	0,	0,	0,	0	);
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

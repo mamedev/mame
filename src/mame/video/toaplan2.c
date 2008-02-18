@@ -951,7 +951,7 @@ static void toaplan2_scroll_reg_data_w(offs_t offset, UINT16 data, UINT32 mem_ma
 					if ((toaplan2_sub_cpu == CPU_2_Z80) && (data == 3))
 					{
 						/* HACK! When tilted, sound CPU needs to be reset. */
-						if (Machine->drv->sound[0].type == SOUND_YM3812)
+						if (Machine->config->sound[0].type == SOUND_YM3812)
 						{
 							cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 							sndti_reset(SOUND_YM3812, 0);

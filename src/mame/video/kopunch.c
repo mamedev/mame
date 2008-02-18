@@ -12,7 +12,7 @@ PALETTE_INIT( kopunch )
 	int i;
 
 	color_prom+=24;	/* first 24 colors are black */
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 

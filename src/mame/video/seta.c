@@ -728,7 +728,7 @@ static void draw_sprites_map(running_machine *machine, mame_bitmap *bitmap,const
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->drv->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config->gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -832,7 +832,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	int offs;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->drv->gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config->gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];

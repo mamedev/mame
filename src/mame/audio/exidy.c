@@ -769,7 +769,7 @@ static void *venture_common_sh_start(int clock, const struct CustomSound_interfa
 	has_mc3417 = FALSE;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		if (Machine->drv->sound[i].type == SOUND_MC3417)
+		if (Machine->config->sound[i].type == SOUND_MC3417)
 			has_mc3417 = TRUE;
 	}
 

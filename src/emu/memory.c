@@ -1227,7 +1227,7 @@ static void init_cpudata(void)
 	memset(&cpudata, 0, sizeof(cpudata));
 
 	/* loop over CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
 		/* set the RAM/ROM base */
 		cpudata[cpunum].op_ram = cpudata[cpunum].op_rom = memory_region(REGION_CPU1 + cpunum);
@@ -1276,7 +1276,7 @@ INLINE void adjust_addresses(addrspace_data *space, int ismatchmask, offs_t *sta
 static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	cpu_type cputype = Machine->drv->cpu[cpunum].type;
+	cpu_type cputype = Machine->config->cpu[cpunum].type;
 	int abits = cputype_addrbus_width(cputype, spacenum);
 	int dbits = cputype_databus_width(cputype, spacenum);
 	int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
@@ -1309,7 +1309,7 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 		space->map = map;
 		space->adjmap = &map[MAX_ADDRESS_MAP_SIZE * 2];
 
-		construct_address_map(map, Machine->drv, cpunum, spacenum);
+		construct_address_map(map, Machine->config, cpunum, spacenum);
 
 		/* convert implicit ROM entries to map to the memory region */
 		if (spacenum == ADDRESS_SPACE_PROGRAM && memory_region(REGION_CPU1 + cpunum))
@@ -1386,7 +1386,7 @@ static void preflight_memory(void)
 	memset(&bankdata, 0, sizeof(bankdata));
 
 	/* loop over CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
@@ -1486,7 +1486,7 @@ static void populate_memory(void)
 	int cpunum, spacenum;
 
 	/* loop over CPUs and address spaces */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
@@ -2116,7 +2116,7 @@ static void allocate_memory(void)
 	int cpunum, spacenum;
 
 	/* loop over all CPUs and memory spaces */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
@@ -2347,7 +2347,7 @@ static void find_memory(void)
 	int cpunum, spacenum, banknum;
 
 	/* loop over CPUs and address spaces */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
@@ -3475,7 +3475,7 @@ void memory_dump(FILE *file)
 		return;
 
 	/* loop over CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->drv->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpudata[cpunum].space[spacenum].abits)
 			{

@@ -78,7 +78,7 @@ static READ8_HANDLER( nbmj8991_sound_r )
 
 static MACHINE_RESET( nbmj8991 )
 {
-	if (machine->drv->cpu[1].type == CPU_Z80)
+	if (machine->config->cpu[1].type == CPU_Z80)
 	{
 		memory_configure_bank(1, 0, 4, memory_region(REGION_CPU2) + 0x8000, 0x8000);
 		memory_set_bank(1, 0);

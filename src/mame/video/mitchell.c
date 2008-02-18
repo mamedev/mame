@@ -65,8 +65,8 @@ VIDEO_START( pang )
 	/*
         Palette RAM
     */
-	paletteram = auto_malloc(2*machine->drv->total_colors);
-	memset(paletteram, 0, 2*machine->drv->total_colors);
+	paletteram = auto_malloc(2*machine->config->total_colors);
+	memset(paletteram, 0, 2*machine->config->total_colors);
 }
 
 

@@ -86,7 +86,7 @@ PALETTE_INIT( warpwarp )
 {
 	int i;
 
-	for (i = 0;i < machine->drv->total_colors;i++)
+	for (i = 0;i < machine->config->total_colors;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -110,7 +110,7 @@ PALETTE_INIT( warpwarp )
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 
-	for (i = 0;i < machine->drv->color_table_len;i += 2)
+	for (i = 0;i < machine->config->color_table_len;i += 2)
 	{
 		colortable[i] = 0;			/* black background */
 		colortable[i + 1] = i / 2;	/* colored foreground */

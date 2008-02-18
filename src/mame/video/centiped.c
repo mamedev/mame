@@ -277,7 +277,7 @@ PALETTE_INIT( warlords )
 {
 	int i;
 
-	for (i = 0; i < machine->drv->total_colors; i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
 		UINT8 pen;
 		int r, g, b;

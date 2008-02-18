@@ -31,7 +31,7 @@ PALETTE_INIT( tankbatt )
 	/* ? Skip the first byte ? */
 	color_prom++;
 
-	for (i = 1;i < machine->drv->total_colors;i++)
+	for (i = 1;i < machine->config->total_colors;i++)
 	{
 		int bit0, bit1, bit2, bit3, r, g, b;
 
