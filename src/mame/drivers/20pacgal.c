@@ -159,7 +159,7 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
  *
  *************************************/
 
-WRITE8_HANDLER( rom_bank_select_w )
+static WRITE8_HANDLER( rom_bank_select_w )
 {
 	_20pacgal_state *state = Machine->driver_data;
 
@@ -170,7 +170,7 @@ WRITE8_HANDLER( rom_bank_select_w )
 }
 
 
-WRITE8_HANDLER( rom_48000_w )
+static WRITE8_HANDLER( rom_48000_w )
 {
 	_20pacgal_state *state = Machine->driver_data;
 

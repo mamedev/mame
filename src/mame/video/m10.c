@@ -17,25 +17,24 @@
 static tilemap *		tx_tilemap;
 static gfx_element *	back_gfx;
 static UINT32			extyoffs[32*8];
-static UINT32			extxoffs[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
 
 static const gfx_layout backlayout =
 {
 	8,8*32,	/* 8*8 characters */
-	4,	/* 256 characters */
-	1,	/* 1 bits per pixel */
+	4,		/* 256 characters */
+	1,		/* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8*32, 1*8*32, 2*8*32, 3*8*32, 4*8*32, 5*8*32, 6*8*32, 7*8*32 },
+	EXTENDED_YOFFS,
 	32*8*8,	/* every char takes 8 consecutive bytes */
-	extxoffs, extyoffs
+	NULL, extyoffs
 };
 
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
 	256,	/* 256 characters */
-	1,	/* 1 bits per pixel */
+	1,		/* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },

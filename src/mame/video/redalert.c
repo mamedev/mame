@@ -9,6 +9,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "redalert.h"
 
 
 #define NUM_CHARMAP_PENS	0x200

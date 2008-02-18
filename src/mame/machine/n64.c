@@ -566,7 +566,7 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-UINT32 n64_vi_width;
+static UINT32 n64_vi_width;
 UINT32 n64_vi_origin;
 UINT32 n64_vi_control;
 static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;

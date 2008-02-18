@@ -629,7 +629,7 @@ WRITE8_HANDLER ( vce_w )
 
 static void pce_refresh_line(int which, int line, int external_input, UINT8 *drawn, UINT16 *line_buffer, const pen_t *pens)
 {
-    static int width_table[4] = {5, 6, 7, 7};
+    static const int width_table[4] = {5, 6, 7, 7};
 
     int scroll_y = ( vdc[which].y_scroll & 0x01FF);
     int scroll_x = (vdc[which].vdc_data[BXR].w & 0x03FF);

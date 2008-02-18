@@ -6,6 +6,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "exidy.h"
 
 
 UINT8 *exidy_videoram;

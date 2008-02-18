@@ -15,8 +15,6 @@ extern UINT8 *jedi_foreground_bank;
 VIDEO_START( jedi );
 VIDEO_UPDATE( jedi );
 
-WRITE8_HANDLER( jedi_alpha_banksel_w );
-WRITE8_HANDLER( jedi_paletteram_w );
 WRITE8_HANDLER( jedi_vscroll_w );
 WRITE8_HANDLER( jedi_hscroll_w );
 WRITE8_HANDLER( jedi_video_off_w );

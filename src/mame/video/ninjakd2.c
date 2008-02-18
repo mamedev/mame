@@ -88,7 +88,7 @@ static TILEMAP_MAPPER( omegaf_bg_scan )
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
 }
 
-void robokid_get_bg_tile_info(running_machine* const machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
+static void robokid_get_bg_tile_info(running_machine* const machine, tile_data* const tileinfo, tilemap_memory_index const tile_index, int const gfxnum, const UINT8* const videoram)
 {
 	int const lo = videoram[(tile_index << 1)];
 	int const hi = videoram[(tile_index << 1) | 1];
@@ -282,7 +282,7 @@ WRITE8_HANDLER( robokid_bg2_videoram_w )
 
 
 
-void bg_ctrl(int offset, int data, tilemap* tilemap)
+static void bg_ctrl(int offset, int data, tilemap* tilemap)
 {
 	int scrollx = tilemap_get_scrollx(tilemap, 0);
 	int scrolly = tilemap_get_scrolly(tilemap, 0);

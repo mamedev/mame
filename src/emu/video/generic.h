@@ -55,10 +55,6 @@ extern size_t spriteram_size;
 extern size_t spriteram_2_size;
 extern size_t spriteram_3_size;
 
-extern UINT8 *dirtybuffer;
-extern UINT16 *dirtybuffer16;
-extern UINT32 *dirtybuffer32;
-
 extern UINT8 *paletteram;
 extern UINT16 *paletteram16;
 extern UINT32 *paletteram32;

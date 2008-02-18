@@ -18,6 +18,12 @@
 #define ST0016_CHAR_BANK_MASK (ST0016_MAX_CHAR_BANK-1)
 #define ST0016_PAL_BANK_MASK  (ST0016_MAX_PAL_BANK-1)
 
+/*----------- defined in drivers/st0016.c -----------*/
+
+extern UINT32 st0016_rom_bank;
+WRITE8_HANDLER	(st0016_rom_bank_w);
+
+
 /*----------- defined in video/st0016.c -----------*/
 
 extern UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;
@@ -38,14 +44,11 @@ READ8_HANDLER  	(st0016_character_ram_r);
 WRITE8_HANDLER 	(st0016_character_ram_w);
 READ8_HANDLER	(st0016_vregs_r);
 WRITE8_HANDLER	(st0016_vregs_w);
-WRITE8_HANDLER	(st0016_rom_bank_w);
 
 VIDEO_START(st0016);
 VIDEO_UPDATE(st0016);
 
 extern UINT32 st0016_game;
-
-extern UINT32 st0016_rom_bank;
 
 void st0016_save_init(void);
 

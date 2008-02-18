@@ -176,12 +176,12 @@ static UINT16 tmaster_color;
 static UINT16 tmaster_addr;
 static int (*compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
 
-int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+static int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
 {
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+static int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
 {
 	return reg_low | (reg_mid << 16);
 }

@@ -183,7 +183,7 @@ NEP-16
 extern void skns_sprite_kludge(int x, int y);
 
 UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
-UINT32 *skns_palette_ram, *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
+UINT32 *skns_palette_ram;
 UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
 
 UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
@@ -198,6 +198,8 @@ WRITE32_HANDLER ( skns_palette_ram_w );
 VIDEO_START(skns);
 VIDEO_EOF(skns);
 VIDEO_UPDATE(skns);
+
+static UINT32 *skns_v3t_ram, *skns_main_ram, *skns_cache_ram;
 
 /* hit.c */
 

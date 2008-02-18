@@ -13,6 +13,7 @@
 #include "sound/hc55516.h"
 #include "sound/5220intf.h"
 #include "sound/custom.h"
+#include "exidy.h"
 
 
 
@@ -726,7 +727,7 @@ WRITE8_HANDLER( exidy_sfxctrl_w )
  *
  *************************************/
 
-WRITE8_HANDLER( exidy_sound_filter_w )
+static WRITE8_HANDLER( exidy_sound_filter_w )
 {
 	logerror("exidy_sound_filter_w = %02X\n", data);
 }

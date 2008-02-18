@@ -6,7 +6,7 @@
 /* Functions */
 
 #if (HAS_SSP1610)
-void e116t_get_info(UINT32 state, cpuinfo *info);
+void ssp1610_get_info(UINT32 state, cpuinfo *info);
 #endif
 
 #ifdef ENABLE_DEBUGGER

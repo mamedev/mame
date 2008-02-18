@@ -379,6 +379,9 @@ extern UINT8  *snes_vram;			/* Video RAM (Should be 16-bit, but it's easier this
 extern UINT16 *snes_cgram;			/* Colour RAM */
 extern UINT16 *snes_oam;			/* Object Attribute Memory */
 extern UINT8  *snes_ram;			/* Main memory */
+extern UINT8  *spc_ram;				/* SPC main memory */
+extern UINT8  spc_port_in[4];		/* SPC input ports */
+extern UINT8  spc_port_out[4];		/* SPC output ports */
 struct SNES_PPU_STRUCT
 {
 	struct
@@ -451,9 +454,6 @@ extern struct snes_cart_info snes_cart;
 /*----------- defined in audio/snes.c -----------*/
 
 /* (APU) Sound related */
-extern UINT8 *spc_ram;			/* SPC main memory */
-extern UINT8 spc_port_in[4];	/* SPC input ports */
-extern UINT8 spc_port_out[4];	/* SPC output ports */
 extern READ8_HANDLER( spc_io_r );
 extern WRITE8_HANDLER( spc_io_w );
 extern READ8_HANDLER( spc_ram_r );

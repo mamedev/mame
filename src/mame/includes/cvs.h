@@ -9,7 +9,7 @@
 #define CVS_S2636_X_OFFSET		(-26)
 
 
-/*----------- defined in driver/cvs.c -----------*/
+/*----------- defined in drivers/cvs.c -----------*/
 
 extern UINT8 *cvs_color_ram;
 extern UINT8 *cvs_video_ram;

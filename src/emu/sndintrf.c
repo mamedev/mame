@@ -316,6 +316,9 @@ static const struct
 #if (HAS_M58817)
 	{ SOUND_M58817, m58817_get_info },
 #endif
+#if (HAS_TMC0285)
+	{ SOUND_TMC0285, tmc0285_get_info },
+#endif
 #if (HAS_TMS5200)
 	{ SOUND_TMS5200, tms5200_get_info },
 #endif

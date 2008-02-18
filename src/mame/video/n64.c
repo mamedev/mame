@@ -18,7 +18,6 @@ extern UINT32 *rsp_dmem;
 extern void dp_full_sync(void);
 
 extern UINT32 n64_vi_origin;
-extern UINT32 n64_vi_width;
 extern UINT32 n64_vi_control;
 
 extern UINT32 dp_start;

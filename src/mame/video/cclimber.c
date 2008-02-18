@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/cclimber.h"
 
 
 UINT8 *cclimber_bsvideoram;

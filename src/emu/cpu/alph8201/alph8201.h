@@ -38,8 +38,8 @@ enum {
 	ALPHA8201_R4,ALPHA8201_R5,ALPHA8201_R6,ALPHA8201_R7
 };
 
-extern void ALPHA8201_get_info(UINT32 state, cpuinfo *info);
-extern void ALPHA8301_get_info(UINT32 state, cpuinfo *info);
+extern void alpha8201_get_info(UINT32 state, cpuinfo *info);
+extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
 
 /*
  *   Read a UINT8 from given memory location

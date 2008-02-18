@@ -19,7 +19,7 @@
 #define DEBUG_MAPLE	(0)
 
 #if DEBUG_SYSCTRL
-static const char *sysctrl_names[] =
+static const char *const sysctrl_names[] =
 {
 	"CH2 DMA dest",
 	"CH2 DMA length",
@@ -73,7 +73,7 @@ static const char *sysctrl_names[] =
 #endif
 
 #if DEBUG_MAPLE
-static const char *maple_names[] =
+static const char *const maple_names[] =
 {
 	"5f6c00",
 	"DMA command table addr",
@@ -126,7 +126,7 @@ extern UINT32 dma_offset;
 static UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 
-static UINT32 maple0x82answer[]=
+static const UINT32 maple0x82answer[]=
 {
 	0x07200083,0x2d353133,0x39343136,0x20202020,0x59504f43,0x48474952,0x45532054,0x45204147,
 	0x05200083,0x5245544e,0x53495250,0x43205345,0x544c2c4f,0x20202e44,0x38393931,0x5c525043
@@ -809,7 +809,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
         }
 
 	AICA_0_w(offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
- 	
+
 //	mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
 

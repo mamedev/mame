@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-/*----------- defined in video/centiped.c -----------*/
+/*----------- defined in video/m62.c -----------*/
 
 PALETTE_INIT( m62 );
 PALETTE_INIT( lotlot );

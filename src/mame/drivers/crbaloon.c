@@ -344,7 +344,7 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_RESET( crballoon )
+static MACHINE_RESET( crballoon )
 {
 	pc3092_reset();
 	port_sound_w(0, 0);

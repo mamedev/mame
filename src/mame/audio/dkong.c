@@ -1286,7 +1286,7 @@ ADDRESS_MAP_END
 static const struct NESinterface nes_interface_1 = { REGION_CPU2 };
 static const struct NESinterface nes_interface_2 = { REGION_CPU3 };
 
-static struct TMS5110interface tms5110_interface =
+static const struct TMS5110interface tms5110_interface =
 {
 	REGION_SOUND1,		/* Sample Rom */
 	NULL,

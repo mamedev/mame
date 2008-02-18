@@ -42,6 +42,7 @@
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
+void neogeo_set_display_position_interrupt_control(UINT16 data);
 void neogeo_set_display_counter_msb(UINT16 data);
 void neogeo_set_display_counter_lsb(UINT16 data);
 void neogeo_acknowledge_interrupt(UINT16 data);
@@ -139,8 +140,6 @@ VIDEO_UPDATE( neogeo );
 
 READ16_HANDLER( neogeo_video_register_r );
 WRITE16_HANDLER( neogeo_video_register_w );
-
-void neogeo_set_display_position_interrupt_control(UINT16 data);
 
 void neogeo_set_palette_bank(UINT8 data);
 void neogeo_set_screen_dark(UINT8 data);

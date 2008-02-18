@@ -125,7 +125,6 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io);
 /*----------- defined in video/leland.c -----------*/
 
 extern UINT8 *ataxx_qram;
-extern UINT8 leland_last_scanline_int;
 
 WRITE8_HANDLER( leland_scroll_w );
 WRITE8_HANDLER( leland_gfx_port_w );

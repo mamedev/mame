@@ -723,7 +723,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const char *m10_sample_names[] =
+static const char *const m10_sample_names[] =
 {
 	"*ipminvad",
 	"1.wav",		/* shot/missle */
@@ -740,7 +740,7 @@ static const char *m10_sample_names[] =
 };
 
 
-static struct Samplesinterface m10_samples_interface =
+static const struct Samplesinterface m10_samples_interface =
 {
 	6,	/* 6 channels */
 	m10_sample_names

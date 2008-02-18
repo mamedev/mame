@@ -17,6 +17,8 @@ VIDEO_UPDATE( midzeus );
 READ32_HANDLER( zeus_r );
 WRITE32_HANDLER( zeus_w );
 
+/*----------- defined in video/midzeus2.c -----------*/
+
 VIDEO_START( midzeus2 );
 VIDEO_UPDATE( midzeus2 );
 

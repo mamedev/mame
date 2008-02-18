@@ -31,8 +31,6 @@ WRITE32_HANDLER( dc_arm_aica_w );
 
 MACHINE_RESET( dc );
 
-void dc_vblank( void );
-
 int compute_interrupt_level(void);
 void update_interrupt_status(void);
 
@@ -93,6 +91,8 @@ extern UINT32 sysctrl_regs[0x200/4];
 
 
 /*----------- defined in video/dc.c -----------*/
+
+void dc_vblank( void );
 
 READ64_HANDLER( pvr_ctrl_r );
 WRITE64_HANDLER( pvr_ctrl_w );

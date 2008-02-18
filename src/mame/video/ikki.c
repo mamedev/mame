@@ -59,11 +59,6 @@ PALETTE_INIT( ikki )
 	}
 }
 
-WRITE8_HANDLER( ikki_scroll_w )
-{
-	ikki_scroll[offset] = data;
-}
-
 WRITE8_HANDLER( ikki_scrn_ctrl_w )
 {
 	ikki_flipscreen = (data >> 2) & 1;

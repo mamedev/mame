@@ -260,7 +260,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( irem_audio_base )
+static MACHINE_DRIVER_START( irem_audio_base )
 
 	MDRV_SOUND_START(irem_audio)
 

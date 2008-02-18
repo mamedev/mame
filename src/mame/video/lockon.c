@@ -32,7 +32,6 @@ size_t	lockon_hudram_size;
 size_t	lockon_objectram_size;
 size_t	lockon_groundram_size;
 
-UINT8	*obj_pal_ram;
 
 /*************************************
  *
@@ -62,6 +61,7 @@ static UINT16	dyll;
 
 /* Object palette RAM control */
 static UINT32	iden;
+static UINT8	*obj_pal_ram;
 static UINT32	obj_pal_latch;
 static UINT32	obj_pal_addr;
 

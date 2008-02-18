@@ -98,7 +98,6 @@ VIDEO_UPDATE( buggyboy );
 VIDEO_EOF( buggyboy );
 
 extern UINT16 *buggybjr_vram;
-PALETTE_INIT( buggybjr );
 WRITE16_HANDLER( buggybjr_vram_w );
 VIDEO_START( buggybjr );
 VIDEO_UPDATE( buggybjr );

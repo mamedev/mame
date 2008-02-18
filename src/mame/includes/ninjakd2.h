@@ -1,3 +1,5 @@
+/*----------- defined in video/ninjakd2.c -----------*/
+
 extern WRITE8_HANDLER( ninjakd2_bgvideoram_w );
 extern WRITE8_HANDLER( ninjakd2_fgvideoram_w );
 extern WRITE8_HANDLER( ninjakd2_bg_ctrl_w );

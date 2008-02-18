@@ -269,6 +269,7 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
+#if (HAS_TMC0285)
 void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
@@ -278,7 +279,9 @@ void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
 		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }
+#endif
 
+#if (HAS_TMS5200)
 void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
 {
 	switch (state)
@@ -288,4 +291,4 @@ void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
 		default: 										tms5220_get_info(token, state, info);	break;
 	}
 }
-
+#endif
