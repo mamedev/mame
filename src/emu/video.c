@@ -889,6 +889,33 @@ void video_screen_update_partial(int scrnum, int scanline)
 
 
 /*-------------------------------------------------
+    video_screen_update_partial - perform an update
+    from the last beam position up to the current
+    beam position
+-------------------------------------------------*/
+
+void video_screen_update_now(int scrnum)
+{
+	internal_screen_info *info = get_screen_info(Machine, scrnum);
+	int current_vpos = video_screen_get_vpos(scrnum);
+	int current_hpos = video_screen_get_hpos(scrnum);
+
+	/* since we can currently update only at the scanline
+       level, we are trying to do the right thing by
+       updating including the current scanline, only if the
+       beam is past the halfway point horizontally.
+       If the beam is in the first half of the scanline,
+       we only update up to the previous scanline.
+       This minimizes the number of pixels that might be drawn
+       incorrectly until we support a pixel level granularity */
+	if ((current_hpos < (info->state->width / 2)) && (current_vpos > 0))
+		current_vpos = current_vpos - 1;
+
+	video_screen_update_partial(scrnum, current_vpos);
+}
+
+
+/*-------------------------------------------------
     video_screen_get_vpos - returns the current
     vertical position of the beam for a given
     screen

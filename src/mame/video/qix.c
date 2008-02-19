@@ -154,7 +154,7 @@ WRITE8_HANDLER( qix_videoram_w )
 {
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+	video_screen_update_now(0);
 
 	/* add in the upper bit of the address latch */
 	offset += (qix_videoaddress[0] & 0x80) << 8;
@@ -219,7 +219,7 @@ WRITE8_HANDLER( qix_paletteram_w )
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == qix_palettebank) &&
 	    (old_data != data))
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+		video_screen_update_now(0);
 }
 
 
@@ -228,7 +228,7 @@ WRITE8_HANDLER( qix_palettebank_w )
 	/* set the bank value */
 	if (qix_palettebank != (data & 3))
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+		video_screen_update_now(0);
 		qix_palettebank = data & 3;
 	}
 
@@ -368,11 +368,18 @@ static VIDEO_UPDATE( qix )
 }
 
 
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 MACHINE_DRIVER_START( qix_video )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)
-	
+
 	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
 

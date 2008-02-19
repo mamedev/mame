@@ -92,6 +92,9 @@ void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int m
 /* force a partial update of the screen up to and including the requested scanline */
 void video_screen_update_partial(int scrnum, int scanline);
 
+/* force an update from the last beam position up to the current beam position */
+void video_screen_update_now(int scrnum);
+
 /* return the current vertical or horizontal position of the beam for a screen */
 int video_screen_get_vpos(int scrnum);
 int video_screen_get_hpos(int scrnum);
