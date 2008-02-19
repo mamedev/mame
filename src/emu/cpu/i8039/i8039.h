@@ -103,6 +103,31 @@ extern void i8048_get_info(UINT32 state, cpuinfo *info);
 #endif
 
 /**************************************************************************
+ * I8749 section
+ **************************************************************************/
+#if (HAS_I8749)
+#define I8749_PC				I8039_PC
+#define I8749_SP				I8039_SP
+#define I8749_PSW				I8039_PSW
+#define I8749_A 				I8039_A
+#define I8749_TC				I8039_TC
+#define I8749_P1				I8039_P1
+#define I8749_P2				I8039_P2
+#define I8749_R0				I8039_R0
+#define I8749_R1				I8039_R1
+#define I8749_R2				I8039_R2
+#define I8749_R3				I8039_R3
+#define I8749_R4				I8039_R4
+#define I8749_R5				I8039_R5
+#define I8749_R6				I8039_R6
+#define I8749_R7				I8039_R7
+
+#define i8749_ICount			i8039_ICount
+
+extern void i8749_get_info(UINT32 state, cpuinfo *info);
+#endif
+
+/**************************************************************************
  * N7751 section
  **************************************************************************/
 #if (HAS_N7751)

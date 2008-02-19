@@ -629,6 +629,16 @@ static void i8035_init (int index, int clock, const void *config, int (*irqcallb
 }
 #endif
 
+#if (HAS_I8749)
+static void i8749_init (int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i8039_init(index, clock, config, irqcallback);
+
+	R.ram_mask = 0x7f;
+	R.int_rom_size = 0x800;
+}
+#endif
+
 #if (HAS_M58715)
 static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -1024,6 +1034,22 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 }
 #endif
 
+#if (HAS_I8749)
+/**************************************************************************
+ * CPU-specific get_info/set_info
+ **************************************************************************/
+void i8749_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8749");				break;
+		case CPUINFO_PTR_INIT:							info->init = i8749_init;				break;
+
+		default:										i8039_get_info(state, info);			break;
+	}
+}
+#endif
 
 #if (HAS_N7751)
 /**************************************************************************

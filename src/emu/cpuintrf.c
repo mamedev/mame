@@ -52,6 +52,7 @@ void v70_get_info(UINT32 state, cpuinfo *info);
 void i8035_get_info(UINT32 state, cpuinfo *info);
 void i8039_get_info(UINT32 state, cpuinfo *info);
 void i8048_get_info(UINT32 state, cpuinfo *info);
+void i8749_get_info(UINT32 state, cpuinfo *info);
 void n7751_get_info(UINT32 state, cpuinfo *info);
 void mb8884_get_info(UINT32 state, cpuinfo *info);
 void m58715_get_info(UINT32 state, cpuinfo *info);
@@ -368,6 +369,9 @@ static const struct
 #endif
 #if (HAS_I8048)
 	{ CPU_I8048, i8048_get_info },
+#endif
+#if (HAS_I8749)
+	{ CPU_I8749, i8749_get_info },
 #endif
 #if (HAS_N7751)
 	{ CPU_N7751, n7751_get_info },
