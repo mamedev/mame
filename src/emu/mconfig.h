@@ -80,11 +80,10 @@ struct _machine_config
 	UINT32				video_attributes;			/* flags describing the video system */
 	const gfx_decode_entry *gfxdecodeinfo;			/* pointer to array of graphics decoding information */
 	UINT32				total_colors;				/* total number of colors in the palette */
-	UINT32				color_table_len;			/* length of the color indirection table */
 	const char *		default_layout;				/* default layout for this machine */
 	screen_config		screen[MAX_SCREENS];		/* total number of screens */
 
-	void 				(*init_palette)(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom); /* one-time palette init callback  */
+	void 				(*init_palette)(running_machine *machine, const UINT8 *color_prom); /* one-time palette init callback  */
 	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
 	void				(*video_reset)(running_machine *machine);		/* video reset callback */
 	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */

@@ -1391,7 +1391,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			UINT32 palbase = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -1477,7 +1477,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									for( x=sx; x<ex; x++ )
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+											dest[x] = palbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 										pri[x] = 31;
 										x_index += dx;
 									}
@@ -1497,7 +1497,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									for( x=sx; x<ex; x++ )
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[source[x_index>>16]];
+											dest[x] = palbase + source[x_index>>16];
 										x_index += dx;
 									}
 
@@ -1517,7 +1517,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									int x, x_index = x_index_base;
 									for( x=sx; x<ex; x++ )
 									{
-										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+										dest[x] = palbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 										x_index += dx;
 									}
 
@@ -1534,7 +1534,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									int x, x_index = x_index_base;
 									for( x=sx; x<ex; x++ )
 									{
-										dest[x] = pal[source[x_index>>16]];
+										dest[x] = palbase + source[x_index>>16];
 										x_index += dx;
 									}
 
@@ -1564,7 +1564,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 										if( c != transparent_color )
 										{
 											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
+												dest[x] = palbase + c;
 											pri[x] = 31;
 										}
 										x_index += dx;
@@ -1588,7 +1588,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 										if( c != transparent_color )
 										{
 											if (((1 << pri[x]) & pri_mask) == 0)
-												dest[x] = pal[c];
+												dest[x] = palbase + c;
 											pri[x] = 31;
 										}
 										x_index += dx;
@@ -1611,7 +1611,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									for( x=sx; x<ex; x++ )
 									{
 										int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-										if( c != transparent_color ) dest[x] = pal[c];
+										if( c != transparent_color ) dest[x] = palbase + c;
 										x_index += dx;
 									}
 
@@ -1629,7 +1629,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									for( x=sx; x<ex; x++ )
 									{
 										int c = source[x_index>>16];
-										if( c != transparent_color ) dest[x] = pal[c];
+										if( c != transparent_color ) dest[x] = palbase + c;
 										x_index += dx;
 									}
 
@@ -1704,7 +1704,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 									if (((1 << c) & transparent_color) == 0)
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
+											dest[x] = palbase + c;
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -1725,7 +1725,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 								{
 									int c = source[x_index>>16];
 									if (((1 << c) & transparent_color) == 0)
-										dest[x] = pal[c];
+										dest[x] = palbase + c;
 									x_index += dx;
 								}
 
@@ -1758,9 +1758,9 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 											if (((1 << (pri[x] & 0x1f)) & pri_mask) == 0)
 											{
 												if (pri[x] & 0x80)
-													dest[x] = palette_shadow_table[pal[c]];
+													dest[x] = palette_shadow_table[palbase + c];
 												else
-													dest[x] = pal[c];
+													dest[x] = palbase + c;
 											}
 											pri[x] = (pri[x] & 0x7f) | 31;
 											break;
@@ -1793,7 +1793,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 										switch(gfx_drawmode_table[c])
 										{
 										case DRAWMODE_SOURCE:
-											dest[x] = pal[c];
+											dest[x] = palbase + c;
 											break;
 										case DRAWMODE_SHADOW:
 											dest[x] = palette_shadow_table[dest[x]];
@@ -1817,7 +1817,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -2351,7 +2351,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+			const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
 			UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 			int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -3796,7 +3796,7 @@ DECLARE(drawgfx_core,(
 		int dw = ex-sx+1;										/* dest width */
 		int dh = ey-sy+1;										/* dest height */
 		int dm = dest->rowpixels;								/* dest modulo */
-		const pen_t *paldata = &Machine->remapped_colortable[gfx->color_base + gfx->color_granularity * color];
+		const pen_t *paldata = &Machine->pens[gfx->color_base + gfx->color_granularity * color];
 		UINT8 *pribuf = (pri_buffer) ? BITMAP_ADDR8(pri_buffer, sy, sx) : NULL;
 
 		switch (transparency)

@@ -34,6 +34,9 @@
 #define IP_ACTIVE_HIGH		0x00000000
 #define IP_ACTIVE_LOW		0xffffffff
 
+#define INPUT_PORT_PAIR_ENTRIES	(sizeof(FPTR) / sizeof(UINT32))
+#define INPUT_PORT_PAIR_TOKENS	(2 * sizeof(UINT32) / sizeof(FPTR))
+
 
 /* macro for a custom callback functions (PORT_CUSTOM) */
 #define CUSTOM_INPUT(name)	UINT32 name(void *param)
@@ -492,8 +495,24 @@ enum
 typedef struct _input_port_init_params input_port_init_params;
 
 
+/* a custom input port callback function */
+typedef UINT32 (*input_port_custom_func)(void *param);
+typedef void (*input_port_changed_func)(void *param, UINT32 oldval, UINT32 newval);
+
+
 /* this type is used to encode input port definitions */
-typedef struct _input_port_token *input_port_token;
+typedef union _input_port_token input_port_token;
+union _input_port_token
+{
+	FPTR		fptr;								/* default value used for C89 implementations */
+	UINT32		i[INPUT_PORT_PAIR_ENTRIES];			/* one or two UINT32s */
+	float		f[INPUT_PORT_PAIR_ENTRIES];			/* one or two floats */
+	void *		ptr;								/* a generic pointer value */
+	const char *stringptr;							/* pointer to a string value */
+	const input_port_token *tokenptr;				/* pointer to a another token list */
+	input_port_custom_func customptr;				/* pointer to a custom input function */
+	const UINT32 *remapptr;							/* pointer to a remap table */
+};
 
 
 /* In mamecore.h: typedef struct _input_port_default_entry input_port_default_entry; */
@@ -544,7 +563,7 @@ struct _input_port_entry
 	UINT16		category;		/* (MESS-specific) category */
 	const char *name;			/* user-friendly name to display */
 	input_seq	seq;			/* input sequence affecting the input bits */
-	UINT32		(*custom)(void *);/* custom callback routine */
+	input_port_custom_func custom;/* custom callback routine */
 	void *		custom_param;	/* parameter for callback routine */
 
 	/* valid if type is between __ipt_analog_start and __ipt_analog_end */
@@ -631,19 +650,22 @@ struct _ext_inp_header
 #define IP_NAME_DEFAULT 				NULL
 
 /* single pointers and UINT32s are just encoded straight */
-#define INPUT_PORT_PTR(x)				((input_port_token)(x))
-#define INPUT_PORT_UINT32(x)			((input_port_token)(FPTR)(UINT32)(FPTR)(x))
+#define INPUT_PORT_PTR(type,x)			{ (FPTR)(x) }
+#define INPUT_PORT_PAIR_UINT32(vptr,x)	(vptr)->i[x]
 
-#ifdef PTR64
 /* on 64-bit platforms, pairs of UINT32s are encoded into a single 64-bit pointer */
-#define INPUT_PORT_UINT32_PAIR(x,y)		((input_port_token)((UINT32)(x) | ((UINT64)(y) << 32)))
-#define INPUT_PORT_PAIR_ITEM(vptr,x)	((UINT32)((FPTR)*(vptr) >> (32 * (x))))
-#define INPUT_PORT_PAIR_TOKENS			1
+#ifdef PTR64
+#ifdef LSB_FIRST
+#define INPUT_PORT_UINT32_PAIR(x,y)		{ (FPTR)((UINT32)(x) | ((UINT64)(y) << 32)) }
 #else
+#define INPUT_PORT_UINT32_PAIR(x,y)		{ (FPTR)((UINT32)(y) | ((UINT64)(x) << 32)) }
+#endif
+#define INPUT_PORT_UINT32(x)			INPUT_PORT_UINT32_PAIR(x,0)
+
 /* on 32-bit platforms, pairs of UINT32s are encoded in two consecutive 32-bit pointers */
+#else
+#define INPUT_PORT_UINT32(x)			{ (FPTR)(UINT32)(x) }
 #define INPUT_PORT_UINT32_PAIR(x,y)		INPUT_PORT_UINT32(x), INPUT_PORT_UINT32(y)
-#define INPUT_PORT_PAIR_ITEM(vptr,x)	((UINT32)((vptr)[x]))
-#define INPUT_PORT_PAIR_TOKENS			2
 #endif
 
 /* start of table */
@@ -660,7 +682,7 @@ struct _ext_inp_header
 
 /* including */
 #define PORT_INCLUDE(name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_INCLUDE), INPUT_PORT_PTR(&ipt_##name[0]),
+	INPUT_PORT_UINT32(INPUT_TOKEN_INCLUDE), INPUT_PORT_PTR(tokenptr, &ipt_##name[0]),
 
 /* start of a new input port */
 #define PORT_START \
@@ -668,11 +690,11 @@ struct _ext_inp_header
 
 /* start of a new input port (with included tag) */
 #define PORT_START_TAG(tag_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_START_TAG), INPUT_PORT_PTR(tag_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_START_TAG), INPUT_PORT_PTR(stringptr, tag_),
 
 /* modify an existing port */
 #define PORT_MODIFY(tag_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_MODIFY), INPUT_PORT_PTR(tag_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_MODIFY), INPUT_PORT_PTR(stringptr, tag_),
 
 /* input bit definition */
 #define PORT_BIT(mask_,default_,type_) \
@@ -706,7 +728,7 @@ struct _ext_inp_header
 
 /* general flags */
 #define PORT_NAME(name_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_NAME), INPUT_PORT_PTR(name_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_NAME), INPUT_PORT_PTR(stringptr, name_),
 
 #define PORT_PLAYER(player_) \
 	INPUT_PORT_UINT32(INPUT_TOKEN_PLAYER1 + (((player_) - 1) % MAX_PLAYERS)),
@@ -765,7 +787,7 @@ struct _ext_inp_header
 
 /* positional control uses this remap table */
 #define PORT_REMAP_TABLE(table_)										\
-	INPUT_PORT_UINT32(INPUT_TOKEN_REMAP_TABLE), INPUT_PORT_PTR(table_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_REMAP_TABLE), INPUT_PORT_PTR(remapptr, table_),
 
 /* positional control bits are active low */
 #define PORT_INVERT													\
@@ -773,34 +795,34 @@ struct _ext_inp_header
 
 /* custom callbacks */
 #define PORT_CUSTOM(callback_, param_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_CUSTOM), INPUT_PORT_PTR(callback_), INPUT_PORT_PTR(param_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_CUSTOM), INPUT_PORT_PTR(customptr, callback_), INPUT_PORT_PTR(ptr, param_),
 
 /* dip switch definition */
 #define PORT_DIPNAME(mask,default,name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_DIPNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32(INPUT_TOKEN_DIPNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
 
 #define PORT_DIPSETTING(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_DIPSETTING, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_DIPSETTING, default), INPUT_PORT_PTR(stringptr, name),
 
 /* physical location, of the form: name:[!]sw,[name:][!]sw,... */
 /* note that these are specified LSB-first */
 #define PORT_DIPLOCATION(location_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_DIPLOCATION), INPUT_PORT_PTR(location_),
+	INPUT_PORT_UINT32(INPUT_TOKEN_DIPLOCATION), INPUT_PORT_PTR(stringptr, location_),
 
 /* conditionals for dip switch settings */
 #define PORT_CONDITION(tag_,mask_,condition_,value_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONDITION, condition_), INPUT_PORT_UINT32_PAIR(mask_, value_), INPUT_PORT_PTR(tag_),
+	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONDITION, condition_), INPUT_PORT_UINT32_PAIR(mask_, value_), INPUT_PORT_PTR(stringptr, tag_),
 
 /* analog adjuster definition */
 #define PORT_ADJUSTER(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_ADJUSTER, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_ADJUSTER, default), INPUT_PORT_PTR(stringptr, name),
 
 /* config definition */
 #define PORT_CONFNAME(mask,default,name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_CONFNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32(INPUT_TOKEN_CONFNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
 
 #define PORT_CONFSETTING(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONFSETTING, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONFSETTING, default), INPUT_PORT_PTR(stringptr, name),
 
 #ifdef MESS
 /* keyboard chars */
@@ -812,10 +834,10 @@ struct _ext_inp_header
 	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
 
 #define PORT_CATEGORY_CLASS(mask,default,name) 						\
-	INPUT_PORT_UINT32(INPUT_TOKEN_CATEGORY_NAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(name),
+	INPUT_PORT_UINT32(INPUT_TOKEN_CATEGORY_NAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
 
 #define PORT_CATEGORY_ITEM(default,name,category) 					\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY_SETTING, default), INPUT_PORT_PTR(name), INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
+	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY_SETTING, default), INPUT_PORT_PTR(stringptr, name), INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
 #endif /* MESS */
 
 
@@ -895,7 +917,7 @@ const char *input_port_name(const input_port_entry *in);
 const input_seq *input_port_seq(input_port_entry *in, input_seq_type seqtype);
 const input_seq *input_port_default_seq(int type, int player, input_seq_type seqtype);
 int input_port_condition(const input_port_entry *in);
-void input_port_set_changed_callback(int port, UINT32 mask, void (*callback)(void *, UINT32, UINT32), void *param);
+void input_port_set_changed_callback(int port, UINT32 mask, input_port_changed_func callback, void *param);
 
 const char *port_type_to_token(int type, int player);
 int token_to_port_type(const char *string, int *player);

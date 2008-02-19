@@ -183,12 +183,8 @@ struct _running_machine
 	palette_t *				palette;			/* global palette object */
 
 	/* palette-related information */
-/* fix me - some games try to modify remapped_colortable directly */
-/* search for "palette hack" to find instances */
 	const pen_t *			pens;				/* remapped palette pen numbers */
 	struct _colortable_t *	colortable;			/* global colortable for remapping */
-	const UINT16 *			game_colortable;	/* lookup table used to map gfx pen numbers to color numbers */
-	const pen_t *			remapped_colortable;/* the above, already remapped through machine->pens */
 	pen_t *					shadow_table;		/* table for looking up a shadowed pen */
 
 	/* audio-related information */

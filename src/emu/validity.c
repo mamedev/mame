@@ -79,6 +79,15 @@ static quark_table *defstr_table;
 
 
 
+INLINE const char *input_port_string_from_index(UINT32 index)
+{
+	input_port_token token;
+	token.i[0] = index;
+	return input_port_string_from_token(token);
+}
+
+
+
 /*************************************
  *
  *  Allocate an array of quark
@@ -198,7 +207,7 @@ static void build_quarks(void)
 	/* add all the default strings */
 	for (strnum = 1; strnum < INPUT_STRING_COUNT; strnum++)
 	{
-		const char *string = input_port_string_from_token(INPUT_PORT_UINT32(strnum));
+		const char *string = input_port_string_from_index(strnum);
 		if (string != NULL)
 			add_quark(defstr_table, strnum, quark_string_crc(string));
 	}
@@ -961,7 +970,7 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
 		/* hash the string and look it up in the string table */
 		crc = quark_string_crc(inp->name);
 		for (entry = first_hash_entry(defstr_table, crc); entry; entry = entry->next)
-			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_token(INPUT_PORT_UINT32(entry - defstr_table->entry))))
+			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_index(entry - defstr_table->entry)))
 			{
 				strindex = entry - defstr_table->entry;
 				break;
@@ -992,7 +1001,7 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
 		for (j = 0; j < coin_len; j++)
 			/* if it's on our list, display it */
 			if (coin_list[j] == i)
-				mame_printf_error("%s\n", input_port_string_from_token(INPUT_PORT_UINT32(i)));
+				mame_printf_error("%s\n", input_port_string_from_index(i));
 }
 
 
@@ -1004,8 +1013,8 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
 
 static int validate_inputs(int drivnum, const machine_config *drv, input_port_entry **memory)
 {
-	const char *demo_sounds = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Demo_Sounds));
-	const char *flipscreen = input_port_string_from_token(INPUT_PORT_UINT32(INPUT_STRING_Flip_Screen));
+	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
+	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
 	const input_port_entry *inp, *last_dipname_entry = NULL;
 	const game_driver *driver = drivers[drivnum];
 	int empty_string_found = FALSE;
@@ -1188,14 +1197,14 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
 		/* hash the string and look it up in the string table */
 		crc = quark_string_crc(inp->name);
 		for (entry = first_hash_entry(defstr_table, crc); entry; entry = entry->next)
-			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_token(INPUT_PORT_UINT32(entry - defstr_table->entry))))
+			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_index(entry - defstr_table->entry)))
 			{
 				strindex = entry - defstr_table->entry;
 				break;
 			}
 
 		/* check for strings that should be DEF_STR */
-		if (strindex != 0 && inp->name != input_port_string_from_token(INPUT_PORT_UINT32(strindex)))
+		if (strindex != 0 && inp->name != input_port_string_from_index(strindex))
 		{
 			mame_printf_error("%s: %s must use DEF_STR( %s )\n", driver->source_file, driver->name, inp->name);
 			error = TRUE;

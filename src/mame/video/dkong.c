@@ -846,10 +846,10 @@ static void check_palette(running_machine *machine)
 			switch (newset)
 			{
 				case 0x00:
-					palette_init_radarscp(machine, (UINT16 *) machine->game_colortable, memory_region(REGION_PROMS));
+					palette_init_radarscp(machine, memory_region(REGION_PROMS));
 					break;
 				case 0x01:
-					palette_init_dkong2b(machine, (UINT16 *) machine->game_colortable, memory_region(REGION_PROMS));
+					palette_init_dkong2b(machine, memory_region(REGION_PROMS));
 					break;
 			}
 		}

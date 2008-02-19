@@ -46,8 +46,8 @@
 #define VIDEO_RESET(name)			void video_reset_##name(running_machine *machine)
 #define VIDEO_RESET_CALL(name)		video_reset_##name(machine)
 
-#define PALETTE_INIT(name)			void palette_init_##name(running_machine *machine, UINT16 *colortable, const UINT8 *color_prom)
-#define PALETTE_INIT_CALL(name)		palette_init_##name(machine, colortable, color_prom)
+#define PALETTE_INIT(name)			void palette_init_##name(running_machine *machine, const UINT8 *color_prom)
+#define PALETTE_INIT_CALL(name)		palette_init_##name(machine, color_prom)
 
 #define VIDEO_EOF(name)				void video_eof_##name(running_machine *machine)
 #define VIDEO_EOF_CALL(name)		video_eof_##name(machine)

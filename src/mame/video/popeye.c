@@ -58,7 +58,7 @@ static tilemap *fg_tilemap;
   The bootleg is the same, but the outputs are not inverted.
 
 ***************************************************************************/
-static void convert_color_prom(running_machine *machine,UINT16 *colortable,const UINT8 *color_prom)
+static void convert_color_prom(running_machine *machine,const UINT8 *color_prom)
 {
 	int i;
 
@@ -125,14 +125,14 @@ PALETTE_INIT( popeye )
 {
 	invertmask = 0xff;
 
-	convert_color_prom(machine,colortable,color_prom);
+	convert_color_prom(machine,color_prom);
 }
 
 PALETTE_INIT( popeyebl )
 {
 	invertmask = 0x00;
 
-	convert_color_prom(machine,colortable,color_prom);
+	convert_color_prom(machine,color_prom);
 }
 
 static void set_background_palette(running_machine *machine,int bank)

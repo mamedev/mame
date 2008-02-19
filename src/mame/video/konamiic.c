@@ -1216,10 +1216,7 @@ static void decode_gfx(running_machine *machine, int gfx_index, UINT8 *data, UIN
 	decodegfx(machine->gfx[gfx_index], data, 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
-	if (machine->config->color_table_len)
-		machine->gfx[gfx_index]->total_colors = machine->config->color_table_len / (1 << bpp);
-	else
-		machine->gfx[gfx_index]->total_colors = machine->config->total_colors / (1 << bpp);
+	machine->gfx[gfx_index]->total_colors = machine->config->total_colors / (1 << bpp);
 }
 
 

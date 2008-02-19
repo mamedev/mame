@@ -69,10 +69,7 @@ VIDEO_START( polygonet )
 	machine->gfx[ttl_gfx_index] = allocgfx(&charlayout);
 	decodegfx(machine->gfx[ttl_gfx_index], memory_region(REGION_GFX1), 0, machine->gfx[ttl_gfx_index]->total_elements);
 
-	if (machine->config->color_table_len)
-	        machine->gfx[ttl_gfx_index]->total_colors = machine->config->color_table_len / 16;
-	else
-	        machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	// create the tilemap
 	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);

@@ -110,19 +110,14 @@ void palette_init(running_machine *machine)
 	switch (palette->format)
 	{
 		case BITMAP_FORMAT_INDEXED16:
-			/* indexed modes are fine for everything */
-			break;
-
 		case BITMAP_FORMAT_RGB15:
 		case BITMAP_FORMAT_RGB32:
-			/* RGB modes can't use color tables */
-			assert(machine->config->color_table_len == 0);
+			/* indexed and RGB modes are fine for everything */
 			break;
 
 		case BITMAP_FORMAT_INVALID:
 			/* invalid format means no palette - or at least it should */
 			assert(machine->config->total_colors == 0);
-			assert(machine->config->color_table_len == 0);
 			return;
 
 		default:
@@ -158,40 +153,11 @@ void palette_init(running_machine *machine)
 
 void palette_config(running_machine *machine)
 {
-	int total_colors = (machine->palette == NULL) ? 0 : palette_get_num_colors(machine->palette) * palette_get_num_groups(machine->palette);
-	pen_t *remapped_colortable = NULL;
-	UINT16 *colortable = NULL;
 	int i;
-
-	/* allocate memory for the colortables, if needed */
-	if (machine->config->color_table_len > 0)
-	{
-		/* first for the raw colortable */
-		colortable = auto_malloc(machine->config->color_table_len * sizeof(colortable[0]));
-		for (i = 0; i < machine->config->color_table_len; i++)
-			colortable[i] = i % total_colors;
-
-		/* then for the remapped colortable */
-		remapped_colortable = auto_malloc(machine->config->color_table_len * sizeof(remapped_colortable[0]));
-	}
 
 	/* now let the driver modify the initial palette and colortable */
 	if (machine->config->init_palette)
-		(*machine->config->init_palette)(machine, colortable, memory_region(REGION_PROMS));
-
-	/* now compute the remapped_colortable */
-	for (i = 0; i < machine->config->color_table_len; i++)
-	{
-		pen_t color = colortable[i];
-
-		/* check for invalid colors set by machine->config->init_palette */
-		assert(color < total_colors);
-		remapped_colortable[i] = machine->pens[color];
-	}
-
-	/* now we can set the final colortables */
-	machine->game_colortable = colortable;
-	machine->remapped_colortable = (remapped_colortable != NULL) ? remapped_colortable : machine->pens;
+		(*machine->config->init_palette)(machine, memory_region(REGION_PROMS));
 
 	/* set the color table base for each graphics element */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
@@ -371,6 +337,7 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 
 	assert(machine != NULL);
 	assert(machine->config != NULL);
+	assert(palettesize > 0);
 
 	/* allocate the colortable */
 	ctable = auto_malloc(sizeof(*ctable));

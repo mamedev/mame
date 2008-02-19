@@ -1453,8 +1453,6 @@ static void reset_machine(running_machine *machine)
 
 	/* palette-related information */
 	machine->pens = NULL;
-	machine->game_colortable = NULL;
-	machine->remapped_colortable = NULL;
 	machine->shadow_table = NULL;
 
 	/* audio-related information */

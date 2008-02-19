@@ -343,10 +343,7 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	machine->gfx[K037122_gfx_index[chip]] = allocgfx(&K037122_char_layout);
 	decodegfx(machine->gfx[K037122_gfx_index[chip]], (UINT8*)K037122_char_ram[chip], 0, machine->gfx[K037122_gfx_index[chip]]->total_elements);
 
-	if (machine->config->color_table_len)
-		machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->color_table_len / 16;
-	else
-		machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
 
 	return 0;
 }

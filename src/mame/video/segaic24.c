@@ -166,10 +166,7 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	machine->gfx[sys24_char_gfx_index] = allocgfx(&sys24_char_layout);
 
-	if (machine->config->color_table_len)
-		machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->color_table_len / 16;
-	else
-		machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
+	machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(sys24_char_ram, 0x80000/2);
