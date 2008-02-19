@@ -392,9 +392,6 @@ struct _game_driver
 #define MDRV_PALETTE_LENGTH(length)										\
 	machine->total_colors = (length);									\
 
-#define MDRV_COLORTABLE_LENGTH(length)									\
-	machine->color_table_len = (length);								\
-
 #define MDRV_DEFAULT_LAYOUT(layout)										\
 	machine->default_layout = &(layout)[0];								\
 
