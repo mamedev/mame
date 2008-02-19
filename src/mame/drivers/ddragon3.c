@@ -577,13 +577,13 @@ ROM_START( ddragon3 )
 	ROM_LOAD( "30j-4.ic7",    0x0c0000, 0x40000, CRC(0f74ea1c) SHA1(6bd8dd89bd22b29038cf502a898336e95e50a9cc) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-    ROM_LOAD( "30j-3.ic9",    0x000000, 0x80000, CRC(b3151871) SHA1(a647b4d9bddd6b8715a1d24641391a2e2d0f8867) )
+	ROM_LOAD( "30j-3.ic9",    0x000000, 0x80000, CRC(b3151871) SHA1(a647b4d9bddd6b8715a1d24641391a2e2d0f8867) )
 	ROM_LOAD( "30a12-0.ic8",  0x080000, 0x10000, CRC(20d64bea) SHA1(c2bd86bc5310f13f158ca2f93cfc57e5dbf01f7e) )
-    ROM_LOAD( "30j-2.ic11",   0x100000, 0x80000, CRC(41c6fb08) SHA1(9fb6105bdc9ff8eeaacf378d208cf6d32a09401b) )
+	ROM_LOAD( "30j-2.ic11",   0x100000, 0x80000, CRC(41c6fb08) SHA1(9fb6105bdc9ff8eeaacf378d208cf6d32a09401b) )
 	ROM_LOAD( "30a11-0.ic10", 0x180000, 0x10000, CRC(785d71b0) SHA1(e3f63f6984589d4d6ec6200ae33ce12610d27774) )
-    ROM_LOAD( "30j-1.ic13",   0x200000, 0x80000, CRC(67a6f114) SHA1(7d0f3cd6376128ddfcd13f2ec683ec270e95c19c) )
+	ROM_LOAD( "30j-1.ic13",   0x200000, 0x80000, CRC(67a6f114) SHA1(7d0f3cd6376128ddfcd13f2ec683ec270e95c19c) )
 	ROM_LOAD( "30a10-0.ic12", 0x280000, 0x10000, CRC(15e43d12) SHA1(b51cbd0c4c38b802e60616e11795b1ac43bfcb01) )
-    ROM_LOAD( "30j-0.ic15",   0x300000, 0x80000, CRC(f15dafbe) SHA1(68049c4542e1c7119bbf1be1fa44e3eea9c11b6e) )
+	ROM_LOAD( "30j-0.ic15",   0x300000, 0x80000, CRC(f15dafbe) SHA1(68049c4542e1c7119bbf1be1fa44e3eea9c11b6e) )
 	ROM_LOAD( "30a9-0.ic14",  0x380000, 0x10000, CRC(5a47e7a4) SHA1(74b9dff6e3d5fe22ea505dc439121ff64889769c) )
 
 	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* ADPCM Samples */
@@ -608,13 +608,13 @@ ROM_START( ddrago3j )
 	ROM_LOAD( "30j-4.ic7",    0x0c0000, 0x40000, CRC(0f74ea1c) SHA1(6bd8dd89bd22b29038cf502a898336e95e50a9cc) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE ) /* sprites */
-    ROM_LOAD( "30j-3.ic9",    0x000000, 0x80000, CRC(b3151871) SHA1(a647b4d9bddd6b8715a1d24641391a2e2d0f8867) )
+	ROM_LOAD( "30j-3.ic9",    0x000000, 0x80000, CRC(b3151871) SHA1(a647b4d9bddd6b8715a1d24641391a2e2d0f8867) )
 	ROM_LOAD( "30j12-0.ic8",  0x080000, 0x10000, CRC(1e9290d7) SHA1(77e660d2dc9a0e2c4c8ceb3e47b7ce674bceb34a) )
-    ROM_LOAD( "30j-2.ic11",   0x100000, 0x80000, CRC(41c6fb08) SHA1(9fb6105bdc9ff8eeaacf378d208cf6d32a09401b) )
+	ROM_LOAD( "30j-2.ic11",   0x100000, 0x80000, CRC(41c6fb08) SHA1(9fb6105bdc9ff8eeaacf378d208cf6d32a09401b) )
 	ROM_LOAD( "30j11-0.ic10", 0x180000, 0x10000, CRC(99195b2a) SHA1(d1c0e1855aed22f169717f94d78bc326e68e3064) )
-    ROM_LOAD( "30j-1.ic13",   0x200000, 0x80000, CRC(67a6f114) SHA1(7d0f3cd6376128ddfcd13f2ec683ec270e95c19c) )
+	ROM_LOAD( "30j-1.ic13",   0x200000, 0x80000, CRC(67a6f114) SHA1(7d0f3cd6376128ddfcd13f2ec683ec270e95c19c) )
 	ROM_LOAD( "30a10-0.ic12", 0x280000, 0x10000, CRC(e3879b5d) SHA1(fc87aedb0f4964a8d261d86121fe8544b330bed9) )
-    ROM_LOAD( "30j-0.ic15",   0x300000, 0x80000, CRC(f15dafbe) SHA1(68049c4542e1c7119bbf1be1fa44e3eea9c11b6e) )
+	ROM_LOAD( "30j-0.ic15",   0x300000, 0x80000, CRC(f15dafbe) SHA1(68049c4542e1c7119bbf1be1fa44e3eea9c11b6e) )
 	ROM_LOAD( "30j9-0.ic14",  0x380000, 0x10000, CRC(2759ae84) SHA1(02c70958259f56174ce2ba2db56040dad72be02b) )
 
 	ROM_REGION( 0x080000, REGION_SOUND1, 0 )	/* ADPCM Samples */
@@ -776,9 +776,9 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1990, ddragon3, 0,		ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddrago3j, ddragon3,	ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe,   0,		ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,  ctribe,	ctribe,   ctribe,	0, ROT0, "Technos", "The Combatribes (US) - Set 1?", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribeb,  ctribe,	ctribe,   ctribe,	0, ROT0, "bootleg", "The Combatribes (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US) - Set 1?", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribe,   0, ROT0, "bootleg", "The Combatribes (bootleg)", GAME_SUPPORTS_SAVE )

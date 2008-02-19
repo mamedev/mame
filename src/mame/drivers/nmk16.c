@@ -141,6 +141,8 @@ Afega Games
 01 Fire Hawk                    By ESD with different sound hardware: 2 M6295,
                                 this doesn't have the glitches present in spec2k
 
+Afega stands for "Art-Fiction Electronic Game"
+
 
 ********************************************************************/
 
@@ -6291,7 +6293,7 @@ Parts:
 
 ***************************************************************************/
 
-ROM_START( stagger1 )
+ROM_START( stagger1 ) /* Japan only, with later (c) year of 1998 */
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(8555929b) SHA1(b405d81c2a45191111b1a4458ac6b5c0a129b8f1) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(5b0b63ac) SHA1(239f793b6845a88d1630da790a2762da730a450d) )
@@ -6337,7 +6339,7 @@ ROM_END
 
 ***************************************************************************/
 
-ROM_START( redhawk )
+ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(3ef5f326) SHA1(e89c7c24a05886a14995d7c399958dc00ad35d63) )
 	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(9b3a10ef) SHA1(d03480329b23474e5a9e42a75b09d2140eed4443) )
@@ -6351,6 +6353,28 @@ ROM_START( redhawk )
 
 	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 0, 16x16x8 */
 	ROM_LOAD( "4", 0x000000, 0x080000, CRC(d6427b8a) SHA1(556de1b5ce29d1c3c54bb315dcaa4dd0848ca462) )
+
+	ROM_REGION( 0x00100, REGION_GFX3, ROMREGION_DISPOSE | ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
+	// Unused
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
+ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997 */
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "rhawk2.bin", 0x000000, 0x020000, CRC(6d2e23b4) SHA1(54579d460844e022ab61f32bfec28f00f2d27140) )
+	ROM_LOAD16_BYTE( "rhawk3.bin", 0x000001, 0x020000, CRC(5e0d6188) SHA1(c6ce8a3adf940893fcb6281348fdb0cdd65fe654) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )		/* Z80 Code */
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "rhawk6.bin", 0x000001, 0x080000, CRC(3f980ab6) SHA1(2b9202555f09d99e3575123dfed415bfd815bb2e) )
+	ROM_LOAD16_BYTE( "rhawk7.bin", 0x000000, 0x080000, CRC(0264ef54) SHA1(1124007538161dfc582f9c7692a20cdee459720c) )
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )	/* Layer 0, 16x16x8 */
+	ROM_LOAD( "rhawk4.bin", 0x000000, 0x080000, CRC(d79aa288) SHA1(b8598ab77d2019e5943b22f551e0a38eee5e52b6) )
 
 	ROM_REGION( 0x00100, REGION_GFX3, ROMREGION_DISPOSE | ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
 	// Unused
@@ -6879,61 +6903,62 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1989, tharrier, 0,       tharrier, tharrier, 0, 		 ROT270, "UPL (American Sammy license)",    "Task Force Harrier", 0  )
-GAME( 1989, tharierj, tharrier,tharrier, tharrier, 0, 		 ROT270, "UPL",                             "Task Force Harrier (Japan)", 0 )
-GAME( 1990, mustang,  0,       mustang,  mustang,  0,        ROT0,   "UPL",							    "US AAF Mustang (Japan)", GAME_IMPERFECT_SOUND)
-GAME( 1990, mustangs, mustang, mustang,  mustang,  0,        ROT0,   "UPL (Seoul Trading license)",	    "US AAF Mustang (Seoul Trading)", GAME_IMPERFECT_SOUND )
-GAME( 1990, bioship,  0,       bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)",	"Bio-ship Paladin", GAME_IMPERFECT_SOUND )
-GAME( 1990, sbsgomo,  bioship, bioship,  bioship,  0,        ROT0,   "UPL",                             "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyke,  0,       vandyke,  vandyke,  0,        ROT270, "UPL",                             "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyjal, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandyja2, vandyke, vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",            "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykeb, vandyke, vandykeb, vandyke,  vandykeb, ROT270, "[UPL] (bootleg)",                 "Vandyke (bootleg with PIC16c57)",  GAME_NOT_WORKING )
-GAME( 1991, blkheart, 0,       macross,  blkheart, 0,        ROT0,   "UPL",                             "Black Heart", GAME_IMPERFECT_SOUND  )
-GAME( 1991, blkhearj, blkheart,macross,  blkheart, 0,        ROT0,   "UPL",                             "Black Heart (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1991, acrobatm, 0,       acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",             "Acrobat Mission", GAME_IMPERFECT_SOUND )
-GAME( 1992, strahl,   0,       strahl,   strahl,   0,        ROT0,   "UPL",                             "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1992, strahla,  strahl,  strahl,   strahl,   0,        ROT0,   "UPL",                             "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1991, tdragon,  0,       tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",             "Thunder Dragon", GAME_IMPERFECT_SOUND )
+GAME( 1989, tharrier, 0,        tharrier, tharrier, 0,        ROT270, "UPL (American Sammy license)", "Task Force Harrier", 0  )
+GAME( 1989, tharierj, tharrier, tharrier, tharrier, 0,        ROT270, "UPL",                          "Task Force Harrier (Japan)", 0 )
+GAME( 1990, mustang,  0,        mustang,  mustang,  0,        ROT0,   "UPL",                          "US AAF Mustang (Japan)", GAME_IMPERFECT_SOUND)
+GAME( 1990, mustangs, mustang,  mustang,  mustang,  0,        ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (Seoul Trading)", GAME_IMPERFECT_SOUND )
+GAME( 1990, bioship,  0,        bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", GAME_IMPERFECT_SOUND )
+GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyke,  0,        vandyke,  vandyke,  0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyjal, vandyke,  vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandyja2, vandyke,  vandyke,  vandyke,  0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykeb, vandyke,  vandykeb, vandyke,  vandykeb, ROT270, "[UPL] (bootleg)",              "Vandyke (bootleg with PIC16c57)",  GAME_NOT_WORKING )
+GAME( 1991, blkheart, 0,        macross,  blkheart, 0,        ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )
+GAME( 1991, blkhearj, blkheart, macross,  blkheart, 0,        ROT0,   "UPL",                          "Black Heart (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1991, acrobatm, 0,        acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",          "Acrobat Mission", GAME_IMPERFECT_SOUND )
+GAME( 1992, strahl,   0,        strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1992, strahla,  strahl,   strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1991, tdragon,  0,        tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon", GAME_IMPERFECT_SOUND )
 
-GAME( 1991, hachamf,  0,       hachamf,  hachamf,  hachamf,  ROT0,   "NMK",                             "Hacha Mecha Fighter", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, macross,  0,       macross,  macross,  nmk,      ROT270, "Banpresto",                       "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
-GAME( 1993, gunnail,  0,       gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                     "GunNail", GAME_IMPERFECT_SOUND )
-GAME( 1993, macross2, 0,       macross2, macross2, 0,        ROT0,   "Banpresto",                       "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
-GAME( 1993, tdragon2, 0,       tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, tdragn2a, tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, bigbang,  tdragon2,tdragon2, tdragon2, 0,        ROT270, "NMK",                             "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
-GAME( 1994, raphero,  0,       raphero,  raphero,  0,        ROT270, "Media Trading Corp",              "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1991, hachamf,  0,        hachamf,  hachamf,  hachamf,  ROT0,   "NMK",                          "Hacha Mecha Fighter", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, macross,  0,        macross,  macross,  nmk,      ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
+GAME( 1993, gunnail,  0,        gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                  "GunNail", GAME_IMPERFECT_SOUND )
+GAME( 1993, macross2, 0,        macross2, macross2, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
+GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, tdragn2a, tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
+GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "Media Trading Corp",           "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
-GAME( 1992, sabotenb, 0,       bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                     "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
-GAME( 1992, sabotnba, sabotenb,bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                     "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
-GAME( 1993, bjtwin,   0,       bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                             "Bombjack Twin", GAME_NO_COCKTAIL )
-GAME( 1995, nouryoku, 0,       bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",                           "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
+GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
+GAME( 1992, sabotnba, sabotenb, bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin", GAME_NO_COCKTAIL )
+GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
 
 /* Non NMK boards */
 
 // these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
-GAME( 1990, mustangb, mustang, mustangb, mustang,  0,        ROT0,   "bootleg",                         "US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
-GAME( 1991, tdragonb, tdragon, tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",	                    "Thunder Dragon (Bootleg)", 0 )
+GAME( 1990, mustangb, mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", GAME_UNEMULATED_PROTECTION ) // Playable but there are Still Protection Problems
+GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "NMK / Tecmo",	               "Thunder Dragon (Bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
-GAME( 1992, ssmissin, 0,       ssmissin, ssmissin, ssmissin, ROT270, "Comad",                           "S.S. Mission", GAME_NO_COCKTAIL )
-GAME( 1996, airattck, 0,       ssmissin, airattck, ssmissin, ROT270, "Comad",                           "Air Attack (set 1)", GAME_NO_COCKTAIL )
-GAME( 1996, airattca, airattck,ssmissin, airattck, ssmissin, ROT270, "Comad",                           "Air Attack (set 2)", GAME_NO_COCKTAIL )
+GAME( 1992, ssmissin, 0,        ssmissin, ssmissin, ssmissin, ROT270, "Comad",                         "S.S. Mission", GAME_NO_COCKTAIL )
+GAME( 1996, airattck, 0,        ssmissin, airattck, ssmissin, ROT270, "Comad",                         "Air Attack (set 1)", GAME_NO_COCKTAIL )
+GAME( 1996, airattca, airattck, ssmissin, airattck, ssmissin, ROT270, "Comad",                         "Air Attack (set 2)", GAME_NO_COCKTAIL )
 
 // afega & clones
-GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,               "Afega",    "Twin Action",                      0 )
-GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270,             "Afega",    "Stagger I (Japan)",                0 )
-GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270,             "Afega",    "Red Hawk (US)",                    0 )
-GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,               "bootleg",  "Red Hawk (bootleg)",               0 )
-GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270,             "Afega",    "Sen Jin - Guardian Storm (Korea)", 0 )
-GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,               "Tuning",   "Bubble 2000",                      0 ) // on a tuning board (bootleg?)
-GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,               "Pandora",  "Hot Bubble" ,                      0 ) // on an afega board ..
-GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,               "Afega",    "Pop's Pop's",                      0 )
-GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,               "Afega",    "Mang-Chi",                         0 )
-GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech", "Spectrum 2000 (Euro)",             0 )
-GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",      "Fire Hawk",                        0 )
+GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,   "Afega",                         "Twin Action", 0 )
+GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270, "Afega",                         "Stagger I (Japan)", 0 )
+GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega",                         "Red Hawk (US)", 0 )
+GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)", "Red Hawk (Excellent Co., Ltd)", 0 )
+GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                       "Red Hawk (bootleg)", 0 )
+GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270, "Afega",                         "Sen Jin - Guardian Storm (Korea)", 0 )
+GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning",                        "Bubble 2000", 0 ) // on a tuning board (bootleg?)
+GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                       "Hot Bubble" , 0 ) // on an afega board ..
+GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                         "Pop's Pop's", 0 )
+GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,   "Afega",                         "Mang-Chi", 0 )
+GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yonatech",          "Spectrum 2000 (Euro)", 0 )
+GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",               "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
-GAME( 1991, manybloc, 0,       manybloc, manybloc, 0,        ROT270, "Bee-Oh",                          "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1991, manybloc, 0,        manybloc, manybloc, 0,        ROT270,             "Bee-Oh",            "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 

@@ -7025,9 +7025,10 @@ Other Sun games
 	DRIVER( silkroad )	/* (c) 1999 */
 
 	/* Afega games */
-	DRIVER( twinactn )	/* (c) 1996 - bootleg of mustang in nmk16.c */
+	DRIVER( twinactn )	/* (c) 1996 - bootleg of US AFF Mustang */
 	DRIVER( stagger1 )	/* (c) 1998 */
 	DRIVER( redhawk )	/* (c) 1997 */
+	DRIVER( redhawke )	/* (c) 1997 Excellent Co., Ltd license */
 	DRIVER( redhawkb )	/* (c) 1997 */
 	DRIVER( grdnstrm )	/* (c) 1998 */
 	DRIVER( bubl2000 )	/* (c) 1998 Tuning */
