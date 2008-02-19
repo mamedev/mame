@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION	/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
 	MDRV_INTERLEAVE(20)	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(friskyt)

@@ -1014,7 +1014,7 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	MDRV_INTERLEAVE(640)
 

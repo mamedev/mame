@@ -381,7 +381,7 @@ static MACHINE_DRIVER_START( retofinv )
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */

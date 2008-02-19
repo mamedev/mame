@@ -46,11 +46,10 @@ INTERRUPT_GEN( qix_vblank_start );
 
 /*----------- defined in video/qix.c -----------*/
 
+MACHINE_DRIVER_EXTERN( qix_video );
+
 extern UINT8 *qix_videoaddress;
 extern UINT8 qix_cocktail_flip;
-
-VIDEO_START( qix );
-VIDEO_UPDATE( qix );
 
 WRITE8_HANDLER( qix_mc6845_address_w );
 READ8_HANDLER( qix_mc6845_register_r );

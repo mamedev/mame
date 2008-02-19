@@ -44,6 +44,7 @@ EMUOBJS = \
 	$(EMUOBJ)/cpuexec.o \
 	$(EMUOBJ)/cpuint.o \
 	$(EMUOBJ)/cpuintrf.o \
+	$(EMUOBJ)/devintrf.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
 	$(EMUOBJ)/emuopts.o \
@@ -56,6 +57,7 @@ EMUOBJS = \
 	$(EMUOBJ)/inptport.o \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/mamecore.o \
+	$(EMUOBJ)/mconfig.o \
 	$(EMUOBJ)/memory.o \
 	$(EMUOBJ)/output.o \
 	$(EMUOBJ)/render.o \

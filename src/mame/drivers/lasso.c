@@ -578,7 +578,7 @@ static MACHINE_DRIVER_START( base )
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
 	MDRV_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)

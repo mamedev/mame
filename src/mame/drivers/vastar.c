@@ -335,7 +335,7 @@ static MACHINE_DRIVER_START( vastar )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* ??? */
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(vastar)

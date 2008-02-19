@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( carpolo )
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	MDRV_MACHINE_START(carpolo)
 	MDRV_MACHINE_RESET(carpolo)

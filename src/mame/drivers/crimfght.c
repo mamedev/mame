@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( crimfght )
 	MDRV_CPU_PROGRAM_MAP(crimfght_readmem_sound,crimfght_writemem_sound)
 
 	MDRV_SCREEN_REFRESH_RATE(54)	/* adjusted - compared with PCB speed */
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MDRV_MACHINE_RESET(crimfght)
 

@@ -352,7 +352,7 @@ static TIMER_CALLBACK( display_enable_changed_timer_cb )
 	mc6845_t *mc6845 = ptr;
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->display_enable_changed(is_display_enabled(mc6845));
+	mc6845->intf->display_enable_changed(mc6845, is_display_enabled(mc6845));
 
 	update_timer(mc6845);
 }
@@ -418,7 +418,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 		void *param = 0;
 
 		if (mc6845->intf->begin_update)
-			param = mc6845->intf->begin_update(bitmap, cliprect);
+			param = mc6845->intf->begin_update(mc6845, bitmap, cliprect);
 
 		/* read the start address at the beginning of the frame */
 		if (cliprect->min_y == 0)
@@ -430,7 +430,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
+			mc6845->intf->update_row(mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -439,6 +439,44 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update)
-			mc6845->intf->end_update(bitmap, cliprect, param);
+			mc6845->intf->end_update(mc6845, bitmap, cliprect, param);
+	}
+}
+
+
+/* device interface */
+static void *mc6845_start(running_machine *machine, UINT32 clock, UINT32 flags, const void *config)
+{
+	return mc6845_config(config);
+}
+
+
+static void mc6845_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+void mc6845_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = mc6845_set_info;		break;
+		case DEVINFO_FCT_START:							info->start = mc6845_start;				break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";				break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }

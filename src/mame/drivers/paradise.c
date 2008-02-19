@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( paradise )
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No nmi routine */
 
 	MDRV_SCREEN_REFRESH_RATE(54) /* 54 verified */
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION	/* we're using IPT_VBLANK */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using IPT_VBLANK */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

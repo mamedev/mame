@@ -584,7 +584,7 @@ static MACHINE_DRIVER_START( firetrap )
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_MACHINE_RESET(firetrap)
 
 	/* video hardware */
@@ -623,7 +623,7 @@ static MACHINE_DRIVER_START( firetpbl )
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)

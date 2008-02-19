@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( matmania )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */
@@ -403,7 +403,7 @@ static MACHINE_DRIVER_START( maniach )
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_INTERLEAVE(100)	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
 	/* video hardware */

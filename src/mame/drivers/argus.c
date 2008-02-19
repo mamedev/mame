@@ -873,7 +873,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_CPU_IO_MAP(sound_readport_1,sound_writeport_1)
 
 	MDRV_SCREEN_REFRESH_RATE(54)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION	/* This value is refered to psychic5 driver */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is refered to psychic5 driver */)
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( valtric )
 	MDRV_CPU_IO_MAP(sound_readport_2,sound_writeport_2)
 
 	MDRV_SCREEN_REFRESH_RATE(54)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION	/* This value is refered to psychic5 driver */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is refered to psychic5 driver */)
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */
@@ -955,7 +955,7 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_CPU_IO_MAP(sound_readport_2,sound_writeport_2)
 
 	MDRV_SCREEN_REFRESH_RATE(54)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION	/* This value is taken from psychic5 driver */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is taken from psychic5 driver */)
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */
@@ -999,7 +999,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_CPU_IO_MAP(sound_readport_2,sound_writeport_2)
 
 	MDRV_SCREEN_REFRESH_RATE(54)									/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_INTERLEAVE(10)
 
 	/* video hardware */

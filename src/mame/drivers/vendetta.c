@@ -588,7 +588,7 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
                             /* interrupts are triggered by the main CPU */
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_REAL_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	MDRV_MACHINE_RESET(vendetta)
 	MDRV_NVRAM_HANDLER(vendetta)

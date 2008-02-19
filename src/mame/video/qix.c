@@ -31,11 +31,11 @@ static UINT8 scanline_latch;
  *
  *************************************/
 
-static void qix_display_enable_changed(int display_enabled);
+static void qix_display_enable_changed(mc6845_t *mc6845, int display_enabled);
 
-static void *qix_begin_update(mame_bitmap *bitmap, const rectangle *cliprect);
+static void *qix_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
 
-static void qix_update_row(mame_bitmap *bitmap,
+static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap,
 						   const rectangle *cliprect,
 						   UINT16 ma,
 						   UINT8 ra,
@@ -63,10 +63,10 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-VIDEO_START( qix )
+static VIDEO_START( qix )
 {
-	/* configure the CRT controller */
-	mc6845 = mc6845_config(&mc6845_intf);
+	/* get the pointer to the mc6845 object */
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	/* allocate memory for the full video RAM */
 	videoram = auto_malloc(256 * 256);
@@ -90,7 +90,7 @@ VIDEO_START( qix )
  *
  *************************************/
 
-static void qix_display_enable_changed(int display_enabled)
+static void qix_display_enable_changed(mc6845_t *mc6845, int display_enabled)
 {
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
@@ -318,7 +318,7 @@ WRITE8_HANDLER( qix_mc6845_register_w )
  *
  *************************************/
 
-static void *qix_begin_update(mame_bitmap *bitmap, const rectangle *cliprect)
+static void *qix_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 #if 0
 	// note the confusing bit order!
@@ -334,7 +334,7 @@ static void *qix_begin_update(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void qix_update_row(mame_bitmap *bitmap, const rectangle *cliprect,
+static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
 	UINT16 x;
@@ -360,9 +360,23 @@ static void qix_update_row(mame_bitmap *bitmap, const rectangle *cliprect,
  *
  *************************************/
 
-VIDEO_UPDATE( qix  )
+static VIDEO_UPDATE( qix )
 {
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }
+
+
+MACHINE_DRIVER_START( qix_video )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_VIDEO_START(qix)
+	MDRV_VIDEO_UPDATE(qix)
+	
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_CONFIG(mc6845_intf)
+
+	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+MACHINE_DRIVER_END

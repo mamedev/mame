@@ -47,7 +47,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
 };
 
-static void update_row(mame_bitmap *bitmap, const rectangle *cliprect,
+static void update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
 	int cx,x;
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( ssingles )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( galpanic )
 	MDRV_CPU_VBLANK_INT(galpanic_interrupt,2)
 
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION	/* frames per second, vblank duration */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -965,7 +965,7 @@ static MACHINE_DRIVER_START( galpania )
 	MDRV_IMPORT_FROM(galpanic)
 
 	/* arm watchdog */
-	MDRV_WATCHDOG_VBLANK_INIT(DEFAULT_60HZ_3S_VBLANK_WATCHDOG)
+	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comad )

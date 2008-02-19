@@ -558,7 +558,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 
 	MDRV_SCREEN_REFRESH_RATE(53.8)
-	MDRV_SCREEN_VBLANK_TIME(DEFAULT_60HZ_VBLANK_DURATION)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	/* frames per second hand tuned to match game and music speed */
 	MDRV_INTERLEAVE(10)      /* Allow time for 2nd cpu to interleave*/
 	MDRV_MACHINE_RESET(psychic5)

@@ -1575,6 +1575,9 @@ static void init_machine(running_machine *machine)
 	ui_set_startup_text(machine, "Initializing...", TRUE);
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
+	
+	/* start up the devices */
+	device_list_start(machine);
 
 	/* start the video and audio hardware */
 	video_init(machine);
