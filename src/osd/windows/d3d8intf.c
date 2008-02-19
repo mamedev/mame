@@ -1,6 +1,6 @@
 //============================================================
 //
-//  d3d9intf.c - Direct3D 8.1 abstraction layer
+//  d3d8intf.c - Direct3D 8.1 abstraction layer
 //
 //  Copyright Nicola Salmoria and the MAME Team.
 //  Visit http://mamedev.org for licensing and usage restrictions.

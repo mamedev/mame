@@ -143,6 +143,12 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
     2005-04-02  Sebastien Chevalier : various update to video on terrafu, plus some typos here and there
 
+
+	DIP locations verified for:
+	-cclimbr2 
+	-legion
+	-terraf
+
 */
 
 #include "driver.h"
@@ -269,12 +275,12 @@ static ADDRESS_MAP_START( terraf_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)	/* not use in terrafu, 0x07c008 neither */
-	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)	/* written twice, lsb and msb */
+	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)			/* not use in terrafu, 0x07c008 neither */
+	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP)		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)		/* MCU Command ? */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w) /* written between two consecutive writes to 7c008 */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP)					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kodure_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -340,8 +346,8 @@ static ADDRESS_MAP_START( cclimbr2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(MWA16_NOP)		/* ? */
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP)		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(MWA16_NOP) /* ? */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP) /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legion_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -359,7 +365,7 @@ static ADDRESS_MAP_START( legion_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)		/* MCU Command ? */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)	/* MCU Command ? */
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP)		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
@@ -380,7 +386,7 @@ static ADDRESS_MAP_START( legiono_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	//AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)     /* MCU Command ? */
+	//AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd) /* MCU Command ? */
 	//AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(MWA16_NOP)      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
@@ -473,199 +479,186 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(_n_) \
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-#define NIHON_COINS \
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 ) \
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 ) \
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 ) \
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 ) \
+static INPUT_PORTS_START( armedf )
+	PORT_START_TAG("IN0")
+	NIHON_SINGLE_JOYSTICK(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define NIHON_SYSTEM \
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 ) \
-	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW ) \
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_TILT )     /* Tilt */ \
-	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define NIHON_COINAGE_A \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-
-#define NIHON_COINAGE_B \
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-
-#define NIHON_COINAGE_B_ALT \
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) ) \
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
-
-#define NIHON_LIVES \
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) \
-	PORT_DIPSETTING(    0x03, "3" ) \
-	PORT_DIPSETTING(    0x02, "4" ) \
-	PORT_DIPSETTING(    0x01, "5" ) \
-	PORT_DIPSETTING(    0x00, "6" )
-
-
-static INPUT_PORTS_START( legion )
-	PORT_START_TAG("IN0")
-	NIHON_SINGLE_JOYSTICK(1)
-	NIHON_COINS
-
-	PORT_START_TAG("IN0")
-	NIHON_SINGLE_JOYSTICK(2)
-	NIHON_SYSTEM
-
-	PORT_START_TAG("DSW0")
-	NIHON_LIVES
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x04, "30k then every 100k" )
-	PORT_DIPSETTING(    0x00, "50k only" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-#if LEGION_HACK
-	PORT_DIPNAME( 0x80, 0x80, "Allow Invulnerability (Cheat)" )		// see notes
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-#else
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-#endif
-
-	PORT_START_TAG("DSW1")
-	NIHON_COINAGE_A
-	NIHON_COINAGE_B
-	PORT_DIPNAME( 0x10, 0x10, "Coin Slots" )
-	PORT_DIPSETTING(    0x10, "Common" )
-	PORT_DIPSETTING(    0x00, "Individual" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-#if LEGION_HACK
-	PORT_DIPNAME( 0x40, 0x40, "P1 Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "P2 Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-#else
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-#endif
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( terraf )
-	PORT_START_TAG("IN0")
-	NIHON_SINGLE_JOYSTICK(1)
-	NIHON_COINS
 
 	PORT_START_TAG("IN1")
 	NIHON_SINGLE_JOYSTICK(2)
-	NIHON_SYSTEM
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW0")
-	NIHON_LIVES
-//  PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
-//  PORT_DIPSETTING(    0x04, "20k" )
-//  PORT_DIPSETTING(    0x00, "50k" )
-//  PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
-//  PORT_DIPSETTING(    0x08, "60k" )
-//  PORT_DIPSETTING(    0x00, "90k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )				PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	/* SW1:3,4 defined in manual/test-mode as:
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "40k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "80k" )*/
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
-	PORT_DIPSETTING(    0x04, "20k then every 90k" )
-	PORT_DIPSETTING(    0x08, "50k then every 60k" )
-	PORT_DIPSETTING(    0x00, "50k then every 90k" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x04, "20k then every 80k" )
+	PORT_DIPSETTING(    0x08, "40k then every 60k" )
+	PORT_DIPSETTING(    0x00, "40k then every 80k" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )				PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	PORT_START_TAG("DSW1")
-	NIHON_COINAGE_A
-	NIHON_COINAGE_B
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )				PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )				PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:5,6")	// not in the "test mode"
+	PORT_DIPSETTING(    0x30, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, "3 Times" )
+	PORT_DIPSETTING(    0x10, "5 Times" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:7") // not in the "test mode"
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( legion )
+	PORT_INCLUDE( armedf )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "30k Then Every 100k" )
+	PORT_DIPSETTING(    0x00, "50k Only" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:6" )				/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )				/* Listed as "Unused" */
+#if LEGION_HACK // see notes
+	PORT_DIPNAME( 0x80, 0x80, "Allow Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+#else
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )				/* Listed as "Unused" */
+#endif
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x10, 0x10, "Coin Slots" )					PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Common" )
+	PORT_DIPSETTING(    0x00, "Individual" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+#if LEGION_HACK // see notes
+	PORT_DIPNAME( 0x40, 0x40, "P1 Invulnerability (Cheat)")		PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "P2 Invulnerability (Cheat)")		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+#else
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )				/* Listed as "Unused" */
+#endif
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( terraf )
+	PORT_INCLUDE( armedf )
+
+	PORT_MODIFY("DSW0")
+	/* SW1:3,4 defined in manual/test-mode as:
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "90k" )*/
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
+	PORT_DIPSETTING(    0x04, "20k then every 90k" )
+	PORT_DIPSETTING(    0x08, "50k then every 60k" )
+	PORT_DIPSETTING(    0x00, "50k then every 90k" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )				/* Listed as "Unused" */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )			PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, "3 Times" )
-	PORT_DIPSETTING(    0x40, "5 Times" )
+	PORT_DIPSETTING(    0x80, "Only 3 Times" )
+	PORT_DIPSETTING(    0x40, "Only 5 Times" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kodure )
-	PORT_START_TAG("IN0")
-	NIHON_SINGLE_JOYSTICK(1)
-	NIHON_COINS
+	PORT_INCLUDE( terraf )
 
-	PORT_START_TAG("IN1")
-	NIHON_SINGLE_JOYSTICK(2)
-	NIHON_SYSTEM
-
-	PORT_START_TAG("DSW0")
-	NIHON_LIVES
-//  PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
-//  PORT_DIPSETTING(    0x04, "00k" )
-//  PORT_DIPSETTING(    0x00, "50k" )
-//  PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
-//  PORT_DIPSETTING(    0x08, "60k" )
-//  PORT_DIPSETTING(    0x00, "90k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_MODIFY("DSW0")
+	/* SW1:3,4 defined in manual/test-mode as:
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "60k" )
+	PORT_DIPSETTING(    0x00, "90k" )*/
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, "50k then every 60k" )
 	PORT_DIPSETTING(    0x00, "50k then every 90k" )
 	PORT_DIPSETTING(    0x0c, "Every 60k" )
 	PORT_DIPSETTING(    0x04, "Every 90k" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:7" )				/* Listed as "Unused" */
 
-	PORT_START_TAG("DSW1")
-	NIHON_COINAGE_A
-	NIHON_COINAGE_B_ALT
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )				PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cclimbr2 )
-	PORT_START_TAG("IN0")
+	PORT_INCLUDE( armedf )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -674,9 +667,8 @@ static INPUT_PORTS_START( cclimbr2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	NIHON_COINS
 
-	PORT_START_TAG("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -685,94 +677,36 @@ static INPUT_PORTS_START( cclimbr2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	NIHON_SYSTEM
 
-	PORT_START_TAG("DSW0")
-	NIHON_LIVES
-//  PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
-//  PORT_DIPSETTING(    0x04, "30k" )
-//  PORT_DIPSETTING(    0x00, "60k" )
-//  PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
-//  PORT_DIPSETTING(    0x08, "70k" )
-//  PORT_DIPSETTING(    0x00, "00k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_MODIFY("DSW0")
+	/* SW1:3,4 defined in manual/test-mode as:
+	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )					PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "30k" )
+	PORT_DIPSETTING(    0x00, "60k" )
+	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )					PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, "70k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )				PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "30K and 100k" )
 	PORT_DIPSETTING(    0x08, "60k and 130k" )
 	PORT_DIPSETTING(    0x04, "30k only" )
 	PORT_DIPSETTING(    0x00, "60k only" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )				PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )					/* Listed as "Unused" */
 
-	PORT_START_TAG("DSW1")
-	NIHON_COINAGE_A
-	NIHON_COINAGE_B
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )			PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, "3 Times" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )				PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Partial Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Partial Invulnerability (Cheat)")	PORT_DIPLOCATION("SW2:7") /* Listed as "Unused" */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( armedf )
-	PORT_START_TAG("IN0")
-	NIHON_SINGLE_JOYSTICK(1)
-	NIHON_COINS
-
-	PORT_START_TAG("IN1")
-	NIHON_SINGLE_JOYSTICK(2)
-	NIHON_SYSTEM
-
-	PORT_START_TAG("DSW0")
-	NIHON_LIVES
-//  PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
-//  PORT_DIPSETTING(    0x04, "20k" )
-//  PORT_DIPSETTING(    0x00, "40k" )
-//  PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
-//  PORT_DIPSETTING(    0x08, "60k" )
-//  PORT_DIPSETTING(    0x00, "80k" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
-	PORT_DIPSETTING(    0x04, "20k then every 80k" )
-	PORT_DIPSETTING(    0x08, "40k then every 60k" )
-	PORT_DIPSETTING(    0x00, "40k then every 80k" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-
-	PORT_START_TAG("DSW1")
-	NIHON_COINAGE_A
-	NIHON_COINAGE_B
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Allow_Continue ) )		// not in the "test mode"
-	PORT_DIPSETTING(    0x30, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, "3 Times" )
-	PORT_DIPSETTING(    0x10, "5 Times" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )	// not in the "test mode"
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )					/* Listed as "Unused" */
 INPUT_PORTS_END
 
 
@@ -1417,13 +1351,13 @@ static DRIVER_INIT( cclimbr2 )
 }
 
 
-/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,     FULLNAME, FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu", "Legion (ver 2.03)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu", "Legion (ver 1.05)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu", "Terra Force (set 1)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu", "Terra Force (set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",  GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu", "Kodure Ookami (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu", "Crazy Climber 2 (Japan)", 0)
-GAME( 1988, cclmbr2a, cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu", "Crazy Climber 2 (Japan, Harder)", 0)
-GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu", "Armed Formation", 0)
+/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion (ver 2.03)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Legion (ver 1.05)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",                GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, kodure,   0,        kodure,   kodure,   kodure,   ROT0,   "Nichibutsu",     "Kodure Ookami (Japan)",           GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan)",         0													)
+GAME( 1988, cclmbr2a, cclimbr2, cclimbr2, cclimbr2, cclimbr2, ROT0,   "Nichibutsu",     "Crazy Climber 2 (Japan, Harder)", 0													)
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf,   ROT270, "Nichibutsu",     "Armed Formation",                 0													)
