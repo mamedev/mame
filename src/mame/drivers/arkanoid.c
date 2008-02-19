@@ -460,6 +460,12 @@ Stephh's notes on 'tetrsark' (based on the game Z80 code and some tests) :
   - Known bugs :
       * Coins "buttons" don't work - we need to use fake BUTTON2 for each player
 
+***************************************************************************
+
+DIP locations verified for:
+  - arknoidj
+  - arkanoid
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -521,53 +527,46 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-#define ARKNOI_IN0\
-	PORT_START_TAG("IN0")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )\
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )\
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )\
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )\
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	/* input from the 68705, some bootlegs need it to be 1 */\
+static INPUT_PORTS_START( arkanoid )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )	/* input from the 68705, some bootlegs need it to be 1 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* input from the 68705 */
 
-#define ARKNOI_IN1\
-	PORT_START_TAG("IN1")\
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )\
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL\
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-#define ARKNOI_SPINNERS\
-	PORT_START_TAG("IN2")      /* Spinner Player 1 */\
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15)\
-	PORT_START_TAG("IN3")      /* Spinner Player 2  */\
+	PORT_START_TAG("IN2")      /* Spinner Player 1 */
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15)
+	PORT_START_TAG("IN3")      /* Spinner Player 2  */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_COCKTAIL
 
-static INPUT_PORTS_START( arkanoid )
-	ARKNOI_IN0
-	ARKNOI_IN1
-	ARKNOI_SPINNERS
-
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_SERVICE_DIPLOC(0x04, IP_ACTIVE_LOW, "SW1:6" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, "20K 60K 60K+" )
 	PORT_DIPSETTING(    0x00, "20K" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        /* Table at 0x9a28 */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:3") /* Table at 0x9a28 */
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )      /* Table at 0x0328 */
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1,2") /* Table at 0x0328 */
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
@@ -576,31 +575,13 @@ INPUT_PORTS_END
 
 /* Different coinage and additionnal "Cabinet" Dip Switch */
 static INPUT_PORTS_START( arknoidj )
-	ARKNOI_IN0
-	ARKNOI_IN1
-	ARKNOI_SPINNERS
+	PORT_INCLUDE( arkanoid )
 
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x10, "20K 60K 60K+" )
-	PORT_DIPSETTING(    0x00, "20K" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        /* Table at 0x9a28 */
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )      /* table at 0x0320 */
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2") /* table at 0x0320 */
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -609,10 +590,10 @@ static INPUT_PORTS_START( ark1ball )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4") /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )
 	PORT_DIPSETTING(    0x00, "60K" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        /* Table at 0x9a28 */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:3") /* Table at 0x9a28 */
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
 INPUT_PORTS_END
@@ -621,7 +602,7 @@ static INPUT_PORTS_START( arkangc )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Ball Speed" )            /* Speed at 0xc462 (code at 0x18aa) - Also affects level 2 (code at 0x7b82) */
+	PORT_DIPNAME( 0x01, 0x01, "Ball Speed" )			PORT_DIPLOCATION("SW1:8") /* Speed at 0xc462 (code at 0x18aa) - Also affects level 2 (code at 0x7b82) */
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )       /* 0xc462 = 0x06 - Normal level 2 */
 	PORT_DIPSETTING(    0x00, "Faster" )                /* 0xc462 = 0x08 - Level 2 same as level 30 */
 INPUT_PORTS_END
@@ -630,7 +611,7 @@ static INPUT_PORTS_START( arkangc2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Ball Speed" )            /* Speed at 0xc462 (code at 0x18aa) - Also affects level 2 (code at 0x7b82) */
+	PORT_DIPNAME( 0x01, 0x01, "Ball Speed" )			PORT_DIPLOCATION("SW1:8") /* Speed at 0xc462 (code at 0x18aa) - Also affects level 2 (code at 0x7b82) */
 	PORT_DIPSETTING(    0x01, "Slower" )                /* 0xc462 = 0x04 - Normal level 2 */
 	PORT_DIPSETTING(    0x00, DEF_STR ( Normal ) )      /* 0xc462 = 0x06 - Level 2 same as level 30 */
 INPUT_PORTS_END
@@ -639,32 +620,32 @@ static INPUT_PORTS_START( arkgcbl )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Round Select" )          /* Check code at 0x7bc2 - Speed at 0xc462 (code at 0x18aa) */
+	PORT_DIPNAME( 0x01, 0x00, "Round Select" )			PORT_DIPLOCATION("SW1:8") /* Check code at 0x7bc2 - Speed at 0xc462 (code at 0x18aa) */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )          /* 0xc462 = 0x06 */
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )           /* 0xc462 = 0x06 */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$20" at 0x9c7f and 0x9c9b */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4") /* "ld a,$60" at 0x93bd and "ld a,$20" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )         /* But "20K 60K 60K+" when continue */
 	PORT_DIPSETTING(    0x00, "60K" )                   /* But "20K" when continue */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )               /* Always 2C_1C - check code at 0x7d5e */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:2" )        /* Always 2C_1C - check code at 0x7d5e */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( paddle2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Round Select" )          /* Check code at 0x7bc2 - Speed at 0xc462 (code at 0x18aa) */
+	PORT_DIPNAME( 0x01, 0x00, "Round Select" )          PORT_DIPLOCATION("SW1:8") /* Check code at 0x7bc2 - Speed at 0xc462 (code at 0x18aa) */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )          /* 0xc462 = 0x06 */
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )           /* 0xc462 = 0x06 */
-	PORT_DIPNAME( 0x04, 0x04, "Controls ?" )            /* Check code at 0x96a1 and read notes */
+	PORT_DIPNAME( 0x04, 0x04, "Controls ?" )			PORT_DIPLOCATION("SW1:6") /* Check code at 0x96a1 and read notes */
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Alternate ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$20" at 0x9c7f and 0x9c9b */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4") /* "ld a,$60" at 0x93bd and "ld a,$20" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )         /* But "20K 60K 60K+" when continue */
 	PORT_DIPSETTING(    0x00, "60K" )                   /* But "20K" when continue */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        /* Table at 0x9a28 */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:3") /* Table at 0x9a28 */
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 INPUT_PORTS_END
@@ -673,13 +654,13 @@ static INPUT_PORTS_START( arktayt2 )
 	PORT_INCLUDE(arknoidj)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )   /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4") /* "ld a,$60" at 0x93bd and "ld a,$60" at 0x9c7f and 0x9c9b */
 	PORT_DIPSETTING(    0x10, "60K 100K 60K+" )
 	PORT_DIPSETTING(    0x00, "60K" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )        /* Table at 0x9a28 */
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:3") /* Table at 0x9a28 */
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )      /* Table at 0x0320 */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:2") /* Table at 0x0320 */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END

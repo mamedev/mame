@@ -289,16 +289,6 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-/* Here is the way to access to the different parts of the "test mode" :
-
-     - sound  : set "Coin A" Dip Switch to "Free Play" and "Coin B" Dip Switch to "Free Play"
-     - paddle : set "Coin A" Dip Switch to "3C_1C" and "Coin B" Dip Switch to "Free Play"
-
-If use different settings, you'll only see a black screen.
-
-I haven't found how to exit the tests. The only way seems to reset the game.
-*/
-
 #define ANGELDSK_PLAYERS_INPUT( player ) \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_PLAYER(player) PORT_8WAY \
@@ -321,8 +311,14 @@ I haven't found how to exit the tests. The only way seems to reset the game.
 
 
 static INPUT_PORTS_START( angelkds )
+	/*
+		Free Play: Set SW1:1-8 ON (A:Free Play & B:Free Play).
+		Sound Test: Set SW1:1-8 ON (A:Free Play & B:Free Play), hold test switch and reboot.
+		Joystick Test: Set SW1:1-7 ON & SW1:8 OFF (A:Free Play & B:3C_1C), hold test switch and reboot.
+		Joystick Test Coin_A & Coin_B seem to be switched, only works when setting A to 3C_1C and B to Free Play.
+	*/
 	PORT_START_TAG("I40")		/* inport $40 */
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(	0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x90, DEF_STR( 2C_1C ) )
@@ -338,9 +334,9 @@ static INPUT_PORTS_START( angelkds )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(	0xa0, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )	// needed to enter "test mode" (see above)
+	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(	0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(	0x09, DEF_STR( 2C_1C ) )
@@ -359,23 +355,23 @@ static INPUT_PORTS_START( angelkds )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 
 	PORT_START_TAG("I41")		/* inport $41 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )				PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, "Hi Score" )
-	PORT_DIPSETTING(    0x00, "3 Characters" )
-	PORT_DIPSETTING(    0x02, "10 Characters" )
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x02, 0x00, "High Score Characters" )			PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "20k, 50k, 100k, 200k and 500k" )
 	PORT_DIPSETTING(    0x08, "50k, 100k, 200k and 500k" )
 	PORT_DIPSETTING(    0x04, "100k, 200k and 500k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )				PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "99 (Cheat)" )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )	/* Stored at 0xc023 */
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )			PORT_DIPLOCATION("SW2:7,8") /* Stored at 0xc023 */
 	PORT_DIPSETTING(    0xc0, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
@@ -428,7 +424,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spcpostn )
 	PORT_START_TAG("I40")		/* inport $40 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -445,7 +441,7 @@ static INPUT_PORTS_START( spcpostn )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
@@ -464,28 +460,26 @@ static INPUT_PORTS_START( spcpostn )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 
 	PORT_START_TAG("I41")		/* inport $41 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Allow_Continue ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Obstruction Car" )
+	PORT_DIPNAME( 0x02, 0x02, "Obstruction Car" )			PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Time Limit" )
+	PORT_DIPNAME( 0x0c, 0x08, "Time Limit" )				PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "1:10" )
 	PORT_DIPSETTING(    0x04, "1:20" )
 	PORT_DIPSETTING(    0x08, "1:30" )
 	PORT_DIPSETTING(    0x0c, "1:40" )
-	PORT_DIPNAME( 0x30, 0x20, "Power Down" )
+	PORT_DIPNAME( 0x30, 0x20, "Power Down" )				PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(    0x30, "Slow" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, "Fast" )
 	PORT_DIPSETTING(    0x00, "Fastest" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )			/* Listed as "Unused" */
 
 	PORT_START_TAG("I42")		/* inport $42 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
