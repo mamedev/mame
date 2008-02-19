@@ -43,13 +43,16 @@ enum
     ------------------    ------------  ------------------------------------------------------------ */
 	XTAL_32_768kHz		= 327680,		/* 32.768kHz, used to drive RTC chips */
 	XTAL_1MHz    		= 1000000,		/* Used to drive OKI M6295 chips */
+	XTAL_1_75MHz		= 1750000,		/* RCA CDP1861 */
 	XTAL_2MHz    		= 2000000,
+	XTAL_2_4576MHz		= 2457600,		/* Atari ST MFP */
 	XTAL_3MHz    		= 3000000,		/* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
-	XTAL_3_579545MHz   	= 3579545,		/* Extremely common, used on 100's of PCBs */
+	XTAL_3_52128MHz		= 3521280,		/* RCA COSMAC VIP */
+	XTAL_3_579545MHz   	= 3579545,		/* NTSC color subcarrier, extremely common, used on 100's of PCBs */
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz    		= 4000000,
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
-	XTAL_4_433619MHz	= 4433619,		/* PAL subcarrier */
+	XTAL_4_433619MHz	= 4433619,		/* PAL color subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
@@ -60,6 +63,7 @@ enum
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
+	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
@@ -76,6 +80,7 @@ enum
 	XTAL_14_31818MHz  	= 14318180,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz  	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
+	XTAL_15MHz			= 15000000,		/* Sinclair QL */
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz   		= 16000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
