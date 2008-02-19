@@ -87,13 +87,14 @@ _mulu_32x32(UINT32 a, UINT32 b)
 INLINE INT32 __attribute__((const, always_inline))
 _mul_32x32_hi(INT32 a, INT32 b)
 {
-	register INT32 result;
+    register INT32 result, temp;
 
 	__asm__ (
 		" imull  %[b] ;"
 		: [result] "=d"  (result)	/* result in edx */
-		, [a]      "+%a" (a)		/* 'a' should be in eax on entry (clobbered) */
-		: [b]      "rm"  (b)		/* 'b' can be memory or register */
+        , [temp]   "=a"  (temp)     /* This is effectively a clobber */
+        : [a]      "%1"  (a)        /* 'a' should be in eax on entry */
+        , [b]      "rm"  (b)        /* 'b' can be memory or register */
 		: "%cc"						/* Clobbers condition codes */
 	);
 
@@ -111,13 +112,14 @@ _mul_32x32_hi(INT32 a, INT32 b)
 INLINE UINT32 __attribute__((const, always_inline))
 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
-	register UINT32 result;
+    register UINT32 result, temp;
 
 	__asm__ (
 		" mull  %[b] ;"
 		: [result] "=d"  (result)	/* result in edx */
-		, [a]      "+%a" (a)		/* 'a' should be in eax on entry (clobbered) */
-		: [b]      "rm"  (b)		/* 'b' can be memory or register */
+        , [temp]   "=a"  (temp)     /* This is effectively a clobber */
+        : [a]      "%1"  (a)        /* 'a' should be in eax on entry */
+        , [b]      "rm"  (b)        /* 'b' can be memory or register */
 		: "%cc"						/* Clobbers condition codes */
 	);
 
