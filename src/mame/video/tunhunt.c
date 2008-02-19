@@ -74,8 +74,7 @@ VIDEO_START( tunhunt )
     */
 	tmpbitmap = auto_bitmap_alloc( 256, 64, machine->screen[0].format );
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		 8, 8, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrollx(fg_tilemap, 0, 64);
@@ -83,10 +82,19 @@ VIDEO_START( tunhunt )
 
 PALETTE_INIT( tunhunt )
 {
+	int i;
+
 	/* Tunnel Hunt uses a combination of color proms and palette RAM to specify a 16 color
      * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL
      * graphics, which are unpacked ahead of time and drawn using MAME's drawgfx primitives.
      */
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x10);
+
+	/* motion objects/box */
+	for (i = 0; i < 0x10; i++)
+		colortable_entry_set_value(machine->colortable, i, i);
 
 	/* AlphaNumerics (1bpp)
      *  2 bits of hilite select from 4 different background colors
@@ -95,28 +103,26 @@ PALETTE_INIT( tunhunt )
      */
 
 	/* alpha hilite#0 */
-	colortable[0] = 0x0; /* background color#0 (transparent) */
-	colortable[1] = 0x4; /* foreground color */
+	colortable_entry_set_value(machine->colortable, 0x10, 0x0); /* background color#0 (transparent) */
+	colortable_entry_set_value(machine->colortable, 0x11, 0x4); /* foreground color */
 
 	/* alpha hilite#1 */
-	colortable[2] = 0x5; /* background color#1 */
-	colortable[3] = 0x4; /* foreground color */
+	colortable_entry_set_value(machine->colortable, 0x12, 0x5); /* background color#1 */
+	colortable_entry_set_value(machine->colortable, 0x13, 0x4); /* foreground color */
 
 	/* alpha hilite#2 */
-	colortable[4] = 0x6; /* background color#2 */
-	colortable[5] = 0x4; /* foreground color */
+	colortable_entry_set_value(machine->colortable, 0x14, 0x6); /* background color#2 */
+	colortable_entry_set_value(machine->colortable, 0x15, 0x4); /* foreground color */
 
 	/* alpha hilite#3 */
-	colortable[6] = 0xf; /* background color#3 */
-	colortable[7] = 0x4; /* foreground color */
+	colortable_entry_set_value(machine->colortable, 0x16, 0xf); /* background color#3 */
+	colortable_entry_set_value(machine->colortable, 0x17, 0x4); /* foreground color */
 
 	/* shell graphics; these are either 1bpp (2 banks) or 2bpp.  It isn't clear which.
      * In any event, the following pens are associated with the shell graphics:
      */
-	colortable[0x8] = 0;
-	colortable[0x9] = 4;//1;
-	colortable[0xa] = 2;
-	colortable[0xb] = 4;
+	colortable_entry_set_value(machine->colortable, 0x18, 0);
+	colortable_entry_set_value(machine->colortable, 0x19, 4);//1;
 }
 
 /*
@@ -132,7 +138,7 @@ Color Array Ram Assignments:
         8-E             Lines (as normal) background
         F               Hilight 3
 */
-static void update_palette(running_machine *machine)
+static void set_pens(colortable_t *colortable)
 {
 //  const UINT8 *color_prom = memory_region( REGION_PROMS );
 /*
@@ -186,7 +192,7 @@ static void update_palette(running_machine *machine)
 		green	= APPLY_SHADE(green,shade);
 		blue	= APPLY_SHADE(blue,shade);
 
-		palette_set_color( machine,i,MAKE_RGB(red,green,blue) );
+		colortable_palette_set_color( colortable,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
@@ -365,7 +371,7 @@ static void draw_shell(running_machine *machine,
 
 VIDEO_UPDATE( tunhunt )
 {
-	update_palette(machine);
+	set_pens(machine->colortable);
 
 	draw_box(machine, bitmap, cliprect);
 

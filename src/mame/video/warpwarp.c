@@ -7,7 +7,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "includes/warpwarp.h"
+#include "video/resnet.h"
+#include "warpwarp.h"
 
 
 UINT8 *geebee_videoram,*warpwarp_videoram;
@@ -27,37 +28,25 @@ static const rgb_t geebee_palette[] =
 	MAKE_RGB(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-static const UINT16 geebee_colortable[] =
-{
-	 0, 1,
-	 1, 0,
-	 0, 2,
-	 2, 0
-};
-
-static const UINT16 navarone_colortable[] =
-{
-	 0, 2,
-	 2, 0,
-};
-
-
-/* Initialise the palette */
 PALETTE_INIT( geebee )
 {
-	int i;
-	for (i = 0; i < sizeof(geebee_palette)/sizeof(geebee_palette[0]); i++)
-		palette_set_color(machine,i,geebee_palette[i]);
-	memcpy(colortable, geebee_colortable, sizeof (geebee_colortable));
+	palette_set_color(machine, 0, geebee_palette[0]);
+	palette_set_color(machine, 1, geebee_palette[1]);
+	palette_set_color(machine, 2, geebee_palette[1]);
+	palette_set_color(machine, 3, geebee_palette[0]);
+	palette_set_color(machine, 4, geebee_palette[0]);
+	palette_set_color(machine, 5, geebee_palette[2]);
+	palette_set_color(machine, 6, geebee_palette[2]);
+	palette_set_color(machine, 7, geebee_palette[0]);
 }
 
-/* Initialise the palette */
 PALETTE_INIT( navarone )
 {
-	int i;
-	for (i = 0; i < sizeof(geebee_palette)/sizeof(geebee_palette[0]); i++)
-		palette_set_color(machine,i,geebee_palette[i]);
-	memcpy(colortable, navarone_colortable, sizeof (navarone_colortable));
+	palette_set_color(machine, 0, geebee_palette[0]);
+	palette_set_color(machine, 1, geebee_palette[2]);
+	palette_set_color(machine, 2, geebee_palette[2]);
+	palette_set_color(machine, 3, geebee_palette[0]);
+	palette_set_color(machine, 4, geebee_palette[1]);
 }
 
 
@@ -66,15 +55,14 @@ PALETTE_INIT( navarone )
   Warp Warp doesn't use PROMs - the 8-bit code is directly converted into a
   color.
 
-  The color RAM is connected to the RGB output this way (I think - schematics
-  are fuzzy):
+  The color RAM is connected to the RGB output this way:
 
-  bit 7 -- 300 ohm resistor  -- BLUE
+  bit 7 -- 390 ohm resistor  -- BLUE
         -- 820 ohm resistor  -- BLUE
-        -- 300 ohm resistor  -- GREEN
+        -- 390 ohm resistor  -- GREEN
         -- 820 ohm resistor  -- GREEN
         -- 1.6kohm resistor  -- GREEN
-        -- 300 ohm resistor  -- RED
+        -- 390 ohm resistor  -- RED
         -- 820 ohm resistor  -- RED
   bit 0 -- 1.6kohm resistor  -- RED
 
@@ -85,36 +73,44 @@ PALETTE_INIT( navarone )
 PALETTE_INIT( warpwarp )
 {
 	int i;
+	static const int resistances_tiles_rg[] = { 1600, 820, 390 };
+	static const int resistances_tiles_b[]  = { 820, 390 };
+	static const int resistance_ball[]      = { 220 };
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	double weights_tiles_rg[3], weights_tiles_b[2], weight_ball[1];
+
+	compute_resistor_weights(0, 0xff, -1.0,
+							 3, resistances_tiles_rg, weights_tiles_rg, 150, 0,
+							 2, resistances_tiles_b,  weights_tiles_b,  150, 0,
+							 1, resistance_ball,      weight_ball,      150, 0);
+
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
-
+		int bit0, bit1, bit2;
+		int r,g,b;
 
 		/* red component */
 		bit0 = (i >> 0) & 0x01;
 		bit1 = (i >> 1) & 0x01;
 		bit2 = (i >> 2) & 0x01;
-		r = 0x1f * bit0 + 0x3c * bit1 + 0xa4 * bit2;
+		r = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+
 		/* green component */
 		bit0 = (i >> 3) & 0x01;
 		bit1 = (i >> 4) & 0x01;
 		bit2 = (i >> 5) & 0x01;
-		g = 0x1f * bit0 + 0x3c * bit1 + 0xa4 * bit2;
+		g = combine_3_weights(weights_tiles_rg, bit0, bit1, bit2);
+
 		/* blue component */
-		bit0 = 0;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		b = 0x1f * bit0 + 0x3c * bit1 + 0xa4 * bit2;
+		bit0 = (i >> 6) & 0x01;
+		bit1 = (i >> 7) & 0x01;
+		b = combine_2_weights(weights_tiles_b, bit0, bit1);
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, (i * 2) + 0, RGB_BLACK);
+		palette_set_color(machine, (i * 2) + 1, MAKE_RGB(r, g, b));
 	}
 
-	for (i = 0;i < machine->config->color_table_len;i += 2)
-	{
-		colortable[i] = 0;			/* black background */
-		colortable[i + 1] = i / 2;	/* colored foreground */
-	}
+	palette_set_color(machine, 0x200, MAKE_RGB(weight_ball[0], weight_ball[0], weight_ball[0]));
 }
 
 
@@ -222,13 +218,13 @@ WRITE8_HANDLER( warpwarp_videoram_w )
 
 ***************************************************************************/
 
-INLINE void geebee_plot(mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int pen)
+INLINE void geebee_plot(mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, pen_t pen)
 {
 	if (x >= cliprect->min_x && x <= cliprect->max_x && y >= cliprect->min_y && y <= cliprect->max_y)
 		*BITMAP_ADDR16(bitmap, y, x) = pen;
 }
 
-static void draw_ball(mame_bitmap *bitmap, const rectangle *cliprect,int color)
+static void draw_ball(mame_bitmap *bitmap, const rectangle *cliprect,pen_t pen)
 {
 	if (warpwarp_ball_on)
 	{
@@ -237,12 +233,8 @@ static void draw_ball(mame_bitmap *bitmap, const rectangle *cliprect,int color)
 		int i,j;
 
 		for (i = warpwarp_ball_sizey;i > 0;i--)
-		{
 			for (j = warpwarp_ball_sizex;j > 0;j--)
-			{
-				geebee_plot(bitmap, cliprect, x-j, y-i, color);
-			}
-		}
+				geebee_plot(bitmap, cliprect, x-j, y-i, pen);
 	}
 }
 
@@ -259,11 +251,19 @@ VIDEO_UPDATE( geebee )
 }
 
 
+VIDEO_UPDATE( navarone )
+{
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+
+	draw_ball(bitmap,cliprect,4);
+	return 0;
+}
+
 
 VIDEO_UPDATE( warpwarp )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_ball(bitmap,cliprect,0xf6);
+	draw_ball(bitmap,cliprect,0x200);
 	return 0;
 }

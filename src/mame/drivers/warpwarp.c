@@ -129,7 +129,7 @@ TODO:
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/custom.h"
-#include "includes/warpwarp.h"
+#include "warpwarp.h"
 #include "geebee.lh"
 #include "sos.lh"
 
@@ -848,8 +848,7 @@ static MACHINE_DRIVER_START( geebee )
 	MDRV_SCREEN_SIZE(34*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(1k)
-	MDRV_PALETTE_LENGTH(3)
-	MDRV_COLORTABLE_LENGTH(4*2)
+	MDRV_PALETTE_LENGTH(4*2)
 
 	MDRV_PALETTE_INIT(geebee)
 	MDRV_VIDEO_START(geebee)
@@ -869,10 +868,11 @@ static MACHINE_DRIVER_START( navarone )
 	MDRV_IMPORT_FROM(geebee)
 
 	MDRV_GFXDECODE(2k)
-	MDRV_COLORTABLE_LENGTH(2*2)
+	MDRV_PALETTE_LENGTH(2*2+1)
 
 	MDRV_PALETTE_INIT(navarone)
 	MDRV_VIDEO_START(navarone)
+	MDRV_VIDEO_UPDATE(navarone)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bombbee )
@@ -891,8 +891,7 @@ static MACHINE_DRIVER_START( bombbee )
 	MDRV_SCREEN_SIZE(34*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0*8, 28*8-1)
 	MDRV_GFXDECODE(color)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_COLORTABLE_LENGTH(2*256)
+	MDRV_PALETTE_LENGTH(2*256+1)
 
 	MDRV_PALETTE_INIT(warpwarp)
 	MDRV_VIDEO_START(warpwarp)

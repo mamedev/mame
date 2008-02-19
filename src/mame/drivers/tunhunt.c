@@ -282,9 +282,9 @@ static const gfx_layout obj_layout =
 
 
 static GFXDECODE_START( tunhunt )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x000, alpha_layout, 0, 4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x200, obj_layout,	 8, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x000, obj_layout,	 8, 1 ) /* second bank, or second bitplane? */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x000, alpha_layout, 0x10, 4 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x200, obj_layout,   0x18, 1 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x000, obj_layout,   0x18, 1 ) /* second bank, or second bitplane? */
 GFXDECODE_END
 
 
@@ -330,8 +330,7 @@ static MACHINE_DRIVER_START( tunhunt )
 	MDRV_SCREEN_SIZE(256, 256-16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255-16)
 	MDRV_GFXDECODE(tunhunt)
-	MDRV_PALETTE_LENGTH(16)
-	MDRV_COLORTABLE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(0x1a)
 
 	MDRV_PALETTE_INIT(tunhunt)
 	MDRV_VIDEO_START(tunhunt)

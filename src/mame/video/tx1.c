@@ -123,36 +123,27 @@ PALETTE_INIT( tx1 )
 {
 	int i;
 
-	for (i = 0; i < 256; ++i)
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
 	{
-		int bit0, bit1, bit2, bit3;
-		int r, g, b;
+		int r = pal4bit(color_prom[i + 0x000]);
+		int g = pal4bit(color_prom[i + 0x100]);
+		int b = pal4bit(color_prom[i + 0x200]);
 
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		bit3 = BIT(color_prom[i], 3);
-		r = 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		bit0 = BIT(color_prom[i + 0x100], 0);
-		bit1 = BIT(color_prom[i + 0x100], 1);
-		bit2 = BIT(color_prom[i + 0x100], 2);
-		bit3 = BIT(color_prom[i + 0x100], 3);
-		g = 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		bit0 = BIT(color_prom[i + 0x200], 0);
-		bit1 = BIT(color_prom[i + 0x200], 1);
-		bit2 = BIT(color_prom[i + 0x200], 2);
-		bit3 = BIT(color_prom[i + 0x200], 3);
-		b = 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x300;
+
 	/* TODO */
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 0x100; i++)
 	{
-		colortable[i] = (color_prom[i + 0x900] & 0xf) + 0x00;
+		UINT8 ctabentry = (color_prom[i + 0x600] & 0x0f) | 0x00;
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 
@@ -451,7 +442,7 @@ static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 							else
 								color = ~ic162[prom_addr] & 0x3f;
 
-							*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[TX1_COLORS_OBJ + color];
+							*BITMAP_ADDR16(bitmap, y, x) = TX1_COLORS_OBJ + color;
 						}
 					}
 
@@ -590,19 +581,19 @@ static UINT8 *rod_bmp;
   bit 2 -- 4.7kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT( buggyboy )
+PALETTE_INIT( buggybjr )
 {
 	int i;
 
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2, bit3, bit4;
 		int r, g, b;
 
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 1);
-		bit2 = BIT(color_prom[i], 2);
-		bit3 = BIT(color_prom[i], 3);
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		bit3 = BIT(color_prom[i + 0x000], 3);
 		bit4 = BIT(color_prom[i + 0x300], 2);
 		r = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
@@ -620,13 +611,55 @@ PALETTE_INIT( buggyboy )
 		bit4 = BIT(color_prom[i + 0x300], 0);
 		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
 
-		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
+PALETTE_INIT( buggyboy )
+{
+	int i;
+
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x100);
+
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x100; i++)
+	{
+		int bit0, bit1, bit2, bit3, bit4;
+		int r, g, b;
+
+		bit0 = BIT(color_prom[i + 0x000], 0);
+		bit1 = BIT(color_prom[i + 0x000], 1);
+		bit2 = BIT(color_prom[i + 0x000], 2);
+		bit3 = BIT(color_prom[i + 0x000], 3);
+		bit4 = BIT(color_prom[i + 0x300], 2);
+		r = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+
+		bit0 = BIT(color_prom[i + 0x100], 0);
+		bit1 = BIT(color_prom[i + 0x100], 1);
+		bit2 = BIT(color_prom[i + 0x100], 2);
+		bit3 = BIT(color_prom[i + 0x100], 3);
+		bit4 = BIT(color_prom[i + 0x300], 1);
+		g = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+
+		bit0 = BIT(color_prom[i + 0x200], 0);
+		bit1 = BIT(color_prom[i + 0x200], 1);
+		bit2 = BIT(color_prom[i + 0x200], 2);
+		bit3 = BIT(color_prom[i + 0x200], 3);
+		bit4 = BIT(color_prom[i + 0x300], 0);
+		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
+
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
+	/* color_prom now points to the beginning of the lookup table */
+	color_prom += 0x400;
+
 	/* Characters use colours 192-255 */
-	for (i = 0; i < 256; ++i)
+	for (i = 0; i < 0x100; i++)
 	{
-		colortable[i] = 192 + color_prom[i + 0x400] + ((i & 0xc0) >> 2);
+		UINT8 ctabentry = 0xc0 | (((i & 0xc0) >> 2)) | (color_prom[i] & 0x0f);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
 

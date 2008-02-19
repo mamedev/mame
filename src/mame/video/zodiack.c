@@ -57,61 +57,52 @@ PALETTE_INIT( zodiack )
 {
 	int i;
 
-	#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-	#define COLOR(gfxn,offs) (colortable[machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs])
+	/* allocate the colortable */
+	machine->colortable = colortable_alloc(machine, 0x31);
 
-	/* first, the character/sprite palette */
-	for (i = 0;i < machine->config->total_colors-1; i++)
+	/* create a lookup table for the palette */
+	for (i = 0; i < 0x30; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
 		/* red component */
-
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
-
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
-
 		bit0 = 0;
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-
-		color_prom++;
+		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
 	/* white for bullets */
+	colortable_palette_set_color(machine->colortable, 0x30, RGB_WHITE);
 
-	palette_set_color(machine,machine->config->total_colors-1,MAKE_RGB(0xff,0xff,0xff));
+	for (i = 0; i < 0x20; i++)
+		if ((i & 3) == 0)
+			colortable_entry_set_value(machine->colortable, i, 0);
 
-	for (i = 0;i < TOTAL_COLORS(0);i+=2)
+	for (i = 0; i < 0x10; i += 2)
 	{
-		COLOR(0,i  ) = (32 + (i / 2));
-		COLOR(0,i+1) = (40 + (i / 2));
-	}
-
-	for (i = 0;i < TOTAL_COLORS(3);i++)
-	{
-		if ((i & 3) == 0)  COLOR(3,i) = 0;
+		colortable_entry_set_value(machine->colortable, 0x20 + i, 32 + (i / 2));
+		colortable_entry_set_value(machine->colortable, 0x21 + i, 40 + (i / 2));
 	}
 
 	/* bullet */
-	COLOR(2, 0) = 0;
-	COLOR(2, 1) = 48;
+	colortable_entry_set_value(machine->colortable, 0x30, 0);
+	colortable_entry_set_value(machine->colortable, 0x31, 0x30);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -132,11 +123,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( zodiack )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scroll_cols(fg_tilemap, 32);
@@ -207,9 +196,7 @@ VIDEO_UPDATE( zodiack )
 	int i;
 
 	for (i = 0; i < 32; i++)
-	{
 		tilemap_set_scrolly(fg_tilemap, i, zodiack_attributesram[i * 2]);
-	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

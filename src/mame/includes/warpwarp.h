@@ -16,6 +16,7 @@ VIDEO_START( geebee );
 VIDEO_START( navarone );
 VIDEO_START( warpwarp );
 VIDEO_UPDATE( geebee );
+VIDEO_UPDATE( navarone );
 VIDEO_UPDATE( warpwarp );
 WRITE8_HANDLER( warpwarp_videoram_w );
 WRITE8_HANDLER( geebee_videoram_w );

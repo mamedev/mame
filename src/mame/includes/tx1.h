@@ -91,6 +91,7 @@ extern UINT16 *buggyboy_rcram;
 extern UINT16 *buggyboy_vram;
 extern size_t buggyboy_objram_size;
 extern size_t buggyboy_rcram_size;
+PALETTE_INIT( buggybjr );
 PALETTE_INIT( buggyboy );
 WRITE16_HANDLER( buggyboy_vram_w );
 VIDEO_START( buggyboy );

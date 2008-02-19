@@ -16,22 +16,23 @@ extern int wolfpack_collision;
 
 extern UINT8* wolfpack_alpha_num_ram;
 
-extern VIDEO_UPDATE( wolfpack );
-extern VIDEO_START( wolfpack );
-extern VIDEO_EOF( wolfpack );
+PALETTE_INIT( wolfpack );
+VIDEO_UPDATE( wolfpack );
+VIDEO_START( wolfpack );
+VIDEO_EOF( wolfpack );
 
-extern WRITE8_HANDLER( wolfpack_video_invert_w );
-extern WRITE8_HANDLER( wolfpack_ship_reflect_w );
-extern WRITE8_HANDLER( wolfpack_pt_pos_select_w );
-extern WRITE8_HANDLER( wolfpack_pt_horz_w );
-extern WRITE8_HANDLER( wolfpack_pt_pic_w );
-extern WRITE8_HANDLER( wolfpack_ship_h_w );
-extern WRITE8_HANDLER( wolfpack_torpedo_pic_w );
-extern WRITE8_HANDLER( wolfpack_ship_size_w );
-extern WRITE8_HANDLER( wolfpack_ship_h_precess_w );
-extern WRITE8_HANDLER( wolfpack_ship_pic_w );
-extern WRITE8_HANDLER( wolfpack_torpedo_h_w );
-extern WRITE8_HANDLER( wolfpack_torpedo_v_w );
+WRITE8_HANDLER( wolfpack_video_invert_w );
+WRITE8_HANDLER( wolfpack_ship_reflect_w );
+WRITE8_HANDLER( wolfpack_pt_pos_select_w );
+WRITE8_HANDLER( wolfpack_pt_horz_w );
+WRITE8_HANDLER( wolfpack_pt_pic_w );
+WRITE8_HANDLER( wolfpack_ship_h_w );
+WRITE8_HANDLER( wolfpack_torpedo_pic_w );
+WRITE8_HANDLER( wolfpack_ship_size_w );
+WRITE8_HANDLER( wolfpack_ship_h_precess_w );
+WRITE8_HANDLER( wolfpack_ship_pic_w );
+WRITE8_HANDLER( wolfpack_torpedo_h_w );
+WRITE8_HANDLER( wolfpack_torpedo_v_w );
 
 
 static TIMER_CALLBACK( periodic_callback )
@@ -54,36 +55,6 @@ static TIMER_CALLBACK( periodic_callback )
 static MACHINE_RESET( wolfpack )
 {
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, periodic_callback);
-}
-
-
-static PALETTE_INIT( wolfpack )
-{
-	int i;
-
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 1, MAKE_RGB(0xc1, 0xc1, 0xc1));
-	palette_set_color(machine, 2, MAKE_RGB(0x81, 0x81, 0x81));
-	palette_set_color(machine, 3, MAKE_RGB(0x48, 0x48, 0x48));
-
-	for (i = 0; i < 4; i++)
-	{
-		rgb_t color = palette_get_color(machine, i);
-
-		palette_set_color_rgb(machine, 4 + i,
-			RGB_RED(color) < 0xb8   ? RGB_RED(color)   + 0x48 : 0xff,
-			RGB_GREEN(color) < 0xb8 ? RGB_GREEN(color) + 0x48 : 0xff,
-			RGB_BLUE(color) < 0xb8  ? RGB_BLUE(color)  + 0x48 : 0xff);
-	}
-
-	colortable[0] = 0;
-	colortable[1] = 1;
-	colortable[2] = 1;
-	colortable[3] = 0;
-	colortable[4] = 0;
-	colortable[5] = 2;
-	colortable[6] = 0;
-	colortable[7] = 3;
 }
 
 
@@ -378,8 +349,7 @@ static MACHINE_DRIVER_START(wolfpack)
 	MDRV_SCREEN_SIZE(512, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 	MDRV_GFXDECODE(wolfpack)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_COLORTABLE_LENGTH(8)
+	MDRV_PALETTE_LENGTH(12)
 	MDRV_PALETTE_INIT(wolfpack)
 	MDRV_VIDEO_START(wolfpack)
 	MDRV_VIDEO_UPDATE(wolfpack)
