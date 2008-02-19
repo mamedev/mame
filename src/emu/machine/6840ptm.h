@@ -5,8 +5,6 @@
     This function is a simple emulation of up to 4 MC6840 PTM
     (Programmable Timer Module)
 
-    based on ( 6522 and 6821 PTM )
-
 **********************************************************************/
 
 #ifndef PTM_6840
@@ -31,15 +29,19 @@ int  ptm6840_read(   int which, int offset);
 void ptm6840_write(  int which, int offset, int data);
 
 int ptm6840_get_status(int which, int clock);	// get whether timer is enabled
-int ptm6840_get_irq(int which);				// get IRQ state
-void ptm6840_set_g1(int which, int state);	// set gate1  state
-void ptm6840_set_c1(int which, int state);	// set clock1 state
+int ptm6840_get_irq(int which);					// get IRQ state
+UINT16 ptm6840_get_count(int which,int counter);// get counter value
+void ptm6840_set_ext_clock(int which, int counter, int clock); // set clock frequency
+int ptm6840_get_ext_clock(int which, int counter);// get clock frequency
 
-void ptm6840_set_g2(int which, int state);	// set gate2  state
-void ptm6840_set_c2(int which, int state);	// set clock2 state
+void ptm6840_set_g1(int which, int state);		// set gate1  state
+void ptm6840_set_c1(int which, int state);		// set clock1 state
 
-void ptm6840_set_g3(int which, int state);	// set gate3  state
-void ptm6840_set_c3(int which, int state);	// set clock3 state
+void ptm6840_set_g2(int which, int state);		// set gate2  state
+void ptm6840_set_c2(int which, int state);		// set clock2 state
+
+void ptm6840_set_g3(int which, int state);		// set gate3  state
+void ptm6840_set_c3(int which, int state);		// set clock3 state
 
 /*-------------------------------------------------------------------------*/
 

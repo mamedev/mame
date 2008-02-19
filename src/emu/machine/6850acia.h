@@ -28,6 +28,9 @@ struct acia6850_interface
 
 void acia6850_config(int which, const struct acia6850_interface *intf);
 
+void acia6850_set_rx_clock(int which, int clock);
+void acia6850_set_tx_clock(int which, int clock);
+
 WRITE8_HANDLER( acia6850_0_ctrl_w );
 WRITE8_HANDLER( acia6850_1_ctrl_w );
 WRITE8_HANDLER( acia6850_2_ctrl_w );

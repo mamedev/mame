@@ -630,6 +630,19 @@ static TIMER_CALLBACK( receive_event )
 	}
 }
 
+void acia6850_set_rx_clock(int which, int clock)
+{
+	acia_6850 *acia_p = &acia[which];
+	acia_p->rx_clock = clock;
+}
+
+void acia6850_set_tx_clock(int which, int clock)
+{
+	acia_6850 *acia_p = &acia[which];
+	acia_p->tx_clock = clock;
+}
+
+
 WRITE8_HANDLER( acia6850_0_ctrl_w ) { acia6850_ctrl_w(0, data); }
 WRITE8_HANDLER( acia6850_1_ctrl_w ) { acia6850_ctrl_w(1, data); }
 WRITE8_HANDLER( acia6850_2_ctrl_w ) { acia6850_ctrl_w(2, data); }

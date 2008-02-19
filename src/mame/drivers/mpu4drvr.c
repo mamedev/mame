@@ -341,7 +341,19 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 static WRITE8_HANDLER( vid_o2_callback )
 {
+	int clock  = ptm6840_get_ext_clock(1, 1)/(ptm6840_get_count(1,1)?ptm6840_get_count(1,1):1)
+	*ptm6840_get_ext_clock(1, 0)/(ptm6840_get_count(1,0)?ptm6840_get_count(1,0):1)
+	*ptm6840_get_ext_clock(1, 2)/(ptm6840_get_count(1,2)?ptm6840_get_count(1,2):1);
+
 	ptm6840_set_c3(   1, data); // copy output value to c3
+
+	if (clock)
+	{
+		acia6850_set_rx_clock(0, clock);
+		acia6850_set_tx_clock(0, clock);
+		acia6850_set_rx_clock(1, clock);
+		acia6850_set_tx_clock(1, clock);
+	}
 }
 
 static WRITE8_HANDLER( vid_o3_callback )
@@ -1450,7 +1462,9 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 //Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
-//It's an unoffical addon, and does all its work through the existing 6809 CPU
+//It's an unoffical addon, and does all its work through the existing 6809 CPU.
+//Although given unofficial status, Barcrest's patent on the MPU4 Video hardware (GB1596363) describes
+//the Deal 'Em board design, rather than the one they ultimately used.
 
 static const gfx_layout dealemcharlayout =
 {
@@ -1954,8 +1968,8 @@ GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em
 GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
 GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD version SWP)",								GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The Crystal Maze - Now Featuring Ocean Zone (AMLD Version SWP)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The New Crystal Maze - Now Featuring Ocean Zone! (AMLD Version)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine v2.0",												GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?

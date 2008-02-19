@@ -22,6 +22,7 @@
 #include "sound/ay8910.h"
 #include "cpu/z80/z80daisy.h"
 
+#define CCHASM_68K_CLOCK (XTAL_8MHz)
 
 /*************************************
  *
@@ -29,26 +30,15 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x040000, 0x04000f) AM_READ(ptm6840_0_lsb_r)
-	AM_RANGE(0x060000, 0x060001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xf80000, 0xf800ff) AM_READ(cchasm_io_r)
-	AM_RANGE(0xffb000, 0xffffff) AM_READ(MRA16_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x040000, 0x04000f) AM_WRITE(ptm6840_0_lsb_w)
+static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x040000, 0x04000f) AM_READWRITE(ptm6840_0_lsb_r,ptm6840_0_lsb_w)
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(cchasm_refresh_control_w)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(cchasm_led_w)
+	AM_RANGE(0x060000, 0x060001) AM_READWRITE(input_port_0_word_r,cchasm_led_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0xf80000, 0xf800ff) AM_WRITE(cchasm_io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&cchasm_ram)
+	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(cchasm_io_r,cchasm_io_w)
+	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE(&cchasm_ram)
 ADDRESS_MAP_END
-
-
 
 /*************************************
  *
@@ -56,31 +46,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x5000, 0x53ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(cchasm_snd_io_r)
+static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM
+	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(cchasm_snd_io_r,cchasm_snd_io_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(cchasm_snd_io_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x03) AM_READ(z80ctc_0_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x03) AM_WRITE(z80ctc_0_w)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(z80ctc_0_r,z80ctc_0_w)
 ADDRESS_MAP_END
 
 static void cchasm_6840_irq(int state)
@@ -89,8 +64,8 @@ static void cchasm_6840_irq(int state)
 }
 static const ptm6840_interface cchasm_6840_intf =
 {
-	8000000/10,
-	{ 0,8000000/10,0 },
+	CCHASM_68K_CLOCK/10,
+	{ 0,CCHASM_68K_CLOCK/10,0 },
 	{ NULL, NULL, NULL },
 	cchasm_6840_irq
 };
@@ -102,7 +77,7 @@ static const ptm6840_interface cchasm_6840_intf =
  *************************************/
 
 static INPUT_PORTS_START( cchasm )
-	PORT_START /* DSW */
+	PORT_START_TAG("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -125,10 +100,10 @@ static INPUT_PORTS_START( cchasm )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START /* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START /* IN2 */
+	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -138,7 +113,7 @@ static INPUT_PORTS_START( cchasm )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START /* IN3 */
+	PORT_START_TAG("IN3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -178,13 +153,13 @@ static MACHINE_DRIVER_START( cchasm )
 
 	MDRV_MACHINE_START(cchasm)
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,8000000)	/* 8 MHz (from schematics) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD(M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
+	MDRV_CPU_PROGRAM_MAP(memmap,0)
 
 	MDRV_CPU_ADD(Z80,3584229)		/* 3.58  MHz (from schematics) */
 	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(sound_memmap,0)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_SCREEN_REFRESH_RATE(40)
 

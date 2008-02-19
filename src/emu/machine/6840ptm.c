@@ -66,6 +66,7 @@ struct _ptm6840
 	UINT8 mode[3];
 	UINT8 fired[3];
 	UINT8 t3_divisor;
+	UINT8 t3_scaler;
 	UINT8 IRQ;
 	UINT8 status_reg;
 	UINT8 status_read_since_int;
@@ -135,9 +136,11 @@ int ptm6840_get_irq(int which)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-static void subtract_from_counter(int counter, int count, int which)
+static void subtract_from_counter(int which, int counter, int count)
 {
 	int clock;
+	attotime duration;
+
 	ptm6840 *currptr = ptm + which;
 
 	/* determine the clock frequency for this timer */
@@ -171,13 +174,11 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = (msb << 8) | lsb;
-		timer_adjust_oneshot(currptr->timer[counter], attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]), which);
 	}
 
 	/* word mode */
 	else
 	{
-		attotime duration;
 		int word = currptr->counter[counter];
 
 		/* count the clocks */
@@ -195,9 +196,32 @@ static void subtract_from_counter(int counter, int count, int which)
 
 		/* store the result */
 		currptr->counter[counter] = word;
+	}
+
+	if (currptr->enabled[counter])
+	{
 		duration = attotime_mul(ATTOTIME_IN_HZ(clock), currptr->counter[counter]);
 		if (counter == 2) duration = attotime_mul(duration, currptr->t3_divisor);
 		timer_adjust_oneshot(currptr->timer[counter], duration, which);
+	}
+}
+
+static void ptm_tick(int which, int counter, int count)
+{
+	ptm6840 *currptr = ptm + which;
+
+	if (counter == 2)
+	{
+		currptr->t3_scaler += count;
+		if ( currptr->t3_scaler > currptr->t3_divisor-1)
+		{
+			subtract_from_counter(which,counter,1);
+			currptr->t3_scaler = 0;
+		}
+	}
+	else
+	{
+		subtract_from_counter(which,counter,count);
 	}
 }
 
@@ -236,7 +260,7 @@ INLINE void update_interrupts(int which)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-static UINT16 compute_counter(int counter, int which)
+static UINT16 compute_counter(int which, int counter)
 {
 	ptm6840 *currptr = ptm + which;
 
@@ -245,7 +269,10 @@ static UINT16 compute_counter(int counter, int which)
 
 	/* if there's no timer, return the count */
 	if (!currptr->enabled[counter])
+	{
+		PLOG(("MC6840 #%d: read counter(%d): %d\n", which, counter, currptr->counter[counter]));
 		return currptr->counter[counter];
+	}
 
 	/* determine the clock frequency for this timer */
 	if (currptr->control_reg[counter] & 0x02)
@@ -279,7 +306,7 @@ static UINT16 compute_counter(int counter, int which)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-static void reload_count(int idx, int which)
+static void reload_count(int which, int idx)
 {
 	int clock;
 	int count;
@@ -321,7 +348,6 @@ static void reload_count(int idx, int which)
 
 	duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
 	if (idx == 2) duration = attotime_mul(duration, currptr->t3_divisor);
-	timer_adjust_oneshot(currptr->timer[idx], duration, which);
 	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, attotime_to_double(duration)));
 
 	if (!currptr->control_reg[idx] & 0x02)
@@ -335,6 +361,7 @@ static void reload_count(int idx, int which)
 	else
 	{
 		currptr->enabled[idx] = 1;
+		timer_adjust_oneshot(currptr->timer[idx], duration, which);
 		timer_enable(currptr->timer[idx],TRUE);
 	}
 }
@@ -380,6 +407,7 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 	state_save_register_item("6840ptm", which, currptr->status_read_since_int);
 	state_save_register_item("6840ptm", which, currptr->status_reg);
 	state_save_register_item("6840ptm", which, currptr->t3_divisor);
+	state_save_register_item("6840ptm", which, currptr->t3_scaler);
 	state_save_register_item("6840ptm", which, currptr->internal_clock);
 	state_save_register_item("6840ptm", which, currptr->IRQ);
 
@@ -395,7 +423,6 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 	state_save_register_item_array("6840ptm", which, currptr->latch);
 
 	ptm6840_reset(which);
-
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -454,7 +481,7 @@ int ptm6840_read(int which, int offset)
 		case PTM_6840_MSBBUF3://6
 		{
 			int idx = (offset - 2)/2;
-			int result = compute_counter(idx, which);
+			int result = compute_counter(which, idx);
 
 			/* clear the interrupt if the status has been read */
 			if (currptr->status_read_since_int & (1 << idx))
@@ -544,7 +571,7 @@ void ptm6840_write (int which, int offset, int data)
 				{
 					for (i = 0; i < 3; i++)
 					{
-						reload_count(i,which);
+						reload_count(which,i);
 					}
 				}
 
@@ -553,7 +580,7 @@ void ptm6840_write (int which, int offset, int data)
 
 				/* changing the clock source? (e.g. Zwackery) */
 				if (diffs & 0x02)
-					reload_count(idx,which);
+					reload_count(which,idx);
 			}
 			break;
 		}
@@ -582,7 +609,7 @@ void ptm6840_write (int which, int offset, int data)
 			/* reload the count if in an appropriate mode */
 			if (!(currptr->control_reg[idx] & 0x10))
 			{
-				reload_count(idx, which);
+				reload_count(which,idx);
 			}
 			PLOG(("%06X:MC6840 #%d: Counter %d latch = %04X\n", activecpu_get_previouspc(), which, idx, currptr->latch[idx]));
 			break;
@@ -613,13 +640,13 @@ static void ptm6840_timeout(int which, int idx)
 	{ // output enabled
 		if ( p->intf )
 		{
-			if ((p->mode[idx] == 0)|(p->mode[idx] == 2))
+			if ((p->mode[idx] == 0)||(p->mode[idx] == 2))
 			{
 				p->output[idx] = p->output[idx]?0:1;
 				PLOG(("**ptm6840 %d t%d output %d **\n", which, idx+1, p->output[idx]));
 				if ( p->intf->out_func[idx] ) p->intf->out_func[idx](0, p->output[idx]);
 			}
-			if ((p->mode[idx] == 4)|(p->mode[idx] == 6))
+			if ((p->mode[idx] == 4)||(p->mode[idx] == 6))
 			{
 				if (!p->fired[idx])
 				{
@@ -632,7 +659,7 @@ static void ptm6840_timeout(int which, int idx)
 		}
 	}
 	p->enabled[idx]= 0;
-	reload_count(idx,which);
+	reload_count(which,idx);
 }
 
 static TIMER_CALLBACK( ptm6840_t1_timeout ) { ptm6840_timeout(param, 0); }
@@ -649,10 +676,10 @@ INLINE void ptm6840_set_gate(int which, int state, int idx)
 {
 	ptm6840 *p = ptm + which;
 
-	if ((p->mode[idx] == 0)|(p->mode[idx] == 2)|(p->mode[0] == 4)|(p->mode[idx] == 6))
+	if ((p->mode[idx] == 0)||(p->mode[idx] == 2)||(p->mode[0] == 4)||(p->mode[idx] == 6))
 	{
 		if (state == 0 && p->gate[idx])
-		reload_count(idx,which);
+		reload_count(which,idx);
 	}
 	p->gate[idx] = state;
 }
@@ -675,8 +702,70 @@ INLINE void ptm6840_set_clock(int which, int state, int idx)
 
 	if (!(p->control_reg[idx] & 0x02))
 	{
-		if (state) subtract_from_counter(idx,1,which);
+		if (state) ptm_tick(which,idx,1);
 	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// ptm6840_get_count: get count value                                    //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+UINT16 ptm6840_get_count(int which,int counter)
+{
+	return compute_counter(which, counter);
+}
+
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// ptm6840_set_ext_clock: set external clock frequency                   //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+void ptm6840_set_ext_clock(int which, int counter, int clock)
+{
+	ptm6840 *currptr = ptm + which;
+	currptr->external_clock[counter] = clock;
+
+	if (!currptr->control_reg[counter] & 0x02)
+	{
+		if (!currptr->intf->external_clock[counter])
+		{
+			currptr->enabled[counter] = 0;
+			timer_enable(currptr->timer[counter],FALSE);
+		}
+	}
+	else
+	{
+		int count;
+		attotime duration;
+
+		/* determine the number of clock periods before we expire */
+		count = currptr->counter[counter];
+		if (currptr->control_reg[counter] & 0x04)
+		count = ((count >> 8) + 1) * ((count & 0xff) + 1);
+		else
+		count = count + 1;
+
+		duration = attotime_mul(ATTOTIME_IN_HZ(clock), count);
+		if (counter == 2) duration = attotime_mul(duration, currptr->t3_divisor);
+		currptr->enabled[counter] = 1;
+		timer_adjust_oneshot(currptr->timer[counter], duration, which);
+		timer_enable(currptr->timer[counter],TRUE);
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////
+//                                                                       //
+// ptm6840_get_ext_clock: get external clock frequency                   //
+//                                                                       //
+///////////////////////////////////////////////////////////////////////////
+
+int ptm6840_get_ext_clock(int which, int counter)
+{
+	ptm6840 *currptr = ptm + which;
+	return currptr->external_clock[counter];
 }
 
 void ptm6840_set_c1(int which, int state) { ptm6840_set_clock(which, state, 0); }
