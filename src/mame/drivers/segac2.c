@@ -1263,6 +1263,74 @@ static INPUT_PORTS_START( pclub )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( pclubjv2 )
+	PORT_INCLUDE( systemc_generic )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ok")
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cancel")
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* Probably Unused */
+
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Probably Unused */
+
+	PORT_MODIFY("COINAGE")
+	PORT_DIPNAME( 0x07, 0x07, "Coins per Credit (Normal / Alternate)" )
+	PORT_DIPSETTING(    0x00, "25 / 30" ) //7C1C
+	PORT_DIPSETTING(    0x01, "6 / 7" ) //6C1C
+	PORT_DIPSETTING(    0x02, "10 / 12" ) //5C1C
+	PORT_DIPSETTING(    0x03, "1 / 2" ) //4C1C
+    PORT_DIPSETTING(    0x07, "3 / Free Play" ) //3C1C
+	PORT_DIPSETTING(    0x04, "15 / 20" ) //2C1C
+	PORT_DIPSETTING(    0x05, "4 / 5" ) //1C1C
+    PORT_DIPSETTING(    0x06, "8 / 9" ) //FP
+    PORT_DIPNAME( 0x08, 0x08, "Alternate Coinage" )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, "Unknown 4-5" )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, "Unknown 4-6" )
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, "Unknown 4-7" )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, "Unknown 4-8" )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW")
+    PORT_DIPNAME( 0x01, 0x01, "Unknown 5-1" )
+    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02, 0x02, "Unknown 5-2" )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04, 0x04, "Unknown 5-3" )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08, 0x08, "Unknown 5-4" )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x10, "Unknown 5-5" )
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ))
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40, 0x40, "Unknown 5-7" )
+    PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, "Unknown 5-8" )
+    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /******************************************************************************
     Sound interfaces
@@ -2191,6 +2259,6 @@ GAME( 1994, zunkyou,  0,        segac2,   zunkyou,  zunkyou,  ROT0, "Sega",     
 
 /* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
 GAME( 1995, pclubj,   0,        segac2,   pclub,    pclub,    ROT0, "Atlus",                  "Print Club (Japan Vol.1)", GAME_NOT_WORKING )
-GAME( 1995, pclubjv2, pclubj,   segac2,   pclub,    pclubjv2, ROT0, "Atlus",                  "Print Club (Japan Vol.2)", GAME_NOT_WORKING )
-GAME( 1996, pclubjv4, pclubj,   segac2,   pclub,    pclubjv4, ROT0, "Atlus",                  "Print Club (Japan Vol.4)", GAME_NOT_WORKING )
-GAME( 1996, pclubjv5, pclubj,   segac2,   pclub,    pclubjv5, ROT0, "Atlus",                  "Print Club (Japan Vol.5)", GAME_NOT_WORKING )
+GAME( 1995, pclubjv2, pclubj,   segac2,   pclubjv2, pclubjv2, ROT0, "Atlus",                  "Print Club (Japan Vol.2)", GAME_NOT_WORKING )
+GAME( 1996, pclubjv4, pclubj,   segac2,   pclubjv2, pclubjv4, ROT0, "Atlus",                  "Print Club (Japan Vol.4)", GAME_NOT_WORKING )
+GAME( 1996, pclubjv5, pclubj,   segac2,   pclubjv2, pclubjv5, ROT0, "Atlus",                  "Print Club (Japan Vol.5)", GAME_NOT_WORKING )
