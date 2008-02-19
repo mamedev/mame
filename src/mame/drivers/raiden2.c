@@ -1179,7 +1179,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( raiden2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(V30,32000000/2) /* NEC V30 CPU, 32? Mhz */
+	MDRV_CPU_ADD(V30,XTAL_32MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(raiden2_mem, 0)
 	MDRV_CPU_VBLANK_INT(raiden2_interrupt,1)
 
@@ -1203,6 +1203,10 @@ static MACHINE_DRIVER_START( raiden2 )
 
 	MDRV_VIDEO_START(raiden2)
 	MDRV_VIDEO_UPDATE(raiden2)
+
+/* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
+/* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
+
 MACHINE_DRIVER_END
 
 /* ROM LOADING */

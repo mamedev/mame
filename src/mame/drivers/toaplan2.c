@@ -3489,7 +3489,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT(toaplan2_vblank_irq2,1)
 
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_28MHz / 4) / (432 * 263) ) /* 28MHz Oscillator */
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) ) /* 27MHz Oscillator */
 
 	MDRV_MACHINE_RESET(toaplan2)
 
@@ -3508,7 +3508,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, XTAL_28MHz/8) /* verified on pcb */
+	MDRV_SOUND_ADD(YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/4) /* verified on pcb */
