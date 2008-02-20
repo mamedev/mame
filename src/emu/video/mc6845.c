@@ -445,9 +445,9 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 
 
 /* device interface */
-static void *mc6845_start(running_machine *machine, UINT32 clock, UINT32 flags, const void *config)
+static void *mc6845_start(running_machine *machine, UINT32 clock, UINT32 flags, const void *static_config, const void *inline_config)
 {
-	return mc6845_config(config);
+	return mc6845_config(static_config);
 }
 
 
@@ -465,6 +465,7 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = mc6845_set_info;		break;

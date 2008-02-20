@@ -27,6 +27,8 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	DEVINFO_INT_FIRST = 0x00000,
 
+	DEVINFO_INT_INLINE_CONFIG_BYTES = DEVINFO_INT_FIRST,/* R/O: bytes of inline configuration */
+
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
 
 	DEVINFO_INT_LAST = 0x0ffff,
@@ -77,7 +79,7 @@ typedef union _deviceinfo deviceinfo;
 /* device interface function types */
 typedef void (*device_get_info_func)(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 typedef void (*device_set_info_func)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info);
-typedef void *(*device_start_func)(running_machine *machine, UINT32 clock, UINT32 flags, const void *config);
+typedef void *(*device_start_func)(running_machine *machine, UINT32 clock, UINT32 flags, const void *static_config, const void *inline_config);
 typedef void (*device_stop_func)(running_machine *machine, void *token);
 typedef void (*device_reset_func)(running_machine *machine, void *token);
 
@@ -109,11 +111,12 @@ struct _device_config
 	device_type				type;					/* device type */
 	UINT32					flags;					/* device flags */
 	UINT32					clock;					/* device clock */
-	const void *			config;					/* static device configuration */
 	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
 	device_start_func		start;					/* quick pointer to start callback */
 	device_stop_func		stop;					/* quick pointer to stop callback */
 	device_reset_func		reset;					/* quick pointer to reset callback */
+	const void *			static_config;			/* static device configuration */
+	void *					inline_config;			/* inline device configuration */
 	void *					token;					/* token if device is live */
 	char					tag[1];					/* tag for this instance */
 };

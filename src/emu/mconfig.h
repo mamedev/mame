@@ -385,7 +385,7 @@ struct _machine_config
 	device->flags = (_flags);											\
 
 #define MDRV_DEVICE_CONFIG(_config)										\
-	device->config = &(_config);										\
+	device->static_config = &(_config);									\
 
 
 
