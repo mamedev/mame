@@ -457,10 +457,35 @@ static void AICA_StartSlot(struct _AICA *AICA, struct _SLOT *slot)
 
 	if (PCMS(slot) >= 2)
 	{
+		UINT8 *base;
+		UINT32 curstep, steps_to_go;
+
 		slot->curstep = slot->nxtstep = 0;
-		slot->adbase = slot->nxtbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&AICA->RAM_MASK));
+		slot->adbase = slot->nxtbase = (unsigned char *) (AICA->AICARAM+((SA(slot))&0x7fffff));
 		InitADPCM(&(slot->cur_sample), &(slot->cur_quant));
 		InitADPCM(&(slot->nxt_sample), &(slot->nxt_quant));
+		InitADPCM(&(slot->cur_lpsample), &(slot->cur_lpquant));
+
+		// walk to the ADPCM state at LSA
+		curstep = 0;
+		base = slot->adbase;
+		steps_to_go = LSA(slot);
+
+		while (curstep < steps_to_go)
+		{
+			int shift1, delta1;
+			shift1 = 4*((curstep&1));
+			delta1 = (*base>>shift1)&0xf;
+			DecodeADPCM(&(slot->cur_lpsample),delta1,&(slot->cur_lpquant));
+			curstep++;
+			if (!(curstep & 1))
+			{
+				base++;
+			}
+		}
+
+		slot->cur_lpstep = curstep;
+		slot->adlpbase = base;
 	}
 }
 
@@ -998,7 +1023,6 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	UINT32 addr1,addr2,addr_select;                                   // current and next sample addresses
 	UINT32 *addr[2]      = {&addr1, &addr2};                          // used for linear interpolation
 	UINT32 *slot_addr[2] = {&(slot->cur_addr), &(slot->nxt_addr)};    //
-	int    *adpcm_sample[2] = {&(slot->cur_sample), &(slot->nxt_sample)};
 
 	if(SSCTL(slot)!=0)	//no FM or noise yet
 		return 0;
@@ -1046,8 +1070,6 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	else	// 4-bit ADPCM
 	{
 		UINT8 *base= slot->adbase;
-		UINT8 *p1=(unsigned char *) (AICA->AICARAM+((SA(slot)+(addr1>>1))&AICA->RAM_MASK));
-		UINT8 *p2=(unsigned char *) (AICA->AICARAM+((SA(slot)+(addr2>>1))&AICA->RAM_MASK));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
 		UINT32 steps_to_go = addr1, curstep = slot->curstep;
