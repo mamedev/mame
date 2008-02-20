@@ -12,7 +12,8 @@
 #ifndef __EIVC__
 #define __EIVC__
 
-#if (_MSC_VER >= 1400)
+// PTR64 is needed for platform sdk - no intrin.h
+#if (_MSC_VER >= 1400) && !defined(PTR64)
 #include <intrin.h>
 #else
 long __cdecl _InterlockedIncrement(long volatile *);

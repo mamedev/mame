@@ -135,6 +135,7 @@ DEFS += -D_CRT_SECURE_NO_DEPRECATE -DXML_STATIC -D__inline__=__inline -Dsnprintf
 # make msvcprep into a pre-build step
 # OSPREBUILD = $(VCONV)
 
+ifneq ($(CROSS_BUILD),1)
 # add VCONV to the build tools
 BUILD += $(VCONV)
 
@@ -147,7 +148,7 @@ $(WINOBJ)/vconv.o: $(WINSRC)/vconv.c
 	@cl.exe /nologo /O1 -D_CRT_SECURE_NO_DEPRECATE -c $< /Fo$@
 
 endif
-
+endif
 
 
 #-------------------------------------------------
