@@ -79,7 +79,7 @@ typedef union _deviceinfo deviceinfo;
 /* device interface function types */
 typedef void (*device_get_info_func)(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 typedef void (*device_set_info_func)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info);
-typedef void *(*device_start_func)(running_machine *machine, UINT32 clock, UINT32 flags, const void *static_config, const void *inline_config);
+typedef void *(*device_start_func)(running_machine *machine, const void *static_config, const void *inline_config);
 typedef void (*device_stop_func)(running_machine *machine, void *token);
 typedef void (*device_reset_func)(running_machine *machine, void *token);
 

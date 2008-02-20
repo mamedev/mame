@@ -378,12 +378,6 @@ struct _machine_config
 #define MDRV_DEVICE_MODIFY(_tag, _type)									\
 	device = device_list_find_by_tag(&machine->devicelist, _type, _tag);\
 
-#define MDRV_DEVICE_CLOCK(_clock)										\
-	device->clock = (_clock);											\
-
-#define MDRV_DEVICE_FLAGS(_flags)										\
-	device->flags = (_flags);											\
-
 #define MDRV_DEVICE_CONFIG(_config)										\
 	device->static_config = &(_config);									\
 

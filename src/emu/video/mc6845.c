@@ -445,7 +445,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 
 
 /* device interface */
-static void *mc6845_start(running_machine *machine, UINT32 clock, UINT32 flags, const void *static_config, const void *inline_config)
+static void *mc6845_start(running_machine *machine, const void *static_config, const void *inline_config)
 {
 	return mc6845_config(static_config);
 }

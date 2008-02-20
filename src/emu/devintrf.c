@@ -92,8 +92,6 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	/* populate all fields */
 	device->next = NULL;
 	device->type = type;
-	device->flags = 0;
-	device->clock = 0;
 	device->static_config = NULL;
 	device->inline_config = (info.i == 0) ? NULL : (device->tag + strlen(tag) + 1);
 	device->token = NULL;
@@ -222,7 +220,7 @@ void device_list_start(running_machine *machine)
 		assert(config->start != NULL);
 
 		/* call the start function */	
-		config->token = (*config->start)(machine, config->clock, config->flags, config->static_config, config->inline_config);
+		config->token = (*config->start)(machine, config->static_config, config->inline_config);
 		assert(config->token != NULL);
 			
 		/* fatal error if this fails */
