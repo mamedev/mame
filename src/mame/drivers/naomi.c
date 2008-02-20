@@ -523,15 +523,6 @@ UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
 {
-	FILE *f;
-
-	if (input_code_pressed_once(KEYCODE_H))
-	{
-		f = fopen("aica.bin", "wb");
-		fwrite(dc_sound_ram, 8*1024*1024, 1, f);
-		fclose(f);
-	}
-
 	dc_vblank();
 }
 
