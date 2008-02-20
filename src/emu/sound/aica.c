@@ -124,7 +124,8 @@ struct _SLOT
 	int cur_quant;        //current ADPCM step
 	int nxt_quant;        //next ADPCM step
 	int curstep, nxtstep;
-	UINT8 *adbase, *nxtbase;
+	int cur_lpquant, cur_lpsample, cur_lpstep;
+	UINT8 *adbase, *nxtbase, *adlpbase;
 };
 
 
@@ -997,6 +998,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	UINT32 addr1,addr2,addr_select;                                   // current and next sample addresses
 	UINT32 *addr[2]      = {&addr1, &addr2};                          // used for linear interpolation
 	UINT32 *slot_addr[2] = {&(slot->cur_addr), &(slot->nxt_addr)};    //
+	int    *adpcm_sample[2] = {&(slot->cur_sample), &(slot->nxt_sample)};
 
 	if(SSCTL(slot)!=0)	//no FM or noise yet
 		return 0;
@@ -1044,6 +1046,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 	else	// 4-bit ADPCM
 	{
 		UINT8 *base= slot->adbase;
+		UINT8 *p1=(unsigned char *) (AICA->AICARAM+((SA(slot)+(addr1>>1))&AICA->RAM_MASK));
+		UINT8 *p2=(unsigned char *) (AICA->AICARAM+((SA(slot)+(addr2>>1))&AICA->RAM_MASK));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
 		UINT32 steps_to_go = addr1, curstep = slot->curstep;
@@ -1111,7 +1115,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 			slot->EG.state = DECAY1;
 	}
 
-	for (addr_select=0;addr_select<2;addr_select++)
+	for (addr_select=0; addr_select<2; addr_select++)
 	{
 		INT32 rem_addr;
 		switch(LPCTL(slot))
@@ -1128,13 +1132,29 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 			{
 				rem_addr = *slot_addr[addr_select] - (LEA(slot)<<SHIFT);
 				*slot_addr[addr_select]=(LSA(slot)<<SHIFT) + rem_addr;
-				if(PCMS(slot)==2 && addr_select==0)
+
+				if(PCMS(slot)>=2 && addr_select==0)
 				{
-					InitADPCM(&(slot->cur_sample), &(slot->cur_quant));
+					// restore the state @ LSA - the sampler will naturally walk to (LSA + remainder)
+					slot->adbase = &AICA->AICARAM[SA(slot)+(LSA(slot)/2)];
+					slot->curstep = LSA(slot);
+					if (PCMS(slot) == 2)
+					{
+						slot->cur_sample = slot->cur_lpsample;
+						slot->cur_quant = slot->cur_lpquant;
+					}
+
+//					printf("Looping: slot_addr %x LSA %x LEA %x step %x base %x\n", *slot_addr[addr_select]>>SHIFT, LSA(slot), LEA(slot), slot->curstep, slot->adbase);
 				}
-				else if(PCMS(slot)==2 && addr_select==1)
+				else if(PCMS(slot)>=2 && addr_select==1)
 				{
-					InitADPCM(&(slot->nxt_sample), &(slot->nxt_quant));
+					slot->nxtbase = &AICA->AICARAM[SA(slot)+(LSA(slot)/2)];
+					slot->nxtstep = LSA(slot);
+					if (PCMS(slot) == 2)
+					{
+						slot->nxt_sample = slot->cur_lpsample;
+						slot->nxt_quant = slot->cur_lpquant;
+					}
 				}
 			}
 			break;
@@ -1332,7 +1352,7 @@ void aica_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:						info->s = "AICA";				break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Sega/Yamaha custom";		 	break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";			 	break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0.1";			 	break;
 		case SNDINFO_STR_CORE_FILE:					info->s = __FILE__;				break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
