@@ -9,7 +9,7 @@
 
 static const char *const regname[16] = {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
-	"R8", "R9", "R10","R11","R12","R13","R14","SP"
+	"R8", "R9", "R10","R11","R12","R13","R14","R15"
 };
 
 static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
@@ -721,6 +721,9 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 				case 0x60:
 					sprintf(buffer, "FSQRT   F%s\n", regname[Rn]);
 					break;
+				case 0x70:
+					sprintf(buffer, "FSRRA   F%s\n", regname[Rn]);
+					break;
 				case 0x80:
 					sprintf(buffer, "FLDI0   F%s\n", regname[Rn]);
 					break;
@@ -737,14 +740,26 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 					sprintf(buffer, "FIPR    FV%d, FV%d\n", Rn << 2, Rn & 12);
 					break;
 				case 0xF0:
-					if (opcode == 0xF3FD)
-						sprintf(buffer, "FSCHG\n");
-					else if (opcode == 0xFBFD)
-						sprintf(buffer, "FRCHG\n");
-					else if ((opcode & 0x300) == 0x100)
-						sprintf(buffer, "FTRV    XMTRX, FV%d\n", Rn & 12);
-					else
-						sprintf(buffer, "Funknown $%04X", opcode);
+					if (opcode & 0x100) {
+						if (opcode & 0x200) {
+							switch (opcode & 0xC00)
+							{
+								case 0x000:
+									sprintf(buffer, "FSCHG\n");
+									break;
+								case 0x800:
+									sprintf(buffer, "FRCHG\n");
+									break;
+								default:
+									sprintf(buffer, "Funknown $%04X", opcode);
+									break;
+							}
+						} else {
+							sprintf(buffer, "FTRV    XMTRX, FV%d\n", Rn & 12);
+						}
+					} else {
+						sprintf(buffer, "FSSCA    FPUL, F%d\n", Rn & 14);
+					}
 					break;
 				default:
 					sprintf(buffer, "Funknown $%04X", opcode);

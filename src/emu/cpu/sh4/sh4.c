@@ -29,8 +29,6 @@
 
 /* speed up delay loops, bail out of tight loops */
 #define BUSY_LOOP_HACKS 	0
-/* work only as described in the datasheet */
-#define DATASHEET_STRICT	0
 
 #define VERBOSE 0
 
@@ -159,6 +157,84 @@ static void set_irq_line(int irqline, int state);
 static void TODO(void)
 {
 }
+
+#if 0
+int sign_of(int n)
+{
+	return(sh4.fr[n]>>31);
+}
+
+void zero(int n,int sign)
+{
+if (sign == 0) 
+	sh4.fr[n] = 0x00000000;
+else 
+	sh4.fr[n] = 0x80000000;
+if ((sh4.fpscr & PR) == 1) 
+	sh4.fr[n+1] = 0x00000000;
+}
+
+int data_type_of(int n)
+{
+UINT32 abs;
+
+	abs = sh4.fr[n] & 0x7fffffff;
+	if ((sh4.fpscr & PR) == 0) { /* Single-precision */
+		if (abs < 0x00800000) {
+			if (((sh4.fpscr & DN) == 1) || (abs == 0x00000000)) {
+				if (sign_of(n) == 0) {
+					zero(n, 0); 
+					return(SH4_FPU_PZERO);
+				} else {
+					zero(n, 1); 
+					return(SH4_FPU_NZERO);
+				}
+			} else 
+				return(SH4_FPU_DENORM);
+		} else 
+			if (abs < 0x7f800000) 
+				return(SH4_FPU_NORM);
+			else 
+				if (abs == 0x7f800000) {
+					if (sign_of(n) == 0) 
+						return(SH4_FPU_PINF);
+					else 
+						return(SH4_FPU_NINF);
+				} else 
+					if (abs < 0x7fc00000) 
+						return(SH4_FPU_qNaN);
+					else 
+						return(SH4_FPU_sNaN);
+	} else { /* Double-precision */
+		if (abs < 0x00100000) {
+			if (((sh4.fpscr & DN) == 1) || ((abs == 0x00000000) && (sh4.fr[n+1] == 0x00000000))) {
+				if(sign_of(n) == 0) {
+					zero(n, 0); 
+					return(SH4_FPU_PZERO);
+				} else {
+					zero(n, 1); 
+					return(SH4_FPU_NZERO);
+				}
+			} else 
+				return(SH4_FPU_DENORM);
+		} else
+			if (abs < 0x7ff00000) 
+				return(SH4_FPU_NORM);
+			else 
+				if ((abs == 0x7ff00000) && (sh4.fr[n+1] == 0x00000000)) {
+					if (sign_of(n) == 0) 
+						return(SH4_FPU_PINF);
+					else 
+						return(SH4_FPU_NINF);
+				} else 
+					if (abs < 0x7ff80000) 
+						return(SH4_FPU_qNaN);
+					else 
+						return(SH4_FPU_sNaN);
+	}
+	return(SH4_FPU_NORM);
+}
+#endif
 
 INLINE UINT8 RB(offs_t A)
 {
@@ -2837,12 +2913,20 @@ INLINE void FMOVMRIFR(UINT32 m,UINT32 n)
 #endif
 	} else {              /* PR = 0 */
 		if (sh4.fpu_sz) { /* SZ = 1 */
-			n = n & 14;
-			sh4.ea = sh4.r[m];
-			sh4.fr[n] = RL( sh4.ea );
-			sh4.r[m] += 4;
-			sh4.fr[n+1] = RL( sh4.r[m] );
-			sh4.r[m] += 4;
+			if (n & 1) {
+				n = n & 14;
+				sh4.ea = sh4.r[m];
+				sh4.xf[n] = RL( sh4.ea );
+				sh4.r[m] += 4;
+				sh4.xf[n+1] = RL( sh4.ea+4 );
+				sh4.r[m] += 4;
+			} else {
+				sh4.ea = sh4.r[m];
+				sh4.fr[n] = RL( sh4.ea );
+				sh4.r[m] += 4;
+				sh4.fr[n+1] = RL( sh4.ea+4 );
+				sh4.r[m] += 4;
+			}
 		} else {              /* SZ = 0 */
 			sh4.ea = sh4.r[m];
 			sh4.fr[n] = RL( sh4.ea );
@@ -2897,11 +2981,18 @@ INLINE void FMOVFRMDR(UINT32 m,UINT32 n)
 #endif
 	} else {              /* PR = 0 */
 		if (sh4.fpu_sz) { /* SZ = 1 */
-			m= m & 14;
-			sh4.r[n] -= 8;
-			sh4.ea = sh4.r[n];
-			WL( sh4.ea,sh4.fr[m] );
-			WL( sh4.ea+4,sh4.fr[m+1] );
+			if (m & 1) {
+				m= m & 14;
+				sh4.r[n] -= 8;
+				sh4.ea = sh4.r[n];
+				WL( sh4.ea,sh4.xf[m] );
+				WL( sh4.ea+4,sh4.xf[m+1] );
+			} else {
+				sh4.r[n] -= 8;
+				sh4.ea = sh4.r[n];
+				WL( sh4.ea,sh4.fr[m] );
+				WL( sh4.ea+4,sh4.fr[m+1] );
+			}
 		} else {              /* SZ = 0 */
 			sh4.r[n] -= 4;
 			sh4.ea = sh4.r[n];
@@ -2973,29 +3064,6 @@ INLINE void FMOVS0FR(UINT32 m,UINT32 n)
 /*  FMOV    @Rm,DRn PR=1      1111nnn0mmmm1000 */
 INLINE void FMOVMRFR(UINT32 m,UINT32 n)
 {
-#if DATASHEET_STRICT
-	if (sh4.fpu_pr) { /* PR = 1 */
-		n= n & 14;
-		sh4.ea = sh4.r[m];
-#ifdef LSB_FIRST
-		sh4.xf[n+1] = RL( sh4.ea );
-		sh4.xf[n] = RL( sh4.ea+4 );
-#else
-		sh4.xf[n] = RL( sh4.ea );
-		sh4.xf[n+1] = RL( sh4.ea+4 );
-#endif
-	} else {              /* PR = 0 */
-		if (sh4.fpu_sz) { /* SZ = 1 */
-			n= n & 14;
-			sh4.ea = sh4.r[m];
-			sh4.fr[n] = RL( sh4.ea );
-			sh4.fr[n+1] = RL( sh4.ea+4 );
-		} else {              /* SZ = 0 */
-			sh4.ea = sh4.r[m];
-			sh4.fr[n] = RL( sh4.ea );
-		}
-	}
-#else
 	if (sh4.fpu_pr) { /* PR = 1 */
 		if (n & 1) {
 			n= n & 14;
@@ -3036,7 +3104,6 @@ INLINE void FMOVMRFR(UINT32 m,UINT32 n)
 			sh4.fr[n] = RL( sh4.ea );
 		}
 	}
-#endif
 }
 
 /*  FMOV    FRm,FRn PR=0 SZ=0 FRm -> FRn 1111nnnnmmmm1100 */
@@ -3046,33 +3113,10 @@ INLINE void FMOVMRFR(UINT32 m,UINT32 n)
 /*  FMOV    XDm,XDn PR=1      XDm -> XDn 1111nnn1mmm11100 */
 INLINE void FMOVFR(UINT32 m,UINT32 n)
 {
-#if DATASHEET_STRICT
-	if (sh4.fpu_pr) { /* PR = 1 */
-		if (m & 1)
-			if (n & 1) {
-				sh4.xf[n & 14] = sh4.xf[m & 14];
-				sh4.xf[n | 1] = sh4.xf[m | 1];
-			} else {
-				sh4.fr[n] = sh4.xf[m & 14];
-				sh4.fr[n | 1] = sh4.xf[m | 1];
-			}
-		else {
-			sh4.xf[n & 14] = sh4.fr[m];
-			sh4.xf[n | 1] = sh4.fr[m|1]; // (a&14)+1 -> a|1
-		}
-	} else {              /* PR = 0 */
-		if (sh4.fpu_sz) { /* SZ = 1 */
-			sh4.fr[n] = sh4.fr[m];
-			sh4.fr[n+1] = sh4.fr[m+1];
-		} else {              /* SZ = 0 */
-			sh4.fr[n] = sh4.fr[m];
-		}
-	}
-#else
-	if (sh4.fpu_sz == 0) /* SZ = 0 */
+	if ((sh4.fpu_sz == 0) && (sh4.fpu_pr == 0)) /* SZ = 0 */
 		sh4.fr[n] = sh4.fr[m];
 	else { /* SZ = 1 or PR = 1 */
-		if (m & 1)
+		if (m & 1) {
 			if (n & 1) {
 				sh4.xf[n & 14] = sh4.xf[m & 14];
 				sh4.xf[n | 1] = sh4.xf[m | 1];
@@ -3080,17 +3124,16 @@ INLINE void FMOVFR(UINT32 m,UINT32 n)
 				sh4.fr[n] = sh4.xf[m & 14];
 				sh4.fr[n | 1] = sh4.xf[m | 1];
 			}
-		else {
+		} else {
 			if (n & 1) {
 				sh4.xf[n & 14] = sh4.fr[m];
 				sh4.xf[n | 1] = sh4.fr[m | 1]; // (a&14)+1 -> a|1
 			} else {
-				sh4.fr[n] = sh4.fr[m & 14];
+				sh4.fr[n] = sh4.fr[m];
 				sh4.fr[n | 1] = sh4.fr[m | 1];
 			}
 		}
 	}
-#endif
 }
 
 /*  FLDI1  FRn 1111nnnn10011101 */
@@ -3137,10 +3180,10 @@ INLINE void FTRC(UINT32 n)
 {
 	if (sh4.fpu_pr) { /* PR = 1 */
 		n = n & 14;
-		sh4.fpul = (INT32)FP_RFD(n);
+		*((INT32 *)&sh4.fpul) = (INT32)FP_RFD(n);
 	} else {              /* PR = 0 */
 		/* read sh4.fr[n] as float -> truncate -> fpul(32) */
-		sh4.fpul = (INT32)FP_RFS(n);
+		*((INT32 *)&sh4.fpul) = (INT32)FP_RFS(n);
 	}
 }
 
@@ -3150,9 +3193,9 @@ INLINE void FLOAT(UINT32 n)
 {
 	if (sh4.fpu_pr) { /* PR = 1 */
 		n = n & 14;
-		FP_RFD(n) = (double)(INT32)sh4.fpul;
+		FP_RFD(n) = (double)*((INT32 *)&sh4.fpul);
 	} else {              /* PR = 0 */
-		FP_RFS(n) = (float)(INT32)sh4.fpul;
+		FP_RFS(n) = (float)*((INT32 *)&sh4.fpul);
 	}
 }
 
@@ -3161,18 +3204,11 @@ INLINE void FLOAT(UINT32 n)
 INLINE void FNEG(UINT32 n)
 {
 	if (sh4.fpu_pr) { /* PR = 1 */
-#ifdef LSB_FIRST
-		n = n | 1; // n & 14 + 1
-		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
-#else
-		n = n & 14;
-		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
-#endif
+		FP_RFD(n) = -FP_RFD(n);
 	} else {              /* PR = 0 */
-		sh4.fr[n] = sh4.fr[n] ^ 0x80000000;
+		FP_RFS(n) = -FP_RFS(n);
 	}
 }
-
 
 /* FABS FRn PR=0 1111nnnn01011101 */
 /* FABS DRn PR=1 1111nnn001011101 */
@@ -3250,7 +3286,7 @@ INLINE void FCNVSD(UINT32 n)
 {
 	if (sh4.fpu_pr) { /* PR = 1 */
 		n = n & 14;
-		FP_RFD(n) = *((float *)&sh4.fpul);
+		FP_RFD(n) = (double)*((float *)&sh4.fpul);
 	}
 }
 
@@ -3331,8 +3367,26 @@ INLINE void FSQRT(UINT32 n)
 	} else {              /* PR = 0 */
 		if (FP_RFS(n) < 0)
 			return;
-		FP_RFS(n) = sqrt(FP_RFS(n));
+		FP_RFS(n) = sqrtf(FP_RFS(n));
 	}
+}
+
+/* FSRRA FRn PR=0 1111nnnn01111101 */
+INLINE void FSRRA(UINT32 n)
+{
+	if (FP_RFS(n) < 0)
+		return;
+	FP_RFS(n) = 1.0 / sqrtf(FP_RFS(n));
+}
+
+/*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
+INLINE void FSSCA(UINT32 n)
+{
+float angle;
+	
+	angle = (((float)(sh4.fpul & 0xFFFF)) / 65536.0) * 2.0 * M_PI;
+	FP_RFS(n) = sinf(angle);
+	FP_RFS(n+1) = cosf(angle);
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
@@ -3359,7 +3413,7 @@ float sum[4];
 	for (i = 0;i < 4;i++) {
 		sum[i] = 0;
 		for (j=0;j < 4;j++)
-			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + i);
+			sum[i] += FP_XFS((j << 2) + i)*FP_RFS(n + j);
 		FP_RFS(n + i) = sum[i];
 	}
 }
@@ -3431,6 +3485,9 @@ INLINE void op1111(UINT16 opcode)
 				case 0x60:
 					FSQRT(Rn);
 					break;
+				case 0x70:
+					FSRRA(Rn);
+					break;
 				case 0x80:
 					FLDI0(Rn);
 					break;
@@ -3447,18 +3504,44 @@ INLINE void op1111(UINT16 opcode)
 					FIPR(Rn);
 					break;
 				case 0xF0:
-					if (opcode == 0xF3FD)
-						FSCHG();
-					else if (opcode == 0xFBFD)
-						FRCHG();
-					else if ((opcode & 0x300) == 0x100)
-						FTRV(Rn);
+					if (opcode & 0x100) {
+						if (opcode & 0x200) {
+							switch (opcode & 0xC00)
+							{
+								case 0x000:
+									FSCHG();
+									break;
+								case 0x800:
+									FRCHG();
+									break;
+#ifdef ENABLE_DEBUGGER
+								default:
+									mame_debug_break();
+									break;
+#endif
+							}
+						} else {
+							FTRV(Rn);
+						}
+					} else {
+						FSSCA(Rn);
+					}
 					break;
+#ifdef ENABLE_DEBUGGER
+				default:
+					mame_debug_break();
+					break;
+#endif
 			}
 			break;
 		case 14:
 			FMAC(Rm,Rn);
 			break;
+#ifdef ENABLE_DEBUGGER
+		default:
+			mame_debug_break();
+			break;
+#endif
 	}
 }
 
@@ -5132,7 +5215,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_FPSCR:			sprintf(info->s, "FPSCR :%08X", sh4.fpscr); break;
 		case CPUINFO_STR_REGISTER + SH4_FPUL:			sprintf(info->s, "FPUL :%08X", sh4.fpul); break;
 #ifdef LSB_FIRST
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.4e", FP_RS2( 0),(double)FP_RFS2( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.2e", FP_RS2( 0),(double)FP_RFS2( 0)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS2( 1),(double)FP_RFS2( 1)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS2( 2),(double)FP_RFS2( 2)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS2( 3),(double)FP_RFS2( 3)); break;
@@ -5165,7 +5248,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + SH4_XF14:			sprintf(info->s, "XF14 :%08X %01.2e", FP_XS2(14),(double)FP_XFS2(14)); break;
 		case CPUINFO_STR_REGISTER + SH4_XF15:			sprintf(info->s, "XF15 :%08X %01.2e", FP_XS2(15),(double)FP_XFS2(15)); break;
 #else
-		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.4e", FP_RS( 0),(double)FP_RFS( 0)); break;
+		case CPUINFO_STR_REGISTER + SH4_FR0:			sprintf(info->s, "FR0  :%08X %01.2e", FP_RS( 0),(double)FP_RFS( 0)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR1:			sprintf(info->s, "FR1  :%08X %01.2e", FP_RS( 1),(double)FP_RFS( 1)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR2:			sprintf(info->s, "FR2  :%08X %01.2e", FP_RS( 2),(double)FP_RFS( 2)); break;
 		case CPUINFO_STR_REGISTER + SH4_FR3:			sprintf(info->s, "FR3  :%08X %01.2e", FP_RS( 3),(double)FP_RFS( 3)); break;

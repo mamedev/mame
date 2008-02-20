@@ -15,7 +15,7 @@
 
 #if DEBUG_REGISTERS
 
-#define DEBUG_SYSCTRL	(1)
+#define DEBUG_SYSCTRL	(0)
 #define DEBUG_MAPLE	(0)
 
 #if DEBUG_SYSCTRL
@@ -125,6 +125,7 @@ static UINT32 g1bus_regs[0x100/4];
 extern UINT32 dma_offset;
 static UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
+static UINT32 coin_counts[8];
 
 static const UINT32 maple0x82answer[]=
 {
@@ -252,9 +253,6 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
-			/*if (pp == 1)
-                if (sysctrl_regs[SB_C2DLEN] == 0x240)
-                    pp=pp+1;*/
 			cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 			#if DEBUG_SYSCTRL
 			mame_printf_verbose("SYSCTRL: Ch2 dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, sysctrl_regs[SB_C2DSTAT],sysctrl_regs[SB_LMMODE0],sysctrl_regs[SB_LMMODE1]);
@@ -308,6 +306,7 @@ WRITE64_HANDLER( dc_maple_w )
 	struct sh4_ddt_dma ddtdata;
 	UINT32 buff[512];
 	UINT32 endflag,port,pattern,length,command,dap,sap,destination;
+	UINT32 subcommand;
 	static int jvs_command = 0,jvs_address = 0;
 	int chk;
 	int a;
@@ -401,7 +400,8 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.mode=-1;
 								cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
-								if ((buff[0] & 0xff) == 3) // read data
+								subcommand = buff[0] & 0xff;
+								if (subcommand == 3) // read data
 								{
 									for (a=0;a < 0x80;a+=4)
 									{
@@ -409,18 +409,18 @@ WRITE64_HANDLER( dc_maple_w )
 									}
 									ddtdata.length=0x84/4;
 								}
-								else if ((buff[0] & 0xff) == 0xb) // store data
+								else if (subcommand == 0xb) // store data
 								{
 									off=(buff[0] >> 8) & 0xff;
 									len=(buff[0] >> 16) & 0xff;
 									for (a=0;a < len;a++)
 										maple0x86data1[off+a]=(buff[1+a/4] >> (a & 3) * 8) & 255;
 								}
-								else if (((buff[0] & 0xff) == 0x31) || ((buff[0] & 0xff) == 0x1))
+								else if ((subcommand == 0x31) || (subcommand == 0x1))
 								{
 									ddtdata.length=1;
 								}
-								else if ((buff[0] & 0xff) == 0x17) // send command into jvs serial bus !!!
+								else if (subcommand == 0x17) // send command into jvs serial bus !!!
 								{
 									// Examples:
 									// 17,*c295407 (77),*c295404,*c295405,*c295406,0,ff,2,f0,d9, 0 // ff broadcast
@@ -436,114 +436,160 @@ WRITE64_HANDLER( dc_maple_w )
 									buff[1] = 0xe4e3e2e1;
 									ddtdata.length = 2;
 								}
-								else if ((buff[0] & 0xff) == 0x15) // get response from previous jvs command
+								else if (subcommand == 0x15) // get response from previous jvs command
 								{
-									int tocopy;
+									int tocopy, pos;
 									// 15,0,0,0
-									maple0x86data1[0] = 0xa0;
+									maple0x86data2[0] = 0xa0;
 									for (a=1;a < 32;a++)
 										maple0x86data2[a] = maple0x86data2[a-1] + 1;
-									buff[1] = 0xA3A2A1A0;
-									for (a=0;a < 9;a++)
-									{
-										buff[2+a]=buff[1+a]+0x04040404;
-									}
-									buff[1] = buff[1] | 0x0c000000;
 									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
-									buff[2] = buff[2] & 0xFFCFFFFF;
 									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
 
-									a = readinputport(0); // put keys here
-									buff[2]= buff[2] | (a << 20);
+									a = readinputportbytag("IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
-									if (jvs_command)
-										*(((unsigned char *)buff)+0x15+2)=jvs_address;
-									else
-										*(((unsigned char *)buff)+0x15+2)=0;
-									*(((unsigned char *)buff)+0x15+3)=0;
-									*(((unsigned char *)buff)+0x15+8)=1;
-									*(((unsigned char *)buff)+0x15+1)=0x8e;
-									if (jvs_command)
-										maple0x86data2[0x11+2] = jvs_address;
-									else
-										maple0x86data2[0x11+2] = 0;
-									maple0x86data2[0x11+3] = 0;
-									maple0x86data2[0x11+8] = 1;
-									maple0x86data2[0x11+1] = 0x8e;
-									maple0x86data2[0x11+9] = 1;
-									// 4 + 1 + 0x10 + ?,8e,addr,0,?,?,addr?,len,status,report1,jvsbytes...
-									ddtdata.length=11;
-									tocopy=27;
-									*(((unsigned char *)buff)+0x15+9)=1;
-									switch (jvs_command)
+									pos = 0x11;
+									tocopy = 17;
+									for (;;)
 									{
-										case 0xf0: // reset
-										case 0xf1: // set address
+										if (jvs_command)
+											maple0x86data2[pos+2] = jvs_address;
+										else
+											maple0x86data2[pos+2] = 0;
+										maple0x86data2[pos+3] = 0;
+										maple0x86data2[pos+8] = 1;
+										maple0x86data2[pos+1] = 0x8e;
+										maple0x86data2[pos+9] = 1;
+										// 4 + 1 + 0x10 + ?,8e,addr,0,?,?,addr?,len,status,report1,jvsbytes...
+										ddtdata.length=11;
+										tocopy += 10;
+										switch (jvs_command)
+										{
+											case 0xf0: // reset
+											case 0xf1: // set address
+												break;
+											case 0x10:
+												strcpy((char *)(maple0x86data2+0x11+10), "MAME test JVS I/O board"); // name
+												maple0x86data2[pos+7]=24+2;
+												tocopy += 24;
+												break;
+											case 0x11:
+												maple0x86data2[pos+10]=0x13; // version bcd
+												maple0x86data2[pos+7]=1+2;
+												tocopy += 1;
+												break;
+											case 0x12:
+												maple0x86data2[pos+10]=0x30; // version bcd
+												maple0x86data2[pos+7]=1+2;
+												tocopy += 1;
+												break;
+											case 0x13:
+												maple0x86data2[pos+10]=0x10; // version bcd
+												maple0x86data2[pos+7]=1+2;
+												tocopy += 1;
+												break;
+											case 0x14:
+												// four bytes for every available function
+												// first function
+												maple0x86data2[pos+10]=1;
+												maple0x86data2[pos+11]=2; // number of players
+												maple0x86data2[pos+12]=9; // switches per player (27 = mahjong)
+												maple0x86data2[pos+13]=0;
+												// second function
+												maple0x86data2[pos+14]=2;
+												maple0x86data2[pos+15]=2; // number of coin slots
+												maple0x86data2[pos+16]=0;
+												maple0x86data2[pos+17]=0;
+												// third function
+												maple0x86data2[pos+18]=3;
+												maple0x86data2[pos+19]=2; // analog channels
+												maple0x86data2[pos+20]=8; // bits per channel
+												maple0x86data2[pos+21]=0;
+												// no more functions
+												maple0x86data2[pos+22]=0;
+												maple0x86data2[pos+7]=13+2;
+												tocopy += 13;
+												break;
+											case 0x21:
+												maple0x86data2[pos+10]=0; // bits 7-6 status bits 5-0 higer bits of coin count
+												maple0x86data2[pos+11]=0; // lower bits of coin count
+												maple0x86data2[pos+12]=0; // like previuos two but for second coin slot
+												maple0x86data2[pos+13]=0;
+												maple0x86data2[pos+7]=4+2;
+												tocopy += 4;
+												break;
+											case -1: // special case to read controls
+											case -2:
+												// report1,jvsbytes repeated for each function
+												// first function
+												maple0x86data2[pos+ 9]=1; // report
+												maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
+												maple0x86data2[pos+11]=readinputportbytag("IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2 
+												maple0x86data2[pos+12]=readinputportbytag("IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
+												maple0x86data2[pos+13]=readinputportbytag("IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2 
+												maple0x86data2[pos+14]=readinputportbytag("IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
+												// second function
+												maple0x86data2[pos+15]=1; // report
+												maple0x86data2[pos+16]=(coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
+												maple0x86data2[pos+17]=coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
+												maple0x86data2[pos+18]=(coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
+												maple0x86data2[pos+19]=coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
+												// third function
+												maple0x86data2[pos+20]=1; // report
+												maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
+												maple0x86data2[pos+22]=0; // channel 1
+												maple0x86data2[pos+23]=0; // channel 2 bits 7-0
+												maple0x86data2[pos+24]=0xff; // channel 2
+												if (jvs_command == -1)
+												{
+													// ?
+													maple0x86data2[pos+25]=0;
+													maple0x86data2[pos+26]=0;
+													maple0x86data2[pos+7]=17+2;
+													tocopy += 17;
+												} 
+												else
+												{
+													maple0x86data2[pos+7]=15+2;
+													tocopy += 15;
+												}
+												break;
+										}
+										if (jvs_command == -1)
+										{
+											maple0x86data2[pos+4]=maple0x86data2[pos+7]+5;
+											pos = pos+maple0x86data2[pos+4]+3;
+											jvs_command = 0;
+											continue;
+										}
+										else
+										{
+											maple0x86data2[pos+4]=maple0x86data2[pos+7]-1;
 											break;
-										case 0x10:
-											strcpy((char *)(maple0x86data2+0x11+10), "MAME test JVS I/O board"); // name
-											maple0x86data2[0x11+7]=24+2;
-											tocopy += 24;
-											break;
-										case 0x11:
-											maple0x86data2[0x11+10]=0x13; // version bcd
-											maple0x86data2[0x11+7]=1+2;
-											tocopy += 1;
-											break;
-										case 0x12:
-											maple0x86data2[0x11+10]=0x30; // version bcd
-											maple0x86data2[0x11+7]=1+2;
-											tocopy += 1;
-											break;
-										case 0x13:
-											maple0x86data2[0x11+10]=0x10; // version bcd
-											maple0x86data2[0x11+7]=1+2;
-											tocopy += 1;
-											break;
-										case 0x14:
-											// four bytes for every available function
-											// first function
-											maple0x86data2[0x11+10]=1;
-											maple0x86data2[0x11+11]=2; // number of players
-											maple0x86data2[0x11+12]=7;
-											maple0x86data2[0x11+13]=0;
-											// second function
-											maple0x86data2[0x11+14]=2;
-											maple0x86data2[0x11+15]=2; // number of coin slots
-											maple0x86data2[0x11+16]=0;
-											maple0x86data2[0x11+17]=0;
-											// third function
-											maple0x86data2[0x11+18]=3;
-											maple0x86data2[0x11+19]=2; // channels
-											maple0x86data2[0x11+20]=8; // bits
-											maple0x86data2[0x11+21]=0;
-											// no more functions
-											maple0x86data2[0x11+22]=0;
-											maple0x86data2[0x11+7]=13+2;
-											tocopy += 13;
-											break;
-										case 0x21:
-											maple0x86data2[0x11+10]=0; // bits 7-6 status bits 5-0 higer bits of coin count
-											maple0x86data2[0x11+11]=0; // lower bits of coin count
-											maple0x86data2[0x11+12]=0; // like previuos two but for second coin slot
-											maple0x86data2[0x11+13]=0;
-											maple0x86data2[0x11+7]=4+2;
-											tocopy += 4;
-											break;
+										}
 									}
 									for (a=0;a < tocopy;a=a+4)
 										buff[1+a/4] = maple0x86data2[a] | (maple0x86data2[a+1] << 8) | (maple0x86data2[a+2] << 16) | (maple0x86data2[a+3] << 24);
 									jvs_command=0;
 									ddtdata.length = (tocopy+7)/4;
 								}
-								else if ((buff[0] & 0xff) == 0x21)
+								else if (subcommand == 0x21)
 								{
 									// 21,*c295407 (77),*c295404,*c295405,*c295406,0,1,0
-									ddtdata.length=1;
+									jvs_address = (buff[1] >> 16) & 0xff; // slave address
+									jvs_command = -2;
+									ddtdata.length=2;
 								}
-								else //0x27
+								else if (subcommand == 0x27) //0x27
 								{
-									ddtdata.length=1;
+									// 27,*c295407 (77),*c295404,*c295405,*c295406,0,01,1,0,0,0
+									jvs_address = (buff[1] >> 16) & 0xff; // slave address
+									jvs_command = -1;
+									ddtdata.length=2;
+								}
+								else // 0x13
+								{
+									ddtdata.length=2;
 								}
 								break;
 							default:
@@ -571,6 +617,20 @@ WRITE64_HANDLER( dc_maple_w )
 			}
 		}
 		break;
+	}
+}
+
+static void coin_slots_callback(void *param, UINT32 oldval, UINT32 newval)
+{
+UINT32 a,b,c;
+
+	c = (newval ^ oldval) & newval;
+	b = 1;
+	for (a=0;a < 2;a++)
+	{
+		if (c & b)
+			coin_counts[a]++;
+		b = b << 1;
 	}
 }
 
@@ -751,6 +811,11 @@ WRITE64_HANDLER( dc_rtc_w )
         dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
 }*/
 
+MACHINE_START( dc )
+{
+	input_port_set_changed_callback(port_tag_to_index("COINS"), 0x03, coin_slots_callback, NULL);
+}
+
 MACHINE_RESET( dc )
 {
 	int a;
@@ -761,6 +826,7 @@ MACHINE_RESET( dc )
 	memset(sysctrl_regs, 0, sizeof(sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
+	memset(coin_counts, 0, sizeof(coin_counts));
 
 	sysctrl_regs[SB_SBREV] = 0x0b;
 	for (a=0;a < 0x80;a++)

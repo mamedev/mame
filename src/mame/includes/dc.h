@@ -29,6 +29,7 @@ WRITE64_HANDLER( dc_aica_reg_w );
 READ32_HANDLER( dc_arm_aica_r );
 WRITE32_HANDLER( dc_arm_aica_w );
 
+MACHINE_START( dc );
 MACHINE_RESET( dc );
 
 int compute_interrupt_level(void);
