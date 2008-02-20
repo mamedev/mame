@@ -429,8 +429,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_START( nyny )
 {
-	/* configure the CRT controller */
-	mc6845 = mc6845_config(machine, &mc6845_intf);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 
@@ -699,6 +698,9 @@ static MACHINE_DRIVER_START( nyny )
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_CONFIG(mc6845_intf)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

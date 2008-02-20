@@ -235,8 +235,9 @@
 #define MASTER_CLOCK	10000000
 
 #include "driver.h"
-#include "sound/ay8910.h"
+#include "video/mc6845.h"
 #include "machine/6821pia.h"
+#include "sound/ay8910.h"
 
 /* from video */
 WRITE8_HANDLER( gdrawpkr_videoram_w );
@@ -585,6 +586,8 @@ static MACHINE_DRIVER_START( gdrawpkr )
 	MDRV_PALETTE_INIT(gdrawpkr)
 	MDRV_VIDEO_START(gdrawpkr)
 	MDRV_VIDEO_UPDATE(gdrawpkr)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

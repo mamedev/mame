@@ -24,6 +24,7 @@ Sound: AY-3-8912
 */
 
 #include "driver.h"
+#include "video/mc6845.h"
 #include "sound/ay8910.h"
 
 /* video */
@@ -309,6 +310,8 @@ static MACHINE_DRIVER_START( usg32 )
 	MDRV_PALETTE_INIT(usgames)
 	MDRV_VIDEO_START(usgames)
 	MDRV_VIDEO_UPDATE(usgames)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

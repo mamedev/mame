@@ -180,7 +180,7 @@ static PALETTE_INIT(murogem)
 
 static VIDEO_START(murogem)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static VIDEO_UPDATE(murogem)
@@ -229,6 +229,8 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_INIT(murogem)
 	MDRV_VIDEO_START(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 MACHINE_DRIVER_END
 
 

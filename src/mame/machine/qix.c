@@ -281,7 +281,7 @@ INTERRUPT_GEN( qix_vblank_start )
  *
  *************************************/
 
-WRITE8_HANDLER( zoo_bankswitch_w )
+WRITE8_HANDLER( zookeep_bankswitch_w )
 {
 	memory_set_bank(1, (data >> 2) & 1);
 	/* not necessary, but technically correct */

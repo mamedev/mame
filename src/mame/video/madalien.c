@@ -160,18 +160,7 @@ static VIDEO_START( madalien )
 		16, 16, 32, 32
 	};
 
-	static const mc6845_interface mc6845_intf =
-	{
-		0,                /* screen we are acting on */
-		PIXEL_CLOCK / 8,  /* the clock of the chip  */
-		8,                /* number of pixels per video memory address */
-		NULL,             /* before pixel update callback */
-		NULL,             /* row update callback */
-		NULL,             /* after pixel update callback */
-		NULL              /* call back for display state changes */
-	};
-
-	mc6845 = mc6845_config(machine, &mc6845_intf);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	tilemap_fg = tilemap_create(get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(tilemap_fg, 0);
@@ -407,6 +396,18 @@ static GFXDECODE_START( madalien )
 GFXDECODE_END
 
 
+static const mc6845_interface mc6845_intf =
+{
+	0,                /* screen we are acting on */
+	PIXEL_CLOCK / 8,  /* the clock of the chip  */
+	8,                /* number of pixels per video memory address */
+	NULL,             /* before pixel update callback */
+	NULL,             /* row update callback */
+	NULL,             /* after pixel update callback */
+	NULL              /* call back for display state changes */
+};
+
+
 MACHINE_DRIVER_START( madalien_video )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
@@ -417,4 +418,7 @@ MACHINE_DRIVER_START( madalien_video )
 	MDRV_PALETTE_INIT(madalien)
 	MDRV_VIDEO_START(madalien)
 	MDRV_VIDEO_UPDATE(madalien)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_CONFIG(mc6845_intf)
 MACHINE_DRIVER_END

@@ -119,7 +119,7 @@ static WRITE8_HANDLER( ssingles_mc6845_register_w )
 
 static VIDEO_START(ssingles)
 {
-	mc6845 = mc6845_config(machine, &mc6845_intf);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	{
 		int i;
@@ -285,6 +285,9 @@ static MACHINE_DRIVER_START( ssingles )
 
 	MDRV_VIDEO_START(ssingles)
 	MDRV_VIDEO_UPDATE(ssingles)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_CONFIG(mc6845_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

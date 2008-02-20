@@ -544,7 +544,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( coinmstr )
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 64);
 }
 
@@ -652,6 +652,8 @@ static MACHINE_DRIVER_START( coinmstr )
 
 	MDRV_VIDEO_START(coinmstr)
 	MDRV_VIDEO_UPDATE(coinmstr)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

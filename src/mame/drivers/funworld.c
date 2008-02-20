@@ -800,8 +800,9 @@
 #define MASTER_CLOCK	XTAL_16MHz
 
 #include "driver.h"
-#include "sound/ay8910.h"
+#include "video/mc6845.h"
 #include "machine/6821pia.h"
+#include "sound/ay8910.h"
 
 #include "funworld.lh"
 
@@ -1475,6 +1476,8 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_VIDEO_START(funworld)
 	MDRV_VIDEO_UPDATE(funworld)
 
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1545,6 +1548,8 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
 //  MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)
 //  MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)
+
+//	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	MDRV_GFXDECODE(sn10)
 

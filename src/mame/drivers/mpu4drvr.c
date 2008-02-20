@@ -1548,7 +1548,7 @@ static PALETTE_INIT( dealem )
 
 static VIDEO_START(dealem)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static VIDEO_UPDATE(dealem)
@@ -1685,6 +1685,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(dealem)
 
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT (crmaze)

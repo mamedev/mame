@@ -51,7 +51,7 @@ static TILE_GET_INFO( get_usgames_tile_info )
 
 VIDEO_START(usgames)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	usgames_tilemap = tilemap_create(get_usgames_tile_info,tilemap_scan_rows, 8, 8,64,32);
 }
 

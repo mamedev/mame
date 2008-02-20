@@ -56,10 +56,6 @@ struct _mc6845_interface
 /* device interface */
 void mc6845_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 
-/* use mc6845_init to set up for save states.
-   if intf is NULL, the emulator will NOT call video_configure_screen() */
-mc6845_t *mc6845_config(running_machine *machine, const mc6845_interface *intf);
-
 /* select one of the registers for reading or writing */
 void mc6845_address_w(mc6845_t *mc6845, UINT8 data);
 

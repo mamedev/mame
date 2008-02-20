@@ -431,7 +431,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( pmpoker )
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
@@ -1023,6 +1023,8 @@ static MACHINE_DRIVER_START( pmpoker )
 
 	MDRV_VIDEO_START(pmpoker)
 	MDRV_VIDEO_UPDATE(pmpoker)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jokerpkr )

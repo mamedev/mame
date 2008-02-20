@@ -182,7 +182,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( miniboy7 )
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 37, 37);
 }
 
@@ -290,6 +290,8 @@ static MACHINE_DRIVER_START( miniboy7 )
 
 	MDRV_VIDEO_START(miniboy7)
 	MDRV_VIDEO_UPDATE(miniboy7)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 MACHINE_DRIVER_END
 
 

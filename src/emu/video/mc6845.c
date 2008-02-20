@@ -15,6 +15,9 @@
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
 
+    The various speed rated devices are identified by a letter,
+    for example M68A45, M68B45, etc.
+
     The chip is originally designed by Hitachi, not by Motorola.
 
 **********************************************************************/
@@ -67,48 +70,6 @@ static void mc6845_state_save_postload(void *param);
 static void configure_screen(mc6845_t *mc6845, int postload);
 static void update_timer(mc6845_t *mc6845);
 static TIMER_CALLBACK( display_enable_changed_timer_cb );
-
-
-mc6845_t *mc6845_config(running_machine *machine, const mc6845_interface *intf)
-{
-	mc6845_t *mc6845;
-
-	assert(machine != NULL);
-
-	/* allocate the object that holds the state */
-	mc6845 = auto_malloc(sizeof(*mc6845));
-	memset(mc6845, 0, sizeof(*mc6845));
-
-	mc6845->machine = machine;
-	mc6845->intf = intf;
-
-	/* create the timer if the user is interested in getting display enable
-       notifications */
-	if (intf && intf->display_enable_changed)
-		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
-
-	/* register for state saving */
-	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
-
-	state_save_register_item("mc6845", 0, mc6845->address_latch);
-	state_save_register_item("mc6845", 0, mc6845->horiz_total);
-	state_save_register_item("mc6845", 0, mc6845->horiz_disp);
-	state_save_register_item("mc6845", 0, mc6845->horiz_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->sync_width);
-	state_save_register_item("mc6845", 0, mc6845->vert_total);
-	state_save_register_item("mc6845", 0, mc6845->vert_total_adj);
-	state_save_register_item("mc6845", 0, mc6845->vert_disp);
-	state_save_register_item("mc6845", 0, mc6845->vert_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->intl_skew);
-	state_save_register_item("mc6845", 0, mc6845->max_ras_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor_start_ras);
-	state_save_register_item("mc6845", 0, mc6845->cursor_end_ras);
-	state_save_register_item("mc6845", 0, mc6845->start_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor);
-	state_save_register_item("mc6845", 0, mc6845->light_pen);
-
-	return mc6845;
-}
 
 
 static void mc6845_state_save_postload(void *param)
@@ -451,7 +412,43 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 /* device interface */
 static void *mc6845_start(running_machine *machine, const void *static_config, const void *inline_config)
 {
-	return mc6845_config(machine, static_config);
+	mc6845_t *mc6845;
+
+	assert(machine != NULL);
+
+	/* allocate the object that holds the state */
+	mc6845 = auto_malloc(sizeof(*mc6845));
+	memset(mc6845, 0, sizeof(*mc6845));
+
+	mc6845->machine = machine;
+	mc6845->intf = static_config;
+
+	/* create the timer if the user is interested in getting display enable
+       notifications */
+	if (mc6845->intf && mc6845->intf->display_enable_changed)
+		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
+
+	/* register for state saving */
+	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
+
+	state_save_register_item("mc6845", 0, mc6845->address_latch);
+	state_save_register_item("mc6845", 0, mc6845->horiz_total);
+	state_save_register_item("mc6845", 0, mc6845->horiz_disp);
+	state_save_register_item("mc6845", 0, mc6845->horiz_sync_pos);
+	state_save_register_item("mc6845", 0, mc6845->sync_width);
+	state_save_register_item("mc6845", 0, mc6845->vert_total);
+	state_save_register_item("mc6845", 0, mc6845->vert_total_adj);
+	state_save_register_item("mc6845", 0, mc6845->vert_disp);
+	state_save_register_item("mc6845", 0, mc6845->vert_sync_pos);
+	state_save_register_item("mc6845", 0, mc6845->intl_skew);
+	state_save_register_item("mc6845", 0, mc6845->max_ras_addr);
+	state_save_register_item("mc6845", 0, mc6845->cursor_start_ras);
+	state_save_register_item("mc6845", 0, mc6845->cursor_end_ras);
+	state_save_register_item("mc6845", 0, mc6845->start_addr);
+	state_save_register_item("mc6845", 0, mc6845->cursor);
+	state_save_register_item("mc6845", 0, mc6845->light_pen);
+
+	return mc6845;
 }
 
 

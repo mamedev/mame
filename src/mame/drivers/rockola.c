@@ -265,6 +265,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
+#include "video/mc6845.h"
 #include "sound/sn76477.h"
 #include "sound/custom.h"
 #include "sound/samples.h"
@@ -1099,6 +1100,8 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_VIDEO_START(satansat)
 	MDRV_VIDEO_UPDATE(rockola)
 
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1170,6 +1173,8 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_PALETTE_INIT(rockola)
 	MDRV_VIDEO_START(rockola)
 	MDRV_VIDEO_UPDATE(rockola)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

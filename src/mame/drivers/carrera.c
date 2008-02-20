@@ -259,7 +259,7 @@ GFXDECODE_END
 
 static VIDEO_START(carrera)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 }
 
 static VIDEO_UPDATE(carrera)
@@ -322,6 +322,8 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_PALETTE_INIT(carrera)
 	MDRV_VIDEO_START(carrera)
 	MDRV_VIDEO_UPDATE(carrera)
+
+	MDRV_DEVICE_ADD("crtc", MC6845, 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

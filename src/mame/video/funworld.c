@@ -136,19 +136,19 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START(funworld)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
 }
 
 VIDEO_START(magiccrd)
 {
-	mc6845 = mc6845_config(machine, NULL);
+	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
 }
 
 VIDEO_START(snookr10)
 {
-//  mc6845 = mc6845_config(machine, NULL);
+//	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 32);
 }
 

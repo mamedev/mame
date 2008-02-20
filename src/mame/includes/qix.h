@@ -29,9 +29,9 @@ struct _qix_state
 	mc6845_t *mc6845;
 	UINT8 *videoram;
 	UINT8 *videoram_address;
+	UINT8 *videoram_mask;
 	UINT8 *paletteram;
 	UINT8  flip_screen;
-	UINT8  vram_mask;
 	UINT8  palette_bank;
 	UINT8  leds;
 	UINT8 *scanline_latch;
@@ -45,7 +45,7 @@ MACHINE_START( qixmcu );
 MACHINE_START( slither );
 MACHINE_RESET( qix );
 
-WRITE8_HANDLER( zoo_bankswitch_w );
+WRITE8_HANDLER( zookeep_bankswitch_w );
 
 READ8_HANDLER( qix_data_firq_r );
 READ8_HANDLER( qix_data_firq_ack_r );
