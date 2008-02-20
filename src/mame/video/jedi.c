@@ -2,6 +2,8 @@
 
     Atari Return of the Jedi hardware
 
+    driver by Dan Boris
+
     Return of the Jedi has a peculiar playfield/motion object
     priority system. That is, there is no priority system ;-)
     The color of the pixel which appears on screen depends on
@@ -13,40 +15,27 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "jedi.h"
 
 
 #define NUM_PENS	(0x1000)
 
 
-/* globals */
-UINT8 *jedi_foregroundram;
-UINT8 *jedi_backgroundram;
-UINT8 *jedi_spriteram;
-UINT8 *jedi_paletteram;
-UINT8 *jedi_foreground_bank;
-
-/* local variables */
-static UINT32 jedi_vscroll;
-static UINT32 jedi_hscroll;
-static UINT8 video_off;
-static UINT8 smoothing_table;
-
-
 
 /*************************************
  *
- *  Video startup
+ *  Start
  *
  *************************************/
 
-VIDEO_START( jedi )
+static VIDEO_START( jedi )
 {
+	jedi_state *state = machine->driver_data;
+
 	/* register for saving */
-	state_save_register_global(jedi_vscroll);
-	state_save_register_global(jedi_hscroll);
-	state_save_register_global(video_off);
-	state_save_register_global(smoothing_table);
+	state_save_register_global(state->vscroll);
+	state_save_register_global(state->hscroll);
 }
 
 
@@ -77,7 +66,7 @@ VIDEO_START( jedi )
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+static void get_pens(jedi_state *state, pen_t *pens)
 {
 	offs_t offs;
 
@@ -85,7 +74,7 @@ static void get_pens(pen_t *pens)
 	{
 		int r, g, b, bits, intensity;
 
-		UINT16 color = jedi_paletteram[offs] | (jedi_paletteram[offs | 0x400] << 8);
+		UINT16 color = state->paletteram[offs] | (state->paletteram[offs | 0x400] << 8);
 
 		intensity = (color >> 9) & 7;
 		bits = (color >> 6) & 7;
@@ -100,12 +89,12 @@ static void get_pens(pen_t *pens)
 }
 
 
-static void do_pen_lookup(mame_bitmap *bitmap, const rectangle *cliprect)
+static void do_pen_lookup(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
 
-	get_pens(pens);
+	get_pens(state, pens);
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		for(x = cliprect->min_x; x <= cliprect->max_x; x++)
@@ -122,139 +111,116 @@ static void do_pen_lookup(mame_bitmap *bitmap, const rectangle *cliprect)
 
 WRITE8_HANDLER( jedi_vscroll_w )
 {
-    jedi_vscroll = data | (offset << 8);
+	jedi_state *state = Machine->driver_data;
+
+	state->vscroll = data | (offset << 8);
 }
 
 
 WRITE8_HANDLER( jedi_hscroll_w )
 {
-    jedi_hscroll = data | (offset << 8);
+	jedi_state *state = Machine->driver_data;
+
+	state->hscroll = data | (offset << 8);
 }
 
 
 
 /*************************************
  *
- *  Video control
+ *  Background/text layer drawing
+ *  with smoothing
  *
  *************************************/
 
-WRITE8_HANDLER( jedi_video_off_w )
-{
-	video_off = data;
-}
-
-
-WRITE8_HANDLER( jedi_PIXIRAM_w )
-{
-	/* this should really be 0x07, but the PROMs were
-       dumped at half size */
-	smoothing_table = data & 0x03;
-}
-
-
-
-/*************************************
- *
- *  Foreground drawing
- *
- *************************************/
-
-static void draw_foreground(mame_bitmap *bitmap)
-{
-	offs_t offs;
-    UINT32 *dst = BITMAP_ADDR32(bitmap, 0, 0);
-
-	/* draw the bitmap 4 pixels at a time */
-    for (offs = 0; offs < 0x7c00; offs++)
-	{
-		UINT16 code = ((*jedi_foreground_bank & 0x80) << 1) |
-					  jedi_foregroundram[((offs & 0x7c00) >> 4) | ((offs & 0x7e) >> 1)];
-
-		UINT8 data = memory_region(REGION_GFX1)[(code << 4) | ((offs & 0x380) >> 6) | (offs & 0x01)];
-
-		/* the background pixel determines pen address bits A8 and A9 */
-		dst[0] = (dst[0] & 0xff) | ((data & 0xc0) << 2);
-		dst[1] = (dst[1] & 0xff) | ((data & 0x30) << 4);
-		dst[2] = (dst[2] & 0xff) | ((data & 0x0c) << 6);
-		dst[3] = (dst[3] & 0xff) | ((data & 0x03) << 8);
-
-		dst = dst + 4;
-	}
-}
-
-
-
-/*************************************
- *
- *  Background drawing with smoothing
- *
- *************************************/
-
-static void draw_and_smooth_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background_and_text(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int y;
-	UINT32 background_line_buffer[0x200];	/* RAM chip at 2A */
+	int background_line_buffer[0x200];	/* RAM chip at 2A */
 
-	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x0000 | (smoothing_table << 8)];
-	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x0800 | (smoothing_table << 8)];
+	UINT8 *tx_gfx = memory_region(REGION_GFX1);
+	UINT8 *bg_gfx = memory_region(REGION_GFX2);
+	UINT8 *prom1 = &memory_region(REGION_PROMS)[0x0000 | ((*state->smoothing_table & 0x03) << 8)];
+	UINT8 *prom2 = &memory_region(REGION_PROMS)[0x0800 | ((*state->smoothing_table & 0x03) << 8)];
+	int vscroll = state->vscroll;
+	int hscroll = state->hscroll;
+	int tx_bank = *state->foreground_bank;
+	UINT8 *tx_ram = state->foregroundram;
+	UINT8 *bg_ram = state->backgroundram;
 
-	memset(background_line_buffer, 0, 0x200 * sizeof(UINT32));
+	memset(background_line_buffer, 0, 0x200 * sizeof(int));
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		int x;
-		UINT32 last_col = 0;
+		int bg_last_col = 0;
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
 		{
-			UINT32 col;
-			UINT32 tempcol;
-			offs_t gfx_offs;
-			UINT8 data1;
-			UINT8 data2;
+			int tx_col1, tx_col2, bg_col;
+			int bg_tempcol;
+			offs_t tx_gfx_offs, bg_gfx_offs;
+			int tx_data, bg_data1, bg_data2;
 
-			int sy = y + jedi_vscroll;
-			int sx = x + jedi_hscroll;
+			int sy = y + vscroll;
+			int sx = x + hscroll;
 
-			offs_t backgroundram_offs = ((sy & 0x1f0) << 1) | ((sx & 0x1f0) >> 4);
+			/* determine offsets into video memory */
+			offs_t tx_offs = ((y & 0xf8) << 3) | (x >> 3);
+			offs_t bg_offs = ((sy & 0x1f0) << 1) | ((sx & 0x1f0) >> 4);
 
-			/* shuffle the bank bits in */
-			UINT8 bank = jedi_backgroundram[0x0400 | backgroundram_offs];
-			UINT16 code = jedi_backgroundram[0x0000 | backgroundram_offs] |
-						  ((bank & 0x01) << 8) |
-						  ((bank & 0x08) << 6) |
-						  ((bank & 0x02) << 9);
+			/* get the character codes */
+			int tx_code = ((tx_bank & 0x80) << 1) | tx_ram[tx_offs];
+			int bg_bank = bg_ram[0x0400 | bg_offs];
+			int bg_code = bg_ram[0x0000 | bg_offs] |
+						  ((bg_bank & 0x01) << 8) |
+						  ((bg_bank & 0x08) << 6) |
+						  ((bg_bank & 0x02) << 9);
 
-			/* flip X */
-			if (bank & 0x04)
+			/* background flip X */
+			if (bg_bank & 0x04)
 				sx = sx ^ 0x0f;
 
-			/* get the pointer to the graphics */
-			gfx_offs = (code << 4) | (sy & 0x0e) | (((sx & 0x08) >> 3));
+			/* calculate the address of the gfx data */
+			tx_gfx_offs = (tx_code << 4) | ((y & 0x07) << 1) | ((( x & 0x04) >> 2));
+			bg_gfx_offs = (bg_code << 4) | (sy & 0x0e)       | (((sx & 0x08) >> 3));
 
-			data1 = memory_region(REGION_GFX2)[0x0000 | gfx_offs];
-			data2 = memory_region(REGION_GFX2)[0x8000 | gfx_offs];
+			/* get the gfx data */
+			tx_data  = tx_gfx[         tx_gfx_offs];
+			bg_data1 = bg_gfx[0x0000 | bg_gfx_offs];
+			bg_data2 = bg_gfx[0x8000 | bg_gfx_offs];
 
-			/* the foreground pixel determines pen address bits A0-A3 */
+			/* the text layer pixel determines pen address bits A8 and A9 */
+			if (x & 0x02)
+			{
+				tx_col1 = ((tx_data  & 0x0c) << 6);
+				tx_col2 = ((tx_data  & 0x03) << 8);
+			}
+			else
+			{
+				tx_col1 = ((tx_data  & 0xc0) << 2);
+				tx_col2 = ((tx_data  & 0x30) << 4);
+			}
+
+			/* the background pixel determines pen address bits A0-A3 */
 			switch (sx & 0x06)
 			{
-			case 0x00:	col = ((data1 & 0x80) >> 4) | ((data1 & 0x08) >> 1) | ((data2 & 0x80) >> 6) | ((data2 & 0x08) >> 3); break;
-			case 0x02:	col = ((data1 & 0x40) >> 3) | ((data1 & 0x04) >> 0) | ((data2 & 0x40) >> 5) | ((data2 & 0x04) >> 2); break;
-			case 0x04:	col = ((data1 & 0x20) >> 2) | ((data1 & 0x02) << 1) | ((data2 & 0x20) >> 4) | ((data2 & 0x02) >> 1); break;
-			default:	col = ((data1 & 0x10) >> 1) | ((data1 & 0x01) << 2) | ((data2 & 0x10) >> 3) | ((data2 & 0x01) >> 0); break;
+			case 0x00: bg_col = ((bg_data1 & 0x80) >> 4) | ((bg_data1 & 0x08) >> 1) | ((bg_data2 & 0x80) >> 6) | ((bg_data2 & 0x08) >> 3); break;
+			case 0x02: bg_col = ((bg_data1 & 0x40) >> 3) | ((bg_data1 & 0x04) >> 0) | ((bg_data2 & 0x40) >> 5) | ((bg_data2 & 0x04) >> 2); break;
+			case 0x04: bg_col = ((bg_data1 & 0x20) >> 2) | ((bg_data1 & 0x02) << 1) | ((bg_data2 & 0x20) >> 4) | ((bg_data2 & 0x02) >> 1); break;
+			default:   bg_col = ((bg_data1 & 0x10) >> 1) | ((bg_data1 & 0x01) << 2) | ((bg_data2 & 0x10) >> 3) | ((bg_data2 & 0x01) >> 0); break;
 			}
 
 			/* the first pixel is smoothed via a lookup using the current and last pixel value -
                the next pixel just uses the current value directly. After we done with a pixel
                save it for later in the line buffer RAM */
-			tempcol = prom1[(last_col << 4) | col];
-			*BITMAP_ADDR32(bitmap, y, x + 0) = prom2[(background_line_buffer[x + 0] << 4) | tempcol];
-			*BITMAP_ADDR32(bitmap, y, x + 1) = prom2[(background_line_buffer[x + 1] << 4) | col];
-			background_line_buffer[x + 0] = tempcol;
-			background_line_buffer[x + 1] = col;
+			bg_tempcol = prom1[(bg_last_col << 4) | bg_col];
+			*BITMAP_ADDR32(bitmap, y, x + 0) = tx_col1 | prom2[(background_line_buffer[x + 0] << 4) | bg_tempcol];
+			*BITMAP_ADDR32(bitmap, y, x + 1) = tx_col2 | prom2[(background_line_buffer[x + 1] << 4) | bg_col];
+			background_line_buffer[x + 0] = bg_tempcol;
+			background_line_buffer[x + 1] = bg_col;
 
-			last_col = col;
+			bg_last_col = bg_col;
 		}
 	}
 }
@@ -267,9 +233,10 @@ static void draw_and_smooth_background(mame_bitmap *bitmap, const rectangle *cli
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap)
+static void draw_sprites(jedi_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
+	UINT8 *spriteram = state->spriteram;
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{
@@ -278,16 +245,16 @@ static void draw_sprites(mame_bitmap *bitmap)
 		UINT8 *gfx;
 
 		/* coordinates adjustments made to match screenshot */
-		UINT8 y = 240 - jedi_spriteram[offs + 0x80] + 1;
-		int flip_x = jedi_spriteram[offs + 0x40] & 0x10;
-		int flip_y = jedi_spriteram[offs + 0x40] & 0x20;
-		int tall = jedi_spriteram[offs + 0x40] & 0x08;
+		UINT8 y = 240 - spriteram[offs + 0x80] + 1;
+		int flip_x = spriteram[offs + 0x40] & 0x10;
+		int flip_y = spriteram[offs + 0x40] & 0x20;
+		int tall = spriteram[offs + 0x40] & 0x08;
 
 		/* shuffle the bank bits in */
-		UINT16 code = jedi_spriteram[offs] |
-					  ((jedi_spriteram[offs + 0x40] & 0x04) << 8) |
-					  ((jedi_spriteram[offs + 0x40] & 0x40) << 3) |
-					  ((jedi_spriteram[offs + 0x40] & 0x02) << 7);
+		UINT16 code = spriteram[offs] |
+					  ((spriteram[offs + 0x40] & 0x04) << 8) |
+					  ((spriteram[offs + 0x40] & 0x40) << 3) |
+					  ((spriteram[offs + 0x40] & 0x02) << 7);
 
 		/* adjust for double-height */
 		if (tall)
@@ -307,7 +274,10 @@ static void draw_sprites(mame_bitmap *bitmap)
 		for (sy = 0; sy < y_size; sy++)
 		{
 			int i;
-			UINT16 x = jedi_spriteram[offs + 0x100] + ((jedi_spriteram[offs + 0x40] & 0x01) << 8) - 2;
+			UINT16 x = spriteram[offs + 0x100] + ((spriteram[offs + 0x40] & 0x01) << 8) - 2;
+
+			if ((y < cliprect->min_y) || (y > cliprect->max_y))
+				continue;
 
 			if (flip_x)
 				x = x + 7;
@@ -357,21 +327,42 @@ static void draw_sprites(mame_bitmap *bitmap)
  *
  *************************************/
 
-VIDEO_UPDATE( jedi )
+static VIDEO_UPDATE( jedi )
 {
+	jedi_state *state = machine->driver_data;
+
 	/* if no video, clear it all to black */
-	if (video_off)
+	if (*state->video_off & 0x01)
 		fillbitmap(bitmap, RGB_BLACK, cliprect);
 	else
 	{
-		/* draw the background - it needs to be done first */
-		draw_and_smooth_background(bitmap, cliprect);
-
-		draw_foreground(bitmap);
-		draw_sprites(bitmap);
-
-		do_pen_lookup(bitmap, cliprect);
+		/* draw the background/text layers, followed by the sprites
+           - it needs to be done in this order*/
+		draw_background_and_text(state, bitmap, cliprect);
+		draw_sprites(state, bitmap, cliprect);
+		do_pen_lookup(state, bitmap, cliprect);
 	}
 
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( jedi_video )
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(64*8, 262) /* verify vert size */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
+
+	MDRV_VIDEO_START(jedi)
+	MDRV_VIDEO_UPDATE(jedi)
+MACHINE_DRIVER_END

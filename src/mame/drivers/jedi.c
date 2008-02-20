@@ -7,6 +7,11 @@
     Games supported:
         * Return of the Jedi
 
+    Notes:
+        * The schematics show the smoothing PROMs as being twice as large,
+          but the current sizes are confirmed via a PCB.  The PROMs
+          are 82S137 devices.
+
 ****************************************************************************
 
     Memory map
@@ -108,26 +113,8 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/5220intf.h"
-#include "sound/pokey.h"
 #include "jedi.h"
 
-
-/* constants */
-#define MAIN_CPU_OSC		10000000
-#define SOUND_CPU_OSC		12096000
-
-
-/* local variables */
-static UINT8 control_num;
-static UINT8 sound_latch;
-static UINT8 sound_ack_latch;
-static UINT8 sound_comm_stat;
-static UINT8 speech_write_buffer;
-static UINT8 speech_strobe_state;
-static UINT8 nvram_enabled;
-
-static emu_timer *jedi_timer;
 
 
 /*************************************
@@ -138,6 +125,7 @@ static emu_timer *jedi_timer;
 
 static TIMER_CALLBACK( generate_interrupt )
 {
+	jedi_state *state = machine->driver_data;
 	int scanline = param;
 
 	/* IRQ is set by /32V */
@@ -148,7 +136,7 @@ static TIMER_CALLBACK( generate_interrupt )
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	timer_adjust_oneshot(jedi_timer,video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
 }
 
 
@@ -158,42 +146,43 @@ static WRITE8_HANDLER( main_irq_ack_w )
 }
 
 
-static WRITE8_HANDLER( sound_irq_ack_w )
-{
-	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
-}
 
+/*************************************
+ *
+ *  Start
+ *
+ *************************************/
 
 static MACHINE_START( jedi )
 {
+	jedi_state *state = machine->driver_data;
+
 	/* set a timer to run the interrupts */
-	jedi_timer = timer_alloc(generate_interrupt, NULL);
-	timer_adjust_oneshot(jedi_timer,video_screen_get_time_until_pos(0, 32, 0), 32);
+	state->interrupt_timer = timer_alloc(generate_interrupt, NULL);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, 32, 0), 32);
 
 	/* configure the banks */
 	memory_configure_bank(1, 0, 3, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 
 	/* set up save state */
-	state_save_register_global(control_num);
-	state_save_register_global(sound_latch);
-	state_save_register_global(sound_ack_latch);
-	state_save_register_global(sound_comm_stat);
-	state_save_register_global(speech_write_buffer);
-	state_save_register_global(speech_strobe_state);
-	state_save_register_global(nvram_enabled);
+	state_save_register_global(state->nvram_enabled);
 }
 
 
+
+/*************************************
+ *
+ *  Reset
+ *
+ *************************************/
+
 static MACHINE_RESET( jedi )
 {
+	jedi_state *state = machine->driver_data;
+
 	/* init globals */
-	control_num = 0;
-	sound_latch = 0;
-	sound_ack_latch = 0;
-	sound_comm_stat = 0;
-	speech_write_buffer = 0;
-	speech_strobe_state = 0;
-	nvram_enabled = 0;
+	state->a2d_select = 0;
+	state->nvram_enabled = 0;
 }
 
 
@@ -215,91 +204,30 @@ static WRITE8_HANDLER( rom_banksel_w )
 
 /*************************************
  *
- *  Main CPU -> Sound CPU communications
- *
- *************************************/
-
-static WRITE8_HANDLER( sound_reset_w )
-{
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-}
-
-
-static TIMER_CALLBACK( delayed_sound_latch_w )
-{
-    sound_latch = param;
-    sound_comm_stat |= 0x80;
-}
-
-
-static WRITE8_HANDLER( sound_latch_w )
-{
-	timer_call_after_resynch(NULL, data, delayed_sound_latch_w);
-}
-
-
-static READ8_HANDLER( sound_latch_r )
-{
-    sound_comm_stat &= ~0x80;
-    return sound_latch;
-}
-
-
-
-/*************************************
- *
- *  Sound CPU -> Main CPU communications
- *
- *************************************/
-
-static READ8_HANDLER( sound_ack_latch_r )
-{
-    sound_comm_stat &= ~0x40;
-    return sound_ack_latch;
-}
-
-
-static WRITE8_HANDLER( sound_ack_latch_w )
-{
-    sound_ack_latch = data;
-    sound_comm_stat |= 0x40;
-}
-
-
-
-/*************************************
- *
  *  I/O ports
  *
  *************************************/
 
 static READ8_HANDLER( a2d_data_r )
 {
-	switch (control_num)
+	jedi_state *state = Machine->driver_data;
+	UINT8 ret = 0;
+
+	switch (state->a2d_select)
 	{
-		case 0:		return readinputport(2);
-		case 2:		return readinputport(3);
-		default:	return 0;
+		case 0: ret = readinputport(2); break;
+		case 2: ret = readinputport(3); break;
 	}
-    return 0;
-}
 
-
-static READ8_HANDLER( special_port1_r )
-{
-	return readinputport(1) ^ ((sound_comm_stat >> 1) & 0x60);
+	return ret;
 }
 
 
 static WRITE8_HANDLER( a2d_select_w )
 {
-    control_num = offset;
-}
+	jedi_state *state = Machine->driver_data;
 
-
-static READ8_HANDLER( soundstat_r )
-{
-    return sound_comm_stat;
+	state->a2d_select = offset;
 }
 
 
@@ -312,49 +240,24 @@ static WRITE8_HANDLER( jedi_coin_counter_w )
 
 /*************************************
  *
- *  Speech access
- *
- *************************************/
-
-static WRITE8_HANDLER( speech_data_w )
-{
-	speech_write_buffer = data;
-}
-
-
-static WRITE8_HANDLER( speech_strobe_w )
-{
-	int state = (~offset >> 8) & 1;
-
-	if ((state ^ speech_strobe_state) && state)
-		tms5220_data_w(0, speech_write_buffer);
-	speech_strobe_state = state;
-}
-
-
-static READ8_HANDLER( speech_ready_r )
-{
-    return (!tms5220_ready_r()) << 7;
-}
-
-
-
-/*************************************
- *
  *  NVRAM
  *
  *************************************/
 
 static WRITE8_HANDLER( nvram_data_w )
 {
-	if (nvram_enabled)
+	jedi_state *state = Machine->driver_data;
+
+	if (state->nvram_enabled)
 		generic_nvram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( nvram_enable_w )
 {
-	nvram_enabled = ~offset & 1;
+	jedi_state *state = Machine->driver_data;
+
+	state->nvram_enabled = ~offset & 1;
 }
 
 
@@ -367,55 +270,34 @@ static WRITE8_HANDLER( nvram_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(MRA8_RAM, nvram_data_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_0_r)
-	AM_RANGE(0x0c01, 0x0c01) AM_READ(special_port1_r)
-	AM_RANGE(0x1400, 0x1400) AM_READ(sound_ack_latch_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ(a2d_data_r)
-	AM_RANGE(0x1c00, 0x1c01) AM_WRITE(nvram_enable_w)
-	AM_RANGE(0x1c80, 0x1c82) AM_WRITE(a2d_select_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(MWA8_NOP)	/* NVRAM store */
-	AM_RANGE(0x1d80, 0x1d80) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x1e80, 0x1e81) AM_WRITE(jedi_coin_counter_w)
-	AM_RANGE(0x1e82, 0x1e83) AM_WRITE(MWA8_NOP)	/* LED control; not used */
-	AM_RANGE(0x1e84, 0x1e84) AM_WRITE(MWA8_RAM) AM_BASE(&jedi_foreground_bank)
-	AM_RANGE(0x1e86, 0x1e86) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x1e87, 0x1e87) AM_WRITE(jedi_video_off_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(sound_latch_w)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(rom_banksel_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&jedi_backgroundram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&jedi_paletteram)
-	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_BASE(&jedi_foregroundram)
-	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_BASE(&jedi_spriteram)
-	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(jedi_vscroll_w)
-	AM_RANGE(0x3d00, 0x3d01) AM_WRITE(jedi_hscroll_w)
-	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(jedi_PIXIRAM_w)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0380) AM_READWRITE(MRA8_RAM, nvram_data_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x03fe) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x1000, 0x13ff) AM_NOP
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READWRITE(jedi_audio_ack_latch_r, MWA8_NOP)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READWRITE(a2d_data_r, MWA8_NOP)
+	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, nvram_enable_w)
+	AM_RANGE(0x1c80, 0x1c82) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, a2d_select_w)
+	AM_RANGE(0x1c83, 0x1c87) AM_MIRROR(0x0078) AM_NOP
+	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, MWA8_NOP)	/* write: NVRAM store */
+	AM_RANGE(0x1d80, 0x1d80) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, watchdog_reset_w)
+	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, main_irq_ack_w)
+	AM_RANGE(0x1e80, 0x1e81) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, jedi_coin_counter_w)
+	AM_RANGE(0x1e82, 0x1e83) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, MWA8_NOP)	/* write: LED control - not used */
+	AM_RANGE(0x1e84, 0x1e84) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE_MEMBER(jedi_state, foreground_bank)
+	AM_RANGE(0x1e85, 0x1e85) AM_MIRROR(0x0078) AM_NOP
+	AM_RANGE(0x1e86, 0x1e86) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, jedi_audio_reset_w)
+	AM_RANGE(0x1e87, 0x1e87) AM_MIRROR(0x0078) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE_MEMBER(jedi_state, video_off)
+	AM_RANGE(0x1f00, 0x1f00) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, jedi_audio_latch_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x007f) AM_READWRITE(MRA8_NOP, rom_banksel_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_MEMBER(jedi_state, backgroundram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(jedi_state, paletteram)
+	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_BASE_MEMBER(jedi_state, foregroundram)
+	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_BASE_MEMBER(jedi_state, spriteram)
+	AM_RANGE(0x3c00, 0x3c01) AM_MIRROR(0x00fe) AM_READWRITE(MRA8_NOP, jedi_vscroll_w)
+	AM_RANGE(0x3d00, 0x3d01) AM_MIRROR(0x00fe) AM_READWRITE(MRA8_NOP, jedi_hscroll_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x01ff) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(jedi_state, smoothing_table)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Sound CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x080f) AM_READWRITE(pokey1_r, pokey1_w)
-	AM_RANGE(0x0810, 0x081f) AM_READWRITE(pokey2_r, pokey2_w)
-	AM_RANGE(0x0820, 0x082f) AM_READWRITE(pokey3_r, pokey3_w)
-	AM_RANGE(0x0830, 0x083f) AM_READWRITE(pokey4_r, pokey4_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x1100, 0x11ff) AM_WRITE(speech_data_w)
-	AM_RANGE(0x1200, 0x13ff) AM_WRITE(speech_strobe_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound_ack_latch_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(sound_latch_r)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(speech_ready_r)
-	AM_RANGE(0x1c01, 0x1c01) AM_READ(soundstat_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -442,7 +324,7 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* sound comm */
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jedi_audio_comm_stat_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START	/* analog Y */
@@ -462,14 +344,12 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( jedi )
 
+	MDRV_DRIVER_DATA(jedi_state)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502,MAIN_CPU_OSC/2/2)		/* 2.5MHz */
+	MDRV_CPU_ADD(M6502, JEDI_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD(M6502,SOUND_CPU_OSC/2/4)		/* 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_INTERLEAVE(4)
 
 	MDRV_MACHINE_START(jedi)
@@ -477,34 +357,10 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 262) /* verify vert size */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 30*8-1)
+	MDRV_IMPORT_FROM(jedi_video)
 
-	MDRV_VIDEO_START(jedi)
-	MDRV_VIDEO_UPDATE(jedi)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(POKEY, SOUND_CPU_OSC/2/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
-
-	MDRV_SOUND_ADD(POKEY, SOUND_CPU_OSC/2/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
-
-	MDRV_SOUND_ADD(POKEY, SOUND_CPU_OSC/2/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-
-	MDRV_SOUND_ADD(POKEY, SOUND_CPU_OSC/2/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
-
-	MDRV_SOUND_ADD(TMS5220, SOUND_CPU_OSC/2/9)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	/* audio hardware */
+	MDRV_IMPORT_FROM(jedi_audio)
 MACHINE_DRIVER_END
 
 
@@ -541,8 +397,8 @@ ROM_START( jedi )
 	ROM_LOAD( "136030-129.01k",  0x18000, 0x8000, CRC(ac86b98c) SHA1(9f86c8801a7293fa46e9432f1651dd85bf00f4b9) )
 
 	ROM_REGION( 0x1000, REGION_PROMS, 0 )	/* background smoothing */
-	ROM_LOAD( "136030-117.bin",   0x0000, 0x0400, CRC(9831bd55) SHA1(12945ef2d1582914125b9ee591567034d71d6573) ) /* Prom is a 82S137 */
-	ROM_LOAD( "136030-118.bin",   0x0800, 0x0400, CRC(261fbfe7) SHA1(efc65a74a3718563a07b718e34d8a7aa23339a69) ) /* Prom is a 82S137 */
+	ROM_LOAD( "136030-117.bin",   0x0000, 0x0400, CRC(9831bd55) SHA1(12945ef2d1582914125b9ee591567034d71d6573) )
+	ROM_LOAD( "136030-118.bin",   0x0800, 0x0400, CRC(261fbfe7) SHA1(efc65a74a3718563a07b718e34d8a7aa23339a69) )
 ROM_END
 
 
@@ -553,4 +409,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1984, jedi, 0, jedi, jedi, 0, ROT0, "Atari", "Return of the Jedi", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1984, jedi, 0, jedi, jedi, 0, ROT0, "Atari", "Return of the Jedi", GAME_SUPPORTS_SAVE )

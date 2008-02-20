@@ -1074,6 +1074,7 @@ src/mame/audio/invinco.c svneol=native#text/plain
 src/mame/audio/irem.c svneol=native#text/plain
 src/mame/audio/irem.h svneol=native#text/plain
 src/mame/audio/jaguar.c svneol=native#text/plain
+src/mame/audio/jedi.c svneol=native#text/plain
 src/mame/audio/laserbat.c svneol=native#text/plain
 src/mame/audio/leland.c svneol=native#text/plain
 src/mame/audio/llander.c svneol=native#text/plain
