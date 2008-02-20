@@ -1,16 +1,26 @@
-/* Super Kaneko Nova System */
-/* Original Driver by Sylvain Glaize */
-/* taken to pieces and attempted reconstruction by David Haywood */
+/* 
+   Super Kaneko Nova System
+    Original Driver by Sylvain Glaize
+    taken to pieces and attempted reconstruction by David Haywood
 
-/* Credits (in no particular order):
+Mainboard + Cart combo
+  Regions are not cross compatible and have thier own BIOS
+   Regions by color coded cart:
+
+    White      = Japan
+    Light Blue = USA
+    Dark Blue  = Europe
+    Green      = Asia
+    Red        = Korean
+
+  Credits (in no particular order):
    Olivier Galibert for all the assistance and information he's provided
    R.Belmont for working on the SH2 timers so sound worked
    Nicola Salmoria for hooking up the Roz and improving the dirty tile handling
    Paul Priest for a lot of things
    Stephh for spotting what was wrong with Puzz Loop's inputs
-*/
 
-/*
+
 ToDo:
    Priorities
    Transparency effects (each pen has a transparent flag, there are seperate r,g,b alpha values to be used for these pens)
