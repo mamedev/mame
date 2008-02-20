@@ -259,7 +259,7 @@ GFXDECODE_END
 
 static VIDEO_START(carrera)
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = mc6845_config(machine, NULL);
 }
 
 static VIDEO_UPDATE(carrera)

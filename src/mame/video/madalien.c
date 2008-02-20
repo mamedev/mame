@@ -171,7 +171,7 @@ static VIDEO_START( madalien )
 		NULL              /* call back for display state changes */
 	};
 
-	mc6845 = mc6845_config(&mc6845_intf);
+	mc6845 = mc6845_config(machine, &mc6845_intf);
 
 	tilemap_fg = tilemap_create(get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(tilemap_fg, 0);

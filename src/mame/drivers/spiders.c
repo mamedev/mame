@@ -434,7 +434,7 @@ static WRITE8_HANDLER( flipscreen_w )
 }
 
 
-static void *begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static void *begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* create the pens */
 	offs_t i;
@@ -449,7 +449,7 @@ static void *begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle
 }
 
 
-static void update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
+static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 					   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
 	UINT8 cx;
@@ -509,7 +509,7 @@ static void update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *c
 }
 
 
-static void display_enable_changed(mc6845_t *mc6845, int display_enabled)
+static void display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
 {
 	TTL74123_A_w(0, display_enabled);
 }
@@ -530,7 +530,7 @@ static const mc6845_interface mc6845_intf =
 static VIDEO_START( spiders )
 {
 	/* configure the CRT controller */
-	mc6845 = mc6845_config(&mc6845_intf);
+	mc6845 = mc6845_config(machine, &mc6845_intf);
 }
 
 

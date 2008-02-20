@@ -47,7 +47,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 	0x00,0x00,0x00,	0xff,0x00,0xff,	0x80,0x00,0x80,	0x40,0x00,0x40
 };
 
-static void update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
+static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
 	int cx,x;
@@ -119,7 +119,7 @@ static WRITE8_HANDLER( ssingles_mc6845_register_w )
 
 static VIDEO_START(ssingles)
 {
-	mc6845 = mc6845_config(&mc6845_intf);
+	mc6845 = mc6845_config(machine, &mc6845_intf);
 
 	{
 		int i;

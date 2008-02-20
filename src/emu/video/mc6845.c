@@ -28,6 +28,7 @@
 
 struct _mc6845_t
 {
+	running_machine *machine;
 	const mc6845_interface *intf;
 
 	/* internal registers */
@@ -68,14 +69,17 @@ static void update_timer(mc6845_t *mc6845);
 static TIMER_CALLBACK( display_enable_changed_timer_cb );
 
 
-mc6845_t *mc6845_config(const mc6845_interface *intf)
+mc6845_t *mc6845_config(running_machine *machine, const mc6845_interface *intf)
 {
 	mc6845_t *mc6845;
+
+	assert(machine != NULL);
 
 	/* allocate the object that holds the state */
 	mc6845 = auto_malloc(sizeof(*mc6845));
 	memset(mc6845, 0, sizeof(*mc6845));
 
+	mc6845->machine = machine;
 	mc6845->intf = intf;
 
 	/* create the timer if the user is interested in getting display enable
@@ -352,7 +356,7 @@ static TIMER_CALLBACK( display_enable_changed_timer_cb )
 	mc6845_t *mc6845 = ptr;
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->display_enable_changed(mc6845, is_display_enabled(mc6845));
+	mc6845->intf->display_enable_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
 
 	update_timer(mc6845);
 }
@@ -418,7 +422,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 		void *param = 0;
 
 		if (mc6845->intf->begin_update)
-			param = mc6845->intf->begin_update(mc6845, bitmap, cliprect);
+			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
 
 		/* read the start address at the beginning of the frame */
 		if (cliprect->min_y == 0)
@@ -430,7 +434,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
+			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -439,7 +443,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update)
-			mc6845->intf->end_update(mc6845, bitmap, cliprect, param);
+			mc6845->intf->end_update(mc6845->machine, mc6845, bitmap, cliprect, param);
 	}
 }
 
@@ -447,7 +451,7 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 /* device interface */
 static void *mc6845_start(running_machine *machine, const void *static_config, const void *inline_config)
 {
-	return mc6845_config(static_config);
+	return mc6845_config(machine, static_config);
 }
 
 

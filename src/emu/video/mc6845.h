@@ -36,18 +36,20 @@ struct _mc6845_interface
 	/* if specified, this gets called before any pixel update,
        optionally return a pointer that will be passed to the
        update and tear down callbacks */
-	void * (*begin_update)(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
+	void * (*begin_update)(running_machine *machine, mc6845_t *mc6845,
+						   mame_bitmap *bitmap, const rectangle *cliprect);
 
 	/* this gets called for every row, the driver must output
        x_count * hpixels_per_column pixels */
-	void (*update_row)(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-					   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+	void (*update_row)(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap,
+					   const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param);
 
 	/* if specified, this gets called after all row updating is complete */
-	void (*end_update)(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, void *param);
+	void (*end_update)(running_machine *machine, mc6845_t *mc6845,
+					   mame_bitmap *bitmap, const rectangle *cliprect, void *param);
 
 	/* if specified, this gets called for every change of the disply enable (DT pin 18) */
-	void (*display_enable_changed)(mc6845_t *mc6845, int display_enabled);
+	void (*display_enable_changed)(running_machine *machine, mc6845_t *mc6845, int display_enabled);
 };
 
 
@@ -56,15 +58,15 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 
 /* use mc6845_init to set up for save states.
    if intf is NULL, the emulator will NOT call video_configure_screen() */
-mc6845_t *mc6845_config(const mc6845_interface *intf);
+mc6845_t *mc6845_config(running_machine *machine, const mc6845_interface *intf);
 
-/* selects one of the registers for reading or writing */
+/* select one of the registers for reading or writing */
 void mc6845_address_w(mc6845_t *mc6845, UINT8 data);
 
-/* reads the currently selected register */
+/* read from the currently selected register */
 UINT8 mc6845_register_r(mc6845_t *mc6845);
 
-/* writes the currently selected register */
+/* write to the currently selected register */
 void mc6845_register_w(mc6845_t *mc6845, UINT8 data);
 
 /* return the current value on the MA0-MA13 pins */

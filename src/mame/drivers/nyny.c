@@ -288,7 +288,7 @@ static WRITE8_HANDLER( flipscreen_w )
 }
 
 
-static void *nyny_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static void *nyny_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	/* create the pens */
 	offs_t i;
@@ -303,7 +303,7 @@ static void *nyny_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rect
 }
 
 
-static void nyny_update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
+static void nyny_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 							UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
 	UINT8 cx;
@@ -373,9 +373,9 @@ INLINE void shift_star_generator(void)
 }
 
 
-static void nyny_end_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, void *param)
+static void nyny_end_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, void *param)
 {
-	/* the the star field into the bitmap */
+	/* draw the star field into the bitmap */
 	int y;
 
 	pen_t *pens = (pen_t *)param;
@@ -409,7 +409,7 @@ static void nyny_end_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectang
 }
 
 
-static void nyny_display_enable_changed(mc6845_t *mc6845, int display_enabled)
+static void nyny_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
 {
 	TTL74123_A_w(0, display_enabled);
 }
@@ -430,7 +430,7 @@ static const mc6845_interface mc6845_intf =
 static VIDEO_START( nyny )
 {
 	/* configure the CRT controller */
-	mc6845 = mc6845_config(&mc6845_intf);
+	mc6845 = mc6845_config(machine, &mc6845_intf);
 }
 
 

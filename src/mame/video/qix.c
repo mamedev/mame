@@ -7,21 +7,9 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/mc6845.h"
 #include "qix.h"
-
-
-/* Globals */
-UINT8 *qix_videoaddress;
-UINT8 qix_cocktail_flip;
-
-
-/* Local variables */
-static mc6845_t *mc6845;
-static UINT8 vram_mask;
-static UINT8 qix_palettebank;
-static UINT8 leds;
-static UINT8 scanline_latch;
 
 
 
@@ -31,11 +19,13 @@ static UINT8 scanline_latch;
  *
  *************************************/
 
-static void qix_display_enable_changed(mc6845_t *mc6845, int display_enabled);
+static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
 
-static void *qix_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
+static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
 
-static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap,
+static void qix_update_row(running_machine *machine,
+						   mc6845_t *mc6845,
+						   mame_bitmap *bitmap,
 						   const rectangle *cliprect,
 						   UINT16 ma,
 						   UINT8 ra,
@@ -47,7 +37,7 @@ static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap,
 
 /*************************************
  *
- *  Video startup
+ *  Start
  *
  *************************************/
 
@@ -65,21 +55,23 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_START( qix )
 {
+	qix_state *state = machine->driver_data;
+
 	/* get the pointer to the mc6845 object */
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+	state->mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	/* allocate memory for the full video RAM */
-	videoram = auto_malloc(256 * 256);
+	state->videoram = auto_malloc(256 * 256);
 
 	/* initialize the mask for games that don't use it */
-	vram_mask = 0xff;
+	state->vram_mask = 0xff;
 
 	/* set up save states */
-	state_save_register_global_pointer(videoram, 256 * 256);
-	state_save_register_global(qix_cocktail_flip);
-	state_save_register_global(vram_mask);
-	state_save_register_global(qix_palettebank);
-	state_save_register_global(leds);
+	state_save_register_global_pointer(state->videoram, 256 * 256);
+	state_save_register_global(state->flip_screen);
+	state_save_register_global(state->vram_mask);
+	state_save_register_global(state->palette_bank);
+	state_save_register_global(state->leds);
 }
 
 
@@ -90,8 +82,10 @@ static VIDEO_START( qix )
  *
  *************************************/
 
-static void qix_display_enable_changed(mc6845_t *mc6845, int display_enabled)
+static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
 {
+	qix_state *state = machine->driver_data;
+
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
 	{
@@ -99,14 +93,8 @@ static void qix_display_enable_changed(mc6845_t *mc6845, int display_enabled)
 		UINT8 ra = mc6845_get_ra(mc6845);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
-		scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
+		*state->scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
 	}
-}
-
-
-READ8_HANDLER( qix_scanline_r )
-{
-	return scanline_latch;
 }
 
 
@@ -117,12 +105,29 @@ READ8_HANDLER( qix_scanline_r )
  *
  *************************************/
 
-WRITE8_HANDLER( slither_vram_mask_w )
+static WRITE8_HANDLER( slither_vram_mask_w )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* Slither appears to extend the basic hardware by providing */
 	/* a mask register which controls which data bits get written */
 	/* to video RAM */
-	vram_mask = data;
+	state->vram_mask = data;
+}
+
+
+
+/*************************************
+ *
+ *  Cocktail flip
+ *
+ *************************************/
+
+WRITE8_HANDLER( qix_flip_screen_w )
+{
+	qix_state *state = Machine->driver_data;
+
+	state->flip_screen = data;
 }
 
 
@@ -142,25 +147,29 @@ WRITE8_HANDLER( slither_vram_mask_w )
  *
  *************************************/
 
-READ8_HANDLER( qix_videoram_r )
+static READ8_HANDLER( qix_videoram_r )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* add in the upper bit of the address latch */
-	offset += (qix_videoaddress[0] & 0x80) << 8;
-	return videoram[offset];
+	offset += (state->videoram_address[0] & 0x80) << 8;
+	return state->videoram[offset];
 }
 
 
-WRITE8_HANDLER( qix_videoram_w )
+static WRITE8_HANDLER( qix_videoram_w )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
 	video_screen_update_now(0);
 
 	/* add in the upper bit of the address latch */
-	offset += (qix_videoaddress[0] & 0x80) << 8;
+	offset += (state->videoram_address[0] & 0x80) << 8;
 
 	/* blend the data */
-	videoram[offset] = (videoram[offset] & ~vram_mask) | (data & vram_mask);
+	state->videoram[offset] = (state->videoram[offset] & ~state->vram_mask) | (data & state->vram_mask);
 }
 
 
@@ -180,22 +189,26 @@ WRITE8_HANDLER( qix_videoram_w )
  *
  *************************************/
 
-READ8_HANDLER( qix_addresslatch_r )
+static READ8_HANDLER( qix_addresslatch_r )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* compute the value at the address latch */
-	offset = (qix_videoaddress[0] << 8) | qix_videoaddress[1];
-	return videoram[offset];
+	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
+	return state->videoram[offset];
 }
 
 
 
-WRITE8_HANDLER( qix_addresslatch_w )
+static WRITE8_HANDLER( qix_addresslatch_w )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* compute the value at the address latch */
-	offset = (qix_videoaddress[0] << 8) | qix_videoaddress[1];
+	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
 
 	/* blend the data */
-	videoram[offset] = (videoram[offset] & ~vram_mask) | (data & vram_mask);
+	state->videoram[offset] = (state->videoram[offset] & ~state->vram_mask) | (data & state->vram_mask);
 }
 
 
@@ -209,15 +222,17 @@ WRITE8_HANDLER( qix_addresslatch_w )
 #define NUM_PENS	(0x100)
 
 
-WRITE8_HANDLER( qix_paletteram_w )
+static WRITE8_HANDLER( qix_paletteram_w )
 {
-	UINT8 old_data = paletteram[offset];
+	qix_state *state = Machine->driver_data;
+
+	UINT8 old_data = state->paletteram[offset];
 
 	/* set the palette RAM value */
-	paletteram[offset] = data;
+	state->paletteram[offset] = data;
 
 	/* trigger an update if a currently visible pen has changed */
-	if (((offset >> 8) == qix_palettebank) &&
+	if (((offset >> 8) == state->palette_bank) &&
 	    (old_data != data))
 		video_screen_update_now(0);
 }
@@ -225,19 +240,21 @@ WRITE8_HANDLER( qix_paletteram_w )
 
 WRITE8_HANDLER( qix_palettebank_w )
 {
+	qix_state *state = Machine->driver_data;
+
 	/* set the bank value */
-	if (qix_palettebank != (data & 3))
+	if (state->palette_bank != (data & 3))
 	{
 		video_screen_update_now(0);
-		qix_palettebank = data & 3;
+		state->palette_bank = data & 3;
 	}
 
 	/* LEDs are in the upper 6 bits */
-	leds = ~data & 0xfc;
+	state->leds = ~data & 0xfc;
 }
 
 
-static void get_pens(pen_t *pens)
+static void get_pens(qix_state *state, pen_t *pens)
 {
 	offs_t offs;
 
@@ -264,11 +281,11 @@ static void get_pens(pen_t *pens)
 		0xff	/* value = 3, intensity = 3 */
 	};
 
-	for (offs = qix_palettebank << 8; offs < (qix_palettebank << 8) + NUM_PENS; offs++)
+	for (offs = state->palette_bank << 8; offs < (state->palette_bank << 8) + NUM_PENS; offs++)
 	{
 		int bits, intensity, r, g, b;
 
-		UINT8 data = paletteram[offs];
+		UINT8 data = state->paletteram[offs];
 
 		/* compute R, G, B from the table */
 		intensity = (data >> 0) & 0x03;
@@ -292,21 +309,27 @@ static void get_pens(pen_t *pens)
  *
  *************************************/
 
-WRITE8_HANDLER( qix_mc6845_address_w )
+static WRITE8_HANDLER( qix_mc6845_address_w )
 {
-	mc6845_address_w(mc6845, data);
+	qix_state *state = Machine->driver_data;
+
+	mc6845_address_w(state->mc6845, data);
 }
 
 
-READ8_HANDLER( qix_mc6845_register_r )
+static READ8_HANDLER( qix_mc6845_register_r )
 {
-	return mc6845_register_r(mc6845);
+	qix_state *state = Machine->driver_data;
+
+	return mc6845_register_r(state->mc6845);
 }
 
 
-WRITE8_HANDLER( qix_mc6845_register_w )
+static WRITE8_HANDLER( qix_mc6845_register_w )
 {
-	mc6845_register_w(mc6845, data);
+	qix_state *state = Machine->driver_data;
+
+	mc6845_register_w(state->mc6845, data);
 }
 
 
@@ -318,8 +341,10 @@ WRITE8_HANDLER( qix_mc6845_register_w )
  *
  *************************************/
 
-static void *qix_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
 {
+	qix_state *state = machine->driver_data;
+
 #if 0
 	// note the confusing bit order!
 	popmessage("self test leds: %d%d %d%d%d%d",BIT(leds,7),BIT(leds,5),BIT(leds,6),BIT(leds,4),BIT(leds,2),BIT(leds,3));
@@ -328,15 +353,16 @@ static void *qix_begin_update(mc6845_t *mc6845, mame_bitmap *bitmap, const recta
 	/* create the pens */
 	static pen_t pens[NUM_PENS];
 
-	get_pens(pens);
+	get_pens(state, pens);
 
 	return pens;
 }
 
 
-static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
+static void qix_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
 						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
 {
+	qix_state *state = machine->driver_data;
 	UINT16 x;
 	UINT8 scanline[256];
 
@@ -344,10 +370,10 @@ static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangl
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);
-	offs_t offs_xor = qix_cocktail_flip ? 0xffff : 0;
+	offs_t offs_xor = state->flip_screen ? 0xffff : 0;
 
 	for (x = 0; x < x_count * 8; x++)
-		scanline[x] = videoram[(offs + x) ^ offs_xor];
+		scanline[x] = state->videoram[(offs + x) ^ offs_xor];
 
 	draw_scanline8(bitmap, 0, y, x_count * 8, scanline, pens, -1);
 }
@@ -362,10 +388,73 @@ static void qix_update_row(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangl
 
 static VIDEO_UPDATE( qix )
 {
-	mc6845_update(mc6845, bitmap, cliprect);
+	qix_state *state = machine->driver_data;
+
+	mc6845_update(state->mc6845, bitmap, cliprect);
 
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03fe) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8801, 0x8801) AM_MIRROR(0x03fe) AM_WRITE(zoo_bankswitch_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_WRITE(qix_palettebank_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x03fe) AM_READWRITE(qix_data_firq_r, qix_data_firq_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_video_firq_ack_r, qix_video_firq_ack_w)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, qix_paletteram_w) AM_BASE_MEMBER(qix_state, paletteram)
+	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
+	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITE(slither_vram_mask_w)
+	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 
 
@@ -376,6 +465,9 @@ static VIDEO_UPDATE( qix )
  *************************************/
 
 MACHINE_DRIVER_START( qix_video )
+	MDRV_CPU_ADD_TAG("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MDRV_CPU_PROGRAM_MAP(qix_video_map,0)
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)
@@ -386,4 +478,16 @@ MACHINE_DRIVER_START( qix_video )
 	MDRV_SCREEN_ADD("main", 0)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( zookeep_video )
+	MDRV_CPU_MODIFY("video")
+	MDRV_CPU_PROGRAM_MAP(zookeep_video_map,0)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( slither_video )
+	MDRV_CPU_REPLACE("video", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MDRV_CPU_PROGRAM_MAP(slither_video_map,0)
 MACHINE_DRIVER_END

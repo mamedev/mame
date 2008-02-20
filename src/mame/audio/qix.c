@@ -5,6 +5,8 @@
 *************************************************************************/
 #include "driver.h"
 #include "qix.h"
+#include "machine/6821pia.h"
+#include "sound/sn76496.h"
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
@@ -15,7 +17,7 @@
 
 
 /***************************************************************************
-Sound handlers
+Audio handlers
 ***************************************************************************/
 
 WRITE8_HANDLER( qix_dac_w )
@@ -76,3 +78,53 @@ DISCRETE_SOUND_START(qix)
 	DISCRETE_OUTPUT(NODE_13, 1)
 	DISCRETE_OUTPUT(NODE_23, 1)
 DISCRETE_SOUND_END
+
+
+
+/*************************************
+ *
+ *  Audio CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_READWRITE(pia_5_r, pia_5_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_READWRITE(pia_4_r, pia_4_w)
+	AM_RANGE(0xd000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( qix_audio )
+	MDRV_CPU_ADD_TAG("audio", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
+
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD_TAG("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(qix)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( slither_audio )
+	MDRV_CPU_REMOVE("audio")
+
+	MDRV_SPEAKER_REMOVE("left")
+	MDRV_SPEAKER_REMOVE("right")
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_REPLACE("discrete", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(SN76489, SLITHER_CLOCK_OSC/4/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_DRIVER_END

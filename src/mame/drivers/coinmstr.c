@@ -544,7 +544,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( coinmstr )
 {
-	mc6845 = mc6845_config(NULL);
+	mc6845 = mc6845_config(machine, NULL);
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows, 8, 8, 46, 64);
 }
 
