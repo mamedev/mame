@@ -13,7 +13,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define ARRAY_LENGTH(x)            (sizeof(x) / sizeof(x[0]))
+#define ARRAY_LENGTH(x)		(sizeof(x) / sizeof(x[0]))
+#define BUILD_WINDOWS		(0)
+#define BUILD_WINUI			(1)
+#define BUILD_MESS			(2)
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -37,6 +40,13 @@ struct _version_info
 	const char *product_name;
 };
 
+
+
+//============================================================
+// STATIC
+//============================================================
+
+static int build;
 
 
 //============================================================
@@ -160,6 +170,16 @@ static int parse_version(char *str, int *version_major, int *version_minor, int 
 //============================================================
 //  main
 //============================================================
+static int usage(char *me)
+{
+	fprintf(stderr, "Usage: %s [-b windows|winui|mess] <filename>\n", me);
+	return 1;
+}
+
+
+//============================================================
+//  main
+//============================================================
 
 int main(int argc, char *argv[])
 {
@@ -167,22 +187,43 @@ int main(int argc, char *argv[])
 	char legal_copyright[512];
 	char *buffer;
 	size_t size;
+	int opt;
 	FILE *f;
 
 	memset(&v, 0, sizeof(v));
-
+	build = BUILD_WINDOWS;
+	
 	// validate parameters
-	if (argc < 2)
+	opt = 1;
+	while (opt < argc && *argv[opt] == '-')
 	{
-		printf("Usage: %s <filename>\n", argv[0]);
-		return 0;
+		if (!strcmp(argv[opt], "-b"))
+		{
+			char *p = argv[++opt];
+			if (!strcmp(p,"windows"))
+				build = BUILD_WINDOWS;
+			else if (!strcmp(p,"winui"))
+				build = BUILD_WINUI;
+			else if (!strcmp(p,"mess"))
+				build = BUILD_MESS;
+			else
+				return usage(argv[0]);
+		}
+		else
+			return usage(argv[0]);
+		opt++;
+	}
+		
+	if (opt != argc-1 )
+	{
+		return usage(argv[0]);
 	}
 
 	// open the file
-	f = fopen(argv[1], "rb");
+	f = fopen(argv[argc-1], "rb");
 	if (f == NULL)
 	{
-		fprintf(stderr, "Error opening file %s\n", argv[1]);
+		fprintf(stderr, "Error opening file %s\n", argv[argc-1]);
 		return 1;
 	}
 
@@ -209,34 +250,39 @@ int main(int argc, char *argv[])
 	if (parse_version(buffer, &v.version_major, &v.version_minor, &v.version_build, &v.version_string))
 		return 1;
 
-#ifdef MESS
-	// MESS
-	v.author = "MESS Team";
-	v.comments = "Multi Emulation Super System";
-	v.company_name = "MESS Team";
-	v.file_description = "Multi Emulation Super System";
-	v.internal_name = "MESS";
-	v.original_filename = "MESS";
-	v.product_name = "MESS";
-#elif defined(WINUI)
-	// MAMEUI
-	v.author = "Christopher Kirmse and the MAMEUI team";
-	v.comments = "Multiple Arcade Machine Emulator with GUI";
-	v.company_name = "MAME Team";
-	v.file_description = "Multiple Arcade Machine Emulator with GUI";
-	v.internal_name = "MAMEUI";
-	v.original_filename = "MAMEUI";
-	v.product_name = "MAMEUI";
-#else
-	// MAME
-	v.author = "Nicola Salmoria and the MAME Team";
-	v.comments = "Multiple Arcade Machine Emulator";
-	v.company_name = "MAME Team";
-	v.file_description = "Multiple Arcade Machine Emulator";
-	v.internal_name = "MAME";
-	v.original_filename = "MAME";
-	v.product_name = "MAME";
-#endif
+	if (build == BUILD_MESS)
+	{
+		// MESS
+		v.author = "MESS Team";
+		v.comments = "Multi Emulation Super System";
+		v.company_name = "MESS Team";
+		v.file_description = "Multi Emulation Super System";
+		v.internal_name = "MESS";
+		v.original_filename = "MESS";
+		v.product_name = "MESS";
+	}
+	else if (build == BUILD_WINUI)
+	{
+		// MAMEUI
+		v.author = "Christopher Kirmse and the MAMEUI team";
+		v.comments = "Multiple Arcade Machine Emulator with GUI";
+		v.company_name = "MAME Team";
+		v.file_description = "Multiple Arcade Machine Emulator with GUI";
+		v.internal_name = "MAMEUI";
+		v.original_filename = "MAMEUI";
+		v.product_name = "MAMEUI";
+	} 
+	else
+	{
+		// MAME
+		v.author = "Nicola Salmoria and the MAME Team";
+		v.comments = "Multiple Arcade Machine Emulator";
+		v.company_name = "MAME Team";
+		v.file_description = "Multiple Arcade Machine Emulator";
+		v.internal_name = "MAME";
+		v.original_filename = "MAME";
+		v.product_name = "MAME";
+	}
 
 	// build legal_copyright string
 	v.legal_copyright = legal_copyright;

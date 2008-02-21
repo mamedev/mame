@@ -9,11 +9,6 @@
 #
 ###########################################################################
 
-
-BUILDSRC = $(SRC)/build
-BUILDOBJ = $(OBJ)/build
-BUILDOUT = $(BUILDOBJ)
-
 OBJDIRS += \
 	$(BUILDOBJ) \
 
@@ -23,8 +18,10 @@ OBJDIRS += \
 # set of build targets
 #-------------------------------------------------
 
-FILE2STR = $(BUILDOUT)/file2str$(EXE)
-PNG2BDC = $(BUILDOUT)/png2bdc$(EXE)
+FILE2STR = $(BUILDOUT)/file2str$(BUILD_EXE)
+PNG2BDC = $(BUILDOUT)/png2bdc$(BUILD_EXE)
+VERINFO = $(BUILDOUT)/verinfo$(BUILD_EXE)
+
 VERINFO = $(BUILDOUT)/verinfo$(EXE)
 
 ifneq ($(CROSS_BUILD),1)
