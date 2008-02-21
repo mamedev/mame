@@ -1112,7 +1112,7 @@ int sprintf_game_info(char *buffer)
 	{
 		int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
 		const screen_config *scrconfig = device->inline_config;
-		
+
 		if (scrcount > 1)
 			bufptr += sprintf(bufptr, "Screen %d: ", index + 1);
 

@@ -66,9 +66,9 @@ Note :
 =======
  - To enter test mode, press coin 2 key at start in Argus and Valtric.
  - DIP locations verified for:
-	butasan
-	argus
-	valtric
+    butasan
+    argus
+    valtric
 
 
 Known issues :

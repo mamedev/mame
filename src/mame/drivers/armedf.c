@@ -144,10 +144,10 @@ Stephh's notes (based on the games M68000 code and some tests) :
     2005-04-02  Sebastien Chevalier : various update to video on terrafu, plus some typos here and there
 
 
-	DIP locations verified for:
-	-cclimbr2 
-	-legion
-	-terraf
+    DIP locations verified for:
+    -cclimbr2
+    -legion
+    -terraf
 
 */
 
@@ -502,12 +502,12 @@ static INPUT_PORTS_START( armedf )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "6" )
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "20k" )
-	PORT_DIPSETTING(    0x00, "40k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "80k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "20k" )
+    PORT_DIPSETTING(    0x00, "40k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "80k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 80k" )
@@ -595,12 +595,12 @@ static INPUT_PORTS_START( terraf )
 
 	PORT_MODIFY("DSW0")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "20k" )
-	PORT_DIPSETTING(    0x00, "50k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "90k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "20k" )
+    PORT_DIPSETTING(    0x00, "50k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "20k then every 60k" )
 	PORT_DIPSETTING(    0x04, "20k then every 90k" )
@@ -628,12 +628,12 @@ static INPUT_PORTS_START( kodure )
 
 	PORT_MODIFY("DSW0")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )				PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( None ) )
-	PORT_DIPSETTING(    0x00, "50k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )				PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "60k" )
-	PORT_DIPSETTING(    0x00, "90k" )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, DEF_STR( None ) )
+    PORT_DIPSETTING(    0x00, "50k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "60k" )
+    PORT_DIPSETTING(    0x00, "90k" )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )			PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, "50k then every 60k" )
 	PORT_DIPSETTING(    0x00, "50k then every 90k" )
@@ -680,12 +680,12 @@ static INPUT_PORTS_START( cclimbr2 )
 
 	PORT_MODIFY("DSW0")
 	/* SW1:3,4 defined in manual/test-mode as:
-	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )					PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "30k" )
-	PORT_DIPSETTING(    0x00, "60k" )
-	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )					PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, "70k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
+    PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )                    PORT_DIPLOCATION("SW1:3")
+    PORT_DIPSETTING(    0x04, "30k" )
+    PORT_DIPSETTING(    0x00, "60k" )
+    PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )                    PORT_DIPLOCATION("SW1:4")
+    PORT_DIPSETTING(    0x08, "70k" )
+    PORT_DIPSETTING(    0x00, DEF_STR( None ) )*/
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )				PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x0c, "30K and 100k" )
 	PORT_DIPSETTING(    0x08, "60k and 130k" )

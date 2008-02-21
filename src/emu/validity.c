@@ -100,7 +100,7 @@ INLINE UINT32 quark_string_crc(const char *string)
 
 /*-------------------------------------------------
     quark_add - add a quark to the table and
-	connect it to the hash tables
+    connect it to the hash tables
 -------------------------------------------------*/
 
 INLINE void quark_add(quark_table *table, int index, UINT32 crc)
@@ -114,7 +114,7 @@ INLINE void quark_add(quark_table *table, int index, UINT32 crc)
 
 
 /*-------------------------------------------------
-    quark_table_get_first - return a pointer to the 
+    quark_table_get_first - return a pointer to the
     first hash entry connected to a CRC
 -------------------------------------------------*/
 
@@ -130,7 +130,7 @@ INLINE quark_entry *quark_table_get_first(quark_table *table, UINT32 crc)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    quark_table_alloc - allocate an array of 
+    quark_table_alloc - allocate an array of
     quark entries and a hash table
 -------------------------------------------------*/
 
@@ -158,7 +158,7 @@ static quark_table *quark_table_alloc(UINT32 entries, UINT32 hashsize)
 
 
 /*-------------------------------------------------
-    quark_tables_create - build "quarks" for fast 
+    quark_tables_create - build "quarks" for fast
     string operations
 -------------------------------------------------*/
 
@@ -782,7 +782,7 @@ static int validate_display(int drivnum, const machine_config *drv)
 	for (device = video_screen_first(drv); device != NULL; device = video_screen_next(device))
 	{
 		const screen_config *scrconfig = device->inline_config;
-	
+
 		/* sanity check dimensions */
 		if ((scrconfig->defstate.width <= 0) || (scrconfig->defstate.height <= 0))
 		{
@@ -1450,7 +1450,7 @@ int mame_validitychecks(const game_driver *curdriver)
 		sound_checks -= osd_profiling_ticks();
 		error = validate_sound(drivnum, config) || error;
 		sound_checks += osd_profiling_ticks();
-		
+
 		machine_config_free(config);
 	}
 

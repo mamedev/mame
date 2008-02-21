@@ -359,7 +359,7 @@ static void print_game_bios(FILE *out, const game_driver *game)
 	/* skip if no ROMs */
 	if (game->rom == NULL)
 		return;
-	
+
 	/* iterate over ROM entries and look for BIOSes */
 	for (rom = game->rom; !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
@@ -407,7 +407,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
 				continue;
 
-			/* iterate through ROM entries */		
+			/* iterate through ROM entries */
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 			{
 				int is_bios = ROM_GETBIOSFLAGS(rom);
@@ -417,7 +417,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 				const rom_entry *chunk;
 				char bios_name[100];
 				int length;
-				
+
 				/* BIOS ROMs only apply to bioses */
 				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
 					continue;
@@ -431,7 +431,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 				if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
 				{
 					const rom_entry *pregion, *prom;
-					
+
 					/* scan the clone_of ROM for a matching ROM entry */
 					for (pregion = rom_first_region(clone_of); pregion != NULL; pregion = rom_next_region(pregion))
 						for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
@@ -478,7 +478,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 				{
 					char checksum[HASH_BUF_SIZE];
 					int hashtype;
-					
+
 					/* iterate over hash function types and print out their values */
 					for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
 						if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
@@ -551,7 +551,7 @@ static void print_game_rom(FILE *out, const game_driver *game)
 						fprintf(out, " dispose=\"yes\"");
 					fprintf(out, " offset=\"%x\"", offset);
 				}
-				
+
 				/* for disk entries, add the disk index */
 				else
 					fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
@@ -579,12 +579,12 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 			if (samplenames != NULL)
 			{
 				int sampnum;
-				
+
 				/* iterate over sample names */
 				for (sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
 				{
 					const char *cursampname = samplenames[sampnum];
-					
+
 					/* only output sampleof if different from the game name */
 					if (cursampname[0] == '*' && strcmp(cursampname + 1, game->name) != 0)
 						fprintf(out, " sampleof=\"%s\"", xml_normalize_string(cursampname + 1));
@@ -596,7 +596,7 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 
 /*-------------------------------------------------
-    print_game_sample - print a list of all 
+    print_game_sample - print a list of all
     samples referenced by a game_driver
 -------------------------------------------------*/
 
@@ -613,17 +613,17 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 			if (samplenames != NULL)
 			{
 				int sampnum;
-				
+
 				/* iterate over sample names */
 				for (sampnum = 0; samplenames[sampnum] != NULL; sampnum++)
 				{
 					const char *cursampname = samplenames[sampnum];
 					int dupnum;
-				
+
 					/* ignore the special '*' samplename */
 					if (sampnum == 0 && cursampname[0] == '*')
 						continue;
-					
+
 					/* filter out duplicates */
 					for (dupnum = 0; dupnum < sampnum; dupnum++)
 						if (strcmp(samplenames[dupnum], cursampname) == 0)
@@ -682,14 +682,14 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *screen;
-	
+
 	/* iterate over screens */
 	for (screen = video_screen_first(config); screen != NULL; screen = video_screen_next(screen))
 	{
 		const screen_config *scrconfig = screen->inline_config;
-	
+
 		fprintf(out, "\t\t<display");
-		
+
 		switch (scrconfig->type)
 		{
 			case SCREEN_TYPE_RASTER:	fprintf(out, " type=\"raster\"");	break;
@@ -915,7 +915,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
-	
+
 	/* release resources */
 	end_resource_tracking();
 	machine_config_free(config);
@@ -930,7 +930,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 void print_mame_xml(FILE *out, const game_driver *const games[], const char *gamename)
 {
 	int drvnum;
-	
+
 	fprintf(out,
 		"<?xml version=\"1.0\"?>\n"
 		"<!DOCTYPE " XML_ROOT " [\n"

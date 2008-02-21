@@ -13,11 +13,11 @@
         * measured against a real PCB, the games run slightly too fast
           in spite of accurately measured VBLANK timings
 
-	DIP locations verified for:
-		* ultennis (manual+test mode)
-		* cheesech (test mode)
-		* stonebal (test mode)
-		* stoneba2 (test mode)
+    DIP locations verified for:
+        * ultennis (manual+test mode)
+        * cheesech (test mode)
+        * stonebal (test mode)
+        * stoneba2 (test mode)
 
 ***************************************************************************/
 

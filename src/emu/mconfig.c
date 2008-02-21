@@ -26,13 +26,13 @@
 machine_config *machine_config_alloc(void (*constructor)(machine_config *))
 {
 	machine_config *config;
-	
+
 	/* allocate a new configuration object */
 	config = malloc_or_die(sizeof(*config));
 	if (config == NULL)
 		return NULL;
 	memset(config, 0, sizeof(*config));
-	
+
 	/* call the function to construct the data */
 	(*constructor)(config);
 	return config;

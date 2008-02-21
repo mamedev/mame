@@ -1355,7 +1355,7 @@ static int get_variable_value(const char *string, char **outputptr)
 	{
 		int scrnum = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
 		const screen_config *scrconfig = device->inline_config;
-	
+
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))

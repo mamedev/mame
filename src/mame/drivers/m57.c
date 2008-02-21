@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( m57 )
 	PORT_START_TAG("IN0")
 	/* Start 1 & 2 also restarts and freezes the game with stop mode on
-	   and are used in test mode to enter and esc the various tests */
+       and are used in test mode to enter and esc the various tests */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	/* coin input must be active for 19 frames to be consistently recognized */

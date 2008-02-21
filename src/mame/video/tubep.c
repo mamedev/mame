@@ -839,7 +839,7 @@ VIDEO_UPDATE( rjammer )
                         PIN15 = select prom @16B (active low)
                         PIN16 = select prom @16A (active low)
                         PINs: 1,2,3,4,5 and 7,14 are used for priority system
-					*/
+                    */
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);

@@ -166,11 +166,11 @@ int sign_of(int n)
 
 void zero(int n,int sign)
 {
-if (sign == 0) 
+if (sign == 0)
 	sh4.fr[n] = 0x00000000;
-else 
+else
 	sh4.fr[n] = 0x80000000;
-if ((sh4.fpscr & PR) == 1) 
+if ((sh4.fpscr & PR) == 1)
 	sh4.fr[n+1] = 0x00000000;
 }
 
@@ -183,53 +183,53 @@ UINT32 abs;
 		if (abs < 0x00800000) {
 			if (((sh4.fpscr & DN) == 1) || (abs == 0x00000000)) {
 				if (sign_of(n) == 0) {
-					zero(n, 0); 
+					zero(n, 0);
 					return(SH4_FPU_PZERO);
 				} else {
-					zero(n, 1); 
+					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else 
+			} else
 				return(SH4_FPU_DENORM);
-		} else 
-			if (abs < 0x7f800000) 
+		} else
+			if (abs < 0x7f800000)
 				return(SH4_FPU_NORM);
-			else 
+			else
 				if (abs == 0x7f800000) {
-					if (sign_of(n) == 0) 
+					if (sign_of(n) == 0)
 						return(SH4_FPU_PINF);
-					else 
+					else
 						return(SH4_FPU_NINF);
-				} else 
-					if (abs < 0x7fc00000) 
+				} else
+					if (abs < 0x7fc00000)
 						return(SH4_FPU_qNaN);
-					else 
+					else
 						return(SH4_FPU_sNaN);
 	} else { /* Double-precision */
 		if (abs < 0x00100000) {
 			if (((sh4.fpscr & DN) == 1) || ((abs == 0x00000000) && (sh4.fr[n+1] == 0x00000000))) {
 				if(sign_of(n) == 0) {
-					zero(n, 0); 
+					zero(n, 0);
 					return(SH4_FPU_PZERO);
 				} else {
-					zero(n, 1); 
+					zero(n, 1);
 					return(SH4_FPU_NZERO);
 				}
-			} else 
+			} else
 				return(SH4_FPU_DENORM);
 		} else
-			if (abs < 0x7ff00000) 
+			if (abs < 0x7ff00000)
 				return(SH4_FPU_NORM);
-			else 
+			else
 				if ((abs == 0x7ff00000) && (sh4.fr[n+1] == 0x00000000)) {
-					if (sign_of(n) == 0) 
+					if (sign_of(n) == 0)
 						return(SH4_FPU_PINF);
-					else 
+					else
 						return(SH4_FPU_NINF);
-				} else 
-					if (abs < 0x7ff80000) 
+				} else
+					if (abs < 0x7ff80000)
 						return(SH4_FPU_qNaN);
-					else 
+					else
 						return(SH4_FPU_sNaN);
 	}
 	return(SH4_FPU_NORM);
@@ -3383,7 +3383,7 @@ INLINE void FSRRA(UINT32 n)
 INLINE void FSSCA(UINT32 n)
 {
 float angle;
-	
+
 	angle = (((float)(sh4.fpul & 0xFFFF)) / 65536.0) * 2.0 * M_PI;
 	FP_RFS(n) = sinf(angle);
 	FP_RFS(n+1) = cosf(angle);

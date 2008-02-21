@@ -1,6 +1,6 @@
 /*
 
-	Sega/Yamaha AICA emulation	
+    Sega/Yamaha AICA emulation
 */
 
 #ifndef _AICA_H_
@@ -8,7 +8,7 @@
 
 #define MAX_AICA	(2)
 
-struct AICAinterface 
+struct AICAinterface
 {
 	int region;				/* region of 2M/8M RAM */
 	int roffset;				/* offset in the region */

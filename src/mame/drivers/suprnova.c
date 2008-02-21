@@ -1,4 +1,4 @@
-/* 
+/*
    Super Kaneko Nova System
     Original Driver by Sylvain Glaize
     taken to pieces and attempted reconstruction by David Haywood

@@ -11,7 +11,7 @@
 #define IREM_Z80_COINAGE_TYPE_1_LOC(DIPBANK) \
 	/* Coin Mode 1 */ \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_CONDITION("DSW2", 0x04, PORTCOND_NOTEQUALS, 0x00) PORT_DIPLOCATION(#DIPBANK":5,6,7,8") \
-/*	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) */ \
+/*  PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) */ \
 	PORT_DIPSETTING(    0x90, DEF_STR( 7C_1C ) ) \
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) ) \
@@ -42,8 +42,8 @@
 #define IREM_Z80_COINAGE_TYPE_2_LOC(DIPBANK) \
 	/* Coin Mode 1 */ \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_CONDITION("DSW2", 0x04, PORTCOND_NOTEQUALS, 0x00) PORT_DIPLOCATION(#DIPBANK":5,6,7,8") \
-/*	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) ) */ \
-/*	PORT_DIPSETTING(    0x90, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x90, DEF_STR( Free_Play ) ) */ \
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) ) \
@@ -55,8 +55,8 @@
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) ) \
-/*	PORT_DIPSETTING(    0x20, DEF_STR( Free_Play ) ) */ \
-/*	PORT_DIPSETTING(    0x10, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x20, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x10, DEF_STR( Free_Play ) ) */ \
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) \
 	/* Coin Mode 2 */ \
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW2", 0x04, PORTCOND_EQUALS, 0x00) PORT_DIPLOCATION(#DIPBANK":5,6") \
@@ -75,7 +75,7 @@
 #define IREM_Z80_COINAGE_TYPE_1 \
 	/* Coin Mode 1 */ \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_CONDITION("DSW2", 0x04, PORTCOND_NOTEQUALS, 0x00) \
-/*	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) */ \
+/*  PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) ) */ \
 	PORT_DIPSETTING(    0x90, DEF_STR( 7C_1C ) ) \
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) ) \
@@ -101,13 +101,13 @@
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) 
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
 #define IREM_Z80_COINAGE_TYPE_2 \
 	/* Coin Mode 1 */ \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) )      PORT_CONDITION("DSW2", 0x04, PORTCOND_NOTEQUALS, 0x00) \
-/*	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) ) */ \
-/*	PORT_DIPSETTING(    0x90, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x90, DEF_STR( Free_Play ) ) */ \
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) ) \
@@ -119,8 +119,8 @@
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_4C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) ) \
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_6C ) ) \
-/*	PORT_DIPSETTING(    0x20, DEF_STR( Free_Play ) ) */ \
-/*	PORT_DIPSETTING(    0x10, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x20, DEF_STR( Free_Play ) ) */ \
+/*  PORT_DIPSETTING(    0x10, DEF_STR( Free_Play ) ) */ \
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) \
 	/* Coin Mode 2 */ \
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )       PORT_CONDITION("DSW2", 0x04, PORTCOND_EQUALS, 0x00) \
@@ -132,5 +132,5 @@
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) 
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 

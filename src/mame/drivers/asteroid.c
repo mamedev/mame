@@ -158,10 +158,10 @@ Kits are available immediately from your Atari Distributor.  To determine which 
                (Left coin always registers 1 credit/coin)
 
    DIP locations verified from manual for:
-	- asteroid
-	- llander
-	- llander1
-	- astdelux
+    - asteroid
+    - llander
+    - llander1
+    - astdelux
 
 ***************************************************************************/
 
@@ -433,8 +433,8 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (	0x01, DEF_STR( German ) )
 	PORT_DIPSETTING (	0x02, DEF_STR( French ) )
 	PORT_DIPSETTING (	0x03, DEF_STR( Spanish ) )
-	/*	Default lives is 2,3,4,5. Values incremented by 1 if Bonus Life set to None or Coinage set to 2C_1C.
-		Incremented by 2 if both are set at the same time. PORT_CONDITION() can only test for 1 switch at a time. */
+	/*  Default lives is 2,3,4,5. Values incremented by 1 if Bonus Life set to None or Coinage set to 2C_1C.
+        Incremented by 2 if both are set at the same time. PORT_CONDITION() can only test for 1 switch at a time. */
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("R5:3,4") /* Default is 2 or 3 depending on manual version */
 	PORT_DIPSETTING (	0x00, "2-4" )
 	PORT_DIPSETTING (	0x04, "3-5" )
@@ -474,17 +474,17 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (	0xe0, DEF_STR( None ) )
 
 	/* The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as:
-	PORT_START_TAG("DSW3")									// 4-Toggle switch located on game PCB at M12
-	PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )				PORT_DIPLOCATION("M12:1,2")
-	PORT_DIPSETTING (	0x00, "1=Left, Center & Right" )	// "For games having these coin doors: Thai 1Baht/1Baht, German 1DM/1DM, US 25c/25c,
-															// Belgian or French 5Fr/5Fr, Swiss or French 1Fr/1Fr, US 25c/25c/25c,
-															// Japanese 100Y/100Y, Swedish 1Kr/1Kr, UK 10P/10P, Australian 20c/20c, or Italian 100L/100L."
-	PORT_DIPSETTING (	0x01, "1=Left & Center, 2=Right" )	// "For games having these coin doors: German 2DM/1DM, German 1DM/5DM, US 25c/25c/1$, or US 25c/1$."
-	PORT_DIPSETTING (	0x02, "1=Left, 2=Center & Right" )	// "No coin door is currently designed for this configuration."
-	PORT_DIPSETTING (	0x03, "1=Left, 2=Center, 3=Right" ) // "For games having these coin doors: German 1DM/2DM/5DM."
-	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "M12:3" )			// Listed as "Unused"
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "M12:4" )			// Listed as "Unused"
-	*/
+    PORT_START_TAG("DSW3")                                  // 4-Toggle switch located on game PCB at M12
+    PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )             PORT_DIPLOCATION("M12:1,2")
+    PORT_DIPSETTING (   0x00, "1=Left, Center & Right" )    // "For games having these coin doors: Thai 1Baht/1Baht, German 1DM/1DM, US 25c/25c,
+                                                            // Belgian or French 5Fr/5Fr, Swiss or French 1Fr/1Fr, US 25c/25c/25c,
+                                                            // Japanese 100Y/100Y, Swedish 1Kr/1Kr, UK 10P/10P, Australian 20c/20c, or Italian 100L/100L."
+    PORT_DIPSETTING (   0x01, "1=Left & Center, 2=Right" )  // "For games having these coin doors: German 2DM/1DM, German 1DM/5DM, US 25c/25c/1$, or US 25c/1$."
+    PORT_DIPSETTING (   0x02, "1=Left, 2=Center & Right" )  // "No coin door is currently designed for this configuration."
+    PORT_DIPSETTING (   0x03, "1=Left, 2=Center, 3=Right" ) // "For games having these coin doors: German 1DM/2DM/5DM."
+    PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "M12:3" )            // Listed as "Unused"
+    PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "M12:4" )            // Listed as "Unused"
+    */
 INPUT_PORTS_END
 
 

@@ -84,23 +84,23 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	device_config **devptr;
 	device_config *device;
 	deviceinfo info;
-	
+
 	assert(listheadptr != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
-	
+
 	/* find the end of the list, and ensure no duplicates along the way */
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
 		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", devtype_name(type), tag);
-	
+
 	/* get the size of the inline config */
 	info.i = 0;
 	(*type)(NULL, NULL, DEVINFO_INT_INLINE_CONFIG_BYTES, &info);
-	
+
 	/* allocate a new device */
 	device = malloc_or_die(sizeof(*device) + strlen(tag) + info.i);
-	
+
 	/* populate all fields */
 	device->next = NULL;
 	device->type = type;
@@ -108,7 +108,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	device->inline_config = (info.i == 0) ? NULL : (device->tag + strlen(tag) + 1);
 	device->token = NULL;
 	strcpy(device->tag, tag);
-	
+
 	/* reset the inline_config to 0 */
 	if (info.i > 0)
 		memset(device->inline_config, 0, info.i);
@@ -117,19 +117,19 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	info.set_info = NULL;
 	(*type)(NULL, NULL, DEVINFO_FCT_SET_INFO, &info);
 	device->set_info = info.set_info;
-	
+
 	info.start = NULL;
 	(*type)(NULL, NULL, DEVINFO_FCT_START, &info);
 	device->start = info.start;
-	
+
 	info.stop = NULL;
 	(*type)(NULL, NULL, DEVINFO_FCT_STOP, &info);
 	device->stop = info.stop;
-	
+
 	info.reset = NULL;
 	(*type)(NULL, NULL, DEVINFO_FCT_RESET, &info);
 	device->reset = info.reset;
-	
+
 	/* link us to the end and return */
 	*devptr = device;
 	return device;
@@ -156,7 +156,7 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 			break;
 	if (*devptr == NULL)
 		fatalerror("Attempted to remove non-existant device: type=%s tag=%s\n", devtype_name(type), tag);
-	
+
 	/* remove the device from the list */
 	device = *devptr;
 	*devptr = device->next;
@@ -167,8 +167,8 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 
 
 /*-------------------------------------------------
-    device_list_items - return the number of 
-    items of a given type; DEVICE_TYPE_WILDCARD 
+    device_list_items - return the number of
+    items of a given type; DEVICE_TYPE_WILDCARD
     is allowed
 -------------------------------------------------*/
 
@@ -176,51 +176,51 @@ int device_list_items(const device_config *listhead, device_type type)
 {
 	const device_config *curdev;
 	int count = 0;
-	
+
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		count += device_matches_type(curdev, type);
-	
+
 	return count;
 }
 
 
 /*-------------------------------------------------
-    device_list_first - return the first device 
-    in the list of a given type; 
+    device_list_first - return the first device
+    in the list of a given type;
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
 const device_config *device_list_first(const device_config *listhead, device_type type)
 {
 	const device_config *curdev;
-	
+
 	/* scan forward starting with the list head */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type))
 			return curdev;
-	
+
 	return NULL;
 }
 
 
 /*-------------------------------------------------
-    device_list_next - return the next device 
-    in the list of a given type; 
+    device_list_next - return the next device
+    in the list of a given type;
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
 const device_config *device_list_next(const device_config *prevdevice, device_type type)
 {
 	const device_config *curdev;
-	
+
 	assert(prevdevice != NULL);
 
 	/* scan forward starting with the item after the previous one */
 	for (curdev = prevdevice->next; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type))
 			return curdev;
-	
+
 	return NULL;
 }
 
@@ -240,7 +240,7 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type) && strcmp(tag, curdev->tag) == 0)
 			return curdev;
-	
+
 	/* fail */
 	return NULL;
 }
@@ -253,8 +253,8 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 
 
 /*-------------------------------------------------
-    device_list_index - return the index of a 
-    device based on its type and tag; 
+    device_list_index - return the index of a
+    device based on its type and tag;
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
@@ -262,7 +262,7 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 {
 	const device_config *curdev;
 	int index = 0;
-	
+
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type))
@@ -271,7 +271,7 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 				return index;
 			index++;
 		}
-	
+
 	return -1;
 }
 
@@ -291,7 +291,7 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type) && index-- == 0)
 			return curdev;
-	
+
 	/* fail */
 	return NULL;
 }
@@ -303,18 +303,18 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_list_start - start the configured list 
+    device_list_start - start the configured list
     of devices for a machine
 -------------------------------------------------*/
 
 void device_list_start(running_machine *machine)
 {
 	device_config *config;
-	
+
 	/* add an exit callback for cleanup */
 	add_reset_callback(machine, device_list_reset);
 	add_exit_callback(machine, device_list_stop);
-	
+
 	/* iterate over devices and start them */
 	for (config = (device_config *)machine->config->devicelist; config != NULL; config = config->next)
 	{
@@ -322,10 +322,10 @@ void device_list_start(running_machine *machine)
 		assert(config->type != NULL);
 		assert(config->start != NULL);
 
-		/* call the start function */	
+		/* call the start function */
 		config->token = (*config->start)(machine, config->tag, config->static_config, config->inline_config);
 		assert(config->token != NULL);
-			
+
 		/* fatal error if this fails */
 		if (config->token == NULL)
 			fatalerror("Error starting device: type=%s tag=%s\n", devtype_name(config->type), config->tag);
@@ -334,24 +334,24 @@ void device_list_start(running_machine *machine)
 
 
 /*-------------------------------------------------
-    device_list_stop - stop the configured list 
+    device_list_stop - stop the configured list
     of devices for a machine
 -------------------------------------------------*/
 
 static void device_list_stop(running_machine *machine)
 {
 	device_config *config;
-	
+
 	/* iterate over devices and stop them */
 	for (config = (device_config *)machine->config->devicelist; config != NULL; config = config->next)
 	{
 		assert(config->token != NULL);
 		assert(config->type != NULL);
-		
+
 		/* if we have a stop function, call it */
 		if (config->stop != NULL)
 			(*config->stop)(machine, config->token);
-			
+
 		/* clear the token to indicate we are finished */
 		config->token = NULL;
 	}
@@ -359,14 +359,14 @@ static void device_list_stop(running_machine *machine)
 
 
 /*-------------------------------------------------
-    device_list_reset - reset the configured list 
+    device_list_reset - reset the configured list
     of devices for a machine
 -------------------------------------------------*/
 
 static void device_list_reset(running_machine *machine)
 {
 	const device_config *config;
-	
+
 	/* iterate over devices and stop them */
 	for (config = (device_config *)machine->config->devicelist; config != NULL; config = config->next)
 		device_reset(machine, config);
@@ -374,7 +374,7 @@ static void device_list_reset(running_machine *machine)
 
 
 /*-------------------------------------------------
-    device_reset - reset a device based on an 
+    device_reset - reset a device based on an
     allocated device_config
 -------------------------------------------------*/
 
@@ -382,7 +382,7 @@ void device_reset(running_machine *machine, const device_config *config)
 {
 	assert(config->token != NULL);
 	assert(config->type != NULL);
-	
+
 	/* if we have a reset function, call it */
 	if (config->reset != NULL)
 		(*config->reset)(machine, config->token);
@@ -404,7 +404,7 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    devtag_get_token - return the token associated 
+    devtag_get_token - return the token associated
     with an allocated device
 -------------------------------------------------*/
 
@@ -418,8 +418,8 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 
 
 /*-------------------------------------------------
-    devtag_get_static_config - return a pointer to 
-    the static configuration for a device based on 
+    devtag_get_static_config - return a pointer to
+    the static configuration for a device based on
     type and tag
 -------------------------------------------------*/
 
@@ -433,8 +433,8 @@ const void *devtag_get_static_config(running_machine *machine, device_type type,
 
 
 /*-------------------------------------------------
-    devtag_get_inline_config - return a pointer to 
-    the inline configuration for a device based on 
+    devtag_get_inline_config - return a pointer to
+    the inline configuration for a device based on
     type and tag
 -------------------------------------------------*/
 
@@ -448,18 +448,18 @@ const void *devtag_get_inline_config(running_machine *machine, device_type type,
 
 
 /*-------------------------------------------------
-    device_get_info_int - return an integer state 
+    device_get_info_int - return an integer state
     value from an allocated device
 -------------------------------------------------*/
 
 INT64 device_get_info_int(running_machine *machine, const device_config *config, UINT32 state)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
-	
+
 	/* retrieve the value */
 	info.i = 0;
 	(*config->type)(machine, config->token, state, &info);
@@ -477,18 +477,18 @@ INT64 devtag_get_info_int(running_machine *machine, device_type type, const char
 
 
 /*-------------------------------------------------
-    device_get_info_ptr - return a pointer state 
+    device_get_info_ptr - return a pointer state
     value from an allocated device
 -------------------------------------------------*/
 
 void *device_get_info_ptr(running_machine *machine, const device_config *config, UINT32 state)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
-	
+
 	/* retrieve the value */
 	info.p = NULL;
 	(*config->type)(machine, config->token, state, &info);
@@ -506,18 +506,18 @@ void *devtag_get_info_ptr(running_machine *machine, device_type type, const char
 
 
 /*-------------------------------------------------
-    device_get_info_fct - return a function 
+    device_get_info_fct - return a function
     pointer state value from an allocated device
 -------------------------------------------------*/
 
 genf *device_get_info_fct(running_machine *machine, const device_config *config, UINT32 state)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
-	
+
 	/* retrieve the value */
 	info.f = 0;
 	(*config->type)(machine, config->token, state, &info);
@@ -535,18 +535,18 @@ genf *devtag_get_info_fct(running_machine *machine, device_type type, const char
 
 
 /*-------------------------------------------------
-    device_get_info_string - return a string value 
+    device_get_info_string - return a string value
     from an allocated device
 -------------------------------------------------*/
 
 const char *device_get_info_string(running_machine *machine, const device_config *config, UINT32 state)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
-	
+
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*config->type)(machine, config->token, state, &info);
@@ -564,18 +564,18 @@ const char *devtag_get_info_string(running_machine *machine, device_type type, c
 
 
 /*-------------------------------------------------
-    devtype_get_info_string - return a string value 
-    from a device type (does not need to be 
+    devtype_get_info_string - return a string value
+    from a device type (does not need to be
     allocated)
 -------------------------------------------------*/
 
 const char *devtype_get_info_string(device_type type, UINT32 state)
 {
 	deviceinfo info;
-	
+
 	assert(type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
-	
+
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*type)(NULL, NULL, state, &info);
@@ -589,18 +589,18 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_set_info_int - set an integer state 
+    device_set_info_int - set an integer state
     value for an allocated device
 -------------------------------------------------*/
 
 void device_set_info_int(running_machine *machine, const device_config *config, UINT32 state, INT64 data)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
-	
+
 	/* set the value */
 	info.i = data;
 	(*config->set_info)(machine, config->token, state, &info);
@@ -617,18 +617,18 @@ void devtag_set_info_int(running_machine *machine, device_type type, const char 
 
 
 /*-------------------------------------------------
-    device_set_info_ptr - set a pointer state 
+    device_set_info_ptr - set a pointer state
     value for an allocated device
 -------------------------------------------------*/
 
 void device_set_info_ptr(running_machine *machine, const device_config *config, UINT32 state, void *data)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
-	
+
 	/* set the value */
 	info.p = data;
 	(*config->set_info)(machine, config->token, state, &info);
@@ -645,18 +645,18 @@ void devtag_set_info_ptr(running_machine *machine, device_type type, const char 
 
 
 /*-------------------------------------------------
-    device_set_info_fct - set a function pointer 
+    device_set_info_fct - set a function pointer
     state value for an allocated device
 -------------------------------------------------*/
 
 void device_set_info_fct(running_machine *machine, const device_config *config, UINT32 state, genf *data)
 {
 	deviceinfo info;
-	
+
 	assert(config->token != NULL);
 	assert(config->type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
-	
+
 	/* set the value */
 	info.f = data;
 	(*config->set_info)(machine, config->token, state, &info);

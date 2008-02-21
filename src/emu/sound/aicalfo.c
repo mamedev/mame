@@ -1,10 +1,10 @@
 /*
-	AICA LFO handling
+    AICA LFO handling
 
-	Part of the AICA emulator package.
-	(not compiled directly, #included from aica.c)
+    Part of the AICA emulator package.
+    (not compiled directly, #included from aica.c)
 
-	By ElSemi, kingshriek, Deunan Knute, and R. Belmont
+    By ElSemi, kingshriek, Deunan Knute, and R. Belmont
 */
 
 #define LFO_SHIFT 	8
@@ -40,16 +40,16 @@ void AICALFO_Init(void)
     for(i=0;i<256;++i)
     {
 		int a,p;
-//		float TL;
+//      float TL;
 		//Saw
 		a=255-i;
 		if(i<128)
 			p=i;
 		else
-			p=i-256;    
+			p=i-256;
 		ALFO_SAW[i]=a;
 		PLFO_SAW[i]=p;
-	
+
 		//Square
 		if(i<128)
 		{
@@ -63,7 +63,7 @@ void AICALFO_Init(void)
 		}
 		ALFO_SQR[i]=a;
 		PLFO_SQR[i]=p;
-	
+
 		//Tri
 		if(i<128)
 			a=255-(i*2);
@@ -79,7 +79,7 @@ void AICALFO_Init(void)
 			p=i*2-511;
 		ALFO_TRI[i]=a;
 		PLFO_TRI[i]=p;
-	
+
 		//noise
 		//a=lfo_noise[i];
 		a=mame_rand(Machine)&0xff;
@@ -107,10 +107,10 @@ signed int INLINE AICAPLFO_Step(struct _LFO *LFO)
 {
 	int p;
 
-    LFO->phase+=LFO->phase_step;    
-#if LFO_SHIFT!=8    
+    LFO->phase+=LFO->phase_step;
+#if LFO_SHIFT!=8
     LFO->phase&=(1<<(LFO_SHIFT+8))-1;
-#endif    
+#endif
     p=LFO->table[LFO->phase>>LFO_SHIFT];
 	p=LFO->scale[p+128];
 	return p<<(SHIFT-LFO_SHIFT);
@@ -119,10 +119,10 @@ signed int INLINE AICAPLFO_Step(struct _LFO *LFO)
 signed int INLINE AICAALFO_Step(struct _LFO *LFO)
 {
 	int p;
-    LFO->phase+=LFO->phase_step;    
-#if LFO_SHIFT!=8    
+    LFO->phase+=LFO->phase_step;
+#if LFO_SHIFT!=8
     LFO->phase&=(1<<(LFO_SHIFT+8))-1;
-#endif    
+#endif
     p=LFO->table[LFO->phase>>LFO_SHIFT];
 	p=LFO->scale[p];
 	return p<<(SHIFT-LFO_SHIFT);

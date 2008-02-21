@@ -312,11 +312,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( angelkds )
 	/*
-		Free Play: Set SW1:1-8 ON (A:Free Play & B:Free Play).
-		Sound Test: Set SW1:1-8 ON (A:Free Play & B:Free Play), hold test switch and reboot.
-		Joystick Test: Set SW1:1-7 ON & SW1:8 OFF (A:Free Play & B:3C_1C), hold test switch and reboot.
-		Joystick Test Coin_A & Coin_B seem to be switched, only works when setting A to 3C_1C and B to Free Play.
-	*/
+        Free Play: Set SW1:1-8 ON (A:Free Play & B:Free Play).
+        Sound Test: Set SW1:1-8 ON (A:Free Play & B:Free Play), hold test switch and reboot.
+        Joystick Test: Set SW1:1-7 ON & SW1:8 OFF (A:Free Play & B:3C_1C), hold test switch and reboot.
+        Joystick Test Coin_A & Coin_B seem to be switched, only works when setting A to 3C_1C and B to Free Play.
+    */
 	PORT_START_TAG("I40")		/* inport $40 */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(	0x70, DEF_STR( 4C_1C ) )

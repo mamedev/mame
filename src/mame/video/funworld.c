@@ -148,7 +148,7 @@ VIDEO_START(magiccrd)
 
 VIDEO_START(snookr10)
 {
-//	mc6845 = devtag_get_token(machine, MC6845, "crtc");
+//  mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 32);
 }
 

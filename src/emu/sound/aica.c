@@ -71,7 +71,7 @@
 #define DIPAN(slot)		((slot->udata.data[0x24/2]>>0x0)&0x001F)
 
 #define EFSDL(slot)		((AICA->EFSPAN[slot*4]>>8)&0x000f)
-#define EFPAN(slot)		((AICA->EFSPAN[slot*4]>>0)&0x001f) 
+#define EFPAN(slot)		((AICA->EFSPAN[slot*4]>>0)&0x001f)
 
 //Envelope times in ms
 static const double ARTimes[64]={100000/*infinity*/,100000/*infinity*/,8100.0,6900.0,6000.0,4800.0,4000.0,3400.0,3000.0,2400.0,2000.0,1700.0,1500.0,
@@ -356,7 +356,7 @@ static int EG_Update(struct _SLOT *slot)
 			slot->EG.volume+=slot->EG.AR;
 			if(slot->EG.volume>=(0x3ff<<EG_SHIFT))
 			{
-				if (!LPSLNK(slot)) 
+				if (!LPSLNK(slot))
 				{
 					slot->EG.state=DECAY1;
 					if(slot->EG.D1R>=(1024<<EG_SHIFT)) //Skip DECAY1, go directly to DECAY2
@@ -386,8 +386,8 @@ static int EG_Update(struct _SLOT *slot)
 			{
  				slot->EG.volume=0;
 				AICA_StopSlot(slot,0);
-//				slot->EG.volume=0x17f<<EG_SHIFT;
-//				slot->EG.state=ATTACK;
+//              slot->EG.volume=0x17f<<EG_SHIFT;
+//              slot->EG.state=ATTACK;
 			}
 			break;
 		default:
@@ -529,7 +529,7 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 		{
 			AICA->AICARAM = memory_region(intf->region);
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = memory_region_length(intf->region); 
+			AICA->AICARAM_LENGTH = memory_region_length(intf->region);
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;
@@ -700,7 +700,7 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 			Compute_LFO(slot);
 			break;
 		case 0x24:
-//			printf("[%02d]: %x to DISDL/DIPAN (PC=%x)\n", s, slot->udata.data[0x24/2], arm7_get_register(15));
+//          printf("[%02d]: %x to DISDL/DIPAN (PC=%x)\n", s, slot->udata.data[0x24/2], arm7_get_register(15));
 			break;
 	}
 }
@@ -728,13 +728,13 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 		case 0x9:
 			AICA_MidiIn(0, AICA->udata.data[0x8/2]&0xff, 0);
 			break;
-/*		case 0x12:
-		case 0x13:
-		case 0x14:
-		case 0x15:
-		case 0x16:
-		case 0x17:
-			break;*/
+/*      case 0x12:
+        case 0x13:
+        case 0x14:
+        case 0x15:
+        case 0x16:
+        case 0x17:
+            break;*/
 		case 0x90:
 		case 0x91:
 			if(AICA->Master)
@@ -795,7 +795,7 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 		case 0xa4:	//SCIRE
 		case 0xa5:
 
-			if(AICA->Master)		   
+			if(AICA->Master)
 			{
 				AICA->udata.data[0xa0/2] &= ~AICA->udata.data[0xa4/2];
 				ResetInterrupts(AICA);
@@ -860,9 +860,9 @@ static void AICA_UpdateRegR(struct _AICA *AICA, int reg)
 		case 0x10:	// LP check
 		case 0x11:
 			{
-//				int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;	// which slot are we monitoring?
+//              int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f; // which slot are we monitoring?
 
-//				AICA->udata.data[0x10/2] |= 0x8000;	// set LP if necessary
+//              AICA->udata.data[0x10/2] |= 0x8000; // set LP if necessary
 			}
 			break;
 
@@ -885,7 +885,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 	{
 		int slot=addr/0x80;
 		addr&=0x7f;
-//		printf("%x to slot %d offset %x\n", val, slot, addr);
+//      printf("%x to slot %d offset %x\n", val, slot, addr);
 		*((unsigned short *) (AICA->Slots[slot].udata.datab+(addr))) = val;
 		AICA_UpdateSlotReg(AICA,slot,addr&0x7f);
 	}
@@ -893,7 +893,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 	{
 		if (addr <= 0x2044)
 		{
-//			printf("%x to EFSxx slot %d (addr %x)\n", val, (addr-0x2000)/4, addr&0x7f);
+//          printf("%x to EFSxx slot %d (addr %x)\n", val, (addr-0x2000)/4, addr&0x7f);
 			AICA->EFSPAN[addr&0x7f] = val;
 		}
 	}
@@ -901,7 +901,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 	{
 		if (addr < 0x28be)
 		{
-//			printf("%x to AICA global @ %x\n", val, addr & 0xff);
+//          printf("%x to AICA global @ %x\n", val, addr & 0xff);
 			*((unsigned short *) (AICA->udata.datab+((addr&0xff)))) = val;
 			AICA_UpdateReg(AICA, addr&0xff);
 		}
@@ -969,8 +969,8 @@ static unsigned short AICA_r16(struct _AICA *AICA, unsigned int addr)
 			return AICA->IRQR;
 		}
 	}
-//	else if (addr<0x700)
-//		v=AICA->RINGBUF[(addr-0x600)/2];
+//  else if (addr<0x700)
+//      v=AICA->RINGBUF[(addr-0x600)/2];
 	return v;
 }
 
@@ -1038,7 +1038,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 		addr1=slot->cur_addr>>SHIFT;
 		addr2=slot->nxt_addr>>SHIFT;
 	}
-	else if(PCMS(slot) == 0) 
+	else if(PCMS(slot) == 0)
 	{
 		addr1=(slot->cur_addr>>(SHIFT-1))&AICA->RAM_MASK16;
 		addr2=(slot->nxt_addr>>(SHIFT-1))&AICA->RAM_MASK16;
@@ -1123,7 +1123,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 
 		sample=(s>>SHIFT);
 	}
-	
+
 	slot->prv_addr=slot->cur_addr;
 	slot->cur_addr+=step;
 	slot->nxt_addr=slot->cur_addr+(1<<SHIFT);
@@ -1166,7 +1166,7 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 						slot->cur_quant = slot->cur_lpquant;
 					}
 
-//					printf("Looping: slot_addr %x LSA %x LEA %x step %x base %x\n", *slot_addr[addr_select]>>SHIFT, LSA(slot), LEA(slot), slot->curstep, slot->adbase);
+//                  printf("Looping: slot_addr %x LSA %x LEA %x step %x base %x\n", *slot_addr[addr_select]>>SHIFT, LSA(slot), LEA(slot), slot->curstep, slot->adbase);
 				}
 				else if(PCMS(slot)>=2 && addr_select==1)
 				{
@@ -1231,7 +1231,7 @@ static void AICA_DoMasterSamples(struct _AICA *AICA, int nsamples)
 					smpr+=(sample*AICA->RPANTABLE[Enc])>>SHIFT;
 				}
 			}
-			
+
 			AICA->BUFPTR&=63;
 		}
 
@@ -1299,7 +1299,7 @@ void aica_stop(void)
 
 void AICA_set_ram_base(int which, void *base, int size)
 {
-	struct _AICA *AICA = sndti_token(SOUND_AICA, which); 
+	struct _AICA *AICA = sndti_token(SOUND_AICA, which);
 	if (AICA)
 	{
 		AICA->AICARAM = base;

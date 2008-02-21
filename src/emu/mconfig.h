@@ -88,7 +88,7 @@ struct _machine_config
 
 	void				(*sound_start)(running_machine *machine);		/* one-time sound start callback */
 	void				(*sound_reset)(running_machine *machine);		/* sound reset callback */
-	
+
 	device_config *		devicelist;					/* list head for devices */
 };
 

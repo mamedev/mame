@@ -39,14 +39,14 @@ enum
 
 	/* --- the following bits of info are returned as pointers --- */
 	DEVINFO_PTR_FIRST = 0x10000,
-	
+
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
 
 	DEVINFO_PTR_LAST = 0x1ffff,
 
 	/* --- the following bits of info are returned as pointers to functions --- */
 	DEVINFO_FCT_FIRST = 0x20000,
-	
+
 	DEVINFO_FCT_SET_INFO = DEVINFO_FCT_FIRST,			/* R/O: device_set_info_func */
 	DEVINFO_FCT_START,									/* R/O: device_start_func */
 	DEVINFO_FCT_STOP,									/* R/O: device_stop_func */
@@ -99,7 +99,7 @@ union _deviceinfo
 	void *					p;						/* generic pointers */
 	genf *  				f;						/* generic function pointers */
 	const char *			s;						/* generic strings */
-	
+
 	device_set_info_func 	set_info;				/* DEVINFO_FCT_SET_INFO */
 	device_start_func		start;					/* DEVINFO_FCT_START */
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */

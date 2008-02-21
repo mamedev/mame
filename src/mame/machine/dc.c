@@ -146,7 +146,7 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", activecpu_get_pc());
 		#ifdef ENABLE_DEBUGGER
-//		mame_debug_break();
+//      mame_debug_break();
 		#endif
 	}
 
@@ -524,9 +524,9 @@ WRITE64_HANDLER( dc_maple_w )
 												// first function
 												maple0x86data2[pos+ 9]=1; // report
 												maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
-												maple0x86data2[pos+11]=readinputportbytag("IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2 
+												maple0x86data2[pos+11]=readinputportbytag("IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
 												maple0x86data2[pos+12]=readinputportbytag("IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
-												maple0x86data2[pos+13]=readinputportbytag("IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2 
+												maple0x86data2[pos+13]=readinputportbytag("IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
 												maple0x86data2[pos+14]=readinputportbytag("IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
 												// second function
 												maple0x86data2[pos+15]=1; // report
@@ -547,7 +547,7 @@ WRITE64_HANDLER( dc_maple_w )
 													maple0x86data2[pos+26]=0;
 													maple0x86data2[pos+7]=17+2;
 													tocopy += 17;
-												} 
+												}
 												else
 												{
 													maple0x86data2[pos+7]=15+2;
@@ -846,7 +846,7 @@ READ64_HANDLER( dc_aica_reg_r )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
-//	mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
+//  mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
 	return (UINT64) AICA_0_r(offset*2, 0x0000)<<shift;
 }
@@ -876,7 +876,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
 
 	AICA_0_w(offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 
-//	mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
+//  mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ32_HANDLER( dc_arm_aica_r )
