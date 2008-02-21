@@ -66,7 +66,7 @@ Alternate Program roms:
 11.ic4    27C2001
 12.ic5    27C2001
 
-Is there an other alt program roms set labeled 9 & 10?
+Is there another alt program rom set labeled 9 & 10?
 
 */
 
