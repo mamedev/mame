@@ -947,6 +947,53 @@ const char *state_save_get_indexed_item(int index, void **base, UINT32 *valsize,
 
 
 /*-------------------------------------------------
+    state_save_combine_module_and_tag - creates
+    a name from a given module and tag that can
+    be used as the first agrument to the
+    state_save_register_item family of functions
+-------------------------------------------------*/
+
+void state_save_combine_module_and_tag(char *dest, const char *module, const char *tag)
+{
+	astring *module_lower;
+	astring *tag_lower;
+	astring *combined;
+
+	/* validate arguments */
+	assert(dest != NULL);
+	assert(module != NULL);
+	assert(tag != NULL);
+	assert(strlen(module) > 0);
+	assert(strlen(tag) > 0);
+
+	/* allocate objects */
+	module_lower = astring_alloc();
+	tag_lower = astring_alloc();
+	combined = astring_alloc();
+
+	/* convert both arguments to lower case for case insenstive comparisson */
+	astring_tolower(astring_cpyc(module_lower, module));
+	astring_tolower(astring_cpyc(tag_lower, tag));
+
+	/* if the tag contains the module name, just use the tag as the combined name */
+	if (astring_find(tag_lower, 0, module_lower) >= 0)
+		astring_cpyc(combined, tag);
+
+	/* otherwise combine the module and the tag */
+	else
+		astring_assemble_3(combined, module, ".", tag);
+
+	/* copy the result to the destination array */
+	strcpy(dest, astring_c(combined));
+
+	/* free the objects */
+	astring_free(module_lower);
+	astring_free(tag_lower);
+	astring_free(combined);
+}
+
+
+/*-------------------------------------------------
     state_save_dump_registry - dump the registry
     to the logfile
 -------------------------------------------------*/

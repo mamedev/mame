@@ -111,6 +111,9 @@ void state_save_load_continue(void);
 void state_save_save_finish(void);
 void state_save_load_finish(void);
 
+/* Helper function for creating a unique name */
+void state_save_combine_module_and_tag(char *dest, const char *module, const char *tag);
+
 /* Display function */
 void state_save_dump_registry(void);
 

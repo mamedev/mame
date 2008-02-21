@@ -413,8 +413,12 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 static void *mc6845_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
 {
 	mc6845_t *mc6845;
+	char unique_tag[30];
 
+	/* validate arguments */
 	assert(machine != NULL);
+	assert(tag != NULL);
+	assert(strlen(tag) < 20);
 
 	/* allocate the object that holds the state */
 	mc6845 = auto_malloc(sizeof(*mc6845));
@@ -429,24 +433,26 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
 
 	/* register for state saving */
+	state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
+
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
-	state_save_register_item("mc6845", 0, mc6845->address_latch);
-	state_save_register_item("mc6845", 0, mc6845->horiz_total);
-	state_save_register_item("mc6845", 0, mc6845->horiz_disp);
-	state_save_register_item("mc6845", 0, mc6845->horiz_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->sync_width);
-	state_save_register_item("mc6845", 0, mc6845->vert_total);
-	state_save_register_item("mc6845", 0, mc6845->vert_total_adj);
-	state_save_register_item("mc6845", 0, mc6845->vert_disp);
-	state_save_register_item("mc6845", 0, mc6845->vert_sync_pos);
-	state_save_register_item("mc6845", 0, mc6845->intl_skew);
-	state_save_register_item("mc6845", 0, mc6845->max_ras_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor_start_ras);
-	state_save_register_item("mc6845", 0, mc6845->cursor_end_ras);
-	state_save_register_item("mc6845", 0, mc6845->start_addr);
-	state_save_register_item("mc6845", 0, mc6845->cursor);
-	state_save_register_item("mc6845", 0, mc6845->light_pen);
+	state_save_register_item(unique_tag, 0, mc6845->address_latch);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_total);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
+	state_save_register_item(unique_tag, 0, mc6845->sync_width);
+	state_save_register_item(unique_tag, 0, mc6845->vert_total);
+	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
+	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
+	state_save_register_item(unique_tag, 0, mc6845->vert_sync_pos);
+	state_save_register_item(unique_tag, 0, mc6845->intl_skew);
+	state_save_register_item(unique_tag, 0, mc6845->max_ras_addr);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_start_ras);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_end_ras);
+	state_save_register_item(unique_tag, 0, mc6845->start_addr);
+	state_save_register_item(unique_tag, 0, mc6845->cursor);
+	state_save_register_item(unique_tag, 0, mc6845->light_pen);
 
 	return mc6845;
 }
