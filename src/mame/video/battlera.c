@@ -373,7 +373,7 @@ static void screenrefresh(running_machine *machine, mame_bitmap *bitmap,const re
 	if (sb_enable) draw_sprites(machine,bitmap,clip,0);
 
 	/* Render background over sprites */
-	copyscrollbitmap_trans(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,machine->pens[256]);
+	copyscrollbitmap_trans(bitmap,front_bitmap,1,&scrollx,1,&scrolly,clip,256);
 
 	/* Render high priority sprites, if enabled */
 	if (sb_enable) draw_sprites(machine,bitmap,clip,1);

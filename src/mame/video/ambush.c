@@ -95,7 +95,7 @@ VIDEO_UPDATE( ambush )
 	int offs;
 
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 
 	/* Draw the background priority characters */

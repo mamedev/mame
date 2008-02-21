@@ -141,7 +141,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* update the video */
-	beathead_scanline_update(scanline);
+	video_screen_update_now(0);
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)

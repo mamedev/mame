@@ -27,10 +27,6 @@ UINT32 *	beathead_palette_select;
  *
  *************************************/
 
-static offs_t				scanline_offset[240];
-static UINT8				scanline_palette[240];
-
-static int					current_scanline;
 static UINT32				finescroll;
 static offs_t				vram_latch_offset;
 
@@ -115,10 +111,10 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	UINT32 oldword = finescroll;
 	UINT32 newword = COMBINE_DATA(&finescroll);
 
-	/* if VBLANK is going off on a non-zero scanline, suspend time */
-	if ((oldword & 8) && !(newword & 8) && current_scanline != 0)
+	/* if VBLANK is going off on a scanline other than the last, suspend time */
+	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(0) != 261)
 	{
-		logerror("Suspending time! (scanline = %d)\n", current_scanline);
+		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(0));
 		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
@@ -180,29 +176,6 @@ WRITE32_HANDLER( beathead_hsync_ram_w )
 
 /*************************************
  *
- *  Scanline updater
- *
- *************************************/
-
-void beathead_scanline_update(int scanline)
-{
-	/* remember the current scanline */
-	current_scanline = scanline;
-
-	/* grab the latch for the previous scanline */
-	scanline--;
-	if (scanline < 0 || scanline >= 240)
-		return;
-
-	/* cache the offset and palette for this scanline */
-	scanline_offset[scanline] = (finescroll & 8) ? ~0 : vram_latch_offset + (finescroll & 3);
-	scanline_palette[scanline] = *beathead_palette_select & 0x7f;
-}
-
-
-
-/*************************************
- *
  *  Main screen refresher
  *
  *************************************/
@@ -214,20 +187,27 @@ VIDEO_UPDATE( beathead )
 	/* generate the final screen */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		offs_t src = scanline_offset[y] + cliprect->min_x;
-		UINT8 scanline[336];
+		pen_t pen_base = (*beathead_palette_select & 0x7f) * 256;
+		UINT16 scanline[336];
 
-		/* unswizzle the scanline first */
-		if (scanline_offset[y] != ~0)
-		{
+		/* blanking */
+		if (finescroll & 8)
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
-				scanline[x] = ((UINT8 *)videoram32)[BYTE4_XOR_LE(src++)];
-		}
+				scanline[x] = pen_base;
+
+		/* non-blanking */
 		else
-			memset(scanline, 0, sizeof(scanline));
+		{
+			offs_t scanline_offset = vram_latch_offset + (finescroll & 3);
+			offs_t src = scanline_offset + cliprect->min_x;
+
+			/* unswizzle the scanline first */
+			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+				scanline[x] = pen_base | ((UINT8 *)videoram32)[BYTE4_XOR_LE(src++)];
+		}
 
 		/* then draw it */
-		draw_scanline8(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], &machine->pens[scanline_palette[y] * 256], -1);
+		draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], NULL, -1);
 	}
 	return 0;
 }

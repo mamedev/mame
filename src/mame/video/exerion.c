@@ -261,7 +261,7 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 		int stop3 = background_latches[11] >> 4;
 		UINT8 *mixer = &background_mixer[(background_latches[12] << 4) & 0xf0];
 		UINT16 scanline[VISIBLE_X_MAX];
-		int pen_base = 0x200 + ((background_latches[12] >> 4) << 4);
+		pen_t pen_base = 0x200 + ((background_latches[12] >> 4) << 4);
 
 		/* the cocktail flip flag controls whether we count up or down in X */
 		if (!exerion_cocktail_flip)

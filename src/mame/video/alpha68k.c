@@ -133,7 +133,7 @@ VIDEO_UPDATE( alpha68k_II )
 	last_bank=bank_base;
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	fillbitmap(bitmap,machine->pens[2047],cliprect);
+	fillbitmap(bitmap,2047,cliprect);
 //AT
 	draw_sprites(machine, bitmap,cliprect,0,0x07c0,0x0800);
 	draw_sprites(machine, bitmap,cliprect,1,0x0000,0x0800);
@@ -272,7 +272,7 @@ VIDEO_UPDATE( alpha68k_V )
 	last_bank=bank_base;
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	fillbitmap(bitmap,machine->pens[4095],cliprect);
+	fillbitmap(bitmap,4095,cliprect);
 
 	/* This appears to be correct priority */
 	if (alpha68k_microcontroller_id == 0x8814) /* Sky Adventure */
@@ -308,7 +308,7 @@ VIDEO_UPDATE( alpha68k_V_sb )
 	last_bank=bank_base;
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	fillbitmap(bitmap,machine->pens[4095],cliprect);
+	fillbitmap(bitmap,4095,cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites_V(machine,bitmap,cliprect,0,0x07c0,0x0800,0x4000,0x8000,0x3fff);
@@ -480,7 +480,7 @@ static void kyros_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 VIDEO_UPDATE( kyros )
 {
 	colortable_entry_set_value(machine->colortable, 0x100, *videoram16 & 0xff);
-	fillbitmap(bitmap, machine->pens[0x100], cliprect); //AT
+	fillbitmap(bitmap, 0x100, cliprect); //AT
 
 	kyros_draw_sprites(machine, bitmap,cliprect,2,0x0800);
 	kyros_draw_sprites(machine, bitmap,cliprect,3,0x0c00);
@@ -538,7 +538,7 @@ static void sstingry_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 VIDEO_UPDATE( sstingry )
 {
 	colortable_entry_set_value(machine->colortable, 0x100, *videoram16 & 0xff);
-	fillbitmap(bitmap, machine->pens[0x100], cliprect); //AT
+	fillbitmap(bitmap, 0x100, cliprect); //AT
 
 	sstingry_draw_sprites(machine, bitmap,cliprect,2,0x0800);
 	sstingry_draw_sprites(machine, bitmap,cliprect,3,0x0c00);

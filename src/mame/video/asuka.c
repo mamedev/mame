@@ -56,7 +56,7 @@ VIDEO_UPDATE( asuka )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
@@ -81,7 +81,7 @@ VIDEO_UPDATE( bonzeadv )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);

@@ -148,7 +148,7 @@ INLINE const UINT8 *get_source_ptr(running_machine *machine, UINT32 sprite, int 
 
 static void bbusters_draw_block(running_machine *machine, mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
-	const pen_t *pal = &machine->pens[machine->gfx[bank]->color_base + machine->gfx[bank]->color_granularity * (color % machine->gfx[bank]->total_colors)];
+	pen_t pen_base = machine->gfx[bank]->color_base + machine->gfx[bank]->color_granularity * (color % machine->gfx[bank]->total_colors);
 	UINT32 xinc=(scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;
 	int x_index;
@@ -176,7 +176,7 @@ static void bbusters_draw_block(running_machine *machine, mame_bitmap *dest,int 
 
 				pixel=*srcptr++;
 				if (x+(x_index>>16)>=0 && x+(x_index>>16)<256 && pixel!=15)
-					destline[x+(x_index>>16)]=pal[pixel];
+					destline[x+(x_index>>16)]= pen_base + pixel;
 
 				if (flipx)
 					x_index-=xinc;

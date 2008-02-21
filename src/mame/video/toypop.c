@@ -178,7 +178,7 @@ static void draw_background(mame_bitmap *bitmap)
 {
 	int offs, x, y;
 	UINT16 scanline[288];
-	int pen_base = 0x300 + 0x10*palettebank;
+	pen_t pen_base = 0x300 + 0x10*palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
 	if (bitmapflip)

@@ -119,7 +119,7 @@ VIDEO_UPDATE( magmax )
 			UINT32 rom15F_addr   = (((scroll_v + v) & 0x07)<<2) + (map_v_scr_100<<5);
 			UINT32 map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe)<<6;
 
-			int pen_base = 0x110 + 0x20 + (map_v_scr_100>>1);
+			pen_t pen_base = 0x110 + 0x20 + (map_v_scr_100>>1);
 
 			for (h = 0; h < 0x100; h++)
 			{

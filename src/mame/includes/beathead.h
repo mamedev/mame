@@ -12,8 +12,6 @@ extern UINT32 *	beathead_palette_select;
 VIDEO_START( beathead );
 VIDEO_UPDATE( beathead );
 
-void beathead_scanline_update(int scanline);
-
 WRITE32_HANDLER( beathead_vram_transparent_w );
 WRITE32_HANDLER( beathead_vram_bulk_w );
 WRITE32_HANDLER( beathead_vram_latch_w );
