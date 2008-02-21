@@ -57,6 +57,7 @@ enum
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_6MHz    		= 6000000,
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
+	XTAL_7MHz    		= 7000000,		/* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz   	= 7159090,		/* Blood Bros */
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_8MHz    		= 8000000,		/* Extremely common, used on 100's of PCBs */
@@ -64,7 +65,7 @@ enum
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
-	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
+	XTAL_11MHz		= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
@@ -81,7 +82,7 @@ enum
 	XTAL_14_31818MHz  	= 14318180,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz  	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
-	XTAL_15MHz			= 15000000,		/* Sinclair QL */
+	XTAL_15MHz		= 15000000,		/* Sinclair QL */
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz   		= 16000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
@@ -132,8 +133,8 @@ enum
 	XTAL_66_6667MHz   	= 66666700,		/* later Midway games */
 	XTAL_67_7376MHz  	= 67737600,		/* PSX-based h/w, Sony ZN1-2-based */
 	XTAL_73_728MHz  	= 73728000,		/* Ms. Pac-Man/Galaga 20th Anniversary */
-	XTAL_100MHz  		= 100000000,	/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
-	XTAL_101_4912MHz  	= 101491200,	/* PSX-based Namco System 10 */
+	XTAL_100MHz  		= 100000000,		/* PSX-based Namco System 12, Vegas, Sony ZN1-2-based */
+	XTAL_101_4912MHz  	= 101491200,		/* PSX-based Namco System 10 */
 
 /* Resonators (There are probably more. Almost always used for driving OKI sound chips) */
 
@@ -141,7 +142,7 @@ enum
 	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
 	XTAL_455kHz			= 455000,		/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000,
-	XTAL_1_056MHz		= 1056000 		/* used on Trio The Punch */
+	XTAL_1_056MHz			= 1056000 		/* used on Trio The Punch */
 };
 
 

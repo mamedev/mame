@@ -102,14 +102,6 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
   bootleg version of rodlandj has one instruction patched out to do exactly
   the same thing that we are doing (ignoring the 6295 status).
 
-- Iganinju doesn't work properly: I have to patch lev3 irq and it severely
-  slows down at times. Strangely, it gets *better* by lowering the main CPU
-  clock from 12 to 7 MHz.
-  This is likely an interrupt timing issue: changing the order in
-  interrupt_A() from 3 2 1 to 1 2 3 makes it work reasonably well for a very
-  short while.
-  ( Fixed by Kale 21 May 2002 )
-
 - VERY bad sprite lag in iganinju and plusalph and generally others.
   Is this a sprites buffer issue ?
 
@@ -117,6 +109,12 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 
 
 ***************************************************************************/
+
+#define SYS_A_CPU_CLOCK		(XTAL_12MHz / 2)	/* clock for main 68000 */
+#define SYS_B_CPU_CLOCK		XTAL_8MHz		/* clock for main 68000 */
+#define SYS_C_CPU_CLOCK		(XTAL_24MHz / 2)	/* clock for main 68000 */
+#define SOUND_CPU_CLOCK		XTAL_7MHz		/* clock for sound 68000 */
+#define OKI4_SOUND_CLOCK	XTAL_4MHz
 
 #include "driver.h"
 #include "deprecat.h"
@@ -196,18 +194,6 @@ static INTERRUPT_GEN( interrupt_A )
 		case 2:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
 	}
 }
-
-static INTERRUPT_GEN( interrupt_A_iganinju )
-{
-	switch ( cpu_getiloops() )
-	{
-		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
-	//  case 2:     cpunum_set_input_line(machine, 0, 1, HOLD_LINE); break;
-	}
-}
-
-
 
 
 static ADDRESS_MAP_START( readmem_A, ADDRESS_SPACE_PROGRAM, 16 )
@@ -648,11 +634,11 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( system_A )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
+	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD_TAG("sound", M68000, 7000000)
+	MDRV_CPU_ADD_TAG("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_A,sound_writemem_A)
 
@@ -678,28 +664,20 @@ static MACHINE_DRIVER_START( system_A )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, 7000000/2)
+	MDRV_SOUND_ADD(YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz verified */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
-	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, 4000000)
+	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
-	MDRV_SOUND_ADD_TAG("OKI2",OKIM6295, 4000000)
+	MDRV_SOUND_ADD_TAG("OKI2",OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( system_A_iganinju )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system_A)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(interrupt_A_iganinju,INTERRUPT_NUM_A)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( system_A_hachoo )
@@ -711,6 +689,8 @@ static MACHINE_DRIVER_START( system_B )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_A)
+
+	MDRV_CPU_REPLACE("main", M68000, SYS_B_CPU_CLOCK) /* 8MHz */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_B,writemem_B)
 	MDRV_CPU_VBLANK_INT(interrupt_B,INTERRUPT_NUM_B)
@@ -723,14 +703,13 @@ static MACHINE_DRIVER_START( system_B_hayaosi1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_B)
-	MDRV_CPU_REPLACE("main", M68000, 8000000)
 
-	MDRV_SOUND_REPLACE("OKI1",OKIM6295, 2000000)
+	MDRV_SOUND_REPLACE("OKI1",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
 
-	MDRV_SOUND_REPLACE("OKI2",OKIM6295, 2000000)
+	MDRV_SOUND_REPLACE("OKI2",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
@@ -741,6 +720,7 @@ static MACHINE_DRIVER_START( system_C )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system_A)
+	MDRV_CPU_REPLACE("main", M68000, SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_C,writemem_C)
 	MDRV_CPU_VBLANK_INT(interrupt_C,INTERRUPT_NUM_C)
@@ -764,7 +744,7 @@ KLOV entry for peekaboo: Jaleco board no. PB-92127A. Main CPU: Motorola 68000P10
 static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000)	/* ? */
+	MDRV_CPU_ADD(M68000, 8000000)	/* 8MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
 	MDRV_CPU_VBLANK_INT(interrupt_D,INTERRUPT_NUM_D)
 
@@ -825,12 +805,12 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( system_Z )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 6000000) /* ??? */
+	MDRV_CPU_ADD(M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
 	MDRV_CPU_VBLANK_INT(interrupt_A,INTERRUPT_NUM_A)
 
-	MDRV_CPU_ADD(Z80, 3000000)
-	/* audio CPU */ /* ??? */
+	MDRV_CPU_ADD(Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_z80,sound_writemem_z80)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 
@@ -3960,8 +3940,10 @@ GAME( 1988, p47j,     p47,      system_A,          p47,      0,        ROT0,   "
 GAME( 1988, kickoff,  0,        system_A,          kickoff,  0,        ROT0,   "Jaleco", "Kick Off (Japan)", 0 )
 GAME( 1988, tshingen, 0,        system_A,          tshingen, phantasm, ROT0,   "Jaleco", "Takeda Shingen (Japan, Japanese)", 0 )
 GAME( 1988, tshingna, tshingen, system_A,          tshingen, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
-GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
-GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
+GAME( 1988, kazan,    0,        system_A,          kazan,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
+GAME( 1988, iganinju, kazan,    system_A,          kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
+//GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
+//GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   hachoo,   ROT0,   "Jaleco", "Hachoo!", 0 )
