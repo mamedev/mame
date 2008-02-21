@@ -2288,6 +2288,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 
 	for (i = 0;i < chips;i++)
 	{
+		int has_separate_screen = (device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, i) != NULL);
 		int xd,yd;
 		TC0100SCN_dblwidth[i]=0;
 
@@ -2306,7 +2307,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
            Thundfox is the only one of those with two chips, and
            we're safe as it uses single width tilemaps. */
 
-		myclip = machine->screen[(machine->config->screen[i].tag == NULL) ? 0 : i].visarea;
+		myclip = machine->screen[has_separate_screen ? i : 0].visarea;
 
 		TC0100SCN_cliprect[i] = myclip;
 

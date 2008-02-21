@@ -470,6 +470,7 @@ INLINE void free_render_ref(render_ref *ref)
 
 void render_init(running_machine *machine)
 {
+	int numscreens = video_screen_count(machine->config);
 	int scrnum;
 
 	/* make sure we clean up after ourselves */
@@ -490,15 +491,14 @@ void render_init(running_machine *machine)
 	ui_container = render_container_alloc();
 
 	/* create a container for each screen and determine its orientation */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->config->screen[scrnum].tag != NULL)
-		{
-			screen_container[scrnum] = render_container_alloc();
-			render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
-			render_container_set_brightness(screen_container[scrnum], options_get_float(mame_options(), OPTION_BRIGHTNESS));
-			render_container_set_contrast(screen_container[scrnum], options_get_float(mame_options(), OPTION_CONTRAST));
-			render_container_set_gamma(screen_container[scrnum], options_get_float(mame_options(), OPTION_GAMMA));
-		}
+	for (scrnum = 0; scrnum < numscreens; scrnum++)
+	{
+		screen_container[scrnum] = render_container_alloc();
+		render_container_set_orientation(screen_container[scrnum], Machine->gamedrv->flags & ORIENTATION_MASK);
+		render_container_set_brightness(screen_container[scrnum], options_get_float(mame_options(), OPTION_BRIGHTNESS));
+		render_container_set_contrast(screen_container[scrnum], options_get_float(mame_options(), OPTION_CONTRAST));
+		render_container_set_gamma(screen_container[scrnum], options_get_float(mame_options(), OPTION_GAMMA));
+	}
 
 	/* register callbacks */
 	config_register("video", render_load, render_save);
@@ -1366,19 +1366,20 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
+				const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, item->index)->inline_config;
 				const rectangle vectorvis = { 0, 639, 0, 479 };
-				const rectangle *visarea;
+				const rectangle *visarea = NULL;
 				render_container *container = screen_container[item->index];
 				render_bounds bounds;
 				float xscale, yscale;
 
 				/* we may be called very early, before Machine->visible_area is initialized; handle that case */
-				if ((Machine->config->video_attributes & VIDEO_TYPE_VECTOR) != 0)
+				if (scrconfig->type == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
 				else if (Machine->screen[item->index].visarea.max_x > Machine->screen[item->index].visarea.min_x)
 					visarea = &Machine->screen[item->index].visarea;
 				else
-					visarea = &Machine->config->screen[item->index].defstate.visarea;
+					visarea = &scrconfig->defstate.visarea;
 
 				/* apply target orientation to the bounds */
 				bounds = item->bounds;
@@ -1619,7 +1620,7 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	}
 
 	/* now do the built-in layouts for single-screen games */
-	if (Machine->config->screen[0].tag != NULL && Machine->config->screen[1].tag == NULL)
+	if (video_screen_count(Machine->config) == 1)
 	{
 		if (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)
 			*nextfile = layout_file_load(NULL, layout_vertical);

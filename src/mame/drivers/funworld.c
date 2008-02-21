@@ -1456,13 +1456,13 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_CPU_PROGRAM_MAP(funworld_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)		// Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	// Taken from MC6845 init, registers 01 & 06.
@@ -1476,7 +1476,7 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_VIDEO_START(funworld)
 	MDRV_VIDEO_UPDATE(funworld)
 
-	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_ADD("crtc", MC6845)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1500,6 +1500,7 @@ static MACHINE_DRIVER_START( magiccrd )
 	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	// 2MHz
 	MDRV_CPU_PROGRAM_MAP(magiccrd_map, 0)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE((123+1)*4, (36+1)*8)			// Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1).
 //  MDRV_SCREEN_VISIBLE_AREA(0*4, 112*4-1, 0*8, 34*8-1) // Taken from MC6845 init, registers 01 & 06.
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 98*4-1, 0*8, 32*8-1)     // adjusted to screen for testing purposes.
@@ -1538,18 +1539,18 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
+	// video hardware
+
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((128+1)*4, (30+1)*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 30*8-1)
 //  MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)
 //  MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)
 
-//	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+//	MDRV_DEVICE_ADD("crtc", MC6845)
 
 	MDRV_GFXDECODE(sn10)
 

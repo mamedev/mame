@@ -569,13 +569,13 @@ static MACHINE_DRIVER_START( gdrawpkr )
 	MDRV_CPU_PROGRAM_MAP(gdrawpkr_map, 0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	// video hardware
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( gdrawpkr )
 	MDRV_VIDEO_START(gdrawpkr)
 	MDRV_VIDEO_UPDATE(gdrawpkr)
 
-	MDRV_DEVICE_ADD("crtc", MC6845, 0)
+	MDRV_DEVICE_ADD("crtc", MC6845)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

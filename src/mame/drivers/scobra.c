@@ -1386,9 +1386,6 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(type1_readmem,type1_writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_readmem,scobra_sound_writemem)
@@ -1397,10 +1394,13 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_MACHINE_RESET(scramble)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(scobra)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
@@ -1454,7 +1454,7 @@ static MACHINE_DRIVER_START( rescue )
 	MDRV_IMPORT_FROM(type1)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)	/* needs fine color resolution for the gradient background */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(32+64+2+128)	/* 32 for characters, 64 for stars, 2 for bullets, 128 for background */
 
@@ -1469,7 +1469,7 @@ static MACHINE_DRIVER_START( minefld )
 	MDRV_IMPORT_FROM(type1)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)	/* needs fine color resolution for the gradient background */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(32+64+2+256)	/* 32 for characters, 64 for stars, 2 for bullets, 256 for background */
 
@@ -1543,9 +1543,6 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_readmem,hustler_writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_CPU_ADD_TAG("sound",Z80,14318000/8)
 	/* audio CPU */	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_readmem,hustler_sound_writemem)
@@ -1554,10 +1551,13 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_MACHINE_RESET(scramble)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(scobra)
 	MDRV_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
 

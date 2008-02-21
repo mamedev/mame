@@ -874,10 +874,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 	// if we don't have a match, default to the nth view
 	if (viewindex == -1)
 	{
-		int scrcount;
-
-		// count the number of screens
-		for (scrcount = 0; Machine->config->screen[scrcount].tag != NULL; scrcount++) ;
+		int scrcount = video_screen_count(Machine->config);
 
 		// if we have enough screens to be one per monitor, assign in order
 		if (video_config.numscreens >= scrcount)

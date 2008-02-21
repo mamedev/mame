@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( trvquest )
 	MDRV_MACHINE_RESET(trvquest)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(trvquest_video);
+	MDRV_IMPORT_FROM(trvquest_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

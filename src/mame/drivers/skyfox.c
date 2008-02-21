@@ -262,14 +262,14 @@ static MACHINE_DRIVER_START( skyfox )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(skyfox_sound_readmem,skyfox_sound_writemem)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0+0x60, 320-1+0x60, 0+16, 256-1-16)	// from $30*2 to $CC*2+8
+
 	MDRV_GFXDECODE(skyfox)
 	MDRV_PALETTE_LENGTH(256+256)	/* 256 static colors (+256 for the background??) */
 

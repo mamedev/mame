@@ -234,14 +234,14 @@ static MACHINE_DRIVER_START( dommy )
 	MDRV_CPU_PROGRAM_MAP(dommy_readmem,dommy_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 1*8, 31*8-1)
+
 	MDRV_GFXDECODE(scregg)
 	MDRV_PALETTE_LENGTH(8)
 
@@ -267,14 +267,14 @@ static MACHINE_DRIVER_START( scregg )
 	MDRV_CPU_PROGRAM_MAP(eggs_readmem,eggs_writemem)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
+
 	MDRV_GFXDECODE(scregg)
 	MDRV_PALETTE_LENGTH(8)
 

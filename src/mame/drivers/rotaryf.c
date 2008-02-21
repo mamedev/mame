@@ -152,13 +152,11 @@ static MACHINE_DRIVER_START( rotaryf )
 	MDRV_CPU_PROGRAM_MAP(rotaryf_map,0)
 	MDRV_CPU_IO_MAP(rotaryf_io_map,0)
 	MDRV_CPU_VBLANK_INT(rotaryf_interrupt,5)
-	MDRV_SCREEN_REFRESH_RATE(60)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_VIDEO_UPDATE(rotaryf)
 
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)

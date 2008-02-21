@@ -1310,14 +1310,14 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_CPU_IO_MAP(kungfum_readport,kungfum_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
+
 	MDRV_GFXDECODE(ldrun)
 	MDRV_PALETTE_LENGTH(512)
 
@@ -1339,6 +1339,7 @@ static MACHINE_DRIVER_START( kungfum )
 	MDRV_CPU_IO_MAP(kungfum_readport,kungfum_writeport)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
 	MDRV_VIDEO_START(kungfum)
@@ -1355,6 +1356,7 @@ static MACHINE_DRIVER_START( battroad )
 	MDRV_CPU_IO_MAP(kungfum_readport,battroad_writeport)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(battroad)
 	MDRV_PALETTE_LENGTH(544)
@@ -1376,6 +1378,7 @@ static MACHINE_DRIVER_START( ldrun2 )
 	MDRV_VIDEO_START(ldrun2)
 	MDRV_VIDEO_UPDATE(ldrun)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 31*8-1)
 MACHINE_DRIVER_END
 
@@ -1391,6 +1394,7 @@ static MACHINE_DRIVER_START( ldrun3 )
 	/* video hardware */
 	MDRV_GFXDECODE(ldrun3)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 31*8-1)
 MACHINE_DRIVER_END
 
@@ -1484,6 +1488,7 @@ static MACHINE_DRIVER_START( youjyudn )
 	MDRV_CPU_IO_MAP(kungfum_readport,youjyudn_writeport)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(youjyudn)
 
@@ -1500,6 +1505,7 @@ static MACHINE_DRIVER_START( horizon )
 	MDRV_CPU_PROGRAM_MAP(horizon_readmem,horizon_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
 	MDRV_VIDEO_START(horizon)

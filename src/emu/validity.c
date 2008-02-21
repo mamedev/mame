@@ -83,7 +83,7 @@ static quark_table *defstr_table;
 INLINE const char *input_port_string_from_index(UINT32 index)
 {
 	input_port_token token;
-	token.i[0] = index;
+	token.fptr = index;
 	return input_port_string_from_token(token);
 }
 
@@ -774,52 +774,53 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 static int validate_display(int drivnum, const machine_config *drv)
 {
 	const game_driver *driver = drivers[drivnum];
+	const device_config *device;
 	int palette_modes = FALSE;
 	int error = FALSE;
-	int scrnum;
 
 	/* loop over screens */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (drv->screen[scrnum].tag != NULL)
+	for (device = video_screen_first(drv); device != NULL; device = video_screen_next(device))
+	{
+		const screen_config *scrconfig = device->inline_config;
+	
+		/* sanity check dimensions */
+		if ((scrconfig->defstate.width <= 0) || (scrconfig->defstate.height <= 0))
 		{
-			/* sanity check dimensions */
-			if ((drv->screen[scrnum].defstate.width <= 0) || (drv->screen[scrnum].defstate.height <= 0))
+			mame_printf_error("%s: %s screen \"%s\" has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
+			error = TRUE;
+		}
+
+		/* sanity check display area */
+		if (scrconfig->type != SCREEN_TYPE_VECTOR)
+		{
+			if ((scrconfig->defstate.visarea.max_x < scrconfig->defstate.visarea.min_x)
+				|| (scrconfig->defstate.visarea.max_y < scrconfig->defstate.visarea.min_y)
+				|| (scrconfig->defstate.visarea.max_x >= scrconfig->defstate.width)
+				|| (scrconfig->defstate.visarea.max_y >= scrconfig->defstate.height))
 			{
-				mame_printf_error("%s: %s screen %d has invalid display dimensions\n", driver->source_file, driver->name, scrnum);
+				mame_printf_error("%s: %s screen \"%s\" has an invalid display area\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 
 			/* sanity check screen formats */
-			if (drv->screen[scrnum].defstate.format != BITMAP_FORMAT_INDEXED16 &&
-				drv->screen[scrnum].defstate.format != BITMAP_FORMAT_RGB15 &&
-				drv->screen[scrnum].defstate.format != BITMAP_FORMAT_RGB32)
+			if (scrconfig->defstate.format != BITMAP_FORMAT_INDEXED16 &&
+				scrconfig->defstate.format != BITMAP_FORMAT_RGB15 &&
+				scrconfig->defstate.format != BITMAP_FORMAT_RGB32)
 			{
-				mame_printf_error("%s: %s screen %d has unsupported format\n", driver->source_file, driver->name, scrnum);
+				mame_printf_error("%s: %s screen \"%s\" has unsupported format\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-			if (drv->screen[scrnum].defstate.format == BITMAP_FORMAT_INDEXED16)
+			if (scrconfig->defstate.format == BITMAP_FORMAT_INDEXED16)
 				palette_modes = TRUE;
-
-			/* sanity check display area */
-			if (!(drv->video_attributes & VIDEO_TYPE_VECTOR))
-			{
-				if ((drv->screen[scrnum].defstate.visarea.max_x < drv->screen[scrnum].defstate.visarea.min_x)
-					|| (drv->screen[scrnum].defstate.visarea.max_y < drv->screen[scrnum].defstate.visarea.min_y)
-					|| (drv->screen[scrnum].defstate.visarea.max_x >= drv->screen[scrnum].defstate.width)
-					|| (drv->screen[scrnum].defstate.visarea.max_y >= drv->screen[scrnum].defstate.height))
-				{
-					mame_printf_error("%s: %s screen %d has an invalid display area\n", driver->source_file, driver->name, scrnum);
-					error = TRUE;
-				}
-			}
-
-			/* check for zero frame rate */
-			if (drv->screen[scrnum].defstate.refresh == 0)
-			{
-				mame_printf_error("%s: %s screen %d has a zero refresh rate\n", driver->source_file, driver->name, scrnum);
-				error = TRUE;
-			}
 		}
+
+		/* check for zero frame rate */
+		if (scrconfig->defstate.refresh == 0)
+		{
+			mame_printf_error("%s: %s screen \"%s\" has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
+			error = TRUE;
+		}
+	}
 
 	/* check for empty palette */
 	if (palette_modes && drv->total_colors == 0)

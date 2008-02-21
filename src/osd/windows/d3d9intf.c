@@ -250,70 +250,70 @@ static const d3d_interface d3d9_interface =
 //  Direct3DDevice interfaces
 //============================================================
 
-static HRESULT device_begin_scene(d3d_device *dev)
+static HRESULT d3d_device_begin_scene(d3d_device *dev)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_BeginScene(device);
 }
 
 
-static HRESULT device_clear(d3d_device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil)
+static HRESULT d3d_device_clear(d3d_device *dev, DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_Clear(device, count, rects, flags, color, z, stencil);
 }
 
 
-static HRESULT device_create_offscreen_plain_surface(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, d3d_surface **surface)
+static HRESULT d3d_device_create_offscreen_plain_surface(d3d_device *dev, UINT width, UINT height, D3DFORMAT format, D3DPOOL pool, d3d_surface **surface)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_CreateOffscreenPlainSurface(device, width, height, format, pool, (IDirect3DSurface9 **)surface, NULL);
 }
 
 
-static HRESULT device_create_texture(d3d_device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, d3d_texture **texture)
+static HRESULT d3d_device_create_texture(d3d_device *dev, UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, D3DPOOL pool, d3d_texture **texture)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_CreateTexture(device, width, height, levels, usage, format, pool, (IDirect3DTexture9 **)texture, NULL);
 }
 
 
-static HRESULT device_create_vertex_buffer(d3d_device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, d3d_vertex_buffer **buf)
+static HRESULT d3d_device_create_vertex_buffer(d3d_device *dev, UINT length, DWORD usage, DWORD fvf, D3DPOOL pool, d3d_vertex_buffer **buf)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_CreateVertexBuffer(device, length, usage, fvf, pool, (IDirect3DVertexBuffer9 **)buf, NULL);
 }
 
 
-static HRESULT device_draw_primitive(d3d_device *dev, D3DPRIMITIVETYPE type, UINT start, UINT count)
+static HRESULT d3d_device_draw_primitive(d3d_device *dev, D3DPRIMITIVETYPE type, UINT start, UINT count)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_DrawPrimitive(device, type, start, count);
 }
 
 
-static HRESULT device_end_scene(d3d_device *dev)
+static HRESULT d3d_device_end_scene(d3d_device *dev)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_EndScene(device);
 }
 
 
-static HRESULT device_get_raster_status(d3d_device *dev, D3DRASTER_STATUS *status)
+static HRESULT d3d_device_get_raster_status(d3d_device *dev, D3DRASTER_STATUS *status)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_GetRasterStatus(device, 0, status);
 }
 
 
-static HRESULT device_get_render_target(d3d_device *dev, DWORD index, d3d_surface **surface)
+static HRESULT d3d_device_get_render_target(d3d_device *dev, DWORD index, d3d_surface **surface)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_GetRenderTarget(device, index, (IDirect3DSurface9 **)surface);
 }
 
 
-static HRESULT device_present(d3d_device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags)
+static HRESULT d3d_device_present(d3d_device *dev, const RECT *source, const RECT *dest, HWND override, RGNDATA *dirty, DWORD flags)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	if (flags != 0)
@@ -331,14 +331,14 @@ static HRESULT device_present(d3d_device *dev, const RECT *source, const RECT *d
 }
 
 
-static ULONG device_release(d3d_device *dev)
+static ULONG d3d_device_release(d3d_device *dev)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_Release(device);
 }
 
 
-static HRESULT device_reset(d3d_device *dev, d3d_present_parameters *params)
+static HRESULT d3d_device_reset(d3d_device *dev, d3d_present_parameters *params)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	D3DPRESENT_PARAMETERS d3d9params;
@@ -347,21 +347,21 @@ static HRESULT device_reset(d3d_device *dev, d3d_present_parameters *params)
 }
 
 
-static void device_set_gamma_ramp(d3d_device *dev, DWORD flags, const D3DGAMMARAMP *ramp)
+static void d3d_device_set_gamma_ramp(d3d_device *dev, DWORD flags, const D3DGAMMARAMP *ramp)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	IDirect3DDevice9_SetGammaRamp(device, 0, flags, ramp);
 }
 
 
-static HRESULT device_set_render_state(d3d_device *dev, D3DRENDERSTATETYPE state, DWORD value)
+static HRESULT d3d_device_set_render_state(d3d_device *dev, D3DRENDERSTATETYPE state, DWORD value)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_SetRenderState(device, state, value);
 }
 
 
-static HRESULT device_set_render_target(d3d_device *dev, DWORD index, d3d_surface *surf)
+static HRESULT d3d_device_set_render_target(d3d_device *dev, DWORD index, d3d_surface *surf)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	IDirect3DSurface9 *surface = (IDirect3DSurface9 *)surf;
@@ -369,7 +369,7 @@ static HRESULT device_set_render_target(d3d_device *dev, DWORD index, d3d_surfac
 }
 
 
-static HRESULT device_set_stream_source(d3d_device *dev, UINT number, d3d_vertex_buffer *vbuf, UINT stride)
+static HRESULT d3d_device_set_stream_source(d3d_device *dev, UINT number, d3d_vertex_buffer *vbuf, UINT stride)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	IDirect3DVertexBuffer9 *vertexbuf = (IDirect3DVertexBuffer9 *)vbuf;
@@ -377,7 +377,7 @@ static HRESULT device_set_stream_source(d3d_device *dev, UINT number, d3d_vertex
 }
 
 
-static HRESULT device_set_texture(d3d_device *dev, DWORD stage, d3d_texture *tex)
+static HRESULT d3d_device_set_texture(d3d_device *dev, DWORD stage, d3d_texture *tex)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	IDirect3DBaseTexture9 *texture = (IDirect3DBaseTexture9 *)tex;
@@ -385,7 +385,7 @@ static HRESULT device_set_texture(d3d_device *dev, DWORD stage, d3d_texture *tex
 }
 
 
-static HRESULT device_set_texture_stage_state(d3d_device *dev, DWORD stage, D3DTEXTURESTAGESTATETYPE state, DWORD value)
+static HRESULT d3d_device_set_texture_stage_state(d3d_device *dev, DWORD stage, D3DTEXTURESTAGESTATETYPE state, DWORD value)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 
@@ -416,14 +416,14 @@ static HRESULT device_set_texture_stage_state(d3d_device *dev, DWORD stage, D3DT
 }
 
 
-static HRESULT device_set_vertex_shader(d3d_device *dev, D3DFORMAT format)
+static HRESULT d3d_device_set_vertex_shader(d3d_device *dev, D3DFORMAT format)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_SetFVF(device, format);
 }
 
 
-static HRESULT device_stretch_rect(d3d_device *dev, d3d_surface *source, const RECT *srcrect, d3d_surface *dest, const RECT *dstrect, D3DTEXTUREFILTERTYPE filter)
+static HRESULT d3d_device_stretch_rect(d3d_device *dev, d3d_surface *source, const RECT *srcrect, d3d_surface *dest, const RECT *dstrect, D3DTEXTUREFILTERTYPE filter)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	IDirect3DSurface9 *ssurface = (IDirect3DSurface9 *)source;
@@ -432,7 +432,7 @@ static HRESULT device_stretch_rect(d3d_device *dev, d3d_surface *source, const R
 }
 
 
-static HRESULT device_test_cooperative_level(d3d_device *dev)
+static HRESULT d3d_device_test_cooperative_level(d3d_device *dev)
 {
 	IDirect3DDevice9 *device = (IDirect3DDevice9 *)dev;
 	return IDirect3DDevice9_TestCooperativeLevel(device);
@@ -441,27 +441,27 @@ static HRESULT device_test_cooperative_level(d3d_device *dev)
 
 static const d3d_device_interface d3d9_device_interface =
 {
-	device_begin_scene,
-	device_clear,
-	device_create_offscreen_plain_surface,
-	device_create_texture,
-	device_create_vertex_buffer,
-	device_draw_primitive,
-	device_end_scene,
-	device_get_raster_status,
-	device_get_render_target,
-	device_present,
-	device_release,
-	device_reset,
-	device_set_gamma_ramp,
-	device_set_render_state,
-	device_set_render_target,
-	device_set_stream_source,
-	device_set_texture,
-	device_set_texture_stage_state,
-	device_set_vertex_shader,
-	device_stretch_rect,
-	device_test_cooperative_level
+	d3d_device_begin_scene,
+	d3d_device_clear,
+	d3d_device_create_offscreen_plain_surface,
+	d3d_device_create_texture,
+	d3d_device_create_vertex_buffer,
+	d3d_device_draw_primitive,
+	d3d_device_end_scene,
+	d3d_device_get_raster_status,
+	d3d_device_get_render_target,
+	d3d_device_present,
+	d3d_device_release,
+	d3d_device_reset,
+	d3d_device_set_gamma_ramp,
+	d3d_device_set_render_state,
+	d3d_device_set_render_target,
+	d3d_device_set_stream_source,
+	d3d_device_set_texture,
+	d3d_device_set_texture_stage_state,
+	d3d_device_set_vertex_shader,
+	d3d_device_stretch_rect,
+	d3d_device_test_cooperative_level
 };
 
 
@@ -470,21 +470,21 @@ static const d3d_device_interface d3d9_device_interface =
 //  Direct3DSurface interfaces
 //============================================================
 
-static HRESULT surface_lock_rect(d3d_surface *surf, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags)
+static HRESULT d3d_surface_lock_rect(d3d_surface *surf, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags)
 {
 	IDirect3DSurface9 *surface = (IDirect3DSurface9 *)surf;
 	return IDirect3DSurface9_LockRect(surface, locked, rect, flags);
 }
 
 
-static ULONG surface_release(d3d_surface *surf)
+static ULONG d3d_surface_release(d3d_surface *surf)
 {
 	IDirect3DSurface9 *surface = (IDirect3DSurface9 *)surf;
 	return IDirect3DSurface9_Release(surface);
 }
 
 
-static HRESULT surface_unlock_rect(d3d_surface *surf)
+static HRESULT d3d_surface_unlock_rect(d3d_surface *surf)
 {
 	IDirect3DSurface9 *surface = (IDirect3DSurface9 *)surf;
 	return IDirect3DSurface9_UnlockRect(surface);
@@ -493,9 +493,9 @@ static HRESULT surface_unlock_rect(d3d_surface *surf)
 
 static const d3d_surface_interface d3d9_surface_interface =
 {
-	surface_lock_rect,
-	surface_release,
-	surface_unlock_rect
+	d3d_surface_lock_rect,
+	d3d_surface_release,
+	d3d_surface_unlock_rect
 };
 
 
@@ -504,28 +504,28 @@ static const d3d_surface_interface d3d9_surface_interface =
 //  Direct3DTexture interfaces
 //============================================================
 
-static HRESULT texture_get_surface_level(d3d_texture *tex, UINT level, d3d_surface **surface)
+static HRESULT d3d_texture_get_surface_level(d3d_texture *tex, UINT level, d3d_surface **surface)
 {
 	IDirect3DTexture9 *texture = (IDirect3DTexture9 *)tex;
 	return IDirect3DTexture9_GetSurfaceLevel(texture, level, (IDirect3DSurface9 **)surface);
 }
 
 
-static HRESULT texture_lock_rect(d3d_texture *tex, UINT level, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags)
+static HRESULT d3d_texture_lock_rect(d3d_texture *tex, UINT level, D3DLOCKED_RECT *locked, const RECT *rect, DWORD flags)
 {
 	IDirect3DTexture9 *texture = (IDirect3DTexture9 *)tex;
 	return IDirect3DTexture9_LockRect(texture, level, locked, rect, flags);
 }
 
 
-static ULONG texture_release(d3d_texture *tex)
+static ULONG d3d_texture_release(d3d_texture *tex)
 {
 	IDirect3DTexture9 *texture = (IDirect3DTexture9 *)tex;
 	return IDirect3DTexture9_Release(texture);
 }
 
 
-static HRESULT texture_unlock_rect(d3d_texture *tex, UINT level)
+static HRESULT d3d_texture_unlock_rect(d3d_texture *tex, UINT level)
 {
 	IDirect3DTexture9 *texture = (IDirect3DTexture9 *)tex;
 	return IDirect3DTexture9_UnlockRect(texture, level);
@@ -534,10 +534,10 @@ static HRESULT texture_unlock_rect(d3d_texture *tex, UINT level)
 
 static const d3d_texture_interface d3d9_texture_interface =
 {
-	texture_get_surface_level,
-	texture_lock_rect,
-	texture_release,
-	texture_unlock_rect
+	d3d_texture_get_surface_level,
+	d3d_texture_lock_rect,
+	d3d_texture_release,
+	d3d_texture_unlock_rect
 };
 
 
@@ -546,21 +546,21 @@ static const d3d_texture_interface d3d9_texture_interface =
 //  Direct3DVertexBuffer interfaces
 //============================================================
 
-static HRESULT vertex_buffer_lock(d3d_vertex_buffer *vbuf, UINT offset, UINT size, VOID **data, DWORD flags)
+static HRESULT d3d_vertex_buffer_lock(d3d_vertex_buffer *vbuf, UINT offset, UINT size, VOID **data, DWORD flags)
 {
 	IDirect3DVertexBuffer9 *vertexbuf = (IDirect3DVertexBuffer9 *)vbuf;
 	return IDirect3DVertexBuffer9_Lock(vertexbuf, offset, size, data, flags);
 }
 
 
-static ULONG vertex_buffer_release(d3d_vertex_buffer *vbuf)
+static ULONG d3d_vertex_buffer_release(d3d_vertex_buffer *vbuf)
 {
 	IDirect3DVertexBuffer9 *vertexbuf = (IDirect3DVertexBuffer9 *)vbuf;
 	return IDirect3DVertexBuffer9_Release(vertexbuf);
 }
 
 
-static HRESULT vertex_buffer_unlock(d3d_vertex_buffer *vbuf)
+static HRESULT d3d_vertex_buffer_unlock(d3d_vertex_buffer *vbuf)
 {
 	IDirect3DVertexBuffer9 *vertexbuf = (IDirect3DVertexBuffer9 *)vbuf;
 	return IDirect3DVertexBuffer9_Unlock(vertexbuf);
@@ -569,9 +569,9 @@ static HRESULT vertex_buffer_unlock(d3d_vertex_buffer *vbuf)
 
 static const d3d_vertex_buffer_interface d3d9_vertex_buffer_interface =
 {
-	vertex_buffer_lock,
-	vertex_buffer_release,
-	vertex_buffer_unlock
+	d3d_vertex_buffer_lock,
+	d3d_vertex_buffer_release,
+	d3d_vertex_buffer_unlock
 };
 
 

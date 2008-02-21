@@ -236,8 +236,6 @@ static MACHINE_DRIVER_START( frogger )
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */ /* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(frogger_sound_readmem,frogger_sound_writemem)
@@ -246,10 +244,12 @@ static MACHINE_DRIVER_START( frogger )
 	MDRV_MACHINE_RESET(scramble)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(frogger)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 

@@ -28,11 +28,6 @@
 
 /* ----- flags for video_attributes ----- */
 
-/* is the video hardware raster or vector based? */
-#define VIDEO_TYPE_NONE                 0x0000
-#define	VIDEO_TYPE_RASTER				0x0001
-#define	VIDEO_TYPE_VECTOR				0x0002
-
 /* should VIDEO_UPDATE by called at the start of VBLANK or at the end? */
 #define	VIDEO_UPDATE_BEFORE_VBLANK		0x0000
 #define	VIDEO_UPDATE_AFTER_VBLANK		0x0004
@@ -81,7 +76,6 @@ struct _machine_config
 	const gfx_decode_entry *gfxdecodeinfo;			/* pointer to array of graphics decoding information */
 	UINT32				total_colors;				/* total number of colors in the palette */
 	const char *		default_layout;				/* default layout for this machine */
-	screen_config		screen[MAX_SCREENS];		/* total number of screens */
 
 	void 				(*init_palette)(running_machine *machine, const UINT8 *color_prom); /* one-time palette init callback  */
 	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
@@ -115,11 +109,9 @@ struct _machine_config
 	{																	\
 		cpu_config *cpu = NULL;											\
 		sound_config *sound = NULL;										\
-		screen_config *screen = &machine->screen[0];					\
 		device_config *device = NULL;									\
 		(void)cpu;														\
 		(void)sound;													\
-		(void)screen;													\
 		(void)device;													\
 
 #define MACHINE_DRIVER_END 												\
@@ -129,6 +121,23 @@ struct _machine_config
 /* importing data from other machine drivers */
 #define MDRV_IMPORT_FROM(game) 											\
 	construct_##game(machine); 											\
+
+
+/* add/remove/config devices */
+#define MDRV_DEVICE_ADD(_tag, _type)									\
+	device = device_list_add(&machine->devicelist, _type, _tag);		\
+
+#define MDRV_DEVICE_REMOVE(_tag, _type)									\
+	device_list_remove(&machine->devicelist, _type, _tag);				\
+
+#define MDRV_DEVICE_MODIFY(_tag, _type)									\
+	device = (device_config *)device_list_find_by_tag(machine->devicelist, _type, _tag); \
+
+#define MDRV_DEVICE_CONFIG(_config)										\
+	device->static_config = &(_config);									\
+
+#define MDRV_DEVICE_CONFIG_DATA(_struct, _field, _val)					\
+	((_struct *)device->inline_config)->_field = (_val);				\
 
 
 /* add/modify/remove/replace CPUs */
@@ -256,50 +265,54 @@ struct _machine_config
 
 
 /* add/remove screens */
-#define MDRV_SCREEN_ADD(tag, palbase)									\
-	screen = machine_config_add_screen(machine, (tag), (palbase));				\
+#define MDRV_SCREEN_ADD(tag, _type)										\
+	MDRV_DEVICE_ADD(tag, VIDEO_SCREEN)									\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, type, SCREEN_TYPE_##_type)	\
 
 #define MDRV_SCREEN_REMOVE(tag)											\
-	machine_config_remove_screen(machine, tag);									\
+	MDRV_DEVICE_REMOVE(tag, VIDEO_SCREEN)								\
 
 #define MDRV_SCREEN_MODIFY(tag)											\
-	screen = machine_config_find_screen(machine, tag);							\
+	MDRV_DEVICE_MODIFY(tag, VIDEO_SCREEN)								\
 
 #define MDRV_SCREEN_FORMAT(_format)										\
-	screen->defstate.format = (_format);								\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.format, _format)	\
+
+#define MDRV_SCREEN_TYPE(_type)											\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, type, SCREEN_TYPE_##_type)	\
 
 #define MDRV_SCREEN_RAW_PARAMS(pixclock, htotal, hbend, hbstart, vtotal, vbend, vbstart) \
-	screen->defstate.refresh = HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal); \
-	screen->defstate.vblank = (screen->defstate.refresh / (vtotal)) * ((vtotal) - ((vbstart) - (vbend))); \
-	screen->defstate.width = (htotal);									\
-	screen->defstate.height = (vtotal);									\
-	screen->defstate.visarea.min_x = (hbend);							\
-	screen->defstate.visarea.max_x = (hbstart) - 1;						\
-	screen->defstate.visarea.min_y = (vbend);							\
-	screen->defstate.visarea.max_y = (vbstart) - 1;						\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal))	\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.vblank, ((HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal)) / (vtotal)) * ((vtotal) - ((vbstart) - (vbend))))	\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.width, htotal)		\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.height, vtotal)		\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_x, hbend) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_x, (hbstart) - 1) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_y, vbend) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_y, (vbstart) - 1) \
 
 #define MDRV_SCREEN_REFRESH_RATE(rate)									\
-	screen->defstate.refresh = HZ_TO_ATTOSECONDS(rate);					\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(rate)) \
 
 #define MDRV_SCREEN_VBLANK_TIME(time)									\
-	screen->defstate.vblank = time;										\
-	screen->defstate.oldstyle_vblank_supplied = 1;						\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.vblank, time)		\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.oldstyle_vblank_supplied, TRUE) \
 
 #define MDRV_SCREEN_SIZE(_width, _height)								\
-	screen->defstate.width = (_width);									\
-	screen->defstate.height = (_height);								\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.width, _width)		\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.height, _height)	\
 
 #define MDRV_SCREEN_VISIBLE_AREA(minx, maxx, miny, maxy)				\
-	screen->defstate.visarea.min_x = (minx);							\
-	screen->defstate.visarea.max_x = (maxx);							\
-	screen->defstate.visarea.min_y = (miny);							\
-	screen->defstate.visarea.max_y = (maxy);							\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_x, minx) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_x, maxx) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_y, miny) \
+	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_y, maxy) \
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	screen->xoffset = (float)(_xoffs);									\
-	screen->xscale = (float)(_xscale);									\
-	screen->yoffset = (float)(_yoffs);									\
-	screen->yscale = (float)(_yscale);									\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, xoffset, (float)(_xoffs)) 	\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, xscale, (float)(_xscale)) 	\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, yoffset, (float)(_yoffs)) 	\
+	MDRV_DEVICE_CONFIG_DATA(screen_config, yscale, (float)(_yscale)) 	\
 
 
 /* add/remove speakers */
@@ -367,21 +380,6 @@ struct _machine_config
 	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, -1)					\
 
 
-/* add/remove devices */
-#define MDRV_DEVICE_ADD(_tag, _type, _clock)							\
-	device = device_list_add(&machine->devicelist, _type, _tag);		\
-	device->clock = (_clock);											\
-
-#define MDRV_DEVICE_REMOVE(_tag, _type)									\
-	device_list_remove(&machine->devicelist, _type, _tag);				\
-
-#define MDRV_DEVICE_MODIFY(_tag, _type)									\
-	device = device_list_find_by_tag(&machine->devicelist, _type, _tag);\
-
-#define MDRV_DEVICE_CONFIG(_config)										\
-	device->static_config = &(_config);									\
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -411,10 +409,6 @@ void machine_config_remove_speaker(machine_config *machine, const char *tag);
 sound_config *machine_config_add_sound(machine_config *machine, const char *tag, sound_type type, int clock);
 sound_config *machine_config_find_sound(machine_config *machine, const char *tag);
 void machine_config_remove_sound(machine_config *machine, const char *tag);
-
-screen_config *machine_config_add_screen(machine_config *machine, const char *tag, int palbase);
-screen_config *machine_config_find_screen(machine_config *machine, const char *tag);
-void machine_config_remove_screen(machine_config *machine, const char *tag);
 
 
 #endif	/* __MCONFIG_H__ */

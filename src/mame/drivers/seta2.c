@@ -1816,16 +1816,16 @@ static MACHINE_DRIVER_START( mj4simai )
 	MDRV_CPU_PROGRAM_MAP(mj4simai_readmem,mj4simai_writemem)
 	MDRV_CPU_VBLANK_INT(seta2_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x200, 0x200)
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+
 	MDRV_GFXDECODE(seta2)
 	MDRV_PALETTE_LENGTH(0x8000)
 
@@ -1852,6 +1852,7 @@ static MACHINE_DRIVER_START( gundamex )
 	MDRV_NVRAM_HANDLER(93C46_gundamex)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
 MACHINE_DRIVER_END
 
@@ -1862,6 +1863,7 @@ static MACHINE_DRIVER_START( grdians )
 	MDRV_CPU_PROGRAM_MAP(grdians_readmem,grdians_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
 MACHINE_DRIVER_END
 
@@ -1874,6 +1876,7 @@ static MACHINE_DRIVER_START( myangel )
 	MDRV_CPU_PROGRAM_MAP(myangel_readmem,myangel_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
@@ -1888,6 +1891,7 @@ static MACHINE_DRIVER_START( myangel2 )
 	MDRV_CPU_PROGRAM_MAP(myangel2_readmem,myangel2_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
@@ -1902,6 +1906,7 @@ static MACHINE_DRIVER_START( pzlbowl )
 	MDRV_CPU_PROGRAM_MAP(pzlbowl_readmem,pzlbowl_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
 MACHINE_DRIVER_END
 
@@ -1914,6 +1919,7 @@ static MACHINE_DRIVER_START( penbros )
 	MDRV_CPU_PROGRAM_MAP(penbros_readmem,penbros_writemem)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_DRIVER_END
 
@@ -1928,6 +1934,7 @@ static MACHINE_DRIVER_START( samshoot )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
 MACHINE_DRIVER_END
 

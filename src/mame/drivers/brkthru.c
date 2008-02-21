@@ -408,12 +408,11 @@ static MACHINE_DRIVER_START( brkthru )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(brkthru)
 	MDRV_PALETTE_LENGTH(256)
 
 	/* not sure; assuming to be the same as darwin */
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -447,11 +446,10 @@ static MACHINE_DRIVER_START( darwin )
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_GFXDECODE(brkthru)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", 0)
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 8, 248, 272, 8, 248)
 	/* frames per second, vblank duration
         Horizontal video frequency:

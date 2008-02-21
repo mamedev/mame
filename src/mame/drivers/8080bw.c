@@ -2406,6 +2406,7 @@ static MACHINE_DRIVER_START( shuttlei )
 	MDRV_CPU_IO_MAP(shuttlei_io_map,0)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MDRV_VIDEO_UPDATE(shuttlei)
 

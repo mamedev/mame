@@ -1991,9 +1991,6 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(scramble_readmem,scramble_writemem)
 
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_CPU_ADD_TAG("audio", Z80, 14318000/8)	/* 1.78975 MHz */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(scramble_sound_readmem,scramble_sound_writemem)
@@ -2002,10 +1999,13 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_MACHINE_RESET(scramble)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(scramble)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
@@ -2288,6 +2288,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_MACHINE_RESET(sfx)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 2*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 	MDRV_GFXDECODE(sfx)
@@ -2331,6 +2332,7 @@ static MACHINE_DRIVER_START( monsterz )
 	MDRV_MACHINE_RESET(monsterz)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 30*8-1, 2*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 	MDRV_GFXDECODE(sfx)
@@ -2406,6 +2408,7 @@ static MACHINE_DRIVER_START( hunchbks )
 	MDRV_CPU_IO_MAP(hunchbks_readport,0)
 	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
 
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 
 	/* video hardware */
@@ -2454,14 +2457,14 @@ static MACHINE_DRIVER_START( ad2083 )
 
 	MDRV_MACHINE_RESET(galaxian)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(ad2083)
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 

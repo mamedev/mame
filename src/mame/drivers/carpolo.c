@@ -241,17 +241,17 @@ static MACHINE_DRIVER_START( carpolo )
 	MDRV_CPU_VBLANK_INT(carpolo_timer_interrupt,1)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
 	MDRV_MACHINE_START(carpolo)
 	MDRV_MACHINE_RESET(carpolo)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
+
 	MDRV_GFXDECODE(carpolo)
 	MDRV_PALETTE_LENGTH(12*2+2*16+4*2)
 

@@ -577,19 +577,19 @@ static MACHINE_DRIVER_START( base )
 	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
-	MDRV_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
 	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(lasso)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(lasso)
 	MDRV_PALETTE_LENGTH(0x40)
 
@@ -641,6 +641,7 @@ static MACHINE_DRIVER_START( wwjgtin )
 	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map,0)
 
 	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
 	MDRV_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MDRV_PALETTE_LENGTH(0x40 + 16*16)

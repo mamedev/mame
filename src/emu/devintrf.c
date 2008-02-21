@@ -57,6 +57,18 @@ INLINE char *get_temp_string_buffer(void)
 }
 
 
+/*-------------------------------------------------
+    device_matches_type - does a device match
+    the provided type, taking wildcards into
+    effect?
+-------------------------------------------------*/
+
+INLINE int device_matches_type(const device_config *config, device_type type)
+{
+	return (type == DEVICE_TYPE_WILDCARD) ? TRUE : (config->type == type);
+}
+
+
 
 /***************************************************************************
     DEVICE CONFIGURATION
@@ -96,6 +108,10 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	device->inline_config = (info.i == 0) ? NULL : (device->tag + strlen(tag) + 1);
 	device->token = NULL;
 	strcpy(device->tag, tag);
+	
+	/* reset the inline_config to 0 */
+	if (info.i > 0)
+		memset(device->inline_config, 0, info.i);
 
 	/* fetch function pointers to the core functions */
 	info.set_info = NULL;
@@ -151,24 +167,112 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 
 
 /*-------------------------------------------------
+    device_list_items - return the number of 
+    items of a given type; DEVICE_TYPE_WILDCARD 
+    is allowed
+-------------------------------------------------*/
+
+int device_list_items(const device_config *listhead, device_type type)
+{
+	const device_config *curdev;
+	int count = 0;
+	
+	/* locate all devices */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		count += device_matches_type(curdev, type);
+	
+	return count;
+}
+
+
+/*-------------------------------------------------
+    device_list_first - return the first device 
+    in the list of a given type; 
+    DEVICE_TYPE_WILDCARD is allowed
+-------------------------------------------------*/
+
+const device_config *device_list_first(const device_config *listhead, device_type type)
+{
+	const device_config *curdev;
+	
+	/* scan forward starting with the list head */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (device_matches_type(curdev, type))
+			return curdev;
+	
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    device_list_next - return the next device 
+    in the list of a given type; 
+    DEVICE_TYPE_WILDCARD is allowed
+-------------------------------------------------*/
+
+const device_config *device_list_next(const device_config *prevdevice, device_type type)
+{
+	const device_config *curdev;
+	
+	assert(prevdevice != NULL);
+
+	/* scan forward starting with the item after the previous one */
+	for (curdev = prevdevice->next; curdev != NULL; curdev = curdev->next)
+		if (device_matches_type(curdev, type))
+			return curdev;
+	
+	return NULL;
+}
+
+
+/*-------------------------------------------------
     device_list_find_by_tag - retrieve a device
     configuration based on a type and tag
 -------------------------------------------------*/
 
 const device_config *device_list_find_by_tag(const device_config *listhead, device_type type, const char *tag)
 {
-	const device_config *device;
+	const device_config *curdev;
 
-	assert(type != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
-	for (device = listhead; device != NULL; device = device->next)
-		if (type == device->type && strcmp(tag, device->tag) == 0)
-			return device;
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (device_matches_type(curdev, type) && strcmp(tag, curdev->tag) == 0)
+			return curdev;
 	
 	/* fail */
 	return NULL;
+}
+
+
+
+/***************************************************************************
+    INDEX-BASED DEVICE ACCESS
+***************************************************************************/
+
+
+/*-------------------------------------------------
+    device_list_index - return the index of a 
+    device based on its type and tag; 
+    DEVICE_TYPE_WILDCARD is allowed
+-------------------------------------------------*/
+
+int device_list_index(const device_config *listhead, device_type type, const char *tag)
+{
+	const device_config *curdev;
+	int index = 0;
+	
+	/* locate all devices */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (device_matches_type(curdev, type))
+		{
+			if (strcmp(tag, curdev->tag) == 0)
+				return index;
+			index++;
+		}
+	
+	return -1;
 }
 
 
@@ -179,15 +283,14 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 
 const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index)
 {
-	const device_config *device;
+	const device_config *curdev;
 
 	assert(listhead != NULL);
-	assert(type != NULL);
 
 	/* find the device in the list */
-	for (device = listhead; device != NULL; device = device->next)
-		if (type == device->type && index-- == 0)
-			return device;
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (device_matches_type(curdev, type) && index-- == 0)
+			return curdev;
 	
 	/* fail */
 	return NULL;
@@ -220,7 +323,7 @@ void device_list_start(running_machine *machine)
 		assert(config->start != NULL);
 
 		/* call the start function */	
-		config->token = (*config->start)(machine, config->static_config, config->inline_config);
+		config->token = (*config->start)(machine, config->tag, config->static_config, config->inline_config);
 		assert(config->token != NULL);
 			
 		/* fatal error if this fails */
@@ -311,6 +414,36 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 	if (config == NULL)
 		fatalerror("devtag_get_token failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return config->token;
+}
+
+
+/*-------------------------------------------------
+    devtag_get_static_config - return a pointer to 
+    the static configuration for a device based on 
+    type and tag
+-------------------------------------------------*/
+
+const void *devtag_get_static_config(running_machine *machine, device_type type, const char *tag)
+{
+	const device_config *config = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	if (config == NULL)
+		fatalerror("devtag_get_static_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+	return config->static_config;
+}
+
+
+/*-------------------------------------------------
+    devtag_get_inline_config - return a pointer to 
+    the inline configuration for a device based on 
+    type and tag
+-------------------------------------------------*/
+
+const void *devtag_get_inline_config(running_machine *machine, device_type type, const char *tag)
+{
+	const device_config *config = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	if (config == NULL)
+		fatalerror("devtag_get_inline_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+	return config->inline_config;
 }
 
 

@@ -591,6 +591,7 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_LSW32)
 			{
+				int numscreens = video_screen_count(Machine->config);
 				int screen = chip;
 				int width, height;
 				screen_state *state = &Machine->screen[screen];
@@ -604,7 +605,7 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 				visarea.max_y = height-1;
 
 				// only try and update the screen if the driver says we have one
-				if(Machine->config->screen[screen].tag)
+				if (screen < numscreens)
 					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, Machine->screen[screen].refresh);
 			}
 			break;
@@ -1995,20 +1996,18 @@ static MACHINE_DRIVER_START(firebeat)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT(firebeat_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
 	MDRV_MACHINE_RESET(firebeat)
 	MDRV_NVRAM_HANDLER(firebeat)
 
  	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_PALETTE_LENGTH(32768)
-
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+
+	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(firebeat)
 	MDRV_VIDEO_UPDATE(firebeat)
@@ -2039,17 +2038,16 @@ static MACHINE_DRIVER_START(firebeat2)
 	MDRV_NVRAM_HANDLER(firebeat)
 
  	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("left", 0x000)
+	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_SCREEN_ADD("right", 0x000)
+	MDRV_SCREEN_ADD("right", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)

@@ -413,11 +413,10 @@ static MACHINE_DRIVER_START( crospang )
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
@@ -452,11 +451,10 @@ static MACHINE_DRIVER_START( bestri )
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)

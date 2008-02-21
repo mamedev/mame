@@ -15,6 +15,7 @@
 #define __VIDEO_H__
 
 #include "mamecore.h"
+#include "devintrf.h"
 #include "timer.h"
 
 
@@ -28,6 +29,27 @@
 /* number of levels of frameskipping supported */
 #define FRAMESKIP_LEVELS			12
 #define MAX_FRAMESKIP				(FRAMESKIP_LEVELS - 2)
+
+/* screen types */
+enum
+{
+	SCREEN_TYPE_INVALID = 0,
+	SCREEN_TYPE_RASTER,
+	SCREEN_TYPE_VECTOR,
+	SCREEN_TYPE_LCD
+};
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* these functions are macros primarily due to include file ordering */
+/* plus, they are very simple */
+#define video_screen_count(config)		device_list_items((config)->devicelist, VIDEO_SCREEN)
+#define video_screen_first(config)		device_list_first((config)->devicelist, VIDEO_SCREEN)
+#define video_screen_next(previous)		device_list_next((previous), VIDEO_SCREEN)
 
 
 
@@ -59,8 +81,7 @@ struct _screen_state
 typedef struct _screen_config screen_config;
 struct _screen_config
 {
-	const char *	tag;						/* nametag for the screen */
-	UINT32			palette_base;				/* base palette entry for this screen */
+	int				type;						/* type of screen */
 	screen_state	defstate;					/* default state */
 	float			xoffset, yoffset;			/* default X/Y offsets */
 	float			xscale, yscale;				/* default X/Y scale factor */
@@ -117,6 +138,14 @@ int video_screen_exists(int scrnum);
 
 
 
+/* ----- video screen device interface ----- */
+
+/* device get info callback */
+#define VIDEO_SCREEN video_screen_get_info
+void video_screen_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+
+
+
 /* ----- global rendering ----- */
 
 /* update the screen, handling frame skipping and rendering */
@@ -168,5 +197,6 @@ void video_movie_end_recording(running_machine *machine, int scrnum);
 /* ----- crosshair rendering ----- */
 
 void video_crosshair_toggle(void);
+
 
 #endif	/* __VIDEO_H__ */

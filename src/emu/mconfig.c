@@ -35,15 +35,6 @@ machine_config *machine_config_alloc(void (*constructor)(machine_config *))
 	
 	/* call the function to construct the data */
 	(*constructor)(config);
-
-	/* if no screen tagged, tag screen 0 as main */
-	if (config->screen[0].tag == NULL && config->screen[0].defstate.format != BITMAP_FORMAT_INVALID)
-		config->screen[0].tag = "main";
-
-	/* if no screens, set a dummy refresh for the main screen */
-	if (config->screen[0].tag == NULL)
-		config->screen[0].defstate.refresh = HZ_TO_ATTOSECONDS(60);
-	
 	return config;
 }
 
@@ -252,65 +243,4 @@ void machine_config_remove_sound(machine_config *machine, const char *tag)
 		}
 
 	fatalerror("Can't find sound '%s'!\n", tag);
-}
-
-
-/*-------------------------------------------------
-    machine_config_add_screen - add a screen during
-    machine driver expansion
--------------------------------------------------*/
-
-screen_config *machine_config_add_screen(machine_config *machine, const char *tag, int palbase)
-{
-	int screennum;
-
-	for (screennum = 0; screennum < MAX_SCREENS; screennum++)
-		if (machine->screen[screennum].tag == NULL)
-		{
-			machine->screen[screennum].tag = tag;
-			machine->screen[screennum].palette_base = palbase;
-			return &machine->screen[screennum];
-		}
-
-	fatalerror("Out of screens!\n");
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    machine_config_find_screen - find a tagged screen
-    during machine driver expansion
--------------------------------------------------*/
-
-screen_config *machine_config_find_screen(machine_config *machine, const char *tag)
-{
-	int screennum;
-
-	for (screennum = 0; screennum < MAX_SCREENS; screennum++)
-		if (machine->screen[screennum].tag && strcmp(machine->screen[screennum].tag, tag) == 0)
-			return &machine->screen[screennum];
-
-	fatalerror("Can't find screen '%s'!\n", tag);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    machine_config_remove_screen - remove a tagged screen
-    during machine driver expansion
--------------------------------------------------*/
-
-void machine_config_remove_screen(machine_config *machine, const char *tag)
-{
-	int screennum;
-
-	for (screennum = 0; screennum < MAX_SCREENS; screennum++)
-		if (machine->screen[screennum].tag && strcmp(machine->screen[screennum].tag, tag) == 0)
-		{
-			memmove(&machine->screen[screennum], &machine->screen[screennum + 1], sizeof(machine->screen[0]) * (MAX_SCREENS - screennum - 1));
-			memset(&machine->screen[MAX_SCREENS - 1], 0, sizeof(machine->screen[0]));
-			return;
-		}
-
-	fatalerror("Can't find screen '%s'!\n", tag);
 }

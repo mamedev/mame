@@ -21,6 +21,10 @@
     CONSTANTS
 ***************************************************************************/
 
+/* useful in device_list functions for scanning through all devices */
+#define DEVICE_TYPE_WILDCARD			NULL
+
+
 /* state constants passed to the device_get_info_func */
 enum
 {
@@ -79,7 +83,7 @@ typedef union _deviceinfo deviceinfo;
 /* device interface function types */
 typedef void (*device_get_info_func)(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 typedef void (*device_set_info_func)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info);
-typedef void *(*device_start_func)(running_machine *machine, const void *static_config, const void *inline_config);
+typedef void *(*device_start_func)(running_machine *machine, const char *tag, const void *static_config, const void *inline_config);
 typedef void (*device_stop_func)(running_machine *machine, void *token);
 typedef void (*device_reset_func)(running_machine *machine, void *token);
 
@@ -136,10 +140,26 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 /* remove a device from a device list */
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag);
 
-/* retrieve a device configuration based on a type and tag */
+/* return the number of items of a given type; DEVICE_TYPE_WILDCARD is allowed */
+int device_list_items(const device_config *listhead, device_type type);
+
+/* return the first device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
+const device_config *device_list_first(const device_config *listhead, device_type type);
+
+/* return the next device in the list of a given type; DEVICE_TYPE_WILDCARD is allowed */
+const device_config *device_list_next(const device_config *prevdevice, device_type type);
+
+/* retrieve a device configuration based on a type and tag; DEVICE_TYPE_WILDCARD is allowed */
 const device_config *device_list_find_by_tag(const device_config *listhead, device_type type, const char *tag);
 
-/* retrieve a device configuration based on a type and index */
+
+
+/* ----- index-based device access (avoid if possible) ----- */
+
+/* return the index of a device based on its type and tag; DEVICE_TYPE_WILDCARD is allowed */
+int device_list_index(const device_config *listhead, device_type type, const char *tag);
+
+/* retrieve a device configuration based on a type and index; DEVICE_TYPE_WILDCARD is allowed */
 const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index);
 
 
@@ -159,6 +179,12 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag);
 
 /* return the token associated with an allocated device */
 void *devtag_get_token(running_machine *machine, device_type type, const char *tag);
+
+/* return a pointer to the static configuration for a device based on type and tag */
+const void *devtag_get_static_config(running_machine *machine, device_type type, const char *tag);
+
+/* return a pointer to the inline configuration for a device based on type and tag */
+const void *devtag_get_inline_config(running_machine *machine, device_type type, const char *tag);
 
 /* return an integer state value from an allocated device */
 INT64 device_get_info_int(running_machine *machine, const device_config *config, UINT32 state);

@@ -1126,14 +1126,14 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_18,sound_writemem_18)
 	MDRV_CPU_IO_MAP(sound_readport_18,sound_writeport_18)
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(40*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
+
 	MDRV_GFXDECODE(sys16)
 	MDRV_PALETTE_LENGTH((2048+2048)*ShadowColorsMultiplier) // 64 extra colours for vdp (but we use 2048 so shadow mask works)
 

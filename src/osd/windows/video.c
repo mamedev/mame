@@ -452,6 +452,7 @@ static void extract_video_config(void)
 static void load_effect_overlay(const char *filename)
 {
 	char *tempstr = malloc_or_die(strlen(filename) + 5);
+	int numscreens;
 	int scrnum;
 	char *dest;
 
@@ -472,9 +473,9 @@ static void load_effect_overlay(const char *filename)
 	}
 
 	// set the overlay on all screens
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (Machine->config->screen[scrnum].tag != NULL)
-			render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
+	numscreens = video_screen_count(Machine->config);
+	for (scrnum = 0; scrnum < numscreens; scrnum++)
+		render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
 
 	free(tempstr);
 }

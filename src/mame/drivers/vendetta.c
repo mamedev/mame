@@ -587,17 +587,20 @@ static MACHINE_DRIVER_START( vendetta )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
                             /* interrupts are triggered by the main CPU */
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
 	MDRV_MACHINE_RESET(vendetta)
 	MDRV_NVRAM_HANDLER(vendetta)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER | VIDEO_HAS_SHADOWS)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
+
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(vendetta)
@@ -624,6 +627,7 @@ static MACHINE_DRIVER_START( esckids )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(esckids_readmem,esckids_writemem)
 
+	MDRV_SCREEN_MODIFY("main")
 //MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */
 	MDRV_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 

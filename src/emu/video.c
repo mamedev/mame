@@ -273,9 +273,9 @@ INLINE int effective_throttle(void)
 
 void video_init(running_machine *machine)
 {
+	const device_config *device;
 	video_private *viddata;
 	const char *filename;
-	int scrnum;
 
 	/* reset our global state */
 	memset(&global, 0, sizeof(global));
@@ -299,46 +299,46 @@ void video_init(running_machine *machine)
 	add_exit_callback(machine, video_exit);
 
 	/* configure all of the screens */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (machine->config->screen[scrnum].tag != NULL)
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	{
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		render_container *container = render_container_get_screen(scrnum);
+		internal_screen_info *info = &viddata->scrinfo[scrnum];
+
+		/* allocate a timer to reset partial updates */
+		info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
+
+		/* make pointers back to the config and state */
+		info->config = device->inline_config;
+		info->state = &machine->screen[scrnum];
+
+		/* configure the screen with the default parameters */
+		video_screen_configure(scrnum, info->state->width, info->state->height, &info->state->visarea, info->state->refresh);
+
+		/* configure the default cliparea */
+		if (info->config->xoffset != 0)
+			render_container_set_xoffset(container, info->config->xoffset);
+		if (info->config->yoffset != 0)
+			render_container_set_yoffset(container, info->config->yoffset);
+		if (info->config->xscale != 0)
+			render_container_set_xscale(container, info->config->xscale);
+		if (info->config->yscale != 0)
+			render_container_set_yscale(container, info->config->yscale);
+
+		/* reset VBLANK timing */
+		info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
+
+		/* allocate a timer to generate per-scanline updates */
+		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 		{
-			render_container *container = render_container_get_screen(scrnum);
-			internal_screen_info *info = &viddata->scrinfo[scrnum];
-
-			/* allocate a timer to reset partial updates */
-			info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
-
-			/* make pointers back to the config and state */
-			info->config = &machine->config->screen[scrnum];
-			info->state = &machine->screen[scrnum];
-
-			/* configure the screen with the default parameters */
-			video_screen_configure(scrnum, info->state->width, info->state->height, &info->state->visarea, info->state->refresh);
-
-			/* configure the default cliparea */
-			if (info->config->xoffset != 0)
-				render_container_set_xoffset(container, info->config->xoffset);
-			if (info->config->yoffset != 0)
-				render_container_set_yoffset(container, info->config->yoffset);
-			if (info->config->xscale != 0)
-				render_container_set_xscale(container, info->config->xscale);
-			if (info->config->yscale != 0)
-				render_container_set_yscale(container, info->config->yscale);
-
-			/* reset VBLANK timing */
-			info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
-
-			/* allocate a timer to generate per-scanline updates */
-			if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
-			{
-				info->scanline_timer = timer_alloc(scanline_update_callback, NULL);
-				timer_adjust_oneshot(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
-			}
-
-			/* register for save states */
-			state_save_register_item("video", scrnum, info->vblank_time.seconds);
-			state_save_register_item("video", scrnum, info->vblank_time.attoseconds);
+			info->scanline_timer = timer_alloc(scanline_update_callback, NULL);
+			timer_adjust_oneshot(info->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
 		}
+
+		/* register for save states */
+		state_save_register_item("video", scrnum, info->vblank_time.seconds);
+		state_save_register_item("video", scrnum, info->vblank_time.attoseconds);
+	}
 
 	/* create spriteram buffers if necessary */
 	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
@@ -676,11 +676,12 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 
 void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh)
 {
+	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
 	video_private *viddata = Machine->video_data;
 	internal_screen_info *info = &viddata->scrinfo[scrnum];
 
 	/* reallocate bitmap if necessary */
-	if (!(Machine->config->video_attributes & VIDEO_TYPE_VECTOR))
+	if (scrconfig->type != SCREEN_TYPE_VECTOR)
 	{
 		int curwidth = 0, curheight = 0;
 
@@ -732,9 +733,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 			/* allocate textures */
 			info->texture[0] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(info->texture[0], info->bitmap[0], visarea, info->config->palette_base, info->format);
+			render_texture_set_bitmap(info->texture[0], info->bitmap[0], visarea, 0, info->format);
 			info->texture[1] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(info->texture[1], info->bitmap[1], visarea, info->config->palette_base, info->format);
+			render_texture_set_bitmap(info->texture[1], info->bitmap[1], visarea, 0, info->format);
 		}
 	}
 
@@ -805,7 +806,7 @@ void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int m
 
 int video_screen_exists(int scrnum)
 {
-	return (scrnum >= 0 && scrnum < MAX_SCREENS && Machine->config->screen[scrnum].tag != NULL);
+	return (device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum) != NULL);
 }
 
 
@@ -1047,6 +1048,65 @@ attotime video_screen_get_frame_period(int scrnum)
 
 
 /***************************************************************************
+    VIDEO SCREEN DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    video_screen_start - device start callback
+    for a video screen
+-------------------------------------------------*/
+
+static void *video_screen_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+{
+	int scrindex = device_list_index(machine->config->devicelist, VIDEO_SCREEN, tag);
+	return &machine->screen[scrindex];
+}
+
+
+/*-------------------------------------------------
+    video_screen_set_info - device set info
+    callback
+-------------------------------------------------*/
+
+static void video_screen_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    video_screen_get_info - device get info
+    callback
+-------------------------------------------------*/
+
+void video_screen_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(screen_config);		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = video_screen_set_info;break;
+		case DEVINFO_FCT_START:							info->start = video_screen_start;		break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Raster";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "Video Screen";				break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+
+
+
+/***************************************************************************
     GLOBAL RENDERING
 ***************************************************************************/
 
@@ -1166,26 +1226,31 @@ void video_frame_update(running_machine *machine, int debug)
 static int finish_screen_updates(running_machine *machine)
 {
 	video_private *viddata = machine->video_data;
+	const device_config *device;
 	int anything_changed = FALSE;
 	int livemask;
-	int scrnum;
 
 	/* finish updating the screens */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (machine->config->screen[scrnum].tag != NULL)
-			video_screen_update_partial(scrnum, machine->screen[scrnum].visarea.max_y);
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	{
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		video_screen_update_partial(scrnum, machine->screen[scrnum].visarea.max_y);
+	}
 
 	/* now add the quads for all the screens */
 	livemask = render_get_live_screens_mask();
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
 		internal_screen_info *screen = &viddata->scrinfo[scrnum];
 
 		/* only update if live */
 		if (livemask & (1 << scrnum))
 		{
+			const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
+
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
-			if ((machine->config->video_attributes & (VIDEO_TYPE_VECTOR | VIDEO_SELF_RENDER)) == 0)
+			if (scrconfig->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
 			{
 				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && screen->changed)
@@ -1194,7 +1259,7 @@ static int finish_screen_updates(running_machine *machine)
 					rectangle fixedvis = machine->screen[scrnum].visarea;
 					fixedvis.max_x++;
 					fixedvis.max_y++;
-					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, machine->config->screen[scrnum].palette_base, screen->format);
+					render_texture_set_bitmap(screen->texture[screen->curbitmap], bitmap, &fixedvis, 0, screen->format);
 					screen->curtexture = screen->curbitmap;
 					screen->curbitmap = 1 - screen->curbitmap;
 				}

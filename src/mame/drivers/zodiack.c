@@ -483,16 +483,16 @@ static MACHINE_DRIVER_START( zodiack )
 	MDRV_CPU_IO_MAP(0,sound_writeport)
 	MDRV_CPU_VBLANK_INT(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
-
 	MDRV_MACHINE_RESET(zodiack)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(zodiack)
 	MDRV_PALETTE_LENGTH(4*8+2*8+2*1)
 

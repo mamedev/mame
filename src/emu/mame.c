@@ -265,7 +265,7 @@ extern int mame_validitychecks(const game_driver *driver);
 static int parse_ini_file(core_options *options, const char *name);
 
 static running_machine *create_machine(const game_driver *driver);
-static void reset_machine(running_machine *machine);
+static void prepare_machine(running_machine *machine);
 static void destroy_machine(running_machine *machine);
 static void init_machine(running_machine *machine);
 static TIMER_CALLBACK( soft_reset );
@@ -330,7 +330,7 @@ int mame_execute(core_options *options)
 
 		/* create the machine structure and driver */
 		machine = create_machine(driver);
-		reset_machine(machine);
+		prepare_machine(machine);
 		mame = machine->mame_data;
 
 		/* start in the "pre-init phase" */
@@ -1329,13 +1329,21 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 	{
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
+		const device_config *device;
 		machine_config *config;
 		astring *sourcename;
 
 		/* parse "vector.ini" for vector games */
 		config = machine_config_alloc(driver->drv);
-		if (config->video_attributes & VIDEO_TYPE_VECTOR)
-			parse_ini_file(options, "vector");
+		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
+		{
+			const screen_config *scrconfig = device->inline_config;
+			if (scrconfig->type == SCREEN_TYPE_VECTOR)
+			{
+				parse_ini_file(options, "vector");
+				break;
+			}
+		}
 		machine_config_free(config);
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
@@ -1436,20 +1444,24 @@ error:
 
 
 /*-------------------------------------------------
-    reset_machine - reset the state of the
+    prepare_machine - reset the state of the
     machine object
 -------------------------------------------------*/
 
-static void reset_machine(running_machine *machine)
+static void prepare_machine(running_machine *machine)
 {
-	int scrnum;
+	const device_config *device;
 
 	/* reset most portions of the machine */
 
 	/* video-related information */
 	memset(machine->gfx, 0, sizeof(machine->gfx));
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		machine->screen[scrnum] = machine->config->screen[scrnum].defstate;
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	{
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		const screen_config *scrconfig = device->inline_config;
+		machine->screen[scrnum] = scrconfig->defstate;
+	}
 
 	/* palette-related information */
 	machine->pens = NULL;
@@ -1574,12 +1586,12 @@ static void init_machine(running_machine *machine)
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
 	
-	/* start up the devices */
-	device_list_start(machine);
-
 	/* start the video and audio hardware */
 	video_init(machine);
 	sound_init(machine);
+
+	/* start up the devices */
+	device_list_start(machine);
 
 	/* call the driver's _START callbacks */
 	if (machine->config->machine_start != NULL) (*machine->config->machine_start)(machine);

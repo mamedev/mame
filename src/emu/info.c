@@ -681,57 +681,65 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 
 static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
 {
-	int scrnum;
-
+	const device_config *screen;
+	
 	/* iterate over screens */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		if (config->screen[scrnum].tag != NULL)
+	for (screen = video_screen_first(config); screen != NULL; screen = video_screen_next(screen))
+	{
+		const screen_config *scrconfig = screen->inline_config;
+	
+		fprintf(out, "\t\t<display");
+		
+		switch (scrconfig->type)
 		{
-			fprintf(out, "\t\t<display");
-			fprintf(out, " type=\"%s\"", (config->video_attributes & VIDEO_TYPE_VECTOR) ? "vector" : "raster");
-
-			/* output the orientation as a string */
-			switch (game->flags & ORIENTATION_MASK)
-			{
-				case ORIENTATION_FLIP_X:
-					fprintf(out, " rotate=\"0\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_FLIP_Y:
-					fprintf(out, " rotate=\"180\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					fprintf(out, " rotate=\"180\"");
-					break;
-				case ORIENTATION_SWAP_XY:
-					fprintf(out, " rotate=\"90\" flipx=\"yes\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-					fprintf(out, " rotate=\"90\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-					fprintf(out, " rotate=\"270\"");
-					break;
-				case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-					fprintf(out, " rotate=\"270\" flipx=\"yes\"");
-					break;
-				default:
-					fprintf(out, " rotate=\"0\"");
-					break;
-			}
-
-			/* output width and height only for games that are not vector */
-			if (!(config->video_attributes & VIDEO_TYPE_VECTOR))
-			{
-				int dx = config->screen[scrnum].defstate.visarea.max_x - config->screen[scrnum].defstate.visarea.min_x + 1;
-				int dy = config->screen[scrnum].defstate.visarea.max_y - config->screen[scrnum].defstate.visarea.min_y + 1;
-				fprintf(out, " width=\"%d\"", dx);
-				fprintf(out, " height=\"%d\"", dy);
-			}
-
-			/* output refresh rate */
-			fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(config->screen[scrnum].defstate.refresh));
-			fprintf(out, " />\n");
+			case SCREEN_TYPE_RASTER:	fprintf(out, " type=\"raster\"");	break;
+			case SCREEN_TYPE_VECTOR:	fprintf(out, " type=\"vector\"");	break;
+			case SCREEN_TYPE_LCD:		fprintf(out, " type=\"lcd\"");		break;
+			default:					fprintf(out, " type=\"unknown\"");	break;
 		}
+
+		/* output the orientation as a string */
+		switch (game->flags & ORIENTATION_MASK)
+		{
+			case ORIENTATION_FLIP_X:
+				fprintf(out, " rotate=\"0\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_FLIP_Y:
+				fprintf(out, " rotate=\"180\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+				fprintf(out, " rotate=\"180\"");
+				break;
+			case ORIENTATION_SWAP_XY:
+				fprintf(out, " rotate=\"90\" flipx=\"yes\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+				fprintf(out, " rotate=\"90\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+				fprintf(out, " rotate=\"270\"");
+				break;
+			case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+				fprintf(out, " rotate=\"270\" flipx=\"yes\"");
+				break;
+			default:
+				fprintf(out, " rotate=\"0\"");
+				break;
+		}
+
+		/* output width and height only for games that are not vector */
+		if (scrconfig->type != SCREEN_TYPE_VECTOR)
+		{
+			int dx = scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1;
+			int dy = scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1;
+			fprintf(out, " width=\"%d\"", dx);
+			fprintf(out, " height=\"%d\"", dy);
+		}
+
+		/* output refresh rate */
+		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+		fprintf(out, " />\n");
+	}
 }
 
 

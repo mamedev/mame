@@ -541,14 +541,14 @@ static MACHINE_DRIVER_START( paradise )
 	MDRV_CPU_IO_MAP(paradise_readport,paradise_writeport)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No nmi routine */
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54) /* 54 verified */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using IPT_VBLANK */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
+
 	MDRV_GFXDECODE(paradise)
 	MDRV_PALETTE_LENGTH(0x800 + 16)
 

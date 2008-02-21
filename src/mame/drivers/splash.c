@@ -442,14 +442,14 @@ static MACHINE_DRIVER_START( splash )
 	MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)	/* needed for the msm5205 to play the samples */
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 49*8-1, 2*8, 32*8-1)
+
 	MDRV_GFXDECODE(splash)
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -490,15 +490,15 @@ static MACHINE_DRIVER_START( roldfrog )
 	MDRV_CPU_IO_MAP(roldf_sound_io_map,0)
 //  MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 49*8-1, 2*8, 32*8-1)
 //  MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+
 	MDRV_GFXDECODE(splash)
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -528,14 +528,14 @@ static MACHINE_DRIVER_START( funystrp )
 //  MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
 //  MDRV_CPU_VBLANK_INT(nmi_line_pulse,64)  /* needed for the msm5205 to play the samples */
 
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 47*8-1, 2*8, 32*8-1)
+	
 	MDRV_GFXDECODE(splash)
 	MDRV_PALETTE_LENGTH(2048)
 
