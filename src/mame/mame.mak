@@ -723,7 +723,7 @@ $(MAMEOBJ)/gaelco.a: \
 
 $(MAMEOBJ)/gameplan.a: \
 	$(DRIVERS)/enigma2.o \
-	$(DRIVERS)/gameplan.o \
+	$(DRIVERS)/gameplan.o $(VIDEO)/gameplan.o \
 	$(DRIVERS)/toratora.o \
 
 $(MAMEOBJ)/gametron.a: \
