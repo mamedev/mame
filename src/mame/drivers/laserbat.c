@@ -539,13 +539,13 @@ static VIDEO_UPDATE( laserbat )
 			int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel0))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel0)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel1))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel1)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel2))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel2)];
+				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel2);
 		}
 	}
 

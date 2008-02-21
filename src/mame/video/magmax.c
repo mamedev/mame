@@ -112,14 +112,14 @@ VIDEO_UPDATE( magmax )
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{
 			int h;
-			UINT8 line_data[256];
+			UINT16 line_data[256];
 
 			UINT32 map_v_scr_100 =   (scroll_v + v) & 0x100;
 			UINT32 rom18D_addr   =  ((scroll_v + v) & 0xf8)     + (map_v_scr_100<<5);
 			UINT32 rom15F_addr   = (((scroll_v + v) & 0x07)<<2) + (map_v_scr_100<<5);
 			UINT32 map_v_scr_1fe_6 =((scroll_v + v) & 0x1fe)<<6;
 
-			const pen_t *pens = &machine->pens[0x110 + 0x20 + (map_v_scr_100>>1)];
+			int pen_base = 0x110 + 0x20 + (map_v_scr_100>>1);
 
 			for (h = 0; h < 0x100; h++)
 			{
@@ -154,23 +154,23 @@ VIDEO_UPDATE( magmax )
 					graph_data >>= 4;
 				graph_data &= 0x0f;
 
-				line_data[h] = graph_color + graph_data;
+				line_data[h] = pen_base + graph_color + graph_data;
 
 				/*priority: background over sprites*/
 				if (map_v_scr_100 && ((graph_data & 0x0c)==0x0c))
-					*BITMAP_ADDR16(tmpbitmap, v, h) = pens[graph_color + graph_data];
+					*BITMAP_ADDR16(tmpbitmap, v, h) = line_data[h];
 			}
 
 			if (flipscreen)
 			{
 				int i;
-				UINT8 line_data_flip_x[256];
+				UINT16 line_data_flip_x[256];
 				for (i=0; i<256; i++)
 					line_data_flip_x[i] = line_data[255-i];
-				draw_scanline8(bitmap, 0, 255-v, 256, line_data_flip_x, pens, -1);
+				draw_scanline16(bitmap, 0, 255-v, 256, line_data_flip_x, NULL , -1);
 			}
 			else
-				draw_scanline8(bitmap, 0, v, 256, line_data, pens, -1);
+				draw_scanline16(bitmap, 0, v, 256, line_data, NULL, -1);
 		}
 	}
 

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *toypop_videoram;
 
@@ -177,8 +176,9 @@ WRITE16_HANDLER( toypop_merged_background_w )
 
 static void draw_background(mame_bitmap *bitmap)
 {
-	register int offs, x, y;
-	UINT8 scanline[288];
+	int offs, x, y;
+	UINT16 scanline[288];
+	int pen_base = 0x300 + 0x10*palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
 	if (bitmapflip)
@@ -189,11 +189,11 @@ static void draw_background(mame_bitmap *bitmap)
 			for (x = 0; x < 288; x+=2)
 			{
 				UINT16 data = toypop_bg_image[offs];
-				scanline[x]   = data;
-				scanline[x+1] = data >> 8;
+				scanline[x]   = pen_base | (data & 0x0f);
+				scanline[x+1] = pen_base | (data >> 8);
 				offs--;
 			}
-			draw_scanline8(bitmap, 0, y, 288, scanline, &Machine->pens[0x300 + 0x10*palettebank], -1);
+			draw_scanline16(bitmap, 0, y, 288, scanline, NULL, -1);
 		}
 	}
 	else
@@ -204,11 +204,11 @@ static void draw_background(mame_bitmap *bitmap)
 			for (x = 0; x < 288; x+=2)
 			{
 				UINT16 data = toypop_bg_image[offs];
-				scanline[x]   = data >> 8;
-				scanline[x+1] = data;
+				scanline[x]   = pen_base | (data >> 8);
+				scanline[x+1] = pen_base | (data & 0x0f);
 				offs++;
 			}
-			draw_scanline8(bitmap, 0, y, 288, scanline, &Machine->pens[0x300 + 0x10*palettebank], -1);
+			draw_scanline16(bitmap, 0, y, 288, scanline, NULL, -1);
 		}
 	}
 }

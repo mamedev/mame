@@ -479,10 +479,10 @@ static VIDEO_UPDATE( marinedt )
 {
 	int sx, sy;
 
-	fillbitmap(tile, machine->pens[0], NULL);
+	fillbitmap(tile, 0, NULL);
 	tilemap_draw(tile, cliprect, tx_tilemap, 0, 0);
 
-	fillbitmap(obj1, machine->pens[0], NULL);
+	fillbitmap(obj1, 0, NULL);
 	drawgfx(obj1, machine->gfx[1],
 			OBJ_CODE(marinedt_obj1_a),
 			OBJ_COLOR(marinedt_obj1_a),
@@ -490,7 +490,7 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(obj2, machine->pens[0], NULL);
+	fillbitmap(obj2, 0, NULL);
 	drawgfx(obj2, machine->gfx[2],
 			OBJ_CODE(marinedt_obj2_a),
 			OBJ_COLOR(marinedt_obj2_a),
@@ -498,15 +498,15 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(bitmap, machine->pens[0], NULL);
+	fillbitmap(bitmap, 0, NULL);
 
 	if (marinedt_pd & 0x02)
-		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, machine->pens[0]);
+		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, 0);
 
 	if (marinedt_pd & 0x01)
-		copybitmap_trans(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, machine->pens[0]);
+		copybitmap_trans(bitmap, obj1, 0, 0, OBJ_X(marinedt_obj1_x), OBJ_Y(marinedt_obj1_y), cliprect, 0);
 
-	copybitmap_trans(bitmap, tile, 0, 0, 0, 0, cliprect, machine->pens[0]);
+	copybitmap_trans(bitmap, tile, 0, 0, 0, 0, cliprect, 0);
 
 	coll = cx = cyr = cyq = 0;
 	if (marinedt_pd & 0x01)
@@ -521,10 +521,10 @@ static VIDEO_UPDATE( marinedt )
 				 || y < cliprect->min_y || y > cliprect->max_y)
 					continue;
 
-				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(tile, y, x) != machine->pens[0])
+				if (*BITMAP_ADDR16(tile, y, x) != 0)
 				{
 					coll = 0x08;
 
@@ -558,10 +558,10 @@ static VIDEO_UPDATE( marinedt )
 				 || yy < 0 || yy >= 32)
 					continue;
 
-				if (*BITMAP_ADDR16(obj1, sy, sx) == machine->pens[0])
+				if (*BITMAP_ADDR16(obj1, sy, sx) == 0)
 					continue;
 
-				if (*BITMAP_ADDR16(obj2, yy, xx) != machine->pens[0])
+				if (*BITMAP_ADDR16(obj2, yy, xx) != 0)
 				{
 					collh = 0x80;
 

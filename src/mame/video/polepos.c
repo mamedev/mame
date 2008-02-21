@@ -351,7 +351,7 @@ WRITE8_HANDLER( polepos_alpha_w )
 
 ***************************************************************************/
 
-static void draw_road(running_machine *machine, mame_bitmap *bitmap)
+static void draw_road(mame_bitmap *bitmap)
 {
 	const UINT8 *road_control = memory_region(REGION_GFX5);
 	const UINT8 *road_bits1 = memory_region(REGION_GFX5) + 0x2000;
@@ -362,9 +362,9 @@ static void draw_road(running_machine *machine, mame_bitmap *bitmap)
 	for (y = 128; y < 256; y++)
 	{
 		int xoffs, yoffs, xscroll, roadpal;
-		UINT8 scanline[256 + 8];
-		UINT8 *dest = scanline;
-		const pen_t *colortable;
+		UINT16 scanline[256 + 8];
+		UINT16 *dest = scanline;
+		int pen_base;
 
 		/* first add the vertical position modifier and the vertical scroll */
 		yoffs = ((polepos_vertical_position_modifier[y] + road16_vscroll) >> 3) & 0x1ff;
@@ -373,7 +373,7 @@ static void draw_road(running_machine *machine, mame_bitmap *bitmap)
 		roadpal = polepos_road16_memory[yoffs] & 15;
 
 		/* this becomes the palette base for the scanline */
-		colortable = &machine->pens[0x0b00 + (roadpal << 6)];
+		pen_base = 0x0b00 + (roadpal << 6);
 
 		/* now fetch the horizontal scroll offset for this scanline */
 		xoffs = polepos_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
@@ -392,7 +392,7 @@ static void draw_road(running_machine *machine, mame_bitmap *bitmap)
 			{
 				/* in this case, it looks like we just fill with 0 */
 				for (i = 0; i < 8; i++)
-					*dest++ = 0;
+					*dest++ = pen_base | 0;
 			}
 
 			/* otherwise, we clock in the bits and compute the road value */
@@ -415,14 +415,14 @@ static void draw_road(running_machine *machine, mame_bitmap *bitmap)
 				{
 					int bits = BIT(bits1,i) + (BIT(bits2,i) << 1);
 					if (!carin && bits) bits++;
-					*dest++ = roadval & 0x3f;
+					*dest++ = pen_base | (roadval & 0x3f);
 					roadval += bits;
 				}
 			}
 		}
 
 		/* draw the scanline */
-		draw_scanline8(bitmap, 0, y, 256, &scanline[xscroll], colortable, -1);
+		draw_scanline16(bitmap, 0, y, 256, &scanline[xscroll], NULL, -1);
 	}
 }
 
@@ -511,7 +511,7 @@ VIDEO_UPDATE( polepos )
 	rectangle clip = *cliprect;
 	clip.max_y = 127;
 	tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
-	draw_road(machine, bitmap);
+	draw_road(bitmap);
 	draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 /* following code should be enabled only in a debug build */

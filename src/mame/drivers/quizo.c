@@ -33,7 +33,6 @@ Xtals 8MHz, 21.47727MHz
 
 static UINT8 port60;
 static UINT8 port70;
-static UINT8 dirty;
 
 static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
@@ -64,43 +63,33 @@ static PALETTE_INIT(quizo)
 	}
 }
 
-static VIDEO_START( quizo )
-{
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-}
-
 static VIDEO_UPDATE( quizo )
 {
 	int x,y;
-	if(dirty)
+	for(y=0;y<200;y++)
 	{
-		for(y=0;y<200;y++)
+		for(x=0;x<80;x++)
 		{
-			for(x=0;x<80;x++)
-			{
-				int data=videoram[y*80+x];
-				int data1=videoram[y*80+x+0x4000];
-				int pix;
+			int data=videoram[y*80+x];
+			int data1=videoram[y*80+x+0x4000];
+			int pix;
 
-				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				*BITMAP_ADDR16(tmpbitmap, y, x*4+3) = machine->pens[pix];
-				data>>=1;
-				data1>>=1;
-				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				*BITMAP_ADDR16(tmpbitmap, y, x*4+2) = machine->pens[pix];
-				data>>=1;
-				data1>>=1;
-				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				*BITMAP_ADDR16(tmpbitmap, y, x*4+1) = machine->pens[pix];
-				data>>=1;
-				data1>>=1;
-				pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
-				*BITMAP_ADDR16(tmpbitmap, y, x*4+0) = machine->pens[pix];
-			}
+			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
+			*BITMAP_ADDR16(bitmap, y, x*4+3) = pix;
+			data>>=1;
+			data1>>=1;
+			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
+			*BITMAP_ADDR16(bitmap, y, x*4+2) = pix;
+			data>>=1;
+			data1>>=1;
+			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
+			*BITMAP_ADDR16(bitmap, y, x*4+1) = pix;
+			data>>=1;
+			data1>>=1;
+			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
+			*BITMAP_ADDR16(bitmap, y, x*4+0) = pix;
 		}
 	}
-	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
-	dirty=0;
 	return 0;
 }
 
@@ -108,7 +97,6 @@ static WRITE8_HANDLER(vram_w)
 {
 	int bank=(port70&8)?1:0;
 	videoram[offset+bank*0x4000]=data;
-	dirty=1;
 }
 
 static WRITE8_HANDLER(port70_w)
@@ -219,7 +207,6 @@ static MACHINE_DRIVER_START( quizo )
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT(quizo)
 
-	MDRV_VIDEO_START(quizo)
 	MDRV_VIDEO_UPDATE(quizo)
 
 	/* sound hardware */
@@ -246,7 +233,6 @@ ROM_END
 static DRIVER_INIT(quizo)
 {
 	videoram=auto_malloc(0x4000*2);
-	dirty=1;
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic", 0 )

@@ -400,7 +400,7 @@ static void update_screen(running_machine *machine, mame_bitmap *bitmap, const r
 			sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], machine->pens, -1);
+		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], NULL, -1);
 	}
 
 	/* draw the sprites */

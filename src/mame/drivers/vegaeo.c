@@ -142,16 +142,16 @@ static VIDEO_UPDATE( vega )
 		for (x=0;x < 320/4;x++)
 		{
 			color = vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 3) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 3) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 2) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 2) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff0000) >> 16;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 1) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 1) = color;
 
 			color = (vega_vram[count + (0x14000/4) * (vega_vbuffer ^ 1)] & 0xff000000) >> 24;
-			*BITMAP_ADDR16(bitmap, y, x*4 + 0) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*4 + 0) = color;
 
 			count++;
 		}

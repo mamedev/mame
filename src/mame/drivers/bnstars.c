@@ -496,7 +496,7 @@ static VIDEO_UPDATE(bnstars)
 
 	if (screen==0)
 	{
-		fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
+		fillbitmap(bitmap,0,cliprect);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[0], 0, ms32_bg0_scroll[0x00/4] + ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -514,7 +514,7 @@ static VIDEO_UPDATE(bnstars)
 	}
 	else
 	{
-		fillbitmap(bitmap,machine->pens[0x8000+0],cliprect);	/* bg color */
+		fillbitmap(bitmap,0x8000+0,cliprect);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[1], 0, ms32_bg1_scroll[0x00/4] + ms32_bg1_scroll[0x08/4] + 0x10 );

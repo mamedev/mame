@@ -245,7 +245,7 @@ static VIDEO_UPDATE( filetto )
             xxxx xx1x  Select graphics
             xxxx xxx1  80x25 text
             */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	if(vga_mode[0] & 8)
 	{

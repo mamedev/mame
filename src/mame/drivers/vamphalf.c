@@ -429,7 +429,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, int scrn
 
 static VIDEO_UPDATE( common )
 {
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	draw_sprites(machine, bitmap, screen);
 	return 0;
 }

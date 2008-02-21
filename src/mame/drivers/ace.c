@@ -74,7 +74,7 @@ static VIDEO_UPDATE( ace )
 	}
 
 	/* first of all, fill the screen with the background color */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 
 		drawgfx(bitmap,machine->gfx[1],

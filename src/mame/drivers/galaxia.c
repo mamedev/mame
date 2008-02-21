@@ -35,7 +35,7 @@ static VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	count = 0;
 
 	for (y=0;y<256/8;y++)

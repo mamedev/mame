@@ -144,18 +144,18 @@ VIDEO_UPDATE( test_vcu )
 
 
 	if (planes_enabled[2])
-		copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[2],machine->pens[color_base],NULL);
+		copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
+	fillbitmap(tmpbitmaps[2],color_base,NULL);
 
 
 	if (planes_enabled[1])
-		copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[1],machine->pens[color_base],NULL);
+		copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,color_base);
+	fillbitmap(tmpbitmaps[1],color_base,NULL);
 
 
 	if (planes_enabled[0])
-		copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,machine->pens[color_base] );
-	fillbitmap(tmpbitmaps[0],machine->pens[color_base],NULL);
+		copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,color_base);
+	fillbitmap(tmpbitmaps[0],color_base,NULL);
 
 	if (input_code_pressed_once(KEYCODE_1))	/* plane 1 */
 	{
@@ -251,9 +251,9 @@ static VIDEO_UPDATE( greatgun )
 //fillbitmap(bitmap,0,NULL);
 
 	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect);
-	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,machine->pens[color_base] );
-	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,machine->pens[color_base] );
-	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,machine->pens[color_base] );
+	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,color_base);
+	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,color_base);
+	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,color_base);
 	return 0;
 }
 
@@ -271,9 +271,9 @@ static VIDEO_UPDATE( mazerbla )
 //fillbitmap(bitmap,0,NULL);
 
 	copybitmap      (bitmap,tmpbitmaps[3],0,0,0,0,cliprect); //text
-	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,machine->pens[0] );
-	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,machine->pens[0] ); //haircross
-	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,machine->pens[0] ); //sprites
+	copybitmap_trans(bitmap,tmpbitmaps[2],0,0,0,0,cliprect,0);
+	copybitmap_trans(bitmap,tmpbitmaps[1],0,0,0,0,cliprect,0); //haircross
+	copybitmap_trans(bitmap,tmpbitmaps[0],0,0,0,0,cliprect,0); //sprites
 	return 0;
 }
 

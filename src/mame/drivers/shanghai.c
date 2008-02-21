@@ -704,7 +704,7 @@ static VIDEO_UPDATE( shanghai )
 		for (x = 0;x < 384;x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[HD63484_ram[b]];
+			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
 			b++;
 		}
 	}
@@ -724,7 +724,7 @@ static VIDEO_UPDATE( shanghai )
 			{
 				b &= (HD63484_RAM_SIZE-1);
 				if (x <= w && x + sx >= 0 && x+sx < 384)
-					*BITMAP_ADDR16(bitmap, y, x+sx) = machine->pens[HD63484_ram[b]];
+					*BITMAP_ADDR16(bitmap, y, x+sx) = HD63484_ram[b];
 
 				b++;
 			}

@@ -1476,12 +1476,12 @@ VIDEO_UPDATE( itech32 )
 			}
 
 			/* draw from the buffer */
-			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], machine->pens, -1);
+			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], NULL, -1);
 		}
 
 		/* otherwise, draw directly from VRAM */
 		else
-			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &src1[cliprect->min_x], machine->pens, -1);
+			draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &src1[cliprect->min_x], NULL, -1);
 	}
 	return 0;
 }

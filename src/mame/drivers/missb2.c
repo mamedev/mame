@@ -47,7 +47,7 @@ static VIDEO_UPDATE( missb2 )
 	/* the background character columns is stored in the area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,&machine->screen[0].visarea);
 
 	if (!bublbobl_video_enable) return 0;
 

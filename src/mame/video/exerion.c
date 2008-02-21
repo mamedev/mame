@@ -236,7 +236,7 @@ READ8_HANDLER( exerion_video_timing_r )
  *
  *************************************/
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 
@@ -260,8 +260,8 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		int stop2 = background_latches[10] >> 4;
 		int stop3 = background_latches[11] >> 4;
 		UINT8 *mixer = &background_mixer[(background_latches[12] << 4) & 0xf0];
-		UINT8 scanline[VISIBLE_X_MAX];
-		const pen_t *pens;
+		UINT16 scanline[VISIBLE_X_MAX];
+		int pen_base = 0x200 + ((background_latches[12] >> 4) << 4);
 
 		/* the cocktail flip flag controls whether we count up or down in X */
 		if (!exerion_cocktail_flip)
@@ -292,7 +292,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 				lookupval = mixer[combined >> 8] & 3;
 
 				/* the color index comes from the looked up value combined with the pixel data */
-				scanline[x] = (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
+				scanline[x] = pen_base | (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
 
 				/* the start/stop counters are clocked when the low 5 bits of the X counter overflow */
 				if (!(++xoffs0 & 0x1f)) start0++, stop0++;
@@ -329,7 +329,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 				lookupval = mixer[combined >> 8] & 3;
 
 				/* the color index comes from the looked up value combined with the pixel data */
-				scanline[x] = (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
+				scanline[x] = pen_base | (lookupval << 2) | ((combined >> (2 * lookupval)) & 3);
 
 				/* the start/stop counters are clocked when the low 5 bits of the X counter overflow */
 				if (!(xoffs0-- & 0x1f)) start0++, stop0++;
@@ -340,8 +340,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		}
 
 		/* draw the scanline */
-		pens = &machine->pens[0x200 + ((background_latches[12] >> 4) << 4)];
-		draw_scanline8(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], pens, -1);
+		draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], NULL, -1);
 	}
 }
 
@@ -357,7 +356,7 @@ VIDEO_UPDATE( exerion )
 	int sx, sy, offs, i;
 
 	/* draw background */
-	draw_background(machine, bitmap, cliprect);
+	draw_background(bitmap, cliprect);
 
 	/* draw sprites */
 	for (i = 0; i < spriteram_size; i += 4)

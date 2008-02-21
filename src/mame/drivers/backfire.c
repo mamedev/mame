@@ -182,7 +182,7 @@ static VIDEO_UPDATE(backfire)
 	{
 
 		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,machine->pens[0x100],cliprect);
+		fillbitmap(bitmap,0x100,cliprect);
 
 		if (backfire_left_priority[0] == 0)
 		{
@@ -204,7 +204,7 @@ static VIDEO_UPDATE(backfire)
 	else if (screen==1)
 	{
 		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,machine->pens[0x500],cliprect);
+		fillbitmap(bitmap,0x500,cliprect);
 
 		if (backfire_right_priority[0] == 0)
 		{

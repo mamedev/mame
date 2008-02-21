@@ -172,7 +172,7 @@ static VIDEO_UPDATE( fcrash )
 	tilemap_set_enable(cps1_bg_tilemap[2],1);
 
 	/* Blank screen */
-	fillbitmap(bitmap,machine->pens[4095],cliprect);
+	fillbitmap(bitmap,4095,cliprect);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	l0 = (layercontrol >> 0x06) & 03;

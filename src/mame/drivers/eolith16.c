@@ -114,10 +114,10 @@ static VIDEO_UPDATE( eolith16 )
 		for (x=0;x < 320/2;x++)
 		{
 			color = vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff;
-			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color;
 
 			color = (vram[count + (0x10000/2) * (vbuffer ^ 1)] & 0xff00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color;
 
 			count++;
 		}

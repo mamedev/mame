@@ -41,7 +41,7 @@ static VIDEO_START( cowrace )
 
 static VIDEO_UPDATE( cowrace )
 {
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }

@@ -353,10 +353,10 @@ static VIDEO_UPDATE( pasha2 )
 			if(x*2 < cliprect->max_x)
 			{
 				color = (bitmap0[count + (vbuffer^1)*0x20000/2] & 0xff00) >> 8;
-				*BITMAP_ADDR16(bitmap, y, x*2 + 0) = machine->pens[(color + 0x100)];
+				*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color + 0x100;
 
 				color = bitmap0[count + (vbuffer^1)*0x20000/2] & 0xff;
-				*BITMAP_ADDR16(bitmap, y, x*2 + 1) = machine->pens[(color + 0x100)];
+				*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color + 0x100;
 			}
 
 			count++;
@@ -372,11 +372,11 @@ static VIDEO_UPDATE( pasha2 )
 			{
 				color = bitmap1[count + (vbuffer^1)*0x20000/2] & 0xff;
 				if(color != 0)
-					*BITMAP_ADDR16(bitmap, y, x*2 + 1) = machine->pens[(color)];
+					*BITMAP_ADDR16(bitmap, y, x*2 + 1) = color;
 
 				color = (bitmap1[count + (vbuffer^1)*0x20000/2] & 0xff00) >> 8;
 				if(color != 0)
-					*BITMAP_ADDR16(bitmap, y, x*2 + 0) = machine->pens[(color)];
+					*BITMAP_ADDR16(bitmap, y, x*2 + 0) = color;
 			}
 
 			count++;

@@ -188,7 +188,7 @@ static void hal21_draw_background(running_machine *machine, mame_bitmap *bitmap,
 
 	bankbase = attrs<<3 & 0x100;
 	c = attrs & 0x0f;
-	if (c > 11) { fillbitmap(bitmap,machine->pens[(c<<4)+8], cliprect); return; }
+	if (c > 11) { fillbitmap(bitmap,(c<<4)+8, cliprect); return; }
 	if (c<8 || color[0]<14 || bankbase)
 	{
 		c ^= 0x08;
