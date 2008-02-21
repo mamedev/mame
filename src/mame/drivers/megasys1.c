@@ -3942,8 +3942,6 @@ GAME( 1988, tshingen, 0,        system_A,          tshingen, phantasm, ROT0,   "
 GAME( 1988, tshingna, tshingen, system_A,          tshingen, phantasm, ROT0,   "Jaleco", "Shingen Samurai-Fighter (Japan, English)", 0 )
 GAME( 1988, kazan,    0,        system_A,          kazan,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
 GAME( 1988, iganinju, kazan,    system_A,          kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
-//GAME( 1988, kazan,    0,        system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Ninja Kazan (World)", 0 )
-//GAME( 1988, iganinju, kazan,    system_A_iganinju, kazan,    iganinju, ROT0,   "Jaleco", "Iga Ninjyutsuden (Japan)", 0 )
 GAME( 1989, astyanax, 0,        system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Astyanax", 0 )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", 0 )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   hachoo,   ROT0,   "Jaleco", "Hachoo!", 0 )
