@@ -263,7 +263,7 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 		px = x + (i ^ xx);
 		py = y;
 
-		*BITMAP_ADDR16(ojankoc_tmpbitmap, py, px) = Machine->pens[color];
+		*BITMAP_ADDR16(ojankoc_tmpbitmap, py, px) = color;
 
 		color1 >>= 1;
 		color2 >>= 1;

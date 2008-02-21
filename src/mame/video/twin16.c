@@ -89,7 +89,7 @@ WRITE16_HANDLER( twin16_video_register_w )
 static void draw_sprite( /* slow slow slow, but it's ok for now */
 	mame_bitmap *bitmap,
 	const UINT16 *pen_data,
-	const pen_t *pal_data,
+	int pal_base,
 	int xpos, int ypos,
 	int width, int height,
 	int flipx, int flipy, int pri )
@@ -127,7 +127,7 @@ static void draw_sprite( /* slow slow slow, but it's ok for now */
 
 							if( pen )
 							{
-								if(pdest[sx]<pval) { dest[sx] = pal_data[pen]; }
+								if(pdest[sx]<pval) { dest[sx] = pal_base + pen; }
 
 								pdest[sx]|=0x10;
 							}
@@ -211,7 +211,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 			int xpos = source[1];
 			int ypos = source[2];
 
-			const pen_t *pal_data = Machine->pens+((attributes&0xf)+0x10)*16;
+			int pal_base = ((attributes&0xf)+0x10)*16;
 			int height	= 16<<((attributes>>6)&0x3);
 			int width	= 16<<((attributes>>4)&0x3);
 			const UINT16 *pen_data = 0;
@@ -275,7 +275,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 			}
 
 			//if( sprite_which==count || !input_code_pressed( KEYCODE_B ) )
-			draw_sprite( bitmap, pen_data, pal_data, xpos, ypos, width, height, flipx, flipy, (attributes&0x4000) );
+			draw_sprite( bitmap, pen_data, pal_base, xpos, ypos, width, height, flipx, flipy, (attributes&0x4000) );
 		}
 
 		count++;
@@ -362,7 +362,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
             */
 			const UINT16 *gfx_data = gfx_base + (code&0x7ff)*16 + bank_table[(code>>11)&0x3]*0x8000;
 			int color = (code>>13);
-			const pen_t *pal_data = Machine->pens + 16*(0x20+color+8*palette);
+			int pal_base = 16*(0x20+color+8*palette);
 			int x, y;
 
 			if( opaque )
@@ -377,7 +377,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 					{
 						int effx = (x - xpos) ^ xxor;
 						UINT16 data = gfxptr[effx / 4];
-						dest[x] = pal_data[(data >> 4*(~effx & 3)) & 0x0f];
+						dest[x] = pal_base + ((data >> 4*(~effx & 3)) & 0x0f);
 						pdest[x] |= 1;
 					}
 				}
@@ -397,7 +397,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 						UINT8 pen = (data >> 4*(~effx & 3)) & 0x0f;
 						if (pen)
 						{
-							dest[x] = pal_data[pen];
+							dest[x] = pal_base + pen;
 							pdest[x] |= 4;
 						}
 					}

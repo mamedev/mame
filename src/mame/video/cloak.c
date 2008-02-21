@@ -78,12 +78,12 @@ WRITE8_HANDLER( cloak_clearbmp_w )
 	{
 		if (bmap)
 		{
-			fillbitmap(tmpbitmap, Machine->pens[16], &Machine->screen[0].visarea);
+			fillbitmap(tmpbitmap, 16, &Machine->screen[0].visarea);
 			memset(tmpvideoram, 0, 256*256);
 		}
 		else
 		{
-			fillbitmap(tmpbitmap2, Machine->pens[16], &Machine->screen[0].visarea);
+			fillbitmap(tmpbitmap2, 16, &Machine->screen[0].visarea);
 			memset(tmpvideoram2, 0, 256*256);
 		}
 	}
@@ -133,12 +133,12 @@ WRITE8_HANDLER( graph_processor_w )
 
 			if (bmap)
 			{
-				*BITMAP_ADDR16(tmpbitmap, y, (x-6)&0xff) = Machine->pens[16 + color];
+				*BITMAP_ADDR16(tmpbitmap, y, (x-6)&0xff) = 16 + color;
 				tmpvideoram[y*256+x] = color;
 			}
 			else
 			{
-				*BITMAP_ADDR16(tmpbitmap2, y, (x-6)&0xff) = Machine->pens[16 + color];
+				*BITMAP_ADDR16(tmpbitmap2, y, (x-6)&0xff) = 16 + color;
 				tmpvideoram2[y*256+x] = color;
 			}
 
@@ -173,8 +173,8 @@ static void refresh_bitmaps(void)
 	{
 		for (lx = 0; lx < 256; lx++)
 		{
-			*BITMAP_ADDR16(tmpbitmap,  ly, (lx-6)&0xff) = Machine->pens[16 + tmpvideoram[ly*256+lx]];
-			*BITMAP_ADDR16(tmpbitmap2, ly, (lx-6)&0xff) = Machine->pens[16 + tmpvideoram2[ly*256+lx]];
+			*BITMAP_ADDR16(tmpbitmap,  ly, (lx-6)&0xff) = 16 + tmpvideoram[ly*256+lx];
+			*BITMAP_ADDR16(tmpbitmap2, ly, (lx-6)&0xff) = 16 + tmpvideoram2[ly*256+lx];
 		}
 	}
 }

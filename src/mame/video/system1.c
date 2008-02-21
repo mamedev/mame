@@ -256,7 +256,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 {
 	int sy,row,height,src,bank;
 	UINT8 *sprite_base;
-	const pen_t *sprite_palette;
+	int sprite_palette_base;
 	INT16 skip;	/* bytes to skip before drawing each row (can be negative) */
 	UINT8 *gfx;
 
@@ -269,7 +269,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 	skip = sprite_base[SPR_SKIP_LO] + (sprite_base[SPR_SKIP_HI] << 8);
 
 	height = sprite_base[SPR_Y_BOTTOM] - sprite_base[SPR_Y_TOP];
-	sprite_palette = Machine->pens + 0x10 * spr_number;
+	sprite_palette_base = 0x10 * spr_number;
 
 	sy = sprite_base[SPR_Y_TOP] + 1;
 
@@ -320,13 +320,13 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 
 			if (color1 == 15) break;
 			if (color1)
-				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette[color1]);
+				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
 			x++;
 			x_flipped += flip_screen ? -1 : 1;
 
 			if (color2 == 15) break;
 			if (color2)
-				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette[color2]);
+				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
 			x++;
 			x_flipped += flip_screen ? -1 : 1;
 		}

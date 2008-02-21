@@ -199,7 +199,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		if (flip_screen)
 			sy = 512-8 - sy;
 
-		colour = Machine->pens[data & 0x0f];
+		colour = data & 0x0f;
 		for (y = 0; y < 8; y++)
 		{
 			for (x = 0; x < 8; x++)
@@ -216,7 +216,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		if (flip_screen)
 			sy = 512-4 - sy;
 
-		colour = Machine->pens[data & 0x0f];
+		colour = data & 0x0f;
 		for (y = 0; y < 4; y++)
 		{
 			for (x = 0; x < 8; x++)

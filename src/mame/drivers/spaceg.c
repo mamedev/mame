@@ -244,7 +244,7 @@ static WRITE8_HANDLER( zvideoram_w )
 		for (i = 0; i < 8; i++)
 		{
 			if (x >= 0 && y < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
 			x++;
 			data >>= 1;
 		}
@@ -310,7 +310,7 @@ static WRITE8_HANDLER(spaceg_colorram_w)
 		for (i = 0; i < 8; i++)
 		{
 			if (x >= 0 && x < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)?Machine->pens[col]:Machine->pens[0];
+				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
 			x++;
 			data >>= 1;
 		}

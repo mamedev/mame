@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *glass_spriteram;
 UINT16 *glass_vregs;
@@ -101,11 +100,11 @@ WRITE16_HANDLER( glass_blitter_w )
 					for (i = 0; i < 320; i++){
 						int color = *gfx;
 						gfx++;
-						*BITMAP_ADDR16(screen_bitmap, j, i) = Machine->pens[color & 0xff];
+						*BITMAP_ADDR16(screen_bitmap, j, i) = color & 0xff;
 					}
 				}
 			} else {
-				fillbitmap(screen_bitmap, Machine->pens[0], 0);
+				fillbitmap(screen_bitmap, 0, 0);
 			}
 		}
 	}

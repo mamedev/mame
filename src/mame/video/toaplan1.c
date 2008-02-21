@@ -119,7 +119,6 @@ Abnormalities:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "toaplan1.h"
 #include "cpu/m68000/m68000.h"
 
@@ -946,7 +945,7 @@ static void toaplan1_draw_sprite_custom(mame_bitmap *dest_bmp,const gfx_element 
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
-	const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
@@ -1028,7 +1027,7 @@ static void toaplan1_draw_sprite_custom(mame_bitmap *dest_bmp,const gfx_element 
 					if( c != 0 )
 					{
 						if (pri[x] < priority)
-							dest[x] = pal[c];
+							dest[x] = pal_base+c;
 						pri[x] = 0xff; // mark it "already drawn"
 					}
 					x_index += dx;

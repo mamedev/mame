@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/taitoic.h"
 #include "includes/taito_f2.h"
 
@@ -374,7 +373,7 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int scalex, int scaley)
 {
-	const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -480,15 +479,15 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 						// Blend mode 1 - Sprite under tilemap, use sprite palette with tilemap data
 						if ((f2_spriteblendmode&0xc0)==0xc0 && sprite_priority==(tilemap_priority-1))
 						{
-							dest[x]=(pal[c]&0xfff0)|(dest[x]&0xf);
+							dest[x]=((pal_base+c)&0xfff0)|(dest[x]&0xf);
 						}
 						// Blend mode 1 - Sprite over tilemap, use sprite data with tilemap palette
 						else if ((f2_spriteblendmode&0xc0)==0xc0 && sprite_priority==(tilemap_priority+1))
 						{
 							if (dest[x]&0xf)
-								dest[x]=(dest[x]&0xfff0)|(pal[c]&0xf);
+								dest[x]=(dest[x]&0xfff0)|((pal_base+c)&0xf);
 							else
-								dest[x]=pal[c];
+								dest[x]=pal_base+c;
 						}
 						// Blend mode 2 - Sprite under tilemap, use sprite data with tilemap palette
 						else if ((f2_spriteblendmode&0xc0)==0x80 && sprite_priority==(tilemap_priority-1))
@@ -498,13 +497,13 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 						// Blend mode 2 - Sprite over tilemap, alternate sprite palette, confirmed in Pulirula level 2
 						else if ((f2_spriteblendmode&0xc0)==0x80 && sprite_priority==(tilemap_priority+1))
 						{
-							dest[x]=(pal[c]&0xffef); // Pulirula level 2, Liquid Kids attract mode
+							dest[x]=((pal_base+c)&0xffef); // Pulirula level 2, Liquid Kids attract mode
 						}
 						// No blending
 						else
 						{
 							if (sprite_priority>tilemap_priority) // Ninja Kids confirms tilemap takes priority in equal value case
-								dest[x]=pal[c];
+								dest[x]=pal_base+c;
 						}
 						pri[x] |= 0x80;
 					}

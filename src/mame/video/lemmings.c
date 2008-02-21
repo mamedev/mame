@@ -14,7 +14,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "includes/lemmings.h"
+#include "lemmings.h"
 
 UINT16 *lemmings_pixel_0_data,*lemmings_pixel_1_data,*lemmings_vram_data,*lemmings_control_data;
 static UINT16 *sprite_triple_buffer_0,*sprite_triple_buffer_1;
@@ -130,8 +130,8 @@ WRITE16_HANDLER( lemmings_pixel_0_w )
 	if (sx>2047 || sy>255)
 		return;
 
-	*BITMAP_ADDR16(bitmap0, sy, sx+0) = Machine->pens[((src>>8)&0xf)|0x100];
-	*BITMAP_ADDR16(bitmap0, sy, sx+1) = Machine->pens[((src>>0)&0xf)|0x100];
+	*BITMAP_ADDR16(bitmap0, sy, sx+0) = ((src>>8)&0xf)|0x100;
+	*BITMAP_ADDR16(bitmap0, sy, sx+1) = ((src>>0)&0xf)|0x100;
 }
 
 WRITE16_HANDLER( lemmings_pixel_1_w )

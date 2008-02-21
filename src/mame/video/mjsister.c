@@ -8,7 +8,6 @@ Video hardware
 *****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 int mjsister_screen_redraw;
 int mjsister_flip_screen;
@@ -40,8 +39,8 @@ static void mjsister_plot0(int offset,UINT8 data)
 	c1 = (data & 0x0f)        + mjsister_colorbank * 0x20;
 	c2 = ((data & 0xf0) >> 4) + mjsister_colorbank * 0x20;
 
-	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+0) = Machine->pens[c1];
-	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+1) = Machine->pens[c2];
+	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+0) = c1;
+	*BITMAP_ADDR16(mjsister_tmpbitmap0, y, x*2+1) = c2;
 }
 
 static void mjsister_plot1(int offset,UINT8 data)
@@ -59,8 +58,8 @@ static void mjsister_plot1(int offset,UINT8 data)
 	if (c2)
 		c2 += mjsister_colorbank * 0x20 + 0x10;
 
-	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+0) = Machine->pens[c1];
-	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+1) = Machine->pens[c2];
+	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+0) = c1;
+	*BITMAP_ADDR16(mjsister_tmpbitmap1, y, x*2+1) = c2;
 }
 
 WRITE8_HANDLER( mjsister_videoram_w )

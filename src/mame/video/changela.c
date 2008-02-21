@@ -103,7 +103,7 @@ static void draw_obj0(mame_bitmap *bitmap, int sy)
 					data = (ROM[rom_addr] & 0xf0) >> 4;
 
 				if((data != 0x0f) && (data != 0))
-					*BITMAP_ADDR16(bitmap, sy, xpos+i) = Machine->pens[data | 0x10];
+					*BITMAP_ADDR16(bitmap, sy, xpos+i) = data | 0x10;
 
 				if(hs)
 				{
@@ -113,7 +113,7 @@ static void draw_obj0(mame_bitmap *bitmap, int sy)
 						data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
 
 					if((data != 0x0f) && (data != 0))
-						*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = Machine->pens[data | 0x10];
+						*BITMAP_ADDR16(bitmap, sy, xpos+i+16) = data | 0x10;
 				}
 			}
 		}
@@ -326,7 +326,7 @@ static void draw_river(mame_bitmap *bitmap, int sy)
 			else
 				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
 
-			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col];
+			*BITMAP_ADDR16(bitmap, sy, sx) = col;
 		}
 
 		for(sx = 16; sx < 256; sx++)
@@ -357,7 +357,7 @@ static void draw_river(mame_bitmap *bitmap, int sy)
 			else
 				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
 
-			*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col];
+			*BITMAP_ADDR16(bitmap, sy, sx) = col;
 		}
 	}
 }
@@ -567,7 +567,7 @@ static void draw_tree(mame_bitmap *bitmap, int sy, int tree_num)
 				all_ff = 0;
 
 			if(col != 0x0f && col != 0x00)
-				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col | 0x30];
+				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x30;
 		}
 	}
 
@@ -607,7 +607,7 @@ static void draw_tree(mame_bitmap *bitmap, int sy, int tree_num)
 				all_ff = 0;
 
 			if(col != 0x0f && col != 0x00)
-				*BITMAP_ADDR16(bitmap, sy, sx) = Machine->pens[col | 0x30];
+				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x30;
 		}
 	}
 

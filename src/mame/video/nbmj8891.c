@@ -318,13 +318,13 @@ void nbmj8891_vramflip(int vram)
 static void update_pixel0(int x, int y)
 {
 	UINT8 color = nbmj8891_videoram0[(y * Machine->screen[0].width) + x];
-	*BITMAP_ADDR16(nbmj8891_tmpbitmap0, y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(nbmj8891_tmpbitmap0, y, x) = color;
 }
 
 static void update_pixel1(int x, int y)
 {
 	UINT8 color = nbmj8891_videoram1[(y * Machine->screen[0].width) + x];
-	*BITMAP_ADDR16(nbmj8891_tmpbitmap1, y, x) = Machine->pens[(color == 0x7f) ? 0xff : color];
+	*BITMAP_ADDR16(nbmj8891_tmpbitmap1, y, x) = (color == 0x7f) ? 0xff : color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )

@@ -84,11 +84,11 @@ static void updatepixels(int x,int y)
 
 	if (front>>8) color = front>>8;
 	else color = (back>>8) + 256;
-	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(tmpbitmap, y, x) = color;
 
 	if (front&0xff) color = front&0xff;
 	else color = (back&0xff) + 256;
-	*BITMAP_ADDR16(tmpbitmap, y, x+1) = Machine->pens[color];
+	*BITMAP_ADDR16(tmpbitmap, y, x+1) = color;
 }
 
 

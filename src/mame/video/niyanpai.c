@@ -185,7 +185,7 @@ static void niyanpai_vramflip(int vram)
 static void update_pixel(int vram, int x, int y)
 {
 	UINT16 color = niyanpai_videoram[vram][(y * Machine->screen[0].width) + x];
-	*BITMAP_ADDR16(niyanpai_tmpbitmap[vram], y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(niyanpai_tmpbitmap[vram], y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )

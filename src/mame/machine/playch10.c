@@ -222,7 +222,6 @@ READ8_HANDLER( pc10_in1_r )
 		int x = readinputport( 5 );
 		int y = readinputport( 6 );
 		UINT32 pix, color_base;
-		const pen_t *pens = Machine->pens;
 
 		/* no sprite hit (yet) */
 		ret |= 0x08;
@@ -234,8 +233,8 @@ READ8_HANDLER( pc10_in1_r )
 		color_base = ppu2c0x_get_colorbase( 0 );
 
 		/* look at the screen and see if the cursor is over a bright pixel */
-		if ( ( pix == pens[color_base+0x20] ) || ( pix == pens[color_base+0x30] ) ||
-			 ( pix == pens[color_base+0x33] ) || ( pix == pens[color_base+0x34] ) )
+		if ( ( pix == color_base+0x20 ) || ( pix == color_base+0x30 ) ||
+			 ( pix == color_base+0x33 ) || ( pix == color_base+0x34 ) )
 		{
 			ret &= ~0x08; /* sprite hit */
 		}

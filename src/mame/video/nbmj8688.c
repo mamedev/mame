@@ -7,7 +7,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "nb1413m3.h"
 
 
@@ -269,7 +268,7 @@ void mjsikaku_vramflip(void)
 static void update_pixel(int x, int y)
 {
 	int color = mjsikaku_videoram[(y * 512) + x];
-	*BITMAP_ADDR16(mjsikaku_tmpbitmap, y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(mjsikaku_tmpbitmap, y, x) = color;
 }
 
 static void writeram_low(int x, int y, int color)
@@ -554,9 +553,9 @@ static void mbmj8688_gfxdraw(int gfxtype)
 
 ******************************************************************************/
 
-static void common_video_start(void)
+static void common_video_start(running_machine *machine)
 {
-	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, Machine->screen[0].format);
+	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, machine->screen[0].format);
 	mjsikaku_videoram = auto_malloc(512 * 256 * sizeof(UINT16));
 	nbmj8688_clut = auto_malloc(0x20 * sizeof(UINT8));
 	memset(mjsikaku_videoram, 0, (512 * 256 * sizeof(UINT16)));
@@ -567,31 +566,31 @@ static void common_video_start(void)
 VIDEO_START( mbmj8688_8bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_8BIT;
-	common_video_start();
+	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_hybrid_12bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_HYBRID_12BIT;
-	common_video_start();
+	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_12bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_PURE_12BIT;
-	common_video_start();
+	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_hybrid_16bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_HYBRID_16BIT;
-	common_video_start();
+	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_16bit )
 {
 	mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
-	common_video_start();
+	common_video_start(machine);
 }
 
 VIDEO_START( mbmj8688_pure_16bit_LCD )
@@ -601,7 +600,7 @@ VIDEO_START( mbmj8688_pure_16bit_LCD )
 	HD61830B_ram[0] = auto_malloc(0x10000);
 	HD61830B_ram[1] = auto_malloc(0x10000);
 
-	common_video_start();
+	common_video_start(machine);
 }
 
 

@@ -38,7 +38,6 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
@@ -67,7 +66,7 @@ static void plot_pixel_sbw(int x, int y, int col)
 		y = 255-y;
 		x = 247-x;
 	}
-	*BITMAP_ADDR16(tmpbitmap, y, x) = Machine->pens[col];
+	*BITMAP_ADDR16(tmpbitmap, y, x) = col;
 }
 
 static WRITE8_HANDLER( sbw_videoram_w )

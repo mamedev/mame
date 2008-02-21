@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 
 UINT16 *taitob_scroll;
@@ -148,8 +147,8 @@ WRITE16_HANDLER( hitice_pixelram_w )
   {
     /* bit 15 of pixel_scroll[0] is probably flip screen */
 
-	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+0) = Machine->pens[b_fg_color_base * 16 + (data & 0xff)];
-	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+1) = Machine->pens[b_fg_color_base * 16 + (data & 0xff)];
+	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+0) = b_fg_color_base * 16 + (data & 0xff);
+	*BITMAP_ADDR16(pixel_bitmap, sy, 2*sx+1) = b_fg_color_base * 16 + (data & 0xff);
   }
 }
 

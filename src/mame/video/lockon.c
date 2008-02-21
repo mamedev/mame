@@ -283,7 +283,7 @@ static void scene_draw(void)
 				 | (((d1 >> x_gran) & 1) << 1)
 				 | ( (d0 >> x_gran) & 1);
 
-			*bmpaddr++ = Machine->pens[0xa00 + col];
+			*bmpaddr++ = 0xa00 + col;
 
 			x_offs = (x_offs + 1) & 0x1ff;
 		}
@@ -411,7 +411,7 @@ static void ground_draw(void)
 				color += ((rom_data2 >> gpbal2_0) & 0x1) << 1;
 				color += ((rom_data3 >> gpbal2_0) & 0x1) << 2;
 
-				*bmpaddr++ = Machine->pens[0x800 + color];
+				*bmpaddr++ = 0x800 + color;
 
 				/* Update the counters */
 				tz2213_cy = (UINT8)tz2213_dx > (UINT8)~(tz2213_x);
@@ -468,7 +468,7 @@ do {                                                     \
 		UINT8 clr = obj_pal_ram[(pal << 4) + COLOR];     \
 		UINT16 *pix = (line + px);						 \
 		if (!(clr == 0xff && ((*pix & 0xe00) == 0xa00))) \
-			*pix = Machine->pens[0x400 + clr];			 \
+			*pix = 0x400 + clr;			 \
 	}                                                    \
 	px = (px + 1) & 0x7ff;                               \
 } while(0)
@@ -859,7 +859,7 @@ static void hud_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 		x_pos	= lockon_hud_ram[offs + 1] & 0x1ff;
 		x_size	= (lockon_hud_ram[offs + 1] >> 12) & 7;
 		code	= (lockon_hud_ram[offs] >> 9) & 0x7f;
-		colour	= Machine->pens[0x200 + ((lockon_hud_ram[offs + 1] >> 9) & 7)];
+		colour	= 0x200 + ((lockon_hud_ram[offs + 1] >> 9) & 7);
 		layout	= (code >> 5) & 3;
 
 		rom_a12_7 = (code & 0xfe) << 6;

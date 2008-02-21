@@ -354,7 +354,6 @@ static WRITE8_HANDLER( gun_in0_w )
 			int x = readinputport( 4 );
 			int y = readinputport( 5 );
 			UINT32 pix, color_base;
-			const pen_t *pens = Machine->pens;
 
 			/* get the pixel at the gun position */
 			pix = ppu2c0x_get_pixel( 0, x, y );
@@ -363,8 +362,8 @@ static WRITE8_HANDLER( gun_in0_w )
 			color_base = ppu2c0x_get_colorbase( 0 );
 
 			/* look at the screen and see if the cursor is over a bright pixel */
-			if ( ( pix == pens[color_base+0x20] ) || ( pix == pens[color_base+0x30] ) ||
-				 ( pix == pens[color_base+0x33] ) || ( pix == pens[color_base+0x34] ) )
+			if ( ( pix == color_base+0x20 ) || ( pix == color_base+0x30 ) ||
+				 ( pix == color_base+0x33 ) || ( pix == color_base+0x34 ) )
 			{
 				input_latch[0] |= 0x40;
 			}

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *superqix_videoram;
 UINT8 *superqix_bitmapram,*superqix_bitmapram2;
@@ -92,8 +91,8 @@ WRITE8_HANDLER( superqix_bitmapram_w )
 
 		superqix_bitmapram[offset] = data;
 
-		*BITMAP_ADDR16(fg_bitmap[0], y, x + 0) = Machine->pens[data >> 4];
-		*BITMAP_ADDR16(fg_bitmap[0], y, x + 1) = Machine->pens[data & 0x0f];
+		*BITMAP_ADDR16(fg_bitmap[0], y, x + 0) = data >> 4;
+		*BITMAP_ADDR16(fg_bitmap[0], y, x + 1) = data & 0x0f;
 	}
 }
 
@@ -106,8 +105,8 @@ WRITE8_HANDLER( superqix_bitmapram2_w )
 
 		superqix_bitmapram2[offset] = data;
 
-		*BITMAP_ADDR16(fg_bitmap[1], y, x + 0) = Machine->pens[data >> 4];
-		*BITMAP_ADDR16(fg_bitmap[1], y, x + 1) = Machine->pens[data & 0x0f];
+		*BITMAP_ADDR16(fg_bitmap[1], y, x + 0) = data >> 4;
+		*BITMAP_ADDR16(fg_bitmap[1], y, x + 1) = data & 0x0f;
 	}
 }
 

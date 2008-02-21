@@ -38,7 +38,7 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 	sy = offset / 256;
 	sx = offset % 256;
 
-	*BITMAP_ADDR16(tmpbitmap, sy, sx) = Machine->pens[1024 + (data >> 1)];
+	*BITMAP_ADDR16(tmpbitmap, sy, sx) = 1024 + (data >> 1);
 }
 
 WRITE16_HANDLER( galpanic_paletteram_w )

@@ -143,7 +143,7 @@ static void pastelg_vramflip(void)
 static void update_pixel(int x,int y)
 {
 	int color = pastelg_videoram[(y * Machine->screen[0].width) + x];
-	*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = Machine->pens[color];
+	*BITMAP_ADDR16(pastelg_tmpbitmap, y, x) = color;
 }
 
 static TIMER_CALLBACK( blitter_timer_callback )
