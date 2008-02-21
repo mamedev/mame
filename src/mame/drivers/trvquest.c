@@ -38,74 +38,13 @@ Notes:
 #include "deprecat.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
-
-static int cmd,portA;
-static UINT8 xpos,ypos;
-
-static int trvquest_question = 0;
-
-static WRITE8_HANDLER( trvquest_video_portA_w )
-{
-	portA = data;
-}
-
-static WRITE8_HANDLER( trvquest_video_portB_w )
-{
-	cmd = data & 7;
-}
-
-static WRITE8_HANDLER( trvquest_video_CA2_w )
-{
-	if (data != 0) return;
-
-	switch (cmd)
-	{
-		case 0:	// draw pixel
-			if (portA & 0x10)	// auto increment X
-			{
-				if (portA & 0x40)
-					xpos--;
-				else
-					xpos++;
-			}
-			if (portA & 0x20)	// auto increment Y
-			{
-				if (portA & 0x80)
-					ypos--;
-				else
-					ypos++;
-			}
-
-			*BITMAP_ADDR16(tmpbitmap, ypos, xpos) = Machine->pens[portA & 7];
-			break;
-
-		case 1:	// load X register
-			xpos = portA;
-			break;
-
-		case 2:	// load Y register
-			ypos = portA;
-			break;
-
-		case 3:	// clear screen
-			fillbitmap(tmpbitmap, Machine->pens[portA & 7], NULL);
-			break;
-	}
-}
-
-static WRITE8_HANDLER( trvquest_question_w )
-{
-	trvquest_question = data;
-}
+#include "gameplan.h"
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	return memory_region(REGION_USER1)[trvquest_question * 0x2000 + offset];
-}
+	gameplan_state *state = Machine->driver_data;
 
-static READ8_HANDLER( trvquest_vblank_r )
-{
-	return 0x20;
+	return memory_region(REGION_USER1)[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_HANDLER( trvquest_coin_w )
@@ -121,16 +60,16 @@ static WRITE8_HANDLER( trvquest_misc_w )
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
-	AM_RANGE(0x3800, 0x380f) AM_READWRITE(via_0_r, via_0_w)
-	AM_RANGE(0x3810, 0x381f) AM_READWRITE(via_1_r, via_1_w)
-	AM_RANGE(0x3820, 0x382f) AM_READWRITE(via_2_r, via_2_w)
+	AM_RANGE(0x3800, 0x380f) AM_READWRITE(via_1_r, via_1_w)
+	AM_RANGE(0x3810, 0x381f) AM_READWRITE(via_2_r, via_2_w)
+	AM_RANGE(0x3820, 0x382f) AM_READWRITE(via_0_r, via_0_w)
 	AM_RANGE(0x3830, 0x3830) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x3831, 0x3831) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x3841, 0x3841) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(trvquest_question_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(gameplan_state, trvquest_question)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	// bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -225,7 +164,7 @@ static void via_irq(int state)
 }
 
 
-static const struct via6522_interface via_0_interface =
+static const struct via6522_interface via_1_interface =
 {
 	/*inputs : A/B         */ input_port_0_r, input_port_1_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
@@ -234,7 +173,7 @@ static const struct via6522_interface via_0_interface =
 	/*irq                  */ NULL
 };
 
-static const struct via6522_interface via_1_interface =
+static const struct via6522_interface via_2_interface =
 {
 	/*inputs : A/B         */ input_port_2_r, input_port_3_r,
 	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
@@ -243,63 +182,38 @@ static const struct via6522_interface via_1_interface =
 	/*irq                  */ via_irq
 };
 
-static const struct via6522_interface via_2_interface =
-{
-	/*inputs : A/B         */ NULL, trvquest_vblank_r,
-	/*inputs : CA/B1,CA/B2 */ NULL, NULL, NULL, NULL,
-	/*outputs: A/B         */ trvquest_video_portA_w, trvquest_video_portB_w,
-	/*outputs: CA/B1,CA/B2 */ NULL, NULL, trvquest_video_CA2_w, NULL,
-	/*irq                  */ NULL
-};
 
-static PALETTE_INIT( trvquest )
+static MACHINE_START( trvquest )
 {
-	palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* 0 BLACK   */
-	palette_set_color(machine,1,MAKE_RGB(0xff,0x00,0x00)); /* 1 RED     */
-	palette_set_color(machine,2,MAKE_RGB(0x00,0xff,0x00)); /* 2 GREEN   */
-	palette_set_color(machine,3,MAKE_RGB(0xff,0xff,0x00)); /* 3 YELLOW  */
-	palette_set_color(machine,4,MAKE_RGB(0x00,0x00,0xff)); /* 4 BLUE    */
-	palette_set_color(machine,5,MAKE_RGB(0xff,0x00,0xff)); /* 5 MAGENTA */
-	palette_set_color(machine,6,MAKE_RGB(0x00,0xff,0xff)); /* 6 CYAN    */
-	palette_set_color(machine,7,MAKE_RGB(0xff,0xff,0xff)); /* 7 WHITE   */
+	via_config(1, &via_1_interface);
+	via_config(2, &via_2_interface);
 }
 
 static MACHINE_RESET( trvquest )
 {
-	via_config(0, &via_0_interface);
-	via_config(1, &via_1_interface);
-	via_config(2, &via_2_interface);
 	via_reset();
 }
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_1_ca1_w(0,1);
-	via_1_ca1_w(0,0);
+	via_2_ca1_w(0,1);
+	via_2_ca1_w(0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )
+
+	MDRV_DRIVER_DATA(gameplan_state)
+
 	MDRV_CPU_ADD(M6809,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_VBLANK_INT(trvquest_interrupt,1)
 
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_MACHINE_START(trvquest)
 	MDRV_MACHINE_RESET(trvquest)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
-
-	MDRV_PALETTE_LENGTH(8)
-
-	MDRV_PALETTE_INIT(trvquest)
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_IMPORT_FROM(trvquest_video);
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -332,4 +246,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, 0, ROT90, "Sunn / Techstar", "Trivia Quest", 0 )
+GAME( 1984, trvquest, 0, trvquest, trvquest, 0, ROT90, "Sunn / Techstar", "Trivia Quest", GAME_SUPPORTS_SAVE )

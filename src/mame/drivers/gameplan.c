@@ -16,7 +16,7 @@ Address          Dir Data     Name      Description
 00011-----------              n.c.
 00100-------xxxx R/W xxxxxxxx VIA 1     6522 for video interface
 00101-------xxxx R/W xxxxxxxx VIA 2     6522 for I/O interface
-00110-------xxxx R/W xxxxxxxx VIA 3     6522 for interface with sound CPU
+00110-------xxxx R/W xxxxxxxx VIA 3     6522 for interface with audio CPU
 00111-----------              n.c.
 01--------------              n.c.
 10--------------              n.c.
@@ -68,266 +68,7 @@ TODO:
 #include "machine/6532riot.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
-
-
-
-#define MAIN_MASTER_CLOCK	(3579000)
-#define AUDIO_MASTER_CLOCK	(3579000)
-#define MAIN_CPU_CLOCK		(MAIN_MASTER_CLOCK / 4)
-#define AUDIO_CPU_CLOCK		(AUDIO_MASTER_CLOCK / 4)
-#define AY8910_CLOCK		(AUDIO_MASTER_CLOCK / 2)
-#define PIXEL_CLOCK			(11668800 / 2)
-#define HTOTAL				(0x160)
-#define HBEND				(0x000)
-#define HBSTART				(0x100)
-#define VTOTAL				(0x118)
-#define VBEND				(0x000)
-#define VBSTART				(0x100)
-
-#define GAMEPLAN_NUM_PENS	(0x08)
-#define LEPRECHN_NUM_PENS	(0x10)
-
-
-
-/*************************************
- *
- *  Video system
- *
- *************************************/
-
-static UINT8 *gameplan_videoram;
-static size_t gameplan_videoram_size;
-static UINT8 video_x;
-static UINT8 video_y;
-static UINT8 video_command;
-static UINT8 video_data;
-
-
-static VIDEO_START( gameplan )
-{
-	gameplan_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	gameplan_videoram = auto_malloc(gameplan_videoram_size);
-}
-
-
-static void gameplan_get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i < GAMEPLAN_NUM_PENS; i++)
-	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
-	}
-}
-
-
-/* RGBI palette. Is it correct, or does it use the standard RGB? */
-static void leprechn_get_pens(pen_t *pens)
-{
-	offs_t i;
-
-	for (i = 0; i < LEPRECHN_NUM_PENS; i++)
-	{
-		UINT8 bk = (i & 8) ? 0x40 : 0x00;
-		UINT8 r = (i & 1) ? 0xff : bk;
-		UINT8 g = (i & 2) ? 0xff : bk;
-		UINT8 b = (i & 4) ? 0xff : bk;
-
-		pens[i] = MAKE_RGB(r, g, b);
-	}
-}
-
-
-static VIDEO_UPDATE( gameplan )
-{
-	pen_t pens[GAMEPLAN_NUM_PENS];
-	offs_t offs;
-
-	gameplan_get_pens(pens);
-
-	for (offs = 0; offs < gameplan_videoram_size; offs++)
-	{
-		UINT8 y = offs >> 8;
-		UINT8 x = offs & 0xff;
-
-		*BITMAP_ADDR32(bitmap, y, x) = pens[gameplan_videoram[offs] & 0x07];
-	}
-
-	return 0;
-}
-
-
-static VIDEO_UPDATE( leprechn )
-{
-	pen_t pens[LEPRECHN_NUM_PENS];
-	offs_t offs;
-
-	leprechn_get_pens(pens);
-
-	for (offs = 0; offs < gameplan_videoram_size; offs++)
-	{
-		UINT8 y = offs >> 8;
-		UINT8 x = offs & 0xff;
-
-		*BITMAP_ADDR32(bitmap, y, x) = pens[gameplan_videoram[offs]];
-	}
-
-	return 0;
-}
-
-
-
-/*************************************
- *
- *  VIA 1 - video
- *
- *************************************/
-
-static emu_timer *via_0_ca1_timer;
-
-
-
-static WRITE8_HANDLER( video_data_w )
-{
-	video_data = data;
-}
-
-
-static WRITE8_HANDLER( gameplan_video_command_w )
-{
-	video_command = data & 0x07;
-}
-
-
-static WRITE8_HANDLER( leprechn_video_command_w )
-{
-	video_command = (data >> 3) & 0x07;
-}
-
-
-static TIMER_CALLBACK( clear_screen_done_callback )
-{
-	/* indicate that the we are done clearing the screen */
-	via_0_ca1_w(0, 0);
-}
-
-
-static WRITE8_HANDLER( video_command_trigger_w )
-{
-	if (data == 0)
-	{
-		switch (video_command)
-		{
-		/* draw pixel */
-		case 0:
-			/* auto-adjust X? */
-			if (video_data & 0x10)
-			{
-				if (video_data & 0x40)
-					video_x = video_x - 1;
-				else
-					video_x = video_x + 1;
-			}
-
-			/* auto-adjust Y? */
-			if (video_data & 0x20)
-			{
-				if (video_data & 0x80)
-					video_y = video_y - 1;
-				else
-					video_y = video_y + 1;
-			}
-
-			gameplan_videoram[video_y * (HBSTART - HBEND) + video_x] = video_data & 0x0f;
-
-			break;
-
-		/* load X register */
-		case 1:
-			video_x = video_data;
-			break;
-
-		/* load Y register */
-		case 2:
-			video_y = video_data;
-			break;
-
-		/* clear screen */
-		case 3:
-
-			/* indicate that the we are busy */
-			via_0_ca1_w(0, 1);
-
-			memset(gameplan_videoram, video_data & 0x0f, gameplan_videoram_size);
-
-			/* set a timer for an arbitrarily short period.
-               The real time it takes to clear to screen is not
-               important to the software */
-			timer_call_after_resynch(NULL, 0, clear_screen_done_callback);
-
-			break;
-		}
-	}
-}
-
-
-static TIMER_CALLBACK( via_irq_delayed )
-{
-	cpunum_set_input_line(machine, 0, 0, param);
-}
-
-
-static void via_irq(int state)
-{
-	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
-       cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
-       leave time for the program to see the flag change. */
-	timer_set(ATTOTIME_IN_USEC(50), NULL, state, via_irq_delayed);
-}
-
-
-static const struct via6522_interface gameplan_via_0_interface =
-{
-	0, 0,									/*inputs : A/B         */
-	/*vblank*/0, 0, 0, 0,					/*inputs : CA/B1,CA/B2 */
-	video_data_w, gameplan_video_command_w,	/*outputs: A/B         */
-	0, 0, video_command_trigger_w, 0,		/*outputs: CA/B1,CA/B2 */
-	via_irq									/*irq                  */
-};
-
-
-static const struct via6522_interface leprechn_via_0_interface =
-{
-	0, 0,									/*inputs : A/B         */
-	/*vblank*/0, 0, 0, 0,					/*inputs : CA/B1,CA/B2 */
-	video_data_w, leprechn_video_command_w,	/*outputs: A/B         */
-	0, 0, video_command_trigger_w, 0,		/*outputs: CA/B1,CA/B2 */
-	via_irq									/*irq                  */
-};
-
-
-static TIMER_CALLBACK( via_0_ca1_timer_callback )
-{
-	/* !VBLANK is connected to CA1 */
-	via_0_ca1_w(0, (UINT8)param);
-
-	if (param)
-		timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
-	else
-		timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1);
-}
-
-
-static void create_via_0_timer(void)
-{
-	via_0_ca1_timer = timer_alloc(via_0_ca1_timer_callback, NULL);
-}
-
-
-static void start_via_0_timer(void)
-{
-	timer_adjust_oneshot(via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
-}
+#include "gameplan.h"
 
 
 
@@ -337,26 +78,27 @@ static void start_via_0_timer(void)
  *
  *************************************/
 
-static UINT8 current_port;
-
-
 static WRITE8_HANDLER( io_select_w )
 {
+	gameplan_state *state = Machine->driver_data;
+
 	switch (data)
 	{
-	case 0x01: current_port = 0; break;
-	case 0x02: current_port = 1; break;
-	case 0x04: current_port = 2; break;
-	case 0x08: current_port = 3; break;
-	case 0x80: current_port = 4; break;
-	case 0x40: current_port = 5; break;
+	case 0x01: state->current_port = 0; break;
+	case 0x02: state->current_port = 1; break;
+	case 0x04: state->current_port = 2; break;
+	case 0x08: state->current_port = 3; break;
+	case 0x80: state->current_port = 4; break;
+	case 0x40: state->current_port = 5; break;
 	}
 }
 
 
 static READ8_HANDLER( io_port_r )
 {
-	return readinputport(current_port);
+	gameplan_state *state = Machine->driver_data;
+
+	return readinputport(state->current_port);
 }
 
 
@@ -379,28 +121,29 @@ static const struct via6522_interface via_1_interface =
 
 /*************************************
  *
- *  VIA 3 - sound
+ *  VIA 3 - audio
  *
  *************************************/
 
-static UINT8 sound_cmd;
-
-
-static WRITE8_HANDLER( sound_reset_w )
+static WRITE8_HANDLER( audio_reset_w )
 {
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( sound_cmd_w )
+static WRITE8_HANDLER( audio_cmd_w )
 {
-	sound_cmd = data & 0x7f;
+	gameplan_state *state = Machine->driver_data;
+
+	state->audio_cmd = data & 0x7f;
 }
 
 
-static WRITE8_HANDLER( sound_trigger_w )
+static WRITE8_HANDLER( audio_trigger_w )
 {
-	UINT8 cmd = (data << 7) | sound_cmd;
+	gameplan_state *state = Machine->driver_data;
+
+	UINT8 cmd = (data << 7) | (state->audio_cmd & 0x7f);
 
 	soundlatch_w(0, cmd);
 	r6532_0_porta_w(0, cmd);
@@ -411,8 +154,8 @@ static const struct via6522_interface via_2_interface =
 {
 	0, soundlatch2_r,					  /*inputs : A/B         */
 	0, 0, 0, 0,							  /*inputs : CA/B1,CA/B2 */
-	sound_cmd_w, 0,						  /*outputs: A/B         */
-	0, 0, sound_trigger_w, sound_reset_w, /*outputs: CA/B1,CA/B2 */
+	audio_cmd_w, 0,						  /*outputs: A/B         */
+	0, 0, audio_trigger_w, audio_reset_w, /*outputs: CA/B1,CA/B2 */
 	0									  /*irq                  */
 };
 
@@ -420,7 +163,7 @@ static const struct via6522_interface via_2_interface =
 
 /*************************************
  *
- *  VIA 5 - sound
+ *  RIOT - audio
  *
  *************************************/
 
@@ -443,46 +186,46 @@ static const struct riot6532_interface r6532_interface =
 
 /*************************************
  *
- *  Machine start-up
+ *  Start
  *
  *************************************/
 
 static MACHINE_START( gameplan )
 {
-	via_config(0, &gameplan_via_0_interface);
+	gameplan_state *state = machine->driver_data;
+
 	via_config(1, &via_1_interface);
 	via_config(2, &via_2_interface);
 
 	r6532_config(0, &r6532_interface);
-	r6532_set_clock(0, AUDIO_CPU_CLOCK);
+	r6532_set_clock(0, GAMEPLAN_AUDIO_CPU_CLOCK);
 	r6532_reset(0);
 
-	create_via_0_timer();
+	/* register for save states */
+	state_save_register_global(state->current_port);
+	state_save_register_global(state->audio_cmd);
 }
 
 
-static MACHINE_START( leprechn )
-{
-	via_config(0, &leprechn_via_0_interface);
-	via_config(1, &via_1_interface);
-	via_config(2, &via_2_interface);
 
-	r6532_config(0, &r6532_interface);
-	r6532_set_clock(0, AUDIO_CPU_CLOCK);
-	r6532_reset(0);
-
-	create_via_0_timer();
-}
-
+/*************************************
+ *
+ *  Reset
+ *
+ *************************************/
 
 static MACHINE_RESET( gameplan )
 {
 	via_reset();
-
-	start_via_0_timer();
 }
 
 
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
@@ -494,6 +237,13 @@ static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+
+/*************************************
+ *
+ *  Audio CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( gameplan_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
@@ -522,6 +272,12 @@ static ADDRESS_MAP_START( leprechn_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( killcom )
 	PORT_START      /* COL. A - from "TEST NO.7 - status locator - coin-door" */
@@ -614,7 +370,7 @@ static INPUT_PORTS_START( killcom )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -640,7 +396,7 @@ static INPUT_PORTS_START( killcom )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -760,7 +516,7 @@ static INPUT_PORTS_START( megatack )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x00, "Sound Test A 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -786,7 +542,7 @@ static INPUT_PORTS_START( megatack )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x00, "Sound Test B 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -905,7 +661,7 @@ static INPUT_PORTS_START( challeng )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x00, "Sound Test A 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -931,7 +687,7 @@ static INPUT_PORTS_START( challeng )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x00, "Sound Test B 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1055,7 +811,7 @@ static INPUT_PORTS_START( kaos )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1081,7 +837,7 @@ static INPUT_PORTS_START( kaos )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1198,7 +954,7 @@ static INPUT_PORTS_START( leprechn )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1224,7 +980,7 @@ static INPUT_PORTS_START( leprechn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1341,7 +1097,7 @@ static INPUT_PORTS_START( piratetr )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW A */
+	PORT_START      /* audio board DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1367,7 +1123,7 @@ static INPUT_PORTS_START( piratetr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START      /* sound board DSW B */
+	PORT_START      /* audio board DSW B */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1396,6 +1152,12 @@ INPUT_PORTS_END
 
 
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
+
 static const struct AY8910interface ay8910_interface =
 {
 	input_port_6_r,
@@ -1405,50 +1167,49 @@ static const struct AY8910interface ay8910_interface =
 
 static MACHINE_DRIVER_START( gameplan )
 
+	MDRV_DRIVER_DATA(gameplan_state)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD(M6502, GAMEPLAN_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(gameplan_main_map,0)
 
-	MDRV_CPU_ADD_TAG("audio", M6502, AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD_TAG("audio", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map,0)
 
 	MDRV_MACHINE_START(gameplan)
 	MDRV_MACHINE_RESET(gameplan)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_TYPE_RASTER)
-	MDRV_VIDEO_START(gameplan)
-	MDRV_VIDEO_UPDATE(gameplan)
+	MDRV_IMPORT_FROM(gameplan_video);
 
-	MDRV_SCREEN_ADD("main", 0)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
+	MDRV_SOUND_ADD(AY8910, GAMEPLAN_AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( leprechn )
 
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gameplan)
+
+	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map,0)
 
-	MDRV_MACHINE_START(leprechn)
-
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(leprechn)
-
+	MDRV_IMPORT_FROM(leprechn_video);
 MACHINE_DRIVER_END
 
 
+
+/*************************************
+ *
+ *  ROM defintions
+ *
+ *************************************/
 
 ROM_START( killcom )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -1574,11 +1335,17 @@ ROM_END
 
 
 
-GAME( 1980, killcom,  0,        gameplan, killcom,  0, ROT0,   "GamePlan (Centuri license)", "Killer Comet", 0 )
-GAME( 1980, megatack, 0,        gameplan, megatack, 0, ROT0,   "GamePlan (Centuri license)", "Megatack", 0 )
-GAME( 1981, challeng, 0,        gameplan, challeng, 0, ROT0,   "GamePlan (Centuri license)", "Challenger", 0 )
-GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "GamePlan", "Kaos", 0 )
-GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun", 0 )
-GAME( 1982, potogold, leprechn, leprechn, leprechn, 0, ROT0,   "GamePlan", "Pot of Gold", 0 )
-GAME( 1982, leprechp, leprechn, leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun (Pacific Polytechnical license)", 0 )
-GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic", "Pirate Treasure", 0 )
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1980, killcom,  0,        gameplan, killcom,  0, ROT0,   "GamePlan (Centuri license)", "Killer Comet", GAME_SUPPORTS_SAVE )
+GAME( 1980, megatack, 0,        gameplan, megatack, 0, ROT0,   "GamePlan (Centuri license)", "Megatack", GAME_SUPPORTS_SAVE )
+GAME( 1981, challeng, 0,        gameplan, challeng, 0, ROT0,   "GamePlan (Centuri license)", "Challenger", GAME_SUPPORTS_SAVE )
+GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "GamePlan", "Kaos", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun", GAME_SUPPORTS_SAVE )
+GAME( 1982, potogold, leprechn, leprechn, leprechn, 0, ROT0,   "GamePlan", "Pot of Gold", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechp, leprechn, leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun (Pacific Polytechnical license)", GAME_SUPPORTS_SAVE )
+GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic", "Pirate Treasure", GAME_SUPPORTS_SAVE )

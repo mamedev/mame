@@ -68,6 +68,7 @@ enum
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
+	XTAL_11_6688MHz  	= 11668800,		/* Gameplan pixel clock */
 	XTAL_12MHz   		= 12000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_12_096MHz 		= 12096000,		/* Some early 80's Atari games */
 	XTAL_12_288MHz  	= 12288000,		/* Sega Model 3 digital audio board */
