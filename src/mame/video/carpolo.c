@@ -237,10 +237,10 @@ VIDEO_UPDATE( carpolo )
 	/* draw the playfield elements in the correct priority order */
 
 	/* score area - position determined by bit 4 of the vertical timing PROM */
-	plot_box(bitmap,0,0,RIGHT_BORDER+1,TOP_BORDER,machine->pens[BACKGROUND_PEN]);
+	plot_box(bitmap,0,0,RIGHT_BORDER+1,TOP_BORDER,BACKGROUND_PEN);
 
 	/* field */
-	plot_box(bitmap,0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[FIELD_PEN]);
+	plot_box(bitmap,0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,FIELD_PEN);
 
 	/* car 1 */
 	draw_sprite(machine, bitmap, cliprect,
@@ -248,10 +248,10 @@ VIDEO_UPDATE( carpolo )
 				0, carpolo_spriteram[0x0c] & 0x0f, CAR1_COLOR);
 
 	/* border - position determined by bit 4 and 7 of the vertical timing PROM */
-	plot_box(bitmap,0,TOP_BORDER,   RIGHT_BORDER+1,1,machine->pens[LINE_PEN]);
-	plot_box(bitmap,0,BOTTOM_BORDER,RIGHT_BORDER+1,1,machine->pens[LINE_PEN]);
-	plot_box(bitmap,LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[LINE_PEN]);
-	plot_box(bitmap,RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,machine->pens[LINE_PEN]);
+	plot_box(bitmap,0,TOP_BORDER,   RIGHT_BORDER+1,1,LINE_PEN);
+	plot_box(bitmap,0,BOTTOM_BORDER,RIGHT_BORDER+1,1,LINE_PEN);
+	plot_box(bitmap,LEFT_BORDER,TOP_BORDER, 1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
+	plot_box(bitmap,RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
 
 	/* car 4 */
 	draw_sprite(machine, bitmap, cliprect,
@@ -371,8 +371,8 @@ static int check_sprite_sprite_collision(running_machine *machine,
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_sprite_collision_bitmap1, machine->pens[0], 0);
-		fillbitmap(sprite_sprite_collision_bitmap2, machine->pens[0], 0);
+		fillbitmap(sprite_sprite_collision_bitmap1, 0, 0);
+		fillbitmap(sprite_sprite_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_sprite_collision_bitmap1,machine->gfx[0],
 				code1,0,
@@ -388,8 +388,8 @@ static int check_sprite_sprite_collision(running_machine *machine,
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((*BITMAP_ADDR16(sprite_sprite_collision_bitmap1, y, x) == machine->pens[1]) &&
-				    (*BITMAP_ADDR16(sprite_sprite_collision_bitmap2, y, x) == machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_sprite_collision_bitmap1, y, x) == 1) &&
+				    (*BITMAP_ADDR16(sprite_sprite_collision_bitmap2, y, x) == 1))
 				{
 					*col_x = (x1 + x) & 0x0f;
 					*col_y = (y1 + y) & 0x0f;
@@ -426,8 +426,8 @@ static int check_sprite_left_goal_collision(running_machine *machine, int x1, in
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_goal_collision_bitmap1, machine->pens[0], 0);
-		fillbitmap(sprite_goal_collision_bitmap2, machine->pens[0], 0);
+		fillbitmap(sprite_goal_collision_bitmap1, 0, 0);
+		fillbitmap(sprite_goal_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
 				code1,0,
@@ -444,17 +444,17 @@ static int check_sprite_left_goal_collision(running_machine *machine, int x1, in
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == 1))
 				{
 					pen_t pix = *BITMAP_ADDR16(sprite_goal_collision_bitmap2, y, x);
 
-					if (pix == machine->pens[LEFT_GOAL_PEN])
+					if (pix == LEFT_GOAL_PEN)
 					{
 						collided = 1;
 						break;
 					}
 
-					if (!goalpost_only && (pix == machine->pens[LEFT_SCORE_PEN]))
+					if (!goalpost_only && (pix == LEFT_SCORE_PEN))
 					{
 						collided = 2;
 						break;
@@ -485,8 +485,8 @@ static int check_sprite_right_goal_collision(running_machine *machine, int x1, i
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_goal_collision_bitmap1, machine->pens[0], 0);
-		fillbitmap(sprite_goal_collision_bitmap2, machine->pens[0], 0);
+		fillbitmap(sprite_goal_collision_bitmap1, 0, 0);
+		fillbitmap(sprite_goal_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
 				code1,0,
@@ -503,17 +503,17 @@ static int check_sprite_right_goal_collision(running_machine *machine, int x1, i
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == machine->pens[1]))
+				if ((*BITMAP_ADDR16(sprite_goal_collision_bitmap1, y, x) == 1))
 				{
 					pen_t pix = *BITMAP_ADDR16(sprite_goal_collision_bitmap2, y, x);
 
-					if (pix == machine->pens[RIGHT_GOAL_PEN])
+					if (pix == RIGHT_GOAL_PEN)
 					{
 						collided = 1;
 						break;
 					}
 
-					if (!goalpost_only && (pix == machine->pens[RIGHT_SCORE_PEN]))
+					if (!goalpost_only && (pix == RIGHT_SCORE_PEN))
 					{
 						collided = 2;
 						break;
@@ -543,7 +543,7 @@ static int check_sprite_border_collision(running_machine *machine, UINT8 x1, UIN
 
 	for (x = 0; x < SPRITE_WIDTH; x++)
 		for (y = 0; y < SPRITE_HEIGHT; y++)
-			if ((*BITMAP_ADDR16(sprite_border_collision_bitmap, y, x) == machine->pens[1]))
+			if ((*BITMAP_ADDR16(sprite_border_collision_bitmap, y, x) == 1))
 			{
 				if (((UINT8)(x1 + x) == LEFT_BORDER) ||
 					((UINT8)(x1 + x) == RIGHT_BORDER))

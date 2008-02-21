@@ -248,7 +248,8 @@ if (input_code_pressed(KEYCODE_Z))
 	if (layers_ctrl&1)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, tilemap_0, i, i);
-	else	fillbitmap(bitmap,machine->pens[0],cliprect);
+	else
+		fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl&2)
 		for (i = 0; i <= 1; i++)

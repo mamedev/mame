@@ -664,7 +664,7 @@ PALETTE_INIT( usclssic )
 }
 
 
-static void set_pens_no_colortable(running_machine *machine)
+static void set_pens(running_machine *machine)
 {
 	offs_t i;
 
@@ -674,23 +674,10 @@ static void set_pens_no_colortable(running_machine *machine)
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-		palette_set_color(machine, i, color);
-	}
-}
-
-
-static void set_pens_colortable(colortable_t *colortable)
-{
-	offs_t i;
-	int palette_size = colortable_palette_get_size(colortable);
-
-	for (i = 0; i < palette_size; i++)
-	{
-		UINT16 data = paletteram16[i];
-
-		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-
-		colortable_palette_set_color(colortable, i, color);
+		if (machine->colortable != NULL)
+			colortable_palette_set_color(machine->colortable, i, color);
+		else
+			palette_set_color(machine, i, color);
 	}
 }
 
@@ -900,8 +887,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 /* For games without tilemaps */
 VIDEO_UPDATE( seta_no_layers )
 {
-	set_pens_no_colortable(machine);
-	fillbitmap(bitmap,machine->pens[0x1f0],cliprect);
+	set_pens(machine);
+	fillbitmap(bitmap,0x1f0,cliprect);
 	draw_sprites(machine,bitmap,cliprect);
 	return 0;
 }
@@ -990,7 +977,7 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	if (order & 1)	// swap the layers?
 	{
@@ -1045,7 +1032,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 VIDEO_UPDATE( seta )
 {
-	set_pens_colortable(machine->colortable);
+	set_pens(machine);
 	return VIDEO_UPDATE_CALL(seta_layers);
 }
 

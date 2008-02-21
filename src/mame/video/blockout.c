@@ -113,7 +113,7 @@ VIDEO_UPDATE( blockout )
 	{
 		int x,y;
 
-		pen_t color = machine->pens[512];
+		pen_t color = 512;
 
 		for (y = 0;y < 256;y++)
 		{

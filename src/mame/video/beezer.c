@@ -20,13 +20,11 @@ VIDEO_UPDATE( beezer )
 	int x,y;
 
 	for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y+=2)
-	{
 		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
 		{
-			*BITMAP_ADDR16(bitmap, y+1, x) = machine->pens[videoram[0x80*y+x] & 0x0f];
-			*BITMAP_ADDR16(bitmap, y,   x) = machine->pens[(videoram[0x80*y+x] >> 4)& 0x0f];
+			*BITMAP_ADDR16(bitmap, y+1, x) = videoram[0x80*y+x] & 0x0f;
+			*BITMAP_ADDR16(bitmap, y,   x) = videoram[0x80*y+x] >> 4;
 		}
-	}
 
 	return 0;
 }

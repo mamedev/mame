@@ -227,7 +227,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( blktiger )
 {
-	fillbitmap(bitmap,machine->pens[1023],cliprect);
+	fillbitmap(bitmap,1023,cliprect);
 
 	if (bgon)
 		tilemap_draw(bitmap,cliprect,screen_layout ? bg_tilemap8x4 : bg_tilemap4x8,TILEMAP_DRAW_LAYER1,0);

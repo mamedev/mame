@@ -58,6 +58,7 @@ UINT16 *cave_vram_0, *cave_vctrl_0;
 UINT16 *cave_vram_1, *cave_vctrl_1;
 UINT16 *cave_vram_2, *cave_vctrl_2;
 UINT16 *cave_vram_3, *cave_vctrl_3;
+size_t cave_paletteram_size;
 
 /* Variables only used here: */
 
@@ -87,7 +88,7 @@ struct sprite_cave {
 	const UINT8 *pen_data;	/* points to top left corner of tile data */
 	int line_offset;
 
-	const pen_t *pal_data;
+	pen_t base_pen;
 	int tile_width, tile_height;
 	int total_width, total_height;	/* in screen coordinates */
 	int x, y, xcount0, ycount0;
@@ -233,18 +234,20 @@ PALETTE_INIT( korokoro )
 }
 
 
-static void set_pens(colortable_t *colortable)
+static void set_pens(running_machine *machine)
 {
 	offs_t i;
-	int palette_size = colortable_palette_get_size(colortable);
 
-	for (i = 0; i < palette_size; i++)
+	for (i = 0; i < cave_paletteram_size / 2; i++)
 	{
 		UINT16 data = paletteram16[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
-		colortable_palette_set_color(colortable, i, color);
+		if (machine->colortable != NULL)
+			colortable_palette_set_color(machine->colortable, i, color);
+		else
+			palette_set_color(machine, i, color);
 	}
 }
 
@@ -551,7 +554,7 @@ static void get_sprite_info_cave(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	machine->pens + 0;
+	pen_t          base_pal	=	0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -652,7 +655,7 @@ static void get_sprite_info_cave(running_machine *machine)
 		sprite->priority		=	(attr & 0x0030) >> 4;
 		sprite->flags			=	SPRITE_VISIBLE_CAVE;
 		sprite->line_offset		=	sprite->tile_width;
-		sprite->pal_data		=	base_pal + (attr & 0x3f00);	// first 0x4000 colors
+		sprite->base_pen		=	base_pal + (attr & 0x3f00);	// first 0x4000 colors
 
 		if (glob_flipx)	{ x = max_x - x - sprite->total_width;	flipx = !flipx; }
 		if (glob_flipy)	{ y = max_y - y - sprite->total_height;	flipy = !flipy; }
@@ -672,7 +675,7 @@ static void get_sprite_info_donpachi(running_machine *machine)
 {
 	const int region				=	REGION_GFX1;
 
-	const pen_t          *base_pal	=	machine->pens + 0;
+	pen_t          base_pal	=	0;
 	const UINT8  *base_gfx	=	memory_region(region);
 	int                   code_max	=	memory_region_length(region) / (16*16);
 
@@ -722,12 +725,12 @@ static void get_sprite_info_donpachi(running_machine *machine)
 		if (cave_spritetype == 3)	/* pwrinst2 */
 		{
 			sprite->priority		=	((attr & 0x0010) >> 4)+2;
-			sprite->pal_data		=	base_pal + (attr & 0x3f00) + 0x4000*((attr & 0x0020) >> 5);
+			sprite->base_pen		=	base_pal + (attr & 0x3f00) + 0x4000*((attr & 0x0020) >> 5);
 		}
 		else
 		{
 			sprite->priority		=	(attr & 0x0030) >> 4;
-			sprite->pal_data		=	base_pal + (attr & 0x3f00);	// first 0x4000 colors
+			sprite->base_pen		=	base_pal + (attr & 0x3f00);	// first 0x4000 colors
 		}
 
 		sprite->flags			=	SPRITE_VISIBLE_CAVE;
@@ -910,7 +913,7 @@ static void do_blit_zoom16_cave( const struct sprite_cave *sprite ){
 
 	{
 		const UINT8 *pen_data = sprite->pen_data -1 -sprite->line_offset;
-		const pen_t         *pal_data = sprite->pal_data;
+		pen_t         base_pen = sprite->base_pen;
 		int x,y;
 		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
@@ -931,7 +934,7 @@ static void do_blit_zoom16_cave( const struct sprite_cave *sprite ){
 						source+=xcount>>16;
 						xcount &= 0xffff;
 						pen = *source;
-						if (pen) dest[x] = pal_data[pen];
+						if (pen) dest[x] = base_pen + pen;
 					}
 					xcount += sprite->zoomx_re;
 				}
@@ -1002,7 +1005,7 @@ static void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite ){
 
 	{
 		const UINT8 *pen_data = sprite->pen_data -1 -sprite->line_offset;
-		const pen_t         *pal_data = sprite->pal_data;
+		pen_t         base_pen = sprite->base_pen;
 		int x,y;
 		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
@@ -1027,7 +1030,7 @@ static void do_blit_zoom16_cave_zb( const struct sprite_cave *sprite ){
 						xcount &= 0xffff;
 						pen = *source;
 						if (pen && (zbf[x]<=pri_sp)){
-							dest[x] = pal_data[pen];
+							dest[x] = base_pen + pen;
 							zbf[x] = pri_sp;
 						}
 					}
@@ -1096,7 +1099,7 @@ static void do_blit_16_cave( const struct sprite_cave *sprite ){
 
 	{
 		const UINT8 *pen_data = sprite->pen_data;
-		const pen_t         *pal_data = sprite->pal_data;
+		pen_t         base_pen = sprite->base_pen;
 		int x,y;
 		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
@@ -1108,7 +1111,7 @@ static void do_blit_16_cave( const struct sprite_cave *sprite ){
 			source = pen_data;
 			for( x=x1; x!=x2; x+=dx ){
 				pen = *source;
-				if (pen) dest[x] = pal_data[pen];
+				if (pen) dest[x] = base_pen + pen;
 				source++;
 			}
 			pen_data += sprite->line_offset;
@@ -1173,7 +1176,7 @@ static void do_blit_16_cave_zb( const struct sprite_cave *sprite ){
 
 	{
 		const UINT8 *pen_data = sprite->pen_data;
-		const pen_t         *pal_data = sprite->pal_data;
+		pen_t         base_pen = sprite->base_pen;
 		int x,y;
 		UINT8 pen;
 		int pitch = blit.line_offset*dy/2;
@@ -1190,7 +1193,7 @@ static void do_blit_16_cave_zb( const struct sprite_cave *sprite ){
 				pen = *source;
 				if ( pen && (zbf[x]<=pri_sp))
 				{
-					dest[x] = pal_data[pen];
+					dest[x] = base_pen + pen;
 					zbf[x] = pri_sp;
 				}
 				source++;
@@ -1436,7 +1439,7 @@ VIDEO_UPDATE( cave )
 	int pri, pri2;
 	int layers_ctrl = -1;
 
-	set_pens(machine->colortable);
+	set_pens(machine);
 
 	blit.baseaddr = bitmap->base;
 	blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
