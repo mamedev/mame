@@ -260,7 +260,7 @@ popmessage("unknown sprite size 0");
 	}
 }
 
-static void draw_bullets(const pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bullets(mame_bitmap *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -277,7 +277,7 @@ static void draw_bullets(const pen_t *pens, mame_bitmap *bitmap, const rectangle
 
 		if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 			sy >= cliprect->min_y && sy <= cliprect->max_y)
-			*BITMAP_ADDR16(bitmap, sy, sx) = pens[0x19];
+			*BITMAP_ADDR16(bitmap, sy, sx) = 0x19;
 	}
 }
 
@@ -357,7 +357,7 @@ void redclash_set_stars_speed( UINT8 speed )
 /* Space Raider doesn't use the Va bit, and it is also set up to */
 /* window the stars to a certain x range */
 
-void redclash_draw_stars(const pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx)
+void redclash_draw_stars(mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx)
 {
 	int i;
 	UINT8 tempbit, feedback, star_color, xloc, yloc;
@@ -403,7 +403,7 @@ void redclash_draw_stars(const pen_t *pens, mame_bitmap *bitmap, const rectangle
 					if ((xloc>=firstx) && (xloc<=lastx))
 					{
 						star_color = (state >> 9) & 0x1f;
-						*BITMAP_ADDR16(bitmap, yloc, xloc) = pens[palette_offset+star_color];
+						*BITMAP_ADDR16(bitmap, yloc, xloc) = palette_offset+star_color;
 					}
 				}
 			}
@@ -422,9 +422,9 @@ VIDEO_EOF( redclash )
 VIDEO_UPDATE( redclash )
 {
 	fillbitmap(bitmap, get_black_pen(machine), cliprect);
-	redclash_draw_stars(machine->pens, bitmap, cliprect, 0x60, 0, 0x00, 0xff);
+	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(machine, bitmap, cliprect);
-	draw_bullets(machine->pens, bitmap, cliprect);
+	draw_bullets(bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

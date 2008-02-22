@@ -338,7 +338,7 @@ VIDEO_UPDATE( nbmj8991_type1 )
 		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, machine->pens[0x00], 0);
+		fillbitmap(bitmap, 0, 0);
 
 	return 0;
 }
@@ -378,7 +378,7 @@ VIDEO_UPDATE( nbmj8991_type2 )
 		copyscrollbitmap(bitmap, nbmj8991_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, machine->pens[0x00], 0);
+		fillbitmap(bitmap, 0, 0);
 
 	return 0;
 }

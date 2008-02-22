@@ -488,7 +488,7 @@ VIDEO_UPDATE( ms32 )
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	fillbitmap(bitmap,machine->pens[0],cliprect);	/* bg color */
+	fillbitmap(bitmap,0,cliprect);	/* bg color */
 
 
 	/* priority hack, we really need to figure out what priority ram is I think */

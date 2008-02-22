@@ -138,10 +138,10 @@ VIDEO_START( namcos1 )
 
 	/* all palette entries are not affected by shadow sprites... */
 	for (i = 0;i < 0x2000;i++)
-		machine->shadow_table[machine->pens[i]] = machine->pens[i];
+		machine->shadow_table[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x0800;i < 0x1000;i++)
-		machine->shadow_table[machine->pens[i]] = machine->pens[i + 0x0800];
+		machine->shadow_table[i] = i + 0x0800;
 
 	spriteram = &namcos1_spriteram[0x800];
 

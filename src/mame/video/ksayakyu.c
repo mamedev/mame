@@ -107,7 +107,7 @@ VIDEO_START(ksayakyu)
 
 VIDEO_UPDATE(ksayakyu)
 {
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	if(video_ctrl&1)
 		tilemap_draw(bitmap,cliprect,ksayakyu_tilemap,0,0);
 	draw_sprites(machine,bitmap,cliprect);

@@ -79,17 +79,11 @@ VIDEO_UPDATE( flyball )
 	/* draw ball */
 
 	for (y = bally; y < bally + 2; y++)
-	{
 		for (x = ballx; x < ballx + 2; x++)
-		{
 			if (x >= machine->screen[0].visarea.min_x &&
 			    x <= machine->screen[0].visarea.max_x &&
 			    y >= machine->screen[0].visarea.min_y &&
 			    y <= machine->screen[0].visarea.max_y)
-			{
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[1];
-			}
-		}
-	}
+				*BITMAP_ADDR16(bitmap, y, x) = 1;
 	return 0;
 }

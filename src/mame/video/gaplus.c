@@ -172,7 +172,7 @@ static void starfield_init(running_machine *machine)
 				if ( color && total_stars < MAX_STARS ) {
 					stars[total_stars].x = x;
 					stars[total_stars].y = y;
-					stars[total_stars].col = machine->pens[color];
+					stars[total_stars].col = color;
 					stars[total_stars].set = set++;
 
 					if ( set == 3 )
@@ -322,7 +322,7 @@ VIDEO_UPDATE( gaplus )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(gaplus_spriteram[0x1f7f-0x800] & 1);
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	starfield_render(machine, bitmap);
 

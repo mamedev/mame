@@ -98,7 +98,7 @@ VIDEO_UPDATE( magmax )
 
 	/* copy the background graphics */
 	if (*magmax_vreg & 0x40)		/* background disable */
-		fillbitmap(bitmap, machine->pens[0], cliprect);
+		fillbitmap(bitmap, 0, cliprect);
 	else
 	{
 		int v;

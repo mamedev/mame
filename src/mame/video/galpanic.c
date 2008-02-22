@@ -86,7 +86,7 @@ static void comad_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void draw_fgbitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_fgbitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -98,7 +98,7 @@ static void draw_fgbitmap(running_machine *machine, mame_bitmap *bitmap, const r
 		sy = offs / 256;
 		color = galpanic_fgvideoram[offs];
 		if (color)
-			*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, sy, sx) = color;
 	}
 }
 
@@ -107,7 +107,7 @@ VIDEO_UPDATE( galpanic )
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 
-	draw_fgbitmap(machine, bitmap, cliprect);
+	draw_fgbitmap(bitmap, cliprect);
 
 	pandora_update(machine,bitmap,cliprect);
 
@@ -119,7 +119,7 @@ VIDEO_UPDATE( comad )
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,tmpbitmap,0,0,0,0,cliprect);
 
-	draw_fgbitmap(machine,bitmap,cliprect);
+	draw_fgbitmap(bitmap,cliprect);
 
 
 //  if(galpanic_clear_sprites)

@@ -325,7 +325,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
@@ -353,7 +353,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,machine->pens[0],cliprect);
+	else					fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl & 2)
 	{

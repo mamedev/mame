@@ -222,9 +222,7 @@ VIDEO_UPDATE( exedexes )
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	}
 	else
-	{
-		fillbitmap(bitmap, machine->pens[0], cliprect);
-	}
+		fillbitmap(bitmap, 0, cliprect);
 
 	draw_sprites(machine, bitmap, cliprect, 1);
 

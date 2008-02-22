@@ -436,13 +436,13 @@ VIDEO_UPDATE( niyanpai )
 	if (niyanpai_dispflag[0])
 		copyscrollbitmap(bitmap, niyanpai_tmpbitmap[0], 1, &scrollx[0], 1, &scrolly[0], cliprect);
 	else
-		fillbitmap(bitmap, machine->pens[0x00ff], 0);
+		fillbitmap(bitmap, 0x00ff, 0);
 
 	if (niyanpai_dispflag[1])
-		copyscrollbitmap_trans(bitmap, niyanpai_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, machine->pens[0x01ff]);
+		copyscrollbitmap_trans(bitmap, niyanpai_tmpbitmap[1], 1, &scrollx[1], 1, &scrolly[1], cliprect, 0x01ff);
 
 	if (niyanpai_dispflag[2])
-		copyscrollbitmap_trans(bitmap, niyanpai_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, machine->pens[0x02ff]);
+		copyscrollbitmap_trans(bitmap, niyanpai_tmpbitmap[2], 1, &scrollx[2], 1, &scrolly[2], cliprect, 0x02ff);
 
 	return 0;
 }

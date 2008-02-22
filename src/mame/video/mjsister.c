@@ -97,10 +97,8 @@ VIDEO_UPDATE( mjsister )
 	if (mjsister_video_enable)
 	{
 		for (i=0; i<256; i++)
-		{
 			for (j=0; j<4; j++)
-				*BITMAP_ADDR16(bitmap, i, 256+j) = machine->pens[mjsister_colorbank * 0x20];
-		}
+				*BITMAP_ADDR16(bitmap, i, 256+j) = mjsister_colorbank * 0x20;
 
 		copybitmap      (bitmap,mjsister_tmpbitmap0,f,f,0,0,cliprect);
 		copybitmap_trans(bitmap,mjsister_tmpbitmap1,f,f,2,0,cliprect,0);

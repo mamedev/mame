@@ -259,7 +259,7 @@ static void pdraw_masked_tile(running_machine *machine,
 		int bShadow )
 {
 	const gfx_element *gfx,*mask;
-	const pen_t *paldata;
+	pen_t pen_base;
 	UINT8 *gfx_addr;
 	int gfx_pitch;
 	UINT8 *mask_addr;
@@ -278,7 +278,7 @@ static void pdraw_masked_tile(running_machine *machine,
 		mask = machine->gfx[1];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
+		pen_base = gfx->color_base + gfx->color_granularity * color;
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 		mask_addr = mask->gfxdata + code * mask->char_modulo;
@@ -355,7 +355,7 @@ static void pdraw_masked_tile(running_machine *machine,
 								{ /* sprite pixel is opaque */
 									if( priority>=pri[-x] )
 									{
-										dest[-x] = paldata[gfx_addr[x]];
+										dest[-x] = pen_base + gfx_addr[x];
 									}
 									pri[-x] = 0xff;
 								}
@@ -372,7 +372,7 @@ static void pdraw_masked_tile(running_machine *machine,
 								{ /* sprite pixel is opaque */
 									if( priority>=pri[x] )
 									{
-										dest[x] = paldata[gfx_addr[x]];
+										dest[x] = pen_base + gfx_addr[x];
 									}
 									pri[x] = 0xff;
 								}
@@ -397,7 +397,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 		int bShadow )
 {
 	const gfx_element *gfx;
-	const pen_t *paldata;
+	pen_t pen_base;
 	UINT8 *gfx_addr;
 	int gfx_pitch;
 	int x,y;
@@ -413,7 +413,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 		gfx = machine->gfx[0];
 		code %= gfx->total_elements;
 		color %= gfx->total_colors;
-		paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
+		pen_base = gfx->color_base + gfx->color_granularity * color;
 		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
 		gfx_pitch = gfx->line_modulo;
 
@@ -433,7 +433,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 						{
 							if( priority>=pri[-x] )
 							{
-								dest[-x] = paldata[gfx_addr[x]];
+								dest[-x] = pen_base + gfx_addr[x];
 							}
 							pri[-x] = 0xff;
 						}
@@ -447,7 +447,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 						{
 							if( priority>=pri[x] )
 							{
-								dest[x] = paldata[gfx_addr[x]];
+								dest[x] = pen_base + gfx_addr[x];
 							}
 							pri[x] = 0xff;
 						} /* next x */

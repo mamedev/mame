@@ -504,17 +504,17 @@ VIDEO_UPDATE( nbmj9195 )
 		// nbmj9195 1layer
 		copyscrollbitmap(bitmap, nbmj9195_tmpbitmap[0], SCANLINE_MAX, nbmj9195_scrollx_raster[0], 1, &scrolly[0], cliprect);
 	else
-		fillbitmap(bitmap, machine->pens[0x0ff], 0);
+		fillbitmap(bitmap, 0x0ff, 0);
 
 	if (nbmj9195_dispflag[1])
 	{
 		if (gfxdraw_mode == 1)
 			// nbmj9195 2layer
-			copyscrollbitmap_trans(bitmap, nbmj9195_tmpbitmap[1], SCANLINE_MAX, nbmj9195_scrollx_raster[1], 1, &scrolly[1], cliprect, machine->pens[0x0ff]);
+			copyscrollbitmap_trans(bitmap, nbmj9195_tmpbitmap[1], SCANLINE_MAX, nbmj9195_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x0ff);
 
 		if (gfxdraw_mode == 2)
 			// nbmj9195 nb22090 2layer
-			copyscrollbitmap_trans(bitmap, nbmj9195_tmpbitmap[1], SCANLINE_MAX, nbmj9195_scrollx_raster[1], 1, &scrolly[1], cliprect, machine->pens[0x1ff]);
+			copyscrollbitmap_trans(bitmap, nbmj9195_tmpbitmap[1], SCANLINE_MAX, nbmj9195_scrollx_raster[1], 1, &scrolly[1], cliprect, 0x1ff);
 	}
 	return 0;
 }

@@ -340,10 +340,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_lasso(const pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
-	pen_t pen = pens[0x3f];
+	pen_t pen = 0x3f;
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -383,10 +383,10 @@ static void draw_lasso(const pen_t *pens, mame_bitmap *bitmap, const rectangle *
 VIDEO_UPDATE( lasso )
 {
 	palette_set_color(machine, 0, get_color(*lasso_back_color));
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_lasso(machine->pens, bitmap, cliprect);
+	draw_lasso(bitmap, cliprect);
 	draw_sprites(machine, bitmap, cliprect, 0);
 
 	return 0;
@@ -395,7 +395,7 @@ VIDEO_UPDATE( lasso )
 VIDEO_UPDATE( chameleo )
 {
 	palette_set_color(machine, 0, get_color(*lasso_back_color));
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(machine, bitmap, cliprect, 0);

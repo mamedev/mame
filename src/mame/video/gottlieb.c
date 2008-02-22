@@ -203,19 +203,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 VIDEO_UPDATE( gottlieb )
 {
 	if (!background_priority)
-	{
 		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	}
 	else
-	{
-		fillbitmap(bitmap, machine->pens[0], cliprect);
-	}
+		fillbitmap(bitmap, 0, cliprect);
 
 	draw_sprites(machine, bitmap, cliprect);
 
 	if (background_priority)
-	{
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	}
+
 	return 0;
 }

@@ -17,7 +17,7 @@ UINT8 sraider_grid_color;
 void redclash_set_stars_enable( UINT8 on );
 void redclash_update_stars_state(void);
 void redclash_set_stars_speed( UINT8 speed );
-void redclash_draw_stars(const pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+void redclash_draw_stars(mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 
 static tilemap *bg_tilemap;
 static tilemap *grid_tilemap;
@@ -363,7 +363,7 @@ VIDEO_UPDATE( ladybug )
 	int offs;
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (offs = 0; offs < 32; offs++)
 	{
@@ -406,13 +406,13 @@ VIDEO_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	// draw the stars
 	if (flip_screen)
-		redclash_draw_stars(machine->pens,bitmap,cliprect,0x60,1,0x27,0xff);
+		redclash_draw_stars(bitmap,cliprect,0x60,1,0x27,0xff);
 	else
-		redclash_draw_stars(machine->pens,bitmap,cliprect,0x60,1,0x00,0xd8);
+		redclash_draw_stars(bitmap,cliprect,0x60,1,0x00,0xd8);
 
 	// draw the gridlines
 	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(sraider_grid_color & 0x40 ? 0xff : 0,
@@ -431,7 +431,7 @@ VIDEO_UPDATE( sraider )
 			if (flip_screen)
 				x = ~x;
 
-			plot_box(bitmap, x, cliprect->min_y, 1, height, machine->pens[0x81]);
+			plot_box(bitmap, x, cliprect->min_y, 1, height, 0x81);
 		}
 	}
 

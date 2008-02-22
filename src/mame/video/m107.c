@@ -281,7 +281,7 @@ static void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap, co
 		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 1, 0);
 	}
 	else
-		fillbitmap(bitmap, machine->pens[0], cliprect);
+		fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 0, 0);
 	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 1, 0);

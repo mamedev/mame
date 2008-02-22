@@ -873,7 +873,7 @@ VIDEO_UPDATE( metro )
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[((metro_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000],cliprect);
+	fillbitmap(bitmap,((metro_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000,cliprect);
 
 	/*  Screen Control Register:
 

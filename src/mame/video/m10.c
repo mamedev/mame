@@ -138,7 +138,7 @@ VIDEO_UPDATE( m10 )
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
 	int i;
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	decodegfx(back_gfx, state->chargen,0,4);
 	for (i=0;i<4;i++)

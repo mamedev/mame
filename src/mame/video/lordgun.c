@@ -294,7 +294,7 @@ if (input_code_pressed(KEYCODE_Z))
 	tilemap_set_scrollx( tilemap_3, 0, *lordgun_scroll_x_3 );
 	tilemap_set_scrolly( tilemap_3, 0, *lordgun_scroll_y_3 );
 
-	fillbitmap( bitmap, machine->pens[0], cliprect );
+	fillbitmap( bitmap, 0, cliprect );
 
 	if (layers_ctrl & 4)	tilemap_draw(bitmap, cliprect, tilemap_2, 0, 0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap, cliprect, tilemap_0, 0, 0);

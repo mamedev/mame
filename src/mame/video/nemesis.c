@@ -388,7 +388,7 @@ VIDEO_UPDATE( nemesis )
 	update_gfx(machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	tilemap_set_scrolly( background, 0, (nemesis_yscroll[0x180] & 0xff) );
 
@@ -417,7 +417,7 @@ VIDEO_UPDATE( salamand )
 	update_gfx(machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	clip.min_x = 0;
 	clip.max_x = 255;

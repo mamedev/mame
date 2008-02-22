@@ -36,27 +36,24 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( nitedrvr )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_box(running_machine *machine, mame_bitmap *bitmap, int bx, int by, int ex, int ey )
+static void draw_box(mame_bitmap *bitmap, int bx, int by, int ex, int ey )
 {
 	int x, y;
 
 	for (y = by; y < ey; y++)
 	{
 		for (x = bx; x < ex; x++)
-		{
 			if ((y < 256) && (x < 256))
-				*BITMAP_ADDR16(bitmap, y, x) = machine->pens[1];
-		}
+				*BITMAP_ADDR16(bitmap, y, x) = 1;
 	}
 
 	return;
 }
 
-static void draw_roadway(running_machine *machine, mame_bitmap *bitmap)
+static void draw_roadway(mame_bitmap *bitmap)
 {
 	int roadway;
 
@@ -69,13 +66,13 @@ static void draw_roadway(running_machine *machine, mame_bitmap *bitmap)
 		ex = bx + ((nitedrvr_hvc[roadway + 32] & 0xf0) >> 4);
 		ey = by + (16 - (nitedrvr_hvc[roadway + 32] & 0x0f));
 
-		draw_box(machine, bitmap, bx, by, ex, ey);
+		draw_box(bitmap, bx, by, ex, ey);
 	}
 }
 
 VIDEO_UPDATE( nitedrvr )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_roadway(machine, bitmap);
+	draw_roadway(bitmap);
 	return 0;
 }

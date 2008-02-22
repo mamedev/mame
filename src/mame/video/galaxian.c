@@ -1421,7 +1421,7 @@ static void galaxian_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 			/* yellow missile, white shells (this is the terminology on the schematics) */
 			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
 
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x) = color;
 		}
 	}
 }
@@ -1441,7 +1441,7 @@ static void scramble_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 		x <= machine->screen[0].visarea.max_x)
 	{
 		/* yellow bullets */
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[BULLETS_COLOR_BASE];
+		*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
 	}
 }
 
@@ -1454,7 +1454,7 @@ static void darkplnt_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 	if (x >= machine->screen[0].visarea.min_x &&
 		x <= machine->screen[0].visarea.max_x)
 	{
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[32 + darkplnt_bullet_color];
+		*BITMAP_ADDR16(bitmap, y, x) = 32 + darkplnt_bullet_color;
 	}
 }
 
@@ -1471,7 +1471,7 @@ static void theend_draw_bullets(running_machine *machine, mame_bitmap *bitmap, i
 		if (x >= machine->screen[0].visarea.min_x &&
 			x <= machine->screen[0].visarea.max_x)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[BULLETS_COLOR_BASE];
+			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
 		}
 	}
 }
@@ -1500,7 +1500,7 @@ static void dambustr_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 		if (x >= machine->screen[0].visarea.min_x &&
 			x <= machine->screen[0].visarea.max_x)
 		{
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x) = color;
 		}
 	}
 }
@@ -1512,26 +1512,22 @@ static void dambustr_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 static void galaxian_draw_background(running_machine *machine, mame_bitmap *bitmap)
 {
 	/* plain black background */
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,&machine->screen[0].visarea);
 }
 
 static void scramble_draw_background(running_machine *machine, mame_bitmap *bitmap)
 {
 	if (background_enable)
-	{
-		fillbitmap(bitmap,machine->pens[BACKGROUND_COLOR_BASE],&machine->screen[0].visarea);
-	}
+		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,&machine->screen[0].visarea);
 	else
-	{
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
-	}
+		fillbitmap(bitmap,0,&machine->screen[0].visarea);
 }
 
 static void turtles_draw_background(running_machine *machine, mame_bitmap *bitmap)
 {
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
-	fillbitmap(bitmap,machine->pens[BACKGROUND_COLOR_BASE + color],&machine->screen[0].visarea);
+	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,&machine->screen[0].visarea);
 }
 
 static void frogger_draw_background(running_machine *machine, mame_bitmap *bitmap)
@@ -1539,13 +1535,13 @@ static void frogger_draw_background(running_machine *machine, mame_bitmap *bitma
 	/* color split point verified on real machine */
 	if (flipscreen_x)
 	{
-		plot_box(bitmap,   0, 0, 128, 256, machine->pens[0]);
-		plot_box(bitmap, 128, 0, 128, 256, machine->pens[BACKGROUND_COLOR_BASE]);
+		plot_box(bitmap,   0, 0, 128, 256, 0);
+		plot_box(bitmap, 128, 0, 128, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
 	{
-		plot_box(bitmap,   0, 0, 128, 256, machine->pens[BACKGROUND_COLOR_BASE]);
-		plot_box(bitmap, 128, 0, 128, 256, machine->pens[0]);
+		plot_box(bitmap,   0, 0, 128, 256, BACKGROUND_COLOR_BASE);
+		plot_box(bitmap, 128, 0, 128, 256, 0);
 	}
 }
 
@@ -1576,15 +1572,11 @@ static void stratgyx_draw_background(running_machine *machine, mame_bitmap *bitm
 		if ((~prom[x] & 0x01) && background_blue)  color |= 0x04;
 
 		if (flipscreen_x)
-		{
 			sx = 8 * (31 - x);
-		}
 		else
-		{
 			sx = 8 * x;
-		}
 
-		plot_box(bitmap, sx, 0, 8, 256, machine->pens[BACKGROUND_COLOR_BASE + color]);
+		plot_box(bitmap, sx, 0, 8, 256, BACKGROUND_COLOR_BASE + color);
 	}
 }
 
@@ -1596,21 +1588,15 @@ static void minefld_draw_background(running_machine *machine, mame_bitmap *bitma
 
 
 		for (x = 0; x < 128; x++)
-		{
-			plot_box(bitmap, x,       0, 1, 256, machine->pens[BACKGROUND_COLOR_BASE + x]);
-		}
+			plot_box(bitmap, x,       0, 1, 256, BACKGROUND_COLOR_BASE + x);
 
 		for (x = 0; x < 120; x++)
-		{
-			plot_box(bitmap, x + 128, 0, 1, 256, machine->pens[BACKGROUND_COLOR_BASE + x + 128]);
-		}
+			plot_box(bitmap, x + 128, 0, 1, 256, BACKGROUND_COLOR_BASE + x + 128);
 
-		plot_box(bitmap, 248, 0, 16, 256, machine->pens[BACKGROUND_COLOR_BASE]);
+		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-	{
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
-	}
+		fillbitmap(bitmap,0,&machine->screen[0].visarea);
 }
 
 static void rescue_draw_background(running_machine *machine, mame_bitmap *bitmap)
@@ -1619,23 +1605,16 @@ static void rescue_draw_background(running_machine *machine, mame_bitmap *bitmap
 	{
 		int x;
 
-
 		for (x = 0; x < 128; x++)
-		{
-			plot_box(bitmap, x,       0, 1, 256, machine->pens[BACKGROUND_COLOR_BASE + x]);
-		}
+			plot_box(bitmap, x,       0, 1, 256, BACKGROUND_COLOR_BASE + x);
 
 		for (x = 0; x < 120; x++)
-		{
-			plot_box(bitmap, x + 128, 0, 1, 256, machine->pens[BACKGROUND_COLOR_BASE + x + 8]);
-		}
+			plot_box(bitmap, x + 128, 0, 1, 256, BACKGROUND_COLOR_BASE + x + 8);
 
-		plot_box(bitmap, 248, 0, 16, 256, machine->pens[BACKGROUND_COLOR_BASE]);
+		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-	{
-		fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
-	}
+		fillbitmap(bitmap,0,&machine->screen[0].visarea);
 }
 
 static void mariner_draw_background(running_machine *machine, mame_bitmap *bitmap)
@@ -1656,13 +1635,12 @@ static void mariner_draw_background(running_machine *machine, mame_bitmap *bitma
 		{
 			int color;
 
-
 			if (x == 0)
 				color = 0;
 			else
 				color = prom[0x20 + x - 1];
 
-			plot_box(bitmap, 8 * (31 - x), 0, 8, 256, machine->pens[BACKGROUND_COLOR_BASE + color]);
+			plot_box(bitmap, 8 * (31 - x), 0, 8, 256, BACKGROUND_COLOR_BASE + color);
 		}
 	}
 	else
@@ -1671,13 +1649,12 @@ static void mariner_draw_background(running_machine *machine, mame_bitmap *bitma
 		{
 			int color;
 
-
 			if (x == 31)
 				color = 0;
 			else
 				color = prom[x + 1];
 
-			plot_box(bitmap, 8 * x, 0, 8, 256, machine->pens[BACKGROUND_COLOR_BASE + color]);
+			plot_box(bitmap, 8 * x, 0, 8, 256, BACKGROUND_COLOR_BASE + color);
 		}
 	}
 }
@@ -1689,13 +1666,13 @@ static void dambustr_draw_background(running_machine *machine, mame_bitmap *bitm
 
 	if (flip_screen_x)
 	{
-		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, machine->pens[col2]);
-		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, machine->pens[col1]);
+		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col2);
+		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col1);
 	}
 	else
 	{
-		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, machine->pens[col1]);
-		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, machine->pens[col2]);
+		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col1);
+		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col2);
 	}
 
 }
@@ -1807,15 +1784,12 @@ static void plot_star(running_machine *machine, mame_bitmap *bitmap, int x, int 
 
 
 	if (flipscreen_x)
-	{
 		x = 255 - x;
-	}
-	if (flipscreen_y)
-	{
-		y = 255 - y;
-	}
 
-	*BITMAP_ADDR16(bitmap, y, x) = machine->pens[stars_colors_start + color];
+	if (flipscreen_y)
+		y = 255 - y;
+
+	*BITMAP_ADDR16(bitmap, y, x) = stars_colors_start + color;
 }
 
 static void noop_draw_stars(running_machine *machine, mame_bitmap *bitmap)

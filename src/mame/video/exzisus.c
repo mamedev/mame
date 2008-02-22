@@ -83,7 +83,7 @@ VIDEO_UPDATE( exzisus )
 	int gfx_num, gfx_attr, gfx_offs;
 
 	/* Is this correct ? */
-	fillbitmap(bitmap, machine->pens[1023], cliprect);
+	fillbitmap(bitmap, 1023, cliprect);
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;

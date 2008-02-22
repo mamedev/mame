@@ -555,13 +555,13 @@ VIDEO_UPDATE( nbmj8891 )
 		if (gfxdraw_mode)
 		{
 			copyscrollbitmap      (bitmap, nbmj8891_tmpbitmap0, 0, 0, 0, 0, cliprect);
-			copyscrollbitmap_trans(bitmap, nbmj8891_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, machine->pens[0xff]);
+			copyscrollbitmap_trans(bitmap, nbmj8891_tmpbitmap1, 0, 0, 1, &scrolly, cliprect, 0xff);
 		}
 		else
 			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, machine->pens[0xff], 0);
+		fillbitmap(bitmap, 0xff, 0);
 
 	return 0;
 }

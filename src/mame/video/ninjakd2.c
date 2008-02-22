@@ -464,7 +464,7 @@ static void erase_sprites(running_machine* const machine, mame_bitmap* const bit
 
 VIDEO_UPDATE( ninjakd2 )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -477,7 +477,7 @@ VIDEO_UPDATE( ninjakd2 )
 
 VIDEO_UPDATE( robokid )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 
@@ -494,7 +494,7 @@ VIDEO_UPDATE( robokid )
 
 VIDEO_UPDATE( omegaf )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 

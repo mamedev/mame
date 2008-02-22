@@ -1001,7 +1001,7 @@ VIDEO_UPDATE( megasys1 )
 				if (flag != 0)
 				{
 					flag = 0;
-					fillbitmap(bitmap,machine->pens[0],cliprect);
+					fillbitmap(bitmap,0,cliprect);
 				}
 
 				if (megasys1_sprite_flag & 0x100)	/* sprites are split */

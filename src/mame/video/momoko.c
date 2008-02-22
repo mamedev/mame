@@ -69,7 +69,7 @@ WRITE8_HANDLER( momoko_flipscreen_w )
 }
 /****************************************************************************/
 
-static void momoko_draw_bg_pri(running_machine *machine, mame_bitmap *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
+static void momoko_draw_bg_pri(mame_bitmap *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
 {
 	int xx,sx,sy,px,py,dot;
 	UINT32 gfxadr;
@@ -91,7 +91,7 @@ static void momoko_draw_bg_pri(running_machine *machine, mame_bitmap *bitmap, in
 					else  py=7-sy + y;
 
 				if (dot>=pri)
-					*BITMAP_ADDR16(bitmap, py, px) = machine->pens[col*16+dot+256];
+					*BITMAP_ADDR16(bitmap, py, px) = col*16+dot+256;
 				d0 = d0 << 1;
 				d1 = d1 << 1;
 			}
@@ -152,7 +152,7 @@ VIDEO_UPDATE( momoko )
 		}
 	}
 	else
-	fillbitmap(bitmap, machine->pens[256], 0);
+	fillbitmap(bitmap, 256, 0);
 
 
 /* draw sprites (momoko) */
@@ -213,7 +213,7 @@ VIDEO_UPDATE( momoko )
 				{
 					col = col & 0x0f;
 					chr = chr + momoko_bg_select * 512;
-					momoko_draw_bg_pri(machine, bitmap,chr,col,flip,flip,px,py,pri);
+					momoko_draw_bg_pri(bitmap,chr,col,flip,flip,px,py,pri);
 				}
 			}
 		}

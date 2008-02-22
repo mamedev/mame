@@ -286,7 +286,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
+static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
 {
 	int i;
 
@@ -351,7 +351,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					{
 						/* combine with the background */
 						pen = left | old[0];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
@@ -364,7 +364,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 					{
 						/* combine with the background */
 						pen = right | old[1];
-						*BITMAP_ADDR16(bitmap, yoffs, currx) = machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
 
 						/* check the collisions bit */
 						if ((palette[2 * pen] & 0x80) && count++ < 128)
@@ -404,7 +404,7 @@ static void update_screen(running_machine *machine, mame_bitmap *bitmap, const r
 	}
 
 	/* draw the sprites */
-	draw_sprites(machine, bitmap, cliprect, scroll_offset);
+	draw_sprites(bitmap, cliprect, scroll_offset);
 }
 
 

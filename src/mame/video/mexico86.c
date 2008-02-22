@@ -32,7 +32,7 @@ VIDEO_UPDATE( mexico86 )
 	/* the background character columns is stored inthe area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,&machine->screen[0].visarea);
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */
@@ -113,7 +113,7 @@ VIDEO_UPDATE( kikikai )
 	/* the background character columns is stored inthe area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,machine->pens[255],&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,&machine->screen[0].visarea);
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */

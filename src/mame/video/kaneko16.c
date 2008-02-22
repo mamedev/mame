@@ -278,7 +278,7 @@ VIDEO_START( berlwall )
 			if ((r & 0x10) && (b & 0x10))
 				g = (g - 1) & 0x1f;		/* decrease with wraparound */
 
-			*BITMAP_ADDR16(kaneko16_bg15_bitmap, y, sx * 256 + x) = machine->pens[2048 + ((g << 10) | (r << 5) | b)];
+			*BITMAP_ADDR16(kaneko16_bg15_bitmap, y, sx * 256 + x) = 2048 + ((g << 10) | (r << 5) | b);
 	  }
 
 	VIDEO_START_CALL(kaneko16_1xVIEW2);
@@ -395,7 +395,7 @@ static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
-	const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+	pen_t pen_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
@@ -477,7 +477,7 @@ static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *
 					if( c != 0 )
 					{
 						if (pri[x] < priority)
-							dest[x] = pal[c];
+							dest[x] = pen_base + c;
 						pri[x] = 0xff; // mark it "already drawn"
 					}
 					x_index += dx;
@@ -909,7 +909,7 @@ static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitma
 	}
 	else
 	{
-		fillbitmap(sprites_bitmap,machine->pens[0],cliprect);
+		fillbitmap(sprites_bitmap,0,cliprect);
 		kaneko16_draw_sprites(machine,bitmap,cliprect);
 	}
 }
@@ -937,12 +937,12 @@ static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *
 static void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if(kaneko16_sprite_type == 1)
-		fillbitmap(bitmap,machine->pens[0x7f00],cliprect);
+		fillbitmap(bitmap,0x7f00,cliprect);
 	else
 		/* Fill the bitmap with pen 0. This is wrong, but will work most of
            the times. To do it right, each pixel should be drawn with pen 0
            of the bottomost tile that covers it (which is pretty tricky to do) */
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 }
 
 static VIDEO_UPDATE( common )
@@ -1006,7 +1006,7 @@ VIDEO_UPDATE( galsnew )
 		{
 			UINT16 dat = (galsnew_fg_pixram[count] & 0xfffe)>>1;
 			dat+=2048;
-			dest[x] = machine->pens[dat];
+			dest[x] = dat;
 			count++;
 		}
 	}
@@ -1021,9 +1021,8 @@ VIDEO_UPDATE( galsnew )
 			UINT16 dat = (galsnew_bg_pixram[count]);
 			//dat &=0x3ff;
 			if (dat)
-			{
-				dest[x] = machine->pens[dat];
-			}
+				dest[x] = dat;
+
 			count++;
 		}
 	}
