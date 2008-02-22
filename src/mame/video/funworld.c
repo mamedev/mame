@@ -56,16 +56,19 @@ static tilemap *bg_tilemap;
 
 /***** RESISTORS *****
 
-  bit 0 --> 1  KOhms resistor --> \
-  bit 1 --> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> RED
-  bit 2 --> 220 Ohms resistor --> /
-  bit 3 --> 1  KOhms resistor --> \
-  bit 4 --> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> BLUE
-  bit 5 --> 220 Ohms resistor --> /
-  bit 6 --> 470 Ohms resistor --> \  100 Ohms pulldown resistor --> GREEN
-  bit 7 --> 220 Ohms resistor --> /
-
+            74LS373
+           +-------+
+  bit 0 -->|03   02|--> 1  KOhms resistor --> \
+  bit 1 -->|04   05|--> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> RED
+  bit 2 -->|07   06|--> 220 Ohms resistor --> /
+  bit 3 -->|08   09|--> 1  KOhms resistor --> \
+  bit 4 -->|13   12|--> 470 Ohms resistor -->  | 100 Ohms pulldown resistor --> BLUE
+  bit 5 -->|14   15|--> 220 Ohms resistor --> /
+  bit 6 -->|17   16|--> 470 Ohms resistor --> \  100 Ohms pulldown resistor --> GREEN
+  bit 7 -->|18   19|--> 220 Ohms resistor --> /
+           +-------+
   (G pulldown is silk labeled 220 Ohms, but a 100 Ohms resistor is there)
+
 */
 
 PALETTE_INIT(funworld)

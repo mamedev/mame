@@ -784,6 +784,7 @@
 
     2008/02/22
     - Switched the color decoding routines to use resnet code.
+    - Added complete color connections to/from 74ls373 to the source.
 
 
     *** TO DO ***
