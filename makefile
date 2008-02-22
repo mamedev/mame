@@ -43,6 +43,9 @@ ifndef OSD
 OSD = windows
 endif
 
+ifndef CROSS_BUILD_OSD
+CROSS_BUILD_OSD = $(OSD)
+endif
 
 
 #-------------------------------------------------
@@ -185,6 +188,10 @@ EXE = .exe
 endif
 ifeq ($(TARGETOS),os2)
 EXE = .exe
+endif
+
+ifndef BUILD_EXE
+BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
@@ -442,7 +449,13 @@ endif
 
 all: maketree buildtools emulator tools
 
+#-------------------------------------------------
+# defines needed by multiple make files 
+#-------------------------------------------------
 
+BUILDSRC = $(SRC)/build
+BUILDOBJ = $(OBJ)/build
+BUILDOUT = $(BUILDOBJ)
 
 #-------------------------------------------------
 # include the various .mak files
@@ -456,6 +469,7 @@ include $(SRC)/$(TARGET)/$(SUBTARGET).mak
 include $(SRC)/emu/emu.mak
 include $(SRC)/lib/lib.mak
 include $(SRC)/build/build.mak
+-include $(SRC)/osd/$(CROSS_BUILD_OSD)/build.mak
 include $(SRC)/tools/tools.mak
 
 # combine the various definitions to one
