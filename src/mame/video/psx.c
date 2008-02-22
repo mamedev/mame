@@ -932,7 +932,7 @@ VIDEO_UPDATE( psx )
 			n_line = n_lines;
 			while( n_line > 0 )
 			{
-				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, m_p_p_vram[ n_y + m_n_displaystarty ] + n_x + n_displaystartx, machine->pens, -1 );
+				draw_scanline16( bitmap, n_x + n_left, n_y + n_top, n_columns, m_p_p_vram[ n_y + m_n_displaystarty ] + n_x + n_displaystartx, NULL, -1 );
 				n_y++;
 				n_line--;
 			}

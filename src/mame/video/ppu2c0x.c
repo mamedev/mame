@@ -423,7 +423,7 @@ static void draw_background(const int num, UINT8 *line_priority )
 	}
 
 	/* cache the background pen */
-	back_pen = chips[num].machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
+	back_pen = (chips[num].back_color & color_mask)+intf->color_base[num];
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -739,7 +739,7 @@ static void render_scanline(int num)
 			color_mask = 0xff;
 
 		/* cache the background pen */
-		back_pen = chips[num].machine->pens[(chips[num].back_color & color_mask)+intf->color_base[num]];
+		back_pen = (chips[num].back_color & color_mask)+intf->color_base[num];
 
 		// Fill this scanline with the background pen.
 		for (i = 0; i < bitmap->width; i ++)
@@ -803,10 +803,10 @@ static void update_scanline(int num )
 				else
 					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f00] & 0x3f;
 
-				back_pen = chips[num].machine->pens[penNum + intf->color_base[num]];
+				back_pen = penNum + intf->color_base[num];
 			}
 			else
-				back_pen = chips[num].machine->pens[(this_ppu->back_color & color_mask)+intf->color_base[num]];
+				back_pen = (this_ppu->back_color & color_mask)+intf->color_base[num];
 
 			// Fill this scanline with the background pen.
 			for (i = 0; i < bitmap->width; i ++)
@@ -986,10 +986,10 @@ void ppu2c0x_reset(int num, int scan_scale )
 		for( i = 0; i < ARRAY_LENGTH( default_colortable_mono ); i++ )
 		{
 			/* monochromatic table */
-			chips[num].colortable_mono[i] = chips[num].machine->pens[default_colortable_mono[i] + color_base];
+			chips[num].colortable_mono[i] = default_colortable_mono[i] + color_base;
 
 			/* color table */
-			chips[num].colortable[i] = chips[num].machine->pens[default_colortable[i] + color_base];
+			chips[num].colortable[i] = default_colortable[i] + color_base;
 		}
 	}
 
@@ -1132,7 +1132,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				{
 					UINT8 oldColor = this_ppu->videoram[i+0x3f00];
 
-					this_ppu->colortable[i] = chips[num].machine->pens[color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2];
+					this_ppu->colortable[i] = color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2;
 				}
 			}
 
@@ -1248,8 +1248,8 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 					if ( tempAddr & 0x03 )
 					{
-						this_ppu->colortable[ tempAddr & 0x1f ] = chips[num].machine->pens[color_base + data + colorEmphasis];
-						this_ppu->colortable_mono[tempAddr & 0x1f] = chips[num].machine->pens[color_base + (data & 0xf0) + colorEmphasis];
+						this_ppu->colortable[ tempAddr & 0x1f ] = color_base + data + colorEmphasis;
+						this_ppu->colortable_mono[tempAddr & 0x1f] = color_base + (data & 0xf0) + colorEmphasis;
 					}
 
 					/* The only valid background colors are writes to 0x3f00 and 0x3f10 */
@@ -1261,8 +1261,8 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 						this_ppu->back_color = data;
 						for( i = 0; i < 32; i += 4 )
 						{
-							this_ppu->colortable[ i ] = chips[num].machine->pens[color_base + data + colorEmphasis];
-							this_ppu->colortable_mono[i] = chips[num].machine->pens[color_base + (data & 0xf0) + colorEmphasis];
+							this_ppu->colortable[ i ] = color_base + data + colorEmphasis;
+							this_ppu->colortable_mono[i] = color_base + (data & 0xf0) + colorEmphasis;
 						}
 					}
 				}

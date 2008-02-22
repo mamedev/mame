@@ -201,7 +201,7 @@ static void draw_sprite(running_machine *machine,
 	mame_bitmap *bitmap,
 	const rectangle *cliprect,
 	const UINT8 *addr, int pitch,
-	const pen_t *paldata,
+	pen_t pen_base,
 	int x0, int y0, int screen_width, int screen_height,
 	int width, int height,
 	int flipx, int flipy,
@@ -209,7 +209,7 @@ static void draw_sprite(running_machine *machine,
 	int shadow,
 	int shadow_pen, int eos )
 {
-	const pen_t *shadow_base = machine->pens + machine->gfx[0]->color_base + (machine->config->total_colors/2);
+	pen_t shadow_pen_base = machine->gfx[0]->color_base + (machine->config->total_colors/2);
 	const UINT8 *source;
 	int full_shadow=shadow&SYS16_SPR_SHADOW;
 	int partial_shadow=shadow&SYS16_SPR_PARTIAL_SHADOW;
@@ -260,11 +260,11 @@ static void draw_sprite(running_machine *machine,
 							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x ){
 								if(!(pri[sx]&priority)){
 									if (full_shadow)
-										dest[sx] = shadow_base[dest[sx]&shadow_mask];
+										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
 									else if (partial_shadow && pen==shadow_pen)
-										dest[sx] = shadow_base[dest[sx]&shadow_mask];
+										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
 									else
-										dest[sx] = paldata[pen];
+										dest[sx] = pen_base + pen;
 								}
 							}
 							xcount -= width;
@@ -277,11 +277,11 @@ static void draw_sprite(running_machine *machine,
 							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x ){
 								if(!(pri[sx]&priority)){
 									if (full_shadow)
-										dest[sx] = shadow_base[dest[sx]&shadow_mask];
+										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
 									else if (partial_shadow && pen==shadow_pen)
-										dest[sx] = shadow_base[dest[sx]&shadow_mask];
+										dest[sx] = shadow_pen_base + (dest[sx]&shadow_mask);
 									else
-										dest[sx] = paldata[pen];
+										dest[sx] = pen_base + pen;
 								}
 							}
 							xcount -= width;
@@ -315,7 +315,7 @@ static void draw_sprite(running_machine *machine,
 						while( xcount>=width )
 						{
 							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x )
-								if(!(pri[sx]&priority)) dest[sx] = paldata[pen];
+								if(!(pri[sx]&priority)) dest[sx] = pen_base + pen;
 							xcount -= width;
 							sx+=dx;
 						}
@@ -324,7 +324,7 @@ static void draw_sprite(running_machine *machine,
 						while( xcount>=width )
 						{
 							if( pen && pen!=0xf && sx>=cliprect->min_x && sx<=cliprect->max_x )
-								if(!(pri[sx]&priority)) dest[sx] = paldata[pen];
+								if(!(pri[sx]&priority)) dest[sx] = pen_base + pen;
 							xcount -= width;
 							sx+=dx;
 						}
@@ -340,7 +340,7 @@ static void draw_sprite(running_machine *machine,
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
 {
-	const pen_t *base_pal = machine->pens + machine->gfx[0]->color_base;
+	pen_t pen_base = machine->gfx[0]->color_base;
 	const UINT8 *base_gfx = memory_region(REGION_GFX2);
 	const int gfx_rom_size = memory_region_length(REGION_GFX2);
 	const UINT16 *source = sys16_spriteram;
@@ -423,7 +423,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			draw_sprite(machine,
 				bitmap,cliprect,
 				base_gfx + gfx, pitch,
-				base_pal + (sprite.color<<4),
+				pen_base + (sprite.color<<4),
 				xpos, ypos, screen_width, sprite.screen_height,
 				width, logical_height,
 				flipx, flipy,
@@ -1112,7 +1112,7 @@ VIDEO_UPDATE( system18old ){
 	if(sys18_bg2_active)
 		tilemap_draw( bitmap,cliprect, background2, 0, 0 );
 	else
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0 );
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0 );	//??

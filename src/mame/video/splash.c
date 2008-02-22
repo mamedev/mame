@@ -89,7 +89,7 @@ WRITE16_HANDLER( splash_vram_w )
 	tilemap_mark_tile_dirty(bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
-static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int sx,sy,color,count,colxor,bitswap;
 	colxor = 0; /* splash and some bitmap modes in roldfrog */
@@ -165,7 +165,7 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap,const rect
 			}
 
 			if (sy >= cliprect->min_y && sy <= cliprect->max_y && sx-9 >= cliprect->min_x && sx-9 <= cliprect->max_x)
-				*BITMAP_ADDR16(bitmap, sy, sx-9) = machine->pens[0x300+(color^colxor)];
+				*BITMAP_ADDR16(bitmap, sy, sx-9) = 0x300+(color^colxor);
 		}
 	}
 
@@ -268,7 +268,7 @@ VIDEO_UPDATE( splash )
 	tilemap_set_scrolly(bg_tilemap[0], 0, splash_vregs[0]);
 	tilemap_set_scrolly(bg_tilemap[1], 0, splash_vregs[1]);
 
-	draw_bitmap(machine, bitmap,cliprect);
+	draw_bitmap(bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
 	splash_draw_sprites(machine, bitmap,cliprect);
@@ -282,7 +282,7 @@ VIDEO_UPDATE( funystrp )
 	tilemap_set_scrolly(bg_tilemap[0], 0, splash_vregs[0]);
 	tilemap_set_scrolly(bg_tilemap[1], 0, splash_vregs[1]);
 
-	draw_bitmap(machine, bitmap,cliprect);
+	draw_bitmap(bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
 	/*Sprite chip is similar but not the same*/

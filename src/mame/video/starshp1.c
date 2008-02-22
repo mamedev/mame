@@ -379,7 +379,7 @@ VIDEO_UPDATE( starshp1 )
 {
 	set_pens(machine->colortable);
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	if (starshp1_starfield_kill == 0)
 		draw_starfield(bitmap);
@@ -422,7 +422,7 @@ VIDEO_EOF( starshp1 )
 	if (rect.max_y > helper->height - 1)
 		rect.max_y = helper->height - 1;
 
-	fillbitmap(helper, machine->pens[0], &machine->screen[0].visarea);
+	fillbitmap(helper, 0, &machine->screen[0].visarea);
 
 	if (starshp1_attract == 0)
 		draw_spaceship(machine, helper, &machine->screen[0].visarea);

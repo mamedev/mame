@@ -243,7 +243,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 ***************************************************************************/
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	UINT8 *RAM	=	memory_region(REGION_GFX2);
 	int x,y,i;
@@ -271,7 +271,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		for (j = 0 ; j <= ((pen&0x80)?0:3); j++)
 			*BITMAP_ADDR16(bitmap,
 						   ( ((j/2)&1) + y ) % 256,
-						   ( (j&1)     + x ) % 512) = machine->pens[256+(pen&0x7f)];
+						   ( (j&1)     + x ) % 512) = 256+(pen&0x7f);
 	}
 }
 
@@ -287,8 +287,8 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 VIDEO_UPDATE( skyfox )
 {
-	fillbitmap(bitmap,machine->pens[255],cliprect);	// the bg is black
-	draw_background(machine, bitmap, cliprect);
+	fillbitmap(bitmap,255,cliprect);	// the bg is black
+	draw_background(bitmap, cliprect);
 	draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

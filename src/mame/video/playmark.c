@@ -369,7 +369,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y,count;
 	int color;
@@ -386,7 +386,7 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rec
 			{
 				if(bg_full_size)
 				{
-					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = machine->pens[0x100 + color];
+					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = 0x100 + color;
 
 					pri = BITMAP_ADDR8(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
 					pri[(x + bgscrollx) & 0x1ff] |= 2;
@@ -396,7 +396,7 @@ static void draw_bitmap(running_machine *machine, mame_bitmap *bitmap, const rec
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = machine->pens[0x100 + color];
+						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = 0x100 + color;
 
 						pri = BITMAP_ADDR8(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
 						pri[(x / 2 + bgscrollx) & 0x1ff] |= 2;
@@ -415,7 +415,7 @@ VIDEO_UPDATE( bigtwin )
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	if (bg_enable)
-		draw_bitmap(machine, bitmap, cliprect);
+		draw_bitmap(bitmap, cliprect);
 	draw_sprites(machine, bitmap,cliprect,4);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -427,7 +427,7 @@ VIDEO_UPDATE( excelsr )
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 	if (bg_enable)
-		draw_bitmap(machine, bitmap, cliprect);
+		draw_bitmap(bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
 	draw_sprites(machine,bitmap,cliprect,2);
 	return 0;

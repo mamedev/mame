@@ -410,7 +410,7 @@ static void draw_text_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 VIDEO_UPDATE( suna8 )
 {
 	/* see hardhead, hardhea2 test mode (press button 2 for both players) */
-	fillbitmap(bitmap,machine->pens[0xff],cliprect);
+	fillbitmap(bitmap,0xff,cliprect);
 
 #ifdef MAME_DEBUG
 #if TILEMAPS

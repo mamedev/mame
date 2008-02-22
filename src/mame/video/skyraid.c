@@ -35,15 +35,12 @@ static void draw_text(running_machine *machine, mame_bitmap* bitmap, const recta
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap->width; x += 16)
-		{
-			drawgfx(bitmap, machine->gfx[0], *p++, 0, 0, 0,
-				x, y, cliprect, TRANSPARENCY_PEN, 0);
-		}
+			drawgfx(bitmap, machine->gfx[0], *p++, 0, 0, 0, 	x, y, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 
-static void draw_terrain(running_machine *machine, mame_bitmap* bitmap, const rectangle *cliprect)
+static void draw_terrain(mame_bitmap* bitmap, const rectangle *cliprect)
 {
 	const UINT8* p = memory_region(REGION_USER1);
 
@@ -70,7 +67,7 @@ static void draw_terrain(running_machine *machine, mame_bitmap* bitmap, const re
 			r.max_y = y + 1;
 			r.max_x = x + 31 - count;
 
-			fillbitmap(bitmap, machine->pens[color], &r);
+			fillbitmap(bitmap, color, &r);
 
 			x += 32 - count;
 		}
@@ -92,11 +89,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 		vert -= 31;
 
 		if (flag & 1)
-		{
 			drawgfx(bitmap, machine->gfx[1],
 				code ^ 15, code >> 3, 0, 0,
 				horz / 2, vert, cliprect, TRANSPARENCY_PEN, 2);
-		}
 	}
 }
 
@@ -139,18 +134,16 @@ static void draw_trapezoid(mame_bitmap* dst, mame_bitmap* src)
 		int x2 = 0x100 + p[(y & ~1) + 1];
 
 		for (x = x1; x < x2; x++)
-		{
 			pDst[x] = pSrc[128 * (x - x1) / (x2 - x1)];
-		}
 	}
 }
 
 
 VIDEO_UPDATE( skyraid )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
-	draw_terrain(machine, helper, cliprect);
+	draw_terrain(helper, cliprect);
 	draw_sprites(machine, helper, cliprect);
 	draw_missiles(machine, helper, cliprect);
 	draw_trapezoid(bitmap, helper);

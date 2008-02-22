@@ -1159,7 +1159,7 @@ VIDEO_UPDATE( ssv )
 	}
 
 	/* The background color is the first one in the palette */
-	fillbitmap(bitmap,machine->pens[0], cliprect);
+	fillbitmap(bitmap,0, cliprect);
 
 	if (!enable_video)	return 0;
 

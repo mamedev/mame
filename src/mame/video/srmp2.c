@@ -434,7 +434,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 
 VIDEO_UPDATE( srmp2 )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	fillbitmap(bitmap, 0x1f0, cliprect);
 	srmp2_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
@@ -442,7 +442,7 @@ VIDEO_UPDATE( srmp2 )
 
 VIDEO_UPDATE( srmp3 )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	fillbitmap(bitmap, 0x1f0, cliprect);
 	srmp3_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
@@ -450,7 +450,7 @@ VIDEO_UPDATE( srmp3 )
 
 VIDEO_UPDATE( mjyuugi )
 {
-	fillbitmap(bitmap, machine->pens[0x1f0], cliprect);
+	fillbitmap(bitmap, 0x1f0, cliprect);
 	mjyuugi_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }

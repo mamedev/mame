@@ -25,7 +25,7 @@ VIDEO_UPDATE( spcforce )
 
 	/* draw the characters as sprites because they could be overlapping */
 
-	fillbitmap(bitmap,machine->pens[0],&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,&machine->screen[0].visarea);
 
 
 	for (offs = 0; offs < videoram_size; offs++)

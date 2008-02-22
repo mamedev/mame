@@ -117,7 +117,7 @@ VIDEO_UPDATE( simpl156 )
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,machine->pens[256],cliprect);
+	fillbitmap(bitmap,256,cliprect);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);

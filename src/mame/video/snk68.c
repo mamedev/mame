@@ -202,7 +202,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_UPDATE( pow )
 {
-	fillbitmap(bitmap,machine->pens[2047],cliprect);
+	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites(machine, bitmap,cliprect,1,0x000);
@@ -284,7 +284,7 @@ static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const r
 
 VIDEO_UPDATE( searchar )
 {
-	fillbitmap(bitmap,machine->pens[2047],cliprect);
+	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
 	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x000);

@@ -127,12 +127,12 @@ VIDEO_UPDATE( psikyo4 )
 {
 	if (screen==0)
 	{
-		fillbitmap(bitmap, machine->pens[0x1000], cliprect);
+		fillbitmap(bitmap, 0x1000, cliprect);
 		draw_sprites(machine, bitmap, cliprect, 0x0000);
 	}
 	else if (screen==1)
 	{
-		fillbitmap(bitmap, machine->pens[0x1001], cliprect);
+		fillbitmap(bitmap, 0x1001, cliprect);
 		draw_sprites(machine, bitmap, cliprect, 0x2000);
 	}
 	return 0;

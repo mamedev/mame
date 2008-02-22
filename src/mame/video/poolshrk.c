@@ -35,7 +35,7 @@ VIDEO_UPDATE( poolshrk )
 
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	/* draw sprites */
 

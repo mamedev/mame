@@ -89,7 +89,7 @@ VIDEO_UPDATE( surpratk )
 	sortlayers(layer,layerpri);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[16 * bg_colorbase],cliprect);
+	fillbitmap(bitmap,16 * bg_colorbase,cliprect);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);

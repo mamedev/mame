@@ -82,12 +82,11 @@ VIDEO_START( shangha3 )
 		int i;
 
 		/* Prepare the shadow table */
-		/* We draw in a raw bitmap so we don't have to remap pens through machine->pens */
 		for (i = 0;i < 14;i++)
 			gfx_drawmode_table[i] = DRAWMODE_SOURCE;
 		gfx_drawmode_table[14] = DRAWMODE_SHADOW;
 		for (i = 0;i < 128;i++)
-			machine->shadow_table[machine->pens[i]] = machine->pens[i+128];
+			machine->shadow_table[i] = i+128;
 	}
 }
 

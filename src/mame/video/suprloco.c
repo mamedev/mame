@@ -176,11 +176,11 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 }
 
 
-static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int spr_number)
+static void draw_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_number)
 {
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
-	const pen_t *spr_palette;
+	pen_t pen_base;
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
 
@@ -190,7 +190,7 @@ static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rect
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
 	height		= spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
-	spr_palette	= machine->pens + 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
+	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
@@ -236,18 +236,18 @@ static void draw_sprite(running_machine *machine, mame_bitmap *bitmap,const rect
 
 			if (color1 == 15) break;
 			if (color1)
-				draw_pixel(bitmap,cliprect,sx+col,  adjy,spr_palette[color1]);
+				draw_pixel(bitmap,cliprect,sx+col,  adjy,pen_base + color1);
 
 			if (color2 == 15) break;
 			if (color2)
-				draw_pixel(bitmap,cliprect,sx+col+1,adjy,spr_palette[color2]);
+				draw_pixel(bitmap,cliprect,sx+col+1,adjy,pen_base + color2);
 
 			col += 2;
 		}
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int spr_number;
 	UINT8 *spr_reg;
@@ -257,14 +257,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	{
 		spr_reg = spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
-			draw_sprite(machine, bitmap, cliprect, spr_number);
+			draw_sprite(bitmap, cliprect, spr_number);
 	}
 }
 
 VIDEO_UPDATE( suprloco )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	return 0;
 }

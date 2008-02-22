@@ -635,7 +635,7 @@ VIDEO_UPDATE( st0016 )
 		//super eagle shot
 		int x,y,dy;
 
-		fillbitmap(speglsht_bitmap,machine->pens[0],&machine->screen[0].visarea);
+		fillbitmap(speglsht_bitmap,0,&machine->screen[0].visarea);
 		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
 
 		for(y=0;y<256;y++)
@@ -676,7 +676,7 @@ VIDEO_UPDATE( st0016 )
 			}
 		}
 
-		fillbitmap(bitmap,machine->pens[UNUSED_PEN],&machine->screen[0].visarea);
+		fillbitmap(bitmap,UNUSED_PEN,&machine->screen[0].visarea);
 		draw_bgmap(machine, bitmap,cliprect,0);
  		draw_sprites(machine, bitmap,cliprect);
 		draw_bgmap(machine, bitmap,cliprect,1);

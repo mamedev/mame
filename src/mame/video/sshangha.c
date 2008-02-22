@@ -30,7 +30,7 @@ WRITE16_HANDLER( sshangha_palette_24bit_w )
 	palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
 }
 
-static void sshangha_tilemap_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void sshangha_tilemap_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	const mame_bitmap *bitmap0 = tilemap_get_pixmap(pf1_16x16_tilemap);
 	const mame_bitmap *bitmap1 = tilemap_get_pixmap(pf2_tilemap);
@@ -41,7 +41,7 @@ static void sshangha_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,
 			p=*BITMAP_ADDR16(bitmap0, y, x)&0xf;
 			p|=(*BITMAP_ADDR16(bitmap1, y, x)&0xf)<<4;
 
-			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[p|0x300];
+			*BITMAP_ADDR16(bitmap, y, x) = p|0x300;
 		}
 	}
 }
@@ -240,7 +240,7 @@ VIDEO_UPDATE( sshangha )
     produce a 6bpp tilemap.  We can't precompute this as any tiles can be
     used in any tilemap, so we plot it on the fly */
 	if ((sshangha_video_control&4)==0) {
-		sshangha_tilemap_draw(machine, bitmap, cliprect);
+		sshangha_tilemap_draw(bitmap, cliprect);
 		draw_sprites(machine, bitmap, cliprect, spriteram16,0x4000,0x4000);
 	}
 	else {

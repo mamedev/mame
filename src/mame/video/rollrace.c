@@ -66,7 +66,7 @@ VIDEO_UPDATE( rollrace )
 	int col;
 
 	/* fill in background colour*/
-	fillbitmap(bitmap,machine->pens[ra_bkgpen],&machine->screen[0].visarea);
+	fillbitmap(bitmap,ra_bkgpen,&machine->screen[0].visarea);
 
 	/* draw road */
 	for (offs = videoram_size - 1;offs >= 0;offs--)

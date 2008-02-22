@@ -176,7 +176,7 @@ VIDEO_UPDATE( quasar )
 				if (*BITMAP_ADDR8(s2636_0_bitmap, offs, bx) != 0) cvs_collision_register |= 0x04;
 				if (*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) cvs_collision_register |= 0x08;
 
-				*BITMAP_ADDR16(bitmap, offs, bx) = machine->pens[7];
+				*BITMAP_ADDR16(bitmap, offs, bx) = 7;
             }
         }
     }
@@ -200,7 +200,7 @@ VIDEO_UPDATE( quasar )
 
 				if (S2636_IS_PIXEL_DRAWN(pixel))
 				{
-					*BITMAP_ADDR16(bitmap, y, x) = machine->pens[S2636_PIXEL_COLOR(pixel)];
+					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
 					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))

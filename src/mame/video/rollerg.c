@@ -69,7 +69,7 @@ VIDEO_START( rollerg )
 VIDEO_UPDATE( rollerg )
 {
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[16 * bg_colorbase],cliprect);
+	fillbitmap(bitmap,16 * bg_colorbase,cliprect);
 	K051316_zoom_draw_0(bitmap,cliprect,0,1);
 	K053245_sprites_draw(0,bitmap,cliprect);
 	return 0;

@@ -228,7 +228,7 @@ VIDEO_UPDATE( sf )
 	if (sf_active & 0x20)
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	else
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 

@@ -182,7 +182,7 @@ VIDEO_EOF( sprint8 )
 
 	tilemap_draw(helper2, &machine->screen[0].visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, machine->pens[0x20], &machine->screen[0].visarea);
+	fillbitmap(helper1, 0x20, &machine->screen[0].visarea);
 
 	draw_sprites(machine, helper1, &machine->screen[0].visarea);
 

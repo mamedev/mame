@@ -197,8 +197,8 @@ static int collision_check_s1s2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,machine->pens[0],&clip);
-    fillbitmap(ship2_vid,machine->pens[0],&clip);
+    fillbitmap(ship1_vid,0,&clip);
+    fillbitmap(ship2_vid,0,&clip);
 
 	/* origin is with respect to ship1 */
 
@@ -229,17 +229,10 @@ static int collision_check_s1s2(running_machine *machine)
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
-    {
         for (sx=0;sx<16;sx++)
-        {
-        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==machine->pens[1])
-           	{
-        		/* Condition 1 - ship 1 = ship 2 */
-				if (*BITMAP_ADDR16(ship2_vid, sy, sx)==machine->pens[1])
-                	return 1;
-			}
-        }
-    }
+       		/* Condition 1 - ship 1 = ship 2 */
+        	if ((*BITMAP_ADDR16(ship1_vid, sy, sx)==1) && (*BITMAP_ADDR16(ship2_vid, sy, sx)==1))
+                return 1;
 
     return 0;
 }
@@ -262,8 +255,8 @@ static int collision_check_p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(proj1_vid,machine->pens[0],&clip);
-    fillbitmap(proj2_vid,machine->pens[0],&clip);
+    fillbitmap(proj1_vid,0,&clip);
+    fillbitmap(proj2_vid,0,&clip);
 
 	/* origin is with respect to proj1 */
 
@@ -300,17 +293,10 @@ static int collision_check_p1p2(running_machine *machine)
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
-    {
         for (sx=0;sx<16;sx++)
-        {
-        	if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
-           	{
-        		/* Condition 1 - proj 1 = proj 2 */
-				if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
-                	return 1;
-			}
-        }
-    }
+       		/* Condition 1 - proj 1 = proj 2 */
+        	if ((*BITMAP_ADDR16(proj1_vid, sy, sx)==1) && (*BITMAP_ADDR16(proj2_vid, sy, sx)==1))
+                return 1;
 
     return 0;
 }
@@ -333,9 +319,9 @@ static int collision_check_s1p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,machine->pens[0],&clip);
-    fillbitmap(proj1_vid,machine->pens[0],&clip);
-    fillbitmap(proj2_vid,machine->pens[0],&clip);
+    fillbitmap(ship1_vid,0,&clip);
+    fillbitmap(proj1_vid,0,&clip);
+    fillbitmap(proj2_vid,0,&clip);
 
 	/* origin is with respect to ship1 */
 
@@ -383,20 +369,16 @@ static int collision_check_s1p1p2(running_machine *machine)
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
-    {
         for (sx=0;sx<16;sx++)
-        {
-        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==machine->pens[1])
+        	if (*BITMAP_ADDR16(ship1_vid, sy, sx)==1)
            	{
         		/* Condition 1 - ship 1 = proj 1 */
-				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==1)
                 	return 1;
         		/* Condition 2 - ship 1 = proj 2 */
-        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==1)
                 	return 1;
             }
-        }
-    }
 
     return 0;
 }
@@ -419,9 +401,9 @@ static int collision_check_s2p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship2_vid,machine->pens[0],&clip);
-    fillbitmap(proj1_vid,machine->pens[0],&clip);
-    fillbitmap(proj2_vid,machine->pens[0],&clip);
+    fillbitmap(ship2_vid,0,&clip);
+    fillbitmap(proj1_vid,0,&clip);
+    fillbitmap(proj2_vid,0,&clip);
 
 	/* origin is with respect to ship2 */
 
@@ -469,27 +451,23 @@ static int collision_check_s2p1p2(running_machine *machine)
 
     /* Now check for collisions */
     for (sy=0;sy<16;sy++)
-    {
         for (sx=0;sx<16;sx++)
-        {
-        	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==machine->pens[1])
+        	if (*BITMAP_ADDR16(ship2_vid, sy, sx)==1)
            	{
         		/* Condition 1 - ship 2 = proj 1 */
-				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==machine->pens[1])
+				if (*BITMAP_ADDR16(proj1_vid, sy, sx)==1)
                 	return 1;
         		/* Condition 2 - ship 2 = proj 2 */
-        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==machine->pens[1])
+        		if (*BITMAP_ADDR16(proj2_vid, sy, sx)==1)
                 	return 1;
             }
-        }
-    }
 
     return 0;
 }
 
 VIDEO_UPDATE( starcrus )
 {
-    fillbitmap(bitmap,machine->pens[0],cliprect);
+    fillbitmap(bitmap,0,cliprect);
 
 	/* Draw ship 1 */
     drawgfx(bitmap,

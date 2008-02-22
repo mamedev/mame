@@ -497,7 +497,7 @@ static void plot_star(running_machine *machine, mame_bitmap *bitmap, const recta
 		y = 255 - y;
 
 	if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x) % 0x144) == 0)
-		*BITMAP_ADDR16(bitmap, y, x) = machine->pens[STARS_COLOR_BASE + color];
+		*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + color;
 }
 
 static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
