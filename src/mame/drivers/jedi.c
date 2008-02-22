@@ -270,7 +270,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0380) AM_READWRITE(MRA8_RAM, nvram_data_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_READWRITE(MRA8_RAM, nvram_data_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READWRITE(input_port_0_r, MWA8_NOP)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x03fe) AM_READWRITE(input_port_1_r, MWA8_NOP)
 	AM_RANGE(0x1000, 0x13ff) AM_NOP
