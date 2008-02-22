@@ -1588,6 +1588,7 @@ static MACHINE_DRIVER_START( default )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1661,6 +1662,7 @@ static MACHINE_DRIVER_START( gollygho )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1710,6 +1712,7 @@ static MACHINE_DRIVER_START( finallap )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1759,6 +1762,7 @@ static MACHINE_DRIVER_START( sgunner )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1808,6 +1812,7 @@ static MACHINE_DRIVER_START( luckywld )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1857,6 +1862,7 @@ static MACHINE_DRIVER_START( metlhawk )
 
 	MDRV_INTERLEAVE(100) /* CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 

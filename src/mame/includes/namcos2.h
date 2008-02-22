@@ -137,6 +137,7 @@ extern UINT16 *namcos2_68k_roz_ram;
 
 extern int namcos2_gametype;
 
+MACHINE_START( namcos2 );
 MACHINE_RESET( namcos2 );
 
 READ16_HANDLER( namcos2_flap_prot_r );

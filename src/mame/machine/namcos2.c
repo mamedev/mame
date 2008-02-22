@@ -94,12 +94,15 @@ ResetAllSubCPUs( int state )
 	}
 }
 
+MACHINE_START( namcos2 )
+{
+	namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
+}
+
 MACHINE_RESET( namcos2 )
 {
 	int loop;
 	mFinalLapProtCount = 0;
-
-	namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
 
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(0,0); /* Page in bank 0 */

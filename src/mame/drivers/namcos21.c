@@ -1545,6 +1545,7 @@ static MACHINE_DRIVER_START( s21base )
 
 	MDRV_INTERLEAVE(200)
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1618,6 +1619,7 @@ static MACHINE_DRIVER_START( driveyes )
 
 	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
@@ -1676,6 +1678,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 
 	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
 
+	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
 	MDRV_NVRAM_HANDLER(namcos2)
 
