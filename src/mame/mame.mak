@@ -1170,7 +1170,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/segaybd.o $(VIDEO)/segaybd.o \
 	$(DRIVERS)/ssf2md.o \
 	$(DRIVERS)/sg1000a.o \
-	$(DRIVERS)/stactics.o $(MACHINE)/stactics.o $(VIDEO)/stactics.o \
+	$(DRIVERS)/stactics.o $(VIDEO)/stactics.o \
 	$(DRIVERS)/stv.o $(DRIVERS)/stvinit.o $(MACHINE)/stvprot.o $(MACHINE)/stvcd.o \
 	$(DRIVERS)/suprloco.o $(VIDEO)/suprloco.o \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
@@ -1715,6 +1715,8 @@ $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
+
+$(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 

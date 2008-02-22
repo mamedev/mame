@@ -1,10 +1,9 @@
-/***************************************************************************
+/****************************************************************************
 
-  video.c
+    Sega "Space Tactics" Driver
 
-  Functions to emulate the video hardware of the machine.
+    Frank Palazzolo (palazzol@home.com)
 
----
 
 The Video system used in Space Tactics is unusual.
 Here are my notes on how the video system works:
@@ -48,37 +47,18 @@ tilt the mirror up and down, and the monitor left and right.
 ***************************************************************************/
 
 #include "driver.h"
-
-/* These are defined in machine/stactics.c */
-extern int stactics_vert_pos;
-extern int stactics_horiz_pos;
-extern UINT8 *stactics_motor_on;
-
-/* These are needed by machine/stactics.c  */
-int stactics_vblank_count;
-int stactics_shot_standby;
-int stactics_shot_arrive;
-
-/* These are needed by driver/stactics.c   */
-UINT8 *stactics_videoram_b;
-UINT8 *stactics_videoram_d;
-UINT8 *stactics_videoram_e;
-UINT8 *stactics_videoram_f;
-UINT8 *stactics_palette;
-UINT8 *stactics_display_buffer;
-UINT8 *stactics_lamps;
-
-static UINT8 y_scroll_d;
-static UINT8 y_scroll_e;
-static UINT8 y_scroll_f;
-
-static UINT16 beam_state;
-static UINT16 old_beam_state;
-static UINT16 beam_states_per_frame;
+#include "deprecat.h"
+#include "stactics.h"
 
 
 
-PALETTE_INIT( stactics )
+/*************************************
+ *
+ *  Palette
+ *
+ *************************************/
+
+static PALETTE_INIT( stactics )
 {
 	int i;
 
@@ -102,54 +82,64 @@ PALETTE_INIT( stactics )
 	}
 }
 
-/***************************************************************************
 
-  Start the video hardware emulation.
 
-***************************************************************************/
-
-VIDEO_START( stactics )
-{
-	y_scroll_d = 0;
-	y_scroll_e = 0;
-	y_scroll_f = 0;
-
-	stactics_vblank_count = 0;
-	stactics_shot_standby = 1;
-	stactics_shot_arrive = 0;
-	beam_state = 0;
-	old_beam_state = 0;
-
-	stactics_vblank_count = 0;
-	stactics_vert_pos = 0;
-	stactics_horiz_pos = 0;
-	*stactics_motor_on = 0;
-}
-
+/*************************************
+ *
+ *  Scrolling
+ *
+ *************************************/
 
 WRITE8_HANDLER( stactics_scroll_ram_w )
 {
-	switch ((offset & 0x700) >> 8)
+	stactics_state *state = Machine->driver_data;
+
+	switch (offset >> 8)
 	{
 		case 4:  // Page D
-			if (data&0x01)
-				y_scroll_d = offset&0xff;
+			if (data & 0x01)
+				state->y_scroll_d = offset & 0xff;
 			break;
 
 		case 5:  // Page E
-			if (data&0x01)
-				y_scroll_e = offset&0xff;
+			if (data & 0x01)
+				state->y_scroll_e = offset & 0xff;
 			break;
 
 		case 6:  // Page F
-			if (data&0x01)
-				y_scroll_f = offset&0xff;
+			if (data & 0x01)
+				state->y_scroll_f = offset & 0xff;
 			break;
     }
 }
 
+
+
+/*************************************
+ *
+ *  VBLANK counter
+ *
+ *************************************/
+
+CUSTOM_INPUT( stactics_get_vblank_count_d3 )
+{
+	stactics_state *state = Machine->driver_data;
+
+	return (state->vblank_count >> 3) & 0x01;
+}
+
+
+
+/*************************************
+ *
+ *  Beam handling
+ *
+ *************************************/
+
 WRITE8_HANDLER( stactics_speed_latch_w )
 {
+	stactics_state *state = Machine->driver_data;
+
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
 	/* the LED fire beams as follows:                        */
@@ -169,50 +159,72 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 			num_rising_edges++;
 	}
 
-	beam_states_per_frame = num_rising_edges*19/8;
+	state->beam_states_per_frame = num_rising_edges*19/8;
 }
+
 
 WRITE8_HANDLER( stactics_shot_trigger_w )
 {
-	stactics_shot_standby = 0;
+	stactics_state *state = Machine->driver_data;
+
+	state->shot_standby = 0;
 }
+
 
 WRITE8_HANDLER( stactics_shot_flag_clear_w )
 {
-	stactics_shot_arrive = 0;
+	stactics_state *state = Machine->driver_data;
+
+	state->shot_arrive = 0;
 }
 
 
-
-static void update_beam(void)
+CUSTOM_INPUT( stactics_get_shot_standby )
 {
-	/* An LED fire beam! */
-	/* (There were 120 green LEDS mounted in the cabinet in the game, */
-	/*  and one red one, for the sight)                               */
+	stactics_state *state = Machine->driver_data;
 
-	/* First, update the firebeam state */
+	return state->shot_standby;
+}
 
-	old_beam_state = beam_state;
-	if (stactics_shot_standby == 0)
-		beam_state = beam_state + beam_states_per_frame;
+
+CUSTOM_INPUT( stactics_get_not_shot_arrive )
+{
+	stactics_state *state = Machine->driver_data;
+
+	return !state->shot_arrive;
+}
+
+
+static void update_beam(stactics_state *state)
+{
+	/* first, update the firebeam state */
+	state->old_beam_state = state->beam_state;
+	if (state->shot_standby == 0)
+		state->beam_state = state->beam_state + state->beam_states_per_frame;
 
 	/* These are thresholds for the two shots from the LED fire ROM */
 	/* (Note: There are two more for sound triggers, */
 	/*        whenever that gets implemented)        */
-	if ((old_beam_state < 0x8b) & (beam_state >= 0x8b))
-		stactics_shot_arrive = 1;
+	if ((state->old_beam_state < 0x8b) & (state->beam_state >= 0x8b))
+		state->shot_arrive = 1;
 
-	if ((old_beam_state < 0xca) & (beam_state >= 0xca))
-		stactics_shot_arrive = 1;
+	if ((state->old_beam_state < 0xca) & (state->beam_state >= 0xca))
+		state->shot_arrive = 1;
 
-	if (beam_state >= 0x100)
+	if (state->beam_state >= 0x100)
 	{
-		beam_state = 0;
-		stactics_shot_standby = 1;
+		state->beam_state = 0;
+		state->shot_standby = 1;
 	}
 }
 
 
+
+/*************************************
+ *
+ *  Video drawing
+ *
+ *************************************/
 
 INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 {
@@ -233,11 +245,11 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, const pen_t *pens)
+static void draw_background(stactics_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int y;
 
-	fillbitmap(bitmap, pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)
@@ -248,13 +260,13 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, cons
 		for (x = 0; x < 0x100; x++)
 		{
 			/* get the pixels for the four planes */
-			int pixel_b = get_pixel_on_plane(stactics_videoram_b, y, x, 0);
-			int pixel_d = get_pixel_on_plane(stactics_videoram_d, y, x, y_scroll_d);
-			int pixel_e = get_pixel_on_plane(stactics_videoram_e, y, x, y_scroll_e);
-			int pixel_f = get_pixel_on_plane(stactics_videoram_f, y, x, y_scroll_f);
+			int pixel_b = get_pixel_on_plane(state->videoram_b, y, x, 0);
+			int pixel_d = get_pixel_on_plane(state->videoram_d, y, x, state->y_scroll_d);
+			int pixel_e = get_pixel_on_plane(state->videoram_e, y, x, state->y_scroll_e);
+			int pixel_f = get_pixel_on_plane(state->videoram_f, y, x, state->y_scroll_f);
 
 			/* get the color for this pixel */
-			UINT8 color = stactics_videoram_b[((y >> 3) << 5) | (x >> 3)] >> 4;
+			UINT8 color = state->videoram_b[((y >> 3) << 5) | (x >> 3)] >> 4;
 
 			/* assemble the pen index */
 			int pen = color |
@@ -262,104 +274,164 @@ static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect, cons
 					  (pixel_f << 5) |
 					  (pixel_e << 6) |
 					  (pixel_d << 7) |
-					  ((stactics_palette[0] & 0x01) << 8) |
-					  ((stactics_palette[1] & 0x01) << 9);
+					  ((state->palette[0] & 0x01) << 8) |
+					  ((state->palette[1] & 0x01) << 9);
 
 			/* compute the effective pixel coordinate after adjusting for the
                mirror movement - this is mechanical on the real machine */
-			int sy = y + stactics_vert_pos;
-			int sx = x - stactics_horiz_pos;
+			int sy = y + state->vert_pos;
+			int sx = x - state->horiz_pos;
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
-				*BITMAP_ADDR16(bitmap, sy, sx) = pens[pen];
+				*BITMAP_ADDR16(bitmap, sy, sx) = pen;
 		}
 	}
 }
 
 
+
+/*************************************
+ *
+ *  Non-video artwork
+ *
+ *************************************/
+
+/* from 7448 datasheet */
+static const int to_7seg[0x10] =
+{
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
+	0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00
+};
+
+
 static void set_indicator_leds(int data, const char *output_name, int base_index)
 {
-	/* from 7448 datasheet */
-	static const int to_7seg[0x10] =
-	{
-		0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x1f, 0x70,
-		0x7f, 0x73, 0x0d, 0x19, 0x23, 0x4b, 0x0f, 0x00
-	};
-
 	/* decode the data */
-	data = to_7seg[(data ^ 0x0f) & 0x0f];
+	data = to_7seg[~data & 0x0f];
 
 	/* set the 4 LEDs */
-	output_set_indexed_value(output_name, base_index + 0, (data >> 4) & 0x01);
-	output_set_indexed_value(output_name, base_index + 1, (data >> 0) & 0x01);
-	output_set_indexed_value(output_name, base_index + 2, (data >> 1) & 0x01);
-	output_set_indexed_value(output_name, base_index + 3, (data >> 2) & 0x01);
+	output_set_indexed_value(output_name, base_index + 0, (data >> 2) & 0x01);
+	output_set_indexed_value(output_name, base_index + 1, (data >> 6) & 0x01);
+	output_set_indexed_value(output_name, base_index + 2, (data >> 5) & 0x01);
+	output_set_indexed_value(output_name, base_index + 3, (data >> 4) & 0x01);
 }
 
 
-static void update_artwork(void)
+static void update_artwork(stactics_state *state)
 {
 	int i;
 	UINT8 *beam_region = memory_region(REGION_USER1);
 
 	/* set the lamps first */
-	output_set_indexed_value("base_lamp", 4, stactics_lamps[0] & 0x01);
-	output_set_indexed_value("base_lamp", 3, stactics_lamps[1] & 0x01);
-	output_set_indexed_value("base_lamp", 2, stactics_lamps[2] & 0x01);
-	output_set_indexed_value("base_lamp", 1, stactics_lamps[3] & 0x01);
-	output_set_indexed_value("base_lamp", 0, stactics_lamps[4] & 0x01);
-	output_set_value("start_lamp",   stactics_lamps[5] & 0x01);
-	output_set_value("barrier_lamp", stactics_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
+	output_set_indexed_value("base_lamp", 4, state->lamps[0] & 0x01);
+	output_set_indexed_value("base_lamp", 3, state->lamps[1] & 0x01);
+	output_set_indexed_value("base_lamp", 2, state->lamps[2] & 0x01);
+	output_set_indexed_value("base_lamp", 1, state->lamps[3] & 0x01);
+	output_set_indexed_value("base_lamp", 0, state->lamps[4] & 0x01);
+	output_set_value("start_lamp",   state->lamps[5] & 0x01);
+	output_set_value("barrier_lamp", state->lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
 
 	/* laser beam - loop for each LED */
 	for (i = 0; i < 0x40; i++)
 	{
-		offs_t beam_data_offs;
-		UINT8 beam_data;
-		int on;
-
-		beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | beam_state;
-		beam_data = beam_region[beam_data_offs];
-		on = (beam_data >> (i & 0x07)) & 0x01;
+		offs_t beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | state->beam_state;
+		UINT8 beam_data = beam_region[beam_data_offs];
+		int on = (beam_data >> (i & 0x07)) & 0x01;
 
 		output_set_indexed_value("beam_led_left", i, on);
 		output_set_indexed_value("beam_led_right", i, on);
 	}
 
 	/* sight LED */
-	output_set_value("sight_led", *stactics_motor_on & 0x01);
+	output_set_value("sight_led", *state->motor_on & 0x01);
 
 	/* score display */
 	for (i = 0x01; i < 0x07; i++)
-		output_set_indexed_value("score_7seg", i - 1, ~stactics_display_buffer[i] & 0x0f);
+		output_set_digit_value(i - 1, to_7seg[~state->display_buffer[i] & 0x0f]);
 
 	/* credits indicator */
-	set_indicator_leds(stactics_display_buffer[0x07], "credit_led", 0x00);
-	set_indicator_leds(stactics_display_buffer[0x08], "credit_led", 0x04);
+	set_indicator_leds(state->display_buffer[0x07], "credit_led", 0x00);
+	set_indicator_leds(state->display_buffer[0x08], "credit_led", 0x04);
 
 	/* barriers indicator */
-	set_indicator_leds(stactics_display_buffer[0x09], "barrier_led", 0x00);
-	set_indicator_leds(stactics_display_buffer[0x0a], "barrier_led", 0x04);
-	set_indicator_leds(stactics_display_buffer[0x0b], "barrier_led", 0x08);
+	set_indicator_leds(state->display_buffer[0x09], "barrier_led", 0x00);
+	set_indicator_leds(state->display_buffer[0x0a], "barrier_led", 0x04);
+	set_indicator_leds(state->display_buffer[0x0b], "barrier_led", 0x08);
 
 	/* rounds indicator */
-	set_indicator_leds(stactics_display_buffer[0x0c], "round_led", 0x00);
-	set_indicator_leds(stactics_display_buffer[0x0d], "round_led", 0x04);
-	set_indicator_leds(stactics_display_buffer[0x0e], "round_led", 0x08);
-	set_indicator_leds(stactics_display_buffer[0x0f], "round_led", 0x0c);
+	set_indicator_leds(state->display_buffer[0x0c], "round_led", 0x00);
+	set_indicator_leds(state->display_buffer[0x0d], "round_led", 0x04);
+	set_indicator_leds(state->display_buffer[0x0e], "round_led", 0x08);
+	set_indicator_leds(state->display_buffer[0x0f], "round_led", 0x0c);
 }
 
 
-VIDEO_UPDATE( stactics )
+
+/*************************************
+ *
+ *  Start
+ *
+ *************************************/
+
+static VIDEO_START( stactics )
 {
-	update_beam();
+	stactics_state *state = machine->driver_data;
 
-	/* update vblank counter */
-	stactics_vblank_count++;
+	state->y_scroll_d = 0;
+	state->y_scroll_e = 0;
+	state->y_scroll_f = 0;
 
-	draw_background(bitmap, cliprect, machine->pens);
-	update_artwork();
+	state->shot_standby = 1;
+	state->shot_arrive = 0;
+	state->beam_state = 0;
+	state->old_beam_state = 0;
+	state->vblank_count = 0;
+}
+
+
+
+/*************************************
+ *
+ *  Update
+ *
+ *************************************/
+
+static VIDEO_UPDATE( stactics )
+{
+	stactics_state *state = machine->driver_data;
+
+	update_beam(state);
+	draw_background(state, bitmap, cliprect);
+	update_artwork(state);
+
+	state->vblank_count = (state->vblank_count + 1) & 0x0f;
 
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( stactics_video )
+
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+
+	MDRV_PALETTE_LENGTH(0x400)
+
+	MDRV_PALETTE_INIT(stactics)
+	MDRV_VIDEO_START(stactics)
+	MDRV_VIDEO_UPDATE(stactics)
+MACHINE_DRIVER_END

@@ -1,8 +1,8 @@
 /****************************************************************************
 
-Sega "Space Tactics" Driver
+    Sega "Space Tactics" Driver
 
-Frank Palazzolo (palazzol@home.com)
+    Frank Palazzolo (palazzol@home.com)
 
 Master processor - Intel 8080A
 
@@ -35,44 +35,141 @@ f000-ffff VRAM F                    R/W   closest aliens (scrolling)
 
 At this time, emulation is missing:
 
-Lamps (Credit, Barrier, and 5 lamps for firing from the bases)
 Sound (all discrete and a 76477)
 Verify Color PROM resistor values (Last 8 colors)
-Verify Bar graph displays
 
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
+#include "stactics.h"
+#include "stactics.lh"
 
-/* Defined in machine/stactics.c */
-READ8_HANDLER( stactics_port_0_r );
-READ8_HANDLER( stactics_port_2_r );
-READ8_HANDLER( stactics_port_3_r );
-READ8_HANDLER( stactics_vert_pos_r );
-READ8_HANDLER( stactics_horiz_pos_r );
-INTERRUPT_GEN( stactics_interrupt );
-WRITE8_HANDLER( stactics_coin_lockout_w );
-extern UINT8 *stactics_motor_on;
 
-/* Defined in video/stactics.c */
-VIDEO_START( stactics );
-VIDEO_UPDATE( stactics );
-extern UINT8 *stactics_videoram_b;
-extern UINT8 *stactics_videoram_d;
-extern UINT8 *stactics_videoram_e;
-extern UINT8 *stactics_videoram_f;
-extern UINT8 *stactics_palette;
-extern UINT8 *stactics_display_buffer;
-extern UINT8 *stactics_lamps;
 
-PALETTE_INIT( stactics );
+/*************************************
+ *
+ *  Mirror motor handling
+ *
+ *************************************/
 
-WRITE8_HANDLER( stactics_palette_w );
-WRITE8_HANDLER( stactics_scroll_ram_w );
-WRITE8_HANDLER( stactics_speed_latch_w );
-WRITE8_HANDLER( stactics_shot_trigger_w );
-WRITE8_HANDLER( stactics_shot_flag_clear_w );
+static CUSTOM_INPUT( get_motor_not_ready )
+{
+	stactics_state *state = Machine->driver_data;
 
+	/* if the motor is self-centering, but not centered yet */
+    return ((*state->motor_on & 0x01) == 0) &&
+    	   ((state->horiz_pos != 0) || (state->vert_pos != 0));
+}
+
+
+static READ8_HANDLER( vert_pos_r )
+{
+	stactics_state *state = Machine->driver_data;
+
+    return 0x70 - state->vert_pos;
+}
+
+
+static READ8_HANDLER( horiz_pos_r )
+{
+	stactics_state *state = Machine->driver_data;
+
+    return state->horiz_pos + 0x88;
+}
+
+
+static void move_motor(stactics_state *state)
+{
+	 /* monitor motor under joystick control */
+    if (*state->motor_on & 0x01)
+    {
+		int ip3 = readinputport(3);
+		int ip4 = readinputport(4);
+
+		/* up */
+		if (((ip4 & 0x01) == 0) && (state->vert_pos > -128))
+			state->vert_pos--;
+
+		/* down */
+		if (((ip4 & 0x02) == 0) && (state->vert_pos < 127))
+			state->vert_pos++;
+
+		/* left */
+		if (((ip3 & 0x20) == 0) && (state->horiz_pos < 127))
+			state->horiz_pos++;
+
+		/* right */
+		if (((ip3 & 0x40) == 0) && (state->horiz_pos > -128))
+			state->horiz_pos--;
+    }
+
+	 /* monitor motor under self-centering control */
+    else
+    {
+        if (state->horiz_pos > 0)
+            state->horiz_pos--;
+        else if (state->horiz_pos < 0)
+            state->horiz_pos++;
+
+        if (state->vert_pos > 0)
+            state->vert_pos--;
+        else if (state->vert_pos < 0)
+            state->vert_pos++;
+    }
+}
+
+
+
+/*************************************
+ *
+ *  Random number generator
+ *
+ *************************************/
+
+static CUSTOM_INPUT( get_rng )
+{
+	/* this is a 555 timer, but cannot read one of the resistor values */
+	return mame_rand(Machine) & 0x07;
+}
+
+
+
+/*************************************
+ *
+ *  Coin lockout
+ *
+ *************************************/
+
+static WRITE8_HANDLER( stactics_coin_lockout_w )
+{
+	coin_lockout_w(offset, ~data & 0x01);
+}
+
+
+
+/*************************************
+ *
+ *  Interrupt system
+ *
+ *************************************/
+
+static INTERRUPT_GEN( stactics_interrupt )
+{
+	stactics_state *state = machine->driver_data;
+
+	move_motor(state);
+
+    cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Data CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x2fff) AM_ROM
@@ -81,41 +178,48 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(input_port_1_r)
     AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
     AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITE(MWA8_NOP)
-    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_palette)
+    AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(stactics_state, palette)
  /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE(stactics_sound_w) */
-    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_motor_on)  /* Note: This overlaps rocket sound */
-    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_lamps)
+    AM_RANGE(0x6016, 0x6016) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(stactics_state, motor_on)  /* Note: This overlaps rocket sound */
+    AM_RANGE(0x6020, 0x6027) AM_MIRROR(0x0f08) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(stactics_state, lamps)
     AM_RANGE(0x6030, 0x6030) AM_MIRROR(0x0f0f) AM_WRITE(stactics_speed_latch_w)
     AM_RANGE(0x6040, 0x6040) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_trigger_w)
     AM_RANGE(0x6050, 0x6050) AM_MIRROR(0x0f0f) AM_WRITE(stactics_shot_flag_clear_w)
-    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITE(MWA8_RAM) AM_BASE(&stactics_display_buffer)
+    AM_RANGE(0x6060, 0x606f) AM_MIRROR(0x0f00) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(stactics_state, display_buffer)
     AM_RANGE(0x6070, 0x609f) AM_MIRROR(0x0f00) AM_WRITE(MWA8_NOP)
  /* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(stactics_sound2_w) */
     AM_RANGE(0x60f0, 0x60ff) AM_MIRROR(0x0f00) AM_WRITE(MWA8_NOP)
-    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ(stactics_port_2_r)
-    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ(stactics_port_3_r)
-    AM_RANGE(0x8000, 0x8fff) AM_WRITE(stactics_scroll_ram_w)
-    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(stactics_vert_pos_r)
-    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(stactics_horiz_pos_r)
-    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(&stactics_videoram_b)
+    AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ(input_port_2_r)
+    AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ(input_port_3_r)
+    AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE(stactics_scroll_ram_w)
+    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
+    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
+    AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_b)
     AM_RANGE(0xc000, 0xcfff) AM_NOP
-    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&stactics_videoram_d)
-    AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&stactics_videoram_e)
-    AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&stactics_videoram_f)
+    AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_d)
+    AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_e)
+    AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(stactics_state, videoram_f)
 ADDRESS_MAP_END
 
+
+
+/*************************************
+ *
+ *  Input port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( stactics )
 
     PORT_START  /*  IN0 */
-    /*PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) Motor status. see stactics_port_0_r */
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
-    PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 )
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 )
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 )
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+    PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_motor_not_ready, 0)
 
     PORT_START  /* IN1 */
     PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_B ) )
@@ -144,8 +248,8 @@ static INPUT_PORTS_START( stactics )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
     PORT_START  /* IN2 */
-    /* This is accessed by stactics_port_2_r() */
-    /*PORT_BIT (0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) Random number generator */
+    PORT_BIT (0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_rng, 0)
+    PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_vblank_count_d3, 0)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
     PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
@@ -154,9 +258,8 @@ static INPUT_PORTS_START( stactics )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
     PORT_START  /* IN3 */
-    /* This is accessed by stactics_port_3_r() */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-    /* PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) */
+    PORT_BIT (0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_shot_standby, 0)
     PORT_DIPNAME( 0x04, 0x04, "Number of Barriers" )
     PORT_DIPSETTING(    0x04, "4" )
     PORT_DIPSETTING(    0x00, "6" )
@@ -168,7 +271,7 @@ static INPUT_PORTS_START( stactics )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-    /* PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) */
+    PORT_BIT (0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_not_shot_arrive, 0)
 
 	PORT_START	/* FAKE */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -176,39 +279,54 @@ static INPUT_PORTS_START( stactics )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Start
+ *
+ *************************************/
+
+static MACHINE_START( stactics )
+{
+	stactics_state *state = machine->driver_data;
+
+	state->vert_pos = 0;
+	state->horiz_pos = 0;
+	*state->motor_on = 0;
+}
+
+
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
 static MACHINE_DRIVER_START( stactics )
+
+	MDRV_DRIVER_DATA(stactics_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 1933560)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(stactics_interrupt,1)
+	MDRV_CPU_VBLANK_INT(stactics_interrupt, 1)
+
+	MDRV_MACHINE_START(stactics)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MDRV_IMPORT_FROM(stactics_video)
 
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(stactics)
-	MDRV_VIDEO_START(stactics)
-	MDRV_VIDEO_UPDATE(stactics)
-
-	/* sound hardware */
+	/* audio hardware */
 MACHINE_DRIVER_END
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition
+ *
+ *************************************/
 
 ROM_START( stactics )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -232,5 +350,10 @@ ROM_END
 
 
 
-GAME( 1981, stactics, 0, stactics, stactics, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+/*************************************
+ *
+ *  Game driver
+ *
+ *************************************/
 
+GAMEL( 1981, stactics, 0, stactics, stactics, 0, ORIENTATION_FLIP_X, "Sega", "Space Tactics", GAME_NO_SOUND, layout_stactics )
