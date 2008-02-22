@@ -1076,6 +1076,23 @@ ROM_START( csmash )
 	ROM_LOAD("mpr23427.8", 0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
 ROM_END
 
+ROM_START( csmasho )
+	ROM_REGION( 0x200000, REGION_CPU1, 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x4800000, REGION_USER1, ROMREGION_ERASE00)
+	ROM_LOAD("epr23428.22", 0x0000000, 0x400000, CRC(f8597496) SHA1(2bb9f25b63b7410934ae4b1e052e1308a5c5a57f) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("mpr23420.1", 0x0800000, 0x0800000, CRC(9d5991f2) SHA1(c75871db314b01935d1daaacf1a762e73e5fd411) )
+	ROM_LOAD("mpr23421.2", 0x1000000, 0x0800000, CRC(6c351db3) SHA1(cdd601321a38fc34152517abdc473b73a4c6f630) )
+	ROM_LOAD("mpr23422.3", 0x1800000, 0x0800000, CRC(a1d4bd29) SHA1(6c446fd1819f55412351f15cf57b769c0c56c1db) )
+	ROM_LOAD("mpr23423.4", 0x2000000, 0x0800000, CRC(08cbf373) SHA1(0d9a593f5cc5d632d85d7253c135eef2e8e01598) )
+	ROM_LOAD("mpr23424.5", 0x2800000, 0x0800000, CRC(f4404000) SHA1(e49d941e47e63bb7f3fddc3c3d2c1653611914ee) )
+	ROM_LOAD("mpr23425.6", 0x3000000, 0x0800000, CRC(47f51da2) SHA1(af5ecd460114caed3a00157ffd3a2df0fbf348c0) )
+	ROM_LOAD("mpr23426.7", 0x3800000, 0x0800000, CRC(7f91b13f) SHA1(2d534f77291ebfedc011bf0e803a1b9243fb477f) )
+	ROM_LOAD("mpr23427.8", 0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
+ROM_END
+
 /*
 
 SYSTEMID: NAOMI
@@ -2280,7 +2297,8 @@ ROM_END
 /* Naomi & Naomi GD-ROM */
 GAME( 1998, naomi,    0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 // Complete Dumps
-GAME( 2001, csmash,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, csmash,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (rev. A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, csmasho,  csmash,   naomi,    naomi,    0, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, suchie3,  naomi,    naomi,    naomi,    0, ROT0, "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (set 1)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, vs2_2ka,  vs2_2k,   naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS) (set 2)", GAME_NO_SOUND|GAME_NOT_WORKING )

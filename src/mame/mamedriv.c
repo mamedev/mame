@@ -3980,6 +3980,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Sega Naomi-based (Dreamcast) systems */
 	DRIVER( naomi )
 	DRIVER( csmash )
+	DRIVER( csmasho )
 	DRIVER( vs2_2k )
 	DRIVER( vs2_2ka )
 	DRIVER( smarinef )
