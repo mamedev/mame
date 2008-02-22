@@ -782,6 +782,9 @@
     - Updated technical notes.
     - Cleaned up the driver.
 
+    2008/02/22
+    - Switched the color decoding routines to use resnet code.
+
 
     *** TO DO ***
 
