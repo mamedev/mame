@@ -812,15 +812,15 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))
 		{
 			if ( state->star_ff && (table[counter|offset] & 0x80) )	/* star */
-				*pixel = machine->pens[RADARSCP_STAR_COL];
+				*pixel = RADARSCP_STAR_COL;
 			else if (state->grid_sig && !(table[counter|offset] & 0x80))			/* radar */
-				*pixel = machine->pens[RADARSCP_GRID_COL_OFFSET+state->grid_col];
+				*pixel = RADARSCP_GRID_COL_OFFSET+state->grid_col;
 			else
-				*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + state->blue_level];
+				*pixel = RADARSCP_BCK_COL_OFFSET + state->blue_level;
 			counter++;
 		}
 		else
-			*pixel = machine->pens[RADARSCP_BCK_COL_OFFSET + state->blue_level];
+			*pixel = RADARSCP_BCK_COL_OFFSET + state->blue_level;
 		x++;
 	}
 	while ((counter < table_len) && ( x < 4 * (table[counter|offset] & 0x7f)))

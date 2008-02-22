@@ -125,7 +125,7 @@ static void draw_obj0(mame_bitmap *bitmap, int sy)
     Obj 1 - Text Layer
 
 ***************************************************************************/
-static void draw_obj1(running_machine *machine, mame_bitmap *bitmap)
+static void draw_obj1(mame_bitmap *bitmap)
 {
 	int sx, sy;
 
@@ -178,7 +178,7 @@ static void draw_obj1(running_machine *machine, mame_bitmap *bitmap)
 
 			col = c0 | (c1 << 1) | ((attrib & 0xc0) >> 4);
 			if((col & 0x07) != 0x07)
-				*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[col | 0x20];
+				*BITMAP_ADDR16(bitmap, sy, sx) = col | 0x20;
 		}
 	}
 }
@@ -687,21 +687,21 @@ static TIMER_CALLBACK( changela_scanline_callback )
 	{
 		int riv_col, prev_col;
 
-		if((*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x08])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x09])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == machine->pens[0x0a]))
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx) == 0x08)
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == 0x09)
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx) == 0x0a))
 			riv_col = 1;
 		else
 			riv_col = 0;
 
-		if((*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x08])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x09])
-		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == machine->pens[0x0a]))
+		if((*BITMAP_ADDR16(river_bitmap, sy, sx-1) == 0x08)
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == 0x09)
+		|| (*BITMAP_ADDR16(river_bitmap, sy, sx-1) == 0x0a))
 			prev_col = 1;
 		else
 			prev_col = 0;
 
-		if(*BITMAP_ADDR16(obj0_bitmap, sy, sx) == machine->pens[0x14]) /* Car Outline Color */
+		if(*BITMAP_ADDR16(obj0_bitmap, sy, sx) == 0x14) /* Car Outline Color */
 		{
 			/* Tree 0 Collision */
 			if(*BITMAP_ADDR16(tree0_bitmap, sy, sx) != 0)
@@ -747,7 +747,7 @@ VIDEO_UPDATE( changela )
 	copybitmap_trans(bitmap, obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(machine, bitmap);
+	draw_obj1(bitmap);
 
 	return 0;
 }

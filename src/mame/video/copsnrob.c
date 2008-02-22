@@ -38,40 +38,32 @@ VIDEO_UPDATE( copsnrob )
 
     /* Draw the cars. Positioning was based on a screen shot */
     if (copsnrob_cary[0])
-    {
         drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[0],0,
                 1,0,
                 0xe4,256-copsnrob_cary[0],
                 cliprect,TRANSPARENCY_PEN,0);
-    }
 
     if (copsnrob_cary[1])
-    {
         drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[1],0,
                 1,0,
                 0xc4,256-copsnrob_cary[1],
                 cliprect,TRANSPARENCY_PEN,0);
-    }
 
     if (copsnrob_cary[2])
-    {
         drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[2],0,
                 0,0,
                 0x24,256-copsnrob_cary[2],
                 cliprect,TRANSPARENCY_PEN,0);
-    }
 
     if (copsnrob_cary[3])
-    {
         drawgfx(bitmap,machine->gfx[1],
                 copsnrob_carimage[3],0,
                 0,0,
                 0x04,256-copsnrob_cary[3],
                 cliprect,TRANSPARENCY_PEN,0);
-    }
 
 
     /* Draw the beer truck. Positioning was based on a screen shot.
@@ -143,12 +135,8 @@ VIDEO_UPDATE( copsnrob )
             if (val & mask1)
             {
                 for (y = 0; y <= machine->screen[0].visarea.max_y; y++)
-                {
                     if (copsnrob_bulletsram[y] & mask2)
-                    {
-						*BITMAP_ADDR16(bitmap, y, 256-x) = machine->pens[1];
-                    }
-                }
+						*BITMAP_ADDR16(bitmap, y, 256-x) = 1;
             }
 
             mask1 <<= 1;

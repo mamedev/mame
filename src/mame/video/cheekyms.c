@@ -86,7 +86,7 @@ VIDEO_UPDATE( cheekyms )
 	int offs;
 
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	/* Draw the sprites first, because they're supposed to appear below
        the characters */
@@ -106,9 +106,7 @@ VIDEO_UPDATE( cheekyms )
 		if (v1 & 0x80)
 		{
 			if (!flip_screen)
-			{
 				code++;
-			}
 
 			drawgfx(bitmap,machine->gfx[1],
 					code,

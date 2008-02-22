@@ -1072,7 +1072,7 @@ static int debug_mask(void)
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static int debug_viewer(mame_bitmap *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
 	static int toggle;
@@ -1093,7 +1093,7 @@ static int debug_viewer(running_machine *machine, mame_bitmap *bitmap,const rect
 		dynax_blit_palettes = (c & 0xf) * 0x111;
 		dynax_blit_palbank  = (c >>  4) & 1;
 
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 		memset(dynax_pixmap[0][0],0,sizeof(UINT8)*0x100*0x100);
 		if (layer_layout != LAYOUT_MJDIALQ2)
 			memset(dynax_pixmap[0][1],0,sizeof(UINT8)*0x100*0x100);
@@ -1116,12 +1116,12 @@ VIDEO_UPDATE( hanamai )
 	int layers_ctrl = ~dynax_layer_enable;
 	int lay[4];
 
-	if (debug_viewer(machine,bitmap,cliprect))	return 0;
+	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
 		bitmap,
-		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
 	/* bit 4 = display enable? */
@@ -1152,12 +1152,12 @@ VIDEO_UPDATE( hnoridur )
 	int lay[4];
 	int pri;
 
-	if (debug_viewer(machine,bitmap,cliprect))	return 0;
+	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
 		bitmap,
-		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256],
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256,
 		cliprect);
 
 	pri = hanamai_priority >> 4;
@@ -1187,12 +1187,12 @@ VIDEO_UPDATE( sprtmtch )
 {
 	int layers_ctrl = ~dynax_layer_enable;
 
-	if (debug_viewer(machine,bitmap,cliprect))	return 0;
+	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
 		bitmap,
-		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
 	if (layers_ctrl & 1)	hanamai_copylayer( bitmap, cliprect, 0 );
@@ -1206,12 +1206,12 @@ VIDEO_UPDATE( jantouki )
 
 	int layers_ctrl = dynax_layer_enable;
 
-	if (debug_viewer(machine,bitmap,cliprect))	return 0;
+	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
 		bitmap,
-		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
 	if (screen==0)
@@ -1237,12 +1237,12 @@ VIDEO_UPDATE( mjdialq2 )
 {
 	int layers_ctrl = ~dynax_layer_enable;
 
-	if (debug_viewer(machine,bitmap,cliprect))	return 0;
+	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
 	fillbitmap(
 		bitmap,
-		machine->pens[(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256],
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
 	if (layers_ctrl & 1)	mjdialq2_copylayer( bitmap, cliprect, 0 );

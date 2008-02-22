@@ -1525,7 +1525,7 @@ VIDEO_UPDATE( cave )
 
 	cave_sprite_check(machine, cliprect);
 
-	fillbitmap(bitmap,machine->pens[background_color],cliprect);
+	fillbitmap(bitmap,background_color,cliprect);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with

@@ -19,7 +19,7 @@ VIDEO_UPDATE( destroyr )
 	int i;
 	int j;
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	/* draw major objects */
 
@@ -84,7 +84,7 @@ VIDEO_UPDATE( destroyr )
 	for (i = 0; i < 256; i++)
 	{
 		if (i & 4)
-			*BITMAP_ADDR16(bitmap, destroyr_cursor ^ 0xff, i) = machine->pens[7];
+			*BITMAP_ADDR16(bitmap, destroyr_cursor ^ 0xff, i) = 7;
 	}
 	return 0;
 }

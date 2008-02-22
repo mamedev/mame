@@ -238,6 +238,6 @@ VIDEO_UPDATE( dogfgt )
 
 	draw_sprites(machine, bitmap, cliprect);
 
-	copybitmap_trans(bitmap,pixbitmap,0,0,0,0,cliprect,machine->pens[PIXMAP_COLOR_BASE + 8*pixcolor]);
+	copybitmap_trans(bitmap,pixbitmap,0,0,0,0,cliprect,PIXMAP_COLOR_BASE + 8*pixcolor);
 	return 0;
 }

@@ -171,7 +171,7 @@ static void draw_object(running_machine* machine, mame_bitmap *bitmap, const rec
 	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
 }
 
-static void draw_center(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int sx, sy, x, y, color;
 
@@ -194,7 +194,7 @@ static void draw_center(running_machine* machine, mame_bitmap *bitmap, const rec
 			if (((sy + y) & color_center_bot & 3) == (sy & color_center_bot & 3))
 				for (x = 0; x < 256; x++)
 					if (0 != (x & 16) || 0 != (center_h_shift_space & 1))
-						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = machine->pens[color];
+						*BITMAP_ADDR16(bitmap, sy + y, (sx + x) & 255) = color;
 		}
 }
 
@@ -459,7 +459,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_missiles(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {
@@ -483,7 +483,7 @@ static void draw_missiles(running_machine* machine, mame_bitmap *bitmap, const r
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[(color_missiles >> 4) & 7];
+					*BITMAP_ADDR16(bitmap, sy, sx) = (color_missiles >> 4) & 7;
 				sx++;
 			}
 
@@ -499,7 +499,7 @@ static void draw_missiles(running_machine* machine, mame_bitmap *bitmap, const r
 			for (x = 0; x < 4; x++)
 			{
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, sy, sx) = machine->pens[color_missiles & 7];
+					*BITMAP_ADDR16(bitmap, sy, sx) = color_missiles & 7;
 				sx++;
 			}
 	}
@@ -690,12 +690,12 @@ VIDEO_UPDATE( decocass )
 	if (mode_set & 0x20)
 	{
 		draw_object(machine,bitmap,cliprect);
-		draw_center(machine,bitmap,cliprect);
+		draw_center(bitmap,cliprect);
 	}
 	else
 	{
 		draw_object(machine,bitmap,cliprect);
-		draw_center(machine,bitmap,cliprect);
+		draw_center(bitmap,cliprect);
 		if (mode_set & 0x08)	/* bkg_ena on ? */
 		{
 			clip = bg_tilemap_l_clip;
@@ -709,7 +709,7 @@ VIDEO_UPDATE( decocass )
 	}
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 	draw_sprites(machine,bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
-	draw_missiles(machine,bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
+	draw_missiles(bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
 	return 0;
 }
 

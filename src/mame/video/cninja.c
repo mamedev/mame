@@ -404,7 +404,7 @@ VIDEO_UPDATE( cninja )
 
 	/* Draw playfields */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[512],cliprect);
+	fillbitmap(bitmap,512,cliprect);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
@@ -421,7 +421,7 @@ VIDEO_UPDATE( edrandy )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	if (deco16_raster_display_position)
 		raster_pf3_draw(bitmap,cliprect,0,2);
@@ -453,7 +453,7 @@ VIDEO_UPDATE( robocop2 )
 
 	/* Draw playfields */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0x200],cliprect);
+	fillbitmap(bitmap,0x200,cliprect);
 	if ((deco16_priority&4)==0)
 		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 
@@ -488,7 +488,7 @@ VIDEO_UPDATE( mutantf )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	fillbitmap(bitmap,machine->pens[0x400],cliprect); /* Confirmed */
+	fillbitmap(bitmap,0x400,cliprect); /* Confirmed */
 
 	/* There is no priority prom on this board, but there is a
     priority control word, the only values used in game appear
