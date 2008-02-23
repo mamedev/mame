@@ -1185,7 +1185,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* ask the OSD to update */
 	profiler_mark(PROFILER_BLIT);
-	osd_update(!debug && skipped_it);
+	osd_update(machine, !debug && skipped_it);
 	profiler_mark(PROFILER_END);
 
 	/* perform tasks for this frame */

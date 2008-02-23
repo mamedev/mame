@@ -20,7 +20,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "osdepend.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -74,7 +73,7 @@ static FILE *				sound_log;
 //============================================================
 
 static void 		sound_exit(running_machine *machine);
-static HRESULT		dsound_init(void);
+static HRESULT		dsound_init(running_machine *machine);
 static void			dsound_kill(void);
 static HRESULT		dsound_create_buffers(void);
 static void			dsound_destroy_buffers(void);
@@ -100,7 +99,7 @@ void winsound_init(running_machine *machine)
 
 	// attempt to initialize directsound
 	// don't make it fatal if we can't -- we'll just run without sound
-	dsound_init();
+	dsound_init(machine);
 }
 
 
@@ -174,7 +173,7 @@ static void copy_sample_data(INT16 *data, int bytes_to_copy)
 //  osd_update_audio_stream
 //============================================================
 
-void osd_update_audio_stream(INT16 *buffer, int samples_this_frame)
+void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
 {
 	int bytes_this_frame = samples_this_frame * stream_format.nBlockAlign;
 	DWORD play_position, write_position;
@@ -248,7 +247,7 @@ void osd_set_mastervolume(int attenuation)
 //  dsound_init
 //============================================================
 
-static HRESULT dsound_init(void)
+static HRESULT dsound_init(running_machine *machine)
 {
 	HRESULT result;
 
@@ -281,7 +280,7 @@ static HRESULT dsound_init(void)
 	stream_format.wBitsPerSample	= 16;
 	stream_format.wFormatTag		= WAVE_FORMAT_PCM;
 	stream_format.nChannels			= 2;
-	stream_format.nSamplesPerSec	= Machine->sample_rate;
+	stream_format.nSamplesPerSec	= machine->sample_rate;
 	stream_format.nBlockAlign		= stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec	= stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 
