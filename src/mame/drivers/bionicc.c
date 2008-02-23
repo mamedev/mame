@@ -57,6 +57,8 @@ ToDo:
 #include "deprecat.h"
 #include "sound/2151intf.h"
 
+#define MASTER_CLOCK		XTAL_24MHz
+#define EXO3_F0_CLK			XTAL_14_31818MHz
 
 WRITE16_HANDLER( bionicc_fgvideoram_w );
 WRITE16_HANDLER( bionicc_bgvideoram_w );
@@ -343,14 +345,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bionicc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* ?? MHz ? */
+	MDRV_CPU_ADD(M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT(bionicc_interrupt,8)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */  /* 4 MHz ??? TODO: find real FRQ */
+	/* audio CPU */
+	MDRV_CPU_ADD(Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)	/* ??? */
+	/* FIXME: interrupt timing
+	 * schematics indicate that nmi_line is set on  M680000 access with AB1=1 
+	 * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics 
+	 */
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)	
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
