@@ -285,8 +285,6 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
-
 	/* find the device in the list */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type) && index-- == 0)

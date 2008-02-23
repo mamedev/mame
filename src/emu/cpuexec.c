@@ -163,11 +163,12 @@ void cpu_compute_vblank_timing(running_machine *machine);
 
 void cpuexec_init(running_machine *machine)
 {
+	int numscreens = video_screen_count(machine->config);
 	int cpunum;
 
 	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
        from the visible area */
-	if (machine->screen[0].vblank == 0 && !machine->screen[0].oldstyle_vblank_supplied)
+	if (numscreens > 0 && machine->screen[0].vblank == 0 && !machine->screen[0].oldstyle_vblank_supplied)
 		machine->screen[0].vblank = (machine->screen[0].refresh / machine->screen[0].height) * (machine->screen[0].height - (machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y));
 
 	/* allocate vblank and refresh timers, and compute the initial timing */
@@ -866,10 +867,14 @@ void watchdog_enable(running_machine *machine, int enable)
 
 void cpu_compute_vblank_timing(running_machine *machine)
 {
-	refresh_period = attotime_make(0, machine->screen[0].refresh);
+	int numscreens = video_screen_count(machine->config);
+	attoseconds_t refresh_attosecs;
+
+	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : machine->screen[0].refresh;
+	refresh_period = attotime_make(0, refresh_attosecs);
 
 	/* recompute the vblank period */
-	vblank_period = attotime_make(0, machine->screen[0].refresh / (vblank_multiplier ? vblank_multiplier : 1));
+	vblank_period = attotime_make(0, refresh_attosecs / (vblank_multiplier ? vblank_multiplier : 1));
 	if (vblank_timer != NULL && timer_enable(vblank_timer, FALSE))
 	{
 		attotime remaining = timer_timeleft(vblank_timer);
@@ -1161,6 +1166,8 @@ static void compute_perfect_interleave(running_machine *machine)
 
 static void cpu_inittimers(running_machine *machine)
 {
+	int numscreens = video_screen_count(machine->config);
+	attoseconds_t refresh_attosecs;
 	attotime first_time;
 	int cpunum, max, ipf;
 
@@ -1171,7 +1178,8 @@ static void cpu_inittimers(running_machine *machine)
 	ipf = machine->config->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	timeslice_period = attotime_make(0, machine->screen[0].refresh / ipf);
+	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : machine->screen[0].refresh;
+	timeslice_period = attotime_make(0, refresh_attosecs / ipf);
 	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
 	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);
 
@@ -1220,7 +1228,7 @@ static void cpu_inittimers(running_machine *machine)
 	}
 
 	/* allocate a vblank timer at the frame rate * the LCD number of interrupts per frame */
-	vblank_period = attotime_make(0, machine->screen[0].refresh / vblank_multiplier);
+	vblank_period = attotime_make(0, refresh_attosecs / vblank_multiplier);
 	vblank_countdown = vblank_multiplier;
 
 	/* allocate an update timer that will be used to time the actual screen updates */
