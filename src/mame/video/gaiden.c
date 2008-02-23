@@ -213,111 +213,52 @@ WRITE16_HANDLER( gaiden_videoram_w )
 ***************************************************************************/
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
+
+/* the source data is 3 16-bit indexed bitmaps, we use them to determine which 2 colours
+   to blend into the final 32-bit rgb bitmaps, this is currently broken (due to zsolt's core
+   changes?) it appears that the sprite drawing is no longer putting the correct raw data
+   in the bitmaps? */
 static void blendbitmaps(running_machine *machine,
 		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
 		int sx,int sy,const rectangle *clip)
 {
-	int ox;
-	int oy;
-	int ex;
-	int ey;
-
-	/* check bounds */
-	ox = sx;
-	oy = sy;
-
-	ex = sx + src1->width - 1;
-	if (sx < 0) sx = 0;
-	if (sx < clip->min_x) sx = clip->min_x;
-	if (ex >= dest->width) ex = dest->width - 1;
-	if (ex > clip->max_x) ex = clip->max_x;
-	if (sx > ex) return;
-
-	ey = sy + src1->height - 1;
-	if (sy < 0) sy = 0;
-	if (sy < clip->min_y) sy = clip->min_y;
-	if (ey >= dest->height) ey = dest->height - 1;
-	if (ey > clip->max_y) ey = clip->max_y;
-	if (sy > ey) return;
-
+	int y,x;
+	const pen_t *paldata = machine->pens;
+	
+	for (y=0;y<256;y++)
 	{
-		const pen_t *paldata = machine->pens;
-		UINT32 *end;
+		UINT32 *dd = BITMAP_ADDR32(dest,y, 0);
+		UINT16 *sd1 = BITMAP_ADDR16(src1,y,0);
+		UINT16 *sd2 = BITMAP_ADDR16(src2,y,0);
+		UINT16 *sd3 = BITMAP_ADDR16(src3,y,0);
 
-		UINT16 *sd1 = src1->base;												/* source data   */
-		UINT16 *sd2 = src2->base;
-		UINT16 *sd3 = src3->base;
-
-		int sw = ex-sx+1;														/* source width  */
-		int sh = ey-sy+1;														/* source height */
-		int sm = src1->rowpixels;												/* source modulo */
-
-		UINT32 *dd = BITMAP_ADDR32(dest, sy, sx);								/* dest data     */
-		int dm = dest->rowpixels;											/* dest modulo   */
-
-		sd1 += (sx-ox);
-		sd1 += sm * (sy-oy);
-		sd2 += (sx-ox);
-		sd2 += sm * (sy-oy);
-		sd3 += (sx-ox);
-		sd3 += sm * (sy-oy);
-
-		sm -= sw;
-		dm -= sw;
-
-		while (sh)
+		for (x=0;x<256;x++)
 		{
-
-#define BLENDPIXEL(x)	if (sd3[x]) {														\
-							if (sd2[x]) {													\
-								dd[x] = paldata[sd2[x] | 0x0400] + paldata[sd3[x]];			\
-							} else {														\
-								dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd3[x]];			\
-							}																\
-						} else {															\
-							if (sd2[x]) {													\
-								if (sd2[x] & 0x0800) {										\
-									dd[x] = paldata[sd1[x] | 0x0400] + paldata[sd2[x]];		\
-								} else {													\
-									dd[x] = paldata[sd2[x]];								\
-								}															\
-							} else {														\
-								dd[x] = paldata[sd1[x]];									\
-							}																\
-						}
-
-			end = dd + sw;
-			while (dd <= end - 8)
-			{
-				BLENDPIXEL(0);
-				BLENDPIXEL(1);
-				BLENDPIXEL(2);
-				BLENDPIXEL(3);
-				BLENDPIXEL(4);
-				BLENDPIXEL(5);
-				BLENDPIXEL(6);
-				BLENDPIXEL(7);
-				dd += 8;
-				sd1 += 8;
-				sd2 += 8;
-				sd3 += 8;
-			}
-			while (dd < end)
-			{
-				BLENDPIXEL(0);
-				dd++;
-				sd1++;
-				sd2++;
-				sd3++;
-			}
-			dd += dm;
-			sd1 += sm;
-			sd2 += sm;
-			sd3 += sm;
-			sh--;
-
-#undef BLENDPIXEL
-
+			if (sd3[x]) {
+				if (sd2[x]) {
+					UINT32 coldat1 = paldata[sd2[x] | 0x0400]; // get the first colour from the palette to blend
+					UINT32 coldat2 = paldata[sd3[x]]; // get the second colour from the palette  to blend
+					dd[x] = coldat1 + coldat2; // blend the actual colour data;
+				} else {
+					UINT32 coldat1 = paldata[sd1[x] | 0x0400];  // get the first colour from the palette to blend
+					UINT32 coldat2 = paldata[sd3[x]]; // get the second colour from the palette  to blend
+					dd[x] = coldat1 + coldat2; // blend the actual colour data;
+				}
+			} else {
+				if (sd2[x]) {
+					if (sd2[x] & 0x0800) {
+						UINT32 coldat1 = paldata[sd1[x] | 0x0400];  // get the first colour from the palette to blend
+						UINT32 coldat2 = paldata[sd2[x]]; // get the second colour from the palette  to blend
+						dd[x] = coldat1 + coldat2;  // blend the actual colour data;
+					} else {
+						UINT32 coldat = paldata[sd2[x]];
+						dd[x] = coldat;
+					}
+				} else {
+					UINT32 coldat = paldata[sd1[x]];
+					dd[x] = coldat;
+				}
+			}	
 		}
 	}
 }
