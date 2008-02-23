@@ -732,12 +732,29 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 		{
 			int dx = scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1;
 			int dy = scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1;
+
 			fprintf(out, " width=\"%d\"", dx);
 			fprintf(out, " height=\"%d\"", dy);
 		}
 
 		/* output refresh rate */
 		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+
+		/* output raw video parameters only for games that are not vector */
+		/* and had raw parameters specified                               */
+		if ((scrconfig->type != SCREEN_TYPE_VECTOR) && !scrconfig->defstate.oldstyle_vblank_supplied)
+		{
+			int pixclock = scrconfig->defstate.width * scrconfig->defstate.height 
+			  				* ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh);
+
+			fprintf(out, " pixclock=\"%d\"", pixclock);
+			fprintf(out, " htotal=\"%d\"", scrconfig->defstate.width);
+			fprintf(out, " hbend=\"%d\"", scrconfig->defstate.visarea.min_x);
+			fprintf(out, " hbstart=\"%d\"", scrconfig->defstate.visarea.max_x+1);
+			fprintf(out, " vtotal=\"%d\"", scrconfig->defstate.height);
+			fprintf(out, " vbend=\"%d\"", scrconfig->defstate.visarea.min_y);
+			fprintf(out, " vbstart=\"%d\"", scrconfig->defstate.visarea.max_y+1);
+		}
 		fprintf(out, " />\n");
 	}
 }
@@ -989,6 +1006,13 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST display width CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST display height CDATA #IMPLIED>\n"
 		"\t\t\t<!ATTLIST display refresh CDATA #REQUIRED>\n"
+		"\t\t\t<!ATTLIST display pixclock CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display htotal CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display hbend CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display hbstart CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display vtotal CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display vbend CDATA #IMPLIED>\n"
+		"\t\t\t<!ATTLIST display vbstart CDATA #IMPLIED>\n"
 		"\t\t<!ELEMENT sound EMPTY>\n"
 		"\t\t\t<!ATTLIST sound channels CDATA #REQUIRED>\n"
 		"\t\t<!ELEMENT input (control*)>\n"
