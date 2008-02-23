@@ -25,6 +25,7 @@
 #define VS7		0x00070000
 #define VS71	0x0007000a
 #define VS2005	0x00080000
+#define VS2008	0x00090000
 
 
 
@@ -91,6 +92,7 @@ static const translation_info gcc_translate[] =
 
 static const translation_info ld_translate[] =
 {
+	{ VS2008,	"-lbufferoverflowu","" },
 	{ 0,		"-l*",				"*.lib" },
 	{ 0,		"-o*",				"/out:*" },
 	{ 0,		"-Wl,-Map,*",		"/map:*" },
