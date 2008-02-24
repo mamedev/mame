@@ -97,9 +97,7 @@ static void refresh_pixel_layer(running_machine *machine, mame_bitmap *bitmap)
 	UINT16* p = video_ram;
 
 	if (video_ctrl & 1)
-	{
 		p += 0x20000;
-	}
 
 	for (y = 0; y < machine->screen[0].height; y++)
 	{
@@ -112,16 +110,12 @@ static void refresh_pixel_layer(running_machine *machine, mame_bitmap *bitmap)
 				color |= 0x800 | ((p[x] >> 9) & 0xf);
 
 				if (p[x] & 0x2000)
-				{
 					color &= ~0xf;	  /* hack */
-				}
 			}
 			else
-			{
 				color |= p[x] & 0xf;
-			}
 
-			*BITMAP_ADDR16(bitmap, y, x - 1) = machine->pens[color];
+			*BITMAP_ADDR16(bitmap, y, x - 1) = color;
 		}
 
 		p += 512;

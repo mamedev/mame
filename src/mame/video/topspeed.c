@@ -166,7 +166,7 @@ VIDEO_UPDATE( topspeed )
 	layer[3] = 0;
 
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 #ifdef MAME_DEBUG
 	if (dislayer[3]==0)

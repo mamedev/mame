@@ -771,7 +771,7 @@ static void copy_layers(running_machine *machine, mame_bitmap *bitmap, const rec
 	int i = 0;
 
 	/* fill the screen with the background color */
-	fillbitmap(bitmap, machine->pens[8 * (taitosj_colorbank[1] & 0x07)], cliprect);
+	fillbitmap(bitmap, 8 * (taitosj_colorbank[1] & 0x07), cliprect);
 
 	for (i = 0; i < 4; i++)
 	{

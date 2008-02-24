@@ -1431,7 +1431,7 @@ VIDEO_UPDATE( toaplan2_0 )
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1458,7 +1458,7 @@ VIDEO_UPDATE( dogyuun_1 )
 	mark_tile_priority(0);
 	mark_tile_priority(1);
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1493,7 +1493,7 @@ VIDEO_UPDATE( batsugun_1 )
 	mark_tile_priority(0);
 	mark_tile_priority(1);
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1546,7 +1546,7 @@ VIDEO_UPDATE( batrider_0 )
 		objectbank_dirty = 0;
 	}
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	for (priority = 0; priority < 16; priority++)
 	{
@@ -1585,7 +1585,7 @@ VIDEO_UPDATE( mahoudai_0 )
 	mark_sprite_priority(0);
 	mark_tile_priority(0);
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	if (bg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	if (fg_tile_priority[0][0]) tilemap_draw(bitmap,cliprect,fg_tilemap[0],0,0);

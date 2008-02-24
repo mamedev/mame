@@ -2687,7 +2687,7 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
 {
 	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
@@ -2717,7 +2717,7 @@ static void TC0100SCN_tilemap_draw_fg(running_machine *machine, mame_bitmap *bit
 
 			if ((p&0xf)!=0 || (flags & TILEMAP_DRAW_OPAQUE))
 			{
-				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = machine->pens[p];
+				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = p;
 				if (priority_bitmap)
 				{
 					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
@@ -2749,7 +2749,7 @@ if (disable != 0 && disable != 3 && disable != 7)
 			break;
 		case 1:
 			if (disable & 0x02) return 1;
-			TC0100SCN_tilemap_draw_fg(machine,bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
+			TC0100SCN_tilemap_draw_fg(bitmap,&clip,chip,TC0100SCN_tilemap[chip][1][TC0100SCN_dblwidth[chip]],flags,priority);
 			break;
 		case 2:
 			if (disable & 0x04) return 1;

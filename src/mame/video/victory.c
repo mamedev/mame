@@ -1130,7 +1130,7 @@ VIDEO_UPDATE( victory )
 		}
 
 		/* draw the scanline */
-		draw_scanline8(bitmap, 0, y, 256, scanline, machine->pens, -1);
+		draw_scanline8(bitmap, 0, y, 256, scanline, NULL, -1);
 	}
 
 	return 0;

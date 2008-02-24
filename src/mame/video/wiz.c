@@ -226,7 +226,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 VIDEO_UPDATE( kungfut )
 {
-	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	fillbitmap(bitmap,bgpen,cliprect);
 	draw_background(machine, bitmap, cliprect, 2 + char_bank[0] , 0);
 	draw_foreground(machine, bitmap, cliprect, 0);
 	draw_sprites(machine, bitmap, cliprect, spriteram_2, 4);
@@ -239,7 +239,7 @@ VIDEO_UPDATE( wiz )
 	int bank;
 	const rectangle* visible_area;
 
-	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	fillbitmap(bitmap,bgpen,cliprect);
 	draw_background(machine, bitmap, cliprect, 2 + ((char_bank[0] << 1) | char_bank[1]), 0);
 	draw_foreground(machine, bitmap, cliprect, 0);
 
@@ -255,7 +255,7 @@ VIDEO_UPDATE( wiz )
 
 VIDEO_UPDATE( stinger )
 {
-	fillbitmap(bitmap,machine->pens[bgpen],cliprect);
+	fillbitmap(bitmap,bgpen,cliprect);
 	draw_background(machine, bitmap, cliprect, 2 + char_bank[0], 1);
 	draw_foreground(machine, bitmap, cliprect, 1);
 	draw_sprites(machine, bitmap, cliprect, spriteram_2, 4);

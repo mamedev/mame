@@ -809,7 +809,7 @@ VIDEO_UPDATE( ygv608 )
 		tilemap_set_scroll_cols( tilemap_B, ygv608.page_x );
 
 		// now clear the screen in case we change to 1-plane mode
-		fillbitmap( work_bitmap, machine->pens[0], cliprect );
+		fillbitmap( work_bitmap, 0, cliprect );
 
 		// reset resize flag
 		ygv608.tilemap_resize = 0;
@@ -862,7 +862,7 @@ VIDEO_UPDATE( ygv608 )
 	if ((ygv608.regs.s.r7 & r7_md) & MD_1PLANE)
 	{
 		// If the background tilemap is disabled, we need to clear the bitmap to black
-		fillbitmap (work_bitmap,machine->pens[0],cliprect);
+		fillbitmap (work_bitmap,0,cliprect);
 //      fillbitmap (work_bitmap,1,&machine->screen[0].visarea);
 	}
 	else
@@ -900,9 +900,7 @@ VIDEO_UPDATE( ygv608 )
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
   // - look at why this is the case?!?
-  fillbitmap( work_bitmap,
-              machine->pens[0],
-              &machine->screen[0].visarea );
+  fillbitmap( work_bitmap,0,&machine->screen[0].visarea );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
@@ -917,10 +915,10 @@ VIDEO_UPDATE( ygv608 )
                    ygv608.ay, // + ( machine->screen[0].visarea.min_y << 16 ),
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
                    cliprect,
-                   TRANSPARENCY_PEN, machine->pens[0], 0 );
+                   TRANSPARENCY_PEN, 0, 0 );
   else
 #endif
-    copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, cliprect, machine->pens[0] );
+    copybitmap_trans( bitmap, work_bitmap, 0, 0, 0, 0, cliprect, 0 );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)

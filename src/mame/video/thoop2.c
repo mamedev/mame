@@ -211,7 +211,7 @@ VIDEO_UPDATE( thoop2 )
 
 	thoop2_sort_sprites();
 
-	fillbitmap( bitmap, machine->pens[0], cliprect );
+	fillbitmap( bitmap, 0, cliprect );
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 3,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 3,0);

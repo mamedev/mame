@@ -24,7 +24,7 @@ VIDEO_UPDATE( taxidrvr )
 
 	if (taxidrvr_bghide)
 	{
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 
 
 		/* kludge to fix scroll after death */

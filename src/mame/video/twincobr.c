@@ -500,7 +500,7 @@ VIDEO_UPDATE( toaplan0 )
 
 	if (wardner_sprite_hack) wardner_sprite_priority_hack();
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,0,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(machine, bitmap,cliprect,0x0400);

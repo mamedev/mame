@@ -427,7 +427,7 @@ VIDEO_UPDATE( syvalion )
 	taitoh_log_vram();
 #endif
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,TILEMAP_DRAW_OPAQUE,0);
 	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
@@ -445,7 +445,7 @@ VIDEO_UPDATE( recordbr )
 	taitoh_log_vram();
 #endif
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(KEYCODE_A) )
@@ -476,7 +476,7 @@ VIDEO_UPDATE( dleague )
 	taitoh_log_vram();
 #endif
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(KEYCODE_A) )

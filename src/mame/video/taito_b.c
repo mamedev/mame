@@ -491,7 +491,7 @@ static void TC0180VCU_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect
 }
 
 
-static void draw_framebuffer(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_framebuffer(mame_bitmap *bitmap,const rectangle *cliprect,int priority)
 {
   rectangle myclip = *cliprect;
   int x,y;
@@ -520,7 +520,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0)
-						*dst = machine->pens[b_sp_color_base + c];
+						*dst = b_sp_color_base + c;
 
 					dst--;
 				}
@@ -538,7 +538,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0)
-						*dst = machine->pens[b_sp_color_base + c];
+						*dst = b_sp_color_base + c;
 
 					dst++;
 				}
@@ -562,7 +562,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
-						*dst = machine->pens[b_sp_color_base + c];
+						*dst = b_sp_color_base + c;
 
 					dst--;
 				}
@@ -580,7 +580,7 @@ profiler_mark(PROFILER_USER1);
 					UINT16 c = *src++;
 
 					if (c != 0 && (c & 0x10) == priority)
-						*dst = machine->pens[b_sp_color_base + c];
+						*dst = b_sp_color_base + c;
 
 					dst++;
 				}
@@ -594,14 +594,14 @@ VIDEO_UPDATE( taitob )
 {
   if ((video_control & 0x20) == 0)
   {
-    fillbitmap(bitmap,machine->pens[0],cliprect);
+    fillbitmap(bitmap,0,cliprect);
     return 0;
   }
 
   /* Draw playfields */
   TC0180VCU_tilemap_draw(bitmap,cliprect,bg_tilemap,1);
 
-  draw_framebuffer(machine, bitmap,cliprect,1);
+  draw_framebuffer(bitmap,cliprect,1);
 
   TC0180VCU_tilemap_draw(bitmap,cliprect,fg_tilemap,0);
 
@@ -611,10 +611,10 @@ VIDEO_UPDATE( taitob )
     int scrolly = -pixel_scroll[1]; //+240;
     /* bit 15 of pixel_scroll[0] is probably flip screen */
 
-    copyscrollbitmap_trans(bitmap,pixel_bitmap,1,&scrollx,1,&scrolly,cliprect,machine->pens[b_fg_color_base * 16]);
+    copyscrollbitmap_trans(bitmap,pixel_bitmap,1,&scrollx,1,&scrolly,cliprect,b_fg_color_base * 16);
   }
 
-  draw_framebuffer(machine, bitmap,cliprect,0);
+  draw_framebuffer(bitmap,cliprect,0);
 
   tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

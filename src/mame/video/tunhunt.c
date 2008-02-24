@@ -196,7 +196,7 @@ static void set_pens(colortable_t *colortable)
 	}
 }
 
-static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_motion_object(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -229,10 +229,10 @@ static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, co
 			color = ((span_data>>6)&0x3)^0x3;
 			count = (span_data&0x1f)+1;
 			while( count-- && x < 256 )
-				*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[color];
+				*BITMAP_ADDR16(tmpbitmap, line, x++) = color;
 		}
 		while( x<256 )
-			*BITMAP_ADDR16(tmpbitmap, line, x++) = machine->pens[0];
+			*BITMAP_ADDR16(tmpbitmap, line, x++) = 0;
 	} /* next line */
 
 	switch( tunhunt_ram[VSTRLO] )
@@ -260,12 +260,12 @@ static void draw_motion_object(running_machine *machine, mame_bitmap *bitmap, co
 		scaley,/* incyy */
 		0, /* no wraparound */
 		cliprect,
-		TRANSPARENCY_PEN,machine->pens[0],
+		TRANSPARENCY_PEN,0,
 		0 /* priority */
 	);
 }
 
-static void draw_box(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_box(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -311,7 +311,7 @@ static void draw_box(running_machine *machine, mame_bitmap *bitmap, const rectan
 					}
 				}
 				if (x >= cliprect->min_x && x <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, 0xff-y, x) = machine->pens[color];
+					*BITMAP_ADDR16(bitmap, 0xff-y, x) = color;
 			}
 	}
 }
@@ -373,9 +373,9 @@ VIDEO_UPDATE( tunhunt )
 {
 	set_pens(machine->colortable);
 
-	draw_box(machine, bitmap, cliprect);
+	draw_box(bitmap, cliprect);
 
-	draw_motion_object(machine, bitmap, cliprect);
+	draw_motion_object(bitmap, cliprect);
 
 	draw_shell(machine, bitmap, cliprect,
 		tunhunt_ram[SHL0PC],	/* picture code */

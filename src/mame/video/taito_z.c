@@ -857,7 +857,7 @@ VIDEO_UPDATE( contcirc )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],0,0);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
@@ -884,7 +884,7 @@ VIDEO_UPDATE( chasehq )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
@@ -909,7 +909,7 @@ VIDEO_UPDATE( bshark )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0],cliprect);
+	fillbitmap(bitmap, 0,cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
@@ -934,7 +934,7 @@ VIDEO_UPDATE( sci )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
@@ -959,7 +959,7 @@ VIDEO_UPDATE( aquajack )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,1);
@@ -984,7 +984,7 @@ VIDEO_UPDATE( spacegun )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
@@ -1014,7 +1014,7 @@ VIDEO_UPDATE( dblaxle )
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	/* Ensure screen blanked - this shouldn't be necessary! */
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, 0, cliprect);
 
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,0);

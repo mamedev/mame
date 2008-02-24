@@ -582,7 +582,7 @@ VIDEO_UPDATE( tubep )
 {
 	int DISP_ = DISP^1;
 
-	const pen_t *pens = &machine->pens[ 32 ]; //change it later
+	pen_t pen_base = 32; //change it later
 
 	UINT32 v;
 	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
@@ -609,7 +609,7 @@ VIDEO_UPDATE( tubep )
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				*BITMAP_ADDR16(bitmap, v, h) = machine->pens[(tubep_textram[text_offs + 1] & 0x0f) | color_A4];
+				*BITMAP_ADDR16(bitmap, v, h) = (tubep_textram[text_offs + 1] & 0x0f) | color_A4;
 			else
 			{
 				UINT32 bg_data;
@@ -650,7 +650,7 @@ VIDEO_UPDATE( tubep )
 				if (sp_data != 0x0f)
 					bg_data = prom2[sp_data | color_A4];
 
-				*BITMAP_ADDR16(bitmap, v, h) = pens[ bg_data*64 + romB_data_h ];
+				*BITMAP_ADDR16(bitmap, v, h) = pen_base + bg_data*64 + romB_data_h;
 			}
 		}
 	}
@@ -737,8 +737,6 @@ VIDEO_UPDATE( rjammer )
 {
 	int DISP_ = DISP^1;
 
-	const pen_t *pens = &machine->pens[ 0x00 ];
-
 	UINT32 v;
 	UINT8 *text_gfx_base = memory_region(REGION_GFX1);
 	UINT8 *rom13D  = memory_region(REGION_USER1);
@@ -779,7 +777,7 @@ VIDEO_UPDATE( rjammer )
 			text_gfx_data = text_gfx_base[(text_code << 3) | (v & 0x07)];
 
 			if (text_gfx_data & (0x80 >> (h & 0x07)))
-				*BITMAP_ADDR16(bitmap, v, h) = machine->pens[0x10 | (tubep_textram[text_offs + 1] & 0x0f)];
+				*BITMAP_ADDR16(bitmap, v, h) = 0x10 | (tubep_textram[text_offs + 1] & 0x0f);
 			else
 			{
 				UINT32 sp_data;
@@ -790,7 +788,7 @@ VIDEO_UPDATE( rjammer )
 					sp_data = sp_data1;
 
 				if (sp_data != 0x0f)
-					*BITMAP_ADDR16(bitmap, v, h) = pens[0x00+ sp_data ];
+					*BITMAP_ADDR16(bitmap, v, h) = 0x00 + sp_data;
 				else
 				{
 					UINT32 bg_data;
@@ -843,7 +841,7 @@ VIDEO_UPDATE( rjammer )
 					color_bank =  (pal14h4_pin13 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) & (((bg_data&0x02)>>1)^1) &  (bg_data&0x01)    )
 								| (pal14h4_pin18 & ((bg_data&0x08)>>3) & ((bg_data&0x04)>>2) &  ((bg_data&0x02)>>1)    & ((bg_data&0x01)^1) )
 								| (pal14h4_pin19);
-					*BITMAP_ADDR16(bitmap, v, h) = pens[0x20+ color_bank*0x10 + bg_data ];
+					*BITMAP_ADDR16(bitmap, v, h) = 0x20 + color_bank*0x10 + bg_data;
 				}
 			}
 		}

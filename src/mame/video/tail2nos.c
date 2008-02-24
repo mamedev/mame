@@ -190,6 +190,6 @@ VIDEO_UPDATE( tail2nos )
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,0,cliprect);
 	return 0;
 }

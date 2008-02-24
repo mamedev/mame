@@ -113,7 +113,6 @@ VIDEO_START( thief ){
 VIDEO_UPDATE( thief ){
 	UINT32 offs;
 	int flipscreen = thief_video_control&1;
-	const pen_t *pal_data = machine->pens;
 	const UINT8 *source = videoram;
 
 	if( thief_video_control&4 ) /* visible page */
@@ -130,21 +129,19 @@ VIDEO_UPDATE( thief ){
 		if( flipscreen ){
 			for( bit=0; bit<8; bit++ ){
 				*BITMAP_ADDR16(bitmap, 0xff - ypos, 0xff - (xpos+bit)) =
-					pal_data[
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |
-						(((plane3<<bit)&0x80)>>4)];
+						(((plane3<<bit)&0x80)>>4);
 			}
 		}
 		else {
 			for( bit=0; bit<8; bit++ ){
 				*BITMAP_ADDR16(bitmap, ypos, xpos+bit) =
-					pal_data[
 						(((plane0<<bit)&0x80)>>7) |
 						(((plane1<<bit)&0x80)>>6) |
 						(((plane2<<bit)&0x80)>>5) |
-						(((plane3<<bit)&0x80)>>4)];
+						(((plane3<<bit)&0x80)>>4);
 			}
 		}
 	}
