@@ -783,8 +783,6 @@ static void set_irq_line(int irqline, int linestate)
 				IOREG(REG_INTPEND) &= ~TMS34010_INT2;
 			break;
 	}
-
-	check_interrupt();
 }
 
 
