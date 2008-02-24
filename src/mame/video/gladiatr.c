@@ -272,7 +272,7 @@ VIDEO_UPDATE( ppking )
 			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, sx);
 			while( x <= cliprect->max_x )
 			{
-				if( *BITMAP_ADDR8(flagsbitmap, y, x)&TILEMAP_PIXEL_LAYER0 )
+				if( *BITMAP_ADDR16(flagsbitmap, y, x)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest += 512;
 				}

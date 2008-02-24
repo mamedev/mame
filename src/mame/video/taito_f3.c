@@ -302,7 +302,7 @@ struct f3_playfield_line_inf
 
 	/* use for draw_scanlines */
 	UINT16 *src[256],*src_s[256],*src_e[256];
-	UINT8 *tsrc[256],*tsrc_s[256];
+	UINT16 *tsrc[256],*tsrc_s[256];
 	int x_count[256];
 	UINT32 x_zoom[256];
 	UINT32 clip0[256];
@@ -605,7 +605,7 @@ VIDEO_START( f3 )
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
-	pri_alp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	pri_alp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
 	tile_opaque_pf = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
 
@@ -1378,28 +1378,28 @@ INLINE void draw_scanlines(running_machine *machine,
 	UINT32 sprite_noalp_5=sprite[5]&0x100;
 
 	static UINT16 *src0=0,*src_s0=0,*src_e0=0,clip_al0=0,clip_ar0=0,clip_bl0=0,clip_br0=0;
-	static UINT8 *tsrc0=0,*tsrc_s0=0;
+	static UINT16 *tsrc0=0,*tsrc_s0=0;
 	static UINT32 x_count0=0,x_zoom0=0;
 
 	static UINT16 *src1=0,*src_s1=0,*src_e1=0,clip_al1=0,clip_ar1=0,clip_bl1=0,clip_br1=0;
-	static UINT8 *tsrc1=0,*tsrc_s1=0;
+	static UINT16 *tsrc1=0,*tsrc_s1=0;
 	static UINT32 x_count1=0,x_zoom1=0;
 
 	static UINT16 *src2=0,*src_s2=0,*src_e2=0,clip_al2=0,clip_ar2=0,clip_bl2=0,clip_br2=0;
-	static UINT8 *tsrc2=0,*tsrc_s2=0;
+	static UINT16 *tsrc2=0,*tsrc_s2=0;
 	static UINT32 x_count2=0,x_zoom2=0;
 
 	static UINT16 *src3=0,*src_s3=0,*src_e3=0,clip_al3=0,clip_ar3=0,clip_bl3=0,clip_br3=0;
-	static UINT8 *tsrc3=0,*tsrc_s3=0;
+	static UINT16 *tsrc3=0,*tsrc_s3=0;
 	static UINT32 x_count3=0,x_zoom3=0;
 
 	static UINT16 *src4=0,*src_s4=0,*src_e4=0,clip_al4=0,clip_ar4=0,clip_bl4=0,clip_br4=0;
-	static UINT8 *tsrc4=0,*tsrc_s4=0;
+	static UINT16 *tsrc4=0,*tsrc_s4=0;
 	static UINT32 x_count4=0,x_zoom4=0;
 
 	UINT16 clip_als=0, clip_ars=0, clip_bls=0, clip_brs=0;
 
-	UINT8 *dstp0,*dstp;
+	UINT16 *dstp0,*dstp;
 
 	int yadv = bitmap->rowpixels;
 	int i=0,y=draw_line_num[0];
@@ -1411,7 +1411,7 @@ INLINE void draw_scanlines(running_machine *machine,
 		yadv = -yadv;
 	}
 
-	dstp0 = BITMAP_ADDR8(pri_alp_bitmap, ty, x);
+	dstp0 = BITMAP_ADDR16(pri_alp_bitmap, ty, x);
 
 	pdest_2a = f3_alpha_level_2ad ? 0x10 : 0;
 	pdest_2b = f3_alpha_level_2bd ? 0x20 : 0;
@@ -2060,7 +2060,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 		if(line_t->alpha_mode[y]!=0)
 		{
 			UINT16 *src_s;
-			UINT8 *tsrc_s;
+			UINT16 *tsrc_s;
 
 			x_index_fx = (sx+_x_offset[y]-(10*0x10000)+(10*line_t->x_zoom[y]))&((width_mask<<16)|0xffff);
 			y_index = ((y_index_fx>>16)+_colscroll[y])&0x1ff;
@@ -2078,7 +2078,7 @@ static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, i
 			line_t->src_e[y]=&src_s[width_mask+1];
 			line_t->src[y]=&src_s[x_index_fx>>16];
 
-			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap, y_index, 0);
+			line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR16(flagsbitmap, y_index, 0);
 			line_t->tsrc[y]=&tsrc_s[x_index_fx>>16];
 		}
 
@@ -2186,7 +2186,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 		if(line_t->alpha_mode[y]!=0)
 		{
 			UINT16 *src_s;
-			UINT8 *tsrc_s;
+			UINT16 *tsrc_s;
 
 			// These bits in control ram indicate whether the line is taken from
 			// the VRAM tilemap layer or pixel layer.
@@ -2202,9 +2202,9 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 			line_t->src[y]=&src_s[sx];
 
 			if (usePixelLayer)
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_pixel, sy&0xff, 0);
+				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR16(flagsbitmap_pixel, sy&0xff, 0);
 			else
-				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR8(flagsbitmap_vram, sy&0x1ff, 0);
+				line_t->tsrc_s[y]=tsrc_s=BITMAP_ADDR16(flagsbitmap_vram, sy&0x1ff, 0);
 			line_t->tsrc[y]=&tsrc_s[sx];
 		}
 
@@ -2737,14 +2737,14 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 					int x=(ex-sx-1)|(tile_opaque_sp[code % gfx->total_elements]<<4);
 					UINT8 *source0 = gfx->gfxdata + (source_base+y_index) * 16 + x_index_base;
 					UINT32 *dest0 = BITMAP_ADDR32(dest_bmp, sy, sx);
-					UINT8 *pri0 = BITMAP_ADDR8(pri_alp_bitmap, sy, sx);
+					UINT16 *pri0 = BITMAP_ADDR16(pri_alp_bitmap, sy, sx);
 					int yadv = dest_bmp->rowpixels;
 					dy=dy*16;
 					while(1)
 					{
 						UINT8 *source = source0;
 						UINT32 *dest = dest0;
-						UINT8 *pri = pri0;
+						UINT16 *pri = pri0;
 
 						switch(x)
 						{
@@ -2902,7 +2902,7 @@ INLINE void f3_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
 					{
 						UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * 16;
 						UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-						UINT8 *pri = BITMAP_ADDR8(pri_alp_bitmap, y, 0);
+						UINT16 *pri = BITMAP_ADDR16(pri_alp_bitmap, y, 0);
 
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )

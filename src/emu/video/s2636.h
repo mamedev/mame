@@ -16,7 +16,7 @@ typedef struct _s2636_t s2636_t;
 
 s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset);
 
-/* returns a BITMAP_FORMAT_INDEXED8 bitmap the size of the screen
+/* returns a BITMAP_FORMAT_INDEXED16 bitmap the size of the screen
    D0-D2 of each pixel is the pixel color
    D3 indicates whether the S2636 drew this pixel - 0 = not drawn, 1 = drawn */
 mame_bitmap *s2636_update(s2636_t *s2636, const rectangle *cliprect);

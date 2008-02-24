@@ -1140,7 +1140,7 @@ VIDEO_UPDATE( tms340x0 )
 		for (x = params.hsblnk; x <= cliprect->max_y; x++)
 			dest[x] = blackpen;
 	}
-	else if (bitmap->bpp == 32)
+	else
 	{
 		UINT32 *dest = BITMAP_ADDR32(bitmap, cliprect->min_y, 0);
 		for (x = cliprect->min_x; x < params.heblnk; x++)

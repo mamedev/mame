@@ -694,7 +694,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 				for( ypixel=0; ypixel<gfx->height; ypixel++ )
 				{
 					UINT8 *source = gfx->gfxdata + (source_base+ypixel) * gfx->line_modulo;
-					UINT8 *dest = BITMAP_ADDR8(zoom_bitmap, ypixel + ytile*gfx->height, 0);
+					UINT16 *dest = BITMAP_ADDR16(zoom_bitmap, ypixel + ytile*gfx->height, 0);
 
 					for( xpixel=0; xpixel<gfx->width; xpixel++ )
 					{
@@ -772,7 +772,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT16 *pri = BITMAP_ADDR16(z_bitmap, y, 0);
 
@@ -798,7 +798,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -821,7 +821,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT16 *pri = BITMAP_ADDR16(z_bitmap, y, 0);
 
@@ -847,7 +847,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -870,7 +870,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 								UINT16 *pri = BITMAP_ADDR16(z_bitmap, y, 0);
 
@@ -900,7 +900,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 						{
 							for( y=sy; y<ey; y++ )
 							{
-								UINT8 *source = BITMAP_ADDR8(zoom_bitmap, y_index>>10, 0);
+								UINT16 *source = BITMAP_ADDR16(zoom_bitmap, y_index>>10, 0);
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
@@ -1054,7 +1054,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 VIDEO_START( psikyosh )
 {
-	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
+	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED16);
 
 	/* Need 16-bit z-buffer */
 	z_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);

@@ -131,7 +131,7 @@ static void draw_vdp(mame_bitmap *bitmap, const rectangle *cliprect, int priorit
 	{
 		UINT16 *src = BITMAP_ADDR16(tempbitmap, y, 0);
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{

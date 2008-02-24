@@ -173,8 +173,8 @@ VIDEO_UPDATE( quasar )
             	int bx=255-9-cvs_bullet_ram[offs]-ct;
 
             	/* bullet/object Collision */
-				if (*BITMAP_ADDR8(s2636_0_bitmap, offs, bx) != 0) cvs_collision_register |= 0x04;
-				if (*BITMAP_ADDR8(s2636_2_bitmap, offs, bx) != 0) cvs_collision_register |= 0x08;
+				if (*BITMAP_ADDR16(s2636_0_bitmap, offs, bx) != 0) cvs_collision_register |= 0x04;
+				if (*BITMAP_ADDR16(s2636_2_bitmap, offs, bx) != 0) cvs_collision_register |= 0x08;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = 7;
             }
@@ -192,9 +192,9 @@ VIDEO_UPDATE( quasar )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
-				int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
+				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
+				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
+				int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
 
 				int pixel = pixel0 | pixel1 | pixel2;
 

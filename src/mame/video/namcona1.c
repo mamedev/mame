@@ -295,7 +295,7 @@ static void pdraw_masked_tile(running_machine *machine,
 				int ypos = sy+(flipy?7-y:y);
 				if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
+					UINT16 *pri = BITMAP_ADDR16(priority_bitmap, ypos, 0);
 					UINT16 *dest = BITMAP_ADDR16(bitmap, ypos, 0);
 					if( flipx )
 					{
@@ -342,7 +342,7 @@ static void pdraw_masked_tile(running_machine *machine,
 				int ypos = sy+(flipy?7-y:y);
 				if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
+					UINT16 *pri = BITMAP_ADDR16(priority_bitmap, ypos, 0);
 					UINT16 *dest = BITMAP_ADDR16(bitmap, ypos, 0);
 					if( flipx )
 					{
@@ -402,7 +402,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 	int gfx_pitch;
 	int x,y;
 	int ypos;
-	UINT8 *pri;
+	UINT16 *pri;
 	UINT16 *dest;
 
 	if( sx > cliprect->min_x-8 &&
@@ -422,7 +422,7 @@ static void pdraw_opaque_tile(running_machine *machine,
 			ypos = sy+(flipy?7-y:y);
 			if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 			{
-				pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
+				pri = BITMAP_ADDR16(priority_bitmap, ypos, 0);
 				dest = BITMAP_ADDR16(bitmap, ypos, 0);
 				if( flipx )
 				{
@@ -543,14 +543,14 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 } /* draw_sprites */
 
-static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const pen_t *paldata )
+static void draw_pixel_line( UINT16 *pDest, UINT16 *pPri, UINT16 *pSource, const pen_t *paldata )
 {
 	int x;
 	UINT16 data;
 
-	memset( pPri, 0xff, 38*8 );
 	for( x=0; x<38*8; x+=2 )
 	{
+		pPri[x / 2] = 0xff;
 		data = *pSource++;
 		pDest[x] = paldata[data>>8];
 		pDest[x+1] = paldata[data&0xff];
@@ -608,7 +608,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
                  */
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
-					BITMAP_ADDR8(priority_bitmap, line, 0),
+					BITMAP_ADDR16(priority_bitmap, line, 0),
 					namcona1_sparevram + (ydata-0x4000) + 25,
 					paldata );
 			}

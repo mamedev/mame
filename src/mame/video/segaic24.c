@@ -818,7 +818,7 @@ void sys24_sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect, const int
 										int zx1 = flipx ? 7-zx : zx;
 										UINT32 neweroffset = (newoffset+(zx1>>2))&0x1ffff; // crackdown sometimes attempts to use data past the end of spriteram
 										int c = (sys24_sprite_ram[neweroffset] >> (((~zx1) & 3) << 2)) & 0xf;
-										UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos1, xpos2);
+										UINT16 *pri = BITMAP_ADDR16(priority_bitmap, ypos1, xpos2);
 										if(!(*pri & pm[c])) {
 											c = colors[c];
 											if(c) {

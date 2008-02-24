@@ -288,7 +288,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	rgbint fadeColor = extra->fadeColor;
 	int penmask, penshift;
 	int prioverchar;
-	const UINT8 *pCharPri = BITMAP_ADDR8(priority_bitmap, scanline, 0);
+	const UINT16 *pCharPri = BITMAP_ADDR16(priority_bitmap, scanline, 0);
 	UINT32 *pDest = BITMAP_ADDR32(bitmap, scanline, 0);
 	int x;
 
@@ -496,7 +496,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int alpha = extra->alpha;
 	UINT8 *source = (UINT8 *)extra->source + (y_index>>16) * extra->line_modulo;
 	UINT32 *dest = BITMAP_ADDR32(destmap, scanline, 0);
-	const UINT8 *pCharPri = BITMAP_ADDR8(priority_bitmap, scanline, 0);
+	const UINT16 *pCharPri = BITMAP_ADDR16(priority_bitmap, scanline, 0);
 	int x;
 
 	int bFogEnable = 0;

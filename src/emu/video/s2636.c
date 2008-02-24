@@ -128,8 +128,8 @@ s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int 
 	s2636->y_offset = y_offset;
 	s2636->x_offset = x_offset;
 
-	s2636->bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
-	s2636->collision_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+	s2636->bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
+	s2636->collision_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
 
 	return s2636;
 }
@@ -180,9 +180,9 @@ static void draw_sprite(UINT8 *gfx, int color, int y, int x, int expand,
 						continue;
 
 					if (or_mode)
-						*BITMAP_ADDR8(bitmap, ty, tx) = 0x08 | *BITMAP_ADDR8(bitmap, ty, tx) | color;
+						*BITMAP_ADDR16(bitmap, ty, tx) = 0x08 | *BITMAP_ADDR16(bitmap, ty, tx) | color;
 					else
-						*BITMAP_ADDR8(bitmap, ty, tx) = 0x08 | color;
+						*BITMAP_ADDR16(bitmap, ty, tx) = 0x08 | color;
 				}
 			}
 		}
@@ -233,7 +233,7 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
 					(y > cliprect->max_y))
 					continue;
 
-				checksum = checksum + *BITMAP_ADDR8(s2636->collision_bitmap, y, x);
+				checksum = checksum + *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
 			}
 
 		/* black out second sprite */
@@ -249,7 +249,7 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
 					(y > cliprect->max_y))
 					continue;
 
-				checksum = checksum - *BITMAP_ADDR8(s2636->collision_bitmap, y, x);
+				checksum = checksum - *BITMAP_ADDR16(s2636->collision_bitmap, y, x);
 			}
 	}
 

@@ -7595,65 +7595,8 @@ static void K053250_pdraw_scanline8(
 		mame_bitmap *bitmap,int x,int y,int length,
 		const UINT8 *src,pen_t *pens,int transparent_pen,UINT32 orient,int pri)
 {
-	/* 8bpp destination */
-	if (bitmap->bpp == 8)
-	{
-		/* adjust in case we're oddly oriented */
-		ADJUST_FOR_ORIENTATION(UINT8, orient, bitmap, priority_bitmap, x, y);
-
-		/* with pen lookups */
-		if (pens)
-		{
-			if (transparent_pen == -1)
-				while (length--)
-				{
-					*dsti = pens[*src++];
-					*dstp = pri;
-					dsti += xadv;
-					dstp += xadv;
-				}
-			else
-				while (length--)
-				{
-					UINT32 spixel = *src++;
-					if (spixel != transparent_pen)
-					{
-						*dsti = pens[spixel];
-						*dstp = pri;
-					}
-					dsti += xadv;
-					dstp += xadv;
-				}
-		}
-
-		/* without pen lookups */
-		else
-		{
-			if (transparent_pen == -1)
-				while (length--)
-				{
-					*dsti = *src++;
-					*dstp = pri;
-					dsti += xadv;
-					dstp += xadv;
-				}
-			else
-				while (length--)
-				{
-					UINT32 spixel = *src++;
-					if (spixel != transparent_pen)
-					{
-						*dsti = spixel;
-						*dstp = pri;
-					}
-					dsti += xadv;
-					dstp += xadv;
-				}
-		}
-	}
-
 	/* 16bpp destination */
-	else if(bitmap->bpp == 16)
+	if(bitmap->bpp == 16)
 	{
 		/* adjust in case we're oddly oriented */
 		ADJUST_FOR_ORIENTATION(UINT16, orient, bitmap, priority_bitmap, x, y);
@@ -7983,7 +7926,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, 
 	int src_fx, src_fdx;
 	int pix_data, dst_offset;
 	const pen_t  *pal_base;
-	UINT8  *pri_base;
+	UINT16 *pri_base;
 	UINT32 *dst_base;
 	int dst_adv;
 	UINT8 pri;
@@ -8073,7 +8016,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, 
 		// calculate target increment for horizontal scanlines which is exactly one
 		dst_adv = 1;
 		dst_offset = dst_length;
-		pri_base = BITMAP_ADDR8(priority_bitmap, linepos, dst_start + dst_offset);
+		pri_base = BITMAP_ADDR16(priority_bitmap, linepos, dst_start + dst_offset);
 		dst_base = BITMAP_ADDR32(bitmap, linepos, dst_start + dst_length);
 	}
 	else
@@ -8081,7 +8024,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, 
 		// calculate target increment for vertical scanlines which is the bitmap's pitch value
 		dst_adv = bitmap->rowpixels;
 		dst_offset= dst_length * dst_adv;
-		pri_base = BITMAP_ADDR8(priority_bitmap, dst_start, linepos + dst_offset);
+		pri_base = BITMAP_ADDR16(priority_bitmap, dst_start, linepos + dst_offset);
 		dst_base = BITMAP_ADDR32(bitmap, dst_start, linepos + dst_offset);
 	}
 

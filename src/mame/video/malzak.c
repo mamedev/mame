@@ -40,7 +40,6 @@ static struct
 
 UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
 
-static mame_bitmap* collision_bitmap;
 static s2636_t *s2636_0, *s2636_1;
 UINT8 *malzak_s2636_0_ram;
 UINT8 *malzak_s2636_1_ram;
@@ -57,8 +56,6 @@ static struct playfield
 
 VIDEO_START( malzak )
 {
-	collision_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,BITMAP_FORMAT_INDEXED8);
-
 	saa5050_vidram = auto_malloc(0x800);
 
 	/* configure the S2636 chips */
@@ -233,8 +230,8 @@ VIDEO_UPDATE( malzak )
 
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
-				int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
+				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
+				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
 
 				if (S2636_IS_PIXEL_DRAWN(pixel0))
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);

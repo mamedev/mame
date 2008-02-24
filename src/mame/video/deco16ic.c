@@ -518,7 +518,7 @@ WRITE16_HANDLER( deco16_pf4_data_w )
 
 static void deco16_video_init(int pf12_only, int split, int full_width)
 {
-	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
 
 	pf1_tilemap_16x16 =	tilemap_create(get_pf1_tile_info,   deco16_scan_rows, 16,16,64,32);
 	pf1_tilemap_8x8 =	tilemap_create(get_pf1_tile_info_b, tilemap_scan_rows,8,8,64,32);
@@ -598,7 +598,7 @@ void deco16_2_video_init_half_width(void) /* 2 times playfield generator chips *
 void deco_allocate_sprite_bitmap(void)
 {
 	/* Allow sprite bitmap to be used by Deco32 games as well */
-	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	sprite_priority_bitmap = auto_bitmap_alloc( Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
 }
 
 /*****************************************************************************************/
@@ -861,8 +861,8 @@ void deco16_pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
 	{
 		UINT8 *source = gfx->gfxdata + ((source_base+y_index) * gfx->line_modulo);
 		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-		UINT8 *spri = BITMAP_ADDR8(sprite_priority_bitmap, sy, 0);
+		UINT16 *pri = BITMAP_ADDR16(priority_bitmap, sy, 0);
+		UINT16 *spri = BITMAP_ADDR16(sprite_priority_bitmap, sy, 0);
 
 		if (sy >= 0 && sy < 248)
 		{
@@ -1015,7 +1015,7 @@ static void custom_tilemap_draw(
 					*BITMAP_ADDR16(bitmap, y, x) = Machine->pens[p];
 					if (priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
 						pri[x]|=priority;
 					}
 				}
@@ -1040,7 +1040,7 @@ static void custom_tilemap_draw(
 					*BITMAP_ADDR32(bitmap, y, x) = Machine->pens[p];
 					if (priority_bitmap)
 					{
-						UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+						UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
 						pri[x]|=priority;
 					}
 				}

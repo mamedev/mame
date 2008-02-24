@@ -567,7 +567,7 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 	int i,j;
 	UINT16 *s;
 	UINT16 *d;
-	UINT8 *t;
+	UINT16 *t;
 	UINT32 xscroll_mask, yscroll_mask;
 	mame_bitmap *pen_bitmap;
 	mame_bitmap *flags_bitmap;
@@ -589,7 +589,7 @@ static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const
 
 		d = BITMAP_ADDR16(bitmap, j, 0);
 		s = BITMAP_ADDR16(pen_bitmap, (j+y) & yscroll_mask, 0);
-		t = BITMAP_ADDR8(flags_bitmap, (j+y) & yscroll_mask, 0);
+		t = BITMAP_ADDR16(flags_bitmap, (j+y) & yscroll_mask, 0);
 		for (i=cliprect->min_x+rx; i <= cliprect->max_x+rx; i++)
 		{
 			if (opaque || (t[i & xscroll_mask] & (TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1)))

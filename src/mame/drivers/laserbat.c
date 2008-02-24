@@ -534,9 +534,9 @@ static VIDEO_UPDATE( laserbat )
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int pixel0 = *BITMAP_ADDR8(s2636_0_bitmap, y, x);
-			int pixel1 = *BITMAP_ADDR8(s2636_1_bitmap, y, x);
-			int pixel2 = *BITMAP_ADDR8(s2636_2_bitmap, y, x);
+			int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
+			int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
+			int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel0))
 				*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);
