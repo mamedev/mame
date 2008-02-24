@@ -3982,7 +3982,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( csmash )
 	DRIVER( csmasho )
 	DRIVER( vs2_2k )
-	DRIVER( vs2_2ka )
 	DRIVER( smarinef )
 	DRIVER( cspike )
 	DRIVER( capsnk )
