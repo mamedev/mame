@@ -914,10 +914,17 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gaiden )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        256, 4096 - 256 )	/* tiles 8x8  */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, tile2layout,       768, 4096 - 768 )	/* tiles 16x16 */
-	GFXDECODE_ENTRY( REGION_GFX3, 0, tile2layout,       512, 4096 - 512 )	/* tiles 16x16 */
-	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,        0, 4096 -   0 )	/* sprites 8x8 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        0x100, 16 )	/* tiles 8x8  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile2layout,       0x300, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile2layout,       0x200, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,      0x000, 16 )	/* sprites 8x8 */
+GFXDECODE_END
+
+static GFXDECODE_START( raiga )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, tilelayout,        0x100, 16 )	/* tiles 8x8  */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, tile2layout,       0x300, 16 )	/* tiles 16x16 */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, tile2layout,       0x200, 16 + 128 ) /* tiles 16x16 (only colors 0x00-x0f and 0x80-0x8f are used) */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, spritelayout,      0x000, 16 + 128 ) /* sprites 8x8 (only colors 0x00-x0f and 0x80-0x8f are used) */
 GFXDECODE_END
 
 static const gfx_layout drgnbowl_tile2layout =
@@ -1017,6 +1024,7 @@ static MACHINE_DRIVER_START( raiga )
 
 	MDRV_VIDEO_START(raiga)
 	MDRV_VIDEO_UPDATE(raiga)
+	MDRV_GFXDECODE(raiga)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( drgnbowl )

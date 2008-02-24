@@ -220,45 +220,39 @@ WRITE16_HANDLER( gaiden_videoram_w )
    in the bitmaps? */
 static void blendbitmaps(running_machine *machine,
 		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
-		int sx,int sy,const rectangle *clip)
+		int sx,int sy,const rectangle *cliprect)
 {
 	int y,x;
 	const pen_t *paldata = machine->pens;
-	
-	for (y=0;y<256;y++)
-	{
-		UINT32 *dd = BITMAP_ADDR32(dest,y, 0);
-		UINT16 *sd1 = BITMAP_ADDR16(src1,y,0);
-		UINT16 *sd2 = BITMAP_ADDR16(src2,y,0);
-		UINT16 *sd3 = BITMAP_ADDR16(src3,y,0);
 
-		for (x=0;x<256;x++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT32 *dd  = BITMAP_ADDR32(dest, y, 0);
+		UINT16 *sd1 = BITMAP_ADDR16(src1, y, 0);
+		UINT16 *sd2 = BITMAP_ADDR16(src2, y, 0);
+		UINT16 *sd3 = BITMAP_ADDR16(src3, y, 0);
+
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			if (sd3[x]) {
-				if (sd2[x]) {
-					UINT32 coldat1 = paldata[sd2[x] | 0x0400]; // get the first colour from the palette to blend
-					UINT32 coldat2 = paldata[sd3[x]]; // get the second colour from the palette  to blend
-					dd[x] = coldat1 + coldat2; // blend the actual colour data;
-				} else {
-					UINT32 coldat1 = paldata[sd1[x] | 0x0400];  // get the first colour from the palette to blend
-					UINT32 coldat2 = paldata[sd3[x]]; // get the second colour from the palette  to blend
-					dd[x] = coldat1 + coldat2; // blend the actual colour data;
+			if (sd3[x])
+			{
+				if (sd2[x])
+					dd[x] = paldata[sd2[x] | 0x0400] | paldata[sd3[x]];
+				else
+					dd[x] = paldata[sd1[x] | 0x0400] | paldata[sd3[x]];
+			}
+			else
+			{
+				if (sd2[x])
+				{
+					if (sd2[x] & 0x800)
+						dd[x] = paldata[sd1[x] | 0x0400] | paldata[sd2[x]];
+					else
+						dd[x] = paldata[sd2[x]];
 				}
-			} else {
-				if (sd2[x]) {
-					if (sd2[x] & 0x0800) {
-						UINT32 coldat1 = paldata[sd1[x] | 0x0400];  // get the first colour from the palette to blend
-						UINT32 coldat2 = paldata[sd2[x]]; // get the second colour from the palette  to blend
-						dd[x] = coldat1 + coldat2;  // blend the actual colour data;
-					} else {
-						UINT32 coldat = paldata[sd2[x]];
-						dd[x] = coldat;
-					}
-				} else {
-					UINT32 coldat = paldata[sd1[x]];
-					dd[x] = coldat;
-				}
-			}	
+				else
+					dd[x] = paldata[sd1[x]];
+			}
 		}
 	}
 }
@@ -282,7 +276,7 @@ static void blendbitmaps(running_machine *machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -297,9 +291,7 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg
 	};
 
 	const gfx_element *gfx = machine->gfx[3];
-	mame_bitmap *bitmap = bitmap_bg;
 	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram16;
-	const UINT8 blend_support = (bitmap_fg && bitmap_sp);
 	int count = NUM_SPRITES;
 
 	/* draw all sprites from front to back */
@@ -325,7 +317,7 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg
 			int ypos = source[3] & 0x01ff;
 			int xpos = source[4] & 0x01ff;
 
-			if (!blend_support && (attributes & 0x20) && (cpu_getcurrentframe() & 1))
+			if ((attributes & 0x20) && (cpu_getcurrentframe() & 1))
 				goto skip_sprite;
 
 			color = (color >> 4) & 0x0f;
@@ -360,8 +352,104 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg
 				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;	break;	/* obscured by bg and fg  */
 			}
 
+			for (row = 0; row < sizey; row++)
+			{
+				for (col = 0; col < sizex; col++)
+				{
+					int sx = xpos + 8 * (flipx ? (sizex - 1 - col) : col);
+					int sy = ypos + 8 * (flipy ? (sizey - 1 - row) : row);
+
+					pdrawgfx(bitmap, gfx,
+						number + layout[row][col],
+						color,
+						flipx, flipy,
+						sx, sy,
+						cliprect, TRANSPARENCY_PEN, 0,
+						priority_mask);
+				}
+			}
+		}
+skip_sprite:
+		source -= 8;
+	}
+}
+
+
+static void raiga_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+{
+	static const UINT8 layout[8][8] =
+	{
+		{ 0, 1, 4, 5,16,17,20,21},
+		{ 2, 3, 6, 7,18,19,22,23},
+		{ 8, 9,12,13,24,25,28,29},
+		{10,11,14,15,26,27,30,31},
+		{32,33,36,37,48,49,52,53},
+		{34,35,38,39,50,51,54,55},
+		{40,41,44,45,56,57,60,61},
+		{42,43,46,47,58,59,62,63}
+	};
+
+	const gfx_element *gfx = machine->gfx[3];
+	const UINT16 *source = (NUM_SPRITES - 1) * 8 + spriteram16;
+	int count = NUM_SPRITES;
+
+	/* draw all sprites from front to back */
+	while (count--)
+	{
+		UINT32 attributes = source[0];
+		UINT32 priority_mask;
+		int col,row;
+
+		if (attributes & 0x04)
+		{
+			UINT32 priority = (attributes >> 6) & 3;
+			UINT32 flipx = (attributes & 1);
+			UINT32 flipy = (attributes & 2);
+
+			UINT32 color = source[2];
+			UINT32 sizex = 1 << ((color >> 0) & 3);						/* 1,2,4,8 */
+			UINT32 sizey = 1 << ((color >> gaiden_sprite_sizey) & 3);	/* 1,2,4,8 */
+
+			/* raiga needs something like this */
+			UINT32 number = (source[1] & (sizex > 2 ? 0x7ff8 : 0x7ffc));
+
+			int ypos = source[3] & 0x01ff;
+			int xpos = source[4] & 0x01ff;
+
+			color = (color >> 4) & 0x0f;
+
+			/* wraparound */
+			if (xpos >= 256)
+				xpos -= 512;
+			if (ypos >= 256)
+				ypos -= 512;
+
+			if (flip_screen)
+			{
+				flipx = !flipx;
+				flipy = !flipy;
+
+				xpos = 256 - (8 * sizex) - xpos;
+				ypos = 256 - (8 * sizey) - ypos;
+
+				if (xpos <= -256)
+					xpos += 512;
+				if (ypos <= -256)
+					ypos += 512;
+			}
+
+			/* bg: 1; fg:2; text: 4 */
+			switch( priority )
+			{
+				default:
+				case 0x0: priority_mask = 0;					break;
+				case 0x1: priority_mask = 0xf0;					break;	/* obscured by text layer */
+				case 0x2: priority_mask = 0xf0 | 0xcc;			break;	/* obscured by foreground */
+				case 0x3: priority_mask = 0xf0 | 0xcc | 0xaa;	break;	/* obscured by bg and fg  */
+			}
+
 			/* blending */
-			if (blend_support && (attributes & 0x20))
+			if (attributes & 0x20)
 			{
 				color |= 0x80;
 
@@ -374,18 +462,17 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg
 
 						pdrawgfx(bitmap_sp, gfx,
 							number + layout[row][col],
-							color,
+							color * 16,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
+							cliprect, TRANSPARENCY_PEN_RAW, 0,
 							priority_mask);
 					}
 				}
 			}
 			else
 			{
-				if (blend_support)
-					bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+				mame_bitmap *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
 				for (row = 0; row < sizey; row++)
 				{
@@ -396,16 +483,16 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg
 
 						pdrawgfx(bitmap, gfx,
 							number + layout[row][col],
-							color,
+							color * 16,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
+							cliprect, TRANSPARENCY_PEN_RAW, 0,
 							priority_mask);
 					}
 				}
 			}
 		}
-skip_sprite:
+
 		source -= 8;
 	}
 }
@@ -472,14 +559,14 @@ static void drgnbowl_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 VIDEO_UPDATE( gaiden )
 {
-	fillbitmap(priority_bitmap,                    0, cliprect);
-	fillbitmap(bitmap,          machine->pens[0x200], cliprect);
+	fillbitmap(priority_bitmap, 0, cliprect);
+	fillbitmap(bitmap, 0x200, cliprect);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
 	tilemap_draw(bitmap, cliprect, text_layer, 0, 4);
 
-	gaiden_draw_sprites(machine, bitmap, NULL, NULL, cliprect);
+	gaiden_draw_sprites(machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -500,7 +587,7 @@ VIDEO_UPDATE( raiga )
 	tilemap_draw(tile_bitmap_fg, cliprect,text_layer, 0, 4);
 
 	/* draw sprites into a 16-bit bitmap */
-	gaiden_draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
+	raiga_draw_sprites(machine, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, cliprect);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, sprite_bitmap, 0, 0, cliprect);
