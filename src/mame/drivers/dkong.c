@@ -717,8 +717,10 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)  /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram) 
+									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* sprite set 1 */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) 
+							 		AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				  /* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkong_sh_tuneselect_w)  /* IN0, sound CPU intf */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)  /* IN1 */
@@ -737,8 +739,10 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram) 
+									AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) 
+									AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7800, 0x780f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkongjr_sh_tuneselect_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
@@ -761,8 +765,10 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprite set 1 */
-	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram) 
+									AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
+	AM_RANGE(0x7400, 0x77ff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) 
+									AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_WRITE(soundlatch3_w)
@@ -794,7 +800,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)  /* 0x7000 */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram) 
+									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_WRITE(dkong_sh_tuneselect_w)
 	AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
 	AM_RANGE(0x1500, 0x1500) AM_READ(dkong_in2_r)                                 /* IN2 */
@@ -806,7 +813,8 @@ static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1585, 0x1585) AM_WRITE(p8257_drq_w)								  /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) AM_BASE(&videoram) /* 0x7400 */
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(MRA8_RAM, dkong_videoram_w) 
+									AM_BASE_MEMBER(dkong_state, video_ram)		  /* 0x7400 */
 	AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
 	AM_RANGE(0x1f80, 0x1f8f) AM_READWRITE(dma8257_0_r, dma8257_0_w)				  /* P8257 control registers */
 	/* 0x6800 not remapped */

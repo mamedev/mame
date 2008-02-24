@@ -71,6 +71,9 @@ struct _dkong_state
 	const UINT8 *	color_codes;
 	emu_timer *		scanline_timer;
 	INT8 			vidhw;			/* Selected video hardware RS Conversion / TKG04 */
+	UINT8 *			video_ram;
+	UINT8 *			sprite_ram;
+	size_t 			sprite_ram_size;
 
 	/* radar scope */
 	UINT8	sig30Hz;
@@ -93,7 +96,8 @@ struct _dkong_state
 	UINT16	grid_col;
 	UINT8	sprite_bank;
 	UINT8	dma_latch;
-
+	UINT8 	flip;
+	
 	/* reverse address lookup map - hunchbkd */
 	INT16 rev_map[0x200];
 
