@@ -259,9 +259,9 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR16(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]&0x0f);
-								*BITMAP_ADDR16(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -279,9 +279,9 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR16(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]>>4);
-								*BITMAP_ADDR16(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -303,9 +303,9 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR16(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]>>4);
-								*BITMAP_ADDR16(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;
@@ -323,9 +323,9 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
 							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x &&
 								y >= cliprect->min_y && y <= cliprect->max_y)
 							{
-								if ((*BITMAP_ADDR16(priority_bitmap, y, sx+x) & primask) == 0)
+								if ((*BITMAP_ADDR8(priority_bitmap, y, sx+x) & primask) == 0)
 									*BITMAP_ADDR16(bitmap, y, sx+x) = color*16+(rom[i]&0x0f);
-								*BITMAP_ADDR16(priority_bitmap, y, sx+x) = 8;
+								*BITMAP_ADDR8(priority_bitmap, y, sx+x) = 8;
 							}
 						}
 						x++;

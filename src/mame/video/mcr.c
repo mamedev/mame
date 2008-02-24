@@ -278,7 +278,7 @@ static void render_sprites_91399(running_machine *machine, mame_bitmap *bitmap, 
 			{
 				UINT8 *src = gfx->gfxdata + gfx->char_modulo * code + gfx->line_modulo * (y ^ vflip);
 				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
-				UINT16 *pri = BITMAP_ADDR16(priority_bitmap, sy, 0);
+				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -348,7 +348,7 @@ static void render_sprites_91464(running_machine *machine, mame_bitmap *bitmap, 
 			{
 				UINT8 *src = gfx->gfxdata + gfx->char_modulo * code + gfx->line_modulo * (y ^ vflip);
 				UINT16 *dst = BITMAP_ADDR16(bitmap, sy, 0);
-				UINT16 *pri = BITMAP_ADDR16(priority_bitmap, sy, 0);
+				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)

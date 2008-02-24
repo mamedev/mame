@@ -218,7 +218,7 @@ static void draw_sprite(running_machine *machine,
 	int sy, y, ycount = 0;
 	int dx,dy;
 	UINT16 *dest;
-	UINT16 *pri;
+	UINT8 *pri;
 	unsigned pen, data;
 
 	priority = 1<<priority;
@@ -248,7 +248,7 @@ static void draw_sprite(running_machine *machine,
 				if( sy>=cliprect->min_y && sy<=cliprect->max_y ){
 					source = addr;
 					dest = BITMAP_ADDR16(bitmap, sy, 0);
-					pri = BITMAP_ADDR16(priority_bitmap, sy, 0);
+					pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 					sx = x0;
 					xcount = 0;
 					for( x=width; x; x-=2 ){
@@ -304,7 +304,7 @@ static void draw_sprite(running_machine *machine,
 				if( sy>=cliprect->min_y && sy<=cliprect->max_y ){
 					source = addr;
 					dest = BITMAP_ADDR16(bitmap, sy, 0);
-					pri = BITMAP_ADDR16(priority_bitmap, sy, 0);
+					pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
 					sx = x0;
 					xcount = 0;
 					for( x=width; x; x-=2 ){

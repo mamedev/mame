@@ -183,6 +183,12 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 	/* based on the bpp go from there */
 	switch (dest->bpp)
 	{
+		case 8:
+			/* 8bpp always uses memset */
+			for (y = fill.min_y; y <= fill.max_y; y++)
+				memset(BITMAP_ADDR8(dest, y, fill.min_x), (UINT8)color, fill.max_x + 1 - fill.min_x);
+			break;
+
 		case 16:
 			/* 16bpp can use memset if the bytes are equal */
 			if ((UINT8)(color >> 8) == (UINT8)color)
@@ -237,6 +243,9 @@ int bitmap_format_to_bpp(bitmap_format format)
 	/* choose a depth for the format */
 	switch (format)
 	{
+		case BITMAP_FORMAT_INDEXED8:
+			return 8;
+
 		case BITMAP_FORMAT_INDEXED16:
 		case BITMAP_FORMAT_RGB15:
 		case BITMAP_FORMAT_YUY16:

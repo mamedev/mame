@@ -26,6 +26,7 @@
 enum _bitmap_format
 {
 	BITMAP_FORMAT_INVALID = 0,		/* invalid format */
+	BITMAP_FORMAT_INDEXED8,			/* 8bpp indexed */
 	BITMAP_FORMAT_INDEXED16,		/* 16bpp indexed */
 	BITMAP_FORMAT_INDEXED32,		/* 32bpp indexed */
 	BITMAP_FORMAT_RGB15,			/* 15bpp 5-5-5 RGB */
@@ -72,6 +73,7 @@ struct _bitmap_t
 #define BITMAP_ADDR(bitmap, type, y, x)	\
 	((type *)(bitmap)->base + (y) * (bitmap)->rowpixels + (x))
 
+#define BITMAP_ADDR8(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT8, y, x)
 #define BITMAP_ADDR16(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT16, y, x)
 #define BITMAP_ADDR32(bitmap, y, x)	BITMAP_ADDR(bitmap, UINT32, y, x)
 

@@ -109,7 +109,7 @@ static void draw_sprite( /* slow slow slow, but it's ok for now */
 				if( sy>=16 && sy<256-16 )
 				{
 					UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-					UINT16 *pdest = BITMAP_ADDR16(priority_bitmap, sy, 0);
+					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, sy, 0);
 
 					for( x=0; x<width; x++ )
 					{
@@ -371,7 +371,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT16 *pdest = BITMAP_ADDR16(priority_bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
 
 					for (x = x1; x <= x2; x++)
 					{
@@ -388,7 +388,7 @@ static void draw_layer( mame_bitmap *bitmap, int opaque ){
 				{
 					const UINT16 *gfxptr = gfx_data + ((y - ypos) ^ yxor) * 2;
 					UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-					UINT16 *pdest = BITMAP_ADDR16(priority_bitmap, y, 0);
+					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, y, 0);
 
 					for (x = x1; x <= x2; x++)
 					{

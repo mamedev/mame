@@ -109,7 +109,7 @@ DrawRozHelper(
 					goto L_SkipPixel;
 				}
 
-				if( *BITMAP_ADDR16(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
+				if( *BITMAP_ADDR8(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest = *BITMAP_ADDR16(srcbitmap, ypos, xpos)+rozInfo->color;
 				}

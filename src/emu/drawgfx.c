@@ -848,6 +848,7 @@ INLINE void common_drawgfx(mame_bitmap *dest,const gfx_element *gfx,
 		mame_bitmap *pri_buffer,UINT32 pri_mask)
 {
 	assert(dest != NULL);
+	assert((dest->bpp == 16) || (dest->bpp == 32));
 	assert(gfx != NULL);
 
 	code %= gfx->total_elements;
@@ -927,6 +928,8 @@ static void copybitmap_common(mame_bitmap *dest,mame_bitmap *src,int flipx,int f
 {
 	assert(dest != NULL);
 	assert(src != NULL);
+	assert((dest->bpp == 16) || (dest->bpp == 32));
+	assert(dest->bpp == src->bpp);
 
 	profiler_mark(PROFILER_COPYBITMAP);
 
@@ -974,6 +977,7 @@ static void copyscrollbitmap_common(mame_bitmap *dest,mame_bitmap *src,
 
 	assert(dest != NULL);
 	assert(src != NULL);
+	assert((dest->bpp == 16) || (dest->bpp == 32));
 	assert(dest->bpp == src->bpp);
 	assert((rows != 0) || (rowscroll == NULL));
 	assert((rows == 0) || (rowscroll != NULL));
@@ -1227,6 +1231,7 @@ void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
 {
 	assert(dest != NULL);
 	assert(src != NULL);
+	assert((dest->bpp == 16) || (dest->bpp == 32));
 	assert(dest->bpp == src->bpp);
 
 	profiler_mark(PROFILER_COPYBITMAP);
@@ -1261,6 +1266,7 @@ INLINE void common_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 {
 	/* verify arguments */
 	assert(dest_bmp != NULL);
+	assert((dest_bmp->bpp == 16) || (dest_bmp->bpp == 32));
 	assert(gfx != NULL);
 
 	if ((scalex == 0) || (scaley == 0)) return;
@@ -3717,6 +3723,7 @@ DECLAREG(draw_scanline, (
 		const DATA_TYPE *src,const pen_t *pens,int transparent_pen),
 {
 	assert(bitmap != NULL);
+	assert((bitmap->bpp == 16) || (bitmap->bpp == 32));
 	assert(src != NULL);
 	assert(length > 0);
 	assert(x >= 0);
@@ -3818,7 +3825,7 @@ DECLAREG(pdraw_scanline, (
 		const DATA_TYPE *src,const pen_t *pens,int transparent_pen,int pri),
 {
 	assert(bitmap != NULL);
-	assert(src != NULL);
+	assert((bitmap->bpp == 16) || (bitmap->bpp == 32));
 	assert(length > 0);
 	assert(x >= 0);
 	assert(y >= 0);
@@ -3946,6 +3953,7 @@ DECLAREG(extract_scanline, (
 		DATA_TYPE *dst),
 {
 	assert(bitmap != NULL);
+	assert((bitmap->bpp == 16) || (bitmap->bpp == 32));
 	assert(dst != NULL);
 	assert(length > 0);
 	assert(x >= 0);

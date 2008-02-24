@@ -68,7 +68,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	int global_y = mcatadv_vidregs[1]-0x1f1;
 
 	UINT16 *destline;
-	UINT16 *priline;
+	UINT8 *priline;
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
@@ -129,7 +129,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 
 				if ((drawypos >= cliprect->min_y) && (drawypos <= cliprect->max_y)) {
 					destline = BITMAP_ADDR16(bitmap, drawypos, 0);
-					priline = BITMAP_ADDR16(priority_bitmap, drawypos, 0);
+					priline = BITMAP_ADDR8(priority_bitmap, drawypos, 0);
 
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc) {
 						drawxpos = x+xcnt-global_x;

@@ -565,7 +565,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 							{
 								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(pri_buffer, y, 0);
+								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -612,7 +612,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 							{
 								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(pri_buffer, y, 0);
+								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -1421,7 +1421,7 @@ static void mixDualAlphaSprites(running_machine* machine, mame_bitmap *bitmap, c
 
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
-		UINT16* tilemapPri=BITMAP_ADDR16(priority_bitmap, y, 0);
+		UINT8* tilemapPri=BITMAP_ADDR8(priority_bitmap, y, 0);
 		UINT16* sprite0=BITMAP_ADDR16(sprite0_mix_bitmap, y, 0);
 		UINT16* sprite1=BITMAP_ADDR16(sprite1_mix_bitmap, y, 0);
 		UINT32* destLine=BITMAP_ADDR32(bitmap, y, 0);

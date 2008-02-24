@@ -510,7 +510,7 @@ INLINE void bryan2_drawscanline(
 		const UINT16 *src,int transparent,UINT32 orient,int pri)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
-	UINT16 *dstp = BITMAP_ADDR16(priority_bitmap, y, x);
+	UINT8 *dstp = BITMAP_ADDR8(priority_bitmap, y, x);
 
 	if (transparent) {
 		while (length--) {
@@ -538,7 +538,7 @@ static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int
 	mame_bitmap *flagsbitmap = tilemap_get_flagsmap(wgp_piv_tilemap[layer]);
 
 	UINT16 *dst16,*src16;
-	UINT16 *tsrc;
+	UINT8 *tsrc;
 	int i,y,y_index,src_y_index,row_index,row_zoom;
 
 	/* I have a fairly strong feeling these should be UINT32's, x_index is
@@ -617,7 +617,7 @@ static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int
 
 		x_max = x_index + screen_width * x_step;
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)

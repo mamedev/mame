@@ -355,7 +355,7 @@ static void draw_fg(mame_bitmap *bitmap, const rectangle *cliprect, int priority
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
+		const UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 		UINT16 *src = BITMAP_ADDR16(fg_bitmap, y, 0);
 		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
 

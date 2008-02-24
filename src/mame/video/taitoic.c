@@ -546,7 +546,7 @@ INLINE void taitoic_drawscanline(
 		const UINT16 *src,int transparent,UINT32 orient,int pri, const rectangle *cliprect)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
-	UINT16 *dstp = BITMAP_ADDR16(priority_bitmap, y, x);
+	UINT8 *dstp = BITMAP_ADDR8(priority_bitmap, y, x);
 	int length=cliprect->max_x - cliprect->min_x + 1;
 
 	src+=cliprect->min_x;
@@ -1073,7 +1073,7 @@ static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,i
 							UINT32 priority,UINT16 *color_ctrl_ram)
 {
 	UINT16 *dst16,*src16;
-	UINT16 *tsrc;
+	UINT8 *tsrc;
 	UINT16 scanline[1024];	/* won't be called by a wide-screen game, but just in case... */
 
 	mame_bitmap *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
@@ -1115,7 +1115,7 @@ static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,i
 		x_index = sx - (PC080SN_bgscroll_ram[chip][layer][row_index]);
 
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
@@ -1775,7 +1775,7 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 	else		/* zoom + rowscroll = custom draw routine */
 	{
 		UINT16 *dst16,*src16;
-		UINT16 *tsrc;
+		UINT8 *tsrc;
 		UINT16 scanline[512];
 		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[0]);
 		mame_bitmap *flagsbitmap = tilemap_get_flagsmap(TC0080VCO_tilemap[0]);
@@ -1862,7 +1862,7 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 			x_index = sx - ((TC0080VCO_bgscroll_ram[row_index] << 16));
 
 			src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-			tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+			tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 			dst16 = scanline;
 
 			x_step = zoomx;
@@ -2720,7 +2720,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 				*BITMAP_ADDR16(bitmap, y, x + cliprect->min_x) = p;
 				if (priority_bitmap)
 				{
-					UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
+					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 					pri[x + cliprect->min_x]|=priority;
 				}
 			}
@@ -3608,7 +3608,7 @@ static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 	else	/* zoom */
 	{
 		UINT16 *dst16,*src16;
-		UINT16 *tsrc;
+		UINT8 *tsrc;
 		UINT16 scanline[512];
 		UINT32 sx;
 		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
@@ -3663,7 +3663,7 @@ static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 				- ((TC0480SCP_bgscroll_ram[layer][row_index+0x800] << 8) &0xffff);
 
 			src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-			tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+			tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 			dst16 = scanline;
 
 			x_step = zoomx;

@@ -373,7 +373,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	int x,y,count;
 	int color;
-	UINT16 *pri;
+	UINT8 *pri;
 
 	count = 0;
 	for (y=0;y<512;y++)
@@ -388,7 +388,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 				{
 					*BITMAP_ADDR16(bitmap, (y + bgscrolly) & 0x1ff, (x + bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = BITMAP_ADDR16(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
+					pri = BITMAP_ADDR8(priority_bitmap, (y + bgscrolly) & 0x1ff, 0);
 					pri[(x + bgscrollx) & 0x1ff] |= 2;
 				}
 				else
@@ -398,7 +398,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 					{
 						*BITMAP_ADDR16(bitmap, (y / 2 + bgscrolly) & 0x1ff, (x / 2 + bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = BITMAP_ADDR16(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
+						pri = BITMAP_ADDR8(priority_bitmap, (y / 2 + bgscrolly) & 0x1ff, 0);
 						pri[(x / 2 + bgscrollx) & 0x1ff] |= 2;
 					}
 				}

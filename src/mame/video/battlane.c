@@ -87,9 +87,13 @@ WRITE8_HANDLER( battlane_bitmap_w )
 	for (i = 0; i < 8; i++)
 	{
 		if (data & 1 << i)
-			*BITMAP_ADDR16(screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+		{
+			*BITMAP_ADDR8(screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+		}
 		else
-			*BITMAP_ADDR16(screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+		{
+			*BITMAP_ADDR8(screen_bitmap, offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+		}
 	}
 }
 
@@ -140,9 +144,10 @@ static TILEMAP_MAPPER( battlane_tilemap_scan_rows_2x2 )
 ***************************************************************************/
 VIDEO_START( battlane )
 {
-	bg_tilemap = tilemap_create(get_tile_info_bg, battlane_tilemap_scan_rows_2x2, 16, 16, 32, 32);
+	bg_tilemap = tilemap_create(get_tile_info_bg, battlane_tilemap_scan_rows_2x2,
+		 16, 16, 32, 32);
 
-	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED16);
+	screen_bitmap = auto_bitmap_alloc(32 * 8, 32 * 8, BITMAP_FORMAT_INDEXED8);
 }
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
@@ -218,7 +223,7 @@ static void draw_fg_bitmap(running_machine *machine, mame_bitmap *bitmap )
 	{
 		for (x = 0; x < 32 * 8; x++)
 		{
-			data = *BITMAP_ADDR16(screen_bitmap, y, x);
+			data = *BITMAP_ADDR8(screen_bitmap, y, x);
 
 			if (data)
 			{

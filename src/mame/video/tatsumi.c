@@ -425,7 +425,7 @@ INLINE void roundupt_drawgfxzoomrotate( mame_bitmap *dest_bmp,const gfx_element 
 							{
 								UINT8 *source = gfx->gfxdata + (source_base+(y_index>>16)) * gfx->line_modulo;
 								UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
-								UINT16 *priority_dest = BITMAP_ADDR16(dest_bmp, y, 0);
+								UINT8 *priority_dest = BITMAP_ADDR8(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
 								for( x=sx; x<ex; x++ )
@@ -833,7 +833,7 @@ offset is from last pixel of first road segment?
 		/* Fill in left of road segment */
 		for (x=0; x<startPos && x<320; x++) {
 			int col = linedata[0]&0xf;
-			UINT16 shadow=*BITMAP_ADDR16(shadow_bitmap, y, x);
+			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
 			if (shadow)
 				*BITMAP_ADDR32(bitmap, y, x) = machine->pens[768 + pal*16 + col];
 			else
@@ -852,7 +852,7 @@ offset is from last pixel of first road segment?
 		for (x=startPos; x<320 && (samplePos>>11)<0x80; x++) {
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-			UINT16 shadow=*BITMAP_ADDR16(shadow_bitmap, y, x);
+			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
@@ -883,7 +883,7 @@ offset is from last pixel of first road segment?
 		/* Fill pixels */
 		for (x=startPos; x<320 && x<endPos; x++) {
 			int col = linedata[0x80]&0xf;
-			UINT16 shadow=*BITMAP_ADDR16(shadow_bitmap, y, x);
+			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			//if ((samplePos>>11) > 0x7f)
@@ -907,7 +907,7 @@ offset is from last pixel of first road segment?
 		for (/*x=endPos*/; x<320; x++) {
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-			UINT16 shadow=*BITMAP_ADDR16(shadow_bitmap, y, x);
+			UINT8 shadow=*BITMAP_ADDR8(shadow_bitmap, y, x);
 
 			/* Clamp if we have reached the end of the pixel data */
 			if ((samplePos>>11) > 0x7f)

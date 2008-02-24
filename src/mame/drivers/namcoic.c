@@ -350,7 +350,7 @@ static void zdrawgfxzoom(running_machine *machine,
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-								UINT16 *pri = BITMAP_ADDR16(priority_bitmap, y, 0);
+								UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
 								int x, x_index = x_index_base;
 								if( mPalXOR )
 								{
@@ -1237,7 +1237,7 @@ DrawRozHelper(
 			{
 				UINT32 xpos = (((cx>>16)&size_mask) + rozInfo->left)&0xfff;
 				UINT32 ypos = (((cy>>16)&size_mask) + rozInfo->top)&0xfff;
-				if( *BITMAP_ADDR16(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
+				if( *BITMAP_ADDR8(flagsbitmap, ypos, xpos)&TILEMAP_PIXEL_LAYER0 )
 				{
 					*dest = *BITMAP_ADDR16(srcbitmap,ypos,xpos)+rozInfo->color;
 				}
