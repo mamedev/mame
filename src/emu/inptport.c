@@ -1906,12 +1906,12 @@ const char *input_port_string_from_token(const input_port_token token)
 {
 	int index;
 
-	if (token.fptr == 0)
+	if (token.i == 0)
 		return NULL;
-	if (token.fptr >= INPUT_STRING_COUNT)
+	if (token.i >= INPUT_STRING_COUNT)
 		return token.stringptr;
 	for (index = 0; index < ARRAY_LENGTH(input_port_default_strings); index++)
-		if (input_port_default_strings[index].id == token.fptr)
+		if (input_port_default_strings[index].id == token.i)
 			return input_port_default_strings[index].string;
 	return "(Unknown Default)";
 }
@@ -1935,10 +1935,9 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 	while (entrytype != INPUT_TOKEN_END)
 	{
 		UINT32 mask, defval, type, val;
-
-		/* the entry is the first of a UINT32 pair */
-		/* note that we advance IPT assuming that there is no second half */
-		entrytype = INPUT_PORT_PAIR_UINT32(ipt++, 0);
+		
+		/* unpack the token from the first entry without advancing */
+		TOKEN_GET_UINT32_UNPACK1(ipt, entrytype, 8);
 		switch (entrytype)
 		{
 			/* end */
@@ -1947,7 +1946,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			/* including */
 			case INPUT_TOKEN_INCLUDE:
-				input_port_detokenize(param, (ipt++)->tokenptr);
+				input_port_detokenize(param, TOKEN_GET_PTR(ipt, tokenptr));
 				break;
 
 			/* start of a new input port */
@@ -1956,46 +1955,43 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				modify_tag = NULL;
 				port = input_port_initialize(param, IPT_PORT, NULL, 0, 0);
 				if (entrytype == INPUT_TOKEN_START_TAG)
-					port->start.tag = (ipt++)->stringptr;
+					port->start.tag = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* modify an existing port */
 			case INPUT_TOKEN_MODIFY:
-				modify_tag = (ipt++)->stringptr;
+				modify_tag = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* input bit definition */
 			case INPUT_TOKEN_BIT:
-				type = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-				mask = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				defval = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, type, 24);
+				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				port = input_port_initialize(param, type, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				break;
 
 			/* append a code */
 			case INPUT_TOKEN_CODE:
-				val = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[0] > 0)
 					port->seq.code[seq_index[0]++] = SEQCODE_OR;
 				port->seq.code[seq_index[0]++] = val;
 				break;
 
 			case INPUT_TOKEN_CODE_DEC:
-				val = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[1] > 0)
 					port->analog.decseq.code[seq_index[1]++] = SEQCODE_OR;
 				port->analog.decseq.code[seq_index[1]++] = val;
 				break;
 
 			case INPUT_TOKEN_CODE_INC:
-				val = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[2] > 0)
 					port->analog.incseq.code[seq_index[2]++] = SEQCODE_OR;
 				port->analog.incseq.code[seq_index[2]++] = val;
@@ -2039,8 +2035,8 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				break;
 
 			case INPUT_TOKEN_IMPULSE:
-				port->impulse = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->impulse, 24);
 				break;
 
 			case INPUT_TOKEN_REVERSE:
@@ -2057,43 +2053,42 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			/* analog settings */
 			case INPUT_TOKEN_MINMAX:
-				port->analog.min = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				port->analog.max = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_GET_UINT64_UNPACK2(ipt, port->analog.min, 32, port->analog.max, 32);
 				break;
 
 			case INPUT_TOKEN_SENSITIVITY:
-				port->analog.sensitivity = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.sensitivity, 24);
 				break;
 
 			case INPUT_TOKEN_KEYDELTA:
-				port->analog.delta = port->analog.centerdelta = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.delta, -24);
+				port->analog.centerdelta = port->analog.delta;
 				break;
 
 			case INPUT_TOKEN_CENTERDELTA:
-				port->analog.centerdelta = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.centerdelta, -24);
 				break;
 
 			case INPUT_TOKEN_CROSSHAIR:
-				port->analog.crossaxis = INPUT_PORT_PAIR_UINT32(--ipt, 1) & 0xff;
-				port->analog.crossaltaxis = (float)((INT32)INPUT_PORT_PAIR_UINT32(ipt, 1) >> 8) / 65536.0f;
-				ipt += INPUT_PORT_PAIR_TOKENS;
-				port->analog.crossscale = (float)(INT32)INPUT_PORT_PAIR_UINT32(ipt, 0) / 65536.0f;
-				port->analog.crossoffset = (float)(INT32)INPUT_PORT_PAIR_UINT32(ipt, 1) / 65536.0f;
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, port->analog.crossaxis, 4, port->analog.crossaltaxis, -20);
+				TOKEN_GET_UINT64_UNPACK2(ipt, port->analog.crossscale, -32, port->analog.crossoffset, -32);
+				port->analog.crossaltaxis *= 1.0f / 65536.0f;
+				port->analog.crossscale *= 1.0f / 65536.0f;
+				port->analog.crossoffset *= 1.0f / 65536.0f;
 				break;
 
 			case INPUT_TOKEN_FULL_TURN_COUNT:
-				port->analog.full_turn_count = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.full_turn_count, 24);
 				break;
 
 			case INPUT_TOKEN_POSITIONS:
-				port->analog.max = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.max, 24);
 				break;
 
 			case INPUT_TOKEN_WRAPS:
@@ -2101,7 +2096,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				break;
 
 			case INPUT_TOKEN_REMAP_TABLE:
-				port->analog.remap_table = (ipt++)->remapptr;
+				port->analog.remap_table = TOKEN_GET_PTR(ipt, ui32ptr);
 				break;
 
 			case INPUT_TOKEN_INVERT:
@@ -2110,25 +2105,21 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			/* custom callbacks */
 			case INPUT_TOKEN_CUSTOM:
-				port->custom = (ipt++)->customptr;
-				port->custom_param = (ipt++)->ptr;
+				port->custom = TOKEN_GET_PTR(ipt, customptr);
+				port->custom_param = TOKEN_GET_PTR(ipt, voidptr);
 				break;
 
 			/* dip switch definition */
 			case INPUT_TOKEN_DIPNAME:
-				mask = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				defval = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				port = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_DIPSETTING:
-				defval = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
 				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
@@ -2136,44 +2127,37 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			/* physical location */
 			case INPUT_TOKEN_DIPLOCATION:
-				input_port_parse_diplocation(port, (ipt++)->stringptr);
+				input_port_parse_diplocation(port, TOKEN_GET_STRING(ipt));
 				break;
 
 			/* conditionals for dip switch settings */
 			case INPUT_TOKEN_CONDITION:
-				port->condition.condition = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-				port->condition.mask = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				port->condition.value = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-				port->condition.tag = (ipt++)->stringptr;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->condition.condition, 24);
+				TOKEN_GET_UINT64_UNPACK2(ipt, port->condition.mask, 32, port->condition.value, 32);
+				port->condition.tag = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* analog adjuster definition */
 			case INPUT_TOKEN_ADJUSTER:
-				defval = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
 				port = input_port_initialize(param, IPT_ADJUSTER, modify_tag, 0xff, defval | (defval << 8));
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				port->name = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* configuration definition */
 			case INPUT_TOKEN_CONFNAME:
-				mask = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				defval = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				port = input_port_initialize(param, IPT_CONFIG_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_CONFSETTING:
-				defval = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
 				port = input_port_initialize(param, IPT_CONFIG_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
@@ -2181,9 +2165,8 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 #ifdef MESS
 			case INPUT_TOKEN_CHAR:
-				val = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, val, 24);
 				{
 					int ch;
 					for (ch = 0; port->keyboard.chars[ch] != 0; ch++)
@@ -2194,24 +2177,20 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			/* category definition */
 			case INPUT_TOKEN_CATEGORY:
-				port->category = (UINT16) INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->category, 24);
 				break;
 
 			case INPUT_TOKEN_CATEGORY_NAME:
-				mask = INPUT_PORT_PAIR_UINT32(ipt, 0);
-				defval = INPUT_PORT_PAIR_UINT32(ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				port = input_port_initialize(param, IPT_CATEGORY_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_CATEGORY_SETTING:
-				defval = INPUT_PORT_PAIR_UINT32(--ipt, 1);
-				ipt += INPUT_PORT_PAIR_TOKENS;
-
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
 				port = input_port_initialize(param, IPT_CATEGORY_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);

@@ -83,7 +83,7 @@ static quark_table *defstr_table;
 INLINE const char *input_port_string_from_index(UINT32 index)
 {
 	input_port_token token;
-	token.fptr = index;
+	token.i = index;
 	return input_port_string_from_token(token);
 }
 

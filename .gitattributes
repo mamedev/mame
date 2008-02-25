@@ -894,6 +894,7 @@ src/emu/tilemap.c svneol=native#text/plain
 src/emu/tilemap.h svneol=native#text/plain
 src/emu/timer.c svneol=native#text/plain
 src/emu/timer.h svneol=native#text/plain
+src/emu/tokenize.h svneol=native#text/plain
 src/emu/ui.c svneol=native#text/plain
 src/emu/ui.h svneol=native#text/plain
 src/emu/uigfx.c svneol=native#text/plain

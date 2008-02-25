@@ -16,6 +16,7 @@
 
 #include "memory.h"
 #include "inputseq.h"
+#include "tokenize.h"
 
 #ifdef MESS
 #include "unicode.h"
@@ -504,14 +505,9 @@ typedef void (*input_port_changed_func)(void *param, UINT32 oldval, UINT32 newva
 typedef union _input_port_token input_port_token;
 union _input_port_token
 {
-	FPTR		fptr;								/* default value used for C89 implementations */
-	UINT32		i[INPUT_PORT_PAIR_ENTRIES];			/* one or two UINT32s */
-	float		f[INPUT_PORT_PAIR_ENTRIES];			/* one or two floats */
-	void *		ptr;								/* a generic pointer value */
-	const char *stringptr;							/* pointer to a string value */
-	const input_port_token *tokenptr;				/* pointer to a another token list */
-	input_port_custom_func customptr;				/* pointer to a custom input function */
-	const UINT32 *remapptr;							/* pointer to a remap table */
+	TOKEN_COMMON_FIELDS
+	const input_port_token *tokenptr;
+	input_port_custom_func customptr;
 };
 
 
@@ -649,195 +645,198 @@ struct _ext_inp_header
 
 #define IP_NAME_DEFAULT 				NULL
 
-/* single pointers and UINT32s are just encoded straight */
-#define INPUT_PORT_PTR(type,x)			{ (FPTR)(x) }
-#define INPUT_PORT_PAIR_UINT32(vptr,x)	(vptr)->i[x]
-
-/* on 64-bit platforms, pairs of UINT32s are encoded into a single 64-bit pointer */
-#ifdef PTR64
-#ifdef LSB_FIRST
-#define INPUT_PORT_UINT32_PAIR(x,y)		{ (FPTR)((UINT32)(x) | ((UINT64)(y) << 32)) }
-#else
-#define INPUT_PORT_UINT32_PAIR(x,y)		{ (FPTR)((UINT32)(y) | ((UINT64)(x) << 32)) }
-#endif
-#define INPUT_PORT_UINT32(x)			INPUT_PORT_UINT32_PAIR(x,0)
-
-/* on 32-bit platforms, pairs of UINT32s are encoded in two consecutive 32-bit pointers */
-#else
-#define INPUT_PORT_UINT32(x)			{ (FPTR)(UINT32)(x) }
-#define INPUT_PORT_UINT32_PAIR(x,y)		INPUT_PORT_UINT32(x), INPUT_PORT_UINT32(y)
-#endif
-
 /* start of table */
-#define INPUT_PORTS_START(name) \
-	const input_port_token ipt_##name[] = {
+#define INPUT_PORTS_START(_name) \
+	const input_port_token ipt_##_name[] = {
 
 /* end of table */
 #define INPUT_PORTS_END \
-	INPUT_PORT_UINT32(INPUT_TOKEN_END) };
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_END, 8) };
 
 /* aliasing */
-#define INPUT_PORTS_EXTERN(name) \
-	extern const input_port_token ipt_##name[]
+#define INPUT_PORTS_EXTERN(_name) \
+	extern const input_port_token ipt_##_name[]
 
 /* including */
-#define PORT_INCLUDE(name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_INCLUDE), INPUT_PORT_PTR(tokenptr, &ipt_##name[0]),
+#define PORT_INCLUDE(_name) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_INCLUDE, 8), \
+	TOKEN_PTR(tokenptr, &ipt_##_name[0]),
 
 /* start of a new input port */
 #define PORT_START \
-	INPUT_PORT_UINT32(INPUT_TOKEN_START),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_START, 8),
 
 /* start of a new input port (with included tag) */
-#define PORT_START_TAG(tag_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_START_TAG), INPUT_PORT_PTR(stringptr, tag_),
+#define PORT_START_TAG(_tag) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_START_TAG, 8), \
+	TOKEN_STRING(_tag),
 
 /* modify an existing port */
-#define PORT_MODIFY(tag_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_MODIFY), INPUT_PORT_PTR(stringptr, tag_),
+#define PORT_MODIFY(_tag) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_MODIFY, 8), \
+	TOKEN_STRING(_tag),
 
 /* input bit definition */
-#define PORT_BIT(mask_,default_,type_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_BIT, type_), INPUT_PORT_UINT32_PAIR(mask_, default_),
+#define PORT_BIT(_mask,_default,_type) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_BIT, 8, _type, 24), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
 
 /* append a code */
-#define PORT_CODE(code) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CODE, code),
+#define PORT_CODE(_code) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE, 8, _code, 32),
 
-#define PORT_CODE_DEC(code) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CODE_DEC, code),
+#define PORT_CODE_DEC(_code) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE_DEC, 8, _code, 32),
 
-#define PORT_CODE_INC(code) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CODE_INC, code),
+#define PORT_CODE_INC(_code) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_CODE_INC, 8, _code, 32),
 
 /* joystick flags */
 #define PORT_2WAY \
-	INPUT_PORT_UINT32(INPUT_TOKEN_2WAY),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_2WAY, 8),
 
 #define PORT_4WAY \
-	INPUT_PORT_UINT32(INPUT_TOKEN_4WAY),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_4WAY, 8),
 
 #define PORT_8WAY \
-	INPUT_PORT_UINT32(INPUT_TOKEN_8WAY),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_8WAY, 8),
 
 #define PORT_16WAY \
-	INPUT_PORT_UINT32(INPUT_TOKEN_16WAY),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_16WAY, 8),
 
 #define PORT_ROTATED \
-	INPUT_PORT_UINT32(INPUT_TOKEN_ROTATED),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_ROTATED, 8),
 
 /* general flags */
-#define PORT_NAME(name_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_NAME), INPUT_PORT_PTR(stringptr, name_),
+#define PORT_NAME(_name) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_NAME, 8), \
+	TOKEN_STRING(_name),
 
 #define PORT_PLAYER(player_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_PLAYER1 + (((player_) - 1) % MAX_PLAYERS)),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_PLAYER1 + (((player_) - 1) % MAX_PLAYERS), 8),
 
 #define PORT_COCKTAIL \
-	INPUT_PORT_UINT32(INPUT_TOKEN_COCKTAIL),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_COCKTAIL, 8),
 
 #define PORT_TOGGLE \
-	INPUT_PORT_UINT32(INPUT_TOKEN_TOGGLE),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_TOGGLE, 8),
 
-#define PORT_IMPULSE(duration_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_IMPULSE, duration_),
+#define PORT_IMPULSE(_duration) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_TOGGLE, 8, _duration, 24),
 
 #define PORT_REVERSE \
-	INPUT_PORT_UINT32(INPUT_TOKEN_REVERSE),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_REVERSE, 8),
 
 #define PORT_RESET \
-	INPUT_PORT_UINT32(INPUT_TOKEN_RESET),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_RESET, 8),
 
 #define PORT_UNUSED \
-	INPUT_PORT_UINT32(INPUT_TOKEN_UNUSED),
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_UNUSED, 8),
 
 /* analog settings */
-/* if this macro is not used, the minimum defaluts to 0 and maximum defaluts to the mask value */
-#define PORT_MINMAX(min_,max_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_MINMAX), INPUT_PORT_UINT32_PAIR(min_, max_),
+/* if this macro is not used, the minimum defaluts to 0 and maximum defaults to the mask value */
+#define PORT_MINMAX(_min,_max) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_MINMAX, 8), \
+	TOKEN_UINT64_PACK2(_min, 32, _max, 32),
 
-#define PORT_SENSITIVITY(sensitivity_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_SENSITIVITY, sensitivity_),
+#define PORT_SENSITIVITY(_sensitivity) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_SENSITIVITY, 8, _sensitivity, 24),
 
-#define PORT_KEYDELTA(delta_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_KEYDELTA, delta_),
+#define PORT_KEYDELTA(_delta) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_KEYDELTA, 8, _delta, 24),
 
 /* note that PORT_CENTERDELTA must appear after PORT_KEYDELTA */
-#define PORT_CENTERDELTA(delta_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CENTERDELTA, delta_),
+#define PORT_CENTERDELTA(_delta) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_CENTERDELTA, 8, _delta, 24),
 
 #define PORT_CROSSHAIR(axis, scale, offset, altaxis) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CROSSHAIR, CROSSHAIR_AXIS_##axis | ((INT32)((altaxis) * 65536.0f) << 8)), \
-	INPUT_PORT_UINT32_PAIR((INT32)((scale) * 65536.0f), (INT32)((offset) * 65536.0f)),
+	TOKEN_UINT32_PACK3(INPUT_TOKEN_CROSSHAIR, 8, CROSSHAIR_AXIS_##axis, 4, (INT32)((altaxis) * 65536.0f), 20), \
+	TOKEN_UINT64_PACK2((INT32)((scale) * 65536.0f), 32, (INT32)((offset) * 65536.0f), 32),
 
 /* how many optical counts for 1 full turn of the control */
-#define PORT_FULL_TURN_COUNT(count_)								\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_FULL_TURN_COUNT, count_),
+#define PORT_FULL_TURN_COUNT(_count) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_FULL_TURN_COUNT, 8, _count, 24),
 
 /* positional controls can be binary or 1 of X */
 /* 1 of X not completed yet */
 /* if it is specified as PORT_REMAP_TABLE then it is binary, but remapped */
 /* otherwise it is binary */
-#define PORT_POSITIONS(positions_)									\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_POSITIONS, positions_),
+#define PORT_POSITIONS(_positions) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_POSITIONS, 8, _positions, 24),
 
 /* positional control wraps at min/max */
-#define PORT_WRAPS								\
-	INPUT_PORT_UINT32(INPUT_TOKEN_WRAPS),
+#define PORT_WRAPS \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_WRAPS, 8),
 
 /* positional control uses this remap table */
-#define PORT_REMAP_TABLE(table_)										\
-	INPUT_PORT_UINT32(INPUT_TOKEN_REMAP_TABLE), INPUT_PORT_PTR(remapptr, table_),
+#define PORT_REMAP_TABLE(_table) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_REMAP_TABLE, 8), \
+	TOKEN_PTR(ui32ptr, _table),
 
 /* positional control bits are active low */
-#define PORT_INVERT													\
-	INPUT_PORT_UINT32(INPUT_TOKEN_INVERT),
+#define PORT_INVERT \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_INVERT, 8),
 
 /* custom callbacks */
-#define PORT_CUSTOM(callback_, param_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_CUSTOM), INPUT_PORT_PTR(customptr, callback_), INPUT_PORT_PTR(ptr, param_),
+#define PORT_CUSTOM(_callback, _param) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_CUSTOM, 8), \
+	TOKEN_PTR(customptr, _callback), \
+	TOKEN_PTR(voidptr, _param),
 
 /* dip switch definition */
-#define PORT_DIPNAME(mask,default,name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_DIPNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_DIPNAME(_mask,_default,_name) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPNAME, 8), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
+	TOKEN_STRING(_name),
 
-#define PORT_DIPSETTING(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_DIPSETTING, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_DIPSETTING(_default,_name) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_DIPSETTING, 8, _default, 32), \
+	TOKEN_STRING(_name), 
 
 /* physical location, of the form: name:[!]sw,[name:][!]sw,... */
 /* note that these are specified LSB-first */
-#define PORT_DIPLOCATION(location_) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_DIPLOCATION), INPUT_PORT_PTR(stringptr, location_),
+#define PORT_DIPLOCATION(_location) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPLOCATION, 8), \
+	TOKEN_STRING(_location), 
 
 /* conditionals for dip switch settings */
-#define PORT_CONDITION(tag_,mask_,condition_,value_) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONDITION, condition_), INPUT_PORT_UINT32_PAIR(mask_, value_), INPUT_PORT_PTR(stringptr, tag_),
+#define PORT_CONDITION(_tag,_mask,_condition,_value) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_CONDITION, 8, _condition, 24), \
+	TOKEN_UINT64_PACK2(_mask, 32, _value, 32), \
+	TOKEN_STRING(_tag),
 
 /* analog adjuster definition */
-#define PORT_ADJUSTER(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_ADJUSTER, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_ADJUSTER(_default,_name) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_ADJUSTER, 8, _default, 32), \
+	TOKEN_STRING(_name), 
 
 /* config definition */
-#define PORT_CONFNAME(mask,default,name) \
-	INPUT_PORT_UINT32(INPUT_TOKEN_CONFNAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_CONFNAME(_mask,_default,_name) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_CONFNAME, 8), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
+	TOKEN_STRING(_name),
 
-#define PORT_CONFSETTING(default,name) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CONFSETTING, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_CONFSETTING(_default,_name) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_CONFSETTING, 8, _default, 32), \
+	TOKEN_STRING(_name), 
 
 #ifdef MESS
 /* keyboard chars */
-#define PORT_CHAR(ch)	\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CHAR, ch),
+#define PORT_CHAR(_ch) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_CHAR, 8, _ch, 24),
 
 /* categories */
-#define PORT_CATEGORY(category) \
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
+#define PORT_CATEGORY(_category) \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_CHAR, 8, _category, 24),
 
-#define PORT_CATEGORY_CLASS(mask,default,name) 						\
-	INPUT_PORT_UINT32(INPUT_TOKEN_CATEGORY_NAME), INPUT_PORT_UINT32_PAIR(mask, default), INPUT_PORT_PTR(stringptr, name),
+#define PORT_CATEGORY_CLASS(_mask,_default,_name) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_CATEGORY_NAME, 8), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
+	TOKEN_STRING(_name),
 
-#define PORT_CATEGORY_ITEM(default,name,category) 					\
-	INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY_SETTING, default), INPUT_PORT_PTR(stringptr, name), INPUT_PORT_UINT32_PAIR(INPUT_TOKEN_CATEGORY, category),
+#define PORT_CATEGORY_ITEM(_default,_name) \
+	TOKEN_UINT64_PACK2(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32), \
+	TOKEN_STRING(_name), 
 #endif /* MESS */
 
 
