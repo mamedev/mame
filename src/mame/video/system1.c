@@ -288,7 +288,7 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 		x_flipped = x;
 		y = y_flipped = sy+row;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			y_flipped = 258 - sy - height + row;
 			x_flipped = (252*2) - x;
@@ -322,13 +322,13 @@ static void draw_sprite(mame_bitmap *bitmap,int spr_number)
 			if (color1)
 				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
 			x++;
-			x_flipped += flip_screen ? -1 : 1;
+			x_flipped += flip_screen_get() ? -1 : 1;
 
 			if (color2 == 15) break;
 			if (color2)
 				draw_pixel(bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
 			x++;
-			x_flipped += flip_screen ? -1 : 1;
+			x_flipped += flip_screen_get() ? -1 : 1;
 		}
 	}
 }
@@ -382,7 +382,7 @@ static int system1_draw_fg(running_machine *machine, mame_bitmap *bitmap, const 
 			sx = (offs/2) % 32;
 			sy = (offs/2) / 32;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 31 - sx;
 				sy = 31 - sy;
@@ -396,7 +396,7 @@ static int system1_draw_fg(running_machine *machine, mame_bitmap *bitmap, const 
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						8*sx + blockgal_kludgeoffset,8*sy,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
@@ -441,7 +441,7 @@ static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 				sx = (offs/2) % 32;
 				sy = (offs/2) / 32;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 31 - sx;
 					sy = 31 - sy;
@@ -450,14 +450,14 @@ static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 				drawgfx(tmp_bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						8*sx,8*sy,
 						0,TRANSPARENCY_NONE,0);
 			}
 		}
 
 		/* copy the temporary bitmap to the screen */
-		if (flip_screen)
+		if (flip_screen_get())
 			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,cliprect);
 		else
 			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,cliprect);
@@ -479,7 +479,7 @@ static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 				sx = (offs/2) % 32;
 				sy = (offs/2) / 32;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 8*(31-sx) + background_scrollx_flip;
 					sy = 8*(31-sy) + background_scrolly_flip;
@@ -494,25 +494,25 @@ static void system1_draw_bg(running_machine *machine, mame_bitmap *bitmap, const
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						sx,sy,
 						cliprect,TRANSPARENCY_PEN,0);
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						sx-256,sy,
 						cliprect,TRANSPARENCY_PEN,0);
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						sx,sy-256,
 						cliprect,TRANSPARENCY_PEN,0);
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						sx-256,sy-256,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
@@ -583,7 +583,7 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 				sx = (offs/2) % 32;
 				sy = (offs/2) / 32;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 31 - sx;
 					sy = 31 - sy;
@@ -592,7 +592,7 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 				drawgfx(tmp_bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						8*sx,8*sy,
 						0,TRANSPARENCY_NONE,0);
 			}
@@ -601,7 +601,7 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 		/* copy the temporary bitmap to the screen */
 		if (choplifter_scroll_x_on)
 		{
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				int scrollx_row_flip[32],i;
 
@@ -633,7 +633,7 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 				sx = (offs/2) % 32;
 				sy = (offs/2) / 32;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 8*(31-sx);
 
@@ -653,7 +653,7 @@ static void chplft_draw_bg(running_machine *machine, mame_bitmap *bitmap, const 
 				drawgfx(bitmap,machine->gfx[0],
 						code,
 						color,
-						flip_screen,flip_screen,
+						flip_screen_get(),flip_screen_get(),
 						sx,8*sy,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
@@ -736,7 +736,7 @@ static void wbml_draw_bg(running_machine *machine, mame_bitmap *bitmap, const re
 				if (x > 256) x -= 512;
 				if (y > 224) y -= 512;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -750,14 +750,14 @@ static void wbml_draw_bg(running_machine *machine, mame_bitmap *bitmap, const re
 					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
+							flip_screen_get(),flip_screen_get(),
 							x,y,
 							cliprect, TRANSPARENCY_NONE, 0);
 				else if (priority)
 					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
+							flip_screen_get(),flip_screen_get(),
 							x,y,
 							cliprect, TRANSPARENCY_PEN, 0);
 
@@ -782,7 +782,7 @@ static void wbml_draw_fg(running_machine *machine, mame_bitmap *bitmap, const re
 		code = wbml_paged_videoram[offs] | (wbml_paged_videoram[offs+1] << 8);
 		code = ((code >> 4) & 0x800) | (code & 0x7ff);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
@@ -791,7 +791,7 @@ static void wbml_draw_fg(running_machine *machine, mame_bitmap *bitmap, const re
 		drawgfx(bitmap,machine->gfx[0],
 				code,
 				(code >> 5) & 0x3f,
-				flip_screen,flip_screen,
+				flip_screen_get(),flip_screen_get(),
 				8*sx,8*sy,
 				cliprect,TRANSPARENCY_PEN,0);
 	}
@@ -837,7 +837,7 @@ static void ufosensi_draw_bg(running_machine *machine, mame_bitmap *bitmap, cons
 				if (x > 256) x -= 512;
 				if (y > 224) y -= 512;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -851,14 +851,14 @@ static void ufosensi_draw_bg(running_machine *machine, mame_bitmap *bitmap, cons
 					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
+							flip_screen_get(),flip_screen_get(),
 							x,y,
 							cliprect, TRANSPARENCY_NONE, 0);
 				else if (priority)
 					drawgfx(bitmap,machine->gfx[0],
 							code,
 							((code >> 5) & 0x3f) + 64,
-							flip_screen,flip_screen,
+							flip_screen_get(),flip_screen_get(),
 							x,y,
 							cliprect, TRANSPARENCY_PEN, 0);
 

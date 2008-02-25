@@ -334,7 +334,7 @@ static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rect
         /* check priority */
         if ((priority != -1) && (priority != ((code >> 7) & 0x01)))  continue;
 
-        if (flip_screen)
+        if (flip_screen_get())
         {
             x = 31 - x;
             y = 31 - y;
@@ -343,7 +343,7 @@ static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rect
         drawgfx(bitmap,machine->gfx[0],
                 code,
                 color,
-                flip_screen,flip_screen,
+                flip_screen_get(),flip_screen_get(),
                 8*x,8*y,
                 cliprect,transparency,0);
     }
@@ -370,7 +370,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
         flipx = sprite_ram[offs + 0] & 0x04;
         flipy = sprite_ram[offs + 0] & 0x02;
 
-        if (flip_screen)
+        if (flip_screen_get())
         {
             x = 240 - x;
             y = 240 - y + sprite_y_adjust_flip_screen;
@@ -388,7 +388,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
                 x, y,
                 cliprect,TRANSPARENCY_PEN,0);
 
-        y = y + (flip_screen ? -256 : 256);
+        y = y + (flip_screen_get() ? -256 : 256);
 
         // Wrap around
         drawgfx(bitmap,machine->gfx[1],
@@ -422,7 +422,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
             int x = 240 - (16 * (offs / 16) + scroll);
             int y = 16 * (offs % 16);
 
-            if (flip_screen)
+            if (flip_screen_get())
             {
                 x = 240 - x;
                 y = 240 - y;
@@ -431,7 +431,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
             drawgfx(bitmap, machine->gfx[2],
                     memory_region(REGION_GFX3)[tileoffset + offs],
                     color,
-                    flip_screen,flip_screen,
+                    flip_screen_get(),flip_screen_get(),
                     x,y,
                     cliprect,TRANSPARENCY_NONE,0);
         }
@@ -485,7 +485,7 @@ VIDEO_UPDATE( btime )
         // Generate tile map
         static UINT8 btime_tilemap[4];
 
-        if (flip_screen)
+        if (flip_screen_get())
             start = 0;
         else
             start = 1;
@@ -566,7 +566,7 @@ VIDEO_UPDATE( bnj )
             sy = 16 * (((offs % 0x100) < 0x80) ? offs % 8 : (offs % 8) + 8);
             sx = 496 - sx;
 
-            if (flip_screen)
+            if (flip_screen_get())
             {
                 sx = 496 - sx;
                 sy = 240 - sy;
@@ -575,14 +575,14 @@ VIDEO_UPDATE( bnj )
             drawgfx(background_bitmap, machine->gfx[2],
                     (bnj_backgroundram[offs] >> 4) + ((offs & 0x80) >> 3) + 32,
                     0,
-                    flip_screen, flip_screen,
+                    flip_screen_get(), flip_screen_get(),
                     sx, sy,
                     0, TRANSPARENCY_NONE, 0);
         }
 
         /* copy the background bitmap to the screen */
         scroll = (bnj_scroll1 & 0x02) * 128 + 511 - bnj_scroll2;
-        if (!flip_screen)
+        if (!flip_screen_get())
             scroll = 767-scroll;
         copyscrollbitmap (bitmap, background_bitmap, 1, &scroll, 0, 0, cliprect);
 
@@ -613,7 +613,7 @@ VIDEO_UPDATE( cookrace )
         sx = 31 - (offs / 32);
         sy = offs % 32;
 
-        if (flip_screen)
+        if (flip_screen_get())
         {
             sx = 31 - sx;
             sy = 31 - sy;
@@ -622,7 +622,7 @@ VIDEO_UPDATE( cookrace )
         drawgfx(bitmap, machine->gfx[2],
                 bnj_backgroundram[offs],
                 0,
-                flip_screen, flip_screen,
+                flip_screen_get(), flip_screen_get(),
                 8*sx,8*sy,
                 cliprect, TRANSPARENCY_NONE, 0);
     }

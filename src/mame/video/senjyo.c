@@ -198,11 +198,11 @@ static void draw_bgbitmap(running_machine *machine, mame_bitmap *bitmap,const re
 		count = 0;
 		strwid = senjyo_bgstripes;
 		if (strwid == 0) strwid = 0x100;
-		if (flip_screen) strwid ^= 0xff;
+		if (flip_screen_get()) strwid ^= 0xff;
 
 		for (x = 0;x < 256;x++)
 		{
-			if (flip_screen)
+			if (flip_screen_get())
 				for (y = 0;y < 256;y++)
 					*BITMAP_ADDR16(bitmap, y, 255 - x) = 384 + pen;
 			else
@@ -232,7 +232,7 @@ static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -267,7 +267,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			flipx = spriteram[offs+1] & 0x40;
 			flipy = spriteram[offs+1] & 0x80;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -312,7 +312,7 @@ VIDEO_UPDATE( senjyo )
 
 		scrollx = senjyo_scrollx1[0];
 		scrolly = senjyo_scrolly1[0] + 256 * senjyo_scrolly1[1];
-		if (flip_screen)
+		if (flip_screen_get())
 			scrollx = -scrollx;
 		tilemap_set_scrollx(bg1_tilemap,0,scrollx);
 		tilemap_set_scrolly(bg1_tilemap,0,scrolly);
@@ -324,14 +324,14 @@ VIDEO_UPDATE( senjyo )
 			scrollx = senjyo_scrollx1[0];
 			scrolly = senjyo_scrolly1[0] + 256 * senjyo_scrolly1[1];
 		}
-		if (flip_screen)
+		if (flip_screen_get())
 			scrollx = -scrollx;
 		tilemap_set_scrollx(bg2_tilemap,0,scrollx);
 		tilemap_set_scrolly(bg2_tilemap,0,scrolly);
 
 		scrollx = senjyo_scrollx3[0];
 		scrolly = senjyo_scrolly3[0] + 256 * senjyo_scrolly3[1];
-		if (flip_screen)
+		if (flip_screen_get())
 			scrollx = -scrollx;
 		tilemap_set_scrollx(bg3_tilemap,0,scrollx);
 		tilemap_set_scrolly(bg3_tilemap,0,scrolly);

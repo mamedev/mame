@@ -109,7 +109,7 @@ WRITE8_HANDLER( sonson_colorram_w )
 
 WRITE8_HANDLER( sonson_flipscreen_w )
 {
-	if (flip_screen != (~data & 0x01))
+	if (flip_screen_get() != (~data & 0x01))
 	{
 		flip_screen_set(~data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -145,7 +145,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs + 0];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

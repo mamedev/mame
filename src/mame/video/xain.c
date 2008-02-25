@@ -184,7 +184,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		sy = 240 - spriteram[offs];
 		if (sy <= -7) sy += 256;
 		flipx = attr & 0x40;
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 239 - sx;
 			sy = 240 - sy;
@@ -196,13 +196,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			drawgfx(bitmap,machine->gfx[3],
 					numtile,
 					color,
-					flipx,flip_screen,
-					sx-1,flip_screen?sy+16:sy-16,
+					flipx,flip_screen_get(),
+					sx-1,flip_screen_get() ? sy+16:sy-16,
 					cliprect,TRANSPARENCY_PEN,0);
 			drawgfx(bitmap,machine->gfx[3],
 					numtile+1,
 					color,
-					flipx,flip_screen,
+					flipx,flip_screen_get(),
 					sx-1,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}
@@ -211,7 +211,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			drawgfx(bitmap,machine->gfx[3],
 					numtile,
 					color,
-					flipx,flip_screen,
+					flipx,flip_screen_get(),
 					sx,sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}

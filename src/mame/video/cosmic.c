@@ -267,7 +267,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 		{
 			if (data & 0x80)
 			{
-				if (flip_screen)
+				if (flip_screen_get())
 					*BITMAP_ADDR16(bitmap, 255-y, 255-x) = pen;
 				else
 					*BITMAP_ADDR16(bitmap, y, x) = pen;
@@ -333,7 +333,7 @@ static void cosmica_draw_starfield(mame_bitmap *bitmap, const rectangle *cliprec
 			UINT8 x1;
 			int hc, hb_;
 
-			if (flip_screen)
+			if (flip_screen_get())
 				x1 = x - cpu_getcurrentframe();
 			else
 				x1 = x + cpu_getcurrentframe();
@@ -404,7 +404,7 @@ static void devzone_draw_grid(mame_bitmap *bitmap, const rectangle *cliprect)
 				if (!(vert_data & horz_data & 0x80))	/* NAND gate */
 				{
 					/* blue */
-					if (flip_screen)
+					if (flip_screen_get())
 						*BITMAP_ADDR16(bitmap, 255-y, 255-x) = 4;
 					else
 						*BITMAP_ADDR16(bitmap, y, x) = 4;
@@ -489,7 +489,7 @@ static void nomnlnd_draw_background(mame_bitmap *bitmap, const rectangle *clipre
 				if (!hd_ & hc_ & !hb_)
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
-					              (flip_screen ? 0x80 : 0);
+					              (flip_screen_get() ? 0x80 : 0);
 
 					UINT8 plane1 = PROM[offs         ] << (x & 0x07);
 					UINT8 plane2 = PROM[offs | 0x0400] << (x & 0x07);
@@ -523,7 +523,7 @@ static void nomnlnd_draw_background(mame_bitmap *bitmap, const rectangle *clipre
 
 			if (color != 0)
 			{
-				if (flip_screen)
+				if (flip_screen_get())
 					*BITMAP_ADDR16(bitmap, 255-y, 255-x) = color;
 				else
 					*BITMAP_ADDR16(bitmap, y, x) = color;

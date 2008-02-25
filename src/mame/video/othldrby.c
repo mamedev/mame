@@ -153,7 +153,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		sizex = (buf_spriteram[offs+2] & 0x000f) + 1;
 		sizey = (buf_spriteram[offs+3] & 0x000f) + 1;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -185,7 +185,7 @@ VIDEO_UPDATE( othldrby )
 
 	for (layer = 0;layer < 3;layer++)
 	{
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			tilemap_set_scrollx(bg_tilemap[layer],0,vreg[2*layer]+59);
 			tilemap_set_scrolly(bg_tilemap[layer],0,vreg[2*layer+1]+248);

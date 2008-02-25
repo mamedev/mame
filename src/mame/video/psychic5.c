@@ -318,7 +318,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 224 - sx;
 			sy = 224 - sy;
@@ -354,7 +354,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		}
 		else
 		{
-			if (flip_screen)
+			if (flip_screen_get())
 				DRAW_SPRITE(code, sx + 16, sy + 16)
 			else
 				DRAW_SPRITE(code, sx, sy)

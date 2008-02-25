@@ -196,7 +196,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		sx = 8 * (offset % 128);
 		sy = 8 * (offset / 128);
 
-		if (flip_screen)
+		if (flip_screen_get())
 			sy = 512-8 - sy;
 
 		colour = data & 0x0f;
@@ -213,7 +213,7 @@ WRITE8_HANDLER( popeye_bitmap_w )
 		sx = 8 * (offset % 64);
 		sy = 4 * (offset / 64);
 
-		if (flip_screen)
+		if (flip_screen_get())
 			sy = 512-4 - sy;
 
 		colour = data & 0x0f;
@@ -277,12 +277,12 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	int offs;
 	static int lastflip = 0;
 
-	if (lastflip != flip_screen)
+	if (lastflip != flip_screen_get())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
 			popeye_bitmap_w(offs,popeye_bitmapram[offs]);
 
-		lastflip = flip_screen;
+		lastflip = flip_screen_get();
 	}
 
 	set_background_palette(machine, (*popeye_palettebank & 0x08) >> 3);
@@ -298,7 +298,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		if (bitmap_type == TYPE_SKYSKIPR)
 			scrollx = 2*scrollx - 512;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			if (bitmap_type == TYPE_POPEYE)
 				scrollx = -scrollx;
@@ -344,7 +344,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		sx = 2*(spriteram[offs])-8;
 		sy = 2*(256-spriteram[offs + 1]);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			flipx = !flipx;
 			flipy = !flipy;

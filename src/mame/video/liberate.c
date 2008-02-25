@@ -215,7 +215,7 @@ static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		if (multi && fy==0) sy-=16;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fy)
@@ -276,7 +276,7 @@ static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
@@ -332,7 +332,7 @@ static void boomrang_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 //      if (multi) sy-=16;
 		if (fy && multi) { code2=code; code++; }
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;

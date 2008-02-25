@@ -241,7 +241,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			code2 = code1 + 0x40;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy2 = 192 - sy1;
@@ -281,14 +281,14 @@ static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rec
 			0*8, 6*8-1,
 			1*8, 31*8-1
 		};
-		rectangle clip = flip_screen ? clippanelflip : clippanel;
-		int sx = flip_screen ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
-		int yoffs = flip_screen ? -40 : -16;
+		rectangle clip = flip_screen_get() ? clippanelflip : clippanel;
+		int sx = flip_screen_get() ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
+		int yoffs = flip_screen_get() ? -40 : -16;
 
 		clip.min_y += machine->screen[0].visarea.min_y + yoffs;
 		clip.max_y += machine->screen[0].visarea.max_y + yoffs;
 
-		copybitmap(bitmap, scroll_panel_bitmap, flip_screen, flip_screen,
+		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(), flip_screen_get(),
 				   sx, machine->screen[0].visarea.min_y + yoffs, &clip);
 	}
 }

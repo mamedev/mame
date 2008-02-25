@@ -215,7 +215,7 @@ static void esd16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 		sy	 =	0x100 - ((sy & 0xff)  - (sy & 0x100));
 		sy	-=	dimy*16;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 
@@ -274,7 +274,7 @@ static void hedpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 
 		sy = 0x1ff-sy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	flipx = !flipx;		sx = max_x - sx -    1 * 16 + 2;	// small offset
 			flipy = !flipy;		sy = max_y - sy - dimy * 16;	}
 

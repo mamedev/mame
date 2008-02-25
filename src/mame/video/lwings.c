@@ -203,7 +203,7 @@ static void lwings_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			flipx = buffered_spriteram[offs + 1] & 0x02;
 			flipy = buffered_spriteram[offs + 1] & 0x04;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -252,7 +252,7 @@ static void trojan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 				flipy = 1;
 			}
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

@@ -185,7 +185,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = sr[offs + 1] & 0x40;
 		int flipy = sr[offs + 1] & 0x80;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

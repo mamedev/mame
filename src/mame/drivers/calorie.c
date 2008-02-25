@@ -141,7 +141,7 @@ static VIDEO_UPDATE( calorie )
 		ypos = 0xff - calorie_sprites[x+2];
 		xpos = calorie_sprites[x+3];
 
-		if(flip_screen)
+		if(flip_screen_get())
 		{
 			if( calorie_sprites[x+1] & 0x10 )
 				ypos = 0xff - ypos + 32;

@@ -222,7 +222,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -292,9 +292,9 @@ VIDEO_UPDATE( gladiatr )
 		int scroll;
 
 		scroll = bg_scrollx + ((video_attributes & 0x04) << 6);
-		tilemap_set_scrollx(bg_tilemap, 0, scroll ^ (flip_screen ? 0x0f : 0));
+		tilemap_set_scrollx(bg_tilemap, 0, scroll ^ (flip_screen_get() ? 0x0f : 0));
 		scroll = fg_scrollx + ((video_attributes & 0x08) << 5);
-		tilemap_set_scrollx(fg_tilemap, 0, scroll ^ (flip_screen ? 0x0f : 0));
+		tilemap_set_scrollx(fg_tilemap, 0, scroll ^ (flip_screen_get() ? 0x0f : 0));
 
 		// always 0 anyway
 		tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);

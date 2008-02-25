@@ -222,7 +222,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
 		int color = spriteram_2[offs + 1] & 0x3f;
-		if (flip_screen) sx += 32-2;
+		if (flip_screen_get()) sx += 32-2;
 
 		drawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
@@ -245,7 +245,7 @@ static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const re
 
 		x = bosco_radarx[offs] + ((~bosco_radarattr[offs] & 0x01) << 8);
 		y = 253 - bosco_radary[offs];
-		if (flip_screen) x -= 3;
+		if (flip_screen_get()) x -= 3;
 
 		drawgfx(bitmap,machine->gfx[2],
 				((bosco_radarattr[offs] & 0x0e) >> 1) ^ 0x07,
@@ -280,7 +280,7 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 				/* dont draw the stars that are off the screen */
 				if ( x < 224 && y < 224 )
 				{
-					if (flip_screen) x += 64;
+					if (flip_screen_get()) x += 64;
 
 					if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
 						*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
@@ -297,7 +297,7 @@ VIDEO_UPDATE( bosco )
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
 	rectangle bg_clip = *cliprect;
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		bg_clip.min_x = 8*8;
 		fg_clip.max_x = 8*8-1;

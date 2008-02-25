@@ -64,8 +64,6 @@ extern UINT16 *paletteram16_2;
 
 extern mame_bitmap *tmpbitmap;
 
-extern int flip_screen_x, flip_screen_y;
-
 
 
 /***************************************************************************
@@ -123,11 +121,14 @@ void buffer_spriteram_2(UINT8 *ptr, int length);
 
 /* set global attributes */
 void flip_screen_set(int on);
+void flip_screen_set_no_update(int on); 	/* will not call update_flip */
 void flip_screen_x_set(int on);
 void flip_screen_y_set(int on);
 int flip_screen_get(void); 
+int flip_screen_x_get(void); 
+int flip_screen_y_get(void); 
 
-#define flip_screen flip_screen_get()
+//#define flip_screen flip_screen_get()
 
 
 

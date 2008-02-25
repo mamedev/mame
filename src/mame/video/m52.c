@@ -302,7 +302,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 {
 	rectangle rect;
 
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		xpos = 255 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
@@ -315,8 +315,8 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
-		flip_screen,
-		flip_screen,
+		flip_screen_get(),
+		flip_screen_get(),
 		xpos,
 		ypos,
 		cliprect,
@@ -324,8 +324,8 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 	drawgfx(bitmap, machine->gfx[image],
 		0, 0,
-		flip_screen,
-		flip_screen,
+		flip_screen_get(),
+		flip_screen_get(),
 		xpos - 256,
 		ypos,
 		cliprect,
@@ -334,7 +334,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	rect.min_x = machine->screen[0].visarea.min_x;
 	rect.max_x = machine->screen[0].visarea.max_x;
 
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		rect.min_y = ypos - BGHEIGHT;
 		rect.max_y = ypos - 1;
@@ -374,7 +374,7 @@ VIDEO_UPDATE( m52 )
 			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 4); /* cityscape */
 	}
 
-	tilemap_set_flip(bg_tilemap, flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(bg_tilemap, flip_screen_get() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -398,7 +398,7 @@ VIDEO_UPDATE( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;

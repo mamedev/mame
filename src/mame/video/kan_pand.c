@@ -120,7 +120,7 @@ static void pandora_draw(running_machine *machine, mame_bitmap *bitmap, const re
 			y = dy;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

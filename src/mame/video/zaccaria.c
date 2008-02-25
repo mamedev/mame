@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	int offs;
 	rectangle clip = *cliprect;
 
-	if (flip_screen_x)
+	if (flip_screen_x_get())
 		sect_rect(&clip, &spritevisiblearea_flipx);
 	else
 		sect_rect(&clip, &spritevisiblearea);
@@ -235,12 +235,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		int flipx = spriteram_2[offs + 2] & 0x40;
 		int flipy = spriteram_2[offs + 2] & 0x80;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -261,12 +261,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		int flipx = spriteram[offs + 1] & 0x40;
 		int flipy = spriteram[offs + 1] & 0x80;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

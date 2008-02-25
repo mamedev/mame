@@ -291,7 +291,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx ^= 1;
 				flipy ^= 1;

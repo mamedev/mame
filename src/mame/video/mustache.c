@@ -52,7 +52,7 @@ WRITE8_HANDLER( mustache_videoram_w )
 
 WRITE8_HANDLER (mustache_video_control_w)
 {
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -115,12 +115,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		if ((control_byte & 0xa))
 			clip.max_y = machine->screen[0].visarea.max_y;
 		else
-			if (flip_screen)
+			if (flip_screen_get())
 				clip.min_y = machine->screen[0].visarea.min_y + 56;
 			else
 				clip.max_y = machine->screen[0].visarea.max_y - 56;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		drawgfx(bitmap,gfx,
 				code,
 				color,
-				flip_screen,flip_screen,
+				flip_screen_get(),flip_screen_get(),
 				sx,sy,
 				&clip,TRANSPARENCY_PEN,0);
 	}

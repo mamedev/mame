@@ -102,7 +102,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		flipx = flipy = 0;
 
-		if(flip_screen)
+		if(flip_screen_get())
 		{
 			x = 246 - x;
 			y = 238 - y;

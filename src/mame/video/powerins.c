@@ -299,7 +299,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{	sx = screen_w - sx - dimx*16 - 32;	flipx = !flipx;
 			sy = screen_h - sy - dimy*16;		flipy = !flipy;
 			code += dimx*dimy-1;			inc = -1;	}

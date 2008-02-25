@@ -166,7 +166,7 @@ VIDEO_START( bankp )
 
 VIDEO_UPDATE( bankp )
 {
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		tilemap_set_scrollx(fg_tilemap, 0, -scroll_x);
 		tilemap_set_scrollx(bg_tilemap, 0, 0);

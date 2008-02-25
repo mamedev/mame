@@ -428,7 +428,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 		flipx = sprite_ram[offs + 0] & 0x04;
 		flipy = sprite_ram[offs + 0] & 0x02;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + sprite_y_adjust_flip_screen;
@@ -446,7 +446,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 				sx,sy,
 				cliprect, TRANSPARENCY_PEN, 0);
 
-		sy += (flip_screen ? -256 : 256);
+		sy += (flip_screen_get() ? -256 : 256);
 
 		// Wrap around
 		drawgfx(bitmap,machine->gfx[1],
@@ -473,7 +473,7 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 
 		sy = 255 - missile_ram[offs + 0*interleave];
 		sx = 255 - missile_ram[offs + 2*interleave];
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -489,7 +489,7 @@ static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
 
 		sy = 255 - missile_ram[offs + 1*interleave];
 		sx = 255 - missile_ram[offs + 3*interleave];
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;

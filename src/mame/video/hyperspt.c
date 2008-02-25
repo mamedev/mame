@@ -105,7 +105,7 @@ WRITE8_HANDLER( hyperspt_colorram_w )
 
 WRITE8_HANDLER( hyperspt_flipscreen_w )
 {
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -141,13 +141,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = ~spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		/* Note that this adjustment must be done AFTER handling flip_screen, thus */
+		/* Note that this adjustment must be done AFTER handling flip_screen_get(), thus */
 		/* proving that this is a hardware related "feature" */
 
 		sy += 1;
@@ -179,7 +179,7 @@ VIDEO_UPDATE( hyperspt )
 	for (row = 0; row < 32; row++)
 	{
 		int scrollx = hyperspt_scroll[row * 2] + (hyperspt_scroll[(row * 2) + 1] & 0x01) * 256;
-		if (flip_screen) scrollx = -scrollx;
+		if (flip_screen_get()) scrollx = -scrollx;
 		tilemap_set_scrollx(bg_tilemap, row, scrollx);
 	}
 

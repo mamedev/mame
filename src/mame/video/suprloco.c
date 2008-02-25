@@ -119,7 +119,7 @@ WRITE8_HANDLER( suprloco_videoram_w )
 
 WRITE8_HANDLER( suprloco_scrollram_w )
 {
-	int adj = flip_screen ? -8 : 8;
+	int adj = flip_screen_get() ? -8 : 8;
 
 	suprloco_scrollram[offset] = data;
 	tilemap_set_scrollx(bg_tilemap,offset, data - adj);
@@ -160,7 +160,7 @@ READ8_HANDLER( suprloco_control_r )
 
 INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y,int color)
 {
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		x = bitmap->width - x - 1;
 		y = bitmap->height - y - 1;
@@ -194,7 +194,7 @@ static void draw_sprite(mame_bitmap *bitmap,const rectangle *cliprect,int spr_nu
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
-	if (!flip_screen)
+	if (!flip_screen_get())
 	{
 		adjy = sy;
 		dy = 1;

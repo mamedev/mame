@@ -355,7 +355,7 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(!flip_screen);
+		flip_screen_set(!flip_screen_get());
 	}
 }
 

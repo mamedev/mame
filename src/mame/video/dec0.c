@@ -191,7 +191,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rec
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -256,7 +256,7 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
     doesn't affect any games.
     */
 
-	if (flip_screen)
+	if (flip_screen_get())
 		src_y = (src_bitmap->height - 256) - scrolly;
 	else
 		src_y = scrolly;
@@ -267,7 +267,7 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
 		else
 			src_x=scrollx;
 
-		if (flip_screen)
+		if (flip_screen_get())
 			src_x=(src_bitmap->width - 256) - src_x;
 
 		for (x=0; x<=cliprect->max_x; x++) {

@@ -155,7 +155,7 @@ WRITE8_HANDLER( rockola_flipscreen_w )
 
 	/* bit 7 flips screen */
 
-	if (flip_screen != (data & 0x80))
+	if (flip_screen_get() != (data & 0x80))
 	{
 		flip_screen_set(data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -265,7 +265,7 @@ WRITE8_HANDLER( satansat_b002_w )
 {
 	/* bit 0 flips screen */
 
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);

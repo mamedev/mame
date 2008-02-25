@@ -201,12 +201,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 256 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -256,10 +256,10 @@ VIDEO_UPDATE( pitnrun )
 		dx=128-pitnrun_h_heed+((pitnrun_ha&8)<<5)+3;
 		dy=128-pitnrun_v_heed+((pitnrun_ha&0x10)<<4);
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 			dx=128-dx+16;
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 			dy=128-dy;
 
 		myclip.min_x=dx;
@@ -280,7 +280,7 @@ VIDEO_UPDATE( pitnrun )
 	draw_sprites(machine,bitmap,&myclip);
 
 	if(pitnrun_ha&4)
-		copybitmap_trans(bitmap,tmp_bitmap[pitnrun_ha&3],flip_screen_x,flip_screen_y,dx,dy,&myclip, 1);
+		copybitmap_trans(bitmap,tmp_bitmap[pitnrun_ha&3],flip_screen_x_get(),flip_screen_y_get(),dx,dy,&myclip, 1);
 	tilemap_draw(bitmap,cliprect,fg, 0,0);
 	return 0;
 }

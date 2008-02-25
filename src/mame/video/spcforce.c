@@ -39,7 +39,7 @@ VIDEO_UPDATE( spcforce )
 		code = videoram[offs] + ((colorram[offs] & 0x01) << 8);
 		col  = (~colorram[offs] >> 4) & 0x07;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -47,7 +47,7 @@ VIDEO_UPDATE( spcforce )
 
 		drawgfx(bitmap,machine->gfx[0],
 				code, col,
-				flip_screen, flip_screen,
+				flip_screen_get(), flip_screen_get(),
 				sx, sy,
 				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
 	}

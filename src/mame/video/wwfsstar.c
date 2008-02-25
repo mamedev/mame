@@ -154,7 +154,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			number &= ~(chain - 1);
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipy = !flipy;
 				flipx = !flipx;
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			for (count=0;count<chain;count++)
 			{
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					if (!flipy)
 					{

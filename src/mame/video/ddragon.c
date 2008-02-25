@@ -203,7 +203,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rec
 				which = src[i+3] + ( ( src[i+2] & 0x0f ) << 8 );
 			}
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 256 - sy;

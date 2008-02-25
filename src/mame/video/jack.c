@@ -73,7 +73,7 @@ static void jack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, con
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -154,7 +154,7 @@ static void joinem_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 		flipx = (spriteram[offs + 3] & 0x80);
 		flipy = (spriteram[offs + 3] & 0x40);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

@@ -150,7 +150,7 @@ static READ8_HANDLER( geebee_in_r )
 	res = readinputport(offset);
 	if (offset == 3)
 	{
-		res = readinputport(3 + (flip_screen & 1));	// read player 2 input in cocktail mode
+		res = readinputport(3 + (flip_screen_get() & 1));	// read player 2 input in cocktail mode
 		if (handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -232,7 +232,7 @@ static READ8_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = readinputport(2 + (flip_screen & 1));
+	res = readinputport(2 + (flip_screen_get() & 1));
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;

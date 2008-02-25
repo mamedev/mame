@@ -192,7 +192,7 @@ static WRITE8_HANDLER( flip_screen_x_w )
 {
 	looping_state *state = Machine->driver_data;
 	flip_screen_x_set(~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen ? 128 : 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
 }
 
 
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( flip_screen_y_w )
 {
 	looping_state *state = Machine->driver_data;
 	flip_screen_y_set(~data & 0x01);
-	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen ? 128 : 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
 }
 
 
@@ -255,13 +255,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int code  = source[1] & 0x3f;
 		int color = source[2];
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

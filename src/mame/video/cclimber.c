@@ -278,7 +278,7 @@ static void cclimber_draw_big_sprite(running_machine *machine, mame_bitmap *bitm
 	oy = 128 - cclimber_bigspriteram[2];
 	flipx = cclimber_bigspriteram[1] & 0x10;
 	flipy = cclimber_bigspriteram[1] & 0x20;
-	if (flip_screen_y)      /* only the Y direction has to be flipped */
+	if (flip_screen_y_get())      /* only the Y direction has to be flipped */
 	{
 		oy = 128 - oy;
 		flipy = !flipy;
@@ -328,12 +328,12 @@ VIDEO_UPDATE( cclimber )
 		/* vertical flipping flips two adjacent characters */
 		if (flipy) sy ^= 1;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 31 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 31 - sy;
 			flipy = !flipy;
@@ -353,12 +353,12 @@ VIDEO_UPDATE( cclimber )
 		int scroll[32];
 
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 		else
@@ -366,7 +366,7 @@ VIDEO_UPDATE( cclimber )
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 
@@ -390,12 +390,12 @@ VIDEO_UPDATE( cclimber )
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -435,12 +435,12 @@ VIDEO_UPDATE( cannonb )
 		/* vertical flipping flips two adjacent characters */
 		if (flipy) sy ^= 1;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 31 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 31 - sy;
 			flipy = !flipy;
@@ -460,12 +460,12 @@ VIDEO_UPDATE( cannonb )
 		int scroll[32];
 
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 		else
@@ -473,7 +473,7 @@ VIDEO_UPDATE( cannonb )
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 
@@ -498,12 +498,12 @@ VIDEO_UPDATE( cannonb )
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -547,12 +547,12 @@ VIDEO_UPDATE( swimmer )
 			color += 32;
 		}
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 31 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 31 - sy;
 			flipy = !flipy;
@@ -572,7 +572,7 @@ VIDEO_UPDATE( swimmer )
 		int scroll[32];
 
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			for (offs = 0;offs < 32;offs++)
 				scroll[offs] = cclimber_column_scroll[31 - offs];
@@ -603,12 +603,12 @@ VIDEO_UPDATE( swimmer )
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -639,7 +639,7 @@ VIDEO_UPDATE( yamato )
 
 	for(i=8;i<256;i++)
 	{
-		pen_t pen = 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x?0x1280:0x1200)+(i>>1)];
+		pen_t pen = 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x_get()?0x1280:0x1200)+(i>>1)];
 
 		for(j=0;j<256;j++)
 		{
@@ -661,12 +661,12 @@ VIDEO_UPDATE( yamato )
 		/* vertical flipping flips two adjacent characters */
 		if (flipy) sy ^= 1;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 31 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 31 - sy;
 			flipy = !flipy;
@@ -686,12 +686,12 @@ VIDEO_UPDATE( yamato )
 		int scroll[32];
 
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 		else
@@ -699,7 +699,7 @@ VIDEO_UPDATE( yamato )
 			for (offs = 0;offs < 32;offs++)
 			{
 				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y) scroll[offs] = -scroll[offs];
+				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
 			}
 		}
 
@@ -723,12 +723,12 @@ VIDEO_UPDATE( yamato )
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -807,7 +807,7 @@ static void toprollr_draw_big_sprite(running_machine *machine, mame_bitmap *bitm
 			return;
 		}
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			flipx^=1;
 		}
@@ -858,12 +858,12 @@ VIDEO_UPDATE( toprollr )
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -893,12 +893,12 @@ VIDEO_UPDATE( toprollr )
 			int attr=(x>16)?(toprollr_videoram2[(y&0xfe)*32+x]):(toprollr_videoram2[y*32+x]);
 			int palette;
 
-			if (flip_screen_x)
+			if (flip_screen_x_get())
 			{
 				sx = 240 - sx;
 				flipx^=1;
 			}
-			if (flip_screen_y)
+			if (flip_screen_y_get())
 			{
 				sy = 240 - sy;
 				flipy^=1;

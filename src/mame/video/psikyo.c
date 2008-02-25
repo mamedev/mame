@@ -359,7 +359,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		zoomy = 32 - zoomy;
 
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			x = width  - x - (nx * zoomx)/2;
 			y = height - y - (ny * zoomy)/2;

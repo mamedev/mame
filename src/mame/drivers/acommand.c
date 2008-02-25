@@ -109,12 +109,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			int xx,yy,x;
 			int delta = 16;
 
-			flipx ^= flip_screen;
-			flipy ^= flip_screen;
+			flipx ^= flip_screen_get();
+			flipy ^= flip_screen_get();
 
 			if ((pri&pri_mask)!=priority) continue;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;

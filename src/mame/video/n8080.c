@@ -29,8 +29,7 @@ WRITE8_HANDLER( n8080_video_control_w )
 	sheriff_color_mode = (data >> 3) & 3;
 	sheriff_color_data = (data >> 0) & 7;
 
-	/* FIXME: flip_screen_x should not be written. */
-	flip_screen_x = data & 0x20;
+	flip_screen_set_no_update(data & 0x20);
 }
 
 
@@ -88,7 +87,7 @@ static void helifire_next_line(void)
 	}
 	else
 	{
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			helifire_mv %= 255;
 		}
@@ -109,8 +108,7 @@ VIDEO_START( spacefev )
 {
 	cannon_timer = timer_alloc(spacefev_stop_red_cannon, NULL);
 
-	/* FIXME: flip_screen_x should not be written. */
-	flip_screen_x = 0;
+	flip_screen_set_no_update(0);
 
 	spacefev_red_screen = 0;
 	spacefev_red_cannon = 0;
@@ -119,8 +117,7 @@ VIDEO_START( spacefev )
 
 VIDEO_START( sheriff )
 {
-	/* FIXME: flip_screen_x should not be written. */
-	flip_screen_x = 0;
+	flip_screen_set_no_update(0);
 
 	sheriff_color_mode = 0;
 	sheriff_color_data = 0;
@@ -147,7 +144,7 @@ VIDEO_START( helifire )
 		helifire_LSFR[i] = data;
 	}
 
-	flip_screen_x = 0;
+	flip_screen_set_no_update(0);
 
 	helifire_flash = 0;
 }
@@ -155,7 +152,7 @@ VIDEO_START( helifire )
 
 VIDEO_UPDATE( spacefev )
 {
-	UINT8 mask = flip_screen ? 0xff : 0x00;
+	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
 
 	int x;
 	int y;
@@ -225,7 +222,7 @@ VIDEO_UPDATE( spacefev )
 
 VIDEO_UPDATE( sheriff )
 {
-	UINT8 mask = flip_screen ? 0xff : 0x00;
+	UINT8 mask = flip_screen_get() ? 0xff : 0x00;
 
 	const UINT8* pPROM = memory_region(REGION_PROMS);
 
@@ -342,7 +339,7 @@ VIDEO_UPDATE( helifire )
 
 			for (n = 0; n < 8; n++)
 			{
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					if ((videoram[offset ^ 0x1fff] << n) & 0x80)
 					{

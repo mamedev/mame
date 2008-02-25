@@ -197,7 +197,7 @@ static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -265,7 +265,7 @@ static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			y=240-y;
 			x=304-x;
 			if (fx) fx=0; else fx=1;
@@ -355,7 +355,7 @@ static void mutantf_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 		fx = (spriteptr[offs+0]&0x4000);
 		fy = (spriteptr[offs+0]&0x8000);
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 

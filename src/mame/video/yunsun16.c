@@ -175,7 +175,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		x	+=	sprites_scrolldx;
 		y	+=	sprites_scrolldy;
 
-		if (flip_screen)	// not used?
+		if (flip_screen_get())	// not used?
 		{
 			flipx = !flipx;		x = max_x - x - 16;
 			flipy = !flipy;		y = max_y - y - 16;

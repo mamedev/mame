@@ -21,7 +21,7 @@ VIDEO_START( citycon );
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return readinputport(flip_screen ? 1 : 0);
+	return readinputport(flip_screen_get() ? 1 : 0);
 }
 
 

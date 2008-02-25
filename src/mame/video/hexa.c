@@ -23,14 +23,14 @@ WRITE8_HANDLER( hexa_d008_w )
 	int bankaddress;
 
 	/* bit 0 = flipx (or y?) */
-	if (flip_screen_x != (data & 0x01))
+	if (flip_screen_x_get() != (data & 0x01))
 	{
 		flip_screen_x_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
 	/* bit 1 = flipy (or x?) */
-	if (flip_screen_y != (data & 0x02))
+	if (flip_screen_y_get() != (data & 0x02))
 	{
 		flip_screen_y_set(data & 0x02);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);

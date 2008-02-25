@@ -45,7 +45,7 @@ READ16_HANDLER( ddragon3_scroll16_r )
 		case 1: return ddragon3_fg_scrolly;
 		case 2: return ddragon3_bg_scrollx;
 		case 3: return ddragon3_bg_scrolly;
-		case 5: return flip_screen;
+		case 5: return flip_screen_get();
 		case 6: return ddragon3_bg_tilebase;
 	}
 
@@ -153,7 +153,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 			if (attr & 0x02) sy = 239 + (0x100 - sy); else sy = 240 - sy;
 			if (sx > 0x17f) sx = 0 - (0x200 - sx);
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 304 - sx;
 				sy = 224 - sy;
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 			for (i = 0; i <= height; i++)
 			{
 				drawgfx(bitmap, machine->gfx[1], code + i, color, flipx, flipy,
-					sx, sy + (flip_screen ? (i * 16) : (-i * 16)), cliprect,
+					sx, sy + (flip_screen_get() ? (i * 16) : (-i * 16)), cliprect,
 					TRANSPARENCY_PEN, 0);
 			}
 		}

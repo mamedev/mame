@@ -80,7 +80,7 @@ WRITE8_HANDLER( mrjong_colorram_w )
 
 WRITE8_HANDLER( mrjong_flipscreen_w )
 {
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -119,7 +119,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		sx = 224 - spriteram[offs + 2];
 		sy = spriteram[offs + 0];
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 208 - sx;
 			sy = 240 - sy;

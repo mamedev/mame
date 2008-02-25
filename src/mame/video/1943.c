@@ -205,7 +205,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram[offs + 3] - ((attr & 0x10) << 4);
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -216,7 +216,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		{
 			if (color != 0x0a && color != 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen, flip_screen,
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(), flip_screen_get(),
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}
@@ -224,7 +224,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		{
 			if (color == 0x0a || color == 0x0b)
 			{
-				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen, flip_screen,
+				drawgfx(bitmap, machine->gfx[3], code, color, flip_screen_get(), flip_screen_get(),
 					sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 			}
 		}

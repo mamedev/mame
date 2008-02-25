@@ -108,7 +108,7 @@ static void draw_sprite_and_check_collision(running_machine *machine, mame_bitma
 	UINT8 *gfx = memory_region(REGION_GFX2) + (code << 7);
 
 
-	if (flip_screen)
+	if (flip_screen_get())
 		sy += 32;
 
 	/* assume no collision */

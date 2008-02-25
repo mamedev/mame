@@ -214,7 +214,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		flipy = attr & sprite_flipy_mask;	/* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

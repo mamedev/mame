@@ -304,7 +304,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		8*8, 32*8-1
 	};
 	rectangle clip = *cliprect;
-	if (flip_screen)
+	if (flip_screen_get())
 		sect_rect(&clip, &spritevisibleareaflip);
 	else
 		sect_rect(&clip, &spritevisiblearea);
@@ -319,7 +319,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		int flipx = attr & 0x40;
 		int flipy = attr & 0x80;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

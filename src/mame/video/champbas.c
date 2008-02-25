@@ -117,7 +117,7 @@ WRITE8_HANDLER( champbas_palette_bank_w )
 
 WRITE8_HANDLER( champbas_flipscreen_w )
 {
-	if (flip_screen != data)
+	if (flip_screen_get() != data)
 	{
 		flip_screen_set(data);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);

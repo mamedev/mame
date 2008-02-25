@@ -174,7 +174,7 @@ WRITE8_HANDLER( kingofb_f800_w )
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
-	if (flip_screen != (data & 0x80))
+	if (flip_screen_get() != (data & 0x80))
 	{
 		flip_screen_set(data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -229,7 +229,7 @@ static void kingofb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 		sx = spriteram[roffs+1];
 		sy = spriteram[roffs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -289,7 +289,7 @@ static void ringking_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int sx = spriteram[offs+2];
 		int sy = spriteram[offs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

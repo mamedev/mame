@@ -231,11 +231,11 @@ WRITE8_HANDLER( lasso_colorram_w )
 static WRITE8_HANDLER( lasso_flip_screen_w )
 {
 	/* don't know which is which, but they are always set together */
-	flip_screen_x = data & 0x01;
-	flip_screen_y = data & 0x02;
+	flip_screen_x_set(data & 0x01);
+	flip_screen_y_set( data & 0x02);
 
-	tilemap_set_flip(ALL_TILEMAPS, (flip_screen_x ? TILEMAP_FLIPX : 0) |
-								   (flip_screen_y ? TILEMAP_FLIPY : 0));
+	tilemap_set_flip(ALL_TILEMAPS, (flip_screen_x_get() ? TILEMAP_FLIPX : 0) |
+								   (flip_screen_y_get() ? TILEMAP_FLIPY : 0));
 }
 
 
@@ -309,13 +309,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		flipx = source[1] & 0x40;
 		flipy = source[1] & 0x80;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			flipy = !flipy;
 		}
@@ -352,7 +352,7 @@ static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
 		UINT8 x;
 		UINT8 y = offs >> 5;
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 			y = ~y;
 
 		if ((y < cliprect->min_y) || (y > cliprect->max_y))
@@ -361,7 +361,7 @@ static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
 		x = (offs & 0x1f) << 3;
 		data = lasso_bitmap_ram[offs];
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 			x = ~x;
 
 		for (bit = 0; bit < 8; bit++)
@@ -369,7 +369,7 @@ static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
 			if ((data & 0x80) && (x >= cliprect->min_x) && (x <= cliprect->max_x))
 				*BITMAP_ADDR16(bitmap, y, x) = pen;
 
-			if (flip_screen_x)
+			if (flip_screen_x_get())
 				x = x - 1;
 			else
 				x = x + 1;

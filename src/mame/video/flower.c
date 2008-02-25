@@ -79,7 +79,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		code |= ((source[2] & 0x01) << 6);
 		code |= ((source[2] & 0x08) << 4);
 
-		if(flip_screen)
+		if(flip_screen_get())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -173,7 +173,7 @@ VIDEO_UPDATE( flower )
 
 	draw_sprites(machine,bitmap,cliprect);
 
-	if(flip_screen)
+	if(flip_screen_get())
 	{
 		myclip.min_x = cliprect->min_x;
 		myclip.max_x = cliprect->min_x + 15;

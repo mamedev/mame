@@ -50,21 +50,21 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		sx = spriteram[offs];
 		sy = 248 - spriteram[offs + 1];
-		if (flip_screen_x) sx = 248 - sx;
-		if (flip_screen_y) sy = 248 - sy;
+		if (flip_screen_x_get()) sx = 248 - sx;
+		if (flip_screen_y_get()) sy = 248 - sy;
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8)  ;
 
 		drawgfx(bitmap,machine->gfx[0],
 				2 * code,
 				((spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x,flip_screen_y,
-				sx,sy + (flip_screen_y ? 8 : -8),
+				flip_screen_x_get(),flip_screen_y_get(),
+				sx,sy + (flip_screen_y_get() ? 8 : -8),
 				cliprect,TRANSPARENCY_PEN,0);
 		drawgfx(bitmap,machine->gfx[0],
 				2 * code + 1,
 				((spriteram[offs + 2] & 0xf8) >> 3)  ,
-				flip_screen_x,flip_screen_y,
+				flip_screen_x_get(),flip_screen_y_get(),
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
 	}

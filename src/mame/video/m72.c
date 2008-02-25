@@ -422,7 +422,7 @@ static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const
 		h = 1 << ((m72_spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 284 - 16*h - sy;
@@ -474,7 +474,7 @@ static void majtitle_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		h = 1 << ((spriteram16_2[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 256 - 16*h - sy;

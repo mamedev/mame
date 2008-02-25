@@ -276,7 +276,7 @@ static void draw_sprites1(running_machine* machine, mame_bitmap *bitmap, const r
 		y=(y+16)%0x200;
 		x=256 - x;
 		y=256 - y;
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -348,7 +348,7 @@ static void draw_sprites2(running_machine* machine, mame_bitmap *bitmap, const r
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -394,7 +394,7 @@ static void srdarwin_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
 		fx = buffered_spriteram[offs+1] & 0x04;
 		multi = buffered_spriteram[offs+1] & 0x10;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
@@ -405,14 +405,14 @@ static void srdarwin_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
     	drawgfx(bitmap,machine->gfx[1],
         		code,
 				color,
-				fx,flip_screen,
+				fx,flip_screen_get(),
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
         if (multi)
     		drawgfx(bitmap,machine->gfx[1],
 				code+1,
 				color,
-				fx,flip_screen,
+				fx,flip_screen_get(),
 				sx,sy2,
 				cliprect,TRANSPARENCY_PEN,0);
 	}

@@ -61,7 +61,7 @@ static TILE_GET_INFO( get_sb_tile_info )
 
 static void plot_pixel_sbw(int x, int y, int col)
 {
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		y = 255-y;
 		x = 247-x;

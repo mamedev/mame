@@ -19,7 +19,7 @@ WRITE16_HANDLER( tigeroad_videoctrl_w )
 
 		/* bit 1 flips screen */
 
-		if (flip_screen != (data & 0x02))
+		if (flip_screen_get() != (data & 0x02))
 		{
 			flip_screen_set(data & 0x02);
 			tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -88,7 +88,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			if (sx > 0x100) sx -= 0x200;
 			if (sy > 0x100) sy -= 0x200;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

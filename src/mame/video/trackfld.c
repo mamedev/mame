@@ -107,7 +107,7 @@ WRITE8_HANDLER( trackfld_colorram_w )
 
 WRITE8_HANDLER( trackfld_flipscreen_w )
 {
-	if (flip_screen != data)
+	if (flip_screen_get() != data)
 	{
 		flip_screen_set(data);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -202,7 +202,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram[offs] - 1;
 		int sy = 240 - spriteram_2[offs + 1];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -238,7 +238,7 @@ VIDEO_UPDATE( trackfld )
 	for (row = 0; row < 32; row++)
 	{
 		scrollx = trackfld_scroll[row] + 256 * (trackfld_scroll2[row] & 0x01);
-		if (flip_screen) scrollx = -scrollx;
+		if (flip_screen_get()) scrollx = -scrollx;
 		tilemap_set_scrollx(bg_tilemap, row, scrollx);
 	}
 

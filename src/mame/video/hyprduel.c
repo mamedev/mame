@@ -459,7 +459,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			gfxdata		=	base_gfx + (8*8*4/8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;

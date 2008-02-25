@@ -127,12 +127,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			priority_mask = (0xf0);
 		}
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if( flip_screen_y )
+		if( flip_screen_y_get() )
 		{
 			sy = 254 - 16*height - sy;
 			flipy = !flipy;

@@ -200,7 +200,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		fy = 0;
 		inc = 16;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			x = 240 - x;
 			fx = !fx;
@@ -240,7 +240,7 @@ VIDEO_UPDATE( tryout )
 
 	int scrollx;
 
-	if (!flip_screen)
+	if (!flip_screen_get())
 		tilemap_set_scrollx(fg_tilemap, 0, 16); /* Assumed hard-wired */
 	else
 		tilemap_set_scrollx(fg_tilemap, 0, -8); /* Assumed hard-wired */

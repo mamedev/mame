@@ -155,7 +155,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;

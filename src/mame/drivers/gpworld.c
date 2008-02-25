@@ -78,7 +78,7 @@ static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,con
 
 INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y,int color)
 {
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		x = bitmap->width - x - 1;
 		y = bitmap->height - y - 1;

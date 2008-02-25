@@ -111,13 +111,13 @@ static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectang
 		int sx = offs % 32;
 		int sy = offs / 32;
 
-		if (flip_screen_x) sx = 31 - sx;
-		if (flip_screen_y) sy = 31 - sy;
+		if (flip_screen_x_get()) sx = 31 - sx;
+		if (flip_screen_y_get()) sy = 31 - sy;
 
 		drawgfx(tmpbitmap1,machine->gfx[0],
 				code,
 				2,
-				flip_screen_x,flip_screen_y,
+				flip_screen_x_get(),flip_screen_y_get(),
 				8*sx,8*sy,
 				NULL,TRANSPARENCY_NONE,0);
 	}
@@ -150,13 +150,13 @@ static void draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectang
 
 		int code = videoram[offs];
 
-		if (flip_screen_x) sx = 31 - sx;
-		if (flip_screen_y) sy = 31 - sy;
+		if (flip_screen_x_get()) sx = 31 - sx;
+		if (flip_screen_y_get()) sy = 31 - sy;
 
 		drawgfx(bitmap,machine->gfx[0],
 				code,
 				0,
-				flip_screen_x,flip_screen_y,
+				flip_screen_x_get(),flip_screen_y_get(),
 				8*sx,8*sy,
 				cliprect,transp,0);
 	}
@@ -187,7 +187,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		for (y = 0;y < 64;y++)
 		{
-			int dy = flip_screen_y ? (255 - sy - y) : (sy + y);
+			int dy = flip_screen_y_get() ? (255 - sy - y) : (sy + y);
 
 			if ((dy & ~0xff) == 0)
 			{
@@ -216,7 +216,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 						col = pendata[x];
 						if (col)
 						{
-							int dx = flip_screen_x ? (255 - sx - px) : (sx + px);
+							int dx = flip_screen_x_get() ? (255 - sx - px) : (sx + px);
 							if ((dx & ~0xff) == 0)
 								*BITMAP_ADDR16(bitmap, dy, dx) = sprite_color_base + col;
 						}

@@ -30,7 +30,7 @@ VIDEO_UPDATE( honeydol )
 		x = dx;
 		y = dy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -62,7 +62,7 @@ VIDEO_UPDATE( honeydol )
 		x = dx;
 		y = dy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -117,7 +117,7 @@ VIDEO_UPDATE( twinadv )
 		x = dx;
 		y = dy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - x;
 			sy = 240 - y;
@@ -165,7 +165,7 @@ VIDEO_UPDATE( wintbob )
 
 		if (wrapr == 8) xpos -= 256;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			xpos = 240 - xpos;
 			ypos = 240 - ypos;
@@ -245,7 +245,7 @@ VIDEO_UPDATE( snowbro3 )
 		if (x > 511) x &= 0x1ff;
 		if (y > 511) y &= 0x1ff;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - x;
 			sy = 240 - y;

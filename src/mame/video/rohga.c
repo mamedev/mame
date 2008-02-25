@@ -124,7 +124,7 @@ static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			x=304-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -217,7 +217,7 @@ static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 			inc = 1;
 		}
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			x=304-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -395,7 +395,7 @@ sprite 2:
 		fx = (spriteptr[offs+0]&0x4000);
 		fy = (spriteptr[offs+0]&0x8000);
 
-		if (!flip_screen) { /* Inverted from Mutant Fighter! */
+		if (!flip_screen_get()) { /* Inverted from Mutant Fighter! */
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 

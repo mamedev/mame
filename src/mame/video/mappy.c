@@ -427,7 +427,7 @@ void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rec
 			sprite &= ~sizex;
 			sprite &= ~(sizey << 1);
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -502,7 +502,7 @@ static void phozon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			int sizey = size[(spriteram_3[offs] & 0x30) >> 4];
 			int x,y;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx ^= 1;
 				flipy ^= 1;

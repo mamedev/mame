@@ -340,7 +340,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 				x &= 0x1ff;
 				for (i=0; i<y_multi; i++)
 				{
-					if (flip_screen) {
+					if (flip_screen_get()) {
 						pdrawgfx(bitmap,machine->gfx[1],
 								sprite + s_ptr,
 								colour,

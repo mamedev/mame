@@ -183,7 +183,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 				if (flipx)	tile_flipx = !tile_flipx;
 
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;

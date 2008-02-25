@@ -26,12 +26,12 @@ WRITE8_HANDLER( arkanoid_d008_w )
 	int bank;
 
 	/* bits 0 and 1 flip X and Y, I don't know which is which */
-	if (flip_screen_x != (data & 0x01)) {
+	if (flip_screen_x_get() != (data & 0x01)) {
 		flip_screen_x_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
-	if (flip_screen_y != (data & 0x02)) {
+	if (flip_screen_y_get() != (data & 0x02)) {
 		flip_screen_y_set(data & 0x02);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
@@ -99,21 +99,21 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		sx = spriteram[offs];
 		sy = 248 - spriteram[offs + 1];
-		if (flip_screen_x) sx = 248 - sx;
-		if (flip_screen_y) sy = 248 - sy;
+		if (flip_screen_x_get()) sx = 248 - sx;
+		if (flip_screen_y_get()) sy = 248 - sy;
 
 		code = spriteram[offs + 3] + ((spriteram[offs + 2] & 0x03) << 8) + 1024 * gfxbank;
 
 		drawgfx(bitmap,machine->gfx[0],
 				2 * code,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
-				flip_screen_x,flip_screen_y,
-				sx,sy + (flip_screen_y ? 8 : -8),
+				flip_screen_x_get(),flip_screen_y_get(),
+				sx,sy + (flip_screen_y_get() ? 8 : -8),
 				cliprect,TRANSPARENCY_PEN,0);
 		drawgfx(bitmap,machine->gfx[0],
 				2 * code + 1,
 				((spriteram[offs + 2] & 0xf8) >> 3) + 32 * palettebank,
-				flip_screen_x,flip_screen_y,
+				flip_screen_x_get(),flip_screen_y_get(),
 				sx,sy,
 				cliprect,TRANSPARENCY_PEN,0);
 	}

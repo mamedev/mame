@@ -177,7 +177,7 @@ static void pbillian_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int sx = spriteram[offs + 1] + 256 * (spriteram[offs] & 0x01);
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -186,7 +186,7 @@ static void pbillian_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		drawgfx(bitmap,machine->gfx[1],
 				code,
 				color,
-				flip_screen, flip_screen,
+				flip_screen_get(), flip_screen_get(),
 				sx, sy,
 				cliprect, TRANSPARENCY_PEN, 0);
 	}
@@ -206,7 +206,7 @@ static void superqix_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int sx = spriteram[offs + 1];
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -253,7 +253,7 @@ VIDEO_UPDATE( pbillian )
 VIDEO_UPDATE( superqix )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,fg_bitmap[show_bitmap],flip_screen,flip_screen,0,0,cliprect,0);
+	copybitmap_trans(bitmap,fg_bitmap[show_bitmap],flip_screen_get(),flip_screen_get(),0,0,cliprect,0);
 	superqix_draw_sprites(machine, bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

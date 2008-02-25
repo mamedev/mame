@@ -328,7 +328,7 @@ static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -424,7 +424,7 @@ static void raiga_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg,
 			if (ypos >= 256)
 				ypos -= 512;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;
 				flipy = !flipy;

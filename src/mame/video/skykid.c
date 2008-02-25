@@ -83,9 +83,9 @@ static TILE_GET_INFO( tx_get_tile_info )
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			skykid_textram[tile_index] | (flip_screen ? 0x100 : 0),
+			skykid_textram[tile_index] | (flip_screen_get() ? 0x100 : 0),
 			skykid_textram[tile_index + 0x400] & 0x3f,
-			flip_screen ? (TILE_FLIPY | TILE_FLIPX) : 0);
+			flip_screen_get() ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
 
@@ -123,7 +123,8 @@ VIDEO_START( skykid )
 	state_save_register_global(priority);
 	state_save_register_global(scroll_x);
 	state_save_register_global(scroll_y);
-	state_save_register_global(flip_screen_x);
+	//FIXME: flip_screen
+	//state_save_register_global(flip_screen_x_get());
 }
 
 
@@ -205,7 +206,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -233,7 +234,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 VIDEO_UPDATE( skykid )
 {
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		tilemap_set_scrollx(bg_tilemap, 0, 189 - (scroll_x ^ 1));
 		tilemap_set_scrolly(bg_tilemap, 0, 7 - scroll_y);

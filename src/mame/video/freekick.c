@@ -44,12 +44,12 @@ static void gigas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 		int flipy = 0;
 		int color = spriteram[offs + 1] & 0x1f;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -79,12 +79,12 @@ static void pbillrd_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 		int flipy = 0;//spriteram[offs + 0] & 0x40;
 		int color = spriteram[offs + 1] & 0x0f;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;
@@ -115,12 +115,12 @@ static void freekick_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int flipy = spriteram[offs + 2] & 0x40;
 		int color = spriteram[offs + 2] & 0x1f;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			xpos = 240 - xpos;
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			ypos = 256 - ypos;
 			flipy = !flipy;

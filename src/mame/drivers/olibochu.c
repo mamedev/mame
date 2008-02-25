@@ -67,7 +67,7 @@ static WRITE8_HANDLER( olibochu_colorram_w )
 
 static WRITE8_HANDLER( olibochu_flipscreen_w )
 {
-	if (flip_screen != (data & 0x80))
+	if (flip_screen_get() != (data & 0x80))
 	{
 		flip_screen_set(data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -108,7 +108,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram[offs+3];
 		int sy = ((spriteram[offs+2] + 8) & 0xff) - 8;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -136,7 +136,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram_2[offs+3];
 		int sy = spriteram_2[offs+2];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;

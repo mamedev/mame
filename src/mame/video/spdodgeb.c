@@ -179,7 +179,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int dy = -16;
 		int cy;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -198,7 +198,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			break;
 
 			case 1: /* double y */
-			if (flip_screen) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+			if (flip_screen_get()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
 			cy = sy + dy;
 			which &= ~1;
 			DRAW_SPRITE(0,sx,cy);

@@ -882,7 +882,7 @@ static VIDEO_START( dkong_base )
 	state_save_register_global(state->flip);
 
 	/* this must be registered here - hmmm */
-	//state_save_register_global(flip_screen);
+	//state_save_register_global(flip_screen_get());
 
 }
 

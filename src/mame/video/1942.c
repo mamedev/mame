@@ -214,7 +214,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		sx = spriteram[offs + 3] - 0x10 * (spriteram[offs + 1] & 0x10);
 		sy = spriteram[offs + 2];
 		dir = 1;
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -229,7 +229,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		{
 			drawgfx(bitmap,machine->gfx[2],
 					code + i,col,
-					flip_screen,flip_screen,
+					flip_screen_get(),flip_screen_get(),
 					sx,sy + 16 * i * dir,
 					cliprect,TRANSPARENCY_PEN,15);
 

@@ -142,13 +142,13 @@ static VIDEO_UPDATE(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;

@@ -490,10 +490,10 @@ static void plot_star(running_machine *machine, mame_bitmap *bitmap, const recta
 		x > cliprect->max_x)
 		return;
 
-	if (flip_screen_x)
+	if (flip_screen_x_get())
 		x = 255 - x;
 
-	if (flip_screen_y)
+	if (flip_screen_y_get())
 		y = 255 - y;
 
 	if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x) % 0x144) == 0)
@@ -526,7 +526,7 @@ static void rallyx_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flipx = spriteram[offs] & 1;
 		int flipy = spriteram[offs] & 2;
-		if (flip_screen) sx -= 2*displacement;
+		if (flip_screen_get()) sx -= 2*displacement;
 
 		pdrawgfx(bitmap,machine->gfx[1],
 				(spriteram[offs] & 0xfc) >> 2,
@@ -551,7 +551,7 @@ static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		int flip = spriteram[offs] & 2;
 
 		/* handle reduced visible area in some games */
-		if (flip_screen && machine->screen[0].visarea.max_x == 32*8-1) sx += 32;
+		if (flip_screen_get() && machine->screen[0].visarea.max_x == 32*8-1) sx += 32;
 
 		pdrawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
@@ -574,7 +574,7 @@ static void rallyx_draw_bullets(running_machine *machine, mame_bitmap *bitmap, c
 
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x01) << 8);
 		y = 253 - rallyx_radary[offs];
-		if (flip_screen) x -= 3;
+		if (flip_screen_get()) x -= 3;
 
 		drawgfx(bitmap,machine->gfx[2],
 				((rallyx_radarattr[offs & 0x0f] & 0x0e) >> 1) ^ 0x07,
@@ -625,7 +625,7 @@ static void locomotn_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 		y = 252 - rallyx_radary[offs];
 
 		/* handle reduced visible area in some games */
-		if (flip_screen && machine->screen[0].visarea.max_x == 32*8-1) x += 32;
+		if (flip_screen_get() && machine->screen[0].visarea.max_x == 32*8-1) x += 32;
 
 		drawgfx(bitmap,machine->gfx[2],
 				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
@@ -643,7 +643,7 @@ VIDEO_UPDATE( rallyx )
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
 	rectangle bg_clip = *cliprect;
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		bg_clip.min_x = 8*8;
 		fg_clip.max_x = 8*8-1;
@@ -675,7 +675,7 @@ VIDEO_UPDATE( jungler )
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
 	rectangle bg_clip = *cliprect;
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		bg_clip.min_x = 8*8;
 		fg_clip.max_x = 8*8-1;
@@ -711,7 +711,7 @@ VIDEO_UPDATE( locomotn )
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
 	rectangle bg_clip = *cliprect;
-	if (flip_screen)
+	if (flip_screen_get())
 	{
 		bg_clip.min_x = 8*8;
 		fg_clip.max_x = 8*8-1;

@@ -277,7 +277,7 @@ static void nova2001_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 			continue;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -314,7 +314,7 @@ static void pkunwar_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 			continue;
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

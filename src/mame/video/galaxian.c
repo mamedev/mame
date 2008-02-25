@@ -1480,7 +1480,7 @@ static void dambustr_draw_bullets(running_machine *machine, mame_bitmap *bitmap,
 {
 	int i, color;
 
-	if (flip_screen_x)  x++;
+	if (flip_screen_x_get())  x++;
 
 	x = x - 6;
 
@@ -1664,7 +1664,7 @@ static void dambustr_draw_background(running_machine *machine, mame_bitmap *bitm
 	int col1 = BACKGROUND_COLOR_BASE + dambustr_bg_color_1;
 	int col2 = BACKGROUND_COLOR_BASE + dambustr_bg_color_2;
 
-	if (flip_screen_x)
+	if (flip_screen_x_get())
 	{
 		plot_box(bitmap,   0, 0, 256-dambustr_bg_split_line, 256, col2);
 		plot_box(bitmap, 256-dambustr_bg_split_line, 0, dambustr_bg_split_line, 256, col1);
@@ -1681,7 +1681,7 @@ static void dambustr_draw_upper_background(mame_bitmap *bitmap)
 {
 	static rectangle clip = { 0, 0, 0, 0 };
 
-	if (flip_screen_x)
+	if (flip_screen_x_get())
 	{
 		clip.min_x = 254 - dambustr_bg_split_line;
 		clip.max_x = dambustr_bg_split_line;

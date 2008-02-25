@@ -78,7 +78,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 				sx=240-sx;
 				sy=240-sy;

@@ -134,9 +134,9 @@ static TILE_GET_INFO( tx_get_tile_info )
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			(code & 0x7f) | (flip_screen ? 0x80 : 0),
+			(code & 0x7f) | (flip_screen_get() ? 0x80 : 0),
 			color,
-			flip_screen ? TILE_FLIPX : 0);
+			flip_screen_get() ? TILE_FLIPX : 0);
 }
 
 
@@ -277,7 +277,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 		if (size)
 			sprite = (sprite & 0xc0) | ((sprite & ~0xc0) << 2);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			flipx ^= 1;
 			flipy ^= 1;

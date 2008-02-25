@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			int sx = (INT16)buffered_spriteram16[offs+3];	/* signed */
 			int sy = (INT16)buffered_spriteram16[offs+2];	/* signed */
 			if(sy>512-16) sy-=512;
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

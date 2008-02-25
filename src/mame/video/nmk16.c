@@ -444,7 +444,7 @@ static void nmk16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 			if(pri != priority)
 				continue;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;
@@ -461,7 +461,7 @@ static void nmk16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 					drawgfx(bitmap,machine->gfx[2],
 							code,
 							color,
-							flip_screen, flip_screen,
+							flip_screen_get(), flip_screen_get(),
 							((x + 16) & 0x1ff) - 16,sy & 0x1ff,
 							cliprect,TRANSPARENCY_PEN,15);
 					code++;
@@ -498,10 +498,10 @@ static void nmk16_draw_sprites_flipsupported(running_machine *machine, mame_bitm
 			if(pri != priority)
 				continue;
 
-			flipx ^= flip_screen;
-			flipy ^= flip_screen;
+			flipx ^= flip_screen_get();
+			flipy ^= flip_screen_get();
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 368 - sx;
 				sy = 240 - sy;

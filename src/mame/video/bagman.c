@@ -85,7 +85,7 @@ PALETTE_INIT( bagman )
 
 WRITE8_HANDLER( bagman_flipscreen_w )
 {
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
@@ -120,12 +120,12 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		sy = 240 - spriteram[offs + 2];
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			sx = 240 - sx +1;	/* compensate misplacement */
 			flipx = !flipx;
 		}
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

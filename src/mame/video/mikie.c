@@ -113,7 +113,7 @@ WRITE8_HANDLER( mikie_palettebank_w )
 
 WRITE8_HANDLER( mikie_flipscreen_w )
 {
-	if (flip_screen != (data & 0x01))
+	if (flip_screen_get() != (data & 0x01))
 	{
 		flip_screen_set(data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -149,7 +149,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipx = ~spriteram[offs] & 0x10;
 		int flipy = spriteram[offs] & 0x20;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sy = 242 - sy;
 			flipy = !flipy;

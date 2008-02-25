@@ -75,13 +75,13 @@ WRITE8_HANDLER( hanaawas_colorram_w )
 
 	/* dirty both current and next offsets */
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
-	tilemap_mark_tile_dirty(bg_tilemap, (offset + (flip_screen ? -1 : 1)) & 0x03ff);
+	tilemap_mark_tile_dirty(bg_tilemap, (offset + (flip_screen_get() ? -1 : 1)) & 0x03ff);
 }
 
 WRITE8_HANDLER( hanaawas_portB_w )
 {
 	/* bit 7 is flip screen */
-	if (flip_screen != (~data & 0x80))
+	if (flip_screen_get() != (~data & 0x80))
 	{
 		flip_screen_set(~data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -91,7 +91,7 @@ WRITE8_HANDLER( hanaawas_portB_w )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
-	int offset = (tile_index + (flip_screen ? 1 : -1)) & 0x3ff;
+	int offset = (tile_index + (flip_screen_get() ? 1 : -1)) & 0x3ff;
 	int attr = colorram[offset];
 	int gfxbank = (attr & 0x40) >> 6;
 	int code = videoram[tile_index] + ((attr & 0x20) << 3);

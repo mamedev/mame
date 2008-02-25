@@ -124,7 +124,7 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 
 WRITE8_HANDLER( ironhors_flipscreen_w )
 {
-	if (flip_screen != (~data & 0x08))
+	if (flip_screen_get() != (~data & 0x08))
 	{
 		flip_screen_set(~data & 0x08);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -170,9 +170,9 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipy = sr[offs+4] & 0x40;
 		int code = (sr[offs] << 2) + ((sr[offs+1] & 0x03) << 10) + ((sr[offs+1] & 0x0c) >> 2);
 		int color = ((sr[offs+1] & 0xf0)>>4) + 16 * palettebank;
-	//  int mod = flip_screen ? -8 : 8;
+	//  int mod = flip_screen_get() ? -8 : 8;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -193,7 +193,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 			case 0x04:	/* 16x8 */
 				{
-					if (flip_screen) sy += 8; // this fixes the train wheels' position
+					if (flip_screen_get()) sy += 8; // this fixes the train wheels' position
 
 					drawgfx(bitmap,machine->gfx[2],
 							code & ~1,

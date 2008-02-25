@@ -201,10 +201,8 @@ static WRITE8_HANDLER( pacland_flipscreen_w )
 {
 	int bit = !BIT(offset,11);
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	/* FIXME: flip_screen_x should not be written. The above issue needs */
-	/*        some other solution */
-	flip_screen_x = bit;
-	tilemap_set_flip(ALL_TILEMAPS,flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set_no_update(bit);
+	tilemap_set_flip(ALL_TILEMAPS,flip_screen_get() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 

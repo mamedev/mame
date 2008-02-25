@@ -189,9 +189,8 @@ VIDEO_START( congo )
 WRITE8_HANDLER( zaxxon_flipscreen_w )
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	/* FIXME: flip_screen_x should not be written. */
-	flip_screen_x = ~data & 1;
-	tilemap_set_flip(fg_tilemap, flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	flip_screen_set_no_update(~data & 1);
+	tilemap_set_flip(fg_tilemap, flip_screen_get() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 
 
@@ -314,13 +313,13 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 		int colorbase = bg_color + (congo_color_bank << 8);
 		int xmask = pixmap->width - 1;
 		int ymask = pixmap->height - 1;
-		int flipmask = flip_screen ? 0xff : 0x00;
-		int flipoffs = flip_screen ? 0x38 : 0x40;
+		int flipmask = flip_screen_get() ? 0xff : 0x00;
+		int flipoffs = flip_screen_get() ? 0x38 : 0x40;
 		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
-		if (!flip_screen)
+		if (!flip_screen_get())
 			flipoffs -= 1;
 		else
 			flipoffs += 7;
@@ -378,8 +377,8 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 INLINE int find_minimum_y(UINT8 value)
 {
-	int flipmask = flip_screen ? 0xff : 0x00;
-	int flipconst = flip_screen ? 0xef : 0xf1;
+	int flipmask = flip_screen_get() ? 0xff : 0x00;
+	int flipconst = flip_screen_get() ? 0xef : 0xf1;
 	int y;
 
 	/* the sum of the Y position plus a constant based on the flip state */
@@ -409,7 +408,7 @@ INLINE int find_minimum_y(UINT8 value)
 
 INLINE int find_minimum_x(UINT8 value)
 {
-	int flipmask = flip_screen ? 0xff : 0x00;
+	int flipmask = flip_screen_get() ? 0xff : 0x00;
 	int x;
 
 	/* the sum of the X position plus a constant specifies the address within */
@@ -423,7 +422,7 @@ INLINE int find_minimum_x(UINT8 value)
 
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
-	int flipmask = flip_screen ? 0xff : 0x00;
+	int flipmask = flip_screen_get() ? 0xff : 0x00;
 	int offs;
 
 	/* only the lower half of sprite RAM is read during rendering */

@@ -104,7 +104,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 		sx += (spriteram_2[offs] & 0x20) >> 5;	// not sure about this
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;

@@ -202,7 +202,7 @@ static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 			flipy   = 0;
 			tile    = (sprite_word[1] & 0xfff) + ((sprite_word[2] & 0x8000) >> 3);
 
-			if (flip_screen) {
+			if (flip_screen_get()) {
 				x=240-x;
 				y=240-y;
 				if (flipx) flipx=0; else flipx=1;

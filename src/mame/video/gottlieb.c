@@ -95,13 +95,13 @@ WRITE8_HANDLER( gottlieb_video_outputs_w )
 
 	background_priority = data & 0x01;
 
-	if (flip_screen_x != (data & 0x02))
+	if (flip_screen_x_get() != (data & 0x02))
 	{
 		flip_screen_x_set(data & 0x02);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	if (flip_screen_y != (data & 0x04))
+	if (flip_screen_y_get() != (data & 0x04))
 	{
 		flip_screen_y_set(data & 0x04);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -187,13 +187,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sy = (spriteram[offs]) - 13;
 		int code = (255 ^ spriteram[offs + 2]) + 256 * spritebank;
 
-		if (flip_screen_x) sx = 233 - sx;
-		if (flip_screen_y) sy = 244 - sy;
+		if (flip_screen_x_get()) sx = 233 - sx;
+		if (flip_screen_y_get()) sy = 244 - sy;
 
 		if (spriteram[offs] || spriteram[offs + 1])	/* needed to avoid garbage on screen */
 			drawgfx(bitmap, machine->gfx[1],
 				code, 0,
-				flip_screen_x, flip_screen_y,
+				flip_screen_x_get(), flip_screen_y_get(),
 				sx,sy,
 				cliprect,
 				TRANSPARENCY_PEN, 0);

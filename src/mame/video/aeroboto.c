@@ -75,7 +75,7 @@ VIDEO_START( aeroboto )
 
 READ8_HANDLER( aeroboto_in0_r )
 {
-	return readinputport(flip_screen ? 1 : 0);
+	return readinputport(flip_screen_get() ? 1 : 0);
 }
 
 WRITE8_HANDLER( aeroboto_3000_w )
@@ -126,7 +126,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int x = spriteram[offs+3];
 		int y = 240 - spriteram[offs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			x = 248 - x;
 			y = 240 - y;
@@ -135,7 +135,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		drawgfx(bitmap, machine->gfx[1],
 				spriteram[offs+1],
 				spriteram[offs+2] & 0x07,
-				flip_screen, flip_screen,
+				flip_screen_get(), flip_screen_get(),
 				((x + 8) & 0xff) - 8, y,
 				cliprect, TRANSPARENCY_PEN, 0);
 	}

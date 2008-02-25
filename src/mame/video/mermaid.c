@@ -167,20 +167,20 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
 		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy,
-			(flip_screen_x ? &flip_spritevisiblearea : &spritevisiblearea),
+			(flip_screen_x_get() ? &flip_spritevisiblearea : &spritevisiblearea),
 			TRANSPARENCY_PEN, 0);
 	}
 }

@@ -9,7 +9,7 @@ UINT16* pcktgaldb_sprites;
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
 {
 	int offs;
-	int flipscreen=!flip_screen;
+	int flipscreen=!flip_screen_get();
 
 	for (offs = 0;offs < 0x400;offs += 4)
 	{

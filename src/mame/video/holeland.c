@@ -120,13 +120,13 @@ static void holeland_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		flipx = spriteram[offs+3] & 0x04;
 		flipy = spriteram[offs+3] & 0x08;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -158,13 +158,13 @@ static void crzrally_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 		flipx = spriteram[offs+3] & 0x04;
 		flipy = spriteram[offs+3] & 0x08;
 
-		if (flip_screen_x)
+		if (flip_screen_x_get())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y)
+		if (flip_screen_y_get())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;

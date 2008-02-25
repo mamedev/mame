@@ -108,7 +108,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		color = (spriteram16[offs+1]>>12)&0xf;
 		sprite = spriteram16[offs+1]&0xfff;
 
-		if (flip_screen) {
+		if (flip_screen_get()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;

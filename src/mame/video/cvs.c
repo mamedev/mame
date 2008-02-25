@@ -362,10 +362,10 @@ VIDEO_UPDATE( cvs )
 			{
 				if ((y & 1) ^ ((x >> 4) & 1))
 				{
-					if (flip_screen_x)
+					if (flip_screen_x_get())
 						x = ~x;
 
-					if (flip_screen_y)
+					if (flip_screen_y_get())
 						y = ~y;
 
 					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)

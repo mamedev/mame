@@ -1306,7 +1306,7 @@ static void cps1_render_sprites(running_machine *machine, mame_bitmap *bitmap, c
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
-	if (flip_screen)												\
+	if (flip_screen_get())												\
 		pdrawgfx(bitmap,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
@@ -1549,7 +1549,7 @@ static void cps2_render_sprites(running_machine *machine, mame_bitmap *bitmap,co
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									\
 {																					\
-	if (flip_screen)																\
+	if (flip_screen_get())																\
 		pdrawgfx(bitmap,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
@@ -1716,7 +1716,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 				int sy = (offs % 256);
 				sx = (sx - stars2x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - stars2y) & 0xff;
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;
@@ -1742,7 +1742,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 				int sy = (offs % 256);
 				sx = (sx - stars1x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - stars1y) & 0xff;
-				if (flip_screen)
+				if (flip_screen_get())
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;

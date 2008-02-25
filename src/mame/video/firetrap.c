@@ -227,7 +227,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		color = ((spriteram[offs + 1] & 0x08) >> 2) | (spriteram[offs + 1] & 0x01);
 		flipx = spriteram[offs + 1] & 0x04;
 		flipy = spriteram[offs + 1] & 0x02;
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -237,7 +237,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 		if (spriteram[offs + 1] & 0x10)	/* double width */
 		{
-			if (flip_screen) sy -= 16;
+			if (flip_screen_get()) sy -= 16;
 
 			drawgfx(bitmap,machine->gfx[3],
 					code & ~1,

@@ -142,7 +142,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		sx = buffered_spriteram[offs + 3] + 0x100 * ( attr & 0x01);
 		flipy = attr & 0x02;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
@@ -152,7 +152,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		drawgfx(bitmap,machine->gfx[2],
 				code,
 				colour,
-				flip_screen,flipy,
+				flip_screen_get(),flipy,
 				sx, sy,
 				cliprect,TRANSPARENCY_PEN,15);
 	}

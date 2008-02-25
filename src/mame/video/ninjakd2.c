@@ -367,7 +367,7 @@ static void draw_sprites(running_machine* const machine, mame_bitmap* const bitm
 			int const big = (sprptr[2] & 0x04) >> 2;
 			int x,y;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - 16*big - sx;
 				sy = 240 - 16*big - sy;

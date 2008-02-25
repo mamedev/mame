@@ -5,7 +5,7 @@
 static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
 {
 	int offs;
-	int flipscreen=!flip_screen;
+	int flipscreen=!flip_screen_get();
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{

@@ -305,7 +305,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipy	=	0;
 
 		x -= 0x4a/2;
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			y = 240 - y;
 			flipx = !flipx;

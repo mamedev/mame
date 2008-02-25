@@ -61,7 +61,7 @@ WRITE8_HANDLER( battlex_flipscreen_w )
 
 	/* bit 7 is flip screen */
 
-	if (flip_screen != (data & 0x80))
+	if (flip_screen_get() != (data & 0x80))
 	{
 		flip_screen_set(data & 0x80);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -97,7 +97,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

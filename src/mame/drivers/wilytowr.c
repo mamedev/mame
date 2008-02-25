@@ -122,7 +122,7 @@ static WRITE8_HANDLER( wilytwr_palbank_w )
 
 static WRITE8_HANDLER( wilytwr_flipscreen_w )
 {
-	if (flip_screen != (~data & 0x01))
+	if (flip_screen_get() != (~data & 0x01))
 	{
 		flip_screen_set(~data & 0x01);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( wilytwr_flipscreen_w )
 static WRITE8_HANDLER( fghtbskt_flipscreen_w )
 {
 	flip_screen_set(data);
-	fg_flag = flip_screen ? TILE_FLIPX : 0;
+	fg_flag = flip_screen_get() ? TILE_FLIPX : 0;
 }
 
 
@@ -179,7 +179,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 		int sx = spriteram[offs + 3];
 		int sy = sy_offset - spriteram[offs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = sy_offset - sy;

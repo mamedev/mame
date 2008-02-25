@@ -80,7 +80,7 @@ static void kchamp_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
         int sx = spriteram[offs + 3] - 8;
         int sy = 247 - spriteram[offs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -108,7 +108,7 @@ static void kchampvs_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
         int sx = spriteram[offs + 3];
         int sy = 240 - spriteram[offs];
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

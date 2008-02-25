@@ -201,7 +201,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			flipx = bank & 1;
 			flipy = bank & 2;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				xpos = 256 - (8 * size) - xpos;
 				ypos = 256 - (8 * size) - ypos;

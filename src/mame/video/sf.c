@@ -148,7 +148,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		{
 			int c1,c2,c3,c4,t;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 480 - sx;
 				sy = 224 - sy;
@@ -203,7 +203,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 		}
 		else
 		{
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;

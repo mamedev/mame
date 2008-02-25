@@ -205,7 +205,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			flipx ^= 1;
 			flipy ^= 1;

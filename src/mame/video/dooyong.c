@@ -413,7 +413,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			}
 		}
 
-		if (flip_screen)
+		if (flip_screen_get())
 		{
 			sx = 498 - sx;
 			sy = 240 - (16 * height) - sy;
@@ -475,7 +475,7 @@ static void rshark_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 			width = buffered_spriteram16[offs+1] & 0x000f;
 			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
 
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 498 - (16 * width) - sx;
 				sy = 240 - (16 * height) - sy;

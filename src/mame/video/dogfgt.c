@@ -128,7 +128,7 @@ static WRITE8_HANDLER( internal_bitmapram_w )
 
 		for (i = 0;i < 3;i++)
 			color |= ((bitmapram[offset + BITMAPRAM_SIZE/3 * i] >> subx) & 1) << i;
-		if (flip_screen)
+		if (flip_screen_get())
 			*BITMAP_ADDR16(pixbitmap, y^0xff, (x+subx)^0xff) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
 		else
 			*BITMAP_ADDR16(pixbitmap, y, x+subx) = PIXMAP_COLOR_BASE + 8*pixcolor + color;
@@ -199,7 +199,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			sy = (240 - spriteram[offs+2]) & 0xff;
 			flipx = spriteram[offs] & 0x04;
 			flipy = spriteram[offs] & 0x02;
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -224,9 +224,9 @@ VIDEO_UPDATE( dogfgt )
 	int offs;
 
 
-	if (lastflip != flip_screen || lastpixcolor != pixcolor)
+	if (lastflip != flip_screen_get() || lastpixcolor != pixcolor)
 	{
-		lastflip = flip_screen;
+		lastflip = flip_screen_get();
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)

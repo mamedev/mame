@@ -194,9 +194,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
 	SET_TILE_INFO(
 			0,
-			xevious_fg_videoram[tile_index] | (flip_screen ? 0x100 : 0),
+			xevious_fg_videoram[tile_index] | (flip_screen_get() ? 0x100 : 0),
 			color,
-			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen ? TILE_FLIPX : 0));
+			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen_get() ? TILE_FLIPX : 0));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -450,7 +450,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 			color = spriteram[offs + 1] & 0x7f;
 			flipx = spriteram_3[offs] & 4;
 			flipy = spriteram_3[offs] & 8;
-			if (flip_screen)
+			if (flip_screen_get())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
