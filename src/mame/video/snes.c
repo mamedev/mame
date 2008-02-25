@@ -1443,7 +1443,7 @@ static void snes_update_objects(UINT8 screen, UINT16 curline )
              * Stop drawing if exceeded 32 objects and
              * enforcing that limit is enabled */
 			range_over++;
-			if( range_over == 32 && (readinputport( 16 ) & 0x10) )
+			if( range_over == 32 ) //&& (readinputport( 16 ) & 0x10) )
 			{
 				/* Set the flag in STAT77 register */
 				snes_ram[STAT77] |= 0x40;
