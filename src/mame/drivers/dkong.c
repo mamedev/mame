@@ -96,6 +96,10 @@ Done:
   I have added a driver configuration switch to switch between TKG4 and TKG2-01 (radarscope) palettes.
   At a later stage, a TKG2-02 will be added as well.
 
+  Mike Haaland provided the following information on startup sounds:
+  
+  For both of these boards [dkong, dkongjr], only the jump sound 
+  is distinguishable. I don't hear the pound of walk sound.
 
 Donkey Kong and Donkey Kong Jr. memory map (preliminary) (DKong 3 follows)
 
