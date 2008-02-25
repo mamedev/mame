@@ -7790,12 +7790,17 @@ Other Sun games
 	DRIVER( dreamwld )	/* (c) 2000 SemiCom */
 	DRIVER( cybertnk )	/* (c) 1990 Coreland */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
+
+	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolycdae )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
-	DRIVER( jolycdcr )	/* (c) 1993 Soft Design */
+	DRIVER( jolycdev )	/* (c) 1998 TAB/Evona */
+	DRIVER( jolyccra )	/* (c) 1985 TAB-Austria */
+	DRIVER( jolyccrb )	/* (c) 1993 Soft Design */
 	DRIVER( jolycdit )	/* 199? bootleg */
+	DRIVER( sjcd2kx3 )	/* (c) 1985 M.P.*/
 	DRIVER( jolycdab )	/* (c) 1986 Inter Games */
 	DRIVER( bigdeal )	/* (c) 1986 Funworld */
 	DRIVER( bigdealb )	/* (c) 1986 Funworld */
@@ -7816,11 +7821,15 @@ Other Sun games
 	DRIVER( magiccdb )	/* (c) 1996 Impera */
 	DRIVER( vegasslw )	/* (c) 1993 Funworld */
 	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
+	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
+	DRIVER( jolyjokr )	/* (c) 198? Impera */
+	DRIVER( jolyjkra )	/* (c) 198? Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
 	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
+
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
 	DRIVER( cmv801 )	/* (c) 198? Corsica */

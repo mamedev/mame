@@ -14,8 +14,11 @@
     * Jolly Card (austrian, encrypted),                 TAB-Austria,        1985.
     * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
     * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
-    * Jolly Card (croatian),                            Soft Design,        1993.
+    * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
+    * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
+    * Jolly Card (croatian, set 2),                     Soft Design,        1993.
     * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
+    * Super Joly 2000 - 3x,                             M.P.                1985.
     * Jolly Card (austrian, Funworld, bootleg),         Inter Games,        1986.
     * Big Deal (hungarian, set 1),                      Funworld,           1986.
     * Big Deal (hungarian, set 2),                      Funworld,           1986.
@@ -36,6 +39,9 @@
     * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
     * Royal Vegas Joker Card (slow deal),               Funworld,           1993.
     * Royal Vegas Joker Card (fast deal),               Soft Design,        1993.
+    * Royal Vegas Joker Card (fast deal, english gfx),  Soft Design,        1993.
+    * Jolly Joker,                                      Impera,             198?.
+    * Jolly Joker (50bet),                              Impera,             198?.
     * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
     * Mongolfier New (italian),                         bootleg,            199?.
     * Soccer New (italian),                             bootleg,            199?.
