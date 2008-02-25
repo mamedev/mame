@@ -173,7 +173,7 @@ static void draw_sprites(const _20pacgal_state *state, mame_bitmap *bitmap)
 		sy = (sy & 0xff) - 32;	/* fix wraparound */
 
 		/* only Galaga appears to be effected by the global flip state */
-		if (state->game_selected && (state->flip_screen[0] & 0x01))
+		if (state->game_selected && (state->flip[0] & 0x01))
 		{
 			flip_x = !flip_x;
 			flip_y = !flip_y;
@@ -201,7 +201,7 @@ static void draw_chars(const _20pacgal_state *state, mame_bitmap *bitmap)
 {
 	offs_t offs;
 
-	int flip = state->flip_screen[0] & 0x01;
+	int flip = state->flip[0] & 0x01;
 
 	/* for each byte in the video RAM */
 	for (offs = 0; offs < 0x400; offs++)

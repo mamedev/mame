@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x88, 0x88) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_WRITE(_20pacgal_dac_w)
 	AM_RANGE(0x8a, 0x8a) AM_WRITE(MWA8_NOP)				/* stars: bits 3-4 = active set; bit 5 = enable */
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(_20pacgal_state, flip_screen)
+	AM_RANGE(0x8b, 0x8b) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(_20pacgal_state, flip)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
 

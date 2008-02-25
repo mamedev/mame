@@ -185,7 +185,7 @@ static VIDEO_START( madalien )
 }
 
 
-static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip_screen, int scroll_mode)
+static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip, int scroll_mode)
 {
 	rectangle clip_edge1;
 	rectangle clip_edge2;
@@ -193,7 +193,7 @@ static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip_
 	clip_edge1 = *cliprect;
 	clip_edge2 = *cliprect;
 
-	if (flip_screen)
+	if (flip)
 	{
 		clip_edge1.min_y = *madalien_edge1_pos | 0x80;
 		clip_edge2.max_y = (*madalien_edge2_pos & 0x7f) ^ 0x7f;
@@ -210,11 +210,11 @@ static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip_
 	tilemap_mark_all_tiles_dirty(tilemap_edge1[scroll_mode]);
 	tilemap_mark_all_tiles_dirty(tilemap_edge2[scroll_mode]);
 
-	tilemap_set_flip(tilemap_edge1[scroll_mode], flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(tilemap_edge1[scroll_mode], flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_scrollx(tilemap_edge1[scroll_mode], 0, -(*madalien_scroll & 0xfc));
 	tilemap_set_scrolly(tilemap_edge1[scroll_mode], 0, *madalien_edge1_pos & 0x7f);
 
-	tilemap_set_flip(tilemap_edge2[scroll_mode], flip_screen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	tilemap_set_flip(tilemap_edge2[scroll_mode], flip ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 	tilemap_set_scrollx(tilemap_edge2[scroll_mode], 0, -(*madalien_scroll & 0xfc));
 	tilemap_set_scrolly(tilemap_edge2[scroll_mode], 0, *madalien_edge2_pos & 0x7f);
 
@@ -223,7 +223,7 @@ static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip_
 }
 
 
-static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int flip_screen)
+static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int flip)
 {
 	if (BIT(*madalien_video_flags, 0))
 	{
@@ -234,7 +234,7 @@ static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int f
 			UINT8 x;
 			UINT8 hy = y - *madalien_headlight_pos;
 
-			if (flip_screen)
+			if (flip)
 				hy = ~hy;
 
 			if ((hy < cliprect->min_y) || (hy > cliprect->max_y))
@@ -244,7 +244,7 @@ static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int f
 			{
 				UINT8 hx = x;
 
-				if (flip_screen)
+				if (flip)
 					hx = ~hx;
 
 				if ((hx < cliprect->min_x) || (hx > cliprect->max_x))
@@ -258,7 +258,7 @@ static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int f
 }
 
 
-static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int flip_screen)
+static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int flip)
 {
 	int i;
 
@@ -266,14 +266,14 @@ static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const
 		decodechar(machine->gfx[0], i, madalien_charram);
 
 	tilemap_mark_all_tiles_dirty(tilemap_fg);
-	tilemap_set_flip(tilemap_fg, flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	tilemap_set_flip(tilemap_fg, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_draw(bitmap, cliprect, tilemap_fg, 0, 0);
 }
 
 
 static VIDEO_UPDATE( madalien )
 {
-	int flip_screen = BIT(readinputportbytag("DIP"), 6) && BIT(*madalien_video_control, 0);
+	int flip = BIT(readinputportbytag("DIP"), 6) && BIT(*madalien_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//
@@ -285,8 +285,8 @@ static VIDEO_UPDATE( madalien )
 	int scroll_mode = *madalien_scroll & 3;
 
 	fillbitmap(bitmap, 0, cliprect);
-	draw_edges(bitmap, cliprect, flip_screen, scroll_mode);
-	draw_foreground(machine, bitmap, cliprect, flip_screen);
+	draw_edges(bitmap, cliprect, flip, scroll_mode);
+	draw_foreground(machine, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels) */
 
@@ -304,7 +304,7 @@ static VIDEO_UPDATE( madalien )
 		if (scroll_mode == 3)
 			max_x = (*madalien_scroll & 0xfc) - 1;
 
-		if (flip_screen)
+		if (flip)
 		{
 			int max_x_save = max_x;
 			max_x = 0xff - min_x;
@@ -317,7 +317,7 @@ static VIDEO_UPDATE( madalien )
 					*BITMAP_ADDR16(bitmap, y, x) |= 8;
 	}
 
-	draw_headlight(bitmap, cliprect, flip_screen);
+	draw_headlight(bitmap, cliprect, flip);
 
 	return 0;
 }

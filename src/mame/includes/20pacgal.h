@@ -16,7 +16,7 @@ struct __20pacgal_state
 	UINT8 *video_ram;
 	UINT8 *sprite_ram;
 	UINT8 *sprite_color_lookup;
-	UINT8 *flip_screen;
+	UINT8 *flip;
 
 	/* machine state */
 	UINT8 game_selected;	/* 0 = Ms. Pac-Man, 1 = Galaga */

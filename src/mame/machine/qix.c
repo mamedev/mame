@@ -605,7 +605,7 @@ static READ8_HANDLER( slither_trak_lr_r )
 {
 	qix_state *state = Machine->driver_data;
 
-	return readinputport(state->flip_screen ? 6 : 4);
+	return readinputport(state->flip ? 6 : 4);
 }
 
 
@@ -613,5 +613,5 @@ static READ8_HANDLER( slither_trak_ud_r )
 {
 	qix_state *state = Machine->driver_data;
 
-	return readinputport(state->flip_screen ? 5 : 3);
+	return readinputport(state->flip ? 5 : 3);
 }

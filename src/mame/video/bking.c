@@ -149,7 +149,8 @@ WRITE8_HANDLER( bking_cont1_w )
 
 	coin_lockout_global_w(~data & 0x01);
 
-	flip_screen = data & 0x04;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = data & 0x04;
 
 	tilemap_set_flip(ALL_TILEMAPS, flip_screen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 

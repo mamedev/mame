@@ -93,8 +93,9 @@ static VIDEO_START(backfire)
 static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
 {
 	int offs;
-
-	flip_screen = 1;
+	
+	//FIXME: flip_screen_x should not be written!
+	flip_screen_x = 1;
 
 	for (offs = (0x1400/4)-4;offs >= 0;offs -= 4) // 0x1400 for charlien
 	{
@@ -144,7 +145,7 @@ static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rect
 			inc = 1;
 		}
 
-		if (flip_screen)
+		if (flip_screen_x)
 		{
 			y=240-y;
 			x=304-x;

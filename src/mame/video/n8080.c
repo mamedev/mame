@@ -29,7 +29,8 @@ WRITE8_HANDLER( n8080_video_control_w )
 	sheriff_color_mode = (data >> 3) & 3;
 	sheriff_color_data = (data >> 0) & 7;
 
-	flip_screen = data & 0x20;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = data & 0x20;
 }
 
 
@@ -108,7 +109,8 @@ VIDEO_START( spacefev )
 {
 	cannon_timer = timer_alloc(spacefev_stop_red_cannon, NULL);
 
-	flip_screen = 0;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = 0;
 
 	spacefev_red_screen = 0;
 	spacefev_red_cannon = 0;
@@ -117,7 +119,8 @@ VIDEO_START( spacefev )
 
 VIDEO_START( sheriff )
 {
-	flip_screen = 0;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = 0;
 
 	sheriff_color_mode = 0;
 	sheriff_color_data = 0;
@@ -144,7 +147,7 @@ VIDEO_START( helifire )
 		helifire_LSFR[i] = data;
 	}
 
-	flip_screen = 0;
+	flip_screen_x = 0;
 
 	helifire_flash = 0;
 }

@@ -63,6 +63,7 @@ extern UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
 extern UINT16 *paletteram16_2;
 
 extern mame_bitmap *tmpbitmap;
+
 extern int flip_screen_x, flip_screen_y;
 
 
@@ -124,7 +125,9 @@ void buffer_spriteram_2(UINT8 *ptr, int length);
 void flip_screen_set(int on);
 void flip_screen_x_set(int on);
 void flip_screen_y_set(int on);
-#define flip_screen flip_screen_x
+int flip_screen_get(void); 
+
+#define flip_screen flip_screen_get()
 
 
 

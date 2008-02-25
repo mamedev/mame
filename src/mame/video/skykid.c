@@ -123,7 +123,7 @@ VIDEO_START( skykid )
 	state_save_register_global(priority);
 	state_save_register_global(scroll_x);
 	state_save_register_global(scroll_y);
-	state_save_register_global(flip_screen);
+	state_save_register_global(flip_screen_x);
 }
 
 

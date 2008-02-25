@@ -53,7 +53,7 @@ static VIDEO_START( qix )
 
 	/* set up save states */
 	state_save_register_global_pointer(state->videoram, 256 * 256);
-	state_save_register_global(state->flip_screen);
+	state_save_register_global(state->flip);
 	state_save_register_global(state->palette_bank);
 	state_save_register_global(state->leds);
 }
@@ -93,7 +93,7 @@ WRITE8_HANDLER( qix_flip_screen_w )
 {
 	qix_state *state = Machine->driver_data;
 
-	state->flip_screen = data;
+	state->flip = data;
 }
 
 
@@ -363,7 +363,7 @@ static void qix_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitm
 
 	/* the memory is hooked up to the MA, RA lines this way */
 	offs_t offs = ((ma << 6) & 0xf800) | ((ra << 8) & 0x0700);
-	offs_t offs_xor = state->flip_screen ? 0xffff : 0;
+	offs_t offs_xor = state->flip ? 0xffff : 0;
 
 	for (x = 0; x < x_count * 8; x++)
 		scanline[x] = state->videoram[(offs + x) ^ offs_xor];

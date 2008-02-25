@@ -130,7 +130,8 @@ VIDEO_START( zodiack )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scroll_cols(fg_tilemap, 32);
 
-	flip_screen = 0;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = 0;
 }
 
 static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)

@@ -189,7 +189,8 @@ VIDEO_START( congo )
 WRITE8_HANDLER( zaxxon_flipscreen_w )
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
-	flip_screen = ~data & 1;
+	/* FIXME: flip_screen_x should not be written. */
+	flip_screen_x = ~data & 1;
 	tilemap_set_flip(fg_tilemap, flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 }
 

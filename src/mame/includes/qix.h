@@ -31,7 +31,7 @@ struct _qix_state
 	UINT8 *videoram_address;
 	UINT8 *videoram_mask;
 	UINT8 *paletteram;
-	UINT8  flip_screen;
+	UINT8  flip;
 	UINT8  palette_bank;
 	UINT8  leds;
 	UINT8 *scanline_latch;

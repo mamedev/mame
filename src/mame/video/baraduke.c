@@ -313,7 +313,9 @@ VIDEO_UPDATE( baraduke )
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
-	flip_screen = spriteram[0x07f6] & 0x01;
+	/* FIXME: flip_screen_x should not be written. The above issue needs */
+	/*        some other solution */
+	flip_screen_x = spriteram[0x07f6] & 0x01;
 	tilemap_set_flip(ALL_TILEMAPS,flip_screen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	set_scroll(0);
 	set_scroll(1);
