@@ -2353,7 +2353,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_CPU_PROGRAM_MAP(mazinger_sound_readmem,mazinger_sound_writemem)
 	MDRV_CPU_IO_MAP(mazinger_sound_readport,mazinger_sound_writeport)
 
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2410,7 +2410,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_readmem,metmqstr_sound_writemem)
 	MDRV_CPU_IO_MAP(metmqstr_sound_readport,metmqstr_sound_writeport)
 
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(cave)	/* start with the watchdog armed */
 	MDRV_NVRAM_HANDLER(cave)

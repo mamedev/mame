@@ -525,14 +525,12 @@ static TIMER_CALLBACK( pc_keyb_timer )
 
 void pc_keyb_set_clock(int on)
 {
-	attotime keyb_delay = STATIC_ATTOTIME_IN_MSEC(5);
-
 	on = on ? 1 : 0;
 
 	if (pc_keyb.on != on)
 	{
 		if (on)
-			timer_adjust_oneshot(pc_keyboard_timer, keyb_delay, 0);
+			timer_adjust_oneshot(pc_keyboard_timer, ATTOTIME_IN_MSEC(5), 0);
 		else
 			timer_reset(pc_keyboard_timer, attotime_never);
 

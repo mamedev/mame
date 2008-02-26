@@ -19,6 +19,8 @@
     MACROS (must be *before* the includes below)
 ***************************************************************************/
 
+#include "mamecore.h"
+
 #define DRIVER_INIT(name)			void driver_init_##name(running_machine *machine)
 #define DRIVER_INIT_CALL(name)		driver_init_##name(machine)
 
@@ -68,6 +70,20 @@
 #define palette_init_NULL			NULL
 #define video_eof_NULL 				NULL
 #define video_update_NULL 			NULL
+
+
+typedef void (*driver_init_func)(running_machine *machine);
+typedef void (*nvram_handler_func)(running_machine *machine, mame_file *file, int read_or_write);
+typedef void (*memcard_handler_func)(running_machine *machine, mame_file *file, int action);
+typedef void (*machine_start_func)(running_machine *machine);
+typedef void (*machine_reset_func)(running_machine *machine);
+typedef void (*sound_start_func)(running_machine *machine);
+typedef void (*sound_reset_func)(running_machine *machine);
+typedef void (*video_start_func)(running_machine *machine);
+typedef void (*video_reset_func)(running_machine *machine);
+typedef void (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
+typedef void (*video_eof_func)(running_machine *machine);
+typedef UINT32 (*video_update_func)(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect);
 
 
 
@@ -147,7 +163,7 @@ struct _game_driver
 	const char *		description;				/* full name of the game */
 	const char *		year;						/* year the game was released */
 	const char *		manufacturer;				/* manufacturer of the game */
-	void 				(*drv)(machine_config *);	/* machine driver constructor */
+	const machine_config_token *machine_config;		/* machine driver tokens */
 	const input_port_token *ipt;					/* pointer to array of input port tokens */
 	void				(*driver_init)(running_machine *machine); /* DRIVER_INIT callback */
 	const rom_entry *	rom;						/* pointer to list of ROMs for the game */
@@ -179,7 +195,7 @@ const game_driver driver_##NAME =					\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	construct_##MACHINE,					\
+	machine_config_##MACHINE,				\
 	ipt_##INPUT,							\
 	driver_init_##INIT,						\
 	rom_##NAME,								\

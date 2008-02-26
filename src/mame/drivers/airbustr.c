@@ -614,7 +614,7 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_INTERLEAVE(100)	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
 	MDRV_MACHINE_RESET(airbustr)
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	// video hardware
 

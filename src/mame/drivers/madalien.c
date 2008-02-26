@@ -185,7 +185,7 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(madalien_video);
+	MDRV_IMPORT_FROM(madalien_video)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

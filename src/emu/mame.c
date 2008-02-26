@@ -1334,7 +1334,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		astring *sourcename;
 
 		/* parse "vector.ini" for vector games */
-		config = machine_config_alloc(driver->drv);
+		config = machine_config_alloc(driver->machine_config);
 		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 		{
 			const screen_config *scrconfig = device->inline_config;
@@ -1419,7 +1419,7 @@ static running_machine *create_machine(const game_driver *driver)
 	/* initialize the driver-related variables in the machine */
 	machine->gamedrv = driver;
 	machine->basename = mame_strdup(driver->name);
-	machine->config = machine_config_alloc(driver->drv);
+	machine->config = machine_config_alloc(driver->machine_config);
 
 	/* allocate the driver data */
 	if (machine->config->driver_data_size != 0)
@@ -1588,10 +1588,11 @@ static void init_machine(running_machine *machine)
 
 	/* start the video and audio hardware */
 	video_init(machine);
-	sound_init(machine);
 
 	/* start up the devices */
 	device_list_start(machine);
+
+	sound_init(machine);
 
 	/* call the driver's _START callbacks */
 	if (machine->config->machine_start != NULL) (*machine->config->machine_start)(machine);

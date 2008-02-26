@@ -607,6 +607,7 @@ static MACHINE_DRIVER_START( abaseb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(abaseb_map,0)
 
 	/* video hardware */

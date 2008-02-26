@@ -273,7 +273,6 @@ static MACHINE_DRIVER_START( froggrmc )
 	MDRV_CPU_PROGRAM_MAP(froggrmc_readmem,froggrmc_writemem)
 
 	MDRV_VIDEO_START(froggers)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_DRIVER_END
 
 

@@ -558,7 +558,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 	for (drvindex = 0; drivers[drvindex]; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config *config = machine_config_alloc(drivers[drvindex]->drv);
+			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
 			int sndnum;
 
 			/* find samples interfaces */

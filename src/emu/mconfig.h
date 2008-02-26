@@ -15,15 +15,72 @@
 #define __MCONFIG_H__
 
 #include "devintrf.h"
+#include <stddef.h>
 
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* maxima */
-#define MAX_SPEAKER 			4
+/* token types */
+enum
+{
+	MCONFIG_TOKEN_INVALID,
+	MCONFIG_TOKEN_END,
+	MCONFIG_TOKEN_INCLUDE,
+	
+	MCONFIG_TOKEN_DEVICE_ADD,
+	MCONFIG_TOKEN_DEVICE_REMOVE,
+	MCONFIG_TOKEN_DEVICE_MODIFY,
+	MCONFIG_TOKEN_DEVICE_CONFIG,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATA32,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATA64,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32,
+	MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64,
 
+	MCONFIG_TOKEN_CPU_ADD,
+	MCONFIG_TOKEN_CPU_MODIFY,
+	MCONFIG_TOKEN_CPU_REMOVE,
+	MCONFIG_TOKEN_CPU_REPLACE,
+	MCONFIG_TOKEN_CPU_FLAGS,
+	MCONFIG_TOKEN_CPU_CONFIG,
+	MCONFIG_TOKEN_CPU_PROGRAM_MAP,
+	MCONFIG_TOKEN_CPU_DATA_MAP,
+	MCONFIG_TOKEN_CPU_IO_MAP,
+	MCONFIG_TOKEN_CPU_VBLANK_INT,
+	MCONFIG_TOKEN_CPU_PERIODIC_INT,
+	
+	MCONFIG_TOKEN_DRIVER_DATA,
+	MCONFIG_TOKEN_INTERLEAVE,
+	MCONFIG_TOKEN_WATCHDOG_VBLANK,
+	MCONFIG_TOKEN_WATCHDOG_TIME,
+	
+	MCONFIG_TOKEN_MACHINE_START,
+	MCONFIG_TOKEN_MACHINE_RESET,
+	MCONFIG_TOKEN_NVRAM_HANDLER,
+	MCONFIG_TOKEN_MEMCARD_HANDLER,
+	
+	MCONFIG_TOKEN_VIDEO_ATTRIBUTES,
+	MCONFIG_TOKEN_GFXDECODE,
+	MCONFIG_TOKEN_PALETTE_LENGTH,
+	MCONFIG_TOKEN_DEFAULT_LAYOUT,
+	
+	MCONFIG_TOKEN_PALETTE_INIT,
+	MCONFIG_TOKEN_VIDEO_START,
+	MCONFIG_TOKEN_VIDEO_RESET,
+	MCONFIG_TOKEN_VIDEO_EOF,
+	MCONFIG_TOKEN_VIDEO_UPDATE,
+	
+	MCONFIG_TOKEN_SOUND_START,
+	MCONFIG_TOKEN_SOUND_RESET,
+	
+	MCONFIG_TOKEN_SOUND_ADD,
+	MCONFIG_TOKEN_SOUND_REMOVE,
+	MCONFIG_TOKEN_SOUND_MODIFY,
+	MCONFIG_TOKEN_SOUND_CONFIG,
+	MCONFIG_TOKEN_SOUND_REPLACE,
+	MCONFIG_TOKEN_SOUND_ROUTE,
+};
 
 
 /* ----- flags for video_attributes ----- */
@@ -84,7 +141,6 @@ struct _machine_config
 	UINT32				(*video_update)(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect); /* video update callback */
 
 	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
-	speaker_config		speaker[MAX_SPEAKER];		/* array of speakers in the system */
 
 	void				(*sound_start)(running_machine *machine);		/* one-time sound start callback */
 	void				(*sound_reset)(running_machine *machine);		/* sound reset callback */
@@ -98,286 +154,325 @@ struct _machine_config
     MACROS FOR BUILDING MACHINE DRIVERS
 ***************************************************************************/
 
-/* use this to declare external references to a machine driver */
-#define MACHINE_DRIVER_EXTERN(game)										\
-	void construct_##game(machine_config *machine)						\
+/* this type is used to encode machine configuration definitions */
+typedef union _machine_config_token machine_config_token;
+union _machine_config_token
+{
+	TOKEN_COMMON_FIELDS
+	const machine_config_token *tokenptr;
+	const gfx_decode_entry *gfxdecode;
+	device_type devtype;
+	void (*interrupt)(running_machine *machine, int cpunum);
+	driver_init_func driver_init;
+	nvram_handler_func nvram_handler;
+	memcard_handler_func memcard_handler;
+	machine_start_func machine_start;
+	machine_reset_func machine_reset;
+	sound_start_func sound_start;
+	sound_reset_func sound_reset;
+	video_start_func video_start;
+	video_reset_func video_reset;
+	palette_init_func palette_init;
+	video_eof_func video_eof;
+	video_update_func video_update;
+};
+
 
 
 /* start/end tags for the machine driver */
-#define MACHINE_DRIVER_START(game) 										\
-	void construct_##game(machine_config *machine)						\
-	{																	\
-		cpu_config *cpu = NULL;											\
-		sound_config *sound = NULL;										\
-		device_config *device = NULL;									\
-		(void)cpu;														\
-		(void)sound;													\
-		(void)device;													\
+#define MACHINE_DRIVER_START(_name) \
+	const machine_config_token machine_config_##_name[] = {
 
-#define MACHINE_DRIVER_END 												\
-	}																	\
+#define MACHINE_DRIVER_END \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_END, 8) };
+
+/* use this to declare external references to a machine driver */
+#define MACHINE_DRIVER_EXTERN(_name) \
+	extern const machine_config_token machine_config_##_name[];
 
 
 /* importing data from other machine drivers */
-#define MDRV_IMPORT_FROM(game) 											\
-	construct_##game(machine); 											\
+#define MDRV_IMPORT_FROM(_name) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_INCLUDE, 8), \
+	TOKEN_PTR(tokenptr, machine_config_##_name),
 
 
 /* add/remove/config devices */
-#define MDRV_DEVICE_ADD(_tag, _type)									\
-	device = device_list_add(&machine->devicelist, _type, _tag);		\
+#define MDRV_DEVICE_ADD(_tag, _type) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_ADD, 8), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_DEVICE_REMOVE(_tag, _type)									\
-	device_list_remove(&machine->devicelist, _type, _tag);				\
+#define MDRV_DEVICE_REMOVE(_tag, _type) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_REMOVE, 8), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_DEVICE_MODIFY(_tag, _type)									\
-	device = (device_config *)device_list_find_by_tag(machine->devicelist, _type, _tag); \
+#define MDRV_DEVICE_MODIFY(_tag, _type)	\
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_MODIFY, 8), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_DEVICE_CONFIG(_config)										\
-	device->static_config = &(_config);									\
+#define MDRV_DEVICE_CONFIG(_config) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
+	TOKEN_PTR(voidptr, &(_config)),
 
-#define MDRV_DEVICE_CONFIG_DATA(_struct, _field, _val)					\
-	((_struct *)device->inline_config)->_field = (_val);				\
+#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, sizeof(((_struct *)NULL)->_field), 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT32((UINT32)(_val)),
+
+#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, sizeof(((_struct *)NULL)->_field), 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT64((UINT64)(_val)),
+
+#define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT32((UINT32)((float)(_val) * (float)(1 << (_fixbits)))),
+
+#define MDRV_DEVICE_CONFIG_DATAFP64(_struct, _field, _val, _fixbits) \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT64((UINT64)((float)(_val) * (float)((UINT64)1 << (_fixbits)))),
+
+#ifdef PTR64
+#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
+#else
+#define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val)
+#endif
 
 
 /* add/modify/remove/replace CPUs */
-#define MDRV_CPU_ADD_TAG(tag, type, clock)								\
-	cpu = machine_config_add_cpu(machine, (tag), CPU_##type, (clock));			\
+#define MDRV_CPU_ADD_TAG(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_CPU_ADD, 8, CPU_##_type, 24, _clock, 32), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_CPU_ADD(type, clock)										\
-	MDRV_CPU_ADD_TAG(NULL, type, clock)									\
+#define MDRV_CPU_ADD(_type, _clock) \
+	MDRV_CPU_ADD_TAG(NULL, _type, _clock)
 
-#define MDRV_CPU_MODIFY(tag)											\
-	cpu = machine_config_find_cpu(machine, tag);								\
+#define MDRV_CPU_MODIFY(_tag) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_MODIFY, 8), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_CPU_REMOVE(tag)											\
-	machine_config_remove_cpu(machine, tag);									\
-	cpu = NULL;															\
+#define MDRV_CPU_REMOVE(_tag) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_REMOVE, 8), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_CPU_REPLACE(tag, _type, _clock)							\
-	cpu = machine_config_find_cpu(machine, tag);								\
-	cpu->type = (CPU_##_type);											\
-	cpu->clock = (_clock);												\
+#define MDRV_CPU_REPLACE(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_CPU_REPLACE, 8, CPU_##_type, 24, _clock, 32), \
+	TOKEN_STRING(_tag),
 
 
 /* CPU parameters */
-#define MDRV_CPU_FLAGS(_flags)											\
-	if (cpu)															\
-		cpu->flags = (_flags);											\
+#define MDRV_CPU_FLAGS(_flags) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_FLAGS, 8, _flags, 24),
 
-#define MDRV_CPU_CONFIG(config)											\
-	if (cpu)															\
-		cpu->reset_param = &(config);									\
+#define MDRV_CPU_CONFIG(_config) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_CONFIG, 8), \
+	TOKEN_PTR(voidptr, &(_config)),
 
-#define MDRV_CPU_PROGRAM_MAP(readmem, writemem)							\
-	if (cpu)															\
-	{																	\
-		cpu->construct_map[ADDRESS_SPACE_PROGRAM][0] = (construct_map_##readmem); \
-		cpu->construct_map[ADDRESS_SPACE_PROGRAM][1] = (construct_map_##writemem); \
-	}																	\
+#define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_PROGRAM_MAP, 8), \
+	TOKEN_PTR(voidptr, construct_map_##_map1), \
+	TOKEN_PTR(voidptr, construct_map_##_map2), \
 
-#define MDRV_CPU_DATA_MAP(readmem, writemem)							\
-	if (cpu)															\
-	{																	\
-		cpu->construct_map[ADDRESS_SPACE_DATA][0] = (construct_map_##readmem); \
-		cpu->construct_map[ADDRESS_SPACE_DATA][1] = (construct_map_##writemem); \
-	}																	\
+#define MDRV_CPU_DATA_MAP(_map1, _map2)	\
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_DATA_MAP, 8), \
+	TOKEN_PTR(voidptr, construct_map_##_map1), \
+	TOKEN_PTR(voidptr, construct_map_##_map2), \
 
-#define MDRV_CPU_IO_MAP(readmem, writemem)								\
-	if (cpu)															\
-	{																	\
-		cpu->construct_map[ADDRESS_SPACE_IO][0] = (construct_map_##readmem); \
-		cpu->construct_map[ADDRESS_SPACE_IO][1] = (construct_map_##writemem); \
-	}																	\
+#define MDRV_CPU_IO_MAP(_map1, _map2) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_IO_MAP, 8), \
+	TOKEN_PTR(voidptr, construct_map_##_map1), \
+	TOKEN_PTR(voidptr, construct_map_##_map2), \
 
-#define MDRV_CPU_VBLANK_INT(func, rate)									\
-	if (cpu)															\
-	{																	\
-		cpu->vblank_interrupt = func;									\
-		cpu->vblank_interrupts_per_frame = (rate);						\
-	}																	\
+#define MDRV_CPU_VBLANK_INT(_func, _rate) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_VBLANK_INT, 8, _rate, 24), \
+	TOKEN_PTR(interrupt, _func),
 
-#define MDRV_CPU_PERIODIC_INT(func, rate)								\
-	if (cpu)															\
-	{																	\
-		cpu->timed_interrupt = func;									\
-		cpu->timed_interrupt_period = HZ_TO_ATTOSECONDS(rate);			\
-	}																	\
+#define MDRV_CPU_PERIODIC_INT(_func, _rate)	\
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_PERIODIC_INT, 8, _rate, 24), \
+	TOKEN_PTR(interrupt, _func),
 
 
 /* core parameters */
-#define MDRV_DRIVER_DATA(_struct)										\
-	machine->driver_data_size = sizeof(_struct);						\
+#define MDRV_DRIVER_DATA(_struct) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DRIVER_DATA, 8, sizeof(_struct), 24),
 
-#define MDRV_INTERLEAVE(interleave)										\
-	machine->cpu_slices_per_frame = (interleave);						\
+#define MDRV_INTERLEAVE(_interleave) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_INTERLEAVE, 8, _interleave, 24),
 
-#define MDRV_WATCHDOG_VBLANK_INIT(watch_count)							\
-	machine->watchdog_vblank_count = (watch_count);						\
+#define MDRV_WATCHDOG_VBLANK_INIT(_count) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_WATCHDOG_VBLANK, 8, _count, 24),
 
-#define MDRV_WATCHDOG_TIME_INIT(time)									\
-	machine->watchdog_time = (time);									\
+#define MDRV_WATCHDOG_TIME_INIT(_time) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_WATCHDOG_TIME, 8), \
+	TOKEN_UINT64(_time),
 
 
 /* core functions */
-#define MDRV_MACHINE_START(name)										\
-	machine->machine_start = machine_start_##name;						\
+#define MDRV_MACHINE_START(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MACHINE_START, 8), \
+	TOKEN_PTR(machine_start, machine_start_##_func),
 
-#define MDRV_MACHINE_RESET(name)										\
-	machine->machine_reset = machine_reset_##name;						\
+#define MDRV_MACHINE_RESET(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MACHINE_RESET, 8), \
+	TOKEN_PTR(machine_reset, machine_reset_##_func),
 
-#define MDRV_NVRAM_HANDLER(name)										\
-	machine->nvram_handler = nvram_handler_##name;						\
+#define MDRV_NVRAM_HANDLER(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_NVRAM_HANDLER, 8), \
+	TOKEN_PTR(nvram_handler, nvram_handler_##_func),
 
-#define MDRV_MEMCARD_HANDLER(name)										\
-	machine->memcard_handler = memcard_handler_##name;					\
+#define MDRV_MEMCARD_HANDLER(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_MEMCARD_HANDLER, 8), \
+	TOKEN_PTR(memcard_handler, memcard_handler_##_func),
 
 
 /* core video parameters */
-#define MDRV_VIDEO_ATTRIBUTES(flags)									\
-	machine->video_attributes = (flags);								\
+#define MDRV_VIDEO_ATTRIBUTES(_flags) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_VIDEO_ATTRIBUTES, 8, _flags, 24),
 
-#define MDRV_GFXDECODE(gfx)												\
-	machine->gfxdecodeinfo = (gfxdecodeinfo_##gfx);						\
+#define MDRV_GFXDECODE(_gfx) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_GFXDECODE, 8), \
+	TOKEN_PTR(gfxdecode, gfxdecodeinfo_##_gfx),
 
-#define MDRV_PALETTE_LENGTH(length)										\
-	machine->total_colors = (length);									\
+#define MDRV_PALETTE_LENGTH(_length) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_PALETTE_LENGTH, 8, _length, 24),
 
-#define MDRV_DEFAULT_LAYOUT(layout)										\
-	machine->default_layout = &(layout)[0];								\
+#define MDRV_DEFAULT_LAYOUT(_layout) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEFAULT_LAYOUT, 8), \
+	TOKEN_STRING(&(_layout)[0]),
 
 
 /* core video functions */
-#define MDRV_PALETTE_INIT(name)											\
-	machine->init_palette = palette_init_##name;						\
+#define MDRV_PALETTE_INIT(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_PALETTE_INIT, 8), \
+	TOKEN_PTR(palette_init, palette_init_##_func),
 
-#define MDRV_VIDEO_START(name)											\
-	machine->video_start = video_start_##name;							\
+#define MDRV_VIDEO_START(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_START, 8), \
+	TOKEN_PTR(video_start, video_start_##_func),
 
-#define MDRV_VIDEO_RESET(name)											\
-	machine->video_reset = video_reset_##name;							\
+#define MDRV_VIDEO_RESET(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_RESET, 8), \
+	TOKEN_PTR(video_reset, video_reset_##_func),
 
-#define MDRV_VIDEO_EOF(name)											\
-	machine->video_eof = video_eof_##name;								\
+#define MDRV_VIDEO_EOF(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_EOF, 8), \
+	TOKEN_PTR(video_eof, video_eof_##_func),
 
-#define MDRV_VIDEO_UPDATE(name)											\
-	machine->video_update = video_update_##name;						\
+#define MDRV_VIDEO_UPDATE(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_VIDEO_UPDATE, 8), \
+	TOKEN_PTR(video_update, video_update_##_func),
 
 
 /* add/remove screens */
-#define MDRV_SCREEN_ADD(tag, _type)										\
-	MDRV_DEVICE_ADD(tag, VIDEO_SCREEN)									\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, type, SCREEN_TYPE_##_type)	\
+#define MDRV_SCREEN_ADD(_tag, _type) \
+	MDRV_DEVICE_ADD(_tag, VIDEO_SCREEN) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
 
-#define MDRV_SCREEN_REMOVE(tag)											\
-	MDRV_DEVICE_REMOVE(tag, VIDEO_SCREEN)								\
+#define MDRV_SCREEN_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, VIDEO_SCREEN)
 
-#define MDRV_SCREEN_MODIFY(tag)											\
-	MDRV_DEVICE_MODIFY(tag, VIDEO_SCREEN)								\
+#define MDRV_SCREEN_MODIFY(_tag) \
+	MDRV_DEVICE_MODIFY(_tag, VIDEO_SCREEN)
 
-#define MDRV_SCREEN_FORMAT(_format)										\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.format, _format)	\
+#define MDRV_SCREEN_FORMAT(_format) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.format, _format)
 
-#define MDRV_SCREEN_TYPE(_type)											\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, type, SCREEN_TYPE_##_type)	\
+#define MDRV_SCREEN_TYPE(_type) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
 
-#define MDRV_SCREEN_RAW_PARAMS(pixclock, htotal, hbend, hbstart, vtotal, vbend, vbstart) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal))	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.vblank, ((HZ_TO_ATTOSECONDS(pixclock) * (htotal) * (vtotal)) / (vtotal)) * ((vtotal) - ((vbstart) - (vbend))))	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.width, htotal)		\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.height, vtotal)		\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_x, hbend) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_x, (hbstart) - 1) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_y, vbend) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_y, (vbstart) - 1) \
+#define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _htotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _vtotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _hbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, (_hbstart) - 1) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _vbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, (_vbstart) - 1)
 
-#define MDRV_SCREEN_REFRESH_RATE(rate)									\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(rate)) \
+#define MDRV_SCREEN_REFRESH_RATE(_rate) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_rate))
 
-#define MDRV_SCREEN_VBLANK_TIME(time)									\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.vblank, time)		\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.oldstyle_vblank_supplied, TRUE) \
+#define MDRV_SCREEN_VBLANK_TIME(_time) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, _time) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.oldstyle_vblank_supplied, TRUE)
 
-#define MDRV_SCREEN_SIZE(_width, _height)								\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.width, _width)		\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.height, _height)	\
+#define MDRV_SCREEN_SIZE(_width, _height) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _width) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _height)
 
-#define MDRV_SCREEN_VISIBLE_AREA(minx, maxx, miny, maxy)				\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_x, minx) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_x, maxx) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.min_y, miny) \
-	MDRV_DEVICE_CONFIG_DATA(screen_config, defstate.visarea.max_y, maxy) \
+#define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _minx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, _maxx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _miny) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, _maxy)
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, xoffset, (float)(_xoffs)) 	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, xscale, (float)(_xscale)) 	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, yoffset, (float)(_yoffs)) 	\
-	MDRV_DEVICE_CONFIG_DATA(screen_config, yscale, (float)(_yscale)) 	\
+	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xoffset, _xoffs, 24) \
+	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xscale, _xscale, 24) \
+	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yoffset, _yoffs, 24) \
+	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yscale, _yscale, 24)
 
 
 /* add/remove speakers */
-#define MDRV_SPEAKER_ADD(tag, x, y, z)									\
-	machine_config_add_speaker(machine, (tag), (float)(x), (float)(y), (float)(z));	\
+#define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
+	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT) \
+	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, x, _x, 24) \
+	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, y, _y, 24) \
+	MDRV_DEVICE_CONFIG_DATAFP32(speaker_config, z, _z, 24)
 
-#define MDRV_SPEAKER_REMOVE(tag)										\
-	machine_config_remove_speaker(machine, (tag));								\
+#define MDRV_SPEAKER_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, SPEAKER_OUTPUT)
 
-#define MDRV_SPEAKER_STANDARD_MONO(tag)									\
-	MDRV_SPEAKER_ADD(tag, 0.0, 0.0, 1.0)								\
+#define MDRV_SPEAKER_STANDARD_MONO(_tag) \
+	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
 
-#define MDRV_SPEAKER_STANDARD_STEREO(tagl, tagr)						\
-	MDRV_SPEAKER_ADD(tagl, -0.2, 0.0, 1.0)								\
-	MDRV_SPEAKER_ADD(tagr, 0.2, 0.0, 1.0)								\
+#define MDRV_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
+	MDRV_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
+	MDRV_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
 
 
 /* core sound functions */
-#define MDRV_SOUND_START(name)											\
-	machine->sound_start = sound_start_##name;							\
+#define MDRV_SOUND_START(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_START, 8), \
+	TOKEN_PTR(sound_start, sound_start_##_func),
 
-#define MDRV_SOUND_RESET(name)											\
-	machine->sound_reset = sound_reset_##name;							\
+#define MDRV_SOUND_RESET(_func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_RESET, 8), \
+	TOKEN_PTR(sound_start, sound_reset_##_func),
 
 
 /* add/remove/replace sounds */
-#define MDRV_SOUND_ADD_TAG(tag, type, clock)							\
-	sound = machine_config_add_sound(machine, (tag), SOUND_##type, (clock));	\
+#define MDRV_SOUND_ADD_TAG(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_SOUND_ADD, 8, SOUND_##_type, 24, _clock, 32), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_ADD(type, clock)										\
-	MDRV_SOUND_ADD_TAG(NULL, type, clock)								\
+#define MDRV_SOUND_ADD(_type, _clock) \
+	MDRV_SOUND_ADD_TAG(NULL, _type, _clock)
 
-#define MDRV_SOUND_REMOVE(tag)											\
-	machine_config_remove_sound(machine, tag);									\
+#define MDRV_SOUND_REMOVE(_tag) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_REMOVE, 8), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_MODIFY(tag)											\
-	sound = machine_config_find_sound(machine, tag);							\
-	sound->routes = 0;													\
+#define MDRV_SOUND_MODIFY(_tag) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_MODIFY, 8), \
+	TOKEN_STRING(_tag),
 
-#define MDRV_SOUND_CONFIG(_config)										\
-	if (sound)															\
-		sound->config = &(_config);										\
+#define MDRV_SOUND_CONFIG(_config) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_CONFIG, 8), \
+	TOKEN_PTR(voidptr, &(_config)),
 
-#define MDRV_SOUND_REPLACE(tag, _type, _clock)							\
-	sound = machine_config_find_sound(machine, tag);							\
-	if (sound)															\
-	{																	\
-		sound->type = SOUND_##_type;									\
-		sound->clock = (_clock);										\
-		sound->config = NULL;											\
-		sound->routes = 0;												\
-	}																	\
+#define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
+	TOKEN_UINT64_PACK3(MCONFIG_TOKEN_SOUND_REPLACE, 8, SOUND_##_type, 24, _clock, 32), \
+	TOKEN_STRING(_tag),
 
 #define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input)			\
-	if (sound)															\
-	{																	\
-		sound->route[sound->routes].output = (_output);					\
-		sound->route[sound->routes].target = (_target);					\
-		sound->route[sound->routes].gain = (float)(_gain);				\
-		sound->route[sound->routes].input = (_input);					\
-		sound->routes++;												\
-	}																	\
+	TOKEN_UINT64_PACK4(MCONFIG_TOKEN_SOUND_ROUTE, 8, _output, 12, _input, 12, (UINT32)((float)(_gain) * 16777216.0f), 32), \
+	TOKEN_STRING(_target),
 
-#define MDRV_SOUND_ROUTE(_output, _target, _gain)						\
-	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, -1)					\
+#define MDRV_SOUND_ROUTE(_output, _target, _gain) \
+	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, -1)
 
 
 
@@ -389,7 +484,7 @@ struct _machine_config
 /* ----- machine configurations ----- */
 
 /* allocate a new machine configuration and populate it using the supplied constructor */
-machine_config *machine_config_alloc(void (*constructor)(machine_config *));
+machine_config *machine_config_alloc(const machine_config_token *tokens);
 
 /* release memory allocated for a machine configuration */
 void machine_config_free(machine_config *config);
@@ -401,10 +496,6 @@ void machine_config_free(machine_config *config);
 cpu_config *machine_config_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock);
 cpu_config *machine_config_find_cpu(machine_config *machine, const char *tag);
 void machine_config_remove_cpu(machine_config *machine, const char *tag);
-
-speaker_config *machine_config_add_speaker(machine_config *machine, const char *tag, float x, float y, float z);
-speaker_config *machine_config_find_speaker(machine_config *machine, const char *tag);
-void machine_config_remove_speaker(machine_config *machine, const char *tag);
 
 sound_config *machine_config_add_sound(machine_config *machine, const char *tag, sound_type type, int clock);
 sound_config *machine_config_find_sound(machine_config *machine, const char *tag);

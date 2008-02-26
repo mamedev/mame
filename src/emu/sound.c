@@ -72,6 +72,7 @@ typedef struct _speaker_info speaker_info;
 struct _speaker_info
 {
 	const speaker_config *speaker;			/* pointer to the speaker info */
+	const char *	tag;					/* speaker tag */
 	sound_stream *	mixer_stream;			/* mixing stream */
 	int				inputs;					/* number of input streams */
 	speaker_input *	input;					/* array of input information */
@@ -92,9 +93,6 @@ static emu_timer *sound_update_timer;
 
 static int totalsnd;
 static sound_info sound[MAX_SOUND];
-
-static int totalspeakers;
-static speaker_info speaker[MAX_SPEAKER];
 
 static INT16 *finalmix;
 static UINT32 finalmix_leftover;
@@ -120,7 +118,6 @@ static void sound_load(int config_type, xml_data_node *parentnode);
 static void sound_save(int config_type, xml_data_node *parentnode);
 static TIMER_CALLBACK( sound_update );
 static void start_sound_chips(void);
-static void start_speakers(void);
 static void route_sound(void);
 static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
@@ -136,13 +133,8 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 
 INLINE speaker_info *find_speaker_by_tag(const char *tag)
 {
-	int spknum;
-
-	/* attempt to find the speaker in our list */
-	for (spknum = 0; spknum < totalspeakers; spknum++)
-		if (strcmp(speaker[spknum].speaker->tag, tag) == 0)
-			return &speaker[spknum];
-	return NULL;
+	const device_config *speaker = device_list_find_by_tag(Machine->config->devicelist, SPEAKER_OUTPUT, tag);
+	return (speaker == NULL) ? NULL : speaker->token;
 }
 
 
@@ -179,16 +171,15 @@ void sound_init(running_machine *machine)
 	/* handle -nosound */
 	nosound_mode = !options_get_bool(mame_options(), OPTION_SOUND);
 	if (nosound_mode)
-		Machine->sample_rate = 11025;
+		machine->sample_rate = 11025;
 
 	/* count the speakers */
-	for (totalspeakers = 0; Machine->config->speaker[totalspeakers].tag; totalspeakers++) ;
-	VPRINTF(("total speakers = %d\n", totalspeakers));
+	VPRINTF(("total speakers = %d\n", speaker_output_count(machine->config)));
 
 	/* allocate memory for mix buffers */
-	leftmix = auto_malloc(Machine->sample_rate * sizeof(*leftmix));
-	rightmix = auto_malloc(Machine->sample_rate * sizeof(*rightmix));
-	finalmix = auto_malloc(Machine->sample_rate * sizeof(*finalmix));
+	leftmix = auto_malloc(machine->sample_rate * sizeof(*leftmix));
+	rightmix = auto_malloc(machine->sample_rate * sizeof(*rightmix));
+	finalmix = auto_malloc(machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
 	sound_update_timer = timer_alloc(sound_update, NULL);
@@ -201,10 +192,6 @@ void sound_init(running_machine *machine)
 	/* now start up the sound chips and tag their streams */
 	VPRINTF(("start_sound_chips\n"));
 	start_sound_chips();
-
-	/* then create all the speakers */
-	VPRINTF(("start_speakers\n"));
-	start_speakers();
 
 	/* finally, do all the routing */
 	VPRINTF(("route_sound\n"));
@@ -240,29 +227,13 @@ static void sound_exit(running_machine *machine)
 	if (wavfile != NULL)
 		wav_close(wavfile);
 
-#ifdef MAME_DEBUG
-{
-	int spknum;
-
-	/* log the maximum sample values for all speakers */
-	for (spknum = 0; spknum < totalspeakers; spknum++)
-		if (speaker[spknum].max_sample > 0)
-		{
-			speaker_info *spk = &speaker[spknum];
-			mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", spk->speaker->tag, spk->max_sample, 32767.0 / (spk->max_sample ? spk->max_sample : 1), (int)((double)spk->clipped_samples * 100.0 / spk->total_samples));
-		}
-}
-#endif /* MAME_DEBUG */
-
 	/* stop all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
 		if (Machine->config->sound[sndnum].type != SOUND_DUMMY)
 			sndintrf_exit_sound(sndnum);
 
 	/* reset variables */
-	totalspeakers = 0;
 	totalsnd = 0;
-	memset(&speaker, 0, sizeof(speaker));
 	memset(&sound, 0, sizeof(sound));
 }
 
@@ -363,45 +334,14 @@ static void start_sound_chips(void)
 
 
 /*-------------------------------------------------
-    start_speakers - loop over all speakers and
-    initialize them
--------------------------------------------------*/
-
-static void start_speakers(void)
-{
-	/* reset the speaker array */
-	memset(speaker, 0, sizeof(speaker));
-
-	/* start up all the speakers */
-	for (totalspeakers = 0; totalspeakers < MAX_SPEAKER; totalspeakers++)
-	{
-		const speaker_config *mspeaker = &Machine->config->speaker[totalspeakers];
-		speaker_info *info;
-
-		/* stop when we hit an empty entry */
-		if (mspeaker->tag == NULL)
-			break;
-
-		/* zap all the info */
-		info = &speaker[totalspeakers];
-		memset(info, 0, sizeof(*info));
-
-		/* copy in all the relevant info */
-		info->speaker = mspeaker;
-		info->mixer_stream = NULL;
-		info->inputs = 0;
-	}
-}
-
-
-/*-------------------------------------------------
     route_sound - route sound outputs to target
     inputs
 -------------------------------------------------*/
 
 static void route_sound(void)
 {
-	int sndnum, spknum, routenum, outputnum;
+	int sndnum, routenum, outputnum;
+	const device_config *curspeak;
 
 	/* iterate over all the sound chips */
 	for (sndnum = 0; sndnum < totalsnd; sndnum++)
@@ -436,9 +376,9 @@ static void route_sound(void)
 
 	/* now allocate the mixers and input data */
 	streams_set_tag(Machine, NULL);
-	for (spknum = 0; spknum < totalspeakers; spknum++)
+	for (curspeak = speaker_output_first(Machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		speaker_info *info = &speaker[spknum];
+		speaker_info *info = curspeak->token;
 		if (info->inputs != 0)
 		{
 			info->mixer_stream = stream_create(info->inputs, 1, Machine->sample_rate, info, mixer_update);
@@ -446,7 +386,7 @@ static void route_sound(void)
 			info->inputs = 0;
 		}
 		else
-			logerror("Warning: speaker \"%s\" has no inputs\n", info->speaker->tag);
+			logerror("Warning: speaker \"%s\" has no inputs\n", info->tag);
 	}
 
 	/* iterate again over all the sound chips */
@@ -480,8 +420,8 @@ static void route_sound(void)
                         namebuf[0] = '\0';
 
                         /* speaker name, if more than one speaker */
-						if (totalspeakers > 1)
-							sprintf(namebuf, "%sSpeaker '%s': ", namebuf, speaker->speaker->tag);
+						if (speaker_output_count(Machine->config) > 1)
+							sprintf(namebuf, "%sSpeaker '%s': ", namebuf, speaker->tag);
 
                         /* device name */
 						sprintf(namebuf, "%s%s ", namebuf, sndnum_name(sndnum));
@@ -697,17 +637,18 @@ static void sound_save(int config_type, xml_data_node *parentnode)
 static TIMER_CALLBACK( sound_update )
 {
 	UINT32 finalmix_step, finalmix_offset;
+	const device_config *curspeak;
 	int samples_this_update = 0;
-	int sample, spknum;
+	int sample;
 
 	VPRINTF(("sound_update\n"));
 
 	profiler_mark(PROFILER_SOUND);
 
 	/* force all the speaker streams to generate the proper number of samples */
-	for (spknum = 0; spknum < totalspeakers; spknum++)
+	for (curspeak = speaker_output_first(Machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		speaker_info *spk = &speaker[spknum];
+		speaker_info *spk = curspeak->token;
 		const stream_sample_t *stream_buf;
 
 		/* get the output buffer */
@@ -836,6 +777,90 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 
 
 /***************************************************************************
+    SPEAKER OUTPUT DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    speaker_output_start - device start callback
+    for a speaker
+-------------------------------------------------*/
+
+static void *speaker_output_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+{
+	speaker_info *info;
+	
+	/* allocate memory for the speaker information */
+	info = auto_malloc(sizeof(*info));
+	memset(info, 0, sizeof(*info));
+
+	/* copy in all the relevant info */
+	info->speaker = inline_config;
+	info->tag = tag;
+	return info;
+}
+
+
+/*-------------------------------------------------
+    speaker_output_stop - device stop callback
+    for a speaker
+-------------------------------------------------*/
+
+static void speaker_output_stop(running_machine *machine, void *token)
+{
+#ifdef MAME_DEBUG
+	speaker_info *info = token;
+
+	/* log the maximum sample values for all speakers */
+	if (info->max_sample > 0)
+		mame_printf_debug("Speaker \"%s\" - max = %d (gain *= %f) - %d%% samples clipped\n", info->tag, info->max_sample, 32767.0 / (info->max_sample ? info->max_sample : 1), (int)((double)info->clipped_samples * 100.0 / info->total_samples));
+#endif /* MAME_DEBUG */
+}
+
+
+/*-------------------------------------------------
+    speaker_output_set_info - device set info
+    callback
+-------------------------------------------------*/
+
+static void speaker_output_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    speaker_output_get_info - device get info
+    callback
+-------------------------------------------------*/
+
+void speaker_output_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(speaker_config);		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = speaker_output_set_info;break;
+		case DEVINFO_FCT_START:							info->start = speaker_output_start;		break;
+		case DEVINFO_FCT_STOP:							info->stop = speaker_output_stop;		break;
+		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Speaker";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "Sound";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+
+
+
+/***************************************************************************
     MISCELLANEOUS HELPERS
 ***************************************************************************/
 
@@ -874,17 +899,19 @@ void sndti_set_output_gain(sound_type type, int index, int output, float gain)
 
 INLINE speaker_info *index_to_input(int index, int *input)
 {
-	int count = 0, speakernum;
+	const device_config *curspeak;
+	int count = 0;
 
 	/* scan through the speakers until we find the indexed input */
-	for (speakernum = 0; speakernum < totalspeakers; speakernum++)
+	for (curspeak = speaker_output_first(Machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		if (index < count + speaker[speakernum].inputs)
+		speaker_info *info = curspeak->token;
+		if (index < count + info->inputs)
 		{
 			*input = index - count;
-			return &speaker[speakernum];
+			return info;
 		}
-		count += speaker[speakernum].inputs;
+		count += info->inputs;
 	}
 
 	/* index out of range */
@@ -899,11 +926,15 @@ INLINE speaker_info *index_to_input(int index, int *input)
 
 int sound_get_user_gain_count(void)
 {
-	int count = 0, speakernum;
+	const device_config *curspeak;
+	int count = 0;
 
 	/* count up the number of speaker inputs */
-	for (speakernum = 0; speakernum < totalspeakers; speakernum++)
-		count += speaker[speakernum].inputs;
+	for (curspeak = speaker_output_first(Machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
+	{
+		speaker_info *info = curspeak->token;
+		count += info->inputs;
+	}
 	return count;
 }
 

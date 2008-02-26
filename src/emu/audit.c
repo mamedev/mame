@@ -120,7 +120,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
-	machine_config *config = machine_config_alloc(gamedrv->drv);
+	machine_config *config = machine_config_alloc(gamedrv->machine_config);
 	audit_record *record;
 	int sndnum, sampnum;
 	int records = 0;

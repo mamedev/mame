@@ -33,8 +33,10 @@
 
 /* macros for the RC time constant on a 555 timer IC */
 /* R is in ohms, C is in farads */
-#define PERIOD_OF_555_MONOSTABLE(r,c)	ATTOTIME_IN_NSEC((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
-#define PERIOD_OF_555_ASTABLE(r1,r2,c)	ATTOTIME_IN_NSEC((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
+#define PERIOD_OF_555_MONOSTABLE_NSEC(r,c)	((attoseconds_t)(1100000000 * (double)(r) * (double)(c)))
+#define PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c)	((attoseconds_t)( 693000000 * ((double)(r1) + 2.0 * (double)(r2)) * (double)(c)))
+#define PERIOD_OF_555_MONOSTABLE(r,c)		ATTOTIME_IN_NSEC(PERIOD_OF_555_MONOSTABLE_NSEC(r,c))
+#define PERIOD_OF_555_ASTABLE(r1,r2,c)		ATTOTIME_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
 #define timer_alloc(c,ptr)				_timer_alloc_internal(c, ptr, __FILE__, __LINE__, #c)

@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_PALETTE_INIT(berlwall)
 
 	/* arm watchdog */
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

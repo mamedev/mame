@@ -72,41 +72,41 @@
 
 /* 32-bit integer packing */
 #define TOKEN_UINT32_PACK1(val1, bits1) \
-	TOKEN_UINT32(SHIFT_AND_MASK32(val1, bits1, 0))
+	TOKEN_UINT32(SHIFT_AND_MASK32((val1), (bits1), 0))
 
 #define TOKEN_UINT32_PACK2(val1, bits1, val2, bits2) \
-	TOKEN_UINT32(SHIFT_AND_MASK32(val1, bits1, 0) | \
-				 SHIFT_AND_MASK32(val2, bits2, bits1))
+	TOKEN_UINT32(SHIFT_AND_MASK32((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK32((val2), (bits2), (bits1)))
 
 #define TOKEN_UINT32_PACK3(val1, bits1, val2, bits2, val3, bits3) \
-	TOKEN_UINT32(SHIFT_AND_MASK32(val1, bits1, 0) | \
-				 SHIFT_AND_MASK32(val2, bits2, bits1) | \
-				 SHIFT_AND_MASK32(val3, bits3, (bits1)+(bits2)))
+	TOKEN_UINT32(SHIFT_AND_MASK32((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK32((val2), (bits2), (bits1)) | \
+				 SHIFT_AND_MASK32((val3), (bits3), (bits1)+(bits2)))
 
 #define TOKEN_UINT32_PACK4(val1, bits1, val2, bits2, val3, bits3, val4, bits4) \
-	TOKEN_UINT32(SHIFT_AND_MASK32(val1, bits1, 0) | \
-				 SHIFT_AND_MASK32(val2, bits2, bits1) | \
-				 SHIFT_AND_MASK32(val3, bits3, (bits1)+(bits2)) | \
-				 SHIFT_AND_MASK32(val4, bits4, (bits1)+(bits2)+(bits3)))
+	TOKEN_UINT32(SHIFT_AND_MASK32((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK32((val2), (bits2), (bits1)) | \
+				 SHIFT_AND_MASK32((val3), (bits3), (bits1)+(bits2)) | \
+				 SHIFT_AND_MASK32((val4), (bits4), (bits1)+(bits2)+(bits3)))
 
 /* 64-bit integer packing */
 #define TOKEN_UINT64_PACK1(val1, bits1) \
-	TOKEN_UINT64(SHIFT_AND_MASK64(val1, bits1, 0))
+	TOKEN_UINT64(SHIFT_AND_MASK64((val1), (bits1), 0))
 
 #define TOKEN_UINT64_PACK2(val1, bits1, val2, bits2) \
-	TOKEN_UINT64(SHIFT_AND_MASK64(val1, bits1, 0) | \
-				 SHIFT_AND_MASK64(val2, bits2, bits1))
+	TOKEN_UINT64(SHIFT_AND_MASK64((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK64((val2), (bits2), (bits1)))
 
 #define TOKEN_UINT64_PACK3(val1, bits1, val2, bits2, val3, bits3) \
-	TOKEN_UINT64(SHIFT_AND_MASK64(val1, bits1, 0) | \
-				 SHIFT_AND_MASK64(val2, bits2, bits1) | \
-				 SHIFT_AND_MASK64(val3, bits3, (bits1)+(bits2)))
+	TOKEN_UINT64(SHIFT_AND_MASK64((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK64((val2), (bits2), (bits1)) | \
+				 SHIFT_AND_MASK64((val3), (bits3), (bits1)+(bits2)))
 
 #define TOKEN_UINT64_PACK4(val1, bits1, val2, bits2, val3, bits3, val4, bits4) \
-	TOKEN_UINT64(SHIFT_AND_MASK64(val1, bits1, 0) | \
-				 SHIFT_AND_MASK64(val2, bits2, bits1) | \
-				 SHIFT_AND_MASK64(val3, bits3, (bits1)+(bits2)) | \
-				 SHIFT_AND_MASK64(val4, bits4, (bits1)+(bits2)+(bits3)))
+	TOKEN_UINT64(SHIFT_AND_MASK64((val1), (bits1), 0) | \
+				 SHIFT_AND_MASK64((val2), (bits2), (bits1)) | \
+				 SHIFT_AND_MASK64((val3), (bits3), (bits1)+(bits2)) | \
+				 SHIFT_AND_MASK64((val4), (bits4), (bits1)+(bits2)+(bits3)))
 
 
 
@@ -149,65 +149,65 @@
 /* 32-bit integer unpacking */
 #define TOKEN_GET_UINT32_UNPACK1(tp, val1, bits1) do { \
 	UINT32 token32 = TOKEN_GET_UINT32(tp); \
-	UNSHIFT_AND_MASK32(token32, val1, bits1, 0); \
+	UNSHIFT_AND_MASK32(token32, val1, (bits1), 0); \
 } while (0)
 
 #define TOKEN_GET_UINT32_UNPACK2(tp, val1, bits1, val2, bits2) do { \
 	UINT32 token32 = TOKEN_GET_UINT32(tp); \
 	UINT8 shift = 0; \
-	UNSHIFT_AND_MASK32(token32, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK32(token32, val2, bits2, shift); \
+	UNSHIFT_AND_MASK32(token32, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK32(token32, val2, (bits2), shift); \
 } while (0)
 
 #define TOKEN_GET_UINT32_UNPACK3(tp, val1, bits1, val2, bits2, val3, bits3) do { \
 	UINT32 token32 = TOKEN_GET_UINT32(tp); \
 	UINT8 shift = 0; \
-	UNSHIFT_AND_MASK32(token32, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK32(token32, val2, bits2, shift); shift += TOKENABS(bits2); \
-	UNSHIFT_AND_MASK32(token32, val3, bits3, shift); \
+	UNSHIFT_AND_MASK32(token32, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK32(token32, val2, (bits2), shift); shift += TOKENABS(bits2); \
+	UNSHIFT_AND_MASK32(token32, val3, (bits3), shift); \
 } while (0)
 
 #define TOKEN_GET_UINT32_UNPACK4(tp, val1, bits1, val2, bits2, val3, bits3, val4, bits4) do { \
 	UINT32 token32 = TOKEN_GET_UINT32(tp); \
 	UINT8 shift = 0; \
-	UNSHIFT_AND_MASK32(token32, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK32(token32, val2, bits2, shift); shift += TOKENABS(bits2); \
-	UNSHIFT_AND_MASK32(token32, val3, bits3, shift); shift += TOKENABS(bits3); \
-	UNSHIFT_AND_MASK32(token32, val4, bits4, shift); \
+	UNSHIFT_AND_MASK32(token32, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK32(token32, val2, (bits2), shift); shift += TOKENABS(bits2); \
+	UNSHIFT_AND_MASK32(token32, val3, (bits3), shift); shift += TOKENABS(bits3); \
+	UNSHIFT_AND_MASK32(token32, val4, (bits4), shift); \
 } while (0)
 
 /* 64-bit integer unpacking */
 #define TOKEN_GET_UINT64_UNPACK1(tp, val1, bits1) do { \
 	UINT64 token64; \
 	TOKEN_EXTRACT_UINT64(tp, token64); \
-	UNSHIFT_AND_MASK64(token64, val1, bits1, 0); \
+	UNSHIFT_AND_MASK64(token64, val1, (bits1), 0); \
 } while (0)
 
 #define TOKEN_GET_UINT64_UNPACK2(tp, val1, bits1, val2, bits2) do { \
 	UINT64 token64; \
 	UINT8 shift = 0; \
 	TOKEN_EXTRACT_UINT64(tp, token64); \
-	UNSHIFT_AND_MASK64(token64, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK64(token64, val2, bits2, shift); \
+	UNSHIFT_AND_MASK64(token64, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK64(token64, val2, (bits2), shift); \
 } while (0)
 
 #define TOKEN_GET_UINT64_UNPACK3(tp, val1, bits1, val2, bits2, val3, bits3) do { \
 	UINT64 token64; \
 	UINT8 shift = 0; \
 	TOKEN_EXTRACT_UINT64(tp, token64); \
-	UNSHIFT_AND_MASK64(token64, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK64(token64, val2, bits2, shift); shift += TOKENABS(bits2); \
-	UNSHIFT_AND_MASK64(token64, val3, bits3, shift); \
+	UNSHIFT_AND_MASK64(token64, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK64(token64, val2, (bits2), shift); shift += TOKENABS(bits2); \
+	UNSHIFT_AND_MASK64(token64, val3, (bits3), shift); \
 } while (0)
 
 #define TOKEN_GET_UINT64_UNPACK4(tp, val1, bits1, val2, bits2, val3, bits3, val4, bits4) do { \
 	UINT64 token64; \
 	UINT8 shift = 0; \
 	TOKEN_EXTRACT_UINT64(tp, token64); \
-	UNSHIFT_AND_MASK64(token64, val1, bits1, shift); shift += TOKENABS(bits1); \
-	UNSHIFT_AND_MASK64(token64, val2, bits2, shift); shift += TOKENABS(bits2); \
-	UNSHIFT_AND_MASK64(token64, val3, bits3, shift); shift += TOKENABS(bits3); \
-	UNSHIFT_AND_MASK64(token64, val4, bits4, shift); \
+	UNSHIFT_AND_MASK64(token64, val1, (bits1), shift); shift += TOKENABS(bits1); \
+	UNSHIFT_AND_MASK64(token64, val2, (bits2), shift); shift += TOKENABS(bits2); \
+	UNSHIFT_AND_MASK64(token64, val3, (bits3), shift); shift += TOKENABS(bits3); \
+	UNSHIFT_AND_MASK64(token64, val4, (bits4), shift); \
 } while (0)
 
 

@@ -767,8 +767,8 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 
 static void print_game_sound(FILE *out, const game_driver *game, const machine_config *config)
 {
+	int speakers = speaker_output_count(config);
 	int has_sound = FALSE;
-	int speakers = 0;
 	int sndnum;
 
 	/* see if we have any sound chips to report */
@@ -780,10 +780,8 @@ static void print_game_sound(FILE *out, const game_driver *game, const machine_c
 		}
 
 	/* if we have sound, count the number of speakers */
-	if (has_sound)
-		for (speakers = 0; speakers < ARRAY_LENGTH(config->speaker); speakers++)
-			if (config->speaker[speakers].tag == NULL)
-				break;
+	if (!has_sound)
+		speakers = 0;
 
 	fprintf(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
 }
@@ -871,7 +869,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 
 	/* start tracking resources and allocate the machine and input configs */
 	begin_resource_tracking();
-	config = machine_config_alloc(game->drv);
+	config = machine_config_alloc(game->machine_config);
 	input = input_port_allocate(game->ipt, NULL);
 
 	/* print the header and the game name */

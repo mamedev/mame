@@ -364,7 +364,7 @@ static int validate_inlines(void)
     information
 -------------------------------------------------*/
 
-static int validate_driver(int drivnum, const machine_config *drv)
+static int validate_driver(int drivnum, const machine_config *config)
 {
 	const game_driver *driver = drivers[drivnum];
 	const game_driver *clone_of;
@@ -416,7 +416,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
 
 #ifndef MESS
 	/* make sure sound-less drivers are flagged */
-	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && drv->sound[0].type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
+	if ((driver->flags & GAME_IS_BIOS_ROOT) == 0 && config->sound[0].type == SOUND_DUMMY && (driver->flags & GAME_NO_SOUND) == 0 && strcmp(driver->name, "minivadr"))
 	{
 		mame_printf_error("%s: %s missing GAME_NO_SOUND flag\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -475,7 +475,7 @@ static int validate_driver(int drivnum, const machine_config *drv)
     validate_roms - validate ROM definitions
 -------------------------------------------------*/
 
-static int validate_roms(int drivnum, const machine_config *drv, UINT32 *region_length)
+static int validate_roms(int drivnum, const machine_config *config, UINT32 *region_length)
 {
 	const game_driver *driver = drivers[drivnum];
 	const rom_entry *romp;
@@ -603,7 +603,7 @@ static int validate_roms(int drivnum, const machine_config *drv, UINT32 *region_
     validate_cpu - validate CPUs and memory maps
 -------------------------------------------------*/
 
-static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *region_length)
+static int validate_cpu(int drivnum, const machine_config *config, const UINT32 *region_length)
 {
 	const game_driver *driver = drivers[drivnum];
 	int error = FALSE;
@@ -613,7 +613,7 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
 		extern void dummy_get_info(UINT32 state, cpuinfo *info);
-		const cpu_config *cpu = &drv->cpu[cpunum];
+		const cpu_config *cpu = &config->cpu[cpunum];
 		int spacenum;
 
 		/* skip empty entries */
@@ -666,7 +666,7 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
 
 			/* construct the maps */
 			map = addrmap;
-			construct_address_map(map, drv, cpunum, spacenum);
+			construct_address_map(map, config, cpunum, spacenum);
 
 			/* if this is an empty map, just skip it */
 			if (IS_AMENTRY_END(map))
@@ -771,7 +771,7 @@ static int validate_cpu(int drivnum, const machine_config *drv, const UINT32 *re
     configurations
 -------------------------------------------------*/
 
-static int validate_display(int drivnum, const machine_config *drv)
+static int validate_display(int drivnum, const machine_config *config)
 {
 	const game_driver *driver = drivers[drivnum];
 	const device_config *device;
@@ -779,7 +779,7 @@ static int validate_display(int drivnum, const machine_config *drv)
 	int error = FALSE;
 
 	/* loop over screens */
-	for (device = video_screen_first(drv); device != NULL; device = video_screen_next(device))
+	for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 	{
 		const screen_config *scrconfig = device->inline_config;
 
@@ -823,7 +823,7 @@ static int validate_display(int drivnum, const machine_config *drv)
 	}
 
 	/* check for empty palette */
-	if (palette_modes && drv->total_colors == 0)
+	if (palette_modes && config->total_colors == 0)
 	{
 		mame_printf_error("%s: %s has zero palette entries\n", driver->source_file, driver->name);
 		error = TRUE;
@@ -838,23 +838,23 @@ static int validate_display(int drivnum, const machine_config *drv)
     configuration
 -------------------------------------------------*/
 
-static int validate_gfx(int drivnum, const machine_config *drv, const UINT32 *region_length)
+static int validate_gfx(int drivnum, const machine_config *config, const UINT32 *region_length)
 {
 	const game_driver *driver = drivers[drivnum];
 	int error = FALSE;
 	int gfxnum;
 
 	/* bail if no gfx */
-	if (!drv->gfxdecodeinfo)
+	if (!config->gfxdecodeinfo)
 		return FALSE;
 
 	/* iterate over graphics decoding entries */
-	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && drv->gfxdecodeinfo[gfxnum].memory_region != -1; gfxnum++)
+	for (gfxnum = 0; gfxnum < MAX_GFX_ELEMENTS && config->gfxdecodeinfo[gfxnum].memory_region != -1; gfxnum++)
 	{
-		const gfx_decode_entry *gfx = &drv->gfxdecodeinfo[gfxnum];
+		const gfx_decode_entry *gfx = &config->gfxdecodeinfo[gfxnum];
 		int region = gfx->memory_region;
-		int xscale = (drv->gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : drv->gfxdecodeinfo[gfxnum].xscale;
-		int yscale = (drv->gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : drv->gfxdecodeinfo[gfxnum].yscale;
+		int xscale = (config->gfxdecodeinfo[gfxnum].xscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].xscale;
+		int yscale = (config->gfxdecodeinfo[gfxnum].yscale == 0) ? 1 : config->gfxdecodeinfo[gfxnum].yscale;
 		const gfx_layout *gl = gfx->gfxlayout;
 		int israw = (gl->planeoffset[0] == GFX_RAW);
 		int planes = gl->planes;
@@ -987,7 +987,7 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *drv, input_port_entry **memory)
+static int validate_inputs(int drivnum, const machine_config *config, input_port_entry **memory)
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
@@ -1266,60 +1266,61 @@ static int validate_inputs(int drivnum, const machine_config *drv, input_port_en
     speaker configuration
 -------------------------------------------------*/
 
-static int validate_sound(int drivnum, const machine_config *drv)
+static int validate_sound(int drivnum, const machine_config *config)
 {
 	const game_driver *driver = drivers[drivnum];
-	int speaknum, sndnum;
+	const device_config *curspeak, *checkspeak;
 	int error = FALSE;
+	int sndnum;
 
 	/* make sure the speaker layout makes sense */
-	for (speaknum = 0; speaknum < MAX_SPEAKER && drv->speaker[speaknum].tag; speaknum++)
+	for (curspeak = speaker_output_first(config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
 		int check;
 
 		/* check for duplicate tags */
-		for (check = 0; check < MAX_SPEAKER && drv->speaker[check].tag; check++)
-			if (speaknum != check && drv->speaker[check].tag && !strcmp(drv->speaker[speaknum].tag, drv->speaker[check].tag))
+		for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
+			if (checkspeak != curspeak && strcmp(checkspeak->tag, curspeak->tag) == 0)
 			{
-				mame_printf_error("%s: %s has multiple speakers tagged as '%s'\n", driver->source_file, driver->name, drv->speaker[speaknum].tag);
+				mame_printf_error("%s: %s has multiple speakers tagged as '%s'\n", driver->source_file, driver->name, checkspeak->tag);
 				error = TRUE;
 			}
 
 		/* make sure there are no sound chips with the same tag */
-		for (check = 0; check < MAX_SOUND && drv->sound[check].type != SOUND_DUMMY; check++)
-			if (drv->sound[check].tag && !strcmp(drv->speaker[speaknum].tag, drv->sound[check].tag))
+		for (check = 0; check < MAX_SOUND && config->sound[check].type != SOUND_DUMMY; check++)
+			if (config->sound[check].tag && strcmp(curspeak->tag, config->sound[check].tag) == 0)
 			{
-				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, drv->speaker[speaknum].tag);
+				mame_printf_error("%s: %s has both a speaker and a sound chip tagged as '%s'\n", driver->source_file, driver->name, curspeak->tag);
 				error = TRUE;
 			}
 	}
 
 	/* make sure the sounds are wired to the speakers correctly */
-	for (sndnum = 0; sndnum < MAX_SOUND && drv->sound[sndnum].type != SOUND_DUMMY; sndnum++)
+	for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 	{
 		int routenum;
 
 		/* loop over all the routes */
-		for (routenum = 0; routenum < drv->sound[sndnum].routes; routenum++)
+		for (routenum = 0; routenum < config->sound[sndnum].routes; routenum++)
 		{
 			/* find a speaker with the requested tag */
-			for (speaknum = 0; speaknum < MAX_SPEAKER && drv->speaker[speaknum].tag; speaknum++)
-				if (!strcmp(drv->sound[sndnum].route[routenum].target, drv->speaker[speaknum].tag))
+			for (checkspeak = speaker_output_first(config); checkspeak != NULL; checkspeak = speaker_output_next(checkspeak))
+				if (strcmp(config->sound[sndnum].route[routenum].target, checkspeak->tag) == 0)
 					break;
 
 			/* if we didn't find one, look for another sound chip with the tag */
-			if (speaknum >= MAX_SPEAKER || !drv->speaker[speaknum].tag)
+			if (checkspeak == NULL)
 			{
 				int check;
 
-				for (check = 0; check < MAX_SOUND && drv->sound[check].type != SOUND_DUMMY; check++)
-					if (check != sndnum && drv->sound[check].tag && !strcmp(drv->sound[check].tag, drv->sound[sndnum].route[routenum].target))
+				for (check = 0; check < MAX_SOUND && config->sound[check].type != SOUND_DUMMY; check++)
+					if (check != sndnum && config->sound[check].tag && strcmp(config->sound[check].tag, config->sound[sndnum].route[routenum].target) == 0)
 						break;
 
 				/* if we didn't find one, it's an error */
-				if (check >= MAX_SOUND || drv->sound[check].type == SOUND_DUMMY)
+				if (check >= MAX_SOUND || config->sound[check].type == SOUND_DUMMY)
 				{
-					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, drv->sound[sndnum].route[routenum].target);
+					mame_printf_error("%s: %s attempting to route sound to non-existant speaker '%s'\n", driver->source_file, driver->name, config->sound[sndnum].route[routenum].target);
 					error = TRUE;
 				}
 			}
@@ -1413,7 +1414,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* expand the machine driver */
 		expansion -= osd_profiling_ticks();
-		config = machine_config_alloc(driver->drv);
+		config = machine_config_alloc(driver->machine_config);
 		expansion += osd_profiling_ticks();
 
 		/* validate the driver entry */

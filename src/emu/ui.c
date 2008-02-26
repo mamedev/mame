@@ -1108,22 +1108,27 @@ int sprintf_game_info(char *buffer)
 
 	/* display screen information */
 	bufptr += sprintf(bufptr, "\nVideo:\n");
-	for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+	if (scrcount == 0)
+		buffer += sprintf(bufptr, "None\n");
+	else
 	{
-		int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
-		const screen_config *scrconfig = device->inline_config;
+		for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+		{
+			int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
+			const screen_config *scrconfig = device->inline_config;
 
-		if (scrcount > 1)
-			bufptr += sprintf(bufptr, "Screen %d: ", index + 1);
+			if (scrcount > 1)
+				bufptr += sprintf(bufptr, "Screen %d: ", index + 1);
 
-		if (scrconfig->type == SCREEN_TYPE_VECTOR)
-			bufptr += sprintf(bufptr, "Vector\n");
-		else
-			bufptr += sprintf(bufptr, "Resolution:\n%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-					Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1,
-					Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1,
-					(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-					ATTOSECONDS_TO_HZ(Machine->screen[0].refresh));
+			if (scrconfig->type == SCREEN_TYPE_VECTOR)
+				bufptr += sprintf(bufptr, "Vector\n");
+			else
+				bufptr += sprintf(bufptr, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
+						scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
+						scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
+						(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
+						ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+		}
 	}
 
 	return bufptr - buffer;

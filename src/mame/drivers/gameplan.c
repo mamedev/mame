@@ -1180,7 +1180,7 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_MACHINE_RESET(gameplan)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(gameplan_video);
+	MDRV_IMPORT_FROM(gameplan_video)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1200,7 +1200,7 @@ static MACHINE_DRIVER_START( leprechn )
 	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map,0)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(leprechn_video);
+	MDRV_IMPORT_FROM(leprechn_video)
 MACHINE_DRIVER_END
 
 

@@ -811,7 +811,7 @@ void cpu_triggerint(running_machine *machine, int cpunum)
 
 static TIMER_CALLBACK( watchdog_callback )
 {
-	logerror("reset caused by the (time) watchdog\n");
+	logerror("reset caused by the watchdog\n");
 	mame_schedule_soft_reset(machine);
 }
 

@@ -512,7 +512,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	MDRV_GFXDECODE(mcatadv)
 	MDRV_PALETTE_LENGTH(0x2000/2)
 
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_VIDEO_START(mcatadv)
 	MDRV_VIDEO_EOF(mcatadv) // Buffer Spriteram

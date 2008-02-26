@@ -67,27 +67,35 @@
 #define HZ_TO_ATTOSECONDS(x)			((attoseconds_t)(ATTOSECONDS_PER_SECOND / (x)))
 
 /* macros for converting other seconds types to attoseconds */
-#define ATTOSECONDS_IN_SEC(x)			((x) * ATTOSECONDS_PER_SECOND)
-#define ATTOSECONDS_IN_MSEC(x)			((x) * ATTOSECONDS_PER_MILLISECOND)
-#define ATTOSECONDS_IN_USEC(x)			((x) * ATTOSECONDS_PER_MICROSECOND)
-#define ATTOSECONDS_IN_NSEC(x)			((x) * ATTOSECONDS_PER_NANOSECOND)
+#define ATTOSECONDS_IN_SEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_SECOND)
+#define ATTOSECONDS_IN_MSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MILLISECOND)
+#define ATTOSECONDS_IN_USEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_MICROSECOND)
+#define ATTOSECONDS_IN_NSEC(x)			((attoseconds_t)(x) * ATTOSECONDS_PER_NANOSECOND)
 
 /* macros for building attotimes from other types at runtime */
-#define ATTOTIME_IN_HZ(hz)				attotime_make(0, HZ_TO_ATTOSECONDS(hz))
-#define ATTOTIME_IN_SEC(s)				attotime_make((s)  / 1, (s) % 1 /* mod here errors on doubles, which is intended */)
-#define ATTOTIME_IN_MSEC(ms)			attotime_make((ms) / 1000, ATTOSECONDS_IN_MSEC((ms) % 1000))
-#define ATTOTIME_IN_USEC(us)			attotime_make((us) / 1000000, ATTOSECONDS_IN_USEC((us) % 1000000))
-#define ATTOTIME_IN_NSEC(ns)			attotime_make((ns) / 1000000000, ATTOSECONDS_IN_NSEC((ns) % 1000000000))
+#define ATTOTIME_IN_HZ(hz)				attotime_make((0), (HZ_TO_ATTOSECONDS(hz)))
+#define ATTOTIME_IN_SEC(s)				attotime_make(((s) / 1), ((s) % 1))
+#define ATTOTIME_IN_MSEC(ms)			attotime_make(((ms) / 1000), (ATTOSECONDS_IN_MSEC((ms) % 1000)))
+#define ATTOTIME_IN_USEC(us)			attotime_make(((us) / 1000000), (ATTOSECONDS_IN_USEC((us) % 1000000)))
+#define ATTOTIME_IN_NSEC(ns)			attotime_make(((ns) / 1000000000), (ATTOSECONDS_IN_NSEC((ns) % 1000000000)))
 
 /* macros for building attotimes from other types at compile time */
-#define STATIC_ATTOTIME_IN_HZ(hz)		{ 0, HZ_TO_ATTOSECONDS(hz) }
-#define STATIC_ATTOTIME_IN_SEC(s)		{ (s)  / 1, (s) % 1 /* mod here errors on doubles, which is intended */ }
-#define STATIC_ATTOTIME_IN_MSEC(ms)		{ (ms) / 1000, ATTOSECONDS_IN_MSEC((ms) % 1000) }
-#define STATIC_ATTOTIME_IN_USEC(us)		{ (us) / 1000000, ATTOSECONDS_IN_USEC((us) % 1000000) }
-#define STATIC_ATTOTIME_IN_NSEC(ns)		{ (ns) / 1000000000, ATTOSECONDS_IN_NSEC((ns) % 1000000000) }
+#define STATIC_ATTOTIME_IN_HZ(hz)		{ (0), (HZ_TO_ATTOSECONDS(hz)) }
+#define STATIC_ATTOTIME_IN_SEC(s)		{ ((s) / 1), ((s) % 1) }
+#define STATIC_ATTOTIME_IN_MSEC(ms)		{ ((ms) / 1000), (ATTOSECONDS_IN_MSEC((ms) % 1000)) }
+#define STATIC_ATTOTIME_IN_USEC(us)		{ ((us) / 1000000), (ATTOSECONDS_IN_USEC((us) % 1000000)) }
+#define STATIC_ATTOTIME_IN_NSEC(ns)		{ ((ns) / 1000000000), (ATTOSECONDS_IN_NSEC((ns) % 1000000000)) }
 
+/* macros for building a reduced-resolution attotime for tokenized storage in a UINT64 */
+/* this form supports up to 1000 seconds and sacrifices 1/1000 of the full attotime resolution */
+#define UINT64_ATTOTIME_IN_HZ(hz)		((UINT64)((ATTOSECONDS_PER_SECOND / 1000) / (hz)))
+#define UINT64_ATTOTIME_IN_SEC(s)		((UINT64)(s) * (ATTOSECONDS_PER_SECOND / 1000))
+#define UINT64_ATTOTIME_IN_MSEC(ms)		((UINT64)(ms) * (ATTOSECONDS_PER_SECOND / 1000 / 1000))
+#define UINT64_ATTOTIME_IN_USEC(us)		((UINT64)(us) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000))
+#define UINT64_ATTOTIME_IN_NSEC(ns)		((UINT64)(ns) * (ATTOSECONDS_PER_SECOND / 1000 / 1000 / 1000 / 1000))
 
-#define USEC_TO_ATTOSECONDS(us)			((attoseconds_t)((us) * ATTOSECONDS_PER_MICROSECOND))
+/* macros for converting a UINT64 attotime to a full attotime */
+#define UINT64_ATTOTIME_TO_ATTOTIME(v)	attotime_make((v) / (ATTOSECONDS_PER_SECOND / 1000), ((v) % (ATTOSECONDS_PER_SECOND / 1000)) * 1000)
 
 
 

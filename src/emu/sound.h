@@ -26,6 +26,18 @@
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* these functions are macros primarily due to include file ordering */
+/* plus, they are very simple */
+#define speaker_output_count(config)		device_list_items((config)->devicelist, SPEAKER_OUTPUT)
+#define speaker_output_first(config)		device_list_first((config)->devicelist, SPEAKER_OUTPUT)
+#define speaker_output_next(previous)		device_list_next((previous), SPEAKER_OUTPUT)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -57,7 +69,6 @@ struct _sound_config
 typedef struct _speaker_config speaker_config;
 struct _speaker_config
 {
-	const char *tag;					/* tag for this speaker */
 	float		x, y, z;				/* positioning vector */
 };
 
@@ -85,6 +96,13 @@ const char *sound_get_user_gain_name(int index);
 
 /* misc helpers */
 int sound_find_sndnum_by_tag(const char *tag);
+
+
+/* ----- sound speaker device interface ----- */
+
+/* device get info callback */
+#define SPEAKER_OUTPUT speaker_output_get_info
+void speaker_output_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 
 
 #endif	/* __SOUND_H__ */

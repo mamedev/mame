@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem,0)
 	MDRV_CPU_IO_MAP(sandscrp_soundport,0)
 
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 
 	MDRV_MACHINE_RESET(sandscrp)
 

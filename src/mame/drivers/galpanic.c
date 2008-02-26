@@ -965,7 +965,7 @@ static MACHINE_DRIVER_START( galpania )
 	MDRV_IMPORT_FROM(galpanic)
 
 	/* arm watchdog */
-	MDRV_WATCHDOG_TIME_INIT(ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( comad )
