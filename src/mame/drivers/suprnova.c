@@ -8,8 +8,8 @@ Mainboard + Cart combo
    Regions by color coded cart:
 
     White      = Japan
-    Light Blue = USA
-    Dark Blue  = Europe
+    Light Blue = Europe
+    Dark Blue  = USA
     Green      = Asia
     Red        = Korean
 
