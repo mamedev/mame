@@ -213,21 +213,16 @@ contain a level.
 
 */
 
-static ADDRESS_MAP_START( readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_WRITE(angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
-	AM_RANGE(0xec00, 0xecff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_WRITE(angelkds_paletteram_w) AM_BASE(&paletteram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(MRA8_RAM, angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_READWRITE(MRA8_RAM, angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_READWRITE(MRA8_RAM, angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
+	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xed00, 0xeeff) AM_READWRITE(MRA8_RAM, angelkds_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(angelkds_bgbotbank_write)
@@ -236,54 +231,37 @@ static ADDRESS_MAP_START( writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport_main, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) // 00 on start-up, not again
+	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
+	AM_RANGE(0x43, 0x43) AM_WRITE(MWA8_NOP) // 9a on start-up, not again
 	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)	/* "Coinage" Dip Switches */
 	AM_RANGE(0x41, 0x41) AM_READ(input_port_1_r)	/* Other Dip Switches */
 	AM_RANGE(0x42, 0x42) AM_READ(input_port_2_r)	/* Players inputs (not needed ?) */
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r)	/* System inputs */
 	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)	/* Players inputs */
-	AM_RANGE(0xc0, 0xc3) AM_READ(angelkds_main_sound_r)  /* needed by spcpostn */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_main, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) // 00 on start-up, not again
-	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
-	AM_RANGE(0x43, 0x43) AM_WRITE(MWA8_NOP) // 9a on start-up, not again
 	AM_RANGE(0x83, 0x83) AM_WRITE(MWA8_NOP) // 9b on start-up, not again
-	AM_RANGE(0xc0, 0xc3) AM_WRITE(angelkds_main_sound_w) // 02 various points
+	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
 ADDRESS_MAP_END
 
 /* sub cpu */
 
-static ADDRESS_MAP_START( readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xaaa9, 0xaaa9) AM_READ(MRA8_NOP)
-	AM_RANGE(0xaaab, 0xaaab) AM_READ(MRA8_NOP)
-	AM_RANGE(0xaaac, 0xaaac) AM_READ(MRA8_NOP)
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xaaa9, 0xaaa9) AM_READNOP
+	AM_RANGE(0xaaab, 0xaaab) AM_READNOP
+	AM_RANGE(0xaaac, 0xaaac) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport_sub, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sub_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0x80, 0x83) AM_READ(angelkds_sub_sound_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(YM2203_control_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE(angelkds_sub_sound_w) // spcpostn
+	AM_RANGE(0x80, 0x83) AM_READWRITE(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
 ADDRESS_MAP_END
 
 
@@ -616,14 +594,13 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( angelkds )
 	MDRV_CPU_ADD(Z80, 8000000) /* 8MHz? 6 seems too slow? */
-	MDRV_CPU_PROGRAM_MAP(readmem_main,writemem_main)
-	MDRV_CPU_IO_MAP(readport_main,writeport_main)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* 8 MHz? */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(readmem_sub,writemem_sub)
-	MDRV_CPU_IO_MAP(readport_sub,writeport_sub)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
+	MDRV_CPU_IO_MAP(sub_portmap,0)
 
 	MDRV_INTERLEAVE(100)
 

@@ -143,13 +143,19 @@ static READ8_HANDLER( unk_r )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+/* 5x2101 - SRAM 256x4 */
+/* 3x3106 - SRAM 256x1 */
+/* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
 
-	AM_RANGE(0x0000, 0x09ff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x2000, 0x20ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8300, 0x83ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x80ff) AM_READ(ace_characterram_r)
+	AM_RANGE(0x0000, 0x09ff) AM_ROM
+
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&ace_scoreram)	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(&ace_ram2)		/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(ace_characterram_r, ace_characterram_w) AM_BASE(&ace_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+
+	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
 	/* players inputs */
 	AM_RANGE(0xc008, 0xc008) AM_READ(input_port_0_r)
@@ -186,20 +192,6 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc025, 0xc025) AM_READ(unk_r)
 	AM_RANGE(0xc026, 0xc026) AM_READ(unk_r)
 
-ADDRESS_MAP_END
-
-/* 5x2101 - SRAM 256x4 */
-/* 3x3106 - SRAM 256x1 */
-/* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x09ff) AM_WRITE(MWA8_ROM)
-
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(MWA8_RAM) AM_BASE(&ace_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&ace_ram2)		/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_WRITE(ace_characterram_w) AM_BASE(&ace_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
-
-	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 ADDRESS_MAP_END
 
 
@@ -319,7 +311,7 @@ static MACHINE_DRIVER_START( ace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 18000000 / 9)	/* 2 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

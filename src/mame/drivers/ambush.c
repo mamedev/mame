@@ -56,37 +56,27 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc080, 0xc09f) AM_BASE(&ambush_scrollram)
+	AM_RANGE(0xc100, 0xc1ff) AM_BASE(&colorram)
+	AM_RANGE(0xc200, 0xc3ff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ(input_port_2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xc080, 0xc09f) AM_WRITE(MWA8_RAM) AM_BASE(&ambush_scrollram)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xcc05, 0xcc05) AM_WRITE(MWA8_RAM) AM_BASE(&ambush_colorbank)
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(AY8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_1_r, AY8910_control_port_1_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_write_port_1_w)
 ADDRESS_MAP_END
 
@@ -184,8 +174,8 @@ static MACHINE_DRIVER_START( ambush )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.00 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
 
 	/* video hardware */

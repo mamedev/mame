@@ -72,26 +72,17 @@ static READ16_HANDLER( joystick_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00bfff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x022000, 0x022fff) AM_READ(nvram_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00bfff) AM_ROM
+	AM_RANGE(0x022000, 0x0220ff) AM_READWRITE(nvram_r, MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x027008, 0x027009) AM_READ(aztarac_sound_r)
+	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xff8000, 0xffafff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffe000, 0xffffff) AM_READ(MRA16_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x00bfff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x022000, 0x0220ff) AM_WRITE(MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x027008, 0x027009) AM_WRITE(aztarac_sound_w)
-	AM_RANGE(0xff8000, 0xffafff) AM_WRITE(MWA16_RAM) AM_BASE(&aztarac_vectorram)
+	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_BASE(&aztarac_vectorram)
 	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(aztarac_ubr_w)
-	AM_RANGE(0xffe000, 0xffffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -102,30 +93,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READ(aztarac_snd_command_r)
-	AM_RANGE(0x8c00, 0x8c01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x8c02, 0x8c03) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0x8c04, 0x8c05) AM_READ(AY8910_read_port_2_r)
-	AM_RANGE(0x8c06, 0x8c07) AM_READ(AY8910_read_port_3_r)
-	AM_RANGE(0x9000, 0x9000) AM_READ(aztarac_snd_status_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8c02, 0x8c02) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8c03, 0x8c03) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8c04, 0x8c04) AM_WRITE(AY8910_write_port_2_w)
-	AM_RANGE(0x8c05, 0x8c05) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x8c06, 0x8c06) AM_WRITE(AY8910_write_port_3_w)
-	AM_RANGE(0x8c07, 0x8c07) AM_WRITE(AY8910_control_port_3_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(aztarac_snd_status_w)
+	AM_RANGE(0x8c00, 0x8c00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
+	AM_RANGE(0x8c02, 0x8c02) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0x8c03, 0x8c03) AM_READWRITE(AY8910_read_port_1_r, AY8910_control_port_1_w)
+	AM_RANGE(0x8c04, 0x8c04) AM_READWRITE(AY8910_read_port_2_r, AY8910_write_port_2_w)
+	AM_RANGE(0x8c05, 0x8c05) AM_READWRITE(AY8910_read_port_2_r, AY8910_control_port_2_w)
+	AM_RANGE(0x8c06, 0x8c06) AM_READWRITE(AY8910_read_port_3_r, AY8910_write_port_3_w)
+	AM_RANGE(0x8c07, 0x8c07) AM_READWRITE(AY8910_read_port_3_r, AY8910_control_port_3_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(aztarac_snd_status_r, aztarac_snd_status_w)
 ADDRESS_MAP_END
 
 
@@ -169,12 +149,11 @@ static MACHINE_DRIVER_START( aztarac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 2000000)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(aztarac_snd_timed_irq, 100)
 
 	MDRV_MACHINE_RESET(aztarac)

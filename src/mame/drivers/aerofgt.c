@@ -161,55 +161,42 @@ static WRITE16_HANDLER( pspikesb_oki_banking_w )
 }
 
 
-static ADDRESS_MAP_START( pspikes_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8000, 0xff8fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffd000, 0xffdfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffe000, 0xffefff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(pending_command_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pspikes_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0xff8000, 0xff8fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(pspikes_palette_bank_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(pspikes_gfxbank_w)
-	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
+static ADDRESS_MAP_START( pspikes_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITEONLY AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff000, 0xfff001) AM_READWRITE(input_port_0_word_r, pspikes_palette_bank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_READWRITE(input_port_1_word_r, pspikes_gfxbank_w)
+	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(pending_command_r, sound_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pspikesb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
+	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
 	AM_RANGE(0xffc000, 0xffcbff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 	AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(pspikesb_oki_banking_w)
-	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
+	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(pspikesb_oki_banking_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pallavol_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
 	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
 	AM_RANGE(0xffc000, 0xffcbff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 	//AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
@@ -217,21 +204,19 @@ static ADDRESS_MAP_START( pallavol_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r) AM_WRITE(pspikes_gfxbank_w)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff008, 0xfff009) AM_NOP
-	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
+	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_NOP
+	AM_RANGE(0xfff008, 0xfff009) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
 	AM_RANGE(0xffc000, 0xffcbff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfff000, 0xfff001) AM_READWRITE(input_port_0_word_r, pspikes_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READWRITE(input_port_1_word_r, pspikes_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
@@ -239,182 +224,105 @@ static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( karatblz_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( karatblz_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x081fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x082000, 0x083fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0a0000, 0x0affff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0b0000, 0x0bffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0fe000, 0x0fe7ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x081fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0x082000, 0x083fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
+	AM_RANGE(0x0a0000, 0x0affff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0x0fe000, 0x0fe7ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0ff000, 0x0ff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0ff002, 0x0ff003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x0ff002, 0x0ff003) AM_READWRITE(input_port_1_word_r, karatblz_gfxbank_w)
 	AM_RANGE(0x0ff004, 0x0ff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0ff006, 0x0ff007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x0ff008, 0x0ff009) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x0ff00a, 0x0ff00b) AM_READ(pending_command_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( karatblz_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x081fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0x082000, 0x083fff) AM_WRITE(aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
-	AM_RANGE(0x0a0000, 0x0affff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0x0b0000, 0x0bffff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0x0fe000, 0x0fe7ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0ff002, 0x0ff003) AM_WRITE(karatblz_gfxbank_w)
-	AM_RANGE(0x0ff006, 0x0ff007) AM_WRITE(sound_command_w)
-	AM_RANGE(0x0ff008, 0x0ff009) AM_WRITE(aerofgt_bg1scrollx_w)
-	AM_RANGE(0x0ff00a, 0x0ff00b) AM_WRITE(aerofgt_bg1scrolly_w)
+	AM_RANGE(0x0ff006, 0x0ff007) AM_READWRITE(input_port_3_word_r, sound_command_w)
+	AM_RANGE(0x0ff008, 0x0ff009) AM_READWRITE(input_port_4_word_r, aerofgt_bg1scrollx_w)
+	AM_RANGE(0x0ff00a, 0x0ff00b) AM_READWRITE(pending_command_r, aerofgt_bg1scrolly_w)
 	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(aerofgt_bg2scrolly_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spinlbrk_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x082000, 0x082fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffd000, 0xffd1ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffe000, 0xffe7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r)
+static ADDRESS_MAP_START( spinlbrk_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0x082000, 0x082fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM	/* work RAM */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0xffd000, 0xffd1ff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffe7ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff000, 0xfff001) AM_READWRITE(input_port_0_word_r, spinlbrk_gfxbank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_READWRITE(input_port_1_word_r, aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spinlbrk_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0x082000, 0x082fff) AM_WRITE(aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
-	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0xffd000, 0xffd1ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0xffe000, 0xffe7ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(spinlbrk_gfxbank_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turbofrc_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( turbofrc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
-	AM_RANGE(0x000000, 0x0bffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0d0000, 0x0d1fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0e4000, 0x0e7fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0fd000, 0x0fdfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0fe000, 0x0fe7ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x0bffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0d0000, 0x0d1fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0x0d2000, 0x0d3fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0x0e4000, 0x0e7fff) AM_RAM AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
+	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0x0fd000, 0x0fdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
+	AM_RANGE(0x0fe000, 0x0fe7ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0ff000, 0x0ff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0ff002, 0x0ff003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0ff004, 0x0ff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0ff006, 0x0ff007) AM_READ(pending_command_r)
+	AM_RANGE(0x0ff002, 0x0ff003) AM_READWRITE(input_port_1_word_r, aerofgt_bg1scrolly_w)
+	AM_RANGE(0x0ff004, 0x0ff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg2scrollx_w)
+	AM_RANGE(0x0ff006, 0x0ff007) AM_READWRITE(pending_command_r, aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0ff008, 0x0ff009) AM_READ(input_port_3_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( turbofrc_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
-	AM_RANGE(0x000000, 0x0bffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0d0000, 0x0d1fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_WRITE(aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0x0e4000, 0x0e7fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0x0fd000, 0x0fdfff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0x0fe000, 0x0fe7ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0ff002, 0x0ff003) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0x0ff004, 0x0ff005) AM_WRITE(aerofgt_bg2scrollx_w)
-	AM_RANGE(0x0ff006, 0x0ff007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0ff008, 0x0ff00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITE(MWA16_NOP)	/* related to bg2 (written together with the scroll registers) */
 	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(turbofrc_sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgtb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0d0000, 0x0d1fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0e4000, 0x0e7fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_READ(MRA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0fd000, 0x0fd7ff) AM_READ(MRA16_RAM)
+static ADDRESS_MAP_START( aerofgtb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0d0000, 0x0d1fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0x0d2000, 0x0d3fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0x0e4000, 0x0e7fff) AM_RAM AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
+	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM	/* work RAM */
+	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0x0fd000, 0x0fd7ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0fe000, 0x0fe001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x0fe002, 0x0fe003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0fe004, 0x0fe005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0fe006, 0x0fe007) AM_READ(pending_command_r)
+	AM_RANGE(0x0fe002, 0x0fe003) AM_READWRITE(input_port_1_word_r, aerofgt_bg1scrolly_w)
+	AM_RANGE(0x0fe004, 0x0fe005) AM_READWRITE(input_port_2_word_r, aerofgt_bg2scrollx_w)
+	AM_RANGE(0x0fe006, 0x0fe007) AM_READWRITE(pending_command_r, aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe009) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x0ff000, 0x0fffff) AM_READ(MRA16_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( aerofgtb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x0c0000, 0x0cffff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0d0000, 0x0d1fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_WRITE(aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0x0e4000, 0x0e7fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
-	AM_RANGE(0x0f8000, 0x0fbfff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0x0fd000, 0x0fd7ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0fe002, 0x0fe003) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0x0fe004, 0x0fe005) AM_WRITE(aerofgt_bg2scrollx_w)
-	AM_RANGE(0x0fe006, 0x0fe007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0fe00e, 0x0fe00f) AM_WRITE(turbofrc_sound_command_w)
-	AM_RANGE(0x0ff000, 0x0fffff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
+	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgt_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1b0000, 0x1b07ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1b0800, 0x1b0801) AM_READ(MRA16_NOP)	/* ??? */
-	AM_RANGE(0x1b0ff0, 0x1b0fff) AM_READ(MRA16_RAM)	/* stack area during boot */
-	AM_RANGE(0x1b2000, 0x1b3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1b4000, 0x1b5fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1c4000, 0x1c7fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfef000, 0xffefff) AM_READ(MRA16_RAM)	/* work RAM */
+static ADDRESS_MAP_START( aerofgt_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1b0000, 0x1b07ff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
+	AM_RANGE(0x1b0800, 0x1b0801) AM_NOP	/* ??? */
+	AM_RANGE(0x1b0ff0, 0x1b0fff) AM_RAM	/* stack area during boot */
+	AM_RANGE(0x1b2000, 0x1b3fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0x1b4000, 0x1b5fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0x1c4000, 0x1c7fff) AM_RAM AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0xfef000, 0xffefff) AM_RAM	/* work RAM */
+	AM_RANGE(0xffff80, 0xffff87) AM_WRITE(aerofgt_gfxbank_w)
+	AM_RANGE(0xffff88, 0xffff89) AM_WRITE(aerofgt_bg1scrolly_w)	/* + something else in the top byte */
+	AM_RANGE(0xffff90, 0xffff91) AM_WRITE(aerofgt_bg2scrolly_w)	/* + something else in the top byte */
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xffffa4, 0xffffa5) AM_READ(input_port_2_word_r)
 	AM_RANGE(0xffffa6, 0xffffa7) AM_READ(input_port_3_word_r)
 	AM_RANGE(0xffffa8, 0xffffa9) AM_READ(input_port_4_word_r)
-	AM_RANGE(0xffffac, 0xffffad) AM_READ(pending_command_r)
+	AM_RANGE(0xffffac, 0xffffad) AM_READWRITE(pending_command_r, MWA16_NOP)	/* ??? */
 	AM_RANGE(0xffffae, 0xffffaf) AM_READ(input_port_5_word_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( aerofgt_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x1b0000, 0x1b07ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
-	AM_RANGE(0x1b0800, 0x1b0801) AM_WRITE(MWA16_NOP)	/* ??? */
-	AM_RANGE(0x1b0ff0, 0x1b0fff) AM_WRITE(MWA16_RAM)	/* stack area during boot */
-	AM_RANGE(0x1b2000, 0x1b3fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0x1b4000, 0x1b5fff) AM_WRITE(aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0x1c4000, 0x1c7fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0xfef000, 0xffefff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0xffff80, 0xffff87) AM_WRITE(aerofgt_gfxbank_w)
-	AM_RANGE(0xffff88, 0xffff89) AM_WRITE(aerofgt_bg1scrolly_w)	/* + something else in the top byte */
-	AM_RANGE(0xffff90, 0xffff91) AM_WRITE(aerofgt_bg2scrolly_w)	/* + something else in the top byte */
-	AM_RANGE(0xffffac, 0xffffad) AM_WRITE(MWA16_NOP)	/* ??? */
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
@@ -444,83 +352,50 @@ static ADDRESS_MAP_START( aerfboot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10b800, 0x10bfff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wbbc97_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x500000, 0x50ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x600000, 0x605fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xa00000, 0xa3ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8000, 0xff8fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffd000, 0xffdfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffe000, 0xffefff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfff006, 0xfff007) AM_READNOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wbbc97_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x500000, 0x50ffff) AM_WRITE(MWA16_RAM)	/* work RAM */
-	AM_RANGE(0x600000, 0x605fff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
-	AM_RANGE(0xa00000, 0xa3ffff) AM_WRITE(MWA16_RAM) AM_BASE(&wbbc97_bitmapram)
-	AM_RANGE(0xff8000, 0xff8fff) AM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
-	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(MWA16_RAM) AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
-	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(pspikes_palette_bank_w)
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(pspikes_gfxbank_w)
-	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
+static ADDRESS_MAP_START( wbbc97_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* work RAM */
+	AM_RANGE(0x600000, 0x605fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM AM_BASE(&wbbc97_bitmapram)
+	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITEONLY AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfff000, 0xfff001) AM_READWRITE(input_port_0_word_r, pspikes_palette_bank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_READWRITE(input_port_1_word_r, pspikes_gfxbank_w)
+	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(MRA16_NOP, sound_command_w)
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(wbbc97_bitmap_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( turbofrc_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_r)
-	AM_RANGE(0x18, 0x18) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ(YM2610_status_port_0_B_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( turbofrc_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( turbofrc_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(YM2610_control_port_0_A_w)
+	AM_RANGE(0x14, 0x14) AM_READWRITE(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x18, 0x18) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
 	AM_RANGE(0x19, 0x19) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x1a, 0x1a) AM_WRITE(YM2610_control_port_0_B_w)
+	AM_RANGE(0x1a, 0x1a) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(YM2610_data_port_0_B_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgt_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( aerofgt_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x02, 0x02) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( aerofgt_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2610_control_port_0_A_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerfboot_snd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aerfboot_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -1388,13 +1263,12 @@ static MACHINE_DRIVER_START( pspikes )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pspikes_readmem,pspikes_writemem)
+	MDRV_CPU_PROGRAM_MAP(pspikes_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(turbofrc_sound_readport,turbofrc_sound_writeport)
+	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1515,13 +1389,12 @@ static MACHINE_DRIVER_START( karatblz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(karatblz_readmem,karatblz_writemem)
+	MDRV_CPU_PROGRAM_MAP(karatblz_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(turbofrc_sound_readport,turbofrc_sound_writeport)
+	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1554,13 +1427,12 @@ static MACHINE_DRIVER_START( spinlbrk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(spinlbrk_readmem,spinlbrk_writemem)
+	MDRV_CPU_PROGRAM_MAP(spinlbrk_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* there are vectors for 3 and 4 too */
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(turbofrc_sound_readport,turbofrc_sound_writeport)
+	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1593,13 +1465,12 @@ static MACHINE_DRIVER_START( turbofrc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(turbofrc_readmem,turbofrc_writemem)
+	MDRV_CPU_PROGRAM_MAP(turbofrc_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,5000000)
-	/* audio CPU */	/* 5 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(turbofrc_sound_readport,turbofrc_sound_writeport)
+	MDRV_CPU_ADD(Z80,5000000) /* 5 MHz (verified on pcb) */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(turbofrc_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1632,13 +1503,12 @@ static MACHINE_DRIVER_START( aerofgtb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(aerofgtb_readmem,aerofgtb_writemem)
+	MDRV_CPU_PROGRAM_MAP(aerofgtb_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,8000000/2)
-	/* audio CPU */	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(aerofgt_sound_readport,aerofgt_sound_writeport)
+	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1672,13 +1542,12 @@ static MACHINE_DRIVER_START( aerofgt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(aerofgt_readmem,aerofgt_writemem)
+	MDRV_CPU_PROGRAM_MAP(aerofgt_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
-	MDRV_CPU_ADD(Z80,5000000)
-	/* audio CPU */	/* 5 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(aerofgt_sound_readport,aerofgt_sound_writeport)
+	MDRV_CPU_ADD(Z80,5000000) /* 5 MHz (verified on pcb) */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(aerofgt_sound_portmap,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_MACHINE_RESET(aerofgt)
@@ -1716,7 +1585,7 @@ static MACHINE_DRIVER_START( aerfboot )
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(aerfboot_snd_map,0)
+	MDRV_CPU_PROGRAM_MAP(aerfboot_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1744,7 +1613,7 @@ static MACHINE_DRIVER_START( wbbc97 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(wbbc97_readmem,wbbc97_writemem)
+	MDRV_CPU_PROGRAM_MAP(wbbc97_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* all irq vectors are the same */
 
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */

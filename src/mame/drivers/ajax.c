@@ -15,15 +15,11 @@ TO DO:
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 
-extern UINT8 *ajax_sharedram;
-
 static WRITE8_HANDLER( k007232_extvol_w );
 static WRITE8_HANDLER( sound_bank_w );
 
 /* from machine/ajax.c */
 WRITE8_HANDLER( ajax_bankswitch_2_w );
-READ8_HANDLER( ajax_sharedram_r );
-WRITE8_HANDLER( ajax_sharedram_w );
 READ8_HANDLER( ajax_ls138_f10_r );
 WRITE8_HANDLER( ajax_ls138_f10_w );
 MACHINE_RESET( ajax );
@@ -35,66 +31,39 @@ VIDEO_UPDATE( ajax );
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( ajax_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01c0) AM_READ(ajax_ls138_f10_r)			/* inputs + DIPSW */
-	AM_RANGE(0x0800, 0x0807) AM_READ(K051937_r)					/* sprite control registers */
-	AM_RANGE(0x0c00, 0x0fff) AM_READ(K051960_r)					/* sprite RAM 2128SL at J7 */
-	AM_RANGE(0x1000, 0x1fff) AM_READ(MRA8_RAM)		/* palette */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(ajax_sharedram_r)			/* shared RAM with the 6809 */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)					/* RAM 6264L at K10*/
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK2)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)					/* ROM N11 */
+static ADDRESS_MAP_START( ajax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01c0) AM_READWRITE(ajax_ls138_f10_r, ajax_ls138_f10_w)	/* bankswitch + sound command + FIRQ command */
+	AM_RANGE(0x0800, 0x0807) AM_READWRITE(K051937_r, K051937_w)					/* sprite control registers */
+	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(K051960_r, K051960_w)					/* sprite RAM 2128SL at J7 */
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE(1)									/* shared RAM with the 6809 */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM 6264L at K10 */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(2)										/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM N11 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ajax_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01c0) AM_WRITE(ajax_ls138_f10_w)			/* bankswitch + sound command + FIRQ command */
-	AM_RANGE(0x0800, 0x0807) AM_WRITE(K051937_w)					/* sprite control registers */
-	AM_RANGE(0x0c00, 0x0fff) AM_WRITE(K051960_w)					/* sprite RAM 2128SL at J7 */
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram)/* palette */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(ajax_sharedram_w)			/* shared RAM with the 6809 */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM)					/* RAM 6264L at K10 */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM N11 */
+static ADDRESS_MAP_START( ajax_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(K051316_0_r, K051316_0_w)	/* 051316 zoom/rotation layer */
+	AM_RANGE(0x0800, 0x080f) AM_WRITE(K051316_ctrl_0_w)				/* 051316 control registers */
+	AM_RANGE(0x1000, 0x17ff) AM_READ(K051316_rom_0_r)				/* 051316 (ROM test) */
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)			/* bankswitch control */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE(1)						/* shared RAM with the 052001 */
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_r, K052109_w)		/* video RAM + color RAM + video registers */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)							/* banked ROM */
+	AM_RANGE(0xa000, 0xffff) AM_ROM									/* ROM I16 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ajax_readmem_2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(K051316_0_r)		/* 051316 zoom/rotation layer */
-	AM_RANGE(0x1000, 0x17ff) AM_READ(K051316_rom_0_r)	/* 051316 (ROM test) */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(ajax_sharedram_r)	/* shared RAM with the 052001 */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)			/* video RAM + color RAM + video registers */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_BANK1)			/* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)			/* ROM I16 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ajax_writemem_2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(K051316_0_w)			/* 051316 zoom/rotation layer */
-	AM_RANGE(0x0800, 0x080f) AM_WRITE(K051316_ctrl_0_w)		/* 051316 control registers */
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ajax_bankswitch_2_w)	/* bankswitch control */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(ajax_sharedram_w) AM_BASE(&ajax_sharedram)/* shared RAM with the 052001 */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)				/* video RAM + color RAM + video registers */
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_ROM)				/* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM I16 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ajax_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* ROM F6 */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)				/* RAM 2128SL at D16 */
-	AM_RANGE(0xa000, 0xa00d) AM_READ(K007232_read_port_0_r)	/* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_1_r)	/* 007232 registers (chip 2) */
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ajax_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)					/* ROM F6 */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)					/* RAM 2128SL at D16 */
+static ADDRESS_MAP_START( ajax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM F6 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM 2128SL at D16 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_1_w)		/* 007232 registers (chip 2) */
-	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)	/* extra volume, goes to the 007232 w/ A11 */
-											/* selecting a different latch for the external port */
+	AM_RANGE(0xa000, 0xa00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)		/* 007232 registers (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_1_r, K007232_write_port_1_w)		/* 007232 registers (chip 2) */
+	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
+																/* selecting a different latch for the external port */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)		/* YM2151 */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)				/* soundlatch_r */
 ADDRESS_MAP_END
 
 
@@ -270,14 +239,14 @@ static MACHINE_DRIVER_START( ajax )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)	/* 12/4 MHz*/
-	MDRV_CPU_PROGRAM_MAP(ajax_readmem,ajax_writemem)
+	MDRV_CPU_PROGRAM_MAP(ajax_main_map,0)
 	MDRV_CPU_VBLANK_INT(ajax_interrupt,1)	/* IRQs triggered by the 051960 */
 
 	MDRV_CPU_ADD(M6809, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(ajax_readmem_2,ajax_writemem_2)
+	MDRV_CPU_PROGRAM_MAP(ajax_sub_map,0)
 
 	MDRV_CPU_ADD(Z80, 3579545)	/* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(ajax_readmem_sound,ajax_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(ajax_sound_map,0)
 
 	MDRV_INTERLEAVE(10)
 

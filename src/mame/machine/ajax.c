@@ -14,7 +14,6 @@
 #include "cpu/konami/konami.h"
 #include "video/konamiic.h"
 
-UINT8 *ajax_sharedram;
 extern UINT8 ajax_priority;
 static int firq_enable;
 
@@ -163,17 +162,6 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 		default:
 			logerror("%04x: (ls138_f10) write %02x to an unknown address %02x\n",activecpu_get_pc(), data, offset);
 	}
-}
-
-/* Shared RAM between the 052001 and the 6809 (6264SL at I8) */
-READ8_HANDLER( ajax_sharedram_r )
-{
-	return ajax_sharedram[offset];
-}
-
-WRITE8_HANDLER( ajax_sharedram_w )
-{
-	ajax_sharedram[offset] = data;
 }
 
 /*  ajax_bankswitch_w_2:

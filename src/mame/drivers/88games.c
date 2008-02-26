@@ -120,10 +120,16 @@ static WRITE8_HANDLER( speech_msg_w )
 	upd7759_port_w( speech_chip, data );
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM) AM_BASE(&banked_rom)	/* banked ROM + palette RAM */
-	AM_RANGE(0x2000, 0x37ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(bankedram_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM	AM_BASE(&banked_rom) /* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
+	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)
+	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
+	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5f94, 0x5f94) AM_READ(input_port_0_r)
 //  AM_RANGE(0x5f95, 0x5f95) AM_READ(input_port_1_r)
 //  AM_RANGE(0x5f96, 0x5f96) AM_READ(input_port_2_r)
@@ -131,38 +137,18 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5f96, 0x5f96) AM_READ(cheat2_r)	/* P3 and P4 IO and handle fake button for cheating */
 	AM_RANGE(0x5f97, 0x5f97) AM_READ(input_port_3_r)
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ(input_port_4_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)	/* banked ROM */
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram_1000)	/* banked ROM + palette RAM */
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
-	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5fc0, 0x5fcf) AM_WRITE(K051316_ctrl_0_w)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
 ADDRESS_MAP_END
 
@@ -292,12 +278,11 @@ static MACHINE_DRIVER_START( 88games )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT(k88games_interrupt,1)
 
 	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(88games)
 	MDRV_NVRAM_HANDLER(generic_0fill)
