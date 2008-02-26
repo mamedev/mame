@@ -7901,8 +7901,44 @@ Other Sun games
 	DRIVER( jokerpkr )	/* Bootleg in Coinmaster hardware */
 	DRIVER( pottnpkr )	/* Bootleg */
 	DRIVER( pottnpkb )	/* Bootleg */
-	DRIVER( gdrawpkr )	/* (c) 1981 Cal Omega / Casino Electronics Inc. */
+
+	/* Cal Omega */
+	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg094 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg125 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg127 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg128 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg134 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg145 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg157 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg159 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg164 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg168 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg172 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg175 )	/* (c) 1984 Cal Omega / Casino Electronics Inc. */
+	DRIVER( comg176 )	/* (c) 1982 Cal Omega Inc. */
+	DRIVER( comg181 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg183 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg185 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg186 )	/* (c) 1983 Cal Omega Inc. */
+	DRIVER( comg204 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg208 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg227 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg236 )	/* (c) 1984 Cal Omega Inc. */
+	DRIVER( comg239 )	/* (c) 1985 Cal Omega / Casino Electronics Inc. */
+	DRIVER( comg246 )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg272a )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg272b )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg903d )	/* (c) 198? Cal Omega Inc. */
+	DRIVER( comg905d )	/* (c) 198? Cal Omega Inc. */
 	DRIVER( elgrande )	/* (c) 1982 Tuni Electro Service / E.T. Marketing */
+	DRIVER( jjpoker )	/* (c) 1983 Enter-Tech */
+	DRIVER( jjpokerb )	/* (c) 1983 Enter-Tech */
+	DRIVER( ssipkr24 )	/* (c) 1988 SSI */
+	DRIVER( ssipkr30 )	/* (c) 1988 SSI */
+	DRIVER( ssipkr40 )	/* (c) 1990 SSI */
+
 	DRIVER( altair )	/* (c) 1981 Cidelsa */
 	DRIVER( destryer )	/* (c) 1981 Cidelsa */
 	DRIVER( destryea )	/* (c) 1981 Cidelsa */

@@ -1,11 +1,17 @@
-/**********************************************************************************
+/***********************************************
 
-    GAMING DRAW POKER (CEI)
-    Driver by Roberto Fresca.
+    +-------------------------------------+
+    |                                     |
+    | CAL OMEGA - SYSTEMS 903/904/905/906 |
+    |                                     |
+    |      Driver by Roberto Fresca.      |
+    |                                     |
+    +-------------------------------------+
 
-    Video Hardware
+             * Video Hardware *
 
-***********************************************************************************/
+************************************************/
+
 
 #include "driver.h"
 #include "video/mc6845.h"
@@ -13,13 +19,13 @@
 static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
-WRITE8_HANDLER( gdrawpkr_videoram_w )
+WRITE8_HANDLER( calomega_videoram_w )
 {
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( gdrawpkr_colorram_w )
+WRITE8_HANDLER( calomega_colorram_w )
 {
 	colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -44,34 +50,34 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-WRITE8_HANDLER( gdrawpkr_mc6845_address_w )
+WRITE8_HANDLER( calomega_mc6845_address_w )
 {
 	mc6845_address_w(mc6845, data);
 }
 
-READ8_HANDLER( gdrawpkr_mc6845_register_r )
+READ8_HANDLER( calomega_mc6845_register_r )
 {
 	return mc6845_register_r(mc6845);
 }
 
-WRITE8_HANDLER( gdrawpkr_mc6845_register_w )
+WRITE8_HANDLER( calomega_mc6845_register_w )
 {
 	mc6845_register_w(mc6845, data);
 }
 
-VIDEO_START( gdrawpkr )
+VIDEO_START( calomega )
 {
 	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 
-VIDEO_UPDATE( gdrawpkr )
+VIDEO_UPDATE( calomega )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT( gdrawpkr )
+PALETTE_INIT( calomega )
 {
 /*  prom bits
     7654 3210
