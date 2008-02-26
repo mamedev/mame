@@ -34,8 +34,8 @@
 /* include this at the top of your union to get the standard fields */
 #define TOKEN_COMMON_FIELDS		\
 	FPTR			i;			\
-	void *			voidptr;	\
 	const char *	stringptr;	\
+	const void *	voidptr;	\
 	const UINT8 *	ui8ptr;		\
 	const INT8 *	i8ptr;		\
 	const UINT16 *	ui16ptr;	\
@@ -48,8 +48,8 @@
 
 /* ----- compile-time token generation macros ----- */
 
-/* C99 compilers can use designated initializers for type safety */
-#if defined(_STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+/* GCC and C99 compilers can use designated initializers for type safety */
+#if (defined(__GNUC__) && (__GNUC__ >= 3)) || (defined(_STDC_VERSION__) && (__STDC_VERSION__ >= 199901L))
 #define TOKEN_VALUE(field,a)   	{ .field = (a) }
 #else
 #define TOKEN_VALUE(field,a)	{ (FPTR)(a) }

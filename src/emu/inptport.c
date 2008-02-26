@@ -2106,7 +2106,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 			/* custom callbacks */
 			case INPUT_TOKEN_CUSTOM:
 				port->custom = TOKEN_GET_PTR(ipt, customptr);
-				port->custom_param = TOKEN_GET_PTR(ipt, voidptr);
+				port->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
 
 			/* dip switch definition */
