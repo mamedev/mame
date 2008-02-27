@@ -7906,6 +7906,7 @@ Other Sun games
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg079 )	/* (c) 1981 Cal Omega Inc. */
 	DRIVER( comg094 )	/* (c) 1981 Cal Omega Inc. */
+	DRIVER( comg107 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg125 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg127 )	/* (c) 1982 Cal Omega Inc. */
 	DRIVER( comg128 )	/* (c) 1982 Cal Omega Inc. */

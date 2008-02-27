@@ -41,8 +41,8 @@
 
     Inputs use 6 lines from 6520 PIA's port, and multiplexed x4 each.
 
-    Some games like Keno, also have a key encoder peripheral processor based on a 8035,
-    and 1x ROM 2516/2532.
+    Some games like Keno and Big Game, also have a key encoder peripheral processor
+    based on a 8035, and 1x ROM 2516/2532.
 
 
 
@@ -58,7 +58,7 @@
  *  7.9 | Arcade Poker             |  903   | AUG/81  | PKCG     | 6300010 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
  *  8.0 | Arcade Black Jack        |  903   | SEP/81  | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
  *  9.4 | Keno                     |  903   | DEC/81  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
- * 10.7 | Big Game                 |  903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | No   |      | No
+ * 10.7 | Big Game                 |  903   | MAR/82  | LOTCG    | unknown | BCLR     | unknown | Amusement?    | Yes  | OK   | Yes
  * 11.3 | Black Jack               |  903   |         | CPKCG?   | 6300010 | POKCLR   | 6600020 | Amusement?    | No   |      | No
  * 12.5 | Bingo                    |  903   | JUN/82  | NBCG     | unknown | BCLR     | unknown | Amusement     | Yes  | OK   | Yes
  * 12.7 | Keno                     | 903/4? | JUL/82  | KCG      | 6300060 | POKCLR   | 6600020 | Amusement     | Yes  | BD   | Yes
@@ -386,6 +386,7 @@
         Game 7.6 (Arcade Poker)
         Game 7.9 (Arcade Poker)
         Game 9.4 (Keno)
+        Game 10.7 (Big Game)
         Game 12.5 (Bingo)
         Game 12.7 (Keno)
         Game 12.8 (Arcade Game)
@@ -1260,6 +1261,32 @@ ROM_START( comg094 )	/* Cal Omega v9.4 (Keno) */
 	ROM_RELOAD(				0x0300, 0x0100 )
 ROM_END
 
+ROM_START( comg107 )	/* Cal Omega v10.7 (Big Game) */
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "10.72",	0x2000, 0x0800, CRC(dd0fbefb) SHA1(caed286ba1adb4d5c5c874c56339b9d71dd41bc6) )
+	ROM_LOAD( "10.73",	0x2800, 0x0800, CRC(fcb7774d) SHA1(d3c89e0df0005e4bc4894156622b3d1e4cd09f2a) )
+	ROM_LOAD( "10.74",	0x3000, 0x0800, CRC(d19ed885) SHA1(c41e59e87ce88a5b229e334b6a563a3b21d12b15) )
+	ROM_LOAD( "10.75",	0x3800, 0x0800, CRC(1491f3ab) SHA1(cf545f5f5da910b98846699bff1d2e6eb40dc290) )
+	ROM_RELOAD(			0xf800, 0x0800 )    /* for vectors/pointers */
+
+	ROM_REGION( 0x1000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "lotclr.cgo",	 0x0000, 0x1000, CRC(6f7cffee) SHA1(ababeb49155c84b22c4bb3568cfb5f05ff1cd797) )
+
+	ROM_REGION( 0x3000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "lotclr.cgc",	 0x0000, 0x1000, CRC(bfe4df1c) SHA1(f7e055d41e16ead6b18d755e664347645f94865a) )
+	ROM_LOAD( "lotclr.cgb",	 0x1000, 0x1000, CRC(5bda0f42) SHA1(d4b3340e9c8ca49483fa846103f0bd81d57a5ab3) )
+	ROM_LOAD( "lotclr.cga",	 0x2000, 0x1000, CRC(0975e360) SHA1(7b9dbbae50c43ad99ee11798ada0a44e71c611f9) )
+
+	ROM_REGION( 0x0800, REGION_USER1, 0 )	/* keyboard interfase ROM */
+	ROM_LOAD( "lotkbd.sub",	 0x0000, 0x0800, CRC(c1636ab5) SHA1(5a3ad24918751ca6a6640807e421e80f6b4cc844) )
+
+	ROM_REGION( 0x400, REGION_PROMS, 0 )
+	ROM_LOAD( "bclr",		0x0000, 0x0100, CRC(0ec45d01) SHA1(da73ae7e1c74913921dc378a97795c6da47dcbfb) )
+	ROM_RELOAD(				0x0100, 0x0100 )
+	ROM_RELOAD(				0x0200, 0x0100 )
+	ROM_RELOAD(				0x0300, 0x0100 )
+ROM_END
+
 ROM_START( comg125 )	/* Cal Omega v12.5 (Bingo) */
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "bngo12_5.02", 0xe000, 0x0800, CRC(ea0a6bd6) SHA1(f138d2f29252d95dea93a1e936725de99c714b35) )
@@ -2061,6 +2088,7 @@ static DRIVER_INIT( standard )
 GAME( 1981, comg076,  0,        sys903,   comg076,  calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",           0 )
 GAME( 1981, comg079,  0,        sys903,   comg076,  calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",           0 )
 GAME( 1981, comg094,  0,        sys903,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                   GAME_NOT_WORKING )
+GAME( 1982, comg107,  0,        sys903,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7 (Big Game)",              GAME_NOT_WORKING )
 GAME( 1982, comg125,  0,        sys903,   standard, calomega, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.5 (Bingo)",                 GAME_NOT_WORKING )
 GAME( 1982, comg127,  0,        sys903,   standard, standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.7 (Keno)",                  GAME_NOT_WORKING )
 GAME( 1982, comg128,  0,        sys903,   comg128,  standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.8 (Arcade Game)",           0 )
