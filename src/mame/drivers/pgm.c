@@ -546,6 +546,21 @@ static WRITE16_HANDLER( pgm_calendar_w )
 	}
 }
 
+static NVRAM_HANDLER( pgm )
+{
+	if (read_or_write)
+		/* save the SRAM settings */
+		mame_fwrite(file, pgm_mainram, 0x20000);
+	else
+	{
+		/* load the SRAM settings */
+		if (file)
+			mame_fread(file, pgm_mainram, 0x20000);
+		else
+			memset(pgm_mainram, 0, 0x20000);
+	}
+}
+
 /*** Memory Maps *************************************************************/
 
 static ADDRESS_MAP_START( pgm_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -1567,6 +1582,7 @@ static MACHINE_DRIVER_START( pgm )
 	MDRV_GFXDECODE(pgm)
 	MDRV_PALETTE_LENGTH(0x1200/2)
 	MDRV_MACHINE_RESET ( pgm )
+	MDRV_NVRAM_HANDLER ( pgm )
 
 	MDRV_VIDEO_START(pgm)
 	MDRV_VIDEO_EOF(pgm)
