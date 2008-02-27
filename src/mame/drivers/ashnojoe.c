@@ -115,35 +115,26 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	}
 }
 
-static ADDRESS_MAP_START( ashnojoe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x044000, 0x048fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x049000, 0x049fff) AM_READ(MRA16_RAM)
+static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x040000, 0x041fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram3_w) AM_BASE(&ashnojoetileram16_3)
+	AM_RANGE(0x042000, 0x043fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram4_w) AM_BASE(&ashnojoetileram16_4)
+	AM_RANGE(0x044000, 0x044fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram5_w) AM_BASE(&ashnojoetileram16_5)
+	AM_RANGE(0x045000, 0x045fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram2_w) AM_BASE(&ashnojoetileram16_2)
+	AM_RANGE(0x046000, 0x046fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram6_w) AM_BASE(&ashnojoetileram16_6)
+	AM_RANGE(0x047000, 0x047fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
+	AM_RANGE(0x048000, 0x048fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
+	AM_RANGE(0x049000, 0x049fff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04a000, 0x04a001) AM_READ(input_port_0_word_r) // p1 inputs, coins
 	AM_RANGE(0x04a002, 0x04a003) AM_READ(input_port_1_word_r) // p2 inputs
 	AM_RANGE(0x04a004, 0x04a005) AM_READ(input_port_2_word_r) // dipswitches
-	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r) // ??
-	AM_RANGE(0x04c000, 0x04ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x080000, 0x0bffff) AM_READ(MRA16_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ashnojoe_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x040000, 0x041fff) AM_WRITE(ashnojoe_tileram3_w) AM_BASE(&ashnojoetileram16_3)
-	AM_RANGE(0x042000, 0x043fff) AM_WRITE(ashnojoe_tileram4_w) AM_BASE(&ashnojoetileram16_4)
-	AM_RANGE(0x044000, 0x044fff) AM_WRITE(ashnojoe_tileram5_w) AM_BASE(&ashnojoetileram16_5)
-	AM_RANGE(0x045000, 0x045fff) AM_WRITE(ashnojoe_tileram2_w) AM_BASE(&ashnojoetileram16_2)
-	AM_RANGE(0x046000, 0x046fff) AM_WRITE(ashnojoe_tileram6_w) AM_BASE(&ashnojoetileram16_6)
-	AM_RANGE(0x047000, 0x047fff) AM_WRITE(ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
-	AM_RANGE(0x048000, 0x048fff) AM_WRITE(ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
-	AM_RANGE(0x049000, 0x049fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04a006, 0x04a007) AM_WRITE(MWA16_RAM) AM_BASE(&ashnojoe_tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
+	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r) // ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
 	AM_RANGE(0x04a020, 0x04a029) AM_WRITE(joe_tilemaps_yscroll_w)
-	AM_RANGE(0x04c000, 0x04ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x080000, 0x0bffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x04c000, 0x04ffff) AM_RAM
+	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
 static READ8_HANDLER(fake_6_r)
@@ -163,31 +154,19 @@ static WRITE8_HANDLER( adpcm_data_w )
 	MSM5205_data_w(0, data>>4);
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK4)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r) //PC: 15D -> cp $7f
 	AM_RANGE(0x06, 0x06) AM_READ(fake_6_r/*soundlatch_r */) //PC: 14A -> and $1
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ashnojoe )
@@ -355,13 +334,12 @@ static MACHINE_DRIVER_START( ashnojoe )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000) /* 8 MHz (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(ashnojoe_readmem,ashnojoe_writemem)
+	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
 	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz (verified on pcb) */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -349,20 +349,20 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				
 			case MCONFIG_TOKEN_CPU_PROGRAM_MAP:
 				assert(cpu != NULL);
-				cpu->construct_map[ADDRESS_SPACE_PROGRAM][0] = TOKEN_GET_PTR(tokens, voidptr);
-				cpu->construct_map[ADDRESS_SPACE_PROGRAM][1] = TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_PROGRAM][0] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_PROGRAM][1] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
 				break;
 				
 			case MCONFIG_TOKEN_CPU_DATA_MAP:
 				assert(cpu != NULL);
-				cpu->construct_map[ADDRESS_SPACE_DATA][0] = TOKEN_GET_PTR(tokens, voidptr);
-				cpu->construct_map[ADDRESS_SPACE_DATA][1] = TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_DATA][0] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_DATA][1] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
 				break;
 				
 			case MCONFIG_TOKEN_CPU_IO_MAP:
 				assert(cpu != NULL);
-				cpu->construct_map[ADDRESS_SPACE_IO][0] = TOKEN_GET_PTR(tokens, voidptr);
-				cpu->construct_map[ADDRESS_SPACE_IO][1] = TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_IO][0] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
+				cpu->construct_map[ADDRESS_SPACE_IO][1] = (construct_map_t)TOKEN_GET_PTR(tokens, voidptr);
 				break;
 				
 			case MCONFIG_TOKEN_CPU_VBLANK_INT:
