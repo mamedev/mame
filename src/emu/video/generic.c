@@ -306,17 +306,6 @@ void generic_video_init(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    VIDEO_START( generic ) - general video system
--------------------------------------------------*/
-
-VIDEO_START( generic )
-{
-	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-}
-
-
-/*-------------------------------------------------
     VIDEO_START( generic_bitmapped ) - general video
     system with a bitmap
 -------------------------------------------------*/
@@ -505,9 +494,9 @@ void flip_screen_set(int on)
 
 void flip_screen_set_no_update(int on)
 {
-	/* flip_screen_y is not updated on purpose 
-	 * this function is for drivers which 
-	 * where writing to flip_screen_x to 
+	/* flip_screen_y is not updated on purpose
+	 * this function is for drivers which
+	 * where writing to flip_screen_x to
 	 * bypass update_flip
 	 */
 	flip_screen_x = on;

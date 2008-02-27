@@ -1028,7 +1028,6 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/terracre.o $(VIDEO)/terracre.o \
 	$(DRIVERS)/tubep.o $(VIDEO)/tubep.o \
 	$(DRIVERS)/wiping.o $(AUDIO)/wiping.o $(VIDEO)/wiping.o \
-	$(DRIVERS)/yamato.o \
 	$(MACHINE)/nb1413m3.o \
 
 $(MAMEOBJ)/nintendo.a: \

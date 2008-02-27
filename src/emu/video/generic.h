@@ -90,9 +90,6 @@ extern const gfx_layout gfx_16x16x4_planar;
 /* set up all the common systems */
 void generic_video_init(running_machine *machine);
 
-/* generic video start */
-VIDEO_START( generic );
-
 /* generic video start with a temporary bitmap */
 VIDEO_START( generic_bitmapped );
 
@@ -124,9 +121,9 @@ void flip_screen_set(int on);
 void flip_screen_set_no_update(int on); 	/* will not call update_flip */
 void flip_screen_x_set(int on);
 void flip_screen_y_set(int on);
-int flip_screen_get(void); 
-int flip_screen_x_get(void); 
-int flip_screen_y_get(void); 
+int flip_screen_get(void);
+int flip_screen_x_get(void);
+int flip_screen_y_get(void);
 
 //#define flip_screen flip_screen_get()
 

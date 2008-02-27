@@ -12,9 +12,12 @@ XX Mission (c) 1986 UPL
 #include "deprecat.h"
 #include "sound/2203intf.h"
 
+VIDEO_START( xxmissio );
 VIDEO_UPDATE( xxmissio );
 
+extern UINT8 *xxmissio_bgram;
 extern UINT8 *xxmissio_fgram;
+extern UINT8 *xxmissio_spriteram;
 
 static UINT8 xxmissio_status;
 
@@ -23,8 +26,8 @@ WRITE8_HANDLER( xxmissio_scroll_x_w );
 WRITE8_HANDLER( xxmissio_scroll_y_w );
 WRITE8_HANDLER( xxmissio_flipscreen_w );
 
-READ8_HANDLER( xxmissio_videoram_r );
-WRITE8_HANDLER( xxmissio_videoram_w );
+READ8_HANDLER( xxmissio_bgram_r );
+WRITE8_HANDLER( xxmissio_bgram_w );
 
 WRITE8_HANDLER( xxmissio_paletteram_w );
 
@@ -112,8 +115,8 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE(1) AM_RAM AM_BASE(&xxmissio_fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_videoram_r, xxmissio_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(&xxmissio_bgram)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM AM_BASE(&xxmissio_spriteram)
 
 	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_READWRITE(MRA8_RAM, xxmissio_paletteram_w) AM_BASE(&paletteram)
 
@@ -139,7 +142,7 @@ static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE(1) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_videoram_r, xxmissio_videoram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE(2) AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE(3) AM_RAM
 
 	AM_RANGE(0xd800, 0xdaff) AM_SHARE(4) AM_READWRITE(MRA8_RAM, xxmissio_paletteram_w)
@@ -310,7 +313,7 @@ static MACHINE_DRIVER_START( xxmissio )
 	MDRV_GFXDECODE(xxmissio)
 	MDRV_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(xxmissio)
 	MDRV_VIDEO_UPDATE(xxmissio)
 
 	/* sound hardware */

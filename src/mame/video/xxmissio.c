@@ -10,19 +10,24 @@ Video hardware driver by Uki
 
 #include "driver.h"
 
+UINT8 *xxmissio_bgram;
 UINT8 *xxmissio_fgram;
+UINT8 *xxmissio_spriteram;
 
-static UINT8 xxmissio_xscroll,xxmissio_yscroll;
+static tilemap *bg_tilemap;
+static tilemap *fg_tilemap;
+static UINT8 xscroll;
+static UINT8 yscroll;
 static UINT8 flipscreen;
 
 
 WRITE8_HANDLER( xxmissio_scroll_x_w )
 {
-	xxmissio_xscroll = data;
+	xscroll = data;
 }
 WRITE8_HANDLER( xxmissio_scroll_y_w )
 {
-	xxmissio_yscroll = data;
+	yscroll = data;
 }
 
 WRITE8_HANDLER( xxmissio_flipscreen_w )
@@ -30,21 +35,19 @@ WRITE8_HANDLER( xxmissio_flipscreen_w )
 	flipscreen = data & 0x01;
 }
 
-WRITE8_HANDLER( xxmissio_videoram_w )
+WRITE8_HANDLER( xxmissio_bgram_w )
 {
-	int offs = offset & 0x7e0;
-	int x = (offset + (xxmissio_xscroll >> 3) ) & 0x1f;
-	offs |= x;
+	int x = (offset + (xscroll >> 3)) & 0x1f;
+	offset = (offset & 0x7e0) | x;
 
-	videoram[offs] = data;
+	xxmissio_bgram[offset] = data;
 }
-READ8_HANDLER( xxmissio_videoram_r )
+READ8_HANDLER( xxmissio_bgram_r )
 {
-	int offs = offset & 0x7e0;
-	int x = (offset + (xxmissio_xscroll >> 3) ) & 0x1f;
-	offs |= x;
+	int x = (offset + (xscroll >> 3)) & 0x1f;
+	offset = (offset & 0x7e0) | x;
 
-	return videoram[offs];
+	return xxmissio_bgram[offset];
 }
 
 WRITE8_HANDLER( xxmissio_paletteram_w )
@@ -54,67 +57,51 @@ WRITE8_HANDLER( xxmissio_paletteram_w )
 
 /****************************************************************************/
 
-VIDEO_UPDATE( xxmissio )
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	int code = ((xxmissio_bgram[0x400 | tile_index] & 0xc0) << 2) | xxmissio_bgram[0x000 | tile_index];
+	int color =  xxmissio_bgram[0x400 | tile_index] & 0x0f;
+
+	SET_TILE_INFO(2, code, color, 0);
+}
+
+static TILE_GET_INFO( get_fg_tile_info )
+{
+	int code = xxmissio_fgram[0x000 | tile_index];
+	int color = xxmissio_fgram[0x400 | tile_index] & 0x07;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+VIDEO_START( xxmissio )
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
+
+	tilemap_set_scroll_cols(bg_tilemap, 1);
+	tilemap_set_scroll_rows(bg_tilemap, 1);
+	tilemap_set_scrolldx(bg_tilemap, 2, 12);
+
+	tilemap_set_transparent_pen(fg_tilemap, 0);
+}
+
+
+static void draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
 	int chr,col;
-	int x,y,px,py,fx,fy,sx,sy;
+	int x,y,px,py,fx,fy;
 
-	int size = videoram_size/2;
-
-/* draw BG layer */
-
-	for (y=0; y<32; y++)
+	for (offs=0; offs<0x800; offs +=0x20)
 	{
-		for (x=0; x<32; x++)
-		{
-			offs = y*0x20 + x;
-
-			if (flipscreen!=0)
-				offs = (size-1)-offs;
-
-			px = x*16;
-			py = y*8;
-
-			chr = videoram[ offs ] ;
-			col = videoram[ offs + size];
-			chr = chr + ((col & 0xc0) << 2 );
-			col = col & 0x0f;
-
-			drawgfx(tmpbitmap,machine->gfx[2],
-				chr,
-				col,
-				flipscreen,flipscreen,
-				px,py,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
-		}
-	}
-
-	if (flipscreen == 0)
-	{
-		sx = -xxmissio_xscroll*2+12;
-		sy = -xxmissio_yscroll;
-	}
-	else
-	{
-		sx = xxmissio_xscroll*2+2;
-		sy = xxmissio_yscroll;
-	}
-
-	copyscrollbitmap(bitmap,tmpbitmap,1,&sx,1,&sy,cliprect);
-
-/* draw sprites */
-
-	for (offs=0; offs<spriteram_size; offs +=32)
-	{
-		chr = spriteram[offs];
-		col = spriteram[offs+3];
+		chr = xxmissio_spriteram[offs];
+		col = xxmissio_spriteram[offs+3];
 
 		fx = ((col & 0x10) >> 4) ^ flipscreen;
 		fy = ((col & 0x20) >> 5) ^ flipscreen;
 
-		x = spriteram[offs+1]*2;
-		y = spriteram[offs+2];
+		x = xxmissio_spriteram[offs+1]*2;
+		y = xxmissio_spriteram[offs+2];
 
 		chr = chr + ((col & 0x40) << 2);
 		col = col & 0x07;
@@ -126,20 +113,21 @@ VIDEO_UPDATE( xxmissio )
 		}
 		else
 		{
-			px = 480-x-8;
+			px = 480-x-6;
 			py = 240-y;
 		}
 
 		px &= 0x1ff;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,gfx[1],
 			chr,
 			col,
 			fx,fy,
 			px,py,
 			cliprect,TRANSPARENCY_PEN,0);
+
 		if (px>0x1e0)
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx(bitmap,gfx[1],
 				chr,
 				col,
 				fx,fy,
@@ -147,37 +135,20 @@ VIDEO_UPDATE( xxmissio )
 				cliprect,TRANSPARENCY_PEN,0);
 
 	}
+}
 
 
-/* draw FG layer */
+VIDEO_UPDATE( xxmissio )
+{
+	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+	tilemap_set_flip(ALL_TILEMAPS, flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	for (y=4; y<28; y++)
-	{
-		for (x=0; x<32; x++)
-		{
-			offs = y*32+x;
-			chr = xxmissio_fgram[offs];
-			col = xxmissio_fgram[offs + 0x400] & 0x07;
+	tilemap_set_scrollx(bg_tilemap, 0, xscroll * 2);
+	tilemap_set_scrolly(bg_tilemap, 0, yscroll);
 
-			if (flipscreen==0)
-			{
-				px = 16*x;
-				py = 8*y;
-			}
-			else
-			{
-				px = 496-16*x;
-				py = 248-8*y;
-			}
-
-			drawgfx(bitmap,machine->gfx[0],
-				chr,
-				col,
-				flipscreen,flipscreen,
-				px,py,
-				cliprect,TRANSPARENCY_PEN,0);
-		}
-	}
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	draw_sprites(bitmap, machine->gfx, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	return 0;
 }

@@ -123,10 +123,74 @@ Changes:
 TODO:
         * Verify timings of sound/music on Swimmer.
 
+
+-------------------------------------------------------------------
+
+    T.S. 17.12.2005:
+
+    Yamato:
+    -------
+     Added temporary bg gradient (bad colors/offset).
+
+     Gradient table are stored in two(?) ROMs.
+     Each table is 256 bytes long: 128 for normal
+     and 128 bytes for flipped screen.
+     Color format is unknown - probably direct RGB
+     mapping of 8 or 16 (both roms) bits. Also table
+     selection source is unknown.
+
+     TODO:
+      - bg gradient color decode & table selection
+
+
+ Top Roller:
+ ----------
+     It's made by the same developers as Yamato and use
+     probably the same encrypted SEGA cpu as Yamato.
+
+     lives - $6155
+
+     TODO:
+
+       - COINB DSW is missing
+       - few issues in cocktail mode
+       - wrong colors (fg text layer) - game sometimes ("round" text , lives) updates only even columns of cell attribs...
+
+-------------------------------------------------------------------
+
+
+ Top Roller
+ Jaleco
+
+ Hardware : Original Jaleco board no 8307-B/8307-A(redump)
+
+ Main CPU : Encrypted Z80 (probably 315-5018)
+ Sound : AY-3-8910
+
+ ROMS CRC32 + positions :
+
+ [9894374d]  d5
+ [ef789f00]  f5
+ [d45494ba]  h5
+ [1cb48ea0]  k5
+ [84139f46]  l5
+ [e30c1dd8]  m5
+ [904fffb6]  d3
+ [94371cfb]  f3
+ [8a8032a7]  h3
+ [1e8914a6]  k3
+ [b20a9fa2]  l3
+ [7f989dc9]  p3
+ [89327329]  a4 bottom board 89327329
+ [7a945733]  c4 bottom board
+ [5f2c2a78]  h4 bottom board  bad dump / [1d9e3325] (8307-A)
+ [ce3afe26]  j4 bottom board
+
 ***************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
+#include "machine/segacrpt.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "includes/cclimber.h"
@@ -134,29 +198,46 @@ TODO:
 
 #define MASTER_CLOCK			XTAL_18_432MHz
 
-
-
-static WRITE8_HANDLER( cannonb_flip_screen_w )
-{
-	flip_screen_set(data);
-}
-
-
-static WRITE8_HANDLER( flip_screen_x_w )
-{
-	flip_screen_x_set(data);
-}
-
-static WRITE8_HANDLER( flip_screen_y_w )
-{
-	flip_screen_y_set(data);
-}
+static UINT8 yamato_p0;
+static UINT8 yamato_p1;
+static UINT8 toprollr_rombank;
 
 
 static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+}
+
+
+static WRITE8_HANDLER( yamato_p0_w )
+{
+	yamato_p0 = data;
+}
+
+static WRITE8_HANDLER( yamato_p1_w )
+{
+	yamato_p1 = data;
+}
+
+static READ8_HANDLER( yamato_p0_r )
+{
+	return yamato_p0;
+}
+
+static READ8_HANDLER( yamato_p1_r )
+{
+	return yamato_p1;
+}
+
+
+static WRITE8_HANDLER(toprollr_rombank_w)
+{
+	toprollr_rombank &= ~(1 << offset);
+	toprollr_rombank |= (data & 1) << offset;
+
+	if (toprollr_rombank < 3)
+		memory_set_bank(1, toprollr_rombank);
 }
 
 
@@ -173,6 +254,8 @@ static MACHINE_RESET( cclimber )
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
 	timer_call_after_resynch(NULL, 0, disable_interrupts);
+
+	toprollr_rombank = 0;
 }
 
 
@@ -184,72 +267,110 @@ static ADDRESS_MAP_START( cclimber_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM				/* Crazy Kong only */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
 	AM_RANGE(0x8900, 0x8bff) AM_RAM				/* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
 	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE(&cclimber_column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigspriteram)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)     /* IN0 */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(flip_screen_y_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(interrupt_enable_w) //used by Crazy Kong Bootleg with alt levels and speed up
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)     /* IN1 */
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, cclimber_sample_volume_w)     /* DSW */
-	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)     /* IN2 */
+	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, cclimber_sample_volume_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5045, 0x505f) AM_WRITENOP		/* do not errorlog this */
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6bff) AM_RAM		    	/* Crazy Kong only, Cannon Ball also */
+	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_READNOP		 	/* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
 //AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)  /* not used, but initialized */
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
 	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE(&cclimber_column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigspriteram)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(cannonb_flip_screen_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, cclimber_sample_volume_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)     /* IN2 */
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( swimmer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE(&cclimber_bsvideoram) AM_SIZE(&cclimber_bsvideoram_size)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x98fc, 0x98ff) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_bigspriteram)
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9880, 0x989f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x98fc, 0x98ff) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_bigsprite_control)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(flip_screen_y_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_sidepanel_enabled)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_side_background_enabled)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_palettebank)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, MWA8_RAM) AM_BASE(&swimmer_bgcolor)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, MWA8_RAM) AM_BASE(&swimmer_background_color)
 	AM_RANGE(0xb880, 0xb880) AM_READ(input_port_4_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					/* ??? used by Guzzler */
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( yamato_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_ROM
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
+	AM_RANGE(0x8900, 0x8bff) AM_RAM				/* not used, but initialized */
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
+	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
+	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE(&cclimber_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)
+	AM_RANGE(0xba00, 0xba00) AM_READ(input_port_4_r)     /* IN3 (maybe a mirror of b800) */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( toprollr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x6000, 0x6bff) AM_RAM
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM AM_BASE(&toprollr_bg_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&cclimber_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM AM_BASE(&toprollr_bg_coloram)
+	AM_RANGE(0x9800, 0x987f) AM_RAM /* unused ? */
+	AM_RANGE(0x9880, 0x995f) AM_RAM AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE(&cclimber_colorram)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w) AM_READ(input_port_0_r)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
+	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
+	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, cclimber_sample_volume_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -260,20 +381,42 @@ static ADDRESS_MAP_START( cclimber_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_READ(AY8910_read_port_0_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( yamato_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(yamato_p0_w)	/* ??? */
+	AM_RANGE(0x01, 0x01) AM_WRITE(yamato_p1_w)	/* ??? */
+ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( swimmer_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( swimmer_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4001) AM_RAM				/* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( swimmer_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( yamato_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x5000, 0x53ff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( swimmer_audio_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_control_port_1_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( yamato_audio_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_READ(yamato_p0_r)	/* ??? */
+	AM_RANGE(0x08, 0x08) AM_READ(yamato_p1_r)	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -705,47 +848,177 @@ static INPUT_PORTS_START( guzzler )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( yamato )
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "Every 30000" )
+	PORT_DIPSETTING(    0x20, "Every 50000" )
+	PORT_DIPNAME( 0x40, 0x00, "Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x40, "Fast" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )	/* set 1 only */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )	/* set 1 only */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START      /* IN3 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( toprollr )
+	PORT_START
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_START
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "Every 30000" )
+	PORT_DIPSETTING(    0x20, "Every 50000" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
+
+static const gfx_layout cclimber_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters (256 in Crazy Climber) */
-	2,      /* 2 bits per pixel */
-	{ 0, 512*8*8 }, /* the two bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },     /* pretty straightforward layout */
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ 0, RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
+	8*8
 };
-static const gfx_layout bscharlayout =
+
+static const gfx_layout cclimber_spritelayout =
 {
-	8,8,    /* 8*8 characters */
-	256,    /* 256 characters */
-	2,      /* 2 bits per pixel */
-	{ 0, 256*8*8 }, /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },     /* pretty straightforward layout */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8     /* every char takes 8 consecutive bytes */
-};
-static const gfx_layout spritelayout =
-{
-	16,16,  /* 16*16 sprites */
-	128,    /* 128 sprites (64 in Crazy Climber) */
-	2,      /* 2 bits per pixel */
-	{ 0, 128*16*16 },       /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,       /* pretty straightforward layout */
+	16,16,
+	RGN_FRAC(1,2),
+	2,
+	{ 0, RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8
+};
+
+static const gfx_layout cannonb_charlayout =
+{
+	8,8,
+	512,
+	2,
+	{ 0, 1024*8*8 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout cannonb_spritelayout =
+{
+	16,16,
+	64,
+	2,
+	{ 0, 256*16*16 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	32*8
 };
 
 static const gfx_layout swimmer_charlayout =
 {
-	8,8,    /* 8*8 characters */
-	512,    /* 512 characters */
-	3,      /* 3 bits per pixel */
-	{ 0, 512*8*8, 512*2*8*8 },      /* the bitplanes are separated */
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },	     /* characters are upside down */
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8     /* every char takes 8 consecutive bytes */
@@ -753,34 +1026,45 @@ static const gfx_layout swimmer_charlayout =
 
 static const gfx_layout swimmer_spritelayout =
 {
-	16,16,  /* 16*16 sprites */
-	128,    /* 128 sprites */
-	3,	      /* 3 bits per pixel */
-	{ 0, 128*16*16, 128*2*16*16 },  /* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,       /* pretty straightforward layout */
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
 			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8    /* every sprite takes 32 consecutive bytes */
+	32*8
 };
 
 static GFXDECODE_START( cclimber )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout,      0, 16 ) /* char set #1 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, charlayout,      0, 16 ) /* char set #2 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, bscharlayout, 16*4,  8 ) /* big sprite char set */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout,    0, 16 ) /* sprite set #1 */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, spritelayout,    0, 16 ) /* sprite set #2 */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cclimber_charlayout,      0, 16 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cclimber_spritelayout,    0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
+GFXDECODE_END
+
+static GFXDECODE_START( cannonb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cannonb_charlayout,       0, 16 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, cannonb_spritelayout,     0, 16 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
 GFXDECODE_END
 
 static GFXDECODE_START( swimmer )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, swimmer_charlayout,      0, 64 ) /* characters */
-	GFXDECODE_ENTRY( REGION_GFX1, 0, swimmer_spritelayout,    0, 32 ) /* sprite set #1 */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, swimmer_charlayout,   64*8, 4 )  /* big sprite set */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, swimmer_charlayout,       0, 32 ) /* characters */
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, swimmer_spritelayout,     0, 32 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, swimmer_charlayout,    32*8,  4 ) /* big sprites */
+GFXDECODE_END
+
+static GFXDECODE_START( toprollr )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cclimber_charlayout,      0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, cclimber_spritelayout,    0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, cclimber_charlayout,   16*4,  8 ) /* big sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( cclimber )
+static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
@@ -802,8 +1086,14 @@ static MACHINE_DRIVER_START( cclimber )
 	MDRV_PALETTE_LENGTH(16*4+8*4)
 
 	MDRV_PALETTE_INIT(cclimber)
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(cclimber)
 	MDRV_VIDEO_UPDATE(cclimber)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( cclimber )
+
+	MDRV_IMPORT_FROM(root)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -827,7 +1117,54 @@ static MACHINE_DRIVER_START( cannonb )
 	MDRV_CPU_PROGRAM_MAP(cannonb_map,0)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(cannonb)
+	MDRV_GFXDECODE(cannonb)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( yamato )
+
+	MDRV_IMPORT_FROM(root)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(yamato_map,0)
+	MDRV_CPU_IO_MAP(yamato_portmap,0)
+
+	MDRV_CPU_ADD(Z80, 3072000) /* 3.072 MHz ? */
+	MDRV_CPU_PROGRAM_MAP(yamato_audio_map,0)
+	MDRV_CPU_IO_MAP(yamato_audio_portmap,0)
+
+	/* video hardware */
+	MDRV_PALETTE_LENGTH(16*4+8*4+256)
+	MDRV_PALETTE_INIT(yamato)
+	MDRV_VIDEO_UPDATE(yamato)
+
+	/* audio hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(AY8910, 1536000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD(AY8910, 1536000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( toprollr )
+
+	MDRV_IMPORT_FROM(cclimber)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(toprollr_map,0)
+
+	/* video hardware */
+	MDRV_GFXDECODE(toprollr)
+	MDRV_PALETTE_LENGTH(32*5)
+	MDRV_PALETTE_INIT(toprollr)
+
+	MDRV_VIDEO_START(toprollr)
+	MDRV_VIDEO_UPDATE(toprollr)
 MACHINE_DRIVER_END
 
 
@@ -839,8 +1176,8 @@ static MACHINE_DRIVER_START( swimmer )
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
 
 	MDRV_CPU_ADD(Z80,4000000/2)
-	MDRV_CPU_PROGRAM_MAP(swimmer_sound_map,0)
-	MDRV_CPU_IO_MAP(swimmer_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map,0)
+	MDRV_CPU_IO_MAP(swimmer_audio_portmap,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, (double)4000000/16384) /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
@@ -852,13 +1189,13 @@ static MACHINE_DRIVER_START( swimmer )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(swimmer)
-	MDRV_PALETTE_LENGTH(64*8+4*8)
+	MDRV_PALETTE_LENGTH(32*8+4*8+1)
 
 	MDRV_PALETTE_INIT(swimmer)
-	MDRV_VIDEO_START(generic)
+	MDRV_VIDEO_START(swimmer)
 	MDRV_VIDEO_UPDATE(swimmer)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, 4000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -884,13 +1221,13 @@ ROM_START( cclimber )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc04",         0x1000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc05",         0x2000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "cc04",         0x2000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
+	/* 0x2800-0x2fff - empty */
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
@@ -916,13 +1253,13 @@ ROM_START( cclimbrj )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc04",         0x1000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc05",         0x2000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "cc04",         0x2000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
+	/* 0x2800-0x2fff - empty */
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
@@ -948,13 +1285,13 @@ ROM_START( ccboot )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "m04.bin",      0x1000, 0x0800, CRC(6fb80538) SHA1(6ba5add5c0190e79191b3fa749a1b94e766e3950) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "m05.bin",      0x2000, 0x0800, CRC(056af36b) SHA1(756a295bbf7ede201b2e4cb106ce67a127e008de) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "m03.bin",      0x3000, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "m05.bin",      0x1000, 0x0800, CRC(056af36b) SHA1(756a295bbf7ede201b2e4cb106ce67a127e008de) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "m04.bin",      0x2000, 0x0800, CRC(6fb80538) SHA1(6ba5add5c0190e79191b3fa749a1b94e766e3950) )
+	/* 0x2800-0x2fff - empty */
+	ROM_LOAD( "m03.bin",      0x3800, 0x0800, CRC(67127253) SHA1(e27556ed74e73644a2578ce6645c312d64f484c6) )
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "m02.bin",      0x0000, 0x0800, CRC(7f4877de) SHA1(c9aa9ff1b6cf907917fedfbd419b15ac337cf7bb) )
@@ -981,13 +1318,13 @@ ROM_START( ccboot2 )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc06",         0x0000, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc04",         0x1000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
-	/* empty hole - Crazy Kong has an additional ROM here */
-	ROM_LOAD( "cc05",         0x2000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "cc05",         0x1000, 0x0800, CRC(2c33b760) SHA1(2edea8fe13376fbd51a5586d97aba3b30d78e94b) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "cc04",         0x2000, 0x0800, CRC(332347cb) SHA1(4115ca32af73f1791635b7d9e093bf77088a8222) )
+	/* 0x2800-0x2fff - empty */
 	ROM_LOAD( "cc03",         0x3000, 0x0800, CRC(4e4b3658) SHA1(0d39a8cb5cd6cf06008be60707f9b277a8a32a2d) )
-	/* empty hole - Crazy Kong has an additional ROM here */
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "cc02",         0x0000, 0x0800, CRC(14f3ecc9) SHA1(a1b5121abfbe8f07580eb3fa6384352d239a3d75) )
@@ -1015,8 +1352,8 @@ ROM_START( ckong )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "n11-06.bin",   0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-04.bin",   0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-05.bin",   0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "l11-05.bin",   0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-04.bin",   0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-03.bin",   0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1044,8 +1381,8 @@ ROM_START( ckonga )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "n11-06.bin",   0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-04.bin",   0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-05.bin",   0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "l11-05.bin",   0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-04.bin",   0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-03.bin",   0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1073,8 +1410,8 @@ ROM_START( ckongjeu )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "n11-06.bin",   0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-04.bin",   0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-05.bin",   0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "l11-05.bin",   0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-04.bin",   0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-03.bin",   0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1103,12 +1440,12 @@ ROM_START( ckongo )
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	/* same as ckong but with halves switched */
 	ROM_LOAD( "o50b-1",       0x0000, 0x0800, CRC(cae9e2bf) SHA1(bc62d98840b8b5b296de0f1379baabb1b4d25df0) )
-	ROM_CONTINUE(             0x2000, 0x0800 )
+	ROM_CONTINUE(             0x1000, 0x0800 )
 	ROM_LOAD( "o50b-2",       0x0800, 0x0800, CRC(fba82114) SHA1(36b7c124edf73b01681f5d63867fafa38a31abbf) )
-	ROM_CONTINUE(             0x2800, 0x0800 )
-	ROM_LOAD( "o50b-3",       0x1000, 0x0800, CRC(1714764b) SHA1(b025fcc03d45b1ec29be7e292622745544ba891d) )
+	ROM_CONTINUE(             0x1800, 0x0800 )
+	ROM_LOAD( "o50b-3",       0x2000, 0x0800, CRC(1714764b) SHA1(b025fcc03d45b1ec29be7e292622745544ba891d) )
 	ROM_CONTINUE(             0x3000, 0x0800 )
-	ROM_LOAD( "o50b-4",       0x1800, 0x0800, CRC(b7008b57) SHA1(9328ff79947dbebdc3e2dd8bcc362667b8201476) )
+	ROM_LOAD( "o50b-4",       0x2800, 0x0800, CRC(b7008b57) SHA1(9328ff79947dbebdc3e2dd8bcc362667b8201476) )
 	ROM_CONTINUE(             0x3800, 0x0800 )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1136,8 +1473,8 @@ ROM_START( ckongalc )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "ck6.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
-	ROM_LOAD( "ck4.bin",      0x1000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
-	ROM_LOAD( "ck5.bin",      0x2000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "ck5.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "ck4.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1165,8 +1502,8 @@ ROM_START( bigkong )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "n11-06.bin",   0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-04.bin",   0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-05.bin",   0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "l11-05.bin",   0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-04.bin",   0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-03.bin",   0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1194,8 +1531,8 @@ ROM_START( monkeyd )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "ck6.bin",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
-	ROM_LOAD( "ck4.bin",      0x1000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
-	ROM_LOAD( "ck5.bin",      0x2000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "ck5.bin",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
+	ROM_LOAD( "ck4.bin",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
 	ROM_LOAD( "ck3.bin",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1223,8 +1560,8 @@ ROM_START( ckongb )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "n11-6.bin",    0x0000, 0x1000, CRC(2dcedd12) SHA1(dfdcfc21bcba7c8e148ee54daae511ca78c58e70) )
-	ROM_LOAD( "k11-4.bin",    0x1000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
-	ROM_LOAD( "l11-5.bin",    0x2000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "l11-5.bin",    0x1000, 0x1000, CRC(fa7cbd91) SHA1(0208d2ebc59f3600005476b6987472685bc99d67) )
+	ROM_LOAD( "k11-4.bin",    0x2000, 0x1000, CRC(3375b3bd) SHA1(a00b3c31cff123aab6ac0833aabfdd663302971a) )
 	ROM_LOAD( "h11-3.bin",    0x3000, 0x1000, CRC(5655cc11) SHA1(5195e9b2a60c54280b48b32ee8248090904dbc51) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1241,6 +1578,63 @@ ROM_START( ckongb )
 	ROM_LOAD( "r05-13.bin",   0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+/* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
+   the same as River Patrol but appear to have an original ORCA copyright
+
+   I think the board was a half-converted board as 'Water Gage' and 'Bon Voyage' don't really fit the theme
+   of Silver Land so I'm loading the River Patrol GFX instead as they fit better
+*/
+ROM_START( rpatrol )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "sci1.bin",       0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) )
+	ROM_LOAD( "sci2.bin",       0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
+	ROM_LOAD( "sci3.bin",       0x2000, 0x1000, CRC(8fa300df) SHA1(5c3ba1ef6c1ce8df437b4fa464293208630b5e8d) )
+	ROM_LOAD( "sci4.bin",       0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
+	ROM_LOAD( "sci5.bin",       0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "rp6.6n",       0x0000, 0x0800, CRC(19f18e9e) SHA1(a5500ac36bcda772f3ba79d9e9d37b1eec7bfd13) )
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "rp7.6l",       0x1000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "rp8.6k",       0x2000, 0x0800, CRC(008738c7) SHA1(a66d9daf31b0d9cf087b591c74f0aaee3d7607b5) )
+	/* 0x2800-0x2fff - empty */
+	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
+	/* 0x3800-0x3fff - empty */
+
+	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "rp10.6a",      0x0000, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
+	ROM_LOAD( "rp11.6c",      0x0800, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
+
+	ROM_REGION( 0x0060, REGION_PROMS, 0 )
+	ROM_LOAD( "bprom1.9n",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) )
+	ROM_LOAD( "bprom2.9p",    0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) )
+	ROM_LOAD( "bprom3.9c",    0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) )
+
+	// these are the GFX Roms found on the board, from Silver Land, but IMO not correct for this program
+#if 0
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "sci46.bin",    0x0000, 0x0800, CRC(affb804f) SHA1(9fc77804690e91773787e06f3329accef075f9f3) )
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "sci45.bin",    0x1000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "sci44.bin",    0x2000, 0x0800, CRC(e487579d) SHA1(aed59f15dbc904d73e19d914ccd0a86fda859085) )
+	/* 0x2800-0x2fff - empty */
+	ROM_LOAD( "sci43.bin",    0x3000, 0x0800, CRC(59125a1a) SHA1(37638fb690d6b4f11585f6a13586271c2f0e3743) )
+	/* 0x3800-0x3fff - empty */
+
+	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "sci42.bin",         0x0000, 0x0800, CRC(c8d32b8e) SHA1(7d655d243ed13cf2537f3fdfde5bf34229f7cb84) )
+	ROM_LOAD( "sci41.bin",         0x0800, 0x0800, CRC(ee333daf) SHA1(b02998dccec9a4f841838874221caabae8380fcc) )
+
+	ROM_REGION( 0x0060, REGION_PROMS, 0 )
+	ROM_LOAD( "mb7051.1v",    0x0000, 0x0020, CRC(1d2343b1) SHA1(294f22178af4532abf767c1ffe2dc831bbe683bf) )
+	ROM_LOAD( "mb7051.1u",    0x0020, 0x0020, CRC(c174753c) SHA1(303bfb1f470b525ccaeafa81a38a4bc3a7de5dbb) )
+	ROM_LOAD( "mb7051.1t",    0x0040, 0x0020, CRC(04a1be01) SHA1(9c270c04d374d46752ec99bd4e79fed1e2896bc0) )
+#endif
+	/* no samples */
+ROM_END
+
 ROM_START( rpatrolb )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "rp1.4l",       0x0000, 0x1000, CRC(bfd7ae7a) SHA1(a06d1cc2674ed40d0bfa67dd6d724964c1e40600) )
@@ -1252,13 +1646,13 @@ ROM_START( rpatrolb )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "rp6.6n",       0x0000, 0x0800, CRC(19f18e9e) SHA1(a5500ac36bcda772f3ba79d9e9d37b1eec7bfd13) )
-	/* 0800-0fff empty */
-	ROM_LOAD( "rp8.6k",       0x1000, 0x0800, CRC(008738c7) SHA1(a66d9daf31b0d9cf087b591c74f0aaee3d7607b5) )
-	/* 1800-1fff empty */
-	ROM_LOAD( "rp7.6l",       0x2000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
-	/* 2800-2fff empty */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "rp7.6l",       0x1000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "rp8.6k",       0x2000, 0x0800, CRC(008738c7) SHA1(a66d9daf31b0d9cf087b591c74f0aaee3d7607b5) )
+	/* 0x2800-0x2fff - empty */
 	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
-	/* 3800-3fff empty */
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "rp10.6a",      0x0000, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
@@ -1283,13 +1677,13 @@ ROM_START( silvland )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "6.6n",         0x0000, 0x0800, CRC(affb804f) SHA1(9fc77804690e91773787e06f3329accef075f9f3) )
-	/* 0800-0fff empty */
-	ROM_LOAD( "4.6k",         0x1000, 0x0800, CRC(e487579d) SHA1(aed59f15dbc904d73e19d914ccd0a86fda859085) )
-	/* 1800-1fff empty */
-	ROM_LOAD( "5.6l",         0x2000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
-	/* 2800-2fff empty */
+	/* 0x0800-0x0fff - empty */
+	ROM_LOAD( "5.6l",         0x1000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
+	/* 0x1800-0xffff - empty */
+	ROM_LOAD( "4.6k",         0x2000, 0x0800, CRC(e487579d) SHA1(aed59f15dbc904d73e19d914ccd0a86fda859085) )
+	/* 0x2800-0x2fff - empty */
 	ROM_LOAD( "3.6h",         0x3000, 0x0800, CRC(59125a1a) SHA1(37638fb690d6b4f11585f6a13586271c2f0e3743) )
-	/* 3800-3fff empty */
+	/* 0x3800-0x3fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "2.6c",         0x0000, 0x0800, CRC(c8d32b8e) SHA1(7d655d243ed13cf2537f3fdfde5bf34229f7cb84) )
@@ -1300,63 +1694,6 @@ ROM_START( silvland )
 	ROM_LOAD( "mb7051.1u",    0x0020, 0x0020, CRC(c174753c) SHA1(303bfb1f470b525ccaeafa81a38a4bc3a7de5dbb) )
 	ROM_LOAD( "mb7051.1t",    0x0040, 0x0020, CRC(04a1be01) SHA1(9c270c04d374d46752ec99bd4e79fed1e2896bc0) )
 
-	/* no samples */
-ROM_END
-
-/* This set came from a 'Silver Land' board with Silver Land GFX roms, however, the program roms are nearly
-   the same as River Patrol but appear to have an original ORCA copyright
-
-   I think the board was a half-converted board as 'Water Gage' and 'Bon Voyage' don't really fit the theme
-   of Silver Land so I'm loading the River Patrol GFX instead as they fit better
-*/
-ROM_START( rpatrol )
-	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "sci1.bin",       0x0000, 0x1000, CRC(33b01c90) SHA1(9c8da6dd963bfb0544ef99b8fdedcf86c32cdb6b) )
-	ROM_LOAD( "sci2.bin",       0x1000, 0x1000, CRC(03f53340) SHA1(35336945f4b634fc4c7791ac9c9e6643c8cd8006) )
-	ROM_LOAD( "sci3.bin",       0x2000, 0x1000, CRC(8fa300df) SHA1(5c3ba1ef6c1ce8df437b4fa464293208630b5e8d) )
-	ROM_LOAD( "sci4.bin",       0x3000, 0x1000, CRC(74a8f1f4) SHA1(6bbc4944e4b31425a6b82f370b6760e5a4b36f56) )
-	ROM_LOAD( "sci5.bin",       0x4000, 0x1000, CRC(d7ef6c87) SHA1(38e3b44b355907824919acc4f5064dcb98ebb1d0) )
-
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "rp6.6n",       0x0000, 0x0800, CRC(19f18e9e) SHA1(a5500ac36bcda772f3ba79d9e9d37b1eec7bfd13) )
-	/* 0800-0fff empty */
-	ROM_LOAD( "rp8.6k",       0x1000, 0x0800, CRC(008738c7) SHA1(a66d9daf31b0d9cf087b591c74f0aaee3d7607b5) )
-	/* 1800-1fff empty */
-	ROM_LOAD( "rp7.6l",       0x2000, 0x0800, CRC(07f2070d) SHA1(39df286fda9e48eba6e770fe23a603b5e10d88b6) )
-	/* 2800-2fff empty */
-	ROM_LOAD( "rp9.6h",       0x3000, 0x0800, CRC(ea5aafca) SHA1(d8f8fe270680ae261d63bd4702107961cd904699) )
-	/* 3800-3fff empty */
-
-	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "rp10.6a",      0x0000, 0x0800, CRC(59747c31) SHA1(92acf07489f3e17f0c1769a0df15b6ddb117830f) )
-	ROM_LOAD( "rp11.6c",      0x0800, 0x0800, CRC(065651a5) SHA1(5c2f9b44d8819d2f792525c06b5c341fe07329c0) )
-
-	ROM_REGION( 0x0060, REGION_PROMS, 0 )
-	ROM_LOAD( "bprom1.9n",    0x0000, 0x0020, CRC(f9a2383b) SHA1(4d88c177740efdb27708474c9ee0fcdca5a78c36) )
-	ROM_LOAD( "bprom2.9p",    0x0020, 0x0020, CRC(1743bd26) SHA1(9bb50f6e24a7ac3c9ddf3923e57c5532603009e5) )
-	ROM_LOAD( "bprom3.9c",    0x0040, 0x0020, CRC(ee03bc96) SHA1(45e33e750a536a904f30136d84dd7993d97e8e54) )
-
-	// these are the GFX Roms found on the board, from Silver Land, but IMO not correct for this program
-#if 0
-	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "sci46.bin",         0x0000, 0x0800, CRC(affb804f) SHA1(9fc77804690e91773787e06f3329accef075f9f3) )
-	/* 0800-0fff empty */
-	ROM_LOAD( "sci44.bin",         0x1000, 0x0800, CRC(e487579d) SHA1(aed59f15dbc904d73e19d914ccd0a86fda859085) )
-	/* 1800-1fff empty */
-	ROM_LOAD( "sci45.bin",         0x2000, 0x0800, CRC(ad4642e5) SHA1(f4de2d9ed0e69c002be07f47247e95167a3ffffb) )
-	/* 2800-2fff empty */
-	ROM_LOAD( "sci43.bin",         0x3000, 0x0800, CRC(59125a1a) SHA1(37638fb690d6b4f11585f6a13586271c2f0e3743) )
-	/* 3800-3fff empty */
-
-	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "sci42.bin",         0x0000, 0x0800, CRC(c8d32b8e) SHA1(7d655d243ed13cf2537f3fdfde5bf34229f7cb84) )
-	ROM_LOAD( "sci41.bin",         0x0800, 0x0800, CRC(ee333daf) SHA1(b02998dccec9a4f841838874221caabae8380fcc) )
-
-	ROM_REGION( 0x0060, REGION_PROMS, 0 )
-	ROM_LOAD( "mb7051.1v",    0x0000, 0x0020, CRC(1d2343b1) SHA1(294f22178af4532abf767c1ffe2dc831bbe683bf) )
-	ROM_LOAD( "mb7051.1u",    0x0020, 0x0020, CRC(c174753c) SHA1(303bfb1f470b525ccaeafa81a38a4bc3a7de5dbb) )
-	ROM_LOAD( "mb7051.1t",    0x0040, 0x0020, CRC(04a1be01) SHA1(9c270c04d374d46752ec99bd4e79fed1e2896bc0) )
-#endif
 	/* no samples */
 ROM_END
 
@@ -1374,8 +1711,8 @@ ROM_START( cannonb )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "canballs.11n", 0x0000, 0x1000, CRC(a95b8e03) SHA1(e78125023e1af6de292292b875b45401b2173ca9) )
-	ROM_LOAD( "canballs.11k", 0x1000, 0x1000, CRC(dbbe8263) SHA1(efe4bba25a03261bc8309e6d83d5600def875b0c) )
-	ROM_LOAD( "canballs.11l", 0x2000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
+	ROM_LOAD( "canballs.11l", 0x1000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
+	ROM_LOAD( "canballs.11k", 0x2000, 0x1000, CRC(dbbe8263) SHA1(efe4bba25a03261bc8309e6d83d5600def875b0c) )
 	ROM_LOAD( "canballs.11h", 0x3000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
@@ -1400,8 +1737,14 @@ ROM_START( cannonb2 )
 	ROM_LOAD( "cb4.bin",   0x3000, 0x1000, CRC(696ebdb0) SHA1(0bff115e4710199641722ca12af4e16dc5b0ec13) )
 
 	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "cb10.bin",   0x0000, 0x1000, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
-	ROM_LOAD( "cb9.bin",   0x1000, 0x1000, CRC(2d036026) SHA1(b6eada3e67edd7db59d9ca823b798cd20f0afca9) )
+	ROM_LOAD( "cb10.bin",   0x0000, 0x0800, CRC(602a6c2d) SHA1(788f83bcb0667d8a42c209f3d51708d496be58df) )
+	/* 0x0800-0x0fff - empty */
+	ROM_CONTINUE(           0x1000, 0x0800 )
+	/* 0x1800-0x0fff - empty */
+	ROM_LOAD( "cb9.bin",    0x2000, 0x0800, CRC(2d036026) SHA1(b6eada3e67edd7db59d9ca823b798cd20f0afca9) )
+	/* 0x2800-0x0fff - empty */
+	ROM_CONTINUE(           0x3000, 0x0800 )
+	/* 0x3800-0x0fff - empty */
 
 	ROM_REGION( 0x1000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "cb7.bin",   0x0000, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
@@ -1428,7 +1771,7 @@ ROM_START( swimmer )
 	ROM_LOAD( "sw7",          0x6000, 0x1000, CRC(37efb64e) SHA1(0ed4d678895c17b37df605990acd096c538e3675) )
 	ROM_LOAD( "sw8",          0x7000, 0x1000, CRC(33d6001e) SHA1(749b746d018e74e364fd6974e4522c8a18915774) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1461,7 +1804,7 @@ ROM_START( swimmera )
 	ROM_LOAD( "swa7",         0x6000, 0x1000, CRC(7090e5ee) SHA1(d1e0ca38c3d1e4a7b7efa3696e47fb36ad3f8aa0) )
 	ROM_LOAD( "swa8",         0x7000, 0x1000, CRC(ab86efa9) SHA1(5b5a80ae285c7e9f4c51e646116edf789d4dba39) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1494,7 +1837,7 @@ ROM_START( swimmerb )
 	ROM_LOAD( "sw7.9c",       0x6000, 0x1000, CRC(88266f2e) SHA1(4ad15f9ba7b45a6c1c3637f8d0fd8be9c04b495f) )
 	ROM_LOAD( "sw8.9a",       0x7000, 0x1000, CRC(191a16e4) SHA1(75d3f49e2f4ea04d3a7cc88662c023768bf48365) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "sw12.4k",      0x0000, 0x1000, CRC(2eee9bcb) SHA1(ceafdf750a8af0c1c9abbbf437c3e9d9ae09f72b) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1524,7 +1867,7 @@ ROM_START( guzzler )
 	ROM_LOAD( "guzz-04.bin",  0x6000, 0x2000, CRC(45be42f5) SHA1(578943afdb6ceca34ca7c19c2fd1164ca3aa57bd) )
 	ROM_LOAD( "guzz-16.bin",  0xe000, 0x2000, CRC(61ee00b7) SHA1(ea8516c8dfb2de32a8034f94c7d0c086e3596740) )
 
-	ROM_REGION( 0x10000, REGION_CPU2, 0 )     /* 64k for sound board */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "guzz-12.bin",  0x0000, 0x1000, CRC(f3754d9e) SHA1(bb30832aba4e82ab0ecce40fc1223d9771ff7dd2) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
@@ -1543,6 +1886,120 @@ ROM_START( guzzler )
 	ROM_LOAD( "guzzler.001",  0x0200, 0x020, CRC(69089495) SHA1(96b067b22be14536bac748f8d61e5587a8a04e92) )
 ROM_END
 
+ROM_START( yamato )
+	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "2.5de",        0x0000, 0x2000, CRC(20895096) SHA1(af76786e3c519e710899f143d46c53087e9817c7) )
+	ROM_LOAD( "3.5f",         0x2000, 0x2000, CRC(57a696f9) SHA1(28ea80fb100ac92295fc3eb318617d7cb014408d) )
+	ROM_LOAD( "4.5jh",        0x4000, 0x2000, CRC(59a468e8) SHA1(a79cdee6efefd87a356cc8d710f8050bc12e07c3) )
+	/* hole at 6000-6fff */
+	ROM_LOAD( "11.5a",        0x7000, 0x1000, CRC(35987485) SHA1(1f0cb545bbd52982cbf801bc1dd2c4087af2f5f7) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
+	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
+	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )	/* ?? */
+	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
+
+	ROM_REGION( 0x00a0, REGION_PROMS, 0 )
+	ROM_LOAD( "1.bpr",        0x0000, 0x0020, CRC(ef2053ab) SHA1(2006cbf003f90a8e75f39047a88a3bba85d78e80) )
+	ROM_LOAD( "2.bpr",        0x0020, 0x0020, CRC(2281d39f) SHA1(e9b568bdacf7ab611801cf42ea5c7624f5440ef6) )
+	ROM_LOAD( "3.bpr",        0x0040, 0x0020, CRC(9e6341e3) SHA1(2e7a4d3c1f40d6089735734b9d9de2ca57fb73c7) )
+	ROM_LOAD( "4.bpr",        0x0060, 0x0020, CRC(1c97dc0b) SHA1(fe8e0a91172abdd2d14b199da144306a9b944372) )
+	ROM_LOAD( "5.bpr",        0x0080, 0x0020, CRC(edd6c05f) SHA1(b95db8aaf74fe175d1179f0d85f79242b16f5fb4) )
+ROM_END
+
+ROM_START( yamato2 )
+	ROM_REGION( 2*0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "2-2.5de",      0x0000, 0x2000, CRC(93da1d52) SHA1(21b72856ebbd969e4e075b52719e6acdbd1bc4c5) )
+	ROM_LOAD( "3-2.5f",       0x2000, 0x2000, CRC(31e73821) SHA1(e582c9fcea1b29d43f65b6aa67e1895c38d2736c) )
+	ROM_LOAD( "4-2.5jh",      0x4000, 0x2000, CRC(fd7bcfc3) SHA1(5037170cb3a9824794e90d74def92b0b25d45caa) )
+	/* hole at 6000-6fff */
+	/* 7000-7fff not present here */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "1.5v",         0x0000, 0x0800, CRC(3aad9e3c) SHA1(37b0414b265397881bb45b166ecab85880d1358d) )
+
+	ROM_REGION( 0x4000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "10.11k",       0x0000, 0x2000, CRC(161121f5) SHA1(017c5c6b773b0ae1d0be52e4bac90b699ea196dd) )
+	ROM_LOAD( "9.11h",        0x2000, 0x2000, CRC(56e84cc4) SHA1(c48e0e5460376d6b34173c42a27907ef12218182) )
+
+	ROM_REGION( 0x2000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "8.11c",        0x0000, 0x1000, CRC(28024d9a) SHA1(c871c4d74be72a8bfea99e89d43f91922f4b734b) )
+	ROM_LOAD( "7.11a",        0x1000, 0x1000, CRC(4a179790) SHA1(7fb6b033de939ff8bd13055c073311dca2c1a6fe) )
+
+	ROM_REGION( 0x2000, REGION_USER1, 0 )
+	ROM_LOAD( "5.5lm",        0x0000, 0x1000, CRC(7761ad24) SHA1(98878b19addd142d35718080eece05eaaee0388d) )	/* ?? */
+	ROM_LOAD( "6.5n",         0x1000, 0x1000, CRC(da48444c) SHA1(a43e672ce262eb817fb4e5715ef4fb304a6a2815) )
+
+	ROM_REGION( 0x00a0, REGION_PROMS, 0 )
+	ROM_LOAD( "1.bpr",        0x0000, 0x0020, CRC(ef2053ab) SHA1(2006cbf003f90a8e75f39047a88a3bba85d78e80) )
+	ROM_LOAD( "2.bpr",        0x0020, 0x0020, CRC(2281d39f) SHA1(e9b568bdacf7ab611801cf42ea5c7624f5440ef6) )
+	ROM_LOAD( "3.bpr",        0x0040, 0x0020, CRC(9e6341e3) SHA1(2e7a4d3c1f40d6089735734b9d9de2ca57fb73c7) )
+	ROM_LOAD( "4.bpr",        0x0060, 0x0020, CRC(1c97dc0b) SHA1(fe8e0a91172abdd2d14b199da144306a9b944372) )
+	ROM_LOAD( "5.bpr",        0x0080, 0x0020, CRC(edd6c05f) SHA1(b95db8aaf74fe175d1179f0d85f79242b16f5fb4) )
+ROM_END
+
+ROM_START( toprollr )
+	ROM_REGION( 0x10000*2, REGION_CPU1, 0 )
+	ROM_LOAD( "10.k3", 0xc000, 0x2000, CRC(1e8914a6) SHA1(ec17f185f890d04ce75a5d8edf8b32da60e7a8d8) )
+	ROM_LOAD( "11.l3", 0xe000, 0x2000, CRC(b20a9fa2) SHA1(accd3296447eca002b0808e7b02832f5e35407e8) )
+
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "16.j4", 0x0000, 0x2000, CRC(ce3afe26) SHA1(7de00720f091537c64cc0fec687c061de3a8b1a3) )
+	ROM_LOAD( "15.h4", 0x2000, 0x2000, CRC(1d9e3325) SHA1(e7f6863aa2ba2aeec40cfcc5cf6c69e947c185b5) )
+
+	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "14.c4", 0x0000, 0x2000, CRC(7a945733) SHA1(14187ba303aecf0a812c425c34d8edda3deaa2b5) )
+	ROM_LOAD( "13.a4", 0x2000, 0x2000, CRC(89327329) SHA1(555331a3136aa8c5bb35b97dd54bc59da067be57) )
+
+	ROM_REGION( 0x2000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "6.m5",  0x0000, 0x1000, CRC(e30c1dd8) SHA1(1777bf98625153c9b191020860e4e1839b46b998) )
+	ROM_LOAD( "5.l5",  0x1000, 0x1000, CRC(84139f46) SHA1(976f781fb279dd540778708174b942a263f16443) )
+
+	ROM_REGION( 0x12000, REGION_USER1, 0 )
+	ROM_LOAD( "2.f5",	0x00000, 0x02000, CRC(ef789f00) SHA1(424d69584d391ee7b9ad5db7ee6ced97d69897d4) )
+	ROM_LOAD( "8.f3",	0x02000, 0x02000, CRC(94371cfb) SHA1(cb501c36b213c995a4048b3a96c85848c556cd05) )
+	ROM_LOAD( "4.k5",	0x04000, 0x02000, CRC(1cb48ea0) SHA1(fdc75075112042ec84a7d1b3e5b5a6db1d1cb871) )
+	ROM_COPY( REGION_USER1, 0x04000, 0x0a000, 0x02000 )
+	ROM_COPY( REGION_USER1, 0x04000, 0x10000, 0x02000 )
+	ROM_LOAD( "3.h5",	0x06000, 0x02000, CRC(d45494ba) SHA1(6e235b34f9457acadad6d4e27799978bc2e3db08) )
+	ROM_LOAD( "9.h3",	0x08000, 0x02000, CRC(8a8032a7) SHA1(d6642d72645c613c21f65bbbe1560d0437d41f43) )
+	ROM_LOAD( "1.d5",	0x0c000, 0x02000, CRC(9894374d) SHA1(173de4abbc3fb5d522aa6d6d5caf8e4d54f2a598) )
+	ROM_LOAD( "7.d3",	0x0e000, 0x02000, CRC(904fffb6) SHA1(5528bc2a4d2fe8672428fd4725644265f0d57ded) )
+
+	ROM_REGION( 0x2000, REGION_SOUND1, 0 )
+	ROM_LOAD( "12.p3",  0x0000, 0x2000, CRC(7f989dc9) SHA1(3b4d18cbb992872b3cf8f5eaf5381ed3a9468cc1) )
+
+	ROM_REGION( 0x01a0, REGION_PROMS, 0 )
+	ROM_LOAD( "prom.p2",  0x0000, 0x0020, CRC(42e828fa) SHA1(81250b1f7c3956b3902324adbbaf3b5989e854ee) ) //08-0f sprites + fg (wrong?)
+	ROM_LOAD( "prom.r2",  0x0020, 0x0020, CRC(99b87eed) SHA1(06c3164d681fe4aff0338c0dad1a921f7fe7369d) ) //10-17 sprites
+	ROM_LOAD( "prom.a1",  0x0040, 0x0020, CRC(7d626d6c) SHA1(7c7202d0ec5bf0381e7104eef53afa5fa4596a29) ) //00-07 big sprites
+	ROM_LOAD( "prom.p9",  0x0060, 0x0020, CRC(eb399c02) SHA1(bf3d6c6dd982cb54446cf8a010b7adb949514bdb) ) //18-1f bg
+	ROM_LOAD( "prom.n9",  0x0080, 0x0020, CRC(fb03ea99) SHA1(4dcef86106cef713dfcbd965072bfa8fe4b68e15) ) //20-27 bg
+	ROM_LOAD( "prom.s9",  0x00a0, 0x0100, CRC(abf4c5fb) SHA1(a953f14642d4b72328293b36bc3c65b13491ffff) ) //unknown prom (filled with 2 bit vals)
+
+ROM_END
+
+
+static DRIVER_INIT( yamato )
+{
+	yamato_decode();
+}
+
+
+static DRIVER_INIT( toprollr )
+{
+	toprollr_decode();
+}
 
 
 GAME( 1980, cclimber, 0,        cclimber, cclimber, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", 0 )
@@ -1557,15 +2014,15 @@ GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg",
 GAME( 198?, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
 GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
-
 GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )
 GAME( 1981, rpatrolb, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "bootleg", "River Patrol (bootleg)", 0 )
 GAME( 1981, silvland, rpatrol,  cclimber, rpatrol,  0,        ROT0,   "Falcon", "Silver Land", 0 )
-
 GAME( 1985, cannonb,  cannonbp, cannonb,  cannonb,  cannonb,  ROT90,  "Soft", "Cannon Ball (bootleg on Crazy Climber hardware, set 1)" , GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, cannonb2, cannonbp, cannonb,  cannonb,  cannonb2, ROT90,  "TV Game Gruenberg", "Cannon Ball (bootleg on Crazy Climber hardware, set 2)", 0 )
-
 GAME( 1982, swimmer,  0,        swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 1)", 0 )
 GAME( 1982, swimmera, swimmer,  swimmer,  swimmer,  0,        ROT0,   "Tehkan", "Swimmer (set 2)", 0 )
 GAME( 1982, swimmerb, swimmer,  swimmer,  swimmerb, 0,        ROT0,   "Tehkan", "Swimmer (set 3)", 0 )
 GAME( 1983, guzzler,  0,        swimmer,  guzzler,  0,        ROT90,  "Tehkan", "Guzzler", 0 )
+GAME( 1983, yamato,   0,        yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (US)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, yamato2,  yamato,   yamato,   yamato,   yamato,   ROT90,  "Sega", "Yamato (World?)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, toprollr, 0,        toprollr, toprollr, toprollr, ROT90,  "Jaleco", "Top Roller", GAME_IMPERFECT_COLORS )

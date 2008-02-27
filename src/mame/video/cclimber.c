@@ -11,13 +11,32 @@
 #include "includes/cclimber.h"
 
 
-UINT8 *cclimber_bsvideoram;
-size_t cclimber_bsvideoram_size;
-UINT8 *cclimber_bigspriteram;
+#define CCLIMBER_FLIP_X		(cclimber_flip_screen[0] & 0x01)
+#define CCLIMBER_FLIP_Y		(cclimber_flip_screen[1] & 0x01)
+#define CCLIMBER_BG_PEN		(0)
+#define SWIMMER_SIDE_BG_PEN	(0x120)
+#define SWIMMER_BG_SPLIT	(0x18 * 8)
+#define YAMATO_SKY_PEN_BASE	(0x60)
+
+static tilemap *pf_tilemap;
+static tilemap *bs_tilemap;
+
+UINT8 *cclimber_videoram;
+UINT8 *cclimber_colorram;
+UINT8 *cclimber_spriteram;
+
+UINT8 *cclimber_bigsprite_videoram;
+UINT8 *cclimber_bigsprite_control;
 UINT8 *cclimber_column_scroll;
-UINT8 *swimmer_bgcolor;
-UINT8 *swimmer_sidepanel_enabled;
+UINT8 *cclimber_flip_screen;
+
+UINT8 *swimmer_background_color;
+UINT8 *swimmer_side_background_enabled;
 UINT8 *swimmer_palettebank;
+
+UINT8 *toprollr_bg_videoram;
+UINT8 *toprollr_bg_coloram;
+static tilemap *toproller_bg_tilemap;
 
 
 /***************************************************************************
@@ -41,43 +60,36 @@ PALETTE_INIT( cclimber )
 {
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
-	double rweights[3], gweights[3], bweights[2];
+	double weights_rg[3], weights_b[2];
 	int i;
 
 	/* compute the color output resistor weights */
 	compute_resistor_weights(0,	255, -1.0,
-			3, &resistances_rg[0], rweights, 0, 0,
-			3, &resistances_rg[0], gweights, 0, 0,
-			2, &resistances_b[0],  bweights, 0, 0);
+			3, resistances_rg, weights_rg, 0, 0,
+			2, resistances_b,  weights_b,  0, 0,
+			0, 0, 0, 0, 0);
 
 	for (i = 0;i < machine->config->total_colors; i++)
 	{
-		UINT8 data;
 		int bit0, bit1, bit2;
 		int r, g, b;
 
-		if (i & 0x07)
-			data = color_prom[i];
-		else
-			/* River Patrol shows that background is pen 0 */
-			data = color_prom[0];
-
 		/* red component */
-		bit0 = (data >> 0) & 0x01;
-		bit1 = (data >> 1) & 0x01;
-		bit2 = (data >> 2) & 0x01;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
 		/* green component */
-		bit0 = (data >> 3) & 0x01;
-		bit1 = (data >> 4) & 0x01;
-		bit2 = (data >> 5) & 0x01;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
 
 		/* blue component */
-		bit0 = (data >> 6) & 0x01;
-		bit1 = (data >> 7) & 0x01;
-		b = combine_2_weights(bweights, bit0, bit1);
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
@@ -124,53 +136,30 @@ PALETTE_INIT( swimmer )
 {
 	int i;
 
-	for (i = 0; i < 0x200; i++)
+	for (i = 0; i < 0x100; i++)
 	{
-		rgb_t color;
+		int bit0, bit1, bit2;
+		int r, g, b;
 
-		/* non-backgrond pens */
-		if (i & 0x07)
-		{
-			int bit0, bit1, bit2;
-			int r, g, b;
+		/* red component */
+		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
+		r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-			/* red component */
-			bit0 = (color_prom[(i & 0xff) + 0x000] >> 0) & 0x01;
-			bit1 = (color_prom[(i & 0xff) + 0x000] >> 1) & 0x01;
-			bit2 = (color_prom[(i & 0xff) + 0x000] >> 2) & 0x01;
-			r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		/* green component */
+		bit0 = (color_prom[i + 0x000] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0x100] >> 0) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 1) & 0x01;
+		g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-			/* green component */
-			bit0 = (color_prom[(i & 0xff) + 0x000] >> 3) & 0x01;
-			bit1 = (color_prom[(i & 0xff) + 0x100] >> 0) & 0x01;
-			bit2 = (color_prom[(i & 0xff) + 0x100] >> 1) & 0x01;
-			g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i + 0x100] >> 2) & 0x01;
+		bit2 = (color_prom[i + 0x100] >> 3) & 0x01;
+		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-			/* blue component */
-			bit0 = 0;
-			bit1 = (color_prom[(i & 0xff) + 0x100] >> 2) & 0x01;
-			bit2 = (color_prom[(i & 0xff) + 0x100] >> 3) & 0x01;
-			b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
-
-			color = MAKE_RGB(r,g,b);
-		}
-
-		/* backgrond pen */
-		else
-		{
-			if (i & 0x100)
-				/* side panel */
-#if 0
-				// values calculated from the resistors don't seem to match the real board
-				color = MAKE_RGB(0x24, 0x5d, 0x4e);
-#endif
-				color = MAKE_RGB(0x20, 0x98, 0x79);
-			else
-				/* 'water' background -- will be modified dynamically later */
-				color = RGB_BLACK;
-		}
-
-		palette_set_color(machine, i, color);
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 
 	color_prom += 0x200;
@@ -199,10 +188,115 @@ PALETTE_INIT( swimmer )
 		bit2 = (color_prom[i] >> 7) & 0x01;
 		b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-		palette_set_color(machine, i + 0x200, MAKE_RGB(r, g, b));
+		palette_set_color(machine, i + 0x100, MAKE_RGB(r, g, b));
 	}
+
+	/* side panel backgrond pen */
+#if 0
+	// values calculated from the resistors don't seem to match the real board
+	palette_set_color(machine, SWIMMER_SIDE_BG_PEN, MAKE_RGB(0x24, 0x5d, 0x4e));
+#endif
+	palette_set_color(machine, SWIMMER_SIDE_BG_PEN, MAKE_RGB(0x20, 0x98, 0x79));
 }
 
+
+PALETTE_INIT( yamato )
+{
+	int i;
+
+	/* chars - 12 bits RGB */
+	for (i = 0; i < 0x40; i++)
+	{
+		int bit0, bit1, bit2, bit3;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i + 0x00] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 3) & 0x01;
+		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		/* green component */
+		bit0 = (color_prom[i + 0x00] >> 4) & 0x01;
+		bit1 = (color_prom[i + 0x00] >> 5) & 0x01;
+		bit2 = (color_prom[i + 0x00] >> 6) & 0x01;
+		bit3 = (color_prom[i + 0x00] >> 7) & 0x01;
+		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		/* blue component */
+		bit0 = (color_prom[i + 0x40] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x40] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x40] >> 2) & 0x01;
+		bit3 = (color_prom[i + 0x40] >> 3) & 0x01;
+		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+
+	/* big sprite - 8 bits RGB */
+	for (i = 0; i < 0x20; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i + 0x80] >> 0) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 1) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* green component */
+		bit0 = (color_prom[i + 0x80] >> 3) & 0x01;
+		bit1 = (color_prom[i + 0x80] >> 4) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i + 0x80] >> 6) & 0x01;
+		bit2 = (color_prom[i + 0x80] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i + 0x40, MAKE_RGB(r, g, b));
+	}
+
+	/* fake colors for bg gradient */
+	for (i = 0; i < 0x100; i++)
+		palette_set_color(machine, YAMATO_SKY_PEN_BASE + i, MAKE_RGB(0, 0, i));
+}
+
+
+PALETTE_INIT( toprollr )
+{
+	int i;
+
+	for (i = 0; i < 0xa0; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i] >> 6) & 0x01;
+		bit2 = (color_prom[i] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
 
 
 /***************************************************************************
@@ -224,692 +318,453 @@ PALETTE_INIT( swimmer )
 
 static void swimmer_set_background_pen(running_machine *machine)
 {
-	int i;
-	pen_t color;
 	int bit0, bit1, bit2;
 	int r, g, b;
 
 	/* red component */
 	bit0 = 0;
-	bit1 = (*swimmer_bgcolor >> 6) & 0x01;
-	bit2 = (*swimmer_bgcolor >> 7) & 0x01;
+	bit1 = (*swimmer_background_color >> 6) & 0x01;
+	bit2 = (*swimmer_background_color >> 7) & 0x01;
 	r = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	/* green component */
-	bit0 = (*swimmer_bgcolor >> 3) & 0x01;
-	bit1 = (*swimmer_bgcolor >> 4) & 0x01;
-	bit2 = (*swimmer_bgcolor >> 5) & 0x01;
+	bit0 = (*swimmer_background_color >> 3) & 0x01;
+	bit1 = (*swimmer_background_color >> 4) & 0x01;
+	bit2 = (*swimmer_background_color >> 5) & 0x01;
 	g = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
 	/* blue component */
-	bit0 = (*swimmer_bgcolor >> 0) & 0x01;
-	bit1 = (*swimmer_bgcolor >> 1) & 0x01;
-	bit2 = (*swimmer_bgcolor >> 2) & 0x01;
+	bit0 = (*swimmer_background_color >> 0) & 0x01;
+	bit1 = (*swimmer_background_color >> 1) & 0x01;
+	bit2 = (*swimmer_background_color >> 2) & 0x01;
 	b = 0x20 * bit0 + 0x40 * bit1 + 0x80 * bit2;
 
-	color = MAKE_RGB(r, g, b);
-
-	/* set pen 0 if each color code */
-	for (i = 0; i < 0x100; i += 8)
-		palette_set_color(machine, i, color);
+	palette_set_color(machine, CCLIMBER_BG_PEN, MAKE_RGB(r, g, b));
 }
 
 
 
 WRITE8_HANDLER( cclimber_colorram_w )
 {
-	/* bit 5 of the address is not used for color memory. There is just */
-	/* 512 bytes of memory; every two consecutive rows share the same memory */
-	/* region. */
-	colorram[offset] = data;
-	colorram[offset ^ 0x20] = data;
+	/* A5 is not connected, there is only 0x200 bytes of RAM */
+	cclimber_colorram[offset & ~0x20] = data;
+	cclimber_colorram[offset |  0x20] = data;
 }
 
 
+WRITE8_HANDLER( cannonb_flip_screen_w )
+{
+	cclimber_flip_screen[0] = data;
+	cclimber_flip_screen[1] = data;
+}
 
-static void cclimber_draw_big_sprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+
+static TILE_GET_INFO( cclimber_get_pf_tile_info )
+{
+	int code, color;
+
+	int flags = TILE_FLIPYX(cclimber_colorram[tile_index] >> 6);
+
+	/* vertical flipping flips two adjacent characters */
+	if (flags & 0x02)
+		tile_index = tile_index ^ 0x20;
+
+	code = ((cclimber_colorram[tile_index] & 0x10) << 5) |
+		   ((cclimber_colorram[tile_index] & 0x20) << 3) |
+			 cclimber_videoram[tile_index];
+
+	color = cclimber_colorram[tile_index] & 0x0f;
+
+	SET_TILE_INFO(0, code, color, flags);
+}
+
+
+static TILE_GET_INFO( swimmer_get_pf_tile_info )
+{
+	int code, color;
+
+	int flags = TILE_FLIPYX(cclimber_colorram[tile_index] >> 6);
+
+	/* vertical flipping flips two adjacent characters */
+	if (flags & 0x02)
+		tile_index = tile_index ^ 0x20;
+
+	code = ((cclimber_colorram[tile_index] & 0x10) << 4) | cclimber_videoram[tile_index];
+	color = ((*swimmer_palettebank & 0x01) << 4) | (cclimber_colorram[tile_index] & 0x0f);
+
+	SET_TILE_INFO(0, code, color, flags);
+}
+
+
+static TILE_GET_INFO( toprollr_get_pf_tile_info )
+{
+	int code, attr, color;
+
+	attr = tile_index & 0x10 ? cclimber_colorram[tile_index & ~0x20] : cclimber_colorram[tile_index];
+	code = ((attr & 0x30) << 4) | cclimber_videoram[tile_index];
+	color = attr & 0x0f;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+
+static TILE_GET_INFO( cclimber_get_bs_tile_info )
+{
+	int code, color;
+
+	/* only the lower right is visible */
+	tileinfo->group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+
+	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
+	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
+
+	code = ((cclimber_bigsprite_control[1] & 0x08) << 5) | cclimber_bigsprite_videoram[tile_index];
+	color = cclimber_bigsprite_control[1] & 0x07;
+
+	SET_TILE_INFO(2, code, color, 0);
+}
+
+
+static TILE_GET_INFO( toprollr_get_bs_tile_info )
+{
+	int code, color;
+
+	/* only the lower right is visible */
+	tileinfo->group = ((tile_index & 0x210) == 0x210) ? 0 : 1;
+
+	/* the address doesn't use A4 of the coordinates, giving a 16x16 map */
+	tile_index = ((tile_index & 0x1e0) >> 1) | (tile_index & 0x0f);
+
+	code = ((cclimber_bigsprite_control[1] & 0x18) << 5) | cclimber_bigsprite_videoram[tile_index];
+	color = cclimber_bigsprite_control[1] & 0x07;
+
+	SET_TILE_INFO(2, code, color, 0);
+}
+
+
+static TILE_GET_INFO( toproller_get_bg_tile_info )
+{
+	int code = ((toprollr_bg_coloram[tile_index] & 0x40) << 2) | toprollr_bg_videoram[tile_index];
+	int color = toprollr_bg_coloram[tile_index] & 0x0f;
+
+	SET_TILE_INFO(3, code, color, TILE_FLIPX);
+}
+
+
+VIDEO_START( cclimber )
+{
+	pf_tilemap = tilemap_create(cclimber_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(pf_tilemap, 0);
+	tilemap_set_scroll_cols(pf_tilemap, 32);
+
+	bs_tilemap = tilemap_create(cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(bs_tilemap, 1);
+	tilemap_set_scroll_rows(bs_tilemap, 1);
+	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
+	tilemap_set_transmask(bs_tilemap, 1, 0x0f, 0);  /* all 4 pens are transparent */
+}
+
+
+VIDEO_START( swimmer )
+{
+	pf_tilemap = tilemap_create(swimmer_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(pf_tilemap, 0);
+	tilemap_set_scroll_cols(pf_tilemap, 32);
+
+	bs_tilemap = tilemap_create(cclimber_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(bs_tilemap, 1);
+	tilemap_set_scroll_rows(bs_tilemap, 1);
+	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
+	tilemap_set_transmask(bs_tilemap, 1, 0xff, 0);  /* all 8 pens are transparent */
+}
+
+
+VIDEO_START( toprollr )
+{
+	pf_tilemap = tilemap_create(toprollr_get_pf_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(pf_tilemap, 0);
+
+	toproller_bg_tilemap = tilemap_create(toproller_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_rows(toproller_bg_tilemap, 1);
+
+	bs_tilemap = tilemap_create(toprollr_get_bs_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_scroll_cols(bs_tilemap, 1);
+	tilemap_set_scroll_rows(bs_tilemap, 1);
+	tilemap_set_transmask(bs_tilemap, 0, 0x01, 0);	/* pen 0 is transaprent */
+	tilemap_set_transmask(bs_tilemap, 1, 0x0f, 0);  /* all 4 pens are transparent */
+}
+
+
+static void draw_playfield(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	int i;
+
+	tilemap_mark_all_tiles_dirty(pf_tilemap);
+	tilemap_set_flip(pf_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	for (i = 0; i < 32; i++)
+		tilemap_set_scrolly(pf_tilemap, i, cclimber_column_scroll[i]);
+
+	tilemap_draw(bitmap, cliprect, pf_tilemap, 0, 0);
+}
+
+
+static void cclimber_draw_bigsprite(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	UINT8 x = cclimber_bigsprite_control[3] - 8;
+	UINT8 y = cclimber_bigsprite_control[2];
+	int bigsprite_flip_x = (cclimber_bigsprite_control[1] & 0x10) >> 4;
+	int bigsprite_flip_y = (cclimber_bigsprite_control[1] & 0x20) >> 5;
+
+	if (bigsprite_flip_x)
+		x = 0x7f - x;
+
+	if (bigsprite_flip_y)
+		y = 0x7f - y;
+
+	tilemap_mark_all_tiles_dirty(bs_tilemap);
+
+	tilemap_set_flip(bs_tilemap, (bigsprite_flip_x ? TILEMAP_FLIPX : 0) |
+								 (CCLIMBER_FLIP_Y ^ bigsprite_flip_y ? TILEMAP_FLIPY : 0));
+
+	tilemap_set_scrollx(bs_tilemap, 0, x);
+	tilemap_set_scrolly(bs_tilemap, 0, y);
+
+	tilemap_draw(bitmap, cliprect, bs_tilemap, 0, 0);
+}
+
+
+static void toprollr_draw_bigsprite(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	UINT8 x = cclimber_bigsprite_control[3] - 8;
+	UINT8 y = cclimber_bigsprite_control[2];
+
+	tilemap_mark_all_tiles_dirty(bs_tilemap);
+
+	tilemap_set_flip(bs_tilemap, CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0);
+
+	tilemap_set_scrollx(bs_tilemap, 0, x);
+	tilemap_set_scrolly(bs_tilemap, 0, y);
+
+	tilemap_draw(bitmap, cliprect, bs_tilemap, 0, 0);
+}
+
+
+static void cclimber_draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
-	int ox,oy,sx,sy,flipx,flipy;
-	int color;
 
-
-	ox = 136 - cclimber_bigspriteram[3];
-	oy = 128 - cclimber_bigspriteram[2];
-	flipx = cclimber_bigspriteram[1] & 0x10;
-	flipy = cclimber_bigspriteram[1] & 0x20;
-	if (flip_screen_y_get())      /* only the Y direction has to be flipped */
+	/* draw the sprites -- note that it is important to draw them exactly in this
+       order, to have the correct priorities. */
+	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
-		oy = 128 - oy;
-		flipy = !flipy;
+		int x = cclimber_spriteram[offs + 3];
+		int y = 240 - cclimber_spriteram[offs + 2];
+
+		int code = ((cclimber_spriteram[offs + 1] & 0x10) << 3) |
+				   ((cclimber_spriteram[offs + 1] & 0x20) << 1) |
+				   ( cclimber_spriteram[offs + 0] & 0x3f);
+
+		int color = cclimber_spriteram[offs + 1] & 0x0f;
+
+		int flipx = cclimber_spriteram[offs + 0] & 0x40;
+		int flipy = cclimber_spriteram[offs + 0] & 0x80;
+
+		if (CCLIMBER_FLIP_X)
+		{
+			x = 240 - x;
+			flipx = !flipx;
+		}
+
+		if (CCLIMBER_FLIP_Y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		drawgfx(bitmap, gfx[1], code, color, flipx, flipy, x, y, cliprect, TRANSPARENCY_PEN, 0);
 	}
-	color = cclimber_bigspriteram[1] & 0x07;	/* cclimber */
-//  color = cclimber_bigspriteram[1] & 0x03;    /* swimmer */
+}
 
-	for (offs = cclimber_bsvideoram_size - 1;offs >= 0;offs--)
+
+static void swimmer_draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
+{
+	int offs;
+
+	/* draw the sprites -- note that it is important to draw them exactly in this
+       order, to have the correct priorities. */
+	for (offs = 0x1c; offs >= 0; offs -= 4)
 	{
-		sx = offs % 16;
-		sy = offs / 16;
-		if (flipx) sx = 15 - sx;
-		if (flipy) sy = 15 - sy;
+		int x = cclimber_spriteram[offs + 3];
+		int y = 240 - cclimber_spriteram[offs + 2];
 
-		drawgfx(bitmap,machine->gfx[2],
-//              cclimber_bsvideoram[offs],  /* cclimber */
-				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5),	/* swimmer */
-				color,
-				flipx,flipy,
-				(ox+8*sx) & 0xff,(oy+8*sy) & 0xff,
-				cliprect,TRANSPARENCY_PEN,0);
+		int code = ((cclimber_spriteram[offs + 1] & 0x10) << 2) |
+				   (cclimber_spriteram[offs + 0] & 0x3f);
 
-		/* wraparound */
-		drawgfx(bitmap,machine->gfx[2],
-//              cclimber_bsvideoram[offs],  /* cclimber */
-				cclimber_bsvideoram[offs] + ((cclimber_bigspriteram[1] & 0x08) << 5),	/* swimmer */
-				color,
-				flipx,flipy,
-				((ox+8*sx) & 0xff) - 256,(oy+8*sy) & 0xff,
-				cliprect,TRANSPARENCY_PEN,0);
+		int color = ((*swimmer_palettebank & 0x01) << 4) |
+					(cclimber_spriteram[offs + 1] & 0x0f);
+
+		int flipx = cclimber_spriteram[offs + 0] & 0x40;
+		int flipy = cclimber_spriteram[offs + 0] & 0x80;
+
+		if (CCLIMBER_FLIP_X)
+		{
+			x = 240 - x;
+			flipx = !flipx;
+		}
+
+		if (CCLIMBER_FLIP_Y)
+		{
+			y = 240 - y;
+			flipy = !flipy;
+		}
+
+		drawgfx(bitmap, gfx[1], code, color, flipx, flipy, x, y, cliprect, TRANSPARENCY_PEN, 0);
 	}
 }
 
 
 VIDEO_UPDATE( cclimber )
 {
-	int offs;
+	fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
+	draw_playfield(bitmap, cliprect);
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	/* draw the "big sprite" under the regular sprites */
+	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
-		int sx,sy,flipx,flipy;
-
-		sx = offs % 32;
-		sy = offs / 32;
-		flipx = colorram[offs] & 0x40;
-		flipy = colorram[offs] & 0x80;
-		/* vertical flipping flips two adjacent characters */
-		if (flipy) sy ^= 1;
-
-		if (flip_screen_x_get())
-		{
-			sx = 31 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 31 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-				videoram[offs] + 8 * (colorram[offs] & 0x20),
-				colorram[offs] & 0x0f,
-				flipx,flipy,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+		cclimber_draw_bigsprite(bitmap, cliprect);
+		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
 	}
 
-
-	/* copy the temporary bitmap to the screen */
+	/* draw the "big sprite" over the regular sprites */
+	else
 	{
-		int scroll[32];
-
-
-		if (flip_screen_x_get())
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-		else
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
+		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
-
-	if (cclimber_bigspriteram[0] & 1)
-		/* draw the "big sprite" below sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
-
-
-	/* Draw the sprites. Note that it is important to draw them exactly in this */
-	/* order, to have the correct priorities. */
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
-	{
-		int sx,sy,flipx,flipy;
-
-
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs + 2];
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get())
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(bitmap,machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
-				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
-				spriteram[offs + 1] & 0x0f,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
-	}
-
-
-	if ((cclimber_bigspriteram[0] & 1) == 0)
-		/* draw the "big sprite" over sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
 
-VIDEO_UPDATE( cannonb )
+VIDEO_UPDATE( yamato )
 {
-	int offs;
+	int i;
+	UINT8 *sky_rom = memory_region(REGION_USER1) + 0x1200;
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	for (i = 0; i < 0x100; i++)
 	{
-		int attr,code,color,sx,sy,flipx,flipy;
+		int j;
+		pen_t pen = YAMATO_SKY_PEN_BASE + sky_rom[(CCLIMBER_FLIP_X ? 0x80 : 0) + (i >> 1)];
 
-		code = videoram[offs];
-		attr = colorram[offs] & 0x20;
-		color = colorram[offs] & 0x0f;
-		sx = offs % 32;
-		sy = offs / 32;
-		flipx = colorram[offs] & 0x40;
-		flipy = colorram[offs] & 0x80;
-		/* vertical flipping flips two adjacent characters */
-		if (flipy) sy ^= 1;
-
-		if (flip_screen_x_get())
-		{
-			sx = 31 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 31 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(tmpbitmap,machine->gfx[0],
-				code + 8 * attr,
-				color,
-				flipx,flipy,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
+		for (j = 0; j < 0x100; j++)
+			*BITMAP_ADDR16(bitmap, j, (i - 8) & 0xff) = pen;
 	}
 
+	draw_playfield(bitmap, cliprect);
 
-	/* copy the temporary bitmap to the screen */
+	/* draw the "big sprite" under the regular sprites */
+	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
-		int scroll[32];
-
-
-		if (flip_screen_x_get())
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-		else
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
+		cclimber_draw_bigsprite(bitmap, cliprect);
+		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
 	}
 
-
-	if (cclimber_bigspriteram[0] & 1)
-		/* draw the "big sprite" below sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
-
-
-	/* Draw the sprites. Note that it is important to draw them exactly in this */
-	/* order, to have the correct priorities. */
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	/* draw the "big sprite" over the regular sprites */
+	else
 	{
-		int code,color,sx,sy,flipx,flipy;
-
-		code = spriteram[offs] & 0x3f;
-		color = spriteram[offs + 1] & 0x0f;
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs + 2];
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get())
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(bitmap,machine->gfx[3],
-				code + 0x40,
-				color,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
-	if ((cclimber_bigspriteram[0] & 1) == 0)
-		/* draw the "big sprite" over sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( swimmer )
 {
-	int offs;
-
 	swimmer_set_background_pen(machine);
 
-	for (offs = videoram_size - 1;offs >= 0;offs--)
+	if (*swimmer_side_background_enabled & 0x01)
 	{
-		int sx,sy,flipx,flipy,color;
-
-		sx = offs % 32;
-		sy = offs / 32;
-		flipx = colorram[offs] & 0x40;
-		flipy = colorram[offs] & 0x80;
-		/* vertical flipping flips two adjacent characters */
-		if (flipy) sy ^= 1;
-
-		color = (colorram[offs] & 0x0f) + 0x10 * (*swimmer_palettebank & 0x01);
-		if (sx >= 24 && (*swimmer_sidepanel_enabled & 0x01))
+		if (CCLIMBER_FLIP_X)
 		{
-			color += 32;
-		}
+			rectangle split_rect_left =  { 0, 0xff - SWIMMER_BG_SPLIT, 0, 0xff };
+			rectangle split_rect_right = { 0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff };
 
-		if (flip_screen_x_get())
-		{
-			sx = 31 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 31 - sy;
-			flipy = !flipy;
-		}
+			sect_rect(&split_rect_left, cliprect);
+			fillbitmap(bitmap, SWIMMER_SIDE_BG_PEN, &split_rect_left);
 
-		drawgfx(tmpbitmap,machine->gfx[0],
-				videoram[offs] + ((colorram[offs] & 0x10) << 4),
-				color,
-				flipx,flipy,
-				8*sx,8*sy,
-				0,TRANSPARENCY_NONE,0);
-	}
-
-
-	/* copy the temporary bitmap to the screen */
-	{
-		int scroll[32];
-
-
-		if (flip_screen_y_get())
-		{
-			for (offs = 0;offs < 32;offs++)
-				scroll[offs] = cclimber_column_scroll[31 - offs];
+			sect_rect(&split_rect_right, cliprect);
+			fillbitmap(bitmap, CCLIMBER_BG_PEN, &split_rect_right);
 		}
 		else
 		{
-			for (offs = 0;offs < 32;offs++)
-				scroll[offs] = -cclimber_column_scroll[offs];
+			rectangle split_rect_left =  { 0, SWIMMER_BG_SPLIT - 1, 0, 0xff };
+			rectangle split_rect_right = { SWIMMER_BG_SPLIT, 0xff, 0, 0xff };
+
+			sect_rect(&split_rect_left, cliprect);
+			fillbitmap(bitmap, CCLIMBER_BG_PEN, &split_rect_left);
+
+			sect_rect(&split_rect_right, cliprect);
+			fillbitmap(bitmap, SWIMMER_SIDE_BG_PEN, &split_rect_right);
 		}
-
-		copyscrollbitmap(bitmap,tmpbitmap,0,0,32,scroll,cliprect);
 	}
+	else
+		fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
 
+	draw_playfield(bitmap, cliprect);
 
-	if (cclimber_bigspriteram[0] & 1)
-		/* draw the "big sprite" below sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
-
-
-	/* Draw the sprites. Note that it is important to draw them exactly in this */
-	/* order, to have the correct priorities. */
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	/* draw the "big sprite" under the regular sprites */
+	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
-		int sx,sy,flipx,flipy;
-
-
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs + 2];
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get())
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(bitmap,machine->gfx[1],
-				(spriteram[offs] & 0x3f) | (spriteram[offs + 1] & 0x10) << 2,
-				(spriteram[offs + 1] & 0x0f) + 0x10 * (*swimmer_palettebank & 0x01),
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
+		cclimber_draw_bigsprite(bitmap, cliprect);
+		swimmer_draw_sprites(bitmap, machine->gfx, cliprect);
 	}
 
+	/* draw the "big sprite" over the regular sprites */
+	else
+	{
+		swimmer_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_bigsprite(bitmap, cliprect);
+	}
 
-	if ((cclimber_bigspriteram[0] & 1) == 0)
-		/* draw the "big sprite" over sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
 	return 0;
 }
 
-VIDEO_UPDATE( yamato )
-{
-	int offs;
-	int i,j;
-
-	/* bg gradient */
-	fillbitmap(bitmap, 0, cliprect);
-
-	for(i=8;i<256;i++)
-	{
-		pen_t pen = 16*4+8*4 + memory_region(REGION_USER1)[(flip_screen_x_get()?0x1280:0x1200)+(i>>1)];
-
-		for(j=0;j<256;j++)
-		{
-			*BITMAP_ADDR16(bitmap, j, i-8) = pen;
-		}
-	}
-
-
-	fillbitmap(tmpbitmap, 0, NULL);
-
-	for (offs = videoram_size - 1;offs >= 0;offs--)
-	{
-		int sx,sy,flipx,flipy;
-
-		sx = offs % 32;
-		sy = offs / 32;
-		flipx = colorram[offs] & 0x40;
-		flipy = colorram[offs] & 0x80;
-		/* vertical flipping flips two adjacent characters */
-		if (flipy) sy ^= 1;
-
-		if (flip_screen_x_get())
-		{
-			sx = 31 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 31 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(tmpbitmap,machine->gfx[(colorram[offs] & 0x10) ? 1 : 0],
-				videoram[offs] + 8 * (colorram[offs] & 0x20),
-				colorram[offs] & 0x0f,
-				flipx,flipy,
-				8*sx,8*sy,
-				NULL,TRANSPARENCY_PEN,0);
-	}
-
-
-	/* copy the temporary bitmap to the screen */
-	{
-		int scroll[32];
-
-
-		if (flip_screen_x_get())
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[31 - offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-		else
-		{
-			for (offs = 0;offs < 32;offs++)
-			{
-				scroll[offs] = -cclimber_column_scroll[offs];
-				if (flip_screen_y_get()) scroll[offs] = -scroll[offs];
-			}
-		}
-
-		copyscrollbitmap_trans(bitmap,tmpbitmap,0,0,32,scroll,cliprect,0);
-	}
-
-
-	if (cclimber_bigspriteram[0] & 1)
-		/* draw the "big sprite" below sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
-
-
-	/* Draw the sprites. Note that it is important to draw them exactly in this */
-	/* order, to have the correct priorities. */
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
-	{
-		int sx,sy,flipx,flipy;
-
-
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs + 2];
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get())
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		drawgfx(bitmap,machine->gfx[spriteram[offs + 1] & 0x10 ? 4 : 3],
-				(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
-				spriteram[offs + 1] & 0x0f,
-				flipx,flipy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
-	}
-
-
-	if ((cclimber_bigspriteram[0] & 1) == 0)
-		/* draw the "big sprite" over sprites */
-		cclimber_draw_big_sprite(machine, bitmap, cliprect);
-	return 0;
-}
-
-
-/* Top Roller */
-
-#define PRIORITY_OVER  	0x20
-#define PRIORITY_UNDER 	0x00
-#define PRIORITY_MASK 	0x20
-
-static tilemap *bg_tilemap;
-
-UINT8 *toprollr_videoram2;
-UINT8 *toprollr_videoram3;
-UINT8 *toprollr_videoram4;
-
-
-static TILE_GET_INFO( get_tile_info_bg )
-{
-	int code = toprollr_videoram3[tile_index];
-	int attr = toprollr_videoram4[tile_index];
-	int flipx,flipy,bank,palette;
-
-	bank=(attr&0x40)<<2;
-
-
-
-
-
-	flipx=1;
-	flipy=0;
-
-	code+=bank;
-
-	palette=(attr&0xf)+0x18 ;
-
-	SET_TILE_INFO(1, code, palette, (flipx?TILE_FLIPX:0)|(flipy?TILE_FLIPY:0));
-}
-
-VIDEO_START( toprollr )
-{
-	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,8,8,32,32);
-}
-
-static void toprollr_draw_big_sprite(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
-{
-	if((cclimber_bigspriteram[1]&PRIORITY_MASK)==priority)
-	{
-		int code,xs,ys,palette,bank,x,y;
-		int flipx=0;
-		int flipy=0;
-
-		xs=136-cclimber_bigspriteram[3];
-		ys=128-cclimber_bigspriteram[2];
-
-
-		if(xs==0)
-		{
-			return;
-		}
-
-		if (flip_screen_x_get())
-		{
-			flipx^=1;
-		}
-
-		palette=cclimber_bigspriteram[1]&0x7;
-
-		bank=(cclimber_bigspriteram[1]>>3)&3;
-
-
-		for(y=0;y<16;y++)
-			for(x=0;x<16;x++)
-			{
-				int sx=x;
-				int sy=y;
-				if (flipx) sx = 15 - x;
-				if (flipy) sy = 15 - y;
-
-				code=cclimber_bsvideoram[y*16+x]+bank*256;
-
-				drawgfx(bitmap, machine->gfx[3], code, palette, flipx, flipy,(sx*8+xs)&0xff,(sy*8+ys)&0xff, cliprect, TRANSPARENCY_PEN, 0);
-				drawgfx(bitmap, machine->gfx[3], code, palette, flipx, flipy,((sx*8+xs)&0xff)-256,((sy*8+ys)&0xff)-256, cliprect, TRANSPARENCY_PEN, 0);
-			}
-	}
-}
 
 VIDEO_UPDATE( toprollr )
 {
+	rectangle scroll_area_clip = *cliprect;
+	scroll_area_clip.min_x = 4*8;
+	scroll_area_clip.max_x = 29*8-1;
 
-	UINT32 x,y;
-	int offs;
-	rectangle myclip=*cliprect;
-	myclip.min_x=4*8;
-	myclip.max_x=29*8-1;
+	fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
 
-	fillbitmap(bitmap, 0, cliprect);
+	tilemap_set_scrollx(toproller_bg_tilemap, 0, toprollr_bg_videoram[0]);
+	tilemap_set_flip(toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+								 		   (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	tilemap_mark_all_tiles_dirty(toproller_bg_tilemap);
+	tilemap_draw(bitmap, &scroll_area_clip, toproller_bg_tilemap, 0, 0);
 
-	tilemap_set_scrollx(bg_tilemap,0,toprollr_videoram3[0]+8);
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-	tilemap_draw(bitmap, &myclip,bg_tilemap,0,0);
-
-	toprollr_draw_big_sprite(machine, bitmap, &myclip, PRIORITY_UNDER);
-
-	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
+	/* draw the "big sprite" over the regular sprites */
+	if ((cclimber_bigsprite_control[1] & 0x20))
 	{
-		int sx,sy,flipx,flipy,palette;
-
-		sx = spriteram[offs + 3]-8;
-		sy = 240 - spriteram[offs + 2];
-		flipx = spriteram[offs] & 0x40;
-		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get())
-		{
-			sx = 240 - sx;
-			flipx = !flipx;
-		}
-		if (flip_screen_y_get())
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		palette=0x08+(spriteram[offs + 1] & 0x0f);
-
-		drawgfx(bitmap,machine->gfx[2],
-			(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20)+8*(spriteram[offs + 1] & 0x10),
-				palette,
-				flipx,flipy,
-				sx,sy,
-				&myclip,TRANSPARENCY_PEN,0);
+		cclimber_draw_sprites(bitmap, machine->gfx, &scroll_area_clip);
+		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
 	}
 
-	toprollr_draw_big_sprite(machine, bitmap, &myclip, PRIORITY_OVER);
+	/* draw the "big sprite" under the regular sprites */
+	else
+	{
+		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
+		cclimber_draw_sprites(bitmap, machine->gfx, &scroll_area_clip);
+	}
 
-	for(y=0;y<32;y++)
-		for(x=0;x<32;x++)
-		{
-			int sx=x*8;
-			int sy=y*8;
-			int flipx=0;
-			int flipy=0;
+	tilemap_mark_all_tiles_dirty(pf_tilemap);
+	tilemap_set_flip(pf_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |
+								 (CCLIMBER_FLIP_Y ? TILEMAP_FLIPY : 0));
+	tilemap_draw(bitmap, cliprect, pf_tilemap, 0, 0);
 
-			int code=videoram[y*32+x];
-			int attr=(x>16)?(toprollr_videoram2[(y&0xfe)*32+x]):(toprollr_videoram2[y*32+x]);
-			int palette;
-
-			if (flip_screen_x_get())
-			{
-				sx = 240 - sx;
-				flipx^=1;
-			}
-			if (flip_screen_y_get())
-			{
-				sy = 240 - sy;
-				flipy^=1;
-			}
-
-			palette=8+(attr&0xf);
-			drawgfx(bitmap, machine->gfx[0], code+((attr&0xf0)<<4),palette, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
-
-		}
 	return 0;
 }
-
-
-
