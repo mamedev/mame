@@ -503,7 +503,7 @@ static MACHINE_DRIVER_START( omegrace )
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 
-	MDRV_VIDEO_START(dvg_omegrace)
+	MDRV_VIDEO_START(dvg)
 	MDRV_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
@@ -561,6 +561,26 @@ ROM_START( deltrace )
 ROM_END
 
 
+/*************************************
+ *
+ *  Game specific initalization
+ *
+ *************************************/
+
+static DRIVER_INIT( omegrace )
+{
+	int i;
+	UINT8 *prom = memory_region(REGION_USER1);
+
+	/* Omega Race has two pairs of the state PROM output
+	 * lines swapped before going into the decoder.
+	 * Since all other avg/dvg games connect the PROM
+	 * in a consistent way to the decoder, we swap the bits
+	 * here. */
+	for (i=0; i<memory_region_length(REGION_USER1); i++)
+		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
+}
+
 
 /*************************************
  *
@@ -568,5 +588,5 @@ ROM_END
  *
  *************************************/
 
-GAMEL(1981, omegrace, 0,        omegrace, omegrace, 0, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL, layout_hoffe457 )
-GAMEL(1981, deltrace, omegrace, omegrace, omegrace, 0, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL, layout_hoffe457 )
+GAMEL(1981, omegrace, 0,        omegrace, omegrace, omegrace, ROT0, "Midway",         "Omega Race", GAME_NO_COCKTAIL, layout_hoffe457 )
+GAMEL(1981, deltrace, omegrace, omegrace, omegrace, omegrace, ROT0, "Allied Leisure", "Delta Race", GAME_NO_COCKTAIL, layout_hoffe457 )
