@@ -17,6 +17,7 @@ void avg_set_flip_x(int flip);
 void avg_set_flip_y(int flip);
 
 VIDEO_START( dvg );
+VIDEO_START( dvg_omegrace );
 VIDEO_START( avg );
 VIDEO_START( avg_tempest );
 VIDEO_START( avg_mhavoc );

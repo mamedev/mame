@@ -1485,6 +1485,23 @@ VIDEO_START( dvg )
 	VIDEO_START_CALL(vector);
 }
 
+VIDEO_START( dvg_omegrace )
+{
+	int i;
+	UINT8 *prom = memory_region(REGION_USER1);
+
+	/* Omega Race has two pairs of the state PROM output
+	 * lines swapped before going into the decoder.
+	 * Since all other avg/dvg games connect the PROM
+	 * in a consistent way to the decoder, we swap the bits
+	 * here. */
+	for (i=0; i < 256; i++)
+		prom[i] = ((prom[i] & 0x3) << 2) |
+			((prom[i] & 0xc) >> 2);
+	
+	VIDEO_START_CALL(dvg);
+}
+
 VIDEO_START( avg )
 {
 	vgc = &avg_default;
