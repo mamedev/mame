@@ -404,7 +404,9 @@ static const mc6845_interface mc6845_intf =
 	NULL,             /* before pixel update callback */
 	NULL,             /* row update callback */
 	NULL,             /* after pixel update callback */
-	NULL              /* call back for display state changes */
+	NULL,             /* callback for display state changes */
+	NULL,			  /* HSYNC callback */
+	NULL			  /* VSYNC callback */
 };
 
 

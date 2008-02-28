@@ -288,7 +288,7 @@ static WRITE8_HANDLER( flipscreen_w )
 }
 
 
-static void *nyny_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static MC6845_BEGIN_UPDATE( begin_update )
 {
 	/* create the pens */
 	offs_t i;
@@ -303,8 +303,7 @@ static void *nyny_begin_update(running_machine *machine, mc6845_t *mc6845, mame_
 }
 
 
-static void nyny_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-							UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
 {
 	UINT8 cx;
 
@@ -373,7 +372,7 @@ INLINE void shift_star_generator(void)
 }
 
 
-static void nyny_end_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect, void *param)
+static MC6845_END_UPDATE( end_update )
 {
 	/* draw the star field into the bitmap */
 	int y;
@@ -409,7 +408,7 @@ static void nyny_end_update(running_machine *machine, mc6845_t *mc6845, mame_bit
 }
 
 
-static void nyny_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
 	TTL74123_A_w(0, display_enabled);
 }
@@ -417,13 +416,15 @@ static void nyny_display_enable_changed(running_machine *machine, mc6845_t *mc68
 
 static const mc6845_interface mc6845_intf =
 {
-	0,							/* screen we are acting on */
-	CRTC_CLOCK, 				/* the clock (pin 21) of the chip */
-	8,							/* number of pixels per video memory address */
-	nyny_begin_update,			/* before pixel update callback */
-	nyny_update_row,			/* row update callback */
-	nyny_end_update,			/* after pixel update callback */
-	nyny_display_enable_changed	/* call back for display state changes */
+	0,						/* screen we are acting on */
+	CRTC_CLOCK, 			/* the clock (pin 21) of the chip */
+	8,						/* number of pixels per video memory address */
+	begin_update,			/* before pixel update callback */
+	update_row,				/* row update callback */
+	end_update,				/* after pixel update callback */
+	display_enable_changed,	/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	NULL					/* VSYNC callback */
 };
 
 

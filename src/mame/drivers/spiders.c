@@ -434,7 +434,7 @@ static WRITE8_HANDLER( flipscreen_w )
 }
 
 
-static void *begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static MC6845_BEGIN_UPDATE( begin_update )
 {
 	/* create the pens */
 	offs_t i;
@@ -449,8 +449,7 @@ static void *begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitma
 }
 
 
-static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-					   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
 {
 	UINT8 cx;
 
@@ -509,7 +508,7 @@ static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *
 }
 
 
-static void display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
 	TTL74123_A_w(0, display_enabled);
 }
@@ -523,7 +522,9 @@ static const mc6845_interface mc6845_intf =
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
 	0,						/* after pixel update callback */
-	display_enable_changed	/* call back for display state changes */
+	display_enable_changed,	/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	NULL					/* VSYNC callback */
 };
 
 

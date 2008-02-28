@@ -19,20 +19,9 @@
  *
  *************************************/
 
-static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled);
-
-static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
-
-static void qix_update_row(running_machine *machine,
-						   mc6845_t *mc6845,
-						   mame_bitmap *bitmap,
-						   const rectangle *cliprect,
-						   UINT16 ma,
-						   UINT8 ra,
-						   UINT16 y,
-						   UINT8 x_count,
-						   INT8 cursor_x,
-						   void *param);
+static MC6845_BEGIN_UPDATE( begin_update );
+static MC6845_UPDATE_ROW( update_row );
+static MC6845_ON_DE_CHANGED( display_enable_changed );
 
 
 
@@ -67,7 +56,7 @@ static VIDEO_START( qix )
  *
  *************************************/
 
-static void qix_display_enable_changed(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
 	qix_state *state = machine->driver_data;
 
@@ -335,7 +324,7 @@ static WRITE8_HANDLER( qix_mc6845_register_w )
  *
  *************************************/
 
-static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+static MC6845_BEGIN_UPDATE( begin_update )
 {
 	qix_state *state = machine->driver_data;
 
@@ -353,8 +342,8 @@ static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_b
 }
 
 
-static void qix_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+static MC6845_UPDATE_ROW( update_row )
+
 {
 	qix_state *state = machine->driver_data;
 	UINT16 x;
@@ -460,13 +449,15 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,							/* screen we are acting on */
-	QIX_CHARACTER_CLOCK, 		/* the clock (pin 21) of the chip */
-	8,							/* number of pixels per video memory address */
-	qix_begin_update,			/* before pixel update callback */
-	qix_update_row,				/* row update callback */
-	0,							/* after pixel update callback */
-	qix_display_enable_changed	/* call back for display state changes */
+	0,						/* screen we are acting on */
+	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
+	8,						/* number of pixels per video memory address */
+	begin_update,			/* before pixel update callback */
+	update_row,				/* row update callback */
+	NULL,					/* after pixel update callback */
+	display_enable_changed,	/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	NULL					/* VSYNC callback */
 };
 
 

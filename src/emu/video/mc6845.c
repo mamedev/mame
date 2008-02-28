@@ -52,7 +52,9 @@ struct _mc6845_t
 	UINT16	cursor;
 	UINT16	light_pen;
 
-	emu_timer *display_enable_changed_timer;
+	emu_timer *de_changed_timer;
+	emu_timer *hsync_timer;
+	emu_timer *vsync_timer;
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
 
@@ -63,6 +65,8 @@ struct _mc6845_t
 	UINT16	last_vert_total;
 	UINT16	last_max_x;
 	UINT16	last_max_y;
+	UINT16	last_hsync_pos;
+	UINT16	last_vsync_pos;
 	UINT16  current_ma;		/* the MA address currently drawn */
 	int		has_valid_parameters;
 };
@@ -70,8 +74,12 @@ struct _mc6845_t
 
 static void mc6845_state_save_postload(void *param);
 static void configure_screen(mc6845_t *mc6845, int postload);
-static void update_timer(mc6845_t *mc6845);
-static TIMER_CALLBACK( display_enable_changed_timer_cb );
+static void update_de_changed_timer(mc6845_t *mc6845);
+static void update_hsync_timer(mc6845_t *mc6845);
+static void update_vsync_timer(mc6845_t *mc6845);
+static TIMER_CALLBACK( de_changed_timer_cb );
+static TIMER_CALLBACK( vsync_timer_cb );
+static TIMER_CALLBACK( hsync_timer_cb );
 
 
 static void mc6845_state_save_postload(void *param)
@@ -140,6 +148,7 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 			break;
 		case 2:
 			mc6845->horiz_sync_pos = data;
+			call_configure_screen = TRUE;
 			break;
 		case 3:
 			mc6845->sync_width = data & 0x0f;
@@ -158,6 +167,7 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 			break;
 		case 7:
 			mc6845->vert_sync_pos = data & 0x7f;
+			call_configure_screen = TRUE;
 			break;
 		case 8:
 			mc6845->intl_skew = data & 0x03;
@@ -215,13 +225,20 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 		UINT16 max_x = mc6845->horiz_disp * mc6845->intf->hpixels_per_column - 1;
 		UINT16 max_y = mc6845->vert_disp * (mc6845->max_ras_addr + 1) - 1;
 
+		/* determine the syncing positions */
+		UINT16 hsync_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
+		UINT16 vsync_pos = mc6845->vert_sync_pos * (mc6845->max_ras_addr + 1);
+
 		/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 		if (postload ||
 		    (horiz_total != mc6845->last_horiz_total) || (vert_total != mc6845->last_vert_total) ||
-			(max_x != mc6845->last_max_x) || (max_y != mc6845->last_max_y))
+			(max_x != mc6845->last_max_x) || (max_y != mc6845->last_max_y) ||
+			(hsync_pos != mc6845->last_hsync_pos) || (vsync_pos != mc6845->last_vsync_pos))
 		{
 			/* update the screen only if we have valid data */
-			if ((mc6845->horiz_total > 0) && (max_x < horiz_total) && (mc6845->vert_total > 0) && (max_y < vert_total))
+			if ((horiz_total > 0) && (max_x < horiz_total) &&
+				(vert_total > 0) && (max_y < vert_total) &&
+				(hsync_pos < horiz_total) && (vsync_pos < vert_total))
 			{
 				rectangle visarea;
 
@@ -232,8 +249,8 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 				visarea.max_x = max_x;
 				visarea.max_y = max_y;
 
-				if (LOG) logerror("M6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  FPS: %f\n",
-								  horiz_total, vert_total, max_x, max_y, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+				if (LOG) logerror("M6845 config screen: HTOTAL: %x  VTOTAL: %x  MAX_X: %x  MAX_Y: %x  HSYNC: %x  VSYNC: %x  FPS: %f\n",
+								  horiz_total, vert_total, max_x, max_y, hsync_pos, vsync_pos, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
 				video_screen_configure(mc6845->intf->scrnum, horiz_total, vert_total, &visarea, refresh);
 
@@ -246,8 +263,12 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 			mc6845->last_vert_total = vert_total;
 			mc6845->last_max_x = max_x;
 			mc6845->last_max_y = max_y;
+			mc6845->last_hsync_pos = hsync_pos;
+			mc6845->last_vsync_pos = vsync_pos;
 
-			update_timer(mc6845);
+			update_de_changed_timer(mc6845);
+			update_hsync_timer(mc6845);
+			update_vsync_timer(mc6845);
 		}
 	}
 }
@@ -262,19 +283,17 @@ static int is_display_enabled(mc6845_t *mc6845)
 }
 
 
-static void update_timer(mc6845_t *mc6845)
+static void update_de_changed_timer(mc6845_t *mc6845)
 {
-	INT16 next_y;
-	UINT16 next_x;
-	attotime duration;
-
-	if (mc6845->has_valid_parameters && (mc6845->display_enable_changed_timer != 0))
+	if (mc6845->has_valid_parameters && (mc6845->de_changed_timer != NULL))
 	{
+		INT16 next_y;
+		UINT16 next_x;
+		attotime duration;
+
+		/* we are in a display region, get the location of the next blanking start */
 		if (is_display_enabled(mc6845))
 		{
-			/* we are in a display region,
-               get the location of the next blanking start */
-
 			/* normally, it's at end the current raster line */
 			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
 			next_x = mc6845->last_max_x + 1;
@@ -291,10 +310,10 @@ static void update_timer(mc6845_t *mc6845)
 					next_y = -1;
 			}
 		}
+
+		/* we are in a blanking region, get the location of the next display start */
 		else
 		{
-			/* we are in a blanking region,
-               get the location of the next display start */
 			next_x = 0;
 			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->last_vert_total;
 
@@ -309,19 +328,71 @@ static void update_timer(mc6845_t *mc6845)
 		else
 			duration = attotime_never;
 
-		timer_adjust_oneshot(mc6845->display_enable_changed_timer, duration, 0);
+		timer_adjust_oneshot(mc6845->de_changed_timer, duration, 0);
 	}
 }
 
 
-static TIMER_CALLBACK( display_enable_changed_timer_cb )
+static void update_hsync_timer(mc6845_t *mc6845)
+{
+	if (mc6845->has_valid_parameters && (mc6845->hsync_timer != NULL))
+	{
+		UINT16 next_y;
+
+		/* we are before the HSYNC position, we trigger on the current line */
+		if (video_screen_get_hpos(mc6845->intf->scrnum) < mc6845->last_hsync_pos)
+			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
+
+		/* trigger on the next line */
+		else
+			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->last_vert_total;
+
+		/* if the next line is not in the visible region, go to the beginning of the screen */
+		if (next_y > mc6845->last_max_y)
+			next_y = 0;
+
+		timer_adjust_oneshot(mc6845->hsync_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->last_hsync_pos), 0);
+	}
+}
+
+
+static void update_vsync_timer(mc6845_t *mc6845)
+{
+	if (mc6845->has_valid_parameters && (mc6845->vsync_timer != NULL))
+		timer_adjust_oneshot(mc6845->vsync_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->last_vsync_pos, 0), 0);
+}
+
+
+static TIMER_CALLBACK( de_changed_timer_cb )
 {
 	mc6845_t *mc6845 = ptr;
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->display_enable_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
+	mc6845->intf->on_de_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
 
-	update_timer(mc6845);
+	update_de_changed_timer(mc6845);
+}
+
+
+static TIMER_CALLBACK( vsync_timer_cb )
+{
+	mc6845_t *mc6845 = ptr;
+
+	/* call the callback function -- we know it exists */
+	mc6845->intf->on_vsync(mc6845->machine, mc6845);
+
+	update_vsync_timer(mc6845);
+}
+
+
+static TIMER_CALLBACK( hsync_timer_cb )
+{
+	mc6845_t *mc6845 = ptr;
+
+	/* call the callback function -- we know it exists */
+	mc6845->intf->on_hsync(mc6845->machine, mc6845);
+
+	update_hsync_timer(mc6845);
 }
 
 
@@ -477,10 +548,18 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	mc6845->machine = machine;
 	mc6845->intf = static_config;
 
-	/* create the timer if the user is interested in getting display enable
-       notifications */
-	if (mc6845->intf && mc6845->intf->display_enable_changed)
-		mc6845->display_enable_changed_timer = timer_alloc(display_enable_changed_timer_cb, mc6845);
+	/* create the timers for the various pin notifications */
+	if (mc6845->intf)
+	{
+		if (mc6845->intf->on_de_changed)
+			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, mc6845);
+
+		if (mc6845->intf->on_hsync)
+			mc6845->hsync_timer = timer_alloc(hsync_timer_cb, mc6845);
+
+		if (mc6845->intf->on_vsync)
+			mc6845->vsync_timer = timer_alloc(vsync_timer_cb, mc6845);
+	}
 
 	/* register for state saving */
 	state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
