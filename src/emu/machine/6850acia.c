@@ -389,6 +389,15 @@ static TIMER_CALLBACK( transmit_event )
 	int which = param;
 	acia_6850 *acia_p = &acia[which];
 
+	if (acia_p->cts_pin && *acia_p->cts_pin)
+	{
+		acia_p->status |= ACIA6850_STATUS_CTS;
+	}
+	else
+	{
+		acia_p->status &= ~ACIA6850_STATUS_CTS;
+	}
+
 	switch (acia_p->tx_state)
 	{
 		case START:

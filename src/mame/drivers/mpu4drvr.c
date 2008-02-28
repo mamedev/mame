@@ -306,8 +306,8 @@ static void m68k_acia_irq(int state)
 
 static const struct acia6850_interface m6809_acia_if =
 {
-	MPU4_MASTER_CLOCK/44,//This isn't a real division, this is just to work around
-	MPU4_MASTER_CLOCK/44,//the ACIA code's hard coding
+	1,//This isn't a real division, this is just to work around
+	1,//the ACIA code's hard coding
 	&m68k_m6809_line,
 	&m6809_m68k_line,
 	&m6809_acia_cts,
@@ -318,8 +318,8 @@ static const struct acia6850_interface m6809_acia_if =
 
 static const struct acia6850_interface m68k_acia_if =
 {
-	MPU4_MASTER_CLOCK/44,
-	MPU4_MASTER_CLOCK/44,
+	1,
+	1,
 	&m6809_m68k_line,
 	&m68k_m6809_line,
 	&m68k_acia_cts,
@@ -336,24 +336,28 @@ static void cpu1_ptm_irq(int state)
 
 static WRITE8_HANDLER( vid_o1_callback )
 {
+	int clock;
+
 	ptm6840_set_c2(   1, data); // copy output value to c2
-}
 
-static WRITE8_HANDLER( vid_o2_callback )
-{
-	int clock  = ptm6840_get_ext_clock(1, 1)/(ptm6840_get_count(1,1)?ptm6840_get_count(1,1):1)
-	*ptm6840_get_ext_clock(1, 0)/(ptm6840_get_count(1,0)?ptm6840_get_count(1,0):1)
-	*ptm6840_get_ext_clock(1, 2)/(ptm6840_get_count(1,2)?ptm6840_get_count(1,2):1);
-
-	ptm6840_set_c3(   1, data); // copy output value to c3
-
-	if (clock)
+	if (data)
 	{
+		clock = MPU4_MASTER_CLOCK/44;
+		LOGSTUFF(("acia on for %d cycles \n",ptm6840_get_count(1,0)));
+	}
+	else
+	{
+		clock = 1; //as low as we can go, ideally we need to switch the ACIAs off
+	}
 		acia6850_set_rx_clock(0, clock);
 		acia6850_set_tx_clock(0, clock);
 		acia6850_set_rx_clock(1, clock);
 		acia6850_set_tx_clock(1, clock);
-	}
+}
+
+static WRITE8_HANDLER( vid_o2_callback )
+{
+	ptm6840_set_c3(   1, data); // copy output value to c3
 }
 
 static WRITE8_HANDLER( vid_o3_callback )
@@ -365,7 +369,7 @@ static WRITE8_HANDLER( vid_o3_callback )
 static const ptm6840_interface ptm_vid_intf =
 {
 	VIDEO_MASTER_CLOCK/10,
-	{ MPU4_MASTER_CLOCK/4,0,0 },
+	{ 0,0,0 },
 	{ vid_o1_callback, vid_o2_callback, vid_o3_callback },
 	cpu1_ptm_irq
 };
@@ -685,7 +689,15 @@ static void scn2674_write_command(UINT8 data)
 	if (data==0x00)
 	{
 		// master reset
-		LOGSTUFF(("master reset %02x\n",data));
+		LOGSTUFF(("master reset\n"));
+		scn2675_IR_pointer=0;
+		scn2674_irq_register = 0x20;
+		scn2674_status_register = 0x20;
+		scn2674_irq_mask = 0x20;
+		scn2674_gfx_enabled = 0;
+		scn2674_display_enabled = 0;
+		scn2674_cursor_enabled = 0;
+		IR2_scn2674_row_table = 0;
 	}
 
 	if ((data&0xf0)==0x10)
@@ -1662,7 +1674,7 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)	// 6809 CPU
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)					// setup read and write memorymap
 
-	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)	// generate 50 hz signal
+	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)					// generate 50 hz signal
 
 	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
 
@@ -1670,14 +1682,14 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)					// load/save nv RAM
+	MDRV_NVRAM_HANDLER(generic_0fill)						// load/save nv RAM
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)		/* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from MC6845 init, registers 01 & 06 */
+	MDRV_SCREEN_REFRESH_RATE(56)							//Measured accurately from the flip-flop
 
 	MDRV_VIDEO_START( dealem)
 	MDRV_GFXDECODE(dealem)
@@ -1969,17 +1981,17 @@ GAME( 1987, dealem,	 0,		  dealem,	dealem,   0,	 ROT0,   "Zenitone", 		"Deal 'Em
 
 GAME( 199?, bctvidbs,0,       mpu4mod2, mpu4,     0,	 ROT0,   "Barcrest", 		"MPU4 Video Firmware",												GAME_IS_BIOS_ROOT )
 
-GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze: Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1994?,crmaze,  bctvidbs,mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze Team Challenge (SWP)",							GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1992?,crmazea, crmaze,  mpu4_vid, crmaze,   crmaze,ROT0,   "Barcrest", 		"The Crystal Maze (AMLD Version)",									GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The New Crystal Maze - Now Featuring Ocean Zone! (AMLD Version)",	GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1993?,crmazeb, crmaze,  mpu4_vid, crmaze,   0,     ROT0,   "Barcrest", 		"The New Crystal Maze Featuring Ocean Zone (AMLD Version)",			GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1990, turnover,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Turnover",															GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 1992, skiltrek,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Skill Trek",														GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
-GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine v2.0",												GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
+GAME( 1990, timemchn,bctvidbs,mpu4_vid, mpu4,     0,     ROT0,   "Barcrest", 		"Time Machine (v2.0)",												GAME_NOT_WORKING|GAME_NO_SOUND ) // unprotected?
 GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Datapak)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, vgpoker, 0,		  vgpoker,	mpu4,     0,	 ROT0,   "BwB",				"Vegas Poker (Prototype)",											GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,   "Dolbeck Systems", 	"Connect 4",														GAME_IMPERFECT_GRAPHICS,layout_connect4 )
-GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 4)",										0 )
-GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 2)",										0 )
-GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,   "Barcrest", 		"MPU4 Meter Clear ROM",												0 )
+GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,   "Dolbeck Systems", 	"Connect 4",													GAME_IMPERFECT_GRAPHICS,layout_connect4 )
+GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 4)",									0 )
+GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 2)",									0 )
+GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,   "Barcrest", 		"MPU4 Meter Clear ROM",											0 )
