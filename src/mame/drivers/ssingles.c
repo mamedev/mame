@@ -48,7 +48,7 @@ static const UINT8 ssingles_colors[NUM_PENS*3]=
 };
 
 static void update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
+		UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	int cx,x;
 	UINT32 tile_address;

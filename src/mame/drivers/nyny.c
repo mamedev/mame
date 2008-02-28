@@ -304,7 +304,7 @@ static void *nyny_begin_update(running_machine *machine, mc6845_t *mc6845, mame_
 
 
 static void nyny_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-							UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
+							UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	UINT8 cx;
 

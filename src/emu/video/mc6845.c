@@ -53,6 +53,8 @@ struct _mc6845_t
 	UINT16	light_pen;
 
 	emu_timer *display_enable_changed_timer;
+	UINT8	cursor_state;	/* 0 = off, 1 = on */
+	UINT8	cursor_count;
 
 	/* saved screen parameters so we don't call
        video_screen_configure() unneccessarily.
@@ -373,6 +375,38 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 }
 
 
+
+static void update_cursor_state(mc6845_t *mc6845)
+{
+	/* save and increment cursor counter */
+	UINT8 old_count = mc6845->cursor_count;
+	mc6845->cursor_count = mc6845->cursor_count + 1;
+
+	/* switch on cursor blinking mode */
+	switch (mc6845->cursor_start_ras & 0x60)
+	{
+		/* always on */
+		case 0x00: mc6845->cursor_state = TRUE; break;
+
+		/* always off */
+		default:
+		case 0x20: mc6845->cursor_state = FALSE; break;
+
+		/* fast blink */
+		case 0x40:
+			if ((old_count & 0x10) != (mc6845->cursor_count & 0x10))
+				mc6845->cursor_state = !mc6845->cursor_state;
+			break;
+
+		/* slow blink */
+		case 0x60:
+			if ((old_count & 0x20) != (mc6845->cursor_count & 0x20))
+				mc6845->cursor_state = !mc6845->cursor_state;
+			break;
+	}
+}
+
+
 void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
 {
 	if (mc6845->has_valid_parameters)
@@ -380,22 +414,38 @@ void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *clipr
 		UINT16 y;
 
 		/* call the set up function if any */
-		void *param = 0;
+		void *param = NULL;
 
 		if (mc6845->intf->begin_update)
 			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
 
-		/* read the start address at the beginning of the frame */
 		if (cliprect->min_y == 0)
+		{
+			/* read the start address at the beginning of the frame */
 			mc6845->current_ma = mc6845->start_addr;
+
+			/* also update the cursor state here */
+			update_cursor_state(mc6845);
+		}
 
 		/* for each row in the visible region */
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
+			/* compute the current raster line */
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
 
+			/* check if the cursor is visible and is on this scanline */
+			int cursor_visible = mc6845->cursor_state &&
+							 	(ra >= (mc6845->cursor_start_ras & 0x1f)) &&
+							 	(ra <= mc6845->cursor_end_ras) &&
+							 	(mc6845->cursor >= mc6845->current_ma) &&
+							 	(mc6845->cursor < (mc6845->current_ma + mc6845->horiz_disp));
+
+			/* compute the cursor x position, or -1 if not visible */
+			INT8 cursor_x = cursor_visible ? (mc6845->cursor - mc6845->current_ma) : -1;
+
 			/* call the external system to draw it */
-			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, param);
+			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, cursor_x, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -453,6 +503,8 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->start_addr);
 	state_save_register_item(unique_tag, 0, mc6845->cursor);
 	state_save_register_item(unique_tag, 0, mc6845->light_pen);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
+	state_save_register_item(unique_tag, 0, mc6845->cursor_count);
 
 	return mc6845;
 }
@@ -483,7 +535,7 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
 		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.5";						break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}

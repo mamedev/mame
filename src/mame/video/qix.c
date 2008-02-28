@@ -31,6 +31,7 @@ static void qix_update_row(running_machine *machine,
 						   UINT8 ra,
 						   UINT16 y,
 						   UINT8 x_count,
+						   INT8 cursor_x,
 						   void *param);
 
 
@@ -353,7 +354,7 @@ static void *qix_begin_update(running_machine *machine, mc6845_t *mc6845, mame_b
 
 
 static void qix_update_row(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect,
-						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param)
+						   UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
 	qix_state *state = machine->driver_data;
 	UINT16 x;

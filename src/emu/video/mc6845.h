@@ -40,9 +40,12 @@ struct _mc6845_interface
 						   mame_bitmap *bitmap, const rectangle *cliprect);
 
 	/* this gets called for every row, the driver must output
-       x_count * hpixels_per_column pixels */
+       x_count * hpixels_per_column pixels.
+       cursor_x indicates the character position where the cursor is, or -1
+       if there is no cursor on this row */
 	void (*update_row)(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap,
-					   const rectangle *cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, void *param);
+					   const rectangle *cliprect, UINT16 ma, UINT8 ra,
+					   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
 	/* if specified, this gets called after all row updating is complete */
 	void (*end_update)(running_machine *machine, mc6845_t *mc6845,
