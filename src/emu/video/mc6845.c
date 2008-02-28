@@ -50,7 +50,7 @@ struct _mc6845_t
 	UINT8	cursor_end_ras;
 	UINT16	start_addr;
 	UINT16	cursor_addr;
-	UINT16	light_pen;
+	UINT16	light_pen_addr;
 
 	emu_timer *de_changed_timer;
 	emu_timer *hsync_on_timer;
@@ -98,6 +98,8 @@ static void mc6845_state_save_postload(void *param)
 
 void mc6845_address_w(mc6845_t *mc6845, UINT8 data)
 {
+	assert(mc6845 != NULL);
+
 	mc6845->address_latch = data & 0x1f;
 }
 
@@ -106,15 +108,17 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 {
 	UINT8 ret = 0;
 
+	assert(mc6845 != NULL);
+
 	switch (mc6845->address_latch)
 	{
 		/* 0x0c and 0x0d - Motorola device only */
-		case 0x0c:  ret = (mc6845->start_addr  >> 8) & 0xff; break;
-		case 0x0d:  ret = (mc6845->start_addr  >> 0) & 0xff; break;
-		case 0x0e:  ret = (mc6845->cursor_addr >> 8) & 0xff; break;
-		case 0x0f:  ret = (mc6845->cursor_addr >> 0) & 0xff; break;
-		case 0x10:  ret = (mc6845->light_pen   >> 8) & 0xff; break;
-		case 0x11:  ret = (mc6845->light_pen   >> 0) & 0xff; break;
+		case 0x0c:  ret = (mc6845->start_addr     >> 8) & 0xff; break;
+		case 0x0d:  ret = (mc6845->start_addr     >> 0) & 0xff; break;
+		case 0x0e:  ret = (mc6845->cursor_addr    >> 8) & 0xff; break;
+		case 0x0f:  ret = (mc6845->cursor_addr    >> 0) & 0xff; break;
+		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; break;
+		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -127,6 +131,8 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 {
 	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
+
+	assert(mc6845 != NULL);
 
 	switch (mc6845->address_latch)
 	{
@@ -366,15 +372,14 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 }
 
 
-UINT16 mc6845_get_ma(mc6845_t *mc6845)
+
+static UINT16 get_ma_for_yx(mc6845_t *mc6845, int y, int x)
 {
 	UINT16 ret;
 
 	if (mc6845->has_valid_parameters)
 	{
-		/* get the current raster positions and clamp them to the visible region */
-		int y = video_screen_get_vpos(0);
-		int x = video_screen_get_hpos(0);
+		/* clamp Y/X to the visible region */
 
 		/* since the MA counter stops in the blanking regions, if we are in a
            VBLANK, both X and Y are at their max */
@@ -385,8 +390,28 @@ UINT16 mc6845_get_ma(mc6845_t *mc6845)
 			y = mc6845->last_max_y;
 
 		ret = (mc6845->start_addr +
-			   (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
-			   (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
+			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
+			  (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
+	}
+	else
+		ret = 0;
+
+	return ret;
+}
+
+
+UINT16 mc6845_get_ma(mc6845_t *mc6845)
+{
+	UINT16 ret;
+
+	assert(mc6845 != NULL);
+
+	if (mc6845->has_valid_parameters)
+	{
+		int y = video_screen_get_vpos(mc6845->intf->scrnum);
+		int x = video_screen_get_hpos(mc6845->intf->scrnum);
+
+		ret = get_ma_for_yx(mc6845, y, x);
 	}
 	else
 		ret = 0;
@@ -399,10 +424,12 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 {
 	UINT8 ret;
 
+	assert(mc6845 != NULL);
+
 	if (mc6845->has_valid_parameters)
 	{
 		/* get the current vertical raster position and clamp it to the visible region */
-		int y = video_screen_get_vpos(0);
+		int y = video_screen_get_vpos(mc6845->intf->scrnum);
 
 		if (y > mc6845->last_max_y)
 			y = mc6845->last_max_y;
@@ -415,6 +442,19 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 	return ret;
 }
 
+
+void mc6845_assert_light_pen_input(mc6845_t *mc6845)
+{
+	int y, x;
+
+	assert(mc6845 != NULL);
+
+	/* the light pen address register gets latched on the NEXT display address change */
+	y = video_screen_get_vpos(mc6845->intf->scrnum);
+	x = video_screen_get_hpos(mc6845->intf->scrnum) + mc6845->intf->hpixels_per_column;
+
+	mc6845->light_pen_addr = get_ma_for_yx(mc6845, y, x);
+}
 
 
 static void update_cursor_state(mc6845_t *mc6845)
@@ -561,7 +601,7 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->cursor_end_ras);
 	state_save_register_item(unique_tag, 0, mc6845->start_addr);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_addr);
-	state_save_register_item(unique_tag, 0, mc6845->light_pen);
+	state_save_register_item(unique_tag, 0, mc6845->light_pen_addr);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
 
