@@ -540,3 +540,15 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
+
+
+void r6545_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "R6545";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "R6545 CRTC";					break;
+		default: mc6845_get_info(machine, token, state, info);									break;
+	}
+}

@@ -25,6 +25,7 @@ typedef struct _mc6845_t mc6845_t;
 typedef struct _mc6845_interface mc6845_interface;
 
 #define MC6845 mc6845_get_info
+#define R6545 r6545_get_info
 
 
 struct _mc6845_interface
@@ -58,6 +59,7 @@ struct _mc6845_interface
 
 /* device interface */
 void mc6845_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+void r6545_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
 
 /* select one of the registers for reading or writing */
 void mc6845_address_w(mc6845_t *mc6845, UINT8 data);
