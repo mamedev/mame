@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 
 	memset(&v, 0, sizeof(v));
 	build = BUILD_WINDOWS;
-	
+
 	// validate parameters
 	opt = 1;
 	while (opt < argc && *argv[opt] == '-')
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 			return usage(argv[0]);
 		opt++;
 	}
-		
+
 	if (opt != argc-1 )
 	{
 		return usage(argv[0]);
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
 		v.internal_name = "MAMEUI";
 		v.original_filename = "MAMEUI";
 		v.product_name = "MAMEUI";
-	} 
+	}
 	else
 	{
 		// MAME

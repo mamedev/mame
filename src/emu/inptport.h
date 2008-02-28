@@ -791,13 +791,13 @@ struct _ext_inp_header
 
 #define PORT_DIPSETTING(_default,_name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_DIPSETTING, 8, _default, 32), \
-	TOKEN_STRING(_name), 
+	TOKEN_STRING(_name),
 
 /* physical location, of the form: name:[!]sw,[name:][!]sw,... */
 /* note that these are specified LSB-first */
 #define PORT_DIPLOCATION(_location) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPLOCATION, 8), \
-	TOKEN_STRING(_location), 
+	TOKEN_STRING(_location),
 
 /* conditionals for dip switch settings */
 #define PORT_CONDITION(_tag,_mask,_condition,_value) \
@@ -808,7 +808,7 @@ struct _ext_inp_header
 /* analog adjuster definition */
 #define PORT_ADJUSTER(_default,_name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_ADJUSTER, 8, _default, 32), \
-	TOKEN_STRING(_name), 
+	TOKEN_STRING(_name),
 
 /* config definition */
 #define PORT_CONFNAME(_mask,_default,_name) \
@@ -818,7 +818,7 @@ struct _ext_inp_header
 
 #define PORT_CONFSETTING(_default,_name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_CONFSETTING, 8, _default, 32), \
-	TOKEN_STRING(_name), 
+	TOKEN_STRING(_name),
 
 #ifdef MESS
 /* keyboard chars */
@@ -836,7 +836,7 @@ struct _ext_inp_header
 
 #define PORT_CATEGORY_ITEM(_default,_name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32), \
-	TOKEN_STRING(_name), 
+	TOKEN_STRING(_name),
 #endif /* MESS */
 
 

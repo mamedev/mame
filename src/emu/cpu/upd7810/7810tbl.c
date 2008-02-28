@@ -3538,7 +3538,7 @@ static const struct opcode_s opXX_7807[256] =
  * uPD7801
  *
  **********************************************************************/
- 
+
 static const struct opcode_s op48_7801[256] =
 {
 	/* 0x00 - 0x1F */
@@ -3645,7 +3645,7 @@ static const struct opcode_s op48_7801[256] =
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
-	
+
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
@@ -4896,7 +4896,7 @@ static const struct opcode_s op48_78c05[256] =
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
-	
+
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
@@ -5022,7 +5022,7 @@ static const struct opcode_s op4C_78c05[256] =
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
-	
+
 	/* 0x80 - 0x9F */
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
 	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
@@ -6146,7 +6146,7 @@ static const struct opcode_s op48_78c06[256] =
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
-	
+
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
@@ -6272,7 +6272,7 @@ static const struct opcode_s op4C_78c06[256] =
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
-	
+
 	/* 0x80 - 0x9F */
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
 	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},

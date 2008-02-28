@@ -1935,7 +1935,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 	while (entrytype != INPUT_TOKEN_END)
 	{
 		UINT32 mask, defval, type, val;
-		
+
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(ipt, entrytype, 8);
 		switch (entrytype)

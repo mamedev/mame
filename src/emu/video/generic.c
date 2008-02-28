@@ -495,10 +495,10 @@ void flip_screen_set(int on)
 void flip_screen_set_no_update(int on)
 {
 	/* flip_screen_y is not updated on purpose
-	 * this function is for drivers which
-	 * where writing to flip_screen_x to
-	 * bypass update_flip
-	 */
+     * this function is for drivers which
+     * where writing to flip_screen_x to
+     * bypass update_flip
+     */
 	flip_screen_x = on;
 }
 

@@ -353,10 +353,10 @@ static MACHINE_DRIVER_START( bionicc )
 	MDRV_CPU_ADD(Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	/* FIXME: interrupt timing
-	 * schematics indicate that nmi_line is set on  M680000 access with AB1=1 
-	 * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics 
-	 */
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)	
+     * schematics indicate that nmi_line is set on  M680000 access with AB1=1
+     * and IOCS=0 (active low), see pages A-1/10, A-4/10 in schematics
+     */
+	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

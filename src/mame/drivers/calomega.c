@@ -178,7 +178,7 @@
  * 903d | System 903 Diag.PROM     |  903   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
  * 905d | System 905 Diag.PROM     |  905   | unknown | any      | unknown | any      | unknown | Testing H/W   | Yes  | OK   | Yes
 
-  
+
    (*) Not in the original list.
 
 
@@ -411,7 +411,7 @@
         Game 24.6 (Hotline)
         Game 27.2 (Keno, amusement)
         Game 27.2 (Keno, gaming)
-        System 903 Diag.PROM 
+        System 903 Diag.PROM
         System 905 Diag.PROM
         Jackpot Joker Poker (set 1)
         Jackpot Joker Poker (set 2)

@@ -12,7 +12,7 @@ Space Intruder emulation by Lee Taylor (lee@defender.demon.co.uk),
     December 1998.
 
 DIP locations verified for:
-	- astinvad (manual)
+    - astinvad (manual)
 
 ***************************************************************************/
 

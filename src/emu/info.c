@@ -744,7 +744,7 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 		/* and had raw parameters specified                               */
 		if ((scrconfig->type != SCREEN_TYPE_VECTOR) && !scrconfig->defstate.oldstyle_vblank_supplied)
 		{
-			int pixclock = scrconfig->defstate.width * scrconfig->defstate.height 
+			int pixclock = scrconfig->defstate.width * scrconfig->defstate.height
 			  				* ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh);
 
 			fprintf(out, " pixclock=\"%d\"", pixclock);

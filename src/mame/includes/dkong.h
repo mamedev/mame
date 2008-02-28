@@ -97,7 +97,7 @@ struct _dkong_state
 	UINT8	sprite_bank;
 	UINT8	dma_latch;
 	UINT8 	flip;
-	
+
 	/* reverse address lookup map - hunchbkd */
 	INT16 rev_map[0x200];
 

@@ -573,10 +573,10 @@ static DRIVER_INIT( omegrace )
 	UINT8 *prom = memory_region(REGION_USER1);
 
 	/* Omega Race has two pairs of the state PROM output
-	 * lines swapped before going into the decoder.
-	 * Since all other avg/dvg games connect the PROM
-	 * in a consistent way to the decoder, we swap the bits
-	 * here. */
+     * lines swapped before going into the decoder.
+     * Since all other avg/dvg games connect the PROM
+     * in a consistent way to the decoder, we swap the bits
+     * here. */
 	for (i=0; i<memory_region_length(REGION_USER1); i++)
 		prom[i] = BITSWAP8(prom[i],7,6,5,4,1,0,3,2);
 }

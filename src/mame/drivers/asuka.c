@@ -203,11 +203,11 @@ Eto: $76d0 might be a protection check? It reads to and writes from
 the prog rom. Doesn't seem to cause problems though.
 
 DIP locations verified for:
-	- bonzeadv (manual)
-	- cadash (manual)
-	- asuka (manual)
-	- mofflott (manual)
-	- galmedes (manual)
+    - bonzeadv (manual)
+    - cadash (manual)
+    - asuka (manual)
+    - mofflott (manual)
+    - galmedes (manual)
 
 ***************************************************************************/
 
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-//	AM_RANGE(0x9002, 0x9100) AM_READ(MRA8_RAM)
+//  AM_RANGE(0x9002, 0x9100) AM_READ(MRA8_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)

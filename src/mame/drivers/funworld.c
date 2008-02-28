@@ -188,7 +188,7 @@
 
     Impera made 2 graphics sets for this game. One of them is encrypted, and meant for the TAB blue board.
     This board has two HY18CV85 (electrically-erasable PLD) that handle the encryption.
-    In another hand, the sound has some weird things, but is confirmed that happen in the real thing. 
+    In another hand, the sound has some weird things, but is confirmed that happen in the real thing.
 
 
     - Jolly Joker (Impera, 50bet)

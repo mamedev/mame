@@ -788,7 +788,7 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 static void *speaker_output_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
 {
 	speaker_info *info;
-	
+
 	/* allocate memory for the speaker information */
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));

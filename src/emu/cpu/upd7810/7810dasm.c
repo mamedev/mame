@@ -3962,7 +3962,7 @@ static const struct dasm_s  dasmXX_7807[256] =
  * uPD7801
  *
  *********************************************************/
- 
+
 static const struct dasm_s dasm48_7801[256] = {
 	/* 0x00 - 0x3F */
 	{ SKIT, "F0" },		{ SKIT, "FT" },		{ SKIT, "F1" },		{ SKIT, "F2" },
@@ -4567,43 +4567,43 @@ static const struct dasm_s dasm74_7801[256] = {
 
 static const struct dasm_s dasmXX_7801[256] = {
 	/* 0x00 - 0x3F */
-	{ NOP, 0 },			{ HALT, 0 },		{ INX, "SP" },		{ DCX, "SP" },		
-	{ LXI, "SP,%w" },	{ ANIW, "%a,%b" },	{ illegal, 0 },		{ ANI, "A,%b" },	
-	{ RET, 0 },			{ SIO, 0 },			{ MOV, "A,B" },		{ MOV, "A,C" },	
-	{ MOV, "A,D" },		{ MOV, "A,E" },		{ MOV, "A,H" },		{ MOV, "A,L" },	
+	{ NOP, 0 },			{ HALT, 0 },		{ INX, "SP" },		{ DCX, "SP" },
+	{ LXI, "SP,%w" },	{ ANIW, "%a,%b" },	{ illegal, 0 },		{ ANI, "A,%b" },
+	{ RET, 0 },			{ SIO, 0 },			{ MOV, "A,B" },		{ MOV, "A,C" },
+	{ MOV, "A,D" },		{ MOV, "A,E" },		{ MOV, "A,H" },		{ MOV, "A,L" },
 
-	{ EX, 0 },			{ EXX, 0 },			{ INX, "BC" },		{ DCX, "BC" },    
+	{ EX, 0 },			{ EXX, 0 },			{ INX, "BC" },		{ DCX, "BC" },
 	{ LXI, "BC,%w" },	{ ORIW, "%a,%b" },	{ XRI, "A,%b" },	{ ORI, "A,%b" },
 	{ RETS, 0 },		{ STM, 0 },			{ MOV, "B,A" },		{ MOV, "C,A" },
 	{ MOV, "D,A" },		{ MOV, "E,A" },		{ MOV, "H,A" },		{ MOV, "L,A" },
 
-	{ INRW, "%a" },		{ TABLE, 0 },		{ INX, "DE" },		{ DCX, "DE" },    
+	{ INRW, "%a" },		{ TABLE, 0 },		{ INX, "DE" },		{ DCX, "DE" },
 	{ LXI, "DE,%w" },	{ GTIW, "%a,%b" },	{ ADINC, "A,%b" },	{ GTI, "A,%b" },
 	{ LDAW, "%a" },		{ LDAX, "BC" },		{ LDAX, "DE" },		{ LDAX, "HL" },
 	{ LDAX, "DE+" },	{ LDAX, "HL+" },	{ LDAX, "DE-" },	{ LDAX, "HL-" },
 
-	{ DCRW, "%a" },		{ BLOCK, 0 },		{ INX, "HL" },		{ DCX, "HL" },    
+	{ DCRW, "%a" },		{ BLOCK, 0 },		{ INX, "HL" },		{ DCX, "HL" },
 	{ LXI, "HL,%w" },	{ LTIW, "%a,%b" },	{ SUINB, "A,%b" },	{ LTI, "A,%b" },
 	{ STAW, "%a" },		{ STAX, "BC" },		{ STAX, "DE" },		{ STAX, "HL" },
 	{ STAX, "DE+" },	{ STAX, "HL+" },	{ STAX, "DE-" },	{ STAX, "HL-" },
 
 	/* 0x40 - 0x7F */
-	{ illegal, 0 },		{ INR, "A" },		{ INR, "B" },		{ INR, "C" },    
+	{ illegal, 0 },		{ INR, "A" },		{ INR, "B" },		{ INR, "C" },
 	{ CALL, "%w" },		{ ONIW, "%a,%b" },	{ ADI, "A,%b" },	{ ONI, "A,%b" },
 	{ 0, dasm48_7801 },	{ MVIX, "BC,%b" },	{ MVIX, "DE,%b" },	{ MVIX, "HL,%b" },
 	{ 0, dasm4c_7801 },	{ 0, dasm4d_7801 },	{ JRE, "%d" },		{ JRE, "%d" },
 
-	{ illegal, 0 },		{ DCR, "A" },		{ DCR, "B" },		{ DCR, "C" },    
+	{ illegal, 0 },		{ DCR, "A" },		{ DCR, "B" },		{ DCR, "C" },
 	{ JMP, "%w" },		{ OFFIW, "%a,%b" },	{ ACI, "A,%b" },	{ OFFI, "A,%b" },
 	{ BIT, "0,%a" },	{ BIT, "1,%a" },	{ BIT," 2,%a" },	{ BIT, "3,%a" },
 	{ BIT, "4,%a" },	{ BIT, "5,%a" },	{ BIT, "6,%a" },	{ BIT, "7,%a" },
 
-	{ 0, dasm60_7801 },	{ DAA, 0 },			{ RETI, 0 },		{ CALB, 0 },    
+	{ 0, dasm60_7801 },	{ DAA, 0 },			{ RETI, 0 },		{ CALB, 0 },
 	{ 0, dasm64_7801 },	{ NEIW, "%a,%b" },	{ SUI, "A,%b" },	{ NEI, "A,%b" },
 	{ MVI, "V,%b?" },	{ MVI, "A,%b" },	{ MVI, "B,%b" },	{ MVI, "C,%b" },
 	{ MVI, "D,%b" },	{ MVI, "E,%b" },	{ MVI, "H,%b" },	{ MVI, "L,%b" },
 
-	{ 0, dasm70_7801 },	{ MVIW, "%a,%b" },	{ SOFTI, 0 },		{ JB, 0 },    
+	{ 0, dasm70_7801 },	{ MVIW, "%a,%b" },	{ SOFTI, 0 },		{ JB, 0 },
 	{ 0, dasm74_7801 },	{ EQIW, "%a,%b" },	{ SBI, "A,%b" },	{ EQI, "A,%b" },
 	{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },
 	{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },
@@ -4656,7 +4656,7 @@ static const struct dasm_s dasmXX_7801[256] = {
  * uPD7801
  *
  *********************************************************/
- 
+
 static const struct dasm_s dasm48_78c05[256] = {
 	/* 0x00 - 0x3F */
 	{ SKIT, "F0" },		{ SKIT, "FT" },		{ SKIT, "F1" },		{ illegal, 0 },	/* TODO: PDF doesn't mention SKIT and SK */
@@ -5261,43 +5261,43 @@ static const struct dasm_s dasm74_78c05[256] = {
 
 static const struct dasm_s dasmXX_78c05[256] = {
 	/* 0x00 - 0x3F */
-	{ NOP, 0 },			{ HALT, 0 },		{ INX, "SP" },		{ DCX, "SP" },		
-	{ LXI, "SP,%w" },	{ ANIW, "%a,%b" },	{ illegal, 0 },		{ ANI, "A,%b" },	
-	{ RET, 0 },			{ SIO, 0 },			{ MOV, "A,B" },		{ MOV, "A,C" },	
-	{ MOV, "A,D" },		{ MOV, "A,E" },		{ MOV, "A,H" },		{ MOV, "A,L" },	
+	{ NOP, 0 },			{ HALT, 0 },		{ INX, "SP" },		{ DCX, "SP" },
+	{ LXI, "SP,%w" },	{ ANIW, "%a,%b" },	{ illegal, 0 },		{ ANI, "A,%b" },
+	{ RET, 0 },			{ SIO, 0 },			{ MOV, "A,B" },		{ MOV, "A,C" },
+	{ MOV, "A,D" },		{ MOV, "A,E" },		{ MOV, "A,H" },		{ MOV, "A,L" },
 
-	{ illegal, 0 },		{ illegal, 0 },		{ INX, "BC" },		{ DCX, "BC" },    
+	{ illegal, 0 },		{ illegal, 0 },		{ INX, "BC" },		{ DCX, "BC" },
 	{ LXI, "BC,%w" },	{ ORIW, "%a,%b" },	{ XRI, "A,%b" },	{ ORI, "A,%b" },
 	{ RETS, 0 },		{ STM, 0 },			{ MOV, "B,A" },		{ MOV, "C,A" },
 	{ MOV, "D,A" },		{ MOV, "E,A" },		{ MOV, "H,A" },		{ MOV, "L,A" },
 
-	{ INRW, "%a" },		{ illegal, 0 },		{ INX, "DE" },		{ DCX, "DE" },    
+	{ INRW, "%a" },		{ illegal, 0 },		{ INX, "DE" },		{ DCX, "DE" },
 	{ LXI, "DE,%w" },	{ GTIW, "%a,%b" },	{ ADINC, "A,%b" },	{ GTI, "A,%b" },
 	{ LDAW, "%a" },		{ LDAX, "BC" },		{ LDAX, "DE" },		{ LDAX, "HL" },
 	{ LDAX, "DE+" },	{ LDAX, "HL+" },	{ LDAX, "DE-" },	{ LDAX, "HL-" },
 
-	{ DCRW, "%a" },		{ illegal, 0 },		{ INX, "HL" },		{ DCX, "HL" },    
+	{ DCRW, "%a" },		{ illegal, 0 },		{ INX, "HL" },		{ DCX, "HL" },
 	{ LXI, "HL,%w" },	{ LTIW, "%a,%b" },	{ SUINB, "A,%b" },	{ LTI, "A,%b" },
 	{ STAW, "%a" },		{ STAX, "BC" },		{ STAX, "DE" },		{ STAX, "HL" },
 	{ STAX, "DE+" },	{ STAX, "HL+" },	{ STAX, "DE-" },	{ STAX, "HL-" },
 
 	/* 0x40 - 0x7F */
-	{ illegal, 0 },		{ INR, "A" },		{ INR, "B" },		{ INR, "C" },    
+	{ illegal, 0 },		{ INR, "A" },		{ INR, "B" },		{ INR, "C" },
 	{ CALL, "%w" },		{ ONIW, "%a,%b" },	{ ADI, "A,%b" },	{ ONI, "A,%b" },
 	{ 0, dasm48_78c05 },	{ illegal, 0 },	{ illegal, 0 },		{ illegal, 0 },
 	{ 0, dasm4c_78c05 },	{ 0, dasm4d_78c05 },	{ JRE, "%d" },		{ JRE, "%d" },
 
-	{ illegal, 0 },		{ DCR, "A" },		{ DCR, "B" },		{ DCR, "C" },    
+	{ illegal, 0 },		{ DCR, "A" },		{ DCR, "B" },		{ DCR, "C" },
 	{ JMP, "%w" },		{ OFFIW, "%a,%b" },	{ ACI, "A,%b" },	{ OFFI, "A,%b" },
 	{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },
 	{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },		{ illegal, 0 },
 
-	{ 0, dasm60_78c05 },	{ DAA, 0 },			{ RETI, 0 },		{ CALB, 0 },    
+	{ 0, dasm60_78c05 },	{ DAA, 0 },			{ RETI, 0 },		{ CALB, 0 },
 	{ 0, dasm64_78c05 },	{ NEIW, "%a,%b" },	{ SUI, "A,%b" },	{ NEI, "A,%b" },
 	{ illegal, 0 },		{ MVI, "A,%b" },	{ MVI, "B,%b" },	{ MVI, "C,%b" },
 	{ MVI, "D,%b" },	{ MVI, "E,%b" },	{ MVI, "H,%b" },	{ MVI, "L,%b" },
 
-	{ 0, dasm70_78c05 },	{ MVIW, "%a,%b" },	{ SOFTI, 0 },		{ JB, 0 },    
+	{ 0, dasm70_78c05 },	{ MVIW, "%a,%b" },	{ SOFTI, 0 },		{ JB, 0 },
 	{ 0, dasm74_78c05 },	{ EQIW, "%a,%b" },	{ SBI, "A,%b" },	{ EQI, "A,%b" },
 	{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },
 	{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },		{ CALF, "%f" },

@@ -100,12 +100,12 @@
 
 ****************************************************************************
 
-	DIP locations verified for:
-	- seawolf2 (manual)
-	- wow (manual)
-	- gorf (manual)
-	- robby (manual)
-	- profpac (manual)
+    DIP locations verified for:
+    - seawolf2 (manual)
+    - wow (manual)
+    - gorf (manual)
+    - robby (manual)
+    - profpac (manual)
 
 ****************************************************************************/
 

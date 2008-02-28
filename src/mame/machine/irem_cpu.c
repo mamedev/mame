@@ -348,7 +348,7 @@ missing opcode:
 14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> probably 08
 ab -> 4f?(19570 - routine from 194e1 to 19619) (when the water go up)
 b3 -> 19 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36
-b9 -> b7 (21210 - routine from 2117e to ) 2 bytes - 
+b9 -> b7 (21210 - routine from 2117e to ) 2 bytes -
 
 rz probably:
 19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
@@ -386,7 +386,7 @@ rz guess:
 73 -> 73 (1d4f7 - routine from 1d4df to 1d539) -> (no 70,71,72,74,75,76,77,78,79,7a,7b,7c,7d,7e,7f) - ok 73
 7c -> fd
 7e -> 92 (1e095 - routine from 1e073 to 1e0cf)
-83 -> 7f (194cd - routine from) no 70,78,79,7a,7b,7c,7d,7e ok 77(no) ok 7f 
+83 -> 7f (194cd - routine from) no 70,78,79,7a,7b,7c,7d,7e ok 77(no) ok 7f
 84 -> 08 (1d8f1 - routine from 1d8c7 to 1d8fc) - three bytes (ok 30) (sprite animation) -> 30
 88 -> 9a
 92 -> 9d

@@ -1522,7 +1522,7 @@ static void upd78c05_timers(int cycles)
 				if (upd7810.config.io_callback)
 					(*upd7810.config.io_callback)(UPD7810_TO,TO);
 			}
-			
+
 			while ( upd7810.ovc0 <= 0 ) {
 				upd7810.ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
 			}
