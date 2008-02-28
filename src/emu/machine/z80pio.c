@@ -109,7 +109,7 @@ static void update_irq_state(z80pio *pio, int ch)
 	int old_state = pio->int_state[ch];
 	int irq = 0;
 	int data;
-	if (pio->mode[ch] == 0x13) return;
+	if (pio->mode[ch] == 0x13 || (pio->enable[ch] & PIO_INT_MASK)) return;
 
 	/* only check if interrupts are enabled */
 	if (pio->enable[ch] & PIO_INT_ENABLE)
