@@ -5,16 +5,6 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-    The following variations exist that are different in
-    functionality and not just in speed rating(1):
-        * Motorola 6845, 6845-1
-        * Hitachi 46505
-        * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
-        * Commodore 6545-1
-
-    (1) as per the document at
-    http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
-
 **********************************************************************/
 
 #ifndef __MC6845__
@@ -78,10 +68,10 @@ struct _mc6845_interface
 	/* if specified, this gets called for every change of the disply enable pin (pin 18) */
 	mc6845_on_de_changed_func		on_de_changed;
 
-	/* if specified, this gets called when the HSYNC pin is asserted (pin 39) */
+	/* if specified, this gets called for every change of the HSYNC pin (pin 39) */
 	mc6845_on_hsync_changed_func	on_hsync_changed;
 
-	/* if specified, this gets called when the VSYNC pin is asserted (pin 40) */
+	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	mc6845_on_vsync_changed_func	on_vsync_changed;
 };
 
