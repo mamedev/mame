@@ -113,6 +113,9 @@ void psxcpu_get_info(UINT32 state, cpuinfo *info);
 void asap_get_info(UINT32 state, cpuinfo *info);
 void upd7810_get_info(UINT32 state, cpuinfo *info);
 void upd7807_get_info(UINT32 state, cpuinfo *info);
+void upd7801_get_info(UINT32 state, cpuinfo *info);
+void upd78c05_get_info(UINT32 state, cpuinfo *info);
+void upd78c06_get_info(UINT32 state, cpuinfo *info);
 void jaguargpu_get_info(UINT32 state, cpuinfo *info);
 void jaguardsp_get_info(UINT32 state, cpuinfo *info);
 void r3000be_get_info(UINT32 state, cpuinfo *info);
@@ -552,6 +555,11 @@ static const struct
 #endif
 #if (HAS_UPD7807)
 	{ CPU_UPD7807, upd7807_get_info },
+#endif
+#if (HAS_UPD7801)
+	{ CPU_UPD7801, upd7801_get_info },
+	{ CPU_UPD78C05, upd78c05_get_info },
+	{ CPU_UPD78C06, upd78c06_get_info },
 #endif
 #if (HAS_JAGUAR)
 	{ CPU_JAGUARGPU, jaguargpu_get_info },

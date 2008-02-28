@@ -376,6 +376,7 @@ static void GTI_SMH_xx(void);
 static void GTI_TMM_xx(void);
 static void GTI_V_xx(void);
 static void HALT(void);
+static void IN(void);
 static void INRW_wa(void);
 static void INR_A(void);
 static void INR_B(void);
@@ -489,6 +490,7 @@ static void MOV_A_PC(void);
 static void MOV_A_PD(void);
 static void MOV_A_PF(void);
 static void MOV_A_RXB(void);
+static void MOV_A_S(void);
 static void MOV_A_SMH(void);
 static void MOV_A_TMM(void);
 static void MOV_A_PT(void);
@@ -522,6 +524,7 @@ static void MOV_PB_A(void);
 static void MOV_PC_A(void);
 static void MOV_PD_A(void);
 static void MOV_PF_A(void);
+static void MOV_S_A(void);
 static void MOV_SMH_A(void);
 static void MOV_SML_A(void);
 static void MOV_TM0_A(void);
@@ -730,6 +733,10 @@ static void ORI_PF_xx(void);
 static void ORI_SMH_xx(void);
 static void ORI_TMM_xx(void);
 static void ORI_V_xx(void);
+static void OUT(void);
+static void PEN(void);
+static void PER(void);
+static void PEX(void);
 static void POP_BC(void);
 static void POP_DE(void);
 static void POP_EA(void);
@@ -806,6 +813,7 @@ static void SBI_V_xx(void);
 static void SDED_w(void);
 static void SETB(void);
 static void SHLD_w(void);
+static void SIO(void);
 static void SK_bit(void);
 static void SKN_bit(void);
 static void SKIT_AN4(void);
@@ -813,6 +821,7 @@ static void SKIT_AN5(void);
 static void SKIT_AN6(void);
 static void SKIT_AN7(void);
 static void SKIT_ER(void);
+static void SKIT_F0(void);
 static void SKIT_F1(void);
 static void SKIT_F2(void);
 static void SKIT_FAD(void);
@@ -831,6 +840,7 @@ static void SKNIT_AN5(void);
 static void SKNIT_AN6(void);
 static void SKNIT_AN7(void);
 static void SKNIT_ER(void);
+static void SKNIT_F0(void);
 static void SKNIT_F1(void);
 static void SKNIT_F2(void);
 static void SKNIT_FAD(void);
@@ -889,6 +899,7 @@ static void STEAX_H_B(void);
 static void STEAX_H_EA(void);
 static void STEAX_H_xx(void);
 static void STEAX_Hp(void);
+static void STM(void);
 static void STOP(void);
 static void SUBNBW_wa(void);
 static void SUBNBX_B(void);
@@ -1023,6 +1034,16 @@ static void XRI_PF_xx(void);
 static void XRI_SMH_xx(void);
 static void XRI_TMM_xx(void);
 static void XRI_V_xx(void);
+static void CALT_7801(void);
+static void DCR_A_7801(void);
+static void DCR_B_7801(void);
+static void DCR_C_7801(void);
+static void DCRW_wa_7801(void);
+static void INR_A_7801(void);
+static void INR_B_7801(void);
+static void INR_C_7801(void);
+static void INRW_wa_7801(void);
+
 
 static const struct opcode_s op48[256] =
 {
@@ -3511,3 +3532,3755 @@ static const struct opcode_s opXX_7807[256] =
 	{JR,			1,10,10,L0|L1}	/* ff: 1111 1111                                */
 };
 
+
+/***********************************************************************
+ *
+ * uPD7801
+ *
+ **********************************************************************/
+ 
+static const struct opcode_s op48_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{SKIT_F0,		2, 8, 8,L0|L1},	{SKIT_FT0,		2, 8, 8,L0|L1},
+	{SKIT_F1,		2, 8, 8,L0|L1},	{SKIT_F2,		2, 8, 8,L0|L1},
+	{SKIT_FST,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SK_CY, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{SK_Z,			2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{PUSH_VA,		2,15,15,L0|L1},	{POP_VA,		2,15,15,L0|L1},
+
+	{SKNIT_F0,		2, 8, 8,L0|L1},	{SKNIT_FT0,		2, 8, 8,L0|L1},
+	{SKNIT_F1,		2, 8, 8,L0|L1},	{SKNIT_F2,		2, 8, 8,L0|L1},
+	{SKNIT_FST,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal,		2, 8, 8,L0|L1},
+	{SKN_CY,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SKN_Z, 		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{PUSH_BC,		2,17,17,L0|L1},	{POP_BC,		2,15,15,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{EI,			2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{DI,			2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{CLC,			2, 8, 8,L0|L1},	{STC,			2, 8, 8,L0|L1},
+	{PEN,			2,11,11,L0|L1},	{PEX,			2,11,11,L0|L1},
+	{PUSH_DE, 		2,17,17,L0|L1},	{POP_DE, 		2,15,15,L0|L1},
+
+	{RLL_A,			2, 8, 8,L0|L1},	{RLR_A, 		2, 8, 8,L0|L1},
+	{RLL_C, 		2, 8, 8,L0|L1},	{RLR_C, 		2, 8, 8,L0|L1},
+	{SLL_A,			2, 8, 8,L0|L1},	{SLR_A, 		2, 8, 8,L0|L1},
+	{SLL_C, 		2, 8, 8,L0|L1},	{SLR_C, 		2, 8, 8,L0|L1},
+	{RLD,			2,17,17,L0|L1},	{RRD,			2,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{PER,			2,11,11,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{PUSH_HL, 		2,17,17,L0|L1},	{POP_HL, 		2,15,15,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+static const struct opcode_s op4C_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+	{IN,			2,10,10,L0|L1},	{IN,			2,10,10,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_A_PA,		2,10,10,L0|L1},	{MOV_A_PB,		2,10,10,L0|L1},
+	{MOV_A_PC,		2,10,10,L0|L1},	{MOV_A_MKL,		2,10,10,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{MOV_A_S,		2,10,10,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 4D */
+static const struct opcode_s op4D_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+	{OUT,			2,10,10,L0|L1},	{OUT,			2,10,10,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_PA_A,		2,10,10,L0|L1},	{MOV_PB_A,		2,10,10,L0|L1},
+	{MOV_PC_A,		2,10,10,L0|L1},	{MOV_MKL_A,		2,10,10,L0|L1},
+	{MOV_MB_A,		2,10,10,L0|L1},	{MOV_MC_A,		2,10,10,L0|L1},
+	{MOV_TM0_A, 	2,10,10,L0|L1},	{MOV_TM1_A, 	2,10,10,L0|L1},
+	{MOV_S_A,		2,10,10,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 60 */
+static const struct opcode_s op60_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANA_V_A,		2, 8, 8,L0|L1},	{ANA_A_A,		2, 8, 8,L0|L1},
+	{ANA_B_A,		2, 8, 8,L0|L1},	{ANA_C_A,		2, 8, 8,L0|L1},
+	{ANA_D_A,		2, 8, 8,L0|L1},	{ANA_E_A,		2, 8, 8,L0|L1},
+	{ANA_H_A,		2, 8, 8,L0|L1},	{ANA_L_A,		2, 8, 8,L0|L1},
+
+	{XRA_V_A,		2, 8, 8,L0|L1},	{XRA_A_A,		2, 8, 8,L0|L1},
+	{XRA_B_A,		2, 8, 8,L0|L1},	{XRA_C_A,		2, 8, 8,L0|L1},
+	{XRA_D_A,		2, 8, 8,L0|L1},	{XRA_E_A,		2, 8, 8,L0|L1},
+	{XRA_H_A,		2, 8, 8,L0|L1},	{XRA_L_A,		2, 8, 8,L0|L1},
+	{ORA_V_A,		2, 8, 8,L0|L1},	{ORA_A_A,		2, 8, 8,L0|L1},
+	{ORA_B_A,		2, 8, 8,L0|L1},	{ORA_C_A,		2, 8, 8,L0|L1},
+	{ORA_D_A,		2, 8, 8,L0|L1},	{ORA_E_A,		2, 8, 8,L0|L1},
+	{ORA_H_A,		2, 8, 8,L0|L1},	{ORA_L_A,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{ADDNC_V_A, 	2, 8, 8,L0|L1},	{ADDNC_A_A, 	2, 8, 8,L0|L1},
+	{ADDNC_B_A, 	2, 8, 8,L0|L1},	{ADDNC_C_A, 	2, 8, 8,L0|L1},
+	{ADDNC_D_A, 	2, 8, 8,L0|L1},	{ADDNC_E_A, 	2, 8, 8,L0|L1},
+	{ADDNC_H_A, 	2, 8, 8,L0|L1},	{ADDNC_L_A, 	2, 8, 8,L0|L1},
+	{GTA_V_A,		2, 8, 8,L0|L1},	{GTA_A_A,		2, 8, 8,L0|L1},
+	{GTA_B_A,		2, 8, 8,L0|L1},	{GTA_C_A,		2, 8, 8,L0|L1},
+	{GTA_D_A,		2, 8, 8,L0|L1},	{GTA_E_A,		2, 8, 8,L0|L1},
+	{GTA_H_A,		2, 8, 8,L0|L1},	{GTA_L_A,		2, 8, 8,L0|L1},
+
+	{SUBNB_V_A, 	2, 8, 8,L0|L1},	{SUBNB_A_A, 	2, 8, 8,L0|L1},
+	{SUBNB_B_A, 	2, 8, 8,L0|L1},	{SUBNB_C_A, 	2, 8, 8,L0|L1},
+	{SUBNB_D_A, 	2, 8, 8,L0|L1},	{SUBNB_E_A, 	2, 8, 8,L0|L1},
+	{SUBNB_H_A, 	2, 8, 8,L0|L1},	{SUBNB_L_A, 	2, 8, 8,L0|L1},
+	{LTA_V_A,		2, 8, 8,L0|L1},	{LTA_A_A,		2, 8, 8,L0|L1},
+	{LTA_B_A,		2, 8, 8,L0|L1},	{LTA_C_A,		2, 8, 8,L0|L1},
+	{LTA_D_A,		2, 8, 8,L0|L1},	{LTA_E_A,		2, 8, 8,L0|L1},
+	{LTA_H_A,		2, 8, 8,L0|L1},	{LTA_L_A,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{ADD_V_A,		2, 8, 8,L0|L1},	{ADD_A_A,		2, 8, 8,L0|L1},
+	{ADD_B_A,		2, 8, 8,L0|L1},	{ADD_C_A,		2, 8, 8,L0|L1},
+	{ADD_D_A,		2, 8, 8,L0|L1},	{ADD_E_A,		2, 8, 8,L0|L1},
+	{ADD_H_A,		2, 8, 8,L0|L1},	{ADD_L_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{ADC_V_A,		2, 8, 8,L0|L1},	{ADC_A_A,		2, 8, 8,L0|L1},
+	{ADC_B_A,		2, 8, 8,L0|L1},	{ADC_C_A,		2, 8, 8,L0|L1},
+	{ADC_D_A,		2, 8, 8,L0|L1},	{ADC_E_A,		2, 8, 8,L0|L1},
+	{ADC_H_A,		2, 8, 8,L0|L1},	{ADC_L_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{SUB_V_A,		2, 8, 8,L0|L1},	{SUB_A_A,		2, 8, 8,L0|L1},
+	{SUB_B_A,		2, 8, 8,L0|L1},	{SUB_C_A,		2, 8, 8,L0|L1},
+	{SUB_D_A,		2, 8, 8,L0|L1},	{SUB_E_A,		2, 8, 8,L0|L1},
+	{SUB_H_A,		2, 8, 8,L0|L1},	{SUB_L_A,		2, 8, 8,L0|L1},
+	{NEA_V_A,		2, 8, 8,L0|L1},	{NEA_A_A,		2, 8, 8,L0|L1},
+	{NEA_B_A,		2, 8, 8,L0|L1},	{NEA_C_A,		2, 8, 8,L0|L1},
+	{NEA_D_A,		2, 8, 8,L0|L1},	{NEA_E_A,		2, 8, 8,L0|L1},
+	{NEA_H_A,		2, 8, 8,L0|L1},	{NEA_L_A,		2, 8, 8,L0|L1},
+
+	{SBB_V_A,		2, 8, 8,L0|L1},	{SBB_A_A,		2, 8, 8,L0|L1},
+	{SBB_B_A,		2, 8, 8,L0|L1},	{SBB_C_A,		2, 8, 8,L0|L1},
+	{SBB_D_A,		2, 8, 8,L0|L1},	{SBB_E_A,		2, 8, 8,L0|L1},
+	{SBB_H_A,		2, 8, 8,L0|L1},	{SBB_L_A,		2, 8, 8,L0|L1},
+	{EQA_V_A,		2, 8, 8,L0|L1},	{EQA_A_A,		2, 8, 8,L0|L1},
+	{EQA_B_A,		2, 8, 8,L0|L1},	{EQA_C_A,		2, 8, 8,L0|L1},
+	{EQA_D_A,		2, 8, 8,L0|L1},	{EQA_E_A,		2, 8, 8,L0|L1},
+	{EQA_H_A,		2, 8, 8,L0|L1},	{EQA_L_A,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANA_A_V,		2, 8, 8,L0|L1},	{ANA_A_A,		2, 8, 8,L0|L1},
+	{ANA_A_B,		2, 8, 8,L0|L1},	{ANA_A_C,		2, 8, 8,L0|L1},
+	{ANA_A_D,		2, 8, 8,L0|L1},	{ANA_A_E,		2, 8, 8,L0|L1},
+	{ANA_A_H,		2, 8, 8,L0|L1},	{ANA_A_L,		2, 8, 8,L0|L1},
+
+	{XRA_A_V,		2, 8, 8,L0|L1},	{XRA_A_A,		2, 8, 8,L0|L1},
+	{XRA_A_B,		2, 8, 8,L0|L1},	{XRA_A_C,		2, 8, 8,L0|L1},
+	{XRA_A_D,		2, 8, 8,L0|L1},	{XRA_A_E,		2, 8, 8,L0|L1},
+	{XRA_A_H,		2, 8, 8,L0|L1},	{XRA_A_L,		2, 8, 8,L0|L1},
+	{ORA_A_V,		2, 8, 8,L0|L1},	{ORA_A_A,		2, 8, 8,L0|L1},
+	{ORA_A_B,		2, 8, 8,L0|L1},	{ORA_A_C,		2, 8, 8,L0|L1},
+	{ORA_A_D,		2, 8, 8,L0|L1},	{ORA_A_E,		2, 8, 8,L0|L1},
+	{ORA_A_H,		2, 8, 8,L0|L1},	{ORA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADDNC_A_V, 	2, 8, 8,L0|L1},	{ADDNC_A_A, 	2, 8, 8,L0|L1},
+	{ADDNC_A_B, 	2, 8, 8,L0|L1},	{ADDNC_A_C, 	2, 8, 8,L0|L1},
+	{ADDNC_A_D, 	2, 8, 8,L0|L1},	{ADDNC_A_E, 	2, 8, 8,L0|L1},
+	{ADDNC_A_H, 	2, 8, 8,L0|L1},	{ADDNC_A_L, 	2, 8, 8,L0|L1},
+	{GTA_A_V,		2, 8, 8,L0|L1},	{GTA_A_A,		2, 8, 8,L0|L1},
+	{GTA_A_B,		2, 8, 8,L0|L1},	{GTA_A_C,		2, 8, 8,L0|L1},
+	{GTA_A_D,		2, 8, 8,L0|L1},	{GTA_A_E,		2, 8, 8,L0|L1},
+	{GTA_A_H,		2, 8, 8,L0|L1},	{GTA_A_L,		2, 8, 8,L0|L1},
+
+	{SUBNB_A_V, 	2, 8, 8,L0|L1},	{SUBNB_A_A, 	2, 8, 8,L0|L1},
+	{SUBNB_A_B, 	2, 8, 8,L0|L1},	{SUBNB_A_C, 	2, 8, 8,L0|L1},
+	{SUBNB_A_D, 	2, 8, 8,L0|L1},	{SUBNB_A_E, 	2, 8, 8,L0|L1},
+	{SUBNB_A_H, 	2, 8, 8,L0|L1},	{SUBNB_A_L, 	2, 8, 8,L0|L1},
+	{LTA_A_V,		2, 8, 8,L0|L1},	{LTA_A_A,		2, 8, 8,L0|L1},
+	{LTA_A_B,		2, 8, 8,L0|L1},	{LTA_A_C,		2, 8, 8,L0|L1},
+	{LTA_A_D,		2, 8, 8,L0|L1},	{LTA_A_E,		2, 8, 8,L0|L1},
+	{LTA_A_H,		2, 8, 8,L0|L1},	{LTA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADD_A_V,		2, 8, 8,L0|L1},	{ADD_A_A,		2, 8, 8,L0|L1},
+	{ADD_A_B,		2, 8, 8,L0|L1},	{ADD_A_C,		2, 8, 8,L0|L1},
+	{ADD_A_D,		2, 8, 8,L0|L1},	{ADD_A_E,		2, 8, 8,L0|L1},
+	{ADD_A_H,		2, 8, 8,L0|L1},	{ADD_A_L,		2, 8, 8,L0|L1},
+	{ONA_A_V,		2, 8, 8,L0|L1},	{ONA_A_A,		2, 8, 8,L0|L1},
+	{ONA_A_B,		2, 8, 8,L0|L1},	{ONA_A_C,		2, 8, 8,L0|L1},
+	{ONA_A_D,		2, 8, 8,L0|L1},	{ONA_A_E,		2, 8, 8,L0|L1},
+	{ONA_A_H,		2, 8, 8,L0|L1},	{ONA_A_L,		2, 8, 8,L0|L1},
+
+	{ADC_A_V,		2, 8, 8,L0|L1},	{ADC_A_A,		2, 8, 8,L0|L1},
+	{ADC_A_B,		2, 8, 8,L0|L1},	{ADC_A_C,		2, 8, 8,L0|L1},
+	{ADC_A_D,		2, 8, 8,L0|L1},	{ADC_A_E,		2, 8, 8,L0|L1},
+	{ADC_A_H,		2, 8, 8,L0|L1},	{ADC_A_L,		2, 8, 8,L0|L1},
+	{OFFA_A_V,		2, 8, 8,L0|L1},	{OFFA_A_A,		2, 8, 8,L0|L1},
+	{OFFA_A_B,		2, 8, 8,L0|L1},	{OFFA_A_C,		2, 8, 8,L0|L1},
+	{OFFA_A_D,		2, 8, 8,L0|L1},	{OFFA_A_E,		2, 8, 8,L0|L1},
+	{OFFA_A_H,		2, 8, 8,L0|L1},	{OFFA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUB_A_V,		2, 8, 8,L0|L1},	{SUB_A_A,		2, 8, 8,L0|L1},
+	{SUB_A_B,		2, 8, 8,L0|L1},	{SUB_A_C,		2, 8, 8,L0|L1},
+	{SUB_A_D,		2, 8, 8,L0|L1},	{SUB_A_E,		2, 8, 8,L0|L1},
+	{SUB_A_H,		2, 8, 8,L0|L1},	{SUB_A_L,		2, 8, 8,L0|L1},
+	{NEA_A_V,		2, 8, 8,L0|L1},	{NEA_A_A,		2, 8, 8,L0|L1},
+	{NEA_A_B,		2, 8, 8,L0|L1},	{NEA_A_C,		2, 8, 8,L0|L1},
+	{NEA_A_D,		2, 8, 8,L0|L1},	{NEA_A_E,		2, 8, 8,L0|L1},
+	{NEA_A_H,		2, 8, 8,L0|L1},	{NEA_A_L,		2, 8, 8,L0|L1},
+
+	{SBB_A_V,		2, 8, 8,L0|L1},	{SBB_A_A,		2, 8, 8,L0|L1},
+	{SBB_A_B,		2, 8, 8,L0|L1},	{SBB_A_C,		2, 8, 8,L0|L1},
+	{SBB_A_D,		2, 8, 8,L0|L1},	{SBB_A_E,		2, 8, 8,L0|L1},
+	{SBB_A_H,		2, 8, 8,L0|L1},	{SBB_A_L,		2, 8, 8,L0|L1},
+	{EQA_A_V,		2, 8, 8,L0|L1},	{EQA_A_A,		2, 8, 8,L0|L1},
+	{EQA_A_B,		2, 8, 8,L0|L1},	{EQA_A_C,		2, 8, 8,L0|L1},
+	{EQA_A_D,		2, 8, 8,L0|L1},	{EQA_A_E,		2, 8, 8,L0|L1},
+	{EQA_A_H,		2, 8, 8,L0|L1},	{EQA_A_L,		2, 8, 8,L0|L1}
+};
+
+/* prefix 64 */
+static const struct opcode_s op64_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANI_V_xx,		3,11,11,L0|L1},	{ANI_A_xx,		3,11,11,L0|L1},
+	{ANI_B_xx,		3,11,11,L0|L1},	{ANI_C_xx,		3,11,11,L0|L1},
+	{ANI_D_xx,		3,11,11,L0|L1},	{ANI_E_xx,		3,11,11,L0|L1},
+	{ANI_H_xx,		3,11,11,L0|L1},	{ANI_L_xx,		3,11,11,L0|L1},
+
+	{XRI_V_xx,		3,11,11,L0|L1},	{XRI_A_xx,		3,11,11,L0|L1},
+	{XRI_B_xx,		3,11,11,L0|L1},	{XRI_C_xx,		3,11,11,L0|L1},
+	{XRI_D_xx,		3,11,11,L0|L1},	{XRI_E_xx,		3,11,11,L0|L1},
+	{XRI_H_xx,		3,11,11,L0|L1},	{XRI_L_xx,		3,11,11,L0|L1},
+	{ORI_V_xx,		3,11,11,L0|L1},	{ORI_A_xx,		3,11,11,L0|L1},
+	{ORI_B_xx,		3,11,11,L0|L1},	{ORI_C_xx,		3,11,11,L0|L1},
+	{ORI_D_xx,		3,11,11,L0|L1},	{ORI_E_xx,		3,11,11,L0|L1},
+	{ORI_H_xx,		3,11,11,L0|L1},	{ORI_L_xx,		3,11,11,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{ADINC_V_xx,	3,11,11,L0|L1},	{ADINC_A_xx,	3,11,11,L0|L1},
+	{ADINC_B_xx,	3,11,11,L0|L1},	{ADINC_C_xx,	3,11,11,L0|L1},
+	{ADINC_D_xx,	3,11,11,L0|L1},	{ADINC_E_xx,	3,11,11,L0|L1},
+	{ADINC_H_xx,	3,11,11,L0|L1},	{ADINC_L_xx,	3,11,11,L0|L1},
+	{GTI_V_xx,		3,11,11,L0|L1},	{GTI_A_xx,		3,11,11,L0|L1},
+	{GTI_B_xx,		3,11,11,L0|L1},	{GTI_C_xx,		3,11,11,L0|L1},
+	{GTI_D_xx,		3,11,11,L0|L1},	{GTI_E_xx,		3,11,11,L0|L1},
+	{GTI_H_xx,		3,11,11,L0|L1},	{GTI_L_xx,		3,11,11,L0|L1},
+
+	{SUINB_V_xx,	3,11,11,L0|L1},	{SUINB_A_xx,	3,11,11,L0|L1},
+	{SUINB_B_xx,	3,11,11,L0|L1},	{SUINB_C_xx,	3,11,11,L0|L1},
+	{SUINB_D_xx,	3,11,11,L0|L1},	{SUINB_E_xx,	3,11,11,L0|L1},
+	{SUINB_H_xx,	3,11,11,L0|L1},	{SUINB_L_xx,	3,11,11,L0|L1},
+	{LTI_V_xx,		3,11,11,L0|L1},	{LTI_A_xx,		3,11,11,L0|L1},
+	{LTI_B_xx,		3,11,11,L0|L1},	{LTI_C_xx,		3,11,11,L0|L1},
+	{LTI_D_xx,		3,11,11,L0|L1},	{LTI_E_xx,		3,11,11,L0|L1},
+	{LTI_H_xx,		3,11,11,L0|L1},	{LTI_L_xx,		3,11,11,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{ADI_V_xx,		3,11,11,L0|L1},	{ADI_A_xx,		3,11,11,L0|L1},
+	{ADI_B_xx,		3,11,11,L0|L1},	{ADI_C_xx,		3,11,11,L0|L1},
+	{ADI_D_xx,		3,11,11,L0|L1},	{ADI_E_xx,		3,11,11,L0|L1},
+	{ADI_H_xx,		3,11,11,L0|L1},	{ADI_L_xx,		3,11,11,L0|L1},
+	{ONI_V_xx,		3,11,11,L0|L1},	{ONI_A_xx,		3,11,11,L0|L1},
+	{ONI_B_xx,		3,11,11,L0|L1},	{ONI_C_xx,		3,11,11,L0|L1},
+	{ONI_D_xx,		3,11,11,L0|L1},	{ONI_E_xx,		3,11,11,L0|L1},
+	{ONI_H_xx,		3,11,11,L0|L1},	{ONI_L_xx,		3,11,11,L0|L1},
+
+	{ACI_V_xx,		3,11,11,L0|L1},	{ACI_A_xx,		3,11,11,L0|L1},
+	{ACI_B_xx,		3,11,11,L0|L1},	{ACI_C_xx,		3,11,11,L0|L1},
+	{ACI_D_xx,		3,11,11,L0|L1},	{ACI_E_xx,		3,11,11,L0|L1},
+	{ACI_H_xx,		3,11,11,L0|L1},	{ACI_L_xx,		3,11,11,L0|L1},
+	{OFFI_V_xx,		3,11,11,L0|L1},	{OFFI_A_xx,		3,11,11,L0|L1},
+	{OFFI_B_xx,		3,11,11,L0|L1},	{OFFI_C_xx,		3,11,11,L0|L1},
+	{OFFI_D_xx,		3,11,11,L0|L1},	{OFFI_E_xx,		3,11,11,L0|L1},
+	{OFFI_H_xx,		3,11,11,L0|L1},	{OFFI_L_xx,		3,11,11,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{SUI_V_xx,		3,11,11,L0|L1},	{SUI_A_xx,		3,11,11,L0|L1},
+	{SUI_B_xx,		3,11,11,L0|L1},	{SUI_C_xx,		3,11,11,L0|L1},
+	{SUI_D_xx,		3,11,11,L0|L1},	{SUI_E_xx,		3,11,11,L0|L1},
+	{SUI_H_xx,		3,11,11,L0|L1},	{SUI_L_xx,		3,11,11,L0|L1},
+	{NEI_V_xx,		3,11,11,L0|L1},	{NEI_A_xx,		3,11,11,L0|L1},
+	{NEI_B_xx,		3,11,11,L0|L1},	{NEI_C_xx,		3,11,11,L0|L1},
+	{NEI_D_xx,		3,11,11,L0|L1},	{NEI_E_xx,		3,11,11,L0|L1},
+	{NEI_H_xx,		3,11,11,L0|L1},	{NEI_L_xx,		3,11,11,L0|L1},
+
+	{SBI_V_xx,		3,11,11,L0|L1},	{SBI_A_xx,		3,11,11,L0|L1},
+	{SBI_B_xx,		3,11,11,L0|L1},	{SBI_C_xx,		3,11,11,L0|L1},
+	{SBI_D_xx,		3,11,11,L0|L1},	{SBI_E_xx,		3,11,11,L0|L1},
+	{SBI_H_xx,		3,11,11,L0|L1},	{SBI_L_xx,		3,11,11,L0|L1},
+	{EQI_V_xx,		3,11,11,L0|L1},	{EQI_A_xx,		3,11,11,L0|L1},
+	{EQI_B_xx,		3,11,11,L0|L1},	{EQI_C_xx,		3,11,11,L0|L1},
+	{EQI_D_xx,		3,11,11,L0|L1},	{EQI_E_xx,		3,11,11,L0|L1},
+	{EQI_H_xx,		3,11,11,L0|L1},	{EQI_L_xx,		3,11,11,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANI_PA_xx,		3,17,17,L0|L1},	{ANI_PB_xx,		3,17,17,L0|L1},
+	{ANI_PC_xx,		3,17,17,L0|L1},	{ANI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{XRI_PA_xx,		3,17,17,L0|L1},	{XRI_PB_xx,		3,17,17,L0|L1},
+	{XRI_PC_xx,		3,17,17,L0|L1},	{XRI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ORI_PA_xx,		3,17,17,L0|L1},	{ORI_PB_xx,		3,17,17,L0|L1},
+	{ORI_PC_xx,		3,17,17,L0|L1},	{ORI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADINC_PA_xx,	3,17,17,L0|L1},	{ADINC_PB_xx,	3,17,17,L0|L1},
+	{ADINC_PC_xx,	3,17,17,L0|L1},	{ADINC_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{GTI_PA_xx,		3,14,14,L0|L1},	{GTI_PB_xx,		3,14,14,L0|L1},
+	{GTI_PC_xx,		3,14,14,L0|L1},	{GTI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SUINB_PA_xx,	3,17,17,L0|L1},	{SUINB_PB_xx,	3,17,17,L0|L1},
+	{SUINB_PC_xx,	3,17,17,L0|L1},	{SUINB_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{LTI_PA_xx,		3,14,14,L0|L1},	{LTI_PB_xx,		3,14,14,L0|L1},
+	{LTI_PC_xx,		3,14,14,L0|L1},	{LTI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADI_PA_xx,		3,17,17,L0|L1},	{ADI_PB_xx,		3,17,17,L0|L1},
+	{ADI_PC_xx,		3,17,17,L0|L1},	{ADI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ONI_PA_xx,		3,14,14,L0|L1},	{ONI_PB_xx,		3,14,14,L0|L1},
+	{ONI_PC_xx,		3,14,14,L0|L1},	{ONI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{ACI_PA_xx,		3,17,17,L0|L1},	{ACI_PB_xx,		3,17,17,L0|L1},
+	{ACI_PC_xx,		3,17,17,L0|L1},	{ACI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{OFFI_PA_xx,	3,14,14,L0|L1},	{OFFI_PB_xx,	3,14,14,L0|L1},
+	{OFFI_PC_xx,	3,14,14,L0|L1},	{OFFI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUI_PA_xx,		3,17,17,L0|L1},	{SUI_PB_xx,		3,17,17,L0|L1},
+	{SUI_PC_xx,		3,17,17,L0|L1},	{SUI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{NEI_PA_xx,		3,14,14,L0|L1},	{NEI_PB_xx,		3,14,14,L0|L1},
+	{NEI_PC_xx,		3,14,14,L0|L1},	{NEI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SBI_PA_xx,		3,17,17,L0|L1},	{SBI_PB_xx,		3,17,17,L0|L1},
+	{SBI_PC_xx,		3,17,17,L0|L1},	{SBI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{EQI_PA_xx,		3,14,14,L0|L1},	{EQI_PB_xx,		3,14,14,L0|L1},
+	{EQI_PC_xx,		3,14,14,L0|L1},	{EQI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 70 */
+static const struct opcode_s op70_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SSPD_w,		4,20,20,L0|L1},	{LSPD_w,		4,20,20,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SBCD_w,		4,20,20,L0|L1},	{LBCD_w,		4,20,20,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SDED_w,		4,20,20,L0|L1},	{LDED_w,		4,20,20,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SHLD_w,		4,20,20,L0|L1},	{LHLD_w,		4,20,20,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{MOV_V_w,		4,17,17,L0|L1},	{MOV_A_w,		4,17,17,L0|L1},
+	{MOV_B_w,		4,17,17,L0|L1},	{MOV_C_w,		4,17,17,L0|L1},
+	{MOV_D_w,		4,17,17,L0|L1},	{MOV_E_w,		4,17,17,L0|L1},
+	{MOV_H_w,		4,17,17,L0|L1},	{MOV_L_w,		4,17,17,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{MOV_w_V,		4,17,17,L0|L1},	{MOV_w_A,		4,17,17,L0|L1},
+	{MOV_w_B,		4,17,17,L0|L1},	{MOV_w_C,		4,17,17,L0|L1},
+	{MOV_w_D,		4,17,17,L0|L1},	{MOV_w_E,		4,17,17,L0|L1},
+	{MOV_w_H,		4,17,17,L0|L1},	{MOV_w_L,		4,17,17,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ANAX_B,		2,11,11,L0|L1},
+	{ANAX_D,		2,11,11,L0|L1},	{ANAX_H,		2,11,11,L0|L1},
+	{ANAX_Dp,		2,11,11,L0|L1},	{ANAX_Hp,		2,11,11,L0|L1},
+	{ANAX_Dm,		2,11,11,L0|L1},	{ANAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{XRAX_B,		2,11,11,L0|L1},
+	{XRAX_D,		2,11,11,L0|L1},	{XRAX_H,		2,11,11,L0|L1},
+	{XRAX_Dp,		2,11,11,L0|L1},	{XRAX_Hp,		2,11,11,L0|L1},
+	{XRAX_Dm,		2,11,11,L0|L1},	{XRAX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ORAX_B,		2,11,11,L0|L1},
+	{ORAX_D,		2,11,11,L0|L1},	{ORAX_H,		2,11,11,L0|L1},
+	{ORAX_Dp,		2,11,11,L0|L1},	{ORAX_Hp,		2,11,11,L0|L1},
+	{ORAX_Dm,		2,11,11,L0|L1},	{ORAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDNCX_B,		2,11,11,L0|L1},
+	{ADDNCX_D,		2,11,11,L0|L1},	{ADDNCX_H,		2,11,11,L0|L1},
+	{ADDNCX_Dp, 	2,11,11,L0|L1},	{ADDNCX_Hp, 	2,11,11,L0|L1},
+	{ADDNCX_Dm, 	2,11,11,L0|L1},	{ADDNCX_Hm, 	2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{GTAX_B,		2,11,11,L0|L1},
+	{GTAX_D,		2,11,11,L0|L1},	{GTAX_H,		2,11,11,L0|L1},
+	{GTAX_Dp,		2,11,11,L0|L1},	{GTAX_Hp,		2,11,11,L0|L1},
+	{GTAX_Dm,		2,11,11,L0|L1},	{GTAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SUBNBX_B,		2,11,11,L0|L1},
+	{SUBNBX_D,		2,11,11,L0|L1},	{SUBNBX_H,		2,11,11,L0|L1},
+	{SUBNBX_Dp, 	2,11,11,L0|L1},	{SUBNBX_Hp, 	2,11,11,L0|L1},
+	{SUBNBX_Dm, 	2,11,11,L0|L1},	{SUBNBX_Hm, 	2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{LTAX_B,		2,11,11,L0|L1},
+	{LTAX_D,		2,11,11,L0|L1},	{LTAX_H,		2,11,11,L0|L1},
+	{LTAX_Dp,		2,11,11,L0|L1},	{LTAX_Hp,		2,11,11,L0|L1},
+	{LTAX_Dm,		2,11,11,L0|L1},	{LTAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDX_B,		2,11,11,L0|L1},
+	{ADDX_D,		2,11,11,L0|L1},	{ADDX_H,		2,11,11,L0|L1},
+	{ADDX_Dp,		2,11,11,L0|L1},	{ADDX_Hp,		2,11,11,L0|L1},
+	{ADDX_Dm,		2,11,11,L0|L1},	{ADDX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ONAX_B,		2,11,11,L0|L1},
+	{ONAX_D,		2,11,11,L0|L1},	{ONAX_H,		2,11,11,L0|L1},
+	{ONAX_Dp,		2,11,11,L0|L1},	{ONAX_Hp,		2,11,11,L0|L1},
+	{ONAX_Dm,		2,11,11,L0|L1},	{ONAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{ADCX_B,		2,11,11,L0|L1},
+	{ADCX_D,		2,11,11,L0|L1},	{ADCX_H,		2,11,11,L0|L1},
+	{ADCX_Dp,		2,11,11,L0|L1},	{ADCX_Hp,		2,11,11,L0|L1},
+	{ADCX_Dm,		2,11,11,L0|L1},	{ADCX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{OFFAX_B,		2,11,11,L0|L1},
+	{OFFAX_D,		2,11,11,L0|L1},	{OFFAX_H,		2,11,11,L0|L1},
+	{OFFAX_Dp,		2,11,11,L0|L1},	{OFFAX_Hp,		2,11,11,L0|L1},
+	{OFFAX_Dm,		2,11,11,L0|L1},	{OFFAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{SUBX_B,		2,11,11,L0|L1},
+	{SUBX_D,		2,11,11,L0|L1},	{SUBX_H,		2,11,11,L0|L1},
+	{SUBX_Dp,		2,11,11,L0|L1},	{SUBX_Hp,		2,11,11,L0|L1},
+	{SUBX_Dm,		2,11,11,L0|L1},	{SUBX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{NEAX_B,		2,11,11,L0|L1},
+	{NEAX_D,		2,11,11,L0|L1},	{NEAX_H,		2,11,11,L0|L1},
+	{NEAX_Dp,		2,11,11,L0|L1},	{NEAX_Hp,		2,11,11,L0|L1},
+	{NEAX_Dm,		2,11,11,L0|L1},	{NEAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SBBX_B,		2,11,11,L0|L1},
+	{SBBX_D,		2,11,11,L0|L1},	{SBBX_H,		2,11,11,L0|L1},
+	{SBBX_Dp,		2,11,11,L0|L1},	{SBBX_Hp,		2,11,11,L0|L1},
+	{SBBX_Dm,		2,11,11,L0|L1},	{SBBX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{EQAX_B,		2,11,11,L0|L1},
+	{EQAX_D,		2,11,11,L0|L1},	{EQAX_H,		2,11,11,L0|L1},
+	{EQAX_Dp,		2,11,11,L0|L1},	{EQAX_Hp,		2,11,11,L0|L1},
+	{EQAX_Dm,		2,11,11,L0|L1},	{EQAX_Hm,		2,11,11,L0|L1}
+};
+
+/* prefix 74 */
+static const struct opcode_s op74_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{XRAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ORAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADDNCW_wa, 	3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{GTAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SUBNBW_wa, 	3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{LTAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADDW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ONAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{ADCW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{OFFAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUBW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{NEAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SBBW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{EQAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+static const struct opcode_s opXX_7801[256] =
+{
+	/* 0x00 - 0x1F */
+	{NOP,			1, 4, 4,L0|L1},	{HALT,			1, 6, 6,L0|L1},
+	{INX_SP,		1, 7, 7,L0|L1},	{DCX_SP,		1, 7, 7,L0|L1},
+	{LXI_S_w,		3,10,10,L0|L1},	{ANIW_wa_xx,	3,16,16,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{ANI_A_xx,		2, 7, 7,L0|L1},
+	{RET,			1,11,11,L0|L1},	{SIO,			1, 4, 4,L0|L1},
+	{MOV_A_B,		1, 4, 4,L0|L1},	{MOV_A_C,		1, 4, 4,L0|L1},
+	{MOV_A_D,		1, 4, 4,L0|L1},	{MOV_A_E,		1, 4, 4,L0|L1},
+	{MOV_A_H,		1, 4, 4,L0|L1},	{MOV_A_L,		1, 4, 4,L0|L1},
+
+	{EXA,			1, 4, 4,L0|L1},	{EXX,			1, 4, 4,L0|L1},
+	{INX_BC,		1, 7, 7,L0|L1},	{DCX_BC,		1, 7, 7,L0|L1},
+	{LXI_B_w,		3,10,10,L0|L1},	{ORIW_wa_xx,	3,16,16,L0|L1},
+	{XRI_A_xx,		2, 7, 7,L0|L1},	{ORI_A_xx,		2, 7, 7,L0|L1},
+	{RETS,			1,11,11,L0|L1},	{STM,			1, 4, 4,L0|L1},
+	{MOV_B_A,		1, 4, 4,L0|L1},	{MOV_C_A,		1, 4, 4,L0|L1},
+	{MOV_D_A,		1, 4, 4,L0|L1},	{MOV_E_A,		1, 4, 4,L0|L1},
+	{MOV_H_A,		1, 4, 4,L0|L1},	{MOV_L_A,		1, 4, 4,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{INRW_wa_7801,	2,13,13,L0|L1},	{TABLE,			1,19,19,L0|L1},
+	{INX_DE,		1, 7, 7,L0|L1},	{DCX_DE,		1, 7, 7,L0|L1},
+	{LXI_D_w,		3,10,10,L0|L1},	{GTIW_wa_xx,	3,13,13,L0|L1},
+	{ADINC_A_xx,	2, 7, 7,L0|L1},	{GTI_A_xx,		2, 7, 7,L0|L1},
+	{LDAW_wa,		2,10,10,L0|L1},	{LDAX_B,		1, 7, 7,L0|L1},
+	{LDAX_D,		1, 7, 7,L0|L1},	{LDAX_H,		1, 7, 7,L0|L1},
+	{LDAX_Dp,		1, 7, 7,L0|L1},	{LDAX_Hp,		1, 7, 7,L0|L1},
+	{LDAX_Dm,		1, 7, 7,L0|L1},	{LDAX_Hm,		1, 7, 7,L0|L1},
+
+	{DCRW_wa_7801,	2,13,13,L0|L1},	{BLOCK,			1,13,13,L0|L1},
+	{INX_HL,		1, 7, 7,L0|L1},	{DCX_HL,		1, 7, 7,L0|L1},
+	{LXI_H_w,		3,10,10,   L1},	{LTIW_wa_xx,	3,13,13,L0|L1},
+	{SUINB_A_xx,	2, 7, 7,L0|L1},	{LTI_A_xx,		2, 7, 7,L0|L1},
+	{STAW_wa,		2,10,10,L0|L1},	{STAX_B,		1, 7, 7,L0|L1},
+	{STAX_D,		1, 7, 7,L0|L1},	{STAX_H,		1, 7, 7,L0|L1},
+	{STAX_Dp,		1, 7, 7,L0|L1},	{STAX_Hp,		1, 7, 7,L0|L1},
+	{STAX_Dm,		1, 7, 7,L0|L1},	{STAX_Hm,		1, 7, 7,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal,		1, 4, 4,L0|L1},	{INR_A_7801, 	1, 4, 4,L0|L1},
+	{INR_B_7801, 	1, 4, 4,L0|L1},	{INR_C_7801, 	1, 4, 4,L0|L1},
+	{CALL_w,		3,16,16,L0|L1},	{ONIW_wa_xx,	3,13,13,L0|L1},
+	{ADI_A_xx,		2, 7, 7,L0|L1},	{ONI_A_xx,		2, 7, 7,L0|L1},
+	{PRE_48,		1, 0, 0,L0|L1},	{MVIX_BC_xx,	2,10,10,L0|L1},
+	{MVIX_DE_xx,	2,10,10,L0|L1},	{MVIX_HL_xx,	2,10,10,L0|L1},
+	{PRE_4C,		1, 0, 0,L0|L1},	{PRE_4D,		1, 0, 0,L0|L1},
+	{JRE,			2,17,17,L0|L1},	{JRE,			2,17,17,L0|L1},
+
+	{illegal,		1, 4, 4,L0|L1},	{DCR_A_7801, 	1, 4, 4,L0|L1},
+	{DCR_B_7801, 	1, 4, 4,L0|L1},	{DCR_C_7801, 	1, 4, 4,L0|L1},
+	{JMP_w, 		3,10,10,L0|L1},	{OFFIW_wa_xx,	3,13,13,L0|L1},
+	{ACI_A_xx,		2, 7, 7,L0|L1},	{OFFI_A_xx, 	2, 7, 7,L0|L1},
+	{BIT_0_wa,		2,10,10,L0|L1},	{BIT_1_wa,		2,10,10,L0|L1},
+	{BIT_2_wa,		2,10,10,L0|L1},	{BIT_3_wa,		2,10,10,L0|L1},
+	{BIT_4_wa,		2,10,10,L0|L1},	{BIT_5_wa,		2,10,10,L0|L1},
+	{BIT_6_wa,		2,10,10,L0|L1},	{BIT_7_wa,		2,10,10,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{PRE_60,		1, 0, 0,L0|L1},	{DAA,			1, 4, 4,L0|L1},
+	{RETI,			1,15,15,L0|L1},	{CALB,			2,13,13,L0|L1},
+	{PRE_64,		1, 0, 0,L0|L1},	{NEIW_wa_xx,	3,13,13,L0|L1},
+	{SUI_A_xx,		2, 7, 7,L0|L1},	{NEI_A_xx,		2, 7, 7,L0|L1},
+	{MVI_V_xx,		2, 7, 7,L0|L1},	{MVI_A_xx,		2, 7, 7,L0	 },
+	{MVI_B_xx,		2, 7, 7,L0|L1},	{MVI_C_xx,		2, 7, 7,L0|L1},
+	{MVI_D_xx,		2, 7, 7,L0|L1},	{MVI_E_xx,		2, 7, 7,L0|L1},
+	{MVI_H_xx,		2, 7, 7,L0|L1},	{MVI_L_xx,		2, 7, 7,   L1},
+
+	{PRE_70,		1, 0, 0,L0|L1},	{MVIW_wa_xx,	3,13,13,L0|L1},
+	{SOFTI, 		1,19,19,L0|L1},	{JB,			1, 4, 4,L0|L1},
+	{PRE_74,		1, 0, 0,L0|L1},	{EQIW_wa_xx,	3,13,13,L0|L1},
+	{SBI_A_xx,		2, 7, 7,L0|L1},	{EQI_A_xx,		2, 7, 7,L0|L1},
+	{CALF,			2,16,16,L0|L1},	{CALF,			2,16,16,L0|L1},
+	{CALF,			2,16,16,L0|L1},	{CALF,			2,16,16,L0|L1},
+	{CALF,			2,16,16,L0|L1},	{CALF,			2,16,16,L0|L1},
+	{CALF,			2,16,16,L0|L1},	{CALF,			2,16,16,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1},
+	{JR,			1,13,13,L0|L1},	{JR,			1,13,13,L0|L1}
+};
+
+/***********************************************************************
+ *
+ * uPD78C05(A)
+ *
+ **********************************************************************/
+
+static const struct opcode_s op48_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{SKIT_F0,		2, 8, 8,L0|L1},	{SKIT_FT0,		2, 8, 8,L0|L1},
+	{SKIT_F1,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SKIT_FST,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SK_CY, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{SK_Z,			2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{PUSH_VA,		2,17,17,L0|L1},	{POP_VA,		2,14,14,L0|L1},
+
+	{SKNIT_F0,		2, 8, 8,L0|L1},	{SKNIT_FT0,		2, 8, 8,L0|L1},
+	{SKNIT_F1,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SKNIT_FST,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SKN_CY,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SKN_Z, 		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{PUSH_BC,		2,17,17,L0|L1},	{POP_BC,		2,14,14,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{EI,			2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{DI,			2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{CLC,			2, 8, 8,L0|L1},	{STC,			2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{PEX,			2,11,11,L0|L1},
+	{PUSH_DE, 		2,17,17,L0|L1},	{POP_DE, 		2,14,14,L0|L1},
+
+	{RLL_A,			2, 8, 8,L0|L1},	{RLR_A, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{illegal2, 		2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{RLD,			2,17,17,L0|L1},	{RRD,			2,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{PER,			2, 8, 8,L0|L1},	{illegal2, 		2, 8, 8,L0|L1},
+	{PUSH_HL, 		2,17,17,L0|L1},	{POP_HL, 		2,14,14,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+static const struct opcode_s op4C_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_A_PA,		2,10,10,L0|L1},	{MOV_A_PB,		2,10,10,L0|L1},
+	{MOV_A_PC,		2,10,10,L0|L1},	{MOV_A_MKL,		2,10,10,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{MOV_A_S,		2,10,10,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 4D */
+static const struct opcode_s op4D_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_PA_A,		2,10,10,L0|L1},	{MOV_PB_A,		2,10,10,L0|L1},
+	{MOV_PC_A,		2,10,10,L0|L1},	{MOV_MKL_A,		2,10,10,L0|L1},
+	{MOV_MB_A,		2,10,10,L0|L1},	{MOV_MC_A,		2,10,10,L0|L1},
+	{MOV_TM0_A, 	2,10,10,L0|L1},	{MOV_TM1_A, 	2,10,10,L0|L1},
+	{MOV_S_A,		2,10,10,L0|L1},	{MOV_TMM_A,		2,10,10,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 60 */
+static const struct opcode_s op60_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ANA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{XRA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ORA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDNC_A_A, 	2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{GTA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SUBNB_A_A, 	2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{LTA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{ADD_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{ADC_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{SUB_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{NEA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SBB_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{EQA_A_A,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ANA_A_A,		2, 8, 8,L0|L1},
+	{ANA_A_B,		2, 8, 8,L0|L1},	{ANA_A_C,		2, 8, 8,L0|L1},
+	{ANA_A_D,		2, 8, 8,L0|L1},	{ANA_A_E,		2, 8, 8,L0|L1},
+	{ANA_A_H,		2, 8, 8,L0|L1},	{ANA_A_L,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{XRA_A_A,		2, 8, 8,L0|L1},
+	{XRA_A_B,		2, 8, 8,L0|L1},	{XRA_A_C,		2, 8, 8,L0|L1},
+	{XRA_A_D,		2, 8, 8,L0|L1},	{XRA_A_E,		2, 8, 8,L0|L1},
+	{XRA_A_H,		2, 8, 8,L0|L1},	{XRA_A_L,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ORA_A_A,		2, 8, 8,L0|L1},
+	{ORA_A_B,		2, 8, 8,L0|L1},	{ORA_A_C,		2, 8, 8,L0|L1},
+	{ORA_A_D,		2, 8, 8,L0|L1},	{ORA_A_E,		2, 8, 8,L0|L1},
+	{ORA_A_H,		2, 8, 8,L0|L1},	{ORA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDNC_A_A, 	2, 8, 8,L0|L1},
+	{ADDNC_A_B, 	2, 8, 8,L0|L1},	{ADDNC_A_C, 	2, 8, 8,L0|L1},
+	{ADDNC_A_D, 	2, 8, 8,L0|L1},	{ADDNC_A_E, 	2, 8, 8,L0|L1},
+	{ADDNC_A_H, 	2, 8, 8,L0|L1},	{ADDNC_A_L, 	2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{GTA_A_A,		2, 8, 8,L0|L1},
+	{GTA_A_B,		2, 8, 8,L0|L1},	{GTA_A_C,		2, 8, 8,L0|L1},
+	{GTA_A_D,		2, 8, 8,L0|L1},	{GTA_A_E,		2, 8, 8,L0|L1},
+	{GTA_A_H,		2, 8, 8,L0|L1},	{GTA_A_L,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SUBNB_A_A, 	2, 8, 8,L0|L1},
+	{SUBNB_A_B, 	2, 8, 8,L0|L1},	{SUBNB_A_C, 	2, 8, 8,L0|L1},
+	{SUBNB_A_D, 	2, 8, 8,L0|L1},	{SUBNB_A_E, 	2, 8, 8,L0|L1},
+	{SUBNB_A_H, 	2, 8, 8,L0|L1},	{SUBNB_A_L, 	2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{LTA_A_A,		2, 8, 8,L0|L1},
+	{LTA_A_B,		2, 8, 8,L0|L1},	{LTA_A_C,		2, 8, 8,L0|L1},
+	{LTA_A_D,		2, 8, 8,L0|L1},	{LTA_A_E,		2, 8, 8,L0|L1},
+	{LTA_A_H,		2, 8, 8,L0|L1},	{LTA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADD_A_A,		2, 8, 8,L0|L1},
+	{ADD_A_B,		2, 8, 8,L0|L1},	{ADD_A_C,		2, 8, 8,L0|L1},
+	{ADD_A_D,		2, 8, 8,L0|L1},	{ADD_A_E,		2, 8, 8,L0|L1},
+	{ADD_A_H,		2, 8, 8,L0|L1},	{ADD_A_L,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ONA_A_A,		2, 8, 8,L0|L1},
+	{ONA_A_B,		2, 8, 8,L0|L1},	{ONA_A_C,		2, 8, 8,L0|L1},
+	{ONA_A_D,		2, 8, 8,L0|L1},	{ONA_A_E,		2, 8, 8,L0|L1},
+	{ONA_A_H,		2, 8, 8,L0|L1},	{ONA_A_L,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{ADC_A_A,		2, 8, 8,L0|L1},
+	{ADC_A_B,		2, 8, 8,L0|L1},	{ADC_A_C,		2, 8, 8,L0|L1},
+	{ADC_A_D,		2, 8, 8,L0|L1},	{ADC_A_E,		2, 8, 8,L0|L1},
+	{ADC_A_H,		2, 8, 8,L0|L1},	{ADC_A_L,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{OFFA_A_A,		2, 8, 8,L0|L1},
+	{OFFA_A_B,		2, 8, 8,L0|L1},	{OFFA_A_C,		2, 8, 8,L0|L1},
+	{OFFA_A_D,		2, 8, 8,L0|L1},	{OFFA_A_E,		2, 8, 8,L0|L1},
+	{OFFA_A_H,		2, 8, 8,L0|L1},	{OFFA_A_L,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{SUB_A_A,		2, 8, 8,L0|L1},
+	{SUB_A_B,		2, 8, 8,L0|L1},	{SUB_A_C,		2, 8, 8,L0|L1},
+	{SUB_A_D,		2, 8, 8,L0|L1},	{SUB_A_E,		2, 8, 8,L0|L1},
+	{SUB_A_H,		2, 8, 8,L0|L1},	{SUB_A_L,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{NEA_A_A,		2, 8, 8,L0|L1},
+	{NEA_A_B,		2, 8, 8,L0|L1},	{NEA_A_C,		2, 8, 8,L0|L1},
+	{NEA_A_D,		2, 8, 8,L0|L1},	{NEA_A_E,		2, 8, 8,L0|L1},
+	{NEA_A_H,		2, 8, 8,L0|L1},	{NEA_A_L,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SBB_A_A,		2, 8, 8,L0|L1},
+	{SBB_A_B,		2, 8, 8,L0|L1},	{SBB_A_C,		2, 8, 8,L0|L1},
+	{SBB_A_D,		2, 8, 8,L0|L1},	{SBB_A_E,		2, 8, 8,L0|L1},
+	{SBB_A_H,		2, 8, 8,L0|L1},	{SBB_A_L,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{EQA_A_A,		2, 8, 8,L0|L1},
+	{EQA_A_B,		2, 8, 8,L0|L1},	{EQA_A_C,		2, 8, 8,L0|L1},
+	{EQA_A_D,		2, 8, 8,L0|L1},	{EQA_A_E,		2, 8, 8,L0|L1},
+	{EQA_A_H,		2, 8, 8,L0|L1},	{EQA_A_L,		2, 8, 8,L0|L1}
+};
+
+/* prefix 64 */
+static const struct opcode_s op64_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ANI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{XRI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ORI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{ADINC_A_xx,	3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{GTI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SUINB_A_xx,	3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		3, 8, 8,L0|L1},	{LTI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{ADI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ONI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		3, 8, 8,L0|L1},	{ACI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		3, 8, 8,L0|L1},	{OFFI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{SUI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{NEI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SBI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{EQI_A_xx,		3,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANI_PA_xx,		3,17,17,L0|L1},	{ANI_PB_xx,		3,17,17,L0|L1},
+	{ANI_PC_xx,		3,17,17,L0|L1},	{ANI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{XRI_PA_xx,		3,17,17,L0|L1},	{XRI_PB_xx,		3,17,17,L0|L1},
+	{XRI_PC_xx,		3,17,17,L0|L1},	{XRI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ORI_PA_xx,		3,17,17,L0|L1},	{ORI_PB_xx,		3,17,17,L0|L1},
+	{ORI_PC_xx,		3,17,17,L0|L1},	{ORI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADINC_PA_xx,	3,17,17,L0|L1},	{ADINC_PB_xx,	3,17,17,L0|L1},
+	{ADINC_PC_xx,	3,17,17,L0|L1},	{ADINC_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{GTI_PA_xx,		3,14,14,L0|L1},	{GTI_PB_xx,		3,14,14,L0|L1},
+	{GTI_PC_xx,		3,14,14,L0|L1},	{GTI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SUINB_PA_xx,	3,17,17,L0|L1},	{SUINB_PB_xx,	3,17,17,L0|L1},
+	{SUINB_PC_xx,	3,17,17,L0|L1},	{SUINB_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{LTI_PA_xx,		3,14,14,L0|L1},	{LTI_PB_xx,		3,14,14,L0|L1},
+	{LTI_PC_xx,		3,14,14,L0|L1},	{LTI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADI_PA_xx,		3,17,17,L0|L1},	{ADI_PB_xx,		3,17,17,L0|L1},
+	{ADI_PC_xx,		3,17,17,L0|L1},	{ADI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ONI_PA_xx,		3,14,14,L0|L1},	{ONI_PB_xx,		3,14,14,L0|L1},
+	{ONI_PC_xx,		3,14,14,L0|L1},	{ONI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{ACI_PA_xx,		3,17,17,L0|L1},	{ACI_PB_xx,		3,17,17,L0|L1},
+	{ACI_PC_xx,		3,17,17,L0|L1},	{ACI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{OFFI_PA_xx,	3,14,14,L0|L1},	{OFFI_PB_xx,	3,14,14,L0|L1},
+	{OFFI_PC_xx,	3,14,14,L0|L1},	{OFFI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUI_PA_xx,		3,17,17,L0|L1},	{SUI_PB_xx,		3,17,17,L0|L1},
+	{SUI_PC_xx,		3,17,17,L0|L1},	{SUI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{NEI_PA_xx,		3,14,14,L0|L1},	{NEI_PB_xx,		3,14,14,L0|L1},
+	{NEI_PC_xx,		3,14,14,L0|L1},	{NEI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SBI_PA_xx,		3,17,17,L0|L1},	{SBI_PB_xx,		3,17,17,L0|L1},
+	{SBI_PC_xx,		3,17,17,L0|L1},	{SBI_MKL_xx,	3,17,17,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{EQI_PA_xx,		3,14,14,L0|L1},	{EQI_PB_xx,		3,14,14,L0|L1},
+	{EQI_PC_xx,		3,14,14,L0|L1},	{EQI_MKL_xx,	3,14,14,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+/* prefix 70 */
+static const struct opcode_s op70_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SSPD_w,		4,20,20,L0|L1},	{LSPD_w,		4,20,20,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SBCD_w,		4,20,20,L0|L1},	{LBCD_w,		4,20,20,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SDED_w,		4,20,20,L0|L1},	{LDED_w,		4,20,20,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{SHLD_w,		4,20,20,L0|L1},	{LHLD_w,		4,20,20,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{MOV_A_w,		4,17,17,L0|L1},
+	{MOV_B_w,		4,17,17,L0|L1},	{MOV_C_w,		4,17,17,L0|L1},
+	{MOV_D_w,		4,17,17,L0|L1},	{MOV_E_w,		4,17,17,L0|L1},
+	{MOV_H_w,		4,17,17,L0|L1},	{MOV_L_w,		4,17,17,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{MOV_w_A,		4,17,17,L0|L1},
+	{MOV_w_B,		4,17,17,L0|L1},	{MOV_w_C,		4,17,17,L0|L1},
+	{MOV_w_D,		4,17,17,L0|L1},	{MOV_w_E,		4,17,17,L0|L1},
+	{MOV_w_H,		4,17,17,L0|L1},	{MOV_w_L,		4,17,17,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ANAX_B,		2,11,11,L0|L1},
+	{ANAX_D,		2,11,11,L0|L1},	{ANAX_H,		2,11,11,L0|L1},
+	{ANAX_Dp,		2,11,11,L0|L1},	{ANAX_Hp,		2,11,11,L0|L1},
+	{ANAX_Dm,		2,11,11,L0|L1},	{ANAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{XRAX_B,		2,11,11,L0|L1},
+	{XRAX_D,		2,11,11,L0|L1},	{XRAX_H,		2,11,11,L0|L1},
+	{XRAX_Dp,		2,11,11,L0|L1},	{XRAX_Hp,		2,11,11,L0|L1},
+	{XRAX_Dm,		2,11,11,L0|L1},	{XRAX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ORAX_B,		2,11,11,L0|L1},
+	{ORAX_D,		2,11,11,L0|L1},	{ORAX_H,		2,11,11,L0|L1},
+	{ORAX_Dp,		2,11,11,L0|L1},	{ORAX_Hp,		2,11,11,L0|L1},
+	{ORAX_Dm,		2,11,11,L0|L1},	{ORAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDNCX_B,		2,11,11,L0|L1},
+	{ADDNCX_D,		2,11,11,L0|L1},	{ADDNCX_H,		2,11,11,L0|L1},
+	{ADDNCX_Dp, 	2,11,11,L0|L1},	{ADDNCX_Hp, 	2,11,11,L0|L1},
+	{ADDNCX_Dm, 	2,11,11,L0|L1},	{ADDNCX_Hm, 	2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{GTAX_B,		2,11,11,L0|L1},
+	{GTAX_D,		2,11,11,L0|L1},	{GTAX_H,		2,11,11,L0|L1},
+	{GTAX_Dp,		2,11,11,L0|L1},	{GTAX_Hp,		2,11,11,L0|L1},
+	{GTAX_Dm,		2,11,11,L0|L1},	{GTAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SUBNBX_B,		2,11,11,L0|L1},
+	{SUBNBX_D,		2,11,11,L0|L1},	{SUBNBX_H,		2,11,11,L0|L1},
+	{SUBNBX_Dp, 	2,11,11,L0|L1},	{SUBNBX_Hp, 	2,11,11,L0|L1},
+	{SUBNBX_Dm, 	2,11,11,L0|L1},	{SUBNBX_Hm, 	2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{LTAX_B,		2,11,11,L0|L1},
+	{LTAX_D,		2,11,11,L0|L1},	{LTAX_H,		2,11,11,L0|L1},
+	{LTAX_Dp,		2,11,11,L0|L1},	{LTAX_Hp,		2,11,11,L0|L1},
+	{LTAX_Dm,		2,11,11,L0|L1},	{LTAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2, 8, 8,L0|L1},	{ADDX_B,		2,11,11,L0|L1},
+	{ADDX_D,		2,11,11,L0|L1},	{ADDX_H,		2,11,11,L0|L1},
+	{ADDX_Dp,		2,11,11,L0|L1},	{ADDX_Hp,		2,11,11,L0|L1},
+	{ADDX_Dm,		2,11,11,L0|L1},	{ADDX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{ONAX_B,		2,11,11,L0|L1},
+	{ONAX_D,		2,11,11,L0|L1},	{ONAX_H,		2,11,11,L0|L1},
+	{ONAX_Dp,		2,11,11,L0|L1},	{ONAX_Hp,		2,11,11,L0|L1},
+	{ONAX_Dm,		2,11,11,L0|L1},	{ONAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{ADCX_B,		2,11,11,L0|L1},
+	{ADCX_D,		2,11,11,L0|L1},	{ADCX_H,		2,11,11,L0|L1},
+	{ADCX_Dp,		2,11,11,L0|L1},	{ADCX_Hp,		2,11,11,L0|L1},
+	{ADCX_Dm,		2,11,11,L0|L1},	{ADCX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{OFFAX_B,		2,11,11,L0|L1},
+	{OFFAX_D,		2,11,11,L0|L1},	{OFFAX_H,		2,11,11,L0|L1},
+	{OFFAX_Dp,		2,11,11,L0|L1},	{OFFAX_Hp,		2,11,11,L0|L1},
+	{OFFAX_Dm,		2,11,11,L0|L1},	{OFFAX_Hm,		2,11,11,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2, 8, 8,L0|L1},	{SUBX_B,		2,11,11,L0|L1},
+	{SUBX_D,		2,11,11,L0|L1},	{SUBX_H,		2,11,11,L0|L1},
+	{SUBX_Dp,		2,11,11,L0|L1},	{SUBX_Hp,		2,11,11,L0|L1},
+	{SUBX_Dm,		2,11,11,L0|L1},	{SUBX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{NEAX_B,		2,11,11,L0|L1},
+	{NEAX_D,		2,11,11,L0|L1},	{NEAX_H,		2,11,11,L0|L1},
+	{NEAX_Dp,		2,11,11,L0|L1},	{NEAX_Hp,		2,11,11,L0|L1},
+	{NEAX_Dm,		2,11,11,L0|L1},	{NEAX_Hm,		2,11,11,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{SBBX_B,		2,11,11,L0|L1},
+	{SBBX_D,		2,11,11,L0|L1},	{SBBX_H,		2,11,11,L0|L1},
+	{SBBX_Dp,		2,11,11,L0|L1},	{SBBX_Hp,		2,11,11,L0|L1},
+	{SBBX_Dm,		2,11,11,L0|L1},	{SBBX_Hm,		2,11,11,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{EQAX_B,		2,11,11,L0|L1},
+	{EQAX_D,		2,11,11,L0|L1},	{EQAX_H,		2,11,11,L0|L1},
+	{EQAX_Dp,		2,11,11,L0|L1},	{EQAX_Hp,		2,11,11,L0|L1},
+	{EQAX_Dm,		2,11,11,L0|L1},	{EQAX_Hm,		2,11,11,L0|L1}
+};
+
+/* prefix 74 */
+static const struct opcode_s op74_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ANAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{XRAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ORAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADDNCW_wa, 	3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{GTAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SUBNBW_wa, 	3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{LTAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADDW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{ONAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{ADCW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{OFFAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUBW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{NEAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+
+	{SBBW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{EQAW_wa,		3,14,14,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1},
+	{illegal2,		2, 8, 8,L0|L1},	{illegal2,		2, 8, 8,L0|L1}
+};
+
+static const struct opcode_s opXX_78c05[256] =
+{
+	/* 0x00 - 0x1F */
+	{NOP,			1, 4, 4,L0|L1},	{HALT,			1, 6, 6,L0|L1},
+	{INX_SP,		1, 7, 7,L0|L1},	{DCX_SP,		1, 7, 7,L0|L1},
+	{LXI_S_w,		3,10,10,L0|L1},	{ANIW_wa_xx,	3,16,16,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{ANI_A_xx,		2, 7, 7,L0|L1},
+	{RET,			1,10,10,L0|L1},	{SIO,			1, 4, 4,L0|L1},
+	{MOV_A_B,		1, 4, 4,L0|L1},	{MOV_A_C,		1, 4, 4,L0|L1},
+	{MOV_A_D,		1, 4, 4,L0|L1},	{MOV_A_E,		1, 4, 4,L0|L1},
+	{MOV_A_H,		1, 4, 4,L0|L1},	{MOV_A_L,		1, 4, 4,L0|L1},
+
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{INX_BC,		1, 7, 7,L0|L1},	{DCX_BC,		1, 7, 7,L0|L1},
+	{LXI_B_w,		3,10,10,L0|L1},	{ORIW_wa_xx,	3,16,16,L0|L1},
+	{XRI_A_xx,		2, 7, 7,L0|L1},	{ORI_A_xx,		2, 7, 7,L0|L1},
+	{RETS,			1,10,10,L0|L1},	{STM,			1, 4, 4,L0|L1},
+	{MOV_B_A,		1, 4, 4,L0|L1},	{MOV_C_A,		1, 4, 4,L0|L1},
+	{MOV_D_A,		1, 4, 4,L0|L1},	{MOV_E_A,		1, 4, 4,L0|L1},
+	{MOV_H_A,		1, 4, 4,L0|L1},	{MOV_L_A,		1, 4, 4,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{INRW_wa_7801,	2,13,13,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{INX_DE,		1, 7, 7,L0|L1},	{DCX_DE,		1, 7, 7,L0|L1},
+	{LXI_D_w,		3,10,10,L0|L1},	{GTIW_wa_xx,	3,13,13,L0|L1},
+	{ADINC_A_xx,	2, 7, 7,L0|L1},	{GTI_A_xx,		2, 7, 7,L0|L1},
+	{LDAW_wa,		2,10,10,L0|L1},	{LDAX_B,		1, 7, 7,L0|L1},
+	{LDAX_D,		1, 7, 7,L0|L1},	{LDAX_H,		1, 7, 7,L0|L1},
+	{LDAX_Dp,		1, 7, 7,L0|L1},	{LDAX_Hp,		1, 7, 7,L0|L1},
+	{LDAX_Dm,		1, 7, 7,L0|L1},	{LDAX_Hm,		1, 7, 7,L0|L1},
+
+	{DCRW_wa_7801,	2,13,13,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{INX_HL,		1, 7, 7,L0|L1},	{DCX_HL,		1, 7, 7,L0|L1},
+	{LXI_H_w,		3,10,10,   L1},	{LTIW_wa_xx,	3,13,13,L0|L1},
+	{SUINB_A_xx,	2, 7, 7,L0|L1},	{LTI_A_xx,		2, 7, 7,L0|L1},
+	{STAW_wa,		2,10,10,L0|L1},	{STAX_B,		1, 7, 7,L0|L1},
+	{STAX_D,		1, 7, 7,L0|L1},	{STAX_H,		1, 7, 7,L0|L1},
+	{STAX_Dp,		1, 7, 7,L0|L1},	{STAX_Hp,		1, 7, 7,L0|L1},
+	{STAX_Dm,		1, 7, 7,L0|L1},	{STAX_Hm,		1, 7, 7,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal,		1, 4, 4,L0|L1},	{INR_A_7801,	1, 4, 4,L0|L1},
+	{INR_B_7801, 	1, 4, 4,L0|L1},	{INR_C_7801, 	1, 4, 4,L0|L1},
+	{CALL_w,		3,16,16,L0|L1},	{ONIW_wa_xx,	3,13,13,L0|L1},
+	{ADI_A_xx,		2, 7, 7,L0|L1},	{ONI_A_xx,		2, 7, 7,L0|L1},
+	{PRE_48,		1, 0, 0,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{PRE_4C,		1, 0, 0,L0|L1},	{PRE_4D,		1, 0, 0,L0|L1},
+	{JRE,			2,13,13,L0|L1},	{JRE,			2,13,13,L0|L1},
+
+	{illegal,		1, 4, 4,L0|L1},	{DCR_A_7801, 	1, 4, 4,L0|L1},
+	{DCR_B_7801, 	1, 4, 4,L0|L1},	{DCR_C_7801, 	1, 4, 4,L0|L1},
+	{JMP_w, 		3,10,10,L0|L1},	{OFFIW_wa_xx,	3,13,13,L0|L1},
+	{ACI_A_xx,		2, 7, 7,L0|L1},	{OFFI_A_xx, 	2, 7, 7,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{PRE_60,		1, 0, 0,L0|L1},	{DAA,			1, 4, 4,L0|L1},
+	{RETI,			1,13,13,L0|L1},	{CALB,			2,13,13,L0|L1},
+	{PRE_64,		1, 0, 0,L0|L1},	{NEIW_wa_xx,	3,13,13,L0|L1},
+	{SUI_A_xx,		2, 7, 7,L0|L1},	{NEI_A_xx,		2, 7, 7,L0|L1},
+	{illegal,		1, 4, 4,L0|L1},	{MVI_A_xx,		2, 7, 7,L0	 },
+	{MVI_B_xx,		2, 7, 7,L0|L1},	{MVI_C_xx,		2, 7, 7,L0|L1},
+	{MVI_D_xx,		2, 7, 7,L0|L1},	{MVI_E_xx,		2, 7, 7,L0|L1},
+	{MVI_H_xx,		2, 7, 7,L0|L1},	{MVI_L_xx,		2, 7, 7,   L1},
+
+	{PRE_70,		1, 0, 0,L0|L1},	{MVIW_wa_xx,	3,13,13,L0|L1},
+	{SOFTI, 		1,19,19,L0|L1},	{JB,			1, 4, 4,L0|L1},
+	{PRE_74,		1, 0, 0,L0|L1},	{EQIW_wa_xx,	3,13,13,L0|L1},
+	{SBI_A_xx,		2, 7, 7,L0|L1},	{EQI_A_xx,		2, 7, 7,L0|L1},
+	{CALF,			2,13,13,L0|L1},	{CALF,			2,13,13,L0|L1},
+	{CALF,			2,13,13,L0|L1},	{CALF,			2,13,13,L0|L1},
+	{CALF,			2,13,13,L0|L1},	{CALF,			2,13,13,L0|L1},
+	{CALF,			2,13,13,L0|L1},	{CALF,			2,13,13,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1},
+	{JR,			1,10,10,L0|L1},	{JR,			1,10,10,L0|L1}
+};
+
+/***********************************************************************
+ *
+ * uPD78C06(A) - Same as uPD78C05 but with different instruction timing
+ *
+ **********************************************************************/
+
+static const struct opcode_s op48_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{SKIT_F0,		2,12,12,L0|L1},	{SKIT_FT0,		2,12,12,L0|L1},
+	{SKIT_F1,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{SKIT_FST,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{SK_CY, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{SK_Z,			2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{PUSH_VA,		2,21,21,L0|L1},	{POP_VA,		2,18,18,L0|L1},
+
+	{SKNIT_F0,		2,12,12,L0|L1},	{SKNIT_FT0,		2,12,12,L0|L1},
+	{SKNIT_F1,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{SKNIT_FST,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{SKN_CY,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{SKN_Z, 		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{PUSH_BC,		2,21,21,L0|L1},	{POP_BC,		2,18,18,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{EI,			2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{DI,			2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{CLC,			2,12,12,L0|L1},	{STC,			2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{PEX,			2,15,15,L0|L1},
+	{PUSH_DE, 		2,21,21,L0|L1},	{POP_DE, 		2,18,18,L0|L1},
+
+	{RLL_A,			2,12,12,L0|L1},	{RLR_A, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{RLD,			2,21,21,L0|L1},	{RRD,			2,21,21,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{PER,			2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{PUSH_HL, 		2,21,21,L0|L1},	{POP_HL, 		2,18,18,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1}
+};
+
+static const struct opcode_s op4C_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_A_PA,		2,14,14,L0|L1},	{MOV_A_PB,		2,14,14,L0|L1},
+	{MOV_A_PC,		2,14,14,L0|L1},	{MOV_A_MKL,		2,14,14,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{MOV_A_S,		2,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1}
+};
+
+/* prefix 4D */
+static const struct opcode_s op4D_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{MOV_PA_A,		2,14,14,L0|L1},	{MOV_PB_A,		2,14,14,L0|L1},
+	{MOV_PC_A,		2,14,14,L0|L1},	{MOV_MKL_A,		2,14,14,L0|L1},
+	{MOV_MB_A,		2,14,14,L0|L1},	{MOV_MC_A,		2,14,14,L0|L1},
+	{MOV_TM0_A, 	2,14,14,L0|L1},	{MOV_TM1_A, 	2,14,14,L0|L1},
+	{MOV_S_A,		2,14,14,L0|L1},	{MOV_TMM_A,		2,14,14,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1}
+};
+
+/* prefix 60 */
+static const struct opcode_s op60_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ANA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{XRA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ORA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2,12,12,L0|L1},	{ADDNC_A_A, 	2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{GTA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SUBNB_A_A, 	2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{LTA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2,12,12,L0|L1},	{ADD_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{ADC_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2, 8, 8,L0|L1},	{SUB_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{NEA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SBB_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{EQA_A_A,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ANA_A_A,		2,12,12,L0|L1},
+	{ANA_A_B,		2,12,12,L0|L1},	{ANA_A_C,		2,12,12,L0|L1},
+	{ANA_A_D,		2,12,12,L0|L1},	{ANA_A_E,		2,12,12,L0|L1},
+	{ANA_A_H,		2,12,12,L0|L1},	{ANA_A_L,		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{XRA_A_A,		2,12,12,L0|L1},
+	{XRA_A_B,		2,12,12,L0|L1},	{XRA_A_C,		2,12,12,L0|L1},
+	{XRA_A_D,		2,12,12,L0|L1},	{XRA_A_E,		2,12,12,L0|L1},
+	{XRA_A_H,		2,12,12,L0|L1},	{XRA_A_L,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ORA_A_A,		2,12,12,L0|L1},
+	{ORA_A_B,		2,12,12,L0|L1},	{ORA_A_C,		2,12,12,L0|L1},
+	{ORA_A_D,		2,12,12,L0|L1},	{ORA_A_E,		2,12,12,L0|L1},
+	{ORA_A_H,		2,12,12,L0|L1},	{ORA_A_L,		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2,12,12,L0|L1},	{ADDNC_A_A, 	2,12,12,L0|L1},
+	{ADDNC_A_B, 	2,12,12,L0|L1},	{ADDNC_A_C, 	2,12,12,L0|L1},
+	{ADDNC_A_D, 	2,12,12,L0|L1},	{ADDNC_A_E, 	2,12,12,L0|L1},
+	{ADDNC_A_H, 	2,12,12,L0|L1},	{ADDNC_A_L, 	2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{GTA_A_A,		2,12,12,L0|L1},
+	{GTA_A_B,		2,12,12,L0|L1},	{GTA_A_C,		2,12,12,L0|L1},
+	{GTA_A_D,		2,12,12,L0|L1},	{GTA_A_E,		2,12,12,L0|L1},
+	{GTA_A_H,		2,12,12,L0|L1},	{GTA_A_L,		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SUBNB_A_A, 	2,12,12,L0|L1},
+	{SUBNB_A_B, 	2,12,12,L0|L1},	{SUBNB_A_C, 	2,12,12,L0|L1},
+	{SUBNB_A_D, 	2,12,12,L0|L1},	{SUBNB_A_E, 	2,12,12,L0|L1},
+	{SUBNB_A_H, 	2,12,12,L0|L1},	{SUBNB_A_L, 	2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{LTA_A_A,		2,12,12,L0|L1},
+	{LTA_A_B,		2,12,12,L0|L1},	{LTA_A_C,		2,12,12,L0|L1},
+	{LTA_A_D,		2,12,12,L0|L1},	{LTA_A_E,		2,12,12,L0|L1},
+	{LTA_A_H,		2,12,12,L0|L1},	{LTA_A_L,		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2,12,12,L0|L1},	{ADD_A_A,		2,12,12,L0|L1},
+	{ADD_A_B,		2,12,12,L0|L1},	{ADD_A_C,		2,12,12,L0|L1},
+	{ADD_A_D,		2,12,12,L0|L1},	{ADD_A_E,		2,12,12,L0|L1},
+	{ADD_A_H,		2,12,12,L0|L1},	{ADD_A_L,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ONA_A_A,		2,12,12,L0|L1},
+	{ONA_A_B,		2,12,12,L0|L1},	{ONA_A_C,		2,12,12,L0|L1},
+	{ONA_A_D,		2,12,12,L0|L1},	{ONA_A_E,		2,12,12,L0|L1},
+	{ONA_A_H,		2,12,12,L0|L1},	{ONA_A_L,		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{ADC_A_A,		2,12,12,L0|L1},
+	{ADC_A_B,		2,12,12,L0|L1},	{ADC_A_C,		2,12,12,L0|L1},
+	{ADC_A_D,		2,12,12,L0|L1},	{ADC_A_E,		2,12,12,L0|L1},
+	{ADC_A_H,		2,12,12,L0|L1},	{ADC_A_L,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{OFFA_A_A,		2,12,12,L0|L1},
+	{OFFA_A_B,		2,12,12,L0|L1},	{OFFA_A_C,		2,12,12,L0|L1},
+	{OFFA_A_D,		2,12,12,L0|L1},	{OFFA_A_E,		2,12,12,L0|L1},
+	{OFFA_A_H,		2,12,12,L0|L1},	{OFFA_A_L,		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2,12,12,L0|L1},	{SUB_A_A,		2,12,12,L0|L1},
+	{SUB_A_B,		2,12,12,L0|L1},	{SUB_A_C,		2,12,12,L0|L1},
+	{SUB_A_D,		2,12,12,L0|L1},	{SUB_A_E,		2,12,12,L0|L1},
+	{SUB_A_H,		2,12,12,L0|L1},	{SUB_A_L,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{NEA_A_A,		2,12,12,L0|L1},
+	{NEA_A_B,		2,12,12,L0|L1},	{NEA_A_C,		2,12,12,L0|L1},
+	{NEA_A_D,		2,12,12,L0|L1},	{NEA_A_E,		2,12,12,L0|L1},
+	{NEA_A_H,		2,12,12,L0|L1},	{NEA_A_L,		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SBB_A_A,		2,12,12,L0|L1},
+	{SBB_A_B,		2,12,12,L0|L1},	{SBB_A_C,		2,12,12,L0|L1},
+	{SBB_A_D,		2,12,12,L0|L1},	{SBB_A_E,		2,12,12,L0|L1},
+	{SBB_A_H,		2,12,12,L0|L1},	{SBB_A_L,		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{EQA_A_A,		2,12,12,L0|L1},
+	{EQA_A_B,		2,12,12,L0|L1},	{EQA_A_C,		2,12,12,L0|L1},
+	{EQA_A_D,		2,12,12,L0|L1},	{EQA_A_E,		2,12,12,L0|L1},
+	{EQA_A_H,		2,12,12,L0|L1},	{EQA_A_L,		2,12,12,L0|L1}
+};
+
+/* prefix 64 */
+static const struct opcode_s op64_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ANI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{XRI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ORI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2,		2,12,12,L0|L1},	{ADINC_A_xx,	3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{GTI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SUINB_A_xx,	3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		3,12,12,L0|L1},	{LTI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2,		2,12,12,L0|L1},	{ADI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ONI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		3,12,12,L0|L1},	{ACI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		3,12,12,L0|L1},	{OFFI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2,		2,12,12,L0|L1},	{SUI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{NEI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SBI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{EQI_A_xx,		3,17,17,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ANI_PA_xx,		3,23,23,L0|L1},	{ANI_PB_xx,		3,23,23,L0|L1},
+	{ANI_PC_xx,		3,23,23,L0|L1},	{ANI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{XRI_PA_xx,		3,23,23,L0|L1},	{XRI_PB_xx,		3,23,23,L0|L1},
+	{XRI_PC_xx,		3,23,23,L0|L1},	{XRI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ORI_PA_xx,		3,23,23,L0|L1},	{ORI_PB_xx,		3,23,23,L0|L1},
+	{ORI_PC_xx,		3,23,23,L0|L1},	{ORI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADINC_PA_xx,	3,23,23,L0|L1},	{ADINC_PB_xx,	3,23,23,L0|L1},
+	{ADINC_PC_xx,	3,23,23,L0|L1},	{ADINC_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{GTI_PA_xx,		3,20,20,L0|L1},	{GTI_PB_xx,		3,20,20,L0|L1},
+	{GTI_PC_xx,		3,20,20,L0|L1},	{GTI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{SUINB_PA_xx,	3,23,23,L0|L1},	{SUINB_PB_xx,	3,23,23,L0|L1},
+	{SUINB_PC_xx,	3,23,23,L0|L1},	{SUINB_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{LTI_PA_xx,		3,20,20,L0|L1},	{LTI_PB_xx,		3,20,20,L0|L1},
+	{LTI_PC_xx,		3,20,20,L0|L1},	{LTI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADI_PA_xx,		3,23,23,L0|L1},	{ADI_PB_xx,		3,23,23,L0|L1},
+	{ADI_PC_xx,		3,23,23,L0|L1},	{ADI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ONI_PA_xx,		3,20,20,L0|L1},	{ONI_PB_xx,		3,20,20,L0|L1},
+	{ONI_PC_xx,		3,20,20,L0|L1},	{ONI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{ACI_PA_xx,		3,23,23,L0|L1},	{ACI_PB_xx,		3,23,23,L0|L1},
+	{ACI_PC_xx,		3,23,23,L0|L1},	{ACI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{OFFI_PA_xx,	3,20,20,L0|L1},	{OFFI_PB_xx,	3,20,20,L0|L1},
+	{OFFI_PC_xx,	3,20,20,L0|L1},	{OFFI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUI_PA_xx,		3,23,23,L0|L1},	{SUI_PB_xx,		3,23,23,L0|L1},
+	{SUI_PC_xx,		3,23,23,L0|L1},	{SUI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{NEI_PA_xx,		3,20,20,L0|L1},	{NEI_PB_xx,		3,20,20,L0|L1},
+	{NEI_PC_xx,		3,20,20,L0|L1},	{NEI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{SBI_PA_xx,		3,23,23,L0|L1},	{SBI_PB_xx,		3,23,23,L0|L1},
+	{SBI_PC_xx,		3,23,23,L0|L1},	{SBI_MKL_xx,	3,23,23,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{EQI_PA_xx,		3,20,20,L0|L1},	{EQI_PB_xx,		3,20,20,L0|L1},
+	{EQI_PC_xx,		3,20,20,L0|L1},	{EQI_MKL_xx,	3,20,20,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1}
+};
+
+/* prefix 70 */
+static const struct opcode_s op70_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{SSPD_w,		4,28,28,L0|L1},	{LSPD_w,		4,28,28,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{SBCD_w,		4,28,28,L0|L1},	{LBCD_w,		4,28,28,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{SDED_w,		4,28,28,L0|L1},	{LDED_w,		4,28,28,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{SHLD_w,		4,28,28,L0|L1},	{LHLD_w,		4,28,28,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{MOV_A_w,		4,25,25,L0|L1},
+	{MOV_B_w,		4,25,25,L0|L1},	{MOV_C_w,		4,25,25,L0|L1},
+	{MOV_D_w,		4,25,25,L0|L1},	{MOV_E_w,		4,25,25,L0|L1},
+	{MOV_H_w,		4,25,25,L0|L1},	{MOV_L_w,		4,25,25,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{MOV_w_A,		4,25,25,L0|L1},
+	{MOV_w_B,		4,25,25,L0|L1},	{MOV_w_C,		4,25,25,L0|L1},
+	{MOV_w_D,		4,25,25,L0|L1},	{MOV_w_E,		4,25,25,L0|L1},
+	{MOV_w_H,		4,25,25,L0|L1},	{MOV_w_L,		4,25,25,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ANAX_B,		2,15,15,L0|L1},
+	{ANAX_D,		2,15,15,L0|L1},	{ANAX_H,		2,15,15,L0|L1},
+	{ANAX_Dp,		2,15,15,L0|L1},	{ANAX_Hp,		2,15,15,L0|L1},
+	{ANAX_Dm,		2,15,15,L0|L1},	{ANAX_Hm,		2,15,15,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{XRAX_B,		2,15,15,L0|L1},
+	{XRAX_D,		2,15,15,L0|L1},	{XRAX_H,		2,15,15,L0|L1},
+	{XRAX_Dp,		2,15,15,L0|L1},	{XRAX_Hp,		2,15,15,L0|L1},
+	{XRAX_Dm,		2,15,15,L0|L1},	{XRAX_Hm,		2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ORAX_B,		2,15,15,L0|L1},
+	{ORAX_D,		2,15,15,L0|L1},	{ORAX_H,		2,15,15,L0|L1},
+	{ORAX_Dp,		2,15,15,L0|L1},	{ORAX_Hp,		2,15,15,L0|L1},
+	{ORAX_Dm,		2,15,15,L0|L1},	{ORAX_Hm,		2,15,15,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{illegal2,		2,12,12,L0|L1},	{ADDNCX_B,		2,15,15,L0|L1},
+	{ADDNCX_D,		2,15,15,L0|L1},	{ADDNCX_H,		2,15,15,L0|L1},
+	{ADDNCX_Dp, 	2,15,15,L0|L1},	{ADDNCX_Hp, 	2,15,15,L0|L1},
+	{ADDNCX_Dm, 	2,15,15,L0|L1},	{ADDNCX_Hm, 	2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{GTAX_B,		2,15,15,L0|L1},
+	{GTAX_D,		2,15,15,L0|L1},	{GTAX_H,		2,15,15,L0|L1},
+	{GTAX_Dp,		2,15,15,L0|L1},	{GTAX_Hp,		2,15,15,L0|L1},
+	{GTAX_Dm,		2,15,15,L0|L1},	{GTAX_Hm,		2,15,15,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SUBNBX_B,		2,15,15,L0|L1},
+	{SUBNBX_D,		2,15,15,L0|L1},	{SUBNBX_H,		2,15,15,L0|L1},
+	{SUBNBX_Dp, 	2,15,15,L0|L1},	{SUBNBX_Hp, 	2,15,15,L0|L1},
+	{SUBNBX_Dm, 	2,15,15,L0|L1},	{SUBNBX_Hm, 	2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{LTAX_B,		2,15,15,L0|L1},
+	{LTAX_D,		2,15,15,L0|L1},	{LTAX_H,		2,15,15,L0|L1},
+	{LTAX_Dp,		2,15,15,L0|L1},	{LTAX_Hp,		2,15,15,L0|L1},
+	{LTAX_Dm,		2,15,15,L0|L1},	{LTAX_Hm,		2,15,15,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{illegal2,		2,12,12,L0|L1},	{ADDX_B,		2,15,15,L0|L1},
+	{ADDX_D,		2,15,15,L0|L1},	{ADDX_H,		2,15,15,L0|L1},
+	{ADDX_Dp,		2,15,15,L0|L1},	{ADDX_Hp,		2,15,15,L0|L1},
+	{ADDX_Dm,		2,15,15,L0|L1},	{ADDX_Hm,		2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{ONAX_B,		2,15,15,L0|L1},
+	{ONAX_D,		2,15,15,L0|L1},	{ONAX_H,		2,15,15,L0|L1},
+	{ONAX_Dp,		2,15,15,L0|L1},	{ONAX_Hp,		2,15,15,L0|L1},
+	{ONAX_Dm,		2,15,15,L0|L1},	{ONAX_Hm,		2,15,15,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{ADCX_B,		2,15,15,L0|L1},
+	{ADCX_D,		2,15,15,L0|L1},	{ADCX_H,		2,15,15,L0|L1},
+	{ADCX_Dp,		2,15,15,L0|L1},	{ADCX_Hp,		2,15,15,L0|L1},
+	{ADCX_Dm,		2,15,15,L0|L1},	{ADCX_Hm,		2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{OFFAX_B,		2,15,15,L0|L1},
+	{OFFAX_D,		2,15,15,L0|L1},	{OFFAX_H,		2,15,15,L0|L1},
+	{OFFAX_Dp,		2,15,15,L0|L1},	{OFFAX_Hp,		2,15,15,L0|L1},
+	{OFFAX_Dm,		2,15,15,L0|L1},	{OFFAX_Hm,		2,15,15,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{illegal2,		2,12,12,L0|L1},	{SUBX_B,		2,15,15,L0|L1},
+	{SUBX_D,		2,15,15,L0|L1},	{SUBX_H,		2,15,15,L0|L1},
+	{SUBX_Dp,		2,15,15,L0|L1},	{SUBX_Hp,		2,15,15,L0|L1},
+	{SUBX_Dm,		2,15,15,L0|L1},	{SUBX_Hm,		2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{NEAX_B,		2,15,15,L0|L1},
+	{NEAX_D,		2,15,15,L0|L1},	{NEAX_H,		2,15,15,L0|L1},
+	{NEAX_Dp,		2,15,15,L0|L1},	{NEAX_Hp,		2,15,15,L0|L1},
+	{NEAX_Dm,		2,15,15,L0|L1},	{NEAX_Hm,		2,15,15,L0|L1},
+
+	{illegal2,		2,12,12,L0|L1},	{SBBX_B,		2,15,15,L0|L1},
+	{SBBX_D,		2,15,15,L0|L1},	{SBBX_H,		2,15,15,L0|L1},
+	{SBBX_Dp,		2,15,15,L0|L1},	{SBBX_Hp,		2,15,15,L0|L1},
+	{SBBX_Dm,		2,15,15,L0|L1},	{SBBX_Hm,		2,15,15,L0|L1},
+	{illegal2,		2,12,12,L0|L1},	{EQAX_B,		2,15,15,L0|L1},
+	{EQAX_D,		2,15,15,L0|L1},	{EQAX_H,		2,15,15,L0|L1},
+	{EQAX_Dp,		2,15,15,L0|L1},	{EQAX_Hp,		2,15,15,L0|L1},
+	{EQAX_Dm,		2,15,15,L0|L1},	{EQAX_Hm,		2,15,15,L0|L1}
+};
+
+/* prefix 74 */
+static const struct opcode_s op74_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ANAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{XRAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ORAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{ADDNCW_wa, 	3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{GTAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{SUBNBW_wa, 	3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{LTAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{ADDW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{ONAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{ADCW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{OFFAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{SUBW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{NEAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+
+	{SBBW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{EQAW_wa,		3,14,14,L0|L1},	{illegal2,		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1},
+	{illegal2, 		2,12,12,L0|L1},	{illegal2, 		2,12,12,L0|L1}
+};
+
+static const struct opcode_s opXX_78c06[256] =
+{
+	/* 0x00 - 0x1F */
+	{NOP,			1, 6, 6,L0|L1},	{HALT,			1, 6, 6,L0|L1},
+	{INX_SP,		1, 9, 9,L0|L1},	{DCX_SP,		1, 9, 9,L0|L1},
+	{LXI_S_w,		3,16,16,L0|L1},	{ANIW_wa_xx,	3,22,22,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{ANI_A_xx,		2,11,11,L0|L1},
+	{RET,			1,12,12,L0|L1},	{SIO,			1, 6, 6,L0|L1},
+	{MOV_A_B,		1, 6, 6,L0|L1},	{MOV_A_C,		1, 6, 6,L0|L1},
+	{MOV_A_D,		1, 6, 6,L0|L1},	{MOV_A_E,		1, 6, 6,L0|L1},
+	{MOV_A_H,		1, 6, 6,L0|L1},	{MOV_A_L,		1, 6, 6,L0|L1},
+
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{INX_BC,		1, 9, 9,L0|L1},	{DCX_BC,		1, 9, 9,L0|L1},
+	{LXI_B_w,		3,16,16,L0|L1},	{ORIW_wa_xx,	3,22,2,L0|L1},
+	{XRI_A_xx,		2,11,11,L0|L1},	{ORI_A_xx,		2,11,11,L0|L1},
+	{RETS,			1,12,12,L0|L1},	{STM,			1, 6, 6,L0|L1},
+	{MOV_B_A,		1, 6, 6,L0|L1},	{MOV_C_A,		1, 6, 6,L0|L1},
+	{MOV_D_A,		1, 6, 6,L0|L1},	{MOV_E_A,		1, 6, 6,L0|L1},
+	{MOV_H_A,		1, 6, 6,L0|L1},	{MOV_L_A,		1, 6, 6,L0|L1},
+
+	/* 0x20 - 0x3F */
+	{INRW_wa_7801,	2,17,17,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{INX_DE,		1, 9, 9,L0|L1},	{DCX_DE,		1, 9, 9,L0|L1},
+	{LXI_D_w,		3,16,16,L0|L1},	{GTIW_wa_xx,	3,19,19,L0|L1},
+	{ADINC_A_xx,	2,11,11,L0|L1},	{GTI_A_xx,		2,11,11,L0|L1},
+	{LDAW_wa,		2,14,14,L0|L1},	{LDAX_B,		1, 9, 9,L0|L1},
+	{LDAX_D,		1, 9, 9,L0|L1},	{LDAX_H,		1, 9, 9,L0|L1},
+	{LDAX_Dp,		1, 9, 9,L0|L1},	{LDAX_Hp,		1, 9, 9,L0|L1},
+	{LDAX_Dm,		1, 9, 9,L0|L1},	{LDAX_Hm,		1, 9, 9,L0|L1},
+
+	{DCRW_wa_7801,	2,17,17,L0|L1},	{illegal,		1, 4, 4,L0|L1},
+	{INX_HL,		1, 9, 9,L0|L1},	{DCX_HL,		1, 9, 9,L0|L1},
+	{LXI_H_w,		3,16,16,   L1},	{LTIW_wa_xx,	3,19,19,L0|L1},
+	{SUINB_A_xx,	2,11,11,L0|L1},	{LTI_A_xx,		2,11,11,L0|L1},
+	{STAW_wa,		2,14,14,L0|L1},	{STAX_B,		1, 9, 9,L0|L1},
+	{STAX_D,		1, 9, 9,L0|L1},	{STAX_H,		1, 9, 9,L0|L1},
+	{STAX_Dp,		1, 9, 9,L0|L1},	{STAX_Hp,		1, 9, 9,L0|L1},
+	{STAX_Dm,		1, 9, 9,L0|L1},	{STAX_Hm,		1, 9, 9,L0|L1},
+
+	/* 0x40 - 0x5F */
+	{illegal,		1, 6, 6,L0|L1},	{INR_A_7801,	1, 6, 6,L0|L1},
+	{INR_B_7801,	1, 6, 6,L0|L1},	{INR_C_7801,	1, 6, 6,L0|L1},
+	{CALL_w,		3,22,22,L0|L1},	{ONIW_wa_xx,	3,19,19,L0|L1},
+	{ADI_A_xx,		2,11,11,L0|L1},	{ONI_A_xx,		2,11,11,L0|L1},
+	{PRE_48,		1, 0, 0,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{PRE_4C,		1, 0, 0,L0|L1},	{PRE_4D,		1, 0, 0,L0|L1},
+	{JRE,			2,17,17,L0|L1},	{JRE,			2,17,17,L0|L1},
+
+	{illegal,		1, 6, 6,L0|L1},	{DCR_A_7801, 	1, 6, 6,L0|L1},
+	{DCR_B_7801, 	1, 6, 6,L0|L1},	{DCR_C_7801, 	1, 6, 6,L0|L1},
+	{JMP_w, 		3,16,16,L0|L1},	{OFFIW_wa_xx,	3,19,19,L0|L1},
+	{ACI_A_xx,		2,11,11,L0|L1},	{OFFI_A_xx, 	2,11,11,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{illegal,		1, 6, 6,L0|L1},
+
+	/* 0x60 - 0x7F */
+	{PRE_60,		1, 0, 0,L0|L1},	{DAA,			1, 6, 6,L0|L1},
+	{RETI,			1,15,15,L0|L1},	{CALB,			2,13,13,L0|L1},
+	{PRE_64,		1, 0, 0,L0|L1},	{NEIW_wa_xx,	3,19,19,L0|L1},
+	{SUI_A_xx,		2,11,11,L0|L1},	{NEI_A_xx,		2,11,11,L0|L1},
+	{illegal,		1, 6, 6,L0|L1},	{MVI_A_xx,		2,11,11,L0	 },
+	{MVI_B_xx,		2,11,11,L0|L1},	{MVI_C_xx,		2,11,11,L0|L1},
+	{MVI_D_xx,		2,11,11,L0|L1},	{MVI_E_xx,		2,11,11,L0|L1},
+	{MVI_H_xx,		2,11,11,L0|L1},	{MVI_L_xx,		2,11,11,   L1},
+
+	{PRE_70,		1, 0, 0,L0|L1},	{MVIW_wa_xx,	3,13,13,L0|L1},
+	{SOFTI, 		1,19,19,L0|L1},	{JB,			1, 6, 6,L0|L1},
+	{PRE_74,		1, 0, 0,L0|L1},	{EQIW_wa_xx,	3,19,19,L0|L1},
+	{SBI_A_xx,		2,11,11,L0|L1},	{EQI_A_xx,		2,11,11,L0|L1},
+	{CALF,			2,17,17,L0|L1},	{CALF,			2,17,17,L0|L1},
+	{CALF,			2,17,17,L0|L1},	{CALF,			2,17,17,L0|L1},
+	{CALF,			2,17,17,L0|L1},	{CALF,			2,17,17,L0|L1},
+	{CALF,			2,17,17,L0|L1},	{CALF,			2,17,17,L0|L1},
+
+	/* 0x80 - 0x9F */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xA0 - 0xBF */
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+	{CALT_7801,		1,19,19,L0|L1},	{CALT_7801,		1,19,19,L0|L1},
+
+	/* 0xC0 - 0xDF */
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+
+	/* 0xE0 - 0xFF */
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1},
+	{JR,			1,12,12,L0|L1},	{JR,			1,12,12,L0|L1}
+};

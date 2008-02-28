@@ -1225,8 +1225,9 @@ $(CPUOBJ)/v810/v810.o:	$(CPUSRC)/v810/v810.c \
 
 CPUDEFS += -DHAS_UPD7810=$(if $(filter UPD7810,$(CPUS)),1,0)
 CPUDEFS += -DHAS_UPD7807=$(if $(filter UPD7807,$(CPUS)),1,0)
+CPUDEFS += -DHAS_UPD7801=$(if $(filter UPD7801,$(CPUS)),1,0)
 
-ifneq ($(filter UPD7810 UPD7807,$(CPUS)),)
+ifneq ($(filter UPD7810 UPD7807 UPD7801,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/upd7810
 CPUOBJS += $(CPUOBJ)/upd7810/upd7810.o
 DBGOBJS += $(CPUOBJ)/upd7810/7810dasm.o

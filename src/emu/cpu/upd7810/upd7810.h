@@ -11,6 +11,9 @@
 
 // unfortunatly memory configuration differs with internal rom size
 typedef enum {
+	TYPE_7801,
+	TYPE_78C05,
+	TYPE_78C06,
 	TYPE_7810,
 	TYPE_7810_GAMEMASTER, // a few modifications until internal rom dumped
 	TYPE_7807
@@ -62,8 +65,11 @@ enum {
 #define UPD7810_INTF2		1
 #define UPD7810_INTFE1      4
 
-extern void upd7810_get_info(UINT32 state, cpuinfo *info);
-extern void upd7807_get_info(UINT32 state, cpuinfo *info);
+void upd7810_get_info(UINT32 state, cpuinfo *info);
+void upd7807_get_info(UINT32 state, cpuinfo *info);
+void upd7801_get_info(UINT32 state, cpuinfo *info);
+void upd78c05_get_info(UINT32 state, cpuinfo *info);
+void upd78c06_get_info(UINT32 state, cpuinfo *info);
 
 typedef struct {
 	PAIR	ppc;	/* previous program counter */
@@ -144,6 +150,12 @@ typedef struct {
 	const struct opcode_s *opXX;	/* opcode table */
 	const struct opcode_s *op48;
 	const struct opcode_s *op4C;
+	const struct opcode_s *op4D;
+	const struct opcode_s *op60;
+	const struct opcode_s *op64;
+	const struct opcode_s *op70;
+	const struct opcode_s *op74;
+	void (*handle_timers)(int cycles);
 	UPD7810_CONFIG config;
 	int (*irq_callback)(int irqline);
 }	UPD7810;
@@ -151,6 +163,8 @@ typedef struct {
 #ifdef ENABLE_DEBUGGER
 offs_t upd7810_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t upd7807_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+offs_t upd7801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+offs_t upd78c05_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
 
 #endif

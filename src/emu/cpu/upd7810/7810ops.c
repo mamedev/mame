@@ -291,7 +291,7 @@ static void HALT(void)
 {
 	int cycles = (upd7810_icount / 4) * 4;
 	upd7810_icount -= cycles;
-	upd7810_timers(cycles);
+	upd7810.handle_timers(cycles);
 	PC -= 1;		/* continue executing HALT */
 }
 
@@ -816,7 +816,7 @@ static void STOP(void)
 {
 	int cycles = (upd7810_icount / 4) * 4;
 	upd7810_icount -= cycles;
-	upd7810_timers(cycles);
+	upd7810.handle_timers(cycles);
 	PC -= 1;
 }
 
@@ -8397,9 +8397,9 @@ static void ONIW_wa_xx(void)
 static void PRE_48(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op48[OP2].cycles;
-	upd7810_timers(op48[OP2].cycles);
-	(*op48[OP2].opfunc)();
+	upd7810_icount -= upd7810.op48[OP2].cycles;
+	upd7810.handle_timers(upd7810.op48[OP2].cycles);
+	(*upd7810.op48[OP2].opfunc)();
 }
 
 /* 49: 0100 1001 xxxx xxxx */
@@ -8430,18 +8430,18 @@ static void MVIX_HL_xx(void)
 static void PRE_4C(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op4C[OP2].cycles;
-	upd7810_timers(op4C[OP2].cycles);
-	(*op4C[OP2].opfunc)();
+	upd7810_icount -= upd7810.op4C[OP2].cycles;
+	upd7810.handle_timers(upd7810.op4C[OP2].cycles);
+	(*upd7810.op4C[OP2].opfunc)();
 }
 
 /* 4d: prefix */
 static void PRE_4D(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op4D[OP2].cycles;
-	upd7810_timers(op4D[OP2].cycles);
-	(*op4D[OP2].opfunc)();
+	upd7810_icount -= upd7810.op4D[OP2].cycles;
+	upd7810.handle_timers(upd7810.op4D[OP2].cycles);
+	(*upd7810.op4D[OP2].opfunc)();
 }
 
 /* 4e: 0100 111d dddd dddd */
@@ -8820,9 +8820,9 @@ static void SK_bit(void)
 static void PRE_60(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op60[OP2].cycles;
-	upd7810_timers(op60[OP2].cycles);
-	(*op60[OP2].opfunc)();
+	upd7810_icount -= upd7810.op60[OP2].cycles;
+	upd7810.handle_timers(upd7810.op60[OP2].cycles);
+	(*upd7810.op60[OP2].opfunc)();
 }
 
 /* 61: 0110 0001 */
@@ -8883,9 +8883,9 @@ static void STAW_wa(void)
 static void PRE_64(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op64[OP2].cycles;
-	upd7810_timers(op64[OP2].cycles);
-	(*op64[OP2].opfunc)();
+	upd7810_icount -= upd7810.op64[OP2].cycles;
+	upd7810.handle_timers(upd7810.op64[OP2].cycles);
+	(*upd7810.op64[OP2].opfunc)();
 }
 
 /* 65: 0110 0101 oooo oooo xxxx xxxx */
@@ -8970,9 +8970,9 @@ static void MVI_L_xx(void)
 static void PRE_70(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op70[OP2].cycles;
-	upd7810_timers(op70[OP2].cycles);
-	(*op70[OP2].opfunc)();
+	upd7810_icount -= upd7810.op70[OP2].cycles;
+	upd7810.handle_timers(upd7810.op70[OP2].cycles);
+	(*upd7810.op70[OP2].opfunc)();
 }
 
 /* 71: 0111 0001 oooo oooo xxxx xxxx */
@@ -9005,9 +9005,9 @@ static void SOFTI(void)
 static void PRE_74(void)
 {
 	RDOP(OP2);
-	upd7810_icount -= op74[OP2].cycles;
-	upd7810_timers(op74[OP2].cycles);
-	(*op74[OP2].opfunc)();
+	upd7810_icount -= upd7810.op74[OP2].cycles;
+	upd7810.handle_timers(upd7810.op74[OP2].cycles);
+	(*upd7810.op74[OP2].opfunc)();
 }
 
 /* 75: 0111 0101 oooo oooo xxxx xxxx */
@@ -9072,7 +9072,6 @@ static void CALT(void)
 	    PCH=RM(w.w.l+1);
 
 	change_pc( PCD );
-	    logerror ("!!!!!!!%.4x calt %.2x %.4x; game master table position not known\n",PPC, OP, PCD);
 	}
 }
 
@@ -9339,3 +9338,138 @@ static void JR(void)
 	change_pc(PCD);
 }
 
+/*********************/
+/*                   */
+/* 7801 instructions */
+/*                   */
+/*********************/
+
+static void CALT_7801(void)
+{
+	PAIR w;
+	w.d = 0;
+
+	w.w.l = 0x80 + 2 * (OP & 0x3f);
+
+	SP--;
+	WM( SPD, PCH );
+	SP--;
+	WM( SPD, PCL );
+
+	PCL=RM(w.w.l);
+	PCH=RM(w.w.l+1);
+
+	change_pc( PCD );
+}
+
+/* DCR(W) and INR(W) instructions do not modify the CY register on at least 78c05 and 78c06 */
+static void DCR_A_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	DCR_A();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void DCR_B_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	DCR_B();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void DCR_C_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	DCR_C();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void DCRW_wa_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	DCRW_wa();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void INR_A_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	INR_A();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void INR_B_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	INR_B();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void INR_C_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	INR_C();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void INRW_wa_7801(void)
+{
+	UINT32 old_CY = PSW & CY;
+	INRW_wa();
+	PSW = ( PSW & ~CY ) | old_CY;
+}
+
+static void IN(void)
+{
+	logerror("unimplemented instruction: IN\n");
+}
+
+static void OUT(void)
+{
+	logerror("unimplemented instruction: OUT\n");
+}
+
+static void MOV_A_S(void)
+{
+	logerror("unimplemented instruction: MOV_A_S\n");
+}
+
+static void MOV_S_A(void)
+{
+	logerror("unimplemented instruction: MOV_A_S\n");
+}
+
+static void PEN(void)
+{
+	logerror("unimplemented instruction: PEN\n");
+}
+
+static void PER(void)
+{
+	logerror("unimplemented instruction: PER\n");
+}
+
+static void PEX(void)
+{
+	logerror("unimplemented instruction: PEX\n");
+}
+
+static void SIO(void)
+{
+	logerror("unimplemented instruction: SIO\n");
+}
+
+static void SKIT_F0(void)
+{
+	logerror("unimplemented instruction: SKIT_F0\n");
+}
+
+static void SKNIT_F0(void)
+{
+	logerror("unimplemented instruction: SKNIT_F0\n");
+}
+
+static void STM(void)
+{
+	upd7810.ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
+}

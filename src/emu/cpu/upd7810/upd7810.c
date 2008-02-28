@@ -59,6 +59,16 @@
  *       5B xx (CLR)
  *       5D xx (SK bit)
  *
+ * 2008-02-24 (Wilbert Pol):
+ * - Added preliminary support for uPD7801
+ *   For the uPD7801 only the basic instruction set was added. The current timer
+ *   and serial i/o implementations are most likely incorrect.
+ * - Added basic support for uPD78C05 and uPD78C06
+ *   Documentation of the actual instruction set layout is missing, so we took
+ *   the uPD7801 instruction set and only kept the instructions mentioned in
+ *   the little documentation available on the uPD78c05A/06A. The serial i/o
+ *   implementation has not been tested and is probably incorrect.
+ *
  *****************************************************************************/
 /* Hau around 23 May 2004
   gta, gti, dgt fixed
@@ -1496,6 +1506,30 @@ static void upd7810_timers(int cycles)
 	}
 }
 
+//static void upd7801_timers(int cycles)
+//{
+//}
+
+static void upd78c05_timers(int cycles)
+{
+	if ( upd7810.ovc0 ) {
+		upd7810.ovc0 -= cycles;
+
+		if ( upd7810.ovc0 <= 0 ) {
+			IRR |= INTFT0;
+			if (0x00 == (TMM & 0x03)) {
+				TO ^= 1;
+				if (upd7810.config.io_callback)
+					(*upd7810.config.io_callback)(UPD7810_TO,TO);
+			}
+			
+			while ( upd7810.ovc0 <= 0 ) {
+				upd7810.ovc0 += ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
+			}
+		}
+	}
+}
+
 static void upd7810_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	upd7810.config = *(const UPD7810_CONFIG*) config;
@@ -1580,6 +1614,13 @@ static void upd7810_reset (void)
 	upd7810.irq_callback = save_irqcallback;
 
 	upd7810.opXX = opXX_7810;
+	upd7810.op48 = op48;
+	upd7810.op4C = op4C;
+	upd7810.op4D = op4D;
+	upd7810.op60 = op60;
+	upd7810.op64 = op64;
+	upd7810.op70 = op70;
+	upd7810.op74 = op74;
 	ETMM = 0xff;
 	TMM = 0xff;
 	MA = 0xff;
@@ -1599,6 +1640,7 @@ static void upd7810_reset (void)
 	// gamemaster falling block "and"s to enable interrupts
 	MKL = 0xff;
 	MKH = 0xff; //?
+	upd7810.handle_timers = upd7810_timers;
 }
 
 static void upd7807_reset (void)
@@ -1607,14 +1649,54 @@ static void upd7807_reset (void)
 	upd7810.opXX = opXX_7807;
 }
 
+static void upd7801_reset( void ) {
+	upd7810_reset();
+	upd7810.op48 = op48_7801;
+	upd7810.op4C = op4C_7801;
+	upd7810.op4D = op4D_7801;
+	upd7810.op60 = op60_7801;
+	upd7810.op64 = op64_7801;
+	upd7810.op70 = op70_7801;
+	upd7810.op74 = op74_7801;
+	upd7810.opXX = opXX_7801;
+}
+
+static void upd78c05_reset( void ) {
+	upd7810_reset();
+	upd7810.op48 = op48_78c05;
+	upd7810.op4C = op4C_78c05;
+	upd7810.op4D = op4D_78c05;
+	upd7810.op60 = op60_78c05;
+	upd7810.op64 = op64_78c05;
+	upd7810.op70 = op70_78c05;
+	upd7810.op74 = op74_78c05;
+	upd7810.opXX = opXX_78c05;
+	MA = 0;		/* All outputs */
+	MC = 0xFF;	/* All inputs */
+	V = 0xFF;	/* The vector register is always pointing to FF00 */
+	upd7810.handle_timers = upd78c05_timers;
+	TM0 = 0xFF;	/* Timer seems to be running from boot */
+	upd7810.ovc0 = ( ( TMM & 0x04 ) ? 16 * 8 : 8 ) * TM0;
+}
+
+static void upd78c06_reset( void ) {
+	upd78c05_reset();
+	upd7810.op48 = op48_78c06;
+	upd7810.op4C = op4C_78c06;
+	upd7810.op4D = op4D_78c06;
+	upd7810.op60 = op60_78c06;
+	upd7810.op64 = op64_78c06;
+	upd7810.op70 = op70_78c06;
+	upd7810.op74 = op74_78c06;
+	upd7810.opXX = opXX_78c06;
+}
+
 static void upd7810_exit (void)
 {
 }
 
 static int upd7810_execute (int cycles)
 {
-	const struct opcode_s *opXX = upd7810.opXX;
-
 	upd7810_icount = cycles;
 
 	do
@@ -1631,15 +1713,15 @@ static int upd7810_execute (int cycles)
          * L0   for "MVI L,xx" or "LXI H,xxxx"
          * L1   for "MVI A,xx"
          */
-		PSW &= ~opXX[OP].mask_l0_l1;
+		PSW &= ~upd7810.opXX[OP].mask_l0_l1;
 
 		/* skip flag set and not SOFTI opcode? */
 		if ((PSW & SK) && (OP != 0x72))
 		{
-			if (opXX[OP].cycles)
+			if (upd7810.opXX[OP].cycles)
 			{
-				cc = opXX[OP].cycles_skip;
-				PC += opXX[OP].oplen - 1;
+				cc = upd7810.opXX[OP].cycles_skip;
+				PC += upd7810.opXX[OP].oplen - 1;
 			}
 			else
 			{
@@ -1647,46 +1729,46 @@ static int upd7810_execute (int cycles)
 				switch (OP)
 				{
 				case 0x48:
-					cc = op48[OP2].cycles_skip;
-					PC += op48[OP2].oplen - 2;
+					cc = upd7810.op48[OP2].cycles_skip;
+					PC += upd7810.op48[OP2].oplen - 2;
 					break;
 				case 0x4c:
-					cc = op4C[OP2].cycles_skip;
-					PC += op4C[OP2].oplen - 2;
+					cc = upd7810.op4C[OP2].cycles_skip;
+					PC += upd7810.op4C[OP2].oplen - 2;
 					break;
 				case 0x4d:
-					cc = op4D[OP2].cycles_skip;
-					PC += op4D[OP2].oplen - 2;
+					cc = upd7810.op4D[OP2].cycles_skip;
+					PC += upd7810.op4D[OP2].oplen - 2;
 					break;
 				case 0x60:
-					cc = op60[OP2].cycles_skip;
-					PC += op60[OP2].oplen - 2;
+					cc = upd7810.op60[OP2].cycles_skip;
+					PC += upd7810.op60[OP2].oplen - 2;
 					break;
 				case 0x64:
-					cc = op64[OP2].cycles_skip;
-					PC += op64[OP2].oplen - 2;
+					cc = upd7810.op64[OP2].cycles_skip;
+					PC += upd7810.op64[OP2].oplen - 2;
 					break;
 				case 0x70:
-					cc = op70[OP2].cycles_skip;
-					PC += op70[OP2].oplen - 2;
+					cc = upd7810.op70[OP2].cycles_skip;
+					PC += upd7810.op70[OP2].oplen - 2;
 					break;
 				case 0x74:
-					cc = op74[OP2].cycles_skip;
-					PC += op74[OP2].oplen - 2;
+					cc = upd7810.op74[OP2].cycles_skip;
+					PC += upd7810.op74[OP2].oplen - 2;
 					break;
 				default:
 					fatalerror("uPD7810 internal error: check cycle counts for main");
 				}
 			}
 			PSW &= ~SK;
-			upd7810_timers( cc );
+			upd7810.handle_timers( cc );
 			change_pc( PCD );
 		}
 		else
 		{
-			cc = opXX[OP].cycles;
-			upd7810_timers( cc );
-			(*opXX[OP].opfunc)();
+			cc = upd7810.opXX[OP].cycles;
+			upd7810.handle_timers( cc );
+			(*upd7810.opXX[OP].opfunc)();
 		}
 		upd7810_icount -= cc;
 		upd7810_take_irq();
@@ -2015,5 +2097,77 @@ void upd7807_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7807");				break;
 
 		default:										upd7810_get_info(state, info);			break;
+	}
+}
+
+void upd7801_get_info(UINT32 state, cpuinfo *info) {
+	switch( state ) {
+		case CPUINFO_PTR_RESET:							info->reset = upd7801_reset;			break;
+#ifdef ENABLE_DEBUGGER
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd7801_dasm;		break;
+#endif /* ENABLE_DEBUGGER */
+
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD7801");				break;
+
+		default:										upd7810_get_info(state, info);			break;
+	}
+}
+
+void upd78c05_get_info(UINT32 state, cpuinfo *info ) {
+	switch ( state ) {
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
+
+		case CPUINFO_PTR_RESET:							info->reset = upd78c05_reset;			break;
+#ifdef ENABLE_DEBUGGER
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = upd78c05_dasm;		break;
+#endif /* ENABLE_DEBUGGER */
+
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C05");			break;
+
+		/* These registers are not present in the uPD78C05 cpu */
+		case CPUINFO_STR_REGISTER + UPD7810_A2:
+		case CPUINFO_STR_REGISTER + UPD7810_V2:
+		case CPUINFO_STR_REGISTER + UPD7810_EA2:
+		case CPUINFO_STR_REGISTER + UPD7810_BC2:
+		case CPUINFO_STR_REGISTER + UPD7810_DE2:
+		case CPUINFO_STR_REGISTER + UPD7810_HL2:
+		case CPUINFO_STR_REGISTER + UPD7810_MA:
+		case CPUINFO_STR_REGISTER + UPD7810_MCC:
+		case CPUINFO_STR_REGISTER + UPD7810_MC:
+		case CPUINFO_STR_REGISTER + UPD7810_MM:
+		case CPUINFO_STR_REGISTER + UPD7810_MF:
+		case CPUINFO_STR_REGISTER + UPD7810_ETMM:
+		case CPUINFO_STR_REGISTER + UPD7810_EOM:
+		case CPUINFO_STR_REGISTER + UPD7810_SML:
+		case CPUINFO_STR_REGISTER + UPD7810_SMH:
+		case CPUINFO_STR_REGISTER + UPD7810_ANM:
+		case CPUINFO_STR_REGISTER + UPD7810_MKH:
+		case CPUINFO_STR_REGISTER + UPD7810_ZCM:
+		case CPUINFO_STR_REGISTER + UPD7810_CR0:
+		case CPUINFO_STR_REGISTER + UPD7810_CR1:
+		case CPUINFO_STR_REGISTER + UPD7810_CR2:
+		case CPUINFO_STR_REGISTER + UPD7810_CR3:
+		case CPUINFO_STR_REGISTER + UPD7810_RXB:
+		case CPUINFO_STR_REGISTER + UPD7810_TXB:
+		case CPUINFO_STR_REGISTER + UPD7810_TXD:
+		case CPUINFO_STR_REGISTER + UPD7810_RXD:
+		case CPUINFO_STR_REGISTER + UPD7810_SCK:
+		case CPUINFO_STR_REGISTER + UPD7810_TI:
+		case CPUINFO_STR_REGISTER + UPD7810_TO:
+		case CPUINFO_STR_REGISTER + UPD7810_CI:
+		case CPUINFO_STR_REGISTER + UPD7810_CO0:
+		case CPUINFO_STR_REGISTER + UPD7810_CO1:		break;
+
+		default:										upd7801_get_info(state, info);			break;
+	}
+}
+
+void upd78c06_get_info(UINT32 state, cpuinfo *info ) {
+	switch ( state ) {
+		case CPUINFO_PTR_RESET:							info->reset = upd78c06_reset;			break;
+
+		case CPUINFO_STR_NAME:							strcpy(info->s, "uPD78C06");			break;
+
+		default:										upd78c05_get_info(state, info);			break;
 	}
 }
