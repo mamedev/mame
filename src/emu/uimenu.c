@@ -1887,7 +1887,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 		const char *name = input_port_name(in);
 
 		/* add if we match the group and we have a valid name */
-		if (name != NULL &&
+		if ((name != NULL) && (input_port_condition(in)) &&
 #ifdef MESS
 			(in->category == 0 || input_category_active(in->category)) &&
 #endif /* MESS */
