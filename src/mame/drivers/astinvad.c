@@ -11,6 +11,9 @@ Misc early Z80 games with simple color bitmap graphics
 Space Intruder emulation by Lee Taylor (lee@defender.demon.co.uk),
     December 1998.
 
+DIP locations verified for:
+	- astinvad (manual)
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -393,14 +396,14 @@ static INPUT_PORTS_START( astinvad )
 	PORT_INCLUDE(kamikaze)
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x88, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x88, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )

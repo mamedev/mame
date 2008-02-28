@@ -1,11 +1,11 @@
 /*******************************************************************************
 
-    Input port macros used by many games in mutiple Taito drivers
+    Input port macros used by many games in multiple Taito drivers
 
 *******************************************************************************/
 
 
-/**************************** Machine Dip Swicthes ****************************/
+/**************************** Machine Dip Switches ****************************/
 
 /* with location */
 #define TAITO_DSWA_BITS_2_TO_3_LOC(DIPBANK) \
@@ -205,7 +205,7 @@
 	TAITO_COINAGE_US_COIN_CONT
 
 
-/************************** Difficulty Dip Swicthes ***************************/
+/************************** Difficulty Dip Switches ***************************/
 
 /* with location */
 #define TAITO_DIFFICULTY_LOC(DIPBANK) \

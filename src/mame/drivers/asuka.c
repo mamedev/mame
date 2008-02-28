@@ -85,8 +85,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 'bonzeadu' : region = 0x0001
   - These 3 games are 100% the same, only region differs !
   - Coinage relies on the region (code at 0x02d344) :
-      * 0x0000 (Japan) and 0x0001 (US) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (World) uses TAITO_COINAGE_WORLD
+      * 0x0000 (Japan) and 0x0001 (US) use TAITO_COINAGE_JAPAN_OLD_LOC()
+      * 0x0002 (World) uses TAITO_COINAGE_WORLD_LOC()
   - Notice screen only if region = 0x0000
   - Texts and game name rely on the region :
       * 0x0000 : most texts in Japanese - game name is "Jigoku Meguri"
@@ -125,7 +125,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 3) 'asuka*'
 
   - No region
-  - BOTH sets use TAITO_COINAGE_JAPAN_OLD for coinage,
+  - BOTH sets use TAITO_COINAGE_JAPAN_OLD_LOC() for coinage,
     so I wonder if the World version isn't a US version
   - Additional notice screen in 'asukaj'
 
@@ -136,8 +136,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - Sets :
       * 'mofflott' : region = 0x0001
   - Coinage relies on the region (code at 0x0145ec) :
-      * 0x0001 (Japan) and 0x0002 (US ?) use TAITO_COINAGE_JAPAN_OLD
-      * 0x0003 (World) uses TAITO_COINAGE_WORLD
+      * 0x0001 (Japan) and 0x0002 (US ?) use TAITO_COINAGE_JAPAN_OLD_LOC()
+      * 0x0003 (World) uses TAITO_COINAGE_WORLD_LOC()
   - Notice screen only if region = 0x0001
 
 
@@ -153,9 +153,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
   - These 5 games are 100% the same, only region differs !
     However each version requires its specific texts
   - Coinage relies on the region (code at 0x0013d6) :
-      * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD
-      * 0x0002 (US) uses TAITO_COINAGE_US
-      * 0x0003 (World) uses TAITO_COINAGE_WORLD
+      * 0x0001 (Japan) uses TAITO_COINAGE_JAPAN_OLD_LOC()
+      * 0x0002 (US) uses TAITO_COINAGE_US_LOC()
+      * 0x0003 (World) uses TAITO_COINAGE_WORLD_LOC()
   - Notice screen only if region = 0x0001 or region = 0x0002
   - FBI logo only if region = 0x0002
   - I can't tell about the Italian and Japanese versions,
@@ -166,22 +166,22 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
   - No region (not a Taito game anyway)
   - Coinage relies on "Coin Mode" Dip Switch (code at 0x0801c0) :
-      * "Mode A" uses TAITO_COINAGE_JAPAN_OLD
-      * "Mode B" uses TAITO_COINAGE_WORLD
+      * "Mode A" uses TAITO_COINAGE_JAPAN_OLD_LOC()
+      * "Mode B" uses TAITO_COINAGE_WORLD_LOC()
   - Notice screen
 
 
 7) 'earthjkr'
 
   - No region (not a Taito game anyway)
-  - Game uses TAITO_COINAGE_JAPAN_OLD
+  - Game uses TAITO_COINAGE_JAPAN_OLD_LOC()
   - Notice screen only if "Copyright" Dip Switch set to "Visco"
 
 
 8) 'eto'
 
   - No region (not a Taito game anyway)
-  - Game uses TAITO_COINAGE_JAPAN_OLD
+  - Game uses TAITO_COINAGE_JAPAN_OLD_LOC()
   - No notice screen
 
 
@@ -201,6 +201,13 @@ Galmedes: Test mode has select1/2 stuck at on.
 
 Eto: $76d0 might be a protection check? It reads to and writes from
 the prog rom. Doesn't seem to cause problems though.
+
+DIP locations verified for:
+	- bonzeadv (manual)
+	- cadash (manual)
+	- asuka (manual)
+	- mofflott (manual)
+	- galmedes (manual)
 
 ***************************************************************************/
 
@@ -425,26 +432,26 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( bonzeadv )
 	/* 0x390000 -> 0x10cb7c ($b7c,A5) */
 	PORT_START_TAG("DSWA")
-	TAITO_MACHINE_COCKTAIL
-	TAITO_COINAGE_WORLD
+	TAITO_MACHINE_COCKTAIL_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* 0x3b0000 -> 0x10cb7e ($b7e,A5) */
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* see notes */
-	PORT_DIPSETTING(    0x08, "40k 100k" )                       /* 300k 1000k 1500k 2000k 2500k 3000k 3500k 5000k */
-	PORT_DIPSETTING(    0x0c, "50k 150k" )                       /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPSETTING(    0x04, "60k 200k" )                       /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPSETTING(    0x00, "80k 250k" )                       /* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SWB:3,4") /* see notes */
+	PORT_DIPSETTING(    0x08, "40k 100k" )					/* 300k 1000k 1500k 2000k 2500k 3000k 3500k 5000k */
+	PORT_DIPSETTING(    0x0c, "50k 150k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPSETTING(    0x04, "60k 200k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPSETTING(    0x00, "80k 250k" )					/* 500k 1000k 2000k 3000k 4000k 5000k 6000k 7000k */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )			/* see notes */
 
 	PORT_START_TAG("800007")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
@@ -480,32 +487,32 @@ static INPUT_PORTS_START( jigkmgri )
 	PORT_INCLUDE(bonzeadv)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( asuka )
 	/* 0x400000 -> 0x103618 */
 	PORT_START_TAG("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_MACHINE_NO_COCKTAIL_LOC(SWA)
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 
 	/* 0x400002 -> 0x10361c */
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Points" )                   /* for each plane shot after each end of level boss */
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Points" )				PORT_DIPLOCATION("SWB:3,4") /* for each plane shot after each end of level boss */
 	PORT_DIPSETTING(    0x0c, "500" )
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPSETTING(    0x04, "2000" )
 	PORT_DIPSETTING(    0x00, "2500" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SWB:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0xc0, "Up to Level 2" )
-	PORT_DIPSETTING(    0x80, "Up to Level 3" )
+	PORT_DIPSETTING(    0xc0, "Up To Level 2" )
+	PORT_DIPSETTING(    0x80, "Up To Level 3" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
 
 	PORT_START_TAG("IN0")
@@ -530,41 +537,40 @@ static INPUT_PORTS_START( mofflott )
 
 	/* 0x400000 -> 0x100a92.b */
 	PORT_MODIFY("DSWA")
-	TAITO_MACHINE_COCKTAIL
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_MACHINE_COCKTAIL_LOC(SWA)
 
 	/* 0x400002 -> 0x100a93.b */
 	PORT_MODIFY("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "20k and every 50k" )
-	PORT_DIPSETTING(    0x08, "50k and every 100k" )
-	PORT_DIPSETTING(    0x04, "100k only" )
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPSETTING(    0x0c, "20k And Every 50k" )
+	PORT_DIPSETTING(    0x08, "50k And Every 100k" )
+	PORT_DIPSETTING(    0x04, "100k Only" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Number of Keys" )
-	PORT_DIPSETTING(    0x00, "14" ) /* Hard */
-	PORT_DIPSETTING(    0x80, "16" ) /* Easy */
+	PORT_DIPNAME( 0x80, 0x80, "Number Of Keys" )			PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x00, "B 14" )						/* Hard */
+	PORT_DIPSETTING(    0x80, "A 16" )						/* Easy */
 INPUT_PORTS_END
 
 /* different players and system inputs than 'asuka' */
 static INPUT_PORTS_START( cadash )
 	/* 0x900000 -> 0x10317a ($317a,A5) */
 	PORT_START_TAG("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL
-	TAITO_COINAGE_WORLD
+	TAITO_MACHINE_NO_COCKTAIL_LOC(SWA)
+	TAITO_COINAGE_WORLD_LOC(SWA)
 
 	/* 0x900002 -> 0x10317c ($317c,A5) */
 	PORT_START_TAG("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x0c, "Starting Time" )
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x0c, "Starting Time" )			PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "5:00" )
 	PORT_DIPSETTING(    0x04, "6:00" )
 	PORT_DIPSETTING(    0x0c, "7:00" )
@@ -575,12 +581,12 @@ static INPUT_PORTS_START( cadash )
 	/*       3            8:00  */
 	/*       4            7:00  */
 	/*       5            9:00  */
-	PORT_DIPNAME( 0x30, 0x30, "Added Time (after round clear)" )
+	PORT_DIPNAME( 0x30, 0x30, "Added Time (after round clear)" ) PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, "Default - 2:00" )
 	PORT_DIPSETTING(    0x10, "Default - 1:00" )
 	PORT_DIPSETTING(    0x30, "Default" )
 	PORT_DIPSETTING(    0x20, "Default + 1:00" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Communication Mode" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Communication Mode" )	PORT_DIPLOCATION("SWB:7,8")
 	PORT_DIPSETTING(    0xc0, "Stand alone" )
 	PORT_DIPSETTING(    0x80, "Master" )
 	PORT_DIPSETTING(    0x00, "Slave" )
@@ -607,14 +613,14 @@ static INPUT_PORTS_START( cadashj )
 	PORT_INCLUDE(cadash)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_COINAGE_JAPAN_OLD_LOC(SWA)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cadashu )
 	PORT_INCLUDE(cadash)
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_US
+	TAITO_COINAGE_US_LOC(SWA)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galmedes )
@@ -622,8 +628,7 @@ static INPUT_PORTS_START( galmedes )
 
 	/* 0x400000 -> 0x100982 */
 	PORT_MODIFY("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
@@ -632,7 +637,7 @@ static INPUT_PORTS_START( galmedes )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWB",0x80,PORTCOND_EQUALS,0x80)
@@ -644,67 +649,57 @@ static INPUT_PORTS_START( galmedes )
 
 	/* 0x400002 -> 0x100984 */
 	PORT_MODIFY("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "every 100k" )
-	PORT_DIPSETTING(    0x0c, "100k and every 200k" )
-	PORT_DIPSETTING(    0x04, "150k and every 200k" )
-	PORT_DIPSETTING(    0x00, "every 200k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:3,4")
+	PORT_DIPSETTING(    0x08, "Every 100k" )
+	PORT_DIPSETTING(    0x0c, "100k And Every 200k" )
+	PORT_DIPSETTING(    0x04, "150k And Every 200k" )
+	PORT_DIPSETTING(    0x00, "Every 200k" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x20, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" )
-	PORT_DIPSETTING(    0x80, "Mode A (Japan)" ) /* Mode A is TAITO_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x00, "Mode B (World)" ) /* Mode B is TAITO_COINAGE_WORLD */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x80, 0x80, "Coin Mode" )				PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, "Mode A (Japan)" )		/* Mode A is TAITO_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x00, "Mode B (World)" )		/* Mode B is TAITO_COINAGE_WORLD */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( earthjkr )
 	PORT_INCLUDE(asuka)
-
-	/* 0x400000 -> 0x100932 */
-	PORT_MODIFY("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL
-	TAITO_COINAGE_JAPAN_OLD
+	/* DSWA: 0x400000 -> 0x100932 */
 
 	/* 0x400002 -> 0x1009842 */
 	PORT_MODIFY("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:3,4")
 	PORT_DIPSETTING(    0x00, "100k and 300k" )
 	PORT_DIPSETTING(    0x08, "100k only" )
 	PORT_DIPSETTING(    0x04, "200k only" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:5,6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x30, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPNAME( 0x40, 0x40, "Copyright" )                      /* code at 0x00b982 and 0x00dbce */
+	PORT_DIPNAME( 0x40, 0x40, "Copyright" )				PORT_DIPLOCATION("SWB:7") /* code at 0x00b982 and 0x00dbce */
 	PORT_DIPSETTING(    0x40, "Visco" )                          /* Japan notice screen ON */
 	PORT_DIPSETTING(    0x00, "Visco (distributed by Romstar)" ) /* Japan notice screen OFF */
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( eto )
 	PORT_INCLUDE(asuka)
-
-	/* 0x300000 -> 0x200914 */
-	PORT_MODIFY("DSWA")
-	TAITO_MACHINE_NO_COCKTAIL
-	TAITO_COINAGE_JAPAN_OLD
+	/* DSWA: 0x300000 -> 0x200914 */
 
 	/* 0x300002 -> 0x200916 */
 	PORT_MODIFY("DSWB")
-	TAITO_DIFFICULTY
-	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                        /* value stored at 0x20090a but not read back */
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SWB:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SWB:6" )	/* value stored at 0x20090a but not read back */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SWB:8" )
 INPUT_PORTS_END
 
 
