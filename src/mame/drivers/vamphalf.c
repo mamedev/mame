@@ -352,7 +352,7 @@ Offset+3
 -------x xxxxxxxx X offs
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, int scrnum)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scrnum)
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 cnt;

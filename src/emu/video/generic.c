@@ -59,7 +59,7 @@ UINT32 *paletteram32;
 UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
 UINT16 *paletteram16_2;
 
-mame_bitmap *tmpbitmap;
+bitmap_t *tmpbitmap;
 static int flip_screen_x, flip_screen_y;
 
 

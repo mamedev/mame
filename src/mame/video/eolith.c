@@ -1,7 +1,7 @@
 #include "driver.h"
 
 int eolith_buffer = 0;
-static mame_bitmap *bitmaps[2];
+static bitmap_t *bitmaps[2];
 static UINT32 *eo_vram;
 
 static void plot_pixel_rgb(int x, int y, int color)

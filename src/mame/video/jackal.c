@@ -85,7 +85,7 @@ VIDEO_START( jackal )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_background( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	int i;
@@ -124,7 +124,7 @@ static void draw_background( mame_bitmap *bitmap, const rectangle *cliprect )
 
 #define DRAW_SPRITE(bank, code, sx, sy) drawgfx(bitmap, machine->gfx[bank], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 0);
 
-static void draw_sprites_region(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
+static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *sram, int length, int bank )
 {
 	int offs;
 
@@ -206,7 +206,7 @@ static void draw_sprites_region(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	UINT8 *sr, *ss;

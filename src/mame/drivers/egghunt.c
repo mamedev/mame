@@ -54,7 +54,7 @@ static tilemap *bg_tilemap;
 static UINT8 egghunt_okibanking;
 static UINT8 egghunt_gfx_banking;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int flipscreen = 0;
 	int offs,sx,sy;

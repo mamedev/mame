@@ -9,7 +9,7 @@
 static tilemap *fg_tilemap,*fg2_tilemap,*fg3_tilemap;
 extern UINT32 *silkroad_vidram,*silkroad_vidram2,*silkroad_vidram3, *silkroad_sprram, *silkroad_regs;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 	const gfx_element *gfx = machine->gfx[0];
 	UINT32 *source = silkroad_sprram;

@@ -69,7 +69,7 @@ WRITE8_HANDLER( momoko_flipscreen_w )
 }
 /****************************************************************************/
 
-static void momoko_draw_bg_pri(mame_bitmap *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
+static void momoko_draw_bg_pri(bitmap_t *bitmap, int chr, int col, int flipx, int flipy, int x,int y, int pri)
 {
 	int xx,sx,sy,px,py,dot;
 	UINT32 gfxadr;

@@ -934,7 +934,7 @@ static const poly_draw_scanline render_funcs[8] =
 	model2_3d_render_7	/* checker = 1, textured = 1, translucent = 1 */
 };
 
-static void model2_3d_render( mame_bitmap *bitmap, triangle *tri, const rectangle *cliprect )
+static void model2_3d_render( bitmap_t *bitmap, triangle *tri, const rectangle *cliprect )
 {
 	poly_extra_data *extra = poly_get_extra_data(poly);
 	UINT8		renderer;

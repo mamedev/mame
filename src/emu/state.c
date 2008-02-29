@@ -291,7 +291,7 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
     bitmap to be saved
 -------------------------------------------------*/
 
-void state_save_register_bitmap(const char *module, UINT32 instance, const char *name, mame_bitmap *val)
+void state_save_register_bitmap(const char *module, UINT32 instance, const char *name, bitmap_t *val)
 {
 	state_save_register_memory(module, instance, name, val->base, val->bpp / 8, val->rowpixels * val->height);
 }

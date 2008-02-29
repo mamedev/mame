@@ -116,7 +116,7 @@ WRITE8_HANDLER (tbowl_bg2yscroll_hi)
 	tbowl_bg2yscroll = (tbowl_bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int xscroll)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int xscroll)
 {
 	int offs;
 	static const UINT8 layout[8][8] =

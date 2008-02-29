@@ -214,7 +214,7 @@ static WRITE16_HANDLER( bg_scrolly_w )
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 	for (offs = 0;offs < spriteram_size/2;offs += 4)

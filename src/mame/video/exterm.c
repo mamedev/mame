@@ -67,7 +67,7 @@ void exterm_from_shiftreg_slave(UINT32 address, UINT16 *shiftreg)
  *
  *************************************/
 
-void exterm_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void exterm_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *bgsrc = &exterm_master_videoram[(params->rowaddr << 8) & 0xff00];
 	UINT16 *fgsrc = NULL;

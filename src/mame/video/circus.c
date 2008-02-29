@@ -51,7 +51,7 @@ VIDEO_START( circus )
 		 8, 8, 32, 32);
 }
 
-static void draw_line(mame_bitmap *bitmap, const rectangle *cliprect, int x1, int y1, int x2, int y2, int dotted)
+static void draw_line(bitmap_t *bitmap, const rectangle *cliprect, int x1, int y1, int x2, int y2, int dotted)
 {
 	/* Draws horizontal and Vertical lines only! */
 
@@ -72,7 +72,7 @@ static void draw_line(mame_bitmap *bitmap, const rectangle *cliprect, int x1, in
 			*BITMAP_ADDR16(bitmap, y1, count) = 1;
 }
 
-static void draw_robot_box(mame_bitmap *bitmap, const rectangle *cliprect, int x, int y)
+static void draw_robot_box(bitmap_t *bitmap, const rectangle *cliprect, int x, int y)
 {
 	/* Box */
 
@@ -92,7 +92,7 @@ static void draw_robot_box(mame_bitmap *bitmap, const rectangle *cliprect, int x
 	draw_line(bitmap,cliprect,x+16,y,x+16,ey,0);
 }
 
-static void circus_draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void circus_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* The sync generator hardware is used to   */
 	/* draw the border and diving boards        */
@@ -122,7 +122,7 @@ VIDEO_UPDATE( circus )
 	return 0;
 }
 
-static void robotbwl_draw_scoreboard(mame_bitmap *bitmap, const rectangle *cliprect)
+static void robotbwl_draw_scoreboard(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -147,7 +147,7 @@ static void robotbwl_draw_scoreboard(mame_bitmap *bitmap, const rectangle *clipr
 	draw_line(bitmap, cliprect, 39+152,137,47+152,137,0);
 }
 
-static void robotbwl_draw_bowling_alley(mame_bitmap *bitmap, const rectangle *cliprect)
+static void robotbwl_draw_bowling_alley(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	draw_line(bitmap, cliprect, 103,17,103,205,0);
 	draw_line(bitmap, cliprect, 111,17,111,203,1);
@@ -155,7 +155,7 @@ static void robotbwl_draw_bowling_alley(mame_bitmap *bitmap, const rectangle *cl
 	draw_line(bitmap, cliprect, 144,17,144,203,1);
 }
 
-static void robotbwl_draw_ball(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void robotbwl_draw_ball(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	drawgfx(bitmap,machine->gfx[1],
 			clown_z,
@@ -174,7 +174,7 @@ VIDEO_UPDATE( robotbwl )
 	return 0;
 }
 
-static void crash_draw_car(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void crash_draw_car(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	drawgfx(bitmap,machine->gfx[1],
 		clown_z,
@@ -191,7 +191,7 @@ VIDEO_UPDATE( crash )
 	return 0;
 }
 
-static void ripcord_draw_skydiver(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void ripcord_draw_skydiver(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx;
 	UINT8  *src_lineptr, *src_pixptr;

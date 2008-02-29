@@ -18,7 +18,7 @@
  *************************************/
 
 static double rweights[3], gweights[3], bweights[3];
-static mame_bitmap *spritebitmap;
+static bitmap_t *spritebitmap;
 
 static UINT8 video_control[8];
 static UINT8 bitmode_addr[2];

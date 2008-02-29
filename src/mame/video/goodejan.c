@@ -33,7 +33,7 @@ static TILE_GET_INFO( goodejan_tx_tile_info )
 	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay;

@@ -16,7 +16,7 @@ static tilemap *fof_txt_tilemap;
 
 extern char bbprot_kludge;
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {
 	const gfx_element *gfx = machine->gfx[3];
 	UINT16 *source = fitfight_spriteram;

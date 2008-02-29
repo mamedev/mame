@@ -13,7 +13,7 @@ UINT8 *superqix_bitmapram,*superqix_bitmapram2;
 int pbillian_show_power;
 
 static int gfxbank;
-static mame_bitmap *fg_bitmap[2];
+static bitmap_t *fg_bitmap[2];
 static int show_bitmap;
 static tilemap *bg_tilemap;
 
@@ -165,7 +165,7 @@ WRITE8_HANDLER( superqix_0410_w )
 
 ***************************************************************************/
 
-static void pbillian_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void pbillian_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -192,7 +192,7 @@ static void pbillian_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void superqix_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void superqix_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

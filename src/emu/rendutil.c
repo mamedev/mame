@@ -22,8 +22,8 @@
 /* utilities */
 static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
 static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
-static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *hasalpha);
-static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *hasalpha);
+static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha);
+static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha);
 
 
 
@@ -52,7 +52,7 @@ INLINE UINT8 compute_brightness(rgb_t rgb)
     quality resampling of a texture
 -------------------------------------------------*/
 
-void render_resample_argb_bitmap_hq(void *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const mame_bitmap *source, const rectangle *orig_sbounds, const render_color *color)
+void render_resample_argb_bitmap_hq(void *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const bitmap_t *source, const rectangle *orig_sbounds, const render_color *color)
 {
 	UINT32 swidth, sheight;
 	const UINT32 *sbase;
@@ -556,12 +556,12 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
 
 /*-------------------------------------------------
     render_load_png - load a PNG file into a
-    mame_bitmap
+    bitmap_t
 -------------------------------------------------*/
 
-mame_bitmap *render_load_png(const char *dirname, const char *filename, mame_bitmap *alphadest, int *hasalpha)
+bitmap_t *render_load_png(const char *dirname, const char *filename, bitmap_t *alphadest, int *hasalpha)
 {
-	mame_bitmap *bitmap = NULL;
+	bitmap_t *bitmap = NULL;
 	file_error filerr;
 	mame_file *file;
 	png_info png;
@@ -636,7 +636,7 @@ mame_bitmap *render_load_png(const char *dirname, const char *filename, mame_bit
     bitmap
 -------------------------------------------------*/
 
-static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *hasalpha)
+static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;
@@ -701,7 +701,7 @@ static void copy_png_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *ha
     to the alpha channel of a bitmap
 -------------------------------------------------*/
 
-static void copy_png_alpha_to_bitmap(mame_bitmap *bitmap, const png_info *png, int *hasalpha)
+static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;

@@ -96,7 +96,7 @@ p2 ink doesn't always light up in test mode
 
 #include "driver.h"
 
-static mame_bitmap *tile, *obj1, *obj2;
+static bitmap_t *tile, *obj1, *obj2;
 static tilemap *tx_tilemap;
 
 static UINT8 *tx_tileram;

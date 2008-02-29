@@ -102,7 +102,7 @@ WRITE16_HANDLER( klax_latch_w )
 VIDEO_UPDATE( klax )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

@@ -11,7 +11,7 @@ extern UINT8 K007121_ctrlram[MAX_K007121][8];
 void K007121_ctrl_w(int chip,int offset,int data);
 WRITE8_HANDLER( K007121_ctrl_0_w );
 WRITE8_HANDLER( K007121_ctrl_1_w );
-void K007121_sprites_draw(int chip,mame_bitmap *bitmap,gfx_element **gfxs, colortable_t *ctable,
+void K007121_sprites_draw(int chip,bitmap_t *bitmap,gfx_element **gfxs, colortable_t *ctable,
 						  const rectangle *cliprect, const UINT8 *source,int base_color,
 						  int global_x_offset,int bank_base, UINT32 pri_mask);
 
@@ -24,14 +24,14 @@ WRITE8_HANDLER( K007342_scroll_w );
 void K007342_tilemap_update(void);
 WRITE8_HANDLER( K007342_vreg_w );
 void K007342_tilemap_set_enable(int layer, int enable);
-void K007342_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int num,int flags,UINT32 priority);
+void K007342_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int num,int flags,UINT32 priority);
 int K007342_is_INT_enabled(void);
 
 
 void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int *code,int *color));
 READ8_HANDLER( K007420_r );
 WRITE8_HANDLER( K007420_w );
-void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect);
+void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect);
 void K007420_set_banklimit(int limit);
 
 
@@ -104,7 +104,7 @@ READ8_HANDLER( K051937_r );
 WRITE8_HANDLER( K051937_w );
 READ16_HANDLER( K051937_word_r );
 WRITE16_HANDLER( K051937_word_w );
-void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
+void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority);
 int K051960_is_IRQ_enabled(void);
 int K051960_is_NMI_enabled(void);
 void K051960_set_sprite_offsets(int dx, int dy);
@@ -129,8 +129,8 @@ WRITE16_HANDLER( K053244_lsb_w );
 READ16_HANDLER( K053244_word_r );
 WRITE16_HANDLER( K053244_word_w );
 void K053244_bankselect(int chip, int bank);	/* used by TMNT2, Asterix and Premier Soccer for ROM testing */
-void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect);
-void K053245_sprites_draw_lethal(running_machine *machine, int chip, mame_bitmap *bitmap,const rectangle *cliprect); /* for lethal enforcers */
+void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect);
+void K053245_sprites_draw_lethal(running_machine *machine, int chip, bitmap_t *bitmap,const rectangle *cliprect); /* for lethal enforcers */
 void K053245_clear_buffer(int chip);
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy);
 
@@ -164,7 +164,7 @@ READ32_HANDLER( K053247_long_r );
 WRITE32_HANDLER( K053247_long_w );
 WRITE16_HANDLER( K053247_reg_word_w ); // "OBJSET2" registers
 WRITE32_HANDLER( K053247_reg_long_w );
-void K053247_sprites_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect);
+void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect);
 int K053247_read_register(int regnum);
 void K053247_set_SpriteOffset(int offsx, int offsy);
 void K053247_wraparound_enable(int status);
@@ -214,17 +214,17 @@ READ8_HANDLER( K051316_rom_2_r );
 WRITE8_HANDLER( K051316_ctrl_0_w );
 WRITE8_HANDLER( K051316_ctrl_1_w );
 WRITE8_HANDLER( K051316_ctrl_2_w );
-void K051316_zoom_draw_0(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
-void K051316_zoom_draw_1(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
-void K051316_zoom_draw_2(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
+void K051316_zoom_draw_0(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
+void K051316_zoom_draw_1(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
+void K051316_zoom_draw_2(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority);
 void K051316_wraparound_enable(int chip, int status);
 void K051316_set_offset(int chip, int xoffs, int yoffs);
 
 
 extern UINT16 *K053936_0_ctrl,*K053936_0_linectrl;
 extern UINT16 *K053936_1_ctrl,*K053936_1_linectrl;
-void K053936_0_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority);
-void K053936_1_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority);
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority);
+void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority);
 void K053936_wraparound_enable(int chip, int status);
 void K053936_set_offset(int chip, int xoffs, int yoffs);
 
@@ -284,8 +284,8 @@ WRITE8_HANDLER( K056832_w );
 WRITE8_HANDLER( K056832_b_w );
 void K056832_mark_plane_dirty(int num);
 void K056832_MarkAllTilemapsDirty(void);
-void K056832_tilemap_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority);
-void K056832_tilemap_draw_dj(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
+void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int num, int flags, UINT32 priority);
+void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority);
 void K056832_set_LayerAssociation(int status);
 int  K056832_get_LayerAssociation(void);
 void K056832_set_LayerOffset(int layer, int offsx, int offsy);
@@ -391,8 +391,8 @@ WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
 void K054338_update_all_shadows(running_machine *machine);			// called at the beginning of VIDEO_UPDATE()
-void K054338_fill_solid_bg(mame_bitmap *bitmap);				// solid backcolor fill
-void K054338_fill_backcolor(running_machine *machine, mame_bitmap *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
+void K054338_fill_solid_bg(bitmap_t *bitmap);				// solid backcolor fill
+void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode);	// unified fill, 0=solid, 1=gradient
 int  K054338_set_alpha_level(int pblend);							// blend style 0-2
 void K054338_invert_alpha(int invert);								// 0=0x00(invis)-0x1f(solid), 1=0x1f(invis)-0x00(solod)
 void K054338_export_config(int **shdRGB);
@@ -427,7 +427,7 @@ READ16_HANDLER( K053250_1_rom_r );
 #define K053250_WRAP500		0x01
 #define K053250_OVERDRIVE	0x02
 
-void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
+void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
 void K053250_unpack_pixels(int region);
 void K053250_dma(int chip, int limiter);

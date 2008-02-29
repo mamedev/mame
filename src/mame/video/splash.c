@@ -89,7 +89,7 @@ WRITE16_HANDLER( splash_vram_w )
 	tilemap_mark_tile_dirty(bg_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 1);
 }
 
-static void draw_bitmap(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bitmap(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int sx,sy,color,count,colxor,bitswap;
 	colxor = 0; /* splash and some bitmap modes in roldfrog */
@@ -216,7 +216,7 @@ VIDEO_START( splash )
       400| xxxxxxxx -------- | unused
 */
 
-static void splash_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void splash_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 	const gfx_element *gfx = machine->gfx[1];
@@ -237,7 +237,7 @@ static void splash_draw_sprites(running_machine *machine, mame_bitmap *bitmap,co
 	}
 }
 
-static void funystrp_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void funystrp_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 	const gfx_element *gfx = machine->gfx[1];

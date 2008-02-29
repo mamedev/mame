@@ -82,7 +82,7 @@ VIDEO_START( battlex )
 		 8, 8, 64, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = spriteram;

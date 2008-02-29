@@ -254,7 +254,7 @@ void taitol_obj1b_m(int offset)
                  plgirs2 bullets and raimais big bosses.
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

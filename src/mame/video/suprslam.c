@@ -9,7 +9,7 @@ static UINT16 screen_bank, bg_bank;
 static tilemap *suprslam_screen_tilemap, *suprslam_bg_tilemap;
 
 /* todo, fix zooming correctly, its _not_ like aerofgt */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* SPRITE INFO
 

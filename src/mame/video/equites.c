@@ -278,7 +278,7 @@ static void equites_update_clut(running_machine *machine)
 		colortable_entry_set_value(machine->colortable, i, c);
 }
 
-static void equites_draw_scroll(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void equites_draw_scroll(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #define TILE_BANKBASE 1
 
@@ -326,7 +326,7 @@ static void equites_draw_scroll(running_machine *machine, mame_bitmap *bitmap, c
 #undef TILE_BANKBASE
 }
 
-static void equites_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void equites_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #define SPRITE_BANKBASE 3
 #define SHIFTX -4
@@ -402,7 +402,7 @@ static void splndrbt_update_clut(running_machine *machine)
 	}
 }
 
-static void splndrbt_draw_scroll(running_machine *machine, mame_bitmap *bitmap)
+static void splndrbt_draw_scroll(running_machine *machine, bitmap_t *bitmap)
 {
 #define TILE_BANKBASE 1
 
@@ -436,8 +436,8 @@ static void splndrbt_draw_scroll(running_machine *machine, mame_bitmap *bitmap)
 }
 
 static void splndrbt_slantcopy(
-	mame_bitmap *src_bitmap,
-	mame_bitmap *dst_bitmap,
+	bitmap_t *src_bitmap,
+	bitmap_t *dst_bitmap,
 	const rectangle *dst_clip,
 	int src_x, int src_y,
 	unsigned src_w, unsigned src_h,
@@ -479,7 +479,7 @@ static void splndrbt_slantcopy(
 #undef WRAP
 }
 
-static void splndrbt_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *clip)
+static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *clip)
 {
 #define SPRITE_BANKBASE 3
 #define FP_ONE 0x10000

@@ -98,7 +98,7 @@ void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear)
 
 
 
-static void draw_sprite_and_check_collision(running_machine *machine, mame_bitmap *bitmap)
+static void draw_sprite_and_check_collision(running_machine *machine, bitmap_t *bitmap)
 {
 	int y;
 	UINT8 code = crbaloon_spriteram[0] & 0x0f;

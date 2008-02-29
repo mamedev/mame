@@ -18,7 +18,7 @@ static tilemap *background_tilemap, *fix_tilemap;
 static UINT8 deco16_io_ram[16];
 
 #if 0
-void debug_print(mame_bitmap *bitmap)
+void debug_print(bitmap_t *bitmap)
 {
 	int i,j;
 	char buf[20*16];
@@ -182,7 +182,7 @@ PALETTE_INIT( liberate )
 
 /***************************************************************************/
 
-static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void liberate_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -248,7 +248,7 @@ static void liberate_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void prosport_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 
@@ -303,7 +303,7 @@ static void prosport_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void boomrang_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void boomrang_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs,multi,fx,fy,sx,sy,sy2,code,code2,color;
 

@@ -78,7 +78,7 @@ WRITE8_HANDLER( m15_chargen_w )
 }
 
 
-INLINE void plot_pixel_m10(mame_bitmap *bm, int x, int y, int col)
+INLINE void plot_pixel_m10(bitmap_t *bm, int x, int y, int col)
 {
 	m10_state *state = Machine->driver_data;
 
@@ -127,7 +127,7 @@ VIDEO_START( m15 )
 
 /***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
 
 ***************************************************************************/
 VIDEO_UPDATE( m10 )
@@ -167,7 +167,7 @@ VIDEO_UPDATE( m10 )
 
 /***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
 
 ***************************************************************************/
 VIDEO_UPDATE( m15 )

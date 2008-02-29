@@ -74,7 +74,7 @@ VIDEO_START( slapshot )
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int y_offset)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int *primasks,int y_offset)
 {
 	/*
         Sprite format:

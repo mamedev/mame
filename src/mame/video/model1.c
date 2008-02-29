@@ -142,7 +142,7 @@ static void project_point_direct(struct point *p)
 }
 
 
-static void draw_hline(mame_bitmap *bitmap, int x1, int x2, int y, int color)
+static void draw_hline(bitmap_t *bitmap, int x1, int x2, int y, int color)
 {
 	UINT16 *base = BITMAP_ADDR16(bitmap, y, 0);
 	while(x1 <= x2) {
@@ -151,7 +151,7 @@ static void draw_hline(mame_bitmap *bitmap, int x1, int x2, int y, int color)
 	}
 }
 
-static void draw_hline_moired(mame_bitmap *bitmap, int x1, int x2, int y, int color)
+static void draw_hline_moired(bitmap_t *bitmap, int x1, int x2, int y, int color)
 {
 	UINT16 *base = BITMAP_ADDR16(bitmap, y, 0);
 	while(x1 <= x2) {
@@ -161,7 +161,7 @@ static void draw_hline_moired(mame_bitmap *bitmap, int x1, int x2, int y, int co
 	}
 }
 
-static void fill_slope(mame_bitmap *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
+static void fill_slope(bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
 {
 	if(y1 > view.y2)
 		return;
@@ -221,7 +221,7 @@ static void fill_slope(mame_bitmap *bitmap, int color, INT32 x1, INT32 x2, INT32
 	*nx2 = x2;
 }
 
-static void fill_line(mame_bitmap *bitmap, int color, INT32 y, INT32 x1, INT32 x2)
+static void fill_line(bitmap_t *bitmap, int color, INT32 y, INT32 x1, INT32 x2)
 {
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
@@ -242,7 +242,7 @@ static void fill_line(mame_bitmap *bitmap, int color, INT32 y, INT32 x1, INT32 x
 	}
 }
 
-static void fill_quad(mame_bitmap *bitmap, const struct quad *q)
+static void fill_quad(bitmap_t *bitmap, const struct quad *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -343,7 +343,7 @@ static void fill_quad(mame_bitmap *bitmap, const struct quad *q)
 		fill_line(bitmap, color, cury, x1, x2);
 }
 #if 0
-static void draw_line(mame_bitmap *bitmap, int color, int x1, int y1, int x2, int y2)
+static void draw_line(bitmap_t *bitmap, int color, int x1, int y1, int x2, int y2)
 {
 	int s1x, s1y, s2x, s2y;
 	int d1, d2;
@@ -440,7 +440,7 @@ static void unsort_quads(void)
 }
 
 
-static void draw_quads(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_quads(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int count = quadpt - quaddb;
 	int i;
@@ -1108,7 +1108,7 @@ static UINT16 *skip_direct(UINT16 *list)
 	return list+2;
 }
 
-static void draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if(quadpt != quaddb) {
 		LOG_TGP(("VIDEO: sort&draw\n"));
@@ -1120,7 +1120,7 @@ static void draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
 	pointpt = pointdb;
 }
 
-static UINT16 *draw_direct(UINT16 *list, mame_bitmap *bitmap, const rectangle *cliprect)
+static UINT16 *draw_direct(UINT16 *list, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT16 *res;
 
@@ -1170,7 +1170,7 @@ WRITE16_HANDLER( model1_listctl_w )
 	LOG_TGP(("VIDEO: control=%08x\n", (listctl[1]<<16)|listctl[0]));
 }
 
-static void tgp_render(mame_bitmap *bitmap, const rectangle *cliprect)
+static void tgp_render(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	render_done = 1;
 	if((listctl[1] & 0x1f) == 0x1f) {

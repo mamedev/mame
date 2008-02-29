@@ -24,7 +24,7 @@ static int nbmj8891_clutsel;
 static int nbmj8891_screen_refresh;
 static int gfxdraw_mode;
 
-static mame_bitmap *nbmj8891_tmpbitmap0, *nbmj8891_tmpbitmap1;
+static bitmap_t *nbmj8891_tmpbitmap0, *nbmj8891_tmpbitmap1;
 static UINT8 *nbmj8891_videoram0, *nbmj8891_videoram1;
 static UINT8 *nbmj8891_palette;
 static UINT8 *nbmj8891_clut;

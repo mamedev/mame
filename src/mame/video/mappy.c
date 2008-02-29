@@ -8,7 +8,7 @@ UINT8 *mappy_spriteram;
 static UINT8 mappy_scroll;
 static tilemap *bg_tilemap;
 
-static mame_bitmap *sprite_bitmap;
+static bitmap_t *sprite_bitmap;
 
 
 /***************************************************************************
@@ -400,7 +400,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 ***************************************************************************/
 
 /* also used by toypop.c */
-void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor)
+void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor)
 {
 	int offs;
 
@@ -475,7 +475,7 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-static void phozon_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 

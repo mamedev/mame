@@ -30,7 +30,7 @@ WRITE8_HANDLER( freek_videoram_w )
 	tilemap_mark_tile_dirty(freek_tilemap,offset&0x3ff);
 }
 
-static void gigas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void gigas_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -65,7 +65,7 @@ static void gigas_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 
-static void pbillrd_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void pbillrd_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -101,7 +101,7 @@ static void pbillrd_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 
 
 
-static void freekick_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void freekick_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 

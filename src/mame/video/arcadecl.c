@@ -95,7 +95,7 @@ VIDEO_UPDATE( arcadecl )
 	if (has_mo)
 	{
 		struct atarimo_rect_list rectlist;
-		mame_bitmap *mobitmap;
+		bitmap_t *mobitmap;
 		int x, y, r;
 
 		mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);

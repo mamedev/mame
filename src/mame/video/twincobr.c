@@ -454,7 +454,7 @@ static void twincobr_log_vram(void)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int offs;
 
@@ -489,7 +489,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 
 
 /***************************************************************************
-    Draw the game screen in the given mame_bitmap.
+    Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
 VIDEO_UPDATE( toaplan0 )

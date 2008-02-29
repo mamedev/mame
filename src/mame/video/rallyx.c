@@ -482,7 +482,7 @@ WRITE8_HANDLER( tactcian_starson_w )
 
 
 
-static void plot_star(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int x, int y, int color)
+static void plot_star(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int x, int y, int color)
 {
 	if (y < cliprect->min_y ||
 		y > cliprect->max_y ||
@@ -500,7 +500,7 @@ static void plot_star(running_machine *machine, mame_bitmap *bitmap, const recta
 		*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + color;
 }
 
-static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -515,7 +515,7 @@ static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rect
 }
 
 
-static void rallyx_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
+static void rallyx_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
 	int offs;
 
@@ -539,7 +539,7 @@ static void rallyx_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int displacement )
+static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
 	int offs;
 
@@ -564,7 +564,7 @@ static void locomotn_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void rallyx_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void rallyx_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
@@ -585,7 +585,7 @@ static void rallyx_draw_bullets(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void jungler_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void jungler_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 
@@ -605,7 +605,7 @@ static void jungler_draw_bullets(running_machine *machine, mame_bitmap *bitmap, 
 	}
 }
 
-static void locomotn_draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int transparency )
+static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transparency )
 {
 	int offs;
 

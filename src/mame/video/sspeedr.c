@@ -93,7 +93,7 @@ WRITE8_HANDLER( sspeedr_track_ice_w )
 }
 
 
-static void draw_track(mame_bitmap* bitmap)
+static void draw_track(bitmap_t* bitmap)
 {
 	const UINT8* p = memory_region(REGION_GFX3);
 
@@ -181,7 +181,7 @@ static void draw_track(mame_bitmap* bitmap)
 }
 
 
-static void draw_drones(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_drones(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	static const UINT8 code[6] =
 	{
@@ -221,7 +221,7 @@ static void draw_drones(running_machine *machine, mame_bitmap* bitmap, const rec
 }
 
 
-static void draw_driver(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_driver(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int x;
 	int y;

@@ -360,11 +360,11 @@ void cyberbal_scanline_update(running_machine *machine, int scrnum, int scanline
  *
  *************************************/
 
-static void update_one_screen(running_machine* machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect)
+static void update_one_screen(running_machine* machine, int screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	struct atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r, mooffset, temp;
 
 	/* draw the playfield */

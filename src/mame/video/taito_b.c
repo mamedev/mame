@@ -10,7 +10,7 @@ static tilemap *bg_tilemap, *fg_tilemap, *tx_tilemap;
 static UINT16 bg_rambank[2],fg_rambank[2],tx_rambank;
 
 /* framebuffer is a raw bitmap, remapped as a last step */
-static mame_bitmap *framebuffer[2],*pixel_bitmap;
+static bitmap_t *framebuffer[2],*pixel_bitmap;
 
 static UINT16 pixel_scroll[2];
 
@@ -327,7 +327,7 @@ WRITE16_HANDLER( TC0180VCU_framebuffer_word_w )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 /*  Sprite format: (16 bytes per sprite)
   offs:             bits:
@@ -450,7 +450,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 }
 
 
-static void TC0180VCU_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int plane)
+static void TC0180VCU_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int plane)
 {
 /*plane = 0 fg tilemap*/
 /*plane = 1 bg tilemap*/
@@ -491,7 +491,7 @@ static void TC0180VCU_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect
 }
 
 
-static void draw_framebuffer(mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_framebuffer(bitmap_t *bitmap,const rectangle *cliprect,int priority)
 {
   rectangle myclip = *cliprect;
   int x,y;

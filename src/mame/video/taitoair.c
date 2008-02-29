@@ -87,7 +87,7 @@ VIDEO_START( taitoair )
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -217,7 +217,7 @@ struct poly {
 	int col;
 };
 
-static void fill_slope(mame_bitmap *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
+static void fill_slope(bitmap_t *bitmap, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2)
 {
 	if(y1 > view.y2)
 		return;
@@ -280,7 +280,7 @@ static void fill_slope(mame_bitmap *bitmap, int color, INT32 x1, INT32 x2, INT32
 	*nx2 = x2;
 }
 
-static void fill_poly(mame_bitmap *bitmap, const struct poly *q)
+static void fill_poly(bitmap_t *bitmap, const struct poly *q)
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;

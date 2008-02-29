@@ -305,7 +305,7 @@ static void get_pens(pen_t *pens)
 }
 
 
-static void liberatr_draw_planet(mame_bitmap *bitmap, pen_t *pens)
+static void liberatr_draw_planet(bitmap_t *bitmap, pen_t *pens)
 {
 	UINT8 latitude;
 
@@ -345,7 +345,7 @@ static void liberatr_draw_planet(mame_bitmap *bitmap, pen_t *pens)
 }
 
 
-static void liberatr_draw_bitmap(running_machine *machine, mame_bitmap *bitmap, pen_t *pens)
+static void liberatr_draw_bitmap(running_machine *machine, bitmap_t *bitmap, pen_t *pens)
 {
 	offs_t offs;
 

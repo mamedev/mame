@@ -130,7 +130,7 @@ INLINE int sf_invert(int nb)
 	return nb ^ delta[(nb >> 3) & 3];
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

@@ -65,7 +65,7 @@ static rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 	return MAKE_RGB((UINT8)finalR,(UINT8)finalG,(UINT8)finalB) ;
 }
 
-static void jal_blend_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void jal_blend_drawgfx( bitmap_t *dest_bmp,const gfx_element *gfx,
 							   UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 							   const rectangle *clip,int transparency,int transparent_color)
 {

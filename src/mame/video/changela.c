@@ -32,7 +32,7 @@ static UINT8* memory_devices;
 static UINT8* tree_ram;
 static UINT32  mem_dev_selected; /* an offset within memory_devices area */
 
-static mame_bitmap *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
+static bitmap_t *obj0_bitmap, *river_bitmap, *tree0_bitmap, *tree1_bitmap;
 
 static emu_timer* changela_scanline_timer;
 static TIMER_CALLBACK( changela_scanline_callback );
@@ -64,7 +64,7 @@ VIDEO_START( changela )
     Obj 0 - Sprite Layer
 
 ***************************************************************************/
-static void draw_obj0(mame_bitmap *bitmap, int sy)
+static void draw_obj0(bitmap_t *bitmap, int sy)
 {
 	int sx, i;
 
@@ -125,7 +125,7 @@ static void draw_obj0(mame_bitmap *bitmap, int sy)
     Obj 1 - Text Layer
 
 ***************************************************************************/
-static void draw_obj1(mame_bitmap *bitmap)
+static void draw_obj1(bitmap_t *bitmap)
 {
 	int sx, sy;
 
@@ -188,7 +188,7 @@ static void draw_obj1(mame_bitmap *bitmap)
     River Video Generator
 
 ***************************************************************************/
-static void draw_river(mame_bitmap *bitmap, int sy)
+static void draw_river(bitmap_t *bitmap, int sy)
 {
 	int sx, i, j;
 
@@ -367,7 +367,7 @@ static void draw_river(mame_bitmap *bitmap, int sy)
     Tree Generators
 
 ***************************************************************************/
-static void draw_tree(mame_bitmap *bitmap, int sy, int tree_num)
+static void draw_tree(bitmap_t *bitmap, int sy, int tree_num)
 {
 	int sx, i, j;
 

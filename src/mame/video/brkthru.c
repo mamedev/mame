@@ -163,7 +163,7 @@ WRITE8_HANDLER( brkthru_1800_w )
 
 
 #if 0
-static void show_register( mame_bitmap *bitmap, int x, int y, UINT32 data )
+static void show_register( bitmap_t *bitmap, int x, int y, UINT32 data )
 {
 	char buf[5];
 
@@ -173,7 +173,7 @@ static void show_register( mame_bitmap *bitmap, int x, int y, UINT32 data )
 #endif
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int prio )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int prio )
 {
 	int offs;
 	/* Draw the sprites. Note that it is important to draw them exactly in this */

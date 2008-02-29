@@ -174,7 +174,7 @@ WRITE16_HANDLER( toypop_merged_background_w )
 		toypop_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-static void draw_background(mame_bitmap *bitmap)
+static void draw_background(bitmap_t *bitmap)
 {
 	int offs, x, y;
 	UINT16 scanline[288];
@@ -222,7 +222,7 @@ static void draw_background(mame_bitmap *bitmap)
 ***************************************************************************/
 
 /* from mappy.c */
-void mappy_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor);
+void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xoffs, int yoffs, int transcolor);
 
 
 VIDEO_UPDATE( toypop )

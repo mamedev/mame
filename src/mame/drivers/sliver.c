@@ -89,8 +89,8 @@ static int jpeg_y=0;
 static int tmp_counter;
 static int clr_offset=0;
 
-static mame_bitmap *sliver_bitmap_fg;
-static mame_bitmap *sliver_bitmap_bg;
+static bitmap_t *sliver_bitmap_fg;
+static bitmap_t *sliver_bitmap_bg;
 
 static UINT16 tempbuf[8];
 

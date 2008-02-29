@@ -75,7 +75,7 @@ void fd1094_machine_init(void);
 void fd1094_driver_init(void (*set_decrypted)(UINT8 *));
 
 /* video/segac2.c */
-extern void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect );
+extern void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect );
 extern void start_system18_vdp(void);
 extern READ16_HANDLER( segac2_vdp_r );
 extern WRITE16_HANDLER( segac2_vdp_w );

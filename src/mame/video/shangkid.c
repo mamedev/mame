@@ -59,7 +59,7 @@ WRITE8_HANDLER( shangkid_videoram_w )
 	tilemap_mark_tile_dirty( background, offset&0x7ff );
 }
 
-static void draw_sprite(running_machine *machine, const UINT8 *source, mame_bitmap *bitmap, const rectangle *cliprect ){
+static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t *bitmap, const rectangle *cliprect ){
 	const gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
@@ -152,7 +152,7 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, mame_bitm
 	}
 }
 
-static void shangkid_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source, *finish;
 
@@ -213,7 +213,7 @@ PALETTE_INIT( dynamski )
 }
 
 
-static void dynamski_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+static void dynamski_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 	int i;
 	int sx,sy;
@@ -267,7 +267,7 @@ static void dynamski_draw_background(running_machine *machine, mame_bitmap *bitm
 	}
 }
 
-static void dynamski_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int i;
 	int sx,sy;

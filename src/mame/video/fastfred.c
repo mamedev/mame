@@ -13,7 +13,7 @@
 
 extern UINT8 galaxian_stars_on;
 void galaxian_init_stars(running_machine *machine, int colors_offset);
-void galaxian_draw_stars(running_machine *machine, mame_bitmap *bitmap);
+void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap);
 
 UINT8 *fastfred_videoram;
 UINT8 *fastfred_spriteram;
@@ -249,7 +249,7 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

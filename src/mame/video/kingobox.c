@@ -209,7 +209,7 @@ VIDEO_START( kingofb )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void kingofb_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kingofb_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -275,7 +275,7 @@ VIDEO_START( ringking )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
-static void ringking_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void ringking_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

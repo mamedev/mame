@@ -84,7 +84,7 @@ WRITE16_HANDLER( kickgoal_bg2ram_w )
 
 
 
-static void kickgoal_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void kickgoal_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;
@@ -209,7 +209,7 @@ VIDEO_START( actionhw )
 }
 
 
-static void actionhw_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void actionhw_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;

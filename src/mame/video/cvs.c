@@ -20,9 +20,9 @@
 
 
 static s2636_t *s2636_0, *s2636_1, *s2636_2;
-static mame_bitmap *background_bitmap;
-mame_bitmap *cvs_collision_background;
-static mame_bitmap *scrolled_collision_background;
+static bitmap_t *background_bitmap;
+bitmap_t *cvs_collision_background;
+static bitmap_t *scrolled_collision_background;
 
 int cvs_collision_register;
 
@@ -210,9 +210,9 @@ VIDEO_UPDATE( cvs )
 	offs_t offs;
 	int scroll[8];
 	UINT8 character_banking_mode;
-	mame_bitmap *s2636_0_bitmap;
-	mame_bitmap *s2636_1_bitmap;
-	mame_bitmap *s2636_2_bitmap;
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
+	bitmap_t *s2636_2_bitmap;
 
 	set_pens(machine->colortable);
 

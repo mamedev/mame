@@ -131,7 +131,7 @@ struct _element_component
 	render_bounds		bounds;				/* bounds of the element */
 	render_color		color;				/* color of the element */
 	const char *		string;				/* string for text components */
-	mame_bitmap *		bitmap;				/* source bitmap for images */
+	bitmap_t *			bitmap;				/* source bitmap for images */
 	const char *		dirname;			/* directory name of image file (for lazy loading) */
 	const char *		imagefile;			/* name of the image file (for lazy loading) */
 	const char *		alphafile;			/* name of the alpha file (for lazy loading) */
@@ -145,22 +145,22 @@ struct _element_component
 ***************************************************************************/
 
 /* layout elements */
-static void layout_element_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
-static void layout_element_draw_rect(mame_bitmap *dest, const rectangle *bounds, const render_color *color);
-static void layout_element_draw_disk(mame_bitmap *dest, const rectangle *bounds, const render_color *color);
-static void layout_element_draw_text(mame_bitmap *dest, const rectangle *bounds, const render_color *color, const char *string);
-static void layout_element_draw_led7seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led14seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led16seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led14segsc(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led16segsc(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
+static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, const render_color *color);
+static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, const render_color *color);
+static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, const render_color *color, const char *string);
+static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
 
 /* layout file parsing */
 static layout_element *load_layout_element(xml_data_node *elemnode, const char *dirname);
 static element_component *load_element_component(xml_data_node *compnode, const char *dirname);
 static layout_view *load_layout_view(xml_data_node *viewnode, layout_element *elemlist);
 static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemlist);
-static mame_bitmap *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha);
+static bitmap_t *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha);
 static int load_bounds(xml_data_node *boundsnode, render_bounds *bounds);
 static int load_color(xml_data_node *colornode, render_color *color);
 static int load_orientation(xml_data_node *orientnode, int *orientation);
@@ -360,7 +360,7 @@ void layout_view_recompute(layout_view *view, int layerconfig)
     appropriate resolution
 -------------------------------------------------*/
 
-static void layout_element_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
+static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
 {
 	element_texture *elemtex = param;
 	element_component *component;
@@ -432,7 +432,7 @@ static void layout_element_scale(mame_bitmap *dest, const mame_bitmap *source, c
     in the specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_rect(mame_bitmap *dest, const rectangle *bounds, const render_color *color)
+static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, const render_color *color)
 {
 	UINT32 r, g, b, inva;
 	UINT32 x, y;
@@ -471,7 +471,7 @@ static void layout_element_draw_rect(mame_bitmap *dest, const rectangle *bounds,
     in the specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_disk(mame_bitmap *dest, const rectangle *bounds, const render_color *color)
+static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, const render_color *color)
 {
 	float xcenter, ycenter;
 	float xradius, yradius, ooyradius2;
@@ -530,10 +530,10 @@ static void layout_element_draw_disk(mame_bitmap *dest, const rectangle *bounds,
     specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_text(mame_bitmap *dest, const rectangle *bounds, const render_color *color, const char *string)
+static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, const render_color *color, const char *string)
 {
 	render_font *font = render_font_alloc(NULL);
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 	UINT32 r, g, b, a;
 	float aspect = 1.0f;
 	INT32 curx, width;
@@ -613,7 +613,7 @@ static void layout_element_draw_text(mame_bitmap *dest, const rectangle *bounds,
     and start points
 -------------------------------------------------*/
 
-static void draw_segment_horizontal_caps(mame_bitmap *dest, int minx, int maxx, int midy, int width, int caps, rgb_t color)
+static void draw_segment_horizontal_caps(bitmap_t *dest, int minx, int maxx, int midy, int width, int caps, rgb_t color)
 {
 	int x, y;
 
@@ -636,7 +636,7 @@ static void draw_segment_horizontal_caps(mame_bitmap *dest, int minx, int maxx, 
     LED segment
 -------------------------------------------------*/
 
-static void draw_segment_horizontal(mame_bitmap *dest, int minx, int maxx, int midy, int width, rgb_t color)
+static void draw_segment_horizontal(bitmap_t *dest, int minx, int maxx, int midy, int width, rgb_t color)
 {
 	draw_segment_horizontal_caps(dest, minx, maxx, midy, width, LINE_CAP_START | LINE_CAP_END, color);
 }
@@ -648,7 +648,7 @@ static void draw_segment_horizontal(mame_bitmap *dest, int minx, int maxx, int m
     and start points
 -------------------------------------------------*/
 
-static void draw_segment_vertical_caps(mame_bitmap *dest, int miny, int maxy, int midx, int width, int caps, rgb_t color)
+static void draw_segment_vertical_caps(bitmap_t *dest, int miny, int maxy, int midx, int width, int caps, rgb_t color)
 {
 	int x, y;
 
@@ -671,7 +671,7 @@ static void draw_segment_vertical_caps(mame_bitmap *dest, int miny, int maxy, in
     LED segment
 -------------------------------------------------*/
 
-static void draw_segment_vertical(mame_bitmap *dest, int miny, int maxy, int midx, int width, rgb_t color)
+static void draw_segment_vertical(bitmap_t *dest, int miny, int maxy, int midx, int width, rgb_t color)
 {
 	draw_segment_vertical_caps(dest, miny, maxy, midx, width, LINE_CAP_START | LINE_CAP_END, color);
 }
@@ -682,7 +682,7 @@ static void draw_segment_vertical(mame_bitmap *dest, int miny, int maxy, int mid
     LED segment that looks like this: /
 -------------------------------------------------*/
 
-static void draw_segment_diagonal_1(mame_bitmap *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_diagonal_1(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -712,7 +712,7 @@ static void draw_segment_diagonal_1(mame_bitmap *dest, int minx, int maxx, int m
     LED segment that looks like this: \
 -------------------------------------------------*/
 
-static void draw_segment_diagonal_2(mame_bitmap *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_diagonal_2(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -741,7 +741,7 @@ static void draw_segment_diagonal_2(mame_bitmap *dest, int minx, int maxx, int m
     draw_segment_decimal - draw a decimal point
 -------------------------------------------------*/
 
-static void draw_segment_decimal(mame_bitmap *dest, int midx, int midy, int width, rgb_t color)
+static void draw_segment_decimal(bitmap_t *dest, int midx, int midy, int width, rgb_t color)
 {
 	float ooradius2;
 	UINT32 x, y;
@@ -772,7 +772,7 @@ static void draw_segment_decimal(mame_bitmap *dest, int midx, int midy, int widt
     draw_segment_comma - draw a comma tail
 -------------------------------------------------*/
 #if 0
-static void draw_segment_comma(mame_bitmap *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_comma(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -797,10 +797,10 @@ static void draw_segment_comma(mame_bitmap *dest, int minx, int maxx, int miny, 
 
 
 /*-------------------------------------------------
-    apply_skew - apply skew to a mame_bitmap
+    apply_skew - apply skew to a bitmap_t
 -------------------------------------------------*/
 
-static void apply_skew(mame_bitmap *dest, int skewwidth)
+static void apply_skew(bitmap_t *dest, int skewwidth)
 {
 	int x, y;
 
@@ -821,12 +821,12 @@ static void apply_skew(mame_bitmap *dest, int skewwidth)
     7-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led7seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff,0xff,0xff,0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff,0x20,0x20,0x20);
 	int bmwidth, bmheight, segwidth, skewwidth;
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 
 	/* sizes for computation */
 	bmwidth = 250;
@@ -877,12 +877,12 @@ static void layout_element_draw_led7seg(mame_bitmap *dest, const rectangle *boun
     14-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led14seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
 	int bmwidth, bmheight, segwidth, skewwidth;
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 
 	/* sizes for computation */
 	bmwidth = 250;
@@ -983,12 +983,12 @@ static void layout_element_draw_led14seg(mame_bitmap *dest, const rectangle *bou
     14-segment LCD with semicolon (2 extra segments)
 -------------------------------------------------*/
 
-static void layout_element_draw_led14segsc(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
 	int bmwidth, bmheight, segwidth, skewwidth;
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 
 	/* sizes for computation */
 	bmwidth = 250;
@@ -1098,12 +1098,12 @@ static void layout_element_draw_led14segsc(mame_bitmap *dest, const rectangle *b
     16-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led16seg(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
 	int bmwidth, bmheight, segwidth, skewwidth;
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 
 	/* sizes for computation */
 	bmwidth = 250;
@@ -1214,12 +1214,12 @@ static void layout_element_draw_led16seg(mame_bitmap *dest, const rectangle *bou
     16-segment LCD with semicolon (2 extra segments)
 -------------------------------------------------*/
 
-static void layout_element_draw_led16segsc(mame_bitmap *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
 	int bmwidth, bmheight, segwidth, skewwidth;
-	mame_bitmap *tempbitmap;
+	bitmap_t *tempbitmap;
 
 	/* sizes for computation */
 	bmwidth = 250;
@@ -1878,9 +1878,9 @@ error:
     with artwork for a component
 -------------------------------------------------*/
 
-static mame_bitmap *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha)
+static bitmap_t *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha)
 {
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 
 	/* load the basic bitmap */
 	bitmap = render_load_png(dirname, file, NULL, hasalpha);

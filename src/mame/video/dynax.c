@@ -848,7 +848,7 @@ VIDEO_START( neruton )
 
 ***************************************************************************/
 
-static void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void hanamai_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;
@@ -913,7 +913,7 @@ static void hanamai_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int 
 }
 
 
-static void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i, int y)
+static void jantouki_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i, int y)
 {
 	int color,scrollx,scrolly,palettes,palbank;
 
@@ -982,7 +982,7 @@ static void jantouki_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int
 }
 
 
-static void mjdialq2_copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int i)
+static void mjdialq2_copylayer(bitmap_t *bitmap,const rectangle *cliprect,int i)
 {
 	int color;
 	int scrollx,scrolly;
@@ -1072,7 +1072,7 @@ static int debug_mask(void)
     I,O        -  Change palette (-,+)
     J,K & N,M  -  Change "tile"  (-,+, slow & fast)
     R          -  move "tile" to the next 1/8th of the gfx  */
-static int debug_viewer(mame_bitmap *bitmap,const rectangle *cliprect)
+static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
 {
 #ifdef MAME_DEBUG
 	static int toggle;
@@ -1252,7 +1252,7 @@ VIDEO_UPDATE( mjdialq2 )
 
 // htengoku uses the mixer chip from ddenlovr
 
-static mame_bitmap *framebuffer;
+static bitmap_t *framebuffer;
 
 VIDEO_START(htengoku)
 {

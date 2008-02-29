@@ -49,7 +49,7 @@ PALETTE_INIT( ambush )
 }
 
 
-static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs, transparency;
 

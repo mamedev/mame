@@ -22,7 +22,7 @@ size_t matmania_videoram2_size;
 UINT8 *matmania_videoram3,*matmania_colorram3;
 size_t matmania_videoram3_size;
 UINT8 *matmania_scroll;
-static mame_bitmap *tmpbitmap2;
+static bitmap_t *tmpbitmap2;
 
 UINT8 *matmania_pageselect;
 

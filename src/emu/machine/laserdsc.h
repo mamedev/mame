@@ -73,7 +73,7 @@ void laserdisc_reset(laserdisc_info *info, int type);
 void laserdisc_exit(laserdisc_info *info);
 void laserdisc_vsync(laserdisc_info *info);
 const char *laserdisc_describe_state(laserdisc_info *info);
-UINT32 laserdisc_get_video(laserdisc_info *info, mame_bitmap **bitmap);
+UINT32 laserdisc_get_video(laserdisc_info *info, bitmap_t **bitmap);
 UINT32 laserdisc_get_field_code(laserdisc_info *info, UINT8 code);
 
 void laserdisc_data_w(laserdisc_info *info, UINT8 data);

@@ -49,11 +49,11 @@ UINT8 *carpolo_spriteram;
 #define RIGHT_BORDER		(239)
 
 
-static mame_bitmap *sprite_sprite_collision_bitmap1;
-static mame_bitmap *sprite_sprite_collision_bitmap2;
-static mame_bitmap *sprite_goal_collision_bitmap1;
-static mame_bitmap *sprite_goal_collision_bitmap2;
-static mame_bitmap *sprite_border_collision_bitmap;
+static bitmap_t *sprite_sprite_collision_bitmap1;
+static bitmap_t *sprite_sprite_collision_bitmap2;
+static bitmap_t *sprite_goal_collision_bitmap1;
+static bitmap_t *sprite_goal_collision_bitmap2;
+static bitmap_t *sprite_border_collision_bitmap;
 
 
 /***************************************************************************
@@ -176,7 +176,7 @@ VIDEO_START( carpolo )
  *
  *************************************/
 
-static void draw_alpha_line(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_alpha_line(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					   		int alpha_line, int video_line)
 {
 	int x;
@@ -207,7 +207,7 @@ static void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy
 }
 
 
-static void draw_sprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 						UINT8 x, UINT8 y, int bank, int code, int col)
 {
 	int remapped_code, flipy;

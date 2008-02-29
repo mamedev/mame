@@ -22,7 +22,7 @@ static int nbmj8991_flipscreen;
 static int nbmj8991_clutsel;
 static int nbmj8991_screen_refresh;
 
-static mame_bitmap *nbmj8991_tmpbitmap;
+static bitmap_t *nbmj8991_tmpbitmap;
 static UINT8 *nbmj8991_videoram;
 static UINT8 *nbmj8991_clut;
 

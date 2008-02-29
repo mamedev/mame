@@ -62,7 +62,7 @@ VIDEO_START( mnchmobl )
 	tmpbitmap = auto_bitmap_alloc(512,512,machine->screen[0].format);
 }
 
-static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[0];
 	int row;
@@ -89,7 +89,7 @@ static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rec
 	}
 }
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
@@ -128,7 +128,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int scroll = mnchmobl_vreg[6];
 	int flags = mnchmobl_vreg[7];					/*   XB?????? */

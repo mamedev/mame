@@ -116,7 +116,7 @@ WRITE8_HANDLER( wiz_flipy_w )
 	flipy = data;
 }
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, int colortype)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, int colortype)
 {
 	int offs;
 
@@ -156,7 +156,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 	}
 }
 
-static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int colortype)
+static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int colortype)
 {
 	int offs;
 
@@ -195,7 +195,7 @@ static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,
 						 const rectangle *cliprect, UINT8* sprite_ram,
                          int bank)
 {

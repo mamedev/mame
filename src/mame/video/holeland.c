@@ -102,7 +102,7 @@ WRITE8_HANDLER( holeland_flipscreen_w )
 }
 
 
-static void holeland_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void holeland_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx, flipy;
 
@@ -141,7 +141,7 @@ static void holeland_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void crzrally_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void crzrally_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx, flipy;
 

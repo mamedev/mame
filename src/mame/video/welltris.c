@@ -40,7 +40,7 @@ WRITE16_HANDLER( welltris_spriteram_w )
 
 
 /* Sprite Drawing is pretty much the same as fromance.c */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 	int offs;
@@ -223,7 +223,7 @@ VIDEO_START( welltris )
 	tilemap_set_transparent_pen(char_tilemap, 15);
 }
 
-static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 	int pixdata;

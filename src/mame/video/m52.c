@@ -298,7 +298,7 @@ WRITE8_HANDLER( alpha1v_flipscreen_w )
  *
  *************************************/
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 

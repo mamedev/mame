@@ -180,7 +180,7 @@ static VIDEO_START( aso )
 }
 
 
-static void hal21_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
+static void hal21_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
 	static int color[2] = {8, 8};
@@ -218,7 +218,7 @@ static void hal21_draw_background(running_machine *machine, mame_bitmap *bitmap,
 		}
 }
 
-static void hal21_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
+static void hal21_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 								const gfx_element *gfx )
 {
 	UINT8 *sprptr, *endptr;
@@ -248,7 +248,7 @@ static void hal21_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, i
 	}
 }
 
-static void aso_draw_background(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
+static void aso_draw_background(bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly, int attrs,
 								const gfx_element *gfx )
 {
 	int bankbase, c, x, y, offsx, offsy, dx, dy, sx, sy, offs, tile_number;
@@ -278,7 +278,7 @@ static void aso_draw_background(mame_bitmap *bitmap, const rectangle *cliprect, 
 		}
 }
 
-static void aso_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
+static void aso_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 								const gfx_element *gfx )
 {
 	UINT8 *sprptr, *endptr;

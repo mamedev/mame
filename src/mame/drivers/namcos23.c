@@ -387,7 +387,7 @@ Normalize( UINT32 data )
 }
 
 static void
-DrawLine( mame_bitmap *bitmap, int x0, int y0, int x1, int y1 )
+DrawLine( bitmap_t *bitmap, int x0, int y0, int x1, int y1 )
 {
 	if( x0>=0 && x0<bitmap->width &&
 		x1>=0 && x1<bitmap->width &&
@@ -421,7 +421,7 @@ DrawLine( mame_bitmap *bitmap, int x0, int y0, int x1, int y1 )
 } /* DrawLine */
 
 static void
-DrawPoly( mame_bitmap *bitmap, const UINT32 *pSource, int n, int bNew )
+DrawPoly( bitmap_t *bitmap, const UINT32 *pSource, int n, int bNew )
 {
 	UINT32 flags = *pSource++;
 	UINT32 unk = *pSource++;

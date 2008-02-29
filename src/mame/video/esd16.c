@@ -179,7 +179,7 @@ VIDEO_START( esd16 )
 
 ***************************************************************************/
 
-static void esd16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -235,7 +235,7 @@ static void esd16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 /* note, check if i can re-merge this with the other or if its really different */
-static void hedpanic_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

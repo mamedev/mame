@@ -254,7 +254,7 @@ static const rectangle spritevisiblearea =
 	0*8, 28*8-1
 };
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 

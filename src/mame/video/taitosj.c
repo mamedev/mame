@@ -31,16 +31,16 @@ UINT8 *taitosj_video_mode;
 UINT8 *taitosj_video_priority;
 UINT8 *taitosj_collision_reg;
 UINT8 *kikstart_scrollram;
-static mame_bitmap *taitosj_layer_bitmap[3];
-static mame_bitmap *sprite_sprite_collbitmap1,*sprite_sprite_collbitmap2;
-static mame_bitmap *sprite_layer_collbitmap1;
-static mame_bitmap *sprite_layer_collbitmap2[3];
+static bitmap_t *taitosj_layer_bitmap[3];
+static bitmap_t *sprite_sprite_collbitmap1,*sprite_sprite_collbitmap2;
+static bitmap_t *sprite_layer_collbitmap1;
+static bitmap_t *sprite_layer_collbitmap2[3];
 static UINT8 dirtycharacter1[256],dirtycharacter2[256];
 static UINT8 dirtysprite1[64],dirtysprite2[64];
 
 static const int layer_enable_mask[3] = { 0x10, 0x20, 0x40 };
 
-typedef void (*copy_layer_func_t)(running_machine *, mame_bitmap *,
+typedef void (*copy_layer_func_t)(running_machine *, bitmap_t *,
 								  const rectangle *, int, int *, rectangle *);
 
 
@@ -613,7 +613,7 @@ static void draw_layers(running_machine *machine)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	/*
        sprite visibility area is missing 4 pixels from the sides, surely to reduce
@@ -679,7 +679,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
 }
 
 
-static void taitosj_copy_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void taitosj_copy_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 							   int which, int *sprites_on, rectangle *sprite_areas)
 {
 	static const int fudge1[3] = { 3,  1, -1 };
@@ -717,7 +717,7 @@ static void taitosj_copy_layer(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 
-static void kikstart_copy_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void kikstart_copy_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 								int which, int *sprites_on, rectangle *sprite_areas)
 {
 	if (*taitosj_video_mode & layer_enable_mask[which])
@@ -755,7 +755,7 @@ static void kikstart_copy_layer(running_machine *machine, mame_bitmap *bitmap, c
 }
 
 
-static void copy_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void copy_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					   copy_layer_func_t copy_layer_func, int which, int *sprites_on, rectangle *sprite_areas)
 {
 	if (which == 0)
@@ -765,7 +765,7 @@ static void copy_layer(running_machine *machine, mame_bitmap *bitmap, const rect
 }
 
 
-static void copy_layers(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void copy_layers(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 						copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas)
 {
 	int i = 0;
@@ -792,7 +792,7 @@ static void check_collision(running_machine *machine, int *sprites_on, rectangle
 }
 
 
-static int video_update_common(running_machine *machine, mame_bitmap *bitmap,
+static int video_update_common(running_machine *machine, bitmap_t *bitmap,
 							   const rectangle *cliprect, copy_layer_func_t copy_layer_func)
 {
 	int sprites_on[0x20]; 			/* 1 if sprite is active */

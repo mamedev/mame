@@ -516,9 +516,9 @@ static VIDEO_START( laserbat )
 static VIDEO_UPDATE( laserbat )
 {
 	int y;
-	mame_bitmap *s2636_0_bitmap;
-	mame_bitmap *s2636_1_bitmap;
-	mame_bitmap *s2636_2_bitmap;
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
+	bitmap_t *s2636_2_bitmap;
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 

@@ -107,7 +107,7 @@ static UINT8 HMBL_latch;
 static UINT8 REFLECT;		/* Should playfield be reflected or not */
 static UINT8 NUSIZx_changed;
 
-static mame_bitmap *helper[3];
+static bitmap_t *helper[3];
 
 static UINT16 screen_height;
 

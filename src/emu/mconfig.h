@@ -138,7 +138,7 @@ struct _machine_config
 	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
 	void				(*video_reset)(running_machine *machine);		/* video reset callback */
 	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */
-	UINT32				(*video_update)(running_machine *machine, int screen, mame_bitmap *bitmap, const rectangle *cliprect); /* video update callback */
+	UINT32				(*video_update)(running_machine *machine, int screen, bitmap_t *bitmap, const rectangle *cliprect); /* video update callback */
 
 	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
 

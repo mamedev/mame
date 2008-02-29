@@ -110,7 +110,7 @@ static struct {
 static int num_sprites;
 static struct sprite_cave *sprite_cave;
 static struct sprite_cave *sprite_table[MAX_PRIORITY][MAX_SPRITE_NUM+1];
-static mame_bitmap *sprite_zbuf;
+static bitmap_t *sprite_zbuf;
 static UINT16 sprite_zbuf_baseval = 0x10000-MAX_SPRITE_NUM;
 
 static void (*get_sprite_info)(running_machine *machine);
@@ -1304,7 +1304,7 @@ static void sprite_draw_donpachi_zbuf( int priority )
 ***************************************************************************/
 
 INLINE void cave_tilemap_draw(
-	mame_bitmap *bitmap, const rectangle *cliprect,
+	bitmap_t *bitmap, const rectangle *cliprect,
 	tilemap *TILEMAP, UINT16 *VRAM, UINT16 *VCTRL,
 	UINT32 flags, UINT32 priority, UINT32 priority2 )
 {
@@ -1424,13 +1424,13 @@ INLINE void cave_tilemap_draw(
 	}
 }
 
-static void cave_tilemap_0_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_0_draw( bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_0, cave_vram_0, cave_vctrl_0, flags, priority, priority2 );	}
-static void cave_tilemap_1_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_1_draw( bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_1, cave_vram_1, cave_vctrl_1, flags, priority, priority2 );	}
-static void cave_tilemap_2_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_2_draw( bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_2, cave_vram_2, cave_vctrl_2, flags, priority, priority2 );	}
-static void cave_tilemap_3_draw( mame_bitmap *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
+static void cave_tilemap_3_draw( bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 priority, UINT32 priority2 )
 {	 cave_tilemap_draw( bitmap, cliprect, tilemap_3, cave_vram_3, cave_vctrl_3, flags, priority, priority2 );	}
 
 

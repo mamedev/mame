@@ -279,7 +279,7 @@ static VIDEO_START( jollyjgr )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(bitmap_t *bitmap)
 {
 	int x,y,count;
 	int i, bit0, bit1, bit2;

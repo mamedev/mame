@@ -139,7 +139,7 @@ a split down the middle of the screen
 
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int enable_n)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int enable_n)
 {
 	const UINT8 *source = spriteram+0x100-4;
 	const UINT8 *finish = spriteram;

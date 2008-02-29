@@ -205,7 +205,7 @@ static void get_starfield_pens(pen_t *pens)
 
 static void draw_starfield(running_machine *machine,
 						   int scrnum,
-						   mame_bitmap *bitmap,
+						   bitmap_t *bitmap,
 						   const rectangle *cliprect)
 {
 	int y;
@@ -314,7 +314,7 @@ static void get_sprite_pens(pen_t *pens)
 }
 
 
-static void draw_bullet(offs_t offs, pen_t pen, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bullet(offs_t offs, pen_t pen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 sy;
 
@@ -365,7 +365,7 @@ static void draw_bullet(offs_t offs, pen_t pen, mame_bitmap *bitmap, const recta
 }
 
 
-static void draw_sprite(offs_t offs, pen_t *pens, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprite(offs_t offs, pen_t *pens, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 sy;
 
@@ -422,7 +422,7 @@ static void draw_sprite(offs_t offs, pen_t *pens, mame_bitmap *bitmap, const rec
 }
 
 
-static void draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	pen_t sprite_pens[NUM_SPRITE_PENS];
 

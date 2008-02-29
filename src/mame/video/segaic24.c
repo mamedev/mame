@@ -191,7 +191,7 @@ void sys24_tile_update(running_machine *machine)
 	}
 }
 
-static void sys24_tile_draw_rect(running_machine *machine, mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
 								 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
@@ -325,7 +325,7 @@ static void sys24_tile_draw_rect(running_machine *machine, mame_bitmap *bm, mame
 // about sprite priority hence the lack of support for the
 // priority_bitmap
 
-static void sys24_tile_draw_rect_rgb(running_machine *machine, mame_bitmap *bm, mame_bitmap *tm, mame_bitmap *dm, const UINT16 *mask,
+static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bitmap_t *tm, bitmap_t *dm, const UINT16 *mask,
 									 UINT16 tpri, UINT8 lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
 {
 	int y;
@@ -437,7 +437,7 @@ static void sys24_tile_draw_rect_rgb(running_machine *machine, mame_bitmap *bm, 
 	}
 }
 
-void sys24_tile_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
+void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int lpri, int flags)
 {
 	UINT16 hscr = sys24_tile_ram[0x5000+(layer >> 1)];
 	UINT16 vscr = sys24_tile_ram[0x5004+(layer >> 1)];
@@ -511,8 +511,8 @@ void sys24_tile_draw(running_machine *machine, mame_bitmap *bitmap, const rectan
 		};
 
 	} else {
-		mame_bitmap *bm, *tm;
-		void (*draw)(running_machine *machine, mame_bitmap *, mame_bitmap *, mame_bitmap *, const UINT16 *,
+		bitmap_t *bm, *tm;
+		void (*draw)(running_machine *machine, bitmap_t *, bitmap_t *, bitmap_t *, const UINT16 *,
 					 UINT16, UINT8, int, int, int, int, int, int, int);
 		int win = layer & 1;
 
@@ -656,7 +656,7 @@ void sys24_sprite_vh_start(void)
     0   11------    --------
 */
 
-void sys24_sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect, const int *spri)
+void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri)
 {
 	UINT16 curspr = 0;
 	int countspr = 0;

@@ -112,9 +112,9 @@ VIDEO_START( quasar )
 VIDEO_UPDATE( quasar )
 {
 	int offs;
-	mame_bitmap *s2636_0_bitmap;
-	mame_bitmap *s2636_1_bitmap;
-	mame_bitmap *s2636_2_bitmap;
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
+	bitmap_t *s2636_2_bitmap;
 
 	/* for every character in the video RAM */
 	for (offs = 0; offs < 0x0400; offs++)

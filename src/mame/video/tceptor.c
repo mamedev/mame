@@ -32,7 +32,7 @@ static tilemap *bg2_tilemap;
 static INT32 bg1_scroll_x, bg1_scroll_y;
 static INT32 bg2_scroll_x, bg2_scroll_y;
 
-static mame_bitmap *temp_bitmap;
+static bitmap_t *temp_bitmap;
 
 static UINT16 *tceptor_sprite_ram_buffered;
 
@@ -474,7 +474,7 @@ VIDEO_START( tceptor )
     z: zoom y
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
 {
 	UINT16 *mem1 = &tceptor_sprite_ram_buffered[0x000/2];
 	UINT16 *mem2 = &tceptor_sprite_ram_buffered[0x100/2];

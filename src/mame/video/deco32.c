@@ -16,7 +16,7 @@ static int deco32_pf1_bank,deco32_pf2_bank,deco32_pf3_bank,deco32_pf4_bank;
 static int deco32_pf1_flip,deco32_pf2_flip,deco32_pf3_flip,deco32_pf4_flip;
 static int deco32_pf2_colourbank,deco32_pf4_colourbank,deco32_pri;
 
-static mame_bitmap *sprite0_mix_bitmap, *sprite1_mix_bitmap, *tilemap_alpha_bitmap;
+static bitmap_t *sprite0_mix_bitmap, *sprite1_mix_bitmap, *tilemap_alpha_bitmap;
 
 static UINT32 dragngun_sprite_ctrl;
 static int deco32_ace_ram_dirty, has_ace_ram;
@@ -193,7 +193,7 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 
 /******************************************************************************/
 
-static void captaven_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
+static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
 {
 	int offs;
 
@@ -278,7 +278,7 @@ static void captaven_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
 	}
 }
 
-static void fghthist_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
+static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
 {
 	int offs;
 
@@ -344,7 +344,7 @@ static void fghthist_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
     Bottom 8 bits per pixel is palettised sprite data, top 8 is
     colour/alpha/priority.
 */
-static void deco32_draw_sprite(mame_bitmap *dest,const gfx_element *gfx,
+static void deco32_draw_sprite(bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip)
 {
@@ -393,7 +393,7 @@ static void deco32_draw_sprite(mame_bitmap *dest,const gfx_element *gfx,
 }
 
 // Merge with Tattass & Fghthist sprite routines later
-static void nslasher_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
+static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
 {
 	int offs;
 
@@ -455,10 +455,10 @@ static void nslasher_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
 	}
 }
 
-INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void dragngun_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height )
+		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask, int sprite_screen_width, int  sprite_screen_height )
 {
 	rectangle myclip;
 
@@ -655,7 +655,7 @@ INLINE void dragngun_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 }
 
-static void dragngun_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT32 *spritedata)
+static void dragngun_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata)
 {
 	const UINT32 *layout_ram;
 	const UINT32 *lookup_ram;
@@ -1073,7 +1073,7 @@ VIDEO_EOF( dragngun )
 }
 
 #if 0
-static void print_debug_info(mame_bitmap *bitmap)
+static void print_debug_info(bitmap_t *bitmap)
 {
 	int j;
 	char buf[64*5];
@@ -1091,7 +1091,7 @@ static void print_debug_info(mame_bitmap *bitmap)
 
 #endif
 
-static void tilemap_raster_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, int pri)
+static void tilemap_raster_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
 {
 	int ptr=0,sx0,sy0,sx1,sy1,start,end=0;
 	rectangle clip;
@@ -1124,10 +1124,10 @@ static void tilemap_raster_draw(mame_bitmap *bitmap, const rectangle *cliprect, 
 	}
 }
 
-static void combined_tilemap_draw(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void combined_tilemap_draw(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const mame_bitmap *bitmap0 = tilemap_get_pixmap(pf3_tilemap);
-	const mame_bitmap *bitmap1 = tilemap_get_pixmap(pf4_tilemap);
+	const bitmap_t *bitmap0 = tilemap_get_pixmap(pf3_tilemap);
+	const bitmap_t *bitmap1 = tilemap_get_pixmap(pf4_tilemap);
 	int x,y,p;
 
 	const UINT16 width_mask=0x3ff;
@@ -1412,7 +1412,7 @@ VIDEO_UPDATE( fghthist )
     blending support - it can't be done in-place on the final framebuffer
     without a lot of support bitmaps.
 */
-static void mixDualAlphaSprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
+static void mixDualAlphaSprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx0, const gfx_element *gfx1, int mixAlphaTilemap)
 {
 	const pen_t *pal0 = &machine->pens[gfx0->color_base];
 	const pen_t *pal1 = &machine->pens[gfx1->color_base];

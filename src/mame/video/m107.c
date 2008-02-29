@@ -153,7 +153,7 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -273,7 +273,7 @@ static void m107_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-static void m107_screenrefresh(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{

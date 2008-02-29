@@ -106,7 +106,7 @@ VIDEO_START( targeth )
       3  | xx------ -------- | not used?
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 	const gfx_element *gfx = machine->gfx[0];

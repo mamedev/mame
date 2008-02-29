@@ -32,7 +32,7 @@ TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *spritepalettebank = memory_region(REGION_USER1);
 	const gfx_element *pGfx = machine->gfx[2];

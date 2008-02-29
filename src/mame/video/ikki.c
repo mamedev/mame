@@ -12,7 +12,7 @@ Video hardware driver by Uki
 
 UINT8 *ikki_scroll;
 
-static mame_bitmap *sprite_bitmap;
+static bitmap_t *sprite_bitmap;
 static UINT8 ikki_flipscreen;
 static int punch_through_pen;
 
@@ -65,7 +65,7 @@ WRITE8_HANDLER( ikki_scrn_ctrl_w )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	offs_t offs;

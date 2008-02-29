@@ -83,7 +83,7 @@ VIDEO_START( rampart )
 VIDEO_UPDATE( rampart )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
@@ -117,7 +117,7 @@ VIDEO_UPDATE( rampart )
  *
  *************************************/
 
-void rampart_bitmap_render(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 

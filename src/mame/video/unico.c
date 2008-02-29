@@ -217,7 +217,7 @@ VIDEO_START( zeropnt2 )
 
 ***************************************************************************/
 
-static void unico_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -270,7 +270,7 @@ static void unico_draw_sprites(running_machine *machine, mame_bitmap *bitmap,con
 	}
 }
 
-static void zeropnt2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

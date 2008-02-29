@@ -149,7 +149,7 @@ static TILE_GET_INFO( get_fg_tile_info )
     big object
  ********************************************/
 
-static void draw_object(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_object(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int sx, sy, color;
 
@@ -171,7 +171,7 @@ static void draw_object(running_machine* machine, mame_bitmap *bitmap, const rec
 	drawgfx(bitmap, machine->gfx[3], 1, color, 0, 1, sx, sy - 64, cliprect, TRANSPARENCY_PEN, 0);
 }
 
-static void draw_center(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_center(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int sx, sy, x, y, color;
 
@@ -408,7 +408,7 @@ WRITE8_HANDLER( decocass_center_v_shift_w )
     memory handlers
  ********************************************/
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int color,
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int color,
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						UINT8 *sprite_ram, int interleave)
 {
@@ -459,7 +459,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_missiles(mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_missiles(bitmap_t *bitmap, const rectangle *cliprect,
 						int missile_y_adjust, int missile_y_adjust_flip_screen,
 						UINT8 *missile_ram, int interleave)
 {

@@ -103,8 +103,8 @@ static void refresh_palette_data(void);
 static int stv_vdp2_window_process(int x,int y);
 static int stv_vdp2_apply_window_on_layer(rectangle *cliprect);
 static void stv_vdp2_get_window0_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
-static void stv_vdp2_check_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static mame_bitmap *stv_vdp2_roz_bitmap[2];
+static void stv_vdp2_check_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static bitmap_t *stv_vdp2_roz_bitmap[2];
 
 enum
 {
@@ -2357,7 +2357,7 @@ INLINE UINT16 stv_add_blend(UINT16 a, UINT16 b)
 
 }
 
-static void stv_vdp2_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void stv_vdp2_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex, int scaley,
 		int sprite_screen_width, int sprite_screen_height)
@@ -2690,7 +2690,7 @@ static void stv_vdp2_compute_color_offset_RGB555_UINT16(UINT16 *rgb, int cor)
 	*rgb = (_r << 10) |  (_g << 5) | _b;
 }
 
-static void stv_vdp2_drawgfx_rgb555( mame_bitmap *dest_bmp, UINT32 code, int flipx, int flipy,
+static void stv_vdp2_drawgfx_rgb555( bitmap_t *dest_bmp, UINT32 code, int flipx, int flipy,
 									 int sx, int sy, const rectangle *clip, int transparency)
 {
 	rectangle myclip;
@@ -2815,7 +2815,7 @@ static void stv_vdp2_drawgfx_rgb555( mame_bitmap *dest_bmp, UINT32 code, int fli
 
 }
 
-static void stv_vdp2_draw_basic_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_basic_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 //  if(LOG_VDP2) logerror ("bitmap enable %02x size %08x depth %08x\n", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth);
 //  popmessage ("bitmap enable %02x size %08x depth %08x number %02x", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth,stv2_current_tilemap.bitmap_palette_number);
@@ -3301,7 +3301,7 @@ static void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
 	*_map = map;
 }
 
-static void stv_vdp2_draw_basic_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_basic_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* hopefully this is easier to follow than it is efficient .. */
 
@@ -3790,7 +3790,7 @@ static void stv_vdp2_draw_basic_tilemap(running_machine *machine, mame_bitmap *b
 	}
 
 
-static void stv_vdp2_check_tilemap_with_linescroll(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_check_tilemap_with_linescroll(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	rectangle mycliprect;
 	int cur_line = cliprect->min_y;
@@ -3921,7 +3921,7 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine *machine, mam
 	}
 }
 
-static void stv_vdp2_check_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_check_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* the idea is here we check the tilemap capabilities / whats enabled and call an appropriate tilemap drawing routine, or
       at the very list throw up a few errors if the tilemaps want to do something we don't support yet */
@@ -3967,8 +3967,8 @@ static void stv_vdp2_check_tilemap(running_machine *machine, mame_bitmap *bitmap
 	}
 }
 
-static void stv_vdp2_copy_roz_bitmap(mame_bitmap *bitmap,
-									 mame_bitmap *roz_bitmap,
+static void stv_vdp2_copy_roz_bitmap(bitmap_t *bitmap,
+									 bitmap_t *roz_bitmap,
 									 const rectangle *cliprect,
 									 int iRP,
 									 int planesizex,
@@ -4334,7 +4334,7 @@ static void stv_vdp2_copy_roz_bitmap(mame_bitmap *bitmap,
 	}
 }
 
-static void stv_vdp2_draw_NBG0(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_NBG0(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
        Colours           : 16, 256, 2048, 32768, 16770000
@@ -4424,7 +4424,7 @@ static void stv_vdp2_draw_NBG0(running_machine *machine, mame_bitmap *bitmap, co
 	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG1(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_NBG1(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
        Colours           : 16, 256, 2048, 32768
@@ -4514,7 +4514,7 @@ static void stv_vdp2_draw_NBG1(running_machine *machine, mame_bitmap *bitmap, co
 	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_NBG2(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
        NBG2 is the first of the 2 more basic tilemaps, it has exactly the same capabilities as NBG3
@@ -4614,7 +4614,7 @@ static void stv_vdp2_draw_NBG2(running_machine *machine, mame_bitmap *bitmap, co
 	stv_vdp2_check_tilemap(machine, bitmap, cliprect);
 }
 
-static void stv_vdp2_draw_NBG3(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_NBG3(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
        NBG3 is the second of the 2 more basic tilemaps, it has exactly the same capabilities as NBG2
@@ -4715,7 +4715,7 @@ static void stv_vdp2_draw_NBG3(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 
-static void stv_vdp2_draw_rotation_screen(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int iRP)
+static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int iRP)
 {
 	rectangle roz_clip_rect, mycliprect;
 	int planesizex = 0, planesizey = 0, planerenderedsizex, planerenderedsizey;
@@ -4900,7 +4900,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, mame_bitmap 
 
 }
 
-static void stv_vdp2_draw_RBG0(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_RBG0(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
        Colours           : 16, 256, 2048, 32768, 16770000
@@ -5000,7 +5000,7 @@ static void stv_vdp2_draw_RBG0(running_machine *machine, mame_bitmap *bitmap, co
 
 }
 
-static void stv_vdp2_draw_back(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void stv_vdp2_draw_back(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int xcnt,ycnt;
 	UINT8* gfxdata = stv_vdp2_gfx_decode;
@@ -5632,7 +5632,7 @@ static int		stv_sprite_priorities_usage_valid;
 static UINT8	stv_sprite_priorities_in_fb_line[512][8];
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 pri)
 {
 	int x,y,r,g,b;
 	int i;

@@ -56,7 +56,7 @@ static void get_pens(const _20pacgal_state *state, pen_t *pens)
 }
 
 
- static void do_pen_lookup(const _20pacgal_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+ static void do_pen_lookup(const _20pacgal_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
@@ -76,7 +76,7 @@ static void get_pens(const _20pacgal_state *state, pen_t *pens)
  *
  *************************************/
 
-static void draw_sprite(const _20pacgal_state *state, mame_bitmap *bitmap, int y, int x,
+static void draw_sprite(const _20pacgal_state *state, bitmap_t *bitmap, int y, int x,
 						UINT8 code, UINT8 color, int flip_y, int flip_x)
 {
 	int sy;
@@ -145,7 +145,7 @@ static void draw_sprite(const _20pacgal_state *state, mame_bitmap *bitmap, int y
 }
 
 
-static void draw_sprites(const _20pacgal_state *state, mame_bitmap *bitmap)
+static void draw_sprites(const _20pacgal_state *state, bitmap_t *bitmap)
 {
 	int offs;
 
@@ -197,7 +197,7 @@ static void draw_sprites(const _20pacgal_state *state, mame_bitmap *bitmap)
  *
  *************************************/
 
-static void draw_chars(const _20pacgal_state *state, mame_bitmap *bitmap)
+static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 {
 	offs_t offs;
 

@@ -105,7 +105,7 @@ VIDEO_EOF( cninja )
 	deco16_raster_display_position=0;
 }
 
-static void raster_pf3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, int pri)
+static void raster_pf3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, int pri)
 {
 	tilemap *tmap=deco16_get_tilemap(2,0);
 	int ptr=0,start,end=0;
@@ -151,7 +151,7 @@ static void raster_pf3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int 
 
 /******************************************************************************/
 
-static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -220,7 +220,7 @@ static void cninja_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -288,7 +288,7 @@ static void robocop2_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void mutantf_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 

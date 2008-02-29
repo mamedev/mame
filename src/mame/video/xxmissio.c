@@ -86,7 +86,7 @@ VIDEO_START( xxmissio )
 }
 
 
-static void draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
 	int chr,col;

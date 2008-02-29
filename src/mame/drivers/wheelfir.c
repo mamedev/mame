@@ -75,7 +75,7 @@ static READ16_HANDLER( wheelfir_rand4 )
 
 static UINT16 *wheelfir_myram;
 static UINT16 wheelfir_blitdata[16];
-static mame_bitmap *wheelfir_tmp_bitmap[3];
+static bitmap_t *wheelfir_tmp_bitmap[3];
 
 /*
 
@@ -150,7 +150,7 @@ therefore a 512x256 page is
 
 /* it draws the background and road with direct writes to port 6... but where does this really go? an extra blit source page? */
 static int wheelfir_six_pos = 0;
-static mame_bitmap* render_bitmap;
+static bitmap_t* render_bitmap;
 
 static WRITE16_HANDLER(wheelfir_blit_w)
 {

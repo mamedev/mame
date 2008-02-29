@@ -1296,7 +1296,7 @@ WRITE8_HANDLER( K007121_ctrl_1_w )
  *
  */
 
-void K007121_sprites_draw(int chip,mame_bitmap *bitmap,gfx_element **gfxs, colortable_t *ctable,
+void K007121_sprites_draw(int chip,bitmap_t *bitmap,gfx_element **gfxs, colortable_t *ctable,
 						  const rectangle *cliprect, const UINT8 *source,int base_color,
 						  int global_x_offset,int bank_base, UINT32 pri_mask)
 {
@@ -1674,7 +1674,7 @@ void K007342_tilemap_set_enable(int tmap, int enable)
 	tilemap_set_enable(K007342_tilemap[tmap], enable);
 }
 
-void K007342_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int num,int flags,UINT32 priority)
+void K007342_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int num,int flags,UINT32 priority)
 {
 	tilemap_draw(bitmap,cliprect,K007342_tilemap[num],flags,priority);
 }
@@ -1741,7 +1741,7 @@ WRITE8_HANDLER( K007420_w )
  *   7  | xxxxxxxx | unused
  */
 
-void K007420_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect)
+void K007420_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect)
 {
 #define K007420_SPRITERAM_SIZE 0x200
 	int offs;
@@ -2730,7 +2730,7 @@ WRITE16_HANDLER( K051937_word_w )
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void K051960_sprites_draw(mame_bitmap *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
+void K051960_sprites_draw(bitmap_t *bitmap,const rectangle *cliprect,int min_priority,int max_priority)
 {
 #define NUM_SPRITES 128
 	int offs,pri_code;
@@ -3244,7 +3244,7 @@ void K053244_bankselect(int chip, int bank)
  * The rest of the sprite remains normal.
  */
 
-void K053245_sprites_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
@@ -3473,7 +3473,7 @@ if (input_code_pressed(KEYCODE_D))
 
 /* Lethal Enforcers has 2 of these chips hooked up in parallel to give 6bpp gfx.. lets cheat a
   bit and make emulating it a little less messy by using a custom function instead */
-void K053245_sprites_draw_lethal(running_machine *machine,int chip, mame_bitmap *bitmap,const rectangle *cliprect) //*
+void K053245_sprites_draw_lethal(running_machine *machine,int chip, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 128
 	int offs,pri_code,i;
@@ -4193,7 +4193,7 @@ int K053246_is_IRQ_enabled(void)
  * The rest of the sprite remains normal.
  */
 
-void K053247_sprites_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect) //*
+void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect) //*
 {
 #define NUM_SPRITES 256
 
@@ -4858,7 +4858,7 @@ void K051316_set_offset(int chip, int xoffs, int yoffs)
 }
 
 
-static void K051316_zoom_draw(int chip, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void K051316_zoom_draw(int chip, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
@@ -4902,17 +4902,17 @@ static void K051316_zoom_draw(int chip, mame_bitmap *bitmap,const rectangle *cli
 #endif
 }
 
-void K051316_zoom_draw_0(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+void K051316_zoom_draw_0(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	K051316_zoom_draw(0,bitmap,cliprect,flags,priority);
 }
 
-void K051316_zoom_draw_1(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+void K051316_zoom_draw_1(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	K051316_zoom_draw(1,bitmap,cliprect,flags,priority);
 }
 
-void K051316_zoom_draw_2(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+void K051316_zoom_draw_2(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	K051316_zoom_draw(2,bitmap,cliprect,flags,priority);
 }
@@ -4933,7 +4933,7 @@ static int K053936_offset[K053936_MAX_CHIPS][2];
 static int K053936_wraparound[K053936_MAX_CHIPS];
 
 
-static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl,mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+static void K053936_zoom_draw(int chip,UINT16 *ctrl,UINT16 *linectrl,bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
 {
 	if (ctrl[0x07] & 0x0040)	/* "super" mode */
 	{
@@ -5041,12 +5041,12 @@ if (input_code_pressed(KEYCODE_D))
 }
 
 
-void K053936_0_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+void K053936_0_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
 {
 	K053936_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,flags,priority);
 }
 
-void K053936_1_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
+void K053936_1_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,tilemap *tmap,int flags,UINT32 priority)
 {
 	K053936_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,flags,priority);
 }
@@ -5347,7 +5347,7 @@ READ8_HANDLER( K051733_r )
 #define K056832_PAGE_COUNT 16
 
 static tilemap *K056832_tilemap[K056832_PAGE_COUNT];
-static mame_bitmap *K056832_pixmap[K056832_PAGE_COUNT];
+static bitmap_t *K056832_pixmap[K056832_PAGE_COUNT];
 
 static UINT16 K056832_regs[0x20];	// 157/832 regs group 1
 static UINT16 K056832_regsb[4];	// 157/832 regs group 2, board dependent
@@ -6430,7 +6430,7 @@ WRITE32_HANDLER( K056832_b_long_w )
 	}
 }
 
-static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap, int page, int flags)
+static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, int page, int flags)
 {
 #define LINE_WIDTH 512
 
@@ -6441,7 +6441,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 
 	rectangle zerorect;
 	tilemap *tmap;
-	mame_bitmap *pixmap, *xprmap;
+	bitmap_t *pixmap, *xprmap;
 	UINT8 *xprdata;
 	const gfx_element *src_gfx;
 
@@ -6536,7 +6536,7 @@ static int K056832_update_linemap(running_machine *machine, mame_bitmap *bitmap,
 #undef DRAW_PIX
 }
 
-void K056832_tilemap_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
+void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -6817,7 +6817,7 @@ void K056832_tilemap_draw(running_machine *machine, mame_bitmap *bitmap, const r
 
 } // end of function
 
-void K056832_tilemap_draw_dj(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority) //*
+void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority) //*
 {
 	static int last_colorbase[K056832_PAGE_COUNT];
 
@@ -7271,7 +7271,7 @@ void K054338_update_all_shadows(running_machine *machine)
 }
 
 // K054338 BG color fill
-void K054338_fill_solid_bg(mame_bitmap *bitmap)
+void K054338_fill_solid_bg(bitmap_t *bitmap)
 {
 	UINT32 bgcolor;
 	UINT32 *pLine;
@@ -7291,7 +7291,7 @@ void K054338_fill_solid_bg(mame_bitmap *bitmap)
 }
 
 // Unified K054338/K055555 BG color fill
-void K054338_fill_backcolor(running_machine *machine, mame_bitmap *bitmap, int mode) // (see p.67)
+void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode) // (see p.67)
 {
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
@@ -7592,7 +7592,7 @@ READ16_HANDLER( K053250_1_rom_r )
 #if 0
 
 static void K053250_pdraw_scanline8(
-		mame_bitmap *bitmap,int x,int y,int length,
+		bitmap_t *bitmap,int x,int y,int length,
 		const UINT8 *src,pen_t *pens,int transparent_pen,UINT32 orient,int pri)
 {
 	/* 8bpp destination */
@@ -7765,7 +7765,7 @@ static void K053250_pdraw_scanline8(
 	}
 }
 
-void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
+void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int pri)
 {
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
@@ -7967,7 +7967,7 @@ void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle
 #else
 
 // utility function to render a clipped scanline vertically or horizontally
-INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, UINT8 *source,
+INLINE void K053250_pdraw_scanline32(bitmap_t *bitmap, const pen_t *palette, UINT8 *source,
 		const rectangle *cliprect, int linepos, int scroll, int zoom,
 		UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, int priority)
 {
@@ -8134,7 +8134,7 @@ INLINE void K053250_pdraw_scanline32(mame_bitmap *bitmap, const pen_t *palette, 
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void K053250_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
+void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int priority)
 {
 	struct K053250_CHIPTAG *chip_ptr;
 	UINT16 *line_ram;

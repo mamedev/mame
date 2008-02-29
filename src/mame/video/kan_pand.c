@@ -50,7 +50,7 @@
 
 static UINT8* pandora_spriteram;
 static UINT8 pandora_region;
-static mame_bitmap *pandora_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
+static bitmap_t *pandora_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 static int pandora_clear_bitmap;
 static int pandora_xoffset, pandora_yoffset;
 
@@ -59,7 +59,7 @@ void pandora_set_clear_bitmap(int clear)
 	pandora_clear_bitmap = clear;
 }
 
-void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+void pandora_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (!pandora_sprites_bitmap)
 	{
@@ -71,7 +71,7 @@ void pandora_update(running_machine *machine, mame_bitmap *bitmap, const rectang
 }
 
 
-static void pandora_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void pandora_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 
 	int sx=0, sy=0, x=0, y=0, offs;

@@ -169,7 +169,7 @@ static VIDEO_START(mediagx)
 	}
 }
 
-static void draw_char(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;
@@ -193,7 +193,7 @@ static void draw_char(running_machine *machine, mame_bitmap *bitmap, const recta
 	}
 }
 
-static void draw_framebuffer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j;
 	int width, height;
@@ -284,7 +284,7 @@ static void draw_framebuffer(running_machine *machine, mame_bitmap *bitmap, cons
 	}
 }
 
-static void draw_cga(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j;
 	const gfx_element *gfx = machine->gfx[0];

@@ -334,7 +334,7 @@ static struct f3_playfield_line_inf *pf_line_inf;
 static struct f3_spritealpha_line_inf *sa_line_inf;
 
 
-static mame_bitmap *pri_alp_bitmap;
+static bitmap_t *pri_alp_bitmap;
 /*
 pri_alp_bitmap
 ---- ---1    sprite priority 0
@@ -366,7 +366,7 @@ static UINT8 *tile_opaque_pf;
 
 /******************************************************************************/
 
-static void print_debug_info(mame_bitmap *bitmap)
+static void print_debug_info(bitmap_t *bitmap)
 {
 	int l[16];
 	char buf[64*16];
@@ -1358,7 +1358,7 @@ static void init_alpha_blend_func(void)
 /*============================================================================*/
 
 INLINE void draw_scanlines(running_machine *machine,
-		mame_bitmap *bitmap,int xsize,INT16 *draw_line_num,
+		bitmap_t *bitmap,int xsize,INT16 *draw_line_num,
 		const struct f3_playfield_line_inf **line_t,
 		const int *sprite,
 		UINT32 orient,
@@ -1870,8 +1870,8 @@ static void get_spritealphaclip_info(void)
 static void get_line_ram_info(running_machine *machine, tilemap *tmap, int sx, int sy, int pos, UINT32 *f3_pf_data_n)
 {
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[pos];
-	const mame_bitmap *srcbitmap;
-	const mame_bitmap *flagsbitmap;
+	const bitmap_t *srcbitmap;
+	const bitmap_t *flagsbitmap;
 
 	int y,y_start,y_end,y_inc;
 	int line_base,zoom_base,col_base,pri_base,inc;
@@ -2091,8 +2091,8 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 {
 	const struct f3_spritealpha_line_inf *sprite_alpha_line_t=&sa_line_inf[0];
 	struct f3_playfield_line_inf *line_t=&pf_line_inf[4];
-	const mame_bitmap *srcbitmap_pixel, *srcbitmap_vram;
-	const mame_bitmap *flagsbitmap_pixel, *flagsbitmap_vram;
+	const bitmap_t *srcbitmap_pixel, *srcbitmap_vram;
+	const bitmap_t *flagsbitmap_pixel, *flagsbitmap_vram;
 
 	int y,y_start,y_end,y_inc;
 	int pri_base,inc;
@@ -2215,7 +2215,7 @@ static void get_vram_info(tilemap *vram_tilemap, tilemap *pixel_tilemap, int sx,
 
 /******************************************************************************/
 
-static void scanline_draw(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i,j,y,ys,ye;
 	int y_start,y_end,y_start_next,y_end_next;
@@ -2637,7 +2637,7 @@ static void scanline_draw(running_machine *machine, mame_bitmap *bitmap, const r
 	dest++;						\
 	pri++;
 
-INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfx( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
@@ -2800,7 +2800,7 @@ INLINE void f3_drawgfx( mame_bitmap *dest_bmp,const gfx_element *gfx,
 #undef NEXT_P
 
 
-INLINE void f3_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void f3_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,
 		UINT32 color,
 		int flipx,int flipy,
@@ -3198,7 +3198,7 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
 #undef CALC_ZOOM
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const struct tempsprite *sprite_ptr;
 	const gfx_element *sprite_gfx = machine->gfx[2];

@@ -12,7 +12,7 @@ UINT8* skyraid_alpha_num_ram;
 UINT8* skyraid_pos_ram;
 UINT8* skyraid_obj_ram;
 
-static mame_bitmap *helper;
+static bitmap_t *helper;
 
 
 VIDEO_START( skyraid )
@@ -21,7 +21,7 @@ VIDEO_START( skyraid )
 }
 
 
-static void draw_text(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	const UINT8* p = skyraid_alpha_num_ram;
 
@@ -40,7 +40,7 @@ static void draw_text(running_machine *machine, mame_bitmap* bitmap, const recta
 }
 
 
-static void draw_terrain(mame_bitmap* bitmap, const rectangle *cliprect)
+static void draw_terrain(bitmap_t* bitmap, const rectangle *cliprect)
 {
 	const UINT8* p = memory_region(REGION_USER1);
 
@@ -75,7 +75,7 @@ static void draw_terrain(mame_bitmap* bitmap, const rectangle *cliprect)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -96,7 +96,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 }
 
 
-static void draw_missiles(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -118,7 +118,7 @@ static void draw_missiles(running_machine *machine, mame_bitmap* bitmap, const r
 }
 
 
-static void draw_trapezoid(mame_bitmap* dst, mame_bitmap* src)
+static void draw_trapezoid(bitmap_t* dst, bitmap_t* src)
 {
 	const UINT8* p = memory_region(REGION_USER2);
 

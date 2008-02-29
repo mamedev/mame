@@ -267,7 +267,7 @@ Offset:     Format:                 Value:
 #define SIGN_EXTEND_POS(_var_)	{_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT16 *source = spriteram16 + 0x8000/2;
 	UINT16 *finish = spriteram16 + 0x9000/2;

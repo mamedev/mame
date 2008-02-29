@@ -239,7 +239,7 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 
 ***************************************************************************/
 
-static void starfield_render(running_machine *machine, mame_bitmap *bitmap)
+static void starfield_render(running_machine *machine, bitmap_t *bitmap)
 {
 	int i;
 	int width, height;
@@ -266,7 +266,7 @@ static void starfield_render(running_machine *machine, mame_bitmap *bitmap)
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 

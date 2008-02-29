@@ -296,7 +296,7 @@ VIDEO_UPDATE( megaplay )
 	return 0;
 }
 
-void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect )
+void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int y;
 

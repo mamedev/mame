@@ -69,7 +69,7 @@ typedef struct _vector_texture vector_texture;
 struct _vector_texture
 {
 	render_texture *	texture;
-	mame_bitmap *		bitmap;
+	bitmap_t *			bitmap;
 };
 
 static vector_texture *vectortex[TEXTURE_INTENSITY_BUCKETS][TEXTURE_LENGTH_BUCKETS];

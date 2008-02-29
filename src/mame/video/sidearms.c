@@ -172,7 +172,7 @@ VIDEO_START( sidearms )
 	flipon = charon = staron = objon = bgon = 0;
 }
 
-static void draw_sprites_region(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int start_offset, int end_offset )
+static void draw_sprites_region(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start_offset, int end_offset )
 {
 	const gfx_element *gfx = machine->gfx[2];
 	int offs, attr, color, code, x, y, flipx, flipy;
@@ -204,7 +204,7 @@ static void draw_sprites_region(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void sidearms_draw_starfield( mame_bitmap *bitmap )
+static void sidearms_draw_starfield( bitmap_t *bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
@@ -327,7 +327,7 @@ static void sidearms_draw_starfield( mame_bitmap *bitmap )
 #endif
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (sidearms_gameid == 2 || sidearms_gameid == 3) // Dyger and Whizz have simple front-to-back sprite priority
 		draw_sprites_region(machine, bitmap, cliprect, 0x0000, 0x1000);

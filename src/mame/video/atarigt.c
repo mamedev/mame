@@ -53,8 +53,8 @@ UINT16 *atarigt_colorram;
  *
  *************************************/
 
-static mame_bitmap *pf_bitmap;
-static mame_bitmap *an_bitmap;
+static bitmap_t *pf_bitmap;
+static bitmap_t *an_bitmap;
 
 static UINT8 playfield_tile_bank;
 static UINT8 playfield_color_bank;
@@ -559,8 +559,8 @@ PrimRage GALs:
 
 VIDEO_UPDATE( atarigt )
 {
-	mame_bitmap *mo_bitmap = atarirle_get_vram(0, 0);
-	mame_bitmap *tm_bitmap = atarirle_get_vram(0, 1);
+	bitmap_t *mo_bitmap = atarirle_get_vram(0, 0);
+	bitmap_t *tm_bitmap = atarirle_get_vram(0, 1);
 	int color_latch;
 	int x, y;
 

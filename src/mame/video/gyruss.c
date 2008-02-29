@@ -127,7 +127,7 @@ READ8_HANDLER( gyruss_scanline_r )
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	rectangle clip = machine->screen[0].visarea;
 	int offs;

@@ -272,7 +272,7 @@ PALETTE_INIT( psx )
 #if defined( MAME_DEBUG )
 
 #define DEBUG_COORDS ( 10 )
-static mame_bitmap *debugmesh;
+static bitmap_t *debugmesh;
 static int m_b_debugclear;
 static int m_b_debugmesh;
 static int m_n_debugskip;
@@ -507,7 +507,7 @@ static void DebugCheckKeys( void )
 #endif
 }
 
-static int DebugMeshDisplay( mame_bitmap *bitmap, const rectangle *cliprect )
+static int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	if( m_b_debugmesh )
 	{
@@ -517,7 +517,7 @@ static int DebugMeshDisplay( mame_bitmap *bitmap, const rectangle *cliprect )
 	return m_b_debugmesh;
 }
 
-static int DebugTextureDisplay( mame_bitmap *bitmap )
+static int DebugTextureDisplay( bitmap_t *bitmap )
 {
 	UINT32 n_y;
 

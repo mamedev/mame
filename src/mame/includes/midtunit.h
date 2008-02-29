@@ -60,5 +60,5 @@ READ16_HANDLER( midxunit_paletteram_r );
 READ16_HANDLER( midtunit_dma_r );
 WRITE16_HANDLER( midtunit_dma_w );
 
-void midtunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);
-void midxunit_scanline_update(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);
+void midtunit_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
+void midxunit_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);

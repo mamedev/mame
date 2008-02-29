@@ -207,7 +207,7 @@ WRITE16_HANDLER( rpunch_ins_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int start, int stop)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int stop)
 {
 	int offs;
 
@@ -243,7 +243,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
  *
  *************************************/
 
-static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int colourbase;
 	int xxx=512/4;

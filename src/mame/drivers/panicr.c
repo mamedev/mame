@@ -194,7 +194,7 @@ static VIDEO_START( panicr )
 	colortable_configure_tilemap_groups(machine->colortable, txttilemap, machine->gfx[0], 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
 	int offs,fx,fy,x,y,color,sprite;
 

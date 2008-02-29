@@ -189,7 +189,7 @@ WRITE8_HANDLER( spyhunt_alpharam_w )
  *
  *************************************/
 
-static void mcr3_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
+static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
 {
 	int offs;
 

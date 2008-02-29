@@ -12,7 +12,7 @@
 UINT32 *djmain_obj_ram;
 
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];

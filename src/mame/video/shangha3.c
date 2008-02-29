@@ -69,7 +69,7 @@ size_t shangha3_ram_size;
 int shangha3_do_shadows;
 
 static UINT16 gfxlist_addr;
-static mame_bitmap *rawbitmap;
+static bitmap_t *rawbitmap;
 
 
 

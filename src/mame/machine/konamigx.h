@@ -21,8 +21,8 @@ void K053247GP_set_SpriteOffset(int offsx, int offsy);
 void K053936GP_set_offset(int chip, int xoffs, int yoffs);
 void K053936GP_clip_enable(int chip, int status);
 void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy);
-void K053936GP_0_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend);
-void K053936GP_1_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend);
+void K053936GP_0_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend);
+void K053936GP_1_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, int tilebpp, int blend);
 
 
 
@@ -83,7 +83,7 @@ void konamigx_le2_sprite_callback(int *code, int *color, int *priority);
 #define GXSUB_5BPP 		0x05	//  32 colors
 #define GXSUB_8BPP 		0x08	// 256 colors
 
-void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
 					int mixerflags);

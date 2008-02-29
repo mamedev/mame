@@ -10,7 +10,7 @@ Atari Ultra Tank video emulation
 
 static tilemap* playfield;
 
-static mame_bitmap* helper;
+static bitmap_t* helper;
 
 int ultratnk_collision[4];
 

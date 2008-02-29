@@ -32,7 +32,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 extern UINT32 *psikyo4_vidregs;
 
 /* --- SPRITES --- */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 scr )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 scr )
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 

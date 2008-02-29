@@ -58,7 +58,7 @@ VIDEO_START( jack )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols_flipy,  8, 8, 32, 32);
 }
 
-static void jack_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void jack_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -139,7 +139,7 @@ VIDEO_START( joinem )
 	bg_tilemap = tilemap_create(joinem_get_bg_tile_info, tilemap_scan_cols_flipy,  8, 8, 32, 32);
 }
 
-static void joinem_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void joinem_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

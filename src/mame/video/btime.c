@@ -26,7 +26,7 @@ static int char_dirty[1024];
 static UINT8 btime_palette = 0;
 static UINT8 bnj_scroll1 = 0;
 static UINT8 bnj_scroll2 = 0;
-static mame_bitmap *background_bitmap;
+static bitmap_t *background_bitmap;
 static UINT8 lnc_sound_interrupt_enabled = 0;
 
 /***************************************************************************
@@ -320,7 +320,7 @@ INTERRUPT_GEN( lnc_sound_interrupt )
 }
 
 
-static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
+static void draw_chars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 transparency, UINT8 color, int priority)
 {
     offs_t offs;
 
@@ -349,7 +349,7 @@ static void draw_chars(running_machine *machine, mame_bitmap *bitmap, const rect
     }
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 color,
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 color,
                          UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
                          UINT8 *sprite_ram, offs_t interleave)
 {
@@ -401,7 +401,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8* tmap, UINT8 color)
 {
     int i;
 

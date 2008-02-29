@@ -185,7 +185,7 @@ WRITE8_HANDLER( paradise_priority_w )
 	paradise_priority = data;
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 	for (i = 0; i < spriteram_size ; i += paradise_sprite_inc)

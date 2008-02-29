@@ -147,7 +147,7 @@ static VIDEO_START(firebeat)
 }
 
 
-static void gcu_draw_object(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *cmd)
+static void gcu_draw_object(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------   command type
 	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   object data address in vram
@@ -300,7 +300,7 @@ static void gcu_draw_object(int chip, mame_bitmap *bitmap, const rectangle *clip
 	}
 }
 
-static void gcu_fill_rect(mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *cmd)
+static void gcu_fill_rect(bitmap_t *bitmap, const rectangle *cliprect, UINT32 *cmd)
 {
 	int i, j;
 	int x1, y1, x2, y2;
@@ -347,7 +347,7 @@ static void gcu_fill_rect(mame_bitmap *bitmap, const rectangle *cliprect, UINT32
 	}
 }
 
-static void gcu_draw_character(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *cmd)
+static void gcu_draw_character(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------   command type
 	// 0x00: -------- xxxxxxxx xxxxxxxx xxxxxxxx   character data address in vram
@@ -395,7 +395,7 @@ static void gcu_draw_character(int chip, mame_bitmap *bitmap, const rectangle *c
 	}
 }
 
-static void gcu_exec_display_list(int chip, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 address)
+static void gcu_exec_display_list(int chip, bitmap_t *bitmap, const rectangle *cliprect, UINT32 address)
 {
 	int counter = 0;
 	int end = 0;

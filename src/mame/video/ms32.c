@@ -239,7 +239,7 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *sprram_top, size_t sprram_size)
 {
 /***************************************************************************
 
@@ -379,7 +379,7 @@ if (input_code_pressed(KEYCODE_F) && (pri & 1)) color = rand();
 
 
 
-static void draw_roz(mame_bitmap *bitmap, const rectangle *cliprect,int priority)
+static void draw_roz(bitmap_t *bitmap, const rectangle *cliprect,int priority)
 {
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 

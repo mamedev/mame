@@ -236,7 +236,7 @@ VIDEO_UPDATE( atarig42 )
 
 	/* copy the motion objects on top */
 	{
-		mame_bitmap *mo_bitmap = atarirle_get_vram(0, 0);
+		bitmap_t *mo_bitmap = atarirle_get_vram(0, 0);
 		int left	= cliprect->min_x;
 		int top		= cliprect->min_y;
 		int right	= cliprect->max_x + 1;

@@ -224,11 +224,11 @@ struct _laserdisc_info
 	UINT32			fieldnum;				/* field number (0 or 1) */
 
 	/* video data */
-	mame_bitmap *	videoframe[2];			/* currently cached frames */
+	bitmap_t *		videoframe[2];			/* currently cached frames */
 	UINT8			videofields[2];			/* number of fields in each frame */
 	UINT32			videoframenum[2];		/* frame number contained in each frame */
 	UINT8			videoindex;				/* index of the current video buffer */
-	mame_bitmap *	emptyframe;				/* blank frame */
+	bitmap_t *		emptyframe;				/* blank frame */
 
 	/* audio data */
 	INT16 *			audiobuffer[2];			/* buffer for audio samples */
@@ -642,7 +642,7 @@ INLINE void write_16bits_to_ram_be(UINT8 *ram, UINT32 offset, UINT16 data)
     given color pattern
 -------------------------------------------------*/
 
-INLINE void fillbitmap_yuy16(mame_bitmap *bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
+INLINE void fillbitmap_yuy16(bitmap_t *bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
 {
 	UINT16 color0 = (yval << 8) | cb;
 	UINT16 color1 = (yval << 8) | cr;
@@ -1059,7 +1059,7 @@ UINT8 laserdisc_line_r(laserdisc_info *info, UINT8 line)
     video frame
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_video(laserdisc_info *info, mame_bitmap **bitmap)
+UINT32 laserdisc_get_video(laserdisc_info *info, bitmap_t **bitmap)
 {
 	int frameindex;
 

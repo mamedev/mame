@@ -240,7 +240,7 @@ VIDEO_START( ssrj )
 }
 
 
-static void draw_objects(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int i,j,k,x,y;
 

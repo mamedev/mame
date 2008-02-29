@@ -17,7 +17,7 @@ to switch between 8*8 tiles and 16*16 tiles.
 #include "deprecat.h"
 #include "deco16ic.h"
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

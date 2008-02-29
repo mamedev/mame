@@ -1302,11 +1302,11 @@ static void cps1_find_last_sprite(void)    /* Find the offset of last sprite */
 }
 
 
-static void cps1_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
-	if (flip_screen_get())												\
+	if (flip_screen_get())											\
 		pdrawgfx(bitmap,machine->gfx[2],							\
 				CODE,												\
 				COLOR,												\
@@ -1545,11 +1545,11 @@ static void cps2_find_last_sprite(void)    /* Find the offset of last sprite */
 #undef DRAWSPRITE
 }
 
-static void cps2_render_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks)
+static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int *primasks)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									\
 {																					\
-	if (flip_screen_get())																\
+	if (flip_screen_get())															\
 		pdrawgfx(bitmap,machine->gfx[2],											\
 				CODE,																\
 				COLOR,																\
@@ -1692,7 +1692,7 @@ static void cps2_render_sprites(running_machine *machine, mame_bitmap *bitmap,co
 
 
 
-static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
+static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *stars_rom = memory_region(REGION_GFX2);
@@ -1759,7 +1759,7 @@ static void cps1_render_stars(mame_bitmap *bitmap,const rectangle *cliprect)
 }
 
 
-static void cps1_render_layer(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int layer,int primask)
+static void cps1_render_layer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int layer,int primask)
 {
 	switch (layer)
 	{
@@ -1774,7 +1774,7 @@ static void cps1_render_layer(running_machine *machine,mame_bitmap *bitmap,const
 	}
 }
 
-static void cps1_render_high_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
+static void cps1_render_high_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer)
 {
 	switch (layer)
 	{

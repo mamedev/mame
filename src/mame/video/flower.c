@@ -27,7 +27,7 @@ PALETTE_INIT( flower )
 		colortable_entry_set_value(machine->colortable, i, i);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = spriteram + 0x200;

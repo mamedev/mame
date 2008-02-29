@@ -96,7 +96,7 @@ VIDEO_START( sauro )
 	palette_bank = 0;
 }
 
-static void sauro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void sauro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,code,sx,sy,color,flipx;
 
@@ -163,7 +163,7 @@ VIDEO_START( trckydoc )
 		 8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,code,sy,color,flipx,sx;
 

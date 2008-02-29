@@ -132,7 +132,7 @@ WRITE16_HANDLER( dynduke_control_w )
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 
@@ -169,10 +169,10 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri )
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
 	/* The transparency / palette handling on the background layer is very strange */
-	mame_bitmap *bm = tilemap_get_pixmap(bg_layer);
+	bitmap_t *bm = tilemap_get_pixmap(bg_layer);
 	int scrolly, scrollx;
 	int x,y;
 

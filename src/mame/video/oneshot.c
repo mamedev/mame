@@ -76,7 +76,7 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(oneshot_fg_tilemap,0);
 }
 
-static void draw_crosshairs( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_crosshairs( bitmap_t *bitmap, const rectangle *cliprect )
 {
     int xpos,ypos;
     /* get gun raw coordonates (player 1) */
@@ -106,7 +106,7 @@ static void draw_crosshairs( mame_bitmap *bitmap, const rectangle *cliprect )
         gun_x_p2=0;
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT16 *source = oneshot_sprites;
 	const UINT16 *finish = source+(0x1000/2);

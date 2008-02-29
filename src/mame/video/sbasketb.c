@@ -135,7 +135,7 @@ VIDEO_START( sbasketb )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs = (*sbasketb_spriteram_select & 0x01) * 0x100;
 	int i;

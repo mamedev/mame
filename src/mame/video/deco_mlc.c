@@ -13,7 +13,7 @@
 
 extern int mlc_raster_table[9][256];
 extern UINT32 mlc_clipper[32];
-static mame_bitmap *temp_bitmap;
+static bitmap_t *temp_bitmap;
 static UINT32 colour_mask, *mlc_buffered_spriteram;
 UINT32 *mlc_vram, *mlc_clip_ram;
 
@@ -35,7 +35,7 @@ VIDEO_START( mlc )
 }
 
 #ifdef UNUSED_FUNCTION
-static void blitRaster(mame_bitmap *bitmap, int rasterMode)
+static void blitRaster(bitmap_t *bitmap, int rasterMode)
 {
 	int x,y;
 	for (y=0; y<256; y++) //todo
@@ -63,7 +63,7 @@ static void blitRaster(mame_bitmap *bitmap, int rasterMode)
 }
 #endif
 
-static void mlc_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void mlc_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int use8bpp,
 		int scalex, int scaley)
@@ -226,7 +226,7 @@ static void mlc_drawgfxzoom(mame_bitmap *dest_bmp,const gfx_element *gfx,
 	}
 }
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;

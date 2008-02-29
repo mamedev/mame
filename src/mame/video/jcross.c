@@ -109,7 +109,7 @@ VIDEO_START( jcross )
 **
 ***************************************************************************/
 
-static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *base =  jcr_textram + 0x400;
 	const gfx_element *gfx = machine->gfx[0];
@@ -136,7 +136,7 @@ static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rec
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
 	const gfx_element *gfx = machine->gfx[3];
 	const UINT8 *source, *finish;

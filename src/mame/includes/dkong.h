@@ -67,7 +67,7 @@ struct _dkong_state
 	/* video state */
 	tilemap *bg_tilemap;
 
-	mame_bitmap *	bg_bits;
+	bitmap_t *		bg_bits;
 	const UINT8 *	color_codes;
 	emu_timer *		scanline_timer;
 	INT8 			vidhw;			/* Selected video hardware RS Conversion / TKG04 */

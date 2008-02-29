@@ -89,7 +89,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 	SET_TILE_INFO(region,tile,color,0);
 }
 
-static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int pri)
+static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	int offs,fx,fy,x,y,color,sprite;
 

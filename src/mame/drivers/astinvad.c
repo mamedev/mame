@@ -110,7 +110,7 @@ static WRITE8_HANDLER( spaceint_videoram_w )
  *
  *************************************/
 
-static void plot_byte(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color)
+static void plot_byte(bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color)
 {
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
 	UINT8 flip_xor = screen_flip & 7;

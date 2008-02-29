@@ -4,7 +4,7 @@ UINT8 *lsasquad_scrollram;
 
 
 
-static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *scrollram)
+static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *scrollram)
 {
 	int offs,scrollx,scrolly;
 
@@ -50,7 +50,7 @@ static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rect
 	}
 }
 
-static int draw_layer_daikaiju(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int offs, int  * previd, int type)
+static int draw_layer_daikaiju(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int  * previd, int type)
 {
 	int id,scrollx,scrolly,initoffs, globalscrollx;
 	int stepx=0;
@@ -140,7 +140,7 @@ static int draw_layer_daikaiju(running_machine *machine, mame_bitmap *bitmap, co
 	return offs;
 }
 
-static void drawbg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int type)
+static void drawbg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int type)
 {
 	int i=0;
 	int id=-1;
@@ -159,7 +159,7 @@ static void drawbg(running_machine *machine, mame_bitmap *bitmap, const rectangl
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

@@ -329,7 +329,7 @@ void K001604_tile_update(running_machine *machine, int chip)
 	}
 }
 
-void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
+void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int layer;
 	int num_layers;
@@ -363,7 +363,7 @@ void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cli
 	}
 }
 
-void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
+void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	//tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][1], 0,0);
 	tilemap_draw(bitmap, cliprect, K001604_layer_8x8[chip][0], 0,0);

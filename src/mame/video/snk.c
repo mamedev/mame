@@ -72,7 +72,7 @@ VIDEO_START( snk )
 
 /**************************************************************************************/
 
-static void tnk3_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
+static void tnk3_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 					int x_size, int y_size, int bg_type )
 {
 	const gfx_element *gfx = machine->gfx[1];
@@ -108,7 +108,7 @@ static void tnk3_draw_background(running_machine *machine, mame_bitmap *bitmap, 
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 }
 
-void tnk3_draw_text(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
+void tnk3_draw_text(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
 {
 	const gfx_element *gfx = machine->gfx[0];
 
@@ -134,7 +134,7 @@ void tnk3_draw_text(running_machine *machine, mame_bitmap *bitmap, const rectang
 	}
 }
 
-static void tnk3_draw_status_main(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source, int start )
+static void tnk3_draw_status_main(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source, int start )
 {
 	const gfx_element *gfx = machine->gfx[0];
 
@@ -158,13 +158,13 @@ static void tnk3_draw_status_main(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-void tnk3_draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
+void tnk3_draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
 {
 	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source, 0);
 	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source,30);
 }
 
-static void tnk3_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
+static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
 {
 	const gfx_element *gfx = machine->gfx[2];
 
@@ -244,7 +244,7 @@ VIDEO_START( sgladiat )
 	tmpbitmap = auto_bitmap_alloc( 512, 256, machine->screen[0].format );
 }
 
-static void sgladiat_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
+static void sgladiat_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
 	const gfx_element *gfx = machine->gfx[1];
 
@@ -290,7 +290,7 @@ VIDEO_UPDATE( sgladiat )
 
 /**************************************************************************************/
 
-static void ikari_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int start, int xscroll, int yscroll,
+static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int xscroll, int yscroll,
 				UINT8 *source, int mode )
 {
 	gfx_element *gfx = machine->gfx[mode];
@@ -360,7 +360,7 @@ VIDEO_UPDATE( ikari )
 
 /**************************************************************/
 
-static void tdfever_draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
+static void tdfever_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
 {
 	const UINT8 *source = snk_rambase + 0x000;
 	const gfx_element *gfx = machine->gfx[1];
@@ -413,7 +413,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sp(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode )
+static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode )
 {
 	const UINT8 *source = snk_rambase + ((mode==2)?0x1800:0x1000);
 	const gfx_element *gfx = machine->gfx[(mode==1)?3:2];
@@ -467,7 +467,7 @@ static void tdfever_draw_sp(running_machine *machine, mame_bitmap *bitmap, const
 	}
 }
 
-static void tdfever_draw_tx(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int attributes, int dx, int dy, int base )
+static void tdfever_draw_tx(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int attributes, int dx, int dy, int base )
 {
 	const UINT8 *source = snk_rambase - 0xd000 + base;
 	const gfx_element *gfx = machine->gfx[0];

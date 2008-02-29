@@ -495,7 +495,7 @@ VIDEO_START( toprollr )
 }
 
 
-static void draw_playfield(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_playfield(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -509,7 +509,7 @@ static void draw_playfield(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void cclimber_draw_bigsprite(mame_bitmap *bitmap, const rectangle *cliprect)
+static void cclimber_draw_bigsprite(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 x = cclimber_bigsprite_control[3] - 8;
 	UINT8 y = cclimber_bigsprite_control[2];
@@ -534,7 +534,7 @@ static void cclimber_draw_bigsprite(mame_bitmap *bitmap, const rectangle *clipre
 }
 
 
-static void toprollr_draw_bigsprite(mame_bitmap *bitmap, const rectangle *cliprect)
+static void toprollr_draw_bigsprite(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 x = cclimber_bigsprite_control[3] - 8;
 	UINT8 y = cclimber_bigsprite_control[2];
@@ -550,7 +550,7 @@ static void toprollr_draw_bigsprite(mame_bitmap *bitmap, const rectangle *clipre
 }
 
 
-static void cclimber_draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void cclimber_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
 
@@ -587,7 +587,7 @@ static void cclimber_draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const 
 }
 
 
-static void swimmer_draw_sprites(mame_bitmap *bitmap, gfx_element **gfx, const rectangle *cliprect)
+static void swimmer_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rectangle *cliprect)
 {
 	int offs;
 

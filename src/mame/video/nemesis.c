@@ -241,7 +241,7 @@ VIDEO_START( nemesis )
 	tilemap_flip = 0;
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
      *  16 bytes per sprite, in memory from 56000-56fff

@@ -339,7 +339,7 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
 	int j, x, y, ex, ey, px, py;
 	const gfx_element *gfx = machine->gfx[0];

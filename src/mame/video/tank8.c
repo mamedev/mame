@@ -17,9 +17,9 @@ UINT8 *tank8_team;
 
 static tilemap *tank8_tilemap;
 
-static mame_bitmap *helper1;
-static mame_bitmap *helper2;
-static mame_bitmap *helper3;
+static bitmap_t *helper1;
+static bitmap_t *helper2;
+static bitmap_t *helper3;
 
 
 
@@ -140,7 +140,7 @@ static int get_y_pos(int n)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_bullets(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bullets(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 

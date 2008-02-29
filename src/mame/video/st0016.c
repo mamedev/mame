@@ -20,7 +20,7 @@ static UINT8 st0016_vregs[0xc0];
 static int st0016_ramgfx;
 
 //super eagle shot
-static mame_bitmap *speglsht_bitmap;
+static bitmap_t *speglsht_bitmap;
 extern UINT32 *speglsht_framebuffer;
 extern UINT32  speglsht_videoreg;
 
@@ -212,7 +212,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
     object ram :
@@ -503,7 +503,7 @@ VIDEO_START( st0016 )
 }
 
 
-static void draw_bgmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int priority)
+static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int priority)
 {
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)

@@ -44,8 +44,8 @@ static UINT8	ground_ctrl;
 static UINT16	scroll_h;
 static UINT16	scroll_v;
 
-static mame_bitmap	*front_buffer;
-static mame_bitmap	*back_buffer;
+static bitmap_t	*front_buffer;
+static bitmap_t	*back_buffer;
 static emu_timer	*bufend_timer;
 static emu_timer	*cursor_timer;
 
@@ -730,7 +730,7 @@ do {                                     \
 	if (carry) --CNT;                    \
 } while(0)
 
-static void rotate_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+static void rotate_draw(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT32 y;
 
@@ -834,7 +834,7 @@ static void rotate_draw(mame_bitmap *bitmap, const rectangle *cliprect)
 
 *******************************************************************************************/
 
-static void hud_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+static void hud_draw(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8	*tile_rom = memory_region(REGION_GFX3);
 	UINT32	offs;
@@ -977,7 +977,7 @@ VIDEO_UPDATE( lockon )
 VIDEO_EOF( lockon )
 {
 	/* Swap the frame buffers */
-	mame_bitmap *tmp = front_buffer;
+	bitmap_t *tmp = front_buffer;
 	front_buffer = back_buffer;
 	back_buffer = tmp;
 

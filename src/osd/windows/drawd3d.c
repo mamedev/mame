@@ -167,7 +167,7 @@ struct _d3d_info
 	int						last_wrap;					// previous wrap state
 	DWORD					last_modmode;				// previous texture modulation
 
-	mame_bitmap *			vector_bitmap;				// experimental: bitmap for vectors
+	bitmap_t *				vector_bitmap;				// experimental: bitmap for vectors
 	texture_info *			vector_texture;				// experimental: texture for vectors
 };
 

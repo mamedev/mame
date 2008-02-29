@@ -150,7 +150,7 @@ static void thoop2_sort_sprites(void)
       3  | xxxxxxxx xxxxxx-- | sprite code (low bits)
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int j, x, y, ex, ey;
 	const gfx_element *gfx = machine->gfx[0];

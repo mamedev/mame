@@ -143,7 +143,7 @@ WRITE16_HANDLER( bloodbro_txvideoram_w )
    -------X XXXXXXXX
    -------- YYYYYYYY */
 
-static void bloodbro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void bloodbro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	for (offs = 0;offs < spriteram_size/2;offs += 4)
@@ -190,7 +190,7 @@ static void bloodbro_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
    -------X XXXXXXXX
 */
 
-static void weststry_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void weststry_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

@@ -173,7 +173,7 @@ VIDEO_START(macrossp)
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	const gfx_element *gfx = machine->gfx[0];
 //  UINT32 *source = macrossp_spriteram;
@@ -299,7 +299,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer)
+static void draw_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer)
 {
 	tilemap *tm;
 	UINT32 *vr;

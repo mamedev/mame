@@ -25,8 +25,8 @@
 
 //UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs;
 UINT16 *realbrk_vram_0, *realbrk_vram_1, *realbrk_vram_2, *realbrk_vregs, *realbrk_vram_0ras, *realbrk_vram_1ras;
-static mame_bitmap *tmpbitmap0 = NULL;
-static mame_bitmap *tmpbitmap1 = NULL;
+static bitmap_t *tmpbitmap0 = NULL;
+static bitmap_t *tmpbitmap1 = NULL;
 
 static int disable_video;
 
@@ -228,7 +228,7 @@ VIDEO_START(realbrk)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -395,7 +395,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 
 /* DaiDaiKakumei */
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
-static void dai2kaku_draw_sprites( mame_bitmap *bitmap,const rectangle *cliprect, int layer)
+static void dai2kaku_draw_sprites( bitmap_t *bitmap,const rectangle *cliprect, int layer)
 {
 	int offs;
 

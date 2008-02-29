@@ -408,7 +408,7 @@ struct tilemap_info
 	struct tilemap_callback_info tilemap_info[16];	/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
 	void			(*reset)(struct tilemap_info *info);/* reset callback */
-	void			(*draw_layer)(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority);
+	void			(*draw_layer)(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, int which, int flags, int priority);
 	UINT16 *		textram;						/* pointer to textram pointer */
 	UINT16 *		tileram;						/* pointer to tileram pointer */
 };
@@ -424,7 +424,7 @@ struct sprite_info
 	UINT16			colorbase;						/* base color index */
 	INT32			ramsize;						/* size of sprite RAM */
 	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect);
+	void			(*draw)(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect);
 	UINT16 *		spriteram;						/* pointer to spriteram pointer */
 	UINT16 *		buffer;							/* buffered spriteram for those that use it */
 };
@@ -439,7 +439,7 @@ struct road_info
 	UINT16			colorbase2;						/* color base for road background data */
 	UINT16			colorbase3;						/* color base for sky data */
 	INT32			xoffs;							/* X scroll offset */
-	void			(*draw)(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority);
+	void			(*draw)(struct road_info *info, bitmap_t *bitmap, const rectangle *cliprect, int priority);
 	UINT16 *		roadram;						/* pointer to roadram pointer */
 	UINT16 *		buffer;							/* buffered roadram pointer */
 	UINT8 *			gfx;							/* expanded road graphics */
@@ -605,7 +605,7 @@ WRITE16_HANDLER( segaic16_paletteram_w )
  *
  *************************************/
 
-static void segaic16_draw_virtual_tilemap(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
+static void segaic16_draw_virtual_tilemap(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, UINT16 pages, UINT16 xscroll, UINT16 yscroll, UINT32 flags, UINT32 priority)
 {
 	int leftmin = -1, leftmax = -1, rightmin = -1, rightmax = -1;
 	int topmin = -1, topmax = -1, bottommin = -1, bottommax = -1;
@@ -828,7 +828,7 @@ static TILE_GET_INFO( segaic16_tilemap_16a_text_info )
 }
 
 
-static void segaic16_tilemap_16a_draw_layer(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16a_draw_layer(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 
@@ -1070,7 +1070,7 @@ static TILE_GET_INFO( segaic16_tilemap_16b_alt_text_info )
 }
 
 
-static void segaic16_tilemap_16b_draw_layer(running_machine *machine, struct tilemap_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int which, int flags, int priority)
+static void segaic16_tilemap_16b_draw_layer(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, int which, int flags, int priority)
 {
 	UINT16 *textram = info->textram;
 	UINT16 xscroll, yscroll, pages;
@@ -1304,7 +1304,7 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
  *
  *************************************/
 
-void segaic16_tilemap_draw(running_machine *machine, int which, mame_bitmap *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(running_machine *machine, int which, bitmap_t *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
@@ -1493,7 +1493,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_hangon_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_hangon_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(REGION_GFX2);
@@ -1657,7 +1657,7 @@ static void segaic16_sprites_hangon_draw(struct sprite_info *info, mame_bitmap *
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_sharrier_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x20000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
@@ -1827,7 +1827,7 @@ static void segaic16_sprites_sharrier_draw(struct sprite_info *info, mame_bitmap
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_16a_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_16a_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x10000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(REGION_GFX2);
@@ -1982,7 +1982,7 @@ static void segaic16_sprites_16a_draw(struct sprite_info *info, mame_bitmap *bit
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_16b_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_16b_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks;
 	const UINT16 *spritebase;
@@ -2140,7 +2140,7 @@ static void segaic16_sprites_16b_draw(struct sprite_info *info, mame_bitmap *bit
 		pri[x] = 0;															\
 	}																		\
 
-static void segaic16_sprites_yboard_16b_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_yboard_16b_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x20000;
 	const UINT16 *spritebase = (const UINT16 *)memory_region(REGION_GFX2);
@@ -2317,7 +2317,7 @@ static void segaic16_sprites_yboard_16b_draw(struct sprite_info *info, mame_bitm
 		pri[x] = 0xff;														\
 	}																		\
 
-static void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_outrun_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x40000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
@@ -2478,7 +2478,7 @@ static void segaic16_sprites_outrun_draw(struct sprite_info *info, mame_bitmap *
 	if (x >= minx && x <= maxx && ind < 0x1fe)								\
 		dest[x] = ind | colorpri;											\
 
-static void segaic16_sprites_yboard_draw(struct sprite_info *info, mame_bitmap *bitmap, const rectangle *cliprect)
+static void segaic16_sprites_yboard_draw(struct sprite_info *info, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 numbanks = memory_region_length(REGION_GFX1) / 0x80000;
 	const UINT64 *spritebase = (const UINT64 *)memory_region(REGION_GFX1);
@@ -2741,7 +2741,7 @@ void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
  *
  *************************************/
 
-void segaic16_sprites_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect)
+void segaic16_sprites_draw(int which, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	struct sprite_info *info = &sprites[which];
 	(*info->draw)(info, bitmap, cliprect);
@@ -2909,7 +2909,7 @@ static void segaic16_road_hangon_decode(struct road_info *info)
 }
 
 
-static void segaic16_road_hangon_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void segaic16_road_hangon_draw(struct road_info *info, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	UINT16 *roadram = info->roadram;
 	int x, y;
@@ -3177,7 +3177,7 @@ static void segaic16_road_outrun_decode(struct road_info *info)
 }
 
 
-static void segaic16_road_outrun_draw(struct road_info *info, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	UINT16 *roadram = info->buffer;
 	int x, y;
@@ -3403,7 +3403,7 @@ void segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int
  *
  *************************************/
 
-void segaic16_road_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+void segaic16_road_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	struct road_info *info = &road[which];
 	(*info->draw)(info, bitmap, cliprect, priority);
@@ -3503,7 +3503,7 @@ void segaic16_rotate_init(int which, int type, int colorbase)
  *
  *************************************/
 
-void segaic16_rotate_draw(int which, mame_bitmap *bitmap, const rectangle *cliprect, mame_bitmap *srcbitmap)
+void segaic16_rotate_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap)
 {
 	struct rotate_info *info = &rotate[which];
 	INT32 currx = (info->buffer[0x3f0] << 16) | info->buffer[0x3f1];

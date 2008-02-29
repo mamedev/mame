@@ -6,7 +6,7 @@ UINT16* pcktgaldb_fgram;
 UINT16* pcktgaldb_sprites;
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	int flipscreen=!flip_screen_get();

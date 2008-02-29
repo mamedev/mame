@@ -34,7 +34,7 @@ WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
    things eventually */
 
-static void draw_sprite(running_machine *machine, UINT16 spriteno, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -118,7 +118,7 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, mame_bitmap *
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* first part of sprite ram is the list of sprites to draw, terminated with 0x4000 */
 	UINT16 *source = taotaido_spriteram_older;

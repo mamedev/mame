@@ -244,7 +244,7 @@ WRITE8_HANDLER( gondo_scroll_w )
 /******************************************************************************/
 
 /* 'Karnov' sprites, used by Gondomania, Last Mission, Shackled, Ghostbusters */
-static void draw_sprites1(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs,x,y,sprite,sprite2,colour,extra,fx,fy;
 
@@ -307,7 +307,7 @@ static void draw_sprites1(running_machine* machine, mame_bitmap *bitmap, const r
 }
 
 /* 'Dec0' sprites, used by Cobra Command, Oscar */
-static void draw_sprites2(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs,x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
@@ -370,7 +370,7 @@ static void draw_sprites2(running_machine* machine, mame_bitmap *bitmap, const r
 	}
 }
 
-static void srdarwin_draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	int offs;
 
@@ -420,7 +420,7 @@ static void srdarwin_draw_sprites(running_machine* machine, mame_bitmap *bitmap,
 
 /* Draw character tiles, each game has different colour masks */
 #if 0
-static void draw_characters(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int mask, int shift)
+static void draw_characters(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int mask, int shift)
 {
 	int mx,my,tile,color,offs;
 

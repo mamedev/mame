@@ -196,7 +196,7 @@ void batman_scanline_update(running_machine *machine, int scrnum, int scanline)
 VIDEO_UPDATE( batman )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

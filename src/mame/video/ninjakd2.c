@@ -6,7 +6,7 @@ UINT8* ninjakd2_fg_videoram;
 
 static int sprite_overdraw_enabled;
 static int next_sprite_overdraw_enabled;
-static mame_bitmap *sp_bitmap;
+static bitmap_t *sp_bitmap;
 // in robokid and omegaf big sprites are laid out differently in ROM
 static int robokid_sprites;
 
@@ -335,7 +335,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine* const machine, mame_bitmap* const bitmap, const rectangle* const cliprect)
+static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
 	const gfx_element* const gfx = machine->gfx[1];
 	int const big_xshift = robokid_sprites ? 1 : 0;
@@ -437,7 +437,7 @@ static void draw_sprites(running_machine* const machine, mame_bitmap* const bitm
 }
 
 
-static void erase_sprites(running_machine* const machine, mame_bitmap* const bitmap, const rectangle* const cliprect)
+static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	// if sprite overdraw is enabled, only clear palettes 0-B, and leave C-F on screen

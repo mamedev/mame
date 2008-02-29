@@ -185,7 +185,7 @@ WRITE8_HANDLER( senjyo_bgstripes_w )
 
 ***************************************************************************/
 
-static void draw_bgbitmap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bgbitmap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,pen,strwid,count;
 
@@ -219,7 +219,7 @@ static void draw_bgbitmap(running_machine *machine, mame_bitmap *bitmap,const re
 	}
 }
 
-static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_radar(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs,x;
 
@@ -244,7 +244,7 @@ static void draw_radar(mame_bitmap *bitmap,const rectangle *cliprect)
 			}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int priority)
 {
 	int offs;
 

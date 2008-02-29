@@ -60,7 +60,7 @@ WRITE16_HANDLER( mcatadv_videoram2_w )
 }
 
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *source = spriteram_old;
 	UINT16 *finish = source + (spriteram_size/2)/2;
@@ -156,7 +156,7 @@ static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect )
 	}
 }
 
-static void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, mame_bitmap *bitmap, const rectangle *cliprect)
+static void mcatadv_draw_tilemap_part(UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap* current_tilemap, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int flip;
 	UINT32 drawline;

@@ -20,7 +20,7 @@ static int ojankohs_flipscreen;
 static int ojankohs_scrollx, ojankohs_scrolly;
 static tilemap *ojankohs_tilemap;
 static int ojankoc_screen_refresh;
-static mame_bitmap *ojankoc_tmpbitmap;
+static bitmap_t *ojankoc_tmpbitmap;
 
 WRITE8_HANDLER( ojankoc_videoram_w );
 

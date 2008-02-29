@@ -198,7 +198,7 @@ static void sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-static void do_blit_zoom16(mame_bitmap *bitmap, const rectangle *cliprect, struct sprite *sprite)
+static void do_blit_zoom16(bitmap_t *bitmap, const rectangle *cliprect, struct sprite *sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -332,7 +332,7 @@ static void do_blit_zoom16(mame_bitmap *bitmap, const rectangle *cliprect, struc
 	}
 }
 
-static void sprite_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+static void sprite_draw(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 
@@ -535,7 +535,7 @@ WRITE16_HANDLER( wecleman_pageram_w )
 
 ------------------------------------------------------------------------*/
 
-static void wecleman_draw_road(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 // must be powers of 2
 #define XSIZE 512
@@ -644,7 +644,7 @@ static void wecleman_draw_road(running_machine *machine, mame_bitmap *bitmap, co
 ------------------------------------------------------------------------*/
 
 // blends two 8x8x16bpp direct RGB tilemaps
-static void draw_cloud(running_machine *machine, mame_bitmap *bitmap,
+static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 				 gfx_element *gfx,
 				 UINT16 *tm_base,
 				 int x0, int y0,				// target coordinate
@@ -780,7 +780,7 @@ static void draw_cloud(running_machine *machine, mame_bitmap *bitmap,
 
 ------------------------------------------------------------------------*/
 
-static void hotchase_draw_road(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /* Referred to what's in the ROMs */
 #define XSIZE 512

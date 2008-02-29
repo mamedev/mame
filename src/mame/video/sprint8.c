@@ -16,8 +16,8 @@ UINT8* sprint8_team;
 static tilemap* tilemap1;
 static tilemap* tilemap2;
 
-static mame_bitmap* helper1;
-static mame_bitmap* helper2;
+static bitmap_t* helper1;
+static bitmap_t* helper2;
 
 
 PALETTE_INIT( sprint8 )
@@ -136,7 +136,7 @@ VIDEO_START( sprint8 )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
 	int i;
 

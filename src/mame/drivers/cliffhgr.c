@@ -90,7 +90,7 @@ static int phillips_code = 0;
 
 static render_texture *video_texture;
 static render_texture *overlay_texture;
-static mame_bitmap *last_video_bitmap;
+static bitmap_t *last_video_bitmap;
 
 static emu_timer *irq_timer;
 
@@ -112,7 +112,7 @@ static VIDEO_UPDATE( cliff )
 
 	if (discinfo != NULL)
 	{
-		mame_bitmap *vidbitmap;
+		bitmap_t *vidbitmap;
 		rectangle fixedvis = *TMS9928A_get_visarea();
 		fixedvis.max_x++;
 		fixedvis.max_y++;

@@ -62,7 +62,7 @@ extern UINT32 *paletteram32;
 extern UINT8 *paletteram_2;	/* use when palette RAM is split in two parts */
 extern UINT16 *paletteram16_2;
 
-extern mame_bitmap *tmpbitmap;
+extern bitmap_t *tmpbitmap;
 
 
 

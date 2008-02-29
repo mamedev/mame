@@ -6,7 +6,7 @@ UINT8 *dogfgt_bgvideoram;
 
 static UINT8 *bitmapram;
 static int bm_plane;
-static mame_bitmap *pixbitmap;
+static bitmap_t *pixbitmap;
 static int pixcolor;
 static tilemap *bg_tilemap;
 
@@ -185,7 +185,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

@@ -286,7 +286,7 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset)
 {
 	int i;
 
@@ -387,7 +387,7 @@ static void draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int scr
  *
  *************************************/
 
-static void update_screen(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scroll_offset)
+static void update_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset)
 {
 	int y, sy;
 

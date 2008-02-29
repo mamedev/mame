@@ -30,10 +30,10 @@ WRITE16_HANDLER( sshangha_palette_24bit_w )
 	palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
 }
 
-static void sshangha_tilemap_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+static void sshangha_tilemap_draw(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const mame_bitmap *bitmap0 = tilemap_get_pixmap(pf1_16x16_tilemap);
-	const mame_bitmap *bitmap1 = tilemap_get_pixmap(pf2_tilemap);
+	const bitmap_t *bitmap0 = tilemap_get_pixmap(pf1_16x16_tilemap);
+	const bitmap_t *bitmap1 = tilemap_get_pixmap(pf2_tilemap);
 	int x,y,p;
 
 	for (y=0; y<240; y++) {
@@ -55,7 +55,7 @@ WRITE16_HANDLER (sshangha_video_w)
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spritesrc, UINT16 pmask, UINT16 pval)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spritesrc, UINT16 pmask, UINT16 pval)
 {
 	int offs;
 

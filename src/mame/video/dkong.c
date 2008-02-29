@@ -567,11 +567,11 @@ WRITE8_HANDLER( dkong_spritebank_w )
 
 /***************************************************************************
 
-  Draw the game screen in the given mame_bitmap.
+  Draw the game screen in the given bitmap_t.
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT32 mask_bank, UINT32 shift_bits)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 mask_bank, UINT32 shift_bits)
 {
 	dkong_state *state = machine->driver_data;
 	int offs;
@@ -762,7 +762,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	dkong_state *state = machine->driver_data;
 	const UINT8 	*htable = NULL;

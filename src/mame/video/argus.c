@@ -159,7 +159,7 @@ static UINT8 bombsa_ram_page;
 static UINT8* bomba_otherram;
 
 static int valtric_mosaic=0;
-static mame_bitmap *mosaicbitmap;
+static bitmap_t *mosaicbitmap;
 
 
 /***************************************************************************
@@ -1110,7 +1110,7 @@ static void argus_bg0_scroll_handle( void )
 
 }
 
-static void argus_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -1166,7 +1166,7 @@ static void argus_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void valtric_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1219,7 +1219,7 @@ static void valtric_draw_sprites(running_machine *machine, mame_bitmap *bitmap, 
 	}
 }
 
-static void butasan_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1464,7 +1464,7 @@ static void butasan_log_vram(void)
 }
 #endif
 
-static void bombsa_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void bombsa_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

@@ -70,8 +70,8 @@ VIDEO_UPDATE( malzak )
 	int code, colour;
 	int sx, sy;
 	int x,y;
-	mame_bitmap *s2636_0_bitmap;
-	mame_bitmap *s2636_1_bitmap;
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
 
 	fillbitmap(bitmap,0,0);
 

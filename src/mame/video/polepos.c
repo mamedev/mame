@@ -351,7 +351,7 @@ WRITE8_HANDLER( polepos_alpha_w )
 
 ***************************************************************************/
 
-static void draw_road(mame_bitmap *bitmap)
+static void draw_road(bitmap_t *bitmap)
 {
 	const UINT8 *road_control = memory_region(REGION_GFX5);
 	const UINT8 *road_bits1 = memory_region(REGION_GFX5) + 0x2000;
@@ -426,7 +426,7 @@ static void draw_road(mame_bitmap *bitmap)
 	}
 }
 
-static void zoom_sprite(running_machine *machine, mame_bitmap *bitmap,int big,
+static void zoom_sprite(running_machine *machine, bitmap_t *bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
@@ -477,7 +477,7 @@ static void zoom_sprite(running_machine *machine, mame_bitmap *bitmap,int big,
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT16 *posmem = &polepos_sprite16_memory[0x380];
 	UINT16 *sizmem = &polepos_sprite16_memory[0x780];

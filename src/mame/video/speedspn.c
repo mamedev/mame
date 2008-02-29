@@ -58,7 +58,7 @@ WRITE8_HANDLER(speedspn_global_display_w)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *source = speedspn_vidram+ 0x1000;

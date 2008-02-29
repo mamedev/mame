@@ -112,7 +112,7 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, mame_bitmap* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
+static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
 {
 	int ycnt;
 	int ydrawpos;
@@ -183,7 +183,7 @@ static void draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, int p
 
 static UINT16 *pgm_sprite_source;
 
-static void draw_sprites(int priority, mame_bitmap* bitmap)
+static void draw_sprites(int priority, bitmap_t* bitmap)
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy

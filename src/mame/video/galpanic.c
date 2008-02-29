@@ -5,7 +5,7 @@
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
 size_t galpanic_fgvideoram_size;
 
-static mame_bitmap *sprites_bitmap;
+static bitmap_t *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
@@ -49,7 +49,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 }
 
 
-static void comad_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void comad_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int sx=0, sy=0;
@@ -86,7 +86,7 @@ static void comad_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void draw_fgbitmap(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_fgbitmap(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

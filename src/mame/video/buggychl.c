@@ -9,7 +9,7 @@ UINT8 *buggychl_character_ram;
 
 static int *dirtychar;
 
-static mame_bitmap *tmpbitmap1,*tmpbitmap2;
+static bitmap_t *tmpbitmap1,*tmpbitmap2;
 static int sl_bank,bg_on,sky_on,sprite_color_base,bg_scrollx;
 
 
@@ -89,7 +89,7 @@ WRITE8_HANDLER( buggychl_bg_scrollx_w )
 
 
 
-static void draw_sky(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sky(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 
@@ -99,7 +99,7 @@ static void draw_sky(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	int scroll[256];
@@ -136,7 +136,7 @@ static void draw_bg(running_machine *machine, mame_bitmap *bitmap, const rectang
 }
 
 
-static void draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -163,7 +163,7 @@ static void draw_fg(running_machine *machine, mame_bitmap *bitmap, const rectang
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

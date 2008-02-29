@@ -91,7 +91,7 @@ WRITE8_HANDLER( goindol_bg_videoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int gfxbank, UINT8 *sprite_ram)
 {
 	int offs,sx,sy,tile,palette;
 

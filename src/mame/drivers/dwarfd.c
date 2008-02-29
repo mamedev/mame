@@ -462,7 +462,7 @@ static VIDEO_START(dwarfd)
 {
 }
 
-static void drawCrt(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y;
 	for (y=0;y<maxy;y++)

@@ -199,7 +199,7 @@ WRITE8_HANDLER( gladiatr_video_registers_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -257,7 +257,7 @@ VIDEO_UPDATE( ppking )
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
-		mame_bitmap *flagsbitmap;
+		bitmap_t *flagsbitmap;
 		int sx = cliprect->min_x;
 		int sy = cliprect->min_y;
 

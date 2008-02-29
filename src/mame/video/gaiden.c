@@ -12,7 +12,7 @@ int gaiden_sprite_sizey;
 //int raiga_alpha;
 
 static tilemap *text_layer,*foreground,*background;
-static mame_bitmap *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
+static bitmap_t *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 
 /***************************************************************************
 
@@ -219,7 +219,7 @@ WRITE16_HANDLER( gaiden_videoram_w )
    changes?) it appears that the sprite drawing is no longer putting the correct raw data
    in the bitmaps? */
 static void blendbitmaps(running_machine *machine,
-		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
+		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
 		int sx,int sy,const rectangle *cliprect)
 {
 	int y,x;
@@ -276,7 +276,7 @@ static void blendbitmaps(running_machine *machine,
 
 #define NUM_SPRITES 256
 
-static void gaiden_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -375,7 +375,7 @@ skip_sprite:
 }
 
 
-static void raiga_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -472,7 +472,7 @@ static void raiga_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg,
 			}
 			else
 			{
-				mame_bitmap *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
+				bitmap_t *bitmap = (priority >= 2) ? bitmap_bg : bitmap_fg;
 
 				for (row = 0; row < sizey; row++)
 				{
@@ -516,7 +516,7 @@ static void raiga_draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg,
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 

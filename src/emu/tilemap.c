@@ -55,7 +55,7 @@ typedef void (*blitopaque_t)(void *dest, const UINT16 *source, int count, UINT8 
 typedef struct _blit_parameters blit_parameters;
 struct _blit_parameters
 {
-	mame_bitmap *		bitmap;
+	bitmap_t *			bitmap;
 	rectangle			cliprect;
 	blitmask_t 			draw_masked;
 	blitopaque_t 		draw_opaque;
@@ -108,10 +108,10 @@ struct _tilemap
 	INT32						dy_flipped;			/* global vertical scroll offset when flipped */
 
 	/* pixel data */
-	mame_bitmap *				pixmap;				/* cached pixel data */
+	bitmap_t *					pixmap;				/* cached pixel data */
 
 	/* transparency mapping */
-	mame_bitmap *				flagsmap;			/* per-pixel flags */
+	bitmap_t *					flagsmap;			/* per-pixel flags */
 	UINT8 *						tileflags;			/* per-tile flags */
 	UINT8 *						pen_to_flags; 		/* mapping of pens to flags */
 };
@@ -122,7 +122,7 @@ struct _tilemap
     GLOBAL VARIABLES
 ***************************************************************************/
 
-mame_bitmap *			priority_bitmap;
+bitmap_t *				priority_bitmap;
 
 static tilemap *		tilemap_list;
 static tilemap **		tilemap_tailptr;
@@ -152,7 +152,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 static UINT8 tile_apply_bitmask(tilemap *tmap, const UINT8 *maskdata, UINT32 x0, UINT32 y0, UINT8 category, UINT8 flags);
 
 /* drawing helpers */
-static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, mame_bitmap *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
+static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask);
 static void tilemap_draw_instance(tilemap *tmap, const blit_parameters *blit, int xpos, int ypos);
 static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
@@ -693,7 +693,7 @@ int tilemap_get_scrolly(tilemap *tmap, int which)
     (updated) internal pixmap for a tilemap
 -------------------------------------------------*/
 
-mame_bitmap *tilemap_get_pixmap(tilemap *tmap)
+bitmap_t *tilemap_get_pixmap(tilemap *tmap)
 {
 	/* ensure all the tiles are up-to-date and then return the pixmap */
 	pixmap_update(tmap, NULL);
@@ -706,7 +706,7 @@ mame_bitmap *tilemap_get_pixmap(tilemap *tmap)
     (updated) internal flagsmap for a tilemap
 -------------------------------------------------*/
 
-mame_bitmap *tilemap_get_flagsmap(tilemap *tmap)
+bitmap_t *tilemap_get_flagsmap(tilemap *tmap)
 {
 	/* ensure all the tiles are up-to-date and then return the pixmap */
 	pixmap_update(tmap, NULL);
@@ -738,7 +738,7 @@ UINT8 *tilemap_get_tile_flags(tilemap *tmap)
     priority/priority_mask to the priority bitmap
 -------------------------------------------------*/
 
-void tilemap_draw_primask(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask)
+void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
 	rectangle original_cliprect;
 	blit_parameters blit;
@@ -856,7 +856,7 @@ profiler_mark(PROFILER_END);
     priority_mask to the priority bitmap
 -------------------------------------------------*/
 
-void tilemap_draw_roz_primask(mame_bitmap *dest, const rectangle *cliprect, tilemap *tmap,
+void tilemap_draw_roz_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
@@ -933,7 +933,7 @@ void tilemap_size_by_index(int number, UINT32 *width, UINT32 *height)
     priority)
 -------------------------------------------------*/
 
-void tilemap_draw_by_index(mame_bitmap *dest, int number, UINT32 scrollx, UINT32 scrolly)
+void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 scrolly)
 {
 	tilemap *tmap = indexed_tilemap(number);
 	blit_parameters blit;
@@ -1266,8 +1266,8 @@ profiler_mark(PROFILER_END);
 static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags)
 {
 	const UINT8 *penmap = tmap->pen_to_flags + group * MAX_PEN_TO_FLAGS;
-	mame_bitmap *flagsmap = tmap->flagsmap;
-	mame_bitmap *pixmap = tmap->pixmap;
+	bitmap_t *flagsmap = tmap->flagsmap;
+	bitmap_t *pixmap = tmap->pixmap;
 	int height = tmap->tileheight;
 	int width = tmap->tilewidth;
 	UINT8 andmask = ~0, ormask = 0;
@@ -1361,7 +1361,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 
 static UINT8 tile_apply_bitmask(tilemap *tmap, const UINT8 *maskdata, UINT32 x0, UINT32 y0, UINT8 category, UINT8 flags)
 {
-	mame_bitmap *flagsmap = tmap->flagsmap;
+	bitmap_t *flagsmap = tmap->flagsmap;
 	int height = tmap->tileheight;
 	int width = tmap->tilewidth;
 	UINT8 andmask = ~0, ormask = 0;
@@ -1421,7 +1421,7 @@ static UINT8 tile_apply_bitmask(tilemap *tmap, const UINT8 *maskdata, UINT32 x0,
     and indexed drawing code
 -------------------------------------------------*/
 
-static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, mame_bitmap *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask)
+static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitmap_t *dest, const rectangle *cliprect, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -1506,7 +1506,7 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, mame
 
 static void tilemap_draw_instance(tilemap *tmap, const blit_parameters *blit, int xpos, int ypos)
 {
-	mame_bitmap *dest = blit->bitmap;
+	bitmap_t *dest = blit->bitmap;
 	const UINT16 *source_baseaddr;
 	const UINT8 *mask_baseaddr;
 	void *dest_baseaddr = NULL;
@@ -1685,9 +1685,9 @@ static void tilemap_draw_roz_core(tilemap *tmap, const blit_parameters *blit,
 		UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
 {
 	const pen_t *clut = &Machine->pens[blit->tilemap_priority_code >> 16];
-	mame_bitmap *destbitmap = blit->bitmap;
-	mame_bitmap *srcbitmap = tmap->pixmap;
-	mame_bitmap *flagsmap = tmap->flagsmap;
+	bitmap_t *destbitmap = blit->bitmap;
+	bitmap_t *srcbitmap = tmap->pixmap;
+	bitmap_t *flagsmap = tmap->flagsmap;
 	const int xmask = srcbitmap->width-1;
 	const int ymask = srcbitmap->height-1;
 	const int widthshifted = srcbitmap->width << 16;

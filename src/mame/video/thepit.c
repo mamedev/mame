@@ -236,7 +236,7 @@ READ8_HANDLER( thepit_input_port_0_r )
  *************************************/
 
 static void draw_sprites(running_machine *machine,
-						 mame_bitmap *bitmap,
+						 bitmap_t *bitmap,
 						 const rectangle *cliprect,
 						 int priority_to_draw)
 {

@@ -70,7 +70,7 @@ VIDEO_START( nitrobal )
 
 /******************************************************************************/
 
-static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int is_schmeisr)
+static void rohga_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int is_schmeisr)
 {
 	int offs;
 
@@ -147,7 +147,7 @@ static void rohga_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spriteptr, int mode, int bank)
+static void wizdfire_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spriteptr, int mode, int bank)
 {
 	int offs;
 
@@ -244,7 +244,7 @@ static void wizdfire_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void nitrobal_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
+static void nitrobal_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank)
 {
 	int offs,end,inc;
 
@@ -436,7 +436,7 @@ sprite 2:
 
 /******************************************************************************/
 
-static void update_rohga(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int is_schmeisr)
+static void update_rohga(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int is_schmeisr)
 {
 	/* Update playfields */
 	flip_screen_set( deco16_pf12_control[0]&0x80 );

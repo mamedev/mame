@@ -132,7 +132,7 @@ VIDEO_UPDATE( route16 )
  *  The Stratovox video connections have been verified from the schematics
  */
 
-static int video_update_stratvox_ttmahjng(mame_bitmap *bitmap,
+static int video_update_stratvox_ttmahjng(bitmap_t *bitmap,
 										  const rectangle *cliprect,
 										  pen_t (*make_pen)(UINT8))
 {

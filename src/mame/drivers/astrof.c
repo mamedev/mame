@@ -311,7 +311,7 @@ static WRITE8_HANDLER( tomahawk_video_control_2_w )
 }
 
 
-static void video_update_common(mame_bitmap *bitmap, const rectangle *cliprect, pen_t *pens)
+static void video_update_common(bitmap_t *bitmap, const rectangle *cliprect, pen_t *pens)
 {
 	offs_t offs;
 

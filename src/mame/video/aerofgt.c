@@ -294,7 +294,7 @@ WRITE16_HANDLER( wbbc97_bitmap_enable_w )
 
 ***************************************************************************/
 
-static void aerofgt_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int priority)
+static void aerofgt_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int priority)
 {
 	int offs;
 
@@ -366,7 +366,7 @@ static void aerofgt_draw_sprites(running_machine *machine, mame_bitmap *bitmap,c
 	}
 }
 
-static void turbofrc_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
+static void turbofrc_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int chip,int chip_disabled_pri)
 {
 	int attr_start,base,first;
 
@@ -441,7 +441,7 @@ static void turbofrc_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void pspikesb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void pspikesb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 
@@ -476,7 +476,7 @@ static void pspikesb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void aerfboot_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int attr_start;//,base,first;
 
@@ -546,7 +546,7 @@ static void aerfboot_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void wbbc97_draw_bitmap(mame_bitmap *bitmap)
+static void wbbc97_draw_bitmap(bitmap_t *bitmap)
 {
 	int x,y,count;
 	int color;

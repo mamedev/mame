@@ -45,7 +45,7 @@ PALETTE_INIT( arknoid2 )
 
 
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *m)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *m)
 {
 	int x,y,column,tot,flag;
 	int scrollx, scrolly;
@@ -131,7 +131,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 
 
 static void draw_foreground(running_machine *machine,
-							mame_bitmap *bitmap,
+							bitmap_t *bitmap,
 							const rectangle *cliprect,
 							 UINT8 *char_pointer,
 							 UINT8 *x_pointer,

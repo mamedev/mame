@@ -9,7 +9,7 @@
 
 
 UINT8 *zac2650_s2636_0_ram;
-static mame_bitmap *spritebitmap;
+static bitmap_t *spritebitmap;
 
 static int CollisionBackground;
 static int CollisionSprite;
@@ -138,7 +138,7 @@ VIDEO_START( tinvader )
 	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	int offs;
 

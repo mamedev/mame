@@ -138,7 +138,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
  *
  *************************************/
 
-static void draw_one_sprite(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 *sprite)
+static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *sprite)
 {
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);

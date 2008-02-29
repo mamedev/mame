@@ -61,7 +61,7 @@ win_video_config video_config;
 win_monitor_info *win_monitor_list;
 static win_monitor_info *primary_monitor;
 
-static mame_bitmap *effect_bitmap;
+static bitmap_t *effect_bitmap;
 
 
 

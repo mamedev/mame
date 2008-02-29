@@ -31,7 +31,7 @@ static UINT16 blitter_xparam[16];
 static UINT16 blitter_yparam[16];
 static UINT16 blitter_vidparam[32];
 
-static mame_bitmap *dstbitmap;
+static bitmap_t *dstbitmap;
 static emu_timer *blitter_timer;
 
 

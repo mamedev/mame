@@ -35,7 +35,7 @@ static int gfxdraw_mode;
 static int nb19010_busyctr;
 static int nb19010_busyflag;
 
-static mame_bitmap *nbmj9195_tmpbitmap[VRAM_MAX];
+static bitmap_t *nbmj9195_tmpbitmap[VRAM_MAX];
 static UINT16 *nbmj9195_videoram[VRAM_MAX];
 static UINT16 *nbmj9195_videoworkram[VRAM_MAX];
 static UINT8 *nbmj9195_palette, *nbmj9195_nb22090_palette;

@@ -206,7 +206,7 @@
 
 struct layer_info
 {
-	mame_bitmap *	bitmap;
+	bitmap_t *	bitmap;
 	UINT8 *					transparent;
 };
 
@@ -943,7 +943,7 @@ INLINE void get_tilemaps(int bgnum, tilemap **tilemaps)
 static void update_tilemap_zoom(running_machine *machine, int scrnum, struct layer_info *layer, const rectangle *cliprect, int bgnum)
 {
 	int clipenable, clipout, clips, clipdraw_start;
-	mame_bitmap *bitmap = layer->bitmap;
+	bitmap_t *bitmap = layer->bitmap;
 	struct extents_list clip_extents;
 	tilemap *tilemaps[4];
 	UINT32 srcx, srcx_start, srcy;
@@ -1020,7 +1020,7 @@ static void update_tilemap_zoom(running_machine *machine, int scrnum, struct lay
 		/* optimize for the case where we are clipped out */
 		if (clipdraw || extents[1] <= cliprect->max_x)
 		{
-			mame_bitmap *tm0, *tm1;
+			bitmap_t *tm0, *tm1;
 			int transparent = 0;
 			UINT16 *src[2];
 
@@ -1094,7 +1094,7 @@ static void update_tilemap_zoom(running_machine *machine, int scrnum, struct lay
 static void update_tilemap_rowscroll(running_machine *machine, int scrnum, struct layer_info *layer, const rectangle *cliprect, int bgnum)
 {
 	int clipenable, clipout, clips, clipdraw_start;
-	mame_bitmap *bitmap = layer->bitmap;
+	bitmap_t *bitmap = layer->bitmap;
 	struct extents_list clip_extents;
 	tilemap *tilemaps[4];
 	int rowscroll, rowselect;
@@ -1145,7 +1145,7 @@ static void update_tilemap_rowscroll(running_machine *machine, int scrnum, struc
 		/* optimize for the case where we are clipped out */
 		if (clipdraw || extents[1] <= cliprect->max_x)
 		{
-			mame_bitmap *tm0, *tm1;
+			bitmap_t *tm0, *tm1;
 			int transparent = 0;
 			UINT16 *src[2];
 			int srcxstep;
@@ -1243,7 +1243,7 @@ static void update_tilemap_rowscroll(running_machine *machine, int scrnum, struc
 
 static void update_tilemap_text(running_machine *machine, int scrnum, struct layer_info *layer, const rectangle *cliprect)
 {
-	mame_bitmap *bitmap = layer->bitmap;
+	bitmap_t *bitmap = layer->bitmap;
 	UINT16 *tilebase;
 	UINT16 *gfxbase;
 	int startx, starty;
@@ -1401,7 +1401,7 @@ static void update_tilemap_text(running_machine *machine, int scrnum, struct lay
 static void update_bitmap(running_machine *machine, int scrnum, struct layer_info *layer, const rectangle *cliprect)
 {
 	int clipenable, clipout, clips, clipdraw_start;
-	mame_bitmap *bitmap = layer->bitmap;
+	bitmap_t *bitmap = layer->bitmap;
 	struct extents_list clip_extents;
 	int xscroll, yscroll;
 	int color;
@@ -1503,7 +1503,7 @@ static void update_bitmap(running_machine *machine, int scrnum, struct layer_inf
 
 static void update_background(struct layer_info *layer, const rectangle *cliprect)
 {
-	mame_bitmap *bitmap = layer->bitmap;
+	bitmap_t *bitmap = layer->bitmap;
 	int x, y;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -1699,7 +1699,7 @@ static int draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rectangle *
 		{ 0x1fff, 0x0fff, 0x07ff, 0x03ff }
 	};
 
-	mame_bitmap *bitmap = layer_data[(!is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
+	bitmap_t *bitmap = layer_data[(!is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
 	UINT8 numbanks = memory_region_length(REGION_GFX2) / 0x400000;
 	const UINT32 *spritebase = (const UINT32 *)memory_region(REGION_GFX2);
 
@@ -2028,7 +2028,7 @@ INLINE UINT16 *get_layer_scanline(int layer, int scanline)
 	return BITMAP_ADDR16(layer_data[layer].bitmap, scanline, 0);
 }
 
-static void mix_all_layers(int which, int xoffs, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 enablemask)
+static void mix_all_layers(int which, int xoffs, bitmap_t *bitmap, const rectangle *cliprect, UINT8 enablemask)
 {
 	int blendenable = mixer_control[which][0x4e/2] & 0x0800;
 	int blendfactor = (mixer_control[which][0x4e/2] >> 8) & 7;

@@ -57,7 +57,7 @@
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
 
 	/* extract color information */
@@ -108,7 +108,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
 
 	UINT32	tex_width = extra->texwidth;

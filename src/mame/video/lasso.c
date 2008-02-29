@@ -281,7 +281,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int reverse )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int reverse )
 {
 	const UINT8 *finish, *source;
 	int inc;
@@ -340,7 +340,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_lasso(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_lasso(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 	pen_t pen = 0x3f;

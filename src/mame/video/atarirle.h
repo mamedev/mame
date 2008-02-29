@@ -86,7 +86,7 @@ WRITE16_HANDLER( atarirle_0_spriteram_w );
 WRITE32_HANDLER( atarirle_0_spriteram32_w );
 
 /* render helpers */
-mame_bitmap *atarirle_get_vram(int map, int idx);
+bitmap_t *atarirle_get_vram(int map, int idx);
 
 
 

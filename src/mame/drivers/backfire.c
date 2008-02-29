@@ -27,8 +27,8 @@ extern void decrypt156(void);
 static UINT32 *backfire_spriteram32_1;
 static UINT32 *backfire_spriteram32_2;
 static UINT32 *backfire_mainram;
-static mame_bitmap * backfire_left;
-static mame_bitmap * backfire_right;
+static bitmap_t *backfire_left;
+static bitmap_t *backfire_right;
 
 //UINT32 *backfire_180010, *backfire_188010;
 static UINT32 *backfire_left_priority, *backfire_right_priority;
@@ -90,7 +90,7 @@ static VIDEO_START(backfire)
 	backfire_right = auto_bitmap_alloc(80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 }
 
-static void draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
+static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect, UINT32 *backfire_spriteram32, int region)
 {
 	int offs;
 

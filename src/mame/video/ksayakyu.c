@@ -63,7 +63,7 @@ static TILE_GET_INFO( get_text_tile_info )
 	SET_TILE_INFO(0,code,((attr>>2)&7),flags);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source = spriteram+spriteram_size-4;
 	const UINT8 *finish = spriteram;

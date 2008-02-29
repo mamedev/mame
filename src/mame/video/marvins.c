@@ -230,7 +230,7 @@ VIDEO_START( marvins )
 **
 ***************************************************************************/
 
-static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *base = videoram+0x400;
 	const gfx_element *gfx = machine->gfx[0];
@@ -261,7 +261,7 @@ static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rec
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 		int priority, UINT8 sprite_partition )
 {
 	const gfx_element *gfx = machine->gfx[3];

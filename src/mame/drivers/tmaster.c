@@ -170,7 +170,7 @@ static READ16_HANDLER( tmaster_tscreen_y_lo_r )	{	return 0x00;	}
 
 ***************************************************************************/
 
-static mame_bitmap *tmaster_bitmap[2][2];	// 2 layers, 2 buffers per layer
+static bitmap_t *tmaster_bitmap[2][2];	// 2 layers, 2 buffers per layer
 static UINT16 *tmaster_regs;
 static UINT16 tmaster_color;
 static UINT16 tmaster_addr;
@@ -253,7 +253,7 @@ static void tmaster_draw(void)
 
 	UINT16 data;
 
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 
 	buffer	=	(tmaster_regs[0x02/2] >> 8) & 3;	// 1 bit per layer, selects the currently displayed buffer
  	sw		=	 tmaster_regs[0x04/2];

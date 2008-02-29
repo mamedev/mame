@@ -116,7 +116,7 @@ static VIDEO_UPDATE( alg )
 	/* at the end of the frame, composite the video */
 	if (!video_skip_this_frame() && (cliprect->max_y == machine->screen[screen].visarea.max_y))
 	{
-		mame_bitmap *vidbitmap;
+		bitmap_t *vidbitmap;
 		rectangle fixedvis = machine->screen[screen].visarea;
 		fixedvis.max_x++;
 		fixedvis.max_y++;

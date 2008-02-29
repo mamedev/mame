@@ -41,7 +41,7 @@ struct _render_font_char
 	INT32				xoffs, yoffs;		/* X and Y offset from baseline to top,left of bitmap */
 	INT32				bmwidth, bmheight;	/* width and height of bitmap */
 	const char *		rawdata;			/* pointer to the raw data for this one */
-	mame_bitmap *		bitmap;				/* pointer to the bitmap containing the raw data */
+	bitmap_t *			bitmap;				/* pointer to the bitmap containing the raw data */
 	render_texture *	texture;			/* pointer to a texture for rendering and sizing */
 };
 
@@ -320,7 +320,7 @@ render_texture *render_font_get_char_texture_and_bounds(render_font *font, float
     string to a bitmap
 -------------------------------------------------*/
 
-void render_font_get_scaled_bitmap_and_bounds(render_font *font, mame_bitmap *dest, float height, float aspect, unicode_char chnum, rectangle *bounds)
+void render_font_get_scaled_bitmap_and_bounds(render_font *font, bitmap_t *dest, float height, float aspect, unicode_char chnum, rectangle *bounds)
 {
 	render_font_char *ch = get_char(font, chnum);
 	float scale = font->scale * height;

@@ -13,7 +13,7 @@ UINT16 *glass_vregs;
 UINT16 *glass_videoram;
 
 static tilemap *pant[2];
-static mame_bitmap *screen_bitmap;
+static bitmap_t *screen_bitmap;
 
 static int glass_blitter_serial_buffer[5];
 static int current_command = 0;
@@ -163,7 +163,7 @@ VIDEO_START( glass )
       3  | xxxxxxxx xxxxxxxx | sprite code
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i;
 	const gfx_element *gfx = machine->gfx[0];

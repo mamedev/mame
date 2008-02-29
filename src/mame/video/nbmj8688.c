@@ -23,7 +23,7 @@ static int mjsikaku_flipscreen;
 static int mjsikaku_screen_refresh;
 static int mjsikaku_gfxmode;
 
-static mame_bitmap *mjsikaku_tmpbitmap;
+static bitmap_t *mjsikaku_tmpbitmap;
 static UINT16 *mjsikaku_videoram;
 static UINT8 *nbmj8688_clut;
 

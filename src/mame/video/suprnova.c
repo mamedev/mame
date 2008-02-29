@@ -325,7 +325,7 @@ void skns_sprite_kludge(int x, int y)
 		old2 += 0x40;				\
 	}
 
-static void blit_nf_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_nf_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -339,7 +339,7 @@ static void blit_nf_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT
 	}
 }
 
-static void blit_fy_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -353,7 +353,7 @@ static void blit_fy_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT
 	}
 }
 
-static void blit_fx_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fx_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -367,7 +367,7 @@ static void blit_fx_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT
 	}
 }
 
-static void blit_fxy_z(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
+static void blit_fxy_z(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -381,14 +381,14 @@ static void blit_fxy_z(mame_bitmap *bitmap, const rectangle *cliprect, const UIN
 	}
 }
 
-static void (*const blit_z[4])(mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour) = {
+static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx, UINT16 zy, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,
 	blit_fxy_z,
 };
 
-void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*- SPR RAM Format -**
 
@@ -766,7 +766,7 @@ VIDEO_START(skns)
 	machine->gfx[3]->color_granularity=256;
 }
 
-static void supernova_draw_a( mame_bitmap *bitmap, const rectangle *cliprect, int tran )
+static void supernova_draw_a( bitmap_t *bitmap, const rectangle *cliprect, int tran )
 {
 		int enable_a  = (skns_v3_regs[0x10/4] >> 0) & 0x0001;
 	UINT32 startx,starty;
@@ -818,7 +818,7 @@ static void supernova_draw_a( mame_bitmap *bitmap, const rectangle *cliprect, in
 	}
 }
 
-static void supernova_draw_b( mame_bitmap *bitmap, const rectangle *cliprect, int tran )
+static void supernova_draw_b( bitmap_t *bitmap, const rectangle *cliprect, int tran )
 {
 		int enable_b  = (skns_v3_regs[0x34/4] >> 0) & 0x0001;
 	UINT32 startx,starty;

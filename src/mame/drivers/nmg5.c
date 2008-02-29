@@ -805,7 +805,7 @@ static VIDEO_START( nmg5 )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -841,7 +841,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 	}
 }
 
-static void draw_bitmap(mame_bitmap *bitmap)
+static void draw_bitmap(bitmap_t *bitmap)
 {
 	int yyy=256;
 	int xxx=512/4;

@@ -146,7 +146,7 @@ INLINE const UINT8 *get_source_ptr(running_machine *machine, UINT32 sprite, int 
 	return gfx->gfxdata + ((source_base+(dy%16)) * gfx->line_modulo);
 }
 
-static void bbusters_draw_block(running_machine *machine, mame_bitmap *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+static void bbusters_draw_block(running_machine *machine, bitmap_t *dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
 	pen_t pen_base = machine->gfx[bank]->color_base + machine->gfx[bank]->color_granularity * (color % machine->gfx[bank]->total_colors);
 	UINT32 xinc=(scale_line_count * 0x10000 ) / size;
@@ -191,7 +191,7 @@ static void bbusters_draw_block(running_machine *machine, mame_bitmap *dest,int 
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const UINT16 *source, int bank, int colval, int colmask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
 	const UINT8 *scale_table=memory_region(REGION_USER1);
 	int offs;

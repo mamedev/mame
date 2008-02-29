@@ -95,13 +95,13 @@ sol divide doesn't seem to make much use of tilemaps at all, it uses them to fad
 #include "psikyosh.h"
 
 /* Needed for psikyosh_drawgfxzoom */
-static mame_bitmap *zoom_bitmap, *z_bitmap;
+static bitmap_t *zoom_bitmap, *z_bitmap;
 
 /* Psikyo PS6406B */
 /* --- BACKGROUNDS --- */
 
 /* 'Normal' layers, no line/columnscroll. No per-line effects */
-static void draw_bglayer(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayer(running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs=0, sx, sy;
@@ -167,7 +167,7 @@ static void draw_bglayer(running_machine *machine, int layer, mame_bitmap *bitma
 
 /* This is a complete bodge for the daraku text layers. There is not enough info to be sure how it is supposed to work */
 /* It appears that there are row/column scroll values for 2 seperate layers, just drawing it twice using one of each of the sets of values for now */
-static void draw_bglayertext(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayertext(running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
@@ -257,7 +257,7 @@ static void draw_bglayertext(running_machine *machine, int layer, mame_bitmap *b
 
 /* Row Scroll and/or Column Scroll/Zoom, has per-column Alpha/Bank/Priority. This isn't correct, just testing */
 /* For now I'm just using the first alpha/bank/priority values and sodding the rest of it */
-static void draw_bglayerscroll(running_machine *machine, int layer, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	gfx_element *gfx;
 	int offs, sx, sy;
@@ -335,7 +335,7 @@ static void draw_bglayerscroll(running_machine *machine, int layer, mame_bitmap 
 }
 
 /* 3 BG layers, with priority */
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	int i;
 
@@ -393,7 +393,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 /* sx and sy is top-left of entire sprite regardless of flip */
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
-static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void psikyosh_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int zoomx, int zoomy, int wide, int high, UINT32 z)
@@ -930,7 +930,7 @@ static void psikyosh_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
 
 #define SPRITE_PRI(n) (((psikyosh_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 req_pri )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 req_pri )
 {
 	/*- Sprite Format 0x0000 - 0x37ff -**
 
@@ -1073,7 +1073,7 @@ VIDEO_START( psikyosh )
 
 }
 
-static void psikyosh_prelineblend( mame_bitmap *bitmap, const rectangle *cliprect )
+static void psikyosh_prelineblend( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* There are 224 values for pre-lineblending. Using one for every row currently */
 	/* I suspect that it should be blended against black by the amount specified as
@@ -1097,7 +1097,7 @@ static void psikyosh_prelineblend( mame_bitmap *bitmap, const rectangle *cliprec
 	profiler_mark(PROFILER_END);
 }
 
-static void psikyosh_postlineblend( mame_bitmap *bitmap, const rectangle *cliprect )
+static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* There are 224 values for post-lineblending. Using one for every row currently */
 	UINT32 *dstline;

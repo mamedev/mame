@@ -66,7 +66,7 @@ VIDEO_START( m90 )
 	state_save_register_global_array(m90_video_control_data);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -101,7 +101,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 }
 
 #if 0
-static void bootleg_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

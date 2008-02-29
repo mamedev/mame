@@ -143,7 +143,7 @@ WRITE16_HANDLER( pow_video16_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int j,int pos)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j,int pos)
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 
@@ -217,7 +217,7 @@ VIDEO_UPDATE( pow )
 }
 
 
-static void draw_sprites2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int j, int z, int pos)
+static void draw_sprites2(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int j, int z, int pos)
 {
 	int offs,mx,my,color,tile,fx,fy,i;
 

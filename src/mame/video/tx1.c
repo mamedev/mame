@@ -88,7 +88,7 @@ UINT16 *tx1_rcram;
 size_t tx1_objram_size;
 
 static tilemap *tx1_tilemap;
-static mame_bitmap *tx1_bitmap;
+static bitmap_t *tx1_bitmap;
 static render_texture *tx1_texture;
 
 WRITE16_HANDLER( tx1_vram_w )
@@ -222,7 +222,7 @@ WRITE16_HANDLER( tx1_flgcs_w )
 
 
 /* Preliminary */
-static void tx1_draw_objects(mame_bitmap *bitmap, const rectangle *cliprect)
+static void tx1_draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
 {
 #define FRAC	16
 

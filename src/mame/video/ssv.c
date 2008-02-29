@@ -144,7 +144,7 @@ Note: press Z to show some info on each sprite (debug builds only)
 
 static int shadow_pen_mask, shadow_pen_shift;
 
-static void ssv_drawgfx(	mame_bitmap *bitmap, const gfx_element *gfx,
+static void ssv_drawgfx(	bitmap_t *bitmap, const gfx_element *gfx,
 					UINT32 code,UINT32 color,int flipx,int flipy,int x0,int y0,
 					const rectangle *cliprect, int shadow	)
 {
@@ -591,7 +591,7 @@ From the above some noteworthy cases are:
 
 /* Draw a tilemap sprite */
 
-static void draw_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
+static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int sy, int scroll)
 {
 	rectangle clip;
 	int attr, code, color, mode, size, page, shadow;
@@ -716,7 +716,7 @@ static void draw_row(running_machine *machine, mame_bitmap *bitmap, const rectan
 
 /* Draw the "background layer" using multiple tilemap sprites */
 
-static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int  nr)
+static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int  nr)
 {
 	int sy;
 	for ( sy = 0; sy <= machine->screen[0].visarea.max_y; sy += 0x40 )
@@ -725,7 +725,7 @@ static void draw_layer(running_machine *machine, mame_bitmap *bitmap, const rect
 
 /* Draw sprites in the sprites list */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Sprites list */
 
@@ -994,7 +994,7 @@ VIDEO_UPDATE( eaglshot )
         E.h                             Unused
 
 */
-static void gdfs_draw_zooming_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void gdfs_draw_zooming_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Sprites list */
 

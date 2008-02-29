@@ -86,7 +86,7 @@ int state_save_registration_allowed(void);
 int state_save_get_reg_count(void);
 
 void state_save_register_memory(const char *module, UINT32 instance, const char *name, void *val, UINT32 valsize, UINT32 valcount);
-void state_save_register_bitmap(const char *module, UINT32 instance, const char *name, mame_bitmap *val);
+void state_save_register_bitmap(const char *module, UINT32 instance, const char *name, bitmap_t *val);
 
 void state_save_register_func_presave(void (*func)(void));
 void state_save_register_func_postload(void (*func)(void));

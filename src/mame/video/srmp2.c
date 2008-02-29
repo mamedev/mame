@@ -45,7 +45,7 @@ PALETTE_INIT( srmp3 )
 }
 
 
-static void srmp2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2
@@ -118,7 +118,7 @@ static void srmp2_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 
-static void srmp3_draw_sprites_map(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
@@ -191,7 +191,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, mame_bitmap *bitmap
 }
 
 
-static void srmp3_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram_2
@@ -275,7 +275,7 @@ static void srmp3_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 }
 
 
-static void mjyuugi_draw_sprites_map(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
@@ -355,7 +355,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, mame_bitmap *bitm
 }
 
 
-static void mjyuugi_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     Sprite RAM A:   spriteram16_2

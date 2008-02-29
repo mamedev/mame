@@ -94,7 +94,7 @@ VIDEO_START( lkage )
 } /* VIDEO_START( lkage ) */
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	const UINT8 *source = spriteram;
 	const UINT8 *finish = source+0x60;

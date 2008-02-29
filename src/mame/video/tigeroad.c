@@ -64,7 +64,7 @@ WRITE16_HANDLER( tigeroad_scroll_w )
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	UINT16 *source = &buffered_spriteram16[spriteram_size/2] - 4;
 	UINT16 *finish = buffered_spriteram16;

@@ -37,7 +37,7 @@ static VIDEO_START(taitowlf)
 	}
 }
 
-static void draw_char(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;

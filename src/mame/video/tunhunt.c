@@ -196,7 +196,7 @@ static void set_pens(colortable_t *colortable)
 	}
 }
 
-static void draw_motion_object(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_motion_object(bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -265,7 +265,7 @@ static void draw_motion_object(mame_bitmap *bitmap, const rectangle *cliprect)
 	);
 }
 
-static void draw_box(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_box(bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -318,7 +318,7 @@ static void draw_box(mame_bitmap *bitmap, const rectangle *cliprect)
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
 static void draw_shell(running_machine *machine,
-		mame_bitmap *bitmap,
+		bitmap_t *bitmap,
 		const rectangle *cliprect,
 		int picture_code,
 		int hposition,

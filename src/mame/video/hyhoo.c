@@ -21,7 +21,7 @@ static int hyhoo_dispflag;
 static int hyhoo_highcolorflag;
 static int hyhoo_flipscreen;
 
-static mame_bitmap *hyhoo_tmpbitmap;
+static bitmap_t *hyhoo_tmpbitmap;
 static void hyhoo_gfxdraw(void);
 
 

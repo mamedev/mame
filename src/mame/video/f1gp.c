@@ -191,7 +191,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 
 ***************************************************************************/
 
-static void f1gp_draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,int chip,int primask)
+static void f1gp_draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int chip,int primask)
 {
 	int attr_start,first;
 	UINT16 *spram = chip ? f1gp_spr2vram : f1gp_spr1vram;
@@ -262,7 +262,7 @@ static void f1gp_draw_sprites(running_machine *machine,mame_bitmap *bitmap,const
 	}
 }
 
-static void f1gpb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int attr_start, start_offset = spriteram_size/2 - 4;
 
@@ -417,7 +417,7 @@ VIDEO_UPDATE( f1gpb )
 }
 
 
-static void f1gp2_draw_sprites(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect)
+static void f1gp2_draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

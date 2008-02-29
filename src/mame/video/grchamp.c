@@ -118,7 +118,7 @@ VIDEO_START( grchamp )
 }
 
 #if 0
-static int collision_check(running_machine *machine, grchamp_state *state, mame_bitmap *bitmap, int which )
+static int collision_check(running_machine *machine, grchamp_state *state, bitmap_t *bitmap, int which )
 {
 	int bgcolor = machine->pens[0];
 	int sprite_transp = machine->pens[0x24];
@@ -170,7 +170,7 @@ static int collision_check(running_machine *machine, grchamp_state *state, mame_
 	return result?(1<<which):0;
 }
 
-static void draw_fog(grchamp_state *state, mame_bitmap *bitmap, const rectangle *cliprect, int fog)
+static void draw_fog(grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect, int fog)
 {
 	int x,y,offs;
 
@@ -187,7 +187,7 @@ static void draw_fog(grchamp_state *state, mame_bitmap *bitmap, const rectangle 
 	}
 }
 
-static void draw_sprites(running_machine *machine, grchamp_state *state, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, grchamp_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[5];
 	int bank = (state->cpu0_out[0] & 0x20) ? 0x40 : 0x00;
@@ -373,9 +373,9 @@ VIDEO_UPDATE( grchamp )
 	const UINT8 *amedata = memory_region(REGION_GFX5);
 	const UINT8 *headdata = memory_region(REGION_GFX6);
 	const UINT8 *pldata = memory_region(REGION_GFX7);
-	mame_bitmap *lpixmap = tilemap_get_pixmap(state->left_tilemap);
-	mame_bitmap *rpixmap = tilemap_get_pixmap(state->right_tilemap);
-	mame_bitmap *cpixmap = tilemap_get_pixmap(state->center_tilemap);
+	bitmap_t *lpixmap = tilemap_get_pixmap(state->left_tilemap);
+	bitmap_t *rpixmap = tilemap_get_pixmap(state->right_tilemap);
+	bitmap_t *cpixmap = tilemap_get_pixmap(state->center_tilemap);
 	int lrxscroll, cxscroll, lyscroll, ryscroll, cyscroll;
 	int bgcolor = state->cpu1_out[3] & 0x10;
 	int amebase = state->cpu0_out[4] >> 4;
@@ -401,7 +401,7 @@ VIDEO_UPDATE( grchamp )
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		/* select either left or right tilemaps based on Y */
-		mame_bitmap *lrpixmap = (y < 128) ? lpixmap : rpixmap;
+		bitmap_t *lrpixmap = (y < 128) ? lpixmap : rpixmap;
 		int lryscroll = (y < 128) ? lyscroll : ryscroll;
 
 		/* get source/dest pointers */

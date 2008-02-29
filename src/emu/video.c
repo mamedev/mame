@@ -56,7 +56,7 @@ struct _internal_screen_info
 
 	/* textures and bitmaps */
 	render_texture *		texture[2];			/* 2x textures for the screen bitmap */
-	mame_bitmap *			bitmap[2];			/* 2x bitmaps for rendering */
+	bitmap_t *				bitmap[2];			/* 2x bitmaps for rendering */
 	UINT8					curbitmap;			/* current bitmap index */
 	UINT8					curtexture;			/* current texture index */
 	bitmap_format			format;				/* format of bitmap for this screen */
@@ -83,10 +83,10 @@ struct _video_private
 
 	/* snapshot stuff */
 	render_target *			snap_target;		/* screen shapshot target */
-	mame_bitmap *			snap_bitmap;		/* screen snapshot bitmap */
+	bitmap_t *				snap_bitmap;		/* screen snapshot bitmap */
 
 	/* crosshair bits */
-	mame_bitmap *			crosshair_bitmap[MAX_PLAYERS]; /* crosshair bitmap per player */
+	bitmap_t *				crosshair_bitmap[MAX_PLAYERS]; /* crosshair bitmap per player */
 	render_texture *		crosshair_texture[MAX_PLAYERS]; /* crosshair texture per player */
 	UINT8 					crosshair_animate;	/* animation frame index */
 	UINT8 					crosshair_visible;	/* crosshair visible mask */
@@ -187,7 +187,7 @@ static void update_frameskip(void);
 static void recompute_speed(attotime emutime);
 
 /* screen snapshots */
-static mame_bitmap *get_snapshot_bitmap(running_machine *machine, int scrnum);
+static bitmap_t *get_snapshot_bitmap(running_machine *machine, int scrnum);
 static file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
@@ -1255,7 +1255,7 @@ static int finish_screen_updates(running_machine *machine)
 				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && screen->changed)
 				{
-					mame_bitmap *bitmap = screen->bitmap[screen->curbitmap];
+					bitmap_t *bitmap = screen->bitmap[screen->curbitmap];
 					rectangle fixedvis = machine->screen[scrnum].visarea;
 					fixedvis.max_x++;
 					fixedvis.max_y++;
@@ -1802,7 +1802,7 @@ void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scr
 {
 	const rgb_t *palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
 	png_info pnginfo = { 0 };
-	mame_bitmap *bitmap;
+	bitmap_t *bitmap;
 	png_error error;
 	char text[256];
 
@@ -1856,7 +1856,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
     given screen number
 -------------------------------------------------*/
 
-static mame_bitmap *get_snapshot_bitmap(running_machine *machine, int scrnum)
+static bitmap_t *get_snapshot_bitmap(running_machine *machine, int scrnum)
 {
 	video_private *viddata = machine->video_data;
 	const render_primitive_list *primlist;
@@ -2007,7 +2007,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 	if (info->movie_file != NULL)
 	{
 		png_info pnginfo = { 0 };
-		mame_bitmap *bitmap;
+		bitmap_t *bitmap;
 		png_error error;
 
 		profiler_mark(PROFILER_MOVIE_REC);

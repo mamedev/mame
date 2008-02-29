@@ -203,7 +203,7 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(12); }
 
 ***************************************************************************/
 
-static void draw_normal_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 	int mx = 0;	// multisprite x counter
@@ -334,7 +334,7 @@ static void draw_normal_sprites(running_machine *machine, mame_bitmap *bitmap,co
 	}
 }
 
-static void draw_text_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int i;
 

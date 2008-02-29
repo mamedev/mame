@@ -29,15 +29,15 @@ void deco16_set_tilemap_colour_base(int tmap, int base);
 void deco16_set_tilemap_colour_mask(int tmap, int mask);
 void deco16_set_tilemap_transparency_mask(int tmap, int mask);
 
-void deco16_tilemap_1_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_2_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_3_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
-void deco16_tilemap_4_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_1_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_2_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_4_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
-void deco16_tilemap_34_combine_draw(mame_bitmap *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16_tilemap_34_combine_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
 void deco16_clear_sprite_priority_bitmap(void);
-void deco16_pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void deco16_pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri);
 
@@ -56,4 +56,4 @@ WRITE16_HANDLER( deco16_priority_w );
 
 READ16_HANDLER( deco16_71_r );
 
-void deco16_print_debug_info(mame_bitmap *bitmap);
+void deco16_print_debug_info(bitmap_t *bitmap);

@@ -24,7 +24,7 @@ static int pitnrun_ha;
 static int pitnrun_scroll;
 static int pitnrun_char_bank;
 static int pitnrun_color_select;
-static mame_bitmap *tmp_bitmap[4];
+static bitmap_t *tmp_bitmap[4];
 static tilemap *bg, *fg;
 UINT8* pitnrun_videoram2;
 
@@ -187,7 +187,7 @@ VIDEO_START(pitnrun)
 	pitnrun_spotlights();
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int sx, sy, flipx, flipy, offs,pal;
 

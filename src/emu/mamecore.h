@@ -77,9 +77,6 @@ typedef UINT32 pen_t;
 /* stream_sample_t is used to represent a single sample in a sound stream */
 typedef INT32 stream_sample_t;
 
-/* mame_bitmap is just a bitmap_t */
-typedef bitmap_t mame_bitmap;
-
 
 
 /***************************************************************************

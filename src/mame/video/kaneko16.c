@@ -56,8 +56,8 @@ UINT16 *kaneko16_sprites_regs;
 
 
 UINT16 *kaneko16_bg15_select, *kaneko16_bg15_reg;
-static mame_bitmap *kaneko16_bg15_bitmap;
-static mame_bitmap *sprites_bitmap; /* bitmap used for to keep sprites on screen (mgcrystl 1st boss) */
+static bitmap_t *kaneko16_bg15_bitmap;
+static bitmap_t *sprites_bitmap; /* bitmap used for to keep sprites on screen (mgcrystl 1st boss) */
 
 struct tempsprite
 {
@@ -391,7 +391,7 @@ else
 }
 
 // custom function to draw a single sprite. needed to keep correct sprites - sprites and sprites - tilemaps priorities
-static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void kaneko16_draw_sprites_custom(running_machine *machine, bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int priority)
 {
@@ -491,7 +491,7 @@ static void kaneko16_draw_sprites_custom(running_machine *machine, mame_bitmap *
 
 /* Build a list of sprites to display & draw them */
 
-void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Sprites *must* be parsed from the first in RAM to the last,
        because of the multisprite feature. But they *must* be drawn
@@ -802,7 +802,7 @@ WRITE16_HANDLER( kaneko16_bg15_reg_w )
 
 ***************************************************************************/
 
-static void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_first_tilemap_chip(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Set Up FIRST Tilemap chip */
 	int layers_flip_0;
@@ -842,7 +842,7 @@ static void kaneko16_prepare_first_tilemap_chip(running_machine *machine, mame_b
 
 }
 
-static void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_prepare_second_tilemap_chip(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Set Up SECOND Tilemap chip */
 	int layers_flip_1 = 0;
@@ -881,13 +881,13 @@ static void kaneko16_prepare_second_tilemap_chip(running_machine *machine, mame_
 	}
 }
 
-static void kaneko16_render_first_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_first_tilemap_chip(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_0, pri, pri, 0);
 	tilemap_draw_primask(bitmap,cliprect, kaneko16_tmap_1, pri, pri, 0);
 }
 
-static void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri)
+static void kaneko16_render_second_tilemap_chip(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
 {
 	if (kaneko16_tmap_2)
 	{
@@ -896,7 +896,7 @@ static void kaneko16_render_second_tilemap_chip(running_machine *machine, mame_b
 	}
 }
 
-static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_render_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* Sprites last (rendered with pdrawgfx, so they can slip
        in between the layers) */
@@ -914,7 +914,7 @@ static void kaneko16_render_sprites(running_machine *machine, mame_bitmap *bitma
 	}
 }
 
-static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_render_15bpp_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (kaneko16_bg15_bitmap)
 	{
@@ -934,7 +934,7 @@ static void kaneko16_render_15bpp_bitmap(running_machine *machine, mame_bitmap *
 	}
 }
 
-static void kaneko16_fill_bitmap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kaneko16_fill_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if(kaneko16_sprite_type == 1)
 		fillbitmap(bitmap,0x7f00,cliprect);

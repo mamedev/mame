@@ -17,7 +17,7 @@ UINT16 *tecmo16_colorram2;
 UINT16 *tecmo16_charram;
 
 static tilemap *fg_tilemap,*bg_tilemap,*tx_tilemap;
-static mame_bitmap *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
+static bitmap_t *sprite_bitmap, *tile_bitmap_bg, *tile_bitmap_fg;
 
 static int flipscreen, game_is_riot;
 
@@ -212,7 +212,7 @@ WRITE16_HANDLER( tecmo16_scroll_char_y_w )
 
 /* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
 static void blendbitmaps(running_machine *machine,
-		mame_bitmap *dest,mame_bitmap *src1,mame_bitmap *src2,mame_bitmap *src3,
+		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,bitmap_t *src3,
 		int sx,int sy,const rectangle *clip)
 {
 	int ox;
@@ -320,7 +320,7 @@ static void blendbitmaps(running_machine *machine,
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_bitmap *bitmap_fg, mame_bitmap *bitmap_sp, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t *bitmap_fg, bitmap_t *bitmap_sp, const rectangle *cliprect)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -335,7 +335,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap_bg, mame_
 		{42,43,46,47,58,59,62,63}
 	};
 
-	mame_bitmap *bitmap = bitmap_bg;
+	bitmap_t *bitmap = bitmap_bg;
 
 	for (offs = spriteram_size/2 - 8;offs >= 0;offs -= 8)
 	{

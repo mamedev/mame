@@ -87,7 +87,7 @@ WRITE16_HANDLER( twin16_video_register_w )
 }
 
 static void draw_sprite( /* slow slow slow, but it's ok for now */
-	mame_bitmap *bitmap,
+	bitmap_t *bitmap,
 	const UINT16 *pen_data,
 	int pal_base,
 	int xpos, int ypos,
@@ -196,7 +196,7 @@ shadow bit?
 
  */
 
-static void draw_sprites( mame_bitmap *bitmap )
+static void draw_sprites( bitmap_t *bitmap )
 {
 	int count = 0;
 
@@ -282,7 +282,7 @@ static void draw_sprites( mame_bitmap *bitmap )
 	}
 }
 
-static void draw_layer( mame_bitmap *bitmap, int opaque ){
+static void draw_layer( bitmap_t *bitmap, int opaque ){
 	const UINT16 *gfx_base;
 	const UINT16 *source = videoram16;
 	int i, xxor, yxor;

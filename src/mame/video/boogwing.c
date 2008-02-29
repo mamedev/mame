@@ -2,7 +2,7 @@
 #include "deprecat.h"
 #include "deco16ic.h"
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, UINT16* spriteram_base, int gfx_region)
 {
 	int offs;
 	int flipscreen=!flip_screen_get();

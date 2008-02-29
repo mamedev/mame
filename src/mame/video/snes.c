@@ -100,7 +100,7 @@ struct DEBUGOPTS
 static struct DEBUGOPTS debug_options  = {5, {0,0,0,0,0,0}, 0, 0, 0};
 /*                                    red   green  blue    purple  yellow cyan    grey    white */
 static const UINT16 dbg_mode_colours[8] = { 0x1f, 0x3e0, 0x7c00, 0x7c1f, 0x3ff, 0x7fe0, 0x4210, 0x7fff };
-static UINT8 snes_dbg_video(mame_bitmap *bitmap, UINT16 curline);
+static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline);
 #endif /* SNES_DBG_video */
 
 /* Forward declarations */
@@ -1783,7 +1783,7 @@ static void snes_update_offsets(void)
  *
  * Redraw the current line.
  *********************************************/
-static void snes_refresh_scanline(mame_bitmap *bitmap, UINT16 curline )
+static void snes_refresh_scanline(bitmap_t *bitmap, UINT16 curline )
 {
 	UINT16 ii;
 	int x;
@@ -1889,7 +1889,7 @@ VIDEO_UPDATE( snes )
 
 #ifdef SNES_DBG_video
 
-static void snes_dbg_draw_maps(mame_bitmap *bitmap, UINT32 tmap, UINT8 bpl, UINT16 curline, UINT8 layer )
+static void snes_dbg_draw_maps(bitmap_t *bitmap, UINT32 tmap, UINT8 bpl, UINT16 curline, UINT8 layer )
 {
 	UINT32 tile, addr = tmap;
 	UINT16 ii, vflip, hflip, pal;
@@ -1930,7 +1930,7 @@ static void snes_dbg_draw_maps(mame_bitmap *bitmap, UINT32 tmap, UINT8 bpl, UINT
 	//ui_draw_text( str, 0, 227 );
 }
 
-static void snes_dbg_draw_all_tiles(mame_bitmap *bitmap, UINT32 tileaddr, UINT8 bpl, UINT16 pal )
+static void snes_dbg_draw_all_tiles(bitmap_t *bitmap, UINT32 tileaddr, UINT8 bpl, UINT16 pal )
 {
 	UINT16 ii, jj, kk;
 	UINT32 addr = tileaddr;
@@ -1969,7 +1969,7 @@ static void snes_dbg_draw_all_tiles(mame_bitmap *bitmap, UINT32 tileaddr, UINT8 
 	//ui_draw_text( str, 0, 227 );
 }
 
-static UINT8 snes_dbg_video(mame_bitmap *bitmap, UINT16 curline )
+static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 {
 	UINT16 ii;
 

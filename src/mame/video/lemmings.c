@@ -19,12 +19,12 @@
 UINT16 *lemmings_pixel_0_data,*lemmings_pixel_1_data,*lemmings_vram_data,*lemmings_control_data;
 static UINT16 *sprite_triple_buffer_0,*sprite_triple_buffer_1;
 static UINT8 *vram_buffer, *vram_dirty;
-static mame_bitmap *bitmap0;
+static bitmap_t *bitmap0;
 static tilemap *vram_tilemap;
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *spritedata, int gfxbank, UINT16 pri)
 {
 	int offs;
 

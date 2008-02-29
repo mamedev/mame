@@ -618,7 +618,7 @@ static VIDEO_START(crystal)
 {
 }
 
-static void plot_pixel_rgb(mame_bitmap *bitmap, int x, int y , int color)
+static void plot_pixel_rgb(bitmap_t *bitmap, int x, int y , int color)
 {
 	//565 to 555
 	color=(color&0x1f)|((color>>1)&0x7fe0);

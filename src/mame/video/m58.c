@@ -13,7 +13,7 @@ UINT8 *yard_scroll_x_low;
 UINT8 *yard_scroll_x_high;
 UINT8 *yard_scroll_y_low;
 UINT8 *yard_score_panel_disabled;
-static mame_bitmap *scroll_panel_bitmap;
+static bitmap_t *scroll_panel_bitmap;
 
 static tilemap *bg_tilemap;
 
@@ -214,7 +214,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
 
 #define DRAW_SPRITE(code, sy) drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PENS, colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512));
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -267,7 +267,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
  *
  *************************************/
 
-static void draw_panel( running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	if (! *yard_score_panel_disabled)
 	{

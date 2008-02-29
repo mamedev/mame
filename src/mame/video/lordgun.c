@@ -218,7 +218,7 @@ void lordgun_update_gun(int i)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT16 *s		=	spriteram16;
 	UINT16 *end		=	spriteram16 + spriteram_size/2;

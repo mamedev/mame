@@ -176,7 +176,7 @@ WRITE16_HANDLER( toki_background2_videoram16_w )
 ***************************************************************************/
 
 
-static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void toki_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
@@ -220,7 +220,7 @@ static void toki_draw_sprites(running_machine *machine, mame_bitmap *bitmap,cons
 }
 
 
-static void tokib_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void tokib_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;

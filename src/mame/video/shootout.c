@@ -77,7 +77,7 @@ VIDEO_START( shootout ){
 		tilemap_set_transparent_pen( foreground, 0 );
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank_bits ){
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank_bits ){
 	static int bFlicker;
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source = spriteram+127*4;

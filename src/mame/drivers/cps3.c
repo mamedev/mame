@@ -377,7 +377,7 @@ static UINT32 cps3_screenwidth;
 
 static UINT32* cps3_mame_colours;//[0x20000]; // actual values to write to 32-bit bitmap
 
-static mame_bitmap *renderbuffer_bitmap;
+static bitmap_t *renderbuffer_bitmap;
 static rectangle renderbuffer_clip;
 
 
@@ -386,10 +386,10 @@ static rectangle renderbuffer_clip;
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-INLINE void cps3_drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
-		int scalex, int scaley,mame_bitmap *pri_buffer,UINT32 pri_mask)
+		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
 {
 	rectangle myclip;
 
@@ -941,7 +941,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, mame_bitmap *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT32* tmapregs[4] = { tilemap20_regs_base, tilemap30_regs_base, tilemap40_regs_base, tilemap50_regs_base };
 	UINT32* regs;

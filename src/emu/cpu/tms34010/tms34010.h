@@ -73,7 +73,7 @@ struct _tms34010_config
 	UINT8	scrnum;								/* the screen operated on */
 	UINT32	pixclock;							/* the pixel clock (0 means don't adjust screen size) */
 	int		pixperclock;						/* pixels per clock */
-	void	(*scanline_callback)(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params);
+	void	(*scanline_callback)(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(int state);			/* output interrupt callback */
 	void	(*to_shiftreg)(offs_t, UINT16 *);	/* shift register write */
 	void	(*from_shiftreg)(offs_t, UINT16 *);	/* shift register read */

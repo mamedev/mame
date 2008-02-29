@@ -367,7 +367,7 @@ static void K037122_tile_update(running_machine *machine, int chip)
 	}
 }
 
-static void K037122_tile_draw(int chip, mame_bitmap *bitmap, const rectangle *cliprect)
+static void K037122_tile_draw(int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{

@@ -121,7 +121,7 @@ struct _object_transform
 /* a scaled_texture contains a single scaled entry for a texture */
 struct _scaled_texture
 {
-	mame_bitmap *		bitmap;				/* final bitmap */
+	bitmap_t *			bitmap;				/* final bitmap */
 	UINT32				seqid;				/* sequence number */
 };
 
@@ -131,7 +131,7 @@ struct _render_texture
 {
 	render_texture *	next;				/* next texture (for free list) */
 	render_texture *	base;				/* pointer to base of texture group */
-	mame_bitmap *		bitmap;				/* pointer to the original bitmap */
+	bitmap_t *			bitmap;				/* pointer to the original bitmap */
 	rectangle			sbounds;			/* source bounds within the bitmap */
 	UINT32				palettebase;		/* palette base within the system palette */
 	int					format;				/* format of the texture data */
@@ -193,7 +193,7 @@ struct _render_container
 	float				yscale;				/* Y scale factor of the container */
 	float				xoffset;			/* X offset of the container */
 	float				yoffset;			/* Y offset of the container */
-	mame_bitmap *		overlaybitmap;		/* overlay bitmap */
+	bitmap_t *			overlaybitmap;		/* overlay bitmap */
 	render_texture *	overlaytexture;		/* overlay texture */
 	palette_client *	palclient;			/* client to the system palette */
 	rgb_t				bcglookup256[0x400];/* lookup table for brightness/contrast/gamma */
@@ -223,7 +223,7 @@ static render_texture *render_texture_free_list;
 /* containers for the UI and for screens */
 static render_container *ui_container;
 static render_container *screen_container[MAX_SCREENS];
-static mame_bitmap *screen_overlay;
+static bitmap_t *screen_overlay;
 
 /* variables for tracking extents to clear */
 static INT32 clear_extents[MAX_CLEAR_EXTENTS];
@@ -270,7 +270,7 @@ static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UIN
 static render_container *render_container_alloc(void);
 static void render_container_free(render_container *container);
 static container_item *render_container_item_add_generic(render_container *container, UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb);
-static void render_container_overlay_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+static void render_container_overlay_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 static void render_container_recompute_lookups(render_container *container);
 static void render_container_update_palette(render_container *container);
 
@@ -2291,7 +2291,7 @@ void render_texture_free(render_texture *texture)
     bitmap
 -------------------------------------------------*/
 
-void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format)
+void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, UINT32 palettebase, int format)
 {
 	int scalenum;
 
@@ -2415,7 +2415,7 @@ static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UIN
     resampling scaler
 -------------------------------------------------*/
 
-void render_texture_hq_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
+void render_texture_hq_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
 {
 	render_color color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, source, sbounds, &color);
@@ -2701,7 +2701,7 @@ void render_container_set_yoffset(render_container *container, float yoffset)
     overlay bitmap for the container
 -------------------------------------------------*/
 
-void render_container_set_overlay(render_container *container, mame_bitmap *bitmap)
+void render_container_set_overlay(render_container *container, bitmap_t *bitmap)
 {
 	/* free any existing texture */
 	if (container->overlaytexture != NULL)
@@ -2836,7 +2836,7 @@ void render_container_add_char(render_container *container, float x0, float y0, 
     an overlay
 -------------------------------------------------*/
 
-static void render_container_overlay_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
+static void render_container_overlay_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
 {
 	int x, y;
 

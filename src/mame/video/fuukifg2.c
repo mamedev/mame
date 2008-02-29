@@ -144,7 +144,7 @@ VIDEO_START( fuuki16 )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -268,7 +268,7 @@ if (input_code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-static void fuuki16_draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int i, int flag, int pri)
+static void fuuki16_draw_layer(bitmap_t *bitmap, const rectangle *cliprect, int i, int flag, int pri)
 {
 	int buffer = (fuuki16_vregs[0x1e/2] & 0x40);
 

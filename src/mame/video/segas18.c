@@ -26,7 +26,7 @@
  *
  *************************************/
 
-static mame_bitmap *tempbitmap;
+static bitmap_t *tempbitmap;
 
 static UINT8 grayscale_enable;
 static UINT8 vdp_enable;
@@ -41,7 +41,7 @@ static UINT8 vdp_mixing;
  *************************************/
 
 extern void start_system18_vdp(void);
-extern void update_system18_vdp(mame_bitmap *bitmap, const rectangle *cliprect);
+extern void update_system18_vdp(bitmap_t *bitmap, const rectangle *cliprect);
 
 
 
@@ -123,7 +123,7 @@ void system18_set_vdp_mixing(int mixing)
  *
  *************************************/
 
-static void draw_vdp(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void draw_vdp(bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int x, y;
 

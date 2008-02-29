@@ -197,54 +197,54 @@ void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count);
 void freegfx(gfx_element *gfx);
 
 
-void drawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void drawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color);
-void pdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void pdrawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		UINT32 priority_mask);
-void mdrawgfx(mame_bitmap *dest,const gfx_element *gfx,
+void mdrawgfx(bitmap_t *dest,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		UINT32 priority_mask);
 
 
-void drawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley);
-void pdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void pdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
 		UINT32 priority_mask);
-void mdrawgfxzoom( mame_bitmap *dest_bmp,const gfx_element *gfx,
+void mdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,int scalex,int scaley,
 		UINT32 priority_mask);
 
 
-void draw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen);
-void draw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen);
-void draw_scanline32(mame_bitmap *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen);
-void pdraw_scanline8(mame_bitmap *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen,int pri);
-void pdraw_scanline16(mame_bitmap *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen,int pri);
-void pdraw_scanline32(mame_bitmap *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen,int pri);
-void extract_scanline8(mame_bitmap *bitmap,int x,int y,int length,UINT8 *dst);
-void extract_scanline16(mame_bitmap *bitmap,int x,int y,int length,UINT16 *dst);
-void extract_scanline32(mame_bitmap *bitmap,int x,int y,int length,UINT32 *dst);
+void draw_scanline8(bitmap_t *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen);
+void draw_scanline16(bitmap_t *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen);
+void draw_scanline32(bitmap_t *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen);
+void pdraw_scanline8(bitmap_t *bitmap,int x,int y,int length,const UINT8 *src,const pen_t *pens,int transparent_pen,int pri);
+void pdraw_scanline16(bitmap_t *bitmap,int x,int y,int length,const UINT16 *src,const pen_t *pens,int transparent_pen,int pri);
+void pdraw_scanline32(bitmap_t *bitmap,int x,int y,int length,const UINT32 *src,const pen_t *pens,int transparent_pen,int pri);
+void extract_scanline8(bitmap_t *bitmap,int x,int y,int length,UINT8 *dst);
+void extract_scanline16(bitmap_t *bitmap,int x,int y,int length,UINT16 *dst);
+void extract_scanline32(bitmap_t *bitmap,int x,int y,int length,UINT32 *dst);
 
 
-void copybitmap(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,
+void copybitmap(bitmap_t *dest,bitmap_t *src,int flipx,int flipy,
 				int sx,int sy,const rectangle *clip);
 
-void copybitmap_trans(mame_bitmap *dest,mame_bitmap *src,int flipx,int flipy,
+void copybitmap_trans(bitmap_t *dest,bitmap_t *src,int flipx,int flipy,
 					  int sx,int sy,const rectangle *clip,pen_t transparent_pen);
 
-void copyscrollbitmap(mame_bitmap *dest,mame_bitmap *src,
+void copyscrollbitmap(bitmap_t *dest,bitmap_t *src,
 					  int rows,const int *rowscroll,int cols,const int *colscroll,
 					  const rectangle *clip);
 
-void copyscrollbitmap_trans(mame_bitmap *dest,mame_bitmap *src,
+void copyscrollbitmap_trans(bitmap_t *dest,bitmap_t *src,
 					 		int rows,const int *rowscroll,int cols,const int *colscroll,
 					 		const rectangle *clip,pen_t transparent_pen);
 
@@ -277,7 +277,7 @@ void copyscrollbitmap_trans(mame_bitmap *dest,mame_bitmap *src,
   Optionally the bitmap can be tiled across the screen instead of doing a single
   copy. This is obtained by setting the wraparound parameter to true.
  */
-void copyrozbitmap(mame_bitmap *dest,mame_bitmap *src,
+void copyrozbitmap(bitmap_t *dest,bitmap_t *src,
 		UINT32 startx,UINT32 starty,int incxx,int incxy,int incyx,int incyy,int wraparound,
 		const rectangle *clip,int transparency,int transparent_color,UINT32 priority);
 

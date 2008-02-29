@@ -150,7 +150,7 @@ static void slapfght_log_vram(void)
   Render the Sprites
 
 ***************************************************************************/
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority_to_display )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority_to_display )
 {
 	int offs;
 

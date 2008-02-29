@@ -17,7 +17,7 @@ UINT8 *dday_textvideoram;
 UINT8 *dday_colorram;
 
 static tilemap *fg_tilemap, *bg_tilemap, *text_tilemap, *sl_tilemap;
-static mame_bitmap *main_bitmap;
+static bitmap_t *main_bitmap;
 static int control;
 static int sl_image;
 static int sl_enable;
@@ -324,7 +324,7 @@ VIDEO_UPDATE( dday )
 		/* apply shadow */
 		int x, y;
 
-		mame_bitmap *sl_bitmap = tilemap_get_pixmap(sl_tilemap);
+		bitmap_t *sl_bitmap = tilemap_get_pixmap(sl_tilemap);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			for (y = cliprect->min_y; y <= cliprect->max_y; y++)

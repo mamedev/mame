@@ -100,17 +100,17 @@ static const rgb_t TMS9928A_palette[16] =
 /*
 ** Forward declarations of internal functions.
 */
-static void draw_mode0 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_mode1 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_mode2 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_mode12 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_mode3 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_mode23 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_modebogus (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
-static void draw_sprites (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
+static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void change_register (int reg, UINT8 data);
 
-static void (*const ModeHandlers[])(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) = {
+static void (*const ModeHandlers[])(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
         draw_mode3, draw_modebogus, draw_mode23,
         draw_modebogus };
@@ -141,7 +141,7 @@ typedef struct {
     void (*INTCallback)(int);
     /* memory */
     UINT8 *vMem, *dBackMem;
-    mame_bitmap *tmpbmp;
+    bitmap_t *tmpbmp;
     int vramsize, model;
     /* emulation settings */
     int LimitSprites; /* max 4 sprites on a row, like original TMS9918A */
@@ -442,7 +442,7 @@ int TMS9928A_interrupt () {
     return b;
 }
 
-static void draw_mode1 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
 	rectangle rt;
@@ -475,7 +475,7 @@ static void draw_mode1 (running_machine *machine, mame_bitmap *bitmap, const rec
     }
 }
 
-static void draw_mode12 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode;
     UINT8 fg,bg,*patternptr;
 	rectangle rt;
@@ -508,7 +508,7 @@ static void draw_mode12 (running_machine *machine, mame_bitmap *bitmap, const re
     }
 }
 
-static void draw_mode0 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode0 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int pattern,x,y,yy,xx,name,charcode,colour;
     UINT8 fg,bg,*patternptr;
 
@@ -532,7 +532,7 @@ static void draw_mode0 (running_machine *machine, mame_bitmap *bitmap, const rec
     }
 }
 
-static void draw_mode2 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode2 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int colour,name,x,y,yy,pattern,xx,charcode;
     UINT8 fg,bg;
     UINT8 *colourptr,*patternptr;
@@ -560,7 +560,7 @@ static void draw_mode2 (running_machine *machine, mame_bitmap *bitmap, const rec
     }
 }
 
-static void draw_mode3 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
 
@@ -588,7 +588,7 @@ static void draw_mode3 (running_machine *machine, mame_bitmap *bitmap, const rec
     }
 }
 
-static void draw_mode23 (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     int x,y,yy,yyy,name,charcode;
     UINT8 fg,bg,*patternptr;
 
@@ -617,7 +617,7 @@ static void draw_mode23 (running_machine *machine, mame_bitmap *bitmap, const re
     }
 }
 
-static void draw_modebogus (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 fg,bg;
     int x,y,n,xx;
 
@@ -644,7 +644,7 @@ static void draw_modebogus (running_machine *machine, mame_bitmap *bitmap, const
 **
 ** This code should be optimized. One day.
 */
-static void draw_sprites (running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect) {
+static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) {
     UINT8 *attributeptr,*patternptr,c;
     int p,x,y,size,i,j,large,yy,xx,limit[192],
         illegalsprite,illegalspriteline;

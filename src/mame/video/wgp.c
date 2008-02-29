@@ -363,7 +363,7 @@ static const UINT8 ylookup[16] =
 	  2, 2, 3, 3,
 	  2, 2, 3, 3 };
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	int offs,i,j,k;
 	int x,y,curx,cury;
@@ -506,7 +506,7 @@ if (((spriteram16[i + 4]!=0xf800) && (spriteram16[i + 4]!=0xfff6))
 *********************************************************/
 
 INLINE void bryan2_drawscanline(
-		mame_bitmap *bitmap,int x,int y,int length,
+		bitmap_t *bitmap,int x,int y,int length,
 		const UINT16 *src,int transparent,UINT32 orient,int pri)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
@@ -532,10 +532,10 @@ INLINE void bryan2_drawscanline(
 
 
 
-static void wgp_piv_layer_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void wgp_piv_layer_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(wgp_piv_tilemap[layer]);
-	mame_bitmap *flagsbitmap = tilemap_get_flagsmap(wgp_piv_tilemap[layer]);
+	bitmap_t *srcbitmap = tilemap_get_pixmap(wgp_piv_tilemap[layer]);
+	bitmap_t *flagsbitmap = tilemap_get_flagsmap(wgp_piv_tilemap[layer]);
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;

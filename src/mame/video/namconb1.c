@@ -158,7 +158,7 @@ handle_mcu( void )
 } /* handle_mcu */
 
 static void
-video_update_common(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bROZ )
+video_update_common(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
 {
 	int pri;
 	handle_mcu();

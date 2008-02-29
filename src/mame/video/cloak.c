@@ -184,7 +184,7 @@ VIDEO_START( cloak )
 	state_save_register_func_postload(set_current_bitmap_videoram_pointer);
 }
 
-static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x, y;
 
@@ -198,7 +198,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 		}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

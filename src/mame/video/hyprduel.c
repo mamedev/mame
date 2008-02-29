@@ -390,7 +390,7 @@ VIDEO_START( hyprduel_14220 )
 
 /* Draw sprites */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
@@ -542,7 +542,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 ***************************************************************************/
 
 /* Draw all the layers that match the given priority */
-static void draw_layers(mame_bitmap *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
+static void draw_layers(bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
 {
 	UINT16 layers_pri = hyprduel_videoregs[0x10/2];
 	int layer;

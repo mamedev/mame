@@ -119,7 +119,7 @@ VIDEO_START( tehkanwc )
    bit 7 = enable (0 = display off)
  */
 
-static void gridiron_draw_led(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT8 led,int player)
+static void gridiron_draw_led(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 led,int player)
 {
 	int i;
 
@@ -155,7 +155,7 @@ static void gridiron_draw_led(running_machine *machine, mame_bitmap *bitmap, con
 else logerror("unknown LED %02x for player %d\n",led,player);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

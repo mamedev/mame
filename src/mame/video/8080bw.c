@@ -79,7 +79,7 @@ static void cosmo_get_pens(pen_t *pens)
 }
 
 
-INLINE void set_pixel(mame_bitmap *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color)
+INLINE void set_pixel(bitmap_t *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color)
 {
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
@@ -91,7 +91,7 @@ INLINE void set_pixel(mame_bitmap *bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 
 }
 
 
-INLINE void set_8_pixels(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data,
+INLINE void set_8_pixels(bitmap_t *bitmap, UINT8 y, UINT8 x, UINT8 data,
 						  pen_t *pens, UINT8 fore_color, UINT8 back_color)
 {
 	int i;
@@ -107,7 +107,7 @@ INLINE void set_8_pixels(mame_bitmap *bitmap, UINT8 y, UINT8 x, UINT8 data,
 
 
 /* this is needed as this driver doesn't emulate the shift register like mw8080bw does */
-static void clear_extra_columns(mame_bitmap *bitmap, pen_t *pens, UINT8 color)
+static void clear_extra_columns(bitmap_t *bitmap, pen_t *pens, UINT8 color)
 {
 	UINT8 x;
 

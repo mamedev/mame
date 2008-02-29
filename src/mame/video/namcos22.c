@@ -277,7 +277,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
-	mame_bitmap *bitmap = dest;
+	bitmap_t *bitmap = dest;
 	const poly_extra_data *extra = extradata;
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = &Machine->pens[(extra->color&0x7f)<<8];
@@ -384,7 +384,7 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	}
 } /* renderscanline_uvi_full */
 
-static void poly3d_DrawQuad(running_machine *machine, mame_bitmap *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
+static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int textureBank, int color, Poly3dVertex pv[4], UINT16 flags, int direct, int cmode )
 {
 	poly_extra_data *extra;
 	poly_vertex v[4], clipv[5];
@@ -489,7 +489,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int y_index = extent->param[1].start * 65536.0f;
 	int dx = extent->param[0].dpdx * 65536.0f;
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = destbase;
+	bitmap_t *destmap = destbase;
 	const pen_t *pal = &Machine->pens[extra->color];
 	int prioverchar = extra->prioverchar;
 	int z = extra->z;
@@ -556,7 +556,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 
 static void
 mydrawgfxzoom(
-	mame_bitmap *dest_bmp,const gfx_element *gfx,
+	bitmap_t *dest_bmp,const gfx_element *gfx,
 	UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 	const rectangle *clip,int transparency,int transparent_color,
 	int scalex, int scaley, int z, int prioverchar, int alpha )
@@ -607,7 +607,7 @@ mydrawgfxzoom(
 } /* mydrawgfxzoom */
 
 static void
-ApplyGamma( mame_bitmap *bitmap )
+ApplyGamma( bitmap_t *bitmap )
 {
 	int x,y;
 	if( mbSuperSystem22 )
@@ -654,7 +654,7 @@ ApplyGamma( mame_bitmap *bitmap )
 } /* ApplyGamma */
 
 static void
-poly3d_Draw3dSprite( mame_bitmap *bitmap, gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
+poly3d_Draw3dSprite( bitmap_t *bitmap, gfx_element *gfx, int tileNumber, int color, int sx, int sy, int width, int height, int translucency, int zc, UINT32 pri )
 {
    int flipx = 0;
    int flipy = 0;
@@ -900,7 +900,7 @@ NewSceneNode( UINT32 zsortvalue24, SceneNodeType type )
 } /* NewSceneNode */
 
 
-static void RenderSprite(running_machine *machine, mame_bitmap *bitmap, struct SceneNode *node )
+static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
 {
    int tile = node->data.sprite.tile;
    int col,row;
@@ -935,7 +935,7 @@ static void RenderSprite(running_machine *machine, mame_bitmap *bitmap, struct S
 	} /* next row */
 } /* RenderSprite */
 
-static void RenderSceneHelper(running_machine *machine, mame_bitmap *bitmap, struct SceneNode *node )
+static void RenderSceneHelper(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
 {
    if( node )
    {
@@ -988,7 +988,7 @@ static void RenderSceneHelper(running_machine *machine, mame_bitmap *bitmap, str
    }
 } /* RenderSceneHelper */
 
-static void RenderScene(running_machine *machine, mame_bitmap *bitmap )
+static void RenderScene(running_machine *machine, bitmap_t *bitmap )
 {
    struct SceneNode *node = &mSceneRoot;
    int i;
@@ -1248,7 +1248,7 @@ Prepare3dTexture( void *pTilemapROM, void *pTextureROM )
 
 static void
 DrawSpritesHelper(
-	mame_bitmap *bitmap,
+	bitmap_t *bitmap,
 	const rectangle *cliprect,
 	const UINT32 *pSource,
 	const UINT32 *pPal,
@@ -1343,7 +1343,7 @@ DrawSpritesHelper(
 } /* DrawSpritesHelper */
 
 static void
-DrawSprites( mame_bitmap *bitmap, const rectangle *cliprect )
+DrawSprites( bitmap_t *bitmap, const rectangle *cliprect )
 {
 /*
 // time crisis:
@@ -1536,13 +1536,13 @@ WRITE32_HANDLER( namcos22_textram_w )
 }
 
 static void
-DrawTranslucentCharacters( mame_bitmap *bitmap, const rectangle *cliprect )
+DrawTranslucentCharacters( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	alpha_set_level( 0xff-mixer.text_translucency ); /* ? */
 	tilemap_draw( bitmap, cliprect, bgtilemap, TILEMAP_DRAW_ALPHA|1, 0 );
 }
 
-static void DrawCharacterLayer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	unsigned i;
 	INT32 dx = namcos22_tilemapattr[0]>>16;
@@ -1647,7 +1647,7 @@ Signed18( UINT32 value )
  */
 static void
 BlitQuadHelper(
-		mame_bitmap *bitmap,
+		bitmap_t *bitmap,
 		unsigned color,
 		unsigned addr,
 		float m[4][4],
@@ -1813,7 +1813,7 @@ RegisterNormals( INT32 addr, float m[4][4] )
 } /* RegisterNormals */
 
 static void
-BlitQuads( mame_bitmap *bitmap, INT32 addr, float m[4][4], INT32 base )
+BlitQuads( bitmap_t *bitmap, INT32 addr, float m[4][4], INT32 base )
 {
 	int numAdditionalNormals = 0;
 	int chunkLength = GetPolyData(addr++);
@@ -1918,7 +1918,7 @@ BlitQuads( mame_bitmap *bitmap, INT32 addr, float m[4][4], INT32 base )
 } /* BlitQuads */
 
 static void
-BlitPolyObject( mame_bitmap *bitmap, int code, float M[4][4] )
+BlitPolyObject( bitmap_t *bitmap, int code, float M[4][4] )
 {
 	unsigned addr1 = GetPolyData(code);
 	mLitSurfaceCount = 0;
@@ -2036,7 +2036,7 @@ HandleBB0003( const INT32 *pSource )
 } /* HandleBB0003 */
 
 static void
-Handle200002( mame_bitmap *bitmap, const INT32 *pSource )
+Handle200002( bitmap_t *bitmap, const INT32 *pSource )
 {
 	if( mPrimitiveID>=0x45 )
 	{
@@ -2102,7 +2102,7 @@ Handle233002( const INT32 *pSource )
 } /* Handle233002 */
 
 static void
-SimulateSlaveDSP( mame_bitmap *bitmap )
+SimulateSlaveDSP( bitmap_t *bitmap )
 {
 	const INT32 *pSource = 0x300 + (INT32 *)namcos22_polygonram;
 	INT16 len;
@@ -2167,7 +2167,7 @@ SimulateSlaveDSP( mame_bitmap *bitmap )
 } /* SimulateSlaveDSP */
 
 static void
-DrawPolygons( mame_bitmap *bitmap )
+DrawPolygons( bitmap_t *bitmap )
 {
 	if( mbDSPisActive )
 	{

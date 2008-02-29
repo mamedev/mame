@@ -308,7 +308,7 @@ WRITE8_HANDLER( punchout_palettebank_w )
 
 
 
-static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_big_sprite(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int zoom;
 
@@ -349,7 +349,7 @@ static void draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *cliprect)
+static void armwrest_draw_big_sprite(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int zoom;
 
@@ -394,7 +394,7 @@ static void armwrest_draw_big_sprite(mame_bitmap *bitmap, const rectangle *clipr
 	}
 }
 
-static void drawbs2(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int sx,sy;
 	int incxx;

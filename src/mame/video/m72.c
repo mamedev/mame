@@ -401,7 +401,7 @@ WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 
 ***************************************************************************/
 
-static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -454,7 +454,7 @@ static void m72_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const
 	}
 }
 
-static void majtitle_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

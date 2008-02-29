@@ -22,7 +22,7 @@ static int bioship_background_bank;
 static UINT8 bioship_scroll[4];
 
 static tilemap *bg_tilemap,*fg_tilemap,*tx_tilemap;
-static mame_bitmap *background_bitmap;
+static bitmap_t *background_bitmap;
 extern UINT16* nmk16_mainram;
 
 /***************************************************************************
@@ -423,7 +423,7 @@ WRITE16_HANDLER( gunnail_scrolly_w )
 
 // manybloc uses extra flip bits on the sprites, but these break other games
 
-static void nmk16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void nmk16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -474,7 +474,7 @@ static void nmk16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, co
 	}
 }
 
-static void nmk16_draw_sprites_flipsupported(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void nmk16_draw_sprites_flipsupported(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 
@@ -1040,7 +1040,7 @@ VIDEO_START( firehawk )
 
 ***************************************************************************/
 
-static void video_update(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+static void video_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 	int dsw_flipscreen,			// 1 = Horizontal and vertical screen flip are hardwired to 2 dip switches
 	int xoffset, int yoffset,	// tilemap_0 offsets
 	int attr_mask				// "sprite active" mask

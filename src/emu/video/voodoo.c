@@ -456,7 +456,7 @@ void voodoo_exit(int which)
  *
  *************************************/
 
-int voodoo_update(int which, mame_bitmap *bitmap, const rectangle *cliprect)
+int voodoo_update(int which, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	voodoo_state *v = voodoo[which];
 	int changed = v->fbi.video_changed;

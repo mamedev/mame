@@ -65,7 +65,7 @@ VIDEO_START( kchamp )
             3             XXXXXXXX
 */
 
-static void kchamp_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kchamp_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -93,7 +93,7 @@ static void kchamp_draw_sprites(running_machine *machine, mame_bitmap *bitmap, c
 	}
 }
 
-static void kchampvs_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void kchampvs_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

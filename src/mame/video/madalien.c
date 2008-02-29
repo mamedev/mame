@@ -31,7 +31,7 @@ static tilemap *tilemap_fg;
 static tilemap *tilemap_edge1[4];
 static tilemap *tilemap_edge2[4];
 
-static mame_bitmap *headlight_bitmap;
+static bitmap_t *headlight_bitmap;
 
 
 static PALETTE_INIT( madalien )
@@ -185,7 +185,7 @@ static VIDEO_START( madalien )
 }
 
 
-static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip, int scroll_mode)
+static void draw_edges(bitmap_t *bitmap, const rectangle *cliprect, int flip, int scroll_mode)
 {
 	rectangle clip_edge1;
 	rectangle clip_edge2;
@@ -223,7 +223,7 @@ static void draw_edges(mame_bitmap *bitmap, const rectangle *cliprect, int flip,
 }
 
 
-static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int flip)
+static void draw_headlight(bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
 	if (BIT(*madalien_video_flags, 0))
 	{
@@ -258,7 +258,7 @@ static void draw_headlight(mame_bitmap *bitmap, const rectangle *cliprect, int f
 }
 
 
-static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int flip)
+static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
 	int i;
 

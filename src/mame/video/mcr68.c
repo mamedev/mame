@@ -186,7 +186,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
  *
  *************************************/
 
-static void mcr68_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	rectangle sprite_clip = machine->screen[0].visarea;
 	int offs;
@@ -238,7 +238,7 @@ static void mcr68_update_sprites(running_machine *machine, mame_bitmap *bitmap, 
 }
 
 
-static void zwackery_update_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	int offs;
 

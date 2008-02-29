@@ -691,7 +691,7 @@ static VIDEO_START(witch)
   tilemap_set_palette_offset(gfx1_tilemap,0x200);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;

@@ -90,7 +90,7 @@ VIDEO_START( shuuz )
 VIDEO_UPDATE( shuuz )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

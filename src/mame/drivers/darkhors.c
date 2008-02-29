@@ -101,7 +101,7 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 	tilemap_mark_tile_dirty(darkhors_tmap2, offset);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT32 *s		=	spriteram32;
 	UINT32 *end		=	spriteram32 + 0x02000/4;

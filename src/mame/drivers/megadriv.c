@@ -92,7 +92,7 @@ static emu_timer* frame_timer;
 static emu_timer* scanline_timer;
 static emu_timer* irq6_on_timer;
 static emu_timer* irq4_on_timer;
-static mame_bitmap* render_bitmap;
+static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
 

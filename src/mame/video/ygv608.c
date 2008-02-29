@@ -49,7 +49,7 @@ static tilemap *tilemap_B_cache_8[3];
 static tilemap *tilemap_B_cache_16[3];
 static tilemap *tilemap_A = NULL;
 static tilemap *tilemap_B = NULL;
-static mame_bitmap *work_bitmap = NULL;
+static bitmap_t *work_bitmap = NULL;
 
 static void HandleYGV608Reset( void );
 static void HandleRomTransfers( void );
@@ -538,7 +538,7 @@ VIDEO_START( ygv608 )
 	add_exit_callback(machine, ygv608_exit);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 #ifdef _ENABLE_SPRITES
 

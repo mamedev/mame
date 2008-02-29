@@ -188,7 +188,7 @@ void eprom_scanline_update(running_machine *machine, int scrnum, int scanline)
 VIDEO_UPDATE( eprom )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */
@@ -334,7 +334,7 @@ VIDEO_UPDATE( eprom )
 VIDEO_UPDATE( guts )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

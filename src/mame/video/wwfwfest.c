@@ -143,7 +143,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
  sprite drawing could probably be improved a bit
 *******************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/*- SPR RAM Format -**
 

@@ -36,7 +36,7 @@ static int rear_disable=1;
 
 static int rear_refresh=1;
 
-static mame_bitmap *bg_bitmap;
+static bitmap_t *bg_bitmap;
 
 
 VIDEO_START( vigilant )
@@ -170,7 +170,7 @@ WRITE8_HANDLER( vigilant_rear_color_w )
  ???
  **************************************************************************/
 
-static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority, int opaque )
+static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int opaque )
 {
 	int offs;
 	int scroll = -(horiz_scroll_low + horiz_scroll_high);
@@ -218,7 +218,7 @@ static void draw_foreground(running_machine *machine, mame_bitmap *bitmap, const
 
 
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int scrollx = 0x17a + 16*8 - (rear_horiz_scroll_low + rear_horiz_scroll_high);
 
@@ -233,7 +233,7 @@ static void draw_background(running_machine *machine, mame_bitmap *bitmap, const
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

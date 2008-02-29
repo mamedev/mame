@@ -158,7 +158,7 @@ static VIDEO_START( talbot )
 	bg_tilemap = tilemap_create(get_tile_info_bg, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

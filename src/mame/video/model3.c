@@ -106,8 +106,8 @@ static UINT16 *pal_lookup;
 
 static int real3d_display_list = 0;
 
-static mame_bitmap *bitmap3d;
-static mame_bitmap *zbuffer;
+static bitmap_t *bitmap3d;
+static bitmap_t *zbuffer;
 static rectangle clip3d;
 static rectangle *screen_clip;
 
@@ -178,7 +178,7 @@ VIDEO_START( model3 )
 	init_matrix_stack();
 }
 
-static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_4bit(bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
 	int x, y;
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
@@ -213,7 +213,7 @@ static void draw_tile_4bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	}
 }
 
-static void draw_tile_8bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
+static void draw_tile_8bit(bitmap_t *bitmap, int tx, int ty, int tilenum)
 {
 	int x, y;
 	UINT8 *tile_base = (UINT8*)m3_char_ram;
@@ -244,7 +244,7 @@ static void draw_tile_8bit(mame_bitmap *bitmap, int tx, int ty, int tilenum)
 	}
 }
 #if 0
-static void draw_texture_sheet(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_texture_sheet(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 	for(y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -262,7 +262,7 @@ static void draw_texture_sheet(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 #endif
 
-static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer, int bitdepth)
+static void draw_layer(bitmap_t *bitmap, const rectangle *cliprect, int layer, int bitdepth)
 {
 	int x, y;
 	int tile_index = 0;
@@ -337,7 +337,7 @@ static void draw_layer(mame_bitmap *bitmap, const rectangle *cliprect, int layer
 }
 
 #ifdef UNUSED_FUNCTION
-static void copy_screen(mame_bitmap *bitmap, const rectangle *cliprect)
+static void copy_screen(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int x,y;
 	for(y=cliprect->min_y; y <= cliprect->max_y; y++) {

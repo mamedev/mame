@@ -30,7 +30,7 @@ static int sprite_yoffset;
 
 /******************************************************************************/
 
-static void tumblepb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void tumblepb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -92,7 +92,7 @@ static void tumblepb_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void jumpkids_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void jumpkids_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -154,7 +154,7 @@ static void jumpkids_draw_sprites(running_machine *machine, mame_bitmap *bitmap,
 	}
 }
 
-static void fncywld_draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void fncywld_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 

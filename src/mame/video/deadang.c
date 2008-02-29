@@ -81,7 +81,7 @@ VIDEO_START( deadang )
 	tilemap_set_transparent_pen(text_layer, 15);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,fx,fy,x,y,color,sprite,pri;
 

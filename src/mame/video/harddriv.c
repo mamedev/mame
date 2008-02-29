@@ -460,7 +460,7 @@ static void display_speedups(void)
 }
 
 
-void harddriv_scanline_driver(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_driver(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT8 *vram_base = &hdgsp_vram[(params->rowaddr << 12) & vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -475,7 +475,7 @@ void harddriv_scanline_driver(running_machine *machine, int screen, mame_bitmap 
 }
 
 
-void harddriv_scanline_multisync(running_machine *machine, int screen, mame_bitmap *bitmap, int scanline, const tms34010_display_params *params)
+void harddriv_scanline_multisync(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT8 *vram_base = &hdgsp_vram[(params->rowaddr << 11) & vram_mask];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);

@@ -112,7 +112,7 @@ VIDEO_START(mainsnk)
 	tilemap_set_scrollx( me_bg_tilemap, 0, -mainsnk_offset );
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source, *finish;
@@ -142,7 +142,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int dx,int off )
+static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int dx,int off )
 {
 	const UINT8 *base = mainsnk_fgram+off;
 	const gfx_element *gfx = machine->gfx[0];

@@ -40,7 +40,7 @@ UINT8 cvs_get_character_banking_mode(void);
 
 /*----------- defined in video/cvs.c -----------*/
 
-extern mame_bitmap *cvs_collision_background;
+extern bitmap_t *cvs_collision_background;
 extern int cvs_collision_register;
 
 PALETTE_INIT( cvs );

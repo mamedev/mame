@@ -10,7 +10,7 @@
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap, const rectangle *cliprect, int pf_priority)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pf_priority)
 {
 	int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 	int offs, bank, gfxbank;

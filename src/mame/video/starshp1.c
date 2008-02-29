@@ -33,7 +33,7 @@ int starshp1_inverse;
 
 static UINT16 *LSFR;
 
-static mame_bitmap *helper;
+static bitmap_t *helper;
 
 static tilemap *bg_tilemap;
 
@@ -169,7 +169,7 @@ WRITE8_HANDLER( starshp1_playfield_w )
 }
 
 
-static void draw_starfield(mame_bitmap* bitmap)
+static void draw_starfield(bitmap_t* bitmap)
 {
 	/*
      * The LSFR is reset once per frame at the position of
@@ -203,7 +203,7 @@ static int get_sprite_vpos(int i)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -222,7 +222,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap* bitmap, const re
 }
 
 
-static void draw_spaceship(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_spaceship(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	double scaler = -5 * log(1 - starshp1_ship_size / 256.0); /* ? */
 
@@ -248,7 +248,7 @@ static void draw_spaceship(running_machine *machine, mame_bitmap* bitmap, const 
 }
 
 
-static void draw_phasor(mame_bitmap* bitmap)
+static void draw_phasor(bitmap_t* bitmap)
 {
 	int i;
 
@@ -277,7 +277,7 @@ static int get_circle_vpos(void)
 }
 
 
-static void draw_circle_line(mame_bitmap *bitmap, int x, int y, int l)
+static void draw_circle_line(bitmap_t *bitmap, int x, int y, int l)
 {
 	if (y >= 0 && y <= bitmap->height - 1)
 	{
@@ -305,7 +305,7 @@ static void draw_circle_line(mame_bitmap *bitmap, int x, int y, int l)
 }
 
 
-static void draw_circle(mame_bitmap* bitmap)
+static void draw_circle(bitmap_t* bitmap)
 {
 	int cx = get_circle_hpos();
 	int cy = get_circle_vpos();
@@ -334,7 +334,7 @@ static void draw_circle(mame_bitmap* bitmap)
 }
 
 
-static int spaceship_collision(mame_bitmap *bitmap, rectangle *rect)
+static int spaceship_collision(bitmap_t *bitmap, rectangle *rect)
 {
 	int x;
 	int y;

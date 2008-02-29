@@ -710,7 +710,7 @@ static void usclssic_set_pens(colortable_t *colortable)
 ***************************************************************************/
 
 
-static void draw_sprites_map(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs, col;
 	int xoffs, yoffs;
@@ -814,7 +814,7 @@ twineagl:   000 027 00 0f   (test mode)
 
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	int xoffs, yoffs;

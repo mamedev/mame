@@ -66,7 +66,7 @@ VIDEO_START(homerun)
 	homerun_tilemap = tilemap_create(get_homerun_tile_info,tilemap_scan_rows, 8, 8,64,64);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 	for (offs = spriteram_size-4; offs >=0; offs -= 4)

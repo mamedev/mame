@@ -645,7 +645,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
  *
  *************************************/
 
-static void draw_videoram(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, const UINT8 *transparent_pens)
+static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *transparent_pens)
 {
 	int flipmask = video_flip ? 0x1f : 0x00;
 	int x, y;
@@ -680,9 +680,9 @@ static void draw_videoram(running_machine *machine, mame_bitmap *bitmap, const r
  *
  *************************************/
 
-static void draw_background_spaceod(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background_spaceod(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mame_bitmap *pixmap = tilemap_get_pixmap(!(spaceod_bg_control & 0x02) ? spaceod_bg_htilemap : spaceod_bg_vtilemap);
+	bitmap_t *pixmap = tilemap_get_pixmap(!(spaceod_bg_control & 0x02) ? spaceod_bg_htilemap : spaceod_bg_vtilemap);
 	int flipmask = (spaceod_bg_control & 0x01) ? 0xff : 0x00;
 	int xoffset = (spaceod_bg_control & 0x02) ? 0x10 : 0x00;
 	int xmask = pixmap->width - 1;
@@ -737,9 +737,9 @@ static void draw_background_spaceod(mame_bitmap *bitmap, const rectangle *clipre
  *
  *************************************/
 
-static void draw_background_page_scroll(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mame_bitmap *pixmap = tilemap_get_pixmap(bg_tilemap);
+	bitmap_t *pixmap = tilemap_get_pixmap(bg_tilemap);
 	int flipmask = (video_control & 0x08) ? 0xff : 0x00;
 	int xmask = pixmap->width - 1;
 	int ymask = pixmap->height - 1;
@@ -777,9 +777,9 @@ static void draw_background_page_scroll(mame_bitmap *bitmap, const rectangle *cl
  *
  *************************************/
 
-static void draw_background_full_scroll(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mame_bitmap *pixmap = tilemap_get_pixmap(bg_tilemap);
+	bitmap_t *pixmap = tilemap_get_pixmap(bg_tilemap);
 	int flipmask = (video_control & 0x08) ? 0x3ff : 0x000;
 	int xmask = pixmap->width - 1;
 	int ymask = pixmap->height - 1;

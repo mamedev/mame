@@ -542,7 +542,7 @@ Newer version of the I/O chip ?
 /* These scanline drawing routines lifted from Taito F3: optimise / merge ? */
 
 INLINE void taitoic_drawscanline(
-		mame_bitmap *bitmap,int x,int y,
+		bitmap_t *bitmap,int x,int y,
 		const UINT16 *src,int transparent,UINT32 orient,int pri, const rectangle *cliprect)
 {
 	UINT16 *dsti = BITMAP_ADDR16(bitmap, y, x);
@@ -1069,15 +1069,15 @@ static UINT16 topspeed_get_road_pixel_color(UINT16 pixel,UINT16 color)
 }
 
 
-static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
+static void topspeed_custom_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,
 							UINT32 priority,UINT16 *color_ctrl_ram)
 {
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
 	UINT16 scanline[1024];	/* won't be called by a wide-screen game, but just in case... */
 
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
-	mame_bitmap *flagsbitmap = tilemap_get_flagsmap(PC080SN_tilemap[chip][layer]);
+	bitmap_t *srcbitmap = tilemap_get_pixmap(PC080SN_tilemap[chip][layer]);
+	bitmap_t *flagsbitmap = tilemap_get_flagsmap(PC080SN_tilemap[chip][layer]);
 
 	UINT16 a,color;
 	int sx,x_index;
@@ -1160,12 +1160,12 @@ static void topspeed_custom_draw(mame_bitmap *bitmap,const rectangle *cliprect,i
 }
 
 
-void PC080SN_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
+void PC080SN_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	tilemap_draw(bitmap,cliprect,PC080SN_tilemap[chip][layer],flags,priority);
 }
 
-void PC080SN_tilemap_draw_offset(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs)
+void PC080SN_tilemap_draw_offset(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,int xoffs,int yoffs)
 {
 	int basedx = -16 - PC080SN_xoffs;
 	int basedxflip = -16 + PC080SN_xoffs;
@@ -1179,7 +1179,7 @@ void PC080SN_tilemap_draw_offset(mame_bitmap *bitmap,const rectangle *cliprect,i
 	tilemap_set_scrolldy(PC080SN_tilemap[chip][layer], basedy, basedyflip);
 }
 
-void PC080SN_tilemap_draw_special(mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
+void PC080SN_tilemap_draw_special(bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority,UINT16 *ram)
 {
 	topspeed_custom_draw(bitmap,cliprect,chip,layer,flags,priority,ram);
 }
@@ -1276,7 +1276,7 @@ void PC090OJ_eof_callback(void)
 }
 
 
-void PC090OJ_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,int pri_type)
+void PC090OJ_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int pri_type)
 {
 	int offs,priority=0;
 	int sprite_colbank = (PC090OJ_sprite_ctrl & 0xf) << 4;	/* top nibble */
@@ -1760,7 +1760,7 @@ void TC0080VCO_tilemap_update(running_machine *machine)
 
 /* NB: orientation_flipx code in following routine has not been tested */
 
-static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg0_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT16 zoom = TC0080VCO_scroll_ram[6];
 	int zx, zy;
@@ -1777,8 +1777,8 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 		UINT16 *dst16,*src16;
 		UINT8 *tsrc;
 		UINT16 scanline[512];
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[0]);
-		mame_bitmap *flagsbitmap = tilemap_get_flagsmap(TC0080VCO_tilemap[0]);
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[0]);
+		bitmap_t *flagsbitmap = tilemap_get_flagsmap(TC0080VCO_tilemap[0]);
 
 		int sx,zoomx,zoomy;
 		int dx,ex,dy,ey;
@@ -1914,7 +1914,7 @@ static void TC0080VCO_bg0_tilemap_draw(mame_bitmap *bitmap,const rectangle *clip
 }
 
 
-static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
+static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT32 priority)
 {
 	UINT8 layer=1;
 	UINT16 zoom = TC0080VCO_scroll_ram[6+layer];
@@ -1937,7 +1937,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bi
 		int sx,sy;
 
 		/* shouldn't we set no_clip before doing this (see TC0480SCP) ? */
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[layer]);
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0080VCO_tilemap[layer]);
 
 		if (zoomx < 63)
 		{
@@ -1990,7 +1990,7 @@ static void TC0080VCO_bg1_tilemap_draw(running_machine *machine, mame_bitmap *bi
 }
 
 
-void TC0080VCO_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0080VCO_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	int disable = 0x00;	/* possibly layer disable bits do exist ?? */
 
@@ -2687,9 +2687,9 @@ void TC0100SCN_tilemap_update(running_machine *machine)
 	}
 }
 
-static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
+static void TC0100SCN_tilemap_draw_fg(bitmap_t *bitmap,const rectangle *cliprect, int chip, tilemap* tmap ,int flags, UINT32 priority)
 {
-	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tmap);
+	const bitmap_t *src_bitmap = tilemap_get_pixmap(tmap);
 	int width_mask, height_mask, x, y, p;
 	int column_offset, src_x=0, src_y=0;
 	int scrollx_delta = - tilemap_get_scrolldx( tmap );
@@ -2730,7 +2730,7 @@ static void TC0100SCN_tilemap_draw_fg(mame_bitmap *bitmap,const rectangle *clipr
 	}
 }
 
-int TC0100SCN_tilemap_draw(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
+int TC0100SCN_tilemap_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int chip,int layer,int flags,UINT32 priority)
 {
 	int disable = TC0100SCN_ctrl[chip][6] & 0xf7;
 	rectangle clip = *cliprect;
@@ -2848,7 +2848,7 @@ void TC0430GRW_tilemap_update(int base_color)
 	TC0280GRD_tilemap_update(base_color);
 }
 
-static void zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority,int xmultiply)
+static void zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority,int xmultiply)
 {
 	UINT32 startx,starty;
 	int incxx,incxy,incyx,incyy;
@@ -2875,12 +2875,12 @@ static void zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,
 			0,priority);
 }
 
-void TC0280GRD_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
+void TC0280GRD_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
 {
 	zoom_draw(bitmap,cliprect,xoffset,yoffset,priority,2);
 }
 
-void TC0430GRW_zoom_draw(mame_bitmap *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
+void TC0430GRW_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority)
 {
 	zoom_draw(bitmap,cliprect,xoffset,yoffset,priority,1);
 }
@@ -3591,7 +3591,7 @@ Historical Issues
 
 **********************************************************************/
 
-static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg01_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* X-axis zoom offers expansion only: 0 = no zoom, 0xff = max
        Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max
@@ -3611,8 +3611,8 @@ static void TC0480SCP_bg01_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 		UINT8 *tsrc;
 		UINT16 scanline[512];
 		UINT32 sx;
-		mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
-		mame_bitmap *flagsbitmap = tilemap_get_flagsmap
+		bitmap_t *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
+		bitmap_t *flagsbitmap = tilemap_get_flagsmap
 							(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 		int flip = TC0480SCP_pri_reg & 0x40;
 		int i,y,y_index,src_y_index,row_index;
@@ -3742,10 +3742,10 @@ flipscreen.
 
 ****************************************************************/
 
-static void TC0480SCP_bg23_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
-	mame_bitmap *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
-	mame_bitmap *flagsbitmap = tilemap_get_flagsmap
+	bitmap_t *srcbitmap = tilemap_get_pixmap(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
+	bitmap_t *flagsbitmap = tilemap_get_flagsmap
 						(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 
 	UINT16 *dst16,*src16;
@@ -3868,7 +3868,7 @@ static void TC0480SCP_bg23_draw(mame_bitmap *bitmap,const rectangle *cliprect,in
 
 
 
-void TC0480SCP_tilemap_draw(mame_bitmap *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
+void TC0480SCP_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprect,int layer,int flags,UINT32 priority)
 {
 	/* no layer disable bits */
 
@@ -4100,7 +4100,7 @@ lookup table from rom for the TaitoZ sprites.
 
 ******************************************************************************/
 
-void TC0150ROD_draw(mame_bitmap *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority)
+void TC0150ROD_draw(bitmap_t *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority)
 {
 #ifdef MAME_DEBUG
 	static int dislayer[6];	/* Road Layer toggles to help get road correct */

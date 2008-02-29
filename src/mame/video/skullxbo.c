@@ -237,7 +237,7 @@ void skullxbo_scanline_update(int scanline)
 VIDEO_UPDATE( skullxbo )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

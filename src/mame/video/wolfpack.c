@@ -27,7 +27,7 @@ static UINT8 wolfpack_torpedo_v;
 
 static UINT8* LFSR;
 
-static mame_bitmap* helper;
+static bitmap_t* helper;
 
 
 PALETTE_INIT( wolfpack )
@@ -140,7 +140,7 @@ VIDEO_START( wolfpack )
 }
 
 
-static void draw_ship(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_ship(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	static const UINT32 scaler[] =
 	{
@@ -176,7 +176,7 @@ static void draw_ship(running_machine *machine, mame_bitmap* bitmap, const recta
 }
 
 
-static void draw_torpedo(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_torpedo(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int count = 0;
 
@@ -210,7 +210,7 @@ static void draw_torpedo(running_machine *machine, mame_bitmap* bitmap, const re
 }
 
 
-static void draw_pt(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_pt(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	rectangle rect = *cliprect;
 
@@ -240,7 +240,7 @@ static void draw_pt(running_machine *machine, mame_bitmap* bitmap, const rectang
 }
 
 
-static void draw_water(colortable_t *colortable, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_water(colortable_t *colortable, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	rectangle rect = *cliprect;
 

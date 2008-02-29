@@ -19,7 +19,7 @@ static UINT32 plane_visible = 0;
 static UINT8 *vidram;
 
 
-static mame_bitmap *tmp_bitmap[4];
+static bitmap_t *tmp_bitmap[4];
 
 WRITE8_HANDLER(bigevglf_palette_w)
 {
@@ -69,7 +69,7 @@ VIDEO_START( bigevglf )
 	vidram = auto_malloc(0x100*0x100 * 4);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i,j;
 	for (i = 0xc0-4; i >= 0; i-=4)

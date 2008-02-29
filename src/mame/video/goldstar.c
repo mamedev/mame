@@ -14,7 +14,7 @@ UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
 size_t goldstar_video_size;
 UINT8 *goldstar_scroll1, *goldstar_scroll2, *goldstar_scroll3;
 
-static mame_bitmap *tmpbitmap1, *tmpbitmap2, *tmpbitmap3, *tmpbitmap4;
+static bitmap_t *tmpbitmap1, *tmpbitmap2, *tmpbitmap3, *tmpbitmap4;
 static int bgcolor;
 
 

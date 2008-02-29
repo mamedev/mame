@@ -99,7 +99,7 @@ WRITE16_HANDLER( crshrace_gfxctrl_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 
@@ -171,13 +171,13 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rec
 }
 
 
-static void draw_bg(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_bg(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	tilemap_draw(bitmap,cliprect,tilemap2,0,0);
 }
 
 
-static void draw_fg(mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_fg(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	K053936_0_zoom_draw(bitmap,cliprect,tilemap1,0,0);
 }

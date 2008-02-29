@@ -47,7 +47,7 @@ typedef struct {
 	pair	vce_address;			/* Current address in the palette */
 	pair	vce_data[512];			/* Palette data */
 	int		current_bitmap_line;	/* The current line in the display we are on */
-	mame_bitmap	*bmp;
+	bitmap_t	*bmp;
 }VCE;
 
 typedef struct {

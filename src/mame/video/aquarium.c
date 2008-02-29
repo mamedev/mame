@@ -14,7 +14,7 @@ static tilemap *aquarium_bak_tilemap;
 extern UINT16 *aquarium_bak_videoram;
 
 /* gcpinbal.c modified */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int y_offs)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)
 {
 	int offs,chain_pos;
 	int x,y,curx,cury;

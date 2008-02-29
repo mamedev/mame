@@ -36,7 +36,7 @@
 UINT8 *airbustr_videoram2, *airbustr_colorram2;
 //int airbustr_clear_sprites;
 static tilemap *bg_tilemap, *fg_tilemap;
-static mame_bitmap *sprites_bitmap;
+static bitmap_t *sprites_bitmap;
 
 WRITE8_HANDLER( airbustr_videoram_w )
 {

@@ -72,7 +72,7 @@ static VIDEO_START( livequiz )
 	tilemap_set_transparent_pen(tmap, 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT16 *s		=	livequiz_gfxram + 0x8000;
 	UINT16 *codes	=	livequiz_gfxram;

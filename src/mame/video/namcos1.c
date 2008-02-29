@@ -274,7 +274,7 @@ sprite format:
 15   xxxxxxxx  Y position
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source = &spriteram[0x0800-0x20];	/* the last is NOT a sprite */
 	const UINT8 *finish = &spriteram[0];

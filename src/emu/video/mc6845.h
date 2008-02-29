@@ -19,20 +19,20 @@ typedef struct _mc6845_interface mc6845_interface;
 
 
 /* callback definitions */
-typedef void * (*mc6845_begin_update_func)(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
-#define MC6845_BEGIN_UPDATE(name)	void *name(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+typedef void * (*mc6845_begin_update_func)(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect);
+#define MC6845_BEGIN_UPDATE(name)	void *name(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
 
-typedef void (*mc6845_update_row_func)(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap,
+typedef void (*mc6845_update_row_func)(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap,
 					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
 					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define MC6845_UPDATE_ROW(name)		void name(running_machine *machine, mc6845_t *mc6845, mame_bitmap *bitmap,	\
+#define MC6845_UPDATE_ROW(name)		void name(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap,	\
 					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
 					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 typedef void (*mc6845_end_update_func)(running_machine *machine, mc6845_t *mc6845,
-					   				   mame_bitmap *bitmap, const rectangle *cliprect, void *param);
+					   				   bitmap_t *bitmap, const rectangle *cliprect, void *param);
 #define MC6845_END_UPDATE(name)		void name(running_machine *machine, mc6845_t *mc6845,						\
-					   						  mame_bitmap *bitmap, const rectangle *cliprect, void *param)
+					   						  bitmap_t *bitmap, const rectangle *cliprect, void *param)
 
 typedef void (*mc6845_on_de_changed_func)(running_machine *machine, mc6845_t *mc6845, int display_enabled);
 #define MC6845_ON_DE_CHANGED(name)	void name(running_machine *machine, mc6845_t *mc6845, int display_enabled)
@@ -101,7 +101,7 @@ void mc6845_assert_light_pen_input(mc6845_t *mc6845);
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
-void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect);
+void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect);
 
 
 #endif

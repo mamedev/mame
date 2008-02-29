@@ -628,7 +628,7 @@ WRITE16_HANDLER( scudhamm_vregs_w )
 /*  Draw the road in the given bitmap. The priority1 and priority2 parameters
     specify the range of lines to draw  */
 
-static void cischeat_draw_road(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
+static void cischeat_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
 {
 	int curr_code,sx,sy;
 	int min_priority, max_priority;
@@ -718,7 +718,7 @@ static void cischeat_draw_road(running_machine *machine, mame_bitmap *bitmap, co
 /*  Draw the road in the given bitmap. The priority1 and priority2 parameters
     specify the range of lines to draw  */
 
-static void f1gpstar_draw_road(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
+static void f1gpstar_draw_road(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int road_num, int priority1, int priority2, int transparency)
 {
 	int sx,sy;
 	int xstart;
@@ -834,7 +834,7 @@ static void f1gpstar_draw_road(running_machine *machine, mame_bitmap *bitmap, co
     sprites whose priority nibble is between 0 and 15 and whose
     colour code's high bit is set.  */
 
-static void cischeat_draw_sprites(running_machine *machine, mame_bitmap *bitmap , const rectangle *cliprect, int priority1, int priority2)
+static void cischeat_draw_sprites(running_machine *machine, bitmap_t *bitmap , const rectangle *cliprect, int priority1, int priority2)
 {
 	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
 	int y, sy, flipy, yzoom, yscale, ydim, ynum, ystart, yend, yinc;
@@ -989,7 +989,7 @@ if (input_code_pressed(KEYCODE_X))
 
 ***************************************************************************/
 
-static void bigrun_draw_sprites(running_machine *machine, mame_bitmap *bitmap , const rectangle *cliprect, int priority1, int priority2)
+static void bigrun_draw_sprites(running_machine *machine, bitmap_t *bitmap , const rectangle *cliprect, int priority1, int priority2)
 {
 	int x, sx, flipx, xzoom, xscale, xdim, xnum, xstart, xend, xinc;
 	int y, sy, flipy, yzoom, yscale, ydim, ynum, ystart, yend, yinc;

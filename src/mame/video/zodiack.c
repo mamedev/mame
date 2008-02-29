@@ -134,7 +134,7 @@ VIDEO_START( zodiack )
 	flip_screen_set_no_update(0);
 }
 
-static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -161,7 +161,7 @@ static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

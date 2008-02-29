@@ -208,7 +208,7 @@ void K053936GP_set_cliprect(int chip, int minx, int maxx, int miny, int maxy)
 	cliprect->max_y = maxy;
 }
 
-INLINE void K053936GP_copyroz32clip( mame_bitmap *dst_bitmap, mame_bitmap *src_bitmap,
+INLINE void K053936GP_copyroz32clip( bitmap_t *dst_bitmap, bitmap_t *src_bitmap,
 		const rectangle *dst_cliprect, const rectangle *src_cliprect,
 		UINT32 _startx,UINT32 _starty,int _incxx,int _incxy,int _incyx,int _incyy,
 		int tilebpp, int blend, int clip )
@@ -359,10 +359,10 @@ INLINE void K053936GP_copyroz32clip( mame_bitmap *dst_bitmap, mame_bitmap *src_b
 
 // adpoted from generic K053936_zoom_draw()
 static void K053936GP_zoom_draw(int chip, UINT16 *ctrl, UINT16 *linectrl,
-		mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap,
+		bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap,
 		int tilebpp, int blend)
 {
-	mame_bitmap *src_bitmap;
+	bitmap_t *src_bitmap;
 	rectangle *src_cliprect;
 	UINT16 *lineaddr;
 
@@ -427,13 +427,13 @@ static void K053936GP_zoom_draw(int chip, UINT16 *ctrl, UINT16 *linectrl,
 	}
 }
 
-void K053936GP_0_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect,
+void K053936GP_0_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect,
 		tilemap *tmap, int tilebpp, int blend)
 {
 	K053936GP_zoom_draw(0,K053936_0_ctrl,K053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
 }
 
-void K053936GP_1_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect,
+void K053936GP_1_zoom_draw(bitmap_t *bitmap, const rectangle *cliprect,
 		tilemap *tmap, int tilebpp, int blend)
 {
 	K053936GP_zoom_draw(1,K053936_1_ctrl,K053936_1_linectrl,bitmap,cliprect,tmap,tilebpp,blend);
@@ -457,7 +457,7 @@ void K053936GP_1_zoom_draw(mame_bitmap *bitmap, const rectangle *cliprect,
     pri     : 0 = topmost, 255 = backmost (pixel priority)
 */
 
-INLINE void zdrawgfxzoom32GP( mame_bitmap *bitmap, const gfx_element *gfx, const rectangle *cliprect,
+INLINE void zdrawgfxzoom32GP( bitmap_t *bitmap, const gfx_element *gfx, const rectangle *cliprect,
 		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
 		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri)
 {
@@ -1226,7 +1226,7 @@ void konamigx_objdma(void)
 	if (gx_objdma && gx_spriteram && K053247_ram) memcpy(gx_spriteram, K053247_ram, 0x1000);
 }
 
-void konamigx_mixer(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect,
+void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
 					tilemap *sub1, int sub1flags,
 					tilemap *sub2, int sub2flags,
 					int mixerflags)

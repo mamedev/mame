@@ -340,7 +340,7 @@ WRITE8_HANDLER( m62_textram_w )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority)
 {
 	int offs;
 

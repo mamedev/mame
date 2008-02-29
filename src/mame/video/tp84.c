@@ -209,7 +209,7 @@ VIDEO_START( tp84 )
 	sprite_mux_buffer = auto_malloc(256 * spriteram_size);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const gfx_element *gfx = machine->gfx[1];
 	int offs;

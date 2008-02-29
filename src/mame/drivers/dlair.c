@@ -76,7 +76,7 @@ static render_texture *video_texture;
 static render_texture *overlay_texture;
 static UINT32 last_seqid;
 
-static mame_bitmap *overlay_bitmap;
+static bitmap_t *overlay_bitmap;
 
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
@@ -164,7 +164,7 @@ static void video_cleanup(running_machine *machine)
 
 static VIDEO_START( dlair )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 
 	/* create textures */
 	last_seqid = laserdisc_get_video(discinfo, &vidbitmap);
@@ -207,7 +207,7 @@ static VIDEO_START( dleuro )
 
 static VIDEO_UPDATE( dlair )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 	UINT32 seqid;
 
 	/* get the current video and update the bitmap if different */
@@ -229,7 +229,7 @@ static VIDEO_UPDATE( dlair )
 
 static VIDEO_UPDATE( dleuro )
 {
-	mame_bitmap *vidbitmap;
+	bitmap_t *vidbitmap;
 	UINT32 seqid;
 	int x, y;
 

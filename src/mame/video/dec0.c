@@ -148,7 +148,7 @@ WRITE16_HANDLER( dec0_paletteram_b_w )
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
+static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
 	int offs;
 
@@ -216,7 +216,7 @@ static void draw_sprites(running_machine* machine, mame_bitmap *bitmap,const rec
 
 /******************************************************************************/
 
-static void custom_tilemap_draw(mame_bitmap *bitmap,
+static void custom_tilemap_draw(bitmap_t *bitmap,
 								const rectangle *cliprect,
 								tilemap *tilemap_ptr,
 								const UINT16 *rowscroll_ptr,
@@ -225,7 +225,7 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
 								const UINT16 *control1,
 								int flags)
 {
-	const mame_bitmap *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
+	const bitmap_t *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
 	int x, y, p;
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx=control1[0];
@@ -295,7 +295,7 @@ static void custom_tilemap_draw(mame_bitmap *bitmap,
 
 /******************************************************************************/
 
-static void dec0_pf1_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags)
+static void dec0_pf1_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
 	switch (dec0_pf1_control_0[3]&0x3) {
 		case 0:	/* 4x1 */
@@ -311,7 +311,7 @@ static void dec0_pf1_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flag
 	};
 }
 
-static void dec0_pf2_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags)
+static void dec0_pf2_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
 	switch (dec0_pf2_control_0[3]&0x3) {
 		case 0:	/* 4x1 */
@@ -327,7 +327,7 @@ static void dec0_pf2_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flag
 	};
 }
 
-static void dec0_pf3_draw(mame_bitmap *bitmap,const rectangle *cliprect,int flags)
+static void dec0_pf3_draw(bitmap_t *bitmap,const rectangle *cliprect,int flags)
 {
 	switch (dec0_pf3_control_0[3]&0x3) {
 		case 0:	/* 4x1 */

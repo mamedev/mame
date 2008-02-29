@@ -114,7 +114,7 @@ VIDEO_START( gotya )
 		 8, 8, 64, 32);
 }
 
-static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sx, int col)
+static void draw_status_row(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sx, int col)
 {
 	int row;
 
@@ -146,7 +146,7 @@ static void draw_status_row(running_machine *machine, mame_bitmap *bitmap, const
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -171,7 +171,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void draw_status(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	draw_status_row(machine, bitmap, cliprect, 0,  1);
 	draw_status_row(machine, bitmap, cliprect, 1,  0);

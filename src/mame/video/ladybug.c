@@ -17,7 +17,7 @@ UINT8 sraider_grid_color;
 void redclash_set_stars_enable( UINT8 on );
 void redclash_update_stars_state(void);
 void redclash_set_stars_speed( UINT8 speed );
-void redclash_draw_stars(mame_bitmap *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
+void redclash_draw_stars(bitmap_t *bitmap, const rectangle *cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 
 static tilemap *bg_tilemap;
 static tilemap *grid_tilemap;
@@ -307,7 +307,7 @@ VIDEO_START( sraider )
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 

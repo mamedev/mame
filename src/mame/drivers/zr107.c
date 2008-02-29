@@ -70,8 +70,8 @@ VIDEO_UPDATE( gticlub );
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
+void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
+void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 READ32_HANDLER(K001604_tile_r);
 READ32_HANDLER(K001604_char_r);
 WRITE32_HANDLER(K001604_tile_w);

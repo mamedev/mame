@@ -4,10 +4,10 @@
 #include "driver.h"
 #include "sound/samples.h"
 
-static mame_bitmap *ship1_vid;
-static mame_bitmap *ship2_vid;
-static mame_bitmap *proj1_vid;
-static mame_bitmap *proj2_vid;
+static bitmap_t *ship1_vid;
+static bitmap_t *ship2_vid;
+static bitmap_t *proj1_vid;
+static bitmap_t *proj2_vid;
 
 static int s1_x = 0;
 static int s1_y = 0;

@@ -233,7 +233,7 @@ WRITE32_HANDLER( video_dma_address_w )
 	COMBINE_DATA( &video_dma_address );
 }
 
-static void draw_blend_gfx(mame_bitmap *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+static void draw_blend_gfx(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
 	UINT8 *dp;
 	int i, j;
@@ -355,7 +355,7 @@ static const int sprite_ytable[2][8] =
 	{ 7*16, 6*16, 5*16, 4*16, 3*16, 2*16, 1*16, 0*16 }
 };
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri_mask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
 {
 	INT16 xpos, ypos;
 	int tile_num, color;
@@ -562,15 +562,15 @@ static void set_scroll(tilemap *layer, int scroll)
 #endif
 
 
-static void combine_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)
+static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tile, int x, int y, int opaque, INT16 *rowscroll)
 {
 	int i,j;
 	UINT16 *s;
 	UINT16 *d;
 	UINT8 *t;
 	UINT32 xscroll_mask, yscroll_mask;
-	mame_bitmap *pen_bitmap;
-	mame_bitmap *flags_bitmap;
+	bitmap_t *pen_bitmap;
+	bitmap_t *flags_bitmap;
 
 	pen_bitmap = tilemap_get_pixmap(tile);
 	flags_bitmap = tilemap_get_flagsmap(tile);

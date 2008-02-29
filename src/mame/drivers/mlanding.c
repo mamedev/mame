@@ -13,7 +13,7 @@
 static UINT16 * ml_tileram;
 static UINT16 * ml_spriteram;
 static UINT16 * ml_unk;
-static mame_bitmap *ml_bitmap[8];
+static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
 static UINT8 dirtychar[ML_CHARS];
 static int status_bit;

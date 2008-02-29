@@ -211,7 +211,7 @@ WRITE8_HANDLER( bosco_starclr_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -235,7 +235,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -257,7 +257,7 @@ static void draw_bullets(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_stars(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	if (1)
 	{

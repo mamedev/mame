@@ -59,7 +59,7 @@ static laserdisc_info *discinfo;
 
 
 /* VIDEO GOODS */
-static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT8 characterX, characterY;
 
@@ -76,7 +76,7 @@ static void gpworld_draw_tiles(running_machine *machine, mame_bitmap *bitmap,con
 	}
 }
 
-INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y,int color)
+INLINE void draw_pixel(bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int color)
 {
 	if (flip_screen_get())
 	{
@@ -93,7 +93,7 @@ INLINE void draw_pixel(mame_bitmap *bitmap,const rectangle *cliprect,int x,int y
 	*BITMAP_ADDR32(bitmap, y, x) = color;
 }
 
-static void gpworld_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect)
+static void gpworld_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;

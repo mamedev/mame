@@ -86,7 +86,7 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 			0);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int priority, int pri_mask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
 	int offs;
 
@@ -162,7 +162,7 @@ static VIDEO_START( acommand )
 #define SHOW_LEDS	0
 
 #if SHOW_LEDS
-static void draw_led(mame_bitmap *bitmap, int x, int y,UINT8 value)
+static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 {
 	plot_box(bitmap, x, y, 5, 9, 0x00000000);
 

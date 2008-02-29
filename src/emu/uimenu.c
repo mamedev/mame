@@ -125,7 +125,7 @@ static const game_driver **select_game_driver_list;
 
 static dip_descriptor dip_switch_model[MAX_PHYSICAL_DIPS];
 
-static mame_bitmap *hilight_bitmap;
+static bitmap_t *hilight_bitmap;
 static render_texture *hilight_texture;
 
 static render_texture *arrow_texture;
@@ -174,7 +174,7 @@ static UINT32 menu_tape_control(UINT32 state);
 #endif /* MESS */
 
 /* menu helpers */
-static void menu_render_triangle(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 
 static int input_menu_get_items(input_item_data *itemlist, int group);
 static int input_menu_get_game_items(input_item_data *itemlist);
@@ -1756,7 +1756,7 @@ static UINT32 menu_tape_control(UINT32 state)
     indicators
 -------------------------------------------------*/
 
-static void menu_render_triangle(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param)
+static void menu_render_triangle(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
 {
 	int halfwidth = dest->width / 2;
 	int height = dest->height;

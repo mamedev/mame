@@ -36,7 +36,7 @@ static int superdq_color_bank = 0;
 
 static render_texture *video_texture;
 static render_texture *overlay_texture;
-static mame_bitmap *last_video_bitmap;
+static bitmap_t *last_video_bitmap;
 
 static void video_cleanup(running_machine *machine)
 {
@@ -66,7 +66,7 @@ static VIDEO_UPDATE( superdq )
 
 	if (!video_skip_this_frame() && discinfo != NULL)
 	{
-		mame_bitmap *vidbitmap;
+		bitmap_t *vidbitmap;
 		rectangle fixedvis = machine->screen[screen].visarea;
 		fixedvis.max_x++;
 		fixedvis.max_y++;

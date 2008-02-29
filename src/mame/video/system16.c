@@ -94,7 +94,7 @@ type1       type0           function
 #include "video/resnet.h"
 
 /* video/segac2.c */
-extern void update_system18_vdp( mame_bitmap *bitmap, const rectangle *cliprect );
+extern void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect );
 extern void start_system18_vdp(void);
 extern READ16_HANDLER( segac2_vdp_r );
 extern WRITE16_HANDLER( segac2_vdp_w );
@@ -198,7 +198,7 @@ READ16_HANDLER( sys16_tileram_r ){
 */
 
 static void draw_sprite(running_machine *machine,
-	mame_bitmap *bitmap,
+	bitmap_t *bitmap,
 	const rectangle *cliprect,
 	const UINT8 *addr, int pitch,
 	pen_t pen_base,
@@ -338,7 +338,7 @@ static void draw_sprite(running_machine *machine,
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int b3d ) //*
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int b3d ) //*
 {
 	pen_t pen_base = machine->gfx[0]->color_base;
 	const UINT8 *base_gfx = memory_region(REGION_GFX2);

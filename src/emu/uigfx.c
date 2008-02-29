@@ -29,7 +29,7 @@ struct _ui_gfx_state
 
 	/* intermediate bitmaps */
 	UINT8			bitmap_dirty;		/* is the bitmap dirty? */
-	mame_bitmap *	bitmap;				/* bitmap for drawing gfx and tilemaps */
+	bitmap_t *		bitmap;				/* bitmap for drawing gfx and tilemaps */
 	render_texture *texture;			/* texture for rendering the above bitmap */
 
 	/* palette-specific data */
@@ -83,7 +83,7 @@ static void palette_handler(ui_gfx_state *state);
 
 /* graphics set handling */
 static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells);
-static void gfxset_draw_item(const gfx_element *gfx, int index, mame_bitmap *bitmap, int dstx, int dsty, int color, int rotate);
+static void gfxset_draw_item(const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
 static void gfxset_handler(ui_gfx_state *state);
 
@@ -761,7 +761,7 @@ static void gfxset_update_bitmap(ui_gfx_state *state, int xcells, int ycells, gf
     the view
 -------------------------------------------------*/
 
-static void gfxset_draw_item(const gfx_element *gfx, int index, mame_bitmap *bitmap, int dstx, int dsty, int color, int rotate)
+static void gfxset_draw_item(const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate)
 {
 	static const pen_t default_palette[] =
 	{

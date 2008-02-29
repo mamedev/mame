@@ -369,7 +369,7 @@ WRITE16_HANDLER( koshien_spritebank_w )
 	spritebank_buffered[7] = spritebank_buffered[6] + 0x400;
 }
 
-static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_element *gfx,
+static void taito_f2_tc360_spritemixdraw( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int scalex, int scaley)
 {
@@ -517,7 +517,7 @@ static void taito_f2_tc360_spritemixdraw( mame_bitmap *dest_bmp,const gfx_elemen
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,int *primasks,int uses_tc360_mixer)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int *primasks,int uses_tc360_mixer)
 {
 	/*
         Sprite format:
@@ -1124,7 +1124,7 @@ VIDEO_UPDATE( taitof2_pri )
 
 
 
-static void draw_roz_layer(mame_bitmap *bitmap,const rectangle *cliprect,UINT32 priority)
+static void draw_roz_layer(bitmap_t *bitmap,const rectangle *cliprect,UINT32 priority)
 {
 	if (has_TC0280GRD())
 		TC0280GRD_zoom_draw(bitmap,cliprect,f2_pivot_xdisp,f2_pivot_ydisp,priority);

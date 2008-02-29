@@ -214,7 +214,7 @@ WRITE8_HANDLER( baraduke_spriteram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int sprite_priority)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int sprite_priority)
 {
 	const UINT8 *source = &spriteram[0];
 	const UINT8 *finish = &spriteram[0x0800-16];	/* the last is NOT a sprite */

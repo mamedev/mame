@@ -302,7 +302,7 @@ PALETTE_INIT( littlerb )
 }
 #endif
 
-static void draw_sprite(mame_bitmap *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
+static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos )
 {
 	UINT16* spritegfx = littlerb_region4;
 	int x,y;

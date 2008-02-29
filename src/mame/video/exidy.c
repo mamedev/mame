@@ -24,10 +24,10 @@ static UINT8 collision_invert;
 static int is_2bpp;
 static UINT8 int_condition;
 
-static mame_bitmap *background_bitmap;
-static mame_bitmap *motion_object_1_vid;
-static mame_bitmap *motion_object_2_vid;
-static mame_bitmap *motion_object_2_clip;
+static bitmap_t *background_bitmap;
+static bitmap_t *motion_object_1_vid;
+static bitmap_t *motion_object_2_vid;
+static bitmap_t *motion_object_2_clip;
 
 
 
@@ -229,7 +229,7 @@ INLINE int sprite_1_enabled(void)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* draw sprite 2 first */
 	int sprite_set_2 = ((*exidy_sprite_enable & 0x40) != 0);

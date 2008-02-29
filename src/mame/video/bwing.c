@@ -228,7 +228,7 @@ VIDEO_START( bwing )
 //****************************************************************************
 // Realtime
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bmp, const rectangle *clip, UINT8 *ram, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bmp, const rectangle *clip, UINT8 *ram, int pri)
 {
 	int attrib, fx, fy, code, x, y, color, i;
 	gfx_element *gfx = machine->gfx[1];

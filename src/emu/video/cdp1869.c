@@ -381,7 +381,7 @@ static int cdp1869_get_color(int ccb0, int ccb1, int pcb)
 	}
 }
 
-static void cdp1869_draw_line(running_machine *machine, mame_bitmap *bitmap, int x, int y, int data, int color)
+static void cdp1869_draw_line(running_machine *machine, bitmap_t *bitmap, int x, int y, int data, int color)
 {
 	int i;
 
@@ -420,7 +420,7 @@ static void cdp1869_draw_line(running_machine *machine, mame_bitmap *bitmap, int
 	}
 }
 
-static void cdp1869_draw_char(running_machine *machine, mame_bitmap *bitmap, int x, int y, UINT16 pramaddr, const rectangle *screenrect)
+static void cdp1869_draw_char(running_machine *machine, bitmap_t *bitmap, int x, int y, UINT16 pramaddr, const rectangle *screenrect)
 {
 	int i;
 	UINT8 code = cdp1869_read_pageram(pramaddr);

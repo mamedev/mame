@@ -104,7 +104,7 @@ TODO:
 
 
 UINT8 *ddenlovr_pixmap[8];
-static mame_bitmap *framebuffer;
+static bitmap_t *framebuffer;
 static int extra_layers;
 
 
@@ -1176,7 +1176,7 @@ static READ16_HANDLER( ddenlovr_gfxrom_r )
 
 
 
-static void copylayer(mame_bitmap *bitmap,const rectangle *cliprect,int layer)
+static void copylayer(bitmap_t *bitmap,const rectangle *cliprect,int layer)
 {
 	int x,y;
 	int scrollx = ddenlovr_scroll[layer/4*8 + (layer%4) + 0];

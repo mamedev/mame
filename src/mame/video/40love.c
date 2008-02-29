@@ -16,8 +16,8 @@ static UINT8 fortyl_xoffset = 128;
 static UINT8 *fortyl_pixram1;
 static UINT8 *fortyl_pixram2;
 
-static mame_bitmap *pixel_bitmap1;
-static mame_bitmap *pixel_bitmap2;
+static bitmap_t *pixel_bitmap1;
+static bitmap_t *pixel_bitmap2;
 
 static tilemap *background;
 
@@ -256,7 +256,7 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 
@@ -319,7 +319,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 	}
 }
 
-static void draw_pixram( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_pixram( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 	int f = fortyl_flipscreen ^ 1;

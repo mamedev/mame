@@ -3,8 +3,8 @@
 #include "video/poly.h"
 
 UINT8 *taitojc_texture;
-static mame_bitmap *framebuffer;
-static mame_bitmap *zbuffer;
+static bitmap_t *framebuffer;
+static bitmap_t *zbuffer;
 
 extern UINT32 *taitojc_vram;
 extern UINT32 *taitojc_objlist;
@@ -103,7 +103,7 @@ WRITE32_HANDLER(taitojc_char_w)
 // 0x01:   -------- --x----- -------- --------   Priority (0 = below 3D, 1 = above 3D)
 // 0x01:   -------- -------- -xxxxxxx xxxxxxxx   VRAM data address
 
-static void draw_object(mame_bitmap *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
+static void draw_object(bitmap_t *bitmap, const rectangle *cliprect, UINT32 w1, UINT32 w2)
 {
 	int x, y, width, height, palette;
 	int i, j;
@@ -315,7 +315,7 @@ VIDEO_UPDATE( taitojc )
 
 static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	float z = extent->param[0].start;
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -339,7 +339,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	float z = extent->param[0].start;
 	float color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -367,7 +367,7 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;

@@ -60,7 +60,7 @@
 
 #include "driver.h"
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	UINT8	*indx_ram	=	spriteram + 0x2000,	// this ram contains indexes into offs_ram
 			*offs_ram	=	spriteram + 0x2400,	// this ram contains x,y offsets or indexes into spriteram_2

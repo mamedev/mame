@@ -229,7 +229,7 @@ WRITE16_HANDLER( toobin_slip_w )
 VIDEO_UPDATE( toobin )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

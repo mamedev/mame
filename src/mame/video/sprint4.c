@@ -9,7 +9,7 @@ Atari Sprint 4 video emulation
 
 static tilemap* playfield;
 
-static mame_bitmap* helper;
+static bitmap_t* helper;
 
 int sprint4_collision[4];
 

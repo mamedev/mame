@@ -554,7 +554,7 @@ VIDEO_START( gstrik2 )
 
 /* Draw sprites */
 
-void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const int region		=	REGION_GFX1;
 
@@ -728,7 +728,7 @@ void metro_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rec
 
 ***************************************************************************/
 
-static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority,
+static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT32 priority,
 		  				 int sx, int sy, int wx, int wy)	// scroll & window values
 {
 #if 1
@@ -788,7 +788,7 @@ static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap, const re
 
 
 /* Draw all the layers that match the given priority */
-static void draw_layers(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
+static void draw_layers(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
 {
 	UINT16 layers_pri = metro_videoregs[0x10/2];
 	int layer;

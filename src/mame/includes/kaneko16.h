@@ -64,7 +64,7 @@ extern UINT16 *kaneko16_sprites_regs;
 READ16_HANDLER ( kaneko16_sprites_regs_r );
 WRITE16_HANDLER( kaneko16_sprites_regs_w );
 
-void kaneko16_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect);
+void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 
 /* Pixel Layer: */
 

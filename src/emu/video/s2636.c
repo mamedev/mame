@@ -105,8 +105,8 @@ struct _s2636_t
 	int y_offset;
 	int x_offset;
 
-	mame_bitmap *bitmap;
-	mame_bitmap *collision_bitmap;
+	bitmap_t *bitmap;
+	bitmap_t *collision_bitmap;
 };
 
 
@@ -143,7 +143,7 @@ s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int 
  *************************************/
 
 static void draw_sprite(UINT8 *gfx, int color, int y, int x, int expand,
-						int or_mode, mame_bitmap *bitmap, const rectangle *cliprect)
+						int or_mode, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int sy;
 
@@ -264,7 +264,7 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
  *
  *************************************/
 
-mame_bitmap *s2636_update(s2636_t *s2636, const rectangle *cliprect)
+bitmap_t *s2636_update(s2636_t *s2636, const rectangle *cliprect)
 {
 	UINT8 collision = 0;
 	int spriteno;

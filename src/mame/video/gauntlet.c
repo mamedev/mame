@@ -190,7 +190,7 @@ WRITE16_HANDLER( gauntlet_yscroll_w )
 VIDEO_UPDATE( gauntlet )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

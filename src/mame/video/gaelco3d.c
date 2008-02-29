@@ -31,8 +31,8 @@ UINT32 gaelco3d_texmask_size;
 #define IS_POLYEND(x)		(((x) ^ ((x) >> 1)) & 0x4000)
 
 
-static mame_bitmap *screenbits;
-static mame_bitmap *zbuffer;
+static bitmap_t *screenbits;
+static bitmap_t *zbuffer;
 static rgb_t *palette;
 static UINT32 *polydata_buffer;
 static UINT32 polydata_count;
@@ -219,7 +219,7 @@ static void render_poly(UINT32 *polydata)
 static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *bitmap = destbase;
+	bitmap_t *bitmap = destbase;
 	float zbase = recip_approx(extra->ooz_base);
 	float uoz_step = extra->uoz_dx * zbase;
 	float voz_step = extra->voz_dx * zbase;
@@ -260,7 +260,7 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_
 static void render_normal(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *bitmap = destbase;
+	bitmap_t *bitmap = destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;
@@ -312,7 +312,7 @@ static void render_normal(void *destbase, INT32 scanline, const poly_extent *ext
 static void render_alphablend(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *bitmap = destbase;
+	bitmap_t *bitmap = destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;

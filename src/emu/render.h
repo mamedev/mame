@@ -170,7 +170,7 @@ enum
 -------------------------------------------------*/
 
 /* texture scaling callback */
-typedef void (*texture_scaler)(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+typedef void (*texture_scaler)(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 
 
 
@@ -396,10 +396,10 @@ render_texture *render_texture_alloc(texture_scaler scaler, void *param);
 void render_texture_free(render_texture *texture);
 
 /* set a new source bitmap */
-void render_texture_set_bitmap(render_texture *texture, mame_bitmap *bitmap, const rectangle *sbounds, UINT32 palettebase, int format);
+void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, UINT32 palettebase, int format);
 
 /* generic high quality resampling scaler */
-void render_texture_hq_scale(mame_bitmap *dest, const mame_bitmap *source, const rectangle *sbounds, void *param);
+void render_texture_hq_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 
 
 
@@ -460,7 +460,7 @@ float render_container_get_yoffset(render_container *container);
 void render_container_set_yoffset(render_container *container, float yoffset);
 
 /* set the overlay bitmap for the container */
-void render_container_set_overlay(render_container *container, mame_bitmap *bitmap);
+void render_container_set_overlay(render_container *container, bitmap_t *bitmap);
 
 /* return a pointer to the UI container */
 render_container *render_container_get_ui(void);

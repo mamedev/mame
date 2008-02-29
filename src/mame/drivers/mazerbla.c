@@ -100,7 +100,7 @@ static PALETTE_INIT( mazerbla )
 }
 
 
-static mame_bitmap * tmpbitmaps[4];
+static bitmap_t * tmpbitmaps[4];
 
 static VIDEO_START( mazerbla )
 {

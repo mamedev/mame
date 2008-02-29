@@ -627,7 +627,7 @@ struct sms_vdp
 	UINT8* vram;
 	UINT8* cram;
 	UINT8  writemode;
-	mame_bitmap* r_bitmap;
+	bitmap_t* r_bitmap;
 	UINT8* tile_renderline;
 	UINT8* sprite_renderline;
 

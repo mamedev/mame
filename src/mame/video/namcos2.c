@@ -73,7 +73,7 @@ struct RozParam
 
 static void
 DrawRozHelper(
-	mame_bitmap *bitmap,
+	bitmap_t *bitmap,
 	tilemap *tmap,
 	const rectangle *clip,
 	const struct RozParam *rozInfo )
@@ -83,8 +83,8 @@ DrawRozHelper(
 	if( bitmap->bpp == 16 )
 	{
 		UINT32 size_mask = rozInfo->size-1;
-		mame_bitmap *srcbitmap = tilemap_get_pixmap( tmap );
-		mame_bitmap *flagsbitmap = tilemap_get_flagsmap( tmap );
+		bitmap_t *srcbitmap = tilemap_get_pixmap( tmap );
+		bitmap_t *flagsbitmap = tilemap_get_flagsmap( tmap );
 		UINT32 startx = rozInfo->startx + clip->min_x * rozInfo->incxx + clip->min_y * rozInfo->incyx;
 		UINT32 starty = rozInfo->starty + clip->min_x * rozInfo->incxy + clip->min_y * rozInfo->incyy;
 		int sx = clip->min_x;
@@ -138,7 +138,7 @@ L_SkipPixel:
 } /* DrawRozHelper */
 
 static void
-DrawROZ(mame_bitmap *bitmap,const rectangle *cliprect)
+DrawROZ(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	const int xoffset = 38,yoffset = 0;
 	struct RozParam rozParam;

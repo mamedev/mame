@@ -70,7 +70,7 @@ WRITE16_HANDLER( volfied_sprite_ctrl_w )
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer(running_machine *machine, mame_bitmap *bitmap)
+static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
 {
 	int x, y;
 

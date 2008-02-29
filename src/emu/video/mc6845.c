@@ -488,7 +488,7 @@ static void update_cursor_state(mc6845_t *mc6845)
 }
 
 
-void mc6845_update(mc6845_t *mc6845, mame_bitmap *bitmap, const rectangle *cliprect)
+void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (mc6845->has_valid_parameters)
 	{

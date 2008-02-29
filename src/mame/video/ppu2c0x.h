@@ -103,7 +103,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 void ppu2c0x_reset( int num, int scan_scale );
 void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank, int bank_size );
 void ppu2c0x_spriteram_dma(int num, const UINT8 page );
-void ppu2c0x_render( int num, mame_bitmap *bitmap, int flipx, int flipy, int sx, int sy );
+void ppu2c0x_render( int num, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy );
 int ppu2c0x_get_pixel( int num, int x, int y );
 int ppu2c0x_get_colorbase( int num );
 int ppu2c0x_get_current_scanline( int num );

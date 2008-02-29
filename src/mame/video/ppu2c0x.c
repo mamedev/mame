@@ -65,7 +65,7 @@ static const pen_t default_colortable[] =
 /* our chip state */
 typedef struct {
 	running_machine 		*machine;				/* execution context */
-	mame_bitmap				*bitmap;				/* target bitmap */
+	bitmap_t				*bitmap;				/* target bitmap */
 	UINT8					*videoram;				/* video ram */
 	UINT8					*spriteram;				/* sprite ram */
 	pen_t					*colortable;			/* color table modified at run time */
@@ -385,7 +385,7 @@ static TIMER_CALLBACK( nmi_callback )
 static void draw_background(const int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
-	mame_bitmap *bitmap = chips[num].bitmap;
+	bitmap_t *bitmap = chips[num].bitmap;
 	const int *ppu_regs = &chips[num].regs[0];
 	const int scanline = chips[num].scanline;
 	const int refresh_data = chips[num].refresh_data;
@@ -524,7 +524,7 @@ static void draw_background(const int num, UINT8 *line_priority )
 static void draw_sprites(const int num, UINT8 *line_priority )
 {
 	/* cache some values locally */
-	mame_bitmap *bitmap = chips[num].bitmap;
+	bitmap_t *bitmap = chips[num].bitmap;
 	const int scanline = chips[num].scanline;
 	const int gfx_bank = intf->gfx_layout_number[num];
 	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
@@ -726,7 +726,7 @@ static void render_scanline(int num)
 		draw_background(num, line_priority );
 	else
 	{
-		mame_bitmap *bitmap = chips[num].bitmap;
+		bitmap_t *bitmap = chips[num].bitmap;
 		const int scanline = chips[num].scanline;
 		UINT8 color_mask;
 		UINT16 back_pen;
@@ -777,7 +777,7 @@ static void update_scanline(int num )
 		}
 		else
 		{
-			mame_bitmap *bitmap = this_ppu->bitmap;
+			bitmap_t *bitmap = this_ppu->bitmap;
 			const int scanline = this_ppu->scanline;
 			UINT8 color_mask;
 			UINT16 back_pen;
@@ -1335,7 +1335,7 @@ void ppu2c0x_spriteram_dma (int num, const UINT8 page)
  *  PPU Rendering
  *
  *************************************/
-void ppu2c0x_render( int num, mame_bitmap *bitmap, int flipx, int flipy, int sx, int sy )
+void ppu2c0x_render( int num, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
 {
 	/* check bounds */
 	if ( num >= intf->num )

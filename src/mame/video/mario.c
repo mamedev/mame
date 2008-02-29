@@ -162,7 +162,7 @@ VIDEO_START( mario )
  * confirmed on mametests.org as being present on real PCB as well.
  */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	mario_state	*state = Machine->driver_data;
 	int offs;

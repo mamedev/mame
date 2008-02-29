@@ -196,7 +196,7 @@ static UINT16 gpu_regs[GPU_REGS];
 static emu_timer *object_timer;
 static UINT8 cpu_irq_state;
 
-static mame_bitmap *screen_bitmap;
+static bitmap_t *screen_bitmap;
 
 static pen_t *pen_table;
 

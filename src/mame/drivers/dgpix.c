@@ -54,7 +54,7 @@
 
 static UINT32 *vram;
 static int vbuffer = 0;
-static mame_bitmap *bitmaps[2];
+static bitmap_t *bitmaps[2];
 
 static int flash_roms;
 static UINT32 flash_cmd = 0;

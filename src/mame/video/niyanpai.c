@@ -27,7 +27,7 @@ static int niyanpai_screen_refresh;
 static int nb19010_busyctr;
 static int nb19010_busyflag;
 
-static mame_bitmap *niyanpai_tmpbitmap[VRAM_MAX];
+static bitmap_t *niyanpai_tmpbitmap[VRAM_MAX];
 static UINT16 *niyanpai_videoram[VRAM_MAX];
 static UINT16 *niyanpai_videoworkram[VRAM_MAX];
 static UINT16 *niyanpai_palette;

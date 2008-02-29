@@ -21,8 +21,8 @@ struct _poly_extra_data
 // defined in drivers/nwk-tr.c
 int K001604_vh_start(running_machine *machine, int chip);
 void K001604_tile_update(running_machine *machine, int chip);
-void K001604_draw_front_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
-void K001604_draw_back_layer(int chip, mame_bitmap *bitmap, const rectangle *cliprect);
+void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
+void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 
 extern UINT8 gticlub_led_reg0;
 extern UINT8 gticlub_led_reg1;
@@ -155,8 +155,8 @@ static const int decode_x_zr107[8] = {  0, 16, 1, 17, 2, 18, 3, 19 };
 static const int decode_y_zr107[16] = {  0, 8, 32, 40, 4, 12, 36, 44, 64, 72, 96, 104, 68, 76, 100, 108 };
 
 static UINT32 K001005_status = 0;
-static mame_bitmap *K001005_bitmap[2];
-static mame_bitmap *K001005_zbuffer;
+static bitmap_t *K001005_bitmap[2];
+static bitmap_t *K001005_zbuffer;
 static rectangle K001005_cliprect;
 
 static void render_polygons(void);
@@ -429,7 +429,7 @@ WRITE32_HANDLER( K001005_w )
 static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	float z = extent->param[0].start;
 	float dz = extent->param[0].dpdx;
 	UINT32 *fb = BITMAP_ADDR32(destmap, scanline, 0);
@@ -457,7 +457,7 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 static void draw_scanline_tex(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
 	const poly_extra_data *extra = extradata;
-	mame_bitmap *destmap = dest;
+	bitmap_t *destmap = dest;
 	UINT8 *texrom = memory_region(REGION_GFX1) + (extra->texture_page * 0x40000);
 	int pal_chip = (extra->texture_palette & 0x8) ? 1 : 0;
 	int palette_index = (extra->texture_palette & 0x7) * 256;
@@ -911,7 +911,7 @@ static void render_polygons(void)
 	}
 }
 
-void K001005_draw(mame_bitmap *bitmap, const rectangle *cliprect)
+void K001005_draw(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j;
 

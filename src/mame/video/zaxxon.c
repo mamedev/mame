@@ -304,12 +304,12 @@ WRITE8_HANDLER( congo_sprite_custom_w )
  *
  *************************************/
 
-static void draw_background(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int skew)
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int skew)
 {
 	/* only draw if enabled */
 	if (bg_enable)
 	{
-		mame_bitmap *pixmap = tilemap_get_pixmap(bg_tilemap);
+		bitmap_t *pixmap = tilemap_get_pixmap(bg_tilemap);
 		int colorbase = bg_color + (congo_color_bank << 8);
 		int xmask = pixmap->width - 1;
 		int ymask = pixmap->height - 1;
@@ -420,7 +420,7 @@ INLINE int find_minimum_x(UINT8 value)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
 	int flipmask = flip_screen_get() ? 0xff : 0x00;
 	int offs;

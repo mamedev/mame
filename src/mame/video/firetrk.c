@@ -13,8 +13,8 @@ UINT8* firetrk_playfield_ram;
 int firetrk_skid[2];
 int firetrk_crash[2];
 
-static mame_bitmap *helper1;
-static mame_bitmap *helper2;
+static bitmap_t *helper1;
+static bitmap_t *helper2;
 
 static int blink;
 static int flash;
@@ -337,7 +337,7 @@ static void calc_car_positions(void)
 }
 
 
-static void draw_text(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	const UINT8* p = firetrk_alpha_num_ram;
 

@@ -572,7 +572,7 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
     0C      Y position
     0E      Code                                            */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
 
@@ -923,7 +923,7 @@ PALETTE_INIT( megasys1 )
 
 
 /***************************************************************************
-              Draw the game screen in the given mame_bitmap.
+              Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
 

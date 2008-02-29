@@ -643,7 +643,7 @@ WRITE32_HANDLER(nwk_voodoo_1_w)
 
 #define LED_ON		0xff00ff00
 
-void draw_7segment_led(mame_bitmap *bitmap, int x, int y, UINT8 value)
+void draw_7segment_led(bitmap_t *bitmap, int x, int y, UINT8 value)
 {
 	if ((value & 0x7f) == 0x7f)
 	{

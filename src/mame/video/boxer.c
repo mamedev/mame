@@ -10,7 +10,7 @@ UINT8* boxer_tile_ram;
 UINT8* boxer_sprite_ram;
 
 
-static void draw_boxer(running_machine *machine, mame_bitmap* bitmap, const rectangle* cliprect)
+static void draw_boxer(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
 	int n;
 

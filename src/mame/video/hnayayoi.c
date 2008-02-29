@@ -214,7 +214,7 @@ WRITE8_HANDLER( hnayayoi_palbank_w )
 }
 
 
-static void draw_layer_interleaved(mame_bitmap *bitmap, const rectangle *cliprect,
+static void draw_layer_interleaved(bitmap_t *bitmap, const rectangle *cliprect,
 		int left_pixmap, int right_pixmap, int palbase, int transp)
 {
 	int county,countx,pen,offs;

@@ -280,7 +280,7 @@ void neogeo_set_fixed_layer_source(UINT8 data)
 }
 
 
-static void draw_fixed_layer(mame_bitmap *bitmap, int scanline)
+static void draw_fixed_layer(bitmap_t *bitmap, int scanline)
 {
 	int x;
 

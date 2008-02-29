@@ -417,7 +417,7 @@ static VIDEO_START(jchan)
 	skns_spc_regs = auto_malloc (0x40);
 }
 
-extern void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 static VIDEO_UPDATE(jchan)

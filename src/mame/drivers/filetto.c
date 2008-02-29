@@ -89,7 +89,7 @@ static UINT8 hv_blank;
 #define RES_320x200 0
 #define RES_640x200 1
 
-static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
+static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs);
 
 static VIDEO_START( filetto )
 {
@@ -109,7 +109,7 @@ static READ8_HANDLER( vga_hvretrace_r )
 
 
 /*Basic Graphic mode */
-static void cga_graphic_bitmap(running_machine *machine,mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
+static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
 	static UINT16 x,y,pen = 0;
 	static UINT32 offs;
@@ -197,7 +197,7 @@ static void cga_graphic_bitmap(running_machine *machine,mame_bitmap *bitmap,cons
 
 
 
-static void cga_alphanumeric_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
+static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
 	static UINT32 offs,x,y,max_x,max_y;
 

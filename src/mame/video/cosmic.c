@@ -249,7 +249,7 @@ WRITE8_HANDLER( cosmic_background_enable_w )
 }
 
 
-static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 
@@ -280,7 +280,7 @@ static void draw_bitmap(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int color_mask, int extra_sprites)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int extra_sprites)
 {
 	int offs;
 
@@ -315,7 +315,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void cosmica_draw_starfield(mame_bitmap *bitmap, const rectangle *cliprect)
+static void cosmica_draw_starfield(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
@@ -364,7 +364,7 @@ static void cosmica_draw_starfield(mame_bitmap *bitmap, const rectangle *cliprec
 }
 
 
-static void devzone_draw_grid(mame_bitmap *bitmap, const rectangle *cliprect)
+static void devzone_draw_grid(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y;
 	UINT8 *horz_PROM = memory_region(REGION_USER2);
@@ -422,7 +422,7 @@ static void devzone_draw_grid(mame_bitmap *bitmap, const rectangle *cliprect)
 }
 
 
-static void nomnlnd_draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+static void nomnlnd_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y = 0;
 	UINT8 water = cpu_getcurrentframe();

@@ -95,7 +95,7 @@ static UINT32 *rabbit_viewregs10;
 static UINT32 *rabbit_tilemap_regs[4];
 static UINT32 *rabbit_spriteregs;
 static UINT32 *rabbit_blitterregs;
-static mame_bitmap *rabbit_sprite_bitmap;
+static bitmap_t *rabbit_sprite_bitmap;
 static rectangle rabbit_sprite_clip;
 
 static int rabbit_vblirqlevel, rabbit_bltirqlevel, rabbit_banking;
@@ -214,7 +214,7 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int xpos,ypos,tileno,xflip,yflip, colr;
 	const gfx_element *gfx = machine->gfx[1];
@@ -253,7 +253,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 /* the sprite bitmap can probably be handled better than this ... */
-static void rabbit_clearspritebitmap( mame_bitmap *bitmap, const rectangle *cliprect )
+static void rabbit_clearspritebitmap( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int startx, starty;
 	int y;
@@ -280,7 +280,7 @@ static void rabbit_clearspritebitmap( mame_bitmap *bitmap, const rectangle *clip
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void draw_sprite_bitmap( mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprite_bitmap( bitmap_t *bitmap, const rectangle *cliprect )
 {
 
 	UINT32 x,y;
@@ -383,7 +383,7 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-static void rabbit_drawtilemap( mame_bitmap *bitmap, const rectangle *cliprect, int whichtilemap )
+static void rabbit_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int whichtilemap )
 {
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
 

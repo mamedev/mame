@@ -97,7 +97,7 @@ VIDEO_START( dleague )
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
+static void syvalion_draw_sprites(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -190,7 +190,7 @@ static void syvalion_draw_sprites(mame_bitmap *bitmap,const rectangle *cliprect)
 	}
 }
 
-static void recordbr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void recordbr_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */
@@ -302,7 +302,7 @@ static void recordbr_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect
 	}
 }
 
-static void dleague_draw_sprites(mame_bitmap *bitmap, const rectangle *cliprect, int priority)
+static void dleague_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
        is always 64 pixels. */

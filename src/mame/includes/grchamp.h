@@ -29,7 +29,7 @@ struct _grchamp_state
 	UINT8 *		rightram;
 	UINT8 *		spriteram;
 
-	mame_bitmap *work_bitmap;
+	bitmap_t *	work_bitmap;
 	tilemap *	text_tilemap;
 	tilemap *	left_tilemap;
 	tilemap *	center_tilemap;

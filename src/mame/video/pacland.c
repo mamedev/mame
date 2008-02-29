@@ -34,7 +34,7 @@ static UINT8 palette_bank;
 static const UINT8 *pacland_color_prom;
 
 static tilemap *bg_tilemap, *fg_tilemap;
-static mame_bitmap *fg_bitmap;
+static bitmap_t *fg_bitmap;
 
 static UINT32 *transmask[3];
 
@@ -286,7 +286,7 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int whichmask)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int whichmask)
 {
 	int offs;
 
@@ -343,7 +343,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_fg(mame_bitmap *bitmap, const rectangle *cliprect, int priority )
+static void draw_fg(bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
 	int y, x;
 

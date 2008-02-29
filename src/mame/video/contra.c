@@ -267,7 +267,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int bank )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank )
 {
 	const UINT8 *source;
 	int base_color = (K007121_ctrlram[bank][6]&0x30)*2;

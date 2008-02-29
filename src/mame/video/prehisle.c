@@ -110,7 +110,7 @@ VIDEO_START( prehisle )
 	state_save_register_global(invert_controls);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int foreground )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )
 {
 	int offs;
 

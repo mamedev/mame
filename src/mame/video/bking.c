@@ -31,10 +31,10 @@ static int palette_bank;
 static int controller;
 static int hit;
 
-static mame_bitmap* helper0;
-static mame_bitmap* helper1;
+static bitmap_t *helper0;
+static bitmap_t *helper1;
 
-static tilemap* bg_tilemap;
+static tilemap *bg_tilemap;
 
 
 /***************************************************************************

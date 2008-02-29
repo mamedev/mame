@@ -16,7 +16,7 @@
  *
  *************************************/
 
-static mame_bitmap *yboard_bitmap;
+static bitmap_t *yboard_bitmap;
 
 
 

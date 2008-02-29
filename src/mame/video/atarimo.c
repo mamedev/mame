@@ -29,7 +29,7 @@ struct atarimo_data
 	gfx_element	gfxelement[MAX_GFX_ELEMENTS]; /* local copy of graphics elements */
 	int					gfxgranularity[MAX_GFX_ELEMENTS];
 
-	mame_bitmap *bitmap;				/* temporary bitmap to render to */
+	bitmap_t 			*bitmap;			/* temporary bitmap to render to */
 
 	int					linked;				/* are the entries linked? */
 	int					split;				/* are entries split or together? */
@@ -646,7 +646,7 @@ static void convert_dirty_grid_to_rects(struct atarimo_data *mo, const rectangle
     destination bitmap.
 ---------------------------------------------------------------*/
 
-mame_bitmap *atarimo_render(running_machine *machine, int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist)
+bitmap_t *atarimo_render(running_machine *machine, int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist)
 {
 	struct atarimo_data *mo = &atarimo[map];
 	int startband, stopband, band, i;
@@ -754,7 +754,7 @@ static int mo_render_object(running_machine *machine, struct atarimo_data *mo, c
 {
 	int gfxindex = mo->gfxlookup[EXTRACT_DATA(entry, mo->gfxmask)];
 	const gfx_element *gfx = &mo->gfxelement[gfxindex];
-	mame_bitmap *bitmap = mo->bitmap;
+	bitmap_t *bitmap = mo->bitmap;
 	int x, y, sx, sy;
 
 	/* extract data from the various words */

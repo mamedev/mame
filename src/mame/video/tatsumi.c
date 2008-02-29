@@ -5,7 +5,7 @@
 static tilemap *tx_layer;
 static tilemap *layer0, *layer1, *layer2, *layer3;
 
-static mame_bitmap *temp_bitmap;
+static bitmap_t *temp_bitmap;
 
 UINT16 *roundup_r_ram, *roundup_p_ram, *roundup_l_ram;
 UINT16 *cyclwarr_videoram0, *cyclwarr_videoram1;
@@ -237,7 +237,7 @@ VIDEO_START( bigfight )
 
 /********************************************************************/
 
-INLINE void roundupt_drawgfxzoomrotate( mame_bitmap *dest_bmp,const gfx_element *gfx,
+INLINE void roundupt_drawgfxzoomrotate( bitmap_t *dest_bmp,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,UINT32 ssx,UINT32 ssy,
 		const rectangle *clip, int scalex, int scaley, int rotate, int write_priority_only )
 {
@@ -453,7 +453,7 @@ INLINE void roundupt_drawgfxzoomrotate( mame_bitmap *dest_bmp,const gfx_element 
 	}
 }
 
-static void mycopyrozbitmap_core(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
+static void mycopyrozbitmap_core(bitmap_t *bitmap,bitmap_t *srcbitmap,
 		int dstx,int dsty, int srcwidth, int srcheight,int incxx,int incxy,int incyx,int incyy,
 		const rectangle *clip,int transparency,int transparent_color)
 {
@@ -515,7 +515,7 @@ static void mycopyrozbitmap_core(mame_bitmap *bitmap,mame_bitmap *srcbitmap,
 	}
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect, int write_priority_only, int rambank)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int write_priority_only, int rambank)
 {
 	int offs,fx,x,y,color;
 	int w,h,index,lines,scale,rotate;
@@ -686,7 +686,7 @@ extent_x=extent_y=0;
 	}
 }
 
-static void draw_sky(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect, int palette_base, int start_offset)
+static void draw_sky(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int palette_base, int start_offset)
 {
 	// all todo
 	int x,y;
@@ -708,7 +708,7 @@ start_offset-=48;
 	}
 }
 
-static void draw_road(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,mame_bitmap *shadow_bitmap)
+static void draw_road(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,bitmap_t *shadow_bitmap)
 {
 /*
 0xf980 0x0008 0x8c80 0x4a00 - road right to below, width unknown (32 pixels guess)
@@ -960,14 +960,14 @@ static void update_cluts(running_machine *machine, int fake_palette_offset, int 
 
 /**********************************************************************/
 
-static void draw_bg(running_machine *machine, mame_bitmap *dst, tilemap *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
+static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap *src, const UINT16* scrollx, const UINT16* scrolly, const UINT16* tilemap_ram, int tile_bank, int xscroll_offset, int yscroll_offset, int xsize, int ysize)
 {
 	/*
         Each tile (0x4000 of them) has a lookup table in ROM to build an individual 3-bit palette
         from sets of 8 bit palettes!
     */
 	const UINT8* tile_cluts = memory_region(REGION_GFX4);
-	const mame_bitmap *src_bitmap = tilemap_get_pixmap(src);
+	const bitmap_t *src_bitmap = tilemap_get_pixmap(src);
 	int src_y_mask=ysize-1;
 	int src_x_mask=xsize-1;
 	int tile_y_mask=(ysize/8)-1;

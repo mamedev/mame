@@ -79,7 +79,7 @@ static WRITE8_HANDLER( tugboat_score_w )
       if (offset<0x8 ) tugboat_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
-static void draw_tilemap(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect,
+static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
 	int x,y;

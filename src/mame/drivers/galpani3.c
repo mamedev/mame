@@ -97,7 +97,7 @@ static VIDEO_START(galpani3)
 	skns_spc_regs = auto_malloc (0x40);
 }
 
-extern void skns_draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect );
+extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 static VIDEO_UPDATE(galpani3)

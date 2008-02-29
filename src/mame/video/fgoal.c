@@ -7,8 +7,8 @@
 #include "driver.h"
 #include "includes/fgoal.h"
 
-static mame_bitmap *fgbitmap;
-static mame_bitmap *bgbitmap;
+static bitmap_t *fgbitmap;
+static bitmap_t *bgbitmap;
 
 static UINT8 xpos;
 static UINT8 ypos;

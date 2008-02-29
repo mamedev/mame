@@ -93,7 +93,7 @@ VIDEO_START( seicross )
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 }
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
 

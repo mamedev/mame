@@ -88,7 +88,7 @@ static void VS920A_set_gfx_region(int numchip, int gfx_region)
 	VS920A[numchip].gfx_region = gfx_region;
 }
 
-static void VS920A_draw(int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+static void VS920A_draw(int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
 	VS920A_cur_chip = &VS920A[numchip];
 
@@ -242,7 +242,7 @@ static void MB60553_set_gfx_region(int numchip, int gfx_region)
 }
 
 /* THIS IS STILL WRONG! */
-static void MB60553_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
 	int line;
 	rectangle clip;
@@ -389,7 +389,7 @@ Abstracts the VS9210
 tCG10103 CG10103[MAX_CG10103];
 static tCG10103* CG10103_cur_chip;
 
-static void CG10103_draw_sprite(running_machine *machine, mame_bitmap* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
+static void CG10103_draw_sprite(running_machine *machine, bitmap_t* screen, const rectangle* cliprect, UINT16* spr, int drawpri)
 {
 	int ypos = spr[0] & 0x1FF;
 	int xpos = (spr[1] & 0x1FF);
@@ -465,7 +465,7 @@ static void CG10103_draw_sprite(running_machine *machine, mame_bitmap* screen, c
 }
 
 
-static void CG10103_draw(running_machine *machine, int numchip, mame_bitmap* screen, const rectangle* cliprect, int priority)
+static void CG10103_draw(running_machine *machine, int numchip, bitmap_t* screen, const rectangle* cliprect, int priority)
 {
 	UINT16* splist;
 	int i;

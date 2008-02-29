@@ -331,7 +331,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 VIDEO_UPDATE( atarisy2 )
 {
 	struct atarimo_rect_list rectlist;
-	mame_bitmap *mobitmap;
+	bitmap_t *mobitmap;
 	int x, y, r;
 
 	/* draw the playfield */

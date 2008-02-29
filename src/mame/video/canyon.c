@@ -34,7 +34,7 @@ VIDEO_START( canyon )
 }
 
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle* cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle* cliprect)
 {
 	int i;
 
@@ -56,7 +56,7 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
-static void draw_bombs(mame_bitmap *bitmap, const rectangle* cliprect)
+static void draw_bombs(bitmap_t *bitmap, const rectangle* cliprect)
 {
 	int i;
 

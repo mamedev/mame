@@ -1256,7 +1256,7 @@ static void toaplan2_log_vram(void)
     Sprite Handlers
 ***************************************************************************/
 
-static void draw_sprites( mame_bitmap *bitmap, const rectangle *cliprect, int controller, int priority_to_display, int bank_sel )
+static void draw_sprites( bitmap_t *bitmap, const rectangle *cliprect, int controller, int priority_to_display, int bank_sel )
 {
 	const gfx_element *gfx = Machine->gfx[ ((controller*2)+1) ];
 
@@ -1416,7 +1416,7 @@ static void mark_tile_priority(int controller)
 }
 
 /***************************************************************************
-    Draw the game screen in the given mame_bitmap.
+    Draw the game screen in the given bitmap_t.
 ***************************************************************************/
 
 VIDEO_UPDATE( toaplan2_0 )

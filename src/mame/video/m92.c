@@ -296,7 +296,7 @@ VIDEO_START( m92 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs,k;
 
@@ -429,7 +429,7 @@ static void m92_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-static void m92_screenrefresh(running_machine *machine, mame_bitmap *bitmap,const rectangle *cliprect)
+static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	fillbitmap(priority_bitmap, 0, cliprect);
 
