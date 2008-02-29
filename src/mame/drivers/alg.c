@@ -32,6 +32,7 @@ static emu_timer *serial_timer;
 static UINT8 serial_timer_active;
 static UINT16 input_select;
 
+static bitmap_t *amiga_bitmap;
 static render_texture *video_texture;
 static render_texture *overlay_texture;
 
@@ -76,6 +77,9 @@ static VIDEO_START( alg )
 	/* configure for cleanup */
 	add_exit_callback(machine, video_cleanup);
 
+	/* allocate Amiga bitmap */
+	amiga_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+
 	/* standard video start */
 	VIDEO_START_CALL(amiga);
 
@@ -103,8 +107,14 @@ static void video_cleanup(running_machine *machine)
 
 static VIDEO_UPDATE( alg )
 {
-	/* composite the video */
-	if (!video_skip_this_frame())
+	int y;
+
+	/* update the Amiga video */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		amiga_render_scanline(amiga_bitmap, y);
+
+	/* at the end of the frame, composite the video */
+	if (!video_skip_this_frame() && (cliprect->max_y == machine->screen[screen].visarea.max_y))
 	{
 		mame_bitmap *vidbitmap;
 		rectangle fixedvis = machine->screen[screen].visarea;
@@ -120,17 +130,17 @@ static VIDEO_UPDATE( alg )
 		/* then overlay the Amiga video */
 		if (overlay_texture == NULL)
 			overlay_texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(overlay_texture, tmpbitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
+		render_texture_set_bitmap(overlay_texture, amiga_bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
 		render_container_empty(render_container_get_screen(screen));
 		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
-	}
 
-	/* display disc information */
-	if (discinfo != NULL)
-		popmessage("%s", laserdisc_describe_state(discinfo));
+		/* display disc information */
+		if (discinfo != NULL)
+			popmessage("%s", laserdisc_describe_state(discinfo));
+	}
 
 	return 0;
 }
@@ -455,7 +465,6 @@ static MACHINE_DRIVER_START( alg_r1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map_r1,0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
@@ -507,7 +516,6 @@ static MACHINE_DRIVER_START( picmatic )
 	/* adjust for PAL specs */
 	MDRV_CPU_REPLACE("main", M68000, AMIGA_68000_PAL_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map_picmatic,0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_REFRESH_RATE(50)

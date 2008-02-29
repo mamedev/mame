@@ -291,7 +291,6 @@ static MACHINE_DRIVER_START( arcadia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(amiga_map,0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 262)
 
 	MDRV_MACHINE_RESET(amiga)
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -309,7 +308,7 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_PALETTE_INIT(amiga)
 
 	MDRV_VIDEO_START(amiga)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(amiga)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

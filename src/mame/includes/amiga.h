@@ -377,7 +377,6 @@ extern void (*amiga_chip_ram_w)(offs_t offset, UINT16 data);
 void amiga_machine_config(const amiga_machine_interface *intf);
 
 MACHINE_RESET( amiga );
-INTERRUPT_GEN( amiga_scanline_callback );
 
 CUSTOM_INPUT( amiga_joystick_convert );
 
@@ -408,11 +407,12 @@ void amiga_audio_data_w(int which, UINT16 data);
 
 PALETTE_INIT( amiga );
 VIDEO_START( amiga );
+VIDEO_UPDATE( amiga );
 
 UINT32 amiga_gethvpos(void);
 void copper_setpc(UINT32 pc);
 void amiga_set_genlock_color(UINT16 color);
-void amiga_render_scanline(int scanline);
+void amiga_render_scanline(bitmap_t *bitmap, int scanline);
 void amiga_sprite_dma_reset(int which);
 void amiga_sprite_enable_comparitor(int which, int enable);
 

@@ -28,6 +28,11 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( 39in1 )
 INPUT_PORTS_END
 
+static VIDEO_UPDATE( 39in1 )
+{
+	return 0;
+}
+
 static MACHINE_DRIVER_START( 39in1 )
 	MDRV_CPU_ADD(ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
 	MDRV_CPU_PROGRAM_MAP(39in1_map,0)
@@ -38,8 +43,7 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)	// completely bogus for this h/w
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(39in1)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 MACHINE_DRIVER_END

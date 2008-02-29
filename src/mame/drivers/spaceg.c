@@ -170,10 +170,10 @@ Notes:
 
 
 
-static UINT8 unkram[65536];
+static UINT8 *unkram;
 
-static int io9400;
-static int io9401;
+static UINT8 *io9400;
+static UINT8 *io9401;
 
 static PALETTE_INIT( spaceg )
 {
@@ -205,7 +205,7 @@ static PALETTE_INIT( spaceg )
 
 static WRITE8_HANDLER( zvideoram_w )
 {
-	int i,x,y,col;
+	int col;
 
 	col = unkram[0x400];
 
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( zvideoram_w )
 
 	col &=0x0f;
 
-	switch(io9401)
+	switch(*io9401)
 	{
 	case 0x0d:	/* 1101 */
 		videoram[offset] &= ~data;
@@ -226,28 +226,14 @@ static WRITE8_HANDLER( zvideoram_w )
 		break;
 
 	default:
-		logerror("mode =%02x pc=%04x\n",io9401,activecpu_get_pc() );
-		popmessage("mode =%02x pc=%04x\n",io9401,activecpu_get_pc() );
+		logerror("mode =%02x pc=%04x\n",*io9401,activecpu_get_pc() );
+		popmessage("mode =%02x pc=%04x\n",*io9401,activecpu_get_pc() );
 		return;
 		break;
 	}
 
 
 	unkram  [offset] = col;
-
-	y= 255 - (offset & 0xff);
-	x= 255 - ((offset>>8)*8);
-	x -= ((io9400&0xe0)>>5);
-
-	/* draw modified eight pixels */
-	if (y >= 0 && y < tmpbitmap->height)
-		for (i = 0; i < 8; i++)
-		{
-			if (x >= 0 && y < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
-			x++;
-			data >>= 1;
-		}
 }
 
 static READ8_HANDLER(fake_r)
@@ -283,83 +269,49 @@ int rgbcolor;
 			logerror("palette? read from unkram offset = %04x\n",offset);
 	}
 
-if (io9401!=0x40)
-	logerror("unkram read in mode: 9401 = %02x (offset=%04x)\n",io9401,offset);
+if (*io9401!=0x40)
+	logerror("unkram read in mode: 9401 = %02x (offset=%04x)\n",*io9401,offset);
 
 
 	return unkram[offset];
 }
 
-static WRITE8_HANDLER(spaceg_colorram_w)
+
+static VIDEO_UPDATE( spaceg )
 {
-	int i,x,y,col;
+	offs_t offs;
 
-	unkram[offset] = data;
+	for (offs = 0; offs < 0x2000; offs++)
+	{
+		int i;
+		UINT8 data = videoram[offs];
 
+		int y = offs & 0xff;
+		UINT8 x = ((offs >> 8) << 3) - ((*io9400 & 0xe0) >> 5);
 
-	/* refresh eight pixels because the color might have just been changed */
-	data = videoram[offset];
-	col  = unkram  [offset];
-
-	y= 255 - (offset & 0xff);
-	x= 255 - ((offset>>8)*8);
-	x -= ((io9400&0xe0)>>5);
-
-	/* draw modified eight pixels */
-	if (y >= 0 && y < tmpbitmap->height)
 		for (i = 0; i < 8; i++)
 		{
-			if (x >= 0 && x < tmpbitmap->width)
-				*BITMAP_ADDR16(tmpbitmap, y, x) = (data&1)? col : 0;
+			*BITMAP_ADDR16(bitmap, y, x) = (data & 0x80) ? unkram[offs] : 0;
+
 			x++;
-			data >>= 1;
+			data <<= 1;
 		}
-}
-
-
-static READ8_HANDLER(zr_r)
-{
-	return videoram[offset];
-}
-
-static WRITE8_HANDLER(io9400_w)
-{
-	io9400=data;
-	if (io9400 & 0x1f)
-	{
-		logerror("!!9400 =%02x pc=%04x\n",io9400,activecpu_get_pc() );
 	}
+
+	return 0;
 }
 
-static WRITE8_HANDLER(io9401_w)
-{
-	io9401 = data;
-
-
-//0x40 - loads the palette on READ, address line 0x100 is the ninth bit (3rd bit of the red component)
-
-	switch(io9401)
-	{
-	case 0x0d:
-	case 0x01:
-	case 0x00:
-			break;
-	default:
-		logerror("!!9401 mode =%02x pc=%04x\n",io9401,activecpu_get_pc() );
-		break;
-	}
-}
 
 static ADDRESS_MAP_START( readwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(zr_r, zvideoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, spaceg_colorram_w)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(MRA8_RAM, zvideoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, MWA8_RAM) AM_BASE(&unkram)
 
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITE(io9400_w) /* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITE(io9401_w) /* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITE(MWA8_RAM) AM_BASE(&io9400) 	/* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITE(MWA8_RAM) AM_BASE(&io9401)	/* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 3 is probably a flip screen
@@ -422,12 +374,11 @@ static MACHINE_DRIVER_START( spaceg )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1-3*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 32, 255)
 
 	MDRV_PALETTE_LENGTH(16+128-16)
 	MDRV_PALETTE_INIT( spaceg )
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_UPDATE( spaceg )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -469,4 +420,4 @@ ROM_START( spaceg )
 ROM_END
 
 
-GAME( 1979, spaceg, 0, spaceg, spaceg, 0, ROT90, "Omori", "Space Guerrilla", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)
+GAME( 1979, spaceg, 0, spaceg, spaceg, 0, ROT270, "Omori", "Space Guerrilla", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND)

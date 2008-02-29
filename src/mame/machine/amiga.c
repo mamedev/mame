@@ -43,6 +43,7 @@
 #define BLITTER_NASTY_DELAY			16
 
 
+
 /*************************************
  *
  *  Type definitions
@@ -178,6 +179,9 @@ static void amiga_cia_0_irq(int state);
 static void amiga_cia_1_irq(int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
+static TIMER_CALLBACK( scanline_callback );
+
+
 
 /*************************************
  *
@@ -245,6 +249,7 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 		amiga_chip_ram32[offset / 4] = dat;
 	}
 }
+
 
 
 /*************************************
@@ -346,6 +351,9 @@ MACHINE_RESET( amiga )
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
 		(*amiga_intf->reset_callback)();
+
+	/* start the scanline timer */
+	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, scanline_callback);
 }
 
 
@@ -356,9 +364,9 @@ MACHINE_RESET( amiga )
  *
  *************************************/
 
-INTERRUPT_GEN( amiga_scanline_callback )
+static TIMER_CALLBACK( scanline_callback )
 {
-	int scanline = machine->screen[0].height - 1 - cpu_getiloops();
+	int scanline = param;
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -377,11 +385,18 @@ INTERRUPT_GEN( amiga_scanline_callback )
 	/* on every scanline, clock the second CIA TOD */
 	cia_clock_tod(1);
 
-	/* render this scanline */
-	amiga_render_scanline(scanline);
+	/* render up to this scanline */
+	if (scanline < machine->screen[0].visarea.min_y)
+		amiga_render_scanline(NULL, scanline);
+	else
+		video_screen_update_partial(0, scanline);
 
 	/* force a sound update */
 	amiga_audio_update();
+
+	/* set timer for next line */
+	scanline = (scanline + 1) % machine->screen[0].height;
+	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 
@@ -432,11 +447,14 @@ static void update_irqs(void)
 		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
 }
 
+
 static TIMER_CALLBACK( amiga_irq_proc )
 {
 	update_irqs();
 	timer_reset( amiga_irq_timer, attotime_never);
 }
+
+
 
 /*************************************
  *

@@ -51,16 +51,57 @@ Ports:
  */
 #include "driver.h"
 
-WRITE8_HANDLER( ramtek_videoram_w );
-
 INTERRUPT_GEN( invaders_interrupt );
 void ramtek_sh_update(void);
-WRITE8_HANDLER( ramtek_mask_w );
 
-/*
- * since these functions aren't used anywhere else, i've made them
- * static, and included them here
- */
+
+/***************************************************************************
+
+  video.c
+
+  Functions to emulate the video hardware of the machine.
+
+***************************************************************************/
+
+#include "driver.h"
+
+
+
+static UINT8 *ramtek_videoram;
+static UINT8 *mask;
+
+
+static WRITE8_HANDLER( ramtek_videoram_w )
+{
+	ramtek_videoram[offset] = data & ~*mask;
+}
+
+static VIDEO_UPDATE( ramtek )
+{
+	offs_t offs;
+
+	for (offs = 0; offs < 0x2000; offs++)
+	{
+		int i;
+
+		UINT8 data = ramtek_videoram[offs];
+		int y = offs >> 5;
+		int x = (offs & 0x1f) << 3;
+
+		for (i = 0; i < 8; i++)
+		{
+			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
+			*BITMAP_ADDR32(bitmap, y, x) = pen;
+
+			x++;
+			data <<= 1;
+		}
+	}
+
+	return 0;
+}
+
+
 static const int ControllerTable[32] = {
     0  , 1  , 3  , 2  , 6  , 7  , 5  , 4  ,
     12 , 13 , 15 , 14 , 10 , 11 , 9  , 8  ,
@@ -78,32 +119,24 @@ static READ8_HANDLER( gray5bit_controller1_r )
     return (input_port_3_r(0) & 0xe0) | (~ControllerTable[input_port_3_r(0) & 0x1f] & 0x1f);
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x63ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
-	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_1_r)
-	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
-	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
-	AM_RANGE(0xC000, 0xC07f) AM_READ(MRA8_RAM)			/* ?? */
-	AM_RANGE(0xC200, 0xC27f) AM_READ(MRA8_RAM)			/* ?? */
-ADDRESS_MAP_END
-
 static WRITE8_HANDLER( sound_w )
 {
 }
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4400, 0x5fff) AM_WRITE(ramtek_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(MWA8_RAM)		/* ?? */
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(ramtek_mask_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_w)		/* sound_w listed twice?? */
-	AM_RANGE(0x8002, 0x8003) AM_WRITE(sound_w)		/* Manual Shows sound control at 0x8002 */
-	AM_RANGE(0xC000, 0xC07f) AM_WRITE(MWA8_RAM)			/* ?? */
-	AM_RANGE(0xC200, 0xC27f) AM_WRITE(MWA8_RAM)			/* ?? */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM, ramtek_videoram_w) AM_BASE(&ramtek_videoram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM		/* ?? */
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(input_port_0_r, sound_w) /* sound_w listed twice?? */
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(MWA8_RAM) AM_BASE(&mask)
+	AM_RANGE(0x8002, 0x8002) AM_READWRITE(input_port_1_r, sound_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(sound_w)		/* Manual Shows sound control at 0x8002 */
+	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
+	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
+	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */
+	AM_RANGE(0xc200, 0xc27f) AM_RAM					/* ?? */
 ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( m79amb )
@@ -142,7 +175,7 @@ static INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-static INTERRUPT_GEN( M79_interrupt )
+static INTERRUPT_GEN( m79amb_interrupt )
 {
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
@@ -161,19 +194,18 @@ static MACHINE_DRIVER_START( m79amb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 1996800)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(M79_interrupt,1)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_VBLANK_INT(m79amb_interrupt,1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(ramtek)
 
 	/* sound hardware */
 MACHINE_DRIVER_END
@@ -202,4 +234,4 @@ ROM_END
 
 
 
-GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb, ROT0, "RamTek", "M79 Ambush", GAME_NO_SOUND )
+GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb, ROT0, "Ramtek", "M-79 Ambush", GAME_NO_SOUND )

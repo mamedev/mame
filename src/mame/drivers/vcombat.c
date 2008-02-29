@@ -88,6 +88,10 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vcombat )
 INPUT_PORTS_END
 
+static VIDEO_UPDATE( vcombat )
+{
+	return 0;
+}
 
 static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz)
@@ -110,8 +114,7 @@ static MACHINE_DRIVER_START( vcombat )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(vcombat)
 MACHINE_DRIVER_END
 
 

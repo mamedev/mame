@@ -2902,7 +2902,6 @@ src/mame/video/m57.c svneol=native#text/plain
 src/mame/video/m58.c svneol=native#text/plain
 src/mame/video/m62.c svneol=native#text/plain
 src/mame/video/m72.c svneol=native#text/plain
-src/mame/video/m79amb.c svneol=native#text/plain
 src/mame/video/m90.c svneol=native#text/plain
 src/mame/video/m92.c svneol=native#text/plain
 src/mame/video/macrossp.c svneol=native#text/plain

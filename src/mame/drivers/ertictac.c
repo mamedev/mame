@@ -31,30 +31,9 @@ TODO:
 #include "cpu/arm/arm.h"
 
 static UINT32 *ertictac_mainram;
-static UINT32 *ram;
+static UINT32 *ertictac_videoram;
 static UINT32 IRQSTA, IRQMSKA, IRQMSKB, FIQMSK, T1low, T1high;
 static UINT32 vidFIFO[256];
-
-static READ32_HANDLER(ram_r)
-{
-	return ram[offset];
-}
-
-static WRITE32_HANDLER(ram_w)
-{
-	COMBINE_DATA(&ram[offset]);
-	if(offset>=vidFIFO[0x88]/4 && offset<( (vidFIFO[0x88]/4) + 0x28000/4))
-	{
-		int tmp=offset-vidFIFO[0x88]/4;
-		int x=(tmp%80)<<2;
-		int y=(tmp/80)&0xff;
-
-		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>> 0)&0xff;
-		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>> 8)&0xff;
-		*BITMAP_ADDR16(tmpbitmap, y, x++) = (ram[offset]>>16)&0xff;
-		*BITMAP_ADDR16(tmpbitmap, y, x  ) = (ram[offset]>>24)&0xff;
-	}
-}
 
 static WRITE32_HANDLER(video_fifo_w)
 {
@@ -172,7 +151,7 @@ static WRITE32_HANDLER(T1GO_w)
 
 static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE (&ertictac_mainram)
-	AM_RANGE(0x01f00000, 0x01ffffff) AM_READWRITE(ram_r, ram_w) AM_BASE (&ram)
+	AM_RANGE(0x01f00000, 0x01ffffff) AM_RAM AM_BASE (&ertictac_videoram)
 	AM_RANGE(0x03200000, 0x03200003) AM_READWRITE(IOCR_r, IOCR_w)
 	AM_RANGE(0x03200010, 0x03200013) AM_READ(IRQSTA_r)
 	AM_RANGE(0x03200014, 0x03200017) AM_READWRITE(IRQRQA_r, IRQRQA_w)
@@ -360,22 +339,46 @@ static INTERRUPT_GEN( ertictac_interrupt )
 	}
 }
 
-static PALETTE_INIT(ertictac)
+
+#define NUM_PENS	(0x100)
+
+static void get_pens(pen_t *pens)
 {
-	int c;
+	int color;
 
-	for (c = 0; c < 256; c++)
+	for (color = 0; color < NUM_PENS; color++)
 	{
- 		int r,g,b,i;
+ 		UINT8 i = color & 0x03;
+ 		UINT8 r = ((color & 0x04) >> 0) | ((color & 0x10) >> 1) | i;
+ 		UINT8 g = ((color & 0x20) >> 3) | ((color & 0x40) >> 3) | i;
+ 		UINT8 b = ((color & 0x08) >> 1) | ((color & 0x80) >> 4) | i;
 
- 		i = c & 0x03;
- 		r = ((c & 0x04) >> 0) | ((c & 0x10) >> 1) | i;
- 		g = ((c & 0x20) >> 3) | ((c & 0x40) >> 3) | i;
- 		b = ((c & 0x08) >> 1) | ((c & 0x80) >> 4) | i;
-
- 		palette_set_color_rgb(machine, c, pal4bit(r), pal4bit(g), pal4bit(b));
+		pens[color] = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
+
+
+static VIDEO_UPDATE( ertictac )
+{
+	int y, x;
+	pen_t pens[NUM_PENS];
+
+	get_pens(pens);
+
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (x = 0; x < 0x140; x += 4)
+		{
+			offs_t offs = (y * 0x50) + (x >> 2) + (vidFIFO[0x88] >> 2);
+
+			*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(ertictac_videoram[offs] >>  0) & 0xff];
+			*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(ertictac_videoram[offs] >>  8) & 0xff];
+			*BITMAP_ADDR32(bitmap, y, x + 2) = pens[(ertictac_videoram[offs] >> 16) & 0xff];
+			*BITMAP_ADDR32(bitmap, y, x + 3) = pens[(ertictac_videoram[offs] >> 24) & 0xff];
+		}
+
+	return 0;
+}
+
 
 static MACHINE_DRIVER_START( ertictac )
 
@@ -389,15 +392,11 @@ static MACHINE_DRIVER_START( ertictac )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 255)
 
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(ertictac)
-
-	MDRV_VIDEO_START(generic_bitmapped)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(ertictac)
 MACHINE_DRIVER_END
 
 ROM_START( ertictac )

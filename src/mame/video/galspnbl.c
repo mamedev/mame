@@ -2,9 +2,10 @@
 #include "deprecat.h"
 
 
-UINT16 *galspnbl_bgvideoram,*galspnbl_videoram,*galspnbl_colorram;
-static int screenscroll;
-
+UINT16 *galspnbl_bgvideoram;
+UINT16 *galspnbl_videoram;
+UINT16 *galspnbl_colorram;
+UINT16 *galspnbl_scroll;
 
 
 PALETTE_INIT( galspnbl )
@@ -14,27 +15,6 @@ PALETTE_INIT( galspnbl )
 	/* initialize 555 RGB lookup */
 	for (i = 0;i < 32768;i++)
 		palette_set_color_rgb(machine,i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
-}
-
-
-
-WRITE16_HANDLER( galspnbl_bgvideoram_w )
-{
-	int sx,sy;
-
-
-	data = COMBINE_DATA(&galspnbl_bgvideoram[offset]);
-
-	sx = offset % 512;
-	sy = offset / 512;
-
-	*BITMAP_ADDR16(tmpbitmap, sy, sx) = 1024 + (data >> 1);
-}
-
-WRITE16_HANDLER( galspnbl_scroll_w )
-{
-	if (ACCESSING_LSB)
-		screenscroll = 4-(data & 0xff);
 }
 
 
@@ -84,7 +64,8 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 			color = spriteram16[offs+2];
 			size = 1 << (color & 0x0003); // 1,2,4,8
 			color = (color & 0x00f0) >> 4;
-			sx = spriteram16[offs+4] + screenscroll;
+//			sx = spriteram16[offs+4] + screenscroll;
+			sx = spriteram16[offs+4];
 			sy = spriteram16[offs+3];
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
@@ -108,13 +89,27 @@ static void draw_sprites(running_machine *machine, mame_bitmap *bitmap, const re
 }
 
 
+static void draw_background(mame_bitmap *bitmap, const rectangle *cliprect)
+{
+	offs_t offs;
+
+//	int screenscroll = 4 - (galspnbl_scroll[0] & 0xff);
+
+	for (offs = 0; offs < 0x20000; offs++)
+	{
+		int y = offs >> 9;
+		int x = offs & 0x1ff;
+
+		*BITMAP_ADDR16(bitmap, y, x) = 1024 + (galspnbl_bgvideoram[offs] >> 1);
+	}
+}
+
+
 VIDEO_UPDATE( galspnbl )
 {
 	int offs;
 
-
-	/* copy the temporary bitmap to the screen */
-	copyscrollbitmap(bitmap,tmpbitmap,1,&screenscroll,0,0,cliprect);
+	draw_background(bitmap, cliprect);
 
 	draw_sprites(machine,bitmap,cliprect,0);
 
@@ -135,7 +130,8 @@ VIDEO_UPDATE( galspnbl )
 					code,
 					color,
 					0,0,
-					16*sx + screenscroll,8*sy,
+//					16*sx + screenscroll,8*sy,
+					16*sx,8*sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}
 	}

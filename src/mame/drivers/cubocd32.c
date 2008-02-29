@@ -267,7 +267,6 @@ static MACHINE_DRIVER_START( cd32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cd32_map,0)
-	MDRV_CPU_VBLANK_INT(amiga_scanline_callback, 312)
 
 	MDRV_MACHINE_RESET(amiga)
 	MDRV_NVRAM_HANDLER(cd32)
@@ -286,7 +285,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_PALETTE_INIT(amiga)
 
 	MDRV_VIDEO_START(amiga)
-	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(amiga)
 
 	/* sound hardware */
     MDRV_SPEAKER_STANDARD_STEREO("left", "right")
