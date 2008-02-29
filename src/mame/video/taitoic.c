@@ -3749,7 +3749,7 @@ static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int l
 						(TC0480SCP_tilemap[layer][TC0480SCP_dblwidth]);
 
 	UINT16 *dst16,*src16;
-	UINT16 *tsrc;
+	UINT8 *tsrc;
 	int i,y,y_index,src_y_index,row_index,row_zoom;
 	int sx,x_index,x_step;
 	UINT32 zoomx,zoomy;
@@ -3831,7 +3831,7 @@ static void TC0480SCP_bg23_draw(bitmap_t *bitmap,const rectangle *cliprect,int l
 		}
 
 		src16 = BITMAP_ADDR16(srcbitmap, src_y_index, 0);
-		tsrc  = BITMAP_ADDR16(flagsbitmap, src_y_index, 0);
+		tsrc  = BITMAP_ADDR8(flagsbitmap, src_y_index, 0);
 		dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
