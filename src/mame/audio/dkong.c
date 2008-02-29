@@ -331,7 +331,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_INVERTER_OSC(NODE_51,1,0,DK_R47,DK_R48,DK_C30,0,&dkong_inverter_osc_desc_walk)
 
 	DISCRETE_TRANSFORM3(NODE_52,1,DS_SOUND0,DK_R46,R_SERIE(DK_R44,DK_R45),"01*2+")
-	DISCRETE_MIXER4(NODE_54, 1, NODE_50, NODE_51, DK_SUP_V, 0,&dkong_rc_jump_desc)
+	DISCRETE_MIXER4(NODE_54, 1, NODE_50, NODE_51, DK_SUP_V, 0,&dkong_rc_walk_desc)
 
     /* 555 Voltage controlled */
     DISCRETE_555_ASTABLE_CV(NODE_55, 1, RES_K(47), RES_K(27), CAP_N(33), NODE_54, &dkong_555_vco_desc)
@@ -499,7 +499,7 @@ static const discrete_mixer_desc radarscp_mixer_desc_7 =
  * For the walk circuit, the voltage does not matter */
 
 static const discrete_555_desc radarscp_555_vco_desc =
-	{DISC_555_OUT_DC | DISC_555_OUT_SQW,
+	{DISC_555_OUT_DC | DISC_555_OUT_ENERGY,
 		DK_SUP_V,
 		DK_SUP_V-0.5,DK_SUP_V*0.66,DK_SUP_V*0.33
 	};
@@ -589,7 +589,7 @@ static DISCRETE_SOUND_START(radarscp)
 	DISCRETE_MIXER3(NODE_42, 1, NODE_41, DK_SUP_V, 0,&radarscp_mixer_desc_0)
 
     /* 555 Voltage controlled */
-    DISCRETE_555_ASTABLE_CV(NODE_43, DS_SOUND6, RES_K(47), RES_K(27), RS_C49, NODE_42, &dkong_555_vco_desc)
+    DISCRETE_555_ASTABLE_CV(NODE_43, DS_SOUND6, RES_K(47), RES_K(27), RS_C49, NODE_42, &radarscp_555_vco_desc)
 
 	DISCRETE_RCDISC_MODULATED(NODE_44,1,DS_SOUND0_INV,NODE_43,RS_R39,RS_R18,RS_R37,RS_R38,RS_C22,DK_SUP_V)
 	DISCRETE_CRFILTER(NODE_45, 1, NODE_44, RS_R15+RS_R16, RS_C33)
@@ -605,7 +605,7 @@ static DISCRETE_SOUND_START(radarscp)
 
 	DISCRETE_MIXER3(NODE_53, 1, NODE_51, DK_SUP_V, 0,&radarscp_mixer_desc_7)
     /* 555 Voltage controlled */
-    DISCRETE_555_ASTABLE_CV(NODE_54, DS_SOUND7, RES_K(47), RES_K(27), RS_C48, NODE_53, &dkong_555_vco_desc)
+    DISCRETE_555_ASTABLE_CV(NODE_54, DS_SOUND7, RES_K(47), RES_K(27), RS_C48, NODE_53, &radarscp_555_vco_desc)
 
     DISCRETE_RCINTEGRATE(NODE_55,1,NODE_52,RS_R46, RS_R46,0,RS_C45,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
     DISCRETE_TRANSFORM4(NODE_56, 1, NODE_55, DS_SOUND7,NODE_54,2.5, "01*23<*")
