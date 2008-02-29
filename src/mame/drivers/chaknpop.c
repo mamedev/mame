@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( chaknpop )
 	MDRV_CPU_ADD(Z80, 2350000)
 	//MDRV_CPU_ADD(Z80, 2760000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(chaknpop)
 

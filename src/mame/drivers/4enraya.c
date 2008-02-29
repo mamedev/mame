@@ -49,6 +49,7 @@ Sound :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -161,7 +162,7 @@ static MACHINE_DRIVER_START( 4enraya )
 	MDRV_CPU_ADD(Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

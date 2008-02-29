@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( wwfwfest )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 24000000/2)	/* 24 crystal, 12 rated chip */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(wwfwfest_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(wwfwfest_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */

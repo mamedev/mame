@@ -158,7 +158,7 @@ static MACHINE_DRIVER_START( puckpkmn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000, MASTER_CLOCK/7) 		/*???*/
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_readmem,puckpkmn_writemem)
-	MDRV_CPU_VBLANK_INT(genesis_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
 
 	MDRV_MACHINE_START(genesis)
 	MDRV_MACHINE_RESET(genesis)

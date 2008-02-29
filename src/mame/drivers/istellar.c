@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_istellar, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_istellar)
 
 /*  sound cpu */
 	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)

@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "bsktball.h"
 #include "sound/discrete.h"
 
@@ -210,7 +211,7 @@ static MACHINE_DRIVER_START( bsktball )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,750000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(bsktball_interrupt,8)
+	MDRV_CPU_VBLANK_INT_HACK(bsktball_interrupt,8)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

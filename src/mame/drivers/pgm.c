@@ -1559,7 +1559,7 @@ static MACHINE_DRIVER_START( pgm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 20000000) /* 20 mhz! verified on real board */
 	MDRV_CPU_PROGRAM_MAP(pgm_mem,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8468000)
 	MDRV_CPU_PROGRAM_MAP(z80_mem, 0)
@@ -1593,7 +1593,7 @@ static MACHINE_DRIVER_START( drgw2 )
 	MDRV_IMPORT_FROM(pgm)
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( killbld );

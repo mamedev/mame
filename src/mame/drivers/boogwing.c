@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( boogwing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)	/* DE102 */
 	MDRV_CPU_PROGRAM_MAP(boogwing_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)

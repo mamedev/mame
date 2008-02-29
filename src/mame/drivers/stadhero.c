@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( stadhero )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */

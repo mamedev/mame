@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( cabal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu,writemem_cpu)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3579580) /* verified on pcb */
 	/* audio CPU */
@@ -585,7 +585,7 @@ static MACHINE_DRIVER_START( cabalbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_cpu,cabalbl_writemem_cpu)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_sound,cabalbl_writemem_sound)

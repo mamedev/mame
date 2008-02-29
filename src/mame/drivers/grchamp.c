@@ -675,13 +675,13 @@ static MACHINE_DRIVER_START( grchamp )
 	MDRV_CPU_ADD(Z80, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(grchamp_cpu0_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", grchamp_cpu0_interrupt)
 
 	/* GAME BOARD */
 	MDRV_CPU_ADD(Z80, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_IO_MAP(sub_portmap,0)
-	MDRV_CPU_VBLANK_INT(grchamp_cpu1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", grchamp_cpu1_interrupt)
 
 	/* SOUND BOARD */
 	MDRV_CPU_ADD(Z80, SOUND_CLOCK/2)

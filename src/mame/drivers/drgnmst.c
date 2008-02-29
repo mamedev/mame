@@ -360,7 +360,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( drgnmst )
 	MDRV_CPU_ADD(M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */

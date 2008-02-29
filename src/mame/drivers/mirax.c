@@ -61,6 +61,7 @@ The End
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static int nSndNum=0x10;
@@ -179,7 +180,7 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_CPU_ADD(Z80, 12000000) // audio cpu ?
 	MDRV_CPU_PROGRAM_MAP(memory_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

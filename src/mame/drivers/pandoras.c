@@ -379,11 +379,11 @@ static MACHINE_DRIVER_START( pandoras )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
-	MDRV_CPU_VBLANK_INT(pandoras_interrupt_a,1)
+	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_a)
 
 	MDRV_CPU_ADD(M6809,18432000/6)	/* CPU B */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_b,pandoras_writemem_b)
-	MDRV_CPU_VBLANK_INT(pandoras_interrupt_b,1)
+	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_b)
 
 	MDRV_CPU_ADD(Z80,14318000/8)
 	/* audio CPU */

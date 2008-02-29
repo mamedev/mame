@@ -1239,7 +1239,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
-	MDRV_CPU_VBLANK_INT(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
+	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)

@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( powerins )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(powerins_readmem,powerins_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* 6 MHz */
 	/* audio CPU */

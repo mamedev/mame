@@ -1877,7 +1877,7 @@ static MACHINE_DRIVER_START( captaven )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(captaven_readmem,captaven_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -1925,7 +1925,7 @@ static MACHINE_DRIVER_START( fghthist )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthist_readmem,fghthist_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -1972,7 +1972,7 @@ static MACHINE_DRIVER_START( fghthsta )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(fghthsta_memmap,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8) /* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -2018,7 +2018,7 @@ static MACHINE_DRIVER_START( dragngun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(dragngun_readmem,dragngun_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -2072,7 +2072,7 @@ static MACHINE_DRIVER_START( lockload )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4)
 	MDRV_CPU_PROGRAM_MAP(lockload_readmem,lockload_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,2) // From 2
+	MDRV_CPU_VBLANK_INT_HACK(deco32_vbl_interrupt,2) // From 2
 
 	MDRV_CPU_ADD(H6280, 32220000/8)
 	/* audio CPU */
@@ -2126,7 +2126,7 @@ static MACHINE_DRIVER_START( tattass )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(tattass_readmem,tattass_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(M6809, 2000000)
 	/* audio CPU */
@@ -2164,7 +2164,7 @@ static MACHINE_DRIVER_START( nslasher )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28322000/4)
 	MDRV_CPU_PROGRAM_MAP(nslasher_readmem,nslasher_writemem)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_CPU_ADD(Z80, 32220000/9)
 	MDRV_CPU_PROGRAM_MAP(nslasher_sound,0)

@@ -278,7 +278,7 @@ static MACHINE_DRIVER_START( goodejan )
 	MDRV_CPU_ADD(V30, GOODEJAN_MHZ2/2)
 	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
 	MDRV_CPU_IO_MAP(goodejan_io_map,0)
-	MDRV_CPU_VBLANK_INT(goodejan_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(goodejan_interrupt,2)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
 

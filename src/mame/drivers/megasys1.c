@@ -360,7 +360,6 @@ ADDRESS_MAP_END
                             [ Main CPU - System D ]
 ***************************************************************************/
 
-#define INTERRUPT_NUM_D		1
 static INTERRUPT_GEN( interrupt_D )
 {
 	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
@@ -636,7 +635,7 @@ static MACHINE_DRIVER_START( system_A )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
-	MDRV_CPU_VBLANK_INT(interrupt_A,INTERRUPT_NUM_A)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
 	MDRV_CPU_ADD_TAG("sound", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	/* audio CPU */
@@ -693,7 +692,7 @@ static MACHINE_DRIVER_START( system_B )
 	MDRV_CPU_REPLACE("main", M68000, SYS_B_CPU_CLOCK) /* 8MHz */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_B,writemem_B)
-	MDRV_CPU_VBLANK_INT(interrupt_B,INTERRUPT_NUM_B)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_B,INTERRUPT_NUM_B)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_B,sound_writemem_B)
@@ -723,7 +722,7 @@ static MACHINE_DRIVER_START( system_C )
 	MDRV_CPU_REPLACE("main", M68000, SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_C,writemem_C)
-	MDRV_CPU_VBLANK_INT(interrupt_C,INTERRUPT_NUM_C)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_C,INTERRUPT_NUM_C)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_B,sound_writemem_B)
@@ -746,7 +745,7 @@ static MACHINE_DRIVER_START( system_D )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)	/* 8MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
-	MDRV_CPU_VBLANK_INT(interrupt_D,INTERRUPT_NUM_D)
+	MDRV_CPU_VBLANK_INT("main", interrupt_D)
 
 	MDRV_MACHINE_RESET(megasys1)
 
@@ -807,7 +806,7 @@ static MACHINE_DRIVER_START( system_Z )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
 	MDRV_CPU_PROGRAM_MAP(readmem_A,writemem_A)
-	MDRV_CPU_VBLANK_INT(interrupt_A,INTERRUPT_NUM_A)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_A,INTERRUPT_NUM_A)
 
 	MDRV_CPU_ADD(Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	/* audio CPU */

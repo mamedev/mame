@@ -7,6 +7,7 @@ Mahjong Sisters (c) 1986 Toa Plan
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 
@@ -308,7 +309,7 @@ static MACHINE_DRIVER_START( mjsister )
 	MDRV_CPU_ADD(Z80, MCLK/2) /* 6.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjsister_readmem,mjsister_writemem)
 	MDRV_CPU_IO_MAP(mjsister_readport,mjsister_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_MACHINE_RESET(mjsister)
 

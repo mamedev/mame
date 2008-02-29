@@ -576,7 +576,7 @@ static MACHINE_DRIVER_START( firetrap )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(firetrap,2)
+	MDRV_CPU_VBLANK_INT_HACK(firetrap,2)
 
 	MDRV_CPU_ADD(M6502,3072000/2)
 	/* audio CPU */	/* 1.536 MHz? */
@@ -616,7 +616,7 @@ static MACHINE_DRIVER_START( firetpbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_bootleg,writemem_bootleg)
-	MDRV_CPU_VBLANK_INT(bootleg,1)
+	MDRV_CPU_VBLANK_INT("main", bootleg)
 
 	MDRV_CPU_ADD(M6502,3072000/2)
 	/* audio CPU */	/* 1.536 MHz? */

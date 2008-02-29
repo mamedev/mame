@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_CPU_ADD(Z80,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(iqblock_interrupt,16)
+	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
 	MDRV_MACHINE_RESET(iqblock)
 
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz , appears to use Z180 instructions */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(iqblock_interrupt,16)
+	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
 	MDRV_MACHINE_RESET(iqblock)
 
@@ -368,7 +368,7 @@ static MACHINE_DRIVER_START( pokerigs )
 	MDRV_CPU_ADD(Z180,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(pokerigs_portmap,0)
-	MDRV_CPU_VBLANK_INT(iqblock_interrupt,16)
+	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
 	MDRV_MACHINE_RESET(iqblock)
 

@@ -235,13 +235,13 @@ static MACHINE_DRIVER_START( flower )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,10)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1) //nmis stuff up the writes to shared ram
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,10)
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) //nmis stuff up the writes to shared ram
 
 	MDRV_CPU_ADD(Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu2,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_sound_cpu,0)

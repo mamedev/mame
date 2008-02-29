@@ -537,7 +537,7 @@ static const struct YMZ280Binterface ymz280b_interface =
 static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_ADD(M68000, 16000000/8) /* the /8 divider is here only for OPL3 testing */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
 	/* audio CPU */

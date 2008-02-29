@@ -1313,7 +1313,7 @@ static MACHINE_DRIVER_START( konamigx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68EC020, 24000000)
 	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type2_map)
-	MDRV_CPU_VBLANK_INT(konamigx_vbinterrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", konamigx_vbinterrupt)
 
 	/* note: part is a -8, crystals are 18.4 and 32.0 MHz, and
        twinbee yahhoo will not pass POST if the 68000 isn't
@@ -1408,7 +1408,7 @@ static MACHINE_DRIVER_START( gxtype3 )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type3_map)
-	MDRV_CPU_VBLANK_INT(konamigx_hbinterrupt, 262)
+	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
 
 	MDRV_VIDEO_START(konamigx_type3)
 	MDRV_PALETTE_LENGTH(16384)
@@ -1423,7 +1423,7 @@ static MACHINE_DRIVER_START( gxtype4 )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gx_base_memmap, gx_type4_map)
-	MDRV_CPU_VBLANK_INT(konamigx_hbinterrupt, 262)
+	MDRV_CPU_VBLANK_INT_HACK(konamigx_hbinterrupt, 262)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE(64*8, 32*8)

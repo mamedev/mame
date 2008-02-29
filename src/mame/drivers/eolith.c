@@ -258,7 +258,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( eolith45 )
 	MDRV_CPU_ADD_TAG("cpu", E132N, 45000000)		 /* 45 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith_map,0)
-	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
+	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	/* sound cpu */
 

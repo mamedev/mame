@@ -360,7 +360,7 @@ static MACHINE_DRIVER_START( cultures )
 	MDRV_CPU_ADD(Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
-	MDRV_CPU_VBLANK_INT(cultures_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cultures_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

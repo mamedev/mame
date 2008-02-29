@@ -2192,7 +2192,7 @@ static MACHINE_DRIVER_START( system32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V60, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system32_map,0)
-	MDRV_CPU_VBLANK_INT(start_of_vblank_int,1)
+	MDRV_CPU_VBLANK_INT("main", start_of_vblank_int)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(system32_sound_map,0)
@@ -2246,7 +2246,7 @@ static MACHINE_DRIVER_START( multi32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V70, MULTI32_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(multi32_map,0)
-	MDRV_CPU_VBLANK_INT(start_of_vblank_int,1)
+	MDRV_CPU_VBLANK_INT("left", start_of_vblank_int)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(multi32_sound_map,0)

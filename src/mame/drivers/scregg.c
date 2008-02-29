@@ -50,6 +50,7 @@ it as ASCII text.
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 
@@ -232,7 +233,7 @@ static MACHINE_DRIVER_START( dommy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dommy_readmem,dommy_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -265,7 +266,7 @@ static MACHINE_DRIVER_START( scregg )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(eggs_readmem,eggs_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,16)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

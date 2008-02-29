@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( twins )
 	MDRV_CPU_ADD(V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(twins_map, 0)
 	MDRV_CPU_IO_MAP(twins_io,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -256,7 +256,7 @@ static MACHINE_DRIVER_START( twinsa )
 	MDRV_CPU_ADD(V30, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(twins_map, 0)
 	MDRV_CPU_IO_MAP(twinsa_io,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

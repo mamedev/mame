@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(psychic5_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	/* audio CPU */

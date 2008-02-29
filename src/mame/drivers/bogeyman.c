@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 extern UINT8 *bogeyman_videoram2, *bogeyman_colorram2;
@@ -227,7 +228,7 @@ static MACHINE_DRIVER_START( bogeyman )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6502, 2000000)	// 12 MHz clock on board
 	MDRV_CPU_PROGRAM_MAP(bogeyman_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 16) // Controls sound
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 16) // Controls sound
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

@@ -461,11 +461,11 @@ static MACHINE_DRIVER_START( tp84 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
-	MDRV_CPU_VBLANK_INT(tp84_6809_interrupt,256)
+	MDRV_CPU_VBLANK_INT_HACK(tp84_6809_interrupt,256)
 
 	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	/* audio CPU */

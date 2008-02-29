@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_ADD(Z80, SCHEMATIC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainio,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_thayers, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_thayers)
 
 	MDRV_MACHINE_START(thayers)
 

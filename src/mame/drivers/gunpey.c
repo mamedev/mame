@@ -124,7 +124,7 @@ static MACHINE_DRIVER_START( gunpey )
 	MDRV_CPU_ADD(V30, 57242400 / 4)
 	MDRV_CPU_PROGRAM_MAP(mem_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(gunpey_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", gunpey_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

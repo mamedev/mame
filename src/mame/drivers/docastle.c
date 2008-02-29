@@ -126,6 +126,7 @@ more sprite tiles, it also has a MSM5205 chip for sample playback.
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
 #include "includes/docastle.h"
@@ -630,15 +631,15 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_CPU_ADD_TAG("main", Z80, 3900000)	// make dip switches work in docastle and dorunrun
 	MDRV_CPU_PROGRAM_MAP(docastle_map, 0)
 	MDRV_CPU_IO_MAP(docastle_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("slave", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map2, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 8)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
 	MDRV_CPU_ADD(Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(docastle_map3, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	// video hardware
 

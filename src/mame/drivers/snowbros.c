@@ -1558,7 +1558,7 @@ static MACHINE_DRIVER_START( snowbros )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* 8 Mhz - confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 6000000) /* 6 MHz - confirmed */
 	/* audio CPU */
@@ -1656,7 +1656,7 @@ static MACHINE_DRIVER_START( honeydol )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(honeydol_readmem,honeydol_writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
@@ -1696,13 +1696,13 @@ static MACHINE_DRIVER_START( twinadv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000) // or 12
 	MDRV_CPU_PROGRAM_MAP(twinadv_readmem,twinadv_writemem)
-	MDRV_CPU_VBLANK_INT(snowbros_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(twinadv_sound_readmem,twinadv_sound_writemem)
 	MDRV_CPU_IO_MAP(twinadv_sound_readport,twinadv_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1777,7 +1777,7 @@ static MACHINE_DRIVER_START( snowbro3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
-	MDRV_CPU_VBLANK_INT(snowbro3_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

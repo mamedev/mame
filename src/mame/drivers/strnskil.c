@@ -337,11 +337,11 @@ static MACHINE_DRIVER_START( strnskil )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem1,strnskil_writemem1)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem2,strnskil_writemem2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_INTERLEAVE(100)
 

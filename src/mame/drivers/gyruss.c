@@ -56,6 +56,7 @@ and 1 SFX channel controlled by an 8039:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -366,11 +367,11 @@ static MACHINE_DRIVER_START( gyruss )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(m6809_readmem,m6809_writemem)
-	MDRV_CPU_VBLANK_INT(gyruss_6809_interrupt,256)
+	MDRV_CPU_VBLANK_INT_HACK(gyruss_6809_interrupt,256)
 
 	MDRV_CPU_ADD(Z80,14318180/4)
 	/* audio CPU */	/* 3.579545 MHz */

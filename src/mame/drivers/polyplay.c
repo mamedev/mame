@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_CPU_PROGRAM_MAP(polyplay_map,0)
 	MDRV_CPU_IO_MAP(polyplay_io_map,0)
 	MDRV_CPU_PERIODIC_INT(periodic_interrupt,75)
-	MDRV_CPU_VBLANK_INT(coin_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", coin_interrupt)
 
 	MDRV_MACHINE_RESET(polyplay)
 

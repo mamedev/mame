@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( ttchamp )
 	MDRV_CPU_ADD(V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ttchamp_map, 0)
 	MDRV_CPU_IO_MAP(ttchamp_io,0)
-	MDRV_CPU_VBLANK_INT(ttchamp_irq,1)
+	MDRV_CPU_VBLANK_INT("main", ttchamp_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

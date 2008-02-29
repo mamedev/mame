@@ -845,7 +845,7 @@ static MACHINE_DRIVER_START( hangon_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(hangon_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD_TAG("sub", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( sharrier_base )
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("main", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(sharrier_map,0)
-	MDRV_CPU_VBLANK_INT(i8751_main_cpu_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", i8751_main_cpu_vblank)
 
 	MDRV_CPU_REPLACE("sub", M68000, MASTER_CLOCK_10MHz)
 
@@ -999,7 +999,7 @@ static MACHINE_DRIVER_START( sharrier )
 	MDRV_CPU_ADD_TAG("mcu", I8751, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
 MACHINE_DRIVER_END
 
 

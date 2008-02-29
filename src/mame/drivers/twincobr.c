@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( twincobr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
-	MDRV_CPU_VBLANK_INT(twincobr_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", twincobr_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)			/* 3.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)

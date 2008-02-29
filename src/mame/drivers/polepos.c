@@ -882,15 +882,15 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_CPU_ADD(Z80, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 	MDRV_CPU_IO_MAP(z80_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,2)	/* 64V */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
 	MDRV_CPU_ADD(Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)

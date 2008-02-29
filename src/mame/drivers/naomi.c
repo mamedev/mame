@@ -774,7 +774,7 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
 	MDRV_CPU_IO_MAP(naomi_port,0)
-	MDRV_CPU_VBLANK_INT(naomi_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", naomi_vblank)
 
 	MDRV_CPU_ADD_TAG("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)

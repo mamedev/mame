@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( bishi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(bishi_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(bishi_interrupt, 2)
 
 	MDRV_MACHINE_START(bishi)
 	MDRV_MACHINE_RESET(bishi)

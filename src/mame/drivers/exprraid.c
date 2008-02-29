@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( exprraid )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
-	MDRV_CPU_VBLANK_INT(exprraid_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", exprraid_interrupt)
 
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)

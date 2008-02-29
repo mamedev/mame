@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( shootout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 2000000)	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(shootout_interrupt,1) /* nmi's are triggered at coin up */
+	MDRV_CPU_VBLANK_INT("main", shootout_interrupt) /* nmi's are triggered at coin up */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -340,7 +340,7 @@ static MACHINE_DRIVER_START( shootouj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 2000000)	/* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem_alt,writemem_alt)
-	MDRV_CPU_VBLANK_INT(shootout_interrupt,1) /* nmi's are triggered at coin up */
+	MDRV_CPU_VBLANK_INT("main", shootout_interrupt) /* nmi's are triggered at coin up */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

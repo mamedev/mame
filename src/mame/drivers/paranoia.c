@@ -34,6 +34,7 @@ HuC6280A (Hudson)
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
@@ -132,7 +133,7 @@ static MACHINE_DRIVER_START( paranoia )
 	MDRV_CPU_ADD(H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem, 0)
 	MDRV_CPU_IO_MAP(pce_io, 0)
-	MDRV_CPU_VBLANK_INT(pce_interrupt, VDC_LPF)
+	MDRV_CPU_VBLANK_INT_HACK(pce_interrupt, VDC_LPF)
 
 	MDRV_INTERLEAVE(1)
 

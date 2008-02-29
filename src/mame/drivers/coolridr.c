@@ -178,14 +178,14 @@ static MACHINE_RESET ( coolridr )
 static MACHINE_DRIVER_START( coolridr )
 	MDRV_CPU_ADD_TAG("main", SH2, 28000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map,0)
-	MDRV_CPU_VBLANK_INT(system_h1, 2)
+	MDRV_CPU_VBLANK_INT_HACK(system_h1, 2)
 
 	MDRV_CPU_ADD_TAG("sound", M68000, 12000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_sound_map,0)
 
 	MDRV_CPU_ADD_TAG("sub", SH2, 8000000)	// SH7032 HD6417032F20!! ?? mhz
 	MDRV_CPU_PROGRAM_MAP(coolridr_submap,0)
-	MDRV_CPU_VBLANK_INT(system_h1_sub, 2)
+	MDRV_CPU_VBLANK_INT_HACK(system_h1_sub, 2)
 
 	MDRV_GFXDECODE(coolridr)
 

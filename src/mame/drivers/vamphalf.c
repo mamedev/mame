@@ -584,7 +584,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( common )
 	MDRV_CPU_ADD_TAG("main", E116T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46_vamphalf)
 

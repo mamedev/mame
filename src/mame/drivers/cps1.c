@@ -3466,7 +3466,7 @@ static MACHINE_DRIVER_START( cps1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(cps1_readmem,cps1_writemem)
-	MDRV_CPU_VBLANK_INT(cps1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
 	/* audio CPU */
@@ -3520,7 +3520,7 @@ static MACHINE_DRIVER_START( qsound )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1)
 	MDRV_CPU_REPLACE("main", M68000, 12000000)
-	MDRV_CPU_VBLANK_INT(cps1_qsound_interrupt,1)  /* ??? interrupts per frame */
+	MDRV_CPU_VBLANK_INT("main", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
 	MDRV_CPU_REPLACE("sound", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)

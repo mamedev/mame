@@ -2018,7 +2018,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dfeveron_readmem,dfeveron_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2057,7 +2057,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(ddonpach_readmem,ddonpach_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2096,7 +2096,7 @@ static MACHINE_DRIVER_START( donpachi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(donpachi_readmem,donpachi_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2140,7 +2140,7 @@ static MACHINE_DRIVER_START( esprade )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(esprade_readmem,esprade_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2178,7 +2178,7 @@ static MACHINE_DRIVER_START( gaia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(gaia_readmem,gaia_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 
@@ -2215,7 +2215,7 @@ static MACHINE_DRIVER_START( guwange )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(guwange_readmem,guwange_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(cave)
@@ -2252,7 +2252,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(hotdogst_readmem,hotdogst_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
@@ -2307,7 +2307,7 @@ static MACHINE_DRIVER_START( korokoro )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(korokoro_readmem,korokoro_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_MACHINE_RESET(cave)
 	MDRV_NVRAM_HANDLER(korokoro)
@@ -2346,7 +2346,7 @@ static MACHINE_DRIVER_START( mazinger )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(mazinger_readmem,mazinger_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 //  /* audio CPU */ // Bidirectional communication
@@ -2403,7 +2403,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,32000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(metmqstr_readmem,metmqstr_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000 / 4)
 	/* audio CPU */
@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(pwrinst2_readmem,pwrinst2_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000 / 2)
 	/* audio CPU */	/* 8 MHz */
@@ -2521,7 +2521,7 @@ static MACHINE_DRIVER_START( sailormn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(sailormn_readmem,sailormn_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 //  /* audio CPU */ // Bidirectional Communication
@@ -2576,7 +2576,7 @@ static MACHINE_DRIVER_START( uopoko )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(uopoko_readmem,uopoko_writemem)
-	MDRV_CPU_VBLANK_INT(cave_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
 	MDRV_NVRAM_HANDLER(cave)
 

@@ -788,7 +788,7 @@ static MACHINE_DRIVER_START( renegade )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12000000/8)	/* 1.5 MHz (measured) */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
-	MDRV_CPU_VBLANK_INT(renegade_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
 	MDRV_CPU_ADD(M6809, 12000000/8)
 	/* audio CPU */

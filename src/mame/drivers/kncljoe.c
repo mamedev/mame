@@ -175,7 +175,7 @@ static MACHINE_DRIVER_START( kncljoe )
 //  MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz */
 	MDRV_CPU_ADD(Z80, 5500000) /* 4 MHz is too low. The game loop never finishes a frame in time. */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

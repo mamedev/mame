@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_CPU_ADD_TAG("main",Z80,2500000)		 /* ?? */
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(merit)

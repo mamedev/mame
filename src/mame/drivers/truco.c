@@ -151,7 +151,7 @@ static MACHINE_DRIVER_START( truco )
 	MDRV_CPU_ADD(M6809, 750000)        /* ?? guess */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
-	MDRV_CPU_VBLANK_INT(truco_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", truco_interrupt)
 
 	MDRV_MACHINE_RESET(truco)
 

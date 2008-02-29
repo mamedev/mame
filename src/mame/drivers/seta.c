@@ -6686,11 +6686,11 @@ static MACHINE_DRIVER_START( tndrcade )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(tndrcade_readmem,tndrcade_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(tndrcade_sub_readmem,tndrcade_sub_writemem)
-	MDRV_CPU_VBLANK_INT(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6736,11 +6736,11 @@ static MACHINE_DRIVER_START( twineagl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(twineagl_sub_readmem,twineagl_sub_writemem)
-	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6778,11 +6778,11 @@ static MACHINE_DRIVER_START( downtown )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(downtown_sub_readmem,downtown_sub_writemem)
-	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6838,11 +6838,11 @@ static MACHINE_DRIVER_START( usclssic )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(usclssic_readmem,usclssic_writemem)
-	MDRV_CPU_VBLANK_INT(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* NMI caused by main cpu when writing to the sound latch */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6883,11 +6883,11 @@ static MACHINE_DRIVER_START( calibr50 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_readmem,calibr50_writemem)
-	MDRV_CPU_VBLANK_INT(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* IRQ: 4/frame
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
 
 	/* video hardware */
@@ -6925,11 +6925,11 @@ static MACHINE_DRIVER_START( metafox )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(downtown_readmem,downtown_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	MDRV_CPU_ADD(M65C02, 16000000/8)	/* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(metafox_sub_readmem,metafox_sub_writemem)
-	MDRV_CPU_VBLANK_INT(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6968,7 +6968,7 @@ static MACHINE_DRIVER_START( atehate )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(atehate_readmem,atehate_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7010,7 +7010,7 @@ static MACHINE_DRIVER_START( blandia )
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blandia_readmem,blandia_writemem)
 
-	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7042,7 +7042,7 @@ static MACHINE_DRIVER_START( blandiap )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blandiap_readmem,blandiap_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7079,7 +7079,7 @@ static MACHINE_DRIVER_START( blockcar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(blockcar_readmem,blockcar_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7114,7 +7114,7 @@ static MACHINE_DRIVER_START( daioh )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(daioh_readmem,daioh_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7154,7 +7154,7 @@ static MACHINE_DRIVER_START( drgnunit )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnunit_readmem,drgnunit_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7188,7 +7188,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnunit_readmem,drgnunit_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7224,7 +7224,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7264,7 +7264,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(extdwnhl_readmem,extdwnhl_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7317,10 +7317,10 @@ static MACHINE_DRIVER_START( gundhara )
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 #if	__uPD71054_TIMER
-//  MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+//  MDRV_CPU_VBLANK_INT("main", wrofaero_interrupt)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 #else
-	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
@@ -7365,7 +7365,7 @@ static MACHINE_DRIVER_START( jjsquawk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7401,7 +7401,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(kamenrid_readmem,kamenrid_writemem)
-	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
 	MDRV_MACHINE_RESET( wrofaero )
@@ -7441,7 +7441,7 @@ static MACHINE_DRIVER_START( orbs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14318180/2)	/* 7.143 MHz */
 	MDRV_CPU_PROGRAM_MAP(orbs_readmem,orbs_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7476,7 +7476,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(krzybowl_readmem,krzybowl_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7512,7 +7512,7 @@ static MACHINE_DRIVER_START( madshark )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(madshark_readmem,madshark_writemem)
-	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", wrofaero_interrupt)
 
 #if	__uPD71054_TIMER
 	MDRV_MACHINE_RESET( wrofaero )
@@ -7555,9 +7555,9 @@ static MACHINE_DRIVER_START( msgundam )
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(msgundam_readmem,msgundam_writemem)
 #if	__uPD71054_TIMER
-	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", wrofaero_interrupt)
 #else
-	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
@@ -7599,7 +7599,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(oisipuzl_readmem,oisipuzl_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7635,7 +7635,7 @@ static MACHINE_DRIVER_START( triplfun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(triplfun_readmem,triplfun_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7669,7 +7669,7 @@ static MACHINE_DRIVER_START( kiwame )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(kiwame_readmem,kiwame_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* lev 1-7 are the same. WARNING:
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)/* lev 1-7 are the same. WARNING:
                                    the interrupt table is written to. */
 
 	/* video hardware */
@@ -7708,7 +7708,7 @@ static MACHINE_DRIVER_START( rezon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7746,7 +7746,7 @@ static MACHINE_DRIVER_START( thunderl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7777,7 +7777,7 @@ static MACHINE_DRIVER_START( wiggie )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(wiggie_sound_readmem,wiggie_sound_writemem)
@@ -7810,7 +7810,7 @@ static MACHINE_DRIVER_START( wits )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(thunderl_readmem,thunderl_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7846,7 +7846,7 @@ static MACHINE_DRIVER_START( umanclub )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(umanclub_readmem,umanclub_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -7881,7 +7881,7 @@ static MACHINE_DRIVER_START( utoukond )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(utoukond_readmem,utoukond_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz */
 	/* audio CPU */
@@ -7927,9 +7927,9 @@ static MACHINE_DRIVER_START( wrofaero )
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
 #if	__uPD71054_TIMER
-	MDRV_CPU_VBLANK_INT( wrofaero_interrupt, 1 )
+	MDRV_CPU_VBLANK_INT("main", wrofaero_interrupt)
 #else
-	MDRV_CPU_VBLANK_INT(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_2_and_4,SETA_INTERRUPTS_NUM)
 #endif	// __uPD71054_TIMER
 
 #if	__uPD71054_TIMER
@@ -7976,7 +7976,7 @@ static MACHINE_DRIVER_START( zingzip )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,wrofaero_writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -8011,7 +8011,7 @@ static MACHINE_DRIVER_START( pairlove )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000/2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pairlove_readmem,pairlove_writemem)
-	MDRV_CPU_VBLANK_INT(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -8055,7 +8055,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(crazyfgt_map,0)
-	MDRV_CPU_VBLANK_INT(crazyfgt_interrupt,1+5)
+	MDRV_CPU_VBLANK_INT_HACK(crazyfgt_interrupt,1+5)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -8114,7 +8114,7 @@ static MACHINE_DRIVER_START( inttoote )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(inttoote_map,0)
-	MDRV_CPU_VBLANK_INT(inttoote_interrupt,8+1+1+1)
+	MDRV_CPU_VBLANK_INT_HACK(inttoote_interrupt,8+1+1+1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

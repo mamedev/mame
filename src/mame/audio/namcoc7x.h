@@ -37,13 +37,13 @@ static const struct C352interface namcoc7x_c352_interface =	\
 	MDRV_CPU_ADD_TAG("mcu", M37702, clock)	\
 	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_map, 0)	\
 	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
-	MDRV_CPU_VBLANK_INT(namcoc7x_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_MCU_SHARED(clock)	\
 	MDRV_CPU_ADD_TAG("mcu", M37702, clock)	\
 	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map, 0)	\
 	MDRV_CPU_IO_MAP(namcoc7x_mcu_io, 0)	\
-	MDRV_CPU_VBLANK_INT(namcoc7x_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_SOUND(clock)	\
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")	\

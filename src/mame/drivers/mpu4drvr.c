@@ -1627,7 +1627,7 @@ static MACHINE_DRIVER_START( mpu4_vid )
 
 	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
-	MDRV_CPU_VBLANK_INT(mpu4_vid_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mpu4_vid_irq)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				// confirm
 
@@ -1676,7 +1676,7 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)					// generate 50 hz signal
 
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)

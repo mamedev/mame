@@ -214,7 +214,6 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_CPU_ADD_TAG("sound", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
-	MDRV_CPU_VBLANK_INT(NULL, 0)
 
 	MDRV_INTERLEAVE(400)
 

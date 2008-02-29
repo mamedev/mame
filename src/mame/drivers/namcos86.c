@@ -1066,16 +1066,16 @@ static MACHINE_DRIVER_START( hopmappy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu1", M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD_TAG("cpu2", M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(hopmappy_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD_TAG("mcu", HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(hopmappy_mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_INTERLEAVE(800)	/* heavy interleaving needed to avoid hangs in rthunder */
 

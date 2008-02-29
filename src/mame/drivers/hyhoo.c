@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( hyhoo )
 	MDRV_CPU_ADD(Z80, 5000000/1)	/* 5.00 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem_hyhoo, writemem_hyhoo)
 	MDRV_CPU_IO_MAP(readport_hyhoo, writeport_hyhoo)
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)

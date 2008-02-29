@@ -524,7 +524,7 @@ static MACHINE_DRIVER_START( xmen )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(xmen_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,8000000)	/* verified with M1, guessed but accurate */
 	/* audio CPU */	/* ????? */
@@ -592,7 +592,7 @@ static MACHINE_DRIVER_START( xmen6p )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem6p,writemem6p)
-	MDRV_CPU_VBLANK_INT(xmen6p_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(xmen6p_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,8000000)	/* verified with M1, guessed but accurate */
 	/* audio CPU */	/* ????? */

@@ -759,6 +759,59 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 						}
 					}
 				}
+
+			/* validate the interrupts */
+			if (cpu->vblank_interrupt != NULL)
+			{
+				if (cpu->vblank_interrupts_per_frame == 0)
+				{
+					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, cpunum);
+					error = TRUE;
+				}
+				else if (cpu->vblank_interrupts_per_frame == 1)
+				{
+					if (cpu->vblank_interrupt_screen == NULL)
+					{
+						mame_printf_error("%s: %s cpu #%d has a valid VBLANK interrupt handler with no screen tag supplied!\n", driver->source_file, driver->name, cpunum);
+						error = TRUE;
+					}
+					else
+					{
+						int screen_tag_found = FALSE;
+						const device_config *device;
+
+						/* loop over screens looking for the tag */
+						for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
+							if (strcmp(device->tag, cpu->vblank_interrupt_screen) == 0)
+							{
+								screen_tag_found = TRUE;
+								break;
+							}
+
+						if (!screen_tag_found)
+						{
+							mame_printf_error("%s: %s cpu #%d VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, cpunum, cpu->vblank_interrupt_screen);
+							error = TRUE;
+						}
+					}
+				}
+			}
+			else if (cpu->vblank_interrupts_per_frame != 0)
+			{
+				mame_printf_error("%s: %s cpu #%d has no VBLANK interrupt handler but a non-0 interrupt count is given!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
+
+			if ((cpu->timed_interrupt != NULL) && (cpu->timed_interrupt_period == 0))
+			{
+				mame_printf_error("%s: %s cpu #%d has a timer interrupt handler with 0 period!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
+			else if ((cpu->timed_interrupt == NULL) && (cpu->timed_interrupt_period != 0))
+			{
+				mame_printf_error("%s: %s cpu #%d has a no timer interrupt handler but has a non-0 period given!\n", driver->source_file, driver->name, cpunum);
+				error = TRUE;
+			}
 		}
 	}
 

@@ -709,7 +709,7 @@ static INTERRUPT_GEN(srmp6_interrupt)
 static MACHINE_DRIVER_START( srmp6 )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6,0)
-	MDRV_CPU_VBLANK_INT(srmp6_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(srmp6_interrupt,2)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

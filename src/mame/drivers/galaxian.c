@@ -4321,7 +4321,7 @@ static MACHINE_DRIVER_START( gmgalax )
 	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gmgalax_readmem,galaxian_writemem)
-	MDRV_CPU_VBLANK_INT(gmgalax_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", gmgalax_vh_interrupt)
 
 	/* video hardware */
 	MDRV_GFXDECODE(gmgalax)
@@ -4543,7 +4543,7 @@ static MACHINE_DRIVER_START( checkman )
 	/* audio CPU */	/* 1.62 MHz */
 	MDRV_CPU_PROGRAM_MAP(checkman_sound_readmem,checkman_sound_writemem)
 	MDRV_CPU_IO_MAP(checkman_sound_readport,checkman_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* NMIs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+2+64)	/* 32 for the characters, 2 for the bullets, 64 for the stars */
@@ -4570,7 +4570,7 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_CPU_ADD(Z80, 1620000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_readmem,checkmaj_sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,32)	/* NMIs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,32)	/* NMIs are triggered by the main CPU */
 
 
 	/* video hardware */
@@ -4594,7 +4594,7 @@ static MACHINE_DRIVER_START( dingoe )
 	/* audio CPU */	/* 1.62 MHz */
 	MDRV_CPU_PROGRAM_MAP(checkman_sound_readmem,checkman_sound_writemem)
 	MDRV_CPU_IO_MAP(checkman_sound_readport,checkman_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* NMIs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+2+64)	/* 32 for the characters, 2 for the bullets, 64 for the stars */
@@ -4717,7 +4717,7 @@ static MACHINE_DRIVER_START( ozon1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(ozon1_readmem,ozon1_writemem)
 	MDRV_CPU_IO_MAP(0,ozon1_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(NULL)
 
@@ -4735,7 +4735,7 @@ static MACHINE_DRIVER_START( drivfrcg )
 	MDRV_CPU_ADD(S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(drivfrcg,0)
 	MDRV_CPU_IO_MAP(drivfrcg_io,0)
-	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -4781,7 +4781,7 @@ static MACHINE_DRIVER_START( hunchbkg )
 	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(hunchbkg,0)
 	MDRV_CPU_IO_MAP(hunchbkg_io,0)
-	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */
@@ -4807,7 +4807,7 @@ static MACHINE_DRIVER_START( harem )
 	MDRV_IMPORT_FROM(galaxian_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(harem_cpu1,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 1620000)
 	/* audio CPU */
@@ -4844,7 +4844,7 @@ static MACHINE_DRIVER_START( racknrol )
 	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(racknrol_io,0)
-	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
@@ -4902,7 +4902,7 @@ static MACHINE_DRIVER_START( hexpoola )
 	MDRV_CPU_ADD(S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(hexpoola_io,0)
-	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)

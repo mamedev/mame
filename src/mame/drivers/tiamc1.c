@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 	MDRV_CPU_PROGRAM_MAP(tiamc1_readmem,tiamc1_writemem)
 	MDRV_CPU_IO_MAP(tiamc1_readport,tiamc1_writeport)
 
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_MACHINE_RESET(tiamc1)
 

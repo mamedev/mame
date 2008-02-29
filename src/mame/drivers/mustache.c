@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( mustache )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_VBLANK_INT(assert_irq,1)
+	MDRV_CPU_VBLANK_INT("main", assert_irq)
 
 	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80, T5182_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)

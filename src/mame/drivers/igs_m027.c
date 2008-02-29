@@ -368,7 +368,7 @@ static MACHINE_DRIVER_START( igs_majhong )
 
 	MDRV_CPU_PROGRAM_MAP(igs_majhong_map,0)
 
-	MDRV_CPU_VBLANK_INT(igs_majhong_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", igs_majhong_interrupt)
 	//MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_GFXDECODE(igs_m027)

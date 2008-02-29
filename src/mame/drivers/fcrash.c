@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( fcrash )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fcrash_readmem,fcrash_writemem)
-	MDRV_CPU_VBLANK_INT(cps1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
 //  MDRV_CPU_ADD_TAG("sound", Z80, 4000000) /* ???? */
 //  /* audio CPU */

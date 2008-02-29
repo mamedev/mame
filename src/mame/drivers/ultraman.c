@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( ultraman )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)		/* 12 MHz? */
 	MDRV_CPU_PROGRAM_MAP(ultraman_readmem,ultraman_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,24000000/6)
 	/* audio CPU */		/* 4 MHz? */

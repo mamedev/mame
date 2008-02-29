@@ -195,7 +195,7 @@ static const struct YM2610interface ym2610_interface =
 static MACHINE_DRIVER_START( drill )
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map,0)
-	MDRV_CPU_VBLANK_INT(drill_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", drill_interrupt)
 	MDRV_GFXDECODE(2mindril)
 
 	MDRV_SCREEN_ADD("main", RASTER)

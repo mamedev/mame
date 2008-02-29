@@ -489,7 +489,7 @@ static MACHINE_DRIVER_START( backfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(backfire_map,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("left", deco32_vbl_interrupt)	/* or is it "right?" */
 
 	MDRV_NVRAM_HANDLER(93C46)
 

@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000N-12 */
 	MDRV_CPU_PROGRAM_MAP(sandscrp,0)
-	MDRV_CPU_VBLANK_INT(sandscrp_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", sandscrp_interrupt)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
 	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem,0)

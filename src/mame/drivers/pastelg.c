@@ -204,8 +204,8 @@ static MACHINE_DRIVER_START( pastelg )
 	MDRV_CPU_ADD(Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_pastelg, writemem_pastelg)
 	MDRV_CPU_IO_MAP(readport_pastelg, writeport_pastelg)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)

@@ -368,6 +368,15 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_CPU_VBLANK_INT:
 				assert(cpu != NULL);
 				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
+				cpu->vblank_interrupt_screen = TOKEN_GET_STRING(tokens);
+				cpu->vblank_interrupt = TOKEN_GET_PTR(tokens, interrupt);
+				cpu->vblank_interrupts_per_frame = 1;
+				break;
+
+			case MCONFIG_TOKEN_CPU_VBLANK_INT_HACK:
+				assert(cpu != NULL);
+				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, cpu->vblank_interrupts_per_frame, 24);
 				cpu->vblank_interrupt = TOKEN_GET_PTR(tokens, interrupt);
 				break;

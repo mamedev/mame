@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( shougi )
 
 	MDRV_CPU_ADD(Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(shougi_vblank_nmi,1)
+	MDRV_CPU_VBLANK_INT("main", shougi_vblank_nmi)
 
 	MDRV_CPU_ADD(Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)

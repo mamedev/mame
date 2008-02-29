@@ -599,17 +599,17 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_CPU_ADD(Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_IO_MAP(master_io_map, 0)
-	MDRV_CPU_VBLANK_INT(master_interrupt, 2)	// nmi caused by sub cpu?, ?
+	MDRV_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
 
 	MDRV_CPU_ADD(Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
-	MDRV_CPU_VBLANK_INT(slave_interrupt, 2)		// nmi caused by main cpu, ?
+	MDRV_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
 
 	MDRV_CPU_ADD(Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)		// nmi are caused by sub cpu writing a sound command
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
 	MDRV_INTERLEAVE(100)	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches

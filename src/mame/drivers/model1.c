@@ -1534,7 +1534,7 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_CPU_ADD(V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_mem, 0)
 	MDRV_CPU_IO_MAP(model1_io, 0)
-	MDRV_CPU_VBLANK_INT(model1_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
 	MDRV_CPU_ADD(M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
@@ -1580,7 +1580,7 @@ static MACHINE_DRIVER_START( model1_vr )
 	MDRV_CPU_ADD(V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_mem, 0)
 	MDRV_CPU_IO_MAP(model1_vr_io, 0)
-	MDRV_CPU_VBLANK_INT(model1_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
 	MDRV_CPU_ADD(M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)

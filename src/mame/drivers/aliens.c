@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( aliens )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(aliens_map,0)
-	MDRV_CPU_VBLANK_INT(aliens_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", aliens_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(aliens_sound_map,0)

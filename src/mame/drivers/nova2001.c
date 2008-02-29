@@ -118,6 +118,7 @@ e000 - e7ff        R/W      Work RAM
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "nova2001.h"
 
@@ -689,7 +690,7 @@ static MACHINE_DRIVER_START( nova2001 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
 	MDRV_CPU_PROGRAM_MAP(nova2001_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -722,11 +723,11 @@ static MACHINE_DRIVER_START( ninjakun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(ninjakun_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4) /* ? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4) /* ? */
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame */
 
@@ -764,7 +765,7 @@ static MACHINE_DRIVER_START( pkunwar )
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(pkunwar_map,0)
 	MDRV_CPU_IO_MAP(pkunwar_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -798,11 +799,11 @@ static MACHINE_DRIVER_START( raiders5 )
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu1_map,0)
 	MDRV_CPU_IO_MAP(raiders5_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(raiders5_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* ? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ? */
 
 	MDRV_INTERLEAVE(400)
 

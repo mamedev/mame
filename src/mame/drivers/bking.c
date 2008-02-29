@@ -444,7 +444,7 @@ static MACHINE_DRIVER_START( bking )
 	MDRV_CPU_ADD_TAG("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_map,0)
 	MDRV_CPU_IO_MAP(bking_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_6MHz/2)	/* 3 MHz */
 	/* audio CPU */

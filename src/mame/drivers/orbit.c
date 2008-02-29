@@ -264,7 +264,7 @@ static MACHINE_DRIVER_START( orbit )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
 	MDRV_CPU_PERIODIC_INT(orbit_interrupt, 240)
 
 	MDRV_MACHINE_RESET(orbit)

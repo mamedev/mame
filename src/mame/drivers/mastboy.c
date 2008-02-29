@@ -862,7 +862,7 @@ static MACHINE_DRIVER_START( mastboy )
 	MDRV_CPU_ADD_TAG("main", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(port_readmem,0)
-	MDRV_CPU_VBLANK_INT(mastboy_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", mastboy_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 

@@ -4139,7 +4139,7 @@ static MACHINE_DRIVER_START( NBMJDRV1 )
 	MDRV_CPU_CONFIG(daisy_chain_main)
 	MDRV_CPU_PROGRAM_MAP(readmem_sailorws, writemem_sailorws)
 	MDRV_CPU_IO_MAP(readport_sailorws, writeport_sailorws)
-	MDRV_CPU_VBLANK_INT(ctc0_trg1, 1)				/* vblank is connect to ctc triggfer */
+	MDRV_CPU_VBLANK_INT("main", ctc0_trg1)				/* vblank is connect to ctc triggfer */
 
 	MDRV_CPU_ADD(Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	/* audio CPU */

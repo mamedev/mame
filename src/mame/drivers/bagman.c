@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 
@@ -601,7 +601,7 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_readmem,pickin_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(pickin_readmem,pickin_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(bagman)
 

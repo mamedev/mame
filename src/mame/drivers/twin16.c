@@ -960,11 +960,11 @@ static MACHINE_DRIVER_START( twin16 )
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sub,writemem_sub)
-	MDRV_CPU_VBLANK_INT(CPUB_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUB_interrupt)
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(CPUA_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUA_interrupt)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( fround )
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fround_readmem,fround_writemem)
-	MDRV_CPU_VBLANK_INT(CPUA_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", CPUA_interrupt)
 
 	MDRV_INTERLEAVE(100)
 

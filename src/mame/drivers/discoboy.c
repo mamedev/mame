@@ -477,13 +477,13 @@ static MACHINE_DRIVER_START( discoboy )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-//  MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,32)
+//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

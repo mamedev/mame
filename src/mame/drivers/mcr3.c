@@ -1055,7 +1055,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
-	MDRV_CPU_VBLANK_INT(mcr_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)

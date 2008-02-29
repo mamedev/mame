@@ -833,7 +833,7 @@ static MACHINE_DRIVER_START( darius )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_readmem,darius_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */	/* 4 MHz ? */
@@ -841,7 +841,7 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_cpub_readmem,darius_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ? */
 	/* audio CPU */	/* ADPCM player using MSM5205 */

@@ -430,7 +430,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( mugsmash )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mugsmash_readmem,mugsmash_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* Guess */

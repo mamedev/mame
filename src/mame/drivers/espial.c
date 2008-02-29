@@ -315,12 +315,12 @@ static MACHINE_DRIVER_START( espial )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(espial_readmem,espial_writemem)
-	MDRV_CPU_VBLANK_INT(zodiac_master_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3072000)	/* 2 MHz?????? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
-	MDRV_CPU_VBLANK_INT(espial_sound_nmi_gen,4)
+	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
 	MDRV_MACHINE_RESET(espial)
 

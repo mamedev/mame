@@ -125,7 +125,7 @@ static MACHINE_DRIVER_START( cheekyms )
 	MDRV_CPU_ADD(Z80,5000000/2)  /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(addressmap,0)
 	MDRV_CPU_IO_MAP(portmap,0)
-	MDRV_CPU_VBLANK_INT(cheekyms_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cheekyms_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

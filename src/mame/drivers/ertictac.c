@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( ertictac )
 
 	MDRV_CPU_ADD(ARM, 16000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(ertictac_map,0)
-	MDRV_CPU_VBLANK_INT(ertictac_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ertictac_interrupt)
 
 	MDRV_MACHINE_RESET(ertictac)
 

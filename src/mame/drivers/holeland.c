@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( holeland )
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_CPU_ADD(Z80, 20000000/4)        /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(crzrally_readmem,crzrally_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/n8080.h"
 
 static unsigned shift_data;
@@ -78,7 +79,7 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_CPU_ADD(8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT(interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -103,7 +104,7 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_CPU_ADD(8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT(interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -128,7 +129,7 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_CPU_ADD(8080, 20160000 / 10)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT(interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt, 2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

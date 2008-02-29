@@ -598,7 +598,7 @@ static MACHINE_DRIVER_START( psikyo3v1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", SH2, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(ps3v1_readmem,ps3v1_writemem)
-	MDRV_CPU_VBLANK_INT(psikyosh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", psikyosh_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C56)
 

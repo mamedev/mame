@@ -266,7 +266,7 @@ static MACHINE_DRIVER_START( onetwo )
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz */
 	/* audio CPU */

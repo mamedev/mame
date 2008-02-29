@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( ssfindo )
 	MDRV_CPU_ADD(ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ssfindo_map,0)
 
-	MDRV_CPU_VBLANK_INT(ssfindo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)
 
 
@@ -636,7 +636,7 @@ static MACHINE_DRIVER_START( ppcar )
 	MDRV_CPU_ADD(ARM7, 54000000) // guess...
 	MDRV_CPU_PROGRAM_MAP(ppcar_map,0)
 
-	MDRV_CPU_VBLANK_INT(ssfindo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ssfindo_interrupt)
 	MDRV_MACHINE_RESET(ssfindo)
 
 

@@ -188,7 +188,7 @@ static MACHINE_DRIVER_START( hotblock )
 	MDRV_CPU_ADD(I8088, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hotblock_map, 0)
 	MDRV_CPU_IO_MAP(hotblock_io,0)
-	MDRV_CPU_VBLANK_INT(hotblocks_irq,1)
+	MDRV_CPU_VBLANK_INT("main", hotblocks_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

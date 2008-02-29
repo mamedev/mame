@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( chqflag )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem,chqflag_writemem)
-	MDRV_CPU_VBLANK_INT(chqflag_interrupt,16)	/* ? */
+	MDRV_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	/* audio CPU */	/* ? */

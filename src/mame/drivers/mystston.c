@@ -246,7 +246,7 @@ static MACHINE_DRIVER_START( mystston )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12000000/8)	// 1.5 MHz
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_VBLANK_INT(mystston_interrupt, 272)
+	MDRV_CPU_VBLANK_INT_HACK(mystston_interrupt, 272)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

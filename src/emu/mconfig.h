@@ -48,6 +48,7 @@ enum
 	MCONFIG_TOKEN_CPU_DATA_MAP,
 	MCONFIG_TOKEN_CPU_IO_MAP,
 	MCONFIG_TOKEN_CPU_VBLANK_INT,
+	MCONFIG_TOKEN_CPU_VBLANK_INT_HACK,
 	MCONFIG_TOKEN_CPU_PERIODIC_INT,
 
 	MCONFIG_TOKEN_DRIVER_DATA,
@@ -284,8 +285,9 @@ union _machine_config_token
 	TOKEN_PTR(voidptr, construct_map_##_map1), \
 	TOKEN_PTR(voidptr, construct_map_##_map2), \
 
-#define MDRV_CPU_VBLANK_INT(_func, _rate) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_VBLANK_INT, 8, _rate, 24), \
+#define MDRV_CPU_VBLANK_INT(_tag, _func) \
+	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_VBLANK_INT, 8), \
+	TOKEN_STRING(_tag), \
 	TOKEN_PTR(interrupt, _func),
 
 #define MDRV_CPU_PERIODIC_INT(_func, _rate)	\

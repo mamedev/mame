@@ -3000,7 +3000,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 
 	MDRV_CPU_ADD_TAG("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
-	MDRV_CPU_VBLANK_INT(adder2_vbl, 1)					// board has a VBL IRQ
+	MDRV_CPU_VBLANK_INT("ADDER", adder2_vbl)			// board has a VBL IRQ
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)

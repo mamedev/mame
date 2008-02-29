@@ -2406,7 +2406,7 @@ static MACHINE_DRIVER_START( hunchbks )
 	MDRV_CPU_REPLACE("main", S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(hunchbks_readmem,hunchbks_writemem)
 	MDRV_CPU_IO_MAP(hunchbks_readport,0)
-	MDRV_CPU_VBLANK_INT(hunchbks_vh_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

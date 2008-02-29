@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( 88games )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(k88games_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", k88games_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

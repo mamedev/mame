@@ -1735,9 +1735,6 @@ static INTERRUPT_GEN( cischeat_interrupt )
 }
 
 
-/* CPU # 2 & 3 */
-#define CISCHEAT_SUB_INTERRUPT_NUM	1
-
 /* CPU # 4 */
 #define CISCHEAT_SOUND_INTERRUPT_NUM	16
 
@@ -1752,20 +1749,20 @@ static MACHINE_DRIVER_START( bigrun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu1", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem,bigrun_writemem)
-	MDRV_CPU_VBLANK_INT(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
 
 	MDRV_CPU_ADD_TAG("cpu2", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem2,bigrun_writemem2)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,CISCHEAT_SUB_INTERRUPT_NUM)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD_TAG("cpu3", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem3,bigrun_writemem3)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,CISCHEAT_SUB_INTERRUPT_NUM)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", M68000, 6000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(bigrun_sound_readmem,bigrun_sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
 
 	MDRV_INTERLEAVE(20)
 
@@ -1898,7 +1895,7 @@ static MACHINE_DRIVER_START( scudhamm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_scudhamm,writemem_scudhamm)
-	MDRV_CPU_VBLANK_INT(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
@@ -1950,7 +1947,7 @@ static MACHINE_DRIVER_START( armchmp2 )
 	MDRV_IMPORT_FROM(scudhamm)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_armchmp2,writemem_armchmp2)
-	MDRV_CPU_VBLANK_INT(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
+	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
 MACHINE_DRIVER_END
 

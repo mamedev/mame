@@ -770,12 +770,12 @@ static MACHINE_DRIVER_START( witch )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main, 0)
-	MDRV_CPU_VBLANK_INT(witch_main_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", witch_main_interrupt)
 
 	/* 2nd z80 */
 	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_sub, 0)
-	MDRV_CPU_VBLANK_INT(witch_sub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", witch_sub_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

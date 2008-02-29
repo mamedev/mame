@@ -495,7 +495,7 @@ static MACHINE_DRIVER_START( mcatadv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_16MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_readmem,mcatadv_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_readmem,mcatadv_sound_writemem)

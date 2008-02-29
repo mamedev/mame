@@ -214,7 +214,7 @@ static MACHINE_DRIVER_START( mogura )
 	MDRV_CPU_ADD(Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_GFXDECODE(mogura)
 

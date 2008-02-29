@@ -284,7 +284,7 @@ static MACHINE_DRIVER_START( hexion )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,24000000/4)	/* Z80B 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(hexion_interrupt,3)	/* both IRQ and NMI are used */
+	MDRV_CPU_VBLANK_INT_HACK(hexion_interrupt,3)	/* both IRQ and NMI are used */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

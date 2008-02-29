@@ -1789,7 +1789,7 @@ static const struct mb86233_config tgp_config =
 static MACHINE_DRIVER_START( model2o )
 	MDRV_CPU_ADD(I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2o_mem)
- 	MDRV_CPU_VBLANK_INT(model2_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
@@ -1836,7 +1836,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model2a )
 	MDRV_CPU_ADD(I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2a_crx_mem)
- 	MDRV_CPU_VBLANK_INT(model2_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
@@ -1880,7 +1880,7 @@ static const sharc_config sharc_cfg =
 static MACHINE_DRIVER_START( model2b )
 	MDRV_CPU_ADD(I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2b_crx_mem)
- 	MDRV_CPU_VBLANK_INT(model2_interrupt,2)
+ 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)
@@ -1924,7 +1924,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( model2c )
 	MDRV_CPU_ADD(I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2_base_mem, model2c_crx_mem)
- 	MDRV_CPU_VBLANK_INT(model2c_interrupt,3)
+ 	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
 
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(model2_snd, 0)

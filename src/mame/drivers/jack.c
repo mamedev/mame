@@ -875,7 +875,7 @@ static MACHINE_DRIVER_START( jack )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 18000000/6)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) /* jack needs 1 or its too fast */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* jack needs 1 or its too fast */
 
 	MDRV_CPU_ADD(Z80,18000000/12)
 	/* audio CPU */	/* 1.5 MHz */
@@ -909,7 +909,7 @@ static MACHINE_DRIVER_START( tripool )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(jack)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
 MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( joinem_interrupts )
@@ -929,7 +929,7 @@ static MACHINE_DRIVER_START( joinem )
 	MDRV_IMPORT_FROM(jack)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
-	MDRV_CPU_VBLANK_INT(joinem_interrupts,3)
+	MDRV_CPU_VBLANK_INT_HACK(joinem_interrupts,3)
 
 	MDRV_GFXDECODE(joinem)
 	MDRV_PALETTE_LENGTH(0x100)
@@ -949,7 +949,7 @@ static MACHINE_DRIVER_START( loverboy )
 	MDRV_IMPORT_FROM(jack)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(joinem_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_GFXDECODE(joinem)
 	MDRV_PALETTE_LENGTH(0x100)

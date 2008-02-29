@@ -158,6 +158,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 
@@ -706,12 +707,12 @@ static MACHINE_DRIVER_START( wiz )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 14318000/8)	/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)	/* ??? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( pkscramble )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map,0)
-	//MDRV_CPU_VBLANK_INT(irq1_line_hold,1) /* only valid irq */
+	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* only valid irq */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_CPU_ADD(H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(battlera_readmem,battlera_writemem)
 	MDRV_CPU_IO_MAP(0,battlera_portwrite)
-	MDRV_CPU_VBLANK_INT(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
+	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MDRV_CPU_ADD(H6280,21477200/3)
 	/* audio CPU */

@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( sbasketb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1400000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318000/4)
 	/* audio CPU */	/* 3.5795 MHz */

@@ -281,11 +281,11 @@ static MACHINE_DRIVER_START( deadang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(deadang_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
 
 	MDRV_CPU_ADD(V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT(deadang_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 

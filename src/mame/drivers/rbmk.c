@@ -501,7 +501,7 @@ static NVRAM_HANDLER( syf )
 static MACHINE_DRIVER_START( rbmk )
 	MDRV_CPU_ADD_TAG("main", M68000, 22000000 /2)
 	MDRV_CPU_PROGRAM_MAP(rbmk_mem,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_GFXDECODE(rbmk)
 

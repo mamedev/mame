@@ -6,6 +6,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 #define NUM_PENS	(8)
@@ -183,7 +184,7 @@ static MACHINE_DRIVER_START( sstrangr )
 	MDRV_CPU_ADD_TAG("main",8080,1996800)	/* clock is a guess, taken from mw8080bw */
 	MDRV_CPU_PROGRAM_MAP(sstrangr_map,0)
 	MDRV_CPU_IO_MAP(sstrangr_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sstrangr)

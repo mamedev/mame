@@ -3028,8 +3028,8 @@ static MACHINE_DRIVER_START( gionbana )
 	MDRV_CPU_ADD_TAG("main", Z80, 20000000/4)	/* 5.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_gionbana, writemem_gionbana)
 	MDRV_CPU_IO_MAP(readport_gionbana, writeport_gionbana)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 132)    // nmiclock = 60
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 132)    // nmiclock = 60
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 
@@ -3093,7 +3093,7 @@ static MACHINE_DRIVER_START( mjcamerb )
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(readport_gionbana, writeport_hanamomo)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 142)    // ?
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // ?
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
@@ -3109,7 +3109,7 @@ static MACHINE_DRIVER_START( mmcamera )
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(readport_gionbana, writeport_hanamomo)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
@@ -3126,7 +3126,7 @@ static MACHINE_DRIVER_START( hanamomo )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_hanamomo, writemem_hanamomo)
 	MDRV_CPU_IO_MAP(readport_gionbana, writeport_hanamomo)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
@@ -3142,7 +3142,7 @@ static MACHINE_DRIVER_START( msjiken )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_gionbana, writemem_gionbana)
 	MDRV_CPU_IO_MAP(readport_gionbana, writeport_msjiken)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 142)    // nmiclock = 70
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 MACHINE_DRIVER_END
 
 
@@ -3153,7 +3153,7 @@ static MACHINE_DRIVER_START( telmahjn )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gionbana)
 	MDRV_CPU_MODIFY("main")
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 142)    // nmiclock = 70
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 
 	/* video hardware */
 	MDRV_VIDEO_START(nbmj8891_1layer)
@@ -3165,7 +3165,7 @@ static MACHINE_DRIVER_START( mgmen89 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(telmahjn)
 	MDRV_CPU_MODIFY("main")
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_DRIVER_END
 
 
@@ -3264,7 +3264,7 @@ static MACHINE_DRIVER_START( mjfocusm )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_scandalm, writemem_scandalm)
 	MDRV_CPU_IO_MAP(readport_scandalm, writeport_scandalm)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
@@ -3287,7 +3287,7 @@ static MACHINE_DRIVER_START( taiwanmb )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_taiwanmb, writemem_taiwanmb)
 	MDRV_CPU_IO_MAP(readport_taiwanmb, writeport_taiwanmb)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+//  MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_NVRAM_HANDLER(nb1413m3)
 

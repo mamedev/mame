@@ -1547,7 +1547,7 @@ static MACHINE_DRIVER_START( funworld )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M65SC02, MASTER_CLOCK/8)	// 2MHz
 	MDRV_CPU_PROGRAM_MAP(funworld_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -1630,7 +1630,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( snookr10 )
 	MDRV_CPU_ADD_TAG("main", M65SC02, MASTER_CLOCK/8)	// 2MHz
 	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	// video hardware
 

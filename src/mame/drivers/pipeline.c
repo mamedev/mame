@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( pipeline )
 
 	MDRV_CPU_ADD(Z80, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(cpu0_mem, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 7372800/2)
 	MDRV_CPU_CONFIG(daisy_chain_sound)

@@ -232,7 +232,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_CPU_ADD(Z80,MCLK/6)	/* 3.072MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(drmicro_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
 
 	MDRV_INTERLEAVE(1)
 

@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( kopunch )
 	MDRV_CPU_ADD(8080, 4000000)	/* 4 MHz ???? appears to use 8080 instructions, not z80 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
-	MDRV_CPU_VBLANK_INT(kopunch_interrupt,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

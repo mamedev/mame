@@ -820,7 +820,7 @@ static MACHINE_DRIVER_START( sf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */	/* ? xtal is 3.579545MHz */
@@ -889,7 +889,7 @@ static MACHINE_DRIVER_START( sfp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 MACHINE_DRIVER_END
 
 

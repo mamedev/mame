@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("mcu", NSC8105, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)

@@ -2032,7 +2032,7 @@ static MACHINE_DRIVER_START( tumblepb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_readmem,tumblepopb_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2062,7 +2062,7 @@ static MACHINE_DRIVER_START( tumbleb2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_readmem,tumblepopb_writemem)
-	MDRV_CPU_VBLANK_INT(tumbleb2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2091,7 +2091,7 @@ static MACHINE_DRIVER_START( jumpkids )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_readmem,jumpkids_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* z80? */
 	MDRV_CPU_ADD( Z80, 8000000/2)
@@ -2123,7 +2123,7 @@ static MACHINE_DRIVER_START( fncywld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fncywld_readmem,fncywld_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2181,7 +2181,7 @@ static MACHINE_DRIVER_START( htchctch )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 15000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(htchctch_readmem,htchctch_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD( Z80, 15000000/4) /* verified on dquizgo */
 
@@ -2258,7 +2258,7 @@ static MACHINE_DRIVER_START( jumppop )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jumppop_readmem,jumppop_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3500000) /* verified */
 	/* audio CPU */
@@ -2297,7 +2297,7 @@ static MACHINE_DRIVER_START( suprtrio )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
 	MDRV_CPU_PROGRAM_MAP(suprtrio_main_cpu,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	/* audio CPU */
@@ -2331,7 +2331,7 @@ static MACHINE_DRIVER_START( pangpang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pangpang_readmem,pangpang_writemem)
-	MDRV_CPU_VBLANK_INT(tumbleb2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

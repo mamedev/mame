@@ -553,7 +553,7 @@ static INTERRUPT_GEN( shadfrce_interrupt ) {
 static MACHINE_DRIVER_START( shadfrce )
 	MDRV_CPU_ADD(M68000, 28000000/2) /* ? Guess - CPU is rated for 16MHz */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_readmem,shadfrce_writemem)
-	MDRV_CPU_VBLANK_INT(shadfrce_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */

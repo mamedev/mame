@@ -837,7 +837,7 @@ static MACHINE_DRIVER_START( geebee )
 	MDRV_CPU_ADD_TAG("main", 8080,XTAL_18_432MHz/9) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_geebee,writemem_geebee)
 	MDRV_CPU_IO_MAP(readport_geebee,writeport_geebee)
-	MDRV_CPU_VBLANK_INT(irq0_line_pulse,1)	/* one interrupt per frame */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( bombbee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", 8080,18432000/9) 		/* 18.432 MHz / 9 */
 	MDRV_CPU_PROGRAM_MAP(readmem_bombbee,writemem_bombbee)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

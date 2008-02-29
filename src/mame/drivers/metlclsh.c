@@ -320,7 +320,7 @@ static MACHINE_DRIVER_START( metlclsh )
 
 	MDRV_CPU_ADD(M6809, 1500000)        // ?
 	MDRV_CPU_PROGRAM_MAP(metlclsh_readmem2, metlclsh_writemem2)
-	MDRV_CPU_VBLANK_INT(metlclsh_interrupt2,2)
+	MDRV_CPU_VBLANK_INT_HACK(metlclsh_interrupt2,2)
 	// IRQ by cpu #1, NMI by coins insertion
 
 	MDRV_MACHINE_RESET(metlclsh)

@@ -683,12 +683,12 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppking_cpu1_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(ppking_cpu2_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(M6809, XTAL_12MHz/16) /* verified on pcb */
 	/* audio CPU */
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map,0)
 	MDRV_CPU_IO_MAP(gladiatr_cpu1_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)

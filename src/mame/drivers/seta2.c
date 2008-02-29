@@ -1814,7 +1814,7 @@ static MACHINE_DRIVER_START( mj4simai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
 	MDRV_CPU_PROGRAM_MAP(mj4simai_readmem,mj4simai_writemem)
-	MDRV_CPU_VBLANK_INT(seta2_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", seta2_interrupt)
 
 	MDRV_MACHINE_RESET( tmp68301 )
 
@@ -1929,7 +1929,7 @@ static MACHINE_DRIVER_START( samshoot )
 	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(samshoot_map,0)
-	MDRV_CPU_VBLANK_INT(samshoot_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

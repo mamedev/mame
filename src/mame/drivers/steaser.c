@@ -82,7 +82,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( steaser )
 	MDRV_CPU_ADD_TAG("main", M68000, 11059200 )
 	MDRV_CPU_PROGRAM_MAP(steaser_map,0)
-//  MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+//  MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_GFXDECODE(steaser)
 

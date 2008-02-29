@@ -323,7 +323,7 @@ static MACHINE_DRIVER_START( timeplt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(timeplt_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", timeplt_interrupt)
 
 	MDRV_MACHINE_START(timeplt)
 

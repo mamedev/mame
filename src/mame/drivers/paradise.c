@@ -30,6 +30,7 @@ paradise: I'm not sure it's working correctly:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "paradise.h"
 #include "sound/okim6295.h"
 
@@ -539,7 +540,7 @@ static MACHINE_DRIVER_START( paradise )
 	MDRV_CPU_ADD_TAG("main", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MDRV_CPU_PROGRAM_MAP(paradise_map,0)
 	MDRV_CPU_IO_MAP(paradise_readport,paradise_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* No nmi routine */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

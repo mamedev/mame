@@ -752,7 +752,7 @@ static MACHINE_DRIVER_START( welltris )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(welltris_readmem,welltris_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)		/* 4 MHz ??? */
 	/* audio CPU */

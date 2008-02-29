@@ -1070,7 +1070,7 @@ static MACHINE_DRIVER_START( root )
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(cclimber_map,0)
 	MDRV_CPU_IO_MAP(cclimber_portmap,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(cclimber)
 
@@ -1173,7 +1173,7 @@ static MACHINE_DRIVER_START( swimmer )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(swimmer_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80,4000000/2)
 	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map,0)

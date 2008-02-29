@@ -29,6 +29,7 @@ SX008-14.BIN ; /
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
 #include "st0016.h"
@@ -624,11 +625,11 @@ static MACHINE_DRIVER_START( srmp5 )
 	MDRV_CPU_ADD_TAG("main",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-  MDRV_CPU_ADD(R3000LE, 40000000)
+	MDRV_CPU_ADD(R3000LE, 40000000)
 	MDRV_CPU_CONFIG(config)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,2)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem,0)
 
 

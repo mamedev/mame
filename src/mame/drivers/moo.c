@@ -629,7 +629,7 @@ static MACHINE_DRIVER_START( moo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(moo_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", moo_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
 	/* audio CPU */
@@ -673,7 +673,7 @@ static MACHINE_DRIVER_START( moobl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16100000)
 	MDRV_CPU_PROGRAM_MAP(readmembl,writemembl)
-	MDRV_CPU_VBLANK_INT(moobl_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", moobl_interrupt)
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)

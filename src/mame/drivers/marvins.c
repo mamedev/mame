@@ -513,11 +513,11 @@ static MACHINE_DRIVER_START( marvins )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3360000)	/* 3.36 MHz */
 	MDRV_CPU_PROGRAM_MAP(marvins_cpuA_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3360000)	/* 3.36 MHz */
 	MDRV_CPU_PROGRAM_MAP(marvins_cpuB_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4.0 MHz */
 	/* audio CPU */
@@ -563,11 +563,11 @@ static MACHINE_DRIVER_START( vangrd2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 3360000)	/* 3.36 MHz */
 	MDRV_CPU_PROGRAM_MAP(madcrash_cpuA_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("sub", Z80, 3360000)	/* 3.36 MHz */
 	MDRV_CPU_PROGRAM_MAP(madcrash_cpuB_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4.0 MHz */
 	/* audio CPU */
@@ -614,10 +614,10 @@ static MACHINE_DRIVER_START( madcrash )
 	MDRV_IMPORT_FROM( vangrd2 )
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(0, 0)
+	MDRV_CPU_VBLANK_INT_HACK(0, 0)
 
 	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_VBLANK_INT(snk_irq_BA, 1)
+	MDRV_CPU_VBLANK_INT("main", snk_irq_BA)
 
 	MDRV_INTERLEAVE(300)
 

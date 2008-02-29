@@ -7,6 +7,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/6522via.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
@@ -92,7 +93,7 @@ static MACHINE_DRIVER_START( beezer )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(beezer_interrupt,128)
+	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
 	MDRV_CPU_ADD(M6809, 1000000)        /* 1 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)

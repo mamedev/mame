@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( rainbow )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_readmem,rainbow_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_s_readmem,rainbow_s_writemem)
@@ -654,7 +654,7 @@ static MACHINE_DRIVER_START( jumping )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(jumping_readmem,jumping_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(jumping_sound_readmem,jumping_sound_writemem)

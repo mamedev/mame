@@ -1223,7 +1223,7 @@ static MACHINE_DRIVER_START( djmain )
 	//MDRV_CPU_ADD(M68EC020, 18432000/2)    /*  9.216 MHz!? */
 	MDRV_CPU_ADD(M68EC020, 32000000/4)	/*  8.000 MHz!? */
 	MDRV_CPU_PROGRAM_MAP(memory_map, 0)
-	MDRV_CPU_VBLANK_INT(vb_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", vb_interrupt)
 
 	MDRV_MACHINE_START(djmain)
 	MDRV_MACHINE_RESET(djmain)

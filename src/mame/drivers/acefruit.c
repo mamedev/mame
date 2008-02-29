@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( acefruit )
 	MDRV_CPU_PROGRAM_MAP(acefruit_map,0)
 	MDRV_CPU_IO_MAP(acefruit_io,0)
 	MDRV_GFXDECODE(acefruit)
-	MDRV_CPU_VBLANK_INT(acefruit_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", acefruit_vblank)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

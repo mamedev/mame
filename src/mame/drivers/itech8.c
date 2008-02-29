@@ -1764,7 +1764,7 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(tmslo_map,0)
-	MDRV_CPU_VBLANK_INT(generate_nmi,1)
+	MDRV_CPU_VBLANK_INT("main", generate_nmi)
 
 	MDRV_MACHINE_START(itech8)
 	MDRV_MACHINE_RESET(itech8)

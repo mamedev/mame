@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( stfight )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3000000)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-	MDRV_CPU_VBLANK_INT(stfight_vb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", stfight_vb_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* 3 MHz */

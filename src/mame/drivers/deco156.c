@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( hvysmsh )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(hvysmsh_map,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( wcvol95 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM, 28000000) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(wcvol95_map,0)
-	MDRV_CPU_VBLANK_INT(deco32_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C46)
 

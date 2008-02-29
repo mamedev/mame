@@ -9,6 +9,7 @@ Tomasz Slanina
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -479,7 +480,7 @@ static MACHINE_DRIVER_START( changela )
 
 	MDRV_CPU_ADD(Z80,5000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(chl_interrupt,4)
+	MDRV_CPU_VBLANK_INT_HACK(chl_interrupt,4)
 
 	MDRV_CPU_ADD(M68705,2500000)
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)

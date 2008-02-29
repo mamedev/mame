@@ -1150,7 +1150,7 @@ static MACHINE_DRIVER_START( sys903 )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

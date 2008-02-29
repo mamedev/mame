@@ -690,7 +690,7 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
 
-	MDRV_CPU_VBLANK_INT(dwarfd_interrupt,NUM_LINES+4) //16 +vblank + 1 unused
+	MDRV_CPU_VBLANK_INT_HACK(dwarfd_interrupt,NUM_LINES+4) //16 +vblank + 1 unused
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

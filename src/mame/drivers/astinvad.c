@@ -538,7 +538,7 @@ static MACHINE_DRIVER_START( spaceint )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK)        /* a guess */
 	MDRV_CPU_PROGRAM_MAP(spaceint_map,0)
 	MDRV_CPU_IO_MAP(spaceint_portmap,0)
-	MDRV_CPU_VBLANK_INT(spaceint_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", spaceint_interrupt)
 
 	/* video hardware */
 	MDRV_VIDEO_START(spaceint)

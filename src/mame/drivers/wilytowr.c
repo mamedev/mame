@@ -515,7 +515,7 @@ static MACHINE_DRIVER_START( wilytowr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(I8039,8000000)	/* ????? */
 	/* audio CPU */
@@ -552,7 +552,7 @@ static MACHINE_DRIVER_START( fghtbskt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 12000000/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(I8039,12000000/4)	/* ????? */
 	/* audio CPU */

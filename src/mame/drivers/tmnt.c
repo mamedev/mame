@@ -2329,7 +2329,7 @@ static MACHINE_DRIVER_START( cuebrick )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(cuebrick_main_map,0)
-	MDRV_CPU_VBLANK_INT(cuebrick_interrupt,10)
+	MDRV_CPU_VBLANK_INT_HACK(cuebrick_interrupt,10)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
@@ -2362,7 +2362,7 @@ static MACHINE_DRIVER_START( mia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/3)
 	MDRV_CPU_PROGRAM_MAP(mia_main_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(mia_audio_map,0)
@@ -2408,7 +2408,7 @@ static MACHINE_DRIVER_START( tmnt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/3)
 	MDRV_CPU_PROGRAM_MAP(tmnt_main_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(tmnt_audio_map,0)
@@ -2457,7 +2457,7 @@ static MACHINE_DRIVER_START( punkshot )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)
 	MDRV_CPU_PROGRAM_MAP(punkshot_main_map,0)
-	MDRV_CPU_VBLANK_INT(punkshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(punkshot_audio_map,0)
@@ -2496,7 +2496,7 @@ static MACHINE_DRIVER_START( lgtnfght )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/2)
 	MDRV_CPU_PROGRAM_MAP(lgtnfght_main_map,0)
-	MDRV_CPU_VBLANK_INT(lgtnfght_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(lgtnfght_audio_map,0)
@@ -2535,7 +2535,7 @@ static MACHINE_DRIVER_START( blswhstl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(blswhstl_main_map,0)
-	MDRV_CPU_VBLANK_INT(punkshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(ssriders_audio_map,0)
@@ -2595,7 +2595,7 @@ static MACHINE_DRIVER_START( glfgreat )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(glfgreat_main_map,0)
-	MDRV_CPU_VBLANK_INT(lgtnfght_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(glfgreat_audio_map,0)
@@ -2644,7 +2644,7 @@ static MACHINE_DRIVER_START( prmrsocr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(prmrsocr_main_map,0)
-	MDRV_CPU_VBLANK_INT(lgtnfght_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", lgtnfght_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	/* audio CPU */	/* ? */
@@ -2684,7 +2684,7 @@ static MACHINE_DRIVER_START( tmnt2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_32MHz/2)
 	MDRV_CPU_PROGRAM_MAP(tmnt2_main_map,0)
-	MDRV_CPU_VBLANK_INT(punkshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	/* audio CPU */	/* 8 MHz; clock is correct, but there's 1 cycle wait for ROM/RAM */
@@ -2731,7 +2731,7 @@ static MACHINE_DRIVER_START( ssriders )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_32MHz/2)
 	MDRV_CPU_PROGRAM_MAP(ssriders_main_map,0)
-	MDRV_CPU_VBLANK_INT(punkshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ????? makes the ROM test sync */
@@ -2774,7 +2774,7 @@ static MACHINE_DRIVER_START( sunsetbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(sunsetbl_main_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_NVRAM_HANDLER(eeprom)
 
@@ -2807,7 +2807,7 @@ static MACHINE_DRIVER_START( thndrx2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(thndrx2_main_map,0)
-	MDRV_CPU_VBLANK_INT(punkshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", punkshot_interrupt)
 
 	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(thndrx2_audio_map,0)

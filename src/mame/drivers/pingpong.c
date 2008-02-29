@@ -457,7 +457,7 @@ static MACHINE_DRIVER_START( pingpong )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
+	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( merlinmm )
 	MDRV_IMPORT_FROM( pingpong )
 	MDRV_CPU_MODIFY("cpu")
 	MDRV_CPU_PROGRAM_MAP(merlinmm_map,0)
-	MDRV_CPU_VBLANK_INT(pingpong_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END

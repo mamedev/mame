@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( jongkyo )
 	MDRV_CPU_ADD(Z80,JONGKYO_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(jongkyo_memmap,0)
 	MDRV_CPU_IO_MAP(jongkyo_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

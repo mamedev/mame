@@ -262,13 +262,13 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_CPU_ADD(Z80, 5000000)	/* 5.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(timelimt_irq,1)
+	MDRV_CPU_VBLANK_INT("main", timelimt_irq)
 
 	MDRV_CPU_ADD(Z80,18432000/6)
 	/* audio CPU */	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) /* ? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* ? */
 
 	MDRV_INTERLEAVE(50)
 

@@ -930,7 +930,7 @@ static MACHINE_DRIVER_START( hbarrel )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL, level 5 interrupts from i8751 */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -973,7 +973,7 @@ static MACHINE_DRIVER_START( baddudes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL, level 5 interrupts from i8751 */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -1016,7 +1016,7 @@ static MACHINE_DRIVER_START( birdtry )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL, level 5 interrupts from i8751 */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL, level 5 interrupts from i8751 */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( robocop )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -1107,7 +1107,7 @@ static MACHINE_DRIVER_START( robocopb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -1150,7 +1150,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(dec0_readmem,dec0_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
@@ -1198,7 +1198,7 @@ static MACHINE_DRIVER_START( slyspy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(slyspy_readmem,slyspy_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_12MHz/2/3)
 	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
@@ -1241,7 +1241,7 @@ static MACHINE_DRIVER_START( midres )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MDRV_CPU_PROGRAM_MAP(midres_readmem,midres_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(H6280, XTAL_24MHz/4/3)
 	/* audio CPU */ /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */

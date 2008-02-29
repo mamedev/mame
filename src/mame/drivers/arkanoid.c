@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", Z80, 6000000) /* 6 Mhz */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("mcu", M68705, 3000000) /* 3 Mhz */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)

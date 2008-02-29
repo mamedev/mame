@@ -534,7 +534,7 @@ static MACHINE_DRIVER_START( macrossp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 50000000/2)	/* 25 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1) // there are others ...
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold) // there are others ...
 
 	MDRV_CPU_ADD(M68000, 32000000/2)	/* 16 MHz */
 	/* audio CPU */

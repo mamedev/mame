@@ -396,12 +396,12 @@ static MACHINE_DRIVER_START( imolagp )
 	MDRV_CPU_ADD(Z80,8000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(imolagp_master,0)
 	MDRV_CPU_IO_MAP(readport_master,0)
-	MDRV_CPU_VBLANK_INT(master_interrupt,4)
+	MDRV_CPU_VBLANK_INT_HACK(master_interrupt,4)
 
 	MDRV_CPU_ADD(Z80,8000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(imolagp_slave,0)
 	MDRV_CPU_IO_MAP(readport_slave,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 

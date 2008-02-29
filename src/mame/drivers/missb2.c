@@ -368,17 +368,17 @@ static MACHINE_DRIVER_START( missb2 )
 	// basic machine hardware
 	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MAIN_XTAL/8)
 	/* audio CPU */	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-//  MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
-	MDRV_CPU_VBLANK_INT(missb2_interrupt, 1)
+//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("main", missb2_interrupt)
 
 	MDRV_INTERLEAVE(100) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 

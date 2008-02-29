@@ -310,7 +310,7 @@ static MACHINE_DRIVER_START( stactics )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 1933560)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(stactics_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", stactics_interrupt)
 
 	MDRV_MACHINE_START(stactics)
 

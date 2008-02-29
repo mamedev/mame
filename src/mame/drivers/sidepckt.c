@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( sidepckt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */        /* 1.5 MHz */
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( sidepctj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */        /* 1.5 MHz */

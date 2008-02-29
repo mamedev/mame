@@ -249,7 +249,7 @@ static MACHINE_DRIVER_START( darkmist )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_VBLANK_INT(darkmist_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
 
 	MDRV_CPU_ADD_TAG(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)

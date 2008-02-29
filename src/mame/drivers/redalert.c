@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( redalert )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_main_map,0)
-	MDRV_CPU_VBLANK_INT(redalert_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(redalert_video)
@@ -290,7 +290,7 @@ static MACHINE_DRIVER_START( demoneye )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(demoneye_main_map,0)
-	MDRV_CPU_VBLANK_INT(redalert_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(demoneye_video)

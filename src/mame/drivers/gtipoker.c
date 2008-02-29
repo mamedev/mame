@@ -58,7 +58,7 @@ static MACHINE_DRIVER_START( gtipoker )
 	MDRV_CPU_ADD(Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(gtipoker_memmap,0)
 	MDRV_CPU_IO_MAP(gtipoker_iomap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

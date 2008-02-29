@@ -164,7 +164,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6502, 12096000/12) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(nitedrvr_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
 
 	MDRV_MACHINE_RESET(nitedrvr)

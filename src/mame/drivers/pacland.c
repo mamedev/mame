@@ -415,12 +415,12 @@ static MACHINE_DRIVER_START( pacland )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 49152000/32)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_CPU_ADD(HD63701, 49152000/8)	/* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_INTERLEAVE(100)	/* we need heavy synching between the MCU and the CPU */
 

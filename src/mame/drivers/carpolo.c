@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( carpolo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,11289000/12)		/* 940.75 kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(carpolo_timer_interrupt,1)	/* this not strictly VBLANK,
+	MDRV_CPU_VBLANK_INT("main", carpolo_timer_interrupt)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
 	MDRV_MACHINE_START(carpolo)

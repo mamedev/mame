@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_CPU_ADD(8080, 2079000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(blockade_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

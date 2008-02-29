@@ -1535,7 +1535,7 @@ static MACHINE_DRIVER_START( sflush )
 	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("main",M6800,2000000)        /* ?? */
 	MDRV_CPU_PROGRAM_MAP(sflush_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_pulse,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sflush)
@@ -1775,7 +1775,7 @@ static MACHINE_DRIVER_START( polaris )
 	MDRV_CPU_PROGRAM_MAP(schaser_map,0)
 	MDRV_CPU_IO_MAP(polaris_io_map,0)
 	MDRV_WATCHDOG_VBLANK_INIT(255)
-	MDRV_CPU_VBLANK_INT(polaris_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", polaris_interrupt)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(polaris)
@@ -2515,7 +2515,7 @@ static MACHINE_DRIVER_START( darthvdr )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(darthvdr_map,0)
 	MDRV_CPU_IO_MAP(darthvdr_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_START(darthvdr)
 	MDRV_MACHINE_RESET(darthvdr)

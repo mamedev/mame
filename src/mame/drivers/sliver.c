@@ -533,7 +533,7 @@ static INTERRUPT_GEN( sliver_int )
 static MACHINE_DRIVER_START( sliver )
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sliver_map,0)
-	MDRV_CPU_VBLANK_INT(sliver_int,3)
+	MDRV_CPU_VBLANK_INT_HACK(sliver_int,3)
 
 	MDRV_CPU_ADD(I8051, 8000000)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)

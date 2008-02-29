@@ -762,7 +762,7 @@ static MACHINE_DRIVER_START( m10 )
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT(m10_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", m10_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -794,7 +794,7 @@ static MACHINE_DRIVER_START( m11 )
 	MDRV_CPU_REPLACE("main", M6502,IREMM10_CPU_CLOCK / 2)
 	//MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(m11_main,0)
-	MDRV_CPU_VBLANK_INT(m11_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", m11_interrupt)
 
 	/* sound hardware */
 MACHINE_DRIVER_END
@@ -809,7 +809,7 @@ static MACHINE_DRIVER_START( m15 )
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT(m15_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", m15_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

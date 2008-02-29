@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( galivan )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */		/* 4 MHz? */
@@ -604,7 +604,7 @@ static MACHINE_DRIVER_START( ninjemak )
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,ninjemak_writemem)
 	MDRV_CPU_IO_MAP(ninjemak_readport,ninjemak_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */		/* 4 MHz? */

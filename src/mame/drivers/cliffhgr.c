@@ -738,7 +738,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_CPU_ADD(Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT(cliff_vsync,1)
+	MDRV_CPU_VBLANK_INT("main", cliff_vsync)
 
 	MDRV_MACHINE_START(cliffhgr)
 	MDRV_MACHINE_RESET(cliffhgr)

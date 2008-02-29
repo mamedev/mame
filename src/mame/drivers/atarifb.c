@@ -103,6 +103,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "atarifb.h"
 #include "sound/discrete.h"
 
@@ -561,7 +562,7 @@ static MACHINE_DRIVER_START( atarifb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 750000)
 	MDRV_CPU_PROGRAM_MAP(atarifb_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

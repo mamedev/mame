@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( destroyr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(destroyr_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert, 4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert, 4)
 
 	MDRV_MACHINE_RESET(destroyr)
 

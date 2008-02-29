@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_CPU_ADD(Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_lgp, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_lgp)
 
 /*  sound cpu */
 	MDRV_CPU_ADD(Z80, SOUND_PCB_CLOCK)

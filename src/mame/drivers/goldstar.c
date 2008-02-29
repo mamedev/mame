@@ -287,7 +287,7 @@ static MACHINE_DRIVER_START( goldstar )
 	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -323,7 +323,7 @@ static MACHINE_DRIVER_START( goldstbl )
 	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( moonlght )
 	MDRV_CPU_ADD(Z80, 3579545)//(4000000?)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

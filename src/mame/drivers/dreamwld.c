@@ -448,7 +448,7 @@ static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(dreamwld_map, 0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1) // 4, 5, or 6, all point to the same place
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4, 5, or 6, all point to the same place
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

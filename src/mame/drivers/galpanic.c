@@ -932,7 +932,7 @@ static MACHINE_DRIVER_START( galpanic )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(galpanic,0)
-	MDRV_CPU_VBLANK_INT(galpanic_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -986,7 +986,7 @@ static MACHINE_DRIVER_START( supmodel )
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(supmodel_readmem,supmodel_writemem)
-	MDRV_CPU_VBLANK_INT(galpanic_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
@@ -1017,7 +1017,7 @@ static MACHINE_DRIVER_START( galhustl )
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(galhustl_readmem,galhustl_writemem)
-	MDRV_CPU_VBLANK_INT(galhustl_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
@@ -1034,7 +1034,7 @@ static MACHINE_DRIVER_START( zipzap )
 	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(zipzap_readmem,zipzap_writemem)
-	MDRV_CPU_VBLANK_INT(galhustl_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)

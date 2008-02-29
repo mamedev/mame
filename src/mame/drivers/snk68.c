@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( ikari3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(searchar_readmem,searchar_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* Accurate */
@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( pow )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(pow_readmem,pow_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* Accurate */
@@ -778,7 +778,7 @@ static MACHINE_DRIVER_START( searchar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_18MHz/2) /* verified on pcb  */
 	MDRV_CPU_PROGRAM_MAP(searchar_readmem,searchar_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, XTAL_8MHz/2) /* verified on pcb  */
 	/* audio CPU */
@@ -817,7 +817,7 @@ static MACHINE_DRIVER_START( streetsm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(pow_readmem,pow_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* Accurate */

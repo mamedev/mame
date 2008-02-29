@@ -18,6 +18,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "subs.h"
 #include "sound/discrete.h"
 #include "rendlay.h"
@@ -185,7 +186,7 @@ static MACHINE_DRIVER_START( subs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,12096000/16)		/* clock input is the "4H" signal */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(subs_interrupt,4)
+	MDRV_CPU_VBLANK_INT_HACK(subs_interrupt,4)
 
 	MDRV_MACHINE_RESET(subs)
 

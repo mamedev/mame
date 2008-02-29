@@ -440,7 +440,7 @@ static MACHINE_DRIVER_START( badlands )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_int,1)
+	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
 	MDRV_CPU_ADD(M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)

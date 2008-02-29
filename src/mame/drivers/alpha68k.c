@@ -1986,14 +1986,14 @@ static MACHINE_DRIVER_START( sstingry )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 6000000) /* 24MHz/4? */
 	MDRV_CPU_PROGRAM_MAP(kyros_map,0)
-	MDRV_CPU_VBLANK_INT(alpha68k_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */ /* ? */
 	MDRV_CPU_PROGRAM_MAP(sstingry_sound_map,0)
 	MDRV_CPU_IO_MAP(kyros_sound_portmap,0)
 //AT
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
@@ -2036,14 +2036,14 @@ static MACHINE_DRIVER_START( kyros )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 6000000) /* 24MHz/4? */
 	MDRV_CPU_PROGRAM_MAP(kyros_map,0)
-	MDRV_CPU_VBLANK_INT(alpha68k_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */ /* ? */
 	MDRV_CPU_PROGRAM_MAP(kyros_sound_map,0)
 	MDRV_CPU_IO_MAP(kyros_sound_portmap,0)
 //AT
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000)
 //ZT
 
@@ -2085,12 +2085,12 @@ static MACHINE_DRIVER_START( jongbou )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(kyros_map,0)
-	MDRV_CPU_VBLANK_INT(alpha68k_interrupt,17) // must be at least 4 for the controls to be smooth
+	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,17) // must be at least 4 for the controls to be smooth
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(jongbou_sound_map,0)
 	MDRV_CPU_IO_MAP(jongbou_sound_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 160) // guess, controls sound speed
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 160) // guess, controls sound speed
 
 	MDRV_MACHINE_RESET(common)
 
@@ -2120,7 +2120,7 @@ static MACHINE_DRIVER_START( alpha68k_I )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 6000000) /* 24MHz/4? */
 	MDRV_CPU_PROGRAM_MAP(alpha68k_I_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(Z80, 4000000) // 4Mhz seems to yield the correct tone
 	MDRV_CPU_PROGRAM_MAP(alpha68k_I_s_map,0)
@@ -2152,7 +2152,7 @@ static MACHINE_DRIVER_START( alpha68k_II )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 8000000) /* Correct */
 	MDRV_CPU_PROGRAM_MAP(alpha68k_II_map,0)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	/* audio CPU */ /* Correct?? */
@@ -2192,7 +2192,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( btlfildb )
 	MDRV_IMPORT_FROM(alpha68k_II)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(alpha68k_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 MACHINE_DRIVER_END
 
 //AT
@@ -2201,7 +2201,7 @@ static MACHINE_DRIVER_START( alpha68k_II_gm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(alpha68k_II_map, 0)
-	MDRV_CPU_VBLANK_INT(alpha68k_interrupt, 4)
+	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt, 4)
 
 	MDRV_CPU_ADD(Z80, 4000000*2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -2243,7 +2243,7 @@ static MACHINE_DRIVER_START( alpha68k_V )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(alpha68k_V_map,0)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -2284,7 +2284,7 @@ static MACHINE_DRIVER_START( alpha68k_V_sb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(alpha68k_V_map,0)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(Z80, /*3579545*/3579545*2) /* Unlikely but needed to stop nested NMI's */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -2325,7 +2325,7 @@ static MACHINE_DRIVER_START( tnexspce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 9000000) /* Confirmed 18 MHz/2 */
 	MDRV_CPU_PROGRAM_MAP(tnexspce_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(tnexspce_sound_map,0)

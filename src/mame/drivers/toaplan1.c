@@ -1223,7 +1223,7 @@ static MACHINE_DRIVER_START( rallybik )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(rallybik_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1263,7 +1263,7 @@ static MACHINE_DRIVER_START( truxton )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(truxton_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1303,7 +1303,7 @@ static MACHINE_DRIVER_START( hellfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hellfire_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1343,7 +1343,7 @@ static MACHINE_DRIVER_START( zerowing )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(zerowing_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1383,7 +1383,7 @@ static MACHINE_DRIVER_START( demonwld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(demonwld_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1427,7 +1427,7 @@ static MACHINE_DRIVER_START( samesame )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(samesame_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_MACHINE_RESET(toaplan1)
 
@@ -1461,7 +1461,7 @@ static MACHINE_DRIVER_START( outzone )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(outzone_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_CPU_ADD(Z80,28000000/8)		/* 3.5MHz (28MHz Oscillator) */
 	MDRV_CPU_PROGRAM_MAP(toaplan1_sound_map, 0)
@@ -1501,7 +1501,7 @@ static MACHINE_DRIVER_START( vimana )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_10MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vimana_main_map, 0)
-	MDRV_CPU_VBLANK_INT(toaplan1_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", toaplan1_interrupt)
 
 	MDRV_MACHINE_RESET(vimana)
 

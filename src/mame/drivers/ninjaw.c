@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( ninjaw )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_readmem,ninjaw_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 16/4 MHz ? */
@@ -633,7 +633,7 @@ static MACHINE_DRIVER_START( ninjaw )
 
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_cpub_readmem,ninjaw_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_INTERLEAVE(100)	/* CPU slices */
 
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( darius2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_readmem,darius2_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ? */
@@ -707,7 +707,7 @@ static MACHINE_DRIVER_START( darius2 )
 
 	MDRV_CPU_ADD(M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_cpub_readmem,darius2_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_INTERLEAVE(100)	/* CPU slices */
 

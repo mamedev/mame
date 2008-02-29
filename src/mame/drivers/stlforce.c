@@ -242,7 +242,7 @@ static MACHINE_DRIVER_START( stlforce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(stlforce_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_NVRAM_HANDLER(stlforce)
 

@@ -803,7 +803,7 @@ static MACHINE_DRIVER_START( dlair )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK_US/4)
 	MDRV_CPU_PROGRAM_MAP(dlus_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	MDRV_MACHINE_START(dlair)
@@ -843,7 +843,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_CPU_CONFIG(dleuro_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(dleuro_map,0)
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 

@@ -38,6 +38,7 @@ PROMs : NEC B406 (1kx4) x2
 ***********************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
@@ -330,7 +331,7 @@ static MACHINE_DRIVER_START( sbowling )
 	MDRV_CPU_ADD(8080, 19968000/10 )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
-	MDRV_CPU_VBLANK_INT(sbw_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)
 	MDRV_GFXDECODE(sbowling)
 
 	/* video hardware */

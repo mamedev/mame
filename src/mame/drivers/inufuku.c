@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( inufuku )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 32000000/2)	/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(inufuku_readmem, inufuku_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 32000000/4)		/* 8.00 MHz */
 	/* audio CPU */

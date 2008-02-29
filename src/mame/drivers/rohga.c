@@ -817,7 +817,7 @@ static MACHINE_DRIVER_START( rohga )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(rohga_readmem,rohga_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -862,7 +862,7 @@ static MACHINE_DRIVER_START( wizdfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(wizdfire_readmem,wizdfire_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -907,7 +907,7 @@ static MACHINE_DRIVER_START( nitrobal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(nitrobal_readmem,nitrobal_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -952,7 +952,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(schmeisr_readmem,schmeisr_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)

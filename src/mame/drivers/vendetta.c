@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_CPU_ADD_TAG("main", KONAMI, 6000000)	/* this is strange, seems an overclock but */
 //  MDRV_CPU_ADD_TAG("main", KONAMI, 3000000)   /* is needed to have correct music speed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(vendetta_irq,1)
+	MDRV_CPU_VBLANK_INT("main", vendetta_irq)
 
 	MDRV_CPU_ADD(Z80, 3579545)	/* verified with PCB */
 	/* audio CPU */

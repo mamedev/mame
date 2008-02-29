@@ -178,7 +178,7 @@ static MACHINE_DRIVER_START( dderby )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
-	MDRV_CPU_VBLANK_INT(dderby_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", dderby_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

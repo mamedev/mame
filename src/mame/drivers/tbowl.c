@@ -589,12 +589,12 @@ static MACHINE_DRIVER_START( tbowl )
 	/* CPU on Board '6206B' */
 	MDRV_CPU_ADD(Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MDRV_CPU_PROGRAM_MAP(readmem_6206B,writemem_6206B)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
 	/* CPU on Board '6206C' */
 	MDRV_CPU_ADD(Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MDRV_CPU_PROGRAM_MAP(readmem_6206C,writemem_6206C)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
 	/* CPU on Board '6206A' */
 	MDRV_CPU_ADD(Z80, 4000000) /* Actual Z80 */

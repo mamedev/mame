@@ -1296,12 +1296,12 @@ static MACHINE_DRIVER_START( btime )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(btime_readmem,btime_writemem)
-	MDRV_CPU_VBLANK_INT(btime_irq_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", btime_irq_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", M6502, 500000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1335,7 +1335,7 @@ static MACHINE_DRIVER_START( cookrace )
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(cookrace_readmem,cookrace_writemem)
-	MDRV_CPU_VBLANK_INT(btime_nmi_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -1354,10 +1354,10 @@ static MACHINE_DRIVER_START( lnc )
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(lnc_readmem,lnc_writemem)
-	MDRV_CPU_VBLANK_INT(btime_nmi_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
 
 	MDRV_CPU_MODIFY("sound")
-	MDRV_CPU_VBLANK_INT(lnc_sound_interrupt,16)
+	MDRV_CPU_VBLANK_INT_HACK(lnc_sound_interrupt,16)
 
 	MDRV_MACHINE_RESET(lnc)
 
@@ -1375,7 +1375,7 @@ static MACHINE_DRIVER_START( wtennis )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(lnc)
 	MDRV_CPU_MODIFY("sound")
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(eggs)
@@ -1397,7 +1397,7 @@ static MACHINE_DRIVER_START( bnj )
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_REPLACE("main", M6502, 750000)
 	MDRV_CPU_PROGRAM_MAP(bnj_readmem,bnj_writemem)
-	MDRV_CPU_VBLANK_INT(btime_nmi_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
 
 	/* video hardware */
 	MDRV_GFXDECODE(bnj)
@@ -1414,7 +1414,7 @@ static MACHINE_DRIVER_START( zoar )
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(zoar_readmem,zoar_writemem)
-	MDRV_CPU_VBLANK_INT(zoar_irq_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", zoar_irq_interrupt)
 
 	/* video hardware */
 	MDRV_GFXDECODE(zoar)

@@ -1028,7 +1028,7 @@ static MACHINE_DRIVER_START( exidy440 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,EXIDY440_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_map,0)
-	MDRV_CPU_VBLANK_INT(main_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", main_interrupt)
 
 	MDRV_MACHINE_RESET(exidy440)
 	MDRV_NVRAM_HANDLER(exidy440)

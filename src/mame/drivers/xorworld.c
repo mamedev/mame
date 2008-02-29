@@ -208,7 +208,7 @@ static MACHINE_DRIVER_START( xorworld )
 	// basic machine hardware
 	MDRV_CPU_ADD(M68000, 10000000)	// 10 MHz
 	MDRV_CPU_PROGRAM_MAP(xorworld_map, 0)
-	MDRV_CPU_VBLANK_INT(xorworld_interrupt, 4)	// 1 IRQ2 + 1 IRQ4 + 1 IRQ6
+	MDRV_CPU_VBLANK_INT_HACK(xorworld_interrupt, 4)	// 1 IRQ2 + 1 IRQ4 + 1 IRQ6
 
 	MDRV_INTERLEAVE(1)
 

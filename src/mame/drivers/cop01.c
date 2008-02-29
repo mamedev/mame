@@ -418,7 +418,7 @@ static MACHINE_DRIVER_START( cop01 )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ???? */
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( mightguy )
 	MDRV_CPU_ADD(Z80, 4000000)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mightguy_readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ???? */

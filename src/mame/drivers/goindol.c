@@ -18,6 +18,7 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 VIDEO_START( goindol );
@@ -272,12 +273,12 @@ static MACHINE_DRIVER_START( goindol )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)        /* 6 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

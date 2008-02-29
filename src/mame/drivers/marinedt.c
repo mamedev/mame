@@ -587,7 +587,7 @@ static MACHINE_DRIVER_START( marinedt )
 	MDRV_CPU_ADD(Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(marinedt_readmem,marinedt_writemem)
 	MDRV_CPU_IO_MAP(marinedt_readport,marinedt_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

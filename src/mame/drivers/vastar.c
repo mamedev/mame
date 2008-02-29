@@ -327,12 +327,12 @@ static MACHINE_DRIVER_START( vastar )
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(0,writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_readmem,cpu2_writemem)
 	MDRV_CPU_IO_MAP(cpu2_readport,cpu2_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* ??? */
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame - seems enough to ensure proper */
 						/* synchronization of the CPUs */

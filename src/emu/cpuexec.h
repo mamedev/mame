@@ -261,6 +261,7 @@ struct _cpu_config
 	construct_map_t construct_map[ADDRESS_SPACES][2]; /* 2 memory maps per address space */
 	void 			(*vblank_interrupt)(running_machine *machine, int cpunum);	/* for interrupts tied to VBLANK */
 	int 			vblank_interrupts_per_frame;/* usually 1 */
+	const char *	vblank_interrupt_screen;	/* the screen that causes the VBLANK interrupt */
 	void 			(*timed_interrupt)(running_machine *machine, int cpunum);	/* for interrupts not tied to VBLANK */
 	attoseconds_t 	timed_interrupt_period;		/* period for periodic interrupts */
 	const void *	reset_param;				/* parameter for cpu_reset */

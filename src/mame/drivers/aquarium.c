@@ -370,7 +370,7 @@ static MACHINE_DRIVER_START( aquarium )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	/* audio CPU */

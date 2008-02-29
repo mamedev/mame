@@ -693,7 +693,7 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_CPU_ADD(S2650, 14318180/4) // ???
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(laserbat_io_map,0)
-	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_ADD(S2650, 14318000/4)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(laserbat_map,0)
 	MDRV_CPU_IO_MAP(catnmous_io_map,0)
-	MDRV_CPU_VBLANK_INT(laserbat_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", laserbat_interrupt)
 
 	MDRV_CPU_ADD(M6802,3580000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)

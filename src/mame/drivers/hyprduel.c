@@ -710,7 +710,7 @@ static MACHINE_DRIVER_START( hyprduel )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem,hyprduel_writemem)
-	MDRV_CPU_VBLANK_INT(hyprduel_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(hyprduel_readmem2,hyprduel_writemem2)
@@ -751,7 +751,7 @@ static MACHINE_DRIVER_START( magerror )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem,magerror_writemem)
-	MDRV_CPU_VBLANK_INT(hyprduel_interrupt,RASTER_LINES)
+	MDRV_CPU_VBLANK_INT_HACK(hyprduel_interrupt,RASTER_LINES)
 
 	MDRV_CPU_ADD(M68000,20000000/2)		/* 10MHz */
 	MDRV_CPU_PROGRAM_MAP(magerror_readmem2,magerror_writemem2)

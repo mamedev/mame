@@ -28,6 +28,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/discrete.h"
 #include "avalnche.h"
 
@@ -235,7 +236,7 @@ static MACHINE_DRIVER_START( avalnche )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,12096000/16)	   /* clock input is the "2H" signal divided by two */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(avalnche_interrupt,8)
+	MDRV_CPU_VBLANK_INT_HACK(avalnche_interrupt,8)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(avalnche)

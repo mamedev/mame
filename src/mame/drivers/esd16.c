@@ -528,13 +528,13 @@ static MACHINE_DRIVER_START( multchmp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(multchmp_readmem,multchmp_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
 	MDRV_CPU_PROGRAM_MAP(multchmp_sound_readmem,multchmp_sound_writemem)
 	MDRV_CPU_IO_MAP(multchmp_sound_readport,multchmp_sound_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,32)	/* IRQ By Main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -519,7 +519,7 @@ static MACHINE_DRIVER_START( acommand )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(acommand,0)
-	MDRV_CPU_VBLANK_INT(acommand_irq,2)
+	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

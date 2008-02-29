@@ -852,7 +852,7 @@ static MACHINE_DRIVER_START( niyanpai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
 	MDRV_CPU_PROGRAM_MAP(niyanpai_readmem,niyanpai_writemem)
-	MDRV_CPU_VBLANK_INT(niyanpai_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", niyanpai_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)

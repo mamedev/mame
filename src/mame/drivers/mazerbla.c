@@ -1502,7 +1502,7 @@ static MACHINE_DRIVER_START( mazerbla )
 and cleared on ANY port access.
 but handled differently for now
 */
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* synchronization forced on the fly */
 
@@ -1544,7 +1544,7 @@ static MACHINE_DRIVER_START( greatgun )
 and cleared on ANY port access.
 but handled differently for now
 */
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(greatgun)
 

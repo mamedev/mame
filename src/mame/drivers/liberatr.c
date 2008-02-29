@@ -134,6 +134,7 @@
 ******************************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 #include "liberatr.h"
@@ -383,7 +384,7 @@ static MACHINE_DRIVER_START( liberatr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MDRV_CPU_PROGRAM_MAP(liberatr_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_NVRAM_HANDLER(atari_vg)
 

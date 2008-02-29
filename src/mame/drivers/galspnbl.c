@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( galspnbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq3_line_hold,1)/* also has vector for 6, but it does nothing */
+	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)/* also has vector for 6, but it does nothing */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* 4 MHz ??? */

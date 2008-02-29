@@ -149,7 +149,7 @@ static MACHINE_DRIVER_START( kingpin )
 	MDRV_CPU_ADD(Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map,0)
 	MDRV_CPU_IO_MAP(kingpin_readport,kingpin_writeport)
-	MDRV_CPU_VBLANK_INT(kingpin_video_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kingpin_video_interrupt)
 
 /*  SOUND CPU */
 	MDRV_CPU_ADD(Z80, 3579545)

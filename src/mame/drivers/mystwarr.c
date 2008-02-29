@@ -931,7 +931,7 @@ static MACHINE_DRIVER_START( mystwarr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 16000000)	/* 16 MHz (confirmed) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(mystwarr_interrupt, 3)
+	MDRV_CPU_VBLANK_INT_HACK(mystwarr_interrupt, 3)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 8000000)
 	/* audio CPU */
@@ -981,7 +981,7 @@ static MACHINE_DRIVER_START( viostorm )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vsreadmem,vswritemem)
-	MDRV_CPU_VBLANK_INT(metamrph_interrupt, 40)
+	MDRV_CPU_VBLANK_INT_HACK(metamrph_interrupt, 40)
 
 	/* video hardware */
 	MDRV_VIDEO_START(viostorm)
@@ -1001,7 +1001,7 @@ static MACHINE_DRIVER_START( metamrph )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mmreadmem,mmwritemem)
-	MDRV_CPU_VBLANK_INT(metamrph_interrupt, 40)
+	MDRV_CPU_VBLANK_INT_HACK(metamrph_interrupt, 40)
 
 	/* video hardware */
 	MDRV_VIDEO_START(metamrph)
@@ -1021,7 +1021,7 @@ static MACHINE_DRIVER_START( dadandrn )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(dddreadmem, dddwritemem)
-	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", ddd_interrupt)
 
 	MDRV_GFXDECODE(dadandrn)
 
@@ -1043,7 +1043,7 @@ static MACHINE_DRIVER_START( gaiapols )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gaiareadmem,gaiawritemem)
-	MDRV_CPU_VBLANK_INT(ddd_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", ddd_interrupt)
 
 	MDRV_GFXDECODE(gaiapols)
 
@@ -1067,7 +1067,7 @@ static MACHINE_DRIVER_START( martchmp )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mcreadmem,mcwritemem)
-	MDRV_CPU_VBLANK_INT(mchamp_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mchamp_interrupt, 2)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 

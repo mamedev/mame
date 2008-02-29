@@ -51,6 +51,7 @@ c1  ??
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/3812intf.h"
 
 
@@ -230,12 +231,12 @@ static MACHINE_DRIVER_START( speedbal )
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,8)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( shadoww )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 18432000/2)	/* 9.216 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz */
 	/* audio CPU */
@@ -1032,7 +1032,7 @@ static MACHINE_DRIVER_START( drgnbowl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 20000000/2)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnbowl_map,0)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	/* audio CPU */

@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( spaceg )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,2500000)		 /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(readwritemem,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)	/* 60 Hz NMIs (verified) */
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* 60 Hz NMIs (verified) */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

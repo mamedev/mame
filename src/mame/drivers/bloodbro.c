@@ -528,7 +528,7 @@ static MACHINE_DRIVER_START( bloodbro )
 	// basic machine hardware
 	MDRV_CPU_ADD_TAG("main", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map, 0)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
 
@@ -558,7 +558,7 @@ static MACHINE_DRIVER_START( weststry )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(weststry_map, 0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_GFXDECODE(weststry)
 	MDRV_PALETTE_LENGTH(1024)
@@ -570,7 +570,7 @@ static MACHINE_DRIVER_START( skysmash )
 	MDRV_IMPORT_FROM(bloodbro)
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(irq2_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_VIDEO_UPDATE(skysmash)
 MACHINE_DRIVER_END

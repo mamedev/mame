@@ -1807,13 +1807,13 @@ static const struct C352interface c352_interface =
 static MACHINE_DRIVER_START( namcos22s )
 	MDRV_CPU_ADD_TAG("main", M68EC020,SS22_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(namcos22s_am,0)
-	MDRV_CPU_VBLANK_INT(namcos22s_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
 
 	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
 	MDRV_CPU_DATA_MAP(master_dsp_data,0)
 	MDRV_CPU_IO_MAP(master_dsp_io,0)
-	MDRV_CPU_VBLANK_INT(dsp_serial_pulse1,SERIAL_IO_PERIOD)
+	MDRV_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
 
 	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(slave_dsp_program,0)
@@ -1823,7 +1823,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_CPU_ADD(M37710, SS22_MASTER_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(mcu_program, 0)
 	MDRV_CPU_IO_MAP( mcu_io, 0 )
-	MDRV_CPU_VBLANK_INT(mcu_interrupt, 3)
+	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 3)
 
 	MDRV_NVRAM_HANDLER(namcos22)
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2222,13 +2222,13 @@ static MACHINE_RESET(namcos22)
 static MACHINE_DRIVER_START( namcos22 )
 	MDRV_CPU_ADD(M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MDRV_CPU_PROGRAM_MAP(namcos22_am,0)
-	MDRV_CPU_VBLANK_INT(namcos22_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
 
 	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
 	MDRV_CPU_DATA_MAP(master_dsp_data,0)
 	MDRV_CPU_IO_MAP(master_dsp_io,0)
-	MDRV_CPU_VBLANK_INT(dsp_serial_pulse1,SERIAL_IO_PERIOD)
+	MDRV_CPU_VBLANK_INT_HACK(dsp_serial_pulse1,SERIAL_IO_PERIOD)
 
 	MDRV_CPU_ADD(TMS32025,SS22_MASTER_CLOCK) /* ? */
 	MDRV_CPU_PROGRAM_MAP(slave_dsp_program,0)

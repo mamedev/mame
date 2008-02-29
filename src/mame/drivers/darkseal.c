@@ -289,7 +289,7 @@ static MACHINE_DRIVER_START( darkseal )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(darkseal_readmem,darkseal_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(H6280, 32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	/* audio CPU */

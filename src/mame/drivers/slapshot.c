@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( slapshot )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(slapshot_readmem,slapshot_writemem)
-	MDRV_CPU_VBLANK_INT(slapshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000/8)
 	/* audio CPU */	/* 4 MHz */
@@ -592,7 +592,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolf3_readmem,opwolf3_writemem)
-	MDRV_CPU_VBLANK_INT(slapshot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
 
 	MDRV_CPU_ADD(Z80,32000000/8)
 	/* audio CPU */	/* 4 MHz */

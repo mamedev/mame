@@ -170,12 +170,12 @@ static MACHINE_DRIVER_START( suprloco )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)			/* NMIs are caused by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)			/* NMIs are caused by the main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

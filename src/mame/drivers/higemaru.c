@@ -175,7 +175,7 @@ static MACHINE_DRIVER_START( higemaru )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz ? Main xtal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(higemaru_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(higemaru_interrupt,2)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

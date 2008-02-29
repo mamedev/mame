@@ -129,8 +129,8 @@ static MACHINE_DRIVER_START( igs_180 )
 	MDRV_CPU_ADD(Z180,16000000)	/* 16 MHz? */
 	MDRV_CPU_PROGRAM_MAP(igs_180_map,0)
 	MDRV_CPU_IO_MAP(igs_180_portmap,0)
-	MDRV_CPU_VBLANK_INT(igs_180_interrupt,2)
-	//MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT_HACK(igs_180_interrupt,2)
+	//MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

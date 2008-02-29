@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( sg1000a )
 	MDRV_CPU_ADD(Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(sg100a_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", sg100a_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

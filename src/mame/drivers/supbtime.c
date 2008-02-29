@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( supbtime )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(supbtime_readmem,supbtime_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280, 32220000/8)	/* Custom chip 45, audio section crystal is 32.220 MHz */
 	/* audio CPU */
@@ -417,7 +417,7 @@ static MACHINE_DRIVER_START( chinatwn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(chinatwn_readmem,chinatwn_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280, 32220000/8) /* Custom chip 45, audio section crystal is 32.220 MHz */
 	/* audio CPU */

@@ -123,7 +123,7 @@ static MACHINE_DRIVER_START( stepstag )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000 ) //??
 	MDRV_CPU_PROGRAM_MAP(stepstag_readmem,stepstag_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1) // 4 & 6 valid
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4 & 6 valid
 
 	MDRV_CPU_ADD(M68000, 16000000 ) //??
 	MDRV_CPU_PROGRAM_MAP(stepstag_sub_readmem,stepstag_sub_writemem)

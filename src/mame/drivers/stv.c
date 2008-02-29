@@ -2736,7 +2736,7 @@ static MACHINE_DRIVER_START( stv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
-	MDRV_CPU_VBLANK_INT(stv_interrupt,264)/*264 lines,224 display lines*/
+	MDRV_CPU_VBLANK_INT_HACK(stv_interrupt,264)/*264 lines,224 display lines*/
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD(SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( pushman )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( bballs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(bballs_readmem,bballs_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */

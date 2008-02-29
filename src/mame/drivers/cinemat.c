@@ -988,7 +988,7 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 	MDRV_CPU_PROGRAM_MAP(program_map_4k,0)
 	MDRV_CPU_DATA_MAP(data_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(check_coins,1)
+	MDRV_CPU_VBLANK_INT("main", check_coins)
 
 	MDRV_MACHINE_START(cinemat)
 	MDRV_MACHINE_RESET(cinemat)

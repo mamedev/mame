@@ -318,7 +318,7 @@ static MACHINE_DRIVER_START( blockout )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(blockout_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(blockout_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */	/* 3.579545 MHz */

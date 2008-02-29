@@ -344,7 +344,7 @@ static MACHINE_DRIVER_START( gijoe )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_VBLANK_INT(gijoe_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", gijoe_interrupt)
 
 	MDRV_CPU_ADD(Z80, 8000000)
 	/* audio CPU */	/* Amuse & confirmed. z80e */

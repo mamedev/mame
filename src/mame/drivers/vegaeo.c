@@ -163,7 +163,7 @@ static VIDEO_UPDATE( vega )
 static MACHINE_DRIVER_START( vega )
 	MDRV_CPU_ADD_TAG("cpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MDRV_CPU_PROGRAM_MAP(vega_map,0)
-	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
+	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	/* sound cpu */
 

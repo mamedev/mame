@@ -211,7 +211,7 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_DRIVER_START( compgolf )
 	MDRV_CPU_ADD(M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

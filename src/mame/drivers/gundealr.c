@@ -465,7 +465,7 @@ static MACHINE_DRIVER_START( gundealr )
 	MDRV_CPU_ADD(Z80, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(yamyam_interrupt,4)	/* ? */
+	MDRV_CPU_VBLANK_INT_HACK(yamyam_interrupt,4)	/* ? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

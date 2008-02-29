@@ -372,12 +372,12 @@ static MACHINE_DRIVER_START( nomcu )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_START(kangaroo)
 	MDRV_MACHINE_RESET(kangaroo)

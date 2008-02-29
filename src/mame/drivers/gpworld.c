@@ -434,7 +434,7 @@ static MACHINE_DRIVER_START( gpworld )
 	MDRV_CPU_ADD(Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT(vblank_callback_gpworld, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_callback_gpworld)
 
 	MDRV_MACHINE_START(gpworld)
 

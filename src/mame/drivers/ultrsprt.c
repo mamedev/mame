@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_CPU_ADD(PPC403, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_CONFIG(ultrsprt_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map, 0)
-	MDRV_CPU_VBLANK_INT(ultrsprt_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", ultrsprt_vblank)
 
 	MDRV_CPU_ADD(M68000, 8000000)		/* Not sure about the frequency */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)

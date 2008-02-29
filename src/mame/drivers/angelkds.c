@@ -596,7 +596,7 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_CPU_ADD(Z80, 8000000) /* 8MHz? 6 seems too slow? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000) /* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)

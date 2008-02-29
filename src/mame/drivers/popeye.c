@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( skyskipr )
 	MDRV_CPU_ADD_TAG("main", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(skyskipr_readmem,skyskipr_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(popeye_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", popeye_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

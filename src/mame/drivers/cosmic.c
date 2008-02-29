@@ -1005,7 +1005,7 @@ static MACHINE_DRIVER_START( panic )
 	MDRV_CPU_MODIFY("main")
 
 	MDRV_CPU_PROGRAM_MAP(panic_readmem,panic_writemem)
-	MDRV_CPU_VBLANK_INT(panic_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(panic_interrupt,2)
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)
@@ -1033,7 +1033,7 @@ static MACHINE_DRIVER_START( cosmica )
 	MDRV_CPU_MODIFY("main")
 
 	MDRV_CPU_PROGRAM_MAP(cosmica_readmem,cosmica_writemem)
-	MDRV_CPU_VBLANK_INT(cosmica_interrupt,32)
+	MDRV_CPU_VBLANK_INT_HACK(cosmica_interrupt,32)
 
 	/* video hardware */
 	MDRV_GFXDECODE(cosmica)
@@ -1054,7 +1054,7 @@ static MACHINE_DRIVER_START( cosmicg )
             1.5MHz.  So, if someone can check this... */
 	MDRV_CPU_PROGRAM_MAP(cosmicg_readmem,cosmicg_writemem)
 	MDRV_CPU_IO_MAP(cosmicg_readport,cosmicg_writeport)
-	MDRV_CPU_VBLANK_INT(cosmicg_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", cosmicg_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1087,7 +1087,7 @@ static MACHINE_DRIVER_START( magspot )
 	MDRV_CPU_MODIFY("main")
 
 	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
-	MDRV_CPU_VBLANK_INT(magspot_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", magspot_interrupt)
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)
@@ -1121,7 +1121,7 @@ static MACHINE_DRIVER_START( nomnlnd )
 	MDRV_CPU_MODIFY("main")
 
 	MDRV_CPU_PROGRAM_MAP(magspot_readmem,magspot_writemem)
-	MDRV_CPU_VBLANK_INT(nomnlnd_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", nomnlnd_interrupt)
 
 	/* video hardware */
 	MDRV_GFXDECODE(panic)

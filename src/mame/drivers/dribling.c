@@ -301,7 +301,7 @@ static MACHINE_DRIVER_START( dribling )
 	MDRV_CPU_ADD(Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(dribling_irq_gen,1)
+	MDRV_CPU_VBLANK_INT("main", dribling_irq_gen)
 
 	MDRV_MACHINE_RESET(dribling)
 

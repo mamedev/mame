@@ -222,7 +222,7 @@ static MACHINE_DRIVER_START( blockhl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI,3000000)		/* Konami custom 052526 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(blockhl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", blockhl_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */		/* ? */

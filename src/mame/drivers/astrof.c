@@ -882,7 +882,7 @@ static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_VBLANK_INT(coin_nmi,1)
+	MDRV_CPU_VBLANK_INT("main", coin_nmi)
 
 	MDRV_MACHINE_RESET(astrof)
 

@@ -34,6 +34,26 @@ extern running_machine *Machine;
 
 /*************************************
  *
+ *  Old way of allowing "VBLANK"
+ *  interrupts to fire more than once
+ *  a frame.
+ *
+ *  These should be replaced with
+ *  scanline based interrupts as
+ *  it makes no sense to have more
+ *  than one VBLANK interrupt
+ *  per frame.
+ *
+ *************************************/
+
+#define MDRV_CPU_VBLANK_INT_HACK(_func, _rate) \
+	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_CPU_VBLANK_INT_HACK, 8, _rate, 24), \
+	TOKEN_PTR(interrupt, _func),
+
+
+
+/*************************************
+ *
  *  Video timing
  *
  *  These functions are no longer considered

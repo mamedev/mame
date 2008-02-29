@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_CPU_ADD(E116XT, 20000000*4)		/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(pasha2_map,0)
 	MDRV_CPU_IO_MAP(pasha2_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 

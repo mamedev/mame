@@ -439,7 +439,7 @@ static MACHINE_DRIVER_START( dbz )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dbz_readmem,dbz_writemem)
-	MDRV_CPU_VBLANK_INT(dbz_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(dbz_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */

@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( blmbycar )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(blmbycar_readmem,blmbycar_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -416,7 +416,7 @@ static MACHINE_DRIVER_START( watrball )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(watrball_readmem,watrball_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

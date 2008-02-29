@@ -461,7 +461,7 @@ static MACHINE_DRIVER_START( chinsan )
 	MDRV_CPU_ADD(Z80,10000000/2)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(chinsan_map,0)
 	MDRV_CPU_IO_MAP(chinsan_io,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( chinsan )
 

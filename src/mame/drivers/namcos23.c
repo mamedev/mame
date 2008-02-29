@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_ADD(H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT( irq1_line_pulse, 1 )
+	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -895,12 +895,12 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_CPU_ADD(R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
-	MDRV_CPU_VBLANK_INT(namcos23_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", namcos23_interrupt)
 
 	MDRV_CPU_ADD(H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT( irq1_line_pulse, 1 )
+	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

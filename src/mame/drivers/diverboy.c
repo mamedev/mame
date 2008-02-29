@@ -195,7 +195,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( diverboy )
 	MDRV_CPU_ADD(M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_readmem,diverboy_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */

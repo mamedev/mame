@@ -264,8 +264,8 @@ Notes:
 
 ***************************************************************************/
 
-#include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
@@ -877,7 +877,7 @@ static MACHINE_DRIVER_START( coh100 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos11_map, 0 )
-	MDRV_CPU_VBLANK_INT( namcos11_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", namcos11_vblank)
 
 	MDRV_MACHINE_RESET( namcos11 )
 	MDRV_NVRAM_HANDLER( at28c16_0 )

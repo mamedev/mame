@@ -41,6 +41,7 @@ XTAL: 10.0 MHz
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 
@@ -210,7 +211,7 @@ static MACHINE_DRIVER_START( battlex )
 	MDRV_CPU_ADD(Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,8) /* controls game speed? */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

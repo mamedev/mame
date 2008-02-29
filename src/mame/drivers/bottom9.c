@@ -403,12 +403,12 @@ static MACHINE_DRIVER_START( bottom9 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(bottom9_readmem,bottom9_writemem)
-	MDRV_CPU_VBLANK_INT(bottom9_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", bottom9_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(bottom9_sound_readmem,bottom9_sound_writemem)
-	MDRV_CPU_VBLANK_INT(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(bottom9_sound_interrupt,8)	/* irq is triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

@@ -466,7 +466,7 @@ static MACHINE_DRIVER_START( policetr )
 	MDRV_CPU_ADD_TAG("main", R3000BE, MASTER_CLOCK/2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(policetr_map,0)
-	MDRV_CPU_VBLANK_INT(irq4_gen,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_gen)
 
 	MDRV_NVRAM_HANDLER(policetr)
 

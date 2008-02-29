@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( epos )
 	MDRV_CPU_ADD(Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)
@@ -374,7 +374,7 @@ static MACHINE_DRIVER_START( dealer )
 	MDRV_CPU_ADD(Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(dealer_readmem,dealer_writemem)
 	MDRV_CPU_IO_MAP(dealer_readport,dealer_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)

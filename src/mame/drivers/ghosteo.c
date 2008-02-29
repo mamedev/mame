@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( bballoon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(ARM7, 24000000)
 	MDRV_CPU_PROGRAM_MAP(bballoon_map,0)
-	MDRV_CPU_VBLANK_INT(bballoon_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", bballoon_interrupt)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

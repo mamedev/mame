@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(arcadecl)
 	MDRV_NVRAM_HANDLER(atarigen)

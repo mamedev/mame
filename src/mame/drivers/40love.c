@@ -1098,12 +1098,12 @@ static MACHINE_DRIVER_START( 40love )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(40love_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */ /* OK */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* source/number of IRQs is unknown */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
 	MDRV_CPU_ADD(M68705,18432000/6) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
@@ -1145,12 +1145,12 @@ static MACHINE_DRIVER_START( undoukai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(undoukai_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,8000000/2)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* source/number of IRQs is unknown */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
 //  MDRV_CPU_ADD(M68705,18432000/6)
 //  MDRV_CPU_PROGRAM_MAP(mcu_map,0)

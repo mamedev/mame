@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( exerion )
 
 	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(exerion_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", exerion_interrupt)
 
 	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)

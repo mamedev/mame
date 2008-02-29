@@ -6523,7 +6523,7 @@ static MACHINE_DRIVER_START( ddenlovr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(ddenlovr_readmem,ddenlovr_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6638,7 +6638,7 @@ static MACHINE_DRIVER_START( quizchq )
 	MDRV_CPU_ADD_TAG("main", Z80, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(quizchq_readmem,quizchq_writemem)
 	MDRV_CPU_IO_MAP(quizchq_readport,quizchq_writeport)
-	MDRV_CPU_VBLANK_INT(quizchq_irq,1)
+	MDRV_CPU_VBLANK_INT("main", quizchq_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6708,12 +6708,12 @@ static MACHINE_DRIVER_START( mmpanic )
 	MDRV_CPU_ADD_TAG("main", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_readmem,mmpanic_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_readport,mmpanic_writeport)
-	MDRV_CPU_VBLANK_INT(mmpanic_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mmpanic_irq)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_readmem,mmpanic_sound_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_sound_readport,mmpanic_sound_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	// NMI by main cpu
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main cpu
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6777,7 +6777,7 @@ static MACHINE_DRIVER_START( hanakanz )
 	MDRV_CPU_ADD_TAG("main",Z80,8000000)	// TMPZ84C015BF-8
 	MDRV_CPU_PROGRAM_MAP(hanakanz_readmem,hanakanz_writemem)
 	MDRV_CPU_IO_MAP(hanakanz_readport,hanakanz_writeport)
-	MDRV_CPU_VBLANK_INT(hanakanz_irq,1)
+	MDRV_CPU_VBLANK_INT("main", hanakanz_irq)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -6850,7 +6850,7 @@ static MACHINE_DRIVER_START( mjchuuka )
 	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjchuuka_readport,mjchuuka_writeport)
-	MDRV_CPU_VBLANK_INT(mjchuuka_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -6863,7 +6863,7 @@ static MACHINE_DRIVER_START( funkyfig )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(funkyfig_readmem,funkyfig_writemem)
 	MDRV_CPU_IO_MAP(funkyfig_readport,funkyfig_writeport)
-	MDRV_CPU_VBLANK_INT(mjchuuka_irq,1)
+	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(funkyfig_sound_readport,mmpanic_sound_writeport)
@@ -6922,7 +6922,7 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
@@ -6969,7 +6969,7 @@ static MACHINE_DRIVER_START( hginga )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hginga_readmem,hginga_writemem)
 	MDRV_CPU_IO_MAP(hginga_readport,hginga_writeport)
-	MDRV_CPU_VBLANK_INT(hginga_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hginga_irq)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -6982,7 +6982,7 @@ static MACHINE_DRIVER_START( hgokou )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hgokou_readmem,hgokou_writemem)
 	MDRV_CPU_IO_MAP(hgokou_readport,hgokou_writeport)
-	MDRV_CPU_VBLANK_INT(hginga_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hginga_irq)
 
 	MDRV_SOUND_ADD(AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -7003,7 +7003,7 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
@@ -7016,7 +7016,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
-	MDRV_CPU_VBLANK_INT(mjmyster_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
 
 	MDRV_SOUND_ADD(AY8910, 1789772)
@@ -7047,7 +7047,7 @@ static MACHINE_DRIVER_START( mjflove )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(rongrong_readmem,rongrong_writemem)
 	MDRV_CPU_IO_MAP(mjflove_readport,mjflove_writeport)
-	MDRV_CPU_VBLANK_INT(mjflove_irq, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
 
 	MDRV_VIDEO_START(mjflove)	// blitter commands in the roms are shuffled around
 
@@ -7068,7 +7068,7 @@ static MACHINE_DRIVER_START( hparadis )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hparadis_readmem,hparadis_writemem)
 	MDRV_CPU_IO_MAP(hparadis_readport,hparadis_writeport)
-	MDRV_CPU_VBLANK_INT(hparadis_irq, 1)
+	MDRV_CPU_VBLANK_INT("main", hparadis_irq)
 MACHINE_DRIVER_END
 
 

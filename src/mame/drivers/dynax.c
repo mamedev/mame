@@ -3605,7 +3605,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(hanamai_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3660,7 +3660,7 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
 	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3714,7 +3714,7 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_CPU_ADD(Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -3754,7 +3754,7 @@ static MACHINE_DRIVER_START( mjfriday )
 	MDRV_CPU_ADD_TAG("main",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -3891,12 +3891,12 @@ static MACHINE_DRIVER_START( jantouki )
 	MDRV_CPU_ADD_TAG("main",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_io_map,0)
-	MDRV_CPU_VBLANK_INT(jantouki_vblank_interrupt, 1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_CPU_ADD_TAG("sound",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT(jantouki_sound_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
@@ -3970,7 +3970,7 @@ static MACHINE_DRIVER_START( mjelctrn )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
 	MDRV_CPU_IO_MAP(mjelctrn_io_map,0)
-	MDRV_CPU_VBLANK_INT(mjelctrn_vblank_interrupt,1)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT("main", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
 MACHINE_DRIVER_END
@@ -4007,7 +4007,7 @@ static MACHINE_DRIVER_START( neruton )
 
 	MDRV_IMPORT_FROM( mjelctrn )
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(neruton)
 MACHINE_DRIVER_END
@@ -4032,7 +4032,7 @@ static MACHINE_DRIVER_START( majxtal7 )
 
 	MDRV_IMPORT_FROM( neruton )
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(majxtal7_vblank_interrupt,1)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT("main", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 MACHINE_DRIVER_END
 
@@ -4054,7 +4054,7 @@ static MACHINE_DRIVER_START( htengoku )
 	MDRV_CPU_ADD_TAG("main",Z80,20000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(htengoku_io_map,0)
-	MDRV_CPU_VBLANK_INT(sprtmtch_vblank_interrupt,1)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -4112,7 +4112,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_CPU_ADD_TAG("main",TMP91640, 21472700 / 2)
 	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
 	MDRV_CPU_IO_MAP(tenkai_io_map,0)
-	MDRV_CPU_VBLANK_INT(tenkai_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

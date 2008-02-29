@@ -821,7 +821,7 @@ static MACHINE_DRIVER_START( g80r_base )
 	MDRV_CPU_ADD_TAG("main", Z80, VIDEO_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(segag80r_vblank_start,1)
+	MDRV_CPU_VBLANK_INT("main", segag80r_vblank_start)
 
 	MDRV_MACHINE_START(g80r)
 
@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( sindbadm )
 	MDRV_IMPORT_FROM(g80r_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(sindbadm_portmap,0)
-	MDRV_CPU_VBLANK_INT(sindbadm_vblank_start,1)
+	MDRV_CPU_VBLANK_INT("main", sindbadm_vblank_start)
 
 	/* video hardware */
 	MDRV_GFXDECODE(monsterb)
@@ -924,7 +924,7 @@ static MACHINE_DRIVER_START( sindbadm )
 
 	MDRV_CPU_ADD(Z80, SINDBADM_SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD(SN76496, SINDBADM_SOUND_CLOCK/4)

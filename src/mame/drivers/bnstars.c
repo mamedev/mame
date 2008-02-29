@@ -1339,7 +1339,7 @@ static MACHINE_DRIVER_START( bnstars )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V70, 20000000) // 20MHz
 	MDRV_CPU_PROGRAM_MAP(bnstars_map,0)
-	MDRV_CPU_VBLANK_INT(ms32_interrupt,32)
+	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
 //  MDRV_CPU_ADD(Z80, 4000000) /* audio CPU */
 //  MDRV_CPU_PROGRAM_MAP(bnstars_z80_map, 0)

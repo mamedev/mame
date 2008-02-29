@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( sspeedr )
 	MDRV_CPU_ADD(Z80, 19968000 / 8)
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_IO_MAP(readport, writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

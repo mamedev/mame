@@ -43,6 +43,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *commando_videoram2, *commando_colorram2;
@@ -240,12 +241,12 @@ static MACHINE_DRIVER_START( commando )
 	// basic machine hardware
 	MDRV_CPU_ADD(Z80, PHI_MAIN)	// ???
 	MDRV_CPU_PROGRAM_MAP(commando_map, 0)
-	MDRV_CPU_VBLANK_INT(commando_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", commando_interrupt)
 
 	MDRV_CPU_ADD(Z80, PHI_B)	// 3 MHz
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

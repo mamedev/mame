@@ -10,6 +10,7 @@
 **********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "eolithsp.h"
@@ -165,7 +166,7 @@ static PALETTE_INIT( eolith16 )
 static MACHINE_DRIVER_START( eolith16 )
 	MDRV_CPU_ADD(E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
-	MDRV_CPU_VBLANK_INT(eolith_speedup,262)
+	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	MDRV_NVRAM_HANDLER(eolith16_eeprom)
 

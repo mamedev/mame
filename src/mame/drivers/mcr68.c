@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( zwackery )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 7652400)	/* should be XTAL_16MHz/2 */
 	MDRV_CPU_PROGRAM_MAP(zwackery_map,0)
-	MDRV_CPU_VBLANK_INT(mcr68_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", mcr68_interrupt)
 
 //  MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(zwackery)
@@ -910,7 +910,7 @@ static MACHINE_DRIVER_START( mcr68 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 7723800)
 	MDRV_CPU_PROGRAM_MAP(mcr68_map,0)
-	MDRV_CPU_VBLANK_INT(mcr68_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", mcr68_interrupt)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(mcr68)

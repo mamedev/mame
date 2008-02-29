@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_CPU_ADD(TMS9995, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_map,0)
 	MDRV_CPU_IO_MAP(looping_io_map,0)
-	MDRV_CPU_VBLANK_INT(looping_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", looping_interrupt)
 
 	MDRV_CPU_ADD(TMS9980, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(looping_sound_map,0)

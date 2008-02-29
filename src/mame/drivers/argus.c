@@ -773,7 +773,7 @@ static MACHINE_DRIVER_START( argus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(argus_readmem,argus_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 4 MHz */
@@ -811,7 +811,7 @@ static MACHINE_DRIVER_START( valtric )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(valtric_readmem,valtric_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 5 MHz */
@@ -855,7 +855,7 @@ static MACHINE_DRIVER_START( butasan )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(butasan_readmem,butasan_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 5000000)
 	/* audio CPU */			/* 5 MHz */
@@ -899,7 +899,7 @@ static MACHINE_DRIVER_START( bombsa )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(bombsa_readmem,bombsa_writemem)
-	MDRV_CPU_VBLANK_INT(argus_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 12000000 / 2)
 	/* audio CPU */						/* 6 MHz */				/* maybe CPU speeds are reversed? Probably not (ajg) */

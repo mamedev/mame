@@ -863,7 +863,7 @@ static MACHINE_DRIVER_START( trackfld )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318180/4)
 	/* audio CPU */	/* Z80 Clock is derived from a 14.31818 MHz crystal */
@@ -907,7 +907,7 @@ static MACHINE_DRIVER_START( hyprolyb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318180/4)
 	/* audio CPU */	/* Z80 Clock is derived from a 14.31818 MHz crystal */
@@ -962,7 +962,7 @@ static MACHINE_DRIVER_START( wizzquiz )
 	// right cpu?
 	MDRV_CPU_REPLACE("main",M6800,2048000)		/* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wizzquiz_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
@@ -974,7 +974,7 @@ static MACHINE_DRIVER_START( reaktor )
 	MDRV_CPU_REPLACE("main",Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(reaktor_readmem,reaktor_writemem)
 	MDRV_CPU_IO_MAP(reaktor_readport,reaktor_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 MACHINE_DRIVER_END
 
 

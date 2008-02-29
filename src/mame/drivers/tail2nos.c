@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80,XTAL_20MHz/4)	/* verified on pcb */
 	/* audio CPU */

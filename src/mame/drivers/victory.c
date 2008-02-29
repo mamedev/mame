@@ -212,7 +212,7 @@ static MACHINE_DRIVER_START( victory )
 	MDRV_CPU_ADD(Z80, VICTORY_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT(victory_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", victory_vblank_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

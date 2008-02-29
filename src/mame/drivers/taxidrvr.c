@@ -362,16 +362,16 @@ static MACHINE_DRIVER_START( taxidrvr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
 	MDRV_CPU_IO_MAP(readport3,writeport3)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* ??? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */

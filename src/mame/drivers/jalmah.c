@@ -1002,7 +1002,7 @@ static MACHINE_RESET (daireika)
 static MACHINE_DRIVER_START( jalmah )
 	MDRV_CPU_ADD_TAG("main" , M68000, 8000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah,0)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_GFXDECODE(jalmah)
 

@@ -614,7 +614,7 @@ static MACHINE_DRIVER_START( meadows )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(S2650, 5000000/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(meadows_interrupt,1) 	/* one interrupt per frame!? */
+	MDRV_CPU_VBLANK_INT("main", meadows_interrupt) 	/* one interrupt per frame!? */
 
 	MDRV_CPU_ADD(S2650, 5000000/8)
 	/* audio CPU */ 	/* 5MHz / 8 = 625 kHz */
@@ -655,7 +655,7 @@ static MACHINE_DRIVER_START( minferno )
 	MDRV_CPU_ADD(S2650, 5000000/8/3) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(minferno_readmem,minferno_writemem)
 	MDRV_CPU_IO_MAP(minferno_readport,0)
-	MDRV_CPU_VBLANK_INT(minferno_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", minferno_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

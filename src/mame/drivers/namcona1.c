@@ -1346,12 +1346,12 @@ static MACHINE_DRIVER_START( namcona1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_readmem,namcona1_mcu_writemem)
-	MDRV_CPU_VBLANK_INT(namcona1_interrupt,5)
+	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
 	MDRV_CPU_ADD(M37710, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map, 0)
 	MDRV_CPU_IO_MAP( namcona1_mcu_io_map, 0 )
-	MDRV_CPU_VBLANK_INT(mcu_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
 
 	MDRV_NVRAM_HANDLER(namcosna1)
 	MDRV_MACHINE_START(namcona1)
@@ -1445,7 +1445,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona2_readmem,namcona2_writemem)
-	MDRV_CPU_VBLANK_INT(namcona1_interrupt,5)
+	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
 	MDRV_NVRAM_HANDLER(namcosna1)
 	MDRV_INTERLEAVE(40)

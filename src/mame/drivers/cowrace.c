@@ -164,12 +164,12 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_cowrace,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_sound_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_sound_cowrace,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	// NMI by main CPU
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main CPU
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

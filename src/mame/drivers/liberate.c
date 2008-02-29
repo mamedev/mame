@@ -15,6 +15,7 @@
 *******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 
@@ -519,12 +520,12 @@ static MACHINE_DRIVER_START( liberate )
 	MDRV_CPU_ADD_TAG("main",DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
-	MDRV_CPU_VBLANK_INT(deco16_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound",M6502, 1500000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	MDRV_INTERLEAVE(200)
 
@@ -558,7 +559,7 @@ static MACHINE_DRIVER_START( liberatb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
-	MDRV_CPU_VBLANK_INT(deco16_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
 	MDRV_IMPORT_FROM(liberate)
 	MDRV_CPU_REMOVE("main")
@@ -595,7 +596,7 @@ static MACHINE_DRIVER_START( prosport )
 	MDRV_CPU_ADD(M6502, 1500000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,16)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	MDRV_INTERLEAVE(200)
 

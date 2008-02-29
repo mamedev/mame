@@ -1262,7 +1262,7 @@ static MACHINE_DRIVER_START( mrokumei )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4MHz ? */
 	/* audio CPU */
@@ -1319,13 +1319,13 @@ static MACHINE_DRIVER_START( reikaids )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD(UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
 	MDRV_CPU_IO_MAP(reikaids_upd7807_readport,reikaids_upd7807_writeport)
-	MDRV_CPU_VBLANK_INT(upd7807_irq,1)
+	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(500)	// very high interleave required to sync for startup tests
 
@@ -1369,13 +1369,13 @@ static MACHINE_DRIVER_START( pteacher )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
-	MDRV_CPU_VBLANK_INT(homedata_irq,1)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
 
 	MDRV_CPU_ADD_TAG("sound", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
 	MDRV_CPU_IO_MAP(pteacher_upd7807_readport,pteacher_upd7807_writeport)
-	MDRV_CPU_VBLANK_INT(upd7807_irq,1)
+	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(100)	// should be enough
 

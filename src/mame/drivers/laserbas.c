@@ -131,7 +131,7 @@ static MACHINE_DRIVER_START( laserbas )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(laserbas_memory,0)
 	MDRV_CPU_IO_MAP(laserbas_io,0)
-	MDRV_CPU_VBLANK_INT(laserbas_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(laserbas_interrupt,2)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

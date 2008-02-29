@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( crospang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(crospang_readmem,crospang_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 14318180/4)
 	/* audio CPU */
@@ -444,7 +444,7 @@ static MACHINE_DRIVER_START( bestri )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(bestri_readmem,bestri_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80, 14318180/4)
 	/* audio CPU */

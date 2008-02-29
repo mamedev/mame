@@ -530,12 +530,12 @@ static MACHINE_DRIVER_START( yunsung8 )
 	MDRV_CPU_ADD(Z80, 8000000)			/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(yunsung8_readmem,yunsung8_writemem)
 	MDRV_CPU_IO_MAP(yunsung8_readport,yunsung8_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* No nmi routine */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No nmi routine */
 
 	MDRV_CPU_ADD(Z80, 4000000)			/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(yunsung8_sound_readmem,yunsung8_sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* NMI caused by the MSM5205? */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMI caused by the MSM5205? */
 
 	MDRV_MACHINE_RESET(yunsung8)
 

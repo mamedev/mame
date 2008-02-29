@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_CPU_ADD_TAG("master", Z80, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(master_map_program,0)
 	MDRV_CPU_IO_MAP(master_map_io,0)
-	MDRV_CPU_VBLANK_INT(leland_master_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", leland_master_interrupt)
 
 	MDRV_CPU_ADD_TAG("slave", Z80, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(slave_small_map_program,0)

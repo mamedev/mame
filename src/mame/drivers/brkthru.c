@@ -402,7 +402,7 @@ static MACHINE_DRIVER_START( brkthru )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(brkthru_map,0)
-	MDRV_CPU_VBLANK_INT(brkthru_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(brkthru_interrupt,2)
 
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -440,7 +440,7 @@ static MACHINE_DRIVER_START( darwin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darwin_map,0)
-	MDRV_CPU_VBLANK_INT(brkthru_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(brkthru_interrupt,2)
 
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

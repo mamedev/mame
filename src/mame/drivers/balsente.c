@@ -1670,7 +1670,7 @@ static MACHINE_DRIVER_START( balsente )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 5000000/4)
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(balsente_update_analog_inputs,1)
+	MDRV_CPU_VBLANK_INT("main", balsente_update_analog_inputs)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */

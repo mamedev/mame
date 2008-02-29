@@ -755,7 +755,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_CONFIG(gticlub_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
-	MDRV_CPU_VBLANK_INT(gticlub_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", gticlub_vblank)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)

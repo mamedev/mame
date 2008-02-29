@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( mikie )
 	// basic machine hardware
 	MDRV_CPU_ADD(M6809, 1250000)	// ??? MC68A09E
 	MDRV_CPU_PROGRAM_MAP(mikie_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, CLK)	// 3.58 MHz
 	/* audio CPU */

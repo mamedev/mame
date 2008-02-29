@@ -1476,12 +1476,12 @@ static MACHINE_DRIVER_START( coh700 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	MDRV_CPU_ADD(H83002, 14745600 )	/* verified 14.7456 MHz */
 	MDRV_CPU_PROGRAM_MAP( s12h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s12h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT( irq1_line_pulse, 1 )
+	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
 	MDRV_MACHINE_RESET( namcos12 )
 	MDRV_NVRAM_HANDLER( at28c16_0 )

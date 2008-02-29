@@ -432,12 +432,12 @@ static MACHINE_DRIVER_START( buggychl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */ /* 4 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
 	MDRV_CPU_ADD(M68705,8000000/2)  /* 4 MHz */

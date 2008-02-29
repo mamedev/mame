@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_CPU_ADD(Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_VIDEO_START(suprgolf)
 	MDRV_VIDEO_UPDATE(suprgolf)

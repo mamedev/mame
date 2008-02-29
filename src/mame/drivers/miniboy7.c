@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( miniboy7 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MASTER_CLOCK/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(miniboy7_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse, 1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

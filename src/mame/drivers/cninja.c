@@ -785,7 +785,7 @@ static MACHINE_DRIVER_START( cninja )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/8)
 	/* audio CPU */	/* Accurate */
@@ -834,7 +834,7 @@ static MACHINE_DRIVER_START( stoneage )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(cninja_readmem,cninja_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */
@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( edrandy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(edrandy_readmem,edrandy_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/8)
 	/* audio CPU */	/* Accurate */
@@ -929,7 +929,7 @@ static MACHINE_DRIVER_START( robocop2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(robocop2_readmem,robocop2_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/8)
 	/* audio CPU */	/* Accurate */
@@ -981,7 +981,7 @@ static MACHINE_DRIVER_START( mutantf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(mutantf_readmem,mutantf_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/8)
 	/* audio CPU */

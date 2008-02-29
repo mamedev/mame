@@ -551,7 +551,7 @@ static MACHINE_DRIVER_START( undrfire )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(undrfire_readmem,undrfire_writemem)
-	MDRV_CPU_VBLANK_INT(undrfire_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", undrfire_interrupt)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 

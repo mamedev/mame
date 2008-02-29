@@ -195,7 +195,7 @@ static MACHINE_DRIVER_START( m79amb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(8080, 1996800)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(m79amb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", m79amb_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

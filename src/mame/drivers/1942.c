@@ -268,11 +268,11 @@ static MACHINE_DRIVER_START( 1942 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(c1942_map, 0)
-	MDRV_CPU_VBLANK_INT(c1942_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(c1942_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3000000)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_GFXDECODE(1942)

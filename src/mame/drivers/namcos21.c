@@ -1518,20 +1518,20 @@ static const struct C140interface C140_interface_typeB =
 static MACHINE_DRIVER_START( s21base )
 	MDRV_CPU_ADD(M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master, namcos21_68k_common)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_master_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD(M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_slave, namcos21_68k_common)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_slave_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
 	MDRV_CPU_ADD(M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD(HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(TMS32025,24000000) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
@@ -1597,20 +1597,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( driveyes )
 	MDRV_CPU_ADD(M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master, driveyes_68k_common)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_master_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD(M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_slave, driveyes_68k_common)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_slave_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
 	MDRV_CPU_ADD(M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD(HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(TMS32025,24000000*2) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program,0)
@@ -1652,20 +1652,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_CPU_ADD(M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun,0)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_master_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD(M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(am_slave_winrun,0)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_slave_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
 
 	MDRV_CPU_ADD(M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD(HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(TMS32025,24000000) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program,0)
@@ -1674,7 +1674,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 
 	MDRV_CPU_ADD(M68000,12288000) /* graphics coprocessor */
 	MDRV_CPU_PROGRAM_MAP(am_gpu_winrun,0)
-	MDRV_CPU_VBLANK_INT(namcos2_68k_gpu_vblank,1)
+	MDRV_CPU_VBLANK_INT("main", namcos2_68k_gpu_vblank)
 
 	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */
 

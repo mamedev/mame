@@ -444,7 +444,7 @@ static MACHINE_DRIVER_START( kchampvs )
 	MDRV_CPU_ADD(Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(kc_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* 12MHz / 4 = 3.0 MHz */
@@ -492,7 +492,7 @@ static MACHINE_DRIVER_START( kchamp )
 	MDRV_CPU_ADD(Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_readmem,kc_writemem)
 	MDRV_CPU_IO_MAP(kc_readport,kc_writeport)
-	MDRV_CPU_VBLANK_INT(kc_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* 12MHz / 4 = 3.0 MHz */

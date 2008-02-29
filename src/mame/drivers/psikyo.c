@@ -1565,7 +1565,7 @@ static MACHINE_DRIVER_START( sngkace )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ? */
@@ -1619,7 +1619,7 @@ static MACHINE_DRIVER_START( gunbird )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	/* audio CPU */
@@ -1681,7 +1681,7 @@ static MACHINE_DRIVER_START( s1945 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	/* audio CPU */

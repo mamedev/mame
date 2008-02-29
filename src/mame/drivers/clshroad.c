@@ -306,12 +306,12 @@ static MACHINE_DRIVER_START( firebatl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_readmem,clshroad_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD(Z80, 3000000)	/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_readmem,clshroad_sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
 
@@ -343,12 +343,12 @@ static MACHINE_DRIVER_START( clshroad )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_readmem,clshroad_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* ? */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_readmem,clshroad_sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
 

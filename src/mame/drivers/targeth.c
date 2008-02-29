@@ -190,7 +190,7 @@ static MACHINE_DRIVER_START( targeth )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(targeth_readmem,targeth_writemem)
-	MDRV_CPU_VBLANK_INT(targeth_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(targeth_interrupt,3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

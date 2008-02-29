@@ -225,12 +225,12 @@ static MACHINE_DRIVER_START( exedexes )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(exedexes_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(exedexes_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

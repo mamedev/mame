@@ -1908,7 +1908,7 @@ static const struct YM2151interface ym2151_interface =
 static MACHINE_DRIVER_START( system24 )
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map, 0)
-	MDRV_CPU_VBLANK_INT(irq_vbl, 2)
+	MDRV_CPU_VBLANK_INT_HACK(irq_vbl, 2)
 
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map, 0)

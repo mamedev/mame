@@ -1051,7 +1051,7 @@ static MACHINE_DRIVER_START( firetrk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6800, FIRETRK_CPU_CLOCK_1MHZ)	/* 750Khz during service mode */
 	MDRV_CPU_PROGRAM_MAP(firetrk_map, 0)
-	MDRV_CPU_VBLANK_INT(firetrk_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", firetrk_interrupt)
 	MDRV_WATCHDOG_VBLANK_INIT(5)
 
 	MDRV_MACHINE_RESET(firetrk)

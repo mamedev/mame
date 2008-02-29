@@ -189,7 +189,7 @@ static INTERRUPT_GEN( ddealer_interrupt )
 static MACHINE_DRIVER_START( ddealer )
 	MDRV_CPU_ADD_TAG("main" , M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ddealer,0)
-	MDRV_CPU_VBLANK_INT(ddealer_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", ddealer_interrupt)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 112)
 
 	MDRV_GFXDECODE(jalmah)

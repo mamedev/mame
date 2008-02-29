@@ -1060,7 +1060,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_main,nekkyoku_writemem_main)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( idolmj )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
@@ -1136,7 +1136,7 @@ static MACHINE_DRIVER_START( fromance )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)

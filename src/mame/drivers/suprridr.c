@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( suprridr )
 	MDRV_CPU_ADD(Z80, 10000000/4)		/* just a guess */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT(main_nmi_gen,1)
+	MDRV_CPU_VBLANK_INT("main", main_nmi_gen)
 
 	MDRV_CPU_ADD(Z80, 10000000/4)		/* just a guess */
 	/* audio CPU */

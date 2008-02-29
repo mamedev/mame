@@ -420,7 +420,7 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
-	MDRV_CPU_VBLANK_INT(st0016_int,5) /*  4*nmi + int0 */
+	MDRV_CPU_VBLANK_INT_HACK(st0016_int,5) /*  4*nmi + int0 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -278,12 +278,12 @@ static MACHINE_DRIVER_START( mrflea )
 	MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1) /* NMI resets the game */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_io,writemem_io)
 	MDRV_CPU_IO_MAP(readport_io,writeport_io)
-	MDRV_CPU_VBLANK_INT(mrflea_io_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mrflea_io_interrupt,2)
 
 	MDRV_INTERLEAVE(100)
 

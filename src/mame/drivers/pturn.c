@@ -75,6 +75,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 
 */
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static tilemap *pturn_fgmap,*pturn_bgmap;
@@ -446,13 +447,13 @@ static MACHINE_RESET( pturn )
 static MACHINE_DRIVER_START( pturn )
 	MDRV_CPU_ADD(Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(pturn_main_intgen,1)
+	MDRV_CPU_VBLANK_INT("main", pturn_main_intgen)
 	MDRV_MACHINE_RESET(pturn)
 
 	MDRV_CPU_ADD(Z80, 12000000/3)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT(pturn_sub_intgen,3)
+	MDRV_CPU_VBLANK_INT_HACK(pturn_sub_intgen,3)
 
 	MDRV_GFXDECODE(pturn)
 

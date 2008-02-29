@@ -829,17 +829,17 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am,0)
 	MDRV_CPU_IO_MAP(cpu0_port_am,0)
-	MDRV_CPU_VBLANK_INT(djboy_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(djboy_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu1_am,0)
 	MDRV_CPU_IO_MAP(cpu1_port_am,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_am,0)
 	MDRV_CPU_IO_MAP(cpu2_port_am,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
 

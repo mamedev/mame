@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "fastfred.h"
 #include "sound/ay8910.h"
 
@@ -558,12 +559,12 @@ static MACHINE_DRIVER_START( fastfred )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, CLOCK/6)     /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(fastfred_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD_TAG("audio", Z80, CLOCK/12)
 	/* audio CPU */    /* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

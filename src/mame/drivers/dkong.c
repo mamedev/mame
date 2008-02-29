@@ -1558,7 +1558,7 @@ static MACHINE_DRIVER_START( dkong_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, CLOCK_1H)
 	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong2b)
 	MDRV_MACHINE_RESET(dkong)
@@ -1625,7 +1625,7 @@ static MACHINE_DRIVER_START( hunchbkd )
 	MDRV_CPU_REPLACE("main", S2650, CLOCK_1H / 2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(hunchbkd_map, 0)
 	MDRV_CPU_IO_MAP(hunchbkd_io_map, 0)
-	MDRV_CPU_VBLANK_INT(hunchbkd_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", hunchbkd_interrupt)
 
 	MDRV_MACHINE_START(hunchbkd)
 
@@ -1640,7 +1640,7 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_CPU_ADD_TAG("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
 	MDRV_CPU_IO_MAP(0, dkong3_io_map)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)
 	MDRV_MACHINE_RESET(dkong3)

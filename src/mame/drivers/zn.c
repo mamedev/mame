@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG( "MAIN", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
-	MDRV_CPU_VBLANK_INT( psx_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( coh1000c )
 	/* audio CPU */  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -709,7 +709,7 @@ static MACHINE_DRIVER_START( coh1002c )
 	/* audio CPU */  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -893,7 +893,7 @@ static MACHINE_DRIVER_START( coh3002c )
 	MDRV_CPU_ADD( Z80, 8000000 )
 	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
 	MDRV_CPU_IO_MAP( qsound_readport, 0 )
-	MDRV_CPU_VBLANK_INT( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh3002c )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
@@ -1306,7 +1306,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_IMPORT_FROM( zn1_1mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
 	MDRV_CPU_ADD( Z80, 16000000 / 4 )
 	/* audio CPU */	/* 4 MHz */
@@ -1390,7 +1390,7 @@ static MACHINE_DRIVER_START( coh1000tb )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1000t_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1000t_vblank)
 
 	MDRV_MACHINE_RESET( coh1000tb )
 	MDRV_NVRAM_HANDLER( coh1000tb )
@@ -2486,7 +2486,7 @@ static MACHINE_DRIVER_START( coh1002v )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_MODIFY( "MAIN" )
-	MDRV_CPU_VBLANK_INT( coh1002v_vblank, 1 )
+	MDRV_CPU_VBLANK_INT("main", coh1002v_vblank)
 
 	MDRV_MACHINE_RESET( coh1002v )
 	MDRV_NVRAM_HANDLER( at28c16_0 )

@@ -3315,7 +3315,7 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_CPU_ADD_TAG("main", Z80, 3000000)        /* 3.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(royalmah_map,0)
 	MDRV_CPU_IO_MAP(royalmah_iomap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -3361,7 +3361,7 @@ static MACHINE_DRIVER_START( suzume )
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(suzume_iomap,0)
-	MDRV_CPU_VBLANK_INT(suzume_irq,1)
+	MDRV_CPU_VBLANK_INT("main", suzume_irq)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tontonb )
@@ -3415,7 +3415,7 @@ static MACHINE_DRIVER_START( janptr96 )
 	MDRV_CPU_REPLACE("main",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(janptr96_map,0)
 	MDRV_CPU_IO_MAP(janptr96_iomap,0)
-	MDRV_CPU_VBLANK_INT(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
@@ -3427,7 +3427,7 @@ static MACHINE_DRIVER_START( mjifb )
 	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjifb_map,0)
 	MDRV_CPU_IO_MAP(mjifb_iomap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3439,7 +3439,7 @@ static MACHINE_DRIVER_START( mjdejavu )
 	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjdejavu_map,0)
 	MDRV_CPU_IO_MAP(mjifb_iomap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3460,7 +3460,7 @@ static MACHINE_DRIVER_START( mjtensin )
 	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjtensin_map,0)
 	MDRV_CPU_IO_MAP(mjtensin_iomap,0)
-	MDRV_CPU_VBLANK_INT( mjtensin_interrupt,2 )
+	MDRV_CPU_VBLANK_INT_HACK( mjtensin_interrupt,2 )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
@@ -3471,7 +3471,7 @@ static MACHINE_DRIVER_START( cafetime )
 	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(cafetime_map,0)
 	MDRV_CPU_IO_MAP(cafetime_iomap,0)
-	MDRV_CPU_VBLANK_INT(mjtensin_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)

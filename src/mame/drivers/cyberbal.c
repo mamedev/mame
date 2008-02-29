@@ -454,7 +454,7 @@ static MACHINE_DRIVER_START( cyberbal )
 
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map,0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("left", atarigen_video_int_gen)	/* or is it "right?" */
 
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_68k_map,0)
@@ -506,7 +506,7 @@ static MACHINE_DRIVER_START( cyberb2p )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(cyberb2p_map,0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(cyberb2p)
 	MDRV_NVRAM_HANDLER(atarigen)

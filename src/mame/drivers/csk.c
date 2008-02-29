@@ -128,6 +128,7 @@ Palette3*:  585D (low), 5899 (high), len = 60   (used alternatively with pal3)
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2413intf.h"
 
@@ -737,7 +738,7 @@ static MACHINE_DRIVER_START( cpoker )
 	MDRV_CPU_ADD_TAG("main",Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(map,0)
 	MDRV_CPU_IO_MAP(cpoker_map,0)
-	MDRV_CPU_VBLANK_INT(cpoker_interrupt,8)
+	MDRV_CPU_VBLANK_INT_HACK(cpoker_interrupt,8)
 
 	MDRV_MACHINE_RESET(cpk)
 
@@ -768,7 +769,7 @@ static MACHINE_DRIVER_START( csk227it )
 	MDRV_CPU_MODIFY("main")
 	/* basic machine hardware */
 	MDRV_CPU_IO_MAP(csk227_map,0)
-	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
+	MDRV_CPU_VBLANK_INT_HACK(cska_interrupt,8)
 	MDRV_GFXDECODE(csk)
 
 MACHINE_DRIVER_END
@@ -779,7 +780,7 @@ static MACHINE_DRIVER_START( csk234it )
 	MDRV_CPU_MODIFY("main")
 	/* basic machine hardware */
 	MDRV_CPU_IO_MAP(csk234_map,0)
-	MDRV_CPU_VBLANK_INT(cska_interrupt,8)
+	MDRV_CPU_VBLANK_INT_HACK(cska_interrupt,8)
 	MDRV_GFXDECODE(csk)
 
 MACHINE_DRIVER_END

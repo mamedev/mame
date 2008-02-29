@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( chainrec )
 
 	MDRV_CPU_ADD_TAG("DE156", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	MDRV_CPU_PROGRAM_MAP(chainrec_map,0)
-	MDRV_CPU_VBLANK_INT(simpl156_vbl_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", simpl156_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(simpl156) // 93C45
 

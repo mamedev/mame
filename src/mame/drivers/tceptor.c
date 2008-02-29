@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( tceptor )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(m6809_map,0)
-	MDRV_CPU_VBLANK_INT(m6809_vb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("2D", m6809_vb_interrupt)
 
 	MDRV_CPU_ADD(M65C02, 49152000/24)
 	/* audio CPU */
@@ -445,12 +445,12 @@ static MACHINE_DRIVER_START( tceptor )
 
 	MDRV_CPU_ADD(M68000, 49152000/4)
 	MDRV_CPU_PROGRAM_MAP(m68k_map,0)
-	MDRV_CPU_VBLANK_INT(m68k_vb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("2D", m68k_vb_interrupt)
 
 	MDRV_CPU_ADD(HD63701, 49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
-	MDRV_CPU_VBLANK_INT(mcu_vb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("2D", mcu_vb_interrupt)
 
 	MDRV_INTERLEAVE(100)
 

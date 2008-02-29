@@ -930,7 +930,7 @@ static MACHINE_DRIVER_START( pbillian )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(pbillian_port_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -961,7 +961,7 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_CPU_ADD(Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(hotsmash_port_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M68705, 4000000) /* ???? */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
@@ -997,7 +997,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(sqix_port_map,0)
-	MDRV_CPU_VBLANK_INT(sqix_interrupt,6)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD(I8751, 12000000/3)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
@@ -1038,7 +1038,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(bootleg_port_map,0)
-	MDRV_CPU_VBLANK_INT(bootleg_interrupt,6)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

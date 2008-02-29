@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( drw80pkr )
 	MDRV_CPU_ADD_TAG("main", I8039, 7864300)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map, 0)
     MDRV_CPU_IO_MAP(drw80pkr_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	// video hardware
 

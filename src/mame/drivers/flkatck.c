@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( flkatck )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
-	MDRV_CPU_VBLANK_INT(flkatck_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", flkatck_interrupt)
 
 	MDRV_CPU_ADD(Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem_sound,flkatck_writemem_sound)

@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( lvcards )
 
 	MDRV_CPU_PROGRAM_MAP(lvcards_map, 0)
 	MDRV_CPU_IO_MAP(lvcards_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	// video hardware
 

@@ -951,7 +951,7 @@ static const struct YMZ280Binterface ymz280b_intf =
 static MACHINE_DRIVER_START(skns)
 	MDRV_CPU_ADD(SH2,28638000)
 	MDRV_CPU_PROGRAM_MAP(skns_readmem,skns_writemem)
-	MDRV_CPU_VBLANK_INT(skns_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(skns_interrupt,2)
 
 	MDRV_MACHINE_RESET(skns)
 	MDRV_NVRAM_HANDLER(generic_1fill)

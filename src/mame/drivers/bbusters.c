@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( bbusters )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbuster_readmem,bbuster_writemem)
-	MDRV_CPU_VBLANK_INT(bbuster,4)
+	MDRV_CPU_VBLANK_INT_HACK(bbuster,4)
 
 	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
 	/* audio CPU */
@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( mechatt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mechatt_readmem,mechatt_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000) /* Accurate */
 	/* audio CPU */

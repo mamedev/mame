@@ -314,7 +314,7 @@ static MACHINE_DRIVER_START( goal92 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(goal92_readmem,goal92_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1) /* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold) /* VBL */
 
 	MDRV_CPU_ADD(Z80, 2500000)
 	/* audio CPU */

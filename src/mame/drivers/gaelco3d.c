@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START( gaelco3d )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_gen, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_gen)
 
 	MDRV_CPU_ADD_TAG("tms", TMS32031, 60000000)
 	MDRV_CPU_PROGRAM_MAP(tms_map,0)

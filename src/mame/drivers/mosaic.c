@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( mosaic )
 	MDRV_CPU_ADD_TAG("main", Z180, 7000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

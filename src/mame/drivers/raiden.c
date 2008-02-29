@@ -236,11 +236,11 @@ static MACHINE_DRIVER_START( raiden )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 
 	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
@@ -275,11 +275,11 @@ static MACHINE_DRIVER_START( raidena )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(alt_map,0)
-	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 
 	MDRV_CPU_ADD(V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT(raiden_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 

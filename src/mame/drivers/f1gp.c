@@ -568,11 +568,11 @@ static MACHINE_DRIVER_START( f1gp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(Z80,XTAL_20MHz/4)	/* verified on pcb */
 	/* audio CPU */
@@ -611,11 +611,11 @@ static MACHINE_DRIVER_START( f1gpb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main",M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_CPU_ADD(M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT(irq1_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* NO sound CPU */
 	MDRV_INTERLEAVE(100) /* 100 CPU slices per frame */

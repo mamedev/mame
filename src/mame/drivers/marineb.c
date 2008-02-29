@@ -511,7 +511,7 @@ static MACHINE_DRIVER_START( marineb )
 	MDRV_CPU_ADD_TAG("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(marineb_map,0)
 	MDRV_CPU_IO_MAP(marineb_io_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(marineb)
 
@@ -576,7 +576,7 @@ static MACHINE_DRIVER_START( wanted )
 	MDRV_IMPORT_FROM(marineb)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(wanted_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(wanted)

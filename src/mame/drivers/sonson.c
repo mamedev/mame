@@ -240,12 +240,12 @@ static MACHINE_DRIVER_START( sonson )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,12000000/6)	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(M6809,12000000/6)
 	/* audio CPU */	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
 
 
 	/* video hardware */

@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( vroulet )
 	MDRV_CPU_ADD(Z80, 4000000)	//???
 	MDRV_CPU_PROGRAM_MAP(vroulet_map, 0)
 	MDRV_CPU_IO_MAP(vroulet_io_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(vroulet)
 

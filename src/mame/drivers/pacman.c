@@ -3075,7 +3075,7 @@ static MACHINE_DRIVER_START( pacman )
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(pacman_map,0)
 	MDRV_CPU_IO_MAP(0,writeport)
-	MDRV_CPU_VBLANK_INT(pacman_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
@@ -3149,7 +3149,7 @@ static MACHINE_DRIVER_START( alibaba )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(alibaba_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 MACHINE_DRIVER_END
 
 
@@ -3161,7 +3161,7 @@ static MACHINE_DRIVER_START( dremshpr )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(dremshpr_map,0)
 	MDRV_CPU_IO_MAP(0,dremshpr_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("namco", AY8910, 14318000/8)
@@ -3203,7 +3203,7 @@ static MACHINE_DRIVER_START( vanvan )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(vanvan_map,0)
 	MDRV_CPU_IO_MAP(0,vanvan_writeport)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
@@ -3225,7 +3225,7 @@ static MACHINE_DRIVER_START( bigbucks )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(bigbucks_map,0)
 	MDRV_CPU_IO_MAP(bigbucks_readport,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,20)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3240,7 +3240,7 @@ static MACHINE_DRIVER_START( s2650games )
 	MDRV_CPU_REMOVE("main")
 	MDRV_CPU_ADD_TAG("main", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MDRV_CPU_PROGRAM_MAP(s2650games_map,0)
-	MDRV_CPU_VBLANK_INT(s2650_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", s2650_interrupt)
 
 	MDRV_GFXDECODE(s2650games)
 
@@ -3295,7 +3295,7 @@ static MACHINE_DRIVER_START( rocktrv2 )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(rocktrv2_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
@@ -3310,7 +3310,7 @@ static MACHINE_DRIVER_START( mschamp )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mschamp_map,0)
 	MDRV_CPU_IO_MAP(mschamp_readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(mschamp)
 MACHINE_DRIVER_END

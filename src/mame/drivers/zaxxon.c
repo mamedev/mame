@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( root )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(zaxxon_map, 0)
-	MDRV_CPU_VBLANK_INT(vblank_int, 1)
+	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
 	MDRV_MACHINE_START(zaxxon)
 

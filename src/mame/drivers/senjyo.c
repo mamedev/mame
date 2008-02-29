@@ -664,7 +664,7 @@ static MACHINE_DRIVER_START( senjyo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(senjyo_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", senjyo_interrupt)
 
 	MDRV_CPU_ADD_TAG("sub", Z80, 2000000)
 	MDRV_CPU_CONFIG(daisy_chain)

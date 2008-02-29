@@ -530,12 +530,12 @@ static MACHINE_DRIVER_START( msisaac )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)	/* source of IRQs is unknown */
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MDRV_CPU_ADD(M68705,8000000/2)  /* 4 MHz */

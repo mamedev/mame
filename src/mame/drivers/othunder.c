@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( othunder )
 //  MDRV_CPU_ADD(M68000, 24000000/2 )   /* 12 MHz */
 	MDRV_CPU_ADD(M68000, 13000000 )	/* fixes garbage graphics on startup */
 	MDRV_CPU_PROGRAM_MAP(othunder_map,0)
-	MDRV_CPU_VBLANK_INT(vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", vblank_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000/4 )	/* 4 MHz */
 	/* audio CPU */

@@ -977,7 +977,7 @@ static MACHINE_DRIVER_START( lastday )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(lastday_readmem,lastday_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1011,7 +1011,7 @@ static MACHINE_DRIVER_START( gulfstrm )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(gulfstrm_readmem,pollux_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1045,7 +1045,7 @@ static MACHINE_DRIVER_START( pollux )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(pollux_readmem,pollux_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1079,7 +1079,7 @@ static MACHINE_DRIVER_START( bluehawk )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(bluehawk_readmem,bluehawk_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1113,7 +1113,7 @@ static MACHINE_DRIVER_START( flytiger )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(flytiger_readmem,flytiger_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1147,7 +1147,7 @@ static MACHINE_DRIVER_START( primella )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 8000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(primella_readmem,primella_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* ??? */
@@ -1185,7 +1185,7 @@ static MACHINE_DRIVER_START( rshark )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)	/* measured on super-x */
 	MDRV_CPU_PROGRAM_MAP(rshark_readmem,rshark_writemem)
-	MDRV_CPU_VBLANK_INT(rshark_interrupt,2)	/* 5 and 6 */
+	MDRV_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* measured on super-x */
@@ -1217,7 +1217,7 @@ static MACHINE_DRIVER_START( superx ) // dif mem map
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)	/* measured on super-x */
 	MDRV_CPU_PROGRAM_MAP(superx_readmem,superx_writemem)
-	MDRV_CPU_VBLANK_INT(rshark_interrupt,2)	/* 5 and 6 */
+	MDRV_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* measured on super-x */
@@ -1249,7 +1249,7 @@ static MACHINE_DRIVER_START( popbingo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(popbingo_readmem,popbingo_writemem)
-	MDRV_CPU_VBLANK_INT(rshark_interrupt,2)	/* 5 and 6 */
+	MDRV_CPU_VBLANK_INT_HACK(rshark_interrupt,2)	/* 5 and 6 */
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* measured on super-x */

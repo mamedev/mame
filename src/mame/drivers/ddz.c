@@ -54,7 +54,7 @@ static const struct VR0Interface vr0_interface =
 static MACHINE_DRIVER_START( ddz )
 	MDRV_CPU_ADD(SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(ddz_mem,0)
- 	MDRV_CPU_VBLANK_INT(ddz_interrupt,1)
+ 	MDRV_CPU_VBLANK_INT("main", ddz_interrupt)
 
 	//MDRV_MACHINE_RESET(ddz)
 

@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( base )
 	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
-	MDRV_CPU_VBLANK_INT(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
+	MDRV_CPU_VBLANK_INT_HACK(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(lasso)

@@ -221,6 +221,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "lazercmd.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
@@ -620,7 +621,7 @@ static MACHINE_DRIVER_START( lazercmd )
             thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(lazercmd_map,0)
 	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
-	MDRV_CPU_VBLANK_INT(lazercmd_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -655,7 +656,7 @@ static MACHINE_DRIVER_START( medlanes )
             thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(medlanes_map,0)
 	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
-	MDRV_CPU_VBLANK_INT(lazercmd_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -690,7 +691,7 @@ static MACHINE_DRIVER_START( bbonk )
             thus requiring an extra loading of approx 3-5 */
 	MDRV_CPU_PROGRAM_MAP(bbonk_map,0)
 	MDRV_CPU_IO_MAP(lazercmd_portmap,0)
-	MDRV_CPU_VBLANK_INT(bbonk_timer, 128) 	/* 7680 Hz */
+	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -49,6 +49,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/pokey.h"
 
 
@@ -319,7 +320,7 @@ static MACHINE_DRIVER_START( tunhunt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502,2000000)		/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ? probably wrong */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ? probably wrong */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( rocnrope )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1600000)        /* 1.6 MHz??? Attract mode depends on this to work correctly */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

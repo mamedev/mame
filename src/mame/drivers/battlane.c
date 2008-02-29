@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( battlane )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1250000)        /* 1.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(battlane_map, 0)
-	MDRV_CPU_VBLANK_INT(battlane_cpu1_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", battlane_cpu1_interrupt)
 
 	MDRV_CPU_ADD(M6809, 1250000)        /* 1.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(battlane_map, 0)

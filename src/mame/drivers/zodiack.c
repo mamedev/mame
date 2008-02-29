@@ -19,6 +19,7 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/espial.h"
 
@@ -476,12 +477,12 @@ static MACHINE_DRIVER_START( zodiack )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(zodiac_master_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(0,sound_writeport)
-	MDRV_CPU_VBLANK_INT(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(zodiack)
 

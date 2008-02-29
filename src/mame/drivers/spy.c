@@ -538,7 +538,7 @@ static MACHINE_DRIVER_START( spy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(spy_readmem,spy_writemem)
-	MDRV_CPU_VBLANK_INT(spy_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", spy_interrupt)
 
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */

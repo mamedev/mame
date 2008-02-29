@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( fcombat )
 
 	MDRV_CPU_ADD(Z80, 10000000/3)
 	MDRV_CPU_PROGRAM_MAP(fcombat_readmem,fcombat_writemem)
-	MDRV_CPU_VBLANK_INT(fcombat_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", fcombat_interrupt)
 
 	MDRV_CPU_ADD(Z80, 10000000/3)
 	MDRV_CPU_PROGRAM_MAP(fcombat_readmem2,fcombat_writemem2)

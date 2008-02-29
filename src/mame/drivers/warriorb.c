@@ -488,7 +488,7 @@ static MACHINE_DRIVER_START( darius2d )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
 	MDRV_CPU_PROGRAM_MAP(darius2d_readmem,darius2d_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ? */
@@ -547,7 +547,7 @@ static MACHINE_DRIVER_START( warriorb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(warriorb_readmem,warriorb_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ? */

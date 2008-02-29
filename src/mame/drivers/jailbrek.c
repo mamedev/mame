@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( jailbrek )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/12)
 	MDRV_CPU_PROGRAM_MAP(jailbrek_map, 0)
-	MDRV_CPU_VBLANK_INT(jb_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", jb_interrupt)
 	MDRV_CPU_PERIODIC_INT(jb_interrupt_nmi, 500) /* ? */
 
 	MDRV_MACHINE_START(jailbrek)

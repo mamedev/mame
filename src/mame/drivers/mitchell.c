@@ -1331,7 +1331,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	MDRV_CPU_ADD(Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1365,7 +1365,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_CPU_ADD_TAG("main",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
 
@@ -1436,13 +1436,13 @@ static MACHINE_DRIVER_START( spangbl )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(spangb_memmap,0)
 	MDRV_CPU_IO_MAP(spangb_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("sound",Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
 	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
-//  MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_GFXDECODE(spangbl)
 
@@ -1464,7 +1464,7 @@ static MACHINE_DRIVER_START( mstworld )
 
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mstworld_readport,mstworld_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,6000000)		 /* 6 MHz? */
 	/* audio CPU */
@@ -1499,7 +1499,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_CPU_ADD(Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
 

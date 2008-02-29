@@ -932,7 +932,7 @@ MACHINE_DRIVER_START( exidy440_audio )
 
 	MDRV_CPU_ADD(M6809, EXIDY440_AUDIO_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_audio_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 

@@ -754,7 +754,7 @@ static MACHINE_DRIVER_START( tsamurai )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport)
-	MDRV_CPU_VBLANK_INT(samurai_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
 	MDRV_CPU_ADD(Z80, 2000000)
 	/* audio CPU */
@@ -799,7 +799,7 @@ static MACHINE_DRIVER_START( m660 )
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_m660,writemem_m660)
 	MDRV_CPU_IO_MAP(z80_readport,z80_writeport_m660)
-	MDRV_CPU_VBLANK_INT(samurai_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
 	MDRV_CPU_ADD(Z80, 2000000)
 	/* audio CPU */
@@ -813,7 +813,7 @@ static MACHINE_DRIVER_START( m660 )
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound3_m660,writemem_sound3_m660)
 	MDRV_CPU_IO_MAP(readport_sound3_m660,writeport_sound3_m660)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -849,12 +849,12 @@ static MACHINE_DRIVER_START( vsgongf )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_vsgongf,writemem_vsgongf)
-	MDRV_CPU_VBLANK_INT(samurai_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound_vsgongf,writemem_sound_vsgongf)
 	MDRV_CPU_IO_MAP(0,z80_writeport)
-	MDRV_CPU_VBLANK_INT(vsgongf_sound_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

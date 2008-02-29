@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( volfied )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 8000000)   /* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(volfied_readmem,volfied_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)   /* sound CPU, required to run the game */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)

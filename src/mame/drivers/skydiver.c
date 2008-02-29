@@ -87,6 +87,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "skydiver.h"
 #include "sound/discrete.h"
 
@@ -370,7 +371,7 @@ static MACHINE_DRIVER_START( skydiver )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6800,3000000/4)	   /* ???? */
 	MDRV_CPU_PROGRAM_MAP(skydiver_map, 0)
-	MDRV_CPU_VBLANK_INT(skydiver_interrupt, 5)
+	MDRV_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
 	MDRV_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 
 	MDRV_MACHINE_RESET(skydiver)

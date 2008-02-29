@@ -317,7 +317,7 @@ static MACHINE_DRIVER_START( galsnew )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(galsnew,0)
-	MDRV_CPU_VBLANK_INT(galsnew_interrupt,3)
+	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 

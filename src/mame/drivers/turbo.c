@@ -1001,7 +1001,7 @@ static MACHINE_DRIVER_START( turbo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( subroc3d )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( buckrog )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)

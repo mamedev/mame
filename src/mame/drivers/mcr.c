@@ -283,6 +283,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
@@ -1507,7 +1508,7 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(cpu_90009_map,0)
 	MDRV_CPU_IO_MAP(cpu_90009_portmap,0)
-	MDRV_CPU_VBLANK_INT(mcr_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
@@ -1595,7 +1596,7 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_CPU_CONFIG(mcr_ipu_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ipu_91695_map,0)
 	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)
-	MDRV_CPU_VBLANK_INT(mcr_ipu_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
 MACHINE_DRIVER_END
 
 

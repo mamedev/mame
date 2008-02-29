@@ -227,7 +227,7 @@ static MACHINE_DRIVER_START( smstrv )
 	MDRV_CPU_ADD(I8088,24000000/2)
 	MDRV_CPU_PROGRAM_MAP(smstrv_map,0)
 //  MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(smstrv)

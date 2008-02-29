@@ -3138,7 +3138,7 @@ static MACHINE_DRIVER_START( NBMJDRV_4096 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 5000000)	/* 5.00 MHz */
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
@@ -3206,7 +3206,7 @@ static MACHINE_DRIVER_START( crystalg )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_crystalg)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 96) // nmiclock = 2f
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 96) // nmiclock = 2f
 MACHINE_DRIVER_END
 
 
@@ -3217,7 +3217,7 @@ static MACHINE_DRIVER_START( apparel )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
 
@@ -3228,7 +3228,7 @@ static MACHINE_DRIVER_START( mbmj_h12bit )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
 	/* video hardware */
 	MDRV_VIDEO_START(mbmj8688_hybrid_12bit)
@@ -3242,7 +3242,7 @@ static MACHINE_DRIVER_START( mbmj_p16bit )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60/40
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60/40
 
 	/* video hardware */
 	MDRV_VIDEO_START(mbmj8688_pure_16bit)
@@ -3253,7 +3253,7 @@ static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", Z80, 5000000)	/* 5.00 MHz */
-	MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_p16bit_LCD)
 
@@ -3308,7 +3308,7 @@ static MACHINE_DRIVER_START( seiha )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_seiha)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
 
@@ -3319,7 +3319,7 @@ static MACHINE_DRIVER_START( iemoto )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_iemoto)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
 
@@ -3330,7 +3330,7 @@ static MACHINE_DRIVER_START( ojousan )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_ojousan, writemem_ojousan)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_iemoto)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)    // nmiclock = 60
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 MACHINE_DRIVER_END
 
 
@@ -3341,7 +3341,7 @@ static MACHINE_DRIVER_START( mbmj_p12bit )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjsikaku, writemem_mjsikaku)
 	MDRV_CPU_IO_MAP(readport_kaguya, writeport_kaguya)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_DRIVER_END
 
 
@@ -3352,7 +3352,7 @@ static MACHINE_DRIVER_START( mjsikaku )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjsikaku, writemem_mjsikaku)
 	MDRV_CPU_IO_MAP(readport_mjsikaku, writeport_mjsikaku)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 144)    // nmiclock = 70
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 144)    // nmiclock = 70
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("8910", YM3812, 20000000/8)
@@ -3367,7 +3367,7 @@ static MACHINE_DRIVER_START( mmsikaku )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_mmsikaku, writeport_mmsikaku)
-//  MDRV_CPU_VBLANK_INT(nb1413m3_interrupt, 128)
+//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_DRIVER_END
 
 

@@ -315,7 +315,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bestleag )
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bestleag_map,0)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 
 	MDRV_SCREEN_ADD("main", RASTER)

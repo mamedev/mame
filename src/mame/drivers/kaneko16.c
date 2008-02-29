@@ -1680,7 +1680,7 @@ static MACHINE_DRIVER_START( berlwall )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* MC68000P12 */
 	MDRV_CPU_PROGRAM_MAP(berlwall,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(berlwall)
 
@@ -1727,7 +1727,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(bakubrkr)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1783,7 +1783,7 @@ static MACHINE_DRIVER_START( blazeon )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,12000000)	/* TMP68HC000-12 */
 	MDRV_CPU_PROGRAM_MAP(blazeon,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* D780C-2 */
 	MDRV_CPU_PROGRAM_MAP(blazeon_soundmem,0)
@@ -1836,7 +1836,7 @@ static MACHINE_DRIVER_START( gtmr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("gtmr", M68000, 16000000)	/* ? Most likely a 68000-HC16 */
 	MDRV_CPU_PROGRAM_MAP(gtmr_readmem,gtmr_writemem)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(gtmr)
 
@@ -1914,7 +1914,7 @@ static MACHINE_DRIVER_START( bonkadv )
 	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
 	MDRV_CPU_PROGRAM_MAP(bonkadv,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
 
 	MDRV_MACHINE_RESET( bonkadv )
 MACHINE_DRIVER_END
@@ -1928,7 +1928,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
-	MDRV_CPU_VBLANK_INT(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(mgcrystl)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -1998,7 +1998,7 @@ static MACHINE_DRIVER_START( shogwarr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(shogwarr,0)
-	MDRV_CPU_VBLANK_INT(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
+	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(shogwarr)
 

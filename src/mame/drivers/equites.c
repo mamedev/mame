@@ -666,7 +666,7 @@ static MACHINE_DRIVER_START( equites )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(equites_map,0)
-	MDRV_CPU_VBLANK_INT(equites_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( splndrbt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(splndrbt_map, 0)
-	MDRV_CPU_VBLANK_INT(splndrbt_interrupt, 2)
+	MDRV_CPU_VBLANK_INT_HACK(splndrbt_interrupt, 2)
 
 	MDRV_MACHINE_RESET(splndrbt)
 

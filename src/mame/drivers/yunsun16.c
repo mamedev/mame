@@ -530,7 +530,7 @@ static MACHINE_DRIVER_START( magicbub )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(yunsun16_readmem,yunsun16_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ? */
@@ -575,7 +575,7 @@ static MACHINE_DRIVER_START( shocking )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(yunsun16_readmem,yunsun16_writemem)
-	MDRV_CPU_VBLANK_INT(irq2_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

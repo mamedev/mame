@@ -637,7 +637,7 @@ static const struct AY8910interface ay8912_interface =
 static MACHINE_DRIVER_START( coinmstr )
 	MDRV_CPU_ADD_TAG("cpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

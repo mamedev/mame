@@ -1308,7 +1308,7 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_CPU_ADD_TAG("main", Z80, 24000000/6)
 	MDRV_CPU_PROGRAM_MAP(ldrun_readmem,ldrun_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,kungfum_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

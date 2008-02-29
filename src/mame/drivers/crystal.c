@@ -824,7 +824,7 @@ static const struct VR0Interface vr0_interface =
 static MACHINE_DRIVER_START( crystal )
 	MDRV_CPU_ADD(SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(crystal_mem,0)
- 	MDRV_CPU_VBLANK_INT(crystal_interrupt,1)
+ 	MDRV_CPU_VBLANK_INT("main", crystal_interrupt)
 
 	MDRV_MACHINE_RESET(crystal)
 

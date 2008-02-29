@@ -5,6 +5,7 @@ Issues:
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
@@ -237,12 +238,12 @@ static MACHINE_DRIVER_START( rollrace )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,XTAL_24MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80,XTAL_24MHz/16) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,4)
+	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

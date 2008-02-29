@@ -9,6 +9,7 @@ Todo:
 */
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 #define NUM_PENS	(8)
@@ -213,7 +214,7 @@ static MACHINE_DRIVER_START( dorachan )
 	MDRV_CPU_ADD(Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dorachan_map,0)
 	MDRV_CPU_IO_MAP(dorachan_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,2)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dorachan)

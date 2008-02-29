@@ -287,7 +287,7 @@ static MACHINE_DRIVER_START( madmotor )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(madmotor_readmem,madmotor_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)/* VBL */
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD(H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
 	/* audio CPU */

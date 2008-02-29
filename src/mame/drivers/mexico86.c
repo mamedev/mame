@@ -45,6 +45,7 @@ PS4  J8648       PS4  J8635
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
@@ -385,15 +386,15 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	MDRV_CPU_ADD(Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
-	MDRV_CPU_VBLANK_INT(mexico86_m68705_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
 
 	MDRV_CPU_ADD_TAG("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -441,7 +442,7 @@ static MACHINE_DRIVER_START( kikikai )
 	MDRV_IMPORT_FROM(knightb)
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT(kikikai_interrupt, 1) // IRQs should be triggered by the MCU, but we don't have it
+	MDRV_CPU_VBLANK_INT("main", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
 	MDRV_CPU_REMOVE("mcu")	// we don't have code for the 68701
 

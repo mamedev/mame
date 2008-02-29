@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_CPU_ADD(Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_assert,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_NVRAM_HANDLER(eeprom)
 

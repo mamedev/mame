@@ -556,11 +556,11 @@ static MACHINE_DRIVER_START( dassault )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_readmem,dassault_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(M68000, 14000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(dassault_sub_readmem,dassault_sub_writemem)
-	MDRV_CPU_VBLANK_INT(irq5_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
 
 	MDRV_CPU_ADD(H6280,32220000/8)
 	/* audio CPU */	/* Accurate */

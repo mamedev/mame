@@ -305,12 +305,12 @@ static MACHINE_RESET( meijinsn )
 static MACHINE_DRIVER_START( meijinsn )
 	MDRV_CPU_ADD_TAG("main", M68000, 9000000 )
 	MDRV_CPU_PROGRAM_MAP(meijinsn_map, 0)
-	MDRV_CPU_VBLANK_INT(meijinsn_interrupt,2)
+	MDRV_CPU_VBLANK_INT_HACK(meijinsn_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(meijinsn_sound_map,0)
 	MDRV_CPU_IO_MAP(meijinsn_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 160)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 160)
 
 	MDRV_MACHINE_RESET(meijinsn)
 

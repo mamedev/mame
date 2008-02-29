@@ -496,12 +496,12 @@ static MACHINE_DRIVER_START( gyrodine )
 	MDRV_CPU_ADD_TAG("main", Z80, 18432000 / 4)	/* 18.432 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(0,gyrodine_portmap)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD_TAG("sub", Z80, 18432000 / 4)	/* 18.432 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(gyrodine_sub_map,0)
 	MDRV_CPU_IO_MAP(gyrodine_sub_portmap,0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,4)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_INTERLEAVE(100)
 

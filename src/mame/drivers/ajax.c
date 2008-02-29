@@ -240,7 +240,7 @@ static MACHINE_DRIVER_START( ajax )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(KONAMI, 3000000)	/* 12/4 MHz*/
 	MDRV_CPU_PROGRAM_MAP(ajax_main_map,0)
-	MDRV_CPU_VBLANK_INT(ajax_interrupt,1)	/* IRQs triggered by the 051960 */
+	MDRV_CPU_VBLANK_INT("main", ajax_interrupt)	/* IRQs triggered by the 051960 */
 
 	MDRV_CPU_ADD(M6809, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(ajax_sub_map,0)

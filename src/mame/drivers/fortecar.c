@@ -147,7 +147,7 @@ static MACHINE_DRIVER_START( fortecar )
 	MDRV_CPU_PROGRAM_MAP(fortecar_map,0)
 	MDRV_CPU_IO_MAP(fortecar_ports,0)
 
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

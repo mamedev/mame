@@ -2835,7 +2835,7 @@ static MACHINE_DRIVER_START( contcirc )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(contcirc_readmem,contcirc_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -2843,7 +2843,7 @@ static MACHINE_DRIVER_START( contcirc )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(contcirc_cpub_readmem,contcirc_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -2880,7 +2880,7 @@ static MACHINE_DRIVER_START( chasehq )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(chasehq_readmem,chasehq_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -2888,7 +2888,7 @@ static MACHINE_DRIVER_START( chasehq )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(chq_cpub_readmem,chq_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -2924,7 +2924,7 @@ static MACHINE_DRIVER_START( enforce )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(enforce_readmem,enforce_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -2932,7 +2932,7 @@ static MACHINE_DRIVER_START( enforce )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(enforce_cpub_readmem,enforce_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq6_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -2971,11 +2971,11 @@ static MACHINE_DRIVER_START( bshark )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(bshark_readmem,bshark_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(bshark_cpub_readmem,bshark_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3012,7 +3012,7 @@ static MACHINE_DRIVER_START( sci )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sci_readmem,sci_writemem)
-	MDRV_CPU_VBLANK_INT(sci_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", sci_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -3020,7 +3020,7 @@ static MACHINE_DRIVER_START( sci )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sci_cpub_readmem,sci_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3057,7 +3057,7 @@ static MACHINE_DRIVER_START( nightstr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(nightstr_readmem,nightstr_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -3065,7 +3065,7 @@ static MACHINE_DRIVER_START( nightstr )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(nightstr_cpub_readmem,nightstr_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3103,7 +3103,7 @@ static MACHINE_DRIVER_START( aquajack )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(aquajack_readmem,aquajack_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -3111,7 +3111,7 @@ static MACHINE_DRIVER_START( aquajack )
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(aquajack_cpub_readmem,aquajack_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3148,11 +3148,11 @@ static MACHINE_DRIVER_START( spacegun )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(spacegun_readmem,spacegun_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(spacegun_cpub_readmem,spacegun_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(irq4_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3189,7 +3189,7 @@ static MACHINE_DRIVER_START( dblaxle )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(dblaxle_readmem,dblaxle_writemem)
-	MDRV_CPU_VBLANK_INT(dblaxle_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", dblaxle_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -3197,7 +3197,7 @@ static MACHINE_DRIVER_START( dblaxle )
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(dblaxle_cpub_readmem,dblaxle_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(dblaxle_cpub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
 
@@ -3234,7 +3234,7 @@ static MACHINE_DRIVER_START( racingb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(racingb_readmem,racingb_writemem)
-	MDRV_CPU_VBLANK_INT(dblaxle_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", dblaxle_interrupt)
 
 	MDRV_CPU_ADD(Z80,16000000/4)
 	/* audio CPU */	/* 4 MHz ??? */
@@ -3242,7 +3242,7 @@ static MACHINE_DRIVER_START( racingb )
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(racingb_cpub_readmem,racingb_cpub_writemem)
-	MDRV_CPU_VBLANK_INT(dblaxle_cpub_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", dblaxle_cpub_interrupt)
 
 	MDRV_MACHINE_START(taitoz)
 	MDRV_INTERLEAVE(100)

@@ -442,7 +442,7 @@ static MACHINE_DRIVER_START( f3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
-	MDRV_CPU_VBLANK_INT(f3_interrupt2,1)
+	MDRV_CPU_VBLANK_INT("main", f3_interrupt2)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 

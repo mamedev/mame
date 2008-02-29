@@ -963,7 +963,7 @@ static MACHINE_DRIVER_START( driver_nomsp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68010, 32000000/4)
 	MDRV_CPU_PROGRAM_MAP(driver_68k_map,0)
-	MDRV_CPU_VBLANK_INT(atarigen_video_int_gen,1)
+	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
 	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
 
 	MDRV_CPU_ADD_TAG("gsp", TMS34010, 48000000)

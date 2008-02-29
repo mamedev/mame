@@ -192,7 +192,7 @@ static MACHINE_DRIVER_START( yard )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(yard_map, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(yard)

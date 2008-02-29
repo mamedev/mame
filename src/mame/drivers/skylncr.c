@@ -429,7 +429,7 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_CPU_ADD(Z80, 12000000/4)
 	MDRV_CPU_PROGRAM_MAP(mem_map_skylncr,0)
 	MDRV_CPU_IO_MAP(io_map_skylncr,0)
-	MDRV_CPU_VBLANK_INT(skylncr_vblank_interrupt,1)
+	MDRV_CPU_VBLANK_INT("main", skylncr_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

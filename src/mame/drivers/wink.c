@@ -320,7 +320,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_CPU_ADD(Z80, 12000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(wink_map,0)
 	MDRV_CPU_IO_MAP(wink_io,0)
-	MDRV_CPU_VBLANK_INT(nmi_line_pulse,1)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(Z80, 12000000 / 8)
 	MDRV_CPU_PROGRAM_MAP(wink_sound_map,0)

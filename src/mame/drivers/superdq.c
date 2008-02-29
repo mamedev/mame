@@ -338,7 +338,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
-	MDRV_CPU_VBLANK_INT(superdq_vblank, 1)
+	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
 
 	MDRV_MACHINE_START(superdq)
 

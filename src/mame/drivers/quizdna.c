@@ -456,7 +456,7 @@ static MACHINE_DRIVER_START( quizdna )
 	MDRV_CPU_ADD_TAG("main", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(quizdna_readmem,quizdna_writemem)
 	MDRV_CPU_IO_MAP(quizdna_readport,quizdna_writeport)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

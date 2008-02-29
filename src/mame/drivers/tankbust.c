@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( tankbust )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)		/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP( readmem, writemem )
-	MDRV_CPU_VBLANK_INT(irq0_line_hold,1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 4000000)		/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP( readmem2, writemem2 )

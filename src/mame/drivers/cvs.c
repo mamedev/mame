@@ -998,7 +998,7 @@ static MACHINE_DRIVER_START( cvs )
 	MDRV_CPU_ADD(S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_main_cpu_map,0)
 	MDRV_CPU_IO_MAP(cvs_main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT(cvs_main_cpu_interrupt, 1)
+	MDRV_CPU_VBLANK_INT("main", cvs_main_cpu_interrupt)
 
 	MDRV_CPU_ADD(S2650, 894886.25)
 	MDRV_CPU_PROGRAM_MAP(cvs_dac_cpu_map,0)

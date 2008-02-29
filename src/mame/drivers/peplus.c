@@ -978,7 +978,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
 	MDRV_CPU_DATA_MAP(peplus_datamap, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)
-	MDRV_CPU_VBLANK_INT(irq0_line_hold, 1)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(peplus)
 	MDRV_NVRAM_HANDLER(peplus)
