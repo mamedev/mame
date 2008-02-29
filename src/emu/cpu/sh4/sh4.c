@@ -3711,9 +3711,8 @@ UINT32 ticks;
 	//if rtcnt < rtcor then rtcor-rtcnt
 	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
 	ticks = sh4.m[RTCOR]-sh4.m[RTCNT];
-	if (ticks < 0)
+	if (ticks <= 0)
 		ticks = 256 + ticks;
-	//((double)rtcnt_div[(sh4.m[RTCSR] >> 3) & 7] / (double)100000000)*ticks
 	timer_adjust_oneshot(sh4.refresh_timer, attotime_mul(attotime_mul(ATTOTIME_IN_HZ(sh4.bus_clock), rtcnt_div[(sh4.m[RTCSR] >> 3) & 7]), ticks), sh4.cpu_number);
 	sh4.refresh_timer_base = sh4.m[RTCNT];
 }
