@@ -183,7 +183,6 @@ static int condition(int which)
 		case 20:	return CONDITION_ZUF;
 		default:	illegal(); return 1;
 	}
-	return 0;
 }
 
 

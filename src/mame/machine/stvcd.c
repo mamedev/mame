@@ -457,7 +457,6 @@ static UINT16 cd_readWord(UINT32 addr)
 			break;
 	}
 
-	return 0xffff;
 }
 
 static UINT32 cd_readLong(UINT32 addr)

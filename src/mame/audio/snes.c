@@ -146,7 +146,9 @@ static int              echo_ptr;
 
 /* Original SPC DSP took samples 32000 times a second, which is once every
    (1024000/32000 = 32) cycles. */
+#ifdef UNUSED_DEFINITION
 static const int               TS_CYC = CPU_RATE / SAMP_FREQ;
+#endif
 
 /* Ptrs to Gaussian table */
 static const int *const G1 = &gauss[ 256 ];

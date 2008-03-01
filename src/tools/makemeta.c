@@ -454,7 +454,7 @@ static int generate_from_pattern(pattern_data *pattern, int patcount)
 
 		/* bail if we passed the end */
 		if (framenum > patcount)
-			return 0;
+			break;
 
 		/* if we don't have a white flag, the previous frame must match us */
 		if (!curpat->white) flags |= 0x01;
@@ -470,7 +470,6 @@ static int generate_from_pattern(pattern_data *pattern, int patcount)
 		/* output the result */
 		output_meta(flags, curpat->white, line16, line17, line18, bcdframenum, 0);
 	}
-
 	return 0;
 }
 

@@ -166,8 +166,9 @@ static READ8_HANDLER( mux_r )
 		case 0x02: return readinputport(2);
 		case 0x04: return readinputport(3);
 		case 0x08: return readinputport(4);
-		case 0x10: return 0xff; return readinputport(5);
-		case 0x20: return 0xff; return readinputport(6);
+		/* FIXME: Was this a quick hack? */
+		case 0x10: return 0xff; //return readinputport(5);
+		case 0x20: return 0xff; //return readinputport(6);
 	}
 	return 0xff;
 }

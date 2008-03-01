@@ -1350,7 +1350,6 @@ unsigned i8051_get_reg(int regnum)
 	default:
 		return 0;
 	}
-	return 0;
 }
 
 /*NOTE: These are not used by the opcode functions, they are here only for MAME requirements*/
@@ -2133,9 +2132,9 @@ INLINE void update_timer(int cyc)
 #if (HAS_I8052 || HAS_I8752)
 	//Update Timer 2
 	if(GET_TR2) {
-		int timerinc, overflow, isoverflow;
+		int timerinc, overflow;
 		UINT16 count = ((R_TH2<<8) | R_TL2);
-		timerinc = overflow = isoverflow = 0;
+		timerinc = overflow = 0;
 
 		//Are we in counter mode?
 		if(GET_CT2)		{

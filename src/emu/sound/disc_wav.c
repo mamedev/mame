@@ -177,7 +177,7 @@ struct dss_inverter_osc_context
 
 static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
 
-void dss_counter_step(node_description *node)
+static void dss_counter_step(node_description *node)
 {
 	struct dss_counter_context *context = node->context;
 	double cycles;
@@ -267,7 +267,7 @@ void dss_counter_step(node_description *node)
 		node->output = context->count;
 }
 
-void dss_counter_reset(node_description *node)
+static void dss_counter_reset(node_description *node)
 {
 	struct dss_counter_context *context = node->context;
 
@@ -373,9 +373,9 @@ int	dss_lfsr_function(int myfunc,int in0,int in1,int bitmask)
 }
 
 /* reset prototype so that it can be used in init function */
-void dss_lfsr_reset(node_description *node);
+static void dss_lfsr_reset(node_description *node);
 
-void dss_lfsr_step(node_description *node)
+static void dss_lfsr_step(node_description *node)
 {
 	const discrete_lfsr_desc *lfsr_desc = node->custom;
 	struct dss_lfsr_context *context = node->context;
@@ -465,7 +465,7 @@ void dss_lfsr_step(node_description *node)
 	}
 }
 
-void dss_lfsr_reset(node_description *node)
+static void dss_lfsr_reset(node_description *node)
 {
 	const discrete_lfsr_desc *lfsr_desc = node->custom;
 	struct dss_lfsr_context *context = node->context;
@@ -519,7 +519,7 @@ void dss_lfsr_reset(node_description *node)
 #define DSS_NOISE__AMP		(*(node->input[2]))
 #define DSS_NOISE__BIAS		(*(node->input[3]))
 
-void dss_noise_step(node_description *node)
+static void dss_noise_step(node_description *node)
 {
 	struct dss_noise_context *context = node->context;
 
@@ -556,7 +556,7 @@ void dss_noise_step(node_description *node)
 }
 
 
-void dss_noise_reset(node_description *node)
+static void dss_noise_reset(node_description *node)
 {
 	struct dss_noise_context *context = node->context;
 
@@ -585,7 +585,7 @@ void dss_noise_reset(node_description *node)
  #define DSS_NOTE__MAX2			(*(node->input[4]))
  #define DSS_NOTE__CLOCK_TYPE	(*(node->input[5]))
 
-void dss_note_step(node_description *node)
+static void dss_note_step(node_description *node)
 {
 	struct dss_note_context *context = node->context;
 
@@ -671,7 +671,7 @@ void dss_note_step(node_description *node)
 		node->output = 0;
 }
 
-void dss_note_reset(node_description *node)
+static void dss_note_reset(node_description *node)
 {
 	struct dss_note_context *context = node->context;
 
@@ -709,7 +709,7 @@ void dss_note_reset(node_description *node)
 /* the same to save a calculation step */
 #define DSS_OP_AMP_OSC_NORTON_VP_IN		context->high_out_V
 
-void dss_op_amp_osc_step(node_description *node)
+static void dss_op_amp_osc_step(node_description *node)
 {
 	const discrete_op_amp_osc_info *info = node->custom;
 	struct dss_op_amp_osc_context *context = node->context;
@@ -881,7 +881,7 @@ void dss_op_amp_osc_step(node_description *node)
 	}
 }
 
-void dss_op_amp_osc_reset(node_description *node)
+static void dss_op_amp_osc_reset(node_description *node)
 {
 	const discrete_op_amp_osc_info *info = node->custom;
 	struct dss_op_amp_osc_context *context = node->context;
@@ -1024,7 +1024,7 @@ void dss_op_amp_osc_reset(node_description *node)
 #define DSS_SAWTOOTHWAVE__GRAD		(*(node->input[4]))
 #define DSS_SAWTOOTHWAVE__PHASE		(*(node->input[5]))
 
-void dss_sawtoothwave_step(node_description *node)
+static void dss_sawtoothwave_step(node_description *node)
 {
 	struct dss_sawtoothwave_context *context = node->context;
 
@@ -1050,7 +1050,7 @@ void dss_sawtoothwave_step(node_description *node)
 	context->phase=fmod((context->phase+((2.0*M_PI*DSS_SAWTOOTHWAVE__FREQ)/discrete_current_context->sample_rate)),2.0*M_PI);
 }
 
-void dss_sawtoothwave_reset(node_description *node)
+static void dss_sawtoothwave_reset(node_description *node)
 {
 	struct dss_sawtoothwave_context *context = node->context;
 	double start;
@@ -1084,7 +1084,7 @@ void dss_sawtoothwave_reset(node_description *node)
 #define DSS_SCHMITT_OSC__VIN	(*(node->input[1]))
 #define DSS_SCHMITT_OSC__AMP	(*(node->input[2]))
 
-void dss_schmitt_osc_step(node_description *node)
+static void dss_schmitt_osc_step(node_description *node)
 {
 	const discrete_schmitt_osc_desc *info = node->custom;
 	struct dss_schmitt_osc_context *context = node->context;
@@ -1158,7 +1158,7 @@ void dss_schmitt_osc_step(node_description *node)
 	node->output *= DSS_SCHMITT_OSC__AMP;
 }
 
-void dss_schmitt_osc_reset(node_description *node)
+static void dss_schmitt_osc_reset(node_description *node)
 {
 	const discrete_schmitt_osc_desc *info = node->custom;
 	struct dss_schmitt_osc_context *context = node->context;
@@ -1204,7 +1204,7 @@ void dss_schmitt_osc_reset(node_description *node)
 #define DSS_SINEWAVE__BIAS		(*(node->input[3]))
 #define DSS_SINEWAVE__PHASE		(*(node->input[4]))
 
-void dss_sinewave_step(node_description *node)
+static void dss_sinewave_step(node_description *node)
 {
 	struct dss_sinewave_context *context = node->context;
 
@@ -1230,7 +1230,7 @@ void dss_sinewave_step(node_description *node)
 	context->phase=fmod((context->phase+((2.0*M_PI*DSS_SINEWAVE__FREQ)/discrete_current_context->sample_rate)),2.0*M_PI);
 }
 
-void dss_sinewave_reset(node_description *node)
+static void dss_sinewave_reset(node_description *node)
 {
 	struct dss_sinewave_context *context = node->context;
 	double start;
@@ -1263,7 +1263,7 @@ void dss_sinewave_reset(node_description *node)
 #define DSS_SQUAREWAVE__BIAS	(*(node->input[4]))
 #define DSS_SQUAREWAVE__PHASE	(*(node->input[5]))
 
-void dss_squarewave_step(node_description *node)
+static void dss_squarewave_step(node_description *node)
 {
 	struct dss_squarewave_context *context = node->context;
 
@@ -1296,7 +1296,7 @@ void dss_squarewave_step(node_description *node)
 	context->phase=fmod((context->phase+((2.0*M_PI*DSS_SQUAREWAVE__FREQ)/discrete_current_context->sample_rate)),2.0*M_PI);
 }
 
-void dss_squarewave_reset(node_description *node)
+static void dss_squarewave_reset(node_description *node)
 {
 	struct dss_squarewave_context *context = node->context;
 	double start;
@@ -1329,7 +1329,7 @@ void dss_squarewave_reset(node_description *node)
 #define DSS_SQUAREWFIX__BIAS	(*(node->input[4]))
 #define DSS_SQUAREWFIX__PHASE	(*(node->input[5]))
 
-void dss_squarewfix_step(node_description *node)
+static void dss_squarewfix_step(node_description *node)
 {
 	struct dss_squarewfix_context *context = node->context;
 
@@ -1358,7 +1358,7 @@ void dss_squarewfix_step(node_description *node)
 	}
 }
 
-void dss_squarewfix_reset(node_description *node)
+static void dss_squarewfix_reset(node_description *node)
 {
 	struct dss_squarewfix_context *context = node->context;
 
@@ -1407,7 +1407,7 @@ void dss_squarewfix_reset(node_description *node)
 #define DSS_SQUAREWAVE2__BIAS	(*(node->input[4]))
 #define DSS_SQUAREWAVE2__SHIFT	(*(node->input[5]))
 
-void dss_squarewave2_step(node_description *node)
+static void dss_squarewave2_step(node_description *node)
 {
 	struct dss_squarewave_context *context = node->context;
 	double newphase;
@@ -1442,7 +1442,7 @@ void dss_squarewave2_step(node_description *node)
 	}
 }
 
-void dss_squarewave2_reset(node_description *node)
+static void dss_squarewave2_reset(node_description *node)
 {
 	struct dss_squarewave_context *context = node->context;
 	double start;
@@ -1490,7 +1490,7 @@ static double dss_inverter_tf(node_description *node, double x)
 		return info->vB;
 }
 
-void dss_inverter_osc_step(node_description *node)
+static void dss_inverter_osc_step(node_description *node)
 {
 	struct dss_inverter_osc_context *context = node->context;
 	const discrete_inverter_osc_desc *info = node->custom;
@@ -1596,7 +1596,7 @@ void dss_inverter_osc_step(node_description *node)
 		node->output = (node->output > info->vInFall);
 }
 
-void dss_inverter_osc_reset(node_description *node)
+static void dss_inverter_osc_reset(node_description *node)
 {
 	struct dss_inverter_osc_context *context = node->context;
 	const discrete_inverter_osc_desc *info = node->custom;
@@ -1633,7 +1633,7 @@ void dss_inverter_osc_reset(node_description *node)
 #define DSS_TRIANGLEWAVE__BIAS		(*(node->input[3]))
 #define DSS_TRIANGLEWAVE__PHASE		(*(node->input[4]))
 
-void dss_trianglewave_step(node_description *node)
+static void dss_trianglewave_step(node_description *node)
 {
 	struct dss_trianglewave_context *context = node->context;
 
@@ -1660,7 +1660,7 @@ void dss_trianglewave_step(node_description *node)
 	context->phase=fmod((context->phase+((2.0*M_PI*DSS_TRIANGLEWAVE__FREQ)/discrete_current_context->sample_rate)),2.0*M_PI);
 }
 
-void dss_trianglewave_reset(node_description *node)
+static void dss_trianglewave_reset(node_description *node)
 {
 	struct dss_trianglewave_context *context = node->context;
 	double start;
@@ -1686,7 +1686,7 @@ void dss_trianglewave_reset(node_description *node)
  ************************************************************************/
 #define DSS_ADSR__ENABLE	(*(node->input[0]))
 
-void dss_adsrenv_step(node_description *node)
+static void dss_adsrenv_step(node_description *node)
 {
 //  struct dss_adsr_context *context = node->context;
 
@@ -1701,7 +1701,7 @@ void dss_adsrenv_step(node_description *node)
 }
 
 
-void dss_adsrenv_reset(node_description *node)
+static void dss_adsrenv_reset(node_description *node)
 {
 	dss_adsrenv_step(node);
 }

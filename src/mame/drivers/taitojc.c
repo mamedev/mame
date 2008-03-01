@@ -1081,6 +1081,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( taitojc )
 	PORT_START
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
@@ -1114,6 +1115,7 @@ static INPUT_PORTS_START( taitojc )
 		PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON8)
 
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( dendeg )
 	PORT_START

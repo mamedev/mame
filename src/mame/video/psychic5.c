@@ -199,7 +199,6 @@ READ8_HANDLER( psychic5_paged_ram_r )
 			return psychic5_fg_videoram[offset & 0xfff];
 		}
 	}
-	return 0;
 }
 
 WRITE8_HANDLER( psychic5_paged_ram_w )

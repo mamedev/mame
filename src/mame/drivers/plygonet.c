@@ -110,8 +110,11 @@ static READ32_HANDLER( polygonet_eeprom_r )
 		return (readinputport(0)<<24);
 	}
 
+	/* FIXME: code will never execute */
+#if 0
 	logerror("unk access to eeprom port (mask %x)\n", mem_mask);
 	return 0;
+#endif
 }
 
 

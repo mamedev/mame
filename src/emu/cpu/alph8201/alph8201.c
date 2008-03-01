@@ -308,10 +308,10 @@ static void nop(void)		 { }
 static void rlca(void)		 { CF = (R.A>>7)&1; R.A = (R.A<<1) | (R.A>>7); ZF = (R.A==0); }
 static void rrca(void)		 { CF = R.A &1;     R.A = (R.A>>1) | (R.A<<7); ZF = (R.A==0); }
 static void inc_b(void)	 	 { M_ADDB(1); }
-static void dec_b(void)	 	 { M_SUBB(1); };
+static void dec_b(void)	 	 { M_SUBB(1); }
 static void inc_a(void)		 { M_ADD(1); }
 static void dec_a(void)		 { M_SUB(1); }
-static void cpl(void)		 { R.A = R.A^0xff; ZF = (R.A==0); };
+static void cpl(void)		 { R.A = R.A^0xff; ZF = (R.A==0); }
 
 static void ld_a_ix0_0(void) { R.A = M_RDMEM(BIX0+0); }
 static void ld_a_ix0_1(void) { R.A = M_RDMEM(BIX0+1); }
@@ -611,9 +611,9 @@ static void add_a_cf(void) { R.A += CF; CF = 0; ZF = (R.A==0); } /* OK */
 static void tst_a(void)	 { ZF = (R.A==0); }                          /* maybe OK */
 static void clr_a(void)	 { R.A = 0; ZF = (R.A==0); }                 /* maybe OK */
 static void cmp_a_n(void)	{ UINT8 i=M_RDMEM_OPCODE();  ZF = (R.A==i); CF = (R.A<i); }
-static void call(void) { UINT8 i=M_RDMEM_OPCODE(); R.retptr.w.l = PC; M_JMP(i); }; /* OK , but stack is unknown */
+static void call(void) { UINT8 i=M_RDMEM_OPCODE(); R.retptr.w.l = PC; M_JMP(i); } /* OK , but stack is unknown */
 static void ld_a_ix0_a(void) { R.A = M_RDMEM(BIX0+R.A); }              /* maybe OK */
-static void ret(void) { R.mb = R.retptr.b.h; M_JMP( R.retptr.b.l ); }; /* OK , but stack is unknown */
+static void ret(void) { R.mb = R.retptr.b.h; M_JMP( R.retptr.b.l ); }  /* OK , but stack is unknown */
 
 static const s_opcode opcode_8301[256]=
 {

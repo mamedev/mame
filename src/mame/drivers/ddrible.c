@@ -92,8 +92,11 @@ static WRITE8_HANDLER( ddrible_coin_counter_w )
 static READ8_HANDLER( ddrible_vlm5030_busy_r )
 {
 	return mame_rand(Machine); /* patch */
+	/* FIXME: remove ? */
+#if 0
 	if (VLM5030_BSY()) return 1;
 	else return 0;
+#endif
 }
 
 static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )

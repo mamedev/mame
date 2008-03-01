@@ -3081,7 +3081,6 @@ static int compile_set_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			emit_mov_m32_r32(DRCTOP, CPR0ADDR(reg), REG_EAX);								// mov  cpr0[reg],eax
 			return TRUE;
 	}
-	return FALSE;
 }
 
 
@@ -3134,7 +3133,6 @@ static int compile_get_cop0_reg(drc_core *drc, compiler_state *compiler, const o
 			emit_movsxd_r64_m32(DRCTOP, REG_RAX, CPR0ADDR(reg));							// movsxd rax,cpr0[reg]
 			return TRUE;
 	}
-	return FALSE;
 }
 
 

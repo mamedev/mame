@@ -56,6 +56,7 @@
 /* non-textured render path */
 static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
+#if !defined( MODEL2_TRANSLUCENT)
 	const poly_extra_data *extra = extradata;
 	bitmap_t *destmap = dest;
 	UINT32 *p = BITMAP_ADDR32(destmap, scanline, 0);
@@ -71,11 +72,11 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	UINT8	luma;
 	UINT32	tr, tg, tb;
 	int		x;
-
+#endif 
 	/* if it's translucent, there's nothing to render */
 #if defined( MODEL2_TRANSLUCENT)
 	return;
-#endif
+#else
 
 	luma = lumaram[BYTE_XOR_LE(lumabase + (0xf << 3))] & 0x3F;
 
@@ -100,6 +101,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 		if ((x^scanline) & 1) p[x] = color;
 #else
 		p[x] = color;
+#endif
 #endif
 }
 

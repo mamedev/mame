@@ -258,7 +258,6 @@ READ8_HANDLER( daikaiju_mcu_r )
 			}
 			return n;
 		}
-		return 0;
 
 		case MCU_ADDRESS1:
 		{
@@ -277,7 +276,6 @@ READ8_HANDLER( daikaiju_mcu_r )
 				return address>>8;
 			}
 		}
-		return 0;
 
 		case MCU_ADDRESS2:
 		{
@@ -296,7 +294,6 @@ READ8_HANDLER( daikaiju_mcu_r )
 				return address>>8;
 			}
 		}
-		return 0;
 
 		case MCU_MESSAGE:
 			return daikaiju_buffer[1];

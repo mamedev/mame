@@ -92,7 +92,6 @@ static UINT8 hc11_regs_r(UINT32 address)
 			{
 				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
-			break;
 		}
 		case 0x32:		/* ADR2 */
 		{
@@ -104,7 +103,6 @@ static UINT8 hc11_regs_r(UINT32 address)
 			{
 				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
-			break;
 		}
 		case 0x33:		/* ADR3 */
 		{
@@ -116,7 +114,6 @@ static UINT8 hc11_regs_r(UINT32 address)
 			{
 				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
-			break;
 		}
 		case 0x34:		/* ADR4 */
 		{
@@ -128,7 +125,6 @@ static UINT8 hc11_regs_r(UINT32 address)
 			{
 				return io_read_byte((hc11.adctl & 0x7) + MC68HC11_IO_AD0);
 			}
-			break;
 		}
 		case 0x38:		/* OPT2 */
 			return 0;

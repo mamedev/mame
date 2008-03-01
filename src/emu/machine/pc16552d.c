@@ -201,7 +201,6 @@ static UINT8 duart_r(int chip, int reg)
 
 				return duart_pop_rx_fifo(chip, channel);
 			}
-			break;
 		}
 		case 1:
 		{
@@ -314,7 +313,6 @@ static void duart_w(int chip, int reg, UINT8 data)
 
 				return;
 			}
-			break;
 		}
 		case 1:
 		{
@@ -335,7 +333,6 @@ static void duart_w(int chip, int reg, UINT8 data)
 				check_interrupts(chip, channel);
 				return;
 			}
-			break;
 		}
 
 		case 2:

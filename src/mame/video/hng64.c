@@ -1435,10 +1435,10 @@ static int Inside(struct polyVert *v, int plane)
 
 	case HNG64_NEAR:
 		return (v->clipCoords[2] <=  v->clipCoords[3]) ? 1 : 0;
-		return 1 ;
+
 	case HNG64_FAR:
 		return (v->clipCoords[2] >= -v->clipCoords[3]) ? 1 : 0;
-		return 1 ;
+
 	}
 
 	return 0 ;

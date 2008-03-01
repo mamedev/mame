@@ -66,11 +66,13 @@ INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
 	return result | RM((mAddr+1)&0xffff);
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
 {
 	WM( mAddr, p.b.h );
 	WM( (mAddr+1)&0xffff, p.b.l );
 }
+#endif
 
 INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
 {

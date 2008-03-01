@@ -417,7 +417,7 @@ static void twincobr_log_vram(void)
 	if ( input_code_pressed(KEYCODE_M) )
 	{
 		offs_t tile_voffs;
-		int tcode[3];
+		int tcode[4];
 		while (input_code_pressed(KEYCODE_M)) ;
 		logerror("Scrolls             BG-X BG-Y  FG-X FG-Y  TX-X  TX-Y\n");
 		logerror("------>             %04x %04x  %04x %04x  %04x  %04x\n",bgscrollx,bgscrolly,fgscrollx,fgscrolly,txscrollx,txscrolly);

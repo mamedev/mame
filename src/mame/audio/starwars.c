@@ -94,10 +94,9 @@ READ8_HANDLER( starwars_m6532_r )
 			return temp;
 
 		default:
-			return 0;
+			return 0; 
 	}
 
-	return 0; /* will never execute this */
 }
 
 
@@ -165,8 +164,6 @@ WRITE8_HANDLER( starwars_m6532_w )
 		default:
 			return;
 	}
-
-	return; /* will never execute this */
 
 }
 

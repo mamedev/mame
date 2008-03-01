@@ -5,6 +5,7 @@
 /* 26.March 2000 PeT changed set_irq_line */
 
 #include "debugger.h"
+#include "cpuintrf.h"
 #include "deprecat.h"
 
 #include "host.h"

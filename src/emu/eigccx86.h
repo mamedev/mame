@@ -93,7 +93,7 @@ _mul_32x32_hi(INT32 a, INT32 b)
 		" imull  %[b] ;"
 		: [result] "=d"  (result)	/* result in edx */
         , [temp]   "=a"  (temp)     /* This is effectively a clobber */
-        : [a]      "%1"  (a)        /* 'a' should be in eax on entry */
+        : [a]      "a"  (a)        /* 'a' should be in eax on entry */
         , [b]      "rm"  (b)        /* 'b' can be memory or register */
 		: "%cc"						/* Clobbers condition codes */
 	);
@@ -118,7 +118,7 @@ _mulu_32x32_hi(UINT32 a, UINT32 b)
 		" mull  %[b] ;"
 		: [result] "=d"  (result)	/* result in edx */
         , [temp]   "=a"  (temp)     /* This is effectively a clobber */
-        : [a]      "%1"  (a)        /* 'a' should be in eax on entry */
+        : [a]      "a"   (a)        /* 'a' should be in eax on entry */
         , [b]      "rm"  (b)        /* 'b' can be memory or register */
 		: "%cc"						/* Clobbers condition codes */
 	);

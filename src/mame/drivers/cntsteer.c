@@ -564,6 +564,7 @@ static INPUT_PORTS_START( cntsteer )
 INPUT_PORTS_END
 
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( zerotrgt )
 	PORT_START
 	PORT_DIPNAME( 0x01, 0x01, "0" )
@@ -637,6 +638,7 @@ static INPUT_PORTS_START( zerotrgt )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )
 INPUT_PORTS_END
+#endif
 
 /***************************************************************************/
 

@@ -222,7 +222,6 @@ static int icallback(int line)
 		if(IntPend&(1<<i))
 		{
 			return (IntHigh<<5)|i;
-			break;
 		}
 	}
 	return 0;		//This should never happen

@@ -333,7 +333,7 @@ READ8_HANDLER( H6280_irq_status_r )
 			if(h6280.irq_state[1]!=CLEAR_LINE) status|=1; /* IRQ 2 */
 			if(h6280.irq_state[0]!=CLEAR_LINE) status|=2; /* IRQ 1 */
 			if(h6280.irq_state[2]!=CLEAR_LINE) status|=4; /* TIMER */
-			return status|(h6280.io_buffer&(~H6280_IRQ_MASK));break;
+			return status|(h6280.io_buffer&(~H6280_IRQ_MASK));
 		}
 	case 2: return h6280.irq_mask|(h6280.io_buffer&(~H6280_IRQ_MASK));break;
 	}

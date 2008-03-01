@@ -102,7 +102,7 @@ static READ16_HANDLER(fake_4a00a_r)
 	//if it returns 1 there's no sound. is it used to sync the game and sound?
 	//or just a debug enable/disble register?
 	return 0;
-	return 1;
+	//return 1;
 }
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
@@ -143,9 +143,11 @@ static READ8_HANDLER(fake_6_r)
 	int ret = 0;
 	ret ^= 1;
 	return ret;
+	/* FIXME: earlier attemts to remove ?
 	return 1;
 	return 0;
 	return mame_rand(Machine);
+	*/
 }
 
 static WRITE8_HANDLER( adpcm_data_w )

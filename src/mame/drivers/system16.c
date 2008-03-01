@@ -577,6 +577,7 @@ static void set_bg_page( int data )
 
 /***************************************************************************/
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( aliensyn )
 	SYS16_JOY1
 	SYS16_JOY2
@@ -604,7 +605,7 @@ static INPUT_PORTS_START( aliensyn )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
-
+#endif
 /****************************************************************************/
 
 
@@ -2523,6 +2524,7 @@ ROM_END
 
 
 // pre16
+#ifdef UNUSED_DEFINITION
 ROM_START( mjleague )
 	ROM_REGION( 0x030000, REGION_CPU1, 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7404.09b", 0x000000, 0x8000, CRC(ec1655b5) SHA1(5c1df364fa9733daa4478c5f88298089e4963c33) )
@@ -2561,6 +2563,7 @@ ROM_START( mjleague )
 	ROM_LOAD( "epr-7064.03a", 0x10000, 0x8000, CRC(159f6636) SHA1(66fa3f3e95a6ef3d3ff4ded09c05ab1131d9fbbb) )
 	ROM_LOAD( "epr-7066.04a", 0x18000, 0x8000, CRC(f5cfa91f) SHA1(c85d68cbcd03fe1436bed12235c033610acc11ee) )
 ROM_END
+#endif
 
 ROM_START( passht4b )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68000 code */

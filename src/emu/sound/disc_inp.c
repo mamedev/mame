@@ -110,7 +110,7 @@ WRITE8_HANDLER(discrete_sound_w)
 #define DSS_ADJUSTMENT__PMIN	(*(node->input[5]))
 #define DSS_ADJUSTMENT__PMAX	(*(node->input[6]))
 
-void dss_adjustment_step(node_description *node)
+static void dss_adjustment_step(node_description *node)
 {
 	if (DSS_ADJUSTMENT__ENABLE)
 	{
@@ -136,7 +136,7 @@ void dss_adjustment_step(node_description *node)
 	}
 }
 
-void dss_adjustment_reset(node_description *node)
+static void dss_adjustment_reset(node_description *node)
 {
 	struct dss_adjustment_context *context = node->context;
 	double min, max;
@@ -184,7 +184,7 @@ void dss_adjustment_reset(node_description *node)
  ************************************************************************/
 #define DSS_CONSTANT__INIT	(*(node->input[0]))
 
-void dss_constant_step(node_description *node)
+static void dss_constant_step(node_description *node)
 {
 	node->output= DSS_CONSTANT__INIT;
 }
@@ -200,14 +200,14 @@ void dss_constant_step(node_description *node)
  * input[3]    - Current data value
  *
  ************************************************************************/
-void dss_input_step(node_description *node)
+static void dss_input_step(node_description *node)
 {
 	UINT8 *node_data = node->context;
 
 	node->output = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
 }
 
-void dss_input_reset(node_description *node)
+static void dss_input_reset(node_description *node)
 {
 	UINT8 *node_data = node->context;
 
@@ -227,7 +227,7 @@ void dss_input_reset(node_description *node)
 	dss_input_step(node);
 }
 
-void dss_input_pulse_step(node_description *node)
+static void dss_input_pulse_step(node_description *node)
 {
 	UINT8 *node_data = node->context;
 
@@ -252,7 +252,7 @@ void dss_input_pulse_step(node_description *node)
 #define DSS_INPUT_STREAM__GAIN		(*(node->input[1]))
 #define DSS_INPUT_STREAM__OFFSET	(*(node->input[2]))
 
-void dss_input_stream_step(node_description *node)
+static void dss_input_stream_step(node_description *node)
 {
 	// the context pointer is set to point to the current input stream data in discrete_stream_update
 	stream_sample_t **ptr = node->context;
@@ -261,7 +261,7 @@ void dss_input_stream_step(node_description *node)
 	node->output = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
 }
 
-void dss_input_stream_reset(node_description *node)
+static void dss_input_stream_reset(node_description *node)
 {
 	int istream = DSS_INPUT_STREAM__STREAM;
 	/* we will use the node's context pointer to point to the input stream data */

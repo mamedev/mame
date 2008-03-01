@@ -1906,10 +1906,11 @@ static INPUT_PORTS_START( system16b_1button )
 INPUT_PORTS_END
 
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( generic )
 	PORT_INCLUDE( system16b_generic )
 INPUT_PORTS_END
-
+#endif
 
 
 /*************************************

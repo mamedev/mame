@@ -821,12 +821,15 @@ static READ16_HANDLER( peripheral_register_r )
 //          if (hrdfBIT)
 			return HTXHRX;
 
+			/* FIXME: Following code never reached due to commented if above */
+#if 0
 			// Reading HRX clears HRDF.
 			CLEAR_hrdfBIT();
 
 			// The DSP may program the HRIE bit to cause a Host Receive Data interrupt when HRDF is set.
 
 			return 0x0000;
+#endif
 			break;
 	}
 

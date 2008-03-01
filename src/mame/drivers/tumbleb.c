@@ -1783,6 +1783,7 @@ static INPUT_PORTS_START( wlstar )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( dquizgo )
 	PORT_START	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1853,6 +1854,7 @@ static INPUT_PORTS_START( dquizgo )
 	PORT_DIPSETTING(    0x40, "4" )
 	PORT_DIPSETTING(    0x80, "5" )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( jumppop )
 	PORT_START	/* Controls */

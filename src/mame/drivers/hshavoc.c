@@ -192,10 +192,12 @@ ROM_START( hshavoc )
 	ROM_LOAD( "pic16c57",  0x00, 0x01, NO_DUMP ) // protected
 ROM_END
 
+#ifdef UNUSED_DEFINITION
 ROM_START( hshavoc2 ) /* Genesis Version, for reference */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )
 	ROM_LOAD( "hsh.rom", 0x000000, 0x100000, CRC(17be551c) SHA1(0dc1969098716ba332978b89356f62961417682b) )
 ROM_END
+#endif
 
 static READ16_HANDLER( vdp_fake_r )
 {

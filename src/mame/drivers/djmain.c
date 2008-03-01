@@ -1013,20 +1013,23 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnmusic )
 	POPN_INPUT			/* IN 0-2 */
 	POPN_DSW1			/* IN 3 */
 	POPN_DSW2			/* IN 4 */
 	POPN_DSW3			/* IN 5 */
 INPUT_PORTS_END
+#endif
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popn1 )
 	POPN_INPUT			/* IN 0-2 */
 	POPN1_DSW1			/* IN 3 */
 	POPN1_DSW2			/* IN 4 */
 	POPN1_DSW3			/* IN 5 */
 INPUT_PORTS_END
-
+#endif
 
 #define POPNST_INPUT \
 	PORT_START      /* IN 0 */ \
@@ -1114,13 +1117,14 @@ INPUT_PORTS_END
 	PORT_DIPSETTING(    0x2a, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( popnstage )
 	POPNST_INPUT			/* IN 0-2 */
 	POPNST_DSW1			/* IN 3 */
 	POPNST_DSW2			/* IN 4 */
 	POPNST_DSW3			/* IN 5 */
 INPUT_PORTS_END
-
+#endif
 
 /*************************************
  *

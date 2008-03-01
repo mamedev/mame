@@ -1001,7 +1001,7 @@ static void COMPUTE(UINT32 opcode)
 					{
 						UINT32 shift = REG(ry);
 						REG(rn) = REG(rx);
-						if (shift >= 0 && shift < 32)
+						if (shift < 32)
 						{
 							REG(rn) |= (1 << shift);
 						}
@@ -1017,7 +1017,7 @@ static void COMPUTE(UINT32 opcode)
 					{
 						UINT32 shift = REG(ry);
 						REG(rn) = REG(rx);
-						if (shift >= 0 && shift < 32)
+						if (shift < 32)
 						{
 							REG(rn) &= ~(1 << shift);
 						}

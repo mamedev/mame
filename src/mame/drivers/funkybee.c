@@ -187,6 +187,7 @@ static INPUT_PORTS_START( funkybee )
 	PORT_DIPSETTING(	0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( funkbeeb )
 	PORT_INCLUDE(funkybee)
 
@@ -197,6 +198,7 @@ static INPUT_PORTS_START( funkbeeb )
 	PORT_DIPSETTING(	0x10, "3" )
 	PORT_DIPSETTING(	0x00, "4" )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( skylancr )
 	PORT_START_TAG("IN0")

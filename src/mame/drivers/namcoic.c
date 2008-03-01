@@ -674,6 +674,7 @@ nth_byte16( const UINT16 *pSource, int which )
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
+#ifdef UNUSED_FUNCTION
 INLINE UINT16
 nth_word32( const UINT32 *pSource, int which )
 {
@@ -687,6 +688,7 @@ nth_word32( const UINT32 *pSource, int which )
 		return data>>16;
 	}
 } /* nth_word32 */
+#endif
 
 /* nth_byte32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of bytes.

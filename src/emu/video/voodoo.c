@@ -1713,7 +1713,6 @@ static int cmdfifo_compute_expected_depth(voodoo_state *v, cmdfifo_info *f)
 			mame_printf_debug("UNKNOWN PACKET TYPE %d\n", command & 7);
 			return 1;
 	}
-	return 1;
 }
 
 

@@ -108,10 +108,6 @@ static READ8_HANDLER( keyboard1_r )
 	switch (keyboard_select)
 	{
 
-		default:
-			printf("keyboard1_r, select %02x\n",keyboard_select);
-			return 0xff;
-
 		case 0xef:
 			return  readinputportbytag("0");
 
@@ -126,6 +122,10 @@ static READ8_HANDLER( keyboard1_r )
 
 		case 0xfe:
 			return  readinputportbytag("4");
+
+		default:
+			printf("keyboard1_r, select %02x\n",keyboard_select);
+			/* fall through */
 	}
 
 	return 0xff;
@@ -136,11 +136,6 @@ static READ8_HANDLER( keyboard2_r )
 {
 	switch (keyboard_select)
 	{
-
-		default:
-			printf("keyboard2_r, select %02x\n",keyboard_select);
-			return 0xff;
-
 		case 0xef:
 			return  readinputportbytag("5");
 
@@ -155,6 +150,10 @@ static READ8_HANDLER( keyboard2_r )
 
 		case 0xfe:
 			return  readinputportbytag("9");
+
+		default:
+			printf("keyboard2_r, select %02x\n",keyboard_select);
+			/* fall through */
 	}
 
 	return 0xff;

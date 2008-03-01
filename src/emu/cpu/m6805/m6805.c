@@ -263,6 +263,7 @@ INLINE void RM16( UINT32 Addr, PAIR *p )
 	p->b.l = RM(Addr);
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE void WM16( UINT32 Addr, PAIR *p )
 {
 	WM( Addr, p->b.h );
@@ -270,6 +271,7 @@ INLINE void WM16( UINT32 Addr, PAIR *p )
 //  if( ++Addr > AMASK ) Addr = 0;
 	WM( Addr, p->b.l );
 }
+#endif
 
 #if (HAS_M68705)
 

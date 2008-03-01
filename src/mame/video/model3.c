@@ -1061,7 +1061,9 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 	return clip_verts;
 }
 
+#ifdef UNUSED_DEFINITION
 static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4 };
+#endif
 
 static MATRIX coordinate_system;
 static float viewport_focal_length = 300;
@@ -1316,7 +1318,6 @@ static UINT32 *get_memory_pointer(UINT32 address)
 		}
 		return &culling_ram[address];
 	}
-	return NULL;
 }
 
 static void load_matrix(int matrix_num, MATRIX *out)

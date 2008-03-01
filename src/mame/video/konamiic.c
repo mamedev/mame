@@ -6034,7 +6034,6 @@ READ16_HANDLER( K056832_mw_rom_word_r )
 		return K056832_rombase[addr+1] | (K056832_rombase[addr] << 8);
 	}
 
-	return 0;
 }
 
 READ16_HANDLER( K056832_bishi_rom_word_r )

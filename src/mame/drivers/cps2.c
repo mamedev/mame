@@ -1023,6 +1023,7 @@ static INPUT_PORTS_START( cps2_3p3b )
 INPUT_PORTS_END
 
 /* 3 players and 2 buttons */
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( cps2_3p2b )
 	PORT_INCLUDE(cps2_3p3b)
 
@@ -1033,6 +1034,7 @@ static INPUT_PORTS_START( cps2_3p2b )
 	PORT_MODIFY("IN1")
     PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_PLAYER(3) */
 INPUT_PORTS_END
+#endif
 
 /* 2 players and 4 buttons */
 static INPUT_PORTS_START( cps2_2p4b )

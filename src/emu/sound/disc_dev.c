@@ -158,7 +158,7 @@ static int test_555(double threshold, double trigger, double v555, int node)
 #define DSD_555_ASTBL__C		(*(node->input[3]))
 #define DSD_555_ASTBL__CTRLV	(*(node->input[4]))
 
-void dsd_555_astbl_step(node_description *node)
+static void dsd_555_astbl_step(node_description *node)
 {
 	const discrete_555_desc *info = node->custom;
 	struct dsd_555_astbl_context *context = node->context;
@@ -338,7 +338,7 @@ void dsd_555_astbl_step(node_description *node)
 	}
 }
 
-void dsd_555_astbl_reset(node_description *node)
+static void dsd_555_astbl_reset(node_description *node)
 {
 	const discrete_555_desc *info = node->custom;
 	struct dsd_555_astbl_context *context = node->context;
@@ -399,7 +399,7 @@ void dsd_555_astbl_reset(node_description *node)
 #define DSD_555_MSTBL__R		(*(node->input[2]))
 #define DSD_555_MSTBL__C		(*(node->input[3]))
 
-void dsd_555_mstbl_step(node_description *node)
+static void dsd_555_mstbl_step(node_description *node)
 {
 	const discrete_555_desc *info = node->custom;
 	struct dsd_555_mstbl_context *context = node->context;
@@ -485,7 +485,7 @@ void dsd_555_mstbl_step(node_description *node)
 	}
 }
 
-void dsd_555_mstbl_reset(node_description *node)
+static void dsd_555_mstbl_reset(node_description *node)
 {
 	const discrete_555_desc *info = node->custom;
 	struct dsd_555_mstbl_context *context = node->context;
@@ -542,7 +542,7 @@ void dsd_555_mstbl_reset(node_description *node)
 #define DSD_555_CC__RGND	(*(node->input[5]))
 #define DSD_555_CC__RDIS	(*(node->input[6]))
 
-void dsd_555_cc_step(node_description *node)
+static void dsd_555_cc_step(node_description *node)
 {
 	const discrete_555_cc_desc *info = node->custom;
 	struct dsd_555_cc_context *context = node->context;
@@ -814,7 +814,7 @@ void dsd_555_cc_step(node_description *node)
 	}
 }
 
-void dsd_555_cc_reset(node_description *node)
+static void dsd_555_cc_reset(node_description *node)
 {
 	const discrete_555_cc_desc *info = node->custom;
 	struct dsd_555_cc_context *context = node->context;
@@ -999,7 +999,7 @@ void dsd_555_cc_reset(node_description *node)
 #define DSD_555_VCO1__VIN1	(*(node->input[1]))
 #define DSD_555_VCO1__VIN2	(*(node->input[2]))
 
-void dsd_555_vco1_step(node_description *node)
+static void dsd_555_vco1_step(node_description *node)
 {
 	const discrete_555_vco1_desc *info = node->custom;
 	struct dsd_555_vco1_context *context = node->context;
@@ -1150,7 +1150,7 @@ void dsd_555_vco1_step(node_description *node)
 	}
 }
 
-void dsd_555_vco1_reset(node_description *node)
+static void dsd_555_vco1_reset(node_description *node)
 {
 	const discrete_555_vco1_desc *info = node->custom;
 	struct dsd_555_vco1_context *context = node->context;
@@ -1228,7 +1228,7 @@ void dsd_555_vco1_reset(node_description *node)
 #define DSD_566__R		(*(node->input[2]))
 #define DSD_566__C		(*(node->input[3]))
 
-void dsd_566_step(node_description *node)
+static void dsd_566_step(node_description *node)
 {
 	const discrete_566_desc *info = node->custom;
 	struct dsd_566_context *context = node->context;
@@ -1338,7 +1338,7 @@ void dsd_566_step(node_description *node)
 		node->output = 0;
 }
 
-void dsd_566_reset(node_description *node)
+static void dsd_566_reset(node_description *node)
 {
 	const discrete_566_desc *info = node->custom;
 	struct dsd_566_context *context = node->context;
@@ -1404,7 +1404,7 @@ void dsd_566_reset(node_description *node)
 #define LS624_F1(x)			(0.19 + 20.0/90.0*(x))
 #define LS624_T(_C, _R, _F)		(-600.0 * (_C) * log(1.0-LS624_F1(_R)*0.12/LS624_F1(_F)))
 
-void dsd_ls624_step(node_description *node)
+static void dsd_ls624_step(node_description *node)
 {
 	struct dsd_ls624_context *context = node->context;
 
@@ -1452,7 +1452,7 @@ void dsd_ls624_step(node_description *node)
 		node->output = 0;
 }
 
-void dsd_ls624_reset(node_description *node)
+static void dsd_ls624_reset(node_description *node)
 {
 	struct dsd_ls624_context *context = node->context;
 

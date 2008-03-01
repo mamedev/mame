@@ -694,7 +694,9 @@ static float max4f(float a, float b, float c, float d)
 	return m;
 }
 
+#ifdef UNUSED_DEFINITION
 static const UINT8 num_of_times[]={1,1,1,1,2,2,2,3};
+#endif
 static float compute_specular(struct vector *normal, struct vector *light,float diffuse,int lmode)
 {
 #if 0

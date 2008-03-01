@@ -635,9 +635,6 @@ static UINT32 boot_loader(UINT32 boot_rom_addr)
 			WMEM(offs++, data);
 		}
 	}
-
-	/* keep the compiler happy */
-	return 0;
 }
 
 

@@ -6,13 +6,13 @@
 #include "deprecat.h"
 
 #if (HAS_PPC603 || HAS_PPC601 || HAS_PPC604)
-void ppc603_exception(int exception);
+static void ppc603_exception(int exception);
 #endif
 #if (HAS_PPC602)
-void ppc602_exception(int exception);
+static void ppc602_exception(int exception);
 #endif
 #if (HAS_PPC403)
-void ppc403_exception(int exception);
+static void ppc403_exception(int exception);
 static UINT8 ppc403_spu_r(UINT32 a);
 static void ppc403_spu_w(UINT32 a, UINT8 d);
 #endif
@@ -847,7 +847,7 @@ INLINE void ppc_exception(int exception_type)
 
 /* Initialization and shutdown */
 
-void ppc_init(void)
+static void ppc_init(void)
 {
 	int i,j;
 
@@ -1734,7 +1734,7 @@ static void ppc603_set_info(UINT32 state, cpuinfo *info)
 }
 #endif
 
-void ppc_get_info(UINT32 state, cpuinfo *info)
+static void ppc_get_info(UINT32 state, cpuinfo *info)
 {
 	switch(state)
 	{

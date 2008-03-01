@@ -5931,6 +5931,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+#ifdef UNUSED_DEFINITION
 static INPUT_PORTS_START( mjmyuniv )
 	PORT_START	// IN0 - Coins + Service Keys
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3	)	// medal out
@@ -6111,6 +6112,7 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( akamaru )
 	PORT_START	// IN0 - Player 1

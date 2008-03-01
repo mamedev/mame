@@ -90,9 +90,9 @@ void cdda_set_cdrom(int num, void *file)
 
 int cdda_num_from_cdrom(void *file)
 {
-	int index;
+	int index = 0;
 
-	for (index = 0; ; index++)
+	do
 	{
 		cdda_info *info;
 
@@ -105,8 +105,8 @@ int cdda_num_from_cdrom(void *file)
 			return -1;
 		if (info->disc == file)
 			return index;
-	}
-	return 0;
+		index++;
+	} while (1);
 }
 
 
