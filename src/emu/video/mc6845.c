@@ -437,26 +437,29 @@ void mc6845_assert_light_pen_input(mc6845_t *mc6845)
 
 	assert(mc6845 != NULL);
 
-	/* get the current pixel coordinates */
-	y = video_screen_get_vpos(mc6845->intf->scrnum);
-	x = video_screen_get_hpos(mc6845->intf->scrnum);
-
-	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
-	char_x = x / mc6845->intf->hpixels_per_column;
-	x = (char_x + 1) * mc6845->intf->hpixels_per_column;
-
-	/* adjust if we are passed the boundaries of the screen */
-	if (x == mc6845->horiz_pix_total)
+	if (mc6845->has_valid_parameters)
 	{
-		y = y + 1;
-		x = 0;
+		/* get the current pixel coordinates */
+		y = video_screen_get_vpos(mc6845->intf->scrnum);
+		x = video_screen_get_hpos(mc6845->intf->scrnum);
 
-		if (y == mc6845->vert_pix_total)
-			y = 0;
+		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
+		char_x = x / mc6845->intf->hpixels_per_column;
+		x = (char_x + 1) * mc6845->intf->hpixels_per_column;
+
+		/* adjust if we are passed the boundaries of the screen */
+		if (x == mc6845->horiz_pix_total)
+		{
+			y = y + 1;
+			x = 0;
+
+			if (y == mc6845->vert_pix_total)
+				y = 0;
+		}
+
+		/* set the timer that will latch the display address into the light pen registers */
+		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, y, x), 0);
 	}
-
-	/* set the timer that will latch the display address into the light pen registers */
-	timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, y, x), 0);
 }
 
 
