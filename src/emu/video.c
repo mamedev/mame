@@ -1056,7 +1056,7 @@ attotime video_screen_get_frame_period(int scrnum)
     for a video screen
 -------------------------------------------------*/
 
-static void *video_screen_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+static DEVICE_START( video_screen )
 {
 	int scrindex = device_list_index(machine->config->devicelist, VIDEO_SCREEN, tag);
 	return &machine->screen[scrindex];
@@ -1068,7 +1068,7 @@ static void *video_screen_start(running_machine *machine, const char *tag, const
     callback
 -------------------------------------------------*/
 
-static void video_screen_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+static DEVICE_SET_INFO( video_screen )
 {
 	switch (state)
 	{
@@ -1082,16 +1082,17 @@ static void video_screen_set_info(running_machine *machine, void *token, UINT32 
     callback
 -------------------------------------------------*/
 
-void video_screen_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+DEVICE_GET_INFO( video_screen )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(screen_config);		break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = video_screen_set_info;break;
-		case DEVINFO_FCT_START:							info->start = video_screen_start;		break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(video_screen); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(video_screen); break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							/* Nothing */							break;
 

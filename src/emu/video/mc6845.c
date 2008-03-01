@@ -662,18 +662,18 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 	return mc6845;
 }
 
-static void *mc6845_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+static DEVICE_START( mc6845 )
 {
 	return common_start(machine, tag, static_config, inline_config, TYPE_MC6845);
 }
 
-static void *r6545_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+static DEVICE_START( r6545 )
 {
 	return common_start(machine, tag, static_config, inline_config, TYPE_R6545);
 }
 
 
-static void mc6845_reset(running_machine *machine, void *token)
+static DEVICE_RESET( mc6845 )
 {
 	mc6845_t *mc6845 = token;
 
@@ -692,7 +692,7 @@ static void mc6845_reset(running_machine *machine, void *token)
 }
 
 
-static void mc6845_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+static DEVICE_SET_INFO( mc6845 )
 {
 	switch (state)
 	{
@@ -701,18 +701,19 @@ static void mc6845_set_info(running_machine *machine, void *token, UINT32 state,
 }
 
 
-void mc6845_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+DEVICE_GET_INFO( mc6845 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = mc6845_set_info;		break;
-		case DEVINFO_FCT_START:							info->start = mc6845_start;				break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc6845); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							info->reset = mc6845_reset;				break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
@@ -724,7 +725,7 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 }
 
 
-void r6545_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+DEVICE_GET_INFO( r6545 )
 {
 	switch (state)
 	{
@@ -732,8 +733,8 @@ void r6545_get_info(running_machine *machine, void *token, UINT32 state, devicei
 		case DEVINFO_STR_NAME:							info->s = "R6545";						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = r6545_start;				break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545);	break;
 
-		default: mc6845_get_info(machine, token, state, info);									break;
+		default: 										DEVICE_GET_INFO_CALL(mc6845);			break;
 	}
 }

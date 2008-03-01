@@ -344,28 +344,32 @@ static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
 					break;
 				}
 
-			/* print info */
-//          printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
-
-			/* allocate a bitmap */
-			ch->bitmap = bitmap_alloc(colend - colstart + 1, font->height, BITMAP_FORMAT_ARGB32);
-			if (ch->bitmap == NULL)
+			// skip char which code is already registered
+			if (ch->width <= 0)
 			{
-				fprintf(stderr, "Error allocating character bitmap (%dx%d)\n", colend - colstart + 1, font->height);
-				continue;
+				/* print info */
+// 		        printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
+
+				/* allocate a bitmap */
+				ch->bitmap = bitmap_alloc(colend - colstart + 1, font->height, BITMAP_FORMAT_ARGB32);
+				if (ch->bitmap == NULL)
+				{
+					fprintf(stderr, "Error allocating character bitmap (%dx%d)\n", colend - colstart + 1, font->height);
+					continue;
+				}
+
+				/* plot the character */
+				for (y = rowstart; y <= rowend; y++)
+					for (x = colstart; x <= colend; x++)
+						*BITMAP_ADDR32(ch->bitmap, y - rowstart, x - colstart) = pixel_is_set(bitmap, y, x) ? 0xffffffff : 0x00000000;
+
+				/* set the character parameters */
+				ch->width = colend - colstart + 1;
+				ch->xoffs = 0;
+				ch->yoffs = font->yoffs;
+				ch->bmwidth = ch->bitmap->width;
+				ch->bmheight = ch->bitmap->height;
 			}
-
-			/* plot the character */
-			for (y = rowstart; y <= rowend; y++)
-				for (x = colstart; x <= colend; x++)
-					*BITMAP_ADDR32(ch->bitmap, y - rowstart, x - colstart) = pixel_is_set(bitmap, y, x) ? 0xffffffff : 0x00000000;
-
-			/* set the character parameters */
-			ch->width = colend - colstart + 1;
-			ch->xoffs = 0;
-			ch->yoffs = font->yoffs;
-			ch->bmwidth = ch->bitmap->width;
-			ch->bmheight = ch->bitmap->height;
 
 			/* next character */
 			chstart++;

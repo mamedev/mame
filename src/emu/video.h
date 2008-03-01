@@ -141,8 +141,8 @@ int video_screen_exists(int scrnum);
 /* ----- video screen device interface ----- */
 
 /* device get info callback */
-#define VIDEO_SCREEN video_screen_get_info
-void video_screen_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+#define VIDEO_SCREEN DEVICE_GET_INFO_NAME(video_screen)
+DEVICE_GET_INFO( video_screen );
 
 
 

@@ -83,6 +83,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 {
 	device_config **devptr;
 	device_config *device;
+	UINT32 configlen;
 	deviceinfo info;
 
 	assert(listheadptr != NULL);
@@ -95,23 +96,23 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", devtype_name(type), tag);
 
 	/* get the size of the inline config */
-	info.i = 0;
-	(*type)(NULL, NULL, DEVINFO_INT_INLINE_CONFIG_BYTES, &info);
+	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = malloc_or_die(sizeof(*device) + strlen(tag) + info.i);
+	device = malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
 
 	/* populate all fields */
 	device->next = NULL;
 	device->type = type;
+	device->class = devtype_get_info_int(type, DEVINFO_INT_CLASS);
 	device->static_config = NULL;
-	device->inline_config = (info.i == 0) ? NULL : (device->tag + strlen(tag) + 1);
+	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
 	device->token = NULL;
 	strcpy(device->tag, tag);
 
 	/* reset the inline_config to 0 */
-	if (info.i > 0)
-		memset(device->inline_config, 0, info.i);
+	if (configlen > 0)
+		memset(device->inline_config, 0, configlen);
 
 	/* fetch function pointers to the core functions */
 	info.set_info = NULL;
@@ -165,6 +166,11 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 	free(device);
 }
 
+
+
+/***************************************************************************
+    TYPE-BASED DEVICE ACCESS
+***************************************************************************/
 
 /*-------------------------------------------------
     device_list_items - return the number of
@@ -246,12 +252,6 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 }
 
 
-
-/***************************************************************************
-    INDEX-BASED DEVICE ACCESS
-***************************************************************************/
-
-
 /*-------------------------------------------------
     device_list_index - return the index of a
     device based on its type and tag;
@@ -288,6 +288,131 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 	/* find the device in the list */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type) && index-- == 0)
+			return curdev;
+
+	/* fail */
+	return NULL;
+}
+
+
+
+/***************************************************************************
+    CLASS-BASED DEVICE ACCESS
+***************************************************************************/
+
+/*-------------------------------------------------
+    device_list_class_items - return the number of
+    items of a given class
+-------------------------------------------------*/
+
+int device_list_class_items(const device_config *listhead, device_class class)
+{
+	const device_config *curdev;
+	int count = 0;
+
+	/* locate all devices */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		count += (curdev->class == class);
+
+	return count;
+}
+
+
+/*-------------------------------------------------
+    device_list_class_first - return the first 
+    device in the list of a given class
+-------------------------------------------------*/
+
+const device_config *device_list_class_first(const device_config *listhead, device_class class)
+{
+	const device_config *curdev;
+
+	/* scan forward starting with the list head */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (curdev->class == class)
+			return curdev;
+
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    device_list_class_next - return the next 
+    device in the list of a given class
+-------------------------------------------------*/
+
+const device_config *device_list_class_next(const device_config *prevdevice, device_class class)
+{
+	const device_config *curdev;
+
+	assert(prevdevice != NULL);
+
+	/* scan forward starting with the item after the previous one */
+	for (curdev = prevdevice->next; curdev != NULL; curdev = curdev->next)
+		if (curdev->class == class)
+			return curdev;
+
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    device_list_class_find_by_tag - retrieve a 
+    device configuration based on a class and tag
+-------------------------------------------------*/
+
+const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class class, const char *tag)
+{
+	const device_config *curdev;
+
+	assert(tag != NULL);
+
+	/* find the device in the list */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (curdev->class == class && strcmp(tag, curdev->tag) == 0)
+			return curdev;
+
+	/* fail */
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    device_list_class_index - return the index of a
+    device based on its class and tag
+-------------------------------------------------*/
+
+int device_list_class_index(const device_config *listhead, device_class class, const char *tag)
+{
+	const device_config *curdev;
+	int index = 0;
+
+	/* locate all devices */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (curdev->class == class)
+		{
+			if (strcmp(tag, curdev->tag) == 0)
+				return index;
+			index++;
+		}
+
+	return -1;
+}
+
+
+/*-------------------------------------------------
+    device_list_class_find_by_index - retrieve a 
+    device configuration based on a class and 
+    index
+-------------------------------------------------*/
+
+const device_config *device_list_class_find_by_index(const device_config *listhead, device_class class, int index)
+{
+	const device_config *curdev;
+
+	/* find the device in the list */
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (curdev->class == class && index-- == 0)
 			return curdev;
 
 	/* fail */
@@ -558,6 +683,31 @@ const char *devtag_get_info_string(running_machine *machine, device_type type, c
 	if (config == NULL)
 		fatalerror("device_get_info_string failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device_get_info_string(machine, config, state);
+}
+
+
+
+/***************************************************************************
+    DEVICE TYPE INFORMATION SETTERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    devtype_get_info_int - return an integer value
+    from a device type (does not need to be
+    allocated)
+-------------------------------------------------*/
+
+INT64 devtype_get_info_int(device_type type, UINT32 state)
+{
+	deviceinfo info;
+
+	assert(type != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	/* retrieve the value */
+	info.i = 0;
+	(*type)(NULL, NULL, state, &info);
+	return info.i;
 }
 
 

@@ -101,8 +101,8 @@ int sound_find_sndnum_by_tag(const char *tag);
 /* ----- sound speaker device interface ----- */
 
 /* device get info callback */
-#define SPEAKER_OUTPUT speaker_output_get_info
-void speaker_output_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
+#define SPEAKER_OUTPUT DEVICE_GET_INFO_NAME(speaker_output)
+DEVICE_GET_INFO( speaker_output );
 
 
 #endif	/* __SOUND_H__ */

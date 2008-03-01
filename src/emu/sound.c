@@ -785,7 +785,7 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
     for a speaker
 -------------------------------------------------*/
 
-static void *speaker_output_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+static DEVICE_START( speaker_output )
 {
 	speaker_info *info;
 
@@ -805,7 +805,7 @@ static void *speaker_output_start(running_machine *machine, const char *tag, con
     for a speaker
 -------------------------------------------------*/
 
-static void speaker_output_stop(running_machine *machine, void *token)
+static DEVICE_STOP( speaker_output )
 {
 #ifdef MAME_DEBUG
 	speaker_info *info = token;
@@ -822,7 +822,7 @@ static void speaker_output_stop(running_machine *machine, void *token)
     callback
 -------------------------------------------------*/
 
-static void speaker_output_set_info(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+static DEVICE_SET_INFO( speaker_output )
 {
 	switch (state)
 	{
@@ -836,17 +836,18 @@ static void speaker_output_set_info(running_machine *machine, void *token, UINT3
     callback
 -------------------------------------------------*/
 
-void speaker_output_get_info(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+DEVICE_GET_INFO( speaker_output )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(speaker_config);		break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_AUDIO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = speaker_output_set_info;break;
-		case DEVINFO_FCT_START:							info->start = speaker_output_start;		break;
-		case DEVINFO_FCT_STOP:							info->stop = speaker_output_stop;		break;
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(speaker_output); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(speaker_output); break;
+		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME(speaker_output); break;
 		case DEVINFO_FCT_RESET:							/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

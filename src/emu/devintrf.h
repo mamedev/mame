@@ -21,6 +21,20 @@
     CONSTANTS
 ***************************************************************************/
 
+/* device classes */
+enum _device_class
+{
+	DEVICE_CLASS_GENERAL = 0,			/* default class for general devices */
+	DEVICE_CLASS_PERIPHERAL,			/* peripheral devices: PIAs, timers, etc. */
+	DEVICE_CLASS_AUDIO,					/* audio devices (not sound chips), including speakers */
+	DEVICE_CLASS_VIDEO,					/* video devices, including screens */
+	DEVICE_CLASS_CPU_CHIP,				/* CPU chips; only CPU cores should return this class */
+	DEVICE_CLASS_SOUND_CHIP,			/* sound chips; only sound cores should return this class */
+	DEVICE_CLASS_OTHER					/* anything else (the list may expand in the future) */
+};
+typedef enum _device_class device_class;
+
+
 /* useful in device_list functions for scanning through all devices */
 #define DEVICE_TYPE_WILDCARD			NULL
 
@@ -32,6 +46,7 @@ enum
 	DEVINFO_INT_FIRST = 0x00000,
 
 	DEVINFO_INT_INLINE_CONFIG_BYTES = DEVINFO_INT_FIRST,/* R/O: bytes of inline configuration */
+	DEVINFO_INT_CLASS,									/* R/O: the device's class */
 
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
 
@@ -69,6 +84,32 @@ enum
 
 	DEVINFO_STR_LAST = 0x3ffff
 };
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define DEVICE_GET_INFO_NAME(name)	device_get_info_##name
+#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
+#define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(machine, token, state, info)
+
+#define DEVICE_SET_INFO_NAME(name)	device_set_info_##name
+#define DEVICE_SET_INFO(name)		void DEVICE_SET_INFO_NAME(name)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
+#define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(machine, token, state, info)
+
+#define DEVICE_START_NAME(name)		device_start_##name
+#define DEVICE_START(name)			void *DEVICE_START_NAME(name)(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+#define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(machine, tag, static_config, inline_config)
+
+#define DEVICE_STOP_NAME(name)		device_stop_##name
+#define DEVICE_STOP(name)			void DEVICE_STOP_NAME(name)(running_machine *machine, void *token)
+#define DEVICE_STOP_CALL(name)		DEVICE_STOP_NAME(name)(machine, token)
+
+#define DEVICE_RESET_NAME(name)		device_reset_##name
+#define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(running_machine *machine, void *token)
+#define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(machine, token)
 
 
 
@@ -113,8 +154,7 @@ struct _device_config
 {
 	device_config *			next;					/* next device */
 	device_type				type;					/* device type */
-	UINT32					flags;					/* device flags */
-	UINT32					clock;					/* device clock */
+	device_class			class;					/* device class */
 	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
 	device_start_func		start;					/* quick pointer to start callback */
 	device_stop_func		stop;					/* quick pointer to stop callback */
@@ -140,6 +180,10 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 /* remove a device from a device list */
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag);
 
+
+
+/* ----- type-based device access ----- */
+
 /* return the number of items of a given type; DEVICE_TYPE_WILDCARD is allowed */
 int device_list_items(const device_config *listhead, device_type type);
 
@@ -152,15 +196,33 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 /* retrieve a device configuration based on a type and tag; DEVICE_TYPE_WILDCARD is allowed */
 const device_config *device_list_find_by_tag(const device_config *listhead, device_type type, const char *tag);
 
-
-
-/* ----- index-based device access (avoid if possible) ----- */
-
 /* return the index of a device based on its type and tag; DEVICE_TYPE_WILDCARD is allowed */
 int device_list_index(const device_config *listhead, device_type type, const char *tag);
 
 /* retrieve a device configuration based on a type and index; DEVICE_TYPE_WILDCARD is allowed */
 const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index);
+
+
+
+/* ----- class-based device access ----- */
+
+/* return the number of items of a given class */
+int device_list_class_items(const device_config *listhead, device_class class);
+
+/* return the first device in the list of a given class */
+const device_config *device_list_class_first(const device_config *listhead, device_class class);
+
+/* return the next device in the list of a given class */
+const device_config *device_list_class_next(const device_config *prevdevice, device_class class);
+
+/* retrieve a device configuration based on a class and tag */
+const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class class, const char *tag);
+
+/* return the index of a device based on its class and tag */
+int device_list_class_index(const device_config *listhead, device_class class, const char *tag);
+
+/* retrieve a device configuration based on a class and index */
+const device_config *device_list_class_find_by_index(const device_config *listhead, device_class class, int index);
 
 
 
@@ -201,6 +263,13 @@ genf *devtag_get_info_fct(running_machine *machine, device_type type, const char
 /* return a string value from an allocated device */
 const char *device_get_info_string(running_machine *machine, const device_config *config, UINT32 state);
 const char *devtag_get_info_string(running_machine *machine, device_type type, const char *tag, UINT32 state);
+
+
+
+/* ----- device type information getters ----- */
+
+/* return an integer value from a device type (does not need to be allocated) */
+INT64 devtype_get_info_int(device_type type, UINT32 state);
 
 /* return a string value from a device type (does not need to be allocated) */
 const char *devtype_get_info_string(device_type type, UINT32 state);
