@@ -228,13 +228,14 @@ INLINE const char *copy_string(const char *string)
     any non-screen elements
 -------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTION
 INLINE int view_has_art(layout_view *view)
 {
 	return (view->itemlist[ITEM_LAYER_BACKDROP] != 0 ||
 			view->itemlist[ITEM_LAYER_OVERLAY] != 0 ||
 			view->itemlist[ITEM_LAYER_BEZEL] != 0);
 }
-
+#endif
 
 
 /***************************************************************************
