@@ -36,11 +36,11 @@ struct _mc6845_t
 
 	/* internal registers */
 	UINT8	address_latch;
-	UINT8	horiz_total;
+	UINT8	horiz_char_total;
 	UINT8	horiz_disp;
 	UINT8	horiz_sync_pos;
 	UINT8	horiz_sync_width;
-	UINT8	vert_total;
+	UINT8	vert_char_total;
 	UINT8	vert_total_adj;
 	UINT8	vert_disp;
 	UINT8	vert_sync_pos;
@@ -52,25 +52,27 @@ struct _mc6845_t
 	UINT16	cursor_addr;
 	UINT16	light_pen_addr;
 
+	/* other internal state */
+	UINT8	cursor_state;	/* 0 = off, 1 = on */
+	UINT8	cursor_blink_count;
+
+	/* timers */
 	emu_timer *de_changed_timer;
 	emu_timer *hsync_on_timer;
 	emu_timer *hsync_off_timer;
 	emu_timer *vsync_on_timer;
 	emu_timer *vsync_off_timer;
-	UINT8	cursor_state;	/* 0 = off, 1 = on */
-	UINT8	cursor_blink_count;
+	emu_timer *light_pen_latch_timer;
 
-	/* saved screen parameters so we don't call
-       video_screen_configure() unneccessarily.
-       Do NOT state save these! */
-	UINT16	last_horiz_total;
-	UINT16	last_vert_total;
-	UINT16	last_max_x;
-	UINT16	last_max_y;
-	UINT16	last_hsync_on_pos;
-	UINT16	last_hsync_off_pos;
-	UINT16	last_vsync_on_pos;
-	UINT16	last_vsync_off_pos;
+	/* computed values - do NOT state save these! */
+	UINT16	horiz_pix_total;
+	UINT16	vert_pix_total;
+	UINT16	max_visible_x;
+	UINT16	max_visible_y;
+	UINT16	hsync_on_pos;
+	UINT16	hsync_off_pos;
+	UINT16	vsync_on_pos;
+	UINT16	vsync_off_pos;
 	UINT16  current_ma;		/* the MA address currently drawn */
 	int		has_valid_parameters;
 };
@@ -81,18 +83,11 @@ static void configure_screen(mc6845_t *mc6845, int postload);
 static void update_de_changed_timer(mc6845_t *mc6845);
 static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
-static TIMER_CALLBACK( de_changed_timer_cb );
-static TIMER_CALLBACK( vsync_on_timer_cb );
-static TIMER_CALLBACK( vsync_off_timer_cb );
-static TIMER_CALLBACK( hsync_on_timer_cb );
-static TIMER_CALLBACK( hsync_off_timer_cb );
 
 
 static void mc6845_state_save_postload(void *param)
 {
-	mc6845_t *mc6845 = (mc6845_t *)param;
-
-	configure_screen(mc6845, TRUE);
+	configure_screen(param, TRUE);
 }
 
 
@@ -136,11 +131,11 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 
 	switch (mc6845->address_latch)
 	{
-		case 0x00:  mc6845->horiz_total      =   data & 0xff; break;
+		case 0x00:  mc6845->horiz_char_total =   data & 0xff; break;
 		case 0x01:  mc6845->horiz_disp       =   data & 0xff; break;
 		case 0x02:  mc6845->horiz_sync_pos   =   data & 0xff; break;
 		case 0x03:  mc6845->horiz_sync_width =   data & 0x0f; break;
-		case 0x04:  mc6845->vert_total       =   data & 0x7f; break;
+		case 0x04:  mc6845->vert_char_total  =   data & 0x7f; break;
 		case 0x05:  mc6845->vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  mc6845->vert_disp        =   data & 0x7f; break;
 		case 0x07:  mc6845->vert_sync_pos    =   data & 0x7f; break;
@@ -166,12 +161,12 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 	if (mc6845->intf)
 	{
 		/* compute the screen sizes */
-		UINT16 horiz_total = (mc6845->horiz_total + 1) * mc6845->intf->hpixels_per_column;
-		UINT16 vert_total = (mc6845->vert_total + 1) * (mc6845->max_ras_addr + 1) + mc6845->vert_total_adj;
+		UINT16 horiz_pix_total = (mc6845->horiz_char_total + 1) * mc6845->intf->hpixels_per_column;
+		UINT16 vert_pix_total = (mc6845->vert_char_total + 1) * (mc6845->max_ras_addr + 1) + mc6845->vert_total_adj;
 
 		/* determine the visible area, avoid division by 0 */
-		UINT16 max_x = mc6845->horiz_disp * mc6845->intf->hpixels_per_column - 1;
-		UINT16 max_y = mc6845->vert_disp * (mc6845->max_ras_addr + 1) - 1;
+		UINT16 max_visible_x = mc6845->horiz_disp * mc6845->intf->hpixels_per_column - 1;
+		UINT16 max_visible_y = mc6845->vert_disp * (mc6845->max_ras_addr + 1) - 1;
 
 		/* determine the syncing positions */
 		UINT16 hsync_on_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
@@ -181,44 +176,44 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 
 		/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 		if (postload ||
-		    (horiz_total != mc6845->last_horiz_total) || (vert_total != mc6845->last_vert_total) ||
-			(max_x != mc6845->last_max_x) || (max_y != mc6845->last_max_y) ||
-			(hsync_on_pos != mc6845->last_hsync_on_pos) || (vsync_on_pos != mc6845->last_vsync_on_pos) ||
-			(hsync_off_pos != mc6845->last_hsync_off_pos) || (vsync_off_pos != mc6845->last_vsync_off_pos))
+		    (horiz_pix_total != mc6845->horiz_pix_total) || (vert_pix_total != mc6845->vert_pix_total) ||
+			(max_visible_x != mc6845->max_visible_x) || (max_visible_y != mc6845->max_visible_y) ||
+			(hsync_on_pos != mc6845->hsync_on_pos) || (vsync_on_pos != mc6845->vsync_on_pos) ||
+			(hsync_off_pos != mc6845->hsync_off_pos) || (vsync_off_pos != mc6845->vsync_off_pos))
 		{
 			/* update the screen if we have valid data */
-			if ((horiz_total > 0) && (max_x < horiz_total) &&
-				(vert_total > 0) && (max_y < vert_total) &&
-				(hsync_off_pos <= horiz_total) && (vsync_off_pos <= vert_total) &&
+			if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
+				(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
+				(hsync_off_pos <= horiz_pix_total) && (vsync_off_pos <= vert_pix_total) &&
 				(hsync_on_pos != hsync_off_pos))
 			{
 				rectangle visarea;
 
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(mc6845->intf->clock) * (mc6845->horiz_total + 1) * vert_total;
+				attoseconds_t refresh = HZ_TO_ATTOSECONDS(mc6845->intf->clock) * (mc6845->horiz_char_total + 1) * vert_pix_total;
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
-				visarea.max_x = max_x;
-				visarea.max_y = max_y;
+				visarea.max_x = max_visible_x;
+				visarea.max_y = max_visible_y;
 
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-								  horiz_total, vert_total, max_x, max_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-				video_screen_configure(mc6845->intf->scrnum, horiz_total, vert_total, &visarea, refresh);
+				video_screen_configure(mc6845->intf->scrnum, horiz_pix_total, vert_pix_total, &visarea, refresh);
 
 				mc6845->has_valid_parameters = TRUE;
 			}
 			else
 				mc6845->has_valid_parameters = FALSE;
 
-			mc6845->last_horiz_total = horiz_total;
-			mc6845->last_vert_total = vert_total;
-			mc6845->last_max_x = max_x;
-			mc6845->last_max_y = max_y;
-			mc6845->last_hsync_on_pos = hsync_on_pos;
-			mc6845->last_hsync_off_pos = hsync_off_pos;
-			mc6845->last_vsync_on_pos = vsync_on_pos;
-			mc6845->last_vsync_off_pos = vsync_off_pos;
+			mc6845->horiz_pix_total = horiz_pix_total;
+			mc6845->vert_pix_total = vert_pix_total;
+			mc6845->max_visible_x = max_visible_x;
+			mc6845->max_visible_y = max_visible_y;
+			mc6845->hsync_on_pos = hsync_on_pos;
+			mc6845->hsync_off_pos = hsync_off_pos;
+			mc6845->vsync_on_pos = vsync_on_pos;
+			mc6845->vsync_off_pos = vsync_off_pos;
 
 			update_de_changed_timer(mc6845);
 			update_hsync_changed_timers(mc6845);
@@ -233,7 +228,7 @@ static int is_display_enabled(mc6845_t *mc6845)
 	UINT16 y = video_screen_get_vpos(mc6845->intf->scrnum);
 	UINT16 x = video_screen_get_hpos(mc6845->intf->scrnum);
 
-	return (y <= mc6845->last_max_y) && (x <= mc6845->last_max_x);
+	return (y <= mc6845->max_visible_y) && (x <= mc6845->max_visible_x);
 }
 
 
@@ -250,17 +245,17 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		{
 			/* normally, it's at end the current raster line */
 			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
-			next_x = mc6845->last_max_x + 1;
+			next_x = mc6845->max_visible_x + 1;
 
-			/* but if visible width = horiz_total, then we need
+			/* but if visible width = horiz_pix_total, then we need
                to go to the beginning of VBLANK */
-			if (next_x == mc6845->last_horiz_total)
+			if (next_x == mc6845->horiz_pix_total)
 			{
-				next_y = mc6845->last_max_y + 1;
+				next_y = mc6845->max_visible_y + 1;
 				next_x = 0;
 
 				/* abnormal case, no vertical blanking, either */
-				if (next_y == mc6845->last_vert_total)
+				if (next_y == mc6845->vert_pix_total)
 					next_y = -1;
 			}
 		}
@@ -269,11 +264,11 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		else
 		{
 			next_x = 0;
-			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->last_vert_total;
+			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
 
 			/* if we would now fall in the vertical blanking, we need
                to go to the top of the screen */
-			if (next_y > mc6845->last_max_y)
+			if (next_y > mc6845->max_visible_y)
 				next_y = 0;
 		}
 
@@ -294,19 +289,19 @@ static void update_hsync_changed_timers(mc6845_t *mc6845)
 		UINT16 next_y;
 
 		/* we are before the HSYNC position, we trigger on the current line */
-		if (video_screen_get_hpos(mc6845->intf->scrnum) < mc6845->last_hsync_on_pos)
+		if (video_screen_get_hpos(mc6845->intf->scrnum) < mc6845->hsync_on_pos)
 			next_y = video_screen_get_vpos(mc6845->intf->scrnum);
 
 		/* trigger on the next line */
 		else
-			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->last_vert_total;
+			next_y = (video_screen_get_vpos(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
 
 		/* if the next line is not in the visible region, go to the beginning of the screen */
-		if (next_y > mc6845->last_max_y)
+		if (next_y > mc6845->max_visible_y)
 			next_y = 0;
 
-		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->last_hsync_on_pos) , 0);
-		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->last_hsync_off_pos), 0);
+		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->hsync_on_pos) , 0);
+		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, next_y, mc6845->hsync_off_pos), 0);
 	}
 }
 
@@ -315,8 +310,8 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 {
 	if (mc6845->has_valid_parameters && (mc6845->vsync_on_timer != NULL))
 	{
-		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->last_vsync_on_pos,  0), 0);
-		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->last_vsync_off_pos, 0), 0);
+		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->vsync_on_pos,  0), 0);
+		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, mc6845->vsync_off_pos, 0), 0);
 	}
 }
 
@@ -373,33 +368,6 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 
 
 
-static UINT16 get_ma_for_yx(mc6845_t *mc6845, int y, int x)
-{
-	UINT16 ret;
-
-	if (mc6845->has_valid_parameters)
-	{
-		/* clamp Y/X to the visible region */
-
-		/* since the MA counter stops in the blanking regions, if we are in a
-           VBLANK, both X and Y are at their max */
-		if ((y > mc6845->last_max_y) || (x > mc6845->last_max_x))
-			x = mc6845->last_max_x;
-
-		if (y > mc6845->last_max_y)
-			y = mc6845->last_max_y;
-
-		ret = (mc6845->start_addr +
-			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
-			  (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
-	}
-	else
-		ret = 0;
-
-	return ret;
-}
-
-
 UINT16 mc6845_get_ma(mc6845_t *mc6845)
 {
 	UINT16 ret;
@@ -408,10 +376,21 @@ UINT16 mc6845_get_ma(mc6845_t *mc6845)
 
 	if (mc6845->has_valid_parameters)
 	{
+		/* clamp Y/X to the visible region */
 		int y = video_screen_get_vpos(mc6845->intf->scrnum);
 		int x = video_screen_get_hpos(mc6845->intf->scrnum);
 
-		ret = get_ma_for_yx(mc6845, y, x);
+		/* since the MA counter stops in the blanking regions, if we are in a
+           VBLANK, both X and Y are at their max */
+		if ((y > mc6845->max_visible_y) || (x > mc6845->max_visible_x))
+			x = mc6845->max_visible_x;
+
+		if (y > mc6845->max_visible_y)
+			y = mc6845->max_visible_y;
+
+		ret = (mc6845->start_addr +
+			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
+			  (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
 	}
 	else
 		ret = 0;
@@ -431,8 +410,8 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 		/* get the current vertical raster position and clamp it to the visible region */
 		int y = video_screen_get_vpos(mc6845->intf->scrnum);
 
-		if (y > mc6845->last_max_y)
-			y = mc6845->last_max_y;
+		if (y > mc6845->max_visible_y)
+			y = mc6845->max_visible_y;
 
 		ret = y % (mc6845->max_ras_addr + 1);
 	}
@@ -443,17 +422,41 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 }
 
 
+static TIMER_CALLBACK( light_pen_latch_timer_cb )
+{
+	mc6845_t *mc6845 = ptr;
+
+	mc6845->light_pen_addr = mc6845_get_ma(mc6845);
+}
+
+
 void mc6845_assert_light_pen_input(mc6845_t *mc6845)
 {
 	int y, x;
+	int char_x;
 
 	assert(mc6845 != NULL);
 
-	/* the light pen address register gets latched on the NEXT display address change */
+	/* get the current pixel coordinates */
 	y = video_screen_get_vpos(mc6845->intf->scrnum);
-	x = video_screen_get_hpos(mc6845->intf->scrnum) + mc6845->intf->hpixels_per_column;
+	x = video_screen_get_hpos(mc6845->intf->scrnum);
 
-	mc6845->light_pen_addr = get_ma_for_yx(mc6845, y, x);
+	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
+	char_x = x / mc6845->intf->hpixels_per_column;
+	x = (char_x + 1) * mc6845->intf->hpixels_per_column;
+
+	/* adjust if we are passed the boundaries of the screen */
+	if (x == mc6845->horiz_pix_total)
+	{
+		y = y + 1;
+		x = 0;
+
+		if (y == mc6845->vert_pix_total)
+			y = 0;
+	}
+
+	/* set the timer that will latch the display address into the light pen registers */
+	timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->intf->scrnum, y, x), 0);
 }
 
 
@@ -490,14 +493,21 @@ static void update_cursor_state(mc6845_t *mc6845)
 
 void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	assert(mc6845 != NULL);
+	assert(bitmap != NULL);
+	assert(cliprect != NULL);
+
 	if (mc6845->has_valid_parameters)
 	{
 		UINT16 y;
 
-		/* call the set up function if any */
 		void *param = NULL;
 
-		if (mc6845->intf->begin_update)
+		assert(mc6845->intf != NULL);
+		assert(mc6845->intf->update_row != NULL);
+
+		/* call the set up function if any */
+		if (mc6845->intf->begin_update != NULL)
 			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
 
 		if (cliprect->min_y == 0)
@@ -534,13 +544,13 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 		}
 
 		/* call the tear down function if any */
-		if (mc6845->intf->end_update)
+		if (mc6845->intf->end_update != NULL)
 			mc6845->intf->end_update(mc6845->machine, mc6845, bitmap, cliprect, param);
 
 		popmessage(NULL);
 	}
 	else
-		popmessage("Invalid MC6845 screen parameters - display disabed!!!");
+		popmessage("Invalid MC6845 screen parameters - display disabled!!!");
 }
 
 
@@ -563,23 +573,25 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	mc6845->intf = static_config;
 
 	/* create the timers for the various pin notifications */
-	if (mc6845->intf)
+	if (mc6845->intf != NULL)
 	{
-		if (mc6845->intf->on_de_changed)
+		if (mc6845->intf->on_de_changed != NULL)
 			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, mc6845);
 
-		if (mc6845->intf->on_hsync_changed)
+		if (mc6845->intf->on_hsync_changed != NULL)
 		{
 			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, mc6845);
 			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, mc6845);
 		}
 
-		if (mc6845->intf->on_vsync_changed)
+		if (mc6845->intf->on_vsync_changed != NULL)
 		{
 			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, mc6845);
 			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, mc6845);
 		}
 	}
+
+	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
 
 	/* register for state saving */
 	state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
@@ -587,11 +599,11 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
 	state_save_register_item(unique_tag, 0, mc6845->address_latch);
-	state_save_register_item(unique_tag, 0, mc6845->horiz_total);
+	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_width);
-	state_save_register_item(unique_tag, 0, mc6845->vert_total);
+	state_save_register_item(unique_tag, 0, mc6845->vert_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
 	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
 	state_save_register_item(unique_tag, 0, mc6845->vert_sync_pos);
@@ -606,6 +618,25 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
 
 	return mc6845;
+}
+
+
+static void mc6845_reset(running_machine *machine, void *token)
+{
+	mc6845_t *mc6845 = token;
+
+	/* internal registers remain unchanged, all outputs go low */
+	if (mc6845->intf != NULL)
+	{
+		if (mc6845->intf->on_de_changed != NULL)
+			mc6845->intf->on_de_changed(machine, mc6845, FALSE);
+
+		if (mc6845->intf->on_hsync_changed != NULL)
+			mc6845->intf->on_hsync_changed(machine, mc6845, FALSE);
+
+		if (mc6845->intf->on_vsync_changed != NULL)
+			mc6845->intf->on_vsync_changed(machine, mc6845, FALSE);
+	}
 }
 
 
@@ -629,12 +660,12 @@ void mc6845_get_info(running_machine *machine, void *token, UINT32 state, device
 		case DEVINFO_FCT_SET_INFO:						info->set_info = mc6845_set_info;		break;
 		case DEVINFO_FCT_START:							info->start = mc6845_start;				break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							info->reset = mc6845_reset;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
 		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.5";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.6";						break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
