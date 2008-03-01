@@ -763,7 +763,12 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 			/* validate the interrupts */
 			if (cpu->vblank_interrupt != NULL)
 			{
-				if (cpu->vblank_interrupts_per_frame == 0)
+				if (video_screen_count(config) == 0)
+				{
+					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt, but the driver is screenless !\n", driver->source_file, driver->name, cpunum);
+					error = TRUE;
+				}
+				else if (cpu->vblank_interrupts_per_frame == 0)
 				{
 					mame_printf_error("%s: %s cpu #%d has a VBLANK interrupt handler with 0 interrupts!\n", driver->source_file, driver->name, cpunum);
 					error = TRUE;

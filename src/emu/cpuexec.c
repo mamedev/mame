@@ -71,8 +71,6 @@ enum
 typedef struct _cpuexec_data cpuexec_data;
 struct _cpuexec_data
 {
-	UINT8		saveable;				/* true if saveable */
-
 	UINT8		suspend;				/* suspend reason mask (0 = not suspended) */
 	UINT8		nextsuspend;			/* pending suspend reason mask */
 	UINT8		eatcycles;				/* true if we eat cycles while suspended */
@@ -90,8 +88,7 @@ struct _cpuexec_data
 	INT32 		vblankint_multiplier;	/* number of vblank callbacks per interrupt */
 	emu_timer *	vblankint_timer;		/* reference to elapsed time counter */
 
-	emu_timer *	timedint_timer;			/* reference to this CPU's timer */
-	attotime 	timedint_period; 		/* timing period of the timed interrupt */
+	emu_timer *	timedint_timer;			/* reference to this CPU's periodic interrupt timer */
 };
 
 
@@ -1252,9 +1249,9 @@ static void cpu_inittimers(running_machine *machine)
 		/* see if we need to allocate a CPU timer */
 		if (machine->config->cpu[cpunum].timed_interrupt_period != 0)
 		{
-			cpu[cpunum].timedint_period = attotime_make(0, machine->config->cpu[cpunum].timed_interrupt_period);
+			attotime timedint_period = attotime_make(0, machine->config->cpu[cpunum].timed_interrupt_period);
 			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback, NULL);
-			timer_adjust_periodic(cpu[cpunum].timedint_timer, cpu[cpunum].timedint_period, cpunum, cpu[cpunum].timedint_period);
+			timer_adjust_periodic(cpu[cpunum].timedint_timer, timedint_period, cpunum, timedint_period);
 		}
 	}
 
