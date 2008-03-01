@@ -952,7 +952,7 @@ int memory_get_log_unmap(int spacenum)
 void *_memory_install_read_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler < 0 || handler >= STATIC_COUNT)
+	if (handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_read_handler()");
 	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)handler, 0, handler_name);
 	mem_dump();
@@ -1000,7 +1000,7 @@ UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t start, o
 void *_memory_install_write_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler < 0 || handler >= STATIC_COUNT)
+	if (handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_write_handler()");
 	install_mem_handler(space, 1, space->dbits, 0, start, end, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
@@ -1048,7 +1048,7 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, 
 void *_memory_install_readwrite_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler < 0 || rhandler >= STATIC_COUNT || whandler < 0 || whandler >= STATIC_COUNT)
+	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_readwrite_handler()");
 	install_mem_handler(space, 0, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)rhandler, 0, rhandler_name);
 	install_mem_handler(space, 1, space->dbits, 0, start, end, mask, mirror, (genf *)(FPTR)whandler, 0, whandler_name);
@@ -1102,7 +1102,7 @@ UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t sta
 void *_memory_install_read_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler < 0 || handler >= STATIC_COUNT)
+	if (handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_read_matchmask_handler()");
 	install_mem_handler(space, 0, space->dbits, 1, matchval, maskval, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
@@ -1151,7 +1151,7 @@ UINT64 *_memory_install_read64_matchmask_handler(int cpunum, int spacenum, offs_
 void *_memory_install_write_matchmask_handler(int cpunum, int spacenum, offs_t matchval, offs_t maskval, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler < 0 || handler >= STATIC_COUNT)
+	if (handler >= STATIC_COUNT)
 		fatalerror("fatal: can only use static banks with memory_install_write_matchmask_handler()");
 	install_mem_handler(space, 1, space->dbits, 1, matchval, maskval, mask, mirror, (genf *)handler, 0, handler_name);
 	mem_dump();
@@ -1909,8 +1909,6 @@ static UINT8 allocate_subtable(table_data *tabledata)
 			fatalerror("Ran out of subtables!");
 	}
 
-	/* hopefully this never happens */
-	return 0;
 }
 
 
@@ -2082,7 +2080,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 		return 1;
 
 	handler = (FPTR)map->write.handler;
-	if (handler >= 0 && handler < STATIC_COUNT)
+	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
 			handler != STATIC_ROM &&
@@ -2092,7 +2090,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	}
 
 	handler = (FPTR)map->read.handler;
-	if (handler >= 0 && handler < STATIC_COUNT)
+	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
@@ -2480,7 +2478,6 @@ UINT8 name(offs_t original_address)														\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler8)(address));\
-	return 0;																			\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
@@ -2503,7 +2500,6 @@ UINT8 name(offs_t original_address)														\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xff << shift)) >> shift);\
 	}																					\
-	return 0;																			\
 }																						\
 
 #define READBYTE16BE(name,space)	READBYTE(name,space,BYTE_XOR_BE, handler16,1,~address & 1,UINT16)
