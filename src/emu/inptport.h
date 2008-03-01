@@ -893,6 +893,7 @@ struct _ext_inp_header
 ***************************************************************************/
 
 void input_port_init(running_machine *machine, const input_port_token *ipt);
+void input_port_post_init(running_machine *machine);
 const char *input_port_string_from_token(const input_port_token token);
 
 input_port_entry *input_port_initialize(input_port_init_params *params, UINT32 type, const char *tag, UINT32 mask, UINT32 defval);
@@ -926,8 +927,6 @@ int input_ui_pressed(int code);
 int input_ui_pressed_repeat(int code, int speed);
 
 void input_port_update_defaults(void);
-void input_port_vblank_start(void);	/* called by cpuintrf.c - not for external use */
-void input_port_vblank_end(void);	/* called by cpuintrf.c - not for external use */
 
 void input_port_set_digital_value(int port, UINT32 value, UINT32 mask);
 

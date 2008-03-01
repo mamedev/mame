@@ -780,24 +780,10 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 						mame_printf_error("%s: %s cpu #%d has a valid VBLANK interrupt handler with no screen tag supplied!\n", driver->source_file, driver->name, cpunum);
 						error = TRUE;
 					}
-					else
+					else if (device_list_index(config->devicelist, VIDEO_SCREEN, cpu->vblank_interrupt_screen) == -1)
 					{
-						int screen_tag_found = FALSE;
-						const device_config *device;
-
-						/* loop over screens looking for the tag */
-						for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
-							if (strcmp(device->tag, cpu->vblank_interrupt_screen) == 0)
-							{
-								screen_tag_found = TRUE;
-								break;
-							}
-
-						if (!screen_tag_found)
-						{
-							mame_printf_error("%s: %s cpu #%d VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, cpunum, cpu->vblank_interrupt_screen);
-							error = TRUE;
-						}
+						mame_printf_error("%s: %s cpu #%d VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, cpunum, cpu->vblank_interrupt_screen);
+						error = TRUE;
 					}
 				}
 			}

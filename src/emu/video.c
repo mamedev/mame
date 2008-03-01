@@ -39,7 +39,8 @@
 ***************************************************************************/
 
 #define SUBSECONDS_PER_SPEED_UPDATE	(ATTOSECONDS_PER_SECOND / 4)
-#define PAUSED_REFRESH_RATE			30
+#define PAUSED_REFRESH_RATE			(30)
+#define MAX_VBL_CB					(10)
 
 
 
@@ -51,35 +52,43 @@ typedef struct _internal_screen_info internal_screen_info;
 struct _internal_screen_info
 {
 	/* pointers to screen configuration and state */
-	const screen_config *	config;				/* pointer to the configuration in the Machine->config */
-	screen_state *			state;				/* pointer to visible state in Machine structure */
+	int						scrnum;					/* the screen index */
+	const screen_config *	config;					/* pointer to the configuration in the Machine->config */
+	screen_state *			state;					/* pointer to visible state in Machine structure */
 
 	/* textures and bitmaps */
-	render_texture *		texture[2];			/* 2x textures for the screen bitmap */
-	bitmap_t *				bitmap[2];			/* 2x bitmaps for rendering */
-	UINT8					curbitmap;			/* current bitmap index */
-	UINT8					curtexture;			/* current texture index */
-	bitmap_format			format;				/* format of bitmap for this screen */
-	UINT8					changed;			/* has this bitmap changed? */
-	INT32					last_partial_scan;	/* scanline of last partial update */
+	render_texture *		texture[2];				/* 2x textures for the screen bitmap */
+	bitmap_t *				bitmap[2];				/* 2x bitmaps for rendering */
+	UINT8					curbitmap;				/* current bitmap index */
+	UINT8					curtexture;				/* current texture index */
+	bitmap_format			format;					/* format of bitmap for this screen */
+	UINT8					changed;				/* has this bitmap changed? */
+	INT32					last_partial_scan;		/* scanline of last partial update */
+	UINT8					vblank_state;			/* 1 = in VBLANK region, 0 = outside */
 
 	/* screen timing */
-	attoseconds_t			scantime;			/* attoseconds per scanline */
-	attoseconds_t			pixeltime;			/* attoseconds per pixel */
-	attotime 				vblank_time;		/* time of last VBLANK start */
-	emu_timer *				scanline0_timer;	/* scanline 0 timer */
-	emu_timer *				scanline_timer;		/* scanline timer */
+	attoseconds_t			scantime;				/* attoseconds per scanline */
+	attoseconds_t			pixeltime;				/* attoseconds per pixel */
+	attotime 				vblank_time;			/* time of last VBLANK start */
+	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
+	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
+	emu_timer *				scanline0_timer;		/* scanline 0 timer */
+	emu_timer *				scanline_timer;			/* scanline timer */
+
+	/* VBLANK callbacks */
+	int vbl_cb_count;								/* # of callbacks installed */
+	video_screen_on_vbl		vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 
 	/* movie recording */
-	mame_file *				movie_file;			/* handle to the open movie file */
-	UINT32 					movie_frame;		/* current movie frame number */
+	mame_file *				movie_file;				/* handle to the open movie file */
+	UINT32 					movie_frame;			/* current movie frame number */
 };
 
 
 struct _video_private
 {
 	/* per-screen information */
-	internal_screen_info	scrinfo[MAX_SCREENS]; /* per-screen infomration */
+	internal_screen_info	scrinfo[MAX_SCREENS]; /* per-screen information */
 
 	/* snapshot stuff */
 	render_target *			snap_target;		/* screen shapshot target */
@@ -176,6 +185,8 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 static void decode_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
 
 /* global rendering */
+static TIMER_CALLBACK( vblank_begin_callback );
+static TIMER_CALLBACK( vblank_end_callback );
 static TIMER_CALLBACK( scanline0_callback );
 static TIMER_CALLBACK( scanline_update_callback );
 static int finish_screen_updates(running_machine *machine);
@@ -305,10 +316,15 @@ void video_init(running_machine *machine)
 		render_container *container = render_container_get_screen(scrnum);
 		internal_screen_info *info = &viddata->scrinfo[scrnum];
 
+		/* allocate the VBLANK timers */
+		info->vblank_begin_timer = timer_alloc(vblank_begin_callback, info);
+		info->vblank_end_timer = timer_alloc(vblank_end_callback, info);
+
 		/* allocate a timer to reset partial updates */
 		info->scanline0_timer = timer_alloc(scanline0_callback, NULL);
 
 		/* make pointers back to the config and state */
+		info->scrnum = scrnum;
 		info->config = device->inline_config;
 		info->state = &machine->screen[scrnum];
 
@@ -326,7 +342,7 @@ void video_init(running_machine *machine)
 			render_container_set_yscale(container, info->config->yscale);
 
 		/* reset VBLANK timing */
-		info->vblank_time = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
+		info->vblank_time = attotime_zero;
 
 		/* allocate a timer to generate per-scanline updates */
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
@@ -430,28 +446,6 @@ static void video_exit(running_machine *machine)
 		double final_emu_time = attotime_to_double(global.overall_emutime);
 		mame_printf_info("Average speed: %.2f%% (%d seconds)\n", 100 * final_emu_time / final_real_time, attotime_add_attoseconds(global.overall_emutime, ATTOSECONDS_PER_SECOND / 2).seconds);
 	}
-}
-
-
-/*-------------------------------------------------
-    video_vblank_start - called at the start of
-    VBLANK, which is driven by the CPU scheduler
--------------------------------------------------*/
-
-void video_vblank_start(running_machine *machine)
-{
-	video_private *viddata = machine->video_data;
-	attotime curtime = timer_get_time();
-	int scrnum;
-
-	/* kludge: we get called at time 0 to reset, but at that point,
-       the time of last VBLANK is actually -vblank_duration */
-	if (curtime.seconds == 0 && curtime.attoseconds == 0)
-		curtime = attotime_sub_attoseconds(attotime_zero, machine->screen[0].vblank);
-
-	/* reset VBLANK timers for each screen -- fix me */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
-		viddata->scrinfo[scrnum].vblank_time = curtime;
 }
 
 
@@ -765,18 +759,15 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 		}
 	}
 
-	/* recompute the VBLANK timing */
-	{
-		extern void cpu_compute_vblank_timing(running_machine *machine);
-		cpu_compute_vblank_timing(Machine);
-	}
-
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
 	if (video_screen_get_vpos(scrnum) == 0)
 		timer_adjust_oneshot(info->scanline0_timer, attotime_zero, scrnum);
 	else
 		timer_adjust_oneshot(info->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
+
+	/* start the VBLANK timer */
+	timer_adjust_oneshot(info->vblank_begin_timer, video_screen_get_time_until_vblank_start(scrnum), 0);
 }
 
 
@@ -973,8 +964,7 @@ int video_screen_get_hpos(int scrnum)
 int video_screen_get_vblank(int scrnum)
 {
 	internal_screen_info *info = get_screen_info(Machine, scrnum);
-	int vpos = video_screen_get_vpos(scrnum);
-	return (vpos < info->state->visarea.min_y || vpos > info->state->visarea.max_y);
+	return info->vblank_state;
 }
 
 
@@ -1022,6 +1012,18 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 
 
 /*-------------------------------------------------
+    video_screen_get_time_until_vblank_start -
+    returns the amount of time remaining until
+    the next VBLANK period start
+-------------------------------------------------*/
+
+attotime video_screen_get_time_until_vblank_start(int scrnum)
+{
+	return video_screen_get_time_until_pos(scrnum, Machine->screen[scrnum].visarea.max_y + 1, 0);
+}
+
+
+/*-------------------------------------------------
     video_screen_get_scan_period - return the
     amount of time the beam takes to draw one
     scanline
@@ -1043,6 +1045,64 @@ attotime video_screen_get_scan_period(int scrnum)
 attotime video_screen_get_frame_period(int scrnum)
 {
 	return attotime_make(0, Machine->screen[scrnum].refresh);
+}
+
+
+
+/*-------------------------------------------------
+    video_screen_register_vbl_cb - registers a
+    VBLANK callback
+-------------------------------------------------*/
+
+void video_screen_register_vbl_cb(running_machine *machine, void *screen, video_screen_on_vbl vbl_cb)
+{
+	int i, found;
+	internal_screen_info *scrinfo = NULL;
+
+	/* validate arguments */
+	assert(machine != NULL);
+	assert(machine->config != NULL);
+	assert(machine->config->devicelist != NULL);
+	assert(machine->video_data != NULL);
+	assert(machine->video_data->scrinfo != NULL);
+	assert(vbl_cb != NULL);
+
+	/* if the screen is NULL, grab the first screen -- we are installing a "global" handler */
+	if (screen == NULL)
+	{
+		if (video_screen_count(machine->config) > 0)
+		{
+			const char *screen_tag = video_screen_first(machine->config)->tag;
+			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
+		}
+		else
+		{
+			/* we need to do something for screenless games */
+			assert(screen != NULL);
+		}
+	}
+
+	/* find the screen info structure for the given token - there should only be one */
+	for (i = 0; i < MAX_SCREENS; i++)
+		if (machine->video_data->scrinfo[i].state == screen)
+			scrinfo = machine->video_data->scrinfo + i;
+
+	/* make sure we still have room for the callback */
+	assert(scrinfo != NULL);
+	assert(scrinfo->vbl_cb_count != MAX_VBL_CB);
+
+	/* check if we already have this callback registered */
+	found = FALSE;
+	for (i = 0; i < scrinfo->vbl_cb_count; i++)
+		if (scrinfo->vbl_cbs[i] == vbl_cb)
+			found = TRUE;
+
+	/* if not found, register and increment count */
+	if (!found)
+	{
+		scrinfo->vbl_cbs[scrinfo->vbl_cb_count] = vbl_cb;
+		scrinfo->vbl_cb_count++;
+	}
 }
 
 
@@ -1087,21 +1147,21 @@ DEVICE_GET_INFO( video_screen )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(screen_config);		break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_VIDEO;			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(screen_config);		break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(video_screen); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(video_screen); break;
-		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							/* Nothing */							break;
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(video_screen); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(video_screen); break;
+		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_RESET:					/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Raster";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "Video Screen";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
-		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+		case DEVINFO_STR_NAME:					info->s = "Raster";						break;
+		case DEVINFO_STR_FAMILY:				info->s = "Video Screen";				break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
 
@@ -1110,6 +1170,74 @@ DEVICE_GET_INFO( video_screen )
 /***************************************************************************
     GLOBAL RENDERING
 ***************************************************************************/
+
+/*-------------------------------------------------
+    call_vb_callbacks - call any external VBLANK
+    callsbacks with the given state
+-------------------------------------------------*/
+
+static void call_vb_callbacks(running_machine *machine, internal_screen_info *scrinfo, int vblank_state)
+{
+	int i;
+
+	/* set it in the state structure */
+	scrinfo->vblank_state = vblank_state;
+
+	for (i = 0; i < scrinfo->vbl_cb_count; i++)
+		scrinfo->vbl_cbs[i](machine, scrinfo->state, vblank_state);
+}
+
+
+/*-------------------------------------------------
+    vblank_begin_callback - call any external
+    callbacks to signal the VBLANK period has begun
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( vblank_begin_callback )
+{
+	attoseconds_t vblank_period;
+	internal_screen_info *scrinfo = ptr;
+
+	/* reset the starting VBLANK time */
+	scrinfo->vblank_time = timer_get_time();
+
+	/* call the external callbacks */
+	call_vb_callbacks(machine, scrinfo, TRUE);
+
+	/* do we update the screen now? - only do it for the first screen */
+	if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (scrinfo->scrnum == 0))
+		video_frame_update(machine, FALSE);
+
+	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
+       from the visible area, otherwise just used the supplied value */
+	if ((scrinfo->state->vblank == 0) && !scrinfo->state->oldstyle_vblank_supplied)
+		vblank_period = (scrinfo->state->refresh / scrinfo->state->height) * (scrinfo->state->height - (scrinfo->state->visarea.max_y + 1 - scrinfo->state->visarea.min_y));
+	else
+		vblank_period = scrinfo->state->vblank;
+
+	/* reset the timers */
+	timer_adjust_oneshot(scrinfo->vblank_begin_timer, attotime_make(0, scrinfo->state->refresh), 0);
+	timer_adjust_oneshot(scrinfo->vblank_end_timer, attotime_make(0, vblank_period), 0);
+}
+
+
+/*-------------------------------------------------
+    vblank_end_callback - call any external
+    callbacks to signal the VBLANK period has ended
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( vblank_end_callback )
+{
+	internal_screen_info *scrinfo = ptr;
+
+	/* update the first screen if we didn't before */
+	if ((machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (scrinfo->scrnum == 0))
+		video_frame_update(machine, FALSE);
+
+	/* let any external parties know that the VBLANK is over */
+	call_vb_callbacks(machine, scrinfo, FALSE);
+}
+
 
 /*-------------------------------------------------
     scanline0_callback - reset partial updates

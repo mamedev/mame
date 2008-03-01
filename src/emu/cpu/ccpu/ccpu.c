@@ -549,13 +549,13 @@ static int ccpu_execute(int cycles)
    remove section in brackets and uncomment line below.
    Speed Freak should run nice and smooth, with no flickering. */
 {
-	attotime scantime, abstime;
-	extern emu_timer *refresh_timer;
-	scantime = timer_starttime(refresh_timer);
-	abstime = timer_get_time();
-	while (attotime_compare(abstime, scantime) >= 0)
-		scantime = attotime_add(scantime, video_screen_get_frame_period(ccpu.scrnum));
-	cpu_spinuntil_time(attotime_sub(scantime, abstime));
+//	attotime scantime, abstime;
+//	extern emu_timer *refresh_timer;
+//	scantime = timer_starttime(refresh_timer);
+//	abstime = timer_get_time();
+//	while (attotime_compare(abstime, scantime) >= 0)
+//		scantime = attotime_add(scantime, video_screen_get_frame_period(ccpu.scrnum));
+//	cpu_spinuntil_time(attotime_sub(scantime, abstime));
 }
 /*              cpu_spinuntil_time(video_screen_get_time_until_pos(ccpu.scrnum, Machine->screen[ccpu.scrnum].visarea.max_y + 1, 0)); */
 				NEXT_ACC_A(); CYCLES(1);

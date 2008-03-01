@@ -77,18 +77,17 @@ struct _cpuexec_data
 	UINT8		nexteatcycles;			/* pending value */
 	INT32		trigger;				/* pending trigger to release a trigger suspension */
 
-	INT32 		iloops; 				/* number of interrupts remaining this frame */
-
 	UINT64 		totalcycles;			/* total CPU cycles executed */
 	attotime 	localtime;				/* local time, relative to the timer system's global time */
 	INT32		clock;					/* current active clock */
 	double		clockscale;				/* current active clock scale factor */
 
-	INT32		vblankint_countdown;	/* number of vblank callbacks left until we interrupt */
-	INT32 		vblankint_multiplier;	/* number of vblank callbacks per interrupt */
-	emu_timer *	vblankint_timer;		/* reference to elapsed time counter */
-
 	emu_timer *	timedint_timer;			/* reference to this CPU's periodic interrupt timer */
+
+	/* these below are hacks to support multiple interrupts per frame */
+	INT32 		iloops; 				/* number of interrupts remaining this frame */
+	emu_timer *	partial_frame_timer;	/* the timer that triggers partial frame interrupts */
+	attotime	partial_frame_period;	/* the length of one partial frame for interrupt purposes */
 };
 
 
@@ -100,7 +99,6 @@ struct _cpuexec_data
 /* general CPU variables */
 static cpuexec_data cpu[MAX_CPU];
 
-static UINT8 vblank;
 static UINT32 current_frame;
 
 static int cycles_running;
@@ -108,16 +106,6 @@ static int cycles_stolen;
 
 
 /* timer variables */
-static emu_timer *vblank_timer;
-static INT32 vblank_countdown;
-static INT32 vblank_multiplier;
-static attotime vblank_period;
-
-static emu_timer *update_timer;
-
-emu_timer *refresh_timer;	/* temporarily made non-static (for ccpu) */
-static attotime refresh_period;
-
 static emu_timer *timeslice_timer;
 static attotime timeslice_period;
 
@@ -139,13 +127,9 @@ static emu_timer *watchdog_timer;
 static void cpuexec_exit(running_machine *machine);
 static void cpuexec_reset(running_machine *machine);
 static void cpu_inittimers(running_machine *machine);
-static void cpu_vblankreset(running_machine *machine);
-static TIMER_CALLBACK( cpu_vblankcallback );
-static TIMER_CALLBACK( cpu_updatecallback );
 static TIMER_CALLBACK( end_interleave_boost );
+static TIMER_CALLBACK( trigger_partial_frame_interrupt );
 static void compute_perfect_interleave(running_machine *machine);
-
-void cpu_compute_vblank_timing(running_machine *machine);
 
 
 
@@ -160,18 +144,7 @@ void cpu_compute_vblank_timing(running_machine *machine);
 
 void cpuexec_init(running_machine *machine)
 {
-	int numscreens = video_screen_count(machine->config);
 	int cpunum;
-
-	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
-       from the visible area */
-	if (numscreens > 0 && machine->screen[0].vblank == 0 && !machine->screen[0].oldstyle_vblank_supplied)
-		machine->screen[0].vblank = (machine->screen[0].refresh / machine->screen[0].height) * (machine->screen[0].height - (machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y));
-
-	/* allocate vblank and refresh timers, and compute the initial timing */
-	vblank_timer = timer_alloc(cpu_vblankcallback, NULL);
-	refresh_timer = timer_alloc(NULL, NULL);
-	cpu_compute_vblank_timing(machine);
 
 	/* loop over all our CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
@@ -209,8 +182,6 @@ void cpuexec_init(running_machine *machine)
 		state_save_register_item("cpu", cpunum, cpu[cpunum].clock);
 		state_save_register_item("cpu", cpunum, cpu[cpunum].clockscale);
 
-		state_save_register_item("cpu", cpunum, cpu[cpunum].vblankint_countdown);
-
 		/* initialize this CPU */
 		state_save_push_tag(cpunum + 1);
 		num_regs = state_save_get_reg_count();
@@ -235,11 +206,9 @@ void cpuexec_init(running_machine *machine)
 
 	/* save some stuff in the default tag */
 	state_save_push_tag(0);
-	state_save_register_item("cpu", 0, vblank);
 	state_save_register_item("cpu", 0, current_frame);
 	state_save_register_item("cpu", 0, watchdog_enabled);
 	state_save_register_item("cpu", 0, watchdog_counter);
-	state_save_register_item("cpu", 0, vblank_countdown);
 	state_save_pop_tag();
 }
 
@@ -278,8 +247,6 @@ static void cpuexec_reset(running_machine *machine)
 	}
 
 	/* reset the globals */
-	cpu_vblankreset(machine);
-	vblank = 0;
 	current_frame = 0;
 }
 
@@ -858,51 +825,25 @@ void watchdog_enable(running_machine *machine, int enable)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_compute_vblank_timing - recompute cheesy
-    VBLANK timing after a video change
--------------------------------------------------*/
-
-void cpu_compute_vblank_timing(running_machine *machine)
-{
-	int numscreens = video_screen_count(machine->config);
-	attoseconds_t refresh_attosecs;
-
-	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : machine->screen[0].refresh;
-	refresh_period = attotime_make(0, refresh_attosecs);
-
-	/* recompute the vblank period */
-	vblank_period = attotime_make(0, refresh_attosecs / (vblank_multiplier ? vblank_multiplier : 1));
-	if (vblank_timer != NULL && timer_enable(vblank_timer, FALSE))
-	{
-		attotime remaining = timer_timeleft(vblank_timer);
-		if (remaining.seconds == 0 && remaining.attoseconds == 0)
-			remaining = vblank_period;
-		timer_adjust_periodic(vblank_timer, remaining, 0, vblank_period);
-	}
-
-	LOG(("cpu_compute_vblank_timing: refresh=%s vblank=%s\n", attotime_string(refresh_period, 9), attotime_string(vblank_period, 9)));
-}
-
-
-/*-------------------------------------------------
     cpu_scalebyfcount - scale by time between
     refresh timers
 -------------------------------------------------*/
 
 int cpu_scalebyfcount(int value)
 {
-	attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
-	int result;
+//	attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
+//	int result;
 
 	/* shift off some bits to ensure no overflow */
-	if (value < 65536)
-		result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
-	else
-		result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
-	if (value >= 0)
-		return (result < value) ? result : value;
-	else
-		return (result > value) ? result : value;
+//	if (value < 65536)
+//		result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
+//	else
+//		result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
+//	if (value >= 0)
+//		return (result < value) ? result : value;
+//	else
+//		return (result > value) ? result : value;
+	return 0;
 }
 
 
@@ -919,17 +860,6 @@ int cpu_getiloops(void)
 
 
 /*-------------------------------------------------
-    cpu_getvblank - return the cheesy VBLANK
-    state (deprecated)
--------------------------------------------------*/
-
-int cpu_getvblank(void)
-{
-	return vblank;
-}
-
-
-/*-------------------------------------------------
     cpu_getcurrentframe - return the current
     frame count (deprecated)
 -------------------------------------------------*/
@@ -940,147 +870,121 @@ int cpu_getcurrentframe(void)
 }
 
 
-
 /***************************************************************************
     INTERNAL TIMING
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_vblankreset - hook for updating things on
-    cheesy fake VBLANK (once per frame)
+    on_global_vblank - performs VBLANK related
+    housekeeping
 -------------------------------------------------*/
 
-static void cpu_vblankreset(running_machine *machine)
+static void on_global_vblank(running_machine *machine, screen_state *screen, int vblank_state)
 {
-	int cpunum;
-
-	/* notify the video system of a VBLANK start */
-	video_vblank_start(machine);
-
-	/* read keyboard & update the status of the input ports */
-	input_port_vblank_start();
-
-	/* check the watchdog */
-	if (machine->config->watchdog_vblank_count != 0 && --watchdog_counter == 0)
-		watchdog_callback(machine, NULL, 0);
-
-	/* reset the cycle counters */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+	/* VBLANK starting */
+	if (vblank_state)
 	{
-		if (!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
-			cpu[cpunum].iloops = machine->config->cpu[cpunum].vblank_interrupts_per_frame - 1;
-		else
-			cpu[cpunum].iloops = -1;
+		/* check the watchdog */
+		if (machine->config->watchdog_vblank_count != 0 && --watchdog_counter == 0)
+			watchdog_callback(machine, NULL, 0);
 	}
+
+	/* VBLANK ending - increment total frames */
+	else
+		current_frame++;
 }
 
 
 /*-------------------------------------------------
-    cpu_firstvblankcallback - timer callback for
-    the first fake VBLANK
+    on_per_screen_vblank - calls any external
+    callbacks for this screen
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( cpu_firstvblankcallback )
+static void on_per_screen_vblank(running_machine *machine, screen_state *screen, int vblank_state)
 {
-	/* now that we're synced up, pulse from here on out */
-	timer_adjust_periodic(vblank_timer, vblank_period, param, vblank_period);
-
-	/* but we need to call the standard routine as well */
-	cpu_vblankcallback(machine, NULL, param);
-}
-
-
-/*-------------------------------------------------
-    cpu_vblankcallback - timer callback for
-    subsequent fake VBLANKs
--------------------------------------------------*/
-
-static TIMER_CALLBACK( cpu_vblankcallback )
-{
-	int cpunum;
-
-	if (vblank_countdown == 1)
-		vblank = 1;
-
-	/* loop over CPUs */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+	/* VBLANK starting */
+	if (vblank_state)
 	{
-		/* if the interrupt multiplier is valid */
-		if (cpu[cpunum].vblankint_multiplier != -1)
-		{
-			/* decrement; if we hit zero, generate the interrupt and reset the countdown */
-			if (!--cpu[cpunum].vblankint_countdown)
-			{
-				/* a param of -1 means don't call any callbacks */
-				if (param != -1)
-				{
-					/* if the CPU has a VBLANK handler, call it */
-					if (machine->config->cpu[cpunum].vblank_interrupt && !cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
-					{
-						cpuintrf_push_context(cpunum);
-						(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
-						cpuintrf_pop_context();
-					}
+		int cpunum;
+		const char *screen_tag = NULL;
+		const device_config *device;
 
-					/* update the counters */
-					cpu[cpunum].iloops--;
+		/* get the screen's tag */
+		for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+			if (device->token == screen)
+				screen_tag = device->tag;
+
+		assert(screen_tag != NULL);
+
+		/* find any CPUs that have this screen as their VBLANK interrupt source */
+		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+		{
+			int cpu_interested;
+			const cpu_config *config = machine->config->cpu + cpunum;
+
+			/* start the interrupt counter */
+			if (!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
+				cpu[cpunum].iloops = config->vblank_interrupts_per_frame - 1;
+			else
+				cpu[cpunum].iloops = -1;
+
+			/* the hack style VBLANK decleration uses the first screen always */
+			if (config->vblank_interrupts_per_frame > 1)
+				cpu_interested = TRUE;
+
+			/* for new style decleration, we need to compare the tags */
+			else if (config->vblank_interrupts_per_frame == 1)
+				cpu_interested = (strcmp(config->vblank_interrupt_screen, screen_tag) == 0);
+
+			/* no VBLANK interrupt, not interested */
+			else
+				cpu_interested = FALSE;
+
+			/* if interested, call the interrupt handler */
+			if (cpu_interested)
+			{
+				if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+				{
+					cpuintrf_push_context(cpunum);
+					(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
+					cpuintrf_pop_context();
 				}
 
-				/* reset the countdown and timer */
-				cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier;
-				timer_adjust_oneshot(cpu[cpunum].vblankint_timer, attotime_never, 0);
+				/* if we have more than one interrupt per frame, start the timer now to trigger the rest of them */
+				if ((config->vblank_interrupts_per_frame > 1) &&
+					!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
+				{
+					cpu[cpunum].partial_frame_period = attotime_div(video_screen_get_frame_period(0), config->vblank_interrupts_per_frame);
+					timer_adjust_oneshot(cpu[cpunum].partial_frame_timer, cpu[cpunum].partial_frame_period, cpunum);
+				}
 			}
 		}
-
-		/* else reset the VBLANK timer if this is going to be a real VBLANK */
-		else if (vblank_countdown == 1)
-			timer_adjust_oneshot(cpu[cpunum].vblankint_timer, attotime_never, 0);
-	}
-
-	/* is it a real VBLANK? */
-	if (!--vblank_countdown)
-	{
-		/* do we update the screen now? */
-		if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-			video_frame_update(machine, FALSE);
-
-		/* Set the timer to update the screen */
-		timer_adjust_oneshot(update_timer, attotime_make(0, machine->screen[0].vblank), 0);
-
-		/* reset the globals */
-		cpu_vblankreset(machine);
-
-		/* reset the counter */
-		vblank_countdown = vblank_multiplier;
-
-#ifdef ENABLE_DEBUGGER
-		/* notify the debugger */
-		debug_vblank_hook();
-#endif
 	}
 }
 
 
 /*-------------------------------------------------
-    cpu_updatecallback - timer callback for
-    the fake end of VBLANK
+    trigger_partial_frame_interrupt - called to
+    trigger a partial frame interrupt
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( cpu_updatecallback )
+static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 {
-	/* update the screen if we didn't before */
-	if (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
-		video_frame_update(machine, FALSE);
-	vblank = 0;
+	int cpunum = param;
 
-	/* update IPT_VBLANK input ports */
-	input_port_vblank_end();
+	cpu[cpunum].iloops--;
 
-	/* track total frames */
-	current_frame++;
+	/* call the interrupt handler */
+	if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	{
+		cpuintrf_push_context(cpunum);
+		(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
+		cpuintrf_pop_context();
+	}
 
-	/* reset the refresh timer */
-	timer_adjust_oneshot(refresh_timer, attotime_never, 0);
+	/* more? */
+	if (cpu[cpunum].iloops > 0)
+		timer_adjust_oneshot(cpu[cpunum].partial_frame_timer, cpu[cpunum].partial_frame_period, cpunum);
 }
 
 
@@ -1165,8 +1069,7 @@ static void cpu_inittimers(running_machine *machine)
 {
 	int numscreens = video_screen_count(machine->config);
 	attoseconds_t refresh_attosecs;
-	attotime first_time;
-	int cpunum, max, ipf;
+	int cpunum, ipf;
 
 	/* allocate a timer for the watchdog */
 	watchdog_timer = timer_alloc(watchdog_callback, NULL);
@@ -1184,68 +1087,44 @@ static void cpu_inittimers(running_machine *machine)
 	interleave_boost_timer = timer_alloc(NULL, NULL);
 	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 
-	/*
-     *  The following code finds all the CPUs that are interrupting in sync with the VBLANK
-     *  and sets up the VBLANK timer to run at the minimum number of cycles per frame in
-     *  order to service all the synced interrupts
-     */
-
-	/* find the CPU with the maximum interrupts per frame */
-	max = 1;
+	/* register the screen specific VBLANK callbacks */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		ipf = machine->config->cpu[cpunum].vblank_interrupts_per_frame;
-		if (ipf > max)
-			max = ipf;
-	}
+		const cpu_config *config = machine->config->cpu + cpunum;
 
-	/* now find the LCD with the rest of the CPUs (brute force - these numbers aren't huge) */
-	vblank_multiplier = max;
-	while (1)
-	{
-		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+		if (config->vblank_interrupts_per_frame > 0)
 		{
-			ipf = machine->config->cpu[cpunum].vblank_interrupts_per_frame;
-			if (ipf > 0 && (vblank_multiplier % ipf) != 0)
-				break;
+			const char *screen_tag;
+			screen_state *screen;
+
+			/* get the screen that will trigger the VBLANK */
+
+			/* new style - use screen tag directly */
+			if (config->vblank_interrupts_per_frame == 1)
+				screen_tag = config->vblank_interrupt_screen;
+
+			/* old style 'hack' setup - use screen #0 */
+			else
+			{
+				const device_config *config = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
+				screen_tag = config->tag;
+
+				/* allocate timer that will trigger the partial frame updates */
+				cpu[cpunum].partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, 0);
+			}
+
+			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
+			video_screen_register_vbl_cb(machine, screen, on_per_screen_vblank);
 		}
-		if (cpunum == cpu_gettotalcpu())
-			break;
-		vblank_multiplier += max;
 	}
 
-	/* initialize the countdown timers and intervals */
+	/* register the global VBLANK callback -- it's important to do it after the
+       screen specific ones */
+	video_screen_register_vbl_cb(machine, NULL, on_global_vblank);
+
+	/* start the CPU periodic interrupt timers */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		ipf = machine->config->cpu[cpunum].vblank_interrupts_per_frame;
-		if (ipf > 0)
-			cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier = vblank_multiplier / ipf;
-		else
-			cpu[cpunum].vblankint_countdown = cpu[cpunum].vblankint_multiplier = -1;
-	}
-
-	/* allocate a vblank timer at the frame rate * the LCD number of interrupts per frame */
-	vblank_period = attotime_make(0, refresh_attosecs / vblank_multiplier);
-	vblank_countdown = vblank_multiplier;
-
-	/* allocate an update timer that will be used to time the actual screen updates */
-	update_timer = timer_alloc(cpu_updatecallback, NULL);
-
-	/*
-     *      The following code creates individual timers for each CPU whose interrupts are not
-     *      synced to the VBLANK, and computes the typical number of cycles per interrupt
-     */
-
-	/* start the CPU interrupt timers */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-	{
-		ipf = machine->config->cpu[cpunum].vblank_interrupts_per_frame;
-
-		/* compute the average number of cycles per interrupt */
-		if (ipf <= 0)
-			ipf = 1;
-		cpu[cpunum].vblankint_timer = timer_alloc(NULL, NULL);
-
 		/* see if we need to allocate a CPU timer */
 		if (machine->config->cpu[cpunum].timed_interrupt_period != 0)
 		{
@@ -1254,18 +1133,4 @@ static void cpu_inittimers(running_machine *machine)
 			timer_adjust_periodic(cpu[cpunum].timedint_timer, timedint_period, cpunum, timedint_period);
 		}
 	}
-
-	/* note that since we start the first frame on the refresh, we can't pulse starting
-       immediately; instead, we back up one VBLANK period, and inch forward until we hit
-       positive time. That time will be the time of the first VBLANK timer callback */
-	first_time = attotime_sub_attoseconds(vblank_period, machine->screen[0].vblank);
-	while (attotime_compare(first_time, attotime_zero) < 0)
-	{
-		cpu_vblankcallback(machine, NULL, -1);
-		first_time = attotime_add(first_time, vblank_period);
-	}
-	timer_set(first_time, NULL, 0, cpu_firstvblankcallback);
-
-	/* reset the refresh timer to get ourself back in sync */
-	timer_adjust_oneshot(refresh_timer, attotime_never, 0);
 }

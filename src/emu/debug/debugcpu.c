@@ -140,6 +140,22 @@ int mame_debug_is_active(void)
 }
 
 
+/*-------------------------------------------------
+    on_vblank - called when a VBLANK hits
+-------------------------------------------------*/
+
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+{
+	/* if we're configured to stop on VBLANK, break */
+	if (vblank_state && break_on_vblank)
+	{
+		execution_state = EXECUTION_STATE_STOPPED;
+		debug_console_printf("Stopped at VBLANK\n");
+		break_on_vblank = 0;
+	}
+}
+
+
 /***************************************************************************
     INITIALIZATION
 ***************************************************************************/
@@ -278,6 +294,10 @@ void debug_cpu_init(running_machine *machine)
 			spaceinfo->logbytemask = ((spaceinfo->logaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
 		}
 	}
+
+	/* add callback for breaking on VBLANK */
+fprintf(stderr,"Debug 1\n");
+	video_screen_register_vbl_cb(machine, NULL, on_vblank);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }
@@ -1023,23 +1043,6 @@ static void process_source_file(void)
 		/* execute the command */
 		if (buf[0])
 			debug_console_execute_command(buf, 1);
-	}
-}
-
-
-/*-------------------------------------------------
-    debug_vblank_hook - called when the real
-    VBLANK hits
--------------------------------------------------*/
-
-void debug_vblank_hook(void)
-{
-	/* if we're configured to stop on VBLANK, break */
-	if (break_on_vblank)
-	{
-		execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf("Stopped at VBLANK\n");
-		break_on_vblank = 0;
 	}
 }
 

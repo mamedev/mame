@@ -1034,11 +1034,14 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state);
 static void setup_playback(running_machine *machine);
 static void setup_record(running_machine *machine);
 static void input_port_exit(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
+static void input_port_vblank_start(void);
+static void input_port_vblank_end(void);
 static void update_digital_joysticks(void);
 static void update_analog_port(int port);
 static void interpolate_analog_port(int port);
@@ -1136,6 +1139,33 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	setup_playback(machine);
 	setup_record(machine);
 }
+
+
+void input_port_post_init(running_machine *machine)
+{
+	/* set up callback for updating the ports */
+	video_screen_register_vbl_cb(machine, NULL, on_vblank);
+}
+
+
+
+/*************************************
+ *
+ *  VBLANK handler
+ *
+ *************************************/
+
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+{
+	/* VBLANK starting - read keyboard & update the status of the input ports */
+	if (vblank_state)
+		input_port_vblank_start();
+
+	/* VBLANK ending - update IPT_VBLANK input ports */
+	else
+		input_port_vblank_end();
+}
+
 
 
 /*************************************
@@ -2827,7 +2857,7 @@ void input_port_update_defaults(void)
  *
  *************************************/
 
-void input_port_vblank_start(void)
+static void input_port_vblank_start(void)
 {
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	int portnum, bitnum;
@@ -2997,7 +3027,7 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-void input_port_vblank_end(void)
+static void input_port_vblank_end(void)
 {
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	int port;
@@ -3417,18 +3447,8 @@ UINT32 readinputport(int port)
 		result = (result & ~portinfo->vblank) | (portinfo->defvalue & portinfo->vblank);
 
 		/* toggle VBLANK if we're in a VBLANK state */
-		if (Machine->screen[0].oldstyle_vblank_supplied)
-		{
-			int cpu_getvblank(void);
-
-			if (cpu_getvblank())
-				result ^= portinfo->vblank;
-		}
-		else
-		{
-			if (video_screen_get_vblank(0))
-				result ^= portinfo->vblank;
-		}
+		if (video_screen_get_vblank(0))
+			result ^= portinfo->vblank;
 	}
 	return result;
 }

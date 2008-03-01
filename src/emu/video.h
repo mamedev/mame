@@ -88,6 +88,15 @@ struct _screen_config
 };
 
 
+/*-------------------------------------------------
+    video_screen_on_vblank - callback that a
+    screen calls to notify of a change of
+    the VBLANK state
+-------------------------------------------------*/
+
+typedef void (*video_screen_on_vbl)(running_machine *machine, screen_state *screen, int vblank_state);
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -97,9 +106,6 @@ struct _screen_config
 
 /* core initialization */
 void video_init(running_machine *machine);
-
-/* core VBLANK callback */
-void video_vblank_start(running_machine *machine);
 
 
 /* ----- screen management ----- */
@@ -127,6 +133,9 @@ int video_screen_get_hblank(int scrnum);
 /* return the time when the beam will reach a particular H,V position */
 attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 
+/* return the time when the beam will reach the start of VBLANK */
+attotime video_screen_get_time_until_vblank_start(int scrnum);
+
 /* return the amount of time the beam takes to draw one scan line */
 attotime video_screen_get_scan_period(int scrnum);
 
@@ -136,6 +145,8 @@ attotime video_screen_get_frame_period(int scrnum);
 /* returns whether a given screen exists */
 int video_screen_exists(int scrnum);
 
+/* registers a VBLANK callback for the given screen*/
+void video_screen_register_vbl_cb(running_machine *machine, void *screen, video_screen_on_vbl vbl_cb);
 
 
 /* ----- video screen device interface ----- */

@@ -182,7 +182,6 @@ void				debug_source_script(const char *file);
 void				debug_flush_traces(void);
 
 /* debugging hooks */
-void				debug_vblank_hook(void);
 void				debug_interrupt_hook(int cpunum, int irqline);
 void				debug_get_memory_hooks(int cpunum, debug_hook_read_ptr *read, debug_hook_write_ptr *write);
 void				debug_set_instruction_hook(int cpunum, int (*hook)(offs_t pc));

@@ -1573,12 +1573,6 @@ static void init_machine(running_machine *machine)
 	devices_init(machine);
 #endif
 
-#ifdef ENABLE_DEBUGGER
-	/* initialize the debugger */
-	if (machine->debug_mode)
-		mame_debug_init(machine);
-#endif
-
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
@@ -1593,6 +1587,13 @@ static void init_machine(running_machine *machine)
 	device_list_start(machine);
 
 	sound_init(machine);
+	input_port_post_init(machine);
+
+#ifdef ENABLE_DEBUGGER
+	/* initialize the debugger */
+	if (machine->debug_mode)
+		mame_debug_init(machine);
+#endif
 
 	/* call the driver's _START callbacks */
 	if (machine->config->machine_start != NULL) (*machine->config->machine_start)(machine);
