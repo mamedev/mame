@@ -2532,7 +2532,6 @@ UINT16 name(offs_t original_address)													\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler16)(address >> 1,0));\
-	return 0;																			\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
@@ -2555,7 +2554,6 @@ UINT16 name(offs_t original_address)													\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xffff << shift)) >> shift);\
 	}																					\
-	return 0;																			\
 }																						\
 
 #define READWORD32BE(name,space)	READWORD(name,space,WORD_XOR_BE, handler32,2,~address & 2,UINT32)
@@ -2586,7 +2584,6 @@ UINT32 name(offs_t original_address)													\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2,0));\
-	return 0;																			\
 }																						\
 
 #define READMASKED32(name,spacenum)														\
@@ -2606,7 +2603,6 @@ UINT32 name(offs_t original_address, UINT32 mem_mask)									\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler32)(address >> 2, mem_mask));\
-	return 0;																			\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
@@ -2629,7 +2625,6 @@ UINT32 name(offs_t original_address)													\
 		int shift = 8 * (shiftbytes);													\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handlertype)(address >> (ignorebits), ~((masktype)0xffffffff << shift)) >> shift);\
 	}																					\
-	return 0;																			\
 }																						\
 
 #define READDWORD64BE(name,space)	READDWORD(name,space,DWORD_XOR_BE,handler64,3,~address & 4,UINT64)
@@ -2658,7 +2653,6 @@ UINT64 name(offs_t original_address)													\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler64)(address >> 3,0));\
-	return 0;																			\
 }																						\
 
 #define READMASKED64(name,spacenum)														\
@@ -2678,7 +2672,6 @@ UINT64 name(offs_t original_address, UINT64 mem_mask)									\
 	/* fall back to the handler */														\
 	else																				\
 		MEMREADEND((*active_address_space[spacenum].readhandlers[entry].handler.read.handler64)(address >> 3, mem_mask));\
-	return 0;																			\
 }																						\
 
 
