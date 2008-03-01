@@ -196,24 +196,24 @@ int level;
 
 	if (sysctrl_regs[SB_ISTERR])
 	{
-		sysctrl_regs[SB_ISTNRM] |= 0x80000000;
+		sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
 	}
 	else
 	{
-		sysctrl_regs[SB_ISTNRM] &= 0x7fffffff;
+		sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
 	}
 
 	if (sysctrl_regs[SB_ISTEXT])
 	{
-		sysctrl_regs[SB_ISTNRM] |= 0x40000000;
+		sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
 	}
 	else
 	{
-		sysctrl_regs[SB_ISTNRM] &= 0xbfffffff;
+		sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
 	}
 
 	level=compute_interrupt_level();
-	cpunum_set_info_int(0,CPUINFO_INT_SH4_IRLn_INPUT,15-level);
+	cpunum_set_info_int(0, CPUINFO_INT_SH4_IRLn_INPUT, 15-level);
 }
 
 READ64_HANDLER( dc_sysctrl_r )
@@ -260,7 +260,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			sysctrl_regs[SB_C2DSTAT]=sysctrl_regs[SB_C2DSTAT]+ddtdata.length;
 			sysctrl_regs[SB_C2DLEN]=0;
 			sysctrl_regs[SB_C2DST]=0;
-			sysctrl_regs[SB_ISTNRM] |= (1 << 19);
+			sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
 			break;
 
 		case SB_ISTNRM:
@@ -717,7 +717,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dma_offset, g1bus_regs[SB_GDSTAR]);
 			cpunum_set_info_ptr(0, CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
-			sysctrl_regs[SB_ISTNRM] |= (1 << 14);
+			sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 		}
 		break;
 	}

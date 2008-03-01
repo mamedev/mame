@@ -26,6 +26,8 @@ static int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
 static int start_render_received;
 static int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_ZM_OPB, alloc_ctrl_O_OPB;
 
+static emu_timer *vbout_timer;
+
 static struct testsprites
 {
 	int positionx, positiony;
@@ -607,6 +609,14 @@ static void pvr_build_parameterconfig(void)
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
+TIMER_CALLBACK(vbout)
+{
+	sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
+	update_interrupt_status();
+
+	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+}
+
 VIDEO_START(dc)
 {
 	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
@@ -627,12 +637,13 @@ VIDEO_START(dc)
 	testsprites_size=0;
 	toerasesprites=0;
 	computedilated();
+
+	vbout_timer = timer_alloc(vbout, 0);
+	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 }
 
 VIDEO_UPDATE(dc)
 {
-	int a;
-
 	if (pvrta_regs[VO_CONTROL] & (1 << 3))
 	{
 		fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
@@ -644,8 +655,7 @@ VIDEO_UPDATE(dc)
 	if (start_render_received)
 	{
 		start_render_received=0;
-		a=4; // tsp end
-		sysctrl_regs[SB_ISTNRM] |= a;
+		sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 		update_interrupt_status();
 	}
 	return 0;
@@ -653,7 +663,9 @@ VIDEO_UPDATE(dc)
 
 void dc_vblank(void)
 {
-	sysctrl_regs[SB_ISTNRM] |= 0x08; // V Blank-in interrupt
+	sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	update_interrupt_status();
+
+	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
 }
 
