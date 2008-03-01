@@ -189,7 +189,7 @@ union _machine_config_token
 
 /* use this to declare external references to a machine driver */
 #define MACHINE_DRIVER_EXTERN(_name) \
-	extern const machine_config_token machine_config_##_name[];
+	extern const machine_config_token machine_config_##_name[]
 
 
 /* importing data from other machine drivers */

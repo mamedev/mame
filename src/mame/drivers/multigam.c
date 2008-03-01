@@ -216,7 +216,7 @@ static MACHINE_RESET( multigam )
 {
 	/* reset the ppu */
 	ppu2c0x_reset( 0, 1 );
-};
+}
 
 static PALETTE_INIT( multigam )
 {

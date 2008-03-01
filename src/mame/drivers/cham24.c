@@ -206,7 +206,7 @@ static MACHINE_RESET( cham24 )
 
 	/* reset the ppu */
 	ppu2c0x_reset( 0, 1 );
-};
+}
 
 static PALETTE_INIT( cham24 )
 {

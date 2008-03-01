@@ -549,7 +549,7 @@ INLINE INT32 _shading( INT32 color, INT32 correction )
 	if ( color > 0x1f ) color = 0x1f;
 
 	return color;
-};
+}
 
 static UINT16 stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix )
 {
@@ -880,7 +880,7 @@ static void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
 	{
 		stv_framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
 	}
-};
+}
 
 static void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
 {

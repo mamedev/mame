@@ -539,5 +539,5 @@ ROM_END
 
 /*****************************************************************************/
 
-GAME(2002, gamecstl, 0,	gamecstl, gamecstl, gamecstl,	ROT0,   "Cristaltec",  "GameCristal", GAME_NOT_WORKING | GAME_NO_SOUND);
+GAME(2002, gamecstl, 0,	gamecstl, gamecstl, gamecstl,	ROT0,   "Cristaltec",  "GameCristal", GAME_NOT_WORKING | GAME_NO_SOUND)
 
