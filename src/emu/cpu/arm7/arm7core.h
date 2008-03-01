@@ -116,7 +116,6 @@ enum
     kNumRegisters
 };
 
-#ifdef UNUSED_FUNCTION
 static const int thumbCycles[256] =
 {
 //  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
@@ -137,13 +136,11 @@ static const int thumbCycles[256] =
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,  // e
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2   // f
 };
-#endif
 
 /* 17 processor registers are visible at any given time,
  * banked depending on processor mode.
  */
 
-#ifdef UNUSED_FUNCTION
 static const int sRegisterTable[ARM7_NUM_MODES][18] =
 {
     { /* USR */
@@ -192,7 +189,6 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
         eR15, eCPSR  // No SPSR in this mode
     }
 };
-#endif
 
 #define N_BIT   31
 #define Z_BIT   30
