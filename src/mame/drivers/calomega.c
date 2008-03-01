@@ -473,7 +473,7 @@
     TODO:
 
     - Parent/clone relationship.
-    - System 905 inputs.
+    - System 903/905 inputs.
     - System 905 sound through PIAs.
     - Fix lamps.
 
@@ -2118,6 +2118,6 @@ GAME( 198?, comg905d, 0,        sys905,   gdrawpkr, calomega, ROT0, "Cal Omega I
 GAME( 1982, elgrande, 0,        sys903,   elgrande, elgrande, ROT0, "Tuni Electro Service / E.T. Marketing", "El Grande - 5 Card Draw (New)",                 0 )
 GAME( 1983, jjpoker,  0,        sys903,   jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 1)",                   0 )
 GAME( 1983, jjpokerb, jjpoker,  sys903,   jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 2)",                   0 )
-GAME( 1988, ssipkr24, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v2.4)",                              0 )
-GAME( 1988, ssipkr30, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v3.0)",                              0 )
-GAME( 1990, ssipkr40, jjpoker,  sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v4.0)",                              0 )
+GAME( 1988, ssipkr24, 0,        sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v2.4)",                              0 )
+GAME( 1988, ssipkr30, ssipkr24, sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v3.0)",                              0 )
+GAME( 1990, ssipkr40, ssipkr24, sys903,   ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v4.0)",                              0 )
