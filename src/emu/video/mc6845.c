@@ -26,11 +26,20 @@
 #include "mc6845.h"
 
 
-#define LOG		(0)
+#define LOG		(1)
+
+
+/* device types */
+enum
+{
+	TYPE_MC6845,
+	TYPE_R6545
+};
 
 
 struct _mc6845_t
 {
+	int device_type;
 	running_machine *machine;
 	const mc6845_interface *intf;
 
@@ -39,7 +48,7 @@ struct _mc6845_t
 	UINT8	horiz_char_total;
 	UINT8	horiz_disp;
 	UINT8	horiz_sync_pos;
-	UINT8	horiz_sync_width;
+	UINT8	sync_width;
 	UINT8	vert_char_total;
 	UINT8	vert_total_adj;
 	UINT8	vert_disp;
@@ -134,7 +143,7 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 		case 0x00:  mc6845->horiz_char_total =   data & 0xff; break;
 		case 0x01:  mc6845->horiz_disp       =   data & 0xff; break;
 		case 0x02:  mc6845->horiz_sync_pos   =   data & 0xff; break;
-		case 0x03:  mc6845->horiz_sync_width =   data & 0x0f; break;
+		case 0x03:  mc6845->sync_width       =   data & 0xff; break;
 		case 0x04:  mc6845->vert_char_total  =   data & 0x7f; break;
 		case 0x05:  mc6845->vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  mc6845->vert_disp        =   data & 0x7f; break;
@@ -160,6 +169,8 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 {
 	if (mc6845->intf)
 	{
+		UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
+
 		/* compute the screen sizes */
 		UINT16 horiz_pix_total = (mc6845->horiz_char_total + 1) * mc6845->intf->hpixels_per_column;
 		UINT16 vert_pix_total = (mc6845->vert_char_total + 1) * (mc6845->max_ras_addr + 1) + mc6845->vert_total_adj;
@@ -169,10 +180,27 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 		UINT16 max_visible_y = mc6845->vert_disp * (mc6845->max_ras_addr + 1) - 1;
 
 		/* determine the syncing positions */
-		UINT16 hsync_on_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
-		UINT16 hsync_off_pos = hsync_on_pos + (mc6845->horiz_sync_width * mc6845->intf->hpixels_per_column);
-		UINT16 vsync_on_pos = mc6845->vert_sync_pos * (mc6845->max_ras_addr + 1);
-		UINT16 vsync_off_pos = vsync_on_pos + 0x10;	/* this is a constant -- non-programmable */
+		UINT8 horiz_sync_char_width = mc6845->sync_width & 0x0f;
+		UINT8 vert_sync_pix_height = (mc6845->device_type == TYPE_MC6845) ? 0x10 : (mc6845->sync_width >> 4) & 0x0f;
+
+		if (horiz_sync_char_width == 0)
+			horiz_sync_char_width = 0x10;
+
+		if (vert_sync_pix_height == 0)
+			vert_sync_pix_height = 0x10;
+
+		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
+		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->intf->hpixels_per_column);
+		vsync_on_pos = mc6845->vert_sync_pos * (mc6845->max_ras_addr + 1);
+		vsync_off_pos = vsync_on_pos + vert_sync_pix_height;
+
+		/* the Commodore 40xx series computers program a horizontal synch pulse that extends
+           past the scanline width.  I am assume that the real device will clamp it */
+		if (hsync_off_pos > horiz_pix_total)
+			hsync_off_pos = horiz_pix_total;
+
+		if (vsync_off_pos > vert_pix_total)
+			vsync_off_pos = vert_pix_total;
 
 		/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 		if (postload ||
@@ -184,7 +212,7 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 			/* update the screen if we have valid data */
 			if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
 				(vert_pix_total > 0) && (max_visible_y < vert_pix_total) &&
-				(hsync_off_pos <= horiz_pix_total) && (vsync_off_pos <= vert_pix_total) &&
+				(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
 				(hsync_on_pos != hsync_off_pos))
 			{
 				rectangle visarea;
@@ -558,7 +586,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 
 /* device interface */
-static void *mc6845_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+static void *common_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config, int device_type)
 {
 	mc6845_t *mc6845;
 	char unique_tag[30];
@@ -572,6 +600,7 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	mc6845 = auto_malloc(sizeof(*mc6845));
 	memset(mc6845, 0, sizeof(*mc6845));
 
+	mc6845->device_type = device_type;
 	mc6845->machine = machine;
 	mc6845->intf = static_config;
 
@@ -597,7 +626,17 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
+	switch (device_type)
+	{
+	case TYPE_MC6845:
+	default:
+		state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
+		break;
+
+	case TYPE_R6545:
+		state_save_combine_module_and_tag(unique_tag, "r6545", tag);
+		break;
+	}
 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
@@ -605,7 +644,7 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
-	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_width);
+	state_save_register_item(unique_tag, 0, mc6845->sync_width);
 	state_save_register_item(unique_tag, 0, mc6845->vert_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
 	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
@@ -621,6 +660,16 @@ static void *mc6845_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
 
 	return mc6845;
+}
+
+static void *mc6845_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+{
+	return common_start(machine, tag, static_config, inline_config, TYPE_MC6845);
+}
+
+static void *r6545_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
+{
+	return common_start(machine, tag, static_config, inline_config, TYPE_R6545);
 }
 
 
@@ -681,6 +730,10 @@ void r6545_get_info(running_machine *machine, void *token, UINT32 state, devicei
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "R6545";						break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = r6545_start;				break;
+
 		default: mc6845_get_info(machine, token, state, info);									break;
 	}
 }
