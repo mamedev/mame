@@ -179,10 +179,12 @@ void system1_define_background_memory(int mode)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE int get_sprite_bottom_y(int spr_number)
 {
 	return  spriteram[0x10 * spr_number + SPR_Y_BOTTOM];
 }
+#endif
 
 INLINE void draw_pixel(bitmap_t *bitmap,
 				  	   int x,int y,int x_flipped,int y_flipped,

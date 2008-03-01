@@ -707,6 +707,7 @@ INLINE void write_texture16(int xpos, int ypos, int width, int height, int page,
 	}
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, UINT16 *data)
 {
 	int x,y,i,j;
@@ -729,6 +730,7 @@ INLINE void write_texture8(int xpos, int ypos, int width, int height, int page, 
 		}
 	}
 }
+#endif
 
 static void real3d_upload_texture(UINT32 header, UINT32 *data)
 {
@@ -882,10 +884,12 @@ WRITE64_HANDLER( real3d_cmd_w )
 /*****************************************************************************/
 /* matrix and vector operations */
 
+#ifdef UNUSED_FUNCTON
 INLINE float dot_product(VECTOR a, VECTOR b)
 {
 	return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]) + (a[3] * b[3]);
 }
+#endif
 
 INLINE float dot_product3(VECTOR3 a, VECTOR3 b)
 {

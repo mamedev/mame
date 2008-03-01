@@ -58,11 +58,12 @@ INLINE UINT8 fetch_8bit(UINT8 *v)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE UINT16 fetch_16bit(UINT8 *v)
 {
 	return BIG_ENDIANIZE_INT16(*(UINT16 *)v);
 }
-
+#endif
 
 INLINE UINT32 fetch_32bit(UINT8 *v)
 {
@@ -76,11 +77,12 @@ INLINE void put_8bit(UINT8 *v, UINT8 data)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE void put_16bit(UINT8 *v, UINT16 data)
 {
 	*(UINT16 *)v = BIG_ENDIANIZE_INT16(data);
 }
-
+#endif
 
 INLINE void put_32bit(UINT8 *v, UINT32 data)
 {

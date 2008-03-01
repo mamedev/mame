@@ -203,6 +203,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT16 color, UINT16 depth)
 	}
 }
 
+#ifdef UNUSED_FUNCTON
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -212,7 +213,7 @@ INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT16 color, UINT16 
 			WAVERAM_WRITEPIX(zeus_renderbase, y, x, color);
 	}
 }
-
+#endif
 
 
 /*************************************

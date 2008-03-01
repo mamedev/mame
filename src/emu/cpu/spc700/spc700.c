@@ -278,11 +278,13 @@ INLINE uint read_8_immediate(uint address)
 	return spc700_read_8_immediate(address);
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE uint read_8_instruction(uint address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_instruction(address);
 }
+#endif
 
 INLINE uint read_8_direct(uint address)
 {
@@ -432,7 +434,9 @@ INLINE uint EA_AXI(void)   {return OPER_16_ABX();}
 INLINE uint EA_DP(void)   {return OPER_8_IMM();}
 INLINE uint EA_DPX(void)   {return (EA_DP() + REG_X)&0xff;}
 INLINE uint EA_DPY(void)   {return (EA_DP() + REG_Y)&0xff;}
+#ifdef UNUSED_FUNCTION
 INLINE uint EA_DPI(void)   {return OPER_16_DP();}
+#endif
 INLINE uint EA_DXI(void)   {return OPER_16_DPX();}
 INLINE uint EA_DIY(void)   {uint addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
 INLINE uint EA_XI(void)    {return REG_X;}
@@ -535,6 +539,7 @@ INLINE uint PULL_16(void)
 	return value | (PULL_8()<<8);
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE void SERVICE_IRQ(void)
 {
 	CLK(7);
@@ -545,6 +550,7 @@ INLINE void SERVICE_IRQ(void)
 		INT_ACK(0);
 	JUMP(read_16_VEC(VECTOR_IRQ));
 }
+#endif
 
 #if !SPC700_OPTIMIZE_SNES
 INLINE void CHECK_IRQ(void)

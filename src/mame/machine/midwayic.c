@@ -250,11 +250,12 @@ INLINE UINT8 make_bcd(UINT8 data)
 }
 
 
+#ifdef UNUSED_FUNCTON
 INLINE UINT8 unmake_bcd(UINT8 data)
 {
 	return ((data & 0xf0) >> 4) * 10 + (data & 0x0f);
 }
-
+#endif
 
 static TIMER_CALLBACK( reset_timer )
 {

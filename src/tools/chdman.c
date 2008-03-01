@@ -98,6 +98,7 @@ static clock_t lastprogress = 0;
     put_bigendian_uint32 - write a UINT32 in big-endian order to memory
 -------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTON
 INLINE void put_bigendian_uint32(UINT8 *base, UINT32 value)
 {
 	base[0] = value >> 24;
@@ -105,7 +106,7 @@ INLINE void put_bigendian_uint32(UINT8 *base, UINT32 value)
 	base[2] = value >> 8;
 	base[3] = value;
 }
-
+#endif
 
 /*-------------------------------------------------
     print_big_int - 64-bit int printing with commas

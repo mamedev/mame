@@ -260,15 +260,17 @@ INLINE void WLONG(offs_t addr, UINT32 data)
     EXECEPTION HANDLING
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE void generate_exception(int exception)
 {
 }
+#endif
 
-
+#ifdef UNUSED_FUNCTION
 INLINE void invalid_instruction(UINT32 op)
 {
 }
-
+#endif
 
 
 /***************************************************************************
@@ -450,6 +452,7 @@ static offs_t dsp32c_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 ***************************************************************************/
 
 /* context finder */
+#ifdef UNUSED_FUNCTION
 INLINE dsp32_regs *FINDCONTEXT(int cpu)
 {
 	dsp32_regs *context = cpunum_get_context_ptr(cpu);
@@ -457,6 +460,7 @@ INLINE dsp32_regs *FINDCONTEXT(int cpu)
 		context = &dsp32;
 	return context;
 }
+#endif
 
 static const UINT32 regmap[4][16] =
 {

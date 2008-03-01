@@ -358,6 +358,7 @@ void freegfx(gfx_element *gfx)
     BLOCKMOVE PRIMITIVES
 ***************************************************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE void blockmove_NtoN_transpen_noremap8(
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
 		UINT8 *dstdata,int dstmodulo,
@@ -423,7 +424,9 @@ INLINE void blockmove_NtoN_transpen_noremap8(
 		srcheight--;
 	}
 }
+#endif
 
+#ifdef UNUSED_FUNCTION
 INLINE void blockmove_NtoN_transpen_noremap_flipx8(
 		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
 		UINT8 *dstdata,int dstmodulo,
@@ -484,7 +487,7 @@ INLINE void blockmove_NtoN_transpen_noremap_flipx8(
 		srcheight--;
 	}
 }
-
+#endif
 
 INLINE void blockmove_NtoN_transpen_noremap16(
 		const UINT16 *srcdata,int srcwidth,int srcheight,int srcmodulo,

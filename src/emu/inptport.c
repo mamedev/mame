@@ -1529,6 +1529,7 @@ static int save_this_port_type(int type)
  *
  *************************************/
 
+#ifdef UNUSED_FUNCTION
 INLINE input_code get_default_code(int config_type, int type)
 {
 	switch (type)
@@ -1545,6 +1546,7 @@ INLINE input_code get_default_code(int config_type, int type)
 	}
 	return SEQCODE_END;
 }
+#endif
 
 
 INLINE int string_to_seq_index(const char *string)

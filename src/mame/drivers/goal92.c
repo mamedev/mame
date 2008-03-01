@@ -287,6 +287,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
+#ifdef UNUSED_FUNCTON
 static const gfx_layout layout_16x16x4_2 =
 {
 	16,16,
@@ -299,6 +300,7 @@ static const gfx_layout layout_16x16x4_2 =
 		256+0*32,256+1*32,256+2*32,256+3*32,256+4*32,256+5*32,256+6*32,256+7*32 },
 	1024
 };
+#endif
 
 static GFXDECODE_START( goal92 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,		   0*16, 8*16 ) // Sprites

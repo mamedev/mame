@@ -84,6 +84,7 @@ struct i80x86_timing
 
 /* these come from the 8088 timings in OPCODE.LST, but with the
    penalty for 16-bit memory accesses removed wherever possible */
+#ifdef UNUSED_FUNCTION
 static const struct i80x86_timing i8086_cycles =
 {
 	8086,
@@ -149,9 +150,10 @@ static const struct i80x86_timing i8086_cycles =
 
 	(void *)-1		/* marker to make sure we line up */
 };
-
+#endif
 
 /* these come from the Intel 80186 datasheet */
+#ifdef UNUSED_FUNCTION
 static const struct i80x86_timing i80186_cycles =
 {
 	80186,
@@ -229,10 +231,11 @@ static const struct i80x86_timing i80186_cycles =
 
 	(void *)-1		/* marker to make sure we line up */
 };
-
+#endif
 
 /* these come from the 80286 timings in OPCODE.LST */
 /* many of these numbers are suspect */
+#ifdef UNUSED_FUNCTION
 static const struct i80x86_timing i80286_cycles =
 {
 	80286,
@@ -310,3 +313,4 @@ static const struct i80x86_timing i80286_cycles =
 
 	(void *)-1		/* marker to make sure we line up */
 };
+#endif

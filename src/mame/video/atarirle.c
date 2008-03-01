@@ -162,6 +162,7 @@ static void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
     two.
 ---------------------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTON
 INLINE int compute_log(int value)
 {
 	int log = 0;
@@ -174,7 +175,7 @@ INLINE int compute_log(int value)
 		return -1;
 	return log;
 }
-
+#endif
 
 /*---------------------------------------------------------------
     round_to_powerof2: Rounds a number up to the nearest
@@ -200,6 +201,7 @@ INLINE int round_to_powerof2(int value)
     value into the result, packing the bits along the way.
 ---------------------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTON
 INLINE int collapse_bits(int value, int mask)
 {
 	int testmask, ormask;
@@ -214,7 +216,7 @@ INLINE int collapse_bits(int value, int mask)
 		}
 	return result;
 }
-
+#endif
 
 /*---------------------------------------------------------------
     convert_mask: Converts a 4-word mask into a word index,

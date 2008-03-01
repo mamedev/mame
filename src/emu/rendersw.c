@@ -1881,7 +1881,7 @@ static void FUNC_PREFIX(setup_and_draw_textured_quad)(const render_primitive *pr
     using a software rasterizer
 -------------------------------------------------*/
 
-void FUNC_PREFIX(draw_primitives)(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch)
+static void FUNC_PREFIX(draw_primitives)(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch)
 {
 	const render_primitive *prim;
 

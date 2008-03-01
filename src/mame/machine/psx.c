@@ -36,10 +36,12 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 UINT32 *g_p_n_psxram;
 size_t g_n_psxramsize;
 
+#ifdef UNUSED_FUNCTON
 INLINE void psxwriteword( UINT32 n_address, UINT16 n_data )
 {
 	*( (UINT16 *)( (UINT8 *)g_p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
+#endif
 
 INLINE UINT16 psxreadword( UINT32 n_address )
 {

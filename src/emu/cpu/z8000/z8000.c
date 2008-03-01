@@ -256,6 +256,7 @@ INLINE UINT16 RDPORT_W(int mode, UINT16 addr)
 	}
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE UINT32 RDPORT_L(int mode, UINT16 addr)
 {
 	if( mode == 0 )
@@ -271,6 +272,7 @@ INLINE UINT32 RDPORT_L(int mode, UINT16 addr)
 		return 0x00000000;
 	}
 }
+#endif
 
 INLINE void WRPORT_B(int mode, UINT16 addr, UINT8 value)
 {
@@ -297,6 +299,7 @@ INLINE void WRPORT_W(int mode, UINT16 addr, UINT16 value)
     }
 }
 
+#ifdef UNUSED_FUNCTION
 INLINE void WRPORT_L(int mode, UINT16 addr, UINT32 value)
 {
 	if( mode == 0 )
@@ -311,6 +314,7 @@ INLINE void WRPORT_L(int mode, UINT16 addr, UINT32 value)
 		/* how to handle MMU writes? */
 	}
 }
+#endif
 
 #include "z8000ops.c"
 #include "z8000tbl.c"
