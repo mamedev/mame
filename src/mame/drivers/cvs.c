@@ -129,6 +129,8 @@ UINT8 *cvs_s2636_0_ram;
 UINT8 *cvs_s2636_1_ram;
 UINT8 *cvs_s2636_2_ram;
 
+static emu_timer *cvs_393hz_timer;
+static UINT8 cvs_393hz_clock;
 static UINT8 *cvs_4_bit_dac_data;
 static UINT8 *cvs_tms5110_ctl_data;
 
@@ -299,8 +301,20 @@ static READ8_HANDLER( cvs_input_r )
 
 static READ8_HANDLER( cvs_393hz_clock_r )
 {
-  	if(cpu_scalebyfcount(6) & 1) return 0x80;
-    else return 0;
+  	return cvs_393hz_clock ? 0x80 : 0;
+}
+
+
+static TIMER_CALLBACK( cvs_393hz_timer_cb )
+{
+	cvs_393hz_clock = !cvs_393hz_clock;
+}
+
+
+static void start_393hz_timer(void)
+{
+	cvs_393hz_timer = timer_alloc(cvs_393hz_timer_cb, NULL);
+	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(2*393), 0, ATTOTIME_IN_HZ(2*393));
 }
 
 
@@ -486,6 +500,8 @@ MACHINE_START( cvs )
 	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
+	start_393hz_timer();
+
 	/* register state save */
 	state_save_register_global_pointer(cvs_color_ram, 0x400);
 	state_save_register_global_pointer(cvs_palette_ram, 0x10);
@@ -493,6 +509,7 @@ MACHINE_START( cvs )
 	state_save_register_global(character_banking_mode);
 	state_save_register_global(character_ram_page_start);
 	state_save_register_global(speech_rom_bit_address);
+	state_save_register_global(cvs_393hz_clock);
 }
 
 
