@@ -26,15 +26,27 @@
 #include "mc6845.h"
 
 
-#define LOG		(1)
+#define LOG		(0)
 
 
 /* device types */
 enum
 {
 	TYPE_MC6845,
-	TYPE_R6545
+	TYPE_C6545_1,
+	TYPE_R6545_1,
+
+	NUM_TYPES
 };
+
+/* tags for state saving */
+const char * const device_tags[NUM_TYPES] = { "mc6845", "c6545-1", "r6545-1" };
+
+/* capabilities */
+static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE, FALSE, FALSE };
+static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,  TRUE,  TRUE };
+static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
+static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
 
 
 struct _mc6845_t
@@ -43,25 +55,25 @@ struct _mc6845_t
 	running_machine *machine;
 	const mc6845_interface *intf;
 
-	/* internal registers */
-	UINT8	address_latch;
-	UINT8	horiz_char_total;
-	UINT8	horiz_disp;
-	UINT8	horiz_sync_pos;
-	UINT8	sync_width;
-	UINT8	vert_char_total;
-	UINT8	vert_total_adj;
-	UINT8	vert_disp;
-	UINT8	vert_sync_pos;
-	UINT8	intl_skew;
-	UINT8	max_ras_addr;
-	UINT8	cursor_start_ras;
-	UINT8	cursor_end_ras;
-	UINT16	start_addr;
-	UINT16	cursor_addr;
-	UINT16	light_pen_addr;
+	/* register file */
+	UINT8	horiz_char_total;	/* 0x00 */
+	UINT8	horiz_disp;			/* 0x01 */
+	UINT8	horiz_sync_pos;		/* 0x02 */
+	UINT8	sync_width;			/* 0x03 */
+	UINT8	vert_char_total;	/* 0x04 */
+	UINT8	vert_total_adj;		/* 0x05 */
+	UINT8	vert_disp;			/* 0x06 */
+	UINT8	vert_sync_pos;		/* 0x07 */
+	UINT8	mode_control;		/* 0x08 */
+	UINT8	max_ras_addr;		/* 0x09 */
+	UINT8	cursor_start_ras;	/* 0x0a */
+	UINT8	cursor_end_ras;		/* 0x0b */
+	UINT16	disp_start_addr;	/* 0x0c/0x0d */
+	UINT16	cursor_addr;		/* 0x0e/0x0f */
+	UINT16	light_pen_addr;		/* 0x10/0x11 */
 
 	/* other internal state */
+	UINT8	register_address_latch;
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
 
@@ -82,13 +94,14 @@ struct _mc6845_t
 	UINT16	hsync_off_pos;
 	UINT16	vsync_on_pos;
 	UINT16	vsync_off_pos;
-	UINT16  current_ma;		/* the MA address currently drawn */
+	UINT16  current_disp_addr;	/* the display address currently drawn */
+	UINT8	light_pen_latched;
 	int		has_valid_parameters;
 };
 
 
 static void mc6845_state_save_postload(void *param);
-static void configure_screen(mc6845_t *mc6845, int postload);
+static void recompute_parameters(mc6845_t *mc6845, int postload);
 static void update_de_changed_timer(mc6845_t *mc6845);
 static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
@@ -96,7 +109,7 @@ static void update_vsync_changed_timers(mc6845_t *mc6845);
 
 static void mc6845_state_save_postload(void *param)
 {
-	configure_screen(param, TRUE);
+	recompute_parameters(param, TRUE);
 }
 
 
@@ -104,7 +117,26 @@ void mc6845_address_w(mc6845_t *mc6845, UINT8 data)
 {
 	assert(mc6845 != NULL);
 
-	mc6845->address_latch = data & 0x1f;
+	mc6845->register_address_latch = data & 0x1f;
+}
+
+
+UINT8 mc6845_status_r(mc6845_t *mc6845)
+{
+	UINT8 ret = 0;
+
+	assert(mc6845 != NULL);
+
+	/* VBLANK bit */
+	if (supports_status_reg_d5[mc6845->device_type] &&
+	   (video_screen_get_vpos(mc6845->intf->scrnum) > mc6845->max_visible_y))
+	   ret = ret | 0x20;
+
+	/* light pen latched */
+	if (supports_status_reg_d6[mc6845->device_type] && mc6845->light_pen_latched)
+	   ret = ret | 0x40;
+
+	return ret;
 }
 
 
@@ -114,15 +146,14 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 
 	assert(mc6845 != NULL);
 
-	switch (mc6845->address_latch)
+	switch (mc6845->register_address_latch)
 	{
-		/* 0x0c and 0x0d - Motorola device only */
-		case 0x0c:  ret = (mc6845->start_addr     >> 8) & 0xff; break;
-		case 0x0d:  ret = (mc6845->start_addr     >> 0) & 0xff; break;
+		case 0x0c:  ret = supports_disp_start_addr_r[mc6845->device_type] ? (mc6845->disp_start_addr >> 8) & 0xff : 0; break;
+		case 0x0d:  ret = supports_disp_start_addr_r[mc6845->device_type] ? (mc6845->disp_start_addr >> 0) & 0xff : 0; break;
 		case 0x0e:  ret = (mc6845->cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (mc6845->cursor_addr    >> 0) & 0xff; break;
-		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; break;
-		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; break;
+		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; mc6845->light_pen_latched = FALSE; break;
+		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; mc6845->light_pen_latched = FALSE; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -134,11 +165,11 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 
 void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 {
-	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->address_latch, data);
-
 	assert(mc6845 != NULL);
 
-	switch (mc6845->address_latch)
+	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->register_address_latch, data);
+
+	switch (mc6845->register_address_latch)
 	{
 		case 0x00:  mc6845->horiz_char_total =   data & 0xff; break;
 		case 0x01:  mc6845->horiz_disp       =   data & 0xff; break;
@@ -148,12 +179,12 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 		case 0x05:  mc6845->vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  mc6845->vert_disp        =   data & 0x7f; break;
 		case 0x07:  mc6845->vert_sync_pos    =   data & 0x7f; break;
-		case 0x08:  mc6845->intl_skew        =   data & 0x03; break;
+		case 0x08:  mc6845->mode_control     =   data & 0xff; break;
 		case 0x09:  mc6845->max_ras_addr     =   data & 0x1f; break;
 		case 0x0a:  mc6845->cursor_start_ras =   data & 0x7f; break;
 		case 0x0b:  mc6845->cursor_end_ras   =   data & 0x1f; break;
-		case 0x0c:  mc6845->start_addr       = ((data & 0x3f) << 8) | (mc6845->start_addr & 0x00ff); break;
-		case 0x0d:  mc6845->start_addr       = ((data & 0xff) << 0) | (mc6845->start_addr & 0xff00); break;
+		case 0x0c:  mc6845->disp_start_addr  = ((data & 0x3f) << 8) | (mc6845->disp_start_addr & 0x00ff); break;
+		case 0x0d:  mc6845->disp_start_addr  = ((data & 0xff) << 0) | (mc6845->disp_start_addr & 0xff00); break;
 		case 0x0e:  mc6845->cursor_addr      = ((data & 0x3f) << 8) | (mc6845->cursor_addr & 0x00ff); break;
 		case 0x0f:  mc6845->cursor_addr      = ((data & 0xff) << 0) | (mc6845->cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
@@ -161,11 +192,15 @@ void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
 		default: break;
 	}
 
-	configure_screen(mc6845, FALSE);
+	/* display message if the Mode Control register is not zero */
+	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
+		popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
+
+	recompute_parameters(mc6845, FALSE);
 }
 
 
-static void configure_screen(mc6845_t *mc6845, int postload)
+static void recompute_parameters(mc6845_t *mc6845, int postload)
 {
 	if (mc6845->intf)
 	{
@@ -181,21 +216,21 @@ static void configure_screen(mc6845_t *mc6845, int postload)
 
 		/* determine the syncing positions */
 		UINT8 horiz_sync_char_width = mc6845->sync_width & 0x0f;
-		UINT8 vert_sync_pix_height = (mc6845->device_type == TYPE_MC6845) ? 0x10 : (mc6845->sync_width >> 4) & 0x0f;
+		UINT8 vert_sync_pix_width = supports_vert_sync_width[mc6845->device_type] ? (mc6845->sync_width >> 4) & 0x0f : 0x10;
 
 		if (horiz_sync_char_width == 0)
 			horiz_sync_char_width = 0x10;
 
-		if (vert_sync_pix_height == 0)
-			vert_sync_pix_height = 0x10;
+		if (vert_sync_pix_width == 0)
+			vert_sync_pix_width = 0x10;
 
 		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
 		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->intf->hpixels_per_column);
 		vsync_on_pos = mc6845->vert_sync_pos * (mc6845->max_ras_addr + 1);
-		vsync_off_pos = vsync_on_pos + vert_sync_pix_height;
+		vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
-		/* the Commodore 40xx series computers program a horizontal synch pulse that extends
-           past the scanline width.  I am assume that the real device will clamp it */
+		/* the Commodore PET computers program a horizontal synch pulse that extends
+           past the scanline width.  I assume that the real device will clamp it */
 		if (hsync_off_pos > horiz_pix_total)
 			hsync_off_pos = horiz_pix_total;
 
@@ -416,7 +451,7 @@ UINT16 mc6845_get_ma(mc6845_t *mc6845)
 		if (y > mc6845->max_visible_y)
 			y = mc6845->max_visible_y;
 
-		ret = (mc6845->start_addr +
+		ret = (mc6845->disp_start_addr +
 			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
 			  (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
 	}
@@ -455,6 +490,7 @@ static TIMER_CALLBACK( light_pen_latch_timer_cb )
 	mc6845_t *mc6845 = ptr;
 
 	mc6845->light_pen_addr = mc6845_get_ma(mc6845);
+	mc6845->light_pen_latched = TRUE;
 }
 
 
@@ -544,7 +580,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 		if (cliprect->min_y == 0)
 		{
 			/* read the start address at the beginning of the frame */
-			mc6845->current_ma = mc6845->start_addr;
+			mc6845->current_disp_addr = mc6845->disp_start_addr;
 
 			/* also update the cursor state now */
 			update_cursor_state(mc6845);
@@ -560,18 +596,18 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 			int cursor_visible = mc6845->cursor_state &&
 							 	(ra >= (mc6845->cursor_start_ras & 0x1f)) &&
 							 	(ra <= mc6845->cursor_end_ras) &&
-							 	(mc6845->cursor_addr >= mc6845->current_ma) &&
-							 	(mc6845->cursor_addr < (mc6845->current_ma + mc6845->horiz_disp));
+							 	(mc6845->cursor_addr >= mc6845->current_disp_addr) &&
+							 	(mc6845->cursor_addr < (mc6845->current_disp_addr + mc6845->horiz_disp));
 
 			/* compute the cursor X position, or -1 if not visible */
-			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_ma) : -1;
+			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_ma, ra, y, mc6845->horiz_disp, cursor_x, param);
+			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
-				mc6845->current_ma = (mc6845->current_ma + mc6845->horiz_disp) & 0x3fff;
+				mc6845->current_disp_addr = (mc6845->current_disp_addr + mc6845->horiz_disp) & 0x3fff;
 		}
 
 		/* call the tear down function if any */
@@ -604,7 +640,7 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 	mc6845->machine = machine;
 	mc6845->intf = static_config;
 
-	/* create the timers for the various pin notifications */
+	/* create the timers */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
@@ -626,21 +662,11 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
 
 	/* register for state saving */
-	switch (device_type)
-	{
-	case TYPE_MC6845:
-	default:
-		state_save_combine_module_and_tag(unique_tag, "mc6845", tag);
-		break;
-
-	case TYPE_R6545:
-		state_save_combine_module_and_tag(unique_tag, "r6545", tag);
-		break;
-	}
+	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], tag);
 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
-	state_save_register_item(unique_tag, 0, mc6845->address_latch);
+	state_save_register_item(unique_tag, 0, mc6845->register_address_latch);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
@@ -649,13 +675,14 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
 	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
 	state_save_register_item(unique_tag, 0, mc6845->vert_sync_pos);
-	state_save_register_item(unique_tag, 0, mc6845->intl_skew);
+	state_save_register_item(unique_tag, 0, mc6845->mode_control);
 	state_save_register_item(unique_tag, 0, mc6845->max_ras_addr);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_start_ras);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_end_ras);
-	state_save_register_item(unique_tag, 0, mc6845->start_addr);
+	state_save_register_item(unique_tag, 0, mc6845->disp_start_addr);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_addr);
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_addr);
+	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
 
@@ -667,9 +694,14 @@ static DEVICE_START( mc6845 )
 	return common_start(machine, tag, static_config, inline_config, TYPE_MC6845);
 }
 
-static DEVICE_START( r6545 )
+static DEVICE_START( c6545_1 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_R6545);
+	return common_start(machine, tag, static_config, inline_config, TYPE_C6545_1);
+}
+
+static DEVICE_START( r6545_1 )
+{
+	return common_start(machine, tag, static_config, inline_config, TYPE_R6545_1);
 }
 
 
@@ -677,7 +709,7 @@ static DEVICE_RESET( mc6845 )
 {
 	mc6845_t *mc6845 = token;
 
-	/* internal registers remain unchanged, all outputs go low */
+	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
@@ -689,6 +721,8 @@ static DEVICE_RESET( mc6845 )
 		if (mc6845->intf->on_vsync_changed != NULL)
 			mc6845->intf->on_vsync_changed(machine, mc6845, FALSE);
 	}
+
+	mc6845->light_pen_latched = FALSE;
 }
 
 
@@ -706,35 +740,50 @@ DEVICE_GET_INFO( mc6845 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc6845); break;
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);break;
-		case DEVINFO_FCT_STOP:							/* Nothing */							break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "MC6845";						break;
-		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";				break;
-		case DEVINFO_STR_VERSION:						info->s = "1.6";						break;
-		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_NAME:							info->s = "Motorola 6845";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";					break;
+		case DEVINFO_STR_VERSION:						info->s = "1.6";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
 
 
-DEVICE_GET_INFO( r6545 )
+DEVICE_GET_INFO( c6545_1 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "R6545";						break;
+		case DEVINFO_STR_NAME:							info->s = "Commodore 6545-1";				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545);	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c6545_1);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(mc6845);			break;
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( r6545_1 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Rockwell 6545-1";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545_1);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
