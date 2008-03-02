@@ -647,14 +647,7 @@ void options_output_help(core_options *opts, void (*output)(const char *))
 
 		/* otherwise, output entries for all non-deprecated items */
 		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) == 0 && data->description != NULL)
-		{
-			if (data->flags & OPTION_BOOLEAN)
-				output_printf(output, "-[no]%-16s%s\n", astring_c(data->links[0].name), data->description);
-			else if (data->flags & OPTION_COMMAND)
-				output_printf(output, "-%-20s%s\n", astring_c(data->links[0].name), data->description);
-			else
-				output_printf(output, "-%s %s\n%21s%s\n", astring_c(data->links[0].name), astring_c(data->links[0].name), "",data->description);
-		}
+			output_printf(output, "-%-20s%s\n", astring_c(data->links[0].name), data->description);
 	}
 }
 
