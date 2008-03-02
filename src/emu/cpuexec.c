@@ -969,12 +969,12 @@ static void cpu_inittimers(running_machine *machine)
 	interleave_boost_timer = timer_alloc(NULL, NULL);
 	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 
-	/* register the interrupt handercallbacks */
+	/* register the interrupt handler callbacks */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
 		const cpu_config *config = machine->config->cpu + cpunum;
 
-		/* screen specific VBLANK callbacks */
+		/* VBLANK interrupts */
 		if (config->vblank_interrupts_per_frame > 0)
 		{
 			const char *screen_tag;
@@ -1000,7 +1000,7 @@ static void cpu_inittimers(running_machine *machine)
 			video_screen_register_vbl_cb(machine, screen, on_vblank);
 		}
 
-		/* periodic interrupt timer */
+		/* periodic interrupts */
 		if (config->timed_interrupt_period != 0)
 		{
 			attotime timedint_period = attotime_make(0, config->timed_interrupt_period);

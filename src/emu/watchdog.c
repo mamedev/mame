@@ -46,8 +46,8 @@ void watchdog_init(running_machine *machine)
 
 	/* save some stuff in the default tag */
 	state_save_push_tag(0);
-	state_save_register_item("cpu", 0, watchdog_enabled);
-	state_save_register_item("cpu", 0, watchdog_counter);
+	state_save_register_item("watchdog", 0, watchdog_enabled);
+	state_save_register_item("watchdog", 0, watchdog_counter);
 	state_save_pop_tag();
 }
 
