@@ -483,7 +483,7 @@ static READ32_HANDLER(fifoctl_r)
 
 static READ32_HANDLER(videoctl_r)
 {
-	return (cpu_getcurrentframe() & 1)<<2;
+	return (video_screen_get_frame_number(0) & 1)<<2;
 }
 
 

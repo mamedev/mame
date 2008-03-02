@@ -351,7 +351,7 @@ static UINT8 namcoio_51XX_read(int chip)
 
 					if (io[chip].mode == 1)
 					{
-						int on = (cpu_getcurrentframe() & 0x10) >> 4;
+						int on = (video_screen_get_frame_number(0) & 0x10) >> 4;
 
 						if (io[chip].credits >= 2)
 							WRITE_PORT(0,0x0c | 3*on);	// lamps

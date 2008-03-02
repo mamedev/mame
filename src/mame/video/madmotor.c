@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *madmotor_pf1_rowscroll;
 UINT16 *madmotor_pf1_data,*madmotor_pf2_data,*madmotor_pf3_data;
@@ -244,7 +243,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (y = 0;y < h;y++)
 			{
 				if ((color & pri_mask) == pri_val &&
-							(!flash || (cpu_getcurrentframe() & 1)))
+							(!flash || (video_screen_get_frame_number(0) & 1)))
 					drawgfx(bitmap,machine->gfx[3],
 							code - y * incy + h * x,
 							color,

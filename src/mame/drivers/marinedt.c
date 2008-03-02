@@ -278,7 +278,7 @@ static WRITE8_HANDLER( marinedt_pf_w )
 
 //if(data&0xf0)
 //  logerror("pf:%02x %d\n",marinedt_pf);
-//logerror("pd:%02x %d\n",marinedt_pd, cpu_getcurrentframe());
+//logerror("pd:%02x %d\n",marinedt_pd, video_screen_get_frame_number(0));
 
 }
 

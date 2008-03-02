@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/segaic24.h"
 
 #define LOG_TGP_VIDEO 0
@@ -1154,7 +1153,7 @@ static int get_list_number(void)
 
 static void end_frame(void)
 {
-	if((listctl[0] & 4) && (cpu_getcurrentframe() & 1))
+	if((listctl[0] & 4) && (video_screen_get_frame_number(0) & 1))
 		listctl[0] ^= 0x40;
 }
 

@@ -5,12 +5,9 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
 #include "sound/astrocde.h"
-#include <math.h> /* for sin() and cos() */
-#include "osd_cpu.h"
 #include "video/resnet.h"
 
 
@@ -312,7 +309,7 @@ VIDEO_UPDATE( astrocde )
 
 	/* compute the starting point of sparkle for the current frame */
 	if (astrocade_video_config & AC_STARS)
-		sparklebase = ((UINT64)cpu_getcurrentframe() * (UINT64)(machine->screen[0].width * machine->screen[0].height)) % RNG_PERIOD;
+		sparklebase = (video_screen_get_frame_number(0) * (UINT64)(machine->screen[0].width * machine->screen[0].height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

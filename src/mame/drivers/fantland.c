@@ -190,7 +190,7 @@ static READ8_HANDLER( borntofi_inputs_r )
 
 	x = readinputport(13 + offset * 2);
 	y = readinputport(12 + offset * 2);
-	f = cpu_getcurrentframe();
+	f = video_screen_get_frame_number(0);
 
 	ret[offset]	=	(ret[offset] & 0x14) | (readinputport(2 + offset) & 0xc3);
 

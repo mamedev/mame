@@ -921,7 +921,7 @@ void amiga_render_scanline(bitmap_t *bitmap, int scanline)
 	}
 
 #if 0
-	if ( cpu_getcurrentframe() % 64 == 0 && scanline == 100 )
+	if ( video_screen_get_frame_number(0) % 64 == 0 && scanline == 100 )
 	{
 		const char *m_lores = "LORES";
 		const char *m_hires = "HIRES";
@@ -960,7 +960,7 @@ void amiga_render_scanline(bitmap_t *bitmap, int scanline)
 	CUSTOM_REG(REG_COLOR00) = save_color0;
 
 #if GUESS_COPPER_OFFSET
-	if (cpu_getcurrentframe() % 64 == 0 && scanline == 0)
+	if (video_screen_get_frame_number(0) % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(KEYCODE_Q))
 			popmessage("%d", wait_offset -= 1);

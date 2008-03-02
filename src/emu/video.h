@@ -142,6 +142,9 @@ attotime video_screen_get_scan_period(int scrnum);
 /* return the amount of time the beam takes to draw one complete frame */
 attotime video_screen_get_frame_period(int scrnum);
 
+/* return the current frame number -- this is always increasing */
+UINT64 video_screen_get_frame_number(int scrnum);
+
 /* returns whether a given screen exists */
 int video_screen_exists(int scrnum);
 

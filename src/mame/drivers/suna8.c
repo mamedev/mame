@@ -960,7 +960,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 
 static READ8_HANDLER( sparkman_c0a3_r )
 {
-	return (cpu_getcurrentframe() & 1) ? 0x80 : 0;
+	return (video_screen_get_frame_number(0) & 1) ? 0x80 : 0;
 }
 
 static ADDRESS_MAP_START( sparkman_readmem, ADDRESS_SPACE_PROGRAM, 8 )

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 static pen_t (*map_color)(UINT8 x, UINT8 y);
@@ -334,9 +333,9 @@ static void cosmica_draw_starfield(bitmap_t *bitmap, const rectangle *cliprect)
 			int hc, hb_;
 
 			if (flip_screen_get())
-				x1 = x - cpu_getcurrentframe();
+				x1 = x - video_screen_get_frame_number(0);
 			else
-				x1 = x + cpu_getcurrentframe();
+				x1 = x + video_screen_get_frame_number(0);
 
 			hc  = (x1 >> 2) & 0x01;
 			hb_ = (x  >> 5) & 0x01;  /* not a bug, this one is the real x */
@@ -425,7 +424,7 @@ static void devzone_draw_grid(bitmap_t *bitmap, const rectangle *cliprect)
 static void nomnlnd_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y = 0;
-	UINT8 water = cpu_getcurrentframe();
+	UINT8 water = video_screen_get_frame_number(0);
 	UINT8 *PROM = memory_region(REGION_USER2);
 
 	/* all positioning is via logic gates:

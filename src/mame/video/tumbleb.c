@@ -15,7 +15,6 @@ to switch between 8*8 tiles and 16*16 tiles.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT16 tumblepb_control_0[8];
 UINT16 *tumblepb_pf1_data,*tumblepb_pf2_data;
@@ -43,7 +42,7 @@ static void tumblepb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0xf;
@@ -105,7 +104,7 @@ static void jumpkids_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0xf;
@@ -167,7 +166,7 @@ static void fncywld_draw_sprites(running_machine *machine, bitmap_t *bitmap,cons
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0x3f;

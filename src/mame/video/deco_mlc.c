@@ -252,7 +252,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 	{
 		if ((mlc_spriteram[offs+0]&0x8000)==0)
 			continue;
-		if ((mlc_spriteram[offs+1]&0x2000) && (cpu_getcurrentframe() & 1))
+		if ((mlc_spriteram[offs+1]&0x2000) && (video_screen_get_frame_number(0) & 1))
 			continue;
 
 		/*

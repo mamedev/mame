@@ -871,14 +871,14 @@ static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (cpu_getcurrentframe() > last_frame)
+        if (video_screen_get_frame_number(0) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = cpu_getcurrentframe();
+            last_frame = video_screen_get_frame_number(0);
         }
 
 		/* remember the previous value */
@@ -974,7 +974,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
 			target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(2) && cpu_getcurrentframe() > last_frame)
+        if (sample_playing(2) && video_screen_get_frame_number(0) > last_frame)
         {
             if (current_volume > target_volume)
                 current_volume -= 0.078f;
@@ -984,7 +984,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
                 sample_set_volume(2, current_volume);
             else
                 sample_stop(2);
-            last_frame = cpu_getcurrentframe();
+            last_frame = video_screen_get_frame_number(0);
         }
 
 		/* fire - falling edge */
@@ -1251,14 +1251,14 @@ static void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (cpu_getcurrentframe() > last_frame)
+        if (video_screen_get_frame_number(0) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = cpu_getcurrentframe();
+            last_frame = video_screen_get_frame_number(0);
         }
 
 		/* remember the previous value */
@@ -1363,14 +1363,14 @@ static void wotwc_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (cpu_getcurrentframe() > last_frame)
+        if (video_screen_get_frame_number(0) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = cpu_getcurrentframe();
+            last_frame = video_screen_get_frame_number(0);
         }
 
 		/* remember the previous value */

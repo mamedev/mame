@@ -1241,7 +1241,7 @@ static VIDEO_UPDATE(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (cpu_getcurrentframe() & 1)) continue;
+								//if ( (whichbpp) && (video_screen_get_frame_number(0) & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)

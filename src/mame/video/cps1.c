@@ -177,7 +177,6 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cps1.h"
 
 #define VERBOSE 0
@@ -1722,7 +1721,7 @@ static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (cpu_getcurrentframe()/16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(0)/16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
@@ -1748,7 +1747,7 @@ static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (cpu_getcurrentframe()/16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(0)/16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)

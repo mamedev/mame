@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *stadhero_pf1_data;
 static UINT16 *stadhero_pf2_data;
@@ -37,7 +36,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if ((colour & pri_mask) != pri_val) continue;
 
 		flash=x&0x800;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;

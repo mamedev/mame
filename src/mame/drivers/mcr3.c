@@ -423,7 +423,7 @@ static READ8_HANDLER( turbotag_ip2_r )
 	if (input_mux)
 		return readinputportbytag("SSIO.IP2.ALT");
 
-	return readinputportbytag("SSIO.IP2") + 5 * (cpu_getcurrentframe() & 1);
+	return readinputportbytag("SSIO.IP2") + 5 * (video_screen_get_frame_number(0) & 1);
 }
 
 

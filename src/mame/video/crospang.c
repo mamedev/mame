@@ -10,7 +10,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static int xsproff, ysproff; // sprite offsets
 static tilemap *bg_layer,*fg_layer;
@@ -140,7 +139,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0xf;

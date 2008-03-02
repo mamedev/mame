@@ -346,7 +346,7 @@ static WRITE8_HANDLER( dunhuang_input_w )	{	dunhuang_input = data;	}
 static READ8_HANDLER( dunhuang_service_r )
 {
 	return readinputport(5)
-	 | ((dunhuang_hopper && !(cpu_getcurrentframe()%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
+	 | ((dunhuang_hopper && !(video_screen_get_frame_number(0)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
 }

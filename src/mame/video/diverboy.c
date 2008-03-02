@@ -1,7 +1,6 @@
 /* Diver Boy - Video Hardware */
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *diverboy_spriteram;
 size_t diverboy_spriteram_size;
@@ -32,7 +31,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 		bank = (source[1]&0x0002) >> 1;
 
-		if (!flash || (cpu_getcurrentframe() & 1))
+		if (!flash || (video_screen_get_frame_number(0) & 1))
 		{
 			drawgfx(bitmap,machine->gfx[bank],
 					number,

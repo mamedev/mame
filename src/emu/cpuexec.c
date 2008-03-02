@@ -99,8 +99,6 @@ struct _cpuexec_data
 /* general CPU variables */
 static cpuexec_data cpu[MAX_CPU];
 
-static UINT32 current_frame;
-
 static int cycles_running;
 static int cycles_stolen;
 
@@ -206,7 +204,6 @@ void cpuexec_init(running_machine *machine)
 
 	/* save some stuff in the default tag */
 	state_save_push_tag(0);
-	state_save_register_item("cpu", 0, current_frame);
 	state_save_register_item("cpu", 0, watchdog_enabled);
 	state_save_register_item("cpu", 0, watchdog_counter);
 	state_save_pop_tag();
@@ -245,9 +242,6 @@ static void cpuexec_reset(running_machine *machine)
 		/* then reset the CPU directly */
 		cpunum_reset(cpunum);
 	}
-
-	/* reset the globals */
-	current_frame = 0;
 }
 
 
@@ -859,17 +853,6 @@ int cpu_getiloops(void)
 }
 
 
-/*-------------------------------------------------
-    cpu_getcurrentframe - return the current
-    frame count (deprecated)
--------------------------------------------------*/
-
-int cpu_getcurrentframe(void)
-{
-	return current_frame;
-}
-
-
 /***************************************************************************
     INTERNAL TIMING
 ***************************************************************************/
@@ -888,10 +871,6 @@ static void on_global_vblank(running_machine *machine, screen_state *screen, int
 		if (machine->config->watchdog_vblank_count != 0 && --watchdog_counter == 0)
 			watchdog_callback(machine, NULL, 0);
 	}
-
-	/* VBLANK ending - increment total frames */
-	else
-		current_frame++;
 }
 
 

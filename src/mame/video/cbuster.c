@@ -87,7 +87,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (x&0x2000) colour+=64;
 
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		fx = y & 0x2000;
 		fy = y & 0x4000;

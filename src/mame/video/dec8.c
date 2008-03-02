@@ -319,7 +319,7 @@ static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rect
 		x = buffered_spriteram[offs+5]+(buffered_spriteram[offs+4]<<8);
 		colour = ((x & 0xf000) >> 12);
 		flash=x&0x800;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		if (priority==1 &&  (colour&4)) continue;
 		if (priority==2 && !(colour&4)) continue;

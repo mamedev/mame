@@ -153,7 +153,7 @@ static void xexex_objdma(int limiter)
 	UINT16 *src, *dst;
 
 	counter = frame;
-	frame = cpu_getcurrentframe();
+	frame = video_screen_get_frame_number(0);
 	if (limiter && counter == frame) return; // make sure we only do DMA transfer once per frame
 
 	K053247_export_config(&dst, 0, 0, 0, &counter);

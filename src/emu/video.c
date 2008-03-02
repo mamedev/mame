@@ -74,6 +74,7 @@ struct _internal_screen_info
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
 	emu_timer *				scanline0_timer;		/* scanline 0 timer */
 	emu_timer *				scanline_timer;			/* scanline timer */
+	UINT64					frame_number;			/* the current frame number */
 
 	/* VBLANK callbacks */
 	int vbl_cb_count;								/* # of callbacks installed */
@@ -354,6 +355,7 @@ void video_init(running_machine *machine)
 		/* register for save states */
 		state_save_register_item("video", scrnum, info->vblank_time.seconds);
 		state_save_register_item("video", scrnum, info->vblank_time.attoseconds);
+		state_save_register_item("video", scrnum, info->frame_number);
 	}
 
 	/* create spriteram buffers if necessary */
@@ -1048,6 +1050,18 @@ attotime video_screen_get_frame_period(int scrnum)
 }
 
 
+/*-------------------------------------------------
+    video_screen_get_frame_number - return the
+    current frame number since the start of the
+    emulated machine
+-------------------------------------------------*/
+
+UINT64 video_screen_get_frame_number(int scrnum)
+{
+	internal_screen_info *info = get_screen_info(Machine, scrnum);
+	return info->frame_number;
+}
+
 
 /*-------------------------------------------------
     video_screen_register_vbl_cb - registers a
@@ -1236,6 +1250,9 @@ static TIMER_CALLBACK( vblank_end_callback )
 
 	/* let any external parties know that the VBLANK is over */
 	call_vb_callbacks(machine, scrinfo, FALSE);
+
+	/* increment the frame number counter */
+	scrinfo->frame_number++;
 }
 
 

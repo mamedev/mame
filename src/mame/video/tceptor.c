@@ -4,7 +4,6 @@
  */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namcoic.h"
 
 #define TX_TILE_OFFSET_CENTER	(32 * 2)
@@ -562,7 +561,7 @@ VIDEO_UPDATE( tceptor )
 
 	if (screen)
 	{
-		int frame = cpu_getcurrentframe();
+		int frame = video_screen_get_frame_number(screen);
 
 		if ((frame & 1) == 1 && screen == 1)
 			return UPDATE_HAS_NOT_CHANGED;

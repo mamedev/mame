@@ -54,22 +54,6 @@ extern running_machine *Machine;
 
 /*************************************
  *
- *  Video timing
- *
- *  These functions are no longer considered
- *  to be the authority on scanline timing.
- *  Please use the video_screen_* functions
- *  in video.c for newer drivers.
- *
- *************************************/
-
-/* Returns the number of the video frame we are currently playing */
-int cpu_getcurrentframe(void);
-
-
-
-/*************************************
- *
  *  Core timing
  *
  *************************************/

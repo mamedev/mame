@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "lemmings.h"
 
 UINT16 *lemmings_pixel_0_data,*lemmings_pixel_1_data,*lemmings_vram_data,*lemmings_control_data;
@@ -39,7 +38,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (cpu_getcurrentframe() & 1)) continue;
+		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
 
 		x = spritedata[offs+2];
 		colour = (x >>9) & 0xf;

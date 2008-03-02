@@ -118,7 +118,7 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			}
 
 			#if BW_DEBUG
-				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpu_getactivecpu(),activecpu_get_pc(),data,0x1b00+offset,cpu_getcurrentframe());
+				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpu_getactivecpu(),activecpu_get_pc(),data,0x1b00+offset,video_screen_get_frame_number(0));
 			#endif
 		break;
 	}
