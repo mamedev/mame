@@ -278,8 +278,8 @@ static UINT8 hb_dma_read_byte(int channel, offs_t offset);
 static void hb_dma_write_byte(int channel, offs_t offset, UINT8 data);
 static UINT8 dk_dma_read_byte(int channel, offs_t offset);
 static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data);
-static UINT8 dk3_dma_read_byte(offs_t offset);
-static void dk3_dma_write_byte(offs_t offset, UINT8 data);
+static Z80DMA_READ(dk3_dma_read_byte);
+static Z80DMA_WRITE(dk3_dma_write_byte);
 static UINT8 p8257_ctl_r(void);
 static void p8257_ctl_w(UINT8 data);
 
@@ -289,7 +289,7 @@ static void p8257_ctl_w(UINT8 data);
  *
  *************************************/
 
-static const struct z80dma_interface dk3_dma =
+static z80dma_interface dk3_dma =
 {
 	0,
 	CLOCK_1H,
@@ -395,23 +395,14 @@ static MACHINE_START( radarsc1 )
 
 static MACHINE_START( dkong3 )
 {
-	MACHINE_START_CALL(dkong2b);
-	z80dma_init(1);
-	z80dma_config(0, &dk3_dma);
+	dkong_state *state = machine->driver_data;
+
+	state->hardware_type = HARDWARE_TKG04;
 }
 
 static MACHINE_RESET( dkong )
 {
-
 	dma8257_reset();
-
-}
-
-static MACHINE_RESET( dkong3 )
-{
-
-	z80dma_reset();
-
 }
 
 static MACHINE_RESET( strtheat )
@@ -464,7 +455,7 @@ static void dk_dma_write_byte(int channel, offs_t offset, UINT8 data)
 	cpuintrf_pop_context();
 }
 
-static UINT8 dk3_dma_read_byte(offs_t offset)
+static Z80DMA_READ( dk3_dma_read_byte )
 {
 	UINT8 result;
 
@@ -475,7 +466,7 @@ static UINT8 dk3_dma_read_byte(offs_t offset)
 	return result;
 }
 
-static void dk3_dma_write_byte(offs_t offset, UINT8 data)
+static Z80DMA_WRITE( dk3_dma_write_byte )
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -1643,7 +1634,9 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)
-	MDRV_MACHINE_RESET(dkong3)
+
+	MDRV_DEVICE_ADD(Z80DMA_DEV_0_TAG, Z80DMA)
+	MDRV_DEVICE_CONFIG(dk3_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

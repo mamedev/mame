@@ -95,8 +95,8 @@ write:
 
 #include "mario.h"
 
-static UINT8 mario_dma_read_byte(offs_t offset);
-static void mario_dma_write_byte(offs_t offset, UINT8 data);
+static Z80DMA_READ(mario_dma_read_byte);
+static Z80DMA_WRITE(mario_dma_write_byte);
 
 /*************************************
  *
@@ -104,7 +104,7 @@ static void mario_dma_write_byte(offs_t offset, UINT8 data);
  *
  *************************************/
 
-static const struct z80dma_interface mario_dma =
+static const z80dma_interface mario_dma =
 {
 	0,
 	Z80_CLOCK,
@@ -120,24 +120,13 @@ static const struct z80dma_interface mario_dma =
  *
  *************************************/
 
-static MACHINE_START( mario )
-{
-	z80dma_init(1);
-	z80dma_config(0, &mario_dma);
-}
-
-static MACHINE_RESET( mario )
-{
-	z80dma_reset();
-}
-
 /*************************************
  *
  *  DMA handling
  *
  *************************************/
 
-static UINT8 mario_dma_read_byte(offs_t offset)
+static Z80DMA_READ(mario_dma_read_byte)
 {
 	UINT8 result;
 
@@ -148,7 +137,7 @@ static UINT8 mario_dma_read_byte(offs_t offset)
 	return result;
 }
 
-static void mario_dma_write_byte(offs_t offset, UINT8 data)
+static Z80DMA_WRITE(mario_dma_write_byte)
 {
 	cpuintrf_push_context(0);
 	program_write_byte(offset, data);
@@ -363,8 +352,9 @@ static MACHINE_DRIVER_START( mario_base )
 	MDRV_CPU_IO_MAP(0,mario_writeport)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_MACHINE_START(mario)
-	MDRV_MACHINE_RESET(mario)
+	/* devices */
+	MDRV_DEVICE_ADD(Z80DMA_DEV_0_TAG, Z80DMA)
+	MDRV_DEVICE_CONFIG(mario_dma)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

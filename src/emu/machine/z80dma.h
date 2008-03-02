@@ -7,7 +7,18 @@
 #ifndef Z80DMA_H
 #define Z80DMA_H
 
-struct z80dma_interface
+typedef struct _z80dma_t z80dma_t;
+typedef struct _z80dma_interface z80dma_interface;
+
+#define Z80DMA DEVICE_GET_INFO_NAME(z80dma)
+
+typedef UINT8 (*z80dma_read_func)(running_machine *machine, z80dma_t *z80dma, offs_t offset);
+#define Z80DMA_READ(name) UINT8 name(running_machine *machine, z80dma_t *z80dma, offs_t offset)
+
+typedef void (*z80dma_write_func)(running_machine *machine, z80dma_t *z80dma, offs_t offset, UINT8 data);
+#define Z80DMA_WRITE(name) void name(running_machine *machine, z80dma_t *z80dma, offs_t offset, UINT8 data)
+
+struct _z80dma_interface
 {
 	/* CPU to halt when DMA is active */
 	int cpunum;
@@ -16,46 +27,38 @@ struct z80dma_interface
 	int clockhz;
 
 	/* accessors to main memory */
-	UINT8 (*memory_read_func)(offs_t offset);
-	void (*memory_write_func)(offs_t offset, UINT8 data);
+	z80dma_read_func	memory_read;
+	z80dma_write_func	memory_write;
 
 	/* port accesors */
-	UINT8 (*portA_read_func)(UINT16 addr);
-	void (*portA_write_func)(UINT16 addr, UINT8 data);
-	UINT8 (*portB_read_func)(UINT16 addr);
-	void (*portB_write_func)(UINT16 addr, UINT8 data);
+	z80dma_read_func	portA_read;
+	z80dma_write_func	portA_write;
+	z80dma_read_func	portB_read;
+	z80dma_write_func	portB_write;
 
 	/* interrupt callback - not implemented */
 	/* void (*irqcb)(int state); */
 };
 
-int z80dma_init(int count);
-void z80dma_config(int which, const struct z80dma_interface *intf);
-void z80dma_reset(void);
+/* device interface */
+DEVICE_GET_INFO( z80dma );
 
-void z80dma_rdy_write(int which, int state);
+void z80dma_rdy_write( z80dma_t *z80dma, int state);
+UINT8 z80dma_read( z80dma_t *z80dma);
+void z80dma_write( z80dma_t *z80dma, UINT8 data);
+
+/******************* Standard 8-bit CPU interfaces *******************/
+
+#define Z80DMA_DEV_0_TAG	"z80dma0"
 
 READ8_HANDLER(z80dma_0_r);
-READ8_HANDLER(z80dma_1_r);
-WRITE8_HANDLER(z80dma_0_w);
-WRITE8_HANDLER(z80dma_1_w);
-
 WRITE8_HANDLER(z80dma_0_rdy_w);
+WRITE8_HANDLER(z80dma_0_w);
+
+#define Z80DMA_DEV_1_TAG	"z80dma1"
+
+READ8_HANDLER(z80dma_1_r);
+WRITE8_HANDLER(z80dma_1_w);
 WRITE8_HANDLER(z80dma_1_rdy_w);
-
-READ16_HANDLER(z80dma_16le_0_r);
-READ16_HANDLER(z80dma_16le_1_r);
-WRITE16_HANDLER(z80dma_16le_0_w);
-WRITE16_HANDLER(z80dma_16le_1_w);
-
-READ32_HANDLER(z80dma_32le_0_r);
-READ32_HANDLER(z80dma_32le_1_r);
-WRITE32_HANDLER(z80dma_32le_0_w);
-WRITE32_HANDLER(z80dma_32le_1_w);
-
-READ64_HANDLER(z80dma_64be_0_r);
-READ64_HANDLER(z80dma_64be_1_r);
-WRITE64_HANDLER(z80dma_64be_0_w);
-WRITE64_HANDLER(z80dma_64be_1_w);
 
 #endif /* Z80_H */
