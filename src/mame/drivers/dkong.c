@@ -249,6 +249,53 @@ Changes:
     Jul 27 99 Chad Hendrickson
     * Added cocktail mode flipscreen
 
+Donkey Kong Junior Notes
+========================
+
+	DJR-03  Donkey Kong Modification Kits                 02-23-83
+	--------------------------------------------------------------
+	Nintendo Service Department Bulletin # DJR-03         02-23-83
+	GAME: Donkey Kong Junior
+	SUBJECT: Play Time
+	
+	It has come to our attention that play time on Donkey Kong
+	Junior is, in some cases, excessive, while in other cases
+	there is concern over the ability of players to learn the
+	game and thereby retain an interest in playing.
+	
+	We are making available, through our Nintendo Distributors,
+	two EPROM change kits, designated DJR1-E and DJR1-P.
+	
+	The E kit consists of four (4) chips and is an easier version
+	of the program.  it presents the board sequence in a way which
+	familiarizes the players with the game faster.  The board
+	order is vines, springboard, Mario's hideout and keys.
+	
+	The P kit is a more difficult version consisting of two chips.
+	The order remains the same while more and faster 
+	obstacles (snapjaws, nitpickers, etc.) are presented.
+	--------------------------------------------------------------
+	
+	E-Kit - roms
+	------------------------------------------------
+	Filename    Label          Type   Loc/PCB  CSum
+	----------- -------------- ------ -------  ---- --
+	2732.5Ae    DJR1-C-5A e    2732   5A(CPU)  68E9
+	2764.5Be    DJR1-C-5B e    2764   5B(CPU)  B0CF
+	2764.5Ce    DJR1-C-5C e    2764   5C(CPU)  FC64
+	2764.5Ee    DJR1-C-5E e    2764   5E(CPU)  7CC6
+	------------------------------------------------
+	
+	P-Kit roms (Still looking for these, suffix is
+	more than likely P. :)
+	------------------------------------------------
+	Filename    Label          Type   Loc/PCB  CSum
+	----------- -------------- ------ -------  ---- --
+	empty       ---------      ----   5A(CPU)  ----
+	2764.5Bp    DJR1-C-5B p    2764   5B(CPU)  1B58
+	2764.5Cp    DJR1-C-5C p    2764   5C(CPU)  F4FE
+	------------------------------------------------    
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -2106,7 +2153,7 @@ ROM_START( dkongjrb )
 	ROM_LOAD( "v-2n.bpr",  0x0200, 0x0100, CRC(dbf185bf) SHA1(2697a991a4afdf079dd0b7e732f71c7618f43b70) )	/* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dkngjnrb )
+ROM_START( dkongjre )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
@@ -2800,7 +2847,7 @@ GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr,        0,  ROT90, "Nintendo o
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkngjnrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Junior (Japan?)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrb, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "bootleg", "Donkey Kong Jr. (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, dkngjnrb, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjre, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (Easy)", GAME_SUPPORTS_SAVE )
 
 GAME( 1983, dkong3,   0,        dkong3,   dkong3,         0,  ROT90, "Nintendo of America", "Donkey Kong 3 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
