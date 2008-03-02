@@ -376,7 +376,7 @@ void render_target_set_view(render_target *target, int viewindex);
 void render_target_set_max_texture_size(render_target *target, int maxwidth, int maxheight);
 
 /* compute the visible area for the given target with the current layout and proposed new parameters */
-void render_target_compute_visible_area(render_target *target, INT32 target_width, INT32 target_height, float target_pixel_aspect, UINT8 target_orientation, INT32 *visible_width, INT32 *visible_height);
+void render_target_compute_visible_area(render_target *target, INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 *visible_width, INT32 *visible_height);
 
 /* get the "minimum" size of a target, which is the smallest bounds that will ensure at least
    1 target pixel per source pixel for all included screens */

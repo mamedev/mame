@@ -1302,7 +1302,7 @@ void render_target_set_max_texture_size(render_target *target, int maxwidth, int
     the current layout and proposed new parameters
 -------------------------------------------------*/
 
-void render_target_compute_visible_area(render_target *target, INT32 target_width, INT32 target_height, float target_pixel_aspect, UINT8 target_orientation, INT32 *visible_width, INT32 *visible_height)
+void render_target_compute_visible_area(render_target *target, INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 *visible_width, INT32 *visible_height)
 {
 	float width, height;
 	float scale;
@@ -1445,10 +1445,10 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	render_target_compute_visible_area(target, target->width, target->height, target->pixel_aspect, target->orientation, &viswidth, &visheight);
 
 	/* create a root transform for the target */
-	root_xform.xoffs = (target->width - viswidth) / 2;
-	root_xform.yoffs = (target->height - visheight) / 2;
-	root_xform.xscale = viswidth;
-	root_xform.yscale = visheight;
+	root_xform.xoffs = (float) (target->width - viswidth) / 2;
+	root_xform.yoffs = (float) (target->height - visheight) / 2;
+	root_xform.xscale = (float) viswidth;
+	root_xform.yscale = (float) visheight;
 	root_xform.color.r = root_xform.color.g = root_xform.color.b = root_xform.color.a = 1.0f;
 	root_xform.orientation = target->orientation;
 
@@ -1549,8 +1549,8 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 		/* compute the transform for the UI */
 		ui_xform.xoffs = 0;
 		ui_xform.yoffs = 0;
-		ui_xform.xscale = target->width;
-		ui_xform.yscale = target->height;
+		ui_xform.xscale = (float) target->width;
+		ui_xform.yscale = (float) target->height;
 		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = ui_xform.color.a = 1.0f;
 		ui_xform.orientation = target->orientation;
 
@@ -1886,7 +1886,7 @@ static void add_element_primitives(render_target *target, render_primitive_list 
 		prim->flags = PRIMFLAG_TEXORIENT(xform->orientation) | PRIMFLAG_BLENDMODE(blendmode) | PRIMFLAG_TEXFORMAT(texture->format);
 
 		/* compute the bounds */
-		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform->xoffs), render_round_nearest(xform->yoffs), width, height);
+		set_render_bounds_wh(&prim->bounds, render_round_nearest(xform->xoffs), render_round_nearest(xform->yoffs), (float) width, (float) height);
 		if (xform->orientation & ORIENTATION_SWAP_XY)
 			ISWAP(width, height);
 		width = MIN(width, target->maxtexwidth);
@@ -1940,10 +1940,10 @@ static int remove_clear_extent(const render_bounds *bounds)
 	INT32 *max = &clear_extents[MAX_CLEAR_EXTENTS];
 	INT32 *last = &clear_extents[clear_extent_count];
 	INT32 *ext = &clear_extents[0];
-	INT32 boundsx0 = ceil(bounds->x0);
-	INT32 boundsx1 = floor(bounds->x1);
-	INT32 boundsy0 = ceil(bounds->y0);
-	INT32 boundsy1 = floor(bounds->y1);
+	INT32 boundsx0 = (INT32) ceil(bounds->x0);
+	INT32 boundsx1 = (INT32) floor(bounds->x1);
+	INT32 boundsy0 = (INT32) ceil(bounds->y0);
+	INT32 boundsy1 = (INT32) floor(bounds->y1);
 	INT32 y0, y1 = 0;
 
 	/* loop over Y extents */
