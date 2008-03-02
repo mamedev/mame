@@ -10,7 +10,7 @@
         * Time Killers (2 sets)
         * Bloodstorm (4 sets)
         * Hard Yardage (2 sets)
-        * Pairs (2 sets)
+        * Pairs (3 sets)
         * Driver's Edge (1 set)
         * World Class Bowling (8 sets)
         * Street Fighter: The Movie (4 sets)
@@ -23,7 +23,7 @@
         * Golden Tee Classic (3 Sets)
 
     Known issues:
-        * volume controls don't work in the Golden Tee games
+        * volume controls do not work in the Golden Tee games
         * Driver's Edge accesses many uninitialized RAM locations;
             requires hack to make steering in attract mode work
 
@@ -1262,10 +1262,10 @@ static INPUT_PORTS_START( wcbowl )
 	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("TRACKX1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKY1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -1288,10 +1288,10 @@ static INPUT_PORTS_START( wcbowln ) /* WCB version 1.66 supports cocktail mode *
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
 
 	PORT_START_TAG("TRACKX2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
 	PORT_START_TAG("TRACKY2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1347,16 +1347,16 @@ static INPUT_PORTS_START( shufshot ) /* ShuffleShot v1.39 & v1.40 support cockta
 	PORT_DIPSETTING(      0x0020, DEF_STR( Cocktail ) )
 
 	PORT_START_TAG("TRACKX1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKY1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKX2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
 	PORT_START_TAG("TRACKY2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1383,16 +1383,16 @@ static INPUT_PORTS_START( shufbowl )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
 
 	PORT_START_TAG("TRACKX1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKY1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKX2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
 	PORT_START_TAG("TRACKY2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1423,16 +1423,16 @@ static INPUT_PORTS_START( gt3d )
 	PORT_DIPSETTING(      0x0040, "Two Trackballs" )
 
 	PORT_START_TAG("TRACKX1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKY1")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
 
 	PORT_START_TAG("TRACKX2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_COCKTAIL PORT_PLAYER(2)
 
 	PORT_START_TAG("TRACKY2")
-    PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_COCKTAIL PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -2045,10 +2045,10 @@ ROM_END
 
 ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "wcbtprm0.140", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) )
-	ROM_LOAD32_BYTE( "wcbtprm1.140", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
-	ROM_LOAD32_BYTE( "wcbtprm2.140", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
-	ROM_LOAD32_BYTE( "wcbtprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
+	ROM_LOAD32_BYTE( "wcbfprm0.140", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) ) /* Labeled "WCBF PROM0 1.40" ect */
+	ROM_LOAD32_BYTE( "wcbfprm1.140", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
+	ROM_LOAD32_BYTE( "wcbfprm2.140", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
+	ROM_LOAD32_BYTE( "wcbfprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
@@ -2176,7 +2176,7 @@ ROM_END
 
 
 ROM_START( wcbwl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
-	/* v1.0 for this platform have been confirmed, but not dumped */
+	/* v1.0 for this platform has been confirmed, but not dumped */
 	ROM_REGION16_BE( 0x80000, REGION_USER1, 0 )
 	ROM_LOAD16_BYTE( "wcb_v15.u83", 0x00000, 0x20000, CRC(3ca9ab85) SHA1(364946dceb3f7279b7d67d9d685a98ba7f4901aa) ) /* Labeled as "WCB V1.5 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v15.u88", 0x00001, 0x20000, CRC(d43e6fad) SHA1(fd72f6945e7f5ef86dc28503749d18086dd29906) ) /* Labeled as "WCB V1.5 (U88)" */
@@ -3104,12 +3104,12 @@ ROM_START( gt97v120 ) /* Version 1.20 */
 ROM_END
 
 
-ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "gt97prm0.240", 0x00000, 0x100000, CRC(88a386d0) SHA1(003dbf784125b1a442f85e18f8161695dcacc3a8) )
-	ROM_LOAD32_BYTE( "gt97prm1.240", 0x00001, 0x100000, CRC(b0d751aa) SHA1(7e6ab9c2bb0bd4f50360655c59f48c44f6135f4f) )
-	ROM_LOAD32_BYTE( "gt97prm2.240", 0x00002, 0x100000, CRC(451be534) SHA1(2f78cdba607c4b936b5cbdb520757d038d9aa7a3) )
-	ROM_LOAD32_BYTE( "gt97prm3.240", 0x00003, 0x100000, CRC(70da8ca5) SHA1(baf56d04c5d75165fc9f3269650847e46bbbe2d3) )
+	ROM_LOAD32_BYTE( "gt97prm0.243", 0x00000, 0x100000, CRC(b8de60f1) SHA1(06b1f8b9d0b878d5a19e6756957e2df19e013ad6) )
+	ROM_LOAD32_BYTE( "gt97prm1.243", 0x00001, 0x100000, CRC(8152e5d3) SHA1(2a4f8acc6a4e33864c97d5974e2230b1cf3632ea) )
+	ROM_LOAD32_BYTE( "gt97prm2.243", 0x00002, 0x100000, CRC(b80061be) SHA1(9a6a6281690b3bd2eabb081467bfda074639fa6a) )
+	ROM_LOAD32_BYTE( "gt97prm3.243", 0x00003, 0x100000, CRC(d184968d) SHA1(eecd4e9d060e4b8feabca715d3d7f9738641cfcc) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
@@ -3135,12 +3135,12 @@ ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, REGION_USER1, 0 )
-	ROM_LOAD32_BYTE( "gt97prm0.243", 0x00000, 0x100000, CRC(b8de60f1) SHA1(06b1f8b9d0b878d5a19e6756957e2df19e013ad6) )
-	ROM_LOAD32_BYTE( "gt97prm1.243", 0x00001, 0x100000, CRC(8152e5d3) SHA1(2a4f8acc6a4e33864c97d5974e2230b1cf3632ea) )
-	ROM_LOAD32_BYTE( "gt97prm2.243", 0x00002, 0x100000, CRC(b80061be) SHA1(9a6a6281690b3bd2eabb081467bfda074639fa6a) )
-	ROM_LOAD32_BYTE( "gt97prm3.243", 0x00003, 0x100000, CRC(d184968d) SHA1(eecd4e9d060e4b8feabca715d3d7f9738641cfcc) )
+	ROM_LOAD32_BYTE( "gt97prm0.240", 0x00000, 0x100000, CRC(88a386d0) SHA1(003dbf784125b1a442f85e18f8161695dcacc3a8) )
+	ROM_LOAD32_BYTE( "gt97prm1.240", 0x00001, 0x100000, CRC(b0d751aa) SHA1(7e6ab9c2bb0bd4f50360655c59f48c44f6135f4f) )
+	ROM_LOAD32_BYTE( "gt97prm2.240", 0x00002, 0x100000, CRC(451be534) SHA1(2f78cdba607c4b936b5cbdb520757d038d9aa7a3) )
+	ROM_LOAD32_BYTE( "gt97prm3.240", 0x00003, 0x100000, CRC(70da8ca5) SHA1(baf56d04c5d75165fc9f3269650847e46bbbe2d3) )
 
 	ROM_REGION( 0x28000, REGION_CPU2, 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
@@ -3807,9 +3807,9 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x1116);
 }
 
-static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-4 */
+static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
 {
-	/* Tournament Version */
+	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x111a);
 
 	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
@@ -3832,7 +3832,7 @@ static DRIVER_INIT( gt3d )
 {
 	/*
         This is the 3 tier PCB with the short ROM board:
-        Known GT versions on this board:  GT3D v1.4 through v1.92S
+        Known (dumped) GT versions on this board:  GT3D v1.4 through v1.92S
 
         Hacked versions of this PCB have been found with GT97
         through GTClassic. This is _NOT_ a factory modification
@@ -3859,7 +3859,7 @@ static DRIVER_INIT( aama )
 static DRIVER_INIT( aamat )
 {
 	/*
-        Tournament Version
+        Tournament Version - So install needed handler for the TimeKeeper ram
     */
 	DRIVER_INIT_CALL(aama);
 	timekeeper_init( 0, TIMEKEEPER_M48T02, NULL );
@@ -3909,7 +3909,7 @@ static DRIVER_INIT( gtclassp )
         move.b      680002,d0       ; Read protection result
         andi.b      #$C0,d0
         cmpi.b      #$80,d0
-Label1  bne.s       Label1          ; Infinite loop if retsult isn't 0x80
+Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
         rts                         ; Otherwise just return to the game :-)
 
     */
@@ -3948,7 +3948,7 @@ GAME( 1995, sftmj,    sftm,     sftm,     sftm,     sftm,     ROT0, "Capcom/Incr
 GAME( 1997, shufshot, 0,        sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.40)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, sshot139, shufshot, sftm,     shufshot, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.39)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
 GAME( 1997, sshot137, shufshot, sftm,     shufbowl, shufshot, ROT0, "Strata/Incredible Technologies", "Shuffleshot (v1.37)" , 0) /* PIC 16C54 labeled as ITSHF-1 */
-GAME( 1997, wcbwl140, wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",        "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
+GAME( 1997, wcbwl140, wcbowldx, tourny,   wcbowldx, wcbowlt,  ROT0, "Incredible Technologies",        "World Class Bowling Tournament (v1.40)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible Technologies",        "World Class Bowling Deluxe (v2.00)" , 0) /* PIC 16C54 labeled as ITBWL-4 */
 
 /*
@@ -3969,7 +3969,7 @@ GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible 
         Sound P/N 1078 Rev 1 or P/N 1066 Rev 2
     n = Non-tournament (AAMA 676266+) PCB P/N 1082 Rev 2 - Applies only for GT3D
     t = Tournament PCB P/N 1082 Rev 2, with necessary chips on board:
-        Philips SCN68681 (DUART) & ST Timekeeper (M48T02-120PC1)
+        Philips SCN68681 (DUART) & ST Timekeeper (M48T02-120PC1) with an additional 3.6864MHz OSC
 
     NOTE: Due to various different upgrade packages from IT, the 3 tier boards can end up with any combination
         of rom boards and sound boards.  For historical reasons, GTG3 3 tier S versions will use the oldest
@@ -4009,8 +4009,8 @@ GAME( 1997, gt97v122, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Tech
 GAME( 1997, gt97v121, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.21)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 GAME( 1997, gt97s121, gt97,     sftm,    gt97s, s_ver,    ROT0, "Incredible Technologies", "Golden Tee '97 (v1.21S)" , 0) /* PIC 16C54 labeled as ITGFM-3 */
 GAME( 1997, gt97v120, gt97,     sftm,    gt97o, aama,     ROT0, "Incredible Technologies", "Golden Tee '97 (v1.20)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
-GAME( 1997, gt97t240, gt97,     tourny,  gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.40)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 GAME( 1997, gt97t243, gt97,     tourny,  gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.43)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
+GAME( 1997, gt97t240, gt97,     tourny,  gt97o, aamat,    ROT0, "Incredible Technologies", "Golden Tee '97 Tournament (v2.40)" , 0) /* PIC 16C54 labeled as ITGFS-3 */
 
 GAME( 1998, gt98,     0,        sftm,    aama,  aama,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.10)" , 0) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98v100, gt98,     sftm,    gt98,  aama,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00)" , 0) /* PIC 16C54 labeled as ITGF98 */
