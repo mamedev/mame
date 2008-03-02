@@ -56,21 +56,22 @@ and 1 SFX channel controlled by an 8039:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
 
-void konami1_decode_cpu2(void);
+extern UINT8 *gyruss_videoram;
+extern UINT8 *gyruss_colorram;
+extern UINT8 *gyruss_spriteram;
+extern UINT8 *gyruss_flipscreen;
 
-WRITE8_HANDLER( gyruss_flipscreen_w );
+void konami1_decode_cpu2(void);
+WRITE8_HANDLER( gyruss_spriteram_w );
 READ8_HANDLER( gyruss_scanline_r );
 VIDEO_START( gyruss );
 PALETTE_INIT( gyruss );
 VIDEO_UPDATE( gyruss );
-INTERRUPT_GEN( gyruss_6809_interrupt );
-
 
 READ8_HANDLER( gyruss_portA_r );
 WRITE8_HANDLER( gyruss_filter0_w );
@@ -79,99 +80,69 @@ WRITE8_HANDLER( gyruss_sh_irqtrigger_w );
 WRITE8_HANDLER( gyruss_i8039_irq_w );
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x9fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_4_r)	/* DSW1 */
-	AM_RANGE(0xc080, 0xc080) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0xc0a0, 0xc0a0) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0xc0c0, 0xc0c0) AM_READ(input_port_2_r)	/* IN2 */
-	AM_RANGE(0xc0e0, 0xc0e0) AM_READ(input_port_3_r)	/* DSW0 */
-	AM_RANGE(0xc100, 0xc100) AM_READ(input_port_5_r)	/* DSW2 */
+static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&gyruss_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&gyruss_videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(input_port_4_r, MWA8_NOP)	/* watchdog reset */
+	AM_RANGE(0xc080, 0xc080) AM_READWRITE(input_port_0_r, gyruss_sh_irqtrigger_w)
+	AM_RANGE(0xc0a0, 0xc0a0) AM_READ(input_port_1_r)
+	AM_RANGE(0xc0c0, 0xc0c0) AM_READ(input_port_2_r)
+	AM_RANGE(0xc0e0, 0xc0e0) AM_READ(input_port_3_r)
+	AM_RANGE(0xc100, 0xc100) AM_READWRITE(input_port_5_r, soundlatch_w)
+	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0xc185, 0xc185) AM_WRITE(MWA8_RAM) AM_BASE(&gyruss_flipscreen)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)                 /* rom space+1        */
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(MWA8_NOP)	/* watchdog reset */
-	AM_RANGE(0xc080, 0xc080) AM_WRITE(gyruss_sh_irqtrigger_w)
-	AM_RANGE(0xc100, 0xc100) AM_WRITE(soundlatch_w)         /* command to soundb  */
-	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)      /* NMI enable         */
-	AM_RANGE(0xc185, 0xc185) AM_WRITE(gyruss_flipscreen_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m6809_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m6809_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4040, 0x40ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x403f) AM_RAM
+	AM_RANGE(0x4040, 0x40ff) AM_READWRITE(MRA8_RAM, gyruss_spriteram_w) AM_BASE(&gyruss_spriteram)
+	AM_RANGE(0x4100, 0x47ff) AM_RAM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)                 /* rom soundboard     */
-	AM_RANGE(0x6000, 0x63ff) AM_READ(MRA8_RAM)                 /* ram soundboard     */
+static ADDRESS_MAP_START( audio_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)                 /* rom soundboard     */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(MWA8_RAM)                 /* ram soundboard     */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-  	AM_RANGE(0x05, 0x05) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0x09, 0x09) AM_READ(AY8910_read_port_2_r)
-  	AM_RANGE(0x0d, 0x0d) AM_READ(AY8910_read_port_3_r)
-  	AM_RANGE(0x11, 0x11) AM_READ(AY8910_read_port_4_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_cpu1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_1_w)
+  	AM_RANGE(0x05, 0x05) AM_READ(AY8910_read_port_1_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_2_w)
+	AM_RANGE(0x09, 0x09) AM_READ(AY8910_read_port_2_r)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(AY8910_write_port_2_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(AY8910_control_port_3_w)
+  	AM_RANGE(0x0d, 0x0d) AM_READ(AY8910_read_port_3_r)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(AY8910_write_port_3_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_4_w)
+  	AM_RANGE(0x11, 0x11) AM_READ(AY8910_read_port_4_r)
 	AM_RANGE(0x12, 0x12) AM_WRITE(AY8910_write_port_4_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( audio_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(MWA8_NOP)
 ADDRESS_MAP_END
+
 
 #define GYRUSS_COMMON\
 	PORT_START_TAG("IN0")\
@@ -235,7 +206,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
 static INPUT_PORTS_START( gyruss )
-GYRUSS_COMMON
+	GYRUSS_COMMON
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -272,7 +243,7 @@ INPUT_PORTS_END
 /* This is identical to gyruss except for the bonus that has different
    values */
 static INPUT_PORTS_START( gyrussce )
-GYRUSS_COMMON
+	GYRUSS_COMMON
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -317,6 +288,7 @@ static const gfx_layout charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	16*8	/* every char takes 16 consecutive bytes */
 };
+
 static const gfx_layout spritelayout =
 {
 	8,16,	/* 8*16 sprites */
@@ -330,13 +302,11 @@ static const gfx_layout spritelayout =
 };
 
 
-
 static GFXDECODE_START( gyruss )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, spritelayout, 0, 16 )	/* upper half */
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0010, spritelayout, 0, 16 )	/* lower half */
 	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, charlayout,   16*16, 16 )
 GFXDECODE_END
-
 
 
 static const struct AY8910interface ay8910_interface_1 =
@@ -366,22 +336,22 @@ static MACHINE_DRIVER_START( gyruss )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6809, 2000000)        /* 2 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(m6809_readmem,m6809_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(gyruss_6809_interrupt,256)
+	MDRV_CPU_PROGRAM_MAP(main_cpu2_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,14318180/4)
 	/* audio CPU */	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(audio_cpu1_map,0)
+	MDRV_CPU_IO_MAP(audio_cpu1_io_map,0)
 
 	MDRV_CPU_ADD(I8039,8000000)
 	/* audio CPU */	/* 8MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
+	MDRV_CPU_PROGRAM_MAP(audio_cpu2_map,0)
+	MDRV_CPU_IO_MAP(audio_cpu2_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
