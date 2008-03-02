@@ -10,8 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "cheat.h"
 #include "profiler.h"
 
 

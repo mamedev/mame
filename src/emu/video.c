@@ -9,16 +9,13 @@
 
 ***************************************************************************/
 
-#include "osdepend.h"
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "png.h"
 #include "debugger.h"
-#include "render.h"
 #include "rendutil.h"
 #include "ui.h"
-#include "deprecat.h"
-#include "video/vector.h"
 
 #include "snap.lh"
 
