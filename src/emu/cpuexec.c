@@ -13,11 +13,7 @@
 #include "deprecat.h"
 #include "cheat.h"
 #include "profiler.h"
-#include "debugger.h"
 
-#ifdef ENABLE_DEBUGGER
-#include "debug/debugcpu.h"
-#endif
 
 
 
