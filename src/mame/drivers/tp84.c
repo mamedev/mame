@@ -4,23 +4,6 @@ Time Pilot 84  (c) 1984 Konami
 
 driver by Marc Lafontaine
 
-TODO:
-- the slave CPU multiplexes sprites. We are cheating now, and reading them
-  from somewhere else.
-
-
-The schematics are available on the net.
-
-There is 3 CPU for this game.
- Two 68A09E for the game.
- A Z80A for the sound
-
-As I understand it, the second 6809 is for displaying
- the sprites. If we do not emulate him, all work well, except
- that the player cannot die.
- Address 57ff must read 0 to pass the RAM test if the second CPU
- is not emulated.
-
 
 ---- Master 6809 ------
 
@@ -57,7 +40,7 @@ Read/Write
 
 ------ Slave 6809 --------
  0000-1fff SAFR Watch dog ?
- 2000      seem to be the beam position (if always 0, no player collision is detected)
+ 2000      beam position
  4000      enable or reset IRQ
  6000-67ff DRA
  8000-87ff Ram (Common for the Master and Slave 6809)
@@ -87,24 +70,23 @@ C004      76489 #4 trigger
 #include "sound/flt_rc.h"
 
 
-extern UINT8 *tp84_videoram2, *tp84_colorram2;
+extern UINT8 *tp84_bg_videoram;
+extern UINT8 *tp84_bg_colorram;
+extern UINT8 *tp84_fg_videoram;
+extern UINT8 *tp84_fg_colorram;
+extern UINT8 *tp84_spriteram;
+extern UINT8 *tp84_scroll_x;
+extern UINT8 *tp84_scroll_y;
+extern UINT8 *tp84_palette_bank;
+extern UINT8 *tp84_flipscreen_x;
+extern UINT8 *tp84_flipscreen_y;
 
-WRITE8_HANDLER( tp84_videoram_w );
-WRITE8_HANDLER( tp84_colorram_w );
-WRITE8_HANDLER( tp84_videoram2_w );
-WRITE8_HANDLER( tp84_colorram2_w );
-WRITE8_HANDLER( tp84_scroll_x_w );
-WRITE8_HANDLER( tp84_scroll_y_w );
-WRITE8_HANDLER( tp84_flipscreen_x_w );
-WRITE8_HANDLER( tp84_flipscreen_y_w );
-WRITE8_HANDLER( tp84_col0_w );
+WRITE8_HANDLER( tp84_spriteram_w );
 READ8_HANDLER( tp84_scanline_r );
 
 PALETTE_INIT( tp84 );
 VIDEO_START( tp84 );
 VIDEO_UPDATE( tp84 );
-
-INTERRUPT_GEN( tp84_6809_interrupt );
 
 
 
@@ -116,6 +98,7 @@ static READ8_HANDLER( tp84_sh_timer_r )
 	/* incremented every other state change of the clock) */
 	return (activecpu_gettotalcycles() / (2048/2)) & 0x0f;
 }
+
 
 static WRITE8_HANDLER( tp84_filter_w )
 {
@@ -151,89 +134,65 @@ static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 
 
 
-/* CPU 1 read addresses */
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2800, 0x2800) AM_READ(input_port_0_r)
+static ADDRESS_MAP_START( tp84_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2800, 0x2800) AM_READWRITE(input_port_0_r, MWA8_RAM) AM_BASE(&tp84_palette_bank)
 	AM_RANGE(0x2820, 0x2820) AM_READ(input_port_1_r)
 	AM_RANGE(0x2840, 0x2840) AM_READ(input_port_2_r)
 	AM_RANGE(0x2860, 0x2860) AM_READ(input_port_3_r)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_4_r)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x5000, 0x57ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-/* CPU 1 write addresses */
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(tp84_col0_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(tp84_flipscreen_x_w)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(tp84_flipscreen_y_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(input_port_4_r, MWA8_RAM)
+	AM_RANGE(0x3004, 0x3004) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_flipscreen_x)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_flipscreen_y)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(tp84_scroll_x_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(tp84_scroll_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(tp84_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(tp84_videoram2_w) AM_BASE(&tp84_videoram2)
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tp84_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tp84_colorram2_w) AM_BASE(&tp84_colorram2)
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_scroll_x)
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_scroll_y)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&tp84_bg_videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE(&tp84_fg_videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_BASE(&tp84_bg_colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM AM_BASE(&tp84_fg_colorram)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tp84b_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_WRITE(tp84_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(tp84_videoram2_w) AM_BASE(&tp84_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(tp84_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(tp84_colorram2_w) AM_BASE(&tp84_colorram2)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&tp84_bg_videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE(&tp84_fg_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE(&tp84_bg_colorram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE(&tp84_fg_colorram)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_READWRITE(input_port_0_r, tp84_col0_w)
+	AM_RANGE(0x1a00, 0x1a00) AM_READWRITE(input_port_0_r, MWA8_RAM) AM_BASE(&tp84_palette_bank)
 	AM_RANGE(0x1a20, 0x1a20) AM_READ(input_port_1_r)
 	AM_RANGE(0x1a40, 0x1a40) AM_READ(input_port_2_r)
 	AM_RANGE(0x1a60, 0x1a60) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c00, 0x1c00) AM_READWRITE(input_port_4_r, MWA8_NOP)
-	AM_RANGE(0x1c04, 0x1c04) AM_WRITE(tp84_flipscreen_x_w)
-	AM_RANGE(0x1c05, 0x1c05) AM_WRITE(tp84_flipscreen_y_w)
+	AM_RANGE(0x1c04, 0x1c04) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_flipscreen_x)
+	AM_RANGE(0x1c05, 0x1c05) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_flipscreen_y)
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x1e80, 0x1e80) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(tp84_scroll_x_w)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(tp84_scroll_y_w)
+	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_scroll_x)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(MWA8_RAM) AM_BASE(&tp84_scroll_y)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-/* CPU 2 read addresses */
-static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000, 0x0000) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+//  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
-	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-/* CPU 2 write addresses */
-static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000, 0x0000) AM_WRITE(MWA8_RAM) /* Watch dog ?*/
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w) /* IRQ enable */
-	AM_RANGE(0x6000, 0x679f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x67a0, 0x67ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* REAL (multiplexed) */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x6000, 0x679f) AM_RAM
+	AM_RANGE(0x67a0, 0x67ff) AM_READWRITE(MRA8_RAM, tp84_spriteram_w) AM_BASE(&tp84_spriteram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(tp84_sh_timer_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(tp84_filter_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(MWA8_NOP)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(SN76496_0_w)
@@ -436,6 +395,7 @@ static const gfx_layout charlayout =
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	16*8
 };
+
 static const gfx_layout spritelayout =
 {
 	16,16,
@@ -460,20 +420,19 @@ static MACHINE_DRIVER_START( tp84 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
-	MDRV_CPU_VBLANK_INT_HACK(tp84_6809_interrupt,256)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -489,7 +448,7 @@ static MACHINE_DRIVER_START( tp84 )
 	MDRV_VIDEO_START(tp84)
 	MDRV_VIDEO_UPDATE(tp84)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
@@ -611,6 +570,6 @@ ROM_START( tp84b )
 ROM_END
 
 
-GAME( 1984, tp84,  0,    tp84,  tp84, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", 0 )
-GAME( 1984, tp84a, tp84, tp84,  tp84a,0, ROT90, "Konami", "Time Pilot '84 (set 2)", 0 )
-GAME( 1984, tp84b, tp84, tp84b, tp84, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", 0 )
+GAME( 1984, tp84,  0,    tp84,  tp84, 0, ROT90, "Konami", "Time Pilot '84 (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1984, tp84a, tp84, tp84,  tp84a,0, ROT90, "Konami", "Time Pilot '84 (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1984, tp84b, tp84, tp84b, tp84, 0, ROT90, "Konami", "Time Pilot '84 (set 3)", GAME_SUPPORTS_SAVE )

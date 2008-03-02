@@ -366,7 +366,6 @@
 /* Macros for setting tile attributes in the TILE_GET_INFO callback: */
 /*   TILE_FLIP_YX assumes that flipy is in bit 1 and flipx is in bit 0 */
 /*   TILE_FLIP_XY assumes that flipy is in bit 0 and flipx is in bit 1 */
-/*   TILE_GROUP shifts a split group number appropriately to OR into the tile flags */
 #define TILE_FLIPYX(YX)					((YX) & 3)
 #define TILE_FLIPXY(XY)					((((XY) & 2) >> 1) | (((XY) & 1) << 1))
 
