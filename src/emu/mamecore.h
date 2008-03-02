@@ -180,15 +180,6 @@ typedef union
 #define DEGREE_TO_RADIAN(x)   ((M_PI / 180.0) * (x))
 
 
-/* U64 and S64 are used to wrap long integer constants. */
-#ifdef __GNUC__
-#define U64(val) val##ULL
-#define S64(val) val##LL
-#else
-#define U64(val) val
-#define S64(val) val
-#endif
-
 
 /* Useful macros to deal with bit shuffling encryptions */
 #define BIT(x,n) (((x)>>(n))&1)

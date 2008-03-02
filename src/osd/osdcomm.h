@@ -39,9 +39,12 @@
 #define ATTR_MALLOC				__attribute__((malloc))
 #define ATTR_PURE				__attribute__((pure))
 #define ATTR_CONST				__attribute__((const))
+#define ATTR_FORCE_INLINE		__attribute__((always_inline))
+#define ATTR_NONNULL			__attribute__((nonnull(1)))
 #define UNEXPECTED(exp)			__builtin_expect((exp), 0)
 #define TYPES_COMPATIBLE(a,b)	__builtin_types_compatible_p(a, b)
 #define RESTRICT				__restrict__
+#define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
 #else
 #define ATTR_UNUSED
 #define ATTR_NORETURN
@@ -49,9 +52,12 @@
 #define ATTR_MALLOC
 #define ATTR_PURE
 #define ATTR_CONST
+#define ATTR_FORCE_INLINE
+#define ATTR_NONNULL
 #define UNEXPECTED(exp)			(exp)
 #define TYPES_COMPATIBLE(a,b)	1
 #define RESTRICT
+#define SETJMP_GNUC_PROTECT()	do {} while (0)
 #endif
 
 
@@ -127,6 +133,16 @@ __extension__ typedef signed long long		INT64;
 #endif
 #ifndef MAX
 #define MAX(x,y)			((x) > (y) ? (x) : (y))
+#endif
+
+
+/* U64 and S64 are used to wrap long integer constants. */
+#ifdef __GNUC__
+#define U64(val) val##ULL
+#define S64(val) val##LL
+#else
+#define U64(val) val
+#define S64(val) val
 #endif
 
 

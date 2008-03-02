@@ -33,7 +33,7 @@
 
 #ifndef __x86_64__
 #define mul_32x32 _mul_32x32
-INLINE INT64 __attribute__((const, always_inline))
+INLINE INT64 ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32(INT32 a, INT32 b)
 {
 	register INT64 result;
@@ -59,7 +59,7 @@ _mul_32x32(INT32 a, INT32 b)
 
 #ifndef __x86_64__
 #define mulu_32x32 _mulu_32x32
-INLINE UINT64 __attribute__((const, always_inline))
+INLINE UINT64 ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32(UINT32 a, UINT32 b)
 {
 	register UINT64 result;
@@ -84,7 +84,7 @@ _mulu_32x32(UINT32 a, UINT32 b)
 -------------------------------------------------*/
 
 #define mul_32x32_hi _mul_32x32_hi
-INLINE INT32 __attribute__((const, always_inline))
+INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_hi(INT32 a, INT32 b)
 {
     register INT32 result, temp;
@@ -109,7 +109,7 @@ _mul_32x32_hi(INT32 a, INT32 b)
 -------------------------------------------------*/
 
 #define mulu_32x32_hi _mulu_32x32_hi
-INLINE UINT32 __attribute__((const, always_inline))
+INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_hi(UINT32 a, UINT32 b)
 {
     register UINT32 result, temp;
@@ -136,7 +136,7 @@ _mulu_32x32_hi(UINT32 a, UINT32 b)
 
 #ifndef __x86_64__
 #define mul_32x32_shift _mul_32x32_shift
-INLINE INT32 __attribute__((const, always_inline))
+INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	register INT32 result;
@@ -166,7 +166,7 @@ _mul_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mulu_32x32_shift _mulu_32x32_shift
-INLINE UINT32 __attribute__((const, always_inline))
+INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	register UINT32 result;
@@ -194,7 +194,7 @@ _mulu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define div_64x32 _div_64x32
-INLINE INT32 __attribute__((const, always_inline))
+INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _div_64x32(INT64 a, INT32 b)
 {
 	register INT32 result, temp;
@@ -221,7 +221,7 @@ _div_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define divu_64x32 _divu_64x32
-INLINE UINT32 __attribute__((const, always_inline))
+INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _divu_64x32(UINT64 a, UINT32 b)
 {
 	register UINT32 result, temp;
@@ -249,7 +249,7 @@ _divu_64x32(UINT64 a, UINT32 b)
 
 #ifndef __x86_64__
 #define div_64x32_rem _div_64x32_rem
-INLINE INT32 __attribute__((always_inline))
+INLINE INT32 ATTR_FORCE_INLINE
 _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
 {
 	register INT32 quotient;
@@ -277,7 +277,7 @@ _div_64x32_rem(INT64 dividend, INT32 divisor, INT32 *remainder)
 
 #ifndef __x86_64__
 #define divu_64x32_rem _divu_64x32_rem
-INLINE UINT32 __attribute__((always_inline))
+INLINE UINT32 ATTR_FORCE_INLINE
 _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 {
 	register UINT32 quotient;
@@ -305,7 +305,7 @@ _divu_64x32_rem(UINT64 dividend, UINT32 divisor, UINT32 *remainder)
 
 #ifndef __x86_64__
 #define div_32x32_shift _div_32x32_shift
-INLINE INT32 __attribute__((const, always_inline))
+INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 {
 	register INT32 result;
@@ -337,7 +337,7 @@ _div_32x32_shift(INT32 a, INT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define divu_32x32_shift _divu_32x32_shift
-INLINE UINT32 __attribute__((const, always_inline))
+INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 {
 	register INT32 result;
@@ -368,7 +368,7 @@ _divu_32x32_shift(UINT32 a, UINT32 b, UINT8 shift)
 
 #ifndef __x86_64__
 #define mod_64x32 _mod_64x32
-INLINE INT32 __attribute__((const, always_inline))
+INLINE INT32 ATTR_CONST ATTR_FORCE_INLINE
 _mod_64x32(INT64 a, INT32 b)
 {
 	register INT32 result, temp;
@@ -395,7 +395,7 @@ _mod_64x32(INT64 a, INT32 b)
 
 #ifndef __x86_64__
 #define modu_64x32 _modu_64x32
-INLINE UINT32 __attribute__((const, always_inline))
+INLINE UINT32 ATTR_CONST ATTR_FORCE_INLINE
 _modu_64x32(UINT64 a, UINT32 b)
 {
 	register UINT32 result, temp;
@@ -422,7 +422,7 @@ _modu_64x32(UINT64 a, UINT32 b)
 
 #ifdef __SSE2__
 #define recip_approx _recip_approx
-INLINE float __attribute__((const))
+INLINE float ATTR_CONST
 _recip_approx(float value)
 {
 	__m128 value_xmm = _mm_set_ss(value);
@@ -445,7 +445,7 @@ _recip_approx(float value)
 -------------------------------------------------*/
 
 #define count_leading_zeros _count_leading_zeros
-INLINE UINT8 __attribute__((const, always_inline))
+INLINE UINT8 ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_zeros(UINT32 value)
 {
 	register UINT32 result;
@@ -470,7 +470,7 @@ _count_leading_zeros(UINT32 value)
 -------------------------------------------------*/
 
 #define count_leading_ones _count_leading_ones
-INLINE UINT8 __attribute__((const, always_inline))
+INLINE UINT8 ATTR_CONST ATTR_FORCE_INLINE
 _count_leading_ones(UINT32 value)
 {
 	register UINT32 result;
@@ -504,7 +504,7 @@ _count_leading_ones(UINT32 value)
 -------------------------------------------------*/
 
 #define compare_exchange32 _compare_exchange32
-INLINE INT32 __attribute__((nonnull(1), always_inline))
+INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	register INT32 result;
@@ -531,7 +531,7 @@ _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 
 #ifdef __x86_64__
 #define compare_exchange64 _compare_exchange64
-INLINE INT64 __attribute__((nonnull(1), always_inline))
+INLINE INT64 ATTR_NONNULL ATTR_FORCE_INLINE
 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	register INT64 result;
@@ -557,7 +557,7 @@ _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 -------------------------------------------------*/
 
 #define atomic_exchange32 _atomic_exchange32
-INLINE INT32 __attribute__((nonnull(1), always_inline))
+INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	register INT32 result;
@@ -580,7 +580,7 @@ _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 -------------------------------------------------*/
 
 #define atomic_add32 _atomic_add32
-INLINE INT32 __attribute__((nonnull(1), always_inline))
+INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result = delta;
@@ -604,7 +604,7 @@ _atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 __attribute__((nonnull(1), always_inline))
+INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
 _atomic_increment32(INT32 volatile *ptr)
 {
 	register INT32 result = 1;
@@ -628,7 +628,7 @@ _atomic_increment32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 __attribute__((nonnull(1), always_inline))
+INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
 _atomic_decrement32(INT32 volatile *ptr)
 {
 	register INT32 result = -1;

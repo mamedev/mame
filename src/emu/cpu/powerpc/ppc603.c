@@ -247,10 +247,8 @@ static int ppc603_execute(int cycles)
 
 	change_pc(ppc.npc);
 
-#ifdef __GNUC__
 	// MinGW's optimizer kills setjmp()/longjmp()
-	(void)__builtin_return_address(1);
-#endif
+	SETJMP_GNUC_PROTECT();
 
 	exception_type = setjmp(ppc.exception_jmpbuf);
 	if (exception_type)
