@@ -105,11 +105,6 @@ static emu_timer *interleave_boost_timer;
 static emu_timer *interleave_boost_timer_end;
 static attotime perfect_interleave;
 
-/* watchdog state */
-static UINT8 watchdog_enabled;
-static INT32 watchdog_counter;
-static emu_timer *watchdog_timer;
-
 
 
 /***************************************************************************
@@ -195,12 +190,6 @@ void cpuexec_init(running_machine *machine)
 
 	/* compute the perfect interleave factor */
 	compute_perfect_interleave(machine);
-
-	/* save some stuff in the default tag */
-	state_save_push_tag(0);
-	state_save_register_item("cpu", 0, watchdog_enabled);
-	state_save_register_item("cpu", 0, watchdog_counter);
-	state_save_pop_tag();
 }
 
 
@@ -215,11 +204,6 @@ static void cpuexec_reset(running_machine *machine)
 
 	/* initialize the various timers (suspends all CPUs at startup) */
 	cpu_inittimers(machine);
-
-	/* set up the watchdog timer; only start off enabled if explicitly configured */
-	watchdog_enabled = (machine->config->watchdog_vblank_count != 0 || attotime_compare(machine->config->watchdog_time, attotime_zero) != 0);
-	watchdog_reset(machine);
-	watchdog_enabled = TRUE;
 
 	/* first pass over CPUs */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -754,61 +738,6 @@ void cpu_triggerint(running_machine *machine, int cpunum)
 
 
 /***************************************************************************
-    WATCHDOG TIMERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    watchdog_callback - watchdog timer callback
--------------------------------------------------*/
-
-static TIMER_CALLBACK( watchdog_callback )
-{
-	logerror("reset caused by the watchdog\n");
-	mame_schedule_soft_reset(machine);
-}
-
-
-/*-------------------------------------------------
-    watchdog_reset - reset the watchdog timer
--------------------------------------------------*/
-
-void watchdog_reset(running_machine *machine)
-{
-	/* if we're not enabled, skip it */
-	if (!watchdog_enabled)
-		timer_adjust_oneshot(watchdog_timer, attotime_never, 0);
-
-	/* VBLANK-based watchdog? */
-	else if (machine->config->watchdog_vblank_count != 0)
-		watchdog_counter = machine->config->watchdog_vblank_count;
-
-	/* timer-based watchdog? */
-	else if (attotime_compare(machine->config->watchdog_time, attotime_zero) != 0)
-		timer_adjust_oneshot(watchdog_timer, machine->config->watchdog_time, 0);
-
-	/* default to an obscene amount of time (3 seconds) */
-	else
-		timer_adjust_oneshot(watchdog_timer, ATTOTIME_IN_SEC(3), 0);
-}
-
-
-/*-------------------------------------------------
-    watchdog_enable - reset the watchdog timer
--------------------------------------------------*/
-
-void watchdog_enable(running_machine *machine, int enable)
-{
-	/* when re-enabled, we reset our state */
-	if (watchdog_enabled != enable)
-	{
-		watchdog_enabled = enable;
-		watchdog_reset(machine);
-	}
-}
-
-
-
-/***************************************************************************
     CHEESY FAKE VIDEO TIMING
 ***************************************************************************/
 
@@ -852,28 +781,11 @@ int cpu_getiloops(void)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    on_global_vblank - performs VBLANK related
-    housekeeping
+    on_vblank - calls any external callbacks
+    for this screen
 -------------------------------------------------*/
 
-static void on_global_vblank(running_machine *machine, screen_state *screen, int vblank_state)
-{
-	/* VBLANK starting */
-	if (vblank_state)
-	{
-		/* check the watchdog */
-		if (machine->config->watchdog_vblank_count != 0 && --watchdog_counter == 0)
-			watchdog_callback(machine, NULL, 0);
-	}
-}
-
-
-/*-------------------------------------------------
-    on_per_screen_vblank - calls any external
-    callbacks for this screen
--------------------------------------------------*/
-
-static void on_per_screen_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state)
@@ -1044,9 +956,6 @@ static void cpu_inittimers(running_machine *machine)
 	attoseconds_t refresh_attosecs;
 	int cpunum, ipf;
 
-	/* allocate a timer for the watchdog */
-	watchdog_timer = timer_alloc(watchdog_callback, NULL);
-
 	/* allocate a dummy timer at the minimum frequency to break things up */
 	ipf = machine->config->cpu_slices_per_frame;
 	if (ipf <= 0)
@@ -1060,11 +969,12 @@ static void cpu_inittimers(running_machine *machine)
 	interleave_boost_timer = timer_alloc(NULL, NULL);
 	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 
-	/* register the screen specific VBLANK callbacks */
+	/* register the interrupt handercallbacks */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
 		const cpu_config *config = machine->config->cpu + cpunum;
 
+		/* screen specific VBLANK callbacks */
 		if (config->vblank_interrupts_per_frame > 0)
 		{
 			const char *screen_tag;
@@ -1087,21 +997,13 @@ static void cpu_inittimers(running_machine *machine)
 			}
 
 			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
-			video_screen_register_vbl_cb(machine, screen, on_per_screen_vblank);
+			video_screen_register_vbl_cb(machine, screen, on_vblank);
 		}
-	}
 
-	/* register the global VBLANK callback -- it's important to do it after the
-       screen specific ones */
-	video_screen_register_vbl_cb(machine, NULL, on_global_vblank);
-
-	/* start the CPU periodic interrupt timers */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-	{
-		/* see if we need to allocate a CPU timer */
-		if (machine->config->cpu[cpunum].timed_interrupt_period != 0)
+		/* periodic interrupt timer */
+		if (config->timed_interrupt_period != 0)
 		{
-			attotime timedint_period = attotime_make(0, machine->config->cpu[cpunum].timed_interrupt_period);
+			attotime timedint_period = attotime_make(0, config->timed_interrupt_period);
 			cpu[cpunum].timedint_timer = timer_alloc(cpu_timedintcallback, NULL);
 			timer_adjust_periodic(cpu[cpunum].timedint_timer, timedint_period, cpunum, timedint_period);
 		}

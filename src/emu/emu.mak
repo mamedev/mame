@@ -77,6 +77,7 @@ EMUOBJS = \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
+	$(EMUOBJ)/watchdog.o
 
 ifdef PROFILER
 EMUOBJS += \

@@ -16,6 +16,7 @@
 
 #include "cpuint.h"
 #include "cpuexec.h"
+#include "watchdog.h"
 #include "mame.h"
 #include "state.h"
 

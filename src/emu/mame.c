@@ -46,11 +46,12 @@
                 - calls rom_init() [romload.c] to load the game's ROMs
                 - calls memory_init() [memory.c] to process the game's memory maps
                 - calls cpuexec_init() [cpuexec.c] to initialize the CPUs
+                - calls watchdog_init() [watchdog.c] to initialize the watchdog system
                 - calls cpuint_init() [cpuint.c] to initialize the CPU interrupts
-                - calls mame_debug_init() [debugcpu.c] to set up the debugger
                 - calls the driver's DRIVER_INIT callback
                 - calls video_init() [video.c] to start the video system
                 - calls sound_init() [sound.c] to start the audio system
+                - calls mame_debug_init() [debugcpu.c] to set up the debugger
                 - calls the driver's MACHINE_START, SOUND_START, and VIDEO_START callbacks
                 - disposes of regions marked as disposable
                 - calls saveload_init() [mame.c] to set up for save/load
@@ -1566,6 +1567,7 @@ static void init_machine(running_machine *machine)
 	rom_init(machine, machine->gamedrv->rom);
 	memory_init(machine);
 	cpuexec_init(machine);
+	watchdog_init(machine);
 	cpuint_init(machine);
 
 #ifdef MESS

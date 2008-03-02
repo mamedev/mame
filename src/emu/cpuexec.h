@@ -371,14 +371,4 @@ void cpu_triggerint(running_machine *machine, int cpunum);
 
 
 
-/* ----- watchdog timers ----- */
-
-/* reset the watchdog */
-void watchdog_reset(running_machine *machine);
-
-/* enable/disable the watchdog */
-void watchdog_enable(running_machine *machine, int enable);
-
-
-
 #endif	/* __CPUEXEC_H__ */
