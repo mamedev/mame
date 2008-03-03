@@ -397,6 +397,8 @@ static VIDEO_UPDATE( stactics )
 	draw_background(state, bitmap, cliprect);
 	update_artwork(state);
 
+	state->frame_count = (state->frame_count + 1) & 0x0f;
+
 	return 0;
 }
 
