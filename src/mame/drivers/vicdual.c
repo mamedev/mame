@@ -93,7 +93,7 @@ static CUSTOM_INPUT( vicdual_read_coin_status )
 		coin_counter_w(0, 1);
 		coin_counter_w(0, 0);
 
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
 		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(0))), NULL, 0, clear_coin_status);
@@ -136,9 +136,7 @@ static int get_vcounter(void)
 	/* the vertical synch counter gets incremented at the end of HSYNC,
        compensate for this */
 	if (video_screen_get_hpos(0) >= VICDUAL_HSEND)
-	{
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
-	}
 
 	return vcounter;
 }
@@ -158,7 +156,7 @@ static CUSTOM_INPUT( vicdual_get_vblank_comp )
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(0) && !video_screen_get_hblank(0));
+	return (vicdual_get_vblank_comp(machine, 0) && !video_screen_get_hblank(0));
 }
 
 
@@ -174,7 +172,6 @@ static CUSTOM_INPUT( vicdual_get_timer_value )
 	if (!timer_started)
 	{
 		timer_started = 1;
-
 		timer_pulse(TIMER_HALF_PERIOD, NULL, 0, vicdual_timer_callback);
 	}
 
@@ -193,9 +190,7 @@ static CUSTOM_INPUT( vicdual_get_timer_value )
 
 int vicdual_is_cabinet_color(void)
 {
-	UINT32 input = readinputportbytag(COLOR_BW_PORT_TAG);
-
-	return (input == 0);
+	return (readinputportbytag(COLOR_BW_PORT_TAG) == 0);
 }
 
 
@@ -220,8 +215,7 @@ static UINT8 *vicdual_characterram;
 
 static WRITE8_HANDLER( vicdual_videoram_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-
+	video_screen_update_now(0);
 	vicdual_videoram[offset] = data;
 }
 
@@ -234,7 +228,7 @@ UINT8 vicdual_videoram_r(offs_t offset)
 
 static WRITE8_HANDLER( vicdual_characterram_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_now(0);
 
 	vicdual_characterram[offset] = data;
 }
@@ -278,7 +272,6 @@ static READ8_HANDLER( depthch_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x08)  ret = input_port_1_r(0);
 
 	return ret;
@@ -288,7 +281,6 @@ static READ8_HANDLER( depthch_io_r )
 static WRITE8_HANDLER( depthch_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x04)  depthch_audio_w(0, data);
 }
 
@@ -362,7 +354,6 @@ static READ8_HANDLER( safari_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x08)  ret = input_port_1_r(0);
 
 	return ret;
@@ -372,7 +363,6 @@ static READ8_HANDLER( safari_io_r )
 static WRITE8_HANDLER( safari_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  /* safari_audio_w(0, data) */;
 }
 
@@ -448,7 +438,6 @@ static READ8_HANDLER( frogs_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x08)  ret = input_port_1_r(0);
 
 	return ret;
@@ -458,7 +447,6 @@ static READ8_HANDLER( frogs_io_r )
 static WRITE8_HANDLER( frogs_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  frogs_audio_w(0, data);
 }
 
@@ -558,7 +546,6 @@ static READ8_HANDLER( headon_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x08)  ret = input_port_1_r(0);
 
 	return ret;
@@ -570,9 +557,7 @@ static READ8_HANDLER( sspaceat_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x04)  ret = input_port_1_r(0);
-
 	if (offset & 0x08)  ret = input_port_2_r(0);
 
 	return ret;
@@ -582,9 +567,7 @@ static READ8_HANDLER( sspaceat_io_r )
 static WRITE8_HANDLER( headon_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  headon_audio_w(0, data);
-
 	if (offset & 0x04)  /* vicdual_palette_bank_w(0, data)  */;	 /* not written to */
 }
 
@@ -763,13 +746,9 @@ static READ8_HANDLER( headon2_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
  	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-
 	if (offset & 0x04)  ret = input_port_1_r(0);
-
 	if (offset & 0x08)  ret = input_port_2_r(0);
-
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;
@@ -779,15 +758,10 @@ static READ8_HANDLER( headon2_io_r )
 static WRITE8_HANDLER( headon2_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  headon_audio_w(0, data);
-
 	if (offset & 0x04)  vicdual_palette_bank_w(0, data);
-
     if (offset & 0x08)  ;/* schematics show this as going into a shifer circuit, but never written to */
-
     if (offset & 0x10)  ;/* schematics show this as going to an edge connector, but never written to */
-
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
 
@@ -795,9 +769,7 @@ static WRITE8_HANDLER( headon2_io_w )
 static WRITE8_HANDLER( digger_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  /* digger_audio_1_w(0, data) */;
-
 	if (offset & 0x04)
 	{
 		vicdual_palette_bank_w(0, data & 0x03);
@@ -805,9 +777,7 @@ static WRITE8_HANDLER( digger_io_w )
 	}
 
     if (offset & 0x08)  ;/* schematics show this as going into a shifer circuit, but never written to */
-
     if (offset & 0x10)  ;/* schematics show this as going to an edge connector, but never written to */
-
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
 
@@ -994,11 +964,8 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( invho2_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(0, data);
-
 	if (offset & 0x02)  invinco_audio_w(0, data);
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1006,11 +973,8 @@ static WRITE8_HANDLER( invho2_io_w )
 static WRITE8_HANDLER( invds_io_w )
 {
 	if (offset & 0x01)  invinco_audio_w(0, data);
-
 	if (offset & 0x02)  /* deepscan_audio_w(0, data) */;
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1018,11 +982,8 @@ static WRITE8_HANDLER( invds_io_w )
 static WRITE8_HANDLER( sspacaho_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(0, data);
-
 	if (offset & 0x02)  /* sspaceatt_audio_w(0, data) */;
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1030,9 +991,7 @@ static WRITE8_HANDLER( sspacaho_io_w )
 static WRITE8_HANDLER( tranqgun_io_w )
 {
 	if (offset & 0x01)  /* tranqgun_audio_w(0, data) */;
-
 	if (offset & 0x02)  vicdual_palette_bank_w(0, data);
-
 	if (offset & 0x08)  assert_coin_status();
 }
 
@@ -1040,11 +999,8 @@ static WRITE8_HANDLER( tranqgun_io_w )
 static WRITE8_HANDLER( spacetrk_io_w )
 {
 	if (offset & 0x01)  /* spacetrk_audio_w(0, data) */;
-
 	if (offset & 0x02)  /* spacetrk_audio_w(0, data) */;
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1052,11 +1008,8 @@ static WRITE8_HANDLER( spacetrk_io_w )
 static WRITE8_HANDLER( carnival_io_w )
 {
 	if (offset & 0x01)  carnival_audio_1_w(0, data);
-
 	if (offset & 0x02)  carnival_audio_2_w(0, data);
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1064,9 +1017,7 @@ static WRITE8_HANDLER( carnival_io_w )
 static WRITE8_HANDLER( brdrline_io_w )
 {
 	if (offset & 0x01)  /* brdrline_audio_w(0, data) */;
-
 	if (offset & 0x02)  vicdual_palette_bank_w(0, data);
-
 	if (offset & 0x08)  assert_coin_status();
 }
 
@@ -1074,11 +1025,8 @@ static WRITE8_HANDLER( brdrline_io_w )
 static WRITE8_HANDLER( pulsar_io_w )
 {
 	if (offset & 0x01)  pulsar_audio_1_w(0, data);
-
 	if (offset & 0x02)  pulsar_audio_2_w(0, data);
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -1100,11 +1048,8 @@ static WRITE8_HANDLER( heiankyo_io_w )
 static WRITE8_HANDLER( alphaho_io_w )
 {
 	if (offset & 0x01)  /* headon_audio_w(0, data) */;
-
 	if (offset & 0x02)  /* alphaf_audio_w(0, data) */;
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -2035,13 +1980,9 @@ static CUSTOM_INPUT( samurai_protection_r )
 	UINT32 answer = 0;
 
 	if (samurai_protection_data == 0xab)
-	{
 		answer = 0x02;
-	}
 	else if (samurai_protection_data == 0x1d)
-	{
 		answer = 0x0c;
-	}
 
 	return (answer >> offset) & 0x01;
 }
@@ -2050,9 +1991,7 @@ static CUSTOM_INPUT( samurai_protection_r )
 static WRITE8_HANDLER( samurai_io_w )
 {
 	if (offset & 0x02)  /* samurai_audio_w(0, data) */;
-
 	if (offset & 0x08)  assert_coin_status();
-
 	if (offset & 0x40)  vicdual_palette_bank_w(0, data);
 }
 
@@ -2161,7 +2100,6 @@ static READ8_HANDLER( nsub_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x08)  ret = input_port_1_r(0);
 
 	return ret;
@@ -2171,9 +2109,7 @@ static READ8_HANDLER( nsub_io_r )
 static WRITE8_HANDLER( nsub_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  /* nsub_audio_w(0, data) */;
-
 	if (offset & 0x04)  vicdual_palette_bank_w(0, data);
 }
 
@@ -2259,9 +2195,7 @@ static READ8_HANDLER( invinco_io_r )
 	UINT8 ret = 0;
 
 	if (offset & 0x01)  ret = input_port_0_r(0);
-
 	if (offset & 0x02)  ret = input_port_1_r(0);
-
 	if (offset & 0x08)  ret = input_port_2_r(0);
 
 	return ret;
@@ -2271,9 +2205,7 @@ static READ8_HANDLER( invinco_io_r )
 static WRITE8_HANDLER( invinco_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-
 	if (offset & 0x02)  invinco_audio_w(0, data);
-
 	if (offset & 0x04)  vicdual_palette_bank_w(0, data);
 }
 

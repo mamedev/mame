@@ -94,38 +94,30 @@ WRITE8_HANDLER( stactics_scroll_ram_w )
 {
 	stactics_state *state = Machine->driver_data;
 
-	switch (offset >> 8)
+	if (data & 0x01)
 	{
-		case 4:  // Page D
-			if (data & 0x01)
-				state->y_scroll_d = offset & 0xff;
-			break;
-
-		case 5:  // Page E
-			if (data & 0x01)
-				state->y_scroll_e = offset & 0xff;
-			break;
-
-		case 6:  // Page F
-			if (data & 0x01)
-				state->y_scroll_f = offset & 0xff;
-			break;
-    }
+		switch (offset >> 8)
+		{
+			case 4: state->y_scroll_d = offset & 0xff; break;
+			case 5: state->y_scroll_e = offset & 0xff; break;
+			case 6: state->y_scroll_f = offset & 0xff; break;
+		}
+	}
 }
 
 
 
 /*************************************
  *
- *  VBLANK counter
+ *  Frane counter
  *
  *************************************/
 
-CUSTOM_INPUT( stactics_get_vblank_count_d3 )
+CUSTOM_INPUT( stactics_get_frame_count_d3 )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
-	return (state->vblank_count >> 3) & 0x01;
+	return (state->frame_count >> 3) & 0x01;
 }
 
 
@@ -181,7 +173,7 @@ WRITE8_HANDLER( stactics_shot_flag_clear_w )
 
 CUSTOM_INPUT( stactics_get_shot_standby )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
 	return state->shot_standby;
 }
@@ -189,7 +181,7 @@ CUSTOM_INPUT( stactics_get_shot_standby )
 
 CUSTOM_INPUT( stactics_get_not_shot_arrive )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
 	return !state->shot_arrive;
 }
@@ -382,11 +374,11 @@ static VIDEO_START( stactics )
 	state->y_scroll_e = 0;
 	state->y_scroll_f = 0;
 
+	state->frame_count = 0;
 	state->shot_standby = 1;
 	state->shot_arrive = 0;
 	state->beam_state = 0;
 	state->old_beam_state = 0;
-	state->vblank_count = 0;
 }
 
 
@@ -404,8 +396,6 @@ static VIDEO_UPDATE( stactics )
 	update_beam(state);
 	draw_background(state, bitmap, cliprect);
 	update_artwork(state);
-
-	state->vblank_count = (state->vblank_count + 1) & 0x0f;
 
 	return 0;
 }

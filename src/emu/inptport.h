@@ -40,7 +40,7 @@
 
 
 /* macro for a custom callback functions (PORT_CUSTOM) */
-#define CUSTOM_INPUT(name)	UINT32 name(void *param)
+#define CUSTOM_INPUT(name)	UINT32 name(running_machine *machine, void *param)
 
 /* macro for port changed callback functions (PORT_CHANGED) */
 #define INPUT_CHANGED(name)	void name(running_machine *machine, void *param, UINT32 oldval, UINT32 newval)
@@ -501,7 +501,7 @@ typedef struct _input_port_init_params input_port_init_params;
 
 
 /* a custom input port callback function */
-typedef UINT32 (*input_port_custom_func)(void *param);
+typedef UINT32 (*input_port_custom_func)(running_machine *machine, void *param);
 typedef void (*input_port_changed_func)(running_machine *machine, void *param, UINT32 oldval, UINT32 newval);
 
 

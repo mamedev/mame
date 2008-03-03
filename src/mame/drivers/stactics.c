@@ -55,7 +55,7 @@ Verify Color PROM resistor values (Last 8 colors)
 
 static CUSTOM_INPUT( get_motor_not_ready )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
 	/* if the motor is self-centering, but not centered yet */
     return ((*state->motor_on & 0x01) == 0) &&
@@ -130,7 +130,7 @@ static void move_motor(stactics_state *state)
 static CUSTOM_INPUT( get_rng )
 {
 	/* this is a 555 timer, but cannot read one of the resistor values */
-	return mame_rand(Machine) & 0x07;
+	return mame_rand(machine) & 0x07;
 }
 
 
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( stactics )
 
     PORT_START  /* IN2 */
     PORT_BIT (0x07, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_rng, 0)
-    PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_vblank_count_d3, 0)
+    PORT_BIT (0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stactics_get_frame_count_d3, 0)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
     PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )

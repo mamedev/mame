@@ -27,7 +27,7 @@ struct _stactics_state
 	UINT8  y_scroll_d;
 	UINT8  y_scroll_e;
 	UINT8  y_scroll_f;
-	UINT8  vblank_count;
+	UINT8  frame_count;
 	UINT8  shot_standby;
 	UINT8  shot_arrive;
 	UINT16 beam_state;
@@ -45,7 +45,7 @@ WRITE8_HANDLER( stactics_scroll_ram_w );
 WRITE8_HANDLER( stactics_speed_latch_w );
 WRITE8_HANDLER( stactics_shot_trigger_w );
 WRITE8_HANDLER( stactics_shot_flag_clear_w );
-CUSTOM_INPUT( stactics_get_vblank_count_d3 );
+CUSTOM_INPUT( stactics_get_frame_count_d3 );
 CUSTOM_INPUT( stactics_get_shot_standby );
 CUSTOM_INPUT( stactics_get_not_shot_arrive );
 

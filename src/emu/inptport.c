@@ -3449,7 +3449,7 @@ UINT32 readinputport(int port)
 			/* replace the bits with bits from the custom routine */
 			input_port_entry *port = custom->port;
 			portinfo->digital &= ~port->mask;
-			portinfo->digital |= ((*port->custom)(port->custom_param) << custom->shift) & port->mask;
+			portinfo->digital |= ((*port->custom)(Machine, port->custom_param) << custom->shift) & port->mask;
 		}
 
 	/* compute the current result: default value XOR the digital, merged with the analog */
