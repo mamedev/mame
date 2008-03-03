@@ -1023,6 +1023,34 @@ attotime video_screen_get_time_until_vblank_start(int scrnum)
 
 
 /*-------------------------------------------------
+    video_screen_get_time_until_vblank_end -
+    returns the amount of time remaining until
+    the end of the current VBLANK (if in progress)
+    or the end of the next VBLANK
+-------------------------------------------------*/
+
+attotime video_screen_get_time_until_vblank_end(int scrnum)
+{
+	return video_screen_get_time_until_pos(scrnum, Machine->screen[scrnum].visarea.min_y, 0);
+}
+
+
+/*-------------------------------------------------
+    video_screen_get_time_until_update -
+    returns the amount of time remaining until
+    the next VBLANK period start
+-------------------------------------------------*/
+
+attotime video_screen_get_time_until_update(int scrnum)
+{
+	if (Machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
+		return video_screen_get_time_until_vblank_end(scrnum);
+	else
+		return video_screen_get_time_until_vblank_start(scrnum);
+}
+
+
+/*-------------------------------------------------
     video_screen_get_scan_period - return the
     amount of time the beam takes to draw one
     scanline

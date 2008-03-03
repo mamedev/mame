@@ -136,6 +136,12 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
 /* return the time when the beam will reach the start of VBLANK */
 attotime video_screen_get_time_until_vblank_start(int scrnum);
 
+/* return the time when the beam will reach the end of VBLANK */
+attotime video_screen_get_time_until_vblank_end(int scrnum);
+
+/* return the time when the VIDEO_UPDATE function will be called */
+attotime video_screen_get_time_until_update(int scrnum);
+
 /* return the amount of time the beam takes to draw one scan line */
 attotime video_screen_get_scan_period(int scrnum);
 

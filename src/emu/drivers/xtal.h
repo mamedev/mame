@@ -65,7 +65,7 @@ enum
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
-	XTAL_11MHz		= 11000000,		/* Mario I8039 sound */
+	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
 	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
@@ -82,13 +82,14 @@ enum
 	XTAL_14_31818MHz  	= 14318180,		/* Extremely common, used on 100's of PCBs */
 	XTAL_14_705882MHz  	= 14705882,		/* Aleck64 */
 	XTAL_14_7456MHz 	= 14745600,		/* Namco System 12 & System Super 22/23 for H8/3002 CPU */
-	XTAL_15MHz		= 15000000,		/* Sinclair QL */
+	XTAL_15MHz			= 15000000,		/* Sinclair QL */
 	XTAL_15_468MHz  	= 15468000,		/* Bank Panic h/w, Sega G80 */
 	XTAL_16MHz   		= 16000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_16_9344MHz  	= 16934400,		/* Usually used to drive 90's Yamaha OPL/FM chips */
 	XTAL_17_73447MHz	= 17734470,		/* 4 times the PAL subcarrier */
 	XTAL_18MHz   		= 18000000,		/* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz  	= 18432000,		/* Extremely common, used on 100's of PCBs */
+	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
 	XTAL_20MHz   		= 20000000,
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
@@ -142,7 +143,7 @@ enum
 	XTAL_400kHz			= 400000,		/* Used on Great Swordman h/w */
 	XTAL_455kHz			= 455000,		/* Used on Gladiator h/w */
 	XTAL_640kHz			= 640000,
-	XTAL_1_056MHz			= 1056000 		/* used on Trio The Punch */
+	XTAL_1_056MHz		= 1056000 		/* used on Trio The Punch */
 };
 
 

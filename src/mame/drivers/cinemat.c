@@ -39,6 +39,9 @@
 #include "starcas.lh"
 #include "solarq.lh"
 
+#define MASTER_CLOCK			XTAL_19_923MHz
+
+
 
 static UINT16 *rambase;
 
@@ -271,8 +274,12 @@ static READ8_HANDLER( boxingb_dial_r )
 
 static READ8_HANDLER( qb3_frame_r )
 {
+	attotime next_update = video_screen_get_time_until_update(0);
+	attotime frame_period = video_screen_get_frame_period(0);
+	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
+	
 	/* note this is just an approximation... */
-	return cpu_scalebyfcount(100) < 90;
+	return (percent >= 10);
 }
 
 
@@ -983,7 +990,7 @@ static const struct CCPUConfig config_jmi =
 static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", CCPU, 5000000)
+	MDRV_CPU_ADD_TAG("main", CCPU, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(config_nojmi)
 	MDRV_CPU_PROGRAM_MAP(program_map_4k,0)
 	MDRV_CPU_DATA_MAP(data_map,0)
@@ -994,14 +1001,15 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 	MDRV_MACHINE_RESET(cinemat)
 
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	
 	MDRV_SCREEN_ADD("main", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(38)
-	MDRV_SCREEN_SIZE(400, 300)
+	MDRV_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
+	MDRV_SCREEN_SIZE(1024, 768)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 767)
 
 	MDRV_VIDEO_START(cinemat_bilevel)
-	MDRV_VIDEO_EOF(cinemat)
-	MDRV_VIDEO_UPDATE(vector)
+	MDRV_VIDEO_UPDATE(cinemat)
 MACHINE_DRIVER_END
 
 

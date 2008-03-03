@@ -220,9 +220,16 @@ VIDEO_START( cinemat_qb3color )
  *
  *************************************/
 
-VIDEO_EOF( cinemat )
+VIDEO_UPDATE( cinemat )
 {
+	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
+	
+	cpuintrf_push_context(0);
+	ccpu_wdt_timer_trigger();
+	cpuintrf_pop_context();
+
+	return 0;
 }
 
 
@@ -237,7 +244,7 @@ VIDEO_UPDATE( spacewar )
 {
 	int sw_option = readinputportbytag("INPUTS");
 
-	VIDEO_UPDATE_CALL(vector);
+	VIDEO_UPDATE_CALL(cinemat);
 
 	/* set the state of the artwork */
 	output_set_value("pressed3", (~sw_option >> 0) & 1);
