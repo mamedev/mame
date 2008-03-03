@@ -57,6 +57,14 @@ extern UINT8 fcombat_cocktail_flip;
 extern int fcombat_sh;
 extern int fcombat_sv;
 
+
+static INPUT_CHANGED( coin_inserted )
+{
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
 static INPUT_PORTS_START( fcombat )
 	PORT_START_TAG("IN0")      /* player 1 inputs (muxed on 0xe000) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -113,13 +121,8 @@ static INPUT_PORTS_START( fcombat )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("FAKE")
-	/* The coin slots are not memory mapped. */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -192,60 +195,43 @@ static WRITE8_HANDLER(ee00_w)
 
 }
 
-static ADDRESS_MAP_START( fcombat_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
 	AM_RANGE(0xe100, 0xe100) AM_READ(input_port_2_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(input_port_3_r)
 	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
 	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd800, 0xd8ff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fcombat_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
-
 	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
 	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
-
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
 	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
-
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
-
-	/* erk ... */
 	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-/* sound cpu */
 
-static ADDRESS_MAP_START( fcombat_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8001, 0x8001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0xc001, 0xc001) AM_READ(AY8910_read_port_2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fcombat_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(AY8910_read_port_1_r)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0xc001, 0xc001) AM_READ(AY8910_read_port_2_r)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(AY8910_write_port_2_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITE(AY8910_control_port_2_w)
 ADDRESS_MAP_END
+
+
 
 /*************************************
  *
@@ -286,21 +272,7 @@ static GFXDECODE_START( fcombat )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,     512, 64 )
 GFXDECODE_END
 
-/*************************************
- *
- *  Sound interfaces
- *
- *************************************/
 
-/* interrupt */
-
-
-static INTERRUPT_GEN( fcombat_interrupt )
-{
-	/* Exerion triggers NMIs on coin insertion */
-	if (readinputport(4) & 1)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-}
 
 /*************************************
  *
@@ -311,11 +283,10 @@ static INTERRUPT_GEN( fcombat_interrupt )
 static MACHINE_DRIVER_START( fcombat )
 
 	MDRV_CPU_ADD(Z80, 10000000/3)
-	MDRV_CPU_PROGRAM_MAP(fcombat_readmem,fcombat_writemem)
-	MDRV_CPU_VBLANK_INT("main", fcombat_interrupt)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_ADD(Z80, 10000000/3)
-	MDRV_CPU_PROGRAM_MAP(fcombat_readmem2,fcombat_writemem2)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -329,7 +300,7 @@ static MACHINE_DRIVER_START( fcombat )
 	MDRV_VIDEO_START(fcombat)
 	MDRV_VIDEO_UPDATE(fcombat)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(AY8910, 1500000)

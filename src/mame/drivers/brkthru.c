@@ -67,21 +67,19 @@ PALETTE_INIT( brkthru );
 VIDEO_UPDATE( brkthru );
 
 
-static int nmi_enable;
-
 static WRITE8_HANDLER( brkthru_1803_w )
 {
 	/* bit 0 = NMI enable */
-	nmi_enable = ~data & 1;
+	cpu_interrupt_enable(0, ~data & 1);
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 static WRITE8_HANDLER( darwin_0803_w )
 {
 	/* bit 0 = NMI enable */
-	/*nmi_enable = ~data & 1;*/
+	/*cpu_interrupt_enable(1, ~data & 1);*/
 	logerror("0803 %02X\n",data);
-        nmi_enable = data;
+	cpu_interrupt_enable(0, data & 1);
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
@@ -89,6 +87,12 @@ static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+}
+
+static INPUT_CHANGED( coin_inserted )
+{
+	/* coin insertion causes an IRQ */
+	cpunum_set_input_line(machine, 0, 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -143,21 +147,6 @@ ADDRESS_MAP_END
 
 
 
-static INTERRUPT_GEN( brkthru_interrupt )
-{
-	if (cpu_getiloops() == 0)
-	{
-		if (nmi_enable)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	}
-	else
-	{
-		/* generate IRQ on coin insertion */
-		if ((readinputportbytag("IN2") & 0xe0) != 0xe0)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	}
-}
-
 #define COMMON_IN0\
 	PORT_START_TAG("IN0")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )\
@@ -181,8 +170,8 @@ static INTERRUPT_GEN( brkthru_interrupt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )	/* used only by the self test */
 
 static INPUT_PORTS_START( brkthru )
-COMMON_IN0
-COMMON_IN1
+	COMMON_IN0
+	COMMON_IN1
 
 	PORT_START_TAG("IN2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -198,9 +187,9 @@ COMMON_IN1
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Manual says Picture Flip=On, Normal=Off */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)	/* Manual says Picture Flip=On, Normal=Off */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -228,8 +217,8 @@ COMMON_IN1
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brkthruj )
-COMMON_IN0
-COMMON_IN1
+	COMMON_IN0
+	COMMON_IN1
 
 	PORT_START_TAG("IN2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
@@ -243,9 +232,9 @@ COMMON_IN1
 	PORT_DIPSETTING(    0x0c, "20000/30000 Points" )
 	PORT_DIPSETTING(    0x08, "20000/40000 Points" )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)	/* Manual says Pitcure Flip=On, Normal=Off */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)	/* Manual says Pitcure Flip=On, Normal=Off */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -273,8 +262,8 @@ COMMON_IN1
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( darwin )
-COMMON_IN0
-COMMON_IN1
+	COMMON_IN0
+	COMMON_IN1
 
 	PORT_START_TAG("IN2")	/* modified by Shingo Suzuki 1999/11/02 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
@@ -291,9 +280,9 @@ COMMON_IN1
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -402,7 +391,7 @@ static MACHINE_DRIVER_START( brkthru )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(brkthru_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(brkthru_interrupt,2)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -440,7 +429,7 @@ static MACHINE_DRIVER_START( darwin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darwin_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(brkthru_interrupt,2)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_CPU_ADD(M6809, MASTER_CLOCK/8)		/* 1.5 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)

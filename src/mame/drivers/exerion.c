@@ -17,7 +17,10 @@
 #include "exerion.h"
 #include "sound/ay8910.h"
 
+
 static UINT8 *exerion_ram;
+
+
 
 /*************************************
  *
@@ -32,11 +35,10 @@ static READ8_HANDLER( exerion_port01_r )
 }
 
 
-static INTERRUPT_GEN( exerion_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	/* Exerion triggers NMIs on coin insertion */
-	if (readinputport(4) & 1)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -184,13 +186,8 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("FAKE")      /* FAKE */
-	/* The coin slots are not memory mapped. */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -281,7 +278,6 @@ static MACHINE_DRIVER_START( exerion )
 
 	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", exerion_interrupt)
 
 	MDRV_CPU_ADD(Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
@@ -298,7 +294,7 @@ static MACHINE_DRIVER_START( exerion )
 	MDRV_VIDEO_START(exerion)
 	MDRV_VIDEO_UPDATE(exerion)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(AY8910, EXERION_AY8910_CLOCK)

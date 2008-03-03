@@ -98,7 +98,7 @@ WRITE8_HANDLER( disco_video_control_w );
 
 INTERRUPT_GEN( lnc_sound_interrupt );
 
-static WRITE8_HANDLER( sound_command_w );
+static WRITE8_HANDLER( audio_command_w );
 
 READ8_HANDLER( mmonkey_protection_r );
 WRITE8_HANDLER( mmonkey_protection_w );
@@ -106,7 +106,7 @@ WRITE8_HANDLER( mmonkey_protection_w );
 
 static UINT8 *decrypted;
 static UINT8 *rambase;
-static UINT8 *sound_rambase;
+static UINT8 *audio_rambase;
 
 
 
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( lnc_w )
 	else if (offset == 0x8001)                     { lnc_video_control_w(0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* MWA8_NOP */
-	else if (offset == 0x9002)                     { sound_command_w(0,data); return; }
+	else if (offset == 0x9002)                     { audio_command_w(0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
@@ -173,7 +173,7 @@ static WRITE8_HANDLER( mmonkey_w )
 	else if (offset == 0x8001)                     { lnc_video_control_w(0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* MWA8_NOP */
-	else if (offset == 0x9002)                     { sound_command_w(0,data); return; }
+	else if (offset == 0x9002)                     { audio_command_w(0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(offset - 0xb000, data); return; }
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( btime_w )
 	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(offset - 0x1800,data);
 	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(offset - 0x1c00,data);
 	else if (offset == 0x4002)                     btime_video_control_w(0,data);
-	else if (offset == 0x4003)                     sound_command_w(0,data);
+	else if (offset == 0x4003)                     audio_command_w(0,data);
 	else if (offset == 0x4004)                     bnj_scroll1_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
@@ -210,7 +210,7 @@ static WRITE8_HANDLER( zoar_w )
 	else if (offset >= 0x9800 && offset <= 0x9803) ;
 	else if (offset == 0x9804)                     bnj_scroll2_w(0,data);
 	else if (offset == 0x9805)                     bnj_scroll1_w(0,data);
-	else if (offset == 0x9806)                     sound_command_w(0,data);
+	else if (offset == 0x9806)                     audio_command_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
 	rambase[offset] = data;
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( disco_w )
 	if      (offset <= 0x04ff)                     ;
 	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(offset - 0x2000,data);
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
-	else if (offset == 0x9a00)                     sound_command_w(0,data);
+	else if (offset == 0x9a00)                     audio_command_w(0,data);
 	else if (offset == 0x9c00)                     disco_video_control_w(0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
@@ -233,206 +233,135 @@ static WRITE8_HANDLER( disco_w )
 }
 
 
-static ADDRESS_MAP_START( btime_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1800, 0x1bff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x1c00, 0x1fff) AM_READ(btime_mirrorcolorram_r)
-	AM_RANGE(0x4000, 0x4000) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x4002, 0x4002) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0x4003, 0x4003) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x4004, 0x4004) AM_READ(input_port_4_r)     /* DSW2 */
+static ADDRESS_MAP_START( btime_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
+												/* support ROM decryption */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0x4000, 0x4000) AM_READWRITE(input_port_0_r, MWA8_NOP)
+	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)
+	AM_RANGE(0x4002, 0x4002) AM_READWRITE(input_port_2_r, btime_video_control_w)
+	AM_RANGE(0x4003, 0x4003) AM_READWRITE(input_port_3_r, audio_command_w)
+	AM_RANGE(0x4004, 0x4004) AM_READWRITE(input_port_4_r, bnj_scroll1_w)
 	AM_RANGE(0xb000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( btime_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	    /* override the following entries to */
-													/* support ROM decryption */
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(sound_command_w)
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(bnj_scroll1_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cookrace_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0500, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcbff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_READ(btime_mirrorcolorram_r)
-	AM_RANGE(0xd000, 0xd0ff) AM_READ(MRA8_RAM)	/* background */
-	AM_RANGE(0xd100, 0xd3ff) AM_READ(MRA8_RAM)	/* ? */
-	AM_RANGE(0xd400, 0xd7ff) AM_READ(MRA8_RAM)	/* background? */
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0xe300, 0xe300) AM_READ(input_port_3_r)     /* mirror address used on high score name enter */
+static ADDRESS_MAP_START( cookrace_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x0500, 0x3fff) AM_ROM
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM							/* background? */
+	AM_RANGE(0xd100, 0xd3ff) AM_RAM							/* ? */
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(&bnj_backgroundram) AM_SIZE(&bnj_backgroundram_size)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(input_port_3_r, bnj_video_control_w)
+	AM_RANGE(0xe300, 0xe300) AM_READ(input_port_3_r)     /* mirror address used on high score name entry */
 											/* screen */
-	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_4_r)     /* DSW2 */
-	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0xe003, 0xe003) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0xe004, 0xe004) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0xfff9, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(input_port_4_r, audio_command_w)
+	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_0_r)
+	AM_RANGE(0xe003, 0xe003) AM_READ(input_port_1_r)
+	AM_RANGE(0xe004, 0xe004) AM_READ(input_port_2_r)
+	AM_RANGE(0xfff9, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cookrace_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x0500, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0xc800, 0xcbff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(btime_mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd0ff) AM_WRITE(MWA8_RAM)	/* background? */
-	AM_RANGE(0xd100, 0xd3ff) AM_WRITE(MWA8_RAM)	/* ? */
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&bnj_backgroundram) AM_SIZE(&bnj_backgroundram_size)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(sound_command_w)
-#if 0
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(bnj_scroll1_w)
-#endif
-	AM_RANGE(0xfff9, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( zoar_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(input_port_3_r)     /* DSW 1 */
-	AM_RANGE(0x9801, 0x9801) AM_READ(input_port_4_r)     /* DSW 2 */
-	AM_RANGE(0x9802, 0x9802) AM_READ(input_port_0_r)     /* IN 0 */
-	AM_RANGE(0x9803, 0x9803) AM_READ(input_port_1_r)     /* IN 1 */
-	AM_RANGE(0x9804, 0x9804) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0xd000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( zoar_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	    /* override the following entries to */
-													/* support ROM decryption */
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
+static ADDRESS_MAP_START( zoar_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	/* override the following entries to */
+												/* support ROM decryption */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&rambase)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
 	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
+	AM_RANGE(0x9800, 0x9800) AM_READ(input_port_3_r)
+	AM_RANGE(0x9801, 0x9801) AM_READ(input_port_4_r)
+	AM_RANGE(0x9802, 0x9802) AM_READ(input_port_0_r)
+	AM_RANGE(0x9803, 0x9803) AM_READ(input_port_1_r)
 	AM_RANGE(0x9800, 0x9803) AM_WRITE(MWA8_RAM) AM_BASE(&zoar_scrollram)
-	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll2_w)
+	AM_RANGE(0x9804, 0x9804) AM_READWRITE(input_port_2_r, bnj_scroll2_w)
 	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x9806, 0x9806) AM_WRITE(sound_command_w)
-  /*AM_RANGE(0x9807, 0x9807) AM_WRITE(MWA8_RAM) */ /* Marked as ACK on schematics (Board 2 Pg 5) */
+	AM_RANGE(0x9806, 0x9806) AM_WRITE(audio_command_w)
+	AM_RANGE(0xd000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnc_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x7c00, 0x7fff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_4_r)     /* DSW2 */
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x9002, 0x9002) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0xb000, 0xb1ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( lnc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
+												/* support ROM decryption */
+	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(MRA8_RAM, lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(input_port_3_r, MWA8_NOP)     /* ??? */
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(input_port_4_r, lnc_video_control_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&lnc_charbank)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(input_port_0_r, MWA8_NOP)     /* IRQ ack??? */
+	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)
+	AM_RANGE(0x9002, 0x9002) AM_READWRITE(input_port_2_r, audio_command_w)
+	AM_RANGE(0xb000, 0xb1ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)      	/* override the following entries to */
+static ADDRESS_MAP_START( mmonkey_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
 													/* support ROM decryption */
-	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(MRA8_RAM, lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
 	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(MWA8_NOP)            /* ??? */
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_3_r)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(input_port_4_r, lnc_video_control_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&lnc_charbank)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(MWA8_NOP)            /* IRQ ACK ??? */
-	AM_RANGE(0x9002, 0x9002) AM_WRITE(sound_command_w)
-	AM_RANGE(0xb000, 0xb1ff) AM_WRITE(MWA8_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( mmonkey_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x7c00, 0x7fff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_4_r)     /* DSW2 */
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x9002, 0x9002) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(mmonkey_protection_r)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(input_port_0_r, MWA8_NOP)     /* IRQ ack??? */
+	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)
+	AM_RANGE(0x9002, 0x9002) AM_READWRITE(input_port_2_r, audio_command_w)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
 	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmonkey_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)  /* override the following entries to */
-									/* support ROM decryption */
-	AM_RANGE(0x0000, 0x3bff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(lnc_mirrorvideoram_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(lnc_video_control_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_RAM) AM_BASE(&lnc_charbank)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(MWA8_NOP)            /* IRQ ACK ??? */
-	AM_RANGE(0x9002, 0x9002) AM_WRITE(sound_command_w)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(mmonkey_protection_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( bnj_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x1001, 0x1001) AM_READ(input_port_4_r)     /* DSW2 */
-	AM_RANGE(0x1002, 0x1002) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x1003, 0x1003) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x1004, 0x1004) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4800, 0x4bff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x4c00, 0x4fff) AM_READ(btime_mirrorcolorram_r)
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bnj_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x1002, 0x1002) AM_WRITE(sound_command_w)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(btime_mirrorcolorram_w)
+static ADDRESS_MAP_START( bnj_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_3_r)
+	AM_RANGE(0x1001, 0x1001) AM_READWRITE(input_port_4_r, bnj_video_control_w)
+	AM_RANGE(0x1002, 0x1002) AM_READWRITE(input_port_0_r, audio_command_w)
+	AM_RANGE(0x1003, 0x1003) AM_READ(input_port_1_r)
+	AM_RANGE(0x1004, 0x1004) AM_READ(input_port_2_r)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
 	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE(&bnj_backgroundram) AM_SIZE(&bnj_backgroundram_size)
 	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( disco_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x04ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x881f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_2_r)     /* coin */
-	AM_RANGE(0x9200, 0x9200) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x9400, 0x9400) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x9800, 0x9800) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x9a00, 0x9a00) AM_READ(input_port_4_r)     /* DSW2 */
-	AM_RANGE(0x9c00, 0x9c00) AM_READ(input_port_5_r)     /* VBLANK */
 	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)    /* override the following entries to */
+static ADDRESS_MAP_START( disco_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
 												/* support ROM decryption */
-	AM_RANGE(0x0000, 0x04ff) AM_WRITE(MWA8_RAM) AM_BASE(&rambase)
-	AM_RANGE(0x2000, 0x7fff) AM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0x8800, 0x881f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(sound_command_w)
-	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(disco_video_control_w)
+	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x2000, 0x7fff) AM_READWRITE(MRA8_RAM, deco_charram_w) AM_BASE(&deco_charram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_2_r)
+	AM_RANGE(0x9200, 0x9200) AM_READ(input_port_0_r)
+	AM_RANGE(0x9400, 0x9400) AM_READ(input_port_1_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(input_port_3_r)
+	AM_RANGE(0x9a00, 0x9a00) AM_READWRITE(input_port_4_r, audio_command_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_READWRITE(input_port_5_r, disco_video_control_w)
+	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&sound_rambase)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&audio_rambase)
 	AM_RANGE(0x0400, 0x0fff) AM_ROM AM_REGION(REGION_CPU2, 0xf400)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(AY8910_control_port_0_w)
@@ -443,65 +372,36 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( disco_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( disco_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( disco_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x5000, 0x5fff) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_NOP)  /* ACK ? */
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(soundlatch_r, MWA8_NOP) /* ack ? */
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-/***************************************************************************
-
-These games don't have VBlank interrupts.
-Interrupts are still used by the game, coin insertion generates an IRQ.
-
-***************************************************************************/
-static void btime_interrupt(running_machine *machine, int generated_interrupt, int active_high)
+static INPUT_CHANGED( coin_inserted_irq_hi )
 {
-	static int coin;
-	int port;
-
-	port = readinputport(2) & 0xc0;
-	if (active_high) port ^= 0xc0;
-
-	if (port != 0xc0)    /* Coin */
-	{
-		if (coin == 0)
-		{
-			coin = 1;
-			cpunum_set_input_line(machine, 0, generated_interrupt, (generated_interrupt == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
-		}
-	}
-	else coin = 0;
+	if (newval)
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( btime_irq_interrupt )
+static INPUT_CHANGED( coin_inserted_irq_lo )
 {
-	btime_interrupt(machine, 0, 1);
+	if (!newval)
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( zoar_irq_interrupt )
+static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
-	btime_interrupt(machine, 0, 0);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INTERRUPT_GEN( btime_nmi_interrupt )
-{
-	btime_interrupt(machine, INPUT_LINE_NMI, 0);
-}
 
-static WRITE8_HANDLER( sound_command_w )
+static WRITE8_HANDLER( audio_command_w )
 {
 	soundlatch_w(offset,data);
 	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
@@ -531,14 +431,14 @@ static INPUT_PORTS_START( btime )
 	COMMON_INPUTS
 
 	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq_hi, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted_irq_hi, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -609,14 +509,14 @@ static INPUT_PORTS_START( cookrace )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH,IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH,IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -691,8 +591,8 @@ static INPUT_PORTS_START( zoar )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_irq_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -761,8 +661,8 @@ static INPUT_PORTS_START( lnc )
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -831,8 +731,8 @@ static INPUT_PORTS_START( wtennis )
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
@@ -902,8 +802,8 @@ static INPUT_PORTS_START( mmonkey )
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -978,8 +878,8 @@ static INPUT_PORTS_START( bnj )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -1049,8 +949,8 @@ static INPUT_PORTS_START( disco )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH,IPT_COIN1 ) PORT_CHANGED(coin_inserted_irq_hi, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_COIN2 ) PORT_CHANGED(coin_inserted_irq_hi, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
@@ -1134,8 +1034,8 @@ static INPUT_PORTS_START( sdtennis )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi_lo, 0)
 
 	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -1295,12 +1195,11 @@ static MACHINE_DRIVER_START( btime )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(btime_readmem,btime_writemem)
-	MDRV_CPU_VBLANK_INT("main", btime_irq_interrupt)
+	MDRV_CPU_PROGRAM_MAP(btime_map,0)
 
-	MDRV_CPU_ADD_TAG("sound", M6502, 500000)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_ADD_TAG("audio", M6502, 500000)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	/* video hardware */
@@ -1318,7 +1217,7 @@ static MACHINE_DRIVER_START( btime )
 	MDRV_VIDEO_START(btime)
 	MDRV_VIDEO_UPDATE(btime)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
@@ -1334,11 +1233,10 @@ static MACHINE_DRIVER_START( cookrace )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(cookrace_readmem,cookrace_writemem)
-	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
+	MDRV_CPU_PROGRAM_MAP(cookrace_map,0)
 
-	MDRV_CPU_MODIFY("sound")
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(cookrace)
@@ -1353,10 +1251,9 @@ static MACHINE_DRIVER_START( lnc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(lnc_readmem,lnc_writemem)
-	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
+	MDRV_CPU_PROGRAM_MAP(lnc_map,0)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_VBLANK_INT_HACK(lnc_sound_interrupt,16)
 
 	MDRV_MACHINE_RESET(lnc)
@@ -1374,7 +1271,7 @@ static MACHINE_DRIVER_START( wtennis )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(lnc)
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	/* video hardware */
@@ -1387,7 +1284,7 @@ static MACHINE_DRIVER_START( mmonkey )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(wtennis)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(mmonkey_readmem,mmonkey_writemem)
+	MDRV_CPU_PROGRAM_MAP(mmonkey_map,0)
 MACHINE_DRIVER_END
 
 
@@ -1396,8 +1293,7 @@ static MACHINE_DRIVER_START( bnj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_REPLACE("main", M6502, 750000)
-	MDRV_CPU_PROGRAM_MAP(bnj_readmem,bnj_writemem)
-	MDRV_CPU_VBLANK_INT("main", btime_nmi_interrupt)
+	MDRV_CPU_PROGRAM_MAP(bnj_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(bnj)
@@ -1413,8 +1309,7 @@ static MACHINE_DRIVER_START( zoar )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_PROGRAM_MAP(zoar_readmem,zoar_writemem)
-	MDRV_CPU_VBLANK_INT("main", zoar_irq_interrupt)
+	MDRV_CPU_PROGRAM_MAP(zoar_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(zoar)
@@ -1429,10 +1324,10 @@ static MACHINE_DRIVER_START( disco )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
 	MDRV_CPU_REPLACE("main", M6502, 750000)
-	MDRV_CPU_PROGRAM_MAP(disco_readmem,disco_writemem)
+	MDRV_CPU_PROGRAM_MAP(disco_map,0)
 
-	MDRV_CPU_MODIFY("sound")
-	MDRV_CPU_PROGRAM_MAP(disco_sound_readmem,disco_sound_writemem)
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(disco_audio_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(disco)
@@ -1851,13 +1746,13 @@ static DRIVER_INIT( lnc )
 
 static DRIVER_INIT( cookrace )
 {
-	memcpy(&sound_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
+	memcpy(&audio_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
 	decrypt_C10707_cpu(0, REGION_CPU1);
 }
 
 static DRIVER_INIT( wtennis )
 {
-	memcpy(&sound_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
+	memcpy(&audio_rambase[0x200], memory_region(REGION_CPU2) + 0xf200, 0x200);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 	decrypt_C10707_cpu(0, REGION_CPU1);
 }
