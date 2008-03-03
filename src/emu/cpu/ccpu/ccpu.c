@@ -36,7 +36,6 @@ typedef struct
 
 	UINT8		(*external_input)(void);
 	void		(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
-	UINT8		scrnum;
 
 	UINT8		waiting;
 	UINT8		watchdog;
@@ -142,7 +141,7 @@ static void ccpu_init(int index, int clock, const void *_config, int (*irqcallba
 	/* copy input params */
 	ccpu.external_input = config->external_input ? config->external_input : read_jmi;
 	ccpu.vector_callback = config->vector_callback;
-	
+
 	state_save_register_item("ccpu", clock, ccpu.PC);
 	state_save_register_item("ccpu", clock, ccpu.A);
 	state_save_register_item("ccpu", clock, ccpu.B);
@@ -152,7 +151,16 @@ static void ccpu_init(int index, int clock, const void *_config, int (*irqcallba
 	state_save_register_item("ccpu", clock, ccpu.X);
 	state_save_register_item("ccpu", clock, ccpu.Y);
 	state_save_register_item("ccpu", clock, ccpu.T);
-	state_save_register_item("ccpu", clock, ccpu.scrnum);
+	state_save_register_item("ccpu", clock, ccpu.a0flag);
+	state_save_register_item("ccpu", clock, ccpu.ncflag);
+	state_save_register_item("ccpu", clock, ccpu.cmpacc);
+	state_save_register_item("ccpu", clock, ccpu.cmpval);
+	state_save_register_item("ccpu", clock, ccpu.miflag);
+	state_save_register_item("ccpu", clock, ccpu.nextmiflag);
+	state_save_register_item("ccpu", clock, ccpu.nextnextmiflag);
+	state_save_register_item("ccpu", clock, ccpu.drflag);
+	state_save_register_item("ccpu", clock, ccpu.waiting);
+	state_save_register_item("ccpu", clock, ccpu.watchdog);
 }
 
 
@@ -194,7 +202,7 @@ static int ccpu_execute(int cycles)
 		return cycles;
 
 	ccpu_icount = cycles;
-	
+
 	while (ccpu_icount >= 0)
 	{
 		UINT16 tempval;
@@ -566,7 +574,7 @@ static int ccpu_execute(int cycles)
 				ccpu.waiting = TRUE;
 				NEXT_ACC_A();
 				ccpu_icount = -1;
-				
+
 				/* some games repeat the FRM opcode twice; it apparently does not cause
 				   a second wait, so we make sure we skip any duplicate opcode at this
 				   point */
