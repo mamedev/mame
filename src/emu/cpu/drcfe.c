@@ -44,12 +44,12 @@ struct _drcfe_state
 	UINT32				window_end;					/* code window end offset = startpc + window_end */
 	UINT32				max_sequence;				/* maximum instructions to include in a sequence */
 
-	drcfe_describe		describe;					/* callback to describe a single instruction */
+	drcfe_describe_func		describe;					/* callback to describe a single instruction */
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */
 	offs_t				pageshift;					/* shift to convert address to a page index */
-	cpufunc_translate	translate;					/* pointer to translation function */
+	cpu_translate_func	translate;					/* pointer to translation function */
 
 	/* opcode descriptor arrays */
 	opcode_desc *		desc_live_list;				/* head of list of live descriptions */
@@ -135,7 +135,7 @@ drcfe_state *drcfe_init(const drcfe_config *config, void *param)
 
 	/* initialize the state */
 	drcfe->pageshift = activecpu_page_shift(ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpufunc_translate)activecpu_get_info_fct(CPUINFO_PTR_TRANSLATE);
+	drcfe->translate = (cpu_translate_func)activecpu_get_info_fct(CPUINFO_PTR_TRANSLATE);
 
 	return drcfe;
 }

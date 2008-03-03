@@ -220,7 +220,7 @@ VIDEO_START( namcona1 )
 {
 	int i;
 	gfx_element *gfx0,*gfx1;
-	static const tile_get_info_callback get_info[4] =
+	static const tile_get_info_func get_info[4] =
 	{ tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )

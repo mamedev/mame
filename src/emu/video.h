@@ -89,12 +89,12 @@ struct _screen_config
 
 
 /*-------------------------------------------------
-    video_screen_on_vblank - callback that a
+    vblank_state_changed_func - callback that a
     screen calls to notify of a change of
     the VBLANK state
 -------------------------------------------------*/
 
-typedef void (*video_screen_on_vbl)(running_machine *machine, screen_state *screen, int vblank_state);
+typedef void (*vblank_state_changed_func)(running_machine *machine, screen_state *screen, int vblank_state);
 
 
 
@@ -155,7 +155,7 @@ UINT64 video_screen_get_frame_number(int scrnum);
 int video_screen_exists(int scrnum);
 
 /* registers a VBLANK callback for the given screen*/
-void video_screen_register_vbl_cb(running_machine *machine, void *screen, video_screen_on_vbl vbl_cb);
+void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank_state_changed_func vbl_cb);
 
 
 /* ----- video screen device interface ----- */

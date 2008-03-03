@@ -299,9 +299,9 @@ static void draw_sprite_invalid(running_machine *machine, bitmap_t *bitmap, cons
 	logerror("8 pixel sprite size not supported\n" );
 }
 
-typedef void (*draw_sprites_procdef)(running_machine *, bitmap_t *, const rectangle *, int, int, int, int, int );
+typedef void (*draw_sprites_func)(running_machine *, bitmap_t *, const rectangle *, int, int, int, int, int );
 
-static const draw_sprites_procdef draw_sprites_proc[16] = {
+static const draw_sprites_func draw_sprites_proc[16] = {
 	draw_sprite_invalid,	/* 0000 = 08x08 */
 	draw_sprite_invalid,	/* 0001 = 16x08 */
 	draw_sprite_invalid,	/* 0010 = 32x08 */

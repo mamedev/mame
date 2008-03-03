@@ -75,7 +75,7 @@ struct _internal_screen_info
 
 	/* VBLANK callbacks */
 	int vbl_cb_count;								/* # of callbacks installed */
-	video_screen_on_vbl		vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
+	vblank_state_changed_func		vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 
 	/* movie recording */
 	mame_file *				movie_file;				/* handle to the open movie file */
@@ -1093,7 +1093,7 @@ UINT64 video_screen_get_frame_number(int scrnum)
     VBLANK callback
 -------------------------------------------------*/
 
-void video_screen_register_vbl_cb(running_machine *machine, void *screen, video_screen_on_vbl vbl_cb)
+void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank_state_changed_func vbl_cb)
 {
 	int i, found;
 	internal_screen_info *scrinfo = NULL;

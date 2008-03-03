@@ -210,11 +210,11 @@ struct _compiler_state
 
 typedef struct _oob_handler oob_handler;
 
-typedef void (*oob_callback)(drc_core *drc, oob_handler *oob, void *param);
+typedef void (*oob_callback_func)(drc_core *drc, oob_handler *oob, void *param);
 
 struct _oob_handler
 {
-	oob_callback		callback;			/* pointer to callback function */
+	oob_callback_func		callback;			/* pointer to callback function */
 	void *				param;				/* callback parameter */
 	const opcode_desc *	desc;				/* pointer to description of relevant instruction */
 	emit_link			link;				/* link to source of the branch */
@@ -365,7 +365,7 @@ static const char *const x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp
     bounds callback for later
 -------------------------------------------------*/
 
-INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback callback, const compiler_state *compiler, const opcode_desc *desc, void *param)
+INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback_funcs callback, const compiler_state *compiler, const opcode_desc *desc, void *param)
 {
 	oob_handler *oob = &mips3.drcdata->ooblist[mips3.drcdata->oobcount++];
 

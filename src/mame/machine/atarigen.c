@@ -65,7 +65,7 @@ struct atarivc_state_desc atarivc_state;
     STATIC VARIABLES
 ***************************************************************************/
 
-static atarigen_int_callback update_int_callback;
+static atarigen_int_func update_int_callback;
 static emu_timer * scanline_interrupt_timer;
 
 static UINT8 			eeprom_unlocked;
@@ -81,7 +81,7 @@ static UINT8 			atarigen_sound_to_cpu;
 static UINT8 			timed_int;
 static UINT8 			ym2151_int;
 
-static atarigen_scanline_callback scanline_callback;
+static atarigen_scanline_func scanline_callback;
 static UINT32 			scanlines_per_callback;
 
 static UINT32 			actual_vc_latch0;
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( atarivc_eof_update );
     the interrupt sources.
 ---------------------------------------------------------------*/
 
-void atarigen_interrupt_reset(atarigen_int_callback update_int)
+void atarigen_interrupt_reset(atarigen_int_func update_int)
 {
 	int i;
 
@@ -845,7 +845,7 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume)
     atarigen_scanline_timer_reset: Sets up the scanline timer.
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update_graphics, int frequency)
+void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_func update_graphics, int frequency)
 {
 	/* set the scanline callback */
 	scanline_callback = update_graphics;

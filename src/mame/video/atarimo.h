@@ -32,7 +32,7 @@
 ##########################################################################*/
 
 /* callback for special processing */
-typedef int (*atarimo_special_cb)(bitmap_t *bitmap, const rectangle *clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
+typedef int (*atarimo_special_func)(bitmap_t *bitmap, const rectangle *clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
 
 /* description for a four-word mask */
 struct atarimo_entry
@@ -75,7 +75,7 @@ struct atarimo_desc
 
 	struct atarimo_entry specialmask;		/* mask for the special value */
 	UINT16			specialvalue;		/* resulting value to indicate "special" */
-	atarimo_special_cb	specialcb;			/* callback routine for special entries */
+	atarimo_special_func	specialcb;			/* callback routine for special entries */
 };
 
 /* rectangle list */

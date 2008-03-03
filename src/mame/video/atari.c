@@ -796,7 +796,7 @@ VIDEO_UPDATE( atari )
 	return 0;
 }
 
-static renderer_function antic_renderer = antic_mode_0_xx;
+static atari_renderer_func antic_renderer = antic_mode_0_xx;
 
 static void artifacts_gfx(UINT8 *src, UINT8 *dst, int width)
 {
@@ -1060,7 +1060,7 @@ static int cycle(void)
 	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
 }
 
-static void after(int cycles, timer_callback function, const char *funcname)
+static void after(int cycles, timer_fired_func function, const char *funcname)
 {
     attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
@@ -1083,7 +1083,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 }
 
 
-static const renderer_function renderer[2][19][5] = {
+static const atari_renderer_func renderer[2][19][5] = {
 	/*   no playfield    narrow          normal          wide         */
 	{
 		{antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx,antic_mode_0_xx},

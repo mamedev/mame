@@ -145,7 +145,7 @@ struct _sound_stream
 	INT32				output_base_sampindex;	/* sample at base of buffer, relative to the current emulated second */
 
 	/* callback information */
-	stream_callback 	callback;				/* callback function */
+	stream_update_func 	callback;				/* callback function */
 	void *				param;					/* callback function parameter */
 };
 
@@ -348,7 +348,7 @@ void streams_update(running_machine *machine)
     stream_create - create a new stream
 -------------------------------------------------*/
 
-sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_callback callback)
+sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 {
 	streams_private *strdata = Machine->streams_data;
 	int inputnum, outputnum;

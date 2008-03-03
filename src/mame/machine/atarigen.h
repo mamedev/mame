@@ -28,9 +28,9 @@
     TYPES & STRUCTURES
 ***************************************************************************/
 
-typedef void (*atarigen_int_callback)(running_machine *machine);
+typedef void (*atarigen_int_func)(running_machine *machine);
 
-typedef void (*atarigen_scanline_callback)(running_machine *machine, int scrnum, int scanline);
+typedef void (*atarigen_scanline_func)(running_machine *machine, int scrnum, int scanline);
 
 struct atarivc_state_desc
 {
@@ -95,7 +95,7 @@ extern struct atarivc_state_desc atarivc_state;
     INTERRUPT HANDLING
 ---------------------------------------------------------------*/
 
-void atarigen_interrupt_reset(atarigen_int_callback update_int);
+void atarigen_interrupt_reset(atarigen_int_func update_int);
 void atarigen_update_interrupts(void);
 
 void atarigen_scanline_int_set(int scrnum, int scanline);
@@ -218,7 +218,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_callback update_graphics, int frequency);
+void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_func update_graphics, int frequency);
 int atarigen_get_hblank(running_machine *machine, int scrnum);
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
 WRITE16_HANDLER( atarigen_666_paletteram_w );

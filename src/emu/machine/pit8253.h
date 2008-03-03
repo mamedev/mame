@@ -15,7 +15,7 @@ struct pit8253_config
 	struct
 	{
 		double clockin;
-		void (*output_callback)(int state);
+		void (*output_callback_func)(int state);
 		void (*clock_callback)(double clockout);
 	} timer[3];
 };

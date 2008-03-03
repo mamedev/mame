@@ -150,7 +150,7 @@ static VIDEO_START( madalien )
 {
 	int i;
 
-	static const tilemap_mapper_callback scan_functions[4] =
+	static const tilemap_mapper_func scan_functions[4] =
 	{
 		scan_mode0, scan_mode1, scan_mode2, scan_mode3
 	};

@@ -90,8 +90,8 @@ INLINE void set_mstat(int new_value)
 		adsp2100.alt = temp;
 	}
 	if ((new_value ^ adsp2100.mstat) & MSTAT_TIMER)
-		if (adsp2100.timer_callback)
-			(*adsp2100.timer_callback)((new_value & MSTAT_TIMER) != 0);
+		if (adsp2100.timer_fired_func)
+			(*adsp2100.timer_fired_func)((new_value & MSTAT_TIMER) != 0);
 	if (new_value & MSTAT_STICKYV)
 		adsp2100.astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else

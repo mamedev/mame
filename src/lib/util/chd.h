@@ -176,10 +176,6 @@ typedef enum _chd_error chd_error;
 typedef struct _chd_file chd_file;
 
 
-/* progress callback function */
-typedef void (*chd_progress_printf)(const char *format, ...);
-
-
 /* extract header structure (NOT the on-disk header structure) */
 typedef struct _chd_header chd_header;
 struct _chd_header

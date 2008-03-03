@@ -76,7 +76,7 @@ enum
 typedef struct _menu_state menu_state;
 struct _menu_state
 {
-	ui_menu_handler handler;			/* handler callback */
+	ui_menu_handler_func handler;			/* handler callback */
 	UINT32			state;				/* state value */
 };
 
@@ -658,7 +658,7 @@ void ui_menu_stack_reset(void)
     stack
 -------------------------------------------------*/
 
-UINT32 ui_menu_stack_push(ui_menu_handler new_handler, UINT32 new_state)
+UINT32 ui_menu_stack_push(ui_menu_handler_func new_handler, UINT32 new_state)
 {
 	menu_state *state = &menu_stack[++menu_stack_index];
 	assert(menu_stack_index < MENU_STACK_DEPTH);

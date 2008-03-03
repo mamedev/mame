@@ -45,7 +45,7 @@ struct pit8253_timer
 {
 	double clockin;					/* input clock frequency in Hz */
 
-	void (*output_callback)(int);	/* callback function for when output changes */
+	void (*output_callback_func)(int);	/* callback function for when output changes */
 	void (*freq_callback)(double);	/* callback function for when output frequency changes */
 
 	attotime last_updated;			/* time when last updated */
@@ -272,9 +272,9 @@ static void	set_output(struct pit8253_timer	*timer,int output)
 	if (output != timer->output)
 	{
 		timer->output =	output;
-		if (timer->output_callback != NULL)
+		if (timer->output_callback_func != NULL)
 		{
-			timer->output_callback(output);
+			timer->output_callback_func(output);
 		}
 	}
 }
@@ -602,7 +602,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 		break;
 	}
 
-	if (timer->output_callback != NULL)
+	if (timer->output_callback_func != NULL)
 	{
 		timer->cycles_to_output	= cycles_to_output;
 		if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
@@ -766,10 +766,10 @@ int	pit8253_init(int count,	const struct pit8253_config *config)
 			timer =	get_timer(pit,timerno);
 
 			timer->clockin = pit->config->timer[timerno].clockin;
-			timer->output_callback = pit->config->timer[timerno].output_callback;
+			timer->output_callback_func = pit->config->timer[timerno].output_callback_func;
 			timer->freq_callback = pit->config->timer[timerno].clock_callback;
 
-			if (timer->output_callback == NULL)
+			if (timer->output_callback_func == NULL)
 				timer->outputtimer = NULL;
 			else
 			{

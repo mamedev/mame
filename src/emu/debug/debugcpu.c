@@ -1100,7 +1100,7 @@ static void standard_debug_hook_write(int spacenum, int size, offs_t address, UI
     for the specified CPU
 -------------------------------------------------*/
 
-void debug_get_memory_hooks(int cpunum, debug_hook_read_ptr *read, debug_hook_write_ptr *write)
+void debug_get_memory_hooks(int cpunum, debug_hook_read_func *read, debug_hook_write_func *write)
 {
 	memory_hook_cpunum = cpunum;
 

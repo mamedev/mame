@@ -21,7 +21,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*output_notifier)(const char *outname, INT32 value, void *param);
+typedef void (*output_notifier_func)(const char *outname, INT32 value, void *param);
 
 
 
@@ -45,10 +45,10 @@ INT32 output_get_value(const char *outname);
 INT32 output_get_indexed_value(const char *outname, int index);
 
 /* set a notifier on a particular output, or globally if NULL */
-void output_set_notifier(const char *outname, output_notifier callback, void *param);
+void output_set_notifier(const char *outname, output_notifier_func callback, void *param);
 
 /* set a notifier on a particular output, or globally if NULL */
-void output_notify_all(output_notifier callback, void *param);
+void output_notify_all(output_notifier_func callback, void *param);
 
 /* map a name to a unique ID */
 UINT32 output_name_to_id(const char *outname);

@@ -31,7 +31,7 @@ typedef struct _output_notify output_notify;
 struct _output_notify
 {
 	output_notify *		next;			/* link to next item */
-	output_notifier		notifier;		/* callback to call */
+	output_notifier_func		notifier;		/* callback to call */
 	void *				param;			/* parameter to pass the callback */
 };
 
@@ -321,7 +321,7 @@ INT32 output_get_indexed_value(const char *basename, int index)
     if NULL is specified
 -------------------------------------------------*/
 
-void output_set_notifier(const char *outname, output_notifier callback, void *param)
+void output_set_notifier(const char *outname, output_notifier_func callback, void *param)
 {
 	output_notify **headptr;
 
@@ -357,7 +357,7 @@ void output_set_notifier(const char *outname, output_notifier callback, void *pa
     notifier for all outputs
 -------------------------------------------------*/
 
-void output_notify_all(output_notifier callback, void *param)
+void output_notify_all(output_notifier_func callback, void *param)
 {
 	output_item *item;
 	int hash;

@@ -146,7 +146,7 @@ struct _opcode_desc
 
 
 /* callback function that is used to describe a single opcode */
-typedef int (*drcfe_describe)(void *param, opcode_desc *desc);
+typedef int (*drcfe_describe_func)(void *param, opcode_desc *desc);
 
 
 /* description of a given opcode */
@@ -156,7 +156,7 @@ struct _drcfe_config
 	UINT32			window_start;			/* code window start offset = startpc - window_start */
 	UINT32			window_end;				/* code window end offset = startpc + window_end */
 	UINT32			max_sequence;			/* maximum instructions to include in a sequence */
-	drcfe_describe	describe;				/* callback to describe a single instruction */
+	drcfe_describe_func	describe;				/* callback to describe a single instruction */
 };
 
 /*

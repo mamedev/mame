@@ -61,7 +61,7 @@ struct _input_device_item
 	void *					internal;				/* internal callback pointer */
 	input_item_class		itemclass;				/* class of the item */
 	input_item_id			itemid;					/* originally specified item id */
-	item_get_state_cb		getstate;				/* get state callback */
+	item_get_state_func		getstate;				/* get state callback */
 	INT32					current;				/* current raw value */
 	INT32					memory;					/* "memory" value, to remember where we started during polling */
 	INT32					oncelatch;				/* latched "once" value, cleared after each read  */
@@ -689,7 +689,7 @@ input_device *input_device_add(input_device_class devclass, const char *name, vo
     input device
 -------------------------------------------------*/
 
-void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_cb getstate)
+void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
 {
 	input_device_item *item;
 

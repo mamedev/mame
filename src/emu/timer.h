@@ -54,7 +54,7 @@
 ***************************************************************************/
 
 /* a timer callback looks like this */
-typedef void (*timer_callback)(running_machine *machine, void *ptr, INT32 param);
+typedef void (*timer_fired_func)(running_machine *machine, void *ptr, INT32 param);
 
 /* opaque type for representing a timer */
 typedef struct _emu_timer emu_timer;
@@ -106,7 +106,7 @@ int timer_count_anonymous(void);
 /* ----- core timer management ----- */
 
 /* allocate a permament timer that isn't primed yet */
-emu_timer *_timer_alloc_internal(timer_callback callback, void *param, const char *file, int line, const char *func);
+emu_timer *_timer_alloc_internal(timer_fired_func callback, void *param, const char *file, int line, const char *func);
 
 /* adjust the time when this timer will fire and disable any periodic firings */
 void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);
@@ -119,10 +119,10 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 /* ----- anonymous timer management ----- */
 
 /* allocate a one-shot timer, which calls the callback after the given duration */
-void _timer_set_internal(attotime druation, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func);
+void _timer_set_internal(attotime druation, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
 
 /* allocate a pulse timer, which repeatedly calls the callback using the given period */
-void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func);
+void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
 
 
 

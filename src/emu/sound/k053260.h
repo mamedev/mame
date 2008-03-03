@@ -8,7 +8,7 @@
 
 struct K053260_interface {
 	int region;					/* memory region of sample ROM(s) */
-	timer_callback irq;			/* called on SH1 complete cycle ( clock / 32 ) */
+	timer_fired_func irq;			/* called on SH1 complete cycle ( clock / 32 ) */
 };
 
 

@@ -198,21 +198,21 @@ typedef union _cpuinfo cpuinfo;
 
 
 /* define the various callback functions */
-typedef void (*cpufunc_get_info)(UINT32 state, cpuinfo *info);
-typedef void (*cpufunc_set_info)(UINT32 state, cpuinfo *info);
-typedef void (*cpufunc_get_context)(void *buffer);
-typedef void (*cpufunc_set_context)(void *buffer);
-typedef void (*cpufunc_init)(int index, int clock, const void *config, int (*irqcallback)(int));
-typedef void (*cpufunc_reset)(void);
-typedef void (*cpufunc_exit)(void);
-typedef int	(*cpufunc_execute)(int cycles);
-typedef void (*cpufunc_burn)(int cycles);
-typedef offs_t (*cpufunc_disassemble)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-typedef int	(*cpufunc_translate)(int space, offs_t *address);
-typedef int	(*cpufunc_read)(int space, UINT32 offset, int size, UINT64 *value);
-typedef int	(*cpufunc_write)(int space, UINT32 offset, int size, UINT64 value);
-typedef int	(*cpufunc_readop)(UINT32 offset, int size, UINT64 *value);
-typedef void (*cpufunc_setup_commands)(void);
+typedef void (*cpu_get_info_func)(UINT32 state, cpuinfo *info);
+typedef void (*cpu_set_info_func)(UINT32 state, cpuinfo *info);
+typedef void (*cpu_get_context_func)(void *buffer);
+typedef void (*cpu_set_context_func)(void *buffer);
+typedef void (*cpu_init_func)(int index, int clock, const void *config, int (*irqcallback)(int));
+typedef void (*cpu_reset_func)(void);
+typedef void (*cpu_exit_func)(void);
+typedef int	(*cpu_execute_func)(int cycles);
+typedef void (*cpu_burn_func)(int cycles);
+typedef offs_t (*cpu_disassemble_func)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+typedef int	(*cpu_translate_func)(int space, offs_t *address);
+typedef int	(*cpu_read_func)(int space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpu_write_func)(int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpu_readop_func)(UINT32 offset, int size, UINT64 *value);
+typedef void (*cpu_setup_commands_func)(void);
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -223,20 +223,20 @@ union _cpuinfo
 	genf *  				f;							/* generic function pointers */
 	char *					s;							/* generic strings */
 
-	cpufunc_set_info		setinfo;					/* CPUINFO_PTR_SET_INFO */
-	cpufunc_get_context		getcontext;					/* CPUINFO_PTR_GET_CONTEXT */
-	cpufunc_set_context		setcontext;					/* CPUINFO_PTR_SET_CONTEXT */
-	cpufunc_init			init;						/* CPUINFO_PTR_INIT */
-	cpufunc_reset			reset;						/* CPUINFO_PTR_RESET */
-	cpufunc_exit			exit;						/* CPUINFO_PTR_EXIT */
-	cpufunc_execute			execute;					/* CPUINFO_PTR_EXECUTE */
-	cpufunc_burn			burn;						/* CPUINFO_PTR_BURN */
-	cpufunc_disassemble		disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
-	cpufunc_translate		translate;					/* CPUINFO_PTR_TRANSLATE */
-	cpufunc_read			read;						/* CPUINFO_PTR_READ */
-	cpufunc_write			write;						/* CPUINFO_PTR_WRITE */
-	cpufunc_readop			readop;						/* CPUINFO_PTR_READOP */
-	cpufunc_setup_commands	setup_commands;				/* CPUINFO_PTR_DEBUG_SETUP_COMMANDS */
+	cpu_set_info_func		setinfo;					/* CPUINFO_PTR_SET_INFO */
+	cpu_get_context_func	getcontext;					/* CPUINFO_PTR_GET_CONTEXT */
+	cpu_set_context_func	setcontext;					/* CPUINFO_PTR_SET_CONTEXT */
+	cpu_init_func			init;						/* CPUINFO_PTR_INIT */
+	cpu_reset_func			reset;						/* CPUINFO_PTR_RESET */
+	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
+	cpu_execute_func		execute;					/* CPUINFO_PTR_EXECUTE */
+	cpu_burn_func			burn;						/* CPUINFO_PTR_BURN */
+	cpu_disassemble_func	disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
+	cpu_translate_func		translate;					/* CPUINFO_PTR_TRANSLATE */
+	cpu_read_func			read;						/* CPUINFO_PTR_READ */
+	cpu_write_func			write;						/* CPUINFO_PTR_WRITE */
+	cpu_readop_func			readop;						/* CPUINFO_PTR_READOP */
+	cpu_setup_commands_func	setup_commands;				/* CPUINFO_PTR_DEBUG_SETUP_COMMANDS */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
 	construct_map_t 		internal_map;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 };
@@ -246,17 +246,17 @@ typedef struct _cpu_interface cpu_interface;
 struct _cpu_interface
 {
 	/* table of core functions */
-	cpufunc_get_info		get_info;
-	cpufunc_set_info		set_info;
-	cpufunc_get_context		get_context;
-	cpufunc_set_context		set_context;
-	cpufunc_init			init;
-	cpufunc_reset			reset;
-	cpufunc_exit			exit;
-	cpufunc_execute			execute;
-	cpufunc_burn			burn;
-	cpufunc_disassemble		disassemble;
-	cpufunc_translate		translate;
+	cpu_get_info_func		get_info;
+	cpu_set_info_func		set_info;
+	cpu_get_context_func	get_context;
+	cpu_set_context_func	set_context;
+	cpu_init_func			init;
+	cpu_reset_func			reset;
+	cpu_exit_func			exit;
+	cpu_execute_func		execute;
+	cpu_burn_func			burn;
+	cpu_disassemble_func	disassemble;
+	cpu_translate_func		translate;
 
 	/* other info */
 	size_t					context_size;

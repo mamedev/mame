@@ -1200,8 +1200,8 @@ static void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
-	tile_get_info_callback get_text_info;
-	tile_get_info_callback get_tile_info;
+	tile_get_info_func get_text_info;
+	tile_get_info_func get_tile_info;
 	int pagenum;
 	int i;
 

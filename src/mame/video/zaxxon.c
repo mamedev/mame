@@ -124,7 +124,7 @@ static TILE_GET_INFO( congo_get_fg_tile_info )
  *
  *************************************/
 
-static void video_start_common(running_machine *machine, tile_get_info_callback fg_tile_info)
+static void video_start_common(running_machine *machine, tile_get_info_func fg_tile_info)
 {
 	/* reset globals */
 	bg_enable = 0;

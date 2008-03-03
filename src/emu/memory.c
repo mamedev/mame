@@ -292,8 +292,8 @@ static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
 static bank_data 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
 #ifdef ENABLE_DEBUGGER
-static debug_hook_read_ptr	debug_hook_read;				/* pointer to debugger callback for memory reads */
-static debug_hook_write_ptr	debug_hook_write;				/* pointer to debugger callback for memory writes */
+static debug_hook_read_func	debug_hook_read;				/* pointer to debugger callback for memory reads */
+static debug_hook_write_func	debug_hook_write;				/* pointer to debugger callback for memory writes */
 #endif
 
 static const data_accessors memory_accessors[ADDRESS_SPACES][4][2] =

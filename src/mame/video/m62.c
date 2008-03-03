@@ -399,7 +399,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void m62_start( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_start( tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_background = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 
@@ -418,7 +418,7 @@ static void m62_start( tile_get_info_callback tile_get_info, int rows, int cols,
 	}
 }
 
-static void m62_textlayer( tile_get_info_callback tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
+static void m62_textlayer( tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
 	m62_foreground = tilemap_create( tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2 );
 

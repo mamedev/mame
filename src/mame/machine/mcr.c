@@ -62,7 +62,7 @@ static UINT8 m6840_irq_vector;
 static UINT8 v493_irq_state;
 static UINT8 v493_irq_vector;
 
-static timer_callback v493_callback;
+static timer_fired_func v493_callback;
 
 static UINT8 zwackery_sound_data;
 

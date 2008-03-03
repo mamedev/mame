@@ -189,7 +189,7 @@ static core_options *mame_opts;
 static UINT8 started_empty;
 
 /* output channels */
-static output_callback output_cb[OUTPUT_CHANNEL_COUNT];
+static output_callback_func output_cb[OUTPUT_CHANNEL_COUNT];
 static void *output_cb_param[OUTPUT_CHANNEL_COUNT];
 
 /* the "disclaimer" that should be printed when run with no parameters */
@@ -931,7 +931,7 @@ UINT32 memory_region_flags(running_machine *machine, int num)
     channel
 -------------------------------------------------*/
 
-void mame_set_output_channel(output_channel channel, output_callback callback, void *param, output_callback *prevcb, void **prevparam)
+void mame_set_output_channel(output_channel channel, output_callback_func callback, void *param, output_callback_func *prevcb, void **prevparam)
 {
 	assert(channel < OUTPUT_CHANNEL_COUNT);
 	assert(callback != NULL);

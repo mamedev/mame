@@ -84,7 +84,7 @@ struct atarimo_data
 
 	struct atarimo_mask specialmask;		/* mask for the special value */
 	int					specialvalue;		/* resulting value to indicate "special" */
-	atarimo_special_cb	specialcb;			/* callback routine for special entries */
+	atarimo_special_func	specialcb;			/* callback routine for special entries */
 	int					codehighshift;		/* shift count for the upper code */
 
 	struct atarimo_entry *spriteram;		/* pointer to sprite RAM */

@@ -170,7 +170,7 @@ enum
 -------------------------------------------------*/
 
 /* texture scaling callback */
-typedef void (*texture_scaler)(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
+typedef void (*texture_scaler_func)(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
 
 
 
@@ -390,7 +390,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 /* ----- render texture management ----- */
 
 /* allocate a new texture */
-render_texture *render_texture_alloc(texture_scaler scaler, void *param);
+render_texture *render_texture_alloc(texture_scaler_func scaler, void *param);
 
 /* free an allocated texture */
 void render_texture_free(render_texture *texture);

@@ -6,7 +6,7 @@
 typedef struct {
 	const UINT16	*regs;
 	UINT8	features;
-	void	(*timer_callback)(int cycles);
+	void	(*timer_fired_func)(int cycles);
 } Z80GB_CONFIG;
 
 enum {

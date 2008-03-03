@@ -512,7 +512,7 @@ static void state_save_register(void)
 	state_save_register_global(background_blue);
 }
 
-static void video_start_common(running_machine *machine, tilemap_mapper_callback get_memory_offset)
+static void video_start_common(running_machine *machine, tilemap_mapper_func get_memory_offset)
 {
 	bg_tilemap = tilemap_create(get_tile_info,get_memory_offset,8,8,32,32);
 

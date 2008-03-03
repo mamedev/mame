@@ -473,7 +473,7 @@ enum
 typedef UINT32 input_code;
 
 /* callback for getting the value of an item on a device */
-typedef INT32 (*item_get_state_cb)(void *device_internal, void *item_internal);
+typedef INT32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
 /* (opaque) input device object */
 typedef struct _input_device input_device;
@@ -517,7 +517,7 @@ int input_device_set_joystick_map(int devindex, const char *mapstring);
 input_device *input_device_add(input_device_class devclass, const char *name, void *internal);
 
 /* add a new item to an input device */
-void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_cb getstate);
+void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);
 
 
 

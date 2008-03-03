@@ -1059,7 +1059,7 @@ static void zeus_draw_model(UINT32 texdata, int logit)
 
 static void zeus_draw_quad(const UINT32 *databuffer, UINT32 texdata, int logit)
 {
-	poly_draw_scanline callback;
+	poly_draw_scanline_func callback;
 	poly_extra_data *extra;
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];

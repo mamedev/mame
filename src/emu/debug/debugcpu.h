@@ -54,8 +54,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*debug_hook_read_ptr)(int spacenum, int size, offs_t address);
-typedef void (*debug_hook_write_ptr)(int spacenum, int size, offs_t address, UINT64 data);
+typedef void (*debug_hook_read_func)(int spacenum, int size, offs_t address);
+typedef void (*debug_hook_write_func)(int spacenum, int size, offs_t address, UINT64 data);
 
 
 typedef struct _debug_trace_info debug_trace_info;
@@ -183,7 +183,7 @@ void				debug_flush_traces(void);
 
 /* debugging hooks */
 void				debug_interrupt_hook(int cpunum, int irqline);
-void				debug_get_memory_hooks(int cpunum, debug_hook_read_ptr *read, debug_hook_write_ptr *write);
+void				debug_get_memory_hooks(int cpunum, debug_hook_read_func *read, debug_hook_write_func *write);
 void				debug_set_instruction_hook(int cpunum, int (*hook)(offs_t pc));
 
 /* execution control */

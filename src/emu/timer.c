@@ -43,7 +43,7 @@ struct _emu_timer
 {
 	emu_timer *		next;
 	emu_timer *		prev;
-	timer_callback	callback;
+	timer_fired_func	callback;
 	INT32 			param;
 	void *			ptr;
 	const char *	file;
@@ -458,7 +458,7 @@ int timer_count_anonymous(void)
     isn't primed yet
 -------------------------------------------------*/
 
-INLINE emu_timer *_timer_alloc_common(timer_callback callback, void *ptr, const char *file, int line, const char *func, int temp)
+INLINE emu_timer *_timer_alloc_common(timer_fired_func callback, void *ptr, const char *file, int line, const char *func, int temp)
 {
 	attotime time = get_current_time();
 	emu_timer *timer = timer_new();
@@ -490,7 +490,7 @@ INLINE emu_timer *_timer_alloc_common(timer_callback callback, void *ptr, const 
 	return timer;
 }
 
-emu_timer *_timer_alloc_internal(timer_callback callback, void *ptr, const char *file, int line, const char *func)
+emu_timer *_timer_alloc_internal(timer_fired_func callback, void *ptr, const char *file, int line, const char *func)
 {
 	return _timer_alloc_common(callback, ptr, file, line, func, FALSE);
 }
@@ -585,7 +585,7 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
     period
 -------------------------------------------------*/
 
-void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
+void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
 {
 	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, FALSE);
 	timer_adjust_periodic(timer, period, param, period);
@@ -597,7 +597,7 @@ void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_callba
     calls the callback after the given duration
 -------------------------------------------------*/
 
-void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_callback callback, const char *file, int line, const char *func)
+void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
 {
 	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, TRUE);
 	timer_adjust_oneshot(timer, duration, param);

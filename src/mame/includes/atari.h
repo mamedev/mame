@@ -589,7 +589,7 @@ typedef struct {
 	FUNC(40); FUNC(41); FUNC(42); FUNC(43); \
 	FUNC(44); FUNC(45); FUNC(46); FUNC(47);
 
-typedef void (*renderer_function)(VIDEO *video);
+typedef void (*atari_renderer_func)(VIDEO *video);
 
 /*----------- defined in video/antic.c -----------*/
 

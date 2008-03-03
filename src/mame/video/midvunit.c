@@ -306,7 +306,7 @@ static void process_dma_queue(running_machine *machine)
 	poly_extra_data *extra = poly_get_extra_data(poly);
 	UINT16 *dest = &midvunit_videoram[(page_control & 4) ? 0x40000 : 0x00000];
 	int textured = ((dma_data[0] & 0x300) == 0x100);
-	poly_draw_scanline callback;
+	poly_draw_scanline_func callback;
 	poly_vertex vert[4];
 
 	/* if we're rendering to the same page we're viewing, it has changed */

@@ -47,8 +47,8 @@ typedef enum
 
 
 /* internal blitting callbacks */
-typedef void (*blitmask_t)(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, UINT8 *pri, UINT32 pcode);
-typedef void (*blitopaque_t)(void *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode);
+typedef void (*blitmask_func)(void *dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, UINT8 *pri, UINT32 pcode);
+typedef void (*blitopaque_func)(void *dest, const UINT16 *source, int count, UINT8 *pri, UINT32 pcode);
 
 
 /* blitting parameters for rendering */
@@ -57,8 +57,8 @@ struct _blit_parameters
 {
 	bitmap_t *			bitmap;
 	rectangle			cliprect;
-	blitmask_t 			draw_masked;
-	blitopaque_t 		draw_opaque;
+	blitmask_func 		draw_masked;
+	blitopaque_func		draw_opaque;
 	UINT32 				tilemap_priority_code;
 	UINT8				mask;
 	UINT8				value;
@@ -79,14 +79,14 @@ struct _tilemap
 	UINT32						height;				/* height of the full tilemap in pixels */
 
 	/* logical <-> memory mappings */
-	tilemap_mapper_callback		mapper;				/* callback to map a row/column to a memory index */
+	tilemap_mapper_func		mapper;				/* callback to map a row/column to a memory index */
 	tilemap_logical_index *		memory_to_logical;	/* map from memory index to logical index */
 	tilemap_logical_index		max_logical_index;	/* maximum valid logical index */
 	tilemap_memory_index *		logical_to_memory;	/* map from logical index to memory index */
 	tilemap_memory_index		max_memory_index;	/* maximum valid memory index */
 
 	/* callback to interpret video RAM for the tilemap */
-	tile_get_info_callback		tile_get_info;		/* callback to get information about a tile */
+	tile_get_info_func		tile_get_info;		/* callback to get information about a tile */
 	tile_data					tileinfo;			/* structure to hold the data for a tile */
 	void *						user_data;			/* user data value passed to the callback */
 
@@ -287,7 +287,7 @@ void tilemap_init(running_machine *machine)
     tilemap_create - allocate a new tilemap
 -------------------------------------------------*/
 
-tilemap *tilemap_create(tile_get_info_callback tile_get_info, tilemap_mapper_callback mapper, int tilewidth, int tileheight, int cols, int rows)
+tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
 	tilemap *tmap;
 	int group;

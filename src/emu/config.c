@@ -35,8 +35,8 @@ struct _config_type
 {
 	struct _config_type *	next;				/* next in line */
 	const char *			name;				/* node name */
-	config_callback			load;				/* load callback */
-	config_callback			save;				/* save callback */
+	config_callback_func			load;				/* load callback */
+	config_callback_func			save;				/* save callback */
 };
 
 
@@ -86,7 +86,7 @@ void config_init(running_machine *machine)
  *
  *************************************/
 
-void config_register(const char *nodename, config_callback load, config_callback save)
+void config_register(const char *nodename, config_callback_func load, config_callback_func save)
 {
 	config_type *newtype;
 	config_type **ptype;

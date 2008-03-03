@@ -1782,11 +1782,11 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 	}
 }
 
-static void gx700pwfbf_init( void (*output_callback)( int offset, int data ) )
+static void gx700pwfbf_init( void (*output_callback_func)( int offset, int data ) )
 {
 	memset( gx700pwbf_output_data, 0, sizeof( gx700pwbf_output_data ) );
 
-	gx700pwfbf_output_callback = output_callback;
+	gx700pwfbf_output_callback = output_callback_func;
 
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_w );
@@ -2317,11 +2317,11 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	}
 }
 
-static void gx894pwbba_init( void (*output_callback)( int offset, int data ) )
+static void gx894pwbba_init( void (*output_callback_func)( int offset, int data ) )
 {
 	int gx894_ram_size = 24 * 1024 * 1024;
 
-	gx894pwbba_output_callback = output_callback;
+	gx894pwbba_output_callback = output_callback_func;
 
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_w );

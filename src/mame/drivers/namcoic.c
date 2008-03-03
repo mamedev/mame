@@ -1122,7 +1122,7 @@ void
 namco_roz_init( int gfxbank, int maskregion )
 {
 	int i;
-	static const tile_get_info_callback roz_info[ROZ_TILEMAP_COUNT] =
+	static const tile_get_info_func roz_info[ROZ_TILEMAP_COUNT] =
 	{
 		roz_get_info0,
 		roz_get_info1

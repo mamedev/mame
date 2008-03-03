@@ -46,8 +46,8 @@
 #define FLAG_C  0x10
 
 #define CYCLES_PASSED(X)		z80gb_ICount -= ((X) / (Regs.w.gb_speed));	\
-					if ( Regs.w.timer_callback ) {			\
-						Regs.w.timer_callback( X );		\
+					if ( Regs.w.timer_fired_func ) {			\
+						Regs.w.timer_fired_func( X );		\
 					}
 
 typedef struct {
@@ -65,7 +65,7 @@ typedef struct {
 	int	ei_delay;
 	int	(*irq_callback)(int irqline);
 	/* Timer stuff */
-	void	(*timer_callback)(int cycles);
+	void	(*timer_fired_func)(int cycles);
 	/* Fetch & execute related */
 	int		execution_state;
 	UINT8	op;
@@ -197,7 +197,7 @@ static void z80gb_reset(void)
 	Regs.w.HL = 0x0000;
 	Regs.w.SP = 0x0000;
 	Regs.w.PC = 0x0000;
-	Regs.w.timer_callback = NULL;
+	Regs.w.timer_fired_func = NULL;
 	Regs.w.features = Z80GB_FEATURE_HALT_BUG;
 	if (Regs.w.config)
 	{
@@ -209,7 +209,7 @@ static void z80gb_reset(void)
 			Regs.w.SP = Regs.w.config->regs[4];
 			Regs.w.PC = Regs.w.config->regs[5];
 		}
-		Regs.w.timer_callback = Regs.w.config->timer_callback;
+		Regs.w.timer_fired_func = Regs.w.config->timer_fired_func;
 		Regs.w.features = Regs.w.config->features;
 	}
 	Regs.w.enable = 0;

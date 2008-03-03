@@ -135,7 +135,7 @@ struct _render_texture
 	rectangle			sbounds;			/* source bounds within the bitmap */
 	UINT32				palettebase;		/* palette base within the system palette */
 	int					format;				/* format of the texture data */
-	texture_scaler		scaler;				/* scaling callback */
+	texture_scaler_func		scaler;				/* scaling callback */
 	void *				param;				/* scaling callback parameter */
 	UINT32				curseq;				/* current sequence number */
 	scaled_texture		scaled[MAX_TEXTURE_SCALES];	/* array of scaled variants of this texture */
@@ -1940,10 +1940,10 @@ static int remove_clear_extent(const render_bounds *bounds)
 	INT32 *max = &clear_extents[MAX_CLEAR_EXTENTS];
 	INT32 *last = &clear_extents[clear_extent_count];
 	INT32 *ext = &clear_extents[0];
-	INT32 boundsx0 = (INT32) ceil(bounds->x0);
-	INT32 boundsx1 = (INT32) floor(bounds->x1);
-	INT32 boundsy0 = (INT32) ceil(bounds->y0);
-	INT32 boundsy1 = (INT32) floor(bounds->y1);
+	INT32 boundsx0 = ceil(bounds->x0);
+	INT32 boundsx1 = floor(bounds->x1);
+	INT32 boundsy0 = ceil(bounds->y0);
+	INT32 boundsy1 = floor(bounds->y1);
 	INT32 y0, y1 = 0;
 
 	/* loop over Y extents */
@@ -2221,7 +2221,7 @@ static void invalidate_all_render_ref(void *refptr)
     render_texture_alloc - allocate a new texture
 -------------------------------------------------*/
 
-render_texture *render_texture_alloc(texture_scaler scaler, void *param)
+render_texture *render_texture_alloc(texture_scaler_func scaler, void *param)
 {
 	render_texture *texture;
 

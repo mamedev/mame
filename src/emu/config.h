@@ -43,7 +43,7 @@ enum
  *
  *************************************/
 
-typedef void (*config_callback)(int config_type, xml_data_node *parentnode);
+typedef void (*config_callback_func)(int config_type, xml_data_node *parentnode);
 
 
 
@@ -54,7 +54,7 @@ typedef void (*config_callback)(int config_type, xml_data_node *parentnode);
  *************************************/
 
 void config_init(running_machine *machine);
-void config_register(const char *nodename, config_callback load, config_callback save);
+void config_register(const char *nodename, config_callback_func load, config_callback_func save);
 int config_load_settings(running_machine *machine);
 void config_save_settings(running_machine *machine);
 

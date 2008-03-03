@@ -157,7 +157,7 @@ extern const char *const memory_region_names[REGION_MAX];
 ***************************************************************************/
 
 /* output channel callback */
-typedef void (*output_callback)(void *param, const char *format, va_list argptr);
+typedef void (*output_callback_func)(void *param, const char *format, va_list argptr);
 
 
 /* forward type declarations */
@@ -340,7 +340,7 @@ UINT32 memory_region_flags(running_machine *machine, int num);
 /* ----- output management ----- */
 
 /* set the output handler for a channel, returns the current one */
-void mame_set_output_channel(output_channel channel, output_callback callback, void *param, output_callback *prevcb, void **prevparam);
+void mame_set_output_channel(output_channel channel, output_callback_func callback, void *param, output_callback_func *prevcb, void **prevparam);
 
 /* built-in default callbacks */
 void mame_file_output_callback(void *param, const char *format, va_list argptr);
