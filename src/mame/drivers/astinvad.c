@@ -201,12 +201,10 @@ static MACHINE_START( kamikaze )
 }
 
 
-static INTERRUPT_GEN( spaceint_interrupt )
+static INPUT_CHANGED( spaceint_coin_inserted )
 {
-	if (readinputport(2) & 1)	/* coin */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -453,7 +451,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 
 	PORT_START_TAG("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) /* causes NMI */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(spaceint_coin_inserted, 0)
 
 	PORT_START_TAG("IN3")
 	PORT_DIPNAME( 0xff, 0x00, DEF_STR( Cabinet ) )
@@ -538,7 +536,7 @@ static MACHINE_DRIVER_START( spaceint )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK)        /* a guess */
 	MDRV_CPU_PROGRAM_MAP(spaceint_map,0)
 	MDRV_CPU_IO_MAP(spaceint_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", spaceint_interrupt)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_START(spaceint)

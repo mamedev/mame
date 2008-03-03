@@ -118,14 +118,14 @@ enum
 	MAPLE_STATUS = 0x21,
 };
 
-UINT32 sysctrl_regs[0x200/4];
+UINT32 dc_sysctrl_regs[0x200/4];
+UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
 extern UINT32 dma_offset;
 static UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
-static UINT32 coin_counts[8];
 
 static const UINT32 maple0x82answer[]=
 {
@@ -163,25 +163,25 @@ int compute_interrupt_level(void)
 {
 	UINT32 ln,lx,le;
 
-	ln=sysctrl_regs[SB_ISTNRM] & sysctrl_regs[SB_IML6NRM];
-	lx=sysctrl_regs[SB_ISTEXT] & sysctrl_regs[SB_IML6EXT];
-	le=sysctrl_regs[SB_ISTERR] & sysctrl_regs[SB_IML6ERR];
+	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML6NRM];
+	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML6EXT];
+	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML6ERR];
 	if (ln | lx | le)
 	{
 		return 6;
 	}
 
-	ln=sysctrl_regs[SB_ISTNRM] & sysctrl_regs[SB_IML4NRM];
-	lx=sysctrl_regs[SB_ISTEXT] & sysctrl_regs[SB_IML4EXT];
-	le=sysctrl_regs[SB_ISTERR] & sysctrl_regs[SB_IML4ERR];
+	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML4NRM];
+	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML4EXT];
+	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML4ERR];
 	if (ln | lx | le)
 	{
 		return 4;
 	}
 
-	ln=sysctrl_regs[SB_ISTNRM] & sysctrl_regs[SB_IML2NRM];
-	lx=sysctrl_regs[SB_ISTEXT] & sysctrl_regs[SB_IML2EXT];
-	le=sysctrl_regs[SB_ISTERR] & sysctrl_regs[SB_IML2ERR];
+	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML2NRM];
+	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML2EXT];
+	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML2ERR];
 	if (ln | lx | le)
 	{
 		return 2;
@@ -194,22 +194,22 @@ void update_interrupt_status(void)
 {
 int level;
 
-	if (sysctrl_regs[SB_ISTERR])
+	if (dc_sysctrl_regs[SB_ISTERR])
 	{
-		sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
 	}
 	else
 	{
-		sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
+		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
 	}
 
-	if (sysctrl_regs[SB_ISTEXT])
+	if (dc_sysctrl_regs[SB_ISTEXT])
 	{
-		sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
 	}
 	else
 	{
-		sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
+		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
 	}
 
 	level=compute_interrupt_level();
@@ -226,11 +226,11 @@ READ64_HANDLER( dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, activecpu_get_pc());
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, activecpu_get_pc());
 	}
 	#endif
 
-	return (UINT64)sysctrl_regs[reg] << shift;
+	return (UINT64)dc_sysctrl_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_sysctrl_w )
@@ -242,37 +242,37 @@ WRITE64_HANDLER( dc_sysctrl_w )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-	old = sysctrl_regs[reg];
-	sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
+	old = dc_sysctrl_regs[reg];
+	dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
 	switch (reg)
 	{
 		case SB_C2DST:
-			ddtdata.destination=sysctrl_regs[SB_C2DSTAT];
-			ddtdata.length=sysctrl_regs[SB_C2DLEN];
+			ddtdata.destination=dc_sysctrl_regs[SB_C2DSTAT];
+			ddtdata.length=dc_sysctrl_regs[SB_C2DLEN];
 			ddtdata.size=1;
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
 			cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 			#if DEBUG_SYSCTRL
-			mame_printf_verbose("SYSCTRL: Ch2 dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, sysctrl_regs[SB_C2DSTAT],sysctrl_regs[SB_LMMODE0],sysctrl_regs[SB_LMMODE1]);
+			mame_printf_verbose("SYSCTRL: Ch2 dma %x from %08x to %08x (lmmode0=%d lmmode1=%d)\n", dc_sysctrl_regs[SB_C2DLEN], ddtdata.source-ddtdata.length, dc_sysctrl_regs[SB_C2DSTAT],dc_sysctrl_regs[SB_LMMODE0],dc_sysctrl_regs[SB_LMMODE1]);
 			#endif
-			sysctrl_regs[SB_C2DSTAT]=sysctrl_regs[SB_C2DSTAT]+ddtdata.length;
-			sysctrl_regs[SB_C2DLEN]=0;
-			sysctrl_regs[SB_C2DST]=0;
-			sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
+			dc_sysctrl_regs[SB_C2DSTAT]=dc_sysctrl_regs[SB_C2DSTAT]+ddtdata.length;
+			dc_sysctrl_regs[SB_C2DLEN]=0;
+			dc_sysctrl_regs[SB_C2DST]=0;
+			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
 			break;
 
 		case SB_ISTNRM:
-			sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
+			dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
 			break;
 
 		case SB_ISTEXT:
-			sysctrl_regs[SB_ISTEXT] = old;
+			dc_sysctrl_regs[SB_ISTEXT] = old;
 			break;
 
 		case SB_ISTERR:
-			sysctrl_regs[SB_ISTERR] = old & ~dat;
+			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
 			break;
 	}
 	update_interrupt_status();
@@ -530,10 +530,10 @@ WRITE64_HANDLER( dc_maple_w )
 												maple0x86data2[pos+14]=readinputportbytag("IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
 												// second function
 												maple0x86data2[pos+15]=1; // report
-												maple0x86data2[pos+16]=(coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
-												maple0x86data2[pos+17]=coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
-												maple0x86data2[pos+18]=(coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
-												maple0x86data2[pos+19]=coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
+												maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
+												maple0x86data2[pos+17]=dc_coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
+												maple0x86data2[pos+18]=(dc_coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
+												maple0x86data2[pos+19]=dc_coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
 												// third function
 												maple0x86data2[pos+20]=1; // report
 												maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
@@ -620,18 +620,13 @@ WRITE64_HANDLER( dc_maple_w )
 	}
 }
 
-static void coin_slots_callback(void *param, UINT32 oldval, UINT32 newval)
+INPUT_CHANGED( dc_coin_slots_callback )
 {
-UINT32 a,b,c;
+	UINT32 *counter = param;
 
-	c = (newval ^ oldval) & newval;
-	b = 1;
-	for (a=0;a < 2;a++)
-	{
-		if (c & b)
-			coin_counts[a]++;
-		b = b << 1;
-	}
+	/* check for a 0 -> 1 transition */
+	if (!oldval && newval)
+		*counter += 1;
 }
 
 READ64_HANDLER( dc_gdrom_r )
@@ -717,7 +712,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dma_offset, g1bus_regs[SB_GDSTAR]);
 			cpunum_set_info_ptr(0, CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
-			sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 		}
 		break;
 	}
@@ -813,7 +808,6 @@ WRITE64_HANDLER( dc_rtc_w )
 
 MACHINE_START( dc )
 {
-	input_port_set_changed_callback(port_tag_to_index("COINS"), 0x03, coin_slots_callback, NULL);
 }
 
 MACHINE_RESET( dc )
@@ -823,12 +817,12 @@ MACHINE_RESET( dc )
 	/* halt the ARM7 */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
-	memset(sysctrl_regs, 0, sizeof(sysctrl_regs));
+	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 	memset(maple_regs, 0, sizeof(maple_regs));
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
-	memset(coin_counts, 0, sizeof(coin_counts));
+	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
-	sysctrl_regs[SB_SBREV] = 0x0b;
+	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 	for (a=0;a < 0x80;a++)
 		maple0x86data1[a]=0x11+a;
 

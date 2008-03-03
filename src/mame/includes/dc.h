@@ -34,8 +34,10 @@ MACHINE_RESET( dc );
 
 int compute_interrupt_level(void);
 void update_interrupt_status(void);
+INPUT_CHANGED( dc_coin_slots_callback );
 
-extern UINT32 sysctrl_regs[0x200/4];
+extern UINT32 dc_sysctrl_regs[0x200/4];
+extern UINT32 dc_coin_counts[2];
 
                       /*address*/
 #define SB_C2DSTAT	((0x005F6800-0x005F6800)/4)

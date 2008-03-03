@@ -303,7 +303,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 				a = 1 << 21;
 				break;
 			}
-			sysctrl_regs[SB_ISTNRM] |= a;
+			dc_sysctrl_regs[SB_ISTNRM] |= a;
 			update_interrupt_status();
 			tafifo_listtype= -1; // no list being received
 		}
@@ -611,7 +611,7 @@ static void pvr_build_parameterconfig(void)
 
 TIMER_CALLBACK(vbout)
 {
-	sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	update_interrupt_status();
 
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
@@ -655,7 +655,7 @@ VIDEO_UPDATE(dc)
 	if (start_render_received)
 	{
 		start_render_received=0;
-		sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 		update_interrupt_status();
 	}
 	return 0;
@@ -663,7 +663,7 @@ VIDEO_UPDATE(dc)
 
 void dc_vblank(void)
 {
-	sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	update_interrupt_status();
 
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(0, 0, 0), 0);

@@ -355,11 +355,11 @@ static UINT16 razmataz_counter;
  *
  *************************************/
 
-static void service_switch(void *param, UINT32 oldval, UINT32 newval)
+static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -387,9 +387,6 @@ static WRITE8_HANDLER( int_enable_w )
 
 static MACHINE_START( zaxxon )
 {
-	/* request a callback if the service switch is pressed */
-	input_port_set_changed_callback(port_tag_to_index("SERVICESW"), 0x01, service_switch, NULL);
-
 	/* register for save states */
 	state_save_register_global(int_enabled);
 }
@@ -567,7 +564,7 @@ static INPUT_PORTS_START( zaxxon )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
 
 	PORT_START_TAG("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
 
 	PORT_START_TAG("DSW02")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!1,!2")

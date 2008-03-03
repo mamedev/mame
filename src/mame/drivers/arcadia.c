@@ -78,20 +78,6 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
 
 /*************************************
  *
- *  Special port handlers
- *
- *************************************/
-
-static CUSTOM_INPUT( arcadia_coin_counter_r )
-{
-	/* return coin counter values */
-	return *(UINT8 *)param & 3;
-}
-
-
-
-/*************************************
- *
  *  CIA-A port A access:
  *
  *  PA7 = game port 1, pin 6 (fire)
@@ -170,7 +156,14 @@ static void arcadia_cia_0_portb_w(UINT8 data)
  *
  *************************************/
 
-static void coin_changed_callback(void *param, UINT32 oldval, UINT32 newval)
+static CUSTOM_INPUT( coin_counter_r )
+{
+	/* return coin counter values */
+	return *(UINT8 *)param & 3;
+}
+
+
+static INPUT_CHANGED( coin_changed_callback )
 {
 	UINT8 *counter = param;
 
@@ -230,8 +223,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(arcadia_coin_counter_r, &coin_counter[0])
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(arcadia_coin_counter_r, &coin_counter[1])
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, &coin_counter[0])
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, &coin_counter[1])
 
 	PORT_START_TAG("JOY0DAT")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
@@ -261,8 +254,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START_TAG("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed_callback, &coin_counter[0])
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_changed_callback, &coin_counter[1])
 INPUT_PORTS_END
 
 
@@ -683,10 +676,6 @@ static void arcadia_init(void)
 	biosrom = (UINT16 *)memory_region(REGION_USER2);
 	if (biosrom[0] != 0x4afc)
 		generic_decode(REGION_USER2, 6, 1, 0, 2, 3, 4, 5, 7);
-
-	/* request notifications when the coins change */
-	input_port_set_changed_callback(port_tag_to_index("COINS"), 0x01, coin_changed_callback, &coin_counter[0]);
-	input_port_set_changed_callback(port_tag_to_index("COINS"), 0x02, coin_changed_callback, &coin_counter[1]);
 }
 
 
