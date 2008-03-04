@@ -8,21 +8,6 @@
 
 
 #define EXIDY440_MASTER_CLOCK		(XTAL_12_9792MHz)
-#define EXIDY440_MAIN_CPU_CLOCK		(EXIDY440_MASTER_CLOCK / 8)
-#define EXIDY440_PIXEL_CLOCK		(EXIDY440_MASTER_CLOCK / 2)
-#define EXIDY440_HTOTAL				(0x1a0)
-#define EXIDY440_HBEND				(0x000)
-#define EXIDY440_HBSTART			(0x140)
-#define EXIDY440_HSEND				(0x178)
-#define EXIDY440_HSSTART			(0x160)
-#define EXIDY440_VTOTAL				(0x104)
-#define EXIDY440_VBEND				(0x000)
-#define EXIDY440_VBSTART			(0x0f0)
-#define EXIDY440_VSEND				(0x0f8)
-#define EXIDY440_VSSTART			(0x0f0)
-
-/* Top Secret has a larger VBLANK area */
-#define TOPSECEX_VBSTART			(0x0ec)
 
 
 /*----------- defined in drivers/exidy440.c -----------*/
@@ -48,10 +33,6 @@ extern UINT8 *topsecex_yscroll;
 
 INTERRUPT_GEN( exidy440_vblank_interrupt );
 
-VIDEO_START( exidy440 );
-VIDEO_EOF( exidy440 );
-VIDEO_UPDATE( exidy440 );
-
 READ8_HANDLER( exidy440_videoram_r );
 WRITE8_HANDLER( exidy440_videoram_w );
 READ8_HANDLER( exidy440_paletteram_r );
@@ -61,3 +42,6 @@ WRITE8_HANDLER( exidy440_control_w );
 READ8_HANDLER( exidy440_vertical_pos_r );
 READ8_HANDLER( exidy440_horizontal_pos_r );
 WRITE8_HANDLER( exidy440_interrupt_clear_w );
+
+MACHINE_DRIVER_EXTERN( exidy440_video );
+MACHINE_DRIVER_EXTERN( topsecex_video );

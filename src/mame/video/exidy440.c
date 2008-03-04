@@ -8,7 +8,23 @@
 #include "deprecat.h"
 #include "exidy440.h"
 
-#define SPRITE_COUNT		40
+
+#define PIXEL_CLOCK			(EXIDY440_MASTER_CLOCK / 2)
+#define HTOTAL				(0x1a0)
+#define HBEND				(0x000)
+#define HBSTART				(0x140)
+#define HSEND				(0x178)
+#define HSSTART				(0x160)
+#define VTOTAL				(0x104)
+#define VBEND				(0x000)
+#define VBSTART				(0x0f0)
+#define VSEND				(0x0f8)
+#define VSSTART				(0x0f0)
+
+/* Top Secret has a larger VBLANK area */
+#define TOPSECEX_VBSTART	(0x0ec)
+
+#define SPRITE_COUNT		(0x28)
 
 
 /* globals */
@@ -28,7 +44,6 @@ static UINT8 firq_enable;
 static UINT8 firq_select;
 static UINT8 palettebank_io;
 static UINT8 palettebank_vis;
-static UINT8 is_topsecex;
 
 /* function prototypes */
 static void exidy440_update_firq(running_machine *machine);
@@ -41,7 +56,7 @@ static void exidy440_update_firq(running_machine *machine);
  *
  *************************************/
 
-VIDEO_START( exidy440 )
+static VIDEO_START( exidy440 )
 {
 	/* reset the system */
 	firq_enable = 0;
@@ -51,15 +66,6 @@ VIDEO_START( exidy440 )
 	exidy440_firq_vblank = 0;
 	exidy440_firq_beam = 0;
 
-	/* if Top Secret, reset scroll position */
-	if (topsecex_yscroll != NULL)
-	{
-		is_topsecex = TRUE;
-		*topsecex_yscroll = 0;
-	}
-	else
-		is_topsecex = FALSE;
-
 	/* allocate a buffer for VRAM */
 	local_videoram = auto_malloc(256 * 256 * 2);
 	memset(local_videoram, 0, 256 * 256 * 2);
@@ -67,6 +73,14 @@ VIDEO_START( exidy440 )
 	/* allocate a buffer for palette RAM */
 	local_paletteram = auto_malloc(512 * 2);
 	memset(local_paletteram, 0, 512 * 2);
+}
+
+
+static VIDEO_START( topsecex )
+{
+	VIDEO_START_CALL(exidy440);
+
+	*topsecex_yscroll = 0;
 }
 
 
@@ -293,15 +307,13 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset)
+static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset, int check_collision)
 {
 	int i;
 
 	/* get a pointer to the palette to look for collision flags */
 	UINT8 *palette = &local_paletteram[palettebank_vis * 512];
-
-	/* start the count high for topsecret, which doesn't use collision flags */
-	int count = is_topsecex ? 128 : 0;
+	int count = 0;
 
 	/* draw the sprite images, checking for collisions along the way */
 	UINT8 *sprite = spriteram + (SPRITE_COUNT - 1) * 4;
@@ -330,10 +342,10 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
 		for (y = 0; y < 16; y++, yoffs--, sy--)
 		{
 			/* wrap at the top and bottom of the screen */
-			if (sy >= EXIDY440_VBSTART)
-				sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
-			else if (sy < EXIDY440_VBEND)
-				sy += (EXIDY440_VBSTART - EXIDY440_VBEND);
+			if (sy >= VBSTART)
+				sy -= (VBSTART - VBEND);
+			else if (sy < VBEND)
+				sy += (VBSTART - VBEND);
 
 			/* stop if we get before the current scanline */
 			if (yoffs < cliprect->min_y)
@@ -354,27 +366,27 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
 					int pen;
 
 					/* left pixel */
-					if (left && EXIDY440_HBEND >= 0 && currx < EXIDY440_HBSTART)
+					if (left && HBEND >= 0 && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = left | old[0];
 						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
 
 						/* check the collisions bit */
-						if ((palette[2 * pen] & 0x80) && count++ < 128)
+						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
 							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 
 					/* right pixel */
-					if (right && EXIDY440_HBEND >= 0 && currx < EXIDY440_HBSTART)
+					if (right && HBEND >= 0 && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = right | old[1];
 						*BITMAP_ADDR16(bitmap, yoffs, currx) = pen;
 
 						/* check the collisions bit */
-						if ((palette[2 * pen] & 0x80) && count++ < 128)
+						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
 							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
@@ -394,7 +406,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
  *
  *************************************/
 
-static void update_screen(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset)
+static void update_screen(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset, int check_collision)
 {
 	int y, sy;
 
@@ -403,15 +415,15 @@ static void update_screen(running_machine *machine, bitmap_t *bitmap, const rect
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++, sy++)
 	{
 		/* wrap at the bottom of the screen */
-		if (sy >= EXIDY440_VBSTART)
-			sy -= (EXIDY440_VBSTART - EXIDY440_VBEND);
+		if (sy >= VBSTART)
+			sy -= (VBSTART - VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (EXIDY440_HBSTART - EXIDY440_HBEND), &local_videoram[sy * 512], NULL, -1);
+		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &local_videoram[sy * 512], NULL, -1);
 	}
 
 	/* draw the sprites */
-	draw_sprites(bitmap, cliprect, scroll_offset);
+	draw_sprites(bitmap, cliprect, scroll_offset, check_collision);
 }
 
 
@@ -422,13 +434,42 @@ static void update_screen(running_machine *machine, bitmap_t *bitmap, const rect
  *
  *************************************/
 
-VIDEO_UPDATE( exidy440 )
+static VIDEO_UPDATE( exidy440 )
 {
 	/* redraw the screen */
-	if (is_topsecex)
-		update_screen(machine, bitmap, cliprect, *topsecex_yscroll);
-	else
-		update_screen(machine, bitmap, cliprect, 0);
+	update_screen(bitmap, cliprect, 0, TRUE);
+
+	/* generate an interrupt once/frame for the beam */
+	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	{
+		int i;
+
+		int beamx = ((input_port_4_r(0) & 0xff) * (HBSTART - HBEND)) >> 8;
+		int beamy = ((input_port_5_r(0) & 0xff) * (VBSTART - VBEND)) >> 8;
+
+		/* The timing of this FIRQ is very important. The games look for an FIRQ
+			and then wait about 650 cycles, clear the old FIRQ, and wait a
+			very short period of time (~130 cycles) for another one to come in.
+			From this, it appears that they are expecting to get beams over
+			a 12 scanline period, and trying to pick roughly the middle one.
+			This is how it is implemented. */
+		attoseconds_t increment = attotime_to_attoseconds(video_screen_get_scan_period(0));
+		attotime time = attotime_sub(video_screen_get_time_until_pos(0, beamy, beamx), attotime_make(0, increment * 6));
+		for (i = 0; i <= 12; i++)
+		{
+			timer_set(time, NULL, beamx, beam_firq_callback);
+			time = attotime_add(time, attotime_make(0, increment));
+		}
+	}
+
+	return 0;
+}
+
+
+static VIDEO_UPDATE( topsecex )
+{
+	/* redraw the screen */
+	update_screen(bitmap, cliprect, *topsecex_yscroll, FALSE);
 
 	return 0;
 }
@@ -437,35 +478,27 @@ VIDEO_UPDATE( exidy440 )
 
 /*************************************
  *
- *  Standard screen refresh callback
+ *  Machine drivers
  *
  *************************************/
 
-VIDEO_EOF( exidy440 )
-{
-	/* generate an interrupt once/frame for the beam */
-	if (!is_topsecex)
-	{
-		attotime time;
-		attoseconds_t increment;
-		int beamx, beamy;
-		int i;
+MACHINE_DRIVER_START( exidy440_video )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MDRV_VIDEO_START(exidy440)
+	MDRV_VIDEO_UPDATE(exidy440)
+	MDRV_PALETTE_LENGTH(256)
 
-		beamx = ((input_port_4_r(0) & 0xff) * (EXIDY440_HBSTART - EXIDY440_HBEND)) >> 8;
-		beamy = ((input_port_5_r(0) & 0xff) * (EXIDY440_VBSTART - EXIDY440_VBEND)) >> 8;
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+MACHINE_DRIVER_END
 
-		/* The timing of this FIRQ is very important. The games look for an FIRQ
-            and then wait about 650 cycles, clear the old FIRQ, and wait a
-            very short period of time (~130 cycles) for another one to come in.
-            From this, it appears that they are expecting to get beams over
-            a 12 scanline period, and trying to pick roughly the middle one.
-            This is how it is implemented. */
-		increment = attotime_to_attoseconds(video_screen_get_scan_period(0));
-		time = attotime_sub(video_screen_get_time_until_pos(0, beamy, beamx), attotime_make(0, increment * 6));
-		for (i = 0; i <= 12; i++)
-		{
-			timer_set(time, NULL, beamx, beam_firq_callback);
-			time = attotime_add(time, attotime_make(0, increment));
-		}
-	}
-}
+
+MACHINE_DRIVER_START( topsecex_video )
+	MDRV_VIDEO_ATTRIBUTES(0)
+	MDRV_VIDEO_START(topsecex)
+	MDRV_VIDEO_UPDATE(topsecex)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, TOPSECEX_VBSTART)
+MACHINE_DRIVER_END
